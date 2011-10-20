@@ -14,7 +14,7 @@
   #define HPX_UNLIKELY(expr)  __builtin_expect(expr, false)
 #else
   #define HPX_LIKELY(expr)    expr
-  #define HPX_UNLIKELY(expr)  expr 
+  #define HPX_UNLIKELY(expr)  expr
 #endif
 
 #endif // HPX_50B9885A_AAD3_48C5_814A_EBCD47C858AC

@@ -1,4 +1,4 @@
-/** 
+/**
 @page page_changelog Changelog
 
 @section changelog_cur_ver Current Version: v0.22.8, 4 feb 2008
@@ -38,18 +38,18 @@ v0.21.13, 1 feb 2008
 
 v0.20.16, 21 jan 2008
 - docs about using loggers/filters are they were destroyed
-- more docs about @ref defining_your_logger_filter 
+- more docs about @ref defining_your_logger_filter
 - added example using profiling, @ref common_scenario_profile "see it"
 - refactored finding the writer; added logger_to_writer class
-- fully implemented profiling 
-- added logger_to_gather, removed DEFINE_GATHER_CLASS; 
+- fully implemented profiling
+- added logger_to_gather, removed DEFINE_GATHER_CLASS;
 - modified compile_time example, to see compile time with precompiled header
 - added profiler - allow profiling the logging code
 - solved bug in logger_holder_by_value - many thanks to Olaf!
-- refactored logger_holder - that is, we need to return logger_holder, 
+- refactored logger_holder - that is, we need to return logger_holder,
   but keep logger_holder_by_value, for after_destroyed to work
-- added test for using logger after it's been destroyed 
-- handle using logger after it's been destroyed 
+- added test for using logger after it's been destroyed
+- handle using logger after it's been destroyed
 - simpler version of logger (derive from logger_base)
 - added dll_and_exe - show how you can use a logger that is defined in a DLL, and use it from an EXE
 - explained the breaking change in the docs
@@ -84,7 +84,7 @@ v0.12.13, 29 dec 2007
 - added possibility to flush a rolling file, and fixed a bug
 - added high precision_time tag
 - added new includes for files to be able to be compiled standalone - many thanks Jens Seidel!
-- added high precision timer 
+- added high precision timer
 - removed "#define BOOST_LOG_COMPILE_FAST_OFF" from samples - no needed and could be misleading
 - added boost::logging::formatter::named_spacer
 - created lock_resource_finder namespace - with existing resource lockers
@@ -130,7 +130,7 @@ v0.10.12, 8 nov 2007
 
 v0.10.9, 3 nov 2007
 - added virtual destructor for logger<gather,default_> - many thanks Martin Baeker!
-- added TSS tests 
+- added TSS tests
   - test test_ts_resource_with_cache SUCCESSFUL on win32, vs2005
   - test test_tss SUCCESSFUL on win32, vs2005
   - test test_simple_tss SUCCESSFUL on win32, vs2005
@@ -165,19 +165,19 @@ v0.9.6, 30 oct 2007
 - removed garbage from stdafx.h files - so that it can be compiled under Linux
 
 v0.9.5, 30 oct 2007
-- compiles with gcc 4.1 and 4.3 
+- compiles with gcc 4.1 and 4.3
   (note: I just solved some errors that were pointed out by Jens Seidel, not sure if this fixed everything)
 
 v0.9.4, 30 oct 2007
 - compiles with gcc 3.4.2
 
 v0.9.3, 30 oct 2007
-- updated documentation 
+- updated documentation
     - updated workflow/most of the pages in the table of contents
     - removed most of references to @c process_msg class
 
 v0.9.2, 30 oct 2007
-- Breaking chage: 
+- Breaking chage:
   - @c process_msg class has been removed. Now @c logger takes its place
   - Instead of logger<use_format_write<>>, use logger_format_write<>
 
@@ -186,18 +186,18 @@ v0.9.1, 30 oct 2007
 - BEFORE a breaking change that will happen :
   - logger as is now will dissapear
   - the new logger class will be the old process_msg class
-  
+
 
 v0.9.0, 28 oct 2007
-- use_format_write has 4 params now, I've added 2 new params: thread_safety and gather 
+- use_format_write has 4 params now, I've added 2 new params: thread_safety and gather
   - if you want to leave something unchanged, use "default_" as argument
 - added more complex example: Line Counter application
-- Breaking change: 
+- Breaking change:
   - filters are declared with BOOST_DECLARE_LOG_FILTER, and defined with BOOST_DEFINE_LOG_FILTER
   - filters are now used with operator->, instead of "."
-  - Example: 
-		BOOST_DEFINE_LOG_LEVEL(g_log_level(), level::holder ) 
-		... 
+  - Example:
+		BOOST_DEFINE_LOG_LEVEL(g_log_level(), level::holder )
+		...
 		g_log_level()->set_enabled(level::error);
   - rationale: filters, same as levels, could be used before main
 

@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef BOOST_PP_IS_ITERATING
@@ -37,7 +37,7 @@ namespace hpx { namespace components { namespace server
     naming::gid_type create (std::size_t count, error_code& ec = throws)
     {
         if (0 == count) {
-            HPX_THROWS_IF(ec, hpx::bad_parameter, 
+            HPX_THROWS_IF(ec, hpx::bad_parameter,
                 "create<Component>", "count shouldn't be zero");
             return naming::invalid_gid;
         }
@@ -56,7 +56,7 @@ namespace hpx { namespace components { namespace server
         strm << "global id " << gid << " is already bound to a different "
                 "component instance";
         HPX_THROWS_IF(ec, hpx::duplicate_component_address,
-            "create<Component>", 
+            "create<Component>",
             hpx::util::osstream_get_string(strm));
 
         return naming::invalid_gid;
@@ -69,7 +69,7 @@ namespace hpx { namespace components { namespace server
         // retrieve the local address bound to the given global id
         applier::applier& appl = hpx::applier::get_applier();
         naming::address addr;
-        if (!appl.get_agas_client().resolve(gid, addr)) 
+        if (!appl.get_agas_client().resolve(gid, addr))
         {
             hpx::util::osstream strm;
             strm << "global id " << gid << " is not bound to any "
@@ -80,7 +80,7 @@ namespace hpx { namespace components { namespace server
         }
 
         // make sure this component is located here
-        if (appl.here() != addr.locality_) 
+        if (appl.here() != addr.locality_)
         {
             // FIXME: should the component be re-bound ?
             hpx::util::osstream strm;
@@ -92,7 +92,7 @@ namespace hpx { namespace components { namespace server
         }
 
         // make sure it's the correct component type
-        components::component_type type = 
+        components::component_type type =
             components::get_component_type<typename Component::wrapped_type>();
         if (!types_are_compatible(type, addr.type_))
         {
@@ -100,7 +100,7 @@ namespace hpx { namespace components { namespace server
             hpx::util::osstream strm;
             strm << "global id " << gid << " is not bound to a component "
                     "instance of type: " << get_component_type_name(type)
-                 << " (it is bound to a " << get_component_type_name(addr.type_) 
+                 << " (it is bound to a " << get_component_type_name(addr.type_)
                  << ")";
             HPX_THROWS_IF(ec, hpx::unknown_component_address,
                 "destroy<Component>", hpx::util::osstream_get_string(strm));
@@ -127,7 +127,7 @@ namespace hpx { namespace components { namespace server
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// Create single instances of a component using additional constructor 
+    /// Create single instances of a component using additional constructor
     /// parameters
     // FIXME: error code?
     template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename T)>
@@ -136,7 +136,7 @@ namespace hpx { namespace components { namespace server
         Component* c = static_cast<Component*>(
             Component::create_one(BOOST_PP_ENUM_PARAMS(N, t)));
         naming::gid_type gid = c->get_base_gid();
-        if (gid) 
+        if (gid)
             return gid;
 
         delete c;
@@ -145,7 +145,7 @@ namespace hpx { namespace components { namespace server
         strm << "global id " << gid << " is already bound to a different "
                 "component instance";
         HPX_THROW_EXCEPTION(hpx::duplicate_component_address,
-            "create_one<Component>", 
+            "create_one<Component>",
             hpx::util::osstream_get_string(strm));
 
         return naming::invalid_gid;

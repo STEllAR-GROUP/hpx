@@ -111,7 +111,7 @@ private:
         }
         else
             // no suffix
-            m_prefix = format_str; 
+            m_prefix = format_str;
     }
 
 private:
@@ -141,7 +141,7 @@ private:
         }
         else
             // no suffix
-            m_prefix = format_str; 
+            m_prefix = format_str;
     }
 
 private:
@@ -165,7 +165,7 @@ namespace detail {
     };
 }
 
-/** 
+/**
     @copydoc spacer_t
 */
 template<class original_formatter> typename detail::find_spacer<original_formatter>::type spacer(const original_formatter & fmt, const char_type* format_str) {

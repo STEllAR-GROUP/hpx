@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2009-2011 Matthew Anderson
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
@@ -28,15 +28,15 @@ typedef hpx::components::amr::server::logging dataflow_logging_type;
 /// The following construct registers a minimal factory needed for the creation
 /// of new stencil instances. The name used as the second macro parameter
 /// must match the component name used in the ini configuration file used
-/// for this component. For instance the configuration file amr.ini may look 
+/// for this component. For instance the configuration file amr.ini may look
 /// like:
-/// 
+///
 /// [hpx.components.dataflow_stencil]  # this must match the string below
 /// name = had_amr_test           # this must match the name of the shared library
 /// path = $[hpx.location]/lib    # this is the default location where to find the shared library
 ///
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
-    hpx::components::simple_component<dataflow_stencil_type>, 
+    hpx::components::simple_component<dataflow_stencil_type>,
     dataflow_stencil, "dataflow_functional_component_type");
 
 HPX_DEFINE_GET_COMPONENT_TYPE(dataflow_stencil_type);

@@ -21,7 +21,7 @@
  *  For now resort to inline asm.
  */
 
-//     RDI is &from.sp	
+//     RDI is &from.sp
 //     RSI is to.sp
 //
 //     This is the simplest version of swapcontext

@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_SHENEOS_PARTITION3D_AUG_08_2011_1220PM)
@@ -22,13 +22,13 @@ namespace sheneos { namespace server
     private:
         typedef hpx::components::simple_component_base<partition3d> base_type;
 
-        inline void init_dimension(std::string const&, int, dimension const&, 
+        inline void init_dimension(std::string const&, int, dimension const&,
             char const*, boost::scoped_array<double>&);
-        inline void init_data(std::string const& datafilename, 
-            char const* name, boost::scoped_array<double>& values, 
+        inline void init_data(std::string const& datafilename,
+            char const* name, boost::scoped_array<double>& values,
             std::size_t array_size);
         inline std::size_t get_index(int d, double value);
-        inline double interpolate(double* values, 
+        inline double interpolate(double* values,
             std::size_t idx_x, std::size_t idx_y, std::size_t idx_z,
             double delta_ye, double delta_logtemp, double delta_logrho);
 
@@ -69,7 +69,7 @@ namespace sheneos { namespace server
         typedef partition3d wrapping_type;
 
         ///////////////////////////////////////////////////////////////////////
-        // parcel action code: the action to be performed on the destination 
+        // parcel action code: the action to be performed on the destination
         // object (the accumulator)
         enum actions
         {
@@ -78,9 +78,9 @@ namespace sheneos { namespace server
         };
 
         // exposed functionality
-        void init(std::string const&, dimension const&, dimension const&, 
+        void init(std::string const&, dimension const&, dimension const&,
             dimension const&);
-        std::vector<double> interpolate(double ye, double temp, double rho, 
+        std::vector<double> interpolate(double ye, double temp, double rho,
             boost::uint32_t eosvalues);
 
         ///////////////////////////////////////////////////////////////////////
@@ -88,13 +88,13 @@ namespace sheneos { namespace server
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::action4<
-            partition3d, partition3d_init, std::string const&, 
+            partition3d, partition3d_init, std::string const&,
             dimension const&, dimension const&, dimension const&,
             &partition3d::init
         > init_action;
 
         typedef hpx::actions::result_action4<
-            partition3d, std::vector<double>, partition3d_interpolate, 
+            partition3d, std::vector<double>, partition3d_interpolate,
             double, double, double, boost::uint32_t, &partition3d::interpolate
         > interpolate_action;
 

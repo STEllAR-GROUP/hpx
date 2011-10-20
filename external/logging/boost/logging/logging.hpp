@@ -35,7 +35,7 @@
 
 namespace boost { namespace logging {
 
-/** 
+/**
 @file boost/logging/logging.hpp
 
 Include this file when you're using the logging lib, but don't necessarily want to use @ref manipulator "formatters and destinations".

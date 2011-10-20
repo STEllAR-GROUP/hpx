@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_RUNTIME_ACTIONS_CONTINUATION_JUN_13_2008_1031AM)
@@ -25,7 +25,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
-    // parcel continuations are simply lists of global ids of LCO's to call 
+    // parcel continuations are simply lists of global ids of LCO's to call
     // set_event on
     class HPX_EXPORT continuation
     {
@@ -51,7 +51,7 @@ namespace hpx { namespace actions
         void enumerate_argument_gids(enum_gid_handler_type);
 
     private:
-        // serialization support    
+        // serialization support
         friend class boost::serialization::access;
 
         template<class Archive>

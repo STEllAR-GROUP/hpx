@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_COMPONENTS_RUNTIME_SUPPORT_JUN_03_2008_0438PM)
@@ -10,10 +10,10 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 
-namespace hpx { namespace components 
+namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// The \a runtime_support class is the client side representation of a 
+    /// The \a runtime_support class is the client side representation of a
     /// \a server#runtime_support component
     class runtime_support : public stubs::runtime_support
     {
@@ -23,8 +23,8 @@ namespace hpx { namespace components
     public:
         /// Create a client side representation for the existing
         /// \a server#runtime_support instance with the given global id \a gid.
-        runtime_support(naming::id_type const& gid = naming::invalid_id) 
-          : gid_(naming::invalid_id == gid ? 
+        runtime_support(naming::id_type const& gid = naming::invalid_id)
+          : gid_(naming::invalid_id == gid ?
                 naming::id_type(
                     applier::get_applier().get_runtime_support_raw_gid(),
                     naming::id_type::unmanaged
@@ -34,33 +34,33 @@ namespace hpx { namespace components
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
-        /// \brief  The function \a get_factory_properties is used to 
-        ///         determine, whether instances of the derived component can 
-        ///         be created in blocks (i.e. more than one instance at once). 
-        ///         This function is used by the \a distributing_factory to 
+        /// \brief  The function \a get_factory_properties is used to
+        ///         determine, whether instances of the derived component can
+        ///         be created in blocks (i.e. more than one instance at once).
+        ///         This function is used by the \a distributing_factory to
         ///         determine a correct allocation strategy
-        int get_factory_properties(components::component_type type) 
+        int get_factory_properties(components::component_type type)
         {
             return this->base_type::get_factory_properties(gid_, type);
         }
 
-        lcos::promise<int> 
-        get_factory_properties_async(components::component_type type) 
+        lcos::promise<int>
+        get_factory_properties_async(components::component_type type)
         {
             return this->base_type::get_factory_properties_async(gid_, type);
         }
 
-        /// Create a new component type using the runtime_support 
+        /// Create a new component type using the runtime_support
         naming::id_type create_component(
-            components::component_type type, std::size_t count = 1) 
+            components::component_type type, std::size_t count = 1)
         {
             return this->base_type::create_component(gid_, type, count);
         }
 
-        /// Asynchronously create a new component using the runtime_support 
-        lcos::promise<naming::id_type, naming::gid_type> 
-        create_component_async(components::component_type type, 
-            std::size_t count = 1) 
+        /// Asynchronously create a new component using the runtime_support
+        lcos::promise<naming::id_type, naming::gid_type>
+        create_component_async(components::component_type type,
+            std::size_t count = 1)
         {
             return this->base_type::create_component_async(gid_, type, count);
         }
@@ -69,51 +69,51 @@ namespace hpx { namespace components
         /// generic argument to the constructor.
         template <typename Arg0>
         naming::id_type create_one_component(
-            components::component_type type, Arg0 const& arg0) 
+            components::component_type type, Arg0 const& arg0)
         {
             return this->base_type::create_one_component(gid_, type, arg0);
         }
 
-        /// Asynchronously create a new component using the runtime_support. 
-        /// Pass one generic argument to the constructor. 
+        /// Asynchronously create a new component using the runtime_support.
+        /// Pass one generic argument to the constructor.
         template <typename Arg0>
-        lcos::promise<naming::id_type, naming::gid_type> 
-        create_component_async(components::component_type type, 
-            Arg0 const& arg0) 
+        lcos::promise<naming::id_type, naming::gid_type>
+        create_component_async(components::component_type type,
+            Arg0 const& arg0)
         {
             return this->base_type::create_one_component_async(gid_, type, arg0);
         }
 
-        /// Create a new memory block using the runtime_support 
+        /// Create a new memory block using the runtime_support
 //         template <typename T>
-//         naming::id_type create_memory_block(std::size_t count, 
-//             hpx::actions::manage_object_action<T> const& act) 
+//         naming::id_type create_memory_block(std::size_t count,
+//             hpx::actions::manage_object_action<T> const& act)
 //         {
 //             return this->base_type::create_memory_block(gid_, count, act);
 //         }
-// 
-//         /// Asynchronously create a new memory block using the runtime_support 
+//
+//         /// Asynchronously create a new memory block using the runtime_support
 //         template <typename T>
-//         lcos::promise<naming::id_type, naming::gid_type> 
+//         lcos::promise<naming::id_type, naming::gid_type>
 //         create_memory_block_async(std::size_t count,
-//             hpx::actions::manage_object_action<T> const& act) 
+//             hpx::actions::manage_object_action<T> const& act)
 //         {
 //             return this->base_type::create_memory_block_async(gid_, count, act);
 //         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename T, typename Config>
-        naming::id_type create_memory_block(std::size_t count, 
-            hpx::actions::manage_object_action<T, Config> const& act) 
+        naming::id_type create_memory_block(std::size_t count,
+            hpx::actions::manage_object_action<T, Config> const& act)
         {
             return this->base_type::create_memory_block(gid_, count, act);
         }
 
-        /// Asynchronously create a new memory block using the runtime_support 
+        /// Asynchronously create a new memory block using the runtime_support
         template <typename T, typename Config>
-        lcos::promise<naming::id_type, naming::gid_type> 
+        lcos::promise<naming::id_type, naming::gid_type>
         create_memory_block_async(std::size_t count,
-            hpx::actions::manage_object_action<T, Config> const& act) 
+            hpx::actions::manage_object_action<T, Config> const& act)
         {
             return this->base_type::create_memory_block_async(gid_, count, act);
         }

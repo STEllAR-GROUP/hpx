@@ -33,7 +33,7 @@ namespace detail {
 } // namespace detail
 
 
-/** 
+/**
     @brief Allows using a log without knowing its full type yet. Even if the log is not fully @b defined, you can still use it.
 
     This will allow you to log messages even if you don't know the full type of the log (which can aid compilation time).
@@ -47,7 +47,7 @@ template<class type> struct logger_holder {
     const type* operator->() const      { return m_log; }
     type* operator->()                  { return m_log; }
 
-    /** 
+    /**
         in case you want to get the real log object
     */
     const type* get() const             { return m_log; }
@@ -75,7 +75,7 @@ private:
 
 
 
-/** 
+/**
     @brief Allows using a log without knowing its full type yet. Even if the log is not fully @b defined, you can still use it.
 
     This will allow you to log messages even if you don't know the full type of the log (which can aid compilation time).
@@ -98,7 +98,7 @@ private:
 };
 
 
-/** 
+/**
     @brief Allows using a log without knowing its full type yet. Even if the log is not fully @b defined, you can still use it.
 
     This will allow you to log messages even if you don't know the full type of the log (which can aid compilation time).
@@ -107,8 +107,8 @@ template<class type> struct logger_holder_by_ptr : logger_holder<type> {
     typedef logger_holder<type> base_type;
 
     BOOST_LOGGING_FORWARD_CONSTRUCTOR_WITH_NEW_AND_INIT(logger_holder_by_ptr, m_log_ptr, type, init)
-    ~logger_holder_by_ptr() { 
-        delete m_log_ptr; 
+    ~logger_holder_by_ptr() {
+        delete m_log_ptr;
     }
 private:
     void init() {
@@ -124,7 +124,7 @@ private:
 
 
 
-/** 
+/**
     @brief Ensures the log is created before main(), even if not used before main
 
     We need this, so that we won't run into multi-threaded issues while the log is created
@@ -149,7 +149,7 @@ struct ensure_early_log_creation {
 };
 
 
-/** 
+/**
     @brief Ensures the filter is created before main(), even if not used before main
 
     We need this, so that we won't run into multi-threaded issues while the filter is created
@@ -158,7 +158,7 @@ struct ensure_early_log_creation {
 */
 typedef ensure_early_log_creation ensure_early_filter_creation;
 
-/** 
+/**
     Useful for logger_holder - to get the logger' base (so that we can use it even without knowing the full log's definition).
 
     If used on a logger, it just returns it .
@@ -166,11 +166,11 @@ typedef ensure_early_log_creation ensure_early_filter_creation;
 template<class logger> inline logger* get_logger_base(logger * l) { return l; }
 template<class logger> inline const logger* get_logger_base(const logger * l) { return l; }
 
-template<class type> inline typename logger_holder<type>::logger_base_type* get_logger_base(logger_holder<type> & l) { 
-    return l.base(); 
+template<class type> inline typename logger_holder<type>::logger_base_type* get_logger_base(logger_holder<type> & l) {
+    return l.base();
 }
-template<class type> inline const typename logger_holder<type>::logger_base_type* get_logger_base(const logger_holder<type> & l) { 
-    return l.base(); 
+template<class type> inline const typename logger_holder<type>::logger_base_type* get_logger_base(const logger_holder<type> & l) {
+    return l.base();
 }
 
 

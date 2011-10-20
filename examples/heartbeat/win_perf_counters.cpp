@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -31,7 +31,7 @@ void install_windows_counters()
     // CounterInitialize starts the provider and initializes the counter sets.
     ULONG status = CounterInitialize(NULL, NULL, NULL, NULL);
     if (status != ERROR_SUCCESS) {
-        std::cerr << "CounterInitialize failed with error code: " 
+        std::cerr << "CounterInitialize failed with error code: "
                   << boost::lexical_cast<std::string>(status);
         return;
     }
@@ -40,7 +40,7 @@ void install_windows_counters()
     queue_counter = PerfCreateInstance(HPXHeartBeat, &QueueLengthGuid, L"Instance_1", 0);
     if (queue_counter == NULL) {
         std::cerr << "PerfCreateInstance for 'sum_queue_counter' failed "
-                     "with error code: " 
+                     "with error code: "
                   << boost::lexical_cast<std::string>(GetLastError());
         return;
     }
@@ -48,7 +48,7 @@ void install_windows_counters()
     avg_queue_counter = PerfCreateInstance(HPXHeartBeat, &QueueLengthGuid, L"Instance_2", 0);
     if (avg_queue_counter == NULL) {
         std::cerr << "PerfCreateInstance for 'avg_queue_counter' failed"
-                     "with error code: " 
+                     "with error code: "
                   << boost::lexical_cast<std::string>(GetLastError());
         return;
     }
@@ -61,7 +61,7 @@ void update_windows_counters(boost::uint64_t value)
     ULONG status = PerfSetULongCounterValue(HPXHeartBeat, queue_counter, 1, value);
     if (status != ERROR_SUCCESS) {
         std::cerr << "PerfSetCounterRefValue for 'sum_queue_counter' failed "
-                     "with error code: " 
+                     "with error code: "
                   << boost::lexical_cast<std::string>(GetLastError());
         return;
     }
@@ -70,7 +70,7 @@ void update_windows_counters(boost::uint64_t value)
     status = PerfSetULongCounterValue(HPXHeartBeat, avg_queue_counter, 2, value);
     if (status != ERROR_SUCCESS) {
         std::cerr << "PerfSetCounterRefValue for 'avg_queue_counter' failed "
-                     "with error code: " 
+                     "with error code: "
                   << boost::lexical_cast<std::string>(GetLastError());
         return;
     }

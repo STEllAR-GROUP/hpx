@@ -16,14 +16,14 @@
 // test_ts_resource.cpp : Defines the entry point for the console application.
 //
 
-/* 
+/*
     Tests tss_resource_with_cache
 
     I have a vector, that is modified by different threads.
 
     Every once in a while I take a snapshot of this vector. Different threads reading this, they will be equal to the last snapshot, or
     the snapshot took before. I repeat this several times, to see that what I write to the vector, really propagates.
-    
+
     Changing the vector:
     - first we start with one element : "0"
     - at each iteration:
@@ -76,7 +76,7 @@ struct dump {
 #ifdef BOOST_WINDOWS
         ::OutputDebugStringA( msg.c_str() );
 #endif
-    }  
+    }
     dump& ref() { return *this; }
     std::ostringstream out;
 };
@@ -107,7 +107,7 @@ resource g_resource( array(), g_cache_period_secs);
 // the current value we've set in the resource
 ts_value<array> g_cur_val;
 // make sure only one thread updates the vector
-mutex g_cur_val_cs; 
+mutex g_cur_val_cs;
 // the index of the current change
 ts_value<int> g_change_idx;
 // at how many iterations do I increase vector size
@@ -180,7 +180,7 @@ void test_resource(int idx) {
         dump_array(cur_val, "resource");
         dump_array(snap, "snapshot");
         dump_array(prev_snap, "prev snapshot");
-        // we throw, so that the program ends (otherwise we could 
+        // we throw, so that the program ends (otherwise we could
         // get a lot of failed assertions,all dumped at console from different threads)
         throw std::runtime_error("assertion failed");
 //        BOOST_CHECK( false);
@@ -212,7 +212,7 @@ void update_thread() {
     xtime next = g_start;
     int thread_idx = g_thread_idx.get();
     g_thread_idx.set(thread_idx + 1);
- 
+
     while ( true) {
         next.sec += 1;
         thread::sleep( next);
@@ -222,7 +222,7 @@ void update_thread() {
         for ( int i = 0; i < g_update_per_thread_count ; ++i) {
             update_resource();
             do_sleep(10);
-        }        
+        }
         LOG_ << "thread " << thread_idx << " sleeping" << std::endl;
 
         array cur_resource_val ;
@@ -247,15 +247,15 @@ void test_thread() {
 
 void get_snapshot_thread() {
     xtime next = g_start;
-    get_snapshot(); 
- 
+    get_snapshot();
+
     while ( true) {
         const int SECS_BEFORE_END_OF_PASS = 2;
         next.sec += g_cache_period_secs - SECS_BEFORE_END_OF_PASS;
 
         thread::sleep( next);
         // get snapshot after all work has been done
-        get_snapshot(); 
+        get_snapshot();
 
         next.sec += SECS_BEFORE_END_OF_PASS;
         thread::sleep( next);
@@ -282,7 +282,7 @@ int g_test_thread_count = 10;
 
 int g_run_period_secs = 200;
 
-int test_main(int, char *[]) { 
+int test_main(int, char *[]) {
     std::cout << "running test for " << g_run_period_secs << " secs" << std::endl;
     xtime_get( &g_start, TIME_UTC);
 
@@ -298,5 +298,5 @@ int test_main(int, char *[]) {
 	return 0;
 }
 
- 
+
 

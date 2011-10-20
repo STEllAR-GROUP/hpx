@@ -76,7 +76,7 @@ response primary_namespace::service(
         case component_ns_service:
         case primary_ns_service:
         case symbol_ns_service:
-        case invalid_request: 
+        case invalid_request:
         {
             HPX_THROWS_IF(ec, bad_action_code
               , "component_namespace::service"
@@ -104,7 +104,7 @@ response primary_namespace::allocate(
     mutex_type::scoped_lock l(mutex_);
 
     partition_table_type::iterator it = partitions_.find(ep)
-                                 , end = partitions_.end(); 
+                                 , end = partitions_.end();
 
     // If the endpoint is in the table, then this is a resize.
     if (it != end)
@@ -139,26 +139,26 @@ response primary_namespace::allocate(
         // Check for overflow.
         if (upper.get_msb() != lower.get_msb())
         {
-            // Check for address space exhaustion 
+            // Check for address space exhaustion
             if (HPX_UNLIKELY((lower.get_msb() & ~0xFFFFFFFF) == 0xFFFFFFF))
             {
                 HPX_THROWS_IF(ec, internal_server_error
-                  , "primary_namespace::allocate" 
+                  , "primary_namespace::allocate"
                   , "primary namespace has been exhausted");
                 return response();
             }
 
             // Otherwise, correct
             lower = naming::gid_type(upper.get_msb(), 0);
-            upper = lower + real_count; 
+            upper = lower + real_count;
         }
-        
+
         // Store the new upper bound.
         at_c<1>(it->second) = upper;
 
         // Set the initial credit count.
         naming::set_credit_for_gid(lower, HPX_INITIAL_GLOBALCREDIT);
-        naming::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT); 
+        naming::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT);
 
         LAGAS_(info) << (boost::format(
             "primary_namespace::allocate, ep(%1%), count(%2%), "
@@ -182,7 +182,7 @@ response primary_namespace::allocate(
         if (HPX_UNLIKELY(0xFFFFFFFE < partitions_.size()))
         {
             HPX_THROWS_IF(ec, internal_server_error
-              , "primary_namespace::allocate" 
+              , "primary_namespace::allocate"
               , "primary namespace has been exhausted");
             return response();
         }
@@ -200,7 +200,7 @@ response primary_namespace::allocate(
         while (gvas_.count(id))
         {
             prefix = ++prefix_counter_;
-            id = naming::get_gid_from_prefix(prefix); 
+            id = naming::get_gid_from_prefix(prefix);
         }
 
         // Start assigning ids with the second block of 64bit numbers only.
@@ -219,7 +219,7 @@ response primary_namespace::allocate(
             // at some point after we first checked it, which would indicate
             // memory corruption or a locking failure.
             HPX_THROWS_IF(ec, lock_error
-              , "primary_namespace::allocate" 
+              , "primary_namespace::allocate"
               , boost::str(boost::format(
                     "partition table insertion failed due to a locking "
                     "error or memory corruption, endpoint(%1%), "
@@ -237,7 +237,7 @@ response primary_namespace::allocate(
                 std::make_pair(id, g)))))
         {
             HPX_THROWS_IF(ec, lock_error
-              , "primary_namespace::allocate"  
+              , "primary_namespace::allocate"
               , boost::str(boost::format(
                     "GVA table insertion failed due to a locking error "
                     "or memory corruption, gid(%1%), gva(%2%)")
@@ -253,7 +253,7 @@ response primary_namespace::allocate(
 
         // Set the initial credit count.
         naming::set_credit_for_gid(lower, HPX_INITIAL_GLOBALCREDIT);
-        naming::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT); 
+        naming::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT);
 
         LAGAS_(info) << (boost::format(
             "primary_namespace::allocate, ep(%1%), count(%2%), "
@@ -280,7 +280,7 @@ response primary_namespace::bind_gid(
     // parameters
     gva g = req.get_gva();
     naming::gid_type id = req.get_gid();
-    naming::strip_credit_from_gid(id); 
+    naming::strip_credit_from_gid(id);
 
     mutex_type::scoped_lock l(mutex_);
 
@@ -300,7 +300,7 @@ response primary_namespace::bind_gid(
             {
                 // REVIEW: Is this the right error code to use?
                 HPX_THROWS_IF(ec, bad_parameter
-                  , "primary_namespace::bind_gid" 
+                  , "primary_namespace::bind_gid"
                   , "cannot change block size of existing binding");
                 return response();
             }
@@ -308,7 +308,7 @@ response primary_namespace::bind_gid(
             if (HPX_UNLIKELY(g.type == components::component_invalid))
             {
                 HPX_THROWS_IF(ec, bad_parameter
-                  , "primary_namespace::bind_gid" 
+                  , "primary_namespace::bind_gid"
                   , boost::str(boost::format(
                         "attempt to update a GVA with an invalid type, "
                         "gid(%1%), gva(%2%)")
@@ -344,12 +344,12 @@ response primary_namespace::bind_gid(
             {
                 // REVIEW: Is this the right error code to use?
                 HPX_THROWS_IF(ec, bad_parameter
-                  , "primary_namespace::bind_gid" 
+                  , "primary_namespace::bind_gid"
                   , "the new GID is contained in an existing range");
                 return response();
             }
         }
-    }            
+    }
 
     else if (HPX_LIKELY(!gvas_.empty()))
     {
@@ -359,7 +359,7 @@ response primary_namespace::bind_gid(
         if ((it->first + it->second.count) > id)
         {
             // REVIEW: Is this the right error code to use?
-            HPX_THROWS_IF(ec, bad_parameter 
+            HPX_THROWS_IF(ec, bad_parameter
               , "primary_namespace::bind_gid"
               , "the new GID is contained in an existing range");
             return response();
@@ -371,7 +371,7 @@ response primary_namespace::bind_gid(
     if (HPX_UNLIKELY(id.get_msb() != upper_bound.get_msb()))
     {
         HPX_THROWS_IF(ec, internal_server_error
-          , "primary_namespace::bind_gid" 
+          , "primary_namespace::bind_gid"
           , "MSBs of lower and upper range bound do not match");
         return response();
     }
@@ -379,19 +379,19 @@ response primary_namespace::bind_gid(
     if (HPX_UNLIKELY(g.type == components::component_invalid))
     {
         HPX_THROWS_IF(ec, bad_parameter
-          , "primary_namespace::bind_gid" 
+          , "primary_namespace::bind_gid"
           , boost::str(boost::format(
                 "attempt to insert a GVA with an invalid type, "
                 "gid(%1%), gva(%2%)")
                 % id % g));
         return response();
     }
-    
-    // Insert a GID -> GVA entry into the GVA table. 
+
+    // Insert a GID -> GVA entry into the GVA table.
     if (HPX_UNLIKELY(!util::insert_checked(gvas_.insert(
             std::make_pair(id, g)))))
     {
-        HPX_THROWS_IF(ec, lock_error 
+        HPX_THROWS_IF(ec, lock_error
           , "primary_namespace::bind_gid"
           , boost::str(boost::format(
                 "GVA table insertion failed due to a locking error or "
@@ -414,11 +414,11 @@ response primary_namespace::resolve_gid (
     request const& req
   , error_code& ec
     )
-{ // {{{ resolve_gid  implementation 
+{ // {{{ resolve_gid  implementation
     // parameters
     naming::gid_type id = req.get_gid();
-    naming::strip_credit_from_gid(id); 
-        
+    naming::strip_credit_from_gid(id);
+
     mutex_type::scoped_lock l(mutex_);
 
     gva_table_type::const_iterator it = gvas_.lower_bound(id)
@@ -454,7 +454,7 @@ response primary_namespace::resolve_gid (
                 if (HPX_UNLIKELY(id.get_msb() != it->first.get_msb()))
                 {
                     HPX_THROWS_IF(ec, internal_server_error
-                      , "primary_namespace::resolve_gid" 
+                      , "primary_namespace::resolve_gid"
                       , "MSBs of lower and upper range bound do not match");
                     return response();
                 }
@@ -484,7 +484,7 @@ response primary_namespace::resolve_gid (
             if (HPX_UNLIKELY(id.get_msb() != it->first.get_msb()))
             {
                 HPX_THROWS_IF(ec, internal_server_error
-                  , "primary_namespace::resolve_gid" 
+                  , "primary_namespace::resolve_gid"
                   , "MSBs of lower and upper range bound do not match");
                 return response();
             }
@@ -510,7 +510,7 @@ response primary_namespace::resolve_gid (
         ec = make_success_code();
 
     return response(primary_ns_resolve_gid
-                  , naming::invalid_gid 
+                  , naming::invalid_gid
                   , gva()
                   , no_success);
 } // }}}
@@ -528,7 +528,7 @@ response primary_namespace::resolve_locality(
     mutex_type::scoped_lock l(mutex_);
 
     partition_table_type::iterator pit = partitions_.find(ep)
-                                 , pend = partitions_.end(); 
+                                 , pend = partitions_.end();
 
     if (pit != pend)
     {
@@ -568,7 +568,7 @@ response primary_namespace::free(
     mutex_type::scoped_lock l(mutex_);
 
     partition_table_type::iterator pit = partitions_.find(ep)
-                                 , pend = partitions_.end(); 
+                                 , pend = partitions_.end();
 
     if (pit != pend)
     {
@@ -579,7 +579,7 @@ response primary_namespace::free(
         if (HPX_UNLIKELY(git == gend))
         {
             HPX_THROWS_IF(ec, internal_server_error
-              , "primary_namespace::free" 
+              , "primary_namespace::free"
               , boost::str(boost::format(
                     "partition table entry has no corresponding GVA table "
                     "entry, endpoint(%1%)")
@@ -619,10 +619,10 @@ response primary_namespace::unbind_gid(
     )
 { // {{{ unbind_gid implementation
     // parameters
-    boost::uint64_t count = req.get_count(); 
+    boost::uint64_t count = req.get_count();
     naming::gid_type id = req.get_gid();
-    naming::strip_credit_from_gid(id); 
-    
+    naming::strip_credit_from_gid(id);
+
     mutex_type::scoped_lock l(mutex_);
 
     gva_table_type::iterator it = gvas_.find(id)
@@ -633,7 +633,7 @@ response primary_namespace::unbind_gid(
         if (HPX_UNLIKELY(it->second.count != count))
         {
             HPX_THROWS_IF(ec, bad_parameter
-              , "primary_namespace::unbind_gid" 
+              , "primary_namespace::unbind_gid"
               , "block sizes must match");
             return response();
         }
@@ -648,7 +648,7 @@ response primary_namespace::unbind_gid(
         if (&ec != &throws)
             ec = make_success_code();
 
-        return r; 
+        return r;
     }
 
     else
@@ -673,10 +673,10 @@ response primary_namespace::increment(
     )
 { // {{{ increment implementation
     // parameters
-    boost::uint64_t credits = req.get_count(); 
+    boost::uint64_t credits = req.get_count();
     naming::gid_type id = req.get_gid();
-    naming::strip_credit_from_gid(id); 
-    
+    naming::strip_credit_from_gid(id);
+
     mutex_type::scoped_lock l(mutex_);
 
     refcnt_table_type::iterator it = refcnts_.find(id)
@@ -691,7 +691,7 @@ response primary_namespace::increment(
                     boost::uint64_t(HPX_INITIAL_GLOBALCREDIT))), it)))
         {
             HPX_THROWS_IF(ec, lock_error
-              , "primary_namespace::increment" 
+              , "primary_namespace::increment"
               , boost::str(boost::format(
                     "refcnt table insertion failed due to a locking error "
                     "or memory corruption, gid(%1%)")
@@ -699,8 +699,8 @@ response primary_namespace::increment(
             return response();
         }
     }
-   
-    // Add the requested amount and return the new total 
+
+    // Add the requested amount and return the new total
     LAGAS_(info) << (boost::format(
         "primary_namespace::increment, gid(%1%), credits(%2%), "
         "new_count(%3%)")
@@ -711,29 +711,29 @@ response primary_namespace::increment(
 
     return response(primary_ns_increment, it->second += credits);
 } // }}}
-   
+
 response primary_namespace::decrement(
     request const& req
   , error_code& ec
     )
 { // {{{ decrement implementation
     // parameters
-    boost::uint64_t credits = req.get_count(); 
+    boost::uint64_t credits = req.get_count();
     naming::gid_type id = req.get_gid();
-    naming::strip_credit_from_gid(id); 
+    naming::strip_credit_from_gid(id);
 
     if (HPX_UNLIKELY(credits > HPX_INITIAL_GLOBALCREDIT))
     {
         HPX_THROWS_IF(ec, bad_parameter
-          , "primary_namespace::decrement" 
+          , "primary_namespace::decrement"
           , "cannot decrement more than "
             BOOST_PP_STRINGIZE(HPX_INITIAL_GLOBALCREDIT)
             " credits");
         return response();
-    } 
-    
+    }
+
     mutex_type::scoped_lock l(mutex_);
-    
+
     refcnt_table_type::iterator it = refcnts_.find(id)
                               , end = refcnts_.end();
 
@@ -742,14 +742,14 @@ response primary_namespace::decrement(
         if (HPX_UNLIKELY(it->second < credits))
         {
             HPX_THROWS_IF(ec, bad_parameter
-              , "primary_namespace::decrement" 
+              , "primary_namespace::decrement"
               , "bogus credit encountered while decrement global reference "
                 "count");
             return response();
         }
 
         boost::uint64_t cnt = (it->second -= credits);
-        
+
         if (0 == cnt)
         {
             refcnts_.erase(it);
@@ -804,10 +804,10 @@ response primary_namespace::decrement(
                                           , cnt
                                           , git->second.type);
                         }
-                    } 
+                    }
                 }
             }
-            
+
             else if (HPX_LIKELY(!gvas_.empty()))
             {
                 --git;
@@ -833,7 +833,7 @@ response primary_namespace::decrement(
                                       , cnt
                                       , git->second.type);
                     }
-                } 
+                }
             }
 
             // If we didn't find anything, we've got a problem
@@ -860,9 +860,9 @@ response primary_namespace::decrement(
                           , components::component_invalid);
         }
     }
-    
+
     // If the id isn't in the refcnt table and the credit count is
-    // HPX_INITIAL_GLOBALCREDIT, then it needs to be destroyed. 
+    // HPX_INITIAL_GLOBALCREDIT, then it needs to be destroyed.
     else if (HPX_INITIAL_GLOBALCREDIT == credits)
     {
         gva_table_type::iterator git = gvas_.lower_bound(id)
@@ -914,10 +914,10 @@ response primary_namespace::decrement(
                                       , 0
                                       , git->second.type);
                     }
-                } 
+                }
             }
         }
-        
+
         else if (HPX_LIKELY(!gvas_.empty()))
         {
             --git;
@@ -943,12 +943,12 @@ response primary_namespace::decrement(
                                   , 0
                                   , git->second.type);
                 }
-            } 
+            }
         }
 
         // If we didn't find anything, we've got a problem
         HPX_THROWS_IF(ec, bad_parameter
-          , "primary_namespace::decrement" 
+          , "primary_namespace::decrement"
           , "unknown component type encountered while decrement global "
             "reference count");
         return response();
@@ -956,30 +956,30 @@ response primary_namespace::decrement(
 
     // We need to insert a new reference count entry. We assume that
     // binding has already created a first reference + credits.
-    else 
+    else
     {
         if (HPX_UNLIKELY(!util::insert_checked(refcnts_.insert(
                 std::make_pair(id,
                     boost::uint64_t(HPX_INITIAL_GLOBALCREDIT))), it)))
         {
             HPX_THROWS_IF(ec, lock_error
-              , "primary_namespace::decrement" 
+              , "primary_namespace::decrement"
               , boost::str(boost::format(
                     "refcnt table insertion failed due to a locking error "
                     "or memory corruption, gid(%1%)")
                     % id));
             return response();
         }
-        
+
         if (HPX_UNLIKELY(it->second < credits))
         {
             HPX_THROWS_IF(ec, bad_parameter
-              , "primary_namespace::decrement" 
+              , "primary_namespace::decrement"
               , "bogus credit encountered while decrement global reference "
                 "count");
             return response();
         }
-        
+
         boost::uint64_t cnt = (it->second -= credits);
 
         LAGAS_(info) << (boost::format(
@@ -1008,10 +1008,10 @@ response primary_namespace::localities(
     std::vector<boost::uint32_t> p;
 
     partition_table_type::const_iterator it = partitions_.begin()
-                                       , end = partitions_.end(); 
+                                       , end = partitions_.end();
 
     for (; it != end; ++it)
-        p.push_back(at_c<0>(it->second)); 
+        p.push_back(at_c<0>(it->second));
 
     LAGAS_(info) << (boost::format(
         "primary_namespace::localities, localities(%1%)")

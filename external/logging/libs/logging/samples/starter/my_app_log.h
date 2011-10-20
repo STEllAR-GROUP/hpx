@@ -51,7 +51,7 @@ typedef use<
 BOOST_DECLARE_LOG_FILTER(g_l_filter, finder::filter)
 BOOST_DECLARE_LOG(g_l, finder::logger)
 
-#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() ) 
+#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() )
 
 // initialize thy logs..
 void init_logs();

@@ -27,8 +27,8 @@
 
 namespace boost { namespace logging {
 
-/** 
-@brief Represents an ostringstream that takes advantage of TSS (Thread Specific Storage). In other words, each thread has its 
+/**
+@brief Represents an ostringstream that takes advantage of TSS (Thread Specific Storage). In other words, each thread has its
        own copy of an ostringstream, thus when needed, we avoid the cost of re-creating it (it's created only once per thread).
 */
 template< class stream = std::basic_ostringstream<char_type> > struct tss_ostringstream {
@@ -45,7 +45,7 @@ template< class stream = std::basic_ostringstream<char_type> > struct tss_ostrin
         return val;
     }
 
-    string_type str() const { 
+    string_type str() const {
         stream_type & val = *(m_cache.get());
         return val.str();
     }

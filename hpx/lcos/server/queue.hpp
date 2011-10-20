@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_LCOS_SERVER_QUEUE_FEB_09_2011_1204PM)
@@ -22,7 +22,7 @@
 #include <memory>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace server 
+namespace hpx { namespace lcos { namespace server
 {
     /// \class queue queue.hpp hpx/lcos/server/queue.hpp
     ///
@@ -34,9 +34,9 @@ namespace hpx { namespace lcos { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ValueType, typename RemoteType>
-    class queue 
+    class queue
       : public lcos::base_lco_with_value<ValueType, RemoteType>
-      , public components::managed_component_base<queue<ValueType, RemoteType> > 
+      , public components::managed_component_base<queue<ValueType, RemoteType> >
     {
     public:
         typedef lcos::base_lco_with_value<ValueType, RemoteType> base_type_holder;
@@ -70,8 +70,8 @@ namespace hpx { namespace lcos { namespace server
         > slist_option_type;
 
         typedef boost::intrusive::slist<
-            queue_thread_entry, slist_option_type, 
-            boost::intrusive::cache_last<true>, 
+            queue_thread_entry, slist_option_type,
+            boost::intrusive::cache_last<true>,
             boost::intrusive::constant_time_size<false>
         > thread_queue_type;
 
@@ -96,8 +96,8 @@ namespace hpx { namespace lcos { namespace server
         > value_slist_option_type;
 
         typedef boost::intrusive::slist<
-            queue_value_entry, value_slist_option_type, 
-            boost::intrusive::cache_last<true>, 
+            queue_value_entry, value_slist_option_type,
+            boost::intrusive::cache_last<true>,
             boost::intrusive::constant_time_size<false>
         > value_queue_type;
 
@@ -122,17 +122,17 @@ namespace hpx { namespace lcos { namespace server
 
                     // we know that the id is actually the pointer to the thread
                     threads::thread* thrd = static_cast<threads::thread*>(id);
-                    LERR_(fatal) << "~queue: pending thread: " 
-                            << get_thread_state_name(thrd->get_state()) 
+                    LERR_(fatal) << "~queue: pending thread: "
+                            << get_thread_state_name(thrd->get_state())
                             << "(" << id << "): " << thrd->get_description();
 
                     // forcefully abort thread, do not throw
                     error_code ec;
-                    threads::set_thread_state(id, threads::pending, 
+                    threads::set_thread_state(id, threads::pending,
                         threads::wait_abort, threads::thread_priority_normal, ec);
                     if (ec) {
                         LERR_(fatal) << "~queue: could not abort thread"
-                            << get_thread_state_name(thrd->get_state()) 
+                            << get_thread_state_name(thrd->get_state())
                             << "(" << id << "): " << thrd->get_description();
                     }
                 }
@@ -148,15 +148,15 @@ namespace hpx { namespace lcos { namespace server
         {
             return components::get_component_type<queue>();
         }
-        static void set_component_type(components::component_type type) 
+        static void set_component_type(components::component_type type)
         {
             components::set_component_type<queue>(type);
         }
 
         // standard LCO action implementations
 
-        /// The function \a set_event will block the number of entering 
-        /// \a threads (as given by the constructor parameter \a number_of_threads), 
+        /// The function \a set_event will block the number of entering
+        /// \a threads (as given by the constructor parameter \a number_of_threads),
         /// releasing all waiting threads as soon as the last \a thread
         /// entered this function.
         void set_result (RemoteType const& result)
@@ -180,12 +180,12 @@ namespace hpx { namespace lcos { namespace server
             }
         }
 
-        /// The \a function set_error is called whenever a 
-        /// \a set_error_action is applied on an instance of a LCO. This 
-        /// function just forwards to the virtual function \a set_error, which 
+        /// The \a function set_error is called whenever a
+        /// \a set_error_action is applied on an instance of a LCO. This
+        /// function just forwards to the virtual function \a set_error, which
         /// is overloaded by the derived concrete LCO.
         ///
-        /// \param e      [in] The exception encapsulating the error to report 
+        /// \param e      [in] The exception encapsulating the error to report
         ///               to this LCO instance.
         void set_error(boost::exception_ptr const& e)
         {
@@ -211,7 +211,7 @@ namespace hpx { namespace lcos { namespace server
 
             typename mutex_type::scoped_lock l(this);
             if (value_queue_.empty()) {
-                // suspend this thread until a new value is placed into the 
+                // suspend this thread until a new value is placed into the
                 // value queue
                 threads::thread_id_type id = self.get_thread_id();
 
@@ -242,7 +242,7 @@ namespace hpx { namespace lcos { namespace server
                 }
             }
 
-            // get the first value from the value queue and return it to the 
+            // get the first value from the value queue and return it to the
             // caller
             ValueType value = value_queue_.front().val_;
             value_queue_.pop_front();

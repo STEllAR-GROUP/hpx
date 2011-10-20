@@ -90,9 +90,9 @@ public:
     {
         return (T)BOOST_INTERLOCKED_EXCHANGE_ADD((long *)&i, c);
     }
-    
+
     bool is_lock_free(void) const volatile {return true;}
-    
+
     typedef T integral_type;
 private:
     T i;
@@ -170,9 +170,9 @@ public:
     {
       return (T)BOOST_INTERLOCKED_EXCHANGE_ADD64((boost::int64_t *)&i, c);
     }
-    
+
     bool is_lock_free(void) const volatile {return true;}
-    
+
     typedef T integral_type;
 private:
     T i;
@@ -196,8 +196,8 @@ private:
 # include <emmintrin.h>
 
 extern "C" unsigned char __cdecl _InterlockedCompareExchange128(
-    boost::int64_t volatile *Destination, 
-    boost::int64_t ExchangeHigh, boost::int64_t ExchangeLow, 
+    boost::int64_t volatile *Destination,
+    boost::int64_t ExchangeHigh, boost::int64_t ExchangeLow,
     boost::int64_t *Comparand)
 extern "C" __m128i _mm_load_si128(__m128i const*_P);
 extern "C" void _mm_store_si128(__m128i *_P, __m128i _B);
@@ -220,7 +220,7 @@ public:
         T v;
         if (order!=memory_order_seq_cst) {
             v = _mm_load_si128(*(__m128i*)(&i));
-        } 
+        }
         else {
             v = *reinterpret_cast<volatile const T *>(&i);
         }
@@ -231,7 +231,7 @@ public:
     {
         if (order!=memory_order_seq_cst) {
             *reinterpret_cast<volatile T *>(&i)=v;
-        } 
+        }
         else {
             _mm_store_si128(*(__m128i*)(&i), v);
         }
@@ -245,7 +245,7 @@ public:
         boost::int64_t* desired_raw = &desired;
         T prev = i;
         bool success = BOOST_INTERLOCKED_COMPARE_EXCHANGE128(
-            (boost::int64_t volatile *)(&i), 
+            (boost::int64_t volatile *)(&i),
             desired_raw[1], desired_raw[0], (boost::int64_t*)&expected);
         if (!success)
             expected = prev;
@@ -305,7 +305,7 @@ template<typename T>
 class platform_atomic_integral<T, 1>: public build_atomic_from_larger_type<atomic_interlocked_32<uint32_t>, T> {
 public:
     typedef build_atomic_from_larger_type<atomic_interlocked_32<uint32_t>, T> super;
-    
+
     explicit platform_atomic_integral(T v) : super(v) {}
     platform_atomic_integral(void) {}
 };
@@ -314,7 +314,7 @@ template<typename T>
 class platform_atomic_integral<T, 2>: public build_atomic_from_larger_type<atomic_interlocked_32<uint32_t>, T> {
 public:
     typedef build_atomic_from_larger_type<atomic_interlocked_32<uint32_t>, T> super;
-    
+
     explicit platform_atomic_integral(T v) : super(v) {}
     platform_atomic_integral(void) {}
 };
@@ -322,22 +322,22 @@ public:
 # if defined(_M_IA64) || defined(_M_AMD64)
 template<typename T>
 class platform_atomic_integral<T, 8>
-  : public build_atomic_from_add<atomic_interlocked_64<uint64_t> > 
+  : public build_atomic_from_add<atomic_interlocked_64<uint64_t> >
 {
 public:
     typedef build_atomic_from_add<atomic_interlocked_64<uint64_t> > super;
-    
+
     explicit platform_atomic_integral(T v) : super(v) {}
     platform_atomic_integral(void) {}
 };
 
 template<>
 class platform_atomic_integral<void*, 8>
-  : public build_atomic_from_add<atomic_interlocked_64<void*> > 
+  : public build_atomic_from_add<atomic_interlocked_64<void*> >
 {
 public:
     typedef build_atomic_from_add<atomic_interlocked_64<void*> > super;
-    
+
     explicit platform_atomic_integral(void* v) : super(v) {}
     platform_atomic_integral(void) {}
 };
@@ -345,7 +345,7 @@ public:
 #if BOOST_MSVC >= 1500 && defined(BOOST_ATOMIC_HAVE_SSE2)
 
 template<typename T>
-class platform_atomic_integral<T, 16> 
+class platform_atomic_integral<T, 16>
   : public build_atomic_from_add<atomic_interlocked_128<T> >
 {
 public:

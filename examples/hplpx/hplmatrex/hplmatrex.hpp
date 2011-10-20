@@ -10,7 +10,7 @@
 /*This is the hplmatrex interface header file.
 In order to keep things simple, only operations necessary
 to to perform LUP decomposition are declared, which is
-basically just constructors, assignment operators, 
+basically just constructors, assignment operators,
 a destructor, and access operators.
 */
 

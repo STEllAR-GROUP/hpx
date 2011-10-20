@@ -38,7 +38,7 @@ struct response
 {
   public:
     response()
-        : mc(invalid_request) 
+        : mc(invalid_request)
         , status(invalid_status)
         , data(boost::fusion::make_vector())
     {}
@@ -119,7 +119,7 @@ struct response
     {
         // TODO: verification of namespace_action_code
     }
-    
+
     response(
         namespace_action_code type_
       , components::component_type ctype_
@@ -170,7 +170,7 @@ struct response
 
     response(
         namespace_action_code type_
-      , boost::uint32_t prefix_ 
+      , boost::uint32_t prefix_
       , error status_ = success
         )
       : mc(type_)
@@ -199,7 +199,7 @@ struct response
       : mc(other.mc)
       , status(other.status)
       , data(other.data)
-    {}   
+    {}
 
     // copy assignment
     response& operator=(
@@ -211,14 +211,14 @@ struct response
             mc = other.mc;
             status = other.status;
             data = other.data;
-        } 
+        }
         return *this;
     }
 
     gva get_gva(
         error_code& ec = throws
         ) const
-    { 
+    {
         gva g;
 
         // Don't let the first attempt throw.
@@ -231,8 +231,8 @@ struct response
         else if (&ec != &throws)
             ec = make_success_code();
 
-        return g; 
-    } 
+        return g;
+    }
 
     boost::uint64_t get_count(
         error_code& ec = throws
@@ -250,15 +250,15 @@ struct response
         else if (&ec != &throws)
             ec = make_success_code();
 
-        return count; 
-    } // }}} 
+        return count;
+    } // }}}
 
     std::vector<boost::uint32_t> get_localities(
         error_code& ec = throws
         ) const
-    { 
-        return get_data<subtype_prefixes, 0>(ec); 
-    } 
+    {
+        return get_data<subtype_prefixes, 0>(ec);
+    }
 
     boost::int32_t get_component_type(
         error_code& ec = throws
@@ -276,13 +276,13 @@ struct response
         else if (&ec != &throws)
             ec = make_success_code();
 
-        return ctype; 
-    } // }}} 
+        return ctype;
+    } // }}}
 
     boost::uint32_t get_prefix(
         error_code& ec = throws
         ) const
-    { 
+    {
         boost::uint32_t prefix;
 
         // Don't let the first attempt throw.
@@ -295,35 +295,35 @@ struct response
         else if (&ec != &throws)
             ec = make_success_code();
 
-        return prefix; 
-    } 
-    
+        return prefix;
+    }
+
     naming::gid_type get_base_gid(
         error_code& ec = throws
         ) const
-    { 
-        return get_data<subtype_gid_gva, 0>(ec); 
-    } 
+    {
+        return get_data<subtype_gid_gva, 0>(ec);
+    }
 
     naming::gid_type get_gid(
         error_code& ec = throws
         ) const
-    { 
-        return get_data<subtype_gid, 0>(ec); 
-    } 
+    {
+        return get_data<subtype_gid, 0>(ec);
+    }
 
     naming::gid_type get_lower_bound(
         error_code& ec = throws
         ) const
     {
-        return get_data<subtype_gid_gid_prefix, 0>(ec); 
+        return get_data<subtype_gid_gid_prefix, 0>(ec);
     }
 
     naming::gid_type get_upper_bound(
         error_code& ec = throws
         ) const
     {
-        return get_data<subtype_gid_gid_prefix, 1>(ec); 
+        return get_data<subtype_gid_gid_prefix, 1>(ec);
     }
 
     namespace_action_code get_action_code() const
@@ -334,8 +334,8 @@ struct response
     error get_status() const
     {
         return status;
-    } 
- 
+    }
+
   private:
     friend class boost::serialization::access;
 
@@ -351,7 +351,7 @@ struct response
       , subtype_gid             = 0x7
       , subtype_prefix          = 0x8
       , subtype_void            = 0x9
-    }; 
+    };
 
     // The order of the variant types is significant, and should not be changed
     typedef boost::variant<
@@ -359,11 +359,11 @@ struct response
         // primary_ns_allocate
         boost::fusion::vector3<
             naming::gid_type // lower bound
-          , naming::gid_type // upper bound 
-          , boost::uint32_t  // prefix 
+          , naming::gid_type // upper bound
+          , boost::uint32_t  // prefix
         >
         // 0x1
-        // primary_ns_resolve_gid 
+        // primary_ns_resolve_gid
       , boost::fusion::vector2<
             naming::gid_type // idbase
           , gva              // gva
@@ -378,7 +378,7 @@ struct response
       , boost::fusion::vector2<
             boost::uint64_t // count
           , boost::int32_t  // ctype
-        > 
+        >
         // 0x4
         // primary_ns_increment
       , boost::fusion::vector1<
@@ -389,20 +389,20 @@ struct response
         // component_ns_bind_name
       , boost::fusion::vector1<
             boost::int32_t // ctype
-        > 
+        >
         // 0x6
         // primary_ns_localities
         // component_ns_resolve_id
       , boost::fusion::vector1<
             std::vector<boost::uint32_t> // prefixes
         >
-        // 0x7 
+        // 0x7
         // symbol_ns_unbind
         // symbol_ns_resolve
       , boost::fusion::vector1<
             naming::gid_type // gid
         >
-        // 0x8 
+        // 0x8
         // primary_ns_resolve_locality
       , boost::fusion::vector1<
             boost::uint32_t // prefix
@@ -443,14 +443,14 @@ struct response
         {
             case Type:
             {
-                vector_type const* v = boost::get<vector_type>(&data); 
+                vector_type const* v = boost::get<vector_type>(&data);
 
                 if (!v)
                 {
                     HPX_THROWS_IF(ec, invalid_data
                       , "response::get_data"
-                      , "internal data corruption"); 
-                    return return_type(); 
+                      , "internal data corruption");
+                    return return_type();
                 }
 
                 if (&ec != &throws)
@@ -460,19 +460,19 @@ struct response
             }
 
             default: {
-                HPX_THROWS_IF(ec, bad_parameter, 
+                HPX_THROWS_IF(ec, bad_parameter,
                     "response::get_data",
                     "invalid operation for request type");
                 return return_type();
             }
         };
-    } // }}} 
+    } // }}}
     // }}}
 
     template <
         typename Archive
     >
-    struct save_visitor : boost::static_visitor<void> 
+    struct save_visitor : boost::static_visitor<void>
     {
       private:
         Archive& ar;
@@ -494,7 +494,7 @@ struct response
             // TODO: verification?
             util::serialize_sequence(ar, seq);
         }
-    }; 
+    };
 
     template <
         typename Archive
@@ -507,10 +507,10 @@ struct response
         // TODO: versioning?
         int which = data.which();
 
-        ar & which; 
+        ar & which;
         ar & mc;
         ar & status;
-        boost::apply_visitor(save_visitor<Archive>(ar), data);  
+        boost::apply_visitor(save_visitor<Archive>(ar), data);
     } // }}}
 
 #define HPX_LOAD_SEQUENCE(z, n, _)                                          \
@@ -546,7 +546,7 @@ struct response
             BOOST_PP_REPEAT(HPX_AGAS_RESPONSE_SUBTYPES, HPX_LOAD_SEQUENCE, _)
 
             default: {
-                HPX_THROW_EXCEPTION(invalid_data, 
+                HPX_THROW_EXCEPTION(invalid_data,
                     "response::load",
                     "unknown or invalid data loaded");
                 return;

@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2009-2011 Matt Anderson
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(ARRAY1D_JUL_22_2011_1042AM)
@@ -32,16 +32,16 @@ public:
     return data_.size();
   }
 
-  void resize(std::size_t s) 
+  void resize(std::size_t s)
   {
     vsize_ = s;
     start_ = 0;
-    data_.resize(s); 
+    data_.resize(s);
   }
 
   array1d & operator=(array1d const& other)
   {
-    if (this != &other) 
+    if (this != &other)
     {
       resize(other.size());
       for (std::size_t i=0;i<other.size();i++) {
@@ -54,16 +54,16 @@ public:
   }
 
   // basic item reference
-  T & operator[](std::size_t r) 
-  { 
+  T & operator[](std::size_t r)
+  {
      BOOST_ASSERT(r-start_ >= 0 && r-start_ < data_.size() );
-     return data_[r - start_]; 
+     return data_[r - start_];
   }
   // basic item retrieval
-  T operator[](std::size_t r) const 
-  { 
+  T operator[](std::size_t r) const
+  {
     BOOST_ASSERT(r-start_ >= 0 && r-start_ < data_.size() );
-    return data_[r-start_]; 
+    return data_[r-start_];
   }
 
   template<class Archive>
@@ -78,7 +78,7 @@ public:
   }
 
   template<class Archive>
-  void do_load(Archive & ar) 
+  void do_load(Archive & ar)
   {
     ar & start_;
     ar & vsize_;

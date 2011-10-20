@@ -2,8 +2,8 @@
 //
 //  Parts of this code were taken from the Boost.Regex library
 //  Copyright (c) 2004 John Maddock
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_UTIL_CONNECTION_CACHE_MAY_20_0104PM)
@@ -59,8 +59,8 @@ namespace hpx { namespace util
             std::pair<map_iterator, map_iterator> mpos = index_.equal_range(l);
             if (mpos.first != mpos.second) {
             // We have a cached item, return it
-//                LHPX_(debug, logdest_) 
-//                    << "connection_cache: reusing existing connection for: " 
+//                LHPX_(debug, logdest_)
+//                    << "connection_cache: reusing existing connection for: "
 //                    << l;
 
                 connection_type result(mpos.first->second.first->first);
@@ -69,7 +69,7 @@ namespace hpx { namespace util
                 return result;
             }
 
-//            LHPX_(debug, logdest_) 
+//            LHPX_(debug, logdest_)
 //                << "connection_cache: no existing connection for: " << l;
 
             // if we get here then the item is not in the cache
@@ -80,26 +80,26 @@ namespace hpx { namespace util
         {
             mutex_type::scoped_lock lock(mtx_);
 
-//            LHPX_(debug, logdest_) 
+//            LHPX_(debug, logdest_)
 //                << "connection_cache: returning connection to cache: " << l;
 
             // Add it to the list, and index it
-            cont_.push_back(value_type(conn, 
+            cont_.push_back(value_type(conn,
                 std::make_pair((key_type const*)NULL, ++count_)));
             map_iterator it = index_.insert(
                 std::make_pair(l, std::make_pair(--(cont_.end()), count_)));
             if (it == index_.end())
             {
-                HPX_THROW_EXCEPTION(out_of_memory, "connection_cache::add", 
+                HPX_THROW_EXCEPTION(out_of_memory, "connection_cache::add",
                     "couldn't insert new item into connection cache");
             }
             cont_.back().second.first = &(it->first);
 
             map_size_type s = index_.size();
             if (s > max_cache_size_) {
-            // We have too many items in the list, so we need to start popping them 
+            // We have too many items in the list, so we need to start popping them
             // off the back of the list
-//                LHPX_(debug, logdest_) 
+//                LHPX_(debug, logdest_)
 //                    << "connection_cache: cache full, removing least recently "
 //                       "used entries";
 
@@ -110,12 +110,12 @@ namespace hpx { namespace util
                     list_iterator condemmed(pos);
                     ++pos;
 
-//                    LHPX_(debug, logdest_) 
-//                        << "connection_cache: removing entry for: " 
+//                    LHPX_(debug, logdest_)
+//                        << "connection_cache: removing entry for: "
 //                        << *(condemmed->second.first);
 
                     int generational_count = condemmed->second.second;
-                    std::pair<map_iterator, map_iterator> mpos = 
+                    std::pair<map_iterator, map_iterator> mpos =
                         index_.equal_range(*(condemmed->second.first));
                     BOOST_ASSERT(mpos.first != mpos.second);
 
@@ -137,7 +137,7 @@ namespace hpx { namespace util
                     BOOST_ASSERT(found);
 #endif
 
-                    cont_.erase(condemmed); 
+                    cont_.erase(condemmed);
                     --s;
                 }
             }

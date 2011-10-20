@@ -33,7 +33,7 @@ namespace boost { namespace logging { namespace writer {
         };
     }
 
-/** 
+/**
 <tt>\#include <boost/logging/format.hpp> </tt>
 
 Performs all writes in a thread-safe manner.
@@ -52,13 +52,13 @@ logger< gather::ostream_like::return_str<>, ts_write<write_to_cout> > g_l();
 
 
 // not thread-safe
-logger< 
-    gather::ostream_like::return_cache_str<> , 
+logger<
+    gather::ostream_like::return_cache_str<> ,
     format_write< format_base, destination_base> > g_l();
 
 // thread-safe
-logger< 
-    gather::ostream_like::return_cache_str<> , 
+logger<
+    gather::ostream_like::return_cache_str<> ,
     ts_write< format_write< format_base, destination_base > > > g_l();
 @endcode
 

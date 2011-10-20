@@ -29,7 +29,7 @@ inline bool register_name(
     )
 {
     naming::id_type tmp(gid, naming::id_type::unmanaged);
-    return register_name(name, tmp, ec); 
+    return register_name(name, tmp, ec);
 }
 
 HPX_EXPORT bool unregister_name(

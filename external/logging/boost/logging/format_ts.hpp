@@ -27,7 +27,7 @@
 
 namespace boost { namespace logging {
 
-/** 
+/**
 @file boost/logging/format_ts.hpp
 
 Include this file when you're using @ref manipulator "formatters and destinations",

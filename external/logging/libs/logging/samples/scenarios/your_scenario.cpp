@@ -16,7 +16,7 @@
 /**
 @example your_scenario.cpp
 
-@copydoc your_scenario 
+@copydoc your_scenario
 
 @page your_scenario your_scenario.cpp Example
 
@@ -24,7 +24,7 @@
 This usage:
 - You have several loggers
 - You have one filter, which can be turned on or off
-- You want to format the message before it's written 
+- You want to format the message before it's written
 - Each logger has several log destinations
 - The logger and filter are specified using the boost::logging::scenario namespace
   - the filter is always accurate (but slow)
@@ -89,24 +89,24 @@ using namespace boost::logging;
 using namespace boost::logging::scenario::usage;
 typedef use<
         //  the filter is always accurate (but slow)
-        filter_::change::always_accurate, 
+        filter_::change::always_accurate,
         //  filter does not use levels
-        filter_::level::no_levels, 
+        filter_::level::no_levels,
         // the logger is initialized once, when only one thread is running
-        logger_::change::set_once_when_one_thread, 
+        logger_::change::set_once_when_one_thread,
         // the logger favors speed (on a dedicated thread)
         logger_::favor::speed> finder;
 
-BOOST_DECLARE_LOG_FILTER(g_log_filter, finder::filter ) 
-BOOST_DECLARE_LOG(g_log_err, finder::logger ) 
+BOOST_DECLARE_LOG_FILTER(g_log_filter, finder::filter )
+BOOST_DECLARE_LOG(g_log_err, finder::logger )
 BOOST_DECLARE_LOG(g_log_app, finder::logger )
 BOOST_DECLARE_LOG(g_log_dbg, finder::logger )
 
-#define LDBG_ BOOST_LOG_USE_LOG_IF_FILTER(g_log_dbg(), g_log_filter()->is_enabled() ) 
+#define LDBG_ BOOST_LOG_USE_LOG_IF_FILTER(g_log_dbg(), g_log_filter()->is_enabled() )
 #define LERR_ BOOST_LOG_USE_LOG_IF_FILTER(g_log_err(), g_log_filter()->is_enabled() )
-#define LAPP_ BOOST_LOG_USE_LOG_IF_FILTER(g_log_app(), g_log_filter()->is_enabled() ) 
+#define LAPP_ BOOST_LOG_USE_LOG_IF_FILTER(g_log_app(), g_log_filter()->is_enabled() )
 
-BOOST_DEFINE_LOG_FILTER(g_log_filter, finder::filter ) 
+BOOST_DEFINE_LOG_FILTER(g_log_filter, finder::filter )
 BOOST_DEFINE_LOG(g_log_err, finder::logger )
 BOOST_DEFINE_LOG(g_log_app, finder::logger )
 BOOST_DEFINE_LOG(g_log_dbg, finder::logger )

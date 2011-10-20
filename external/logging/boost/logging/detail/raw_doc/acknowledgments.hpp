@@ -1,6 +1,6 @@
 namespace boost { namespace logging {
 
-/** 
+/**
 @page acknowledgements Acknowledgements
 
 There are quite a few thanks I owe:

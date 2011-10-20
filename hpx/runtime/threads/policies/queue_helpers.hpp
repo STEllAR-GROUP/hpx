@@ -53,46 +53,46 @@ namespace detail
             if (state != marked_state) {
                 // log each thread only once
                 if (!logged_headline) {
-                    if (running) { 
-                        LTM_(error) 
+                    if (running) {
+                        LTM_(error)
                             << "Listing suspended threads while queue ("
                             << num_thread << ") is empty:";
                     }
                     else {
-                        LHPX_CONSOLE_(boost::logging::level::error) 
+                        LHPX_CONSOLE_(boost::logging::level::error)
                             << "  [TM] Listing suspended threads while queue ("
                             << num_thread << ") is empty:\n";
                     }
                     logged_headline = true;
                 }
 
-                if (running) { 
-                    LTM_(error) 
+                if (running) {
+                    LTM_(error)
                                 << "queue(" << num_thread << "): "
-                                << get_thread_state_name(state) 
-                                << "(" << std::hex << std::setw(8) 
-                                    << std::setfill('0') << (*it).first 
-                                << "." << std::hex << std::setw(2) 
-                                    << std::setfill('0') << thrd->get_thread_phase() 
-                                << "/" << std::hex << std::setw(8) 
+                                << get_thread_state_name(state)
+                                << "(" << std::hex << std::setw(8)
+                                    << std::setfill('0') << (*it).first
+                                << "." << std::hex << std::setw(2)
+                                    << std::setfill('0') << thrd->get_thread_phase()
+                                << "/" << std::hex << std::setw(8)
                                     << std::setfill('0') << thrd->get_component_id()
-                                << ") P" << std::hex << std::setw(8) 
-                                    << std::setfill('0') << thrd->get_parent_thread_id() 
+                                << ") P" << std::hex << std::setw(8)
+                                    << std::setfill('0') << thrd->get_parent_thread_id()
                                 << ": " << thrd->get_description()
                                 << ": " << thrd->get_lco_description();
                 }
                 else {
-                    LHPX_CONSOLE_(boost::logging::level::error) << "  [TM] " 
+                    LHPX_CONSOLE_(boost::logging::level::error) << "  [TM] "
                                 << "queue(" << num_thread << "): "
-                                << get_thread_state_name(state) 
-                                << "(" << std::hex << std::setw(8) 
-                                    << std::setfill('0') << (*it).first 
-                                << "." << std::hex << std::setw(2) 
-                                    << std::setfill('0') << thrd->get_thread_phase() 
-                                << "/" << std::hex << std::setw(8) 
+                                << get_thread_state_name(state)
+                                << "(" << std::hex << std::setw(8)
+                                    << std::setfill('0') << (*it).first
+                                << "." << std::hex << std::setw(2)
+                                    << std::setfill('0') << thrd->get_thread_phase()
+                                << "/" << std::hex << std::setw(8)
                                     << std::setfill('0') << thrd->get_component_id()
-                                << ") P" << std::hex << std::setw(8) 
-                                    << std::setfill('0') << thrd->get_parent_thread_id() 
+                                << ") P" << std::hex << std::setw(8)
+                                    << std::setfill('0') << thrd->get_parent_thread_id()
                                 << ": " << thrd->get_description()
                                 << ": " << thrd->get_lco_description() << std::endl;
                 }
@@ -112,8 +112,8 @@ namespace detail
                         break;
 
                     default:
-                        // If the thread is terminated we don't care too much 
-                        // anymore. 
+                        // If the thread is terminated we don't care too much
+                        // anymore.
                         break;
                     }
                 }

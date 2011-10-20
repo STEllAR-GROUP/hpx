@@ -15,9 +15,9 @@ namespace hpx { namespace util
 {
 
 ///////////////////////////////////////////////////////////////////////
-// This try_lock_wrapper is essentially equivalent to the template 
+// This try_lock_wrapper is essentially equivalent to the template
 // boost::thread::detail::try_lock_wrapper with the one exception, that
-// the lock() function always calls base::try_lock(). This allows us to 
+// the lock() function always calls base::try_lock(). This allows us to
 // skip lock acquisition while exiting the condition variable.
 template<typename Mutex>
 struct try_lock_wrapper : public boost::detail::try_lock_wrapper<Mutex>

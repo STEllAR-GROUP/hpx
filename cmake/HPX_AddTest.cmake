@@ -1,6 +1,6 @@
 # Copyright (c) 2011 Bryce Lelbach
 #
-# Distributed under the Boost Software License, Version 1.0. (See accompanying 
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(HPX_ADDTEST_LOADED TRUE)
@@ -23,17 +23,17 @@ macro(add_hpx_test name)
   if(NOT ${name}_DONTCOMPILE)
     add_executable(${name}_test EXCLUDE_FROM_ALL
       ${${name}_SOURCES} ${${name}_HEADERS})
-  
+
     set_property(TARGET ${name}_test APPEND
                  PROPERTY COMPILE_DEFINITIONS
                  "HPX_APPLICATION_NAME=${name}"
                  "HPX_APPLICATION_STRING=\"${name}\""
                  "HPX_APPLICATION_EXPORTS")
-  
+
     # linker instructions
     if(NOT ${name}_NOLIBS)
       target_link_libraries(${name}_test
-        ${${name}_DEPENDENCIES} 
+        ${${name}_DEPENDENCIES}
         ${hpx_LIBRARIES}
         ${BOOST_FOUND_LIBRARIES}
         ${pxaccel_LIBRARIES})

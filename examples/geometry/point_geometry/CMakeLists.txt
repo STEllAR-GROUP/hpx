@@ -1,7 +1,7 @@
 # Copyright (c) 2007-2011 Hartmut Kaiser
 # Copyright (c) 2011 Matt Anderson
 #
-# Distributed under the Boost Software License, Version 1.0. (See accompanying 
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 ###############################################################################
@@ -45,8 +45,8 @@ source_group("Header Files\\Server" FILES ${server_headers})
 source_group("Header Files" FILES ${common_headers})
 
 ###############################################################################
-add_hpx_component(point_geometry 
+add_hpx_component(point_geometry
     MODULE point_geometry
-    SOURCES ${sources} 
+    SOURCES ${sources}
     HEADERS ${headers})
 

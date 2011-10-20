@@ -43,7 +43,7 @@ namespace optimize {
     template<class char_type_ > struct cache_string_one_str ;
 }
 
-/** 
+/**
     @brief Classes that implement gathering the message
 
     @copydoc gather_the_message
@@ -65,7 +65,7 @@ namespace optimize {
 */
 namespace gather {
 
-/** 
+/**
     @brief In case your gather class returns anything else than a std::basic_ostream, that returned class @b must derive from this.
 
     This is needed when :
@@ -79,7 +79,7 @@ struct out_base {
 };
 
 
-/** 
+/**
     @brief Gathering the message: Allows you to write to a log using the cool "<<" operator.
 
     The <tt>.msg()</tt> function returns the gathered message.
@@ -89,9 +89,9 @@ struct out_base {
 */
 namespace ostream_like {
 
-/** 
+/**
     @brief Allows you to write to a log using the cool "<<" operator. The @c .msg() returns the stream itself.
-    
+
     Note that this is a very simple class - meant only as an example.
 
     @copydoc gather_the_message
@@ -108,7 +108,7 @@ template<class stream_type = std::basic_ostringstream<char_type> > struct return
     return_raw_stream() {}
     return_raw_stream(const return_raw_stream& other) : m_out( other.m_out.str() ) {}
 
-    /** 
+    /**
     note: we return the whole stream - we don't return out().str() , because the user might use a better ostream class,
     which could have better access to its buffer/internals
     */
@@ -121,9 +121,9 @@ private:
 
 
 
-/** 
+/**
     @brief Allows you to write to a log using the cool "<<" operator. The .msg() returns a string - whatever you set as first template param.
-    
+
     By default, it's @ref boost::logging::optimize::cache_string_one_str "cache_string".
 
     @copydoc gather_the_message
@@ -136,12 +136,12 @@ private:
     @bug right now prepend_size and append_size are ignored; because we can also return a cache_string_several_str<>. When fixing, watch the find_gather class!
 */
 template<
-        class string = boost::logging::optimize::cache_string_one_str<hold_string_type> , 
+        class string = boost::logging::optimize::cache_string_one_str<hold_string_type> ,
         class stream_type = std::basic_ostringstream<char_type> > struct return_str {
 
     // what does the gather_msg class return?
     typedef string msg_type;
-    
+
     return_str() {}
     return_str(const return_str& other) : m_out(other.m_out.str()) {}
 
@@ -154,7 +154,7 @@ private:
 
 
 
-/** 
+/**
     @brief Returns a tag holder
 
     See @ref boost::logging::tag namespace
@@ -162,7 +162,7 @@ private:
 template<class holder_type, class stream_type> struct return_tag_holder : out_base {
     // what does the gather_msg class return?
     typedef holder_type msg_type;
-    
+
     return_tag_holder() {}
     return_tag_holder(const return_tag_holder& other) : m_out(other.m_out.str()), m_val(other.m_val) {}
 

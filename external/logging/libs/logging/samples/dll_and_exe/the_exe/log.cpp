@@ -15,7 +15,7 @@
 
 #include "log.h"
 
-BOOST_DEFINE_LOG_FILTER(g_log_filter, boost::logging::filter::no_ts) 
+BOOST_DEFINE_LOG_FILTER(g_log_filter, boost::logging::filter::no_ts)
 BOOST_DEFINE_LOG(g_l, log_type )
 
 using namespace boost::logging;

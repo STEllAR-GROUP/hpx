@@ -15,7 +15,7 @@
 
 #include <tests/correctness/agas/components/stubs/managed_refcnt_checker.hpp>
 
-namespace hpx { namespace test 
+namespace hpx { namespace test
 {
 
 struct managed_refcnt_checker
@@ -30,7 +30,7 @@ struct managed_refcnt_checker
     > base_type;
 
   private:
-    lcos::promise<void> flag_; 
+    lcos::promise<void> flag_;
 
     using base_type::create;
     using base_type::create_one;
@@ -41,17 +41,17 @@ struct managed_refcnt_checker
     /// Create a new component on the target locality.
     explicit managed_refcnt_checker(
         naming::gid_type const& locality
-        ) 
+        )
     {
-        this->base_type::create_one(locality, flag_.get_gid()); 
+        this->base_type::create_one(locality, flag_.get_gid());
     }
 
     /// Create a new component on the target locality.
     explicit managed_refcnt_checker(
         naming::id_type const& locality
-        ) 
+        )
     {
-        this->base_type::create_one(locality, flag_.get_gid()); 
+        this->base_type::create_one(locality, flag_.get_gid());
     }
 
     lcos::promise<void> take_reference_async(
@@ -60,7 +60,7 @@ struct managed_refcnt_checker
     {
         BOOST_ASSERT(gid_);
         return this->base_type::take_reference_async(gid_, gid);
-    } 
+    }
 
     void take_reference(
         naming::id_type const& gid
@@ -88,9 +88,9 @@ struct managed_refcnt_checker
         // Suspend this pxthread.
         threads::get_self().yield(threads::suspended);
 
-        return flag_.ready(); 
-    } 
-}; 
+        return flag_.ready();
+    }
+};
 
 }}
 

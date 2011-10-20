@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_UTIL_MAP_HOSTNAMES_AUG_29_2011_1257PM)
@@ -15,12 +15,12 @@
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
-    // Try to map a given host name based on the list of mappings read from a 
+    // Try to map a given host name based on the list of mappings read from a
     // file
     struct HPX_EXPORT map_hostnames
     {
-        map_hostnames(bool debug = false) 
-          : debug_(debug) 
+        map_hostnames(bool debug = false)
+          : debug_(debug)
         {}
 
         void use_suffix(std::string const& suffix)

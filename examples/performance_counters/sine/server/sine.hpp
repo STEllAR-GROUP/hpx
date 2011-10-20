@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(PERFORMANCE_COUNTERS_SINE_SEP_20_2011_0112PM)
@@ -15,26 +15,26 @@ namespace performance_counters { namespace sine { namespace server
     ///////////////////////////////////////////////////////////////////////////
     struct sine_counter
       : public hpx::performance_counters::server::base_performance_counter,
-        public hpx::components::managed_component_base<sine_counter> 
+        public hpx::components::managed_component_base<sine_counter>
     {
         typedef hpx::components::managed_component_base<sine_counter> base_type;
 
     public:
         typedef sine_counter type_holder;
-        typedef hpx::performance_counters::server::base_performance_counter 
+        typedef hpx::performance_counters::server::base_performance_counter
             base_type_holder;
 
         sine_counter() : current_value_(0) {}
         sine_counter(hpx::performance_counters::counter_info const& info);
 
-        /// This function will be called in order to query the current value of 
+        /// This function will be called in order to query the current value of
         /// this performance counter
         void get_counter_value(hpx::performance_counters::counter_value& value);
 
         ///////////////////////////////////////////////////////////////////////
         // Disambiguate several functions defined in both base classes
-        
-        /// \brief finalize() will be called just before the instance gets 
+
+        /// \brief finalize() will be called just before the instance gets
         ///        destructed
         void finalize();
 

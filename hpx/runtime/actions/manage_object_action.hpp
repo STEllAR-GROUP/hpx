@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_RUNTIME_ACTIONS_MANAGE_OBJECT_ACTION_JAN_26_2010_0141PM)
@@ -35,10 +35,10 @@ namespace hpx { namespace actions
         typedef boost::archive::binary_iarchive iarchive_type;
 #endif
         typedef void (*serialize_save_function)(
-            boost::uint8_t const*, std::size_t, oarchive_type&, 
+            boost::uint8_t const*, std::size_t, oarchive_type&,
             const unsigned int, boost::uint8_t const*);
         typedef void (*serialize_load_function)(
-            boost::uint8_t*, std::size_t, iarchive_type&, 
+            boost::uint8_t*, std::size_t, iarchive_type&,
             const unsigned int, boost::uint8_t const*);
 
     private:
@@ -55,14 +55,14 @@ namespace hpx { namespace actions
         }
         static void destruct_(void*) {}
 
-        static void save_(boost::uint8_t const* data, std::size_t size, 
+        static void save_(boost::uint8_t const* data, std::size_t size,
             oarchive_type& ar, const unsigned int version,
             boost::uint8_t const* config)
         {
             using boost::serialization::make_array;
             ar << make_array(data, size);
         }
-        static void load_(boost::uint8_t* data, std::size_t size, 
+        static void load_(boost::uint8_t* data, std::size_t size,
             iarchive_type& ar, const unsigned int version,
             boost::uint8_t const* config)
         {
@@ -75,33 +75,33 @@ namespace hpx { namespace actions
         virtual ~manage_object_action_base() {}
 
         // support for construction, copying, destruction
-        virtual construct_function construct() const 
-        { 
-            return &manage_object_action_base::construct_; 
+        virtual construct_function construct() const
+        {
+            return &manage_object_action_base::construct_;
         }
-        virtual clone_function clone() const 
-        { 
-            return &manage_object_action_base::clone_; 
+        virtual clone_function clone() const
+        {
+            return &manage_object_action_base::clone_;
         }
-        virtual assign_function assign() const 
-        { 
-            return &manage_object_action_base::assign_; 
+        virtual assign_function assign() const
+        {
+            return &manage_object_action_base::assign_;
         }
-        virtual destruct_function destruct() const 
-        { 
-            return &manage_object_action_base::destruct_; 
+        virtual destruct_function destruct() const
+        {
+            return &manage_object_action_base::destruct_;
         }
 
         virtual manage_object_action_base const& get_instance() const;
 
         // serialization support
         virtual serialize_save_function save() const
-        { 
-            return &manage_object_action_base::save_; 
+        {
+            return &manage_object_action_base::save_;
         }
         virtual serialize_load_function load() const
-        { 
-            return &manage_object_action_base::load_; 
+        {
+            return &manage_object_action_base::load_;
         }
 
     private:
@@ -145,13 +145,13 @@ namespace hpx { namespace actions
             reinterpret_cast<T*>(memory)->~T();
         }
 
-        static void save_(boost::uint8_t const* data, std::size_t size, 
+        static void save_(boost::uint8_t const* data, std::size_t size,
             oarchive_type& ar, const unsigned int version,
             boost::uint8_t const* config)
         {
             ar << *reinterpret_cast<T const*>(data);
         }
-        static void load_(boost::uint8_t* data, std::size_t size, 
+        static void load_(boost::uint8_t* data, std::size_t size,
             iarchive_type& ar, const unsigned int version,
             boost::uint8_t const* config)
         {
@@ -160,31 +160,31 @@ namespace hpx { namespace actions
 
     private:
         // support for construction, copying, destruction
-        construct_function construct() const 
-        { 
-            return &manage_object_action::construct_; 
+        construct_function construct() const
+        {
+            return &manage_object_action::construct_;
         }
         clone_function clone() const
         {
-            return &manage_object_action::clone_; 
+            return &manage_object_action::clone_;
         }
         assign_function assign() const
         {
-            return &manage_object_action::assign_; 
+            return &manage_object_action::assign_;
         }
         destruct_function destruct() const
         {
-            return &manage_object_action::destruct_; 
+            return &manage_object_action::destruct_;
         }
 
         // serialization support
         serialize_save_function save() const
-        { 
-            return &manage_object_action::save_; 
+        {
+            return &manage_object_action::save_;
         }
         serialize_load_function load() const
-        { 
-            return &manage_object_action::load_; 
+        {
+            return &manage_object_action::load_;
         }
 
     public:
@@ -207,7 +207,7 @@ namespace hpx { namespace actions
         friend class boost::serialization::access;
 
         template<class Archive>
-        void serialize(Archive& ar, const unsigned int) 
+        void serialize(Archive& ar, const unsigned int)
         {
             using namespace boost::serialization;
             ar & base_object<manage_object_action_base>(*this);
@@ -232,14 +232,14 @@ namespace hpx { namespace actions
         friend class boost::serialization::access;
 
         template<class Archive>
-        void serialize(Archive& ar, const unsigned int) 
+        void serialize(Archive& ar, const unsigned int)
         {
             using namespace boost::serialization;
             ar & base_object<manage_object_action_base>(*this);
         }
     };
 
-    inline manage_object_action_base const& 
+    inline manage_object_action_base const&
     manage_object_action_base::get_instance() const
     {
         static manage_object_action<boost::uint8_t> const instance =
@@ -263,30 +263,30 @@ namespace hpx { namespace actions
             serialize_load_function;
 
     private:
-        static void save_(boost::uint8_t const* data, std::size_t size, 
+        static void save_(boost::uint8_t const* data, std::size_t size,
             oarchive_type& ar, const unsigned int version,
             boost::uint8_t const* config)
         {
-            reinterpret_cast<T const*>(data)->save(ar, version, 
+            reinterpret_cast<T const*>(data)->save(ar, version,
                 reinterpret_cast<Config const*>(config));
         }
-        static void load_(boost::uint8_t* data, std::size_t size, 
+        static void load_(boost::uint8_t* data, std::size_t size,
             iarchive_type& ar, const unsigned int version,
             boost::uint8_t const* config)
         {
-            reinterpret_cast<T*>(data)->load(ar, version, 
+            reinterpret_cast<T*>(data)->load(ar, version,
                 reinterpret_cast<Config const*>(config));
         }
 
     private:
         // serialization support
         serialize_save_function save() const
-        { 
-            return &manage_object_action::save_; 
+        {
+            return &manage_object_action::save_;
         }
         serialize_load_function load() const
-        { 
-            return &manage_object_action::load_; 
+        {
+            return &manage_object_action::load_;
         }
 
     public:
@@ -309,7 +309,7 @@ namespace hpx { namespace actions
         friend class boost::serialization::access;
 
         template<class Archive>
-        void serialize(Archive& ar, const unsigned int) 
+        void serialize(Archive& ar, const unsigned int)
         {
             using namespace boost::serialization;
             ar & base_object<manage_object_action_base>(*this);

@@ -1,10 +1,10 @@
 namespace boost { namespace logging {
 
-/** 
+/**
 @page starter_project A starter project...
 
 You've probably looked at the @ref common_scenarios "scenarios", at @ref scenario_multiple_files "basic_usage example",
-and just in case, here's a something to get you started in your own project(s). 
+and just in case, here's a something to get you started in your own project(s).
 
 In your project, you will need to create 2 files:
 - <tt><em>my_app_log</em>.h</tt> - where you declare your log(s)

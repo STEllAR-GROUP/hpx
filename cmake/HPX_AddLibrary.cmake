@@ -1,7 +1,7 @@
 # Copyright (c) 2007-2011 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Lelbach
 #
-# Distributed under the Boost Software License, Version 1.0. (See accompanying 
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(HPX_ADDLIBRARY_LOADED TRUE)
@@ -25,18 +25,18 @@ macro(add_hpx_library name)
 
   if(NOT MSVC)
     if(${name}_ESSENTIAL)
-      add_library(${name}_lib SHARED 
+      add_library(${name}_lib SHARED
         ${${name}_SOURCES} ${${name}_HEADERS})
     else()
       add_library(${name}_lib SHARED EXCLUDE_FROM_ALL
         ${${name}_SOURCES} ${${name}_HEADERS})
-    endif() 
+    endif()
   else()
     if(${name}_ESSENTIAL)
-      add_library(${name}_lib SHARED ${${name}_SOURCES}) 
+      add_library(${name}_lib SHARED ${${name}_SOURCES})
     else()
-      add_library(${name}_lib SHARED EXCLUDE_FROM_ALL ${${name}_SOURCES}) 
-    endif() 
+      add_library(${name}_lib SHARED EXCLUDE_FROM_ALL ${${name}_SOURCES})
+    endif()
   endif()
 
   set(prefix "")
@@ -64,12 +64,12 @@ macro(add_hpx_library name)
   # set properties of generated shared library
   set_target_properties(${name}_lib PROPERTIES
     # create *nix style library versions + symbolic links
-    VERSION ${HPX_VERSION}      
+    VERSION ${HPX_VERSION}
     SOVERSION ${HPX_SOVERSION}
     # allow creating static and shared libs without conflicts
-    CLEAN_DIRECT_OUTPUT 1 
+    CLEAN_DIRECT_OUTPUT 1
     OUTPUT_NAME ${prefix}${name})
-  
+
   set_property(TARGET ${name}_lib APPEND
                PROPERTY COMPILE_DEFINITIONS "HPX_EXPORTS")
 

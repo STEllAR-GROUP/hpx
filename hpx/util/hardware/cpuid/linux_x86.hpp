@@ -11,13 +11,13 @@
 #define HPX_AC3F9C65_08DE_418F_9937_D9898E808454
 
 #include <boost/cstdint.hpp>
- 
+
 namespace hpx { namespace util { namespace hardware
 {
-    
+
 struct cpuid_register
 {
-    enum info 
+    enum info
     {
         eax = 0,
         ebx = 1,

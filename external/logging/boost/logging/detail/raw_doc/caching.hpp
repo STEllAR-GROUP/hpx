@@ -1,13 +1,13 @@
 namespace boost { namespace logging {
 
-/** 
+/**
 @page caching Caching messages before logs are initialized
 
-- @ref caching_why 
-- @ref caching_BOOST_LOG_BEFORE_INIT_LOG_ALL 
-- @ref caching_BOOST_LOG_BEFORE_INIT_CACHE_FILTER 
-    - @ref caching_BOOST_LOG_BEFORE_INIT_CACHE_FILTER_the_catch 
-- @ref caching_BOOST_LOG_BEFORE_INIT_IGNORE_BEFORE_INIT 
+- @ref caching_why
+- @ref caching_BOOST_LOG_BEFORE_INIT_LOG_ALL
+- @ref caching_BOOST_LOG_BEFORE_INIT_CACHE_FILTER
+    - @ref caching_BOOST_LOG_BEFORE_INIT_CACHE_FILTER_the_catch
+- @ref caching_BOOST_LOG_BEFORE_INIT_IGNORE_BEFORE_INIT
 
 @section caching_why Caching - why is it needed?
 
@@ -15,11 +15,11 @@ Logging is all fine and dandy, but what if you do some %logging before the actua
 It's quite easy to end up doing this:
 - usually you initialize logs somewhere within your @c main()
 - as applications grow, you'll have global/static variables
-- you'll do %logging from the body of the global/static variable's constructors 
+- you'll do %logging from the body of the global/static variable's constructors
     - direcly (from a constructor)
     - indirectly (from some constructor you call a function, which calls a function... which in turn does some logging)
 
-You could even run into more complicated scenarios, where you create other threads, 
+You could even run into more complicated scenarios, where you create other threads,
 which, until you initialize your logs, do some logging. It's good practice to log a thread's begin and end, for instance.
 
 Even though you think this'll never happen to you, usage of singletons and other static variables is quite common,
@@ -38,11 +38,11 @@ There are several problems with this solution:
 - you would not have any control over when @c init_logs() is called - what if they need some context information -
   they wouldn't have any context do rely on
 - depending on your application, some logs could only be initialized later than others
-- if your application has several modules, assume each module has its own log. Thus, each module should be able to 
+- if your application has several modules, assume each module has its own log. Thus, each module should be able to
   initialize its own log when the module is initialized
 
 Thus, I came up with a caching mechanism. You can choose to:
-- Cache messages that are written before logs are initialized. For each logged message, you will also cache its corresponding filter 
+- Cache messages that are written before logs are initialized. For each logged message, you will also cache its corresponding filter
   (so that if, when initializing the logs, a certain filter is turned off, that message won't be logged)
 - Cache messages that are written before logs are initialized. When logs are initialized, all these cached messages are logged
 - Ignore messages that are written before the logs are initialized
@@ -64,7 +64,7 @@ If you want to force this setting, make sure you define the @c BOOST_LOG_BEFORE_
 
 @code
 ...
-#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() ) 
+#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() )
 ...
 
 L_ << "this message will be logged, even if filter will be turned off";
@@ -82,7 +82,7 @@ is still turned on or off.
 
 @code
 ...
-#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() ) 
+#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() )
 ...
 
 L_ << "this message will not be logged";
@@ -108,7 +108,7 @@ Assume you have a logger with a filter based on levels:
 #define L_(lvl) BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_level()->is_enabled( lvl ) )
 @endcode
 
-If you cache the filter, the expression <tt>g_log_level()->is_enabled( lvl )</tt> needs to be recomputed at a later time 
+If you cache the filter, the expression <tt>g_log_level()->is_enabled( lvl )</tt> needs to be recomputed at a later time
 (when the log is marked as initialized, and all messages that were cached, are logged).
 Thus, all parameters that are passed to the your L_ macro need to be either compile-time constants or global values. Otherwise, a compile-time error will
 be issued:
@@ -136,7 +136,7 @@ If you do want to use this setting, make sure you define the @c BOOST_LOG_BEFORE
 
 @code
 ...
-#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() ) 
+#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() )
 ...
 
 L_ << "this message will NOT be logged";

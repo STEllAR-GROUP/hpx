@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_583D0662_CA9D_4241_805C_93F92D727E6E)
@@ -27,7 +27,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
 {
-    
+
 typedef boost::lockfree::deque<thread*> work_item_deque_type;
 
 template <typename Queue, typename Value>
@@ -49,10 +49,10 @@ struct thread_deque
     // we use a simple mutex to protect the data members for now
     typedef boost::mutex mutex_type;
 
-    // Add this number of threads to the work items queue each time the 
+    // Add this number of threads to the work items queue each time the
     // function \a add_new() is called if the queue is empty.
-    enum { 
-        min_add_new_count = 100, 
+    enum {
+        min_add_new_count = 100,
         max_add_new_count = 100,
         max_delete_count = 100
     };
@@ -83,7 +83,7 @@ struct thread_deque
         std::size_t added = 0;
         task_description const* task = 0;
 
-        while (add_count-- && dequeue(new_tasks_, &task)) 
+        while (add_count-- && dequeue(new_tasks_, &task))
         {
             --new_tasks_count_;
 
@@ -104,8 +104,8 @@ struct thread_deque
                 thread_map_.insert(id, thrd.get());
 
             if (!p.second) {
-                HPX_THROW_EXCEPTION(hpx::no_success, 
-                    "threadmanager::add_new", 
+                HPX_THROW_EXCEPTION(hpx::no_success,
+                    "threadmanager::add_new",
                     "Couldn't add new thread to the map of threads");
                 return 0;
             }
@@ -113,7 +113,7 @@ struct thread_deque
             // transfer ownership to map
             threads::thread* t = thrd.release();
 
-            // only insert the thread into the work-items queue if it is in 
+            // only insert the thread into the work-items queue if it is in
             // pending state
             if (state == pending) {
                 // pushing the new thread into the pending queue of the
@@ -124,12 +124,12 @@ struct thread_deque
             }
         }
 
-        if (added) 
+        if (added)
         { LTM_(debug) << "add_new: added " << added << " tasks to queues"; }
 
         return added;
     }
-    
+
     // steal new threads if there is some amount of work available
     std::size_t steal_new(boost::int64_t add_count, thread_deque* addfrom)
     {
@@ -139,7 +139,7 @@ struct thread_deque
         std::size_t added = 0;
         task_description const* task = 0;
 
-        while (add_count-- && steal(addfrom->new_tasks_, &task)) 
+        while (add_count-- && steal(addfrom->new_tasks_, &task))
         {
             --addfrom->new_tasks_count_;
 
@@ -160,8 +160,8 @@ struct thread_deque
                 thread_map_.insert(id, thrd.get());
 
             if (!p.second) {
-                HPX_THROW_EXCEPTION(hpx::no_success, 
-                    "threadmanager::add_new", 
+                HPX_THROW_EXCEPTION(hpx::no_success,
+                    "threadmanager::add_new",
                     "Couldn't add new thread to the map of threads");
                 return 0;
             }
@@ -169,7 +169,7 @@ struct thread_deque
             // transfer ownership to map
             threads::thread* t = thrd.release();
 
-            // only insert the thread into the work-items queue if it is in 
+            // only insert the thread into the work-items queue if it is in
             // pending state
             if (state == pending) {
                 // pushing the new thread into the pending queue of the
@@ -180,19 +180,19 @@ struct thread_deque
             }
         }
 
-        if (added) 
+        if (added)
         { LTM_(debug) << "add_new: added " << added << " tasks to queues"; }
 
         return added;
     }
-    
+
     boost::int64_t compute_count()
     {
 
         // create new threads from pending tasks (if appropriate)
         boost::int64_t add_count = -1; // default is no constraint
 
-        // if we are desperate (no work in the queues), add some even if the 
+        // if we are desperate (no work in the queues), add some even if the
         // map holds more than max_count
         if (max_count_) {
             std::size_t count = thread_map_.size();
@@ -222,9 +222,9 @@ struct thread_deque
     {
         {
             // delete only this many threads
-            boost::int64_t delete_count = max_delete_count; 
+            boost::int64_t delete_count = max_delete_count;
             thread_id_type todelete;
-            while (delete_count && terminated_items_.dequeue(&todelete)) 
+            while (delete_count && terminated_items_.dequeue(&todelete))
             {
                 if (thread_map_.erase(todelete))
                     --delete_count;
@@ -241,7 +241,7 @@ struct thread_deque
 
     // The maximum number of active threads this thread manager should
     // create. This number will be a constraint only as long as the work
-    // items queue is not empty. Otherwise the number of active threads 
+    // items queue is not empty. Otherwise the number of active threads
     // will be incremented in steps equal to the \a min_add_new_count
     // specified above.
     enum { max_thread_count = 1000 };
@@ -249,7 +249,7 @@ struct thread_deque
     thread_deque(std::size_t max_count = max_thread_count)
       : work_items_(),
         work_items_count_(0),
-        terminated_items_(), 
+        terminated_items_(),
         max_count_((0 == max_count)
                   ? static_cast<std::size_t>(max_thread_count)
                   : max_count),
@@ -268,9 +268,9 @@ struct thread_deque
     boost::int64_t get_queue_length() const
     { return work_items_count_ + new_tasks_count_; }
 
-    // create a new thread and schedule it if the initial state is equal to 
+    // create a new thread and schedule it if the initial state is equal to
     // pending
-    thread_id_type create_thread(thread_init_data& data, 
+    thread_id_type create_thread(thread_init_data& data,
         thread_state_enum initial_state, bool run_now, error_code& ec)
     {
         if (run_now) {
@@ -286,14 +286,14 @@ struct thread_deque
                 thread_map_.insert(id, thrd.get());
 
             if (!p.second) {
-                HPX_THROWS_IF(ec, hpx::no_success, 
-                    "threadmanager::register_thread", 
+                HPX_THROWS_IF(ec, hpx::no_success,
+                    "threadmanager::register_thread",
                     "Couldn't add new thread to the map of threads");
                 return invalid_thread_id;
             }
 
             // push the new thread in the pending queue thread
-            if (initial_state == pending) 
+            if (initial_state == pending)
                 schedule_thread(thrd.get());
 
             thrd.release(); // release ownership to the map
@@ -305,7 +305,7 @@ struct thread_deque
             return id;
         }
 
-        // do not execute the work, but register a task description for 
+        // do not execute the work, but register a task description for
         // later thread creation
         ++new_tasks_count_;
         enqueue(new_tasks_, new task_description(data, initial_state));
@@ -387,7 +387,7 @@ struct thread_deque
         }
     }
 
-    bool add_new_or_terminate(std::size_t num_thread, bool running, 
+    bool add_new_or_terminate(std::size_t num_thread, bool running,
                               std::size_t& added)
     {
         if (0 == work_items_count_) {
@@ -405,12 +405,12 @@ struct thread_deque
 
             // stop running after all PX threads have been terminated
             if (!(added != 0) && !running) {
-                // Before exiting each of the OS threads deletes the 
-                // remaining terminated PX threads 
+                // Before exiting each of the OS threads deletes the
+                // remaining terminated PX threads
                 if (cleanup_terminated_locked())
-                    return true; 
+                    return true;
 
-                LTM_(debug) << "tfunc(" << num_thread 
+                LTM_(debug) << "tfunc(" << num_thread
                             << "): threadmap not empty";
             }
 
@@ -422,8 +422,8 @@ struct thread_deque
 
         return false;
     }
-    
-    bool steal_new_or_terminate(std::size_t num_thread, bool running, 
+
+    bool steal_new_or_terminate(std::size_t num_thread, bool running,
                                 std::size_t& added, thread_deque* addfrom)
     {
         if (0 == work_items_count_) {
@@ -441,12 +441,12 @@ struct thread_deque
 
             // stop running after all PX threads have been terminated
             if (!(added != 0) && !running) {
-                // Before exiting each of the OS threads deletes the 
-                // remaining terminated PX threads 
+                // Before exiting each of the OS threads deletes the
+                // remaining terminated PX threads
                 if (cleanup_terminated_locked())
-                    return true; 
+                    return true;
 
-                LTM_(debug) << "tfunc(" << num_thread 
+                LTM_(debug) << "tfunc(" << num_thread
                            << "): threadmap not empty";
             }
 
@@ -498,7 +498,7 @@ private:
     boost::atomic<boost::int64_t> new_tasks_count_;     ///< count of new tasks to run
 
     threads::thread_pool memory_pool_;  ///< OS thread local memory pools for
-                                        ///< PX-threads 
+                                        ///< PX-threads
 
     util::block_profiler<add_new_tag> add_new_logger_;
 };

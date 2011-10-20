@@ -1,6 +1,6 @@
 //  Copyright (c) 2009-2011 Matthew Anderson
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 #include <hpx/hpx.hpp>
 
@@ -85,7 +85,7 @@ int level_bbox(int level,parameter &par)
       }
     }
 
-  } 
+  }
 
 
   return 0;
@@ -149,8 +149,8 @@ int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type>
     std::size_t grain_size;
     grain_size = par->grain_size;
     for (int i=0;i<numbox;i++) {
-      b_minx[i] = i*grain_size; 
-      if ( i == numbox-1 ) { 
+      b_minx[i] = i*grain_size;
+      if ( i == numbox-1 ) {
         grain_size = nxl - (numbox-1)*par->grain_size;
       }
       b_maxx[i] = b_minx[i] + grain_size;
@@ -217,21 +217,21 @@ int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type>
   int maxfind = 0;
   for (std::size_t i=0;i<flag.size();i++) {
     if ( flag[i] == 1 && maxfind == 0 ) {
-      b_minx.push_back(i);  
+      b_minx.push_back(i);
       maxfind = 1;
     }
     if ( flag[i] == 0 && maxfind == 1 ) {
-      b_maxx.push_back(i-1);  
+      b_maxx.push_back(i-1);
       maxfind = 0;
     }
   }
 
   // add in ghostzones
   for (std::size_t i=0;i<b_maxx.size();i++) {
-    b_minx[i] -= hgw; 
-    b_maxx[i] += hgw; 
+    b_minx[i] -= hgw;
+    b_maxx[i] += hgw;
   }
-  
+
   // Determine the domain decomposition
   for (std::size_t i=0;i<b_maxx.size();i++) {
     std::size_t grain_size;
@@ -248,8 +248,8 @@ int level_refine(int level,parameter &par,boost::shared_ptr<std::vector<id_type>
       int tnx = b_maxx[i] - b_minx[i];
       int grain_size = tnx/numddbox;
       for (int j=0;j<numddbox;j++) {
-        ddminx.push_back(j*grain_size + b_minx[i]); 
-        if ( j == numddbox-1 ) { 
+        ddminx.push_back(j*grain_size + b_minx[i]);
+        if ( j == numddbox-1 ) {
           grain_size = tnx - (numddbox-1)*grain_size;
         }
         ddmaxx.push_back(ddminx[ddminx.size()-1] + grain_size-1);
@@ -321,7 +321,7 @@ int compute_error(std::vector<double> &error,int nx0,
         } else {
           BOOST_ASSERT(false);
         }
-        
+
         // Provide initial error
         error[i] = fabs(dx_u1);
       }
@@ -334,9 +334,9 @@ int compute_error(std::vector<double> &error,int nx0,
         // see if the new gi is the same as the old
         int gi = par->prev_gi[step];
         if ( gi != -1 ) {
-          if ( floatcmp(minx0,par->gr_minx[gi]) && 
-               floatcmp(h,par->gr_h[gi]) && 
-               nx0 == (int) par->gr_nx[gi] 
+          if ( floatcmp(minx0,par->gr_minx[gi]) &&
+               floatcmp(h,par->gr_h[gi]) &&
+               nx0 == (int) par->gr_nx[gi]
              ) {
             hpx::components::access_memory_block<hpx::components::adaptive1d::stencil_data>
                 result( hpx::components::stubs::memory_block::get((*result_data)[par->gi2item[gi]]) );
@@ -346,23 +346,23 @@ int compute_error(std::vector<double> &error,int nx0,
           } else if ( intersection(minx0,maxx0,
                                    par->gr_minx[gi],par->gr_maxx[gi]) &&
                       floatcmp(h,par->gr_h[gi])
-                    ) { 
+                    ) {
             hpx::components::access_memory_block<hpx::components::adaptive1d::stencil_data>
                 result( hpx::components::stubs::memory_block::get((*result_data)[par->gi2item[gi]]) );
 
             // find the intersection index
-            double x1 = (std::max)(minx0,par->gr_minx[gi]); 
-            double x2 = (std::min)(maxx0,par->gr_maxx[gi]); 
-  
+            double x1 = (std::max)(minx0,par->gr_minx[gi]);
+            double x2 = (std::min)(maxx0,par->gr_maxx[gi]);
+
             int isize = (int) ( (x2-x1)/h );
-  
+
             int istart_dst = (int) ( (x1 - minx0)/h );
-  
+
             int istart_src = (int) ( (x1 - par->gr_minx[gi])/h );
-  
+
             for (int ii=0;ii<=isize;ii++) {
               int i = ii + istart_dst;
-  
+
               int si = ii + istart_src;
               BOOST_ASSERT(i < (int) error.size());
               BOOST_ASSERT(si < (int) result->value_.size());
@@ -475,7 +475,7 @@ int compute_numrows(parameter &par)
     num_rows *= 2; // we take two timesteps in the mesh
     par->num_rows = num_rows;
 
-    int ii = -1; 
+    int ii = -1;
     for (std::size_t i = 0; i < num_rows; ++i)
     {
         if (((i + 5) % 3) != 0 || (par->allowedl == 0))
@@ -503,7 +503,7 @@ int compute_rowsize(parameter &par)
     std::size_t count;
     par->rowsize.resize(par->allowedl+1);
     for (std::size_t i=0;i<=par->allowedl;i++) {
-      count = 0; 
+      count = 0;
       int gi = level_return_start(i,par);
       count++;
       gi = par->gr_sibling[gi];
@@ -512,31 +512,31 @@ int compute_rowsize(parameter &par)
         gi = par->gr_sibling[gi];
       }
       par->rowsize[i] = count;
-    } 
+    }
     for (std::size_t i=0;i<=par->allowedl;i++) {
       for (std::size_t j=i+1;j<=par->allowedl;j++) {
         par->rowsize[i] += par->rowsize[j];
       }
     }
 
-    // here we create a correspondence getween the gi number used in 'had' 
+    // here we create a correspondence getween the gi number used in 'had'
     // and the index number used in hpx
     par->item2gi.resize(par->rowsize[0]);
     par->gi2item.resize(maxgids);
     count = 0;
     for (int i=par->allowedl;i>=0;i--) {
       int gi = level_return_start(i,par);
-      par->item2gi[count] = gi; 
-      par->gi2item[gi] = count; 
+      par->item2gi[count] = gi;
+      par->gi2item[gi] = count;
       count++;
       gi = par->gr_sibling[gi];
       while ( grid_return_existence(gi,par) ) {
-        par->item2gi[count] = gi; 
-        par->gi2item[gi] = count; 
+        par->item2gi[count] = gi;
+        par->gi2item[gi] = count;
         count++;
         gi = par->gr_sibling[gi];
       }
-    } 
+    }
 
     return 0;
 }
@@ -580,14 +580,14 @@ int increment_gi(int level,int nx,
     par->gr_left_neighbor[gi] = -1;
     par->gr_right_neighbor[gi] = -1;
     par->gr_nx[gi]    = nx;
-    
+
     return gi;
 
 };
 // }}}
 
 // intersection {{{
-bool intersection(double xmin,double xmax,double xmin2,double xmax2) 
+bool intersection(double xmin,double xmax,double xmin2,double xmax2)
 {
   double pa[1],ea[1];
   static double const half = 0.5;

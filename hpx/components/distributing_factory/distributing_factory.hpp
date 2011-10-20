@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_COMPONENTS_DISTRIBUTING_FACTORY_OCT_31_2008_0329PM)
@@ -11,12 +11,12 @@
 #include <hpx/components/distributing_factory/stubs/distributing_factory.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components 
+namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
-    // The \a distributing_factory class is the client side representation of a 
+    // The \a distributing_factory class is the client side representation of a
     // concrete \a server#distributing_factory component
-    class distributing_factory 
+    class distributing_factory
       : public client_base<distributing_factory, stubs::distributing_factory>
     {
     private:
@@ -28,9 +28,9 @@ namespace hpx { namespace components
           : base_type(naming::invalid_id)
         {}
 
-        /// Create a client side representation for any existing 
+        /// Create a client side representation for any existing
         /// \a server#runtime_support instance with the given global id \a gid.
-        distributing_factory(naming::id_type gid) 
+        distributing_factory(naming::id_type gid)
           : base_type(gid)
         {}
 
@@ -41,25 +41,25 @@ namespace hpx { namespace components
         typedef base_type::iterator_type iterator_type;
         typedef base_type::iterator_range_type iterator_range_type;
 
-        typedef lcos::promise<result_type, remote_result_type> 
+        typedef lcos::promise<result_type, remote_result_type>
             async_create_result_type;
 
         ///
         async_create_result_type create_components_async(
-            components::component_type type, std::size_t count = 1) 
+            components::component_type type, std::size_t count = 1)
         {
             return this->base_type::create_components_async(gid_, type, count);
         }
 
-        /// 
-        result_type create_components(components::component_type type, 
-            std::size_t count = 1) 
+        ///
+        result_type create_components(components::component_type type,
+            std::size_t count = 1)
         {
             return this->base_type::create_components(gid_, type, count);
         }
 
         /// Left in for backwards compatibility
-        void free_components(result_type const& gids) 
+        void free_components(result_type const& gids)
         {
         }
 

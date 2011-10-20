@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2007-2011 Hartmut Kaiser 
+//  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,7 +16,7 @@
 #include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
 
-namespace hpx { namespace parcelset 
+namespace hpx { namespace parcelset
 {
 
 struct parcelhandler_queue_base
@@ -37,12 +37,12 @@ struct parcelhandler_queue_base
     /// register event handler to be notified whenever a parcel arrives
     virtual bool register_event_handler(
         callback_type const& sink
-    ) = 0; 
+    ) = 0;
 
     virtual bool register_event_handler(
         callback_type const& sink
       , connection_type& conn
-    ) = 0; 
+    ) = 0;
 
     virtual void set_parcelhandler(parcelhandler* ph) = 0;
 

@@ -1,9 +1,9 @@
 namespace boost { namespace logging {
 
-/** 
+/**
 @page known_issues Known Issues
 
-- @ref known_issue_modifying_manipulator 
+- @ref known_issue_modifying_manipulator
 
 
 
@@ -48,7 +48,7 @@ If we were to allow modifying manipulators, we'd have to:
 In case of the former, pitfalls:
 - When modifying a manipulator, you'd need to pause() all loggers that use it. You need to know them.
 - This pause()/resume() mechanism will slow the logging process a bit
-- This will mean tight coupling between the writer and its member data. 
+- This will mean tight coupling between the writer and its member data.
 - In case a lot of logging happens while a logger is paused, could cause either a lot of caching, or a performance hit
   (a lot of threads would have to wait for the resume() to happen)
 
@@ -62,7 +62,7 @@ As a side-note, if I were a well known company, I'd just say "This behavior is b
 @subsection known_issue_modifying_manipulator_when When does it happen?
 
 I would say seldom. This can happen to you only if you want to modify loggers @em after you've initialized - thus, while
-you're logging. 
+you're logging.
 
 The usual scenario is :
 - you initialize Logging once, at beginning of program

@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_COMPONENTS_MEMORY_BLOCK_OCT_21_2008_0159PM)
@@ -24,7 +24,7 @@
 #include <boost/detail/atomic_count.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace server 
+namespace hpx { namespace components { namespace server
 {
     class memory_block;     // forward declaration only
 }}}
@@ -42,28 +42,28 @@ namespace hpx { namespace components { namespace server { namespace detail
         /// is hosted
         memory_block_header(server::memory_block* wrapper, std::size_t size,
                 hpx::actions::manage_object_action_base const& act)
-          : count_(0), size_(size), wrapper_(wrapper), 
+          : count_(0), size_(size), wrapper_(wrapper),
             managing_object_(act.get_instance())
         {
             BOOST_ASSERT(act.construct());
             act.construct()(this->get_ptr(), size);
         }
 
-        memory_block_header(server::memory_block* wrapper, 
+        memory_block_header(server::memory_block* wrapper,
                 memory_block_header const* rhs, std::size_t size,
                 hpx::actions::manage_object_action_base const& act)
-          : count_(0), size_(size), wrapper_(wrapper), 
+          : count_(0), size_(size), wrapper_(wrapper),
             managing_object_(act.get_instance())
         {
             BOOST_ASSERT(act.clone());
             act.clone()(this->get_ptr(), rhs->get_ptr(), size);
         }
 
-        /// This constructor is called whenever a memory_block gets 
+        /// This constructor is called whenever a memory_block gets
         /// de-serialized
         explicit memory_block_header(std::size_t size,
                 hpx::actions::manage_object_action_base const& act)
-          : count_(0), size_(size), wrapper_(NULL), 
+          : count_(0), size_(size), wrapper_(NULL),
             managing_object_(act.get_instance())
         {
             BOOST_ASSERT(act.construct());
@@ -87,9 +87,9 @@ namespace hpx { namespace components { namespace server { namespace detail
             return *this;
         }
 
-        /// \brief get_ptr returns the address of the first byte allocated for 
-        ///        this memory_block. 
-        boost::uint8_t* get_ptr() 
+        /// \brief get_ptr returns the address of the first byte allocated for
+        ///        this memory_block.
+        boost::uint8_t* get_ptr()
         {
             return reinterpret_cast<boost::uint8_t*>(this + 1);
         }
@@ -113,11 +113,11 @@ namespace hpx { namespace components { namespace server { namespace detail
 
         static component_type get_component_type()
         {
-            return components::get_component_type<memory_block_header>(); 
+            return components::get_component_type<memory_block_header>();
         }
         static void set_component_type(component_type t)
         {
-            components::set_component_type<memory_block_header>(t); 
+            components::set_component_type<memory_block_header>(t);
         }
 
         naming::id_type get_gid() const;
@@ -160,11 +160,11 @@ namespace hpx { namespace components { namespace server { namespace detail
 }}}}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components 
+namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief The \a memory_block_data structure is used for marshaling the 
-    ///        memory managed by a server#memory_block_data component to a 
+    /// \brief The \a memory_block_data structure is used for marshaling the
+    ///        memory managed by a server#memory_block_data component to a
     ///        remote site.
     class memory_block_data
     {
@@ -187,11 +187,11 @@ namespace hpx { namespace components
         {
             if (!data_) {
                 hpx::util::osstream strm;
-                strm << "memory_block_data data is NULL (" 
-                     << components::get_component_type_name(component_memory_block) 
+                strm << "memory_block_data data is NULL ("
+                     << components::get_component_type_name(component_memory_block)
                      << ")";
-                HPX_THROW_EXCEPTION(invalid_status, 
-                    "memory_block_data::get_ptr", 
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "memory_block_data::get_ptr",
                     hpx::util::osstream_get_string(strm));
             }
             return data_->get_ptr();
@@ -200,32 +200,32 @@ namespace hpx { namespace components
         {
             if (!data_) {
                 hpx::util::osstream strm;
-                strm << "memory_block_data data is NULL (" 
+                strm << "memory_block_data data is NULL ("
                      << components::get_component_type_name(component_memory_block)
                      << ")";
-                HPX_THROW_EXCEPTION(invalid_status, 
-                    "memory_block_data::get_ptr const", 
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "memory_block_data::get_ptr const",
                     hpx::util::osstream_get_string(strm));
             }
             return data_->get_ptr();
         }
 
-        std::size_t get_size() const 
-        { 
+        std::size_t get_size() const
+        {
             if (!data_) {
                 hpx::util::osstream strm;
-                strm << "memory_block_data data is NULL (" 
+                strm << "memory_block_data data is NULL ("
                      << components::get_component_type_name(component_memory_block)
                      << ")";
-                HPX_THROW_EXCEPTION(invalid_status, 
-                    "memory_block_data::get_size", 
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "memory_block_data::get_size",
                     hpx::util::osstream_get_string(strm));
             }
             return data_->get_size();
         }
 
         template <typename T>
-        T& get() 
+        T& get()
         {
             return *reinterpret_cast<T*>(get_ptr());
         }
@@ -241,28 +241,28 @@ namespace hpx { namespace components
         {
             if (!data_) {
                 hpx::util::osstream strm;
-                strm << "memory_block_data data is NULL (" 
-                     << components::get_component_type_name(component_memory_block) 
+                strm << "memory_block_data data is NULL ("
+                     << components::get_component_type_name(component_memory_block)
                      << ")";
-                HPX_THROW_EXCEPTION(invalid_status, 
-                    "memory_block_data::set", 
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "memory_block_data::set",
                     hpx::util::osstream_get_string(strm));
             }
             if (!data_->is_master())
             {
                 hpx::util::osstream strm;
-                strm << "memory_block_data data is not checked out (" 
+                strm << "memory_block_data data is not checked out ("
                      << components::get_component_type_name(component_memory_block)
                      << ")";
-                HPX_THROW_EXCEPTION(invalid_status, 
-                    "memory_block_data::set", 
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "memory_block_data::set",
                     hpx::util::osstream_get_string(strm));
             }
             *reinterpret_cast<T*>(data_->get_ptr()) = val;
         }
 
     private:
-        /// A memory_block_data structure is just a wrapper for a block of 
+        /// A memory_block_data structure is just a wrapper for a block of
         /// memory which has to be serialized as is
         ///
         /// \note Serializing memory_blocks is not platform independent as
@@ -277,7 +277,7 @@ namespace hpx { namespace components
             server::detail::memory_block_header* config = 0)
         {
             std::size_t size = data->get_size();
-            actions::manage_object_action_base* act = 
+            actions::manage_object_action_base* act =
                 const_cast<actions::manage_object_action_base*>(
                     &data->get_managing_object().get_instance());
 
@@ -288,7 +288,7 @@ namespace hpx { namespace components
 
             BOOST_ASSERT(act->save());
             if (config) {
-                act->save()(data->get_ptr(), data->get_size(), ar, version, 
+                act->save()(data->get_ptr(), data->get_size(), ar, version,
                     config->get_ptr());
             }
             else {
@@ -308,8 +308,8 @@ namespace hpx { namespace components
 
         ///////////////////////////////////////////////////////////////////////
         template <class Archive>
-        static server::detail::memory_block_header* 
-        load_(Archive & ar, const unsigned int version, 
+        static server::detail::memory_block_header*
+        load_(Archive & ar, const unsigned int version,
             server::detail::memory_block_header* config = 0)
         {
             std::size_t size = 0;
@@ -319,13 +319,13 @@ namespace hpx { namespace components
             ar >> act;
 
             typedef server::detail::memory_block_header alloc_type;
-            alloc_type* p = 
-                new (server::detail::allocate_block<alloc_type>(size)) 
+            alloc_type* p =
+                new (server::detail::allocate_block<alloc_type>(size))
                     alloc_type(size, act->get_instance());
 
             BOOST_ASSERT(act->load());
             if (config) {
-                act->load()(p->get_ptr(), size, ar, version, 
+                act->load()(p->get_ptr(), size, ar, version,
                     config->get_ptr());
             }
             else {
@@ -342,7 +342,7 @@ namespace hpx { namespace components
         {
             bool has_config;
             ar >> has_config;
-            if (has_config) 
+            if (has_config)
                 config_.reset(load_(ar, version));
             data_.reset(load_(ar, version, config_.get()));
         }
@@ -358,15 +358,15 @@ namespace hpx { namespace components
 namespace hpx { namespace components { namespace server { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief The memory_block structure implements the component 
+    /// \brief The memory_block structure implements the component
     ///        functionality exposed by a memory_block component
     ///
-    /// The memory block this structure it is managing is constructed from a 
+    /// The memory block this structure it is managing is constructed from a
     /// memory_block_header directly followed by the actual raw memory.
     class HPX_EXPORT memory_block : public memory_block_header
     {
     public:
-        // parcel action code: the action to be performed on the destination 
+        // parcel action code: the action to be performed on the destination
         // object (the accumulator)
         enum actions
         {
@@ -385,14 +385,14 @@ namespace hpx { namespace components { namespace server { namespace detail
 
         // clone memory from rhs
         memory_block(server::memory_block* wrapper, std::size_t size,
-                detail::memory_block_header const* rhs, 
+                detail::memory_block_header const* rhs,
                 hpx::actions::manage_object_action_base const& act)
           : memory_block_header(wrapper, rhs, size, act)
         {}
 
         ///////////////////////////////////////////////////////////////////////
         // components must contain a typedef for wrapping_type defining the
-        // managed_component type used to encapsulate instances of this 
+        // managed_component type used to encapsulate instances of this
         // component
         typedef server::memory_block wrapping_type;
         typedef memory_block_header wrapped_type;
@@ -421,35 +421,35 @@ namespace hpx { namespace components { namespace server { namespace detail
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::direct_result_action0<
-            memory_block, components::memory_block_data, memory_block_get, 
+            memory_block, components::memory_block_data, memory_block_get,
             &memory_block::get
         > get_action;
 
         typedef hpx::actions::direct_result_action1<
-            memory_block, components::memory_block_data, memory_block_get_config, 
+            memory_block, components::memory_block_data, memory_block_get_config,
             components::memory_block_data const&, &memory_block::get_config
         > get_config_action;
 
         typedef hpx::actions::direct_result_action0<
-            memory_block, components::memory_block_data, memory_block_checkout, 
+            memory_block, components::memory_block_data, memory_block_checkout,
             &memory_block::checkout
         > checkout_action;
 
         typedef hpx::actions::direct_action1<
-            memory_block, memory_block_checkin, 
-            components::memory_block_data const&, 
+            memory_block, memory_block_checkin,
+            components::memory_block_data const&,
             &memory_block::checkin
         > checkin_action;
 
         typedef hpx::actions::direct_result_action0<
-            memory_block, naming::gid_type, memory_block_clone, 
+            memory_block, naming::gid_type, memory_block_clone,
             &memory_block::clone
         > clone_action;
     };
 }}}}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace server 
+namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     ///
@@ -460,29 +460,29 @@ namespace hpx { namespace components { namespace server
         typedef memory_block type_holder;
 
         /// \brief Construct an empty managed_component
-        memory_block() 
-          : component_(0) 
+        memory_block()
+          : component_(0)
         {}
 
     private:
-        /// \brief Construct a memory_block instance holding a memory_block 
-        ///        instance. This constructor takes ownership of the 
+        /// \brief Construct a memory_block instance holding a memory_block
+        ///        instance. This constructor takes ownership of the
         ///        passed pointer.
         ///
-        /// \param c    [in] The pointer to the memory_block instance. The 
+        /// \param c    [in] The pointer to the memory_block instance. The
         ///             memory_block instance takes ownership of this pointer.
-        explicit memory_block(wrapped_type* c) 
-          : component_(c) 
+        explicit memory_block(wrapped_type* c)
+          : component_(c)
         {}
 
         /// \brief Construct a memory_block instance holding a new wrapped
         ///        instance
         ///
         /// \param appl [in] The applier to be used for construction of the new
-        ///             wrapped instance. 
-        memory_block(std::size_t size, 
-                actions::manage_object_action_base const& act) 
-          : component_(0) 
+        ///             wrapped instance.
+        memory_block(std::size_t size,
+                actions::manage_object_action_base const& act)
+          : component_(0)
         {
             typedef detail::memory_block alloc_type;
             alloc_type* p = server::detail::allocate_block<alloc_type>(size);
@@ -490,11 +490,11 @@ namespace hpx { namespace components { namespace server
             component_.reset(p);
         }
 
-        /// \brief Construct a memory_block instance as a plain copy of the 
+        /// \brief Construct a memory_block instance as a plain copy of the
         ///        parameter
         memory_block(detail::memory_block_header const* rhs,
-                actions::manage_object_action_base const& act) 
-          : component_(0) 
+                actions::manage_object_action_base const& act)
+          : component_(0)
         {
             std::size_t size = rhs->get_size();
             typedef detail::memory_block alloc_type;
@@ -503,12 +503,12 @@ namespace hpx { namespace components { namespace server
             component_.reset(p);
         }
 
-        /// \brief finalize() will be called just before the instance gets 
+        /// \brief finalize() will be called just before the instance gets
         ///        destructed
         ///
         /// \param self [in] The PX \a thread used to execute this function.
-        /// \param appl [in] The applier to be used for finalization of the 
-        ///             component instance. 
+        /// \param appl [in] The applier to be used for finalization of the
+        ///             component instance.
         void finalize() {}
 
     public:
@@ -521,11 +521,11 @@ namespace hpx { namespace components { namespace server
         {
             if (!component_) {
                 hpx::util::osstream strm;
-                strm << "component is NULL (" 
-                     << components::get_component_type_name(component_memory_block) 
+                strm << "component is NULL ("
+                     << components::get_component_type_name(component_memory_block)
                      << ")";
-                HPX_THROW_EXCEPTION(invalid_status, 
-                    "memory_block::get", 
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "memory_block::get",
                     hpx::util::osstream_get_string(strm));
             }
             return static_cast<detail::memory_block*>(component_.get());
@@ -534,11 +534,11 @@ namespace hpx { namespace components { namespace server
         {
             if (!component_) {
                 hpx::util::osstream strm;
-                strm << "component is NULL (" 
+                strm << "component is NULL ("
                      << components::get_component_type_name(component_memory_block)
                      << ")";
-                HPX_THROW_EXCEPTION(invalid_status, 
-                    "memory_block::get const", 
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "memory_block::get const",
                     hpx::util::osstream_get_string(strm));
             }
             return static_cast<detail::memory_block const*>(component_.get());
@@ -565,7 +565,7 @@ namespace hpx { namespace components { namespace server
     protected:
         // the memory for the wrappers is managed by a one_size_heap_list
         typedef components::detail::wrapper_heap_list<
-            components::detail::fixed_wrapper_heap<memory_block> > 
+            components::detail::fixed_wrapper_heap<memory_block> >
         heap_type;
 
         struct wrapper_heap_tag {};
@@ -573,19 +573,19 @@ namespace hpx { namespace components { namespace server
         static heap_type& get_heap()
         {
             // ensure thread-safe initialization
-            util::static_<heap_type, wrapper_heap_tag, HPX_RUNTIME_INSTANCE_LIMIT> 
+            util::static_<heap_type, wrapper_heap_tag, HPX_RUNTIME_INSTANCE_LIMIT>
                 heap(component_memory_block);
             return heap.get(get_runtime_instance_number());
         }
 
     public:
-        /// \brief  The memory for managed_component objects is managed by 
-        ///         a class specific allocator. This allocator uses a one size 
+        /// \brief  The memory for managed_component objects is managed by
+        ///         a class specific allocator. This allocator uses a one size
         ///         heap implementation, ensuring fast memory allocation.
-        ///         Additionally the heap registers the allocated  
+        ///         Additionally the heap registers the allocated
         ///         managed_component instance with the AGAS service.
         ///
-        /// \param size   [in] The parameter \a size is supplied by the 
+        /// \param size   [in] The parameter \a size is supplied by the
         ///               compiler and contains the number of bytes to allocate.
         static void* operator new(std::size_t size)
         {
@@ -595,7 +595,7 @@ namespace hpx { namespace components { namespace server
         }
         static void operator delete(void* p, std::size_t size)
         {
-            if (NULL == p) 
+            if (NULL == p)
                 return;     // do nothing if given a NULL pointer
 
             if (size != sizeof(memory_block)) {
@@ -605,22 +605,22 @@ namespace hpx { namespace components { namespace server
             get_heap().free(p);
         }
 
-        /// \brief  The placement operator new has to be overloaded as well 
-        ///         (the global placement operators are hidden because of the 
+        /// \brief  The placement operator new has to be overloaded as well
+        ///         (the global placement operators are hidden because of the
         ///         new/delete overloads above).
         static void* operator new(std::size_t, void *p)
         {
             return p;
         }
-        /// \brief  This operator delete is called only if the placement new 
+        /// \brief  This operator delete is called only if the placement new
         ///         fails.
         static void operator delete(void*, void*)
         {}
 
-        /// \brief  The function \a create is used for allocation and 
-        //          initialization of components. Here we abuse the count 
-        ///         parameter normally used to specify the number of objects to 
-        ///         be created. It is interpreted as the number of bytes to 
+        /// \brief  The function \a create is used for allocation and
+        //          initialization of components. Here we abuse the count
+        ///         parameter normally used to specify the number of objects to
+        ///         be created. It is interpreted as the number of bytes to
         ///         allocate for the new memory_block.
         static memory_block* create(std::size_t count,
             actions::manage_object_action_base const& act)
@@ -638,11 +638,11 @@ namespace hpx { namespace components { namespace server
             return new (p) memory_block(rhs, act);
         }
 
-        /// \brief  The function \a destroy is used for deletion and 
+        /// \brief  The function \a destroy is used for deletion and
         //          de-allocation of arrays of wrappers
         static void destroy(memory_block* p, std::size_t count = 1)
         {
-            if (NULL == p || 0 == count) 
+            if (NULL == p || 0 == count)
                 return;     // do nothing if given a NULL pointer
 
             p->finalize();
@@ -652,14 +652,14 @@ namespace hpx { namespace components { namespace server
             get_heap().free(p);
         }
 
-        /// \brief  The function \a get_factory_properties is used to 
-        ///         determine, whether instances of the derived component can 
-        ///         be created in blocks (i.e. more than one instance at once). 
-        ///         This function is used by the \a distributing_factory to 
+        /// \brief  The function \a get_factory_properties is used to
+        ///         determine, whether instances of the derived component can
+        ///         be created in blocks (i.e. more than one instance at once).
+        ///         This function is used by the \a distributing_factory to
         ///         determine a correct allocation strategy
         static factory_property get_factory_properties()
         {
-            // this component can be allocated one at a time only, but the 
+            // this component can be allocated one at a time only, but the
             // meaning of the count parameter passed to create is different.
             // In this case it specifies the number of bytes to allocate for a
             // new memory block.
@@ -693,13 +693,13 @@ namespace detail
 inline naming::id_type memory_block_header::get_gid() const
 {
     return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
-} 
+}
 
 inline naming::gid_type memory_block_header::get_base_gid() const
 {
     BOOST_ASSERT(wrapper_);
-    return wrapper_->get_base_gid(); 
-} 
+    return wrapper_->get_base_gid();
+}
 
 }}}}
 

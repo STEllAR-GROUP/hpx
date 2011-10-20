@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_INTERPOLATE3D_CONFIGURATION_AUG_07_2011_0641PM)
@@ -11,7 +11,7 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 
-namespace interpolate3d 
+namespace interpolate3d
 {
     ///////////////////////////////////////////////////////////////////////////
     struct config_data
@@ -41,7 +41,7 @@ namespace interpolate3d { namespace server
         typedef configuration wrapping_type;
 
         ///////////////////////////////////////////////////////////////////////
-        // parcel action code: the action to be performed on the destination 
+        // parcel action code: the action to be performed on the destination
         // object (the accumulator)
         enum actions
         {
@@ -50,7 +50,7 @@ namespace interpolate3d { namespace server
         };
 
         // exposed functionality
-        void init(std::string const& datafile, std::string const& symbolic_name, 
+        void init(std::string const& datafile, std::string const& symbolic_name,
             std::size_t num_instances);
         config_data get() const;
 
@@ -59,13 +59,13 @@ namespace interpolate3d { namespace server
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::action3<
-            configuration, configuration_init, 
-            std::string const&, std::string const&, std::size_t, 
+            configuration, configuration_init,
+            std::string const&, std::string const&, std::size_t,
             &configuration::init
         > init_action;
 
         typedef hpx::actions::result_action0<
-            configuration const, config_data, configuration_get, 
+            configuration const, config_data, configuration_get,
             &configuration::get
         > get_action;
 

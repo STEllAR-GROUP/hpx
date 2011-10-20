@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2007 Alexandre (aka Alex) TABBAL
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_PARCELSET_SERVER_PARCELPORTQUEUE_MAR_26_2008_1219PM)
@@ -36,7 +36,7 @@ namespace hpx { namespace parcelset { namespace server
 
     private:
         hpx::parcelset::parcelport& parcel_port_;
-        typedef void callback_type(parcelport&, 
+        typedef void callback_type(parcelport&,
             boost::shared_ptr<std::vector<char> > const&,
             threads::thread_priority);
         boost::function<callback_type> notify_;
@@ -44,5 +44,5 @@ namespace hpx { namespace parcelset { namespace server
 
 ///////////////////////////////////////////////////////////////////////////////
 }}}
-    
+
 #endif

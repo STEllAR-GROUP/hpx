@@ -2,7 +2,7 @@
 # Copyright (c) 2010-2011 Matt Anderson
 # Copyright (c) 2011      Bryce Lelbach
 #
-# Distributed under the Boost Software License, Version 1.0. (See accompanying 
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(NOT CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCT)
@@ -21,7 +21,7 @@ macro(hpx_get_version name)
 
   hpx_parse_arguments(${name}
     "HEADERS;HEADER_PATHS;LIBRARIES;LIBRARY_PATHS" "ESSENTIAL" ${ARGN})
-  
+
   #############################################################################
   # Check if ${name}_ROOT is defined and use that path first if
   # ${name}_USE_SYSTEM is defined.
@@ -30,7 +30,7 @@ macro(hpx_get_version name)
       set(${name}_ROOT $ENV{${name}_ROOT})
     endif()
   endif()
-  
+
   set(rooted_header_paths)
   foreach(path ${${name}_HEADER_PATHS})
     list(APPEND rooted_header_paths ${${name}_ROOT}/${path})
@@ -46,7 +46,7 @@ macro(hpx_get_version name)
       hpx_warn("get_version.${name}" "Header not found in ${${name}_ROOT}, trying system path.")
       unset(${name}_ROOT)
     else()
-      hpx_info("get_version.${name}" "Header found in ${${name}_ROOT}.") 
+      hpx_info("get_version.${name}" "Header found in ${${name}_ROOT}.")
     endif()
   endif()
 
@@ -54,19 +54,19 @@ macro(hpx_get_version name)
   if(NOT ${name}_ROOT)
     find_path(${name}_INCLUDE_DIR NAMES ${${name}_HEADERS}
                                   PATH_SUFFIXES ${${name}_HEADER_PATHS})
-    
+
     if(NOT ${name}_INCLUDE_DIR)
       if(${name}_ESSENTIAL)
         hpx_error("get_version.${name}" "Header not found in system path.")
-      else() 
+      else()
         hpx_warn("get_version.${name}" "Header not found in system path.")
       endif()
       unset(${name}_ROOT)
     else()
-      hpx_info("get_version.${name}" "Header found in system path.") 
+      hpx_info("get_version.${name}" "Header found in system path.")
     endif()
   endif()
-  
+
   endif()
 endmacro()
 
@@ -89,13 +89,13 @@ macro(hpx_find_package name)
     find_library(${name}_LIBRARY
       NAMES ${${name}_LIBRARIES}
       PATHS ${rooted_lib_paths}
-      NO_DEFAULT_PATH) 
+      NO_DEFAULT_PATH)
 
     if(NOT ${name}_LIBRARY)
       hpx_warn("find_package.${name}" "Library not found in ${${name}_ROOT}, trying system path.")
       unset(${name}_ROOT)
     else()
-      hpx_info("find_package.${name}" "Library found in ${${name}_ROOT}.") 
+      hpx_info("find_package.${name}" "Library found in ${${name}_ROOT}.")
     endif()
   endif()
 
@@ -105,16 +105,16 @@ macro(hpx_find_package name)
     hpx_print_list("DEBUG" "find_package.${name}" "Library paths" ${name}_LIBRARY_PATHS)
     find_library(${name}_LIBRARY NAMES ${${name}_LIBRARIES}
                                  PATH_SUFFIXES ${${name}_LIBRARY_PATHS})
-    
+
     if(NOT ${name}_LIBRARY)
       if(${name}_ESSENTIAL)
         hpx_error("find_package.${name}" "Library not found in system path.")
-      else() 
+      else()
         hpx_warn("find_package.${name}" "Library not found in system path.")
       endif()
       unset(${name}_ROOT)
     else()
-      hpx_info("find_package.${name}" "Library found in system path.") 
+      hpx_info("find_package.${name}" "Library found in system path.")
     endif()
   endif()
 

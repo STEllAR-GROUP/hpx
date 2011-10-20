@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  
+//
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -172,7 +172,7 @@ namespace hpx { namespace util { namespace detail {
                 ar & f;
                 new (object) Functor(f);
             }
-            
+
             static void oserialize(void ** f, OArchive & ar, unsigned)
             {
                 ar & *reinterpret_cast<Functor *>(f);
@@ -236,7 +236,7 @@ namespace hpx { namespace util { namespace detail {
                 **reinterpret_cast<Functor**>(dest) =
                     **reinterpret_cast<Functor * const *>(f);
             }
-            
+
             static R invoke(
                 void ** f
                 BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)
@@ -292,7 +292,7 @@ namespace hpx { namespace util { namespace detail {
                 ar & f;
                 *object = new Functor(f);
             }
-            
+
             static void oserialize(void ** f, OArchive & ar, unsigned)
             {
                 ar & **reinterpret_cast<Functor **>(f);

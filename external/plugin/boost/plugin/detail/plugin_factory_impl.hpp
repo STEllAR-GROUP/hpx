@@ -37,19 +37,19 @@ namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template<
-        typename BasePlugin, typename Base, 
+        typename BasePlugin, typename Base,
         BOOST_PP_ENUM_PARAMS(N, typename A)
     >
     struct plugin_factory_item<
-        BasePlugin, Base, 
+        BasePlugin, Base,
         boost::mpl::list<BOOST_PP_ENUM_PARAMS(N, A)>
-    > 
-    :   public Base 
+    >
+    :   public Base
     {
         using Base::create;
         BasePlugin* create(std::string const& name, BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
         {
-            std::pair<abstract_factory<BasePlugin> *, dll_handle> r = 
+            std::pair<abstract_factory<BasePlugin> *, dll_handle> r =
                 get_abstract_factory<BasePlugin>(this->m_dll, name, this->m_basename);
             return r.first->create(r.second, BOOST_PP_ENUM_PARAMS(N, a));
         }
@@ -61,15 +61,15 @@ namespace detail {
         BOOST_PP_ENUM_PARAMS(N, typename A)
     >
     struct static_plugin_factory_item<
-        BasePlugin, Base, 
+        BasePlugin, Base,
         boost::mpl::list<BOOST_PP_ENUM_PARAMS(N, A)>
-    > 
-    :   public Base 
+    >
+    :   public Base
     {
         using Base::create;
         BasePlugin* create(std::string const& name, BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
         {
-            std::pair<abstract_factory<BasePlugin> *, dll_handle> r = 
+            std::pair<abstract_factory<BasePlugin> *, dll_handle> r =
                 get_abstract_factory_static<BasePlugin>(
                     this->f, &empty_deleter, name);
             return r.first->create(r.second, BOOST_PP_ENUM_PARAMS(N, a));

@@ -1,6 +1,6 @@
-//  Copyright (c) 2011 Bryce Adelstein-Lelbach 
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Copyright (c) 2011 Bryce Adelstein-Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <stdexcept>
@@ -38,7 +38,7 @@ double delay()
         d += 1 / (2. * i + 1);
     return d;
 }
-    
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(
     variables_map& vm
@@ -46,27 +46,27 @@ int hpx_main(
 {
     {
         num_iterations = vm["delay-iterations"].as<boost::uint64_t>();
-    
+
         const boost::uint64_t count = vm["delay-loops"].as<boost::uint64_t>();
 
         const bool csv = vm.count("csv");
-    
+
         if (HPX_UNLIKELY(0 == count))
             throw std::logic_error("error: count of 0 loops specified\n");
 
         for (boost::uint64_t i = 0; i < count; ++i)
         {
-            // start the clock 
+            // start the clock
             high_resolution_timer walltime;
-     
-            global_scratch = delay();  
-      
-            // stop the clock 
+
+            global_scratch = delay();
+
+            // stop the clock
             const double duration = walltime.elapsed();
-        
+
             if (csv)
                 cout << ( boost::format("%1%,%2%\n")
-                        % num_iterations 
+                        % num_iterations
                         % duration)
                      << flush;
             else
@@ -92,11 +92,11 @@ int main(
 
     cmdline.add_options()
         ( "delay-loops"
-        , value<boost::uint64_t>()->default_value(64) 
+        , value<boost::uint64_t>()->default_value(64)
         , "number of delay loops to run")
-        
+
         ( "delay-iterations"
-        , value<boost::uint64_t>()->default_value(65536) 
+        , value<boost::uint64_t>()->default_value(65536)
         , "number of iterations in the delay loop")
 
         ( "csv"

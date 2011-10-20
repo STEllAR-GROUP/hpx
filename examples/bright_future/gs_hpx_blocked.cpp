@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  
+//
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -42,7 +42,7 @@ struct fun_base
 typedef bright_future::server::remote_lse<double> remote_lse_type;
 typedef bright_future::lse_config<double> lse_config;
 typedef bright_future::server::remote_lse<double>::range_type range_type;
-  
+
 /*
 #include <boost/phoenix.hpp>
 #include <boost/phoenix/stl/cmath.hpp>
@@ -80,7 +80,7 @@ struct init_u_fun
     double operator()(size_type x, size_type y, lse_config const & c)
     {
         //cout << "hx " << c.hx << "hy " << c.hy << "\n" << flush;
-        //return 
+        //return
         double value =
             y == (c.n_y - 1) ? sin((x * c.hx) * 6.283) * sinh(6.283) : 0.0;
             /*
@@ -123,7 +123,7 @@ struct output_fun
     : fun_base
 {
     boost::shared_ptr<std::ofstream> file;
-    
+
     output_fun() {}
     output_fun(std::string const & output) : file(new std::ofstream(output.c_str())) {}
 
@@ -190,7 +190,7 @@ void gs(
             init_future;
 
         init_future(remote_id, n_x, n_y, hx, hy).get();
-        
+
         typedef
             hpx::lcos::eager_future<remote_lse_type::init_rhs_blocked_action>
             init_rhs_future;
@@ -201,11 +201,11 @@ void gs(
         size_type n_x_block = n_x/block_size+1;
         size_type n_y_block = n_y/block_size+1;
         //cout << n_x << " " << n_x_block << " | " << n_y << " " << n_y_block << "\n" << flush;
-        
+
         typedef std::vector<promise_grid_type> iteration_dependencies_type;
 
         iteration_dependencies_type iteration_dependencies(max_iterations+1, promise_grid_type(n_x_block, n_y_block));
-            
+
         // set our initial values, setting the top boundary to be a dirichlet
         // boundary condition
         {
@@ -218,7 +218,7 @@ void gs(
                         init_rhs_future(remote_id, init_rhs_fun(), range_type(x, x+block_size), range_type(y, y + block_size));
                 }
             }
-            
+
             typedef
                 hpx::lcos::eager_future<remote_lse_type::init_u_blocked_action>
                 init_u_future;
@@ -236,11 +236,11 @@ void gs(
                 promise.get();
             }
         }
-        
+
         typedef
             hpx::lcos::eager_future<remote_lse_type::apply_action>
             apply_future;
-        
+
         typedef
             hpx::lcos::eager_future<remote_lse_type::apply_region_action>
             apply_region_future;
@@ -283,7 +283,7 @@ void gs(
                         if(y > 0)
                             deps.push_back(&current(x,y-1));
 
-                        current(x, y) = 
+                        current(x, y) =
                             apply_region_future(
                                 remote_id
                               , update_fun()
@@ -312,7 +312,7 @@ void gs(
             {
                 r = r + residuum[i] * residuum[i];
             }
-        
+
             if(std::sqrt(r) <= 1e-10)
             {
                 break;

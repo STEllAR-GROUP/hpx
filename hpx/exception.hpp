@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_EXCEPTION_MAR_24_2008_0929AM)
@@ -26,7 +26,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx  
+namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
     enum error
@@ -63,7 +63,7 @@ namespace hpx
         last_error
     };
 
-    char const* const error_names[] = 
+    char const* const error_names[] =
     {
         "success",
         "no_success",
@@ -97,7 +97,7 @@ namespace hpx
         ""
     };
 
-    namespace detail 
+    namespace detail
     {
         class hpx_category : public boost::system::error_category
         {
@@ -147,24 +147,24 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    enum throwmode 
+    enum throwmode
     {
         plain = 0,
         rethrow = 1,
     };
 
-    inline boost::system::error_code 
+    inline boost::system::error_code
     make_system_error_code(error e, throwmode mode = plain)
     {
-        return boost::system::error_code(static_cast<int>(e), 
+        return boost::system::error_code(static_cast<int>(e),
             mode == rethrow ? get_hpx_rethrow_category() : get_hpx_category());
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline boost::system::error_condition 
+    inline boost::system::error_condition
         make_error_condition(error e, throwmode mode)
     {
-        return boost::system::error_condition(static_cast<int>(e), 
+        return boost::system::error_condition(static_cast<int>(e),
             mode == rethrow ? get_hpx_rethrow_category() : get_hpx_category());
     }
 
@@ -192,19 +192,19 @@ namespace hpx
         std::string message_;
     };
 
-    inline error_code 
+    inline error_code
     make_error_code(error e, throwmode mode = plain)
     {
         return error_code(e, "", mode);
     }
 
-    inline error_code 
+    inline error_code
     make_error_code(error e, char const* msg, throwmode mode = plain)
     {
         return error_code(e, msg, mode);
     }
 
-    inline error_code 
+    inline error_code
     make_error_code(error e, std::string const& msg, throwmode mode = plain)
     {
         return error_code(e, msg, mode);
@@ -219,41 +219,41 @@ namespace hpx
     class HPX_EXCEPTION_EXPORT exception : public boost::system::system_error
     {
     public:
-        explicit exception(error e) 
+        explicit exception(error e)
           : boost::system::system_error(make_error_code(e, plain))
         {
             BOOST_ASSERT(e >= success && e < last_error);
             LERR_(error) << "created exception: " << this->what();
         }
-        explicit exception(boost::system::system_error e) 
+        explicit exception(boost::system::system_error e)
           : boost::system::system_error(e)
         {
             LERR_(error) << "created exception: " << this->what();
         }
-        exception(error e, char const* msg, throwmode mode = plain) 
+        exception(error e, char const* msg, throwmode mode = plain)
           : boost::system::system_error(make_system_error_code(e, mode), msg)
         {
             BOOST_ASSERT(e >= success && e < last_error);
             LERR_(error) << "created exception: " << this->what();
         }
-        exception(error e, std::string const& msg, throwmode mode = plain) 
+        exception(error e, std::string const& msg, throwmode mode = plain)
           : boost::system::system_error(make_system_error_code(e, mode), msg)
         {
             BOOST_ASSERT(e >= success && e < last_error);
             LERR_(error) << "created exception: " << this->what();
         }
-        ~exception (void) throw() 
+        ~exception (void) throw()
         {
         }
 
-        error get_error() const throw() 
-        { 
+        error get_error() const throw()
+        {
             return static_cast<error>(
                 this->boost::system::system_error::code().value());
         }
 
-        error_code get_error_code(throwmode mode = plain) const throw() 
-        { 
+        error_code get_error_code(throwmode mode = plain) const throw()
+        {
             return make_error_code(static_cast<error>(
                 this->boost::system::system_error::code().value())
               , this->boost::system::system_error::what()
@@ -275,48 +275,48 @@ namespace hpx
     }
 
     /// Stores the information about the locality the exception has been raised
-    /// on. This information will show up in error messages under the 
+    /// on. This information will show up in error messages under the
     /// [locality] tag.
     typedef boost::error_info<detail::tag_throw_locality, boost::uint32_t>
         throw_locality;
 
-    /// Stores the information about the shepherd thread the exception has been 
-    /// raised on. This information will show up in error messages under the 
+    /// Stores the information about the shepherd thread the exception has been
+    /// raised on. This information will show up in error messages under the
     /// [shepherd] tag.
     typedef boost::error_info<detail::tag_throw_shepherd, boost::int64_t>
         throw_shepherd;
 
-    /// Stores the information about the HPX thread the exception has been 
-    /// raised on. This information will show up in error messages under the 
+    /// Stores the information about the HPX thread the exception has been
+    /// raised on. This information will show up in error messages under the
     /// [thread_id] tag.
     typedef boost::error_info<detail::tag_throw_thread_id, std::size_t>
         throw_thread_id;
 
-    /// Stores the information about the HPX thread name the exception has been 
-    /// raised on. This information will show up in error messages under the 
+    /// Stores the information about the HPX thread name the exception has been
+    /// raised on. This information will show up in error messages under the
     /// [thread_name] tag.
     typedef boost::error_info<detail::tag_throw_thread_name, std::string>
         throw_thread_name;
 
-    /// Stores the information about the function name the exception has been 
-    /// raised in. This information will show up in error messages under the 
+    /// Stores the information about the function name the exception has been
+    /// raised in. This information will show up in error messages under the
     /// [function] tag.
     typedef boost::error_info<detail::tag_throw_function, std::string>
         throw_function;
 
-    /// Stores the information about the source file name the exception has 
-    /// been raised in. This information will show up in error messages under 
+    /// Stores the information about the source file name the exception has
+    /// been raised in. This information will show up in error messages under
     /// the [file] tag.
     typedef boost::error_info<detail::tag_throw_file, std::string>
         throw_file;
 
-    /// Stores the information about the source file line number the exception 
-    /// has been raised at. This information will show up in error messages 
+    /// Stores the information about the source file line number the exception
+    /// has been raised at. This information will show up in error messages
     /// under the [line] tag.
     using boost::throw_line;
 
-    /// Stores the information about the stack backtrace at the point the 
-    /// exception has been raised at. This information will show up in error 
+    /// Stores the information about the stack backtrace at the point the
+    /// exception has been raised at. This information will show up in error
     /// messages under the [stack_trace] tag.
     typedef boost::error_info<detail::tag_throw_stacktrace, std::string>
         throw_stacktrace;
@@ -327,8 +327,8 @@ namespace hpx
         // rethrow an exception, internal helper
         template <typename Exception>
         BOOST_ATTRIBUTE_NORETURN HPX_EXPORT
-        void rethrow_exception(Exception const& e, 
-            std::string const& func, std::string const& file, int line, 
+        void rethrow_exception(Exception const& e,
+            std::string const& func, std::string const& file, int line,
             std::string const& back_trace, boost::uint32_t node = 0,
             boost::int64_t shepherd = -1, std::size_t thread_id = 0,
             std::string const& thread_name = "");
@@ -336,7 +336,7 @@ namespace hpx
         // main function for throwing exceptions
         template <typename Exception>
         BOOST_ATTRIBUTE_NORETURN HPX_EXPORT
-        void throw_exception(Exception const& e, 
+        void throw_exception(Exception const& e,
             std::string const& func, std::string const& file, int line);
 
         // BOOST_ASSERT handler
@@ -349,7 +349,7 @@ namespace hpx
         void assertion_failed_msg(char const* msg, char const* expr,
             char const* function, char const* file, long line);
 
-        // If backtrace support is enabled, this function returns the current 
+        // If backtrace support is enabled, this function returns the current
         // stack backtrace, otherwise it will return an empty string.
         HPX_EXPORT std::string backtrace();
 
@@ -397,14 +397,14 @@ namespace boost
         };
 
         template<> struct is_error_condition_enum<hpx::error>
-        { 
-            static const bool value = true; 
+        {
+            static const bool value = true;
         };
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// helper macro allowing to prepend file name and line number to a generated 
+// helper macro allowing to prepend file name and line number to a generated
 // exception
 #define HPX_THROW_EXCEPTION_EX(except, errcode, func, msg, mode)              \
     {                                                                         \

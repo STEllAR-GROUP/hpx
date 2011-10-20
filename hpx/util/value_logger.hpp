@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2008 Hartmut Kaiser
 //
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_UTIL_VALUE_LOGGER_DEC_08_0548PM)
@@ -40,7 +40,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     /// The \a value_logger class can be used to collect timings for a block
     /// of code. It measures the execution time for each of the executions and
-    /// collects the number of invocations, the average, and the variance of 
+    /// collects the number of invocations, the average, and the variance of
     /// the measured execution times.
     template <typename T>
     class value_logger
@@ -53,13 +53,13 @@ namespace hpx { namespace util
         value_logger(char const* const description, bool enabled = true)
           : description_(description), enabled_(enabled && LTIM_ENABLED(fatal))
         {
-            if (enabled_) 
+            if (enabled_)
                 values_.reserve(hpx_initial_times_size);
         }
 
         ~value_logger()
         {
-            if (!enabled_) 
+            if (!enabled_)
                 return;     // generate output only if logging is enabled
 
             std::string name(description_);
@@ -79,7 +79,7 @@ namespace hpx { namespace util
 
         void snapshot(T const& t)
         {
-            if (enabled_) 
+            if (enabled_)
                 values_.push_back(std::make_pair(boost::lockfree::hrtimer_ticks(), t));
         }
 

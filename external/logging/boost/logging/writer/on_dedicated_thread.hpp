@@ -61,8 +61,8 @@ namespace detail {
     };
 }
 
-/** 
-@brief Performs all writes on a dedicated thread  - very efficient and <b>thread-safe</b>. 
+/**
+@brief Performs all writes on a dedicated thread  - very efficient and <b>thread-safe</b>.
 
 <tt>\#include <boost/logging/writer/on_dedicated_thread.hpp> </tt>
 
@@ -104,14 +104,14 @@ logger< string, on_dedicated_thread<string,write_to_cout> > g_l();
 @endcode
 
 You should note that a @b writer is not necessary a %logger. It can be a destination, for instance. For example, you might have a destination
-where writing is time consuming, while writing to the rest of the destinations is very fast. 
+where writing is time consuming, while writing to the rest of the destinations is very fast.
 You can choose to write to all but that destination on the current thread, and to that destination on a dedicated thread.
 (If you want to write to all destinations on a different thread, we can go back to @ref on_dedicated_thread_logger "transforming a logger...")
 
 */
-template<class msg_type, class base_type> 
-struct on_dedicated_thread 
-        : base_type, 
+template<class msg_type, class base_type>
+struct on_dedicated_thread
+        : base_type,
           boost::logging::manipulator::non_const_context<detail::dedicated_thread_context<msg_type> > {
 
     typedef on_dedicated_thread<msg_type,base_type> self_type;
@@ -122,7 +122,7 @@ struct on_dedicated_thread
 
     BOOST_LOGGING_FORWARD_CONSTRUCTOR(on_dedicated_thread,base_type)
 
-    /** 
+    /**
         @brief Sets the write period : on the dedicated thread (in milliseconds)
     */
     void write_period_ms(int period_ms) {
@@ -152,7 +152,7 @@ struct on_dedicated_thread
         std::swap(msg, *new_msg);
 
         scoped_lock lk( non_const_context_base::context().cs);
-        if ( !non_const_context_base::context().writer) 
+        if ( !non_const_context_base::context().writer)
             non_const_context_base::context().writer = thread_ptr( new boost::thread( boost::bind(&self_type::do_write,this) ));
 
         non_const_context_base::context().msgs.push_back(new_msg);
@@ -174,7 +174,7 @@ struct on_dedicated_thread
     */
     void pause() {
         { scoped_lock lk( non_const_context_base::context().cs);
-          non_const_context_base::context().is_paused = true; 
+          non_const_context_base::context().is_paused = true;
           non_const_context_base::context().pause_acknowledged = false;
         }
 
@@ -182,7 +182,7 @@ struct on_dedicated_thread
             do_sleep(10);
             scoped_lock lk( non_const_context_base::context().cs);
             if ( non_const_context_base::context().pause_acknowledged )
-                // the other thread has acknowledged 
+                // the other thread has acknowledged
                 break;
         }
     }
@@ -207,7 +207,7 @@ private:
             sleep_ms -= PERIOD;
 
             scoped_lock lk( non_const_context_base::context().cs);
-            if ( non_const_context_base::context().is_paused) 
+            if ( non_const_context_base::context().is_paused)
                 // this way we wake up early after we've been pause()d, even if sleep_ms has a high value
                 break;
         }
@@ -233,7 +233,7 @@ private:
             }
             write_array();
             { scoped_lock lk( non_const_context_base::context().cs);
-              if ( non_const_context_base::context().is_paused) 
+              if ( non_const_context_base::context().is_paused)
                 // we're paused
                 non_const_context_base::context().pause_acknowledged = true;
             }

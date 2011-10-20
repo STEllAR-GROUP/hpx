@@ -2,22 +2,22 @@
 //
 //  This code may be used under either of the following two licences:
 //
-//  Permission is hereby granted, free of charge, to any person obtaining a copy 
-//  of this software and associated documentation files (the "Software"), to deal 
-//  in the Software without restriction, including without limitation the rights 
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
-//  copies of the Software, and to permit persons to whom the Software is 
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
 //  furnished to do so, subject to the following conditions:
 //
-//  The above copyright notice and this permission notice shall be included in 
+//  The above copyright notice and this permission notice shall be included in
 //  all copies or substantial portions of the Software.
 //
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE. OF SUCH DAMAGE.
 //
 //  Or:
@@ -62,7 +62,7 @@ typedef boost::function<signature> function_type;
 typedef coroutine<signature> coroutine_type;
 
 void foo(int * x) {
-  *x ^= 0xAAAA; 
+  *x ^= 0xAAAA;
   return;
 }
 
@@ -120,27 +120,27 @@ int main() {
   coroutine_type coro_ol_foo(ol_foo_coro);
   cout.setf(ios_base::floatfield);
   cout.unsetf(ios_base::scientific);
-  cout << setw(50) << "Call to function: " 
+  cout << setw(50) << "Call to function: "
        << setw(16) << right << test(foo, iterations) << endl;
-  cout << setw(50) << "Call to out-of-line function: " 
+  cout << setw(50) << "Call to out-of-line function: "
        << setw(16) << right << test(ol_foo, iterations) << endl;
-  cout << setw(50) << "Call to function object: " 
+  cout << setw(50) << "Call to function object: "
        << setw(16) << right << test(foo_struct(), iterations) << endl;
-  cout << setw(50) << "Call to boost::function of function: " 
+  cout << setw(50) << "Call to boost::function of function: "
        << setw(16) << right << test(function_foo, iterations) << endl;
-  cout << setw(50) << "Call to boost::function of function object: " 
+  cout << setw(50) << "Call to boost::function of function object: "
        << setw(16) << right << test(function_foo_struct, iterations) << endl;
-  cout << setw(50) << "Call to boost::function of out-of-line function: " 
+  cout << setw(50) << "Call to boost::function of out-of-line function: "
        << setw(16) << right << test(function_ol_foo, iterations) << endl;
-  cout << setw(50) << "Call to coroutine of function: " 
+  cout << setw(50) << "Call to coroutine of function: "
        << setw(16) << right << noshowpoint << test(coro_foo, iterations) << endl;
-  cout << setw(50) << "Call to coroutine of function object: " 
+  cout << setw(50) << "Call to coroutine of function object: "
        << setw(16) << right  << noshowpoint << test(coro_foo_struct, iterations) << endl;
-  cout << setw(50) << "Call to coroutine of out-of-line function: " 
+  cout << setw(50) << "Call to coroutine of out-of-line function: "
        << setw(16) << right << noshowpoint << test(coro_ol_foo, iterations) << endl;
 */
   foo_struct_coro t;
 //  coroutine_type coro_foo_struct(t);
-  cout << setw(50) << "Call to coroutine of function object: " 
+  cout << setw(50) << "Call to coroutine of function object: "
     << setw(16) << right  << noshowpoint << test(coro_foo_struct, iterations) << endl;
 }

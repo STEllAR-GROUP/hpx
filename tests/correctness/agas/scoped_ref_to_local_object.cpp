@@ -1,6 +1,6 @@
-//  Copyright (c) 2011 Bryce Adelstein-Lelbach 
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Copyright (c) 2011 Bryce Adelstein-Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
@@ -62,11 +62,11 @@ void hpx_test_main(
             id_type id = monitor.detach();
 
             // The component should still be alive.
-            HPX_TEST_EQ(false, monitor.ready(milliseconds(delay))); 
+            HPX_TEST_EQ(false, monitor.ready(milliseconds(delay)));
         }
 
         // The component should be out of scope now.
-        HPX_TEST_EQ(true, monitor.ready(milliseconds(delay))); 
+        HPX_TEST_EQ(true, monitor.ready(milliseconds(delay)));
     }
 }
 
@@ -77,13 +77,13 @@ int hpx_main(
 {
     {
         cout << std::string(80, '#') << "\n"
-             << "simple component test\n" 
+             << "simple component test\n"
              << std::string(80, '#') << "\n" << flush;
 
         hpx_test_main<simple_refcnt_checker>(vm);
 
         cout << std::string(80, '#') << "\n"
-             << "managed component test\n" 
+             << "managed component test\n"
              << std::string(80, '#') << "\n" << flush;
 
         hpx_test_main<managed_refcnt_checker>(vm);
@@ -105,7 +105,7 @@ int main(
     cmdline.add_options()
         ( "delay"
         , value<boost::uint64_t>()->default_value(500)
-        , "number of milliseconds to wait for object destruction") 
+        , "number of milliseconds to wait for object destruction")
         ;
 
     // Initialize and run HPX.

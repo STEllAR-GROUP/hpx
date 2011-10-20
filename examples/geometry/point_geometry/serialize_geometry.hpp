@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2007-2011 Matthew Anderson
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_SERIALIZE_GEOMETRY_JUL_10_2011_0432PM)
@@ -29,21 +29,21 @@ namespace boost { namespace serialization
     ///////////////////////////////////////////////////////////////////////////
     // declarations only
     template <typename Archive>
-    HPX_COMPONENT_EXPORT void 
+    HPX_COMPONENT_EXPORT void
     save(Archive& ar, hpx::geometry::plain_point_type const& p, unsigned int const);
 
     template <typename Archive>
-    HPX_COMPONENT_EXPORT void 
+    HPX_COMPONENT_EXPORT void
     load(Archive& ar, hpx::geometry::plain_point_type& p, unsigned int const);
 
     ///////////////////////////////////////////////////////////////////////////
     // declarations only
     template <typename Archive>
-    HPX_COMPONENT_EXPORT void 
+    HPX_COMPONENT_EXPORT void
     save(Archive& ar, hpx::geometry::plain_polygon_type const& p, unsigned int const);
 
     template <typename Archive>
-    HPX_COMPONENT_EXPORT void 
+    HPX_COMPONENT_EXPORT void
     load(Archive& ar, hpx::geometry::plain_polygon_type& p, unsigned int const);
 }}
 

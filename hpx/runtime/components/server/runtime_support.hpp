@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_RUNTIME_SUPPORT_JUN_02_2008_1145AM)
@@ -53,12 +53,12 @@ namespace hpx { namespace components { namespace server
     public:
         typedef runtime_support type_holder;
 
-        // parcel action code: the action to be performed on the destination 
-        // object 
+        // parcel action code: the action to be performed on the destination
+        // object
         enum actions
         {
-            runtime_support_factory_properties = 0, ///< return whether more than 
-                                                    ///< one instance of a component 
+            runtime_support_factory_properties = 0, ///< return whether more than
+                                                    ///< one instance of a component
                                                     ///< can be created at once
             runtime_support_create_component = 1,   ///< create new components
             runtime_support_create_one_component = 2,   ///< create new component with one constructor argument
@@ -68,7 +68,7 @@ namespace hpx { namespace components { namespace server
             runtime_support_terminate = 6,          ///< terminate the runtime instances of all localities
             runtime_support_terminate_all = 7,      ///< terminate the runtime instances of all localities
 
-            runtime_support_get_config = 8,         ///< get configuration information 
+            runtime_support_get_config = 8,         ///< get configuration information
             runtime_support_create_memory_block = 9,  ///< create new memory block
             runtime_support_load_components = 10,
             runtime_support_call_startup_functions = 11,
@@ -76,17 +76,17 @@ namespace hpx { namespace components { namespace server
             runtime_support_update_agas_cache = 13,
         };
 
-        static component_type get_component_type() 
-        { 
-            return components::get_component_type<runtime_support>(); 
+        static component_type get_component_type()
+        {
+            return components::get_component_type<runtime_support>();
         }
-        static void set_component_type(component_type t) 
-        { 
-            components::set_component_type<runtime_support>(t); 
+        static void set_component_type(component_type t)
+        {
+            components::set_component_type<runtime_support>(t);
         }
 
         // constructor
-        runtime_support(util::section& ini, naming::gid_type const& prefix, 
+        runtime_support(util::section& ini, naming::gid_type const& prefix,
                 naming::resolver_client& agas_client, applier::applier& applier);
 
         ~runtime_support()
@@ -94,12 +94,12 @@ namespace hpx { namespace components { namespace server
             tidy();
         }
 
-        /// \brief finalize() will be called just before the instance gets 
+        /// \brief finalize() will be called just before the instance gets
         ///        destructed
         ///
         /// \param self [in] The PX \a thread used to execute this function.
-        /// \param appl [in] The applier to be used for finalization of the 
-        ///             component instance. 
+        /// \param appl [in] The applier to be used for finalization of the
+        ///             component instance.
         void finalize() {}
 
         void tidy();
@@ -107,26 +107,26 @@ namespace hpx { namespace components { namespace server
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
-        /// \brief Action to figure out, whether we can create more than one 
+        /// \brief Action to figure out, whether we can create more than one
         ///        instance at once
-        int factory_properties(components::component_type type); 
+        int factory_properties(components::component_type type);
 
         /// \brief Action to create new components
-        naming::gid_type create_component(components::component_type type, 
-            std::size_t count); 
+        naming::gid_type create_component(components::component_type type,
+            std::size_t count);
 
-        /// \brief Action to create new component while passing one constructor 
+        /// \brief Action to create new component while passing one constructor
         ///        parameter
-        naming::gid_type create_one_component(components::component_type type, 
-            constructor_argument const& arg0); 
+        naming::gid_type create_one_component(components::component_type type,
+            constructor_argument const& arg0);
 
         /// \brief Action to create new memory block
-        naming::gid_type create_memory_block(std::size_t count, 
-            hpx::actions::manage_object_action_base const& act); 
+        naming::gid_type create_memory_block(std::size_t count,
+            hpx::actions::manage_object_action_base const& act);
 
         /// \brief Action to delete existing components
-        void free_component(components::component_type type, 
-            naming::gid_type const& gid); 
+        void free_component(components::component_type type,
+            naming::gid_type const& gid);
 
         /// \brief Gracefully shutdown this runtime system instance
         void shutdown(double timeout,
@@ -156,37 +156,37 @@ namespace hpx { namespace components { namespace server
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::result_action1<
-            runtime_support, int, 
-            runtime_support_factory_properties, components::component_type, 
+            runtime_support, int,
+            runtime_support_factory_properties, components::component_type,
             &runtime_support::factory_properties
         > factory_properties_action;
 
         typedef hpx::actions::result_action2<
-            runtime_support, naming::gid_type, runtime_support_create_component, 
-            components::component_type, std::size_t, 
+            runtime_support, naming::gid_type, runtime_support_create_component,
+            components::component_type, std::size_t,
             &runtime_support::create_component
         > create_component_action;
 
         typedef hpx::actions::result_action2<
-            runtime_support, naming::gid_type, 
-            runtime_support_create_one_component, 
-            components::component_type, constructor_argument const&, 
+            runtime_support, naming::gid_type,
+            runtime_support_create_one_component,
+            components::component_type, constructor_argument const&,
             &runtime_support::create_one_component
         > create_one_component_action;
 
         typedef hpx::actions::result_action2<
-            runtime_support, naming::gid_type, runtime_support_create_memory_block, 
+            runtime_support, naming::gid_type, runtime_support_create_memory_block,
             std::size_t, hpx::actions::manage_object_action_base const&,
             &runtime_support::create_memory_block
         > create_memory_block_action;
 
         typedef hpx::actions::direct_action0<
-            runtime_support, runtime_support_load_components, 
+            runtime_support, runtime_support_load_components,
             &runtime_support::load_components
         > load_components_action;
 
         typedef hpx::actions::action0<
-            runtime_support, runtime_support_call_startup_functions, 
+            runtime_support, runtime_support_call_startup_functions,
             &runtime_support::call_startup_functions
         > call_startup_functions_action;
 
@@ -196,8 +196,8 @@ namespace hpx { namespace components { namespace server
         > call_shutdown_functions_action;
 
         typedef hpx::actions::direct_action2<
-            runtime_support, runtime_support_free_component, 
-            components::component_type, naming::gid_type const&, 
+            runtime_support, runtime_support_free_component,
+            components::component_type, naming::gid_type const&,
             &runtime_support::free_component
         > free_component_action;
 
@@ -207,7 +207,7 @@ namespace hpx { namespace components { namespace server
         > shutdown_action;
 
         typedef hpx::actions::action1<
-            runtime_support, runtime_support_shutdown_all, double, 
+            runtime_support, runtime_support_shutdown_all, double,
             &runtime_support::shutdown_all
         > shutdown_all_action;
 
@@ -217,16 +217,16 @@ namespace hpx { namespace components { namespace server
         > terminate_action;
 
         typedef hpx::actions::action0<
-            runtime_support, runtime_support_terminate_all, 
+            runtime_support, runtime_support_terminate_all,
             &runtime_support::terminate_all
         > terminate_all_action;
 
-        // even if this is not a short/minimal action, we still execute it 
+        // even if this is not a short/minimal action, we still execute it
         // directly to avoid a deadlock condition inside the thread manager
-        // waiting for this thread to finish, which waits for the thread 
+        // waiting for this thread to finish, which waits for the thread
         // manager to exit
         typedef hpx::actions::direct_result_action0<
-            runtime_support, util::section, runtime_support_get_config, 
+            runtime_support, util::section, runtime_support_get_config,
             &runtime_support::get_config
         > get_config_action;
 
@@ -248,7 +248,7 @@ namespace hpx { namespace components { namespace server
         /// all waiting threads.
         void wait();
 
-        /// \brief Notify all waiting (blocking) threads allowing the system to 
+        /// \brief Notify all waiting (blocking) threads allowing the system to
         ///        be properly stopped.
         ///
         /// \note      This function can be called from any thread.
@@ -279,11 +279,11 @@ namespace hpx { namespace components { namespace server
 
     protected:
         // Load all components from the ini files found in the configuration
-        void load_components(util::section& ini, naming::gid_type const& prefix, 
+        void load_components(util::section& ini, naming::gid_type const& prefix,
             naming::resolver_client& agas_client);
-        bool load_component(util::section& ini, std::string const& instance, 
+        bool load_component(util::section& ini, std::string const& instance,
             std::string const& component, boost::filesystem::path lib,
-            naming::gid_type const& prefix, naming::resolver_client& agas_client, 
+            naming::gid_type const& prefix, naming::resolver_client& agas_client,
             bool isdefault, bool isenabled);
 
         bool load_startup_shutdown_functions(boost::plugin::dll& d);

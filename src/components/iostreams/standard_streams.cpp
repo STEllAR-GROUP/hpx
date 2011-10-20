@@ -67,7 +67,7 @@ namespace hpx { namespace iostreams
                         boost::ref(detail::get_outstream(Tag()))),
                     naming::id_type::managed);
                 client.reset(new lazy_ostream(cout_id));
-                agas::register_name(cout_name, client->get_gid()); 
+                agas::register_name(cout_name, client->get_gid());
             }
 
             else
@@ -93,11 +93,11 @@ namespace hpx { namespace iostreams
                         HPX_THROW_EXCEPTION(service_unavailable,
                             "stream_raii::stream_raii",
                             "couldn't create cout stream on the console locality");
-                    } 
+                    }
                 }
 
                 client.reset(new lazy_ostream(
-                    naming::id_type(gid, naming::id_type::managed))); 
+                    naming::id_type(gid, naming::id_type::managed)));
             }
         }
 
@@ -109,25 +109,25 @@ namespace hpx { namespace iostreams
     {
         util::static_<stream_raii<raii_cout_tag>, raii_cout_tag> cout_(
             "/locality(console)/output_stream(cout)");
-        return *cout_.get().client;  
+        return *cout_.get().client;
     }
 
     lazy_ostream& cerr()
     {
         util::static_<stream_raii<raii_cerr_tag>, raii_cerr_tag> cerr_(
             "/locality(console)/output_stream(cerr)");
-        return *cerr_.get().client;  
+        return *cerr_.get().client;
     }
 
     // force the creation of the singleton stream objects
     void create_cout()
-    { 
-        cout(); 
+    {
+        cout();
     }
 
     void create_cerr()
-    { 
-        cerr(); 
+    {
+        cerr();
     }
 }}
 

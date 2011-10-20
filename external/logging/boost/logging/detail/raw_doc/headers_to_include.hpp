@@ -1,11 +1,11 @@
 namespace boost { namespace logging {
 
-/** 
+/**
 @page headers_to_include Headers to #include
 
-- @ref headers_to_include_declare 
-- @ref headers_to_include_define 
-- @ref headers_to_include_example 
+- @ref headers_to_include_declare
+- @ref headers_to_include_define
+- @ref headers_to_include_example
 
 \n
 @section headers_to_include_declare When declaring the loggers
@@ -40,7 +40,7 @@ If you want to log a message using a certain logger, that logger needs to be dec
 
 @code
 // when you log messages on a dedicated thread (see writer::on_dedicated_thread class)
-#include <boost/logging/writer/on_dedicated_thread.hpp> 
+#include <boost/logging/writer/on_dedicated_thread.hpp>
 @endcode
 
 

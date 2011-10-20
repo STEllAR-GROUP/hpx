@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_COMPONENTS_MEMORY_JUN_25_2008_0122PM)
@@ -18,8 +18,8 @@ namespace hpx { namespace components { namespace server
     public:
         typedef memory type_holder;
 
-        // parcel action code: the action to be performed on the destination 
-        // object 
+        // parcel action code: the action to be performed on the destination
+        // object
         enum actions
         {
             memory_store8 = 0,        ///< store a 8 bit value to a memory location
@@ -32,25 +32,25 @@ namespace hpx { namespace components { namespace server
             memory_load64 = 7,        ///< load a 64 bit value from a memory location
         };
 
-        static component_type get_component_type() 
-        { 
-            return components::get_component_type<memory>(); 
+        static component_type get_component_type()
+        {
+            return components::get_component_type<memory>();
         }
-        static void set_component_type(component_type t) 
-        { 
-            components::set_component_type<memory>(t); 
+        static void set_component_type(component_type t)
+        {
+            components::set_component_type<memory>(t);
         }
 
         // constructor
-        memory() 
+        memory()
         {}
 
-        /// \brief finalize() will be called just before the instance gets 
+        /// \brief finalize() will be called just before the instance gets
         ///        destructed
         ///
         /// \param self [in] The PX \a thread used to execute this function.
-        /// \param appl [in] The applier to be used for finalization of the 
-        ///             component instance. 
+        /// \param appl [in] The applier to be used for finalization of the
+        ///             component instance.
         void finalize() {}
 
         ///////////////////////////////////////////////////////////////////////
@@ -109,42 +109,42 @@ namespace hpx { namespace components { namespace server
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::direct_action2<
-            memory, memory_store8, boost::uint64_t, boost::uint8_t, 
+            memory, memory_store8, boost::uint64_t, boost::uint8_t,
             &memory::store8
         > store8_action;
 
         typedef hpx::actions::direct_action2<
-            memory, memory_store16, boost::uint64_t, boost::uint16_t, 
+            memory, memory_store16, boost::uint64_t, boost::uint16_t,
             &memory::store16
         > store16_action;
 
         typedef hpx::actions::direct_action2<
-            memory, memory_store32, boost::uint64_t, boost::uint32_t, 
+            memory, memory_store32, boost::uint64_t, boost::uint32_t,
             &memory::store32
         > store32_action;
 
         typedef hpx::actions::direct_action2<
-            memory, memory_store64, boost::uint64_t, boost::uint64_t, 
+            memory, memory_store64, boost::uint64_t, boost::uint64_t,
             &memory::store64
         > store64_action;
 
         typedef hpx::actions::direct_result_action1<
-            memory, boost::uint8_t, memory_load8, boost::uint64_t, 
+            memory, boost::uint8_t, memory_load8, boost::uint64_t,
             &memory::load8
         > load8_action;
 
         typedef hpx::actions::direct_result_action1<
-            memory, boost::uint16_t, memory_load16, boost::uint64_t, 
+            memory, boost::uint16_t, memory_load16, boost::uint64_t,
             &memory::load16
         > load16_action;
 
         typedef hpx::actions::direct_result_action1<
-            memory, boost::uint32_t, memory_load32, boost::uint64_t, 
+            memory, boost::uint32_t, memory_load32, boost::uint64_t,
             &memory::load32
         > load32_action;
 
         typedef hpx::actions::direct_result_action1<
-            memory, boost::uint64_t, memory_load64, boost::uint64_t, 
+            memory, boost::uint64_t, memory_load64, boost::uint64_t,
             &memory::load64
         > load64_action;
 

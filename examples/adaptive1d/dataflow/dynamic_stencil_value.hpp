@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2009-2011 Matthew Anderson
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_COMPONENTS_DATAFLOW_STENCIL_VALUE_NOV_02_2011_0506PM)
@@ -13,15 +13,15 @@
 #include "stubs/dynamic_stencil_value.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace adaptive1d 
+namespace hpx { namespace components { namespace adaptive1d
 {
     /// \class dynamic_stencil_value dynamic_stencil_value.hpp hpx/components/adaptive1d/dynamic_stencil_value.hpp
-    class dynamic_stencil_value 
+    class dynamic_stencil_value
       : public client_base<dynamic_stencil_value, adaptive1d::stubs::dynamic_stencil_value >
     {
     private:
-        typedef 
-            client_base<dynamic_stencil_value, adaptive1d::stubs::dynamic_stencil_value > 
+        typedef
+            client_base<dynamic_stencil_value, adaptive1d::stubs::dynamic_stencil_value >
         base_type;
 
     public:
@@ -37,7 +37,7 @@ namespace hpx { namespace components { namespace adaptive1d
 
         ///////////////////////////////////////////////////////////////////////
         /// Invokes the time series evolution for this data point using the
-        /// data referred to by the parameter \a initial. After finishing 
+        /// data referred to by the parameter \a initial. After finishing
         /// execution it returns a reference to the result as its return value
         /// (parameter \a result)
         lcos::promise<naming::id_type> call_async(
@@ -52,23 +52,23 @@ namespace hpx { namespace components { namespace adaptive1d
         }
 
         ///////////////////////////////////////////////////////////////////////
-        /// Return the gid's of the output ports associated with this 
+        /// Return the gid's of the output ports associated with this
         /// \a dynamic_stencil_value instance.
-        lcos::promise<std::vector<naming::id_type> > 
+        lcos::promise<std::vector<naming::id_type> >
         get_output_ports_async()
         {
             return this->base_type::get_output_ports_async(this->gid_);
         }
 
-        std::vector<naming::id_type> 
+        std::vector<naming::id_type>
         get_output_ports()
         {
             return this->base_type::get_output_ports(this->gid_);
         }
 
         ///////////////////////////////////////////////////////////////////////
-        /// Connect the destinations given by the provided gid's with the 
-        /// corresponding input ports associated with this \a dynamic_stencil_value 
+        /// Connect the destinations given by the provided gid's with the
+        /// corresponding input ports associated with this \a dynamic_stencil_value
         /// instance.
         void connect_input_ports(std::vector<naming::id_type> const& gids)
         {
@@ -82,10 +82,10 @@ namespace hpx { namespace components { namespace adaptive1d
             int row, int column, int instencilsize, int outstencilsize,
             double cycle_time,parameter const& par)
         {
-            this->base_type::set_functional_component(this->gid_, functiongid, 
+            this->base_type::set_functional_component(this->gid_, functiongid,
                 row, column, instencilsize, outstencilsize, cycle_time,par);
         }
-        
+
         ///////////////////////////////////////////////////////////////////////
         /// Subset of set_functional_component functionality
         void start()

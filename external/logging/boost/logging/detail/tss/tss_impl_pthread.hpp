@@ -1,7 +1,7 @@
 // Copyright (C) 2001-2003 William E. Kempf
 // Copyright (C) 2006 Roland Schwarz
 //
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // Boost Logging library
@@ -66,7 +66,7 @@ inline unsigned int slot_idx() {
     typedef boost::logging::threading::mutex mutex;
     static mutex cs;
     static unsigned int idx = 0;
-    
+
     mutex::scoped_lock lk(cs);
 
     // note: if the Logging Lib is used with TLS, I'm guaranteed this will be called before main(),

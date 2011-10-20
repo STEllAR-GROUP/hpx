@@ -24,7 +24,7 @@
 #include <boost/logging/detail/fwd.hpp>
 #include <boost/logging/format/optimize.hpp>
 
-namespace boost { namespace logging { 
+namespace boost { namespace logging {
 
 namespace tag {
     template<
@@ -44,7 +44,7 @@ namespace tag {
 namespace formatter {
 
 
-/** 
+/**
     @brief Allows format convertions - In case you're using a formatter that does not match your string type
 
     In case you want to use a formatter developed by someone else (for instance, a formatter provided by this lib),
@@ -64,22 +64,22 @@ namespace convert {
     typedef std::basic_string<char_type> string_type;
     typedef const char_type* char_array;
 
-    template<class string> struct string_finder { 
-        typedef string type; 
-        typedef string original_type ; 
+    template<class string> struct string_finder {
+        typedef string type;
+        typedef string original_type ;
         static const type& get(const original_type & str) { return str; }
     };
-    template<class string> struct string_finder< ::boost::logging::optimize::cache_string_one_str<string> > { 
-        typedef string type; 
-        typedef ::boost::logging::optimize::cache_string_one_str<string> original_type ; 
+    template<class string> struct string_finder< ::boost::logging::optimize::cache_string_one_str<string> > {
+        typedef string type;
+        typedef ::boost::logging::optimize::cache_string_one_str<string> original_type ;
         static const type& get(const original_type & str) { return str; }
     };
-    template<class string> struct string_finder< ::boost::logging::optimize::cache_string_several_str<string> > { 
-        typedef string type; 
-        typedef ::boost::logging::optimize::cache_string_several_str<string> original_type; 
+    template<class string> struct string_finder< ::boost::logging::optimize::cache_string_several_str<string> > {
+        typedef string type;
+        typedef ::boost::logging::optimize::cache_string_several_str<string> original_type;
         static const type& get(const original_type & str) { return str; }
     };
-    template<class string, class p1, class p2, class p3, class p4, class p5, class p6, class p7, class p8, class p9, class p10> 
+    template<class string, class p1, class p2, class p3, class p4, class p5, class p6, class p7, class p8, class p9, class p10>
             struct string_finder< ::boost::logging::tag::holder<string,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10> > {
         typedef typename string_finder< string>::type type;
         typedef ::boost::logging::tag::holder<string,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10> original_type;
@@ -128,7 +128,7 @@ namespace convert {
         }
     }
 
-    /** 
+    /**
     */
     namespace append {
         inline void write(const string_type & src, string_type & dest) {
@@ -162,7 +162,7 @@ namespace convert {
 
     }
 
-    /** 
+    /**
     */
     namespace modify {
         inline void write(const string_type & src, string_type & dest) {
@@ -205,7 +205,7 @@ struct do_convert_format {
     typedef std::basic_string<char_type> string_type;
 
     struct prepend {
-        template<class string> 
+        template<class string>
                 static inline const typename convert::string_finder<string>::type & get_underlying_string(const string & str) {
             return convert::string_finder<string>::get(str);
         }
@@ -223,7 +223,7 @@ struct do_convert_format {
     };
 
     struct append {
-        template<class string> 
+        template<class string>
                 static inline const typename convert::string_finder<string>::type & get_underlying_string(const string & str) {
             return convert::string_finder<string>::get(str);
         }
@@ -241,7 +241,7 @@ struct do_convert_format {
     };
 
     struct modify {
-        template<class string> 
+        template<class string>
                 static inline const typename convert::string_finder<string>::type & get_underlying_string(const string & str) {
             return convert::string_finder<string>::get(str);
         }

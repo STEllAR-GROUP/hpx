@@ -18,7 +18,7 @@
 namespace hpx { namespace performance_counters { namespace parcels
 {
     /// \brief Collect statistics information about parcels sent and received.
-    class gatherer 
+    class gatherer
     {
         typedef hpx::util::spinlock mutex_type;
 
@@ -33,7 +33,7 @@ namespace hpx { namespace performance_counters { namespace parcels
 
         boost::int64_t size() const;
         boost::int64_t total_bytes() const;
-        boost::int64_t total_time() const;    
+        boost::int64_t total_time() const;
 
     private:
         boost::int64_t overall_bytes_;
@@ -47,7 +47,7 @@ namespace hpx { namespace performance_counters { namespace parcels
     inline void gatherer::push_back(data_point const& x)
     {
         mutex_type::scoped_lock mtx(acc_mtx);
-   
+
         overall_bytes_ += x.bytes_;
         overall_time_ += x.timer_;
         ++gatherer_size_;

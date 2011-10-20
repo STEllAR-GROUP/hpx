@@ -22,7 +22,7 @@
 
 
 This usage:
-- Fastest. It does not use formatters and destinations (thus, 
+- Fastest. It does not use formatters and destinations (thus,
   the flexibility that comes with formatters/destinations) is gone
 - You have one filter, which can be turned on or off
 - You have 2 loggers: app and err.
@@ -40,8 +40,8 @@ good to be back ;)
 
 The err.txt file:
 @code
-first error 
-second error 
+first error
+second error
 @endcode
 
 
@@ -68,13 +68,13 @@ struct no_gather {
 typedef logger< no_gather, destination::cout > app_log_type;
 typedef logger< no_gather, destination::file > err_log_type;
 
-BOOST_DEFINE_LOG_FILTER(g_log_filter, filter::no_ts ) 
+BOOST_DEFINE_LOG_FILTER(g_log_filter, filter::no_ts )
 
 BOOST_DEFINE_LOG(g_log_app, app_log_type)
 BOOST_DEFINE_LOG_WITH_ARGS( g_log_err, err_log_type, ("err.txt") )
 
-#define LAPP_ BOOST_LOG_USE_SIMPLE_LOG_IF_FILTER(g_log_app(), g_log_filter()->is_enabled() ) 
-#define LERR_ BOOST_LOG_USE_SIMPLE_LOG_IF_FILTER(g_log_err(), g_log_filter()->is_enabled() ) 
+#define LAPP_ BOOST_LOG_USE_SIMPLE_LOG_IF_FILTER(g_log_app(), g_log_filter()->is_enabled() )
+#define LERR_ BOOST_LOG_USE_SIMPLE_LOG_IF_FILTER(g_log_err(), g_log_filter()->is_enabled() )
 
 void fastest_no_ostr_like_example() {
     g_log_app()->mark_as_initialized();

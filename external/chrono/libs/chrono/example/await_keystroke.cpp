@@ -65,7 +65,7 @@ int main()
   std::cout << "high_resolution_clock latency--: " << (d9 - d8).count() << std::endl;
 
   std::time_t now = system_clock::to_time_t(system_clock::now());
-  
+
   std::cout << "\nsystem_clock::now() reports UTC is "
     << std::asctime(std::gmtime(&now)) << "\n";
 

@@ -20,7 +20,7 @@ namespace hpx { namespace test { namespace server
 
 simple_refcnt_checker::~simple_refcnt_checker()
 {
-    const boost::uint32_t prefix_ = applier::get_prefix_id(); 
+    const boost::uint32_t prefix_ = applier::get_prefix_id();
     const naming::gid_type this_ = get_base_gid();
 
     util::osstream strm;
@@ -38,7 +38,7 @@ simple_refcnt_checker::~simple_refcnt_checker()
             strm << "  " << ref << " "
                  << naming::get_management_type_name(ref.get_management_type())
                  << "\n";
-        } 
+        }
     }
 
     if (naming::invalid_id != target_)

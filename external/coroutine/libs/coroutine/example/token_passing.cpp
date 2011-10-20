@@ -2,22 +2,22 @@
 //
 //  This code may be used under either of the following two licences:
 //
-//  Permission is hereby granted, free of charge, to any person obtaining a copy 
-//  of this software and associated documentation files (the "Software"), to deal 
-//  in the Software without restriction, including without limitation the rights 
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
-//  copies of the Software, and to permit persons to whom the Software is 
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
 //  furnished to do so, subject to the following conditions:
 //
-//  The above copyright notice and this permission notice shall be included in 
+//  The above copyright notice and this permission notice shall be included in
 //  all copies or substantial portions of the Software.
 //
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE. OF SUCH DAMAGE.
 //
 //  Or:
@@ -34,7 +34,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/coroutine/future.hpp>
 #include <boost/coroutine/shared_coroutine.hpp>
- 
+
 typedef boost::asio::ip::tcp::acceptor acceptor_type;
 typedef boost::asio::ip::tcp::endpoint endpoint_type;
 
@@ -53,7 +53,7 @@ namespace coro = boost::coroutines;
 
 typedef boost::asio::error error_type;
 void thread(thread_type::self& self,
-	    acceptor_type* acceptor, 
+	    acceptor_type* acceptor,
 	    endpoint_type* endpoint,
 	    int index, int counter, int token_size){
   // std::cout<<"running\n";
@@ -65,21 +65,21 @@ void thread(thread_type::self& self,
   coro::future<error_type> accept_error(self);
   coro::future<error_type> connect_error(self);
 
-  acceptor->async_accept(sink, 
+  acceptor->async_accept(sink,
 			 coro::make_callback(accept_error));
 
-  source.async_connect(*endpoint, 
+  source.async_connect(*endpoint,
 		       coro::make_callback(connect_error));
 
   coro::wait_all(connect_error, accept_error);
 
   BOOST_ASSERT(connect_error);
   BOOST_ASSERT(accept_error);
- 
+
 
   coro::future<error_type, std::size_t> read_error(self);
   coro::future<error_type, std::size_t> write_error(self);
-  
+
   boost::asio::async_read(source,
 			  boost::asio::buffer(token, token_size),
 			  coro::make_callback(read_error));
@@ -90,14 +90,14 @@ void thread(thread_type::self& self,
 
   while(counter) {
     //   std::cout<<counter<<std::endl;
-    
+
     if(write_error) {
       if(write_error->get<0>()) {
 	// std::cout<<"[Thread "<<index<<"] :error while writing, exiting..."<<std::endl;
 	break;
       }
       // std::cout<<"[Thread "<<index<<"] :token sent"<<std::endl;
-      write_error = boost::none; 
+      write_error = boost::none;
 
       frob(token, token_size);
       // std::cout<<"[Thread "<<index<<"] :sending token"<<std::endl;
@@ -107,30 +107,30 @@ void thread(thread_type::self& self,
       counter--;
 
     }
- 
+
     if(read_error) {
       if(read_error->get<0>()) {
 	// std::cout<<"[Thread "<<index<<"] :error while readin, exiting..."<<std::endl;
 	break;
       }
       // std::cout<<"[Thread "<<index<<"] :token read"<<std::endl;
-      read_error = boost::none;   
+      read_error = boost::none;
       // std::cout<<"[Thread "<<index<<"] :reading token"<<std::endl;
       boost::asio::async_read(source,
 			      boost::asio::buffer(token, token_size),
 			      coro::make_callback(read_error));
-    } 
- 
+    }
+
     BOOST_ASSERT(!(read_error || write_error));
     coro::wait(read_error, write_error);
   }
-   
-  sink.close();  
+
+  sink.close();
   //wait for all pending activities
   coro::wait_all(read_error, write_error);
   return;
 }
- 
+
 typedef std::vector<boost::shared_ptr<acceptor_type> > acceptor_vector_type;
 typedef std::vector< endpoint_type > endpoint_vector_type;
 
@@ -152,7 +152,7 @@ int main(int argc, char** argv) {
        (boost::asio::ip::address_v4::from_string("127.0.0.1"),
 	base_port + i));
     acceptor_vector.push_back
-      (boost::shared_ptr<acceptor_type> 
+      (boost::shared_ptr<acceptor_type>
        (new acceptor_type(demuxer)));
     acceptor_vector.back()->open(endpoint_vector.back().protocol());
     acceptor_vector.back()->set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
@@ -177,15 +177,15 @@ int main(int argc, char** argv) {
     demuxer.post(boost::bind
 		 (thread_type
 		  (boost::bind
-		   (thread, 
-		    _1, 
-		    &*acceptor_vector.at(i-1), 
+		   (thread,
+		    _1,
+		    &*acceptor_vector.at(i-1),
 		    &endpoint_vector.at(i-1),
 		    i,
-		    count, 
-		    token_size)), 
+		    count,
+		    token_size)),
 		  std::nothrow));
   }
-  demuxer.run(); 
- } 
- 
+  demuxer.run();
+ }
+

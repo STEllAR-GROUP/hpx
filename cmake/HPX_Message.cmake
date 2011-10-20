@@ -1,6 +1,6 @@
 # Copyright (c) 2011 Bryce Lelbach
 #
-# Distributed under the Boost Software License, Version 1.0. (See accompanying 
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(HPX_MESSAGE_LOADED TRUE)
@@ -43,7 +43,7 @@ macro(hpx_message level type)
     string(TOLOWER ${type} lctype)
     hpx_info(${lctype} ${ARGN})
   else()
-    hpx_error("message" "\"${level}\" is not an HPX configuration logging level.") 
+    hpx_error("message" "\"${level}\" is not an HPX configuration logging level.")
   endif()
 endmacro()
 
@@ -51,20 +51,20 @@ macro(hpx_config_loglevel level return)
   set(${return} FALSE)
   if(    "${HPX_CMAKE_LOGLEVEL}" MATCHES "ERROR|error|Error"
      AND "${level}" MATCHES "ERROR|error|Error")
-    set(${return} TRUE) 
+    set(${return} TRUE)
   elseif("${HPX_CMAKE_LOGLEVEL}" MATCHES "WARN|warn|Warn"
      AND "${level}" MATCHES "WARN|warn|Warn")
-    set(${return} TRUE) 
+    set(${return} TRUE)
   elseif("${HPX_CMAKE_LOGLEVEL}" MATCHES "DEBUG|debug|Debug"
      AND "${level}" MATCHES "DEBUG|debug|Debug")
-    set(${return} TRUE) 
+    set(${return} TRUE)
   elseif("${HPX_CMAKE_LOGLEVEL}" MATCHES "INFO|info|Info"
      AND "${level}" MATCHES "INFO|info|Info")
-    set(${return} TRUE) 
+    set(${return} TRUE)
   endif()
 endmacro()
 
-macro(hpx_print_list level type message list) 
+macro(hpx_print_list level type message list)
   hpx_config_loglevel(${level} printed)
   if(printed)
     if(${list})

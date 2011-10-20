@@ -73,7 +73,7 @@ response symbol_namespace::service(
         case component_ns_service:
         case primary_ns_service:
         case symbol_ns_service:
-        case invalid_request: 
+        case invalid_request:
         {
             HPX_THROWS_IF(ec, bad_action_code
               , "component_namespace::service"
@@ -132,7 +132,7 @@ response symbol_namespace::bind(
     if (&ec != &throws)
         ec = make_success_code();
 
-    return response(symbol_ns_bind, gid); 
+    return response(symbol_ns_bind, gid);
 } // }}}
 
 response symbol_namespace::resolve(
@@ -177,10 +177,10 @@ response symbol_namespace::resolve(
         gid = split_credits_for_gid(it->second);
 
         // Credit exhaustion - we need to get more.
-        if (0 == naming::get_credit_from_gid(gid)) 
+        if (0 == naming::get_credit_from_gid(gid))
         {
             BOOST_ASSERT(1 == naming::get_credit_from_gid(it->second));
-            naming::get_agas_client().incref(gid, 2 * HPX_INITIAL_GLOBALCREDIT); 
+            naming::get_agas_client().incref(gid, 2 * HPX_INITIAL_GLOBALCREDIT);
 
             naming::add_credit_to_gid(gid, HPX_INITIAL_GLOBALCREDIT);
             naming::add_credit_to_gid(it->second, HPX_INITIAL_GLOBALCREDIT);
@@ -191,7 +191,7 @@ response symbol_namespace::resolve(
         gid = it->second;
 
     return response(symbol_ns_resolve, gid);
-} // }}}  
+} // }}}
 
 response symbol_namespace::unbind(
     request const& req
@@ -202,7 +202,7 @@ response symbol_namespace::unbind(
     std::string key = req.get_name();
 
     mutex_type::scoped_lock l(mutex_);
-    
+
     gid_table_type::iterator it = gids_.find(key)
                            , end = gids_.end();
 
@@ -230,7 +230,7 @@ response symbol_namespace::unbind(
         ec = make_success_code();
 
     return response(symbol_ns_unbind, gid);
-} // }}} 
+} // }}}
 
 response symbol_namespace::iterate(
     request const& req
@@ -240,7 +240,7 @@ response symbol_namespace::iterate(
     iterate_names_function_type f = req.get_iterate_names_function();
 
     mutex_type::scoped_lock l(mutex_);
-    
+
     for (gid_table_type::iterator it = gids_.begin()
                                 , end = gids_.end();
          it != end; ++it)
@@ -254,7 +254,7 @@ response symbol_namespace::iterate(
         ec = make_success_code();
 
     return response(symbol_ns_iterate);
-} // }}} 
+} // }}}
 
 }}}
 

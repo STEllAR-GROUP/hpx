@@ -2,8 +2,8 @@
 //
 //  Parts of this code were taken from the Boost.Asio library
 //  Copyright (c) 2003-2007 Christopher M. Kohlhoff (chris at kohlhoff dot com)
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_PARCELSET_SERVER_PARCELPORT_CONNECTION_MAR_26_2008_1221PM)
@@ -33,7 +33,7 @@
 #include <boost/tuple/tuple.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parcelset { namespace server 
+namespace hpx { namespace parcelset { namespace server
 {
     /// Represents a single parcelport_connection from a client.
     class parcelport_connection
@@ -46,7 +46,7 @@ namespace hpx { namespace parcelset { namespace server
                 parcelport_queue& handler,
                 util::high_resolution_timer& timer,
                 performance_counters::parcels::gatherer& parcels_received)
-          : socket_(io_service), in_priority_(0), in_size_(0), 
+          : socket_(io_service), in_priority_(0), in_size_(0),
             in_buffer_(new std::vector<char>()), parcels_(handler),
             timer_(timer), parcels_received_(parcels_received)
         {
@@ -62,8 +62,8 @@ namespace hpx { namespace parcelset { namespace server
             // Increment number of receives started.
             receive_data_.timer_ = timer_.elapsed_microseconds();
 
-            // Issue a read operation to read the parcel priority and size. 
-            void (parcelport_connection::*f)(boost::system::error_code const&, 
+            // Issue a read operation to read the parcel priority and size.
+            void (parcelport_connection::*f)(boost::system::error_code const&,
                     boost::tuple<Handler>)
                 = &parcelport_connection::handle_read_header<Handler>;
 
@@ -77,7 +77,7 @@ namespace hpx { namespace parcelset { namespace server
             buffers.push_back(buffer(&in_size_, sizeof(in_size_)));
 
             boost::asio::async_read(socket_, buffers,
-                boost::bind(f, shared_from_this(), 
+                boost::bind(f, shared_from_this(),
                     boost::asio::placeholders::error, boost::make_tuple(handler)));
         }
 
@@ -87,7 +87,7 @@ namespace hpx { namespace parcelset { namespace server
         }
 
     protected:
-        /// Handle a completed read of the message priority and size from the 
+        /// Handle a completed read of the message priority and size from the
         /// message header.
         /// The handler is passed using a tuple since boost::bind seems to have
         /// trouble binding a function object created using boost::bind as a
@@ -110,9 +110,9 @@ namespace hpx { namespace parcelset { namespace server
                         boost::tuple<Handler>)
                     = &parcelport_connection::handle_read_data<Handler>;
 
-                boost::asio::async_read(socket_, 
+                boost::asio::async_read(socket_,
                     boost::asio::buffer(*in_buffer_.get()),
-                    boost::bind(f, shared_from_this(), 
+                    boost::bind(f, shared_from_this(),
                         boost::asio::placeholders::error, handler));
             }
         }
@@ -128,14 +128,14 @@ namespace hpx { namespace parcelset { namespace server
             else {
                 // add parcel data to incoming parcel queue
                 boost::integer::ulittle8_t::value_type priority = in_priority_;
-                parcels_.add_parcel(in_buffer_, 
+                parcels_.add_parcel(in_buffer_,
                     static_cast<threads::thread_priority>(priority));
 
                 // Inform caller that data has been received ok.
                 boost::get<0>(handler)(e);
 
-                // Issue a read operation to read the parcel priority. 
-                void (parcelport_connection::*f)(boost::system::error_code const&, 
+                // Issue a read operation to read the parcel priority.
+                void (parcelport_connection::*f)(boost::system::error_code const&,
                         boost::tuple<Handler>)
                     = &parcelport_connection::handle_read_header<Handler>;
 
@@ -149,7 +149,7 @@ namespace hpx { namespace parcelset { namespace server
                 buffers.push_back(buffer(&in_size_, sizeof(in_size_)));
 
                 boost::asio::async_read(socket_, buffers,
-                    boost::bind(f, shared_from_this(), 
+                    boost::bind(f, shared_from_this(),
                         boost::asio::placeholders::error, handler));
             }
         }

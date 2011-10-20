@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_COMPONENTS_MANAGED_COMPONENT_BASE_JUN_04_2008_0902PM)
@@ -23,14 +23,14 @@
 #include <hpx/util/stringstream.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components 
+namespace hpx { namespace components
 {
     template <typename Component, typename Derived>
     class managed_component;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Wrapper>
-    class managed_component_base 
+    class managed_component_base
       : public detail::managed_component_tag, boost::noncopyable
     {
     public:
@@ -39,12 +39,12 @@ namespace hpx { namespace components
         {}
 
         // components must contain a typedef for wrapping_type defining the
-        // managed_component type used to encapsulate instances of this 
+        // managed_component type used to encapsulate instances of this
         // component
         typedef managed_component<Component, Wrapper> wrapping_type;
         typedef Component base_type_holder;
 
-        /// \brief finalize() will be called just before the instance gets 
+        /// \brief finalize() will be called just before the instance gets
         ///        destructed
         void finalize() {}
 
@@ -73,7 +73,7 @@ namespace hpx { namespace components
             back_ptr_ = bp;
         }
 
-        managed_component<Component, Wrapper>* back_ptr_;        
+        managed_component<Component, Wrapper>* back_ptr_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -98,7 +98,7 @@ namespace hpx { namespace components
         static heap_type& get_heap()
         {
             // ensure thread-safe initialization
-            util::static_<heap_type, wrapper_heap_tag, HPX_RUNTIME_INSTANCE_LIMIT> 
+            util::static_<heap_type, wrapper_heap_tag, HPX_RUNTIME_INSTANCE_LIMIT>
                 heap(components::get_component_type<Component>());
             return heap.get(get_runtime_instance_number());
         }
@@ -130,17 +130,17 @@ namespace hpx { namespace components
     ///////////////////////////////////////////////////////////////////////////
     /// \class managed_component managed_component.hpp hpx/runtime/components/server/managed_component.hpp
     ///
-    /// The managed_component template is used as a indirection layer 
-    /// for components allowing to gracefully handle the access to non-existing 
+    /// The managed_component template is used as a indirection layer
+    /// for components allowing to gracefully handle the access to non-existing
     /// components.
     ///
-    /// Additionally it provides memory management capabilities for the 
-    /// wrapping instances, and it integrates the memory management with the 
-    /// AGAS service. Every instance of a managed_component gets assigned 
+    /// Additionally it provides memory management capabilities for the
+    /// wrapping instances, and it integrates the memory management with the
+    /// AGAS service. Every instance of a managed_component gets assigned
     /// a global id.
-    /// The provided memory management allocates the managed_component 
-    /// instances from a special heap, ensuring fast allocation and avoids a 
-    /// full network round trip to the AGAS service for each of the allocated 
+    /// The provided memory management allocates the managed_component
+    /// instances from a special heap, ensuring fast allocation and avoids a
+    /// full network round trip to the AGAS service for each of the allocated
     /// instances.
     ///
     /// \tparam Component
@@ -151,7 +151,7 @@ namespace hpx { namespace components
     {
     private:
         typedef typename boost::mpl::if_<
-                boost::is_same<Derived, detail::this_type>, 
+                boost::is_same<Derived, detail::this_type>,
                 managed_component, Derived
             >::type derived_type;
 
@@ -160,22 +160,22 @@ namespace hpx { namespace components
         typedef Component type_holder;
         typedef typename Component::base_type_holder base_type_holder;
 
-        /// \brief Construct a managed_component instance holding a 
-        ///        wrapped instance. This constructor takes ownership of the 
+        /// \brief Construct a managed_component instance holding a
+        ///        wrapped instance. This constructor takes ownership of the
         ///        passed pointer.
         ///
-        /// \param c    [in] The pointer to the wrapped instance. The 
+        /// \param c    [in] The pointer to the wrapped instance. The
         ///             managed_component takes ownership of this pointer.
-        explicit managed_component(Component* c) 
-          : component_(c) 
+        explicit managed_component(Component* c)
+          : component_(c)
         {
             component_->set_back_ptr(this);
         }
 
         /// \brief Construct a managed_component instance holding a new wrapped
         ///        instance
-        managed_component() 
-          : component_(new wrapped_type()) 
+        managed_component()
+          : component_(new wrapped_type())
         {
             component_->set_back_ptr(this);
         }
@@ -189,7 +189,7 @@ namespace hpx { namespace components
         }
     /**/
 
-        BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARG_MAX, 
+        BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARG_MAX,
             MANAGED_COMPONENT_CONSTRUCT, _)
 
 #undef MANAGED_COMPONENT_CONSTRUCT
@@ -202,7 +202,7 @@ namespace hpx { namespace components
             component_ = 0;
         }
 
-        /// \brief finalize() will be called just before the instance gets 
+        /// \brief finalize() will be called just before the instance gets
         ///        destructed
         void finalize() {}  // finalize the wrapped component in our destructor
 
@@ -230,12 +230,12 @@ namespace hpx { namespace components
         {
             if (0 == component_) {
                 hpx::util::osstream strm;
-                strm << "component is NULL (" 
+                strm << "component is NULL ("
                      << components::get_component_type_name(
                         components::get_component_type<wrapped_type>())
                      << ") gid(" << get_base_gid() << ")";
-                HPX_THROW_EXCEPTION(invalid_status, 
-                    "managed_component<Component, Derived>::get_checked", 
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "managed_component<Component, Derived>::get_checked",
                     hpx::util::osstream_get_string(strm));
             }
             return component_;
@@ -245,12 +245,12 @@ namespace hpx { namespace components
         {
             if (0 == component_) {
                 hpx::util::osstream strm;
-                strm << "component is NULL (" 
+                strm << "component is NULL ("
                      << components::get_component_type_name(
                         components::get_component_type<wrapped_type>())
                      << ") gid(" << get_base_gid() << ")";
-                HPX_THROW_EXCEPTION(invalid_status, 
-                    "managed_component<Component, Derived>::get_checked", 
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "managed_component<Component, Derived>::get_checked",
                     hpx::util::osstream_get_string(strm));
             }
             return component_;
@@ -260,13 +260,13 @@ namespace hpx { namespace components
         typedef heap_factory<Component, derived_type> heap_type;
 
     public:
-        /// \brief  The memory for managed_component objects is managed by 
-        ///         a class specific allocator. This allocator uses a one size 
+        /// \brief  The memory for managed_component objects is managed by
+        ///         a class specific allocator. This allocator uses a one size
         ///         heap implementation, ensuring fast memory allocation.
-        ///         Additionally the heap registers the allocated  
+        ///         Additionally the heap registers the allocated
         ///         managed_component instance with the AGAS service.
         ///
-        /// \param size   [in] The parameter \a size is supplied by the 
+        /// \param size   [in] The parameter \a size is supplied by the
         ///               compiler and contains the number of bytes to allocate.
         static void* operator new(std::size_t size)
         {
@@ -274,14 +274,14 @@ namespace hpx { namespace components
                 return ::operator new(size);
             derived_type* p = heap_type::alloc();
             if (NULL == p) {
-                HPX_THROW_STD_EXCEPTION(std::bad_alloc(), 
+                HPX_THROW_STD_EXCEPTION(std::bad_alloc(),
                     "managed_component::operator new(std::size_t size)");
             }
             return p;
         }
         static void operator delete(void* p, std::size_t size)
         {
-            if (NULL == p) 
+            if (NULL == p)
                 return;     // do nothing if given a NULL pointer
 
             if (size != sizeof(managed_component)) {
@@ -291,26 +291,26 @@ namespace hpx { namespace components
             heap_type::free(p);
         }
 
-        /// \brief  The placement operator new has to be overloaded as well 
-        ///         (the global placement operators are hidden because of the 
+        /// \brief  The placement operator new has to be overloaded as well
+        ///         (the global placement operators are hidden because of the
         ///         new/delete overloads above).
         static void* operator new(std::size_t, void *p)
         {
             return p;
         }
-        /// \brief  This operator delete is called only if the placement new 
+        /// \brief  This operator delete is called only if the placement new
         ///         fails.
         static void operator delete(void*, void*)
         {}
 
-        /// \brief  The function \a create is used for allocation and 
+        /// \brief  The function \a create is used for allocation and
         //          initialization of arrays of wrappers.
         static derived_type* create(std::size_t count)
         {
             // allocate the memory
             derived_type* p = heap_type::alloc(count);
             if (NULL == p) {
-                HPX_THROW_STD_EXCEPTION(std::bad_alloc(), 
+                HPX_THROW_STD_EXCEPTION(std::bad_alloc(),
                     "managed_component::create");
             }
 
@@ -341,7 +341,7 @@ namespace hpx { namespace components
             return p;
         }
 
-        /// \brief  The function \a create is used for allocation and 
+        /// \brief  The function \a create is used for allocation and
         //          initialization of a single instance.
 #define HPX_MANAGED_COMPONENT_CREATE_ONE(Z, N, _)                             \
         template <BOOST_PP_ENUM_PARAMS(N, typename T)>                        \
@@ -357,16 +357,16 @@ namespace hpx { namespace components
         }                                                                     \
     /**/
 
-        BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARG_MAX, 
+        BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARG_MAX,
             HPX_MANAGED_COMPONENT_CREATE_ONE, _)
 
 #undef HPX_MANAGED_COMPONENT_CREATE_ONE
 
-        /// \brief  The function \a destroy is used for deletion and 
+        /// \brief  The function \a destroy is used for deletion and
         //          de-allocation of arrays of wrappers
         static void destroy(derived_type* p, std::size_t count = 1)
         {
-            if (NULL == p || 0 == count) 
+            if (NULL == p || 0 == count)
                 return;     // do nothing if given a NULL pointer
 
             if (1 == count) {
@@ -387,10 +387,10 @@ namespace hpx { namespace components
             heap_type::free(p, count);
         }
 
-        /// \brief  The function \a get_factory_properties is used to 
-        ///         determine, whether instances of the derived component can 
-        ///         be created in blocks (i.e. more than one instance at once). 
-        ///         This function is used by the \a distributing_factory to 
+        /// \brief  The function \a get_factory_properties is used to
+        ///         determine, whether instances of the derived component can
+        ///         be created in blocks (i.e. more than one instance at once).
+        ///         This function is used by the \a distributing_factory to
         ///         determine a correct allocation strategy
         static factory_property get_factory_properties()
         {
@@ -444,15 +444,15 @@ namespace hpx { namespace components
     managed_component_base<Component, Wrapper>::get_gid() const
     {
         return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
-    } 
+    }
 
     template <typename Component, typename Wrapper>
-    inline naming::gid_type 
+    inline naming::gid_type
     managed_component_base<Component, Wrapper>::get_base_gid() const
     {
         BOOST_ASSERT(back_ptr_);
-        return back_ptr_->get_base_gid(); 
-    } 
+        return back_ptr_->get_base_gid();
+    }
 }}
 
 #endif

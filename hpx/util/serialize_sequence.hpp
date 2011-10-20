@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_UTIL_SERIALIZE_SEQUENCE_MAY_17_2008_0545PM)
@@ -42,7 +42,7 @@ namespace hpx { namespace util
         template <typename Archive, typename Element>
         static void serialize(Archive& ar, Element& e)
         {
-            typedef 
+            typedef
                 typename boost::fusion::traits::is_sequence<Element>::type
             is_sequence;
             serialize(ar, e, is_sequence());
@@ -79,7 +79,7 @@ namespace hpx { namespace util
     inline void
     serialize_sequence(Archive& ar, Sequence& seq)
     {
-        serialize_sequence_loop::call(ar, boost::fusion::begin(seq), 
+        serialize_sequence_loop::call(ar, boost::fusion::begin(seq),
             boost::fusion::end(seq));
     }
 

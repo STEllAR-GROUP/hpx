@@ -13,13 +13,13 @@
 #include <intrin.h>
 
 #include <boost/cstdint.hpp>
- 
+
 namespace hpx { namespace util { namespace hardware
 {
-    
+
 struct cpuid_register
 {
-    enum info 
+    enum info
     {
         eax = 0,
         ebx = 1,

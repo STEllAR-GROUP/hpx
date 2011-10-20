@@ -1,8 +1,8 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2007-2011 Matthew Anderson
 //  Copyright (c)      2011 Bryce Adelstein-Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_COMPONENTS_SERVER_POINT)
@@ -26,7 +26,7 @@ typedef boost::geometry::model::d2::point_xy<double> point_type;
 typedef boost::geometry::model::polygon<point_type> polygon_type;
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace geometry { namespace server 
+namespace hpx { namespace geometry { namespace server
 {
 
     struct vertex_data
@@ -47,10 +47,10 @@ namespace hpx { namespace geometry { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT point
-      : public components::detail::managed_component_base<point> 
+      : public components::detail::managed_component_base<point>
     {
     public:
-        // parcel action code: the action to be performed on the destination 
+        // parcel action code: the action to be performed on the destination
         // object (the accumulator)
         enum actions
         {
@@ -75,7 +75,7 @@ namespace hpx { namespace geometry { namespace server
         // exposed functionality of this component
 
         /// Initialize the accumulator
-        void init(double xmin,double xmax,double ymin,double ymax,double velx, double vely, std::size_t numpoints,std::size_t objectid) 
+        void init(double xmin,double xmax,double ymin,double ymax,double velx, double vely, std::size_t numpoints,std::size_t objectid)
         {
             xmin_ = xmin;
             xmax_ = xmax;
@@ -83,7 +83,7 @@ namespace hpx { namespace geometry { namespace server
             ymax_ = ymax;
             numpoints_ = numpoints;
             objectid_ = objectid;
-  
+
             double dx = (xmax - xmin)/(numpoints-1);
             double dy = (ymax - ymin)/(numpoints-1);
 
@@ -145,7 +145,7 @@ namespace hpx { namespace geometry { namespace server
 
             //for (std::size_t i=0;i<poly_.outer().size();i++) {
             //  std::cout << (poly_.outer())[i].x() << " " << (poly_.outer())[i].y() << std::endl;
-            //} 
+            //}
 
         }
 
@@ -192,13 +192,13 @@ namespace hpx { namespace geometry { namespace server
         }
 
         /// modify the X coordinate of this point
-        void set_X(double x) 
+        void set_X(double x)
         {
             pt_.x(x);
         }
 
         /// modify the Y coordinate of this point
-        void set_Y(double y) 
+        void set_Y(double y)
         {
             pt_.y(y);
         }
@@ -245,12 +245,12 @@ namespace hpx { namespace geometry { namespace server
         > set_Y_action;
 
         typedef hpx::actions::result_action1<
-            point, int, point_search, std::vector<hpx::naming::id_type> const&, 
+            point, int, point_search, std::vector<hpx::naming::id_type> const&,
             &point::search
         > search_action;
 
         typedef hpx::actions::action1<
-            point, point_recompute, std::vector<hpx::naming::id_type> const&, 
+            point, point_recompute, std::vector<hpx::naming::id_type> const&,
             &point::recompute
         > recompute_action;
 

@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_INTERPOLATE3D_CONFIGURATION_AUG_07_2011_0648PM)
@@ -20,7 +20,7 @@ namespace interpolate3d { namespace stubs
     {
         ///////////////////////////////////////////////////////////////////////
         static hpx::lcos::promise<void>
-        init_async(hpx::naming::id_type const& gid, std::string const& datafile, 
+        init_async(hpx::naming::id_type const& gid, std::string const& datafile,
             std::string const& symbolic_name, std::size_t num_instances)
         {
             // Create an eager_future, execute the required action,
@@ -31,8 +31,8 @@ namespace interpolate3d { namespace stubs
                 gid, datafile, symbolic_name, num_instances);
         }
 
-        static void init(hpx::naming::id_type const& gid, 
-            std::string const& datafile, std::string const& symbolic_name, 
+        static void init(hpx::naming::id_type const& gid,
+            std::string const& datafile, std::string const& symbolic_name,
             std::size_t num_instances)
         {
             init_async(gid, datafile, symbolic_name, num_instances).get();

@@ -3,20 +3,20 @@
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2011 Vinay C Amatya
 #
-# Distributed under the Boost Software License, Version 1.0. (See accompanying 
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 # We require at least CMake V2.6.4
 cmake_minimum_required(VERSION 2.6.4 FATAL_ERROR)
 
 ################################################################################
-# C++ overrides 
+# C++ overrides
 ################################################################################
 set(CMAKE_USER_MAKE_RULES_OVERRIDE_CXX
     "${CMAKE_SOURCE_DIR}/cmake/HPX_CXXOverrides.cmake")
 
 ################################################################################
-# Fortran overrides 
+# Fortran overrides
 ################################################################################
 set(CMAKE_USER_MAKE_RULES_OVERRIDE_Fortran
     "${CMAKE_SOURCE_DIR}/cmake/HPX_FortranOverrides.cmake")
@@ -49,7 +49,7 @@ if(NOT HPX_CMAKE_LOGLEVEL)
 endif()
 
 ################################################################################
-# Fortran compiler detection 
+# Fortran compiler detection
 ################################################################################
 include(HPX_FortranCompiler)
 
@@ -118,7 +118,7 @@ link_directories(${BOOST_LIBRARY_DIR})
 
 # Boost preprocessor definitions
 add_definitions(-DBOOST_PARAMETER_MAX_ARITY=7)
-add_definitions(-DBOOST_COROUTINE_USE_ATOMIC_COUNT) 
+add_definitions(-DBOOST_COROUTINE_USE_ATOMIC_COUNT)
 add_definitions(-DBOOST_COROUTINE_ARG_MAX=2)
 add_definitions(-DBOOST_LOG_NO_TSS)
 add_definitions(-DBOOST_LOG_NO_TS)
@@ -150,9 +150,9 @@ if(CMAKE_Fortran_COMPILER)
 endif()
 
 hpx_include(CompilerFlags)
-  
+
 ################################################################################
-# SVN revision detection 
+# SVN revision detection
 ################################################################################
 include(HPX_SVNRevision)
 
@@ -201,12 +201,12 @@ if(HPX_CXX11)
 endif()
 
 ################################################################################
-# SDF output 
+# SDF output
 ################################################################################
 find_package(HPX_RNPL)
 
 ################################################################################
-# HDF5 output 
+# HDF5 output
 ################################################################################
 find_package(HPX_HDF5)
 
@@ -216,7 +216,7 @@ find_package(HPX_HDF5)
 hpx_option(HPX_WARNINGS BOOL "Enable compiler warnings (default: ON)" ON)
 
 ################################################################################
-# Backtrace configuration 
+# Backtrace configuration
 ################################################################################
 hpx_option(HPX_STACKTRACES BOOL "Attach backtraces to HPX exceptions (default: ON)" ON)
 
@@ -226,7 +226,7 @@ if(HPX_STACKTRACES)
 endif()
 
 ################################################################################
-# Native TLS configuration 
+# Native TLS configuration
 ################################################################################
 hpx_option(HPX_NATIVE_TLS BOOL "Use native TLS support if available (default: ON)" ON)
 
@@ -250,11 +250,11 @@ if(NOT HPX_STACK_SIZE)
 else()
   set(HPX_STACK_SIZE "${HPX_STACK_SIZE}" CACHE STRING "pxthread stack size" FORCE)
 endif()
- 
+
 add_definitions(-DHPX_DEFAULT_STACK_SIZE=${HPX_STACK_SIZE})
 
 ################################################################################
-# Compiler configuration 
+# Compiler configuration
 ################################################################################
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release")
@@ -267,7 +267,7 @@ foreach(language CXX Fortran)
   set(CMAKE_${language}_FLAGS_RELEASE "" CACHE STRING "Release flags (${language})" FORCE)
   set(CMAKE_${language}_FLAGS_RELWITHDEBINFO ""  CACHE STRING "RelWithDebInfo flags (${language})" FORCE)
 endforeach()
-  
+
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
   add_definitions(-DDEBUG)
   add_definitions(-DHPX_BUILD_TYPE="debug")
@@ -284,13 +284,13 @@ elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
 else()
   hpx_error("build_type" "\"${CMAKE_BUILD_TYPE}\" is not a valid build type.")
 endif()
-  
-# Debug library postfix 
+
+# Debug library postfix
 set(CMAKE_DEBUG_POSTFIX "d")
 set(CMAKE_RELWITHDEBINFO_POSTFIX "d")
 
 ################################################################################
-# MSVC configuration 
+# MSVC configuration
 ################################################################################
 if(MSVC)
   if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
@@ -344,20 +344,20 @@ if(MSVC)
   hpx_append_flag(-GR)
 
   # Multiproccessor build
-  hpx_append_flag(-MP) 
+  hpx_append_flag(-MP)
 
-  # Increase the maximum size of object file sections 
+  # Increase the maximum size of object file sections
   hpx_append_flag(-bigobj LANGUAGES CXX Fortran)
 
   ##############################################################################
-  # Stacktraces 
+  # Stacktraces
   ##############################################################################
   if(HPX_STACKTRACES)
     set(hpx_RUNTIME_LIBRARIES dbghelp)
   endif()
 
   ##############################################################################
-  # C++11 
+  # C++11
   ##############################################################################
   if(HPX_CXX11)
     # C++11 support
@@ -376,7 +376,7 @@ if(MSVC)
   endif()
 
   ##############################################################################
-  # Diagnostics 
+  # Diagnostics
   ##############################################################################
   if(HPX_WARNINGS)
     hpx_append_flag(-W3)
@@ -389,7 +389,7 @@ if(MSVC)
   hpx_append_flag(-FC)
 
   ##############################################################################
-  # Macro definitions for system headers 
+  # Macro definitions for system headers
   ##############################################################################
   add_definitions(-D_WINDOWS)
   add_definitions(-D_WIN32)
@@ -401,7 +401,7 @@ if(MSVC)
   add_definitions(-D_CRT_NONSTDC_NO_WARNINGS)
 
   ##############################################################################
-  # Boost 
+  # Boost
   ##############################################################################
   # We auto-link Boost on Windows, so don't specify boost libraries explicitly
   set(BOOST_FOUND_LIBRARIES "")
@@ -412,7 +412,7 @@ if(MSVC)
   add_definitions(-DBOOST_COROUTINE_USE_FIBERS)
 
 ################################################################################
-# GCC-compatible compiler configuration 
+# GCC-compatible compiler configuration
 ################################################################################
 else()
   if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
@@ -446,10 +446,10 @@ else()
     # Don't allocate registers for wide types (e.g. 128bit ints) independently
     hpx_use_flag_if_available(-fno-split-wide-types LANGUAGES CXX Fortran)
 
-    # Disable register allocation webs, which make debugging impossible 
+    # Disable register allocation webs, which make debugging impossible
     hpx_use_flag_if_available(-fno-web LANGUAGES CXX Fortran)
 
-    # Disable register renaming  
+    # Disable register renaming
     hpx_use_flag_if_available(-fno-rename-registers LANGUAGES CXX Fortran)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
     # Optimize for size
@@ -460,7 +460,7 @@ else()
   endif()
 
   ##############################################################################
-  # Stacktraces 
+  # Stacktraces
   ##############################################################################
   if(HPX_STACKTRACES)
     # Export all visible symbols, not just those that are used
@@ -468,7 +468,7 @@ else()
   endif()
 
   ##############################################################################
-  # C++11 
+  # C++11
   ##############################################################################
   if(HPX_CXX11)
     # Turn on C++11 support
@@ -493,7 +493,7 @@ else()
   endif()
 
   ##############################################################################
-  # Diagnostics 
+  # Diagnostics
   ##############################################################################
   if(HPX_WARNINGS)
     hpx_use_flag_if_available(-Wall LANGUAGES CXX Fortran)
@@ -518,7 +518,7 @@ else()
   hpx_use_flag_if_available(-Wno-sync-nand)
 
   ##############################################################################
-  # GCC-only configuration 
+  # GCC-only configuration
   ##############################################################################
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     if(040400 LESS ${GCC_VERSION})
@@ -539,8 +539,8 @@ else()
   # Intel-only configuration
   ##############################################################################
   elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-    # warning #1125: virtual function override intended 
-    add_definitions(-diag-disable 1125) 
+    # warning #1125: virtual function override intended
+    add_definitions(-diag-disable 1125)
   endif()
 
   ##############################################################################
@@ -560,12 +560,12 @@ else()
   if(HPX_CXX_FLAG_MCX16)
     add_definitions(-DHPX_HAVE_GNU_SYNC_16)
     add_definitions(-DBOOST_ATOMIC_HAVE_GNU_SYNC_16) # for the gnu code
-  endif() 
+  endif()
 
   # __attribute__ ((aligned(16))) should align a variable to a 16-byte, however,
   # GCC sets an upper limit on the maximum alignment (__BIGGEST_ALIGNMENT__)
   # and some versions don't warn if you ask for an alignment above said limit.
-  # Instead, they'll just silently use the maximum, which can be problematical. 
+  # Instead, they'll just silently use the maximum, which can be problematical.
   hpx_check_for_gnu_aligned_16(HPX_GNU_ALIGNED_16
     DEFINITIONS HPX_HAVE_GNU_ALIGNED_16
                 BOOST_ATOMIC_HAVE_GNU_ALIGNED_16) # for the gnu code
@@ -577,15 +577,15 @@ else()
   hpx_check_for_gnu_128bit_integers(HPX_GNU_128BIT_INTEGERS
     DEFINITIONS HPX_HAVE_GNU_128BIT_INTEGERS
                 BOOST_ATOMIC_HAVE_GNU_128BIT_INTEGERS) # for integral casts
- 
-  # we use movdqa for atomic 128bit loads and stores 
+
+  # we use movdqa for atomic 128bit loads and stores
   hpx_cpuid("sse2" HPX_SSE2
     DEFINITIONS HPX_HAVE_SSE2
                 BOOST_ATOMIC_HAVE_SSE2)
-  
+
   if(HPX_SSE2)
     hpx_use_flag_if_available(-msse2 LANGUAGES CXX Fortran)
-  endif() 
+  endif()
 
   # rdtsc is an x86 instruction that reads the value of a CPU time stamp
   # counter. rdtscp is an extension to rdtsc. The difference is that rdtscp is
@@ -596,12 +596,12 @@ else()
     DEFINITIONS HPX_HAVE_RDTSCP)
 
   ##############################################################################
-  # Macro definitions for system headers 
+  # Macro definitions for system headers
   ##############################################################################
   add_definitions(-D_GNU_SOURCE)
 
   ##############################################################################
-  # System libraries 
+  # System libraries
   ##############################################################################
   set(hpx_RUNTIME_LIBRARIES dl rt)
 
@@ -623,7 +623,7 @@ else()
   if("${HPX_MALLOC}" MATCHES "jemalloc|Jemalloc|JEMALLOC" AND NOT JEMALLOC_FOUND)
     hpx_warn("malloc" "jemalloc allocator not found.")
   endif()
-  
+
   set(hpx_MALLOC_LIBRARY "")
 
   if(NOT "${HPX_MALLOC}" MATCHES "system|System|SYSTEM")
@@ -639,7 +639,7 @@ else()
         set(hpx_LIBRARIES ${hpx_LIBRARIES} ${JEMALLOC_LIBRARY})
         add_definitions(-DHPX_JEMALLOC)
       endif()
- 
+
       hpx_use_flag_if_available(-fno-builtin-cfree)
       hpx_use_flag_if_available(-fno-builtin-pvalloc)
       hpx_use_flag_if_available(-fno-builtin-malloc)
@@ -662,14 +662,14 @@ else()
 endif()
 
 ################################################################################
-# target specification 
+# target specification
 ################################################################################
-# hpx_LIBRARIES lists all libraries a HPX module needs to be linked with by 
-# default. 
+# hpx_LIBRARIES lists all libraries a HPX module needs to be linked with by
+# default.
 set(hpx_LIBRARIES hpx hpx_serialization)
 
-# Recurse into some subdirectories. This does not actually cause another cmake 
-# executable to run. The same process will walk through the project's entire 
+# Recurse into some subdirectories. This does not actually cause another cmake
+# executable to run. The same process will walk through the project's entire
 # directory structure.
 add_subdirectory(src)
 
@@ -711,8 +711,8 @@ endif()
 # installation instructions
 ################################################################################
 install( # install all hpx header files
-  DIRECTORY hpx/ 
-  DESTINATION include/hpx 
+  DIRECTORY hpx/
+  DESTINATION include/hpx
   COMPONENT core
   FILES_MATCHING PATTERN "*.hpp"
   PATTERN ".svn" EXCLUDE
@@ -721,14 +721,14 @@ install( # install all hpx header files
   PATTERN "CTestFiles" EXCLUDE)
 
 install( # install all hpx cmake utility files
-  DIRECTORY cmake/ 
-  DESTINATION share/hpx/cmake 
+  DIRECTORY cmake/
+  DESTINATION share/hpx/cmake
   COMPONENT core
   PATTERN ".svn" EXCLUDE
   PATTERN ".git" EXCLUDE)
 
-install( # install hpx python scripts 
-  DIRECTORY python/scripts/ 
+install( # install hpx python scripts
+  DIRECTORY python/scripts/
   DESTINATION bin
   FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
                    GROUP_READ GROUP_EXECUTE
@@ -739,7 +739,7 @@ install( # install hpx python scripts
   PATTERN ".git" EXCLUDE)
 
 if(UNIX)
-  file(GLOB scripts "${CMAKE_SOURCE_DIR}/python/scripts/*.py") 
+  file(GLOB scripts "${CMAKE_SOURCE_DIR}/python/scripts/*.py")
   foreach(script ${scripts})
     get_filename_component(script_name ${script} NAME)
     get_filename_component(script_name_we ${script} NAME_WE)
@@ -752,9 +752,9 @@ if(UNIX)
   endforeach()
 endif()
 
-install( # install hpx python module (TODO: this is a temporary hack) 
-  DIRECTORY python/hpx 
-  DESTINATION share/hpx/python 
+install( # install hpx python module (TODO: this is a temporary hack)
+  DIRECTORY python/hpx
+  DESTINATION share/hpx/python
   COMPONENT core
   FILES_MATCHING PATTERN "*.py"
   PATTERN ".svn" EXCLUDE

@@ -53,20 +53,20 @@ namespace nqueen
             return this->base_type::check_board(gid_, list, level);
         }
 
-        hpx::lcos::promise<bool> check_board_async(list_type const& list, 
+        hpx::lcos::promise<bool> check_board_async(list_type const& list,
             std::size_t level)
         {
             return this->base_type::check_board_async(gid_, list, level);
         }
         //---------------------------------------------------------
 
-        std::size_t solve_board(list_type const& list, std::size_t size, 
+        std::size_t solve_board(list_type const& list, std::size_t size,
             std::size_t level, std::size_t col)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::solve_board(gid_, list, size, level, col);
         }
-        
+
         hpx::lcos::promise<std::size_t>
         solve_board_async(list_type const& list, std::size_t size,
             std::size_t level, std::size_t col)

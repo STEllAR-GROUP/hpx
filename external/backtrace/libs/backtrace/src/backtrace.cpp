@@ -49,12 +49,12 @@ namespace boost {
 
     namespace stack_trace {
         #if defined(BOOST_HAVE_EXECINFO)
-        
+
         int trace(void **array,int n)
         {
             return :: backtrace(array,n);
         }
-        
+
         #elif defined(BOOST_MSVC)
 
         int trace(void **array,int n)
@@ -72,9 +72,9 @@ namespace boost {
         }
 
         #endif
-        
+
         #if defined(BOOST_HAVE_DLADDR) && defined(BOOST_HAVE_ABI_CXA_DEMANGLE)
-        
+
         std::string get_symbol(void *ptr)
         {
             if(!ptr)
@@ -152,7 +152,7 @@ namespace boost {
                 throw;
             }
         }
-        
+
         std::string get_symbols(void * const *address,int size)
         {
             char ** ptr = backtrace_symbols(address,size);
@@ -174,7 +174,7 @@ namespace boost {
             }
         }
 
-        
+
         void write_symbols(void *const *addresses,int size,std::ostream &out)
         {
             char ** ptr = backtrace_symbols(addresses,size);
@@ -193,13 +193,13 @@ namespace boost {
                 throw;
             }
         }
-        
+
         #elif defined(BOOST_MSVC)
-        
+
         namespace {
             HANDLE hProcess = 0;
             bool syms_ready = false;
-            
+
             void init()
             {
                 if(hProcess == 0) {
@@ -213,7 +213,7 @@ namespace boost {
                 }
             }
         }
-        
+
         std::string get_symbol(void *ptr)
         {
             if(ptr==0)
@@ -266,7 +266,7 @@ namespace boost {
             }
             out << std::flush;
         }
-        
+
         #else
 
         std::string get_symbol(void *ptr)

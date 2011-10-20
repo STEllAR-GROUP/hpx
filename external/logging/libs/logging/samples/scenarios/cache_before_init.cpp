@@ -16,7 +16,7 @@
 /**
 @example cache_before_init.cpp
 
-@copydoc cache_before_init 
+@copydoc cache_before_init
 
 @page cache_before_init cache_before_init.cpp Example
 
@@ -90,7 +90,7 @@ typedef boost::logging::logger_format_write< > logger_type;
 
 
 BOOST_DECLARE_LOG_FILTER(g_log_level, boost::logging::level::holder ) // holds the application log level
-BOOST_DECLARE_LOG(g_log_err, logger_type) 
+BOOST_DECLARE_LOG(g_log_err, logger_type)
 BOOST_DECLARE_LOG(g_log_app, logger_type)
 BOOST_DECLARE_LOG(g_log_dbg, logger_type)
 
@@ -98,7 +98,7 @@ BOOST_DECLARE_LOG(g_log_dbg, logger_type)
 #define LERR_ BOOST_LOG_USE_LOG_IF_LEVEL(g_log_err(), g_log_level(), error )
 #define LAPP_ BOOST_LOG_USE_LOG_IF_LEVEL(g_log_app(), g_log_level(), info ) << "[app] "
 
-BOOST_DEFINE_LOG_FILTER(g_log_level, boost::logging::level::holder ) 
+BOOST_DEFINE_LOG_FILTER(g_log_level, boost::logging::level::holder )
 BOOST_DEFINE_LOG(g_log_err, logger_type)
 BOOST_DEFINE_LOG(g_log_app, logger_type)
 BOOST_DEFINE_LOG(g_log_dbg, logger_type)

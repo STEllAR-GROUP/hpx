@@ -21,9 +21,9 @@
 # pragma once
 #endif
 
-#if defined(_MSC_VER) 
+#if defined(_MSC_VER)
 #pragma warning ( disable : 4355)
-#endif 
+#endif
 
 
 
@@ -121,11 +121,11 @@ namespace detail {
             while ( in >> word) {
                 if ( word[0] == '+')
                     word.erase( word.begin());
-                else if ( word[0] == '-') 
+                else if ( word[0] == '-')
                     // ignore this word
                     continue;
 
-                if ( info->name_to_destination.find(word) != info->name_to_destination.end()) 
+                if ( info->name_to_destination.find(word) != info->name_to_destination.end())
                     info->write_steps.push_back( info->name_to_destination.find(word)->second);
             }
         }
@@ -134,7 +134,7 @@ namespace detail {
 
 }
 
-/** 
+/**
 @brief Allows you to contain multiple destinations, give each such destination a name. Then, at run-time, you can specify a format string which will specify which destinations to be called, and on what order.
 
 This allows you:
@@ -142,15 +142,15 @@ This allows you:
 - each destination is given a name, when being added. The name <b>must not</b> contain spaces and must not start with '+'/'-' signs
 - you have a %format string, which contains what destinations to be called, and on which order
 
-The %format string contains destination names, separated by space. 
+The %format string contains destination names, separated by space.
 
 When a message is written to this destination, I parse the format string. When a name is encountered, if there's a destination
-corresponding to this name, I will call it. 
+corresponding to this name, I will call it.
 
 Example:
 
 @code
-g_l()->writer().add_destination( 
+g_l()->writer().add_destination(
     destination::named("cout out debug")
         .add( "cout", destination::cout())
         .add( "debug", destination::dbg_window() )
@@ -186,7 +186,7 @@ template<class destination_base = default_, class lock_resource = default_ > str
     typedef non_const_context< detail::named_context<lock_resource,destination_base> > non_const_context_base;
     typedef hold_string_type string_type;
 
-    /** 
+    /**
         @brief constructs the named destination
 
         @param named_name name of the named

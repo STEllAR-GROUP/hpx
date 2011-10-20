@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_PARCELSET_PARCELHANDLER_MAY_18_2008_0935AM)
@@ -27,23 +27,23 @@ namespace hpx { namespace parcelset
 {
     /// \class parcelhandler parcelhandler.hpp hpx/runtime/parcelset/parcelhandler.hpp
     ///
-    /// The \a parcelhandler is the representation of the parcelset inside a 
-    /// locality. It is built on top of a single parcelport. Several 
+    /// The \a parcelhandler is the representation of the parcelset inside a
+    /// locality. It is built on top of a single parcelport. Several
     /// parcelhandler's may be connected to a single parcelport.
     class HPX_EXPORT parcelhandler : boost::noncopyable
     {
     private:
-        static void default_write_handler(boost::system::error_code const& e, 
+        static void default_write_handler(boost::system::error_code const& e,
             std::size_t size) {}
 
-        void parcel_sink(parcelport& pp, 
+        void parcel_sink(parcelport& pp,
             boost::shared_ptr<std::vector<char> > const& parcel_data,
             threads::thread_priority priority);
 
         threads::thread_state decode_parcel(
             boost::shared_ptr<std::vector<char> > const& parcel_data);
 
-        // make sure the parcel has been properly initialized        
+        // make sure the parcel has been properly initialized
         void init_parcel(parcel& p)
         {
             // ensure the source locality id is set (if no component id is given)
@@ -53,7 +53,7 @@ namespace hpx { namespace parcelset
             // set the current local time for this locality
             p.set_start_time(get_current_time());
         }
-        
+
     public:
         typedef parcelport::read_handler_type read_handler_type;
         typedef parcelport::write_handler_type write_handler_type;
@@ -62,33 +62,33 @@ namespace hpx { namespace parcelset
         /// instance (parameter \a resolver) and the parcelport to be used for
         /// parcel send and receive (parameter \a pp).
         ///
-        /// \param resolver [in] A reference to the AGAS client to use for 
-        ///                 address translation requests to be made by the 
+        /// \param resolver [in] A reference to the AGAS client to use for
+        ///                 address translation requests to be made by the
         ///                 parcelhandler.
         /// \param pp       [in] A reference to the \a parcelport this \a
-        ///                 parcelhandler is connected to. This \a parcelport 
-        ///                 instance will be used for any parcel related 
+        ///                 parcelhandler is connected to. This \a parcelport
+        ///                 instance will be used for any parcel related
         ///                 transport operations the parcelhandler carries out.
         parcelhandler(naming::resolver_client& resolver, parcelport& pp,
             threads::threadmanager_base* tm, parcelhandler_queue_base* policy);
 
-        ~parcelhandler() 
+        ~parcelhandler()
         {
         }
 
-        /// \brief Allow access to AGAS resolver instance. 
+        /// \brief Allow access to AGAS resolver instance.
         ///
-        /// This accessor returns a reference to the AGAS resolver client 
-        /// object the parcelhandler has been initialized with (see 
-        /// parcelhandler constructors). This is the same resolver instance 
+        /// This accessor returns a reference to the AGAS resolver client
+        /// object the parcelhandler has been initialized with (see
+        /// parcelhandler constructors). This is the same resolver instance
         /// this parcelhandler has been initialized with.
         naming::resolver_client& get_resolver();
 
-        /// Allow access to parcelport instance. 
+        /// Allow access to parcelport instance.
         ///
         /// This accessor returns a reference to the parcelport object
-        /// the parcelhandler has been initialized with (see parcelhandler 
-        /// constructors). This is the same \a parcelport instance this 
+        /// the parcelhandler has been initialized with (see parcelhandler
+        /// constructors). This is the same \a parcelport instance this
         /// parcelhandler has been initialized with.
         parcelport& get_parcelport()
         {
@@ -97,7 +97,7 @@ namespace hpx { namespace parcelset
 
         /// Return the prefix of this locality
         ///
-        /// This accessor allows to retrieve the prefix value being assigned to 
+        /// This accessor allows to retrieve the prefix value being assigned to
         /// the locality this parcelhandler is associated with. This returns the
         /// same value as would be returned by:
         ///
@@ -105,15 +105,15 @@ namespace hpx { namespace parcelset
         ///     naming::id_type prefix;
         ///     get_resolver().get_prefix(here, prefix);
         /// \endcode
-        /// 
-        /// but doesn't require the full AGAS round trip as the prefix value 
+        ///
+        /// but doesn't require the full AGAS round trip as the prefix value
         /// is cached inside the parcelhandler.
-        naming::gid_type const& get_prefix() const 
-        { 
-            return prefix_; 
+        naming::gid_type const& get_prefix() const
+        {
+            return prefix_;
         }
 
-        /// Return the list of all remote localities supporting the given 
+        /// Return the list of all remote localities supporting the given
         /// component type
         ///
         /// \param prefixes [out] The reference to a vector of id_types filled
@@ -121,13 +121,13 @@ namespace hpx { namespace parcelset
         /// \param type     [in] The type of the component which needs to exist
         ///                 on the returned localities.
         ///
-        /// \returns The function returns \a true if there is at least one 
+        /// \returns The function returns \a true if there is at least one
         ///          remote locality known by AGAS
         ///          (!prefixes.empty()).
-        bool get_raw_remote_prefixes(std::vector<naming::gid_type>& prefixes, 
+        bool get_raw_remote_prefixes(std::vector<naming::gid_type>& prefixes,
             components::component_type type = components::component_invalid) const;
 
-        /// Return the list of all localities supporting the given 
+        /// Return the list of all localities supporting the given
         /// component type
         ///
         /// \param prefixes [out] The reference to a vector of id_types filled
@@ -135,36 +135,36 @@ namespace hpx { namespace parcelset
         /// \param type     [in] The type of the component which needs to exist
         ///                 on the returned localities.
         ///
-        /// \returns The function returns \a true if there is at least one 
+        /// \returns The function returns \a true if there is at least one
         ///          locality known by AGAS
         ///          (!prefixes.empty()).
-        bool get_raw_prefixes(std::vector<naming::gid_type>& prefixes, 
+        bool get_raw_prefixes(std::vector<naming::gid_type>& prefixes,
             components::component_type type = components::component_invalid) const;
 
-        /// A parcel is submitted for transport at the source locality site to 
+        /// A parcel is submitted for transport at the source locality site to
         /// the parcel set of the locality with the put-parcel command
         ///
-        /// \note The function \a sync_put_parcel() is synchronous, it blocks 
-        ///       until the parcel has been sent by the underlying \a 
+        /// \note The function \a sync_put_parcel() is synchronous, it blocks
+        ///       until the parcel has been sent by the underlying \a
         ///       parcelport.
         ///
-        /// \param p        [in, out] A reference to the parcel to send. The 
+        /// \param p        [in, out] A reference to the parcel to send. The
         ///                 function does not return before the parcel has been
-        ///                 transmitted. The parcel \a p will be modified in 
+        ///                 transmitted. The parcel \a p will be modified in
         ///                 place, as it will get set the resolved destination
         ///                 address and parcel id (if not already set).
         void sync_put_parcel(parcel& p);
-        
-        /// A parcel is submitted for transport at the source locality site to 
+
+        /// A parcel is submitted for transport at the source locality site to
         /// the parcel set of the locality with the put-parcel command
         //
-        /// \note The function \a put_parcel() is asynchronous, the provided 
-        /// function or function object gets invoked on completion of the send 
+        /// \note The function \a put_parcel() is asynchronous, the provided
+        /// function or function object gets invoked on completion of the send
         /// operation or on any error.
         ///
-        /// \param p        [in, out] A reference to the parcel to send. The 
-        ///                 parcel \a p will be modified in place, as it will 
-        ///                 get set the resolved destination address and parcel 
+        /// \param p        [in, out] A reference to the parcel to send. The
+        ///                 parcel \a p will be modified in place, as it will
+        ///                 get set the resolved destination address and parcel
         ///                 id (if not already set).
         /// \param f        [in] A function object to be invoked on successful
         ///                 completion or on errors. The signature of this
@@ -175,50 +175,50 @@ namespace hpx { namespace parcelset
         /// \endcode
         ///
         ///                 where \a err is the status code of the operation and
-        ///                       \a size is the number of successfully 
+        ///                       \a size is the number of successfully
         ///                              transferred bytes.
         void put_parcel(parcel& p, write_handler_type f);
 
-        /// This put_parcel() function overload is asynchronous, but no 
-        /// callback functor is provided by the user. 
+        /// This put_parcel() function overload is asynchronous, but no
+        /// callback functor is provided by the user.
         ///
         /// \note   The function \a put_parcel() is asynchronous.
         ///
-        /// \param p        [in, out] A reference to the parcel to send. The 
-        ///                 parcel \a p will be modified in place, as it will 
-        ///                 get set the resolved destination address and parcel 
+        /// \param p        [in, out] A reference to the parcel to send. The
+        ///                 parcel \a p will be modified in place, as it will
+        ///                 get set the resolved destination address and parcel
         ///                 id (if not already set).
         void put_parcel(parcel& p)
         { put_parcel(p, &parcelhandler::default_write_handler); }
 
         /// The function \a get_parcel returns the next available parcel
         ///
-        /// \param p        [out] The parcel instance to be filled with the 
-        ///                 received parcel. If the functioned returns \a true 
+        /// \param p        [out] The parcel instance to be filled with the
+        ///                 received parcel. If the functioned returns \a true
         ///                 this will be the next received parcel.
         ///
-        /// \returns        Returns \a true if the next parcel has been 
-        ///                 retrieved successfully. The reference given by 
-        ///                 parameter \a p will be initialized with the 
+        /// \returns        Returns \a true if the next parcel has been
+        ///                 retrieved successfully. The reference given by
+        ///                 parameter \a p will be initialized with the
         ///                 received parcel data.
-        ///                 Return \a false if no parcel is available in the 
+        ///                 Return \a false if no parcel is available in the
         ///                 parcelhandler, the reference \a p is not touched.
         ///
-        /// The returned parcel will be no longer available from the 
-        /// parcelhandler as it is removed from the internal queue of received 
+        /// The returned parcel will be no longer available from the
+        /// parcelhandler as it is removed from the internal queue of received
         /// parcels.
         bool get_parcel(parcel& p)
         {
             return parcels_->get_parcel(p);
         }
 
-        /// Register an event handler to be called whenever a parcel has been 
+        /// Register an event handler to be called whenever a parcel has been
         /// received
         ///
-        /// \param sink     [in] A function object to be invoked whenever a 
-        ///                 parcel has been received by the parcelhandler. It is 
-        ///                 possible to register more than one (different) 
-        ///                 function object. The signature of this function 
+        /// \param sink     [in] A function object to be invoked whenever a
+        ///                 parcel has been received by the parcelhandler. It is
+        ///                 possible to register more than one (different)
+        ///                 function object. The signature of this function
         ///                 object is expected to be:
         ///
         /// \code
@@ -235,13 +235,13 @@ namespace hpx { namespace parcelset
             return parcels_->register_event_handler(sink);
         }
 
-        /// Register an event handler to be called whenever a parcel has been 
+        /// Register an event handler to be called whenever a parcel has been
         /// received
         ///
-        /// \param sink     [in] A function object to be invoked whenever a 
-        ///                 parcel has been received by the parcelhandler. It is 
-        ///                 possible to register more than one (different) 
-        ///                 function object. The signature of this function 
+        /// \param sink     [in] A function object to be invoked whenever a
+        ///                 parcel has been received by the parcelhandler. It is
+        ///                 possible to register more than one (different)
+        ///                 function object. The signature of this function
         ///                 object is expected to be:
         ///
         /// \code
@@ -252,7 +252,7 @@ namespace hpx { namespace parcelset
         ///                 where \a pp is a reference to the parcelhandler this
         ///                 function object instance is invoked by, and \a dest
         ///                 is the local destination address of the parcel.
-        /// \param conn     [in] A instance of a unspecified type allowing to 
+        /// \param conn     [in] A instance of a unspecified type allowing to
         ///                 manage the lifetime of the established connection.
         ///                 The easiest way is to pass an instance of \a
         ///                 scoped_connection_type allowing to automatically
@@ -266,7 +266,7 @@ namespace hpx { namespace parcelset
         }
 
         /// The 'scoped_connection_type' typedef simplifies to manage registered
-        /// event handlers. Instances of this type may be passed as the second 
+        /// event handlers. Instances of this type may be passed as the second
         /// parameter to the \a register_event_handler() function
         typedef parcelhandler_queue_base::connection_type scoped_connection_type;
 
@@ -275,7 +275,7 @@ namespace hpx { namespace parcelset
             return startup_time_ + timer_.elapsed();
         }
 
-        /// \brief Allow access to the locality of the parcelport this 
+        /// \brief Allow access to the locality of the parcelport this
         /// parcelhandler is associated with.
         ///
         /// This accessor returns a reference to the locality of the parcelport
@@ -285,8 +285,8 @@ namespace hpx { namespace parcelset
             return pp_.here();
         }
 
-        /// install_counters is called during startup to allow registration of 
-        /// performance counters 
+        /// install_counters is called during startup to allow registration of
+        /// performance counters
         void install_counters();
 
     protected:
@@ -299,7 +299,7 @@ namespace hpx { namespace parcelset
         /// The AGAS client
         naming::resolver_client& resolver_;
 
-        /// The site prefix of the locality 
+        /// The site prefix of the locality
         naming::gid_type prefix_;
 
         /// the parcelport this handler is associated with
@@ -308,7 +308,7 @@ namespace hpx { namespace parcelset
         /// the thread-manager to use (optional)
         threads::threadmanager_base* tm_;
 
-        /// 
+        ///
         boost::shared_ptr<parcelhandler_queue_base> parcels_;
 
         /// This is the timer instance for this parcelhandler

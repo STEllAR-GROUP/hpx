@@ -18,7 +18,7 @@
 /*
     NB: The most natural thing would be to write the increment/decrement
     operators along the following lines:
-    
+
     __asm__ __volatile__(
         "1: ldl_l %0,%1 \n"
         "addl %0,1,%0 \n"
@@ -28,13 +28,13 @@
         : "m" (value)
         : "cc"
     );
-    
+
     However according to the comments on the HP website and matching
     comments in the Linux kernel sources this defies branch prediction,
     as the cpu assumes that backward branches are always taken; so
     instead copy the trick from the Linux kernel, introduce a forward
     branch and back again.
-    
+
     I have, however, had a hard time measuring the difference between
     the two versions in microbenchmarks -- I am leaving it in nevertheless
     as it apparently does not hurt either.
@@ -113,12 +113,12 @@ public:
             "beq %3, 3f\n"
             "stl_c %1, %4\n"
             "2:\n"
-            
+
             ".subsection 2\n"
             "3: mov %3, %1\n"
             "br 2b\n"
             ".previous\n"
-            
+
             : "+&r" (expected), "+&r" (desired), "=&r"(current), "=&r"(success)
             : "m" (i)
             :
@@ -127,7 +127,7 @@ public:
         else fence_after(failure_order);
         return desired;
     }
-    
+
     bool is_lock_free(void) const volatile {return true;}
 protected:
     inline T fetch_add_var(T c, memory_order order) volatile
@@ -139,11 +139,11 @@ protected:
             "addl %0, %3, %1\n"
             "stl_c %1, %2\n"
             "beq %1, 2f\n"
-            
+
             ".subsection 2\n"
             "2: br 1b\n"
             ".previous\n"
-            
+
             : "=&r" (original), "=&r" (modified)
             : "m" (i), "r" (c)
             :
@@ -160,11 +160,11 @@ protected:
             "addl %0, 1, %1\n"
             "stl_c %1, %2\n"
             "beq %1, 2f\n"
-            
+
             ".subsection 2\n"
             "2: br 1b\n"
             ".previous\n"
-            
+
             : "=&r" (original), "=&r" (modified)
             : "m" (i)
             :
@@ -181,11 +181,11 @@ protected:
             "subl %0, 1, %1\n"
             "stl_c %1, %2\n"
             "beq %1, 2f\n"
-            
+
             ".subsection 2\n"
             "2: br 1b\n"
             ".previous\n"
-            
+
             : "=&r" (original), "=&r" (modified)
             : "m" (i)
             :
@@ -229,12 +229,12 @@ public:
             "beq %3, 3f\n"
             "stq_c %1, %4\n"
             "2:\n"
-            
+
             ".subsection 2\n"
             "3: mov %3, %1\n"
             "br 2b\n"
             ".previous\n"
-            
+
             : "+&r" (expected), "+&r" (desired), "=&r"(current), "=&r"(success)
             : "m" (i)
             :
@@ -243,7 +243,7 @@ public:
         else fence_after(failure_order);
         return desired;
     }
-    
+
     bool is_lock_free(void) const volatile {return true;}
 protected:
     inline T fetch_add_var(T c, memory_order order) volatile
@@ -255,11 +255,11 @@ protected:
             "addq %0, %3, %1\n"
             "stq_c %1, %2\n"
             "beq %1, 2f\n"
-            
+
             ".subsection 2\n"
             "2: br 1b\n"
             ".previous\n"
-            
+
             : "=&r" (original), "=&r" (modified)
             : "m" (i), "r" (c)
             :
@@ -276,11 +276,11 @@ protected:
             "addq %0, 1, %1\n"
             "stq_c %1, %2\n"
             "beq %1, 2f\n"
-            
+
             ".subsection 2\n"
             "2: br 1b\n"
             ".previous\n"
-            
+
             : "=&r" (original), "=&r" (modified)
             : "m" (i)
             :
@@ -297,11 +297,11 @@ protected:
             "subq %0, 1, %1\n"
             "stq_c %1, %2\n"
             "beq %1, 2f\n"
-            
+
             ".subsection 2\n"
             "2: br 1b\n"
             ".previous\n"
-            
+
             : "=&r" (original), "=&r" (modified)
             : "m" (i)
             :
@@ -333,7 +333,7 @@ template<typename T>
 class platform_atomic_integral<T, 1>: public build_atomic_from_larger_type<atomic_alpha_32<uint32_t>, T> {
 public:
     typedef build_atomic_from_larger_type<atomic_alpha_32<uint32_t>, T> super;
-    
+
     explicit platform_atomic_integral(T v) : super(v) {}
     platform_atomic_integral(void) {}
 };
@@ -342,7 +342,7 @@ template<typename T>
 class platform_atomic_integral<T, 2>: public build_atomic_from_larger_type<atomic_alpha_32<uint32_t>, T> {
 public:
     typedef build_atomic_from_larger_type<atomic_alpha_32<uint32_t>, T> super;
-    
+
     explicit platform_atomic_integral(T v) : super(v) {}
     platform_atomic_integral(void) {}
 };

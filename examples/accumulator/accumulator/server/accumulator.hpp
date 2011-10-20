@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_COMPONENTS_SERVER_ACCUMULATOR_MAY_17_2008_0731PM)
@@ -16,24 +16,24 @@
 #include <hpx/runtime/actions/component_action.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace server 
+namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// The accumulator is a very simple example of a HPX component. 
+    /// The accumulator is a very simple example of a HPX component.
     ///
     /// The accumulator class is a small example component demonstrating the
     /// main principles of writing your own components. It exposes 4 different
     /// actions: init, add, query, and print, showing how to used and implement
-    /// functionality in a way conformant with the HPX runtime system. 
+    /// functionality in a way conformant with the HPX runtime system.
     ///
-    /// Note that the implementation of the accumulator does not require any 
+    /// Note that the implementation of the accumulator does not require any
     /// special data members or virtual functions.
     ///
-    class accumulator 
-      : public components::detail::managed_component_base<accumulator> 
+    class accumulator
+      : public components::detail::managed_component_base<accumulator>
     {
     public:
-        // parcel action code: the action to be performed on the destination 
+        // parcel action code: the action to be performed on the destination
         // object (the accumulator)
         enum actions
         {
@@ -52,28 +52,28 @@ namespace hpx { namespace components { namespace server
         // exposed functionality of this component
 
         /// Initialize the accumulator
-        void init() 
+        void init()
         {
             arg_ = 0;
         }
 
         /// Add the given number to the accumulator
-        void add (unsigned long arg) 
+        void add (unsigned long arg)
         {
             arg_ += arg;
         }
 
         /// Return the current value to the caller
-        unsigned long query() 
+        unsigned long query()
         {
             return arg_;
         }
 
         /// Print the current value of the accumulator
-        void print() 
+        void print()
         {
             applier::applier& appl = applier::get_applier();
-            std::cout << appl.get_runtime_support_gid() << std::dec << "> " 
+            std::cout << appl.get_runtime_support_gid() << std::dec << "> "
                       << arg_ << std::flush << std::endl;
         }
 

@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_RUNTIME_ACTIONS_COMPONENT_ACTION_MAR_26_2008_1054AM)
@@ -32,24 +32,24 @@
 namespace hpx { namespace actions
 {
     ///////////////////////////////////////////////////////////////////////////
-    //  Specialized generic component action types allowing to hold a different 
+    //  Specialized generic component action types allowing to hold a different
     //  number of arguments
     ///////////////////////////////////////////////////////////////////////////
 
     // zero argument version
     template <
-        typename Component, typename Result, int Action, 
-        Result (Component::*F)(), typename Derived, 
+        typename Component, typename Result, int Action,
+        Result (Component::*F)(), typename Derived,
         threads::thread_priority Priority = threads::thread_priority_default>
-    class base_result_action0 
+    class base_result_action0
       : public action<Component, Action, Result, boost::fusion::vector<>,
                       Derived, Priority>
     {
     public:
         typedef Result result_type;
         typedef boost::fusion::vector<> arguments_type;
-        typedef action<Component, Action, result_type, arguments_type, 
-                       Derived, Priority> 
+        typedef action<Component, Action, result_type, arguments_type,
+                       Derived, Priority>
             base_type;
 
         explicit base_result_action0(threads::thread_priority priority = Priority)
@@ -58,11 +58,11 @@ namespace hpx { namespace actions
 
     protected:
         /// The \a continuation_thread_function will be registered as the thread
-        /// function of a thread. It encapsulates the execution of the 
-        /// original function (given by \a func), while ignoring the return 
+        /// function of a thread. It encapsulates the execution of the
+        /// original function (given by \a func), while ignoring the return
         /// value.
         template <typename Address>   // dummy template parameter
-        static threads::thread_state_enum 
+        static threads::thread_state_enum
         thread_function(Address lva)
         {
             try {
@@ -72,7 +72,7 @@ namespace hpx { namespace actions
                 (get_lva<Component>::call(lva)->*F)();      // just call the function
             }
             catch (hpx::exception const& e) {
-                LTM_(error) 
+                LTM_(error)
                     << "Unhandled exception while executing component action("
                     << detail::get_action_name<Derived>()
                     << "): " << e.what();
@@ -86,11 +86,11 @@ namespace hpx { namespace actions
     public:
         typedef boost::mpl::false_ direct_execution;
 
-        /// \brief This static \a construct_thread_function allows to construct 
-        /// a proper thread function for a \a thread without having to 
-        /// instantiate the \a base_result_action0 type. This is used by the \a 
+        /// \brief This static \a construct_thread_function allows to construct
+        /// a proper thread function for a \a thread without having to
+        /// instantiate the \a base_result_action0 type. This is used by the \a
         /// applier in case no continuation has been supplied.
-        static boost::function<threads::thread_function_type> 
+        static boost::function<threads::thread_function_type>
         construct_thread_function(naming::address::address_type lva)
         {
             threads::thread_state_enum (*f)(naming::address::address_type) =
@@ -99,12 +99,12 @@ namespace hpx { namespace actions
             return boost::bind(f, lva);
         }
 
-        /// \brief This static \a construct_thread_function allows to construct 
-        /// a proper thread function for a \a thread without having to 
-        /// instantiate the \a base_result_action0 type. This is used by the \a 
+        /// \brief This static \a construct_thread_function allows to construct
+        /// a proper thread function for a \a thread without having to
+        /// instantiate the \a base_result_action0 type. This is used by the \a
         /// applier in case a continuation has been supplied
-        static boost::function<threads::thread_function_type> 
-        construct_thread_function(continuation_type& cont, 
+        static boost::function<threads::thread_function_type>
+        construct_thread_function(continuation_type& cont,
             naming::address::address_type lva)
         {
             return base_type::construct_continuation_thread_function(
@@ -120,7 +120,7 @@ namespace hpx { namespace actions
         }
 
     private:
-        /// This \a get_thread_function will be invoked to retrieve the thread 
+        /// This \a get_thread_function will be invoked to retrieve the thread
         /// function for an action which has to be invoked without continuations.
         boost::function<threads::thread_function_type>
         get_thread_function(naming::address::address_type lva) const
@@ -128,7 +128,7 @@ namespace hpx { namespace actions
             return construct_thread_function(lva);
         }
 
-        /// This \a get_thread_function will be invoked to retrieve the thread 
+        /// This \a get_thread_function will be invoked to retrieve the thread
         /// function for an action which has to be invoked with continuations.
         boost::function<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
@@ -152,7 +152,7 @@ namespace hpx { namespace actions
         }
 
     private:
-        // serialization support    
+        // serialization support
         friend class boost::serialization::access;
 
         template<class Archive>
@@ -164,14 +164,14 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     template <
-        typename Component, typename Result, int Action, 
-        Result (Component::*F)(), 
+        typename Component, typename Result, int Action,
+        Result (Component::*F)(),
         threads::thread_priority Priority = threads::thread_priority_default,
         typename Derived = detail::this_type>
-    class result_action0 
+    class result_action0
       : public base_result_action0<Component, Result, Action, F,
             typename detail::action_type<
-                result_action0<Component, Result, Action, F, Priority>, 
+                result_action0<Component, Result, Action, F, Priority>,
                 Derived
             >::type, Priority>
     {
@@ -181,7 +181,7 @@ namespace hpx { namespace actions
         >::type derived_type;
 
         typedef base_result_action0<
-            Component, Result, Action, F, derived_type, Priority> 
+            Component, Result, Action, F, derived_type, Priority>
         base_type;
 
     public:
@@ -191,7 +191,7 @@ namespace hpx { namespace actions
 
         Result execute_function(naming::address::address_type lva) const
         {
-            LTM_(debug) << "result_action0::execute_function: name(" 
+            LTM_(debug) << "result_action0::execute_function: name("
                         << detail::get_action_name<derived_type>()
                         << ") lva(" << lva << ")";
             return (get_lva<Component>::call(lva)->*F)();
@@ -199,7 +199,7 @@ namespace hpx { namespace actions
 
         static Result execute_function_nonvirt(naming::address::address_type lva)
         {
-            LTM_(debug) << "result_action0::execute_function_nonvirt: name(" 
+            LTM_(debug) << "result_action0::execute_function_nonvirt: name("
                         << detail::get_action_name<derived_type>()
                         << ") lva(" << lva << ")";
             return (get_lva<Component>::call(lva)->*F)();
@@ -224,7 +224,7 @@ namespace hpx { namespace actions
         }
 
     private:
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data)
         {
@@ -233,13 +233,13 @@ namespace hpx { namespace actions
             data.description = detail::get_action_name<derived_type>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_; 
+            data.priority = this->priority_;
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva, 
+            naming::address::address_type lva,
             threads::thread_init_data& data)
         {
             data.lva = lva;
@@ -247,11 +247,11 @@ namespace hpx { namespace actions
             data.description = detail::get_action_name<derived_type>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_; 
+            data.priority = this->priority_;
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data,
             typename base_type::arguments_type const&)
@@ -259,9 +259,9 @@ namespace hpx { namespace actions
             return this->get_thread_init_data(lva, data);
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva, 
+            naming::address::address_type lva,
             threads::thread_init_data& data,
             typename base_type::arguments_type const&)
         {
@@ -271,9 +271,9 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     template <
-        typename Component, typename Result, int Action, 
+        typename Component, typename Result, int Action,
         Result (Component::*F)(), typename Derived = detail::this_type>
-    class direct_result_action0 
+    class direct_result_action0
       : public base_result_action0<Component, Result, Action, F,
             typename detail::action_type<
                 direct_result_action0<Component, Result, Action, F>, Derived
@@ -285,7 +285,7 @@ namespace hpx { namespace actions
         >::type derived_type;
 
         typedef base_result_action0<
-            Component, Result, Action, F, derived_type> 
+            Component, Result, Action, F, derived_type>
         base_type;
 
     public:
@@ -300,7 +300,7 @@ namespace hpx { namespace actions
 
         Result execute_function(naming::address::address_type lva) const
         {
-            LTM_(debug) << "direct_result_action0::execute_function: name(" 
+            LTM_(debug) << "direct_result_action0::execute_function: name("
                         << detail::get_action_name<derived_type>()
                         << ") lva(" << lva << ")";
             return (get_lva<Component>::call(lva)->*F)();
@@ -308,7 +308,7 @@ namespace hpx { namespace actions
 
         static Result execute_function_nonvirt(naming::address::address_type lva)
         {
-            LTM_(debug) << "direct_result_action0::execute_function_nonvirt: name(" 
+            LTM_(debug) << "direct_result_action0::execute_function_nonvirt: name("
                         << detail::get_action_name<derived_type>()
                         << ") lva(" << lva << ")";
             return (get_lva<Component>::call(lva)->*F)();
@@ -335,12 +335,12 @@ namespace hpx { namespace actions
     private:
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
-        base_action::action_type get_action_type() const 
+        base_action::action_type get_action_type() const
         {
             return base_action::direct_action;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data)
         {
@@ -349,13 +349,13 @@ namespace hpx { namespace actions
             data.description = detail::get_action_name<derived_type>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_; 
+            data.priority = this->priority_;
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva, 
+            naming::address::address_type lva,
             threads::thread_init_data& data)
         {
             data.lva = lva;
@@ -363,11 +363,11 @@ namespace hpx { namespace actions
             data.description = detail::get_action_name<derived_type>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_; 
+            data.priority = this->priority_;
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data,
             typename base_type::arguments_type const&)
@@ -375,9 +375,9 @@ namespace hpx { namespace actions
             return this->get_thread_init_data(lva, data);
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva, 
+            naming::address::address_type lva,
             threads::thread_init_data& data,
             typename base_type::arguments_type const&)
         {
@@ -387,9 +387,9 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     //  zero parameter version, no result value
-    template <typename Component, int Action, void (Component::*F)(), typename Derived, 
+    template <typename Component, int Action, void (Component::*F)(), typename Derived,
       threads::thread_priority Priority = threads::thread_priority_default>
-    class base_action0 
+    class base_action0
       : public action<Component, Action, util::unused_type,
                       boost::fusion::vector<>, Derived, Priority>
     {
@@ -397,7 +397,7 @@ namespace hpx { namespace actions
         typedef util::unused_type result_type;
         typedef boost::fusion::vector<> arguments_type;
         typedef action<Component, Action, result_type, arguments_type,
-                       Derived, Priority> 
+                       Derived, Priority>
             base_type;
 
         explicit base_action0(threads::thread_priority priority = Priority)
@@ -406,11 +406,11 @@ namespace hpx { namespace actions
 
     protected:
         /// The \a continuation_thread_function will be registered as the thread
-        /// function of a thread. It encapsulates the execution of the 
-        /// original function (given by \a func), while ignoring the return 
+        /// function of a thread. It encapsulates the execution of the
+        /// original function (given by \a func), while ignoring the return
         /// value.
         template <typename Address>   // dummy template parameter
-        static threads::thread_state_enum 
+        static threads::thread_state_enum
         thread_function(Address lva)
         {
             try {
@@ -420,7 +420,7 @@ namespace hpx { namespace actions
                 (get_lva<Component>::call(lva)->*F)();      // just call the function
             }
             catch (hpx::exception const& e) {
-                LTM_(error) 
+                LTM_(error)
                     << "Unhandled exception while executing component action("
                     << detail::get_action_name<Derived>()
                     << "): " << e.what();
@@ -434,11 +434,11 @@ namespace hpx { namespace actions
     public:
         typedef boost::mpl::false_ direct_execution;
 
-        /// \brief This static \a construct_thread_function allows to construct 
-        /// a proper thread function for a \a thread without having to 
-        /// instantiate the base_action0 type. This is used by the \a applier in 
+        /// \brief This static \a construct_thread_function allows to construct
+        /// a proper thread function for a \a thread without having to
+        /// instantiate the base_action0 type. This is used by the \a applier in
         /// case no continuation has been supplied.
-        static boost::function<threads::thread_function_type> 
+        static boost::function<threads::thread_function_type>
         construct_thread_function(naming::address::address_type lva)
         {
             threads::thread_state_enum (*f)(naming::address::address_type) =
@@ -447,11 +447,11 @@ namespace hpx { namespace actions
             return boost::bind(f, lva);
         }
 
-        /// \brief This static \a construct_thread_function allows to construct 
-        /// a proper thread function for a \a thread without having to 
-        /// instantiate the base_action0 type. This is used by the \a applier in 
+        /// \brief This static \a construct_thread_function allows to construct
+        /// a proper thread function for a \a thread without having to
+        /// instantiate the base_action0 type. This is used by the \a applier in
         /// case a continuation has been supplied
-        static boost::function<threads::thread_function_type> 
+        static boost::function<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva)
         {
@@ -510,8 +510,8 @@ namespace hpx { namespace actions
     template <typename Component, int Action, void (Component::*F)(),
         threads::thread_priority Priority = threads::thread_priority_default,
         typename Derived = detail::this_type>
-    class action0 
-      : public base_action0<Component, Action, F, 
+    class action0
+      : public base_action0<Component, Action, F,
             typename detail::action_type<
                 action0<Component, Action, F, Priority>, Derived
             >::type, Priority>
@@ -521,7 +521,7 @@ namespace hpx { namespace actions
             action0<Component, Action, F, Priority>, Derived
         >::type derived_type;
 
-        typedef base_action0<Component, Action, F, derived_type, Priority> 
+        typedef base_action0<Component, Action, F, derived_type, Priority>
             base_type;
 
     public:
@@ -532,7 +532,7 @@ namespace hpx { namespace actions
         util::unused_type
         execute_function(naming::address::address_type lva) const
         {
-            LTM_(debug) << "action0::execute_function: name(" 
+            LTM_(debug) << "action0::execute_function: name("
                         << detail::get_action_name<derived_type>()
                         << ") lva(" << lva << ")";
             (get_lva<Component>::call(lva)->*F)();
@@ -542,7 +542,7 @@ namespace hpx { namespace actions
         static util::unused_type
         execute_function_nonvirt(naming::address::address_type lva)
         {
-            LTM_(debug) << "action0::execute_function_nonvirt: name(" 
+            LTM_(debug) << "action0::execute_function_nonvirt: name("
                         << detail::get_action_name<derived_type>()
                         << ") lva(" << lva << ")";
             (get_lva<Component>::call(lva)->*F)();
@@ -568,7 +568,7 @@ namespace hpx { namespace actions
         }
 
     private:
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data)
         {
@@ -577,13 +577,13 @@ namespace hpx { namespace actions
             data.description = detail::get_action_name<derived_type>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_; 
+            data.priority = this->priority_;
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva, 
+            naming::address::address_type lva,
             threads::thread_init_data& data)
         {
             data.lva = lva;
@@ -591,11 +591,11 @@ namespace hpx { namespace actions
             data.description = detail::get_action_name<derived_type>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_; 
+            data.priority = this->priority_;
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data,
             typename base_type::arguments_type const&)
@@ -603,9 +603,9 @@ namespace hpx { namespace actions
             return this->get_thread_init_data(lva, data);
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva, 
+            naming::address::address_type lva,
             threads::thread_init_data& data,
             typename base_type::arguments_type const&)
         {
@@ -616,8 +616,8 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, int Action, void (Component::*F)(),
         typename Derived = detail::this_type>
-    class direct_action0 
-      : public base_action0<Component, Action, F, 
+    class direct_action0
+      : public base_action0<Component, Action, F,
             typename detail::action_type<
                 direct_action0<Component, Action, F>, Derived
             >::type>
@@ -642,7 +642,7 @@ namespace hpx { namespace actions
         util::unused_type
         execute_function(naming::address::address_type lva) const
         {
-            LTM_(debug) << "direct_action0::execute_function: name(" 
+            LTM_(debug) << "direct_action0::execute_function: name("
                         << detail::get_action_name<derived_type>()
                         << ") lva(" << lva << ")";
             (get_lva<Component>::call(lva)->*F)();
@@ -652,7 +652,7 @@ namespace hpx { namespace actions
         static util::unused_type
         execute_function_nonvirt(naming::address::address_type lva)
         {
-            LTM_(debug) << "direct_action0::execute_function_nonvirt: name(" 
+            LTM_(debug) << "direct_action0::execute_function_nonvirt: name("
                         << detail::get_action_name<derived_type>()
                         << ") lva(" << lva << ")";
             (get_lva<Component>::call(lva)->*F)();
@@ -680,12 +680,12 @@ namespace hpx { namespace actions
     private:
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
-        base_action::action_type get_action_type() const 
+        base_action::action_type get_action_type() const
         {
             return base_action::direct_action;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data)
         {
@@ -694,13 +694,13 @@ namespace hpx { namespace actions
             data.description = detail::get_action_name<derived_type>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_; 
+            data.priority = this->priority_;
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva, 
+            naming::address::address_type lva,
             threads::thread_init_data& data)
         {
             data.lva = lva;
@@ -708,11 +708,11 @@ namespace hpx { namespace actions
             data.description = detail::get_action_name<derived_type>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_; 
+            data.priority = this->priority_;
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data,
             typename base_type::arguments_type const&)
@@ -720,9 +720,9 @@ namespace hpx { namespace actions
             return this->get_thread_init_data(lva, data);
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva, 
+            naming::address::address_type lva,
             threads::thread_init_data& data,
             typename base_type::arguments_type const&)
         {

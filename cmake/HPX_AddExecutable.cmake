@@ -1,7 +1,7 @@
 # Copyright (c) 2007-2011 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Lelbach
 #
-# Distributed under the Boost Software License, Version 1.0. (See accompanying 
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(HPX_ADDEXECUTABLE_LOADED TRUE)
@@ -24,14 +24,14 @@ macro(add_hpx_executable name)
   # add the executable build target
   if(NOT MSVC)
     if(${name}_ESSENTIAL)
-      add_executable(${name}_exe 
+      add_executable(${name}_exe
         ${${name}_SOURCES} ${${name}_HEADERS})
     else()
       add_executable(${name}_exe EXCLUDE_FROM_ALL
         ${${name}_SOURCES})
     endif()
   else()
-    add_executable(${name}_exe 
+    add_executable(${name}_exe
       ${${name}_SOURCES} ${${name}_HEADERS})
   endif()
 
@@ -52,7 +52,7 @@ macro(add_hpx_executable name)
   # linker instructions
   if(NOT ${name}_NOLIBS)
     target_link_libraries(${name}_exe
-      ${${name}_DEPENDENCIES} 
+      ${${name}_DEPENDENCIES}
       ${hpx_LIBRARIES}
       hpx_init
       ${libs})
@@ -68,6 +68,6 @@ macro(add_hpx_executable name)
     hpx_executable_install(${name}_exe ESSENTIAL)
   else()
     hpx_executable_install(${name}_exe)
-  endif() 
+  endif()
 endmacro()
 

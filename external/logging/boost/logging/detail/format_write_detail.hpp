@@ -34,7 +34,7 @@ namespace format_and_write {
     template<class msg_type> struct simple ;
 }
 
-/** 
+/**
 @brief Classes that write the message, once it's been @ref gather "gathered".
 
 The most important class is writer::format_write
@@ -42,7 +42,7 @@ The most important class is writer::format_write
 */
 namespace writer {
 
-/** 
+/**
 @brief Allows custom formatting of the message before %logging it, and writing it to several destinations.
 
 Once the message has been @ref boost::logging::gather "gathered", it's time to write it.
@@ -58,15 +58,15 @@ Make sure you know what a manipulator is before using formatters and destination
 \n\n
 @section object_router The router object
 
-Once you've added the formatters and destinations, the @ref msg_route "router" comes into play. The @ref msg_route "router" 
+Once you've added the formatters and destinations, the @ref msg_route "router" comes into play. The @ref msg_route "router"
 specifies how formatters and destinations are called. By default, all formatters are called first, in the order they were added,
 and then all destinations are called, in the order they were added. You can easily access the router() instance.
 
 @code
 typedef logger< gather::ostream_like::return_cache_str<> , format_write< ... > > logger_type;
-BOOST_DECLARE_LOG(g_l, logger_type) 
-BOOST_DECLARE_LOG_FILTER(g_log_filter, filter::no_ts ) 
-#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() ) 
+BOOST_DECLARE_LOG(g_l, logger_type)
+BOOST_DECLARE_LOG_FILTER(g_log_filter, filter::no_ts )
+#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() )
 
 // add formatters : [idx] [time] message [enter]
 g_l()->writer().add_formatter( formatter::idx() );
@@ -94,8 +94,8 @@ in the msg_route namespace. For instance, take a look at msg_route::with_route c
 @section apply_format_and_write_object The apply_format_and_write object
 
 Once the formatters and destinations are added, and you know the route, you have an extra object - the format_and_write - which
-contains the logic for calling the formatters and destinations. 
-The format_and_write class knows how to call the formatters and destinations @em objects. Usually you'll be happy with the 
+contains the logic for calling the formatters and destinations.
+The format_and_write class knows how to call the formatters and destinations @em objects. Usually you'll be happy with the
 format_and_write::simple class - which simply calls @c operator() on the formatters , and @c operator() on the destinations.
 Otherwise, take a look at format_and_write namespace.
 
@@ -103,7 +103,7 @@ An object of this type (apply_format_and_write) is created for each new logged m
 
 
 \n\n
-@note This class is not thread-safe. If you want thread-safety, check out the other writer classes: on_dedicated_thread and ts_write 
+@note This class is not thread-safe. If you want thread-safety, check out the other writer classes: on_dedicated_thread and ts_write
 
 
 
@@ -131,12 +131,12 @@ Also, iterating over formatters/destinations would be slower, if we were to keep
 
 */
 template<
-        class formatter_base, 
+        class formatter_base,
         class destination_base,
         class lock_resource = default_ ,
         class apply_format_and_write = default_ ,
         class router_type = msg_route::simple<formatter_base, destination_base, lock_resource> ,
-        class formatter_array = array::shared_ptr_holder<formatter_base> , 
+        class formatter_array = array::shared_ptr_holder<formatter_base> ,
         class destination_array = array::shared_ptr_holder<destination_base> >
 struct format_write {
     typedef typename formatter_base::ptr_type formatter_ptr;
@@ -147,7 +147,7 @@ struct format_write {
     typedef typename boost::logging::detail::to_override<formatter_base>::type override_;
     typedef typename use_default<lock_resource, typename boost::logging::types<override_>::lock_resource > ::type lock_resource_type;
 
-    typedef formatter_base formatter_base_type; 
+    typedef formatter_base formatter_base_type;
     typedef destination_base destination_base_type;
 
 
@@ -213,7 +213,7 @@ private:
 
 
 public:
-    /** 
+    /**
         @brief Adds a formatter
 
         @param fmt The formatter
@@ -223,7 +223,7 @@ public:
         add_formatter_impl<formatter>( fmt, boost::is_base_of<is_generic,formatter>() );
     }
 
-    /** 
+    /**
         @brief Adds a formatter. Also, the second argument is the @ref boost::logging::formatter::spacer_t "spacer" string
 
         @param fmt The formatter
@@ -233,7 +233,7 @@ public:
         add_formatter( spacer(fmt, format_str) );
     }
 
-    /** 
+    /**
         @brief Deletes a formatter
 
         @param fmt The formatter to delete
@@ -243,7 +243,7 @@ public:
         del_formatter_impl<formatter>( fmt, boost::is_base_of<is_generic,formatter>() );
     }
 
-    /** 
+    /**
         @brief Adds a destination
     */
     template<class destination> void add_destination(destination dest) {
@@ -251,7 +251,7 @@ public:
         add_destination_impl<destination>( dest, boost::is_base_of<is_generic,destination>() );
     }
 
-    /** 
+    /**
         @brief Deletes a destination
     */
     template<class destination> void del_destination(destination dest) {
@@ -259,17 +259,17 @@ public:
         del_destination_impl<destination>( dest, boost::is_base_of<is_generic,destination>() );
     }
 
-    /** 
+    /**
     returns the object that actually routes the message
     */
     router_type& router()                         { return m_router; }
 
-    /** 
+    /**
     returns the object that actually routes the message
     */
     const router_type& router() const             { return m_router; }
 
-    /** 
+    /**
         does the actual write
     */
     template<class msg_type> void operator()(msg_type & msg) const {

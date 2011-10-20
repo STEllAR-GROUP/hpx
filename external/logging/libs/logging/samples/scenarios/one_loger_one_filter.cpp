@@ -24,7 +24,7 @@
 This usage:
 - You have one logger
 - You have one filter, which can be turned on or off
-- You want to format the message before it's written 
+- You want to format the message before it's written
 - The logger has several log destinations
     - The output goes to console, debug output window, and a file called out.txt
     - Formatting - prefix each message by its index, and append newline
@@ -51,10 +51,10 @@ It will be:
 #include <boost/logging/format/named_write.hpp>
 typedef boost::logging::named_logger<>::type logger_type;
 
-#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() ) 
+#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() )
 
 // Define the filters and loggers you'll use (usually in a source file)
-BOOST_DEFINE_LOG_FILTER(g_log_filter, boost::logging::filter::no_ts ) 
+BOOST_DEFINE_LOG_FILTER(g_log_filter, boost::logging::filter::no_ts )
 BOOST_DEFINE_LOG(g_l, logger_type)
 
 

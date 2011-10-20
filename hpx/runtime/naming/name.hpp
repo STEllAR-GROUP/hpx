@@ -1,8 +1,8 @@
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D. Guidry Jr.
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_NAMING_NAME_MAR_24_2008_0942AM)
@@ -41,11 +41,11 @@ namespace hpx { namespace naming
     {
         static boost::uint64_t const credit_mask = 0xffff0000ul;
 
-        explicit gid_type (boost::uint64_t lsb_id = 0) 
+        explicit gid_type (boost::uint64_t lsb_id = 0)
           : id_msb_(0), id_lsb_(lsb_id)
         {}
 
-        explicit gid_type (boost::uint64_t msb_id, boost::uint64_t lsb_id) 
+        explicit gid_type (boost::uint64_t msb_id, boost::uint64_t lsb_id)
           : id_msb_(msb_id), id_lsb_(lsb_id)
         {}
 
@@ -56,12 +56,12 @@ namespace hpx { namespace naming
             return *this;
         }
 
-        operator util::safe_bool<gid_type>::result_type() const 
-        { 
-            return util::safe_bool<gid_type>()(0 != id_lsb_ || 0 != id_msb_); 
+        operator util::safe_bool<gid_type>::result_type() const
+        {
+            return util::safe_bool<gid_type>()(0 != id_lsb_ || 0 != id_msb_);
         }
 
-        // We support increment, decrement, addition and subtraction 
+        // We support increment, decrement, addition and subtraction
         gid_type& operator++()       // pre-increment
         {
             *this += 1;
@@ -104,7 +104,7 @@ namespace hpx { namespace naming
         gid_type operator+= (boost::uint64_t rhs)
         { return (*this = *this + rhs); }
 
-        // GID - GID 
+        // GID - GID
         friend gid_type operator- (gid_type const& lhs, gid_type const& rhs)
         {
             boost::uint64_t lsb = rhs.id_lsb_ - lhs.id_lsb_;
@@ -177,7 +177,7 @@ namespace hpx { namespace naming
         {
             return id_msb_;
         }
-        void set_msb(boost::uint64_t msb) 
+        void set_msb(boost::uint64_t msb)
         {
             id_msb_ = msb;
         }
@@ -185,11 +185,11 @@ namespace hpx { namespace naming
         {
             return id_lsb_;
         }
-        void set_lsb(boost::uint64_t lsb) 
+        void set_lsb(boost::uint64_t lsb)
         {
             id_lsb_ = lsb;
         }
-        void set_lsb(void* lsb) 
+        void set_lsb(void* lsb)
         {
             id_lsb_ = reinterpret_cast<boost::uint64_t>(lsb);
         }
@@ -203,7 +203,7 @@ namespace hpx { namespace naming
         friend class boost::serialization::access;
 
         template<class Archive>
-        void serialize(Archive & ar, const unsigned int version) 
+        void serialize(Archive & ar, const unsigned int version)
         {
             ar & id_msb_;
             ar & id_lsb_;
@@ -217,7 +217,7 @@ namespace hpx { namespace naming
     ///////////////////////////////////////////////////////////////////////////
     inline std::ostream& operator<< (std::ostream& os, gid_type const& id)
     {
-        boost::io::ios_flags_saver ifs(os); 
+        boost::io::ios_flags_saver ifs(os);
         os << std::hex
            << "{" << std::right << std::setfill('0') << std::setw(16)
                   << id.id_msb_ << ", "
@@ -237,7 +237,7 @@ namespace hpx { namespace naming
 
     inline boost::uint32_t get_prefix_from_gid(gid_type const& id) HPX_PURE;
 
-    inline boost::uint32_t get_prefix_from_gid(gid_type const& id) 
+    inline boost::uint32_t get_prefix_from_gid(gid_type const& id)
     {
         return boost::uint32_t(id.get_msb() >> 32);
     }
@@ -254,7 +254,7 @@ namespace hpx { namespace naming
     inline boost::uint16_t add_credit_to_gid(gid_type& id, boost::uint16_t credit)
     {
         boost::uint64_t msb = id.get_msb();
-        boost::uint32_t c = 
+        boost::uint32_t c =
             boost::uint16_t((msb & gid_type::credit_mask) >> 16) + credit;
 
         BOOST_ASSERT(0 == (c & ~0xffff));
@@ -310,21 +310,21 @@ namespace hpx { namespace naming
         struct HPX_EXPORT id_type_impl
           : public gid_type
         {
-            explicit id_type_impl (boost::uint64_t lsb_id = 0) 
+            explicit id_type_impl (boost::uint64_t lsb_id = 0)
               : gid_type(0, lsb_id), address_()
             {}
 
-            explicit id_type_impl (boost::uint64_t msb_id, boost::uint64_t lsb_id) 
+            explicit id_type_impl (boost::uint64_t msb_id, boost::uint64_t lsb_id)
               : gid_type(msb_id, lsb_id), address_()
             {}
 
-            explicit id_type_impl (gid_type const& gid) 
+            explicit id_type_impl (gid_type const& gid)
               : gid_type(gid), address_()
             {}
 
             explicit id_type_impl (boost::uint64_t msb_id, boost::uint64_t lsb_id,
-                locality const& l, naming::address::component_type type, 
-                naming::address::address_type a) 
+                locality const& l, naming::address::component_type type,
+                naming::address::address_type a)
               : gid_type(msb_id, lsb_id), address_(l, type, a)
             {}
 
@@ -333,7 +333,7 @@ namespace hpx { namespace naming
             bool is_local();
             bool resolve(naming::address& addr);
             bool is_resolved() const { return address_; }
-            bool get_local_address(naming::address& addr) 
+            bool get_local_address(naming::address& addr)
             {
                 if (!is_local_cached() && !resolve())
                     return false;
@@ -398,11 +398,11 @@ namespace hpx { namespace naming
     public:
         id_type() {}
 
-        explicit id_type(boost::uint64_t lsb_id, management_type t/* = unmanaged*/) 
+        explicit id_type(boost::uint64_t lsb_id, management_type t/* = unmanaged*/)
           : gid_(new detail::id_type_impl(0, lsb_id), get_deleter(t))
         {}
 
-        explicit id_type(gid_type const& gid, management_type t/* = unmanaged*/) 
+        explicit id_type(gid_type const& gid, management_type t/* = unmanaged*/)
           : gid_(new detail::id_type_impl(gid), get_deleter(t))
         {
             BOOST_ASSERT(get_credit_from_gid(*gid_) || t == unmanaged ||
@@ -410,17 +410,17 @@ namespace hpx { namespace naming
         }
 
         explicit id_type(boost::uint64_t msb_id, boost::uint64_t lsb_id
-                       , management_type t/* = unmanaged*/) 
+                       , management_type t/* = unmanaged*/)
           : gid_(new detail::id_type_impl(msb_id, lsb_id), get_deleter(t))
         {
             BOOST_ASSERT(get_credit_from_gid(*gid_) || t == unmanaged ||
                          t == transmission);
         }
 
-        explicit id_type(boost::uint64_t msb_id, boost::uint64_t lsb_id, 
-              locality const& l, naming::address::component_type type_, 
-              naming::address::address_type a, management_type t/* = unmanaged*/) 
-          : gid_(new detail::id_type_impl(msb_id, lsb_id, l, type_, a), 
+        explicit id_type(boost::uint64_t msb_id, boost::uint64_t lsb_id,
+              locality const& l, naming::address::component_type type_,
+              naming::address::address_type a, management_type t/* = unmanaged*/)
+          : gid_(new detail::id_type_impl(msb_id, lsb_id, l, type_, a),
                          get_deleter(t))
         {
             BOOST_ASSERT(get_credit_from_gid(*gid_) || t == unmanaged ||
@@ -443,9 +443,9 @@ namespace hpx { namespace naming
             return *this;
         }
 
-        operator util::safe_bool<id_type>::result_type() const 
-        { 
-            return util::safe_bool<id_type>()(gid_); 
+        operator util::safe_bool<id_type>::result_type() const
+        {
+            return util::safe_bool<id_type>()(gid_);
         }
 
         // comparison is required as well
@@ -482,7 +482,7 @@ namespace hpx { namespace naming
         {
             return gid_->get_msb();
         }
-        void set_msb(boost::uint64_t msb) 
+        void set_msb(boost::uint64_t msb)
         {
             gid_->set_msb(msb);
         }
@@ -490,11 +490,11 @@ namespace hpx { namespace naming
         {
             return gid_->get_lsb();
         }
-        void set_lsb(boost::uint64_t lsb) 
+        void set_lsb(boost::uint64_t lsb)
         {
             gid_->set_lsb(lsb);
         }
-        void set_lsb(void* lsb) 
+        void set_lsb(void* lsb)
         {
             gid_->set_lsb(lsb);
         }
@@ -505,12 +505,12 @@ namespace hpx { namespace naming
             gid_type::mutex_type::scoped_lock l(gid_.get());
             return get_credit_from_gid(*gid_);
         }
-        void strip_credit() 
+        void strip_credit()
         {
             gid_type::mutex_type::scoped_lock l(gid_.get());
             strip_credit_from_gid(*gid_);
         }
-        boost::uint16_t add_credit(boost::uint16_t credit) 
+        boost::uint16_t add_credit(boost::uint16_t credit)
         {
             gid_type::mutex_type::scoped_lock l(gid_.get());
             return add_credit_to_gid(*gid_, credit);
@@ -602,7 +602,7 @@ namespace hpx { namespace naming
 
     ///////////////////////////////////////////////////////////////////////
     id_type const invalid_id = id_type();
-        
+
     ///////////////////////////////////////////////////////////////////////
     HPX_EXPORT char const* get_management_type_name(id_type::management_type m);
 }}
@@ -616,5 +616,5 @@ BOOST_CLASS_TRACKING(hpx::naming::id_type, boost::serialization::track_never)
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif 
+#endif
 

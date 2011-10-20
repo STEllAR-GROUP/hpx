@@ -27,10 +27,10 @@
 #include <boost/logging/detail/fwd.hpp>
 
 namespace boost { namespace logging {
-/** @page your_scenario_examples Examples of customizing your scenario 
+/** @page your_scenario_examples Examples of customizing your scenario
 
 Example 1:
-- Use a filter that uses per-thread caching with resync once at 10 secs, 
+- Use a filter that uses per-thread caching with resync once at 10 secs,
 - The filter uses levels
 - Use a logger that will favor speed
 
@@ -39,7 +39,7 @@ using namespace boost::logging::scenario::usage;
 typedef use< filter_::change::often<10>, filter_::level::use_levels, default_, logger_::favor::speed> finder;
 
 BOOST_DECLARE_LOG_FILTER(g_log_filter, finder::filter);
-BOOST_DECLARE_LOG(g_l, finder::logger) 
+BOOST_DECLARE_LOG(g_l, finder::logger)
 ...
 @endcode
 
@@ -54,7 +54,7 @@ using namespace boost::logging::scenario::usage;
 typedef use< filter_::change::set_once_when_multiple_threads, filter_::level::no_levels, logger_::change::set_once_when_one_thread> finder;
 
 BOOST_DECLARE_LOG_FILTER(g_log_filter, finder::filter);
-BOOST_DECLARE_LOG(g_l, finder::logger) 
+BOOST_DECLARE_LOG(g_l, finder::logger)
 ...
 @endcode
 
@@ -84,28 +84,28 @@ namespace writer {
     }
 }
 
-/** 
-@brief Use this when you have a specific scenario, and want the best logger/filter classes that fit that scenario. Check out scenario::usage and scenario::ts. 
+/**
+@brief Use this when you have a specific scenario, and want the best logger/filter classes that fit that scenario. Check out scenario::usage and scenario::ts.
 
 For example, if you want to specify a %scenario based on usage:
 
-@copydoc your_scenario_examples 
+@copydoc your_scenario_examples
 
 */
 namespace scenario {
 
-/** 
+/**
 @brief If you want the library to choose the best logger/filter classes based on how your application will %use the loggers and filters, %use this namespace.
 
-First, don't forget to 
+First, don't forget to
 
-@code 
+@code
 using namespace boost::logging::scenario::usage;
 @endcode
 
 Then, you can specify the logger and filter, in a very easy manner
 
-@copydoc your_scenario_examples 
+@copydoc your_scenario_examples
 
 */
 namespace usage {
@@ -118,8 +118,8 @@ namespace usage {
     namespace filter_ {
         /** @brief When does the filter change? */
         namespace change {
-            /** @brief Optimize for %often %change. Does per-thread caching. At a given period, it re-synchronizes. 
-                
+            /** @brief Optimize for %often %change. Does per-thread caching. At a given period, it re-synchronizes.
+
                 This is the default, for a multi-threaded application.
 
                 @param cache_period_secs At what period should we re-syncronize
@@ -129,21 +129,21 @@ namespace usage {
             /** @brief Set only once, when there's only one thread running - thus, you don't need to worry about thread-syncronizing */
             struct set_once_when_one_thread {};
 
-            /** @brief Set only once, when there could be multiple thread running. 
-            
+            /** @brief Set only once, when there could be multiple thread running.
+
             We automatically implement a strategy to check if the filter/logger has been initialized, and when it's done, we cache
             the result on every thread */
             struct set_once_when_multiple_threads {};
 
             /** @brief This is always accurate. However, it's the slowest too.
 
-            In case of multiple threads, it always locks the logger/filter before accessing it. 
+            In case of multiple threads, it always locks the logger/filter before accessing it.
 
             Not recommended, you should usually go with another strategy (often, set_once_when_one_thread or set_once_when_multiple_threads)
             */
             struct always_accurate {};
 
-            /** @brief Single threading. It doesn't matter when/how %often the filter/logger changes. 
+            /** @brief Single threading. It doesn't matter when/how %often the filter/logger changes.
 
                 This is the default, for a single-threaded application.
             */
@@ -170,10 +170,10 @@ namespace usage {
     /** @brief Logger %usage settings : logger_::change and logger_::favor
     */
     namespace logger_ {
-        /** @brief When does the logger change, that is, how often do you manipulate it? 
-        
-        Note that using the log does not mean changing it. 
-        Manipulation means invoking non-const functions on the logger, like 
+        /** @brief When does the logger change, that is, how often do you manipulate it?
+
+        Note that using the log does not mean changing it.
+        Manipulation means invoking non-const functions on the logger, like
         adding/removing formatters/destinations for instance.
         */
         namespace change {
@@ -186,15 +186,15 @@ namespace usage {
             /** @brief Set only once, when there's only one thread running - thus, you don't need to worry about thread-syncronizing */
             struct set_once_when_one_thread {};
 
-            /** @brief Set only once, when there could be multiple thread running. 
-            
+            /** @brief Set only once, when there could be multiple thread running.
+
             We automatically implement a strategy to check if the filter/logger has been initialized, and when it's done, we cache
             the result on every thread */
             struct set_once_when_multiple_threads {};
 
             /** @brief This is always accurate. However, it's the slowest too.
 
-            In case of multiple threads, it always locks the logger/filter before accessing it. 
+            In case of multiple threads, it always locks the logger/filter before accessing it.
 
             Not recommended, you should usually go with another strategy (often, set_once_when_one_thread or set_once_when_multiple_threads)
             */
@@ -257,7 +257,7 @@ namespace usage {
         //////// use levels
 
         template<class change_> struct find_filter_use_levels {};
-        
+
         template<int period_secs> struct find_filter_use_levels< change::often<period_secs> > {
             typedef ::boost::logging::level::holder_tss_with_cache<period_secs> type;
         };
@@ -283,7 +283,7 @@ namespace usage {
         //////// no levels
 
         template<class change_> struct find_filter_no_levels {};
-        
+
         template<int period_secs> struct find_filter_no_levels< change::often<period_secs> > {
             typedef ::boost::logging::filter::use_tss_with_cache<period_secs> type;
         };
@@ -332,9 +332,9 @@ namespace usage {
         template<class gather_type> struct find_gather {};
         template<> struct find_gather<gather_usage::ostream_like> { typedef ::boost::logging::default_ type; };
         template<class custom_gather> struct find_gather<gather_usage::custom<custom_gather> > { typedef custom_gather type; };
-        
+
         template<class favor_, class change_, class gather> struct find_logger {};
-        
+
         template<class favor_, int period_secs, class gather> struct find_logger< favor_, change::often<period_secs>, gather > {
             typedef typename find_threading_from_favor<favor_>::type threading_type;
             template<int secs> struct lock_resource : ::boost::logging::lock_resource_finder::tss_with_cache<secs> {};
@@ -371,7 +371,7 @@ namespace usage {
         };
     }
 
-    /** 
+    /**
         @brief Finds a filter class and a logger class that fit your application's needs
 
         For this to happen, you will first need to specify your needs (the template parameters you'll pass to this class)
@@ -382,11 +382,11 @@ namespace usage {
         @param logger_favor @ref misc_use_defaults "(optional)" What does the %logger favor? Any of the classes in the logger_::favor namespace
         @param logger_gather @ref misc_use_defaults "(optional)" What to %use as gather class. Any of the classes in the logger_::gather namespace
 
-        @copydoc your_scenario_examples 
+        @copydoc your_scenario_examples
     */
     template<
         class filter_change = default_,
-        class filter_level = default_, 
+        class filter_level = default_,
         class logger_change = default_,
         class logger_favor = default_,
         class logger_gather = default_ >
@@ -409,12 +409,12 @@ namespace usage {
     };
 }
 
-/** 
+/**
 @brief Find out the right logger/filter, based on thread-safety of logger(s)/filter(s)
 
-First, don't forget to 
-    
-@code 
+First, don't forget to
+
+@code
 using namespace boost::logging::scenario::ts;
 @endcode
 
@@ -430,7 +430,7 @@ using namespace boost::logging::scenario::ts;
 typedef use< filter_::use_tss, level_::use_levels, logger_::use_tss> finder;
 
 BOOST_DECLARE_LOG_FILTER(g_log_filter, finder::filter);
-BOOST_DECLARE_LOG(g_l, finder::logger) 
+BOOST_DECLARE_LOG(g_l, finder::logger)
 ...
 @endcode
 
@@ -491,24 +491,24 @@ namespace ts {
         template<> struct find_filter<filter_::ts, level_::use_levels > { typedef ::boost::logging::level::holder_ts type; };
 
         template<logger_::type> struct find_logger {};
-        template<> struct find_logger<logger_::none> { 
+        template<> struct find_logger<logger_::none> {
             typedef ::boost::logging::lock_resource_finder::single_thread lock_resource;
-            typedef ::boost::logging::logger_format_write< default_, default_, th::no_ts, default_, lock_resource > type ; 
+            typedef ::boost::logging::logger_format_write< default_, default_, th::no_ts, default_, lock_resource > type ;
         };
-        template<> struct find_logger<logger_::use_tss> { 
+        template<> struct find_logger<logger_::use_tss> {
             typedef ::boost::logging::lock_resource_finder::tss_with_cache<> lock_resource;
 
-            typedef ::boost::logging::logger_format_write< default_, default_, th::ts_write, default_, lock_resource > type ; 
+            typedef ::boost::logging::logger_format_write< default_, default_, th::ts_write, default_, lock_resource > type ;
         };
-        template<> struct find_logger<logger_::ts> { 
+        template<> struct find_logger<logger_::ts> {
             typedef ::boost::logging::lock_resource_finder::ts<> lock_resource;
 
-            typedef ::boost::logging::logger_format_write< default_, default_, th::ts_write, default_, lock_resource > type ; 
+            typedef ::boost::logging::logger_format_write< default_, default_, th::ts_write, default_, lock_resource > type ;
         };
     }
 
-    /** @brief Find the right logger and filter, based on thread-safety: filter_::type, level_::type and logger_::type 
-    
+    /** @brief Find the right logger and filter, based on thread-safety: filter_::type, level_::type and logger_::type
+
         @copydoc ts
     */
     template<filter_::type filter_type, level_::type level_type, logger_::type logger_type> struct use {

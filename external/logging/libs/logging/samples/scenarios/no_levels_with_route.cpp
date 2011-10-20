@@ -77,12 +77,12 @@ using namespace boost::logging;
 
 typedef logger_format_write< > logger_type;
 
-BOOST_DECLARE_LOG_FILTER(g_log_filter, filter::no_ts ) 
-BOOST_DECLARE_LOG(g_l, logger_type) 
+BOOST_DECLARE_LOG_FILTER(g_log_filter, filter::no_ts )
+BOOST_DECLARE_LOG(g_l, logger_type)
 
 #define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() )
 
-BOOST_DEFINE_LOG_FILTER(g_log_filter, filter::no_ts ) 
+BOOST_DEFINE_LOG_FILTER(g_log_filter, filter::no_ts )
 BOOST_DEFINE_LOG(g_l, logger_type)
 
 void no_levels_with_route_example() {
@@ -99,23 +99,23 @@ void no_levels_with_route_example() {
 
     // Now, specify the route
     g_l()->writer().router().set_route()
-        .fmt( formatter::time("$hh:$mm.$ss ") ) 
+        .fmt( formatter::time("$hh:$mm.$ss ") )
         .fmt( formatter::append_newline() )
-        /* 
+        /*
         Not like this: .fmt( formatter::idx() )
 
-        This is because 
+        This is because
         add_formatter( formatter::idx(), "[%] "  );
         has surrounded formatter::idx() in a spacer - see formatter::spacer
         */
         .fmt( formatter::spacer( formatter::idx(), "[%] ") )
         .clear()
-        .fmt( formatter::time("$hh:$mm.$ss ") ) 
+        .fmt( formatter::time("$hh:$mm.$ss ") )
         .fmt( formatter::append_newline() )
         .dest( destination::dbg_window() )
         .clear()
         .fmt( formatter::spacer( formatter::idx(), "[%] ") )
-        .fmt( formatter::time("$hh:$mm.$ss ") ) 
+        .fmt( formatter::time("$hh:$mm.$ss ") )
         .fmt( formatter::append_newline() )
         .dest( destination::cout() )
         .clear()

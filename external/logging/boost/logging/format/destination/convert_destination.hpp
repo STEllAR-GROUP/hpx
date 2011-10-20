@@ -27,7 +27,7 @@ namespace boost { namespace logging { namespace destination {
 
 template<class t> struct into {};
 
-/** 
+/**
 @brief Allows writing messages to destinations
 
 It has 2 function overloads:

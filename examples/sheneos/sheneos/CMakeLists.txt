@@ -1,6 +1,6 @@
 # Copyright (c) 2007-2011 Hartmut Kaiser
 #
-# Distributed under the Boost Software License, Version 1.0. (See accompanying 
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 ###############################################################################
@@ -36,7 +36,7 @@ set(headers
 
 ###############################################################################
 set(dependencies
-    ${HDF5_CPP_LIBRARY} 
+    ${HDF5_CPP_LIBRARY}
     distributing_factory_component)
 
 ###############################################################################
@@ -47,7 +47,7 @@ source_group("Header Files\\Stubs"  FILES ${stubs_headers})
 source_group("Header Files\\Server" FILES ${server_headers})
 
 ###############################################################################
-add_hpx_component(sheneos 
+add_hpx_component(sheneos
   SOURCES ${client_sources} ${server_sources}
   HEADERS ${headers}
   DEPENDENCIES ${dependencies})

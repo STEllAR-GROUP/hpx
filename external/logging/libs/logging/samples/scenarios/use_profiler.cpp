@@ -36,10 +36,10 @@ Optimizations:
 If logging on dedicated thread, the output for "profile.txt" could look like:
 
 @code
-gather time:      0.796875 seconds 
-write time:       0.78125 seconds 
-filter time:      0.15625 seconds 
-otherthread time: 1.156250 seconds 
+gather time:      0.796875 seconds
+write time:       0.78125 seconds
+filter time:      0.15625 seconds
+otherthread time: 1.156250 seconds
 @endcode
 
 
@@ -49,10 +49,10 @@ otherthread time: 1.156250 seconds
 If logging on same thread, the output for "profile.txt" could look like:
 
 @code
-gather time:      5.562500 seconds 
-write time:       5.265625 seconds 
-filter time:      0.31250 seconds 
-otherthread time: 0.0 seconds 
+gather time:      5.562500 seconds
+write time:       5.265625 seconds
+filter time:      0.31250 seconds
+otherthread time: 0.0 seconds
 @endcode
 
 
@@ -92,9 +92,9 @@ typedef bl::profile::compute_for_filter<bl::filter::no_ts>::type filter_type;
 
 
 
-#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() ) 
+#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() )
 
-BOOST_DEFINE_LOG_FILTER(g_log_filter, filter_type ) 
+BOOST_DEFINE_LOG_FILTER(g_log_filter, filter_type )
 BOOST_DEFINE_LOG(g_l, logger_type)
 
 void do_sleep(int ms) {

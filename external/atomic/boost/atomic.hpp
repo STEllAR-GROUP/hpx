@@ -22,7 +22,7 @@ template<typename T>
 class atomic : public detail::atomic::internal_atomic<T> {
 public:
     typedef detail::atomic::internal_atomic<T> super;
-    
+
     atomic() {}
     explicit atomic(T v) : super(v) {}
 private:
@@ -35,19 +35,19 @@ template<>
 class atomic<bool> : private detail::atomic::internal_atomic<bool> {
 public:
     typedef detail::atomic::internal_atomic<bool> super;
-    
+
     atomic() {}
     explicit atomic(bool v) : super(v) {}
-    
+
     using super::load;
     using super::store;
     using super::compare_exchange_strong;
     using super::compare_exchange_weak;
     using super::exchange;
     using super::is_lock_free;
-    
+
     operator bool(void) const volatile {return load();}
-    bool operator=(bool v) volatile {store(v); return v;}    
+    bool operator=(bool v) volatile {store(v); return v;}
 private:
     atomic(const atomic &);
     void operator=(const atomic &);
@@ -57,7 +57,7 @@ template<>
 class atomic<void *> : private detail::atomic::internal_atomic<void *, sizeof(void *), int> {
 public:
     typedef detail::atomic::internal_atomic<void *, sizeof(void *), int> super;
-    
+
     atomic() {}
     explicit atomic(void * p) : super(p) {}
     using super::load;
@@ -66,10 +66,10 @@ public:
     using super::compare_exchange_weak;
     using super::exchange;
     using super::is_lock_free;
-    
+
     operator void *(void) const volatile {return load();}
     void * operator=(void * v) volatile {store(v); return v;}
-    
+
 private:
     atomic(const atomic &);
     void * operator=(const atomic &);
@@ -81,10 +81,10 @@ template<typename T>
 class atomic<T *> : private detail::atomic::internal_atomic<intptr_t> {
 public:
     typedef detail::atomic::internal_atomic<intptr_t> super;
-    
+
     atomic() {}
     explicit atomic(T * p) : super((intptr_t)p) {}
-    
+
     T *load(memory_order order=memory_order_seq_cst) const volatile
     {
         return (T*)super::load(order);
@@ -134,10 +134,10 @@ public:
         return (T*)super::exchange((intptr_t)replacement, order);
     }
     using super::is_lock_free;
-    
+
     operator T *(void) const volatile {return load();}
     T * operator=(T * v) volatile {store(v); return v;}
-    
+
     T * fetch_add(ptrdiff_t diff, memory_order order=memory_order_seq_cst) volatile
     {
         return (T*)super::fetch_add(diff*sizeof(T), order);
@@ -146,7 +146,7 @@ public:
     {
         return (T*)super::fetch_sub(diff*sizeof(T), order);
     }
-    
+
     T *operator++(void) volatile {return fetch_add(1)+1;}
     T *operator++(int) volatile {return fetch_add(1);}
     T *operator--(void) volatile {return fetch_sub(1)-1;}
@@ -160,10 +160,10 @@ class atomic_flag : private atomic<int> {
 public:
     typedef atomic<int> super;
     using super::is_lock_free;
-    
+
     atomic_flag(bool initial_state) : super(initial_state?1:0) {}
     atomic_flag() {}
-    
+
     bool test_and_set(memory_order order=memory_order_seq_cst)
     {
         return super::exchange(1, order) ? true : false;

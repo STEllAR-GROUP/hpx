@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_COMPONENTS_DISTRIBUTING_FACTORY_JUN_20_2008_0948PM)
@@ -23,7 +23,7 @@
 #include <algorithm>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace server 
+namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT locality_result_iterator;
@@ -39,12 +39,12 @@ namespace hpx { namespace components { namespace server
         remote_locality_result()
         {}
 
-        remote_locality_result(naming::gid_type const& prefix, 
+        remote_locality_result(naming::gid_type const& prefix,
                 components::component_type type)
           : prefix_(prefix), type_(type)
         {}
 
-        naming::gid_type prefix_;             ///< prefix of the locality 
+        naming::gid_type prefix_;             ///< prefix of the locality
         std::vector<naming::gid_type> gids_;  ///< gids of the created components
         components::component_type type_;     ///< type of created components
 
@@ -88,19 +88,19 @@ namespace hpx { namespace components { namespace server
         iterator end() { return gids_.end(); }
         const_iterator end() const { return gids_.end(); }
 
-        naming::gid_type prefix_;             ///< prefix of the locality 
+        naming::gid_type prefix_;             ///< prefix of the locality
         std::vector<naming::id_type> gids_;   ///< gids of the created components
         components::component_type type_;     ///< type of created components
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief The partition_info data structure describes the dimensionality 
-    ///        and the size of the partitions for which components need to be 
+    /// \brief The partition_info data structure describes the dimensionality
+    ///        and the size of the partitions for which components need to be
     ///        created.
     struct HPX_COMPONENT_EXPORT partition_info
     {
-        partition_info() 
-          : dims_(0) 
+        partition_info()
+          : dims_(0)
         {}
 
         partition_info(std::size_t dims, std::vector<std::size_t> const& sizes)
@@ -114,7 +114,7 @@ namespace hpx { namespace components { namespace server
                 std::multiplies<std::size_t>());
         }
 
-        std::size_t dims_;                    ///< dimensionality of the partitions 
+        std::size_t dims_;                    ///< dimensionality of the partitions
         std::vector<std::size_t> dim_sizes_;  ///< size of dimension of the partitions
     };
 
@@ -123,8 +123,8 @@ namespace hpx { namespace components { namespace server
       : public simple_component_base<distributing_factory>
     {
     public:
-        // parcel action code: the action to be performed on the destination 
-        // object 
+        // parcel action code: the action to be performed on the destination
+        // object
         enum actions
         {
             factory_create_components = 0,  // create new components
@@ -139,58 +139,58 @@ namespace hpx { namespace components { namespace server
         typedef std::vector<locality_result> result_type;
 
         typedef locality_result_iterator iterator_type;
-        typedef 
+        typedef
             std::pair<locality_result_iterator, locality_result_iterator>
         iterator_range_type;
 
         /// \brief Action to create new components
-        remote_result_type create_components(components::component_type type, 
-            std::size_t count) const; 
+        remote_result_type create_components(components::component_type type,
+            std::size_t count) const;
 
-        /// \brief Action to create new components based on the given 
+        /// \brief Action to create new components based on the given
         ///        partitioning information
         ///
-        /// This function will create new components, assuming that \a count 
-        /// newly created components are to be placed into each partition, 
-        /// where all the partitions are equal in size as described by the 
-        /// passed \a partition_info. The number of partitions to create is 
+        /// This function will create new components, assuming that \a count
+        /// newly created components are to be placed into each partition,
+        /// where all the partitions are equal in size as described by the
+        /// passed \a partition_info. The number of partitions to create is
         /// specified by \a part_count.
-        /// 
+        ///
         /// For example:
         /// <code>
         ///       partition_info pi(3, {2, 2, 2});
         ///       create_partitioned(t, 2, 16, pi);
         /// </code>
-        /// will create 32 new components in 16 partitions (2 in each 
+        /// will create 32 new components in 16 partitions (2 in each
         /// partition), where each partition is assumed to span 8 localities.
-        remote_result_type create_partitioned(components::component_type type, 
-            std::size_t count, std::size_t part_count, 
-            partition_info const& info) const; 
+        remote_result_type create_partitioned(components::component_type type,
+            std::size_t count, std::size_t part_count,
+            partition_info const& info) const;
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into a action
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::result_action2<
-            distributing_factory const, remote_result_type, 
-            factory_create_components, components::component_type, std::size_t, 
+            distributing_factory const, remote_result_type,
+            factory_create_components, components::component_type, std::size_t,
             &distributing_factory::create_components
         > create_components_action;
 
         typedef hpx::actions::result_action4<
-            distributing_factory const, remote_result_type, 
-            factory_create_partitioned, components::component_type, std::size_t, 
-            std::size_t, partition_info const&, 
+            distributing_factory const, remote_result_type,
+            factory_create_partitioned, components::component_type, std::size_t,
+            std::size_t, partition_info const&,
             &distributing_factory::create_partitioned
         > create_partitioned_action;
     };
 
     ///////////////////////////////////////////////////////////////////////////
     /// Special segmented iterator allowing to iterate over all gids referenced
-    /// by an instance of a \a distributing_factory#result_type 
+    /// by an instance of a \a distributing_factory#result_type
     class HPX_COMPONENT_EXPORT locality_result_iterator
       : public boost::iterator_facade<
-            locality_result_iterator, naming::id_type, 
+            locality_result_iterator, naming::id_type,
             boost::forward_traversal_tag, naming::id_type const&>
     {
     private:
@@ -202,7 +202,7 @@ namespace hpx { namespace components { namespace server
             data();
             data(result_type::const_iterator begin, result_type::const_iterator end);
 
-            void increment(); 
+            void increment();
             bool equal(data const& rhs) const;
             naming::id_type const& dereference() const;
 
@@ -230,8 +230,8 @@ namespace hpx { namespace components { namespace server
         /// support functions needed for a forward iterator
         friend class boost::iterator_core_access;
 
-        void increment() 
-        { 
+        void increment()
+        {
             data_->increment();
         }
 
@@ -243,30 +243,30 @@ namespace hpx { namespace components { namespace server
             return data_->equal(*rhs.data_);
         }
 
-        naming::id_type const& dereference() const 
-        { 
-            return data_->dereference(); 
+        naming::id_type const& dereference() const
+        {
+            return data_->dereference();
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_COMPONENT_EXPORT 
+    HPX_COMPONENT_EXPORT
     std::pair<locality_result_iterator, locality_result_iterator>
         locality_results(distributing_factory::result_type const& v);
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos 
+namespace hpx { namespace lcos
 {
     // we need to specialize this template to allow for automatic conversion of
     // the vector<remote_locality_result> to a vector<locality_result>
     template <>
     struct get_result<
-        std::vector<components::server::locality_result>, 
+        std::vector<components::server::locality_result>,
         std::vector<components::server::remote_locality_result> >
     {
         typedef std::vector<components::server::locality_result> result_type;
-        typedef std::vector<components::server::remote_locality_result> 
+        typedef std::vector<components::server::remote_locality_result>
             remote_result_type;
 
         static result_type call(remote_result_type const& rhs)
@@ -282,11 +282,11 @@ namespace hpx { namespace lcos
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-// Serialization of partition_info 
+// Serialization of partition_info
 namespace boost { namespace serialization
 {
     template <typename Archive>
-    void serialize(Archive&, hpx::components::server::partition_info&, 
+    void serialize(Archive&, hpx::components::server::partition_info&,
         unsigned int const);
 }}
 

@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_UTIL_RUNTIME_CONFIGURATION_OCT_02_2008_0530PM)
@@ -18,14 +18,14 @@
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
-    // The runtime_configuration class is a wrapper for the runtime 
-    // configuration data allowing to extract configuration information in a 
+    // The runtime_configuration class is a wrapper for the runtime
+    // configuration data allowing to extract configuration information in a
     // more convenient way
     class HPX_API_EXPORT runtime_configuration : public section
     {
         std::string hpx_ini_file;
         std::vector<std::string> cmdline_ini_defs;
- 
+
     public:
         // initialize and load configuration information
         runtime_configuration();
@@ -46,10 +46,10 @@ namespace hpx { namespace util
 
         std::size_t get_agas_promise_pool_size() const;
 
-        // Get the AGAS locality to use 
+        // Get the AGAS locality to use
         naming::locality get_agas_locality() const;
 
-        // Get the HPX network address to use 
+        // Get the HPX network address to use
         naming::locality get_parcelport_address() const;
 
         // Get AGAS client-side GVA cache size
@@ -57,7 +57,7 @@ namespace hpx { namespace util
 
         // Load application specific configuration and merge it with the
         // default configuration loaded from hpx.ini
-        bool load_application_configuration(char const* filename, 
+        bool load_application_configuration(char const* filename,
             error_code& ec = throws);
 
         // Can be set to true if we want to use the ITT notify tools API.

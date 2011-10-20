@@ -52,10 +52,10 @@ options[] =
     {0x00000001,edx,19} // CLFLUSH
   , {0x00000001,edx,8}  // CMPXCHG8B
   , {0x00000001,ecx,13} // CMPXCHG16B
-  , {0x00000001,edx,15} // CMOVcc 
-  , {0x00000001,edx,5}  // RDMSR and WRMSR 
+  , {0x00000001,edx,15} // CMOVcc
+  , {0x00000001,edx,5}  // RDMSR and WRMSR
   , {0x00000001,edx,4}  // RDTSC
-  , {0x80000001,edx,27} // RDTSCP 
+  , {0x80000001,edx,27} // RDTSCP
   , {0x00000001,edx,23} // MMX
   , {0x00000001,edx,25} // SSE
   , {0x00000001,edx,26} // SSE2
@@ -98,7 +98,7 @@ int main(int argc, char** argv)
 
   __cpuid(registers,m.function);
 
-  // exit with 0 if the bit is set 
+  // exit with 0 if the bit is set
   return !has_bit_set(registers[m.reg],m.bit);
 }
 

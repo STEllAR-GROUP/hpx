@@ -2,7 +2,7 @@
 # Copyright (c) 2011      Bryce Lelbach
 # Copyright (c) 2011      Dylan Stark
 #
-# Distributed under the Boost Software License, Version 1.0. (See accompanying 
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(subdirs
@@ -11,7 +11,7 @@ set(subdirs
     balancing
     bright_future
     dataflow
-    heartbeat 
+    heartbeat
     hplpx
     nqueen
     object_semaphore
@@ -26,10 +26,10 @@ if(${BOOST_MINOR_VERSION} GREATER 46)
   set(subdirs ${subdirs}
       geometry
      )
-endif() 
+endif()
 
-if(HDF5_CPP_FOUND) 
-  if(HDF5_FOUND) 
+if(HDF5_CPP_FOUND)
+  if(HDF5_FOUND)
     set(subdirs ${subdirs}
         interpolate1d
         interpolate3d

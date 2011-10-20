@@ -14,13 +14,13 @@
 namespace boost { namespace plugin {
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail 
+    namespace detail
     {
-        struct dll_handle_holder 
+        struct dll_handle_holder
         {
-            dll_handle_holder(dll_handle dll) 
+            dll_handle_holder(dll_handle dll)
             :   m_dll(dll) {}
-            
+
             ~dll_handle_holder()
             {}
 
@@ -28,40 +28,40 @@ namespace boost { namespace plugin {
             dll_handle m_dll;
         };
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////
     template<typename Wrapped, typename Parameters>
     struct plugin_wrapper;
 
     template<typename Wrapped>
-    struct plugin_wrapper<Wrapped, boost::mpl::list<> > 
-    :   public detail::dll_handle_holder, 
-        public Wrapped 
+    struct plugin_wrapper<Wrapped, boost::mpl::list<> >
+    :   public detail::dll_handle_holder,
+        public Wrapped
     {
-        plugin_wrapper(dll_handle dll) 
-        :   detail::dll_handle_holder(dll) 
+        plugin_wrapper(dll_handle dll)
+        :   detail::dll_handle_holder(dll)
         {}
     };
 
     template<typename Wrapped, typename A1>
-    struct plugin_wrapper<Wrapped, boost::mpl::list<A1> > 
-    :   public detail::dll_handle_holder, 
-        public Wrapped 
-    {        
-        plugin_wrapper(dll_handle dll, A1 a1) 
-        :   detail::dll_handle_holder(dll), 
-            Wrapped(a1) 
+    struct plugin_wrapper<Wrapped, boost::mpl::list<A1> >
+    :   public detail::dll_handle_holder,
+        public Wrapped
+    {
+        plugin_wrapper(dll_handle dll, A1 a1)
+        :   detail::dll_handle_holder(dll),
+            Wrapped(a1)
         {}
     };
 
     template<typename Wrapped, typename A1, typename A2>
-    struct plugin_wrapper<Wrapped, boost::mpl::list<A1, A2> > 
-    :   public detail::dll_handle_holder, 
-        public Wrapped 
-    {        
+    struct plugin_wrapper<Wrapped, boost::mpl::list<A1, A2> >
+    :   public detail::dll_handle_holder,
+        public Wrapped
+    {
         plugin_wrapper(dll_handle dll, A1 a1, A2 a2)
-        :   detail::dll_handle_holder(dll), 
-            Wrapped(a1, a2) 
+        :   detail::dll_handle_holder(dll),
+            Wrapped(a1, a2)
         {}
     };
 

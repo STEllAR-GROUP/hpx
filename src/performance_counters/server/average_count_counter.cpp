@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -20,7 +20,7 @@ typedef hpx::components::managed_component<
 > average_count_counter_type;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY_EX(
-    average_count_counter_type, average_count_counter, 
+    average_count_counter_type, average_count_counter,
     "base_performance_counter", true);
 HPX_DEFINE_GET_COMPONENT_TYPE(
     hpx::performance_counters::server::average_count_counter);
@@ -29,21 +29,21 @@ HPX_DEFINE_GET_COMPONENT_TYPE(
 namespace hpx { namespace performance_counters { namespace server
 {
     average_count_counter::average_count_counter(counter_info const& info,
-            std::string const& base_counter_name, 
+            std::string const& base_counter_name,
             std::size_t base_time_interval)
-      : base_type_holder(info), 
-        timer_(boost::bind(&average_count_counter::evaluate, this), 
+      : base_type_holder(info),
+        timer_(boost::bind(&average_count_counter::evaluate, this),
             1000 * base_time_interval, info.fullname_, true),
         base_counter_name_(ensure_counter_prefix(base_counter_name))
     {
         if (base_time_interval == 0) {
-            HPX_THROW_EXCEPTION(bad_parameter, 
+            HPX_THROW_EXCEPTION(bad_parameter,
                 "average_count_counter::average_count_counter",
                 "base interval is specified to be zero");
         }
 
         if (info.type_ != counter_average_count) {
-            HPX_THROW_EXCEPTION(bad_parameter, 
+            HPX_THROW_EXCEPTION(bad_parameter,
                 "average_count_counter::average_count_counter",
                 "unexpected counter type specified for elapsed_time_counter");
         }
@@ -81,7 +81,7 @@ namespace hpx { namespace performance_counters { namespace server
         counter_value base_value;
         evaluate_base_counter(base_value);
 
-        // simply average the measured base counter values since it got queried 
+        // simply average the measured base counter values since it got queried
         // for the last time
         counter_value value;
         if (base_value.scaling_ != prev_value_.scaling_ ||
@@ -89,7 +89,7 @@ namespace hpx { namespace performance_counters { namespace server
         {
             // not supported right now
             HPX_THROW_EXCEPTION(not_implemented,
-                "average_count_counter::get_counter_value", 
+                "average_count_counter::get_counter_value",
                 "base counter should keep scaling constant over time");
         }
         else {
@@ -111,10 +111,10 @@ namespace hpx { namespace performance_counters { namespace server
                 agas::resolve_name(base_counter_name_, base_counter_id_, ec);
                 if (HPX_UNLIKELY(ec || !base_counter_id_))
                 {
-                    HPX_THROW_EXCEPTION(bad_parameter, 
+                    HPX_THROW_EXCEPTION(bad_parameter,
                         "average_count_counter::evaluate_base_counter",
                         boost::str(
-                            boost::format("unknown performance counter: '%s'") % 
+                            boost::format("unknown performance counter: '%s'") %
                             base_counter_name_))
                 }
             }

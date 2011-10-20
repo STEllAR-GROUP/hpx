@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2009-2011 Matthew Anderson
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_COMPONENTS_AMR_LOGGING_NOV_10_2008_0719PM)
@@ -16,9 +16,9 @@
 namespace hpx { namespace components { namespace amr { namespace server
 {
     /// This class implements a simple logging sink. It exposes the function
-    /// \a logentry which is supposed to record the received values in a 
+    /// \a logentry which is supposed to record the received values in a
     /// application specific manner.
-    class HPX_COMPONENT_EXPORT logging 
+    class HPX_COMPONENT_EXPORT logging
       : public simple_component_base<logging>
     {
     private:
@@ -43,7 +43,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         /// The \a set_result_action may be used to trigger any LCO instances
         /// while carrying an additional parameter of any type.
         ///
-        /// \param Result [in] The type of the result to be transferred back to 
+        /// \param Result [in] The type of the result to be transferred back to
         ///               this LCO instance.
         typedef hpx::actions::action4<
             logging, logging_logentry, stencil_data const&, int,int,parameter const&,
@@ -59,13 +59,13 @@ namespace hpx { namespace components { namespace amr { namespace server
 }}}}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace amr { namespace stubs 
+namespace hpx { namespace components { namespace amr { namespace stubs
 {
     ///////////////////////////////////////////////////////////////////////////
     struct logging : public components::stubs::stub_base<amr::server::logging>
     {
         ///////////////////////////////////////////////////////////////////////
-        static void logentry(naming::id_type const& gid, 
+        static void logentry(naming::id_type const& gid,
             stencil_data const& val, int row, int column, parameter const& par)
         {
             typedef amr::server::logging::logentry_action action_type;
@@ -76,7 +76,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
 }}}}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace amr 
+namespace hpx { namespace components { namespace amr
 {
     ///////////////////////////////////////////////////////////////////////////
     class logging : public client_base<logging, amr::stubs::logging>

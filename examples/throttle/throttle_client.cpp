@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <sstream>
@@ -10,7 +10,7 @@
 
 #include "throttle/throttle.hpp"
 
-#include <boost/algorithm/string/classification.hpp> 
+#include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/format.hpp>
 
@@ -23,15 +23,15 @@ using hpx::naming::get_agas_client;
 
 ///////////////////////////////////////////////////////////////////////////////
 // AGAS helpers
-inline void 
+inline void
 register_name(hpx::naming::id_type const& id, std::string const& name)
 {
-    get_agas_client().registerid(name, id.get_gid()); 
+    get_agas_client().registerid(name, id.get_gid());
 }
 
 inline void unregister_name(std::string const& name)
 {
-    get_agas_client().unregisterid(name); 
+    get_agas_client().unregisterid(name);
 }
 
 inline hpx::naming::id_type query_name(std::string const& name)
@@ -51,7 +51,7 @@ int hpx_main(variables_map& vm)
                      % hpx::naming::get_prefix_from_id(hpx::find_here()))
                   << std::endl;
 
-        // Try to connect to existing throttle instance, create a new one if 
+        // Try to connect to existing throttle instance, create a new one if
         // this fails.
         char const* throttle_component_name = "/throttle/0";
         throttle::throttle t(query_name(throttle_component_name));
@@ -86,7 +86,7 @@ int hpx_main(variables_map& vm)
                 t.resume(vm["resume"].as<int>());
             }
             else if (vm.count("release")) {
-                // unregister from AGAS, remove additional reference count which 
+                // unregister from AGAS, remove additional reference count which
                 // will allow for the throttle instance to be released
                 hpx::components::component_type type;
                 get_agas_client().decref(t.get_gid().get_gid(), type);

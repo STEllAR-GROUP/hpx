@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
@@ -27,12 +27,12 @@ HPX_DEFINE_GET_COMPONENT_TYPE(partition_client_type);
 namespace interpolate1d
 {
     // create one partition on each of the localities, initialize the partitions
-    interpolate1d::interpolate1d(std::string datafilename, 
+    interpolate1d::interpolate1d(std::string datafilename,
             std::size_t num_instances)
       : num_elements_(0), minval_(0), delta_(0)
     {
         // we want to create 'partition' instances
-        hpx::components::component_type type = 
+        hpx::components::component_type type =
             hpx::components::get_component_type<server::partition>();
 
         // create distributing factory and let it create the required amount
@@ -41,7 +41,7 @@ namespace interpolate1d
 
         distributing_factory factory(
             distributing_factory::create_sync(hpx::find_here()));
-        distributing_factory::async_create_result_type result = 
+        distributing_factory::async_create_result_type result =
             factory.create_components_async(type, num_instances);
 
         // initialize the partitions and store the mappings
@@ -58,7 +58,7 @@ namespace interpolate1d
 
         // initialize the partitions
         distributing_factory::result_type results = future.get();
-        distributing_factory::iterator_range_type parts = 
+        distributing_factory::iterator_range_type parts =
             hpx::components::server::locality_results(results);
 
         BOOST_FOREACH(hpx::naming::id_type id, parts)
@@ -68,7 +68,7 @@ namespace interpolate1d
         BOOST_ASSERT(0 != num_localities);
 
         std::size_t partition_size = num_elements_ / num_localities;
-        std::size_t last_partition_size = 
+        std::size_t last_partition_size =
             num_elements_ - partition_size * (num_localities-1);
 
         for (std::size_t i = 0; i != num_localities; ++i)
@@ -84,7 +84,7 @@ namespace interpolate1d
                 dim.count_ = partition_size;
                 dim.size_ = num_elements_;
             }
-            stubs::partition::init(partitions_[i], datafilename, dim, 
+            stubs::partition::init(partitions_[i], datafilename, dim,
                 num_localities);
         }
     }

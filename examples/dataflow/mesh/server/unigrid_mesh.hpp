@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2009-2011 Matt Anderson
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_COMPONENTS_AMR_SERVER_RK_MESH_FEB_25_2010_0153AM)
@@ -18,7 +18,7 @@
 #include "../../array3d.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace amr { namespace server 
+namespace hpx { namespace components { namespace amr { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT unigrid_mesh
@@ -35,7 +35,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         typedef amr::server::unigrid_mesh wrapping_type;
 
         ///////////////////////////////////////////////////////////////////////
-        // parcel action code: the action to be performed on the destination 
+        // parcel action code: the action to be performed on the destination
         // object (the accumulator)
         enum actions
         {
@@ -43,18 +43,18 @@ namespace hpx { namespace components { namespace amr { namespace server
             unigrid_mesh_execute = 1
         };
 
-        /// This is the main entry point of this component. 
+        /// This is the main entry point of this component.
         boost::shared_ptr<std::vector<naming::id_type> > init_execute(
             std::vector<naming::id_type> const& interp_src_data,
             double time,
-            components::component_type function_type, std::size_t numvalues, 
+            components::component_type function_type, std::size_t numvalues,
             std::size_t numsteps,
-            components::component_type logging_type, 
+            components::component_type logging_type,
             parameter const& par);
 
         std::vector<naming::id_type> execute(
             std::vector<naming::id_type> const& initialdata,
-            components::component_type function_type, std::size_t numvalues, 
+            components::component_type function_type, std::size_t numvalues,
             std::size_t numsteps,
             components::component_type logging_type, parameter const& par);
 
@@ -72,14 +72,14 @@ namespace hpx { namespace components { namespace amr { namespace server
         > init_execute_action;
 
         typedef hpx::actions::result_action6<
-            unigrid_mesh, std::vector<naming::id_type>, unigrid_mesh_execute, 
+            unigrid_mesh, std::vector<naming::id_type>, unigrid_mesh_execute,
             std::vector<naming::id_type> const&,
             components::component_type, std::size_t, std::size_t,
             components::component_type, parameter const&, &unigrid_mesh::execute
         > execute_action;
 
     protected:
-        typedef 
+        typedef
             components::distributing_factory::iterator_range_type
         distributed_iterator_range_type;
 
@@ -88,7 +88,7 @@ namespace hpx { namespace components { namespace amr { namespace server
             std::size_t numsteps);
 
         void prepare_initial_data(
-            distributed_iterator_range_type const& functions, 
+            distributed_iterator_range_type const& functions,
             std::vector<naming::id_type> const& interp_src_data,
             std::vector<naming::id_type>& initial_data,
             double time,
@@ -97,7 +97,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 
         static void init_stencils(
             distributed_iterator_range_type const& stencils,
-            distributed_iterator_range_type const& functions, int static_step, 
+            distributed_iterator_range_type const& functions, int static_step,
             array3d &dst_port,array3d &dst_src,array3d &dst_step,
             array3d &dst_size,array3d &src_size,double cycle_time,parameter const& par);
 
@@ -111,8 +111,8 @@ namespace hpx { namespace components { namespace amr { namespace server
             array3d &dst_size,array3d &dst_step,array3d &dst_src,array3d &dst_port,
             parameter const& par);
 
-        static void execute(distributed_iterator_range_type const& stencils, 
-            std::vector<naming::id_type> const& initial_data, 
+        static void execute(distributed_iterator_range_type const& stencils,
+            std::vector<naming::id_type> const& initial_data,
             std::vector<naming::id_type>& result_data);
 
         static void start_row(distributed_iterator_range_type const& stencils);

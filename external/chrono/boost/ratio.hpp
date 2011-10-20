@@ -10,7 +10,7 @@
 
 This code was derived by Beman Dawes from Howard Hinnant's time2_demo prototype.
 Many thanks to Howard for making his code available under the Boost license.
-The original code was modified to conform to Boost conventions and to section 
+The original code was modified to conform to Boost conventions and to section
 20.4 Compile-time rational arithmetic [ratio], of the C++ committee working
 paper N2798.
 See http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2798.pdf.
@@ -271,7 +271,7 @@ class ratio
 //    static_assert(detail::static_abs<D>::value >  0, "ratio denominator is out of range");
     static const boost::intmax_t m_na = detail::static_abs<N>::value;
     static const boost::intmax_t m_da = detail::static_abs<D>::value;
-    static const boost::intmax_t m_s = detail::static_sign<N>::value 
+    static const boost::intmax_t m_s = detail::static_sign<N>::value
       * detail::static_sign<D>::value;
     static const boost::intmax_t m_gcd = detail::static_gcd<m_na, m_da>::value;
 public:
@@ -362,11 +362,11 @@ public:
 template <class R1, class R2>
 struct ratio_equal
     : public boost::integral_constant<bool,
-                               (R1::num == R2::num) && (R1::den == R2::den)> {}; 
+                               (R1::num == R2::num) && (R1::den == R2::den)> {};
 
 template <class R1, class R2>
 struct ratio_not_equal
-    : public boost::integral_constant<bool, !ratio_equal<R1, R2>::value> {}; 
+    : public boost::integral_constant<bool, !ratio_equal<R1, R2>::value> {};
 
 // ratio_less
 

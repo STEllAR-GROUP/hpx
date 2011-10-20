@@ -21,9 +21,9 @@
 # pragma once
 #endif
 
-#if defined(_MSC_VER) 
+#if defined(_MSC_VER)
 #pragma warning ( disable : 4355)
-#endif 
+#endif
 
 
 
@@ -36,13 +36,13 @@
 
 namespace boost { namespace logging { namespace destination {
 
-/** 
+/**
     @brief settings for when constructing a file class. To see how it's used, see @ref dealing_with_flags.
 */
 struct file_settings {
     typedef ::boost::logging::detail::flag<file_settings> flag;
 
-    file_settings() 
+    file_settings()
         : flush_each_time(this, true)
         , initial_overwrite(this, false)
         , do_append(this, true)
@@ -71,10 +71,10 @@ namespace detail {
     }
 
     struct file_info {
-        file_info(const std::string& name_, file_settings settings_) 
-            : name(name_), 
+        file_info(const std::string& name_, file_settings settings_)
+            : name(name_),
 //               out( new std::basic_ofstream<char_type>
-//                   ( name_.c_str(), open_flags(settings_) )), 
+//                   ( name_.c_str(), open_flags(settings_) )),
               settings(settings_) {}
 
         void open() {
@@ -91,13 +91,13 @@ namespace detail {
     };
 }
 
-/** 
+/**
     @brief Writes the string to a file
 */
 template<class convert_dest = do_convert_destination > struct file_t : is_generic, non_const_context<detail::file_info> {
     typedef non_const_context<detail::file_info> non_const_context_base;
 
-    /** 
+    /**
         @brief constructs the file destination
 
         @param file_name name of the file
@@ -116,7 +116,7 @@ template<class convert_dest = do_convert_destination > struct file_t : is_generi
         return non_const_context_base::context().name == other.context().name;
     }
 
-    /** configure through script 
+    /** configure through script
         right now, you can only specify the file name
     */
     void configure(const hold_string_type & str) {

@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  
+//
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -52,7 +52,7 @@ int hpx_main(variables_map & vm)
     unsigned max_iterations = vm["max_iterations"].as<unsigned>();
 
     std::cout << "Single core version without futures:\n";
-    
+
     high_resolution_timer t;
     double x_n = x;
 
@@ -71,7 +71,7 @@ int hpx_main(variables_map & vm)
         ;
 
     std::cout << "Naive future version:\n";
-    
+
     t.restart();
     x_n = x;
 

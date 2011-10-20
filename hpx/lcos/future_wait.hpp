@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef BOOST_PP_IS_ITERATING
@@ -21,9 +21,9 @@
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos 
+namespace hpx { namespace lcos
 {
-    /// The one argument version is special in the sense that it returns the 
+    /// The one argument version is special in the sense that it returns the
     /// expected value directly (without wrapping it into a tuple).
     template <typename T1, typename TR1>
     inline T1
@@ -40,7 +40,7 @@ namespace hpx { namespace lcos
 
     template <typename T1, typename T2, typename TR1, typename TR2>
     inline boost::tuple<T1, T2>
-    wait (lcos::promise<T1, TR1> const& f1, 
+    wait (lcos::promise<T1, TR1> const& f1,
         lcos::promise<T2, TR2> const& f2)
     {
         return boost::make_tuple(f1.get(), f2.get());
@@ -101,7 +101,7 @@ namespace hpx { namespace lcos
     /**/
 
     template <
-        BOOST_PP_ENUM_PARAMS(N, typename T), 
+        BOOST_PP_ENUM_PARAMS(N, typename T),
         BOOST_PP_ENUM_PARAMS(N, typename TR)>
     inline boost::tuple<BOOST_PP_ENUM_PARAMS(N, T)>
     wait (BOOST_PP_REPEAT(N, HPX_FUTURE_WAIT_ARGUMENT, _))

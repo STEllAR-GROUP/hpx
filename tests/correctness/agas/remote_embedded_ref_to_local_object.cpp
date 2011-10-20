@@ -1,6 +1,6 @@
-//  Copyright (c) 2011 Bryce Adelstein-Lelbach 
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Copyright (c) 2011 Bryce Adelstein-Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
@@ -56,7 +56,7 @@ void hpx_test_main(
         ///     Create two components, one locally and one one remotely.
         ///     Have the remote component store a reference to the local
         ///     component. Let the original references to both components go
-        ///     out of scope. Both components should be deleted. 
+        ///     out of scope. Both components should be deleted.
 
         std::vector<id_type> remote_localities;
 
@@ -76,7 +76,7 @@ void hpx_test_main(
              << "id_local:  " << monitor_local.get_gid() << " "
              << get_management_type_name
                     (monitor_local.get_gid().get_management_type()) << "\n"
-             << flush; 
+             << flush;
 
         {
             // Have the remote object store a reference to the local object.
@@ -85,15 +85,15 @@ void hpx_test_main(
             // Detach the references.
             id_type id_remote = monitor_remote.detach()
                   , id_local = monitor_local.detach();
-            
+
             // Both components should still be alive.
-            HPX_TEST_EQ(false, monitor_remote.ready(milliseconds(delay))); 
-            HPX_TEST_EQ(false, monitor_local.ready(milliseconds(delay))); 
+            HPX_TEST_EQ(false, monitor_remote.ready(milliseconds(delay)));
+            HPX_TEST_EQ(false, monitor_local.ready(milliseconds(delay)));
         }
 
         // Both components should be out of scope now.
-        HPX_TEST_EQ(true, monitor_remote.ready(milliseconds(delay))); 
-        HPX_TEST_EQ(true, monitor_local.ready(milliseconds(delay))); 
+        HPX_TEST_EQ(true, monitor_remote.ready(milliseconds(delay)));
+        HPX_TEST_EQ(true, monitor_local.ready(milliseconds(delay)));
     }
 }
 
@@ -104,13 +104,13 @@ int hpx_main(
 {
     {
         cout << std::string(80, '#') << "\n"
-             << "simple component test\n" 
+             << "simple component test\n"
              << std::string(80, '#') << "\n" << flush;
 
         hpx_test_main<simple_refcnt_checker>(vm);
 
         cout << std::string(80, '#') << "\n"
-             << "managed component test\n" 
+             << "managed component test\n"
              << std::string(80, '#') << "\n" << flush;
 
         hpx_test_main<managed_refcnt_checker>(vm);
@@ -132,7 +132,7 @@ int main(
     cmdline.add_options()
         ( "delay"
         , value<boost::uint64_t>()->default_value(1000)
-        , "number of milliseconds to wait for object destruction") 
+        , "number of milliseconds to wait for object destruction")
         ;
 
     // Initialize and run HPX.

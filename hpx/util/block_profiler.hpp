@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_UTIL_BLOCK_PROFILER_NOV_16_0811PM)
@@ -34,10 +34,10 @@ namespace hpx { namespace util
         {
         private:
             typedef boost::accumulators::stats<
-                    boost::accumulators::tag::sum, 
-                    boost::accumulators::tag::count, 
-                    boost::accumulators::tag::mean, 
-                    boost::accumulators::tag::moment<2> 
+                    boost::accumulators::tag::sum,
+                    boost::accumulators::tag::count,
+                    boost::accumulators::tag::mean,
+                    boost::accumulators::tag::moment<2>
             > accumulator_stats_type;
             typedef boost::accumulators::accumulator_set<
                 double, accumulator_stats_type
@@ -53,9 +53,9 @@ namespace hpx { namespace util
             void print_stats()
             {
                 LTIM_(fatal) << "profiler: " << description_ << ": "
-                            << boost::accumulators::sum(totals_) << " (" 
-                            << boost::accumulators::count(totals_) << ", " 
-                            << boost::accumulators::mean(totals_) << ", " 
+                            << boost::accumulators::sum(totals_) << " ("
+                            << boost::accumulators::count(totals_) << ", "
+                            << boost::accumulators::mean(totals_) << ", "
                             << boost::accumulators::extract::moment<2>(totals_)
                             << ")";
             }
@@ -72,7 +72,7 @@ namespace hpx { namespace util
 
             void restart()
             {
-                if (!registered_on_exit_) 
+                if (!registered_on_exit_)
                 {
                     registered_on_exit_ = hpx::register_on_exit(
                         boost::bind(&accumulator_stats::print_stats, This()));
@@ -82,7 +82,7 @@ namespace hpx { namespace util
 
             double elapsed()
             {
-                if (!registered_on_exit_) 
+                if (!registered_on_exit_)
                 {
                     registered_on_exit_ = hpx::register_on_exit(
                         boost::bind(&accumulator_stats::print_stats, This()));
@@ -121,7 +121,7 @@ namespace hpx { namespace util
             void print_stats()
             {
                 LTIM_(fatal) << "profiler: " << description_ << ": "
-                            << extract_count(totals_) << ", " 
+                            << extract_count(totals_) << ", "
                             << extract_mean(totals_);
             }
 
@@ -139,7 +139,7 @@ namespace hpx { namespace util
 
             void restart()
             {
-                if (!registered_on_exit_) 
+                if (!registered_on_exit_)
                 {
                     registered_on_exit_ = hpx::register_on_exit(
                         boost::bind(&accumulator_stats::print_stats, This()));
@@ -149,7 +149,7 @@ namespace hpx { namespace util
 
             double elapsed()
             {
-                if (!registered_on_exit_) 
+                if (!registered_on_exit_)
                 {
                     registered_on_exit_ = hpx::register_on_exit(
                         boost::bind(&accumulator_stats::print_stats, This()));
@@ -169,7 +169,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     /// The \a block_profiler class can be used to collect timings for a block
     /// of code. It measures the execution time for each of the executions and
-    /// collects the number of invocations, the average, and the variance of 
+    /// collects the number of invocations, the average, and the variance of
     /// the measured execution times.
     template <typename Tag>
     class block_profiler
@@ -198,7 +198,7 @@ namespace hpx { namespace util
         }
         void measure()
         {
-            if (measuring_ && enable_logging_) 
+            if (measuring_ && enable_logging_)
             {
                 stats_.add();
                 measuring_ = false;
@@ -218,7 +218,7 @@ namespace hpx { namespace util
         }
 
     private:
-        static detail::accumulator_stats& 
+        static detail::accumulator_stats&
         get_stats(char const* description)
         {
             static_<detail::accumulator_stats, Tag> stats(description);

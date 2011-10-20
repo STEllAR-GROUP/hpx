@@ -1,7 +1,7 @@
 //  Copyright (c) 2008-2009 Chirag Dekate, Hartmut Kaiser, Anshul Tandon
-//  Copyright (c) 2011      Bryce Lelbach 
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Copyright (c) 2011      Bryce Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -47,7 +47,7 @@ namespace hpx { namespace threads { namespace detail
 
     void thread::operator delete(void *p, thread_pool& pool)
     {
-        if (0 != p) 
+        if (0 != p)
             pool.detail_pool_.free(reinterpret_cast<detail::thread*>(p));
     }
 
@@ -62,19 +62,19 @@ namespace hpx { namespace threads { namespace detail
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads 
+namespace hpx { namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////
     // This overload will be called by the ptr_map<> used in the thread_queue
-    // whenever an instance of a threads::thread needs to be deleted. We 
-    // provide this overload as we need to extract the thread_pool from the 
+    // whenever an instance of a threads::thread needs to be deleted. We
+    // provide this overload as we need to extract the thread_pool from the
     // thread instance the moment before it gets deleted
     void delete_clone(threads::thread const* t)
     {
         if (0 != t) {
             threads::thread_pool* pool = t->get()->pool_;
             boost::checked_delete(t); // delete the normal way, memory does not get freed
-            pool->pool_.free(const_cast<threads::thread*>(t));        
+            pool->pool_.free(const_cast<threads::thread*>(t));
         }
     }
 
@@ -91,7 +91,7 @@ namespace hpx { namespace threads
 
     void thread::operator delete(void *p, thread_pool& pool)
     {
-        if (0 != p) 
+        if (0 != p)
             pool.pool_.free(reinterpret_cast<thread*>(p));
     }
 
@@ -100,7 +100,7 @@ namespace hpx { namespace threads
     {
         thread_self* p = get_self_ptr();
         if (HPX_UNLIKELY(!p)) {
-            HPX_THROW_EXCEPTION(null_thread_id, "threads::get_self", 
+            HPX_THROW_EXCEPTION(null_thread_id, "threads::get_self",
                 "NULL thread id encountered (is this executed on a HPX-thread?)");
         }
         return *p;
@@ -117,15 +117,15 @@ namespace hpx { namespace threads
 
         if (HPX_UNLIKELY(!p))
         {
-            HPX_THROWS_IF(ec, null_thread_id, "threads::get_self_ptr_checked", 
+            HPX_THROWS_IF(ec, null_thread_id, "threads::get_self_ptr_checked",
                 "NULL thread id encountered (is this executed on a HPX-thread?)");
             return 0;
         }
 
-        if (&ec != &throws) 
+        if (&ec != &throws)
             ec = make_success_code();
 
-        return p; 
+        return p;
     }
 
     thread_id_type get_self_id()
@@ -137,7 +137,7 @@ namespace hpx { namespace threads
     thread_id_type get_parent_id()
     {
         thread_self* self = get_self_ptr();
-        return (0 != self) ? 
+        return (0 != self) ?
             reinterpret_cast<thread*>(self->get_thread_id())->get_parent_thread_id() : 0;
     }
 
@@ -151,14 +151,14 @@ namespace hpx { namespace threads
     boost::uint32_t get_parent_prefix()
     {
         thread_self* self = get_self_ptr();
-        return (0 != self) ? 
+        return (0 != self) ?
             reinterpret_cast<thread*>(self->get_thread_id())->get_parent_locality_prefix() : 0;
     }
 
     naming::address::address_type get_self_component_id()
     {
         thread_self* self = get_self_ptr();
-        return (0 != self) ? 
+        return (0 != self) ?
             reinterpret_cast<thread*>(self->get_thread_id())->get_component_id() : 0;
     }
 
@@ -167,7 +167,7 @@ namespace hpx { namespace threads
         void thread::set_event()
         {
             // we need to reactivate the thread itself
-            if (suspended == current_state_.load(boost::memory_order_acquire)) 
+            if (suspended == current_state_.load(boost::memory_order_acquire))
             {
                 hpx::applier::get_applier().get_thread_manager().
                     set_state(get_thread_id(), pending);
@@ -179,6 +179,6 @@ namespace hpx { namespace threads
 
 ///////////////////////////////////////////////////////////////////////////////
 // explicit instantiation of the function thread_self::set_self
-template void 
+template void
 hpx::threads::thread_self::impl_type/*::super_type*/::set_self(hpx::threads::thread_self*);
 

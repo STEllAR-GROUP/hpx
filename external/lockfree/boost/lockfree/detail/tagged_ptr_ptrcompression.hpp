@@ -61,7 +61,7 @@ struct tagged_ptr
 
 public:
     /** uninitialized constructor */
-    tagged_ptr(void): 
+    tagged_ptr(void):
         ptr(0)
     {}
 
@@ -90,11 +90,11 @@ public:
     {
         ptr = pack_ptr(p, t);
     }
-    
+
     void reset(T * p, tag_t t)
     {
         set(p, t);
-    } 
+    }
     /* @} */
 
     /** comparing semantics */

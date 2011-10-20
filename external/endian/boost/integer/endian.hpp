@@ -148,7 +148,7 @@ namespace boost
         typedef T value_type;
         endian() {}
         endian(T i) { detail::store_big_endian<T, n_bits/8>(bytes, i); }
-        operator T() const 
+        operator T() const
           { return detail::load_big_endian<T, n_bits/8>(bytes); }
       private:
   	    char bytes[n_bits/8];
@@ -301,7 +301,7 @@ namespace boost
 #define BOOST_HAS_INT16_T
 #define BOOST_HAS_INT32_T
 #define BOOST_HAS_INT64_T
-  
+
   //  These types only present if platform has exact size integers:
   //     aligned big endian signed integer types
   //     aligned big endian unsigned integer types

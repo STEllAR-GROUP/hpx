@@ -62,7 +62,7 @@ namespace detail {
         virtual void do_gather(const msg_type & ) = 0;
     };
 
-    /** 
+    /**
         when doing scoped logging, we use this as a trick to find out if a logger is enabled.
         That is, we want to do the overhead of gathering the message to happen only if logging is enabled
     */
@@ -105,7 +105,7 @@ struct class_name : ::boost::logging::detail::scoped_gather_base<> { \
     msg_type m_str; \
     bool m_is_enabled; \
 } BOOST_LOG_CONCATENATE(log_, __LINE__); \
-    logger_macro , ::boost::logging::detail::scoped_logger<>( BOOST_LOG_CONCATENATE(log_, __LINE__) ) 
+    logger_macro , ::boost::logging::detail::scoped_logger<>( BOOST_LOG_CONCATENATE(log_, __LINE__) )
 
 
 

@@ -31,7 +31,7 @@ void output_stream::call_write_async(
 void output_stream::write_async(
     buffer const& in
 ) { // {{{
-    // Perform the IO in another OS thread. 
+    // Perform the IO in another OS thread.
     get_runtime().get_io_pool().get_io_service().post(boost::bind
         (&output_stream::call_write_async, this, in));
 } // }}}
@@ -58,7 +58,7 @@ void output_stream::write_sync(
     threads::thread_self& self = threads::get_self();
     threads::thread_id_type id = self.get_thread_id();
 
-    // Perform the IO in another OS thread. 
+    // Perform the IO in another OS thread.
     get_runtime().get_io_pool().get_io_service().post(boost::bind
         (&output_stream::call_write_sync, this, in, id));
 

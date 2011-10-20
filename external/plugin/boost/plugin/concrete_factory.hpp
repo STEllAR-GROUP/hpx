@@ -14,20 +14,20 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace boost { namespace plugin {
 
-    namespace detail 
+    namespace detail
     {
         template<
-            typename BasePlugin, typename Concrete, typename Base, 
+            typename BasePlugin, typename Concrete, typename Base,
             typename Parameters
         >
         struct concrete_factory_item;
 
         template<typename BasePlugin, typename Concrete, typename Base>
         struct concrete_factory_item<
-            BasePlugin, Concrete, Base, boost::mpl::list<> 
-        > 
+            BasePlugin, Concrete, Base, boost::mpl::list<>
+        >
         :   public Base
-        {                
+        {
             BasePlugin* create(dll_handle dll)
             {
                 return new plugin_wrapper<Concrete, boost::mpl::list<> >(dll);
@@ -36,10 +36,10 @@ namespace boost { namespace plugin {
 
         template<typename BasePlugin, typename Concrete, typename Base, typename A1>
         struct concrete_factory_item<
-            BasePlugin, Concrete, Base, boost::mpl::list<A1> 
-        > 
+            BasePlugin, Concrete, Base, boost::mpl::list<A1>
+        >
         :   public Base
-        {                
+        {
             BasePlugin* create(dll_handle dll, A1 a1)
             {
                 return new plugin_wrapper<Concrete, boost::mpl::list<A1> >(dll, a1);
@@ -47,19 +47,19 @@ namespace boost { namespace plugin {
         };
 
         template<typename BasePlugin, typename Concrete, typename Base, typename A1, typename A2>
-        struct concrete_factory_item<BasePlugin, Concrete, Base, boost::mpl::list<A1, A2> > 
+        struct concrete_factory_item<BasePlugin, Concrete, Base, boost::mpl::list<A1, A2> >
         :   public Base
-        {                
+        {
             BasePlugin* create(dll_handle dll, A1 a1, A2 a2)
             {
                 return new plugin_wrapper<Concrete, boost::mpl::list<A1, A2> >(dll, a1, a2);
             }
         };
     }
-        
+
 ///////////////////////////////////////////////////////////////////////////////
 //
-//  Bring in the remaining concrete_factory_item definitions for parameter 
+//  Bring in the remaining concrete_factory_item definitions for parameter
 //  counts greater 2
 //
 ///////////////////////////////////////////////////////////////////////////////
@@ -67,14 +67,14 @@ namespace boost { namespace plugin {
 
     ///////////////////////////////////////////////////////////////////////////
     template<typename BasePlugin, typename Concrete>
-    struct concrete_factory 
+    struct concrete_factory
     :   public boost::mpl::inherit_linearly<
             typename virtual_constructors<BasePlugin>::type,
-            detail::concrete_factory_item<BasePlugin, Concrete, 
+            detail::concrete_factory_item<BasePlugin, Concrete,
                 boost::mpl::placeholders::_, boost::mpl::placeholders::_>,
-            abstract_factory<BasePlugin> 
+            abstract_factory<BasePlugin>
         >::type
-    {};    
+    {};
 
 ///////////////////////////////////////////////////////////////////////////////
 }}  // namespace boost::plugin

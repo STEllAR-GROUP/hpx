@@ -16,7 +16,7 @@
 
 #include <boost/thread/mutex.hpp>
 
-/* 
+/*
     counts the number of objects.
     When it's destroyed, there should be no objects left.
 */
@@ -43,9 +43,9 @@ struct object_count {
         BOOST_ASSERT(m_count >= 0);
     }
 
-    int count() const { 
+    int count() const {
         scoped_lock lk(m_cs);
-        return m_count; 
+        return m_count;
     }
 
 private:

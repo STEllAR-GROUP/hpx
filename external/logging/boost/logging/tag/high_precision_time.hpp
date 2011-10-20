@@ -32,12 +32,12 @@
 #include <boost/logging/format/formatter/convert_format.hpp> // do_convert_format
 
 
-namespace boost { namespace logging { 
+namespace boost { namespace logging {
 
 namespace tag {
 
 
-/** @brief tag that holds the current time (with high precision) context information 
+/** @brief tag that holds the current time (with high precision) context information
 
 @code
 #include <boost/logging/tag/high_precision_time.hpp>
@@ -54,7 +54,7 @@ struct high_precision_time {
 
 namespace formatter { namespace tag {
 
-/** @brief Dumps current high_precision_time information (corresponds to boost::logging::tag::high_precision_time tag class) 
+/** @brief Dumps current high_precision_time information (corresponds to boost::logging::tag::high_precision_time tag class)
 
 @code
 #include <boost/logging/tag/high_precision_time.hpp>

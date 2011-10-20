@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_TAGGED_THREAD_STATE_MAR_12_2010_0125PM)
@@ -26,13 +26,13 @@ namespace hpx { namespace threads { namespace detail
         static const int state_index = 3;
         static const tagged_thread_state_type tag_mask = 0xffffff;  // (1L<<24L)-1;
 
-        static tag_type 
+        static tag_type
         extract_tag(volatile tagged_thread_state_type const& i)
         {
             return (tag_type)(i & tag_mask);    // blend out state
         }
 
-        static thread_state_type 
+        static thread_state_type
         extract_state(volatile tagged_thread_state_type const& i)
         {
             cast_type cu;
@@ -40,7 +40,7 @@ namespace hpx { namespace threads { namespace detail
             return cu.tag[state_index];
         }
 
-        static tagged_thread_state_type 
+        static tagged_thread_state_type
         pack_state(tagged_thread_state_type state, int tag)
         {
             cast_type ret;
@@ -104,7 +104,7 @@ namespace hpx { namespace threads { namespace detail
         }
 
         ///////////////////////////////////////////////////////////////////////
-        /// tag access 
+        /// tag access
         tag_type get_tag() const volatile
         {
             return extract_tag(state_);

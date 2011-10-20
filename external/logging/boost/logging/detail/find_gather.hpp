@@ -57,13 +57,13 @@ namespace boost { namespace logging {
         template<class stream, class param> struct find_gather {};
         template<class stream> struct find_gather< stream, std::basic_string<char_type> > { typedef gather::ostream_like::return_str< std::basic_string<char_type>, stream > type ; };
 
-        template< class stream, class string_type> 
-        struct find_gather< stream, boost::logging::optimize::cache_string_one_str<string_type> > { 
+        template< class stream, class string_type>
+        struct find_gather< stream, boost::logging::optimize::cache_string_one_str<string_type> > {
             typedef gather::ostream_like::return_str< boost::logging::optimize::cache_string_one_str<string_type>, stream > type;
         };
 
-        template< class stream, class string_type> 
-        struct find_gather< stream, boost::logging::optimize::cache_string_several_str<string_type,void*> > { 
+        template< class stream, class string_type>
+        struct find_gather< stream, boost::logging::optimize::cache_string_several_str<string_type,void*> > {
             typedef gather::ostream_like::return_str< boost::logging::optimize::cache_string_several_str<string_type,void*>, stream > type;
         };
 

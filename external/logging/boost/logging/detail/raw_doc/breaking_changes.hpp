@@ -1,6 +1,6 @@
 namespace boost { namespace logging {
 
-/** 
+/**
 @page breaking_changes Breaking changes
 
 - @ref breaking_change_v_20
@@ -11,7 +11,7 @@ namespace boost { namespace logging {
 
 Now, for every call to a filter/logger, you need to append "()" to it. You'll need to do this:
 - when initializing the logs
-- when you've defined your macros 
+- when you've defined your macros
   - any usage of BOOST_LOG_USE_LOG_IF_LEVEL, BOOST_LOG_USE_LOG_IF_FILTER, BOOST_LOG_USE_SIMPLE_LOG_IF_FILTER
 - when dealing with filters (turning them on/off, changing filter levels)
 
@@ -21,7 +21,7 @@ Example
 Before:
 
 @code
-#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l, g_log_filter->is_enabled() ) 
+#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l, g_log_filter->is_enabled() )
 
 g_l->writer().add_formatter( formatter::idx(), "[%] "  );
 g_l->writer().add_formatter( formatter::append_newline_if_needed() );
@@ -35,7 +35,7 @@ g_log_filter->set_enabled(false);
 After:
 
 @code
-#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() ) 
+#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() )
 
 g_l()->writer().add_formatter( formatter::idx(), "[%] "  );
 g_l()->writer().add_formatter( formatter::append_newline_if_needed() );

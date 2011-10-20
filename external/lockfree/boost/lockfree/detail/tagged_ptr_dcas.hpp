@@ -54,7 +54,7 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr
         ptr = p;
         tag = t;
     }
-    
+
     void reset(T * p, tag_t t)
     {
         set(p, t);

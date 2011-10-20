@@ -1,15 +1,15 @@
 namespace boost { namespace logging {
 
-/** 
+/**
 @page workflow Logging workflow
 
 
-- @ref workflow_introduction 
-- @ref workflow_filter 
-- @ref workflow_processing 
-- @ref workflow_2a 
-- @ref workflow_2b 
-- @ref workflow_formatters_destinations 
+- @ref workflow_introduction
+- @ref workflow_filter
+- @ref workflow_processing
+- @ref workflow_2a
+- @ref workflow_2b
+- @ref workflow_formatters_destinations
 
 
 @section workflow_introduction Introduction
@@ -48,21 +48,21 @@ you'll have one %filter, and several loggers:
 
 @code
 // Example 1 : 1 filter, 1 logger
-BOOST_DECLARE_LOG_FILTER(g_log_filter, filter::no_ts ) 
-BOOST_DECLARE_LOG(g_l, logger_type) 
+BOOST_DECLARE_LOG_FILTER(g_log_filter, filter::no_ts )
+BOOST_DECLARE_LOG(g_l, logger_type)
 
-#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() ) 
+#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() )
 
 
 // Example 2 : 1 filter (containing a level), several loggers
-BOOST_DECLARE_LOG_FILTER(g_log_level, level::holder ) 
-BOOST_DECLARE_LOG(g_log_err, logger_type) 
+BOOST_DECLARE_LOG_FILTER(g_log_level, level::holder )
+BOOST_DECLARE_LOG(g_log_err, logger_type)
 BOOST_DECLARE_LOG(g_log_app, logger_type)
 BOOST_DECLARE_LOG(g_log_dbg, logger_type)
 
-#define LDBG_ BOOST_LOG_USE_LOG_IF_LEVEL(g_log_dbg(), g_log_level(), debug ) 
+#define LDBG_ BOOST_LOG_USE_LOG_IF_LEVEL(g_log_dbg(), g_log_level(), debug )
 #define LERR_ BOOST_LOG_USE_LOG_IF_LEVEL(g_log_err(), g_log_level(), error )
-#define LAPP_ BOOST_LOG_USE_LOG_IF_LEVEL(g_log_app(), g_log_level(), info ) 
+#define LAPP_ BOOST_LOG_USE_LOG_IF_LEVEL(g_log_app(), g_log_level(), info )
 @endcode
 
 Every time, before anything gets written to the log, the filter is asked if <em>it's enabled</em>. If so, the processing of the message takes place
@@ -110,7 +110,7 @@ L_(err,"chart")("Cannot load chart")(chart_path);
 How you gather your message, depends on how you @ref macros_use "#define L_ ...".
 
 In other words, gathering the message means getting all the message in "one piece", so that it can be written. \n
-See the 
+See the
 - the gather namespace - classes for gathering
 - the gather::ostream_like - classes for gathering, using the cool "<<" operator
 
@@ -135,7 +135,7 @@ typedef logger< gather::ostream_like::return_str<std::string>, write_to_cout> lo
 BOOST_DECLARE_LOG(g_single_log, logger_type)
 BOOST_DECLARE_LOG_FILTER(g_filter, filter::no_ts)
 
-#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_single_log, g_filter->is_enabled() ) 
+#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_single_log, g_filter->is_enabled() )
 
 // usage
 int i = 100;
@@ -152,10 +152,10 @@ For each log, you decide how messages are formatted and to what destinations the
 @code
 typedef logger_format_write< > logger_type;
 
-BOOST_DECLARE_LOG_FILTER(g_log_filter, filter::no_ts ) 
-BOOST_DECLARE_LOG(g_l, logger_type) 
+BOOST_DECLARE_LOG_FILTER(g_log_filter, filter::no_ts )
+BOOST_DECLARE_LOG(g_l, logger_type)
 
-#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() ) 
+#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() )
 
 // add formatters : [idx] [time] message <enter>
 g_l()->writer().add_formatter( formatter::idx() );

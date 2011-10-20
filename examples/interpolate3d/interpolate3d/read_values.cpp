@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -15,8 +15,8 @@
 namespace interpolate3d
 {
     ///////////////////////////////////////////////////////////////////////////
-    inline void 
-    read_values(H5::DataSet& dataset, H5::DataSpace& data_space, 
+    inline void
+    read_values(H5::DataSet& dataset, H5::DataSpace& data_space,
         hsize_t offset, hsize_t count, double* values)
     {
         using namespace H5;
@@ -40,14 +40,14 @@ namespace interpolate3d
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    boost::uint64_t extract_data_range (std::string const& datafilename, 
-        char const* name, double& minval, double& maxval, double& delta, 
+    boost::uint64_t extract_data_range (std::string const& datafilename,
+        char const* name, double& minval, double& maxval, double& delta,
         std::size_t start, std::size_t end)
     {
         try {
             using namespace H5;
 
-            // Turn off the auto-printing when failure occurs 
+            // Turn off the auto-printing when failure occurs
             Exception::dontPrint();
 
             H5File file(datafilename, H5F_ACC_RDONLY);
@@ -78,19 +78,19 @@ namespace interpolate3d
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline void 
-    read_values(H5::DataSet& dataset, H5::DataSpace& data_space, 
-        dimension const& dimx, dimension const& dimy, dimension const& dimz, 
+    inline void
+    read_values(H5::DataSet& dataset, H5::DataSpace& data_space,
+        dimension const& dimx, dimension const& dimy, dimension const& dimz,
         double* values)
     {
         using namespace H5;
 
         // Define hyperslab for file based data
-        hsize_t data_offset[dimension::dim] = { 
-            dimx.offset_, dimy.offset_, dimz.offset_ 
+        hsize_t data_offset[dimension::dim] = {
+            dimx.offset_, dimy.offset_, dimz.offset_
         };
-        hsize_t data_count[dimension::dim] = { 
-            dimx.count_, dimy.count_, dimz.count_ 
+        hsize_t data_count[dimension::dim] = {
+            dimx.count_, dimy.count_, dimz.count_
         };
         data_space.selectHyperslab(H5S_SELECT_SET, data_count, data_offset);
 
@@ -106,14 +106,14 @@ namespace interpolate3d
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void extract_data(std::string const& datafilename, char const* name, 
-        double* values, dimension const& dimx, dimension const& dimy, 
+    void extract_data(std::string const& datafilename, char const* name,
+        double* values, dimension const& dimx, dimension const& dimy,
         dimension const& dimz)
     {
         try {
             using namespace H5;
 
-            // Turn off the auto-printing when failure occurs 
+            // Turn off the auto-printing when failure occurs
             Exception::dontPrint();
 
             H5File file(datafilename, H5F_ACC_RDONLY);

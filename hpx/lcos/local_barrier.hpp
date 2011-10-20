@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_LCOS_local_barrier_JUN_23_2008_0530PM)
@@ -12,19 +12,19 @@
 #include <hpx/util/stringstream.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos 
+namespace hpx { namespace lcos
 {
     /// \class local_barrier local_barrier.hpp hpx/lcos/local_barrier.hpp
     ///
-    /// A local_barrier can be used to synchronize a specific number of threads, 
-    /// blocking all of the entering threads until all of the threads have 
+    /// A local_barrier can be used to synchronize a specific number of threads,
+    /// blocking all of the entering threads until all of the threads have
     /// entered the local_barrier.
     ///
     /// \note   A \a local_barrier is not a LCO in the sense that it has no global id
-    ///         and it can't be triggered using the action (parcel) mechanism. 
-    ///         It is just a low level synchronization primitive allowing to 
+    ///         and it can't be triggered using the action (parcel) mechanism.
+    ///         It is just a low level synchronization primitive allowing to
     ///         synchronize a given number of \a threads.
-    class local_barrier 
+    class local_barrier
     {
     private:
         struct tag {};
@@ -52,8 +52,8 @@ namespace hpx { namespace lcos
         > slist_option_type;
 
         typedef boost::intrusive::slist<
-            local_barrier_queue_entry, slist_option_type, 
-            boost::intrusive::cache_last<true>, 
+            local_barrier_queue_entry, slist_option_type,
+            boost::intrusive::cache_last<true>,
             boost::intrusive::constant_time_size<false>
         > queue_type;
 
@@ -75,17 +75,17 @@ namespace hpx { namespace lcos
 
                     // we know that the id is actually the pointer to the thread
                     threads::thread* thrd = static_cast<threads::thread*>(id);
-                    LERR_(fatal) << "~local_barrier: pending thread: " 
-                            << get_thread_state_name(thrd->get_state()) 
+                    LERR_(fatal) << "~local_barrier: pending thread: "
+                            << get_thread_state_name(thrd->get_state())
                             << "(" << id << "): " << thrd->get_description();
 
                     // forcefully abort thread, do not throw
                     error_code ec;
-                    threads::set_thread_state(id, threads::pending, 
+                    threads::set_thread_state(id, threads::pending,
                         threads::wait_abort, threads::thread_priority_normal, ec);
                     if (ec) {
                         LERR_(fatal) << "~local_barrier: could not abort thread"
-                            << get_thread_state_name(thrd->get_state()) 
+                            << get_thread_state_name(thrd->get_state())
                             << "(" << id << "): " << thrd->get_description();
                     }
                 }
@@ -93,7 +93,7 @@ namespace hpx { namespace lcos
         }
 
         /// The function \a wait will block the number of entering \a threads
-        /// (as given by the constructor parameter \a number_of_threads), 
+        /// (as given by the constructor parameter \a number_of_threads),
         /// releasing all waiting threads as soon as the last \a thread
         /// entered this function.
         void wait()

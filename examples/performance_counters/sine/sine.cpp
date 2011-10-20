@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
@@ -36,7 +36,7 @@ namespace performance_counters { namespace sine
         return std::sin(up_time.count() / 10.) * 100000.;
     }
 
-    // create an averaging performance counter based on the immediate sine 
+    // create an averaging performance counter based on the immediate sine
     // counter
     void create_averaging_sine()
     {
@@ -53,43 +53,43 @@ namespace performance_counters { namespace sine
         // full info of the counter to create, help text and version will be
         // complemented from counter type info as specified above
         hpx::performance_counters::counter_info info(
-            hpx::performance_counters::counter_average_count, 
+            hpx::performance_counters::counter_average_count,
             boost::str(sine_instance % prefix));
 
         // create the 'sine' performance counter component locally
         boost::format base_instance("/sine(locality#%d/instance#0)/immediate");
-        hpx::naming::id_type id = 
-            hpx::performance_counters::create_average_count_counter(info, 
+        hpx::naming::id_type id =
+            hpx::performance_counters::create_average_count_counter(info,
                 boost::str(base_instance % prefix), 100);
 
         // install the counter instance
         hpx::performance_counters::install_counter(id, info);
     }
 
-    // This function will be registered as a startup function for HPX below. 
-    // 
-    // That means it will be executed in a px-thread before hpx_main, but after 
+    // This function will be registered as a startup function for HPX below.
+    //
+    // That means it will be executed in a px-thread before hpx_main, but after
     // the runtime has been initialized and started.
     void startup()
     {
         using namespace hpx::performance_counters;
 
         // define the counter types
-        raw_counter_type_data const counter_types[] = 
+        raw_counter_type_data const counter_types[] =
         {
             { "/sine/immediate", counter_raw,
               "returns the current value of a sine wave calculated over "
-              "an arbitrary time line", 
+              "an arbitrary time line",
               HPX_PERFORMANCE_COUNTER_V1 }
         };
 
         // install the counter types, un-installation is handled automatically
-        install_counter_types(counter_types, 
+        install_counter_types(counter_types,
             sizeof(counter_types)/sizeof(counter_types[0]));
 
         // create the counter instances
 
-        // The first counter uses our own full counter implementation, we create 
+        // The first counter uses our own full counter implementation, we create
         // the sine_type counter locally and install it to the local counter
         // registry.
         boost::uint32_t const prefix = hpx::applier::get_applier().get_prefix_id();
@@ -112,17 +112,17 @@ namespace performance_counters { namespace sine
         // to explicitly create the counter instance in this case.
         install_counter(boost::str(sine_instance % prefix % 1), immediate_sine);
 
-        // The third counter is an averaging performance counter based on the 
+        // The third counter is an averaging performance counter based on the
         // first counter above
         create_averaging_sine();
     }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-// Register a startup function which will be called as a px-thread during 
-// runtime startup. We use this function to register our performance counter 
+// Register a startup function which will be called as a px-thread during
+// runtime startup. We use this function to register our performance counter
 // type and performance counter instances.
-// 
+//
 // Note that this macro can be used not more than once in one module.
 HPX_REGISTER_STARTUP_SHUTDOWN_MODULE(::performance_counters::sine::startup, 0);
 

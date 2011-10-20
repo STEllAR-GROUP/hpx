@@ -35,7 +35,7 @@ namespace boost
       // The basic ordering operations.
       friend bool operator==(const T& x, IntegerType y) { return +x == y; }
       friend bool operator<(const T& x, IntegerType y) { return +x < y; }
-      
+
       // The basic arithmetic operations.
       friend T& operator+=(T& x, IntegerType y) { return x = +x + y; }
       friend T& operator-=(T& x, IntegerType y) { return x = +x - y; }
@@ -47,11 +47,11 @@ namespace boost
       friend T& operator^=(T& x, IntegerType y) { return x = +x ^ y; }
       friend T& operator<<=(T& x, IntegerType y) { return x = +x << y; }
       friend T& operator>>=(T& x, IntegerType y) { return x = +x >> y; }
-      
+
       // A few binary arithmetic operations not covered by operators base class.
       friend IntegerType operator<<(const T& x, IntegerType y) { return +x << y; }
       friend IntegerType operator>>(const T& x, IntegerType y) { return +x >> y; }
-      
+
       // Auto-increment and auto-decrement can be defined in terms of the
       // arithmetic operations.
       friend T& operator++(T& x) { return x += 1; }

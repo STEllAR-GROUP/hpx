@@ -26,7 +26,7 @@
 #include <boost/logging/detail/ts/ts_none.hpp>
 
 #ifndef BOOST_LOG_NO_TS
-    
+
     #ifdef BOOST_LOG_USE_BOOST_THREADS
         #include <boost/logging/detail/ts/ts_boost.hpp>
     #else
@@ -47,7 +47,7 @@
 namespace boost { namespace logging { namespace threading {
 
 #ifndef BOOST_LOG_NO_TS
-    
+
     #ifdef BOOST_LOG_USE_BOOST_THREADS
         typedef mutex_boost mutex;
     #else

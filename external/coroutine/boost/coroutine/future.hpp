@@ -2,22 +2,22 @@
 //
 //  This code may be used under either of the following two licences:
 //
-//  Permission is hereby granted, free of charge, to any person obtaining a copy 
-//  of this software and associated documentation files (the "Software"), to deal 
-//  in the Software without restriction, including without limitation the rights 
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
-//  copies of the Software, and to permit persons to whom the Software is 
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
 //  furnished to do so, subject to the following conditions:
 //
-//  The above copyright notice and this permission notice shall be included in 
+//  The above copyright notice and this permission notice shall be included in
 //  all copies or substantial portions of the Software.
 //
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE. OF SUCH DAMAGE.
 //
 //  Or:
@@ -58,18 +58,18 @@ namespace boost { namespace coroutines {
   template<
     BOOST_PP_ENUM_BINARY_PARAMS
   (BOOST_COROUTINE_ARG_MAX,
-   typename T, 
+   typename T,
    = boost::tuples::null_type BOOST_PP_INTERCEPT),
-    typename ContextImpl = detail::default_context_impl 
+    typename ContextImpl = detail::default_context_impl
     >
-  class future : 
+  class future :
     public movable
-  <future<BOOST_PP_ENUM_PARAMS(BOOST_COROUTINE_ARG_MAX, T)> > 
+  <future<BOOST_PP_ENUM_PARAMS(BOOST_COROUTINE_ARG_MAX, T)> >
   {
 
     friend struct detail::wait_gateway;
-    typedef void (future::*safe_bool)();           
-    void safe_bool_true() {}                       
+    typedef void (future::*safe_bool)();
+    void safe_bool_true() {}
 
   public:
     typedef ContextImpl context_impl;
@@ -81,24 +81,24 @@ namespace boost { namespace coroutines {
 
     typedef boost::mpl::bool_<tuple_traits_type::length == 1>
       is_singular;
-   
+
     typedef BOOST_DEDUCED_TYPENAME tuple_traits_type::as_tuple tuple_type;
     typedef BOOST_DEDUCED_TYPENAME boost::mpl::eval_if<
       boost::mpl::not_<is_singular>,
       boost::mpl::identity<tuple_type>,
       BOOST_DEDUCED_TYPENAME tuple_traits_type::template at<0>
       >::type  value_type;
-   
+
     typedef detail::future_impl<tuple_type, context_impl> future_impl;
     typedef future_impl * impl_pointer;
     template<typename CoroutineSelf>
       future(CoroutineSelf& self) :
       m_ptr(new future_impl(self)) {}
-   
+
     future(move_from<future> rhs) :
       m_ptr(rhs->pilfer()) {}
 
-   
+
     value_type& operator *() {
       BOOST_ASSERT(m_ptr);
       wait();
@@ -111,7 +111,7 @@ namespace boost { namespace coroutines {
       wait();
       return remove_tuple(m_ptr->value(), boost::mpl::not_<is_singular>());
     }
-   
+
     future& operator=(move_from<future> rhs) {
       future(rhs).swap(*this);
       return *this;
@@ -129,14 +129,14 @@ namespace boost { namespace coroutines {
       return *this;
     }
 
-    operator safe_bool() const {    
+    operator safe_bool() const {
       BOOST_ASSERT(m_ptr);
-      return m_ptr->get()?                     
-        &future::safe_bool_true: 0;                 
-    }       
+      return m_ptr->get()?
+        &future::safe_bool_true: 0;
+    }
 
     BOOST_DEDUCED_TYPENAME
-      future_impl::pointer & 
+      future_impl::pointer &
       operator ->() {
       BOOST_ASSERT(m_ptr);
       wait();
@@ -144,7 +144,7 @@ namespace boost { namespace coroutines {
     }
 
     BOOST_DEDUCED_TYPENAME
-      future_impl::pointer const 
+      future_impl::pointer const
       operator ->() const {
       BOOST_ASSERT(m_ptr);
       wait();
@@ -155,7 +155,7 @@ namespace boost { namespace coroutines {
       std::swap(lhs.m_ptr, rhs.m_ptr);
     }
 
-    // On destruction, if the future is 
+    // On destruction, if the future is
     // pending it will be destroyed.
     ~future() {
       if(m_ptr) {
@@ -206,7 +206,7 @@ namespace boost { namespace coroutines {
       return ptr;
     }
 
-    impl_pointer m_ptr;    
+    impl_pointer m_ptr;
   };
 
 #define BOOST_COROUTINE_gen_call_overload(z, n, unused) \
@@ -223,13 +223,13 @@ namespace boost { namespace coroutines {
 
   /*
    * Generate overloads of call<...>(function, coroutine) for
-   * an arbitrary argument numbers that will forward to 
+   * an arbitrary argument numbers that will forward to
    * detail::call_impl<future<...> >(function, coroutine)
    */
   BOOST_PP_REPEAT(BOOST_COROUTINE_ARG_MAX,
                   BOOST_COROUTINE_gen_call_overload,
                   ~);
-    
+
 #define BOOST_COROUTINE_empty(z, n, name) \
 /**/
 
@@ -287,11 +287,11 @@ namespace boost { namespace coroutines {
    * It will extend the lifetime of the object until
    * it is signaled. More than one callback object
    * can be pending at any time. The coroutine self
-   * will last at least untill the last pending callback 
+   * will last at least untill the last pending callback
    * is fired.
    */
   template<typename Future>
-  BOOST_DEDUCED_TYPENAME 
+  BOOST_DEDUCED_TYPENAME
   make_callback_result<Future>
   ::type
   make_callback(Future& future) {
@@ -299,6 +299,6 @@ namespace boost { namespace coroutines {
       (future);
   }
 
-} } 
+} }
 #endif
 

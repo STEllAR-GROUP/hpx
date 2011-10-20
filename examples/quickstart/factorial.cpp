@@ -38,7 +38,7 @@ using hpx::finalize;
 
 ///////////////////////////////////////////////////////////////////////////////
 boost::uint64_t factorial(
-    id_type const& prefix 
+    id_type const& prefix
   , boost::uint64_t m
 );
 
@@ -46,7 +46,7 @@ typedef plain_result_action2<
     // result type
     boost::uint64_t
     // arguments
-  , id_type const&  
+  , id_type const&
   , boost::uint64_t
     // function
   , factorial
@@ -67,7 +67,7 @@ boost::uint64_t factorial(
     else
     {
         factorial_future n1(prefix, prefix, n - 1);
-        return n * n1.get(); 
+        return n * n1.get();
     }
 }
 
@@ -108,7 +108,7 @@ int main(int argc, char* argv[])
     desc_commandline.add_options()
         ( "n-value"
         , value<boost::uint64_t>()->default_value(10)
-        , "n value for the factorial function") 
+        , "n value for the factorial function")
         ;
 
     // Initialize and run HPX

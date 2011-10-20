@@ -1,11 +1,11 @@
 namespace boost { namespace logging {
 
-/** 
+/**
 @page after_destruction Using the logger(s)/filter(s) after they've been destroyed
 
-- @ref after_destruction_can_happen 
-- @ref after_destruction_avoid 
-- @ref after_destruction_solution 
+- @ref after_destruction_can_happen
+- @ref after_destruction_avoid
+- @ref after_destruction_solution
 
 
 
@@ -15,7 +15,7 @@ namespace boost { namespace logging {
 @section after_destruction_can_happen Can this happen?
 
 The short answer : yes. How? The order of inialization between translation units is not defined, thus the same applies
-for destruction. The following can happen: 
+for destruction. The following can happen:
 - a global object is constructed @em before a logger
 - thus, it will be destroyed @em after the logger
 - if in its destructor it tries to use the logger, there we go - logger is used after it's been destroyed.
@@ -36,10 +36,10 @@ static A a;
 static B b;
 @endcode
 
-... we're guaranteed @c a is initialized before @c b. In other words, if in a translation unit @c a is defined before @c b, 
-@c a will be initialized before @c b. 
+... we're guaranteed @c a is initialized before @c b. In other words, if in a translation unit @c a is defined before @c b,
+@c a will be initialized before @c b.
 
-Apply this to our problem: 
+Apply this to our problem:
 - we just need some object that will reference the logger, to be defined before the global object that might end up using the logger in its destructor
   - note: referencing the logger will imply it gets constructed first
 - this way, the logger will be created before the global object, and thus be destroyed after it
@@ -55,13 +55,13 @@ Therefore, the amazing solution:
     namespace { boost::logging::ensure_early_log_creation ensure_log_is_created_before_main ## name ( * name () ); }
 @endcode
 
-When declaring the logger, we create a dummy static - in each translation unit -, that uses the logger; this will ensure the 
+When declaring the logger, we create a dummy static - in each translation unit -, that uses the logger; this will ensure the
 logger is created before the global object that will use it.
 
 @section after_destruction_solution The solution
 
 All you need to do is :
-- \#include the header file that declares the logs in all translation units that have global objects that could log from their destructor. 
+- \#include the header file that declares the logs in all translation units that have global objects that could log from their destructor.
 - of course, to be sure, you could \#include that header in all translation units :)
 
 @note

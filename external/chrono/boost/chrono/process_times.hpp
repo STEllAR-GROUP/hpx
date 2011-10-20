@@ -7,7 +7,7 @@
 
 //  See http://www.boost.org/libs/system for documentation.
 
-#ifndef BOOST_PROCESS_TIMES_HPP                  
+#ifndef BOOST_PROCESS_TIMES_HPP
 #define BOOST_PROCESS_TIMES_HPP
 
 #include <boost/chrono/chrono.hpp>
@@ -76,7 +76,7 @@ namespace boost
      ~process_timer() {}  // never throws
 
       void  start( system::error_code & ec = system::throws )
-      { 
+      {
         process_clock::now( m_start, ec );
       }
 
@@ -140,7 +140,7 @@ namespace boost
         : m_places(places), m_os(os), m_format(format) { start(ec); }
 
      ~run_timer()  // never throws
-      { 
+      {
         system::error_code ec;
         if ( !reported() ) report( ec );
       }

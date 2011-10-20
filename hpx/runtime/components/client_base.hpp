@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_COMPONENTS_CLIENT_BASE_OCT_31_2008_0424PM)
@@ -12,7 +12,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components 
+namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Derived, typename Stub>
@@ -38,7 +38,7 @@ namespace hpx { namespace components
         }
 
         ///////////////////////////////////////////////////////////////////////
-        /// Create a new instance of an object on the locality as 
+        /// Create a new instance of an object on the locality as
         /// given by the parameter \a targetgid
         Derived& create(naming::gid_type const& targetgid, component_type type,
             std::size_t count = 1)
@@ -119,7 +119,7 @@ namespace hpx { namespace components
             return gid_.get_gid();
         }
 
-        naming::id_type detach() 
+        naming::id_type detach()
         {
             naming::id_type g;
             std::swap(gid_, g);

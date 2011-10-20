@@ -1,6 +1,6 @@
 # Copyright (c) 2011 Bryce Lelbach
 #
-# Distributed under the Boost Software License, Version 1.0. (See accompanying 
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 ################################################################################
@@ -24,11 +24,11 @@ macro(get_boost_version)
     if(NOT BOOST_ROOT)
       if(NOT $ENV{BOOST_ROOT} STREQUAL "")
         set(BOOST_ROOT $ENV{BOOST_ROOT})
-      elseif(NOT $ENV{BOOST} STREQUAL "")  
+      elseif(NOT $ENV{BOOST} STREQUAL "")
         set(BOOST_ROOT $ENV{BOOST})
       endif()
     endif()
-  
+
     if(NOT BOOST_LIBRARY_DIR AND BOOST_ROOT)
       find_path(BOOST_LIBRARY_DIR lib PATHS ${BOOST_ROOT}/stage64 ${BOOST_ROOT}/stage ${BOOST_ROOT} NO_DEFAULT_PATH)
       if(${BOOST_LIBRARY_DIR} STREQUAL BOOST_LIBRARY_DIR-NOTFOUND)
@@ -41,61 +41,61 @@ macro(get_boost_version)
       endif()
       hpx_debug("boost.version" "Using ${BOOST_LIBRARY_DIR} as Boost shared library directory")
     endif()
-    
+
     if(NOT BOOST_INCLUDE_DIR AND BOOST_ROOT)
       find_path(BOOST_INCLUDE_DIR boost PATHS ${BOOST_ROOT} ${BOOST_ROOT}/include NO_DEFAULT_PATH)
     endif()
-  
+
     if(BOOST_ROOT)
       # Locate include directory
       find_path(BOOST_VERSION_HPP boost/version.hpp PATHS ${BOOST_INCLUDE_DIR} NO_DEFAULT_PATH)
 
       if(${BOOST_VERSION_HPP} STREQUAL BOOST_VERSION_HPP-NOTFOUND)
         hpx_warn("boost.version" "Could not locate Boost include directory in ${BOOST_INCLUDE_DIR}. Now searching the system.")
-      
+
         find_path(BOOST_VERSION_HPP boost/version.hpp)
-    
+
         if(${BOOST_VERSION_HPP} STREQUAL BOOST_VERSION_HPP-NOTFOUND)
           hpx_error("boost.version" "Failed to locate Boost include directory in ${BOOST_INCLUDE_DIR} or in the default path.")
         endif()
       endif()
-    else() 
+    else()
       find_path(BOOST_VERSION_HPP boost/version.hpp)
-    
+
       if(${BOOST_VERSION_HPP} STREQUAL BOOST_VERSION_HPP-NOTFOUND)
         hpx_error("boost.version" "Failed to locate Boost include directory in ${BOOST_INCLUDE_DIR} or in the default path.")
       endif()
     endif()
-  
+
   # System Boost installation (deb, rpm, etc)
   else()
     # Locate include directory
     find_path(BOOST_VERSION_HPP boost/version.hpp)
-    
+
     if(${BOOST_VERSION_HPP} STREQUAL BOOST_VERSION_HPP-NOTFOUND)
       hpx_error("boost.version" "Failed to locate Boost include directory in the default path.")
     endif()
-  
-  endif()    
-  
-  set(BOOST_VERSION_HPP ${BOOST_VERSION_HPP}/boost/version.hpp) 
+
+  endif()
+
+  set(BOOST_VERSION_HPP ${BOOST_VERSION_HPP}/boost/version.hpp)
   hpx_info("boost.version" "Using ${BOOST_VERSION_HPP} as Boost version.hpp header.")
-  
-  # Get Boost version 
+
+  # Get Boost version
   set(BOOST_VERSION "")
   set(BOOST_VERSION_STR "")
   set(BOOST_VERSION_NUM 0)
   set(BOOST_MAJOR_VERSION 0)
   set(BOOST_MINOR_VERSION 0)
   set(BOOST_PATCH_VERSION 0)
-  
+
   file(READ "${BOOST_VERSION_HPP}" BOOST_VERSION_HPP_CONTENTS)
-  
+
   string(REGEX REPLACE ".*#define BOOST_LIB_VERSION \"([0-9_]+)\".*" "\\1"
     BOOST_VERSION "${BOOST_VERSION_HPP_CONTENTS}")
   string(REGEX REPLACE ".*#define BOOST_VERSION ([0-9]+).*" "\\1"
     BOOST_VERSION_NUM "${BOOST_VERSION_HPP_CONTENTS}")
-    
+
   if(NOT "${BOOST_VERSION_NUM}" STREQUAL "0")
     math(EXPR BOOST_MAJOR_VERSION "${BOOST_VERSION_NUM} / 100000")
     math(EXPR BOOST_MINOR_VERSION "${BOOST_VERSION_NUM} / 100 % 1000")
@@ -103,7 +103,7 @@ macro(get_boost_version)
   else()
     hpx_error("boost.version" "Invalid Boost version ${BOOST_VERSION_NUM}.")
   endif()
-  
+
   set(BOOST_VERSION_HPP "${BOOST_VERSION_HPP}"
     CACHE FILEPATH "Boost version.hpp header." FORCE)
   set(BOOST_VERSION "${BOOST_VERSION}"
@@ -119,7 +119,7 @@ macro(get_boost_version)
   set(BOOST_VERSION_STR
     "${BOOST_MAJOR_VERSION}.${BOOST_MINOR_VERSION}.${BOOST_PATCH_VERSION}"
     CACHE STRING "Boost version (M.mm.p string version)." FORCE)
-  
+
   hpx_info("boost.version" "Boost version is ${BOOST_VERSION_STR}.")
 
   set(BOOST_USE_SYSTEM "${BOOST_USE_SYSTEM}" CACHE BOOL
@@ -130,7 +130,7 @@ macro(get_boost_version)
     "Path to Boost shared libraries (default: \${BOOST_ROOT}/stage/lib)." FORCE)
   set(BOOST_INCLUDE_DIR "${BOOST_INCLUDE_DIR}" CACHE PATH
     "Include path for Boost (default: \${BOOST_ROOT})." FORCE)
-  
+
   endif()
 endmacro()
 

@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_COMPONENT_FACTORY_SEP_26_2008_0647PM)
@@ -25,12 +25,12 @@ namespace hpx { namespace components
     ///////////////////////////////////////////////////////////////////////////
     /// \class component_factory component_factory.hpp hpx/runtime/components/component_factory.hpp
     ///
-    /// The \a component_factory provides a minimal implementation of a 
+    /// The \a component_factory provides a minimal implementation of a
     /// component's factory. If no additional functionality is required this
-    /// type can be used to implement the full set of minimally required 
+    /// type can be used to implement the full set of minimally required
     /// functions to be exposed by a component's factory instance.
     ///
-    /// \tparam Component   The component type this factory should be 
+    /// \tparam Component   The component type this factory should be
     ///                     responsible for.
     template <typename Component>
     struct component_factory : public component_factory_base
@@ -38,20 +38,20 @@ namespace hpx { namespace components
         /// \brief Construct a new factory instance
         ///
         /// \param global   [in] The pointer to a \a hpx#util#section instance
-        ///                 referencing the settings read from the [settings] 
+        ///                 referencing the settings read from the [settings]
         ///                 section of the global configuration file (hpx.ini)
-        ///                 This pointer may be NULL if no such section has 
+        ///                 This pointer may be NULL if no such section has
         ///                 been found.
         /// \param local    [in] The pointer to a \a hpx#util#section instance
         ///                 referencing the settings read from the section
-        ///                 describing this component type: 
-        ///                 [hpx.components.\<name\>], where \<name\> is the 
-        ///                 instance name of the component as given in the 
+        ///                 describing this component type:
+        ///                 [hpx.components.\<name\>], where \<name\> is the
+        ///                 instance name of the component as given in the
         ///                 configuration files.
         ///
-        /// \note The contents of both sections has to be cloned in order to 
+        /// \note The contents of both sections has to be cloned in order to
         ///       save the configuration setting for later use.
-        component_factory(util::section const* global, 
+        component_factory(util::section const* global,
                 util::section const* local, bool isenabled)
           : isenabled_(isenabled), refcnt_(0)
         {
@@ -65,22 +65,22 @@ namespace hpx { namespace components
         ///
         ~component_factory() {}
 
-        /// \brief Return the unique identifier of the component type this 
+        /// \brief Return the unique identifier of the component type this
         ///        factory is responsible for
         ///
-        /// \param prefix       [in] The prefix of the locality this factory 
+        /// \param prefix       [in] The prefix of the locality this factory
         ///                     is responsible for.
-        /// \param agas_client  [in] The AGAS client to use for component id 
+        /// \param agas_client  [in] The AGAS client to use for component id
         ///                     registration (if needed).
         ///
-        /// \return Returns the unique identifier of the component type this 
+        /// \return Returns the unique identifier of the component type this
         ///         factory instance is responsible for. This function throws
         ///         on any error.
-        component_type get_component_type(naming::gid_type const& prefix, 
+        component_type get_component_type(naming::gid_type const& prefix,
             naming::resolver_client& agas_client)
         {
             typedef typename Component::type_holder type_holder;
-            if (component_invalid == components::get_component_type<type_holder>()) 
+            if (component_invalid == components::get_component_type<type_holder>())
             {
                 // first call to get_component_type, ask AGAS for a unique id
                 if (isenabled_) {
@@ -97,21 +97,21 @@ namespace hpx { namespace components
             return components::get_component_type<type_holder>();
         }
 
-        /// \brief Return the name of the component type this factory is 
+        /// \brief Return the name of the component type this factory is
         ///        responsible for
         ///
-        /// \return Returns the name of the component type this factory 
-        ///         instance is responsible for. This function throws on any 
+        /// \return Returns the name of the component type this factory
+        ///         instance is responsible for. This function throws on any
         ///         error.
         std::string get_component_name() const
         {
             return unique_component_name<component_factory>::call();
         }
 
-        /// \brief  The function \a get_factory_properties is used to 
-        ///         determine, whether instances of the derived component can 
-        ///         be created in blocks (i.e. more than one instance at once). 
-        ///         This function is used by the \a distributing_factory to 
+        /// \brief  The function \a get_factory_properties is used to
+        ///         determine, whether instances of the derived component can
+        ///         be created in blocks (i.e. more than one instance at once).
+        ///         This function is used by the \a distributing_factory to
         ///         determine a correct allocation strategy
         factory_property get_factory_properties() const
         {
@@ -120,51 +120,51 @@ namespace hpx { namespace components
 
         /// \brief Create one or more new component instances.
         ///
-        /// \param count  [in] The number of component instances to 
-        ///               create. The value of this parameter should not 
+        /// \param count  [in] The number of component instances to
+        ///               create. The value of this parameter should not
         ///               be zero.
         ///
-        /// \return Returns the GID of the first newly created component 
-        ///         instance. If more than one component instance has been 
+        /// \return Returns the GID of the first newly created component
+        ///         instance. If more than one component instance has been
         ///         created (\a count > 1) the GID's of all new instances are
         ///         sequential in a row.
         naming::gid_type create (std::size_t count)
         {
             if (isenabled_) {
                 naming::gid_type id = server::create<Component>(count);
-                if (id) 
+                if (id)
                     ++refcnt_;
                 return id;
             }
 
-            HPX_THROW_EXCEPTION(bad_request, 
-                "component_factory::create", 
+            HPX_THROW_EXCEPTION(bad_request,
+                "component_factory::create",
                 "this factory instance is disabled for this locality (" +
                 get_component_name() + ")");
             return naming::invalid_gid;
         }
 
-        /// \brief Create one new component instance using the given constructor 
+        /// \brief Create one new component instance using the given constructor
         ///        argument.
         ///
         /// \param Arg0  [in] The type specific constructor argument
         ///
-        /// \return Returns the GID of the first newly created component 
-        ///         instance. If more than one component instance has been 
+        /// \return Returns the GID of the first newly created component
+        ///         instance. If more than one component instance has been
         ///         created (\a count > 1) the GID's of all new instances are
         ///         sequential in a row.
         naming::gid_type create_one (components::constructor_argument const&)
-        { 
-            HPX_THROW_EXCEPTION(bad_request, 
-                "component_factory::create_one", 
+        {
+            HPX_THROW_EXCEPTION(bad_request,
+                "component_factory::create_one",
                 "create_one is not supported by this factory instance");
-            return naming::invalid_gid; 
+            return naming::invalid_gid;
         }
 
         /// \brief Destroy one or more component instances
         ///
-        /// \param gid    [in] The gid of the first component instance to 
-        ///               destroy. 
+        /// \param gid    [in] The gid of the first component instance to
+        ///               destroy.
         void destroy(naming::gid_type const& gid)
         {
             server::destroy<Component>(gid);
@@ -174,7 +174,7 @@ namespace hpx { namespace components
         /// \brief Ask whether this factory can be unloaded
         ///
         /// \return Returns whether it is safe to unload this factory and
-        ///         the shared library implementing this factory. This 
+        ///         the shared library implementing this factory. This
         ///         function will return 'true' whenever no more outstanding
         ///         instances of the managed object type are alive.
         bool may_unload() const
@@ -193,8 +193,8 @@ namespace hpx { namespace components
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-/// The macro \a HPX_REGISTER_MINIMAL_COMPONENT_FACTORY is used create and to 
-/// register a minimal component factory with Boost.Plugin. 
+/// The macro \a HPX_REGISTER_MINIMAL_COMPONENT_FACTORY is used create and to
+/// register a minimal component factory with Boost.Plugin.
 #define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_EX(                            \
             ComponentType, componentname, enable_always)                      \
         HPX_REGISTER_COMPONENT_FACTORY(                                       \

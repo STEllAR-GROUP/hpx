@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // Create some 3D test data for the interpolate3d example
@@ -27,11 +27,11 @@ int main()
     std::vector<double> values;
     values.reserve((num_points_x+1) * (num_points_y+1) * (num_points_z+1));
 
-    for (double x = -5; x <= 5; x += 10./num_points_x) 
+    for (double x = -5; x <= 5; x += 10./num_points_x)
         data_x.push_back(x);
-    for (double y = -5; y <= 5; y += 10./num_points_y) 
+    for (double y = -5; y <= 5; y += 10./num_points_y)
         data_y.push_back(y);
-    for (double z = -5; z <= 5; z += 10./num_points_z) 
+    for (double z = -5; z <= 5; z += 10./num_points_z)
         data_z.push_back(z);
 
     for (double x = -5; x <= 5; x += 10./num_points_x) {
@@ -43,13 +43,13 @@ int main()
     }
 
     try {
-        // Turn off the auto-printing when failure occurs 
+        // Turn off the auto-printing when failure occurs
         Exception::dontPrint();
 
         // create a new file, truncate any existing file
         H5File file("gauss.h5", H5F_ACC_TRUNC);
 
-        // Define the size of the data array and create the data space for 
+        // Define the size of the data array and create the data space for
         // fixed sized data array
         hsize_t dims_x[1] = { num_points_x+1 };
         DataSpace dataspace_x(1, dims_x);

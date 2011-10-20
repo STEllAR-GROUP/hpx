@@ -30,13 +30,13 @@ namespace boost { namespace logging {
     // array holder class
     namespace array {
 
-    /** 
+    /**
         Holds an array of manipulators (formatters or destinations). It owns them, holding them internally as smart pointers
         Each function call is locked.
 
         The base_type must implement operator==
 
-        When you call get_ptr() or del(), the type you provide, must implement 
+        When you call get_ptr() or del(), the type you provide, must implement
         operator==(const type& , const base_type&)
     */
     template <class base_type, class mutex = boost::logging::threading::mutex > class shared_ptr_holder {
@@ -63,7 +63,7 @@ namespace boost { namespace logging {
             // not found
             return 0;
         }
-        
+
         template<class derived> void del(derived val) {
             base_type * p = get_ptr(val);
             del(p);

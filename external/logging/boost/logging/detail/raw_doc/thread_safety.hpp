@@ -1,6 +1,6 @@
 namespace boost { namespace logging {
 
-/** 
+/**
 @page thread_safety Thread safety
 
 When talking about thread-safety, there are 2 types of things to consider:
@@ -14,7 +14,7 @@ Based on your application, you can fine tune any of the above to suit your needs
   - initialize your logger/filter only once, and once it's initialized, always use that value (very efficient)
 - thread-safe (use mutexes) - every access uses a mutex; very slow in comparison to the above methods
 
-In addition to the above, for loggers, you can have an even faster method of writing the messages to their destinations: 
+In addition to the above, for loggers, you can have an even faster method of writing the messages to their destinations:
 @ref writer::on_dedicated_thread "on a dedicated thread".
 
 \n\n
@@ -34,7 +34,7 @@ Alternatively, you can @ref defining_your_logger_filter "define them manually":
 \n
 Note: I recommend defining loggers manually only if you know the lib very well. Otherwise, choose one of these:
 - @ref scenario::usage "customize the lib to suit your application's needs"
-- @ref defining_your_logger_filter 
+- @ref defining_your_logger_filter
 */
 
 }}

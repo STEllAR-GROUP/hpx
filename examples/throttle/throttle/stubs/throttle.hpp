@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_THROTTLE_STUBS_AUG_09_2011_0703PM)
@@ -28,7 +28,7 @@ namespace throttle { namespace stubs
             return hpx::lcos::eager_future<action_type>(gid, thread_num);
         }
 
-        static void 
+        static void
         suspend(hpx::naming::id_type const& gid, std::size_t thread_num)
         {
             suspend_async(gid, thread_num).get();
@@ -45,7 +45,7 @@ namespace throttle { namespace stubs
             return hpx::lcos::eager_future<action_type>(gid, thread_num);
         }
 
-        static void 
+        static void
         resume(hpx::naming::id_type const& gid, std::size_t thread_num)
         {
             resume_async(gid, thread_num).get();

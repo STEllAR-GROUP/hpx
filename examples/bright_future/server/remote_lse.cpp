@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  
+//
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -16,7 +16,7 @@ HPX_REGISTER_COMPONENT_MODULE();
 
 
 namespace bright_future { namespace server {
-    
+
     template <typename T>
     remote_lse<T>::remote_lse()
         : u(0,0)
@@ -54,7 +54,7 @@ namespace bright_future { namespace server {
     {
         rhs(x, y) = f(x, y, config);
     }
-    
+
     template <typename T>
     void remote_lse<T>::init_rhs_blocked(
         typename remote_lse<T>::init_func_type f
@@ -80,7 +80,7 @@ namespace bright_future { namespace server {
     {
         u(x, y) = f(x, y, config);
     }
-    
+
     template <typename T>
     void remote_lse<T>::init_u_blocked(
         typename remote_lse<T>::init_func_type f

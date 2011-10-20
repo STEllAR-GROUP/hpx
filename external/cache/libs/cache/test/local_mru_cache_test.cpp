@@ -1,6 +1,6 @@
 //  Copyright (c) 2008 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <string>
@@ -21,7 +21,7 @@ struct data
     char const* const value;
 };
 
-data entries[] = 
+data entries[] =
 {
     data ("white", "255,255,255"),
     data ("yellow", "255,255,0"),
@@ -37,7 +37,7 @@ void test_mru_insert()
 {
     typedef boost::cache::entries::lru_entry<std::string> entry_type;
     typedef boost::cache::local_cache<
-        std::string, entry_type, std::greater<entry_type> 
+        std::string, entry_type, std::greater<entry_type>
     > cache_type;
 
     cache_type c(3);
@@ -59,7 +59,7 @@ void test_mru_insert_with_touch()
 {
     typedef boost::cache::entries::lru_entry<std::string> entry_type;
     typedef boost::cache::local_cache<
-        std::string, entry_type, std::greater<entry_type> 
+        std::string, entry_type, std::greater<entry_type>
     > cache_type;
 
     cache_type c(3);
@@ -98,7 +98,7 @@ void test_mru_clear()
 {
     typedef boost::cache::entries::lru_entry<std::string> entry_type;
     typedef boost::cache::local_cache<
-        std::string, entry_type, std::greater<entry_type> 
+        std::string, entry_type, std::greater<entry_type>
     > cache_type;
 
     cache_type c(3);
@@ -121,7 +121,7 @@ void test_mru_clear()
 struct erase_func
 {
     erase_func(std::string const& key)
-      : key_(key) 
+      : key_(key)
     {}
 
     template <typename Entry>
@@ -137,7 +137,7 @@ void test_mru_erase_one()
 {
     typedef boost::cache::entries::lru_entry<std::string> entry_type;
     typedef boost::cache::local_cache<
-        std::string, entry_type, std::greater<entry_type> 
+        std::string, entry_type, std::greater<entry_type>
     > cache_type;
 
     cache_type c(3);
@@ -165,7 +165,7 @@ void test_mru_update()
 {
     typedef boost::cache::entries::lru_entry<std::string> entry_type;
     typedef boost::cache::local_cache<
-        std::string, entry_type, std::greater<entry_type> 
+        std::string, entry_type, std::greater<entry_type>
     > cache_type;
 
     cache_type c(4);    // this time we can hold 4 items

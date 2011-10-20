@@ -1,6 +1,6 @@
 namespace boost { namespace logging {
 
-/** 
+/**
 @page customize_manipulator Customizing manipulator arguments (Advanced)
 
 FIXME

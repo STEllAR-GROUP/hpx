@@ -1,8 +1,8 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2007      Richard D Guidry Jr
 //  Copyright (c) 2011      Bryce Lelbach & Katelyn Kufahl
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_PARCELSET_PARCELPORT_MAR_26_2008_1214PM)
@@ -38,13 +38,13 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { 
+namespace hpx {
 
 namespace agas {
 
 struct HPX_EXPORT big_boot_barrier;
 
-} 
+}
 
 namespace parcelset
 {
@@ -68,11 +68,11 @@ namespace parcelset
             void(parcelport& pp, boost::shared_ptr<std::vector<char> > const&,
                  threads::thread_priority)
         > read_handler_type;
-    
+
         /// Construct the parcelport on the given locality.
         ///
         /// \param io_service_pool
-        ///                 [in] The pool of networking threads to use to serve 
+        ///                 [in] The pool of networking threads to use to serve
         ///                 incoming requests
         /// \param here     [in] The locality this instance should listen at.
         parcelport(util::io_service_pool& io_service_pool
@@ -80,30 +80,30 @@ namespace parcelset
 
         ~parcelport();
 
-        /// Start the parcelport I/O thread pool. 
+        /// Start the parcelport I/O thread pool.
         ///
-        /// \param blocking [in] If blocking is set to \a true the routine will 
+        /// \param blocking [in] If blocking is set to \a true the routine will
         ///                 not return before stop() has been called, otherwise
         ///                 the routine returns immediately.
         bool run(bool blocking = true);
 
         /// Stop the parcelport I/O thread pool.
         ///
-        /// \param blocking [in] If blocking is set to \a false the routine will 
+        /// \param blocking [in] If blocking is set to \a false the routine will
         ///                 return immediately, otherwise it will wait for all
         ///                 worker threads to exit.
         void stop(bool blocking = true);
 
-        /// Queues a parcel for transmission to another locality 
+        /// Queues a parcel for transmission to another locality
         ///
-        /// \note The function put_parcel() is asynchronous, the provided   
-        /// function or function object gets invoked on completion of the send 
+        /// \note The function put_parcel() is asynchronous, the provided
+        /// function or function object gets invoked on completion of the send
         /// operation or on any error.
         ///
-        /// \param p        [in, out] A reference to the parcel to send. The 
-        ///                 parcel \a p will be modified in place, as it will 
-        ///                 parcel \a p will be modified in place, as it will 
-        ///                 get set the resolved destination address and parcel 
+        /// \param p        [in, out] A reference to the parcel to send. The
+        ///                 parcel \a p will be modified in place, as it will
+        ///                 parcel \a p will be modified in place, as it will
+        ///                 get set the resolved destination address and parcel
         ///                 id (if not already set).
         /// \param f        [in] A function object to be invoked on successful
         ///                 completion or on errors. The signature of this
@@ -111,7 +111,7 @@ namespace parcelset
         ///
         /// \code
         ///      void handler(boost::system::error_code const& err,
-        ///                   std::size_t bytes_written); 
+        ///                   std::size_t bytes_written);
         /// \endcode
         void put_parcel(parcel& p, write_handler_type f)
         {
@@ -119,10 +119,10 @@ namespace parcelset
             send_parcel(p, p.get_destination_addr(), f);
         }
 
-        /// Register an event handler to be called whenever a parcel has been 
+        /// Register an event handler to be called whenever a parcel has been
         /// received.
         ///
-        /// \param sink     [in] A function object to be invoked whenever a 
+        /// \param sink     [in] A function object to be invoked whenever a
         ///                 parcel has been received by the parcelport. The
         ///                 signature of this function object is expected to be:
         ///
@@ -141,7 +141,7 @@ namespace parcelset
             parcels_.register_event_handler(sink);
         }
 
-        /// \brief Allow access to the locality this parcelport is associated 
+        /// \brief Allow access to the locality this parcelport is associated
         /// with.
         ///
         /// This accessor returns a reference to the locality this parcelport
@@ -166,8 +166,8 @@ namespace parcelset
             return id_range_;
         }
 
-        void set_range(naming::gid_type const& lower, naming::gid_type const& upper) 
-        { 
+        void set_range(naming::gid_type const& lower, naming::gid_type const& upper)
+        {
             id_range_.set_range(lower, upper);
         }
 
@@ -191,7 +191,7 @@ namespace parcelset
             server::parcelport_connection_ptr);
 
         /// send the parcel to the specified address
-        void send_parcel(parcel const& p, naming::address const& addr, 
+        void send_parcel(parcel const& p, naming::address const& addr,
             write_handler_type f);
 
     private:
@@ -215,7 +215,7 @@ namespace parcelset
 
         /// Parcel timers and their data containers.
         util::high_resolution_timer timer_;
- 
+
         performance_counters::parcels::gatherer parcels_sent_;
         performance_counters::parcels::gatherer parcels_received_;
     };

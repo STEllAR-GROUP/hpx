@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-//  Copyright (c) 2011      Bryce Lelbach 
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Copyright (c) 2011      Bryce Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -47,7 +47,7 @@ namespace hpx { namespace naming
                 }
             }
             catch (hpx::exception const& e) {
-                LTM_(error) 
+                LTM_(error)
                     << "Unhandled exception while executing decrement_refcnt:"
                     << e.what();
             }
@@ -55,27 +55,27 @@ namespace hpx { namespace naming
         }
 
 
-        // custom deleter for managed gid_types, will be called when the last 
+        // custom deleter for managed gid_types, will be called when the last
         // copy of the corresponding naming::id_type goes out of scope
         void gid_managed_deleter (id_type_impl* p)
         {
-            // a credit of zero means the component is not (globally) reference 
+            // a credit of zero means the component is not (globally) reference
             // counted
             boost::uint32_t credits = get_credit_from_gid(*p);
-            if (0 != credits) 
+            if (0 != credits)
             {
                 // We take over the ownership of the gid_type object here
-                // as the shared_ptr is assuming it has been properly deleted 
+                // as the shared_ptr is assuming it has been properly deleted
                 // already. The actual deletion happens in the decrement_refcnt
                 // once it is executed.
                 error_code ec;
-                applier::register_work(boost::bind(decrement_refcnt, p), 
-                    "decrement global gid reference count", 
-                    threads::thread_state(threads::pending), 
+                applier::register_work(boost::bind(decrement_refcnt, p),
+                    "decrement global gid reference count",
+                    threads::thread_state(threads::pending),
                     threads::thread_priority_normal, std::size_t(-1), ec);
-                if (ec) 
+                if (ec)
                 {
-                    // if we are not able to spawn a new thread, we need to execute 
+                    // if we are not able to spawn a new thread, we need to execute
                     // the deleter directly
                     decrement_refcnt(p);
                 }
@@ -85,7 +85,7 @@ namespace hpx { namespace naming
             }
         }
 
-        // custom deleter for unmanaged gid_types, will be called when the last 
+        // custom deleter for unmanaged gid_types, will be called when the last
         // copy of the corresponding naming::id_type goes out of scope
         void gid_unmanaged_deleter (id_type_impl* p)
         {
@@ -97,7 +97,7 @@ namespace hpx { namespace naming
             delete p;   // delete local gid representation only
         }
 
-        bool id_type_impl::is_local_cached() 
+        bool id_type_impl::is_local_cached()
         {
             applier::applier& appl = applier::get_applier();
             gid_type::mutex_type::scoped_lock l(this);
@@ -121,7 +121,7 @@ namespace hpx { namespace naming
                 valid = address_ ? true : false;
             }
 
-            if (!valid && !resolve()) 
+            if (!valid && !resolve())
                 return false;
 
             applier::applier& appl = applier::get_applier();
@@ -138,7 +138,7 @@ namespace hpx { namespace naming
             }
 
             // if it already has been resolved, just return the address
-            if (!valid && !resolve()) 
+            if (!valid && !resolve())
                 return false;
 
             addr = address_;
@@ -189,7 +189,7 @@ namespace hpx { namespace naming
         if (isvalid) {
             management_type m = get_management_type();
             gid_type const& g = *gid_;
-            ar << m; 
+            ar << m;
             ar << g;
         }
     }
@@ -227,21 +227,21 @@ namespace hpx { namespace naming
     ///////////////////////////////////////////////////////////////////////////
     // explicit instantiation for the correct archive types
 #if HPX_USE_PORTABLE_ARCHIVES != 0
-    template HPX_EXPORT void 
+    template HPX_EXPORT void
     id_type::save(util::portable_binary_oarchive&, const unsigned int version) const;
 
-    template HPX_EXPORT void 
+    template HPX_EXPORT void
     id_type::load(util::portable_binary_iarchive&, const unsigned int version);
 #else
-    template HPX_EXPORT void 
+    template HPX_EXPORT void
     id_type::save(boost::archive::binary_oarchive&, const unsigned int version) const;
 
-    template HPX_EXPORT void 
+    template HPX_EXPORT void
     id_type::load(boost::archive::binary_iarchive&, const unsigned int version);
 #endif
-    
+
     ///////////////////////////////////////////////////////////////////////////
-    char const* const management_type_names[] = 
+    char const* const management_type_names[] =
     {
         "unknown_deleter",    // -1
         "unmanaged",          // 0

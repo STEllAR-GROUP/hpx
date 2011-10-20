@@ -1,6 +1,6 @@
 namespace boost { namespace logging {
 
-/** 
+/**
 @page boost_logging_requirements Boost.Logging Requirements
 
 The following are my take on what this wiki page has to say:
@@ -9,23 +9,23 @@ http://www.crystalclearsoftware.com/cgi-bin/boost_wiki/wiki.pl?Boost.Logging
 Last update of this page : 12 Nov 2007
 
 
-- @ref bl_requirements_major 
+- @ref bl_requirements_major
     - @ref bl_requirements_ts
-    - @ref bl_requirements_scope 
-    - @ref bl_requirements_eliminate 
-    - @ref bl_requirements_lazy 
-    - @ref bl_requirements_sinks 
-    - @ref bl_requirements_exception 
-    - @ref bl_requirements_tags 
-    - @ref bl_requirements_i18 
-    - @ref bl_requirements_filt 
-    - @ref bl_requirements_attr 
-    - @ref bl_requirements_exc_support 
-- @ref bl_requirements_design 
-    - @ref bl_requirements_config_msg_attr 
-    - @ref bl_requirements_global_macro 
-    - @ref bl_requirements_general_thoughts 
-- @ref bl_requirements_your_say 
+    - @ref bl_requirements_scope
+    - @ref bl_requirements_eliminate
+    - @ref bl_requirements_lazy
+    - @ref bl_requirements_sinks
+    - @ref bl_requirements_exception
+    - @ref bl_requirements_tags
+    - @ref bl_requirements_i18
+    - @ref bl_requirements_filt
+    - @ref bl_requirements_attr
+    - @ref bl_requirements_exc_support
+- @ref bl_requirements_design
+    - @ref bl_requirements_config_msg_attr
+    - @ref bl_requirements_global_macro
+    - @ref bl_requirements_general_thoughts
+- @ref bl_requirements_your_say
 
 
 
@@ -68,9 +68,9 @@ Most likely, you'd have something like this:
 
 @code
 #ifndef ELIMINATE_LOG_STATEMENTS
-BOOST_DECLARE_LOG_FILTER(g_log_filter, some_filter_class) 
+BOOST_DECLARE_LOG_FILTER(g_log_filter, some_filter_class)
 #else
-BOOST_DECLARE_LOG_FILTER(g_log_filter, filter::always_disabled) 
+BOOST_DECLARE_LOG_FILTER(g_log_filter, filter::always_disabled)
 #endif
 @endcode
 
@@ -85,7 +85,7 @@ Example:
 #ifndef ELIMINATE_LOG_STATEMENTS
 #define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() ) .set_tag( BOOST_LOG_TAG_FILELINE)
 #else
-#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() ) 
+#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() )
 #endif
 @endcode
 
@@ -144,7 +144,7 @@ a wrapper can be provided.
 @subsection bl_requirements_global_macro Macro access (JD)
 
 Don't agree. You will need to have a logger defined somewhere. Note that when you define your macros, you can choose
-which logger you use to log a certain message.  
+which logger you use to log a certain message.
 
 
 @subsection bl_requirements_general_thoughts General Thoghths

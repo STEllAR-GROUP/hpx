@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_FILESYSTEM_COMPATIBILITY_JAN_28_2010_0833PM)
@@ -20,12 +20,12 @@ namespace hpx { namespace util
 // interface wrappers for older Boost versions
     inline boost::filesystem::path initial_path()
     {
-        return boost::filesystem::initial_path(); 
+        return boost::filesystem::initial_path();
     }
 
     inline boost::filesystem::path current_path()
     {
-        return boost::filesystem::current_path(); 
+        return boost::filesystem::current_path();
     }
 
     template <typename String>
@@ -38,18 +38,18 @@ namespace hpx { namespace util
 #endif
     }
 
-    inline std::string leaf(boost::filesystem::path const& p) 
-    { 
+    inline std::string leaf(boost::filesystem::path const& p)
+    {
 #if BOOST_FILESYSTEM_VERSION >= 3
-        return p.leaf().string(); 
+        return p.leaf().string();
 #else
-        return p.leaf(); 
+        return p.leaf();
 #endif
     }
 
-    inline boost::filesystem::path branch_path(boost::filesystem::path const& p) 
-    { 
-        return p.branch_path(); 
+    inline boost::filesystem::path branch_path(boost::filesystem::path const& p)
+    {
+        return p.branch_path();
     }
 
     inline boost::filesystem::path normalize(boost::filesystem::path& p)
@@ -57,12 +57,12 @@ namespace hpx { namespace util
         return p.normalize();
     }
 
-    inline std::string native_file_string(boost::filesystem::path const& p) 
-    { 
+    inline std::string native_file_string(boost::filesystem::path const& p)
+    {
 #if BOOST_FILESYSTEM_VERSION >= 3
-        return p.string(); 
+        return p.string();
 #else
-        return p.native_file_string(); 
+        return p.native_file_string();
 #endif
     }
 
@@ -90,7 +90,7 @@ namespace hpx { namespace util
 
 // interface wrappers if deprecated functions do not exist
     inline boost::filesystem::path initial_path()
-    { 
+    {
 #if BOOST_FILESYSTEM_VERSION >= 3
         return boost::filesystem3::detail::initial_path();
 #else
@@ -99,7 +99,7 @@ namespace hpx { namespace util
     }
 
     inline boost::filesystem::path current_path()
-    { 
+    {
 #if BOOST_FILESYSTEM_VERSION >= 3
         return boost::filesystem3::current_path();
 #else
@@ -113,18 +113,18 @@ namespace hpx { namespace util
         return boost::filesystem::path(p);
     }
 
-    inline std::string leaf(boost::filesystem::path const& p) 
-    { 
+    inline std::string leaf(boost::filesystem::path const& p)
+    {
 #if BOOST_VERSION >= 104600 && BOOST_FILESYSTEM_VERSION >= 3
         return p.filename().string();
 #else
-        return p.filename(); 
+        return p.filename();
 #endif
     }
 
-    inline boost::filesystem::path branch_path(boost::filesystem::path const& p) 
-    { 
-        return p.parent_path(); 
+    inline boost::filesystem::path branch_path(boost::filesystem::path const& p)
+    {
+        return p.parent_path();
     }
 
     inline boost::filesystem::path normalize(boost::filesystem::path& p)
@@ -132,12 +132,12 @@ namespace hpx { namespace util
         return p; // function doesn't exist anymore
     }
 
-    inline std::string native_file_string(boost::filesystem::path const& p) 
-    { 
+    inline std::string native_file_string(boost::filesystem::path const& p)
+    {
 #if BOOST_VERSION >= 104600
-        return p.string(); 
+        return p.string();
 #else
-        return p.file_string(); 
+        return p.file_string();
 #endif
     }
 

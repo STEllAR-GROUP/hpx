@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_COMPONENTS_STUBS_STUB_BASE_CLIENT_OCT_31_2008_0441PM)
@@ -15,7 +15,7 @@ namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename ServerComponent>
-    struct stub_base 
+    struct stub_base
     {
         typedef ServerComponent server_component_type;
 
@@ -29,7 +29,7 @@ namespace hpx { namespace components
         ///////////////////////////////////////////////////////////////////////
         /// Asynchronously create a new instance of a component
         static lcos::promise<naming::id_type, naming::gid_type>
-        create_async(naming::gid_type const& gid, 
+        create_async(naming::gid_type const& gid,
             component_type type, std::size_t count = 1)
         {
             return stubs::runtime_support::create_component_async(gid, type, count);
@@ -42,7 +42,7 @@ namespace hpx { namespace components
         }
 
         static lcos::promise<naming::id_type, naming::gid_type>
-        create_async(naming::id_type const& gid, 
+        create_async(naming::id_type const& gid,
             component_type type, std::size_t count = 1)
         {
             return stubs::runtime_support::create_component_async(
@@ -57,7 +57,7 @@ namespace hpx { namespace components
 
         /// Create a new instance of an simple_accumulator
         static naming::id_type
-        create_sync(naming::gid_type const& gid, component_type type, 
+        create_sync(naming::gid_type const& gid, component_type type,
             std::size_t count = 1)
         {
             return stubs::runtime_support::create_component(gid, type, count);
@@ -70,7 +70,7 @@ namespace hpx { namespace components
         }
 
         static naming::id_type
-        create_sync(naming::id_type const& gid, component_type type, 
+        create_sync(naming::id_type const& gid, component_type type,
             std::size_t count = 1)
         {
             return stubs::runtime_support::create_component(
@@ -84,11 +84,11 @@ namespace hpx { namespace components
         }
 
         ///////////////////////////////////////////////////////////////////////
-        /// Asynchronously create a new instance of a component while passing 
+        /// Asynchronously create a new instance of a component while passing
         /// one argument to it's constructor
         template <typename Arg0>
         static lcos::promise<naming::id_type, naming::gid_type>
-        create_one_async(naming::gid_type const& gid, component_type type, 
+        create_one_async(naming::gid_type const& gid, component_type type,
             Arg0 const& arg0)
         {
             return stubs::runtime_support::create_one_component_async(gid, type, arg0);
@@ -103,7 +103,7 @@ namespace hpx { namespace components
 
         template <typename Arg0>
         static lcos::promise<naming::id_type, naming::gid_type>
-        create_one_async(naming::id_type const& gid, component_type type, 
+        create_one_async(naming::id_type const& gid, component_type type,
             Arg0 const& arg0)
         {
             return stubs::runtime_support::create_one_component_async(

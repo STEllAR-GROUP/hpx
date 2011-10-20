@@ -84,10 +84,10 @@ namespace server
 {
 
 struct HPX_COMPONENT_EXPORT output_stream
-    : components::managed_component_base<output_stream> 
+    : components::managed_component_base<output_stream>
 {
     // {{{ types
-    typedef components::managed_component_base<output_stream> base_type; 
+    typedef components::managed_component_base<output_stream> base_type;
 
     typedef hpx::util::spinlock mutex_type;
     // }}}
@@ -103,13 +103,13 @@ struct HPX_COMPONENT_EXPORT output_stream
         );
 
     void call_write_sync(
-        buffer const& in 
+        buffer const& in
       , threads::thread_id_type caller
         );
 
   public:
     explicit output_stream(write_function_type write_f_ = write_function_type())
-        : write_f(write_f_) {} 
+        : write_f(write_f_) {}
 
     // STL OutputIterator
     template <typename Iterator>

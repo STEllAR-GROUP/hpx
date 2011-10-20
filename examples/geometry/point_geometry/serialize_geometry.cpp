@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2007-2011 Matthew Anderson
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -49,32 +49,32 @@ namespace boost { namespace serialization
     ///////////////////////////////////////////////////////////////////////////
     // explicit instantiation for the correct archive types
 #if HPX_USE_PORTABLE_ARCHIVES != 0
-//     template HPX_COMPONENT_EXPORT void 
-//     save(hpx::util::portable_binary_oarchive&, 
+//     template HPX_COMPONENT_EXPORT void
+//     save(hpx::util::portable_binary_oarchive&,
 //         hpx::geometry::plain_point_type const&, unsigned int const);
-    template HPX_COMPONENT_EXPORT void 
-    load(hpx::util::portable_binary_iarchive&, 
+    template HPX_COMPONENT_EXPORT void
+    load(hpx::util::portable_binary_iarchive&,
         hpx::geometry::plain_point_type&, unsigned int const);
 
-    template HPX_COMPONENT_EXPORT void 
-    save(hpx::util::portable_binary_oarchive&, 
+    template HPX_COMPONENT_EXPORT void
+    save(hpx::util::portable_binary_oarchive&,
         hpx::geometry::plain_polygon_type const&, unsigned int const);
-    template HPX_COMPONENT_EXPORT void 
-    load(hpx::util::portable_binary_iarchive&, 
+    template HPX_COMPONENT_EXPORT void
+    load(hpx::util::portable_binary_iarchive&,
         hpx::geometry::plain_polygon_type&, unsigned int const);
 #else
-    template HPX_COMPONENT_EXPORT void 
-    save(boost::archive::binary_oarchive&, 
+    template HPX_COMPONENT_EXPORT void
+    save(boost::archive::binary_oarchive&,
         hpx::geometry::plain_point_type const&, unsigned int const);
-    template HPX_COMPONENT_EXPORT void 
-    load(boost::archive::binary_iarchive&, 
+    template HPX_COMPONENT_EXPORT void
+    load(boost::archive::binary_iarchive&,
         hpx::geometry::plain_point_type&, unsigned int const);
 
-    template HPX_COMPONENT_EXPORT void 
-    save(boost::archive::binary_oarchive&, 
+    template HPX_COMPONENT_EXPORT void
+    save(boost::archive::binary_oarchive&,
         hpx::geometry::plain_polygon_type const&, unsigned int const);
-    template HPX_COMPONENT_EXPORT void 
-    load(boost::archive::binary_iarchive&, 
+    template HPX_COMPONENT_EXPORT void
+    load(boost::archive::binary_iarchive&,
         hpx::geometry::plain_polygon_type&, unsigned int const);
 #endif
 }}

@@ -2,7 +2,7 @@
 # Copyright (c) 2007-2009 Hartmut Kaiser
 # Copyright (c) 2009-2011 Matthew Anderson
 #
-# Distributed under the Boost Software License, Version 1.0. (See accompanying 
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 ###############################################################################
@@ -52,9 +52,9 @@ source_group("Header Files\\Stubs"  FILES ${stubs_headers})
 source_group("Header Files\\Server" FILES ${server_headers})
 
 ###############################################################################
-add_hpx_component(adaptive1d_dataflow 
+add_hpx_component(adaptive1d_dataflow
   MODULE adaptive1d
-  SOURCES ${sources} 
+  SOURCES ${sources}
   HEADERS ${headers}
   DEPENDENCIES adaptive1d_stencil_component
                distributing_factory_component)

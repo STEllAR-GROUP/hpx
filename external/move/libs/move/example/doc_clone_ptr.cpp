@@ -27,7 +27,7 @@ class Base
 
    Base& operator=(BOOST_COPY_ASSIGN_REF(Base) x)
    {/**/ return *this;}                   // Copy assign
-   
+
    virtual Base *clone() const
    {  return new Base(*this);  }
 };
@@ -61,7 +61,7 @@ class Derived : public Base
    // Compiler-generated copy constructor...
 
    Derived(BOOST_RV_REF(Derived) x)             // Move ctor
-      : Base(boost::move(static_cast<Base&>(x))), 
+      : Base(boost::move(static_cast<Base&>(x))),
         mem_(boost::move(x.mem_)) { }
 
    Derived& operator=(BOOST_RV_REF(Derived) x)  // Move assign
@@ -96,7 +96,7 @@ class clone_ptr
 
    // Destruction
    ~clone_ptr() { delete ptr; }
-   
+
    clone_ptr(const clone_ptr& p) // Copy constructor (as usual)
       : ptr(p.ptr ? p.ptr->clone() : 0) {}
 

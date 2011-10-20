@@ -54,12 +54,12 @@ namespace array {
 
 namespace writer {
     template<
-            class formatter_base, 
+            class formatter_base,
             class destination_base,
             class lock_resource ,
             class apply_format_and_write ,
             class router_type ,
-            class formatter_array , 
+            class formatter_array ,
             class destination_array >
     struct format_write ;
 }
@@ -67,13 +67,13 @@ namespace writer {
 
 namespace detail {
 
-    //////////// find_format_write_params 
+    //////////// find_format_write_params
     template<class string, class formatter_base, class destination_base, class lock_resource> struct find_format_write_params {
         typedef typename ::boost::logging::format_and_write::simple<string> apply_format_and_write ;
         typedef typename ::boost::logging::msg_route::simple<formatter_base, destination_base, lock_resource> router_type;
     };
 
-    template<class string_type, class formatter_base, class destination_base, class lock_resource> 
+    template<class string_type, class formatter_base, class destination_base, class lock_resource>
         struct find_format_write_params< typename boost::logging::optimize::cache_string_several_str<string_type>, formatter_base, destination_base, lock_resource>
     {
         typedef typename boost::logging::optimize::cache_string_several_str<string_type> cache_string;
@@ -130,7 +130,7 @@ namespace detail {
         typedef typename use_default<destination_base_type, default_destination_base > ::type destination_base;
         typedef typename use_default<lock_resource, default_lock_resource > ::type lock_resource_type;
 
-        
+
 
         typedef typename detail::find_format_write_params<format_msg_type, format_base, destination_base, lock_resource_type >::apply_format_and_write apply_format_and_write;
         typedef typename detail::find_format_write_params<format_msg_type, format_base, destination_base, lock_resource_type >::router_type router_type;
@@ -139,11 +139,11 @@ namespace detail {
         typedef ::boost::logging::array::shared_ptr_holder<destination_base, boost::logging::threading::mutex > destination_array ;
 
         // now find the writer based on thread safety
-        typedef writer::format_write< 
-            format_base, 
-            destination_base, 
-            lock_resource_type, 
-            apply_format_and_write, 
+        typedef writer::format_write<
+            format_base,
+            destination_base,
+            lock_resource_type,
+            apply_format_and_write,
             router_type,
             formatter_array,
             destination_array > format_write_type;

@@ -21,7 +21,7 @@ struct X
     {
         std::cout << "X" << id << ": construct\n";
     }
-    
+
     X(X const& rhs) : id(instances++)
     {
         std::cout << "X" << id << ": <- " << "X" << rhs.id << ": **copy**\n";
@@ -42,18 +42,18 @@ struct X
         std::cout << "X" << id << ": <- " << "X" << rhs.id << ": move assign\n";
         return *this;
     }
-    
+
     X(BOOST_RV_REF(X) rhs) : id(instances++)
     {
         std::cout << "X" << id << ": <- " << "X" << rhs.id << ": ..move construct..\n";
         ++copies;
     }
-#endif 
+#endif
 
     ~X() { std::cout << "X" << id << ": destroy\n"; }
 
     unsigned id;
-    
+
     static unsigned copies;
     static unsigned instances;
 
@@ -95,12 +95,12 @@ struct trace
     {
         std::cout << "->: " << name << "\n";
     }
-    
+
     ~trace()
     {
         std::cout << "<-: " << name << "\n";
     }
-    
+
     char const* name;
 };
 
@@ -147,7 +147,7 @@ int main(int argc, char* argv[])
     // Double parens prevent "most vexing parse"
     CHECK_COPIES( X a(( lvalue() )), 1, 1, "Direct initialization from lvalue");
     CHECK_COPIES( X a(( rvalue() )), 0, 1, "Direct initialization from rvalue");
-    
+
     CHECK_COPIES( X a = lvalue(), 1, 1, "Copy initialization from lvalue" );
     CHECK_COPIES( X a = rvalue(), 0, 1, "Copy initialization from rvalue" );
 
@@ -159,7 +159,7 @@ int main(int argc, char* argv[])
 
     // Just to prove these things compose properly
     CHECK_COPIES( X a(urvo_source()), 0, 2, "Return value used as ctor arg" );
-    
+
     // Expect to miss one possible elision here
     CHECK_COPIES( identity( rvalue() ), 0, 2, "Return rvalue passed by value" );
 

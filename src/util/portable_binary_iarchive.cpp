@@ -1,7 +1,7 @@
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
 // portable_binary_iarchive.cpp
 
-// (C) Copyright 2002 Robert Ramey - http://www.rrsd.com . 
+// (C) Copyright 2002 Robert Ramey - http://www.rrsd.com .
 // Use, modification and distribution is subject to the Boost Software
 // License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -17,8 +17,8 @@
 // export the defined functions
 #define BOOST_ARCHIVE_SOURCE
 
-// this hack is needed to properly compile this shared library, allowing to 
-// export the symbols and auto link with the serialization 
+// this hack is needed to properly compile this shared library, allowing to
+// export the symbols and auto link with the serialization
 #if !defined(BOOST_ALL_NO_LIB) && !defined(BOOST_SERIALIZATION_NO_LIB)
 // Set the name of our library, this will get undef'ed by auto_link.hpp
 // once it's done with it:
@@ -77,7 +77,7 @@ portable_binary_iarchive::load_impl(boost::intmax_t & l, char maxsize){
         if(m_flags & endian_big)
     #endif
             reverse_bytes(size, cptr);
-    
+
     if(negative)
         l = -l;
 }
@@ -123,7 +123,7 @@ portable_binary_iarchive::init(unsigned int flags){
                     boost::archive::archive_exception::unsupported_version
                 )
             );
-        
+
         #if BOOST_WORKAROUND(__MWERKS__, BOOST_TESTED_AT(0x3205))
         this->set_library_version(input_library_version);
         //#else
@@ -174,7 +174,7 @@ namespace archive {
 
 template class basic_binary_iprimitive<
     hpx::util::portable_binary_iarchive,
-    std::istream::char_type, 
+    std::istream::char_type,
     std::istream::traits_type
 > ;
 

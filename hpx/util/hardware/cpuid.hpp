@@ -63,12 +63,12 @@
     };
 
     const cpuid_table_type cpuid_table[] = {
-        {cpu_feature::clflush, "clflush", 0x00000001, cpuid_register::edx, 19}, 
-        {cpu_feature::cx8,     "cx8",     0x00000001, cpuid_register::edx, 8},  
-        {cpu_feature::cx16,    "cx16",    0x00000001, cpuid_register::ecx, 13}, 
-        {cpu_feature::cmovcc,  "cmovcc",  0x00000001, cpuid_register::edx, 15}, 
+        {cpu_feature::clflush, "clflush", 0x00000001, cpuid_register::edx, 19},
+        {cpu_feature::cx8,     "cx8",     0x00000001, cpuid_register::edx, 8},
+        {cpu_feature::cx16,    "cx16",    0x00000001, cpuid_register::ecx, 13},
+        {cpu_feature::cmovcc,  "cmovcc",  0x00000001, cpuid_register::edx, 15},
         {cpu_feature::msr,     "msr",     0x00000001, cpuid_register::edx, 5},
-        {cpu_feature::rdtsc,   "rdtsc",   0x00000001, cpuid_register::edx, 4}, 
+        {cpu_feature::rdtsc,   "rdtsc",   0x00000001, cpuid_register::edx, 4},
         {cpu_feature::rdtscp,  "rdtscp",  0x80000001, cpuid_register::edx, 27},
         {cpu_feature::mmx,     "mmx",     0x00000001, cpuid_register::edx, 23},
         {cpu_feature::sse,     "sse",     0x00000001, cpuid_register::edx, 25},

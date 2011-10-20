@@ -28,7 +28,7 @@
 
 namespace boost { namespace logging { namespace formatter {
 
-/** 
+/**
 @brief Writes the thread_id to the log
 
 @param convert [optional] In case there needs to be a conversion between std::(w)string and the string that holds your logged message. See convert_format.
@@ -39,7 +39,7 @@ template<class convert = do_convert_format::prepend> struct thread_id_t : is_gen
 
     template<class msg_type> void operator()(msg_type & msg) const {
         std::basic_ostringstream<char_type> out;
-        out 
+        out
     #if defined (BOOST_HAS_WINTHREADS)
             << ::GetCurrentThreadId()
     #elif defined (BOOST_HAS_PTHREADS)

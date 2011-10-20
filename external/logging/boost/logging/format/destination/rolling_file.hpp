@@ -21,9 +21,9 @@
 # pragma once
 #endif
 
-#if defined(_MSC_VER) 
+#if defined(_MSC_VER)
 #pragma warning ( disable : 4355)
-#endif 
+#endif
 
 #include <boost/version.hpp>
 #include <boost/logging/detail/fwd.hpp>
@@ -38,19 +38,19 @@
 namespace boost { namespace logging { namespace destination {
 
 
-/** 
+/**
     @brief Settings you can pass to the rolling file. To see how it's used, see @ref dealing_with_flags.
 */
 struct rolling_file_settings {
     typedef ::boost::logging::detail::flag<rolling_file_settings> flag;
 
-    rolling_file_settings() 
+    rolling_file_settings()
         : max_size_bytes(this, 1024 * 1024)
         , file_count(this, 10)
         , initial_erase(this, false)
-        , start_where_size_not_exceeded(this, true) 
+        , start_where_size_not_exceeded(this, true)
         , flush_each_time(this, false)
-        , extra_flags(this, std::ios_base::out) 
+        , extra_flags(this, std::ios_base::out)
     {}
 
     /// maximum size in bytes, by default 1Mb
@@ -71,10 +71,10 @@ struct rolling_file_settings {
 };
 
 namespace detail {
-    template<class convert_dest > 
+    template<class convert_dest >
     struct rolling_file_info {
-        
-        rolling_file_info (const std::string& name_prefix, rolling_file_settings flags ) 
+
+        rolling_file_info (const std::string& name_prefix, rolling_file_settings flags )
                 // many thanks to Martin Bauer
                 : m_name_prefix(name_prefix), m_flags(flags), m_cur_idx(0) {
 
@@ -94,7 +94,7 @@ namespace detail {
 
         void restart() {
             namespace fs = boost::filesystem;
-            
+
             if ( m_flags.initial_erase()) {
                 for ( unsigned idx = 0; idx < m_flags.file_count(); ++idx)
                     if ( fs::exists( file_name(idx) ))
@@ -122,7 +122,7 @@ namespace detail {
         }
 
         std::string file_name(unsigned idx) {
-            std::ostringstream out; 
+            std::ostringstream out;
             if ( idx > 0)
                 out << m_name_prefix << "." << (idx+1);
             else
@@ -150,11 +150,11 @@ namespace detail {
             if ( m_out->tellp() > m_flags.max_size_bytes()) {
                 m_cur_idx = (m_cur_idx + 1) % m_flags.file_count();
                 recreate_file();
-            }            
+            }
         }
 
         void flush() {
-            m_out->flush();            
+            m_out->flush();
         }
 
         boost::shared_ptr< std::basic_ofstream<char_type> > m_out;
@@ -165,7 +165,7 @@ namespace detail {
     };
 }
 
-/** 
+/**
     @brief Writes to multiple files: name_prefix.1, name_prefix.2, ... name_prefix.N, and then restarts from 1.
 
     We first write to name_prefix.1.
@@ -176,11 +176,11 @@ namespace detail {
 template<class convert_dest = do_convert_destination > struct rolling_file_t : is_generic, non_const_context<detail::rolling_file_info<convert_dest> > {
     typedef non_const_context< detail::rolling_file_info<convert_dest> > non_const_context_base;
 
-    /** 
+    /**
         Constructs a rolling file
 
         @param name_prefix the name to be used as prefix for the files
-        
+
         @param flags [optional] extra settings to pass to the rolling file. See rolling_file_settings and @ref dealing_with_flags.
     */
     rolling_file_t(const std::string & name_prefix, rolling_file_settings flags = rolling_file_settings() ) : non_const_context_base(name_prefix, flags) {}
@@ -193,14 +193,14 @@ template<class convert_dest = do_convert_destination > struct rolling_file_t : i
         return non_const_context_base::context().m_name_prefix == other.context().m_name_prefix;
     }
 
-    /** 
-        manual flush()ing the currently opened file. 
+    /**
+        manual flush()ing the currently opened file.
     */
     void flush() {
         non_const_context_base::context().flush();
     }
 
-    /** configure through script 
+    /** configure through script
         right now, you can only specify the file name prefix
     */
     void configure(const hold_string_type & str) {

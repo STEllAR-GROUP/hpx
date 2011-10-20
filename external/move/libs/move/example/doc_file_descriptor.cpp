@@ -40,7 +40,7 @@ class file_descriptor
 
    file_descriptor(BOOST_RV_REF(file_descriptor) x)            // Move ctor
       :  os_descr_(x.os_descr_)
-   {  x.os_descr_ = 0;  }      
+   {  x.os_descr_ = 0;  }
 
    file_descriptor& operator=(BOOST_RV_REF(file_descriptor) x) // Move assign
    {

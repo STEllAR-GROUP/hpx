@@ -25,7 +25,7 @@ This example shows you how easy it is to add your custom formatter /destination 
 This usage:
 - You have one logger
 - You have one filter, which can be turned on or off
-- You want to format the message before it's written 
+- You want to format the message before it's written
 - The logger has several log destinations
     - The output goes to console, debug output window, and a file called out.txt - as XML
     - Formatting - prefix each message by its start time, its index, and append newline
@@ -83,9 +83,9 @@ typedef logger_format_write< default_, default_, writer::threading::no_ts > logg
 
 
 BOOST_DECLARE_LOG_FILTER(g_log_filter, filter::no_ts )
-BOOST_DECLARE_LOG(g_l, logger_type) 
+BOOST_DECLARE_LOG(g_l, logger_type)
 
-#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() ) 
+#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() )
 
 BOOST_DEFINE_LOG(g_l, logger_type)
 BOOST_DEFINE_LOG_FILTER(g_log_filter, filter::no_ts )
@@ -107,14 +107,14 @@ struct secs_since_start : formatter::class_<secs_since_start, formatter::impleme
 
 // Example of custom destination:
 // Dump each message as XML
-struct as_xml : 
-        destination::class_<as_xml, destination::implement_op_equal::has_context>, 
+struct as_xml :
+        destination::class_<as_xml, destination::implement_op_equal::has_context>,
         destination::non_const_context<std::ofstream> {
 
     std::string m_name;
     as_xml(const char* name) : non_const_context_base(name), m_name(name) {}
     void operator()(param str) const {
-        context() << "<msg>" << str << "</msg>" << std::endl; 
+        context() << "<msg>" << str << "</msg>" << std::endl;
     }
 
     bool operator==(const as_xml& other) const { return m_name == other.m_name; }

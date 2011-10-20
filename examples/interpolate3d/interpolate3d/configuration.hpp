@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_INTERPOLATE3D_CONFIGURATION_AUG_07_2011_0703PM)
@@ -12,7 +12,7 @@
 
 #include "stubs/configuration.hpp"
 
-namespace interpolate3d 
+namespace interpolate3d
 {
     ///////////////////////////////////////////////////////////////////////////
     class configuration
@@ -25,37 +25,37 @@ namespace interpolate3d
 
     public:
         // create a new partition instance and initialize it synchronously
-        configuration(std::string const& datafilename, 
-                std::string const& symbolic_name, std::size_t num_instances) 
+        configuration(std::string const& datafilename,
+                std::string const& symbolic_name, std::size_t num_instances)
           : base_type(interpolate3d::stubs::configuration::create_sync(hpx::find_here()))
         {
             init(datafilename, symbolic_name, num_instances);
         }
-        configuration(hpx::naming::id_type gid, std::string const& datafilename, 
-                std::string const& symbolic_name, std::size_t num_instances) 
+        configuration(hpx::naming::id_type gid, std::string const& datafilename,
+                std::string const& symbolic_name, std::size_t num_instances)
           : base_type(interpolate3d::stubs::configuration::create_sync(gid))
         {
             init(datafilename, symbolic_name, num_instances);
         }
-        configuration(hpx::naming::id_type gid) 
-          : base_type(gid) 
+        configuration(hpx::naming::id_type gid)
+          : base_type(gid)
         {}
         configuration()
         {}
 
         ///////////////////////////////////////////////////////////////////////
         hpx::lcos::promise<void>
-        init_async(std::string const& datafile, 
+        init_async(std::string const& datafile,
             std::string const& symbolic_name, std::size_t num_instances)
         {
-            return stubs::configuration::init_async(this->gid_, datafile, 
+            return stubs::configuration::init_async(this->gid_, datafile,
                 symbolic_name, num_instances);
         }
 
-        void init(std::string const& datafile, std::string const& symbolic_name, 
+        void init(std::string const& datafile, std::string const& symbolic_name,
             std::size_t num_instances)
         {
-            stubs::configuration::init(this->gid_, datafile, symbolic_name, 
+            stubs::configuration::init(this->gid_, datafile, symbolic_name,
                 num_instances);
         }
 

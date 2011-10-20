@@ -23,7 +23,7 @@
 
 This usage:
 - You have one logger and one filter, which can be turned on or off
-- You want to format the message before it's written 
+- You want to format the message before it's written
 - The logger has several log destinations
     - The output goes to console, and a file called out.txt
     - Formatting - message will look like this: <tt>[file/line] [thread_id] [idx] [time] message [enter] </tt>
@@ -59,21 +59,21 @@ using namespace boost::logging;
 using namespace boost::logging::scenario::usage;
 typedef use<
         //  the filter is always accurate (but slow)
-        filter_::change::always_accurate, 
+        filter_::change::always_accurate,
         //  filter does not use levels
-        filter_::level::no_levels, 
+        filter_::level::no_levels,
         // the logger is initialized once, when only one thread is running
-        logger_::change::set_once_when_one_thread, 
+        logger_::change::set_once_when_one_thread,
         // the logger favors speed (on a dedicated thread)
         logger_::favor::speed> finder;
 
-BOOST_DECLARE_LOG_FILTER(g_log_filter, finder::filter ) 
-BOOST_DECLARE_LOG(g_l, finder::logger) 
+BOOST_DECLARE_LOG_FILTER(g_log_filter, finder::filter )
+BOOST_DECLARE_LOG(g_l, finder::logger)
 
 #define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() ) .set_tag( BOOST_LOG_TAG_FILELINE)
 
-BOOST_DEFINE_LOG_FILTER(g_log_filter, finder::filter ) 
-BOOST_DEFINE_LOG(g_l, finder::logger) 
+BOOST_DEFINE_LOG_FILTER(g_log_filter, finder::filter )
+BOOST_DEFINE_LOG(g_l, finder::logger)
 
 
 void using_tags_example() {
@@ -82,11 +82,11 @@ void using_tags_example() {
 
     g_l()->writer().add_formatter( formatter::named_spacer( "%fileline% [T%thread_id%] [%idx%] %time%" )
         .add( "time", formatter::tag::time("$mm:$ss ") )                // time tag
-        .add( "idx", formatter::idx() )                            
+        .add( "idx", formatter::idx() )
         .add( "thread_id", formatter::tag::thread_id() )                // thread_id tag
         .add( "fileline", formatter::tag::file_line() ) );              // file/line tag
 
-    g_l()->writer().add_formatter( formatter::append_newline() );     
+    g_l()->writer().add_formatter( formatter::append_newline() );
     g_l()->writer().add_destination( destination::cout() );
     g_l()->writer().add_destination( destination::file("out.txt") );
     g_l()->mark_as_initialized();

@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -52,7 +52,7 @@ namespace hpx { namespace parcelset
     {
         if (version > HPX_PARCEL_VERSION)
         {
-            HPX_THROW_EXCEPTION(version_too_new, 
+            HPX_THROW_EXCEPTION(version_too_new,
                 "parcel::load",
                 "trying to load parcel with unknown version");
         }
@@ -65,7 +65,7 @@ namespace hpx { namespace parcelset
 
         // Check for a source id.
         ar >> has_source_id;
-        if (has_source_id) 
+        if (has_source_id)
             ar >> source_id_;
 
         ar >> action_;
@@ -85,16 +85,16 @@ namespace hpx { namespace parcelset
     ///////////////////////////////////////////////////////////////////////////
     // explicit instantiation for the correct archive types
 #if HPX_USE_PORTABLE_ARCHIVES != 0
-    template HPX_EXPORT void 
+    template HPX_EXPORT void
     parcel::save(util::portable_binary_oarchive&, const unsigned int version) const;
 
-    template HPX_EXPORT void 
+    template HPX_EXPORT void
     parcel::load(util::portable_binary_iarchive&, const unsigned int version);
 #else
-    template HPX_EXPORT void 
+    template HPX_EXPORT void
     parcel::save(boost::archive::binary_oarchive&, const unsigned int version) const;
 
-    template HPX_EXPORT void 
+    template HPX_EXPORT void
     parcel::load(boost::archive::binary_iarchive&, const unsigned int version);
 #endif
 

@@ -23,12 +23,12 @@
 
 
 
-/* 
+/*
     make sure we don't need any of our headers included from here!
     we're included from fwd.hpp!
 */
 
-namespace boost { namespace logging { 
+namespace boost { namespace logging {
 
     struct override {};
 
@@ -42,7 +42,7 @@ namespace boost { namespace logging {
     namespace detail {
         /** this is just a simple way to always return override; however, in this case we postpone the instantiation
          until our template parameter is known
-        
+
 
         For instance:
         @code

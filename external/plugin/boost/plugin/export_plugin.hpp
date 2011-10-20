@@ -48,7 +48,7 @@
     BOOST_PP_CAT(boost_exported_plugins_force_load_,                          \
         BOOST_PLUGIN_NAME_2(name, base))                                      \
     /**/
-    
+
 ///////////////////////////////////////////////////////////////////////////////
 #define BOOST_PLUGIN_EXPORT(name, BaseType, ActualType, actualname, classname)\
     extern "C" BOOST_PLUGIN_EXPORT_API std::map<std::string, boost::any>&     \

@@ -1,6 +1,6 @@
 //  Copyright (c) 2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_A7F46A4F_9AF9_4909_B0D8_5304FEFC5649)

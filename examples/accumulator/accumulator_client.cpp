@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser, Richard D Guidry Jr.
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
@@ -20,7 +20,7 @@ int hpx_main(boost::program_options::variables_map&)
     if (appl.get_remote_prefixes(prefixes))
         // create accumulator on any of the remote localities
         prefix = prefixes[0];
-    else 
+    else
         // create an accumulator locally
         prefix = appl.get_runtime_support_gid();
 
@@ -54,15 +54,15 @@ int hpx_main(boost::program_options::variables_map&)
             std::cout << accu.get_gid() << "> " << accu.query() << std::endl;
 
         else if (cmd == "help")
-            std::cout << "commands: init, add [amount], print, query, help, quit" 
+            std::cout << "commands: init, add [amount], print, query, help, quit"
                       << std::endl;
 
         else if (cmd == "quit")
             break;
 
         else
-            std::cout << "Invalid command.\n" 
-                         "commands: init, add [amount], print, help, quit" 
+            std::cout << "Invalid command.\n"
+                         "commands: init, add [amount], print, help, quit"
                       << std::endl;
 
         std::cin >> cmd;

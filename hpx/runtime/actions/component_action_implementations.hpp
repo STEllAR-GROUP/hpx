@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef BOOST_PP_IS_ITERATING
@@ -50,7 +50,7 @@
     ///////////////////////////////////////////////////////////////////////////
     //  N parameter version, with result
     template <
-        typename Component, typename Result, int Action, 
+        typename Component, typename Result, int Action,
         BOOST_PP_ENUM_PARAMS(N, typename T),
         Result (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T)), typename Derived,
         threads::thread_priority Priority = threads::thread_priority_default>
@@ -68,30 +68,30 @@
             base_type;
 
         explicit BOOST_PP_CAT(base_result_action, N)(threads::thread_priority priority = Priority)
-          : base_type(priority) 
+          : base_type(priority)
         {}
 
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(base_result_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(base_result_action, N)(
                 threads::thread_priority priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
-          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg)) 
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg))
         {}
 
     protected:
         /// The \a thread_function will be registered as the thread
-        /// function of a thread. It encapsulates the execution of the 
+        /// function of a thread. It encapsulates the execution of the
         /// original function (given by \a func).
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static threads::thread_state_enum thread_function(
-            naming::address::address_type lva, 
+            naming::address::address_type lva,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
             try {
@@ -101,7 +101,7 @@
                 (get_lva<Component>::call(lva)->*F)(BOOST_PP_ENUM_PARAMS(N, arg));
             }
             catch (hpx::exception const& e) {
-                LTM_(error) 
+                LTM_(error)
                     << "Unhandled exception while executing component action("
                     << detail::get_action_name<Derived>()
                     << "): " << e.what();
@@ -115,16 +115,16 @@
     public:
         typedef boost::mpl::false_ direct_execution;
 
-        // This static construct_thread_function allows to construct 
-        // a proper thread function for a thread without having to 
-        // instantiate the base_result_actionN type. This is used by the applier in 
+        // This static construct_thread_function allows to construct
+        // a proper thread function for a thread without having to
+        // instantiate the base_result_actionN type. This is used by the applier in
         // case no continuation has been supplied.
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        static boost::function<threads::thread_function_type> 
-        construct_thread_function(naming::address::address_type lva, 
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
+        static boost::function<threads::thread_function_type>
+        construct_thread_function(naming::address::address_type lva,
+            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
-            // we need to assign the address of the thread function to a 
+            // we need to assign the address of the thread function to a
             // variable to  help the compiler to deduce the function type
             threads::thread_state_enum (*f)(naming::address::address_type,
                     BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) =
@@ -133,18 +133,18 @@
             return boost::bind(f, lva, BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
-        // This static construct_thread_function allows to construct 
-        // a proper thread function for a thread without having to 
-        // instantiate the base_result_actionN type. This is used by the applier in 
+        // This static construct_thread_function allows to construct
+        // a proper thread function for a thread without having to
+        // instantiate the base_result_actionN type. This is used by the applier in
         // case a continuation has been supplied
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        static boost::function<threads::thread_function_type> 
+        static boost::function<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
-            naming::address::address_type lva, 
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
+            naming::address::address_type lva,
+            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
             return base_type::construct_continuation_thread_function(
-                boost::bind(F, get_lva<Component>::call(lva), 
+                boost::bind(F, get_lva<Component>::call(lva),
                     BOOST_PP_ENUM_PARAMS(N, arg)), cont);
         }
 
@@ -157,22 +157,22 @@
         }
 
     private:
-        // This get_thread_function will be invoked to retrieve the thread 
+        // This get_thread_function will be invoked to retrieve the thread
         // function for an action which has to be invoked without continuations.
         boost::function<threads::thread_function_type>
         get_thread_function(naming::address::address_type lva) const
         {
-            return construct_thread_function(lva, 
+            return construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
         }
 
-        // This get_thread_function will be invoked to retrieve the thread 
+        // This get_thread_function will be invoked to retrieve the thread
         // function for an action which has to be invoked with continuations.
         boost::function<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
             naming::address::address_type lva) const
         {
-            return construct_thread_function(cont, lva, 
+            return construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
         }
 
@@ -180,7 +180,7 @@
         get_thread_function(naming::address::address_type lva,
             arguments_type const& arg) const
         {
-            return construct_thread_function(lva, 
+            return construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
         }
 
@@ -188,7 +188,7 @@
         get_thread_function(continuation_type& cont,
             naming::address::address_type lva, arguments_type const& arg) const
         {
-            return construct_thread_function(cont, lva, 
+            return construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
         }
 
@@ -206,25 +206,25 @@
     ///////////////////////////////////////////////////////////////////////////
     //  N parameter version, direct execution with result
     template <
-        typename Component, typename Result, int Action, 
-        BOOST_PP_ENUM_PARAMS(N, typename T), 
+        typename Component, typename Result, int Action,
+        BOOST_PP_ENUM_PARAMS(N, typename T),
         Result (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T)),
         threads::thread_priority Priority = threads::thread_priority_default,
         typename Derived = detail::this_type>
     class BOOST_PP_CAT(result_action, N)
       : public BOOST_PP_CAT(base_result_action, N)<
-            Component, Result, Action, 
-            BOOST_PP_ENUM_PARAMS(N, T), F, 
+            Component, Result, Action,
+            BOOST_PP_ENUM_PARAMS(N, T), F,
             typename detail::action_type<
                 BOOST_PP_CAT(result_action, N)<
-                    Component, Result, Action, BOOST_PP_ENUM_PARAMS(N, T), F, Priority>, 
+                    Component, Result, Action, BOOST_PP_ENUM_PARAMS(N, T), F, Priority>,
                     Derived
             >::type, Priority>
     {
     private:
         typedef typename detail::action_type<
             BOOST_PP_CAT(result_action, N)<
-                Component, Result, Action, BOOST_PP_ENUM_PARAMS(N, T), F, Priority>, 
+                Component, Result, Action, BOOST_PP_ENUM_PARAMS(N, T), F, Priority>,
                 Derived
         >::type derived_type;
 
@@ -266,15 +266,15 @@
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(result_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(result_action, N)(
                 threads::thread_priority priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
-          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg)) 
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg))
         {}
 
         /// serialization support
@@ -296,12 +296,12 @@
         }
 
     private:
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data)
         {
             data.lva = lva;
-            data.func = this->construct_thread_function(lva, 
+            data.func = this->construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<derived_type>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
@@ -310,9 +310,9 @@
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva, 
+            naming::address::address_type lva,
             threads::thread_init_data& data)
         {
             data.lva = lva;
@@ -325,13 +325,13 @@
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data,
             typename base_type::arguments_type const& arg)
         {
             data.lva = lva;
-            data.func = this->construct_thread_function(lva, 
+            data.func = this->construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
             data.description = detail::get_action_name<derived_type>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
@@ -340,9 +340,9 @@
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva, 
+            naming::address::address_type lva,
             threads::thread_init_data& data,
             typename base_type::arguments_type const& arg)
         {
@@ -360,24 +360,24 @@
     ///////////////////////////////////////////////////////////////////////////
     //  N parameter version, direct execution with result
     template <
-        typename Component, typename Result, int Action, 
-        BOOST_PP_ENUM_PARAMS(N, typename T), 
+        typename Component, typename Result, int Action,
+        BOOST_PP_ENUM_PARAMS(N, typename T),
         Result (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T)),
         typename Derived = detail::this_type>
     class BOOST_PP_CAT(direct_result_action, N)
       : public BOOST_PP_CAT(base_result_action, N)<
-            Component, Result, Action, 
+            Component, Result, Action,
             BOOST_PP_ENUM_PARAMS(N, T), F,
             typename detail::action_type<
                 BOOST_PP_CAT(direct_result_action, N)<
-                    Component, Result, Action, BOOST_PP_ENUM_PARAMS(N, T), F>, 
+                    Component, Result, Action, BOOST_PP_ENUM_PARAMS(N, T), F>,
                     Derived
             >::type>
     {
     private:
         typedef typename detail::action_type<
             BOOST_PP_CAT(direct_result_action, N)<
-                Component, Result, Action, BOOST_PP_ENUM_PARAMS(N, T), F>, 
+                Component, Result, Action, BOOST_PP_ENUM_PARAMS(N, T), F>,
                 Derived
         >::type derived_type;
 
@@ -392,15 +392,15 @@
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(direct_result_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(direct_result_action, N)(
                 threads::thread_priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
         {}
 
     public:
@@ -451,7 +451,7 @@
         }
 
     private:
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data)
         {
@@ -465,9 +465,9 @@
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva, 
+            naming::address::address_type lva,
             threads::thread_init_data& data)
         {
             data.lva = lva;
@@ -480,7 +480,7 @@
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data,
             typename base_type::arguments_type const& arg)
@@ -495,9 +495,9 @@
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva, 
+            naming::address::address_type lva,
             threads::thread_init_data& data,
             typename base_type::arguments_type const& arg)
         {
@@ -513,7 +513,7 @@
 
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
-        base_action::action_type get_action_type() const 
+        base_action::action_type get_action_type() const
         {
             return base_action::direct_action;
         }
@@ -544,24 +544,24 @@
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(base_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(base_action, N)(
                 threads::thread_priority priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
-          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg)) 
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg))
         {}
 
     protected:
         /// The \a thread_function will be registered as the thread
-        /// function of a thread. It encapsulates the execution of the 
+        /// function of a thread. It encapsulates the execution of the
         /// original function (given by \a func).
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static threads::thread_state_enum thread_function(
-            naming::address::address_type lva, 
+            naming::address::address_type lva,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
             try {
@@ -571,7 +571,7 @@
                 (get_lva<Component>::call(lva)->*F)(BOOST_PP_ENUM_PARAMS(N, arg));
             }
             catch (hpx::exception const& e) {
-                LTM_(error) 
+                LTM_(error)
                     << "Unhandled exception while executing component action("
                     << detail::get_action_name<Derived>()
                     << "): " << e.what();
@@ -585,16 +585,16 @@
     public:
         typedef boost::mpl::false_ direct_execution;
 
-        // This static construct_thread_function allows to construct 
-        // a proper thread function for a thread without having to 
-        // instantiate the base_actionN type. This is used by the applier in 
+        // This static construct_thread_function allows to construct
+        // a proper thread function for a thread without having to
+        // instantiate the base_actionN type. This is used by the applier in
         // case no continuation has been supplied.
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        static boost::function<threads::thread_function_type> 
-        construct_thread_function(naming::address::address_type lva, 
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
+        static boost::function<threads::thread_function_type>
+        construct_thread_function(naming::address::address_type lva,
+            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
-            // we need to assign the address of the thread function to a 
+            // we need to assign the address of the thread function to a
             // variable to  help the compiler to deduce the function type
             threads::thread_state_enum (*f)(naming::address::address_type,
                     BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) =
@@ -603,18 +603,18 @@
             return boost::bind(f, lva, BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
-        // This static construct_thread_function allows to construct 
-        // a proper thread function for a thread without having to 
-        // instantiate the base_actionN type. This is used by the applier in 
+        // This static construct_thread_function allows to construct
+        // a proper thread function for a thread without having to
+        // instantiate the base_actionN type. This is used by the applier in
         // case a continuation has been supplied
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        static boost::function<threads::thread_function_type> 
+        static boost::function<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
-            naming::address::address_type lva, 
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
+            naming::address::address_type lva,
+            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
             return base_type::construct_continuation_thread_function_void(
-                boost::bind(F, get_lva<Component>::call(lva), 
+                boost::bind(F, get_lva<Component>::call(lva),
                     BOOST_PP_ENUM_PARAMS(N, arg)), cont);
         }
 
@@ -631,7 +631,7 @@
         boost::function<threads::thread_function_type>
         get_thread_function(naming::address::address_type lva) const
         {
-            return construct_thread_function(lva, 
+            return construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
         }
 
@@ -639,7 +639,7 @@
         get_thread_function(continuation_type& cont,
             naming::address::address_type lva) const
         {
-            return construct_thread_function(cont, lva, 
+            return construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
         }
 
@@ -648,7 +648,7 @@
         get_thread_function(naming::address::address_type lva,
             arguments_type const& arg) const
         {
-            return construct_thread_function(lva, 
+            return construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
         }
 
@@ -656,7 +656,7 @@
         get_thread_function(continuation_type& cont,
             naming::address::address_type lva, arguments_type const& arg) const
         {
-            return construct_thread_function(cont, lva, 
+            return construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
         }
 
@@ -679,22 +679,22 @@
         typename Derived = detail::this_type>
     class BOOST_PP_CAT(action, N)
       : public BOOST_PP_CAT(base_action, N)<
-            Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F, 
+            Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F,
             typename detail::action_type<
                 BOOST_PP_CAT(action, N)<
-                    Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F, Priority>, 
+                    Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F, Priority>,
                     Derived
             >::type, Priority>
     {
     private:
         typedef typename detail::action_type<
             BOOST_PP_CAT(action, N)<
-                Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F, Priority>, 
+                Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F, Priority>,
                 Derived
         >::type derived_type;
 
         typedef BOOST_PP_CAT(base_action, N)<
-            Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F, 
+            Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F,
             derived_type, Priority> base_type;
 
     public:
@@ -706,15 +706,15 @@
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(action, N)(
                 threads::thread_priority priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
-          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg)) 
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg))
         {}
 
         util::unused_type execute_function(
@@ -764,7 +764,7 @@
         }
 
     private:
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data)
         {
@@ -778,9 +778,9 @@
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva, 
+            naming::address::address_type lva,
             threads::thread_init_data& data)
         {
             data.lva = lva;
@@ -793,7 +793,7 @@
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data,
             typename base_type::arguments_type const& arg)
@@ -808,9 +808,9 @@
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva, 
+            naming::address::address_type lva,
             threads::thread_init_data& data,
             typename base_type::arguments_type const& arg)
         {
@@ -835,14 +835,14 @@
             Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F,
             typename detail::action_type<
                 BOOST_PP_CAT(direct_action, N)<
-                    Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F>, 
+                    Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F>,
                     Derived
             >::type>
     {
     private:
         typedef typename detail::action_type<
             BOOST_PP_CAT(direct_action, N)<
-                Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F>, 
+                Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F>,
                 Derived
         >::type derived_type;
 
@@ -857,15 +857,15 @@
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(direct_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(direct_action, N)(
-                threads::thread_priority, 
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
+                threads::thread_priority,
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
         {}
 
     public:
@@ -920,12 +920,12 @@
     private:
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
-        base_action::action_type get_action_type() const 
+        base_action::action_type get_action_type() const
         {
             return base_action::direct_action;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data)
         {
@@ -939,9 +939,9 @@
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva, 
+            naming::address::address_type lva,
             threads::thread_init_data& data)
         {
             data.lva = lva;
@@ -954,7 +954,7 @@
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data,
             typename base_type::arguments_type const& arg)
@@ -969,9 +969,9 @@
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva, 
+            naming::address::address_type lva,
             threads::thread_init_data& data,
             typename base_type::arguments_type const& arg)
         {

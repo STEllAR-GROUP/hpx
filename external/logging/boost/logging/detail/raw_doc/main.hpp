@@ -1,24 +1,24 @@
 namespace boost { namespace logging {
 
-/** 
+/**
 @page main_intro Boost Logging Library v2 : Introduction
 
 - @ref main_motivation
 - @ref main_common_usage
-- @ref main_feeback 
-- @ref page_changelog 
+- @ref main_feeback
+- @ref page_changelog
 
 @section main_motivation Motivation
 
-Applications today are becoming increasingly complex. Part of making them easier to develop/maintain is to do logging. 
-Logging allows you to later see what happened in your application. It can be a great help when debugging and/or testing it. 
-The great thing about logging is that you can use it on systems in production and/or in use - if an error occurs, 
+Applications today are becoming increasingly complex. Part of making them easier to develop/maintain is to do logging.
+Logging allows you to later see what happened in your application. It can be a great help when debugging and/or testing it.
+The great thing about logging is that you can use it on systems in production and/or in use - if an error occurs,
 by examining the log, you can get a picture of where the problem is.
 
 Good logging is mandatory in support projects, you simply can't live without it.
 
-Used properly, logging is a very powerful tool. Besides aiding debugging/ testing, it can also show you 
-how your application is used (which modules, etc.), how time-consuming certain parts of your program are, 
+Used properly, logging is a very powerful tool. Besides aiding debugging/ testing, it can also show you
+how your application is used (which modules, etc.), how time-consuming certain parts of your program are,
 how much bandwidth your application consumes, etc. - it's up to you how much information you log, and where.
 
 <b>Features</b>
@@ -28,14 +28,14 @@ how much bandwidth your application consumes, etc. - it's up to you how much inf
 - A very flexible interface
 - You don't pay for what you don't use.
 - Allows for internationalization (i18n) - can be used with Unicode characters
-- Fits a lot of @ref common_scenarios "scenarios": from @ref common_scenarios_6 "very simple" (dumping all to one log) 
+- Fits a lot of @ref common_scenarios "scenarios": from @ref common_scenarios_6 "very simple" (dumping all to one log)
   to @ref scenario::usage "very complex" (multiple logs, some enabled/some not, levels, etc).
 - Allows you to choose how you use logs in your code (by defining your own LOG_ macros, suiting your application)
 - Allows you to use Log levels (debug, error, fatal, etc). However this is an orthogonal concept - the library
   will work whether you use levels, categories or whatever , or not.
 - Efficient filtering of log messages - that is, if a log is turned off, the message is not processed at all
 - Thread-safe - the library allows you several degrees of thread-safety, as you'll see
-- Allows for formatters and destinations 
+- Allows for formatters and destinations
     - formatters format the message (like, prepending extra information - an index, the time, thread id, etc)
     - destinations specify where the message is to be written
     - Formatters and Destinations are orthogonal to the rest of the library - if you want you can use them, otherwise
@@ -57,7 +57,7 @@ how much bandwidth your application consumes, etc. - it's up to you how much inf
 To get you started, here's the <b>most common usage</b>:
 \n
 
-@copydoc mul_levels_one_logger 
+@copydoc mul_levels_one_logger
 
 @ref scenarios_code_1 "Click to see the code"
 \n\n\n

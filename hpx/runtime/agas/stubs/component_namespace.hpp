@@ -15,10 +15,10 @@
 namespace hpx { namespace agas { namespace stubs
 {
 
-struct component_namespace 
+struct component_namespace
 {
     // {{{ nested types
-    typedef server::component_namespace server_type; 
+    typedef server::component_namespace server_type;
 
     typedef server_type::component_id_type component_id_type;
     typedef server_type::prefixes_type prefixes_type;
@@ -35,13 +35,13 @@ struct component_namespace
 
     static response service(
         naming::id_type const& gid
-      , request const& req 
+      , request const& req
       , error_code& ec = throws
         )
     {
         return service_async(gid, req).get(ec);
-    } 
-};            
+    }
+};
 
 }}}
 

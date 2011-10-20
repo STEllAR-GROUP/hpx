@@ -1,6 +1,6 @@
-//  Copyright (c) 2011 Bryce Lelbach 
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Copyright (c) 2011 Bryce Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
@@ -33,7 +33,7 @@ using hpx::util::high_resolution_timer;
 int hpx_main(variables_map& vm)
 {
     {
-        std::cout << "waiting for 5 seconds\n"; 
+        std::cout << "waiting for 5 seconds\n";
 
         high_resolution_timer t;
 

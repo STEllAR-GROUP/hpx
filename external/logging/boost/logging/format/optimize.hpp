@@ -29,14 +29,14 @@
 #include <string.h>
 #include <wchar.h>
 
-namespace boost { namespace logging { 
+namespace boost { namespace logging {
 
-/** 
+/**
     @brief Gathering the message: contains optimizers for formatting and/or destinations: for example, caching techniques
 */
 namespace optimize {
 
-    /** 
+    /**
         @brief Optimizes the formatting for prepending and/or appending strings to the original message
 
         It keeps all the modified message in one string. Useful if some formatter needs to access the whole
@@ -51,23 +51,23 @@ namespace optimize {
         typedef cache_string_one_str<string_type_> self_type;
         typedef string_type_ string_type;
 
-        /** 
+        /**
         @param reserve_prepend - how many chars to have space to prepend by default
         @param reserve_append - how many chars to have space to append by default
         @param grow_size - in case we add a string and there's no room for it, with how much should we grow? We'll
                            grow this much in addition to the added string - in the needed direction
          */
-        cache_string_one_str(int reserve_prepend_, int reserve_append_, int grow_size_ = 10) 
+        cache_string_one_str(int reserve_prepend_, int reserve_append_, int grow_size_ = 10)
                 : m_reserve_prepend(reserve_prepend_), m_reserve_append(reserve_append_), m_grow_size(grow_size_), m_full_msg_computed(false) {}
 
-        /** 
+        /**
         @param msg - the message that is originally cached
         @param reserve_prepend - how many chars to have space to prepend by default
         @param reserve_append - how many chars to have space to append by default
         @param grow_size - in case we add a string and there's no room for it, with how much should we grow? We'll
                            grow this much in addition to the added string - in the needed direction
          */
-        cache_string_one_str(const string_type & msg, int reserve_prepend_ = 10, int reserve_append_ = 10, int grow_size_ = 10) 
+        cache_string_one_str(const string_type & msg, int reserve_prepend_ = 10, int reserve_append_ = 10, int grow_size_ = 10)
                 : m_reserve_prepend(reserve_prepend_), m_reserve_append(reserve_append_), m_grow_size(grow_size_), m_full_msg_computed(false) {
             set_string(msg);
         }
@@ -134,7 +134,7 @@ namespace optimize {
 
 
 
-        /** 
+        /**
             @brief pre-pends a string (inserts it at the beginning)
         */
         void prepend_string(const string_type & str) {
@@ -152,7 +152,7 @@ namespace optimize {
             m_full_msg_computed = false;
         }
 
-        /** 
+        /**
             @brief appends a string (inserts it at the end)
         */
         void append_string(const string_type & str) {
@@ -170,21 +170,21 @@ namespace optimize {
             m_full_msg_computed = false;
         }
 
-        /** 
+        /**
             writes the current cached contents to a stream
         */
         template<class stream_type> void to_stream(stream_type & stream) const {
             stream.write( m_str.begin() + m_reserve_prepend, m_str.size() - m_reserve_prepend - m_reserve_append);
         }
 
-        /** 
+        /**
             returns the full string
         */
         const string_type & full_string() const {
             if ( !m_full_msg_computed) {
                 m_full_msg_computed = true;
                 m_full_msg = m_str.substr(m_reserve_prepend, m_str.size() - m_reserve_prepend - m_reserve_append );
-            } 
+            }
             return m_full_msg;
         }
 
@@ -238,7 +238,7 @@ namespace optimize {
 
 
 
-    /** 
+    /**
         @brief This holds 3 strings - one for prepend, one for modification, and one for appending
 
         When you prepend or append, you can also specify an extra argument - an identifier.
@@ -270,7 +270,7 @@ namespace optimize {
 
     public:
 
-        /** 
+        /**
             constructs an object
 
             @param reserve_ [optional, default = 512] When creating the full msg, how much should we reserve?
@@ -279,7 +279,7 @@ namespace optimize {
             m_full_msg.reserve(reserve_);
         }
 
-        /** 
+        /**
             constructs an object
 
             @param reserve_ [optional, default = 512] When creating the full msg, how much should we reserve?
@@ -288,7 +288,7 @@ namespace optimize {
             m_full_msg.reserve(reserve_);
         }
 
-        /** 
+        /**
             sets the string with a swap (that is, you pass a non-const refererence, and we do a swap)
         */
         void set_string_swap(string_type & msg) {
@@ -296,7 +296,7 @@ namespace optimize {
             m_full_msg_computed = false;
         }
 
-        /** 
+        /**
             @brief sets the string
         */
         void set_string(const string_type & msg) {
@@ -304,7 +304,7 @@ namespace optimize {
             m_full_msg_computed = false;
         }
 
-        /** 
+        /**
             @brief pre-pends a string (inserts it at the beginning)
         */
         void prepend_string(const string_type & str ) {
@@ -312,7 +312,7 @@ namespace optimize {
             m_full_msg_computed = false;
         }
 
-        /** 
+        /**
             @brief appends a string (inserts it at the end)
         */
          void append_string(const string_type & str ) {
@@ -320,14 +320,14 @@ namespace optimize {
             m_full_msg_computed = false;
         }
 
-        /** 
+        /**
             Specifies the id of the last message
         */
         void set_last_id(ptr_type id) {
             m_cur_msg.back().id = id;
         }
 
-        /** 
+        /**
             @brief Reuses a pre-pended or appended string. The message was already cached
         */
         void reuse(ptr_type id ) {
@@ -340,7 +340,7 @@ namespace optimize {
             m_full_msg_computed = false;
         }
 
-        /** 
+        /**
             @brief computes (if necessary) and returns the full string
         */
         const string_type & full_string() const {
@@ -361,13 +361,13 @@ namespace optimize {
             return m_full_msg;
         }
 
-        /** 
+        /**
             @brief computes (if necessary) and returns the full string
         */
         operator const string_type&() const { return full_string(); }
 
 
-        /** 
+        /**
             @brief This restarts writing the messages. Whatever is cached can be used again
         */
         void restart() {

@@ -2,22 +2,22 @@
 //
 //  This code may be used under either of the following two licences:
 //
-//  Permission is hereby granted, free of charge, to any person obtaining a copy 
-//  of this software and associated documentation files (the "Software"), to deal 
-//  in the Software without restriction, including without limitation the rights 
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
-//  copies of the Software, and to permit persons to whom the Software is 
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
 //  furnished to do so, subject to the following conditions:
 //
-//  The above copyright notice and this permission notice shall be included in 
+//  The above copyright notice and this permission notice shall be included in
 //  all copies or substantial portions of the Software.
 //
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE. OF SUCH DAMAGE.
 //
 //  Or:
@@ -43,14 +43,14 @@
  * Given two binary trees, they have the same fringe
  * if all leafs, read from left to right are equals.
  * This is the classical coroutine demonstration problem,
- * because it is hard to solve in O(N) (with best case O(1)) 
+ * because it is hard to solve in O(N) (with best case O(1))
  * without using coroutines.
  * see http://c2.com/cgi/wiki?CoRoutine
  * NOTE: this solution is an almost verbatim port of the lua solution from
  * the wiki.
  *
  * This is a cleaned up version of samefringe.cpp. It uses generators instead
- * of corutines. The variant is much more cleaner and 
+ * of corutines. The variant is much more cleaner and
  * same_fringe has been simplified.
  */
 namespace coroutines = boost::coroutines;
@@ -65,35 +65,35 @@ namespace meta {
     typedef Left left;
     typedef Right right;
   };
-  
+
   template<int A>
   struct leaf {
     enum {value = A};
   };
 
-  typedef 
+  typedef
   node<node<leaf<0>, leaf<1> >, node<leaf<0>, node<leaf<5>, leaf<7> > > >
   tree_a; // fringe: 0 1 0 5 7
 
-  typedef 
+  typedef
   node<leaf<0>, node<leaf<1>, node<node<leaf<0>, leaf<5> >, leaf<7> > > >
   tree_b; // fringe: 0 1 0 5 7
 
-  typedef 
+  typedef
   node<leaf<1>, node<leaf<7>, node<node<leaf<5>, leaf<4> >, leaf<7> > > >
   tree_c; // fringe: 1 7 5 4 7
 }
 
-// This is ugly, but at least on GCC it is not fount if it is in the the global 
+// This is ugly, but at least on GCC it is not fount if it is in the the global
 // namespace. It could  work both in boost and in std:
 // - in std   is found through ADL from pair,
-// - in boost is found through ADL from pair's template argument 
+// - in boost is found through ADL from pair's template argument
 //   (boost::variant)
-// Adding overloads in std is not portable so we fallback to the boost 
+// Adding overloads in std is not portable so we fallback to the boost
 // namespace.
 namespace boost {
   template<typename Element>
-  std::ostream& operator<<(std::ostream& out, 
+  std::ostream& operator<<(std::ostream& out,
 			   const std::pair<Element, Element>& x) {
     out << "("<< x.first << ", " << x.second<<")";
     return out;
@@ -102,9 +102,9 @@ namespace boost {
 
 
 typedef int leaf;
-typedef boost::make_recursive_variant<leaf, 
-				      std::pair<boost::recursive_variant_, 
-						boost::recursive_variant_> 
+typedef boost::make_recursive_variant<leaf,
+				      std::pair<boost::recursive_variant_,
+						boost::recursive_variant_>
 >::type element;
 typedef std::pair<element, element> node;
 
@@ -115,7 +115,7 @@ bool is_leaf(const element& x) {
 
 template<typename Left, typename Right>
 element make_tree(meta::node<Left, Right> const&) {
-  return node(make_tree(Left()), 
+  return node(make_tree(Left()),
 	      make_tree(Right()));
 }
 

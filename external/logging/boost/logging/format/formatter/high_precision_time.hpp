@@ -25,7 +25,7 @@
 
 #include <boost/logging/format/formatter/convert_format.hpp>
 #include <boost/logging/detail/manipulator.hpp> // is_generic
-#include <boost/logging/detail/time_format_holder.hpp> 
+#include <boost/logging/detail/time_format_holder.hpp>
 
 #include <boost/date_time/microsec_time_clock.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
@@ -52,12 +52,12 @@ $yyyy - year, 4 digits
 $hh - hour, 2 digits
 $mm - minute, 2 digits
 $ss - second, 2 digits
-$mili - milliseconds 
+$mili - milliseconds
 $micro - microseconds (if the high precision clock allows; otherwise, it pads zeros)
 $nano - nanoseconds (if the high precision clock allows; otherwise, it pads zeros)
 
 
-Example: 
+Example:
 
 @code
 high_precision_time("$mm:$ss:$micro");
@@ -70,7 +70,7 @@ template<class convert = do_convert_format::prepend> struct high_precision_time_
     typedef convert convert_type;
     typedef non_const_context<boost::logging::detail::time_format_holder> non_const_context_base;
 
-    /** 
+    /**
         constructs a high_precision_time object
     */
     high_precision_time_t(const hold_string_type & format) : non_const_context_base(format) {}
@@ -91,14 +91,14 @@ template<class convert = do_convert_format::prepend> struct high_precision_time_
         case 7: nanosecs *= 100; break;
         case 8: nanosecs *= 10; break;
         case 9: break;
-        default: 
-            while ( digits > 9) { 
-                nanosecs /= 10; digits--; 
+        default:
+            while ( digits > 9) {
+                nanosecs /= 10; digits--;
             }
             break;
         }
 
-        non_const_context_base::context().write_time( buffer, 
+        non_const_context_base::context().write_time( buffer,
             val.date().day(),
             val.date().month(),
             val.date().year(),
@@ -107,7 +107,7 @@ template<class convert = do_convert_format::prepend> struct high_precision_time_
             val.time_of_day().seconds(),
             nanosecs / 1000000,
             nanosecs / 1000,
-            nanosecs 
+            nanosecs
             );
 
         convert::write(buffer, msg);
@@ -121,7 +121,7 @@ template<class convert = do_convert_format::prepend> struct high_precision_time_
         return non_const_context_base::context() == other.non_const_context_base::context() ;
     }
 
-    /** @brief configure through script 
+    /** @brief configure through script
 
         the string = the time format
     */

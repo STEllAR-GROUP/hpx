@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_EXCEPTION_LIST_OCT_06_2008_0942AM)
@@ -17,12 +17,12 @@ namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
     /// \class exception_list exception_list.hpp hpx/exception_list.hpp
-    class HPX_EXCEPTION_EXPORT exception_list 
+    class HPX_EXCEPTION_EXPORT exception_list
     {
     private:
         typedef std::list<boost::system::system_error> exception_list_type;
         exception_list_type exceptions_;
-        
+
     public:
         exception_list();
         explicit exception_list(boost::system::system_error const& e);

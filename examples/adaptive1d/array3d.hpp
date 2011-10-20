@@ -1,7 +1,7 @@
 //  Copyright (c) 2009-2011 Matt Anderson
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_02AUG2011_1537)
@@ -14,24 +14,24 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/access.hpp>
 
-namespace hpx { namespace components { namespace adaptive1d 
+namespace hpx { namespace components { namespace adaptive1d
 {
 
-struct array3d 
+struct array3d
 {
   private:
     std::size_t width_;
     std::size_t height_;
     std::vector<int> data_;
-    
+
     friend class boost::serialization::access;
 
     template <typename Archive>
-    void serialize(Archive &ar, const unsigned int) 
+    void serialize(Archive &ar, const unsigned int)
     { ar & width_ & height_ & data_; }
 
   public:
-    array3d(std::size_t x, std::size_t y, std::size_t z, int init = 0) 
+    array3d(std::size_t x, std::size_t y, std::size_t z, int init = 0)
       : width_(x), height_(y), data_(x * y * z, init)
       {}
 

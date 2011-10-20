@@ -24,7 +24,7 @@
 namespace hpx { namespace agas
 {
 
-struct gva 
+struct gva
 {
     typedef boost::int32_t component_type;
     typedef boost::uint64_t lva_type;
@@ -62,11 +62,11 @@ struct gva
 
     gva(void* a)
       : endpoint(),
-        type(components::component_invalid), 
+        type(components::component_invalid),
         count(0),
         lva_(reinterpret_cast<lva_type>(a)),
         offset(0) {}
- 
+
     gva& operator=(lva_type a)
     {
         endpoint = naming::locality();
@@ -76,7 +76,7 @@ struct gva
         offset = 0;
         return *this;
     }
-    
+
     gva& operator=(void* a)
     {
         endpoint = naming::locality();
@@ -86,13 +86,13 @@ struct gva
         offset = 0;
         return *this;
     }
-    
+
     gva& operator=(gva const& other)
     {
-        endpoint = other.endpoint; 
-        type = other.type; 
+        endpoint = other.endpoint;
+        type = other.type;
         count = other.count;
-        lva_ = other.lva_; 
+        lva_ = other.lva_;
         offset = other.offset;
         return *this;
     }
@@ -101,42 +101,42 @@ struct gva
     {
         return type     == rhs.type
             && count    == rhs.count
-            && lva_     == rhs.lva_ 
+            && lva_     == rhs.lva_
             && offset   == rhs.offset
             && endpoint == rhs.endpoint;
     }
 
     bool operator!=(gva const& rhs) const
     { return !(*this == rhs); }
-    
+
     void lva(lva_type a)
     { lva_ = a; }
 
     void lva(void* a)
     { lva_ = reinterpret_cast<lva_type>(a); }
-    
+
     lva_type lva(naming::gid_type const& gid = naming::invalid_gid,
                  naming::gid_type const& gidbase = naming::invalid_gid) const
     {
         // Make sure that the credit has been stripped.
         naming::gid_type raw_gid = gid
                        , raw_gidbase = gidbase;
-        naming::strip_credit_from_gid(raw_gid); 
-        naming::strip_credit_from_gid(raw_gidbase); 
+        naming::strip_credit_from_gid(raw_gid);
+        naming::strip_credit_from_gid(raw_gidbase);
 
         lva_type l = lva_;
         l += (raw_gid.get_lsb() - raw_gidbase.get_lsb()) * offset;
         return l;
     }
-    
+
     gva resolve(naming::gid_type const& gid,
                 naming::gid_type const& gidbase) const
     {
         // Make sure that the credit has been stripped.
         naming::gid_type raw_gid = gid
                        , raw_gidbase = gidbase;
-        naming::strip_credit_from_gid(raw_gid); 
-        naming::strip_credit_from_gid(raw_gidbase); 
+        naming::strip_credit_from_gid(raw_gid);
+        naming::strip_credit_from_gid(raw_gidbase);
 
         gva g(*this);
         g.lva_ = g.lva(raw_gid, raw_gidbase);
@@ -147,7 +147,7 @@ struct gva
         g.offset = 0;
         return g;
     }
-    
+
     naming::locality endpoint;
     component_type type;
     boost::uint64_t count;
@@ -156,7 +156,7 @@ struct gva
     lva_type lva_;
 
   public:
-    boost::uint64_t offset; 
+    boost::uint64_t offset;
 
   private:
     friend class boost::serialization::access;
@@ -172,7 +172,7 @@ struct gva
             HPX_THROW_EXCEPTION(version_too_new
               , "gva::load"
               , "trying to load GVA with unknown version");
-        ar >> endpoint >> type >> count >> lva_ >> offset; 
+        ar >> endpoint >> type >> count >> lva_ >> offset;
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -182,14 +182,14 @@ template <typename Char, typename Traits>
 inline std::basic_ostream<Char, Traits>&
 operator<< (std::basic_ostream<Char, Traits>& os, gva const& addr)
 {
-    boost::io::ios_flags_saver ifs(os); 
-    os << "(" << addr.endpoint << " " 
+    boost::io::ios_flags_saver ifs(os);
+    os << "(" << addr.endpoint << " "
        << components::get_component_type_name(addr.type) << " "
        << addr.count << " "
        << std::showbase << std::hex << addr.lva() << " "
-       << addr.offset << ")"; 
+       << addr.offset << ")";
     return os;
-} 
+}
 
 }}
 

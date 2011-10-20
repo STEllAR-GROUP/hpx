@@ -22,7 +22,7 @@
 
 #include <boost/plugin/config.hpp>
 
-#include <windows.h> 
+#include <windows.h>
 
 #if !defined(BOOST_WINDOWS)
 #error "This file shouldn't be included directly, use the file boost/plugin/dll.hpp only."
@@ -31,7 +31,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace boost { namespace plugin {
 
-    namespace detail 
+    namespace detail
     {
         template<typename T>
         struct free_dll
@@ -43,27 +43,27 @@ namespace boost { namespace plugin {
                 if (NULL != h)
                     FreeLibrary(h);
             }
-            
+
             HMODULE h;
         };
     }
 
-    class dll 
+    class dll
     {
     public:
-        dll() 
-        :   dll_handle(NULL) 
+        dll()
+        :   dll_handle(NULL)
         {
             LoadLibrary();
         }
 
-        dll(dll const& rhs) 
+        dll(dll const& rhs)
         :   dll_name(rhs.dll_name), map_name(rhs.map_name), dll_handle(NULL)
         {
             LoadLibrary();
         }
 
-        dll(std::string const& libname) 
+        dll(std::string const& libname)
         :   dll_name(libname), map_name(""), dll_handle(NULL)
         {
             // map_name defaults to dll base name
@@ -79,7 +79,7 @@ namespace boost { namespace plugin {
             LoadLibrary();
         }
 
-        dll(std::string const& libname, std::string const& mapname) 
+        dll(std::string const& libname, std::string const& mapname)
         :   dll_name(libname), map_name(mapname), dll_handle(NULL)
         {
             LoadLibrary();
@@ -99,29 +99,29 @@ namespace boost { namespace plugin {
             return *this;
         }
 
-        ~dll() 
-        { 
-            FreeLibrary(); 
+        ~dll()
+        {
+            FreeLibrary();
         }
 
         std::string get_name() const { return dll_name; }
         std::string get_mapname() const { return map_name; }
 
         template<typename SymbolType, typename Deleter>
-        std::pair<SymbolType, Deleter> 
+        std::pair<SymbolType, Deleter>
         get(std::string const& symbol_name) const
         {
             BOOST_STATIC_ASSERT(boost::is_pointer<SymbolType>::value);
             typedef typename remove_pointer<SymbolType>::type PointedType;
 
-            // Open the library. Yes, we do it on every access to 
+            // Open the library. Yes, we do it on every access to
             // a symbol, the LoadLibrary function increases the refcnt of the dll
-            // so in the end the dll class holds one refcnt and so does every 
+            // so in the end the dll class holds one refcnt and so does every
             // symbol.
             HMODULE handle = ::LoadLibrary(dll_name.c_str());
             if (!handle) {
                 BOOST_PLUGIN_OSSTREAM str;
-                str << "Boost.Plugin: Could not open shared library '" 
+                str << "Boost.Plugin: Could not open shared library '"
                     << dll_name << "'";
 
                 boost::throw_exception(
@@ -131,11 +131,11 @@ namespace boost { namespace plugin {
 
             // Cast the to right type.
             SymbolType address = (SymbolType)GetProcAddress(dll_handle, symbol_name.c_str());
-            if (NULL == address) 
+            if (NULL == address)
             {
                 BOOST_PLUGIN_OSSTREAM str;
-                str << "Boost.Plugin: Unable to locate the exported symbol name '" 
-                    << symbol_name << "' in the shared library '" 
+                str << "Boost.Plugin: Unable to locate the exported symbol name '"
+                    << symbol_name << "' in the shared library '"
                     << dll_name << "'";
 
                 ::FreeLibrary(handle);
@@ -163,9 +163,9 @@ namespace boost { namespace plugin {
             dll_handle = ::LoadLibrary(dll_name.c_str());
             if (!dll_handle) {
                 BOOST_PLUGIN_OSSTREAM str;
-                str << "Boost.Plugin: Could not open shared library '" 
+                str << "Boost.Plugin: Could not open shared library '"
                     << dll_name << "'";
-                
+
                 boost::throw_exception(
                     std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str)));
             }
@@ -173,8 +173,8 @@ namespace boost { namespace plugin {
 
         void FreeLibrary()
         {
-            if (NULL != dll_handle) 
-                ::FreeLibrary(dll_handle); 
+            if (NULL != dll_handle)
+                ::FreeLibrary(dll_handle);
         }
 
     private:

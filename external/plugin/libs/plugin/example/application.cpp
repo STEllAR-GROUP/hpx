@@ -24,13 +24,13 @@ int main()
     boost::plugin::plugin_factory <Weapon> pf (d);
 
     cout << "*** Creating an instance of plugin class\n";
-    std::auto_ptr <Weapon> w1 (pf.create ("Missile", "biz", 13)); 
+    std::auto_ptr <Weapon> w1 (pf.create ("Missile", "biz", 13));
 
     cout << "*** Creating an instance of plugin class\n";
-    std::auto_ptr <Weapon> w2 (pf.create ("Missile", "wush")); 
+    std::auto_ptr <Weapon> w2 (pf.create ("Missile", "wush"));
 
     cout << "*** Creating an instance of plugin class\n";
-    std::auto_ptr <Weapon> w3 (pf.create ("Missile", "wish", 10, 20)); 
+    std::auto_ptr <Weapon> w3 (pf.create ("Missile", "wish", 10, 20));
 
     cout << "*** Calling method of the created instance\n";
     w1->fire();
@@ -38,7 +38,7 @@ int main()
     w3->fire();
 
   }
-  catch ( std::logic_error const & e ) 
+  catch ( std::logic_error const & e )
   {
     /* report error, and skip the library */
     std::cerr << "Could not load weapon: " << e.what () << std::endl;

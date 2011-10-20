@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2009-2011 Matthew Anderson
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_COMPONENTS_AMR_STENCIL_VALUE_IN_ADAPTOR_OCT_17_2008_0850PM)
@@ -15,11 +15,11 @@
 #include "stencil_value_out_adaptor.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace amr { namespace server 
+namespace hpx { namespace components { namespace amr { namespace server
 {
-    class stencil_value_in_adaptor 
+    class stencil_value_in_adaptor
       : public lcos::eager_future<
-            stencil_value_out_adaptor::get_value_action, 
+            stencil_value_out_adaptor::get_value_action,
             naming::id_type
         >
     {
@@ -29,12 +29,12 @@ namespace hpx { namespace components { namespace amr { namespace server
         {}
 
         // start the asynchronous data acquisition
-        void aquire_value() 
+        void aquire_value()
         {
             BOOST_ASSERT(gid_);       // must be valid at this point
 
             this->reset();            // reset the underlying future
-            this->apply(gid_);        // asynchronously start the future action 
+            this->apply(gid_);        // asynchronously start the future action
         }
 
         // connect this in-port to a data source

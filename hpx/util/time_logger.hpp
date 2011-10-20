@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_UTIL_TIME_LOGGER_NOV_26_0548PM)
@@ -41,7 +41,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     /// The \a time_logger class can be used to collect timings for a block
     /// of code. It measures the execution time for each of the executions and
-    /// collects the number of invocations, the average, and the variance of 
+    /// collects the number of invocations, the average, and the variance of
     /// the measured execution times.
     class time_logger
     {
@@ -49,18 +49,18 @@ namespace hpx { namespace util
         enum { hpx_initial_times_size = 64000 };
 
     public:
-        time_logger(char const* const description, int thread_num, 
+        time_logger(char const* const description, int thread_num,
                 bool enabled = false)
-          : description_(description), thread_num_(thread_num), 
+          : description_(description), thread_num_(thread_num),
             enabled_(enabled && LTIM_ENABLED(warning))
         {
-            if (enabled_) 
+            if (enabled_)
                 times_.reserve(hpx_initial_times_size);
         }
 
         ~time_logger()
         {
-            if (!enabled_) 
+            if (!enabled_)
                 return;     // generate output only if logging is enabled
 
             std::string name(description_);
@@ -83,13 +83,13 @@ namespace hpx { namespace util
 
         void tick()
         {
-            if (enabled_) 
+            if (enabled_)
                 times_.push_back(hrtimer_ticks());
         }
 
         void tock()
         {
-            if (enabled_) 
+            if (enabled_)
                 times_.push_back(hrtimer_ticks());
         }
 

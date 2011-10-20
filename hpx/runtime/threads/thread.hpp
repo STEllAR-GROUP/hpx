@@ -1,7 +1,7 @@
 //  Copyright (c) 2008-2009 Chirag Dekate, Hartmut Kaiser, Anshul Tandon
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_PX_THREAD_MAY_20_2008_0910AM)
@@ -34,24 +34,24 @@
 #include <stack>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads 
+namespace hpx { namespace threads
 {
     struct thread_pool;    // forward declaration only
     class thread;
 
     ///////////////////////////////////////////////////////////////////////////
     // This overload will be called by the ptr_map<> used in the thread_queue
-    // whenever an instance of a threads::thread needs to be deleted. We 
-    // provide this overload as we need to extract the thread_pool from the 
+    // whenever an instance of a threads::thread needs to be deleted. We
+    // provide this overload as we need to extract the thread_pool from the
     // thread instance the moment before it gets deleted
     void HPX_EXPORT delete_clone(threads::thread const*);
 
-    // This is a policy instance for the boost::ptr_map used to store the 
+    // This is a policy instance for the boost::ptr_map used to store the
     // pointers to the threads::thread instances
     struct heap_clone_allocator
     {
-        static threads::thread* allocate_clone(threads::thread const& t) 
-        { 
+        static threads::thread* allocate_clone(threads::thread const& t)
+        {
             BOOST_ASSERT(false);    // will not be called, ever
             return 0;
         }
@@ -73,7 +73,7 @@ namespace hpx { namespace threads { namespace detail
     template <typename CoroutineImpl>
     struct coroutine_allocator
     {
-        coroutine_allocator() 
+        coroutine_allocator()
         {}
 
         CoroutineImpl* get()
@@ -104,12 +104,12 @@ namespace hpx { namespace threads { namespace detail
         typedef boost::function<thread_function_type> function_type;
 
     public:
-        thread(thread_init_data const& init_data, thread_id_type id, 
+        thread(thread_init_data const& init_data, thread_id_type id,
                thread_state_enum newstate, thread_pool& pool)
-          : coroutine_(init_data.func, id, HPX_DEFAULT_STACK_SIZE), //coroutine_type::impl_type::create(init_data.func, id)), 
-            current_state_(thread_state(newstate)), 
+          : coroutine_(init_data.func, id, HPX_DEFAULT_STACK_SIZE), //coroutine_type::impl_type::create(init_data.func, id)),
+            current_state_(thread_state(newstate)),
             current_state_ex_(thread_state_ex(wait_signaled)),
-            description_(init_data.description ? init_data.description : ""), 
+            description_(init_data.description ? init_data.description : ""),
             lco_description_(""),
             parent_locality_prefix_(init_data.parent_prefix),
             parent_thread_id_(init_data.parent_id),
@@ -119,7 +119,7 @@ namespace hpx { namespace threads { namespace detail
             back_ptr_(0),
             pool_(&pool)
         {
-            // store the thread id of the parent thread, mainly for debugging 
+            // store the thread id of the parent thread, mainly for debugging
             // purposes
             if (0 == parent_thread_id_) {
                 thread_self* self = get_self_ptr();
@@ -129,24 +129,24 @@ namespace hpx { namespace threads { namespace detail
                     parent_thread_phase_ = self->get_thread_phase();
                 }
             }
-            if (0 == parent_locality_prefix_) 
+            if (0 == parent_locality_prefix_)
                 parent_locality_prefix_ = applier::get_prefix_id();
         }
 
         /// This constructor is provided just for compatibility with the scheme
-        /// of component creation. But since threads never get created 
-        /// by a factory (runtime_support) instance, we can leave this 
+        /// of component creation. But since threads never get created
+        /// by a factory (runtime_support) instance, we can leave this
         /// constructor empty
         thread()
-          : coroutine_(function_type(), 0), //coroutine_type::impl_type::create(function_type())), 
+          : coroutine_(function_type(), 0), //coroutine_type::impl_type::create(function_type())),
             description_(""), lco_description_(""),
-            parent_locality_prefix_(0), parent_thread_id_(0), 
+            parent_locality_prefix_(0), parent_thread_id_(0),
             parent_thread_phase_(0), component_id_(0), back_ptr_(0), pool_(0)
         {
             BOOST_ASSERT(false);    // shouldn't ever be called
         }
 
-        ~thread() 
+        ~thread()
         {}
 
         static components::component_type get_component_type();
@@ -161,7 +161,7 @@ namespace hpx { namespace threads { namespace detail
             return coroutine_(current_state_ex);
         }
 
-        thread_state get_state() const 
+        thread_state get_state() const
         {
             return current_state_.load(boost::memory_order_acquire);
         }
@@ -182,7 +182,7 @@ namespace hpx { namespace threads { namespace detail
             }
         }
 
-        bool set_state_tagged(thread_state_enum newstate, 
+        bool set_state_tagged(thread_state_enum newstate,
             thread_state& prev_state, thread_state& new_tagged_state)
         {
             thread_state tmp = prev_state;
@@ -201,14 +201,14 @@ namespace hpx { namespace threads { namespace detail
                 old_state, thread_state(new_state, old_state.get_tag() + 1));
         }
 
-        thread_state_ex get_state_ex() const 
+        thread_state_ex get_state_ex() const
         {
             return current_state_ex_.load(boost::memory_order_acquire);
         }
 
         thread_state_ex set_state_ex(thread_state_ex_enum new_state)
         {
-            thread_state_ex prev_state = 
+            thread_state_ex prev_state =
                 current_state_ex_.load(boost::memory_order_acquire);
 
             for (;;) {
@@ -233,13 +233,13 @@ namespace hpx { namespace threads { namespace detail
         {
             return coroutine_.get_thread_phase();
         }
- 
+
         std::string get_description() const
         {
             thread_mutex_type::scoped_lock l(this);
             return description_;
         }
-        void set_description(char const* desc) 
+        void set_description(char const* desc)
         {
             thread_mutex_type::scoped_lock l(this);
             if (desc)
@@ -256,7 +256,7 @@ namespace hpx { namespace threads { namespace detail
         void set_lco_description(char const* lco_description)
         {
             thread_mutex_type::scoped_lock l(this);
-            if (lco_description) 
+            if (lco_description)
                 lco_description_ = lco_description;
             else
                 lco_description_.clear();
@@ -309,24 +309,24 @@ namespace hpx { namespace threads { namespace detail
         // to associate this component with a given action.
         enum { value = components::component_thread };
 
-        /// 
+        ///
         void set_event();
 
         naming::id_type get_gid() const
         {
             return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
-        } 
+        }
 
         naming::gid_type get_base_gid() const
         {
             BOOST_ASSERT(back_ptr_);
-            return back_ptr_->get_base_gid(); 
-        } 
+            return back_ptr_->get_base_gid();
+        }
 
     private:
         friend class threads::thread;
         friend void threads::delete_clone(threads::thread const*);
-    
+
         template <typename, typename>
         friend class components::managed_component;
 
@@ -352,13 +352,13 @@ namespace hpx { namespace threads { namespace detail
             back_ptr_ = bp;
         }
 
-        components::managed_component<thread, threads::thread>* back_ptr_; 
+        components::managed_component<thread, threads::thread>* back_ptr_;
         thread_pool* pool_;
     };
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads 
+namespace hpx { namespace threads
 {
     // forward declaration only
     struct thread_pool;
@@ -367,28 +367,28 @@ namespace hpx { namespace threads
     /// \class thread thread.hpp hpx/runtime/threads/thread.hpp
     ///
     /// A \a thread is the representation of a ParalleX thread. It's a first
-    /// class object in ParalleX. In our implementation this is a user level 
-    /// thread running on top of one of the OS threads spawned by the \a 
+    /// class object in ParalleX. In our implementation this is a user level
+    /// thread running on top of one of the OS threads spawned by the \a
     /// threadmanager.
     ///
     /// A \a thread encapsulates:
-    ///  - A thread status word (see the functions \a thread#get_state and 
+    ///  - A thread status word (see the functions \a thread#get_state and
     ///    \a thread#set_state)
     ///  - A function to execute (the thread function)
-    ///  - A frame (in this implementation this is a block of memory used as 
+    ///  - A frame (in this implementation this is a block of memory used as
     ///    the threads stack)
     ///  - A block of registers (not implemented yet)
     ///
-    /// Generally, \a threads are not created or executed directly. All 
-    /// functionality related to the management of \a thread's is 
+    /// Generally, \a threads are not created or executed directly. All
+    /// functionality related to the management of \a thread's is
     /// implemented by the \a threadmanager.
-    class thread 
+    class thread
       : public components::managed_component<detail::thread, thread>
     {
     private:
         typedef detail::thread wrapped_type;
-        typedef 
-            components::managed_component<wrapped_type, thread> 
+        typedef
+            components::managed_component<wrapped_type, thread>
         base_type;
 
         // avoid warning about using 'this' in initializer list
@@ -400,18 +400,18 @@ namespace hpx { namespace threads
 
         /// \brief Construct a new \a thread
         ///
-        /// \param func     [in] The thread function to execute by this 
+        /// \param func     [in] The thread function to execute by this
         ///                 \a thread.
-        /// \param tm       [in] A reference to the thread manager this 
+        /// \param tm       [in] A reference to the thread manager this
         ///                 \a thread will be associated with.
         /// \param newstate [in] The initial thread state this instance will
         ///                 be initialized with.
-        inline thread(thread_init_data const& init_data, thread_pool& pool, 
+        inline thread(thread_init_data const& init_data, thread_pool& pool,
             thread_state_enum new_state);
 
-        ~thread() 
+        ~thread()
         {
-            LTM_(debug) << "~thread(" << this << "), description(" 
+            LTM_(debug) << "~thread(" << this << "), description("
                         << get()->get_description() << "), phase("
                         << get()->get_thread_phase() << ")";
         }
@@ -420,13 +420,13 @@ namespace hpx { namespace threads
         // memory management
         // threads use a specialized allocator for fast creation/destruction
 
-        /// \brief  The memory for thread objects is managed by a class  
+        /// \brief  The memory for thread objects is managed by a class
         ///         specific allocator. This allocator uses a OS-thread local,
-        ///         one size heap implementation, ensuring fast memory 
-        ///         allocation. Additionally the heap registers the allocated  
+        ///         one size heap implementation, ensuring fast memory
+        ///         allocation. Additionally the heap registers the allocated
         ///         thread instance with the AGAS service.
         ///
-        /// \param size   [in] The parameter \a size is supplied by the 
+        /// \param size   [in] The parameter \a size is supplied by the
         ///               compiler and contains the number of bytes to allocate.
         static void* operator new(std::size_t size, thread_pool&);
         static void operator delete(void *p, thread_pool&);
@@ -435,15 +435,15 @@ namespace hpx { namespace threads
         static void* operator new(std::size_t) throw() { return NULL; }
         static void operator delete(void*, std::size_t)
         {
-            // we do not delete the memory here as it will be done in the 
+            // we do not delete the memory here as it will be done in the
             // boost::delete_clone() function (see thread.cpp)
         }
 
-        /// \brief  The placement operator new has to be overloaded as well 
-        ///         (the global placement operators are hidden because of the 
+        /// \brief  The placement operator new has to be overloaded as well
+        ///         (the global placement operators are hidden because of the
         ///         new/delete overloads above).
         static void* operator new(std::size_t, void *p) { return p; }
-        /// \brief  This operator delete is called only if the placement new 
+        /// \brief  This operator delete is called only if the placement new
         ///         fails.
         static void operator delete(void*, void*) {}
 
@@ -491,29 +491,29 @@ namespace hpx { namespace threads
         /// instance.
         ///
         /// \returns        This function returns the current state of this
-        ///                 thread. It will return one of the values as defined 
+        ///                 thread. It will return one of the values as defined
         ///                 by the \a thread_state enumeration.
         ///
-        /// \note           This function will be seldom used directly. Most of 
+        /// \note           This function will be seldom used directly. Most of
         ///                 the time the state of a thread will be retrieved
         ///                 by using the function \a threadmanager#get_state.
-        thread_state get_state() const 
+        thread_state get_state() const
         {
             detail::thread const* t = get();
             return t ? t->get_state() : thread_state(terminated);
         }
 
-        /// The set_state function allows to change the state of this thread 
+        /// The set_state function allows to change the state of this thread
         /// instance.
         ///
         /// \param newstate [in] The new state to be set for the thread.
         ///
-        /// \note           This function will be seldomly used directly. Most of 
-        ///                 the time the state of a thread will have to be 
+        /// \note           This function will be seldomly used directly. Most of
+        ///                 the time the state of a thread will have to be
         ///                 changed using the threadmanager. Moreover,
         ///                 changing the thread state using this function does
         ///                 not change its scheduling status. It only sets the
-        ///                 thread's status word. To change the thread's 
+        ///                 thread's status word. To change the thread's
         ///                 scheduling status \a threadmanager#set_state should
         ///                 be used.
         thread_state set_state(thread_state_enum new_state)
@@ -522,21 +522,21 @@ namespace hpx { namespace threads
             return t ? t->set_state(new_state) : thread_state(terminated);
         }
 
-        /// The set_state function allows to change the state of this thread 
+        /// The set_state function allows to change the state of this thread
         /// instance.
         ///
         /// \param newstate [in] The new state to be set for the thread.
         /// \param new_tagged_state [out] will hold the new fully tagged state
-        bool set_state_tagged(thread_state_enum new_state, 
+        bool set_state_tagged(thread_state_enum new_state,
             thread_state& prev_state, thread_state& new_tagged_state)
         {
             detail::thread* t = get();
-            return t ? 
-                t->set_state_tagged(new_state, prev_state, new_tagged_state) : 
+            return t ?
+                t->set_state_tagged(new_state, prev_state, new_tagged_state) :
                 false;
         }
 
-        /// The restore_state function allows to change the state of this thread 
+        /// The restore_state function allows to change the state of this thread
         /// instance depending on its current state. It will change the state
         /// atomically only if the current state is still the same as passed
         /// as the second parameter. Otherwise it won't touch the thread state
@@ -546,16 +546,16 @@ namespace hpx { namespace threads
         /// \param oldstate [in] The old state of the thread which still has to
         ///                 be the current state.
         ///
-        /// \note           This function will be seldomly used directly. Most of 
-        ///                 the time the state of a thread will have to be 
+        /// \note           This function will be seldomly used directly. Most of
+        ///                 the time the state of a thread will have to be
         ///                 changed using the threadmanager. Moreover,
         ///                 changing the thread state using this function does
         ///                 not change its scheduling status. It only sets the
-        ///                 thread's status word. To change the thread's 
+        ///                 thread's status word. To change the thread's
         ///                 scheduling status \a threadmanager#set_state should
         ///                 be used.
         ///
-        /// \returns This function returns \a true if the state has been 
+        /// \returns This function returns \a true if the state has been
         ///          changed successfully
         bool restore_state(thread_state_enum newstate, thread_state oldstate)
         {
@@ -563,32 +563,32 @@ namespace hpx { namespace threads
             return t ? t->restore_state(newstate, oldstate) : false;
         }
 
-        /// The get_state_ex function allows to query the extended state of 
+        /// The get_state_ex function allows to query the extended state of
         /// this thread instance.
         ///
-        /// \returns        This function returns the current extended state of 
-        ///                 this thread. It will return one of the values as 
+        /// \returns        This function returns the current extended state of
+        ///                 this thread. It will return one of the values as
         ///                 defined by the \a thread_state_ex enumeration.
         ///
-        /// \note           This function will be seldom used directly. Most of 
-        ///                 the time the extended state of a thread will be 
-        ///                 retrieved by using the function 
+        /// \note           This function will be seldom used directly. Most of
+        ///                 the time the extended state of a thread will be
+        ///                 retrieved by using the function
         ///                 \a threadmanager#get_state_ex.
-        thread_state_ex get_state_ex() const 
+        thread_state_ex get_state_ex() const
         {
             detail::thread const* t = get();
             return t ? t->get_state_ex() : thread_state_ex(wait_unknown);
         }
 
-        /// The set_state function allows to change the extended state of this 
+        /// The set_state function allows to change the extended state of this
         /// thread instance.
         ///
-        /// \param newstate [in] The new extended state to be set for the 
+        /// \param newstate [in] The new extended state to be set for the
         ///                 thread.
         ///
-        /// \note           This function will be seldom used directly. Most of 
-        ///                 the time the state of a thread will have to be 
-        ///                 changed using the threadmanager. 
+        /// \note           This function will be seldom used directly. Most of
+        ///                 the time the state of a thread will have to be
+        ///                 changed using the threadmanager.
         thread_state_ex set_state_ex(thread_state_ex_enum new_state)
         {
             detail::thread* t = get();
@@ -599,7 +599,7 @@ namespace hpx { namespace threads
         ///
         /// \returns        This function returns the thread state the thread
         ///                 should be scheduled from this point on. The thread
-        ///                 manager will use the returned value to set the 
+        ///                 manager will use the returned value to set the
         ///                 thread's scheduling status.
         thread_state_enum operator()()
         {
@@ -613,10 +613,10 @@ namespace hpx { namespace threads
             detail::thread const* t = get();
             return t ? t->get_description() : "<terminated>";
         }
-        void set_description(char const* desc = 0) 
+        void set_description(char const* desc = 0)
         {
             detail::thread* t = get();
-            if (t) 
+            if (t)
                 t->set_description(desc);
         }
 
@@ -628,7 +628,7 @@ namespace hpx { namespace threads
         void set_lco_description(char const* lco_description = 0)
         {
             detail::thread* t = get();
-            if (t) 
+            if (t)
                 t->set_lco_description(lco_description);
         }
 
@@ -636,7 +636,7 @@ namespace hpx { namespace threads
         void set_marked_state(thread_state mark) const
         {
             detail::thread const* t = get();
-            if (t) 
+            if (t)
                 t->set_marked_state(mark);
         }
         thread_state get_marked_state() const
@@ -662,12 +662,12 @@ namespace hpx { namespace threads
     struct thread_pool
     {
         typedef components::detail::wrapper_heap_list<
-            components::detail::fixed_wrapper_heap<threads::thread> > 
+            components::detail::fixed_wrapper_heap<threads::thread> >
         heap_type;
         typedef boost::object_pool<threads::detail::thread> detail_heap_type;
 
-        thread_pool() 
-          : pool_(components::get_component_type<threads::detail::thread>()) 
+        thread_pool()
+          : pool_(components::get_component_type<threads::detail::thread>())
         {}
 
         heap_type pool_;
@@ -680,16 +680,16 @@ namespace hpx { namespace threads
       : thread::base_type(new (pool) detail::thread(
             init_data, This(), new_state, pool))
     {
-        LTM_(debug) << "thread::thread(" << this << "), description(" 
+        LTM_(debug) << "thread::thread(" << this << "), description("
                     << init_data.description << ")";
     }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components 
+namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
-    // specialization of heap factory for threads::thread, this is a dummy 
+    // specialization of heap factory for threads::thread, this is a dummy
     // implementation as the memory for threads::thread is managed externally
     // by the pool object stored in the thread_queue
     template <>

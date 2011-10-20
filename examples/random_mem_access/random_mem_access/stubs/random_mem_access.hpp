@@ -1,6 +1,6 @@
 //  Copyright (c) 2011 Matt Anderson
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_COMPONENTS_STUBS_RANDOM_JUN_06_2011_1125AM)
@@ -17,15 +17,15 @@
 namespace hpx { namespace components { namespace stubs
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// The \a stubs#simple_accumulator class is the client side representation 
+    /// The \a stubs#simple_accumulator class is the client side representation
     /// of all \a server#simple_accumulator components
     struct random_mem_access : stub_base<server::random_mem_access>
     {
-        /// Query the current value of the server#simple_accumulator instance 
-        /// with the given \a gid. This is a non-blocking call. The caller 
-        /// needs to call \a promise#get on the return value of 
+        /// Query the current value of the server#simple_accumulator instance
+        /// with the given \a gid. This is a non-blocking call. The caller
+        /// needs to call \a promise#get on the return value of
         /// this function to obtain the result as returned by the simple_accumulator.
-        static lcos::promise<int> query_async(naming::id_type gid) 
+        static lcos::promise<int> query_async(naming::id_type gid)
         {
             // Create an eager_future, execute the required action,
             // we simply return the initialized eager_future, the caller needs
@@ -34,7 +34,7 @@ namespace hpx { namespace components { namespace stubs
             return lcos::eager_future<action_type, int>(gid);
         }
 
-        static lcos::promise<void> add_async(naming::id_type gid) 
+        static lcos::promise<void> add_async(naming::id_type gid)
         {
             // Create an eager_future, execute the required action,
             // we simply return the initialized eager_future, the caller needs
@@ -43,7 +43,7 @@ namespace hpx { namespace components { namespace stubs
             return lcos::eager_future<action_type,void>(gid);
         }
 
-        static lcos::promise<void> print_async(naming::id_type gid) 
+        static lcos::promise<void> print_async(naming::id_type gid)
         {
             // Create an eager_future, execute the required action,
             // we simply return the initialized eager_future, the caller needs
@@ -52,12 +52,12 @@ namespace hpx { namespace components { namespace stubs
             return lcos::eager_future<action_type,void>(gid);
         }
 
-        /// Query the current value of the server#simple_accumulator instance 
-        /// with the given \a gid. Block for the current simple_accumulator value to 
+        /// Query the current value of the server#simple_accumulator instance
+        /// with the given \a gid. Block for the current simple_accumulator value to
         /// be returned.
-        static double query(naming::id_type gid) 
+        static double query(naming::id_type gid)
         {
-            // The following get yields control while the action above 
+            // The following get yields control while the action above
             // is executed and the result is returned to the promise
             return query_async(gid).get();
         }
@@ -65,23 +65,23 @@ namespace hpx { namespace components { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
-        /// Initialize the simple_accumulator value of the server#simple_accumulator instance 
+        /// Initialize the simple_accumulator value of the server#simple_accumulator instance
         /// with the given \a gid
-        static void init(naming::id_type gid,int i) 
+        static void init(naming::id_type gid,int i)
         {
             applier::apply<server::random_mem_access::init_action>(gid,i);
         }
 
-        static void add(naming::id_type gid) 
+        static void add(naming::id_type gid)
         {
-            // The following get yields control while the action above 
+            // The following get yields control while the action above
             // is executed and the result is returned to the promise
             add_async(gid).get();
         }
 
-        /// Print the current value of the server#simple_accumulator instance 
+        /// Print the current value of the server#simple_accumulator instance
         /// with the given \a gid
-        static void print(naming::id_type gid) 
+        static void print(naming::id_type gid)
         {
             print_async(gid).get();
           //  applier::apply<server::random_mem_access::print_action>(gid);

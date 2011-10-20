@@ -2,22 +2,22 @@
 //
 //  This code may be used under either of the following two licences:
 //
-//  Permission is hereby granted, free of charge, to any person obtaining a copy 
-//  of this software and associated documentation files (the "Software"), to deal 
-//  in the Software without restriction, including without limitation the rights 
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
-//  copies of the Software, and to permit persons to whom the Software is 
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
 //  furnished to do so, subject to the following conditions:
 //
-//  The above copyright notice and this permission notice shall be included in 
+//  The above copyright notice and this permission notice shall be included in
 //  all copies or substantial portions of the Software.
 //
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE. OF SUCH DAMAGE.
 //
 //  Or:
@@ -68,15 +68,15 @@ namespace boost { namespace coroutines { namespace detail {
     typedef context_base<context_impl> type;
     typedef boost::intrusive_ptr<type> pointer;
     typedef void deleter_type(const type*);
-    
+
     template<typename Derived>
-        context_base(Derived& derived, 
+        context_base(Derived& derived,
                      std::ptrdiff_t stack_size) :
       context_impl(derived, stack_size),
       m_caller(),
       m_counter(0),
       m_deleter(&deleter<Derived>),
-      m_state(ctx_ready), 
+      m_state(ctx_ready),
       m_exit_state(ctx_exit_not_requested),
       m_exit_status(ctx_not_exited),
       m_wait_counter(0),
@@ -132,7 +132,7 @@ namespace boost { namespace coroutines { namespace detail {
     }
 
     /*
-     * A signal may occur only when a context is 
+     * A signal may occur only when a context is
      * not running (is delivered synchronously).
      * This means that state MUST NOT be busy.
      * It may be ready or waiting.
@@ -158,7 +158,7 @@ namespace boost { namespace coroutines { namespace detail {
      * exited abnormally.
      * Return: false if invoke() would have thrown,
      *         true otherwise.
-     * 
+     *
      */
     bool wake_up() {
       BOOST_ASSERT(ready());
@@ -264,7 +264,7 @@ namespace boost { namespace coroutines { namespace detail {
 
     //
     // If n > 0, put the coroutine in the wait state
-    // then relinquish control to caller. 
+    // then relinquish control to caller.
     // If n = 0 do nothing.
     // The coroutine will remain in the wait state until
     // is signaled 'n' times.
@@ -278,7 +278,7 @@ namespace boost { namespace coroutines { namespace detail {
     // FIXME: currently there is a BIG problem. A coroutine cannot
     // be exited as long as there are futures pending.
     // The exit_exception would cause the future to be destroyed and
-    // an assertion to be generated. Removing an assertion is not a 
+    // an assertion to be generated. Removing an assertion is not a
     // solution because we would leak the coroutine impl. The callback
     // bound to the future in fact hold a reference to it. If the coroutine
     // is exited the callback cannot be called.
@@ -322,7 +322,7 @@ namespace boost { namespace coroutines { namespace detail {
     void exit() throw(){
       BOOST_ASSERT(!pending());
       BOOST_ASSERT(ready()) ;
-      if(m_exit_state < ctx_exit_pending) 
+      if(m_exit_state < ctx_exit_pending)
         m_exit_state = ctx_exit_pending;
       do_invoke();
       BOOST_ASSERT(exited()); //at this point the coroutine MUST have exited.
@@ -371,7 +371,7 @@ namespace boost { namespace coroutines { namespace detail {
       ctx_exit_pending,   // exit requested.
       ctx_exit_signaled,  // exit request delivered.
     };
-    
+
     // exit status
     enum context_exit_status {
       ctx_not_exited,
@@ -393,7 +393,7 @@ namespace boost { namespace coroutines { namespace detail {
 #endif
     }
 
-    // Cause the coroutine to exit if 
+    // Cause the coroutine to exit if
     // a exit request is pending.
     // Throws: exit_exception if an exit request is pending.
     void check_exit_state() {
@@ -432,7 +432,7 @@ namespace boost { namespace coroutines { namespace detail {
     {
         ActualCtx::destroy(static_cast<ActualCtx*>(const_cast<type*>(ctx)));
     }
-            
+
     typedef typename context_impl::context_impl_base ctx_type;
     ctx_type m_caller;
 #ifndef BOOST_COROUTINE_USE_ATOMIC_COUNT

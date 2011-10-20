@@ -29,14 +29,14 @@
 
 namespace boost { namespace logging { namespace detail {
 
-/** 
+/**
     This only holds the time format, and allows writing a certain time
 */
 struct time_format_holder {
 private:
     struct index_info {
         typedef hold_string_type::size_type uint;
-        
+
         index_info(uint src_idx_, int *format_idx_, int advance_size_ = 2,
                    int size_ = 2)
             : src_idx(src_idx_), format_idx(format_idx_),
@@ -57,7 +57,7 @@ public:
     }
 
 
-    /** 
+    /**
         constructs a time format holder object
     */
     time_format_holder(const hold_string_type & format) : m_day(-1), m_month(-1), m_yy(-1), m_yyyy(-1), m_hour(-1), m_min(-1), m_sec(-1),m_millisec(-1),m_microsec(-1),m_nanosec(-1) {
@@ -111,8 +111,8 @@ public:
             indexes.push_back( index_info(nanosec_idx, &m_nanosec, 4, 9) );
 
         std::sort( indexes.begin(), indexes.end(), index_info::by_index);
-        
-        // create the format string, that we can actually pass to sprintf 
+
+        // create the format string, that we can actually pass to sprintf
         uint prev_idx = 0;
         int idx = 0;
         for ( array::iterator begin = indexes.begin(), end = indexes.end(); begin != end; ++begin) {
@@ -131,8 +131,8 @@ public:
     void write_time(char_type buffer[], int day, int month, int year, int hour, int min, int sec, int millisec, int microsec, int nanosec) const {
         int vals[11];
         vals[m_day + 1]      = day;
-        vals[m_month + 1]    = month; 
-        vals[m_yy + 1]       = year % 100; 
+        vals[m_month + 1]    = month;
+        vals[m_yy + 1]       = year % 100;
         vals[m_yyyy + 1]     = year;
         vals[m_hour + 1]     = hour;
         vals[m_min + 1]      = min;
@@ -140,7 +140,7 @@ public:
         vals[m_millisec + 1]        = millisec;
         vals[m_microsec + 1]        = microsec;
         vals[m_nanosec + 1]         = nanosec;
-      
+
         // ignore value at index 0 - it's there so that I don't have to test for an index being -1
     #ifdef BOOST_LOG_USE_WCHAR_T
         swprintf( buffer, m_format.c_str(), vals[1], vals[2], vals[3], vals[4], vals[5], vals[6], vals[7], vals[8], vals[9], vals[10] );
@@ -152,13 +152,13 @@ public:
     void write_time(char_type buffer[], int day, int month, int year, int hour, int min, int sec) const {
         int vals[8];
         vals[m_day + 1]      = day;
-        vals[m_month + 1]    = month; 
-        vals[m_yy + 1]       = year % 100; 
+        vals[m_month + 1]    = month;
+        vals[m_yy + 1]       = year % 100;
         vals[m_yyyy + 1]     = year;
         vals[m_hour + 1]     = hour;
         vals[m_min + 1]      = min;
         vals[m_sec + 1]      = sec;
-      
+
         // ignore value at index 0 - it's there so that I don't have to test for an index being -1
     #ifdef BOOST_LOG_USE_WCHAR_T
         swprintf( buffer, m_format.c_str(), vals[1], vals[2], vals[3], vals[4], vals[5], vals[6], vals[7]);

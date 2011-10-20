@@ -28,7 +28,7 @@ namespace boost { namespace plugin {
 
         template<typename BasePlugin, typename DeleterType>
         std::pair<abstract_factory<BasePlugin> *, dll_handle>
-        get_abstract_factory_static(get_plugins_list_type f, DeleterType d, 
+        get_abstract_factory_static(get_plugins_list_type f, DeleterType d,
             std::string const &class_name, std::string const& libname = "")
         {
             typedef typename remove_pointer<get_plugins_list_type>::type PointedType;
@@ -39,7 +39,7 @@ namespace boost { namespace plugin {
 
             typename exported_plugins_type::iterator it = e.find(clsname);
             if (it != e.end()) {
-                abstract_factory<BasePlugin>** xw = 
+                abstract_factory<BasePlugin>** xw =
                     boost::unsafe_any_cast<abstract_factory<BasePlugin> *>(&(*it).second);
 
                 if (!xw) {
@@ -48,12 +48,12 @@ namespace boost { namespace plugin {
 
                 abstract_factory<BasePlugin> *w = *xw;
                 return make_pair(w, boost::shared_ptr<PointedType>(f, d));
-            } 
+            }
             else {
                 BOOST_PLUGIN_OSSTREAM str;
-                str << "Boost.Plugin: Class '" << class_name 
+                str << "Boost.Plugin: Class '" << class_name
                     << "' was not found";
-                    
+
                 if (!libname.empty())
                     str << " in the shared library '" << libname << "'.";
 
@@ -94,10 +94,10 @@ namespace boost { namespace plugin {
             plugin_entry += d.get_mapname();
             plugin_entry += "_" + base_name;
 
-            std::pair<get_plugins_list_type, DeleterType> f = 
+            std::pair<get_plugins_list_type, DeleterType> f =
                 d.get<get_plugins_list_type, DeleterType>(plugin_entry);
 
-            return get_abstract_factory_static<BasePlugin>(f.first, f.second, 
+            return get_abstract_factory_static<BasePlugin>(f.first, f.second,
                 class_name, d.get_name());
         }
 
@@ -111,7 +111,7 @@ namespace boost { namespace plugin {
             plugin_entry += d.get_mapname();
             plugin_entry += "_" + base_name;
 
-            std::pair<get_plugins_list_type, DeleterType> f = 
+            std::pair<get_plugins_list_type, DeleterType> f =
                 d.get<get_plugins_list_type, DeleterType>(plugin_entry);
 
             exported_plugins_type& e = (f.first)();
@@ -122,7 +122,7 @@ namespace boost { namespace plugin {
                 names.push_back((*it).first);
             }
         }
-        
+
         ///////////////////////////////////////////////////////////////////////
         struct plugin_factory_item_base
         {
@@ -143,45 +143,45 @@ namespace boost { namespace plugin {
         struct plugin_factory_item;
 
         template<typename BasePlugin, typename Base>
-        struct plugin_factory_item<BasePlugin, Base, boost::mpl::list<> > 
-        :   public Base 
-        { 
+        struct plugin_factory_item<BasePlugin, Base, boost::mpl::list<> >
+        :   public Base
+        {
             BasePlugin* create(std::string const& name) const
             {
-                std::pair<abstract_factory<BasePlugin> *, dll_handle> r = 
+                std::pair<abstract_factory<BasePlugin> *, dll_handle> r =
                     get_abstract_factory<BasePlugin>(this->m_dll, name, this->m_basename);
-                return r.first->create(r.second);            
+                return r.first->create(r.second);
             }
         };
 
         template<typename BasePlugin, typename Base, typename A1>
-        struct plugin_factory_item<BasePlugin, Base, boost::mpl::list<A1> > 
-        :   public Base 
+        struct plugin_factory_item<BasePlugin, Base, boost::mpl::list<A1> >
+        :   public Base
         {
             using Base::create;
             BasePlugin* create(std::string const& name, A1 a1) const
             {
-                std::pair<abstract_factory<BasePlugin> *, dll_handle> r = 
+                std::pair<abstract_factory<BasePlugin> *, dll_handle> r =
                     get_abstract_factory<BasePlugin>(this->m_dll, name, this->m_basename);
                 return r.first->create(r.second, a1);
             }
         };
 
         template<typename BasePlugin, typename Base, typename A1, typename A2>
-        struct plugin_factory_item<BasePlugin, Base, boost::mpl::list<A1, A2> > 
-        :   public Base 
+        struct plugin_factory_item<BasePlugin, Base, boost::mpl::list<A1, A2> >
+        :   public Base
         {
             using Base::create;
             BasePlugin* create(std::string const& name, A1 a1, A2 a2) const
             {
-                std::pair<abstract_factory<BasePlugin> *, dll_handle> r = 
+                std::pair<abstract_factory<BasePlugin> *, dll_handle> r =
                     get_abstract_factory<BasePlugin>(this->m_dll, name, this->m_basename);
-                return r.first->create(r.second, a1, a2);            
+                return r.first->create(r.second, a1, a2);
             }
         };
 
         ///////////////////////////////////////////////////////////////////////
-        // empty deleter for the smart pointer to be used for static 
+        // empty deleter for the smart pointer to be used for static
         // plugin_factories
         inline void empty_deleter(get_plugins_list_type) {}
 
@@ -199,83 +199,83 @@ namespace boost { namespace plugin {
         struct static_plugin_factory_item;
 
         template<typename BasePlugin, typename Base>
-        struct static_plugin_factory_item<BasePlugin, Base, boost::mpl::list<> > 
-        :   public Base 
-        { 
+        struct static_plugin_factory_item<BasePlugin, Base, boost::mpl::list<> >
+        :   public Base
+        {
             BasePlugin* create(std::string const& name) const
             {
-                std::pair<abstract_factory<BasePlugin> *, dll_handle> r = 
+                std::pair<abstract_factory<BasePlugin> *, dll_handle> r =
                     get_abstract_factory_static<BasePlugin>(
                         this->f, &empty_deleter, name);
-                return r.first->create(r.second);            
+                return r.first->create(r.second);
             }
         };
 
         template<typename BasePlugin, typename Base, typename A1>
-        struct static_plugin_factory_item<BasePlugin, Base, boost::mpl::list<A1> > 
-        :   public Base 
-        {                
+        struct static_plugin_factory_item<BasePlugin, Base, boost::mpl::list<A1> >
+        :   public Base
+        {
             using Base::create;
             BasePlugin* create(std::string const& name, A1 a1) const
             {
-                std::pair<abstract_factory<BasePlugin> *, dll_handle> r = 
+                std::pair<abstract_factory<BasePlugin> *, dll_handle> r =
                     get_abstract_factory_static<BasePlugin>(
                         this->f, &empty_deleter, name);
-                return r.first->create(r.second, a1);            
+                return r.first->create(r.second, a1);
             }
         };
 
         template<typename BasePlugin, typename Base, typename A1, typename A2>
-        struct static_plugin_factory_item<BasePlugin, Base, boost::mpl::list<A1, A2> > 
-        :   public Base 
+        struct static_plugin_factory_item<BasePlugin, Base, boost::mpl::list<A1, A2> >
+        :   public Base
         {
             using Base::create;
             BasePlugin* create(std::string const& name, A1 a1, A2 a2) const
             {
-                std::pair<abstract_factory<BasePlugin> *, dll_handle> r = 
+                std::pair<abstract_factory<BasePlugin> *, dll_handle> r =
                     get_abstract_factory_static<BasePlugin>(
                         this->f, &empty_deleter, name);
-                return r.first->create(r.second, a1, a2);            
+                return r.first->create(r.second, a1, a2);
             }
         };
     }
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-//  Bring in the remaining plugin_factory_item definitions for parameter 
+//  Bring in the remaining plugin_factory_item definitions for parameter
 //  counts greater 2
 //
 ///////////////////////////////////////////////////////////////////////////////
 #include <boost/plugin/detail/plugin_factory_impl.hpp>
 
-    ///////////////////////////////////////////////////////////////////////////    
+    ///////////////////////////////////////////////////////////////////////////
     template<class BasePlugin>
-    struct plugin_factory 
+    struct plugin_factory
     :   public boost::mpl::inherit_linearly <
             typename virtual_constructors<BasePlugin>::type,
-            detail::plugin_factory_item<BasePlugin, 
+            detail::plugin_factory_item<BasePlugin,
                 boost::mpl::placeholders::_, boost::mpl::placeholders::_>,
             detail::plugin_factory_item_base
-        >::type 
+        >::type
     {
-        plugin_factory(dll const& d, std::string const& basename) 
+        plugin_factory(dll const& d, std::string const& basename)
         {
             this->m_dll = d;
             this->m_basename = basename;
         }
     };
 
-    ///////////////////////////////////////////////////////////////////////////    
+    ///////////////////////////////////////////////////////////////////////////
     template<class BasePlugin>
-    struct static_plugin_factory 
+    struct static_plugin_factory
     :   public boost::mpl::inherit_linearly <
             typename virtual_constructors<BasePlugin>::type,
-            detail::static_plugin_factory_item<BasePlugin, 
+            detail::static_plugin_factory_item<BasePlugin,
                 boost::mpl::placeholders::_, boost::mpl::placeholders::_>,
             detail::static_plugin_factory_item_base
-        >::type 
+        >::type
     {
-        static_plugin_factory(get_plugins_list_type f) 
+        static_plugin_factory(get_plugins_list_type f)
         {
             this->f = f;
         }

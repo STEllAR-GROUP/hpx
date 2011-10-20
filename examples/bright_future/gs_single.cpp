@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  
+//
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -126,7 +126,7 @@ void gs(
                     }
                 }
             }
-            
+
             // update the "black" points
 #pragma omp parallel for private(x_block, y_block, x, y)
             for(x_block = 1; x_block < n_x - 1; x_block += block_size)
@@ -161,7 +161,7 @@ void gs(
         {
             r = r + residuum[i] * residuum[i];
         }
-    
+
         if(std::sqrt(r) <= 1e-10)
         {
             break;

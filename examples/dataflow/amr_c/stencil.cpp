@@ -1,8 +1,8 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Matthew Anderson
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
@@ -24,32 +24,32 @@
 #include "../mesh/unigrid_mesh.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace amr 
+namespace hpx { namespace components { namespace amr
 {
     ///////////////////////////////////////////////////////////////////////////
     // memory block support for config data needed for serialization of
     // stencil_data
     typedef hpx::actions::manage_object_action<server::stencil_config_data>
         manage_object_config_data_action;
-    manage_object_config_data_action const manage_stencil_config_data = 
+    manage_object_config_data_action const manage_stencil_config_data =
         manage_object_config_data_action();
 
     // memory block support for stencil data (user defined data)
     typedef hpx::actions::manage_object_action<
         stencil_data, server::stencil_config_data> manage_object_data_action;
-    manage_object_data_action const manage_stencil_data = 
+    manage_object_data_action const manage_stencil_data =
         manage_object_data_action();
 
 //     // memory block support for stencil data (user defined data)
-//     typedef hpx::actions::manage_object_action<stencil_data> 
+//     typedef hpx::actions::manage_object_action<stencil_data>
 //         manage_object_data_action_simple;
-//     manage_object_data_action_simple const manage_stencil_data_simple = 
+//     manage_object_data_action_simple const manage_stencil_data_simple =
 //         manage_object_data_action_simple();
 
     ///////////////////////////////////////////////////////////////////////////
     memory_block_data stencil_config_data::create_and_resolve_target()
     {
-        mem_block.create(hpx::find_here(), sizeof(server::stencil_config_data), 
+        mem_block.create(hpx::find_here(), sizeof(server::stencil_config_data),
             manage_stencil_config_data);
         return mem_block.get();
     }
@@ -79,7 +79,7 @@ HPX_REGISTER_MANAGE_OBJECT_ACTION(
 //     dataflow_manage_object_action_stencil_data_simple)
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace amr 
+namespace hpx { namespace components { namespace amr
 {
     ///////////////////////////////////////////////////////////////////////////
     stencil::stencil()
@@ -90,7 +90,7 @@ namespace hpx { namespace components { namespace amr
     ///////////////////////////////////////////////////////////////////////////
     // Implement actual functionality of this stencil
     // Compute the result value for the current time step
-    int stencil::eval(naming::id_type const& result, 
+    int stencil::eval(naming::id_type const& result,
         std::vector<naming::id_type> const& gids, std::size_t row, std::size_t column,
         double cycle_time, parameter const& par)
     {
@@ -114,7 +114,7 @@ namespace hpx { namespace components { namespace amr
         stencil_config_data cfg_left(par->grain_size-3, 2);
 
         // get all input memory_block_data instances
-        typedef std::vector<lcos::promise<memory_block_data> > 
+        typedef std::vector<lcos::promise<memory_block_data> >
             lazy_results_type;
 
         // first invoke all remote operations
@@ -136,7 +136,7 @@ namespace hpx { namespace components { namespace amr
             val.push_back(f.get());
 
         // lock all user defined data elements, will be unlocked at function exit
-        scoped_values_lock<lcos::mutex> l(val); 
+        scoped_values_lock<lcos::mutex> l(val);
 
         val[3]->max_index_ = val[1]->max_index_;
         val[3]->index_ = val[1]->index_;
@@ -149,8 +149,8 @@ namespace hpx { namespace components { namespace amr
 
         val[3]->timestep_ = val[1]->timestep_ + 1.0;
 
-        std::cout << " row " << row << " column " << column 
-            << " timestep " << val[3]->timestep_ 
+        std::cout << " row " << row << " column " << column
+            << " timestep " << val[3]->timestep_
             << " left " << val[0]->value_.size() << "(" << val[0]->value_.data_size() << ")"
             << " middle " << val[1]->value_.size() << "(" << val[1]->value_.data_size() << ")"
             << " right " << val[2]->value_.size() << "(" << val[2]->value_.data_size() << ")"
@@ -174,7 +174,7 @@ namespace hpx { namespace components { namespace amr
             here, sizeof(stencil_data), manage_stencil_data);
 
         if (-1 != item) {
-            // provide initial data for the given data value 
+            // provide initial data for the given data value
             access_memory_block<stencil_data> val(
                 components::stubs::memory_block::checkout(result));
 

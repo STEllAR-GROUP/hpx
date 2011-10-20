@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2009-2011 Matthew Anderson
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_COMPONENTS_STENCIL_LOCKING_AUG_02_1139AM)
@@ -19,7 +19,7 @@
 
 #include "stencil_data.hpp"
 
-namespace hpx { namespace components { namespace adaptive1d 
+namespace hpx { namespace components { namespace adaptive1d
 {
 #define HPX_LOCK_MUTEX(z, n, _) BOOST_PP_COMMA_IF(n) mutexes[n].get()
 #define HPX_LOCK_MUTEXES(z, n, _)                                             \
@@ -31,7 +31,7 @@ namespace hpx { namespace components { namespace adaptive1d
     namespace detail
     {
         template <typename Mutex>
-        inline void 
+        inline void
         lock(std::vector<boost::reference_wrapper<Mutex> >& mutexes)
         {
             switch(mutexes.size()) {
@@ -43,8 +43,8 @@ namespace hpx { namespace components { namespace adaptive1d
             BOOST_PP_REPEAT_FROM_TO(2, BOOST_PP_INC(HPX_LOCK_LIMIT), HPX_LOCK_MUTEXES, _)
 
             default:
-                HPX_THROW_EXCEPTION(bad_parameter, 
-                    "hpx::components::adaptive1d::detail::lock", 
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "hpx::components::adaptive1d::detail::lock",
                     "invalid number of arguments" + boost::lexical_cast<std::string>(mutexes.size()));
                 break;
             }
@@ -54,7 +54,7 @@ namespace hpx { namespace components { namespace adaptive1d
 #undef HPX_LOCK_MUTEX
 
         template <typename Mutex>
-        inline void 
+        inline void
         unlock(std::vector<boost::reference_wrapper<Mutex> > mutexes)
         {
             BOOST_FOREACH(Mutex& mutex, mutexes)
@@ -63,13 +63,13 @@ namespace hpx { namespace components { namespace adaptive1d
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // helper allowing to do a scoping lock of several mutex's at once 
+    // helper allowing to do a scoping lock of several mutex's at once
     // unlock and re-lock on exit
     struct compare_mutexes
     {
         template <typename Mutex>
         bool operator()(
-            boost::reference_wrapper<Mutex> const& lhs, 
+            boost::reference_wrapper<Mutex> const& lhs,
             boost::reference_wrapper<Mutex> const& rhs) const
         {
             return lhs.get_pointer() < rhs.get_pointer();
@@ -91,7 +91,7 @@ namespace hpx { namespace components { namespace adaptive1d
             detail::lock(mutexes_);
         }
         scoped_values_lock(
-            access_memory_block<stencil_data>& value, 
+            access_memory_block<stencil_data>& value,
             std::vector<access_memory_block<stencil_data> >& values)
         {
             mutexes_.reserve(values.size()+1);
@@ -104,7 +104,7 @@ namespace hpx { namespace components { namespace adaptive1d
             detail::lock(mutexes_);
         }
         scoped_values_lock(
-            access_memory_block<stencil_data>& value1, 
+            access_memory_block<stencil_data>& value1,
             access_memory_block<stencil_data>& value2)
         {
             mutexes_.reserve(2);

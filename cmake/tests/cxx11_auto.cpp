@@ -13,7 +13,7 @@ struct accumulator
 {
   private:
     unsigned& total_;
-  
+
   public:
     accumulator(
         unsigned& total

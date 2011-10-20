@@ -19,7 +19,7 @@
 using boost::integer::big32_t;
 using boost::integer::little32_t;
 
-namespace 
+namespace
 {
   //  This is an extract from a very widely used GIS file format. I have no idea
   //  why a designer would mix big and little endians in the same file - but
@@ -40,7 +40,7 @@ namespace
 int main()
 {
   assert( sizeof( header ) == 16 );
-  
+
   header h;
 
   h.file_code   = 0x04030201;
@@ -55,14 +55,14 @@ int main()
   //  for I/O in this example.
 
   std::FILE * fi;
-  
+
   if ( !(fi = std::fopen( filename, "wb" )) )
   {
     std::cout << "could not open " << filename << '\n';
     return 1;
   }
 
-  if ( std::fwrite( &h, sizeof( header ), 1, fi ) != 1 ) 
+  if ( std::fwrite( &h, sizeof( header ), 1, fi ) != 1 )
   {
     std::cout << "write failure for " << filename << '\n';
     return 1;

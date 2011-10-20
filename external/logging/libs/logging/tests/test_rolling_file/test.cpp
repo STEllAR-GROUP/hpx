@@ -13,7 +13,7 @@
  See http://www.torjo.com/log2/ for more details
 */
 
-/* 
+/*
     Tests rolling file
     - tests writing to a clean rolling file
     - tests writing to a rolling file that has been partially written to
@@ -38,10 +38,10 @@ using namespace boost::logging;
 
 typedef logger_format_write< > log_type;
 
-BOOST_DEFINE_LOG_FILTER(g_log_filter, filter::no_ts ) 
+BOOST_DEFINE_LOG_FILTER(g_log_filter, filter::no_ts )
 BOOST_DEFINE_LOG(g_l, log_type)
 
-#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() ) 
+#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() )
 
 // whatever we log to the rolling file, we log here too (easy was to find out all the info that was logged)
 std::stringstream g_stringstream;
@@ -58,8 +58,8 @@ const int FILE_COUNT = 5;
 const char NEXT_LINE = '\n';
 
 void init_logs() {
-    g_l()->writer().add_destination( 
-        destination::rolling_file("out.txt", 
+    g_l()->writer().add_destination(
+        destination::rolling_file("out.txt",
             destination::rolling_file_settings()
                 .initial_erase(true)
                 .max_size_bytes( MAX_SIZE_PER_FILE)
@@ -86,10 +86,10 @@ void write_to_clean_rolling_file() {
     g_log_filter()->set_enabled(true);
 }
 
-void write_to_existing_rolling_file() { 
+void write_to_existing_rolling_file() {
     g_l()->writer().del_destination( destination::rolling_file("out.txt") );
-    g_l()->writer().add_destination( 
-        destination::rolling_file("out.txt", 
+    g_l()->writer().add_destination(
+        destination::rolling_file("out.txt",
             destination::rolling_file_settings()
                 .initial_erase(false)
                 .max_size_bytes( MAX_SIZE_PER_FILE)
@@ -112,7 +112,7 @@ void write_to_existing_rolling_file() {
 
 // a bit of white-box testing - we need to know the file names - when dealing with a rolling file
 std::string file_name(const std::string & name_prefix, int idx) {
-    std::ostringstream out; 
+    std::ostringstream out;
     if ( idx > 0)
         out << name_prefix << "." << (idx+1);
     else
@@ -124,7 +124,7 @@ void test_contents() {
     // now, read each file and see if it matches the blocks
     for ( int idx = 0; idx < FILE_COUNT; ++idx) {
         std::ifstream cur_file( file_name("out.txt", idx).c_str() , std::ios_base::in | std::ios_base::binary );
-        std::ostringstream out; 
+        std::ostringstream out;
         out << cur_file.rdbuf();
         std::string cur_file_contents = out.str();
         std::string & cur_block = g_blocks[idx];
@@ -132,10 +132,10 @@ void test_contents() {
     }
 }
 
-void test_contents_after_write_to_existing_rolling_file() { 
+void test_contents_after_write_to_existing_rolling_file() {
     //
     // at this point, we've rolled over - that is, some of the very old contents have been overwritten
-    
+
     // we've also written to a stream, to get the contents as they would have been written, if we hadn't rolled over
     std::string all_contents = g_stringstream.str();
     std::istringstream in(all_contents);
@@ -159,7 +159,7 @@ void test_contents_after_write_to_existing_rolling_file() {
     // now, read each file and see if it matches the blocks
     for ( int idx = 0; idx < FILE_COUNT; ++idx) {
         std::ifstream cur_file( file_name("out.txt", idx).c_str() , std::ios_base::in | std::ios_base::binary );
-        std::ostringstream out; 
+        std::ostringstream out;
         out << cur_file.rdbuf();
         std::string cur_file_contents = out.str();
         std::string & cur_block = g_blocks[idx];
@@ -167,7 +167,7 @@ void test_contents_after_write_to_existing_rolling_file() {
     }
 }
 
-void write_to_too_full_rolling_file() { 
+void write_to_too_full_rolling_file() {
     // make sure all files are too full to be appended to
     for ( int idx = 0; idx < FILE_COUNT; ++idx) {
         std::string cur_file_name = file_name("out.txt", idx);
@@ -182,8 +182,8 @@ void write_to_too_full_rolling_file() {
 
     // right now, we know for sure that all files are too big - thus, when logging, we should end up writing to first file first
     g_l()->writer().del_destination( destination::rolling_file("out.txt") );
-    g_l()->writer().add_destination( 
-        destination::rolling_file("out.txt", 
+    g_l()->writer().add_destination(
+        destination::rolling_file("out.txt",
             destination::rolling_file_settings()
                 .initial_erase(false)
                 .max_size_bytes( MAX_SIZE_PER_FILE)
@@ -209,7 +209,7 @@ void write_to_too_full_rolling_file() {
     }
 
 }
-void test_contents_after_writing_to_full_rolling_file() { 
+void test_contents_after_writing_to_full_rolling_file() {
     std::string last_contents = g_after_full.str();
     std::istringstream in(last_contents);
 
@@ -233,7 +233,7 @@ void test_contents_after_writing_to_full_rolling_file() {
     test_contents();
 }
 
-int test_main(int, char *[]) { 
+int test_main(int, char *[]) {
     fs::path::default_name_check( fs::no_check);
 
     init_logs();

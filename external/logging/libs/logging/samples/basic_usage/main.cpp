@@ -15,13 +15,13 @@
 
 // main.cpp : Where the main() action is
 
-/**  
+/**
 @page scenario_multiple_files A more complex example - a Line counter application
 
-- @ref scenario_multiple_files_program 
-- @ref scenario_multiple_files_log_h 
-- @ref scenario_multiple_files_log_cpp 
-- @ref scenario_multiple_files_main 
+- @ref scenario_multiple_files_program
+- @ref scenario_multiple_files_log_h
+- @ref scenario_multiple_files_log_cpp
+- @ref scenario_multiple_files_main
 
 
 
@@ -33,9 +33,9 @@ It's a simple application, just to show you how to use the Boost Logging Lib v2 
 It counts code lines, empty lines, and comment lines.
 Again, it's a very simple program, thus:
 - an empty line : contains only spaces
-- a comment line: 
+- a comment line:
   - C++ : starts with //
-  - C: the start of a C comment is when the line @b starts with "/ *"; 
+  - C: the start of a C comment is when the line @b starts with "/ *";
        the end of a C comment is when the line @b ends with "* /";
        anything else is not considered a comment
 
@@ -90,7 +90,7 @@ You can check out the whole example: <tt>libs/logging/samples/basic_usage</tt>.
 using namespace boost::logging;
 namespace fs = boost::filesystem;
 
-int main(int argc, char * argv[])  
+int main(int argc, char * argv[])
 {
     fs::path::default_name_check( fs::no_check);
 
@@ -113,7 +113,7 @@ int main(int argc, char * argv[])
     while ( in >> word)
         ext.add(word);
     }
-    
+
     level::type lev = level::info;
     std::string lev_str = "info";
     if ( argc > 3) {

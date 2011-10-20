@@ -1,11 +1,11 @@
 namespace boost { namespace logging {
 
-/** 
+/**
 @page scenarios_code Code for the common scenarios
 
-- @ref scenarios_code_mom 
-- @ref scenarios_code_noo 
-- @ref scenarios_code_mon 
+- @ref scenarios_code_mom
+- @ref scenarios_code_noo
+- @ref scenarios_code_mon
 
 - @ref common_your_scenario_code
 

@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -11,7 +11,7 @@
 #include <hpx/util/stringstream.hpp>
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos 
+namespace hpx { namespace lcos
 {
     local_counting_semaphore::~local_counting_semaphore()
     {
@@ -33,27 +33,27 @@ namespace hpx { namespace lcos
                 threads::thread* thrd = static_cast<threads::thread*>(id);
                 LERR_(fatal)
                         << "lcos::local_counting_semaphore::~local_counting_semaphore:"
-                        << " pending thread: " 
-                        << get_thread_state_name(thrd->get_state()) 
+                        << " pending thread: "
+                        << get_thread_state_name(thrd->get_state())
                         << "(" << id << "): " << thrd->get_description();
 
                 // forcefully abort thread, do not throw
                 error_code ec;
-                threads::set_thread_state(id, threads::pending, 
+                threads::set_thread_state(id, threads::pending,
                     threads::wait_abort, threads::thread_priority_normal, ec);
                 if (ec)
                 {
                     LERR_(fatal)
                         << "lcos::local_counting_semaphore::~local_counting_semaphore:"
                         << " could not abort thread: "
-                        << get_thread_state_name(thrd->get_state()) 
+                        << get_thread_state_name(thrd->get_state())
                         << "(" << id << "): " << thrd->get_description();
                 }
             }
         }
     }
 
-    void local_counting_semaphore::wait_locked(boost::int64_t count, 
+    void local_counting_semaphore::wait_locked(boost::int64_t count,
         mutex_type::scoped_lock& l)
     {
         while (value_ < count)
@@ -80,10 +80,10 @@ namespace hpx { namespace lcos
 
             if (statex == threads::wait_abort) {
                 hpx::util::osstream strm;
-                strm << "thread(" << id << ", " 
+                strm << "thread(" << id << ", "
                      << threads::get_thread_description(id)
                      << ") aborted (yield returned wait_abort)";
-                HPX_THROW_EXCEPTION(yield_aborted, 
+                HPX_THROW_EXCEPTION(yield_aborted,
                     "lcos::local_counting_semaphore::wait",
                     hpx::util::osstream_get_string(strm));
                 return;
@@ -94,7 +94,7 @@ namespace hpx { namespace lcos
     }
 
     void local_counting_semaphore::signal_locked(boost::int64_t count,
-        mutex_type::scoped_lock& l) 
+        mutex_type::scoped_lock& l)
     {
         value_ += count;
         if (value_ >= 0)
@@ -124,7 +124,7 @@ namespace hpx { namespace lcos
                 if (HPX_UNLIKELY(!id)) {
                     HPX_THROW_EXCEPTION(null_thread_id,
                         "local_counting_semaphore::signal_locked",
-                        "NULL thread id encountered"); 
+                        "NULL thread id encountered");
                 }
                 queue.front().id_ = 0;
                 queue.pop_front();

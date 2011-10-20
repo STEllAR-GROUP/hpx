@@ -25,11 +25,11 @@ void console_logging_locked(naming::id_type const& prefix,
     // the AGAS components. We just throw an exception here - there's no
     // thread-manager, so the exception will probably be unhandled. This is
     // desirable in this situation, as we can't trust the logging system to
-    // report this error. 
+    // report this error.
     if (HPX_UNLIKELY(!threads::get_self_ptr()))
         HPX_THROW_EXCEPTION(null_thread_id
           , "components::console_logging_locked"
-          , "console_logging_locked was not called from a pxthread"); 
+          , "console_logging_locked was not called from a pxthread");
 
     try {
         applier::apply<server::console_logging_action<> >(prefix, msgs);
@@ -47,7 +47,7 @@ void console_logging_locked(naming::id_type const& prefix,
                 fail_msg = "Failed logging to console";
             else
                 fail_msg = "Failed logging to console due to: "
-                         + fail_msg; 
+                         + fail_msg;
 
             switch (at_c<0>(msg)) {
             default:
@@ -78,27 +78,27 @@ void console_logging_locked(naming::id_type const& prefix,
 void pending_logs::add(message_type const& msg)
 {
     {
-        queue_mutex_type::scoped_lock l(queue_mtx_); 
+        queue_mutex_type::scoped_lock l(queue_mtx_);
         queue_.push_back(msg);
         ++queue_size_;
     }
 
     // we can only invoke send from within a pxthread
     if (threads::threadmanager_is(running) && threads::get_self_ptr() &&
-        activated_.load()) 
+        activated_.load())
     {
         // invoke actual logging immediately if we're on the console
-        if (naming::get_agas_client().is_console()) 
+        if (naming::get_agas_client().is_console())
             send();
-        else if (max_pending < queue_size_.load()) 
+        else if (max_pending < queue_size_.load())
             send();
     }
 }
 
 void pending_logs::cleanup()
 {
-    if (threads::threadmanager_is(running) && threads::get_self_ptr() && 
-        activated_.load() && (0 < queue_size_.load())) 
+    if (threads::threadmanager_is(running) && threads::get_self_ptr() &&
+        activated_.load() && (0 < queue_size_.load()))
     {
         send();
     }
@@ -109,7 +109,7 @@ bool pending_logs::ensure_prefix()
     // Resolve the console prefix if it's still invalid.
     if (HPX_UNLIKELY(naming::invalid_id == prefix_))
     {
-        prefix_mutex_type::scoped_try_lock l(prefix_mtx_); 
+        prefix_mutex_type::scoped_try_lock l(prefix_mtx_);
 
         if (l.owns_lock() && (naming::invalid_id == prefix_))
         {

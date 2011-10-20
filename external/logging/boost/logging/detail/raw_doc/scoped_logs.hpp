@@ -1,13 +1,13 @@
 namespace boost { namespace logging {
 
-/** 
+/**
 @page scoped_logs Scoped Logs
 
-- @ref scoped_logs_whatis 
-- @ref scoped_logs_equivalence 
-- @ref scoped_logs_context 
-- @ref scoped_logs_fast 
-- @ref scoepd_logs_multiple 
+- @ref scoped_logs_whatis
+- @ref scoped_logs_equivalence
+- @ref scoped_logs_context
+- @ref scoped_logs_fast
+- @ref scoepd_logs_multiple
 
 
 @section scoped_logs_whatis Scoped Logs - what happens?
@@ -57,7 +57,7 @@ void func() {
 ... of couse, using @c BOOST_SCOPED_LOG will have the right functionality even in the presence of exceptions.
 
 
-Note that I encountered a very big problem, when implementing scoped logs: I don't know how you @ref workflow_2a "gather your message", when using the logs. 
+Note that I encountered a very big problem, when implementing scoped logs: I don't know how you @ref workflow_2a "gather your message", when using the logs.
 In other words, I don't know your Usage Syntax. So I had to make a few assumptions, as you'll see.
 
 
@@ -71,7 +71,7 @@ This allows you to simply log context in a straighforward manner, using the oper
 Example:
 
 @code
-#define LDBG BOOST_LOG_USE_LOG_IF_LEVEL(g_l(), g_log_filter(), debug ) 
+#define LDBG BOOST_LOG_USE_LOG_IF_LEVEL(g_l(), g_log_filter(), debug )
 ...
 
 void func(int a, const char * str) {
@@ -104,7 +104,7 @@ The fast way makes no assumptions about your @ref workflow_2a "Usage Syntax". Ho
 Example:
 
 @code
-#define LDBG BOOST_LOG_USE_LOG_IF_LEVEL(g_l(), g_log_filter(), debug ) 
+#define LDBG BOOST_LOG_USE_LOG_IF_LEVEL(g_l(), g_log_filter(), debug )
 ...
 void func(int a, const char * str) {
     BOOST_SCOPED_LOG(LDBG << , "testing inout" );

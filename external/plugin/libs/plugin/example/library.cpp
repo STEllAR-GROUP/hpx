@@ -8,8 +8,8 @@
 
 #include "weapon.hpp"
 
-class Missile 
-:   public Weapon 
+class Missile
+:   public Weapon
 {
 public:
     Missile(std::string const& s, int i = 10) : name(s)
@@ -25,7 +25,7 @@ public:
     }
 
     void fire() { std::cout << "Fire " << name << "!\n"; }
-    
+
     std::string name;
 };
 

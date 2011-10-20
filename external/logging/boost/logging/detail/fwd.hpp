@@ -43,7 +43,7 @@
 #define BOOST_LOG_STR(x)      (const ::boost::logging::char_type*)::boost::logging::ansi_unicode_char_holder ( x, L ## x )
 
 
-/* 
+/*
     Important: we define here only the things that are needed by ALL OF THE LIBRARY.
     So be very careful when modifying this file - we don't want any circular dependencies!
 
@@ -62,14 +62,14 @@ namespace boost { namespace logging {
 
 
 
-    /* 
+    /*
         just in case you're doing a typo - "write" instead of "writer"
     */
     namespace write = writer;
 
 
 
-/** 
+/**
 @page dealing_with_flags Dealing with flags.
 
 Some classes have extra settings. You can specify these settings in the class'es constructor.
@@ -108,7 +108,7 @@ namespace detail {
         self_type * m_self;
     };
 
-    /** 
+    /**
         @brief Can hold a flag. See dealing_with_flags
     */
     template<class self_type> struct flag {

@@ -1,6 +1,6 @@
 # Copyright (c) 2011 Bryce Lelbach
 #
-# Distributed under the Boost Software License, Version 1.0. (See accompanying 
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(types
@@ -24,6 +24,6 @@ foreach(type ${types})
     examples.object_semaphore.${type}_object_semaphore)
 
   add_hpx_pseudo_dependencies(examples.object_semaphore.${type}_object_semaphore
-    ${type}_object_semaphore_client_exe) 
+    ${type}_object_semaphore_client_exe)
 endforeach()
 

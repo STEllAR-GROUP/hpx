@@ -94,7 +94,7 @@ int main()
 {
    copy_movable cm;
    cm = produce();
-   
+
    const copy_movable_wrapper cmw;
    copy_movable_wrapper cmw2;
    cmw2 = cmw;

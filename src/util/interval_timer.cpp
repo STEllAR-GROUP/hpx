@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -19,7 +19,7 @@ namespace hpx { namespace util
       : microsecs_(0), id_(0)
     {}
 
-    interval_timer::interval_timer(boost::function<void()> const& f, 
+    interval_timer::interval_timer(boost::function<void()> const& f,
             std::size_t microsecs, std::string const& description,
             bool pre_shutdown)
       : f_(f), microsecs_(microsecs), id_(0), description_(description),
@@ -41,7 +41,7 @@ namespace hpx { namespace util
         mutex_type::scoped_lock l(mtx_);
         if (id_) {
             error_code ec;       // avoid throwing on error
-            threads::set_thread_state(id_, threads::pending, 
+            threads::set_thread_state(id_, threads::pending,
                 threads::wait_abort, threads::thread_priority_critical, ec);
             id_ = 0;
         }
@@ -81,9 +81,9 @@ namespace hpx { namespace util
             description_.c_str(), threads::suspended);
 
         // schedule this thread to be run after the given amount of seconds
-        threads::set_thread_state(id_, 
-            boost::posix_time::microseconds(microsecs_), 
-            threads::pending, threads::wait_signaled, 
+        threads::set_thread_state(id_,
+            boost::posix_time::microseconds(microsecs_),
+            threads::pending, threads::wait_signaled,
             threads::thread_priority_critical);
     }
 }}

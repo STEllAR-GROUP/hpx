@@ -1,8 +1,8 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Matt Anderson
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
@@ -94,7 +94,7 @@ int hpx_main(variables_map& vm)
     }
 
     // derived parameters
-    if ( (par->nx0 % 2) == 0 ) 
+    if ( (par->nx0 % 2) == 0 )
     {
         std::string msg = boost::str(boost::format(
             "mesh dimensions (%1%) must be odd "
@@ -107,7 +107,7 @@ int hpx_main(variables_map& vm)
             "nt0 needs to be even: (%1%) "
             ) % par->nt0);
         HPX_THROW_IN_CURRENT_FUNC(bad_parameter, msg);
-    } 
+    }
 
     std::cout << " Parameters    : " << std::endl;
     std::cout << " nx0           : " << par->nx0 << std::endl;
@@ -132,7 +132,7 @@ int hpx_main(variables_map& vm)
         boost::shared_ptr<std::vector<id_type> > result_data(new std::vector<id_type>);
 
         double time = 0.0;
-        result_data = um.init_execute(*result_data,time,function_type, 
+        result_data = um.init_execute(*result_data,time,function_type,
                                       par->nx0, numsteps,
                               par->loglevel ? logging_type : component_invalid, par);
 

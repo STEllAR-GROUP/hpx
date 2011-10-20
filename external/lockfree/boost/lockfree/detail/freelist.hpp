@@ -90,7 +90,7 @@ public:
         {
             tagged_ptr old_pool = pool_.load(memory_order_consume);
 
-            if (!old_pool.get_ptr()) 
+            if (!old_pool.get_ptr())
                 return NULL;
 
             freelist_node * new_pool_ptr = old_pool->next.get_ptr();

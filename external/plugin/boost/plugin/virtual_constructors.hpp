@@ -27,7 +27,7 @@ namespace boost { namespace plugin {
 
     ///////////////////////////////////////////////////////////////////////////
     template<typename BasePlugin>
-    struct virtual_constructors 
+    struct virtual_constructors
     {
         typedef boost::mpl::list<boost::mpl::list<> > type;
     };

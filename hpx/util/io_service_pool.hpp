@@ -2,8 +2,8 @@
 //
 //  Parts of this code were taken from the Boost.Asio library
 //  Copyright (c) 2003-2007 Christopher M. Kohlhoff (chris at kohlhoff dot com)
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_UTIL_IO_SERVICE_POOL_MAR_26_2008_1218PM)
@@ -31,7 +31,7 @@ namespace hpx { namespace util
         ///                 [in] The number of threads to run to serve incoming
         ///                 requests
         /// \param start_thread
-        ///                 [in] 
+        ///                 [in]
         explicit io_service_pool(std::size_t pool_size = 2,
             char const* pool_name = "",
             boost::function<void()> on_start_thread = boost::function<void()>(),
@@ -39,7 +39,7 @@ namespace hpx { namespace util
 
         /// \brief Construct the io_service pool.
         /// \param start_thread
-        ///                 [in] 
+        ///                 [in]
         explicit io_service_pool(boost::function<void()> on_start_thread,
             boost::function<void()> on_stop_thread = boost::function<void()>(),
             char const* pool_name = "");
@@ -57,7 +57,7 @@ namespace hpx { namespace util
         /// \brief Clear all internal data structures
         void clear();
 
-        /// \brief 
+        /// \brief
         bool is_running() const { return !threads_.empty(); }
 
         /// \brief Get an io_service to use.
@@ -99,4 +99,4 @@ namespace hpx { namespace util
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif 
+#endif

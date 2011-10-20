@@ -32,7 +32,7 @@
 #include <boost/type_traits/has_trivial_destructor.hpp>
 #include <boost/utility/addressof.hpp>
 
-//! Defining or undefining this macro will change Boost.Move behaviour 
+//! Defining or undefining this macro will change Boost.Move behaviour
 //! for copyable and movable classes when assigning from non-const rvalues:
 //! \code
 //! copyable_and_movable produce(){ return copyable_and_movable(); }
@@ -159,7 +159,7 @@ struct is_movable< rv<T> >
 {
 };
 
-template <class T> 
+template <class T>
 struct has_nothrow_move
    : public ::boost::mpl::bool_<false>
 {
@@ -282,7 +282,7 @@ typename disable_if< ::BOOST_MOVE_NAMESPACE::move_detail::is_rv<T>, const T &>::
 //Catches const lvalues for movable types
 template <class T>
 const T&
-   forward( BOOST_CATCH_CONST_RLVALUE(T) x 
+   forward( BOOST_CATCH_CONST_RLVALUE(T) x
           , typename ::boost::enable_if_c< ::BOOST_MOVE_NAMESPACE::is_movable<T>::value >::type* = 0)
 {
    return static_cast<const T&>(x);
@@ -291,7 +291,7 @@ const T&
 //Catches const lvalues for non-movable types
 template <class T>
 const T&
-   forward( const T &x 
+   forward( const T &x
           , typename ::boost::enable_if_c< !::BOOST_MOVE_NAMESPACE::is_movable<T>::value &&
                                             !::boost::move_detail::is_rv<T>::value
                                           >::type* = 0)
@@ -299,7 +299,7 @@ const T&
    return static_cast<const T&>(x);
 }
 
-//Catches forwarded ::boost::rv<T> via BOOST_FWD_REFs 
+//Catches forwarded ::boost::rv<T> via BOOST_FWD_REFs
 template <class T>
 T &
    forward( const T &t
@@ -442,7 +442,7 @@ struct is_movable
 
 //! By default this traits returns false. Classes with non-thworing move construction
 //! and assignment should specialize this trait to obtain some performance improvements.
-template <class T> 
+template <class T>
 struct has_nothrow_move
    : public ::boost::mpl::bool_<false>
 {};
@@ -458,7 +458,7 @@ struct has_nothrow_move
 //! This function provides a way to convert a reference into a rvalue reference
 //! in compilers with rvalue references. For other compilers converts T & into
 //! <i>::boost::rv<T> &</i> so that move emulation is activated.
-template <class T> inline 
+template <class T> inline
 rvalue_reference move (input_reference);
 
 #else //BOOST_MOVE_DOXYGEN_INVOKED
@@ -474,7 +474,7 @@ typename remove_reference<T>::type && move(T&& t)
 
 template <class T> inline
 typename remove_reference<T>::type && move(T&& t)
-{ return static_cast<typename remove_reference<T>::type &&>(t); } 
+{ return static_cast<typename remove_reference<T>::type &&>(t); }
 
 #endif   //Old move
 
@@ -1053,17 +1053,17 @@ struct has_trivial_destructor_after_move
 
 #ifdef BOOST_MOVE_IN_BOOST_INTERPROCESS_NAMESPACE
 
-#define BOOST_INTERPROCESS_ENABLE_MOVE_EMULATION(TYPE)                     BOOST_ENABLE_MOVE_EMULATION(TYPE)                 
-#define BOOST_INTERPROCESS_MOVABLE_BUT_NOT_COPYABLE(TYPE)                  BOOST_MOVABLE_BUT_NOT_COPYABLE(TYPE)              
-#define BOOST_INTERPROCESS_COPYABLE_AND_MOVABLE(TYPE)                      BOOST_COPYABLE_AND_MOVABLE(TYPE)                  
-#define BOOST_INTERPROCESS_RV_REF_2_TEMPL_ARGS(TYPE, ARG1, ARG2)           BOOST_RV_REF_2_TEMPL_ARGS(TYPE, ARG1, ARG2)       
-#define BOOST_INTERPROCESS_RV_REF_3_TEMPL_ARGS(TYPE, ARG1, ARG2, ARG3)     BOOST_RV_REF_3_TEMPL_ARGS(TYPE, ARG1, ARG2, ARG3) 
-#define BOOST_INTERPROCESS_RV_REF(TYPE)                                    BOOST_RV_REF(TYPE)                                
-#define BOOST_INTERPROCESS_COPY_ASSIGN_REF(TYPE)                           BOOST_COPY_ASSIGN_REF(TYPE)                       
-#define BOOST_INTERPROCESS_COPY_REF_2_TEMPL_ARGS(TYPE, ARG1, ARG2)         BOOST_COPY_REF_2_TEMPL_ARGS(TYPE, ARG1, ARG2)                
-#define BOOST_INTERPROCESS_COPY_REF_3_TEMPL_ARGS(TYPE, ARG1, ARG2, ARG3)   BOOST_COPY_REF_3_TEMPL_ARGS(TYPE, ARG1, ARG2, ARG3)          
-#define BOOST_INTERPROCESS_FWD_REF(TYPE)                                   BOOST_FWD_REF(TYPE)                               
-#define BOOST_INTERPROCESS_CATCH_CONST_RLVALUE(TYPE)                       BOOST_CATCH_CONST_RLVALUE(TYPE)                   
+#define BOOST_INTERPROCESS_ENABLE_MOVE_EMULATION(TYPE)                     BOOST_ENABLE_MOVE_EMULATION(TYPE)
+#define BOOST_INTERPROCESS_MOVABLE_BUT_NOT_COPYABLE(TYPE)                  BOOST_MOVABLE_BUT_NOT_COPYABLE(TYPE)
+#define BOOST_INTERPROCESS_COPYABLE_AND_MOVABLE(TYPE)                      BOOST_COPYABLE_AND_MOVABLE(TYPE)
+#define BOOST_INTERPROCESS_RV_REF_2_TEMPL_ARGS(TYPE, ARG1, ARG2)           BOOST_RV_REF_2_TEMPL_ARGS(TYPE, ARG1, ARG2)
+#define BOOST_INTERPROCESS_RV_REF_3_TEMPL_ARGS(TYPE, ARG1, ARG2, ARG3)     BOOST_RV_REF_3_TEMPL_ARGS(TYPE, ARG1, ARG2, ARG3)
+#define BOOST_INTERPROCESS_RV_REF(TYPE)                                    BOOST_RV_REF(TYPE)
+#define BOOST_INTERPROCESS_COPY_ASSIGN_REF(TYPE)                           BOOST_COPY_ASSIGN_REF(TYPE)
+#define BOOST_INTERPROCESS_COPY_REF_2_TEMPL_ARGS(TYPE, ARG1, ARG2)         BOOST_COPY_REF_2_TEMPL_ARGS(TYPE, ARG1, ARG2)
+#define BOOST_INTERPROCESS_COPY_REF_3_TEMPL_ARGS(TYPE, ARG1, ARG2, ARG3)   BOOST_COPY_REF_3_TEMPL_ARGS(TYPE, ARG1, ARG2, ARG3)
+#define BOOST_INTERPROCESS_FWD_REF(TYPE)                                   BOOST_FWD_REF(TYPE)
+#define BOOST_INTERPROCESS_CATCH_CONST_RLVALUE(TYPE)                       BOOST_CATCH_CONST_RLVALUE(TYPE)
 
 #endif
 

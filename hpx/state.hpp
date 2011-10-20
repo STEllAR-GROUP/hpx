@@ -32,8 +32,8 @@ namespace hpx
 
         // Forwarder
         inline bool threadmanager_is(state mask)
-        { 
-            return threadmanager_is(boost::uint8_t(mask)); 
+        {
+            return threadmanager_is(boost::uint8_t(mask));
         }
     }
 
@@ -44,10 +44,10 @@ namespace hpx
 
         // Forwarder
         inline bool router_is(state mask)
-        { 
-            return router_is(boost::uint8_t(mask)); 
+        {
+            return router_is(boost::uint8_t(mask));
         }
-    } 
+    }
 }
 
 #endif // HPX_703646B3_0567_484E_AD34_A752B8163B30

@@ -41,7 +41,7 @@ For instance, you might use @ref boost::logging::optimize::cache_string_one_str 
 template<class convert = do_convert_format::prepend> struct time_strf_t : is_generic {
     typedef convert convert_type;
 
-    /** 
+    /**
         constructs a time_strf object
 
         @param format the time format , strftime-like
@@ -53,7 +53,7 @@ template<class convert = do_convert_format::prepend> struct time_strf_t : is_gen
 
     template<class msg_type> void operator()(msg_type & msg) const {
         char_type buffer[64];
-        ::time_t t = ::time (0); 
+        ::time_t t = ::time (0);
         ::tm t_details = m_localtime ? *localtime( &t) : *gmtime( &t);
     #ifdef BOOST_LOG_USE_WCHAR_T
         if (0 != wcsftime (buffer, sizeof (buffer), m_format.c_str (), &t_details))

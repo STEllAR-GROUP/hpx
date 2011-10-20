@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_PARTITION3D_AUG_06_2011_1015PM)
@@ -22,7 +22,7 @@ namespace interpolate3d { namespace server
     private:
         typedef hpx::components::simple_component_base<partition3d> base_type;
 
-        void init_dimension(std::string const& datafilename, int d, 
+        void init_dimension(std::string const& datafilename, int d,
             dimension const& dim, char const* name);
         std::size_t get_index(int d, double value);
 
@@ -34,7 +34,7 @@ namespace interpolate3d { namespace server
         typedef partition3d wrapping_type;
 
         ///////////////////////////////////////////////////////////////////////
-        // parcel action code: the action to be performed on the destination 
+        // parcel action code: the action to be performed on the destination
         // object (the accumulator)
         enum actions
         {
@@ -43,7 +43,7 @@ namespace interpolate3d { namespace server
         };
 
         // exposed functionality
-        void init(std::string const&, dimension const&, dimension const&, 
+        void init(std::string const&, dimension const&, dimension const&,
             dimension const&);
         double interpolate(double valuex, double valuey, double valuez);
 
@@ -52,13 +52,13 @@ namespace interpolate3d { namespace server
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::action4<
-            partition3d, partition3d_init, std::string const&, 
+            partition3d, partition3d_init, std::string const&,
             dimension const&, dimension const&, dimension const&,
             &partition3d::init
         > init_action;
 
         typedef hpx::actions::result_action3<
-            partition3d, double, partition3d_interpolate, double, double, 
+            partition3d, double, partition3d_interpolate, double, double,
             double, &partition3d::interpolate
         > interpolate_action;
 

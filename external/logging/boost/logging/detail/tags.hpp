@@ -55,10 +55,10 @@ namespace detail {
     };
 }
 
-/** 
+/**
 @brief Allows you to use tags (extra information about the context of the logged message: file/line, function name, thread id, etc.), and log this information as well
 
-- @ref tag_need 
+- @ref tag_need
 - @ref tag_explained
     - @ref tag_classes
     - @ref tag_tag_holder
@@ -88,13 +88,13 @@ my_cool_sample:234 [dbg] hello, world
 @endcode
 
 I can see a few issues with the above
-- The context formatting is fixed 
+- The context formatting is fixed
   - You can't choose at runtime - what if I want to see the level first, then the file & line?
   - You can't choose at runtime if you want to ignore some of that context (to speed up the app in some cases, you might decide not to log the file & line)
   - You can't mix the context formatting with the rest of the formatting. For example, what if I want to log info like this : \n
     <tt>[idx] file_and_line [time] message [level]</tt> ?
-  - You can't do extra formatting to any of the context. For example, when dumping file/line, 
-    what if you want to strip some information from the file (the file name could be pretty big). Or, you might want to @em normalize 
+  - You can't do extra formatting to any of the context. For example, when dumping file/line,
+    what if you want to strip some information from the file (the file name could be pretty big). Or, you might want to @em normalize
     the file/line (like, fix it at 50 chars - by stripping or padding information)
 - If you want to be efficient and do the logging on a @ref boost::logging::writer::on_dedicated_thread "dedicated thread"
   - You can't use formatter::thread_id, because the thread_id is computed when being written (which when used on a dedicated thread, would always
@@ -146,7 +146,7 @@ You will replace your old <tt>BOOST_LOG_FORMAT_MSG(string_class)</tt> usage, wit
 application, the string_class is std::(w)string.
 
 @code
-// old 
+// old
 BOOST_LOG_FORMAT_MSG( optimize::cache_string_one_str<> )
 
 // new - use tags
@@ -169,7 +169,7 @@ In your LOG macros, you need to append the tags like this:
   (which is just a shortcut for ::boost::logging::tag::class_name)
 - some tags that come with the lib have shortcuts :
   - BOOST_LOG_TAG_LEVEL(lvl) - append the level
-  - BOOST_LOG_TAG_FILELINE - append file/line 
+  - BOOST_LOG_TAG_FILELINE - append file/line
   - BOOST_LOG_TAG_FUNCTION - append function
 
 Examples:

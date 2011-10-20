@@ -12,7 +12,7 @@
 #include <boost/config.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Helper macros/functions to overcome the lack of stringstream on certain 
+// Helper macros/functions to overcome the lack of stringstream on certain
 // architectures
 #if defined(BOOST_NO_STRINGSTREAM)
 #include <strstream>

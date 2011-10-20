@@ -15,7 +15,7 @@ This is to store data semi-contiguously.
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/runtime/components/component_type.hpp>                             
+#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 
 using std::vector;
@@ -91,7 +91,7 @@ namespace hpx { namespace components { namespace server
         //futures
         typedef hpx::lcos::eager_future<server::lublock::getData_action> dataFuture;
         typedef hpx::lcos::eager_future<server::lublock::getRows_action> rowFuture;
-        typedef 
+        typedef
             hpx::lcos::eager_future<server::lublock::getColumns_action> columnFuture;
         typedef hpx::lcos::eager_future<server::lublock::getFuture_action> getFuture;
         typedef hpx::lcos::eager_future<server::lublock::gcorner_action> gcFuture;
@@ -119,7 +119,7 @@ namespace hpx { namespace components { namespace server
 ////////////////////////////////////////////////////////////////////////////////
 
     //the constructor initializes the matrix
-    int lublock::construct_block(const int h, const int w, const int px, 
+    int lublock::construct_block(const int h, const int w, const int px,
         const int py, const int size, vector<vector<id_type> > gids,
         vector<vector<double> > theData){
         gidList = gids;
@@ -160,7 +160,7 @@ namespace hpx { namespace components { namespace server
     int lublock::get_needed_future(const int type, const int iter){
         switch(type){
             case 1: return nextLeft->get();
-            case 2: return nextTop->get(); 
+            case 2: return nextTop->get();
             case 3: return nextBelow[iter]->get();
             case 4: return nextRight[iter]->get();
             case 5: return nextDagnl[iter]->get();

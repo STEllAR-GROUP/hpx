@@ -38,8 +38,8 @@
 namespace boost { namespace logging { namespace formatter {
 
 
-/** 
-@brief prefixes each message with an index. 
+/**
+@brief prefixes each message with an index.
 
 Example:
 @code
@@ -72,7 +72,7 @@ template<class convert = do_convert_format::prepend> struct idx_t : is_generic, 
 };
 
 
-/** 
+/**
 @brief Appends a new line
 
 @param convert [optional] In case there needs to be a conversion between std::(w)string and the string that holds your logged message. See convert_format.
@@ -86,7 +86,7 @@ template<class convert = do_convert_format::append> struct append_newline_t : is
 };
 
 
-/** 
+/**
 @brief Appends a new line, if not already there
 
 @param convert [optional] In case there needs to be a conversion between std::(w)string and the string that holds your logged message. See convert_format.

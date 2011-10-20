@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  
+//
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -74,7 +74,7 @@ struct promise_wrapper
 };
 
 namespace bright_future {
-    
+
     template <typename T> struct grid;
 
     template <typename T>
@@ -148,7 +148,7 @@ namespace bright_future {
               , double hx
               , double hy
             );
-            
+
             typedef
                 hpx::actions::action4<
                     remote_lse<T>
@@ -176,7 +176,7 @@ namespace bright_future {
               , typename remote_lse<T>::size_type x
               , typename remote_lse<T>::size_type y
             );
-            
+
             typedef
                 hpx::actions::action3<
                     remote_lse<T>
@@ -193,7 +193,7 @@ namespace bright_future {
               , typename remote_lse<T>::range_type x
               , typename remote_lse<T>::range_type y
             );
-            
+
             typedef
                 hpx::actions::action3<
                     remote_lse<T>
@@ -210,7 +210,7 @@ namespace bright_future {
               , typename remote_lse<T>::size_type x
               , typename remote_lse<T>::size_type y
             );
-            
+
             typedef
                 hpx::actions::action3<
                     remote_lse<T>
@@ -227,7 +227,7 @@ namespace bright_future {
               , typename remote_lse<T>::range_type x
               , typename remote_lse<T>::range_type y
             );
-            
+
             typedef
                 hpx::actions::action3<
                     remote_lse<T>
@@ -269,7 +269,7 @@ namespace bright_future {
                   , &remote_lse<T>::apply
                 >
                 apply_action;
-            
+
             HPX_EXPORT void apply_region(
                 apply_func_type f
               , range_type x_range

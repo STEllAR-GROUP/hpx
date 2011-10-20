@@ -66,7 +66,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
     };
 
     big_boot_barrier(
-        parcelset::parcelport& pp_ 
+        parcelset::parcelport& pp_
       , util::runtime_configuration const& ini_
       , runtime_mode runtime_type_
         );
@@ -74,13 +74,13 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
     void apply(
         boost::uint32_t prefix
       , naming::address const& addr
-      , actions::base_action* act 
+      , actions::base_action* act
         );
 
     void wait();
 
-    // no-op on non-bootstrap localities 
-    void trigger(); 
+    // no-op on non-bootstrap localities
+    void trigger();
 
     void add_thunk(
         boost::function<void()>* f
@@ -91,7 +91,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
 };
 
 HPX_EXPORT void create_big_boot_barrier(
-    parcelset::parcelport& pp_ 
+    parcelset::parcelport& pp_
   , util::runtime_configuration const& ini_
   , runtime_mode runtime_type_
     );

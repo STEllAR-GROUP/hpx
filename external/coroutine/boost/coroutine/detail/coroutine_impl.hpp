@@ -2,22 +2,22 @@
 //
 //  This code may be used under either of the following two licences:
 //
-//  Permission is hereby granted, free of charge, to any person obtaining a copy 
-//  of this software and associated documentation files (the "Software"), to deal 
-//  in the Software without restriction, including without limitation the rights 
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
-//  copies of the Software, and to permit persons to whom the Software is 
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
 //  furnished to do so, subject to the following conditions:
 //
-//  The above copyright notice and this permission notice shall be included in 
+//  The above copyright notice and this permission notice shall be included in
 //  all copies or substantial portions of the Software.
 //
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE. OF SUCH DAMAGE.
 //
 //  Or:
@@ -31,7 +31,7 @@
 #if defined(_MSC_VER)
 #pragma warning (push)
 #pragma warning (disable: 4355) //this used in base member initializer
-#endif 
+#endif
 
 #include <cstddef>
 #include <boost/optional.hpp>
@@ -46,7 +46,7 @@
 
 #include <hpx/util/thread_specific_ptr.hpp>
 
-namespace boost { namespace coroutines { namespace detail 
+namespace boost { namespace coroutines { namespace detail
 {
   /////////////////////////////////////////////////////////////////////////////
   // This class augment the contest_base class with
@@ -72,29 +72,29 @@ namespace boost { namespace coroutines { namespace detail
     typedef void* thread_id_type;
 
     typedef boost::intrusive_ptr<type> pointer;
-  
+
     template<typename DerivedType>
-        coroutine_impl(DerivedType * this_, thread_id_type id, 
-            std::ptrdiff_t stack_size) 
+        coroutine_impl(DerivedType * this_, thread_id_type id,
+            std::ptrdiff_t stack_size)
       : context_base_(*this_, stack_size),
         m_arg(0),
         m_result(0),
         m_thread_id(id)
     {}
-                
+
     arg_slot_type * args() {
       BOOST_ASSERT(m_arg);
       return m_arg;
     };
-    
+
     result_slot_type * result() {
       BOOST_ASSERT(m_result);
       BOOST_ASSERT(*m_result);
       return *this->m_result;
-    } 
+    }
 
     template<typename Functor>
-    static inline pointer create(Functor, thread_id_type = 0, 
+    static inline pointer create(Functor, thread_id_type = 0,
         std::ptrdiff_t = default_stack_size);
 
 //     template<typename Functor>
@@ -125,7 +125,7 @@ namespace boost { namespace coroutines { namespace detail
     void run() {
       arg_slot_type void_args;
       result_slot_type * ptr = 0;
-      
+
       // This dummy binding is required because
       // do_call expect args() and result()
       // to return a non NULL result.
@@ -206,14 +206,14 @@ namespace boost { namespace coroutines { namespace detail
   };
 
   /////////////////////////////////////////////////////////////////////////////
-  // This type augments coroutine_impl type with the type of the stored 
+  // This type augments coroutine_impl type with the type of the stored
   // functor. The type of this object is erased right after construction
   // when it is assigned to a pointer to coroutine_impl. A deleter is
   // passed down to make sure that the correct derived type is deleted.
   template<typename FunctorType, typename CoroutineType, typename ContextImpl,
       template <typename> class Heap>
   class coroutine_impl_wrapper :
-    public coroutine_impl<CoroutineType, ContextImpl, Heap> 
+    public coroutine_impl<CoroutineType, ContextImpl, Heap>
   {
   public:
     typedef coroutine_impl_wrapper<
@@ -226,7 +226,7 @@ namespace boost { namespace coroutines { namespace detail
     typedef FunctorType functor_type;
 
     coroutine_impl_wrapper(functor_type f, thread_id_type id,
-                std::ptrdiff_t stack_size) 
+                std::ptrdiff_t stack_size)
       : super_type(this, id, stack_size),
         m_fun(f)
     {}
@@ -279,7 +279,7 @@ private:
 
   public:
 
-    //GCC workaround as per enable_if docs 
+    //GCC workaround as per enable_if docs
     template <int> struct dummy { dummy(int) {} };
     /*
      * Implementation for operator()
@@ -288,7 +288,7 @@ private:
      */
     template<typename ResultType>
     typename boost::enable_if<boost::is_void<ResultType> >::type
-    do_call(dummy<0> = 0) 
+    do_call(dummy<0> = 0)
     {
       BOOST_ASSERT(this->count() > 0);
 
@@ -296,14 +296,14 @@ private:
 
       // In this particular case result_slot_type is guaranteed to be
       // default constructible.
-      typedef BOOST_DEDUCED_TYPENAME coroutine_type::result_slot_type 
+      typedef BOOST_DEDUCED_TYPENAME coroutine_type::result_slot_type
         result_slot_type;
 
       {
 //           boost::optional<self_type> self (coroutine_accessor::in_place(this));
           self_type self(this);
           reset_self_on_exit on_exit(&self);
-          detail::unpack(m_fun, *this->args(), 
+          detail::unpack(m_fun, *this->args(),
              detail::trait_tag<typename coroutine_type::arg_slot_traits>());
       }
 
@@ -314,13 +314,13 @@ private:
     // Same as above, but for non void result types.
     template<typename ResultType>
     typename boost::disable_if<boost::is_void<ResultType> >::type
-    do_call(dummy<1> = 1) 
+    do_call(dummy<1> = 1)
     {
       BOOST_ASSERT(this->count() > 0);
 
       typedef BOOST_DEDUCED_TYPENAME coroutine_type::self self_type;
       typedef BOOST_DEDUCED_TYPENAME coroutine_type::arg_slot_traits traits;
-      typedef BOOST_DEDUCED_TYPENAME coroutine_type::result_slot_type 
+      typedef BOOST_DEDUCED_TYPENAME coroutine_type::result_slot_type
         result_slot_type;
 
       {
@@ -379,7 +379,7 @@ private:
   template<typename Functor>
   inline typename coroutine_impl<CoroutineType, ContextImpl, Heap>::pointer
   coroutine_impl<CoroutineType, ContextImpl, Heap>::
-      create(Functor f, thread_id_type id, std::ptrdiff_t stack_size) 
+      create(Functor f, thread_id_type id, std::ptrdiff_t stack_size)
   {
       typedef coroutine_impl_wrapper<
           Functor, CoroutineType, ContextImpl, Heap> wrapper_type;
@@ -397,7 +397,7 @@ private:
 
   template<typename Functor, typename CoroutineType, typename ContextImpl,
       template <typename> class Heap>
-  inline void 
+  inline void
   coroutine_impl_wrapper<Functor, CoroutineType, ContextImpl, Heap>::destroy(type* p)
   {
       deallocate(p, (std::size_t(p->get_thread_id())/8) % BOOST_COROUTINE_NUM_HEAPS);

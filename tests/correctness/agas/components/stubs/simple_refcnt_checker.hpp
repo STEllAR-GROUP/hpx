@@ -34,10 +34,10 @@ struct simple_refcnt_checker
       , naming::id_type const& gid
         )
     {
-        take_reference_async(this_, gid).get(); 
+        take_reference_async(this_, gid).get();
     }
 
-};            
+};
 
 }}}
 

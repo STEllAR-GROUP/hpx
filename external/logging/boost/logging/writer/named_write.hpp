@@ -28,29 +28,29 @@
 #include <boost/logging/format/destination/named.hpp>
 #include <boost/logging/format/destination/rolling_file.hpp>
 
-// all formats 
+// all formats
 #include <boost/logging/format/formatter/named_spacer.hpp>
 #include <boost/logging/format/formatter/thread_id.hpp>
 
 // #ifndef __GNUC__
 // // Boost 1.33.1 - GCC has error compiling microsec_clock
 #include <boost/logging/format/formatter/high_precision_time.hpp>
-namespace boost { namespace logging { namespace detail { 
-    typedef formatter::high_precision_time formatter_time_type ; 
-    typedef formatter::high_precision_time_t<formatter::do_convert_format::append> formatter_time_type_append ; 
+namespace boost { namespace logging { namespace detail {
+    typedef formatter::high_precision_time formatter_time_type ;
+    typedef formatter::high_precision_time_t<formatter::do_convert_format::append> formatter_time_type_append ;
 }}}
 // #else
 // #include <boost/logging/format/formatter/time.hpp>
-// namespace boost { namespace logging { namespace detail { 
-//     typedef formatter::time formatter_time_type ; 
-//     typedef formatter::time_t<formatter::do_convert_format::append> formatter_time_type_append ; 
+// namespace boost { namespace logging { namespace detail {
+//     typedef formatter::time formatter_time_type ;
+//     typedef formatter::time_t<formatter::do_convert_format::append> formatter_time_type_append ;
 // }}}
 // #endif
 
 
 namespace boost { namespace logging { namespace writer {
 
-/** 
+/**
 @brief Composed of a named formatter and a named destinations. Thus, you can specify the formatting and destinations as strings
 
 @code
@@ -64,7 +64,7 @@ Contains a very easy interface for using @ref manipulator "formatters and destin
 Setting the @ref manipulator "formatters and destinations" to write to is extremely simple:
 
 @code
-// Set the formatters (first param) and destinatins (second step) in one step 
+// Set the formatters (first param) and destinatins (second step) in one step
 g_l()->writer().write("%time%($hh:$mm.$ss.$mili) [%idx%] |\n", "cout file(out.txt) debug");
 
 // set the formatter(s)
@@ -84,7 +84,7 @@ g_l()->writer().destination("cout file(out.txt) debug");
     - <tt>"%time%"</tt> - writes the time (formatter::high_precision_time)
     - <tt>"%thread_id%"</tt> - writes the thread id (formatter::thread_id)
     - if you want to write @c "%", double it, like this: @c "%%"
-- @c "|" is used to specify the original message. What is before it, is prepended to the message, what is after, is appended to the message 
+- @c "|" is used to specify the original message. What is before it, is prepended to the message, what is after, is appended to the message
 - If a formatter is configurable, append @em (params) to it
   - For now, only @c "%time%" is configurable. For instance, @c "%time%($hh:$mm.$ss.$mili)" writes time like @c "21:14.24.674"
 
@@ -96,8 +96,8 @@ Example:
 The output can look like:
 
 @code
-21:03.17.243 [1] this is so cool 
-21:03.17.243 [2] first error 
+21:03.17.243 [1] this is so cool
+21:03.17.243 [2] first error
 21:03.17.243 [3] hello, world
 @endcode
 
@@ -175,7 +175,7 @@ template<class format_write_ /* = default_ */ > struct named_write {
         format( before, after);
     };
 
-    /** @brief sets the format strings (what should be before, and what after the original message)    
+    /** @brief sets the format strings (what should be before, and what after the original message)
     */
     void format(const string_type & format_before_str, const string_type & format_after_str) {
         m_format_before_str = format_before_str;
@@ -208,7 +208,7 @@ template<class format_write_ /* = default_ */ > struct named_write {
 
     /** @brief Replaces a destination from the named destination.
 
-    You can use this, for instance, when you want to share a destination between multiple named writers.        
+    You can use this, for instance, when you want to share a destination between multiple named writers.
     */
     template<class destination> void replace_destination(const string_type & name, destination d) {
         m_destination.del(name);
@@ -217,7 +217,7 @@ template<class format_write_ /* = default_ */ > struct named_write {
 
     /** @brief Replaces a formatter from the named formatter.
 
-    You can use this, for instance, when you want to share a formatter between multiple named writers.        
+    You can use this, for instance, when you want to share a formatter between multiple named writers.
     */
     template<class formatter> void replace_formatter(const string_type & name, formatter d) {
         if ( m_format_before_str.find(name) != string_type::npos) {
@@ -242,13 +242,13 @@ template<class format_write_ /* = default_ */ > struct named_write {
 private:
     struct parse_destination {
         bool has_manipulator_name() const { return !m_manipulator.empty(); }
-        string_type get_manipulator_name() const { 
+        string_type get_manipulator_name() const {
             BOOST_ASSERT( has_manipulator_name() );
             if ( m_manipulator[0] == '-' || m_manipulator[0] == '+')
                 // + or - -> turning on or off a destination
                 return m_manipulator.substr(1);
             else
-                return m_manipulator; 
+                return m_manipulator;
         }
         void clear() { m_manipulator.clear(); }
 
@@ -265,8 +265,8 @@ private:
 
     struct parse_formatter {
         // formatter starts and ends with %
-        bool has_manipulator_name() const { 
-            if ( m_manipulator.empty() ) 
+        bool has_manipulator_name() const {
+            if ( m_manipulator.empty() )
                 return false;
             if ( m_manipulator.size() > 1)
                 if ( m_manipulator[0] == '%' && (*m_manipulator.rbegin() == '%') )
@@ -275,10 +275,10 @@ private:
             return false;
         }
 
-        string_type get_manipulator_name() const { 
+        string_type get_manipulator_name() const {
             BOOST_ASSERT( has_manipulator_name() );
             // ignore starting and ending %
-            return m_manipulator.substr( 1, m_manipulator.size() - 2); 
+            return m_manipulator.substr( 1, m_manipulator.size() - 2);
         }
         void clear() { m_manipulator.clear(); }
 
@@ -336,7 +336,7 @@ private:
                     stripped_str += *b;
                     parser.add( *b);
                 }
-            }  
+            }
         }
         manip.string( stripped_str);
     }

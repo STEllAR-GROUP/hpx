@@ -57,7 +57,7 @@ void catch_test()
    movable m;
    const movable constm;
    catch_test<movable>(boost::move(m));
-   #ifdef BOOST_MOVE_MACRO_MOVE_ASSIGN_FROM_NON_CONST_RVALUE   
+   #ifdef BOOST_MOVE_MACRO_MOVE_ASSIGN_FROM_NON_CONST_RVALUE
    catch_test<movable>(create_movable());
    #endif
    catch_test<movable>(m);

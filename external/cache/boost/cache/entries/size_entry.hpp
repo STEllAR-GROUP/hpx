@@ -1,6 +1,6 @@
 //  Copyright (c) 2008-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(BOOST_CACHE_SIZE_ENTRY_NOV_19_2008_0800M)
@@ -34,24 +34,24 @@ namespace boost { namespace cache { namespace entries
     ///////////////////////////////////////////////////////////////////////////
     /// \class size_entry size_entry.hpp boost/cache/entries/size_entry.hpp
     ///
-    /// The \a size_entry type can be used to store values in a cache which 
-    /// have a size associated (such as files, etc.). 
+    /// The \a size_entry type can be used to store values in a cache which
+    /// have a size associated (such as files, etc.).
     /// Using this type as the cache's entry type makes sure that the entries
     /// with the biggest size are discarded from the cache first.
     ///
     /// \note The \a size_entry conforms to the CacheEntry concept.
-    /// \note This type can be used to model a 'discard smallest first' cache 
-    ///       policy if it is used with a std::greater as the caches' 
+    /// \note This type can be used to model a 'discard smallest first' cache
+    ///       policy if it is used with a std::greater as the caches'
     ///       UpdatePolicy (instead of the default std::less).
     ///
-    /// \tparam Value     The data type to be stored in a cache. It has to be 
-    ///                   default constructible, copy constructible and 
+    /// \tparam Value     The data type to be stored in a cache. It has to be
+    ///                   default constructible, copy constructible and
     ///                   less_than_comparable.
-    /// \tparam Derived   The (optional) type for which this type is used as a 
+    /// \tparam Derived   The (optional) type for which this type is used as a
     ///                   base class.
     ///
     template <typename Value, typename Derived>
-    class size_entry 
+    class size_entry
       : public entry<Value, typename detail::size_derived<Value, Derived>::type>
     {
     private:
@@ -64,7 +64,7 @@ namespace boost { namespace cache { namespace entries
           : size_(0)
         {}
 
-        /// \brief Construct a new instance of a cache entry holding the given 
+        /// \brief Construct a new instance of a cache entry holding the given
         ///        value.
         explicit size_entry(Value const& val, std::size_t size)
           : base_type(val), size_(size)

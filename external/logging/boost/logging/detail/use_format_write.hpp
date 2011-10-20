@@ -36,7 +36,7 @@ namespace boost { namespace logging {
 
 
 
-/** 
+/**
 @brief Makes it easier to use a logger with format_write class
 
 You just define your <tt>logger<...> </tt> class like this:
@@ -48,9 +48,9 @@ typedef logger_format_write<format_base,destination_base> logger_type;
 instead of
 
 @code
-typedef logger_format_write< 
+typedef logger_format_write<
         format_base, destination_base
-        gather::ostream_like::return_str<>, 
+        gather::ostream_like::return_str<>,
         writer::format_write<formatter_base,destination_base> > > logger_type;
 @endcode
 
@@ -61,13 +61,13 @@ FIXME need to have more template params
 @param thread_safety @ref misc_use_defaults "(optional)" Thread-safety. Any of the writer::threading classes.
 @param gather @ref misc_use_defaults "(optional)" The class that @ref gather "gathers" the message
 */
-template<class format_base, class destination_base, class thread_safety, class gather, class lock_resource> 
+template<class format_base, class destination_base, class thread_safety, class gather, class lock_resource>
 struct logger_format_write
-    : logger< 
+    : logger<
             typename detail::format_find_gather<gather>::type ,
             typename detail::format_find_writer<format_base, destination_base, lock_resource, thread_safety>::type >
 {
-    typedef logger< 
+    typedef logger<
             typename detail::format_find_gather<gather>::type ,
             typename detail::format_find_writer<format_base, destination_base, lock_resource, thread_safety>::type > logger_base_type;
 

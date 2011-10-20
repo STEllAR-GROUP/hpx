@@ -1,6 +1,6 @@
 # Copyright (c) 2011 Bryce Lelbach
 #
-# Distributed under the Boost Software License, Version 1.0. (See accompanying 
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(HPX_COMPILERFLAGS_LOADED TRUE)
@@ -18,7 +18,7 @@ macro(hpx_language_suffix var language)
   elseif(${language} STREQUAL "Fortran")
     set(${var} .fpp)
   else()
-    hpx_error("language_suffix" "${language} is unsupported") 
+    hpx_error("language_suffix" "${language} is unsupported")
   endif()
 endmacro()
 
@@ -26,9 +26,9 @@ macro(hpx_append_flag flag)
   hpx_parse_arguments(APPEND "LANGUAGES" "" ${ARGN})
 
   set(languages "CXX")
- 
+
   if(APPEND_LANGUAGES)
-    set(languages ${APPEND_LANGUAGES}) 
+    set(languages ${APPEND_LANGUAGES})
   endif()
 
   foreach(language ${languages})
@@ -55,22 +55,22 @@ macro(hpx_use_flag_if_available flag)
 
   # C++ is the only language tested by default
   set(languages "CXX")
- 
+
   if(FLAG_LANGUAGES)
-    set(languages ${FLAG_LANGUAGES}) 
+    set(languages ${FLAG_LANGUAGES})
   endif()
 
   foreach(language ${languages})
     if(CMAKE_${language}_COMPILER)
       hpx_language_suffix(language_suffix ${language})
       string(TOUPPER ${language} uppercase_language)
-  
+
       if(HPX_ROOT)
         set(source_dir "${HPX_ROOT}")
         add_hpx_config_test(${lowercase_name}
           HPX_${uppercase_language}_FLAG_${uppercase_name}
           DEFINITIONS HPX_HAVE_${uppercase_language}_FLAG_${uppercase_name}
-          LANGUAGE ${language} 
+          LANGUAGE ${language}
           ROOT ${source_dir}
           SOURCE cmake/tests/flag${language_suffix}
           FLAGS "${flag}" FILE)
@@ -79,7 +79,7 @@ macro(hpx_use_flag_if_available flag)
         add_hpx_config_test(${lowercase_name}
           HPX_${uppercase_language}_FLAG_${uppercase_name}
           DEFINITIONS HPX_HAVE_${uppercase_language}_FLAG_${uppercase_name}
-          LANGUAGE ${language} 
+          LANGUAGE ${language}
           ROOT ${source_dir}
           SOURCE cmake/tests/flag${language_suffix}
           FLAGS "${flag}" FILE)
@@ -87,15 +87,15 @@ macro(hpx_use_flag_if_available flag)
         add_hpx_config_test(${lowercase_name}
           HPX_${uppercase_language}_FLAG_${uppercase_name}
           DEFINITIONS HPX_HAVE_${uppercase_language}_FLAG_${uppercase_name}
-          LANGUAGE ${language} 
+          LANGUAGE ${language}
           SOURCE cmake/tests/flag${language_suffix}
           FLAGS "${flag}" FILE)
       endif()
-  
+
       if(HPX_${uppercase_language}_FLAG_${uppercase_name})
         hpx_append_flag("${flag}" LANGUAGES ${language})
       else()
-        hpx_warn("use_flag_if_available" "${flag} is unavailable for ${language}") 
+        hpx_warn("use_flag_if_available" "${flag} is unavailable for ${language}")
       endif()
     endif()
   endforeach()

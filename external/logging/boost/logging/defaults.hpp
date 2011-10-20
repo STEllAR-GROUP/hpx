@@ -27,7 +27,7 @@
 
 namespace boost { namespace logging {
 
-/** 
+/**
 @page override_defaults Defaults, and overriding them.
 
 The logging lib has a few default types, used throughout the lib. They are:
@@ -35,7 +35,7 @@ The logging lib has a few default types, used throughout the lib. They are:
 - @c hold_string_type - the type used to hold a string; by default, it's @c std::string
 - @c filter_type - the default filter; by default, it's filter::no_ts
 - @c lock_resource - used to lock resources for access. See locker namespace.
-- @c mutex - the mutex class used throughout the library. By default, it's mutex_win32 for Windows, or mutex_posix for POSIX 
+- @c mutex - the mutex class used throughout the library. By default, it's mutex_win32 for Windows, or mutex_posix for POSIX
 
 They are all present in @c default_types structure.
 
@@ -43,7 +43,7 @@ If you want to override any of the above, you should do the following:
 - before including anything from Boost Logging Library, <tt>\#include <boost/logging/defaults.hpp> </tt>
 - override the types
 - do <tt>\#include <boost/logging/logging.hpp> </tt>
-      
+
 Example:
 
 @code

@@ -15,10 +15,10 @@
 namespace hpx { namespace agas { namespace stubs
 {
 
-struct symbol_namespace 
+struct symbol_namespace
 {
     // {{{ nested types
-    typedef server::symbol_namespace server_type; 
+    typedef server::symbol_namespace server_type;
 
     typedef server_type::iterate_names_function_type
         iterate_names_function_type;
@@ -35,13 +35,13 @@ struct symbol_namespace
 
     static response service(
         naming::id_type const& gid
-      , request const& req 
+      , request const& req
       , error_code& ec = throws
         )
     {
         return service_async(gid, req).get(ec);
-    } 
-};            
+    }
+};
 
 }}}
 

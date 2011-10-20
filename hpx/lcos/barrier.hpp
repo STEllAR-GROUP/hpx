@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_LCOS_BARRIER_MAR_10_2010_0307PM)
@@ -11,45 +11,45 @@
 #include <hpx/lcos/stubs/barrier.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos 
+namespace hpx { namespace lcos
 {
-    class barrier 
+    class barrier
       : public components::client_base<barrier, lcos::stubs::barrier>
     {
         typedef components::client_base<barrier, lcos::stubs::barrier> base_type;
 
     public:
-        barrier() 
+        barrier()
         {}
 
         /// Create a client side representation for the existing
         /// \a server#barrier instance with the given global id \a gid.
-        barrier(naming::id_type gid) 
+        barrier(naming::id_type gid)
           : base_type(gid)
         {}
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
-        lcos::promise<void> wait_async() 
+        lcos::promise<void> wait_async()
         {
             BOOST_ASSERT(gid_);
             return this->base_type::wait_async(gid_);
         }
 
-        void wait() 
+        void wait()
         {
             BOOST_ASSERT(gid_);
             this->base_type::wait(gid_);
         }
 
-        lcos::promise<void> set_error_async(boost::exception_ptr const& e) 
+        lcos::promise<void> set_error_async(boost::exception_ptr const& e)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::set_error_async(gid_, e);
         }
 
-        void set_error(boost::exception_ptr const& e) 
+        void set_error(boost::exception_ptr const& e)
         {
             BOOST_ASSERT(gid_);
             this->base_type::set_error(gid_, e);

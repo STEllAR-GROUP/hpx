@@ -19,12 +19,12 @@ public:
 #if defined(BOOST_ATOMIC_ENFORCE_PODNESS)
     typedef union { T e; boost::uint8_t i;} conv;
 #endif
-    
+
     platform_atomic() {}
     explicit platform_atomic(T t) : super(to_integral(t))
     {
     }
-    
+
     void store(T t, memory_order order=memory_order_seq_cst) volatile
     {
         super::store(to_integral(t), order);
@@ -59,15 +59,15 @@ public:
         expected=from_integral(_expected);
         return success;
     }
-    
+
     T exchange(T replacement, memory_order order=memory_order_seq_cst) volatile
     {
         return from_integral(super::exchange(to_integral(replacement), order));
     }
-    
+
     operator T(void) const volatile {return load();}
-    T operator=(T v) volatile {store(v); return v;}    
-    
+    T operator=(T v) volatile {store(v); return v;}
+
     using super::is_lock_free;
 protected:
     static inline boost::uint8_t to_integral(T &t)
@@ -96,7 +96,7 @@ public:
     explicit platform_atomic(T t) : super(to_integral(t))
     {
     }
-    
+
     void store(T t, memory_order order=memory_order_seq_cst) volatile
     {
         super::store(to_integral(t), order);
@@ -131,15 +131,15 @@ public:
         expected=from_integral(_expected);
         return success;
     }
-    
+
     T exchange(T replacement, memory_order order=memory_order_seq_cst) volatile
     {
         return from_integral(super::exchange(to_integral(replacement), order));
     }
-    
+
     operator T(void) const volatile {return load();}
-    T operator=(T v) volatile {store(v); return v;}    
-    
+    T operator=(T v) volatile {store(v); return v;}
+
     using super::is_lock_free;
 protected:
     static inline boost::uint16_t to_integral(T &t)
@@ -168,7 +168,7 @@ public:
     explicit platform_atomic(T t) : super(to_integral(t))
     {
     }
-    
+
     void store(T t, memory_order order=memory_order_seq_cst) volatile
     {
         super::store(to_integral(t), order);
@@ -203,15 +203,15 @@ public:
         expected=from_integral(_expected);
         return success;
     }
-    
+
     T exchange(T replacement, memory_order order=memory_order_seq_cst) volatile
     {
         return from_integral(super::exchange(to_integral(replacement), order));
     }
-    
+
     operator T(void) const volatile {return load();}
-    T operator=(T v) volatile {store(v); return v;}    
-    
+    T operator=(T v) volatile {store(v); return v;}
+
     using super::is_lock_free;
 protected:
     static inline boost::uint32_t to_integral(T &t)
@@ -240,7 +240,7 @@ public:
     explicit platform_atomic(T t) : super(to_integral(t))
     {
     }
-    
+
     void store(T t, memory_order order=memory_order_seq_cst) volatile
     {
         super::store(to_integral(t), order);
@@ -275,15 +275,15 @@ public:
         expected=from_integral(_expected);
         return success;
     }
-    
+
     T exchange(T replacement, memory_order order=memory_order_seq_cst) volatile
     {
         return from_integral(super::exchange(to_integral(replacement), order));
     }
-    
+
     operator T(void) const volatile {return load();}
-    T operator=(T v) volatile {store(v); return v;}    
-    
+    T operator=(T v) volatile {store(v); return v;}
+
     using super::is_lock_free;
 protected:
     static inline boost::uint64_t to_integral(T &t)
@@ -320,7 +320,7 @@ public:
     explicit platform_atomic(T t) : super(to_integral(t))
     {
     }
-    
+
     void store(T t, memory_order order=memory_order_seq_cst) volatile
     {
         super::store(to_integral(t), order);
@@ -355,15 +355,15 @@ public:
         expected=from_integral(_expected);
         return success;
     }
-    
+
     T exchange(T replacement, memory_order order=memory_order_seq_cst) volatile
     {
         return from_integral(super::exchange(to_integral(replacement), order));
     }
-    
+
     operator T(void) const volatile {return load();}
-    T operator=(T v) volatile {store(v); return v;}    
-    
+    T operator=(T v) volatile {store(v); return v;}
+
     using super::is_lock_free;
 protected:
     static inline __uint128_t to_integral(T &t)

@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -37,9 +37,9 @@ namespace hpx { namespace components
     std::string const get_component_type_name(int type)
     {
         std::string result;
-     
+
         if (type == component_invalid)
-            result = "component_invalid"; 
+            result = "component_invalid";
         else if ((type < component_last) && (get_derived_type(type) == 0))
             result = components::detail::names[type];
         else if (get_derived_type(type) < component_last && (get_derived_type(type) != 0))
@@ -50,9 +50,9 @@ namespace hpx { namespace components
         if (type == get_base_type(type) || component_invalid == type)
             result += "[" + boost::lexical_cast<std::string>(type) + "]";
         else {
-            result += "[" + 
+            result += "[" +
                 boost::lexical_cast<std::string>
-                  (static_cast<int>(get_derived_type(type))) + 
+                  (static_cast<int>(get_derived_type(type))) +
                 "(" + boost::lexical_cast<std::string>
                     (static_cast<int>(get_base_type(type))) + ")"
                 "]";

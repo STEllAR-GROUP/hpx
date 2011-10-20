@@ -1,6 +1,6 @@
 //  Copyright (c) 2006 Joao Abecasis
 //
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_UTIL_STATIC_JUN_12_2008_0934AM)
@@ -40,8 +40,8 @@ namespace hpx { namespace util
     template <typename T, typename Tag = T, std::size_t N = 1>
     struct static_ : boost::noncopyable
     {
-        BOOST_STATIC_ASSERT(N > 0 && N <= HPX_RUNTIME_INSTANCE_LIMIT); 
- 
+        BOOST_STATIC_ASSERT(N > 0 && N <= HPX_RUNTIME_INSTANCE_LIMIT);
+
     public:
         typedef T value_type;
 
@@ -88,7 +88,7 @@ namespace hpx { namespace util
         template <typename U>
         static_(U const& val)
         {
-            boost::call_once(constructed_, 
+            boost::call_once(constructed_,
                 boost::bind(&copy_constructor<U>::construct, boost::addressof(val)));
         }
 

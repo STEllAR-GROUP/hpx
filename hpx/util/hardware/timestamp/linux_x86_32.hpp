@@ -15,22 +15,22 @@ namespace hpx { namespace util { namespace hardware
 
 inline boost::uint64_t timestamp()
 {
-    boost::uint64_t r = 0; 
+    boost::uint64_t r = 0;
     #if defined(HPX_HAVE_RDTSCP)
         __asm__ __volatile__ (
             "rdtscp ;\n"
             : "=A" (r)
             :
-            : "ecx"); 
+            : "ecx");
     #elif defined(HPX_HAVE_RDTSC)
         __asm__ __volatile__ (
             "cpuid ;\n"
             "rdtsc ;\n"
             : "=A" (r)
             :
-            : "ebx", "ecx"); 
+            : "ebx", "ecx");
     #endif
-    return r; 
+    return r;
 }
 
 }}}

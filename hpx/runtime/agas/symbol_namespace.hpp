@@ -11,16 +11,16 @@
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/agas/stubs/symbol_namespace.hpp>
 
-namespace hpx { namespace agas 
+namespace hpx { namespace agas
 {
 
 struct symbol_namespace :
     components::client_base<symbol_namespace, stubs::symbol_namespace>
 {
-    // {{{ nested types 
+    // {{{ nested types
     typedef components::client_base<
         symbol_namespace, stubs::symbol_namespace
-    > base_type; 
+    > base_type;
 
     typedef server::symbol_namespace server_type;
 
@@ -37,20 +37,20 @@ struct symbol_namespace :
     {}
 
     lcos::promise<response> service_async(
-        request const& req 
+        request const& req
         )
     {
         return this->base_type::service_async(this->gid_, req);
     }
 
     response service(
-        request const& req 
+        request const& req
       , error_code& ec = throws
         )
     {
         return this->base_type::service(this->gid_, req, ec);
     }
-};            
+};
 
 }}
 

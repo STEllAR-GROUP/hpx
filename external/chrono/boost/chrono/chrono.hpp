@@ -10,8 +10,8 @@
 
 This code was derived by Beman Dawes from Howard Hinnant's time2_demo prototype.
 Many thanks to Howard for making his code available under the Boost license.
-The original code was modified to conform to Boost conventions and to section 
-20.9 Time utilities [time] of the C++ committee's working paper N2798. 
+The original code was modified to conform to Boost conventions and to section
+20.9 Time utilities [time] of the C++ committee's working paper N2798.
 See http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2798.pdf.
 
 time2_demo contained this comment:

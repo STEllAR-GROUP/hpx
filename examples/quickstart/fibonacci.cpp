@@ -43,7 +43,7 @@ typedef plain_result_action1<
     fibonacci                 // function
 > fibonacci_action;
 
-// this is to generate the required boilerplate we need for the remote 
+// this is to generate the required boilerplate we need for the remote
 // invocation to work
 HPX_REGISTER_PLAIN_ACTION(fibonacci_action);
 
@@ -53,7 +53,7 @@ HPX_REGISTER_PLAIN_ACTION(fibonacci_action);
 typedef eager_future<fibonacci_action> fibonacci_future;
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::uint64_t fibonacci(boost::uint64_t n) 
+boost::uint64_t fibonacci(boost::uint64_t n)
 {
     if (n < 2)
         return n;
@@ -61,11 +61,11 @@ boost::uint64_t fibonacci(boost::uint64_t n)
     // We restrict ourselves to execute the Fibonacci function locally.
     id_type const prefix = find_here();
 
-    // Invoking the Fibonacci algorithm twice is obviously as stupid as it can 
-    // get. However, we intentionally demonstrate it this way to create some 
+    // Invoking the Fibonacci algorithm twice is obviously as stupid as it can
+    // get. However, we intentionally demonstrate it this way to create some
     // heavy workload.
-    fibonacci_future n1(prefix, n - 1); 
-    fibonacci_future n2(prefix, n - 2); 
+    fibonacci_future n1(prefix, n - 1);
+    fibonacci_future n2(prefix, n - 2);
 
     return n1.get() + n2.get();   // wait for the Futures to return their values
 }
@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
 
     desc_commandline.add_options()
         ( "n-value" , value<boost::uint64_t>()->default_value(10),
-            "n value for the Fibonacci function") 
+            "n value for the Fibonacci function")
         ;
 
     // Initialize and run HPX

@@ -16,14 +16,14 @@
 /**
 @example mul_levels_mul_logers.cpp
 
-@copydoc mul_levels_mul_logers 
+@copydoc mul_levels_mul_logers
 
 @page mul_levels_mul_logers mul_levels_mul_logers.cpp Example
 
 
 This usage:
 - You have multiple levels (in this example: debug < info < error)
-- You want to format the message before it's written 
+- You want to format the message before it's written
   (in this example: prefix it by time, by index and append newline to it)
 - You have several loggers
 - Each logger has several log destinations
@@ -81,7 +81,7 @@ typedef boost::logging::named_logger<>::type logger_type;
 #define LERR_ BOOST_LOG_USE_LOG_IF_LEVEL(g_log_err(), g_log_level(), error )
 #define LAPP_ BOOST_LOG_USE_LOG_IF_LEVEL(g_log_app(), g_log_level(), info ) << "[app] "
 
-BOOST_DEFINE_LOG_FILTER(g_log_level, boost::logging::level::holder ) 
+BOOST_DEFINE_LOG_FILTER(g_log_level, boost::logging::level::holder )
 BOOST_DEFINE_LOG(g_log_err, logger_type)
 BOOST_DEFINE_LOG(g_log_app, logger_type)
 BOOST_DEFINE_LOG(g_log_dbg, logger_type)
@@ -98,7 +98,7 @@ void mul_levels_mul_logers_example() {
     g_log_app()->writer().write("%time%($hh:$mm.$ss) |\n", "file cout");
     g_log_dbg()->writer().write("%time%($hh:$mm.$ss) |\n", "file cout debug");
 
-    /* 
+    /*
     Note : the "line A" above originally was:
     g_log_err()->writer().write("[%idx%] %time%($hh:$mm.$ss) |\n", "file(err.txt)");
 

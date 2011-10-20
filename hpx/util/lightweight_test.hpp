@@ -23,7 +23,7 @@
 #include <boost/smart_ptr/detail/spinlock.hpp>
 
 namespace hpx { namespace util
-{ 
+{
 
 enum counter_type
 {
@@ -48,7 +48,7 @@ struct fixture
   public:
     fixture(std::ostream& stream):
       stream_(stream), sanity_failures_(0), test_failures_(0)
-    { 
+    {
         mutex_type l = BOOST_DETAIL_SPINLOCK_INIT;
         mutex_ = l;
     }
@@ -84,10 +84,10 @@ struct fixture
                counter_type c, T const& t, char const* msg)
     {
         if (!t)
-        { 
+        {
             mutex_type::scoped_lock l(mutex_);
-            boost::io::ios_flags_saver ifs(stream_); 
-            stream_ 
+            boost::io::ios_flags_saver ifs(stream_);
+            stream_
                 << file << "(" << line << "): "
                 << msg << " failed in function '"
                 << function << "'" << std::endl;
@@ -104,9 +104,9 @@ struct fixture
         if (!(t == u))
         {
             mutex_type::scoped_lock l(mutex_);
-            boost::io::ios_flags_saver ifs(stream_); 
-            stream_ 
-                << file << "(" << line << "): " << msg  
+            boost::io::ios_flags_saver ifs(stream_);
+            stream_
+                << file << "(" << line << "): " << msg
                 << " failed in function '" << function << "': "
                 << "'" << t << "' != '" << u << "'" << std::endl;
             increment(c);
@@ -114,7 +114,7 @@ struct fixture
         }
         return true;
     }
-    
+
     template <typename T, typename U>
     bool check_not_equal(char const* file, int line, char const* function,
                          counter_type c, T const& t, U const& u,
@@ -123,9 +123,9 @@ struct fixture
         if (!(t != u))
         {
             mutex_type::scoped_lock l(mutex_);
-            boost::io::ios_flags_saver ifs(stream_); 
-            stream_ 
-                << file << "(" << line << "): " << msg  
+            boost::io::ios_flags_saver ifs(stream_);
+            stream_
+                << file << "(" << line << "): " << msg
                 << " failed in function '" << function << "': "
                 << "'" << t << "' != '" << u << "'" << std::endl;
             increment(c);
@@ -141,9 +141,9 @@ struct fixture
         if (!(t < u))
         {
             mutex_type::scoped_lock l(mutex_);
-            boost::io::ios_flags_saver ifs(stream_); 
-            stream_ 
-                << file << "(" << line << "): " << msg  
+            boost::io::ios_flags_saver ifs(stream_);
+            stream_
+                << file << "(" << line << "): " << msg
                 << " failed in function '" << function << "': "
                 << "'" << t << "' >= '" << u << "'" << std::endl;
             increment(c);
@@ -151,7 +151,7 @@ struct fixture
         }
         return true;
     }
-    
+
     template <typename T, typename U>
     bool check_less_equal(char const* file, int line, char const* function,
                           counter_type c, T const& t, U const& u,
@@ -160,9 +160,9 @@ struct fixture
         if (!(t <= u))
         {
             mutex_type::scoped_lock l(mutex_);
-            boost::io::ios_flags_saver ifs(stream_); 
-            stream_ 
-                << file << "(" << line << "): " << msg  
+            boost::io::ios_flags_saver ifs(stream_);
+            stream_
+                << file << "(" << line << "): " << msg
                 << " failed in function '" << function << "': "
                 << "'" << t << "' > '" << u << "'" << std::endl;
             increment(c);
@@ -179,13 +179,13 @@ fixture global_fixture = fixture(std::cerr);
 inline int report_errors(std::ostream& stream = std::cerr)
 {
     std::size_t sanity = detail::global_fixture.get(counter_sanity),
-                test   = detail::global_fixture.get(counter_test); 
+                test   = detail::global_fixture.get(counter_test);
     if (sanity == 0 && test == 0)
         return 0;
 
     else
     {
-        boost::io::ios_flags_saver ifs(stream); 
+        boost::io::ios_flags_saver ifs(stream);
         stream << sanity << " sanity check"
                << ((sanity == 1) ? " and " : "s and ")
                << test << " test"

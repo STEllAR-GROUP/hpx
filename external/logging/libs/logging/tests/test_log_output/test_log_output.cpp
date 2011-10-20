@@ -33,12 +33,12 @@ typedef logger_format_write< > log_type;
 
 
 // Step 4: declare which filters and loggers you'll use (usually in a header file)
-BOOST_DECLARE_LOG_FILTER(g_log_filter, filter::no_ts ) 
-BOOST_DECLARE_LOG(g_l, log_type) 
-BOOST_DEFINE_LOG_FILTER(g_log_filter, filter::no_ts ) 
-BOOST_DEFINE_LOG(g_l, log_type) 
+BOOST_DECLARE_LOG_FILTER(g_log_filter, filter::no_ts )
+BOOST_DECLARE_LOG(g_l, log_type)
+BOOST_DEFINE_LOG_FILTER(g_log_filter, filter::no_ts )
+BOOST_DEFINE_LOG(g_l, log_type)
 
-#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() ) 
+#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() )
 
 void test_log_output() {
     std::ostringstream out_str;
@@ -64,8 +64,8 @@ void test_log_output() {
 
 
 
-int test_main(int, char *[]) { 
-    test_log_output() ; 
+int test_main(int, char *[]) {
+    test_log_output() ;
     return 0;
 }
 

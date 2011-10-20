@@ -1,7 +1,7 @@
 //  Copyright (c) 2005-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -24,25 +24,25 @@
 #include <boost/foreach.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
     bool handle_ini_file (section& ini, std::string const& loc)
     {
-        try { 
+        try {
             namespace fs = boost::filesystem;
             if (!fs::exists(loc))
                 return false;       // avoid exception on missing file
-            ini.read (loc); 
+            ini.read (loc);
         }
-        catch (hpx::exception const& /*e*/) { 
+        catch (hpx::exception const& /*e*/) {
             return false;
         }
         return true;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool handle_ini_file_env (section& ini, char const* env_var, 
+    bool handle_ini_file_env (section& ini, char const* env_var,
         char const* file_suffix)
     {
         char const* env = getenv(env_var);
@@ -61,7 +61,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // read system and user specified ini files
     //
-    // returns true if at least one alternative location has been read 
+    // returns true if at least one alternative location has been read
     // successfully
     bool init_ini_data_base (section& ini, std::string const& hpx_ini_file)
     {
@@ -114,19 +114,19 @@ namespace hpx { namespace util
 
         // have all path elements, now find ini files in there...
         std::vector<std::string>::iterator ini_end = ini_paths.end();
-        for (std::vector<std::string>::iterator it = ini_paths.begin(); 
+        for (std::vector<std::string>::iterator it = ini_paths.begin();
              it != ini_end; ++it)
         {
             try {
                 fs::directory_iterator nodir;
                 fs::path this_path (hpx::util::create_path(*it));
 
-                if (!fs::exists(this_path)) 
+                if (!fs::exists(this_path))
                     continue;
 
                 for (fs::directory_iterator dir(this_path); dir != nodir; ++dir)
                 {
-                    if (fs::extension(*dir) != ".ini") 
+                    if (fs::extension(*dir) != ".ini")
                         continue;
 
                     // read and merge the ini file into the main ini hierarchy
@@ -159,7 +159,7 @@ namespace hpx { namespace util
             fs::directory_iterator nodir;
             fs::path libs_path (hpx::util::create_path(libs));
 
-            if (!fs::exists(libs_path)) 
+            if (!fs::exists(libs_path))
                 return;     // given directory doesn't exist
 
             // retrieve/create section [hpx.components]
@@ -176,23 +176,23 @@ namespace hpx { namespace util
 //             BOOST_ASSERT(NULL != components_sec);
 
             // generate component sections for all found shared libraries
-            // this will create too many sections, but the non-components will 
+            // this will create too many sections, but the non-components will
             // be filtered out during loading
             for (fs::directory_iterator dir(libs_path); dir != nodir; ++dir)
             {
                 fs::path curr(*dir);
-                if (fs::extension(curr) != HPX_SHARED_LIB_EXTENSION) 
+                if (fs::extension(curr) != HPX_SHARED_LIB_EXTENSION)
                     continue;
 
                 // instance name and module name are the same
                 std::string name (fs::basename(curr));
 
                 try {
-                    // get the handle of the library 
+                    // get the handle of the library
                     boost::plugin::dll d (curr.string(), name);
 
                     // get the factory
-                    boost::plugin::plugin_factory<components::component_registry_base> 
+                    boost::plugin::plugin_factory<components::component_registry_base>
                         pf (d, BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME(registry)));
 
                     // retrieve the names of all known registries
@@ -205,24 +205,24 @@ namespace hpx { namespace util
                     BOOST_FOREACH(std::string const& s, names)
                     {
                         // create the component registry object
-                        boost::shared_ptr<components::component_registry_base> 
-                            registry (pf.create(s)); 
+                        boost::shared_ptr<components::component_registry_base>
+                            registry (pf.create(s));
                         registry->get_component_info(ini_data);
                     }
 
-                    // incorporate all information from this module's 
+                    // incorporate all information from this module's
                     // registry into our internal ini object
                     ini.parse("component registry", ini_data);
 
                     continue;   // handle next module
                 }
                 catch (std::logic_error const& e) {
-                    LRT_(info) << "skipping " << curr.string() 
+                    LRT_(info) << "skipping " << curr.string()
                                << ": " << e.what();
                     continue;   // handle next module
                 }
                 catch (std::exception const& e) {
-                    LRT_(info) << "skipping " << curr.string() 
+                    LRT_(info) << "skipping " << curr.string()
                                << ": " << e.what();
                     continue;   // handle next module
                 }

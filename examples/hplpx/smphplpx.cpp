@@ -1,6 +1,6 @@
-//  Copyright (c) 2011 Bryce Lelbach and Dan Kogler 
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Copyright (c) 2011 Bryce Lelbach and Dan Kogler
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <iostream>
@@ -57,7 +57,7 @@ int hpx_main(variables_map& vm)
 
         std::cout << (boost::format("total error   : %1%\n"
                                     "average error : %2%\n")
-                     % r % (r / size));  
+                     % r % (r / size));
     }
 
     finalize();
@@ -73,16 +73,16 @@ int main(int argc, char* argv[])
 
     desc_commandline.add_options()
         ( "size,S"
-        , value<unsigned int>()->default_value(2048) 
+        , value<unsigned int>()->default_value(2048)
         , "the height of the NxN+1 matrix generated")
 
         ( "blocksize,B"
-        , value<unsigned int>()->default_value(256) 
+        , value<unsigned int>()->default_value(256)
         , "the amount of work performed by each pxthread during gaussian "
           "elimination")
 
         ( "allocblock,A"
-        , value<unsigned int>()->default_value(512) 
+        , value<unsigned int>()->default_value(512)
         , "amount of work each thread performs during memory allocation "
           "(must be a power of 2)")
         ;

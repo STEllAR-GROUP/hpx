@@ -367,14 +367,14 @@ public:
         this object is compiled as "position independent". Since
         programmers on x86 tend to forget specifying -DPIC or
         similar, always assume PIC.
-        
+
         To make this work uniformly even in the non-PIC case,
         setup register constraints such that ebx can not be
         used by accident e.g. as base address for the variable
         to be modified. Accessing "scratch" should always be okay,
         as it can only be placed on the stack (and therefore
         accessed through ebp or esp only).
-        
+
         In theory, could push/pop ebx onto/off the stack, but movs
         to a prepared stack slot turn out to be faster. */
         __asm__ __volatile__(

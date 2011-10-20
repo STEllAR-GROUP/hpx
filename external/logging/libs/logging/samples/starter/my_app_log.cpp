@@ -23,8 +23,8 @@
 
 using namespace boost::logging;
 
-BOOST_DEFINE_LOG_FILTER(g_log_filter, finder::filter ) 
-BOOST_DEFINE_LOG(g_l, finder::logger) 
+BOOST_DEFINE_LOG_FILTER(g_log_filter, finder::filter )
+BOOST_DEFINE_LOG(g_l, finder::logger)
 
 
 void init_logs() {

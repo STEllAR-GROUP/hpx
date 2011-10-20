@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  
+//
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -34,7 +34,7 @@
 #define N BOOST_PP_ITERATION()
 
 namespace hpx { namespace util { namespace detail {
-    
+
     template <
         typename R
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
@@ -75,7 +75,7 @@ namespace hpx { namespace util { namespace detail {
             base_type::iserialize = Vtable::iserialize;
             base_type::oserialize = Vtable::oserialize;
         }
-        
+
         static void register_base()
         {
             using namespace boost::serialization;

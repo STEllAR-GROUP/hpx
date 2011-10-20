@@ -27,7 +27,7 @@
 //#if BOOST_WORKAROUND(BOOST_MSVC, BOOST_TESTED_AT(1400))
 
 #ifdef BOOST_MSVC
-// because of copy-constructor bug 
+// because of copy-constructor bug
 #include <boost/type_traits/is_base_of.hpp>
 #endif
 

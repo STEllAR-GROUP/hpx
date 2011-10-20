@@ -42,7 +42,7 @@ struct request
     > iterate_names_function_type;
 
     request()
-        : mc(invalid_request) 
+        : mc(invalid_request)
         , data(boost::fusion::make_vector())
     {}
 
@@ -50,7 +50,7 @@ struct request
     request(
         namespace_action_code type_
       , naming::gid_type const& gid_
-      , gva const& gva_ 
+      , gva const& gva_
         )
       : mc(type_)
       , data(boost::fusion::make_vector(gid_, gva_))
@@ -61,7 +61,7 @@ struct request
     request(
         namespace_action_code type_
       , naming::gid_type const& gid_
-      , boost::uint64_t count_  
+      , boost::uint64_t count_
         )
       : mc(type_)
       , data(boost::fusion::make_vector(gid_, count_))
@@ -82,7 +82,7 @@ struct request
     request(
         namespace_action_code type_
       , naming::locality const& locality_
-      , boost::uint64_t count_  
+      , boost::uint64_t count_
         )
       : mc(type_)
       , data(boost::fusion::make_vector(locality_, count_))
@@ -102,7 +102,7 @@ struct request
 
     request(
         namespace_action_code type_
-      , components::component_type ctype_ 
+      , components::component_type ctype_
         )
       : mc(type_)
       , data(boost::fusion::make_vector(boost::int32_t(ctype_)))
@@ -112,7 +112,7 @@ struct request
 
     request(
         namespace_action_code type_
-      , boost::int32_t ctype_ 
+      , boost::int32_t ctype_
         )
       : mc(type_)
       , data(boost::fusion::make_vector(ctype_))
@@ -123,7 +123,7 @@ struct request
     request(
         namespace_action_code type_
       , std::string const& name_
-      , boost::uint32_t prefix_ 
+      , boost::uint32_t prefix_
         )
       : mc(type_)
       , data(boost::fusion::make_vector(name_, prefix_))
@@ -134,7 +134,7 @@ struct request
     request(
         namespace_action_code type_
       , std::string const& name_
-      , naming::gid_type const& gid_ 
+      , naming::gid_type const& gid_
         )
       : mc(type_)
       , data(boost::fusion::make_vector(name_, gid_))
@@ -154,7 +154,7 @@ struct request
 
     request(
         namespace_action_code type_
-      , iterate_names_function_type const& f_ 
+      , iterate_names_function_type const& f_
         )
       : mc(type_)
       , data(boost::fusion::make_vector(f_))
@@ -177,7 +177,7 @@ struct request
         )
       : mc(other.mc)
       , data(other.data)
-    {}   
+    {}
 
     // copy assignment
     request& operator=(
@@ -192,9 +192,9 @@ struct request
     gva get_gva(
         error_code& ec = throws
         ) const
-    { 
-        return get_data<subtype_gid_gva, 1>(ec); 
-    } 
+    {
+        return get_data<subtype_gid_gva, 1>(ec);
+    }
 
     boost::uint64_t get_count(
         error_code& ec = throws
@@ -212,29 +212,29 @@ struct request
         else if (&ec != &throws)
             ec = make_success_code();
 
-        return count; 
-    } // }}} 
+        return count;
+    } // }}}
 
     boost::int32_t get_component_type(
         error_code& ec = throws
         ) const
-    { 
-        return get_data<subtype_ctype, 0>(ec); 
-    } 
+    {
+        return get_data<subtype_ctype, 0>(ec);
+    }
 
     boost::uint32_t get_prefix(
         error_code& ec = throws
         ) const
-    { 
-        return get_data<subtype_name_prefix, 1>(ec); 
-    } 
+    {
+        return get_data<subtype_name_prefix, 1>(ec);
+    }
 
     iterate_names_function_type get_iterate_names_function(
         error_code& ec = throws
         ) const
-    { 
-        return get_data<subtype_iterate_names_function, 0>(ec); 
-    } 
+    {
+        return get_data<subtype_iterate_names_function, 0>(ec);
+    }
 
     naming::locality get_locality(
         error_code& ec = throws
@@ -252,13 +252,13 @@ struct request
         else if (&ec != &throws)
             ec = make_success_code();
 
-        return l; 
-    } // }}} 
-    
+        return l;
+    } // }}}
+
     naming::gid_type get_gid(
         error_code& ec = throws
         ) const
-    { // {{{ 
+    { // {{{
         switch (data.which())
         {
             case subtype_gid:
@@ -274,18 +274,18 @@ struct request
                 return get_data<subtype_name_gid, 1>(ec);
 
             default: {
-                HPX_THROWS_IF(ec, bad_parameter, 
+                HPX_THROWS_IF(ec, bad_parameter,
                     "request::get_gid",
                     "invalid operation for request type");
-                return naming::invalid_gid; 
+                return naming::invalid_gid;
             }
         };
-    } // }}} 
+    } // }}}
 
     std::string get_name(
         error_code& ec = throws
         ) const
-    { // {{{ 
+    { // {{{
         switch (data.which())
         {
             case subtype_name:
@@ -296,21 +296,21 @@ struct request
 
             case subtype_name_gid:
                 return get_data<subtype_name_gid, 0>(ec);
-                
+
             default: {
-                HPX_THROWS_IF(ec, bad_parameter, 
+                HPX_THROWS_IF(ec, bad_parameter,
                     "request::get_name",
                     "invalid operation for request type");
-                return ""; 
+                return "";
             }
         };
-    } // }}} 
+    } // }}}
 
     namespace_action_code get_action_code() const
     {
         return mc;
     }
- 
+
   private:
     friend class boost::serialization::access;
 
@@ -327,7 +327,7 @@ struct request
       , subtype_name                    = 0x8
       , subtype_iterate_names_function  = 0x9
       , subtype_void                    = 0xa
-    }; 
+    };
 
     // The order of the variant types is significant, and should not be changed
     typedef boost::variant<
@@ -346,7 +346,7 @@ struct request
           , boost::uint64_t  // count
         >
         // 0x2
-        // primary_ns_resolve_gid 
+        // primary_ns_resolve_gid
       , boost::fusion::vector1<
             naming::gid_type // gid
         >
@@ -365,19 +365,19 @@ struct request
         // 0x5
         // component_ns_resolve_id
       , boost::fusion::vector1<
-            boost::int32_t // ctype 
+            boost::int32_t // ctype
         >
         // 0x6
         // component_ns_bind_prefix
       , boost::fusion::vector2<
-            std::string     // name 
-          , boost::uint32_t // prefix 
+            std::string     // name
+          , boost::uint32_t // prefix
         >
         // 0x7
         // symbol_ns_bind
       , boost::fusion::vector2<
-            std::string      // name 
-          , naming::gid_type // gid 
+            std::string      // name
+          , naming::gid_type // gid
         >
         // 0x8
         // component_ns_bind_name
@@ -385,7 +385,7 @@ struct request
         // symbol_ns_resolve
         // symbol_ns_unbind
       , boost::fusion::vector1<
-            std::string // name 
+            std::string // name
         >
         // 0x9
         // symbol_ns_iterate
@@ -424,14 +424,14 @@ struct request
         {
             case Type:
             {
-                vector_type const* v = boost::get<vector_type>(&data); 
+                vector_type const* v = boost::get<vector_type>(&data);
 
                 if (!v)
                 {
                     HPX_THROWS_IF(ec, invalid_data
                       , "request::get_data"
-                      , "internal data corruption"); 
-                    return return_type(); 
+                      , "internal data corruption");
+                    return return_type();
                 }
 
                 if (&ec != &throws)
@@ -441,19 +441,19 @@ struct request
             }
 
             default: {
-                HPX_THROWS_IF(ec, bad_parameter, 
+                HPX_THROWS_IF(ec, bad_parameter,
                     "request::get_data",
                     "invalid operation for request type");
                 return return_type();
             }
         };
-    } // }}} 
+    } // }}}
     // }}}
 
     template <
         typename Archive
     >
-    struct save_visitor : boost::static_visitor<void> 
+    struct save_visitor : boost::static_visitor<void>
     {
       private:
         Archive& ar;
@@ -475,7 +475,7 @@ struct request
             // TODO: verification?
             util::serialize_sequence(ar, seq);
         }
-    }; 
+    };
 
     template <
         typename Archive
@@ -488,9 +488,9 @@ struct request
         // TODO: versioning?
         int which = data.which();
 
-        ar & which; 
+        ar & which;
         ar & mc;
-        boost::apply_visitor(save_visitor<Archive>(ar), data);  
+        boost::apply_visitor(save_visitor<Archive>(ar), data);
     } // }}}
 
 #define HPX_LOAD_SEQUENCE(z, n, _)                                          \
@@ -525,7 +525,7 @@ struct request
             BOOST_PP_REPEAT(HPX_AGAS_REQUEST_SUBTYPES, HPX_LOAD_SEQUENCE, _)
 
             default: {
-                HPX_THROW_EXCEPTION(invalid_data, 
+                HPX_THROW_EXCEPTION(invalid_data,
                     "request::load",
                     "unknown or invalid data loaded");
                 return;

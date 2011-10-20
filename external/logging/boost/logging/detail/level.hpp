@@ -37,10 +37,10 @@ namespace boost { namespace logging {
         - error ,
         - fatal (highest level)
 
-    Depending on which level is enabled for your application, some messages will reach the log: those 
-    messages having at least that level. For instance, if info level is enabled, all 
+    Depending on which level is enabled for your application, some messages will reach the log: those
+    messages having at least that level. For instance, if info level is enabled, all
     logged messages will reach the log.
-    If warning level is enabled, all messages are logged, but the warnings. 
+    If warning level is enabled, all messages are logged, but the warnings.
     If debug level is enabled, messages that have levels debug, error, fatal will be logged.
 
 */
@@ -78,8 +78,8 @@ namespace level {
         type m_level;
     };
 
-    
-    /** 
+
+    /**
         @brief Filter - holds the level, in a thread-safe way.
 
         Holds the level, and tells you if a specific level is enabled.
@@ -92,9 +92,9 @@ namespace level {
         typedef boost::logging::threading::mutex mutex;
 
         holder_ts(type default_level = enable_all) : m_level(default_level) {}
-        bool is_enabled(type level) const { 
+        bool is_enabled(type level) const {
             scoped_lock lk(m_cs);
-            return level >= m_level; 
+            return level >= m_level;
         }
         void set_enabled(type level) {
             scoped_lock lk(m_cs);
@@ -105,13 +105,13 @@ namespace level {
         mutable mutex m_cs;
     };
 
-    /** 
+    /**
         @brief Filter - holds the level - and tells you at compile time if a filter is enabled or not.
 
         Fix (compile time) holder
     */
     template<int fix_level = debug> struct holder_compile_time {
-        static bool is_enabled(type level) { 
+        static bool is_enabled(type level) {
             return fix_level >= level;
         }
     };
@@ -121,7 +121,7 @@ namespace level {
 
 #ifndef BOOST_LOG_NO_TSS
 
-    /** 
+    /**
         @brief Filter - holds the level, in a thread-safe way, using TLS.
 
         Uses TLS (Thread Local Storage) to find out if a level is enabled or not. It caches the current "is_enabled" on each thread.
@@ -131,9 +131,9 @@ namespace level {
         typedef locker::tss_resource_with_cache<type, default_cache_secs> data;
 
         holder_tss_with_cache(int cache_secs = default_cache_secs, type default_level = enable_all) : m_level(default_level, cache_secs) {}
-        bool is_enabled(type test_level) const { 
+        bool is_enabled(type test_level) const {
             typename data::read cur_level(m_level);
-            return test_level >= cur_level.use(); 
+            return test_level >= cur_level.use();
         }
         void set_enabled(type level) {
             typename data::write cur_level(m_level);
@@ -147,9 +147,9 @@ namespace level {
         typedef locker::tss_resource_once_init<type> data;
 
         holder_tss_once_init(type default_level = enable_all) : m_level(default_level) {}
-        bool is_enabled(type test_level) const { 
+        bool is_enabled(type test_level) const {
             data::read cur_level(m_level);
-            return test_level >= cur_level.use(); 
+            return test_level >= cur_level.use();
         }
         void set_enabled(type level) {
             data::write cur_level(m_level);

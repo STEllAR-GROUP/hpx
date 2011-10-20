@@ -32,40 +32,40 @@
 
 namespace boost { namespace logging {
 
-/** 
+/**
 @page macros Macros - how, what for?
 
-- @ref macros_if_else_strategy 
-- @ref macros_using 
-    - @ref macros_define_declare 
-        - @ref BOOST_DECLARE_LOG 
-        - @ref BOOST_DEFINE_LOG 
-        - @ref BOOST_DEFINE_LOG_WITH_ARGS 
-        - @ref BOOST_DECLARE_LOG_FILTER 
-        - @ref BOOST_DEFINE_LOG_FILTER 
-        - @ref BOOST_DEFINE_LOG_FILTER_WITH_ARGS 
-    - @ref macros_use 
+- @ref macros_if_else_strategy
+- @ref macros_using
+    - @ref macros_define_declare
+        - @ref BOOST_DECLARE_LOG
+        - @ref BOOST_DEFINE_LOG
+        - @ref BOOST_DEFINE_LOG_WITH_ARGS
+        - @ref BOOST_DECLARE_LOG_FILTER
+        - @ref BOOST_DEFINE_LOG_FILTER
+        - @ref BOOST_DEFINE_LOG_FILTER_WITH_ARGS
+    - @ref macros_use
         - @ref BOOST_LOG_USE_LOG
-        - @ref BOOST_LOG_USE_LOG_IF_LEVEL 
-        - @ref BOOST_LOG_USE_LOG_IF_FILTER 
-        - @ref BOOST_LOG_USE_SIMPLE_LOG_IF_FILTER 
-    - @ref macros_set_formatters 
-        - @ref BOOST_LOG_FORMAT_MSG 
+        - @ref BOOST_LOG_USE_LOG_IF_LEVEL
+        - @ref BOOST_LOG_USE_LOG_IF_FILTER
+        - @ref BOOST_LOG_USE_SIMPLE_LOG_IF_FILTER
+    - @ref macros_set_formatters
+        - @ref BOOST_LOG_FORMAT_MSG
         - @ref BOOST_LOG_DESTINATION_MSG
-    - @ref macros_use_tags 
-        - @ref BOOST_LOG_TAG 
-        - @ref BOOST_LOG_TAG_LEVEL 
-        - @ref BOOST_LOG_TAG_FILELINE 
-        - @ref BOOST_LOG_TAG_FUNCTION 
-    - @ref macros_compile_time 
-        - @ref macros_compile_time_fast 
+    - @ref macros_use_tags
+        - @ref BOOST_LOG_TAG
+        - @ref BOOST_LOG_TAG_LEVEL
+        - @ref BOOST_LOG_TAG_FILELINE
+        - @ref BOOST_LOG_TAG_FUNCTION
+    - @ref macros_compile_time
+        - @ref macros_compile_time_fast
         - @ref macros_compile_time_slow
-        - @ref boost_log_compile_results 
-    - @ref macros_tss 
-        - @ref BOOST_LOG_TSS_USE_INTERNAL 
-        - @ref BOOST_LOG_TSS_USE_BOOST 
-        - @ref BOOST_LOG_TSS_USE_CUSTOM 
-        - @ref BOOST_LOG_NO_TSS 
+        - @ref boost_log_compile_results
+    - @ref macros_tss
+        - @ref BOOST_LOG_TSS_USE_INTERNAL
+        - @ref BOOST_LOG_TSS_USE_BOOST
+        - @ref BOOST_LOG_TSS_USE_CUSTOM
+        - @ref BOOST_LOG_NO_TSS
 
 
 
@@ -83,7 +83,7 @@ if logging from the constructor of a global/static object.
 Using macros makes sure logging happens efficiently. Basically what you want to achieve is something similar to:
 
 @code
-if ( is_filter_enabled) 
+if ( is_filter_enabled)
     logger.gather_the_message_and_log_it();
 @endcode
 
@@ -97,7 +97,7 @@ When gathering the message, what the macros will achieve is this:
 #define YOUR_COOL_MACRO_GOOD if ( !is_filter_enabled) ; else logger.gather_the_message_and_log_it();
 @endcode
 
-The above is the correct way, instead of 
+The above is the correct way, instead of
 
 @code
 #define YOUR_COOL_MACRO_BAD if ( is_filter_enabled) logger.gather_the_message_and_log_it();
@@ -128,13 +128,13 @@ There are several types of macros that this library supplies. They're explained 
 BOOST_DECLARE_LOG(log_name, logger_type)
 @endcode
 
-This declares a log. It should be used in a header file, to declare the log. 
+This declares a log. It should be used in a header file, to declare the log.
 Note that @c logger_type only needs to be a declaration (a @c typedef, for instance)
 
 Example:
 @code
 typedef logger_format_write< > logger_type;
-BOOST_DECLARE_LOG(g_l, logger_type) 
+BOOST_DECLARE_LOG(g_l, logger_type)
 @endcode
 
 
@@ -144,13 +144,13 @@ BOOST_DECLARE_LOG(g_l, logger_type)
 BOOST_DEFINE_LOG(log_name, logger_type)
 @endcode
 
-This defines a log. It should be used in a source file, to define the log. 
+This defines a log. It should be used in a source file, to define the log.
 
 Example:
 @code
 typedef logger_format_write< > logger_type;
 ...
-BOOST_DEFINE_LOG(g_l, logger_type) 
+BOOST_DEFINE_LOG(g_l, logger_type)
 @endcode
 
 
@@ -160,7 +160,7 @@ BOOST_DEFINE_LOG(g_l, logger_type)
 BOOST_DEFINE_LOG_WITH_ARGS (log_name, logger_type, args)
 @endcode
 
-This defines a log - and specifies some arguments to be used at its constructed. It should be used in a source file, to define the log. 
+This defines a log - and specifies some arguments to be used at its constructed. It should be used in a source file, to define the log.
 
 Example:
 @code
@@ -176,7 +176,7 @@ BOOST_DEFINE_LOG_WITH_ARGS( g_log_err(), err_log_type, ("err.txt") )
 BOOST_DECLARE_LOG_FILTER(filter_name, filter_type)
 @endcode
 
-This declares a log filter. It should be used in a header file, to declare the log filter. 
+This declares a log filter. It should be used in a header file, to declare the log filter.
 
 Example:
 @code
@@ -190,7 +190,7 @@ BOOST_DECLARE_LOG_FILTER(g_log_filter, filter::no_ts )
 BOOST_DEFINE_LOG_FILTER(filter_name, filter_type)
 @endcode
 
-This defines a log filter. It should be used in a source file, to define the log filter. 
+This defines a log filter. It should be used in a source file, to define the log filter.
 
 Example:
 @code
@@ -206,7 +206,7 @@ BOOST_DEFINE_LOG_FILTER(g_log_filter, filter::no_ts )
 BOOST_DEFINE_LOG_FILTER_WITH_ARGS(filter_name, filter_type, args)
 @endcode
 
-This defines a log filter - and specifies some arguments to be used at its constructed. It should be used in a source file, to define the log filter. 
+This defines a log filter - and specifies some arguments to be used at its constructed. It should be used in a source file, to define the log filter.
 
 Example:
 @code
@@ -227,8 +227,8 @@ BOOST_LOG_USE_LOG_IF_LEVEL(log, level_filter, level )
 
 Example:
 @code
-BOOST_DECLARE_LOG_FILTER(g_log_level, boost::logging::level::holder ) 
-BOOST_DECLARE_LOG(g_log_err, logger_type) 
+BOOST_DECLARE_LOG_FILTER(g_log_level, boost::logging::level::holder )
+BOOST_DECLARE_LOG(g_log_err, logger_type)
 
 #define LERR_ BOOST_LOG_USE_LOG_IF_LEVEL(g_log_err(), g_log_level(), error )
 @endcode
@@ -283,7 +283,7 @@ struct no_gather {
 
 typedef logger< no_gather, destination::cout > app_log_type;
 
-#define LAPP_ BOOST_LOG_USE_SIMPLE_LOG_IF_FILTER(g_log_app(), g_log_filter()->is_enabled() ) 
+#define LAPP_ BOOST_LOG_USE_SIMPLE_LOG_IF_FILTER(g_log_app(), g_log_filter()->is_enabled() )
 @endcode
 
 See @ref defining_logger_macros for more details
@@ -368,7 +368,7 @@ Example:
 #define LERR_ BOOST_LOG_USE_LOG_IF_LEVEL(g_log_dbg(), g_log_level(), error ) .set_tag( BOOST_LOG_TAG_LEVEL(error) )
 @endcode
 
-@subsubsection BOOST_LOG_TAG_FILELINE BOOST_LOG_TAG_FILELINE 
+@subsubsection BOOST_LOG_TAG_FILELINE BOOST_LOG_TAG_FILELINE
 
 Ads the file/line tag (that is, the current @c __FILE__ and @c __LINE__ will be appended, for each logged message).
 
@@ -382,7 +382,7 @@ Example:
 #define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() ) .set_tag( BOOST_LOG_TAG_FILELINE)
 @endcode
 
-@subsubsection BOOST_LOG_TAG_FUNCTION BOOST_LOG_TAG_FUNCTION 
+@subsubsection BOOST_LOG_TAG_FUNCTION BOOST_LOG_TAG_FUNCTION
 
 Ads the function tag (that is, the @c BOOST_CURRENT_FUNCTION will be appended, for each logged message).
 
@@ -401,7 +401,7 @@ Example:
 
 @subsection macros_compile_time Macros that treat compilation time
 
-Assume you're using formatters and destinations, and you 
+Assume you're using formatters and destinations, and you
 <tt>#include <boost/logging/format.hpp> </tt> in every source file when you want to do logging.
 This will increase compilation time quite a bit (30 to 50%, in my tests; depending on your application' complexity, this could go higher).
 
@@ -437,7 +437,7 @@ In the former case, most of the time you won't notice the extra virtual function
 \n
 @subsubsection boost_log_compile_results Compile time sample (and results)
 
-Recently I created a sample (compile_time) to test the effect of @c BOOST_LOG_COMPILE_FAST_ON. 
+Recently I created a sample (compile_time) to test the effect of @c BOOST_LOG_COMPILE_FAST_ON.
 The results were not as promising as I had hoped. However, still, when @c BOOST_LOG_COMPILE_FAST_ON is on,
 will compile faster by 30-40%. Noting that this is just an simple example, the results might not be that conclusive.
 Anyway, here they are:
@@ -447,15 +447,15 @@ Tested on 16 jan 2008/intel core duo 2.16Ghz machine, 5400Rpm HDD
 
 - VC 8.0 (no precompiled header)
   - Debug
-    - Compile with BOOST_LOG_COMPILE_FAST_ON (default) - 33 secs 
-    - Compile with BOOST_LOG_COMPILE_FAST_OFF  - 43 secs 
+    - Compile with BOOST_LOG_COMPILE_FAST_ON (default) - 33 secs
+    - Compile with BOOST_LOG_COMPILE_FAST_OFF  - 43 secs
 - gcc 3.4.2
   - Debug
-    - Compile with BOOST_LOG_COMPILE_FAST_ON (default) - 24 secs 
+    - Compile with BOOST_LOG_COMPILE_FAST_ON (default) - 24 secs
     - Compile with BOOST_LOG_COMPILE_FAST_OFF  -  31 secs
 - gcc 4.1
   - Debug
-    - Compile with BOOST_LOG_COMPILE_FAST_ON (default) - 20.5 secs 
+    - Compile with BOOST_LOG_COMPILE_FAST_ON (default) - 20.5 secs
     - Compile with BOOST_LOG_COMPILE_FAST_OFF  -  24 secs
 
 If you have other results, or results from a big program using Boost Logging, please share them with me. Thanks!
@@ -510,7 +510,7 @@ When #defining BOOST_LOG_TSS_USE_CUSTOM, do it like this:
 
 @subsubsection BOOST_LOG_NO_TSS BOOST_LOG_NO_TSS
 
-If defined, we don't use @ref macros_tss "TSS" as all. 
+If defined, we don't use @ref macros_tss "TSS" as all.
 
 */
 
@@ -536,7 +536,7 @@ If defined, we don't use @ref macros_tss "TSS" as all.
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Defining filter Macros 
+// Defining filter Macros
 
 #ifdef BOOST_LOG_COMPILE_FAST
 // ****** Fast compile ******
@@ -544,10 +544,10 @@ If defined, we don't use @ref macros_tss "TSS" as all.
     namespace { boost::logging::ensure_early_log_creation ensure_log_is_created_before_main ## name ( name () ); }
 
 #define BOOST_DEFINE_LOG(name,type)  ::boost::logging::logger_holder< type > & name () \
-    { static ::boost::logging::logger_holder_by_value< type > l; return l; } 
+    { static ::boost::logging::logger_holder_by_value< type > l; return l; }
 
 #define BOOST_DEFINE_LOG_WITH_ARGS(name,type, args)  ::boost::logging::logger_holder< type > & name () \
-    { static ::boost::logging::logger_holder_by_value< type > l ( args ); return l; } 
+    { static ::boost::logging::logger_holder_by_value< type > l ( args ); return l; }
 
 #else
 
@@ -556,10 +556,10 @@ If defined, we don't use @ref macros_tss "TSS" as all.
     namespace { boost::logging::ensure_early_log_creation ensure_log_is_created_before_main ## name ( * name () ); }
 
 #define BOOST_DEFINE_LOG(name,type)  type* name () \
-    { static type l; return &l; } 
+    { static type l; return &l; }
 
 #define BOOST_DEFINE_LOG_WITH_ARGS(name,type, args)  type* name () \
-    { static type l ( args ); return &l; } 
+    { static type l ( args ); return &l; }
 
 #endif
 
@@ -569,16 +569,16 @@ If defined, we don't use @ref macros_tss "TSS" as all.
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Filter Macros 
+// Filter Macros
 
 #define BOOST_DECLARE_LOG_FILTER(name,type) type* name (); \
     namespace { boost::logging::ensure_early_log_creation ensure_log_is_created_before_main ## name ( * name () ); }
 
 #define BOOST_DEFINE_LOG_FILTER(name,type)  type * name () \
-    { static type l; return &l; } 
+    { static type l; return &l; }
 
 #define BOOST_DEFINE_LOG_FILTER_WITH_ARGS(name,type, args)  type * name () \
-    { static type l ( args ); return &l; } 
+    { static type l ( args ); return &l; }
 
 
 

@@ -1,6 +1,6 @@
 namespace boost { namespace logging {
 
-/** 
+/**
 @page page_todo TODOs
 
 Types of priorities:
@@ -12,8 +12,8 @@ Types of priorities:
 
 - @ref todo_implementation
 - @ref todo_docs
-- @ref todo_formatters 
-- @ref todo_destinations 
+- @ref todo_formatters
+- @ref todo_destinations
 
 Lots of things on my plate ;) \n
 If you want to make sure a feature is implemented sooner, drop me a note: http://torjo.com/contact.html
@@ -95,7 +95,7 @@ If you want to make sure a feature is implemented sooner, drop me a note: http:/
   --> turn on/off based on class name (typeid(name).string() - could be problematic in case the names are cryptic.
   What i can do is register some classes - with their name, so that you have a one-to-one corresp.
   you can even enforce a class to register its name TOTHINK \n
-  note: this can be viewed as a hierarchical filter. In the same way, I could create a hierarchical logger (that is, find the logger, 
+  note: this can be viewed as a hierarchical filter. In the same way, I could create a hierarchical logger (that is, find the logger,
   based on __FILE__ or __FUNCTION__)
   \n Implementation details: \n
   have a filter based on file name (the __FILE__) - should use TSS. comparing is very simple and efficient.
@@ -108,7 +108,7 @@ If you want to make sure a feature is implemented sooner, drop me a note: http:/
   to see how I can find out if such a filter is enabled or not - for instance, receive 2 args = pass 1 to filter1 and 2 to filter2;
   or if get only one arg, you need to specify to whom to pass to
 
-- @c low            Design: logged assert. I believe log library needs to provide support for custom assert. 
+- @c low            Design: logged assert. I believe log library needs to provide support for custom assert.
   Such assert would log into log file and invoke system assert depends in assert level. It could be an addon to core functionality. \n
   Note: SMART_ASSERT should be used for this.
 
@@ -121,7 +121,7 @@ If you want to make sure a feature is implemented sooner, drop me a note: http:/
 - @c low    new formatter: limit the text to gives maximal length. It may happend the dump is unexpectedly large and would
   fill disk/overwrite cache/take too much time/be unreadable. Limiting one log size would help here a lot and would relieve end user of doing it manually.
 
-- @c normal           quite often I am not interested not in absolute time (2005/12/11 16:33) but in time offset from some event. 
+- @c normal           quite often I am not interested not in absolute time (2005/12/11 16:33) but in time offset from some event.
   I suggest to add API: \n
   some_formatter.set_time_start_point( bool either_in_all_threads_or_just_in_current_thread); \n
   and escape sequences: \n
@@ -131,12 +131,12 @@ If you want to make sure a feature is implemented sooner, drop me a note: http:/
   $Xhour - e.g. "1 h, 33 m, 20 s, 54 ms" \n
   $Xday  - e.g. "2 d, 1 h, 33 m, 20 s, 54 ms" \n
 
-- @c normal           new formatter: thread ID (both Win32 and POSIX) is of low use. I suggest to add API to specify string name as alternative to thread ID 
+- @c normal           new formatter: thread ID (both Win32 and POSIX) is of low use. I suggest to add API to specify string name as alternative to thread ID
    formatter.set_current_thread_name("gui thread");
 
 - @c normal           Time string cashing time and time_strf calls are not cashed. It's a lot of work for nothing. Note: should use TSS
 
-- @c normal         Design: hexdump. I believe log library needs to provide support for dumping memory in hex format on log file. 
+- @c normal         Design: hexdump. I believe log library needs to provide support for dumping memory in hex format on log file.
 
 
 @section todo_destinations Destinations

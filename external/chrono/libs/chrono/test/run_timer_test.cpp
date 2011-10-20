@@ -32,7 +32,7 @@ namespace
   typedef boost::chrono::nanoseconds ns;
 
   bool check_report( run_timer & tmr, std::stringstream & ss,
-    run_timer::duration r, run_timer::duration u, run_timer::duration s, 
+    run_timer::duration r, run_timer::duration u, run_timer::duration s,
     const std::string & expected, int line )
   {
     tmr.test_report(r,u,s);
@@ -45,7 +45,7 @@ namespace
     }
     return result;
   }
-  
+
   void run_timer_constructor_overload_test()
   {
     // exercise each supported combination of constructor arguments
@@ -97,7 +97,7 @@ namespace
     boost::chrono::monotonic_timer        mono;
     boost::chrono::high_resolution_timer  hires;
     boost::chrono::process_timer          process;
-    
+
     std::clock_t now;
     do
     {
@@ -211,7 +211,7 @@ int test_main( int argc, char * argv[] )
   run_timer_constructor_overload_test();
   process_timer_test();
   report_test();
-  
+
   return 0;
 }
 

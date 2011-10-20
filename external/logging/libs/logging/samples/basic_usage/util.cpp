@@ -40,7 +40,7 @@ void str_replace( std::string & str, const std::string & find, const std::string
     size_t pos = 0;
     while ( true) {
         size_t next = str.find( find, pos);
-        if ( next == std::string::npos) 
+        if ( next == std::string::npos)
             break;
         str.erase( next, find.length() );
         str.insert( next, replace);

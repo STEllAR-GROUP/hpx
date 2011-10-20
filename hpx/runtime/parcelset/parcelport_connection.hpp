@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach & Katelyn Kufahl
 //
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_PARCELSET_PARCELPORT_CONNECTION_MAY_20_2008_1132PM)
@@ -32,7 +32,7 @@
 #include <boost/tuple/tuple.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parcelset 
+namespace hpx { namespace parcelset
 {
     /// Represents a single parcelport_connection from a client.
     class parcelport_connection
@@ -42,7 +42,7 @@ namespace hpx { namespace parcelset
     public:
         /// Construct a sending parcelport_connection with the given io_service.
         parcelport_connection(boost::asio::io_service& io_service,
-                boost::uint32_t prefix, 
+                boost::uint32_t prefix,
                 util::connection_cache<parcelport_connection>& cache,
                 util::high_resolution_timer& timer,
                 performance_counters::parcels::gatherer& parcels_sent)
@@ -63,7 +63,7 @@ namespace hpx { namespace parcelset
             /// Increment sends and begin timer.
             send_data_.timer_ = timer_.elapsed_microseconds();
 
-            // Write the serialized data to the socket. We use "gather-write" 
+            // Write the serialized data to the socket. We use "gather-write"
             // to send both the header and the data in a single write operation.
             std::vector<boost::asio::const_buffer> buffers;
             buffers.push_back(boost::asio::buffer(&out_priority_, sizeof(out_priority_)));
@@ -73,7 +73,7 @@ namespace hpx { namespace parcelset
             // record size of parcel
             send_data_.bytes_ = out_size_;
 
-            // this additional wrapping of the handler into a bind object is 
+            // this additional wrapping of the handler into a bind object is
             // needed to keep  this parcelport_connection object alive for the whole
             // write operation
             void (parcelport_connection::*f)(boost::system::error_code const&, std::size_t,
@@ -81,8 +81,8 @@ namespace hpx { namespace parcelset
                 = &parcelport_connection::handle_write<Handler>;
 
             boost::asio::async_write(socket_, buffers,
-                boost::bind(f, shared_from_this(), 
-                    boost::asio::placeholders::error, _2, 
+                boost::bind(f, shared_from_this(),
+                    boost::asio::placeholders::error, _2,
                     boost::make_tuple(handler)));
         }
 
@@ -92,10 +92,10 @@ namespace hpx { namespace parcelset
         void handle_write(boost::system::error_code const& e, std::size_t bytes,
             boost::tuple<Handler> handler)
         {
-            // if there is an error sending a parcel it's likely logging will not 
+            // if there is an error sending a parcel it's likely logging will not
             // work anyways, so don't log the error
 //             if (e) {
-//                 LPT_(error) << "parcelhandler: put parcel failed: " 
+//                 LPT_(error) << "parcelhandler: put parcel failed: "
 //                             << e.message();
 //             }
 //             else {

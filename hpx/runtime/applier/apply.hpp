@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_APPLIER_APPLY_NOV_27_2008_0957AM)
@@ -17,7 +17,7 @@
 
 // FIXME: Error codes?
 
-namespace hpx { namespace applier 
+namespace hpx { namespace applier
 {
     template <typename Action>
     threads::thread_priority action_priority()
@@ -36,7 +36,7 @@ namespace hpx { namespace applier
 
     // we know, it's remote
     template <typename Action>
-    inline bool 
+    inline bool
     apply_r_p(naming::address& addr, naming::id_type const& gid,
         threads::thread_priority priority)
     {
@@ -53,7 +53,7 @@ namespace hpx { namespace applier
     }
 
     template <typename Action>
-    inline bool 
+    inline bool
     apply_r (naming::address& addr, naming::id_type const& gid)
     {
         return apply_r_p<Action>(addr, gid, action_priority<Action>());
@@ -61,29 +61,29 @@ namespace hpx { namespace applier
 
     // we  know, it's local and has to be directly executed
     template <typename Action>
-    inline bool 
+    inline bool
     apply_l_p(naming::address const& addr, threads::thread_priority priority)
     {
-        BOOST_ASSERT(components::types_are_compatible(addr.type_, 
+        BOOST_ASSERT(components::types_are_compatible(addr.type_,
             components::get_component_type<typename Action::component_type>()));
         detail::apply_helper0<Action>::call(addr.address_, priority);
         return true;     // no parcel has been sent (dest is local)
     }
 
     template <typename Action>
-    inline bool 
+    inline bool
     apply_l (naming::address const& addr)
     {
         return apply_l_p<Action>(addr, action_priority<Action>());
     }
 
     template <typename Action>
-    inline bool 
+    inline bool
     apply_p (naming::id_type const& gid, threads::thread_priority priority)
     {
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local(gid, addr)) 
+        if (hpx::applier::get_applier().address_is_local(gid, addr))
             return apply_l_p<Action>(addr, priority);   // apply locally
 
         // apply remotely
@@ -101,8 +101,8 @@ namespace hpx { namespace applier
     ///    appl_.apply<add_action>(cont, gid, ...);
     /// \endcode
     template <typename Action>
-    inline bool 
-    apply_r_p(naming::address& addr, actions::continuation* c, 
+    inline bool
+    apply_r_p(naming::address& addr, actions::continuation* c,
         naming::id_type const& gid, threads::thread_priority priority)
     {
         actions::continuation_type cont(c);
@@ -120,16 +120,16 @@ namespace hpx { namespace applier
     }
 
     template <typename Action>
-    inline bool 
-    apply_r (naming::address& addr, actions::continuation* c, 
+    inline bool
+    apply_r (naming::address& addr, actions::continuation* c,
         naming::id_type const& gid)
     {
         return apply_r_p<Action>(addr, c, gid, action_priority<Action>());
     }
 
     template <typename Action>
-    inline bool 
-    apply_r_sync_p(naming::address& addr, naming::id_type const& gid, 
+    inline bool
+    apply_r_sync_p(naming::address& addr, naming::id_type const& gid,
         threads::thread_priority priority)
     {
         // If remote, create a new parcel to be sent to the destination
@@ -145,7 +145,7 @@ namespace hpx { namespace applier
     }
 
     template <typename Action>
-    inline bool 
+    inline bool
     apply_r_sync (naming::address& addr, naming::id_type const& gid)
     {
         return apply_r_sync_p<Action>(addr, gid, action_priority<Action>());
@@ -153,10 +153,10 @@ namespace hpx { namespace applier
 
     // we know, it's local and has to be directly executed
     template <typename Action>
-    inline bool apply_l_p(actions::continuation* c, 
+    inline bool apply_l_p(actions::continuation* c,
         naming::address const& addr, threads::thread_priority priority)
     {
-        BOOST_ASSERT(components::types_are_compatible(addr.type_, 
+        BOOST_ASSERT(components::types_are_compatible(addr.type_,
             components::get_component_type<typename Action::component_type>()));
         actions::continuation_type cont(c);
         detail::apply_helper0<Action>::call(cont, addr.address_, priority);
@@ -170,12 +170,12 @@ namespace hpx { namespace applier
     }
 
     template <typename Action>
-    inline bool apply_p(actions::continuation* c, naming::id_type const& gid, 
+    inline bool apply_p(actions::continuation* c, naming::id_type const& gid,
         threads::thread_priority priority)
     {
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local(gid, addr)) 
+        if (hpx::applier::get_applier().address_is_local(gid, addr))
             return apply_l_p<Action>(c, addr, priority);
 
         // apply remotely
@@ -189,24 +189,24 @@ namespace hpx { namespace applier
     }
 
     template <typename Action>
-    inline bool 
-    apply_c_p(naming::address& addr, naming::id_type const& contgid, 
+    inline bool
+    apply_c_p(naming::address& addr, naming::id_type const& contgid,
         naming::id_type const& gid, threads::thread_priority priority)
     {
-        return apply_r_p<Action>(addr, new actions::continuation(contgid), 
+        return apply_r_p<Action>(addr, new actions::continuation(contgid),
             gid, priority);
     }
 
     template <typename Action>
-    inline bool 
-    apply_c (naming::address& addr, naming::id_type const& contgid, 
+    inline bool
+    apply_c (naming::address& addr, naming::id_type const& contgid,
         naming::id_type const& gid)
     {
         return apply_r<Action>(addr, new actions::continuation(contgid), gid);
     }
 
     template <typename Action>
-    inline bool 
+    inline bool
     apply_c_p(naming::id_type const& contgid, naming::id_type const& gid,
         threads::thread_priority priority)
     {
@@ -214,7 +214,7 @@ namespace hpx { namespace applier
     }
 
     template <typename Action>
-    inline bool 
+    inline bool
     apply_c (naming::id_type const& contgid, naming::id_type const& gid)
     {
         return apply<Action>(new actions::continuation(contgid), gid);
@@ -223,8 +223,8 @@ namespace hpx { namespace applier
     ///////////////////////////////////////////////////////////////////////////
     // one parameter version
     template <typename Action, typename Arg0>
-    inline bool 
-    apply_r_p(naming::address& addr, naming::id_type const& gid, 
+    inline bool
+    apply_r_p(naming::address& addr, naming::id_type const& gid,
         threads::thread_priority priority, Arg0 const& arg0)
     {
         // If remote, create a new parcel to be sent to the destination
@@ -240,16 +240,16 @@ namespace hpx { namespace applier
     }
 
     template <typename Action, typename Arg0>
-    inline bool 
-    apply_r (naming::address& addr, naming::id_type const& gid, 
+    inline bool
+    apply_r (naming::address& addr, naming::id_type const& gid,
         Arg0 const& arg0)
     {
         return apply_r_p<Action>(addr, gid, action_priority<Action>(), arg0);
     }
 
     template <typename Action, typename Arg0>
-    inline bool 
-    apply_r_sync_p(naming::address& addr, naming::id_type const& gid, 
+    inline bool
+    apply_r_sync_p(naming::address& addr, naming::id_type const& gid,
         threads::thread_priority priority, Arg0 const& arg0)
     {
         // If remote, create a new parcel to be sent to the destination
@@ -265,39 +265,39 @@ namespace hpx { namespace applier
     }
 
     template <typename Action, typename Arg0>
-    inline bool 
-    apply_r_sync (naming::address& addr, naming::id_type const& gid, 
+    inline bool
+    apply_r_sync (naming::address& addr, naming::id_type const& gid,
         Arg0 const& arg0)
     {
         return apply_r_sync_p<Action>(addr, gid, action_priority<Action>(), arg0);
     }
 
     template <typename Action, typename Arg0>
-    inline bool 
-    apply_l_p(naming::address const& addr, threads::thread_priority priority, 
+    inline bool
+    apply_l_p(naming::address const& addr, threads::thread_priority priority,
         Arg0 const& arg0)
     {
-        BOOST_ASSERT(components::types_are_compatible(addr.type_, 
+        BOOST_ASSERT(components::types_are_compatible(addr.type_,
             components::get_component_type<typename Action::component_type>()));
         detail::apply_helper1<Action, Arg0>::call(addr.address_, priority, arg0);
         return true;     // no parcel has been sent (dest is local)
     }
 
     template <typename Action, typename Arg0>
-    inline bool 
+    inline bool
     apply_l (naming::address const& addr, Arg0 const& arg0)
     {
         return apply_l_p<Action>(addr, action_priority<Action>(), arg0);
     }
 
     template <typename Action, typename Arg0>
-    inline bool 
-    apply_p(naming::id_type const& gid, threads::thread_priority priority, 
+    inline bool
+    apply_p(naming::id_type const& gid, threads::thread_priority priority,
         Arg0 const& arg0)
     {
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local(gid, addr)) 
+        if (hpx::applier::get_applier().address_is_local(gid, addr))
             return apply_l_p<Action>(addr, priority, arg0);   // apply locally
 
         // apply remotely
@@ -305,7 +305,7 @@ namespace hpx { namespace applier
     }
 
     template <typename Action, typename Arg0>
-    inline bool 
+    inline bool
     apply (naming::id_type const& gid, Arg0 const& arg0)
     {
         return apply_p<Action>(gid, action_priority<Action>(), arg0);
@@ -313,8 +313,8 @@ namespace hpx { namespace applier
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Arg0>
-    inline bool 
-    apply_r_p(naming::address& addr, actions::continuation* c, 
+    inline bool
+    apply_r_p(naming::address& addr, actions::continuation* c,
         naming::id_type const& gid, threads::thread_priority priority,
         Arg0 const& arg0)
     {
@@ -333,19 +333,19 @@ namespace hpx { namespace applier
     }
 
     template <typename Action, typename Arg0>
-    inline bool 
-    apply_r (naming::address& addr, actions::continuation* c, 
+    inline bool
+    apply_r (naming::address& addr, actions::continuation* c,
         naming::id_type const& gid, Arg0 const& arg0)
     {
         return apply_r_p<Action>(addr, c, gid, action_priority<Action>(), arg0);
     }
 
     template <typename Action, typename Arg0>
-    inline bool 
-    apply_l_p(actions::continuation* c, naming::address const& addr, 
+    inline bool
+    apply_l_p(actions::continuation* c, naming::address const& addr,
         threads::thread_priority priority, Arg0 const& arg0)
     {
-        BOOST_ASSERT(components::types_are_compatible(addr.type_, 
+        BOOST_ASSERT(components::types_are_compatible(addr.type_,
             components::get_component_type<typename Action::component_type>()));
         actions::continuation_type cont(c);
         detail::apply_helper1<Action, Arg0>::call(cont, addr.address_, priority, arg0);
@@ -353,21 +353,21 @@ namespace hpx { namespace applier
     }
 
     template <typename Action, typename Arg0>
-    inline bool 
-    apply_l (actions::continuation* c, naming::address const& addr, 
+    inline bool
+    apply_l (actions::continuation* c, naming::address const& addr,
         Arg0 const& arg0)
     {
         return apply_l_p<Action>(c, addr, action_priority<Action>(), arg0);
     }
 
     template <typename Action, typename Arg0>
-    inline bool 
-    apply_p(actions::continuation* c, naming::id_type const& gid, 
+    inline bool
+    apply_p(actions::continuation* c, naming::id_type const& gid,
         threads::thread_priority priority, Arg0 const& arg0)
     {
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local(gid, addr)) 
+        if (hpx::applier::get_applier().address_is_local(gid, addr))
             return apply_l_p<Action>(c, addr, priority, arg0);    // apply locally
 
         // apply remotely
@@ -375,8 +375,8 @@ namespace hpx { namespace applier
     }
 
     template <typename Action, typename Arg0>
-    inline bool 
-    apply (actions::continuation* c, naming::id_type const& gid, 
+    inline bool
+    apply (actions::continuation* c, naming::id_type const& gid,
         Arg0 const& arg0)
     {
         return apply_p<Action>(c, gid, action_priority<Action>(), arg0);
@@ -386,21 +386,21 @@ namespace hpx { namespace applier
     ///        at a specific priority using a pre-resolved remote
     ///        \b naming::address. Takes a continuation by GID.
     template <typename Action, typename Arg0>
-    inline bool 
-    apply_c_p(naming::address& addr, naming::id_type const& contgid, 
+    inline bool
+    apply_c_p(naming::address& addr, naming::id_type const& contgid,
         naming::id_type const& gid, threads::thread_priority priority,
         Arg0 const& arg0)
     {
-        return apply_r_p<Action>(addr, new actions::continuation(contgid), gid, 
+        return apply_r_p<Action>(addr, new actions::continuation(contgid), gid,
             action_priority<Action>(), arg0);
     }
 
     /// \brief Invoke an unary action with a \b actions::continuation
     ///        using a pre-resolved remote \b naming::address. Takes a
-    ///        continuation by GID. 
+    ///        continuation by GID.
     template <typename Action, typename Arg0>
-    inline bool 
-    apply_c (naming::address& addr, naming::id_type const& contgid, 
+    inline bool
+    apply_c (naming::address& addr, naming::id_type const& contgid,
         naming::id_type const& gid, Arg0 const& arg0)
     {
         return apply_r<Action>(addr, new actions::continuation(contgid), gid, arg0);
@@ -410,11 +410,11 @@ namespace hpx { namespace applier
     ///        specific priority on a local or remote GID. Takes a continuation
     ///        by GID.
     template <typename Action, typename Arg0>
-    inline bool 
-    apply_c_p(naming::id_type const& contgid, naming::id_type const& gid, 
+    inline bool
+    apply_c_p(naming::id_type const& contgid, naming::id_type const& gid,
         threads::thread_priority priority, Arg0 const& arg0)
     {
-        return apply_p<Action>(new actions::continuation(contgid), gid, 
+        return apply_p<Action>(new actions::continuation(contgid), gid,
             priority, arg0);
     }
 
@@ -424,10 +424,10 @@ namespace hpx { namespace applier
     /// \param contgid      [in] The GID of the continuation.
     /// \param gid          [in] The target of the action.
     /// \param arg0         [in] Value to bind to the first argument of the
-    ///                     action.  
+    ///                     action.
     template <typename Action, typename Arg0>
-    inline bool 
-    apply_c (naming::id_type const& contgid, naming::id_type const& gid, 
+    inline bool
+    apply_c (naming::id_type const& contgid, naming::id_type const& gid,
         Arg0 const& arg0)
     {
         return apply<Action>(new actions::continuation(contgid), gid, arg0);

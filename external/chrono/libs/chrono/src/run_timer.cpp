@@ -11,7 +11,7 @@
 
 // define BOOST_CHRONO_SOURCE so that <boost/chrono/config.hpp> knows
 // the library is being built (possibly exporting rather than importing code)
-#define BOOST_CHRONO_SOURCE 
+#define BOOST_CHRONO_SOURCE
 
 #include <boost/version.hpp>
 
@@ -99,7 +99,7 @@ namespace boost
     void run_timer::report( system::error_code & ec )
     {
       m_reported = true;
-      if ( m_format.empty() ) m_format = default_format; 
+      if ( m_format.empty() ) m_format = default_format;
 
       process_times times;
       elapsed( times, ec );
@@ -120,7 +120,7 @@ namespace boost
         {
           assert( 0 && "error reporting not fully implemented yet" );
           //ec = error_code( EIO, errno_ecat );
-        } 
+        }
       }
     }
 
@@ -128,7 +128,7 @@ namespace boost
 
     void run_timer::test_report( duration real_, duration user_, duration system_ )
     {
-      if ( m_format.empty() ) m_format = default_format; 
+      if ( m_format.empty() ) m_format = default_format;
 
       process_times times;
       times.real = real_;

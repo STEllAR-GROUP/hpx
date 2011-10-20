@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_PERFORMANCE_COUNTERS_SERVER_BASE_MAR_03_2009_0741M)
@@ -16,15 +16,15 @@
 namespace hpx { namespace performance_counters { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
-    // parcel action code: the action to be performed on the destination 
-    // object 
+    // parcel action code: the action to be performed on the destination
+    // object
     enum actions
     {
         performance_counter_get_counter_info = 0,
         performance_counter_get_counter_value = 1,
     };
 
-    class base_performance_counter 
+    class base_performance_counter
     {
     protected:
         /// Destructor, needs to be virtual to allow for clean destruction of
@@ -40,21 +40,21 @@ namespace hpx { namespace performance_counters { namespace server
         {}
 
         // components must contain a typedef for wrapping_type defining the
-        // simple_component type used to encapsulate instances of this 
+        // simple_component type used to encapsulate instances of this
         // component
         typedef components::managed_component<base_performance_counter> wrapping_type;
         typedef base_performance_counter base_type_holder;
 
-        /// \brief finalize() will be called just before the instance gets 
+        /// \brief finalize() will be called just before the instance gets
         ///        destructed
         void finalize() {}
 
-        static components::component_type get_component_type() 
-        { 
+        static components::component_type get_component_type()
+        {
             return components::get_component_type<wrapping_type>();
         }
-        static void set_component_type(components::component_type t) 
-        { 
+        static void set_component_type(components::component_type t)
+        {
             components::set_component_type<wrapping_type>(t);
         }
 
@@ -78,8 +78,8 @@ namespace hpx { namespace performance_counters { namespace server
         /// The \a get_counter_info_action retrieves a performance counters
         /// information.
         typedef hpx::actions::result_action0<
-            base_performance_counter, counter_info, 
-            performance_counter_get_counter_info, 
+            base_performance_counter, counter_info,
+            performance_counter_get_counter_info,
             &base_performance_counter::get_counter_info_nonvirt,
             threads::thread_priority_critical
         > get_counter_info_action;
@@ -87,8 +87,8 @@ namespace hpx { namespace performance_counters { namespace server
         /// The \a get_counter_value_action queries the value of a performance
         /// counter.
         typedef hpx::actions::result_action0<
-            base_performance_counter, counter_value, 
-            performance_counter_get_counter_value, 
+            base_performance_counter, counter_value,
+            performance_counter_get_counter_value,
             &base_performance_counter::get_counter_value_nonvirt,
             threads::thread_priority_critical
         > get_counter_value_action;

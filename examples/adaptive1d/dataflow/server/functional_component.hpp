@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2009-2011 Matt Anderson
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_COMPONENTS_DATAFLOW_SERVER_FUNCTIONAL_COMPONENT_OCT_19_2011_1234PM)
@@ -16,7 +16,7 @@
 #include "../../parameter.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace adaptive1d { namespace server 
+namespace hpx { namespace components { namespace adaptive1d { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT functional_component
@@ -36,18 +36,18 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         }
 
         // components must contain a typedef for wrapping_type defining the
-        // managed_component type used to encapsulate instances of this 
+        // managed_component type used to encapsulate instances of this
         // component
         typedef adaptive1d::server::functional_component wrapping_type;
 
         // The eval and is_last_timestep functions have to be overloaded by any
         // functional component derived from this class
-        virtual int eval(naming::id_type const&, 
+        virtual int eval(naming::id_type const&,
             std::vector<naming::id_type> const&, std::size_t, std::size_t,
             double,parameter const&)
         {
-            // This shouldn't ever be called. If you're seeing this assertion 
-            // you probably forgot to overload this function in your stencil 
+            // This shouldn't ever be called. If you're seeing this assertion
+            // you probably forgot to overload this function in your stencil
             // class.
             BOOST_ASSERT(false);
             return true;
@@ -55,11 +55,11 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
 
         virtual naming::id_type alloc_data(int item, int maxitems, int row,
             std::vector<naming::id_type> const& interp_src_data,
-            double time, 
+            double time,
             parameter const&)
         {
-            // This shouldn't ever be called. If you're seeing this assertion 
-            // you probably forgot to overload this function in your stencil 
+            // This shouldn't ever be called. If you're seeing this assertion
+            // you probably forgot to overload this function in your stencil
             // class.
             BOOST_ASSERT(false);
             return naming::invalid_id;
@@ -67,14 +67,14 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
 
         virtual void init(std::size_t, naming::id_type const&)
         {
-            // This shouldn't ever be called. If you're seeing this assertion 
-            // you probably forgot to overload this function in your stencil 
+            // This shouldn't ever be called. If you're seeing this assertion
+            // you probably forgot to overload this function in your stencil
             // class.
             BOOST_ASSERT(false);
         }
 
         ///////////////////////////////////////////////////////////////////////
-        // parcel action code: the action to be performed on the destination 
+        // parcel action code: the action to be performed on the destination
         // object (the accumulator)
         enum actions
         {
@@ -83,12 +83,12 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
             functional_component_init = 2
         };
 
-        /// This is the main entry point of this component. Calling this 
-        /// function (by applying the eval_action) will compute the next 
-        /// time step value based on the result values of the previous time 
+        /// This is the main entry point of this component. Calling this
+        /// function (by applying the eval_action) will compute the next
+        /// time step value based on the result values of the previous time
         /// steps.
-        int eval_nonvirt(naming::id_type const& result, 
-            std::vector<naming::id_type> const& gids, std::size_t row, 
+        int eval_nonvirt(naming::id_type const& result,
+            std::vector<naming::id_type> const& gids, std::size_t row,
             std::size_t column,double cycle_time, parameter const& par)
         {
             return eval(result, gids, row, column,cycle_time,par);
@@ -102,7 +102,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
             return alloc_data(item, maxitems, row, interp_src_data,time,par);
         }
 
-        util::unused_type 
+        util::unused_type
         init_nonvirt(std::size_t numsteps, naming::id_type const& gid)
         {
             init(numsteps, gid);
@@ -114,24 +114,24 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::result_action6<
-            functional_component, naming::id_type, 
-            functional_component_alloc_data, 
+            functional_component, naming::id_type,
+            functional_component_alloc_data,
             int, int, int,
             std::vector<naming::id_type> const&, double,
-            parameter const&, 
+            parameter const&,
             &functional_component::alloc_data_nonvirt
         > alloc_data_action;
 
         typedef hpx::actions::result_action6<
-            functional_component, int, functional_component_eval, 
-            naming::id_type const&, std::vector<naming::id_type> const&, 
+            functional_component, int, functional_component_eval,
+            naming::id_type const&, std::vector<naming::id_type> const&,
             std::size_t, std::size_t,double,parameter const&,
             &functional_component::eval_nonvirt
         > eval_action;
 
         typedef hpx::actions::result_action2<
-            functional_component, util::unused_type, functional_component_init, 
-            std::size_t, naming::id_type const&, 
+            functional_component, util::unused_type, functional_component_init,
+            std::size_t, naming::id_type const&,
             &functional_component::init_nonvirt
         > init_action;
     };

@@ -2,8 +2,8 @@
 //
 //  Parts of this code were taken from the Boost.Asio library
 //  Copyright (c) 2003-2007 Christopher M. Kohlhoff (chris at kohlhoff dot com)
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <stdexcept>
@@ -20,7 +20,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
-    io_service_pool::io_service_pool(std::size_t pool_size, 
+    io_service_pool::io_service_pool(std::size_t pool_size,
             char const* pool_name, boost::function<void()> on_start_thread,
             boost::function<void()> on_stop_thread)
       : next_io_service_(0), stopped_(false), pool_size_(pool_size),
@@ -30,7 +30,7 @@ namespace hpx { namespace util
         if (pool_size == 0)
             throw std::runtime_error("io_service_pool size is 0");
 
-        // Give all the io_services work to do so that their run() functions 
+        // Give all the io_services work to do so that their run() functions
         // will not exit until they are explicitly stopped.
         for (std::size_t i = 0; i < pool_size; ++i)
         {
@@ -67,7 +67,7 @@ namespace hpx { namespace util
 //             io_services_[index]->run(ec);   // run io service
 //             if (!ec)
 //                 break;
-// 
+//
 //             // reset io service on error and restart the thread loop
 //             io_services_[index]->reset();
 //         } while (true);
@@ -88,17 +88,17 @@ namespace hpx { namespace util
             BOOST_ASSERT(threads_.size() == io_services_.size());
             BOOST_ASSERT(work_.size() == io_services_.size());
 
-            if (join_threads) 
+            if (join_threads)
                 join();
             return false;
         }
 
-        // Give all the io_services work to do so that their run() functions 
+        // Give all the io_services work to do so that their run() functions
         // will not exit until they are explicitly stopped.
         if (!io_services_.empty())
             clear();
 
-        if (io_services_.empty()) 
+        if (io_services_.empty())
         {
             for (std::size_t i = 0; i < pool_size_; ++i)
             {

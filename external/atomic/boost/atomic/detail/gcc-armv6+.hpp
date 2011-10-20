@@ -15,11 +15,11 @@
 #include <boost/atomic/detail/builder.hpp>
 
 // From the ARM Architecture Reference Manual for architecture v6:
-// 
+//
 // LDREX{<cond>} <Rd>, [<Rn>]
 // <Rd> Specifies the destination register for the memory word addressed by <Rd>
 // <Rn> Specifies the register containing the address.
-// 
+//
 // STREX{<cond>} <Rd>, <Rm>, [<Rn>]
 // <Rd> Specifies the destination register for the returned status value.
 //      0  if the operation updates memory
@@ -36,7 +36,7 @@
 // FIXME these are not yet used; should be mostly a matter of copy-and-paste.
 // I think you can supply an immediate offset to the address.
 //
-// A memory barrier is effected using a "co-processor 15" instruction, 
+// A memory barrier is effected using a "co-processor 15" instruction,
 // though a separate assembler mnemonic is available for it in v7.
 
 namespace boost {
@@ -46,22 +46,22 @@ namespace atomic {
 
 // "Thumb 1" is a subset of the ARM instruction set that uses a 16-bit encoding.  It
 // doesn't include all instructions and in particular it doesn't include the co-processor
-// instruction used for the memory barrier or the load-locked/store-conditional 
-// instructions.  So, if we're compiling in "Thumb 1" mode, we need to wrap all of our 
+// instruction used for the memory barrier or the load-locked/store-conditional
+// instructions.  So, if we're compiling in "Thumb 1" mode, we need to wrap all of our
 // asm blocks with code to temporarily change to ARM mode.
 //
-// You can only change between ARM and Thumb modes when branching using the bx instruction. 
-// bx takes an address specified in a register.  The least significant bit of the address 
-// indicates the mode, so 1 is added to indicate that the destination code is Thumb. 
-// A temporary register is needed for the address and is passed as an argument to these 
-// macros.  It must be one of the "low" registers accessible to Thumb code, specified 
+// You can only change between ARM and Thumb modes when branching using the bx instruction.
+// bx takes an address specified in a register.  The least significant bit of the address
+// indicates the mode, so 1 is added to indicate that the destination code is Thumb.
+// A temporary register is needed for the address and is passed as an argument to these
+// macros.  It must be one of the "low" registers accessible to Thumb code, specified
 // usng the "l" attribute in the asm statement.
 //
-// Architecture v7 introduces "Thumb 2", which does include (almost?) all of the ARM 
-// instruction set.  So in v7 we don't need to change to ARM mode; we can write "universal 
-// assembler" which will assemble to Thumb 2 or ARM code as appropriate.  The only thing 
-// we need to do to make this "universal" assembler mode work is to insert "IT" instructions 
-// to annotate the conditional instructions.  These are ignored in other modes (e.g. v6), 
+// Architecture v7 introduces "Thumb 2", which does include (almost?) all of the ARM
+// instruction set.  So in v7 we don't need to change to ARM mode; we can write "universal
+// assembler" which will assemble to Thumb 2 or ARM code as appropriate.  The only thing
+// we need to do to make this "universal" assembler mode work is to insert "IT" instructions
+// to annotate the conditional instructions.  These are ignored in other modes (e.g. v6),
 // so they can always be present.
 
 #if defined(__thumb__) && !defined(__ARM_ARCH_7A__)
@@ -176,7 +176,7 @@ public:
                 else fence_after(failure_order);
         return success;
     }
-    
+
     bool is_lock_free(void) const volatile {return true;}
 protected:
     inline T fetch_add_var(T c, memory_order order) volatile
@@ -270,7 +270,7 @@ template<typename T>
 class platform_atomic_integral<T, 1>: public build_atomic_from_larger_type<atomic_arm_4<uint32_t>, T> {
 public:
     typedef build_atomic_from_larger_type<atomic_arm_4<uint32_t>, T> super;
-    
+
     explicit platform_atomic_integral(T v) : super(v) {}
     platform_atomic_integral(void) {}
 };
@@ -279,7 +279,7 @@ template<typename T>
 class platform_atomic_integral<T, 2>: public build_atomic_from_larger_type<atomic_arm_4<uint32_t>, T> {
 public:
     typedef build_atomic_from_larger_type<atomic_arm_4<uint32_t>, T> super;
-    
+
     explicit platform_atomic_integral(T v) : super(v) {}
     platform_atomic_integral(void) {}
 };

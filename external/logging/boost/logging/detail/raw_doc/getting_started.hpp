@@ -1,14 +1,14 @@
 namespace boost { namespace logging {
 
-/** 
+/**
 @page getting_started Getting started - the Fast & Furious way...
 
 
-- @ref getting_started_basics 
+- @ref getting_started_basics
 - @ref getting_started_code
-- @ref getting_started_example_no_levels 
+- @ref getting_started_example_no_levels
 - @ref getting_started_example_use_levels
-- @ref getting_started_other_examples 
+- @ref getting_started_other_examples
 
 
 
@@ -48,7 +48,7 @@ You should structure your code like this:
 - have a source file, in which you define your loggers and filters, and eventually initialize them
 - in the rest of the code, when you intend to do %logging, just include the above header file
 
-\n\n 
+\n\n
 @section getting_started_example_no_levels Example 1 : Have one Named Writer, No levels
 
 Assume you want one logger and one filter - the filter is a simple filter that can only be turned on/off (the filter is not thread-safe). \n
@@ -57,7 +57,7 @@ This is something you can copy-paste into your program.
 @include fast_start/no_levels.h
 
 
-\n\n 
+\n\n
 @section getting_started_example_use_levels Example 2 : Have one Named Writer , Use Levels
 
 Assume you want one logger and one filter - the filter is a based on levels (the filter is not thread-safe). \n

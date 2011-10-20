@@ -1,8 +1,8 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2007      Richard D Guidry Jr
-//  Copyright (c) 2011      Bryce Lelbach & Katelyn Kufahl 
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Copyright (c) 2011      Bryce Lelbach & Katelyn Kufahl
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -37,7 +37,7 @@
 namespace hpx { namespace parcelset
 {
     ///////////////////////////////////////////////////////////////////////////
-    // A parcel is submitted for transport at the source locality site to 
+    // A parcel is submitted for transport at the source locality site to
     // the parcel set of the locality with the put-parcel command
     // This function is synchronous.
 
@@ -68,7 +68,7 @@ namespace hpx { namespace parcelset
         wfp.wait();          // wait for the parcel to be sent
     }
 
-    void parcelhandler::parcel_sink(parcelport& pp, 
+    void parcelhandler::parcel_sink(parcelport& pp,
         boost::shared_ptr<std::vector<char> > const& parcel_data,
         threads::thread_priority priority)
     {
@@ -79,7 +79,7 @@ namespace hpx { namespace parcelset
             decode_parcel(parcel_data);
         }
 
-        else 
+        else
         {
             // create a new thread which decodes and handles the parcel
             threads::thread_init_data data(
@@ -116,7 +116,7 @@ namespace hpx { namespace parcelset
 
         catch (hpx::exception const& e)
         {
-            LPT_(error) 
+            LPT_(error)
                 << "decode_parcel: caught hpx::exception: "
                 << e.what();
             hpx::report_error(boost::current_exception());
@@ -124,7 +124,7 @@ namespace hpx { namespace parcelset
 
         catch (boost::system::system_error const& e)
         {
-            LPT_(error) 
+            LPT_(error)
                 << "decode_parcel: caught boost::system::error: "
                 << e.what();
             hpx::report_error(boost::current_exception());
@@ -132,7 +132,7 @@ namespace hpx { namespace parcelset
 
         catch (std::exception const& e)
         {
-            LPT_(error) 
+            LPT_(error)
                 << "decode_parcel: caught std::exception: "
                 << e.what();
             hpx::report_error(boost::current_exception());
@@ -141,7 +141,7 @@ namespace hpx { namespace parcelset
         // Prevent exceptions from boiling up into the thread-manager.
         catch (...)
         {
-            LPT_(error) 
+            LPT_(error)
                 << "decode_parcel: caught unknown exception.";
             hpx::report_error(boost::current_exception());
         }
@@ -149,8 +149,8 @@ namespace hpx { namespace parcelset
         return threads::thread_state(threads::terminated);
     }
 
-    parcelhandler::parcelhandler(naming::resolver_client& resolver, 
-            parcelport& pp, threads::threadmanager_base* tm, 
+    parcelhandler::parcelhandler(naming::resolver_client& resolver,
+            parcelport& pp, threads::threadmanager_base* tm,
             parcelhandler_queue_base* policy)
       : resolver_(resolver)
       , pp_(pp)
@@ -176,7 +176,7 @@ namespace hpx { namespace parcelset
     }
 
     bool parcelhandler::get_raw_remote_prefixes(
-        std::vector<naming::gid_type>& prefixes, 
+        std::vector<naming::gid_type>& prefixes,
         components::component_type type) const
     {
         std::vector<naming::gid_type> allprefixes;
@@ -185,13 +185,13 @@ namespace hpx { namespace parcelset
         if (ec || !result) return false;
 
         using boost::lambda::_1;
-        std::remove_copy_if(allprefixes.begin(), allprefixes.end(), 
+        std::remove_copy_if(allprefixes.begin(), allprefixes.end(),
             std::back_inserter(prefixes), _1 == prefix_);
         return !prefixes.empty();
     }
 
     bool parcelhandler::get_raw_prefixes(
-        std::vector<naming::gid_type>& prefixes, 
+        std::vector<naming::gid_type>& prefixes,
         components::component_type type) const
     {
         error_code ec;
@@ -210,7 +210,7 @@ namespace hpx { namespace parcelset
         // request new credits from AGAS if needed (i.e. gid is credit managed
         // and the new gid has no credits after splitting)
         boost::uint16_t oldcredits = id.get_credit();
-        if (0 != oldcredits) 
+        if (0 != oldcredits)
         {
             naming::id_type newid(id.split_credits());
             if (0 == newid.get_credit())
@@ -240,7 +240,7 @@ namespace hpx { namespace parcelset
             cont->enumerate_argument_gids(boost::bind(prepare_gid, boost::ref(resolver_), _1));
     }
 
-    // walk through all data in this parcel and register all required AGAS 
+    // walk through all data in this parcel and register all required AGAS
     // operations with the given resolver_helper
     void prepare_parcel(
         naming::resolver_client& resolver_,
@@ -259,7 +259,7 @@ namespace hpx { namespace parcelset
         init_parcel(p);
 
         if (!p.get_destination_addr())
-        { 
+        {
             naming::address addr;
 
             if (!resolver_.resolve_cached(p.get_destination(), addr))
@@ -280,7 +280,7 @@ namespace hpx { namespace parcelset
         if (ec)
         {
             // parcel preparation failed
-            HPX_THROW_EXCEPTION(no_success, 
+            HPX_THROW_EXCEPTION(no_success,
                 "parcelhandler::put_parcel", ec.get_message());
         }
 
@@ -290,7 +290,7 @@ namespace hpx { namespace parcelset
     ///////////////////////////////////////////////////////////////////////////
     void parcelhandler::install_counters()
     {
-        performance_counters::raw_counter_type_data const counter_types[] = 
+        performance_counters::raw_counter_type_data const counter_types[] =
         {
             { "/parcels/count/sent", performance_counters::counter_raw,
               "returns the number of sent parcels for the referenced locality",
@@ -309,7 +309,7 @@ namespace hpx { namespace parcelset
         boost::format parcel_count("/parcels(locality#%d/total)/count/%s");
         boost::format queue_length("/parcelqueue(locality#%d/total)/length/instantaneous");
 
-        performance_counters::raw_counter_data const counters[] = 
+        performance_counters::raw_counter_data const counters[] =
         {
             // Total parcels sent (completed)
             { boost::str(parcel_count % prefix % "sent"),

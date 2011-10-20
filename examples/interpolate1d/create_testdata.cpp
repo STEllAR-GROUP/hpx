@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // Create some test data for the interpolate1d example
@@ -27,13 +27,13 @@ int main()
     }
 
     try {
-        // Turn off the auto-printing when failure occurs 
+        // Turn off the auto-printing when failure occurs
         Exception::dontPrint();
 
         // create a new file, truncate any existing file
         H5File file("sine.h5", H5F_ACC_TRUNC);
 
-        // Define the size of the data array and create the data space for 
+        // Define the size of the data array and create the data space for
         // fixed sized data array
         hsize_t dimsf[1];              // dataset dimensions
         dimsf[0] = num_points+1;

@@ -3,7 +3,7 @@
 //
 // This is the non-atomic version of the random memory access.  The array length
 // is given by the variable array_length and N is the number of random accesses
-// to this array.  
+// to this array.
 //
 //  At present, the entire array is placed in the root locality while all the random
 //  accesses and writes occur on the remote locality.
@@ -72,12 +72,12 @@ int main(int argc, char* argv[])
 naming::id_type set_initialdata(int);
 void update(naming::id_type);
 
-typedef 
-    actions::plain_result_action1<naming::id_type,int, set_initialdata> 
+typedef
+    actions::plain_result_action1<naming::id_type,int, set_initialdata>
 set_initialdata_action;
 
-typedef 
-    actions::plain_action1<naming::id_type, update> 
+typedef
+    actions::plain_action1<naming::id_type, update>
 update_action;
 
 HPX_REGISTER_PLAIN_ACTION(set_initialdata_action);
@@ -92,13 +92,13 @@ int hpx_main(po::variables_map &vm)
     applier::applier& appl = applier::get_applier();
 
     naming::id_type this_prefix = appl.get_runtime_support_gid();
-    
-    components::component_type type = 
+
+    components::component_type type =
        components::get_component_type<components::server::plain_function<set_initialdata_action> >();
 
     // Declaration used to store the first gid (if any) of the remote prefixes
     naming::id_type that_prefix;
-    
+
     if (appl.get_remote_prefixes(prefixes, type)) {
       // If there is at least one such remote locality, store the first gid in the list
       that_prefix = prefixes[0];
@@ -106,14 +106,14 @@ int hpx_main(po::variables_map &vm)
       that_prefix = this_prefix;
     }
 
-    
+
     {
         // Create a timer so see how its done
         util::high_resolution_timer t;
 
         std::vector<lcos::promise< naming::id_type > > n;
 
-        int array_length = 6; 
+        int array_length = 6;
         for (int i=0;i<array_length;i++) {
           n.push_back(lcos::eager_future<set_initialdata_action>(this_prefix,i));
         }
@@ -135,7 +135,7 @@ int hpx_main(po::variables_map &vm)
         hpx::lcos::wait(future_update);
 
         for (int i=0;i<array_length;i++) {
-          components::access_memory_block<data> 
+          components::access_memory_block<data>
                   result( components::stubs::memory_block::get(n[i].get()) );
           std::cout << " Result index: " << i << " value : "  << result->val_ << std::endl;
         }
@@ -159,7 +159,7 @@ HPX_REGISTER_MANAGE_OBJECT_ACTION(
     hpx::actions::manage_object_action<data>, manage_object_action_data)
 
 naming::id_type set_initialdata (int i)
-{  
+{
 
     naming::id_type here = applier::get_applier().get_runtime_support_gid();
     naming::id_type result = components::stubs::memory_block::create(
@@ -176,9 +176,9 @@ naming::id_type set_initialdata (int i)
     return result;
 }
 
-// the "work" 
+// the "work"
 void update (naming::id_type in)
-{  
+{
 
     components::access_memory_block<data> result(
                 components::stubs::memory_block::checkout(in));

@@ -34,7 +34,7 @@ namespace boost { namespace logging {
 template<class gather_msg , class write_msg > struct logger ;
 
 namespace formatter {
-    /** 
+    /**
     @brief what is the default type of your string, in formatter_base ? See BOOST_LOG_FORMAT_MSG
     */
     template<class T = override> struct msg_type {
@@ -43,7 +43,7 @@ namespace formatter {
 }
 
 namespace destination {
-    /** 
+    /**
     @brief what is the default type of your string, in destination_base ? See BOOST_LOG_DESTINATION_MSG
     */
     template<class T = override> struct msg_type {

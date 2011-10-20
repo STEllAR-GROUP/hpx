@@ -34,7 +34,7 @@
 
 
 
-/** 
+/**
     @file boost/logging/detail/after_being_destoyed.hpp
 
     This file deals with the following situation:
@@ -45,7 +45,7 @@ namespace boost { namespace logging {
 
 namespace destination { template<class T > struct msg_type; }
 
-    /** 
+    /**
         deals with what to do with the logger, if used after it's been destroyed
 
     @remarks
@@ -62,8 +62,8 @@ namespace destination { template<class T > struct msg_type; }
         static void nothing(const type&) {}
 
         bool is_still_alive() const { return !m_is_destroyed; }
-        void call_after_destroyed(const type& msg) const { 
-            m_after_being_destroyed(msg); 
+        void call_after_destroyed(const type& msg) const {
+            m_after_being_destroyed(msg);
         }
 
         after_being_destroyed_defer_to_function () : m_is_destroyed(false), m_after_being_destroyed(&nothing) {}

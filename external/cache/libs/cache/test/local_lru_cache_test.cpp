@@ -1,6 +1,6 @@
 //  Copyright (c) 2008 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <string>
@@ -21,7 +21,7 @@ struct data
     char const* const value;
 };
 
-data entries[] = 
+data entries[] =
 {
     data ("white", "255,255,255"),
     data ("yellow", "255,255,0"),
@@ -115,7 +115,7 @@ void test_lru_clear()
 struct erase_func
 {
     erase_func(std::string const& key)
-      : key_(key) 
+      : key_(key)
     {}
 
     template <typename Entry>

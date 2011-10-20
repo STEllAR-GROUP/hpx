@@ -1,8 +1,8 @@
 //  Copyright (c) 2011 Hartmut Kaiser
 //  Copyright (c) 2011 Matt Anderson
 //  Copyright (c) 2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
@@ -14,7 +14,7 @@
 
 #include "random_mem_access/random_mem_access.hpp"
 
-inline void 
+inline void
 init(hpx::components::server::distributing_factory::iterator_range_type r,
     std::vector<hpx::components::random_mem_access>& accu)
 {
@@ -46,11 +46,11 @@ int hpx_main(boost::program_options::variables_map& vm)
         hpx::components::distributing_factory factory;
         factory.create(hpx::applier::get_applier().get_runtime_support_gid());
 
-        hpx::components::component_type mem_block_type = 
+        hpx::components::component_type mem_block_type =
             hpx::components::get_component_type<
                 hpx::components::random_mem_access::server_component_type>();
 
-        hpx::components::distributing_factory::result_type mem_blocks = 
+        hpx::components::distributing_factory::result_type mem_blocks =
             factory.create_components(mem_block_type, array_size);
 
         //if (appl.get_remote_prefixes(prefixes))
@@ -73,7 +73,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         // initialize the array
         for (std::size_t i=0;i<array_size;i++) {
-          accu[i].init(i); 
+          accu[i].init(i);
         }
 
         srand( time(NULL) );
@@ -89,7 +89,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         std::vector<hpx::lcos::promise<void> > barrier2;
         for (std::size_t i=0;i<array_size;i++) {
-          barrier2.push_back(accu[i].print_async()); 
+          barrier2.push_back(accu[i].print_async());
         }
 
         hpx::lcos::wait(barrier2);
@@ -110,10 +110,10 @@ int main(int argc, char* argv[])
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()
-        ("array-size", value<std::size_t>()->default_value(8), 
+        ("array-size", value<std::size_t>()->default_value(8),
             "the size of the array")
-        ("iterations", value<std::size_t>()->default_value(16), 
-            "the number of lookups to perform") 
+        ("iterations", value<std::size_t>()->default_value(16),
+            "the number of lookups to perform")
         ;
     // Initialize and run HPX
     return hpx::init(desc_commandline, argc, argv);

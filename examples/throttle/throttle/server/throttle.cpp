@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -23,7 +23,7 @@ namespace throttle { namespace server
 {
     throttle::throttle()
     {
-        const std::size_t num_threads = 
+        const std::size_t num_threads =
             hpx::get_runtime().get_config().get_num_os_threads();
         BOOST_ASSERT(num_threads != std::size_t(-1));
         blocked_os_threads_.resize(num_threads);
@@ -38,9 +38,9 @@ namespace throttle { namespace server
 
     void throttle::suspend(std::size_t shepherd)
     {
-        // If the current thread is not the requested one, re-schedule a new 
+        // If the current thread is not the requested one, re-schedule a new
         // PX thread in order to retry.
-        std::size_t thread_num = 
+        std::size_t thread_num =
             hpx::threads::threadmanager_base::get_thread_num();
         if (thread_num != shepherd) {
             register_suspend_thread(shepherd);
@@ -89,12 +89,12 @@ namespace throttle { namespace server
     void throttle::throttle_controller(std::size_t shepherd)
     {
         mutex_type::scoped_lock l(mtx_);
-        if (!blocked_os_threads_[shepherd]) 
+        if (!blocked_os_threads_[shepherd])
             return;     // nothing more to do
 
         {
             // put this shepherd thread to sleep for 100ms
-            boost::system_time xt(boost::get_system_time() + 
+            boost::system_time xt(boost::get_system_time() +
                 boost::posix_time::milliseconds(100));
 
             hpx::util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
@@ -102,7 +102,7 @@ namespace throttle { namespace server
         }
 
         // if this thread still needs to be suspended, re-schedule this routine
-        // which will give the thread manager some cycles to tend to the high 
+        // which will give the thread manager some cycles to tend to the high
         // priority tasks which might have arrived
         if (blocked_os_threads_[shepherd])
             register_thread(shepherd);
@@ -111,13 +111,13 @@ namespace throttle { namespace server
     // schedule a high priority task on the given shepherd thread
     void throttle::register_thread(std::size_t shepherd)
     {
-        std::string description("throttle controller for shepherd thread (" + 
+        std::string description("throttle controller for shepherd thread (" +
             boost::lexical_cast<std::string>(shepherd) + ")");
 
         hpx::applier::register_thread(
             boost::bind(&throttle::throttle_controller, this, shepherd),
-            description.c_str(), 
-            hpx::threads::pending, true, 
+            description.c_str(),
+            hpx::threads::pending, true,
             hpx::threads::thread_priority_critical,
             shepherd);
     }
@@ -125,13 +125,13 @@ namespace throttle { namespace server
     // schedule a high priority task on the given shepherd thread to suspend
     void throttle::register_suspend_thread(std::size_t shepherd)
     {
-        std::string description("suspend shepherd thread (" + 
+        std::string description("suspend shepherd thread (" +
             boost::lexical_cast<std::string>(shepherd) + ")");
 
         hpx::applier::register_thread(
             boost::bind(&throttle::suspend, this, shepherd),
-            description.c_str(), 
-            hpx::threads::pending, true, 
+            description.c_str(),
+            hpx::threads::pending, true,
             hpx::threads::thread_priority_critical,
             shepherd);
     }

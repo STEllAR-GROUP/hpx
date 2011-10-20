@@ -1,8 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -48,8 +48,8 @@ struct signature<
 
     virtual result_type execute_function(
         naming::address::address_type lva,
-        BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T) 
-    ) const = 0; 
+        BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)
+    ) const = 0;
 
     virtual boost::function<threads::thread_function_type>
     get_thread_function(naming::address::address_type lva,
@@ -60,12 +60,12 @@ struct signature<
         naming::address::address_type lva,
         arguments_type const& args) const = 0;
 
-    virtual threads::thread_init_data& 
+    virtual threads::thread_init_data&
     get_thread_init_data(naming::address::address_type lva,
         threads::thread_init_data& data,
         arguments_type const& args) = 0;
 
-    virtual threads::thread_init_data& 
+    virtual threads::thread_init_data&
     get_thread_init_data(continuation_type& cont,
         naming::address::address_type lva,
         threads::thread_init_data& data,

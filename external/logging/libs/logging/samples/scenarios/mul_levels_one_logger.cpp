@@ -22,7 +22,7 @@
 
 This usage:
 - You have multiple levels (in this example: debug < info < error)
-- You want to format the message before it's written 
+- You want to format the message before it's written
   (in this example: prefix it by time, by index, and append newline to it)
 - You have <b>one log</b>, which writes to several log destinations
   (in this example: the console, the debug output window, and a file)

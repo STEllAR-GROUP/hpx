@@ -1,6 +1,6 @@
-//  Copyright (c) 2011 Bryce Adelstein-Lelbach 
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Copyright (c) 2011 Bryce Adelstein-Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <stdexcept>
@@ -49,7 +49,7 @@ double delay()
         d += 1 / (2. * i + 1);
     return d;
 }
-    
+
 ///////////////////////////////////////////////////////////////////////////////
 void null_thread()
 {
@@ -63,17 +63,17 @@ int hpx_main(
 {
     {
         num_iterations = vm["delay-iterations"].as<boost::uint64_t>();
-    
+
         const boost::uint64_t count = vm["pxthreads"].as<boost::uint64_t>();
-    
+
         if (HPX_UNLIKELY(0 == count))
             throw std::logic_error("error: count of 0 pxthreads specified\n");
- 
+
         threadmanager_base& tm = get_applier().get_thread_manager();
 
-        // start the clock 
+        // start the clock
         high_resolution_timer walltime;
-   
+
         for (boost::uint64_t i = 0; i < count; ++i)
             register_work(boost::bind(&null_thread));
 
@@ -85,10 +85,10 @@ int hpx_main(
         } while (tm.get_thread_count() > 1);
 
         const double duration = walltime.elapsed();
-    
+
         if (vm.count("csv"))
             cout << ( boost::format("%1%,%2%\n")
-                    % count 
+                    % count
                     % duration)
                  << flush;
         else
@@ -113,11 +113,11 @@ int main(
 
     cmdline.add_options()
         ( "pxthreads"
-        , value<boost::uint64_t>()->default_value(500000) 
+        , value<boost::uint64_t>()->default_value(500000)
         , "number of pxthreads to invoke")
-        
+
         ( "delay-iterations"
-        , value<boost::uint64_t>()->default_value(0) 
+        , value<boost::uint64_t>()->default_value(0)
         , "number of iterations in the delay loop")
 
         ( "csv"

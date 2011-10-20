@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_UTIL_AGAS_LOGGING_APR_10_2008_1032AM)
@@ -15,7 +15,7 @@
 BOOST_LOG_FORMAT_MSG(optimize::cache_string_one_str<>)
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
     HPX_API_EXPORT std::string levelname(int level);
@@ -117,7 +117,7 @@ namespace hpx { namespace util
         // well
         struct init_logging
         {
-            init_logging(runtime_configuration& ini, bool isconsole, 
+            init_logging(runtime_configuration& ini, bool isconsole,
                 naming::resolver_client& agas_client);
         };
     }

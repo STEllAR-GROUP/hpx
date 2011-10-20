@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -39,69 +39,69 @@ namespace hpx { namespace detail
         std::string const& thread_name)
     {
         try {
-            // create a boost::exception object encapsulating the Exception to 
+            // create a boost::exception object encapsulating the Exception to
             // be thrown and annotate it with all the local information we have
             throw boost::enable_current_exception(
-                boost::enable_error_info(e) 
+                boost::enable_error_info(e)
                     << throw_stacktrace(back_trace)
                     << throw_locality(node)
                     << throw_shepherd(shepherd)
                     << throw_thread_id(thread_id)
                     << throw_thread_name(thread_name)
-                    << throw_function(func) 
+                    << throw_function(func)
                     << throw_file(file)
                     << throw_line(line));
         }
         catch (boost::exception const& e) {
             // log the exception information in any case
-            LERR_(always) << "rethrow_exception: throwing exception: " 
+            LERR_(always) << "rethrow_exception: throwing exception: "
                 << diagnostic_information(e);
             throw;      // rethrow whatever has been caught
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template HPX_EXPORT void rethrow_exception(hpx::exception const&, 
+    template HPX_EXPORT void rethrow_exception(hpx::exception const&,
         std::string const&, std::string const&, int, std::string const&,
         boost::uint32_t, boost::int64_t, std::size_t, std::string const&);
 
-    template HPX_EXPORT void rethrow_exception(boost::system::system_error const&, 
+    template HPX_EXPORT void rethrow_exception(boost::system::system_error const&,
         std::string const&, std::string const&, int, std::string const&,
         boost::uint32_t, boost::int64_t, std::size_t, std::string const&);
 
-    template HPX_EXPORT void rethrow_exception(std::exception const&, 
+    template HPX_EXPORT void rethrow_exception(std::exception const&,
         std::string const&, std::string const&, int, std::string const&,
         boost::uint32_t, boost::int64_t, std::size_t, std::string const&);
     template HPX_EXPORT void rethrow_exception(std::bad_exception const&,
         std::string const&, std::string const&, int, std::string const&,
         boost::uint32_t, boost::int64_t, std::size_t, std::string const&);
 #ifndef BOOST_NO_TYPEID
-    template HPX_EXPORT void rethrow_exception(std::bad_typeid const&, 
+    template HPX_EXPORT void rethrow_exception(std::bad_typeid const&,
         std::string const&, std::string const&, int, std::string const&,
         boost::uint32_t, boost::int64_t, std::size_t, std::string const&);
-    template HPX_EXPORT void rethrow_exception(std::bad_cast const&, 
+    template HPX_EXPORT void rethrow_exception(std::bad_cast const&,
         std::string const&, std::string const&, int, std::string const&,
         boost::uint32_t, boost::int64_t, std::size_t, std::string const&);
 #endif
-    template HPX_EXPORT void rethrow_exception(std::bad_alloc const&, 
+    template HPX_EXPORT void rethrow_exception(std::bad_alloc const&,
         std::string const&, std::string const&, int, std::string const&,
         boost::uint32_t, boost::int64_t, std::size_t, std::string const&);
-    template HPX_EXPORT void rethrow_exception(std::logic_error const&, 
+    template HPX_EXPORT void rethrow_exception(std::logic_error const&,
         std::string const&, std::string const&, int, std::string const&,
         boost::uint32_t, boost::int64_t, std::size_t, std::string const&);
     template HPX_EXPORT void rethrow_exception(std::runtime_error const&,
         std::string const&, std::string const&, int, std::string const&,
         boost::uint32_t, boost::int64_t, std::size_t, std::string const&);
-    template HPX_EXPORT void rethrow_exception(std::out_of_range const&, 
+    template HPX_EXPORT void rethrow_exception(std::out_of_range const&,
         std::string const&, std::string const&, int, std::string const&,
         boost::uint32_t, boost::int64_t, std::size_t, std::string const&);
-    template HPX_EXPORT void rethrow_exception(std::invalid_argument const&, 
+    template HPX_EXPORT void rethrow_exception(std::invalid_argument const&,
         std::string const&, std::string const&, int, std::string const&,
         boost::uint32_t, boost::int64_t, std::size_t, std::string const&);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Exception>
-    HPX_EXPORT void throw_exception(Exception const& e, std::string const& func, 
+    HPX_EXPORT void throw_exception(Exception const& e, std::string const& func,
         std::string const& file, int line)
     {
         boost::uint32_t node = 0;
@@ -110,7 +110,7 @@ namespace hpx { namespace detail
         std::string thread_name("");
         std::string back_trace(backtrace());
 
-        // if this is not a HPX thread we do not need to query neither for 
+        // if this is not a HPX thread we do not need to query neither for
         // the shepherd thread nor for the thread id
         threads::thread_self* self = threads::get_self_ptr();
         if (NULL != self)
@@ -123,38 +123,38 @@ namespace hpx { namespace detail
 
             thread_id = reinterpret_cast<std::size_t>(self->get_thread_id());
             thread_name = threads::get_thread_description(self->get_thread_id());
-        } 
+        }
 
         rethrow_exception(e, func, file, line, back_trace, node, shepherd,
             thread_id, thread_name);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template HPX_EXPORT void throw_exception(hpx::exception const&, 
+    template HPX_EXPORT void throw_exception(hpx::exception const&,
         std::string const&, std::string const&, int);
 
-    template HPX_EXPORT void throw_exception(boost::system::system_error const&, 
+    template HPX_EXPORT void throw_exception(boost::system::system_error const&,
         std::string const&, std::string const&, int);
 
-    template HPX_EXPORT void throw_exception(std::exception const&, 
+    template HPX_EXPORT void throw_exception(std::exception const&,
         std::string const&, std::string const&, int);
     template HPX_EXPORT void throw_exception(std::bad_exception const&,
         std::string const&, std::string const&, int);
 #ifndef BOOST_NO_TYPEID
-    template HPX_EXPORT void throw_exception(std::bad_typeid const&, 
+    template HPX_EXPORT void throw_exception(std::bad_typeid const&,
         std::string const&, std::string const&, int);
-    template HPX_EXPORT void throw_exception(std::bad_cast const&, 
+    template HPX_EXPORT void throw_exception(std::bad_cast const&,
         std::string const&, std::string const&, int);
 #endif
-    template HPX_EXPORT void throw_exception(std::bad_alloc const&, 
+    template HPX_EXPORT void throw_exception(std::bad_alloc const&,
         std::string const&, std::string const&, int);
-    template HPX_EXPORT void throw_exception(std::logic_error const&, 
+    template HPX_EXPORT void throw_exception(std::logic_error const&,
         std::string const&, std::string const&, int);
     template HPX_EXPORT void throw_exception(std::runtime_error const&,
         std::string const&, std::string const&, int);
-    template HPX_EXPORT void throw_exception(std::out_of_range const&, 
+    template HPX_EXPORT void throw_exception(std::out_of_range const&,
         std::string const&, std::string const&, int);
-    template HPX_EXPORT void throw_exception(std::invalid_argument const&, 
+    template HPX_EXPORT void throw_exception(std::invalid_argument const&,
         std::string const&, std::string const&, int);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -168,7 +168,7 @@ namespace hpx { namespace detail
         char const* function, char const* file, long line)
     {
         bool threw = false;
-    
+
         std::string str("assertion '" + std::string(msg) + "' failed");
         if (expr != msg)
             str += " (" + std::string(expr) + ")";
@@ -176,7 +176,7 @@ namespace hpx { namespace detail
         try {
             boost::filesystem::path p(hpx::util::create_path(file));
             hpx::detail::throw_exception(
-                hpx::exception(hpx::assertion_failure, str), 
+                hpx::exception(hpx::assertion_failure, str),
                 function, p.string(), line);
         }
         catch (...) {
@@ -191,17 +191,17 @@ namespace hpx { namespace detail
             else {
                 std::cerr << "Runtime is not available, reporting error locally. "
                     << diagnostic_information(boost::current_exception())
-                    << std::flush; 
+                    << std::flush;
             }
         }
 
         // If the exception wasn't thrown, then print out the assertion message,
         // so that the program doesn't abort without any diagnostics.
-        // 
+        //
         // FIXME: why should the exception be not thrown above?
         if (!threw) {
             std::cerr << "Runtime is not available, reporting error locally\n"
-                         "[what]: " << str << std::endl; 
+                         "[what]: " << str << std::endl;
         }
         std::abort();
     }
@@ -214,7 +214,7 @@ namespace hpx { namespace detail
         util::osstream strm;
         strm << "\n";
 
-        std::string const* back_trace = 
+        std::string const* back_trace =
             boost::get_error_info<hpx::throw_stacktrace>(e);
         if (back_trace && !back_trace->empty()) {
             // FIXME: add indentation to stack frame information
@@ -224,12 +224,12 @@ namespace hpx { namespace detail
         // Try a cast to std::exception - this should handle boost.system
         // error codes in addition to the standard library exceptions.
         std::exception const* se = dynamic_cast<std::exception const*>(&e);
-        if (se) 
+        if (se)
             strm << "[what]: " << se->what() << "\n";
 
-        boost::uint32_t const* locality = 
+        boost::uint32_t const* locality =
             boost::get_error_info<hpx::throw_locality>(e);
-        if (locality && 0 != *locality) 
+        if (locality && 0 != *locality)
             strm << "[locality]: " << *locality << "\n";
 
         char const* const* func =
@@ -238,9 +238,9 @@ namespace hpx { namespace detail
             strm << "[function]: " << *func << "\n";
         }
         else {
-            std::string const* s = 
+            std::string const* s =
                 boost::get_error_info<hpx::throw_function>(e);
-            if (s) 
+            if (s)
                 strm << "[function]: " << *s << "\n";
         }
 
@@ -250,40 +250,40 @@ namespace hpx { namespace detail
             strm << "[file]: " << *file << "\n";
         }
         else {
-            std::string const* s = 
+            std::string const* s =
                 boost::get_error_info<hpx::throw_file>(e);
-            if (s) 
-                strm << "[file]: " << *s << "\n"; 
+            if (s)
+                strm << "[file]: " << *s << "\n";
         }
 
-        int const* line = 
+        int const* line =
             boost::get_error_info<boost::throw_line>(e);
-        if (line) 
+        if (line)
             strm << "[line]: " << *line << "\n";
 
-        boost::int64_t const* shepherd = 
+        boost::int64_t const* shepherd =
             boost::get_error_info<hpx::throw_shepherd>(e);
-        if (shepherd && -1 != *shepherd) 
+        if (shepherd && -1 != *shepherd)
             strm << "[os-thread]: " << *shepherd << "\n";
 
-        std::size_t const* thread_id = 
+        std::size_t const* thread_id =
             boost::get_error_info<hpx::throw_thread_id>(e);
-        if (thread_id && *thread_id) 
+        if (thread_id && *thread_id)
             strm << (boost::format("[thread_id]: %016x\n") % *thread_id);
 
-        std::string const* thread_name = 
+        std::string const* thread_name =
             boost::get_error_info<hpx::throw_thread_name>(e);
-        if (thread_name && !thread_name->empty()) 
+        if (thread_name && !thread_name->empty())
             strm << "[thread_name]: " << *thread_name << "\n";
 
         // add system information
-        strm << "[version]: " << build_string() << "\n"; 
+        strm << "[version]: " << build_string() << "\n";
         strm << "[boost]: " << boost_version() << "\n";
-        strm << "[build-type]: " << HPX_BUILD_TYPE << "\n"; 
-        strm << "[date]: " << __DATE__ << " " << __TIME__ << "\n"; 
-        strm << "[platform]: " << BOOST_PLATFORM << "\n"; 
-        strm << "[compiler]: " << BOOST_COMPILER << "\n"; 
-        strm << "[stdlib]: " << BOOST_STDLIB << "\n"; 
+        strm << "[build-type]: " << HPX_BUILD_TYPE << "\n";
+        strm << "[date]: " << __DATE__ << " " << __TIME__ << "\n";
+        strm << "[platform]: " << BOOST_PLATFORM << "\n";
+        strm << "[compiler]: " << BOOST_COMPILER << "\n";
+        strm << "[stdlib]: " << BOOST_STDLIB << "\n";
 
         return util::osstream_get_string(strm);
     }

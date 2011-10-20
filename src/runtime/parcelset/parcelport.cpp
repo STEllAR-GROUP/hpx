@@ -1,8 +1,8 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2007      Richard D Guidry Jr
 //  Copyright (c) 2011      Bryce Lelbach & Katelyn Kufahl
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <string>
@@ -25,12 +25,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
 {
-    parcelport::parcelport(util::io_service_pool& io_service_pool, 
+    parcelport::parcelport(util::io_service_pool& io_service_pool,
             naming::locality here)
       : io_service_pool_(io_service_pool),
         acceptor_(NULL),
         parcels_(This()),
-        connection_cache_(HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE, "  [PT] "), 
+        connection_cache_(HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE, "  [PT] "),
         here_(here)
     {}
 
@@ -54,8 +54,8 @@ namespace hpx { namespace parcelset
         std::size_t tried = 0;
         exception_list errors;
         naming::locality::iterator_type end = here_.accept_end();
-        for (naming::locality::iterator_type it = 
-                here_.accept_begin(io_service_pool_.get_io_service()); 
+        for (naming::locality::iterator_type it =
+                here_.accept_begin(io_service_pool_.get_io_service());
              it != end; ++it, ++tried)
         {
             try {
@@ -82,7 +82,7 @@ namespace hpx { namespace parcelset
 
         if (errors.get_error_count() == tried) {
             // all attempts failed
-            HPX_THROW_EXCEPTION(network_error, 
+            HPX_THROW_EXCEPTION(network_error,
                 "parcelport::parcelport", errors.get_message());
         }
 
@@ -122,10 +122,10 @@ namespace hpx { namespace parcelset
                 boost::bind(&parcelport::handle_accept, this,
                     boost::asio::placeholders::error, conn));
 
-        // now accept the incoming connection by starting to read from the 
+        // now accept the incoming connection by starting to read from the
         // socket
             c->async_read(
-                boost::bind(&parcelport::handle_read_completion, this, 
+                boost::bind(&parcelport::handle_read_completion, this,
                 boost::asio::placeholders::error, c));
         }
     }
@@ -135,11 +135,11 @@ namespace hpx { namespace parcelset
         server::parcelport_connection_ptr c)
     {
         if (e && e != boost::asio::error::operation_aborted) {
-            LPT_(error) << "handle read operation completion: error: " 
+            LPT_(error) << "handle read operation completion: error: "
                         << e.message();
         }
         else {
-            // complete data point and push back 
+            // complete data point and push back
             performance_counters::parcels::data_point& data = c->get_receive_data();
             data.timer_ = timer_.elapsed_microseconds() - data.timer_;
             parcels_received_.push_back(data);
@@ -147,22 +147,22 @@ namespace hpx { namespace parcelset
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void parcelport::send_parcel(parcel const& p, naming::address const& addr, 
+    void parcelport::send_parcel(parcel const& p, naming::address const& addr,
         write_handler_type f)
     {
-        const boost::uint32_t prefix = 
-            naming::get_prefix_from_gid(p.get_destination()); 
+        const boost::uint32_t prefix =
+            naming::get_prefix_from_gid(p.get_destination());
         parcelport_connection_ptr client_connection(connection_cache_.get(prefix));
 
         if (!client_connection) {
-//                 LPT_(info) << "parcelport: creating new connection to: " 
+//                 LPT_(info) << "parcelport: creating new connection to: "
 //                            << addr.locality_;
 
-        // The parcel gets serialized inside the connection constructor, no 
+        // The parcel gets serialized inside the connection constructor, no
         // need to keep the original parcel alive after this call returned.
             client_connection.reset(new parcelport_connection(
-                io_service_pool_.get_io_service(), prefix, 
-                connection_cache_, timer_, parcels_sent_)); 
+                io_service_pool_.get_io_service(), prefix,
+                connection_cache_, timer_, parcels_sent_));
 
             client_connection->set_parcel(p);
 
@@ -172,8 +172,8 @@ namespace hpx { namespace parcelset
             {
                 try {
                     naming::locality::iterator_type end = addr.locality_.connect_end();
-                    for (naming::locality::iterator_type it = 
-                            addr.locality_.connect_begin(io_service_pool_.get_io_service()); 
+                    for (naming::locality::iterator_type it =
+                            addr.locality_.connect_begin(io_service_pool_.get_io_service());
                          it != end; ++it)
                     {
 //                         boost::system::error_code ec;
@@ -181,18 +181,18 @@ namespace hpx { namespace parcelset
 //                             boost::asio::socket_base::shutdown_both, ec);
                         client_connection->socket().close();
                         client_connection->socket().connect(*it, error);
-                        if (!error) 
+                        if (!error)
                             break;
                     }
-                    if (!error) 
+                    if (!error)
                         break;
 
                     // we wait for a really short amount of time
-                    boost::this_thread::sleep(boost::get_system_time() + 
+                    boost::this_thread::sleep(boost::get_system_time() +
                         boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
                 }
                 catch (boost::system::error_code const& e) {
-                    HPX_THROW_EXCEPTION(network_error, 
+                    HPX_THROW_EXCEPTION(network_error,
                         "parcelport::send_parcel", e.message());
                 }
             }
@@ -203,10 +203,10 @@ namespace hpx { namespace parcelset
                 client_connection->socket().close();
 
                 hpx::util::osstream strm;
-                strm << error.message() << " (while trying to connect to: " 
+                strm << error.message() << " (while trying to connect to: "
                      << addr.locality_ << ")";
-                HPX_THROW_EXCEPTION(network_error, 
-                    "parcelport::send_parcel", 
+                HPX_THROW_EXCEPTION(network_error,
+                    "parcelport::send_parcel",
                     hpx::util::osstream_get_string(strm));
             }
 
@@ -214,7 +214,7 @@ namespace hpx { namespace parcelset
             client_connection->async_write(f);
         }
         else {
-//                 LPT_(info) << "parcelport: reusing existing connection to: " 
+//                 LPT_(info) << "parcelport: reusing existing connection to: "
 //                            << addr.locality_;
 
         // reuse an existing connection

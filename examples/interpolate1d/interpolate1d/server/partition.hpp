@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_PARTITION_AUG_04_2011_1204PM)
@@ -30,7 +30,7 @@ namespace interpolate1d { namespace server
         typedef partition wrapping_type;
 
         ///////////////////////////////////////////////////////////////////////
-        // parcel action code: the action to be performed on the destination 
+        // parcel action code: the action to be performed on the destination
         // object (the accumulator)
         enum actions
         {
@@ -39,7 +39,7 @@ namespace interpolate1d { namespace server
         };
 
         // exposed functionality
-        void init(std::string datafilename, dimension const&, 
+        void init(std::string datafilename, dimension const&,
             std::size_t num_nodes);
         double interpolate(double value);
 
@@ -53,7 +53,7 @@ namespace interpolate1d { namespace server
         > init_action;
 
         typedef hpx::actions::result_action1<
-            partition, double, partition_interpolate, double, 
+            partition, double, partition_interpolate, double,
             &partition::interpolate
         > interpolate_action;
 

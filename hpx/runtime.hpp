@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_RUNTIME_RUNTIME_JUN_10_2008_1012AM)
@@ -35,16 +35,16 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx 
+namespace hpx
 {
-    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    template <typename SchedulingPolicy, typename NotificationPolicy>
     class HPX_EXPORT runtime_impl;
 
     /// \class runtime runtime.hpp hpx/runtime.hpp
     class HPX_EXPORT runtime
     {
     public:
-        /// The \a hpx_main_function_type is the default function type usable 
+        /// The \a hpx_main_function_type is the default function type usable
         /// as the main HPX thread function.
         typedef int hpx_main_function_type();
 
@@ -54,7 +54,7 @@ namespace hpx
 
         /// construct a new instance of a runtime
         runtime(naming::resolver_client& agas_client,
-                std::string const& hpx_ini_file = "", 
+                std::string const& hpx_ini_file = "",
                 std::vector<std::string> const& cmdline_ini_defs
                     = std::vector<std::string>())
           : ini_(util::detail::get_logging_data(), hpx_ini_file,
@@ -69,7 +69,7 @@ namespace hpx
         ~runtime()
         {
             // allow to reuse instance number if this was the only instance
-            if (0 == instance_number_counter_) 
+            if (0 == instance_number_counter_)
                 --instance_number_counter_;
         }
 
@@ -104,7 +104,7 @@ namespace hpx
             return stopped_;
         }
 
-        // the TSS holds a pointer to the runtime associated with a given 
+        // the TSS holds a pointer to the runtime associated with a given
         // OS thread
         struct tls_tag {};
         static hpx::util::thread_specific_ptr<runtime*, tls_tag> runtime_;
@@ -119,30 +119,30 @@ namespace hpx
             return ini_;
         }
 
-        std::size_t get_instance_number() const 
-        { 
+        std::size_t get_instance_number() const
+        {
             return (std::size_t)instance_number_;
         }
 
-        /// \brief Allow access to the registry counter registry instance used 
+        /// \brief Allow access to the registry counter registry instance used
         ///        by the HPX runtime.
         performance_counters::registry& get_counter_registry()
         {
             return *counters_;
         }
 
-        /// \brief Allow access to the registry counter registry instance used 
+        /// \brief Allow access to the registry counter registry instance used
         ///        by the HPX runtime.
         performance_counters::registry const& get_counter_registry() const
         {
             return *counters_;
         }
 
-        /// \brief Install all performance counters related to this runtime 
+        /// \brief Install all performance counters related to this runtime
         ///        instance
         void install_counters();
 
-        virtual util::io_service_pool& get_io_pool() = 0; 
+        virtual util::io_service_pool& get_io_pool() = 0;
 
         virtual parcelset::parcelport& get_parcel_port() = 0;
 
@@ -154,7 +154,7 @@ namespace hpx
 
         virtual std::size_t get_memory_lva() const = 0;
 
-        virtual void report_error(std::size_t num_thread, 
+        virtual void report_error(std::size_t num_thread,
             boost::exception_ptr const& e) = 0;
 
         virtual void report_error(boost::exception_ptr const& e) = 0;
@@ -191,10 +191,10 @@ namespace hpx
 
     /// \class runtime_impl runtime.hpp hpx/runtime.hpp
     ///
-    /// The \a runtime class encapsulates the HPX runtime system in a simple to 
+    /// The \a runtime class encapsulates the HPX runtime system in a simple to
     /// use way. It makes sure all required parts of the HPX runtime system are
-    /// properly initialized. 
-    template <typename SchedulingPolicy, typename NotificationPolicy> 
+    /// properly initialized.
+    template <typename SchedulingPolicy, typename NotificationPolicy>
     class HPX_EXPORT runtime_impl : public runtime
     {
     private:
@@ -204,7 +204,7 @@ namespace hpx
         // avoid warnings about usage of this in member initializer list
         runtime_impl* This() { return this; }
 
-        // 
+        //
         static void default_errorsink(std::string const&);
 
         //
@@ -215,92 +215,92 @@ namespace hpx
         typedef SchedulingPolicy scheduling_policy_type;
         typedef NotificationPolicy notification_policy_type;
 
-        typedef typename scheduling_policy_type::init_parameter_type 
+        typedef typename scheduling_policy_type::init_parameter_type
             init_scheduler_type;
 
-        /// Construct a new HPX runtime instance 
+        /// Construct a new HPX runtime instance
         ///
-        /// \param locality_mode  [in] This is the mode the given runtime 
+        /// \param locality_mode  [in] This is the mode the given runtime
         ///                       instance should be executed in.
         explicit runtime_impl(runtime_mode locality_mode = runtime_mode_console,
             init_scheduler_type const& init = init_scheduler_type(),
             std::string const& hpx_ini_file = "",
-            std::vector<std::string> const& cmdline_ini_defs = 
+            std::vector<std::string> const& cmdline_ini_defs =
                 std::vector<std::string>());
 
-        /// \brief The destructor makes sure all HPX runtime services are 
+        /// \brief The destructor makes sure all HPX runtime services are
         ///        properly shut down before exiting.
         ~runtime_impl();
 
         /// \brief Start the runtime system
         ///
-        /// \param func       [in] This is the main function of an HPX 
+        /// \param func       [in] This is the main function of an HPX
         ///                   application. It will be scheduled for execution
-        ///                   by the thread manager as soon as the runtime has 
-        ///                   been initialized. This function is expected to 
+        ///                   by the thread manager as soon as the runtime has
+        ///                   been initialized. This function is expected to
         ///                   expose an interface as defined by the typedef
         ///                   \a hpx_main_function_type.
-        /// \param num_threads [in] The initial number of threads to be started 
-        ///                   by the threadmanager. This parameter is optional 
+        /// \param num_threads [in] The initial number of threads to be started
+        ///                   by the threadmanager. This parameter is optional
         ///                   and defaults to 1.
-        /// \param blocking   [in] This allows to control whether this 
-        ///                   call blocks until the runtime system has been 
-        ///                   stopped. If this parameter is \a true the 
-        ///                   function \a runtime#start will call 
+        /// \param blocking   [in] This allows to control whether this
+        ///                   call blocks until the runtime system has been
+        ///                   stopped. If this parameter is \a true the
+        ///                   function \a runtime#start will call
         ///                   \a runtime#wait internally.
         ///
-        /// \returns          If a blocking is a true, this function will 
-        ///                   return the value as returned as the result of the 
-        ///                   invocation of the function object given by the 
+        /// \returns          If a blocking is a true, this function will
+        ///                   return the value as returned as the result of the
+        ///                   invocation of the function object given by the
         ///                   parameter \p func. Otherwise it will return zero.
         int start(boost::function<hpx_main_function_type> func =
-                boost::function<hpx_main_function_type>(), 
-            std::size_t num_threads = 1, std::size_t num_localities = 1, 
+                boost::function<hpx_main_function_type>(),
+            std::size_t num_threads = 1, std::size_t num_localities = 1,
             bool blocking = false);
 
         /// \brief Start the runtime system
         ///
-        /// \param num_threads [in] The initial number of threads to be started 
-        ///                   by the threadmanager. 
-        /// \param blocking   [in] This allows to control whether this 
-        ///                   call blocks until the runtime system has been 
-        ///                   stopped. If this parameter is \a true the 
-        ///                   function \a runtime#start will call 
+        /// \param num_threads [in] The initial number of threads to be started
+        ///                   by the threadmanager.
+        /// \param blocking   [in] This allows to control whether this
+        ///                   call blocks until the runtime system has been
+        ///                   stopped. If this parameter is \a true the
+        ///                   function \a runtime#start will call
         ///                   \a runtime#wait internally .
         ///
-        /// \returns          If a blocking is a true, this function will 
-        ///                   return the value as returned as the result of the 
-        ///                   invocation of the function object given by the 
+        /// \returns          If a blocking is a true, this function will
+        ///                   return the value as returned as the result of the
+        ///                   invocation of the function object given by the
         ///                   parameter \p func. Otherwise it will return zero.
-        int start(std::size_t num_threads, std::size_t num_localities = 1, 
+        int start(std::size_t num_threads, std::size_t num_localities = 1,
             bool blocking = false);
 
         /// \brief Wait for the shutdown action to be executed
         ///
-        /// \returns          This function will return the value as returned 
-        ///                   as the result of the invocation of the function 
+        /// \returns          This function will return the value as returned
+        ///                   as the result of the invocation of the function
         ///                   object given by the parameter \p func.
         int wait();
 
         /// \brief Initiate termination of the runtime system
         ///
-        /// \param blocking   [in] This allows to control whether this 
-        ///                   call blocks until the runtime system has been 
-        ///                   fully stopped. If this parameter is \a false then 
+        /// \param blocking   [in] This allows to control whether this
+        ///                   call blocks until the runtime system has been
+        ///                   fully stopped. If this parameter is \a false then
         ///                   this call will initiate the stop action but will
-        ///                   return immediately. Use a second call to stop 
-        ///                   with this parameter set to \a true to wait for 
+        ///                   return immediately. Use a second call to stop
+        ///                   with this parameter set to \a true to wait for
         ///                   all internal work to be completed.
         void stop(bool blocking = true);
 
         /// \brief Stop the runtime system, wait for termination
         ///
-        /// \param blocking   [in] This allows to control whether this 
-        ///                   call blocks until the runtime system has been 
-        ///                   fully stopped. If this parameter is \a false then 
+        /// \param blocking   [in] This allows to control whether this
+        ///                   call blocks until the runtime system has been
+        ///                   fully stopped. If this parameter is \a false then
         ///                   this call will initiate the stop action but will
-        ///                   return immediately. Use a second call to stop 
-        ///                   with this parameter set to \a true to wait for 
+        ///                   return immediately. Use a second call to stop
+        ///                   with this parameter set to \a true to wait for
         ///                   all internal work to be completed.
         void stopped(bool blocking, boost::condition& cond, boost::mutex& mtx);
 
@@ -308,63 +308,63 @@ namespace hpx
         ///
         /// \param num_thread [in] The number of the operating system thread
         ///                   the error has been detected in.
-        /// \param e          [in] This is an instance encapsulating an 
+        /// \param e          [in] This is an instance encapsulating an
         ///                   exception which lead to this function call.
-        void report_error(std::size_t num_thread, 
+        void report_error(std::size_t num_thread,
             boost::exception_ptr const& e);
 
         /// \brief Report a non-recoverable error to the runtime system
         ///
-        /// \param e          [in] This is an instance encapsulating an 
+        /// \param e          [in] This is an instance encapsulating an
         ///                   exception which lead to this function call.
         ///
-        /// \note This function will retrieve the number of the current 
-        ///       shepherd thread and forward to the report_error function 
+        /// \note This function will retrieve the number of the current
+        ///       shepherd thread and forward to the report_error function
         ///       above.
         void report_error(boost::exception_ptr const& e);
 
-        /// \brief Run the HPX runtime system, use the given function for the 
-        ///        main \a thread and block waiting for all threads to 
+        /// \brief Run the HPX runtime system, use the given function for the
+        ///        main \a thread and block waiting for all threads to
         ///        finish
         ///
-        /// \param func       [in] This is the main function of an HPX 
+        /// \param func       [in] This is the main function of an HPX
         ///                   application. It will be scheduled for execution
-        ///                   by the thread manager as soon as the runtime has 
-        ///                   been initialized. This function is expected to 
+        ///                   by the thread manager as soon as the runtime has
+        ///                   been initialized. This function is expected to
         ///                   expose an interface as defined by the typedef
-        ///                   \a hpx_main_function_type. This parameter is 
-        ///                   optional and defaults to none main thread 
-        ///                   function, in which case all threads have to be 
+        ///                   \a hpx_main_function_type. This parameter is
+        ///                   optional and defaults to none main thread
+        ///                   function, in which case all threads have to be
         ///                   scheduled explicitly.
-        /// \param num_threads [in] The initial number of threads to be started 
-        ///                   by the threadmanager. This parameter is optional 
+        /// \param num_threads [in] The initial number of threads to be started
+        ///                   by the threadmanager. This parameter is optional
         ///                   and defaults to 1.
         ///
         /// \note             The parameter \a func is optional. If no function
         ///                   is supplied, the runtime system will simply wait
-        ///                   for the shutdown action without explicitly 
+        ///                   for the shutdown action without explicitly
         ///                   executing any main thread.
         ///
-        /// \returns          This function will return the value as returned 
-        ///                   as the result of the invocation of the function 
+        /// \returns          This function will return the value as returned
+        ///                   as the result of the invocation of the function
         ///                   object given by the parameter \p func.
         int run(boost::function<hpx_main_function_type> func =
-                    boost::function<hpx_main_function_type>(), 
+                    boost::function<hpx_main_function_type>(),
                 std::size_t num_threads = 1, std::size_t num_localities = 1);
 
-        /// \brief Run the HPX runtime system, initially use the given number 
+        /// \brief Run the HPX runtime system, initially use the given number
         ///        of (OS) threads in the threadmanager and block waiting for
         ///        all threads to finish.
         ///
-        /// \param num_threads [in] The initial number of threads to be started 
-        ///                   by the threadmanager. 
+        /// \param num_threads [in] The initial number of threads to be started
+        ///                   by the threadmanager.
         ///
         /// \returns          This function will always return 0 (zero).
         int run(std::size_t num_threads, std::size_t num_localities = 1);
 
         ///////////////////////////////////////////////////////////////////////
         template <typename F, typename Connection>
-        bool register_error_sink(F sink, Connection& conn, 
+        bool register_error_sink(F sink, Connection& conn,
             bool unregister_default = true)
         {
             if (unregister_default)
@@ -417,7 +417,7 @@ namespace hpx
             return action_manager_;
         }
 
-        /// \brief Allow access to the locality this runtime instance is 
+        /// \brief Allow access to the locality this runtime instance is
         /// associated with.
         ///
         /// This accessor returns a reference to the locality this runtime
@@ -429,9 +429,9 @@ namespace hpx
 
         /// \brief Return the number of executed PX threads
         ///
-        /// \param num This parameter specifies the sequence number of the OS 
-        ///            thread the number of executed PX threads should be 
-        ///            returned for. If this is std::size_t(-1) the function 
+        /// \param num This parameter specifies the sequence number of the OS
+        ///            thread the number of executed PX threads should be
+        ///            returned for. If this is std::size_t(-1) the function
         ///            will return the overall number of executed PX threads.
         std::size_t get_executed_threads(std::size_t num = std::size_t(-1)) const
         {
@@ -441,7 +441,7 @@ namespace hpx
         util::io_service_pool& get_io_pool()
         {
             return io_pool_;
-        } 
+        }
 
         std::size_t get_runtime_support_lva() const
         {
@@ -462,31 +462,31 @@ namespace hpx
 
         /// Add a function to be executed inside a HPX thread before hpx_main
         ///
-        /// \param  f   The function 'f' will be called from inside a HPX 
-        ///             thread before hpx_main is executed. This is very useful 
+        /// \param  f   The function 'f' will be called from inside a HPX
+        ///             thread before hpx_main is executed. This is very useful
         ///             to setup the runtime environment of the application
         ///             (install performance counters, etc.)
         void add_startup_function(boost::function<void()> const& f);
 
-        /// Add a function to be executed inside a HPX thread during 
-        /// hpx::finalize, but guaranteed before any of teh shutdown functions 
+        /// Add a function to be executed inside a HPX thread during
+        /// hpx::finalize, but guaranteed before any of teh shutdown functions
         /// is executed.
         ///
-        /// \param  f   The function 'f' will be called from inside a HPX 
-        ///             thread while hpx::finalize is executed. This is very 
-        ///             useful to tear down the runtime environment of the 
+        /// \param  f   The function 'f' will be called from inside a HPX
+        ///             thread while hpx::finalize is executed. This is very
+        ///             useful to tear down the runtime environment of the
         ///             application (uninstall performance counters, etc.)
-        ///             
+        ///
         /// \note       The difference to a shutdown function is that all
-        ///             pre-shutdown functions will be (system-wide) executed 
+        ///             pre-shutdown functions will be (system-wide) executed
         ///             before any shutdown function.
         void add_pre_shutdown_function(boost::function<void()> const& f);
 
         /// Add a function to be executed inside a HPX thread during hpx::finalize
         ///
-        /// \param  f   The function 'f' will be called from inside a HPX 
-        ///             thread while hpx::finalize is executed. This is very 
-        ///             useful to tear down the runtime environment of the 
+        /// \param  f   The function 'f' will be called from inside a HPX
+        ///             thread while hpx::finalize is executed. This is very
+        ///             useful to tear down the runtime environment of the
         ///             application (uninstall performance counters, etc.)
         void add_shutdown_function(boost::function<void()> const& f);
 
@@ -498,9 +498,9 @@ namespace hpx
         util::unique_ids id_pool;
         runtime_mode mode_;
         int result_;
-        util::io_service_pool io_pool_; 
-        util::io_service_pool parcel_pool_; 
-        util::io_service_pool timer_pool_; 
+        util::io_service_pool io_pool_;
+        util::io_service_pool parcel_pool_;
+        util::io_service_pool timer_pool_;
         parcelset::parcelport parcel_port_;
         naming::resolver_client agas_client_;
         parcelset::parcelhandler parcel_handler_;

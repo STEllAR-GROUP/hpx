@@ -2,8 +2,8 @@
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2007 Alexandre (aka Alex) TABBAL
 //  Copyright (c) 2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_PARCELSET_PARCEL_MAR_26_2008_1051AM)
@@ -35,8 +35,8 @@ namespace hpx { namespace parcelset
     class HPX_EXPORT parcel
     {
     public:
-        parcel() 
-          : destination_id_(), destination_addr_(), source_id_(), action_(), 
+        parcel()
+          : destination_id_(), destination_addr_(), source_id_(), action_(),
             continuation_(), start_time_(0), creation_time_(0)
         {
         }
@@ -52,22 +52,22 @@ namespace hpx { namespace parcelset
             action_(act), continuation_(), start_time_(0), creation_time_(0)
         {}
 
-        parcel(naming::gid_type apply_to, actions::base_action* act, 
-               actions::continuation* do_after) 
+        parcel(naming::gid_type apply_to, actions::base_action* act,
+               actions::continuation* do_after)
           : destination_id_(apply_to), destination_addr_(), source_id_(),
             action_(act), continuation_(do_after), start_time_(0),
             creation_time_(0)
         {}
 
-        parcel(naming::gid_type apply_to, actions::base_action* act, 
-               actions::continuation_type do_after) 
+        parcel(naming::gid_type apply_to, actions::base_action* act,
+               actions::continuation_type do_after)
           : destination_id_(apply_to), destination_addr_(), source_id_(),
             action_(act), continuation_(do_after), start_time_(0),
             creation_time_(0)
         {}
-        
+
         parcel(boost::uint32_t prefix, naming::address addr,
-            actions::base_action* act) 
+            actions::base_action* act)
           : destination_id_(naming::get_gid_from_prefix(prefix)),
             destination_addr_(addr), source_id_(), action_(act),
             continuation_(), start_time_(0), creation_time_(0)
@@ -79,12 +79,12 @@ namespace hpx { namespace parcelset
         // default copy constructor is ok
         // default assignment operator is ok
 
-        actions::action_type get_action() const 
+        actions::action_type get_action() const
         {
             return action_;
         }
 
-        actions::continuation_type get_continuation() const 
+        actions::continuation_type get_continuation() const
         {
             return continuation_;
         }
@@ -135,7 +135,7 @@ namespace hpx { namespace parcelset
             return creation_time_;
         }
 
-        threads::thread_priority get_thread_priority() const 
+        threads::thread_priority get_thread_priority() const
         {
             BOOST_ASSERT(action_);
             return action_->get_thread_priority();

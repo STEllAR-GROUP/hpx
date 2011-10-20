@@ -35,13 +35,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 template<typename Wrapped, BOOST_PP_ENUM_PARAMS(N, typename A)>
-struct plugin_wrapper<Wrapped, boost::mpl::list<BOOST_PP_ENUM_PARAMS(N, A)> > 
-:   public dll_handle_holder, 
-    public Wrapped 
-{        
+struct plugin_wrapper<Wrapped, boost::mpl::list<BOOST_PP_ENUM_PARAMS(N, A)> >
+:   public dll_handle_holder,
+    public Wrapped
+{
     plugin_wrapper(dll_handle dll, BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
-    :   detail::dll_handle_holder(dll), 
-        Wrapped(BOOST_PP_ENUM_PARAMS(N, a)) 
+    :   detail::dll_handle_holder(dll),
+        Wrapped(BOOST_PP_ENUM_PARAMS(N, a))
     {}
 };
 

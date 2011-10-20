@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_DIMENSION3D_AUG_07_2011_1143AM)
@@ -11,7 +11,7 @@
 #include <boost/serialization/serialization.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace interpolate3d 
+namespace interpolate3d
 {
     struct dimension
     {

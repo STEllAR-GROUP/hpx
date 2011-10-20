@@ -44,11 +44,11 @@ namespace detail {
         char_type * memory;
         boost::shmem::named_shared_object segment;
         std::size_t mem_size;
-    
+
     };
 }
 
-/** 
+/**
     @brief Logs the information in shared memory
 */
 template<class convert_dest = do_convert_destination > struct shared_memory_t : non_const_context<detail::shared_memory_context> {
@@ -56,7 +56,7 @@ template<class convert_dest = do_convert_destination > struct shared_memory_t : 
     enum { just_in_case = 8192 };
     shared_memory_t(const std::string & name, std::size_t mem_size = 2 * 1024 * 1024 * sizeof(char_type) ) : m_name(name), m_mem_size(mem_size) {
         non_const_context_base::context().mem_size = mem_size;
-        
+
         // this segment might have been previously created...
         non_const_context_base::context().segment.open_or_create(name.c_str(), non_const_context_base::context().mem_size + just_in_case);
 
@@ -75,7 +75,7 @@ template<class convert_dest = do_convert_destination > struct shared_memory_t : 
         // the occupied size
         { typedef std::pair<long*, std::size_t> pair;
         pair res = non_const_context_base::context().segment.find<long>("shared_occupied_size");
-        if ( !res.first) 
+        if ( !res.first)
             // we're creating it right now
             non_const_context_base::context().segment.construct<long>("shared_occupied_size")[1](0);
 
@@ -84,7 +84,7 @@ template<class convert_dest = do_convert_destination > struct shared_memory_t : 
         non_const_context_base::context().occupied_size = res.first;
         }
     }
-    
+
     template<class msg_type> void operator () (const msg_type& msg_arg) const {
         const string_type & msg = do_convert::do_convert(msg_arg, into<string_type>() );
 
@@ -99,7 +99,7 @@ template<class convert_dest = do_convert_destination > struct shared_memory_t : 
                 // move what was previously written, to the left, to make room
                 std::size_t keep = non_const_context_base::context().mem_size / 2;
                 if ( keep + msg.size() > non_const_context_base::context().mem_size) keep = non_const_context_base::context().mem_size - msg.size();
-                std::copy_backward( 
+                std::copy_backward(
                     non_const_context_base::context().memory + *non_const_context_base::context().occupied_size - keep,
                     non_const_context_base::context().memory + *non_const_context_base::context().occupied_size,
                     non_const_context_base::context().memory + keep);

@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
@@ -14,7 +14,7 @@ using boost::program_options::variables_map;
 using boost::program_options::options_description;
 
 ///////////////////////////////////////////////////////////////////////////////
-inline bool 
+inline bool
 eval(char const* expr, sheneos::sheneos& shen, double ye,
     double temp, double rho, std::vector<double>& expected)
 {
@@ -29,7 +29,7 @@ eval(char const* expr, sheneos::sheneos& shen, double ye,
     }
 
     for (std::size_t i = 0; i < results.size(); ++i) {
-        std::cout << results[i] 
+        std::cout << results[i]
                   << ", expected: " << expected[i]
                   << std::endl;
     }
@@ -65,7 +65,7 @@ int hpx_main(variables_map& vm)
 
         std::cout << std::endl << std::endl;
 
-        // create a second client instance connected to the already existing 
+        // create a second client instance connected to the already existing
         // interpolation object
         sheneos::sheneos shen_connected;
         shen_connected.connect(shen_symbolic_name);

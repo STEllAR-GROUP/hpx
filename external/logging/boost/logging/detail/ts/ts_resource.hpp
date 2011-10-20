@@ -26,12 +26,12 @@
 #include <time.h>
 #include <boost/assert.hpp>
 
-namespace boost { namespace logging { 
+namespace boost { namespace logging {
 
 
 
-    
-/** 
+
+/**
     @brief Contains implementations of locker objects. Such a locker can lock data for read or write.
 
     Assume you have
@@ -62,7 +62,7 @@ namespace boost { namespace logging {
 */
 namespace locker {
 
-    /** 
+    /**
         the data to be locked. It's locked using default thread-safety
 
         @sa locker
@@ -142,7 +142,7 @@ namespace locker {
 
 #ifndef BOOST_LOG_NO_TSS
 
-    /** 
+    /**
         Locks a resource, and uses TSS (Thread-specific storage). This holds the value, and each thread caches it.
         Once at a given period (like, every 5 seconds), when used, the latest object is copied.
 
@@ -154,7 +154,7 @@ namespace locker {
 
     private:
         struct value_and_time {
-            value_and_time() 
+            value_and_time()
                 // so that the first time it's used, it'll be refreshed
                 : val( type() ), time_(0) {
             }
@@ -222,8 +222,8 @@ namespace locker {
 
 
 
-    /** 
-        Locks a resource, and uses TSS. 
+    /**
+        Locks a resource, and uses TSS.
 
         The resource can be initialized once, at any time, no matter how many threads.
         Once the resource is initialized (basically, someone used resource::write), that is <b>the final value</b>

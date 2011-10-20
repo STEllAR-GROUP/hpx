@@ -11,7 +11,7 @@
 
 // define BOOST_CHRONO_SOURCE so that <boost/chrono/config.hpp> knows
 // the library is being built (possibly exporting rather than importing code)
-#define BOOST_CHRONO_SOURCE 
+#define BOOST_CHRONO_SOURCE
 
 #include <boost/version.hpp>
 
@@ -92,9 +92,9 @@ namespace boost
       {
         assert( 0 && "error handling not implemented yet" );
 
-        ec = system::error_code( errno, 
+        ec = system::error_code( errno,
 #if BOOST_VERSION >= 104400
-            system::system_category(), 
+            system::system_category(),
 #else
             system::system_category,
 #endif
@@ -115,9 +115,9 @@ namespace boost
         else
         {
         assert( 0 && "error handling not implemented yet" );
-          ec = system::error_code( errno, 
+          ec = system::error_code( errno,
 #if BOOST_VERSION >= 104400
-            system::system_category(), 
+            system::system_category(),
 #else
             system::system_category,
 #endif

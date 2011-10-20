@@ -27,7 +27,7 @@ typedef bl::filter::no_ts filter_type;
 BOOST_DECLARE_LOG_FILTER(g_l_filter, filter_type)
 BOOST_DECLARE_LOG(g_l, logger_type)
 
-#define L_ BOOST_LOG_USE_LOG_IF_FILTER( g_l(), g_log_filter()->is_enabled() ) 
+#define L_ BOOST_LOG_USE_LOG_IF_FILTER( g_l(), g_log_filter()->is_enabled() )
 
 // initialize thy logs..
 void init_logs();
@@ -38,8 +38,8 @@ void init_logs();
 #include "my_app_log.h"
 #include <boost/logging/format/named_write.hpp>
 
-BOOST_DEFINE_LOG_FILTER(g_log_filter, filter_type ) 
-BOOST_DEFINE_LOG(g_l, logger_type) 
+BOOST_DEFINE_LOG_FILTER(g_log_filter, filter_type )
+BOOST_DEFINE_LOG(g_l, logger_type)
 
 
 void init_logs() {

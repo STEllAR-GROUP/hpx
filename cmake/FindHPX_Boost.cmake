@@ -1,6 +1,6 @@
 # Copyright (c) 2011 Bryce Lelbach
 #
-# Distributed under the Boost Software License, Version 1.0. (See accompanying 
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 ################################################################################
@@ -21,7 +21,7 @@ option(BOOST_USE_MULTITHREADED "Set to true if multi-threaded boost libraries sh
 if(BOOST_LIB_DIR AND NOT BOOST_LIBRARY_DIR)
   set(BOOST_LIBRARY_DIR "${BOOST_LIB_DIR}")
 endif()
-  
+
 if(NOT BOOST_VERSION_FOUND)
   include(FindHPX_BoostVersion)
 endif()
@@ -49,12 +49,12 @@ macro(build_boost_libname BOOST_RAW_NAME)
   if(NOT BOOST_COMPILER_VERSION_FOUND)
     get_boost_compiler_version()
   endif()
-    
+
   set(BOOST_COMPILER_VERSION "")
   set(BOOST_LIB_SUFFIX "")
 
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"
-      OR "${CMAKE_CXX_COMPILER}" MATCHES "icl" 
+      OR "${CMAKE_CXX_COMPILER}" MATCHES "icl"
       OR "${CMAKE_CXX_COMPILER}" MATCHES "icpc")
     if(WIN32)
       set(BOOST_COMPILER_VERSION "-iw")
@@ -62,7 +62,7 @@ macro(build_boost_libname BOOST_RAW_NAME)
       set(BOOST_COMPILER_VERSION "-il")
     endif()
   elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
-          OR "${CMAKE_CXX_COMPILER}" MATCHES "clang") 
+          OR "${CMAKE_CXX_COMPILER}" MATCHES "clang")
     set(BOOST_COMPILER_VERSION "-clang")
   elseif(MSVC90)
     set(BOOST_COMPILER_VERSION "-vc90")
@@ -73,9 +73,9 @@ macro(build_boost_libname BOOST_RAW_NAME)
   elseif(MSVC71)
     set(BOOST_COMPILER_VERSION "-vc71")
   elseif(MSVC70) # Good luck!
-    set(BOOST_COMPILER_VERSION "-vc7") 
+    set(BOOST_COMPILER_VERSION "-vc7")
   elseif(MSVC60) # Good luck!
-    set(BOOST_COMPILER_VERSION "-vc6") 
+    set(BOOST_COMPILER_VERSION "-vc6")
   elseif(BORLAND)
     set(BOOST_COMPILER_VERSION "-bcb")
   elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "SunPro")
@@ -111,7 +111,7 @@ macro(build_boost_libname BOOST_RAW_NAME)
     endif()
   endif()
 
-  set(BOOST_COMPILER_VERSION ${BOOST_COMPILER_VERSION} 
+  set(BOOST_COMPILER_VERSION ${BOOST_COMPILER_VERSION}
     CACHE INTERNAL "Boost compiler version.")
 
   if(BOOST_SUFFIX)
@@ -120,7 +120,7 @@ macro(build_boost_libname BOOST_RAW_NAME)
       "Boost library suffix (default: `d' for Debug and RelWithDebInfo builds)." FORCE)
     set(BOOST_LIB_SUFFIX -${BOOST_SUFFIX})
   elseif("${CMAKE_BUILD_TYPE}" MATCHES "Debug|RelWithDebInfo")
-    set(BOOST_LIB_SUFFIX "-gd") 
+    set(BOOST_LIB_SUFFIX "-gd")
   endif()
 
   if(BOOST_USE_MULTITHREADED)
@@ -142,11 +142,11 @@ macro(find_boost_library TARGET_LIB)
   if(NOT BOOST_VERSION_FOUND)
     get_boost_version()
   endif()
- 
+
   # Non-system Boost tree (tarball, SCM checkout, etc)
   if(NOT BOOST_USE_SYSTEM AND BOOST_LIBRARY_DIR)
-    # Locate libraries 
-    build_boost_libname(${TARGET_LIB}) 
+    # Locate libraries
+    build_boost_libname(${TARGET_LIB})
     hpx_print_list("DEBUG" "boost.${TARGET_LIB}" "Searching in ${BOOST_LIBRARY_DIR} for" BOOST_LIBNAMES)
 
     foreach(BOOST_TARGET ${BOOST_LIBNAMES})
@@ -159,14 +159,14 @@ macro(find_boost_library TARGET_LIB)
         break()
       endif()
     endforeach()
-    
+
     if(NOT BOOST_${TARGET_LIB}_LIBRARY)
       hpx_warn("boost.${TARGET_LIB}" "Could not locate Boost ${TARGET_LIB} shared library in ${BOOST_LIBRARY_DIR}. Now searching the system path.")
       unset(BOOST_${TARGET_LIB}_LIBRARY)
-   
-      build_boost_libname(${TARGET_LIB}) 
+
+      build_boost_libname(${TARGET_LIB})
       hpx_print_list("DEBUG" "boost.${TARGET_LIB}" "Searching in system path for" BOOST_LIBNAMES)
-    
+
       foreach(BOOST_TARGET ${BOOST_LIBNAMES})
         find_library(BOOST_${TARGET_LIB}_LIBRARY NAMES ${BOOST_TARGET})
 
@@ -177,7 +177,7 @@ macro(find_boost_library TARGET_LIB)
           break()
         endif()
       endforeach()
-    
+
       if(NOT BOOST_${TARGET_LIB}_LIBRARY)
         hpx_error("boost.${TARGET_LIB}" "Failed to locate library in ${BOOST_LIBRARY_DIR} or in the system path.")
         unset(BOOST_${TARGET_LIB}_LIBRARY)
@@ -189,15 +189,15 @@ macro(find_boost_library TARGET_LIB)
       set(BOOST_${TARGET_LIB}_LIBRARY ${BOOST_${TARGET_LIB}_LIBRARY}
         CACHE FILEPATH "Boost ${TARGET_LIB} shared library." FORCE)
     endif()
-    
+
     list(APPEND BOOST_FOUND_LIBRARIES ${BOOST_${TARGET_LIB}_LIBRARY})
-  
+
   # System Boost installation (deb, rpm, etc)
   else()
-    # Locate libraries 
-    build_boost_libname(${TARGET_LIB}) 
+    # Locate libraries
+    build_boost_libname(${TARGET_LIB})
     hpx_print_list("DEBUG" "boost.${TARGET_LIB}" "Searching in system path for" BOOST_LIBNAMES)
-    
+
     foreach(BOOST_TARGET ${BOOST_LIBNAMES})
       find_library(BOOST_${TARGET_LIB}_LIBRARY NAMES ${BOOST_TARGET})
 
@@ -208,7 +208,7 @@ macro(find_boost_library TARGET_LIB)
         break()
       endif()
     endforeach()
-    
+
     if(NOT BOOST_${TARGET_LIB}_LIBRARY)
       hpx_error("boost.${TARGET_LIB}" "Failed to locate library in the system path.")
       set(BOOST_FOUND OFF)
@@ -217,9 +217,9 @@ macro(find_boost_library TARGET_LIB)
       set(BOOST_${TARGET_LIB}_LIBRARY ${BOOST_${TARGET_LIB}_LIBRARY}
         CACHE FILEPATH "Boost ${TARGET_LIB} shared library." FORCE)
     endif()
-  
+
     list(APPEND BOOST_FOUND_LIBRARIES ${BOOST_${TARGET_LIB}_LIBRARY})
-  endif()    
+  endif()
 endmacro()
 
 foreach(BOOST_LIB ${BOOST_LIBRARIES})

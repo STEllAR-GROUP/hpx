@@ -16,7 +16,7 @@
 /**
 @example mul_loggers_one_filter.cpp
 
-@copydoc mul_loggers_one_filter 
+@copydoc mul_loggers_one_filter
 
 @page mul_loggers_one_filter mul_loggers_one_filter.cpp Example
 
@@ -24,7 +24,7 @@
 This usage:
 - You have several loggers
 - You have one filter, which can be turned on or off
-- You want to format the message before it's written 
+- You want to format the message before it's written
 - Each logger has several log destinations
 
 Optimizations:
@@ -82,8 +82,8 @@ using namespace boost::logging;
 
 typedef logger_format_write< > logger_type;
 
-BOOST_DECLARE_LOG_FILTER(g_log_filter, filter::no_ts ) 
-BOOST_DECLARE_LOG(g_log_err, logger_type) 
+BOOST_DECLARE_LOG_FILTER(g_log_filter, filter::no_ts )
+BOOST_DECLARE_LOG(g_log_err, logger_type)
 BOOST_DECLARE_LOG(g_log_app, logger_type)
 BOOST_DECLARE_LOG(g_log_dbg, logger_type)
 
@@ -91,7 +91,7 @@ BOOST_DECLARE_LOG(g_log_dbg, logger_type)
 #define LERR_ BOOST_LOG_USE_LOG_IF_FILTER(g_log_err(), g_log_filter()->is_enabled() )
 #define LAPP_ BOOST_LOG_USE_LOG_IF_FILTER(g_log_app(), g_log_filter()->is_enabled() ) << "[app] "
 
-BOOST_DEFINE_LOG_FILTER(g_log_filter, filter::no_ts ) 
+BOOST_DEFINE_LOG_FILTER(g_log_filter, filter::no_ts )
 BOOST_DEFINE_LOG(g_log_err, logger_type)
 BOOST_DEFINE_LOG(g_log_app, logger_type)
 BOOST_DEFINE_LOG(g_log_dbg, logger_type)

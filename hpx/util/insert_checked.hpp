@@ -14,14 +14,14 @@ namespace hpx { namespace util
 {
 
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief  Helper function for writing predicates that test whether an std::map 
+/// \brief  Helper function for writing predicates that test whether an std::map
 ///         insertion succeeded. This inline template function negates the need
 ///         to explicitly write the sometimes lengthy std::pair<Iterator, bool>
-///         type. 
+///         type.
 ///
-/// \param r  [in] The return value of a std::map insert operation. 
+/// \param r  [in] The return value of a std::map insert operation.
 ///
-/// \returns  This function returns \b r.second. 
+/// \returns  This function returns \b r.second.
 template <typename Iterator>
 inline bool insert_checked(std::pair<Iterator, bool> const& r)
 {
@@ -29,16 +29,16 @@ inline bool insert_checked(std::pair<Iterator, bool> const& r)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief  Helper function for writing predicates that test whether an std::map 
+/// \brief  Helper function for writing predicates that test whether an std::map
 ///         insertion succeeded. This inline template function negates the need
 ///         to explicitly write the sometimes lengthy std::pair<Iterator, bool>
-///         type. 
+///         type.
 ///
-/// \param r  [in] The return value of a std::map insert operation. 
+/// \param r  [in] The return value of a std::map insert operation.
 ///
-/// \param r  [out] A reference to an Iterator, which is set to \b r.first. 
+/// \param r  [out] A reference to an Iterator, which is set to \b r.first.
 ///
-/// \returns  This function returns \b r.second. 
+/// \returns  This function returns \b r.second.
 template <typename Iterator>
 inline bool insert_checked(std::pair<Iterator, bool> const& r, Iterator& it)
 {

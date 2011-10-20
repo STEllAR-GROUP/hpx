@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <stdexcept>
@@ -15,7 +15,7 @@
 #include <boost/archive/basic_binary_oarchive.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parcelset 
+namespace hpx { namespace parcelset
 {
     ///////////////////////////////////////////////////////////////////////////
     void parcelport_connection::set_parcel (parcel const& p)
@@ -40,8 +40,8 @@ namespace hpx { namespace parcelset
             hpx::util::osstream strm;
             strm << "parcelport: parcel serialization failed: " << e.what()
                  << " parcel(" << p << ")";
-            HPX_THROW_EXCEPTION(no_success, 
-                "parcelport_connection::set_parcel", 
+            HPX_THROW_EXCEPTION(no_success,
+                "parcelport_connection::set_parcel",
                 hpx::util::osstream_get_string(strm));
             return;
         }

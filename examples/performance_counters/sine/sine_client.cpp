@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
@@ -27,24 +27,24 @@ int monitor(boost::uint64_t pause, boost::uint64_t values)
 
     // retrieve the counter values
     boost::int64_t start_time = 0;
-    while (values-- > 0) 
+    while (values-- > 0)
     {
         // Query the performance counter.
         using hpx::performance_counters::counter_value;
         using hpx::performance_counters::status_valid_data;
         using hpx::performance_counters::stubs::performance_counter;
 
-        counter_value value1 = performance_counter::get_value(id1); 
-        counter_value value2 = performance_counter::get_value(id2); 
-        counter_value value3 = performance_counter::get_value(id3); 
+        counter_value value1 = performance_counter::get_value(id1);
+        counter_value value2 = performance_counter::get_value(id2);
+        counter_value value3 = performance_counter::get_value(id3);
         if (status_valid_data == value1.status_)
         {
             if (!start_time)
                 start_time = value1.time_;
 
-            std::cout << (boost::format("%.3f: %.4f, %.4f, %.4f\n") % 
-                ((value1.time_ - start_time) * 1e-9) % 
-                value1.get_value<double>() % 
+            std::cout << (boost::format("%.3f: %.4f, %.4f, %.4f\n") %
+                ((value1.time_ - start_time) * 1e-9) %
+                value1.get_value<double>() %
                 (value2.get_value<double>() / 100000.) %
                 value3.get_value<double>());
         }

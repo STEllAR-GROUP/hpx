@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-//  Copyright (c) 2011      Bryce Lelbach 
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Copyright (c) 2011      Bryce Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -25,15 +25,15 @@ namespace hpx { namespace util
         mutex_type::scoped_lock l(this);
 
         // ensure next_id doesn't overflow
-        if ((lower_ + count) > upper_) 
+        if ((lower_ + count) > upper_)
         {
             naming::gid_type lower;
             naming::gid_type upper;
 
             {
                 unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                resolver.get_id_range(here, 
-                    (std::max)(std::size_t(range_delta), count), 
+                resolver.get_id_range(here,
+                    (std::max)(std::size_t(range_delta), count),
                     lower, upper);
             }
 
@@ -51,21 +51,21 @@ namespace hpx { namespace util
       , naming::resolver_client& resolver
     ) {
         mutex_type::scoped_lock al(allocation_mtx);
-          
+
         const std::size_t leap_at = step / leapfrog;
 
         BOOST_ASSERT(leap_at != 0);
 
         // Get the next range of ids at the "leapfrog" point. TODO: This should
         // probably be scheduled in a new thread so that we can return to the
-        // caller immediately. 
+        // caller immediately.
         const naming::gid_type saved_i = current_i;
         if (HPX_UNLIKELY((current_lower + leap_at) == current_i))
         {
             mutex_type::scoped_lock ll(leapfrog_mtx);
 
             // Make sure someone hasn't already gotten a new range.
-            if (((current_lower + leap_at) == saved_i) && !requested_range) 
+            if (((current_lower + leap_at) == saved_i) && !requested_range)
             {
                 requested_range = true;
 
@@ -92,7 +92,7 @@ namespace hpx { namespace util
         }
 
         // Check for range exhaustion.
-        if (HPX_UNLIKELY((current_i + 1) > current_upper)) 
+        if (HPX_UNLIKELY((current_i + 1) > current_upper))
         {
             mutex_type::scoped_lock ll(leapfrog_mtx);
 

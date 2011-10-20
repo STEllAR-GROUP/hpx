@@ -15,9 +15,9 @@
 namespace hpx { namespace agas { namespace stubs
 {
 
-struct primary_namespace 
+struct primary_namespace
 {
-    typedef server::primary_namespace server_type; 
+    typedef server::primary_namespace server_type;
 
     static lcos::promise<response> service_async(
         naming::id_type const& gid
@@ -30,13 +30,13 @@ struct primary_namespace
 
     static response service(
         naming::id_type const& gid
-      , request const& req 
+      , request const& req
       , error_code& ec = throws
         )
     {
         return service_async(gid, req).get(ec);
-    } 
-};            
+    }
+};
 
 }}}
 

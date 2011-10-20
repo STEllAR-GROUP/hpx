@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -36,7 +36,7 @@ namespace hpx
         return exceptions_.front().code();
     }
 
-    std::string indent_message(char const* msg_) 
+    std::string indent_message(char const* msg_)
     {
         std::string result;
         std::string msg(msg_);
@@ -46,7 +46,7 @@ namespace hpx
 
         while (std::string::npos != pos) {
             if (pos > first_non_ws) {   // skip leading newline
-                result += msg.substr(pos1, pos-pos1+1); 
+                result += msg.substr(pos1, pos-pos1+1);
                 pos = msg.find_first_of("\n", pos1 = pos+1);
                 if (std::string::npos != pos)
                     result += "  ";
@@ -56,7 +56,7 @@ namespace hpx
             }
         }
 
-        result += msg.substr(pos1); 
+        result += msg.substr(pos1);
         return result;
     }
 
@@ -67,7 +67,7 @@ namespace hpx
 
         if (1 == exceptions_.size())
             return exceptions_.front().what();
-            
+
         std::string result("\n");
 
         exception_list_type::const_iterator end = exceptions_.end();

@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  
+//
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -30,7 +30,7 @@
 #else
 
 #define N BOOST_PP_ITERATION()
-    
+
 namespace hpx { namespace util { namespace detail {
 
     template <
@@ -46,9 +46,9 @@ namespace hpx { namespace util { namespace detail {
     >
     {
         virtual ~vtable_ptr_base() {}
-        
+
         virtual vtable_ptr_base * get_ptr() = 0;
-        
+
         boost::detail::sp_typeinfo const & (*get_type)();
         void (*static_delete)(void**);
         void (*destruct)(void**);
@@ -59,7 +59,7 @@ namespace hpx { namespace util { namespace detail {
         void (*oregister_base)(OArchive &);
         void (*iserialize)(void **, IArchive &, unsigned);
         void (*oserialize)(void **, OArchive &, unsigned);
-        
+
         template <typename Archive>
         void serialize(Archive & ar, unsigned)
         {}

@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -93,15 +93,15 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
-    runtime_support::runtime_support(util::section& ini, 
-            naming::gid_type const& prefix, naming::resolver_client& agas_client, 
+    runtime_support::runtime_support(util::section& ini,
+            naming::gid_type const& prefix, naming::resolver_client& agas_client,
             applier::applier& applier)
       : stopped_(false), terminated_(false), ini_(ini)
     {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // return, whether more than one instance of the given component can be 
+    // return, whether more than one instance of the given component can be
     // created at the same time
     int runtime_support::factory_properties(components::component_type type)
     {
@@ -113,7 +113,7 @@ namespace hpx { namespace components { namespace server
             strm << "attempt to query factory properties for components "
                     "invalid/unknown type: "
                  << components::get_component_type_name(type);
-            HPX_THROW_EXCEPTION(hpx::bad_component_type, 
+            HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::factory_properties",
                 hpx::util::osstream_get_string(strm));
             return factory_invalid;
@@ -135,7 +135,7 @@ namespace hpx { namespace components { namespace server
             hpx::util::osstream strm;
             strm << "attempt to create component instance of invalid/unknown type: "
                  << components::get_component_type_name(type);
-            HPX_THROW_EXCEPTION(hpx::bad_component_type, 
+            HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
                 hpx::util::osstream_get_string(strm));
             return naming::invalid_gid;
@@ -146,16 +146,16 @@ namespace hpx { namespace components { namespace server
 
     // set result if requested
         if (LHPX_ENABLED(info)) {
-            if ((*it).second.first->get_factory_properties() & factory_instance_count_is_size) 
+            if ((*it).second.first->get_factory_properties() & factory_instance_count_is_size)
             {
-                LRT_(info) << "successfully created component " << id 
-                           << " of type: " 
-                           << components::get_component_type_name(type) 
+                LRT_(info) << "successfully created component " << id
+                           << " of type: "
+                           << components::get_component_type_name(type)
                            << " (size: " << count << ")";
             }
             else {
-                LRT_(info) << "successfully created " << count 
-                           << " component(s) " << id << " of type: " 
+                LRT_(info) << "successfully created " << count
+                           << " component(s) " << id << " of type: "
                            << components::get_component_type_name(type);
             }
         }
@@ -173,9 +173,9 @@ namespace hpx { namespace components { namespace server
             // we don't know anything about this component
             hpx::util::osstream strm;
             strm << "attempt to create component instance of invalid/unknown type: "
-                 << components::get_component_type_name(type) 
+                 << components::get_component_type_name(type)
                  << " (component not found in map)";
-            HPX_THROW_EXCEPTION(hpx::bad_component_type, 
+            HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
                 hpx::util::osstream_get_string(strm));
             return naming::invalid_gid;
@@ -186,7 +186,7 @@ namespace hpx { namespace components { namespace server
             strm << "attempt to create component instance of invalid/unknown type: "
                  << components::get_component_type_name(type)
                  << " (map entry is NULL)";
-            HPX_THROW_EXCEPTION(hpx::bad_component_type, 
+            HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
                 hpx::util::osstream_get_string(strm));
             return naming::invalid_gid;
@@ -196,8 +196,8 @@ namespace hpx { namespace components { namespace server
         naming::gid_type id = (*it).second.first->create_one(arg0);
 
     // set result if requested
-        LRT_(info) << "successfully created component " << id 
-                   << " of type: " 
+        LRT_(info) << "successfully created component " << id
+                   << " of type: "
                    << components::get_component_type_name(type);
 
         return id;
@@ -212,7 +212,7 @@ namespace hpx { namespace components { namespace server
         server::memory_block* c = server::memory_block::create(count, act);
         naming::gid_type gid = c->get_base_gid();
         if (gid) {
-            LRT_(info) << "successfully created memory block of size " << count 
+            LRT_(info) << "successfully created memory block of size " << count
                        << ": " << gid;
             return gid;
         }
@@ -223,7 +223,7 @@ namespace hpx { namespace components { namespace server
         strm << "global id " << gid << " is already bound to a different "
                 "component instance";
         HPX_THROW_EXCEPTION(hpx::duplicate_component_address,
-            "runtime_support::create_memory_block", 
+            "runtime_support::create_memory_block",
             hpx::util::osstream_get_string(strm));
 
         return naming::invalid_gid;
@@ -239,26 +239,26 @@ namespace hpx { namespace components { namespace server
             // retrieve the local address bound to the given global id
             applier::applier& appl = hpx::applier::get_applier();
             naming::address addr;
-            if (!appl.get_agas_client().resolve(gid, addr)) 
+            if (!appl.get_agas_client().resolve(gid, addr))
             {
                 hpx::util::osstream strm;
                 strm << "global id " << gid << " is not bound to any "
                         "component instance";
                 HPX_THROW_EXCEPTION(hpx::unknown_component_address,
-                    "runtime_support::free_component", 
+                    "runtime_support::free_component",
                     hpx::util::osstream_get_string(strm));
                 return;
             }
 
             // make sure this component is located here
-            if (appl.here() != addr.locality_) 
+            if (appl.here() != addr.locality_)
             {
                 // FIXME: should the component be re-bound ?
                 hpx::util::osstream strm;
                 strm << "global id " << gid << " is not bound to any local "
                         "component instance";
                 HPX_THROW_EXCEPTION(hpx::unknown_component_address,
-                    "runtime_support::free_component", 
+                    "runtime_support::free_component",
                     hpx::util::osstream_get_string(strm));
                 return;
             }
@@ -276,8 +276,8 @@ namespace hpx { namespace components { namespace server
             // we don't know anything about this component
             hpx::util::osstream strm;
 
-            strm << "attempt to destroy component " << gid 
-                 << " of invalid/unknown type: " 
+            strm << "attempt to destroy component " << gid
+                 << " of invalid/unknown type: "
                  << components::get_component_type_name(type)
                  << std::endl;
 
@@ -285,11 +285,11 @@ namespace hpx { namespace components { namespace server
             component_map_type::iterator end = components_.end();
             for (component_map_type::iterator it = components_.begin(); it!= end; ++it)
             {
-                strm << "  " << components::get_component_type_name((*it).first) 
+                strm << "  " << components::get_component_type_name((*it).first)
                      << std::endl;
             }
 
-            HPX_THROW_EXCEPTION(hpx::bad_component_type, 
+            HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::free_component",
                 hpx::util::osstream_get_string(strm));
             return;
@@ -298,7 +298,7 @@ namespace hpx { namespace components { namespace server
     // destroy the component instance
         (*it).second.first->destroy(gid);
 
-        LRT_(info) << "successfully destroyed component " << gid 
+        LRT_(info) << "successfully destroyed component " << gid
             << " of type: " << components::get_component_type_name(type);
     }
 
@@ -351,7 +351,7 @@ namespace hpx { namespace components { namespace server
                 runtime_support::call_shutdown_functions_async(id, pre_shutdown));
         }
 
-        // wait for all localities to finish executing their registered 
+        // wait for all localities to finish executing their registered
         // shutdown functions
         lcos::wait(lazy_actions);
     }
@@ -439,7 +439,7 @@ namespace hpx { namespace components { namespace server
     {
         mutex_type::scoped_lock l(mtx_);
 
-        // Only after releasing the components we are allowed to release 
+        // Only after releasing the components we are allowed to release
         // the modules. This is done in reverse order of loading.
         component_map_type::iterator end = components_.end();
         for (component_map_type::iterator it = components_.begin(); it != end; /**/)
@@ -480,14 +480,14 @@ namespace hpx { namespace components { namespace server
         }
     }
 
-    // let thread manager clean up HPX threads 
+    // let thread manager clean up HPX threads
     template <typename Lock>
-    inline void 
+    inline void
     cleanup_threads(threads::threadmanager_base& tm, Lock& l)
     {
         // re-acquire pointer to self as it might have changed
         threads::thread_self* self = threads::get_self_ptr();
-        BOOST_ASSERT(0 != self);    // needs to be executed by a PX thread 
+        BOOST_ASSERT(0 != self);    // needs to be executed by a PX thread
 
         // give the scheduler some time to work on remaining tasks
         {
@@ -529,7 +529,7 @@ namespace hpx { namespace components { namespace server
                 }
             }
 
-            // If it took longer than expected, kill all suspended threads as 
+            // If it took longer than expected, kill all suspended threads as
             // well.
             if (timed_out) {
                 // now we have to wait for all threads to be aborted
@@ -542,7 +542,7 @@ namespace hpx { namespace components { namespace server
                 }
             }
 
-            naming::resolver_client& agas_client = 
+            naming::resolver_client& agas_client =
                 get_runtime().get_agas_client();
 
             error_code ec;
@@ -596,30 +596,30 @@ namespace hpx { namespace components { namespace server
     void runtime_support::call_startup_functions()
     {
         BOOST_FOREACH(boost::function<void()> const& f, startup_functions_)
-        { 
-            f(); 
-        } 
+        {
+            f();
+        }
     }
 
     void runtime_support::call_shutdown_functions(bool pre_shutdown)
     {
         if (pre_shutdown) {
-            BOOST_FOREACH(boost::function<void()> const& f, pre_shutdown_functions_) 
-            { 
-                f(); 
-            } 
+            BOOST_FOREACH(boost::function<void()> const& f, pre_shutdown_functions_)
+            {
+                f();
+            }
         }
         else {
-            BOOST_FOREACH(boost::function<void()> const& f, shutdown_functions_) 
-            { 
-                f(); 
-            } 
+            BOOST_FOREACH(boost::function<void()> const& f, shutdown_functions_)
+            {
+                f();
+            }
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // Load all components from the ini files found in the configuration
-    void runtime_support::load_components(util::section& ini, 
+    void runtime_support::load_components(util::section& ini,
         naming::gid_type const& prefix, naming::resolver_client& agas_client)
     {
         // load all components as described in the configuration information
@@ -644,7 +644,7 @@ namespace hpx { namespace components { namespace server
         util::section* sec = ini.get_section("hpx.components");
         if (NULL == sec)
         {
-            LRT_(error) << "NULL section found"; 
+            LRT_(error) << "NULL section found";
             return;     // something bad happened
         }
 
@@ -652,7 +652,7 @@ namespace hpx { namespace components { namespace server
 
         typedef util::section::section_map::const_iterator iterator;
         iterator end = s.end();
-        for (iterator i = s.begin (); i != end; ++i) 
+        for (iterator i = s.begin (); i != end; ++i)
         {
             namespace fs = boost::filesystem;
 
@@ -675,12 +675,12 @@ namespace hpx { namespace components { namespace server
                 }
             }
 
-            // test whether this component section was generated 
+            // test whether this component section was generated
             bool isdefault = false;
             if (i->second.has_entry("isdefault")) {
                 std::string tmp = i->second.get_entry("isdefault");
                 boost::algorithm::to_lower (tmp);
-                if (tmp == "true") 
+                if (tmp == "true")
                     isdefault = true;
             }
 
@@ -691,19 +691,19 @@ namespace hpx { namespace components { namespace server
                 else
                     lib = hpx::util::create_path(HPX_DEFAULT_COMPONENT_PATH);
 
-                if (!load_component(ini, instance, component, lib, prefix, 
-                        agas_client, isdefault, isenabled)) 
+                if (!load_component(ini, instance, component, lib, prefix,
+                        agas_client, isdefault, isenabled))
                 {
                     // build path to component to load
                     std::string libname(component + HPX_SHARED_LIB_EXTENSION);
                     lib /= hpx::util::create_path(libname);
-                    if (!load_component(ini, instance, component, lib, prefix, 
+                    if (!load_component(ini, instance, component, lib, prefix,
                             agas_client, isdefault, isenabled))
                     {
                         continue;   // next please :-P
                     }
                 }
-            } 
+            }
             catch (hpx::exception const& e) {
                 LRT_(warning) << "caught exception while loading " << instance
                               << ", " << get_hpx_category().message(e.get_error())
@@ -717,12 +717,12 @@ namespace hpx { namespace components { namespace server
     {
         try {
             // get the factory, may fail
-            boost::plugin::plugin_factory<component_startup_shutdown_base> pf (d, 
+            boost::plugin::plugin_factory<component_startup_shutdown_base> pf (d,
                 BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME(startup_shutdown)));
 
             // create the startup_shutdown object
-            boost::shared_ptr<component_startup_shutdown_base> 
-                startup_shutdown(pf.create("startup_shutdown")); 
+            boost::shared_ptr<component_startup_shutdown_base>
+                startup_shutdown(pf.create("startup_shutdown"));
 
             startup_function_type startup;
             if (startup_shutdown->get_startup_function(startup))
@@ -733,12 +733,12 @@ namespace hpx { namespace components { namespace server
                 shutdown_functions_.push_back(shutdown);
         }
         catch (std::logic_error const& e) {
-            LRT_(debug) << "loading of startup/shutdown functions failed: " 
+            LRT_(debug) << "loading of startup/shutdown functions failed: "
                         << d.get_name() << ": " << e.what();
             return false;
         }
         catch (std::exception const& e) {
-            LRT_(debug) << "loading of startup/shutdown functions failed: " 
+            LRT_(debug) << "loading of startup/shutdown functions failed: "
                         << d.get_name() << ": " << e.what();
             return false;
         }
@@ -746,9 +746,9 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool runtime_support::load_component(util::section& ini, 
-        std::string const& instance, std::string const& component, 
-        boost::filesystem::path lib, naming::gid_type const& prefix, 
+    bool runtime_support::load_component(util::section& ini,
+        std::string const& instance, std::string const& component,
+        boost::filesystem::path lib, naming::gid_type const& prefix,
         naming::resolver_client& agas_client, bool isdefault, bool isenabled)
     {
         namespace fs = boost::filesystem;
@@ -759,14 +759,14 @@ namespace hpx { namespace components { namespace server
         }
 
         try {
-            // get the handle of the library 
+            // get the handle of the library
             boost::plugin::dll d (lib.string(), component);
 
             // get the factory
-            boost::plugin::plugin_factory<component_factory_base> pf (d, 
+            boost::plugin::plugin_factory<component_factory_base> pf (d,
                 BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME(factory)));
 
-            // initialize the factory instance using the preferences from the 
+            // initialize the factory instance using the preferences from the
             // ini files
             util::section const* glob_ini = NULL;
             if (ini.has_section("settings"))
@@ -779,7 +779,7 @@ namespace hpx { namespace components { namespace server
 
             // create the component factory object
             boost::shared_ptr<component_factory_base> factory (
-                pf.create(instance, glob_ini, component_ini, isenabled)); 
+                pf.create(instance, glob_ini, component_ini, isenabled));
 
             component_type t = factory->get_component_type(
                 prefix, agas_client);
@@ -790,11 +790,11 @@ namespace hpx { namespace components { namespace server
 
             // store component factory and module for later use
             component_factory_type data(factory, d, isenabled);
-            std::pair<component_map_type::iterator, bool> p = 
+            std::pair<component_map_type::iterator, bool> p =
                 components_.insert(component_map_type::value_type(t, data));
 
             if (components::get_derived_type(t) != 0) {
-            // insert three component types, the base type, the derived 
+            // insert three component types, the base type, the derived
             // type and the combined one.
                 if (p.second) {
                     p = components_.insert(component_map_type::value_type(
@@ -814,17 +814,17 @@ namespace hpx { namespace components { namespace server
 
             load_startup_shutdown_functions(d);
 
-            LRT_(info) << "dynamic loading succeeded: " << lib.string() 
-                       << ": " << instance << ": " 
+            LRT_(info) << "dynamic loading succeeded: " << lib.string()
+                       << ": " << instance << ": "
                        << components::get_component_type_name(t);
         }
         catch (std::logic_error const& e) {
-            LRT_(warning) << "dynamic loading failed: " << lib.string() 
+            LRT_(warning) << "dynamic loading failed: " << lib.string()
                           << ": " << instance << ": " << e.what();
             return false;
         }
         catch (std::exception const& e) {
-            LRT_(warning) << "dynamic loading failed: " << lib.string() 
+            LRT_(warning) << "dynamic loading failed: " << lib.string()
                           << ": " << instance << ": " << e.what();
             return false;
         }

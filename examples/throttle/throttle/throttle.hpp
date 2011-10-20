@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_THROTTLE_AUG_09_2011_0659PM)
@@ -13,7 +13,7 @@
 
 #include "stubs/throttle.hpp"
 
-namespace throttle 
+namespace throttle
 {
     ///////////////////////////////////////////////////////////////////////////
     class throttle
@@ -24,12 +24,12 @@ namespace throttle
 
     public:
         // create a new partition instance and initialize it synchronously
-        throttle() 
+        throttle()
           : base_type(stubs::throttle::create_sync(hpx::find_here()))
         {}
 
-        throttle(hpx::naming::id_type gid) 
-          : base_type(gid) 
+        throttle(hpx::naming::id_type gid)
+          : base_type(gid)
         {}
 
         ~throttle()

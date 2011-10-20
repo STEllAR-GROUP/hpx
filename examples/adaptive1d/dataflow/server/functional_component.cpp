@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2009-2011 Matthew Anderson
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
@@ -21,11 +21,11 @@ typedef hpx::components::adaptive1d::server::functional_component dataflow_funct
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions
-HPX_REGISTER_ACTION_EX(dataflow_functional_component_type::alloc_data_action, 
+HPX_REGISTER_ACTION_EX(dataflow_functional_component_type::alloc_data_action,
     adaptive1d_dataflow_functional_component_alloc_data_action);
-HPX_REGISTER_ACTION_EX(dataflow_functional_component_type::eval_action, 
+HPX_REGISTER_ACTION_EX(dataflow_functional_component_type::eval_action,
     adaptive1d_dataflow_functional_component_eval_action);
-HPX_REGISTER_ACTION_EX(dataflow_functional_component_type::init_action, 
+HPX_REGISTER_ACTION_EX(dataflow_functional_component_type::init_action,
     adaptive1d_dataflow_functional_component_init_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(dataflow_functional_component_type);
 

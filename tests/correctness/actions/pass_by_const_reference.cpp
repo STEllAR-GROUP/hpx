@@ -58,12 +58,12 @@ struct object
     void serialize(Archive& ar, const unsigned int)
     {
         // no-op
-    } 
+    }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 void pass_object(
-    object const& obj  
+    object const& obj
     )
 {
     std::cout << "pass_object: object(" << &obj << ")\n";
@@ -71,7 +71,7 @@ void pass_object(
 
 typedef plain_action1<
     // arguments
-    object const&  
+    object const&
     // function
   , pass_object
 > pass_object_action;
@@ -84,7 +84,7 @@ typedef eager_future<pass_object_action> pass_object_future;
 int hpx_main(variables_map& vm)
 {
     {
-        const id_type prefix = find_here(); 
+        const id_type prefix = find_here();
 
         object obj;
 

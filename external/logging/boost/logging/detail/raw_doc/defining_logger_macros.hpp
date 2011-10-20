@@ -1,13 +1,13 @@
 namespace boost { namespace logging {
 
-/** 
+/**
 @page defining_logger_macros Defining macros to do logging
 
-- @ref defining_logger_macros_prerequisites 
-- @ref defining_logger_macros_easiest 
-- @ref defining_logger_macros_levels 
-- @ref defining_logger_macros_file_name 
-- @ref defining_logger_macros_module_name 
+- @ref defining_logger_macros_prerequisites
+- @ref defining_logger_macros_easiest
+- @ref defining_logger_macros_levels
+- @ref defining_logger_macros_file_name
+- @ref defining_logger_macros_module_name
 
 
 \n\n
@@ -29,14 +29,14 @@ To define a macro to log messages in code, I've provided these few macros to hel
 
 The parameters are:
 - @c %logger - a pointer to a logger you've declared
-- @c filter_is_enabled - how to determine if the filter is enabled. 
+- @c filter_is_enabled - how to determine if the filter is enabled.
   - For simple filters this can be a simple <tt>filter()->is_enabled()</tt>
   - More complex filters can be passed additional information (as you'll see below)
   - As an example of filter that needs an extra argument, we have: \n
     <tt>BOOST_LOG_USE_LOG_IF_LEVEL(l, holder, the_level) = BOOST_LOG_USE_LOG_IF_FILTER(l, holder->is_enabled(the_level)) </tt>
 - @c %level - in case you have a filter based on level
 
-How you define your macros is up to you. 
+How you define your macros is up to you.
 
 \n\n
 @section defining_logger_macros_easiest The easiest: Example of Logging, with a filter that can be turned on/off
@@ -47,8 +47,8 @@ Assume you have a filter that can only be turned on or off.
 typedef logger_format_write< > logger_type;
 typedef level::no_ts filter_type;
 
-BOOST_DECLARE_LOG_FILTER(g_log_filter, filter_type ) 
-BOOST_DECLARE_LOG(g_l, logger_type) 
+BOOST_DECLARE_LOG_FILTER(g_log_filter, filter_type )
+BOOST_DECLARE_LOG(g_l, logger_type)
 
 #define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() )
 @endcode
@@ -75,8 +75,8 @@ Here's how you'd do each of the above:
 typedef logger_format_write< > logger_type;
 typedef level::holder filter_type;
 
-BOOST_DECLARE_LOG_FILTER(g_log_level, filter_type ) 
-BOOST_DECLARE_LOG(g_l, logger_type) 
+BOOST_DECLARE_LOG_FILTER(g_log_level, filter_type )
+BOOST_DECLARE_LOG(g_l, logger_type)
 
 // Example 1 - have one macro depending on one parameter
 #define L_(lvl) BOOST_LOG_USE_LOG_IF_LEVEL(g_l(), g_log_level(), lvl )
@@ -113,7 +113,7 @@ Another example. Assume you have a @c file_filter class, which filters based on 
 
 @code
 struct file_filter {
-    bool is_enabled(const char * file_name) const ; 
+    bool is_enabled(const char * file_name) const ;
     // ...
 };
 @endcode
@@ -124,8 +124,8 @@ In this case, the macro used to do logging would look like:
 typedef logger_format_write< > logger_type;
 typedef file_filter filter_type;
 
-BOOST_DECLARE_LOG_FILTER(g_log_filter, filter_type ) 
-BOOST_DECLARE_LOG(g_l, logger_type) 
+BOOST_DECLARE_LOG_FILTER(g_log_filter, filter_type )
+BOOST_DECLARE_LOG(g_l, logger_type)
 
 #define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled(__FILE__) )
 @endcode
@@ -146,7 +146,7 @@ Another example. Assume you have a @c module_filter class, which filters based o
 
 @code
 struct module_filter {
-    bool is_enabled(const char * module_name) const ; 
+    bool is_enabled(const char * module_name) const ;
     // ...
 };
 @endcode
@@ -158,8 +158,8 @@ In this case, the macro used to do logging would look like:
 typedef logger_format_write< > logger_type;
 typedef module_filter filter_type;
 
-BOOST_DECLARE_LOG_FILTER(g_log_filter, filter_type ) 
-BOOST_DECLARE_LOG(g_l, logger_type) 
+BOOST_DECLARE_LOG_FILTER(g_log_filter, filter_type )
+BOOST_DECLARE_LOG(g_l, logger_type)
 
 #define L_(mod) BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled(mod) )
 @endcode

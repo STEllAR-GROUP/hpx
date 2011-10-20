@@ -70,7 +70,7 @@ void limitations_test()
    (void)r;
    (void)q;
    (void)s;
- 
+
    //Catch by value, ok
    m = movable();
 
@@ -105,7 +105,7 @@ int main()
       movable m;
       movable m2(boost::move(m));
       movable m3(functionr(movable(boost::move(m2))));
-      movable m4(functionr(boost::move(m3))); 
+      movable m4(functionr(boost::move(m3)));
 	}
    {
       movable m;

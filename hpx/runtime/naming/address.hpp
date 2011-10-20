@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_NAMING_ADDRESS_MAR_24_2008_0949AM)
@@ -26,8 +26,8 @@ namespace hpx { namespace naming
 {
     /// \class address address.hpp hpx/runtime/naming/address.hpp
     ///
-    /// 
-    struct HPX_EXPORT address 
+    ///
+    struct HPX_EXPORT address
     {
         typedef boost::int64_t component_type;
         typedef boost::uint64_t address_type;
@@ -37,35 +37,35 @@ namespace hpx { namespace naming
           : locality_(), type_(components::component_invalid), address_(0)
         {}
 
-        address(locality const& l, 
+        address(locality const& l,
                 component_type t = components::component_invalid)
-          : locality_(l), type_(t), address_(0) 
+          : locality_(l), type_(t), address_(0)
         {}
 
         address(locality const& l, component_type t, void* lva)
-          : locality_(l), type_(t), 
-            address_(reinterpret_cast<address_type>(lva)) 
+          : locality_(l), type_(t),
+            address_(reinterpret_cast<address_type>(lva))
         {}
 
         address(locality const& l, component_type t, address_type a)
-          : locality_(l), type_(t), address_(a) 
+          : locality_(l), type_(t), address_(a)
         {}
 
         // local only addresses
         address(void* lva)
-          : locality_(), type_(components::component_invalid), 
-            address_(reinterpret_cast<address_type>(lva)) 
+          : locality_(), type_(components::component_invalid),
+            address_(reinterpret_cast<address_type>(lva))
         {}
 
         address(address_type a)
-          : locality_(), type_(components::component_invalid), address_(a) 
+          : locality_(), type_(components::component_invalid), address_(a)
         {}
 
         // safe operator bool()
-        operator util::safe_bool<address>::result_type() const 
-        { 
+        operator util::safe_bool<address>::result_type() const
+        {
             return util::safe_bool<address>()(
-                components::component_invalid != type_ || 0 != address_); 
+                components::component_invalid != type_ || 0 != address_);
         }
 
         friend bool operator==(address const& lhs, address const& rhs)
@@ -81,23 +81,23 @@ namespace hpx { namespace naming
     private:
         friend std::ostream& operator<< (std::ostream&, address const&);
 
-        // serialization support    
+        // serialization support
         friend class boost::serialization::access;
 
         template<class Archive>
         void save(Archive & ar, const unsigned int version) const
         {
-            ar << locality_ << type_ << address_; 
+            ar << locality_ << type_ << address_;
         }
 
         template<class Archive>
         void load(Archive & ar, const unsigned int version)
         {
             if (version > HPX_ADDRESS_VERSION) {
-                throw exception(version_too_new, 
+                throw exception(version_too_new,
                     "trying to load address with unknown version");
             }
-            ar >> locality_ >> type_ >> address_; 
+            ar >> locality_ >> type_ >> address_;
         }
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -105,10 +105,10 @@ namespace hpx { namespace naming
 
     inline std::ostream& operator<< (std::ostream& os, address const& addr)
     {
-        boost::io::ios_flags_saver ifs(os); 
-        os << "(" << addr.locality_ << ":" 
-           << components::get_component_type_name((int)addr.type_) 
-           << ":" << std::showbase << std::hex << addr.address_ << ")"; 
+        boost::io::ios_flags_saver ifs(os);
+        os << "(" << addr.locality_ << ":"
+           << components::get_component_type_name((int)addr.type_)
+           << ":" << std::showbase << std::hex << addr.address_ << ")";
         return os;
     }
 

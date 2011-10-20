@@ -33,7 +33,7 @@ struct unbounded_shifter<0, T>
 };
 
 template <std::size_t N, typename T>
-T unbounded_shl(T x) 
+T unbounded_shl(T x)
 { return unbounded_shifter<N, T>::shl(x); }
 
 template <std::size_t N, typename T>

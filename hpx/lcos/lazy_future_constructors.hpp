@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2010 Hartmut Kaiser, Dylan Stark
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef BOOST_PP_IS_ITERATING
@@ -18,7 +18,7 @@
     (3, (2, HPX_ACTION_ARGUMENT_LIMIT,                                        \
     "hpx/lcos/lazy_future_constructors.hpp"))                                       \
     /**/
-    
+
 #include BOOST_PP_ITERATE()
 
 #endif
@@ -42,8 +42,8 @@
 private:
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     static void BOOST_PP_CAT(invoke,N)(
-        hpx::lcos::lazy_future<Action,Result> *th, 
-        naming::id_type const& gid, 
+        hpx::lcos::lazy_future<Action,Result> *th,
+        naming::id_type const& gid,
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
         if (!((*th->impl_)->ready()))
@@ -52,14 +52,14 @@ private:
 
 public:
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    lazy_future(naming::gid_type const& gid, 
+    lazy_future(naming::gid_type const& gid,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
       : apply_logger_("lazy_future::apply"),
         closure_(boost::bind(
-          &lazy_future::template BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N,Arg)>, 
-            this_(), naming::id_type(gid, naming::id_type::unmanaged), 
+          &lazy_future::template BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N,Arg)>,
+            this_(), naming::id_type(gid, naming::id_type::unmanaged),
             BOOST_PP_ENUM_PARAMS(N, arg)))
-    { 
+    {
         LLCO_(info) << "lazy_future::lazy_future("
                     << hpx::actions::detail::get_action_name<Action>()
                     << ", "
@@ -68,14 +68,14 @@ public:
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    lazy_future(naming::id_type const& gid, 
+    lazy_future(naming::id_type const& gid,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
       : apply_logger_("lazy_future::apply"),
         closure_(boost::bind(
-          &lazy_future::template BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N,Arg)>, 
+          &lazy_future::template BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N,Arg)>,
             this_(), gid,
             BOOST_PP_ENUM_PARAMS(N, arg)))
-    { 
+    {
         LLCO_(info) << "lazy_future::lazy_future("
                     << hpx::actions::detail::get_action_name<Action>()
                     << ", "

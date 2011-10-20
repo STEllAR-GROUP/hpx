@@ -24,7 +24,7 @@
 This usage:
 - You have one @b thread-safe logger - the logging is done @ref boost::logging::writer::on_dedicated_thread "on a dedicated thread"
 - You have one filter, which is always turned on
-- You want to format the message before it's written 
+- You want to format the message before it's written
 - The logger has several log destinations
     - The output goes debug output window, and a file called out.txt
     - Formatting - prefix each message by time, its index, and append newline
@@ -81,12 +81,12 @@ using namespace boost::logging;
 
 typedef logger_format_write< default_, default_, writer::threading::on_dedicated_thread > logger_type;
 
-BOOST_DECLARE_LOG_FILTER(g_log_filter, filter::no_ts ) 
-BOOST_DECLARE_LOG(g_l, logger_type) 
+BOOST_DECLARE_LOG_FILTER(g_log_filter, filter::no_ts )
+BOOST_DECLARE_LOG(g_l, logger_type)
 
-#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() ) 
+#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() )
 
-BOOST_DEFINE_LOG_FILTER(g_log_filter, filter::no_ts ) 
+BOOST_DEFINE_LOG_FILTER(g_log_filter, filter::no_ts )
 BOOST_DEFINE_LOG(g_l, logger_type)
 
 void do_sleep(int ms) {

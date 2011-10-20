@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-//  Copyright (c)      2011 Bryce Lelbach 
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Copyright (c)      2011 Bryce Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_COMPONENT_COMPONENT_TYPE_MAR_26_2008_1058AM)
@@ -20,7 +20,7 @@ namespace hpx { namespace components
     /// \brief Return the string representation for a given component type id
     HPX_EXPORT std::string const get_component_type_name(int type);
 
-    /// The lower short word of the component type is the type of the component 
+    /// The lower short word of the component type is the type of the component
     /// exposing the actions.
     inline component_type get_base_type(boost::int64_t t)
     {
@@ -34,8 +34,8 @@ namespace hpx { namespace components
     }
 
     /// A component derived from a base component exposing the actions needs to
-    /// have a specially formatted component type. 
-    inline component_type 
+    /// have a specially formatted component type.
+    inline component_type
     derived_component_type(boost::int64_t derived, boost::int64_t base)
     {
         return component_type(derived << 16 | base);
@@ -72,7 +72,7 @@ namespace hpx { namespace components
 
         static HPX_ALWAYS_EXPORT component_type get();
         static HPX_ALWAYS_EXPORT void set(component_type);
-    }; 
+    };
 
     template <typename Component, typename Enable>
     component_type component_type_database<Component, Enable>::value = component_invalid;
@@ -100,10 +100,10 @@ namespace hpx { namespace components
     {
         factory_invalid = -1,
         factory_none = 0,                   ///< The factory has no special properties
-        factory_is_multi_instance = 1,      ///< The factory can be used to 
-                                            ///< create more than one component 
+        factory_is_multi_instance = 1,      ///< The factory can be used to
+                                            ///< create more than one component
                                             ///< at the same time
-        factory_instance_count_is_size = 2, ///< The component count will be 
+        factory_instance_count_is_size = 2, ///< The component count will be
                                             ///< interpreted as the component
                                             ///< size instead
     };

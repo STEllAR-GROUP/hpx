@@ -37,17 +37,17 @@
 namespace boost { namespace logging {
 
 
-/** 
+/**
 @brief Manipulators = Formatters and/or destinations.
 
 
-- @ref manipulator_common 
-- @ref manipulator_base_class 
+- @ref manipulator_common
+- @ref manipulator_base_class
 - @ref manipulator_default_base_class
-- @ref manipulator_generic 
-- @ref manipulator_create 
-- @ref manipulator_share_data 
-- @ref manipulator_manipulate 
+- @ref manipulator_generic
+- @ref manipulator_create
+- @ref manipulator_share_data
+- @ref manipulator_manipulate
 
 
 \n\n\n
@@ -59,7 +59,7 @@ Remember:
 - formatter - allows formatting the message before writing it (like, prepending extra information - an index, the time, thread id, etc)
 - destination - is a place where the message is to be written to (like, the console, a file, a socket, etc)
 
-In your @ref boost::logging::writer::format_write "format_write" object, you can have several formatters and destinations. 
+In your @ref boost::logging::writer::format_write "format_write" object, you can have several formatters and destinations.
 Note that each formatter class and each destination class is a @c %manipulator.
 
 Each formatter and destination classes implement <tt>operator()(arg_type msg);</tt>, which
@@ -217,7 +217,7 @@ struct ms_since_start : formatter::class_<ms_since_start, formatter::implement_o
     time_t m_start;
     ms_since_start : m_start( time(0) ) {}
 
-    // param = std::string& 
+    // param = std::string&
     // (in other words, it's the arg_type from your formatter base class)
     void operator()(param msg) const {
         std::ostringstream out;
@@ -238,7 +238,7 @@ struct to_hwnd : destination::class_<to_hwnd, destination::implement_op_equal::h
 
     bool operator==(const to_hwnd& other) { return h == other.h; }
 
-    // param = const std::string& 
+    // param = const std::string&
     // (in other words, it's the arg_type from your destination base class)
     void operator()(param msg) const {
         ::SetWindowText(h, msg.c_str());
@@ -251,14 +251,14 @@ struct to_hwnd : destination::class_<to_hwnd, destination::implement_op_equal::h
 \n\n\n
 @section manipulator_share_data Sharing data for manipulator classes
 
-When you implement your own %manipulator (%formatter or %destination) class, you must make sure that 
+When you implement your own %manipulator (%formatter or %destination) class, you must make sure that
 it behaves like an STL function: <b>it needs to contain data as constant.</b>
 
 As long as data is constant, it's all ok - that is, no matter what functions get called, all the data in the formatter/destination
 must remain constant. We need constant functors - just like in STL - because internally, we copy formatters/destinations: that is, we keep
 several copies of a certain object - they all need to be syncronized. In case the objects' data is constant, that's no problem.
 
-In case the data needs to be changed - it needs to be shared. Several copies of the same instance must point to the same data. 
+In case the data needs to be changed - it needs to be shared. Several copies of the same instance must point to the same data.
 I've already provided a class you can derive from , when this is the case: the non_const_context class.
 
 @code
@@ -283,9 +283,9 @@ When it comes to keeping its state, a manipulator (formatter or destination) ins
 
 In the former case, all the member functions the manipulator exposes are <tt>const</tt>ant.
 
-In the latter case, 
+In the latter case,
 - your manipulator class can have member functions that can change its state (non-const member functions).
-- your manipulator class @b must use the non_const_context class to hold all its non-const state  
+- your manipulator class @b must use the non_const_context class to hold all its non-const state
 
 What this guarantees is @ref non_const_pointer_semantics "pointer-like semantics".
 
@@ -328,7 +328,7 @@ L_ << "hello world 3";
 \n\n\n
 @section manipulator_use_it Using loggers in code
 
-Now that you've @ref manipulator_generic "added" formatters and/or destinations, you'll @ref defining_logger_macros "define the macros through which you'll do logging", 
+Now that you've @ref manipulator_generic "added" formatters and/or destinations, you'll @ref defining_logger_macros "define the macros through which you'll do logging",
 and then do logging in your code:
 
 @code
@@ -362,7 +362,7 @@ namespace manipulator {
 
 
 
-/** 
+/**
     @brief What to use as base class, for your manipulator classes
 
     When using formatters and destinations, formatters must share a %base class,
@@ -372,9 +372,9 @@ namespace manipulator {
     Don't use directly. Use formatter::base<> or destination::base<> instead.
 */
 template<
-        class raw_param_type, 
+        class raw_param_type,
         class param_type,
-        class ptr_type_ = default_ > 
+        class ptr_type_ = default_ >
     struct base : boost::logging::op_equal::same_type_op_equal_base {
 
     typedef base<raw_param_type, param_type, ptr_type_> self_type;
@@ -389,7 +389,7 @@ template<
 
     /** @brief Override this if you want to allow configuration through scripting
 
-    That is, this allows configuration of your manipulator (formatter/destination) at run-time.        
+    That is, this allows configuration of your manipulator (formatter/destination) at run-time.
     */
     virtual void configure(const hold_string_type& ) {}
 
@@ -402,7 +402,7 @@ protected:
 
 
 
-/** 
+/**
     @brief When you implement your manipulator class, how is operator== to be implemented?
 */
 struct implement_op_equal {
@@ -425,14 +425,14 @@ namespace detail {
 /**
     @brief Use this when implementing your own formatter or destination class. Don't use this directly. Use formatter::class_ or destination::class_
 */
-template<class type, implement_op_equal::type op_e, class base_type> struct class_ 
-        : base_type, 
-          detail::op_equal_base<op_e>, 
+template<class type, implement_op_equal::type op_e, class base_type> struct class_
+        : base_type,
+          detail::op_equal_base<op_e>,
           boost::logging::op_equal::same_type_op_equal<type> {
 
     /** @brief Override this if you want to allow configuration through scripting
 
-    That is, this allows configuration of your manipulator (formatter/destination) at run-time.        
+    That is, this allows configuration of your manipulator (formatter/destination) at run-time.
     */
     virtual void configure(const hold_string_type& ) {}
 
@@ -490,7 +490,7 @@ private:
 
 protected:
     non_const_context(const non_const_context& other) : m_context(other.m_context) {}
-    
+
     BOOST_LOGGING_FORWARD_CONSTRUCTOR_WITH_NEW(non_const_context,m_context,context_type)
 
     context_type & context() const    { return *(m_context.get()); }
@@ -501,7 +501,7 @@ private:
 
 
 
-/** 
+/**
 @brief Represents a generic manipulator (formatter or destination)
 
 A generic manipulator is one that does not derive from any formatter_base or destination_base class (@ref manipulator_base_class).
@@ -544,7 +544,7 @@ struct is_generic {
 
     /** @brief Override this if you want to allow configuration through scripting
 
-    That is, this allows configuration of your manipulator (formatter/destination) at run-time.        
+    That is, this allows configuration of your manipulator (formatter/destination) at run-time.
     */
     virtual void configure(const hold_string_type& ) {}
 };
@@ -552,9 +552,9 @@ struct is_generic {
 namespace detail {
 
     // holds the generic manipulator, and forwards to it
-    template<class generic_type, class manipulator_base> struct generic_holder 
-            : class_< 
-                    generic_holder<generic_type,manipulator_base>, 
+    template<class generic_type, class manipulator_base> struct generic_holder
+            : class_<
+                    generic_holder<generic_type,manipulator_base>,
                     implement_op_equal::has_context,
                     manipulator_base > {
         typedef typename manipulator_base::param param;
@@ -590,10 +590,10 @@ namespace detail {
 
 } // namespace manipulator
 
-/** 
+/**
 @brief Formatter is a manipulator. It allows you to format the message before writing it to the destination(s)
 
-Examples of formatters are : @ref formatter::time_t "prepend the time", @ref formatter::high_precision_time_t "prepend high-precision time", 
+Examples of formatters are : @ref formatter::time_t "prepend the time", @ref formatter::high_precision_time_t "prepend high-precision time",
 @ref formatter::idx_t "prepend the index of the message", etc.
 
 
@@ -611,7 +611,7 @@ namespace formatter {
         };
     }
 
-    /** 
+    /**
     @brief What to use as base class, for your formatter classes
 
     When using formatters and destinations, formatters must share a %base class,
@@ -619,12 +619,12 @@ namespace formatter {
     */
     template<
         // note: I'm counting on these defaults, in format_find_writer class
-        class arg_type = default_ , 
-        class ptr_type_ = default_ > 
+        class arg_type = default_ ,
+        class ptr_type_ = default_ >
     struct base : detail::format_base_finder<arg_type,ptr_type_>::type {
     };
 
-    /** 
+    /**
         @sa boost::logging::manipulator::implement_op_equal
     */
     typedef boost::logging::manipulator::implement_op_equal implement_op_equal;
@@ -637,20 +637,20 @@ namespace formatter {
 
         @param base_type (optional) The formatter base class. Unless you've specified your own formatter class, you'll be happy with the default
     */
-    template<class type, implement_op_equal::type op_e, class base_type = base<> > struct class_ 
+    template<class type, implement_op_equal::type op_e, class base_type = base<> > struct class_
         : boost::logging::manipulator::class_<type, op_e, base_type> {};
 
 
     using boost::logging::manipulator::non_const_context;
 
-    /** 
+    /**
         @sa boost::logging::manipulator::is_generic
     */
     typedef boost::logging::manipulator::is_generic is_generic;
 
 }
 
-/**  
+/**
 @brief Destination is a manipulator. It contains a place where the message, after being formatted, is to be written to.
 
 Some viable destinations are : @ref destination::cout_t "the console", @ref destination::file_t "a file", a socket, etc.
@@ -670,7 +670,7 @@ namespace destination {
         };
     }
 
-    /** 
+    /**
     @brief What to use as base class, for your destination classes
 
     When using formatters and destinations, formatters must share a %base class,
@@ -678,14 +678,14 @@ namespace destination {
     */
     template<
         // note: I'm counting on these defaults, in format_find_writer class
-        class arg_type = default_ , 
-        class ptr_type_ = default_ > 
+        class arg_type = default_ ,
+        class ptr_type_ = default_ >
     struct base : detail::destination_base_finder<arg_type,ptr_type_>::type {
     };
 
     using boost::logging::manipulator::non_const_context;
 
-    /** 
+    /**
         @sa boost::logging::manipulator::implement_op_equal
     */
     typedef boost::logging::manipulator::implement_op_equal implement_op_equal;
@@ -698,10 +698,10 @@ namespace destination {
 
         @param base_type (optional) The destination base class. Unless you've specified your own destination class, you'll be happy with the default
     */
-    template<class type, implement_op_equal::type op_e, class base_type = base<> > struct class_ 
+    template<class type, implement_op_equal::type op_e, class base_type = base<> > struct class_
         : boost::logging::manipulator::class_<type, op_e, base_type> {};
 
-    /** 
+    /**
         @sa boost::logging::manipulator::is_generic
     */
     typedef boost::logging::manipulator::is_generic is_generic;

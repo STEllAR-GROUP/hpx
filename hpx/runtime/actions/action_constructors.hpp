@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef BOOST_PP_IS_ITERATING
@@ -16,7 +16,7 @@
     (3, (2, HPX_ACTION_ARGUMENT_LIMIT,                                        \
     "hpx/runtime/actions/action_constructors.hpp"))                           \
     /**/
-    
+
 #include BOOST_PP_ITERATE()
 
 #endif
@@ -30,19 +30,19 @@
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     action(BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-        : arguments_(BOOST_PP_ENUM_PARAMS(N, arg)), 
+        : arguments_(BOOST_PP_ENUM_PARAMS(N, arg)),
           parent_locality_(applier::get_prefix_id()),
-          parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())), 
+          parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
           parent_phase_(threads::get_parent_phase()),
           priority_(detail::thread_priority<Priority>::call(Priority))
     {}
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    action(threads::thread_priority priority, 
+    action(threads::thread_priority priority,
               BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-        : arguments_(BOOST_PP_ENUM_PARAMS(N, arg)), 
+        : arguments_(BOOST_PP_ENUM_PARAMS(N, arg)),
           parent_locality_(applier::get_prefix_id()),
-          parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())), 
+          parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
           parent_phase_(threads::get_parent_phase()),
           priority_(detail::thread_priority<Priority>::call(priority))
     {}

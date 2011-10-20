@@ -1,9 +1,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Algorithms from "CAS-Based Lock-Free Algorithm for Shared Deques"
 //  by M. M. Michael
-//  Link: http://www.research.ibm.com/people/m/michael/europar-2003.pdf 
+//  Link: http://www.research.ibm.com/people/m/michael/europar-2003.pdf
 //
-//  C++ implementation - Copyright (C) 2011 Bryce Lelbach 
+//  C++ implementation - Copyright (C) 2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -46,7 +46,7 @@ struct deque_node
 {
     typedef tagged_ptr<deque_node> pointer;
     typedef atomic<pointer> atomic_pointer;
-    
+
     typedef typename pointer::tag_t tag_t;
 
     atomic_pointer left;
@@ -57,7 +57,7 @@ struct deque_node
 
     deque_node(deque_node const& p):
         left(p.left.load()), right(p.right.load()) {}
-    
+
     deque_node(deque_node* lptr, deque_node* rptr, T const& v,
                tag_t ltag = 0, tag_t rtag = 0):
         left(pointer(lptr, ltag)), right(pointer(rptr, rtag)), data(v) {}
@@ -65,7 +65,7 @@ struct deque_node
 
 // FIXME: A lot of these methods can be dropped; in fact, it may make sense to
 // re-structure this class like deque_node.
-template <typename T>    
+template <typename T>
 struct deque_anchor
 {
     typedef deque_node<T> node;
@@ -73,18 +73,18 @@ struct deque_anchor
     typedef typename node::atomic_pointer atomic_node_pointer;
 
     typedef typename node::tag_t tag_t;
-  
+
     typedef tagged_ptr_pair<node, node> pair;
     typedef atomic<pair> atomic_pair;
 
   private:
     atomic_pair pair_;
- 
+
   public:
     deque_anchor(): pair_(pair(0, 0, stable, 0)) {}
 
     deque_anchor(deque_anchor const& p): pair_(p.pair_.load()) {}
-    
+
     deque_anchor(pair const& p): pair_(p) {}
 
     deque_anchor(node* lptr, node* rptr,
@@ -92,44 +92,44 @@ struct deque_anchor
         pair_(pair(lptr, rptr, status, tag)) {}
 
     pair lrs() const volatile
-    { return pair_.load(); }        
+    { return pair_.load(); }
 
     node* left() const volatile
-    { return pair_.load().get_left_ptr(); }        
-    
+    { return pair_.load().get_left_ptr(); }
+
     node* right() const volatile
-    { return pair_.load().get_right_ptr(); }        
+    { return pair_.load().get_right_ptr(); }
 
     tag_t status() const volatile
-    { return pair_.load().get_left_tag(); } 
-    
+    { return pair_.load().get_left_tag(); }
+
     tag_t tag() const volatile
-    { return pair_.load().get_right_tag(); } 
+    { return pair_.load().get_right_tag(); }
 
     bool cas(deque_anchor& expected, deque_anchor const& desired) volatile
     { return pair_.compare_exchange_strong(expected.load(), desired.load()); }
-    
+
     bool cas(pair& expected, deque_anchor const& desired) volatile
     { return pair_.compare_exchange_strong(expected, desired.load()); }
-    
+
     bool cas(deque_anchor& expected, pair const& desired) volatile
     { return pair_.compare_exchange_strong(expected.load(), desired); }
 
     bool cas(pair& expected, pair const& desired) volatile
     { return pair_.compare_exchange_strong(expected, desired); }
 
-    bool operator==(volatile deque_anchor const& rhs) const 
+    bool operator==(volatile deque_anchor const& rhs) const
     { return pair_.load() == rhs.pair_.load(); }
-    
-    bool operator!=(volatile deque_anchor const& rhs) const 
+
+    bool operator!=(volatile deque_anchor const& rhs) const
     { return !(*this == rhs); }
-    
-    bool operator==(volatile pair const& rhs) const 
+
+    bool operator==(volatile pair const& rhs) const
     { return pair_.load() == rhs; }
-    
-    bool operator!=(volatile pair const& rhs) const 
+
+    bool operator!=(volatile pair const& rhs) const
     { return !(*this == rhs); }
-    
+
     bool is_lock_free() const
     { return pair_.is_lock_free(); }
 };
@@ -147,7 +147,7 @@ struct deque: private boost::noncopyable
     typedef typename node::atomic_pointer atomic_node_pointer;
 
     typedef typename node::tag_t tag_t;
-  
+
     typedef deque_anchor<T> anchor;
     typedef typename anchor::pair anchor_pair;
     typedef typename anchor::atomic_pair atomic_anchor_pair;
@@ -163,7 +163,7 @@ struct deque: private boost::noncopyable
   private:
     anchor anchor_;
     pool pool_;
- 
+
     BOOST_STATIC_CONSTANT(int,
         padding_size = BOOST_LOCKFREE_CACHELINE_BYTES - sizeof(anchor));
     char padding[padding_size];
@@ -181,11 +181,11 @@ struct deque: private boost::noncopyable
         n->~node();
         pool_.deallocate(n);
     }
-    
+
     void stabilize_left(anchor_pair& lrs)
-    { 
+    {
         // Get the right node of the leftmost pointer held by lrs and it's ABA
-        // tag (tagged_ptr). 
+        // tag (tagged_ptr).
         node_pointer prev = lrs.get_left_ptr()->right.load();
 
         if (anchor_ != lrs)
@@ -198,7 +198,7 @@ struct deque: private boost::noncopyable
         // Check if prevnext is equal to r.
         if (prevnext.get_ptr() != lrs.get_left_ptr())
         {
-            if (anchor_ != lrs)  
+            if (anchor_ != lrs)
                 return;
 
             // Attempt the CAS, incrementing the tag to protect from the ABA
@@ -215,7 +215,7 @@ struct deque: private boost::noncopyable
     void stabilize_right(anchor_pair& lrs)
     {
         // Get the left node of the rightmost pointer held by lrs and it's ABA
-        // tag (tagged_ptr). 
+        // tag (tagged_ptr).
         node_pointer prev = lrs.get_right_ptr()->left.load();
 
         if (anchor_ != lrs)
@@ -228,7 +228,7 @@ struct deque: private boost::noncopyable
         // Check if prevnext is equal to r.
         if (prevnext.get_ptr() != lrs.get_right_ptr())
         {
-            if (anchor_ != lrs)  
+            if (anchor_ != lrs)
                 return;
 
             // Attempt the CAS, incrementing the tag to protect from the ABA
@@ -243,14 +243,14 @@ struct deque: private boost::noncopyable
     }
 
     void stabilize(anchor_pair& lrs)
-    { 
-        // The left tag stores the status. 
+    {
+        // The left tag stores the status.
         if (lrs.get_left_tag() == rpush)
             stabilize_right(lrs);
         else // lrs.s() == lpush
             stabilize_left(lrs);
     }
-    
+
   public:
     deque(std::size_t initial_nodes = 128): anchor_(), pool_(initial_nodes) {}
 
@@ -270,7 +270,7 @@ struct deque: private boost::noncopyable
     }
 
     // Not thread-safe.
-    // Complexity: O(Processes)  
+    // Complexity: O(Processes)
     // FIXME: Should we check both pointers here?
     bool empty() const
     { return anchor_.lrs().get_left_ptr() == 0; }
@@ -285,34 +285,34 @@ struct deque: private boost::noncopyable
     // allocate a new deque node.
     // Complexity: O(Processes)
     bool push_left(T const& data)
-    {  
+    {
         // Allocate the new node which we will be inserting.
-        node* n = alloc_node(0, 0, data); 
-        
+        node* n = alloc_node(0, 0, data);
+
         if (n == 0)
             return false;
 
         // Loop until we insert successfully.
         while (true)
-        { 
+        {
             // Load the anchor.
             anchor_pair lrs = anchor_.lrs();
 
             // Check if the deque is empty.
             // FIXME: Should we check both pointers here?
             if (lrs.get_left_ptr() == 0)
-            { 
+            {
                 // If the deque is empty, we simply install a new anchor which
                 // points to the new node as both it's leftmost and rightmost
-                // element. 
+                // element.
                 if (anchor_.cas(lrs, anchor_pair(n, n,
                         lrs.get_left_tag(), lrs.get_right_tag() + 1)))
-                    return true; 
+                    return true;
             }
 
             // Check if the deque is stable.
             else if (lrs.get_left_tag() == stable)
-            { 
+            {
                 // Make the right pointer on our new node refer to the current
                 // leftmost node.
                 n->right.store(node_pointer(lrs.get_left_ptr()));
@@ -323,7 +323,7 @@ struct deque: private boost::noncopyable
                 anchor_pair new_anchor(n, lrs.get_right_ptr(),
                     lpush, lrs.get_right_tag() + 1);
 
-                if (anchor_.cas(lrs, new_anchor)) 
+                if (anchor_.cas(lrs, new_anchor))
                 {
                     stabilize_left(new_anchor);
                     return true;
@@ -342,34 +342,34 @@ struct deque: private boost::noncopyable
     // allocate a new deque node.
     // Complexity: O(Processes)
     bool push_right(T const& data)
-    {  
+    {
         // Allocate the new node which we will be inserting.
-        node* n = alloc_node(0, 0, data); 
+        node* n = alloc_node(0, 0, data);
 
         if (n == 0)
             return false;
 
         // Loop until we insert successfully.
         while (true)
-        { 
+        {
             // Load the anchor.
             anchor_pair lrs = anchor_.lrs();
 
             // Check if the deque is empty.
             // FIXME: Should we check both pointers here?
             if (lrs.get_right_ptr() == 0)
-            { 
+            {
                 // If the deque is empty, we simply install a new anchor which
                 // points to the new node as both it's leftmost and rightmost
-                // element. 
+                // element.
                 if (anchor_.cas(lrs, anchor_pair(n, n,
                         lrs.get_left_tag(), lrs.get_right_tag() + 1)))
-                    return true; 
+                    return true;
             }
 
             // Check if the deque is stable.
             else if (lrs.get_left_tag() == stable)
-            { 
+            {
                 // Make the left pointer on our new node refer to the current
                 // rightmost node.
                 n->left.store(node_pointer(lrs.get_right_ptr()));
@@ -380,7 +380,7 @@ struct deque: private boost::noncopyable
                 anchor_pair new_anchor(lrs.get_left_ptr(), n,
                     rpush, lrs.get_right_tag() + 1);
 
-                if (anchor_.cas(lrs, new_anchor)) 
+                if (anchor_.cas(lrs, new_anchor))
                 {
                     stabilize_right(new_anchor);
                     return true;
@@ -393,20 +393,20 @@ struct deque: private boost::noncopyable
                 stabilize(lrs);
         }
     }
-    
+
     // Thread-safe and non-blocking. Returns false if the deque is empty.
     // Complexity: O(Processes)
     bool pop_left(T& r)
-    { 
+    {
         // Loop until we either pop an element or learn that the deque is empty.
         while (true)
-        { 
+        {
             // Load the anchor.
             anchor_pair lrs = anchor_.lrs();
 
             // Check if the deque is empty.
             // FIXME: Should we check both pointers here?
-            if (lrs.get_left_ptr() == 0) 
+            if (lrs.get_left_ptr() == 0)
                 return false;
 
             // Check if the deque has 1 element.
@@ -432,7 +432,7 @@ struct deque: private boost::noncopyable
 
                 // Get the leftmost nodes' right node.
                 node_pointer prev = lrs.get_left_ptr()->right.load();
-               
+
                 // Try to update the anchor to point to prev as the leftmost
                 // node.
                 if (anchor_.cas(lrs, anchor_pair(prev.get_ptr(),
@@ -451,23 +451,23 @@ struct deque: private boost::noncopyable
             else // lrs.s() != stable
                 stabilize(lrs);
         }
-    } 
+    }
 
     bool pop_left(T* r) { return pop_left(*r); }
 
     // Thread-safe and non-blocking. Returns false if the deque is empty.
     // Complexity: O(Processes)
     bool pop_right(T& r)
-    { 
+    {
         // Loop until we either pop an element or learn that the deque is empty.
         while (true)
-        { 
+        {
             // Load the anchor.
             anchor_pair lrs = anchor_.lrs();
 
             // Check if the deque is empty.
             // FIXME: Should we check both pointers here?
-            if (lrs.get_right_ptr() == 0) 
+            if (lrs.get_right_ptr() == 0)
                 return false;
 
             // Check if the deque has 1 element.
@@ -493,7 +493,7 @@ struct deque: private boost::noncopyable
 
                 // Get the rightmost nodes' left node.
                 node_pointer prev = lrs.get_right_ptr()->left.load();
-               
+
                 // Try to update the anchor to point to prev as the rightmost
                 // node.
                 if (anchor_.cas(lrs, anchor_pair(lrs.get_left_ptr(),
@@ -512,8 +512,8 @@ struct deque: private boost::noncopyable
             else // lrs.s() != stable
                 stabilize(lrs);
         }
-    } 
-    
+    }
+
     bool pop_right(T* r) { return pop_right(*r); }
 };
 

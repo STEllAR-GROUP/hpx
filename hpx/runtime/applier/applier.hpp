@@ -1,8 +1,8 @@
 //  Copyright (c) 2007-2008 Anshul Tandon
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_APPLIER_APPLIER_JUN_03_2008_0438PM)
@@ -27,7 +27,7 @@ namespace hpx { namespace applier
     /// \class applier applier.hpp hpx/runtime/applier/applier.hpp
     ///
     /// The \a applier class is used to decide whether a particular action
-    /// has to be issued on a local or a remote resource. If the target 
+    /// has to be issued on a local or a remote resource. If the target
     /// component is local a new \a thread will be created, if the target is
     /// remote a parcel will be sent.
     class HPX_EXPORT applier : private boost::noncopyable
@@ -44,50 +44,50 @@ namespace hpx { namespace applier
         /// \brief Allow access to the AGAS client instance used with this
         ///        \a applier.
         ///
-        /// This function returns a reference to the resolver client this 
+        /// This function returns a reference to the resolver client this
         /// applier instance has been created with.
         naming::resolver_client& get_agas_client();
 
-        /// \brief Access the \a parcelhandler instance associated with this 
+        /// \brief Access the \a parcelhandler instance associated with this
         ///        \a applier
         ///
-        /// This function returns a reference to the parcel handler this 
+        /// This function returns a reference to the parcel handler this
         /// applier instance has been created with.
         parcelset::parcelhandler& get_parcel_handler();
 
-        /// \brief Access the \a threadmanager instance associated with this 
+        /// \brief Access the \a threadmanager instance associated with this
         ///        \a applier
         ///
-        /// This function returns a reference to the thread manager this 
+        /// This function returns a reference to the thread manager this
         /// applier instance has been created with.
         threads::threadmanager_base& get_thread_manager();
 
-        /// \brief Allow access to the locality this applier instance is 
+        /// \brief Allow access to the locality this applier instance is
         ///        associated with.
         ///
         /// This function returns a reference to the locality this applier
         /// instance is associated with.
         naming::locality const& here() const;
 
-        /// \brief Allow access to the prefix of the locality this applier 
+        /// \brief Allow access to the prefix of the locality this applier
         ///        instance is associated with.
         ///
         /// This function returns a reference to the locality this applier
         /// instance is associated with.
         naming::gid_type const& get_prefix() const;
 
-        /// \brief Allow access to the id of the locality this applier 
+        /// \brief Allow access to the id of the locality this applier
         ///        instance is associated with.
         ///
-        /// This function returns a reference to the id of the locality this 
+        /// This function returns a reference to the id of the locality this
         /// applier instance is associated with.
         boost::uint32_t get_prefix_id() const;
 
-        /// \brief Return list of prefixes of all remote localities 
-        ///        registered with the AGAS service for a specific component 
+        /// \brief Return list of prefixes of all remote localities
+        ///        registered with the AGAS service for a specific component
         ///        type.
         ///
-        /// This function returns a list of all remote localities (all 
+        /// This function returns a list of all remote localities (all
         /// localities known to AGAS except the local one) supporting the given
         /// component type.
         ///
@@ -96,8 +96,8 @@ namespace hpx { namespace applier
         /// \param type     [in] The type of the component which needs to exist
         ///                 on the returned localities.
         ///
-        /// \returns The function returns \a true if there is at least one 
-        ///          remote locality known to the AGASservice 
+        /// \returns The function returns \a true if there is at least one
+        ///          remote locality known to the AGASservice
         ///          (!prefixes.empty()).
         bool get_raw_remote_prefixes(std::vector<naming::gid_type>& prefixes,
             components::component_type type = components::component_invalid) const;
@@ -105,11 +105,11 @@ namespace hpx { namespace applier
         bool get_remote_prefixes(std::vector<naming::id_type>& prefixes,
             components::component_type type = components::component_invalid) const;
 
-        /// \brief Return list of prefixes of all localities 
-        ///        registered with the AGAS service for a specific component 
+        /// \brief Return list of prefixes of all localities
+        ///        registered with the AGAS service for a specific component
         ///        type.
         ///
-        /// This function returns a list of all localities (all 
+        /// This function returns a list of all localities (all
         /// localities known to AGAS except the local one) supporting the given
         /// component type.
         ///
@@ -118,8 +118,8 @@ namespace hpx { namespace applier
         /// \param type     [in] The type of the component which needs to exist
         ///                 on the returned localities.
         ///
-        /// \returns The function returns \a true if there is at least one 
-        ///          remote locality known to the AGASservice 
+        /// \returns The function returns \a true if there is at least one
+        ///          remote locality known to the AGASservice
         ///          (!prefixes.empty()).
         bool get_raw_prefixes(std::vector<naming::gid_type>& prefixes,
             components::component_type type = components::component_invalid) const;
@@ -127,28 +127,28 @@ namespace hpx { namespace applier
         bool get_prefixes(std::vector<naming::id_type>& prefixes,
             components::component_type type = components::component_invalid) const;
 
-        /// By convention the runtime_support has a gid identical to the prefix 
+        /// By convention the runtime_support has a gid identical to the prefix
         /// of the locality the runtime_support is responsible for
         naming::gid_type const& get_runtime_support_raw_gid() const
         {
             return runtime_support_id_.get_gid();
         }
 
-        /// By convention the runtime_support has a gid identical to the prefix 
+        /// By convention the runtime_support has a gid identical to the prefix
         /// of the locality the runtime_support is responsible for
         naming::id_type const& get_runtime_support_gid() const
         {
             return runtime_support_id_;
         }
 
-        /// By convention every memory address has gid identical to the prefix 
+        /// By convention every memory address has gid identical to the prefix
         /// of the locality the runtime_support is responsible for
         naming::gid_type const& get_memory_raw_gid() const
         {
             return memory_id_.get_gid();
         }
 
-        /// By convention every memory address has gid identical to the prefix 
+        /// By convention every memory address has gid identical to the prefix
         /// of the locality the runtime_support is responsible for
         naming::id_type const& get_memory_gid() const
         {
@@ -156,14 +156,14 @@ namespace hpx { namespace applier
         }
 
         /// Test whether the given address (gid) is local or remote
-        bool address_is_local(naming::id_type const& id, 
+        bool address_is_local(naming::id_type const& id,
             naming::address& addr) const;
 
-        bool address_is_local(naming::gid_type const& gid, 
+        bool address_is_local(naming::gid_type const& gid,
             naming::address& addr) const;
 
     public:
-        // the TSS holds a pointer to the applier associated with a given 
+        // the TSS holds a pointer to the applier associated with a given
         // OS thread
         struct tls_tag {};
         static hpx::util::thread_specific_ptr<applier*, tls_tag> applier_;
@@ -182,33 +182,33 @@ namespace hpx { namespace applier
     ///        be executed.
     ///
     /// \param func       [in] The function to be executed as the thread-function.
-    ///                   This function has to expose the minimal low level 
+    ///                   This function has to expose the minimal low level
     ///                   PX-thread interface, i.e. it takes one argument (a
-    ///                   \a threads#thread_state_ex) and returns a 
+    ///                   \a threads#thread_state_ex) and returns a
     ///                   \a threads#thread_state.
-    /// \param description [in] A optional string describing the newly created 
-    ///                   thread. This is useful for debugging and logging 
+    /// \param description [in] A optional string describing the newly created
+    ///                   thread. This is useful for debugging and logging
     ///                   purposes as this string will be inserted in the logs.
-    /// \param initial_state [in] The thread state the newly created thread 
+    /// \param initial_state [in] The thread state the newly created thread
     ///                   should have. If this is not given it defaults to
-    ///                   \a threads#pending, which means that the new thread 
+    ///                   \a threads#pending, which means that the new thread
     ///                   will be scheduled to run as soon as it is created.
-    /// \param run_now    [in] If this is set to `true` the thread object will 
-    ///                   be actually immediately created. Otherwise the 
-    ///                   thread-manager creates a work-item description, which 
+    /// \param run_now    [in] If this is set to `true` the thread object will
+    ///                   be actually immediately created. Otherwise the
+    ///                   thread-manager creates a work-item description, which
     ///                   will result in creating a thread object later (if
     ///                   no work is available any more). The default is to
     ///                   immediately create the thread object.
     /// \param priority   [in] This is the priority the newly created PX-thread
-    ///                   should be executed with. The default is \a 
+    ///                   should be executed with. The default is \a
     ///                   threads#thread_priority_normal. This parameter is not
     ///                   guaranteed to be taken into account as it depends on
     ///                   the used scheduling policy whether priorities are
     ///                   supported in the first place.
-    /// \param os_thread  [in] The number of the shepherd thread the newly 
-    ///                   created PX-thread should run on. If this is given it 
-    ///                   will be no more than a hint in any case, mainly 
-    ///                   because even if the PX-thread gets scheduled on the 
+    /// \param os_thread  [in] The number of the shepherd thread the newly
+    ///                   created PX-thread should run on. If this is given it
+    ///                   will be no more than a hint in any case, mainly
+    ///                   because even if the PX-thread gets scheduled on the
     ///                   queue of the requested shepherd thread, it still can
     ///                   be stolen by another shepherd thread. If this is not
     ///                   given, the system will select a shepherd thread.
@@ -217,26 +217,26 @@ namespace hpx { namespace applier
     ///                   the function will throw on error instead.
     ///
     /// \returns This function will return the internal id of the newly created
-    ///          PX-thread or threads#invalid_thread_id (if run_now is set to 
+    ///          PX-thread or threads#invalid_thread_id (if run_now is set to
     ///          `false`).
     ///
-    /// \note The value returned by the thread function will be interpreted by 
+    /// \note The value returned by the thread function will be interpreted by
     ///       the thread manager as the new thread state the executed PX-thread
     ///       needs to be switched to. Normally, PX-threads will either return
-    ///       \a threads#terminated (if the thread should be destroyed) or 
-    ///       \a threads#suspended (if the thread needs to be suspended because 
-    ///       it is waiting for an external event to happen). The external 
-    ///       event will set the state of the thread back to pending, which 
+    ///       \a threads#terminated (if the thread should be destroyed) or
+    ///       \a threads#suspended (if the thread needs to be suspended because
+    ///       it is waiting for an external event to happen). The external
+    ///       event will set the state of the thread back to pending, which
     ///       will re-schedule the PX-thread.
     ///
     /// \throws invalid_status if the runtime system has not been started yet.
-    /// 
+    ///
     HPX_API_EXPORT threads::thread_id_type register_thread_plain(
         boost::function<threads::thread_function_type> const& func,
-        char const* description = 0, 
-        threads::thread_state_enum initial_state = threads::pending, 
-        bool run_now = true, 
-        threads::thread_priority priority = threads::thread_priority_normal, 
+        char const* description = 0,
+        threads::thread_state_enum initial_state = threads::pending,
+        bool run_now = true,
+        threads::thread_priority priority = threads::thread_priority_normal,
         std::size_t os_thread = std::size_t(-1), error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -244,20 +244,20 @@ namespace hpx { namespace applier
     ///        be executed.
     ///
     /// \param func       [in] The function to be executed as the thread-function.
-    ///                   This function has to expose the minimal low level 
+    ///                   This function has to expose the minimal low level
     ///                   PX-thread interface, i.e. it takes one argument (a
-    ///                   \a threads#thread_state_ex). The thread will be 
+    ///                   \a threads#thread_state_ex). The thread will be
     ///                   terminated after the function returns.
     ///
-    /// \note All other arguments are equivalent to those of the function 
+    /// \note All other arguments are equivalent to those of the function
     ///       \a applier#register_thread_plain
     ///
     HPX_API_EXPORT threads::thread_id_type register_thread(
-        boost::function<void(threads::thread_state_ex)> const& func, 
-        char const* description = 0, 
-        threads::thread_state_enum initial_state = threads::pending, 
-        bool run_now = true, 
-        threads::thread_priority priority = threads::thread_priority_normal, 
+        boost::function<void(threads::thread_state_ex)> const& func,
+        char const* description = 0,
+        threads::thread_state_enum initial_state = threads::pending,
+        bool run_now = true,
+        threads::thread_priority priority = threads::thread_priority_normal,
         std::size_t os_thread = std::size_t(-1), error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -265,63 +265,63 @@ namespace hpx { namespace applier
     ///        be executed.
     ///
     /// \param func       [in] The function to be executed as the thread-function.
-    ///                   This function has to expose the minimal low level 
-    ///                   PX-thread interface, i.e. it takes no arguments. The 
+    ///                   This function has to expose the minimal low level
+    ///                   PX-thread interface, i.e. it takes no arguments. The
     ///                   thread will be terminated after the function returns.
     ///
-    /// \note All other arguments are equivalent to those of the function 
+    /// \note All other arguments are equivalent to those of the function
     ///       \a applier#register_thread_plain
     ///
     HPX_API_EXPORT threads::thread_id_type register_thread_nullary(
-        boost::function<void()> const& func, char const* description = 0,  
-        threads::thread_state_enum initial_state = threads::pending, 
-        bool run_now = true, 
-        threads::thread_priority priority = threads::thread_priority_normal, 
+        boost::function<void()> const& func, char const* description = 0,
+        threads::thread_state_enum initial_state = threads::pending,
+        bool run_now = true,
+        threads::thread_priority priority = threads::thread_priority_normal,
         std::size_t os_thread = std::size_t(-1), error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a new \a thread using the given data.
     ///
     /// \note This function is completely equivalent to the first overload
-    ///       of applier#register_thread_plain above, except that part of the 
+    ///       of applier#register_thread_plain above, except that part of the
     ///       parameters are passed as members of the threads#thread_init_data
     ///       object.
     ///
     HPX_API_EXPORT threads::thread_id_type register_thread_plain(
         threads::thread_init_data& data,
-        threads::thread_state_enum initial_state = threads::pending, 
+        threads::thread_state_enum initial_state = threads::pending,
         bool run_now = true, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief Create a new work item using the given function as the 
+    /// \brief Create a new work item using the given function as the
     ///        work to be executed. This work item will be used to create a
     ///        \a threads#thread instance whenever the shepherd thread runs out
-    ///        of work only. The created work descriptions will be queued 
+    ///        of work only. The created work descriptions will be queued
     ///        separately, causing them to be converted into actual thread
     ///        objects on a first-come-first-served basis.
     ///
     /// \param func       [in] The function to be executed as the thread-function.
-    ///                   This function has to expose the minimal low level 
+    ///                   This function has to expose the minimal low level
     ///                   PX-thread interface, i.e. it takes one argument (a
-    ///                   \a threads#thread_state_ex) and returns a 
+    ///                   \a threads#thread_state_ex) and returns a
     ///                   \a threads#thread_state.
-    /// \param description [in] A optional string describing the newly created 
-    ///                   thread. This is useful for debugging and logging 
+    /// \param description [in] A optional string describing the newly created
+    ///                   thread. This is useful for debugging and logging
     ///                   purposes as this string will be inserted in the logs.
-    /// \param initial_state [in] The thread state the newly created thread 
+    /// \param initial_state [in] The thread state the newly created thread
     ///                   should have. If this is not given it defaults to
-    ///                   \a threads#pending, which means that the new thread 
+    ///                   \a threads#pending, which means that the new thread
     ///                   will be scheduled to run as soon as it is created.
     /// \param priority   [in] This is the priority the newly created PX-thread
-    ///                   should be executed with. The default is \a 
+    ///                   should be executed with. The default is \a
     ///                   threads#thread_priority_normal. This parameter is not
     ///                   guaranteed to be taken into account as it depends on
     ///                   the used scheduling policy whether priorities are
     ///                   supported in the first place.
-    /// \param os_thread  [in] The number of the shepherd thread the newly 
-    ///                   created PX-thread should run on. If this is given it 
-    ///                   will be no more than a hint in any case, mainly 
-    ///                   because even if the PX-thread gets scheduled on the 
+    /// \param os_thread  [in] The number of the shepherd thread the newly
+    ///                   created PX-thread should run on. If this is given it
+    ///                   will be no more than a hint in any case, mainly
+    ///                   because even if the PX-thread gets scheduled on the
     ///                   queue of the requested shepherd thread, it still can
     ///                   be stolen by another shepherd thread. If this is not
     ///                   given, the system will select a shepherd thread.
@@ -329,102 +329,102 @@ namespace hpx { namespace applier
     ///                   if this is pre-initialized to \a hpx#throws
     ///                   the function will throw on error instead.
     ///
-    /// \note The value returned by the thread function will be interpreted by 
+    /// \note The value returned by the thread function will be interpreted by
     ///       the thread manager as the new thread state the executed PX-thread
     ///       needs to be switched to. Normally, PX-threads will either return
-    ///       \a threads#terminated (if the thread should be destroyed) or 
-    ///       \a threads#suspended (if the thread needs to be suspended because 
-    ///       it is waiting for an external event to happen). The external 
-    ///       event will set the state of the thread back to pending, which 
+    ///       \a threads#terminated (if the thread should be destroyed) or
+    ///       \a threads#suspended (if the thread needs to be suspended because
+    ///       it is waiting for an external event to happen). The external
+    ///       event will set the state of the thread back to pending, which
     ///       will re-schedule the PX-thread.
     ///
     /// \throws invalid_status if the runtime system has not been started yet.
-    /// 
+    ///
     HPX_API_EXPORT void register_work_plain(
         boost::function<threads::thread_function_type> const& func,
         char const* description = 0, naming::address::address_type lva = 0,
-        threads::thread_state_enum initial_state = threads::pending, 
-        threads::thread_priority priority = threads::thread_priority_normal, 
+        threads::thread_state_enum initial_state = threads::pending,
+        threads::thread_priority priority = threads::thread_priority_normal,
         std::size_t os_thread = std::size_t(-1), error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief Create a new work item using the given function as the 
-    ///        work to be executed. 
+    /// \brief Create a new work item using the given function as the
+    ///        work to be executed.
     ///
     /// \param func       [in] The function to be executed as the thread-function.
-    ///                   This function has to expose the minimal low level 
+    ///                   This function has to expose the minimal low level
     ///                   PX-thread interface, i.e. it takes one argument (a
-    ///                   \a threads#thread_state_ex). The thread will be 
+    ///                   \a threads#thread_state_ex). The thread will be
     ///                   terminated after the function returns.
     ///
-    /// \note All other arguments are equivalent to those of the function 
+    /// \note All other arguments are equivalent to those of the function
     ///       \a applier#register_work_plain
     ///
     HPX_API_EXPORT void register_work(
-        boost::function<void(threads::thread_state_ex)> const& func, 
-        char const* description = 0, 
-        threads::thread_state_enum initial_state = threads::pending, 
-        threads::thread_priority priority = threads::thread_priority_normal, 
+        boost::function<void(threads::thread_state_ex)> const& func,
+        char const* description = 0,
+        threads::thread_state_enum initial_state = threads::pending,
+        threads::thread_priority priority = threads::thread_priority_normal,
         std::size_t os_thread = std::size_t(-1), error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief Create a new work item using the given function as the 
-    ///        work to be executed. 
+    /// \brief Create a new work item using the given function as the
+    ///        work to be executed.
     ///
     /// \param func       [in] The function to be executed as the thread-function.
-    ///                   This function has to expose the minimal low level 
-    ///                   PX-thread interface, i.e. it takes no arguments. The 
+    ///                   This function has to expose the minimal low level
+    ///                   PX-thread interface, i.e. it takes no arguments. The
     ///                   thread will be terminated after the function returns.
     ///
-    /// \note All other arguments are equivalent to those of the function 
+    /// \note All other arguments are equivalent to those of the function
     ///       \a applier#register_work_plain
     ///
     HPX_API_EXPORT void register_work_nullary(
-        boost::function<void()> const& func, char const* description = 0, 
-        threads::thread_state_enum initial_state = threads::pending, 
-        threads::thread_priority priority = threads::thread_priority_normal, 
+        boost::function<void()> const& func, char const* description = 0,
+        threads::thread_state_enum initial_state = threads::pending,
+        threads::thread_priority priority = threads::thread_priority_normal,
         std::size_t os_thread = std::size_t(-1), error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief Create a new work item using the given function as the 
-    ///        work to be executed. 
+    /// \brief Create a new work item using the given function as the
+    ///        work to be executed.
     ///
     /// \note This function is completely equivalent to the first overload
-    ///       of applier#register_work_plain above, except that part of the 
+    ///       of applier#register_work_plain above, except that part of the
     ///       parameters are passed as members of the threads#thread_init_data
     ///       object.
     ///
     HPX_API_EXPORT void register_work_plain(
         threads::thread_init_data& data,
-        threads::thread_state_enum initial_state = threads::pending, 
+        threads::thread_state_enum initial_state = threads::pending,
         error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
-    /// The \a create_async function initiates the creation of a new 
-    /// component instance using the runtime_support as given by targetgid. 
-    /// This function is non-blocking as it returns a \a lcos#promise. The 
-    /// caller of this create_async is responsible to call 
-    /// \a lcos#promise#get to obtain the result. 
+    /// The \a create_async function initiates the creation of a new
+    /// component instance using the runtime_support as given by targetgid.
+    /// This function is non-blocking as it returns a \a lcos#promise. The
+    /// caller of this create_async is responsible to call
+    /// \a lcos#promise#get to obtain the result.
     ///
     /// \param targetgid
     /// \param type
     /// \param count
     ///
-    /// \returns    The function returns a \a lcos#promise instance 
+    /// \returns    The function returns a \a lcos#promise instance
     ///             returning the the global id of the newly created
     ///             component when used to call get.
     ///
-    /// \note       For synchronous operation use the function 
+    /// \note       For synchronous operation use the function
     ///             \a applier#create_async.
-    HPX_API_EXPORT lcos::promise<naming::id_type, naming::gid_type> 
-        create_async(naming::id_type const& targetgid, 
+    HPX_API_EXPORT lcos::promise<naming::id_type, naming::gid_type>
+        create_async(naming::id_type const& targetgid,
             components::component_type type, std::size_t count = 1);
 
     ///////////////////////////////////////////////////////////////////////////
-    /// The \a create function creates a new component instance using the 
-    /// \a runtime_support as given by targetgid. This function is blocking 
-    /// for the component to be created and until the global id of the new 
-    /// component has been returned. 
+    /// The \a create function creates a new component instance using the
+    /// \a runtime_support as given by targetgid. This function is blocking
+    /// for the component to be created and until the global id of the new
+    /// component has been returned.
     ///
     /// \param targetgid
     /// \param type
@@ -433,9 +433,9 @@ namespace hpx { namespace applier
     /// \returns    The function returns the global id of the newly created
     ///             component.
     ///
-    /// \note       For asynchronous operation use the function 
+    /// \note       For asynchronous operation use the function
     ///             \a applier#create_async.
-    HPX_API_EXPORT naming::id_type create(naming::id_type const& targetgid, 
+    HPX_API_EXPORT naming::id_type create(naming::id_type const& targetgid,
         components::component_type type, std::size_t count = 1);
 }}
 

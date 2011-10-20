@@ -49,7 +49,7 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
         cu.value = i;
         return reinterpret_cast<Left*>(cu.ptrs[left_ptr_index] & ptr_mask);
     }
-    
+
     static Right* extract_right_ptr(volatile compressed_ptr_pair_t const& i)
     {
         cast_unit cu;
@@ -63,7 +63,7 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
         cu.value = i;
         return cu.tags[left_tag_index];
     }
-    
+
     static tag_t
     extract_right_tag(volatile compressed_ptr_pair_t const& i)
     {
@@ -86,7 +86,7 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
 
     /** uninitialized constructor */
     tagged_ptr_pair(): pair_(0) {}
-   
+
     template <typename IntegralL>
     tagged_ptr_pair(Left* lptr, Right* rptr, IntegralL ltag):
         pair_(pack_ptr_pair(lptr, rptr, ltag, 0)) {}
@@ -119,11 +119,11 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
     template <typename IntegralL, typename IntegralR>
     void set(Left* lptr, Right* rptr, IntegralL ltag, IntegralR rtag)
     { pair_ = pack_ptr_pair(lptr, rptr, ltag, rtag); }
-    
+
     template <typename IntegralL>
     void reset(Left* lptr, Right* rptr, IntegralL ltag)
     { set(lptr, rptr, ltag, 0); }
-    
+
     template <typename IntegralL, typename IntegralR>
     void reset(Left* lptr, Right* rptr, IntegralL ltag, IntegralR rtag)
     { set(lptr, rptr, ltag, rtag); }
@@ -142,7 +142,7 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
     /* @{ */
     Left* get_left_ptr() const volatile
     { return extract_left_ptr(pair_); }
-    
+
     Right* get_right_ptr() const volatile
     { return extract_right_ptr(pair_); }
 
@@ -153,7 +153,7 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
         tag_t rtag = get_right_tag();
         pair_ = pack_ptr_pair(lptr, rptr, ltag, rtag);
     }
-    
+
     void set_right_ptr(Right* rptr) volatile
     {
         Left* lptr = get_left_ptr();
@@ -167,11 +167,11 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
     /* @{ */
     tag_t get_left_tag() const volatile
     { return extract_left_tag(pair_); }
-    
+
     tag_t get_right_tag() const volatile
     { return extract_right_tag(pair_); }
 
-    template <typename Integral> 
+    template <typename Integral>
     void set_left_tag(Integral ltag) volatile
     {
         Left* lptr = get_left_ptr();
@@ -179,8 +179,8 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
         tag_t rtag = get_right_tag();
         pair_ = pack_ptr_pair(lptr, rptr, ltag, rtag);
     }
-   
-    template <typename Integral> 
+
+    template <typename Integral>
     void set_right_tag(Integral rtag) volatile
     {
         Left* lptr = get_left_ptr();
@@ -207,10 +207,10 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT uint128_type
 
     bool operator==(volatile uint128_type const& rhs) const
     { return (left == rhs.left) && (right == rhs.right); }
-    
+
     bool operator!=(volatile uint128_type const& rhs) const
-    { return !(*this == rhs); } 
-}; 
+    { return !(*this == rhs); }
+};
 
 template <class Left, class Right>
 struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
@@ -231,7 +231,7 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
 
     static Left* extract_left_ptr(volatile compressed_ptr_pair_t const& i)
     { return reinterpret_cast<Left*>(i.left & ptr_mask); }
-    
+
     static Right* extract_right_ptr(volatile compressed_ptr_pair_t const& i)
     { return reinterpret_cast<Right*>(i.right & ptr_mask); }
 
@@ -242,7 +242,7 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
         cu.value.right = i.right;
         return cu.tags[left_tag_index];
     }
-    
+
     static tag_t
     extract_right_tag(volatile compressed_ptr_pair_t const& i)
     {
@@ -267,7 +267,7 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
 
     /** uninitialized constructor */
     tagged_ptr_pair() { pair_.left = 0; pair_.right = 0; }
-   
+
     template <typename IntegralL>
     tagged_ptr_pair(Left* lptr, Right* rptr, IntegralL ltag)
     { pack_ptr_pair(pair_, lptr, rptr, ltag, 0); }
@@ -282,7 +282,7 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
         pair_.left = p.pair_.left;
         pair_.right = p.pair_.right;
     }
-    
+
     tagged_ptr_pair(Left* lptr, Right* rptr)
     { pack_ptr_pair(pair_, lptr, rptr, 0, 0); }
 
@@ -308,11 +308,11 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
     template <typename IntegralL, typename IntegralR>
     void set(Left* lptr, Right* rptr, IntegralL ltag, IntegralR rtag)
     { pack_ptr_pair(pair_, lptr, rptr, ltag, rtag); }
-    
+
     template <typename IntegralL>
     void reset(Left* lptr, Right* rptr, IntegralL ltag)
     { set(lptr, rptr, ltag, 0); }
-    
+
     template <typename IntegralL, typename IntegralR>
     void reset(Left* lptr, Right* rptr, IntegralL ltag, IntegralR rtag)
     { set(lptr, rptr, ltag, rtag); }
@@ -331,7 +331,7 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
     /* @{ */
     Left* get_left_ptr() const volatile
     { return extract_left_ptr(pair_); }
-    
+
     Right* get_right_ptr() const volatile
     { return extract_right_ptr(pair_); }
 
@@ -342,7 +342,7 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
         tag_t rtag = get_right_tag();
         pack_ptr_pair(pair_, lptr, rptr, ltag, rtag);
     }
-    
+
     void set_right_ptr(Right* rptr) volatile
     {
         Left* lptr = get_left_ptr();
@@ -356,11 +356,11 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
     /* @{ */
     tag_t get_left_tag() const volatile
     { return extract_left_tag(pair_); }
-    
+
     tag_t get_right_tag() const volatile
     { return extract_right_tag(pair_); }
 
-    template <typename Integral> 
+    template <typename Integral>
     void set_left_tag(Integral ltag) volatile
     {
         Left* lptr = get_left_ptr();
@@ -368,8 +368,8 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
         tag_t rtag = get_right_tag();
         pack_ptr_pair(pair_, lptr, rptr, ltag, rtag);
     }
-   
-    template <typename Integral> 
+
+    template <typename Integral>
     void set_right_tag(Integral rtag) volatile
     {
         Left* lptr = get_left_ptr();
@@ -392,5 +392,5 @@ struct BOOST_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
 
 }}
 
-#endif // BOOST_LOCKFREE_5C0B91C3_F812_4DA3_A9B7_7F39440555EB 
+#endif // BOOST_LOCKFREE_5C0B91C3_F812_4DA3_A9B7_7F39440555EB
 

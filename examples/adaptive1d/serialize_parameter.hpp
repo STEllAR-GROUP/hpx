@@ -1,7 +1,7 @@
 //  Copyright (c) 2009-2011 Matt Anderson
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_4A2DF0C5_AD6E_489D_95C9_84ED1BACA41B)
@@ -22,7 +22,7 @@ namespace boost { namespace serialization
 
 template <typename Archive>
 void serialize(Archive &ar, hpx::components::adaptive1d::detail::parameter& par,
-               const unsigned int) 
+               const unsigned int)
 {
     ar & par.loglevel;
     ar & par.nt0;
@@ -33,7 +33,7 @@ void serialize(Archive &ar, hpx::components::adaptive1d::detail::parameter& par,
     ar & par.out_every;
     ar & par.outdir;
     ar & par.refine_every;
-    
+
     ar & par.gr_sibling;
     ar & par.gr_minx;
     ar & par.gr_maxx;
@@ -73,7 +73,7 @@ void serialize(Archive &ar, hpx::components::adaptive1d::detail::parameter& par,
 
 template <typename Archive>
 void serialize(Archive &ar, hpx::components::adaptive1d::parameter& par,
-               const unsigned int) 
+               const unsigned int)
 { ar & par.p; }
 
 }}

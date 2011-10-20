@@ -31,18 +31,18 @@
 namespace boost { namespace logging {
 
 
-    
+
     template<class holder, class gather_type> struct gather_holder {
         gather_holder(const holder & p_this) : m_this(p_this), m_use(true) {}
-        
+
         gather_holder(const gather_holder & other) : m_this(other.m_this), m_use(true) {
             other.m_use = false;
         }
 
-        ~gather_holder() { 
+        ~gather_holder() {
             // FIXME handle exiting from exceptions!!!
             if ( m_use)
-                m_this.on_do_write( detail::as_non_const(gather().msg()) ); 
+                m_this.on_do_write( detail::as_non_const(gather().msg()) );
         }
         gather_type & gather() { return m_obj; }
     private:
@@ -73,7 +73,7 @@ namespace boost { namespace logging {
             turn_cache_off();
         }
 
-        /** 
+        /**
             reads all data about a log message (gathers all the data about it)
         */
         gather_holder<self_type, gather_type> read_msg() const { return gather_holder<self_type, gather_type>(*this) ; }
@@ -110,9 +110,9 @@ namespace boost { namespace logging {
     };
 
 
-    /** 
-        @brief Forwards everything to a different logger. 
-        
+    /**
+        @brief Forwards everything to a different logger.
+
         This includes:
         - the writing (writer)
         - the caching
@@ -133,7 +133,7 @@ namespace boost { namespace logging {
                 m_writer = &m_original_logger->writer();
         }
 
-        /** 
+        /**
             specifies the logger to forward to
         */
         void forward_to(original_logger_type *original_logger) {
@@ -155,17 +155,17 @@ namespace boost { namespace logging {
 
 
 
-    /** 
+    /**
     @brief The logger class. Every log from your application is an instance of this (see @ref workflow_processing "workflow")
 
     As described in @ref workflow_processing "workflow", processing the message is composed of 2 things:
-    - @ref workflow_2a "Gathering the message" 
+    - @ref workflow_2a "Gathering the message"
     - @ref workflow_2b "Processing the message"
 
     The logger class has 2 template parameters:
 
 
-    @param gather_msg A new gather instance is created each time a message is written. 
+    @param gather_msg A new gather instance is created each time a message is written.
     The @c gather_msg class needs to be default-constructible.
     The @c gather_msg must have a function called @c .msg() which contains all information about the written message.
     It will be passed to the write_msg class.
@@ -175,7 +175,7 @@ namespace boost { namespace logging {
     @param write_msg This is the object that does the @ref workflow_2b "second step" - the writing of the message.
     It can be a simple functor.
     Or, it can be a more complex object that contains logic of how the message is to be further formatted,
-    and written to multiple destinations. 
+    and written to multiple destinations.
     You can implement your own @c write_msg class, or it can be any of the classes defined in writer namespace.
     Check out writer::format_write - which allows you to use
     several formatters to further format the message, and then write it to destinations.
@@ -184,17 +184,17 @@ namespace boost { namespace logging {
     You will seldom need to use the logger class directly. You can use @ref defining_your_logger "other wrapper classes".
 
 
-    \n\n    
-    The logger forwards 
+    \n\n
+    The logger forwards
     the gathering of the message to the @c gather_msg class. Once all message is gathered, it's passed on to the writer.
     This is usually done through a @ref macros_use "macro".
 
     @code
     typedef logger< ... > logger_type;
-    BOOST_DECLARE_LOG_FILTER(g_log_filter, filter::no_ts ) 
-    BOOST_DECLARE_LOG(g_l, logger_type) 
+    BOOST_DECLARE_LOG_FILTER(g_log_filter, filter::no_ts )
+    BOOST_DECLARE_LOG(g_l, logger_type)
 
-    #define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() ) 
+    #define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() )
 
     // usage
     L_ << "this is so cool " << i++;
@@ -203,13 +203,13 @@ namespace boost { namespace logging {
 
 
 
-    \n\n        
+    \n\n
     To understand more on the workflow that involves %logging:
     - check out the gather namespace
     - check out the writer namespace
-    
+
     */
-    template<class gather_msg , class write_msg > struct logger 
+    template<class gather_msg , class write_msg > struct logger
             // note: default implementation - when gather_msg and write_msg are both known
             : logger_base<gather_msg, write_msg> {
 
@@ -228,7 +228,7 @@ namespace boost { namespace logging {
             turn_cache_off();
         }
 
-        /** 
+        /**
             reads all data about a log message (gathers all the data about it)
         */
         gather_holder<self_type, gather_type> read_msg() const { return gather_holder<self_type, gather_type>(*this) ; }
@@ -282,7 +282,7 @@ namespace boost { namespace logging {
             m_writer = writer;
         }
 
-        /** 
+        /**
             reads all data about a log message (gathers all the data about it)
         */
         gather_holder<self_type, gather_msg> read_msg() const { return gather_holder<self_type, gather_msg>(*this) ; }
@@ -328,8 +328,8 @@ namespace boost { namespace logging {
 
 
 
-    /** 
-    
+    /**
+
     @param write_msg the write message class. If a pointer, forwards to a pointer. If not a pointer, it holds it by value.
     */
     template<class gather_msg, class write_msg> struct implement_default_logger : logger<gather_msg, default_> {
@@ -354,7 +354,7 @@ namespace boost { namespace logging {
 
         void set_writer(write_msg* writer) {
             m_writer = writer;
-        }   
+        }
 
         virtual void do_write(msg_type &a) const {
             (*m_writer)(a);

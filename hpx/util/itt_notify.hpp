@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_UTIL_ITT_NOTIFY_AUG_17_2010_1237PM)
@@ -46,7 +46,7 @@ namespace hpx { namespace util { namespace itt
 {
     struct stack_context
     {
-        stack_context() 
+        stack_context()
           : itt_context_(0)
         {
             HPX_ITT_STACK_CREATE(itt_context_);
@@ -61,8 +61,8 @@ namespace hpx { namespace util { namespace itt
 
     struct caller_context
     {
-        caller_context(stack_context& ctx) 
-          : ctx_(ctx) 
+        caller_context(stack_context& ctx)
+          : ctx_(ctx)
         {
             HPX_ITT_STACK_CALLEE_ENTER(ctx_.itt_context_);
         }
@@ -77,7 +77,7 @@ namespace hpx { namespace util { namespace itt
     ///////////////////////////////////////////////////////////////////////////
     struct frame_context
     {
-        frame_context(char const* name) 
+        frame_context(char const* name)
           : itt_frame_(0)
         {
             HPX_ITT_FRAME_CREATE(itt_frame_, name);
@@ -94,12 +94,12 @@ namespace hpx { namespace util { namespace itt
 
     struct undo_frame_context
     {
-        undo_frame_context(frame_context& frame) 
-          : frame_(frame) 
+        undo_frame_context(frame_context& frame)
+          : frame_(frame)
         {
             HPX_ITT_FRAME_END(frame_.itt_frame_);
         }
-        ~undo_frame_context() 
+        ~undo_frame_context()
         {
             HPX_ITT_FRAME_BEGIN(frame_.itt_frame_);
         }
@@ -110,7 +110,7 @@ namespace hpx { namespace util { namespace itt
     ///////////////////////////////////////////////////////////////////////////
     struct mark_context
     {
-        mark_context(char const* name) 
+        mark_context(char const* name)
           : itt_mark_(0), name_(name)
         {
             HPX_ITT_MARK_CREATE(itt_mark_, name);
@@ -126,12 +126,12 @@ namespace hpx { namespace util { namespace itt
 
     struct undo_mark_context
     {
-        undo_mark_context(mark_context& mark) 
-          : mark_(mark) 
+        undo_mark_context(mark_context& mark)
+          : mark_(mark)
         {
             HPX_ITT_MARK_OFF(mark_.itt_mark_);
         }
-        ~undo_mark_context() 
+        ~undo_mark_context()
         {
             HPX_ITT_MARK_CREATE(mark_.itt_mark_, mark_.name_);
         }

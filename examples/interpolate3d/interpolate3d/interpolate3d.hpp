@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_INTERPOLATE3D_AUG_04_2011_0340PM)
@@ -16,37 +16,37 @@
 #include "configuration.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace interpolate3d 
+namespace interpolate3d
 {
-    // This class encapsulates N partitions and dispatches requests based on 
+    // This class encapsulates N partitions and dispatches requests based on
     // the given values to get interpolated results for.
-    class HPX_COMPONENT_EXPORT interpolate3d 
+    class HPX_COMPONENT_EXPORT interpolate3d
     {
     public:
         // Initialize an interpolation object which is not connected to any
-        // interpolation partitions. Call connect() to attach a running 
+        // interpolation partitions. Call connect() to attach a running
         // instance or create() to create a new one.
         interpolate3d();
 
-        // Destruct an interpolation object instance. If this instance was 
+        // Destruct an interpolation object instance. If this instance was
         // initialized using create(), this will unregister the symbolic name
         //  of the associated partition objects.
         ~interpolate3d();
 
         // Create a new interpolation instance and initialize it synchronously.
-        // Passing -1 as the second argument creates exactly one partition 
+        // Passing -1 as the second argument creates exactly one partition
         // instance on each available locality. Register this interpolation
         // object with the given symbolic name
-        void create(std::string const& datafilename, 
+        void create(std::string const& datafilename,
             std::string const& symbolic_name_base = "/interpolate3d/gauss/",
             std::size_t num_instances = std::size_t(-1));
 
-        // Connect to an existing interpolation object with the given symbolic 
+        // Connect to an existing interpolation object with the given symbolic
         // name.
         void connect(std::string symbolic_name_base = "/interpolate3d/gauss/");
 
         // Return the interpolated  function value for the given argument. This
-        // function dispatches to the proper partition for the actual 
+        // function dispatches to the proper partition for the actual
         // interpolation.
         hpx::lcos::promise<double>
         interpolate_async(double value_x, double value_y, double value_z)
@@ -68,7 +68,7 @@ namespace interpolate3d
 
         // initialize the partitions and store the mappings
         typedef hpx::components::distributing_factory distributing_factory;
-        typedef distributing_factory::async_create_result_type 
+        typedef distributing_factory::async_create_result_type
             async_create_result_type;
 
         void fill_partitions(std::string const& datafilename,

@@ -13,9 +13,9 @@
  See http://www.torjo.com/log2/ for more details
 */
 
-/* 
-    Test : we use TSS (Thread Specific Storage). 
-    
+/*
+    Test : we use TSS (Thread Specific Storage).
+
     We have a dummy object that uses TSS.
     We check to see that every time I request the pointer to an object, on a given thread,
     the same object is returned.
@@ -55,9 +55,9 @@ struct object_count {
         BOOST_CHECK(m_count >= 0);
     }
 
-    int count() const { 
+    int count() const {
         scoped_lock lk(m_cs);
-        return m_count; 
+        return m_count;
     }
 
 private:
@@ -102,7 +102,7 @@ void use_dummy_thread() {
     dummy * local_dummy = &*g_dummy;
     std::string & local_str = g_dummy->str;
     std::string copy_str;
-    
+
     // just in case we get an assertion fails - know when
     int try_idx = 0;
 
@@ -133,7 +133,7 @@ int g_total_thread_count = 20;
 
 int g_run_test_secs = 10;
 
-int test_main(int, char *[]) { 
+int test_main(int, char *[]) {
     for ( int i = 0; i < g_total_thread_count ; ++i)
         thread t( &use_dummy_thread);
 

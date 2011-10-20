@@ -1,6 +1,6 @@
-//  Copyright (c) 2011 Bryce Lelbach 
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Copyright (c) 2011 Bryce Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
@@ -52,14 +52,14 @@ void get_os_thread_num(local_barrier& barr, fifo<std::size_t>& os_threads)
 {
     global_scratch = delay();
     os_threads.enqueue(threadmanager_base::get_thread_num());
-    barr.wait();    
+    barr.wait();
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef std::map<std::size_t, std::size_t>
     result_map;
-    
+
 typedef std::multimap<std::size_t, std::size_t, std::greater<std::size_t> >
     sorter;
 
@@ -68,17 +68,17 @@ int hpx_main(variables_map& vm)
 {
     {
         num_iterations = vm["delay-iterations"].as<boost::uint64_t>();
-    
+
         const bool csv = vm.count("csv");
-    
+
         const std::size_t pxthreads = vm["pxthreads"].as<std::size_t>();
-        
+
         result_map results;
-    
+
         {
             // Have the fifo preallocate the nodes.
-            fifo<std::size_t> os_threads(pxthreads); 
-    
+            fifo<std::size_t> os_threads(pxthreads);
+
             local_barrier barr(pxthreads + 1);
 
             for (std::size_t j = 0; j < pxthreads; ++j)
@@ -90,23 +90,23 @@ int hpx_main(variables_map& vm)
                   , pending
                   , thread_priority_normal
                   , 0);
-            }  
+            }
 
             barr.wait(); // wait for all PX threads to enter the barrier
-    
+
             std::size_t shepherd = 0;
-    
+
             while (os_threads.dequeue(&shepherd))
                 ++results[shepherd];
         }
-    
+
         sorter sort;
-    
+
         BOOST_FOREACH(result_map::value_type const& result, results)
         {
             sort.insert(sorter::value_type(result.second, result.first));
-        } 
-        
+        }
+
         BOOST_FOREACH(sorter::value_type const& result, sort)
         {
             if (csv)
@@ -138,9 +138,9 @@ int main(int argc, char* argv[])
         ( "pxthreads"
         , value<std::size_t>()->default_value(128)
         , "number of PX-threads to invoke")
-        
+
         ( "delay-iterations"
-        , value<boost::uint64_t>()->default_value(65536) 
+        , value<boost::uint64_t>()->default_value(65536)
         , "number of iterations in the delay loop")
 
         ( "csv"

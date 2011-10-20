@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -22,7 +22,7 @@ namespace interpolate1d { namespace server
       : min_value_(0), max_value_(0), delta_(0)
     {}
 
-    void partition::init(std::string datafilename, dimension const& dim, 
+    void partition::init(std::string datafilename, dimension const& dim,
         std::size_t num_nodes)
     {
         // store all parameters
@@ -33,17 +33,17 @@ namespace interpolate1d { namespace server
         if (dim_.offset_ + dim_.count_ < dim_.size_-1)
             ++ghost_width_right;
 
-        if (dim_.offset_ > 0) 
+        if (dim_.offset_ > 0)
             ++ghost_width_left;
 
         // extract the full data range
-        extract_data_range(datafilename, min_value_, max_value_, delta_, 
+        extract_data_range(datafilename, min_value_, max_value_, delta_,
             dim_.offset_, dim_.offset_+dim_.count_);
 
         // read the slice of our data
         values_.reset(new double[dim_.count_ + ghost_width_left + ghost_width_right]);
-        extract_data(datafilename, values_.get(), 
-            dim_.offset_ - ghost_width_left, 
+        extract_data(datafilename, values_.get(),
+            dim_.offset_ - ghost_width_left,
             dim_.count_ + ghost_width_left + ghost_width_right);
     }
 
@@ -51,7 +51,7 @@ namespace interpolate1d { namespace server
     double partition::interpolate(double value)
     {
         if (value < min_value_ || value > max_value_) {
-            HPX_THROW_EXCEPTION(hpx::bad_parameter, "partition::interpolate", 
+            HPX_THROW_EXCEPTION(hpx::bad_parameter, "partition::interpolate",
                 "argument out of range");
             return 0;
         }
@@ -68,12 +68,12 @@ typedef interpolate1d::server::partition partition_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions
-HPX_REGISTER_ACTION_EX(partition_type::init_action, 
+HPX_REGISTER_ACTION_EX(partition_type::init_action,
     partition_init_action);
-HPX_REGISTER_ACTION_EX(partition_type::interpolate_action, 
+HPX_REGISTER_ACTION_EX(partition_type::interpolate_action,
     partition_interpolate_action);
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::simple_component<partition_type>, 
+    hpx::components::simple_component<partition_type>,
     interpolate1d_partition_type);
 HPX_DEFINE_GET_COMPONENT_TYPE(partition_type);

@@ -1,7 +1,7 @@
 // Copyright (C) 2001-2003 William E. Kempf
 // Copyright (C) 2006 Roland Schwarz
 //
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // Boost Logging library
@@ -45,7 +45,7 @@ private:
     unsigned int m_slot; //This is a "pseudo-slot", not a native slot
 };
 
-}}} 
+}}}
 
 #include <boost/logging/detail/tss/tss_ensure_proper_delete.hpp>
 #if defined(BOOST_WINDOWS)
@@ -81,5 +81,5 @@ public:
 }}
 
 
-#endif 
+#endif
 

@@ -1,7 +1,7 @@
 //  Copyright (c) 2008 Anshul Tandon
-//  Copyright (c) 2011 Bryce Lelbach 
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Copyright (c) 2011 Bryce Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -29,7 +29,7 @@ namespace hpx { namespace actions
         if (parcel_handler.get_parcel(p))  // if new parcel is found
         {
             while (threads::threadmanager_is(starting))
-                boost::this_thread::sleep(boost::get_system_time() + 
+                boost::this_thread::sleep(boost::get_system_time() +
                     boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
 
             // Give up if we're shutting down.
@@ -47,9 +47,9 @@ namespace hpx { namespace actions
             naming::address addr = p.get_destination_addr();
             naming::address::address_type lva = addr.address_;
 
-        // by convention, a zero address references the local runtime support 
+        // by convention, a zero address references the local runtime support
         // component
-            if (0 == lva) 
+            if (0 == lva)
                 lva = appl_.get_runtime_support_raw_gid().get_lsb();
 
         // decode the action-type in the parcel
@@ -67,8 +67,8 @@ namespace hpx { namespace actions
                      << dest.type_ << ") action_type("
                      << act->get_component_type()
                      << ") parcel ("  << p << ")";
-                HPX_THROW_EXCEPTION(bad_component_type, 
-                    "action_manager::fetch_parcel", 
+                HPX_THROW_EXCEPTION(bad_component_type,
+                    "action_manager::fetch_parcel",
                     hpx::util::osstream_get_string(strm));
             }
 */
@@ -90,19 +90,19 @@ namespace hpx { namespace actions
                 }
             }
             else {
-            // dispatch action, register work item either with or without 
+            // dispatch action, register work item either with or without
             // continuation support
                 if (!cont) {
-                // no continuation is to be executed, register the plain action 
+                // no continuation is to be executed, register the plain action
                 // and the local-virtual address with the TM only
                     threads::thread_init_data data;
                     appl_.get_thread_manager().register_work(
-                        act->get_thread_init_data(lva, data), 
+                        act->get_thread_init_data(lva, data),
                         threads::thread_state(threads::pending));
                 }
                 else {
                 // this parcel carries a continuation, register a wrapper which
-                // first executes the original thread function as required by 
+                // first executes the original thread function as required by
                 // the action and triggers the continuations afterwards
                     threads::thread_init_data data;
                     appl_.get_thread_manager().register_work(
@@ -113,8 +113,8 @@ namespace hpx { namespace actions
         }
     }
 
-    // Invoked by the Thread Manager when it is running out of work-items 
-    // and needs something to execute on a specific starving resources 
+    // Invoked by the Thread Manager when it is running out of work-items
+    // and needs something to execute on a specific starving resources
     // specified as the argument
     void action_manager::fetch_parcel (naming::id_type const& resourceID)
     {

@@ -2,22 +2,22 @@
 //
 //  This code may be used under either of the following two licences:
 //
-//  Permission is hereby granted, free of charge, to any person obtaining a copy 
-//  of this software and associated documentation files (the "Software"), to deal 
-//  in the Software without restriction, including without limitation the rights 
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
-//  copies of the Software, and to permit persons to whom the Software is 
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
 //  furnished to do so, subject to the following conditions:
 //
-//  The above copyright notice and this permission notice shall be included in 
+//  The above copyright notice and this permission notice shall be included in
 //  all copies or substantial portions of the Software.
 //
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE. OF SUCH DAMAGE.
 //
 //  Or:
@@ -32,7 +32,7 @@
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 #include <string>
-// This is a direct port of the pattern matching algorithm, 
+// This is a direct port of the pattern matching algorithm,
 // written in Lua, found in [Moura04b].
 //
 // The idea behind the algorithm is to use a goal driven desing:
@@ -44,20 +44,20 @@
 // function object of prim, seq and alt in a known runtime-polymorphic type.
 //
 // While using coroutines for pattern matching is not the most
-// efficient solution, the elegance of this design can probably be matched 
+// efficient solution, the elegance of this design can probably be matched
 // only by an implementation using full continuations.
 //
 
 namespace coro = boost::coroutines;
 using coro::coroutine;
 
-typedef coroutine<std::size_t(const std::string&, std::size_t)> 
+typedef coroutine<std::size_t(const std::string&, std::size_t)>
 coroutine_type;
 
 // used in lieu of decltype.
 typedef boost::function<std::size_t(coroutine_type::self&, const std::string& , std::size_t)> function_type;
 
-std::size_t prim_impl(coroutine_type::self& self, 
+std::size_t prim_impl(coroutine_type::self& self,
 		      const std::string& str,
 		      const std::string& input,
 		      std::size_t pos) {
@@ -96,13 +96,13 @@ std::size_t seq_impl(coroutine_type::self& self,
   coroutine_type coro (pattern1);
   while(coro) {
     std::size_t val = coro(input, pos);
-    if(val != std::string::npos) 
+    if(val != std::string::npos)
       pattern2(self, input, val);
     else break;
   }
   return std::string::npos;
 }
-		     
+
 // retuns a function object that matches the conjuction of two patterns.
 function_type seq(const function_type& pattern1,
 		  const function_type& pattern2) {
@@ -114,7 +114,7 @@ bool match(const std::string& str, const function_type& pattern) {
   while(coro) {
     std::size_t pos = coro(str , 0);
     if(pos == std::string::npos) break;
-    if(pos == str.length()) 
+    if(pos == str.length())
       return true;
   }
   return false;

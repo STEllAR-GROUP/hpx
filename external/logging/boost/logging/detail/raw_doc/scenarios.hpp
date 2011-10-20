@@ -1,6 +1,6 @@
 namespace boost { namespace logging {
 
-/** 
+/**
 @page common_scenarios Usage Scenarios (together with code)
 
 - @ref common_scenarios_1
@@ -10,13 +10,13 @@ namespace boost { namespace logging {
 - @ref common_your_scenario
 
 - @ref scenario_multiple_files
-    - @ref scenario_multiple_files_program 
-    - @ref scenario_multiple_files_log_h 
-    - @ref scenario_multiple_files_log_cpp 
-    - @ref scenario_multiple_files_main 
+    - @ref scenario_multiple_files_program
+    - @ref scenario_multiple_files_log_h
+    - @ref scenario_multiple_files_log_cpp
+    - @ref scenario_multiple_files_main
 
 \n\n\n
-@copydoc common_usage_steps_fd 
+@copydoc common_usage_steps_fd
 
 
 
@@ -25,7 +25,7 @@ namespace boost { namespace logging {
 
 Scenario 1 should be the most common.
 
-@copydoc mul_levels_one_logger 
+@copydoc mul_levels_one_logger
 
 @ref scenarios_code_mom "Click to see the code"
 \n\n\n

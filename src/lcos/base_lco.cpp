@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -28,10 +28,10 @@ HPX_REGISTER_ACTION_EX(hpx::lcos::base_lco::set_error_action, base_set_error_act
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<hpx::naming::gid_type>::set_result_action, 
+    hpx::lcos::base_lco_with_value<hpx::naming::gid_type>::set_result_action,
     set_result_action_gid_type);
 HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<hpx::naming::gid_type>::get_value_action, 
+    hpx::lcos::base_lco_with_value<hpx::naming::gid_type>::get_value_action,
     get_value_action_gid_type);
 HPX_REGISTER_ACTION_EX(
     hpx::lcos::base_lco_with_value<std::vector<hpx::naming::gid_type> >::set_result_action,
@@ -40,10 +40,10 @@ HPX_REGISTER_ACTION_EX(
     hpx::lcos::base_lco_with_value<std::vector<hpx::naming::gid_type> >::get_value_action,
     get_value_action_vector_gid_type);
 HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<hpx::naming::id_type>::set_result_action, 
+    hpx::lcos::base_lco_with_value<hpx::naming::id_type>::set_result_action,
     set_result_action_id_type);
 HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<hpx::naming::id_type>::get_value_action, 
+    hpx::lcos::base_lco_with_value<hpx::naming::id_type>::get_value_action,
     get_value_action_id_type);
 HPX_REGISTER_ACTION_EX(
     hpx::lcos::base_lco_with_value<std::vector<hpx::naming::id_type> >::set_result_action,
@@ -94,7 +94,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco_with_value<hpx::naming::id_type>,
     hpx::components::component_base_lco_with_value);
-typedef 
+typedef
     hpx::lcos::base_lco_with_value<hpx::naming::id_type, hpx::naming::gid_type>
 remote_id_type_retval;
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
@@ -122,7 +122,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
-    template hpx::util::section const& 
+    template hpx::util::section const&
     continuation::trigger(hpx::util::section const&);
 }}
 

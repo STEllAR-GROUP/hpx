@@ -1,8 +1,8 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2009-2011 Matt Anderson
 //  Copyright (c)      2011 Bryce Adelstein-Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
@@ -29,9 +29,9 @@ typedef hpx::components::adaptive1d::server::dataflow_stencil dataflow_dataflow_
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions
-HPX_REGISTER_ACTION_EX(dataflow_dataflow_stencil_type::init_execute_action, 
+HPX_REGISTER_ACTION_EX(dataflow_dataflow_stencil_type::init_execute_action,
     adaptive1d_dataflow_dataflow_stencil_init_execute_action);
-HPX_REGISTER_ACTION_EX(dataflow_dataflow_stencil_type::execute_action, 
+HPX_REGISTER_ACTION_EX(dataflow_dataflow_stencil_type::execute_action,
     adaptive1d_dataflow_dataflow_stencil_execute_action);
 
 typedef hpx::lcos::base_lco_with_value<
@@ -43,12 +43,12 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(dataflow_lco_gid_vector_ptr,
                                 hpx::components::component_base_lco_with_value);
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
-    hpx::components::simple_component<dataflow_dataflow_stencil_type>, 
+    hpx::components::simple_component<dataflow_dataflow_stencil_type>,
     adaptive1d_dataflow_dataflow_stencil3d);
 HPX_DEFINE_GET_COMPONENT_TYPE(dataflow_dataflow_stencil_type);
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace adaptive1d { namespace server 
+namespace hpx { namespace components { namespace adaptive1d { namespace server
 {
     dataflow_stencil::dataflow_stencil()
     {}
@@ -116,10 +116,10 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    // Create functional components, one for each data point, use those to 
+    // Create functional components, one for each data point, use those to
     // initialize the stencil value instances
     void dataflow_stencil::init_stencils(distributed_iterator_range_type const& stencils,
-        distributed_iterator_range_type const& functions, int static_step, 
+        distributed_iterator_range_type const& functions, int static_step,
         array3d &dst_port,array3d &dst_src,array3d &dst_step,
         array3d &dst_size,array3d &src_size, double cycle_time, parameter const& par)
     {
@@ -154,8 +154,8 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
 #endif
             lazyvals.push_back(
                 stubs::dynamic_stencil_value::set_functional_component_async(
-                    *stencil, *function, static_step, column, 
-                    dst_size(static_step, column, 0), 
+                    *stencil, *function, static_step, column,
+                    dst_size(static_step, column, 0),
                     src_size(static_step, column, 0), cycle_time,par));
         }
         //BOOST_ASSERT(function == functions.second);
@@ -170,7 +170,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         std::vector<std::vector<naming::id_type> >& outputs)
     {
         typedef components::distributing_factory::result_type result_type;
-        typedef 
+        typedef
             std::vector<lcos::promise<std::vector<naming::id_type> > >
         lazyvals_type;
 
@@ -187,11 +187,11 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    // Connect the given output ports with the correct input ports, creating the 
+    // Connect the given output ports with the correct input ports, creating the
     // required static data-flow structure.
     //
-    // Currently we have exactly one stencil_value instance per data point, where 
-    // the output ports of a stencil_value are connected to the input ports of the 
+    // Currently we have exactly one stencil_value instance per data point, where
+    // the output ports of a stencil_value are connected to the input ports of the
     // direct neighbors of itself.
     void dataflow_stencil::connect_input_ports(
         components::distributing_factory::result_type const* stencils,
@@ -205,9 +205,9 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         lazyvals_type lazyvals;
 
         int steps = (int)outputs.size();
-        for (int step = 0; step < steps; ++step) 
+        for (int step = 0; step < steps; ++step)
         {
-            components::distributing_factory::iterator_range_type r = 
+            components::distributing_factory::iterator_range_type r =
                 locality_results(stencils[step]);
 
             components::distributing_factory::iterator_type stencil = r.first;
@@ -230,7 +230,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
 
     ///////////////////////////////////////////////////////////////////////////////
     void dataflow_stencil::prepare_initial_data(
-        distributed_iterator_range_type const& functions, 
+        distributed_iterator_range_type const& functions,
         std::vector<naming::id_type> const& interp_src_data,
         std::vector<naming::id_type>& initial_data,
         double time,
@@ -255,8 +255,8 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
     ///////////////////////////////////////////////////////////////////////////////
     // do actual work
     void dataflow_stencil::execute(
-        components::distributing_factory::iterator_range_type const& stencils, 
-        std::vector<naming::id_type> const& initial_data, 
+        components::distributing_factory::iterator_range_type const& stencils,
+        std::vector<naming::id_type> const& initial_data,
         std::vector<naming::id_type>& result_data)
     {
         // start the execution of all stencil stencils (data items)
@@ -277,7 +277,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    // 
+    //
     void dataflow_stencil::start_row(
         components::distributing_factory::iterator_range_type const& stencils)
     {
@@ -296,11 +296,11 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// This is the main entry point of this component. 
+    /// This is the main entry point of this component.
     boost::shared_ptr<std::vector<naming::id_type> > dataflow_stencil::init_execute(
         std::vector<naming::id_type> const& interp_src_data,
         double time,
-        components::component_type function_type, std::size_t numvalues, 
+        components::component_type function_type, std::size_t numvalues,
         std::size_t numsteps,
         components::component_type logging_type,
         parameter const& par)
@@ -309,7 +309,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         boost::shared_ptr<std::vector<naming::id_type> > result_data
             (new std::vector<naming::id_type>());
 
-        components::component_type stencil_type = 
+        components::component_type stencil_type =
             components::get_component_type<components::adaptive1d::server::dynamic_stencil_value>();
 
         typedef components::distributing_factory::result_type result_type;
@@ -318,7 +318,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         components::distributing_factory factory;
         factory.create(applier::get_applier().get_runtime_support_gid());
 
-        // create a couple of stencil (functional) components and twice the 
+        // create a couple of stencil (functional) components and twice the
         // amount of stencil_value components
         result_type functions = factory.create_components(function_type, numvalues);
 
@@ -352,26 +352,26 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
                    num_rows,each_row,par);
 
         // initialize stencil_values using the stencil (functional) components
-        for (int i = 0; i < num_rows; ++i) 
+        for (int i = 0; i < num_rows; ++i)
             init_stencils(locality_results(stencils[i]), locality_results(functions), i,
                           dst_port,dst_src,dst_step,dst_size,src_size,time,par);
 
         // ask stencil instances for their output gids
         std::vector<std::vector<std::vector<naming::id_type> > > outputs(num_rows);
-        for (int i = 0; i < num_rows; ++i) 
+        for (int i = 0; i < num_rows; ++i)
             get_output_ports(locality_results(stencils[i]), outputs[i]);
 
         // connect output gids with corresponding stencil inputs
         connect_input_ports(&*stencils.begin(), outputs,dst_size,dst_step,dst_src,dst_port,par);
 
         // for loop over second row ; call start for each
-        for (int i = 1; i < num_rows; ++i) 
+        for (int i = 1; i < num_rows; ++i)
             start_row(locality_results(stencils[i]));
 
         // prepare initial data
         std::vector<naming::id_type> initial_data;
         prepare_initial_data(locality_results(functions), interp_src_data,
-                             initial_data,time, 
+                             initial_data,time,
                              each_row[0],par);
 
         //std::cout << " Startup grid cost " << t.elapsed() << std::endl;
@@ -382,7 +382,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         if (!logging.empty())
             factory.free_components_sync(logging);
 
-        for (int i = 0; i < num_rows; ++i) 
+        for (int i = 0; i < num_rows; ++i)
             factory.free_components_sync(stencils[i]);
         factory.free_components_sync(functions);
 
@@ -390,10 +390,10 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// This the other entry point of this component. 
+    /// This the other entry point of this component.
     std::vector<naming::id_type> dataflow_stencil::execute(
         std::vector<naming::id_type> const& initial_data,
-        components::component_type function_type, std::size_t numvalues, 
+        components::component_type function_type, std::size_t numvalues,
         std::size_t numsteps,
         components::component_type logging_type, parameter const& par)
     {
@@ -417,7 +417,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
 
       // NOTE: this was used uninitialized in the following code
       bool prolongation = false;
-      
+
       // vcolumn is the destination column number
       // vstep is the destination step (or row) number
       // vsrc_column is the source column number
@@ -478,7 +478,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
             } else {
               dst += 1; // this is a prolongation/restriction step
               prolongation = true;
-            }          
+            }
           }
           if ( dst >= num_rows ) dst = 0;
 

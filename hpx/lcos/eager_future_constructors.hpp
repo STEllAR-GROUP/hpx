@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef BOOST_PP_IS_ITERATING
@@ -18,7 +18,7 @@
     (3, (2, HPX_ACTION_ARGUMENT_LIMIT,                                        \
     "hpx/lcos/eager_future_constructors.hpp"))                                \
     /**/
-    
+
 #include BOOST_PP_ITERATE()
 
 #endif
@@ -40,7 +40,7 @@
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    eager_future(naming::gid_type const& gid, 
+    eager_future(naming::gid_type const& gid,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
       : apply_logger_("eager_future::apply")
     {
@@ -49,11 +49,11 @@
                     << ", "
                     << gid
                     << ") args(" << (N + 1) << ")";
-        apply(naming::id_type(gid, naming::id_type::unmanaged), 
+        apply(naming::id_type(gid, naming::id_type::unmanaged),
             BOOST_PP_ENUM_PARAMS(N, arg));
     }
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    eager_future(naming::id_type const& gid, 
+    eager_future(naming::id_type const& gid,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
       : apply_logger_("eager_future::apply")
     {

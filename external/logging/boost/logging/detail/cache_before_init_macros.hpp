@@ -62,7 +62,7 @@ namespace boost { namespace logging {
         }                                                                           \
     } param = ( !(is_log_enabled) ) ? (void*)0 : ::boost::logging::get_logger_base( l )-> do_func
 
-    
+
 
 #elif defined( BOOST_LOG_BEFORE_INIT_USE_LOG_ALL)
 /////////////////////////////////////////////////////////////////////////////////////////////

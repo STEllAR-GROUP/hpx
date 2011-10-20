@@ -49,7 +49,7 @@ namespace
     cout << " A structure with an expected sizeof() " << expected
          << " had an actual sizeof() " << actual
          << "\n This will cause common uses of <boost/endian.hpp> to fail\n";
-  } 
+  }
 
   template <class Endian, class Base>
   void verify_value_and_ops( const Base & expected, int line )
@@ -96,13 +96,13 @@ namespace
   void detect_endianness()
   {
     union View
-    { 
+    {
       long long i;
       unsigned char c[8];
     };
 
     View v = { 0x0102030405060708LL };  // initialize v.i
-    
+
     if ( memcmp( v.c, "\10\7\6\5\4\3\2\1", 8) == 0 )
     {
       cout << "This machine is little-endian.\n";
@@ -112,7 +112,7 @@ namespace
           "Please report the fix to the Boost mailing list.\n";
         exit(1);
   #   endif
-    } 
+    }
     else if ( memcmp( v.c, "\1\2\3\4\5\6\7\10", 8) == 0 )
     {
       cout << "This machine is big-endian.\n";
@@ -124,7 +124,7 @@ namespace
   #   endif
     }
     else
-    { 
+    {
       cout << "This machine is neither strict big-endian nor strict little-endian\n"
         "You must modify boost/endian.hpp for it to work correctly.\n";
       exit(1);
@@ -317,7 +317,7 @@ namespace
     VERIFY_SIZE( sizeof(unative_struct), 39 );
 
     if ( saved_err_count == err_count )
-    { 
+    {
       cout <<
         "Size and alignment for structures of endian types are as expected.\n";
     }
@@ -541,7 +541,7 @@ namespace
   } // check_representation_and_range
 
   long iterations = 10000000;
-  
+
   template< class Endian >
   Endian timing_test( const char * s)
   {

@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2010 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
@@ -61,16 +61,16 @@ struct quicksort_serial
         if (begin != end)
         {
             std::size_t middle_idx = partition(data, begin, end);
-    
+
             ++sort_count;
-    
+
             // always spawn the larger part in a new thread
             if (2 * middle_idx < end - begin)
             {
                 call(data, (std::max)(begin + 1, middle_idx), end);
                 call(data, begin, middle_idx);
             }
-    
+
             else
             {
                 call(data, begin, middle_idx);
@@ -81,8 +81,8 @@ struct quicksort_serial
 };
 
 template <typename T>
-std::size_t quicksort_serial<T>::sort_count(0); 
- 
+std::size_t quicksort_serial<T>::sort_count(0);
+
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
 struct quicksort_parallel
@@ -98,7 +98,7 @@ struct quicksort_parallel
 };
 
 template <typename T>
-std::size_t quicksort_parallel<T>::sort_count(0); 
+std::size_t quicksort_parallel<T>::sort_count(0);
 
 template <typename T>
 void quicksort_parallel<T>::call(id_type prefix, id_type d, std::size_t begin,
@@ -116,7 +116,7 @@ void quicksort_parallel<T>::call(id_type prefix, id_type d, std::size_t begin,
         // always spawn the larger part in a new thread
         if (2 * middle_idx < end - begin)
         {
-            eager_future<action_type> n(prefix, prefix, d, 
+            eager_future<action_type> n(prefix, prefix, d,
                 (std::max)(begin + 1, middle_idx), end);
 
             call(prefix, d, begin, middle_idx);
@@ -125,7 +125,7 @@ void quicksort_parallel<T>::call(id_type prefix, id_type d, std::size_t begin,
 
         else
         {
-            eager_future<action_type> n(prefix, prefix, d, 
+            eager_future<action_type> n(prefix, prefix, d,
                 begin, middle_idx);
 
             call(prefix, d, (std::max)(begin + 1, middle_idx), end);
@@ -174,7 +174,7 @@ int hpx_main(variables_map& vm)
         quicksort_serial<int>::call(data.get_ptr(), 0, elements);
         double elapsed = t.elapsed();
 
-        std::cout << "  elapsed=" << elapsed << "\n" 
+        std::cout << "  elapsed=" << elapsed << "\n"
                   << "  count=" << quicksort_serial<int>::sort_count << "\n";
 
 //        int* it = data.get_ptr();
@@ -195,7 +195,7 @@ int hpx_main(variables_map& vm)
 
         std::cout << "  elapsed=" << elapsed << "\n"
                   << "  count=" << quicksort_parallel<int>::sort_count << "\n";
-        
+
 //        it = data.get_ptr();
 //        end = data.get_ptr() + elements;
 
@@ -219,8 +219,8 @@ int main(int argc, char* argv[])
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()
-        ("elements", value<std::size_t>()->default_value(1024), 
-            "the number of elements to generate and sort") 
+        ("elements", value<std::size_t>()->default_value(1024),
+            "the number of elements to generate and sort")
         ;
 
     // Initialize and run HPX

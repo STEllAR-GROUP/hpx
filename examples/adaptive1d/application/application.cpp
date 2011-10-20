@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2009-2011 Matt Anderson
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <cmath>
@@ -22,14 +22,14 @@
 #include <sdf.h>
 #endif
 
-namespace hpx { namespace components { namespace adaptive1d 
+namespace hpx { namespace components { namespace adaptive1d
 {
 
 ///////////////////////////////////////////////////////////////////////////
 int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
     detail::parameter const& par)
 {
-    // provide initial data for the given data value 
+    // provide initial data for the given data value
     val->max_index_ = maxitems;
     val->index_ = item;
     val->timestep_ = 0;
@@ -45,7 +45,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
       val->value_[i].x = x;
 
       double x1 = 0.5*par.x0;
-      
+
       double H = sqrt(par.lambda/12.0)*par.v*par.v;
       double invH = 1.0/H;
       double u1;
@@ -111,7 +111,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
           xcoord[i] = val->value_[i].x;
           value[i] = val->value_[i].phi[0][j];
         }
-        gft_out_full(fname,datatime,shape,cnames,1,&*xcoord.begin(),&*value.begin()); 
+        gft_out_full(fname,datatime,shape,cnames,1,&*xcoord.begin(),&*value.begin());
       }
     }
 #endif
@@ -122,7 +122,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
 inline void calcrhs(struct nodedata &rhs,
                    double phi,double Pi,
                    double chi,double a,double f,
-                   double g, double b, double q, 
+                   double g, double b, double q,
                    double r, double VV, double dphiVV,
                    double dzphi,double dzPi,double dzchi,
                    double dza,double dzf,
@@ -147,7 +147,7 @@ inline void calcrhs(struct nodedata &rhs,
 }
 
 // rkupdate3 {{{
-int rkupdate3(std::vector<access_memory_block<stencil_data> > &val, 
+int rkupdate3(std::vector<access_memory_block<stencil_data> > &val,
              double t, detail::parameter const& par)
 {
     nodedata rhs;
@@ -186,7 +186,7 @@ int rkupdate3(std::vector<access_memory_block<stencil_data> > &val,
       else if ( i >= size1 ) { index = i-size1; input = 2; }
       else { index = i; input = 1; }
 
-      if ( i-1 < 0 ) { lindex = size0+i-1; linput = 0; } 
+      if ( i-1 < 0 ) { lindex = size0+i-1; linput = 0; }
       else if ( i-1 >= size1 ) { lindex = i-1-size1; linput = 2; }
       else { lindex = i-1; linput = 1; }
 
@@ -194,15 +194,15 @@ int rkupdate3(std::vector<access_memory_block<stencil_data> > &val,
       else if ( i+1 >= size1 ) { rindex = i+1-size1; rinput = 2; }
       else { rindex = i+1; rinput = 1; }
 
-      phi = val[input]->value_[index].phi[0][0]; 
-      Pi  = val[input]->value_[index].phi[0][1]; 
-      chi = val[input]->value_[index].phi[0][2]; 
-      a   = val[input]->value_[index].phi[0][3]; 
-      f   = val[input]->value_[index].phi[0][4]; 
-      g   = val[input]->value_[index].phi[0][5]; 
-      b   = val[input]->value_[index].phi[0][6]; 
-      q   = val[input]->value_[index].phi[0][7]; 
-      r   = val[input]->value_[index].phi[0][8]; 
+      phi = val[input]->value_[index].phi[0][0];
+      Pi  = val[input]->value_[index].phi[0][1];
+      chi = val[input]->value_[index].phi[0][2];
+      a   = val[input]->value_[index].phi[0][3];
+      f   = val[input]->value_[index].phi[0][4];
+      g   = val[input]->value_[index].phi[0][5];
+      b   = val[input]->value_[index].phi[0][6];
+      q   = val[input]->value_[index].phi[0][7];
+      r   = val[input]->value_[index].phi[0][8];
       VV  = 0.25*par.lambda*pow(phi*phi-par.v*par.v,2);
       dphiVV = par.lambda*phi*(phi*phi-par.v*par.v);
 
@@ -260,15 +260,15 @@ int rkupdate3(std::vector<access_memory_block<stencil_data> > &val,
       nodedata& rnd = work[i+1];
       nodedata& nd2 = work2[i];
 
-      phi = nd.phi[1][0]; 
-      Pi  = nd.phi[1][1]; 
-      chi = nd.phi[1][2]; 
-      a   = nd.phi[1][3]; 
-      f   = nd.phi[1][4]; 
-      g   = nd.phi[1][5]; 
-      b   = nd.phi[1][6]; 
-      q   = nd.phi[1][7]; 
-      r   = nd.phi[1][8]; 
+      phi = nd.phi[1][0];
+      Pi  = nd.phi[1][1];
+      chi = nd.phi[1][2];
+      a   = nd.phi[1][3];
+      f   = nd.phi[1][4];
+      g   = nd.phi[1][5];
+      b   = nd.phi[1][6];
+      q   = nd.phi[1][7];
+      r   = nd.phi[1][8];
       VV  = 0.25*par.lambda*pow(phi*phi-par.v*par.v,2);
       dphiVV = par.lambda*phi*(phi*phi-par.v*par.v);
 
@@ -286,7 +286,7 @@ int rkupdate3(std::vector<access_memory_block<stencil_data> > &val,
       calcrhs(rhs,phi,Pi,chi,a,f,g,b,q,r,VV,dphiVV,dzphi,dzPi,dzchi,dza,dzf,dzg,dzb,dzq,dzr);
 
       for (int ll=0;ll<num_eqns;ll++) {
-        nd2.phi[1][ll] = c_0_75*nd.phi[0][ll] + c_0_25*nd.phi[1][ll] 
+        nd2.phi[1][ll] = c_0_75*nd.phi[0][ll] + c_0_25*nd.phi[1][ll]
                                               + c_0_25*rhs.phi[0][ll]*dt;
       }
     }
@@ -300,15 +300,15 @@ int rkupdate3(std::vector<access_memory_block<stencil_data> > &val,
       nodedata& lnd2 = work2[i-1];
       nodedata& rnd2 = work2[i+1];
 
-      phi = nd2.phi[1][0]; 
-      Pi  = nd2.phi[1][1]; 
-      chi = nd2.phi[1][2]; 
-      a   = nd2.phi[1][3]; 
-      f   = nd2.phi[1][4]; 
-      g   = nd2.phi[1][5]; 
-      b   = nd2.phi[1][6]; 
-      q   = nd2.phi[1][7]; 
-      r   = nd2.phi[1][8]; 
+      phi = nd2.phi[1][0];
+      Pi  = nd2.phi[1][1];
+      chi = nd2.phi[1][2];
+      a   = nd2.phi[1][3];
+      f   = nd2.phi[1][4];
+      g   = nd2.phi[1][5];
+      b   = nd2.phi[1][6];
+      q   = nd2.phi[1][7];
+      r   = nd2.phi[1][8];
       VV  = 0.25*par.lambda*pow(phi*phi-par.v*par.v,2);
       dphiVV = par.lambda*phi*(phi*phi-par.v*par.v);
 
@@ -324,10 +324,10 @@ int rkupdate3(std::vector<access_memory_block<stencil_data> > &val,
       // }}}
 
       calcrhs(rhs,phi,Pi,chi,a,f,g,b,q,r,VV,dphiVV,dzphi,dzPi,dzchi,dza,dzf,dzg,dzb,dzq,dzr);
-      
+
       for (int ll=0;ll<num_eqns;ll++) {
-        val[3]->value_[i-2*num_neighbors].phi[0][ll] = 
-                         c_1_3*nd.phi[0][ll]   
+        val[3]->value_[i-2*num_neighbors].phi[0][ll] =
+                         c_1_3*nd.phi[0][ll]
                        + c_2_3*(nd2.phi[1][ll] + rhs.phi[0][ll]*dt);
       }
     }
@@ -351,7 +351,7 @@ int rkupdate3(std::vector<access_memory_block<stencil_data> > &val,
           xcoord[i] = val[3]->value_[i].x;
           value[i] = val[3]->value_[i].phi[0][j];
         }
-        gft_out_full(fname,datatime,shape,cnames,1,&*xcoord.begin(),&*value.begin()); 
+        gft_out_full(fname,datatime,shape,cnames,1,&*xcoord.begin(),&*value.begin());
       }
     }
 #endif
@@ -362,7 +362,7 @@ int rkupdate3(std::vector<access_memory_block<stencil_data> > &val,
 
 // rkupdate2a {{{
 // boundary is on left, right neighbor is val[1]
-int rkupdate2a(std::vector<access_memory_block<stencil_data> > &val, 
+int rkupdate2a(std::vector<access_memory_block<stencil_data> > &val,
              double t, detail::parameter const& par)
 {
     nodedata rhs;
@@ -405,15 +405,15 @@ int rkupdate2a(std::vector<access_memory_block<stencil_data> > &val,
       if ( i+1 >= size0 ) { rindex = i+1-size0; rinput = 1; }
       else { rindex = i+1; rinput = 0; }
 
-      phi = val[input]->value_[index].phi[0][0]; 
-      Pi  = val[input]->value_[index].phi[0][1]; 
-      chi = val[input]->value_[index].phi[0][2]; 
-      a   = val[input]->value_[index].phi[0][3]; 
-      f   = val[input]->value_[index].phi[0][4]; 
-      g   = val[input]->value_[index].phi[0][5]; 
-      b   = val[input]->value_[index].phi[0][6]; 
-      q   = val[input]->value_[index].phi[0][7]; 
-      r   = val[input]->value_[index].phi[0][8]; 
+      phi = val[input]->value_[index].phi[0][0];
+      Pi  = val[input]->value_[index].phi[0][1];
+      chi = val[input]->value_[index].phi[0][2];
+      a   = val[input]->value_[index].phi[0][3];
+      f   = val[input]->value_[index].phi[0][4];
+      g   = val[input]->value_[index].phi[0][5];
+      b   = val[input]->value_[index].phi[0][6];
+      q   = val[input]->value_[index].phi[0][7];
+      r   = val[input]->value_[index].phi[0][8];
       VV  = 0.25*par.lambda*pow(phi*phi-par.v*par.v,2);
       dphiVV = par.lambda*phi*(phi*phi-par.v*par.v);
 
@@ -471,15 +471,15 @@ int rkupdate2a(std::vector<access_memory_block<stencil_data> > &val,
       nodedata& rnd = work[i+1];
       nodedata& nd2 = work2[i];
 
-      phi = nd.phi[1][0]; 
-      Pi  = nd.phi[1][1]; 
-      chi = nd.phi[1][2]; 
-      a   = nd.phi[1][3]; 
-      f   = nd.phi[1][4]; 
-      g   = nd.phi[1][5]; 
-      b   = nd.phi[1][6]; 
-      q   = nd.phi[1][7]; 
-      r   = nd.phi[1][8]; 
+      phi = nd.phi[1][0];
+      Pi  = nd.phi[1][1];
+      chi = nd.phi[1][2];
+      a   = nd.phi[1][3];
+      f   = nd.phi[1][4];
+      g   = nd.phi[1][5];
+      b   = nd.phi[1][6];
+      q   = nd.phi[1][7];
+      r   = nd.phi[1][8];
       VV  = 0.25*par.lambda*pow(phi*phi-par.v*par.v,2);
       dphiVV = par.lambda*phi*(phi*phi-par.v*par.v);
 
@@ -497,7 +497,7 @@ int rkupdate2a(std::vector<access_memory_block<stencil_data> > &val,
       calcrhs(rhs,phi,Pi,chi,a,f,g,b,q,r,VV,dphiVV,dzphi,dzPi,dzchi,dza,dzf,dzg,dzb,dzq,dzr);
 
       for (int ll=0;ll<num_eqns;ll++) {
-        nd2.phi[1][ll] = c_0_75*nd.phi[0][ll] + c_0_25*nd.phi[1][ll] 
+        nd2.phi[1][ll] = c_0_75*nd.phi[0][ll] + c_0_25*nd.phi[1][ll]
                                               + c_0_25*rhs.phi[0][ll]*dt;
       }
     }
@@ -511,15 +511,15 @@ int rkupdate2a(std::vector<access_memory_block<stencil_data> > &val,
       nodedata& lnd2 = work2[i-1];
       nodedata& rnd2 = work2[i+1];
 
-      phi = nd2.phi[1][0]; 
-      Pi  = nd2.phi[1][1]; 
-      chi = nd2.phi[1][2]; 
-      a   = nd2.phi[1][3]; 
-      f   = nd2.phi[1][4]; 
-      g   = nd2.phi[1][5]; 
-      b   = nd2.phi[1][6]; 
-      q   = nd2.phi[1][7]; 
-      r   = nd2.phi[1][8]; 
+      phi = nd2.phi[1][0];
+      Pi  = nd2.phi[1][1];
+      chi = nd2.phi[1][2];
+      a   = nd2.phi[1][3];
+      f   = nd2.phi[1][4];
+      g   = nd2.phi[1][5];
+      b   = nd2.phi[1][6];
+      q   = nd2.phi[1][7];
+      r   = nd2.phi[1][8];
       VV  = 0.25*par.lambda*pow(phi*phi-par.v*par.v,2);
       dphiVV = par.lambda*phi*(phi*phi-par.v*par.v);
 
@@ -535,10 +535,10 @@ int rkupdate2a(std::vector<access_memory_block<stencil_data> > &val,
       // }}}
 
       calcrhs(rhs,phi,Pi,chi,a,f,g,b,q,r,VV,dphiVV,dzphi,dzPi,dzchi,dza,dzf,dzg,dzb,dzq,dzr);
-      
+
       for (int ll=0;ll<num_eqns;ll++) {
-        val[2]->value_[i].phi[0][ll] = 
-                         c_1_3*nd.phi[0][ll]   
+        val[2]->value_[i].phi[0][ll] =
+                         c_1_3*nd.phi[0][ll]
                        + c_2_3*(nd2.phi[1][ll] + rhs.phi[0][ll]*dt);
       }
     }
@@ -562,7 +562,7 @@ int rkupdate2a(std::vector<access_memory_block<stencil_data> > &val,
           xcoord[i] = val[2]->value_[i].x;
           value[i] = val[2]->value_[i].phi[0][j];
         }
-        gft_out_full(fname,datatime,shape,cnames,1,&*xcoord.begin(),&*value.begin()); 
+        gft_out_full(fname,datatime,shape,cnames,1,&*xcoord.begin(),&*value.begin());
       }
     }
 #endif
@@ -573,7 +573,7 @@ int rkupdate2a(std::vector<access_memory_block<stencil_data> > &val,
 
 // rkupdate2b {{{
 // boundary is on right, left neighbor is val[0]
-int rkupdate2b(std::vector<access_memory_block<stencil_data> > &val, 
+int rkupdate2b(std::vector<access_memory_block<stencil_data> > &val,
              double t, detail::parameter const& par)
 {
     nodedata rhs;
@@ -611,21 +611,21 @@ int rkupdate2b(std::vector<access_memory_block<stencil_data> > &val,
       if ( i < 0 ) { index = size0+i; input = 0; }
       else { index = i; input = 1; }
 
-      if ( i-1 < 0 ) { lindex = size0+i-1; linput = 0; } 
+      if ( i-1 < 0 ) { lindex = size0+i-1; linput = 0; }
       else { lindex = i-1; linput = 1; }
 
       if ( i+1 < 0 ) { rindex = size0+i+1; rinput = 0; }
       else { rindex = i+1; rinput = 1; }
 
-      phi = val[input]->value_[index].phi[0][0]; 
-      Pi  = val[input]->value_[index].phi[0][1]; 
-      chi = val[input]->value_[index].phi[0][2]; 
-      a   = val[input]->value_[index].phi[0][3]; 
-      f   = val[input]->value_[index].phi[0][4]; 
-      g   = val[input]->value_[index].phi[0][5]; 
-      b   = val[input]->value_[index].phi[0][6]; 
-      q   = val[input]->value_[index].phi[0][7]; 
-      r   = val[input]->value_[index].phi[0][8]; 
+      phi = val[input]->value_[index].phi[0][0];
+      Pi  = val[input]->value_[index].phi[0][1];
+      chi = val[input]->value_[index].phi[0][2];
+      a   = val[input]->value_[index].phi[0][3];
+      f   = val[input]->value_[index].phi[0][4];
+      g   = val[input]->value_[index].phi[0][5];
+      b   = val[input]->value_[index].phi[0][6];
+      q   = val[input]->value_[index].phi[0][7];
+      r   = val[input]->value_[index].phi[0][8];
       VV  = 0.25*par.lambda*pow(phi*phi-par.v*par.v,2);
       dphiVV = par.lambda*phi*(phi*phi-par.v*par.v);
 
@@ -683,15 +683,15 @@ int rkupdate2b(std::vector<access_memory_block<stencil_data> > &val,
       nodedata& rnd = work[i+1];
       nodedata& nd2 = work2[i];
 
-      phi = nd.phi[1][0]; 
-      Pi  = nd.phi[1][1]; 
-      chi = nd.phi[1][2]; 
-      a   = nd.phi[1][3]; 
-      f   = nd.phi[1][4]; 
-      g   = nd.phi[1][5]; 
-      b   = nd.phi[1][6]; 
-      q   = nd.phi[1][7]; 
-      r   = nd.phi[1][8]; 
+      phi = nd.phi[1][0];
+      Pi  = nd.phi[1][1];
+      chi = nd.phi[1][2];
+      a   = nd.phi[1][3];
+      f   = nd.phi[1][4];
+      g   = nd.phi[1][5];
+      b   = nd.phi[1][6];
+      q   = nd.phi[1][7];
+      r   = nd.phi[1][8];
       VV  = 0.25*par.lambda*pow(phi*phi-par.v*par.v,2);
       dphiVV = par.lambda*phi*(phi*phi-par.v*par.v);
 
@@ -709,7 +709,7 @@ int rkupdate2b(std::vector<access_memory_block<stencil_data> > &val,
       calcrhs(rhs,phi,Pi,chi,a,f,g,b,q,r,VV,dphiVV,dzphi,dzPi,dzchi,dza,dzf,dzg,dzb,dzq,dzr);
 
       for (int ll=0;ll<num_eqns;ll++) {
-        nd2.phi[1][ll] = c_0_75*nd.phi[0][ll] + c_0_25*nd.phi[1][ll] 
+        nd2.phi[1][ll] = c_0_75*nd.phi[0][ll] + c_0_25*nd.phi[1][ll]
                                               + c_0_25*rhs.phi[0][ll]*dt;
       }
     }
@@ -723,15 +723,15 @@ int rkupdate2b(std::vector<access_memory_block<stencil_data> > &val,
       nodedata& lnd2 = work2[i-1];
       nodedata& rnd2 = work2[i+1];
 
-      phi = nd2.phi[1][0]; 
-      Pi  = nd2.phi[1][1]; 
-      chi = nd2.phi[1][2]; 
-      a   = nd2.phi[1][3]; 
-      f   = nd2.phi[1][4]; 
-      g   = nd2.phi[1][5]; 
-      b   = nd2.phi[1][6]; 
-      q   = nd2.phi[1][7]; 
-      r   = nd2.phi[1][8]; 
+      phi = nd2.phi[1][0];
+      Pi  = nd2.phi[1][1];
+      chi = nd2.phi[1][2];
+      a   = nd2.phi[1][3];
+      f   = nd2.phi[1][4];
+      g   = nd2.phi[1][5];
+      b   = nd2.phi[1][6];
+      q   = nd2.phi[1][7];
+      r   = nd2.phi[1][8];
       VV  = 0.25*par.lambda*pow(phi*phi-par.v*par.v,2);
       dphiVV = par.lambda*phi*(phi*phi-par.v*par.v);
 
@@ -747,10 +747,10 @@ int rkupdate2b(std::vector<access_memory_block<stencil_data> > &val,
       // }}}
 
       calcrhs(rhs,phi,Pi,chi,a,f,g,b,q,r,VV,dphiVV,dzphi,dzPi,dzchi,dza,dzf,dzg,dzb,dzq,dzr);
-      
+
       for (int ll=0;ll<num_eqns;ll++) {
-        val[2]->value_[i-2*num_neighbors].phi[0][ll] = 
-                         c_1_3*nd.phi[0][ll]   
+        val[2]->value_[i-2*num_neighbors].phi[0][ll] =
+                         c_1_3*nd.phi[0][ll]
                        + c_2_3*(nd2.phi[1][ll] + rhs.phi[0][ll]*dt);
       }
     }
@@ -774,7 +774,7 @@ int rkupdate2b(std::vector<access_memory_block<stencil_data> > &val,
           xcoord[i] = val[2]->value_[i].x;
           value[i] = val[2]->value_[i].phi[0][j];
         }
-        gft_out_full(fname,datatime,shape,cnames,1,&*xcoord.begin(),&*value.begin()); 
+        gft_out_full(fname,datatime,shape,cnames,1,&*xcoord.begin(),&*value.begin());
       }
     }
 #endif
@@ -784,7 +784,7 @@ int rkupdate2b(std::vector<access_memory_block<stencil_data> > &val,
 // }}}
 
 // rkupdate1 {{{
-int rkupdate1(std::vector<access_memory_block<stencil_data> > &val, 
+int rkupdate1(std::vector<access_memory_block<stencil_data> > &val,
              double t, detail::parameter const& par)
 {
     nodedata rhs;
@@ -820,15 +820,15 @@ int rkupdate1(std::vector<access_memory_block<stencil_data> > &val,
       input = 0; linput = 0; rinput = 0;
       index = i; lindex = i-1; rindex = i+1;
 
-      phi = val[input]->value_[index].phi[0][0]; 
-      Pi  = val[input]->value_[index].phi[0][1]; 
-      chi = val[input]->value_[index].phi[0][2]; 
-      a   = val[input]->value_[index].phi[0][3]; 
-      f   = val[input]->value_[index].phi[0][4]; 
-      g   = val[input]->value_[index].phi[0][5]; 
-      b   = val[input]->value_[index].phi[0][6]; 
-      q   = val[input]->value_[index].phi[0][7]; 
-      r   = val[input]->value_[index].phi[0][8]; 
+      phi = val[input]->value_[index].phi[0][0];
+      Pi  = val[input]->value_[index].phi[0][1];
+      chi = val[input]->value_[index].phi[0][2];
+      a   = val[input]->value_[index].phi[0][3];
+      f   = val[input]->value_[index].phi[0][4];
+      g   = val[input]->value_[index].phi[0][5];
+      b   = val[input]->value_[index].phi[0][6];
+      q   = val[input]->value_[index].phi[0][7];
+      r   = val[input]->value_[index].phi[0][8];
       VV  = 0.25*par.lambda*pow(phi*phi-par.v*par.v,2);
       dphiVV = par.lambda*phi*(phi*phi-par.v*par.v);
 
@@ -886,15 +886,15 @@ int rkupdate1(std::vector<access_memory_block<stencil_data> > &val,
       nodedata& rnd = work[i+1];
       nodedata& nd2 = work2[i];
 
-      phi = nd.phi[1][0]; 
-      Pi  = nd.phi[1][1]; 
-      chi = nd.phi[1][2]; 
-      a   = nd.phi[1][3]; 
-      f   = nd.phi[1][4]; 
-      g   = nd.phi[1][5]; 
-      b   = nd.phi[1][6]; 
-      q   = nd.phi[1][7]; 
-      r   = nd.phi[1][8]; 
+      phi = nd.phi[1][0];
+      Pi  = nd.phi[1][1];
+      chi = nd.phi[1][2];
+      a   = nd.phi[1][3];
+      f   = nd.phi[1][4];
+      g   = nd.phi[1][5];
+      b   = nd.phi[1][6];
+      q   = nd.phi[1][7];
+      r   = nd.phi[1][8];
       VV  = 0.25*par.lambda*pow(phi*phi-par.v*par.v,2);
       dphiVV = par.lambda*phi*(phi*phi-par.v*par.v);
 
@@ -912,7 +912,7 @@ int rkupdate1(std::vector<access_memory_block<stencil_data> > &val,
       calcrhs(rhs,phi,Pi,chi,a,f,g,b,q,r,VV,dphiVV,dzphi,dzPi,dzchi,dza,dzf,dzg,dzb,dzq,dzr);
 
       for (int ll=0;ll<num_eqns;ll++) {
-        nd2.phi[1][ll] = c_0_75*nd.phi[0][ll] + c_0_25*nd.phi[1][ll] 
+        nd2.phi[1][ll] = c_0_75*nd.phi[0][ll] + c_0_25*nd.phi[1][ll]
                                               + c_0_25*rhs.phi[0][ll]*dt;
       }
     }
@@ -926,15 +926,15 @@ int rkupdate1(std::vector<access_memory_block<stencil_data> > &val,
       nodedata& lnd2 = work2[i-1];
       nodedata& rnd2 = work2[i+1];
 
-      phi = nd2.phi[1][0]; 
-      Pi  = nd2.phi[1][1]; 
-      chi = nd2.phi[1][2]; 
-      a   = nd2.phi[1][3]; 
-      f   = nd2.phi[1][4]; 
-      g   = nd2.phi[1][5]; 
-      b   = nd2.phi[1][6]; 
-      q   = nd2.phi[1][7]; 
-      r   = nd2.phi[1][8]; 
+      phi = nd2.phi[1][0];
+      Pi  = nd2.phi[1][1];
+      chi = nd2.phi[1][2];
+      a   = nd2.phi[1][3];
+      f   = nd2.phi[1][4];
+      g   = nd2.phi[1][5];
+      b   = nd2.phi[1][6];
+      q   = nd2.phi[1][7];
+      r   = nd2.phi[1][8];
       VV  = 0.25*par.lambda*pow(phi*phi-par.v*par.v,2);
       dphiVV = par.lambda*phi*(phi*phi-par.v*par.v);
 
@@ -950,10 +950,10 @@ int rkupdate1(std::vector<access_memory_block<stencil_data> > &val,
       // }}}
 
       calcrhs(rhs,phi,Pi,chi,a,f,g,b,q,r,VV,dphiVV,dzphi,dzPi,dzchi,dza,dzf,dzg,dzb,dzq,dzr);
-      
+
       for (int ll=0;ll<num_eqns;ll++) {
-        val[1]->value_[i].phi[0][ll] = 
-                         c_1_3*nd.phi[0][ll]   
+        val[1]->value_[i].phi[0][ll] =
+                         c_1_3*nd.phi[0][ll]
                        + c_2_3*(nd2.phi[1][ll] + rhs.phi[0][ll]*dt);
       }
     }
@@ -977,7 +977,7 @@ int rkupdate1(std::vector<access_memory_block<stencil_data> > &val,
           xcoord[i] = val[1]->value_[i].x;
           value[i] = val[1]->value_[i].phi[0][j];
         }
-        gft_out_full(fname,datatime,shape,cnames,1,&*xcoord.begin(),&*value.begin()); 
+        gft_out_full(fname,datatime,shape,cnames,1,&*xcoord.begin(),&*value.begin());
       }
     }
 #endif

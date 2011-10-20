@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_THREADMANAGER_SCHEDULING_GLOBAL_QUEUE_JUN_18_2009_1116AM)
@@ -28,14 +28,14 @@
 namespace hpx { namespace threads { namespace policies
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// The global_queue_scheduler maintains exactly one global queue of work 
+    /// The global_queue_scheduler maintains exactly one global queue of work
     /// items (threads), where all OS threads pull their next work item from.
     class global_queue_scheduler
     {
     private:
         // The maximum number of active threads this thread manager should
         // create. This number will be a constraint only as long as the work
-        // items queue is not empty. Otherwise the number of active threads 
+        // items queue is not empty. Otherwise the number of active threads
         // will be incremented in steps equal to the \a min_add_new_count
         // specified above.
         enum { max_thread_count = 1000 };
@@ -79,16 +79,16 @@ namespace hpx { namespace threads { namespace policies
         }
 
         ///////////////////////////////////////////////////////////////////////
-        // create a new thread and schedule it if the initial state is equal to 
+        // create a new thread and schedule it if the initial state is equal to
         // pending
-        thread_id_type create_thread(thread_init_data& data, 
+        thread_id_type create_thread(thread_init_data& data,
             thread_state_enum initial_state, bool run_now, error_code& ec,
             std::size_t num_thread)
         {
             return queue_.create_thread(data, initial_state, run_now, num_thread, ec);
         }
 
-        /// Return the next thread to be executed, return false if non is 
+        /// Return the next thread to be executed, return false if non is
         /// available
         bool get_next_thread(std::size_t num_thread, bool running,
             std::size_t& idle_loop_count, threads::thread** thrd)
@@ -109,8 +109,8 @@ namespace hpx { namespace threads { namespace policies
             return queue_.destroy_thread(thrd);
         }
 
-        /// This is a function which gets called periodically by the thread 
-        /// manager to allow for maintenance tasks to be executed in the 
+        /// This is a function which gets called periodically by the thread
+        /// manager to allow for maintenance tasks to be executed in the
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
         bool wait_or_add_new(std::size_t num_thread, bool running,
@@ -129,15 +129,15 @@ namespace hpx { namespace threads { namespace policies
         }
 
         ///////////////////////////////////////////////////////////////////////
-        void on_start_thread(std::size_t num_thread) 
+        void on_start_thread(std::size_t num_thread)
         {
             queue_.on_start_thread(num_thread);
-        } 
+        }
         void on_stop_thread(std::size_t num_thread)
         {
             queue_.on_stop_thread(num_thread);
         }
-        void on_error(std::size_t num_thread, boost::exception_ptr const& e) 
+        void on_error(std::size_t num_thread, boost::exception_ptr const& e)
         {
             queue_.on_error(num_thread, e);
         }

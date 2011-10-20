@@ -13,7 +13,7 @@
  See http://www.torjo.com/log2/ for more details
 */
 
-/* 
+/*
     Tests ...
 */
 

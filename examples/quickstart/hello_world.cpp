@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2011 Hartmut Kaiser and Bryce Adelstein-Lelbach 
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Copyright (c) 2011 Hartmut Kaiser and Bryce Adelstein-Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -48,13 +48,13 @@ using hpx::flush;
 
 ///////////////////////////////////////////////////////////////////////////////
 // The purpose of this example is to execute a PX-thread printing "Hello world"
-// once on each OS-thread on each of the connected localities. 
-// 
+// once on each OS-thread on each of the connected localities.
+//
 // The function hello_world_foreman_action is executed once on each locality.
-// It schedules a PX-thread (encapsulating hello_world_worker) once for each 
-// OS-thread on that locality. The code make sure that the PX-thread gets 
+// It schedules a PX-thread (encapsulating hello_world_worker) once for each
+// OS-thread on that locality. The code make sure that the PX-thread gets
 // really executed by the requested OS-thread. While the PX-thread is scheduled
-// to run on a particular OS-thread, we may have to retry as the PX-thread may 
+// to run on a particular OS-thread, we may have to retry as the PX-thread may
 // end up being 'stolen' by another OS-thread.
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -66,7 +66,7 @@ std::size_t hello_world_worker(std::size_t desired)
     {
         // Yes! The PX-thread is run by the designated OS-thread.
         cout << ( format("hello world from OS-thread %1% on locality %2%\n")
-                  % desired 
+                  % desired
                   % get_prefix_id())
             << flush;
         return desired;
@@ -99,9 +99,9 @@ void hello_world_foreman()
         std::vector<promise<std::size_t> > futures;
         BOOST_FOREACH(std::size_t os_thread, attendance)
         {
-            // Schedule a PX-thread encapsulating the print action on a 
+            // Schedule a PX-thread encapsulating the print action on a
             // particular OS-thread.
-            futures.push_back(async<hello_world_worker_action>(prefix, os_thread)); 
+            futures.push_back(async<hello_world_worker_action>(prefix, os_thread));
         }
 
         // wait for all of the futures to return their values, we re-spawn the
@@ -124,8 +124,8 @@ int hpx_main(variables_map&)
 
         std::vector<promise<void> > futures;
         BOOST_FOREACH(id_type const& node, prefixes)
-        { 
-            futures.push_back(async<hello_world_foreman_action>(node)); 
+        {
+            futures.push_back(async<hello_world_foreman_action>(node));
         }
 
         wait(futures);    // Wait for all IO to finish

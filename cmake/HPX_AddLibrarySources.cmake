@@ -1,7 +1,7 @@
 # Copyright (c) 2007-2011 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Lelbach
 #
-# Distributed under the Boost Software License, Version 1.0. (See accompanying 
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(HPX_ADDLIBRARYSOURCES_LOADED TRUE)
@@ -11,15 +11,15 @@ hpx_include(Message
 
 macro(add_hpx_library_sources name globtype)
   hpx_parse_arguments(SOURCES "EXCLUDE;GLOBS" "" ${ARGN})
-  
-  file(${globtype} sources ${SOURCES_GLOBS}) 
+
+  file(${globtype} sources ${SOURCES_GLOBS})
 
   foreach(source ${sources})
     get_filename_component(absolute_path ${source} ABSOLUTE)
 
     set(add_flag ON)
 
-    if(SOURCES_EXCLUDE) 
+    if(SOURCES_EXCLUDE)
       if(${absolute_path} MATCHES ${SOURCES_EXCLUDE})
         set(add_flag OFF)
       endif()

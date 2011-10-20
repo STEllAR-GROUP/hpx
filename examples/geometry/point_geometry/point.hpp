@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2007-2011 Matthew Anderson
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_COMPONENTS_CLIENT_POINT)
@@ -18,19 +18,19 @@
 typedef boost::geometry::model::d2::point_xy<double> point_type;
 typedef boost::geometry::model::polygon<point_type> polygon_type;
 
-namespace hpx { namespace geometry 
+namespace hpx { namespace geometry
 {
     ///////////////////////////////////////////////////////////////////////////
     /// The \a stubs#point class is the client side representation of all
     /// \a server#point components
-    class point 
+    class point
         : public components::client_base<point, stubs::point>
     {
-        typedef components::client_base<point, stubs::point> 
+        typedef components::client_base<point, stubs::point>
             base_type;
 
     public:
-        /// Default construct an empty client side representation (not 
+        /// Default construct an empty client side representation (not
         /// connected to any existing component)
         point()
         {}
@@ -45,7 +45,7 @@ namespace hpx { namespace geometry
 
         /// Create a client side representation for the existing
         /// \a server#point instance with the given global id \a gid.
-        point(naming::id_type gid) 
+        point(naming::id_type gid)
           : base_type(gid)
         {}
 
@@ -57,7 +57,7 @@ namespace hpx { namespace geometry
                                             double ymin, double ymax,
                                             double velx, double vely,
                                             std::size_t numpoints,
-                                            std::size_t objectid) 
+                                            std::size_t objectid)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::init_async(gid_, xmin,xmax,ymin,ymax,velx,vely,numpoints,objectid);
@@ -66,32 +66,32 @@ namespace hpx { namespace geometry
         void init(double xmin, double xmax,
                   double ymin, double ymax,
                   double velx, double vely,
-                  std::size_t numpoints,std::size_t objectid) 
+                  std::size_t numpoints,std::size_t objectid)
         {
             BOOST_ASSERT(gid_);
             this->base_type::init_async(gid_,xmin,xmax,ymin,ymax,velx,vely,numpoints,objectid);
         }
 
         /// Initialize the server#point instance with the given \a gid
-        lcos::promise<int> search_async(std::vector<hpx::naming::id_type> const& search_objects) 
+        lcos::promise<int> search_async(std::vector<hpx::naming::id_type> const& search_objects)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::search_async(gid_, search_objects);
         }
 
-        lcos::promise<void> recompute_async(std::vector<hpx::naming::id_type> const& search_objects) 
+        lcos::promise<void> recompute_async(std::vector<hpx::naming::id_type> const& search_objects)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::recompute_async(gid_, search_objects);
         }
 
-        int search(std::vector<hpx::naming::id_type> const& search_objects) 
+        int search(std::vector<hpx::naming::id_type> const& search_objects)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::search(gid_, search_objects);
         }
 
-        void recompute(std::vector<hpx::naming::id_type> const& search_objects) 
+        void recompute(std::vector<hpx::naming::id_type> const& search_objects)
         {
             BOOST_ASSERT(gid_);
             this->base_type::recompute(gid_, search_objects);
@@ -109,46 +109,46 @@ namespace hpx { namespace geometry
             return this->base_type::get_poly(gid_);
         }
 
-        lcos::promise<void> move_async(double dt,double time) 
+        lcos::promise<void> move_async(double dt,double time)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::move_async(gid_,dt,time);
         }
 
-        lcos::promise<void> adjust_async(double dt) 
+        lcos::promise<void> adjust_async(double dt)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::adjust_async(gid_,dt);
         }
 
         lcos::promise<void> enforce_async(std::vector<hpx::naming::id_type> const& master_gids,double dt,
-                                               std::size_t n,std::size_t N) 
+                                               std::size_t n,std::size_t N)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::enforce_async(gid_,master_gids,dt,n,N);
         }
 
-        void move(double dt,double time) 
+        void move(double dt,double time)
         {
             BOOST_ASSERT(gid_);
             this->base_type::move(gid_,dt,time);
         }
 
-        void adjust(double dt) 
+        void adjust(double dt)
         {
             BOOST_ASSERT(gid_);
             this->base_type::adjust(gid_,dt);
         }
 
         void enforce(std::vector<hpx::naming::id_type> const& master_gids,double dt,
-                     std::size_t n,std::size_t N) 
+                     std::size_t n,std::size_t N)
         {
             BOOST_ASSERT(gid_);
             this->base_type::enforce(gid_,master_gids,dt,n,N);
         }
 
-        /// Query the current coordinate values of the server#point 
-        /// instance with the given \a gid. 
+        /// Query the current coordinate values of the server#point
+        /// instance with the given \a gid.
         lcos::promise<double> get_X_async() const
         {
             BOOST_ASSERT(gid_);
@@ -171,25 +171,25 @@ namespace hpx { namespace geometry
             return this->base_type::get_Y(gid_);
         }
 
-        /// Modify the current coordinate values of the server#point 
-        /// instance with the given \a gid. 
-        lcos::promise<void> set_X_async(double x) 
+        /// Modify the current coordinate values of the server#point
+        /// instance with the given \a gid.
+        lcos::promise<void> set_X_async(double x)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::set_X_async(gid_, x);
         }
-        lcos::promise<void> set_Y_async(double y) 
+        lcos::promise<void> set_Y_async(double y)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::set_Y_async(gid_, y);
         }
 
-        void set_X(double x) 
+        void set_X(double x)
         {
             BOOST_ASSERT(gid_);
             this->base_type::set_X(gid_, x);
         }
-        void set_Y(double y) 
+        void set_Y(double y)
         {
             BOOST_ASSERT(gid_);
             this->base_type::set_Y(gid_, y);
@@ -197,10 +197,10 @@ namespace hpx { namespace geometry
     };
 }}
 
-// Adapt this point type to Boost.Geometry. This allows to use this type 
+// Adapt this point type to Boost.Geometry. This allows to use this type
 // wherever Boost.Geometry is expecting a point type.
 BOOST_GEOMETRY_REGISTER_POINT_2D_GET_SET(
-    hpx::geometry::point, double, boost::geometry::cs::cartesian, 
+    hpx::geometry::point, double, boost::geometry::cs::cartesian,
     get_X, get_Y, set_X, set_Y)
 
 #endif

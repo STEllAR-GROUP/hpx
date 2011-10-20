@@ -40,14 +40,14 @@ namespace boost { namespace logging {
         template<class type> type& as_non_const(const type & t) { return const_cast<type&>(t); }
 
         template<class gather_msg> struct find_gather_if_default {
-            typedef typename use_default<gather_msg, 
+            typedef typename use_default<gather_msg,
                     gather::ostream_like::return_str< std::basic_string<char_type>, std::basic_ostringstream<char_type> > > ::type gather_type;
             typedef typename gather_type::msg_type msg_type;
         };
 
-        /** 
-            @brief default implementation of keeping cache 
-            
+        /**
+            @brief default implementation of keeping cache
+
             (note : you can override the cache() functions, to implement your own cache keeping strategy)
         */
         template<class cache_type> struct default_cache_keeper {
@@ -58,7 +58,7 @@ namespace boost { namespace logging {
                 m_is_cache_turned_off = true;
             }
 
-            /** 
+            /**
                 I've implemented this as a fast "is turned off" question.
 
                 that is, I want to avoid calling cache().is_cache_turned_off(), since calling cache() involves a virtual call
@@ -75,7 +75,7 @@ namespace boost { namespace logging {
                     return false;
             }
 
-            /** note: this call does not need to be very efficient, since the cache is used seldom, 
+            /** note: this call does not need to be very efficient, since the cache is used seldom,
                       only at the beginning of the app, when the logging hasn't yet been initialized
                       thus, we can afford to make it virtual, and the code will become easier
             */
@@ -94,7 +94,7 @@ namespace boost { namespace logging {
             typedef typename detail::find_gather_if_default<gather_msg>::gather_type gather_type;
             typedef logger<gather_msg, default_> common_base_type;
 
-            /** 
+            /**
                 ... returns a base object - one that can be used to log messages, without having to know the full type of the log.
                     Thus, it can also be passed between a library and the application that uses it, and vice-versa.
             */
@@ -117,11 +117,11 @@ namespace boost { namespace logging {
     }
 
 
-    /** @brief logger base class. 
+    /** @brief logger base class.
 
     @class logger_base
     */
-    template<class gather_msg , class write_msg, class dummy = override > struct logger_base 
+    template<class gather_msg , class write_msg, class dummy = override > struct logger_base
             : detail::default_cache_keeper<  detail::cache_before_init<typename detail::find_gather_if_default<gather_msg>::msg_type > >,
               detail::common_base_holder<gather_msg, write_msg> {
         typedef detail::cache_before_init<typename detail::find_gather_if_default<gather_msg>::msg_type > cache_type;

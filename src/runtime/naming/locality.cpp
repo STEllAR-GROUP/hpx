@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -32,7 +32,7 @@ namespace hpx { namespace naming
         // try to directly create an endpoint from the address
         try {
             tcp::endpoint ep;
-            if (util::get_endpoint(address_, port_, ep)) 
+            if (util::get_endpoint(address_, port_, ep))
             {
                 return iterator_type(tcp::resolver::iterator::create(
                     ep, address_, boost::lexical_cast<std::string>(port_)));
@@ -46,7 +46,7 @@ namespace hpx { namespace naming
         try {
             // resolve the given address
             tcp::resolver resolver(io_service);
-            tcp::resolver::query query(address_, 
+            tcp::resolver::query query(address_,
                 boost::lexical_cast<std::string>(port_));
 
             return iterator_type(resolver.resolve(query));
@@ -61,7 +61,7 @@ namespace hpx { namespace naming
         try {
             // resolve the given address
             tcp::resolver resolver(io_service);
-            tcp::resolver::query query(boost::asio::ip::host_name(), 
+            tcp::resolver::query query(boost::asio::ip::host_name(),
                 boost::lexical_cast<std::string>(port_));
 
             return iterator_type(detail::is_valid_endpoint(address_),
@@ -73,7 +73,7 @@ namespace hpx { namespace naming
 
         // report errors
         hpx::util::osstream strm;
-        strm << errors.get_message() << " (while trying to resolve: " 
+        strm << errors.get_message() << " (while trying to resolve: "
              << address_ << ":" << port_ << ")";
         throw hpx::exception(network_error, hpx::util::osstream_get_string(strm));
         return locality::iterator_type();
@@ -90,7 +90,7 @@ namespace hpx { namespace naming
         // try to directly create an endpoint from the address
         try {
             tcp::endpoint ep;
-            if (util::get_endpoint(address_, port_, ep)) 
+            if (util::get_endpoint(address_, port_, ep))
             {
                 return iterator_type(tcp::resolver::iterator::create(
                     ep, address_, boost::lexical_cast<std::string>(port_)));
@@ -105,7 +105,7 @@ namespace hpx { namespace naming
             // resolve the given address
             tcp::resolver resolver(io_service);
             tcp::resolver::query query(
-                !address_.empty() ? address_ : boost::asio::ip::host_name(), 
+                !address_.empty() ? address_ : boost::asio::ip::host_name(),
                 boost::lexical_cast<std::string>(port_));
 
             return iterator_type(resolver.resolve(query));

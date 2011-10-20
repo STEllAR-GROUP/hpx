@@ -51,7 +51,7 @@ std::string copyright()
         "(parts of) the ParalleX execution model.\n\n"
         "Copyright (C) 1998-2011 Hartmut Kaiser, Bryce Lelbach and others\n"
         "The STE||AR Group, http://stellar.cct.lsu.edu\n\n"
-        "Distributed under the Boost Software License, Version 1.0. (See accompanying\n" 
+        "Distributed under the Boost Software License, Version 1.0. (See accompanying\n"
         "file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n";
 
     return copyright;
@@ -59,17 +59,17 @@ std::string copyright()
 
 std::string build_string()
 {
-    return boost::str(boost::format("V%d.%d.%d%s (AGAS: V%d.%d), SVN: %s") % 
-        HPX_VERSION_MAJOR % HPX_VERSION_MINOR % 
-        HPX_VERSION_SUBMINOR % HPX_VERSION_TAG % 
+    return boost::str(boost::format("V%d.%d.%d%s (AGAS: V%d.%d), SVN: %s") %
+        HPX_VERSION_MAJOR % HPX_VERSION_MINOR %
+        HPX_VERSION_SUBMINOR % HPX_VERSION_TAG %
         (HPX_AGAS_VERSION / 0x10) % (HPX_AGAS_VERSION % 0x10) %
         HPX_SVN_REVISION);
 }
 
 std::string boost_version()
 {
-    return boost::str(boost::format("V%d.%d.%d") % 
-        (BOOST_VERSION / 100000) % (BOOST_VERSION / 100 % 1000) % 
+    return boost::str(boost::format("V%d.%d.%d") %
+        (BOOST_VERSION / 100000) % (BOOST_VERSION / 100 % 1000) %
         (BOOST_VERSION % 100));
 }
 
@@ -82,7 +82,7 @@ std::string complete_version()
         "\n"
         "Build:\n"
         "  Type: %s\n"
-        "  Date: %s %s\n" 
+        "  Date: %s %s\n"
         "  Platform: %s\n"
         "  Compiler: %s\n"
         "  Standard Library: %s\n");

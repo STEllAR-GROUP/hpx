@@ -1,6 +1,6 @@
-//  Copyright (c) 2011 Bryce Lelbach 
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Copyright (c) 2011 Bryce Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_RUNTIME_APPLIER_BIND_NAMING_WRAPPERS_MAY_26_20111234PM)
@@ -19,9 +19,9 @@ namespace hpx { namespace applier
     HPX_EXPORT void unbind_gid (naming::gid_type const&,
         error_code& ec = throws);
 
-    HPX_EXPORT bool bind_range(naming::gid_type const&, std::size_t, 
+    HPX_EXPORT bool bind_range(naming::gid_type const&, std::size_t,
         naming::address const&, std::size_t, error_code& ec = throws);
-    HPX_EXPORT void unbind_range(naming::gid_type const&, std::size_t, 
+    HPX_EXPORT void unbind_range(naming::gid_type const&, std::size_t,
         error_code& ec = throws);
 }}
 

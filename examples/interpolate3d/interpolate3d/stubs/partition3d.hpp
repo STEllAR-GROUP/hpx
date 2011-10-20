@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_PARTITION3D_AUG_06_2011_1017PM)
@@ -15,12 +15,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace interpolate3d { namespace stubs
 {
-    struct partition3d 
+    struct partition3d
       : hpx::components::stubs::stub_base<interpolate3d::server::partition3d>
     {
         ///////////////////////////////////////////////////////////////////////
         static hpx::lcos::promise<void>
-        init_async(hpx::naming::id_type const& gid, std::string const& datafilename, 
+        init_async(hpx::naming::id_type const& gid, std::string const& datafilename,
             dimension const& dimx, dimension const& dimy, dimension const& dimz)
         {
             // Create an eager_future, execute the required action,
@@ -31,8 +31,8 @@ namespace interpolate3d { namespace stubs
                 gid, datafilename, dimx, dimy, dimz);
         }
 
-        static void init(hpx::naming::id_type const& gid, 
-            std::string const& datafilename, dimension const& dimx, 
+        static void init(hpx::naming::id_type const& gid,
+            std::string const& datafilename, dimension const& dimx,
             dimension const& dimy, dimension const& dimz)
         {
             init_async(gid, datafilename, dimx, dimy, dimz).get();
@@ -40,7 +40,7 @@ namespace interpolate3d { namespace stubs
 
         ///////////////////////////////////////////////////////////////////////
         static hpx::lcos::promise<double>
-        interpolate_async(hpx::naming::id_type const& gid, 
+        interpolate_async(hpx::naming::id_type const& gid,
             double value_x, double value_y, double value_z)
         {
             // Create an eager_future, execute the required action,
@@ -50,7 +50,7 @@ namespace interpolate3d { namespace stubs
             return hpx::lcos::eager_future<action_type>(gid, value_x, value_y, value_z);
         }
 
-        static double interpolate(hpx::naming::id_type const& gid, 
+        static double interpolate(hpx::naming::id_type const& gid,
             double value_x, double value_y, double value_z)
         {
             return interpolate_async(gid, value_x, value_y, value_z).get();

@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  
+//
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -65,7 +65,7 @@ namespace boost { namespace serialization {
         typedef mpl::int_<track_never> type;
         BOOST_STATIC_CONSTANT(int, value = track_never);
     };
-    
+
     template <typename Sig, typename IArchive, typename OArchive>
     struct version<hpx::util::HPX_FUNCTION_NAME<Sig, IArchive, OArchive> >
     {
@@ -94,7 +94,7 @@ namespace boost { namespace serialization {
 #define N BOOST_PP_ITERATION()
 
 namespace hpx { namespace util {
-    
+
     template <
         typename R
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
@@ -111,7 +111,7 @@ namespace hpx { namespace util {
             : vptr(0)
             , object(0)
         {}
-        
+
         ~HPX_FUNCTION_NAME()
         {
             if(object)
@@ -119,14 +119,14 @@ namespace hpx { namespace util {
                 vptr->static_delete(&object);
             }
         }
-        
+
         typedef
             detail::vtable_ptr_base<
                 R(BOOST_PP_ENUM_PARAMS(N, A))
               , IArchive
               , OArchive
             > vtable_ptr_type;
-        
+
         template <typename Functor>
             HPX_FUNCTION_NAME(Functor f)
             : vptr(
@@ -147,14 +147,14 @@ namespace hpx { namespace util {
                 object = new Functor(f);
             }
         }
-        
+
         HPX_FUNCTION_NAME(HPX_FUNCTION_NAME const& other)
             : vptr(0)
             , object(0)
         {
             assign(other);
         }
-        
+
         HPX_FUNCTION_NAME &assign(HPX_FUNCTION_NAME const & other)
         {
             if(&other != this)
@@ -175,7 +175,7 @@ namespace hpx { namespace util {
             }
             return *this;
         }
-        
+
         template <typename Functor>
         HPX_FUNCTION_NAME & assign(Functor const & f)
         {
@@ -185,7 +185,7 @@ namespace hpx { namespace util {
                     IArchive
                   , OArchive
                 >();
-            
+
             if(vptr == f_vptr && !empty())
             {
                 vptr->destruct(&object);
@@ -217,25 +217,25 @@ namespace hpx { namespace util {
             }
             return *this;
         }
-        
+
         template <typename T>
         HPX_FUNCTION_NAME & operator=(T const & t)
         {
             return assign(t);
         }
-        
+
         HPX_FUNCTION_NAME &swap(HPX_FUNCTION_NAME& f)
         {
             std::swap(vptr, f.vptr);
             std::swap(object, f.object);
             return *this;
         }
-        
+
         bool empty() const
         {
             return (vptr == 0) && (object == 0);
         }
-        
+
         void reset()
         {
             if (!empty())
@@ -245,13 +245,13 @@ namespace hpx { namespace util {
                 object = 0;
             }
         }
-        
+
         R operator()(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a));
         }
-        
+
         void serialize(IArchive &ar, const unsigned version)
         {
             bool is_empty;
@@ -270,7 +270,7 @@ namespace hpx { namespace util {
                 vptr->iserialize(&object, ar, version);
             }
         }
-        
+
         void serialize(OArchive &ar, const unsigned version)
         {
             bool is_empty = empty();
@@ -281,7 +281,7 @@ namespace hpx { namespace util {
                 vptr->oserialize(&object, ar, version);
             }
         }
-        
+
         vtable_ptr_type *vptr;
         void *object;
     };

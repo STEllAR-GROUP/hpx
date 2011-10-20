@@ -33,14 +33,14 @@ BOOST_LOG_FORMAT_MSG( log_string )
 // Step 3 : Specify your logging class(es)
 using namespace boost::logging::scenario::usage;
 typedef use<
-        filter_::change::single_thread, 
-        filter_::level::use_levels, 
-        logger_::change::single_thread, 
+        filter_::change::single_thread,
+        filter_::level::use_levels,
+        logger_::change::single_thread,
         logger_::favor::correctness> finder;
 
 // Step 4: declare which filters and loggers you'll use
-BOOST_DECLARE_LOG_FILTER(g_l_filter, finder::filter ) 
-BOOST_DECLARE_LOG(g_l, finder::logger) 
+BOOST_DECLARE_LOG_FILTER(g_l_filter, finder::filter )
+BOOST_DECLARE_LOG(g_l, finder::logger)
 
 // Step 5: define the macros through which you'll log
 #define LDBG_ BOOST_LOG_USE_LOG_IF_LEVEL(g_l(), g_l_filter(), debug ) .set_tag( BOOST_LOG_TAG_FILELINE)

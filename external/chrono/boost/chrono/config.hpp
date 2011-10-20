@@ -7,7 +7,7 @@
 
 //  See http://www.boost.org/libs/chrono for documentation.
 
-#ifndef BOOST_CHRONO_CONFIG_HPP                  
+#ifndef BOOST_CHRONO_CONFIG_HPP
 #define BOOST_CHRONO_CONFIG_HPP
 
 #include <boost/config.hpp>
@@ -35,7 +35,7 @@
 #   elif defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__)
 #     define BOOST_CHRONO_MAC_API
 #   else
-#     define BOOST_CHRONO_POSIX_API 
+#     define BOOST_CHRONO_POSIX_API
 #   endif
 # endif
 
@@ -65,7 +65,7 @@
 #define BOOST_CHRONO_DECL
 #endif
 
-//  enable automatic library variant selection  ------------------------------// 
+//  enable automatic library variant selection  ------------------------------//
 
 #if !defined(BOOST_CHRONO_SOURCE) && !defined(BOOST_ALL_NO_LIB) && !defined(BOOST_CHRONO_NO_LIB)
 //

@@ -36,7 +36,7 @@
 
 namespace boost { namespace logging {
 
-/** 
+/**
 @file boost/logging/format.hpp
 
 Include this file when you're using @ref manipulator "formatters and destinations",
@@ -49,24 +49,24 @@ and you want to define the logger classes, in a source file
     // Format and write
     //
 
-    /** 
-        @brief The @c %format_and_write classes know how to call the formatter and destination @c objects. 
-    
-        Usually you'll be happy with the 
+    /**
+        @brief The @c %format_and_write classes know how to call the formatter and destination @c objects.
+
+        Usually you'll be happy with the
         format_and_write::simple class - which simply calls @c operator() on the formatters , and @c operator() on the destinations.
 
         Note that usually the formatter and destination class just have an @c operator(), which when called, formats the message
-        or writes it to a destination. In case your formatters/destinations are more complex than that (for instance, more than 
+        or writes it to a destination. In case your formatters/destinations are more complex than that (for instance, more than
         a member function needs to be called), you'll have to implement your own %format_and_write class.
     */
     namespace format_and_write {
 
-    /** 
+    /**
         @brief This uses a cache, when calling formatters/destinations - for writing a given message
 
         When a formatter is called, it caches its info. If it's called again, reuses that.
     */
-    template<class formatter_base, class destination_base, class msg_type> 
+    template<class formatter_base, class destination_base, class msg_type>
     struct use_cache {
         use_cache( msg_type & msg) : m_msg(msg) {}
 
@@ -95,7 +95,7 @@ and you want to define the logger classes, in a source file
     };
 
 
-    /** 
+    /**
         @brief Formats the message, and writes it to destinations - calls @c operator() on the formatters , and @c operator() on the destinations. Ignores @c clear_format() commands.
 
         @param msg_type The message to pass to the formatter. This is the type that is passed to the formatter objects and to the destination objects.
@@ -126,7 +126,7 @@ and you want to define the logger classes, in a source file
 
         @endcode
     */
-    template<class msg_type> 
+    template<class msg_type>
     struct simple {
         simple ( msg_type & msg) : m_msg(msg) {}
 
@@ -142,9 +142,9 @@ and you want to define the logger classes, in a source file
     };
 
 
-    /** 
-        @brief Formats the message, and writes it to destinations - calls @c operator() on the formatters , and @c operator() on the destinations. 
-        
+    /**
+        @brief Formats the message, and writes it to destinations - calls @c operator() on the formatters , and @c operator() on the destinations.
+
         Cares for the @c clear_format() commands.
 
         @param msg_type The message to pass to the formatter. This is the type that is passed to the formatter objects and to the destination objects.
@@ -178,7 +178,7 @@ and you want to define the logger classes, in a source file
         @endcode
 
     */
-    template<class msg_type, class string_type = hold_string_type> 
+    template<class msg_type, class string_type = hold_string_type>
     struct simple_care_for_clear_format : simple<msg_type> {
         typedef simple<msg_type> simple_base_type;
 
@@ -199,20 +199,20 @@ and you want to define the logger classes, in a source file
     // Message routing
     //
 
-    /** 
+    /**
     @brief Specifies the route : how formatting and writing to destinations take place.
 
-    Classes in this namespace specify when formatters and destinations are to be called. 
+    Classes in this namespace specify when formatters and destinations are to be called.
 
     @sa msg_route::simple, msg_route::with_route
 
     */
     namespace msg_route {
 
-    /** 
+    /**
         @brief Recomended base class for message routers that need access to the underlying formatter and/or destination array.
     */
-    template<class formatter_array, class destination_array> 
+    template<class formatter_array, class destination_array>
     struct formatter_and_destination_array_holder {
     protected:
         formatter_and_destination_array_holder (const formatter_array & formats_,
@@ -227,16 +227,16 @@ and you want to define the logger classes, in a source file
         const destination_array & m_destinations;
     };
 
-/** 
+/**
 @brief Represents a simple router - first calls all formatters - in the order they were added, then all destinations - in the order they were added
 
 Example:
 
 @code
 typedef logger< gather::ostream_like::return_str<> , format_write<...> > logger_type;
-BOOST_DEFINE_LOG_FILTER(g_log_filter, filter::no_ts ) 
+BOOST_DEFINE_LOG_FILTER(g_log_filter, filter::no_ts )
 BOOST_DEFINE_LOG(g_l, logger_type)
-#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() ) 
+#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() )
 
 // add formatters : [idx] [time] message [enter]
 g_l()->writer().add_formatter( write_idx() );
@@ -253,7 +253,7 @@ L_ << "testing " << i << i+1 << i+2;
 @endcode
 
 In the above case:
-- First, the formatters are called: @c write_idx() is called, then @c write_time(), then @c append_newline(). 
+- First, the formatters are called: @c write_idx() is called, then @c write_time(), then @c append_newline().
 - Then, the destinations are called: @c write_to_cout(), and then @c write_to_file().
 
 
@@ -266,9 +266,9 @@ In the above case:
 
     */
     template<
-            class formatter_base, 
+            class formatter_base,
             class destination_base,
-            class lock_resource = default_ > 
+            class lock_resource = default_ >
     struct simple {
         typedef typename formatter_base::ptr_type formatter_ptr;
         typedef typename destination_base::ptr_type destination_ptr;
@@ -286,7 +286,7 @@ In the above case:
         typedef typename lock_resource_type::template finder<write_info>::type data;
 
         template<class formatter_array, class destination_array> simple(const formatter_array&, const destination_array&) {}
-        
+
         void append_formatter(formatter_ptr fmt) {
             typename data::write to_write(m_to_write);
             to_write->formats.push_back(fmt);
@@ -325,7 +325,7 @@ In the above case:
     };
 
 
-    /** 
+    /**
     @brief. Represents a router - by default, first calls all formatters, then all destinations. However you can overwrite this route
 
     You can append a route - with append_route(), or set the route with set_route().
@@ -333,13 +333,13 @@ In the above case:
     Example:
 
     @code
-    typedef logger< default_, 
+    typedef logger< default_,
         writer::format_write< format_base, destination_base, format_and_write::simple<cache_string>,
             msg_route::with_route<format_base,destination_base> > > logger_type;
     logger_type g_l();
 
     g_l()->writer().router().set_route()
-        .fmt( formatter::time() ) 
+        .fmt( formatter::time() )
         .fmt( formatter::append_newline() )
         .dest( destination::dbg_window() )
         .fmt( formatter::write_idx() )
@@ -358,13 +358,13 @@ In the above case:
     @remarks In the router - we don't own the objects - the array holder does that
     */
     template<
-            class formatter_base, 
+            class formatter_base,
             class destination_base,
             class lock_resource = default_ ,
             // note: we're counting on these defaults in format_find_writer
             class formatter_array = boost::logging::array::shared_ptr_holder<formatter_base>,
             class destination_array = boost::logging::array::shared_ptr_holder<destination_base>
-    > 
+    >
     class with_route  : protected formatter_and_destination_array_holder<formatter_array, destination_array> {
         typedef typename formatter_base::ptr_type formatter_ptr;
         typedef typename destination_base::ptr_type destination_ptr;
@@ -394,7 +394,7 @@ In the above case:
 
         class route;
         friend class route;
-        /** 
+        /**
             represents a formatter/destination route to be added/set.
         */
         class route {
@@ -404,13 +404,13 @@ In the above case:
             };
             struct item {
                 item() : m_fmt(0), m_dest(0), m_type(is_clear) {}
-                item& fmt(formatter_ptr f) { 
+                item& fmt(formatter_ptr f) {
                     BOOST_ASSERT(f);
-                    m_fmt = f; m_type = is_fmt; return *this; 
+                    m_fmt = f; m_type = is_fmt; return *this;
                 }
-                item &dest(destination_ptr d) { 
+                item &dest(destination_ptr d) {
                     BOOST_ASSERT(d);
-                    m_dest = d; m_type = is_dest; return *this; 
+                    m_dest = d; m_type = is_dest; return *this;
                 }
                 formatter_ptr m_fmt;
                 destination_ptr m_dest;
@@ -478,12 +478,12 @@ In the above case:
             }
         };
 
-        /** 
+        /**
             sets this as the route for logging
         */
         route_do_set set_route() { return route_do_set(*this); }
 
-        /** 
+        /**
             appends this route
         */
         route_do_append append_route() { return route_do_append(*this); }
@@ -530,7 +530,7 @@ In the above case:
                 typename d_array::iterator del = std::remove( b->destinations.begin(), b->destinations.end(), dest);
                 b->destinations.erase(del, b->destinations.end());
 
-                // if from a write_once - all destinations are gone, don't clear_afterwards 
+                // if from a write_once - all destinations are gone, don't clear_afterwards
                 if ( b->destinations.empty() )
                     b->do_clear_afterwards = false;
             }
@@ -573,7 +573,7 @@ In the above case:
                 switch ( b->m_type) {
                 case route::is_fmt:       append_formatter( b->m_fmt); break;
                 case route::is_dest:      append_destination( b->m_dest); break;
-                    break;  
+                    break;
                 case route::is_clear:     append_clear_format(); break;
                     break;
                 }

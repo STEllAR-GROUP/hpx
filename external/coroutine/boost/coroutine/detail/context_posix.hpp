@@ -2,22 +2,22 @@
 //
 //  This code may be used under either of the following two licences:
 //
-//  Permission is hereby granted, free of charge, to any person obtaining a copy 
-//  of this software and associated documentation files (the "Software"), to deal 
-//  in the Software without restriction, including without limitation the rights 
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
-//  copies of the Software, and to permit persons to whom the Software is 
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
 //  furnished to do so, subject to the following conditions:
 //
-//  The above copyright notice and this permission notice shall be included in 
+//  The above copyright notice and this permission notice shall be included in
 //  all copies or substantial portions of the Software.
 //
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE. OF SUCH DAMAGE.
 //
 //  Or:
@@ -30,7 +30,7 @@
 #define BOOST_COROUTINE_CONTEXT_POSIX_HPP_20060601
 
 // NOTE (per http://lists.apple.com/archives/darwin-dev/2008/Jan/msg00232.html):
-// > Why the bus error? What am I doing wrong? 
+// > Why the bus error? What am I doing wrong?
 // This is a known issue where getcontext(3) is writing past the end of the
 // ucontext_t struct when _XOPEN_SOURCE is not defined (rdar://problem/5578699 ).
 // As a workaround, define _XOPEN_SOURCE before including ucontext.h.
@@ -87,7 +87,7 @@ namespace boost { namespace coroutines { namespace detail {
 
 /*
  * makecontext based context implementation. Should be available on all
- * SuSv2 compliant UNIX systems. 
+ * SuSv2 compliant UNIX systems.
  * NOTE: this implementation is not
  * optimal as the makecontext API saves and restore the signal mask.
  * This requires a system call for every context switch that really kills
@@ -102,7 +102,7 @@ namespace boost { namespace coroutines { namespace detail {
   namespace posix { namespace ucontext {
 
     inline int make_context(::ucontext_t* ctx, void* stack, std::ptrdiff_t size,
-                            void (*startfunc)(void*), void* startarg, 
+                            void (*startfunc)(void*), void* startarg,
                             ::ucontext_t* exitto = NULL)
     {
         int error = ::getcontext(ctx);
@@ -116,7 +116,7 @@ namespace boost { namespace coroutines { namespace detail {
         typedef void (*ctx_main)();
         //makecontext can't fail.
         ::makecontext(ctx,
-                      (ctx_main)(startfunc), 
+                      (ctx_main)(startfunc),
                       1,
                       startarg);
         return 0;
@@ -141,7 +141,7 @@ namespace boost { namespace coroutines { namespace detail {
 #include <boost/coroutine/detail/posix_utility.hpp>
 #include <boost/coroutine/detail/swap_context.hpp>
 
-namespace boost { namespace coroutines { 
+namespace boost { namespace coroutines {
 
   // some platforms need special preparation of the main thread
   struct prepare_main_thread
@@ -150,16 +150,16 @@ namespace boost { namespace coroutines {
       ~prepare_main_thread() {}
   };
 
-  namespace detail { namespace posix 
+  namespace detail { namespace posix
   {
     /*
      * Posix implementation for the context_impl_base class.
      * @note context_impl is not required to be consistent
-     * If not initialized it can only be swapped out, not in 
+     * If not initialized it can only be swapped out, not in
      * (at that point it will be initialized).
      *
      */
-    class ucontext_context_impl_base : detail::context_impl_base  
+    class ucontext_context_impl_base : detail::context_impl_base
     {
     public:
       ucontext_context_impl_base()
@@ -175,13 +175,13 @@ namespace boost { namespace coroutines {
       /*
        * Free function. Saves the current context in @p from
        * and restores the context in @p to.
-       */     
-      friend void 
-      swap_context(ucontext_context_impl_base& from, 
+       */
+      friend void
+      swap_context(ucontext_context_impl_base& from,
                    const ucontext_context_impl_base& to,
-                   default_hint) 
+                   default_hint)
       {
-          int  error = BOOST_CORO_SWAP_CONTEXT(&from.m_ctx, &to.m_ctx); 
+          int  error = BOOST_CORO_SWAP_CONTEXT(&from.m_ctx, &to.m_ctx);
           (void)error;
           BOOST_ASSERT(error == 0);
       }
@@ -190,9 +190,9 @@ namespace boost { namespace coroutines {
       BOOST_CORO_DECLARE_CONTEXT(m_ctx);
     };
 
-    class ucontext_context_impl 
+    class ucontext_context_impl
       : public ucontext_context_impl_base,
-        private boost::noncopyable 
+        private boost::noncopyable
     {
     public:
         typedef ucontext_context_impl_base context_impl_base;
@@ -204,20 +204,20 @@ namespace boost { namespace coroutines {
          *  a new stack. The stack size can be optionally specified.
          */
         template<typename Functor>
-        explicit ucontext_context_impl(Functor& cb, std::ptrdiff_t stack_size) 
+        explicit ucontext_context_impl(Functor& cb, std::ptrdiff_t stack_size)
           : m_stack_size(stack_size == -1? default_stack_size: stack_size),
-            m_stack(alloc_stack(m_stack_size)) 
+            m_stack(alloc_stack(m_stack_size))
         {
             BOOST_ASSERT(m_stack);
             typedef void cb_type(Functor*);
-            cb_type * cb_ptr = &trampoline<Functor>; 
+            cb_type * cb_ptr = &trampoline<Functor>;
             int error = BOOST_CORO_MAKE_CONTEXT(&m_ctx, m_stack, m_stack_size,
                                                 (void (*)(void*))(cb_ptr), &cb, NULL);
             (void)error;
             BOOST_ASSERT(error == 0);
         }
 
-        ~ucontext_context_impl() 
+        ~ucontext_context_impl()
         {
             if(m_stack)
                 free_stack(m_stack, m_stack_size);
@@ -232,7 +232,7 @@ namespace boost { namespace coroutines {
     typedef ucontext_context_impl context_impl;
   }
 } } }
-#else 
+#else
 
 /**
  * This #else clause is essentially unchanged from the original Google Summer

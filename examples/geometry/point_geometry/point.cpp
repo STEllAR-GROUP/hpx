@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2007-2011 Matthew Anderson
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
@@ -65,13 +65,13 @@ HPX_REGISTER_ACTION_EX(
     point_geometry_set_Y_action);
 
 HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<polygon_type>::set_result_action, 
+    hpx::lcos::base_lco_with_value<polygon_type>::set_result_action,
     set_result_action_polygon_type);
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco_with_value<polygon_type>,
     hpx::components::component_base_lco_with_value);
 HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<hpx::geometry::server::vertex_data>::set_result_action, 
+    hpx::lcos::base_lco_with_value<hpx::geometry::server::vertex_data>::set_result_action,
     set_result_action_vertex_data_type);
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco_with_value<hpx::geometry::server::vertex_data>,

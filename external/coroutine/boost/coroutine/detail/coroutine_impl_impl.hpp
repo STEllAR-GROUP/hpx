@@ -10,13 +10,13 @@
 #if defined(_MSC_VER)
 #pragma warning (push)
 #pragma warning (disable: 4355) //this used in base member initializer
-#endif 
+#endif
 
 #include <boost/coroutine/detail/coroutine_impl.hpp>
 
 namespace boost { namespace coroutines { namespace detail {
 
-    template<typename CoroutineType, typename ContextImpl, 
+    template<typename CoroutineType, typename ContextImpl,
         template <typename> class Heap>
     void coroutine_impl<CoroutineType, ContextImpl, Heap>::set_self(self_type* self)
     {
@@ -28,7 +28,7 @@ namespace boost { namespace coroutines { namespace detail {
 
     template<typename CoroutineType, typename ContextImpl,
         template <typename> class Heap>
-    typename coroutine_impl<CoroutineType, ContextImpl, Heap>::self_type* 
+    typename coroutine_impl<CoroutineType, ContextImpl, Heap>::self_type*
     coroutine_impl<CoroutineType, ContextImpl, Heap>::get_self()
     {
         return (NULL == self_.get()) ? NULL : *self_;

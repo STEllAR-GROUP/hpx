@@ -2,22 +2,22 @@
 //
 //  This code may be used under either of the following two licences:
 //
-//  Permission is hereby granted, free of charge, to any person obtaining a copy 
-//  of this software and associated documentation files (the "Software"), to deal 
-//  in the Software without restriction, including without limitation the rights 
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
-//  copies of the Software, and to permit persons to whom the Software is 
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
 //  furnished to do so, subject to the following conditions:
 //
-//  The above copyright notice and this permission notice shall be included in 
+//  The above copyright notice and this permission notice shall be included in
 //  all copies or substantial portions of the Software.
 //
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE. OF SUCH DAMAGE.
 //
 //  Or:
@@ -34,15 +34,15 @@
 
 //
 // move.hpp, modified for inclusion in coroutines/detail.
-// It support movable only types (i.e. explicit move or move 
+// It support movable only types (i.e. explicit move or move
 // from rvalue).
-// 
+//
 // This file should be removed (and coroutine updated)
 // when/if the original move.hpp is included in boost
 //
 // Note some move support for older compilers is left inplace even if
 // Boost.Coroutine is not really supported on them.
-// 
+//
 #ifndef BOOST_COROUTINE_MOVE_HPP_20060703
 #define BOOST_COROUTINE_MOVE_HPP_20060703
 
@@ -75,7 +75,7 @@
 // respond to the move construction hacks, because they blithely bind
 // rvalues to non-const references.
 
-#if defined(BOOST_INTEL_CXX_VERSION) 
+#if defined(BOOST_INTEL_CXX_VERSION)
 # if !defined(_MSC_VER) /* Intel-Linux */ \
   || BOOST_INTEL_CXX_VERSION >= 800
 
@@ -88,10 +88,10 @@
 // when the source is a genuine rvalue.
 #  define BOOST_COROUTINE_MOVE_COPY_SWAP_ASSIGN
 
-# endif 
-#endif 
+# endif
+#endif
 
-namespace boost { namespace coroutines { 
+namespace boost { namespace coroutines {
 
 // This is the class that enables the distinction of const lvalues in
 // the move overload set in case you don't like using the templated
@@ -105,7 +105,7 @@ struct const_lvalue
 
     // It acts like a smart pointer, for syntactic convenience
     X const& operator*() const { return *p; }
-    
+
     X const* operator->() const { return p; }
 
 #if !BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564))
@@ -113,8 +113,8 @@ struct const_lvalue
     // result, implicit_cast<X const&>(rhs) can be used to get at the
     // rhs uniformly.
     operator X const&() const { return **this; }
-#endif 
-    
+#endif
+
     friend inline X const& copy_source(const_lvalue<X> x) { return *x; }
 #ifdef BOOST_COROUTINE_DEBUG_MOVE
     ~const_lvalue()
@@ -122,14 +122,14 @@ struct const_lvalue
         p =0;
     }
 #endif
-    
+
  protected:
     X const* p; // this pointer will refer to the object from which to move
 };
 
 template <class T>
 inline T const& copy_source(T& x) { return x; }
-    
+
 template <class X>
 struct move_from : const_lvalue<X>
 {
@@ -144,8 +144,8 @@ struct move_from : const_lvalue<X>
     // It would be perverse if we inherited const_lvalue's conversion
     // to X const& without providing this one.
     operator X&() const { return **this; }
-#endif 
-    
+#endif
+
     // It acts like a smart pointer, for syntactic convenience
     X& operator*() const { return *const_cast<X*>(this->p); }
     X* operator->() const { return const_cast<X*>(this->p); }
@@ -162,7 +162,7 @@ struct is_movable
 namespace move_
 {
 # if BOOST_WORKAROUND(BOOST_MSVC, == 1300)
-  
+
   template <class T>
   struct move_result
     : mpl::if_<
@@ -175,15 +175,15 @@ namespace move_
         , T&
       >
   {};
-  
+
 # else // default version
-  
+
   template <class T>
   struct move_result
     : mpl::if_< is_movable<T>, move_from<T> , T& >
   {};
 
-# endif 
+# endif
 }
 
 template <class T>
@@ -194,7 +194,7 @@ move(T& x)
     return r(x);
 }
 
-#else 
+#else
 
 template <class T>
 inline
@@ -216,11 +216,11 @@ move(T& x)
         , T
         , T&
     >::type r2;
-   
+
     return r2(r1(x));
 }
 
-#endif 
+#endif
 
 // CRTP base class for conveniently making movable types.  You don't
 // have to use this to make a type movable (if, for example, you don't
@@ -238,10 +238,10 @@ struct movable
     {
         return const_lvalue<Derived>(static_cast<Derived const*>(this));
     }
-    
+
  protected:
     movable() {}
-    
+
  private:
     // any class that wants to be movable should to define its copy
     // ctor and assignment using the macros below, or else those
@@ -284,7 +284,7 @@ namespace move_swap_
   {
       move_::swap(a,b);
   }
-  
+
   template <class T>
   void
   move_swap(T& a, T& b)
@@ -306,7 +306,7 @@ move(InputIterator first, InputIterator last, OutputIterator result)
         *result = move(*first, 0);
     return result;
 }
- 
+
 template <class BidirectionalIterator1, class BidirectionalIterator2>
 BidirectionalIterator2
 move_backward(BidirectionalIterator1 first, BidirectionalIterator1 last,
@@ -317,6 +317,6 @@ move_backward(BidirectionalIterator1 first, BidirectionalIterator1 last,
     return result;
 }
 
-} } 
+} }
 
-#endif 
+#endif

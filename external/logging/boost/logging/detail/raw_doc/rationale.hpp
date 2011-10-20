@@ -1,6 +1,6 @@
 namespace boost { namespace logging {
 
-/** 
+/**
 @page rationale Rationales
 
 
@@ -34,7 +34,7 @@ Note: this section applies to both loggers and filters.
 When using BOOST_LOG_DECLARE/DEFINE, they internally declare/define a function:
 
 @code
-BOOST_DECLARE_LOG(g_l, logger_type) 
+BOOST_DECLARE_LOG(g_l, logger_type)
 
 // equivalent to:
 implementation_defined g_l();

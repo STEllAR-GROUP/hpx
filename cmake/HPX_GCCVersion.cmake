@@ -1,6 +1,6 @@
 # Copyright (c) 2011 Bryce Lelbach
 #
-# Distributed under the Boost Software License, Version 1.0. (See accompanying 
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(HPX_GCCVERSION_LOADED TRUE)
@@ -12,7 +12,7 @@ if(NOT MSVC)
               GetIncludeDirectory)
 
   hpx_get_include_directory(include_dir)
-  
+
   set(source_dir "")
   if(hpx_SOURCE_DIR)
     set(source_dir "${hpx_SOURCE_DIR}/cmake/tests")
@@ -25,10 +25,10 @@ if(NOT MSVC)
   file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests)
 
   hpx_compile(gcc_version SOURCE ${source_dir}/gcc_version.cpp
-    LANGUAGE CXX 
-    OUTPUT ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests/gcc_version 
+    LANGUAGE CXX
+    OUTPUT ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests/gcc_version
     FLAGS -I${BOOST_INCLUDE_DIR} ${include_dir})
-  
+
   if("${gcc_version_RESULT}" STREQUAL "0")
     execute_process(
       COMMAND "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests/gcc_version"
@@ -62,6 +62,6 @@ if(NOT MSVC)
     set(GCC_MINOR_VERSION "00" CACHE INTERNAL "" FORCE)
     set(GCC_PATCH_VERSION "00" CACHE INTERNAL "" FORCE)
     set(GCC_VERSION_STR "unknown" CACHE INTERNAL "" FORCE)
-  endif()    
+  endif()
 endif()
- 
+

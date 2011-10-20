@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -28,8 +28,8 @@ namespace performance_counters { namespace sine { namespace server
     ///////////////////////////////////////////////////////////////////////////
     sine_counter::sine_counter(hpx::performance_counters::counter_info const& info)
       : base_type_holder(info), current_value_(0),
-        timer_(boost::bind(&sine_counter::evaluate, this), 1000000, 
-            "sine example performance counter"), 
+        timer_(boost::bind(&sine_counter::evaluate, this), 1000000,
+            "sine example performance counter"),
         started_at_(boost::chrono::high_resolution_clock::now())
     {
         timer_.start();
@@ -53,7 +53,7 @@ namespace performance_counters { namespace sine { namespace server
         value.time_ = high_resolution_clock::now().time_since_epoch().count();
     }
 
-    void sine_counter::finalize() 
+    void sine_counter::finalize()
     {
         timer_.stop();
         base_type_holder::finalize();

@@ -56,7 +56,7 @@ inline thread_id_type get_thread_id() {
 //////////////////////////////////////////////////////////////////
 // Messages that were logged before initializing the log - Caching them
 
-/** 
+/**
     The library will make sure your logger derives from this in case you want to cache messages that are logged before logs are initialized.
 
     Note:
@@ -98,7 +98,7 @@ private:
 public:
     cache_before_init() : m_is_caching_off(false) {}
 
-    bool is_cache_turned_off() const { 
+    bool is_cache_turned_off() const {
         if ( m_is_caching_off)
             return true; // cache has been turned off
 
@@ -154,14 +154,14 @@ public:
 private:
     mutable mutex m_cs;
     mutable cache m_cache;
-    /** 
+    /**
     IMPORTANT: to make sure we know when the cache is off as efficiently as possible, I have this mechanism:
-    - first, query m_is_enabled, which at the beginning is false 
+    - first, query m_is_enabled, which at the beginning is false
       - if this is true, it's clear that caching has been turned off
       - if this is false, we don't know for sure, thus, continue to ask
-    
+
     - second, use the thread-safe resource 'm_cache' (use a mutex, a bit slow, but that's life)
-      - if m_cache.is_using_cache is true, we're still using cache 
+      - if m_cache.is_using_cache is true, we're still using cache
       - if m_cache.is_using_cache is false, caching has been turned off
         - set m_is_enabled to true, thus this will propagate to all threads soon (depending on your lock_resource)
     */
@@ -174,7 +174,7 @@ private:
 
 template<class msg_type> struct cache_before_init {
     template<class writer_type> void on_do_write(msg_type & msg, const writer_type & writer) const {
-        writer(msg); 
+        writer(msg);
     }
 
     template<class writer_type> void turn_cache_off(const writer_type & writer) {

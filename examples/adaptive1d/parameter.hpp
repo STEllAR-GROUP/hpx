@@ -1,7 +1,7 @@
 //  Copyright (c) 2009-2011 Matt Anderson
 //  Copyrigth (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_COMPONENTS_PARAMETER_AUG_19_2011_0834AM)
@@ -20,7 +20,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace adaptive1d 
+namespace hpx { namespace components { namespace adaptive1d
 {
 
 typedef double double_type;
@@ -79,7 +79,7 @@ struct HPX_COMPONENT_EXPORT parameter
 
 } // detail
 
-struct HPX_COMPONENT_EXPORT parameter 
+struct HPX_COMPONENT_EXPORT parameter
 {
     typedef detail::parameter value_type;
     typedef value_type& reference;
@@ -93,13 +93,13 @@ struct HPX_COMPONENT_EXPORT parameter
 
     pointer operator->()
     { return p.get(); }
-    
+
     const_pointer operator->() const
     { return p.get(); }
-    
+
     reference operator*()
     { return *p; }
-    
+
     const_reference operator*() const
     { return *p; }
 };
@@ -109,5 +109,5 @@ struct HPX_COMPONENT_EXPORT parameter
 
 #include <examples/adaptive1d/serialize_parameter.hpp>
 
-#endif 
+#endif
 

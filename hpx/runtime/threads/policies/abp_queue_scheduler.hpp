@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_D7E5D248_4886_4F46_AA1F_36D81397E5D5)
@@ -35,28 +35,28 @@ struct abp_queue_scheduler : boost::noncopyable
 {
     enum { max_thread_count = 1000 };
 
-    // the scheduler type takes two initialization parameters: 
+    // the scheduler type takes two initialization parameters:
     //    the number of queues
     //    the maxcount per queue
     struct init_parameter
     {
         init_parameter()
-          : num_queues_(1), 
+          : num_queues_(1),
             max_queue_thread_count_(max_thread_count),
             numa_sensitive_(false)
         {}
 
-        init_parameter(std::size_t num_queues, 
-                std::size_t max_queue_thread_count = max_thread_count, 
-                bool numa_sensitive = false) 
-          : num_queues_(num_queues), 
+        init_parameter(std::size_t num_queues,
+                std::size_t max_queue_thread_count = max_thread_count,
+                bool numa_sensitive = false)
+          : num_queues_(num_queues),
             max_queue_thread_count_(max_queue_thread_count),
             numa_sensitive_(numa_sensitive)
         {}
 
         init_parameter(std::pair<std::size_t, std::size_t> const& init,
                 bool numa_sensitive = false)
-          : num_queues_(init.first), 
+          : num_queues_(init.first),
             max_queue_thread_count_(init.second),
             numa_sensitive_(numa_sensitive)
         {}
@@ -69,18 +69,18 @@ struct abp_queue_scheduler : boost::noncopyable
     typedef init_parameter init_parameter_type;
 
     abp_queue_scheduler(init_parameter_type const& init)
-      : queues_(init.num_queues_), 
+      : queues_(init.num_queues_),
         curr_queue_(0),
         numa_sensitive_(init.numa_sensitive_)
     {
         BOOST_ASSERT(init.num_queues_ != 0);
-        for (std::size_t i = 0; i < init.num_queues_; ++i) 
+        for (std::size_t i = 0; i < init.num_queues_; ++i)
             queues_[i] = new thread_deque(init.max_queue_thread_count_);
     }
 
     ~abp_queue_scheduler()
     {
-        for (std::size_t i = 0; i < queues_.size(); ++i) 
+        for (std::size_t i = 0; i < queues_.size(); ++i)
             delete queues_[i];
     }
 
@@ -140,7 +140,7 @@ struct abp_queue_scheduler : boost::noncopyable
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // create a new thread and schedule it if the initial state is equal to 
+    // create a new thread and schedule it if the initial state is equal to
     // pending
     thread_id_type create_thread(thread_init_data& data,
                                  thread_state_enum initial_state,
@@ -149,7 +149,7 @@ struct abp_queue_scheduler : boost::noncopyable
     {
         if (std::size_t(-1) != num_thread) {
             BOOST_ASSERT(num_thread < queues_.size());
-            return queues_[num_thread]->create_thread(data, initial_state, 
+            return queues_[num_thread]->create_thread(data, initial_state,
                 run_now, ec);
         }
 
@@ -219,7 +219,7 @@ struct abp_queue_scheduler : boost::noncopyable
 
             if (core_mask != std::size_t(-1) && node_mask != std::size_t(-1)) {
                 std::size_t m = 0x01LL;
-                for (std::size_t i = 1; (0 == added) && i < queues_.size(); 
+                for (std::size_t i = 1; (0 == added) && i < queues_.size();
                      m <<= 1, ++i)
                 {
                     if (m == core_mask || !(m & node_mask))
@@ -251,7 +251,7 @@ struct abp_queue_scheduler : boost::noncopyable
 
                 if (HPX_UNLIKELY(suspended_only)) {
                     if (running) {
-                        LTM_(error) 
+                        LTM_(error)
                             << "queue(" << num_thread << "): "
                             << "no new work available, are we deadlocked?";
                     }
@@ -270,15 +270,15 @@ struct abp_queue_scheduler : boost::noncopyable
     void do_some_work(std::size_t num_thread) { }
 
     ///////////////////////////////////////////////////////////////////////
-    void on_start_thread(std::size_t num_thread) 
+    void on_start_thread(std::size_t num_thread)
     {
         queues_[num_thread]->on_start_thread(num_thread);
-    } 
+    }
     void on_stop_thread(std::size_t num_thread)
     {
         queues_[num_thread]->on_stop_thread(num_thread);
     }
-    void on_error(std::size_t num_thread, boost::exception_ptr const& e) 
+    void on_error(std::size_t num_thread, boost::exception_ptr const& e)
     {
         queues_[num_thread]->on_error(num_thread, e);
     }

@@ -1,6 +1,6 @@
 # Copyright (c) 2011 Bryce Lelbach
 #
-# Distributed under the Boost Software License, Version 1.0. (See accompanying 
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(HPX_GFORTRANVERSION_LOADED TRUE)
@@ -12,7 +12,7 @@ if(NOT MSVC)
               GetIncludeDirectory)
 
   hpx_get_include_directory(include_dir)
-  
+
   set(source_dir "")
   if(hpx_SOURCE_DIR)
     set(source_dir "${hpx_SOURCE_DIR}/cmake/tests")
@@ -25,9 +25,9 @@ if(NOT MSVC)
   file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests)
 
   hpx_compile(gfortran_version SOURCE ${source_dir}/gfortran_version.fpp
-    LANGUAGE Fortran 
+    LANGUAGE Fortran
     OUTPUT ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests/gfortran_version)
-  
+
   if("${gfortran_version_RESULT}" STREQUAL "0")
     execute_process(
       COMMAND "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests/gfortran_version"
@@ -61,6 +61,6 @@ if(NOT MSVC)
     set(GFORTRAN_MINOR_VERSION "00" CACHE INTERNAL "" FORCE)
     set(GFORTRAN_PATCH_VERSION "00" CACHE INTERNAL "" FORCE)
     set(GFORTRAN_VERSION_STR "unknown" CACHE INTERNAL "" FORCE)
-  endif()    
+  endif()
 endif()
- 
+

@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef BOOST_PP_IS_ITERATING
@@ -50,15 +50,15 @@
     ///////////////////////////////////////////////////////////////////////////
     //  N parameter version, with result
     template <
-        typename Result, 
+        typename Result,
         BOOST_PP_ENUM_PARAMS(N, typename T),
-        Result (*F)(BOOST_PP_ENUM_PARAMS(N, T)), typename Derived, 
+        Result (*F)(BOOST_PP_ENUM_PARAMS(N, T)), typename Derived,
         threads::thread_priority Priority = threads::thread_priority_default
     >
     class BOOST_PP_CAT(plain_base_result_action, N)
       : public action<
-            components::server::plain_function<Derived>, 
-            BOOST_PP_CAT(function_result_action_arg, N), 
+            components::server::plain_function<Derived>,
+            BOOST_PP_CAT(function_result_action_arg, N),
             Result,
             boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
             Derived, Priority>
@@ -67,8 +67,8 @@
         typedef Result result_type;
         typedef boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
         typedef action<
-            components::server::plain_function<Derived>, 
-            BOOST_PP_CAT(function_result_action_arg, N), result_type, 
+            components::server::plain_function<Derived>,
+            BOOST_PP_CAT(function_result_action_arg, N), result_type,
             arguments_type, Derived, Priority> base_type;
 
         BOOST_PP_CAT(plain_base_result_action, N)(
@@ -79,20 +79,20 @@
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_base_result_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_base_result_action, N)(
                 threads::thread_priority priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
-          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg)) 
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg))
         {}
 
     protected:
         /// The \a thread_function will be registered as the thread
-        /// function of a thread. It encapsulates the execution of the 
+        /// function of a thread. It encapsulates the execution of the
         /// original function (given by \a func).
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static threads::thread_state_enum thread_function(
@@ -105,7 +105,7 @@
                 F(BOOST_PP_ENUM_PARAMS(N, arg));      // call the function, ignoring the return value
             }
             catch (hpx::exception const& e) {
-                LTM_(error) 
+                LTM_(error)
                     << "Unhandled exception while executing plain action("
                     << detail::get_action_name<Derived>()
                     << "): " << e.what();
@@ -119,16 +119,16 @@
     public:
         typedef boost::mpl::false_ direct_execution;
 
-        // This static construct_thread_function allows to construct 
-        // a proper thread function for a thread without having to 
-        // instantiate the base_result_actionN type. This is used by the applier in 
+        // This static construct_thread_function allows to construct
+        // a proper thread function for a thread without having to
+        // instantiate the base_result_actionN type. This is used by the applier in
         // case no continuation has been supplied.
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        static boost::function<threads::thread_function_type> 
-        construct_thread_function(naming::address::address_type lva, 
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
+        static boost::function<threads::thread_function_type>
+        construct_thread_function(naming::address::address_type lva,
+            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
-            // we need to assign the address of the thread function to a 
+            // we need to assign the address of the thread function to a
             // variable to  help the compiler to deduce the function type
             threads::thread_state_enum (*f)(BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) =
                 &Derived::template thread_function<BOOST_PP_ENUM_PARAMS(N, Arg)>;
@@ -136,15 +136,15 @@
             return boost::bind(f, BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
-        // This static construct_thread_function allows to construct 
-        // a proper thread function for a thread without having to 
-        // instantiate the base_result_actionN type. This is used by the applier in 
+        // This static construct_thread_function allows to construct
+        // a proper thread function for a thread without having to
+        // instantiate the base_result_actionN type. This is used by the applier in
         // case a continuation has been supplied
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        static boost::function<threads::thread_function_type> 
+        static boost::function<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
-            naming::address::address_type lva, 
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
+            naming::address::address_type lva,
+            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
             return base_type::construct_continuation_thread_function(
                 boost::bind(F, BOOST_PP_ENUM_PARAMS(N, arg)), cont);
@@ -159,31 +159,31 @@
         }
 
     private:
-        // This get_thread_function will be invoked to retrieve the thread 
+        // This get_thread_function will be invoked to retrieve the thread
         // function for an action which has to be invoked without continuations.
         boost::function<threads::thread_function_type>
         get_thread_function(naming::address::address_type lva) const
         {
-            return construct_thread_function(lva, 
+            return construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
         }
 
-        // This get_thread_function will be invoked to retrieve the thread 
+        // This get_thread_function will be invoked to retrieve the thread
         // function for an action which has to be invoked with continuations.
         boost::function<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
             naming::address::address_type lva) const
         {
-            return construct_thread_function(cont, lva, 
+            return construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
         }
 
-        // 
+        //
         boost::function<threads::thread_function_type>
         get_thread_function(naming::address::address_type lva,
             arguments_type const& arg) const
         {
-            return construct_thread_function(lva, 
+            return construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
         }
 
@@ -191,7 +191,7 @@
         get_thread_function(continuation_type& cont,
             naming::address::address_type lva, arguments_type const& arg) const
         {
-            return construct_thread_function(cont, lva, 
+            return construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
         }
 
@@ -209,13 +209,13 @@
     ///////////////////////////////////////////////////////////////////////////
     //  N parameter version, direct execution with result
     template <
-        typename Result, BOOST_PP_ENUM_PARAMS(N, typename T), 
+        typename Result, BOOST_PP_ENUM_PARAMS(N, typename T),
         Result (*F)(BOOST_PP_ENUM_PARAMS(N, T)),
         threads::thread_priority Priority = threads::thread_priority_default,
         typename Derived = detail::this_type>
     class BOOST_PP_CAT(plain_result_action, N)
-      : public BOOST_PP_CAT(plain_base_result_action, N)<Result, 
-          BOOST_PP_ENUM_PARAMS(N, T), F, 
+      : public BOOST_PP_CAT(plain_base_result_action, N)<Result,
+          BOOST_PP_ENUM_PARAMS(N, T), F,
           typename detail::action_type<
               BOOST_PP_CAT(plain_result_action, N)<
                   Result, BOOST_PP_ENUM_PARAMS(N, T), F, Priority>, Derived
@@ -228,7 +228,7 @@
         >::type derived_type;
 
         typedef BOOST_PP_CAT(plain_base_result_action, N)<
-            Result, BOOST_PP_ENUM_PARAMS(N, T), F, derived_type, Priority> 
+            Result, BOOST_PP_ENUM_PARAMS(N, T), F, derived_type, Priority>
         base_type;
 
     public:
@@ -240,15 +240,15 @@
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_result_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_result_action, N)(
                 threads::thread_priority priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
-          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg)) 
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg))
         {}
 
         Result execute_function(
@@ -292,7 +292,7 @@
         }
 
     private:
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data)
         {
@@ -303,13 +303,13 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_; 
+            data.priority = this->priority_;
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva, 
+            naming::address::address_type lva,
             threads::thread_init_data& data)
         {
             data.lva = lva;
@@ -319,11 +319,11 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_; 
+            data.priority = this->priority_;
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data,
             typename base_type::arguments_type const& arg)
@@ -335,13 +335,13 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_; 
+            data.priority = this->priority_;
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva, 
+            naming::address::address_type lva,
             threads::thread_init_data& data,
             typename base_type::arguments_type const& arg)
         {
@@ -352,7 +352,7 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_; 
+            data.priority = this->priority_;
             return data;
         }
     };
@@ -360,12 +360,12 @@
     ///////////////////////////////////////////////////////////////////////////
     //  N parameter version, direct execution with result
     template <
-        typename Result, BOOST_PP_ENUM_PARAMS(N, typename T), 
+        typename Result, BOOST_PP_ENUM_PARAMS(N, typename T),
         Result (*F)(BOOST_PP_ENUM_PARAMS(N, T)),
         typename Derived = detail::this_type>
     class BOOST_PP_CAT(plain_direct_result_action, N)
-      : public BOOST_PP_CAT(plain_base_result_action, N)<Result, 
-          BOOST_PP_ENUM_PARAMS(N, T), F, 
+      : public BOOST_PP_CAT(plain_base_result_action, N)<Result,
+          BOOST_PP_ENUM_PARAMS(N, T), F,
           typename detail::action_type<
               BOOST_PP_CAT(plain_direct_result_action, N)<
                   Result, BOOST_PP_ENUM_PARAMS(N, T), F>, Derived
@@ -387,15 +387,15 @@
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_direct_result_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_direct_result_action, N)(
-                threads::thread_priority, 
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
+                threads::thread_priority,
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
         {}
 
     public:
@@ -444,13 +444,13 @@
     private:
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
-        base_action::action_type get_action_type() const 
+        base_action::action_type get_action_type() const
         {
             return base_action::direct_action;
         }
 
     private:
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data)
         {
@@ -461,13 +461,13 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_; 
+            data.priority = this->priority_;
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva, 
+            naming::address::address_type lva,
             threads::thread_init_data& data)
         {
             data.lva = lva;
@@ -477,11 +477,11 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_; 
+            data.priority = this->priority_;
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data,
             typename base_type::arguments_type const& arg)
@@ -493,13 +493,13 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_; 
+            data.priority = this->priority_;
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva, 
+            naming::address::address_type lva,
             threads::thread_init_data& data,
             typename base_type::arguments_type const& arg)
         {
@@ -510,7 +510,7 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_; 
+            data.priority = this->priority_;
             return data;
         }
     };
@@ -525,18 +525,18 @@
       : public action<
             components::server::plain_function<Derived>,
             BOOST_PP_CAT(function_action_arg, N),
-            util::unused_type, 
+            util::unused_type,
             boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
             Derived, Priority>
     {
     public:
         typedef util::unused_type result_type;
-        typedef 
-            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> 
+        typedef
+            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>
         arguments_type;
         typedef action<
-            components::server::plain_function<Derived>, 
-            BOOST_PP_CAT(function_action_arg, N), result_type, 
+            components::server::plain_function<Derived>,
+            BOOST_PP_CAT(function_action_arg, N), result_type,
             arguments_type, Derived, Priority> base_type;
 
         BOOST_PP_CAT(plain_base_action, N)(threads::thread_priority priority = Priority)
@@ -546,20 +546,20 @@
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_base_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_base_action, N)(
                 threads::thread_priority priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
-          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg)) 
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg))
         {}
 
     protected:
         /// The \a thread_function will be registered as the thread
-        /// function of a thread. It encapsulates the execution of the 
+        /// function of a thread. It encapsulates the execution of the
         /// original function (given by \a func).
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static threads::thread_state_enum thread_function(
@@ -572,7 +572,7 @@
                 F(BOOST_PP_ENUM_PARAMS(N, arg));      // call the function, ignoring the return value
             }
             catch (hpx::exception const& e) {
-                LTM_(error) 
+                LTM_(error)
                     << "Unhandled exception while executing plain action("
                     << detail::get_action_name<Derived>()
                     << "): " << e.what();
@@ -586,16 +586,16 @@
     public:
         typedef boost::mpl::false_ direct_execution;
 
-        // This static construct_thread_function allows to construct 
-        // a proper thread function for a thread without having to 
-        // instantiate the base_actionN type. This is used by the applier in 
+        // This static construct_thread_function allows to construct
+        // a proper thread function for a thread without having to
+        // instantiate the base_actionN type. This is used by the applier in
         // case no continuation has been supplied.
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        static boost::function<threads::thread_function_type> 
-        construct_thread_function(naming::address::address_type lva, 
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
+        static boost::function<threads::thread_function_type>
+        construct_thread_function(naming::address::address_type lva,
+            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
-            // we need to assign the address of the thread function to a 
+            // we need to assign the address of the thread function to a
             // variable to  help the compiler to deduce the function type
             threads::thread_state_enum (*f)(BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) =
                 &Derived::template thread_function<BOOST_PP_ENUM_PARAMS(N, Arg)>;
@@ -603,15 +603,15 @@
             return boost::bind(f, BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
-        // This static construct_thread_function allows to construct 
-        // a proper thread function for a thread without having to 
-        // instantiate the base_actionN type. This is used by the applier in 
+        // This static construct_thread_function allows to construct
+        // a proper thread function for a thread without having to
+        // instantiate the base_actionN type. This is used by the applier in
         // case a continuation has been supplied
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        static boost::function<threads::thread_function_type> 
+        static boost::function<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
-            naming::address::address_type lva, 
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
+            naming::address::address_type lva,
+            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
             return base_type::construct_continuation_thread_function_void(
                 boost::bind(F, BOOST_PP_ENUM_PARAMS(N, arg)), cont);
@@ -629,7 +629,7 @@
         boost::function<threads::thread_function_type>
         get_thread_function(naming::address::address_type lva) const
         {
-            return construct_thread_function(lva, 
+            return construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
         }
 
@@ -637,7 +637,7 @@
         get_thread_function(continuation_type& cont,
             naming::address::address_type lva) const
         {
-            return construct_thread_function(cont, lva, 
+            return construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
         }
 
@@ -646,7 +646,7 @@
         get_thread_function(naming::address::address_type lva,
             arguments_type const& arg) const
         {
-            return construct_thread_function(lva, 
+            return construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
         }
 
@@ -654,7 +654,7 @@
         get_thread_function(continuation_type& cont,
             naming::address::address_type lva, arguments_type const& arg) const
         {
-            return construct_thread_function(cont, lva, 
+            return construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
         }
 
@@ -671,13 +671,13 @@
 
     ///////////////////////////////////////////////////////////////////////////
     template <
-        BOOST_PP_ENUM_PARAMS(N, typename T), 
+        BOOST_PP_ENUM_PARAMS(N, typename T),
         void (*F)(BOOST_PP_ENUM_PARAMS(N, T)),
         threads::thread_priority Priority = threads::thread_priority_default,
         typename Derived = detail::this_type>
     class BOOST_PP_CAT(plain_action, N)
       : public BOOST_PP_CAT(plain_base_action, N)<
-            BOOST_PP_ENUM_PARAMS(N, T), F, 
+            BOOST_PP_ENUM_PARAMS(N, T), F,
             typename detail::action_type<
                 BOOST_PP_CAT(plain_action, N)<
                     BOOST_PP_ENUM_PARAMS(N, T), F, Priority>, Derived
@@ -690,7 +690,7 @@
         >::type derived_type;
 
         typedef BOOST_PP_CAT(plain_base_action, N)<
-            BOOST_PP_ENUM_PARAMS(N, T), F, derived_type, Priority> 
+            BOOST_PP_ENUM_PARAMS(N, T), F, derived_type, Priority>
         base_type;
 
     public:
@@ -701,15 +701,15 @@
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_action, N)(
                 threads::thread_priority priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
-          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg)) 
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg))
         {}
 
         util::unused_type execute_function(
@@ -755,7 +755,7 @@
         }
 
     private:
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data)
         {
@@ -766,13 +766,13 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_; 
+            data.priority = this->priority_;
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva, 
+            naming::address::address_type lva,
             threads::thread_init_data& data)
         {
             data.lva = lva;
@@ -782,11 +782,11 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_; 
+            data.priority = this->priority_;
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data,
             typename base_type::arguments_type const& arg)
@@ -798,13 +798,13 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_; 
+            data.priority = this->priority_;
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva, 
+            naming::address::address_type lva,
             threads::thread_init_data& data,
             typename base_type::arguments_type const& arg)
         {
@@ -815,7 +815,7 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_; 
+            data.priority = this->priority_;
             return data;
         }
     };
@@ -849,15 +849,15 @@
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_direct_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_direct_action, N)(
-                threads::thread_priority, 
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) 
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg)) 
+                threads::thread_priority,
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
         {}
 
     public:
@@ -908,12 +908,12 @@
     private:
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
-        base_action::action_type get_action_type() const 
+        base_action::action_type get_action_type() const
         {
             return base_action::direct_action;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data)
         {
@@ -924,13 +924,13 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_; 
+            data.priority = this->priority_;
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva, 
+            naming::address::address_type lva,
             threads::thread_init_data& data)
         {
             data.lva = lva;
@@ -940,11 +940,11 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_; 
+            data.priority = this->priority_;
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data,
             typename base_type::arguments_type const& arg)
@@ -956,13 +956,13 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_; 
+            data.priority = this->priority_;
             return data;
         }
 
-        threads::thread_init_data& 
+        threads::thread_init_data&
         get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva, 
+            naming::address::address_type lva,
             threads::thread_init_data& data,
             typename base_type::arguments_type const& arg)
         {
@@ -973,7 +973,7 @@
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_; 
+            data.priority = this->priority_;
             return data;
         }
     };

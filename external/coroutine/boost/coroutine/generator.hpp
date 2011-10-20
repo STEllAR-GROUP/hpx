@@ -2,22 +2,22 @@
 //
 //  This code may be used under either of the following two licences:
 //
-//  Permission is hereby granted, free of charge, to any person obtaining a copy 
-//  of this software and associated documentation files (the "Software"), to deal 
-//  in the Software without restriction, including without limitation the rights 
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
-//  copies of the Software, and to permit persons to whom the Software is 
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
 //  furnished to do so, subject to the following conditions:
 //
-//  The above copyright notice and this permission notice shall be included in 
+//  The above copyright notice and this permission notice shall be included in
 //  all copies or substantial portions of the Software.
 //
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE. OF SUCH DAMAGE.
 //
 //  Or:
@@ -55,20 +55,20 @@ namespace boost { namespace coroutines {
   // subset of coroutines) in the form of an InputIterator
   // interface. It also models to the AdaptableGenerator concept.
   // Finally it is ConvertibleToBool.
-  template<typename ValueType, 
-	   typename Coroutine = 
+  template<typename ValueType,
+	   typename Coroutine =
 	   shared_coroutine<ValueType()> >
   class generator : public boost::mpl::eval_if<boost::is_same<ValueType, void>,
 					       boost::mpl::identity<detail::empty>,
 					       detail::make_std_iterator<
-    std::input_iterator_tag, 
+    std::input_iterator_tag,
     typename Coroutine::result_type> >::type {
     typedef void(generator::*safe_bool)();
     typedef ValueType internal_value_type;
 
   public:
     typedef Coroutine coroutine_type;
-    typedef BOOST_DEDUCED_TYPENAME 
+    typedef BOOST_DEDUCED_TYPENAME
     coroutine_type::result_type result_type;
     typedef result_type value_type;
 
@@ -105,7 +105,7 @@ namespace boost { namespace coroutines {
       return lhs.m_val == rhs.m_val;
     }
 
-    friend 
+    friend
     bool operator != (const generator& lhs, const generator & rhs) {
       return !(lhs == rhs);
     }

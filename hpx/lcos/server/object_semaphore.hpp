@@ -1,7 +1,7 @@
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_1A262552_0D65_4C7D_887E_D11B02AAAC7E)
@@ -21,14 +21,14 @@
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/get_result.hpp>
 
-namespace hpx { namespace lcos { namespace server 
+namespace hpx { namespace lcos { namespace server
 {
 
 template <typename ValueType>
-struct object_semaphore 
+struct object_semaphore
   : components::managed_component_base<
         object_semaphore<ValueType>
-    > 
+    >
 {
     enum action
     {
@@ -64,8 +64,8 @@ struct object_semaphore
     > slist_option_type;
 
     typedef boost::intrusive::slist<
-        queue_thread_entry, slist_option_type, 
-        boost::intrusive::cache_last<true>, 
+        queue_thread_entry, slist_option_type,
+        boost::intrusive::cache_last<true>,
         boost::intrusive::constant_time_size<false>
     > thread_queue_type;
 
@@ -90,16 +90,16 @@ struct object_semaphore
     > value_slist_option_type;
 
     typedef boost::intrusive::slist<
-        queue_value_entry, value_slist_option_type, 
-        boost::intrusive::cache_last<true>, 
+        queue_value_entry, value_slist_option_type,
+        boost::intrusive::cache_last<true>,
         boost::intrusive::constant_time_size<false>
     > value_queue_type;
 
   private:
     // assumes that this thread has acquired l
     void resume(typename mutex_type::scoped_lock& l)
-    { // {{{ 
-        // resume as many waiting LCOs as possible 
+    { // {{{
+        // resume as many waiting LCOs as possible
         while (!thread_queue_.empty() && !value_queue_.empty())
         {
             ValueType value = value_queue_.front().val_;
@@ -114,7 +114,7 @@ struct object_semaphore
 
             else
                 --value_queue_.front().count_;
-    
+
             naming::id_type id = thread_queue_.front().id_;
             thread_queue_.front().id_ = naming::invalid_id;
             thread_queue_.pop_front();
@@ -122,8 +122,8 @@ struct object_semaphore
             {
                 util::unlock_the_lock<typename mutex_type::scoped_lock> ul(l);
 
-                // set the LCO's result 
-                applier::trigger<ValueType>(id, value);  
+                // set the LCO's result
+                applier::trigger<ValueType>(id, value);
             }
         }
     } // }}}
@@ -155,7 +155,7 @@ struct object_semaphore
     { // {{{
         // push the LCO's GID onto the queue
         HPX_UNIQUE_PTR<queue_thread_entry> node(new queue_thread_entry(lco));
-        
+
         mutex_type::scoped_lock l(mtx_);
 
         thread_queue_.push_back(*node);
@@ -181,7 +181,7 @@ struct object_semaphore
             thread_queue_.pop_front();
 
             LLCO_(info)
-                << "object_semaphore::abort_pending: pending thread " << id; 
+                << "object_semaphore::abort_pending: pending thread " << id;
 
             try
             {
@@ -190,7 +190,7 @@ struct object_semaphore
             }
 
             catch (hpx::exception& e)
-            { 
+            {
                 applier::trigger_error(id, boost::current_exception());
             }
         }
@@ -200,18 +200,18 @@ struct object_semaphore
 
     void wait()
     { // {{{
-        typedef typename 
-            lcos::template base_lco_with_value<ValueType>::get_value_action 
+        typedef typename
+            lcos::template base_lco_with_value<ValueType>::get_value_action
         action_type;
 
         mutex_type::scoped_lock l(mtx_);
 
         typename thread_queue_type::const_iterator it = thread_queue_.begin()
-                                                 , end = thread_queue_.end(); 
+                                                 , end = thread_queue_.end();
 
         for (; it != end; ++it)
         {
-            naming::id_type id = it->id_; 
+            naming::id_type id = it->id_;
 
             LLCO_(info) << "object_semapohre::wait: waiting for " << id;
 

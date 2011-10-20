@@ -26,7 +26,7 @@ each operation) */
         return __sync_val_compare_and_swap_4(ptr, expected, desired);
     }
     #define BOOST_ATOMIC_HAVE_CAS32 1
-    
+
     #if (defined(__amd64__) || defined(__x86_64__)) || defined(__i686__)
     static inline int64_t
     fenced_compare_exchange_strong_64(int64_t *ptr, int64_t expected, int64_t desired)
@@ -60,7 +60,7 @@ each operation) */
     #define BOOST_ATOMIC_HAVE_CAS64 1
     #endif
     }}}
-    
+
 #elif (defined(__ICC) || defined(__ECC))
     namespace boost { namespace detail { namespace atomic {
     static inline int32_t
@@ -85,7 +85,7 @@ each operation) */
     #define BOOST_ATOMIC_HAVE_CAS64 1
     #endif
     }}}
-    
+
 #elif (defined(__SUNPRO_CC) && defined(__sparc))
     #include <sys/atomic.h>
     namespace boost { namespace detail { namespace atomic {
@@ -95,7 +95,7 @@ each operation) */
         return atomic_cas_32((volatile unsigned int*)ptr, expected, desired);
     }
     #define BOOST_ATOMIC_HAVE_CAS32 1
-    
+
     /* FIXME: check for 64 bit mode */
     static inline int64_t
     fenced_compare_exchange_strong_64(int64_t *ptr, int64_t expected, int64_t desired)
@@ -153,7 +153,7 @@ public:
         do { } while(!compare_exchange_weak(expected, r, order, memory_order_relaxed));
         return expected;
     }
-    
+
     bool is_lock_free(void) const volatile {return true;}
     typedef T integral_type;
 private:
@@ -172,7 +172,7 @@ template<typename T>
 class platform_atomic_integral<T, 1>: public build_atomic_from_larger_type<atomic_generic_cas32<int32_t>, T> {
 public:
     typedef build_atomic_from_larger_type<atomic_generic_cas32<int32_t>, T> super;
-    
+
     explicit platform_atomic_integral(T v) : super(v) {}
     platform_atomic_integral(void) {}
 };
@@ -181,7 +181,7 @@ template<typename T>
 class platform_atomic_integral<T, 2>: public build_atomic_from_larger_type<atomic_generic_cas32<int32_t>, T> {
 public:
     typedef build_atomic_from_larger_type<atomic_generic_cas32<int32_t>, T> super;
-    
+
     explicit platform_atomic_integral(T v) : super(v) {}
     platform_atomic_integral(void) {}
 };

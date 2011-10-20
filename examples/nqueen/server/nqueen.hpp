@@ -62,7 +62,7 @@ namespace server
 
         ~board(){}
 
-        
+
 
         void init_board(std::size_t size)
         {
@@ -77,16 +77,16 @@ namespace server
         bool check_board(list_type const& list, std::size_t level)
         {
             for(std::size_t i = 0 ;i < level; ++i){
-                if((list.at(i) == list.at(level)) 
-                    || (list.at(level) - list.at(i) == level - i) 
+                if((list.at(i) == list.at(level))
+                    || (list.at(level) - list.at(i) == level - i)
                     || (list.at(i) - list.at(level) == level - i))
                     return false;
             }
             return true;
         }
 
-        list_type access_board() 
-        { 
+        list_type access_board()
+        {
             return list_;
         }
 
@@ -96,25 +96,25 @@ namespace server
         }
 
         void clear_board()
-        { 
+        {
             board::list_.clear();
         }
 
-        std::size_t solve_board(list_type const& list, std::size_t size, 
+        std::size_t solve_board(list_type const& list, std::size_t size,
             std::size_t level, std::size_t col)
         {
 
             board b(list, size, level);
-            
+
             if(level == size){
                 return 1;
             }
             else if(level == 0)
-            {   
+            {
                 b.update_board(level, col);
                 if(b.check_board( b.access_board(), level))
                 {
-                   b.count_+= solve_board( b.access_board(), 
+                   b.count_+= solve_board( b.access_board(),
                                             size, level + 1, col);
                 }
             }
@@ -134,50 +134,50 @@ namespace server
         }
 
         typedef hpx::actions::action1<
-            board, 
-            board_init, 
-            std::size_t, 
+            board,
+            board_init,
+            std::size_t,
             &board::init_board
             > init_action;
 
         typedef hpx::actions::result_action0<
-            board, 
-            list_type, 
+            board,
+            list_type,
             board_access,
             &board::access_board
             > access_action;
 
         typedef hpx::actions::action2<
-            board, 
-            board_update, 
-            std::size_t, 
-            std::size_t, 
+            board,
+            board_update,
+            std::size_t,
+            std::size_t,
             &board::update_board
             > update_action;
 
         typedef hpx::actions::result_action2<
-            board, 
-            bool, 
-            board_check, 
-            list_type const&, 
-            std::size_t, 
+            board,
+            bool,
+            board_check,
+            list_type const&,
+            std::size_t,
             &board::check_board
             > check_action;
 
         typedef hpx::actions::result_action4<
-            board, 
+            board,
             std::size_t,
-            board_solve, 
-            list_type const&, 
-            std::size_t, 
-            std::size_t, 
+            board_solve,
+            list_type const&,
+            std::size_t,
+            std::size_t,
             std::size_t,
             &board::solve_board
             > solve_action;
 
         typedef hpx::actions::action0<
-            board, 
-            board_clear, 
+            board,
+            board_clear,
             &board::clear_board
             > clear_action;
     };

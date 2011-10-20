@@ -54,7 +54,7 @@ struct thread_specific_ptr
         if (0 != ptr_)
             delete ptr_;
 
-        ptr_ = new_value; 
+        ptr_ = new_value;
     }
 
   private:

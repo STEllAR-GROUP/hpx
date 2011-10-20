@@ -27,14 +27,14 @@
 
 #include <boost/logging/detail/fwd.hpp>
 
-namespace boost { namespace logging { 
-    
-    /** 
+namespace boost { namespace logging {
+
+    /**
         @brief Possible ways to lock resource for read/write
     */
     namespace lock_resource_finder {
 
-    /** 
+    /**
         @brief Locks a resource thread-safe - each time, at read/write (safe but rather inefficient)
     */
     template<class mutex = boost::logging::threading::mutex> struct ts {
@@ -43,7 +43,7 @@ namespace boost { namespace logging {
             };
     };
 
-    /** 
+    /**
         @brief Does not lock the resouce at read/write access
     */
     struct single_thread {
@@ -52,8 +52,8 @@ namespace boost { namespace logging {
             };
     };
 
-#if !defined( BOOST_LOG_NO_TSS) 
-    /** 
+#if !defined( BOOST_LOG_NO_TSS)
+    /**
         @brief Caches the resource on each thread, and refreshes it at @c refresh_secs period
     */
     template<int refresh_secs = 5, class mutex = boost::logging::threading::mutex > struct tss_with_cache {
@@ -62,7 +62,7 @@ namespace boost { namespace logging {
             };
     };
 
-    /** 
+    /**
         @brief Allows you to initialize this resource once even if multiple threads are running. Then, all threads will use the initialized value
     */
     template<class mutex = boost::logging::threading::mutex> struct tss_once_init {
@@ -73,7 +73,7 @@ namespace boost { namespace logging {
 
 #else
 
-    // Not using TSS at all 
+    // Not using TSS at all
 
     template<int = 5, class = boost::logging::threading::mutex > struct tss_with_cache {
             template<class lock_type> struct finder {

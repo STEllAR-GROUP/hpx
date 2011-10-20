@@ -120,7 +120,7 @@ struct function<Result()>
                 "function::operator()", "empty action was called");
         }
 
-        return f->execute_function(0); 
+        return f->execute_function(0);
     }
 
   private:
@@ -142,7 +142,7 @@ struct function<Result()>
     {
         if (version > HPX_FUNCTION_VERSION)
         {
-            HPX_THROW_EXCEPTION(version_too_new, 
+            HPX_THROW_EXCEPTION(version_too_new,
                 "function::load",
                 "trying to load function with unknown version");
         }

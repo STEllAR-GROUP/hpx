@@ -1,7 +1,7 @@
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_1FB4A979_B6B6_4845_BD95_3CEC605011A2)
@@ -11,13 +11,13 @@
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/lcos/stubs/object_semaphore.hpp>
 
-namespace hpx { namespace lcos 
+namespace hpx { namespace lcos
 {
 
 template <typename ValueType>
-struct object_semaphore 
+struct object_semaphore
   : components::client_base<
-        object_semaphore<ValueType>, 
+        object_semaphore<ValueType>,
         lcos::stubs::object_semaphore<ValueType>
     >
 {

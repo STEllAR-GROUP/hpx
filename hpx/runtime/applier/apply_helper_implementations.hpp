@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef BOOST_PP_IS_ITERATING
@@ -16,7 +16,7 @@
     (3, (2, HPX_ACTION_ARGUMENT_LIMIT,                                        \
     "hpx/runtime/applier/apply_helper_implementations.hpp"))                  \
     /**/
-    
+
 #include BOOST_PP_ITERATE()
 
 #endif
@@ -39,19 +39,19 @@
     struct BOOST_PP_CAT(apply_helper, N)<
         Action, BOOST_PP_ENUM_PARAMS(N, Arg), boost::mpl::false_>
     {
-        static void 
+        static void
         call (naming::address::address_type lva,
             threads::thread_priority priority,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
             hpx::applier::register_work_plain(
-                Action::construct_thread_function(lva, 
+                Action::construct_thread_function(lva,
                     BOOST_PP_ENUM_PARAMS(N, arg)),
                 actions::detail::get_action_name<Action>(), lva,
                 threads::pending, priority);
         }
 
-        static void 
+        static void
         call (actions::continuation_type& c, naming::address::address_type lva,
             threads::thread_priority priority,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
@@ -77,7 +77,7 @@
             Action::execute_function_nonvirt(lva, BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
-        static typename Action::result_type  
+        static typename Action::result_type
         call (actions::continuation_type& c, naming::address::address_type lva,
             threads::thread_priority priority,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))

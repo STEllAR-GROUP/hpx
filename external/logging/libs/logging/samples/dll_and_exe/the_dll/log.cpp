@@ -16,7 +16,7 @@
 #include "dll_log.h"
 
 // note : we export this filter & logger
-THE_DLL_API BOOST_DEFINE_LOG_FILTER(g_dll_log_filter, finder::filter ) 
+THE_DLL_API BOOST_DEFINE_LOG_FILTER(g_dll_log_filter, finder::filter )
 THE_DLL_API BOOST_DEFINE_LOG(g_dll_l, finder::logger )
 
 using namespace boost::logging;

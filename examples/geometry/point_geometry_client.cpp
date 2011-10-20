@@ -1,8 +1,8 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2007-2011 Matthew Anderson
 //  Copyright (c)      2011 Bryce Adelstein-Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
@@ -16,7 +16,7 @@ using hpx::util::high_resolution_timer;
 
 namespace hpx { namespace geometry
 {
-    typedef boost::geometry::model::polygon<hpx::geometry::point> polygon_2d; 
+    typedef boost::geometry::model::polygon<hpx::geometry::point> polygon_2d;
 }}
 
 inline void
@@ -32,16 +32,16 @@ init(hpx::components::server::distributing_factory::iterator_range_type r,
 bool floatcmp_le(double const& x1, double const& x2) {
   // compare two floating point numbers
   static double const epsilon = 1.e-8;
-                               
-  if ( x1 < x2 ) return true;  
-                  
+
+  if ( x1 < x2 ) return true;
+
   if ( x1 + epsilon >= x2 && x1 - epsilon <= x2 ) {
     // the numbers are close enough for coordinate comparison
-    return true;  
-  } else {              
+    return true;
+  } else {
     return false;
-  }               
-}                 
+  }
+}
 
 bool intersection(double xmin,double xmax,
                   double ymin,double ymax,
@@ -179,11 +179,11 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         std::cout << " TEST B " << std::endl;
             std::vector<int> search_vector;
-            { 
+            {
               // Search for Contact------------------------------------
               // vector of futures
               std::vector<hpx::lcos::promise<int> > search_phase;
-    
+
               for (i=0;i<num_bodies;i++) {
                 search_phase.push_back(accu[i].search_async(master_objects));
               }
@@ -219,7 +219,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
               // Recompute the Rsum quantity------------------------------------
               std::vector<hpx::lcos::promise<void> > recompute_phase;
-    
+
               for (i=0;i<num_bodies;i++) {
                 if ( search_vector[i] == 1 ) {
                   recompute_phase.push_back(accu[i].recompute_async(master_objects));
@@ -234,7 +234,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 //#endif
 
       std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl;
-    } // ensure things are go out of scope 
+    } // ensure things are go out of scope
 
     hpx::finalize();
     return 0;

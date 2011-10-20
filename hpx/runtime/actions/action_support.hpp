@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_RUNTIME_ACTIONS_ACTION_SUPPORT_NOV_14_2008_0711PM)
@@ -43,7 +43,7 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        // Helper template meta function removing any 'const' qualifier or 
+        // Helper template meta function removing any 'const' qualifier or
         // reference from the given type (i.e. const& T --> T)
         template <typename T>
         struct remove_qualifiers
@@ -59,17 +59,17 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     namespace traits
     {
-        // The customization point handle_gid is used to handle reference 
-        // counting of GIDs while they are transferred to a different locality. 
-        // It has to be specialized for arbitrary types, which may hold GIDs. 
-        // 
-        // It is important to make sure that all GID instances which are 
-        // contained in any transferred data structure are handled during 
+        // The customization point handle_gid is used to handle reference
+        // counting of GIDs while they are transferred to a different locality.
+        // It has to be specialized for arbitrary types, which may hold GIDs.
+        //
+        // It is important to make sure that all GID instances which are
+        // contained in any transferred data structure are handled during
         // serialization. For this reason any user defined data type, which
         // is passed as an parameter to a action or which is returned from
         // a result_action needs to provide a corresponding specialization.
-        // 
-        // The purpose of this customization point is to call the provided 
+        //
+        // The purpose of this customization point is to call the provided
         // function for all GIDs held in the data type.
         template <typename T, typename F, typename Enable = void>
         struct handle_gid
@@ -103,12 +103,12 @@ namespace hpx { namespace actions
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// The \a base_action class is an abstract class used as the base class  
-    /// for all action types. It's main purpose is to allow polymorphic 
+    /// The \a base_action class is an abstract class used as the base class
+    /// for all action types. It's main purpose is to allow polymorphic
     /// serialization of action instances through a shared_ptr.
     struct base_action
     {
-        /// The type of an action defines whether this action will be executed 
+        /// The type of an action defines whether this action will be executed
         /// directly or by a PX-threads
         enum action_type
         {
@@ -119,11 +119,11 @@ namespace hpx { namespace actions
         /// Destructor
         virtual ~base_action() {}
 
-        /// The function \a get_component_type returns the \a component_type 
+        /// The function \a get_component_type returns the \a component_type
         /// of the component this action belongs to.
         virtual int get_component_type() const = 0;
 
-        /// The function \a get_action_code returns the code of the action 
+        /// The function \a get_action_code returns the code of the action
         /// instance it is called for.
         virtual std::size_t get_action_code() const = 0;
 
@@ -135,36 +135,36 @@ namespace hpx { namespace actions
         /// to be executed in a new thread or directly.
         virtual action_type get_action_type() const = 0;
 
-        /// The \a get_thread_function constructs a proper thread function for 
-        /// a \a thread, encapsulating the functionality and the arguments 
+        /// The \a get_thread_function constructs a proper thread function for
+        /// a \a thread, encapsulating the functionality and the arguments
         /// of the action it is called for.
-        /// 
-        /// \param lva    [in] This is the local virtual address of the 
+        ///
+        /// \param lva    [in] This is the local virtual address of the
         ///               component the action has to be invoked on.
         ///
         /// \returns      This function returns a proper thread function usable
         ///               for a \a thread.
         ///
-        /// \note This \a get_thread_function will be invoked to retrieve the 
-        ///       thread function for an action which has to be invoked without 
+        /// \note This \a get_thread_function will be invoked to retrieve the
+        ///       thread function for an action which has to be invoked without
         ///       continuations.
-        virtual boost::function<threads::thread_function_type> 
+        virtual boost::function<threads::thread_function_type>
             get_thread_function(naming::address::address_type lva) const = 0;
 
-        /// The \a get_thread_function constructs a proper thread function for 
-        /// a \a thread, encapsulating the functionality, the arguments, and 
+        /// The \a get_thread_function constructs a proper thread function for
+        /// a \a thread, encapsulating the functionality, the arguments, and
         /// the continuations of the action it is called for.
-        /// 
-        /// \param cont   [in] This is the list of continuations to be 
+        ///
+        /// \param cont   [in] This is the list of continuations to be
         ///               triggered after the execution of the action
-        /// \param lva    [in] This is the local virtual address of the 
+        /// \param lva    [in] This is the local virtual address of the
         ///               component the action has to be invoked on.
         ///
         /// \returns      This function returns a proper thread function usable
         ///               for a \a thread.
         ///
-        /// \note This \a get_thread_function will be invoked to retrieve the 
-        ///       thread function for an action which has to be invoked with 
+        /// \note This \a get_thread_function will be invoked to retrieve the
+        ///       thread function for an action which has to be invoked with
         ///       continuations.
         virtual boost::function<threads::thread_function_type>
             get_thread_function(continuation_type& cont,
@@ -183,11 +183,11 @@ namespace hpx { namespace actions
         virtual threads::thread_priority get_thread_priority() const = 0;
 
         /// Return all data needed for thread initialization
-        virtual threads::thread_init_data& 
+        virtual threads::thread_init_data&
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data) = 0;
 
-        virtual threads::thread_init_data& 
+        virtual threads::thread_init_data&
         get_thread_init_data(continuation_type& cont,
             naming::address::address_type lva,
             threads::thread_init_data& data) = 0;
@@ -227,7 +227,7 @@ namespace hpx { namespace actions
         typedef Result result_type;
 
         virtual result_type execute_function(
-            naming::address::address_type lva) const = 0; 
+            naming::address::address_type lva) const = 0;
 
         virtual boost::function<threads::thread_function_type>
         get_thread_function(naming::address::address_type lva,
@@ -238,12 +238,12 @@ namespace hpx { namespace actions
             naming::address::address_type lva,
             arguments_type const& args) const = 0;
 
-        virtual threads::thread_init_data& 
+        virtual threads::thread_init_data&
         get_thread_init_data(naming::address::address_type lva,
             threads::thread_init_data& data,
             arguments_type const& args) = 0;
 
-        virtual threads::thread_init_data& 
+        virtual threads::thread_init_data&
         get_thread_init_data(continuation_type& cont,
             naming::address::address_type lva,
             threads::thread_init_data& data,
@@ -264,12 +264,12 @@ namespace hpx { namespace actions
     namespace detail
     {
         // Figure out what priority the action has to be be associated with
-        // A dynamically specified default priority results in using the static 
+        // A dynamically specified default priority results in using the static
         // Priority.
         template <threads::thread_priority Priority>
         struct thread_priority
         {
-            static threads::thread_priority 
+            static threads::thread_priority
             call(threads::thread_priority priority)
             {
                 if (priority == threads::thread_priority_default)
@@ -278,12 +278,12 @@ namespace hpx { namespace actions
             }
         };
 
-        // If the static Priority is default, a dynamically specified default 
+        // If the static Priority is default, a dynamically specified default
         // priority results in using the normal priority.
         template <>
         struct thread_priority<threads::thread_priority_default>
         {
-            static threads::thread_priority 
+            static threads::thread_priority
             call(threads::thread_priority priority)
             {
                 if (priority == threads::thread_priority_default)
@@ -296,7 +296,7 @@ namespace hpx { namespace actions
     template <typename Component                // Component type
             , int Action                        // Action code
             , typename Result                   // Return type
-            , typename Arguments                // Arguments (fusion vector) 
+            , typename Arguments                // Arguments (fusion vector)
             , typename Derived                  // Derived action class
             , threads::thread_priority Priority /* Default priority */>
     class action : public signature<Result, Arguments>
@@ -311,7 +311,7 @@ namespace hpx { namespace actions
         typedef boost::function<void(naming::id_type const&)>
             enum_gid_handler_type;
 
-        // This is the action code (id) of this action. It is exposed to allow 
+        // This is the action code (id) of this action. It is exposed to allow
         // generic handling of actions.
         enum { value = Action };
 
@@ -321,25 +321,25 @@ namespace hpx { namespace actions
         enum { priority_value = Priority };
 
         // construct an action from its arguments
-        explicit action(threads::thread_priority priority) 
+        explicit action(threads::thread_priority priority)
           : arguments_(), parent_locality_(0), parent_id_(0), parent_phase_(0),
             priority_(detail::thread_priority<Priority>::call(priority))
         {}
 
         template <typename Arg0>
-        action(Arg0 const& arg0) 
-          : arguments_(arg0), 
+        action(Arg0 const& arg0)
+          : arguments_(arg0),
             parent_locality_(applier::get_prefix_id()),
-            parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())), 
+            parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
             parent_phase_(threads::get_parent_phase()),
             priority_(detail::thread_priority<Priority>::call(Priority))
         {}
 
         template <typename Arg0>
-        action(threads::thread_priority priority, Arg0 const& arg0) 
-          : arguments_(arg0), 
+        action(threads::thread_priority priority, Arg0 const& arg0)
+          : arguments_(arg0),
             parent_locality_(applier::get_prefix_id()),
-            parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())), 
+            parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
             parent_phase_(threads::get_parent_phase()),
             priority_(detail::thread_priority<Priority>::call(priority))
         {}
@@ -354,27 +354,27 @@ namespace hpx { namespace actions
     public:
         /// retrieve the N's argument
         template <int N>
-        typename boost::fusion::result_of::at_c<arguments_type, N>::type 
-        get() 
-        { 
-            return boost::fusion::at_c<N>(arguments_); 
+        typename boost::fusion::result_of::at_c<arguments_type, N>::type
+        get()
+        {
+            return boost::fusion::at_c<N>(arguments_);
         }
         template <int N>
-        typename boost::fusion::result_of::at_c<arguments_type const, N>::type 
+        typename boost::fusion::result_of::at_c<arguments_type const, N>::type
         get() const
-        { 
-            return boost::fusion::at_c<N>(arguments_); 
+        {
+            return boost::fusion::at_c<N>(arguments_);
         }
 
     protected:
         /// The \a continuation_thread_function will be registered as the thread
-        /// function of a thread. It encapsulates the execution of the 
+        /// function of a thread. It encapsulates the execution of the
         /// original function (given by \a func), and afterwards triggers all
         /// continuations using the result value obtained from the execution
         /// of the original thread function.
         template <typename Func>
-        static threads::thread_state_enum 
-        continuation_thread_function_void(continuation_type cont, 
+        static threads::thread_state_enum
+        continuation_thread_function_void(continuation_type cont,
             boost::tuple<Func> func)
         {
             try {
@@ -392,34 +392,34 @@ namespace hpx { namespace actions
         }
 
         /// The \a construct_continuation_thread_function is a helper function
-        /// for constructing the wrapped thread function needed for 
+        /// for constructing the wrapped thread function needed for
         /// continuation support
         template <typename Func>
         static boost::function<threads::thread_function_type>
-        construct_continuation_thread_function_void(Func func, continuation_type cont) 
+        construct_continuation_thread_function_void(Func func, continuation_type cont)
         {
-            // we need to assign the address of the thread function to a 
+            // we need to assign the address of the thread function to a
             // variable to  help the compiler to deduce the function type
             threads::thread_state_enum (*f)(continuation_type, boost::tuple<Func>) =
                 &action::continuation_thread_function_void;
 
             // The following bind constructs the wrapped thread function
             //    f:  is the wrapping thread function
-            // cont: continuation 
-            // func: wrapped function object 
+            // cont: continuation
+            // func: wrapped function object
             //       (this is embedded into a tuple because boost::bind can't
             //       pre-bind another bound function as an argument)
             return boost::bind(f, cont, boost::make_tuple(func));
         }
 
         /// The \a continuation_thread_function will be registered as the thread
-        /// function of a thread. It encapsulates the execution of the 
+        /// function of a thread. It encapsulates the execution of the
         /// original function (given by \a func), and afterwards triggers all
         /// continuations using the result value obtained from the execution
         /// of the original thread function.
         template <typename Func>
-        static threads::thread_state_enum 
-        continuation_thread_function(continuation_type cont, 
+        static threads::thread_state_enum
+        continuation_thread_function(continuation_type cont,
             boost::tuple<Func> func)
         {
             try {
@@ -436,21 +436,21 @@ namespace hpx { namespace actions
         }
 
         /// The \a construct_continuation_thread_function is a helper function
-        /// for constructing the wrapped thread function needed for 
+        /// for constructing the wrapped thread function needed for
         /// continuation support
         template <typename Func>
         static boost::function<threads::thread_function_type>
-        construct_continuation_thread_function(Func func, continuation_type cont) 
+        construct_continuation_thread_function(Func func, continuation_type cont)
         {
-            // we need to assign the address of the thread function to a 
+            // we need to assign the address of the thread function to a
             // variable to  help the compiler to deduce the function type
             threads::thread_state_enum (*f)(continuation_type, boost::tuple<Func>) =
                 &action::continuation_thread_function;
 
             // The following bind constructs the wrapped thread function
             //    f:  is the wrapping thread function
-            // cont: continuation 
-            // func: wrapped function object 
+            // cont: continuation
+            // func: wrapped function object
             //       (this is embedded into a tuple because boost::bind can't
             //       pre-bind another bound function as an argument)
             return boost::bind(f, cont, boost::make_tuple(func));
@@ -458,7 +458,7 @@ namespace hpx { namespace actions
 
     public:
         /// retrieve component type
-        static int get_static_component_type() 
+        static int get_static_component_type()
         {
             return static_cast<int>(components::get_component_type<Component>());
         }
@@ -473,7 +473,7 @@ namespace hpx { namespace actions
 
     private:
         /// retrieve action code
-        std::size_t get_action_code() const 
+        std::size_t get_action_code() const
         {
             return static_cast<std::size_t>(value);
         }
@@ -493,7 +493,7 @@ namespace hpx { namespace actions
 
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
-        base_action::action_type get_action_type() const 
+        base_action::action_type get_action_type() const
         {
             return base_action::plain_action;
         }
@@ -554,10 +554,10 @@ namespace hpx { namespace actions
       typename Arguments, typename Derived, threads::thread_priority Priority>
     inline typename boost::fusion::result_of::at_c<
         typename action<Component, Action, Result, Arguments, Derived, Priority>::arguments_type const, N
-    >::type 
-    get(action<Component, Action, Result, Arguments, Derived, Priority> const& args) 
-    { 
-        return args.get<N>(); 
+    >::type
+    get(action<Component, Action, Result, Arguments, Derived, Priority> const& args)
+    {
+        return args.get<N>();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -574,7 +574,7 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        // simple type allowing to distinguish whether an action is the most 
+        // simple type allowing to distinguish whether an action is the most
         // derived one
         struct this_type {};
 
@@ -588,7 +588,7 @@ namespace hpx { namespace actions
 #include <hpx/config/warnings_suffix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Helper macro for action serialization, each of the defined actions needs to 
+// Helper macro for action serialization, each of the defined actions needs to
 // be registered with the serialization library
 #define HPX_DEFINE_GET_ACTION_NAME(action)                                    \
         namespace hpx { namespace actions { namespace detail {                \

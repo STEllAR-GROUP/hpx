@@ -15,7 +15,7 @@ bool register_name(
     std::string const& name
   , naming::id_type const& gid
   , error_code& ec
-    ) 
+    )
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
 
@@ -29,10 +29,10 @@ bool register_name(
         new_gid = split_credits_for_gid(mutable_gid);
 
         // Credit exhaustion - we need to get more.
-        if (0 == naming::get_credit_from_gid(new_gid)) 
+        if (0 == naming::get_credit_from_gid(new_gid))
         {
             BOOST_ASSERT(1 == naming::get_credit_from_gid(mutable_gid));
-            agas_.incref(new_gid, 2 * HPX_INITIAL_GLOBALCREDIT); 
+            agas_.incref(new_gid, 2 * HPX_INITIAL_GLOBALCREDIT);
 
             naming::add_credit_to_gid(new_gid, HPX_INITIAL_GLOBALCREDIT);
             naming::add_credit_to_gid(mutable_gid, HPX_INITIAL_GLOBALCREDIT);

@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  
+//
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -60,7 +60,7 @@ namespace hpx { namespace util { namespace detail {
                     >
                 vtable_type;
 
-            typedef 
+            typedef
                 vtable_ptr<
                     R(BOOST_PP_ENUM_PARAMS(N, A))
                   , IArchive
@@ -68,7 +68,7 @@ namespace hpx { namespace util { namespace detail {
                   , vtable_type
                 >
                 vtable_ptr_type;
-    
+
             // make sure the global gets instatntiated;
             //boost::archive::detail::extra_detail::init_guid<vtable_ptr_type>::g.initialize();
             //boost::archive::detail::extra_detail::init_guid<vtable_ptr_type>::g.export_guid();

@@ -1,6 +1,6 @@
 //  Copyright (c) 1998-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_UTIL_WRAPPER_HEAP_LIST_JUN_14_2008_0409PM)
@@ -11,7 +11,7 @@
 #include <hpx/util/generate_unique_ids.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace detail 
+namespace hpx { namespace components { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     // list of managed_component heaps
@@ -32,9 +32,9 @@ namespace hpx { namespace components { namespace detail
 
             typedef typename base_type::const_iterator iterator;
             iterator end = this->heap_list_.end();
-            for (iterator it = this->heap_list_.begin(); it != end; ++it) 
+            for (iterator it = this->heap_list_.begin(); it != end; ++it)
             {
-                if ((*it)->did_alloc(p)) 
+                if ((*it)->did_alloc(p))
                     return (*it)->get_gid(id_range_, p);
             }
             return naming::invalid_gid;
@@ -45,7 +45,7 @@ namespace hpx { namespace components { namespace detail
           , naming::gid_type const& upper
         ) {
             typename base_type::shared_lock_type guard(this->mtx_);
-            id_range_.set_range(lower, upper); 
+            id_range_.set_range(lower, upper);
         }
 
     private:

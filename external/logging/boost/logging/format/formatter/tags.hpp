@@ -25,13 +25,13 @@
 #include <boost/logging/detail/manipulator.hpp>
 #include <boost/logging/format/formatter/time.hpp>
 #include <sstream>
-#include <boost/logging/format.hpp> 
+#include <boost/logging/format.hpp>
 
 namespace boost { namespace logging { namespace formatter {
 
 
 
-/** 
+/**
     @brief Specifies that a formatter class handles a certain tag class
 
     @param type The class itself
@@ -48,13 +48,13 @@ template<class type, class tag_type> struct uses_tag {
     }
 };
 
-/** @brief Classes that process the @ref boost::logging::tag "tags" coming with the library 
+/** @brief Classes that process the @ref boost::logging::tag "tags" coming with the library
 
 See @ref boost::logging::tag "how to use tags".
 */
 namespace tag {
 
-/** @brief Dumps file/line information (corresponds to boost::logging::tag::file_line tag class) 
+/** @brief Dumps file/line information (corresponds to boost::logging::tag::file_line tag class)
 
 See @ref boost::logging::tag "how to use tags".
 */
@@ -67,7 +67,7 @@ template<class convert = do_convert_format::prepend> struct file_line_t : is_gen
 
 
 
-/** @brief Dumps function name information (corresponds to boost::logging::tag::function tag class) 
+/** @brief Dumps function name information (corresponds to boost::logging::tag::function tag class)
 
 See @ref boost::logging::tag "how to use tags".
 */
@@ -80,7 +80,7 @@ template<class convert = do_convert_format::prepend> struct function_t : is_gene
 
 
 
-/** @brief Dumps level (corresponds to boost::logging::tag::level tag class) 
+/** @brief Dumps level (corresponds to boost::logging::tag::level tag class)
 
 See @ref boost::logging::tag "how to use tags".
 */
@@ -94,7 +94,7 @@ template<class convert = do_convert_format::prepend> struct level_t : is_generic
 
 
 
-/** @brief Dumps current time information (corresponds to boost::logging::tag::time tag class) 
+/** @brief Dumps current time information (corresponds to boost::logging::tag::time tag class)
 
 Similar to boost::logging::formatter::time_t class - only that this one uses tags.
 
@@ -120,7 +120,7 @@ private:
 
 
 
-/** @brief Dumps module information (corresponds to boost::logging::tag::module tag class) 
+/** @brief Dumps module information (corresponds to boost::logging::tag::module tag class)
 
 See @ref boost::logging::tag "how to use tags".
 */
@@ -133,11 +133,11 @@ template<class convert = do_convert_format::prepend> struct module_t : is_generi
 
 
 
-/** @brief Dumps thread id information (corresponds to boost::logging::tag::thread_id tag class) 
+/** @brief Dumps thread id information (corresponds to boost::logging::tag::thread_id tag class)
 
 See @ref boost::logging::tag "how to use tags".
 */
-template<class stream_type = ::std::basic_ostringstream<char_type> , class convert = do_convert_format::prepend> struct thread_id_t 
+template<class stream_type = ::std::basic_ostringstream<char_type> , class convert = do_convert_format::prepend> struct thread_id_t
         : is_generic, uses_tag< thread_id_t< ::std::basic_ostringstream<char_type>, convert>, ::boost::logging::tag::thread_id >, boost::logging::op_equal::always_equal  {
 
     typedef convert convert_type;

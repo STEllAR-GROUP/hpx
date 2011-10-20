@@ -73,7 +73,7 @@ response component_namespace::service(
         case component_ns_service:
         case primary_ns_service:
         case symbol_ns_service:
-        case invalid_request: 
+        case invalid_request:
         {
             HPX_THROWS_IF(ec, bad_action_code
               , "component_namespace::service"
@@ -115,7 +115,7 @@ response component_namespace::bind_prefix(
         }
 
         // If the insertion succeeded, we need to increment the type
-        // counter. 
+        // counter.
         ++type_counter;
     }
 
@@ -180,7 +180,7 @@ response component_namespace::bind_name(
         }
 
         // If the insertion succeeded, we need to increment the type
-        // counter. 
+        // counter.
         ++type_counter;
     }
 
@@ -192,13 +192,13 @@ response component_namespace::bind_name(
         ec = make_success_code();
 
     return response(component_ns_bind_name, it->second);
-} // }}} 
+} // }}}
 
 response component_namespace::resolve_id(
     request const& req
   , error_code& ec
     )
-{ // {{{ resolve_id implementation 
+{ // {{{ resolve_id implementation
     // parameters
     component_id_type key = req.get_component_type();
 
@@ -230,7 +230,7 @@ response component_namespace::resolve_id(
                                     , pend = it->second.end();
 
         for (; pit != pend; ++pit)
-            p.push_back(*pit); 
+            p.push_back(*pit);
 
         LAGAS_(info) << (boost::format(
             "component_namespace::resolve_id, key(%1%), localities(%2%)")
@@ -240,7 +240,7 @@ response component_namespace::resolve_id(
             ec = make_success_code();
 
         return response(component_ns_resolve_id, p);
-    } 
+    }
 } // }}}
 
 response component_namespace::unbind(
@@ -252,7 +252,7 @@ response component_namespace::unbind(
     std::string key = req.get_name();
 
     mutex_type::scoped_lock l(mutex_);
-    
+
     component_id_table_type::iterator it = component_ids_.find(key)
                                     , end = component_ids_.end();
 
@@ -282,7 +282,7 @@ response component_namespace::unbind(
         ec = make_success_code();
 
     return response(component_ns_unbind);
-} // }}} 
+} // }}}
 
 }}}
 

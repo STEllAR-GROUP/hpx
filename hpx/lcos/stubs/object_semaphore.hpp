@@ -1,7 +1,7 @@
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_18186AAE_AF96_4ADC_88AF_215F13F18004)
@@ -12,7 +12,7 @@
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/lcos/server/object_semaphore.hpp>
 
-namespace hpx { namespace lcos { namespace stubs 
+namespace hpx { namespace lcos { namespace stubs
 {
 
 template <typename ValueType>
@@ -27,7 +27,7 @@ struct object_semaphore : components::stubs::stub_base<
       , ValueType const& val
       , boost::uint64_t count
     ) {
-        typedef typename server_type::signal_action action_type; 
+        typedef typename server_type::signal_action action_type;
         return lcos::eager_future<action_type>(gid, val, count);
     }
 
@@ -51,10 +51,10 @@ struct object_semaphore : components::stubs::stub_base<
     static lcos::promise<ValueType>
     get_async(naming::id_type const& gid)
     {
-        typedef typename server_type::get_action action_type; 
+        typedef typename server_type::get_action action_type;
         lcos::promise<ValueType> lco;
         applier::apply<action_type>(gid, lco.get_gid());
-        return lco; 
+        return lco;
     }
 
     static ValueType get_sync(naming::id_type const& gid)
@@ -72,7 +72,7 @@ struct object_semaphore : components::stubs::stub_base<
         naming::id_type const& gid
       , error ec
     ) {
-        typedef typename server_type::abort_pending_action action_type; 
+        typedef typename server_type::abort_pending_action action_type;
         return lcos::eager_future<action_type>(gid, ec);
     }
 
@@ -94,7 +94,7 @@ struct object_semaphore : components::stubs::stub_base<
     static lcos::promise<void> wait_async(
         naming::id_type const& gid
     ) {
-        typedef typename server_type::wait_action action_type; 
+        typedef typename server_type::wait_action action_type;
         return lcos::eager_future<action_type>(gid);
     }
 

@@ -1,8 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -53,7 +53,7 @@ struct function<Result(BOOST_PP_ENUM_PARAMS(N, T))>
 {
     typedef typename detail::function_result<Result>::type result_type;
     typedef boost::fusion::vector<
-        BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _) 
+        BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)
     > arguments_type;
     typedef signature<result_type, arguments_type> action_type;
 
@@ -116,10 +116,10 @@ struct function<Result(BOOST_PP_ENUM_PARAMS(N, T))>
 
     bool empty() const
     { return !f; }
-  
+
     operator typename util::safe_bool<function>::result_type() const
     { return util::safe_bool<function>()(f); }
- 
+
     bool operator!() const
     { return !f; }
 
@@ -155,7 +155,7 @@ struct function<Result(BOOST_PP_ENUM_PARAMS(N, T))>
     {
         if (version > HPX_FUNCTION_VERSION)
         {
-            HPX_THROW_EXCEPTION(version_too_new, 
+            HPX_THROW_EXCEPTION(version_too_new,
                 "function::load",
                 "trying to load function with unknown version");
         }

@@ -1,6 +1,6 @@
 //  Copyright (c) 2008-2009 Chirag Dekate, Hartmut Kaiser, Anshul Tandon
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_RUNTIME_THREAD_AFFINITY_NOV_11_2008_0711PM)
@@ -64,7 +64,7 @@ namespace hpx { namespace threads
         {
             data_.reserve(hardware_concurrency());
             numa_sensitve_data_.reserve(hardware_concurrency());
-            for (std::size_t i = 0; i < hardware_concurrency(); ++i) 
+            for (std::size_t i = 0; i < hardware_concurrency(); ++i)
             {
                 data_.push_back(init_numa_node(i, false));
                 numa_sensitve_data_.push_back(init_numa_node(i, true));
@@ -74,14 +74,14 @@ namespace hpx { namespace threads
         int get_numa_node(std::size_t thread_num, bool numa_sensitive)
         {
             BOOST_ASSERT(0 <= thread_num && thread_num < data_.size());
-            return numa_sensitive ? 
+            return numa_sensitive ?
                 numa_sensitve_data_[thread_num] : data_[thread_num];
         }
 
     private:
         int init_numa_node(std::size_t thread_num, bool numa_sensitive)
         {
-            if (std::size_t(-1) == thread_num) 
+            if (std::size_t(-1) == thread_num)
                  return -1;
 
             UCHAR node_number = 0;
@@ -94,7 +94,7 @@ namespace hpx { namespace threads
 
             unsigned int num_of_numa_cores = num_of_cores;
             ULONG numa_nodes = 0;
-            if (GetNumaHighestNodeNumber(&numa_nodes) && 0 != numa_nodes) 
+            if (GetNumaHighestNodeNumber(&numa_nodes) && 0 != numa_nodes)
                 num_of_numa_cores = num_of_cores / (numa_nodes + 1);
 
             return thread_num / num_of_numa_cores;
@@ -119,23 +119,23 @@ namespace hpx { namespace threads
         {
             data_.reserve(hardware_concurrency());
             numa_sensitve_data_.reserve(hardware_concurrency());
-            for (std::size_t i = 0; i < hardware_concurrency(); ++i) 
+            for (std::size_t i = 0; i < hardware_concurrency(); ++i)
             {
                 data_.push_back(init_numa_node_affinity_mask(i, false));
                 numa_sensitve_data_.push_back(init_numa_node_affinity_mask(i, true));
             }
         }
 
-        std::size_t get_numa_node_affinity_mask(std::size_t thread_num, 
+        std::size_t get_numa_node_affinity_mask(std::size_t thread_num,
             bool numa_sensitive)
         {
             BOOST_ASSERT(0 <= thread_num && thread_num < data_.size());
-            return numa_sensitive ? 
+            return numa_sensitive ?
                 numa_sensitve_data_[thread_num] : data_[thread_num];
         }
 
     private:
-        std::size_t init_numa_node_affinity_mask(std::size_t num_thread, 
+        std::size_t init_numa_node_affinity_mask(std::size_t num_thread,
             bool numa_sensitive)
         {
             unsigned int num_of_cores = hardware_concurrency();
@@ -167,7 +167,7 @@ namespace hpx { namespace threads
         std::vector<int> numa_sensitve_data_;
     };
 
-    inline std::size_t 
+    inline std::size_t
     get_numa_node_affinity_mask(std::size_t num_thread, bool numa_sensitive)
     {
         util::static_<numa_affinity_mask_data, numa_affinity_mask_data::tag> data;
@@ -183,23 +183,23 @@ namespace hpx { namespace threads
         {
             data_.reserve(hardware_concurrency());
             numa_sensitve_data_.reserve(hardware_concurrency());
-            for (std::size_t i = 0; i < hardware_concurrency(); ++i) 
+            for (std::size_t i = 0; i < hardware_concurrency(); ++i)
             {
                 data_.push_back(init_thread_affinity_mask(i, false));
                 numa_sensitve_data_.push_back(init_thread_affinity_mask(i, true));
             }
         }
 
-        std::size_t get_thread_affinity_mask(std::size_t thread_num, 
+        std::size_t get_thread_affinity_mask(std::size_t thread_num,
             bool numa_sensitive)
         {
             BOOST_ASSERT(0 <= thread_num && thread_num < data_.size());
-            return numa_sensitive ? 
+            return numa_sensitive ?
                 numa_sensitve_data_[thread_num] : data_[thread_num];
         }
 
     private:
-        std::size_t init_thread_affinity_mask(std::size_t num_thread, 
+        std::size_t init_thread_affinity_mask(std::size_t num_thread,
             bool numa_sensitive)
         {
             unsigned int num_of_cores = hardware_concurrency();
@@ -219,7 +219,7 @@ namespace hpx { namespace threads
                 if (!GetNumaNodeProcessorMask(numa_node, &node_affinity_mask))
                     return false;
 
-                mask = least_significant_bit(node_affinity_mask) << 
+                mask = least_significant_bit(node_affinity_mask) <<
                     (affinity / numa_nodes);
             }
             else {
@@ -227,7 +227,7 @@ namespace hpx { namespace threads
                 if (!GetNumaNodeProcessorMask(numa_node, &node_affinity_mask))
                     return false;
 
-                mask = least_significant_bit(node_affinity_mask) << 
+                mask = least_significant_bit(node_affinity_mask) <<
                     (affinity % num_of_cores_per_numa_node);
             }
 
@@ -244,7 +244,7 @@ namespace hpx { namespace threads
         std::vector<int> numa_sensitve_data_;
     };
 
-    inline std::size_t 
+    inline std::size_t
     get_thread_affinity_mask(std::size_t num_thread, bool numa_sensitive)
     {
         util::static_<thread_affinity_mask_data, thread_affinity_mask_data::tag> data;
@@ -252,7 +252,7 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline bool 
+    inline bool
     set_affinity(boost::thread& thrd, std::size_t num_thread, bool numa_sensitive)
     {
         DWORD_PTR mask = get_thread_affinity_mask(num_thread, numa_sensitive);
@@ -276,7 +276,7 @@ namespace hpx { namespace threads
     #include <mach/thread_policy.h>
 #endif
 
-    inline bool set_affinity(boost::thread& thrd, std::size_t affinity, 
+    inline bool set_affinity(boost::thread& thrd, std::size_t affinity,
         bool numa_sensitive)
     {
         return true;
@@ -287,7 +287,7 @@ namespace hpx { namespace threads
         thread_extended_policy_data_t epolicy;
         epolicy.timeshare = FALSE;
 
-        kern_return_t ret = thread_policy_set(mach_thread_self(), 
+        kern_return_t ret = thread_policy_set(mach_thread_self(),
             THREAD_EXTENDED_POLICY, (thread_policy_t) &epolicy,
             THREAD_EXTENDED_POLICY_COUNT);
 
@@ -297,8 +297,8 @@ namespace hpx { namespace threads
         thread_affinity_policy_data_t policy;
         policy.affinity_tag = num_thread + 1;   // 1...N
 
-        ret = thread_policy_set(mach_thread_self(), 
-            THREAD_AFFINITY_POLICY, (thread_policy_t) &policy, 
+        ret = thread_policy_set(mach_thread_self(),
+            THREAD_AFFINITY_POLICY, (thread_policy_t) &policy,
             THREAD_AFFINITY_POLICY_COUNT);
 
         return ret == KERN_SUCCESS;
@@ -307,13 +307,13 @@ namespace hpx { namespace threads
 #endif
     }
 
-    inline std::size_t 
+    inline std::size_t
     get_thread_affinity_mask(std::size_t thread_num, bool numa_sensitive)
     {
         return std::size_t(-1);
     }
 
-    inline std::size_t 
+    inline std::size_t
     get_numa_node_affinity_mask(std::size_t thread_num, bool numa_sensitive)
     {
         return std::size_t(-1);
@@ -331,7 +331,7 @@ namespace hpx { namespace threads
     #include <sys/syscall.h>
     #include <sys/types.h>
 
-    inline bool set_affinity(boost::thread& thrd, std::size_t num_thread, 
+    inline bool set_affinity(boost::thread& thrd, std::size_t num_thread,
         bool numa_sensitive)
     {
         return true;
@@ -389,13 +389,13 @@ namespace hpx { namespace threads
         return false;
     }
 
-    inline std::size_t 
+    inline std::size_t
     get_thread_affinity_mask(std::size_t thread_num, bool numa_sensitive)
     {
         return std::size_t(-1);
     }
 
-    inline std::size_t 
+    inline std::size_t
     get_numa_node_affinity_mask(std::size_t thread_num, bool numa_sensitive)
     {
         return std::size_t(-1);

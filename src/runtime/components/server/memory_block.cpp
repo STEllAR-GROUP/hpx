@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -25,10 +25,10 @@ HPX_REGISTER_COMPONENT_MODULE();
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the memory_block actions
 HPX_REGISTER_ACTION_EX(
-    hpx::components::server::detail::memory_block::get_action, 
+    hpx::components::server::detail::memory_block::get_action,
     memory_block_get_action);
 HPX_REGISTER_ACTION_EX(
-    hpx::components::server::detail::memory_block::get_config_action, 
+    hpx::components::server::detail::memory_block::get_config_action,
     memory_block_get_action);
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::detail::memory_block::checkout_action,
@@ -59,36 +59,36 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::components::component_base_lco_with_value);
 
 HPX_REGISTER_MANAGE_OBJECT_ACTION(
-    hpx::actions::manage_object_action<boost::uint8_t>, 
+    hpx::actions::manage_object_action<boost::uint8_t>,
     manage_object_action_uint8_t)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server { namespace detail
 {
     /// Get the current data for reading
-    components::memory_block_data memory_block::get() 
+    components::memory_block_data memory_block::get()
     {
         return components::memory_block_data(wrapper_->component_);
     }
 
     /// Get the current data for reading, use config info for serialization
     components::memory_block_data memory_block::get_config(
-        components::memory_block_data const& config) 
+        components::memory_block_data const& config)
     {
         return components::memory_block_data(wrapper_->component_, config.data_);
     }
 
     /// Get the current data for reading
-    components::memory_block_data memory_block::checkout() 
+    components::memory_block_data memory_block::checkout()
     {
         return components::memory_block_data(wrapper_->component_);
     }
 
     /// Write back data
-    void memory_block::checkin(components::memory_block_data const& data) 
+    void memory_block::checkin(components::memory_block_data const& data)
     {
         // we currently just write back to the memory block
-        hpx::actions::manage_object_action_base const& obj = 
+        hpx::actions::manage_object_action_base const& obj =
             wrapper_->component_->get_managing_object();
         obj.assign()(this->get_ptr(), data.get_ptr(), data.get_size());
     }
@@ -108,13 +108,13 @@ namespace hpx { namespace components { namespace server { namespace detail
         strm << "global id " << gid << " is already bound to a different "
                 "component instance";
         HPX_THROW_EXCEPTION(hpx::duplicate_component_address,
-            "server::detail::create_memory_block", 
+            "server::detail::create_memory_block",
             hpx::util::osstream_get_string(strm));
 
         return naming::invalid_gid;
     }
 
-    naming::gid_type memory_block::clone() 
+    naming::gid_type memory_block::clone()
     {
         return create_memory_block(wrapper_->component_.get(), this->managing_object_);
     }

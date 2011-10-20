@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -15,8 +15,8 @@
 namespace interpolate1d
 {
     ///////////////////////////////////////////////////////////////////////////
-    inline void 
-    read_values(H5::DataSet& dataset, H5::DataSpace& data_space, 
+    inline void
+    read_values(H5::DataSet& dataset, H5::DataSpace& data_space,
         hsize_t offset, hsize_t count, double* values)
     {
         using namespace H5;
@@ -40,14 +40,14 @@ namespace interpolate1d
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    boost::uint64_t extract_data_range (std::string const& datafilename, 
-        double& minval, double& maxval, double& delta, 
+    boost::uint64_t extract_data_range (std::string const& datafilename,
+        double& minval, double& maxval, double& delta,
         std::size_t start, std::size_t end)
     {
         try {
             using namespace H5;
 
-            // Turn off the auto-printing when failure occurs 
+            // Turn off the auto-printing when failure occurs
             Exception::dontPrint();
 
             H5File file(datafilename, H5F_ACC_RDONLY);
@@ -90,7 +90,7 @@ namespace interpolate1d
         try {
             using namespace H5;
 
-            // Turn off the auto-printing when failure occurs 
+            // Turn off the auto-printing when failure occurs
             Exception::dontPrint();
 
             H5File file(datafilename, H5F_ACC_RDONLY);

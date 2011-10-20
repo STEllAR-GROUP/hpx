@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_PERFORMANCE_COUNTERS_SERVER_AVERAGE_COUNT_COUNTER_SEP_30_2011_1045AM)
@@ -16,12 +16,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server
 {
-    // This counter exposes the average count of items processed during the 
-    // given base time interval. The counter relies on querying a steadily 
+    // This counter exposes the average count of items processed during the
+    // given base time interval. The counter relies on querying a steadily
     // growing counter value.
-    class HPX_EXPORT average_count_counter 
+    class HPX_EXPORT average_count_counter
       : public base_performance_counter,
-        public components::managed_component_base<average_count_counter> 
+        public components::managed_component_base<average_count_counter>
     {
         typedef components::managed_component_base<average_count_counter> base_type;
 
@@ -31,25 +31,25 @@ namespace hpx { namespace performance_counters { namespace server
 
         average_count_counter() {}
         average_count_counter(counter_info const& info,
-            std::string const& base_counter_name, 
+            std::string const& base_counter_name,
             std::size_t base_time_interval);
 
         void get_counter_value(counter_value& value);
 
-        /// \brief finalize() will be called just before the instance gets 
+        /// \brief finalize() will be called just before the instance gets
         ///        destructed
-        void finalize() 
+        void finalize()
         {
             base_performance_counter::finalize();
             base_type::finalize();
         }
 
-        static components::component_type get_component_type() 
-        { 
-            return base_type::get_component_type(); 
+        static components::component_type get_component_type()
+        {
+            return base_type::get_component_type();
         }
-        static void set_component_type(components::component_type t) 
-        { 
+        static void set_component_type(components::component_type t)
+        {
             base_type::set_component_type(t);
         }
 
@@ -65,8 +65,8 @@ namespace hpx { namespace performance_counters { namespace server
         std::string base_counter_name_;   ///< name of base counter to be queried
         naming::id_type base_counter_id_;
         typedef boost::accumulators::accumulator_set<
-            boost::int64_t, 
-            boost::accumulators::stats<boost::accumulators::tag::mean> 
+            boost::int64_t,
+            boost::accumulators::stats<boost::accumulators::tag::mean>
         > mean_accumulator_type;
         mean_accumulator_type value_;
         counter_value prev_value_;

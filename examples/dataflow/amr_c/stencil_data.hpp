@@ -1,8 +1,8 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2009-2011 Matt Anderson
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_COMPONENTS_AMR_STENCIL_DATA_NOV_10_2008_0719PM)
@@ -19,7 +19,7 @@
 #include <examples/dataflow/parameter.hpp>
 #include <examples/dataflow/array1d.hpp>
 
-namespace hpx { namespace components { namespace amr 
+namespace hpx { namespace components { namespace amr
 {
     namespace server
     {
@@ -38,19 +38,19 @@ namespace hpx { namespace components { namespace amr
             void save(Archive & ar, const unsigned int version) const
             {
                 ar & start_ & count_;
-            } 
+            }
 
             template<class Archive>
             void load(Archive & ar, const unsigned int version)
             {
                 ar & start_ & count_;
-            } 
+            }
         };
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // client side representation
-    struct stencil_config_data 
+    struct stencil_config_data
       : access_memory_block<server::stencil_config_data>
     {
         typedef access_memory_block<server::stencil_config_data> base_type;
@@ -65,15 +65,15 @@ namespace hpx { namespace components { namespace amr
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    struct stencil_data 
+    struct stencil_data
     {
-        stencil_data() 
+        stencil_data()
           : max_index_(0), index_(0), timestep_(0)
         {}
         ~stencil_data() {}
 
         stencil_data(stencil_data const& rhs)
-          : max_index_(rhs.max_index_), index_(rhs.index_), 
+          : max_index_(rhs.max_index_), index_(rhs.index_),
             timestep_(rhs.timestep_),
             value_(rhs.value_)
         {
@@ -114,15 +114,15 @@ namespace hpx { namespace components { namespace amr
                 value_.do_save(ar, config->start_, config->start_+config->count_);
             } else
                 value_.do_save(ar, 0, value_.size());
-        } 
+        }
 
         template<class Archive>
         void load(Archive & ar, const unsigned int version,
-            server::stencil_config_data const* config) 
+            server::stencil_config_data const* config)
         {
             ar & max_index_ & index_ & timestep_;
             value_.do_load(ar);
-        } 
+        }
 
         // 'normal' serialization
         friend class boost::serialization::access;
@@ -133,13 +133,13 @@ namespace hpx { namespace components { namespace amr
         void save(Archive & ar, const unsigned int version) const
         {
             BOOST_ASSERT(false);    // shouldn't ever be called
-        } 
+        }
 
         template<class Archive>
         void load(Archive & ar, const unsigned int version)
         {
             BOOST_ASSERT(false);    // shouldn't ever be called
-        } 
+        }
     };
 }}}
 

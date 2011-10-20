@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -18,7 +18,7 @@ typedef hpx::components::managed_component<
 > elapsed_time_counter_type;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY_EX(
-    elapsed_time_counter_type, elapsed_time_counter, 
+    elapsed_time_counter_type, elapsed_time_counter,
     "base_performance_counter", true);
 HPX_DEFINE_GET_COMPONENT_TYPE(
     hpx::performance_counters::server::elapsed_time_counter);
@@ -30,7 +30,7 @@ namespace hpx { namespace performance_counters { namespace server
       : base_type_holder(info)
     {
         if (info.type_ != counter_elapsed_time) {
-            HPX_THROW_EXCEPTION(bad_parameter, 
+            HPX_THROW_EXCEPTION(bad_parameter,
                 "elapsed_time_counter::elapsed_time_counter",
                 "unexpected counter type specified for elapsed_time_counter");
         }

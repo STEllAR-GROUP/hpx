@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -52,7 +52,7 @@ namespace boost { namespace serialization
                 throw_function_ = *func;
             }
             else {
-                std::string const* s = 
+                std::string const* s =
                     boost::get_error_info<hpx::throw_function>(e);
                 if (s)
                     throw_function_ = *s;
@@ -64,42 +64,42 @@ namespace boost { namespace serialization
                 throw_file_ = *file;
             }
             else {
-                std::string const* s = 
+                std::string const* s =
                     boost::get_error_info<hpx::throw_file>(e);
                 if (s)
                     throw_file_ = *s;
             }
 
-            int const* line = 
+            int const* line =
                 boost::get_error_info<boost::throw_line>(e);
             if (line) {
                 throw_line_ = *line;
             }
 
-            boost::uint32_t const* locality = 
+            boost::uint32_t const* locality =
                 boost::get_error_info<hpx::throw_locality>(e);
             if (locality) {
                 throw_locality_ = *locality;
             }
 
-            boost::int64_t const* shepherd = 
+            boost::int64_t const* shepherd =
                 boost::get_error_info<hpx::throw_shepherd>(e);
             if (shepherd) {
                 throw_shepherd_ = *shepherd;
             }
 
-            std::size_t const* thread_id = 
+            std::size_t const* thread_id =
                 boost::get_error_info<hpx::throw_thread_id>(e);
             if (thread_id) {
                 throw_thread_id_ = *thread_id;
             }
 
-            std::string const* thread_name = 
+            std::string const* thread_name =
                 boost::get_error_info<hpx::throw_thread_name>(e);
             if (thread_name) {
                 throw_thread_name_ = *thread_name;
             }
- 
+
 #if defined(HPX_HAVE_STACKTRACES)
             std::string const* back_trace =
                 boost::get_error_info<hpx::throw_stacktrace>(e);
@@ -285,7 +285,7 @@ namespace boost { namespace serialization
             // boost::system::system_error
             case hpx::util::boost_system_error:
                 hpx::detail::rethrow_exception(
-                    boost::system::system_error(err_value, 
+                    boost::system::system_error(err_value,
                         boost::system::get_system_category(), err_message),
                     throw_function_, throw_file_, throw_line_, back_trace_,
                     throw_locality_, throw_shepherd_, throw_thread_id_,
@@ -310,20 +310,20 @@ namespace boost { namespace serialization
     ///////////////////////////////////////////////////////////////////////////
     // explicit instantiation for the correct archive types
 #if HPX_USE_PORTABLE_ARCHIVES != 0
-    template HPX_EXPORT void 
-    save(hpx::util::portable_binary_oarchive&, boost::exception_ptr const&, 
+    template HPX_EXPORT void
+    save(hpx::util::portable_binary_oarchive&, boost::exception_ptr const&,
         unsigned int);
 
-    template HPX_EXPORT void 
-    load(hpx::util::portable_binary_iarchive&, boost::exception_ptr&, 
+    template HPX_EXPORT void
+    load(hpx::util::portable_binary_iarchive&, boost::exception_ptr&,
         unsigned int);
 #else
-    template HPX_EXPORT void 
-    save(boost::archive::binary_oarchive&, boost::exception_ptr const&, 
+    template HPX_EXPORT void
+    save(boost::archive::binary_oarchive&, boost::exception_ptr const&,
         unsigned int);
 
-    template HPX_EXPORT void 
-    load(boost::archive::binary_iarchive&, boost::exception_ptr&, 
+    template HPX_EXPORT void
+    load(boost::archive::binary_iarchive&, boost::exception_ptr&,
         unsigned int);
 #endif
 }}

@@ -31,7 +31,7 @@ namespace writer {
     template<class msg_type, class base_type> struct on_dedicated_thread ;
     template<class base_type> struct ts_write ;
 
-    /** 
+    /**
         @brief specify thread-safety of your logger_format_write class
     */
     namespace threading {
@@ -44,7 +44,7 @@ namespace writer {
     }
 }
 
-/** 
+/**
 @file boost/logging/format_fwd.hpp
 
 Include this file when you're using @ref manipulator "formatters and destinations",
@@ -60,7 +60,7 @@ Example:
 #include <boost/logging/logging.hpp>
 #include <boost/logging/format/optimize.hpp>
 
-BOOST_LOG_FORMAT_MSG( boost::logging::optimize::cache_string_one_str<> ) 
+BOOST_LOG_FORMAT_MSG( boost::logging::optimize::cache_string_one_str<> )
 
 #if defined(BOOST_LOG_DEFINE_LOGS)
 #include <boost/logging/format.hpp>
@@ -81,7 +81,7 @@ void init_logs();
 @endcode
 */
 template<
-            class format_base_type = default_, 
+            class format_base_type = default_,
             class destination_base_type = default_ ,
             class thread_safety = default_ ,
             class gather = default_,
@@ -89,7 +89,7 @@ template<
     > struct logger_format_write;
 
 
-/** 
+/**
     dumps the default levels
 
     Has a static function : dump, which dumps the level as string (works only for the default levels; for any other level, returns "")
@@ -108,7 +108,7 @@ struct dump_default_levels {
     }
 };
 
-/** 
+/**
     Specifies the class that will dump the levels. Used by formatter::tag::level class.
 */
 template<class T = override> struct dump_level {
@@ -129,7 +129,7 @@ namespace detail {
 
 
 // specialize for logger_format_write
-template<class format_base, class destination_base, class thread_safety, class gather, class lock_resource> 
+template<class format_base, class destination_base, class thread_safety, class gather, class lock_resource>
         struct logger_to_gather< logger_format_write<format_base, destination_base, thread_safety, gather, lock_resource> > {
 
     typedef typename detail::format_find_gather<gather>::type gather_type;

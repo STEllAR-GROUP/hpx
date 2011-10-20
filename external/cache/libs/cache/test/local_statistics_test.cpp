@@ -1,6 +1,6 @@
 //  Copyright (c) 2008 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <string>
@@ -22,7 +22,7 @@ struct data
     char const* const value;
 };
 
-data entries[] = 
+data entries[] =
 {
     data ("white", "255,255,255"),
     data ("yellow", "255,255,0"),
@@ -40,7 +40,7 @@ void test_statistics_insert()
 
     typedef entries::lru_entry<std::string> entry_type;
     typedef local_cache<
-        std::string, entry_type, std::less<entry_type>, 
+        std::string, entry_type, std::less<entry_type>,
         policies::always<entry_type>, std::map<std::string, entry_type>,
         statistics::local_statistics
     > cache_type;
@@ -73,7 +73,7 @@ void test_statistics_insert_with_touch()
 
     typedef entries::lru_entry<std::string> entry_type;
     typedef local_cache<
-        std::string, entry_type, std::less<entry_type>, 
+        std::string, entry_type, std::less<entry_type>,
         policies::always<entry_type>, std::map<std::string, entry_type>,
         statistics::local_statistics
     > cache_type;
@@ -127,7 +127,7 @@ void test_statistics_update()
 
     typedef entries::lru_entry<std::string> entry_type;
     typedef local_cache<
-        std::string, entry_type, std::less<entry_type>, 
+        std::string, entry_type, std::less<entry_type>,
         policies::always<entry_type>, std::map<std::string, entry_type>,
         statistics::local_statistics
     > cache_type;
@@ -171,7 +171,7 @@ void test_statistics_update()
 struct erase_func
 {
     erase_func(std::string const& key)
-      : key_(key) 
+      : key_(key)
     {}
 
     template <typename Entry>
@@ -189,7 +189,7 @@ void test_statistics_erase_one()
 
     typedef entries::lru_entry<std::string> entry_type;
     typedef local_cache<
-        std::string, entry_type, std::less<entry_type>, 
+        std::string, entry_type, std::less<entry_type>,
         policies::always<entry_type>, std::map<std::string, entry_type>,
         statistics::local_statistics
     > cache_type;

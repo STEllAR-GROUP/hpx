@@ -22,7 +22,7 @@ namespace hpx { namespace components
         client_base<lublock, stubs::lublock> base_type;
 
     public:
-    //constructors 
+    //constructors
     lublock(){}
     lublock(id_type gid) : base_type(gid){}
 

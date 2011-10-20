@@ -1,9 +1,9 @@
 # Copyright (c) 2007-2011 Hartmut Kaiser
 # Copyright (c)      2011 Bryce Lelbach
 #
-# Distributed under the Boost Software License, Version 1.0. (See accompanying 
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-  
+
 add_subdirectory(components)
 
 if(UNIX AND HPX_WARNINGS)
@@ -23,7 +23,7 @@ if(UNIX AND HPX_WARNINGS)
   # Be extra strict about format checks
   # Boost.Logging is built on fprintf, sadly
   hpx_use_flag_if_available(-Wformat=2)
-  hpx_use_flag_if_available(-Wno-format-nonliteral) 
+  hpx_use_flag_if_available(-Wno-format-nonliteral)
 
   # Self initialization is dangerous
   hpx_use_flag_if_available(-Winit-self)
@@ -41,8 +41,8 @@ if(UNIX AND HPX_WARNINGS)
   hpx_use_flag_if_available(-Werror=return-type)
   hpx_use_flag_if_available(-Werror=sequence-point)
   hpx_use_flag_if_available(-Werror=uninitialized)
-  hpx_use_flag_if_available(-Werror=missing-field-initializers) 
-  hpx_use_flag_if_available(-Werror=format) 
+  hpx_use_flag_if_available(-Werror=missing-field-initializers)
+  hpx_use_flag_if_available(-Werror=format)
   hpx_use_flag_if_available(-Werror=missing-braces)
   hpx_use_flag_if_available(-Werror=sign-compare)
 endif()
@@ -60,21 +60,21 @@ endforeach()
 
 # libhpx_serialization sources
 add_hpx_library_sources(hpx_serialization
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/util/portable_binary_*archive.cpp") 
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/util/portable_binary_*archive.cpp")
 
 # libhpx sources
 add_hpx_library_sources(hpx
   GLOB GLOBS "${hpx_SOURCE_DIR}/src/*.cpp"
-  EXCLUDE ".*hpx_init.cpp") 
+  EXCLUDE ".*hpx_init.cpp")
 add_hpx_library_sources(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/runtime/*.cpp") 
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/runtime/*.cpp")
 add_hpx_library_sources(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/performance_counters/*.cpp") 
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/performance_counters/*.cpp")
 add_hpx_library_sources(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/util/*.cpp" 
-  EXCLUDE ".*portable_binary_.*archive[.]cpp") 
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/util/*.cpp"
+  EXCLUDE ".*portable_binary_.*archive[.]cpp")
 add_hpx_library_sources(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/lcos/*.cpp") 
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/lcos/*.cpp")
 
 # libhpx_init sources
 add_hpx_library_sources(hpx_init
@@ -86,7 +86,7 @@ if(HPX_INTERNAL_CHRONO AND ${BOOST_MINOR_VERSION} LESS 47)
     GLOB GLOBS "${hpx_SOURCE_DIR}/external/chrono/libs/chrono/src/chrono.cpp")
 endif()
 
-# Add Boost.Backtrace sources if stack traces are enabled 
+# Add Boost.Backtrace sources if stack traces are enabled
 if(HPX_STACKTRACES)
   add_hpx_library_sources(hpx
     GLOB GLOBS "${hpx_SOURCE_DIR}/external/backtrace/libs/backtrace/src/backtrace.cpp")
@@ -100,32 +100,32 @@ add_hpx_library_sources(hpx
 
 # libhpx_serialization headers
 add_hpx_library_headers(hpx_serialization
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/util/portable_binary_*archive.hpp") 
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/util/portable_binary_*archive.hpp")
 
 # libhpx headers
 add_hpx_library_headers(hpx
   GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/*.hpp"
-  EXCLUDE ".*hpx_init.hpp") 
+  EXCLUDE ".*hpx_init.hpp")
 add_hpx_library_headers(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/runtime/*.hpp") 
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/runtime/*.hpp")
 add_hpx_library_headers(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/include/*.hpp") 
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/include/*.hpp")
 add_hpx_library_headers(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/config/*.hpp") 
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/config/*.hpp")
 add_hpx_library_headers(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/performance_counters/*.hpp") 
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/performance_counters/*.hpp")
 add_hpx_library_headers(hpx
   GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/util/*.h*"
-  EXCLUDE ".*portable_binary_.*archive[.]hpp") 
+  EXCLUDE ".*portable_binary_.*archive[.]hpp")
 add_hpx_library_headers(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/lcos/*.hpp") 
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/lcos/*.hpp")
 
 # libhpx_init sources
 add_hpx_library_sources(hpx_init
   GLOB GLOBS "${hpx_SOURCE_DIR}/src/*hpx_init.cpp")
 
 ################################################################################
-# make source groups 
+# make source groups
 add_hpx_source_group(CLASS "Source Files" ROOT ${hpx_SOURCE_DIR}/src
   TARGETS ${hpx_serialization_SOURCES} ${hpx_SOURCES} ${hpx_init_SOURCES})
 
@@ -173,7 +173,7 @@ target_link_libraries(hpx
   ${hpx_MALLOC_LIBRARY}
   ${hpx_RUNTIME_LIBRARIES}
   ${BOOST_FOUND_LIBRARIES})
- 
+
 hpx_mangle_name(name hpx)
 
 set_property(TARGET hpx APPEND
@@ -190,7 +190,7 @@ hpx_library_install(${name})
 ################################################################################
 # libhpx_init
 add_library(hpx_init STATIC ${hpx_init_SOURCES} ${hpx_init_HEADERS})
-  
+
 set_property(TARGET hpx_init APPEND
   PROPERTY COMPILE_DEFINITIONS
   "HPX_APPLICATION_EXPORTS"

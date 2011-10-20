@@ -42,7 +42,7 @@ class count_time_stats {
     double moment_time() const;
     double variance_time() const;
 
-    double total_time() const;    
+    double total_time() const;
 
     private:
     util::high_resolution_timer timer;
@@ -59,7 +59,7 @@ class count_time_stats {
     acc_set < double,
         boost::accumulators::features< boost::accumulators::tag::moment<2> > >
         moment_time_acc;
-   
+
     acc_set < double,
         boost::accumulators::features< boost::accumulators::tag::variance> >
         variance_time_acc;
@@ -71,7 +71,7 @@ inline void count_time_stats::push_back(count_and_time_data_point const& x)
         mtx(acc_mtx)
 
     ++count_time_stats_size;
-    
+
     mean_time_acc(x.time);
     moment_time_acc(x.time);
     variance_time_acc(x.time);
@@ -86,8 +86,8 @@ inline double count_time_stats::mean_time() const
 {
     lock mtx(acc_mtx);
     return boost::accumulators::extract::mean(mean_time_acc);
-}   
-   
+}
+
 inline double count_time_stats::moment_time() const
 {
     lock mtx(acc_mtx);

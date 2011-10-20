@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Thomas Heller
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef BOOST_PP_IS_ITERATING
@@ -22,13 +22,13 @@
 #include <boost/type_traits/is_const.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components 
+namespace hpx { namespace components
 {
     template <typename T>
     class access_memory_block;
 
     ///////////////////////////////////////////////////////////////////////////
-    /// The \a runtime_support class is the client side representation of a 
+    /// The \a runtime_support class is the client side representation of a
     /// \a server#memory_block component
     class memory_block : public client_base<memory_block, stubs::memory_block>
     {
@@ -40,15 +40,15 @@ namespace hpx { namespace components
 
         /// Create a client side representation for the existing
         /// \a server#memory_block instance with the given global id \a gid.
-        memory_block(naming::id_type const& gid) 
+        memory_block(naming::id_type const& gid)
           : base_type(gid)
         {}
 
         ///////////////////////////////////////////////////////////////////////
-        /// Create a new instance of a memory_block component on the locality as 
+        /// Create a new instance of a memory_block component on the locality as
         /// given by the parameter \a targetgid
 //         template <typename T>
-//         memory_block& create(naming::id_type const& targetgid, std::size_t count, 
+//         memory_block& create(naming::id_type const& targetgid, std::size_t count,
 //             hpx::actions::manage_object_action<T> const& act)
 //         {
 //             this->base_type::free();
@@ -57,7 +57,7 @@ namespace hpx { namespace components
 //         }
 
         template <typename T, typename Config>
-        memory_block& create(naming::id_type const& targetgid, std::size_t count, 
+        memory_block& create(naming::id_type const& targetgid, std::size_t count,
             hpx::actions::manage_object_action<T, Config> const& act)
         {
             this->base_type::free();
@@ -65,17 +65,17 @@ namespace hpx { namespace components
             return *this;
         }
 
-        /// Create a new instance of a memory_block component on the locality as 
+        /// Create a new instance of a memory_block component on the locality as
         /// given by the parameter \a targetgid.
         /// Allocates count * sizeof(T1) bytes of memory
         template <typename T0, typename T1, typename Config>
-        memory_block& create(naming::id_type const& targetgid, std::size_t count, 
+        memory_block& create(naming::id_type const& targetgid, std::size_t count,
             hpx::actions::manage_object_action<T1, Config> const& act)
         {
             return create(targetgid, sizeof(T0) * count, act);
         }
 
-        /// Create a new instance of a memory_block component on the locality as 
+        /// Create a new instance of a memory_block component on the locality as
         /// given by the parameter \a targetgid.
         /// Allocates count * sizeof(T) bytes of memory and automatically creates
         /// an instance of hpx::actions::manage_object_action<T>
@@ -85,14 +85,14 @@ namespace hpx { namespace components
             hpx::actions::manage_object_action<T> const act;
             return create(targetgid, sizeof(T) * count, act);
         }
-        
+
         template <typename T0, typename T1>
         memory_block& create(naming::id_type const& targetgid, std::size_t count)
         {
             hpx::actions::manage_object_action<T1> const act;
             return create(targetgid, sizeof(T0) * count, act);
         }
-        
+
         template <typename T0, typename T1, typename Config>
         memory_block& create(naming::id_type const& targetgid, std::size_t count)
         {
@@ -105,47 +105,47 @@ namespace hpx { namespace components
         // exposed functionality of this component
 
         /// Get the \a memory_block_data maintained by this memory_block
-        memory_block_data get() 
+        memory_block_data get()
         {
             return this->base_type::get(gid_);
         }
 
-        /// Asynchronously get the \a memory_block_data maintained by this 
+        /// Asynchronously get the \a memory_block_data maintained by this
         /// memory_block
-        lcos::promise<memory_block_data> get_async() 
+        lcos::promise<memory_block_data> get_async()
         {
             return this->base_type::get_async(gid_);
         }
 
-        /// Get the \a memory_block_data maintained by this memory_block, use 
+        /// Get the \a memory_block_data maintained by this memory_block, use
         /// given data for serialization configuration (will be passed to the
-        /// save() function exposed by the datatype instance wrapped in the 
+        /// save() function exposed by the datatype instance wrapped in the
         /// return value of this get())
-        memory_block_data get(memory_block_data const& config) 
+        memory_block_data get(memory_block_data const& config)
         {
             return this->base_type::get(gid_, config);
         }
 
-        /// Asynchronously get the \a memory_block_data maintained by this 
-        /// memory_block. Use given data for serialization configuration (will 
-        /// be passed to the save() function exposed by the datatype instance 
+        /// Asynchronously get the \a memory_block_data maintained by this
+        /// memory_block. Use given data for serialization configuration (will
+        /// be passed to the save() function exposed by the datatype instance
         /// wrapped in the return value of this get())
         lcos::promise<memory_block_data> get_async(
-          memory_block_data const& config) 
+          memory_block_data const& config)
         {
             return this->base_type::get_async(gid_, config);
         }
 
         ///////////////////////////////////////////////////////////////////////
         /// Clone the \a memory_block_data maintained by this memory_block
-        naming::id_type clone() 
+        naming::id_type clone()
         {
             return this->base_type::clone(gid_);
         }
 
-        /// Asynchronously clone the \a memory_block_data maintained by this 
+        /// Asynchronously clone the \a memory_block_data maintained by this
         /// memory_block
-        lcos::promise<naming::id_type, naming::gid_type> clone_async() 
+        lcos::promise<naming::id_type, naming::gid_type> clone_async()
         {
             return this->base_type::clone_async(gid_);
         }
@@ -153,16 +153,16 @@ namespace hpx { namespace components
         ///////////////////////////////////////////////////////////////////////
         /// Write the given \a memory_block_data back to it's original source
         template <typename T>
-        void checkin(components::access_memory_block<T> const& data) 
+        void checkin(components::access_memory_block<T> const& data)
         {
             this->base_type::checkin(gid_, data);
         }
 
-        /// Asynchronously clone the \a memory_block_data maintained by this 
+        /// Asynchronously clone the \a memory_block_data maintained by this
         /// memory_block
         template <typename T>
         lcos::promise<void> checkin_async(
-            components::access_memory_block<T> const& data) 
+            components::access_memory_block<T> const& data)
         {
             return this->base_type::checkin_async(gid_, data);
         }
@@ -174,7 +174,7 @@ namespace hpx { namespace components
     {
     private:
         typedef typename boost::remove_const<T>::type target_type;
-        typedef typename 
+        typedef typename
             boost::mpl::if_<
                 boost::is_const<T>, memory_block_data const&, memory_block_data&
             >::type
@@ -231,7 +231,7 @@ namespace hpx { namespace components
         }
 
         ///////////////////////////////////////////////////////////////////////
-        target_type* operator->() 
+        target_type* operator->()
         {
             BOOST_ASSERT(sizeof(target_type) <= mb_.get_size());
             return reinterpret_cast<target_type*>(mb_.get_ptr());
@@ -242,7 +242,7 @@ namespace hpx { namespace components
         }
 
         ///////////////////////////////////////////////////////////////////////
-        target_type* get_ptr() 
+        target_type* get_ptr()
         {
             BOOST_ASSERT(sizeof(target_type) <= mb_.get_size());
             return reinterpret_cast<target_type*>(mb_.get_ptr());
@@ -255,7 +255,7 @@ namespace hpx { namespace components
         }
 
         ///////////////////////////////////////////////////////////////////////
-        target_type& get() 
+        target_type& get()
         {
             BOOST_ASSERT(sizeof(target_type) <= mb_.get_size());
             return *reinterpret_cast<target_type*>(mb_.get_ptr());
@@ -306,7 +306,7 @@ namespace hpx { namespace components
     template <typename T, typename AllocA, typename AllocB>
     inline access_memory_block<T>
     get_memory_block_async(std::vector<access_memory_block<T>, AllocA>& results,
-        std::vector<naming::id_type, AllocB> const& gids, 
+        std::vector<naming::id_type, AllocB> const& gids,
         naming::id_type const& result)
     {
         typedef std::vector<lcos::promise<memory_block_data>,

@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_CONSTRUCTOR_ARGUMENT_MAR_10_2010_0201PM)
@@ -14,7 +14,7 @@
 namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
-    // currently, we support a limited set of possible constructor argument 
+    // currently, we support a limited set of possible constructor argument
     // types
     typedef boost::variant<
         std::size_t

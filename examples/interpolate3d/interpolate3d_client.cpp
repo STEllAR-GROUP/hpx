@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
@@ -12,13 +12,13 @@ using boost::program_options::variables_map;
 using boost::program_options::options_description;
 
 ///////////////////////////////////////////////////////////////////////////////
-inline void 
+inline void
 eval(char const* expr, interpolate3d::interpolate3d& gauss, double value_x,
     double value_y, double value_z)
 {
-    std::cout << expr << gauss.interpolate(value_x, value_y, value_z) 
-              << " (expected: " 
-              << std::exp(-value_x*value_x - value_y*value_y - value_z*value_z) 
+    std::cout << expr << gauss.interpolate(value_x, value_y, value_z)
+              << " (expected: "
+              << std::exp(-value_x*value_x - value_y*value_y - value_z*value_z)
               << ")" << std::endl;
 }
 
@@ -49,7 +49,7 @@ int hpx_main(variables_map& vm)
 
         std::cout << std::endl << std::endl;
 
-        // create a second client instance connected to the already existing 
+        // create a second client instance connected to the already existing
         // interpolation object
         interpolate3d::interpolate3d gauss_connected;
         gauss_connected.connect("/interpolate3d_client/gauss");

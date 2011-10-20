@@ -72,7 +72,7 @@ inline delete_array & object_deleter() {
 
 template<class type> inline type * new_object_ensure_delete() {
     type * val = new type;
-    delete_array & del = object_deleter();    
+    delete_array & del = object_deleter();
     del.push_back( new do_delete<type>(val) );
     return val;
 }

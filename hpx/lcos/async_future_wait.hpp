@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_LCOS_ASYNC_FUTURE_WAIT_AUG_02_2011_1146AM)
@@ -14,9 +14,9 @@
 #include <boost/function.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos 
+namespace hpx { namespace lcos
 {
-    /// The one argument version is special in the sense that it returns the 
+    /// The one argument version is special in the sense that it returns the
     /// expected value directly (without wrapping it into a tuple).
     template <typename T1, typename TR1, typename F>
     inline std::size_t
@@ -35,8 +35,8 @@ namespace hpx { namespace lcos
         return 1;
     }
 
-    // This overload of wait() will make sure that the passed function will be 
-    // invoked as soon as a value gets available, it will not wait for all 
+    // This overload of wait() will make sure that the passed function will be
+    // invoked as soon as a value gets available, it will not wait for all
     // results to be there.
     template <typename T1, typename TR1, typename F>
     inline std::size_t
@@ -51,7 +51,7 @@ namespace hpx { namespace lcos
             for (std::size_t i = 0; i < lazy_values.size(); ++i) {
 
                 // loop over all lazy_values, executing the next as soon as its
-                // value gets available 
+                // value gets available
                 if (!handled[i] && lazy_values[i].ready()) {
                     // get the value from the future, invoke the function
                     f(i, lazy_values[i].get());
@@ -59,7 +59,7 @@ namespace hpx { namespace lcos
                     handled[i] = true;
                     ++handled_count;
 
-                    // give thread-manager a chance to look for more work while 
+                    // give thread-manager a chance to look for more work while
                     // waiting
                     threads::suspend();
                     suspended = true;
@@ -68,7 +68,7 @@ namespace hpx { namespace lcos
 
             // suspend after one full loop over all values, 10ms should be fine
             // (default parameter)
-            if (!suspended) 
+            if (!suspended)
                 threads::suspend(boost::posix_time::milliseconds(suspend_for));
         }
         return handled.count();
@@ -87,7 +87,7 @@ namespace hpx { namespace lcos
             for (std::size_t i = 0; i < lazy_values.size(); ++i) {
 
                 // loop over all lazy_values, executing the next as soon as its
-                // value gets available 
+                // value gets available
                 if (!handled[i] && lazy_values[i].ready()) {
                     // get the value from the future, invoke the function
                     lazy_values[i].get();
@@ -96,7 +96,7 @@ namespace hpx { namespace lcos
                     handled[i] = true;
                     ++handled_count;
 
-                    // give thread-manager a chance to look for more work while 
+                    // give thread-manager a chance to look for more work while
                     // waiting
                     threads::suspend();
                     suspended = true;
@@ -105,7 +105,7 @@ namespace hpx { namespace lcos
 
             // suspend after one full loop over all values, 10ms should be fine
             // (default parameter)
-            if (!suspended) 
+            if (!suspended)
                 threads::suspend(boost::posix_time::milliseconds(suspend_for));
         }
         return handled.count();

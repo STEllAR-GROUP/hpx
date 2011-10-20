@@ -2,22 +2,22 @@
 //
 //  This code may be used under either of the following two licences:
 //
-//  Permission is hereby granted, free of charge, to any person obtaining a copy 
-//  of this software and associated documentation files (the "Software"), to deal 
-//  in the Software without restriction, including without limitation the rights 
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
-//  copies of the Software, and to permit persons to whom the Software is 
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
 //  furnished to do so, subject to the following conditions:
 //
-//  The above copyright notice and this permission notice shall be included in 
+//  The above copyright notice and this permission notice shall be included in
 //  all copies or substantial portions of the Software.
 //
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+//  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE. OF SUCH DAMAGE.
 //
 //  Or:
@@ -30,7 +30,7 @@
 // Copyright David Abrahams 2004. Distributed under the Boost
 // Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-// 
+//
 // Slightly modified for inclusion on coroutines/detail library.
 #ifndef BOOST_COROUTINE_DETAIL_HAS_SWAP_HPP_20060709
 #define BOOST_COROUTINE_DETAIL_HAS_SWAP_HPP_20060709
@@ -52,23 +52,23 @@ namespace has_swap_
       char (& operator,(char) )[2];
   };
   no_swap swap(anything,anything);
-    
+
 #if defined(BOOST_MSVC)
 # pragma warning(push)
 # pragma warning(disable: 4675) // function found through argument dependent lookup -- duh!
-#endif 
+#endif
   template <class T>
   struct has_swap_impl
   {
       static T& x;
-        
+
       BOOST_STATIC_CONSTANT(bool, value = sizeof(swap(x,x),'x') == 1);
-      
+
 #if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564))
       typedef boost::mpl::bool_<has_swap_impl<T>::value> type;
 #else
       typedef boost::mpl::bool_<value> type;
-#endif      
+#endif
   };
 }
 template <class T>
@@ -77,8 +77,8 @@ struct has_swap
 {};
 #if defined(BOOST_MSVC)
 # pragma warning(pop)
-#endif 
+#endif
 
-} } 
+} }
 
 #endif // include guard

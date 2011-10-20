@@ -30,7 +30,7 @@
 namespace boost { namespace logging { namespace destination {
 
 
-/** 
+/**
     @brief Writes the string to console
 */
 template<class convert_dest = do_convert_destination > struct cout_t : is_generic, boost::logging::op_equal::always_equal {
@@ -45,7 +45,7 @@ template<class convert_dest = do_convert_destination > struct cout_t : is_generi
 };
 
 
-/** 
+/**
     @brief Writes the string to cerr
 */
 template<class convert_dest = do_convert_destination > struct cerr_t : is_generic, boost::logging::op_equal::always_equal {
@@ -61,8 +61,8 @@ template<class convert_dest = do_convert_destination > struct cerr_t : is_generi
 
 
 
-/** 
-    @brief writes to stream. 
+/**
+    @brief writes to stream.
 
     @note:
     The stream must outlive this object! Or, clear() the stream, before the stream is deleted.
@@ -85,12 +85,12 @@ template<class convert_dest = do_convert_destination > struct stream_t : is_gene
         return non_const_context_base::context() != other.non_const_context_base::context();
     }
 
-    /** 
+    /**
         @brief resets the stream. Further output will be written to this stream
     */
     void stream(stream_type * p) { non_const_context_base::context() = p; }
 
-    /** 
+    /**
         @brief clears the stream. Further output will be ignored
     */
     void clear() { stream(0); }
@@ -99,7 +99,7 @@ template<class convert_dest = do_convert_destination > struct stream_t : is_gene
 
 
 
-/** 
+/**
     @brief Writes the string to output debug window
 
     For non-Windows systems, this is the console.
@@ -111,11 +111,11 @@ template<class convert_dest = do_convert_destination > struct dbg_window_t : is_
 #ifndef BOOST_LOG_USE_WCHAR_T
     ::OutputDebugStringA( convert_dest::do_convert(msg, into<const char*>() ) );
 #else
-    ::OutputDebugStringW( convert_dest::do_convert(msg, into<const wchar_t*>() ) );    
+    ::OutputDebugStringW( convert_dest::do_convert(msg, into<const wchar_t*>() ) );
 #endif
 #else
         // non windows - dump to console
-        std::cout << msg; 
+        std::cout << msg;
 #endif
     }
 };

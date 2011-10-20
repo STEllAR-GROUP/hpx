@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <cstddef>
@@ -26,7 +26,7 @@
 #include <boost/logging/format/destination/defaults.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
     namespace detail
     {
@@ -39,7 +39,7 @@ namespace hpx { namespace util
 
                 switch (env_val) {
                 case 0:
-                    return allow_always ? 
+                    return allow_always ?
                         boost::logging::level::always :
                         boost::logging::level::disable_all;
                 case 1:   return boost::logging::level::fatal;
@@ -116,19 +116,19 @@ namespace hpx { namespace util
         //return "<" + boost::lexical_cast<std::string>(level) + ">";
         return     " <unknown>";
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////
-    // custom formatter: shepherd 
-    struct shepherd_thread_id 
+    // custom formatter: shepherd
+    struct shepherd_thread_id
       : boost::logging::formatter::class_<
-            shepherd_thread_id, 
+            shepherd_thread_id,
             boost::logging::formatter::implement_op_equal::no_context
-        > 
+        >
     {
-        shepherd_thread_id() 
+        shepherd_thread_id()
         {}
 
-        void operator()(param str) const 
+        void operator()(param str) const
         {
             std::stringstream out;
             out << std::hex << std::setw(sizeof(std::size_t)*2)
@@ -139,17 +139,17 @@ namespace hpx { namespace util
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    // custom formatter: locality prefix 
-    struct locality_prefix 
+    // custom formatter: locality prefix
+    struct locality_prefix
       : boost::logging::formatter::class_<
-            locality_prefix, 
+            locality_prefix,
             boost::logging::formatter::implement_op_equal::no_context
-        > 
+        >
     {
-        locality_prefix() 
+        locality_prefix()
         {}
 
-        void operator()(param str) const 
+        void operator()(param str) const
         {
             boost::uint32_t prefix = 0;
             applier::applier* appl = applier::get_applier_ptr();
@@ -164,23 +164,23 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: PX thread id
-    struct thread_id 
+    struct thread_id
       : boost::logging::formatter::class_<
-            thread_id, 
-            boost::logging::formatter::implement_op_equal::no_context> 
+            thread_id,
+            boost::logging::formatter::implement_op_equal::no_context>
     {
-        void operator()(param str) const 
+        void operator()(param str) const
         {
             threads::thread_self* self = threads::get_self_ptr();
             if (0 != self) {
-                // called from inside a PX thread 
+                // called from inside a PX thread
                 std::stringstream out;
-                out << std::hex << std::setw(sizeof(void*)*2) << std::setfill('0') 
+                out << std::hex << std::setw(sizeof(void*)*2) << std::setfill('0')
                     << reinterpret_cast<std::ptrdiff_t>(self->get_thread_id());
                 str.prepend_string(out.str());
             }
             else {
-                // called from outside a PX thread 
+                // called from outside a PX thread
                 str.prepend_string(std::string(sizeof(void*)*2, '-'));
             }
         }
@@ -188,23 +188,23 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: PX thread phase
-    struct thread_phase 
+    struct thread_phase
       : boost::logging::formatter::class_<
-            thread_phase, 
-            boost::logging::formatter::implement_op_equal::no_context> 
+            thread_phase,
+            boost::logging::formatter::implement_op_equal::no_context>
     {
-        void operator()(param str) const 
+        void operator()(param str) const
         {
             threads::thread_self* self = threads::get_self_ptr();
             if (0 != self) {
-                // called from inside a PX thread 
+                // called from inside a PX thread
                 std::stringstream out;
-                out << std::hex << std::setw(2) << std::setfill('0') 
+                out << std::hex << std::setw(2) << std::setfill('0')
                     << self->get_thread_phase();
                 str.prepend_string(out.str());
             }
             else {
-                // called from outside a PX thread 
+                // called from outside a PX thread
                 str.prepend_string("--");
             }
         }
@@ -214,22 +214,22 @@ namespace hpx { namespace util
     // custom formatter: locality prefix of parent thread
     struct parent_thread_locality
       : boost::logging::formatter::class_<
-            parent_thread_locality, 
+            parent_thread_locality,
             boost::logging::formatter::implement_op_equal::no_context
-        > 
+        >
     {
-        void operator()(param str) const 
+        void operator()(param str) const
         {
             boost::uint32_t parent_prefix = threads::get_parent_prefix();
             if (0 != parent_prefix) {
-                // called from inside a PX thread 
+                // called from inside a PX thread
                 std::stringstream out;
-                out << std::hex << std::setw(sizeof(boost::uint32_t)*2) << std::setfill('0') 
+                out << std::hex << std::setw(sizeof(boost::uint32_t)*2) << std::setfill('0')
                     << parent_prefix;
                 str.prepend_string(out.str());
             }
             else {
-                // called from outside a PX thread 
+                // called from outside a PX thread
                 str.prepend_string(std::string(sizeof(boost::uint32_t)*2, '-'));
             }
         }
@@ -237,24 +237,24 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: PX parent thread id
-    struct parent_thread_id 
+    struct parent_thread_id
       : boost::logging::formatter::class_<
-            parent_thread_id, 
+            parent_thread_id,
             boost::logging::formatter::implement_op_equal::no_context
-        > 
+        >
     {
-        void operator()(param str) const 
+        void operator()(param str) const
         {
             threads::thread_id_type parent_id = threads::get_parent_id();
             if (0 != parent_id) {
-                // called from inside a PX thread 
+                // called from inside a PX thread
                 std::stringstream out;
-                out << std::hex << std::setw(sizeof(void*)*2) << std::setfill('0') 
+                out << std::hex << std::setw(sizeof(void*)*2) << std::setfill('0')
                     << reinterpret_cast<std::ptrdiff_t>(parent_id);
                 str.prepend_string(out.str());
             }
             else {
-                // called from outside a PX thread 
+                // called from outside a PX thread
                 str.prepend_string(std::string(sizeof(void*)*2, '-'));
             }
         }
@@ -262,24 +262,24 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: PX parent thread phase
-    struct parent_thread_phase 
+    struct parent_thread_phase
       : boost::logging::formatter::class_<
-            parent_thread_phase, 
+            parent_thread_phase,
             boost::logging::formatter::implement_op_equal::no_context
-        > 
+        >
     {
-        void operator()(param str) const 
+        void operator()(param str) const
         {
             std::size_t parent_phase = threads::get_parent_phase();
             if (0 != parent_phase) {
-                // called from inside a PX thread 
+                // called from inside a PX thread
                 std::stringstream out;
-                out << std::hex << std::setw(2) << std::setfill('0') 
+                out << std::hex << std::setw(2) << std::setfill('0')
                     << parent_phase;
                 str.prepend_string(out.str());
             }
             else {
-                // called from outside a PX thread 
+                // called from outside a PX thread
                 str.prepend_string("--");
             }
         }
@@ -287,24 +287,24 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: PX component id of current thread
-    struct thread_component_id 
+    struct thread_component_id
       : boost::logging::formatter::class_<
-            thread_component_id, 
+            thread_component_id,
             boost::logging::formatter::implement_op_equal::no_context
-        > 
+        >
     {
-        void operator()(param str) const 
+        void operator()(param str) const
         {
             boost::uint64_t component_id = threads::get_self_component_id();
             if (0 != component_id) {
-                // called from inside a PX thread 
+                // called from inside a PX thread
                 std::stringstream out;
-                out << std::hex << std::setw(sizeof(boost::uint64_t)*2) << std::setfill('0') 
+                out << std::hex << std::setw(sizeof(boost::uint64_t)*2) << std::setfill('0')
                     << component_id;
                 str.prepend_string(out.str());
             }
             else {
-                // called from outside a PX thread 
+                // called from outside a PX thread
                 str.prepend_string(std::string(sizeof(boost::uint64_t)*2, '-'));
             }
         }
@@ -312,21 +312,21 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     // custom log destination: send generated strings to console
-    struct console : boost::logging::destination::is_generic 
+    struct console : boost::logging::destination::is_generic
     {
         console(std::size_t level, logging_destination dest)
           : level_(level), dest_(dest)
         {}
 
-        template<typename MsgType> 
-        void operator()(MsgType const& msg) const 
+        template<typename MsgType>
+        void operator()(MsgType const& msg) const
         {
             components::console_logging(dest_, level_, msg);
         }
 
-        bool operator==(console const& rhs) const 
-        { 
-            return dest_ == rhs.dest_; 
+        bool operator==(console const& rhs) const
+        {
+            return dest_ == rhs.dest_;
         }
 
         std::size_t level_;
@@ -336,9 +336,9 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     // this is required in order to use the logging library
-    BOOST_DEFINE_LOG_FILTER_WITH_ARGS(agas_level, filter_type, 
-        boost::logging::level::disable_all) 
-    BOOST_DEFINE_LOG(agas_logger, logger_type) 
+    BOOST_DEFINE_LOG_FILTER_WITH_ARGS(agas_level, filter_type,
+        boost::logging::level::disable_all)
+    BOOST_DEFINE_LOG(agas_logger, logger_type)
 
     // initialize logging for AGAS
     void init_agas_log(util::section const& ini, bool isconsole)
@@ -356,10 +356,10 @@ namespace hpx { namespace util
         }
 
         unsigned lvl = boost::logging::level::disable_all;
-        if (!loglevel.empty()) 
+        if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel);
 
-        if (boost::logging::level::disable_all != lvl) 
+        if (boost::logging::level::disable_all != lvl)
         {
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "cerr" : "console";
@@ -384,9 +384,9 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     // this is required in order to use the logging library for timings
-    BOOST_DEFINE_LOG_FILTER_WITH_ARGS(timing_level, filter_type, 
-        boost::logging::level::disable_all) 
-    BOOST_DEFINE_LOG(timing_logger, logger_type) 
+    BOOST_DEFINE_LOG_FILTER_WITH_ARGS(timing_level, filter_type,
+        boost::logging::level::disable_all)
+    BOOST_DEFINE_LOG(timing_logger, logger_type)
 
     // initialize logging for performance measurements
     void init_timing_log(util::section const& ini, bool isconsole)
@@ -404,10 +404,10 @@ namespace hpx { namespace util
         }
 
         unsigned lvl = boost::logging::level::disable_all;
-        if (!loglevel.empty()) 
+        if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel);
 
-        if (boost::logging::level::disable_all != lvl) 
+        if (boost::logging::level::disable_all != lvl)
         {
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "cerr" : "console";
@@ -432,14 +432,14 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     BOOST_DEFINE_LOG_FILTER_WITH_ARGS(hpx_level, filter_type,
-        boost::logging::level::disable_all) 
-    BOOST_DEFINE_LOG(hpx_logger, logger_type) 
+        boost::logging::level::disable_all)
+    BOOST_DEFINE_LOG(hpx_logger, logger_type)
 
     BOOST_DEFINE_LOG_FILTER_WITH_ARGS(hpx_error_level, filter_type,
-        boost::logging::level::fatal) 
+        boost::logging::level::fatal)
     BOOST_DEFINE_LOG(hpx_error_logger, logger_type)
 
-    void init_hpx_logs(util::section const& ini, bool isconsole)     
+    void init_hpx_logs(util::section const& ini, bool isconsole)
     {
         std::string loglevel, logdest, logformat;
 
@@ -454,7 +454,7 @@ namespace hpx { namespace util
         }
 
         unsigned lvl = boost::logging::level::disable_all;
-        if (!loglevel.empty()) 
+        if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
         if (logdest.empty())      // ensure minimal defaults
@@ -493,7 +493,7 @@ namespace hpx { namespace util
             hpx_error_level()->set_enabled(lvl);
         }
         else {
-            // errors are always logged to cerr 
+            // errors are always logged to cerr
             if (!isconsole) {
                 hpx_error_logger()->writer().add_destination("console",
                     console(lvl, destination_hpx));
@@ -517,11 +517,11 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     BOOST_DEFINE_LOG_FILTER_WITH_ARGS(app_level, filter_type,
-        boost::logging::level::disable_all) 
-    BOOST_DEFINE_LOG(app_logger, logger_type) 
+        boost::logging::level::disable_all)
+    BOOST_DEFINE_LOG(app_logger, logger_type)
 
     BOOST_DEFINE_LOG_FILTER_WITH_ARGS(app_error_level, filter_type,
-        boost::logging::level::fatal) 
+        boost::logging::level::fatal)
     BOOST_DEFINE_LOG(app_error_logger, logger_type)
 
     // initialize logging for application
@@ -540,7 +540,7 @@ namespace hpx { namespace util
         }
 
         unsigned lvl = boost::logging::level::disable_all;
-        if (!loglevel.empty()) 
+        if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel);
 
         if (boost::logging::level::disable_all != lvl) {
@@ -566,12 +566,12 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    BOOST_DEFINE_LOG_FILTER_WITH_ARGS(agas_console_level, filter_type, 
-        boost::logging::level::disable_all) 
-    BOOST_DEFINE_LOG(agas_console_logger, logger_type) 
+    BOOST_DEFINE_LOG_FILTER_WITH_ARGS(agas_console_level, filter_type,
+        boost::logging::level::disable_all)
+    BOOST_DEFINE_LOG(agas_console_logger, logger_type)
 
     // initialize logging for AGAS
-    void init_agas_console_log(util::section const& ini) 
+    void init_agas_console_log(util::section const& ini)
     {
         std::string loglevel, logdest, logformat;
 
@@ -586,10 +586,10 @@ namespace hpx { namespace util
         }
 
         unsigned lvl = boost::logging::level::disable_all;
-        if (!loglevel.empty()) 
+        if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
-        if (boost::logging::level::disable_all != lvl) 
+        if (boost::logging::level::disable_all != lvl)
         {
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
@@ -603,12 +603,12 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    BOOST_DEFINE_LOG_FILTER_WITH_ARGS(timing_console_level, filter_type, 
-        boost::logging::level::disable_all) 
-    BOOST_DEFINE_LOG(timing_console_logger, logger_type) 
+    BOOST_DEFINE_LOG_FILTER_WITH_ARGS(timing_console_level, filter_type,
+        boost::logging::level::disable_all)
+    BOOST_DEFINE_LOG(timing_console_logger, logger_type)
 
     // initialize logging for performance measurements
-    void init_timing_console_log(util::section const& ini) 
+    void init_timing_console_log(util::section const& ini)
     {
         std::string loglevel, logdest, logformat;
 
@@ -623,10 +623,10 @@ namespace hpx { namespace util
         }
 
         unsigned lvl = boost::logging::level::disable_all;
-        if (!loglevel.empty()) 
+        if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
-        if (boost::logging::level::disable_all != lvl) 
+        if (boost::logging::level::disable_all != lvl)
         {
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
@@ -640,12 +640,12 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    BOOST_DEFINE_LOG_FILTER_WITH_ARGS(hpx_console_level, filter_type, 
-        boost::logging::level::disable_all) 
-    BOOST_DEFINE_LOG(hpx_console_logger, logger_type) 
+    BOOST_DEFINE_LOG_FILTER_WITH_ARGS(hpx_console_level, filter_type,
+        boost::logging::level::disable_all)
+    BOOST_DEFINE_LOG(hpx_console_logger, logger_type)
 
     // initialize logging for HPX runtime
-    void init_hpx_console_log(util::section const& ini) 
+    void init_hpx_console_log(util::section const& ini)
     {
         std::string loglevel, logdest, logformat;
 
@@ -660,7 +660,7 @@ namespace hpx { namespace util
         }
 
         unsigned lvl = boost::logging::level::disable_all;
-        if (!loglevel.empty()) 
+        if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
         if (logdest.empty())      // ensure minimal defaults
@@ -676,12 +676,12 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    BOOST_DEFINE_LOG_FILTER_WITH_ARGS(app_console_level, filter_type, 
-        boost::logging::level::disable_all) 
-    BOOST_DEFINE_LOG(app_console_logger, logger_type) 
+    BOOST_DEFINE_LOG_FILTER_WITH_ARGS(app_console_level, filter_type,
+        boost::logging::level::disable_all)
+    BOOST_DEFINE_LOG(app_console_logger, logger_type)
 
     // initialize logging for applications
-    void init_app_console_log(util::section const& ini) 
+    void init_app_console_log(util::section const& ini)
     {
         std::string loglevel, logdest, logformat;
 
@@ -696,10 +696,10 @@ namespace hpx { namespace util
         }
 
         unsigned lvl = boost::logging::level::disable_all;
-        if (!loglevel.empty()) 
+        if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
-        if (boost::logging::level::disable_all != lvl) 
+        if (boost::logging::level::disable_all != lvl)
         {
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
@@ -718,11 +718,11 @@ namespace hpx { namespace util
 namespace hpx { namespace util { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
-    // the logging_configuration type will be instantiated exactly once 
+    // the logging_configuration type will be instantiated exactly once
     struct logging_configuration
     {
         logging_configuration();
-        std::vector<std::string> prefill_; 
+        std::vector<std::string> prefill_;
     };
 
 // the Boost.Log generates bogus milliseconds on Linux systems
@@ -745,7 +745,7 @@ namespace hpx { namespace util { namespace detail
                 "destination = ${HPX_LOGDESTINATION:console}",
                 "format = ${HPX_LOGFORMAT:"
                     "(T%locality%/%pxthread%.%pxphase%/%pxcomponent%) "
-                    "P%parentloc%/%pxparent%.%pxparentphase% %time%(" HPX_TIMEFORMAT 
+                    "P%parentloc%/%pxparent%.%pxparentphase% %time%(" HPX_TIMEFORMAT
                     ") [%idx%]|\\n}",
 
                 // general console logging
@@ -760,7 +760,7 @@ namespace hpx { namespace util { namespace detail
                 "destination = ${HPX_TIMING_LOGDESTINATION:console}",
                 "format = ${HPX_TIMING_LOGFORMAT:"
                     "(T%locality%/%pxthread%.%pxphase%/%pxcomponent%) "
-                    "P%parentloc%/%pxparent%.%pxparentphase% %time%(" HPX_TIMEFORMAT 
+                    "P%parentloc%/%pxparent%.%pxparentphase% %time%(" HPX_TIMEFORMAT
                     ") [%idx%] [TIM] |\\n}",
 
                 // console logging related to timing
@@ -776,7 +776,7 @@ namespace hpx { namespace util { namespace detail
                 "destination = ${HPX_AGAS_LOGDESTINATION:file(hpx.agas.$[system.pid].log)}",
                 "format = ${HPX_AGAS_LOGFORMAT:"
                     "(T%locality%/%pxthread%.%pxphase%/%pxcomponent%) "
-                    "P%parentloc%/%pxparent%.%pxparentphase% %time%(" HPX_TIMEFORMAT 
+                    "P%parentloc%/%pxparent%.%pxparentphase% %time%(" HPX_TIMEFORMAT
                     ") [%idx%][AGAS] |\\n}",
 
                 // console logging related to AGAS
@@ -791,7 +791,7 @@ namespace hpx { namespace util { namespace detail
                 "destination = ${HPX_APP_LOGDESTINATION:console}",
                 "format = ${HPX_APP_LOGFORMAT:"
                     "(T%locality%/%pxthread%.%pxphase%/%pxcomponent%) "
-                    "P%parentloc%/%pxparent%.%pxparentphase% %time%(" HPX_TIMEFORMAT 
+                    "P%parentloc%/%pxparent%.%pxparentphase% %time%(" HPX_TIMEFORMAT
                     ") [%idx%] [APP] |\\n}",
 
                 // console logging related to applications
@@ -803,7 +803,7 @@ namespace hpx { namespace util { namespace detail
         }
         catch (std::exception const&) {
             // just in case something goes wrong
-            std::cerr << "caught std::exception during initialization" 
+            std::cerr << "caught std::exception during initialization"
                       << std::endl;
         }
     }
@@ -826,7 +826,7 @@ namespace hpx { namespace util { namespace detail
         init_hpx_logs(ini, isconsole);
         init_app_logs(ini, isconsole);
 
-        // initialize console logs 
+        // initialize console logs
         init_agas_console_log(ini);
         init_timing_console_log(ini);
         init_hpx_console_log(ini);

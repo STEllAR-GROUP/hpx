@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_UTIL_FULLEMPTYSTORE_JUN_16_2008_0128APM)
@@ -65,7 +65,7 @@ namespace hpx { namespace util { namespace detail
         > list_option_type;
 
         typedef boost::intrusive::slist<
-            queue_entry, list_option_type, 
+            queue_entry, list_option_type,
             boost::intrusive::cache_last<true>,
             boost::intrusive::constant_time_size<false>
         > queue_type;
@@ -80,9 +80,9 @@ namespace hpx { namespace util { namespace detail
 
                 // we know that the id is actually the pointer to the thread
                 threads::thread* thrd = reinterpret_cast<threads::thread*>(id);
-                LERR_(info) << "~full_empty_entry: aborting pending thread in " 
-                        << desc << ": " 
-                        << get_thread_state_name(thrd->get_state()) 
+                LERR_(info) << "~full_empty_entry: aborting pending thread in "
+                        << desc << ": "
+                        << get_thread_state_name(thrd->get_state())
                         << "(" << id << "): " << thrd->get_description();
 
                 // forcefully abort thread, do not throw
@@ -91,7 +91,7 @@ namespace hpx { namespace util { namespace detail
                     threads::wait_abort, threads::thread_priority_normal, ec);
                 if (ec) {
                     LERR_(error) << "~full_empty_entry: could not abort thread"
-                        << get_thread_state_name(thrd->get_state()) 
+                        << get_thread_state_name(thrd->get_state())
                         << "(" << id << "): " << thrd->get_description();
                 }
             }
@@ -130,14 +130,14 @@ namespace hpx { namespace util { namespace detail
         }
 
         // sets this entry to empty
-        bool set_empty() 
+        bool set_empty()
         {
             scoped_lock l(this);
             return set_empty_locked();
         }
 
         // sets this entry to full
-        bool set_full() 
+        bool set_full()
         {
             scoped_lock l(this);
             return set_full_locked();
@@ -159,7 +159,7 @@ namespace hpx { namespace util { namespace detail
             if (state_ == empty) {
                 // enqueue the request and block this thread
                 threads::set_thread_lco_description(id, "enqueue_full_full", ec);
-                if (ec) return;  
+                if (ec) return;
 
                 queue_entry f(id);
                 read_queue_.push_back(f);
@@ -173,7 +173,7 @@ namespace hpx { namespace util { namespace detail
                     statex = self->yield(threads::suspended);
                 }
 
-                if (f.id_) 
+                if (f.id_)
                     read_queue_.erase(last);     // remove entry from queue
 
                 if (statex == threads::wait_abort) {
@@ -185,7 +185,7 @@ namespace hpx { namespace util { namespace detail
                     strm << "thread(" << id
                           << (desc.empty() ? "" : ", " ) << desc
                           << ") aborted (yield returned wait_abort)";
-                    HPX_THROWS_IF(ec, yield_aborted, 
+                    HPX_THROWS_IF(ec, yield_aborted,
                         "full_empty_entry::enqueue_full_full",
                         hpx::util::osstream_get_string(strm));
 
@@ -194,7 +194,7 @@ namespace hpx { namespace util { namespace detail
             }
 
             // copy the data to the destination
-            if (get_address() != &dest) 
+            if (get_address() != &dest)
                 dest = *get_address();
 
             if (&ec != &throws)
@@ -229,7 +229,7 @@ namespace hpx { namespace util { namespace detail
                     statex = self->yield(threads::suspended);
                 }
 
-                if (f.id_) 
+                if (f.id_)
                     read_queue_.erase(last);     // remove entry from queue
 
                 if (statex == threads::wait_abort) {
@@ -241,7 +241,7 @@ namespace hpx { namespace util { namespace detail
                     strm << "thread(" << id
                           << (desc.empty() ? "" : ", " ) << desc
                           << ") aborted (yield returned wait_abort)";
-                    HPX_THROWS_IF(ec, yield_aborted, 
+                    HPX_THROWS_IF(ec, yield_aborted,
                         "full_empty_entry::enqueue_full_full",
                         hpx::util::osstream_get_string(strm));
 
@@ -283,7 +283,7 @@ namespace hpx { namespace util { namespace detail
                     statex = self->yield(threads::suspended);
                 }
 
-                if (f.id_) 
+                if (f.id_)
                     read_and_empty_queue_.erase(last);     // remove entry from queue
 
                 if (statex == threads::wait_abort) {
@@ -295,7 +295,7 @@ namespace hpx { namespace util { namespace detail
                     strm << "thread(" << id
                           << (desc.empty() ? "" : ", " ) << desc
                           << ") aborted (yield returned wait_abort)";
-                    HPX_THROWS_IF(ec, yield_aborted, 
+                    HPX_THROWS_IF(ec, yield_aborted,
                         "full_empty_entry::enqueue_full_empty",
                         hpx::util::osstream_get_string(strm));
 
@@ -303,12 +303,12 @@ namespace hpx { namespace util { namespace detail
                 }
 
                 // copy the data to the destination
-                if (get_address() != &dest) 
+                if (get_address() != &dest)
                     dest = *get_address();
             }
             else {
                 // copy the data to the destination
-                if (get_address() != &dest) 
+                if (get_address() != &dest)
                     dest = *get_address();
                 set_empty_locked();   // state_ = empty;
             }
@@ -345,7 +345,7 @@ namespace hpx { namespace util { namespace detail
                     statex = self->yield(threads::suspended);
                 }
 
-                if (f.id_) 
+                if (f.id_)
                     read_and_empty_queue_.erase(last);     // remove entry from queue
 
                 if (statex == threads::wait_abort) {
@@ -357,7 +357,7 @@ namespace hpx { namespace util { namespace detail
                     strm << "thread(" << id
                           << (desc.empty() ? "" : ", " ) << desc
                           << ") aborted (yield returned wait_abort)";
-                    HPX_THROWS_IF(ec, yield_aborted, 
+                    HPX_THROWS_IF(ec, yield_aborted,
                         "full_empty_entry::enqueue_full_empty",
                         hpx::util::osstream_get_string(strm));
 
@@ -402,7 +402,7 @@ namespace hpx { namespace util { namespace detail
                     statex = self->yield(threads::suspended);
                 }
 
-                if (f.id_) 
+                if (f.id_)
                     write_queue_.erase(last);     // remove entry from queue
 
                 if (statex == threads::wait_abort) {
@@ -414,7 +414,7 @@ namespace hpx { namespace util { namespace detail
                     strm << "thread(" << id
                           << (desc.empty() ? "" : ", " ) << desc
                           << ") aborted (yield returned wait_abort)";
-                    HPX_THROWS_IF(ec, yield_aborted, 
+                    HPX_THROWS_IF(ec, yield_aborted,
                         "full_empty_entry::enqueue_if_full",
                         hpx::util::osstream_get_string(strm));
 
@@ -423,7 +423,7 @@ namespace hpx { namespace util { namespace detail
             }
 
             // set the data
-            if (get_address() != &src) 
+            if (get_address() != &src)
                 *get_address() = src;
 
             // make sure the entry is full
@@ -448,7 +448,7 @@ namespace hpx { namespace util { namespace detail
                 // enqueue the request and block this thread
                 threads::set_thread_lco_description(id, "enqueue_if_full", ec);
                 if (ec) return;
- 
+
                 queue_entry f(id);
                 write_queue_.push_back(f);
 
@@ -461,7 +461,7 @@ namespace hpx { namespace util { namespace detail
                     statex = self->yield(threads::suspended);
                 }
 
-                if (f.id_) 
+                if (f.id_)
                     write_queue_.erase(last);     // remove entry from queue
 
                 if (statex == threads::wait_abort) {
@@ -473,7 +473,7 @@ namespace hpx { namespace util { namespace detail
                     strm << "thread(" << id
                           << (desc.empty() ? "" : ", " ) << desc
                           << ") aborted (yield returned wait_abort)";
-                    HPX_THROWS_IF(ec, yield_aborted, 
+                    HPX_THROWS_IF(ec, yield_aborted,
                         "full_empty_entry::enqueue_if_full",
                         hpx::util::osstream_get_string(strm));
                     return;
@@ -495,7 +495,7 @@ namespace hpx { namespace util { namespace detail
             scoped_lock l(this);
 
             // set the data
-            if (get_address() != &src) 
+            if (get_address() != &src)
                 *get_address() = src;
 
             // make sure the entry is full

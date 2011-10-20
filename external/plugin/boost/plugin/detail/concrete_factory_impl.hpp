@@ -36,23 +36,23 @@
 namespace detail {
 
     template<
-        typename BasePlugin, typename Concrete, typename Base, 
+        typename BasePlugin, typename Concrete, typename Base,
         BOOST_PP_ENUM_PARAMS(N, typename A)
     >
     struct concrete_factory_item<
-        BasePlugin, Concrete, Base, 
+        BasePlugin, Concrete, Base,
         boost::mpl::list<BOOST_PP_ENUM_PARAMS(N, A)>
-    > 
+    >
     :   public Base
-    {                
+    {
         BasePlugin* create(dll_handle dll, BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
         {
             return new plugin_wrapper<
-                    Concrete, boost::mpl::list<BOOST_PP_ENUM_PARAMS(N, A)> 
+                    Concrete, boost::mpl::list<BOOST_PP_ENUM_PARAMS(N, A)>
                 >(dll, BOOST_PP_ENUM_PARAMS(N, a));
         }
     };
-    
+
 ///////////////////////////////////////////////////////////////////////////////
 }   // namespace boost::plugin::detail
 

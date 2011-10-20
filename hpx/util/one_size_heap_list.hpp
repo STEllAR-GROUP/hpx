@@ -1,7 +1,7 @@
 //  Copyright (c) 1998-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_041EF599_BA27_47ED_B1F0_2691B28966B3)
@@ -22,11 +22,11 @@
 #include <hpx/lcos/local_shared_mutex.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util 
+namespace hpx { namespace util
 {
 
 template <typename Heap>
-class one_size_heap_list 
+class one_size_heap_list
 {
   public:
     typedef Heap heap_type;
@@ -39,7 +39,7 @@ class one_size_heap_list
     typedef typename list_type::const_iterator const_iterator;
 
     enum
-    { 
+    {
         heap_step = heap_type::heap_step,   // default grow step
         heap_size = heap_type::heap_size    // size of the object
     };
@@ -82,11 +82,11 @@ class one_size_heap_list
                % alloc_count_
                % free_count_);
 
-        if (alloc_count_ > free_count_) 
+        if (alloc_count_ > free_count_)
         {
-            LOSH_(warning) 
+            LOSH_(warning)
                 << (boost::format(
-                   "%1%::~%1%: releasing %2% allocated objects") 
+                   "%1%::~%1%: releasing %2% allocated objects")
                    % name()
                    % (alloc_count_.load() - free_count_.load()));
         }
@@ -97,19 +97,19 @@ class one_size_heap_list
     {
         if (HPX_UNLIKELY(0 == count))
         {
-            HPX_THROW_EXCEPTION(bad_parameter, 
-                name() + "::alloc", 
+            HPX_THROW_EXCEPTION(bad_parameter,
+                name() + "::alloc",
                 "cannot allocate 0 objects");
         }
 
-        std::size_t size = 0; 
+        std::size_t size = 0;
         value_type* p = NULL;
         {
             shared_lock_type guard(mtx_);
 
             size = heap_list_.size();
 
-            for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it) 
+            for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it)
             {
                 if ((*it)->alloc(&p, count))
                 {
@@ -124,7 +124,7 @@ class one_size_heap_list
 
                 else
                 {
-                    LOSH_(info) 
+                    LOSH_(info)
                         << (boost::format(
                            "%1%::alloc: failed to allocate from heap[%2%] "
                            "(heap[%2%] has allocated %3% objects and has "
@@ -141,27 +141,27 @@ class one_size_heap_list
         bool did_create = false;
         {
             // Acquire exclusive access.
-            unique_lock_type ul(mtx_); 
+            unique_lock_type ul(mtx_);
 
             if (size == heap_list_.size())
             {
                 iterator itnew = heap_list_.insert(heap_list_.begin(),
                     typename list_type::value_type(new heap_type
                         (class_name_.c_str(), heap_count_ + 1, heap_step)));
-    
+
                 if (HPX_UNLIKELY(itnew == heap_list_.end()))
-                    HPX_THROW_EXCEPTION(out_of_memory, 
-                        name() + "::alloc", 
+                    HPX_THROW_EXCEPTION(out_of_memory,
+                        name() + "::alloc",
                         "new heap could not be added");
-    
+
                 bool result = (*itnew)->alloc(&p, count);
 
-                // REVIEW: What does "snh" mean? That was the only comment 
+                // REVIEW: What does "snh" mean? That was the only comment
                 // explaining this branch.
                 if (HPX_UNLIKELY(!result || NULL == p))
                 {
-                    HPX_THROW_EXCEPTION(out_of_memory, 
-                        name() + "::alloc", 
+                    HPX_THROW_EXCEPTION(out_of_memory,
+                        name() + "::alloc",
                         boost::str(boost::format(
                             "new heap failed to allocate %1% objects")
                             % count));
@@ -173,7 +173,7 @@ class one_size_heap_list
                        "%1%::alloc: creating new heap[%2%], size is now %3%")
                        % name()
                        % heap_count_
-                       % heap_list_.size()); 
+                       % heap_list_.size());
                 did_create = true;
             }
         }
@@ -195,14 +195,14 @@ class one_size_heap_list
     {
         if (HPX_UNLIKELY(!p))
         {
-            HPX_THROW_EXCEPTION(bad_parameter, 
+            HPX_THROW_EXCEPTION(bad_parameter,
                 name() + "::add_heap", "encountered NULL heap");
         }
 
         // Acquire exclusive access.
-        unique_lock_type ul(mtx_); 
+        unique_lock_type ul(mtx_);
 
-        p->heap_count_ = heap_count_; 
+        p->heap_count_ = heap_count_;
 
         iterator it = heap_list_.insert(heap_list_.begin(),
             typename list_type::value_type(p));
@@ -210,8 +210,8 @@ class one_size_heap_list
         // Check for insertion failure.
         if (HPX_UNLIKELY(it == heap_list_.end()))
         {
-            HPX_THROW_EXCEPTION(out_of_memory, 
-                name() + "::add_heap", 
+            HPX_THROW_EXCEPTION(out_of_memory,
+                name() + "::add_heap",
                 boost::str(boost::format("heap %1% could not be added") % p));
         }
 
@@ -236,9 +236,9 @@ class one_size_heap_list
             }
         }
 
-        HPX_THROW_EXCEPTION(bad_parameter, 
-            name() + "::free", 
-            boost::str(boost::format(   
+        HPX_THROW_EXCEPTION(bad_parameter,
+            name() + "::free",
+            boost::str(boost::format(
                 "pointer %1% was not allocated by this %2%")
                 % p % name()));
     }
@@ -246,9 +246,9 @@ class one_size_heap_list
     bool did_alloc(void* p) const
     {
         shared_lock_type guard(mtx_);
-        for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it) 
+        for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it)
         {
-            if ((*it)->did_alloc(p)) 
+            if ((*it)->did_alloc(p))
                 return true;
         }
         return false;

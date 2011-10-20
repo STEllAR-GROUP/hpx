@@ -34,16 +34,16 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 template<
-    typename BasePlugin, typename Base, 
+    typename BasePlugin, typename Base,
     BOOST_PP_ENUM_PARAMS(N, typename A)
 >
 struct abstract_factory_item<
-    BasePlugin, Base, boost::mpl::list<BOOST_PP_ENUM_PARAMS(N, A)> 
-> 
+    BasePlugin, Base, boost::mpl::list<BOOST_PP_ENUM_PARAMS(N, A)>
+>
 :   public Base
 {
     using Base::create;
-    virtual BasePlugin* create(dll_handle dll, 
+    virtual BasePlugin* create(dll_handle dll,
         BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)) = 0;
 };
 

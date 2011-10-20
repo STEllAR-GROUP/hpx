@@ -1,14 +1,14 @@
 # Copyright (c) 2007-2011 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Lelbach
 #
-# Distributed under the Boost Software License, Version 1.0. (See accompanying 
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 include_directories(${HDF5_INCLUDE_DIR})
 include_directories(${HDF5_CPP_INCLUDE_DIR})
 
 # just recurse into all components subdirectories and execute the scripts there
-set(subdirs 
+set(subdirs
     interpolate1d)
 
 # for all targets specified above
@@ -21,20 +21,20 @@ foreach(subdir ${subdirs})
   source_group("Source Files" FILES ${sources})
 
   # add example executable
-  add_hpx_executable(${subdir}_client 
-    SOURCES ${sources} 
+  add_hpx_executable(${subdir}_client
+    SOURCES ${sources}
     DEPENDENCIES ${subdir}_component)
 
-  # add a custom target for this example 
+  # add a custom target for this example
   add_hpx_pseudo_target(examples.interpolate1d.${subdir})
 
   # make pseudo-targets depend on master pseudo-target
   add_hpx_pseudo_dependencies(examples.interpolate1d
                               examples.interpolate1d.${subdir})
 
-  # add dependencies to pseudo-target 
+  # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(examples.interpolate1d.${subdir}
-                              ${subdir}_client_exe) 
+                              ${subdir}_client_exe)
 endforeach()
 
 add_hpx_executable(create_1d_testdata
@@ -42,14 +42,14 @@ add_hpx_executable(create_1d_testdata
   DEPENDENCIES ${HDF5_LIBRARY} ${HDF5_CPP_LIBRARY}
   NOLIBS)
 
-# add a custom target for this example 
+# add a custom target for this example
 add_hpx_pseudo_target(examples.interpolate1d.create_1d_testdata)
 
 # make pseudo-targets depend on master pseudo-target
 add_hpx_pseudo_dependencies(examples.interpolate1d
                             examples.interpolate1d.create_1d_testdata)
 
-# add dependencies to pseudo-target 
+# add dependencies to pseudo-target
 add_hpx_pseudo_dependencies(examples.interpolate1d.create_1d_testdata
                             create_1d_testdata_exe)
 

@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  
+//
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -71,14 +71,14 @@ int hpx_main(variables_map & vm)
     //std::generate(xs.begin(), xs.end(), std::rand);
 
     //std::cout << "Single core version without futures:\n";
-    
+
     high_resolution_timer t;
     /*
     for(std::vector<double>::iterator it = xs.begin(); it != xs.end(); ++it)
     {
         double x = *it;
         double x_n = *it;
-        
+
         for(unsigned i = 0; i < max_iterations; ++i)
         {
             double x_new = update(x, x_n);
@@ -98,9 +98,9 @@ int hpx_main(variables_map & vm)
 
     std::generate(xs.begin(), xs.end(), std::rand);
     //std::cout << "Naive future version:\n";
-    
+
     t.restart();
-   
+
     std::vector<promise<double> > promises;
     promises.reserve(xs.size());
     for(std::vector<double>::iterator it = xs.begin(); it != xs.end(); ++it)

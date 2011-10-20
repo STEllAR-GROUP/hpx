@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  
+//
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -137,7 +137,7 @@ int main(int argc, char **argv)
 
 #ifdef BRIGHT_FUTURE_NO_HPX
     variables_map vm;
-    
+
     desc_commandline.add_options()
         (
             "help", "This help message"

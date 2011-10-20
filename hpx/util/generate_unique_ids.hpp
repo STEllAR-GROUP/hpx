@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_UTIL_GENERATE_UNIQUE_IDS_MAR_24_2008_1014AM)
@@ -19,9 +19,9 @@
 
 namespace hpx { namespace util
 {
-    /// The unique_id_ranges class is a type responsible for generating 
+    /// The unique_id_ranges class is a type responsible for generating
     /// unique ids for components, parcels, threads etc.
-    class HPX_EXPORT unique_id_ranges 
+    class HPX_EXPORT unique_id_ranges
     {
         struct tag {};
         typedef hpx::util::spinlock_pool<tag> mutex_type;
@@ -55,8 +55,8 @@ namespace hpx { namespace util
     };
 
     /// The unique_ids class is a restricted form of unique_id_ranges, which
-    /// only allocates one gid at a time. 
-    struct HPX_EXPORT unique_ids 
+    /// only allocates one gid at a time.
+    struct HPX_EXPORT unique_ids
     {
         typedef hpx::util::spinlock mutex_type;
 
@@ -85,7 +85,7 @@ namespace hpx { namespace util
           , next_upper(0)
           , requested_range(false)
           , step(step_)
-          , leapfrog(leapfrog_) 
+          , leapfrog(leapfrog_)
         {
             BOOST_ASSERT(leapfrog_ != 0);
         }
@@ -104,7 +104,7 @@ namespace hpx { namespace util
         {
             current_lower = lower;
             current_i = lower;
-            current_upper = upper; 
+            current_upper = upper;
         }
     };
 }}

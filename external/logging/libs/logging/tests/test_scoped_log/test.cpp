@@ -13,7 +13,7 @@
  See http://www.torjo.com/log2/ for more details
 */
 
-/* 
+/*
     Tests scoped_log
 */
 
@@ -26,10 +26,10 @@ using namespace boost::logging;
 
 typedef logger_format_write< > log_type;
 
-BOOST_DEFINE_LOG_FILTER(g_log_filter, filter::no_ts ) 
+BOOST_DEFINE_LOG_FILTER(g_log_filter, filter::no_ts )
 BOOST_DEFINE_LOG(g_l, log_type)
 
-#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() ) 
+#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() )
 
 void scoped_func(int a, std::string str) {
     BOOST_SCOPED_LOG_CTX(L_) << "func(" << a << ", str=" << str << ")";
@@ -37,7 +37,7 @@ void scoped_func(int a, std::string str) {
 }
 
 std::ostringstream g_out;
-int test_main(int, char *[]) { 
+int test_main(int, char *[]) {
     g_l()->writer().add_formatter( formatter::idx(), "[%] ");
     g_l()->writer().add_formatter( formatter::append_newline() );
     g_l()->writer().add_destination( destination::stream(g_out) );
@@ -50,7 +50,7 @@ int test_main(int, char *[]) {
     scoped_func(3, "str3");
 
     std::string out = g_out.str();
-    BOOST_CHECK( out == 
+    BOOST_CHECK( out ==
         "[1] start of func(1, str=str)\n"
         "[2] inner\n"
         "[3]   end of func(1, str=str)\n"

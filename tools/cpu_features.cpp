@@ -39,7 +39,7 @@ struct return_value
         success                  = 0,
         feature_not_found        = 1,
         help                     = 2,
-        list                     = 3,   
+        list                     = 3,
         no_features_specified    = 4,
         unknown_feature          = 5,
         std_exception_thrown     = 6,
@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
             ("quiet,q", "don't print results")
             ("list", "list known features")
             ;
-    
+
         options_description hidden("Hidden options");
         hidden.add_options()
             ("features", value<std::vector<std::string> >(), "features to test")
@@ -67,21 +67,21 @@ int main(int argc, char* argv[])
 
         options_description cmdline_options;
         cmdline_options.add(visible).add(hidden);
-        
+
         positional_options_description p;
         p.add("features", -1);
-        
+
         variables_map vm;
         store(command_line_parser(argc, argv).
               options(cmdline_options).positional(p).run(), vm);
         notify(vm);
-        
+
         if (vm.count("help"))
         {
             std::cout << visible << "\n";
             return return_value::help;
         }
-        
+
         if (vm.count("list"))
         {
             std::cout << "known features:\n";
@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
             return return_value::no_features_specified;
         }
 
-        std::vector<std::string> raw_features 
+        std::vector<std::string> raw_features
             = vm["features"].as<std::vector<std::string> >();
 
         std::set<std::string> features(raw_features.begin(),
@@ -118,11 +118,11 @@ int main(int argc, char* argv[])
             {
                 cpuid(registers, cpuid_table[i].function);
                 bool found =  has_bit_set(registers[cpuid_table[i].register_],
-                                          cpuid_table[i].bit); 
+                                          cpuid_table[i].bit);
                 if (!vm.count("quiet"))
                     std::cout << std::setfill(' ') << std::setw(10) << std::left
                               << cpuid_table[i].name
-                              << found << "\n"; 
+                              << found << "\n";
 
                 if (!found)
                     not_found = true;
@@ -152,13 +152,13 @@ int main(int argc, char* argv[])
     {
         std::cout << "error: " << e.what() << "\n";
         return return_value::std_exception_thrown;
-    }    
-    
+    }
+
     catch (...)
     {
         std::cout << "error: unknown exception occurred!\n";
         return return_value::unknown_exception_thrown;
-    }    
+    }
 
     return return_value::success;
 }

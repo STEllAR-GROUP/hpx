@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_EXPORT_DEFINITIONS_SEPTEMBER_25_2008_0214PM)
@@ -59,7 +59,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// helper macro for symbols which have to be exported from the runtime and all 
+// helper macro for symbols which have to be exported from the runtime and all
 // components
 #if defined(HPX_EXPORTS) || defined(HPX_COMPONENT_EXPORTS) || \
     defined(HPX_APPLICATION_EXPORTS) || defined(HPX_SERIALIZATION_EXPORTS)

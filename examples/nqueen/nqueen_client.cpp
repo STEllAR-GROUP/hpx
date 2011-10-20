@@ -22,7 +22,7 @@ int hpx_main(boost::program_options::variables_map&)
     hpx::naming::gid_type prefix = hpx::applier::get_applier().get_prefix();
 
     std::cout << "Enter size of board. Default size is 8." << std::endl;
-    std::cout << "Command Options: size[value] | default | print | quit" 
+    std::cout << "Command Options: size[value] | default | print | quit"
               << std::endl;
     std::string cmd;
     std::cin >> cmd;
@@ -30,12 +30,12 @@ int hpx_main(boost::program_options::variables_map&)
     while (std::cin.good())
     {
         if(cmd == "size")
-        {   
+        {
             soln_count_total = 0;
             std::string arg;
             std::cin >> arg;
             std::size_t sz = boost::lexical_cast<std::size_t>(arg);
-            
+
             std::size_t i = 0;
             std::list<nqueen::board> b;
             nqueen::board bi;
@@ -44,14 +44,14 @@ int hpx_main(boost::program_options::variables_map&)
                 b.push_back(bi);
                 ++i;
             }
-    
+
             i=0;
             for(std::list<nqueen::board>::iterator iter = b.begin();
                 iter != b.end(); ++iter)
-            {  
-                iter->create(prefix); 
-                iter->init_board(sz); 
-                soln_count_total+= iter->solve_board(iter->access_board(), 
+            {
+                iter->create(prefix);
+                iter->init_board(sz);
+                soln_count_total+= iter->solve_board(iter->access_board(),
                                                      sz, 0, i);
                 ++i;
             }
@@ -72,10 +72,10 @@ int hpx_main(boost::program_options::variables_map&)
             i = 0;
             for(std::vector<nqueen::board>::iterator iter = b.begin();
                 iter != b.end(); ++iter)
-            {  
-                iter->create(prefix); 
-                iter->init_board(default_size); 
-                soln_count_total+= iter->solve_board(iter->access_board(), 
+            {
+                iter->create(prefix);
+                iter->init_board(default_size);
+                soln_count_total+= iter->solve_board(iter->access_board(),
                                                      default_size, 0, i);
                 ++i;
             }
@@ -90,23 +90,23 @@ int hpx_main(boost::program_options::variables_map&)
             //std::cout << "soln_count : " << soln_count_total << std::endl;
             break;
         }
-        else 
+        else
         {
             std::cout << "Invalid Command." << std::endl;
-            std::cout << "Options: size[value] | default | print "<< 
+            std::cout << "Options: size[value] | default | print "<<
             "| quit" << std::endl;
         }
         std::cin >> cmd;
     }
 
     hpx::finalize();
-    
+
     return 0;
 }
 
 int main(int argc, char* argv[])
 {
-    boost::program_options::options_description 
+    boost::program_options::options_description
         desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     return hpx::init(desc_commandline, argc, argv);

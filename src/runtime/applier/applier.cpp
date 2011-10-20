@@ -1,8 +1,8 @@
 //  Copyright (c) 2007-2008 Anshul Tandon
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-//  Copyright (c) 2011      Bryce Lelbach 
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Copyright (c) 2011      Bryce Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -18,22 +18,22 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace applier
 {
-    // 
-    lcos::promise<naming::id_type, naming::gid_type> 
-    create_async(naming::id_type const& targetgid, 
+    //
+    lcos::promise<naming::id_type, naming::gid_type>
+    create_async(naming::id_type const& targetgid,
         components::component_type type, std::size_t count)
     {
-        // Create a promise, execute the required action, 
+        // Create a promise, execute the required action,
         // we simply return the initialized promise, the caller needs
         // to call get() on the return value to obtain the result
-        typedef 
+        typedef
             components::server::runtime_support::create_component_action
         action_type;
         return lcos::eager_future<action_type, naming::id_type>(targetgid, type, count);
     }
 
-    // 
-    naming::id_type create(naming::id_type const& targetgid, 
+    //
+    naming::id_type create(naming::id_type const& targetgid,
         components::component_type type, std::size_t count)
     {
         return create_async(targetgid, type, count).get();
@@ -56,36 +56,36 @@ namespace hpx { namespace applier
 
     ///////////////////////////////////////////////////////////////////////////
     threads::thread_id_type register_thread_nullary(
-        boost::function<void()> const& func, char const* desc, 
+        boost::function<void()> const& func, char const* desc,
         threads::thread_state_enum state, threads::thread_priority priority,
         bool run_now, std::size_t os_thread, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
         {
-            HPX_THROWS_IF(ec, invalid_status, 
-                "hpx::applier::register_thread_nullary", 
+            HPX_THROWS_IF(ec, invalid_status,
+                "hpx::applier::register_thread_nullary",
                 "global applier object is not accessible");
             return threads::invalid_thread_id;
         }
 
         threads::thread_init_data data(
-            boost::bind(&thread_function_nullary, func), desc, 0, 
+            boost::bind(&thread_function_nullary, func), desc, 0,
             priority, os_thread);
         return app->get_thread_manager().
             register_thread(data, state, run_now, ec);
     }
 
     threads::thread_id_type register_thread(
-        boost::function<void(threads::thread_state_ex)> const& func, 
+        boost::function<void(threads::thread_state_ex)> const& func,
         char const* desc, threads::thread_state_enum state, bool run_now,
         threads::thread_priority priority, std::size_t os_thread, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
         {
-            HPX_THROWS_IF(ec, invalid_status, 
-                "hpx::applier::register_thread", 
+            HPX_THROWS_IF(ec, invalid_status,
+                "hpx::applier::register_thread",
                 "global applier object is not accessible");
             return threads::invalid_thread_id;
         }
@@ -104,8 +104,8 @@ namespace hpx { namespace applier
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
         {
-            HPX_THROWS_IF(ec, invalid_status, 
-                "hpx::applier::register_thread_plain", 
+            HPX_THROWS_IF(ec, invalid_status,
+                "hpx::applier::register_thread_plain",
                 "global applier object is not accessible");
             return threads::invalid_thread_id;
         }
@@ -116,14 +116,14 @@ namespace hpx { namespace applier
     }
 
     threads::thread_id_type register_thread_plain(
-        threads::thread_init_data& data, threads::thread_state_enum state, 
+        threads::thread_init_data& data, threads::thread_state_enum state,
         bool run_now, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
         {
-            HPX_THROWS_IF(ec, invalid_status, 
-                "hpx::applier::register_thread_plain", 
+            HPX_THROWS_IF(ec, invalid_status,
+                "hpx::applier::register_thread_plain",
                 "global applier object is not accessible");
             return threads::invalid_thread_id;
         }
@@ -134,41 +134,41 @@ namespace hpx { namespace applier
 
     ///////////////////////////////////////////////////////////////////////////
     void register_work_nullary(
-        boost::function<void()> const& func, char const* desc, 
+        boost::function<void()> const& func, char const* desc,
         threads::thread_state_enum state, threads::thread_priority priority,
         std::size_t os_thread, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
         {
-            HPX_THROWS_IF(ec, invalid_status, 
-                "hpx::applier::register_work_nullary", 
+            HPX_THROWS_IF(ec, invalid_status,
+                "hpx::applier::register_work_nullary",
                 "global applier object is not accessible");
             return;
         }
 
         threads::thread_init_data data(
-            boost::bind(&thread_function_nullary, func), 
+            boost::bind(&thread_function_nullary, func),
             desc ? desc : "<unknown>", 0, priority, os_thread);
         app->get_thread_manager().register_work(data, state, ec);
     }
 
     void register_work(
-        boost::function<void(threads::thread_state_ex)> const& func, 
-        char const* desc, threads::thread_state_enum state, 
+        boost::function<void(threads::thread_state_ex)> const& func,
+        char const* desc, threads::thread_state_enum state,
         threads::thread_priority priority, std::size_t os_thread, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
         {
-            HPX_THROWS_IF(ec, invalid_status, 
-                "hpx::applier::register_work", 
+            HPX_THROWS_IF(ec, invalid_status,
+                "hpx::applier::register_work",
                 "global applier object is not accessible");
             return;
         }
 
         threads::thread_init_data data(
-            boost::bind(&thread_function, func), 
+            boost::bind(&thread_function, func),
             desc ? desc : "<unknown>", 0, priority, os_thread);
         app->get_thread_manager().register_work(data, state, ec);
     }
@@ -182,13 +182,13 @@ namespace hpx { namespace applier
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
         {
-            HPX_THROWS_IF(ec, invalid_status, 
-                "hpx::applier::register_work_plain", 
+            HPX_THROWS_IF(ec, invalid_status,
+                "hpx::applier::register_work_plain",
                 "global applier object is not accessible");
             return;
         }
 
-        threads::thread_init_data data(func, 
+        threads::thread_init_data data(func,
             desc ? desc : "<unknown>", lva, priority, os_thread);
         app->get_thread_manager().register_work(data, state, ec);
     }
@@ -200,8 +200,8 @@ namespace hpx { namespace applier
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
         {
-            HPX_THROWS_IF(ec, invalid_status, 
-                "hpx::applier::register_work_plain", 
+            HPX_THROWS_IF(ec, invalid_status,
+                "hpx::applier::register_work_plain",
                 "global applier object is not accessible");
             return;
         }
@@ -211,15 +211,15 @@ namespace hpx { namespace applier
 
     ///////////////////////////////////////////////////////////////////////////
     hpx::util::thread_specific_ptr<applier*, applier::tls_tag> applier::applier_;
-        
+
     applier::applier(parcelset::parcelhandler &ph, threads::threadmanager_base& tm,
                 boost::uint64_t rts, boost::uint64_t mem)
       : parcel_handler_(ph), thread_manager_(tm),
         runtime_support_id_(parcel_handler_.get_prefix().get_msb(), rts,
-            parcel_handler_.here(), components::component_runtime_support, 
-            rts, naming::id_type::unmanaged), 
+            parcel_handler_.here(), components::component_runtime_support,
+            rts, naming::id_type::unmanaged),
         memory_id_(parcel_handler_.get_prefix().get_msb(), mem,
-            parcel_handler_.here(), components::component_runtime_support, 
+            parcel_handler_.here(), components::component_runtime_support,
             mem, naming::id_type::unmanaged)
     {}
 
@@ -228,12 +228,12 @@ namespace hpx { namespace applier
         return hpx::naming::get_agas_client();
     }
 
-    parcelset::parcelhandler& applier::get_parcel_handler() 
+    parcelset::parcelhandler& applier::get_parcel_handler()
     {
         return parcel_handler_;
     }
 
-    threads::threadmanager_base& applier::get_thread_manager() 
+    threads::threadmanager_base& applier::get_thread_manager()
     {
         return thread_manager_;
     }
@@ -250,7 +250,7 @@ namespace hpx { namespace applier
 
     boost::uint32_t applier::get_prefix_id() const
     {
-        return naming::get_prefix_from_gid(get_prefix()); 
+        return naming::get_prefix_from_gid(get_prefix());
     }
 
     bool applier::get_raw_remote_prefixes(std::vector<naming::gid_type>& prefixes,
@@ -265,13 +265,13 @@ namespace hpx { namespace applier
         std::vector<naming::gid_type> raw_prefixes;
         if (!parcel_handler_.get_raw_remote_prefixes(raw_prefixes, type))
             return false;
-        
+
         BOOST_FOREACH(naming::gid_type& gid, raw_prefixes)
             prefixes.push_back(naming::id_type(gid, naming::id_type::unmanaged));
 
         return true;
     }
-        
+
     bool applier::get_raw_prefixes(std::vector<naming::gid_type>& prefixes,
         components::component_type type) const
     {
@@ -284,22 +284,22 @@ namespace hpx { namespace applier
         std::vector<naming::gid_type> raw_prefixes;
         if (!parcel_handler_.get_raw_prefixes(raw_prefixes, type))
             return false;
-        
+
         BOOST_FOREACH(naming::gid_type& gid, raw_prefixes)
             prefixes.push_back(naming::id_type(gid, naming::id_type::unmanaged));
 
         return true;
     }
 
-    bool applier::address_is_local(naming::id_type const& id, 
+    bool applier::address_is_local(naming::id_type const& id,
         naming::address& addr) const
     {
         if (id.is_local()) {    // address gets resolved if not already
             if (!id.get_local_address(addr)) {
                 hpx::util::osstream strm;
                 strm << "gid" << id.get_gid();
-                HPX_THROW_EXCEPTION(invalid_status, 
-                    "applier::address_is_local", 
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "applier::address_is_local",
                     hpx::util::osstream_get_string(strm));
             }
             return true;
@@ -308,33 +308,33 @@ namespace hpx { namespace applier
         if (!id.is_resolved()) {
             hpx::util::osstream strm;
             strm << "gid" << id.get_gid();
-            HPX_THROW_EXCEPTION(unknown_component_address, 
+            HPX_THROW_EXCEPTION(unknown_component_address,
                 "applier::address_is_local", hpx::util::osstream_get_string(strm));
         }
 
         if (!id.get_address_cached(addr)) {
             hpx::util::osstream strm;
             strm << "gid" << id.get_gid();
-            HPX_THROW_EXCEPTION(invalid_status, 
-                "applier::address_is_local", 
+            HPX_THROW_EXCEPTION(invalid_status,
+                "applier::address_is_local",
                 hpx::util::osstream_get_string(strm));
         }
         return false;   // non-local
     }
 
-    bool applier::address_is_local(naming::gid_type const& gid, 
+    bool applier::address_is_local(naming::gid_type const& gid,
         naming::address& addr) const
     {
         // test if the gid is of one of the non-movable objects
-        // this is certainly an optimization relying on the fact that the 
+        // this is certainly an optimization relying on the fact that the
         // lsb of the local objects is equal to their address
-        if (naming::strip_credit_from_gid(gid.get_msb()) == 
+        if (naming::strip_credit_from_gid(gid.get_msb()) ==
                 parcel_handler_.get_prefix().get_msb())
         {
             // a zero address references the local runtime support component
             if (0 != gid.get_lsb())
                 addr.address_ = gid.get_lsb();
-            else 
+            else
                 addr.address_ = runtime_support_id_.get_lsb();
             return true;
         }
@@ -344,7 +344,7 @@ namespace hpx { namespace applier
         {
             hpx::util::osstream strm;
             strm << "gid" << gid;
-            HPX_THROW_EXCEPTION(unknown_component_address, 
+            HPX_THROW_EXCEPTION(unknown_component_address,
                 "applier::address_is_local", hpx::util::osstream_get_string(strm));
         }
         return addr.locality_ == parcel_handler_.here();

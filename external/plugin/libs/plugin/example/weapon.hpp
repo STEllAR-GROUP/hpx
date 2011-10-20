@@ -14,12 +14,12 @@ public:
 namespace boost { namespace plugin {
 
     template<>
-    struct virtual_constructors<Weapon> 
+    struct virtual_constructors<Weapon>
     {
         typedef mpl::list<
             mpl::list<std::string>,
             mpl::list<std::string, int>,
-            mpl::list<std::string, int, int>    
+            mpl::list<std::string, int, int>
         > type;
     };
 

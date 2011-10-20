@@ -24,7 +24,7 @@
 #include <boost/logging/detail/fwd.hpp>
 #include <boost/logging/format/formatter/convert_format.hpp>
 #include <boost/logging/detail/manipulator.hpp> // is_generic
-#include <boost/logging/detail/time_format_holder.hpp> 
+#include <boost/logging/detail/time_format_holder.hpp>
 
 #include <time.h>
 
@@ -55,7 +55,7 @@ template<class convert = do_convert_format::prepend> struct time_t : is_generic,
     typedef convert convert_type;
     typedef non_const_context<boost::logging::detail::time_format_holder> non_const_context_base;
 
-    /** 
+    /**
         constructs a time object
     */
     time_t(const hold_string_type & format) : non_const_context_base(format) {}
@@ -70,7 +70,7 @@ template<class convert = do_convert_format::prepend> struct time_t : is_generic,
     }
 
     template<class msg_type> void operator()(msg_type & msg) const {
-        ::time_t val = ::time(0); 
+        ::time_t val = ::time(0);
         write_time(msg, val);
     }
 
@@ -78,7 +78,7 @@ template<class convert = do_convert_format::prepend> struct time_t : is_generic,
         return non_const_context_base::context() == other.non_const_context_base::context();
     }
 
-    /** @brief configure through script 
+    /** @brief configure through script
 
         the string = the time format
     */

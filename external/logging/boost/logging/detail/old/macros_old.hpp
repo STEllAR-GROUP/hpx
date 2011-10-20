@@ -17,8 +17,8 @@
 #ifndef JT28092007_macros_HPP_DEFINED
 #define JT28092007_macros_HPP_DEFINED
 
-/* 
-    VERY IMPORTANT: 
+/*
+    VERY IMPORTANT:
     Not using #pragma once
     We might need to re-include this file, when defining the logs
 */
@@ -50,12 +50,12 @@ namespace boost { namespace logging {
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Defining filter Macros 
+// Defining filter Macros
 
 /*
     when compile fast is "off", we always need BOOST_LOG_MANIPULATE_LOGS, to get access to the logger class typedefs;
 */
-#if !defined(BOOST_LOG_COMPILE_FAST) 
+#if !defined(BOOST_LOG_COMPILE_FAST)
 #if !defined(BOOST_LOG_MANIPULATE_LOGS)
 
 #define BOOST_LOG_MANIPULATE_LOGS
@@ -125,7 +125,7 @@ namespace boost { namespace logging {
     namespace boost_log_define_ { \
     ::boost::logging::detail::log_keeper< base_type, name ## _boost_log_impl_, ::boost::logging::detail::call_write_logger_finder< log_type, gather_msg > ::type > name ; \
     } \
-    using boost_log_define_ :: name ; 
+    using boost_log_define_ :: name ;
 
 #define BOOST_DEFINE_LOG(name,type) \
     BOOST_DEFINE_LOG_FIND_GATHER(name, type, ::boost::logging::detail::fast_compile_with_default_gather<>::log_type, ::boost::logging::detail::fast_compile_with_default_gather<>::gather_msg )
@@ -139,13 +139,13 @@ namespace boost { namespace logging {
 #else
 // don't compile fast
 
-#define BOOST_DECLARE_LOG(name,type) type& name ## _boost_log_impl_(); extern boost::logging::detail::log_keeper<type, name ## _boost_log_impl_ > name; 
+#define BOOST_DECLARE_LOG(name,type) type& name ## _boost_log_impl_(); extern boost::logging::detail::log_keeper<type, name ## _boost_log_impl_ > name;
 #define BOOST_DEFINE_LOG(name,type)  type& name ## _boost_log_impl_() \
     { static type i; return i; } \
     namespace { boost::logging::detail::fake_using_log ensure_log_is_created_before_main ## name ( name ## _boost_log_impl_() ); } \
-    boost::logging::detail::log_keeper<type, name ## _boost_log_impl_ > name; 
+    boost::logging::detail::log_keeper<type, name ## _boost_log_impl_ > name;
 
-/** 
+/**
     Advanced
 */
 #define BOOST_DECLARE_LOG_WITH_GATHER(name,type,gather_type) BOOST_DECLARE_LOG(name,type)
@@ -157,13 +157,13 @@ namespace boost { namespace logging {
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Filter Macros 
+// Filter Macros
 
-#define BOOST_DECLARE_LOG_FILTER_NO_NAMESPACE_PREFIX(name,type) type& name ## _boost_log_filter_impl_(); extern boost::logging::detail::log_filter_keeper<type, name ## _boost_log_filter_impl_ > name; 
+#define BOOST_DECLARE_LOG_FILTER_NO_NAMESPACE_PREFIX(name,type) type& name ## _boost_log_filter_impl_(); extern boost::logging::detail::log_filter_keeper<type, name ## _boost_log_filter_impl_ > name;
 #define BOOST_DEFINE_LOG_FILTER_NO_NAMESPACE_PREFIX(name,type)  type& name ## _boost_log_filter_impl_() \
     { static type i; return i; } \
     namespace { boost::logging::detail::fake_using_log ensure_log_is_created_before_main ## name ( name ## _boost_log_filter_impl_() ); } \
-    boost::logging::detail::log_filter_keeper<type, name ## _boost_log_filter_impl_ > name; 
+    boost::logging::detail::log_filter_keeper<type, name ## _boost_log_filter_impl_ > name;
 
 
 #define BOOST_DECLARE_LOG_FILTER(name,type) BOOST_DECLARE_LOG_FILTER_NO_NAMESPACE_PREFIX(name, ::boost::logging:: type)
@@ -188,7 +188,7 @@ namespace boost { namespace logging {
 
 #define BOOST_LOG_USE_LOG_IF_FILTER(l, the_filter) BOOST_LOG_USE_LOG(l, read_msg().gather().out(), the_filter)
 
-#define BOOST_LOG_USE_SIMPLE_LOG_IF_FILTER(l, is_log_enabled) if ( !(is_log_enabled) ) ; else l ->operator() 
+#define BOOST_LOG_USE_SIMPLE_LOG_IF_FILTER(l, is_log_enabled) if ( !(is_log_enabled) ) ; else l ->operator()
 
 
 

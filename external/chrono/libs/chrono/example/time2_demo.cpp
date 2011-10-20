@@ -10,8 +10,8 @@
 
 This code was derived by Beman Dawes from Howard Hinnant's time2_demo prototype.
 Many thanks to Howard for making his code available under the Boost license.
-The original code was modified to conform to Boost conventions and to section 
-20.9 Time utilities [time] of the C++ committee's working paper N2798. 
+The original code was modified to conform to Boost conventions and to section
+20.9 Time utilities [time] of the C++ committee's working paper N2798.
 See http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2798.pdf.
 
 time2_demo contained this comment:
@@ -32,7 +32,7 @@ time2_demo contained this comment:
 
 #include <iostream>
 
-#include <windows.h>  
+#include <windows.h>
 #undef min
 #undef max
 
@@ -917,7 +917,7 @@ public:
         tv_sec  = static_cast<long>(usec / 1000000);
         fixup();
     }
-    
+
     // explicit
     operator long long() const {return static_cast<long long>(tv_sec) * 1000000 + tv_usec;}
 
@@ -1074,7 +1074,7 @@ init_duration()
     //mach_timebase_info_data_t MachInfo;
     //mach_timebase_info(&MachInfo);
     //return static_cast<double>(MachInfo.denom) / MachInfo.numer;
-    return static_cast<double>(1) / 1000; // Windows FILETIME is 1 per microsec 
+    return static_cast<double>(1) / 1000; // Windows FILETIME is 1 per microsec
 }
 
 const double duration::ticks_per_nanosecond = init_duration();

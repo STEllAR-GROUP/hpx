@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D. Guidry Jr.
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_NAMING_LOCALITY_MAR_24_2008_0942AM)
@@ -43,14 +43,14 @@ namespace hpx { namespace naming
             }
 
             bool operator()(boost::asio::ip::tcp::endpoint ep) const
-            { 
-                return true; 
+            {
+                return true;
             }
 
             std::string pattern_;
         };
 
-        typedef 
+        typedef
             boost::filter_iterator<
                 is_valid_endpoint, boost::asio::ip::tcp::resolver::iterator
             >
@@ -60,12 +60,12 @@ namespace hpx { namespace naming
     ///////////////////////////////////////////////////////////////////////////
     /// \class locality locality.hpp hpx/runtime/naming/locality.hpp
     ///
-    /// The class \a locality is a helper class storing the address and the 
+    /// The class \a locality is a helper class storing the address and the
     /// port number of a HPX locality.
     class HPX_EXPORT locality
     {
     public:
-        locality() 
+        locality()
           : address_(), port_(boost::uint16_t(-1))
         {}
 
@@ -73,12 +73,12 @@ namespace hpx { namespace naming
           : address_(addr), port_(port)
         {}
 
-        locality(boost::asio::ip::address addr, boost::uint16_t port) 
+        locality(boost::asio::ip::address addr, boost::uint16_t port)
           : address_(addr.to_string()), port_(port)
         {}
 
-        explicit locality(boost::asio::ip::tcp::endpoint ep) 
-          : address_(ep.address().to_string()), port_(ep.port()) 
+        explicit locality(boost::asio::ip::tcp::endpoint ep)
+          : address_(ep.address().to_string()), port_(ep.port())
         {}
 
         locality& operator= (boost::asio::ip::tcp::endpoint ep)
@@ -92,7 +92,7 @@ namespace hpx { namespace naming
         typedef detail::locality_iterator_type iterator_type;
 
         /// \brief Returns an iterator which when dereferenced will give an
-        ///        endpoint suitable for a call to accept() related to this 
+        ///        endpoint suitable for a call to accept() related to this
         ///        locality
         iterator_type accept_begin(boost::asio::io_service& io_service) const;
 
@@ -102,7 +102,7 @@ namespace hpx { namespace naming
         }
 
         /// \brief Returns an iterator which when dereferenced will give an
-        ///        endpoint suitable for a call to connect() related to this 
+        ///        endpoint suitable for a call to connect() related to this
         ///        locality
         iterator_type connect_begin(boost::asio::io_service& io_service) const;
 
@@ -124,7 +124,7 @@ namespace hpx { namespace naming
 
         friend bool operator< (locality const& lhs, locality const& rhs)
         {
-            return lhs.address_ < rhs.address_ || 
+            return lhs.address_ < rhs.address_ ||
                    (lhs.address_ == rhs.address_ && lhs.port_ < rhs.port_);
         }
 
@@ -134,9 +134,9 @@ namespace hpx { namespace naming
         }
 
         ///////////////////////////////////////////////////////////////////////
-        operator util::safe_bool<locality>::result_type() const 
-        { 
-            return util::safe_bool<locality>()(port_ != boost::uint16_t(-1)); 
+        operator util::safe_bool<locality>::result_type() const
+        {
+            return util::safe_bool<locality>()(port_ != boost::uint16_t(-1));
         }
 
         std::string const& get_address() const { return address_; }
@@ -145,7 +145,7 @@ namespace hpx { namespace naming
     private:
         friend std::ostream& operator<< (std::ostream& os, locality const& l);
 
-        // serialization support    
+        // serialization support
         friend class boost::serialization::access;
 
         template<class Archive>
@@ -160,7 +160,7 @@ namespace hpx { namespace naming
         {
             if (version > HPX_LOCALITY_VERSION)
             {
-                HPX_THROW_EXCEPTION(version_too_new, 
+                HPX_THROW_EXCEPTION(version_too_new,
                     "locality::load",
                     "trying to load locality with unknown version");
             }
@@ -177,7 +177,7 @@ namespace hpx { namespace naming
 
     inline std::ostream& operator<< (std::ostream& os, locality const& l)
     {
-        boost::io::ios_flags_saver ifs(os); 
+        boost::io::ios_flags_saver ifs(os);
         os << l.address_ << ":" << l.port_;
         return os;
     }

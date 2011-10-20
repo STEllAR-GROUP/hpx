@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_LCOS_EAGER_FUTURE_JUN_27_2008_0420PM)
@@ -24,36 +24,36 @@
 #include <boost/variant.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos 
+namespace hpx { namespace lcos
 {
     ///////////////////////////////////////////////////////////////////////////
     /// \class eager_future eager_future.hpp hpx/lcos/eager_future.hpp
     ///
-    /// A eager_future can be used by a single \a thread to invoke a 
-    /// (remote) action and wait for the result. The result is expected to be 
+    /// A eager_future can be used by a single \a thread to invoke a
+    /// (remote) action and wait for the result. The result is expected to be
     /// sent back to the eager_future using the LCO's set_event action
     ///
-    /// A eager_future is one of the simplest synchronization primitives 
+    /// A eager_future is one of the simplest synchronization primitives
     /// provided by HPX. It allows to synchronize on a eager evaluated remote
-    /// operation returning a result of the type \a Result. 
+    /// operation returning a result of the type \a Result.
     ///
-    /// \tparam Action   The template parameter \a Action defines the action 
-    ///                  to be executed by this eager_future instance. The 
-    ///                  arguments \a arg0,... \a argN are used as parameters 
+    /// \tparam Action   The template parameter \a Action defines the action
+    ///                  to be executed by this eager_future instance. The
+    ///                  arguments \a arg0,... \a argN are used as parameters
     ///                  for this action.
-    /// \tparam Result   The template parameter \a Result defines the type this 
-    ///                  eager_future is expected to return from 
+    /// \tparam Result   The template parameter \a Result defines the type this
+    ///                  eager_future is expected to return from
     ///                  \a eager_future#get.
     /// \tparam DirectExecute The template parameter \a DirectExecute is an
-    ///                  optimization aid allowing to execute the action 
-    ///                  directly if the target is local (without spawning a 
+    ///                  optimization aid allowing to execute the action
+    ///                  directly if the target is local (without spawning a
     ///                  new thread for this). This template does not have to be
-    ///                  supplied explicitly as it is derived from the template 
+    ///                  supplied explicitly as it is derived from the template
     ///                  parameter \a Action.
     ///
-    /// \note            The action executed using the eager_future as a 
-    ///                  continuation must return a value of a type convertible 
-    ///                  to the type as specified by the template parameter 
+    /// \note            The action executed using the eager_future as a
+    ///                  continuation must return a value of a type convertible
+    ///                  to the type as specified by the template parameter
     ///                  \a Result.
     template <typename Action, typename Result, typename DirectExecute>
     class eager_future;
@@ -62,7 +62,7 @@ namespace hpx { namespace lcos
     struct eager_future_tag {};
 
     template <typename Action, typename Result>
-    class eager_future<Action, Result, boost::mpl::false_> 
+    class eager_future<Action, Result, boost::mpl::false_>
         : public promise<Result, typename Action::result_type>
     {
     private:
@@ -91,20 +91,20 @@ namespace hpx { namespace lcos
             hpx::applier::apply_c<Action>(this->get_gid(), gid);
         }
 
-        /// Construct a new \a eager_future instance. The \a thread 
-        /// supplied to the function \a eager_future#get will be 
-        /// notified as soon as the result of the operation associated with 
+        /// Construct a new \a eager_future instance. The \a thread
+        /// supplied to the function \a eager_future#get will be
+        /// notified as soon as the result of the operation associated with
         /// this eager_future instance has been returned.
-        /// 
+        ///
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
         ///
-        /// \note         The result of the requested operation is expected to 
-        ///               be returned as the first parameter using a 
-        ///               \a base_lco#set_result action. Any error has to be 
-        ///               reported using a \a base_lco::set_error action. The 
-        ///               target for either of these actions has to be this 
-        ///               eager_future instance (as it has to be sent along 
+        /// \note         The result of the requested operation is expected to
+        ///               be returned as the first parameter using a
+        ///               \a base_lco#set_result action. Any error has to be
+        ///               reported using a \a base_lco::set_error action. The
+        ///               target for either of these actions has to be this
+        ///               eager_future instance (as it has to be sent along
         ///               with the action as the continuation parameter).
         eager_future(naming::gid_type const& gid)
           : apply_logger_("eager_future::apply")
@@ -132,7 +132,7 @@ namespace hpx { namespace lcos
         ///
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
-        /// \param arg0   [in] The parameter \a arg0 will be passed on to the 
+        /// \param arg0   [in] The parameter \a arg0 will be passed on to the
         ///               apply operation for the embedded action.
         template <typename Arg0>
         void apply(naming::id_type const& gid, Arg0 const arg0)
@@ -141,22 +141,22 @@ namespace hpx { namespace lcos
             hpx::applier::apply_c<Action>(this->get_gid(), gid, arg0);
         }
 
-        /// Construct a new \a eager_future instance. The \a thread 
-        /// supplied to the function \a eager_future#get will be 
-        /// notified as soon as the result of the operation associated with 
+        /// Construct a new \a eager_future instance. The \a thread
+        /// supplied to the function \a eager_future#get will be
+        /// notified as soon as the result of the operation associated with
         /// this eager_future instance has been returned.
         ///
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
-        /// \param arg0   [in] The parameter \a arg0 will be passed on to the 
+        /// \param arg0   [in] The parameter \a arg0 will be passed on to the
         ///               apply operation for the embedded action.
         ///
-        /// \note         The result of the requested operation is expected to 
-        ///               be returned as the first parameter using a 
-        ///               \a base_lco#set_result action. Any error has to be 
-        ///               reported using a \a base_lco::set_error action. The 
-        ///               target for either of these actions has to be this 
-        ///               eager_future instance (as it has to be sent along 
+        /// \note         The result of the requested operation is expected to
+        ///               be returned as the first parameter using a
+        ///               \a base_lco#set_result action. Any error has to be
+        ///               reported using a \a base_lco::set_error action. The
+        ///               target for either of these actions has to be this
+        ///               eager_future instance (as it has to be sent along
         ///               with the action as the continuation parameter).
         template <typename Arg0>
         eager_future(naming::gid_type const& gid, Arg0 const& arg0)
@@ -191,7 +191,7 @@ namespace hpx { namespace lcos
     struct eager_future_direct_tag {};
 
     template <typename Action, typename Result>
-    class eager_future<Action, Result, boost::mpl::true_> 
+    class eager_future<Action, Result, boost::mpl::true_>
         : public promise<Result, typename Action::result_type>
     {
     private:
@@ -222,9 +222,9 @@ namespace hpx { namespace lcos
             naming::address addr;
             if (hpx::applier::get_applier().address_is_local(gid, addr)) {
                 // local, direct execution
-                BOOST_ASSERT(components::types_are_compatible(addr.type_, 
+                BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<typename Action::component_type>()));
-                (*this->impl_)->set_data(0, 
+                (*this->impl_)->set_data(0,
                     Action::execute_function_nonvirt(addr.address_));
             }
             else {
@@ -233,20 +233,20 @@ namespace hpx { namespace lcos
             }
         }
 
-        /// Construct a new \a eager_future instance. The \a thread 
-        /// supplied to the function \a eager_future#get will be 
-        /// notified as soon as the result of the operation associated with 
+        /// Construct a new \a eager_future instance. The \a thread
+        /// supplied to the function \a eager_future#get will be
+        /// notified as soon as the result of the operation associated with
         /// this eager_future instance has been returned.
         ///
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
-        /// 
-        /// \note         The result of the requested operation is expected to 
-        ///               be returned as the first parameter using a 
-        ///               \a base_lco#set_result action. Any error has to be 
-        ///               reported using a \a base_lco::set_error action. The 
-        ///               target for either of these actions has to be this 
-        ///               eager_future instance (as it has to be sent along 
+        ///
+        /// \note         The result of the requested operation is expected to
+        ///               be returned as the first parameter using a
+        ///               \a base_lco#set_result action. Any error has to be
+        ///               reported using a \a base_lco::set_error action. The
+        ///               target for either of these actions has to be this
+        ///               eager_future instance (as it has to be sent along
         ///               with the action as the continuation parameter).
         eager_future(naming::gid_type const& gid)
           : apply_logger_("eager_future_direct::apply")
@@ -274,7 +274,7 @@ namespace hpx { namespace lcos
         ///
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
-        /// \param arg0   [in] The parameter \a arg0 will be passed on to the 
+        /// \param arg0   [in] The parameter \a arg0 will be passed on to the
         ///               apply operation for the embedded action.
         template <typename Arg0>
         void apply(naming::id_type const& gid, Arg0 const& arg0)
@@ -285,7 +285,7 @@ namespace hpx { namespace lcos
             naming::address addr;
             if (hpx::applier::get_applier().address_is_local(gid, addr)) {
                 // local, direct execution
-                BOOST_ASSERT(components::types_are_compatible(addr.type_, 
+                BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<typename Action::component_type>()));
                 (*this->impl_)->set_data(
                     0, Action::execute_function_nonvirt(addr.address_, arg0));
@@ -296,22 +296,22 @@ namespace hpx { namespace lcos
             }
         }
 
-        /// Construct a new \a eager_future instance. The \a thread 
-        /// supplied to the function \a eager_future#get will be 
-        /// notified as soon as the result of the operation associated with 
+        /// Construct a new \a eager_future instance. The \a thread
+        /// supplied to the function \a eager_future#get will be
+        /// notified as soon as the result of the operation associated with
         /// this eager_future instance has been returned.
         ///
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
-        /// \param arg0   [in] The parameter \a arg0 will be passed on to the 
+        /// \param arg0   [in] The parameter \a arg0 will be passed on to the
         ///               apply operation for the embedded action.
-        /// 
-        /// \note         The result of the requested operation is expected to 
-        ///               be returned as the first parameter using a 
-        ///               \a base_lco#set_result action. Any error has to be 
-        ///               reported using a \a base_lco::set_error action. The 
-        ///               target for either of these actions has to be this 
-        ///               eager_future instance (as it has to be sent along 
+        ///
+        /// \note         The result of the requested operation is expected to
+        ///               be returned as the first parameter using a
+        ///               \a base_lco#set_result action. Any error has to be
+        ///               reported using a \a base_lco::set_error action. The
+        ///               target for either of these actions has to be this
+        ///               eager_future instance (as it has to be sent along
         ///               with the action as the continuation parameter).
         template <typename Arg0>
         eager_future(naming::gid_type const& gid, Arg0 const& arg0)

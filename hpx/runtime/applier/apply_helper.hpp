@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_APPLIER_APPLY_HELPER_JUN_25_2008_0917PM)
@@ -27,7 +27,7 @@ namespace hpx { namespace applier { namespace detail
     template <typename Action>
     struct apply_helper0<Action, boost::mpl::false_>
     {
-        static void 
+        static void
         call (Action* act, naming::address::address_type lva,
             threads::thread_priority priority)
         {
@@ -36,7 +36,7 @@ namespace hpx { namespace applier { namespace detail
                 threads::pending, priority);
         }
 
-        static void 
+        static void
         call (naming::address::address_type lva,
             threads::thread_priority priority)
         {
@@ -46,7 +46,7 @@ namespace hpx { namespace applier { namespace detail
                 threads::pending, priority);
         }
 
-        static void 
+        static void
         call (actions::continuation_type& c, naming::address::address_type lva,
             threads::thread_priority priority)
         {
@@ -60,7 +60,7 @@ namespace hpx { namespace applier { namespace detail
     template <typename Action>
     struct apply_helper0<Action, boost::mpl::true_>
     {
-        static void 
+        static void
         call (Action* act, naming::address::address_type lva,
             threads::thread_priority /*priority*/)
         {
@@ -69,13 +69,13 @@ namespace hpx { namespace applier { namespace detail
 
         // If local and to be directly executed, just call the function
         static void
-        call (naming::address::address_type lva, 
+        call (naming::address::address_type lva,
             threads::thread_priority /*priority*/)
         {
             Action::execute_function_nonvirt(lva);
         }
 
-        static typename Action::result_type 
+        static typename Action::result_type
         call (actions::continuation_type& c, naming::address::address_type lva,
             threads::thread_priority /*priority*/)
         {
@@ -92,14 +92,14 @@ namespace hpx { namespace applier { namespace detail
 
     ///////////////////////////////////////////////////////////////////////
     template <
-        typename Action, typename Arg0, 
+        typename Action, typename Arg0,
         typename DirectExecute = typename Action::direct_execution>
     struct apply_helper1;
 
     template <typename Action, typename Arg0>
     struct apply_helper1<Action, Arg0, boost::mpl::false_>
     {
-        static void 
+        static void
         call (naming::address::address_type lva,
             threads::thread_priority priority, Arg0 const& arg0)
         {
@@ -109,7 +109,7 @@ namespace hpx { namespace applier { namespace detail
                 threads::pending, priority);
         }
 
-        static void 
+        static void
         call (actions::continuation_type& c, naming::address::address_type lva,
             threads::thread_priority priority, Arg0 const& arg0)
         {
@@ -131,7 +131,7 @@ namespace hpx { namespace applier { namespace detail
             Action::execute_function_nonvirt(lva, arg0);
         }
 
-        static typename Action::result_type  
+        static typename Action::result_type
         call (actions::continuation_type& c, naming::address::address_type lva,
             threads::thread_priority priority, Arg0 const& arg0)
         {

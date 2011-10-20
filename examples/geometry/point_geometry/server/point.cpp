@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2007-2011 Matthew Anderson
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
@@ -29,10 +29,10 @@
 #include <fstream>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace geometry { namespace server 
+namespace hpx { namespace geometry { namespace server
 {
         /// search for contact
-        int point::search(std::vector<hpx::naming::id_type> const& search_objects) 
+        int point::search(std::vector<hpx::naming::id_type> const& search_objects)
         {
           return 0;
 #if 0
@@ -52,7 +52,7 @@ namespace hpx { namespace geometry { namespace server
             else return 0;
         }
 
-        bool point::search_callback(std::size_t i, polygon_type const& poly,bool &redo) 
+        bool point::search_callback(std::size_t i, polygon_type const& poly,bool &redo)
         {
 
           double tmp = 0;
@@ -60,7 +60,7 @@ namespace hpx { namespace geometry { namespace server
             tmp += rand();
           }
           //std::cout << " TEST in callback " << i << " object id " << objectid_ << std::endl;
- 
+
           // This contains the R1/R2 sums needed to compute alpha2
           R_.resize(poly_.outer().size());
           // initialize
@@ -98,7 +98,7 @@ namespace hpx { namespace geometry { namespace server
                 bool found = false;
                 for (std::size_t k=0;k<poly_.outer().size();k++) {
                   if ( boost::geometry::distance(pp,outer_[k]) < 1.e-10 ) {
-                    slave_.push_back(k); 
+                    slave_.push_back(k);
                     found_ = true;
                     break;
                   }
@@ -107,7 +107,7 @@ namespace hpx { namespace geometry { namespace server
                   // it may belong to poly
                   for (std::size_t k=0;k<poly.outer().size();k++) {
                     if ( boost::geometry::distance(pp,outer[k]) < 1.e-10 ) {
-                      inv_slave_.push_back(k); 
+                      inv_slave_.push_back(k);
                       inv_object_id_.push_back(i);
                       found = true;
                       break;
@@ -116,21 +116,21 @@ namespace hpx { namespace geometry { namespace server
                 }
 
                 if ( found_ ) {
-                  // The following section will be replaced by Barend 
+                  // The following section will be replaced by Barend
                   // with the nearest neighbor routine
                   // but for now, this works
 
                   // the master segment should belong to poly
-                  object_id_.push_back(i);        
+                  object_id_.push_back(i);
                   double mindist = 999.;
                   int min_k = -1;
                   int final;
                   for (std::size_t k=0;k<poly.outer().size();k++) {
-                    final = k+1; 
+                    final = k+1;
                     if ( k+1 >= poly.outer().size() ) final = 0;
                     line[0] = (poly.outer())[k];
                     line[1] = (poly.outer())[final];
-                    double testdist = boost::geometry::distance(pp,line);    
+                    double testdist = boost::geometry::distance(pp,line);
 
                     if ( testdist < mindist ) {
                       mindist = testdist;
@@ -139,12 +139,12 @@ namespace hpx { namespace geometry { namespace server
                   }
 
                   BOOST_ASSERT(min_k >= 0 );
-                  master_.push_back(min_k); 
+                  master_.push_back(min_k);
                 }
 
-                // find the inverse 
+                // find the inverse
                 if ( found ) {
-                  // The following section will be replaced by Barend 
+                  // The following section will be replaced by Barend
                   // with the nearest neighbor routine
                   // but for now, this works
 
@@ -153,11 +153,11 @@ namespace hpx { namespace geometry { namespace server
                   int min_k = -1;
                   int final;
                   for (std::size_t k=0;k<poly_.outer().size();k++) {
-                    final = k+1; 
+                    final = k+1;
                     if ( k+1 >= poly_.outer().size() ) final = 0;
                     line[0] = (poly_.outer())[k];
                     line[1] = (poly_.outer())[final];
-                    double testdist = boost::geometry::distance(pp,line);    
+                    double testdist = boost::geometry::distance(pp,line);
 
                     if ( testdist < mindist ) {
                       mindist = testdist;
@@ -166,7 +166,7 @@ namespace hpx { namespace geometry { namespace server
                   }
 
                   BOOST_ASSERT(min_k >= 0 );
-                  inv_master_.push_back(min_k); 
+                  inv_master_.push_back(min_k);
                 }
 
               }
@@ -183,14 +183,14 @@ namespace hpx { namespace geometry { namespace server
               change_vx_[j] = 0.0;
               change_vy_[j] = 0.0;
             }
-             
+
 
             BOOST_ASSERT(inv_slave_.size() == inv_master_.size());
             BOOST_ASSERT(inv_slave_.size() == inv_object_id_.size());
 
             for (std::size_t j=0;j<inv_slave_.size();j++) {
               std::size_t master_vertex = inv_master_[j];
-              std::size_t final = master_vertex + 1; 
+              std::size_t final = master_vertex + 1;
               if ( final >= poly_.outer().size() ) final = 0;
 
               double x1 = (poly_.outer())[master_vertex].x();
@@ -206,7 +206,7 @@ namespace hpx { namespace geometry { namespace server
               double xs = (poly.outer())[inv_slave_[j]].x();
               double zs = (poly.outer())[inv_slave_[j]].y();
               double delta = -(A*xs + B*zs + C);
-    
+
               double xsm = xs + A*delta;
               double zsm = zs + B*delta;
 
@@ -220,10 +220,10 @@ namespace hpx { namespace geometry { namespace server
 
             // TEST
             //for (std::size_t j=0;j<slave_.size();j++) {
-            //  std::cout << " TEST slave : " << slave_[j] << " master " << master_[j] << " object " << object_id_[j] << std::endl; 
+            //  std::cout << " TEST slave : " << slave_[j] << " master " << master_[j] << " object " << object_id_[j] << std::endl;
             //  std::cout << "        Follow up slave x : " << (poly_.outer())[slave_[j]].x()  << " y " << (poly_.outer())[slave_[j]].y() << std::endl;
             //  std::cout << "        Follow up master1 x : " << (poly.outer())[master_[j]].x()  << " y " << (poly.outer())[master_[j]].y() << std::endl;
-            //  std::size_t final = master_[j] + 1; 
+            //  std::size_t final = master_[j] + 1;
             //  if ( final >= poly.outer().size() ) final = 0;
             //  std::cout << "        Follow up master2 x : " << (poly.outer())[final].x()  << " y " << (poly.outer())[final].y() << std::endl;
             //}
@@ -270,7 +270,7 @@ namespace hpx { namespace geometry { namespace server
           typedef std::vector<lcos::promise<polygon_type> > lazy_results_type;
 
           lazy_results_type lazy_results;
- 
+
           for (std::size_t i=0;i<slave_.size();i++) {
             naming::id_type gid = master_gids[ object_id_[i] ];
             lazy_results.push_back( stubs::point::get_poly_async( gid ) );
@@ -280,11 +280,11 @@ namespace hpx { namespace geometry { namespace server
           lcos::wait(lazy_results, boost::bind(&point::enforce_callback, this, _1, _2,boost::ref(dt),boost::ref(n),boost::ref(N)));
         }
 
-        bool point::enforce_callback(std::size_t i, polygon_type const& poly,double dt,std::size_t n,std::size_t N) 
+        bool point::enforce_callback(std::size_t i, polygon_type const& poly,double dt,std::size_t n,std::size_t N)
         {
 
           std::size_t master_vertex = master_[i];
-          std::size_t final = master_[i] + 1; 
+          std::size_t final = master_[i] + 1;
           if ( final >= poly.outer().size() ) final = 0;
 
           // Masses -- equal for now
@@ -371,7 +371,7 @@ namespace hpx { namespace geometry { namespace server
         }
 
         /// Recompute Rsum
-        void point::recompute(std::vector<hpx::naming::id_type> const& search_objects) 
+        void point::recompute(std::vector<hpx::naming::id_type> const& search_objects)
         {
           typedef std::vector<lcos::promise<polygon_type> > lazy_results_type;
 
@@ -381,7 +381,7 @@ namespace hpx { namespace geometry { namespace server
           for (std::size_t i=0;i<R_.size();i++) {
             R_[i] = 0.0;
           }
- 
+
           for (std::size_t i=0;i<inv_slave_.size();i++) {
             naming::id_type gid = search_objects[ inv_object_id_[i] ];
             lazy_results.push_back( stubs::point::get_poly_async( gid ) );
@@ -391,10 +391,10 @@ namespace hpx { namespace geometry { namespace server
           lcos::wait(lazy_results, boost::bind(&point::recompute_callback, this, _1, _2));
         }
 
-        bool point::recompute_callback(std::size_t i, polygon_type const& poly) 
+        bool point::recompute_callback(std::size_t i, polygon_type const& poly)
         {
           std::size_t master_vertex = inv_master_[i];
-          std::size_t final = master_vertex + 1; 
+          std::size_t final = master_vertex + 1;
           if ( final >= poly_.outer().size() ) final = 0;
 
           double x1 = (poly_.outer())[master_vertex].x();

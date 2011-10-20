@@ -25,9 +25,9 @@
 #include <boost/logging/detail/forward_constructor.hpp>
 #include <boost/logging/detail/tss/tss.hpp>
 
-namespace boost { 
+namespace boost {
 
-/** 
+/**
     @brief Root namespace. All the logging lib is contained in this namespace, or sub-namespaces of this one.
 */
 namespace logging {
@@ -80,8 +80,8 @@ namespace logging {
 namespace filter {
 
 
-/** 
-    @brief Manages is_enabled/set_enabled in a non-thread-safe way. 
+/**
+    @brief Manages is_enabled/set_enabled in a non-thread-safe way.
 
     If you change set_enabled() while program is running, it can take a bit to propagate
     between threads. Most of the time, this should be acceptable.
@@ -95,7 +95,7 @@ private:
 };
 
 
-/** 
+/**
     @brief Filter that is always enabled
 */
 struct always_enabled {
@@ -103,7 +103,7 @@ struct always_enabled {
 };
 
 
-/** 
+/**
     @brief Filter that is always disabled
 */
 struct always_disabled {
@@ -111,7 +111,7 @@ struct always_disabled {
 };
 
 
-/** 
+/**
     @brief Filter that is enabled in debug mode
 */
 struct debug_enabled {
@@ -123,7 +123,7 @@ struct debug_enabled {
 };
 
 
-/** 
+/**
     @brief Filter that is enabled in release mode
 */
 struct release_enabled {
@@ -135,20 +135,20 @@ struct release_enabled {
 };
 
 
-/** 
-    @brief Thread-safe filter. Manages is_enabled/set_enabled in a thread-safe way. 
+/**
+    @brief Thread-safe filter. Manages is_enabled/set_enabled in a thread-safe way.
 
     However, it manages it rather ineffiently - always locking before asking.
 */
 struct ts {
     ts() : m_enabled(true) {}
-    bool is_enabled() const { 
+    bool is_enabled() const {
         threading::scoped_lock lk(m_cs);
-        return m_enabled; 
+        return m_enabled;
     }
-    void set_enabled(bool enabled) { 
+    void set_enabled(bool enabled) {
         threading::scoped_lock lk(m_cs);
-        m_enabled = enabled; 
+        m_enabled = enabled;
     }
 private:
     bool m_enabled;
@@ -160,9 +160,9 @@ private:
 
 #ifndef BOOST_LOG_NO_TSS
 
-/** 
-    @brief Uses TSS (Thread Specific Storage) to find out if a filter is enabled or not. 
-    
+/**
+    @brief Uses TSS (Thread Specific Storage) to find out if a filter is enabled or not.
+
     It caches the current "is_enabled" on each thread.
     Then, at a given period, it retrieves the real "is_enabled".
 
@@ -175,33 +175,33 @@ template<int default_cache_secs = 5> struct use_tss_with_cache {
     typedef locker::tss_resource_with_cache<bool,default_cache_secs> data;
 
     use_tss_with_cache(int cache_secs = default_cache_secs) : m_enabled(true, cache_secs) {}
-    bool is_enabled() const { 
+    bool is_enabled() const {
         typename data::read enabled(m_enabled);
-        return enabled.use(); 
+        return enabled.use();
     }
-    void set_enabled(bool enabled) { 
+    void set_enabled(bool enabled) {
         typename data::write cur(m_enabled);
-        cur.use() = enabled; 
+        cur.use() = enabled;
     }
 private:
     data m_enabled;
 };
 
-/** 
+/**
     @brief Uses TSS (Thread Specific Storage) to find out if a filter is enabled or not. Once the filter is initialized to a value, that value will always be used.
-    
+
 */
 struct use_tss_once_init {
     typedef locker::tss_resource_once_init<bool> data;
 
     use_tss_once_init() : m_enabled(true) {}
-    bool is_enabled() const { 
+    bool is_enabled() const {
         data::read enabled(m_enabled);
-        return enabled.use(); 
+        return enabled.use();
     }
-    void set_enabled(bool enabled) { 
+    void set_enabled(bool enabled) {
         data::write cur(m_enabled);
-        cur.use() = enabled; 
+        cur.use() = enabled;
     }
 private:
     data m_enabled;

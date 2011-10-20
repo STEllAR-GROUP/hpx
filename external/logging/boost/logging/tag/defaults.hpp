@@ -28,7 +28,7 @@
 
 namespace boost { namespace logging { namespace tag {
 
-/** @brief tag that holds file/line context information 
+/** @brief tag that holds file/line context information
 
 See @ref boost::logging::tag "how to use tags".
 */
@@ -37,7 +37,7 @@ struct file_line {
     const char * val;
 };
 
-/** @brief tag that holds function name context information 
+/** @brief tag that holds function name context information
 
 See @ref boost::logging::tag "how to use tags".
 */
@@ -46,7 +46,7 @@ struct function {
     const char * val;
 };
 
-/** @brief tag that holds the log level context information 
+/** @brief tag that holds the log level context information
 
 See @ref boost::logging::tag "how to use tags".
 */
@@ -55,7 +55,7 @@ struct level {
     ::boost::logging::level::type val;
 };
 
-/** @brief tag that holds the current time context information 
+/** @brief tag that holds the current time context information
 
 See @ref boost::logging::tag "how to use tags".
 */
@@ -67,7 +67,7 @@ struct time {
 
 
 
-/** @brief tag that holds module context information (note: you need to specify the module yourself) 
+/** @brief tag that holds module context information (note: you need to specify the module yourself)
 
 See @ref boost::logging::tag "how to use tags".
 */
@@ -77,7 +77,7 @@ struct module {
 };
 
 
-/** @brief tag that holds thread id context information 
+/** @brief tag that holds thread id context information
 
 See @ref boost::logging::tag "how to use tags".
 */
@@ -87,7 +87,7 @@ struct thread_id {
         val = ::GetCurrentThreadId();
 #elif defined (BOOST_HAS_PTHREADS)
         val = pthread_self ();
-#else 
+#else
 #error Unknown type of threads
 #endif
     }

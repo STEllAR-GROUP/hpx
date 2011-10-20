@@ -14,9 +14,9 @@
 
 namespace hpx { namespace performance_counters { namespace parcels
 {
-    /// \brief A \a data_point collects all timing and statistical information     
+    /// \brief A \a data_point collects all timing and statistical information
     ///        for a single parcel (either sent or received).
-    struct data_point 
+    struct data_point
     {
         data_point()
           : bytes_(0)

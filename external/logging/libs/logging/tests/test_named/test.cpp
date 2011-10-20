@@ -13,7 +13,7 @@
  See http://www.torjo.com/log2/ for more details
 */
 
-/* 
+/*
     Tests destination::named
     - I have 3 stream destinations. I do simple logging (no formatting), and see that the message gets written to the destinations I specified
 */
@@ -28,10 +28,10 @@ typedef use< filter_::change::single_thread, filter_::level::no_levels, logger_:
 
 using namespace boost::logging;
 
-BOOST_DEFINE_LOG_FILTER(g_log_filter, finder::filter  ) 
+BOOST_DEFINE_LOG_FILTER(g_log_filter, finder::filter  )
 BOOST_DEFINE_LOG(g_l, finder::logger )
 
-#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() ) 
+#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() )
 
 
 std::stringstream g_first;
@@ -252,7 +252,7 @@ void test_use_0() {
     g_third.str("");
 }
 
-int test_main(int, char *[]) { 
+int test_main(int, char *[]) {
     init_logs();
     test_use_all();
     test_use_2();

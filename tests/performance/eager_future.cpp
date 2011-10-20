@@ -1,6 +1,6 @@
-//  Copyright (c) 2011 Bryce Adelstein-Lelbach 
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Copyright (c) 2011 Bryce Adelstein-Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <stdexcept>
@@ -66,7 +66,7 @@ typedef plain_result_action0<
 HPX_REGISTER_PLAIN_ACTION(null_action);
 
 typedef eager_future<null_action> null_future;
-    
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(
     variables_map& vm
@@ -74,32 +74,32 @@ int hpx_main(
 {
     {
         num_iterations = vm["delay-iterations"].as<boost::uint64_t>();
-    
+
         const boost::uint64_t count = vm["futures"].as<boost::uint64_t>();
-    
+
         const id_type here = find_here();
 
         if (HPX_UNLIKELY(0 == count))
             throw std::logic_error("error: count of 0 futures specified\n");
- 
+
         std::vector<promise<double> > futures;
 
-        futures.reserve(count);        
- 
-        // start the clock 
+        futures.reserve(count);
+
+        // start the clock
         high_resolution_timer walltime;
-   
+
         for (boost::uint64_t i = 0; i < count; ++i)
             futures.push_back(null_future(here));
-  
+
         wait(futures, [&] (std::size_t, double r) { global_scratch += r; });
- 
-        // stop the clock 
+
+        // stop the clock
         const double duration = walltime.elapsed();
-    
+
         if (vm.count("csv"))
             cout << ( boost::format("%1%,%2%\n")
-                    % count 
+                    % count
                     % duration)
                  << flush;
         else
@@ -124,11 +124,11 @@ int main(
 
     cmdline.add_options()
         ( "futures"
-        , value<boost::uint64_t>()->default_value(500000) 
+        , value<boost::uint64_t>()->default_value(500000)
         , "number of futures to invoke")
-        
+
         ( "delay-iterations"
-        , value<boost::uint64_t>()->default_value(0) 
+        , value<boost::uint64_t>()->default_value(0)
         , "number of iterations in the delay loop")
 
         ( "csv"

@@ -1,8 +1,8 @@
 //  Copyright (c) 2009-2011 Matthew Anderson
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
@@ -133,7 +133,7 @@ int hpx_main(variables_map& vm)
     }
 
     // derived parameters
-    if ( (par->nx0 % 2) == 0 ) 
+    if ( (par->nx0 % 2) == 0 )
     {
         std::string msg = boost::str(boost::format(
             "mesh dimensions (%1%) must be odd "
@@ -146,7 +146,7 @@ int hpx_main(variables_map& vm)
             "nt0 needs to be even: (%1%) "
             ) % par->nt0);
         HPX_THROW_IN_CURRENT_FUNC(bad_parameter, msg);
-    } 
+    }
     if ( par->grain_size <= 3*par->num_neighbors ) {
         std::string msg = boost::str(boost::format(
             "Increase grain size (%1%) or decrease the num_neighbors (%2%) "
@@ -234,13 +234,13 @@ int hpx_main(variables_map& vm)
     //    gi = par->gr_sibling[gi];
     //  }
     //}
-    // END TEST 
+    // END TEST
 
     rc = compute_numrows(par);
     rc = compute_rowsize(par);
     //std::cout << " num_rows " << par->num_rows << std::endl;
     //std::cout << " rowsize " << par->rowsize[0] << " number stencils " << number_stencils << std::endl;
- 
+
     // get component types needed below
     component_type function_type = get_component_type<stencil>();
     component_type logging_type = get_component_type<logging>();
@@ -254,14 +254,14 @@ int hpx_main(variables_map& vm)
         um.create(here);
         int numsteps = par->refine_every/2;
         boost::shared_ptr<std::vector<id_type> > result_data(new std::vector<id_type>);
-    
-        for (std::size_t j=0;j<time_grain_size;j++) { 
+
+        for (std::size_t j=0;j<time_grain_size;j++) {
           double time = j*par->refine_every*par->cfl*par->h;
 
-          result_data = um.init_execute(*result_data,time,function_type, 
+          result_data = um.init_execute(*result_data,time,function_type,
                                         par->rowsize[0], numsteps,
                                 par->loglevel ? logging_type : component_invalid, par);
-      
+
           // Regrid
           time = (j+1)*par->refine_every*par->cfl*par->h;
           std::cout << " Completed time: " << time << std::endl;

@@ -19,7 +19,7 @@ class fallback_atomic {
 public:
     fallback_atomic(void) {}
     explicit fallback_atomic(const T &t) {memcpy(&i, &t, sizeof(T));}
-    
+
     void store(const T &t, memory_order order=memory_order_seq_cst) volatile
     {
         detail::spinlock_pool<0>::scoped_lock guard(const_cast<T*>(&i));

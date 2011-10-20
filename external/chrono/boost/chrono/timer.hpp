@@ -7,12 +7,12 @@
 
 //  See http://www.boost.org/libs/system for documentation.
 
-#ifndef BOOST_CHRONO_TIMER_HPP                  
+#ifndef BOOST_CHRONO_TIMER_HPP
 #define BOOST_CHRONO_TIMER_HPP
 
 #include <boost/chrono/chrono.hpp>
 #include <boost/system/error_code.hpp>
-    
+
 namespace boost
 {
   namespace chrono

@@ -22,8 +22,8 @@ namespace fs = boost::filesystem;
 
 #include "file_statistics.h"
 
-/** 
-    Contains a directory specification 
+/**
+    Contains a directory specification
     - what directories we're to search
     - what type of files we're to seach
 */

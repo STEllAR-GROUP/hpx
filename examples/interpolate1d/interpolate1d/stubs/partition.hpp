@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_PARTITION_AUG_04_2011_0255PM)
@@ -15,12 +15,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace interpolate1d { namespace stubs
 {
-    struct partition 
+    struct partition
       : hpx::components::stubs::stub_base<interpolate1d::server::partition>
     {
         ///////////////////////////////////////////////////////////////////////
         static hpx::lcos::promise<void>
-        init_async(hpx::naming::id_type const& gid, std::string datafilename, 
+        init_async(hpx::naming::id_type const& gid, std::string datafilename,
             dimension const& dim, std::size_t num_nodes)
         {
             // Create an eager_future, execute the required action,
@@ -31,8 +31,8 @@ namespace interpolate1d { namespace stubs
                 gid, datafilename, dim, num_nodes);
         }
 
-        static void init(hpx::naming::id_type const& gid, 
-            std::string datafilename, dimension const& dim, 
+        static void init(hpx::naming::id_type const& gid,
+            std::string datafilename, dimension const& dim,
             std::size_t num_nodes)
         {
             init_async(gid, datafilename, dim, num_nodes).get();

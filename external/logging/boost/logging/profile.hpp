@@ -13,8 +13,8 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
-/** 
-    @file boost/logging/profile.hpp 
+/**
+    @file boost/logging/profile.hpp
     @brief Allows you to profile your application' logging
 
     That is, see how much CPU time is taken for logging
@@ -38,8 +38,8 @@
 #include <boost/logging/format_fwd.hpp>
 #include <boost/logging/detail/find_format_writer.hpp>
 
-namespace boost { namespace logging { 
-    
+namespace boost { namespace logging {
+
 namespace writer {
     template<class msg_type, class base_type> struct on_dedicated_thread ;
 }
@@ -81,20 +81,20 @@ bl::profile::compute::inst().log_results( bl::destination::file("profile.txt") )
 Results can look like this:
 
 @code
-gather time:      5.562500 seconds 
-write time:       5.265625 seconds 
-filter time:      0.31250 seconds 
-otherthread time: 0.0 seconds 
+gather time:      5.562500 seconds
+write time:       5.265625 seconds
+filter time:      0.31250 seconds
+otherthread time: 0.0 seconds
 @endcode
 
 
 \n\n
 For more info, see compute_for_logger and compute_for_filter classes.
-*/    
+*/
 namespace profile {
 
 
-/** 
+/**
     @brief Computes profiling information, and can show it to the user
 
 */
@@ -134,13 +134,13 @@ protected:
 private:
     void dump_results() {
         std::ostringstream out;
-        out << "gather time:      " 
+        out << "gather time:      "
             << (m_cpu_times[gather] / 1000000) << "." << (m_cpu_times[gather] % 1000000) << " seconds " << std::endl;
-        out << "write time:       " 
+        out << "write time:       "
             << (m_cpu_times[writer] / 1000000) << "." << (m_cpu_times[writer] % 1000000) << " seconds " << std::endl;
-        out << "filter time:      " 
+        out << "filter time:      "
             << (m_cpu_times[filter] / 1000000) << "." << (m_cpu_times[filter] % 1000000) << " seconds " << std::endl;
-        out << "otherthread time: " 
+        out << "otherthread time: "
             << (m_cpu_times[on_other_thread] / 1000000) << "." << (m_cpu_times[on_other_thread] % 1000000) << " seconds " << std::endl;
         m_log( out.str() );
     }
@@ -173,7 +173,7 @@ struct scoped_compute {
     }
     ~scoped_compute() {
         m_end = ::boost::posix_time::microsec_clock::local_time();
-        m_comp.add_period( (m_end - m_start).total_microseconds() , m_type); 
+        m_comp.add_period( (m_end - m_start).total_microseconds() , m_type);
     }
 
 };
@@ -261,7 +261,7 @@ template<class gather_msg, class write_msg> struct logger_to_write< logger<gathe
 };
 
 // specialize for logger_format_write
-template<class format_base, class destination_base, class thread_safety, class gather, class lock_resource> 
+template<class format_base, class destination_base, class thread_safety, class gather, class lock_resource>
         struct logger_to_write< logger_format_write<format_base, destination_base, thread_safety, gather, lock_resource> > {
 
     typedef typename detail::format_find_writer<format_base, destination_base, lock_resource, thread_safety>::type write_type;
@@ -285,9 +285,9 @@ To do profiling for a logger, just surround it with compute_for_logger. Example:
 namespace bl = boost::logging ;
 typedef bl::logger_format_write< > logger_type;
 
-BOOST_DECLARE_LOG(g_l, logger_type) 
+BOOST_DECLARE_LOG(g_l, logger_type)
 ...
-BOOST_DEFINE_LOG(g_l, logger_type) 
+BOOST_DEFINE_LOG(g_l, logger_type)
 
 @endcode
 
@@ -302,9 +302,9 @@ namespace bl = boost::logging ;
 typedef bl::logger_format_write< > raw_log_type;
 typedef bl::profile::compute_for_logger<raw_log_type>::type logger_type;
 
-BOOST_DECLARE_LOG(g_l, logger_type) 
+BOOST_DECLARE_LOG(g_l, logger_type)
 ...
-BOOST_DEFINE_LOG(g_l, logger_type) 
+BOOST_DEFINE_LOG(g_l, logger_type)
 
 @endcode
 
@@ -345,9 +345,9 @@ To do profiling for a filter, just surround it with compute_for_filter. Example:
 namespace bl = boost::logging ;
 typedef bl::filter::no_ts filter;
 
-BOOST_DECLARE_LOG_FILTER(g_l_filter, filter) 
+BOOST_DECLARE_LOG_FILTER(g_l_filter, filter)
 ...
-BOOST_DEFINE_LOG_FILTER(g_l_filter, filter) 
+BOOST_DEFINE_LOG_FILTER(g_l_filter, filter)
 
 @endcode
 
@@ -362,9 +362,9 @@ namespace bl = boost::logging ;
 typedef bl::filter::no_ts raw_filter;
 typedef compute_for_filter<raw_filter>::type filter;
 
-BOOST_DECLARE_LOG_FILTER(g_l_filter, filter) 
+BOOST_DECLARE_LOG_FILTER(g_l_filter, filter)
 ...
-BOOST_DEFINE_LOG_FILTER(g_l_filter, filter) 
+BOOST_DEFINE_LOG_FILTER(g_l_filter, filter)
 
 @endcode
 

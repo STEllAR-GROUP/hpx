@@ -1,6 +1,6 @@
 # Copyright (c) 2011 Bryce Lelbach
 #
-# Distributed under the Boost Software License, Version 1.0. (See accompanying 
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(HPX_COMPILE_LOADED TRUE)
@@ -25,11 +25,11 @@ macro(hpx_compile_object name)
 
   # FIXME: This is POSIX only, I think (-c should work on MSVC, not sure about
   # -o, Hartmut says it might be -Fo).
-  add_custom_command(OUTPUT ${${name}_OUTPUT} 
+  add_custom_command(OUTPUT ${${name}_OUTPUT}
     COMMAND "${CMAKE_${${name}_LANGUAGE}_COMPILER}" ${flags}
             "-c" "${CMAKE_CURRENT_SOURCE_DIR}/${${name}_SOURCE}"
             "-o" "${${name}_OUTPUT}"
-    DEPENDS ${${name}_SOURCE} 
+    DEPENDS ${${name}_SOURCE}
     VERBATIM)
 
   if(${name}_ESSENTIAL)

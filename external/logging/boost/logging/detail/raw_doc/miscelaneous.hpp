@@ -1,6 +1,6 @@
 namespace boost { namespace logging {
 
-/** 
+/**
 @page miscelaneous Miscelaneous things
 
 @section misc_use_defaults Template parameters - Using defaults
@@ -28,7 +28,7 @@ In case you want to log unicode characters, it's very easy:
 
 The Boost Logging Lib has been tested with the following compilers:
 
-- VC 2005 
+- VC 2005
 - VC 2003
 - gcc 3.4.2
 - gcc 4.1

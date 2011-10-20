@@ -11,19 +11,19 @@
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/agas/stubs/component_namespace.hpp>
 
-namespace hpx { namespace agas 
+namespace hpx { namespace agas
 {
 
 struct component_namespace :
     components::client_base<component_namespace, stubs::component_namespace>
 {
-    // {{{ nested types 
+    // {{{ nested types
     typedef components::client_base<
         component_namespace, stubs::component_namespace
-    > base_type; 
+    > base_type;
 
     typedef server::component_namespace server_type;
-    
+
     typedef server_type::component_id_type component_id_type;
     typedef server_type::prefixes_type prefixes_type;
     // }}}
@@ -37,20 +37,20 @@ struct component_namespace :
     {}
 
     lcos::promise<response> service_async(
-        request const& req 
+        request const& req
         )
     {
         return this->base_type::service_async(this->gid_, req);
     }
 
     response service(
-        request const& req 
+        request const& req
       , error_code& ec = throws
         )
     {
         return this->base_type::service(this->gid_, req, ec);
     }
-};            
+};
 
 }}
 

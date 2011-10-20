@@ -13,7 +13,7 @@
  See http://www.torjo.com/log2/ for more details
 */
 
-/* 
+/*
     Tests named_spacer
 */
 
@@ -27,10 +27,10 @@ typedef use< filter_::change::single_thread, filter_::level::no_levels, logger_:
 
 using namespace boost::logging;
 
-BOOST_DEFINE_LOG_FILTER(g_log_filter, finder::filter  ) 
+BOOST_DEFINE_LOG_FILTER(g_log_filter, finder::filter  )
 BOOST_DEFINE_LOG(g_l, finder::logger )
 
-#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() ) 
+#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() )
 
 
 // whatever we log, is logged here too (easy was to find out all the info that was logged)
@@ -143,7 +143,7 @@ void test_with_no_formatters() {
 }
 
 
-int test_main(int, char *[]) { 
+int test_main(int, char *[]) {
     init_logs();
     std::ostringstream out;
     out << detail::get_thread_id();

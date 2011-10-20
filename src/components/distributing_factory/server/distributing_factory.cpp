@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
@@ -14,7 +14,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace server 
+namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
     struct lazy_result
@@ -29,7 +29,7 @@ namespace hpx { namespace components { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     // create a new instance of a component
-    distributing_factory::remote_result_type 
+    distributing_factory::remote_result_type
     distributing_factory::create_components(
         components::component_type type, std::size_t count) const
     {
@@ -44,7 +44,7 @@ namespace hpx { namespace components { namespace server
 
         if (prefixes.empty())
         {
-            HPX_THROW_EXCEPTION(bad_component_type, 
+            HPX_THROW_EXCEPTION(bad_component_type,
                 "distributing_factory::create_components",
                 "attempt to create component instance of unknown type: " +
                 components::get_component_type_name(type));
@@ -57,7 +57,7 @@ namespace hpx { namespace components { namespace server
         std::size_t count_on_locality = count / prefixes.size();
         std::size_t excess = count - count_on_locality*prefixes.size();
 
-        // distribute the number of components to create evenly over all 
+        // distribute the number of components to create evenly over all
         // available localities
         typedef std::vector<lazy_result> future_values_type;
         typedef server::runtime_support::create_component_action action_type;
@@ -106,8 +106,8 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    distributing_factory::remote_result_type 
-    distributing_factory::create_partitioned(components::component_type type, 
+    distributing_factory::remote_result_type
+    distributing_factory::create_partitioned(components::component_type type,
         std::size_t count, std::size_t parts, partition_info const& info) const
     {
         // make sure we get prefixes for derived component type, if any
@@ -122,17 +122,17 @@ namespace hpx { namespace components { namespace server
         if (prefixes.empty())
         {
             // no locality supports creating the requested component type
-            HPX_THROW_EXCEPTION(bad_component_type, 
+            HPX_THROW_EXCEPTION(bad_component_type,
                 "distributing_factory::create_partitioned",
                 "attempt to create component instance of unknown type: " +
                 components::get_component_type_name(type));
         }
 
         std::size_t part_size = info.size();
-        if (part_size < prefixes.size()) 
+        if (part_size < prefixes.size())
         {
-            // we have less localities than required by one partition 
-            HPX_THROW_EXCEPTION(bad_parameter, 
+            // we have less localities than required by one partition
+            HPX_THROW_EXCEPTION(bad_parameter,
                 "distributing_factory::create_partitioned",
                 "partition size is larger than number of localities");
         }
@@ -142,7 +142,7 @@ namespace hpx { namespace components { namespace server
         if (prefixes.size() > part_size)
             parts_delta = prefixes.size() / part_size;
 
-        // distribute the number of components to create evenly over all 
+        // distribute the number of components to create evenly over all
         // available localities
         typedef std::vector<lazy_result> future_values_type;
         typedef server::runtime_support::create_component_action action_type;
@@ -150,8 +150,8 @@ namespace hpx { namespace components { namespace server
         // start an asynchronous operation for each of the localities
         future_values_type v;
 
-        for (std::size_t i = 0, j = 0; 
-             i < prefixes.size() && j < parts; 
+        for (std::size_t i = 0, j = 0;
+             i < prefixes.size() && j < parts;
              i += parts_delta, ++j)
         {
             // create one component at a time, overall, 'count' components
@@ -159,7 +159,7 @@ namespace hpx { namespace components { namespace server
             naming::id_type fact(prefixes[i], naming::id_type::unmanaged);
 
             v.push_back(future_values_type::value_type(prefixes[i]));
-            for (std::size_t k = 0; k < count; ++k) 
+            for (std::size_t k = 0; k < count; ++k)
             {
                 lcos::eager_future<action_type, naming::gid_type> f(fact, type, 1);
                 v.back().gids_.push_back(f);
@@ -179,12 +179,12 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// 
-    locality_result_iterator::data::data(result_type::const_iterator begin, 
+    ///
+    locality_result_iterator::data::data(result_type::const_iterator begin,
             result_type::const_iterator end)
       : current_(begin), end_(end), is_at_end_(begin == end)
     {
-        if (!is_at_end_) 
+        if (!is_at_end_)
             current_gid_ = (*current_).begin();
     }
 
@@ -239,7 +239,7 @@ namespace boost { namespace serialization
     ///////////////////////////////////////////////////////////////////////////
     // implement the serialization functions
     template <typename Archive>
-    void serialize(Archive& ar, hpx::components::server::partition_info& info, 
+    void serialize(Archive& ar, hpx::components::server::partition_info& info,
         unsigned int const)
     {
         ar & info.dims_ & info.dim_sizes_;
@@ -248,18 +248,18 @@ namespace boost { namespace serialization
     ///////////////////////////////////////////////////////////////////////////
     // explicit instantiation for the correct archive types
 #if HPX_USE_PORTABLE_ARCHIVES != 0
-    template HPX_COMPONENT_EXPORT void 
-    serialize(hpx::util::portable_binary_iarchive&, 
+    template HPX_COMPONENT_EXPORT void
+    serialize(hpx::util::portable_binary_iarchive&,
         hpx::components::server::partition_info&, unsigned int const);
-    template HPX_COMPONENT_EXPORT void 
-    serialize(hpx::util::portable_binary_oarchive&, 
+    template HPX_COMPONENT_EXPORT void
+    serialize(hpx::util::portable_binary_oarchive&,
         hpx::components::server::partition_info&, unsigned int const);
 #else
-    template HPX_COMPONENT_EXPORT void 
-    serialize(boost::archive::binary_iarchive&, 
+    template HPX_COMPONENT_EXPORT void
+    serialize(boost::archive::binary_iarchive&,
         hpx::components::server::partition_info&, unsigned int const);
-    template HPX_COMPONENT_EXPORT void 
-    serialize(boost::archive::binary_oarchive&, 
+    template HPX_COMPONENT_EXPORT void
+    serialize(boost::archive::binary_oarchive&,
         hpx::components::server::partition_info&, unsigned int const);
 #endif
 }}

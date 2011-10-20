@@ -1,6 +1,6 @@
 //  Copyright (c) 2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_COMPONENT_STARTUP_SHUTDOWN_SEP_20_2011_0217PM)
@@ -15,17 +15,17 @@
 namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
-    namespace startup_shutdown_provider     
-    {                                              
-        bool startup(boost::function<void()>& startup_func); 
+    namespace startup_shutdown_provider
+    {
+        bool startup(boost::function<void()>& startup_func);
         bool shutdown(boost::function<void()>& shutdown_func);
-    };                                             
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     /// \class component_startup_shutdown component_startup_shutdown.hpp hpx/runtime/components/component_startup_shutdown.hpp
     ///
-    /// The \a component_startup_shutdown provides a minimal implementation of 
-    /// a component's startup/shutdown function provider. 
+    /// The \a component_startup_shutdown provides a minimal implementation of
+    /// a component's startup/shutdown function provider.
     ///
     struct component_startup_shutdown : public component_startup_shutdown_base
     {
@@ -33,24 +33,24 @@ namespace hpx { namespace components
         ~component_startup_shutdown() {}
 
         /// \brief Return any startup function for this component
-        /// 
+        ///
         /// \param startup  [in, out] The module is expected to fill this
-        ///                 function object with a reference to a startup 
-        ///                 function. This function will be executed by the 
+        ///                 function object with a reference to a startup
+        ///                 function. This function will be executed by the
         ///                 runtime system during system startup.
         ///
         /// \return Returns \a true if the parameter \a startup has been
         ///         successfully initialized with the startup function.
-        bool get_startup_function(boost::function<void()>& startup_) 
+        bool get_startup_function(boost::function<void()>& startup_)
         {
             return startup_shutdown_provider::startup(startup_);
         }
 
         /// \brief Return any startup function for this component
-        /// 
+        ///
         /// \param shutdown  [in, out] The module is expected to fill this
-        ///                 function object with a reference to a startup 
-        ///                 function. This function will be executed by the 
+        ///                 function object with a reference to a startup
+        ///                 function. This function will be executed by the
         ///                 runtime system during system startup.
         ///
         /// \return Returns \a true if the parameter \a shutdown has been

@@ -23,7 +23,7 @@
 
 #include <boost/plugin/config.hpp>
 
-#include <dlfcn.h> 
+#include <dlfcn.h>
 
 #if !defined(BOOST_HAS_DLOPEN)
 #error "This file shouldn't be included directly, use the file boost/plugin/dll.hpp only."
@@ -52,7 +52,7 @@ typedef struct HINSTANCE__* HMODULE;
 namespace boost { namespace plugin {
 
     ///////////////////////////////////////////////////////////////////////////
-    class dll 
+    class dll
     {
     protected:
         ///////////////////////////////////////////////////////////////////////
@@ -61,7 +61,7 @@ namespace boost { namespace plugin {
 #if defined(__AIX__) && defined(__GNUC__)
             dlerror();              // Clear the error state.
             typedef void (*init_proc_type)();
-            init_proc_type init_proc = 
+            init_proc_type init_proc =
                 (init_proc_type)MyGetProcAddress(dll_handle, "_GLOBAL__DI");
             if (init_proc)
                 init_proc();
@@ -73,7 +73,7 @@ namespace boost { namespace plugin {
 #if defined(__AIX__) && defined(__GNUC__)
             dlerror();              // Clear the error state.
             typedef void (*free_proc_type)();
-            free_proc_type free_proc = 
+            free_proc_type free_proc =
                 (free_proc_type)MyGetProcAddress(dll_handle, "_GLOBAL__DD");
             if (free_proc)
                 free_proc();
@@ -82,7 +82,7 @@ namespace boost { namespace plugin {
 
         ///////////////////////////////////////////////////////////////////////
         template<typename T>
-        struct free_dll 
+        struct free_dll
         {
             free_dll(HMODULE h) : h(h) {}
 
@@ -104,19 +104,19 @@ namespace boost { namespace plugin {
         template <typename T> friend struct free_dll;
 
     public:
-        dll() 
-        :   dll_handle (NULL) 
+        dll()
+        :   dll_handle (NULL)
         {
             LoadLibrary();
         }
 
-        dll(dll const& rhs) 
+        dll(dll const& rhs)
         :   dll_name(rhs.dll_name), map_name(rhs.map_name), dll_handle(NULL)
         {
             LoadLibrary();
         }
 
-        dll(std::string const& name) 
+        dll(std::string const& name)
         :   dll_name(name), map_name(""), dll_handle(NULL)
         {
             // map_name defaults to dll base name
@@ -132,7 +132,7 @@ namespace boost { namespace plugin {
             LoadLibrary();
         }
 
-        dll(std::string const& libname, std::string const& mapname) 
+        dll(std::string const& libname, std::string const& mapname)
         :   dll_name(libname), map_name(mapname), dll_handle(NULL)
         {
             LoadLibrary();
@@ -152,8 +152,8 @@ namespace boost { namespace plugin {
             return *this;
         }
 
-        ~dll() 
-        { 
+        ~dll()
+        {
             FreeLibrary();
         }
 
@@ -161,7 +161,7 @@ namespace boost { namespace plugin {
         std::string get_mapname() const { return map_name; }
 
         template<typename SymbolType, typename Deleter>
-        std::pair<SymbolType, Deleter> 
+        std::pair<SymbolType, Deleter>
         get(std::string const& symbol_name) const
         {
             initialize_mutex();
@@ -170,24 +170,24 @@ namespace boost { namespace plugin {
             BOOST_STATIC_ASSERT(boost::is_pointer<SymbolType>::value);
             typedef typename remove_pointer<SymbolType>::type PointedType;
 
-            // Open the library. Yes, we do it on every access to 
+            // Open the library. Yes, we do it on every access to
             // a symbol, the LoadLibrary function increases the refcnt of the dll
-            // so in the end the dll class holds one refcnt and so does every 
+            // so in the end the dll class holds one refcnt and so does every
             // symbol.
 
             dlerror();              // Clear the error state.
             HMODULE handle = MyLoadLibrary((dll_name.empty() ? NULL : dll_name.c_str()));
             if (!handle) {
                 BOOST_PLUGIN_OSSTREAM str;
-                str << "Boost.Plugin: Could not open shared library '" 
+                str << "Boost.Plugin: Could not open shared library '"
                     << dll_name << "' (dlerror: " << dlerror() << ")";
 
                 boost::throw_exception(
                     std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str)));
             }
 
-#if !defined(__AIX__) 
-            // AIX seems to return different handle values for the second and 
+#if !defined(__AIX__)
+            // AIX seems to return different handle values for the second and
             // any following call
             BOOST_ASSERT(handle == dll_handle);
 #endif
@@ -197,13 +197,13 @@ namespace boost { namespace plugin {
             // Cast the to right type.
             dlerror();              // Clear the error state.
             SymbolType address = (SymbolType)MyGetProcAddress(dll_handle, symbol_name.c_str());
-            if (NULL == address) 
+            if (NULL == address)
             {
                 BOOST_PLUGIN_OSSTREAM str;
-                str << "Boost.Plugin: Unable to locate the exported symbol name '" 
-                    << symbol_name << "' in the shared library '" 
+                str << "Boost.Plugin: Unable to locate the exported symbol name '"
+                    << symbol_name << "' in the shared library '"
                     << dll_name << "' (dlerror: " << dlerror () << ")";
-                    
+
                 dlerror();
                 MyFreeLibrary(handle);
                 boost::throw_exception(
@@ -228,24 +228,24 @@ namespace boost { namespace plugin {
             // std::cout << "open\n";
             if (!dll_handle) {
                 BOOST_PLUGIN_OSSTREAM str;
-                str << "Boost.Plugin: Could not open shared library '" 
+                str << "Boost.Plugin: Could not open shared library '"
                     << dll_name << "' (dlerror: " << dlerror() << ")";
                 boost::throw_exception(
                     std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str)));
             }
             init_library(dll_handle);    // initialize library
         }
-        
+
         void FreeLibrary()
         {
-            if (NULL != dll_handle) 
+            if (NULL != dll_handle)
             {
                 initialize_mutex();
                 boost::mutex::scoped_lock lock(mutex_instance());
 
-                deinit_library(dll_handle);                
+                deinit_library(dll_handle);
                 dlerror();
-                MyFreeLibrary(dll_handle); 
+                MyFreeLibrary(dll_handle);
             }
         }
 

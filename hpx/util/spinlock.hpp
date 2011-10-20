@@ -21,7 +21,7 @@ struct spinlock : boost::noncopyable
   private:
     boost::detail::spinlock m;
 
-  public: 
+  public:
     spinlock()
     {
         boost::detail::spinlock l = BOOST_DETAIL_SPINLOCK_INIT;
@@ -39,7 +39,7 @@ struct spinlock : boost::noncopyable
 
     typedef boost::detail::spinlock* native_handle_type;
     native_handle_type native_handle()
-    { return &m; } 
+    { return &m; }
 
     typedef boost::unique_lock<spinlock> scoped_lock;
     typedef boost::detail::try_lock_wrapper<spinlock> scoped_try_lock;

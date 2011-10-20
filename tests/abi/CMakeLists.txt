@@ -1,6 +1,6 @@
 # Copyright (c) 2011 Bryce Adelstein-Lelbach
 #
-# Distributed under the Boost Software License, Version 1.0. (See accompanying 
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
@@ -20,15 +20,15 @@ foreach(test ${tests})
                      SOURCES ${sources}
                      ${${test}_FLAGS})
 
-  # add a custom target for this example 
+  # add a custom target for this example
   add_hpx_pseudo_target(tests.abi.${test})
 
   # make pseudo-targets depend on master pseudo-target
   add_hpx_pseudo_dependencies(tests.abi
                               tests.abi.${test})
 
-  # add dependencies to pseudo-target 
+  # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(tests.abi.${test}
                               ${test}_exe)
-endforeach() 
- 
+endforeach()
+

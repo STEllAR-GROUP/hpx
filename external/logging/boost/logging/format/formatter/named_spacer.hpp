@@ -166,7 +166,7 @@ namespace detail {
                         remaining = remaining.substr(idx + 1);
                         fmt = info->name_to_formatter[name];
                     }
-                    // note: fmt could be null, in case 
+                    // note: fmt could be null, in case
                     info->write_steps.push_back( write_step( spacer, fmt) );
                 }
                 else {
@@ -195,11 +195,11 @@ namespace detail {
             add_impl( name, holder(fmt), boost::false_type() );
         }
 
-        
+
     };
 }
 
-/** 
+/**
 @brief Allows you to contain multiple formatters, and specify a %spacer between them. You have a %spacer string, and within it, you can escape your contained formatters.
 
 @code
@@ -216,7 +216,7 @@ This allows you:
 Example:
 
 @code
-#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() ) 
+#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() )
 
 g_l()->writer().add_formatter( formatter::named_spacer("[%index%] %time% (T%thread%) ")
         .add( "index", formatter::idx())
@@ -242,7 +242,7 @@ You could have an output like this:
 @bug Use_tags.cpp example when on dedicated thread, fails with named_spacer. If using the old code, it works.
 
 */
-template< class convert = default_, class format_base = default_, class lock_resource = default_ > 
+template< class convert = default_, class format_base = default_, class lock_resource = default_ >
         struct named_spacer_t : is_generic, non_const_context< detail::named_spacer_context<convert,lock_resource,format_base> > {
 
     typedef non_const_context< detail::named_spacer_context<convert,lock_resource,format_base> > context_base;

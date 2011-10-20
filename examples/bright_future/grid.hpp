@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  
+//
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -53,7 +53,7 @@ namespace bright_future
         {
             return data[x + y * n_x];
         }
-        
+
         reference_type operator[](size_type i)
         {
             return data[i];
@@ -130,7 +130,7 @@ namespace bright_future
 
         return os;
     }
-    
+
     template <typename T>
     inline T update(
         grid<T> const & u
@@ -159,7 +159,7 @@ namespace bright_future
             * relaxation
             ;
     }
-    
+
     template <typename T>
     inline T update_residuum(
         grid<T> const & u

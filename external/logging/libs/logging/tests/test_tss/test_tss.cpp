@@ -14,7 +14,7 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
-/* 
+/*
     Test : we use TSS (Thread Specific Storage). We check to see that there are no objects leaked.
 
     We create a number of threads.
@@ -53,7 +53,7 @@
 using namespace boost;
 
 // creating this (a log, or a filter), makes sure we initialize TSS
-BOOST_DEFINE_LOG_FILTER_WITH_ARGS(g_log_filter, logging::filter::use_tss_with_cache<> , 10) 
+BOOST_DEFINE_LOG_FILTER_WITH_ARGS(g_log_filter, logging::filter::use_tss_with_cache<> , 10)
 
 extern object_count * g_object_count ;
 extern object_count * g_running_thread_count ;
@@ -61,10 +61,10 @@ extern object_count * g_running_thread_count ;
 // the actual number of started threads
 int g_thread_count = 50;
 
-void do_sleep(int ms) ; 
+void do_sleep(int ms) ;
 void process_file() ;
 
-int test_main(int argc, char *argv[]) { 
+int test_main(int argc, char *argv[]) {
     if ( argc > 1) {
         std::istringstream in(argv[1]);
         in >> g_thread_count;

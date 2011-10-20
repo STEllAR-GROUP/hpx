@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_CONFIG_MAR_24_2008_0943AM)
@@ -44,7 +44,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This defines the maximum number of possible runtime instances in one 
+/// This defines the maximum number of possible runtime instances in one
 /// executable
 #if !defined(HPX_RUNTIME_INSTANCE_LIMIT)
 #  define HPX_RUNTIME_INSTANCE_LIMIT 1
@@ -63,21 +63,21 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This defines the maximum number of arguments a component constructor can 
+/// This defines the maximum number of arguments a component constructor can
 /// take
 #if !defined(HPX_COMPONENT_CREATE_ARG_MAX)
 #  define HPX_COMPONENT_CREATE_ARG_MAX 4
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This defines the number of outgoing (parcel-) connections kept alive 
+/// This defines the number of outgoing (parcel-) connections kept alive
 #if !defined(HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE)
 #  define HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE 64
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This defines the number of AGAS address translations kept in the local 
-/// cache. This is just the initial size which may be adjusted depending on the 
+/// This defines the number of AGAS address translations kept in the local
+/// cache. This is just the initial size which may be adjusted depending on the
 /// load of the system, etc. It must be a minimum of 3 for AGAS v3
 /// bootstrapping.
 #if !defined(HPX_INITIAL_AGAS_GVA_CACHE_SIZE)
@@ -85,14 +85,14 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This defines whether to use the portable binary archives for parcel 
+/// This defines whether to use the portable binary archives for parcel
 /// serialization
 #if !defined(HPX_USE_PORTABLE_ARCHIVES)
 #  define HPX_USE_PORTABLE_ARCHIVES 1
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This defines the initial global reference count associated with any created 
+/// This defines the initial global reference count associated with any created
 /// object.
 #if !defined(HPX_INITIAL_GLOBALCREDIT)
 #  define HPX_INITIAL_GLOBALCREDIT 255
@@ -105,8 +105,8 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// This defines the maximum number of connect retries to the AGAS service 
-// allowing for some leeway during startup of the localities 
+// This defines the maximum number of connect retries to the AGAS service
+// allowing for some leeway during startup of the localities
 #if !defined(HPX_MAX_NETWORK_RETRIES)
 #  define HPX_MAX_NETWORK_RETRIES 100
 #endif
@@ -116,7 +116,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Characters used 
+//  Characters used
 //    - to delimit several HPX ini paths
 //    - used as file extensions for shared libraries
 //    - used as path delimiters
@@ -214,7 +214,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// Count number of empty (no PX thread available) thread manager loop executions 
+// Count number of empty (no PX thread available) thread manager loop executions
 #if !defined(HPX_IDLE_LOOP_COUNT_MAX)
 #  define HPX_IDLE_LOOP_COUNT_MAX 20000
 #endif
@@ -238,10 +238,10 @@
 #    define HPX_DEFAULT_STACK_SIZE 0x4000
 #  else
 #    if defined(HPX_DEBUG)
-#      define HPX_DEFAULT_STACK_SIZE 0x10000 
+#      define HPX_DEFAULT_STACK_SIZE 0x10000
 #    else
-#      define HPX_DEFAULT_STACK_SIZE 0x8000 
-#    endif 
+#      define HPX_DEFAULT_STACK_SIZE 0x8000
+#    endif
 #  endif
 #endif
 
@@ -260,7 +260,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_AGAS_BOOTSTRAP_PREFIX   1U 
+#define HPX_AGAS_BOOTSTRAP_PREFIX   1U
 #define HPX_AGAS_PRIMARY_NS_MSB     0x0000000100000001ULL
 #define HPX_AGAS_PRIMARY_NS_LSB     0x0000000000000001ULL
 #define HPX_AGAS_COMPONENT_NS_MSB   0x0000000100000001ULL

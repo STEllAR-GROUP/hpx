@@ -24,13 +24,13 @@
 This usage:
 - You have one logger
 - You have one filter, always turned on
-- You want to format the message before it's written 
+- You want to format the message before it's written
 - The logger has several log destinations
     - The output goes to console and debug output window
     - Formatting - prefix each message by its index, and append newline
 
 Optimizations:
-- use tss_ostringstream (each thread has its own ostringstream copy, to make writing faster: 
+- use tss_ostringstream (each thread has its own ostringstream copy, to make writing faster:
   when logging of a message, we won't need to create the ostringstream first ; it's created only once per thread )
 - use a cache string (from optimize namespace), in order to make formatting the message faster
 
@@ -60,12 +60,12 @@ using namespace boost::logging;
 
 typedef logger_format_write< > logger_type;
 
-BOOST_DECLARE_LOG_FILTER(g_log_filter, filter::no_ts ) 
-BOOST_DECLARE_LOG(g_l, logger_type) 
+BOOST_DECLARE_LOG_FILTER(g_log_filter, filter::no_ts )
+BOOST_DECLARE_LOG(g_l, logger_type)
 
-#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() ) 
+#define L_ BOOST_LOG_USE_LOG_IF_FILTER(g_l(), g_log_filter()->is_enabled() )
 
-BOOST_DEFINE_LOG_FILTER(g_log_filter, filter::no_ts ) 
+BOOST_DEFINE_LOG_FILTER(g_log_filter, filter::no_ts )
 BOOST_DEFINE_LOG(g_l, logger_type)
 
 

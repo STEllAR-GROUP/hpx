@@ -1,6 +1,6 @@
 //  Copyright (c) 2009-2011 Matthew Anderson
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 #if !defined(HPX_REFINE_SEP_07_2011_0834AM)
 #define HPX_REFINE_SEP_07_2011_0834AM
@@ -20,7 +20,7 @@ using hpx::components::adaptive1d::parameter;
 using hpx::naming::id_type;
 
 int level_refine(int level,parameter &par,
-                 boost::shared_ptr<std::vector<id_type> > &result_data, 
+                 boost::shared_ptr<std::vector<id_type> > &result_data,
                  double time);
 
 int compute_error(std::vector<double> &error,int nx0,

@@ -41,12 +41,12 @@ namespace nqueen { namespace stubs
 
         //-------------------------------------------------------------
 
-        static void update_board(hpx::naming::id_type const& gid, std::size_t level, 
+        static void update_board(hpx::naming::id_type const& gid, std::size_t level,
             std::size_t pos)
         {
             hpx::applier::apply<server::board::update_action>(gid, level, pos);
         }
-        
+
         //------------------------------------------------------------
 
         static hpx::lcos::promise<bool>

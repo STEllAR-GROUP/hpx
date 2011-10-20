@@ -47,10 +47,10 @@ namespace boost {
 
     class backtrace {
     public:
-        
+
         enum { default_stack_size = 128 };
 
-        backtrace(size_t frames_no = default_stack_size) 
+        backtrace(size_t frames_no = default_stack_size)
         {
             if(frames_no == 0)
                 return;
@@ -101,11 +101,11 @@ namespace boost {
                 return;
             stack_trace::write_symbols(&frames_.front(),frames_.size(),out);
         }
-    
+
     private:
         std::vector<void *> frames_;
     };
-    
+
     namespace details {
         class trace_manip {
         public:

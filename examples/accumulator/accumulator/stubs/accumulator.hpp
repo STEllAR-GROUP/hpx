@@ -1,6 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_COMPONENTS_STUBS_ACCUMULATOR_JUN_09_2008_0458PM)
@@ -24,11 +24,11 @@ namespace hpx { namespace components { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
-        /// Query the current value of the server#accumulator instance 
-        /// with the given \a gid. This is a non-blocking call. The caller 
-        /// needs to call \a promise#get on the return value of 
+        /// Query the current value of the server#accumulator instance
+        /// with the given \a gid. This is a non-blocking call. The caller
+        /// needs to call \a promise#get on the return value of
         /// this function to obtain the result as returned by the accumulator.
-        static lcos::promise<unsigned long> query_async(naming::id_type const& gid) 
+        static lcos::promise<unsigned long> query_async(naming::id_type const& gid)
         {
             // Create an eager_future, execute the required action,
             // we simply return the initialized eager_future, the caller needs
@@ -37,33 +37,33 @@ namespace hpx { namespace components { namespace stubs
             return lcos::eager_future<action_type>(gid);
         }
 
-        /// Query the current value of the server#accumulator instance 
-        /// with the given \a gid. Block for the current accumulator value to 
+        /// Query the current value of the server#accumulator instance
+        /// with the given \a gid. Block for the current accumulator value to
         /// be returned.
-        static unsigned long query(naming::id_type const& gid) 
+        static unsigned long query(naming::id_type const& gid)
         {
-            // The following get yields control while the action above 
+            // The following get yields control while the action above
             // is executed and the result is returned to the promise
             return query_async(gid).get();
         }
 
-        /// Initialize the accumulator value of the server#accumulator instance 
+        /// Initialize the accumulator value of the server#accumulator instance
         /// with the given \a gid
-        static void init(naming::id_type gid) 
+        static void init(naming::id_type gid)
         {
             applier::apply<server::accumulator::init_action>(gid);
         }
 
-        /// Add the given number to the server#accumulator instance 
+        /// Add the given number to the server#accumulator instance
         /// with the given \a gid
-        static void add (naming::id_type gid, unsigned long arg) 
+        static void add (naming::id_type gid, unsigned long arg)
         {
             applier::apply<server::accumulator::add_action>(gid, arg);
         }
 
-        /// Print the current value of the server#accumulator instance 
+        /// Print the current value of the server#accumulator instance
         /// with the given \a gid
-        static void print(naming::id_type gid) 
+        static void print(naming::id_type gid)
         {
             applier::apply<server::accumulator::print_action>(gid);
         }
