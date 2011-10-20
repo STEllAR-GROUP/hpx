@@ -199,7 +199,6 @@ namespace boost { namespace coroutines {
       }
       static boost::uint64_t increment_stack_recycle_count()
       {
-        static_<counter_type, stack_recycle> counter(0);
         return ++get_stack_recycle_counter();
       }
 
