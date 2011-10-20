@@ -62,9 +62,9 @@ namespace bright_future { namespace server {
       , typename remote_lse<T>::range_type y_range
     )
     {
-        for(size_type y = y_range.first; y < std::min(config.n_y, y_range.second); ++y)
+        for(size_type y = y_range.first; y < (std::min)(config.n_y, y_range.second); ++y)
         {
-            for(size_type x = x_range.first; x < std::min(config.n_x, x_range.second); ++x)
+            for(size_type x = x_range.first; x < (std::min)(config.n_x, x_range.second); ++x)
             {
                 rhs(x, y) = f(x, y, config);
             }
@@ -88,9 +88,9 @@ namespace bright_future { namespace server {
       , typename remote_lse<T>::range_type y_range
     )
     {
-        for(size_type y = y_range.first; y < std::min(config.n_y, y_range.second); ++y)
+        for(size_type y = y_range.first; y < (std::min)(config.n_y, y_range.second); ++y)
         {
-            for(size_type x = x_range.first; x < std::min(config.n_x, x_range.second); ++x)
+            for(size_type x = x_range.first; x < (std::min)(config.n_x, x_range.second); ++x)
             {
                 u(x, y) = f(x, y, config);
             }
@@ -125,9 +125,9 @@ namespace bright_future { namespace server {
             promise->get();
         }
 
-        for(size_type y = y_range.first; y < std::min(config.n_y, y_range.second); ++y)
+        for(size_type y = y_range.first; y < (std::min)(config.n_y, y_range.second); ++y)
         {
-            for(size_type x = x_range.first; x < std::min(config.n_x, x_range.second); ++x)
+            for(size_type x = x_range.first; x < (std::min)(config.n_x, x_range.second); ++x)
             {
                 u(x, y) = f(u, rhs, x, y, config);
             }

@@ -246,7 +246,7 @@ void gs(
             //for(unsigned jter = 0; jter < iteration_block; ++jter)
             {
                 // update the "red" points
-                size_type y, x, block_size;
+                size_type y, x/*, block_size*/;
                 promise_grid_type & current = iteration_dependencies[iter + jter + 1];
                 promise_grid_type & prev = iteration_dependencies[iter + jter];
 

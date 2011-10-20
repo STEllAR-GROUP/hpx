@@ -107,7 +107,7 @@ namespace bright_future {
     namespace server {
 
     template <typename T>
-    class HPX_EXPORT remote_lse
+    class HPX_COMPONENT_EXPORT remote_lse
         : public hpx::components::simple_component_base<remote_lse<T> >
     {
         private:
@@ -122,7 +122,7 @@ namespace bright_future {
             // stuff for the stencil
 
         public:
-            HPX_EXPORT remote_lse();
+            remote_lse();
 
             typedef typename grid_type::size_type size_type;
             typedef typename grid_type::value_type value_type;
@@ -142,7 +142,7 @@ namespace bright_future {
               , remote_lse_init_rhs_blocked  = 6
             };
 
-            HPX_EXPORT void init(
+            void init(
                 size_type nx
               , size_type ny
               , double hx
@@ -171,7 +171,7 @@ namespace bright_future {
                 >
                 init_func_type;
 
-            HPX_EXPORT void init_rhs(
+            void init_rhs(
                 init_func_type  f
               , typename remote_lse<T>::size_type x
               , typename remote_lse<T>::size_type y
@@ -188,7 +188,7 @@ namespace bright_future {
                 >
                 init_rhs_action;
 
-            HPX_EXPORT void init_rhs_blocked(
+            void init_rhs_blocked(
                 init_func_type  f
               , typename remote_lse<T>::range_type x
               , typename remote_lse<T>::range_type y
@@ -205,7 +205,7 @@ namespace bright_future {
                 >
                 init_rhs_blocked_action;
 
-            HPX_EXPORT void init_u(
+            void init_u(
                 init_func_type  f
               , typename remote_lse<T>::size_type x
               , typename remote_lse<T>::size_type y
@@ -222,7 +222,7 @@ namespace bright_future {
                 >
                 init_u_action;
 
-            HPX_EXPORT void init_u_blocked(
+            void init_u_blocked(
                 init_func_type  f
               , typename remote_lse<T>::range_type x
               , typename remote_lse<T>::range_type y
@@ -251,7 +251,7 @@ namespace bright_future {
                 >
                 apply_func_type;
 
-            HPX_EXPORT void apply(
+            void apply(
                 apply_func_type f
               , typename remote_lse<T>::size_type x
               , typename remote_lse<T>::size_type y
@@ -270,7 +270,7 @@ namespace bright_future {
                 >
                 apply_action;
 
-            HPX_EXPORT void apply_region(
+            void apply_region(
                 apply_func_type f
               , range_type x_range
               , range_type y_range
