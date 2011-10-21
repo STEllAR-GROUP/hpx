@@ -57,6 +57,7 @@ namespace hpx { namespace util {
 
 }}
 
+/*
 namespace boost { namespace serialization {
     template <typename Sig, typename IArchive, typename OArchive>
     struct tracking_level<hpx::util::HPX_FUNCTION_NAME<Sig, IArchive, OArchive> >
@@ -74,6 +75,7 @@ namespace boost { namespace serialization {
         BOOST_STATIC_CONSTANT(int, value = HPX_FUNCTION_VERSION);
     };
 }}
+*/
 
 #define BOOST_PP_ITERATION_PARAMS_1                                             \
     (                                                                           \
@@ -252,7 +254,7 @@ namespace hpx { namespace util {
             return vptr->invoke(&object BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a));
         }
 
-        void serialize(IArchive &ar, const unsigned version)
+        void load(IArchive &ar, const unsigned version)
         {
             bool is_empty;
             ar & is_empty;
@@ -264,23 +266,25 @@ namespace hpx { namespace util {
             else
             {
                 vtable_ptr_type *p = 0;
-                ar & p;
+                ar >> p;
                 vptr = p->get_ptr();
                 delete p;
-                vptr->iserialize(&object, ar, version);
+                p->iserialize(&object, ar, version);
             }
         }
 
-        void serialize(OArchive &ar, const unsigned version)
+        void save(OArchive &ar, const unsigned version) const
         {
             bool is_empty = empty();
             ar & is_empty;
             if(!empty())
             {
-                ar & vptr;
+                ar << vptr;
                 vptr->oserialize(&object, ar, version);
             }
         }
+
+        BOOST_SERIALIZATION_SPLIT_MEMBER();
 
         vtable_ptr_type *vptr;
         void *object;

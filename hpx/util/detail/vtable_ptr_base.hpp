@@ -58,7 +58,7 @@ namespace hpx { namespace util { namespace detail {
         void (*iregister_base)(IArchive &);
         void (*oregister_base)(OArchive &);
         void (*iserialize)(void **, IArchive &, unsigned);
-        void (*oserialize)(void **, OArchive &, unsigned);
+        void (*oserialize)(void *const*, OArchive &, unsigned);
 
         template <typename Archive>
         void serialize(Archive & ar, unsigned)

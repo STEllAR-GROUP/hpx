@@ -70,9 +70,7 @@ namespace hpx { namespace util { namespace detail {
                 vtable_ptr_type;
 
             // make sure the global gets instatntiated;
-            //boost::archive::detail::extra_detail::init_guid<vtable_ptr_type>::g.initialize();
-            //boost::archive::detail::extra_detail::init_guid<vtable_ptr_type>::g.export_guid();
-            vtable_ptr_type::register_base();
+            boost::archive::detail::extra_detail::init_guid<vtable_ptr_type>::g.initialize();
 
             static vtable_ptr_type ptr;
 

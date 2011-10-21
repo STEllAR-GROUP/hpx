@@ -173,9 +173,9 @@ namespace hpx { namespace util { namespace detail {
                 new (object) Functor(f);
             }
 
-            static void oserialize(void ** f, OArchive & ar, unsigned)
+            static void oserialize(void * const * f, OArchive & ar, unsigned)
             {
-                ar & *reinterpret_cast<Functor *>(f);
+                ar & *reinterpret_cast<Functor const *>(f);
             }
         };
 
@@ -293,9 +293,9 @@ namespace hpx { namespace util { namespace detail {
                 *object = new Functor(f);
             }
 
-            static void oserialize(void ** f, OArchive & ar, unsigned)
+            static void oserialize(void *const* f, OArchive & ar, unsigned)
             {
-                ar & **reinterpret_cast<Functor **>(f);
+                ar & **reinterpret_cast<Functor *const*>(f);
             }
         };
 

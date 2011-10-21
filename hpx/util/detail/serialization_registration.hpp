@@ -70,7 +70,8 @@ namespace boost {
                 static inline const char * call()
                 {
                     /// FIXME: this is not portable across different compilers
-                    return
+                    return "screw you!";
+                        /*
                         typeid(
                             ::hpx::util::detail::vtable_ptr<
                                 Sig
@@ -79,6 +80,7 @@ namespace boost {
                               , Vtable
                             >
                         ).name();
+                        */
                 }
             };
         }
