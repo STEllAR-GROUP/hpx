@@ -135,7 +135,7 @@ namespace hpx { namespace lcos
         /// \param arg0   [in] The parameter \a arg0 will be passed on to the
         ///               apply operation for the embedded action.
         template <typename Arg0>
-        void apply(naming::id_type const& gid, Arg0 const arg0)
+        void apply(naming::id_type const& gid, Arg0 const& arg0)
         {
             util::block_profiler_wrapper<eager_future_tag> bp(apply_logger_);
             hpx::applier::apply_c<Action>(this->get_gid(), gid, arg0);

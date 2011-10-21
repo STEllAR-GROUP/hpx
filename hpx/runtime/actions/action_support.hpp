@@ -83,7 +83,7 @@ namespace hpx { namespace actions
         template <typename F>
         struct handle_gid<naming::id_type, F>
         {
-            static bool call(naming::id_type const &id, F f)
+            static bool call(naming::id_type const &id, F const& f)
             {
                 f(id);
                 return true;
@@ -93,7 +93,7 @@ namespace hpx { namespace actions
         template <typename F>
         struct handle_gid<std::vector<naming::id_type>, F>
         {
-            static bool call(std::vector<naming::id_type> const& ids, F f)
+            static bool call(std::vector<naming::id_type> const& ids, F const& f)
             {
                 BOOST_FOREACH(naming::id_type const& id, ids)
                     f(boost::ref(id));
