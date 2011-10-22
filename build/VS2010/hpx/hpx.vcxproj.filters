@@ -377,6 +377,9 @@
     <ClCompile Include="..\..\..\src\lcos\local_recursive_mutex.cpp">
       <Filter>Source Files\LCOs</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\util\full_empty_store.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\hpx\config.hpp">
@@ -759,15 +762,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\runtime\components\plain_component_factory.hpp">
       <Filter>Header Files\Runtime\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\lcos\thunk.hpp">
-      <Filter>Header Files\LCOs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\lcos\thunk_constructors.hpp">
-      <Filter>Header Files\LCOs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\lcos\thunk_constructors_direct.hpp">
-      <Filter>Header Files\LCOs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\util\random.hpp">
       <Filter>Header Files\Util</Filter>

@@ -72,6 +72,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ModuleDefinitionFile>hpx.def</ModuleDefinitionFile>
+      <AdditionalDependencies>psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Outputs>$(HPX_ROOT)\bin64\$(Configuration)\lib\hpx\$(TargetFileName);$(HPX_ROOT)\bin64\$(Configuration)\lib\hpx\$(TargetName).pdb;%(Outputs)</Outputs>
@@ -95,6 +96,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ModuleDefinitionFile>hpx.def</ModuleDefinitionFile>
+      <AdditionalDependencies>psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -153,6 +155,7 @@
     <ClCompile Include="..\..\..\src\runtime\threads\thread_helpers.cpp" />
     <ClCompile Include="..\..\..\src\state.cpp" />
     <ClCompile Include="..\..\..\src\util\asio_util.cpp" />
+    <ClCompile Include="..\..\..\src\util\full_empty_store.cpp" />
     <ClCompile Include="..\..\..\src\util\generate_unique_ids.cpp" />
     <ClCompile Include="..\..\..\src\util\ini.cpp" />
     <ClCompile Include="..\..\..\src\util\init_ini_data.cpp" />
@@ -219,9 +222,6 @@
     <ClInclude Include="..\..\..\hpx\lcos\promise_full_empty_bit.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\server\barrier.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\stubs\barrier.hpp" />
-    <ClInclude Include="..\..\..\hpx\lcos\thunk.hpp" />
-    <ClInclude Include="..\..\..\hpx\lcos\thunk_constructors.hpp" />
-    <ClInclude Include="..\..\..\hpx\lcos\thunk_constructors_direct.hpp" />
     <ClInclude Include="..\..\..\hpx\performance_counters\manage_counter.hpp" />
     <ClInclude Include="..\..\..\hpx\performance_counters\manage_counter_type.hpp" />
     <ClInclude Include="..\..\..\hpx\performance_counters\parcels\count_and_time_data_point.hpp" />
