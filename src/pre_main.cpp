@@ -69,12 +69,16 @@ void install_counters()
                    "counters";
 
      threads::get_thread_manager().install_counters();
-     LBT_(info) << "(3rd stage) pre_main: installed threadmanager performance "
+     LBT_(info) << "(3rd stage) pre_main: installed thread-manager performance "
                    "counters";
 
      applier::get_applier().get_parcel_handler().install_counters();
      LBT_(info) << "(3rd stage) pre_main: installed parcelset performance "
                    "counters";
+
+     util::detail::install_counters();
+     LBT_(info) << "(3rd stage) pre_main: installed full_empty_entry "
+                   "performance counters";
 }
 
 ///////////////////////////////////////////////////////////////////////////////

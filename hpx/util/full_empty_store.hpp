@@ -31,6 +31,26 @@ namespace hpx { namespace util { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    // data structure holding all counters for full_empty entries
+    struct counter_data
+    {
+        counter_data()
+          : constructed_(0), destructed_(0),
+            read_enqueued_(0), read_dequeued_(0), set_full_(0)
+        {}
+
+        boost::uint64_t constructed_;
+        boost::uint64_t destructed_;
+        boost::uint64_t read_enqueued_;
+        boost::uint64_t read_dequeued_;
+        boost::uint64_t set_full_;
+    };
+    extern HPX_EXPORT counter_data counter_data_;
+
+    // call this to install all counters for full_empty entries
+    void install_counters();
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Data>
     class full_empty_entry
     {
@@ -102,6 +122,7 @@ namespace hpx { namespace util { namespace detail
           : state_(empty)
         {
             ::new (get_address()) Data();      // properly initialize memory
+            ++counter_data_.constructed_;
         }
 
         template <typename T0>
@@ -109,6 +130,7 @@ namespace hpx { namespace util { namespace detail
           : state_(empty)
         {
             ::new (get_address()) Data(t0);    // properly initialize memory
+            ++counter_data_.constructed_;
         }
 
         ~full_empty_entry()
@@ -120,6 +142,7 @@ namespace hpx { namespace util { namespace detail
                 log_non_empty_queue("read_queue", read_queue_);
             }
             get_address()->Data::~Data();      // properly destruct value in memory
+            ++counter_data_.destructed_;
         }
 
         // returns whether this entry is currently empty
@@ -167,11 +190,15 @@ namespace hpx { namespace util { namespace detail
                 typename queue_type::const_iterator last = read_queue_.last();
                 threads::thread_state_ex_enum statex;
 
+                ++counter_data_.read_enqueued_;
+
                 {
                     // yield this thread
                     util::unlock_the_lock<scoped_lock> ul(l);
                     statex = self->yield(threads::suspended);
                 }
+
+                ++counter_data_.read_dequeued_;
 
                 if (f.id_)
                     read_queue_.erase(last);     // remove entry from queue
@@ -223,11 +250,15 @@ namespace hpx { namespace util { namespace detail
                 typename queue_type::const_iterator last = read_queue_.last();
                 threads::thread_state_ex_enum statex;
 
+                ++counter_data_.read_enqueued_;
+
                 {
                     // yield this thread
                     util::unlock_the_lock<scoped_lock> ul(l);
                     statex = self->yield(threads::suspended);
                 }
+
+                ++counter_data_.read_dequeued_;
 
                 if (f.id_)
                     read_queue_.erase(last);     // remove entry from queue
@@ -547,6 +578,7 @@ namespace hpx { namespace util { namespace detail
                 read_queue_.pop_front();
                 threads::set_thread_lco_description(id);
                 threads::set_thread_state(id, threads::pending);
+                ++counter_data_.set_full_;
             }
 
             // since we got full now we need to re-activate one thread waiting
