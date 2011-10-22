@@ -445,7 +445,7 @@ namespace hpx { namespace naming
 
         operator util::safe_bool<id_type>::result_type() const
         {
-            return util::safe_bool<id_type>()(gid_);
+            return util::safe_bool<id_type>()(gid_ && *gid_);
         }
 
         // comparison is required as well
