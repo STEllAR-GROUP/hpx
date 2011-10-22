@@ -55,6 +55,8 @@ namespace hpx { namespace threads
 
 #if defined(BOOST_WINDOWS)
 
+#include <Psapi.h>
+
     ///////////////////////////////////////////////////////////////////////////
     struct numa_node_data
     {
@@ -264,6 +266,23 @@ namespace hpx { namespace threads
         return true;
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    inline std::size_t
+    get_thread_affinity_mask_from_lva(naming::address::address_type lva)
+    {
+        PSAPI_WORKING_SET_EX_INFORMATION info;
+        info.VirtualAddress = reinterpret_cast<void*>(lva);
+
+        if (!QueryWorkingSetEx(GetCurrentProcess(), &info, sizeof(info)))
+            return std::size_t(-1);
+
+        DWORD_PTR node_affinity_mask = 0;
+        if (!GetNumaNodeProcessorMask(info.VirtualAttributes.Node, &node_affinity_mask))
+            return std::size_t(-1);
+
+        return node_affinity_mask;
+    }
+
 #elif defined(__APPLE__)
 
     // the thread affinity code is taken from the example:
@@ -322,6 +341,13 @@ namespace hpx { namespace threads
     inline int get_numa_node(std::size_t thread_num, bool numa_sensitive)
     {
         return -1;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    inline std::size_t
+    get_thread_affinity_mask_from_lva(naming::address::address_type lva)
+    {
+        return std::size_t(-1);
     }
 
 #else
@@ -404,6 +430,13 @@ namespace hpx { namespace threads
     inline int get_numa_node(std::size_t thread_num, bool numa_sensitive)
     {
         return -1;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    inline std::size_t
+    get_thread_affinity_mask_from_lva(naming::address::address_type lva)
+    {
+        return std::size_t(-1);
     }
 
 #endif

@@ -153,9 +153,24 @@ namespace hpx { namespace threads { namespace policies
             thread_state_enum initial_state, bool run_now, error_code& ec,
             std::size_t num_thread)
         {
+            // try to figure out the NUMA node where the data lives
+            if (numa_sensitive_ && std::size_t(-1) == num_thread) {
+                std::size_t mask = get_thread_affinity_mask_from_lva(data.lva);
+                if (mask != std::size_t(-1)) {
+                    std::size_t m = 0x01LL;
+                    for (std::size_t i = 0; i < queues_.size(); m <<= 1, ++i)
+                    {
+                        if (!(m & mask))
+                            continue;
+                        num_thread = i;
+                        break;
+                    }
+                }
+            }
             if (std::size_t(-1) == num_thread)
                 num_thread = ++curr_queue_ % queues_.size();
 
+            // now create the thread
             if (data.priority == thread_priority_critical) {
                 BOOST_ASSERT(run_now == true);
                 std::size_t num = num_thread % high_priority_queues_.size();

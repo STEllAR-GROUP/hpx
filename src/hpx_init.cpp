@@ -470,6 +470,11 @@ namespace hpx
                      "the number of operating system threads maintaining a high "
                      "priority queue (default: number of OS threads), valid for "
                      "--queueing=priority_local only")
+#if defined(BOOST_WINDOWS)
+                    ("numa-sensitive",
+                     "makes the priority_local scheduler NUMA sensitive, valid for "
+                     "--queueing=priority_local only")
+#endif
                 ;
 
                 options_description config_options("HPX configuration options");
@@ -733,7 +738,13 @@ namespace hpx
                     "--high-priority-threads, valid for "
                     "--queueing=priority_local only");
             }
-
+#if defined(BOOST_WINDOWS)
+            if (vm.count("numa-sensitive")) {
+                throw std::logic_error("Invalid command line option "
+                    "--numa-sensitive, valid for "
+                    "--queueing=priority_local only");
+            }
+#endif
             // scheduling policy
             typedef hpx::threads::policies::global_queue_scheduler
                 global_queue_policy;
@@ -760,7 +771,13 @@ namespace hpx
                     "--high-priority-threads, valid for "
                     "--queueing=priority_local only.");
             }
-
+#if defined(BOOST_WINDOWS)
+            if (vm.count("numa-sensitive")) {
+                throw std::logic_error("Invalid command line option "
+                    "--numa-sensitive, valid for "
+                    "--queueing=priority_local only");
+            }
+#endif
             // scheduling policy
             typedef hpx::threads::policies::local_queue_scheduler
                 local_queue_policy;
@@ -785,15 +802,20 @@ namespace hpx
             std::size_t num_localities)
         {
             std::size_t num_high_priority_queues = num_threads;
-            if (vm.count("high-priority-threads"))
-                num_high_priority_queues
-                    = vm["high-priority-threads"].as<std::size_t>();
-
+            if (vm.count("high-priority-threads")) {
+                num_high_priority_queues =
+                    vm["high-priority-threads"].as<std::size_t>();
+            }
+            bool numa_sensitive = false;
+#if defined(BOOST_WINDOWS)
+            if (vm.count("numa-sensitive"))
+                numa_sensitive = true;
+#endif
             // scheduling policy
             typedef hpx::threads::policies::local_priority_queue_scheduler
                 local_queue_policy;
             local_queue_policy::init_parameter_type init(
-                num_threads, num_high_priority_queues, 1000);
+                num_threads, num_high_priority_queues, 1000, numa_sensitive);
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
@@ -818,7 +840,13 @@ namespace hpx
                     "--high-priority-threads, valid for "
                     "--queueing=priority_local only.");
             }
-
+#if defined(BOOST_WINDOWS)
+            if (vm.count("numa-sensitive")) {
+                throw std::logic_error("Invalid command line option "
+                    "--numa-sensitive, valid for "
+                    "--queueing=priority_local only");
+            }
+#endif
             // scheduling policy
             typedef hpx::threads::policies::abp_queue_scheduler
                 abp_queue_policy;
