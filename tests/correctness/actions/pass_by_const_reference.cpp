@@ -11,6 +11,7 @@
 #include <hpx/lcos/eager_future.hpp>
 
 #include <boost/atomic.hpp>
+#include <boost/move/move.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -30,6 +31,8 @@ boost::atomic<std::size_t> ctor_count;
 boost::atomic<std::size_t> copy_ctor_count;
 boost::atomic<std::size_t> assignment_count;
 boost::atomic<std::size_t> dtor_count;
+boost::atomic<std::size_t> move_ctor_count;
+boost::atomic<std::size_t> move_assignment_count;
 
 struct object
 {
@@ -38,9 +41,16 @@ struct object
         ++ctor_count;
     }
 
+    // copy constructor
     object(object const& other)
     {
         ++copy_ctor_count;
+    }
+
+    // move constructor
+    object(BOOST_RV_REF(object) other)
+    {
+        ++move_ctor_count;
     }
 
     ~object()
@@ -48,7 +58,15 @@ struct object
         ++dtor_count;
     }
 
-    object& operator=(object const& other)
+    // copy assignment
+    object& operator=(BOOST_COPY_ASSIGN_REF(object) other)
+    {
+        ++assignment_count;
+        return *this;
+    }
+
+    // move assignment
+    object& operator=(BOOST_RV_REF(object) other)
     {
         ++assignment_count;
         return *this;
@@ -59,6 +77,9 @@ struct object
     {
         // no-op
     }
+
+private:
+    BOOST_COPYABLE_AND_MOVABLE(object);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -95,10 +116,12 @@ int hpx_main(variables_map& vm)
         f.get();
     }
 
-    std::cout << "ctor_count:       " << ctor_count.load() << "\n"
-              << "copy_ctor_count:  " << copy_ctor_count.load() << "\n"
-              << "assignment_count: " << assignment_count.load() << "\n"
-              << "dtor_count:       " << dtor_count.load() << "\n";
+    std::cout << "ctor_count:            " << ctor_count.load() << "\n"
+              << "copy_ctor_count:       " << copy_ctor_count.load() << "\n"
+              << "assignment_count:      " << assignment_count.load() << "\n"
+              << "dtor_count:            " << dtor_count.load() << "\n"
+              << "move_ctor_count:       " << move_ctor_count.load() << "\n"
+              << "move_assignment_count: " << move_assignment_count.load() << "\n";
 
     finalize();
 
