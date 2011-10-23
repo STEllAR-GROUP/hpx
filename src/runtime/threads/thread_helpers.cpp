@@ -206,7 +206,7 @@ namespace hpx { namespace threads
     ///
     /// If the suspension was aborted, this function will throw a
     /// \a yield_aborted exception.
-    void suspend(thread_state_enum state, error_code& ec)
+    thread_state_ex_enum suspend(thread_state_enum state, error_code& ec)
     {
         // let the thread manager do other things while waiting
         threads::thread_self& self = threads::get_self();
@@ -224,9 +224,11 @@ namespace hpx { namespace threads
 
         if (&ec != &throws)
             ec = make_success_code();
+
+        return statex;
     }
 
-    void suspend(boost::posix_time::ptime const& at_time, error_code& ec)
+    thread_state_ex_enum suspend(boost::posix_time::ptime const& at_time, error_code& ec)
     {
         // schedule a thread waking us up at_time
         threads::thread_self& self = threads::get_self();
@@ -235,7 +237,7 @@ namespace hpx { namespace threads
             threads::thread_priority_critical, ec);
 
         if (ec)
-            return;
+            return wait_unknown;
 
         // let the thread manager do other things while waiting
         threads::thread_state_ex_enum statex = self.yield(threads::suspended);
@@ -252,9 +254,11 @@ namespace hpx { namespace threads
 
         if (&ec != &throws)
             ec = make_success_code();
+
+        return statex;
     }
 
-    void suspend(boost::posix_time::time_duration const& after_duration,
+    thread_state_ex_enum suspend(boost::posix_time::time_duration const& after_duration,
         error_code& ec)
     {
         // schedule a thread waking us up after_duration
@@ -264,7 +268,7 @@ namespace hpx { namespace threads
             threads::thread_priority_critical, ec);
 
         if (ec)
-            return;
+            return wait_unknown;
 
         // let the thread manager do other things while waiting
         threads::thread_state_ex_enum statex = self.yield(threads::suspended);
@@ -281,6 +285,8 @@ namespace hpx { namespace threads
 
         if (&ec != &throws)
             ec = make_success_code();
+
+        return statex;
     }
 }}
 
