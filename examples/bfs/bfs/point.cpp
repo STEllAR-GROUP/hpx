@@ -32,6 +32,6 @@ HPX_DEFINE_GET_COMPONENT_TYPE(point_geometry_type::wrapped_type);
 HPX_REGISTER_ACTION_EX(
     point_geometry_type::wrapped_type::init_action,
     bfs_geometry_init_action);
-//HPX_REGISTER_ACTION_EX(
-//    point_geometry_type::wrapped_type::traverse_action,
-//    point_geometry_traverse_action);
+HPX_REGISTER_ACTION_EX(
+    point_geometry_type::wrapped_type::traverse_action,
+    bfs_geometry_traverse_action);

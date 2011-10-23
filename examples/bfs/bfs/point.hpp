@@ -59,17 +59,17 @@ namespace hpx { namespace geometry
             this->base_type::init_async(gid_,objectid);
         }
 
-        //lcos::promise< std::vector<std::size_t> > traverse_async(std::size_t level, std::size_t parent)
-        //{
-        //    BOOST_ASSERT(gid_);
-        //    return this->base_type::traverse_async(gid_,level,parent);
-       // }
+        lcos::promise< std::vector<std::size_t> > traverse_async(std::size_t level, std::size_t parent)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::traverse_async(gid_,level,parent);
+        }
 
-        //std::vector<std::size_t> traverse(std::size_t level,std::size_t parent)
-        //{
-        //    BOOST_ASSERT(gid_);
-        //    this->base_type::traverse(gid_,level,parent);
-        //}
+        std::vector<std::size_t> traverse(std::size_t level,std::size_t parent)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::traverse(gid_,level,parent);
+        }
     };
 }}
 

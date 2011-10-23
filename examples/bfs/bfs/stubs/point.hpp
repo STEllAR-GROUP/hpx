@@ -36,19 +36,19 @@ namespace hpx { namespace geometry { namespace stubs
             init_async(gid,objectid).get();
         }
 
-        //static lcos::promise<std::vector<std::size_t> >
-        //traverse_async(naming::id_type gid,std::size_t level,std::size_t parent)
-       // {
-       //     typedef server::point::traverse_action action_type;
-       //     return lcos::eager_future<action_type>(gid,level,parent);
-       // }
+        static lcos::promise<std::vector<std::size_t> >
+        traverse_async(naming::id_type gid,std::size_t level,std::size_t parent)
+        {
+            typedef server::point::traverse_action action_type;
+            return lcos::eager_future<action_type>(gid,level,parent);
+        }
 
-        //static std::vector<std::size_t> traverse(naming::id_type const& gid,std::size_t level,std::size_t parent)
-        //{
-        //    // The following get yields control while the action above
+        static std::vector<std::size_t> traverse(naming::id_type const& gid,std::size_t level,std::size_t parent)
+        {
+            // The following get yields control while the action above
             // is executed and the result is returned to the promise
-        //    return traverse_async(gid,level,parent).get();
-        //}
+            return traverse_async(gid,level,parent).get();
+        }
 
     };
 

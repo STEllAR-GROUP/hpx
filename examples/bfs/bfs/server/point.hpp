@@ -29,8 +29,8 @@ namespace hpx { namespace geometry { namespace server
         // object (the accumulator)
         enum actions
         {
-            point_init = 0
-          //  point_traverse = 2
+            point_init = 0,
+            point_traverse = 2
         };
 
         // constructor: initialize accumulator value
@@ -65,7 +65,7 @@ namespace hpx { namespace geometry { namespace server
         }
 
         // traverse the tree
-        //std::vector<std::size_t> traverse(std::size_t level, std::size_t parent);
+        std::vector<std::size_t> traverse(std::size_t level, std::size_t parent);
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action
@@ -75,9 +75,9 @@ namespace hpx { namespace geometry { namespace server
             point, point_init,std::size_t, &point::init
         > init_action;
 
-        //typedef hpx::actions::result_action2<
-        //    point, std::vector<std::size_t>,point_traverse, std::size_t, std::size_t, &point::traverse
-        //> traverse_action;
+        typedef hpx::actions::result_action2<
+            point, std::vector<std::size_t>,point_traverse, std::size_t, std::size_t, &point::traverse
+        > traverse_action;
 
     private:
         //hpx::lcos::local_mutex mtx_;    // lock for this data block

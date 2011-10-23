@@ -24,15 +24,15 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace geometry { namespace server
 {
-        //std::vector<std::size_t> point::traverse(std::size_t level,std::size_t parent)
-        //{
-        //  level_ = level; 
-        //  visited_ = true;
-        //  parent_ = parent;
+        std::vector<std::size_t> point::traverse(std::size_t level,std::size_t parent)
+        {
+          level_ = level; 
+          visited_ = true;
+          parent_ = parent;
 
           // return the neighbors
-         // return neighbors_;
-        //}
+          return neighbors_;
+        }
 
 }}}
 
