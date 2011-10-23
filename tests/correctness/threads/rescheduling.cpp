@@ -28,6 +28,7 @@ using hpx::applier::register_thread_nullary;
 
 using hpx::lcos::promise;
 using hpx::lcos::async;
+using hpx::lcos::eager_future;
 
 using hpx::threads::thread_id_type;
 using hpx::threads::suspend;
@@ -88,11 +89,7 @@ void change_thread_state(
     boost::uint64_t thread
     )
 {
-//    std::cout << "waking up thread (wait_signaled)\n"; 
-    set_thread_state(reinterpret_cast<void*>(thread), pending, wait_signaled); 
-
-//    std::cout << "suspending thread (wait_timeout)\n"; 
-    set_thread_state(reinterpret_cast<void*>(thread), suspended, wait_timeout); 
+    set_thread_state(reinterpret_cast<void*>(thread), suspended); 
 }
 
 typedef plain_action1<
@@ -123,6 +120,8 @@ typedef plain_action4<
 > tree_boot_action;
 
 HPX_REGISTER_PLAIN_ACTION(tree_boot_action);
+
+typedef eager_future<tree_boot_action> tree_boot_future;
 
 ///////////////////////////////////////////////////////////////////////////////
 void tree_boot(
@@ -175,31 +174,21 @@ void test_dummy_thread(
     boost::uint64_t futures
     )
 {
-    boost::uint64_t woken = 0
-                  , signaled = 0
-                  , timed_out = 0;
+    bool woken = false;
 
     while (true)
     {
         thread_state_ex_enum statex = suspend(suspended);
 
-        if (statex == wait_signaled)
-        {
-            ++signaled;
-            ++woken;
-        }
+        woken = true;
 
-        else if (statex == wait_timeout)
+        if (statex == wait_terminate)
         {
-            ++timed_out;
-            ++woken;
-        }
+            if (woken)
+                std::cout << "rescheduling succeeded\n";
+            else
+                std::cout << "rescheduling failed\n";
 
-        else if (statex == wait_terminate)
-        {
-            std::cout << "woken:     " << woken << "/" << (futures * 2) << "\n"
-                      << "signaled:  " << signaled << "/" << futures << "\n"
-                      << "timed out: " << timed_out << "/0\n";
             return;
         }
     }
@@ -214,13 +203,24 @@ int hpx_main(variables_map& vm)
     {
         id_type const prefix = find_here();
 
-        boost::uint64_t thread = boost::uint64_t(register_thread_nullary
-            (boost::bind(&test_dummy_thread, futures)));
+        thread_id_type thread_id = register_thread_nullary
+            (boost::bind(&test_dummy_thread, futures));
+        boost::uint64_t thread = boost::uint64_t(thread_id);
 
-        tree_boot(futures, grain_size, prefix, thread);
+        // Flood the queues with suspension operations before the rescheduling
+        // attempt.
+        tree_boot_future before(prefix, futures, grain_size, prefix, thread);
 
-        set_thread_state(reinterpret_cast<void*>(thread),
-            pending, wait_terminate);
+        set_thread_state(thread_id, pending, wait_signaled);
+
+        // Flood the queues with suspension operations after the rescheduling
+        // attempt.
+        tree_boot_future after(prefix, futures, grain_size, prefix, thread);
+
+        before.get();
+        after.get();
+
+        set_thread_state(thread_id, pending, wait_terminate);
     }
 
     finalize();
@@ -237,7 +237,7 @@ int main(int argc, char* argv[])
     cmdline.add_options()
         ( "futures"
         , value<boost::uint64_t>()->default_value(64)
-        , "number of futures to invoke")
+        , "number of futures to invoke before and after the rescheduling")
 
         ( "grain-size"
         , value<boost::uint64_t>()->default_value(4)

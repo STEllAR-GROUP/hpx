@@ -7,9 +7,6 @@ set(tests
     pass_by_const_reference
    )
 
-set(pass_by_const_reference_FLAGS
-    DEPENDENCIES iostreams_component)
-
 foreach(test ${tests})
   set(sources
       ${test}.cpp)
