@@ -57,8 +57,8 @@ namespace hpx { namespace applier
     ///////////////////////////////////////////////////////////////////////////
     threads::thread_id_type register_thread_nullary(
         boost::function<void()> const& func, char const* desc,
-        threads::thread_state_enum state, threads::thread_priority priority,
-        bool run_now, std::size_t os_thread, error_code& ec)
+        threads::thread_state_enum state, bool run_now,
+        threads::thread_priority priority, std::size_t os_thread, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -70,8 +70,8 @@ namespace hpx { namespace applier
         }
 
         threads::thread_init_data data(
-            boost::bind(&thread_function_nullary, func), desc, 0,
-            priority, os_thread);
+            boost::bind(&thread_function_nullary, func), desc ? desc : "<unknown>",
+            0, priority, os_thread);
         return app->get_thread_manager().
             register_thread(data, state, run_now, ec);
     }
@@ -91,7 +91,8 @@ namespace hpx { namespace applier
         }
 
         threads::thread_init_data data(
-            boost::bind(&thread_function, func), desc, 0, priority, os_thread);
+            boost::bind(&thread_function, func), desc ? desc : "<unknown>", 0,
+            priority, os_thread);
         return app->get_thread_manager().
             register_thread(data, state, run_now, ec);
     }
@@ -110,7 +111,8 @@ namespace hpx { namespace applier
             return threads::invalid_thread_id;
         }
 
-        threads::thread_init_data data(func, desc, 0, priority, os_thread);
+        threads::thread_init_data data(func, desc ? desc : "<unknown>",
+            0, priority, os_thread);
         return app->get_thread_manager().
             register_thread(data, state, run_now, ec);
     }
