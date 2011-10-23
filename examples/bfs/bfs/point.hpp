@@ -11,7 +11,6 @@
 
 #include "stubs/point.hpp"
 
-
 namespace hpx { namespace geometry
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -70,6 +69,7 @@ namespace hpx { namespace geometry
             BOOST_ASSERT(gid_);
             return this->base_type::traverse(gid_,level,parent);
         }
+
     };
 }}
 

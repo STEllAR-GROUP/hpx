@@ -35,3 +35,15 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     point_geometry_type::wrapped_type::traverse_action,
     bfs_geometry_traverse_action);
+
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    hpx::lcos::base_lco_with_value<std::vector<unsigned long> >,
+    hpx::components::component_base_lco_with_value);
+
+HPX_REGISTER_ACTION_EX(
+    hpx::lcos::base_lco_with_value<std::vector<unsigned long> >::get_value_action,
+    get_value_action_ulong);
+
+HPX_REGISTER_ACTION_EX(
+    hpx::lcos::base_lco_with_value<std::vector<unsigned long>>::set_result_action,
+    set_result_action_ulong);
