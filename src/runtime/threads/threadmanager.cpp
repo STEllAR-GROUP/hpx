@@ -360,8 +360,10 @@ namespace hpx { namespace threads
         if (previous_state_val == active)
         {
             // schedule a new thread to set the state
-            LTM_(fatal) << "set_state: thread(" << id << "), "
-                             "is currently active, scheduling new thread...";
+            LTM_(fatal) << "set_state: thread is currently active, scheduling "
+                           "new thread, thread(" << id << "), description("
+                        << thrd->get_description() << "), new state("
+                        << get_thread_state_name(new_state) << ")";
 
             thread_init_data data(
                 boost::bind(&threadmanager_impl::set_active_state, this,
