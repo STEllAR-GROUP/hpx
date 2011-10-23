@@ -323,8 +323,8 @@ namespace hpx { namespace threads
             error_code& ec)
     {
         if (HPX_UNLIKELY(!id)) {
-            HPX_THROWS_IF(ec, null_thread_id,
-                "threadmanager_impl::set_state", "NULL thread id encountered");
+            HPX_THROWS_IF(ec, null_thread_id, "threadmanager_impl::set_state",
+                "NULL thread id encountered");
             return thread_state(unknown);
         }
 
@@ -334,8 +334,8 @@ namespace hpx { namespace threads
         if (new_state == active) {
             hpx::util::osstream strm;
             strm << "invalid new state: " << get_thread_state_name(new_state);
-            HPX_THROWS_IF(ec, bad_parameter,
-                "threadmanager_impl::set_state", hpx::util::osstream_get_string(strm));
+            HPX_THROWS_IF(ec, bad_parameter, "threadmanager_impl::set_state",
+                hpx::util::osstream_get_string(strm));
             return thread_state(unknown);
         }
 
@@ -357,7 +357,7 @@ namespace hpx { namespace threads
 
         // the thread to set the state for is currently running, so we
         // schedule another thread to execute the pending set_state
-        if (previous_state_val == active)
+        if (active == previous_state_val)
         {
             // schedule a new thread to set the state
             LTM_(fatal) << "set_state: thread is currently active, scheduling "
@@ -373,10 +373,20 @@ namespace hpx { namespace threads
 
             return previous_state;     // done
         }
-        else if (previous_state_val == terminated) {
+        else if (terminated == previous_state_val) {
             // If the thread has been terminated while this set_state was
             // pending nothing has to be done anymore.
             return previous_state;
+        }
+        else if (pending == previous_state_val && suspended == new_state) {
+            // we do not allow explicit resetting of a state to suspended
+            // without the thread being executed.
+            hpx::util::osstream strm;
+            strm << "invalid new state: " << get_thread_state_name(new_state)
+                 << ", can't demote a pending thread.";
+            HPX_THROWS_IF(ec, bad_parameter, "threadmanager_impl::set_state",
+                hpx::util::osstream_get_string(strm));
+            return thread_state(unknown);
         }
 
         // If the previous state was pending we are supposed to remove the
