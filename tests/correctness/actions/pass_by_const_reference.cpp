@@ -7,7 +7,6 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/plain_actions.hpp>
-#include <hpx/include/iostreams.hpp>
 #include <hpx/lcos/eager_future.hpp>
 
 #include <boost/atomic.hpp>
