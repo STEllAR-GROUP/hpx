@@ -13,6 +13,7 @@
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/stringstream.hpp>
+#include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
 #include <boost/aligned_storage.hpp>
