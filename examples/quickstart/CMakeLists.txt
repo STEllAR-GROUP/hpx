@@ -10,6 +10,7 @@ set(example_programs
     non_atomic_rma
     quicksort
     timed_wake
+    simplest_hello_world
    )
 
 if(HPX_CXX11_LAMBDAS)
