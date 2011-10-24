@@ -63,7 +63,7 @@ namespace hpx { namespace components { namespace server
     // implementation of console based logging
     void console_logging(messages_type const& msgs)
     {
-//        util::spinlock::scoped_lock l(get_log_lock());
+        util::spinlock::scoped_lock l(get_log_lock());
 
         using boost::fusion::at_c;
 
