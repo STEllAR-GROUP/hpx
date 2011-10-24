@@ -898,8 +898,12 @@ bool addressing_service::resolve_cached(
             ec = make_success_code();
 
         LAS_(debug) <<
-            ( boost::format("cache hit for address %1% (base %2%)")
-            % id % idbase.get_gid());
+            ( boost::format(
+                "cache hit for address %1%, lva %2% (base %3%, lva %4%)")
+            % id
+            % reinterpret_cast<void*>(addr.address_)
+            % idbase.get_gid()
+            % reinterpret_cast<void*>(g.lva()));
 
         return true;
     }
