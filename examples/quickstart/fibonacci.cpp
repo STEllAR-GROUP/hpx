@@ -61,8 +61,8 @@ boost::uint64_t fibonacci(boost::uint64_t n)
     // We restrict ourselves to execute the Fibonacci function locally.
     id_type const prefix = find_here();
 
-    // Invoking the Fibonacci algorithm twice is obviously as stupid as it can
-    // get. However, we intentionally demonstrate it this way to create some
+    // Invoking the Fibonacci algorithm twice is inefficient.
+    // However, we intentionally demonstrate it this way to create some
     // heavy workload.
     fibonacci_future n1(prefix, n - 1);
     fibonacci_future n2(prefix, n - 2);
@@ -76,15 +76,18 @@ int hpx_main(variables_map& vm)
     // extract command line argument, i.e. fib(N)
     boost::uint64_t n = vm["n-value"].as<boost::uint64_t>();
 
-    // Keep track of the time required to execute.
-    high_resolution_timer t;
+    {
+        // Keep track of the time required to execute.
+        high_resolution_timer t;
 
-    // Create a Future for the whole calculation and wait for it.
-    fibonacci_future f(find_here(), n);    // execute locally
-    boost::uint64_t r = f.get();
+        // Create a Future for the whole calculation and wait for it.
+        fibonacci_future f(find_here(), n);    // execute locally
+        boost::uint64_t r = f.get();
 
-    char const* fmt = "fibonacci(%1%) == %2%\nelapsed time: %3% [s]\n";
-    std::cout << (boost::format(fmt) % n % r % t.elapsed());
+        char const* fmt = "fibonacci(%1%) == %2%\nelapsed time: %3% [s]\n";
+        std::cout << (boost::format(fmt) % n % r % t.elapsed());
+
+    }
 
     finalize();
     return 0;
