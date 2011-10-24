@@ -241,7 +241,7 @@ struct abp_queue_scheduler : boost::noncopyable
             }
 
             // no new work is available, are we deadlocked?
-            if (0 == added && 0 == num_thread && LHPX_ENABLED(error)) {
+            if (0 == added /*&& 0 == num_thread*/ && LHPX_ENABLED(error)) {
                 bool suspended_only = true;
 
                 for (std::size_t i = 0; suspended_only && i < queues_.size(); ++i) {
