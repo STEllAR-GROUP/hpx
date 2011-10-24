@@ -143,15 +143,6 @@ macro(hpx_check_for_cxx11_lambdas variable)
 endmacro()
 
 ###############################################################################
-macro(hpx_check_for_cxx11_unique_ptr variable)
-  hpx_get_include_directory(include_dir)
-
-  add_hpx_config_test("cxx11_unique_ptr" ${variable} LANGUAGE CXX
-    SOURCE cmake/tests/cxx11_unique_ptr.cpp
-    FLAGS -I${BOOST_INCLUDE_DIR} ${include_dir} "-std=c++0x" FILE ${ARGN})
-endmacro()
-
-###############################################################################
 macro(hpx_check_for_cxx11_auto variable)
   hpx_get_include_directory(include_dir)
 
@@ -161,11 +152,38 @@ macro(hpx_check_for_cxx11_auto variable)
 endmacro()
 
 ###############################################################################
-macro(hpx_check_for_cxx11_tuple variable)
+macro(hpx_check_for_cxx11_std_unique_ptr variable)
   hpx_get_include_directory(include_dir)
 
-  add_hpx_config_test("cxx11_tuple" ${variable} LANGUAGE CXX
-    SOURCE cmake/tests/cxx11_tuple.cpp
+  add_hpx_config_test("cxx11_std_unique_ptr" ${variable} LANGUAGE CXX
+    SOURCE cmake/tests/cxx11_std_unique_ptr.cpp
+    FLAGS -I${BOOST_INCLUDE_DIR} ${include_dir} "-std=c++0x" FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_std_tuple variable)
+  hpx_get_include_directory(include_dir)
+
+  add_hpx_config_test("cxx11_std_tuple" ${variable} LANGUAGE CXX
+    SOURCE cmake/tests/cxx11_std_tuple.cpp
+    FLAGS -I${BOOST_INCLUDE_DIR} ${include_dir} "-std=c++0x" FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_std_bind variable)
+  hpx_get_include_directory(include_dir)
+
+  add_hpx_config_test("cxx11_std_bind" ${variable} LANGUAGE CXX
+    SOURCE cmake/tests/cxx11_std_bind.cpp
+    FLAGS -I${BOOST_INCLUDE_DIR} ${include_dir} "-std=c++0x" FILE ${ARGN})
+endmacro()
+
+###############################################################################
+macro(hpx_check_for_cxx11_std_function variable)
+  hpx_get_include_directory(include_dir)
+
+  add_hpx_config_test("cxx11_std_function" ${variable} LANGUAGE CXX
+    SOURCE cmake/tests/cxx11_std_function.cpp
     FLAGS -I${BOOST_INCLUDE_DIR} ${include_dir} "-std=c++0x" FILE ${ARGN})
 endmacro()
 

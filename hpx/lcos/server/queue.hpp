@@ -162,7 +162,7 @@ namespace hpx { namespace lcos { namespace server
         void set_result (RemoteType const& result)
         {
             // push back the new value onto the queue
-            HPX_UNIQUE_PTR<queue_value_entry> node(
+            HPX_STD_UNIQUE_PTR<queue_value_entry> node(
                 new queue_value_entry(get_result<ValueType, RemoteType>::call(result)));
 
             typename mutex_type::scoped_lock l(this);

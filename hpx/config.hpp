@@ -247,10 +247,10 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Enable usage of std::unique_ptr instead of std::auto_ptr
-#if !defined(HPX_HAVE_CXX11_UNIQUE_PTR)
-#  define HPX_UNIQUE_PTR ::std::auto_ptr
+#if !defined(HPX_HAVE_CXX11_STD_UNIQUE_PTR)
+#  define HPX_STD_UNIQUE_PTR ::std::auto_ptr
 #else
-#  define HPX_UNIQUE_PTR ::std::unique_ptr
+#  define HPX_STD_UNIQUE_PTR ::std::unique_ptr
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -265,15 +265,18 @@
 // Use std::bind if it's available and movable
 #if !defined(HPX_HAVE_CXX11_STD_BIND)
 #  if defined(HPX_USE_PHOENIX_BIND)
-#    define HPX_STD_BIND        ::boost::phoenix::bind
-#    define HPX_STD_PROTECT(f)  ::boost::phoenix::lambda[f]
+#    define HPX_STD_PLACEHOLDERS    ::boost::phoenix::placeholders 
+#    define HPX_STD_BIND            ::boost::phoenix::bind
+#    define HPX_STD_PROTECT(f)      ::boost::phoenix::lambda[f]
 #  else
-#    define HPX_STD_BIND        ::boost::bind
-#    define HPX_STD_PROTECT(f)  ::hpx::util::protect(f)
+#    define HPX_STD_PLACEHOLDERS
+#    define HPX_STD_BIND            ::boost::bind
+#    define HPX_STD_PROTECT(f)      ::hpx::util::protect(f)
 #  endif
 #else
-#  define HPX_STD_BIND          ::std::bind
-#  define HPX_STD_PROTECT(f)    ::hpx::util::protect(f)
+#  define HPX_STD_PLACEHOLDERS      ::std::placeholders
+#  define HPX_STD_BIND              ::std::bind
+#  define HPX_STD_PROTECT(f)        ::hpx::util::protect(f)
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

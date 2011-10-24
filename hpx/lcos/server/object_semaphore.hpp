@@ -140,7 +140,7 @@ struct object_semaphore
     void signal(ValueType const& val, boost::uint64_t count)
     { // {{{
         // push back the new value onto the queue
-        HPX_UNIQUE_PTR<queue_value_entry> node
+        HPX_STD_UNIQUE_PTR<queue_value_entry> node
             (new queue_value_entry(val, count));
 
         mutex_type::scoped_lock l(mtx_);

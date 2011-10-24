@@ -367,12 +367,12 @@ if(MSVC)
     set(HPX_CXX11_LAMBDAS)
     add_definitions(-DHPX_CXX11_HAVE_LAMBDAS)
 
-    set(HPX_CXX11_UNIQUE_PTR)
-    add_definitions(-DHPX_CXX11_HAVE_UNIQUE_PTR)
-    add_definitions(-DBOOST_LOCKFREE_HAVE_CXX11_UNIQUE_PTR)
-
     set(HPX_CXX11_AUTO)
     add_definitions(-DHPX_CXX11_HAVE_AUTO)
+
+    set(HPX_CXX11_UNIQUE_PTR)
+    add_definitions(-DHPX_CXX11_HAVE_STD_UNIQUE_PTR)
+    add_definitions(-DBOOST_LOCKFREE_HAVE_CXX11_UNIQUE_PTR)
   endif()
 
   ##############################################################################
@@ -483,13 +483,20 @@ else()
     hpx_check_for_cxx11_lambdas(HPX_CXX11_LAMBDAS
       DEFINITIONS HPX_HAVE_CXX11_LAMBDAS)
 
-    hpx_check_for_cxx11_unique_ptr(HPX_CXX11_UNIQUE_PTR
-      DEFINITIONS HPX_HAVE_CXX11_UNIQUE_PTR
-                  BOOST_LOCKFREE_HAVE_CXX11_UNIQUE_PTR)
-
     hpx_check_for_cxx11_auto(HPX_CXX11_AUTO DEFINITIONS HPX_HAVE_CXX11_AUTO)
 
-    hpx_check_for_cxx11_tuple(HPX_CXX11_TUPLE DEFINITIONS HPX_HAVE_CXX11_TUPLE)
+    hpx_check_for_cxx11_std_unique_ptr(HPX_CXX11_STD_UNIQUE_PTR
+      DEFINITIONS HPX_HAVE_CXX11_STD_UNIQUE_PTR
+                  BOOST_LOCKFREE_HAVE_CXX11_STD_UNIQUE_PTR)
+
+    hpx_check_for_cxx11_std_tuple(HPX_CXX11_STD_TUPLE
+      DEFINITIONS HPX_HAVE_CXX11_STD_TUPLE)
+
+    hpx_check_for_cxx11_std_bind(HPX_CXX11_STD_BIND
+      DEFINITIONS HPX_HAVE_CXX11_STD_BIND)
+
+    hpx_check_for_cxx11_std_function(HPX_CXX11_STD_FUNCTION
+      DEFINITIONS HPX_HAVE_CXX11_STD_FUNCTION)
   endif()
 
   ##############################################################################
