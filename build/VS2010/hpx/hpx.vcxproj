@@ -207,6 +207,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\hpx\config.hpp" />
+    <ClInclude Include="..\..\..\hpx\config\bind.hpp" />
+    <ClInclude Include="..\..\..\hpx\config\branch_hints.hpp" />
+    <ClInclude Include="..\..\..\hpx\config\function.hpp" />
+    <ClInclude Include="..\..\..\hpx\config\manual_profiling.hpp" />
+    <ClInclude Include="..\..\..\hpx\config\tuple.hpp" />
     <ClInclude Include="..\..\..\hpx\exception.hpp" />
     <ClInclude Include="..\..\..\hpx\exception_list.hpp" />
     <ClInclude Include="..\..\..\hpx\hpx.hpp" />

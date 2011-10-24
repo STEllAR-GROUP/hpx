@@ -111,9 +111,6 @@
     <Filter Include="Header Files\Runtime\Threads\Detail">
       <UniqueIdentifier>{5ad0b7af-2e50-473a-8e1f-4314cc4a2a87}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Include\Config">
-      <UniqueIdentifier>{2bd75355-9018-4bac-90d2-39acc245d14c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Runtime\Components">
       <UniqueIdentifier>{5fcbae02-6b64-4509-ab64-5c002b032b5e}</UniqueIdentifier>
     </Filter>
@@ -161,6 +158,9 @@
     </Filter>
     <Filter Include="Header Files\Runtime\Parcelset\Policies">
       <UniqueIdentifier>{f46e2b76-7119-467e-ab11-37fd0ba3b36b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Config">
+      <UniqueIdentifier>{2bd75355-9018-4bac-90d2-39acc245d14c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -386,16 +386,16 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\config\defaults.hpp">
-      <Filter>Header Files\Include\Config</Filter>
+      <Filter>Header Files\Config</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\config\export_definitions.hpp">
-      <Filter>Header Files\Include\Config</Filter>
+      <Filter>Header Files\Config</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\config\warnings_prefix.hpp">
-      <Filter>Header Files\Include\Config</Filter>
+      <Filter>Header Files\Config</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\config\warnings_suffix.hpp">
-      <Filter>Header Files\Include\Config</Filter>
+      <Filter>Header Files\Config</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\c\types.h">
       <Filter>Header Files\C</Filter>
@@ -990,6 +990,21 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\lcos\local_mutex.hpp">
       <Filter>Header Files\LCOs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\config\manual_profiling.hpp">
+      <Filter>Header Files\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\config\branch_hints.hpp">
+      <Filter>Header Files\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\config\function.hpp">
+      <Filter>Header Files\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\config\bind.hpp">
+      <Filter>Header Files\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\config\tuple.hpp">
+      <Filter>Header Files\Config</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
