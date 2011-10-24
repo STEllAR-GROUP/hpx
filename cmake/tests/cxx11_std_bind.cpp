@@ -13,6 +13,11 @@ struct functor
     {
         return i + j;
     }
+
+    int operator()(int i, int j, int k) const
+    {
+        return i + j + k;
+    }
 };
 
 int free_function(int i, int j)
@@ -25,7 +30,10 @@ int main()
     using std::placeholders::_1;
     using std::placeholders::_2;
 
-    return (std::bind(functor(), _1, 9)(8) == 17)
-        && (std::bind(&free_function, 5, _2)(12, 8) == 17);
+    functor f;
+
+    return !(   (std::bind(&functor::operator(), &f, _1, _2)(16, 1) == 17) 
+             && (std::bind(f, _1, 9)(8) == 17)
+             && (std::bind(&free_function, 5, _2)(12, 8) == 17));
 }
 

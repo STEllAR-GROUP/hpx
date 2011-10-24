@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <boost/bind.hpp>
+
 #include <functional>
 
 struct functor
@@ -12,6 +14,11 @@ struct functor
     int operator()(int i, int j) const
     {
         return i + j;
+    }
+
+    int operator()(int i, int j, int k) const
+    {
+        return i + j + k;
     }
 };
 
@@ -22,8 +29,15 @@ int free_function(int i, int j)
 
 int main()
 { 
-    std::function<int(int, int)> f0(functor()), f1(free_function);
+    functor f;
 
-    return (f0() == 17) && (f1() == 17);
+    std::function<int(int, int)>
+        f0(f)
+      , f1(free_function)
+      , f2(boost::bind(&functor::operator(), &f, _1, _2));
+
+    return !(   (f0(9, 8) == 17)
+             && (f1(15, 2) == 17)
+             && (f2(10, 7) == 17));
 }
 
