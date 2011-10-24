@@ -27,7 +27,7 @@ namespace hpx { namespace actions
             lcos::template base_lco_with_value<Arg0>::set_result_action
         action_type;
 
-        LLCO_(info) << "promise::set(" << gid_ << ")";
+        LLCO_(info) << "promise::set_with_value(" << gid_ << ")";
 
         applier::apply<action_type>(gid_, arg0);
         return arg0;

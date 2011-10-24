@@ -50,6 +50,11 @@ namespace hpx { namespace actions
         typedef HPX_STD_FUNCTION<void(naming::id_type&)> enum_gid_handler_type;
         void enumerate_argument_gids(enum_gid_handler_type);
 
+        naming::gid_type const& get_raw_gid()
+        {
+            return gid_.get_gid();
+        }
+
     private:
         // serialization support
         friend class boost::serialization::access;

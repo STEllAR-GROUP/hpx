@@ -31,6 +31,7 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     void continuation::trigger_error(boost::exception_ptr const& e)
     {
+        LLCO_(info) << "promise::set_error(" << gid_ << ")";
         hpx::applier::apply<lcos::base_lco::set_error_action>(gid_, e);
     }
 
