@@ -148,7 +148,7 @@ struct thread_deque
 
             // create the new thread
             thread_state_enum state = boost::get<1>(*task);
-            HPX_UNIQUE_PTR<threads::thread> thrd(
+            HPX_STD_UNIQUE_PTR<threads::thread> thrd(
                 new (memory_pool_) threads::thread(
                     boost::get<0>(*task), memory_pool_, state));
 
@@ -276,7 +276,7 @@ struct thread_deque
         if (run_now) {
             mutex_type::scoped_lock lk(mtx_);
 
-            HPX_UNIQUE_PTR<threads::thread> thrd(
+            HPX_STD_UNIQUE_PTR<threads::thread> thrd(
                 new (memory_pool_) threads::thread(
                     data, memory_pool_, initial_state));
 

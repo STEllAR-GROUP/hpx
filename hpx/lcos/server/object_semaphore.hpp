@@ -154,7 +154,7 @@ struct object_semaphore
     void get(naming::id_type const& lco)
     { // {{{
         // push the LCO's GID onto the queue
-        HPX_UNIQUE_PTR<queue_thread_entry> node(new queue_thread_entry(lco));
+        HPX_STD_UNIQUE_PTR<queue_thread_entry> node(new queue_thread_entry(lco));
 
         mutex_type::scoped_lock l(mtx_);
 

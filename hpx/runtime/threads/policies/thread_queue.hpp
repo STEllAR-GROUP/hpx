@@ -310,7 +310,7 @@ namespace hpx { namespace threads { namespace policies
             if (run_now) {
                 mutex_type::scoped_lock lk(mtx_);
 
-                HPX_UNIQUE_PTR<threads::thread> thrd (
+                HPX_STD_UNIQUE_PTR<threads::thread> thrd (
                     new (memory_pool_) threads::thread(
                         boost::move(data), memory_pool_, initial_state));
 
