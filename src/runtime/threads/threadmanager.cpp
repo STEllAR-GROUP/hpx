@@ -1091,6 +1091,11 @@ namespace hpx { namespace threads
                     }
                 }
                 else if (active == state_val) {
+                    LTM_(fatal) << "tfunc(" << num_thread << "): "
+                        "thread(" << thrd->get_thread_id() << "), "
+                        "description(" << thrd->get_description() << "), "
+                        "rescheduling";
+
                     // re-schedule thread, if it is still marked as active
                     // this might happen, if some thread has been added to the
                     // scheduler queue already but the state has not been reset
