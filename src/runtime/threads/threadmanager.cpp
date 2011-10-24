@@ -308,6 +308,7 @@ namespace hpx { namespace threads
         }
 
         // just retry, set_state will create new thread if target is still active
+        // REVIEW: report errors, at least?
         error_code ec;      // do not throw
         set_state(id, newstate, newstate_ex, priority, ec);
         return thread_state(terminated);
@@ -382,8 +383,13 @@ namespace hpx { namespace threads
             // we do not allow explicit resetting of a state to suspended
             // without the thread being executed.
             hpx::util::osstream strm;
-            strm << "invalid new state: " << get_thread_state_name(new_state)
-                 << ", can't demote a pending thread.";
+            strm << "set_state: invalid new state, can't demote a pending thread, "
+                 << ", can't demote a pending thread, thread(" << id << "), description("
+                 << thrd->get_description() << "), new state("
+                 << get_thread_state_name(new_state) << ")";
+
+            LTM_(fatal) << hpx::util::osstream_get_string(strm);
+
             HPX_THROWS_IF(ec, bad_parameter, "threadmanager_impl::set_state",
                 hpx::util::osstream_get_string(strm));
             return thread_state(unknown);
