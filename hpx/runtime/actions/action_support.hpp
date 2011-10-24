@@ -386,7 +386,9 @@ namespace hpx { namespace actions
                 try {
                     LTM_(debug) << "Executing action("
                                 << detail::get_action_name<derived_type>()
-                                << ") with continuation.";
+                                << ") with continuation("
+                                << cont->get_raw_gid()
+                                << ")";
                     func();
                     cont->trigger();
                 }
@@ -443,7 +445,9 @@ namespace hpx { namespace actions
                 try {
                     LTM_(debug) << "Executing action("
                                 << detail::get_action_name<derived_type>()
-                                << ") with continuation.";
+                                << ") with continuation("
+                                << cont->get_raw_gid()
+                                << ")";
                     cont->trigger(func());
                 }
                 catch (hpx::exception const&) {
