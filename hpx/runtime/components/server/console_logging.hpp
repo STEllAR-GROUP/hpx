@@ -78,7 +78,7 @@ namespace hpx { namespace components { namespace server
                 console_logging(msgs);
             }
             catch (hpx::exception const& /*e*/) {
-                /***/;      // no logging!
+                /**/;      // no logging!
             }
             return util::unused;
         }
@@ -92,7 +92,7 @@ namespace hpx { namespace components { namespace server
                 console_logging(msgs);
             }
             catch (hpx::exception const& /*e*/) {
-                /***/;      // no logging!
+                /**/;      // no logging!
             }
             return util::unused;
         }
