@@ -4,9 +4,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/full_empty_store.hpp>
 #include <hpx/include/performance_counters.hpp>
 
+#include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
 namespace hpx { namespace util { namespace detail
@@ -14,27 +16,27 @@ namespace hpx { namespace util { namespace detail
     // the counter data instance
     counter_data counter_data_;
 
-    boost::uint64_t get_constructed_count()
+    boost::int64_t get_constructed_count()
     {
         return counter_data_.constructed_;
     }
 
-    boost::uint64_t get_destructed_count()
+    boost::int64_t get_destructed_count()
     {
         return counter_data_.destructed_;
     }
 
-    boost::uint64_t get_read_enqueued_count()
+    boost::int64_t get_read_enqueued_count()
     {
         return counter_data_.read_enqueued_;
     }
 
-    boost::uint64_t get_read_dequeued_count()
+    boost::int64_t get_read_dequeued_count()
     {
         return counter_data_.read_dequeued_;
     }
 
-    boost::uint64_t get_set_full_count()
+    boost::int64_t get_set_full_count()
     {
         return counter_data_.set_full_;
     }

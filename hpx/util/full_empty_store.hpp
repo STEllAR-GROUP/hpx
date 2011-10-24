@@ -40,11 +40,11 @@ namespace hpx { namespace util { namespace detail
             read_enqueued_(0), read_dequeued_(0), set_full_(0)
         {}
 
-        boost::uint64_t constructed_;
-        boost::uint64_t destructed_;
-        boost::uint64_t read_enqueued_;
-        boost::uint64_t read_dequeued_;
-        boost::uint64_t set_full_;
+        boost::int64_t constructed_;
+        boost::int64_t destructed_;
+        boost::int64_t read_enqueued_;
+        boost::int64_t read_dequeued_;
+        boost::int64_t set_full_;
     };
     extern HPX_EXPORT counter_data counter_data_;
 
