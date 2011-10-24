@@ -18,7 +18,7 @@
 #  endif
 #else
 #  include <functional>
-#  include <boost/bind/protect.hpp>
+#  include <hpx/util/protect.hpp>
 #endif
 
 #endif
