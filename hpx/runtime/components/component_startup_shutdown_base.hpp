@@ -34,7 +34,7 @@ namespace hpx { namespace components
         ///
         /// \return Returns \a true if the parameter \a startup has been
         ///         successfully initialized with the startup function.
-        virtual bool get_startup_function(boost::function<void()>& startup) = 0;
+        virtual bool get_startup_function(HPX_STD_FUNCTION<void()>& startup) = 0;
 
         /// \brief Return any startup function for this component
         ///
@@ -45,7 +45,7 @@ namespace hpx { namespace components
         ///
         /// \return Returns \a true if the parameter \a shutdown has been
         ///         successfully initialized with the shutdown function.
-        virtual bool get_shutdown_function(boost::function<void()>& shutdown) = 0;
+        virtual bool get_shutdown_function(HPX_STD_FUNCTION<void()>& shutdown) = 0;
     };
 }}
 

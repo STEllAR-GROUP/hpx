@@ -9,12 +9,10 @@
 #if !defined(HPX_E42C5C50_811E_454F_887A_DE7175E72EE9)
 #define HPX_E42C5C50_811E_454F_887A_DE7175E72EE9
 
-#include <boost/function.hpp>
+#include <hpx/hpx_fwd.hpp>
+
 #include <boost/signals2.hpp>
 #include <boost/cstdint.hpp>
-
-#include <hpx/config.hpp>
-#include <hpx/hpx_fwd.hpp>
 
 namespace hpx { namespace parcelset
 {
@@ -23,7 +21,7 @@ struct parcelhandler_queue_base
 {
     typedef boost::signals2::scoped_connection connection_type;
 
-    typedef boost::function<void(parcelhandler&, naming::address const&)>
+    typedef HPX_STD_FUNCTION<void(parcelhandler&, naming::address const&)>
         callback_type;
 
     virtual ~parcelhandler_queue_base() {}

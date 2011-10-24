@@ -105,8 +105,8 @@ namespace hpx
     int init(int (*f)(boost::program_options::variables_map& vm),
         boost::program_options::options_description& desc_cmdline,
         int argc, char* argv[], std::vector<std::string> cfg,
-        boost::function<void()> startup = boost::function<void()>(),
-        boost::function<void()> shutdown = boost::function<void()>(),
+        HPX_STD_FUNCTION<void()> startup = HPX_STD_FUNCTION<void()>(),
+        HPX_STD_FUNCTION<void()> shutdown = HPX_STD_FUNCTION<void()>(),
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -114,8 +114,8 @@ namespace hpx
     init(int (*f)(boost::program_options::variables_map& vm),
         boost::program_options::options_description& desc_cmdline,
         int argc, char* argv[],
-        boost::function<void()> startup = boost::function<void()>(),
-        boost::function<void()> shutdown = boost::function<void()>(),
+        HPX_STD_FUNCTION<void()> startup = HPX_STD_FUNCTION<void()>(),
+        HPX_STD_FUNCTION<void()> shutdown = HPX_STD_FUNCTION<void()>(),
         hpx::runtime_mode mode = hpx::runtime_mode_default)
     {
         std::vector<std::string> cfg;
@@ -195,8 +195,8 @@ namespace hpx
     inline int
     init(boost::program_options::options_description& desc_cmdline,
         int argc, char* argv[],
-        boost::function<void()> startup = boost::function<void()>(),
-        boost::function<void()> shutdown = boost::function<void()>(),
+        HPX_STD_FUNCTION<void()> startup = HPX_STD_FUNCTION<void()>(),
+        HPX_STD_FUNCTION<void()> shutdown = HPX_STD_FUNCTION<void()>(),
         hpx::runtime_mode mode = hpx::runtime_mode_default)
     {
         return init(::hpx_main, desc_cmdline, argc, argv, startup, shutdown, mode);
@@ -206,8 +206,8 @@ namespace hpx
     inline int
     init(boost::program_options::options_description& desc_cmdline,
         int argc, char* argv[], std::vector<std::string> const& cfg,
-        boost::function<void()> startup = boost::function<void()>(),
-        boost::function<void()> shutdown = boost::function<void()>(),
+        HPX_STD_FUNCTION<void()> startup = HPX_STD_FUNCTION<void()>(),
+        HPX_STD_FUNCTION<void()> shutdown = HPX_STD_FUNCTION<void()>(),
         hpx::runtime_mode mode = hpx::runtime_mode_default)
     {
         return init(::hpx_main, desc_cmdline, argc, argv, cfg, startup, shutdown, mode);
@@ -255,7 +255,7 @@ namespace hpx
     init(boost::program_options::options_description& desc_cmdline, int argc,
         char* argv[], hpx::runtime_mode mode)
     {
-        boost::function<void()> const empty;
+        HPX_STD_FUNCTION<void()> const empty;
         return init(::hpx_main, desc_cmdline, argc, argv, empty, empty, mode);
     }
 
@@ -325,7 +325,7 @@ namespace hpx
             return init(desc_commandline, 1, dummy_argv);
         }
 
-        boost::function<void()> const empty;
+        HPX_STD_FUNCTION<void()> const empty;
         return init(f, desc_commandline, argc, argv, empty, empty);
     }
 

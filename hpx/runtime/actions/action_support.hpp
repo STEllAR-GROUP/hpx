@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
+//  Copyright (c)      2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,11 +17,8 @@
 #include <boost/fusion/include/size.hpp>
 #include <boost/fusion/include/any.hpp>
 #include <boost/fusion/include/at_c.hpp>
-#include <boost/bind.hpp>
 #include <boost/ref.hpp>
-#include <boost/function.hpp>
 #include <boost/foreach.hpp>
-#include <boost/tuple/tuple.hpp>
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 #include <boost/type_traits/is_same.hpp>
@@ -29,11 +27,16 @@
 #include <boost/serialization/void_cast.hpp>
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/export.hpp>
+#include <boost/move/move.hpp>
 
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/util/serialize_sequence.hpp>
+
+#include <hpx/config/bind.hpp>
+#include <hpx/config/tuple.hpp>
+#include <hpx/config/function.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -148,7 +151,7 @@ namespace hpx { namespace actions
         /// \note This \a get_thread_function will be invoked to retrieve the
         ///       thread function for an action which has to be invoked without
         ///       continuations.
-        virtual boost::function<threads::thread_function_type>
+        virtual HPX_STD_FUNCTION<threads::thread_function_type>
             get_thread_function(naming::address::address_type lva) const = 0;
 
         /// The \a get_thread_function constructs a proper thread function for
@@ -166,7 +169,7 @@ namespace hpx { namespace actions
         /// \note This \a get_thread_function will be invoked to retrieve the
         ///       thread function for an action which has to be invoked with
         ///       continuations.
-        virtual boost::function<threads::thread_function_type>
+        virtual HPX_STD_FUNCTION<threads::thread_function_type>
             get_thread_function(continuation_type& cont,
                 naming::address::address_type lva) const = 0;
 
@@ -193,7 +196,7 @@ namespace hpx { namespace actions
             threads::thread_init_data& data) = 0;
 
         /// Enumerate all GIDs which stored as arguments
-        typedef boost::function<void(naming::id_type const&)> enum_gid_handler_type;
+        typedef HPX_STD_FUNCTION<void(naming::id_type const&)> enum_gid_handler_type;
         virtual void enumerate_argument_gids(enum_gid_handler_type) = 0;
     };
 
@@ -229,11 +232,11 @@ namespace hpx { namespace actions
         virtual result_type execute_function(
             naming::address::address_type lva) const = 0;
 
-        virtual boost::function<threads::thread_function_type>
+        virtual HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(naming::address::address_type lva,
             arguments_type const& args) const = 0;
 
-        virtual boost::function<threads::thread_function_type>
+        virtual HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
             naming::address::address_type lva,
             arguments_type const& args) const = 0;
@@ -308,7 +311,7 @@ namespace hpx { namespace actions
         typedef Arguments arguments_type;
 
         /// Enumerate all GIDs which stored as arguments
-        typedef boost::function<void(naming::id_type const&)>
+        typedef HPX_STD_FUNCTION<void(naming::id_type const&)>
             enum_gid_handler_type;
 
         // This is the action code (id) of this action. It is exposed to allow
@@ -372,44 +375,56 @@ namespace hpx { namespace actions
         /// original function (given by \a func), and afterwards triggers all
         /// continuations using the result value obtained from the execution
         /// of the original thread function.
-        template <typename Func>
-        static threads::thread_state_enum
-        continuation_thread_function_void(continuation_type cont,
-            boost::tuple<Func> func)
+        struct continuation_thread_function_void
         {
-            try {
-                LTM_(debug) << "Executing action("
-                            << detail::get_action_name<derived_type>()
-                            << ") with continuation.";
-                boost::get<0>(func)();
-                cont->trigger();
-            }
-            catch (hpx::exception const&) {
-                // make sure hpx::exceptions are propagated back to the client
-                cont->trigger_error(boost::current_exception());
-            }
-            return threads::terminated;
-        }
+            typedef threads::thread_state_enum result_type;
+
+            template <typename Func>
+            result_type operator()(continuation_type cont,
+                Func const & func) const
+            {
+                try {
+                    LTM_(debug) << "Executing action("
+                                << detail::get_action_name<derived_type>()
+                                << ") with continuation.";
+                    func();
+                    cont->trigger();
+                }
+                catch (hpx::exception const&) {
+                    // make sure hpx::exceptions are propagated back to the client
+                    cont->trigger_error(boost::current_exception());
+                }
+                return threads::terminated;
+             }
+        };
 
         /// The \a construct_continuation_thread_function is a helper function
         /// for constructing the wrapped thread function needed for
         /// continuation support
         template <typename Func>
-        static boost::function<threads::thread_function_type>
-        construct_continuation_thread_function_void(Func func, continuation_type cont)
+        static HPX_STD_FUNCTION<threads::thread_function_type>
+        construct_continuation_thread_function_void(Func const& func,
+            continuation_type cont)
         {
-            // we need to assign the address of the thread function to a
-            // variable to  help the compiler to deduce the function type
-            threads::thread_state_enum (*f)(continuation_type, boost::tuple<Func>) =
-                &action::continuation_thread_function_void;
-
             // The following bind constructs the wrapped thread function
             //    f:  is the wrapping thread function
             // cont: continuation
             // func: wrapped function object
-            //       (this is embedded into a tuple because boost::bind can't
-            //       pre-bind another bound function as an argument)
-            return boost::bind(f, cont, boost::make_tuple(func));
+            return HPX_STD_BIND(continuation_thread_function_void(), cont,
+                HPX_STD_PROTECT(func));
+        }
+
+        template <typename Func>
+        static HPX_STD_FUNCTION<threads::thread_function_type>
+        construct_continuation_thread_function_void(BOOST_RV_REF(Func) func,
+            continuation_type cont)
+        {
+            // The following bind constructs the wrapped thread function
+            //    f:  is the wrapping thread function
+            // cont: continuation
+            // func: wrapped function object
+            return HPX_STD_BIND(continuation_thread_function_void(), cont,
+                HPX_STD_PROTECT(boost::move(func)));
         }
 
         /// The \a continuation_thread_function will be registered as the thread
@@ -417,43 +432,55 @@ namespace hpx { namespace actions
         /// original function (given by \a func), and afterwards triggers all
         /// continuations using the result value obtained from the execution
         /// of the original thread function.
-        template <typename Func>
-        static threads::thread_state_enum
-        continuation_thread_function(continuation_type cont,
-            boost::tuple<Func> func)
+        struct continuation_thread_function
         {
-            try {
-                LTM_(debug) << "Executing action("
-                            << detail::get_action_name<derived_type>()
-                            << ") with continuation.";
-                cont->trigger(boost::get<0>(func)());
+            typedef threads::thread_state_enum result_type;
+
+            template <typename Func>
+            result_type operator()(continuation_type cont,
+                Func const & func) const
+            {
+                try {
+                    LTM_(debug) << "Executing action("
+                                << detail::get_action_name<derived_type>()
+                                << ") with continuation.";
+                    cont->trigger(func());
+                }
+                catch (hpx::exception const&) {
+                    // make sure hpx::exceptions are propagated back to the client
+                    cont->trigger_error(boost::current_exception());
+                }
+                return threads::terminated;
             }
-            catch (hpx::exception const&) {
-                // make sure hpx::exceptions are propagated back to the client
-                cont->trigger_error(boost::current_exception());
-            }
-            return threads::terminated;
-        }
+        };
 
         /// The \a construct_continuation_thread_function is a helper function
         /// for constructing the wrapped thread function needed for
         /// continuation support
         template <typename Func>
-        static boost::function<threads::thread_function_type>
-        construct_continuation_thread_function(Func func, continuation_type cont)
+        static HPX_STD_FUNCTION<threads::thread_function_type>
+        construct_continuation_thread_function(Func const& func,
+            continuation_type cont)
         {
-            // we need to assign the address of the thread function to a
-            // variable to  help the compiler to deduce the function type
-            threads::thread_state_enum (*f)(continuation_type, boost::tuple<Func>) =
-                &action::continuation_thread_function;
-
             // The following bind constructs the wrapped thread function
             //    f:  is the wrapping thread function
             // cont: continuation
             // func: wrapped function object
-            //       (this is embedded into a tuple because boost::bind can't
-            //       pre-bind another bound function as an argument)
-            return boost::bind(f, cont, boost::make_tuple(func));
+            return HPX_STD_BIND(continuation_thread_function(), cont,
+                HPX_STD_PROTECT(func));
+        }
+
+        template <typename Func>
+        static HPX_STD_FUNCTION<threads::thread_function_type>
+        construct_continuation_thread_function(BOOST_RV_REF(Func) func,
+            continuation_type cont)
+        {
+            // The following bind constructs the wrapped thread function
+            //    f:  is the wrapping thread function
+            // cont: continuation
+            // func: wrapped function object
+            return HPX_STD_BIND(continuation_thread_function(), cont,
+                HPX_STD_PROTECT(boost::move(func)));
         }
 
     public:

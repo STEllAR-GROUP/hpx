@@ -58,9 +58,9 @@ coroutine_type;
 typedef boost::function<std::size_t(coroutine_type::self&, const std::string& , std::size_t)> function_type;
 
 std::size_t prim_impl(coroutine_type::self& self,
-		      const std::string& str,
-		      const std::string& input,
-		      std::size_t pos) {
+              const std::string& str,
+              const std::string& input,
+              std::size_t pos) {
   if(input.substr(pos, str.length()) == str) {
      self.yield(pos + str.length());
   }
@@ -73,10 +73,10 @@ function_type prim(const std::string& str) {
 }
 
 std::size_t alt_impl(coroutine_type::self& self,
-		     const function_type& pattern1,
-		     const function_type& pattern2,
-		     const std::string& input,
-		     const std::size_t pos) {
+             const function_type& pattern1,
+             const function_type& pattern2,
+             const std::string& input,
+             const std::size_t pos) {
   pattern1(self, input, pos);
   pattern2(self, input, pos);
   return std::string::npos;
@@ -84,15 +84,15 @@ std::size_t alt_impl(coroutine_type::self& self,
 
 // returns a function object that matches one of two patterns.
 function_type alt(const function_type& pattern1,
-		  const function_type& pattern2) {
+          const function_type& pattern2) {
   return boost::bind(alt_impl, _1, pattern1, pattern2, _2, _3);
 }
 
 std::size_t seq_impl(coroutine_type::self& self,
-		     const function_type& pattern1,
-		     const function_type& pattern2,
-		     const std::string& input,
-		     const std::size_t pos) {
+             const function_type& pattern1,
+             const function_type& pattern2,
+             const std::string& input,
+             const std::size_t pos) {
   coroutine_type coro (pattern1);
   while(coro) {
     std::size_t val = coro(input, pos);
@@ -105,7 +105,7 @@ std::size_t seq_impl(coroutine_type::self& self,
 
 // retuns a function object that matches the conjuction of two patterns.
 function_type seq(const function_type& pattern1,
-		  const function_type& pattern2) {
+          const function_type& pattern2) {
   return bind(seq_impl, _1, pattern1, pattern2, _2, _3);
 }
 

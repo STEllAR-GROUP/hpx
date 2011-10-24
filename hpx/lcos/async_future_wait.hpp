@@ -11,7 +11,6 @@
 #include <vector>
 
 #include <boost/dynamic_bitset.hpp>
-#include <boost/function.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos

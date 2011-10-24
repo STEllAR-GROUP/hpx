@@ -95,7 +95,14 @@
      make copyable.
 */
 
-#if defined(__linux) || defined(linux) || defined(__linux__)
+#if BOOST_COROUTINE_USE_GENERIC_CONTEXT != 0
+
+#include <boost/coroutine/detail/context_generic_context.hpp>
+namespace boost { namespace coroutines { namespace detail {
+  typedef generic_context::context_impl default_context_impl;
+}}}
+
+#elif defined(__linux) || defined(linux) || defined(__linux__)
 
 #include <boost/coroutine/detail/context_linux_x86.hpp>
 namespace boost { namespace coroutines { namespace detail {
@@ -120,6 +127,6 @@ namespace boost { namespace coroutines { namespace detail {
 
 #error No default_context_impl available for this system
 
-#endif
+#endif // BOOST_COROUTINE_USE_GENERIC_CONTEXT
 
 #endif

@@ -26,7 +26,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE(
 namespace hpx { namespace performance_counters { namespace server
 {
     raw_counter::raw_counter(counter_info const& info,
-            boost::function<boost::int64_t()> f)
+            HPX_STD_FUNCTION<boost::int64_t()> f)
       : base_type_holder(info), f_(f)
     {
         if (info.type_ != counter_raw) {

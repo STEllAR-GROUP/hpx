@@ -209,7 +209,7 @@ namespace hpx { namespace util
 
     std::string pbs_environment::host_name() const
     {
-        if (!transform_.empty())
+        if (!!transform_)
             return transform_(boost::asio::ip::host_name());
         return boost::asio::ip::host_name();
     }

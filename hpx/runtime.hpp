@@ -74,7 +74,7 @@ namespace hpx
         }
 
         /// \brief Manage list of functions to call on exit
-        void on_exit(boost::function<void()> f)
+        void on_exit(HPX_STD_FUNCTION<void()> f)
         {
             boost::mutex::scoped_lock l(on_exit_functions_mtx_);
             on_exit_functions_.push_back(f);
@@ -91,7 +91,7 @@ namespace hpx
         {
             stopped_ = true;
 
-            typedef boost::function<void()> value_type;
+            typedef HPX_STD_FUNCTION<void()> value_type;
 
             boost::mutex::scoped_lock l(on_exit_functions_mtx_);
             BOOST_FOREACH(value_type f, on_exit_functions_)
@@ -163,11 +163,11 @@ namespace hpx
 
         virtual util::unique_ids& get_id_pool() = 0;
 
-        virtual void add_startup_function(boost::function<void()> const& f) = 0;
+        virtual void add_startup_function(HPX_STD_FUNCTION<void()> const& f) = 0;
 
-        virtual void add_pre_shutdown_function(boost::function<void()> const& f) = 0;
+        virtual void add_pre_shutdown_function(HPX_STD_FUNCTION<void()> const& f) = 0;
 
-        virtual void add_shutdown_function(boost::function<void()> const& f) = 0;
+        virtual void add_shutdown_function(HPX_STD_FUNCTION<void()> const& f) = 0;
 
     protected:
         void init_tss();
@@ -175,7 +175,7 @@ namespace hpx
 
     protected:
         // list of functions to call on exit
-        typedef std::vector<boost::function<void()> > on_exit_type;
+        typedef std::vector<HPX_STD_FUNCTION<void()> > on_exit_type;
         on_exit_type on_exit_functions_;
         boost::mutex on_exit_functions_mtx_;
 
@@ -209,7 +209,7 @@ namespace hpx
 
         //
         threads::thread_state run_helper(
-            boost::function<runtime::hpx_main_function_type> func, int& result);
+            HPX_STD_FUNCTION<runtime::hpx_main_function_type> func, int& result);
 
     public:
         typedef SchedulingPolicy scheduling_policy_type;
@@ -253,8 +253,8 @@ namespace hpx
         ///                   return the value as returned as the result of the
         ///                   invocation of the function object given by the
         ///                   parameter \p func. Otherwise it will return zero.
-        int start(boost::function<hpx_main_function_type> func =
-                boost::function<hpx_main_function_type>(),
+        int start(HPX_STD_FUNCTION<hpx_main_function_type> func =
+                HPX_STD_FUNCTION<hpx_main_function_type>(),
             std::size_t num_threads = 1, std::size_t num_localities = 1,
             bool blocking = false);
 
@@ -348,8 +348,8 @@ namespace hpx
         /// \returns          This function will return the value as returned
         ///                   as the result of the invocation of the function
         ///                   object given by the parameter \p func.
-        int run(boost::function<hpx_main_function_type> func =
-                    boost::function<hpx_main_function_type>(),
+        int run(HPX_STD_FUNCTION<hpx_main_function_type> func =
+                    HPX_STD_FUNCTION<hpx_main_function_type>(),
                 std::size_t num_threads = 1, std::size_t num_localities = 1);
 
         /// \brief Run the HPX runtime system, initially use the given number
@@ -466,7 +466,7 @@ namespace hpx
         ///             thread before hpx_main is executed. This is very useful
         ///             to setup the runtime environment of the application
         ///             (install performance counters, etc.)
-        void add_startup_function(boost::function<void()> const& f);
+        void add_startup_function(HPX_STD_FUNCTION<void()> const& f);
 
         /// Add a function to be executed inside a HPX thread during
         /// hpx::finalize, but guaranteed before any of teh shutdown functions
@@ -480,7 +480,7 @@ namespace hpx
         /// \note       The difference to a shutdown function is that all
         ///             pre-shutdown functions will be (system-wide) executed
         ///             before any shutdown function.
-        void add_pre_shutdown_function(boost::function<void()> const& f);
+        void add_pre_shutdown_function(HPX_STD_FUNCTION<void()> const& f);
 
         /// Add a function to be executed inside a HPX thread during hpx::finalize
         ///
@@ -488,7 +488,7 @@ namespace hpx
         ///             thread while hpx::finalize is executed. This is very
         ///             useful to tear down the runtime environment of the
         ///             application (uninstall performance counters, etc.)
-        void add_shutdown_function(boost::function<void()> const& f);
+        void add_shutdown_function(HPX_STD_FUNCTION<void()> const& f);
 
     private:
         void init_tss();

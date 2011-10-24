@@ -21,6 +21,7 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/lockfree/fifo.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
+#include <boost/move/move.hpp>
 
 #ifdef HPX_ACCEL_QUEUING
 #   include <hpx/runtime/threads/policies/accel_fifo.hpp>
@@ -114,8 +115,8 @@ namespace hpx { namespace threads { namespace policies
 
         // this is the type of the queue of new tasks not yet converted to
         // threads
-        typedef boost::tuple<thread_init_data, thread_state_enum> task_description;
-        typedef boost::lockfree::fifo<task_description const*> task_items_type;
+        typedef HPX_STD_TUPLE<thread_init_data, thread_state_enum> task_description;
+        typedef boost::lockfree::fifo<task_description*> task_items_type;
 
         typedef boost::lockfree::fifo<thread_id_type> thread_id_queue_type;
 
@@ -129,7 +130,7 @@ namespace hpx { namespace threads { namespace policies
                 return 0;
 
             boost::int64_t added = 0;
-            task_description const* task = 0;
+            task_description* task = 0;
             while (add_count-- && addfrom->new_tasks_.dequeue(&task))
             {
                 --addfrom->new_tasks_count_;
@@ -138,10 +139,10 @@ namespace hpx { namespace threads { namespace policies
                 util::block_profiler_wrapper<add_new_tag> bp(add_new_logger_);
 
                 // create the new thread
-                thread_state_enum state = boost::get<1>(*task);
+                thread_state_enum state = HPX_STD_GET(1, *task);
                 HPX_UNIQUE_PTR<threads::thread> thrd (
                     new (memory_pool_) threads::thread(
-                        boost::get<0>(*task), memory_pool_, state));
+                        boost::move(HPX_STD_GET(0, *task)), memory_pool_, state));
 
                 delete task;
 
@@ -311,7 +312,7 @@ namespace hpx { namespace threads { namespace policies
 
                 HPX_UNIQUE_PTR<threads::thread> thrd (
                     new (memory_pool_) threads::thread(
-                        data, memory_pool_, initial_state));
+                        boost::move(data), memory_pool_, initial_state));
 
                 // add a new entry in the map for this thread
                 thread_id_type id = thrd->get_thread_id();
@@ -342,7 +343,8 @@ namespace hpx { namespace threads { namespace policies
             // do not execute the work, but register a task description for
             // later thread creation
             ++new_tasks_count_;
-            new_tasks_.enqueue(new task_description(data, initial_state));
+            new_tasks_.enqueue(
+                new task_description(boost::move(data), initial_state));
 
             if (&ec != &throws)
                 ec = make_success_code();

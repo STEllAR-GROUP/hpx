@@ -595,7 +595,7 @@ namespace hpx { namespace components { namespace server
 
     void runtime_support::call_startup_functions()
     {
-        BOOST_FOREACH(boost::function<void()> const& f, startup_functions_)
+        BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, startup_functions_)
         {
             f();
         }
@@ -604,13 +604,13 @@ namespace hpx { namespace components { namespace server
     void runtime_support::call_shutdown_functions(bool pre_shutdown)
     {
         if (pre_shutdown) {
-            BOOST_FOREACH(boost::function<void()> const& f, pre_shutdown_functions_)
+            BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, pre_shutdown_functions_)
             {
                 f();
             }
         }
         else {
-            BOOST_FOREACH(boost::function<void()> const& f, shutdown_functions_)
+            BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, shutdown_functions_)
             {
                 f();
             }

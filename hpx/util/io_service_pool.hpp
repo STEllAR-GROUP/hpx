@@ -34,14 +34,14 @@ namespace hpx { namespace util
         ///                 [in]
         explicit io_service_pool(std::size_t pool_size = 2,
             char const* pool_name = "",
-            boost::function<void()> on_start_thread = boost::function<void()>(),
-            boost::function<void()> on_stop_thread = boost::function<void()>());
+            HPX_STD_FUNCTION<void()> on_start_thread = HPX_STD_FUNCTION<void()>(),
+            HPX_STD_FUNCTION<void()> on_stop_thread = HPX_STD_FUNCTION<void()>());
 
         /// \brief Construct the io_service pool.
         /// \param start_thread
         ///                 [in]
-        explicit io_service_pool(boost::function<void()> on_start_thread,
-            boost::function<void()> on_stop_thread = boost::function<void()>(),
+        explicit io_service_pool(HPX_STD_FUNCTION<void()> on_start_thread,
+            HPX_STD_FUNCTION<void()> on_stop_thread = HPX_STD_FUNCTION<void()>(),
             char const* pool_name = "");
 
         /// \brief Run all io_service objects in the pool. If join_threads is true
@@ -88,8 +88,8 @@ namespace hpx { namespace util
         std::size_t pool_size_;
 
         /// call this for each thread start/stop
-        boost::function<void()> on_start_thread_;
-        boost::function<void()> on_stop_thread_;
+        HPX_STD_FUNCTION<void()> on_start_thread_;
+        HPX_STD_FUNCTION<void()> on_stop_thread_;
 
         char const* pool_name_;
     };

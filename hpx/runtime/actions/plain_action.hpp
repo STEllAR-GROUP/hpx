@@ -12,6 +12,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
+#include <hpx/config/bind.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
@@ -22,7 +23,6 @@
 
 #include <boost/version.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/bind.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repeat.hpp>
 
@@ -118,7 +118,7 @@ namespace hpx { namespace actions
         /// a proper thread function for a \a thread without having to
         /// instantiate the \a plain_base_result_action0 type. This is used by
         /// the \a applier in case no continuation has been supplied.
-        static boost::function<threads::thread_function_type>
+        static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(naming::address::address_type lva)
         {
             // we need to assign the address of the thread function to a
@@ -132,11 +132,12 @@ namespace hpx { namespace actions
         /// a proper thread function for a \a thread without having to
         /// instantiate the \a base_result_action0 type. This is used by the \a
         /// applier in case a continuation has been supplied
-        static boost::function<threads::thread_function_type>
+        static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva)
         {
-            return base_type::construct_continuation_thread_function(F, cont);
+            return base_type::construct_continuation_thread_function(
+                HPX_STD_BIND(F), cont);
         }
 
         /// serialization support
@@ -160,7 +161,7 @@ namespace hpx { namespace actions
     private:
         /// This \a get_thread_function will be invoked to retrieve the thread
         /// function for an action which has to be invoked without continuations.
-        boost::function<threads::thread_function_type>
+        HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(naming::address::address_type lva) const
         {
             return construct_thread_function(lva);
@@ -168,7 +169,7 @@ namespace hpx { namespace actions
 
         /// This \a get_thread_function will be invoked to retrieve the thread
         /// function for an action which has to be invoked with continuations.
-        boost::function<threads::thread_function_type>
+        HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
             naming::address::address_type lva) const
         {
@@ -177,7 +178,7 @@ namespace hpx { namespace actions
 
         /// This \a get_thread_function will be invoked to retrieve the thread
         /// function for an action which has to be invoked without continuations.
-        boost::function<threads::thread_function_type>
+        HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(naming::address::address_type lva,
             arguments_type const& arg) const
         {
@@ -186,7 +187,7 @@ namespace hpx { namespace actions
 
         /// This \a get_thread_function will be invoked to retrieve the thread
         /// function for an action which has to be invoked with continuations.
-        boost::function<threads::thread_function_type>
+        HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
             naming::address::address_type lva, arguments_type const& arg) const
         {
@@ -473,7 +474,7 @@ namespace hpx { namespace actions
         /// a proper thread function for a \a thread without having to
         /// instantiate the base_action0 type. This is used by the \a applier in
         /// case no continuation has been supplied.
-        static boost::function<threads::thread_function_type>
+        static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(naming::address::address_type lva)
         {
             // we need to assign the address of the thread function to a
@@ -487,11 +488,12 @@ namespace hpx { namespace actions
         /// a proper thread function for a \a thread without having to
         /// instantiate the base_action0 type. This is used by the \a applier in
         /// case a continuation has been supplied
-        static boost::function<threads::thread_function_type>
+        static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva)
         {
-            return base_type::construct_continuation_thread_function_void(F, cont);
+            return base_type::construct_continuation_thread_function_void(
+                HPX_STD_BIND(F), cont);
         }
 
         /// serialization support
@@ -503,27 +505,27 @@ namespace hpx { namespace actions
         }
 
     private:
-        boost::function<threads::thread_function_type>
+        HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(naming::address::address_type lva) const
         {
             return construct_thread_function(lva);
         }
 
-        boost::function<threads::thread_function_type>
+        HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
             naming::address::address_type lva) const
         {
             return construct_thread_function(cont, lva);
         }
 
-        boost::function<threads::thread_function_type>
+        HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(naming::address::address_type lva,
             arguments_type const& arg) const
         {
             return construct_thread_function(lva);
         }
 
-        boost::function<threads::thread_function_type>
+        HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
             naming::address::address_type lva, arguments_type const& arg) const
         {

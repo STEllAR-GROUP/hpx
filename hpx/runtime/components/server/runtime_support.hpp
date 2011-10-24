@@ -259,19 +259,19 @@ namespace hpx { namespace components { namespace server
 
         bool was_stopped() const { return stopped_; }
 
-        void add_startup_function(boost::function<void()> const& f)
+        void add_startup_function(HPX_STD_FUNCTION<void()> const& f)
         {
             util::spinlock::scoped_lock l(globals_mtx_);
             startup_functions_.push_back(f);
         }
 
-        void add_pre_shutdown_function(boost::function<void()> const& f)
+        void add_pre_shutdown_function(HPX_STD_FUNCTION<void()> const& f)
         {
             util::spinlock::scoped_lock l(globals_mtx_);
             pre_shutdown_functions_.push_back(f);
         }
 
-        void add_shutdown_function(boost::function<void()> const& f)
+        void add_shutdown_function(HPX_STD_FUNCTION<void()> const& f)
         {
             util::spinlock::scoped_lock l(globals_mtx_);
             shutdown_functions_.push_back(f);
@@ -299,9 +299,9 @@ namespace hpx { namespace components { namespace server
         util::section& ini_;
 
         util::spinlock globals_mtx_;
-        std::list<boost::function<void()> > startup_functions_;
-        std::list<boost::function<void()> > pre_shutdown_functions_;
-        std::list<boost::function<void()> > shutdown_functions_;
+        std::list<HPX_STD_FUNCTION<void()> > startup_functions_;
+        std::list<HPX_STD_FUNCTION<void()> > pre_shutdown_functions_;
+        std::list<HPX_STD_FUNCTION<void()> > shutdown_functions_;
     };
 
 }}}

@@ -38,7 +38,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
     boost::mutex mtx;
     std::size_t connected;
 
-    boost::lockfree::fifo<boost::function<void()>* > thunks;
+    boost::lockfree::fifo<HPX_STD_FUNCTION<void()>* > thunks;
 
     void spin();
 
@@ -83,7 +83,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
     void trigger();
 
     void add_thunk(
-        boost::function<void()>* f
+        HPX_STD_FUNCTION<void()>* f
         )
     {
         thunks.enqueue(f);

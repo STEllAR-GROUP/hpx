@@ -261,7 +261,7 @@ namespace hpx { namespace lcos
         #include <hpx/lcos/lazy_future_constructors.hpp>
 
         util::block_profiler<lazy_future_tag> apply_logger_;
-        boost::function<void()> closure_;
+        HPX_STD_FUNCTION<void()> closure_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -485,7 +485,7 @@ namespace hpx { namespace lcos
         #include <hpx/lcos/lazy_future_constructors_direct.hpp>
 
         util::block_profiler<lazy_future_direct_tag> apply_logger_;
-        boost::function<void()> closure_;
+        HPX_STD_FUNCTION<void()> closure_;
     };
 }}
 

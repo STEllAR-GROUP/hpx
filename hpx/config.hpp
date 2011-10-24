@@ -254,6 +254,41 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+// Use std::function if it's available and movable
+#if !defined(HPX_HAVE_CXX11_STD_FUNCTION)
+#  define HPX_STD_FUNCTION ::boost::function
+#else
+#  define HPX_STD_FUNCTION ::std::function
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// Use std::bind if it's available and movable
+#if !defined(HPX_HAVE_CXX11_STD_BIND)
+#  if defined(HPX_USE_PHOENIX_BIND)
+#    define HPX_STD_BIND        ::boost::phoenix::bind
+#    define HPX_STD_PROTECT(f)  ::boost::phoenix::lambda[f]
+#  else
+#    define HPX_STD_BIND        ::boost::bind
+#    define HPX_STD_PROTECT(f)  ::hpx::util::protect(f)
+#  endif
+#else
+#  define HPX_STD_BIND          ::std::bind
+#  define HPX_STD_PROTECT(f)    ::hpx::util::protect(f)
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// Use std::tuple if it's available and movable
+#if !defined(HPX_HAVE_CXX11_STD_TUPLE)
+#  define HPX_STD_TUPLE         ::boost::tuple
+#  define HPX_STD_MAKE_TUPLE    ::boost::make_tuple
+#  define HPX_STD_GET(N, c)     ::boost::get<N>(c)
+#else
+#  define HPX_STD_TUPLE         ::std::tuple
+#  define HPX_STD_MAKE_TUPLE    ::std::make_tuple
+#  define HPX_STD_GET(N, c)     ::std::get<N>(c)
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 // make sure Chrono is handled properly
 #if defined(HPX_INTERNAL_CHRONO) && BOOST_VERSION < 104700 && !defined(BOOST_CHRONO_NO_LIB)
 #  define BOOST_CHRONO_NO_LIB

@@ -6,10 +6,10 @@
 #if !defined(HPX_LCOS_FUTURE_CALLBACK_DEC_06_2008_1126AM)
 #define HPX_LCOS_FUTURE_CALLBACK_DEC_06_2008_1126AM
 
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 
 #include <boost/bind.hpp>
-#include <boost/function.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
@@ -20,7 +20,7 @@ namespace hpx { namespace lcos
     {
     public:
         typedef typename Future::result_type result_type;
-        typedef boost::function<void(result_type const&)> callback_type;
+        typedef HPX_STD_FUNCTION<void(result_type const&)> callback_type;
 
         future_callback(Future const& future, callback_type cb)
         {

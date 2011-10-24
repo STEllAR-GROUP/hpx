@@ -60,11 +60,11 @@ namespace parcelset
     public:
         friend struct agas::big_boot_barrier;
 
-        typedef boost::function<
+        typedef HPX_STD_FUNCTION<
               void(boost::system::error_code const&, std::size_t)
         > write_handler_type;
 
-        typedef boost::function<
+        typedef HPX_STD_FUNCTION<
             void(parcelport& pp, boost::shared_ptr<std::vector<char> > const&,
                  threads::thread_priority)
         > read_handler_type;

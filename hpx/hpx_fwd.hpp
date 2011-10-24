@@ -24,10 +24,10 @@
 #endif
 
 #include <boost/shared_ptr.hpp>
-#include <boost/function.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/coroutine/coroutine.hpp>
 #include <hpx/config.hpp>
+#include <hpx/config/function.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
 
@@ -293,12 +293,12 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     /// Add a function to be executed inside a HPX thread before hpx_main
-    typedef boost::function<void()> startup_function_type;
+    typedef HPX_STD_FUNCTION<void()> startup_function_type;
     HPX_API_EXPORT void register_startup_function(startup_function_type const&);
 
     /// Add a function to be executed inside a HPX thread during hpx::finalize
     /// but guaranteed before any shutdown function (system-wide)
-    typedef boost::function<void()> shutdown_function_type;
+    typedef HPX_STD_FUNCTION<void()> shutdown_function_type;
     HPX_API_EXPORT void register_pre_shutdown_function(shutdown_function_type const&);
 
     /// Add a function to be executed inside a HPX thread during hpx::finalize
@@ -327,7 +327,7 @@ namespace hpx
     HPX_API_EXPORT void report_error(boost::exception_ptr const& e);
 
     /// Register a function to be called during system shutdown
-    HPX_API_EXPORT bool register_on_exit(boost::function<void()>);
+    HPX_API_EXPORT bool register_on_exit(HPX_STD_FUNCTION<void()>);
 
     enum logging_destination
     {

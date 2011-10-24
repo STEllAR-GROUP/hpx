@@ -12,8 +12,7 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
-
-#include <boost/function.hpp>
+#include <hpx/config/function.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace adaptive1d { namespace server
@@ -25,7 +24,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         >
     {
     private:
-        typedef boost::function<naming::id_type()> callback_function_type;
+        typedef HPX_STD_FUNCTION<naming::id_type()> callback_function_type;
         typedef components::detail::managed_component_base<
             stencil_value_out_adaptor
         > base_type;

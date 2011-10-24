@@ -24,7 +24,7 @@
 #include <hpx/util/stringstream.hpp>
 
 #if !defined(BOOST_WINDOWS)
-    #include <signal.h>
+#  include <signal.h>
 #endif
 
 #include <iostream>
@@ -680,10 +680,10 @@ namespace hpx
                 rt.get_config().load_application_configuration(config.c_str());
             }
 
-            if (!startup.empty())
+            if (!!startup)
                 rt.add_startup_function(startup);
 
-            if (!shutdown.empty())
+            if (!!shutdown)
                 rt.add_shutdown_function(shutdown);
 
             // Dump the configuration before all components have been loaded.

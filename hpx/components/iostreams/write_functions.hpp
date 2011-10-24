@@ -16,12 +16,11 @@
 #include <boost/ref.hpp>
 #include <boost/bind.hpp>
 #include <boost/bind/placeholders.hpp>
-#include <boost/function.hpp>
 
 namespace hpx { namespace iostreams
 {
 
-typedef boost::function<void(std::deque<char> const&)> write_function_type;
+typedef HPX_STD_FUNCTION<void(std::deque<char> const&)> write_function_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Write function that works on STL OutputIterators

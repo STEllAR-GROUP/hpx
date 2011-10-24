@@ -6,9 +6,7 @@
 #if !defined(HPX_COMPONENT_STARTUP_SHUTDOWN_SEP_20_2011_0217PM)
 #define HPX_COMPONENT_STARTUP_SHUTDOWN_SEP_20_2011_0217PM
 
-#include <boost/config.hpp>
-#include <boost/function.hpp>
-
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/component_startup_shutdown_base.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -17,8 +15,8 @@ namespace hpx { namespace components
     ///////////////////////////////////////////////////////////////////////////
     namespace startup_shutdown_provider
     {
-        bool startup(boost::function<void()>& startup_func);
-        bool shutdown(boost::function<void()>& shutdown_func);
+        bool startup(HPX_STD_FUNCTION<void()>& startup_func);
+        bool shutdown(HPX_STD_FUNCTION<void()>& shutdown_func);
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -41,7 +39,7 @@ namespace hpx { namespace components
         ///
         /// \return Returns \a true if the parameter \a startup has been
         ///         successfully initialized with the startup function.
-        bool get_startup_function(boost::function<void()>& startup_)
+        bool get_startup_function(HPX_STD_FUNCTION<void()>& startup_)
         {
             return startup_shutdown_provider::startup(startup_);
         }
@@ -55,7 +53,7 @@ namespace hpx { namespace components
         ///
         /// \return Returns \a true if the parameter \a shutdown has been
         ///         successfully initialized with the shutdown function.
-        bool get_shutdown_function(boost::function<void()>& shutdown_)
+        bool get_shutdown_function(HPX_STD_FUNCTION<void()>& shutdown_)
         {
             return startup_shutdown_provider::shutdown(shutdown_);
         }
@@ -66,16 +64,16 @@ namespace hpx { namespace components
 #define HPX_DEF_COMPONENT_STARTUP_SHUTDOWN(startup_, shutdown_)               \
     namespace hpx { namespace components { namespace startup_shutdown_provider\
     {                                                                         \
-        bool startup(boost::function<void()>& startup_func)                   \
+        bool startup(HPX_STD_FUNCTION<void()>& startup_func)                  \
         {                                                                     \
-            boost::function<void()> tmp = startup_;                           \
-            if (!tmp.empty()) { startup_func = startup_; return true; }       \
+            HPX_STD_FUNCTION<void()> tmp = startup_;                          \
+            if (!!tmp) { startup_func = startup_; return true; }              \
             return false;                                                     \
         }                                                                     \
-        bool shutdown(boost::function<void()>& shutdown_func)                 \
+        bool shutdown(HPX_STD_FUNCTION<void()>& shutdown_func)                \
         {                                                                     \
-            boost::function<void()> tmp = shutdown_;                          \
-            if (!tmp.empty()) { shutdown_func = shutdown_; return true; }     \
+            HPX_STD_FUNCTION<void()> tmp = shutdown_;                         \
+            if (!!tmp) { shutdown_func = shutdown_; return true; }            \
             return false;                                                     \
         }                                                                     \
     }}}                                                                       \

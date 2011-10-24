@@ -191,7 +191,7 @@ namespace hpx
     template <typename SchedulingPolicy, typename NotificationPolicy>
     threads::thread_state
     runtime_impl<SchedulingPolicy, NotificationPolicy>::run_helper(
-        boost::function<runtime::hpx_main_function_type> func, int& result)
+        HPX_STD_FUNCTION<runtime::hpx_main_function_type> func, int& result)
     {
         LBT_(info) << "(2nd stage) runtime_impl::run_helper: launching pre_main";
 
@@ -204,7 +204,7 @@ namespace hpx
         LBT_(info) << "(3rd stage) runtime_impl::run_helper: bootstrap complete";
 
         // Now, execute the user supplied thread function (hpx_main)
-        if (!func.empty())
+        if (!!func)
         {
             // Change our thread description, as we're about to call hpx_main
             threads::set_thread_description(threads::get_self_id(), "hpx_main");
@@ -218,7 +218,7 @@ namespace hpx
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     int runtime_impl<SchedulingPolicy, NotificationPolicy>::start(
-        boost::function<hpx_main_function_type> func,
+        HPX_STD_FUNCTION<hpx_main_function_type> func,
         std::size_t num_threads, std::size_t num_localities, bool blocking)
     {
 #if defined(_WIN64) && defined(_DEBUG) && !defined(BOOST_COROUTINE_USE_FIBERS)
@@ -279,7 +279,7 @@ namespace hpx
     int runtime_impl<SchedulingPolicy, NotificationPolicy>::start(
         std::size_t num_threads, std::size_t num_localities, bool blocking)
     {
-        boost::function<hpx_main_function_type> empty_main;
+        HPX_STD_FUNCTION<hpx_main_function_type> empty_main;
         return start(empty_main, num_threads, num_localities, blocking);
     }
 
@@ -426,7 +426,7 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     int runtime_impl<SchedulingPolicy, NotificationPolicy>::run(
-        boost::function<hpx_main_function_type> func,
+        HPX_STD_FUNCTION<hpx_main_function_type> func,
         std::size_t num_threads, std::size_t num_localities)
     {
         // start the main thread function
@@ -494,21 +494,21 @@ namespace hpx
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::
-        add_startup_function(boost::function<void()> const& f)
+        add_startup_function(HPX_STD_FUNCTION<void()> const& f)
     {
         runtime_support_.add_startup_function(f);
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::
-        add_pre_shutdown_function(boost::function<void()> const& f)
+        add_pre_shutdown_function(HPX_STD_FUNCTION<void()> const& f)
     {
         runtime_support_.add_pre_shutdown_function(f);
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::
-        add_shutdown_function(boost::function<void()> const& f)
+        add_shutdown_function(HPX_STD_FUNCTION<void()> const& f)
     {
         runtime_support_.add_shutdown_function(f);
     }
@@ -591,7 +591,7 @@ namespace hpx
         hpx::applier::get_applier().get_thread_manager().report_error(num_thread, e);
     }
 
-    bool register_on_exit(boost::function<void()> f)
+    bool register_on_exit(HPX_STD_FUNCTION<void()> f)
     {
         runtime* rt = get_runtime_ptr();
         if (NULL == rt)
@@ -668,17 +668,17 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void register_startup_function(boost::function<void()> const& f)
+    void register_startup_function(HPX_STD_FUNCTION<void()> const& f)
     {
         get_runtime().add_startup_function(f);
     }
 
-    void register_pre_shutdown_function(boost::function<void()> const& f)
+    void register_pre_shutdown_function(HPX_STD_FUNCTION<void()> const& f)
     {
         get_runtime().add_pre_shutdown_function(f);
     }
 
-    void register_shutdown_function(boost::function<void()> const& f)
+    void register_shutdown_function(HPX_STD_FUNCTION<void()> const& f)
     {
         get_runtime().add_shutdown_function(f);
     }

@@ -9,8 +9,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
 
-#include <boost/function.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server
 {
@@ -25,7 +23,7 @@ namespace hpx { namespace performance_counters { namespace server
         typedef base_performance_counter base_type_holder;
 
         raw_counter() {}
-        raw_counter(counter_info const& info, boost::function<boost::int64_t()> f);
+        raw_counter(counter_info const& info, HPX_STD_FUNCTION<boost::int64_t()> f);
 
         void get_counter_value(counter_value& value);
 
@@ -47,7 +45,7 @@ namespace hpx { namespace performance_counters { namespace server
         }
 
     private:
-        boost::function<boost::int64_t()> f_;
+        HPX_STD_FUNCTION<boost::int64_t()> f_;
     };
 }}}
 

@@ -232,7 +232,7 @@ namespace hpx { namespace applier
     /// \throws invalid_status if the runtime system has not been started yet.
     ///
     HPX_API_EXPORT threads::thread_id_type register_thread_plain(
-        boost::function<threads::thread_function_type> const& func,
+        HPX_STD_FUNCTION<threads::thread_function_type> const& func,
         char const* description = 0,
         threads::thread_state_enum initial_state = threads::pending,
         bool run_now = true,
@@ -253,7 +253,7 @@ namespace hpx { namespace applier
     ///       \a applier#register_thread_plain
     ///
     HPX_API_EXPORT threads::thread_id_type register_thread(
-        boost::function<void(threads::thread_state_ex)> const& func,
+        HPX_STD_FUNCTION<void(threads::thread_state_ex)> const& func,
         char const* description = 0,
         threads::thread_state_enum initial_state = threads::pending,
         bool run_now = true,
@@ -273,7 +273,7 @@ namespace hpx { namespace applier
     ///       \a applier#register_thread_plain
     ///
     HPX_API_EXPORT threads::thread_id_type register_thread_nullary(
-        boost::function<void()> const& func, char const* description = 0,
+        HPX_STD_FUNCTION<void()> const& func, char const* description = 0,
         threads::thread_state_enum initial_state = threads::pending,
         bool run_now = true,
         threads::thread_priority priority = threads::thread_priority_normal,
@@ -341,7 +341,7 @@ namespace hpx { namespace applier
     /// \throws invalid_status if the runtime system has not been started yet.
     ///
     HPX_API_EXPORT void register_work_plain(
-        boost::function<threads::thread_function_type> const& func,
+        HPX_STD_FUNCTION<threads::thread_function_type> const& func,
         char const* description = 0, naming::address::address_type lva = 0,
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
@@ -361,7 +361,7 @@ namespace hpx { namespace applier
     ///       \a applier#register_work_plain
     ///
     HPX_API_EXPORT void register_work(
-        boost::function<void(threads::thread_state_ex)> const& func,
+        HPX_STD_FUNCTION<void(threads::thread_state_ex)> const& func,
         char const* description = 0,
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
@@ -380,7 +380,7 @@ namespace hpx { namespace applier
     ///       \a applier#register_work_plain
     ///
     HPX_API_EXPORT void register_work_nullary(
-        boost::function<void()> const& func, char const* description = 0,
+        HPX_STD_FUNCTION<void()> const& func, char const* description = 0,
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
         std::size_t os_thread = std::size_t(-1), error_code& ec = throws);

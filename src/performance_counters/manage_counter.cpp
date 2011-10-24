@@ -20,7 +20,7 @@ namespace hpx { namespace performance_counters
     }
 
     void install_counter(std::string const& name,
-        boost::function<boost::int64_t()> const& f, error_code& ec)
+        HPX_STD_FUNCTION<boost::int64_t()> const& f, error_code& ec)
     {
       boost::shared_ptr<manage_counter> p = boost::make_shared<manage_counter>();
 

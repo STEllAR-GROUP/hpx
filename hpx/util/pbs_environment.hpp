@@ -13,15 +13,13 @@
 #include <string>
 #include <vector>
 
-#include <boost/function.hpp>
-
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////
     // Try to retrieve PBS related settings from the environment
     struct HPX_EXPORT pbs_environment
     {
-        typedef boost::function<std::string(std::string const&)>
+        typedef HPX_STD_FUNCTION<std::string(std::string const&)>
             transform_function_type;
         typedef std::map<std::string, std::size_t> node_map_type;
 

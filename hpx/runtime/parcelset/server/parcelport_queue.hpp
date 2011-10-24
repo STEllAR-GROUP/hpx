@@ -39,7 +39,7 @@ namespace hpx { namespace parcelset { namespace server
         typedef void callback_type(parcelport&,
             boost::shared_ptr<std::vector<char> > const&,
             threads::thread_priority);
-        boost::function<callback_type> notify_;
+        HPX_STD_FUNCTION<callback_type> notify_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////

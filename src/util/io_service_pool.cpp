@@ -8,10 +8,10 @@
 
 #include <stdexcept>
 
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/io_service_pool.hpp>
 
-#include <boost/function.hpp>
 #include <boost/asio/io_service.hpp>
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
@@ -21,8 +21,8 @@
 namespace hpx { namespace util
 {
     io_service_pool::io_service_pool(std::size_t pool_size,
-            char const* pool_name, boost::function<void()> on_start_thread,
-            boost::function<void()> on_stop_thread)
+            char const* pool_name, HPX_STD_FUNCTION<void()> on_start_thread,
+            HPX_STD_FUNCTION<void()> on_stop_thread)
       : next_io_service_(0), stopped_(false), pool_size_(pool_size),
         on_start_thread_(on_start_thread), on_stop_thread_(on_stop_thread),
         pool_name_(pool_name)
@@ -41,8 +41,8 @@ namespace hpx { namespace util
         }
     }
 
-    io_service_pool::io_service_pool(boost::function<void()> on_start_thread,
-            boost::function<void()> on_stop_thread, char const* pool_name)
+    io_service_pool::io_service_pool(HPX_STD_FUNCTION<void()> on_start_thread,
+            HPX_STD_FUNCTION<void()> on_stop_thread, char const* pool_name)
       : next_io_service_(0), stopped_(false), pool_size_(2),
         on_start_thread_(on_start_thread), on_stop_thread_(on_stop_thread),
         pool_name_(pool_name)

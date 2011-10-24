@@ -51,11 +51,11 @@ struct signature<
         BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)
     ) const = 0;
 
-    virtual boost::function<threads::thread_function_type>
+    virtual HPX_STD_FUNCTION<threads::thread_function_type>
     get_thread_function(naming::address::address_type lva,
         arguments_type const& args) const = 0;
 
-    virtual boost::function<threads::thread_function_type>
+    virtual HPX_STD_FUNCTION<threads::thread_function_type>
     get_thread_function(continuation_type& cont,
         naming::address::address_type lva,
         arguments_type const& args) const = 0;

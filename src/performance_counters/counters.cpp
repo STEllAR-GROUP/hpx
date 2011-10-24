@@ -400,7 +400,7 @@ namespace hpx { namespace performance_counters
     }
 
     naming::id_type create_raw_counter(
-        counter_info const& info, boost::function<boost::int64_t()> f,
+        counter_info const& info, HPX_STD_FUNCTION<boost::int64_t()> f,
         error_code& ec)
     {
         naming::id_type id;

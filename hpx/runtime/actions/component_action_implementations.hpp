@@ -120,7 +120,7 @@
         // instantiate the base_result_actionN type. This is used by the applier in
         // case no continuation has been supplied.
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        static boost::function<threads::thread_function_type>
+        static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(naming::address::address_type lva,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
@@ -130,7 +130,7 @@
                     BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) =
                 &Derived::template thread_function<BOOST_PP_ENUM_PARAMS(N, Arg)>;
 
-            return boost::bind(f, lva, BOOST_PP_ENUM_PARAMS(N, arg));
+            return HPX_STD_BIND(f, lva, BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
         // This static construct_thread_function allows to construct
@@ -138,13 +138,13 @@
         // instantiate the base_result_actionN type. This is used by the applier in
         // case a continuation has been supplied
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        static boost::function<threads::thread_function_type>
+        static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
             return base_type::construct_continuation_thread_function(
-                boost::bind(F, get_lva<Component>::call(lva),
+                HPX_STD_BIND(F, get_lva<Component>::call(lva),
                     BOOST_PP_ENUM_PARAMS(N, arg)), cont);
         }
 
@@ -159,7 +159,7 @@
     private:
         // This get_thread_function will be invoked to retrieve the thread
         // function for an action which has to be invoked without continuations.
-        boost::function<threads::thread_function_type>
+        HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(naming::address::address_type lva) const
         {
             return construct_thread_function(lva,
@@ -168,7 +168,7 @@
 
         // This get_thread_function will be invoked to retrieve the thread
         // function for an action which has to be invoked with continuations.
-        boost::function<threads::thread_function_type>
+        HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
             naming::address::address_type lva) const
         {
@@ -176,7 +176,7 @@
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
         }
 
-        boost::function<threads::thread_function_type>
+        HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(naming::address::address_type lva,
             arguments_type const& arg) const
         {
@@ -184,7 +184,7 @@
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
         }
 
-        boost::function<threads::thread_function_type>
+        HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
             naming::address::address_type lva, arguments_type const& arg) const
         {
@@ -590,7 +590,7 @@
         // instantiate the base_actionN type. This is used by the applier in
         // case no continuation has been supplied.
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        static boost::function<threads::thread_function_type>
+        static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(naming::address::address_type lva,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
@@ -600,7 +600,7 @@
                     BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) =
                 &Derived::template thread_function<BOOST_PP_ENUM_PARAMS(N, Arg)>;
 
-            return boost::bind(f, lva, BOOST_PP_ENUM_PARAMS(N, arg));
+            return HPX_STD_BIND(f, lva, BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
         // This static construct_thread_function allows to construct
@@ -608,13 +608,13 @@
         // instantiate the base_actionN type. This is used by the applier in
         // case a continuation has been supplied
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        static boost::function<threads::thread_function_type>
+        static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
             return base_type::construct_continuation_thread_function_void(
-                boost::bind(F, get_lva<Component>::call(lva),
+                HPX_STD_BIND(F, get_lva<Component>::call(lva),
                     BOOST_PP_ENUM_PARAMS(N, arg)), cont);
         }
 
@@ -628,14 +628,14 @@
 
     private:
         ///
-        boost::function<threads::thread_function_type>
+        HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(naming::address::address_type lva) const
         {
             return construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
         }
 
-        boost::function<threads::thread_function_type>
+        HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
             naming::address::address_type lva) const
         {
@@ -644,7 +644,7 @@
         }
 
         ///
-        boost::function<threads::thread_function_type>
+        HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(naming::address::address_type lva,
             arguments_type const& arg) const
         {
@@ -652,7 +652,7 @@
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
         }
 
-        boost::function<threads::thread_function_type>
+        HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
             naming::address::address_type lva, arguments_type const& arg) const
         {

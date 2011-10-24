@@ -26,7 +26,7 @@ namespace hpx { namespace performance_counters
         // create and install a counter which extracts the value from a given
         // function
         counter_status install(std::string const& name,
-            boost::function<boost::int64_t()> const& f, error_code& ec = throws)
+            HPX_STD_FUNCTION<boost::int64_t()> const& f, error_code& ec = throws)
         {
             if (0 != counter_) {
                 HPX_THROWS_IF(ec, hpx::invalid_status, "manage_counter::install",
@@ -105,7 +105,7 @@ namespace hpx { namespace performance_counters
     /// Install a new performance counter in a way, which will uninstall it
     /// automatically during shutdown.
     HPX_EXPORT void install_counter(std::string const& name,
-        boost::function<boost::int64_t()> const& f, error_code& ec = throws);
+        HPX_STD_FUNCTION<boost::int64_t()> const& f, error_code& ec = throws);
 
     /// Install a new performance counter in a way, which will uninstall it
     /// automatically during shutdown.
@@ -124,7 +124,7 @@ namespace hpx { namespace performance_counters
     struct raw_counter_data
     {
         std::string name_;
-        boost::function<boost::int64_t()> func_;
+        HPX_STD_FUNCTION<boost::int64_t()> func_;
     };
 
     struct average_count_counter_data

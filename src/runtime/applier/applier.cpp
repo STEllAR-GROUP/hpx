@@ -41,14 +41,14 @@ namespace hpx { namespace applier
 
     ///////////////////////////////////////////////////////////////////////////
     static inline threads::thread_state thread_function(
-        boost::function<void(threads::thread_state_ex)> const& func)
+        HPX_STD_FUNCTION<void(threads::thread_state_ex)> const& func)
     {
         func(threads::thread_state_ex(threads::wait_signaled));
         return threads::thread_state(threads::terminated);
     }
 
     static inline threads::thread_state thread_function_nullary(
-        boost::function<void()> const& func)
+        HPX_STD_FUNCTION<void()> const& func)
     {
         func();
         return threads::thread_state(threads::terminated);
@@ -56,7 +56,7 @@ namespace hpx { namespace applier
 
     ///////////////////////////////////////////////////////////////////////////
     threads::thread_id_type register_thread_nullary(
-        boost::function<void()> const& func, char const* desc,
+        HPX_STD_FUNCTION<void()> const& func, char const* desc,
         threads::thread_state_enum state, bool run_now,
         threads::thread_priority priority, std::size_t os_thread, error_code& ec)
     {
@@ -77,7 +77,7 @@ namespace hpx { namespace applier
     }
 
     threads::thread_id_type register_thread(
-        boost::function<void(threads::thread_state_ex)> const& func,
+        HPX_STD_FUNCTION<void(threads::thread_state_ex)> const& func,
         char const* desc, threads::thread_state_enum state, bool run_now,
         threads::thread_priority priority, std::size_t os_thread, error_code& ec)
     {
@@ -98,7 +98,7 @@ namespace hpx { namespace applier
     }
 
     threads::thread_id_type register_thread_plain(
-        boost::function<threads::thread_function_type> const& func,
+        HPX_STD_FUNCTION<threads::thread_function_type> const& func,
         char const* desc, threads::thread_state_enum state, bool run_now,
         threads::thread_priority priority, std::size_t os_thread, error_code& ec)
     {
@@ -136,7 +136,7 @@ namespace hpx { namespace applier
 
     ///////////////////////////////////////////////////////////////////////////
     void register_work_nullary(
-        boost::function<void()> const& func, char const* desc,
+        HPX_STD_FUNCTION<void()> const& func, char const* desc,
         threads::thread_state_enum state, threads::thread_priority priority,
         std::size_t os_thread, error_code& ec)
     {
@@ -156,7 +156,7 @@ namespace hpx { namespace applier
     }
 
     void register_work(
-        boost::function<void(threads::thread_state_ex)> const& func,
+        HPX_STD_FUNCTION<void(threads::thread_state_ex)> const& func,
         char const* desc, threads::thread_state_enum state,
         threads::thread_priority priority, std::size_t os_thread, error_code& ec)
     {
@@ -176,7 +176,7 @@ namespace hpx { namespace applier
     }
 
     void register_work_plain(
-        boost::function<threads::thread_function_type> const& func,
+        HPX_STD_FUNCTION<threads::thread_function_type> const& func,
         char const* desc, naming::address::address_type lva,
         threads::thread_state_enum state, threads::thread_priority priority,
         std::size_t os_thread, error_code& ec)

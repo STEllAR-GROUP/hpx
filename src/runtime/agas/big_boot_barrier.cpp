@@ -327,7 +327,7 @@ void register_console(registration_header const& header)
                 heap_lower, heap_upper, parcel_lower, parcel_upper,
                 primary_addr, component_addr, symbol_addr));
 
-    boost::function<void()>* thunk = new boost::function<void()>
+    HPX_STD_FUNCTION<void()>* thunk = new HPX_STD_FUNCTION<void()>
         (boost::bind(&big_boot_barrier::apply
                    , boost::ref(get_big_boot_barrier())
                    , naming::get_prefix_from_gid(prefix)
@@ -484,7 +484,7 @@ void register_worker(registration_header const& header)
 
     else // AGAS is starting up; this locality is participating in startup
     {    // synchronization.
-        boost::function<void()>* thunk = new boost::function<void()>
+        HPX_STD_FUNCTION<void()>* thunk = new HPX_STD_FUNCTION<void()>
             (boost::bind(&big_boot_barrier::apply
                        , boost::ref(get_big_boot_barrier())
                        , naming::get_prefix_from_gid(prefix)
@@ -736,7 +736,7 @@ void big_boot_barrier::trigger()
 {
     if (service_mode_bootstrap == service_type)
     {
-        boost::function<void()>* p;
+        HPX_STD_FUNCTION<void()>* p;
 
         while (thunks.dequeue(&p))
             (*p)();

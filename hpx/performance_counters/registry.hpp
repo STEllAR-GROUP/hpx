@@ -11,8 +11,6 @@
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/performance_counters/counters.hpp>
 
-#include <boost/function.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters
 {
@@ -45,7 +43,7 @@ namespace hpx { namespace performance_counters
         ///        raw_counter based on given function returning the counter
         ///        value
         counter_status create_raw_counter(counter_info const& info,
-            boost::function<boost::int64_t()> f, naming::id_type& id,
+            HPX_STD_FUNCTION<boost::int64_t()> f, naming::id_type& id,
             error_code& ec = throws);
 
         /// \brief Create a new performance counter instance based on given

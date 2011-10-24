@@ -369,7 +369,7 @@ namespace hpx { namespace performance_counters
     /// \brief Create a new performance counter instance based on given
     ///        function returning the counter value
     HPX_API_EXPORT naming::id_type create_raw_counter(
-        counter_info const& info, boost::function<boost::int64_t()> f,
+        counter_info const& info, HPX_STD_FUNCTION<boost::int64_t()> f,
         error_code& ec = throws);
 
     /// \brief Create a new performance counter instance based on given

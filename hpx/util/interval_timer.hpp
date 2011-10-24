@@ -9,7 +9,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/spinlock.hpp>
 
-#include <boost/function.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <string>
@@ -22,7 +21,7 @@ namespace hpx { namespace util
     {
     public:
         interval_timer();
-        interval_timer(boost::function<void()> const& f, std::size_t microsecs,
+        interval_timer(HPX_STD_FUNCTION<void()> const& f, std::size_t microsecs,
                 std::string const& description, bool pre_shutdown = false);
         ~interval_timer();
 
@@ -42,7 +41,7 @@ namespace hpx { namespace util
         typedef util::spinlock mutex_type;
 
         mutable mutex_type mtx_;
-        boost::function<void()> f_;   ///< function to call
+        HPX_STD_FUNCTION<void()> f_;   ///< function to call
         std::size_t microsecs_;       ///< time interval
         threads::thread_id_type id_;  ///< id of currently scheduled thread
         std::string description_;     ///< description of this interval timer

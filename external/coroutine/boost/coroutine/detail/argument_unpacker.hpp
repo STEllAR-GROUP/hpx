@@ -114,7 +114,7 @@ BOOST_PP_REPEAT(BOOST_COROUTINE_ARG_MAX,
   inline
   typename unpacker_n<Traits, Traits::length>::
       template result<Functor, Tuple>::type
-  unpack(Functor f, Tuple& parms, trait_tag<Traits>) {
+  unpack(Functor const& f, Tuple& parms, trait_tag<Traits>) {
     return unpacker_n<Traits, Traits::length>()(f, parms);
   }
 
@@ -126,7 +126,7 @@ BOOST_PP_REPEAT(BOOST_COROUTINE_ARG_MAX,
   inline
   typename unpacker_ex_n<Traits, Traits::length>::
       template result<Functor, First, Tuple>::type
-  unpack_ex(Functor f, First& arg0, Tuple& parms, trait_tag<Traits>) {
+  unpack_ex(Functor const& f, First& arg0, Tuple& parms, trait_tag<Traits>) {
     return unpacker_ex_n<Traits, Traits::length>()(f, arg0, parms);
   }
 

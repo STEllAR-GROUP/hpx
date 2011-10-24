@@ -47,7 +47,7 @@ namespace hpx { namespace actions
         ///
         void trigger_error(boost::exception_ptr const& e);
 
-        typedef boost::function<void(naming::id_type&)> enum_gid_handler_type;
+        typedef HPX_STD_FUNCTION<void(naming::id_type&)> enum_gid_handler_type;
         void enumerate_argument_gids(enum_gid_handler_type);
 
     private:

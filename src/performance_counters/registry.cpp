@@ -96,7 +96,7 @@ namespace hpx { namespace performance_counters
     }
 
     counter_status registry::create_raw_counter(counter_info const& info,
-        boost::function<boost::int64_t()> f, naming::id_type& id, error_code& ec)
+        HPX_STD_FUNCTION<boost::int64_t()> f, naming::id_type& id, error_code& ec)
     {
         // create canonical type name
         std::string type_name;
