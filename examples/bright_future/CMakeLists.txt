@@ -10,6 +10,7 @@ set(bright_future_programs
         gs_hpx
         gs_hpx_blocked
         remote_functions
+        remote_object
    )
 
 
@@ -26,6 +27,7 @@ set(gs_hpx_sources gs.cpp)
 set(gs_hpx_blocked_sources gs.cpp)
 
 set(remote_functions_FLAGS DEPENDENCIES iostreams_component)
+set(remote_object_FLAGS DEPENDENCIES remote_object_component iostreams_component)
 set(vector_root_finder_FLAGS DEPENDENCIES iostreams_component)
 set(gs_single_FLAGS DEPENDENCIES iostreams_component)
 set(gs_hpx_FLAGS DEPENDENCIES gs_hpx_component iostreams_component hpx_serialization ${BOOST_serialization_LIBRARY})

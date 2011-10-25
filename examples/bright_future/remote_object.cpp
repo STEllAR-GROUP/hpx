@@ -12,6 +12,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/components/remote_object/new.hpp>
 
 #include <hpx/util/high_resolution_timer.hpp>
 
@@ -23,36 +24,34 @@ using hpx::cout;
 using hpx::flush;
 using hpx::init;
 using hpx::finalize;
-using hpx::actions::plain_result_action0;
-using hpx::actions::plain_action1;
-using hpx::actions::plain_action2;
+using hpx::find_here;
 using hpx::naming::id_type;
-using hpx::lcos::async;
 using hpx::lcos::promise;
-using hpx::lcos::eager_future;
+using hpx::lcos::wait;
 using hpx::find_all_localities;
-using hpx::util::function;
-using hpx::util::high_resolution_timer;
+using hpx::components::new_;
 
-void f(function<void()> f, int)
+struct foo
 {
-    f();
+    foo() : i(-1) {}
+    foo(int i) : i(i) {}
+
+    int i;
+};
+
+std::ostream & operator<<(std::ostream & os, foo const & f)
+{
+    os << "foo : " << find_here() << " " << f.i;
+    return os;
 }
 
-typedef
-    plain_action2<
-        function<void()>
-      , int
-      , &f
-    > f_action;
-
-HPX_REGISTER_PLAIN_ACTION(f_action);
-
-struct g
+struct output
 {
-    void operator()()
+    typedef void result_type;
+
+    void operator()(foo const & f) const
     {
-        cout << "Hello World\n" << flush;
+        cout << f << "\n" << flush;
     }
 
     template <typename Archive>
@@ -60,37 +59,34 @@ struct g
     {}
 };
 
-id_type test()
-{
-    return id_type();
-}
-
-
-typedef
-    plain_result_action0<
-        id_type
-      , &test
-    > test_action;
-
-HPX_REGISTER_PLAIN_ACTION(test_action);
-
-template <typename T>
-promise<object<T> >
-test_async(id_type const & target)
-{
-    return eager_future<test_action, object<T> >(target);
-}
-
 int hpx_main(variables_map &)
 {
     {
-        function<void()> f = g();
+        typedef hpx::components::object<foo> object_type;
+
+        typedef promise<object_type> object_promise_type;
+        typedef std::vector<object_promise_type> object_promises_type;
+        typedef std::vector<object_type> objects_type;
+        
         std::vector<id_type> prefixes = find_all_localities();
+        object_promises_type object_promises;
     
+        int count = 0;
         BOOST_FOREACH(id_type const & prefix, prefixes)
         {
-            async<f_action>(prefix, f, 0).get();
-            test_async<int>(prefix);
+            object_promises.push_back(new_<foo>(prefix));
+            object_promises.push_back(new_<foo>(prefix, count++));
+        }
+
+        objects_type objects;
+        BOOST_FOREACH(object_promise_type const & promise, object_promises)
+        {
+            objects.push_back(promise.get());
+        }
+        
+        BOOST_FOREACH(object_type & o, objects)
+        {
+            wait(o <= output());
         }
     }
     finalize();
@@ -105,3 +101,5 @@ int main(int argc, char **argv)
     return init(cmdline, argc, argv);
 
 }
+
+

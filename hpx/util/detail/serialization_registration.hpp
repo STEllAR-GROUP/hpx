@@ -9,6 +9,7 @@
 
 #include <boost/serialization/export.hpp>
 #include <boost/serialization/extended_type_info.hpp>
+#include <boost/uuid/sha1.hpp>
 #include <typeinfo>
 
 namespace hpx { namespace util { namespace detail {
@@ -69,9 +70,9 @@ namespace boost {
             {
                 static inline const char * call()
                 {
+                    static char buf[20];
                     /// FIXME: this is not portable across different compilers
-                    return "screw you!";
-                        /*
+                    static const char * name = 
                         typeid(
                             ::hpx::util::detail::vtable_ptr<
                                 Sig
@@ -80,7 +81,16 @@ namespace boost {
                               , Vtable
                             >
                         ).name();
-                        */
+                    // create a sha1 hash from the string returned by typeid::name
+                    boost::uuids::detail::sha1 hash;
+                    hash.process_block(name, name + std::strlen(name));
+                    unsigned digest[5];
+                    hash.get_digest(digest);
+
+                    // copy that into our string
+                    std::memcpy(buf, digest, 5*sizeof(unsigned));
+
+                    return buf;
                 }
             };
         }

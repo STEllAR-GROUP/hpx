@@ -6,7 +6,9 @@
 
 set(subdirs
     distributing_factory
-    iostreams)
+    iostreams
+    remote_object
+)
 
 foreach(subdir ${subdirs})
   add_subdirectory(${subdir})

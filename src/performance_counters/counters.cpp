@@ -18,6 +18,7 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 
+#define BOOST_SPIRIT_USE_PHOENIX_V3
 #include <boost/spirit/include/qi_char.hpp>
 #include <boost/spirit/include/qi_nonterminal.hpp>
 #include <boost/spirit/include/qi_numeric.hpp>
