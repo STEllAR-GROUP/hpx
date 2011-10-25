@@ -26,10 +26,13 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_EX(
     remote_object, true);
 
 ///////////////////////////////////////////////////////////////////////////////
-// Serialization support for the distributing_factory actions
+// Serialization support for the remote_object actions
 HPX_REGISTER_ACTION_EX(
     remote_object_type::apply_action,
     remote_object_apply_action);
+HPX_REGISTER_ACTION_EX(
+    remote_object_type::set_dtor_action,
+    remote_object_set_dtor_action);
 HPX_DEFINE_GET_COMPONENT_TYPE(remote_object_type);
 
 HPX_REGISTER_PLAIN_ACTION_EX(

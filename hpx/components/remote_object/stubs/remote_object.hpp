@@ -14,21 +14,38 @@
 namespace hpx { namespace components { namespace stubs
 {
     ///////////////////////////////////////////////////////////////////
-    // The \a stubs#distributing_factory class is the client side
-    // representation of a \a server#distributing_factory component
+    // The \a stubs#remote_object class is the client side
+    // representation of a \a server#remote_object component
     struct remote_object : stub_base<server::remote_object>
     {
+        template <typename F>
         static lcos::promise<void>
-        apply_async(naming::id_type const & target_id, hpx::util::function<void(void**)> f)
+        apply_async(naming::id_type const & target_id, F f)
         {
             typedef server::remote_object::apply_action action_type;
             return lcos::eager_future<action_type>(target_id, f, 0);
         }
 
+        template <typename F>
         static void 
-        apply(naming::id_type const & target_id, hpx::util::function<void(void**)> f)
+        apply(naming::id_type const & target_id, F f)
         {
             apply_async(target_id, f).get();
+        }
+        
+        template <typename F>
+        static lcos::promise<void>
+        set_dtor_async(naming::id_type const & target_id, F f)
+        {
+            typedef server::remote_object::set_dtor_action action_type;
+            return lcos::eager_future<action_type>(target_id, f, 0);
+        }
+
+        template <typename F>
+        static void 
+        set_dtor(naming::id_type const & target_id, F f)
+        {
+            set_dtor_async(target_id, f).get();
         }
     };
 }}}

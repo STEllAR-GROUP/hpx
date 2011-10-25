@@ -60,27 +60,6 @@ struct g
     {}
 };
 
-id_type test()
-{
-    return id_type();
-}
-
-
-typedef
-    plain_result_action0<
-        id_type
-      , &test
-    > test_action;
-
-HPX_REGISTER_PLAIN_ACTION(test_action);
-
-template <typename T>
-promise<object<T> >
-test_async(id_type const & target)
-{
-    return eager_future<test_action, object<T> >(target);
-}
-
 int hpx_main(variables_map &)
 {
     {
@@ -90,7 +69,6 @@ int hpx_main(variables_map &)
         BOOST_FOREACH(id_type const & prefix, prefixes)
         {
             async<f_action>(prefix, f, 0).get();
-            test_async<int>(prefix);
         }
     }
     finalize();
