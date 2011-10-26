@@ -609,7 +609,7 @@ namespace hpx { namespace actions
 // be registered with the serialization library
 #define HPX_DEFINE_GET_ACTION_NAME(action)                                    \
         namespace hpx { namespace actions { namespace detail { namespace ext {\
-            template<> HPX_ALWAYS_EXPORT struct get_action_name_impl<action>  \
+            template<> struct HPX_ALWAYS_EXPORT get_action_name_impl<action>  \
             {                                                                 \
                 static char const* call()                                     \
                 { return BOOST_PP_STRINGIZE(action); }                        \
