@@ -35,18 +35,40 @@ struct foo
       , unsigned const
         )
     {
+        std::cout << "serialize" << std::endl;
         ar & x_;
         ar & y_;
     }
 
   public:
+    foo()
+    {
+        std::cout << "default ctor" << std::endl;
+    }
+
     foo(
-        boost::uint64_t x = 0
-      , boost::uint64_t y = 0
+        boost::uint64_t x
+      , boost::uint64_t y
         )
       : x_(x)
       , y_(y)
-    {}
+    {
+        std::cout << "ctor" << std::endl;
+    }
+
+    foo(
+        foo const& other
+        )
+      : x_(other.x_)
+      , y_(other.y_)
+    {
+        std::cout << "copy ctor" << std::endl;
+    }
+
+    ~foo()
+    {
+        std::cout << "dtor" << std::endl;
+    }
 
     void operator()()
     {
