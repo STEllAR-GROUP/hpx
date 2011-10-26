@@ -118,9 +118,6 @@ namespace hpx { namespace threads { namespace detail
             back_ptr_(0),
             pool_(&pool)
         {
-            LTM_(debug) << "thread::thread(" << this << "), description("
-                        << init_data.description << ")";
-
             // store the thread id of the parent thread, mainly for debugging
             // purposes
             if (0 == parent_thread_id_) {
@@ -150,9 +147,6 @@ namespace hpx { namespace threads { namespace detail
             back_ptr_(0),
             pool_(&pool)
         {
-            LTM_(debug) << "thread::thread(" << this << "), description("
-                        << init_data.description << ")";
-
             // store the thread id of the parent thread, mainly for debugging
             // purposes
             if (0 == parent_thread_id_) {
@@ -716,13 +710,20 @@ namespace hpx { namespace threads
             thread_pool& pool, thread_state_enum new_state)
       : thread::base_type(new (pool) detail::thread(
             init_data, This(), new_state, pool))
-    {}
+    {
+        LTM_(debug) << "thread::thread(" << this << "), description("
+                    << init_data.description << ")";
+    }
 
     inline thread::thread(BOOST_RV_REF(thread_init_data) init_data,
             thread_pool& pool, thread_state_enum new_state)
       : thread::base_type(new (pool) detail::thread(
             boost::move(init_data), This(), new_state, pool))
-    {}
+    {
+        LTM_(debug) << "thread::thread(" << this << "), description("
+                    << init_data.description << ")";
+
+    }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
