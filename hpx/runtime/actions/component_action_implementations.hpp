@@ -1001,7 +1001,7 @@
             return data;
         }
     };
-    
+
     template <
         typename Component, int Action,
         BOOST_PP_ENUM_PARAMS(N, typename T),
@@ -1019,7 +1019,7 @@
     >
         : public BOOST_PP_CAT(action, N)<Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F, Priority, Derived>
     {
-        typedef 
+        typedef
             BOOST_PP_CAT(action, N)<Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F, Priority, Derived>
             base_type;
 
@@ -1027,7 +1027,7 @@
         BOOST_PP_CAT(result_action, N)(threads::thread_priority priority = Priority)
           : base_type(priority)
         {}
-        
+
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(result_action, N)(
@@ -1041,7 +1041,7 @@
                 BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
           : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg))
         {}
-        
+
         /// serialization support
         static void register_base()
         {
@@ -1049,7 +1049,7 @@
             void_cast_register<BOOST_PP_CAT(result_action, N), base_type>();
             base_type::register_base();
         }
-        
+
     private:
         // serialization support
         friend class boost::serialization::access;

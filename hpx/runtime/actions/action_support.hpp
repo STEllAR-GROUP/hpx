@@ -41,6 +41,60 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace traits
+{
+    ///////////////////////////////////////////////////////////////////////////
+    // The customization point handle_gid is used to handle reference
+    // counting of GIDs while they are transferred to a different locality.
+    // It has to be specialized for arbitrary types, which may hold GIDs.
+    //
+    // It is important to make sure that all GID instances which are
+    // contained in any transferred data structure are handled during
+    // serialization. For this reason any user defined data type, which
+    // is passed as an parameter to a action or which is returned from
+    // a result_action needs to provide a corresponding specialization.
+    //
+    // The purpose of this customization point is to call the provided
+    // function for all GIDs held in the data type.
+    template <typename T, typename F, typename Enable>
+    struct handle_gid
+    {
+        static bool call(T const&, F)
+        {
+            return true;    // do nothing for arbitrary types
+        }
+    };
+
+    template <typename F>
+    struct handle_gid<naming::id_type, F>
+    {
+        static bool call(naming::id_type const &id, F const& f)
+        {
+            f(id);
+            return true;
+        }
+    };
+
+    template <typename F>
+    struct handle_gid<std::vector<naming::id_type>, F>
+    {
+        static bool call(std::vector<naming::id_type> const& ids, F const& f)
+        {
+            BOOST_FOREACH(naming::id_type const& id, ids)
+                f(boost::ref(id));
+            return true;
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Action, typename Enable>
+    struct get_action_name
+    {
+        static HPX_ALWAYS_EXPORT char const* call();
+    };
+}}
+
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -55,66 +109,11 @@ namespace hpx { namespace actions
             typedef typename boost::remove_const<no_ref_type>::type type;
         };
 
-        namespace ext
-        {
-            template <typename Action>
-            struct get_action_name_impl
-            {
-                static HPX_ALWAYS_EXPORT char const * call();
-            };
-        }
-
         template <typename Action>
         char const* get_action_name()
         {
-            return ext::get_action_name_impl<Action>::call();
+            return traits::get_action_name<Action>::call();
         }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    namespace traits
-    {
-        // The customization point handle_gid is used to handle reference
-        // counting of GIDs while they are transferred to a different locality.
-        // It has to be specialized for arbitrary types, which may hold GIDs.
-        //
-        // It is important to make sure that all GID instances which are
-        // contained in any transferred data structure are handled during
-        // serialization. For this reason any user defined data type, which
-        // is passed as an parameter to a action or which is returned from
-        // a result_action needs to provide a corresponding specialization.
-        //
-        // The purpose of this customization point is to call the provided
-        // function for all GIDs held in the data type.
-        template <typename T, typename F, typename Enable = void>
-        struct handle_gid
-        {
-            static bool call(T const&, F)
-            {
-                return true;    // do nothing for arbitrary types
-            }
-        };
-
-        template <typename F>
-        struct handle_gid<naming::id_type, F>
-        {
-            static bool call(naming::id_type const &id, F const& f)
-            {
-                f(id);
-                return true;
-            }
-        };
-
-        template <typename F>
-        struct handle_gid<std::vector<naming::id_type>, F>
-        {
-            static bool call(std::vector<naming::id_type> const& ids, F const& f)
-            {
-                BOOST_FOREACH(naming::id_type const& id, ids)
-                    f(boost::ref(id));
-                return true;
-            }
-        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -608,13 +607,13 @@ namespace hpx { namespace actions
 // Helper macro for action serialization, each of the defined actions needs to
 // be registered with the serialization library
 #define HPX_DEFINE_GET_ACTION_NAME(action)                                    \
-        namespace hpx { namespace actions { namespace detail { namespace ext {\
+        namespace hpx { namespace traits {                                    \
             template<> HPX_ALWAYS_EXPORT                                      \
-            char const* get_action_name_impl<action>::call()                  \
+            char const* get_action_name<action>::call()                       \
             {                                                                 \
                 return BOOST_PP_STRINGIZE(action);                            \
             }                                                                 \
-        }}}}                                                                  \
+        }}                                                                    \
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////

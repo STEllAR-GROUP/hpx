@@ -30,6 +30,7 @@
 #include <hpx/config/function.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
+#include <hpx/traits.hpp>
 
 /// \namespace hpx
 ///
@@ -431,15 +432,6 @@ namespace hpx
 
     HPX_EXPORT components::server::runtime_support* get_runtime_support_ptr();
 
-    /// \namespace traits
-    namespace traits
-    {
-        template <typename Result, typename Enable = void>
-        struct promise_remote_result;
-
-        template <typename Result, typename Enable = void>
-        struct promise_local_result;
-    }
 
     /// \namespace lcos
     namespace lcos

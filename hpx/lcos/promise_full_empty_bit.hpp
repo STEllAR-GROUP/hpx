@@ -710,20 +710,20 @@ namespace hpx { namespace lcos
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components
+namespace hpx { namespace traits
 {
     template <typename Result, typename RemoteResult, int N>
     struct component_type_database<
         lcos::detail::promise<Result, RemoteResult, N> >
     {
-        static component_type get()
+        static components::component_type get()
         {
             return component_type_database<
                 lcos::base_lco_with_value<Result, RemoteResult>
             >::get();
         }
 
-        static void set(component_type t)
+        static void set(components::component_type t)
         {
             component_type_database<
                 lcos::base_lco_with_value<Result, RemoteResult>

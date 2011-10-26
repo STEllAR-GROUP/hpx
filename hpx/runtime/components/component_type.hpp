@@ -63,36 +63,45 @@ namespace hpx { namespace components
         }
         return lhs_base == rhs_base;
     }
+}}
 
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace traits
+{
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Enable = void>
+    template <typename Component, typename Enable>
     struct component_type_database
     {
-        static component_type value;
+        static components::component_type value;
 
-        static HPX_ALWAYS_EXPORT component_type get();
-        static HPX_ALWAYS_EXPORT void set(component_type);
+        static HPX_ALWAYS_EXPORT components::component_type get();
+        static HPX_ALWAYS_EXPORT void set(components::component_type);
     };
 
     template <typename Component, typename Enable>
-    component_type component_type_database<Component, Enable>::value = component_invalid;
+    components::component_type
+    component_type_database<Component, Enable>::value = components::component_invalid;
 
     template <typename Component, typename Enable>
     struct component_type_database<Component const, Enable>
       : component_type_database<Component, Enable>
     {};
+}}
 
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace components
+{
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
     inline component_type get_component_type()
     {
-        return component_type_database<Component>::get();
+        return traits::component_type_database<Component>::get();
     }
 
     template <typename Component>
     inline void set_component_type(component_type type)
     {
-        return component_type_database<Component>::set(type);
+        return traits::component_type_database<Component>::set(type);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -111,26 +120,26 @@ namespace hpx { namespace components
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_DEFINE_GET_COMPONENT_TYPE(component)                              \
-    namespace hpx { namespace components                                      \
+    namespace hpx { namespace traits                                          \
     {                                                                         \
         template <> HPX_ALWAYS_EXPORT                                         \
-        component_type component_type_database<component>::get()              \
+        components::component_type component_type_database<component>::get()  \
             { return value; }                                                 \
         template <> HPX_ALWAYS_EXPORT                                         \
-        void component_type_database<component>::set(component_type t)        \
-            { value = t; }                                                    \
+        void component_type_database<component>::set(                         \
+            components::component_type t) { value = t; }                      \
     }}                                                                        \
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(component, type)                 \
-    namespace hpx { namespace components                                      \
+    namespace hpx { namespace traits                                          \
     {                                                                         \
         template <> HPX_ALWAYS_EXPORT                                         \
-        component_type component_type_database<component>::get()              \
+        components::component_type component_type_database<component>::get()  \
             { return type; }                                                  \
         template <> HPX_ALWAYS_EXPORT                                         \
-        void component_type_database<component>::set(component_type)          \
+        void component_type_database<component>::set(components::component_type) \
             { BOOST_ASSERT(false); }                                          \
     }}                                                                        \
     /**/

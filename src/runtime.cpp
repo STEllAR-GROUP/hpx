@@ -685,8 +685,8 @@ namespace hpx
  
     HPX_EXPORT components::server::runtime_support* get_runtime_support_ptr()
     {
-        return reinterpret_cast<components::server::runtime_support*>
-            (get_runtime().get_runtime_support_lva());
+        return reinterpret_cast<components::server::runtime_support*>(
+            get_runtime().get_runtime_support_lva());
     }
 }
 

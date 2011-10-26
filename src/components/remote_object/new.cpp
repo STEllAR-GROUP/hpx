@@ -8,7 +8,7 @@
 
 namespace hpx { namespace components { namespace remote_object
 {
-    HPX_EXPORT naming::id_type
+    HPX_COMPONENT_EXPORT naming::id_type
     new_impl(
         naming::id_type const & target_id
       , util::function<void(void**)> ctor
@@ -17,7 +17,7 @@ namespace hpx { namespace components { namespace remote_object
     {
         naming::id_type object_id
             = stubs::remote_object::create_sync(target_id);
-        
+
         lcos::promise<void> apply_promise
             = stubs::remote_object::apply_async(object_id, ctor);
         lcos::promise<void> dtor_promise

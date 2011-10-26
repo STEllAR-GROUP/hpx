@@ -58,7 +58,7 @@
       : apply_logger_("eager_future::apply")
     {
         LLCO_(info) << "eager_future::eager_future("
-                    << hpx::actions::detail::get_action_name<Action>()
+//                    << hpx::actions::detail::get_action_name<Action>()
                     << ", "
                     << gid
                     << ") args(" << (N + 1) << ")";

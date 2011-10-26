@@ -70,15 +70,14 @@ namespace hpx { namespace components
 
 namespace hpx { namespace traits
 {
+    ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     struct promise_remote_result<hpx::components::object<T> >
     {
         typedef ::hpx::naming::id_type type;
     };
-}}
 
-namespace hpx { namespace components
-{
+    ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     struct component_type_database<
         hpx::lcos::base_lco_with_value<
@@ -87,13 +86,13 @@ namespace hpx { namespace components
         >
     >
     {
-        static HPX_ALWAYS_EXPORT component_type
+        static HPX_ALWAYS_EXPORT components::component_type
         get()
         {
             return hpx::components::component_base_lco_with_value;
         }
         static HPX_ALWAYS_EXPORT void
-        set(component_type)
+        set(components::component_type)
         {
             BOOST_ASSERT(false);
         }

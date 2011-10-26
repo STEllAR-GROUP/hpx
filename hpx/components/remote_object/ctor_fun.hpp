@@ -59,7 +59,7 @@ namespace hpx { namespace components { namespace remote_object
 /**/
 
 #define HPX_REMOTE_OBJECT_MOVE(Z, N, D)                                         \
-    BOOST_PP_CAT(a, N) = boost::move(BOOST_PP_CAT(rhs.a, N));                   \
+    BOOST_PP_CAT(a, N) = boost::move(rhs.BOOST_PP_CAT(a, N));                   \
 /**/
 
 #define HPX_REMOTE_OBJECT_M1(Z, N, D)                                           \

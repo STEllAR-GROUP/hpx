@@ -15,7 +15,7 @@ namespace hpx { namespace components
     namespace remote_object
     {
         // implementation of new
-        HPX_EXPORT naming::id_type
+        HPX_COMPONENT_EXPORT naming::id_type
         new_impl(
             naming::id_type const & target_id
           , util::function<void(void**)> ctor
