@@ -97,7 +97,7 @@ namespace hpx { namespace threads
         std::size_t num_os_thread;
 
     private:
-        BOOST_COPYABLE_AND_MOVABLE(object);
+        BOOST_COPYABLE_AND_MOVABLE(thread_init_data);
     };
 }}
 
