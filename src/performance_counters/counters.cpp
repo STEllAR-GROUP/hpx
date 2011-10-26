@@ -49,10 +49,10 @@ HPX_DEFINE_GET_COMPONENT_TYPE(
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
-    template hpx::performance_counters::counter_info const&
+    template HPX_EXPORT hpx::performance_counters::counter_info const&
     continuation::trigger(hpx::performance_counters::counter_info const& arg0);
 
-    template hpx::performance_counters::counter_value const&
+    template HPX_EXPORT hpx::performance_counters::counter_value const&
     continuation::trigger(hpx::performance_counters::counter_value const& arg0);
 }}
 

@@ -122,7 +122,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
-    template hpx::util::section const&
+    template HPX_EXPORT hpx::util::section const&
     continuation::trigger(hpx::util::section const&);
 }}
 
