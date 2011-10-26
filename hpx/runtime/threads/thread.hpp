@@ -118,6 +118,9 @@ namespace hpx { namespace threads { namespace detail
             back_ptr_(0),
             pool_(&pool)
         {
+            LTM_(debug) << "thread::thread(" << this << "), description("
+                        << init_data.description << ")";
+
             // store the thread id of the parent thread, mainly for debugging
             // purposes
             if (0 == parent_thread_id_) {
@@ -147,6 +150,9 @@ namespace hpx { namespace threads { namespace detail
             back_ptr_(0),
             pool_(&pool)
         {
+            LTM_(debug) << "thread::thread(" << this << "), description("
+                        << init_data.description << ")";
+
             // store the thread id of the parent thread, mainly for debugging
             // purposes
             if (0 == parent_thread_id_) {
@@ -175,7 +181,11 @@ namespace hpx { namespace threads { namespace detail
         }
 
         ~thread()
-        {}
+        {
+            LTM_(debug) << "~thread(" << this << "), description("
+                        << get_description() << "), phase("
+                        << get_thread_phase() << ")";
+        }
 
         static components::component_type get_component_type();
         static void set_component_type(components::component_type);
@@ -440,12 +450,7 @@ namespace hpx { namespace threads
         inline thread(BOOST_RV_REF(thread_init_data) init_data,
             thread_pool& pool, thread_state_enum new_state);
 
-        ~thread()
-        {
-            LTM_(debug) << "~thread(" << this << "), description("
-                        << get()->get_description() << "), phase("
-                        << get()->get_thread_phase() << ")";
-        }
+        ~thread() {}
 
         ///////////////////////////////////////////////////////////////////////
         // memory management
@@ -710,20 +715,13 @@ namespace hpx { namespace threads
             thread_pool& pool, thread_state_enum new_state)
       : thread::base_type(new (pool) detail::thread(
             init_data, This(), new_state, pool))
-    {
-        LTM_(debug) << "thread::thread(" << this << "), description("
-                    << init_data.description << ")";
-    }
+    {}
 
     inline thread::thread(BOOST_RV_REF(thread_init_data) init_data,
             thread_pool& pool, thread_state_enum new_state)
       : thread::base_type(new (pool) detail::thread(
             boost::move(init_data), This(), new_state, pool))
-    {
-        LTM_(debug) << "thread::thread(" << this << "), description("
-                    << init_data.description << ")";
-
-    }
+    {}
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
