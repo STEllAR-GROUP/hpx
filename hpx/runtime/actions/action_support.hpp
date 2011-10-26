@@ -58,7 +58,7 @@ namespace hpx { namespace actions
         namespace ext
         {
             template <typename Action>
-            struct HPX_EXPORT get_action_name_impl
+            struct HPX_ALWAYS_EXPORT get_action_name_impl
             {
                 static char const * call();
             };
@@ -608,17 +608,13 @@ namespace hpx { namespace actions
 // Helper macro for action serialization, each of the defined actions needs to
 // be registered with the serialization library
 #define HPX_DEFINE_GET_ACTION_NAME(action)                                    \
-        namespace hpx { namespace actions { namespace detail {                \
-            namespace ext { \
-            template<>  \
-            struct get_action_name_impl<action> \
-            {   \
-                HPX_ALWAYS_EXPORT                                      \
-                static char const* call()                             \
-                { return BOOST_PP_STRINGIZE(action); }                            \
-            }; \
-            } \
-        }}}                                                                   \
+        namespace hpx { namespace actions { namespace detail { namespace ext {\
+            template<> HPX_ALWAYS_EXPORT struct get_action_name_impl<action>  \
+            {                                                                 \
+                static char const* call()                                     \
+                { return BOOST_PP_STRINGIZE(action); }                        \
+            };                                                                \
+        }}}}                                                                  \
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////
