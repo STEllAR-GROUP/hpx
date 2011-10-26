@@ -10,6 +10,7 @@
 
 #include <boost/move/move.hpp>
 #include <boost/preprocessor/repetition/enum_params_with_a_default.hpp>
+#include <boost/preprocessor/repetition/enum.hpp>
 
 #ifndef HPX_FUNCTION_LIMIT
 #define HPX_FUNCTION_LIMIT 10
@@ -54,7 +55,7 @@ namespace hpx { namespace components { namespace remote_object
 /**/
 
 #define HPX_REMOTE_OBJECT_COPY(Z, N, D)                                         \
-    BOOST_PP_CAT(a, N) = BOOST_PP_CAT(rhs.a, N);                                \
+    BOOST_PP_CAT(a, N) = rhs.BOOST_PP_CAT(a, N);                                \
 /**/
 
 #define HPX_REMOTE_OBJECT_MOVE(Z, N, D)                                         \
@@ -114,7 +115,7 @@ namespace hpx { namespace components { namespace remote_object
         ctor_fun& operator=(BOOST_COPY_ASSIGN_REF(ctor_fun) rhs)
         {
             if (this != &rhs) {
-                BOOST_PP_ENUM(N, HPX_REMOTE_OBJECT_COPY, _)
+                BOOST_PP_REPEAT(N, HPX_REMOTE_OBJECT_COPY, _)
             }
             return *this;
         }
@@ -122,7 +123,7 @@ namespace hpx { namespace components { namespace remote_object
         ctor_fun& operator=(BOOST_RV_REF(ctor_fun) rhs)
         {
             if (this != &rhs) {
-                BOOST_PP_ENUM(N, HPX_REMOTE_OBJECT_MOVE, _)
+                BOOST_PP_REPEAT(N, HPX_REMOTE_OBJECT_MOVE, _)
             }
             return *this;
         }

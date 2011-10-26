@@ -133,7 +133,7 @@ namespace hpx { namespace util {
             > vtable_ptr_type;
 
         template <typename Functor>
-            HPX_FUNCTION_NAME(Functor f)
+            HPX_FUNCTION_NAME(Functor const & f)
             : vptr(
                 detail::get_table<Functor, R(BOOST_PP_ENUM_PARAMS(N, A))>::template get<
                     IArchive
@@ -153,11 +153,19 @@ namespace hpx { namespace util {
             }
         }
 
-        HPX_FUNCTION_NAME(HPX_FUNCTION_NAME const& other)
+        HPX_FUNCTION_NAME(BOOST_COPY_ASSIGN_REF(HPX_FUNCTION_NAME) other)
             : vptr(0)
             , object(0)
         {
             assign(other);
+        }
+
+        HPX_FUNCTION_NAME(BOOST_RV_REF(HPX_FUNCTION_NAME) other)
+            : vptr(other.vptr)
+            , object(other.object)
+        {
+            other.vptr = 0;
+            other.object = 0;
         }
 
         HPX_FUNCTION_NAME &assign(HPX_FUNCTION_NAME const & other)
@@ -216,7 +224,6 @@ namespace hpx { namespace util {
                 }
                 else
                 {
-                    reset();
                     object = new Functor(f);
                 }
                 vptr = f_vptr;
@@ -229,6 +236,26 @@ namespace hpx { namespace util {
         {
             return assign(t);
         }
+        
+        HPX_FUNCTION_NAME & operator=(BOOST_COPY_ASSIGN_REF(HPX_FUNCTION_NAME) t)
+        {
+            return assign(t);
+        }
+        
+        HPX_FUNCTION_NAME & operator=(BOOST_RV_REF(HPX_FUNCTION_NAME) t)
+        {
+            if(this != &t)
+            {
+                reset();
+                vptr = t.vptr;
+                object = t.object;
+                t.vptr = 0;
+                t.object = 0;
+            }
+
+            return *this;
+        }
+
 
         HPX_FUNCTION_NAME &swap(HPX_FUNCTION_NAME& f)
         {
@@ -262,7 +289,7 @@ namespace hpx { namespace util {
             }
         }
 
-        R operator()(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
+        R operator()(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))// const
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a));
@@ -283,7 +310,7 @@ namespace hpx { namespace util {
                 ar >> p;
                 vptr = p->get_ptr();
                 delete p;
-                p->iserialize(&object, ar, version);
+                vptr->iserialize(&object, ar, version);
             }
         }
 
@@ -299,6 +326,9 @@ namespace hpx { namespace util {
         }
 
         BOOST_SERIALIZATION_SPLIT_MEMBER();
+
+    private:
+        BOOST_COPYABLE_AND_MOVABLE(HPX_FUNCTION_NAME);
 
         vtable_ptr_type *vptr;
         void *object;

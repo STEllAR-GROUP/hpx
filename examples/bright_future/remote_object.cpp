@@ -59,6 +59,8 @@ struct output
     {}
 };
 
+int cctor_counter = 0;
+
 struct plus
 {
     typedef int result_type;
@@ -66,6 +68,8 @@ struct plus
     int i;
     plus() {}
     plus(int i) : i(i) {}
+
+    plus(plus const & p) : i(p.i) { ++cctor_counter; }
 
     int operator()(foo const & f) const
     {
@@ -106,7 +110,9 @@ int hpx_main(variables_map &)
         BOOST_FOREACH(object_type & o, objects)
         {
             wait(o <= output());
+            cctor_counter = 0;
             cout << (o <= plus(9)).get() << "\n" << flush;
+            cout << cctor_counter << "\n" << flush;
         }
     }
     finalize();

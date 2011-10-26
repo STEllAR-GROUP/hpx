@@ -6,6 +6,7 @@
 #ifndef HPX_COMPONENTS_REMOTE_OBJECT_OBJECT_HPP
 #define HPX_COMPONENTS_REMOTE_OBJECT_OBJECT_HPP
 
+#include <boost/move/move.hpp>
 #include <hpx/components/remote_object/stubs/remote_object.hpp>
 #include <hpx/lcos/promise.hpp>
 #include <hpx/runtime/naming/address.hpp>
@@ -20,7 +21,7 @@ namespace hpx { namespace components
         struct invoke_apply_fun
         {
             invoke_apply_fun() {}
-            invoke_apply_fun(F f) : f(f) {}
+            invoke_apply_fun(F const & f) : f(f) {}
 
             typedef typename boost::result_of<F(T &)>::type result_type;
 
@@ -50,7 +51,7 @@ namespace hpx { namespace components
         lcos::promise<
             typename boost::result_of<F(T &)>::type
         >
-        operator<=(F f) const
+        operator<=(F const & f) const
         {
             return
                 stubs::remote_object::apply_async(
@@ -86,12 +87,12 @@ namespace hpx { namespace components
         >
     >
     {
-        static component_type HPX_ALWAYS_EXPORT
+        static HPX_ALWAYS_EXPORT component_type
         get()
         {
             return hpx::components::component_base_lco_with_value;
         }
-        static void HPX_ALWAYS_EXPORT
+        static HPX_ALWAYS_EXPORT void
         set(component_type)
         {
             BOOST_ASSERT(false);

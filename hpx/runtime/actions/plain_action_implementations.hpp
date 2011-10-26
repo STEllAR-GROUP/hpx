@@ -977,6 +977,69 @@
             return data;
         }
     };
+    
+    template <
+        BOOST_PP_ENUM_PARAMS(N, typename T),
+        void (*F)(BOOST_PP_ENUM_PARAMS(N, T)),
+        threads::thread_priority Priority,
+        typename Derived>
+    class BOOST_PP_CAT(plain_result_action, N)<
+        void
+      , BOOST_PP_ENUM_PARAMS(N, T)
+      , F
+      , Priority
+      , Derived
+    >
+      : public BOOST_PP_CAT(plain_action, N)<
+            BOOST_PP_ENUM_PARAMS(N, T)
+          , F
+          , Priority
+          , Derived
+        >
+    {
+    private:
+        typedef BOOST_PP_CAT(plain_action, N)<
+          BOOST_PP_ENUM_PARAMS(N, T), F, Priority, Derived>
+        base_type;
+
+    public:
+        BOOST_PP_CAT(plain_result_action, N)(
+                threads::thread_priority priority = Priority)
+          : base_type(priority)
+        {}
+
+        // construct an action from its arguments
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+        BOOST_PP_CAT(plain_result_action, N)(
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
+        {}
+
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+        BOOST_PP_CAT(plain_result_action, N)(
+                threads::thread_priority priority,
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg))
+        {}
+
+        /// serialization support
+        static void register_base()
+        {
+            using namespace boost::serialization;
+            void_cast_register<BOOST_PP_CAT(plain_result_action, N), base_type>();
+            base_type::register_base();
+        }
+
+    private:
+        // serialization support
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int /*version*/)
+        {
+            ar & boost::serialization::base_object<base_type>(*this);
+        }
+    };
 
 #undef HPX_PARAM_ARGUMENT
 #undef HPX_PARAM_TYPES

@@ -123,7 +123,7 @@ namespace boost { namespace serialization {
                         hpx::actions::result_action2<
                             hpx::components::server::remote_object
                           , R
-                          , hpx::components::server::remote_object::actions::remote_object_apply
+                          , hpx::components::server::remote_object::remote_object_apply
                           , hpx::util::function<R(void**)>
                           , std::size_t
                           , &hpx::components::server::remote_object::apply<R>

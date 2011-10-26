@@ -772,6 +772,38 @@ namespace hpx { namespace actions
             return this->get_thread_init_data(cont, lva, data);
         }
     };
+    
+    template <void (*F)(),
+        threads::thread_priority Priority,
+        typename Derived>
+    class plain_result_action0<void, F, Priority, Derived>
+        : public plain_action0<F, Priority, Derived>
+    {
+        typedef plain_action0<F, Priority, Derived> base_type;
+
+    public:
+        explicit plain_result_action0(threads::thread_priority priority = Priority)
+          : base_type(priority)
+        {}
+
+        /// serialization support
+        static void register_base()
+        {
+            using namespace boost::serialization;
+            void_cast_register<plain_result_action0, base_type>();
+            base_type::register_base();
+        }
+
+    private:
+        // serialization support
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int /*version*/)
+        {
+            ar & boost::serialization::base_object<base_type>(*this);
+        }
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     // bring in the rest of the implementations

@@ -23,11 +23,12 @@ namespace hpx { namespace components { namespace stubs
     private:
         template <typename F>
         static lcos::promise<typename F::result_type>
-        apply_async_invoke(naming::id_type const & target_id, F f, boost::mpl::false_)
+        apply_async_invoke(naming::id_type const & target_id, F const & f, boost::mpl::false_)
         {
+            typedef typename F::result_type result_type;
             typedef typename
                 server::remote_object::apply_action<
-                    typename F::result_type
+                    result_type
                 >::type
                 action_type;
             boost::archive::detail::extra_detail::init_guid<action_type>::g.initialize();
@@ -36,7 +37,7 @@ namespace hpx { namespace components { namespace stubs
         
         template <typename F>
         static lcos::promise<void>
-        apply_async_invoke(naming::id_type const & target_id, F f, boost::mpl::true_)
+        apply_async_invoke(naming::id_type const & target_id, F const & f, boost::mpl::true_)
         {
             typedef typename
                 server::remote_object::apply_action<void>::type
@@ -47,21 +48,21 @@ namespace hpx { namespace components { namespace stubs
     public:
         template <typename F>
         static lcos::promise<typename F::result_type>
-        apply_async(naming::id_type const & target_id, F f)
+        apply_async(naming::id_type const & target_id, F const & f)
         {
             return apply_async_invoke(target_id, f, typename boost::is_void<typename F::result_type>::type());
         }
 
         template <typename F>
         static typename F::result_type
-        apply(naming::id_type const & target_id, F f)
+        apply(naming::id_type const & target_id, F const & f)
         {
             return apply_async(target_id, f).get();
         }
         
         template <typename F>
         static lcos::promise<void>
-        set_dtor_async(naming::id_type const & target_id, F f)
+        set_dtor_async(naming::id_type const & target_id, F const & f)
         {
             typedef server::remote_object::set_dtor_action action_type;
             return lcos::eager_future<action_type>(target_id, f, 0);
@@ -69,7 +70,7 @@ namespace hpx { namespace components { namespace stubs
 
         template <typename F>
         static void 
-        set_dtor(naming::id_type const & target_id, F f)
+        set_dtor(naming::id_type const & target_id, F const & f)
         {
             set_dtor_async(target_id, f).get();
         }

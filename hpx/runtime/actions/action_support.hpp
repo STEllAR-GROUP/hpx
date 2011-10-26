@@ -60,7 +60,7 @@ namespace hpx { namespace actions
             template <typename Action>
             struct get_action_name_impl
             {
-                static char const* call();
+                static HPX_ALWAYS_EXPORT char const * call();
             };
         }
 

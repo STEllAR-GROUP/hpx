@@ -1041,6 +1041,24 @@
                 BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
           : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg))
         {}
+        
+        /// serialization support
+        static void register_base()
+        {
+            using namespace boost::serialization;
+            void_cast_register<BOOST_PP_CAT(result_action, N), base_type>();
+            base_type::register_base();
+        }
+        
+    private:
+        // serialization support
+        friend class boost::serialization::access;
+
+        template<class Archive>
+        void serialize(Archive& ar, const unsigned int /*version*/)
+        {
+            ar & boost::serialization::base_object<base_type>(*this);
+        }
     };
 
 #undef HPX_PARAM_ARGUMENT
