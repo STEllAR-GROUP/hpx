@@ -51,7 +51,7 @@ namespace hpx { namespace components { namespace server
                     >
                     type;
             };
-            
+
             void set_dtor(hpx::util::function<void(void**)> d, std::size_t count);
 
             typedef
@@ -67,7 +67,7 @@ namespace hpx { namespace components { namespace server
             void *object;
             hpx::util::function<void(void**)> dtor;
     };
-    
+
     template <>
     struct remote_object::apply_action<void>
     {
@@ -96,20 +96,20 @@ namespace boost { namespace serialization {
         hpx::actions::result_action2<
             hpx::components::server::remote_object
           , R
-          , hpx::components::server::remote_object::actions::remote_object_apply
+          , hpx::components::server::remote_object::remote_object_apply
           , hpx::util::function<R(void**)>
           , std::size_t
           , &hpx::components::server::remote_object::apply<R>
         >
     > : boost::mpl::true_ {};
-    
+
     namespace ext {
         template <typename R>
         struct guid_impl<
             hpx::actions::result_action2<
                 hpx::components::server::remote_object
               , R
-              , hpx::components::server::remote_object::actions::remote_object_apply
+              , hpx::components::server::remote_object::remote_object_apply
               , hpx::util::function<R(void**)>
               , std::size_t
               , &hpx::components::server::remote_object::apply<R>
@@ -139,7 +139,7 @@ namespace boost { namespace archive { namespace detail { namespace extra_detail 
         hpx::actions::result_action2<
             hpx::components::server::remote_object
           , R
-          , hpx::components::server::remote_object::actions::remote_object_apply
+          , hpx::components::server::remote_object::remote_object_apply
           , hpx::util::function<R(void**)>
           , std::size_t
           , &hpx::components::server::remote_object::apply<R>
@@ -151,7 +151,7 @@ namespace boost { namespace archive { namespace detail { namespace extra_detail 
                 hpx::actions::result_action2<
                     hpx::components::server::remote_object
                   , R
-                  , hpx::components::server::remote_object::actions::remote_object_apply
+                  , hpx::components::server::remote_object::remote_object_apply
                   , hpx::util::function<R(void**)>
                   , std::size_t
                   , &hpx::components::server::remote_object::apply<R>
@@ -165,7 +165,7 @@ namespace boost { namespace archive { namespace detail { namespace extra_detail 
         hpx::actions::result_action2<
             hpx::components::server::remote_object
           , R
-          , hpx::components::server::remote_object::actions::remote_object_apply
+          , hpx::components::server::remote_object::remote_object_apply
           , hpx::util::function<R(void**)>
           , std::size_t
           , &hpx::components::server::remote_object::apply<R>
@@ -175,7 +175,7 @@ namespace boost { namespace archive { namespace detail { namespace extra_detail 
         hpx::actions::result_action2<
             hpx::components::server::remote_object
           , R
-          , hpx::components::server::remote_object::actions::remote_object_apply
+          , hpx::components::server::remote_object::remote_object_apply
           , hpx::util::function<R(void**)>
           , std::size_t
           , &hpx::components::server::remote_object::apply<R>
@@ -185,7 +185,7 @@ namespace boost { namespace archive { namespace detail { namespace extra_detail 
             hpx::actions::result_action2<
                 hpx::components::server::remote_object
               , R
-              , hpx::components::server::remote_object::actions::remote_object_apply
+              , hpx::components::server::remote_object::remote_object_apply
               , hpx::util::function<R(void**)>
               , std::size_t
               , &hpx::components::server::remote_object::apply<R>
@@ -200,7 +200,7 @@ namespace hpx { namespace actions { namespace detail { namespace ext {
         hpx::actions::result_action2<
             hpx::components::server::remote_object
           , R
-          , hpx::components::server::remote_object::actions::remote_object_apply
+          , hpx::components::server::remote_object::remote_object_apply
           , hpx::util::function<R(void**)>
           , std::size_t
           , &hpx::components::server::remote_object::apply<R>
@@ -214,7 +214,7 @@ namespace hpx { namespace actions { namespace detail { namespace ext {
                     hpx::actions::result_action2<
                         hpx::components::server::remote_object
                       , R
-                      , hpx::components::server::remote_object::actions::remote_object_apply
+                      , hpx::components::server::remote_object::remote_object_apply
                       , hpx::util::function<R(void**)>
                       , std::size_t
                       , &hpx::components::server::remote_object::apply<R>
