@@ -52,16 +52,28 @@ namespace hpx { namespace lcos { namespace detail
 
         /// Reset the promise to allow to restart an asynchronous
         /// operation. Allows any subsequent set_data operation to succeed.
-        void reset()
+        void reset(int slot, error_code& ec = throws)
         {
-            data_->set_empty();
+            if (slot < 0 || slot >= N) {
+                HPX_THROWS_IF(ec, bad_parameter,
+                    "promise<Result, N>::reset", "slot index out of range");
+                return;
+            }
+
+            data_[slot].set_empty();
         }
 
         /// Return whether or not the data is available for this
         /// \a promise.
-        bool ready() const
+        bool ready(int slot, error_code& ec = throws) const
         {
-            return !(data_->is_empty());
+            if (slot < 0 || slot >= N) {
+                HPX_THROWS_IF(ec, bad_parameter,
+                    "promise<Result, N>::ready", "slot index out of range");
+                return false;
+            }
+
+            return !(data_[slot].is_empty());
         }
 
         /// Get the result of the requested action. This call blocks (yields
@@ -228,16 +240,28 @@ namespace hpx { namespace lcos { namespace detail
 
         /// Reset the promise to allow to restart an asynchronous
         /// operation. Allows any subsequent set_data operation to succeed.
-        void reset()
+        void reset(int slot, error_code& ec = throws)
         {
-            data_->set_empty();
+            if (slot < 0 || slot >= N) {
+                HPX_THROWS_IF(ec, bad_parameter,
+                    "promise<Result, N>::reset", "slot index out of range");
+                return;
+            }
+
+            data_[slot].set_empty();
         }
 
         /// Return whether or not the data is available for this
         /// \a promise.
-        bool ready()
+        bool ready(int slot, error_code& ec = throws) const
         {
-            return !(data_->is_empty());
+            if (slot < 0 || slot >= N) {
+                HPX_THROWS_IF(ec, bad_parameter,
+                    "promise<Result, N>::ready", "slot index out of range");
+                return false;
+            }
+
+            return !(data_[slot].is_empty());
         }
 
         /// Get the result of the requested action. This call blocks (yields
@@ -497,7 +521,7 @@ namespace hpx { namespace lcos
         /// operation. Allows any subsequent set_data operation to succeed.
         void reset()
         {
-            (*impl_)->reset();
+            (*impl_)->reset(0);
         }
 
         /// \brief Return the global id of this \a future instance
@@ -510,7 +534,7 @@ namespace hpx { namespace lcos
         /// \a promise.
         bool ready() const
         {
-            return (*impl_)->ready();
+            return (*impl_)->ready(0);
         }
 
         typedef Result result_type;
@@ -547,6 +571,17 @@ namespace hpx { namespace lcos
             detail::log_on_exit<wrapping_type> on_exit(impl_, ec);
             return (*impl_)->get_data(0, ec);
         }
+
+        void set(int slot, RemoteResult const& result) 
+        {
+            return (*impl_)->set_data(slot, result);
+        }
+
+        void set(RemoteResult const& result) 
+        {
+            return (*impl_)->set_data(0, result);
+        }
+
 
         void invalidate(int slot, boost::exception_ptr const& e)
         {
@@ -597,7 +632,7 @@ namespace hpx { namespace lcos
         /// operation. Allows any subsequent set_data operation to succeed.
         void reset()
         {
-            (*impl_)->reset();
+            (*impl_)->reset(0);
         }
 
         /// \brief Return the global id of this \a future instance
@@ -610,7 +645,7 @@ namespace hpx { namespace lcos
         /// \a promise.
         bool ready() const
         {
-            return (*impl_)->ready();
+            return (*impl_)->ready(0);
         }
 
         typedef util::unused_type result_type;
@@ -643,6 +678,16 @@ namespace hpx { namespace lcos
         {
             detail::log_on_exit<wrapping_type> on_exit(impl_, ec);
             return (*impl_)->get_data(0, ec);
+        }
+
+        void set(int slot) 
+        {
+            return (*impl_)->set_data(slot, util::unused_type());
+        }
+
+        void set() 
+        {
+            return (*impl_)->set_data(0, util::unused_type());
         }
 
         void invalidate(int slot, boost::exception_ptr const& e)
