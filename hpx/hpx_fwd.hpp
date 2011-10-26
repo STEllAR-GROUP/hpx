@@ -429,6 +429,8 @@ namespace hpx
         HPX_EXPORT void activate_logging();
     }
 
+    HPX_EXPORT components::server::runtime_support* get_runtime_support_ptr();
+
     /// \namespace traits
     namespace traits
     {
