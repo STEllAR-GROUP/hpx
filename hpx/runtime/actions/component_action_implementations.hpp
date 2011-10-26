@@ -97,16 +97,18 @@
             try {
                 LTM_(debug) << "Executing component action("
                             << detail::get_action_name<Derived>()
-                            << ") lva(" << reinterpret_cast<void*>
-                                (get_lva<Component>::call(lva)) << ")";
+                            << ")";
+//                             << ") lva(" << reinterpret_cast<void*>
+//                                 (get_lva<Component>::call(lva)) << ")";
                 (get_lva<Component>::call(lva)->*F)(BOOST_PP_ENUM_PARAMS(N, arg));
             }
             catch (hpx::exception const& e) {
                 LTM_(error)
                     << "Unhandled exception while executing component action("
                     << detail::get_action_name<Derived>()
-                    << ") lva(" << reinterpret_cast<void*>
-                        (get_lva<Component>::call(lva)) << "): " << e.what();
+                    << ")" << e.what();
+//                     << ") lva(" << reinterpret_cast<void*>
+//                         (get_lva<Component>::call(lva)) << "): " << e.what();
 
                 // report this error to the console in any case
                 hpx::report_error(boost::current_exception());
@@ -569,16 +571,18 @@
             try {
                 LTM_(debug) << "Executing component action("
                             << detail::get_action_name<Derived>()
-                            << ") lva(" << reinterpret_cast<void*>
-                                (get_lva<Component>::call(lva)) << ")";
+                            << ")";
+//                             << ") lva(" << reinterpret_cast<void*>
+//                                 (get_lva<Component>::call(lva)) << ")";
                 (get_lva<Component>::call(lva)->*F)(BOOST_PP_ENUM_PARAMS(N, arg));
             }
             catch (hpx::exception const& e) {
                 LTM_(error)
                     << "Unhandled exception while executing component action("
                     << detail::get_action_name<Derived>()
-                    << ") lva(" << reinterpret_cast<void*>
-                        (get_lva<Component>::call(lva)) << "): " << e.what();
+                    << ")" << e.what();
+//                     << ") lva(" << reinterpret_cast<void*>
+//                         (get_lva<Component>::call(lva)) << "): " << e.what();
 
                 // report this error to the console in any case
                 hpx::report_error(boost::current_exception());
@@ -729,8 +733,9 @@
                 << "action" << N
                 << "::execute_function name("
                 << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void*>
-                    (get_lva<Component>::call(lva)) << ")";
+                << ")";
+//                 << ") lva(" << reinterpret_cast<void*>
+//                     (get_lva<Component>::call(lva)) << ")";
             (get_lva<Component>::call(lva)->*F)
                 (BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
             return util::unused;
@@ -744,8 +749,9 @@
                 << "action" << N
                 << "::execute_function_nonvirt name("
                 << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void*>
-                    (get_lva<Component>::call(lva)) << ")";
+                << ")";
+//                 << ") lva(" << reinterpret_cast<void*>
+//                     (get_lva<Component>::call(lva)) << ")";
             (get_lva<Component>::call(lva)->*F)
                 (BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
             return util::unused;
@@ -885,8 +891,9 @@
                 << "direct_action" << N
                 << "::execute_function name("
                 << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void*>
-                    (get_lva<Component>::call(lva)) << ")";
+                << ")";
+//                 << ") lva(" << reinterpret_cast<void*>
+//                     (get_lva<Component>::call(lva)) << ")";
             (get_lva<Component>::call(lva)->*F)
                 (BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
             return util::unused;
@@ -900,8 +907,9 @@
                 << "direct_action" << N
                 << "::execute_function_nonvirt name("
                 << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void*>
-                    (get_lva<Component>::call(lva)) << ")";
+                << ")";
+//                 << ") lva(" << reinterpret_cast<void*>
+//                     (get_lva<Component>::call(lva)) << ")";
             (get_lva<Component>::call(lva)->*F)
                 (BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
             return util::unused;
