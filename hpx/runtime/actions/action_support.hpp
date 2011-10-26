@@ -58,14 +58,14 @@ namespace hpx { namespace actions
         namespace ext
         {
             template <typename Action>
-            struct get_action_name_impl
+            struct HPX_EXPORT get_action_name_impl
             {
-                static HPX_ALWAYS_EXPORT char const * call();
+                static char const * call();
             };
         }
 
         template <typename Action>
-        HPX_ALWAYS_EXPORT char const* get_action_name()
+        char const* get_action_name()
         {
             return ext::get_action_name_impl<Action>::call();
         }
