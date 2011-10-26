@@ -131,7 +131,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
     // - get values from previous time step
     // - calculate current result
     // - set the result for the next time step
-    inline threads::thread_state dynamic_stencil_value::main()
+    inline void dynamic_stencil_value::main()
     {
         // ask functional component to create the local data value
         {
@@ -193,8 +193,6 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         if (is_called)
             sem_result_.signal();         // final result has been set
         free_helper_sync(value_gid_to_be_freed);
-
-        return threads::thread_state(threads::terminated);
     }
 
     ///////////////////////////////////////////////////////////////////////////

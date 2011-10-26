@@ -73,7 +73,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         };
 
         /// Main thread function looping through all timesteps
-        threads::thread_state main();
+        void main();
 
         /// This is the main entry point of this component. Calling this
         /// function (by applying the call_action) will trigger the repeated
