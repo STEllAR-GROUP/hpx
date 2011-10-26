@@ -85,6 +85,14 @@
     <None Include="..\..\..\..\examples\sheneos\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\components\distributing_factory\distributing_factory.vcxproj">
+      <Project>{46e027f2-3afc-4f13-b8c8-35a8e8559cd5}</Project>
+      <Private>true</Private>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
+    </ProjectReference>
     <ProjectReference Include="..\..\hpx\hpx.vcxproj">
       <Project>{e6c6c6c4-6959-4b47-b92a-6323a906cc40}</Project>
       <Private>true</Private>

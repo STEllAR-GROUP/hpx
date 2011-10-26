@@ -277,7 +277,17 @@
     <ClInclude Include="..\..\..\hpx\runtime\threads\policies\local_priority_queue_scheduler.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\threads\policies\queue_helpers.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\threads\policies\thread_deque.hpp" />
+    <ClInclude Include="..\..\..\hpx\traits.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\detail\function_template.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\detail\get_table.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\detail\serialization_registration.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\detail\vtable.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\detail\vtable_ptr.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\detail\vtable_ptr_base.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\detail\vtable_ptr_base_fwd.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\detail\vtable_ptr_fwd.hpp" />
     <ClInclude Include="..\..\..\hpx\util\filesystem_compatibility.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\function.hpp" />
     <ClInclude Include="..\..\..\hpx\util\hardware\bit_manipulation.hpp" />
     <ClInclude Include="..\..\..\hpx\util\hardware\cpuid.hpp" />
     <ClInclude Include="..\..\..\hpx\util\hardware\cpuid\linux_x86.hpp" />
@@ -291,6 +301,7 @@
     <ClInclude Include="..\..\..\hpx\util\locking_helpers.hpp" />
     <ClInclude Include="..\..\..\hpx\util\map_hostnames.hpp" />
     <ClInclude Include="..\..\..\hpx\util\pbs_environment.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\protect.hpp" />
     <ClInclude Include="..\..\..\hpx\util\query_counters.hpp" />
     <ClInclude Include="..\..\..\hpx\util\random.hpp" />
     <ClInclude Include="..\..\..\hpx\util\sed_transform.hpp" />

@@ -162,6 +162,9 @@
     <Filter Include="Header Files\Config">
       <UniqueIdentifier>{2bd75355-9018-4bac-90d2-39acc245d14c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Util\Detail">
+      <UniqueIdentifier>{25adbdf4-3bc6-471b-bc4e-b3df926d6be7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\external\chrono\libs\chrono\src\chrono.cpp">
@@ -1005,6 +1008,39 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\config\tuple.hpp">
       <Filter>Header Files\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\protect.hpp">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\detail\vtable.hpp">
+      <Filter>Header Files\Util\Detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\detail\vtable_ptr.hpp">
+      <Filter>Header Files\Util\Detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\detail\vtable_ptr_base.hpp">
+      <Filter>Header Files\Util\Detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\detail\vtable_ptr_base_fwd.hpp">
+      <Filter>Header Files\Util\Detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\detail\vtable_ptr_fwd.hpp">
+      <Filter>Header Files\Util\Detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\detail\function_template.hpp">
+      <Filter>Header Files\Util\Detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\detail\get_table.hpp">
+      <Filter>Header Files\Util\Detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\detail\serialization_registration.hpp">
+      <Filter>Header Files\Util\Detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\function.hpp">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\traits.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
