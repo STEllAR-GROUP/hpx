@@ -309,8 +309,8 @@ namespace hpx { namespace threads
 
         // just retry, set_state will create new thread if target is still active
         // REVIEW: report errors, at least?
-        error_code ec;      // do not throw
-        set_state(id, newstate, newstate_ex, priority, ec);
+        //error_code ec;      // do not throw
+        set_state(id, newstate, newstate_ex, priority/*, ec*/);
         return thread_state(terminated);
     }
 
@@ -340,21 +340,31 @@ namespace hpx { namespace threads
             return thread_state(unknown);
         }
 
-        if (&ec != &throws)
-            ec = make_success_code();
-
         // we know that the id is actually the pointer to the thread
         thread* thrd = reinterpret_cast<thread*>(id);
-        if (NULL == thrd->get())
+        if (NULL == thrd->get()) {
+            if (&ec != &throws)
+                ec = make_success_code();
             return thread_state(terminated);     // this thread has already been terminated
+        }
 
         // action depends on the current state
         thread_state previous_state = thrd->get_state();
         thread_state_enum previous_state_val = previous_state;
 
         // nothing to do here if the state doesn't change
-        if (new_state == previous_state_val)
+        if (new_state == previous_state_val) {
+            LTM_(fatal) << "set_state: old thread state is the same as new "
+                           "thread state, aborting state change, thread("
+                        << id << "), description("
+                        << thrd->get_description() << "), new state("
+                        << get_thread_state_name(new_state) << ")";
+
+            if (&ec != &throws)
+                ec = make_success_code();
+
             return thread_state(new_state);
+        }
 
         // the thread to set the state for is currently running, so we
         // schedule another thread to execute the pending set_state
@@ -372,9 +382,20 @@ namespace hpx { namespace threads
                 "set state for active thread", 0, priority);
             register_work(data);
 
+            if (&ec != &throws)
+                ec = make_success_code();
+
             return previous_state;     // done
         }
         else if (terminated == previous_state_val) {
+            LTM_(fatal) << "set_state: thread is terminated, aborting state "
+                           "change, thread(" << id << "), description("
+                        << thrd->get_description() << "), new state("
+                        << get_thread_state_name(new_state) << ")";
+
+            if (&ec != &throws)
+                ec = make_success_code();
+
             // If the thread has been terminated while this set_state was
             // pending nothing has to be done anymore.
             return previous_state;
@@ -384,7 +405,7 @@ namespace hpx { namespace threads
             // without the thread being executed.
             hpx::util::osstream strm;
             strm << "set_state: invalid new state, can't demote a pending thread, "
-                 << ", can't demote a pending thread, thread(" << id << "), description("
+                 << ", thread(" << id << "), description("
                  << thrd->get_description() << "), new state("
                  << get_thread_state_name(new_state) << ")";
 
@@ -403,7 +424,9 @@ namespace hpx { namespace threads
 
         LTM_(info) << "set_state: thread(" << id << "), "
                       "description(" << thrd->get_description() << "), "
-                      "new state(" << get_thread_state_name(new_state) << ")";
+                      "new state(" << get_thread_state_name(new_state) << "), "
+                      "old state(" << get_thread_state_name(previous_state)
+                   << ")";
 
         // So all what we do here is to set the new state.
         thrd->set_state_ex(new_state_ex);
@@ -413,6 +436,9 @@ namespace hpx { namespace threads
             scheduler_.schedule_thread(thrd, get_thread_num(), priority);
             do_some_work();
         }
+
+        if (&ec != &throws)
+            ec = make_success_code();
 
         return previous_state;
     }
