@@ -5,14 +5,14 @@
 
 #include <iostream>
 
-#include <boost/fusion/container/vector.hpp>
-#include <boost/type_traits/is_convertible.hpp>
-#include <hpx/util/function.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/util/function.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/components/remote_object/new.hpp>
+#include <boost/fusion/container/vector.hpp>
+#include <boost/type_traits/is_convertible.hpp>
 
 #include <hpx/util/high_resolution_timer.hpp>
 
@@ -86,10 +86,10 @@ int hpx_main(variables_map &)
         typedef promise<object_type> object_promise_type;
         typedef std::vector<object_promise_type> object_promises_type;
         typedef std::vector<object_type> objects_type;
-        
+
         std::vector<id_type> prefixes = find_all_localities();
         object_promises_type object_promises;
-    
+
         int count = 0;
         BOOST_FOREACH(id_type const & prefix, prefixes)
         {
@@ -102,7 +102,7 @@ int hpx_main(variables_map &)
         {
             objects.push_back(promise.get());
         }
-        
+
         BOOST_FOREACH(object_type & o, objects)
         {
             wait(o <= output());
