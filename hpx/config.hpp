@@ -70,6 +70,12 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+/// This defines the maximum number of arguments a util::function can take
+#ifndef HPX_FUNCTION_LIMIT
+#  define HPX_FUNCTION_LIMIT 10
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 /// This defines the number of outgoing (parcel-) connections kept alive
 #if !defined(HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE)
 #  define HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE 64
@@ -265,7 +271,7 @@
 // Use std::bind if it's available and movable
 #if !defined(HPX_HAVE_CXX11_STD_BIND)
 #  if defined(HPX_USE_PHOENIX_BIND)
-#    define HPX_STD_PLACEHOLDERS    ::boost::phoenix::placeholders 
+#    define HPX_STD_PLACEHOLDERS    ::boost::phoenix::placeholders
 #    define HPX_STD_BIND            ::boost::phoenix::bind
 #    define HPX_STD_PROTECT(f)      ::boost::phoenix::lambda[f]
 #  else

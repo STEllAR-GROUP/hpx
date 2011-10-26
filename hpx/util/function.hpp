@@ -7,10 +7,7 @@
 #ifndef HPX_UTIL_FUNCTION_HPP
 #define HPX_UTIL_FUNCTION_HPP
 
-#ifndef HPX_FUNCTION_LIMIT
-#define HPX_FUNCTION_LIMIT 10
-#endif
-
+#include <hpx/config.hpp>
 #include <hpx/util/detail/function_template.hpp>
 #include <hpx/util/detail/vtable_ptr_base.hpp>
 #include <hpx/util/detail/vtable_ptr.hpp>
