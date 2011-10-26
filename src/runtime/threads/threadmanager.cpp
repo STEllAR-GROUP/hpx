@@ -679,7 +679,7 @@ namespace hpx { namespace threads
         // execution
         thread_state operator=(thread_state_enum new_state)
         {
-            return prev_state_ = thread_state(new_state);
+            return prev_state_ = thread_state(new_state, prev_state_.get_tag() + 1);
         }
 
         // Get the state this thread was in before execution (usually pending),
