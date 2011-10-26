@@ -554,7 +554,6 @@ response primary_namespace::resolve_locality(
     return response(primary_ns_resolve_locality, 0, no_success);
 } // }}}
 
-// {{{ free implementation
 response primary_namespace::free(
     request const& req
   , error_code& ec
