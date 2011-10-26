@@ -405,7 +405,7 @@ namespace hpx { namespace actions
         /// continuation support
         template <typename Func>
         static HPX_STD_FUNCTION<threads::thread_function_type>
-        construct_continuation_thread_function_void(Func const& func,
+        construct_continuation_thread_function_void(BOOST_FWD_REF(Func) func,
             continuation_type cont)
         {
             // The following bind constructs the wrapped thread function
@@ -413,20 +413,7 @@ namespace hpx { namespace actions
             // cont: continuation
             // func: wrapped function object
             return HPX_STD_BIND(continuation_thread_function_void(), cont,
-                HPX_STD_PROTECT(func));
-        }
-
-        template <typename Func>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
-        construct_continuation_thread_function_void(BOOST_RV_REF(Func) func,
-            continuation_type cont)
-        {
-            // The following bind constructs the wrapped thread function
-            //    f:  is the wrapping thread function
-            // cont: continuation
-            // func: wrapped function object
-            return HPX_STD_BIND(continuation_thread_function_void(), cont,
-                HPX_STD_PROTECT(boost::move(func)));
+                HPX_STD_PROTECT(boost::forward<Func>(func)));
         }
 
         /// The \a continuation_thread_function will be registered as the thread
@@ -463,7 +450,7 @@ namespace hpx { namespace actions
         /// continuation support
         template <typename Func>
         static HPX_STD_FUNCTION<threads::thread_function_type>
-        construct_continuation_thread_function(Func const& func,
+        construct_continuation_thread_function(BOOST_FWD_REF(Func) func,
             continuation_type cont)
         {
             // The following bind constructs the wrapped thread function
@@ -471,20 +458,7 @@ namespace hpx { namespace actions
             // cont: continuation
             // func: wrapped function object
             return HPX_STD_BIND(continuation_thread_function(), cont,
-                HPX_STD_PROTECT(func));
-        }
-
-        template <typename Func>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
-        construct_continuation_thread_function(BOOST_RV_REF(Func) func,
-            continuation_type cont)
-        {
-            // The following bind constructs the wrapped thread function
-            //    f:  is the wrapping thread function
-            // cont: continuation
-            // func: wrapped function object
-            return HPX_STD_BIND(continuation_thread_function(), cont,
-                HPX_STD_PROTECT(boost::move(func)));
+                HPX_STD_PROTECT(boost::forward<Func>(func)));
         }
 
     public:
