@@ -1001,6 +1001,47 @@
             return data;
         }
     };
+    
+    template <
+        typename Component, int Action,
+        BOOST_PP_ENUM_PARAMS(N, typename T),
+        void (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T)),
+        threads::thread_priority Priority,
+        typename Derived>
+    class BOOST_PP_CAT(result_action, N) <
+        Component
+      , void
+      , Action
+      , BOOST_PP_ENUM_PARAMS(N, T)
+      , F
+      , Priority
+      , Derived
+    >
+        : public BOOST_PP_CAT(action, N)<Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F, Priority, Derived>
+    {
+        typedef 
+            BOOST_PP_CAT(action, N)<Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F, Priority, Derived>
+            base_type;
+
+    public:
+        BOOST_PP_CAT(result_action, N)(threads::thread_priority priority = Priority)
+          : base_type(priority)
+        {}
+        
+        // construct an action from its arguments
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+        BOOST_PP_CAT(result_action, N)(
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
+        {}
+
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+        BOOST_PP_CAT(result_action, N)(
+                threads::thread_priority priority,
+                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg))
+        {}
+    };
 
 #undef HPX_PARAM_ARGUMENT
 #undef HPX_PARAM_TYPES

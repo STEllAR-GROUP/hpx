@@ -16,63 +16,6 @@
 
 #include <hpx/lcos/local_mutex.hpp>
 
-template <typename Promise>
-struct promise_wrapper
-{
-    promise_wrapper()
-        //: finished(false)
-    {}
-    promise_wrapper(Promise const & p)
-        : promise(p)
-        //, finished(false)
-    {}
-
-    promise_wrapper(promise_wrapper const & o)
-        : promise(o.promise)
-        //, finished(o.finished)
-    {
-        //BOOST_ASSERT(o.finished == false);
-    }
-
-    /*
-    promise_wrapper & operator=(promise_wrapper const & o)
-    {
-        BOOST_ASSERT(o.finished == false && finished == false);
-        promise = o.promise;
-
-        return *this;
-    }
-    */
-
-    promise_wrapper & operator=(Promise const & p)
-    {
-        //BOOST_ASSERT(finished == false);
-        promise = p;
-
-        return *this;
-    }
-
-
-    void get()
-    {
-        //m.lock();
-        //if(!finished)
-        {
-            promise.get();
-            //finished = true;
-        }
-        //m.unlock();
-    }
-
-    Promise promise;
-    bool finished;
-    //hpx::lcos::local_mutex m;
-
-    template <typename Archive>
-    void serialize(Archive &, unsigned)
-    {}
-};
-
 namespace bright_future {
 
     template <typename T> struct grid;
@@ -255,7 +198,7 @@ namespace bright_future {
                 apply_func_type f
               , typename remote_lse<T>::size_type x
               , typename remote_lse<T>::size_type y
-              , std::vector<promise_wrapper<hpx::lcos::promise<void> > *> const & dependencies
+              , std::vector<hpx::lcos::promise<void> > const & dependencies
             );
 
             typedef
@@ -265,7 +208,7 @@ namespace bright_future {
                   , apply_func_type
                   , size_type
                   , size_type
-                  , std::vector<promise_wrapper<hpx::lcos::promise<void> > *> const &
+                  , std::vector<hpx::lcos::promise<void> > const &
                   , &remote_lse<T>::apply
                 >
                 apply_action;
@@ -274,7 +217,7 @@ namespace bright_future {
                 apply_func_type f
               , range_type x_range
               , range_type y_range
-              , std::vector<promise_wrapper<hpx::lcos::promise<void> > *> const & dependencies
+              , std::vector<hpx::lcos::promise<void> > const & dependencies
             );
 
             typedef
@@ -284,7 +227,7 @@ namespace bright_future {
                   , apply_func_type
                   , range_type
                   , range_type
-                  , std::vector<promise_wrapper<hpx::lcos::promise<void> > *> const &
+                  , std::vector<hpx::lcos::promise<void> > const &
                   , &remote_lse<T>::apply_region
                 >
                 apply_region_action;

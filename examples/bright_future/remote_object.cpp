@@ -59,6 +59,26 @@ struct output
     {}
 };
 
+struct plus
+{
+    typedef int result_type;
+
+    int i;
+    plus() {}
+    plus(int i) : i(i) {}
+
+    int operator()(foo const & f) const
+    {
+        return i + f.i;
+    }
+
+    template <typename Archive>
+    void serialize(Archive & ar, unsigned)
+    {
+        ar & i;
+    }
+};
+
 int hpx_main(variables_map &)
 {
     {
@@ -86,6 +106,7 @@ int hpx_main(variables_map &)
         BOOST_FOREACH(object_type & o, objects)
         {
             wait(o <= output());
+            cout << (o <= plus(9)).get() << "\n" << flush;
         }
     }
     finalize();

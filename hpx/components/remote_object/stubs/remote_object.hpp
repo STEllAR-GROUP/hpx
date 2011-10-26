@@ -6,6 +6,8 @@
 #ifndef HPX_COMPONENTS_REMOTE_OBJECT_STUBS_REMOTE_OBJECT_HPP
 #define HPX_COMPONENTS_REMOTE_OBJECT_STUBS_REMOTE_OBJECT_HPP
 
+#include <boost/type_traits/is_void.hpp>
+
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
@@ -18,19 +20,43 @@ namespace hpx { namespace components { namespace stubs
     // representation of a \a server#remote_object component
     struct remote_object : stub_base<server::remote_object>
     {
+    private:
+        template <typename F>
+        static lcos::promise<typename F::result_type>
+        apply_async_invoke(naming::id_type const & target_id, F f, boost::mpl::false_)
+        {
+            typedef typename
+                server::remote_object::apply_action<
+                    typename F::result_type
+                >::type
+                action_type;
+            boost::archive::detail::extra_detail::init_guid<action_type>::g.initialize();
+            return lcos::eager_future<action_type>(target_id, f, 0);
+        }
+        
         template <typename F>
         static lcos::promise<void>
-        apply_async(naming::id_type const & target_id, F f)
+        apply_async_invoke(naming::id_type const & target_id, F f, boost::mpl::true_)
         {
-            typedef server::remote_object::apply_action action_type;
+            typedef typename
+                server::remote_object::apply_action<void>::type
+                action_type;
             return lcos::eager_future<action_type>(target_id, f, 0);
         }
 
+    public:
         template <typename F>
-        static void 
+        static lcos::promise<typename F::result_type>
+        apply_async(naming::id_type const & target_id, F f)
+        {
+            return apply_async_invoke(target_id, f, typename boost::is_void<typename F::result_type>::type());
+        }
+
+        template <typename F>
+        static typename F::result_type
         apply(naming::id_type const & target_id, F f)
         {
-            apply_async(target_id, f).get();
+            return apply_async(target_id, f).get();
         }
         
         template <typename F>

@@ -102,12 +102,12 @@ namespace bright_future { namespace server {
         typename remote_lse<T>::apply_func_type f
       , typename remote_lse<T>::size_type x
       , typename remote_lse<T>::size_type y
-      , std::vector<promise_wrapper<hpx::lcos::promise<void> >*> const & dependencies
+      , std::vector<hpx::lcos::promise<void> > const & dependencies
     )
     {
-        BOOST_FOREACH(promise_wrapper<hpx::lcos::promise<void> >* promise, dependencies)
+        BOOST_FOREACH(hpx::lcos::promise<void> const & promise, dependencies)
         {
-            promise->get();
+            promise.get();
         }
         u(x, y) = f(u, rhs, x, y, config);
     }
@@ -117,12 +117,12 @@ namespace bright_future { namespace server {
         typename remote_lse<T>::apply_func_type f
       , typename remote_lse<T>::range_type x_range
       , typename remote_lse<T>::range_type y_range
-      , std::vector<promise_wrapper<hpx::lcos::promise<void> >*> const & dependencies
+      , std::vector<hpx::lcos::promise<void> > const & dependencies
     )
     {
-        BOOST_FOREACH(promise_wrapper<hpx::lcos::promise<void> >* promise, dependencies)
+        BOOST_FOREACH(hpx::lcos::promise<void> const & promise, dependencies)
         {
-            promise->get();
+            promise.get();
         }
 
         for(size_type y = y_range.first; y < (std::min)(config.n_y, y_range.second); ++y)

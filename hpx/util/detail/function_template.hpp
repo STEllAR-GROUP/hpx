@@ -23,6 +23,7 @@
 #include <hpx/util/detail/vtable_ptr_base_fwd.hpp>
 #include <hpx/util/detail/vtable_ptr_fwd.hpp>
 #include <hpx/util/detail/serialization_registration.hpp>
+#include <hpx/util/safe_bool.hpp>
 
 #ifndef HPX_FUNCTION_VERSION
 #define HPX_FUNCTION_VERSION 0x10
@@ -122,6 +123,8 @@ namespace hpx { namespace util {
             }
         }
 
+        typedef R result_type;
+
         typedef
             detail::vtable_ptr_base<
                 R(BOOST_PP_ENUM_PARAMS(N, A))
@@ -197,17 +200,18 @@ namespace hpx { namespace util {
                 }
                 else
                 {
-                    new (object) Functor(f);
+                    object = new Functor(f);
                 }
             }
             else
             {
+                if(!empty())
+                {
+                    vptr->destruct(&object);
+                }
+
                 if(is_small)
                 {
-                    if(!empty())
-                    {
-                        vptr->destruct(&object);
-                    }
                     new (&object) Functor(f);
                 }
                 else
@@ -236,6 +240,16 @@ namespace hpx { namespace util {
         bool empty() const
         {
             return (vptr == 0) && (object == 0);
+        }
+
+        operator typename util::safe_bool<HPX_FUNCTION_NAME>::result_type() const
+        {
+            return util::safe_bool<HPX_FUNCTION_NAME>()(!empty());
+        }
+
+        bool operator!() const
+        {
+            return empty();
         }
 
         void reset()

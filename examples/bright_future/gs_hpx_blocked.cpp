@@ -3,6 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/hpx_fwd.hpp>
 
 #include "grid.hpp"
 #include <cmath>
@@ -174,7 +175,7 @@ void gs(
 
         // initalization of hpx component ends here.
 
-        typedef promise_wrapper<hpx::lcos::promise<void> > promise_type;
+        typedef hpx::lcos::promise<void> promise_type;
 
         // The init future:
         // a hpx future takes an action. this action is a remotely callable
@@ -205,7 +206,7 @@ void gs(
         // is used for the initialization of the grid.
         iteration_dependencies_type
             iteration_dependencies(
-                max_iterations+1
+                2
               , promise_grid_type(n_x_block, n_y_block)
             );
 
@@ -275,8 +276,8 @@ void gs(
         for(unsigned iter = 0; iter < max_iterations; ++iter)
         {
             {
-                promise_grid_type & prev = iteration_dependencies[iter];
-                promise_grid_type & current = iteration_dependencies[iter + 1];
+                promise_grid_type & prev = iteration_dependencies[iter % 2];
+                promise_grid_type & current = iteration_dependencies[(iter + 1) % 2];
 
                 // in every iteration we want to compute this:
                 for(size_type y_block = 0, y = 0; y_block < n_y; y_block += block_size, ++y)
@@ -296,12 +297,12 @@ void gs(
                               , y + 1 == n_y_block ? n_y-1 : y_block + block_size
                               );
 
-                        std::vector<promise_type *> deps;
+                        std::vector<promise_type> deps;
                         // these are our dependencies to update this specific
                         // block
                         
                         // we need to be sure to wait for the previous iteration.
-                        deps.push_back(&prev(x,y));
+                        deps.push_back(prev(x,y));
 
                         // keep in mind, our loop goes from top-left to bottom
                         // right.
@@ -309,22 +310,22 @@ void gs(
                         if(x + 1 < n_x_block) // are we on the boundary?
                             // add the right block of the previous iteration
                             // to our list of dependencies
-                            deps.push_back(&prev(x+1,y));
+                            deps.push_back(prev(x+1,y));
 
                         if(y + 1 < n_y_block) // are we on the boundary?
                             // add the upper block of the previous iteration
                             // to our list of dependencies
-                            deps.push_back(&prev(x,y+1));
+                            deps.push_back(prev(x,y+1));
 
                         if(x > 0) // are we on the boundary?
                             // add the upper block of the current iteration
                             // to our list of dependencies
-                            deps.push_back(&current(x-1,y));
+                            deps.push_back(current(x-1,y));
 
                         if(y > 0) // are we on the boundary?
                             // add the upper block of the current iteration
                             // to our list of dependencies
-                            deps.push_back(&current(x,y-1));
+                            deps.push_back(current(x,y-1));
 
                         current(x, y) =
                             // call the update action
@@ -364,7 +365,7 @@ void gs(
             {
                 for(size_type y = 0; y < n_y; ++y)
                 {
-                    apply_future(remote_id, out, x, y, std::vector<promise_type *>()).get();
+                    apply_future(remote_id, out, x, y, std::vector<promise_type>()).get();
                 }
                 (*f.file) << "\n";
             }

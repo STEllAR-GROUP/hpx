@@ -24,7 +24,7 @@ namespace hpx { namespace components { namespace server
             {}
             ~remote_object()
             {
-                BOOST_ASSERT(!dtor.empty());
+                BOOST_ASSERT(dtor);
                 dtor(&object);
             }
 
@@ -34,17 +34,23 @@ namespace hpx { namespace components { namespace server
               , remote_object_set_dtor = 2
             };
 
-            void apply(hpx::util::function<void(void**)> ctor, std::size_t count);
+            template <typename R>
+            R apply(hpx::util::function<R(void**)> ctor, std::size_t count);
 
-            typedef
-                hpx::actions::action2<
-                    remote_object
-                  , remote_object_apply
-                  , hpx::util::function<void(void**)>
-                  , std::size_t
-                  , &remote_object::apply
-                >
-                apply_action;
+            template <typename R>
+            struct apply_action
+            {
+                typedef
+                    hpx::actions::result_action2<
+                        remote_object
+                      , R
+                      , remote_object_apply
+                      , hpx::util::function<R(void**)>
+                      , std::size_t
+                      , &remote_object::apply<R>
+                    >
+                    type;
+            };
             
             void set_dtor(hpx::util::function<void(void**)> d, std::size_t count);
 
@@ -61,7 +67,160 @@ namespace hpx { namespace components { namespace server
             void *object;
             hpx::util::function<void(void**)> dtor;
     };
+    
+    template <>
+    struct remote_object::apply_action<void>
+    {
+        typedef
+            hpx::actions::action2<
+                remote_object
+              , remote_object_apply
+              , hpx::util::function<void(void**)>
+              , std::size_t
+              , &remote_object::apply<void>
+            >
+            type;
+    };
+
+    template <typename R>
+    R remote_object::apply(hpx::util::function<R(void**)> f, std::size_t)
+    {
+        return f(&object);
+    }
 
 }}}
 
+namespace boost { namespace serialization {
+    template<typename R>
+    struct guid_defined<
+        hpx::actions::result_action2<
+            hpx::components::server::remote_object
+          , R
+          , hpx::components::server::remote_object::actions::remote_object_apply
+          , hpx::util::function<R(void**)>
+          , std::size_t
+          , &hpx::components::server::remote_object::apply<R>
+        >
+    > : boost::mpl::true_ {};
+    
+    namespace ext {
+        template <typename R>
+        struct guid_impl<
+            hpx::actions::result_action2<
+                hpx::components::server::remote_object
+              , R
+              , hpx::components::server::remote_object::actions::remote_object_apply
+              , hpx::util::function<R(void**)>
+              , std::size_t
+              , &hpx::components::server::remote_object::apply<R>
+            >
+        >
+        {
+            static inline const char * call()
+            {
+                return
+                    hpx::util::detail::type_hash<
+                        hpx::actions::result_action2<
+                            hpx::components::server::remote_object
+                          , R
+                          , hpx::components::server::remote_object::actions::remote_object_apply
+                          , hpx::util::function<R(void**)>
+                          , std::size_t
+                          , &hpx::components::server::remote_object::apply<R>
+                        >
+                    >();
+            }
+        };
+    }
+}}
+namespace boost { namespace archive { namespace detail { namespace extra_detail {
+    template <typename R>
+    struct init_guid<
+        hpx::actions::result_action2<
+            hpx::components::server::remote_object
+          , R
+          , hpx::components::server::remote_object::actions::remote_object_apply
+          , hpx::util::function<R(void**)>
+          , std::size_t
+          , &hpx::components::server::remote_object::apply<R>
+        >
+    >
+    {
+        static
+            hpx::util::detail::guid_initializer_helper<
+                hpx::actions::result_action2<
+                    hpx::components::server::remote_object
+                  , R
+                  , hpx::components::server::remote_object::actions::remote_object_apply
+                  , hpx::util::function<R(void**)>
+                  , std::size_t
+                  , &hpx::components::server::remote_object::apply<R>
+                >
+            > const &
+            g;
+    };
+
+    template <typename R>
+    hpx::util::detail::guid_initializer_helper<
+        hpx::actions::result_action2<
+            hpx::components::server::remote_object
+          , R
+          , hpx::components::server::remote_object::actions::remote_object_apply
+          , hpx::util::function<R(void**)>
+          , std::size_t
+          , &hpx::components::server::remote_object::apply<R>
+        >
+    > const &
+    init_guid<
+        hpx::actions::result_action2<
+            hpx::components::server::remote_object
+          , R
+          , hpx::components::server::remote_object::actions::remote_object_apply
+          , hpx::util::function<R(void**)>
+          , std::size_t
+          , &hpx::components::server::remote_object::apply<R>
+        >
+    >::g = ::boost::serialization::singleton<
+        hpx::util::detail::guid_initializer_helper<
+            hpx::actions::result_action2<
+                hpx::components::server::remote_object
+              , R
+              , hpx::components::server::remote_object::actions::remote_object_apply
+              , hpx::util::function<R(void**)>
+              , std::size_t
+              , &hpx::components::server::remote_object::apply<R>
+            >
+        >
+    >::get_mutable_instance().export_guid();
+}}}}
+
+namespace hpx { namespace actions { namespace detail { namespace ext {
+    template <typename R>
+    struct get_action_name_impl<
+        hpx::actions::result_action2<
+            hpx::components::server::remote_object
+          , R
+          , hpx::components::server::remote_object::actions::remote_object_apply
+          , hpx::util::function<R(void**)>
+          , std::size_t
+          , &hpx::components::server::remote_object::apply<R>
+        >
+    >
+    {
+        static HPX_ALWAYS_EXPORT const char * call()
+        {
+            return
+                hpx::util::detail::type_hash<
+                    hpx::actions::result_action2<
+                        hpx::components::server::remote_object
+                      , R
+                      , hpx::components::server::remote_object::actions::remote_object_apply
+                      , hpx::util::function<R(void**)>
+                      , std::size_t
+                      , &hpx::components::server::remote_object::apply<R>
+                    >
+                >();
+        }
+    };
+}}}}
 #endif

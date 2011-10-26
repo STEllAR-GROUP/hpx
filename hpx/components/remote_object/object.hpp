@@ -22,11 +22,11 @@ namespace hpx { namespace components
             invoke_apply_fun() {}
             invoke_apply_fun(F f) : f(f) {}
 
-            typedef void result_type;
+            typedef typename boost::result_of<F(T &)>::type result_type;
 
-            void operator()(void ** p) const
+            result_type operator()(void ** p) const
             {
-                f(*reinterpret_cast<T *>(*p));
+                return f(*reinterpret_cast<T *>(*p));
             }
 
             template <typename Archive>
@@ -47,8 +47,10 @@ namespace hpx { namespace components
         naming::id_type gid_;
 
         template <typename F>
-        lcos::promise<void>
-        operator<=(F f)
+        lcos::promise<
+            typename boost::result_of<F(T &)>::type
+        >
+        operator<=(F f) const
         {
             return
                 stubs::remote_object::apply_async(
@@ -96,5 +98,11 @@ namespace hpx { namespace components
         }
     };
 }}
+
+#define HPX_REMOTE_OBJECT_REGISTER_RETURN_TYPE(TYPE)                            \
+    HPX_REGISTER_ACTION_EX(                                                     \
+    hpx::components::server::remote_object::apply_action<TYPE>::type,           \
+    BOOST_PP_CAT(remote_object_apply_action_, TYPE));                           \
+/**/
 
 #endif

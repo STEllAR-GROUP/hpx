@@ -33,8 +33,25 @@ namespace hpx { namespace util { namespace detail {
             guid_init.export_guid();
             return *this;
         }
-
     };
+
+    template <typename T>
+    const char * type_hash()
+    {
+        static char buf[20];
+        /// FIXME: this is not portable across different compilers
+        static const char * name = typeid(T).name();
+        // create a sha1 hash from the string returned by typeid::name
+        boost::uuids::detail::sha1 hash;
+        hash.process_block(name, name + std::strlen(name));
+        unsigned digest[5];
+        hash.get_digest(digest);
+
+        // copy that into our string
+        std::memcpy(buf, digest, 5*sizeof(unsigned));
+
+        return buf;
+    }
 }}}
 
 // registering for serialization
@@ -70,27 +87,15 @@ namespace boost {
             {
                 static inline const char * call()
                 {
-                    static char buf[20];
-                    /// FIXME: this is not portable across different compilers
-                    static const char * name = 
-                        typeid(
+                    return
+                        hpx::util::detail::type_hash<
                             ::hpx::util::detail::vtable_ptr<
                                 Sig
                               , IArchive
                               , OArchive
                               , Vtable
                             >
-                        ).name();
-                    // create a sha1 hash from the string returned by typeid::name
-                    boost::uuids::detail::sha1 hash;
-                    hash.process_block(name, name + std::strlen(name));
-                    unsigned digest[5];
-                    hash.get_digest(digest);
-
-                    // copy that into our string
-                    std::memcpy(buf, digest, 5*sizeof(unsigned));
-
-                    return buf;
+                        >();
                 }
             };
         }

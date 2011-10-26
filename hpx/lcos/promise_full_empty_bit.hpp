@@ -557,6 +557,10 @@ namespace hpx { namespace lcos
         {
             (*impl_)->set_error(0, e); // set the received error
         }
+    
+        template <typename Archive>
+        void serialize(Archive &, unsigned)
+        {}
 
     protected:
         boost::shared_ptr<wrapping_type> impl_;
@@ -650,6 +654,10 @@ namespace hpx { namespace lcos
         {
             (*impl_)->set_error(0, e); // set the received error
         }
+    
+        template <typename Archive>
+        void serialize(Archive &, unsigned)
+        {}
 
     protected:
         boost::shared_ptr<wrapping_type> impl_;

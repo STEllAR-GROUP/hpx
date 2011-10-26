@@ -18,9 +18,13 @@ namespace hpx { namespace components { namespace remote_object
         naming::id_type object_id
             = stubs::remote_object::create_sync(target_id);
         
-        stubs::remote_object::apply(object_id, ctor);
-        stubs::remote_object::set_dtor(object_id, dtor);
+        lcos::promise<void> apply_promise
+            = stubs::remote_object::apply_async(object_id, ctor);
+        lcos::promise<void> dtor_promise
+            = stubs::remote_object::set_dtor_async(object_id, dtor);
 
+        apply_promise.get();
+        dtor_promise.get();
         return object_id;
     }
 }}}

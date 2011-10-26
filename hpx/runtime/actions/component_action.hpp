@@ -749,6 +749,22 @@ namespace hpx { namespace actions
         }
     };
 
+    template <
+        typename Component, int Action,
+        void (Component::*F)(),
+        threads::thread_priority Priority,
+        typename Derived>
+    class result_action0<Component, void, Action, F, Priority, Derived>
+        : public action0<Component, Action, F, Priority, Derived>
+    {
+        typedef action0<Component, Action, F, Priority, Derived> base_type;
+    
+    public:
+        explicit result_action0(threads::thread_priority priority = Priority)
+          : base_type(priority)
+        {}
+    };
+
     ///////////////////////////////////////////////////////////////////////////
     // bring in the rest of the implementations
     #include <hpx/runtime/actions/component_action_implementations.hpp>
