@@ -152,9 +152,14 @@ namespace hpx { namespace lcos { namespace detail
                 return;
             }
 
-            // store the value
-            data_[slot].set(
-                data_type(get_result<Result, RemoteResult>::call(result)));
+            try {
+                // store the value
+                data_[slot].set(
+                    data_type(get_result<Result, RemoteResult>::call(result)));
+            }
+            catch (hpx::exception const&) {
+                data_[slot].set(data_type(boost::current_exception()));
+            }
         }
 
         // trigger the future with the given error condition
@@ -217,6 +222,7 @@ namespace hpx { namespace lcos { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    // FIXME: Can't this be implemented with get_result?
     /// A promise can be used by a single thread to invoke a (remote)
     /// action and wait for the result. This specialization wraps the result
     /// value (a gid_type) into a managed id_type.
