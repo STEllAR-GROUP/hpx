@@ -115,9 +115,9 @@ response symbol_namespace::bind(
                 "new_credit(%4%)")
                 % key % gid
                 % naming::get_credit_from_gid(it->second)
-                % naming::get_credit_from_gid(it->second) + credits);
+                % (naming::get_credit_from_gid(it->second) + credits));
 
-            naming::add_credit_from_gid(it->second, credits);
+            naming::add_credit_to_gid(it->second, credits);
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -125,7 +125,7 @@ response symbol_namespace::bind(
             return response(symbol_ns_bind);
         }
 
-        naming::add_credit_from_gid(gid, credits)
+        naming::add_credit_to_gid(gid, credits);
         LAGAS_(info) << (boost::format(
             "symbol_namespace::bind, key(%1%), gid(%2%), response(no_success)")
             % key % gid);
