@@ -55,11 +55,10 @@ namespace hpx { namespace lcos { namespace server
             > hook_type;
 
             queue_thread_entry(threads::thread_id_type id)
-              : id_(id), aborted_waiting_(false)
+              : id_(id)
             {}
 
             threads::thread_id_type id_;
-            bool aborted_waiting_;
             hook_type slist_hook_;
         };
 
@@ -116,7 +115,6 @@ namespace hpx { namespace lcos { namespace server
                 while (!thread_queue_.empty()) {
                     threads::thread_id_type id = thread_queue_.front().id_;
                     thread_queue_.front().id_ = 0;
-                    thread_queue_.front().aborted_waiting_ = true;
                     thread_queue_.pop_front();
 
                     // we know that the id is actually the pointer to the thread
@@ -193,10 +191,9 @@ namespace hpx { namespace lcos { namespace server
             while (!thread_queue_.empty()) {
                 threads::thread_id_type id = thread_queue_.front().id_;
                 thread_queue_.front().id_ = 0;
-                thread_queue_.front().aborted_waiting_ = true;
                 thread_queue_.pop_front();
 
-                threads::set_thread_state(id, threads::pending);
+                threads::set_thread_state(id, threads::pending, threads::wait_abort);
             }
         }
 
@@ -233,12 +230,6 @@ namespace hpx { namespace lcos { namespace server
 
                 if (e.id_)
                     thread_queue_.erase(last);     // remove entry from queue
-
-                if (e.aborted_waiting_) {
-                    HPX_THROW_EXCEPTION(yield_aborted, "queue::get_value",
-                        "aborted wait on queue");
-                    return ValueType();
-                }
             }
 
             // get the first value from the value queue and return it to the

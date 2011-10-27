@@ -26,10 +26,9 @@ namespace hpx { namespace lcos
     ///         synchronize a given number of \a threads.
     class local_barrier
     {
-    public:
+    private:
         typedef util::spinlock mutex_type;
 
-    private:
         // define data structures needed for intrusive slist container used for
         // the queues
         struct local_barrier_queue_entry
