@@ -21,7 +21,7 @@
 
 #include <hpx/exception.hpp>
 #include <hpx/util/serialize_sequence.hpp>
-#include <hpx/lcos/get_result.hpp>
+#include <hpx/traits/get_remote_result.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/naming/name.hpp>
@@ -566,19 +566,19 @@ struct response
 
 }
 
-namespace lcos
+namespace traits
 {
 
 // TODO: verification of namespace_action_code
 template <>
-struct get_result<naming::id_type, agas::response>
+struct get_remote_result<naming::id_type, agas::response>
 {
     static naming::id_type call(
         agas::response const& rep
         )
     {
         naming::gid_type raw_gid = rep.get_gid();
-    
+
         if (naming::get_credit_from_gid(raw_gid) != 0)
             return naming::id_type(raw_gid, naming::id_type::managed);
         else
@@ -588,7 +588,7 @@ struct get_result<naming::id_type, agas::response>
 
 // TODO: verification of namespace_action_code
 template <>
-struct get_result<bool, agas::response>
+struct get_remote_result<bool, agas::response>
 {
     static bool call(
         agas::response const& rep

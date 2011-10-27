@@ -17,7 +17,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/lcos/base_lco.hpp>
-#include <hpx/lcos/get_result.hpp>
+#include <hpx/traits/get_remote_result.hpp>
 
 #include <memory>
 
@@ -41,10 +41,9 @@ namespace hpx { namespace lcos { namespace server
     public:
         typedef lcos::base_lco_with_value<ValueType, RemoteType> base_type_holder;
 
-        typedef util::spinlock mutex_type;
     private:
+        typedef util::spinlock mutex_type;
         typedef components::managed_component_base<queue> base_type;
-
 
         // define data structures needed for intrusive slist container used for
         // the queues
@@ -160,7 +159,8 @@ namespace hpx { namespace lcos { namespace server
         {
             // push back the new value onto the queue
             HPX_STD_UNIQUE_PTR<queue_value_entry> node(
-                new queue_value_entry(get_result<ValueType, RemoteType>::call(result)));
+                new queue_value_entry(
+                    traits::get_remote_result<ValueType, RemoteType>::call(result)));
 
             mutex_type::scoped_lock l(mtx_);
             value_queue_.push_back(*node);

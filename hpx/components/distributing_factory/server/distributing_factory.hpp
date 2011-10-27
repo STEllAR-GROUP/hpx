@@ -11,7 +11,7 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/lcos/get_result.hpp>
+#include <hpx/traits/get_remote_result.hpp>
 
 #include <boost/make_shared.hpp>
 #include <boost/iterator_adaptors.hpp>
@@ -256,12 +256,12 @@ namespace hpx { namespace components { namespace server
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos
+namespace hpx { namespace traits
 {
     // we need to specialize this template to allow for automatic conversion of
     // the vector<remote_locality_result> to a vector<locality_result>
     template <>
-    struct get_result<
+    struct get_remote_result<
         std::vector<components::server::locality_result>,
         std::vector<components::server::remote_locality_result> >
     {

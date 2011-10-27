@@ -14,7 +14,9 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/lcos/base_lco.hpp>
-#include <hpx/lcos/get_result.hpp>
+#include <hpx/traits/get_remote_result.hpp>
+#include <hpx/traits/promise_local_result.hpp>
+#include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/util/full_empty_memory.hpp>
 #include <hpx/util/unused.hpp>
 
@@ -154,8 +156,8 @@ namespace hpx { namespace lcos { namespace detail
 
             try {
                 // store the value
-                data_[slot].set(
-                    data_type(get_result<Result, RemoteResult>::call(result)));
+                data_[slot].set(data_type(
+                    traits::get_remote_result<Result, RemoteResult>::call(result)));
             }
             catch (hpx::exception const&) {
                 data_[slot].set(data_type(boost::current_exception()));
@@ -222,7 +224,8 @@ namespace hpx { namespace lcos { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    // FIXME: Can't this be implemented with get_result?
+    // FIXME: Can't this be implemented with traits::get_remote_result?
+
     /// A promise can be used by a single thread to invoke a (remote)
     /// action and wait for the result. This specialization wraps the result
     /// value (a gid_type) into a managed id_type.
@@ -349,8 +352,13 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             // store the value as a managed id
-            data_[slot].set(
-                data_type(naming::id_type(result, naming::id_type::managed)));
+            try {
+                data_[slot].set(data_type(
+                    naming::id_type(result, naming::id_type::managed)));
+            }
+            catch (hpx::exception const&) {
+                data_[slot].set(data_type(boost::current_exception()));
+            }
         }
 
         // trigger the future with the given error condition
@@ -433,31 +441,6 @@ namespace hpx { namespace lcos { namespace detail
         error_code const& ec_;
     };
 }}}
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits
-{
-    template <typename Result, typename Enable>
-    struct promise_remote_result
-      : boost::mpl::identity<Result>
-    {};
-
-    template <>
-    struct promise_remote_result<void>
-      : boost::mpl::identity<util::unused_type>
-    {};
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Result, typename Enable>
-    struct promise_local_result
-      : boost::mpl::identity<Result>
-    {};
-
-    template <>
-    struct promise_local_result<util::unused_type>
-      : boost::mpl::identity<void>
-    {};
-}}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
@@ -584,12 +567,12 @@ namespace hpx { namespace lcos
             return (*impl_)->get_data(0, ec);
         }
 
-        void set(int slot, RemoteResult const& result) 
+        void set(int slot, RemoteResult const& result)
         {
             return (*impl_)->set_data(slot, result);
         }
 
-        void set(RemoteResult const& result) 
+        void set(RemoteResult const& result)
         {
             return (*impl_)->set_data(0, result);
         }
@@ -604,7 +587,7 @@ namespace hpx { namespace lcos
         {
             (*impl_)->set_error(0, e); // set the received error
         }
-    
+
         template <typename Archive>
         void serialize(Archive &, unsigned)
         {}
@@ -698,12 +681,12 @@ namespace hpx { namespace lcos
             return (*impl_)->get_data(0, ec);
         }
 
-        void set(int slot) 
+        void set(int slot)
         {
             return (*impl_)->set_data(slot, util::unused_type());
         }
 
-        void set() 
+        void set()
         {
             return (*impl_)->set_data(0, util::unused_type());
         }
@@ -717,7 +700,7 @@ namespace hpx { namespace lcos
         {
             (*impl_)->set_error(0, e); // set the received error
         }
-    
+
         template <typename Archive>
         void serialize(Archive &, unsigned)
         {}

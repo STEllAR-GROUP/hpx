@@ -9,6 +9,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/traits/component_type_database.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/lexical_cast.hpp>
@@ -63,29 +64,6 @@ namespace hpx { namespace components
         }
         return lhs_base == rhs_base;
     }
-}}
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits
-{
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Enable>
-    struct component_type_database
-    {
-        static components::component_type value;
-
-        static HPX_ALWAYS_EXPORT components::component_type get();
-        static HPX_ALWAYS_EXPORT void set(components::component_type);
-    };
-
-    template <typename Component, typename Enable>
-    components::component_type
-    component_type_database<Component, Enable>::value = components::component_invalid;
-
-    template <typename Component, typename Enable>
-    struct component_type_database<Component const, Enable>
-      : component_type_database<Component, Enable>
-    {};
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

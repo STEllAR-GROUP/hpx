@@ -9,6 +9,7 @@
 #include <boost/move/move.hpp>
 #include <hpx/components/remote_object/stubs/remote_object.hpp>
 #include <hpx/lcos/promise.hpp>
+#include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/runtime/naming/address.hpp>
 
 namespace hpx { namespace components

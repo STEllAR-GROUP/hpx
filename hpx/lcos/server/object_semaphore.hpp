@@ -19,7 +19,6 @@
 #include <hpx/runtime/applier/trigger.hpp>
 #include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/lcos/base_lco.hpp>
-#include <hpx/lcos/get_result.hpp>
 
 namespace hpx { namespace lcos { namespace server
 {

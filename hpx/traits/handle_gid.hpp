@@ -3,22 +3,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_TRAITS_OCT_26_2011_0838AM)
-#define HPX_TRAITS_OCT_26_2011_0838AM
+#if !defined(HPX_TRAITS_HANDLE_GID_OCT_27_2011_0418PM)
+#define HPX_TRAITS_HANDLE_GID_OCT_27_2011_0418PM
+
+#include <hpx/traits.hpp>
 
 namespace hpx { namespace traits
 {
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Result, typename Enable = void>
-    struct promise_remote_result;
-
-    template <typename Result, typename Enable = void>
-    struct promise_local_result;
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Result, typename RemoteResult, typename Enable = void>
-    struct get_remote_result;
-
     ///////////////////////////////////////////////////////////////////////////
     // The customization point handle_gid is used to handle reference
     // counting of GIDs while they are transferred to a different locality.
@@ -32,16 +23,35 @@ namespace hpx { namespace traits
     //
     // The purpose of this customization point is to call the provided
     // function for all GIDs held in the data type.
-    template <typename T, typename F, typename Enable = void>
-    struct handle_gid;
+    template <typename T, typename F, typename Enable>
+    struct handle_gid
+    {
+        static bool call(T const&, F)
+        {
+            return true;    // do nothing for arbitrary types
+        }
+    };
 
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename Enable = void>
-    struct get_action_name;
+    template <typename F>
+    struct handle_gid<naming::id_type, F>
+    {
+        static bool call(naming::id_type const &id, F const& f)
+        {
+            f(id);
+            return true;
+        }
+    };
 
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Enable = void>
-    struct component_type_database;
+    template <typename F>
+    struct handle_gid<std::vector<naming::id_type>, F>
+    {
+        static bool call(std::vector<naming::id_type> const& ids, F const& f)
+        {
+            BOOST_FOREACH(naming::id_type const& id, ids)
+                f(boost::ref(id));
+            return true;
+        }
+    };
 }}
 
 #endif
