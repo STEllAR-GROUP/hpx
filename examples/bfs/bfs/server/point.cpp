@@ -26,12 +26,21 @@ namespace hpx { namespace geometry { namespace server
 {
         std::vector<std::size_t> point::traverse(std::size_t level,std::size_t parent)
         {
-          level_ = level; 
-          visited_ = true;
-          parent_ = parent;
+          if ( visited_ == false ) {
+            visited_ = true;
+            parent_ = parent;
+            level_ = level; 
 
-          // return the neighbors
-          return neighbors_;
+            // DEBUG
+            std::cout << "node id " << idx_ << " parent id " << parent_ << " level " << level_ << std::endl;
+
+            // return the neighbors
+            return neighbors_;
+          } else {
+            // don't return neighbors
+            std::vector<std::size_t> tmp;
+            return tmp;
+          }
         }
 
 }}}

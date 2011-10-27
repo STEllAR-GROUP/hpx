@@ -23,17 +23,17 @@ namespace hpx { namespace geometry { namespace stubs
 
         /// Initialize the server#point instance with the given \a gid
         static lcos::promise<void>
-        init_async(naming::id_type gid,std::size_t objectid)
+        init_async(naming::id_type gid,std::size_t objectid,std::string graphfile)
         {
             typedef server::point::init_action action_type;
-            return lcos::eager_future<action_type>(gid,objectid);
+            return lcos::eager_future<action_type>(gid,objectid,graphfile);
         }
 
-        static void init(naming::id_type const& gid,std::size_t objectid)
+        static void init(naming::id_type const& gid,std::size_t objectid,std::string graphfile)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the promise
-            init_async(gid,objectid).get();
+            init_async(gid,objectid,graphfile).get();
         }
 
         static lcos::promise<std::vector<std::size_t> >

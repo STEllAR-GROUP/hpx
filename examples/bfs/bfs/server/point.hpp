@@ -14,7 +14,10 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/lcos/local_mutex.hpp>
 
-#define MAX_NUM_NEIGHBORS 6
+#include <iostream>
+#include <fstream>
+
+#define MAX_NUM_NEIGHBORS 20
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace geometry { namespace server
@@ -41,27 +44,30 @@ namespace hpx { namespace geometry { namespace server
         // exposed functionality of this component
 
         /// Initialize the accumulator
-        void init(std::size_t objectid)
+        void init(std::size_t objectid,std::string graphfile)
         {
             idx_ = objectid;
             visited_ = false;
             neighbors_.reserve(MAX_NUM_NEIGHBORS);
 
-            char j1[64],j2[64];
-            char filename[80];
-            FILE *fdata;
-            // read a graph
-            sprintf(filename,"g1.txt");
-            fdata = fopen(filename,"r");
-            if ( fdata ) {
-              while(fscanf(fdata,"%s %s",&j1,&j2)>0) {
-                std::size_t node = atoi(j1);   
-                std::size_t neighbor = atoi(j2);   
-                if ( node == objectid ) {
-                  neighbors_.push_back(neighbor); 
+            std::string line;
+            std::string val1,val2;
+            std::ifstream myfile;
+            myfile.open(graphfile);
+            if (myfile.is_open() ) {
+              while (myfile.good()) { 
+                while(std::getline(myfile,line)) {
+                  std::istringstream isstream(line);
+                  std::getline(isstream,val1,' ');
+                  std::getline(isstream,val2,' ');
+                  std::size_t node = atoi(val1.c_str());   
+                  std::size_t neighbor = atoi(val2.c_str());   
+                  if ( node == objectid ) {
+                    neighbors_.push_back(neighbor); 
+                  }
                 }
               }
-            }
+            } 
         }
 
         // traverse the tree
@@ -71,8 +77,8 @@ namespace hpx { namespace geometry { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::action1<
-            point, point_init,std::size_t, &point::init
+        typedef hpx::actions::action2<
+            point, point_init,std::size_t,std::string, &point::init
         > init_action;
 
         typedef hpx::actions::result_action2<

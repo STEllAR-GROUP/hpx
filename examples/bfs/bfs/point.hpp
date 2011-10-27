@@ -46,16 +46,16 @@ namespace hpx { namespace geometry
         // exposed functionality of this component
 
         /// Initialize the server#point instance with the given \a gid
-        lcos::promise<void> init_async(std::size_t objectid)
+        lcos::promise<void> init_async(std::size_t objectid,std::string graphfile)
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::init_async(gid_,objectid);
+            return this->base_type::init_async(gid_,objectid,graphfile);
         }
 
-        void init(std::size_t objectid)
+        void init(std::size_t objectid,std::string graphfile)
         {
             BOOST_ASSERT(gid_);
-            this->base_type::init_async(gid_,objectid);
+            this->base_type::init_async(gid_,objectid,graphfile);
         }
 
         lcos::promise< std::vector<std::size_t> > traverse_async(std::size_t level, std::size_t parent)

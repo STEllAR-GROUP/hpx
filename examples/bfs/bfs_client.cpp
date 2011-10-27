@@ -27,7 +27,19 @@ int hpx_main(boost::program_options::variables_map &vm)
     {
        high_resolution_timer t;
 
-        const std::size_t num_elements = 5;
+       const std::size_t maxlevels = 20;
+       std::size_t num_elements = 5;
+       if (vm.count("n"))
+        num_elements = vm["n"].as<std::size_t>();
+
+       // define the root node
+       std::size_t root = 0;
+       if (vm.count("root"))
+        root = vm["root"].as<std::size_t>();
+  
+       std::string graphfile;
+       if (vm.count("graph"))
+        graphfile = vm["graph"].as<std::string>();
 
         // create a distributing factory locally
         hpx::components::distributing_factory factory;
@@ -50,8 +62,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::vector<hpx::lcos::promise<void> > initial_phase;
 
         for (std::size_t i=0;i<num_elements;i++) {
-          // compute the initial velocity so that everything heads to the origin
-          initial_phase.push_back(accu[i].init_async(i));
+          initial_phase.push_back(accu[i].init_async(i,graphfile));
         }
 
         // vector of gids
@@ -62,26 +73,47 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         // We have to wait for the futures to finish before exiting.
         hpx::lcos::wait(initial_phase);
-#if 0
-        std::vector<int> neighbors;
+
         // traverse the graph
-        std::size_t root = 0; // define root node
-        std::size_t level = 0; // define root node
+        std::size_t level = 0; 
         std::size_t parent = 9999; // define root node parent
-        std::vector<int> neighbors;
-        std::vector<hpx::lcos::promise<void> > traverse_phase;
+        std::vector< std::vector<std::size_t> >  parents;
+        for (std::size_t i=0;i<maxlevels;i++) {
+          parents.push_back(std::vector<std::size_t>() );
+        }
+        std::vector< std::vector<std::size_t> > neighbors,alt_neighbors;
+        std::vector<hpx::lcos::promise<std::vector<std::size_t> > > traverse_phase;
+
+        parents[level].push_back( root ); 
         traverse_phase.push_back(accu[root].traverse_async(level,parent));
         hpx::lcos::wait(traverse_phase,neighbors);
-        while (neighbors.size() > 0 ) {
-          level++; 
-          parent = root;
-          BOOST_FOREACH(i,neighbors)
-          {
-            traverse_phase.push_back(accu[i].traverse_async(level,parent));
+
+        // the rest
+        for (std::size_t k=1;k<maxlevels;k++) {
+          traverse_phase.resize(0);
+  
+          if ( (k+1)%2 == 0 ) {
+            alt_neighbors.resize(0);
+            for (std::size_t i=0;i<neighbors.size();i++) {
+              parent = parents[k-1][i];
+              for (std::size_t j=0;j<neighbors[i].size();j++) {
+                parents[k].push_back( neighbors[i][j] ); 
+                traverse_phase.push_back(accu[ neighbors[i][j] ].traverse_async(k,parent));
+              } 
+            }
+            hpx::lcos::wait(traverse_phase,alt_neighbors);
+          } else {
+            neighbors.resize(0);
+            for (std::size_t i=0;i<alt_neighbors.size();i++) {
+              parent = parents[k-1][i];
+              for (std::size_t j=0;j<alt_neighbors[i].size();j++) {
+                parents[k].push_back( alt_neighbors[i][j] ); 
+                traverse_phase.push_back(accu[ alt_neighbors[i][j] ].traverse_async(k,parent));
+              } 
+            }
+            hpx::lcos::wait(traverse_phase,neighbors);
           }
-          hpx::lcos::wait(traverse_phase,neighbors);
         }
-#endif
 
         std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl;
     } // ensure things are go out of scope
@@ -93,5 +125,21 @@ int hpx_main(boost::program_options::variables_map &vm)
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-    return hpx::init("bfs_client", argc, argv); // Initialize and run HPX
+
+    using boost::program_options::value;
+
+    // Configure application-specific options
+    boost::program_options::options_description
+       desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
+
+    desc_commandline.add_options()
+        ("n", value<std::size_t>()->default_value(100),
+            "the number of nodes in the graph")
+        ("root", value<std::size_t>()->default_value(0),
+            "define the root node in the graph")
+        ("graph", value<std::string>()->default_value("g1.txt"),
+            "the file containing the graph");
+
+    return hpx::init(desc_commandline, argc, argv); // Initialize and run HPX
+
 }
