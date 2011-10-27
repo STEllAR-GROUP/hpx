@@ -67,18 +67,16 @@ namespace hpx { namespace actions
             try {
                 LTM_(debug) << "Executing component action("
                             << detail::get_action_name<Derived>()
-                            << ")";
-//                             << ") lva(" << reinterpret_cast<void*>
-//                                 (get_lva<Component>::call(lva)) << ")";
+                            << ") lva(" << reinterpret_cast<void const*>
+                                (get_lva<Component>::call(lva)) << ")";
                 (get_lva<Component>::call(lva)->*F)();      // just call the function
             }
             catch (hpx::exception const& e) {
                 LTM_(error)
                     << "Unhandled exception while executing component action("
                     << detail::get_action_name<Derived>()
-                    << ")" << e.what();
-//                     << ") lva(" << reinterpret_cast<void*>
-//                         (get_lva<Component>::call(lva)) << "): " << e.what();
+                    << ") lva(" << reinterpret_cast<void const*>
+                        (get_lva<Component>::call(lva)) << "): " << e.what();
 
                 // report this error to the console in any case
                 hpx::report_error(boost::current_exception());
@@ -196,9 +194,8 @@ namespace hpx { namespace actions
         {
             LTM_(debug) << "result_action0::execute_function: name("
                         << detail::get_action_name<derived_type>()
-                        << ")";
-//                         << ") lva(" << reinterpret_cast<void*>
-//                             (get_lva<Component>::call(lva)) << ")";
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << ")";
             return (get_lva<Component>::call(lva)->*F)();
         }
 
@@ -206,9 +203,8 @@ namespace hpx { namespace actions
         {
             LTM_(debug) << "result_action0::execute_function_nonvirt: name("
                         << detail::get_action_name<derived_type>()
-                        << ")";
-//                         << ") lva(" << reinterpret_cast<void*>
-//                             (get_lva<Component>::call(lva)) << ")";
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << ")";
             return (get_lva<Component>::call(lva)->*F)();
         }
 
@@ -423,18 +419,16 @@ namespace hpx { namespace actions
             try {
                 LTM_(debug) << "Executing component action("
                             << detail::get_action_name<Derived>()
-                            << ")";
-//                             << ") lva(" << reinterpret_cast<void*>
-//                                 (get_lva<Component>::call(lva)) << ")";
+                            << ") lva(" << reinterpret_cast<void const*>
+                                (get_lva<Component>::call(lva)) << ")";
                 (get_lva<Component>::call(lva)->*F)();      // just call the function
             }
             catch (hpx::exception const& e) {
                 LTM_(error)
                     << "Unhandled exception while executing component action("
                     << detail::get_action_name<Derived>()
-                    << ")" << e.what();
-//                     << ") lva(" << reinterpret_cast<void*>
-//                         (get_lva<Component>::call(lva)) << "): " << e.what();
+                    << ") lva(" << reinterpret_cast<void const*>
+                        (get_lva<Component>::call(lva)) << "): " << e.what();
 
                 // report this error to the console in any case
                 hpx::report_error(boost::current_exception());
@@ -545,9 +539,8 @@ namespace hpx { namespace actions
         {
             LTM_(debug) << "action0::execute_function: name("
                         << detail::get_action_name<derived_type>()
-                        << ")";
-//                         << ") lva(" << reinterpret_cast<void*>
-//                             (get_lva<Component>::call(lva)) << ")";
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << ")";
             (get_lva<Component>::call(lva)->*F)();
             return util::unused;
         }
@@ -557,9 +550,8 @@ namespace hpx { namespace actions
         {
             LTM_(debug) << "action0::execute_function_nonvirt: name("
                         << detail::get_action_name<derived_type>()
-                        << ")";
-//                         << ") lva(" << reinterpret_cast<void*>
-//                             (get_lva<Component>::call(lva)) << ")";
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << ")";
             (get_lva<Component>::call(lva)->*F)();
             return util::unused;
         }
@@ -659,9 +651,8 @@ namespace hpx { namespace actions
         {
             LTM_(debug) << "direct_action0::execute_function: name("
                         << detail::get_action_name<derived_type>()
-                        << ")";
-//                         << ") lva(" << reinterpret_cast<void*>
-//                             (get_lva<Component>::call(lva)) << ")";
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << ")";
             (get_lva<Component>::call(lva)->*F)();
             return util::unused;
         }
@@ -671,9 +662,8 @@ namespace hpx { namespace actions
         {
             LTM_(debug) << "direct_action0::execute_function_nonvirt: name("
                         << detail::get_action_name<derived_type>()
-                        << ")";
-//                         << ") lva(" << reinterpret_cast<void*>
-//                             (get_lva<Component>::call(lva)) << ")";
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << ")";
             (get_lva<Component>::call(lva)->*F)();
             return util::unused;
         }
