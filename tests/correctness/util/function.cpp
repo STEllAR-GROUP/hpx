@@ -19,7 +19,70 @@ using hpx::init;
 using hpx::finalize;
 
 ///////////////////////////////////////////////////////////////////////////////
-struct foo
+struct small_object
+{
+  private:
+    boost::uint64_t x_;
+
+    friend class boost::serialization::access;
+
+    template <
+        typename Archive
+    >
+    void serialize(
+        Archive& ar
+      , unsigned const
+        )
+    {
+        ar & x_;
+        std::cout << "small_object: serialize(" << x_ << ")\n";
+    }
+
+  public:
+    small_object()
+      : x_(0)
+    {
+        std::cout << "small_object: default ctor\n";
+    }
+
+    small_object(
+        boost::uint64_t x
+        )
+      : x_(x)
+    {
+        std::cout << "small_object: ctor(" << x << ")\n";
+    }
+
+    small_object(
+        small_object const& o
+        )
+      : x_(o.x_)
+    {
+        std::cout << "small_object: copy(" << o.x_ << ")\n"; 
+    }
+
+    small_object& operator=(
+        small_object const& o
+        )
+    {
+        x_ = o.x_;
+        std::cout << "small_object: assign(" << o.x_ << ")\n"; 
+        return *this;
+    }
+
+    ~small_object()
+    {
+        std::cout << "small_object: dtor(" << x_ << ")\n";
+    }
+
+    void operator()()
+    {
+        std::cout << "small_object: call(" << x_ << ")\n";
+    } 
+};
+
+///////////////////////////////////////////////////////////////////////////////
+struct big_object
 {
   private:
     boost::uint64_t x_;
@@ -35,46 +98,56 @@ struct foo
       , unsigned const
         )
     {
-        std::cout << "serialize" << std::endl;
         ar & x_;
         ar & y_;
+        std::cout << "big_object: serialize(" << x_ << ", " << y_ << ")\n";
     }
 
   public:
-    foo()
+    big_object()
+      : x_(0)
+      , y_(0)
     {
-        std::cout << "default ctor" << std::endl;
+        std::cout << "big_object: default ctor\n";
     }
 
-    foo(
+    big_object(
         boost::uint64_t x
       , boost::uint64_t y
         )
       : x_(x)
       , y_(y)
     {
-        std::cout << "ctor" << std::endl;
+        std::cout << "big_object: ctor(" << x << ", " << y << ")\n";
     }
 
-    foo(
-        foo const& other
+    big_object(
+        big_object const& o
         )
-      : x_(other.x_)
-      , y_(other.y_)
+      : x_(o.x_)
+      , y_(o.y_)
     {
-        std::cout << "copy ctor" << std::endl;
+        std::cout << "big_object: copy(" << o.x_ << ", " << o.y_ << ")\n"; 
     }
 
-    ~foo()
+    big_object& operator=(
+        big_object const& o
+        )
     {
-        std::cout << "dtor" << std::endl;
+        x_ = o.x_;
+        y_ = o.y_;
+        std::cout << "big_object: assign(" << o.x_ << ", " << o.y_ << ")\n"; 
+        return *this;
+    }
+
+    ~big_object()
+    {
+        std::cout << "big_object: dtor(" << x_ << ", " << y_ << ")\n";
     }
 
     void operator()()
     {
-        std::cout << "x: " << x_ << "\n"
-                  << "y: " << y_ << "\n"
-                  ;
+        std::cout << "big_object: call(" << x_ << ", " << y_ << ")\n";
     } 
 };
 
@@ -82,17 +155,47 @@ struct foo
 int hpx_main(variables_map& vm)
 {
     {
-        foo f(17, 19);
+        {
+            if (sizeof(small_object) <= sizeof(void*))
+                std::cout << "object is small\n";
+            else
+                std::cout << "object is large\n";
 
-        function<void()> f0(f);
+            small_object f(17);
+    
+            function<void()> f0(f);
+    
+            function<void()> f1(f0);
+    
+            function<void()> f2;
+    
+            f2 = f0;
+    
+            f0();
+            f1();
+            f2();
+        }
 
-        function<void()> f1(f0), f2;
+        {
+            if (sizeof(big_object) <= sizeof(void*))
+                std::cout << "object is small\n";
+            else
+                std::cout << "object is large\n";
 
-        f2 = f0;
-
-        f0();
-        f1();
-        f2();
+            big_object f(5, 12);
+    
+            function<void()> f0(f);
+    
+            function<void()> f1(f0);
+    
+            function<void()> f2;
+    
+            f2 = f0;
+    
+            f0();
+            f1();
+            f2();
+        }
     }
 
     finalize();
