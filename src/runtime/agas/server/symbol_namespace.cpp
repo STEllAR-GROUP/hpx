@@ -102,6 +102,30 @@ response symbol_namespace::bind(
 
     if (it != end)
     {
+        boost::uint16_t const credits = naming::get_credit_from_gid(gid);
+        naming::gid_type raw_gid = it->second;
+        naming::strip_credit_from_gid(raw_gid);
+        naming::strip_credit_from_gid(gid);
+
+        // increase reference count
+        if (raw_gid == gid)
+        {
+            LAGAS_(info) << (boost::format(
+                "symbol_namespace::bind, key(%1%), gid(%2%), old_credit(%3%), "
+                "new_credit(%4%)")
+                % key % gid
+                % naming::get_credit_from_gid(it->second)
+                % naming::get_credit_from_gid(it->second) + credits);
+
+            naming::add_credit_from_gid(it->second, credits);
+
+            if (&ec != &throws)
+                ec = make_success_code();
+
+            return response(symbol_ns_bind);
+        }
+
+        naming::add_credit_from_gid(gid, credits)
         LAGAS_(info) << (boost::format(
             "symbol_namespace::bind, key(%1%), gid(%2%), response(no_success)")
             % key % gid);
