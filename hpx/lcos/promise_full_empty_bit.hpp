@@ -530,6 +530,12 @@ namespace hpx { namespace lcos
             return (*impl_)->get_gid();
         }
 
+        /// \brief Return the global id of this \a future instance
+        naming::gid_type get_base_gid() const
+        {
+            return (*impl_)->get_base_gid();
+        }
+
         /// Return whether or not the data is available for this
         /// \a promise.
         bool ready() const
@@ -639,6 +645,12 @@ namespace hpx { namespace lcos
         naming::id_type get_gid() const
         {
             return (*impl_)->get_gid();
+        }
+
+        /// \brief Return the global id of this \a future instance
+        naming::gid_type get_base_gid() const
+        {
+            return (*impl_)->get_base_gid();
         }
 
         /// Return whether or not the data is available for this
