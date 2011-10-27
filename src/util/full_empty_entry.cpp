@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/thread.hpp>
-#include <hpx/util/full_empty_store.hpp>
+#include <hpx/util/full_empty_entry.hpp>
 #include <hpx/include/performance_counters.hpp>
 
 #include <boost/cstdint.hpp>

@@ -10,7 +10,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/call_traits.hpp>
 
-#include <hpx/util/full_empty_store.hpp>
+#include <hpx/util/full_empty_entry.hpp>
 
 namespace hpx { namespace util
 {
