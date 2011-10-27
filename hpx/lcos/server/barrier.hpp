@@ -31,8 +31,10 @@ namespace hpx { namespace lcos { namespace server
       : public lcos::base_lco
       , public components::managed_component_base<barrier>
     {
-    private:
+    public:
         typedef lcos::base_lco base_type_holder;
+
+    private:
         typedef components::managed_component_base<barrier> base_type;
 
         typedef hpx::lcos::local_mutex mutex_type;
