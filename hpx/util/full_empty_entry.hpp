@@ -10,7 +10,7 @@
 #include <memory>
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/spinlock_pool.hpp>
+#include <hpx/util/spinlock.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/runtime/threads/thread.hpp>
@@ -55,11 +55,8 @@ namespace hpx { namespace util { namespace detail
     template <typename Data>
     class full_empty_entry
     {
-        struct tag {};
-
     public:
-        typedef hpx::util::spinlock_pool<tag> mutex_type;
-        typedef typename mutex_type::scoped_lock scoped_lock;
+        typedef util::spinlock mutex_type;
 
     private:
         typedef threads::thread_id_type thread_id_type;
@@ -93,7 +90,7 @@ namespace hpx { namespace util { namespace detail
 
         void log_non_empty_queue(char const* const desc, queue_type& queue)
         {
-            scoped_lock l(this);
+            mutex_type::scoped_lock l(mtx_);
             while (!queue.empty()) {
                 threads::thread_id_type id = queue.front().id_;
                 queue.front().id_ = 0;
@@ -149,21 +146,21 @@ namespace hpx { namespace util { namespace detail
         // returns whether this entry is currently empty
         bool is_empty() const
         {
-            scoped_lock l(this);
+            mutex_type::scoped_lock l(mtx_);
             return state_ == empty;
         }
 
         // sets this entry to empty
         bool set_empty()
         {
-            scoped_lock l(this);
+            mutex_type::scoped_lock l(mtx_);
             return set_empty_locked();
         }
 
         // sets this entry to full
         bool set_full()
         {
-            scoped_lock l(this);
+            mutex_type::scoped_lock l(mtx_);
             return set_full_locked();
         }
 
@@ -177,7 +174,7 @@ namespace hpx { namespace util { namespace detail
 
             threads::thread_id_type id = self->get_thread_id();
 
-            scoped_lock l(this);
+            mutex_type::scoped_lock l(mtx_);
 
             // block if this entry is empty
             if (state_ == empty) {
@@ -195,7 +192,7 @@ namespace hpx { namespace util { namespace detail
 
                 {
                     // yield this thread
-                    util::unlock_the_lock<scoped_lock> ul(l);
+                    util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
                     statex = self->yield(threads::suspended);
                 }
 
@@ -237,7 +234,7 @@ namespace hpx { namespace util { namespace detail
 
             threads::thread_id_type id = self->get_thread_id();
 
-            scoped_lock l(this);
+            mutex_type::scoped_lock l(mtx_);
 
             // block if this entry is empty
             if (state_ == empty) {
@@ -255,7 +252,7 @@ namespace hpx { namespace util { namespace detail
 
                 {
                     // yield this thread
-                    util::unlock_the_lock<scoped_lock> ul(l);
+                    util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
                     statex = self->yield(threads::suspended);
                 }
 
@@ -295,7 +292,7 @@ namespace hpx { namespace util { namespace detail
 
             threads::thread_id_type id = self->get_thread_id();
 
-            scoped_lock l(this);
+            mutex_type::scoped_lock l(mtx_);
 
             // block if this entry is empty
             if (state_ == empty) {
@@ -311,7 +308,7 @@ namespace hpx { namespace util { namespace detail
 
                 {
                     // yield this thread
-                    util::unlock_the_lock<scoped_lock> ul(l);
+                    util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
                     statex = self->yield(threads::suspended);
                 }
 
@@ -357,7 +354,7 @@ namespace hpx { namespace util { namespace detail
 
             threads::thread_id_type id = self->get_thread_id();
 
-            scoped_lock l(this);
+            mutex_type::scoped_lock l(mtx_);
 
             // block if this entry is empty
             if (state_ == empty) {
@@ -373,7 +370,7 @@ namespace hpx { namespace util { namespace detail
 
                 {
                     // yield this thread
-                    util::unlock_the_lock<scoped_lock> ul(l);
+                    util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
                     statex = self->yield(threads::suspended);
                 }
 
@@ -414,7 +411,7 @@ namespace hpx { namespace util { namespace detail
 
             threads::thread_id_type id = self->get_thread_id();
 
-            scoped_lock l(this);
+            mutex_type::scoped_lock l(mtx_);
 
             // block if this entry is already full
             if (state_ == full) {
@@ -430,7 +427,7 @@ namespace hpx { namespace util { namespace detail
 
                 {
                     // yield this thread
-                    util::unlock_the_lock<scoped_lock> ul(l);
+                    util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
                     statex = self->yield(threads::suspended);
                 }
 
@@ -473,7 +470,7 @@ namespace hpx { namespace util { namespace detail
 
             threads::thread_id_type id = self->get_thread_id();
 
-            scoped_lock l(this);
+            mutex_type::scoped_lock l(mtx_);
 
             // block if this entry is already full
             if (state_ == full) {
@@ -489,7 +486,7 @@ namespace hpx { namespace util { namespace detail
 
                 {
                     // yield this thread
-                    util::unlock_the_lock<scoped_lock> ul(l);
+                    util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
                     statex = self->yield(threads::suspended);
                 }
 
@@ -524,7 +521,7 @@ namespace hpx { namespace util { namespace detail
         template <typename T>
         void set_and_fill(T const& src)
         {
-            scoped_lock l(this);
+            mutex_type::scoped_lock l(mtx_);
 
             // set the data
             if (get_address() != &src)
@@ -537,7 +534,7 @@ namespace hpx { namespace util { namespace detail
         // same as above, but for entries without associated data
         void set_and_fill()
         {
-            scoped_lock l(this);
+            mutex_type::scoped_lock l(mtx_);
 
             // make sure the entry is full
             set_full_locked();    // state_ = full
@@ -546,7 +543,7 @@ namespace hpx { namespace util { namespace detail
         // returns whether this entry is still in use
         bool is_used() const
         {
-            scoped_lock l(this);
+            mutex_type::scoped_lock l(mtx_);
             return is_used_locked();
         }
 

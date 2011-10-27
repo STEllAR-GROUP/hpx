@@ -10,7 +10,7 @@
 #include <boost/intrusive/slist.hpp>
 
 #include <hpx/exception.hpp>
-#include <hpx/util/spinlock_pool.hpp>
+#include <hpx/util/spinlock.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/runtime/threads/thread.hpp>
@@ -41,11 +41,10 @@ namespace hpx { namespace lcos { namespace server
     public:
         typedef lcos::base_lco_with_value<ValueType, RemoteType> base_type_holder;
 
+        typedef util::spinlock mutex_type;
     private:
         typedef components::managed_component_base<queue> base_type;
 
-        struct tag {};
-        typedef hpx::util::spinlock_pool<tag> mutex_type;
 
         // define data structures needed for intrusive slist container used for
         // the queues
@@ -113,7 +112,7 @@ namespace hpx { namespace lcos { namespace server
             if (!thread_queue_.empty()) {
                 LERR_(fatal) << "~queue: thread_queue is not empty, aborting threads";
 
-                typename mutex_type::scoped_lock l(this);
+                mutex_type::scoped_lock l(mtx_);
                 while (!thread_queue_.empty()) {
                     threads::thread_id_type id = thread_queue_.front().id_;
                     thread_queue_.front().id_ = 0;
@@ -165,7 +164,7 @@ namespace hpx { namespace lcos { namespace server
             HPX_STD_UNIQUE_PTR<queue_value_entry> node(
                 new queue_value_entry(get_result<ValueType, RemoteType>::call(result)));
 
-            typename mutex_type::scoped_lock l(this);
+            mutex_type::scoped_lock l(mtx_);
             value_queue_.push_back(*node);
 
             node.release();
@@ -189,7 +188,7 @@ namespace hpx { namespace lcos { namespace server
         ///               to this LCO instance.
         void set_error(boost::exception_ptr const& e)
         {
-            typename mutex_type::scoped_lock l(this);
+            mutex_type::scoped_lock l(mtx_);
 
             while (!thread_queue_.empty()) {
                 threads::thread_id_type id = thread_queue_.front().id_;
@@ -209,7 +208,7 @@ namespace hpx { namespace lcos { namespace server
         {
             threads::thread_self& self = threads::get_self();
 
-            typename mutex_type::scoped_lock l(this);
+            mutex_type::scoped_lock l(mtx_);
             if (value_queue_.empty()) {
                 // suspend this thread until a new value is placed into the
                 // value queue
@@ -220,7 +219,7 @@ namespace hpx { namespace lcos { namespace server
                 typename thread_queue_type::const_iterator last = thread_queue_.last();
 
                 {
-                    util::unlock_the_lock<typename mutex_type::scoped_lock> ul(l);
+                    util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
                     threads::thread_state_ex_enum statex = self.yield(threads::suspended);
                     if (statex == threads::wait_abort) {
                         hpx::util::osstream strm;
@@ -251,6 +250,7 @@ namespace hpx { namespace lcos { namespace server
         }
 
     private:
+        mutex_type mtx_;
         value_queue_type value_queue_;
         thread_queue_type thread_queue_;
     };

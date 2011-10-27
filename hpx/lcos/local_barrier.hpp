@@ -3,11 +3,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_local_barrier_JUN_23_2008_0530PM)
-#define HPX_LCOS_local_barrier_JUN_23_2008_0530PM
+#if !defined(HPX_LCOS_LOCAL_BARRIER_JUN_23_2008_0530PM)
+#define HPX_LCOS_LOCAL_BARRIER_JUN_23_2008_0530PM
 
 #include <boost/intrusive/slist.hpp>
-#include <hpx/util/spinlock_pool.hpp>
+#include <hpx/util/spinlock.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/stringstream.hpp>
 
@@ -26,10 +26,10 @@ namespace hpx { namespace lcos
     ///         synchronize a given number of \a threads.
     class local_barrier
     {
-    private:
-        struct tag {};
-        typedef hpx::util::spinlock_pool<tag> mutex_type;
+    public:
+        typedef util::spinlock mutex_type;
 
+    private:
         // define data structures needed for intrusive slist container used for
         // the queues
         struct local_barrier_queue_entry
@@ -67,7 +67,7 @@ namespace hpx { namespace lcos
             if (!queue_.empty()) {
                 LERR_(fatal) << "~local_barrier: thread_queue is not empty, aborting threads";
 
-                mutex_type::scoped_lock l(this);
+                mutex_type::scoped_lock l(mtx_);
                 while (!queue_.empty()) {
                     threads::thread_id_type id = queue_.front().id_;
                     queue_.front().id_ = 0;
@@ -100,7 +100,7 @@ namespace hpx { namespace lcos
         {
             threads::thread_self& self = threads::get_self();
 
-            mutex_type::scoped_lock l(this);
+            mutex_type::scoped_lock l(mtx_);
             if (queue_.size() < number_of_threads_-1) {
                 threads::thread_id_type id = self.get_thread_id();
 
@@ -159,6 +159,7 @@ namespace hpx { namespace lcos
 
     private:
         std::size_t const number_of_threads_;
+        mutable mutex_type mtx_;
         queue_type queue_;
     };
 

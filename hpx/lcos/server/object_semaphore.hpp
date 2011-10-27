@@ -11,7 +11,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/util/spinlock_pool.hpp>
+#include <hpx/util/spinlock.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -97,7 +97,7 @@ struct object_semaphore
 
   private:
     // assumes that this thread has acquired l
-    void resume(typename mutex_type::scoped_lock& l)
+    void resume(mutex_type::scoped_lock& l)
     { // {{{
         // resume as many waiting LCOs as possible
         while (!thread_queue_.empty() && !value_queue_.empty())
@@ -120,7 +120,7 @@ struct object_semaphore
             thread_queue_.pop_front();
 
             {
-                util::unlock_the_lock<typename mutex_type::scoped_lock> ul(l);
+                util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
 
                 // set the LCO's result
                 applier::trigger<ValueType>(id, value);

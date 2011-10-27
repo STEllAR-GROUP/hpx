@@ -13,7 +13,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/util/spinlock_pool.hpp>
+#include <hpx/util/spinlock.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/stringstream.hpp>
@@ -80,13 +80,11 @@ namespace hpx { namespace lcos
     /// TimedLockable concept.
     class HPX_EXPORT local_mutex : public boost::noncopyable
     {
+    public:
+        typedef util::spinlock mutex_type;
     private:
         BOOST_STATIC_CONSTANT(boost::uint32_t, lock_flag_bit = 31);
         BOOST_STATIC_CONSTANT(boost::uint32_t, lock_flag_value = 1u << lock_flag_bit);
-
-    private:
-        struct tag {};
-        typedef hpx::util::spinlock_pool<tag> mutex_type;
 
         // define data structures needed for intrusive slist container used for
         // the queues
@@ -255,7 +253,7 @@ namespace hpx { namespace lcos
         {
             HPX_ITT_SYNC_RELEASING(this);
             {
-                mutex_type::scoped_lock l(this);
+                mutex_type::scoped_lock l(mtx_);
 
                 BOOST_ASSERT(active_count_ & lock_flag_value);
                 active_count_ += lock_flag_value;
@@ -268,6 +266,7 @@ namespace hpx { namespace lcos
         typedef boost::detail::try_lock_wrapper<local_mutex> scoped_try_lock;
 
     private:
+        mutable util::spinlock mtx_;
         boost::atomic<boost::uint32_t> active_count_;
         queue_type queue_;
         boost::uint32_t pending_events_;

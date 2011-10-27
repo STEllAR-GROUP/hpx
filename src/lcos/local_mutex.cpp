@@ -21,7 +21,7 @@ namespace hpx { namespace lcos
             LERR_(fatal) << "lcos::~local_mutex: " << description_
                          << ": queue is not empty";
 
-            mutex_type::scoped_lock l(this);
+            mutex_type::scoped_lock l(mtx_);
             while (!queue_.empty()) {
                 threads::thread_id_type id = queue_.front().id_;
                 queue_.front().id_ = 0;
@@ -52,7 +52,7 @@ namespace hpx { namespace lcos
         threads::thread_id_type id = self.get_thread_id();
 
         // enqueue this thread
-        mutex_type::scoped_lock l(this);
+        mutex_type::scoped_lock l(mtx_);
         if (pending_events_) {
             --pending_events_;
             return false;

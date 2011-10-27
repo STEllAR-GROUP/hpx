@@ -29,17 +29,26 @@ struct spinlock : boost::noncopyable
     }
 
     void lock()
-    { m.lock(); }
+    {
+        m.lock();
+    }
 
     bool try_lock()
-    { return m.try_lock(); }
+    {
+        return m.try_lock();
+    }
 
     void unlock()
-    { m.unlock(); }
+    {
+        m.unlock();
+    }
 
     typedef boost::detail::spinlock* native_handle_type;
+
     native_handle_type native_handle()
-    { return &m; }
+    {
+        return &m;
+    }
 
     typedef boost::unique_lock<spinlock> scoped_lock;
     typedef boost::detail::try_lock_wrapper<spinlock> scoped_try_lock;
