@@ -17,20 +17,21 @@ namespace hpx { namespace agas { namespace stubs
 
 struct symbol_namespace
 {
-    // {{{ nested types
     typedef server::symbol_namespace server_type;
 
     typedef server_type::iterate_names_function_type
         iterate_names_function_type;
-    // }}}
 
-    static lcos::promise<response> service_async(
+    template <
+        typename Result
+    >
+    static lcos::promise<Result, response> service_async(
         naming::id_type const& gid
       , request const& req
         )
     {
         typedef server_type::service_action action_type;
-        return lcos::eager_future<action_type, response>(gid, req);
+        return lcos::eager_future<action_type, Result>(gid, req);
     }
 
     static response service(
@@ -39,7 +40,7 @@ struct symbol_namespace
       , error_code& ec = throws
         )
     {
-        return service_async(gid, req).get(ec);
+        return service_async<response>(gid, req).get(ec);
     }
 };
 

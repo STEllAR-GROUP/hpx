@@ -21,6 +21,7 @@
 
 #include <hpx/exception.hpp>
 #include <hpx/util/serialize_sequence.hpp>
+#include <hpx/lcos/get_result.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/naming/name.hpp>
@@ -561,6 +562,40 @@ struct response
     namespace_action_code mc;
     error status;
     data_type data;
+};
+
+}
+
+namespace lcos
+{
+
+// TODO: verification of namespace_action_code
+template <>
+struct get_result<naming::id_type, agas::response>
+{
+    static naming::id_type call(
+        agas::response const& rep
+        )
+    {
+        naming::gid_type raw_gid = rep.get_gid();
+    
+        if (naming::get_credit_from_gid(raw_gid) != 0)
+            return naming::id_type(raw_gid, naming::id_type::managed);
+        else
+            return naming::id_type(raw_gid, naming::id_type::unmanaged);
+    }
+};
+
+// TODO: verification of namespace_action_code
+template <>
+struct get_result<bool, agas::response>
+{
+    static bool call(
+        agas::response const& rep
+        )
+    {
+        return success != rep.get_status();
+    }
 };
 
 }}

@@ -992,12 +992,8 @@ public:
     ///                   the function will throw on error instead.
     ///
     /// \returns          The function returns \a true if the global name
-    ///                   got an association with a global address for the
-    ///                   first time, and it returns \a false if this
-    ///                   function call replaced a previously registered
-    ///                   global address with the global address (id)
-    ///                   given as the parameter. Any error results in an
-    ///                   exception thrown from this function.
+    ///                   was registered. It returns false if the global name is
+    ///                   not registered. 
     ///
     /// \note             As long as \a ec is not pre-initialized to
     ///                   \a hpx#throws this function doesn't
@@ -1009,6 +1005,11 @@ public:
       , naming::gid_type const& id
       , error_code& ec = throws
         );
+
+    lcos::promise<bool, response> register_name_async(
+        std::string const& name
+      , naming::gid_type const& id
+        ); 
 
     /// \brief Unregister a global name (release any existing association)
     ///
@@ -1047,6 +1048,10 @@ public:
       , error_code& ec = throws
         );
 
+    lcos::promise<naming::id_type, response> unregister_name_async(
+        std::string const& name
+        );
+
     /// \brief Query for the global address associated with a given global name.
     ///
     /// This function returns the global address associated with the given
@@ -1076,6 +1081,10 @@ public:
         std::string const& name
       , naming::gid_type& id
       , error_code& ec = throws
+        );
+
+    lcos::promise<naming::id_type, response> resolve_name_async(
+        std::string const& name
         );
 
     void update_cache(
