@@ -934,7 +934,7 @@ namespace hpx { namespace threads
         boost::format total_stack_unbinds("/threads(locality#%d/total)/count/stack-unbinds");
 #endif
         boost::format total_thread_instant("/threads(locality#%d/total)/count/instantaneous/%s");
-        boost::format queue_length("/queue(locality#%d/os-thread%d)/length");
+        boost::format queue_length("/queue(locality#%d/os-thread#%d)/length");
         boost::format avg_maint("/time(locality#%d/os-thread#%d)/idle-rate");
         boost::format thread_cumulative("/threads(locality#%d/os-thread#%d)/count/cumulative/all");
         boost::format thread_instant("/threads(locality#%d/os-thread#%d)/count/instantaneous/%s");
