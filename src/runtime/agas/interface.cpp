@@ -45,6 +45,13 @@ bool register_name(
     if (agas_.register_name(name, new_gid, ec) && !ec)
         return true;
 
+    // Return the credit to the GID, as the operation failed
+    if (naming::get_credit_from_gid(mutable_gid) != 0)
+    {
+        naming::add_credit_to_gid(mutable_gid,
+            naming::get_credit_from_gid(new_gid));
+    }
+
     return false;
 }
 
