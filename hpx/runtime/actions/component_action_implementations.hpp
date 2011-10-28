@@ -1024,7 +1024,7 @@ namespace hpx { namespace actions
         BOOST_PP_ENUM_PARAMS(N, typename T),
         void (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T)),
         threads::thread_priority Priority,
-        typename Derived = detail::this_type>
+        typename Derived>
     class BOOST_PP_CAT(result_action, N) <
         Component
       , void
