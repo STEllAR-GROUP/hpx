@@ -3,20 +3,23 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-
 #ifndef HPX_FUNCTION_DETAILSERIALIZATION_REGISTRATION_HPP
 #define HPX_FUNCTION_DETAILSERIALIZATION_REGISTRATION_HPP
 
 #include <boost/serialization/export.hpp>
 #include <boost/serialization/extended_type_info.hpp>
 #include <boost/uuid/sha1.hpp>
+#include <boost/cstdint.hpp>
+#include <boost/assert.hpp>
+
 #include <hpx/util/detail/pp_strip_parens.hpp>
+
 #include <typeinfo>
 
-namespace hpx { namespace util { namespace detail {
+namespace hpx { namespace util { namespace detail
+{
     template <typename T>
     struct guid_initializer_helper
-        //: boost::archive::detail::extra_detail::guid_initializer<T>
     {
         typedef boost::archive::detail::extra_detail::guid_initializer<T> base_type;
         base_type guid_init;
@@ -35,22 +38,65 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 
-    template <typename T>
-    const char * type_hash()
+    ///////////////////////////////////////////////////////////////////////////
+    inline char
+    to_digit(int number)
     {
-        static char buf[20];
+        if (number >= 0 && number <= 9)
+            return number + '0';
+        return number - 10 + 'A';
+    }
+
+    inline void convert_byte(boost::uint8_t b, char*& buffer, char const* end)
+    {
+        BOOST_ASSERT(buffer < end-1);
+        *buffer++ = to_digit((b & 0xF0) >> 4);
+        *buffer++ = to_digit(b & 0x0F);
+    }
+
+    inline void
+    convert_unsigned(boost::uint32_t ui, char*& buffer, char const* end)
+    {
+        convert_byte(ui / 0x01000000, buffer, end);
+        convert_byte(ui / 0x010000 % 0x0100, buffer, end);
+        convert_byte(ui / 0x0100 % 0x0100, buffer, end);
+        convert_byte(ui % 0x0100, buffer, end);
+    }
+
+    template <typename T>
+    char const* type_hash_string()
+    {
         /// FIXME: this is not portable across different compilers
-        static const char * name = typeid(T).name();
+        char const* name = typeid(T).name();
+
         // create a sha1 hash from the string returned by typeid::name
         boost::uuids::detail::sha1 hash;
         hash.process_block(name, name + std::strlen(name));
-        unsigned digest[5];
+
+        boost::uint32_t digest[5];
         hash.get_digest(digest);
 
-        // copy that into our string
-        std::memcpy(buf, digest, 5*sizeof(unsigned));
+        // 5 times the number of digits generated from a 32 bit unsigned
+        static char buf[5 * 8 + 1] = { '\0' };
+
+        // stringify hash
+        char* buffer = buf;
+        for (int i = 0; i < 5; ++i)
+            convert_unsigned(digest[i], buffer, &buf[sizeof(buf)]);
+
+        BOOST_ASSERT(buffer == &buf[sizeof(buf)-1]);
+        *buffer = '\0';
 
         return buf;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // return a unique string representing the type T
+    template <typename T>
+    char const* type_hash()
+    {
+        static char const* name = type_hash_string<T>();
+        return name;
     }
 }}}
 
