@@ -28,10 +28,6 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-#ifdef __GNUC__
-#include <cxxabi.h>
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
@@ -753,12 +749,12 @@ namespace hpx { namespace actions
         : public action0<Component, Action, F, Priority, Derived>
     {
         typedef action0<Component, Action, F, Priority, Derived> base_type;
-    
+
     public:
         explicit result_action0(threads::thread_priority priority = Priority)
           : base_type(priority)
         {}
-        
+
         /// serialization support
         static void register_base()
         {
@@ -766,7 +762,7 @@ namespace hpx { namespace actions
             void_cast_register<result_action0, base_type>();
             base_type::register_base();
         }
-        
+
     private:
         // serialization support
         friend class boost::serialization::access;
@@ -779,53 +775,29 @@ namespace hpx { namespace actions
     };
 }}
 
-#ifdef __GNUC__
-#define HPX_ACTIONS_TMP(TEMPLATE, TYPE)                                         \
-HPX_SERIALIZATION_REGISTER_TEMPLATE(TEMPLATE, TYPE)                             \
-namespace hpx { namespace traits                                                \
-{                                                                               \
-    HPX_UTIL_STRIP(TEMPLATE)                                                    \
-    struct get_action_name<HPX_UTIL_STRIP(TYPE)>                                \
-    {                                                                           \
-        static HPX_ALWAYS_EXPORT const char * call()                            \
-        {                                                                       \
-            static char buf[512];                                               \
-            char * demangled                                                    \
-                = abi::__cxa_demangle(                                          \
-                    typeid(HPX_UTIL_STRIP(TYPE)).name()                         \
-                  , 0                                                           \
-                  , 0                                                           \
-                  , 0                                                           \
-                );                                                              \
-            strncpy(buf, demangled, 512);                                       \
-            free(demangled);                                                    \
-            return buf;                                                         \
-        }                                                                       \
-    };                                                                          \
-}}                                                                              \
-/**/
-#else
-#define HPX_ACTIONS_TMP(TEMPLATE, TYPE)                                         \
-HPX_SERIALIZATION_REGISTER_TEMPLATE(TEMPLATE, TYPE)                             \
-namespace hpx { namespace traits                                                \
-{                                                                               \
-    HPX_UTIL_STRIP(TEMPLATE)                                                    \
-    struct get_action_name<HPX_UTIL_STRIP(TYPE)>                                \
-    {                                                                           \
-        static HPX_ALWAYS_EXPORT const char * call()                            \
-        {                                                                       \
-            return typeid(HPX_UTIL_STRIP(TYPE)).name();                         \
-        }                                                                       \
-    };                                                                          \
-}}                                                                              \
-/**/
-#endif
+///////////////////////////////////////////////////////////////////////////////
+// Register the action templates with serialization, define generic action
+// names.
+#define HPX_ACTIONS_TMP(TEMPLATE, TYPE)                                       \
+        HPX_SERIALIZATION_REGISTER_TEMPLATE(TEMPLATE, TYPE)                   \
+        namespace hpx { namespace traits                                      \
+        {                                                                     \
+            HPX_UTIL_STRIP(TEMPLATE)                                          \
+            struct get_action_name<HPX_UTIL_STRIP(TYPE)>                      \
+            {                                                                 \
+                static HPX_ALWAYS_EXPORT const char * call()                  \
+                {                                                             \
+                    return typeid(HPX_UTIL_STRIP(TYPE)).name();               \
+                }                                                             \
+            };                                                                \
+        }}                                                                    \
+    /**/
 
 /////////////////////////////////////////////////////////////////////////////////
 // bring in the rest of the implementations
 #include <hpx/runtime/actions/component_action_implementations.hpp>
-/////////////////////////////////////////////////////////////////////////////////
 
+/////////////////////////////////////////////////////////////////////////////////
 HPX_ACTIONS_TMP(
     (
         template <
@@ -838,17 +810,10 @@ HPX_ACTIONS_TMP(
         >
     )
   , (
-        hpx::actions::result_action0<
-            Component
-          , Result
-          , Action
-          , F
-          , Priority
-          , Derived
-        >
+        hpx::actions::result_action0<Component, Result, Action, F, Priority, Derived>
     )
 )
- 
+
 HPX_ACTIONS_TMP(
     (
         template <
@@ -860,13 +825,7 @@ HPX_ACTIONS_TMP(
         >
     )
   , (
-        hpx::actions::direct_result_action0<
-            Component
-          , Result
-          , Action
-          , F
-          , Derived
-        >
+        hpx::actions::direct_result_action0<Component, Result, Action, F, Derived>
     )
 )
 
@@ -881,16 +840,10 @@ HPX_ACTIONS_TMP(
         >
     )
   , (
-        hpx::actions::action0<
-            Component
-          , Action
-          , F
-          , Priority
-          , Derived
-        >
+        hpx::actions::action0<Component, Action, F, Priority, Derived>
     )
 )
- 
+
 HPX_ACTIONS_TMP(
     (
         template <

@@ -43,8 +43,8 @@
         BOOST_PP_CAT(data, n) const&                                          \
         BOOST_PP_CAT(BOOST_PP_CAT(data, n), _)                                \
     /**/
-#define HPX_PARAM_ARGUMENT(z, n, data)                                       \
-        BOOST_PP_COMMA_IF(n) BOOST_PP_CAT(BOOST_PP_CAT(data, n), _)          \
+#define HPX_PARAM_ARGUMENT(z, n, data)                                        \
+        BOOST_PP_COMMA_IF(n) BOOST_PP_CAT(BOOST_PP_CAT(data, n), _)           \
     /**/
 
 namespace hpx { namespace actions
@@ -64,12 +64,14 @@ namespace hpx { namespace actions
     {
     public:
         typedef Result result_type;
-        typedef boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
+        typedef boost::fusion::vector<
+            BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
         typedef action<Component, Action, result_type, arguments_type,
                        Derived, Priority>
             base_type;
 
-        explicit BOOST_PP_CAT(base_result_action, N)(threads::thread_priority priority = Priority)
+        explicit BOOST_PP_CAT(base_result_action, N)(
+                threads::thread_priority priority = Priority)
           : base_type(priority)
         {}
 
@@ -121,8 +123,8 @@ namespace hpx { namespace actions
 
         // This static construct_thread_function allows to construct
         // a proper thread function for a thread without having to
-        // instantiate the base_result_actionN type. This is used by the applier in
-        // case no continuation has been supplied.
+        // instantiate the base_result_actionN type. This is used by the
+        // applier in case no continuation has been supplied.
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(naming::address::address_type lva,
@@ -139,8 +141,8 @@ namespace hpx { namespace actions
 
         // This static construct_thread_function allows to construct
         // a proper thread function for a thread without having to
-        // instantiate the base_result_actionN type. This is used by the applier in
-        // case a continuation has been supplied
+        // instantiate the base_result_actionN type. This is used by the
+        // applier in case a continuation has been supplied
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
@@ -221,15 +223,17 @@ namespace hpx { namespace actions
             BOOST_PP_ENUM_PARAMS(N, T), F,
             typename detail::action_type<
                 BOOST_PP_CAT(result_action, N)<
-                    Component, Result, Action, BOOST_PP_ENUM_PARAMS(N, T), F, Priority>,
-                    Derived
+                    Component, Result, Action, BOOST_PP_ENUM_PARAMS(N, T), F,
+                        Priority>,
+                Derived
             >::type, Priority>
     {
     private:
         typedef typename detail::action_type<
             BOOST_PP_CAT(result_action, N)<
-                Component, Result, Action, BOOST_PP_ENUM_PARAMS(N, T), F, Priority>,
-                Derived
+                Component, Result, Action, BOOST_PP_ENUM_PARAMS(N, T), F,
+                    Priority>,
+            Derived
         >::type derived_type;
 
         typedef BOOST_PP_CAT(base_result_action, N)<
@@ -237,7 +241,8 @@ namespace hpx { namespace actions
             derived_type, Priority> base_type;
 
     public:
-        BOOST_PP_CAT(result_action, N)(threads::thread_priority priority = Priority)
+        BOOST_PP_CAT(result_action, N)(
+                threads::thread_priority priority = Priority)
           : base_type(priority)
         {}
 
@@ -308,7 +313,8 @@ namespace hpx { namespace actions
             data.func = this->construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
             return data;
@@ -323,7 +329,8 @@ namespace hpx { namespace actions
             data.func = this->construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
             return data;
@@ -338,7 +345,8 @@ namespace hpx { namespace actions
             data.func = this->construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
             return data;
@@ -354,7 +362,8 @@ namespace hpx { namespace actions
             data.func = this->construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
             return data;
@@ -463,7 +472,8 @@ namespace hpx { namespace actions
             data.func = this->construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
             return data;
@@ -478,7 +488,8 @@ namespace hpx { namespace actions
             data.func = this->construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
             return data;
@@ -493,7 +504,8 @@ namespace hpx { namespace actions
             data.func = this->construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
             return data;
@@ -509,7 +521,8 @@ namespace hpx { namespace actions
             data.func = this->construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
             return data;
@@ -537,11 +550,13 @@ namespace hpx { namespace actions
     {
     public:
         typedef util::unused_type result_type;
-        typedef boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
+        typedef boost::fusion::vector<
+            BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
         typedef action<Component, Action, result_type, arguments_type,
                        Derived, Priority> base_type;
 
-        explicit BOOST_PP_CAT(base_action, N)(threads::thread_priority priority = Priority)
+        explicit BOOST_PP_CAT(base_action, N)(
+                threads::thread_priority priority = Priority)
           : base_type(priority)
         {}
 
@@ -689,14 +704,14 @@ namespace hpx { namespace actions
             typename detail::action_type<
                 BOOST_PP_CAT(action, N)<
                     Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F, Priority>,
-                    Derived
+                Derived
             >::type, Priority>
     {
     private:
         typedef typename detail::action_type<
             BOOST_PP_CAT(action, N)<
                 Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F, Priority>,
-                Derived
+            Derived
         >::type derived_type;
 
         typedef BOOST_PP_CAT(base_action, N)<
@@ -780,7 +795,8 @@ namespace hpx { namespace actions
             data.func = this->construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
             return data;
@@ -795,7 +811,8 @@ namespace hpx { namespace actions
             data.func = this->construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
             return data;
@@ -810,7 +827,8 @@ namespace hpx { namespace actions
             data.func = this->construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
             return data;
@@ -826,7 +844,8 @@ namespace hpx { namespace actions
             data.func = this->construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
             return data;
@@ -943,7 +962,8 @@ namespace hpx { namespace actions
             data.func = this->construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
             return data;
@@ -958,7 +978,8 @@ namespace hpx { namespace actions
             data.func = this->construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
             return data;
@@ -973,7 +994,8 @@ namespace hpx { namespace actions
             data.func = this->construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
             return data;
@@ -989,7 +1011,8 @@ namespace hpx { namespace actions
             data.func = this->construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
             return data;
@@ -1001,7 +1024,7 @@ namespace hpx { namespace actions
         BOOST_PP_ENUM_PARAMS(N, typename T),
         void (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T)),
         threads::thread_priority Priority,
-        typename Derived>
+        typename Derived = detail::this_type>
     class BOOST_PP_CAT(result_action, N) <
         Component
       , void
@@ -1011,14 +1034,15 @@ namespace hpx { namespace actions
       , Priority
       , Derived
     >
-        : public BOOST_PP_CAT(action, N)<Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F, Priority, Derived>
+      : public BOOST_PP_CAT(action, N)<Component, Action,
+            BOOST_PP_ENUM_PARAMS(N, T), F, Priority, Derived>
     {
-        typedef
-            BOOST_PP_CAT(action, N)<Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F, Priority, Derived>
-            base_type;
+        typedef BOOST_PP_CAT(action, N)<Component, Action,
+            BOOST_PP_ENUM_PARAMS(N, T), F, Priority, Derived> base_type;
 
     public:
-        BOOST_PP_CAT(result_action, N)(threads::thread_priority priority = Priority)
+        BOOST_PP_CAT(result_action, N)(
+                threads::thread_priority priority = Priority)
           : base_type(priority)
         {}
 
@@ -1056,6 +1080,7 @@ namespace hpx { namespace actions
     };
 }}
 
+///////////////////////////////////////////////////////////////////////////////
 HPX_ACTIONS_TMP(
     (
         template <
@@ -1080,7 +1105,7 @@ HPX_ACTIONS_TMP(
         >
     )
 )
- 
+
 HPX_ACTIONS_TMP(
     (
         template <
@@ -1126,7 +1151,7 @@ HPX_ACTIONS_TMP(
         >
     )
 )
- 
+
 HPX_ACTIONS_TMP(
     (
         template <
