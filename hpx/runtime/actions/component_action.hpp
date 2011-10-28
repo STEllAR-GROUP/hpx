@@ -791,8 +791,14 @@ namespace hpx { namespace traits                                                
         {                                                                       \
             static char buf[512];                                               \
             char * demangled                                                    \
-                = abi::__cxa_demangle(typeid(HPX_UTIL_STRIP(TYPE)).name(), 0, 0, 0);     \
+                = abi::__cxa_demangle(                                          \
+                    typeid(HPX_UTIL_STRIP(TYPE)).name()                         \
+                  , 0                                                           \
+                  , 0                                                           \
+                  , 0                                                           \
+                );                                                              \
             strncpy(buf, demangled, 512);                                       \
+            free(demangled);                                                    \
             return buf;                                                         \
         }                                                                       \
     };                                                                          \
