@@ -555,11 +555,14 @@ namespace hpx { namespace actions
 // Helper macro for action serialization, each of the defined actions needs to
 // be registered with the serialization library
 #define HPX_DEFINE_GET_ACTION_NAME(action)                                    \
+    HPX_DEFINE_GET_ACTION_NAME(action, action)                                \
+    /**/
+#define HPX_DEFINE_GET_ACTION_NAME_EX(action, actionname)                     \
         namespace hpx { namespace traits {                                    \
             template<> HPX_ALWAYS_EXPORT                                      \
             char const* get_action_name<action>::call()                       \
             {                                                                 \
-                return BOOST_PP_STRINGIZE(action);                            \
+                return BOOST_PP_STRINGIZE(actionname);                        \
             }                                                                 \
         }}                                                                    \
     /**/
@@ -575,7 +578,7 @@ namespace hpx { namespace actions
 #define HPX_REGISTER_ACTION_EX(action, actionname)                            \
         BOOST_CLASS_EXPORT(action)                                            \
         HPX_REGISTER_BASE_HELPER(action, actionname)                          \
-        HPX_DEFINE_GET_ACTION_NAME(action)                                    \
+        HPX_DEFINE_GET_ACTION_NAME_EX(action, actionname)                     \
     /**/
 
 #define HPX_REGISTER_ACTION(action) HPX_REGISTER_ACTION_EX(action, action)

@@ -28,6 +28,10 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
+#ifdef __GNUC__
+#include <cxxabi.h>
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
@@ -775,6 +779,7 @@ namespace hpx { namespace actions
     };
 }}
 
+#ifdef __GNUC__
 #define HPX_ACTIONS_TMP(TEMPLATE, TYPE)                                         \
 HPX_SERIALIZATION_REGISTER_TEMPLATE(TEMPLATE, TYPE)                             \
 namespace hpx { namespace traits                                                \
@@ -784,12 +789,31 @@ namespace hpx { namespace traits                                                
     {                                                                           \
         static HPX_ALWAYS_EXPORT const char * call()                            \
         {                                                                       \
-            return                                                              \
-                hpx::util::detail::type_hash<HPX_UTIL_STRIP(TYPE)>();           \
+            static char buf[512];                                               \
+            char * demangled                                                    \
+                = abi::__cxa_demangle(typeid(HPX_UTIL_STRIP(TYPE)).name(), 0, 0, 0);     \
+            strncpy(buf, demangled, 512);                                       \
+            return buf;                                                         \
         }                                                                       \
     };                                                                          \
 }}                                                                              \
 /**/
+#else
+#define HPX_ACTIONS_TMP(TEMPLATE, TYPE)                                         \
+HPX_SERIALIZATION_REGISTER_TEMPLATE(TEMPLATE, TYPE)                             \
+namespace hpx { namespace traits                                                \
+{                                                                               \
+    HPX_UTIL_STRIP(TEMPLATE)                                                    \
+    struct get_action_name<HPX_UTIL_STRIP(TYPE)>                                \
+    {                                                                           \
+        static HPX_ALWAYS_EXPORT const char * call()                            \
+        {                                                                       \
+            return typeid(HPX_UTIL_STRIP(TYPE)).name();                         \
+        }                                                                       \
+    };                                                                          \
+}}                                                                              \
+/**/
+#endif
 
 /////////////////////////////////////////////////////////////////////////////////
 // bring in the rest of the implementations

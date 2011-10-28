@@ -190,10 +190,7 @@ namespace hpx { namespace traits
     {
         static HPX_ALWAYS_EXPORT const char * call()
         {
-            return
-                hpx::util::detail::type_hash<
-                    hpx::components::server::remote_object_apply_action<R>
-                >();
+            return "hpx::components::server::remote_object_apply_action<R>";
         }
     };
 }}
