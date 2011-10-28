@@ -27,6 +27,20 @@
 /**/
 #include BOOST_PP_ITERATE()
 
+HPX_SERIALIZATION_REGISTER_TEMPLATE(
+    (
+        template <
+            typename Sig
+          , typename IArchive
+          , typename OArchive
+          , typename Vtable
+        >
+    )
+  , (
+        hpx::util::detail::vtable_ptr<Sig, IArchive, OArchive, Vtable>
+    )
+)
+
 #endif
 
 #else
@@ -70,8 +84,6 @@ namespace hpx { namespace util { namespace detail {
             base_type::clone = Vtable::clone;
             base_type::move = Vtable::move;
             base_type::invoke = Vtable::invoke;
-            base_type::iregister_base = Vtable::iregister_base;
-            base_type::oregister_base = Vtable::oregister_base;
             base_type::iserialize = Vtable::iserialize;
             base_type::oserialize = Vtable::oserialize;
         }
@@ -95,6 +107,7 @@ namespace hpx { namespace util { namespace detail {
         }
     };
 }}}
+
 
 #endif
 

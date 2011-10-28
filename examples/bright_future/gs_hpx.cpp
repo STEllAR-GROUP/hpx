@@ -145,10 +145,6 @@ struct update_residuum_fun
 
 
 void gs(
-  /*
-    bright_future::grid<double> & u
-  , bright_future::grid<double> const & rhs
-  */
     size_type n_x
   , size_type n_y
   , double hx
@@ -157,6 +153,7 @@ void gs(
   , double relaxation
   , unsigned max_iterations
   , unsigned iteration_block
+  , unsigned block_size
   , std::string const & output
 )
 {
@@ -182,7 +179,7 @@ void gs(
 
         hpx::naming::id_type remote_id = *parts.first;
 
-        typedef promise_wrapper<hpx::lcos::promise<void> > promise_type;
+        typedef hpx::lcos::promise<void> promise_type;
 
         typedef
             hpx::lcos::eager_future<remote_lse_type::init_action>
@@ -254,26 +251,26 @@ void gs(
                 for(y = 0; y < n_y; ++y)
                 {
                     {
-                        std::vector<promise_type*> dependencies;
-                        dependencies.push_back(&prev(0,y));
+                        std::vector<promise_type> dependencies;
+                        dependencies.push_back(prev(0,y));
                         current(0, y) = apply_future(remote_id, identity_fun(), 0, y, dependencies);
                     }
                     {
-                        std::vector<promise_type*> dependencies;
-                        dependencies.push_back(&prev(n_x-1,y));
+                        std::vector<promise_type> dependencies;
+                        dependencies.push_back(prev(n_x-1,y));
                         current(n_x-1, y) = apply_future(remote_id, identity_fun(), n_x-1, y, dependencies);
                     }
                 }
                 for(x = 1; x < n_x-1; ++x)
                 {
                     {
-                        std::vector<promise_type*> dependencies;
-                        dependencies.push_back(&prev(x,0));
+                        std::vector<promise_type> dependencies;
+                        dependencies.push_back(prev(x,0));
                         current(x, 0) = apply_future(remote_id, identity_fun(), x, 0, dependencies);
                     }
                     {
-                        std::vector<promise_type*> dependencies;
-                        dependencies.push_back(&prev(x,n_y-1));
+                        std::vector<promise_type> dependencies;
+                        dependencies.push_back(prev(x,n_y-1));
                         current(x, n_y-1) = apply_future(remote_id, identity_fun(), x, n_y-1, dependencies);
                     }
                 }
@@ -284,13 +281,13 @@ void gs(
                     for(x = 1; x < n_x-1; ++x)
                     {
                         // wait on all the previous results for now to continue the update.
-                        std::vector<promise_type*> dependencies;
+                        std::vector<promise_type> dependencies;
                         dependencies.reserve(5);
-                        dependencies.push_back(&prev(x,y));
-                        dependencies.push_back(&prev(x+1,y));
-                        dependencies.push_back(&prev(x,y+1));
-                        dependencies.push_back(&current(x-1,y));
-                        dependencies.push_back(&current(x,y-1));
+                        dependencies.push_back(prev(x,y));
+                        dependencies.push_back(prev(x+1,y));
+                        dependencies.push_back(prev(x,y+1));
+                        dependencies.push_back(current(x-1,y));
+                        dependencies.push_back(current(x,y-1));
 
                         current(x, y) = apply_future(remote_id, update_fun(), x, y, dependencies);
 
@@ -351,7 +348,7 @@ void gs(
             {
                 for(size_type y = 0; y < n_y; ++y)
                 {
-                    apply_future(remote_id, out, x, y, std::vector<promise_type *>()).get();
+                    apply_future(remote_id, out, x, y, std::vector<promise_type>()).get();
                 }
                 (*f.file) << "\n";
             }

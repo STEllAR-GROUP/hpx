@@ -24,7 +24,7 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
 
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco_with_value<std::vector<std::vector<double> > >,
-    component_base_lco_with_value);
+    hpx::components::component_base_lco_with_value);
 
 HPX_REGISTER_ACTION_EX(
     hpx::lcos::base_lco_with_value<

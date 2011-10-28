@@ -11,6 +11,7 @@
 #include <iostream>
 
 #include <boost/serialization/access.hpp>
+#include <boost/assert.hpp>
 
 namespace bright_future
 {
@@ -31,6 +32,12 @@ namespace bright_future
             , n_y(y_size)
             , data(x_size * y_size)
         {}
+        
+        grid(size_type x_size, size_type y_size, T const & init)
+            : n_x(x_size)
+            , n_y(y_size)
+            , data(x_size * y_size, init)
+        {}
 
         template <typename F>
         void init(F f)
@@ -46,11 +53,15 @@ namespace bright_future
 
         reference_type operator()(size_type x, size_type y)
         {
+            BOOST_ASSERT(x < n_x);
+            BOOST_ASSERT(y < n_y);
             return data[x + y * n_x];
         }
 
         const_reference_type operator()(size_type x, size_type y) const
         {
+            BOOST_ASSERT(x < n_x);
+            BOOST_ASSERT(y < n_y);
             return data[x + y * n_x];
         }
 

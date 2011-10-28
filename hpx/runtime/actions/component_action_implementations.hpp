@@ -47,6 +47,8 @@
         BOOST_PP_COMMA_IF(n) BOOST_PP_CAT(BOOST_PP_CAT(data, n), _)          \
     /**/
 
+namespace hpx { namespace actions
+{
     ///////////////////////////////////////////////////////////////////////////
     //  N parameter version, with result
     template <
@@ -1052,6 +1054,99 @@
             ar & boost::serialization::base_object<base_type>(*this);
         }
     };
+}}
+
+HPX_ACTIONS_TMP(
+    (
+        template <
+            typename Component
+          , typename Result
+          , int Action
+          , BOOST_PP_ENUM_PARAMS(N, typename T)
+          , Result (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T))
+          , hpx::threads::thread_priority Priority
+          , typename Derived
+        >
+    )
+  , (
+        BOOST_PP_CAT(hpx::actions::result_action, N)<
+            Component
+          , Result
+          , Action
+          , BOOST_PP_ENUM_PARAMS(N, T)
+          , F
+          , Priority
+          , Derived
+        >
+    )
+)
+ 
+HPX_ACTIONS_TMP(
+    (
+        template <
+            typename Component
+          , typename Result
+          , int Action
+          , BOOST_PP_ENUM_PARAMS(N, typename T)
+          , Result (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T))
+          , typename Derived
+        >
+    )
+  , (
+        BOOST_PP_CAT(hpx::actions::direct_result_action, N)<
+            Component
+          , Result
+          , Action
+          , BOOST_PP_ENUM_PARAMS(N, T)
+          , F
+          , Derived
+        >
+    )
+)
+
+HPX_ACTIONS_TMP(
+    (
+        template <
+            typename Component
+          , int Action
+          , BOOST_PP_ENUM_PARAMS(N, typename T)
+          , void (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T))
+          , hpx::threads::thread_priority Priority
+          , typename Derived
+        >
+    )
+  , (
+        BOOST_PP_CAT(hpx::actions::action, N)<
+            Component
+          , Action
+          , BOOST_PP_ENUM_PARAMS(N, T)
+          , F
+          , Priority
+          , Derived
+        >
+    )
+)
+ 
+HPX_ACTIONS_TMP(
+    (
+        template <
+            typename Component
+          , int Action
+          , BOOST_PP_ENUM_PARAMS(N, typename T)
+          , void (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T))
+          , typename Derived
+        >
+    )
+  , (
+        BOOST_PP_CAT(hpx::actions::direct_action, N)<
+            Component
+          , Action
+          , BOOST_PP_ENUM_PARAMS(N, T)
+          , F
+          , Derived
+        >
+    )
+)
 
 #undef HPX_PARAM_ARGUMENT
 #undef HPX_PARAM_TYPES

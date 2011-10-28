@@ -198,7 +198,7 @@ namespace bright_future {
                 apply_func_type f
               , typename remote_lse<T>::size_type x
               , typename remote_lse<T>::size_type y
-              , std::vector<hpx::lcos::promise<void> > const & dependencies
+              , std::vector<hpx::lcos::promise<void> > dependencies
             );
 
             typedef
@@ -208,7 +208,7 @@ namespace bright_future {
                   , apply_func_type
                   , size_type
                   , size_type
-                  , std::vector<hpx::lcos::promise<void> > const &
+                  , std::vector<hpx::lcos::promise<void> >
                   , &remote_lse<T>::apply
                 >
                 apply_action;
@@ -217,7 +217,7 @@ namespace bright_future {
                 apply_func_type f
               , range_type x_range
               , range_type y_range
-              , std::vector<hpx::lcos::promise<void> > const & dependencies
+              , std::vector<hpx::lcos::promise<void> > dependencies
             );
 
             typedef
@@ -227,7 +227,7 @@ namespace bright_future {
                   , apply_func_type
                   , range_type
                   , range_type
-                  , std::vector<hpx::lcos::promise<void> > const &
+                  , std::vector<hpx::lcos::promise<void> >
                   , &remote_lse<T>::apply_region
                 >
                 apply_region_action;

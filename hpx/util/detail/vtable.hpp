@@ -128,44 +128,6 @@ namespace hpx { namespace util { namespace detail {
                     );
             }
 
-            static void iregister_base(IArchive & ar)
-            {
-                ar.register_type(
-                    static_cast<
-                        vtable_ptr<
-                            R(BOOST_PP_ENUM_PARAMS(N, A))
-                          , IArchive
-                          , OArchive
-                          , type<
-                                Functor
-                              , R(BOOST_PP_ENUM_PARAMS(N, A))
-                              , IArchive
-                              , OArchive
-                            >
-                        > *
-                    >(0)
-                );
-            }
-
-            static void oregister_base(OArchive & ar)
-            {
-                ar.register_type(
-                    static_cast<
-                        vtable_ptr<
-                            R(BOOST_PP_ENUM_PARAMS(N, A))
-                          , IArchive
-                          , OArchive
-                          , type<
-                                Functor
-                              , R(BOOST_PP_ENUM_PARAMS(N, A))
-                              , IArchive
-                              , OArchive
-                            >
-                        > *
-                    >(0)
-                );
-            }
-
             static void iserialize(void ** object, IArchive & ar, unsigned)
             {
                 Functor f;
@@ -246,44 +208,6 @@ namespace hpx { namespace util { namespace detail {
                     (**reinterpret_cast<Functor **>(f))(
                         BOOST_PP_ENUM_PARAMS(N, a)
                     );
-            }
-
-            static void iregister_base(IArchive & ar)
-            {
-                ar.register_type(
-                    static_cast<
-                        vtable_ptr<
-                            R(BOOST_PP_ENUM_PARAMS(N, A))
-                          , IArchive
-                          , OArchive
-                          , type<
-                                Functor
-                              , R(BOOST_PP_ENUM_PARAMS(N, A))
-                              , IArchive
-                              , OArchive
-                            >
-                        > *
-                    >(0)
-                );
-            }
-
-            static void oregister_base(OArchive & ar)
-            {
-                ar.register_type(
-                    static_cast<
-                        vtable_ptr<
-                            R(BOOST_PP_ENUM_PARAMS(N, A))
-                          , IArchive
-                          , OArchive
-                          , type<
-                                Functor
-                              , R(BOOST_PP_ENUM_PARAMS(N, A))
-                              , IArchive
-                              , OArchive
-                            >
-                        > *
-                    >(0)
-                );
             }
 
             static void iserialize(void ** object, IArchive & ar, unsigned)

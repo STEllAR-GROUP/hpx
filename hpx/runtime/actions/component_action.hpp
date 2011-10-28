@@ -19,6 +19,7 @@
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/util/unused.hpp>
+#include <hpx/util/detail/serialization_registration.hpp>
 
 #include <boost/version.hpp>
 #include <boost/shared_ptr.hpp>
@@ -772,13 +773,108 @@ namespace hpx { namespace actions
             ar & boost::serialization::base_object<base_type>(*this);
         }
     };
-
-    ///////////////////////////////////////////////////////////////////////////
-    // bring in the rest of the implementations
-    #include <hpx/runtime/actions/component_action_implementations.hpp>
-
-///////////////////////////////////////////////////////////////////////////////
 }}
+
+#define HPX_ACTIONS_TMP(TEMPLATE, TYPE)                                         \
+HPX_SERIALIZATION_REGISTER_TEMPLATE(TEMPLATE, TYPE)                             \
+namespace hpx { namespace traits                                                \
+{                                                                               \
+    HPX_UTIL_STRIP(TEMPLATE)                                                    \
+    struct get_action_name<HPX_UTIL_STRIP(TYPE)>                                \
+    {                                                                           \
+        static HPX_ALWAYS_EXPORT const char * call()                            \
+        {                                                                       \
+            return                                                              \
+                hpx::util::detail::type_hash<HPX_UTIL_STRIP(TYPE)>();           \
+        }                                                                       \
+    };                                                                          \
+}}                                                                              \
+/**/
+
+/////////////////////////////////////////////////////////////////////////////////
+// bring in the rest of the implementations
+#include <hpx/runtime/actions/component_action_implementations.hpp>
+/////////////////////////////////////////////////////////////////////////////////
+
+HPX_ACTIONS_TMP(
+    (
+        template <
+            typename Component
+          , typename Result
+          , int Action
+          , Result (Component::*F)()
+          , hpx::threads::thread_priority Priority
+          , typename Derived
+        >
+    )
+  , (
+        hpx::actions::result_action0<
+            Component
+          , Result
+          , Action
+          , F
+          , Priority
+          , Derived
+        >
+    )
+)
+ 
+HPX_ACTIONS_TMP(
+    (
+        template <
+            typename Component
+          , typename Result
+          , int Action
+          , Result (Component::*F)()
+          , typename Derived
+        >
+    )
+  , (
+        hpx::actions::direct_result_action0<
+            Component
+          , Result
+          , Action
+          , F
+          , Derived
+        >
+    )
+)
+
+HPX_ACTIONS_TMP(
+    (
+        template <
+            typename Component
+          , int Action
+          , void (Component::*F)()
+          , hpx::threads::thread_priority Priority
+          , typename Derived
+        >
+    )
+  , (
+        hpx::actions::action0<
+            Component
+          , Action
+          , F
+          , Priority
+          , Derived
+        >
+    )
+)
+ 
+HPX_ACTIONS_TMP(
+    (
+        template <
+            typename Component
+          , int Action
+          , void (Component::*F)()
+          , typename Derived
+        >
+    )
+  , (
+        hpx::actions::direct_action0<Component, Action, F, Derived>
+    )
+)
+#undef HPX_ACTIONS_TMP
 
 #include <hpx/config/warnings_suffix.hpp>
 

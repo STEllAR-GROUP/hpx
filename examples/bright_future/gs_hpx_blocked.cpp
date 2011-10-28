@@ -85,7 +85,7 @@ struct update_fun
             + (
                 (
                     (
-                        (u(x - 1, y) + u(x - 1, y)) / c.hx_sq
+                        (u(x - 1, y) + u(x + 1, y)) / c.hx_sq
                       + (u(x, y - 1) + u(x, y + 1)) / c.hy_sq
                       + rhs(x, y)
                     )
@@ -348,7 +348,7 @@ void gs(
         }
 
         // wait for the last iteration to finish.
-        BOOST_FOREACH(promise_type & promise, iteration_dependencies[max_iterations])
+        BOOST_FOREACH(promise_type & promise, iteration_dependencies[(max_iterations%2)])
         {
             promise.get();
         }

@@ -177,51 +177,10 @@ namespace hpx { namespace components { namespace server
     };
 }}}
 
-namespace boost { namespace serialization
-{
-    template<typename R>
-    struct guid_defined<
-        hpx::components::server::remote_object_apply_action<R>
-    > : boost::mpl::true_ {};
-
-    namespace ext
-    {
-        template <typename R>
-        struct guid_impl<hpx::components::server::remote_object_apply_action<R> >
-        {
-            static inline const char * call()
-            {
-                return hpx::util::detail::type_hash<
-                    hpx::components::server::remote_object_apply_action<R>
-                >();
-            }
-        };
-    }
-}}
-
-namespace boost { namespace archive { namespace detail { namespace extra_detail
-{
+HPX_SERIALIZATION_REGISTER_TEMPLATE(
     template <typename R>
-    struct init_guid<hpx::components::server::remote_object_apply_action<R> >
-    {
-        static
-            hpx::util::detail::guid_initializer_helper<
-                hpx::components::server::remote_object_apply_action<R>
-            > const & g;
-    };
-
-    template <typename R>
-    hpx::util::detail::guid_initializer_helper<
-        hpx::components::server::remote_object_apply_action<R>
-    > const &
-    init_guid<hpx::components::server::remote_object_apply_action<R> >::g =
-        ::boost::serialization::singleton<
-            hpx::util::detail::guid_initializer_helper<
-                hpx::components::server::remote_object_apply_action<R>
-            >
-        >::get_mutable_instance().export_guid();
-}}}}
-
+  , hpx::components::server::remote_object_apply_action<R>
+)
 namespace hpx { namespace traits
 {
     template <typename R>

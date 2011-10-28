@@ -24,6 +24,7 @@
 #include <hpx/util/detail/vtable_ptr_fwd.hpp>
 #include <hpx/util/detail/serialization_registration.hpp>
 #include <hpx/util/safe_bool.hpp>
+#include <boost/move/move.hpp>
 
 #ifndef HPX_FUNCTION_VERSION
 #define HPX_FUNCTION_VERSION 0x10

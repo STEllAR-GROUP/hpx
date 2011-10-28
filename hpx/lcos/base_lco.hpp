@@ -11,6 +11,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
+#include <hpx/util/detail/serialization_registration.hpp>
 
 namespace hpx { namespace lcos
 {
@@ -215,6 +216,26 @@ namespace hpx { namespace lcos
         // component
         typedef components::managed_component<base_lco_with_value> wrapping_type;
         typedef base_lco_with_value base_type_holder;
+    };
+}}
+
+namespace hpx { namespace traits
+{
+    template <typename Result, typename RemoteResult, typename Enable>
+    struct component_type_database<
+            hpx::lcos::base_lco_with_value<Result, RemoteResult>
+          , Enable
+        >
+    {
+        static HPX_ALWAYS_EXPORT components::component_type get()
+        {
+            return components::component_base_lco_with_value;
+        }
+        
+        static HPX_ALWAYS_EXPORT void set(components::component_type)
+        {
+            BOOST_ASSERT(false);
+        }
     };
 }}
 
