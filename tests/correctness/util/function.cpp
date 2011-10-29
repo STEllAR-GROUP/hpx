@@ -151,6 +151,15 @@ struct big_object
     } 
 };
 
+struct foo
+{
+    void operator()() {}
+};
+
+template <typename Archive>
+void serialize(Archive & ar, foo & f, unsigned)
+{}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
 {
@@ -189,6 +198,50 @@ int hpx_main(variables_map& vm)
             function<void()> f1(f0);
     
             function<void()> f2;
+    
+            f2 = f0;
+    
+            f0();
+            f1();
+            f2();
+        }
+    }
+    // non serializable version
+    {
+        {
+            if (sizeof(small_object) <= sizeof(void*))
+                std::cout << "object is small\n";
+            else
+                std::cout << "object is large\n";
+
+            small_object f(17);
+    
+            function<void(), void, void> f0(f);
+    
+            function<void(), void, void> f1(f0);
+    
+            function<void(), void, void> f2;
+    
+            f2 = f0;
+    
+            f0();
+            f1();
+            f2();
+        }
+
+        {
+            if (sizeof(big_object) <= sizeof(void*))
+                std::cout << "object is small\n";
+            else
+                std::cout << "object is large\n";
+
+            big_object f(5, 12);
+    
+            function<void(), void, void> f0(f);
+    
+            function<void(), void, void> f1(f0);
+    
+            function<void(), void, void> f2;
     
             f2 = f0;
     

@@ -94,6 +94,22 @@ namespace hpx { namespace util { namespace detail {
             {
                 return BOOST_SP_TYPEID(Functor);
             }
+            
+            static Functor & construct(void ** f)
+            {
+                new (f) Functor;
+                return *reinterpret_cast<Functor *>(f);
+            }
+
+            static Functor & get(void **f)
+            {
+                return *reinterpret_cast<Functor *>(f);
+            }
+
+            static Functor const & get(void *const*f)
+            {
+                return *reinterpret_cast<Functor const *>(f);
+            }
 
             static void static_delete(void ** f)
             {
@@ -117,27 +133,9 @@ namespace hpx { namespace util { namespace detail {
                     *reinterpret_cast<Functor const *>(f);
             }
 
-            static R invoke(
-                void ** f
-                BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)
-            )
+            static R invoke(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
             {
-                return
-                    (*reinterpret_cast<Functor *>(f))(
-                        BOOST_PP_ENUM_PARAMS(N, a)
-                    );
-            }
-
-            static void iserialize(void ** object, IArchive & ar, unsigned)
-            {
-                Functor f;
-                ar & f;
-                new (object) Functor(f);
-            }
-
-            static void oserialize(void * const * f, OArchive & ar, unsigned)
-            {
-                ar & *reinterpret_cast<Functor const *>(f);
+                return (*reinterpret_cast<Functor*>(f))(BOOST_PP_ENUM_PARAMS(N, a));
             }
         };
 
@@ -176,6 +174,22 @@ namespace hpx { namespace util { namespace detail {
             {
                 return BOOST_SP_TYPEID(Functor);
             }
+            
+            static Functor & construct(void ** f)
+            {
+                *f = new Functor;
+                return **reinterpret_cast<Functor **>(f);
+            }
+
+            static Functor & get(void **f)
+            {
+                return **reinterpret_cast<Functor **>(f);
+            }
+
+            static Functor const & get(void *const*f)
+            {
+                return **reinterpret_cast<Functor *const *>(f);
+            }
 
             static void static_delete(void ** f)
             {
@@ -198,28 +212,10 @@ namespace hpx { namespace util { namespace detail {
                 **reinterpret_cast<Functor**>(dest) =
                     **reinterpret_cast<Functor * const *>(f);
             }
-
-            static R invoke(
-                void ** f
-                BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)
-            )
+            
+            static R invoke(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
             {
-                return
-                    (**reinterpret_cast<Functor **>(f))(
-                        BOOST_PP_ENUM_PARAMS(N, a)
-                    );
-            }
-
-            static void iserialize(void ** object, IArchive & ar, unsigned)
-            {
-                Functor f;
-                ar & f;
-                *object = new Functor(f);
-            }
-
-            static void oserialize(void *const* f, OArchive & ar, unsigned)
-            {
-                ar & **reinterpret_cast<Functor *const*>(f);
+                return (**reinterpret_cast<Functor**>(f))(BOOST_PP_ENUM_PARAMS(N, a));
             }
         };
 

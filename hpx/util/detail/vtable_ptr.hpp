@@ -84,8 +84,9 @@ namespace hpx { namespace util { namespace detail {
             base_type::clone = Vtable::clone;
             base_type::move = Vtable::move;
             base_type::invoke = Vtable::invoke;
-            base_type::iserialize = Vtable::iserialize;
-            base_type::oserialize = Vtable::oserialize;
+
+            // make sure the global gets instantiated;
+            boost::archive::detail::extra_detail::init_guid<vtable_ptr>::g.initialize();
         }
 
         static void register_base()
@@ -98,13 +99,86 @@ namespace hpx { namespace util { namespace detail {
         {
             return Vtable::get_ptr();
         }
+        
+        void save_object(void *const* object, OArchive & ar, unsigned)
+        {
+            ar & Vtable::get(object);
+        }
+        void load_object(void ** object, IArchive & ar, unsigned)
+        {
+            ar & Vtable::construct(object);
+        }
 
+        /*
+        R invoke(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
+        {
+            return Vtable::get(f)(BOOST_PP_ENUM_PARAMS(N, a));
+        }
+
+        R invoke(void *const* f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
+        {
+            return Vtable::get(f)(BOOST_PP_ENUM_PARAMS(N, a));
+        }
+        */
 
         template <typename Archive>
         void serialize(Archive & ar, unsigned)
         {
             ar & boost::serialization::base_object<base_type>(*this);
         }
+    };
+    
+    template <
+        typename R
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
+      , typename Vtable
+    >
+    struct vtable_ptr<
+        R(BOOST_PP_ENUM_PARAMS(N, A))
+      , void
+      , void
+      , Vtable
+    >
+        : hpx::util::detail::vtable_ptr_base<
+            R(BOOST_PP_ENUM_PARAMS(N, A))
+          , void
+          , void
+        >
+    {
+        typedef
+            hpx::util::detail::vtable_ptr_base<
+                R(BOOST_PP_ENUM_PARAMS(N, A))
+              , void
+              , void
+            >
+            base_type;
+
+        vtable_ptr()
+        {
+            base_type::get_type = Vtable::get_type;
+            base_type::static_delete = Vtable::static_delete;
+            base_type::destruct = Vtable::destruct;
+            base_type::clone = Vtable::clone;
+            base_type::move = Vtable::move;
+            base_type::invoke = Vtable::invoke;
+        }
+
+        virtual base_type * get_ptr()
+        {
+            return Vtable::get_ptr();
+        }
+        
+        /*
+        R invoke(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
+        {
+            return Vtable::get(f)(BOOST_PP_ENUM_PARAMS(N, a));
+        }
+
+        R invoke(void *const* f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
+        {
+            return Vtable::get(f)(BOOST_PP_ENUM_PARAMS(N, a));
+        }
+        */
     };
 }}}
 

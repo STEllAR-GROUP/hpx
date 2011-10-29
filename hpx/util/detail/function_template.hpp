@@ -30,7 +30,7 @@
 #define HPX_FUNCTION_VERSION 0x10
 #endif
 
-#define HPX_FUNCTION_NAME function
+#define HPX_FUNCTION_NAME function_base
 
 namespace hpx { namespace util {
     namespace detail
@@ -47,6 +47,13 @@ namespace hpx { namespace util {
 
     template <
         typename Sig
+      , typename IArchive = void
+      , typename OArchive = void
+    >
+    struct HPX_FUNCTION_NAME;
+
+    template <
+        typename Sig
 #if HPX_USE_PORTABLE_ARCHIVES != 0
       , typename IArchive = portable_binary_iarchive
       , typename OArchive = portable_binary_oarchive
@@ -55,29 +62,95 @@ namespace hpx { namespace util {
       , typename OArchive = boost::archive::binary_oarchive
 #endif
     >
-    struct HPX_FUNCTION_NAME;
-
-}}
-
-/*
-namespace boost { namespace serialization {
-    template <typename Sig, typename IArchive, typename OArchive>
-    struct tracking_level<hpx::util::HPX_FUNCTION_NAME<Sig, IArchive, OArchive> >
+    struct function : function_base<Sig, IArchive, OArchive>
     {
-        typedef mpl::integral_c_tag tag;
-        typedef mpl::int_<track_never> type;
-        BOOST_STATIC_CONSTANT(int, value = track_never);
-    };
+        typedef function_base<Sig, IArchive, OArchive> base_type;
+        function() : base_type() {}
+        
+        template <typename Functor>
+        function(BOOST_COPY_ASSIGN_REF(Functor) f)
+            : base_type(f)
+        {}
+        
+        template <typename Functor>
+        function(BOOST_RV_REF(Functor) f)
+            : base_type(f)
+        {}
 
-    template <typename Sig, typename IArchive, typename OArchive>
-    struct version<hpx::util::HPX_FUNCTION_NAME<Sig, IArchive, OArchive> >
+        function(BOOST_COPY_ASSIGN_REF(base_type) other)
+            : base_type(other)
+        {}
+
+        function(BOOST_RV_REF(base_type) other)
+            : base_type(other)
+        {}
+
+    private:
+        BOOST_COPYABLE_AND_MOVABLE(function);
+    
+        friend class boost::serialization::access;
+
+        void load(IArchive &ar, const unsigned version)
+        {
+            bool is_empty;
+            ar & is_empty;
+
+            if(is_empty)
+            {
+                this->reset();
+            }
+            else
+            {
+                typename base_type::vtable_ptr_type *p = 0;
+                ar >> p;
+                this->vptr = p->get_ptr();
+                delete p;
+                this->vptr->load_object(&this->object, ar, version);
+            }
+        }
+
+        void save(OArchive &ar, const unsigned version) const
+        {
+            bool is_empty = this->empty();
+            ar & is_empty;
+            if(!this->empty())
+            {
+                ar << this->vptr;
+                this->vptr->save_object(&this->object, ar, version);
+            }
+        }
+
+        BOOST_SERIALIZATION_SPLIT_MEMBER();
+
+    };
+    
+    template <
+        typename Sig
+    >
+    struct function<Sig, void, void> : function_base<Sig, void, void>
     {
-        typedef mpl::integral_c_tag tag;
-        typedef mpl::int_<HPX_FUNCTION_VERSION> type;
-        BOOST_STATIC_CONSTANT(int, value = HPX_FUNCTION_VERSION);
+        typedef function_base<Sig, void, void> base_type;
+        function() : base_type() {}
+        
+        template <typename Functor>
+        function(BOOST_COPY_ASSIGN_REF(Functor) f)
+            : base_type(f)
+        {}
+        
+        template <typename Functor>
+        function(BOOST_RV_REF(Functor) f)
+            : base_type(f)
+        {}
+
+        function(BOOST_COPY_ASSIGN_REF(base_type) other)
+            : base_type(other)
+        {}
+
+        function(BOOST_RV_REF(base_type) other)
+            : base_type(other)
+        {}
     };
 }}
-*/
 
 #define BOOST_PP_ITERATION_PARAMS_1                                             \
     (                                                                           \
@@ -134,7 +207,7 @@ namespace hpx { namespace util {
             > vtable_ptr_type;
 
         template <typename Functor>
-            HPX_FUNCTION_NAME(Functor const & f)
+        HPX_FUNCTION_NAME(BOOST_COPY_ASSIGN_REF(Functor) f)
             : vptr(
                 detail::get_table<Functor, R(BOOST_PP_ENUM_PARAMS(N, A))>::template get<
                     IArchive
@@ -290,49 +363,24 @@ namespace hpx { namespace util {
             }
         }
 
-        R operator()(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))// const
+        R operator()(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)) const
         {
             BOOST_ASSERT(!empty());
             return vptr->invoke(&object BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a));
         }
 
-        void load(IArchive &ar, const unsigned version)
+        R operator()(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
         {
-            bool is_empty;
-            ar & is_empty;
-
-            if(is_empty)
-            {
-                reset();
-            }
-            else
-            {
-                vtable_ptr_type *p = 0;
-                ar >> p;
-                vptr = p->get_ptr();
-                delete p;
-                vptr->iserialize(&object, ar, version);
-            }
+            BOOST_ASSERT(!empty());
+            return vptr->invoke(&object BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a));
         }
-
-        void save(OArchive &ar, const unsigned version) const
-        {
-            bool is_empty = empty();
-            ar & is_empty;
-            if(!empty())
-            {
-                ar << vptr;
-                vptr->oserialize(&object, ar, version);
-            }
-        }
-
-        BOOST_SERIALIZATION_SPLIT_MEMBER();
 
     private:
         BOOST_COPYABLE_AND_MOVABLE(HPX_FUNCTION_NAME);
 
+    protected:
         vtable_ptr_type *vptr;
-        void *object;
+        mutable void *object;
     };
 }}
 

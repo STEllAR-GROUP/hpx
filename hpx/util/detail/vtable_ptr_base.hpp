@@ -54,15 +54,42 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*move)(void * const*, void **);
-        R (*invoke)(void ** BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A));
-        void (*iregister_base)(IArchive &);
-        void (*oregister_base)(OArchive &);
-        void (*iserialize)(void **, IArchive &, unsigned);
-        void (*oserialize)(void *const*, OArchive &, unsigned);
+        void (*invoke)(void * * BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A));
+
+        virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
+        virtual void load_object(void **, IArchive & ar, unsigned) = 0;
+
+        //virtual R invoke(void ** BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)) = 0;
+        //virtual R invoke(void *const* BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)) = 0;
 
         template <typename Archive>
         void serialize(Archive & ar, unsigned)
         {}
+    };
+    
+    template <
+        typename R
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
+    >
+    struct vtable_ptr_base<
+        R(BOOST_PP_ENUM_PARAMS(N, A))
+      , void
+      , void
+    >
+    {
+        virtual ~vtable_ptr_base() {}
+
+        virtual vtable_ptr_base * get_ptr() = 0;
+
+        boost::detail::sp_typeinfo const & (*get_type)();
+        void (*static_delete)(void**);
+        void (*destruct)(void**);
+        void (*clone)(void * const*, void **);
+        void (*move)(void * const*, void **);
+        void (*invoke)(void * * BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A));
+        
+        //virtual R invoke(void ** BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)) = 0;
+        //virtual R invoke(void *const* BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)) = 0;
     };
 
 }}}

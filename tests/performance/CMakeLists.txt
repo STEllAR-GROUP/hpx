@@ -55,3 +55,14 @@ foreach(benchmark ${benchmarks})
                               ${benchmark}_exe)
 endforeach()
 
+
+add_hpx_executable(util.function
+                   SOURCES util/function.cpp
+                   ${util_function_FLAGS})
+
+add_hpx_pseudo_target(tests.performance.util.function)
+
+add_hpx_pseudo_dependencies(tests.performance
+                              tests.performance.util.function)
+add_hpx_pseudo_dependencies(tests.performance.util.function
+                              util.function_exe)
