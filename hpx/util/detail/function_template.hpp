@@ -30,8 +30,6 @@
 #define HPX_FUNCTION_VERSION 0x10
 #endif
 
-#define HPX_FUNCTION_NAME function_base
-
 namespace hpx { namespace util {
     namespace detail
     {
@@ -50,7 +48,7 @@ namespace hpx { namespace util {
       , typename IArchive = void
       , typename OArchive = void
     >
-    struct HPX_FUNCTION_NAME;
+    struct function_base;
 
     template <
         typename Sig
@@ -178,18 +176,18 @@ namespace hpx { namespace util {
       , typename IArchive
       , typename OArchive
     >
-    struct HPX_FUNCTION_NAME<
+    struct function_base<
         R(BOOST_PP_ENUM_PARAMS(N, A))
       , IArchive
       , OArchive
     >
     {
-        HPX_FUNCTION_NAME()
+        function_base()
             : vptr(0)
             , object(0)
         {}
 
-        ~HPX_FUNCTION_NAME()
+        ~function_base()
         {
             if(object)
             {
@@ -207,7 +205,7 @@ namespace hpx { namespace util {
             > vtable_ptr_type;
 
         template <typename Functor>
-        HPX_FUNCTION_NAME(BOOST_COPY_ASSIGN_REF(Functor) f)
+        function_base(BOOST_COPY_ASSIGN_REF(Functor) f)
             : vptr(
                 detail::get_table<Functor, R(BOOST_PP_ENUM_PARAMS(N, A))>::template get<
                     IArchive
@@ -227,14 +225,14 @@ namespace hpx { namespace util {
             }
         }
 
-        HPX_FUNCTION_NAME(BOOST_COPY_ASSIGN_REF(HPX_FUNCTION_NAME) other)
+        function_base(BOOST_COPY_ASSIGN_REF(function_base) other)
             : vptr(0)
             , object(0)
         {
             assign(other);
         }
 
-        HPX_FUNCTION_NAME(BOOST_RV_REF(HPX_FUNCTION_NAME) other)
+        function_base(BOOST_RV_REF(function_base) other)
             : vptr(other.vptr)
             , object(other.object)
         {
@@ -242,7 +240,7 @@ namespace hpx { namespace util {
             other.object = 0;
         }
 
-        HPX_FUNCTION_NAME &assign(HPX_FUNCTION_NAME const & other)
+        function_base &assign(function_base const & other)
         {
             if(&other != this)
             {
@@ -264,7 +262,7 @@ namespace hpx { namespace util {
         }
 
         template <typename Functor>
-        HPX_FUNCTION_NAME & assign(Functor const & f)
+        function_base & assign(Functor const & f)
         {
             static const bool is_small = sizeof(Functor) <= sizeof(void *);
             vtable_ptr_type * f_vptr
@@ -306,17 +304,17 @@ namespace hpx { namespace util {
         }
 
         template <typename T>
-        HPX_FUNCTION_NAME & operator=(T const & t)
+        function_base & operator=(T const & t)
         {
             return assign(t);
         }
         
-        HPX_FUNCTION_NAME & operator=(BOOST_COPY_ASSIGN_REF(HPX_FUNCTION_NAME) t)
+        function_base & operator=(BOOST_COPY_ASSIGN_REF(function_base) t)
         {
             return assign(t);
         }
         
-        HPX_FUNCTION_NAME & operator=(BOOST_RV_REF(HPX_FUNCTION_NAME) t)
+        function_base & operator=(BOOST_RV_REF(function_base) t)
         {
             if(this != &t)
             {
@@ -331,7 +329,7 @@ namespace hpx { namespace util {
         }
 
 
-        HPX_FUNCTION_NAME &swap(HPX_FUNCTION_NAME& f)
+        function_base &swap(function_base& f)
         {
             std::swap(vptr, f.vptr);
             std::swap(object, f.object);
@@ -343,9 +341,9 @@ namespace hpx { namespace util {
             return (vptr == 0) && (object == 0);
         }
 
-        operator typename util::safe_bool<HPX_FUNCTION_NAME>::result_type() const
+        operator typename util::safe_bool<function_base>::result_type() const
         {
-            return util::safe_bool<HPX_FUNCTION_NAME>()(!empty());
+            return util::safe_bool<function_base>()(!empty());
         }
 
         bool operator!() const
@@ -376,7 +374,7 @@ namespace hpx { namespace util {
         }
 
     private:
-        BOOST_COPYABLE_AND_MOVABLE(HPX_FUNCTION_NAME);
+        BOOST_COPYABLE_AND_MOVABLE(function_base);
 
     protected:
         vtable_ptr_type *vptr;
