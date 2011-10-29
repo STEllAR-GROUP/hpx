@@ -109,18 +109,6 @@ namespace hpx { namespace util { namespace detail {
             ar & Vtable::construct(object);
         }
 
-        /*
-        R invoke(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
-        {
-            return Vtable::get(f)(BOOST_PP_ENUM_PARAMS(N, a));
-        }
-
-        R invoke(void *const* f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
-        {
-            return Vtable::get(f)(BOOST_PP_ENUM_PARAMS(N, a));
-        }
-        */
-
         template <typename Archive>
         void serialize(Archive & ar, unsigned)
         {
@@ -167,18 +155,6 @@ namespace hpx { namespace util { namespace detail {
         {
             return Vtable::get_ptr();
         }
-        
-        /*
-        R invoke(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
-        {
-            return Vtable::get(f)(BOOST_PP_ENUM_PARAMS(N, a));
-        }
-
-        R invoke(void *const* f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
-        {
-            return Vtable::get(f)(BOOST_PP_ENUM_PARAMS(N, a));
-        }
-        */
     };
 }}}
 

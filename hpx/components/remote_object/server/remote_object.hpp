@@ -35,15 +35,15 @@ namespace hpx { namespace components { namespace server
             };
 
             template <typename R>
-            R apply(hpx::util::function<R(void**)> ctor, std::size_t count);
+            R apply(hpx::util::function<R(void**)> const & f, std::size_t count);
 
-            void set_dtor(hpx::util::function<void(void**)> d, std::size_t count);
+            void set_dtor(hpx::util::function<void(void**)> const & dtor, std::size_t count);
 
             typedef
                 hpx::actions::action2<
                     remote_object
                   , remote_object_set_dtor
-                  , hpx::util::function<void(void**)>
+                  , hpx::util::function<void(void**)> const &
                   , std::size_t
                   , &remote_object::set_dtor
                 >
@@ -54,7 +54,7 @@ namespace hpx { namespace components { namespace server
     };
 
     template <typename R>
-    R remote_object::apply(hpx::util::function<R(void**)> f, std::size_t)
+    R remote_object::apply(hpx::util::function<R(void**)> const & f, std::size_t)
     {
         return f(&object);
     }
@@ -66,7 +66,7 @@ namespace hpx { namespace components { namespace server
             remote_object
           , R
           , remote_object::remote_object_apply
-          , hpx::util::function<R(void**)>
+          , hpx::util::function<R(void**)> const &
           , std::size_t
           , &remote_object::apply<R>
           , hpx::threads::thread_priority_default
@@ -78,7 +78,7 @@ namespace hpx { namespace components { namespace server
                 remote_object
               , R
               , remote_object::remote_object_apply
-              , hpx::util::function<R(void**)>
+              , hpx::util::function<R(void**)> const &
               , std::size_t
               , &remote_object::apply<R>
               , hpx::threads::thread_priority_default
@@ -90,13 +90,13 @@ namespace hpx { namespace components { namespace server
         remote_object_apply_action() {}
 
         // construct an action from its arguments
-        remote_object_apply_action(hpx::util::function<R(void**)> f,
+        remote_object_apply_action(hpx::util::function<R(void**)> const& f,
                 std::size_t size)
           : base_type(f, size)
         {}
 
         remote_object_apply_action(threads::thread_priority p,
-                hpx::util::function<R(void**)> f, std::size_t size)
+                hpx::util::function<R(void**)> const & f, std::size_t size)
           : base_type(p, f, size)
         {}
 
@@ -124,7 +124,7 @@ namespace hpx { namespace components { namespace server
       : hpx::actions::action2<
             remote_object
           , remote_object::remote_object_apply
-          , hpx::util::function<void(void**)>
+          , hpx::util::function<void(void**)> const &
           , std::size_t
           , &remote_object::apply<void>
           , hpx::threads::thread_priority_default
@@ -135,7 +135,7 @@ namespace hpx { namespace components { namespace server
         typedef hpx::actions::action2<
                 remote_object
               , remote_object::remote_object_apply
-              , hpx::util::function<void(void**)>
+              , hpx::util::function<void(void**)> const &
               , std::size_t
               , &remote_object::apply<void>
               , hpx::threads::thread_priority_default
@@ -147,13 +147,13 @@ namespace hpx { namespace components { namespace server
         remote_object_apply_action() {}
 
         // construct an action from its arguments
-        remote_object_apply_action(hpx::util::function<void(void**)> f,
+        remote_object_apply_action(hpx::util::function<void(void**)> const & f,
                 std::size_t size)
           : base_type(f, size)
         {}
 
         remote_object_apply_action(threads::thread_priority p,
-                hpx::util::function<void(void**)> f, std::size_t size)
+                hpx::util::function<void(void**)> const & f, std::size_t size)
           : base_type(p, f, size)
         {}
 

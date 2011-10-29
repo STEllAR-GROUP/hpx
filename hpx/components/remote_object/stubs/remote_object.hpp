@@ -23,7 +23,11 @@ namespace hpx { namespace components { namespace stubs
     private:
         template <typename F>
         static lcos::promise<typename F::result_type>
-        apply_async_invoke(naming::id_type const & target_id, F const & f, boost::mpl::false_)
+        apply_async_invoke(
+            naming::id_type const & target_id
+          , F const & f
+          , boost::mpl::false_
+        )
         {
             typedef typename F::result_type result_type;
             typedef typename
@@ -38,7 +42,11 @@ namespace hpx { namespace components { namespace stubs
 
         template <typename F>
         static lcos::promise<void>
-        apply_async_invoke(naming::id_type const & target_id, F const & f, boost::mpl::true_)
+        apply_async_invoke(
+            naming::id_type const & target_id
+          , F const & f
+          , boost::mpl::true_
+        )
         {
             typedef typename
                 server::remote_object_apply_action<void>
@@ -51,7 +59,12 @@ namespace hpx { namespace components { namespace stubs
         static lcos::promise<typename F::result_type>
         apply_async(naming::id_type const & target_id, F const & f)
         {
-            return apply_async_invoke(target_id, f, typename boost::is_void<typename F::result_type>::type());
+            return
+                apply_async_invoke(
+                    target_id
+                  , f
+                  , typename boost::is_void<typename F::result_type>::type()
+                );
         }
 
         template <typename F>

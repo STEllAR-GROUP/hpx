@@ -18,8 +18,8 @@ namespace hpx { namespace components
         HPX_COMPONENT_EXPORT naming::id_type
         new_impl(
             naming::id_type const & target_id
-          , util::function<void(void**)> ctor
-          , util::function<void(void**)> dtor
+          , util::function<void(void**)> const & ctor
+          , util::function<void(void**)> const & dtor
           );
 
         // the action to invoke new_impl
@@ -27,8 +27,8 @@ namespace hpx { namespace components
             actions::plain_result_action3<
                 naming::id_type
               , naming::id_type const &
-              , util::function<void(void**)>
-              , util::function<void(void**)>
+              , util::function<void(void**)> const &
+              , util::function<void(void**)> const &
               , &new_impl
             >
             new_impl_action;

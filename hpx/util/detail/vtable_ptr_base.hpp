@@ -54,13 +54,10 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*move)(void * const*, void **);
-        void (*invoke)(void * * BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A));
+        R (*invoke)(void ** BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A));
 
         virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
         virtual void load_object(void **, IArchive & ar, unsigned) = 0;
-
-        //virtual R invoke(void ** BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)) = 0;
-        //virtual R invoke(void *const* BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)) = 0;
 
         template <typename Archive>
         void serialize(Archive & ar, unsigned)
@@ -86,10 +83,7 @@ namespace hpx { namespace util { namespace detail {
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
         void (*move)(void * const*, void **);
-        void (*invoke)(void * * BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A));
-        
-        //virtual R invoke(void ** BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)) = 0;
-        //virtual R invoke(void *const* BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)) = 0;
+        R (*invoke)(void ** BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A));
     };
 
 }}}
