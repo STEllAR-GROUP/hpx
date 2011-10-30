@@ -71,8 +71,8 @@ namespace hpx { namespace util {
             : base_type(boost::move(f))
         {}
 
-        function(BOOST_COPY_ASSIGN_REF(function) other)
-            : base_type(static_cast<BOOST_COPY_ASSIGN_REF(base_type)>(other))
+        function(function const & other)
+            : base_type(static_cast<base_type const &>(other))
         {}
 
         function(BOOST_RV_REF(function) other)
@@ -131,7 +131,7 @@ namespace hpx { namespace util {
             : base_type(boost::move(f))
         {}
 
-        function(BOOST_COPY_ASSIGN_REF(function) other)
+        function(function const & other)
             : base_type(static_cast<BOOST_COPY_ASSIGN_REF(base_type)>(other))
         {}
 
@@ -208,19 +208,23 @@ namespace hpx { namespace util {
             )
             , object(0)
         {
-            typedef typename boost::decay<Functor>::type functor_type;
+            typedef
+                typename boost::remove_const<
+                    typename boost::decay<Functor>::type
+                >::type
+                functor_type;
             static const bool is_small = sizeof(functor_type) <= sizeof(void *);
             if(is_small)
             {
-                new (&object) functor_type(boost::move(f));
+                new (&object) functor_type(boost::forward<Functor>(f));
             }
             else
             {
-                object = new functor_type(boost::move(f));
+                object = new functor_type(boost::forward<Functor>(f));
             }
         }
 
-        function_base(BOOST_COPY_ASSIGN_REF(function_base) other)
+        function_base(function_base const & other)
             : vptr(0)
             , object(0)
         {
@@ -235,7 +239,7 @@ namespace hpx { namespace util {
             other.object = 0;
         }
 
-        function_base &assign(BOOST_COPY_ASSIGN_REF(function_base) other)
+        function_base &assign(function_base const & other)
         {
             if(&other != this)
             {
@@ -259,7 +263,11 @@ namespace hpx { namespace util {
         template <typename Functor>
         function_base & assign(BOOST_FWD_REF(Functor) f)
         {
-            typedef typename boost::decay<Functor>::type functor_type;
+            typedef
+                typename boost::remove_const<
+                    typename boost::decay<Functor>::type
+                >::type
+                functor_type;
             static const bool is_small = sizeof(functor_type) <= sizeof(void *);
             vtable_ptr_type * f_vptr
                 = detail::get_table<functor_type, R(BOOST_PP_ENUM_PARAMS(N, A))>::template get<
@@ -272,11 +280,11 @@ namespace hpx { namespace util {
                 vptr->destruct(&object);
                 if(is_small)
                 {
-                    new (&object) functor_type(boost::move(f));
+                    new (&object) functor_type(boost::forward<Functor>(f));
                 }
                 else
                 {
-                    object = new functor_type(boost::move(f));
+                    object = new functor_type(boost::forward<Functor>(f));
                 }
             }
             else
@@ -288,11 +296,11 @@ namespace hpx { namespace util {
 
                 if(is_small)
                 {
-                    new (&object) functor_type(boost::move(f));
+                    new (&object) functor_type(boost::forward<Functor>(f));
                 }
                 else
                 {
-                    object = new functor_type(boost::move(f));
+                    object = new functor_type(boost::forward<Functor>(f));
                 }
                 vptr = f_vptr;
             }

@@ -37,7 +37,7 @@ namespace hpx { namespace components
                 ar & f;
             }
 
-            F f;
+            hpx::util::function<result_type(T &)> f;
         };
     }
 
