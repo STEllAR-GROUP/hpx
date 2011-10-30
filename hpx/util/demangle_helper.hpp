@@ -35,12 +35,6 @@ namespace hpx { namespace util
     private:
         char* demangled_;
     };
-
-    template <typename T>
-    struct type_id
-    {
-        static demangle_helper<T> typeid_;
-    };
 }}
 
 #else
