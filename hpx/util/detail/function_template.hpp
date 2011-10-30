@@ -64,28 +64,28 @@ namespace hpx { namespace util {
     {
         typedef function_base<Sig, IArchive, OArchive> base_type;
         function() : base_type() {}
-        
+
         template <typename Functor>
-        function(BOOST_COPY_ASSIGN_REF(Functor) f)
-            : base_type(f)
-        {}
-        
-        template <typename Functor>
-        function(BOOST_RV_REF(Functor) f)
+        function(Functor const& f)
             : base_type(f)
         {}
 
-        function(BOOST_COPY_ASSIGN_REF(base_type) other)
+        template <typename Functor>
+        function(BOOST_RV_REF(Functor) f)
+          : base_type(boost::move(f))
+        {}
+
+        function(base_type const& other)
             : base_type(other)
         {}
 
         function(BOOST_RV_REF(base_type) other)
-            : base_type(other)
+            : base_type(boost::move(other))
         {}
 
     private:
         BOOST_COPYABLE_AND_MOVABLE(function);
-    
+
         friend class boost::serialization::access;
 
         void load(IArchive &ar, const unsigned version)
@@ -121,7 +121,7 @@ namespace hpx { namespace util {
         BOOST_SERIALIZATION_SPLIT_MEMBER();
 
     };
-    
+
     template <
         typename Sig
     >
@@ -129,23 +129,23 @@ namespace hpx { namespace util {
     {
         typedef function_base<Sig, void, void> base_type;
         function() : base_type() {}
-        
+
         template <typename Functor>
-        function(BOOST_COPY_ASSIGN_REF(Functor) f)
-            : base_type(f)
-        {}
-        
-        template <typename Functor>
-        function(BOOST_RV_REF(Functor) f)
+        function(Functor const& f)
             : base_type(f)
         {}
 
-        function(BOOST_COPY_ASSIGN_REF(base_type) other)
+        template <typename Functor>
+        function(BOOST_RV_REF(Functor) f)
+            : base_type(boost::move(f))
+        {}
+
+        function(base_type const& other)
             : base_type(other)
         {}
 
         function(BOOST_RV_REF(base_type) other)
-            : base_type(other)
+            : base_type(boost::move(other))
         {}
     };
 }}
@@ -205,7 +205,7 @@ namespace hpx { namespace util {
             > vtable_ptr_type;
 
         template <typename Functor>
-        function_base(BOOST_COPY_ASSIGN_REF(Functor) f)
+        function_base(Functor const& f)
             : vptr(
                 detail::get_table<Functor, R(BOOST_PP_ENUM_PARAMS(N, A))>::template get<
                     IArchive
@@ -225,7 +225,7 @@ namespace hpx { namespace util {
             }
         }
 
-        function_base(BOOST_COPY_ASSIGN_REF(function_base) other)
+        function_base(function_base const& other)
             : vptr(0)
             , object(0)
         {
@@ -304,16 +304,16 @@ namespace hpx { namespace util {
         }
 
         template <typename T>
-        function_base & operator=(T const & t)
+        function_base & operator=(T const& t)
         {
             return assign(t);
         }
-        
+
         function_base & operator=(BOOST_COPY_ASSIGN_REF(function_base) t)
         {
             return assign(t);
         }
-        
+
         function_base & operator=(BOOST_RV_REF(function_base) t)
         {
             if(this != &t)

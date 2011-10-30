@@ -11,6 +11,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/serialization.hpp>
+#include <boost/move/move.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
@@ -42,10 +43,11 @@ namespace hpx { namespace actions
 
         ///
         template <typename Arg0>
-        Arg0 const& trigger(Arg0 const& arg0);
+        void trigger(BOOST_FWD_REF(Arg0) arg0);
 
         ///
         void trigger_error(boost::exception_ptr const& e);
+        void trigger_error(BOOST_RV_REF(boost::exception_ptr) e);
 
         typedef HPX_STD_FUNCTION<void(naming::id_type&)> enum_gid_handler_type;
         void enumerate_argument_gids(enum_gid_handler_type);

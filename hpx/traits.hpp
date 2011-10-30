@@ -36,10 +36,6 @@ namespace hpx { namespace traits
     struct handle_gid;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename Enable = void>
-    struct get_action_name;
-
-    ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Enable = void>
     struct component_type_database;
 }}

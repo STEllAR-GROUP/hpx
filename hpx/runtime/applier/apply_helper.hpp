@@ -19,8 +19,7 @@
 namespace hpx { namespace applier { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////
-    template <
-        typename Action,
+    template <typename Action,
         typename DirectExecute = typename Action::direct_execution>
     struct apply_helper0;
 
@@ -75,80 +74,81 @@ namespace hpx { namespace applier { namespace detail
             Action::execute_function_nonvirt(lva);
         }
 
-        static typename Action::result_type
+        static void
         call (actions::continuation_type& c, naming::address::address_type lva,
             threads::thread_priority /*priority*/)
         {
             try {
-                return c->trigger(Action::execute_function_nonvirt(lva));
+                c->trigger(Action::execute_function_nonvirt(lva));
             }
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client
                 c->trigger_error(boost::current_exception());
-                return typename Action::result_type();
             }
         }
     };
 
     ///////////////////////////////////////////////////////////////////////
-    template <
-        typename Action, typename Arg0,
+    template <typename Action,
         typename DirectExecute = typename Action::direct_execution>
     struct apply_helper1;
 
-    template <typename Action, typename Arg0>
-    struct apply_helper1<Action, Arg0, boost::mpl::false_>
+    template <typename Action>
+    struct apply_helper1<Action, boost::mpl::false_>
     {
+        template <typename Arg0>
         static void
         call (naming::address::address_type lva,
-            threads::thread_priority priority, Arg0 const& arg0)
+            threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
         {
             hpx::applier::register_work_plain(
-                Action::construct_thread_function(lva, arg0),
+                Action::construct_thread_function(lva, boost::forward<Arg0>(arg0)),
                 actions::detail::get_action_name<Action>(), lva,
                 threads::pending, priority);
         }
 
+        template <typename Arg0>
         static void
         call (actions::continuation_type& c, naming::address::address_type lva,
-            threads::thread_priority priority, Arg0 const& arg0)
+            threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
         {
             hpx::applier::register_work_plain(
-                Action::construct_thread_function(c, lva, arg0),
+                Action::construct_thread_function(c, lva, boost::forward<Arg0>(arg0)),
                 actions::detail::get_action_name<Action>(), lva,
                 threads::pending, priority);
         }
     };
 
-    template <typename Action, typename Arg0>
-    struct apply_helper1<Action, Arg0, boost::mpl::true_>
+    template <typename Action>
+    struct apply_helper1<Action, boost::mpl::true_>
     {
         // If local and to be directly executed, just call the function
+        template <typename Arg0>
         static void
         call (naming::address::address_type lva,
-            threads::thread_priority priority, Arg0 const& arg0)
+            threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
         {
-            Action::execute_function_nonvirt(lva, arg0);
+            Action::execute_function_nonvirt(lva, boost::forward<Arg0>(arg0));
         }
 
-        static typename Action::result_type
+        template <typename Arg0>
+        static void
         call (actions::continuation_type& c, naming::address::address_type lva,
-            threads::thread_priority priority, Arg0 const& arg0)
+            threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
         {
             try {
-                return c->trigger(Action::execute_function_nonvirt(lva, arg0));
+                c->trigger(Action::execute_function_nonvirt(lva,
+                    boost::forward<Arg0>(arg0)));
             }
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client
                 c->trigger_error(boost::current_exception());
-                return typename Action::result_type();
             }
         }
     };
-
-    // bring in the rest of the apply<> overloads
-    #include <hpx/runtime/applier/apply_helper_implementations.hpp>
-
 }}}
+
+// bring in the rest of the apply<> overloads
+#include <hpx/runtime/applier/apply_helper_implementations.hpp>
 
 #endif

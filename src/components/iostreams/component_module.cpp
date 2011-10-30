@@ -10,7 +10,6 @@
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/components/iostreams/server/output_stream.hpp>
 
-#include <boost/serialization/deque.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 

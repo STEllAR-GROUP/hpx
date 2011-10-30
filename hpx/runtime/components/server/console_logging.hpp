@@ -27,6 +27,14 @@ namespace hpx { namespace components
     typedef std::vector<message_type> messages_type;
 }}
 
+///////////////////////////////////////////////////////////////////////////////
+// non-intrusive serialization
+namespace boost { namespace serialization
+{
+    template <typename Archive>
+    void serialize(Archive&, hpx::components::message_type&, unsigned int const);
+}}
+
 //////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
 {
@@ -108,6 +116,11 @@ namespace hpx { namespace components { namespace server
         }
     };
 }}}
+
+HPX_SERIALIZATION_REGISTER_TEMPLATE(
+    (template <typename Dummy>),
+    (hpx::components::server::console_logging_action<Dummy>)
+)
 
 #endif
 

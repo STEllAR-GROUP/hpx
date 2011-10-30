@@ -47,6 +47,15 @@
         BOOST_PP_COMMA_IF(n) BOOST_PP_CAT(BOOST_PP_CAT(data, n), _)           \
     /**/
 
+#define HPX_FWD_ARGS(z, n, _)                                                 \
+        BOOST_PP_COMMA_IF(n)                                                  \
+            BOOST_FWD_REF(BOOST_PP_CAT(Arg, n)) BOOST_PP_CAT(arg, n)          \
+    /**/
+#define HPX_FORWARD_ARGS(z, n, _)                                             \
+        BOOST_PP_COMMA_IF(n)                                                  \
+            boost::forward<BOOST_PP_CAT(Arg, n)>(BOOST_PP_CAT(arg, n))        \
+    /**/
+
 namespace hpx { namespace actions
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -78,15 +87,15 @@ namespace hpx { namespace actions
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(base_result_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(base_result_action, N)(
                 threads::thread_priority priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
     protected:
@@ -275,15 +284,15 @@ namespace hpx { namespace actions
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(result_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(result_action, N)(
                 threads::thread_priority priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
         /// serialization support
@@ -405,15 +414,15 @@ namespace hpx { namespace actions
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(direct_result_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(direct_result_action, N)(
                 threads::thread_priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
     public:
@@ -563,15 +572,15 @@ namespace hpx { namespace actions
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(base_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(base_action, N)(
                 threads::thread_priority priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
     protected:
@@ -727,15 +736,15 @@ namespace hpx { namespace actions
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(action, N)(
                 threads::thread_priority priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
         util::unused_type execute_function(
@@ -884,15 +893,15 @@ namespace hpx { namespace actions
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(direct_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(direct_action, N)(
                 threads::thread_priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
     public:
@@ -1049,15 +1058,15 @@ namespace hpx { namespace actions
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(result_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(result_action, N)(
                 threads::thread_priority priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
         /// serialization support
@@ -1081,7 +1090,8 @@ namespace hpx { namespace actions
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_ACTIONS_TMP(
+// Register the action templates with serialization.
+HPX_SERIALIZATION_REGISTER_TEMPLATE(
     (
         template <
             typename Component
@@ -1106,7 +1116,7 @@ HPX_ACTIONS_TMP(
     )
 )
 
-HPX_ACTIONS_TMP(
+HPX_SERIALIZATION_REGISTER_TEMPLATE(
     (
         template <
             typename Component
@@ -1129,7 +1139,7 @@ HPX_ACTIONS_TMP(
     )
 )
 
-HPX_ACTIONS_TMP(
+HPX_SERIALIZATION_REGISTER_TEMPLATE(
     (
         template <
             typename Component
@@ -1152,7 +1162,7 @@ HPX_ACTIONS_TMP(
     )
 )
 
-HPX_ACTIONS_TMP(
+HPX_SERIALIZATION_REGISTER_TEMPLATE(
     (
         template <
             typename Component
@@ -1173,6 +1183,9 @@ HPX_ACTIONS_TMP(
     )
 )
 
+///////////////////////////////////////////////////////////////////////////////
+#undef HPX_FORWARD_ARGS
+#undef HPX_FWD_ARGS
 #undef HPX_PARAM_ARGUMENT
 #undef HPX_PARAM_TYPES
 #undef HPX_REMOVE_QUALIFIERS

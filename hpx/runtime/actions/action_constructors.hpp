@@ -28,9 +28,18 @@
 
 #define N BOOST_PP_ITERATION()
 
+#define HPX_FWD_ARGS(z, n, _)                                                 \
+        BOOST_PP_COMMA_IF(n)                                                  \
+            BOOST_FWD_REF(BOOST_PP_CAT(Arg, n)) BOOST_PP_CAT(arg, n)          \
+    /**/
+#define HPX_FORWARD_ARGS(z, n, _)                                             \
+        BOOST_PP_COMMA_IF(n)                                                  \
+            boost::forward<BOOST_PP_CAT(Arg, n)>(BOOST_PP_CAT(arg, n))        \
+    /**/
+
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    action(BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-        : arguments_(BOOST_PP_ENUM_PARAMS(N, arg)),
+    action(BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+        : arguments_(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)),
           parent_locality_(applier::get_prefix_id()),
           parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
           parent_phase_(threads::get_parent_phase()),
@@ -39,14 +48,16 @@
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     action(threads::thread_priority priority,
-              BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-        : arguments_(BOOST_PP_ENUM_PARAMS(N, arg)),
+              BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+        : arguments_(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)),
           parent_locality_(applier::get_prefix_id()),
           parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
           parent_phase_(threads::get_parent_phase()),
           priority_(detail::thread_priority<Priority>::call(priority))
     {}
 
+#undef HPX_FORWARD_ARGS
+#undef HPX_FWD_ARGS
 #undef N
 
 #endif

@@ -181,17 +181,5 @@ HPX_SERIALIZATION_REGISTER_TEMPLATE(
     template <typename R>
   , hpx::components::server::remote_object_apply_action<R>
 )
-namespace hpx { namespace traits
-{
-    template <typename R>
-    struct get_action_name<
-        hpx::components::server::remote_object_apply_action<R>
-    >
-    {
-        static HPX_ALWAYS_EXPORT const char * call()
-        {
-            return "hpx::components::server::remote_object_apply_action<R>";
-        }
-    };
-}}
+
 #endif

@@ -92,8 +92,8 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
-    template HPX_EXPORT hpx::naming::gid_type const&
-    continuation::trigger(hpx::naming::gid_type const&);
+    template HPX_EXPORT void
+    continuation::trigger(BOOST_FWD_REF(hpx::naming::gid_type));
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -47,6 +47,17 @@
         BOOST_PP_COMMA_IF(n) BOOST_PP_CAT(BOOST_PP_CAT(data, n), _)          \
     /**/
 
+#define HPX_FWD_ARGS(z, n, _)                                                 \
+        BOOST_PP_COMMA_IF(n)                                                  \
+            BOOST_FWD_REF(BOOST_PP_CAT(Arg, n)) BOOST_PP_CAT(arg, n)          \
+    /**/
+#define HPX_FORWARD_ARGS(z, n, _)                                             \
+        BOOST_PP_COMMA_IF(n)                                                  \
+            boost::forward<BOOST_PP_CAT(Arg, n)>(BOOST_PP_CAT(arg, n))        \
+    /**/
+
+namespace hpx { namespace actions
+{
     ///////////////////////////////////////////////////////////////////////////
     //  N parameter version, with result
     template <
@@ -79,15 +90,15 @@
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_base_result_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_base_result_action, N)(
                 threads::thread_priority priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
     protected:
@@ -240,15 +251,15 @@
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_result_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_result_action, N)(
                 threads::thread_priority priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
         Result execute_function(
@@ -300,7 +311,8 @@
             data.func = this->construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
@@ -316,7 +328,8 @@
             data.func = this->construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
@@ -332,7 +345,8 @@
             data.func = this->construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
@@ -349,7 +363,8 @@
             data.func = this->construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
@@ -387,15 +402,15 @@
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_direct_result_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_direct_result_action, N)(
                 threads::thread_priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
     public:
@@ -458,7 +473,8 @@
             data.func = this->construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
@@ -474,7 +490,8 @@
             data.func = this->construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
@@ -490,7 +507,8 @@
             data.func = this->construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
@@ -507,7 +525,8 @@
             data.func = this->construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
@@ -546,15 +565,15 @@
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_base_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_base_action, N)(
                 threads::thread_priority priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
     protected:
@@ -701,15 +720,15 @@
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_action, N)(
                 threads::thread_priority priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
         util::unused_type execute_function(
@@ -763,7 +782,8 @@
             data.func = this->construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
@@ -779,7 +799,8 @@
             data.func = this->construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
@@ -795,7 +816,8 @@
             data.func = this->construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
@@ -812,7 +834,8 @@
             data.func = this->construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
@@ -849,15 +872,15 @@
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_direct_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_direct_action, N)(
                 threads::thread_priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
     public:
@@ -921,7 +944,8 @@
             data.func = this->construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
@@ -937,7 +961,8 @@
             data.func = this->construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
@@ -953,7 +978,8 @@
             data.func = this->construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
@@ -970,32 +996,23 @@
             data.func = this->construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
             return data;
         }
     };
-    
+
     template <
         BOOST_PP_ENUM_PARAMS(N, typename T),
         void (*F)(BOOST_PP_ENUM_PARAMS(N, T)),
-        threads::thread_priority Priority,
-        typename Derived>
+        threads::thread_priority Priority, typename Derived>
     class BOOST_PP_CAT(plain_result_action, N)<
-        void
-      , BOOST_PP_ENUM_PARAMS(N, T)
-      , F
-      , Priority
-      , Derived
-    >
+                void, BOOST_PP_ENUM_PARAMS(N, T), F, Priority, Derived>
       : public BOOST_PP_CAT(plain_action, N)<
-            BOOST_PP_ENUM_PARAMS(N, T)
-          , F
-          , Priority
-          , Derived
-        >
+            BOOST_PP_ENUM_PARAMS(N, T), F, Priority, Derived>
     {
     private:
         typedef BOOST_PP_CAT(plain_action, N)<
@@ -1011,15 +1028,15 @@
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_result_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_result_action, N)(
                 threads::thread_priority priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
         /// serialization support
@@ -1040,7 +1057,42 @@
             ar & boost::serialization::base_object<base_type>(*this);
         }
     };
+}}
 
+///////////////////////////////////////////////////////////////////////////////
+HPX_SERIALIZATION_REGISTER_TEMPLATE(
+    (template <typename Result, BOOST_PP_ENUM_PARAMS(N, typename T),
+        Result (*F)(BOOST_PP_ENUM_PARAMS(N, T)),
+        hpx::threads::thread_priority Priority, typename Derived>),
+    (BOOST_PP_CAT(hpx::actions::plain_result_action, N)<
+        Result, BOOST_PP_ENUM_PARAMS(N, T), F, Priority, Derived>)
+)
+
+HPX_SERIALIZATION_REGISTER_TEMPLATE(
+    (template <typename Result, BOOST_PP_ENUM_PARAMS(N, typename T),
+        Result (*F)(BOOST_PP_ENUM_PARAMS(N, T)), typename Derived>),
+    (BOOST_PP_CAT(hpx::actions::plain_direct_result_action, N)<
+        Result, BOOST_PP_ENUM_PARAMS(N, T), F, Derived>)
+)
+
+HPX_SERIALIZATION_REGISTER_TEMPLATE(
+    (template <BOOST_PP_ENUM_PARAMS(N, typename T),
+        void (*F)(BOOST_PP_ENUM_PARAMS(N, T)),
+        hpx::threads::thread_priority Priority, typename Derived>),
+    (BOOST_PP_CAT(hpx::actions::plain_action, N)<
+        BOOST_PP_ENUM_PARAMS(N, T), F, Priority, Derived>)
+)
+
+HPX_SERIALIZATION_REGISTER_TEMPLATE(
+    (template <BOOST_PP_ENUM_PARAMS(N, typename T),
+        void (*F)(BOOST_PP_ENUM_PARAMS(N, T)), typename Derived>),
+    (BOOST_PP_CAT(hpx::actions::plain_direct_action, N)<
+        BOOST_PP_ENUM_PARAMS(N, T), F, Derived>)
+)
+
+///////////////////////////////////////////////////////////////////////////////
+#undef HPX_FORWARD_ARGS
+#undef HPX_FWD_ARGS
 #undef HPX_PARAM_ARGUMENT
 #undef HPX_PARAM_TYPES
 #undef HPX_REMOVE_QUALIFIERS

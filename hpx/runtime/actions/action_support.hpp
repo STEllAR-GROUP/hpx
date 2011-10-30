@@ -23,22 +23,20 @@
 #include <boost/type_traits/remove_reference.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/mpl/if.hpp>
-#include <boost/serialization/base_object.hpp>
-#include <boost/serialization/void_cast.hpp>
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/export.hpp>
 #include <boost/move/move.hpp>
 
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/util/detail/serialization_registration.hpp>
 #include <hpx/util/serialize_sequence.hpp>
+#include <hpx/util/serialize_exception.hpp>
+#include <hpx/util/demangle_helper.hpp>
 
 #include <hpx/config/bind.hpp>
 #include <hpx/config/tuple.hpp>
 #include <hpx/config/function.hpp>
 #include <hpx/traits/handle_gid.hpp>
-#include <hpx/traits/get_action_name.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -60,7 +58,7 @@ namespace hpx { namespace actions
         template <typename Action>
         char const* get_action_name()
         {
-            return traits::get_action_name<Action>::call();
+            return util::type_id<Action>::typeid_.type_id();
         }
     }
 
@@ -255,12 +253,15 @@ namespace hpx { namespace actions
         };
     }
 
-    template <typename Component                // Component type
-            , int Action                        // Action code
-            , typename Result                   // Return type
-            , typename Arguments                // Arguments (fusion vector)
-            , typename Derived                  // Derived action class
-            , threads::thread_priority Priority /* Default priority */>
+    /// \tparam Component         component type
+    /// \tparam Action            action code
+    /// \tparam Result            return type
+    /// \tparam Arguments         arguments (fusion vector)
+    /// \tparam Derived           derived action class
+    /// \tparam threads::thread_priority Priority default priority
+    template <typename Component, int Action, typename Result,
+        typename Arguments, typename Derived,
+        threads::thread_priority Priority>
     class action : public signature<Result, Arguments>
     {
     public:
@@ -289,8 +290,8 @@ namespace hpx { namespace actions
         {}
 
         template <typename Arg0>
-        action(Arg0 const& arg0)
-          : arguments_(arg0),
+        action(BOOST_FWD_REF(Arg0) arg0)
+          : arguments_(boost::forward<Arg0>(arg0)),
             parent_locality_(applier::get_prefix_id()),
             parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
             parent_phase_(threads::get_parent_phase()),
@@ -298,8 +299,8 @@ namespace hpx { namespace actions
         {}
 
         template <typename Arg0>
-        action(threads::thread_priority priority, Arg0 const& arg0)
-          : arguments_(arg0),
+        action(threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
+          : arguments_(boost::forward<Arg0>(arg0)),
             parent_locality_(applier::get_prefix_id()),
             parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
             parent_phase_(threads::get_parent_phase()),
@@ -311,7 +312,11 @@ namespace hpx { namespace actions
 
         /// destructor
         ~action()
-        {}
+        {
+            // force serialization self registration to happen
+            using namespace boost::archive::detail::extra_detail;
+            init_guid<derived_type>::g.initialize();
+        }
 
     public:
         /// retrieve the N's argument
@@ -517,7 +522,8 @@ namespace hpx { namespace actions
     template <int N, typename Component, int Action, typename Result,
       typename Arguments, typename Derived, threads::thread_priority Priority>
     inline typename boost::fusion::result_of::at_c<
-        typename action<Component, Action, Result, Arguments, Derived, Priority>::arguments_type const, N
+        typename action<Component, Action, Result, Arguments, Derived,
+            Priority>::arguments_type const, N
     >::type
     get(action<Component, Action, Result, Arguments, Derived, Priority> const& args)
     {
@@ -552,21 +558,10 @@ namespace hpx { namespace actions
 #include <hpx/config/warnings_suffix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Helper macro for action serialization, each of the defined actions needs to
-// be registered with the serialization library
-#define HPX_DEFINE_GET_ACTION_NAME(action)                                    \
-        HPX_DEFINE_GET_ACTION_NAME(action, action)                            \
-    /**/
-
-#define HPX_DEFINE_GET_ACTION_NAME_EX(action, actionname)                     \
-        namespace hpx { namespace traits {                                    \
-            template<> HPX_ALWAYS_EXPORT                                      \
-            char const* get_action_name<action>::call()                       \
-            {                                                                 \
-                return BOOST_PP_STRINGIZE(actionname);                        \
-            }                                                                 \
-        }}                                                                    \
-    /**/
+// Helper macros for action serialization - obsolete, not required anymore
+#define HPX_DEFINE_GET_ACTION_NAME(action)
+#define HPX_REGISTER_ACTION_EX(action, actionname)
+#define HPX_REGISTER_ACTION(action) HPX_REGISTER_ACTION_EX(action, action)
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_BASE_HELPER(action, actionname)                          \
@@ -575,14 +570,6 @@ namespace hpx { namespace actions
                 BOOST_PP_CAT(__hpx_action_register_base_helper_, __LINE__),   \
                 _##actionname);                                               \
     /**/
-
-#define HPX_REGISTER_ACTION_EX(action, actionname)                            \
-        BOOST_CLASS_EXPORT(action)                                            \
-        HPX_REGISTER_BASE_HELPER(action, actionname)                          \
-        HPX_DEFINE_GET_ACTION_NAME_EX(action, actionname)                     \
-    /**/
-
-#define HPX_REGISTER_ACTION(action) HPX_REGISTER_ACTION_EX(action, action)
 
 #endif
 

@@ -1,4 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
+//  Copyright (c) 2011 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,8 +7,12 @@
 #ifndef HPX_FUNCTION_DETAILSERIALIZATION_REGISTRATION_HPP
 #define HPX_FUNCTION_DETAILSERIALIZATION_REGISTRATION_HPP
 
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/void_cast.hpp>
+#include <boost/serialization/access.hpp>
 #include <boost/serialization/export.hpp>
 #include <boost/serialization/extended_type_info.hpp>
+#include <boost/serialization/extended_type_info_typeid.hpp>
 #include <boost/uuid/sha1.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/assert.hpp>
@@ -138,7 +143,6 @@ namespace boost {                                                               
     }}}                                                                         \
 }                                                                               \
 /**/
-
 
 #endif
 

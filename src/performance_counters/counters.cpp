@@ -49,11 +49,11 @@ HPX_DEFINE_GET_COMPONENT_TYPE(
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
-    template HPX_EXPORT hpx::performance_counters::counter_info const&
-    continuation::trigger(hpx::performance_counters::counter_info const& arg0);
+    template HPX_EXPORT void
+    continuation::trigger(BOOST_FWD_REF(hpx::performance_counters::counter_info));
 
-    template HPX_EXPORT hpx::performance_counters::counter_value const&
-    continuation::trigger(hpx::performance_counters::counter_value const& arg0);
+    template HPX_EXPORT void
+    continuation::trigger(BOOST_FWD_REF(hpx::performance_counters::counter_value));
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

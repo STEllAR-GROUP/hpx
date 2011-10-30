@@ -378,7 +378,8 @@ namespace hpx { namespace actions
             data.lva = lva;
             data.func = this->construct_thread_function(lva);
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
@@ -393,7 +394,8 @@ namespace hpx { namespace actions
             data.lva = lva;
             data.func = this->construct_thread_function(cont, lva);
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
@@ -613,7 +615,8 @@ namespace hpx { namespace actions
             data.lva = lva;
             data.func = this->construct_thread_function(lva);
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
@@ -628,7 +631,8 @@ namespace hpx { namespace actions
             data.lva = lva;
             data.func = this->construct_thread_function(cont, lva);
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
@@ -772,7 +776,7 @@ namespace hpx { namespace actions
             return this->get_thread_init_data(cont, lva, data);
         }
     };
-    
+
     template <void (*F)(),
         threads::thread_priority Priority,
         typename Derived>
@@ -804,13 +808,34 @@ namespace hpx { namespace actions
             ar & boost::serialization::base_object<base_type>(*this);
         }
     };
-
-    ///////////////////////////////////////////////////////////////////////////
-    // bring in the rest of the implementations
-    #include <hpx/runtime/actions/plain_action_implementations.hpp>
+}}
 
 ///////////////////////////////////////////////////////////////////////////////
-}}
+HPX_SERIALIZATION_REGISTER_TEMPLATE(
+    (template <typename Result, Result (*F)(),
+        hpx::threads::thread_priority Priority, typename Derived>),
+    (hpx::actions::plain_result_action0<Result, F, Priority, Derived>)
+)
+
+HPX_SERIALIZATION_REGISTER_TEMPLATE(
+    (template <typename Result, Result (*F)(), typename Derived>),
+    (hpx::actions::plain_direct_result_action0<Result, F, Derived>)
+)
+
+HPX_SERIALIZATION_REGISTER_TEMPLATE(
+    (template <void (*F)(), hpx::threads::thread_priority Priority,
+        typename Derived>),
+    (hpx::actions::plain_action0<F, Priority, Derived>)
+)
+
+HPX_SERIALIZATION_REGISTER_TEMPLATE(
+    (template <void (*F)(), typename Derived>),
+    (hpx::actions::plain_direct_action0<F, Derived>)
+)
+
+///////////////////////////////////////////////////////////////////////////
+// bring in the rest of the implementations
+#include <hpx/runtime/actions/plain_action_implementations.hpp>
 
 #include <hpx/config/warnings_suffix.hpp>
 

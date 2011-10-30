@@ -20,8 +20,8 @@ namespace hpx { namespace actions
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Arg0>
-    inline Arg0 const&
-    continuation::trigger(Arg0 const& arg0)
+    inline void
+    continuation::trigger(BOOST_FWD_REF(Arg0) arg0)
     {
         typedef typename
             lcos::template base_lco_with_value<Arg0>::set_result_action
@@ -29,10 +29,8 @@ namespace hpx { namespace actions
 
         LLCO_(info) << "promise::set_with_value(" << gid_ << ")";
 
-        applier::apply<action_type>(gid_, arg0);
-        return arg0;
+        applier::apply<action_type>(gid_, boost::forward<Arg0>(arg0));
     }
-
 }}
 
 #endif
