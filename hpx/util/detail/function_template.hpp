@@ -17,6 +17,7 @@
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/tracking.hpp>
+#include <boost/type_traits/decay.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
@@ -64,28 +65,23 @@ namespace hpx { namespace util {
     {
         typedef function_base<Sig, IArchive, OArchive> base_type;
         function() : base_type() {}
-
+        
         template <typename Functor>
-        function(Functor const& f)
-            : base_type(f)
+        function(Functor f)
+            : base_type(boost::move(f))
         {}
 
-        template <typename Functor>
-        function(BOOST_RV_REF(Functor) f)
-          : base_type(boost::move(f))
+        function(BOOST_COPY_ASSIGN_REF(function) other)
+            : base_type(static_cast<BOOST_COPY_ASSIGN_REF(base_type)>(other))
         {}
 
-        function(base_type const& other)
-            : base_type(other)
-        {}
-
-        function(BOOST_RV_REF(base_type) other)
-            : base_type(boost::move(other))
+        function(BOOST_RV_REF(function) other)
+            : base_type(boost::move(static_cast<BOOST_RV_REF(base_type)>(other)))
         {}
 
     private:
         BOOST_COPYABLE_AND_MOVABLE(function);
-
+    
         friend class boost::serialization::access;
 
         void load(IArchive &ar, const unsigned version)
@@ -121,7 +117,7 @@ namespace hpx { namespace util {
         BOOST_SERIALIZATION_SPLIT_MEMBER();
 
     };
-
+    
     template <
         typename Sig
     >
@@ -129,23 +125,18 @@ namespace hpx { namespace util {
     {
         typedef function_base<Sig, void, void> base_type;
         function() : base_type() {}
-
+        
         template <typename Functor>
-        function(Functor const& f)
-            : base_type(f)
-        {}
-
-        template <typename Functor>
-        function(BOOST_RV_REF(Functor) f)
+        function(Functor f)
             : base_type(boost::move(f))
         {}
 
-        function(base_type const& other)
-            : base_type(other)
+        function(BOOST_COPY_ASSIGN_REF(function) other)
+            : base_type(static_cast<BOOST_COPY_ASSIGN_REF(base_type)>(other))
         {}
 
-        function(BOOST_RV_REF(base_type) other)
-            : base_type(boost::move(other))
+        function(BOOST_RV_REF(function) other)
+            : base_type(boost::move(static_cast<BOOST_RV_REF(base_type)>(other)))
         {}
     };
 }}
@@ -205,27 +196,31 @@ namespace hpx { namespace util {
             > vtable_ptr_type;
 
         template <typename Functor>
-        function_base(Functor const& f)
+        function_base(Functor f)
             : vptr(
-                detail::get_table<Functor, R(BOOST_PP_ENUM_PARAMS(N, A))>::template get<
+                detail::get_table<
+                    typename boost::decay<Functor>::type
+                  , R(BOOST_PP_ENUM_PARAMS(N, A))
+                >::template get<
                     IArchive
                   , OArchive
                 >()
             )
             , object(0)
         {
-            static const bool is_small = sizeof(Functor) <= sizeof(void *);
+            typedef typename boost::decay<Functor>::type functor_type;
+            static const bool is_small = sizeof(functor_type) <= sizeof(void *);
             if(is_small)
             {
-                new (&object) Functor(f);
+                new (&object) functor_type(boost::move(f));
             }
             else
             {
-                object = new Functor(f);
+                object = new functor_type(boost::move(f));
             }
         }
 
-        function_base(function_base const& other)
+        function_base(BOOST_COPY_ASSIGN_REF(function_base) other)
             : vptr(0)
             , object(0)
         {
@@ -240,7 +235,7 @@ namespace hpx { namespace util {
             other.object = 0;
         }
 
-        function_base &assign(function_base const & other)
+        function_base &assign(BOOST_COPY_ASSIGN_REF(function_base) other)
         {
             if(&other != this)
             {
@@ -262,11 +257,12 @@ namespace hpx { namespace util {
         }
 
         template <typename Functor>
-        function_base & assign(Functor const & f)
+        function_base & assign(BOOST_FWD_REF(Functor) f)
         {
-            static const bool is_small = sizeof(Functor) <= sizeof(void *);
+            typedef typename boost::decay<Functor>::type functor_type;
+            static const bool is_small = sizeof(functor_type) <= sizeof(void *);
             vtable_ptr_type * f_vptr
-                = detail::get_table<Functor, R(BOOST_PP_ENUM_PARAMS(N, A))>::template get<
+                = detail::get_table<functor_type, R(BOOST_PP_ENUM_PARAMS(N, A))>::template get<
                     IArchive
                   , OArchive
                 >();
@@ -276,11 +272,11 @@ namespace hpx { namespace util {
                 vptr->destruct(&object);
                 if(is_small)
                 {
-                    new (&object) Functor(f);
+                    new (&object) functor_type(boost::move(f));
                 }
                 else
                 {
-                    object = new Functor(f);
+                    object = new functor_type(boost::move(f));
                 }
             }
             else
@@ -292,11 +288,11 @@ namespace hpx { namespace util {
 
                 if(is_small)
                 {
-                    new (&object) Functor(f);
+                    new (&object) functor_type(boost::move(f));
                 }
                 else
                 {
-                    object = new Functor(f);
+                    object = new functor_type(boost::move(f));
                 }
                 vptr = f_vptr;
             }
@@ -304,16 +300,16 @@ namespace hpx { namespace util {
         }
 
         template <typename T>
-        function_base & operator=(T const& t)
+        function_base & operator=(BOOST_FWD_REF(T) t)
         {
-            return assign(t);
+            return assign(boost::forward<T>(t));
         }
-
+        
         function_base & operator=(BOOST_COPY_ASSIGN_REF(function_base) t)
         {
             return assign(t);
         }
-
+        
         function_base & operator=(BOOST_RV_REF(function_base) t)
         {
             if(this != &t)
