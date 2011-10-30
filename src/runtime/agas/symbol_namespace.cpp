@@ -30,3 +30,11 @@ HPX_REGISTER_ACTION_EX(
     symbol_namespace::service_action,
     symbol_namespace_service_action);
 
+namespace hpx { namespace actions
+{
+    template HPX_EXPORT void
+    continuation::trigger(agas::response const&);
+
+    template HPX_EXPORT void
+    continuation::trigger(BOOST_RV_REF(agas::response));
+}}

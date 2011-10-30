@@ -156,3 +156,4 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
       , gs_remote_lse_type
       );
 HPX_DEFINE_GET_COMPONENT_TYPE(bright_future::server::remote_lse<double>);
+

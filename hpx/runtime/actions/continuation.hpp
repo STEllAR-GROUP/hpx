@@ -43,7 +43,9 @@ namespace hpx { namespace actions
 
         ///
         template <typename Arg0>
-        void trigger(BOOST_FWD_REF(Arg0) arg0);
+        void trigger(Arg0 const& arg0);
+        template <typename Arg0>
+        void trigger(BOOST_RV_REF(Arg0) arg0);
 
         ///
         void trigger_error(boost::exception_ptr const& e);
