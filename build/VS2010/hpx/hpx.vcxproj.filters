@@ -165,6 +165,9 @@
     <Filter Include="Header Files\Util\Detail">
       <UniqueIdentifier>{25adbdf4-3bc6-471b-bc4e-b3df926d6be7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Traits">
+      <UniqueIdentifier>{d3434298-3a41-4879-a63d-8a79071a6e41}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\external\chrono\libs\chrono\src\chrono.cpp">
@@ -380,7 +383,7 @@
     <ClCompile Include="..\..\..\src\lcos\local_recursive_mutex.cpp">
       <Filter>Source Files\LCOs</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\util\full_empty_store.cpp">
+    <ClCompile Include="..\..\..\src\util\full_empty_entry.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1041,6 +1044,48 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\traits.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\server\object_semaphore.hpp">
+      <Filter>Header Files\LCOs\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\stubs\object_semaphore.hpp">
+      <Filter>Header Files\LCOs\Stubs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\stubs\queue.hpp">
+      <Filter>Header Files\LCOs\Stubs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\server\queue.hpp">
+      <Filter>Header Files\LCOs\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\queue.hpp">
+      <Filter>Header Files\LCOs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\object_semaphore.hpp">
+      <Filter>Header Files\LCOs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\traits\get_remote_result.hpp">
+      <Filter>Header Files\Traits</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\traits\promise_local_result.hpp">
+      <Filter>Header Files\Traits</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\traits\promise_remote_result.hpp">
+      <Filter>Header Files\Traits</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\traits\get_action_name.hpp">
+      <Filter>Header Files\Traits</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\traits\handle_gid.hpp">
+      <Filter>Header Files\Traits</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\traits\component_type_database.hpp">
+      <Filter>Header Files\Traits</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\detail\pp_strip_parens.hpp">
+      <Filter>Header Files\Util\Detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\demangle_helper.hpp">
+      <Filter>Header Files\Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

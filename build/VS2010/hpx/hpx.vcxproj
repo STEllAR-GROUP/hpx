@@ -68,6 +68,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DisableSpecificDiagnostics>2586</DisableSpecificDiagnostics>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -155,7 +156,7 @@
     <ClCompile Include="..\..\..\src\runtime\threads\thread_helpers.cpp" />
     <ClCompile Include="..\..\..\src\state.cpp" />
     <ClCompile Include="..\..\..\src\util\asio_util.cpp" />
-    <ClCompile Include="..\..\..\src\util\full_empty_store.cpp" />
+    <ClCompile Include="..\..\..\src\util\full_empty_entry.cpp" />
     <ClCompile Include="..\..\..\src\util\generate_unique_ids.cpp" />
     <ClCompile Include="..\..\..\src\util\ini.cpp" />
     <ClCompile Include="..\..\..\src\util\init_ini_data.cpp" />
@@ -223,10 +224,16 @@
     <ClInclude Include="..\..\..\hpx\lcos\local_barrier.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\local_counting_semaphore.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\local_mutex.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\object_semaphore.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\promise.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\promise_full_empty_bit.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\queue.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\server\barrier.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\server\object_semaphore.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\server\queue.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\stubs\barrier.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\stubs\object_semaphore.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\stubs\queue.hpp" />
     <ClInclude Include="..\..\..\hpx\performance_counters\manage_counter.hpp" />
     <ClInclude Include="..\..\..\hpx\performance_counters\manage_counter_type.hpp" />
     <ClInclude Include="..\..\..\hpx\performance_counters\parcels\count_and_time_data_point.hpp" />
@@ -278,8 +285,16 @@
     <ClInclude Include="..\..\..\hpx\runtime\threads\policies\queue_helpers.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\threads\policies\thread_deque.hpp" />
     <ClInclude Include="..\..\..\hpx\traits.hpp" />
+    <ClInclude Include="..\..\..\hpx\traits\component_type_database.hpp" />
+    <ClInclude Include="..\..\..\hpx\traits\get_action_name.hpp" />
+    <ClInclude Include="..\..\..\hpx\traits\get_remote_result.hpp" />
+    <ClInclude Include="..\..\..\hpx\traits\handle_gid.hpp" />
+    <ClInclude Include="..\..\..\hpx\traits\promise_local_result.hpp" />
+    <ClInclude Include="..\..\..\hpx\traits\promise_remote_result.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\demangle_helper.hpp" />
     <ClInclude Include="..\..\..\hpx\util\detail\function_template.hpp" />
     <ClInclude Include="..\..\..\hpx\util\detail\get_table.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\detail\pp_strip_parens.hpp" />
     <ClInclude Include="..\..\..\hpx\util\detail\serialization_registration.hpp" />
     <ClInclude Include="..\..\..\hpx\util\detail\vtable.hpp" />
     <ClInclude Include="..\..\..\hpx\util\detail\vtable_ptr.hpp" />
