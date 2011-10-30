@@ -86,7 +86,7 @@ namespace server
 ///         Address of the symbol_namespace component on the bootstrap AGAS
 ///         locality.
 ///
-struct primary_namespace :
+struct HPX_EXPORT primary_namespace :
     components::fixed_component_base<
         HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB, // constant GID
         primary_namespace

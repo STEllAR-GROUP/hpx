@@ -10,7 +10,7 @@
 
 namespace hpx { namespace agas
 {
-
+///////////////////////////////////////////////////////////////////////////////
 bool register_name(
     std::string const& name
   , naming::id_type const& gid
@@ -55,6 +55,37 @@ bool register_name(
     return false;
 }
 
+lcos::promise<bool, response> register_name_async(
+    std::string const& name
+  , naming::id_type const& id
+    )
+{
+    // We need to modify the reference count.
+    naming::gid_type& mutable_gid = const_cast<naming::id_type&>(id).get_gid();
+    naming::gid_type new_gid;
+
+    // FIXME: combine incref with register_name, if needed
+    if (naming::get_credit_from_gid(mutable_gid) != 0)
+    {
+        new_gid = split_credits_for_gid(mutable_gid);
+
+        // Credit exhaustion - we need to get more.
+        if (0 == naming::get_credit_from_gid(new_gid))
+        {
+            BOOST_ASSERT(1 == naming::get_credit_from_gid(mutable_gid));
+            naming::get_agas_client().incref(new_gid, 2 * HPX_INITIAL_GLOBALCREDIT);
+
+            naming::add_credit_to_gid(new_gid, HPX_INITIAL_GLOBALCREDIT);
+            naming::add_credit_to_gid(mutable_gid, HPX_INITIAL_GLOBALCREDIT);
+        }
+    }
+    else
+        new_gid = mutable_gid;
+
+    return naming::resolver_client::register_name_async(name, new_gid);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 bool unregister_name(
     std::string const& name
   , error_code& ec
@@ -101,6 +132,14 @@ bool unregister_name(
     return false;
 }
 
+lcos::promise<naming::id_type, response> unregister_name_async(
+    std::string const& name
+    )
+{
+    return naming::resolver_client::unregister_name_async(name);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 bool resolve_name(
     std::string const& name
   , naming::id_type& gid

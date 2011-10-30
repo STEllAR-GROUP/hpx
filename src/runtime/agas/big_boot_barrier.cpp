@@ -724,6 +724,7 @@ void big_boot_barrier::wait()
 
 void big_boot_barrier::notify()
 {
+    // FIXME: adopt_lock does not initially lock the lock, is that intended?
     boost::mutex::scoped_lock lk(mtx, boost::adopt_lock);
     --connected;
     cond.notify_all();
