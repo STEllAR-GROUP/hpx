@@ -196,7 +196,7 @@ namespace hpx { namespace util {
             > vtable_ptr_type;
 
         template <typename Functor>
-        function_base(Functor f)
+        explicit function_base(BOOST_FWD_REF(Functor) f)
             : vptr(
                 detail::get_table<
                     typename boost::decay<Functor>::type
