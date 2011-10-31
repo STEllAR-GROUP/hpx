@@ -8,11 +8,10 @@
 #include <cmath>
 
 #include <hpx/hpx.hpp>
+#include <hpx/include/actions.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
 #include <iostream>
-#include <boost/phoenix.hpp>
-#include <boost/phoenix/stl/cmath.hpp>
 
 using std::cout;
 using std::flush;
@@ -25,55 +24,6 @@ using bright_future::update_residuum;
 typedef bright_future::grid<double> grid_type;
 typedef grid_type::size_type size_type;
 
-namespace bright_future
-{
-    template <typename T>
-    inline void init_u(grid<T> & u, unsigned n_y, T hx, unsigned x_start = 0)
-    {
-        using boost::phoenix::placeholders::arg1;
-        using boost::phoenix::placeholders::arg2;
-        using boost::phoenix::local_names::_a;
-        using boost::phoenix::local_names::_x;
-        using boost::phoenix::local_names::_y;
-        using boost::phoenix::sin;
-
-        u.init(
-            let(
-                _x = (arg1 + x_start) * hx  // actual x coordinate
-            )
-            [
-                if_else(
-                    arg2 == n_y - 1
-                  , sin(_x * 6.283) * sinh(6.283)
-                  , 0.0
-                )
-            ]
-        );
-    }
-
-    template <typename T>
-    inline void init_rhs(grid<T> & rhs, T hx, T hy, unsigned x_start = 0, unsigned y_start = 0)
-    {
-        using boost::phoenix::placeholders::arg1;
-        using boost::phoenix::placeholders::arg2;
-        using boost::phoenix::local_names::_a;
-        using boost::phoenix::local_names::_x;
-        using boost::phoenix::local_names::_y;
-        using boost::phoenix::sin;
-
-        rhs.init(
-            let(
-                _x = (arg1 + x_start) * hx  // actual x coordinate
-              , _y = (arg2 + y_start) * hy  // actual y coordinate
-            )
-            [
-                39.478 * sin(_x * 6.283) * sinh(_y * 6.283)
-            ]
-        );
-    }
-
-}
-
 void gs(
     /*
     bright_future::grid<double> & u
@@ -81,10 +31,10 @@ void gs(
   */
     size_type n_x
   , size_type n_y
-  , double hx
-  , double hy
-  , double k
-  , double relaxation
+  , double hx_
+  , double hy_
+  , double k_
+  , double relaxation_
   , unsigned max_iterations
   , unsigned iteration_block
   , unsigned block_size
@@ -94,82 +44,103 @@ void gs(
     grid_type rhs(n_x, n_y);
     grid_type u(n_x, n_y);
 
-    double div = (2.0/(hx*hx) + 2.0/(hy*hy) + (k*k));
-    double hx_sq = hx * hx;
-    double hy_sq = hy * hy;
+    double relaxation;
+    double k;
+    double hx;
+    double hy;
+    double div;// = (2.0/(hx*hx) + 2.0/(hy*hy) + (k*k));
+    double hx_sq;// = hx * hx;
+    double hy_sq;// = hy * hy;
+    size_type y = 0;
+    size_type x = 0;
 
     // set our initial values, setting the top boundary to be a dirichlet
     // boundary condition
-    bright_future::init_u(u, n_y, hx);
-    bright_future::init_rhs(rhs, hx, hy);
+    unsigned iter;
 
     high_resolution_timer t;
-
-    for(unsigned iter = 0; iter < max_iterations; ++iter)//iter += iteration_block)
     {
-        // split up iterations so we don't need to check the residual every iteration
-        //for(unsigned jter = 0; jter < iteration_block; ++jter)
+        hx = hx_;
+        hy = hy_;
+        k = k_;
+        relaxation = relaxation_;
+        div = (2.0/(hx*hx) + 2.0/(hy*hy) + (k*k));
+        hx_sq = hx * hx;
+        hy_sq = hy * hy;
+        y = 0;
+        x = 0;
+#pragma omp parallel for shared(u, rhs, n_x, n_y, hx, hy) private(x, y)  schedule(static, block_size)
+        for(y = 0; y < n_y; ++y)
         {
-            // update the "red" points
-            size_type y_block, x_block, y, x;
-#pragma omp parallel for private(x_block, y_block, x, y)
-            for(x_block = 1; x_block < n_x - 1; x_block += block_size)
+            for(x = (y%2) + 1; x < n_x; x += 2)
             {
-                for(y_block = 1; y_block < n_y - 1; y_block += block_size)
-                {
-                    for(y = y_block; y < std::min(y_block + block_size, n_y-1); ++y)
-                    {
-                        for(x = (y%2) + 1; x < std::min(x_block + block_size, n_x - 1); x += 2)
-                        {
-                            u(x, y) = update(u, rhs, x, y, hx_sq, hy_sq, div, relaxation);
-                        }
-                    }
-                }
-            }
-
-            // update the "black" points
-#pragma omp parallel for private(x_block, y_block, x, y)
-            for(x_block = 1; x_block < n_x - 1; x_block += block_size)
-            {
-                for(y_block = 1; y_block < n_y - 1; y_block += block_size)
-                {
-                    for(y = y_block; y < std::min(y_block + block_size, n_y-1); ++y)
-                    {
-                        for(x = ((y+1)%2) + 1; x < std::min(x_block + block_size, n_x - 1); x += 2)
-                        {
-                            u(x, y) = update(u, rhs, x, y, hx_sq, hy_sq, div, relaxation);
-                        }
-                    }
-                }
+                u(x, y) = y == (n_y - 1) ? sin((x * hx) * 6.283) * sinh(6.283) : 0.0;
+                rhs(x, y) = 39.478 * sin((x * hx) * 6.283) * sinh((y * hy) * 6.283);
             }
         }
-        /*
-        // check if we converged yet
-        grid_type residuum(u.x(), u.y());
-        size_type y, x;
+#pragma omp parallel for shared(u, rhs, n_x, n_y, hx, hy) private(x, y)  schedule(static, block_size)
+        for(y = 0; y < n_y; ++y)
+        {
+            for(x = ((y+1)%2) + 1; x < n_x; x += 2)
+            {
+                u(x, y) = y == (n_y - 1) ? sin((x * hx) * 6.283) * sinh(6.283) : 0.0;
+                rhs(x, y) = 39.478 * sin((x * hx) * 6.283) * sinh((y * hy) * 6.283);
+            }
+        }
+
+        t.restart();
+        for(iter = 0; iter < max_iterations; ++iter)//iter += iteration_block)
+        {
+            // split up iterations so we don't need to check the residual every iteration
+            //for(unsigned jter = 0; jter < iteration_block; ++jter)
+            {
+                // update the "red" points
+#pragma omp parallel for shared(u, rhs, n_x, n_y, hx_sq, hy_sq, div, relaxation) private(x, y)  schedule(static, block_size)
+                for(y = 1; y < n_y-1; ++y)
+                {
+                    for(x = (y%2) + 1; x < n_x - 1; x += 2)
+                    {
+                        u(x, y) = update(u, rhs, x, y, hx_sq, hy_sq, div, relaxation);
+                    }
+                }
+                // update the "black" points
+#pragma omp parallel for shared(u, rhs, n_x, n_y, hx_sq, hy_sq, div, relaxation) private(x, y)  schedule(static, block_size)
+                for(y = 1; y < n_y-1; ++y)
+                {
+                    for(x = ((y+1)%2) + 1; x < n_x - 1; x += 2)
+                    {
+                        u(x, y) = update(u, rhs, x, y, hx_sq, hy_sq, div, relaxation);
+                    }
+                }
+            }
+            /*
+            // check if we converged yet
+            grid_type residuum(u.x(), u.y());
+            size_type y, x;
 #pragma omp parallel for private(x, y)
-        for(y = 1; y < n_y-1; ++y)
-        {
-            for(x = 1; x < n_x-1; ++x)
+            for(y = 1; y < n_y-1; ++y)
             {
-                residuum(x, y) = update_residuum(u, rhs, x, y, hx_sq, hy_sq, k);
+                for(x = 1; x < n_x-1; ++x)
+                {
+                    residuum(x, y) = update_residuum(u, rhs, x, y, hx_sq, hy_sq, k);
+                }
             }
-        }
-        double r = 0.0;
+            double r = 0.0;
 #pragma omp parallel for reduction(+:r)
-        for(unsigned i = 0; i < residuum.size(); ++i)
-        {
-            r = r + residuum[i] * residuum[i];
-        }
+            for(unsigned i = 0; i < residuum.size(); ++i)
+            {
+                r = r + residuum[i] * residuum[i];
+            }
 
-        if(std::sqrt(r) <= 1e-10)
-        {
-            break;
+            if(std::sqrt(r) <= 1e-10)
+            {
+                break;
+            }
+            */
         }
-        */
     }
     double time_elapsed = t.elapsed();
-    cout << (n_x*n_y) << " " << time_elapsed << "\n" << flush;
+    cout << time_elapsed << "\n" << flush;
 
     if(!output.empty())
     {
