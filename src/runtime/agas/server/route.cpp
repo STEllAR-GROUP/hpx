@@ -11,7 +11,6 @@
 
 #include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
-//#include <hpx/runtime/agas/server/route.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 
 namespace hpx { namespace agas
@@ -26,16 +25,12 @@ bool primary_namespace::route(
   )
 {
     // protection of parcel's content?
-    // resolve id
-    //error_code ec2;
     bool resolved;
     naming::address addr;
     naming::gid_type id = p.get_destination();
-    //if(id)
-    //    std::cout << "Parcel received" << std::endl;
     naming::strip_credit_from_gid(id);
     mutex_type::scoped_lock l(mutex_);
-    // parcel action should set priority of thread.
+    
     gva_table_type::const_iterator it = gvas_.lower_bound(id)
                                   , begin = gvas_.begin()
                                   , end = gvas_.end();

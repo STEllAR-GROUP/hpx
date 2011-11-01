@@ -13,7 +13,6 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/include/performance_counters.hpp>
 
-//#include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 
 #include <boost/format.hpp>
@@ -456,25 +455,12 @@ bool addressing_service::route_parcel(
         hpx::applier::action_priority<action_type>();
     naming::address agas_addr;
     error_code ec;
-    // parcel to be sent to agas server
-    naming::gid_type agas_gid = naming::get_gid_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX);
-    
-    //parcelset::parcel p_temp ( agas_gid
-    //  , new action_type(priority, p));
-        
-    //applier::applier& appl = applier::get_applier();
-    //appl.get_agas_client().resolve(agas_gid, agas_addr, true, ec);
-    //p_temp.set_destination_addr(agas_addr);
-    //appl.get_parcel_handler().put_parcel(p_temp);
+    // parcel to be sent to agas server: direct send?
 
-    // Does not use bootstrap phase of primary namespace
-    //hpx::applier::get_applier()
     if (is_bootstrap())
         return bootstrap->primary_ns_server.route(p);
     else
         return hosted->primary_ns_.route(p);
-
-    //return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

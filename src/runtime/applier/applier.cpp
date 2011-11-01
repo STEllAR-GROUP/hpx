@@ -423,10 +423,6 @@ namespace hpx { namespace applier
         return true;
     }
 
-    /*bool applier::check_if_bootstrap()
-    {
-        return get_agas_client().is_bootstrap();
-    }*/
     bool applier::test_bootstrap()
     {
         return get_agas_client().is_bootstrap();
