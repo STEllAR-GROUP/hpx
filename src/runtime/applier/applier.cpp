@@ -304,6 +304,7 @@ namespace hpx { namespace applier
                     "applier::address_is_local",
                     hpx::util::osstream_get_string(strm));
             }
+            hpx::applier::get_applier().get_agas_client().resolve(id, addr, true, throws);
             return true;
         }
 
@@ -319,6 +320,40 @@ namespace hpx { namespace applier
             strm << "gid" << id.get_gid();
             HPX_THROW_EXCEPTION(invalid_status,
                 "applier::address_is_local",
+                hpx::util::osstream_get_string(strm));
+        }
+        return false;   // non-local
+    }
+
+    bool applier::address_is_local_c_cache(naming::id_type const& id, 
+        naming::address& addr) const
+    {
+        bool is_local = id.is_local_c_cache();
+        bool in_cache = id.get_local_address_c_cache(addr);
+        if(is_local) {     // check address if it is in cache
+            if (!in_cache) {
+                hpx::util::osstream strm;
+                strm << "gid" << id.get_gid();
+                HPX_THROW_EXCEPTION(invalid_status, 
+                    "applier::address_is_local_c_cache", 
+                    hpx::util::osstream_get_string(strm));
+            }
+            hpx::applier::get_applier().get_agas_client().resolve_cached(id.get_gid(), addr, throws);
+            return true;
+        }
+
+        if (!id.is_resolved() && is_local) {
+            hpx::util::osstream strm;
+            strm << "gid" << id.get_gid();
+            HPX_THROW_EXCEPTION(unknown_component_address, 
+                "applier::address_is_local_c_cache", hpx::util::osstream_get_string(strm));
+        }
+
+        if (!id.get_address_cached(addr) && in_cache) {
+            hpx::util::osstream strm;
+            strm << "gid" << id.get_gid();
+            HPX_THROW_EXCEPTION(invalid_status, 
+                "applier::address_is_local_c_cache", 
                 hpx::util::osstream_get_string(strm));
         }
         return false;   // non-local
@@ -350,6 +385,51 @@ namespace hpx { namespace applier
                 "applier::address_is_local", hpx::util::osstream_get_string(strm));
         }
         return addr.locality_ == parcel_handler_.here();
+    }
+
+    bool applier::address_is_local_c_cache(naming::gid_type const& gid, 
+        naming::address& addr) const
+    {
+        // test if the gid is of one of the non-movable objects
+        // this is certainly an optimization relying on the fact that the 
+        // lsb of the local objects is equal to their address
+        if (naming::strip_credit_from_gid(gid.get_msb()) == 
+                parcel_handler_.get_prefix().get_msb())
+        {
+            // a zero address references the local runtime support component
+            if (0 != gid.get_lsb())
+                addr.address_ = gid.get_lsb();
+            else 
+                addr.address_ = runtime_support_id_.get_lsb();
+            return true;
+        }
+
+        // Resolve the address of the gid
+        if (!parcel_handler_.get_resolver().resolve_cached(gid, addr))
+        {
+            hpx::util::osstream strm;
+            strm << "gid" << gid;
+            HPX_THROW_EXCEPTION(unknown_component_address, 
+                "applier::address_is_local", hpx::util::osstream_get_string(strm));
+        }
+        return addr.locality_ == parcel_handler_.here();
+    }
+
+    // parcel forwarding.
+    bool applier::route(parcelset::parcel const& p)
+    {
+        //hpx::applier::applier& appl = hpx::applier::get_applier();
+        get_agas_client().route_parcel(p);
+        return true;
+    }
+
+    /*bool applier::check_if_bootstrap()
+    {
+        return get_agas_client().is_bootstrap();
+    }*/
+    bool applier::test_bootstrap()
+    {
+        return get_agas_client().is_bootstrap();
     }
 
     void applier::init_tss()

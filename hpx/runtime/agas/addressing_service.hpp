@@ -1092,6 +1092,13 @@ public:
       , gva const& gva
       , error_code& ec = throws
         );
+
+    
+    bool route_parcel (
+        parcelset::parcel const& arg0
+        );
+    
+
 };
 
 }}

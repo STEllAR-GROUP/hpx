@@ -51,21 +51,21 @@ namespace hpx { namespace components { namespace stubs
         /// with the given \a gid
         static void init(naming::id_type gid)
         {
-            applier::apply<server::accumulator::init_action>(gid);
+            applier::apply_route<server::accumulator::init_action>(gid);
         }
 
         /// Add the given number to the server#accumulator instance
         /// with the given \a gid
         static void add (naming::id_type gid, unsigned long arg)
         {
-            applier::apply<server::accumulator::add_action>(gid, arg);
+            applier::apply_route<server::accumulator::add_action>(gid, arg);
         }
 
         /// Print the current value of the server#accumulator instance
         /// with the given \a gid
         static void print(naming::id_type gid)
         {
-            applier::apply<server::accumulator::print_action>(gid);
+            applier::apply_route<server::accumulator::print_action>(gid);
         }
     };
 

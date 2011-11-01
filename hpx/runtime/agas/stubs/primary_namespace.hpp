@@ -39,6 +39,25 @@ struct primary_namespace
     {
         return service_async<response>(gid, req).get(ec);
     }
+
+    static lcos::promise<bool> route_async(
+        naming::id_type const& gid
+      , parcelset::parcel const& p
+      )
+    {
+        typedef server_type::route_action action_type;
+        return lcos::eager_future<action_type, bool>(gid, p);
+    }
+
+    static bool route(
+        naming::id_type const& gid
+      , parcelset::parcel const& p
+      , error_code& ec = throws
+      )
+    {
+        return route_async(gid, p).get(ec);
+    }
+
 };
 
 }}}

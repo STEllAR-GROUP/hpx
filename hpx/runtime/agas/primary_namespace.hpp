@@ -37,6 +37,22 @@ struct primary_namespace :
     {
         return this->base_type::service(this->gid_, req, ec);
     }
+
+    lcos::promise<bool> route_async(
+        parcelset::parcel const& p
+        )
+    {
+        return this->base_type::route_async(this->gid_, p);
+    }
+
+    bool route(
+        parcelset::parcel const& p
+      , error_code& ec = throws
+      )
+    {
+        return this->base_type::route(this->gid_, p, ec);
+    }
+ 
 };
 
 }}

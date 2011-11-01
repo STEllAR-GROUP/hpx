@@ -129,6 +129,23 @@ namespace hpx { namespace naming
             return address_.locality_ == appl.here();
         }
 
+        // check just local cache_
+        bool id_type_impl::is_local_c_cache()
+        {
+            bool valid = false;
+            {
+                gid_type::mutex_type::scoped_lock l(this);
+                valid = address_ ? true : false;
+            }
+
+            if (!valid && !resolve_c()) 
+                return false;
+
+            applier::applier& appl = applier::get_applier();
+            gid_type::mutex_type::scoped_lock l(this);
+            return address_.locality_ == appl.here();
+        }
+        
         bool id_type_impl::resolve(naming::address& addr)
         {
             bool valid = false;
@@ -145,6 +162,22 @@ namespace hpx { namespace naming
             return true;
         }
 
+        bool id_type_impl::resolve_c(naming::address& addr)
+        {
+            bool valid = false;
+            {
+                gid_type::mutex_type::scoped_lock l(this);
+                valid = address_ ? true : false;
+            }
+
+            // if it already has been resolved, just return the address
+            if (!valid && !resolve_c()) 
+                return false;
+
+            addr = address_;
+            return true;
+        }
+
         bool id_type_impl::resolve()
         {
             // call only if not already resolved
@@ -153,6 +186,22 @@ namespace hpx { namespace naming
             error_code ec;
             address addr;
             if (appl.get_agas_client().resolve(*this, addr, true, ec) && !ec)
+            {
+                gid_type::mutex_type::scoped_lock l(this);
+                address_ = addr;
+                return true;
+            }
+            return false;
+        }
+
+        bool id_type_impl::resolve_c()
+        {
+            // call only if not already resolved
+            applier::applier& appl = applier::get_applier();
+
+            error_code ec;
+            address addr;
+            if (appl.get_agas_client().resolve_cached(*this, addr, ec) && !ec)
             {
                 gid_type::mutex_type::scoped_lock l(this);
                 address_ = addr;

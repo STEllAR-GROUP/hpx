@@ -331,11 +331,23 @@ namespace hpx { namespace naming
             bool is_local_cached();
             bool is_cached() const;
             bool is_local();
+            bool is_local_c_cache();
             bool resolve(naming::address& addr);
+            bool resolve_c();
+            bool resolve_c(naming::address& addr);
             bool is_resolved() const { return address_; }
             bool get_local_address(naming::address& addr)
             {
                 if (!is_local_cached() && !resolve())
+                    return false;
+                gid_type::mutex_type::scoped_lock l(this);
+                addr = address_;
+                return true;
+            }
+
+            bool get_local_address_c_cache(naming::address& addr)
+            {
+                if (!is_local_cached() && !resolve_c())
                     return false;
                 gid_type::mutex_type::scoped_lock l(this);
                 addr = address_;
@@ -535,9 +547,17 @@ namespace hpx { namespace naming
         {
             return gid_->is_local();
         }
+        bool is_local_c_cache() const
+        {
+            return gid_->is_local_c_cache();
+        }
         bool get_local_address(naming::address& addr) const
         {
             return gid_->get_local_address(addr);
+        }
+        bool get_local_address_c_cache(naming::address& addr) const
+        {
+            return gid_->get_local_address_c_cache(addr);
         }
         bool get_address_cached(naming::address& addr) const
         {

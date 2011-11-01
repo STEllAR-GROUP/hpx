@@ -158,9 +158,23 @@ namespace hpx { namespace applier
         /// Test whether the given address (gid) is local or remote
         bool address_is_local(naming::id_type const& id,
             naming::address& addr) const;
+        
+        //check cache
+        bool address_is_local_c_cache(naming::id_type const& id,
+            naming::address& addr) const;
 
         bool address_is_local(naming::gid_type const& gid,
             naming::address& addr) const;
+
+        //check cache
+        bool address_is_local_c_cache(naming::gid_type const& gid,
+            naming::address& addr) const;
+
+        //parcel forwarding
+        bool 
+        route (parcelset::parcel const& arg0);
+
+        bool test_bootstrap();
 
     public:
         // the TSS holds a pointer to the applier associated with a given
