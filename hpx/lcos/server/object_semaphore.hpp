@@ -177,17 +177,6 @@ struct object_semaphore
             thread_queue_.front().id_ = naming::invalid_id;
             thread_queue_.pop_front();
 
-            // forcefully abort thread, do not throw
-            error_code ec;
-            threads::set_thread_state(id, threads::pending,
-                threads::wait_abort, threads::thread_priority_normal, ec);
-            if (ec) {
-                LERR_(fatal) << "object_semaphore::abort_pending: "
-                                "could not abort thread"
-                    << get_thread_state_name(thrd->get_state())
-                    << "(" << id << "): " << thrd->get_description();
-            }
-
             LLCO_(info)
                 << "object_semaphore::abort_pending: pending thread " << id;
 
