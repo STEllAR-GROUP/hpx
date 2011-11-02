@@ -82,7 +82,11 @@ lcos::promise<bool, response> register_name_async(
     else
         new_gid = mutable_gid;
 
-    return naming::resolver_client::register_name_async(name, new_gid);
+    request req(symbol_ns_bind, name, new_gid);
+
+    naming::id_type const target = bootstrap_symbol_namespace_id();
+
+    return stubs::symbol_namespace::service_async<bool>(target, req);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -136,7 +140,11 @@ lcos::promise<naming::id_type, response> unregister_name_async(
     std::string const& name
     )
 {
-    return naming::resolver_client::unregister_name_async(name);
+    request req(symbol_ns_unbind, name);
+
+    naming::id_type const target = bootstrap_symbol_namespace_id();
+
+    return stubs::symbol_namespace::service_async<naming::id_type>(target, req);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -175,6 +183,17 @@ bool resolve_name(
         return true;
 
     return false;
+}
+
+lcos::promise<naming::id_type, response> resolve_name_async(
+    std::string const& name
+    )
+{
+    request req(symbol_ns_resolve, name);
+
+    naming::id_type const gid = bootstrap_symbol_namespace_id();
+
+    return stubs::symbol_namespace::service_async<naming::id_type>(gid, req);
 }
 
 }}
