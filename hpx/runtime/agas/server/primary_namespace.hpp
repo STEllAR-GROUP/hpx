@@ -136,7 +136,7 @@ struct HPX_EXPORT primary_namespace :
     bool route(
         parcelset::parcel const& p
       , error_code& ec
-      );
+        );
 
     response service(
         request const& req
@@ -199,6 +199,7 @@ struct HPX_EXPORT primary_namespace :
     { // {{{ action enum
         // Actual actions
         namespace_service          = BOOST_BINARY_U(1000000)
+      , namespace_route            = BOOST_BINARY_U(1111111)
 
         // Pseudo-actions
       , namespace_allocate         = BOOST_BINARY_U(1000001)
@@ -210,7 +211,6 @@ struct HPX_EXPORT primary_namespace :
       , namespace_increment        = BOOST_BINARY_U(1000111)
       , namespace_decrement        = BOOST_BINARY_U(1001000)
       , namespace_localities       = BOOST_BINARY_U(1001001)
-      , namespace_route            = BOOST_BINARY_U(1001011)
     }; // }}}
 
     typedef hpx::actions::result_action1<
@@ -225,8 +225,8 @@ struct HPX_EXPORT primary_namespace :
     typedef hpx::actions::result_action1<
         primary_namespace
       , /* return type */ bool
-      , /* enum value */ namespace_route
-      , /* arguments */ parcelset::parcel const&
+      , /* enum value */  namespace_route
+      , /* arguments */   parcelset::parcel const&
       , &primary_namespace::route
       , threads::thread_priority_critical
     > route_action;
