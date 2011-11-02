@@ -136,7 +136,7 @@ namespace hpx { namespace components { namespace amr
             val.push_back(f.get());
 
         // lock all user defined data elements, will be unlocked at function exit
-        scoped_values_lock<lcos::mutex> l(val);
+        scoped_values_lock<lcos::local_mutex> l(val);
 
         val[3]->max_index_ = val[1]->max_index_;
         val[3]->index_ = val[1]->index_;
