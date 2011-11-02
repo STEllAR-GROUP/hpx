@@ -8,18 +8,14 @@ if(NOT HPX_FINDPACKAGE_LOADED)
   include(HPX_FindPackage)
 endif()
 
-if(NOT GSL_ROOT AND NOT $ENV{HOME_GSL} STREQUAL "")
-  set(GSL_ROOT $ENV{HOME_GSL})
-endif()
-
 hpx_find_package(GSL
   LIBRARIES gsl libgsl
-  LIBRARY_PATHS lib64 lib Lib
+  LIBRARY_PATHS lib64 lib
   HEADERS gsl_test.h
   HEADER_PATHS include include/gsl)
 
-if(GSL_FOUND AND NOT HPX_SET_LORENE_MACRO)
-  set(HPX_SET_GSL_MACRO ON CACHE BOOL "Added the Lorene detection macro" FORCE)
+if(GSL_FOUND AND NOT HPX_SET_GRL_MACRO)
+  set(HPX_SET_GSL_MACRO ON CACHE BOOL "Added the GSL detection macro" FORCE)
   add_definitions(-DGSL_FOUND)
 endif()
 
