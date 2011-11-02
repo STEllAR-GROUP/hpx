@@ -48,7 +48,7 @@ struct primary_namespace :
     bool route(
         parcelset::parcel const& p
       , error_code& ec = throws
-      )
+        )
     {
         return this->base_type::route(this->gid_, p, ec);
     }
