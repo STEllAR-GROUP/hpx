@@ -14,24 +14,44 @@ namespace hpx { namespace applier
 {
 
 template <typename Arg0>
-inline Arg0 const& trigger(
+inline void trigger(
     naming::id_type k
-  , Arg0 arg0
-) {
+  , Arg0 const& arg0
+    )
+{
     return actions::continuation(k).trigger<Arg0>(arg0);
+}
+
+template <typename Arg0>
+inline void trigger(
+    naming::id_type k
+  , BOOST_RV_REF(Arg0) arg0
+    )
+{
+    return actions::continuation(k).trigger<Arg0>(boost::move(arg0));
 }
 
 inline void trigger(
     naming::id_type const& k
-) {
+    )
+{
     actions::continuation(k).trigger();
 }
 
 inline void trigger_error(
     naming::id_type const& k
   , boost::exception_ptr const& e
-) {
+    )
+{
     actions::continuation(k).trigger_error(e);
+}
+
+inline void trigger_error(
+    naming::id_type const& k
+  , BOOST_RV_REF(boost::exception_ptr) e
+    )
+{
+    actions::continuation(k).trigger_error(boost::move(e));
 }
 
 }}
