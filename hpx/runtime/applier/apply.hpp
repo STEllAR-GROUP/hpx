@@ -9,15 +9,12 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
-//#include <hpx/runtime/naming/name.hpp>
 
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/apply_helper.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-//#include <hpx/runtime/agas/addressing_service.hpp>
-//#include <hpx/runtime/agas/server/primary_namespace.hpp>
 
 // FIXME: Error codes?
 
