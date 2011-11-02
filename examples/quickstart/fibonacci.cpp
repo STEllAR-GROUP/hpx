@@ -86,7 +86,6 @@ int hpx_main(variables_map& vm)
 
         char const* fmt = "fibonacci(%1%) == %2%\nelapsed time: %3% [s]\n";
         std::cout << (boost::format(fmt) % n % r % t.elapsed());
-
     }
 
     finalize();
