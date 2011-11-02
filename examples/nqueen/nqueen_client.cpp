@@ -17,7 +17,7 @@ int hpx_main(boost::program_options::variables_map&)
 {
     const std::size_t default_size = 8;
 
-    std::size_t soln_count_total;
+    std::size_t soln_count_total = 0;
 
     hpx::naming::gid_type prefix = hpx::applier::get_applier().get_prefix();
 
