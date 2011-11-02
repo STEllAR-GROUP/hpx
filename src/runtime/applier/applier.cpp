@@ -332,24 +332,26 @@ namespace hpx { namespace applier
         bool in_cache = id.get_local_address_c_cache(addr);
         if(is_local) {     // check address if it is in cache
             if (!in_cache) {
-                hpx::util::osstream strm;
-                strm << "gid" << id.get_gid();
-                HPX_THROW_EXCEPTION(invalid_status, 
-                    "applier::address_is_local_c_cache", 
-                    hpx::util::osstream_get_string(strm));
+                //object is local, but cannot be found in cache
+                //or should local object be always be in cache?
+                //TODO: validate this argument
+                return false;
             }
-            hpx::applier::get_applier().get_agas_client().resolve_cached(id.get_gid(), addr, throws);
+            hpx::applier::get_applier().get_agas_client().resolve_cached(
+                    id.get_gid(), addr, throws);
             return true;
         }
 
         if (!id.is_resolved() && is_local) {
-            hpx::util::osstream strm;
-            strm << "gid" << id.get_gid();
-            HPX_THROW_EXCEPTION(unknown_component_address, 
-                "applier::address_is_local_c_cache", hpx::util::osstream_get_string(strm));
+            //object is local, but it is not resolved
+            //object is not local, and id is not resolved
+            //in both cases need to send parcel to agas to resolve address.
+            //TODO: remove this test
         }
 
         if (!id.get_address_cached(addr) && in_cache) {
+            //object is in cache, but cannot retrieve address from cache
+            //should throw 
             hpx::util::osstream strm;
             strm << "gid" << id.get_gid();
             HPX_THROW_EXCEPTION(invalid_status, 
