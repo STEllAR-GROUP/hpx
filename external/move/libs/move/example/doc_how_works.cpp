@@ -28,9 +28,9 @@ class sink_tester
 {
    public: //conversions provided by BOOST_COPYABLE_AND_MOVABLE
    operator ::boost::rv<sink_tester>&()
-      {  return *reinterpret_cast< ::boost::rv<sink_tester>* >(this);  }
+      {  return *static_cast< ::boost::rv<sink_tester>* >(this);  }
    operator const ::boost::rv<sink_tester>&() const
-      {  return *reinterpret_cast<const ::boost::rv<sink_tester>* >(this);  }
+      {  return *static_cast<const ::boost::rv<sink_tester>* >(this);  }
 };
 
 //Functions returning different r/lvalue types

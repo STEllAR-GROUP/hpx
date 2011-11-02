@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// (C) Copyright David Abrahams, Vicente Botet, Ion Gaztanaga 2009.
+// (C) Copyright David Abrahams, Vicente Botet, Ion Gaztanaga 2009-2011.
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -10,6 +10,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <boost/move/move.hpp>
+#include <boost/utility/enable_if.hpp>
 #include "../example/movable.hpp"
 #include "../example/copymovable.hpp"
 #include <cstdio>
@@ -23,24 +24,36 @@ class non_movable
 
 template<class MaybeRvalue>
 void catch_test(BOOST_RV_REF(MaybeRvalue) x
-               ,typename ::boost::enable_if< ::boost::is_movable<MaybeRvalue> >::type* = 0)
+               #ifdef BOOST_NO_RVALUE_REFERENCES
+               ,typename ::boost::enable_if< ::boost::has_move_emulation_enabled<MaybeRvalue> >::type* = 0
+               #endif   //BOOST_NO_RVALUE_REFERENCES
+               )
 {  (void)x;}
 
 template<class MaybeRvalue>
 void catch_test(BOOST_COPY_ASSIGN_REF(MaybeRvalue) x
-               ,typename ::boost::enable_if< ::boost::is_movable<MaybeRvalue> >::type* = 0)
+               #ifdef BOOST_NO_RVALUE_REFERENCES
+               ,typename ::boost::enable_if< ::boost::has_move_emulation_enabled<MaybeRvalue> >::type* = 0
+               #endif   //BOOST_NO_RVALUE_REFERENCES
+               )
 
 {  (void)x;}
 
 template<class MaybeRvalue>
 void catch_test(MaybeRvalue &x
-               ,typename ::boost::enable_if< ::boost::is_movable<MaybeRvalue> >::type* = 0)
+               #ifdef BOOST_NO_RVALUE_REFERENCES
+               ,typename ::boost::enable_if< ::boost::has_move_emulation_enabled<MaybeRvalue> >::type* = 0
+               #endif   //BOOST_NO_RVALUE_REFERENCES
+               )
 {  (void)x;}
 
+               #ifdef BOOST_NO_RVALUE_REFERENCES
 template<class MaybeRvalue>
 void catch_test(const MaybeRvalue& x
-               ,typename ::boost::disable_if< ::boost::is_movable<MaybeRvalue> >::type* = 0)
+               ,typename ::boost::disable_if< ::boost::has_move_emulation_enabled<MaybeRvalue> >::type* = 0
+               )
 {  (void)x;}
+               #endif   //BOOST_NO_RVALUE_REFERENCES
 
 movable create_movable()
 {  return movable(); }
@@ -57,7 +70,7 @@ void catch_test()
    movable m;
    const movable constm;
    catch_test<movable>(boost::move(m));
-   #ifdef BOOST_MOVE_MACRO_MOVE_ASSIGN_FROM_NON_CONST_RVALUE
+   #ifdef BOOST_CATCH_CONST_RLVALUE
    catch_test<movable>(create_movable());
    #endif
    catch_test<movable>(m);

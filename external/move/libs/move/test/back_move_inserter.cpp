@@ -9,7 +9,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 #include <boost/move/move.hpp>
-#include <boost/container/vector.hpp>
+#include <boost/container/deque.hpp>
 #include <boost/container/list.hpp>
 #include <boost/container/stable_vector.hpp>
 #include "../example/movable.hpp"

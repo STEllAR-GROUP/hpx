@@ -11,7 +11,7 @@
 #ifndef BOOST_MOVE_TEST_COPYMOVABLE_HPP
 #define BOOST_MOVE_TEST_COPYMOVABLE_HPP
 
-//[movable_definition
+//[movable_definition 
 //header file "copy_movable.hpp"
 #include <boost/move/move.hpp>
 

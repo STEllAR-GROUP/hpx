@@ -14,7 +14,7 @@
 #include "movable.hpp"
 #include <cassert>
 
-using namespace boost::container;
+using namespace ::boost::container;
 
 typedef list<movable> list_t;
 typedef list_t::iterator l_iterator;

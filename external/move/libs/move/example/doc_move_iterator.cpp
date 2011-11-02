@@ -16,7 +16,7 @@
 
 int main()
 {
-   using namespace boost::container;
+   using namespace ::boost::container;
 
    //Create a vector with 10 default constructed objects
    vector<movable> v(10);
