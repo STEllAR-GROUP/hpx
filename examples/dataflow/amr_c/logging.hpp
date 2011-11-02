@@ -7,7 +7,7 @@
 #if !defined(HPX_COMPONENTS_AMR_LOGGING_NOV_10_2008_0719PM)
 #define HPX_COMPONENTS_AMR_LOGGING_NOV_10_2008_0719PM
 
-#include <hpx/lcos/mutex.hpp>
+#include <hpx/lcos/local_mutex.hpp>
 #include "stencil_data.hpp"
 #include "../parameter.hpp"
 #include <hpx/lcos/barrier.hpp>
@@ -51,7 +51,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         > logentry_action;
 
     private:
-        typedef lcos::mutex mutex_type;
+        typedef lcos::local_mutex mutex_type;
         static mutex_type mtx_;
         std::size_t count;
     };

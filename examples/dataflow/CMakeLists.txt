@@ -11,6 +11,8 @@ set(subdirs
     amr_c
     amr_c_test)
 
+include_directories(${RNPL_INCLUDE_DIR})
+
 add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=7)
 
 foreach(subdir ${subdirs})
