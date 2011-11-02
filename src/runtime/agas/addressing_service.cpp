@@ -25,6 +25,7 @@ addressing_service::addressing_service(
     )
   : service_type(ini_.get_agas_service_mode())
   , runtime_type(runtime_type_)
+  , range_caching_(ini_.get_agas_range_caching_mode())
   , here_(get_runtime().here())
   , rts_lva_(get_runtime().get_runtime_support_lva())
   , state_(starting)
@@ -636,7 +637,15 @@ bool addressing_service::bind_range(
         if (ec || (success != s && repeated_request != s))
             return false;
 
-        update_cache(lower_id, g, ec);
+        if (range_caching_)
+            // Put the range into the cache.
+            update_cache(lower_id, g, ec);
+        else
+        {
+            // Only put the first GID in the range into the cache.
+            gva const first_g = g.resolve(lower_id, lower_id);
+            update_cache(lower_id, first_g, ec);
+        }
 
         if (ec)
             return false;
@@ -799,8 +808,12 @@ bool addressing_service::resolve(
         addr.type_ = g.type;
         addr.address_ = g.lva();
 
-        // Put the gva into the cache.
-        update_cache(rep.get_base_gid(), rep.get_gva(), ec);
+        if (range_caching_)
+            // Put the gva range into the cache.
+            update_cache(rep.get_base_gid(), rep.get_gva(), ec);
+        else
+            // Put the fully resolve gva into the cache.
+            update_cache(id, g, ec);
 
         if (ec)
             return false;
