@@ -13,8 +13,6 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/include/performance_counters.hpp>
 
-#include <hpx/runtime/agas/server/primary_namespace.hpp>
-
 #include <boost/format.hpp>
 
 namespace hpx { namespace agas
@@ -449,14 +447,6 @@ bool addressing_service::route_parcel(
     parcelset::parcel const& p
     )
 {
-    typedef hpx::agas::server::primary_namespace::route_action action_type;
-
-    hpx::threads::thread_priority priority = 
-        hpx::applier::action_priority<action_type>();
-    naming::address agas_addr;
-    error_code ec;
-    // parcel to be sent to agas server: direct send?
-
     if (is_bootstrap())
         return bootstrap->primary_ns_server.route(p);
     else
@@ -803,7 +793,7 @@ bool addressing_service::resolve(
 
         // Resolve the gva to the real resolved address (which is just a gva
         // with as fully resolved LVA and an offset of zero).
-        const gva g = rep.get_gva().resolve(id, rep.get_base_gid());
+        gva const g = rep.get_gva().resolve(id, rep.get_base_gid());
 
         addr.locality_ = g.endpoint;
         addr.type_ = g.type;
@@ -1050,18 +1040,6 @@ bool addressing_service::register_name(
     }
 } // }}}
 
-lcos::promise<bool, response> addressing_service::register_name_async(
-    std::string const& name
-  , naming::gid_type const& id
-    )
-{
-    request req(symbol_ns_bind, name, id);
-
-    naming::id_type const gid = bootstrap_symbol_namespace_id();
-
-    return stubs::symbol_namespace::service_async<bool>(gid, req);
-}
-
 bool addressing_service::unregister_name(
     std::string const& name
   , naming::gid_type& id
@@ -1098,18 +1076,6 @@ bool addressing_service::unregister_name(
         return false;
     }
 } // }}}
-
-lcos::promise<naming::id_type, response>
-addressing_service::unregister_name_async(
-    std::string const& name
-    )
-{
-    request req(symbol_ns_unbind, name);
-
-    naming::id_type const gid = bootstrap_symbol_namespace_id();
-
-    return stubs::symbol_namespace::service_async<naming::id_type>(gid, req);
-}
 
 bool addressing_service::resolve_name(
     std::string const& name
@@ -1148,17 +1114,6 @@ bool addressing_service::resolve_name(
         return false;
     }
 } // }}}
-
-lcos::promise<naming::id_type, response> resolve_name_async(
-    std::string const& name
-    )
-{
-    request req(symbol_ns_resolve, name);
-
-    naming::id_type const gid = bootstrap_symbol_namespace_id();
-
-    return stubs::symbol_namespace::service_async<naming::id_type>(gid, req);
-}
 
 /// Invoke the supplied hpx::function for every registered global name
 bool addressing_service::iterateids(
