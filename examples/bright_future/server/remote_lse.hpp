@@ -217,7 +217,7 @@ namespace bright_future {
                 apply_func_type f
               , range_type x_range
               , range_type y_range
-              , std::vector<hpx::lcos::promise<void> > dependencies
+              , std::vector<hpx::lcos::promise<void> *> dependencies
             );
 
             typedef
@@ -227,7 +227,7 @@ namespace bright_future {
                   , apply_func_type
                   , range_type
                   , range_type
-                  , std::vector<hpx::lcos::promise<void> >
+                  , std::vector<hpx::lcos::promise<void> *>
                   , &remote_lse<T>::apply_region
                 >
                 apply_region_action;

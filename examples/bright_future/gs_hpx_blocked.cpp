@@ -206,9 +206,10 @@ void gs(
         // is used for the initialization of the grid.
         iteration_dependencies_type
             iteration_dependencies(
-                2
+                max_iterations+1
               , promise_grid_type(n_x_block, n_y_block)
             );
+        promise_grid_type init_rhs_promises(n_x_block, n_y_block);
 
         // set our initial values, setting the top boundary to be a dirichlet
         // boundary condition
@@ -219,7 +220,6 @@ void gs(
             
             // we opened another scope to just have this vector temporarily, we
             // won't need it after the initializiation
-            promise_grid_type init_rhs_promises(n_x_block, n_y_block);
             for(size_type y = 0, y_block = 0; y < n_y; y += block_size, ++y_block)
             {
                 for(size_type x = 0, x_block = 0; x < n_x; x += block_size, ++x_block)
@@ -256,10 +256,10 @@ void gs(
             }
 
             // wait for the rhs initialization to finish.
-            BOOST_FOREACH(promise_type & promise, init_rhs_promises)
-            {
-                promise.get();
-            }
+            //BOOST_FOREACH(promise_type & promise, init_rhs_promises)
+            //{
+            //    promise.get();
+            //}
         }
 
         typedef
@@ -276,8 +276,8 @@ void gs(
         for(unsigned iter = 0; iter < max_iterations; ++iter)
         {
             {
-                promise_grid_type & prev = iteration_dependencies[iter % 2];
-                promise_grid_type & current = iteration_dependencies[(iter + 1) % 2];
+                promise_grid_type & prev = iteration_dependencies[iter];
+                promise_grid_type & current = iteration_dependencies[(iter + 1)];
 
                 // in every iteration we want to compute this:
                 for(size_type y_block = 0, y = 0; y_block < n_y; y_block += block_size, ++y)
@@ -297,12 +297,14 @@ void gs(
                               , y + 1 == n_y_block ? n_y-1 : y_block + block_size
                               );
 
-                        std::vector<promise_type> deps;
+                        std::vector<promise_type*> deps;
+                        if(iter==0)
+                            deps.push_back(&init_rhs_promises(x,y));
                         // these are our dependencies to update this specific
                         // block
                         
                         // we need to be sure to wait for the previous iteration.
-                        deps.push_back(prev(x,y));
+                        deps.push_back(&prev(x,y));
 
                         // keep in mind, our loop goes from top-left to bottom
                         // right.
@@ -310,22 +312,22 @@ void gs(
                         if(x + 1 < n_x_block) // are we on the boundary?
                             // add the right block of the previous iteration
                             // to our list of dependencies
-                            deps.push_back(prev(x+1,y));
+                            deps.push_back(&prev(x+1,y));
 
                         if(y + 1 < n_y_block) // are we on the boundary?
                             // add the upper block of the previous iteration
                             // to our list of dependencies
-                            deps.push_back(prev(x,y+1));
+                            deps.push_back(&prev(x,y+1));
 
                         if(x > 0) // are we on the boundary?
                             // add the upper block of the current iteration
                             // to our list of dependencies
-                            deps.push_back(current(x-1,y));
+                            deps.push_back(&current(x-1,y));
 
                         if(y > 0) // are we on the boundary?
                             // add the upper block of the current iteration
                             // to our list of dependencies
-                            deps.push_back(current(x,y-1));
+                            deps.push_back(&current(x,y-1));
 
                         current(x, y) =
                             // call the update action
@@ -348,13 +350,13 @@ void gs(
         }
 
         // wait for the last iteration to finish.
-        BOOST_FOREACH(promise_type & promise, iteration_dependencies[(max_iterations%2)])
+        BOOST_FOREACH(promise_type & promise, iteration_dependencies[max_iterations])
         {
             promise.get();
         }
 
         double time_elapsed = t.elapsed();
-        cout << (n_x*n_y) << " " << time_elapsed << "\n" << flush;
+        cout << time_elapsed << "\n" << flush;
 
         if(!output.empty())
         {
