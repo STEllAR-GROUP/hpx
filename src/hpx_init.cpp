@@ -1268,5 +1268,12 @@ namespace hpx
         p->call_shutdown_functions(false);
         p->shutdown(shutdown_timeout);
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void terminate()
+    {
+        components::stubs::runtime_support::terminate_all(
+            naming::get_id_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX));
+    }
 }
 
