@@ -418,14 +418,7 @@ namespace hpx { namespace applier
     // parcel forwarding.
     bool applier::route(parcelset::parcel const& p)
     {
-        //hpx::applier::applier& appl = hpx::applier::get_applier();
-        get_agas_client().route_parcel(p);
-        return true;
-    }
-
-    bool applier::test_bootstrap()
-    {
-        return get_agas_client().is_bootstrap();
+        return get_agas_client().route_parcel(p);
     }
 
     void applier::init_tss()

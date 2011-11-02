@@ -171,11 +171,7 @@ namespace hpx { namespace applier
             naming::address& addr) const;
 
         //parcel forwarding
-        bool 
-        route (parcelset::parcel const& arg0);
-
-        bool test_bootstrap();
-
+        bool route(parcelset::parcel const& arg0);
     public:
         // the TSS holds a pointer to the applier associated with a given
         // OS thread
