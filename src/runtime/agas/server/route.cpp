@@ -7,6 +7,7 @@
 
 #include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
+#include <hpx/runtime.hpp>
 
 namespace hpx { namespace agas { namespace server
 {
