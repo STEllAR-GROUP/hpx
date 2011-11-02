@@ -145,6 +145,7 @@ struct gva
         // the returned GVA, an exact copy will be returned (see the last two
         // lines of lva() above.
         g.offset = 0;
+        g.count = 1;
         return g;
     }
 
