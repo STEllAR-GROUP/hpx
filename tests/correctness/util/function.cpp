@@ -75,9 +75,12 @@ struct small_object
         std::cout << "small_object: dtor(" << x_ << ")\n";
     }
 
-    void operator()()
+    int operator()(
+        int const& z_
+        )
     {
-        std::cout << "small_object: call(" << x_ << ")\n";
+        std::cout << "small_object: call(" << x_ << ", " << z_ << ")\n";
+        return x_ + z_;
     } 
 };
 
@@ -145,9 +148,14 @@ struct big_object
         std::cout << "big_object: dtor(" << x_ << ", " << y_ << ")\n";
     }
 
-    void operator()()
+    int operator()(
+        int const& z_
+      , int const& w_
+        )
     {
-        std::cout << "big_object: call(" << x_ << ", " << y_ << ")\n";
+        std::cout << "big_object: call(" << x_ << ", " << y_ 
+                  << z_ << ", " << w_ << ")\n";
+        return x_ + y_ + z_ + w_;
     } 
 };
 
@@ -170,19 +178,19 @@ int hpx_main(variables_map& vm)
             else
                 std::cout << "object is large\n";
 
-            small_object f(17);
+            small_object const f(17);
     
-            function<void()> f0(f);
+            function<int(int const&)> f0(f);
     
-            function<void()> f1(f0);
+            function<int(int const&)> f1(f0);
     
-            function<void()> f2;
+            function<int(int const&)> f2;
     
             f2 = f0;
     
-            f0();
-            f1();
-            f2();
+            f0(7);
+            f1(9);
+            f2(11);
         }
 
         {
@@ -191,19 +199,19 @@ int hpx_main(variables_map& vm)
             else
                 std::cout << "object is large\n";
 
-            big_object f(5, 12);
+            big_object const f(5, 12);
     
-            function<void()> f0(f);
+            function<int(int const&, int const&)> f0(f);
     
-            function<void()> f1(f0);
+            function<int(int const&, int const&)> f1(f0);
     
-            function<void()> f2;
+            function<int(int const&, int const&)> f2;
     
             f2 = f0;
     
-            f0();
-            f1();
-            f2();
+            f0(0, 1);
+            f1(1, 0);
+            f2(1, 1);
         }
     }
     // non serializable version
@@ -214,19 +222,19 @@ int hpx_main(variables_map& vm)
             else
                 std::cout << "object is large\n";
 
-            small_object f(17);
+            small_object const f(17);
     
-            function<void(), void, void> f0(f);
+            function<int(int const&), void, void> f0(f);
     
-            function<void(), void, void> f1(f0);
+            function<int(int const&), void, void> f1(f0);
     
-            function<void(), void, void> f2;
+            function<int(int const&), void, void> f2;
     
             f2 = f0;
     
-            f0();
-            f1();
-            f2();
+            f0(2);
+            f1(4);
+            f2(6);
         }
 
         {
@@ -235,19 +243,19 @@ int hpx_main(variables_map& vm)
             else
                 std::cout << "object is large\n";
 
-            big_object f(5, 12);
+            big_object const f(5, 12);
     
-            function<void(), void, void> f0(f);
+            function<int(int const&, int const&), void, void> f0(f);
     
-            function<void(), void, void> f1(f0);
+            function<int(int const&, int const&), void, void> f1(f0);
     
-            function<void(), void, void> f2;
+            function<int(int const&, int const&), void, void> f2;
     
             f2 = f0;
     
-            f0();
-            f1();
-            f2();
+            f0(3, 4);
+            f1(5, 6);
+            f2(7, 8);
         }
     }
 
