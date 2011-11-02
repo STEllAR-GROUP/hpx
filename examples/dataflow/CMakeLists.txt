@@ -11,7 +11,9 @@ set(subdirs
     amr_c
     amr_c_test)
 
-include_directories(${RNPL_INCLUDE_DIR})
+if(RNPL_FOUND)
+  include_directories(${RNPL_INCLUDE_DIR})
+endif()
 
 add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=7)
 
