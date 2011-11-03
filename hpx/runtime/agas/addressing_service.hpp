@@ -187,6 +187,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     const service_mode service_type;
     const runtime_mode runtime_type;
 
+    const bool caching_;
     const bool range_caching_;
 
     naming::locality here_;
