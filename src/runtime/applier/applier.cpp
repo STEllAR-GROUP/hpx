@@ -304,7 +304,6 @@ namespace hpx { namespace applier
                     "applier::address_is_local",
                     hpx::util::osstream_get_string(strm));
             }
-            hpx::applier::get_applier().get_agas_client().resolve(id, addr, true, throws);
             return true;
         }
 
