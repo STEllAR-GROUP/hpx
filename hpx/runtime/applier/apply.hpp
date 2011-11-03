@@ -115,22 +115,21 @@ namespace hpx { namespace applier
         return apply_r_p<Action>(addr, gid, priority);
     }
 
-    ///\routed version
+    /// routed version
     template <typename Action>
     inline bool
     apply_p_route (naming::id_type const& gid, threads::thread_priority priority)
     {
         // check if the address is in the local cache
         // send a parcel to agas if address is not found in cache
-        //parcelset::parcel p(gid.get_gid(), new Action(priority));
         naming::address addr;
         if (hpx::applier::get_applier().address_is_local_c_cache(gid, addr))
             return apply_l_p<Action>(addr, priority);   // apply locally
 
-        //\  ^ since we already know the address is local and its value
-        //\ we can apply the function locally
+        // since we already know the address is local and its value
+        // we can apply the function locally
 
-        //\parameter addr is redundant here
+        // parameter addr is redundant here
         return apply_r_p_route<Action>(addr, gid, priority);
     }
 
@@ -531,14 +530,14 @@ namespace hpx { namespace applier
     {
         actions::continuation_type cont(c);
 
-        //create a parcel and forward it to agas server
+        // create a parcel and forward it to agas server
         parcelset::parcel p (gid.get_gid(), 
             new Action(priority, boost::forward<Arg0>(arg0)), cont);  
         if (components::component_invalid == addr.type_)
             addr.type_ = components::get_component_type<typename Action::component_type>();
         p.set_destination_addr(addr);
 
-        //send the parcel to the applier to send to agas server
+        // send the parcel to the applier to send to agas server
         return hpx::applier::get_applier().route(p);
     }
 
@@ -670,7 +669,7 @@ namespace hpx { namespace applier
     apply_c_route (naming::address& addr, naming::id_type const& contgid,
         naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
     {
-        //addr might be redundant here
+        // addr might be redundant here
         return apply_r_route<Action>(addr, new actions::continuation(contgid), gid, 
             boost::forward<Arg0>(arg0));
     }
