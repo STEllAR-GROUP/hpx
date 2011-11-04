@@ -45,7 +45,6 @@ namespace hpx { namespace geometry { namespace server
         void init(std::size_t objectid,std::string particlefile)
         {
             idx_ = objectid;
-
             std::string line;
             std::string val1,val2,val3,val4;
             std::ifstream myfile;
@@ -59,9 +58,9 @@ namespace hpx { namespace geometry { namespace server
                   std::getline(isstream,val3,' ');
                   std::getline(isstream,val4,' ');
                   std::size_t node = atoi(val1.c_str());   
-                  double posx = atoi(val2.c_str());   
-                  double posy = atoi(val3.c_str());   
-                  double posz = atoi(val4.c_str());   
+                  double posx = atof(val2.c_str());   
+                  double posy = atof(val3.c_str());   
+                  double posz = atof(val4.c_str());   
                   if ( node == objectid ) {
                     posx_ = posx;
                     posy_ = posy;

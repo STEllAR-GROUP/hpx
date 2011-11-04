@@ -79,7 +79,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         // ---------------------------------------------------------
 
         std::vector<hpx::geometry::point> accu_points;
-        std::vector<hpx::geometry::point> accu_particles;
+        std::vector<hpx::geometry::particle> accu_particles;
 
         // Initialize the data -- both mesh and particles
         init(locality_results(blocks_points), accu_points);
