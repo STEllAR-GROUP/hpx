@@ -179,13 +179,9 @@ response symbol_namespace::resolve(
             ec = make_success_code();
 
         return response(symbol_ns_resolve
-                       , naming::invalid_gid
-                       , no_success);
+                      , naming::invalid_gid
+                      , no_success);
     }
-
-    LAGAS_(info) << (boost::format(
-        "symbol_namespace::resolve, key(%1%), gid(%2%)")
-        % key % it->second);
 
     if (&ec != &throws)
         ec = make_success_code();
@@ -195,7 +191,12 @@ response symbol_namespace::resolve(
     // Is this entry reference counted?
     if (naming::get_credit_from_gid(it->second) != 0)
     {
-        gid = split_credits_for_gid(it->second);
+        gid = naming::split_credits_for_gid(it->second);
+
+        LAGAS_(debug) << (boost::format(
+            "symbol_namespace::resolve, split credits for entry, "
+            "key(%1%), entry(%2%), gid(%3%)")
+            % key % it->second % gid);
 
         // Credit exhaustion - we need to get more.
         if (0 == naming::get_credit_from_gid(gid))
@@ -205,11 +206,20 @@ response symbol_namespace::resolve(
 
             naming::add_credit_to_gid(gid, HPX_INITIAL_GLOBALCREDIT);
             naming::add_credit_to_gid(it->second, HPX_INITIAL_GLOBALCREDIT);
+
+            LAGAS_(debug) << (boost::format(
+                "symbol_namespace::resolve, incremented entry credits, "
+                "key(%1%), entry(%2%), gid(%3%)")
+                % key % it->second % gid);
         }
     }
 
     else
         gid = it->second;
+
+    LAGAS_(info) << (boost::format(
+        "symbol_namespace::resolve, key(%1%), gid(%2%)")
+        % key % gid);
 
     return response(symbol_ns_resolve, gid);
 } // }}}
