@@ -23,7 +23,8 @@ addressing_service::addressing_service(
   , util::runtime_configuration const& ini_
   , runtime_mode runtime_type_
     )
-  : service_type(ini_.get_agas_service_mode())
+  : console_cache_(0)
+  , service_type(ini_.get_agas_service_mode())
   , runtime_type(runtime_type_)
   , caching_(ini_.get_agas_caching_mode())
   , range_caching_(caching_ ? ini_.get_agas_range_caching_mode() : false)
@@ -272,6 +273,8 @@ bool addressing_service::get_console_prefix(
             return true;
         }
 
+        mutex_type::scoped_lock lock(console_cache_mtx_);
+
         if (console_cache_)
         {
             prefix = naming::get_gid_from_prefix(console_cache_);
@@ -292,7 +295,13 @@ bool addressing_service::get_console_prefix(
             (rep.get_status() == success))
         {
             prefix = rep.get_gid();
-            console_cache_.store(naming::get_prefix_from_gid(prefix));
+
+            console_cache_ = naming::get_prefix_from_gid(prefix);
+
+            LAS_(debug) <<
+                ( boost::format("caching console locality, prefix(%1%)")
+                % console_cache_);
+
             return true;
         }
 

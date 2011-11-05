@@ -12,7 +12,6 @@
 
 #include <vector>
 
-#include <boost/atomic.hpp>
 #include <boost/lockfree/fifo.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/cache/entries/lfu_entry.hpp>
@@ -56,8 +55,6 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         iterate_names_function_type;
 
     typedef hpx::lcos::local_mutex mutex_type;
-
-    typedef boost::atomic<boost::uint32_t> console_cache_type;
     // }}}
 
     // {{{ gva cache
@@ -182,7 +179,8 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     mutable mutex_type gva_cache_mtx_;
     gva_cache_type gva_cache_;
 
-    console_cache_type console_cache_;
+    mutable mutex_type console_cache_mtx_;
+    boost::uint32_t console_cache_;
 
     const service_mode service_type;
     const runtime_mode runtime_type;
