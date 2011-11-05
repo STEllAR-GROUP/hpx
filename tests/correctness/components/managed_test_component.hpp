@@ -1,4 +1,9 @@
 
+//  Copyright (c) 2011 Thomas Heller
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
 #ifndef q35025ejfwdfho48yt53thgworvgnsoncq83rhew98fnhlacnmamcpeqfmpcdoivonwqnf
 #define q35025ejfwdfho48yt53thgworvgnsoncq83rhew98fnhlacnmamcpeqfmpcdoivonwqnf
 
@@ -29,6 +34,12 @@ namespace server
         {
             cout << "server::test_component::test_component()\n" << flush;
         }
+
+        void finalize()
+        {
+            cout << "server::test_component::finalize()\n" << flush;
+        }
+
         ~test_component()
         {
             cout << "~server::test_component::test_component()\n" << flush;
@@ -69,6 +80,12 @@ namespace server
         {
             cout << "server::simple_test_component::simple_test_component()\n" << flush;
         }
+
+        void finalize()
+        {
+            cout << "server::simple_test_component::finalize()\n" << flush;
+        }
+
         ~simple_test_component()
         {
             cout << "~server::simple_test_component::simple_test_component()\n" << flush;
