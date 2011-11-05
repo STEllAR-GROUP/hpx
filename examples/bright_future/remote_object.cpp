@@ -111,7 +111,8 @@ int hpx_main(variables_map &)
         {
             wait(o <= output());
             cctor_counter = 0;
-            cout << (o <= plus(9)).get() << "\n" << flush;
+            hpx::util::function<int(foo const &)> f = plus(9);
+            cout << (o <= f).get() << "\n" << flush;
             cout << cctor_counter << "\n" << flush;
         }
     }

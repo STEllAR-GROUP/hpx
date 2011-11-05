@@ -21,10 +21,31 @@ namespace hpx { namespace components
         template <typename T, typename F>
         struct invoke_apply_fun
         {
+
+            typedef typename boost::result_of<F(T &)>::type result_type;
+
             invoke_apply_fun() {}
             invoke_apply_fun(F const & f) : f(f) {}
 
-            typedef typename boost::result_of<F(T &)>::type result_type;
+            invoke_apply_fun(invoke_apply_fun const & other)
+                : f(other.f)
+            {}
+
+            invoke_apply_fun(BOOST_RV_REF(invoke_apply_fun) other)
+                : f(boost::move(other.f))
+            {}
+
+            invoke_apply_fun & operator=(BOOST_COPY_ASSIGN_REF(invoke_apply_fun) other)
+            {
+                f = other.f;
+                return *this;
+            }
+            
+            invoke_apply_fun & operator=(BOOST_RV_REF(invoke_apply_fun) other)
+            {
+                f = boost::move(other.f);
+                return *this;
+            }
 
             result_type operator()(void ** p) const
             {
@@ -38,6 +59,9 @@ namespace hpx { namespace components
             }
 
             hpx::util::function<result_type(T &)> f;
+
+            private:
+                BOOST_COPYABLE_AND_MOVABLE(invoke_apply_fun);
         };
     }
 

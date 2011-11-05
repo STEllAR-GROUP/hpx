@@ -23,6 +23,7 @@ namespace hpx { namespace lcos
         lco_set_result = 1,
         lco_set_error = 2,
         lco_get_value = 3,
+        lco_set_target = 2,
     };
 
     /// \class base_lco base_lco.hpp hpx/lcos/base_lco.hpp
@@ -38,6 +39,16 @@ namespace hpx { namespace lcos
         {
             // just rethrow the exception
             boost::rethrow_exception(e);
+        }
+        
+        // noop by default
+        virtual void connect(naming::id_type const &)
+        {
+        }
+        
+        // noop by default
+        virtual void disconnect(naming::id_type const &)
+        {
         }
 
     public:
@@ -85,6 +96,28 @@ namespace hpx { namespace lcos
             set_error(e);
         }
 
+        /// The \a function connect_nonvirt is called whenever a
+        /// \a connect_action is applied on a instance of a LCO. This function
+        /// just forwards to the virtual function \a connect, which is
+        /// overloaded by the derived concrete LCO.
+        ///
+        /// \param id [in] target id
+        void connect_nonvirt(naming::id_type const & id)
+        {
+            connect(id);
+        }
+
+        /// The \a function disconnect_nonvirt is called whenever a
+        /// \a disconnect_action is applied on a instance of a LCO. This function
+        /// just forwards to the virtual function \a disconnect, which is
+        /// overloaded by the derived concrete LCO.
+        ///
+        /// \param id [in] target id
+        void dsiconnectconnect_nonvirt(naming::id_type const & id)
+        {
+            disconnect(id);
+        }
+
         /// Each of the exposed functions needs to be encapsulated into an action
         /// type, allowing to generate all required boilerplate code for threads,
         /// serialization, etc.
@@ -106,6 +139,16 @@ namespace hpx { namespace lcos
             base_lco, lco_set_error, boost::exception_ptr const&,
             &base_lco::set_error_nonvirt
         > set_error_action;
+        
+        typedef hpx::actions::direct_action1<
+            base_lco, lco_set_target, naming::id_type const&,
+            &base_lco::connect
+        > connect_action;
+        
+        typedef hpx::actions::direct_action1<
+            base_lco, lco_set_target, naming::id_type const&,
+            &base_lco::disconnect
+        > disconnect_action;
     };
 
     /// \class base_lco_with_value base_lco.hpp hpx/lcos/base_lco.hpp
@@ -127,7 +170,7 @@ namespace hpx { namespace lcos
 
         virtual void set_event()
         {
-            return set_result(RemoteResult());
+            set_result(RemoteResult());
         }
 
         virtual void set_result (RemoteResult const& result) = 0;

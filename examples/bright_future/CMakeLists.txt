@@ -12,6 +12,7 @@ set(bright_future_programs
         gs_hpx_grid_ro
         remote_functions
         remote_object
+        dataflow_test
    )
 
 
@@ -23,12 +24,21 @@ add_hpx_component(
     DEPENDENCIES iostreams_component distributing_factory_component hpx_serialization ${BOOST_serialization_LIBRARY}
 )
 
+add_hpx_component(
+    bright_future_dataflow
+    MODULE bright_future
+    SOURCES dataflow/dataflow_component.cpp
+    HEADERS dataflow/dataflow.hpp
+    DEPENDENCIES iostreams_component
+)
+
 set(gs_single_sources gs.cpp)
 set(gs_hpx_sources gs.cpp)
 set(gs_hpx_blocked_sources gs.cpp)
 set(gs_hpx_grid_ro_sources gs.cpp)
 
 set(remote_functions_FLAGS DEPENDENCIES iostreams_component)
+set(dataflow_test_FLAGS DEPENDENCIES iostreams_component bright_future_dataflow_component)
 set(remote_object_FLAGS DEPENDENCIES remote_object_component iostreams_component)
 set(vector_root_finder_FLAGS DEPENDENCIES iostreams_component)
 set(gs_single_FLAGS DEPENDENCIES iostreams_component)
