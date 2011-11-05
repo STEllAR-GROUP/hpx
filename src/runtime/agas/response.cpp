@@ -13,7 +13,6 @@
 #include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/runtime/agas/response.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
-#include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
@@ -47,4 +46,13 @@ HPX_REGISTER_ACTION_EX(
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     base_lco_id_type_response_type,
     component_base_lco_with_value);
+
+namespace hpx { namespace actions
+{
+    template HPX_EXPORT void
+    continuation::trigger(agas::response const&);
+
+    template HPX_EXPORT void
+    continuation::trigger(BOOST_RV_REF(agas::response));
+}}
 
