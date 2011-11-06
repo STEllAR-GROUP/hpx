@@ -6,17 +6,17 @@
 #if !defined(HPX_RUNTIME_ACTIONS_CONTINUATION_JUN_13_2008_1031AM)
 #define HPX_RUNTIME_ACTIONS_CONTINUATION_JUN_13_2008_1031AM
 
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/exception.hpp>
+#include <hpx/util/logging.hpp>
+#include <hpx/runtime/naming/name.hpp>
+
 #include <vector>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/serialization.hpp>
 #include <boost/move/move.hpp>
-
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/exception.hpp>
-#include <hpx/util/logging.hpp>
-#include <hpx/runtime/naming/name.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -58,9 +58,9 @@ namespace actions
             typedef typename
                 lcos::template base_lco_with_value<Arg0>::set_result_action
             action_type;
-    
+
             LLCO_(info) << "continuation::trigger(" << gid_ << ")";
-    
+
             applier::apply<action_type>(gid_, boost::forward<Arg0>(arg0));
         }
 
