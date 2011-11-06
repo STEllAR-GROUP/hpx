@@ -25,6 +25,9 @@
 
 #endif
 
+///////////////////////////////////////////////////////////////////////////////
+//  Preprocessor vertical repetition code
+///////////////////////////////////////////////////////////////////////////////
 #else // !#if !BOOST_PP_IS_ITERATING
 
 #define N BOOST_PP_ITERATION()
@@ -85,10 +88,10 @@ namespace hpx { namespace lcos { namespace server
     };
 }}}
 
-// HPX_SERIALIZATION_REGISTER_TEMPLATE(
-//     (template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename A)>)
-//   , (hpx::lcos::server::init_action<Action, BOOST_PP_ENUM_PARAMS(N, A)>)
-// )
+HPX_SERIALIZATION_REGISTER_TEMPLATE(
+    (template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename A)>)
+  , (hpx::lcos::server::init_action<Action, BOOST_PP_ENUM_PARAMS(N, A)>)
+)
 
 #undef N
 
