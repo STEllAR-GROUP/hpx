@@ -136,6 +136,7 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)\primary_namespace1.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)\primary_namespace1.obj</ObjectFileName>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\server\route.cpp" />
     <ClCompile Include="..\..\..\src\runtime\agas\server\symbol_namespace.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)\symbol_namespace1.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)\symbol_namespace1.obj</ObjectFileName>
@@ -265,6 +266,7 @@
     <ClInclude Include="..\..\..\hpx\runtime\agas\stubs\symbol_namespace.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\agas\symbol_namespace.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\applier\bind_naming_wrappers.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\applier\trigger.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\component_factory_one.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\component_registry.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\components\component_registry_base.hpp" />

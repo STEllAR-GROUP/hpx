@@ -386,6 +386,9 @@
     <ClCompile Include="..\..\..\src\util\full_empty_entry.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\server\route.cpp">
+      <Filter>Source Files\Runtime\AGAS\Server</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\hpx\config.hpp">
@@ -1086,6 +1089,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\util\demangle_helper.hpp">
       <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\applier\trigger.hpp">
+      <Filter>Header Files\Runtime\Applier</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
