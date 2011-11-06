@@ -28,7 +28,7 @@ namespace hpx { namespace actions
 {
     // parcel continuations are simply lists of global ids of LCO's to call
     // set_event on
-    class HPX_EXPORT continuation
+    class HPX_API_EXPORT continuation
     {
     public:
         continuation()

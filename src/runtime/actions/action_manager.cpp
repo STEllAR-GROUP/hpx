@@ -15,6 +15,7 @@
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
+#include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/util/stringstream.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

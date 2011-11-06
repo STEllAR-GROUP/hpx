@@ -11,6 +11,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/serialize_sequence.hpp>
 #include <hpx/runtime/components/console_logging.hpp>
+#include <hpx/runtime/actions/continuation_impl.hpp>
 
 #include <boost/fusion/include/at_c.hpp>
 

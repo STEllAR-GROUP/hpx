@@ -96,7 +96,7 @@ namespace hpx { namespace actions
     continuation::trigger(hpx::naming::gid_type const&);
 
     template HPX_EXPORT void
-    continuation::trigger(BOOST_RV_REF(hpx::naming::gid_type));
+    continuation::trigger(BOOST_FWD_REF(hpx::naming::gid_type));
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

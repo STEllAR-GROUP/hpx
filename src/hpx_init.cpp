@@ -52,6 +52,7 @@ namespace hpx { namespace detail
     void list_counter(std::string const& name, naming::gid_type const& gid);
     void list_counter_info(std::string const& name, naming::gid_type const& gid);
     void list_symbolic_name(std::string const& name, naming::gid_type const& gid);
+    void list_component_type(std::string const& name, components::component_type);
 }}
 
 typedef hpx::actions::plain_action1<
@@ -76,6 +77,12 @@ typedef hpx::actions::plain_action2<
     hpx::detail::list_symbolic_name
 > list_symbolic_name_action;
 HPX_REGISTER_PLAIN_ACTION_EX2(list_symbolic_name_action, list_symbolic_name_action, true);
+
+typedef hpx::actions::plain_action2<
+    std::string const&, hpx::components::component_type,
+    hpx::detail::list_component_type
+> list_component_type_action;
+HPX_REGISTER_PLAIN_ACTION_EX2(list_component_type_action, list_component_type_action, true);
 
 namespace hpx { namespace detail
 {
@@ -133,29 +140,8 @@ namespace hpx { namespace detail
         }
     }
 
-    // iterate all registered performance counters and invoke printing their
-    // names
-    template <typename Action>
-    int list_counters(boost::program_options::variables_map& vm,
-        hpx_main_func f)
-    {
-        {
-            std::cout << "registered performance counters" << std::endl;
-            typedef void iter_func(std::string const&, naming::gid_type const&);
-
-            hpx::actions::function<iter_func> cb(new Action);
-            naming::get_agas_client().iterateids(cb);
-        }
-
-        if (0 != f)
-            return f(vm);
-
-        // we assume that we need to exit execution if no hpx_main is given
-        finalize();
-        return 0;
-    }
-
-    void list_symbolic_name(std::string const& name, naming::gid_type const& gid)
+    void list_symbolic_name(std::string const& name,
+        naming::gid_type const& gid)
     {
         util::osstream strm;
 
@@ -177,11 +163,52 @@ namespace hpx { namespace detail
         hpx_main_func f, std::string const& text)
     {
         {
-            std::cout << text << std::endl;
+            if (!text.empty())
+                std::cout << text << std::endl;
+
             typedef void iter_func(std::string const&, naming::gid_type const&);
 
             hpx::actions::function<iter_func> cb(new Action);
             naming::get_agas_client().iterateids(cb);
+        }
+
+        if (0 != f)
+            return f(vm);
+
+        // we assume that we need to exit execution if no hpx_main is given
+        finalize();
+        return 0;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void list_component_type(std::string const& name,
+        components::component_type ctype)
+    {
+        char const* fmt = "%1%, %|40t|%2%";
+
+        std::string const s = boost::str(boost::format(fmt)
+            % name % components::get_component_type_name(ctype));
+
+        typedef lcos::eager_future<console_print_action> future_type;
+
+        naming::gid_type console;
+        naming::get_agas_client().get_console_prefix(console);
+        future_type(console, s).get();
+    }
+
+    template <typename Action>
+    int list_component_types(boost::program_options::variables_map& vm,
+        hpx_main_func f, std::string const& text)
+    {
+        {
+            if (!text.empty())
+                std::cout << text << std::endl;
+
+            typedef void iter_func(std::string const&,
+                components::component_type);
+
+            hpx::actions::function<iter_func> cb(new Action);
+            naming::get_agas_client().iterate_types(cb);
         }
 
         if (0 != f)
@@ -492,7 +519,9 @@ namespace hpx
                 options_description debugging_options(
                     "HPX debugging options");
                 debugging_options.add_options()
-                    ("list-symbolic-names", "list all registered symbolic names"
+                    ("list-symbolic-names", "list all registered symbolic "
+                     "names after startup")
+                    ("list-component-types", "list all dynamic component types "
                      "after startup")
                     ("dump-config-initial", "print the initial runtime configuration")
                     ("dump-config", "print the final runtime configuration")
@@ -594,20 +623,27 @@ namespace hpx
             std::size_t num_localities, int& result)
         {
             // sanity checking
-            int list_count = vm.count("list-counters") +
-                vm.count("list-counter-infos") + vm.count("list-symbolic-names");
-            int print_count = vm.count("print-counter") +
+            std::size_t const list_count = vm.count("list-counters") +
+                vm.count("list-counter-infos") +
+                vm.count("list-symbolic-names") +
+                vm.count("list-component-types");
+            std::size_t const print_count = vm.count("print-counter") +
                 vm.count("print-counter-interval");
 
             if (list_count && print_count) {
-                throw std::logic_error("The performance counter related "
-                    "--list-* options cannot be used in conjunction with any "
-                    " of the --print-* options.");
+                throw std::logic_error("The --list-* options cannot be used "
+                    "in conjunction with any of the --print-* options.");
+            }
+
+            if (list_count > 1) {
+                throw std::logic_error("Only one --list-* option may be "
+                    "specified");
             }
 
             if (vm.count("list-counters")) {
-                // Print all available performance counter names and then
-                // call hpx::finalize() and return 0.
+                // Print the names of all registered performance counters and
+                // then call f (if f is NULL, hpx::finalize() is called instead
+                // and 0 is returned). 
                 result = rt.run(
                     boost::bind(&list_symbolic_names<list_counter_action>,
                         vm, f, "registered performance counters"),
@@ -615,8 +651,9 @@ namespace hpx
                 return true;
             }
             else if (vm.count("list-counter-infos")) {
-                // Print all available performance counter infos and then
-                // call hpx::finalize() and return 0.
+                // Print info about all registered performance counters and
+                // then call f (if f is NULL, hpx::finalize() is called instead
+                // and 0 is returned). 
                 result = rt.run(
                     boost::bind(&list_symbolic_names<list_counter_info_action>,
                         vm, f, "registered performance counters"),
@@ -624,11 +661,20 @@ namespace hpx
                 return true;
             }
             else if (vm.count("list-symbolic-names")) {
-                // Print all registered symbolic names and then call
-                // hpx::finalize() and return 0.
+                // Print all registered symbolic names and then call f (if f is
+                // NULL, hpx::finalize() is called instead and 0 is returned). 
                 result = rt.run(
                     boost::bind(&list_symbolic_names<list_symbolic_name_action>,
                         vm, f, "registered symbolic names"),
+                    num_threads, num_localities);
+                return true;
+            }
+            else if (vm.count("list-component-types")) {
+                // Print all registered component types and then call f (if f is
+                // NULL, hpx::finalize() is called instead and 0 is returned). 
+                result = rt.run(
+                    boost::bind(&list_component_types<list_component_type_action>,
+                        vm, f, "registered dynamic component types"),
                     num_threads, num_localities);
                 return true;
             }

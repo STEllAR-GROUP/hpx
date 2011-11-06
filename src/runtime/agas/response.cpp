@@ -53,6 +53,6 @@ namespace hpx { namespace actions
     continuation::trigger(agas::response const&);
 
     template HPX_EXPORT void
-    continuation::trigger(BOOST_RV_REF(agas::response));
+    continuation::trigger(BOOST_FWD_REF(agas::response));
 }}
 

@@ -8,6 +8,7 @@
 #include <hpx/version.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
+#include <hpx/runtime/actions/continuation_impl.hpp>
 
 namespace hpx { namespace performance_counters
 {

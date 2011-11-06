@@ -8,6 +8,7 @@
 #include <hpx/version.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/performance_counters/manage_counter.hpp>
+#include <hpx/runtime/actions/continuation_impl.hpp>
 
 #include <boost/make_shared.hpp>
 

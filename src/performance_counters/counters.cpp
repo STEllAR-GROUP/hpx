@@ -53,13 +53,13 @@ namespace hpx { namespace actions
     continuation::trigger(hpx::performance_counters::counter_info const&);
 
     template HPX_EXPORT void
-    continuation::trigger(BOOST_RV_REF(hpx::performance_counters::counter_info));
+    continuation::trigger(BOOST_FWD_REF(hpx::performance_counters::counter_info));
 
     template HPX_EXPORT void
     continuation::trigger(hpx::performance_counters::counter_value const&);
 
     template HPX_EXPORT void
-    continuation::trigger(BOOST_RV_REF(hpx::performance_counters::counter_value));
+    continuation::trigger(BOOST_FWD_REF(hpx::performance_counters::counter_value));
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

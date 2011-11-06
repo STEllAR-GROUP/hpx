@@ -12,6 +12,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/util/stringstream.hpp>
 #if defined(HPX_HAVE_STACKTRACES)
   #include <boost/backtrace.hpp>
