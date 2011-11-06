@@ -15,20 +15,11 @@ namespace hpx { namespace applier
 
 template <typename Arg0>
 inline void trigger(
-    naming::id_type k
-  , Arg0 const& arg0
-    )
-{
-    return actions::continuation(k).trigger<Arg0>(arg0);
-}
-
-template <typename Arg0>
-inline void trigger(
-    naming::id_type k
+    naming::id_type const& k
   , BOOST_FWD_REF(Arg0) arg0
     )
 {
-    return actions::continuation(k).trigger<Arg0>(boost::forward<Arg0>(arg0));
+    actions::continuation(k).trigger<Arg0>(boost::forward<Arg0>(arg0));
 }
 
 inline void trigger(
