@@ -58,6 +58,11 @@ namespace hpx { namespace lcos {
             stub_type::connect(this->get_gid(), target);
         }
 
+        promise<void> connect_async(naming::id_type const & target) const
+        {
+            return stub_type::connect_async(this->get_gid(), target);
+        }
+
     private:
 
         friend class boost::serialization::access;

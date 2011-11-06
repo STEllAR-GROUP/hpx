@@ -303,7 +303,12 @@ namespace hpx { namespace traits
             >::type const & value
         )
         {
-            boost::fusion::at_c<Slot>(args) = value;
+            boost::fusion::at<
+                typename boost::mpl::at<
+                    slots_to_args_map
+                  , boost::mpl::int_<Slot>
+                >::type
+            >(args) = value;
             maybe_apply<Slot>();
         }
 
@@ -316,6 +321,7 @@ namespace hpx { namespace traits
         template <int Slot>
         void maybe_apply()
         {
+            delete arg_ids[Slot]
             typename hpx::util::spinlock::scoped_lock l(mtx);
             args_set |= (1<<Slot);
 
