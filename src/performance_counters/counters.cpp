@@ -47,22 +47,6 @@ HPX_DEFINE_GET_COMPONENT_TYPE(
     hpx::performance_counters::server::base_performance_counter);
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace actions
-{
-    template HPX_EXPORT void
-    continuation::trigger(hpx::performance_counters::counter_info const&);
-
-    template HPX_EXPORT void
-    continuation::trigger(BOOST_FWD_REF(hpx::performance_counters::counter_info));
-
-    template HPX_EXPORT void
-    continuation::trigger(hpx::performance_counters::counter_value const&);
-
-    template HPX_EXPORT void
-    continuation::trigger(BOOST_FWD_REF(hpx::performance_counters::counter_value));
-}}
-
-///////////////////////////////////////////////////////////////////////////////
 // HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
 //     hpx::performance_counters::server::base_performance_counter);
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
