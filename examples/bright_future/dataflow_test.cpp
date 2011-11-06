@@ -116,14 +116,10 @@ int hpx_main(variables_map & vm)
 {
     {
         boost::uint64_t n = vm["n"].as<boost::uint64_t>();
-        dataflow<g_action> a =
-            dataflow<g_action>(find_here());
 
-        dataflow<g_action> b =
-            dataflow<g_action>(find_here());
-
-        dataflow<f_action> c =
-            dataflow<f_action>(find_here(), a, b);
+        dataflow<g_action> a(find_here());
+        dataflow<g_action> b(find_here());
+        dataflow<f_action> c(find_here(), a, b);
 
         // blocks until the result is delivered! (constructs a promise and sets
         // this as the target of the dataflow)
@@ -133,7 +129,7 @@ int hpx_main(variables_map & vm)
         boost::uint64_t r = fib(n).get();
         double time = t.elapsed();
         cout << "fib(" << n << ") = " << r << " calculated in " << time << " seconds\n" << flush;
-        
+
         cout << dataflow<h_action>(find_here(), a, 4).get() << "\n" << flush;
         cout << dataflow<h_action>(find_here(), 5, b).get() << "\n" << flush;
         cout
@@ -178,7 +174,7 @@ int main(int argc, char ** argv)
 {
     options_description
         cmdline("usage: " HPX_APPLICATION_STRING " [options]");
-    
+
     cmdline.add_options()
         ( "n" , value<boost::uint64_t>()->default_value(10),
             "n value for the Fibonacci function")

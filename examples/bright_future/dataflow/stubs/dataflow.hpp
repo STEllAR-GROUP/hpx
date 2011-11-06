@@ -21,7 +21,7 @@ namespace hpx { namespace lcos {
             >
         {
             typedef server::dataflow server_type;
-            
+
             template <typename Action>
             static promise<void>
             init_async(
@@ -30,12 +30,12 @@ namespace hpx { namespace lcos {
             )
             {
                 typedef
-                    typename server::dataflow::init_action<Action>::type
+                    typename server::init_action<Action>
                     action_type;
 
                 return eager_future<action_type>(gid, target);
             }
-            
+
             template <typename Action>
             static void init(
                 naming::id_type const & gid
@@ -55,10 +55,10 @@ namespace hpx { namespace lcos {
             )                                                                   \
             {                                                                   \
                 typedef                                                         \
-                    typename server::dataflow::init_action<                     \
+                    typename server::init_action<                               \
                         Action                                                  \
                       , BOOST_PP_ENUM_PARAMS(N, A)                              \
-                    >::type                                                     \
+                    >                                                           \
                     action_type;                                                \
                                                                                 \
                 return                                                          \
@@ -82,7 +82,7 @@ namespace hpx { namespace lcos {
                   , BOOST_PP_ENUM_PARAMS(N, a)                                  \
                 ).get();                                                        \
             }                                                                   \
-    /**/    
+    /**/
         BOOST_PP_REPEAT_FROM_TO(
             1
           , HPX_ACTION_ARGUMENT_LIMIT

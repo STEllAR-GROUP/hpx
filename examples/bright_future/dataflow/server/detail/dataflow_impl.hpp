@@ -171,7 +171,7 @@ namespace hpx { namespace traits
             , action_id(id)
         {
         }
-        
+
         void init(BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
         {
             LLCO_(info)
@@ -226,7 +226,7 @@ namespace hpx { namespace traits
         }
 
         typedef typename Action::result_type remote_result;
-        
+
         void set_result(remote_result const & r)
         {
             BOOST_ASSERT(!result_set);
@@ -288,7 +288,7 @@ namespace hpx { namespace traits
             boost::fusion::at_c<Slot>(args) = value;
             maybe_apply<Slot>();
         }
-        
+
         template <int Slot>
         void set_arg(hpx::util::unused_type)
         {
@@ -322,7 +322,7 @@ namespace hpx { namespace traits
         }
 #endif
 
-        
+
         void set_event()
         {
             if(boost::is_void<Result>::value)
@@ -334,7 +334,7 @@ namespace hpx { namespace traits
                 BOOST_ASSERT(false);
             }
         }
-        
+
         result_type get_value()
         {
             BOOST_ASSERT(false);
@@ -378,5 +378,7 @@ namespace hpx { namespace traits
         boost::array<component_wrapper_base *, N> arg_ids;
 #endif
     };
+
+#undef N
 
 #endif
