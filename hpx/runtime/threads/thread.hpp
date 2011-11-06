@@ -726,7 +726,7 @@ namespace hpx { namespace threads
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components
+namespace hpx { namespace components { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     // specialization of heap factory for threads::thread, this is a dummy
@@ -749,7 +749,7 @@ namespace hpx { namespace components
             return naming::invalid_gid;
         }
     };
-}}
+}}}
 
 #include <hpx/config/warnings_suffix.hpp>
 

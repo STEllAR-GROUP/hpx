@@ -81,51 +81,51 @@ namespace hpx { namespace components
     {
         // for backwards compatibility only
         using components::managed_component_base;
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Component, typename Derived>
+        struct heap_factory
+        {
+            // the memory for the wrappers is managed by a one_size_heap_list
+            typedef detail::wrapper_heap_list<
+                detail::fixed_wrapper_heap<Derived> > heap_type;
+
+            typedef detail::fixed_wrapper_heap<Derived> block_type;
+
+            struct wrapper_heap_tag {};
+
+            static heap_type& get_heap()
+            {
+                // ensure thread-safe initialization
+                util::static_<heap_type, wrapper_heap_tag, HPX_RUNTIME_INSTANCE_LIMIT>
+                    heap(components::get_component_type<Component>());
+                return heap.get(get_runtime_instance_number());
+            }
+
+            static block_type* alloc_heap()
+            {
+                return get_heap().alloc_heap();
+            }
+
+            static void add_heap(block_type* p)
+            {
+                return get_heap().add_heap(p);
+            }
+
+            static Derived* alloc(std::size_t count = 1)
+            {
+                return get_heap().alloc(count);
+            }
+            static void free(void* p, std::size_t count = 1)
+            {
+                get_heap().free(p, count);
+            }
+            static naming::gid_type get_gid(void* p)
+            {
+                return get_heap().get_gid(p);
+            }
+        };
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Derived>
-    struct heap_factory
-    {
-        // the memory for the wrappers is managed by a one_size_heap_list
-        typedef detail::wrapper_heap_list<
-            detail::fixed_wrapper_heap<Derived> > heap_type;
-
-        typedef detail::fixed_wrapper_heap<Derived> block_type;
-
-        struct wrapper_heap_tag {};
-
-        static heap_type& get_heap()
-        {
-            // ensure thread-safe initialization
-            util::static_<heap_type, wrapper_heap_tag, HPX_RUNTIME_INSTANCE_LIMIT>
-                heap(components::get_component_type<Component>());
-            return heap.get(get_runtime_instance_number());
-        }
-
-        static block_type* alloc_heap()
-        {
-            return get_heap().alloc_heap();
-        }
-
-        static void add_heap(block_type* p)
-        {
-            return get_heap().add_heap(p);
-        }
-
-        static Derived* alloc(std::size_t count = 1)
-        {
-            return get_heap().alloc(count);
-        }
-        static void free(void* p, std::size_t count = 1)
-        {
-            get_heap().free(p, count);
-        }
-        static naming::gid_type get_gid(void* p)
-        {
-            return get_heap().get_gid(p);
-        }
-    };
 
     ///////////////////////////////////////////////////////////////////////////
     /// \class managed_component managed_component.hpp hpx/runtime/components/server/managed_component.hpp
@@ -257,7 +257,7 @@ namespace hpx { namespace components
         }
 
     protected:
-        typedef heap_factory<Component, derived_type> heap_type;
+        typedef detail::heap_factory<Component, derived_type> heap_type;
 
     public:
         /// \brief  The memory for managed_component objects is managed by

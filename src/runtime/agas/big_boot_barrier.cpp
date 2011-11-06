@@ -44,7 +44,7 @@ typedef lcos::eager_future<
     response
 > bind_response_future_type;
 
-typedef components::heap_factory<
+typedef components::detail::heap_factory<
     lcos::detail::promise<
         response
       , response
