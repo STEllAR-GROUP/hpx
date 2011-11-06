@@ -178,8 +178,8 @@ namespace hpx { namespace components { namespace server
 }}}
 
 HPX_SERIALIZATION_REGISTER_TEMPLATE(
-    template <typename R>
-  , hpx::components::server::remote_object_apply_action<R>
+    (template <typename R>)
+  , (hpx::components::server::remote_object_apply_action<R>)
 )
 
 #endif
