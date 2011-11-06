@@ -10,6 +10,12 @@ set(subdirs
 
 add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=8)
 
+# GCC 4.4 detects uninitialized variables in Boost.Geometry headers. These
+# appear to be false positives as newer versions of GCC don't detect these.
+if(NOT MSVC AND 040500 GREATER ${GCC_VERSION})
+  hpx_use_flag_if_available(-Wno-error=uninitialized)
+endif()
+
 # for all targets specified above
 foreach(subdir ${subdirs})
   add_subdirectory(${subdir})
