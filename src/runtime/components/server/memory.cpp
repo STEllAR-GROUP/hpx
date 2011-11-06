@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
-#include <hpx/runtime/actions/continuation_impl.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>

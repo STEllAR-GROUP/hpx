@@ -7,7 +7,7 @@
 #define HPX_3C373507_9301_4368_B718_39D25FDF06F4
 
 #include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/runtime/actions/continuation_impl.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 
 #endif

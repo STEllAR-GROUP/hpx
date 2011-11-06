@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
-#include <hpx/runtime/actions/continuation_impl.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace stubs

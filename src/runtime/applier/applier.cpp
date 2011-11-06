@@ -11,7 +11,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/include/parcelset.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/runtime/actions/continuation_impl.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/lcos/eager_future.hpp>
 

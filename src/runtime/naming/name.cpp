@@ -11,7 +11,7 @@
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
-#include <hpx/runtime/actions/continuation_impl.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>

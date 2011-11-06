@@ -7,7 +7,7 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/full_empty_entry.hpp>
 #include <hpx/include/performance_counters.hpp>
-#include <hpx/runtime/actions/continuation_impl.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>

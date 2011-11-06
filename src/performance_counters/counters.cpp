@@ -7,7 +7,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/include/runtime.hpp>
-#include <hpx/runtime/actions/continuation_impl.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
