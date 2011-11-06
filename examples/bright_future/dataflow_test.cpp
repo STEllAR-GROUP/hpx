@@ -94,9 +94,9 @@ boost::uint64_t add(boost::uint64_t n1, boost::uint64_t n2)
 typedef plain_result_action2<boost::uint64_t, boost::uint64_t, boost::uint64_t, &add> add_action;
 HPX_REGISTER_PLAIN_ACTION(add_action);
 
-dataflow<add_action> fib(boost::uint64_t n)
+dataflow_base<boost::uint64_t> fib(boost::uint64_t n)
 {
-    if(n<2) return dataflow<add_action>(find_here(), n, 0);
+    if(n<2) return dataflow<id_action>(find_here(), n);
 
     return dataflow<add_action>(find_here(), fib(n-1), fib(n-2));
 }

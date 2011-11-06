@@ -79,14 +79,20 @@ namespace hpx { namespace traits
         static components::component_type get()
         {
             return component_type_database<
-                lcos::base_lco_with_value<result_type, typename Action::result_type>
+                lcos::base_lco_with_value<
+                    result_type
+                  , typename Action::result_type
+                >
             >::get();
         }
 
         static void set(components::component_type t)
         {
             component_type_database<
-                lcos::base_lco_with_value<result_type, typename Action::result_type>
+                lcos::base_lco_with_value<
+                    result_type
+                  , typename Action::result_type
+                >
             >::set(t);
         }
     };
@@ -309,13 +315,24 @@ namespace hpx { namespace traits
                 << util::type_id<Action>::typeid_.type_id()
                 << ">::maybe_apply(): "
                 << get_gid()
-                << " args set: " << args_set << "(" << (BOOST_PP_REPEAT(N, HPX_LCOS_DATAFLOW_M0, _) 0) << ")"
+                << " args set: "
+                << args_set
+                << "("
+                << (BOOST_PP_REPEAT(N, HPX_LCOS_DATAFLOW_M0, _) 0)
+                << ")"
                 << "\n"
                 ;
             if(args_set == (BOOST_PP_REPEAT(N, HPX_LCOS_DATAFLOW_M0, _) 0))
 #undef HPX_LCOS_DATAFLOW_M0
             {
-                apply_helper<boost::fusion::result_of::size<args_type>::value, Action>()(get_gid(), action_id, args);
+                apply_helper<
+                    boost::fusion::result_of::size<args_type>::value
+                  , Action
+                >()(
+                    get_gid()
+                  , action_id
+                  , args
+                );
             }
 
             l.unlock();

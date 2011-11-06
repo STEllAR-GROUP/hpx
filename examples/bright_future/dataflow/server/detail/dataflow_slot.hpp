@@ -11,7 +11,7 @@
 
 namespace hpx { namespace lcos { namespace server { namespace detail {
 
-    template <typename T, int Slot, typename SinkAction>
+    template <typename T, int Slot, typename SinkAction, typename Enable = void>
     struct dataflow_slot
         : base_lco_with_value<T, T>
     {
@@ -71,30 +71,36 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
         components::managed_component<dataflow_slot>* back_ptr_;
     };
 
-    template <typename Action, typename Result, int Slot, typename SinkAction>
-    struct dataflow_slot<hpx::lcos::dataflow<Action, Result>, Slot, SinkAction>
+    template <typename T, int Slot, typename SinkAction>
+    struct dataflow_slot<T, Slot, SinkAction, typename boost::enable_if<hpx::traits::is_dataflow<T>>::type>
         : hpx::lcos::base_lco_with_value<
             typename boost::mpl::if_<
-                boost::is_void<Result>
+                boost::is_void<typename T::result_type>
               , hpx::util::unused_type
-              , Result
+              , typename T::result_type
             >::type
-          , typename Action::result_type
+          , typename T::remote_result_type
         >
     {
         typedef
             typename boost::mpl::if_<
-                boost::is_void<Result>
+                boost::is_void<typename T::result_type>
               , hpx::util::unused_type
-              , Result
+              , typename T::result_type
             >::type
             result_type;
 
-        typedef hpx::lcos::dataflow<Action, Result> dataflow_type;
-        typedef hpx::lcos::server::detail::dataflow_slot<dataflow_type, Slot, SinkAction> wrapped_type;
+        typedef T dataflow_type;
+        typedef
+            hpx::lcos::server::detail::dataflow_slot<
+                dataflow_type
+              , Slot
+              , SinkAction
+            >
+            wrapped_type;
         typedef components::managed_component<wrapped_type> wrapping_type;
         
-        typedef typename Action::result_type remote_result;
+        typedef typename T::remote_result_type remote_result;
 
         dataflow_slot(SinkAction * back, dataflow_type const & flow)
             : back_ptr_(0)
@@ -106,9 +112,9 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
         ~dataflow_slot()
         {
             LLCO_(info)
-                << "~dataflow_slot<dataflow<"
-                << util::type_id<Action>::typeid_.type_id()
-                << ">, " << Slot
+                << "~dataflow_slot<"
+                << util::type_id<T>::typeid_.type_id()
+                << ", " << Slot
                 << util::type_id<SinkAction>::typeid_.type_id()
                 << ">::dataflow_slot(): "
                 << get_gid();
@@ -117,9 +123,9 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
         void set_result(remote_result const & r)
         {
             LLCO_(info)
-                << "dataflow_slot<dataflow<"
-                << util::type_id<Action>::typeid_.type_id()
-                << ">, " << Slot
+                << "dataflow_slot<"
+                << util::type_id<T>::typeid_.type_id()
+                << ", " << Slot
                 << util::type_id<SinkAction>::typeid_.type_id()
                 << ">::set_result(): "
                 << get_gid()
@@ -134,9 +140,9 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
         void connect()
         {
             LLCO_(info)
-                << "dataflow_slot<dataflow<"
-                << util::type_id<Action>::typeid_.type_id()
-                << ">, " << Slot
+                << "dataflow_slot<"
+                << util::type_id<T>::typeid_.type_id()
+                << ", " << Slot
                 << util::type_id<SinkAction>::typeid_.type_id()
                 << ">::connect() from "
                 << get_gid();
@@ -145,7 +151,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
 
         void set_event()
         {
-            if(boost::is_void<Result>::value)
+            if(boost::is_void<typename T::result_type>::value)
             {
                 set_result(remote_result());
             }

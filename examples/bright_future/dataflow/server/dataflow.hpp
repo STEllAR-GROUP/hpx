@@ -176,106 +176,6 @@ namespace hpx { namespace lcos { namespace server
             ar & boost::serialization::base_object<base_type>(*this);
         }
     };
-
-    template <typename Action, typename A0>
-    struct init_action<Action, A0>
-      : hpx::actions::direct_action2<
-            dataflow
-          , 0
-          , naming::id_type const &, A0 const&
-          , &dataflow::init<Action, A0>
-          , init_action<Action, A0>
-        >
-    {
-    private:
-        typedef hpx::actions::direct_action2<
-            dataflow
-          , 0
-          , naming::id_type const &, A0 const&
-          , &dataflow::init<Action, A0>
-          , init_action<Action, A0>
-        > base_type;
-
-    public:
-        init_action() {}
-
-        // construct an action from its arguments
-        init_action(naming::id_type const & target, A0 const& a0)
-          : base_type(target, a0)
-        {}
-
-        init_action(threads::thread_priority p, naming::id_type const & target, A0 const& a0)
-          : base_type(p, target, a0)
-        {}
-
-        /// serialization support
-        static void register_base()
-        {
-            using namespace boost::serialization;
-            void_cast_register<init_action, base_type>();
-            base_type::register_base();
-        }
-
-    private:
-        // serialization support
-        friend class boost::serialization::access;
-
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int /*version*/)
-        {
-            ar & boost::serialization::base_object<base_type>(*this);
-        }
-    };
-
-    template <typename Action, typename A0, typename A1>
-    struct init_action<Action, A0, A1>
-      : hpx::actions::direct_action3<
-            dataflow
-          , 0
-          , naming::id_type const &, A0 const&, A1 const&
-          , &dataflow::init<Action, A0, A1>
-          , init_action<Action, A0, A1>
-        >
-    {
-    private:
-        typedef hpx::actions::direct_action3<
-            dataflow
-          , 0
-          , naming::id_type const &, A0 const&, A1 const&
-          , &dataflow::init<Action, A0, A1>
-          , init_action<Action, A0, A1>
-        > base_type;
-
-    public:
-        init_action() {}
-
-        // construct an action from its arguments
-        init_action(naming::id_type const & target, A0 const& a0, A1 const& a1)
-          : base_type(target, a0, a1)
-        {}
-
-        init_action(threads::thread_priority p, naming::id_type const & target, A0 const& a0, A1 const& a1)
-          : base_type(p, target, a0, a1)
-        {}
-
-        /// serialization support
-        static void register_base()
-        {
-            using namespace boost::serialization;
-            void_cast_register<init_action, base_type>();
-            base_type::register_base();
-        }
-
-    private:
-        // serialization support
-        friend class boost::serialization::access;
-
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int /*version*/)
-        {
-            ar & boost::serialization::base_object<base_type>(*this);
-        }
-    };
 }}}
 
 HPX_SERIALIZATION_REGISTER_TEMPLATE(
@@ -283,17 +183,7 @@ HPX_SERIALIZATION_REGISTER_TEMPLATE(
   , (hpx::lcos::server::init_action<Action>)
 )
 
-HPX_SERIALIZATION_REGISTER_TEMPLATE(
-    (template <typename Action, typename A0>)
-  , (hpx::lcos::server::init_action<Action, A0>)
-)
-
-HPX_SERIALIZATION_REGISTER_TEMPLATE(
-    (template <typename Action, typename A0, typename A1>)
-  , (hpx::lcos::server::init_action<Action, A0, A1>)
-)
-
 // bring in the remaining specializations for init_action
-// #include <examples/bright_future/dataflow/server/dataflow_impl.hpp>
+#include <examples/bright_future/dataflow/server/dataflow_impl.hpp>
 
 #endif

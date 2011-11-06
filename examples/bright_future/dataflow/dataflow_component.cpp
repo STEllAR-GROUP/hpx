@@ -6,7 +6,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/components/derived_component_factory.hpp>
-#include <hpx/runtime/actions/continuation_impl.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/spinlock.hpp>
 #include <hpx/util/unlock_lock.hpp>
