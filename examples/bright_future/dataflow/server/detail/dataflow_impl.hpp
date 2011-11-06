@@ -241,37 +241,49 @@ namespace hpx { namespace traits
                 << util::type_id<Action>::typeid_.type_id()
                 << ">::set_result(): set_result: "
                 ;
-            result = r;
-            result_set = true;
-            l.lock();
-            while(!targets.empty())
+
+            std::vector<promise<void> > lazy_results;
+            std::vector<naming::id_type> t;
+
+            {
+                typename hpx::util::spinlock::scoped_lock l(mtx);
+                std::swap(targets, t);
+
+                result = r;
+                result_set = true;
+            }
+
+            // Note: lco::set_result is a direct action, for this reason,
+            //       the following loop will not be parallelized if the
+            //       targets are local (which is ok)
+            for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_result_action action_type;
-                eager_future<action_type>(targets.front(), result).get();
-                targets.pop_front();
+                lazy_results.push_back(async<action_type>(t[i], r));
             }
-            l.unlock();
+            wait(lazy_results);
         }
 
         void connect(naming::id_type const & target)
         {
-            l.lock();
             LLCO_(info)
                 << "dataflow_impl<"
                 << util::type_id<Action>::typeid_.type_id()
                 << ">::set_target() of "
                 << get_gid()
                 << " ";
+
+            typename hpx::util::spinlock::scoped_lock l(mtx);
             if(result_set)
             {
                 typedef typename lco_type::set_result_action action_type;
-                eager_future<action_type>(target, result).get();
+                promise<void> p = async<action_type>(target, result);
                 l.unlock();
-                return;
+
+                wait(p);
             }
             else
             {
-                l.unlock();
                 targets.push_back(target);
             }
         }
@@ -304,7 +316,7 @@ namespace hpx { namespace traits
         template <int Slot>
         void maybe_apply()
         {
-            l.lock();
+            typename hpx::util::spinlock::scoped_lock l(mtx);
             args_set |= (1<<Slot);
 
 #define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
@@ -323,7 +335,6 @@ namespace hpx { namespace traits
                 << "\n"
                 ;
             if(args_set == (BOOST_PP_REPEAT(N, HPX_LCOS_DATAFLOW_M0, _) 0))
-#undef HPX_LCOS_DATAFLOW_M0
             {
                 apply_helper<
                     boost::fusion::result_of::size<args_type>::value
@@ -334,9 +345,8 @@ namespace hpx { namespace traits
                   , args
                 );
             }
-
-            l.unlock();
         }
+#undef HPX_LCOS_DATAFLOW_M0
 #endif
 
 
@@ -385,10 +395,10 @@ namespace hpx { namespace traits
         args_type args;
         boost::uint32_t args_set;
 
-        hpx::util::spinlock l;
+        hpx::util::spinlock mtx;
         remote_result result;
         bool result_set;
-        std::list<naming::id_type> targets;
+        std::vector<naming::id_type> targets;
         naming::id_type action_id;
 
 #if N > 0

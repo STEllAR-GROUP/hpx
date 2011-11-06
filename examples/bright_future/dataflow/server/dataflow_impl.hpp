@@ -11,6 +11,7 @@
 
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/inc.hpp>
+#include <boost/preprocessor/dec.hpp>
 #include <boost/preprocessor/repeat.hpp>
 #include <boost/preprocessor/iterate.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
