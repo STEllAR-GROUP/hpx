@@ -17,7 +17,6 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/applier/trigger.hpp>
-#include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/lcos/base_lco.hpp>
 
 namespace hpx { namespace lcos { namespace server
@@ -121,7 +120,7 @@ struct object_semaphore
                 util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
 
                 // set the LCO's result
-                applier::trigger<ValueType>(id, value);
+                applier::trigger(id, boost::move(value));
             }
         }
     } // }}}
