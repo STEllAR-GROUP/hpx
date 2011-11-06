@@ -54,6 +54,9 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     typedef symbol_namespace::iterate_names_function_type
         iterate_names_function_type;
 
+    typedef component_namespace::iterate_types_function_type
+        iterate_types_function_type;
+
     typedef hpx::lcos::local_mutex mutex_type;
     // }}}
 
@@ -381,6 +384,11 @@ public:
     ///                   of hpx#exception.
     components::component_type get_component_id(
         std::string const& name
+      , error_code& ec = throws
+        );
+
+    void iterate_types(
+        iterate_types_function_type const& f
       , error_code& ec = throws
         );
 

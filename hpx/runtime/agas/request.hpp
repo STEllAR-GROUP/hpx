@@ -27,7 +27,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 
 // The number of types that request's variant can represent.
-#define HPX_AGAS_REQUEST_SUBTYPES 11
+#define HPX_AGAS_REQUEST_SUBTYPES 12
 
 namespace hpx { namespace agas
 {
@@ -40,6 +40,10 @@ struct request
     typedef hpx::actions::function<
         void(std::string const&, naming::gid_type const&)
     > iterate_names_function_type;
+
+    typedef hpx::actions::function<
+        void(std::string const&, components::component_type)
+    > iterate_types_function_type;
 
     request()
         : mc(invalid_request)
@@ -162,6 +166,16 @@ struct request
         // TODO: verification of namespace_action_code
     }
 
+    request(
+        namespace_action_code type_
+      , iterate_types_function_type const& f_
+        )
+      : mc(type_)
+      , data(boost::fusion::make_vector(f_))
+    {
+        // TODO: verification of namespace_action_code
+    }
+
     explicit request(
         namespace_action_code type_
         )
@@ -234,6 +248,13 @@ struct request
         ) const
     {
         return get_data<subtype_iterate_names_function, 0>(ec);
+    }
+
+    iterate_types_function_type get_iterate_types_function(
+        error_code& ec = throws
+        ) const
+    {
+        return get_data<subtype_iterate_types_function, 0>(ec);
     }
 
     naming::locality get_locality(
@@ -326,7 +347,8 @@ struct request
       , subtype_name_gid                = 0x7
       , subtype_name                    = 0x8
       , subtype_iterate_names_function  = 0x9
-      , subtype_void                    = 0xa
+      , subtype_iterate_types_function  = 0xa
+      , subtype_void                    = 0xb
     };
 
     // The order of the variant types is significant, and should not be changed
@@ -393,6 +415,11 @@ struct request
             iterate_names_function_type // f
         >
         // 0xa
+        // component_ns_iterate_types
+      , boost::fusion::vector1<
+            iterate_types_function_type // f
+        >
+        // 0xb
         // primary_ns_localities
       , boost::fusion::vector0<
         >

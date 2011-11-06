@@ -26,6 +26,9 @@ struct component_namespace :
 
     typedef server_type::component_id_type component_id_type;
     typedef server_type::prefixes_type prefixes_type;
+
+    typedef server_type::iterate_types_function_type
+        iterate_types_function_type;
     // }}}
 
     component_namespace()

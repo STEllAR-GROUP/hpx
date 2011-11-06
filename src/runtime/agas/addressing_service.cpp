@@ -422,6 +422,31 @@ components::component_type addressing_service::get_component_id(
     }
 } // }}}
 
+void addressing_service::iterate_types(
+    iterate_types_function_type const& f
+  , error_code& ec
+    )
+{ // {{{
+    try {
+        request req(component_ns_iterate_types, f);
+
+        if (is_bootstrap())
+            bootstrap->symbol_ns_server.service(req, ec);
+        else
+            hosted->symbol_ns_.service(req, ec);
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error()
+              , "addressing_service::iterate_types"
+              , e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow);
+        }
+    }
+} // }}}
+
 components::component_type addressing_service::register_factory(
     boost::uint32_t prefix
   , std::string const& name
