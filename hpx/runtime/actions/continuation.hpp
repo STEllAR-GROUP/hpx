@@ -15,6 +15,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/util/logging.hpp>
 #include <hpx/runtime/naming/name.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -24,7 +25,17 @@
 #define HPX_CONTINUATION_VERSION 0x10
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace actions
+namespace hpx { namespace applier {
+
+    template <typename Action, typename Arg0>
+    inline bool
+    apply(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0);
+
+    template <typename Action>
+    inline bool apply(naming::id_type const& gid);
+}
+
+namespace actions
 {
     // parcel continuations are simply lists of global ids of LCO's to call
     // set_event on
@@ -41,11 +52,17 @@ namespace hpx { namespace actions
         ///
         void trigger();
 
-        ///
         template <typename Arg0>
-        void trigger(Arg0 const& arg0);
-        template <typename Arg0>
-        void trigger(BOOST_FWD_REF(Arg0) arg0);
+        void trigger(BOOST_FWD_REF(Arg0) arg0)
+        {
+            typedef typename
+                lcos::template base_lco_with_value<Arg0>::set_result_action
+            action_type;
+    
+            LLCO_(info) << "continuation::trigger(" << gid_ << ")";
+    
+            applier::apply<action_type>(gid_, boost::forward<Arg0>(arg0));
+        }
 
         ///
         void trigger_error(boost::exception_ptr const& e);
