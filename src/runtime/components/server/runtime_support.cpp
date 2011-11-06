@@ -90,16 +90,6 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::components::component_runtime_support);
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace actions
-{
-    template HPX_EXPORT void
-    continuation::trigger(hpx::naming::gid_type const&);
-
-    template HPX_EXPORT void
-    continuation::trigger(BOOST_FWD_REF(hpx::naming::gid_type));
-}}
-
-///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////

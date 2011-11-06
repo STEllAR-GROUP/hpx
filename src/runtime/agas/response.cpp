@@ -47,12 +47,3 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     base_lco_id_type_response_type,
     component_base_lco_with_value);
 
-namespace hpx { namespace actions
-{
-    template HPX_EXPORT void
-    continuation::trigger(agas::response const&);
-
-    template HPX_EXPORT void
-    continuation::trigger(BOOST_FWD_REF(agas::response));
-}}
-

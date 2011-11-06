@@ -86,13 +86,3 @@ HPX_REGISTER_ACTION_EX(
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco, hpx::components::component_base_lco);
 
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace actions
-{
-    template HPX_EXPORT void
-    continuation::trigger(hpx::util::section const&);
-
-    template HPX_EXPORT void
-    continuation::trigger(BOOST_FWD_REF(hpx::util::section));
-}}
-
