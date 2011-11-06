@@ -93,6 +93,6 @@ namespace hpx { namespace actions
     continuation::trigger(hpx::util::section const&);
 
     template HPX_EXPORT void
-    continuation::trigger(BOOST_RV_REF(hpx::util::section));
+    continuation::trigger(BOOST_FWD_REF(hpx::util::section));
 }}
 
