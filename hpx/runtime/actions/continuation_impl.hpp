@@ -35,7 +35,7 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <typename Arg0>
     inline void
-    continuation::trigger(BOOST_RV_REF(Arg0) arg0)
+    continuation::trigger(BOOST_FWD_REF(Arg0) arg0)
     {
         typedef typename
             lcos::template base_lco_with_value<Arg0>::set_result_action

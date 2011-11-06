@@ -25,7 +25,7 @@ inline void trigger(
 template <typename Arg0>
 inline void trigger(
     naming::id_type k
-  , BOOST_RV_REF(Arg0) arg0
+  , BOOST_FWD_REF(Arg0) arg0
     )
 {
     return actions::continuation(k).trigger<Arg0>(boost::forward<Arg0>(arg0));
