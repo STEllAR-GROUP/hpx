@@ -217,12 +217,6 @@ namespace hpx { namespace traits
 
         ~dataflow_impl()
         {
-#define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
-            delete arg_ids[N];                                                  \
-    /**/
-            BOOST_PP_REPEAT(N, HPX_LCOS_DATAFLOW_M0, _)
-
-#undef HPX_LCOS_DATAFLOW_M0
             LLCO_(info)
                 << "~dataflow_impl<"
                 << util::type_id<Action>::typeid_.type_id()
@@ -321,7 +315,7 @@ namespace hpx { namespace traits
         template <int Slot>
         void maybe_apply()
         {
-            delete arg_ids[Slot]
+            delete arg_ids[Slot];
             typename hpx::util::spinlock::scoped_lock l(mtx);
             args_set |= (1<<Slot);
 
