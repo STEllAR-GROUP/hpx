@@ -23,7 +23,7 @@ namespace hpx { namespace lcos
         lco_set_result = 1,
         lco_set_error = 2,
         lco_get_value = 3,
-        lco_set_target = 2,
+        lco_set_target = 4
     };
 
     /// \class base_lco base_lco.hpp hpx/lcos/base_lco.hpp
@@ -40,12 +40,12 @@ namespace hpx { namespace lcos
             // just rethrow the exception
             boost::rethrow_exception(e);
         }
-        
+
         // noop by default
         virtual void connect(naming::id_type const &)
         {
         }
-        
+
         // noop by default
         virtual void disconnect(naming::id_type const &)
         {
@@ -113,11 +113,12 @@ namespace hpx { namespace lcos
         /// overloaded by the derived concrete LCO.
         ///
         /// \param id [in] target id
-        void dsiconnectconnect_nonvirt(naming::id_type const & id)
+        void disconnect_nonvirt(naming::id_type const & id)
         {
             disconnect(id);
         }
 
+    public:
         /// Each of the exposed functions needs to be encapsulated into an action
         /// type, allowing to generate all required boilerplate code for threads,
         /// serialization, etc.
@@ -139,15 +140,15 @@ namespace hpx { namespace lcos
             base_lco, lco_set_error, boost::exception_ptr const&,
             &base_lco::set_error_nonvirt
         > set_error_action;
-        
+
         typedef hpx::actions::direct_action1<
             base_lco, lco_set_target, naming::id_type const&,
-            &base_lco::connect
+            &base_lco::connect_nonvirt
         > connect_action;
-        
+
         typedef hpx::actions::direct_action1<
             base_lco, lco_set_target, naming::id_type const&,
-            &base_lco::disconnect
+            &base_lco::disconnect_nonvirt
         > disconnect_action;
     };
 
@@ -218,6 +219,7 @@ namespace hpx { namespace lcos
             return get_value();
         }
 
+    public:
         /// Each of the exposed functions needs to be encapsulated into an action
         /// type, allowing to generate all required boilerplate code for threads,
         /// serialization, etc.
@@ -274,7 +276,7 @@ namespace hpx { namespace traits
         {
             return components::component_base_lco_with_value;
         }
-        
+
         static HPX_ALWAYS_EXPORT void set(components::component_type)
         {
             BOOST_ASSERT(false);
