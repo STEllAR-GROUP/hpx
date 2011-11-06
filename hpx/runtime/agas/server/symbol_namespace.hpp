@@ -99,7 +99,6 @@ struct HPX_EXPORT symbol_namespace :
       , namespace_resolve = BOOST_BINARY_U(0010010)
       , namespace_unbind  = BOOST_BINARY_U(0010011)
       , namespace_iterate = BOOST_BINARY_U(0010100)
-      , namespace_route   = BOOST_BINARY_U(0010101)
     }; // }}}
 
     typedef hpx::actions::result_action1<
