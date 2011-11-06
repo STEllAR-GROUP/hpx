@@ -97,7 +97,7 @@ namespace hpx { namespace lcos {
               , naming::id_type const & target
             )
             {
-                typedef typename server_type::connect_action action_type;
+                typedef server_type::connect_action action_type;
                 return eager_future<action_type>(gid, target);
             }
 
