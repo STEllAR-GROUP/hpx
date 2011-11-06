@@ -79,7 +79,7 @@ namespace hpx { namespace applier { namespace detail
             threads::thread_priority /*priority*/)
         {
             try {
-                c->trigger(Action::execute_function_nonvirt(lva));
+                c->trigger(boost::move(Action::execute_function_nonvirt(lva)));
             }
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client
@@ -137,8 +137,8 @@ namespace hpx { namespace applier { namespace detail
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
         {
             try {
-                c->trigger(Action::execute_function_nonvirt(lva,
-                    boost::forward<Arg0>(arg0)));
+                c->trigger(boost::move(Action::execute_function_nonvirt(lva,
+                    boost::forward<Arg0>(arg0))));
             }
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client

@@ -28,7 +28,7 @@ inline void trigger(
   , BOOST_RV_REF(Arg0) arg0
     )
 {
-    return actions::continuation(k).trigger<Arg0>(boost::move(arg0));
+    return actions::continuation(k).trigger<Arg0>(boost::forward<Arg0>(arg0));
 }
 
 inline void trigger(

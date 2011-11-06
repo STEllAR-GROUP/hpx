@@ -425,10 +425,10 @@ private:
           (std::size_t(id)/8) % BOOST_COROUTINE_NUM_HEAPS);
       if (NULL == wrapper) {
           context_base<ContextImpl>::increment_allocation_count();
-          return new wrapper_type(boost::move(f), id, stack_size);
+          return new wrapper_type(boost::forward<Functor>(f), id, stack_size);
       }
 
-      wrapper->rebind(boost::move(f), id);
+      wrapper->rebind(boost::forward<Functor>(f), id);
       return wrapper;
   }
 

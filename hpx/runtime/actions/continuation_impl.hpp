@@ -43,7 +43,7 @@ namespace hpx { namespace actions
 
         LLCO_(info) << "promise::set_with_value(" << gid_ << ")";
 
-        applier::apply<action_type>(gid_, boost::move(arg0));
+        applier::apply<action_type>(gid_, boost::forward<Arg0>(arg0));
     }
 }}
 

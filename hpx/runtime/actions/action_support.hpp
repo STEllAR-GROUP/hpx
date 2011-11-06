@@ -399,7 +399,7 @@ namespace hpx { namespace actions
                                 << ") with continuation("
                                 << cont->get_raw_gid()
                                 << ")";
-                    cont->trigger(func());
+                    cont->trigger(boost::move(func()));
                 }
                 catch (hpx::exception const&) {
                     // make sure hpx::exceptions are propagated back to the client

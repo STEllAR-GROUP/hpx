@@ -97,8 +97,8 @@ namespace hpx { namespace applier { namespace detail
             BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
             try {
-                c->trigger(Action::execute_function_nonvirt(
-                    lva, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)));
+                c->trigger(boost::move(Action::execute_function_nonvirt(
+                    lva, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))));
             }
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client
