@@ -12,21 +12,31 @@ if(NOT LORENE_ROOT AND NOT $ENV{HOME_LORENE} STREQUAL "")
   set(LORENE_ROOT $ENV{HOME_LORENE})
 endif()
 
-#if(LORENE_ROOT)
-#  set(LORENE_F77_ROOT $ENV{HOME_LORENE})
-#endif()
+if(LORENE_ROOT)
+  set(LORENE_F77_ROOT $ENV{HOME_LORENE})
+endif()
+
+if(LORENE_ROOT)
+  set(LORENE_EXPORT_ROOT $ENV{HOME_LORENE})
+endif()
 
 hpx_find_package(LORENE
-  LIBRARIES lorene liblorene lorenef77 liblorenef77 lorene_export liblorene_export
+  LIBRARIES lorene liblorene
   LIBRARY_PATHS lib64 lib Lib
   HEADERS bin_bhns_extr.h
   HEADER_PATHS include include/C++/Include C++/Include)
 
-#hpx_find_package(LORENE_F77
-#  LIBRARIES lorenef77 liblorenef77
-#  LIBRARY_PATHS lib64 lib Lib
-#  HEADERS unites.h
-#  HEADER_PATHS include include/C++/Include C++/Include)
+hpx_find_package(LORENE_F77
+  LIBRARIES lorenef77 liblorenef77
+  LIBRARY_PATHS lib64 lib Lib
+  HEADERS unites.h
+  HEADER_PATHS include include/C++/Include C++/Include)
+
+hpx_find_package(LORENE_EXPORT
+  LIBRARIES lorene_export liblorene_export
+  LIBRARY_PATHS lib64 lib Lib
+  HEADERS unites.h
+  HEADER_PATHS include include/C++/Include C++/Include)
 
 if(LORENE_FOUND AND NOT HPX_SET_LORENE_MACRO)
   set(HPX_SET_LORENE_MACRO ON CACHE BOOL "Added the Lorene detection macro" FORCE)
