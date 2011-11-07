@@ -97,4 +97,13 @@ namespace hpx { namespace geometry { namespace server
 
 }}}
 
+// Declaration of serialization support for the actions
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::geometry::server::point::init_action,
+    bfs_geometry_init_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::geometry::server::point::traverse_action,
+    bfs_geometry_traverse_action);
+
 #endif
