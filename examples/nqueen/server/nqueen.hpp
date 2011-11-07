@@ -184,5 +184,40 @@ namespace server
 
 }}
 
+// Declaration of serialization support for the board actions
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    nqueen::server::board::init_action,
+    board_init_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    nqueen::server::board::check_action,
+    board_check_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    nqueen::server::board::access_action,
+    board_access_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    nqueen::server::board::update_action,
+    board_update_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    nqueen::server::board::solve_action,
+    board_solve_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    nqueen::server::board::clear_action,
+    board_clear_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<nqueen::list_type>::set_result_action,
+    set_result_action_vector_std_size_t);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<nqueen::list_type>::get_value_action,
+    get_value_action_vector_std_size_t);
+
+
 #endif // HPX_9FEC203D_0AAB_4213_BA36_456BE578ED3D
 
