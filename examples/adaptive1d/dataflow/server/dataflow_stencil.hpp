@@ -136,4 +136,16 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
 
 }}}}
 
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::adaptive1d::server::dataflow_stencil::init_execute_action,
+    adaptive1d_dataflow_dataflow_stencil_init_execute_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::adaptive1d::server::dataflow_stencil::execute_action,
+    adaptive1d_dataflow_dataflow_stencil_execute_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<boost::shared_ptr<std::vector<hpx::naming::id_type> > >::set_result_action,
+    adaptive1d_dataflow_set_result_action_gid_vector_ptr);
+
+
 #endif

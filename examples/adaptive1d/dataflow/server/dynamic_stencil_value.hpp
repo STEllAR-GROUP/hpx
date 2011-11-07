@@ -164,5 +164,21 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
 
 }}}}
 
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::adaptive1d::server::dynamic_stencil_value::call_action,
+    adaptive1d_dataflow_dynamic_stencil_value_double_call_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::adaptive1d::server::dynamic_stencil_value::get_output_ports_action,
+    adaptive1d_dataflow_dynamic_stencil_value_double_get_output_ports_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::adaptive1d::server::dynamic_stencil_value::connect_input_ports_action,
+    adaptive1d_dataflow_dynamic_stencil_value_double_connect_input_ports_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::adaptive1d::server::dynamic_stencil_value::set_functional_component_action,
+    adaptive1d_dataflow_dynamic_stencil_value_double_set_functional_component_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::adaptive1d::server::dynamic_stencil_value::start_action,
+    adaptive1d_dataflow_dynamic_stencil_value_double_start_action);
+
 #endif
 

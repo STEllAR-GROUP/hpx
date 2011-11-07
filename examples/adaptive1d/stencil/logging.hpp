@@ -100,4 +100,9 @@ namespace hpx { namespace components { namespace adaptive1d
 
 }}}
 
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::adaptive1d::server::logging::logentry_action
+  , adaptive1d_logentry_action
+);
+
 #endif
