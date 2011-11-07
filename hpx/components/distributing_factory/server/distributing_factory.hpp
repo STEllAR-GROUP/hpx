@@ -290,4 +290,27 @@ namespace boost { namespace serialization
         unsigned int const);
 }}
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Declaration of serialization support for the distributing_factory actions
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::distributing_factory::create_components_action
+  , distributing_factory_create_components_action
+)
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::distributing_factory::create_partitioned_action
+  , distributing_factory_create_partitioned_action
+)
+
+namespace hpx { namespace distributing_factory { namespace create_result_ns {
+    typedef hpx::lcos::base_lco_with_value<
+            hpx::components::server::distributing_factory::remote_result_type
+        > type;
+}}}
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::distributing_factory::create_result_ns::type::set_result_action
+  , set_result_action_distributing_factory_result
+)
 #endif

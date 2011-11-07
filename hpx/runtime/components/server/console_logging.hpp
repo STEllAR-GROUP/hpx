@@ -117,10 +117,18 @@ namespace hpx { namespace components { namespace server
     };
 }}}
 
-HPX_SERIALIZATION_REGISTER_TEMPLATE(
-    (template <typename Dummy>),
-    (hpx::components::server::console_logging_action<Dummy>)
+HPX_REGISTER_PLAIN_ACTION_DECLARATION(
+    hpx::components::server::console_logging_action<>
 )
+
+namespace hpx { namespace actions { namespace detail {
+    template <typename Dummy>
+    struct needs_guid_initialization<
+        hpx::components::server::console_logging_action<Dummy>
+    >
+        : boost::mpl::false_
+    {};
+}}}
 
 #endif
 

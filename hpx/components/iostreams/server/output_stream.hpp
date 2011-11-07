@@ -151,5 +151,15 @@ struct HPX_COMPONENT_EXPORT output_stream
 
 }}}
 
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::iostreams::server::output_stream::write_async_action
+  , output_stream_write_async_action
+)
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::iostreams::server::output_stream::write_sync_action
+  , output_stream_write_sync_action
+)
+
 #endif // HPX_4AFE0EEA_49F8_4F4C_8945_7B55BF395DA0
 

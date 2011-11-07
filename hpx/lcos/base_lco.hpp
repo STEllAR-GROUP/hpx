@@ -11,7 +11,8 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/util/detail/serialization_registration.hpp>
+#include <hpx/util/ini.hpp>
+//#include <hpx/util/detail/serialization_registration.hpp>
 
 namespace hpx { namespace lcos
 {
@@ -283,5 +284,71 @@ namespace hpx { namespace traits
         }
     };
 }}
+
+///////////////////////////////////////////////////////////////////////////////
+// Declaration of serialization support for the base LCO actions
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco::set_event_action, base_set_event_action
+);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco::set_error_action
+  , base_set_error_action
+);
+
+///////////////////////////////////////////////////////////////////////////////
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<hpx::naming::gid_type>::set_result_action,
+    set_result_action_gid_type);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<hpx::naming::gid_type>::get_value_action,
+    get_value_action_gid_type);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<std::vector<hpx::naming::gid_type> >::set_result_action,
+    set_result_action_vector_gid_type);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<std::vector<hpx::naming::gid_type> >::get_value_action,
+    get_value_action_vector_gid_type);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<hpx::naming::id_type>::set_result_action,
+    set_result_action_id_type);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<hpx::naming::id_type>::get_value_action,
+    get_value_action_id_type);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<std::vector<hpx::naming::id_type> >::set_result_action,
+    set_result_action_vector_id_type);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<std::vector<hpx::naming::id_type> >::get_value_action,
+    get_value_action_vector_id_type);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<double>::set_result_action,
+    set_result_action_double);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<double>::get_value_action,
+    get_value_action_double);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<int>::set_result_action,
+    set_result_action_int);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<int>::get_value_action,
+    get_value_action_int);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<bool>::set_result_action,
+    set_result_action_bool);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<bool>::get_value_action,
+    get_value_action_bool);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<hpx::util::section>::set_result_action,
+    set_result_action_section);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<hpx::util::section>::get_value_action,
+    get_value_action_section);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<hpx::util::unused_type>::set_result_action,
+    set_result_action_void);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<hpx::util::unused_type>::get_value_action,
+    get_value_action_void);
 
 #endif

@@ -5,6 +5,8 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
+#include <hpx/lcos/base_lco.hpp>
+#include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
@@ -47,6 +49,7 @@ HPX_REGISTER_ACTION_EX(
     hpx::lcos::base_lco_with_value<boost::uint64_t>::set_result_action,
     set_result_action_uint64_t);
 
+/*
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco_with_value<boost::uint8_t>,
     hpx::components::component_base_lco_with_value);
@@ -59,4 +62,4 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco_with_value<boost::uint64_t>,
     hpx::components::component_base_lco_with_value);
-
+*/

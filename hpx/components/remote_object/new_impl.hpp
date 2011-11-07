@@ -35,4 +35,8 @@ namespace hpx { namespace components
     }
 }}
 
+HPX_REGISTER_PLAIN_ACTION_DECLARATION(
+    hpx::components::remote_object::new_impl_action
+)
+
 #endif

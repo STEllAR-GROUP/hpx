@@ -234,5 +234,13 @@ struct HPX_EXPORT primary_namespace :
 
 }}}
 
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::agas::server::primary_namespace::service_action,
+    primary_namespace_service_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::agas::server::primary_namespace::route_action,
+    primary_namespace_route_action);
+
 #endif // HPX_BDD56092_8F07_4D37_9987_37D20A1FEA21
 

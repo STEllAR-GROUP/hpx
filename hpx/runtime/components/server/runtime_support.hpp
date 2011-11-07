@@ -306,6 +306,51 @@ namespace hpx { namespace components { namespace server
 
 }}}
 
+///////////////////////////////////////////////////////////////////////////////
+// Declaration of serialization support for the runtime_support actions
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::factory_properties_action,
+    factory_properties_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::create_component_action,
+    create_component_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::create_one_component_action,
+    create_one_component_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::create_memory_block_action,
+    create_memory_block_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::load_components_action,
+    load_components_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::call_startup_functions_action,
+    call_startup_functions_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::call_shutdown_functions_action,
+    call_shutdown_functions_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::free_component_action,
+    free_component_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::shutdown_action,
+    shutdown_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::shutdown_all_action,
+    shutdown_all_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::terminate_action,
+    terminate_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::terminate_all_action,
+    terminate_all_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::get_config_action,
+    get_config_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::update_agas_cache_action,
+    update_agas_cache_action);
+
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif

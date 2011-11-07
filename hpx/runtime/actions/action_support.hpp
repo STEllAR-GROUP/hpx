@@ -19,6 +19,12 @@
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/ref.hpp>
 #include <boost/foreach.hpp>
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/void_cast.hpp>
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/export.hpp>
+#include <boost/serialization/extended_type_info.hpp>
+#include <boost/serialization/extended_type_info_typeid.hpp>
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 #include <boost/type_traits/is_same.hpp>
@@ -28,7 +34,6 @@
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/util/detail/serialization_registration.hpp>
 #include <hpx/util/serialize_sequence.hpp>
 #include <hpx/util/serialize_exception.hpp>
 #include <hpx/util/demangle_helper.hpp>
@@ -55,9 +60,42 @@ namespace hpx { namespace actions
             typedef typename boost::remove_const<no_ref_type>::type type;
         };
 
+        template <typename Action, typename Enable = void>
+        struct needs_guid_initialization
+            : boost::mpl::true_
+        {};
+
+        template <typename Action>
+        void guid_initialization(boost::mpl::false_) {}
+
+        template <typename Action>
+        void guid_initialization(boost::mpl::true_)
+        {
+            // force serialization self registration to happen
+            using namespace boost::archive::detail::extra_detail;
+            init_guid<Action>::g.initialize();
+        }
+        
+        template <typename Action>
+        void guid_initialization()
+        {
+            guid_initialization<Action>(
+                typename needs_guid_initialization<Action>::type()
+            );
+        }
+
         template <typename Action>
         char const* get_action_name()
         {
+            /// If you encounter this assert whil compiling code, that means that
+            /// you have a HPX_REGISTER_ACTION macro somewhere in a source file,
+            /// but the header in which the action is defined misses a
+            /// HPX_REGISTER_ACTION_DECLARATION
+            BOOST_MPL_ASSERT_MSG(
+                needs_guid_initialization<Action>::value
+              , HPX_REGISTER_ACTION_DECLARATION_MISSING
+              , (Action)
+            );
             return util::type_id<Action>::typeid_.type_id();
         }
     }
@@ -313,9 +351,7 @@ namespace hpx { namespace actions
         /// destructor
         ~action()
         {
-            // force serialization self registration to happen
-            using namespace boost::archive::detail::extra_detail;
-            init_guid<derived_type>::g.initialize();
+            detail::guid_initialization<derived_type>();
         }
 
     public:
@@ -558,10 +594,27 @@ namespace hpx { namespace actions
 #include <hpx/config/warnings_suffix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Helper macros for action serialization - obsolete, not required anymore
-#define HPX_DEFINE_GET_ACTION_NAME(action)
-#define HPX_REGISTER_ACTION_EX(action, actionname)
-#define HPX_REGISTER_ACTION(action) HPX_REGISTER_ACTION_EX(action, action)
+// Helper macro for action serialization, each of the defined actions needs to
+// be registered with the serialization library
+#define HPX_DEFINE_GET_ACTION_NAME(action)                                    \
+    HPX_DEFINE_GET_ACTION_NAME(action, action)                                \
+/**/
+
+#define HPX_DEFINE_GET_ACTION_NAME_EX(action, actionname)                     \
+    namespace hpx { namespace actions { namespace detail {                    \
+        template<> HPX_ALWAYS_EXPORT                                          \
+        char const* get_action_name<action>()                                 \
+        {                                                                     \
+            return BOOST_PP_STRINGIZE(actionname);                            \
+        }                                                                     \
+    }}}                                                                       \
+/**/
+
+#define HPX_REGISTER_ACTION_EX(action, actionname)                            \
+    BOOST_CLASS_EXPORT_IMPLEMENT(action)                                      \
+    HPX_REGISTER_BASE_HELPER(action, actionname)                              \
+    HPX_DEFINE_GET_ACTION_NAME_EX(action, actionname)                         \
+/**/
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_BASE_HELPER(action, actionname)                          \
@@ -570,6 +623,32 @@ namespace hpx { namespace actions
                 BOOST_PP_CAT(__hpx_action_register_base_helper_, __LINE__),   \
                 _##actionname);                                               \
     /**/
+
+#define HPX_REGISTER_ACTION(action) HPX_REGISTER_ACTION_EX(action, action)
+
+#define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID(action)               \
+    namespace hpx { namespace actions { namespace detail {                    \
+        template <> HPX_ALWAYS_EXPORT                                         \
+        char const* get_action_name<action>();                                \
+        template <typename Enable>                                            \
+        struct needs_guid_initialization<action, Enable>                      \
+            : boost::mpl::false_                                              \
+        {};                                                                   \
+    }}}                                                                       \
+/**/
+#define HPX_REGISTER_ACTION_DECLARATION_GUID(action)                          \
+    namespace boost { namespace archive { namespace detail { namespace extra_detail {           \
+        template <>                                                           \
+        struct init_guid<action>;                                             \
+    }}}}                                                                      \
+/**/
+#define HPX_REGISTER_ACTION_DECLARATION_EX(action, actionname)                \
+    HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID(action)                   \
+    BOOST_CLASS_EXPORT_KEY2(action, BOOST_PP_STRINGIZE(actionname))           \
+    HPX_REGISTER_ACTION_DECLARATION_GUID(action)                              \
+/**/
+#define HPX_REGISTER_ACTION_DECLARATION(action)                               \
+    HPX_REGISTER_ACTION_DECLARATION_EX(action, action)                        \
 
 #endif
 

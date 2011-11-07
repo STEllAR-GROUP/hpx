@@ -177,6 +177,7 @@ namespace hpx { namespace components
 /// register a minimal factory for plain actions with Boost.Plugin.
 #define HPX_REGISTER_PLAIN_ACTION_EX2(plain_action, plain_action_name,        \
         enable_always)                                                        \
+    BOOST_CLASS_EXPORT_KEY2(plain_action, BOOST_PP_STRINGIZE(plain_action_name))\
     HPX_REGISTER_ACTION_EX(plain_action, plain_action_name);                  \
     HPX_REGISTER_COMPONENT_FACTORY(                                           \
         hpx::components::plain_component_factory<plain_action>,               \

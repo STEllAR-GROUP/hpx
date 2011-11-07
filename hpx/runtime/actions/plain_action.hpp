@@ -22,6 +22,7 @@
 #include <hpx/util/unused.hpp>
 
 #include <boost/version.hpp>
+#include <boost/serialization/void_cast.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repeat.hpp>
@@ -810,32 +811,75 @@ namespace hpx { namespace actions
     };
 }}
 
-///////////////////////////////////////////////////////////////////////////////
-HPX_SERIALIZATION_REGISTER_TEMPLATE(
-    (template <typename Result, Result (*F)(),
-        hpx::threads::thread_priority Priority, typename Derived>),
-    (hpx::actions::plain_result_action0<Result, F, Priority, Derived>)
-)
+// Disabling the guid initialization stuff for plain actions
+namespace hpx { namespace actions { namespace detail {
+        template <
+            void (*F)()
+          , hpx::threads::thread_priority Priority
+          , typename Enable
+        >
+        struct needs_guid_initialization<
+            hpx::actions::plain_action0<F, Priority>
+          , Enable
+        >
+            : boost::mpl::false_
+        {};
+        
+        template <
+            void (*F)()
+          , typename Derived
+          , typename Enable
+        >
+        struct needs_guid_initialization<
+            hpx::actions::plain_direct_action0<F, Derived>
+          , Enable
+        >
+            : boost::mpl::false_
+        {};
 
-HPX_SERIALIZATION_REGISTER_TEMPLATE(
-    (template <typename Result, Result (*F)(), typename Derived>),
-    (hpx::actions::plain_direct_result_action0<Result, F, Derived>)
-)
+        template <
+            typename R
+          , R(*F)()
+          , hpx::threads::thread_priority Priority
+          , typename Enable
+        >
+        struct needs_guid_initialization<
+            hpx::actions::plain_result_action0<R, F, Priority>
+          , Enable
+        >
+            : boost::mpl::false_
+        {};
 
-HPX_SERIALIZATION_REGISTER_TEMPLATE(
-    (template <void (*F)(), hpx::threads::thread_priority Priority,
-        typename Derived>),
-    (hpx::actions::plain_action0<F, Priority, Derived>)
-)
-
-HPX_SERIALIZATION_REGISTER_TEMPLATE(
-    (template <void (*F)(), typename Derived>),
-    (hpx::actions::plain_direct_action0<F, Derived>)
-)
+        template <
+            typename R
+          , R(*F)()
+          , typename Derived
+          , typename Enable
+        >
+        struct needs_guid_initialization<
+            hpx::actions::plain_direct_result_action0<R, F, Derived>
+          , Enable
+        >
+            : boost::mpl::false_
+        {};
+}}}
 
 ///////////////////////////////////////////////////////////////////////////
 // bring in the rest of the implementations
 #include <hpx/runtime/actions/plain_action_implementations.hpp>
+
+///////////////////////////////////////////////////////////////////////////////
+/// The macro \a HPX_REGISTER_PLAIN_ACTION_DECLARATION is used create the
+/// forward declarations for plain actions. This is only needed if the plain
+/// action was declared in a header, and is defined in a source file. Use this
+/// macro in the header, and \a HPX_REGISTER_PLAIN_ACTION in the source file
+#define HPX_REGISTER_PLAIN_ACTION_DECLARATION(plain_action)                   \
+    namespace hpx { namespace actions { namespace detail {                    \
+        template <>                                                           \
+        const char *                                                          \
+        get_action_name<plain_action>();                                      \
+    }}}                                                                       \
+/**/
 
 #include <hpx/config/warnings_suffix.hpp>
 

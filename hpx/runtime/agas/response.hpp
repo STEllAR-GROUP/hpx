@@ -26,6 +26,7 @@
 #include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/lcos/base_lco.hpp>
 
 // The number of types that response's variant can represent.
 #define HPX_AGAS_RESPONSE_SUBTYPES 10
@@ -603,6 +604,26 @@ struct get_remote_result<bool, agas::response>
 
 BOOST_CLASS_VERSION(hpx::agas::response, HPX_AGAS_VERSION)
 BOOST_CLASS_TRACKING(hpx::agas::response, boost::serialization::track_never)
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<hpx::agas::response>::set_result_action,
+    set_result_action_agas_response_type);
+
+namespace hpx { namespace agas { namespace create_result_ns {
+    typedef
+        hpx::lcos::base_lco_with_value<bool, hpx::agas::response>
+        base_lco_bool_response_type;
+    typedef
+        hpx::lcos::base_lco_with_value<hpx::naming::id_type, hpx::agas::response>
+        base_lco_id_type_response_type;
+}}}
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::agas::create_result_ns::base_lco_bool_response_type::set_result_action,
+    set_result_action_agas_bool_response_type);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::agas::create_result_ns::base_lco_id_type_response_type::set_result_action,
+    set_result_action_agas_id_type_response_type);
 
 #endif // HPX_FB40C7A4_33B0_4C64_A16B_2A3FEEB237ED
 

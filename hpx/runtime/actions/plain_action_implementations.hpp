@@ -1059,36 +1059,80 @@ namespace hpx { namespace actions
     };
 }}
 
-///////////////////////////////////////////////////////////////////////////////
-HPX_SERIALIZATION_REGISTER_TEMPLATE(
-    (template <typename Result, BOOST_PP_ENUM_PARAMS(N, typename T),
-        Result (*F)(BOOST_PP_ENUM_PARAMS(N, T)),
-        hpx::threads::thread_priority Priority, typename Derived>),
-    (BOOST_PP_CAT(hpx::actions::plain_result_action, N)<
-        Result, BOOST_PP_ENUM_PARAMS(N, T), F, Priority, Derived>)
-)
+// Disabling the guid initialization stuff for plain actions
+namespace hpx { namespace actions { namespace detail {
+        template <
+            BOOST_PP_ENUM_PARAMS(N, typename Arg)
+          , void (*F)(BOOST_PP_ENUM_PARAMS(N, Arg))
+          , hpx::threads::thread_priority Priority
+          , typename Enable
+        >
+        struct needs_guid_initialization<
+            BOOST_PP_CAT(hpx::actions::plain_action, N)<
+                BOOST_PP_ENUM_PARAMS(N, Arg)
+              , F
+              , Priority
+            >
+          , Enable
+        >
+            : boost::mpl::false_
+        {};
+        
+        template <
+            BOOST_PP_ENUM_PARAMS(N, typename Arg)
+          , void (*F)(BOOST_PP_ENUM_PARAMS(N, Arg))
+          , typename Derived
+          , typename Enable
+        >
+        struct needs_guid_initialization<
+            BOOST_PP_CAT(hpx::actions::plain_direct_action, N)<
+                BOOST_PP_ENUM_PARAMS(N, Arg)
+              , F
+              , Derived
+            >
+          , Enable
+        >
+            : boost::mpl::false_
+        {};
 
-HPX_SERIALIZATION_REGISTER_TEMPLATE(
-    (template <typename Result, BOOST_PP_ENUM_PARAMS(N, typename T),
-        Result (*F)(BOOST_PP_ENUM_PARAMS(N, T)), typename Derived>),
-    (BOOST_PP_CAT(hpx::actions::plain_direct_result_action, N)<
-        Result, BOOST_PP_ENUM_PARAMS(N, T), F, Derived>)
-)
+        template <
+            typename R
+          , BOOST_PP_ENUM_PARAMS(N, typename Arg)
+          , R(*F)(BOOST_PP_ENUM_PARAMS(N, Arg))
+          , hpx::threads::thread_priority Priority
+          , typename Enable
+        >
+        struct needs_guid_initialization<
+            BOOST_PP_CAT(hpx::actions::plain_result_action, N)<
+                R
+              , BOOST_PP_ENUM_PARAMS(N, Arg)
+              , F
+              , Priority
+            >
+          , Enable
+        >
+            : boost::mpl::false_
+        {};
 
-HPX_SERIALIZATION_REGISTER_TEMPLATE(
-    (template <BOOST_PP_ENUM_PARAMS(N, typename T),
-        void (*F)(BOOST_PP_ENUM_PARAMS(N, T)),
-        hpx::threads::thread_priority Priority, typename Derived>),
-    (BOOST_PP_CAT(hpx::actions::plain_action, N)<
-        BOOST_PP_ENUM_PARAMS(N, T), F, Priority, Derived>)
-)
-
-HPX_SERIALIZATION_REGISTER_TEMPLATE(
-    (template <BOOST_PP_ENUM_PARAMS(N, typename T),
-        void (*F)(BOOST_PP_ENUM_PARAMS(N, T)), typename Derived>),
-    (BOOST_PP_CAT(hpx::actions::plain_direct_action, N)<
-        BOOST_PP_ENUM_PARAMS(N, T), F, Derived>)
-)
+        template <
+            typename R
+          , BOOST_PP_ENUM_PARAMS(N, typename Arg)
+          , R(*F)(BOOST_PP_ENUM_PARAMS(N, Arg))
+          , typename Derived
+          , typename Enable
+        >
+        struct needs_guid_initialization<
+            BOOST_PP_CAT(hpx::actions::plain_direct_result_action, N)<
+                R
+              , BOOST_PP_ENUM_PARAMS(N, Arg)
+              , F
+              , Derived
+            >
+          , Enable
+        >
+            : boost::mpl::false_
+        {};
+}}}
 
 ///////////////////////////////////////////////////////////////////////////////
 #undef HPX_FORWARD_ARGS

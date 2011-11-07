@@ -124,10 +124,4 @@ namespace hpx { namespace traits
     };
 }}
 
-#define HPX_REMOTE_OBJECT_REGISTER_RETURN_TYPE(TYPE)                            \
-    HPX_REGISTER_ACTION_EX(                                                     \
-    hpx::components::server::remote_object::apply_action<TYPE>::type,           \
-    BOOST_PP_CAT(remote_object_apply_action_, TYPE));                           \
-/**/
-
 #endif

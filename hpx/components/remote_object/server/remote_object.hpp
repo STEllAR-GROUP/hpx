@@ -182,4 +182,14 @@ HPX_SERIALIZATION_REGISTER_TEMPLATE(
   , (hpx::components::server::remote_object_apply_action<R>)
 )
 
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::remote_object_apply_action<void>
+  , remote_object_apply_action_void
+)
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::remote_object::set_dtor_action
+  , remote_object_set_dtor_action
+)
+
 #endif

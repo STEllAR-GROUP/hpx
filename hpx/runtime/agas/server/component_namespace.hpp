@@ -133,5 +133,9 @@ struct HPX_EXPORT component_namespace :
 
 }}}
 
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::agas::server::component_namespace::service_action,
+    component_namespace_service_action);
+
 #endif // HPX_A16135FC_AA32_444F_BB46_549AD456A661
 

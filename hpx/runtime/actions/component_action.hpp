@@ -21,6 +21,7 @@
 #include <hpx/util/unused.hpp>
 
 #include <boost/version.hpp>
+#include <boost/serialization/void_cast.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/ref.hpp>
 #include <boost/preprocessor/stringize.hpp>
@@ -782,71 +783,10 @@ namespace hpx { namespace actions
     };
 }}
 
-///////////////////////////////////////////////////////////////////////////////
-// Register the action templates with serialization.
-HPX_SERIALIZATION_REGISTER_TEMPLATE(
-    (
-        template <
-            typename Component
-          , typename Result
-          , int Action
-          , Result (Component::*F)()
-          , hpx::threads::thread_priority Priority
-          , typename Derived
-        >
-    )
-  , (
-        hpx::actions::result_action0<Component, Result, Action, F, Priority, Derived>
-    )
-)
-
-HPX_SERIALIZATION_REGISTER_TEMPLATE(
-    (
-        template <
-            typename Component
-          , typename Result
-          , int Action
-          , Result (Component::*F)()
-          , typename Derived
-        >
-    )
-  , (
-        hpx::actions::direct_result_action0<Component, Result, Action, F, Derived>
-    )
-)
-
-HPX_SERIALIZATION_REGISTER_TEMPLATE(
-    (
-        template <
-            typename Component
-          , int Action
-          , void (Component::*F)()
-          , hpx::threads::thread_priority Priority
-          , typename Derived
-        >
-    )
-  , (
-        hpx::actions::action0<Component, Action, F, Priority, Derived>
-    )
-)
-
-HPX_SERIALIZATION_REGISTER_TEMPLATE(
-    (
-        template <
-            typename Component
-          , int Action
-          , void (Component::*F)()
-          , typename Derived
-        >
-    )
-  , (
-        hpx::actions::direct_action0<Component, Action, F, Derived>
-    )
-)
-
 /////////////////////////////////////////////////////////////////////////////////
 // bring in the rest of the implementations
 #include <hpx/runtime/actions/component_action_implementations.hpp>
+#include <hpx/runtime/actions/component_action_registration.hpp>
 
 #include <hpx/config/warnings_suffix.hpp>
 

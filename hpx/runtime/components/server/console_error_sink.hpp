@@ -27,4 +27,8 @@ namespace hpx { namespace components { namespace server
     > console_error_sink_action;
 }}}
 
+HPX_REGISTER_PLAIN_ACTION_DECLARATION(
+    hpx::components::server::console_error_sink_action
+)
+
 #endif

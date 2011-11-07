@@ -99,5 +99,19 @@ namespace hpx { namespace performance_counters { namespace server
 
 }}}
 
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::performance_counters::server::base_performance_counter::get_counter_info_action,
+    performance_counter_get_counter_info_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::performance_counters::server::base_performance_counter::get_counter_value_action,
+    performance_counter_get_counter_value_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<hpx::performance_counters::counter_info>::set_result_action,
+    set_result_action_counter_info);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<hpx::performance_counters::counter_value>::set_result_action,
+    set_result_action_counter_value);
+
 #endif
 
