@@ -824,7 +824,7 @@ namespace hpx { namespace actions { namespace detail {
         >
             : boost::mpl::false_
         {};
-        
+
         template <
             void (*F)()
           , typename Derived
@@ -876,7 +876,7 @@ namespace hpx { namespace actions { namespace detail {
 #define HPX_REGISTER_PLAIN_ACTION_DECLARATION(plain_action)                   \
     namespace hpx { namespace actions { namespace detail {                    \
         template <>                                                           \
-        const char *                                                          \
+        HPX_ALWAYS_EXPORT const char *                                        \
         get_action_name<plain_action>();                                      \
     }}}                                                                       \
 /**/
