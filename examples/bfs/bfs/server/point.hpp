@@ -106,4 +106,11 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::geometry::server::point::traverse_action,
     bfs_geometry_traverse_action);
 
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<std::vector<unsigned long> >::get_value_action,
+    get_value_action_ulong);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<std::vector<unsigned long>>::set_result_action,
+    set_result_action_ulong);
 #endif
