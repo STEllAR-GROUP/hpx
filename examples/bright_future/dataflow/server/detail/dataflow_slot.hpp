@@ -111,7 +111,6 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
 
         ~dataflow_slot()
         {
-            wait(connection_promise);
             LLCO_(info)
                 << "~dataflow_slot<"
                 << util::type_id<T>::typeid_.type_id()
@@ -136,6 +135,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
                     traits::get_remote_result<result_type, remote_result>
                         ::call(r)
                 );
+            delete this;
         }
 
         void connect()
@@ -147,7 +147,12 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
                 << util::type_id<SinkAction>::typeid_.type_id()
                 << ">::connect() from "
                 << get_gid();
-            connection_promise = dataflow_source.connect_async(get_gid());
+
+            typedef
+                typename dataflow_type::stub_type::server_type::connect_action
+                action_type;
+
+            applier::apply<action_type>(dataflow_source.get_gid(), get_gid());
         }
 
         void set_event()
@@ -194,7 +199,6 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
 
         SinkAction * dataflow_sink;
         dataflow_type dataflow_source;
-        promise<void> connection_promise;
     };
 
 }}}}

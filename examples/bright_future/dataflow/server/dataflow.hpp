@@ -43,6 +43,8 @@ namespace hpx { namespace lcos { namespace server
         template <typename Action>
         void init(naming::id_type const & target)
         {
+            typename hpx::util::spinlock::scoped_lock l(mtx);
+
             typedef detail::dataflow_impl<Action> wrapped_type;
             typedef
                 detail::component_wrapper<wrapped_type>
@@ -66,6 +68,7 @@ namespace hpx { namespace lcos { namespace server
           , BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)                      \
         )                                                                     \
         {                                                                     \
+            typename hpx::util::spinlock::scoped_lock l(mtx);                 \
             typedef                                                           \
                 detail::dataflow_impl<                                        \
                     Action                                                    \
@@ -97,6 +100,14 @@ namespace hpx { namespace lcos { namespace server
         /// to the specified target lco
         void connect(naming::id_type const & target)
         {
+            typename hpx::util::spinlock::scoped_lock l(mtx);
+
+            // wait until component_ptr is initialized.
+            while(component_ptr == 0)
+            {
+                l.unlock();
+                l.lock();
+            }
             (*component_ptr)->connect_nonvirt(target);
         }
 
@@ -111,6 +122,7 @@ namespace hpx { namespace lcos { namespace server
 
     private:
         detail::component_wrapper_base * component_ptr;
+        hpx::util::spinlock mtx;
     };
 
     ///////////////////////////////////////////////////////////////////////////

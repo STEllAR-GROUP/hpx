@@ -235,4 +235,33 @@ namespace bright_future {
 
 }}
 
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    bright_future::server::remote_lse<double>::init_action
+  , remote_lse_init_action
+);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    bright_future::server::remote_lse<double>::init_u_action
+  , remote_lse_init_u_action
+);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    bright_future::server::remote_lse<double>::init_u_blocked_action
+  , remote_lse_init_u_blocked_action
+);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    bright_future::server::remote_lse<double>::init_rhs_action
+  , remote_lse_init_rhs_action
+);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    bright_future::server::remote_lse<double>::init_rhs_blocked_action
+  , remote_lse_init_rhs_blocked_action
+);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    bright_future::server::remote_lse<double>::apply_action
+  , remote_lse_apply_action
+);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    bright_future::server::remote_lse<double>::apply_region_action
+  , remote_lse_apply_region_action
+);
+
 #endif

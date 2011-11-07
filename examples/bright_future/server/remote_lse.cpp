@@ -138,13 +138,34 @@ namespace bright_future { namespace server {
 
 template HPX_EXPORT class bright_future::server::remote_lse<double>;
 
-HPX_REGISTER_ACTION_EX(bright_future::server::remote_lse<double>::init_action, remote_lse_init_action);
-HPX_REGISTER_ACTION_EX(bright_future::server::remote_lse<double>::init_u_action, remote_lse_init_u_action);
-HPX_REGISTER_ACTION_EX(bright_future::server::remote_lse<double>::init_u_blocked_action, remote_lse_init_u_blocked_action);
-HPX_REGISTER_ACTION_EX(bright_future::server::remote_lse<double>::init_rhs_action, remote_lse_init_rhs_action);
-HPX_REGISTER_ACTION_EX(bright_future::server::remote_lse<double>::init_rhs_blocked_action, remote_lse_init_rhs_blocked_action);
-HPX_REGISTER_ACTION_EX(bright_future::server::remote_lse<double>::apply_action, remote_lse_apply_action);
-HPX_REGISTER_ACTION_EX(bright_future::server::remote_lse<double>::apply_region_action, remote_lse_apply_region_action);
+HPX_REGISTER_ACTION_EX(
+    bright_future::server::remote_lse<double>::init_action
+  , remote_lse_init_action
+);
+HPX_REGISTER_ACTION_EX(
+    bright_future::server::remote_lse<double>::init_u_action
+  , remote_lse_init_u_action
+);
+HPX_REGISTER_ACTION_EX(
+    bright_future::server::remote_lse<double>::init_u_blocked_action
+  , remote_lse_init_u_blocked_action
+);
+HPX_REGISTER_ACTION_EX(
+    bright_future::server::remote_lse<double>::init_rhs_action
+  , remote_lse_init_rhs_action
+);
+HPX_REGISTER_ACTION_EX(
+    bright_future::server::remote_lse<double>::init_rhs_blocked_action
+  , remote_lse_init_rhs_blocked_action
+);
+HPX_REGISTER_ACTION_EX(
+    bright_future::server::remote_lse<double>::apply_action
+  , remote_lse_apply_action
+);
+HPX_REGISTER_ACTION_EX(
+    bright_future::server::remote_lse<double>::apply_region_action
+  , remote_lse_apply_region_action
+);
 
 /*
 BRIGHT_GRID_FUTURE_REGISTER_FUNCTOR(init, init_fun)

@@ -32,30 +32,35 @@ namespace hpx { namespace lcos {
         ~dataflow()
         {
             LLCO_(info)
-            //cout
                 << "~dataflow::dataflow() ";
-                //<< "\n" << flush;
         }
 
-        dataflow(naming::id_type const & target_id)
-            : base_type(stub_type::create_sync(target_id))
+        dataflow(naming::id_type const & target)
+            : base_type(stub_type::create_sync(target))
         {
             BOOST_ASSERT(this->get_gid());
-            stubs::dataflow::init<Action>(this->get_gid(), target_id);
+            typedef hpx::lcos::server::init_action<Action> action_type;
+            applier::apply<action_type>(this->get_gid(), target);
         }
 
 #define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
         template <BOOST_PP_ENUM_PARAMS(N, typename A)>                          \
         dataflow(                                                               \
-            naming::id_type const & target_id                                   \
+            naming::id_type const & target                                      \
           , BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)                        \
         )                                                                       \
-            : base_type(stub_type::create_sync(target_id))                      \
+            : base_type(stub_type::create_sync(target))                         \
         {                                                                       \
             BOOST_ASSERT(this->get_gid());                                      \
-            stubs::dataflow::init<Action>(                                      \
+            typedef                                                             \
+                hpx::lcos::server::init_action<                                 \
+                    Action                                                      \
+                  , BOOST_PP_ENUM_PARAMS(N, A)                                  \
+                >                                                               \
+                action_type;                                                    \
+            applier::apply<action_type>(                                        \
                 this->get_gid()                                                 \
-              , target_id                                                       \
+              , target                                                          \
               , BOOST_PP_ENUM_PARAMS(N, a)                                      \
             );                                                                  \
         }                                                                       \

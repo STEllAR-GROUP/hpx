@@ -168,6 +168,14 @@ namespace hpx { namespace traits
 
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
 
+        // generate the bitset for checking if all slots have fired
+#define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
+            (1<<N) |                                                            \
+    /**/
+        static const boost::uint32_t
+            args_completed = (BOOST_PP_REPEAT(N, HPX_LCOS_DATAFLOW_M0, _) 0);
+#undef HPX_LCOS_DATAFLOW_M0
+
         dataflow_impl(
             naming::id_type const & id
         )
@@ -217,6 +225,7 @@ namespace hpx { namespace traits
 
         ~dataflow_impl()
         {
+            BOOST_ASSERT(args_set == args_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << util::type_id<Action>::typeid_.type_id()
@@ -299,7 +308,7 @@ namespace hpx { namespace traits
         {
             boost::fusion::at<
                 typename boost::mpl::at<
-                    slots_to_args_map
+                    slot_to_args_map
                   , boost::mpl::int_<Slot>
                 >::type
             >(args) = value;
@@ -315,13 +324,8 @@ namespace hpx { namespace traits
         template <int Slot>
         void maybe_apply()
         {
-            delete arg_ids[Slot];
             typename hpx::util::spinlock::scoped_lock l(mtx);
             args_set |= (1<<Slot);
-
-#define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
-            (1<<N) |                                                            \
-    /**/
             LLCO_(info)
                 << "dataflow_impl<"
                 << util::type_id<Action>::typeid_.type_id()
@@ -330,11 +334,11 @@ namespace hpx { namespace traits
                 << " args set: "
                 << args_set
                 << "("
-                << (BOOST_PP_REPEAT(N, HPX_LCOS_DATAFLOW_M0, _) 0)
+                << args_completed
                 << ")"
                 << "\n"
                 ;
-            if(args_set == (BOOST_PP_REPEAT(N, HPX_LCOS_DATAFLOW_M0, _) 0))
+            if(args_set == args_completed)
             {
                 apply_helper<
                     boost::fusion::result_of::size<args_type>::value
@@ -345,8 +349,8 @@ namespace hpx { namespace traits
                   , args
                 );
             }
+            arg_ids[Slot] = 0;
         }
-#undef HPX_LCOS_DATAFLOW_M0
 #endif
 
 
