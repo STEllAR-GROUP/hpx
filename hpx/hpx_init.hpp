@@ -373,6 +373,12 @@ namespace hpx
         double localwait = -1.0);
 
     ///////////////////////////////////////////////////////////////////////////
+    /// The function \a hpx#terminate is the non-graceful way to exit any
+    /// application immediately. It can be called from any locality and will
+    /// terminate all localities currently used by the application.
+    void terminate();
+
+    ///////////////////////////////////////////////////////////////////////////
     /// The function \a hpx#disconnect can be used to disconnect a locality
     /// from a running HPX application.
     ///
