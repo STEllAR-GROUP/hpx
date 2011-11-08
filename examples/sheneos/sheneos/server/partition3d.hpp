@@ -137,6 +137,17 @@ namespace sheneos { namespace server
     };
 }}
 
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    sheneos::server::partition3d::init_action,
+    sheneos_partition3d_init_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    sheneos::server::partition3d::interpolate_action,
+    sheneos_partition3d_interpolate_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<std::vector<double> >::set_result_action,
+    set_result_action_vector_double);
+
 #endif
 
 
