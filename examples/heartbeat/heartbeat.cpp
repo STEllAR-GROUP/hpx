@@ -52,7 +52,7 @@ using hpx::threads::set_thread_state;
 
 using hpx::performance_counters::stubs::performance_counter;
 using hpx::performance_counters::counter_value;
-using hpx::performance_counters::status_valid_data;
+using hpx::performance_counters::status_is_valid;
 
 using hpx::naming::resolver_client;
 using hpx::naming::gid_type;
@@ -130,7 +130,7 @@ int monitor(
         // Query the performance counter.
         counter_value value = performance_counter::get_value(gid);
 
-        if (HPX_LIKELY(status_valid_data == value.status_))
+        if (HPX_LIKELY(status_is_valid(value.status_)))
         {
             if (!zero_time)
                 zero_time = value.time_;

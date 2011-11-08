@@ -299,7 +299,7 @@ namespace hpx { namespace performance_counters
         counter_type_path_elements p;
 
         counter_status status = get_counter_path_elements(name, p, ec);
-        if (status_valid_data != status) return status;
+        if (!status_is_valid(status)) return status;
 
         return get_counter_name(p, type_name, ec);
     }
@@ -311,7 +311,7 @@ namespace hpx { namespace performance_counters
         counter_path_elements p;
 
         counter_status status = get_counter_path_elements(name, p, ec);
-        if (status_valid_data != status) return status;
+        if (!status_is_valid(status)) return status;
 
         return get_counter_name(p, countername, ec);
     }
@@ -332,7 +332,7 @@ namespace hpx { namespace performance_counters
         counter_path_elements p;
 
         counter_status status = get_counter_path_elements(info.fullname_, p, ec);
-        if (status_valid_data != status) return status;
+        if (!status_is_valid(status)) return status;
 
         if (p.parentinstancename_.empty()) {
             p.parentinstancename_ = boost::str(boost::format("locality#%d") %

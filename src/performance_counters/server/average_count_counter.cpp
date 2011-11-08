@@ -67,7 +67,7 @@ namespace hpx { namespace performance_counters { namespace server
 
         value = prev_value_;                // return value
         value.value_ = boost::accumulators::mean(value_);
-        value.status_ = status_valid_data;
+        value.status_ = status_new_data;
         value.time_ = boost::chrono::high_resolution_clock::now().
             time_since_epoch().count();
 

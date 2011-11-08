@@ -131,6 +131,11 @@ namespace hpx { namespace performance_counters
         status_generic_error,   ///< A unknown error occurred
     };
 
+    inline bool status_is_valid(counter_status s)
+    {
+        return s == status_valid_data || s == status_new_data;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     /// A counter_type_path_elements holds the elements of a full name for a
     /// counter type. Generally, a full name of a counter type has the
@@ -255,13 +260,13 @@ namespace hpx { namespace performance_counters
     {
         counter_info(counter_type type = counter_raw)
           : type_(type), version_(HPX_PERFORMANCE_COUNTER_V1),
-            status_(status_valid_data)
+            status_(status_invalid_data)
         {}
 
         counter_info(counter_type type, std::string const& name,
                 std::string const& helptext = "",
                 boost::uint32_t version = HPX_PERFORMANCE_COUNTER_V1)
-          : type_(type), version_(version), status_(status_valid_data),
+          : type_(type), version_(version), status_(status_invalid_data),
             fullname_(name), helptext_(helptext)
         {}
 
@@ -313,7 +318,7 @@ namespace hpx { namespace performance_counters
         template <typename T>
         T get_value(error_code& ec = throws)
         {
-            if (status_valid_data != status_) {
+            if (!status_is_valid(status_)) {
                 HPX_THROWS_IF(ec, invalid_status,
                     "counter_value::get_value<T>",
                     "counter value is in invalid status");

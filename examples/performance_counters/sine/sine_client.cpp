@@ -31,13 +31,13 @@ int monitor(boost::uint64_t pause, boost::uint64_t values)
     {
         // Query the performance counter.
         using hpx::performance_counters::counter_value;
-        using hpx::performance_counters::status_valid_data;
+        using hpx::performance_counters::status_is_valid;
         using hpx::performance_counters::stubs::performance_counter;
 
         counter_value value1 = performance_counter::get_value(id1);
         counter_value value2 = performance_counter::get_value(id2);
         counter_value value3 = performance_counter::get_value(id3);
-        if (status_valid_data == value1.status_)
+        if (status_is_valid(value1.status_))
         {
             if (!start_time)
                 start_time = value1.time_;

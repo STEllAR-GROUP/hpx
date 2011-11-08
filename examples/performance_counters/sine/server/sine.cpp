@@ -47,7 +47,7 @@ namespace performance_counters { namespace sine { namespace server
 
         value.scaling_ = scaling;
         value.scale_inverse_ = true;
-        value.status_ = hpx::performance_counters::status_valid_data;
+        value.status_ = hpx::performance_counters::status_new_data;
 
         using namespace boost::chrono;
         value.time_ = high_resolution_clock::now().time_since_epoch().count();

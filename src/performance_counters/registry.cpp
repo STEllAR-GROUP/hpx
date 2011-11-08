@@ -30,7 +30,7 @@ namespace hpx { namespace performance_counters
         // create canonical type name
         std::string type_name;
         counter_status status = get_counter_type_name(info.fullname_, type_name, ec);
-        if (status_valid_data != status) return status;
+        if (!status_is_valid(status)) return status;
 
         counter_type_map_type::iterator it = countertypes_.find(type_name);
         if (it != countertypes_.end()) {
@@ -63,7 +63,7 @@ namespace hpx { namespace performance_counters
         // create canonical type name
         std::string type_name;
         counter_status status = get_counter_type_name(info.fullname_, type_name, ec);
-        if (status_valid_data != status) return status;
+        if (!status_is_valid(status)) return status;
 
         counter_type_map_type::iterator it = countertypes_.find(type_name);
         if (it == countertypes_.end()) {
@@ -101,7 +101,7 @@ namespace hpx { namespace performance_counters
         // create canonical type name
         std::string type_name;
         counter_status status = get_counter_type_name(info.fullname_, type_name, ec);
-        if (status_valid_data != status) return status;
+        if (!status_is_valid(status)) return status;
 
         counter_type_map_type::iterator it = countertypes_.find(type_name);
         if (it == countertypes_.end()) {
@@ -161,7 +161,7 @@ namespace hpx { namespace performance_counters
         // create canonical type name
         std::string type_name;
         counter_status status = get_counter_type_name(info.fullname_, type_name, ec);
-        if (status_valid_data != status) return status;
+        if (!status_is_valid(status)) return status;
 
         counter_type_map_type::iterator it = countertypes_.find(type_name);
         if (it == countertypes_.end()) {
@@ -233,7 +233,7 @@ namespace hpx { namespace performance_counters
         // create canonical type name
         std::string type_name;
         counter_status status = get_counter_type_name(info.fullname_, type_name, ec);
-        if (status_valid_data != status) return status;
+        if (!status_is_valid(status)) return status;
 
         counter_type_map_type::iterator it = countertypes_.find(type_name);
         if (it == countertypes_.end()) {
@@ -302,7 +302,7 @@ namespace hpx { namespace performance_counters
         std::string type_name;
         counter_status status = get_counter_type_name(
             complemented_info.fullname_, type_name, ec);
-        if (status_valid_data != status) return status;
+        if (!status_is_valid(status)) return status;
 
         // make sure the type of the new counter is known to the registry
         counter_type_map_type::iterator it = countertypes_.find(type_name);
@@ -336,7 +336,7 @@ namespace hpx { namespace performance_counters
         std::string name;
         counter_status status = get_counter_name(complemented_info.fullname_,
             name, ec);
-        if (status_valid_data != status) return status;
+        if (!status_is_valid(status)) return status;
 
         // unregister this counter from AGAS
         ensure_counter_prefix(name);      // prepend prefix, if necessary
