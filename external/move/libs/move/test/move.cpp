@@ -8,6 +8,7 @@
 // See http://www.boost.org/libs/move for documentation.
 //
 //////////////////////////////////////////////////////////////////////////////
+
 #include <boost/move/move.hpp>
 #include "../example/movable.hpp"
 #include <boost/static_assert.hpp>
@@ -56,35 +57,6 @@ void function_ref(const movable &)
 void function_ref(BOOST_RV_REF(movable))
 {}
 
-void limitations_test()
-{
-   movable m;
-   movable cm;
-
-   //move returns rv ref
-   BOOST_RV_REF(movable) r = boost::move(m);
-   //Conversion operator applied
-   BOOST_RV_REF(movable) q = movable();
-   //Dangerous for a container if const overload is disabled
-   BOOST_RV_REF(movable) s = m;
-   (void)r;
-   (void)q;
-   (void)s;
-
-   //Catch by value, ok
-   m = movable();
-
-   //Does not compile
-   //_value(m);
-   //Compiles
-   function_value(movable());
-
-   //Does not compile
-   //function_ref(movable());
-   //Compiles
-   function_ref(boost::move(m));
-}
-
 struct copyable
 {};
 
@@ -92,8 +64,15 @@ movable create_movable()
 {  return movable(); }
 int main()
 {
+   #if defined(BOOST_NO_RVALUE_REFERENCES)
    BOOST_STATIC_ASSERT((boost::has_nothrow_move<movable>::value == true));
    BOOST_STATIC_ASSERT((boost::has_nothrow_move<copyable>::value == false));
+   BOOST_STATIC_ASSERT((boost::has_move_emulation_enabled<copyable>::value == false));
+   BOOST_STATIC_ASSERT((boost::has_move_emulation_enabled<copyable*>::value == false));
+   BOOST_STATIC_ASSERT((boost::has_move_emulation_enabled<int>::value == false));
+   BOOST_STATIC_ASSERT((boost::has_move_emulation_enabled<int&>::value == false));
+   BOOST_STATIC_ASSERT((boost::has_move_emulation_enabled<int*>::value == false));
+   #endif
 
    {
       movable m;
@@ -105,7 +84,7 @@ int main()
       movable m;
       movable m2(boost::move(m));
       movable m3(functionr(movable(boost::move(m2))));
-      movable m4(functionr(boost::move(m3)));
+      movable m4(functionr(boost::move(m3))); 
 	}
    {
       movable m;
@@ -129,7 +108,7 @@ int main()
       movable m2(boost::move(m));
       movable m3(move_return_function2());
 	}
-   limitations_test();
+   //limitations_test();
 
    return 0;
 }

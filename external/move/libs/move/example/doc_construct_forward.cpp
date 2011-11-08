@@ -51,7 +51,7 @@ class copyable_movable_tester
    {  std::cout << "copyable_movable_tester(BOOST_RV_REF(copyable_movable_tester), BOOST_RV_REF(copyable_movable_tester))" << std::endl;   }
 
    copyable_movable_tester &operator=(BOOST_RV_REF(copyable_movable_tester))
-   {  std::cout << "copyable_movable_tester & operator=(BOOST_RV_REF(copyable_movable_tester))" << std::endl;
+   {  std::cout << "copyable_movable_tester & operator=(BOOST_RV_REF(copyable_movable_tester))" << std::endl; 
       return *this;  }
 
    copyable_movable_tester &operator=(BOOST_COPY_ASSIGN_REF(copyable_movable_tester))

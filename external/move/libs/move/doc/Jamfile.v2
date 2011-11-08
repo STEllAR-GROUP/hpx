@@ -13,7 +13,7 @@ import quickbook ;
 
 doxygen autodoc
    :
-      [ glob ../../../boost/move/*.hpp ]
+      [ glob ../../../boost/move/move.hpp ]
    :
    <doxygen:param>HIDE_UNDOC_MEMBERS=YES
    <doxygen:param>HIDE_UNDOC_MEMBERS=YES
