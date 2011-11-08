@@ -1030,7 +1030,7 @@ bool addressing_service::register_name(
     }
 } // }}}
 
-lcos::promise<bool, response> register_name_async(
+lcos::promise<bool, response> addressing_service::register_name_async(
     std::string const& name
   , naming::gid_type const& id
     )
@@ -1040,7 +1040,7 @@ lcos::promise<bool, response> register_name_async(
     naming::id_type const gid = bootstrap_symbol_namespace_id();
 
     return stubs::symbol_namespace::service_async<bool>(gid, req);
-} 
+}
 
 bool addressing_service::unregister_name(
     std::string const& name
@@ -1079,16 +1079,17 @@ bool addressing_service::unregister_name(
     }
 } // }}}
 
-lcos::promise<naming::id_type, response> unregister_name_async(
+lcos::promise<naming::id_type, response>
+addressing_service::unregister_name_async(
     std::string const& name
     )
-{ 
+{
     request req(symbol_ns_unbind, name);
 
     naming::id_type const gid = bootstrap_symbol_namespace_id();
 
     return stubs::symbol_namespace::service_async<naming::id_type>(gid, req);
-} 
+}
 
 bool addressing_service::resolve_name(
     std::string const& name
@@ -1127,7 +1128,7 @@ bool addressing_service::resolve_name(
         return false;
     }
 } // }}}
-    
+
 lcos::promise<naming::id_type, response> resolve_name_async(
     std::string const& name
     )

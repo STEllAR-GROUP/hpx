@@ -31,7 +31,7 @@ HPX_EXPORT naming::id_type bootstrap_symbol_namespace_id();
 namespace server
 {
 
-struct symbol_namespace :
+struct HPX_EXPORT symbol_namespace :
     components::fixed_component_base<
         HPX_AGAS_SYMBOL_NS_MSB, HPX_AGAS_SYMBOL_NS_LSB, // constant GID
         symbol_namespace

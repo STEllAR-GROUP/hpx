@@ -12,10 +12,11 @@
 
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/agas/response.hpp>
 
 namespace hpx { namespace agas
 {
-
+///////////////////////////////////////////////////////////////////////////////
 HPX_EXPORT bool register_name(
     std::string const& name
   , naming::id_type const& gid
@@ -32,6 +33,12 @@ inline bool register_name(
     return register_name(name, tmp, ec);
 }
 
+HPX_EXPORT lcos::promise<bool, response> register_name_async(
+    std::string const& name
+  , naming::id_type const& id
+    );
+
+///////////////////////////////////////////////////////////////////////////////
 HPX_EXPORT bool unregister_name(
     std::string const& name
   , error_code& ec = throws
@@ -43,6 +50,11 @@ HPX_EXPORT bool unregister_name(
   , error_code& ec = throws
     );
 
+HPX_EXPORT lcos::promise<naming::id_type, response> unregister_name_async(
+    std::string const& name
+    );
+
+///////////////////////////////////////////////////////////////////////////////
 HPX_EXPORT bool resolve_name(
     std::string const& name
   , naming::id_type& gid

@@ -1006,7 +1006,7 @@ public:
       , error_code& ec = throws
         );
 
-    lcos::promise<bool, response> register_name_async(
+    static lcos::promise<bool, response> register_name_async(
         std::string const& name
       , naming::gid_type const& id
         ); 
@@ -1048,7 +1048,7 @@ public:
       , error_code& ec = throws
         );
 
-    lcos::promise<naming::id_type, response> unregister_name_async(
+    static lcos::promise<naming::id_type, response> unregister_name_async(
         std::string const& name
         );
 
