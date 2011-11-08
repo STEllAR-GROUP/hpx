@@ -7,10 +7,8 @@
 
 set(subdirs
     accumulator
-    adaptive1d
     balancing
     bright_future
-    dataflow
     heartbeat
     hplpx
     nqueen

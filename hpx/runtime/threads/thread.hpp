@@ -15,7 +15,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/coroutine/coroutine.hpp>
-#include <boost/pool/object_pool.hpp>
+//#include <boost/pool/object_pool.hpp>
+#include <boost/lockfree/detail/freelist.hpp>
 #include <boost/lockfree/detail/branch_hints.hpp>
 
 #include <hpx/hpx_fwd.hpp>
@@ -701,7 +702,8 @@ namespace hpx { namespace threads
         typedef components::detail::wrapper_heap_list<
             components::detail::fixed_wrapper_heap<threads::thread> >
         heap_type;
-        typedef boost::object_pool<threads::detail::thread> detail_heap_type;
+        typedef boost::lockfree::caching_freelist<threads::detail::thread>
+            detail_heap_type;
 
         thread_pool()
           : pool_(components::get_component_type<threads::detail::thread>())
