@@ -36,10 +36,10 @@ namespace hpx { namespace lcos
         >::type,
         typename Action::result_type
     >
-    async_callback (naming::id_type const& gid,
+    async_callback (
         HPX_STD_FUNCTION<void(typename traits::promise_local_result<
             typename Action::result_type
-        >::type const&)> const& data_sink)
+        >::type const&)> const& data_sink, naming::id_type const& gid)
     {
         typedef typename traits::promise_local_result<
             typename Action::result_type
@@ -57,11 +57,12 @@ namespace hpx { namespace lcos
         >::type,
         typename Action::result_type
     >
-    async_callback (naming::id_type const& gid,
+    async_callback (
         HPX_STD_FUNCTION<void(typename traits::promise_local_result<
             typename Action::result_type
         >::type const&)> const& data_sink,
-        HPX_STD_FUNCTION<void(boost::exception_ptr const&)> const& error_sink)
+        HPX_STD_FUNCTION<void(boost::exception_ptr const&)> const& error_sink,
+        naming::id_type const& gid)
     {
         typedef typename traits::promise_local_result<
             typename Action::result_type
@@ -116,11 +117,11 @@ namespace hpx { namespace lcos
         >::type,
         typename Action::result_type
     >
-    async_callback (naming::id_type const& gid,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg),
+    async_callback (
         HPX_STD_FUNCTION<void(typename traits::promise_local_result<
             typename Action::result_type
-        >::type const&)> const& data_sink)
+        >::type const&)> const& data_sink, naming::id_type const& gid,
+        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
         typedef typename traits::promise_local_result<
             typename Action::result_type
@@ -137,12 +138,13 @@ namespace hpx { namespace lcos
         >::type,
         typename Action::result_type
     >
-    async_callback (naming::id_type const& gid,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg),
+    async_callback (
         HPX_STD_FUNCTION<void(typename traits::promise_local_result<
             typename Action::result_type
         >::type const&)> const& data_sink,
-        HPX_STD_FUNCTION<void(boost::exception_ptr const&)> const& error_sink)
+        HPX_STD_FUNCTION<void(boost::exception_ptr const&)> const& error_sink,
+        naming::id_type const& gid,
+        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
         typedef typename traits::promise_local_result<
             typename Action::result_type
