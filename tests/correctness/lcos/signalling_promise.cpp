@@ -41,44 +41,57 @@ int hpx_main(variables_map& vm)
 
     {
         bool cb_called = false;
+
         promise<int> p = async_callback<test_action>(
             [&](int const& i) {                       // data callback
                 cb_called = true;
                 BOOST_TEST(i == 42);
-            }, hpx::find_here());
+            },
+            hpx::find_here()
+        );
+
         BOOST_TEST(p.get() == 42);
         BOOST_TEST(cb_called);
     }
 
 
     {
+        std::string error_msg = "throwing test exception: HPX(not_implemented)";
         bool data_cb_called = false;
         bool error_cb_called = false;
+
         promise<int> p = async_callback<test_error_action>(
             [&](int const& i) {                       // data callback
                 data_cb_called = true;
-                BOOST_TEST(i == 42);
             },
             [&](boost::exception_ptr const& be) {     // error callback
                 error_cb_called = true;
+                std::string what_msg;
+
                 try {
                     boost::rethrow_exception(be);
                 }
-                catch (std::exception const& /*e*/) {
-                    ; // BOOST_TEST(e.what() == "");
+                catch (std::exception const& e) {
+                    what_msg = e.what();
                 }
+
+                BOOST_TEST(what_msg == error_msg);
             },
             hpx::find_here()
         );
 
+        std::string what_msg;
         bool exception_caught = false;
+
         try {
             p.get();      // throws
         }
-        catch (std::exception const& /*e*/) {
+        catch (std::exception const& e) {
             exception_caught = true;
+            what_msg = e.what();
         }
 
+        BOOST_TEST(what_msg == error_msg);
         BOOST_TEST(exception_caught);
         BOOST_TEST(!data_cb_called);
         BOOST_TEST(error_cb_called);
