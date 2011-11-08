@@ -3,7 +3,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/include/iostreams.hpp>
@@ -11,9 +10,7 @@
 #include "remote_lse.hpp"
 #include <cmath>
 
-
 HPX_REGISTER_COMPONENT_MODULE();
-
 
 namespace bright_future { namespace server {
 
@@ -134,6 +131,22 @@ namespace bright_future { namespace server {
         }
     }
 
+    template <typename T>
+    void remote_lse<T>::apply_region_df(
+        typename remote_lse<T>::apply_func_type f
+      , typename remote_lse<T>::range_type x_range
+      , typename remote_lse<T>::range_type y_range
+    )
+    {
+        for(size_type y = y_range.first; y < (std::min)(config.n_y, y_range.second); ++y)
+        {
+            for(size_type x = x_range.first; x < (std::min)(config.n_x, x_range.second); ++x)
+            {
+                u(x, y) = f(u, rhs, x, y, config);
+            }
+        }
+    }
+
 }}
 
 template HPX_EXPORT class bright_future::server::remote_lse<double>;
@@ -165,6 +178,10 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     bright_future::server::remote_lse<double>::apply_region_action
   , remote_lse_apply_region_action
+);
+HPX_REGISTER_ACTION_EX(
+    bright_future::server::remote_lse<double>::apply_region_df_action
+  , remote_lse_apply_region_df_action
 );
 
 /*

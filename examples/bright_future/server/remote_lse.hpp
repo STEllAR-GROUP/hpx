@@ -16,6 +16,14 @@
 
 #include <hpx/lcos/local_mutex.hpp>
 
+namespace boost { namespace serialization {
+    template <typename Archive>
+    void serialize(Archive & ar, hpx::lcos::promise<void> &, unsigned)
+    {
+    }
+}}
+
+
 namespace bright_future {
 
     template <typename T> struct grid;
@@ -231,8 +239,24 @@ namespace bright_future {
                   , &remote_lse<T>::apply_region
                 >
                 apply_region_action;
-    };
+            
+            void apply_region_df(
+                apply_func_type f
+              , range_type x_range
+              , range_type y_range
+            );
 
+            typedef
+                hpx::actions::action3<
+                    remote_lse<T>
+                  , remote_lse_apply_region
+                  , apply_func_type
+                  , range_type
+                  , range_type
+                  , &remote_lse<T>::apply_region_df
+                >
+                apply_region_df_action;
+    };
 }}
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
@@ -262,6 +286,10 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     bright_future::server::remote_lse<double>::apply_region_action
   , remote_lse_apply_region_action
+);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    bright_future::server::remote_lse<double>::apply_region_df_action
+  , remote_lse_apply_region_df_action
 );
 
 #endif
