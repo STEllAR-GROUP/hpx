@@ -445,10 +445,18 @@ namespace hpx
                 typename traits::promise_remote_result<Result>::type,
             int N = 1>
         class promise;
+        struct non_signalling_tag {};
+
+        template <typename Result,
+            typename RemoteResult =
+                typename traits::promise_remote_result<Result>::type>
+        class signalling_promise;
+        struct signalling_tag {};
 
         template <typename Action,
             typename Result = typename traits::promise_local_result<
                 typename Action::result_type>::type,
+            typename Signalling = non_signalling_tag,
             typename DirectExecute = typename Action::direct_execution>
         class eager_future;
 

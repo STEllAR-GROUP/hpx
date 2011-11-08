@@ -6,6 +6,7 @@
 #if !defined(HPX_TRAITS_PROMISE_LOCAL_RESULT_OCT_27_2011_0416PM)
 #define HPX_TRAITS_PROMISE_LOCAL_RESULT_OCT_27_2011_0416PM
 
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/traits.hpp>
 
 namespace hpx { namespace traits
@@ -19,6 +20,11 @@ namespace hpx { namespace traits
     template <>
     struct promise_local_result<util::unused_type>
       : boost::mpl::identity<void>
+    {};
+
+    template <>
+    struct promise_remote_result<naming::gid_type>
+      : boost::mpl::identity<naming::id_type>
     {};
 }}
 

@@ -24,7 +24,7 @@ namespace hpx { namespace components { namespace server
         {}
 
         naming::gid_type prefix_;
-        std::vector<lcos::promise<naming::gid_type> > gids_;
+        std::vector<lcos::promise<naming::gid_type, naming::gid_type> > gids_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
