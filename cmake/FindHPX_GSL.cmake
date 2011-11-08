@@ -8,8 +8,12 @@ if(NOT HPX_FINDPACKAGE_LOADED)
   include(HPX_FindPackage)
 endif()
 
+if(GSL_USE_SYSTEM)
+  set(GSLCBLAS_CPP_USE_SYSTEM ON)
+endif()
+
 if(GSL_ROOT)
-  set(GSLCBLAS_ROOT $ENV{HOME_GSL})
+  set(GSLCBLAS_ROOT ${GSL_ROOT})
 endif()
 
 hpx_find_package(GSL
@@ -20,12 +24,7 @@ hpx_find_package(GSL
 
 hpx_find_package(GSLCBLAS
   LIBRARIES gslcblas libgslcblas
-  LIBRARY_PATHS lib64 lib Lib
+  LIBRARY_PATHS lib64 lib
   HEADERS gsl_test.h
   HEADER_PATHS include include/gsl)
-
-if(GSL_FOUND AND NOT HPX_SET_GSL_MACRO)
-  set(HPX_SET_GSL_MACRO ON CACHE BOOL "Added the GSL detection macro" FORCE)
-  add_definitions(-DGSL_FOUND)
-endif()
 
