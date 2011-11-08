@@ -34,7 +34,7 @@ namespace hpx { namespace components
         {
             if (gid_ != gid)
                 gid_ = gid;
-            return this;
+            return *this;
         }
 
         ///////////////////////////////////////////////////////////////////////
