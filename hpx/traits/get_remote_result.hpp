@@ -3,13 +3,15 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_GET_RESULT_FEB_10_2011_1123AM)
-#define HPX_LCOS_GET_RESULT_FEB_10_2011_1123AM
+#if !defined(HPX_TRAITS_GET_REMOTE_RESULT_FEB_10_2011_1123AM)
+#define HPX_TRAITS_GET_REMOTE_RESULT_FEB_10_2011_1123AM
 
-namespace hpx { namespace lcos
+#include <hpx/traits.hpp>
+
+namespace hpx { namespace traits
 {
-    template <typename Result, typename RemoteResult>
-    struct get_result
+    template <typename Result, typename RemoteResult, typename Enable>
+    struct get_remote_result
     {
         static Result call(RemoteResult const& rhs)
         {
@@ -18,7 +20,7 @@ namespace hpx { namespace lcos
     };
 
     template <typename Result>
-    struct get_result<Result, Result>
+    struct get_remote_result<Result, Result>
     {
         static Result const& call(Result const& rhs)
         {

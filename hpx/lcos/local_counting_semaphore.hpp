@@ -37,9 +37,9 @@ namespace hpx { namespace lcos
     /// this semaphore.
     class HPX_EXPORT local_counting_semaphore
     {
+    private:
         typedef util::spinlock mutex_type;
 
-    private:
         // define data structures needed for intrusive slist container used for
         // the queues
         struct queue_entry

@@ -36,13 +36,6 @@ struct symbol_namespace :
       : base_type(id)
     {}
 
-    lcos::promise<response> service_async(
-        request const& req
-        )
-    {
-        return this->base_type::service_async(this->gid_, req);
-    }
-
     response service(
         request const& req
       , error_code& ec = throws

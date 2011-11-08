@@ -534,7 +534,7 @@ bool addressing_service::get_id_range(
             cf.set_ok();
         }
 
-        const error s = rep.get_status();
+        error const s = rep.get_status();
 
         if (ec || (success != s && repeated_request != s))
             return false;
@@ -542,7 +542,7 @@ bool addressing_service::get_id_range(
         lower_bound = rep.get_lower_bound();
         upper_bound = rep.get_upper_bound();
 
-        return repeated_request != s;
+        return success == s;
     }
     catch (hpx::exception const& e) {
         // Replace the future in the pool. To be able to return the future to
@@ -589,7 +589,7 @@ bool addressing_service::bind_range(
 
         // Create a global virtual address from the legacy calling convention
         // parameters.
-        const gva g(ep, baseaddr.type_, count, baseaddr.address_, offset);
+        gva const g(ep, baseaddr.type_, count, baseaddr.address_, offset);
 
         request req(primary_ns_bind_gid, lower_id, g);
         response rep;
@@ -1014,8 +1014,7 @@ bool addressing_service::register_name(
         else
             rep = hosted->symbol_ns_.service(req, ec);
 
-        // Check if we evicted another entry or if an exception occured.
-        return !ec && (rep.get_gid() == id);
+        return !ec && (success == rep.get_status());
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
@@ -1030,6 +1029,18 @@ bool addressing_service::register_name(
         return false;
     }
 } // }}}
+
+lcos::promise<bool, response> register_name_async(
+    std::string const& name
+  , naming::gid_type const& id
+    )
+{
+    request req(symbol_ns_bind, name, id);
+
+    naming::id_type const gid = bootstrap_symbol_namespace_id();
+
+    return stubs::symbol_namespace::service_async<bool>(gid, req);
+} 
 
 bool addressing_service::unregister_name(
     std::string const& name
@@ -1068,6 +1079,17 @@ bool addressing_service::unregister_name(
     }
 } // }}}
 
+lcos::promise<naming::id_type, response> unregister_name_async(
+    std::string const& name
+    )
+{ 
+    request req(symbol_ns_unbind, name);
+
+    naming::id_type const gid = bootstrap_symbol_namespace_id();
+
+    return stubs::symbol_namespace::service_async<naming::id_type>(gid, req);
+} 
+
 bool addressing_service::resolve_name(
     std::string const& name
   , naming::gid_type& id
@@ -1105,6 +1127,17 @@ bool addressing_service::resolve_name(
         return false;
     }
 } // }}}
+    
+lcos::promise<naming::id_type, response> resolve_name_async(
+    std::string const& name
+    )
+{
+    request req(symbol_ns_resolve, name);
+
+    naming::id_type const gid = bootstrap_symbol_namespace_id();
+
+    return stubs::symbol_namespace::service_async<naming::id_type>(gid, req);
+}
 
 /// Invoke the supplied hpx::function for every registered global name
 bool addressing_service::iterateids(
@@ -1134,6 +1167,33 @@ bool addressing_service::iterateids(
         }
 
         return false;
+    }
+} // }}}
+
+void addressing_service::update_cache(
+    naming::gid_type const& gid
+  , gva const& g
+  , error_code& ec
+    )
+{ // {{{
+    try {
+        mutex_type::scoped_lock lock(gva_cache_mtx_);
+
+        gva_cache_key key(gid, g.count);
+        gva_cache_.insert(key, g);
+
+        if (&ec != &throws)
+            ec = make_success_code();
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error()
+              , "addressing_service::update_cache"
+              , e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow);
+        }
     }
 } // }}}
 
@@ -1202,33 +1262,6 @@ void addressing_service::install_counters()
 
     performance_counters::install_counters(
         counters, sizeof(counters)/sizeof(counters[0]));
-} // }}}
-
-void addressing_service::update_cache(
-    naming::gid_type const& gid
-  , gva const& g
-  , error_code& ec
-    )
-{ // {{{
-    try {
-        mutex_type::scoped_lock lock(gva_cache_mtx_);
-
-        gva_cache_key key(gid, g.count);
-        gva_cache_.insert(key, g);
-
-        if (&ec != &throws)
-            ec = make_success_code();
-    }
-    catch (hpx::exception const& e) {
-        if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error()
-              , "addressing_service::update_cache"
-              , e.what());
-        }
-        else {
-            ec = e.get_error_code(hpx::rethrow);
-        }
-    }
 } // }}}
 
 }}

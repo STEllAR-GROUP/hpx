@@ -80,9 +80,9 @@ namespace hpx { namespace lcos
     /// TimedLockable concept.
     class HPX_EXPORT local_mutex : public boost::noncopyable
     {
-    public:
-        typedef util::spinlock mutex_type;
     private:
+        typedef util::spinlock mutex_type;
+
         BOOST_STATIC_CONSTANT(boost::uint32_t, lock_flag_bit = 31);
         BOOST_STATIC_CONSTANT(boost::uint32_t, lock_flag_value = 1u << lock_flag_bit);
 
