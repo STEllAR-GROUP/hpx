@@ -9,13 +9,13 @@
 #define HPX_FF038007_9487_465F_B750_9452CF6D6693
 
 #include <hpx/lcos/eager_future.hpp>
-#include <hpx/lcos/lazy_future.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/components/iostreams/server/output_stream.hpp>
 
 namespace hpx { namespace iostreams { namespace stubs
 {
 
+// TODO: method names are misleading.
 struct output_stream : components::stub_base<server::output_stream>
 {
     static void write_sync(
