@@ -310,9 +310,8 @@ namespace hpx
             std::ifstream ifs(filename.c_str());
             if (!ifs.is_open()) {
                 if (!may_fail) {
-                    std::cerr << filename
-                        << ": command line warning: command line options file "
-                           "not found"
+                    std::cerr << "hpx::init: command line warning: command line "
+                          "options file not found (" << filename << ")"
                         << std::endl;
                 }
                 return false;
@@ -643,7 +642,7 @@ namespace hpx
             if (vm.count("list-counters")) {
                 // Print the names of all registered performance counters and
                 // then call f (if f is NULL, hpx::finalize() is called instead
-                // and 0 is returned). 
+                // and 0 is returned).
                 result = rt.run(
                     boost::bind(&list_symbolic_names<list_counter_action>,
                         vm, f, "registered performance counters"),
@@ -653,7 +652,7 @@ namespace hpx
             else if (vm.count("list-counter-infos")) {
                 // Print info about all registered performance counters and
                 // then call f (if f is NULL, hpx::finalize() is called instead
-                // and 0 is returned). 
+                // and 0 is returned).
                 result = rt.run(
                     boost::bind(&list_symbolic_names<list_counter_info_action>,
                         vm, f, "registered performance counters"),
@@ -662,7 +661,7 @@ namespace hpx
             }
             else if (vm.count("list-symbolic-names")) {
                 // Print all registered symbolic names and then call f (if f is
-                // NULL, hpx::finalize() is called instead and 0 is returned). 
+                // NULL, hpx::finalize() is called instead and 0 is returned).
                 result = rt.run(
                     boost::bind(&list_symbolic_names<list_symbolic_name_action>,
                         vm, f, "registered symbolic names"),
@@ -671,7 +670,7 @@ namespace hpx
             }
             else if (vm.count("list-component-types")) {
                 // Print all registered component types and then call f (if f is
-                // NULL, hpx::finalize() is called instead and 0 is returned). 
+                // NULL, hpx::finalize() is called instead and 0 is returned).
                 result = rt.run(
                     boost::bind(&list_component_types<list_component_type_action>,
                         vm, f, "registered dynamic component types"),
@@ -1150,6 +1149,11 @@ namespace hpx
             else if (vm.count("run-agas-server-only") && !env.run_with_pbs()) {
                 throw std::logic_error("Command line option --run-agas-server-only "
                     "can be specified only for the node running the AGAS server.");
+            }
+            if (1 == num_localities && vm.count("run-agas-server-only")) {
+                std::cerr  << "hpx::init: command line warning: --run-agas-server-only "
+                       "used for single locality execution, application might "
+                       "not run properly." << std::endl;
             }
 
             if (vm.count("debug-hpx-log")) {
