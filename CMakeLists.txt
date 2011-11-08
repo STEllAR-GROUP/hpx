@@ -26,8 +26,8 @@ set(CMAKE_USER_MAKE_RULES_OVERRIDE_Fortran
 ################################################################################
 project(hpx CXX)
 
-set(HPX_MAJOR_VERSION 0)
-set(HPX_MINOR_VERSION 7)
+set(HPX_MAJOR_VERSION 1)
+set(HPX_MINOR_VERSION 0)
 set(HPX_PATCH_LEVEL   0)
 set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
 set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
