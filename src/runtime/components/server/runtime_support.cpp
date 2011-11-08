@@ -21,7 +21,6 @@
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/component_registry_base.hpp>
 #include <hpx/runtime/components/component_startup_shutdown_base.hpp>
-#include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/lcos/future_wait.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
@@ -88,13 +87,6 @@ HPX_REGISTER_ACTION_EX(
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::components::server::runtime_support,
     hpx::components::component_runtime_support);
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace actions
-{
-    template HPX_EXPORT hpx::naming::gid_type const&
-    continuation::trigger(hpx::naming::gid_type const&);
-}}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server

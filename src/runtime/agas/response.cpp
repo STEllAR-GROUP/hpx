@@ -10,7 +10,6 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/base_lco.hpp>
-#include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/runtime/agas/response.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/components/component_factory.hpp>

@@ -11,7 +11,6 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/trigger.hpp>
-#include <hpx/runtime/actions/continuation_impl.hpp>
 
 #include <tests/correctness/agas/components/server/simple_refcnt_checker.hpp>
 

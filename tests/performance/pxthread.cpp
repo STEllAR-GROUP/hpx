@@ -13,7 +13,6 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/include/iostreams.hpp>

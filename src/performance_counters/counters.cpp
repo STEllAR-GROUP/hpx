@@ -7,7 +7,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/include/runtime.hpp>
-#include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
@@ -45,16 +44,6 @@ HPX_REGISTER_ACTION_EX(
 
 HPX_DEFINE_GET_COMPONENT_TYPE(
     hpx::performance_counters::server::base_performance_counter);
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace actions
-{
-    template HPX_EXPORT hpx::performance_counters::counter_info const&
-    continuation::trigger(hpx::performance_counters::counter_info const& arg0);
-
-    template HPX_EXPORT hpx::performance_counters::counter_value const&
-    continuation::trigger(hpx::performance_counters::counter_value const& arg0);
-}}
 
 ///////////////////////////////////////////////////////////////////////////////
 // HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(

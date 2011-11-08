@@ -8,7 +8,6 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/components/derived_component_factory_one.hpp>
-#include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/serialize_exception.hpp>
@@ -118,11 +117,4 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco_with_value<hpx::util::unused_type>,
     hpx::components::component_base_lco_with_value);
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace actions
-{
-    template HPX_EXPORT hpx::util::section const&
-    continuation::trigger(hpx::util::section const&);
-}}
 
