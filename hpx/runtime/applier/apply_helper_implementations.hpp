@@ -8,6 +8,8 @@
 #if !defined(HPX_APPLIER_APPLY_HELPER_IMPLEMENTATIONS_JUN_26_2008_0150PM)
 #define HPX_APPLIER_APPLY_HELPER_IMPLEMENTATIONS_JUN_26_2008_0150PM
 
+#include <boost/preprocessor/cat.hpp>
+#include <boost/preprocessor/repeat.hpp>
 #include <boost/preprocessor/iterate.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
@@ -28,72 +30,87 @@
 
 #define N BOOST_PP_ITERATION()
 
+#define HPX_FWD_ARGS(z, n, _)                                                 \
+        BOOST_PP_COMMA_IF(n)                                                  \
+            BOOST_FWD_REF(BOOST_PP_CAT(Arg, n)) BOOST_PP_CAT(arg, n)          \
+    /**/
+#define HPX_FORWARD_ARGS(z, n, _)                                             \
+        BOOST_PP_COMMA_IF(n)                                                  \
+            boost::forward<BOOST_PP_CAT(Arg, n)>(BOOST_PP_CAT(arg, n))        \
+    /**/
+
+namespace hpx { namespace applier { namespace detail
+{
     ///////////////////////////////////////////////////////////////////////
-    template <
-        typename Action,
-        BOOST_PP_ENUM_PARAMS(N, typename Arg),
+    template <typename Action,
         typename DirectExecute = typename Action::direct_execution>
     struct BOOST_PP_CAT(apply_helper, N);
 
-    template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    struct BOOST_PP_CAT(apply_helper, N)<
-        Action, BOOST_PP_ENUM_PARAMS(N, Arg), boost::mpl::false_>
+    template <typename Action>
+    struct BOOST_PP_CAT(apply_helper, N)<Action, boost::mpl::false_>
     {
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static void
         call (naming::address::address_type lva,
             threads::thread_priority priority,
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+            BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
             hpx::applier::register_work_plain(
                 Action::construct_thread_function(lva,
-                    BOOST_PP_ENUM_PARAMS(N, arg)),
+                    BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)),
                 actions::detail::get_action_name<Action>(), lva,
                 threads::pending, priority);
         }
 
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static void
         call (actions::continuation_type& c, naming::address::address_type lva,
             threads::thread_priority priority,
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+            BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
             hpx::applier::register_work_plain(
                 Action::construct_thread_function(
-                    c, lva, BOOST_PP_ENUM_PARAMS(N, arg)),
+                    c, lva, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)),
                 actions::detail::get_action_name<Action>(), lva,
                 threads::pending, priority);
         }
     };
 
-    template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    struct BOOST_PP_CAT(apply_helper, N)<
-        Action, BOOST_PP_ENUM_PARAMS(N, Arg), boost::mpl::true_>
+    template <typename Action>
+    struct BOOST_PP_CAT(apply_helper, N)<Action, boost::mpl::true_>
     {
         // If local and to be directly executed, just call the function
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static void
         call (naming::address::address_type lva,
             threads::thread_priority priority,
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+            BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
-            Action::execute_function_nonvirt(lva, BOOST_PP_ENUM_PARAMS(N, arg));
+            Action::execute_function_nonvirt(lva,
+                BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
         }
 
-        static typename Action::result_type
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+        static void
         call (actions::continuation_type& c, naming::address::address_type lva,
             threads::thread_priority priority,
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+            BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
             try {
-                return c->trigger(Action::execute_function_nonvirt(
-                    lva, BOOST_PP_ENUM_PARAMS(N, arg)));
+                c->trigger(Action::execute_function_nonvirt(
+                    lva, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)));
             }
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client
                 c->trigger_error(boost::current_exception());
-                return typename Action::result_type();
             }
         }
     };
+}}}
 
+///////////////////////////////////////////////////////////////////////////////
+#undef HPX_FORWARD_ARGS
+#undef HPX_FWD_ARGS
 #undef N
 
 #endif

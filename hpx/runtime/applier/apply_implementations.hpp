@@ -8,6 +8,8 @@
 #if !defined(HPX_APPLIER_APPLY_IMPLEMENTATIONS_JUN_09_2008_0434PM)
 #define HPX_APPLIER_APPLY_IMPLEMENTATIONS_JUN_09_2008_0434PM
 
+#include <boost/preprocessor/cat.hpp>
+#include <boost/preprocessor/repeat.hpp>
 #include <boost/preprocessor/iterate.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
@@ -28,17 +30,27 @@
 
 #define N BOOST_PP_ITERATION()
 
+#define HPX_FWD_ARGS(z, n, _)                                                 \
+        BOOST_PP_COMMA_IF(n)                                                  \
+            BOOST_FWD_REF(BOOST_PP_CAT(Arg, n)) BOOST_PP_CAT(arg, n)          \
+    /**/
+#define HPX_FORWARD_ARGS(z, n, _)                                             \
+        BOOST_PP_COMMA_IF(n)                                                  \
+            boost::forward<BOOST_PP_CAT(Arg, n)>(BOOST_PP_CAT(arg, n))        \
+    /**/
+
+namespace hpx { namespace applier
+{
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply_r_p(naming::address& addr, naming::id_type const& gid,
-        threads::thread_priority priority,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        threads::thread_priority priority, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         // If remote, create a new parcel to be sent to the destination
         // Create a new parcel with the gid, action, and arguments
         parcelset::parcel p (gid.get_gid(),
-            new Action(priority, BOOST_PP_ENUM_PARAMS(N, arg)));
+            new Action(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)));
         if (components::component_invalid == addr.type_)
             addr.type_ = components::get_component_type<typename Action::component_type>();
         p.set_destination_addr(addr);   // avoid to resolve address again
@@ -51,55 +63,55 @@
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply_r (naming::address& addr, naming::id_type const& gid,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         return apply_r_p<Action>(addr, gid, action_priority<Action>(),
-            BOOST_PP_ENUM_PARAMS(N, arg));
+            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply_l_p(naming::address const& addr, threads::thread_priority priority,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         BOOST_ASSERT(components::types_are_compatible(addr.type_,
             components::get_component_type<typename Action::component_type>()));
-        detail::BOOST_PP_CAT(apply_helper, N)<
-                Action, BOOST_PP_ENUM_PARAMS(N, Arg)
-        >::call(addr.address_, priority, BOOST_PP_ENUM_PARAMS(N, arg));
+        detail::BOOST_PP_CAT(apply_helper, N)<Action>::call(addr.address_,
+            priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
         return true;     // no parcel has been sent (dest is local)
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
-    apply_l (naming::address const& addr,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+    apply_l (naming::address const& addr, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         return apply_l_p<Action>(addr, action_priority<Action>(),
-            BOOST_PP_ENUM_PARAMS(N, arg));
+            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply_p(naming::id_type const& gid, threads::thread_priority priority,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local(gid, addr))
-            return apply_l_p<Action>(addr, priority, BOOST_PP_ENUM_PARAMS(N, arg));
+        if (hpx::applier::get_applier().address_is_local(gid, addr)) {
+            return apply_l_p<Action>(addr, priority,
+                BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+        }
 
         // apply remotely
-        return apply_r_p<Action>(addr, gid, priority, BOOST_PP_ENUM_PARAMS(N, arg));
+        return apply_r_p<Action>(addr, gid, priority,
+            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
-    apply (naming::id_type const& gid,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+    apply (naming::id_type const& gid, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         return apply_p<Action>(gid, action_priority<Action>(),
-            BOOST_PP_ENUM_PARAMS(N, arg));
+            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -107,14 +119,14 @@
     inline bool
     apply_r_p(naming::address& addr, actions::continuation* c,
         naming::id_type const& gid, threads::thread_priority priority,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         actions::continuation_type cont(c);
 
         // If remote, create a new parcel to be sent to the destination
         // Create a new parcel with the gid, action, and arguments
         parcelset::parcel p (gid.get_gid(),
-            new Action(priority, BOOST_PP_ENUM_PARAMS(N, arg)), cont);
+            new Action(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)), cont);
         if (components::component_invalid == addr.type_)
             addr.type_ = components::get_component_type<typename Action::component_type>();
         p.set_destination_addr(addr);   // avoid to resolve address again
@@ -127,100 +139,101 @@
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply_r (naming::address& addr, actions::continuation* c,
-        naming::id_type const& gid,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        naming::id_type const& gid, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         return apply_r_p<Action>(addr, c, gid, action_priority<Action>(),
-            BOOST_PP_ENUM_PARAMS(N, arg));
+            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply_l_p(actions::continuation* c, naming::address const& addr,
-        threads::thread_priority priority,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        threads::thread_priority priority, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         BOOST_ASSERT(components::types_are_compatible(addr.type_,
             components::get_component_type<typename Action::component_type>()));
         actions::continuation_type cont(c);
-        detail::BOOST_PP_CAT(apply_helper, N)<
-                Action, BOOST_PP_ENUM_PARAMS(N, Arg)
-        >::call(cont, addr.address_, priority, BOOST_PP_ENUM_PARAMS(N, arg));
+        detail::BOOST_PP_CAT(apply_helper, N)<Action>::call(cont,
+            addr.address_, priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
         return true;     // no parcel has been sent (dest is local)
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply_l (actions::continuation* c, naming::address const& addr,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         return apply_l_p<Action>(c, addr, action_priority<Action>(),
-            BOOST_PP_ENUM_PARAMS(N, arg));
+            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply_p(actions::continuation* c, naming::id_type const& gid,
-        threads::thread_priority priority,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        threads::thread_priority priority, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local(gid, addr))
-            return apply_l_p<Action>(c, addr, priority, BOOST_PP_ENUM_PARAMS(N, arg));
+        if (hpx::applier::get_applier().address_is_local(gid, addr)) {
+            return apply_l_p<Action>(c, addr, priority,
+                BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+        }
 
         // apply remotely
-        return apply_r_p<Action>(addr, c, gid, priority, BOOST_PP_ENUM_PARAMS(N, arg));
+        return apply_r_p<Action>(addr, c, gid, priority,
+            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply (actions::continuation* c, naming::id_type const& gid,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         return apply_p<Action>(c, gid, action_priority<Action>(),
-            BOOST_PP_ENUM_PARAMS(N, arg));
+            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply_c_p(naming::address& addr, naming::id_type const& contgid,
         naming::id_type const& gid, threads::thread_priority priority,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         return apply_r_p<Action>(addr, new actions::continuation(contgid),
-            gid, priority, BOOST_PP_ENUM_PARAMS(N, arg));
+            gid, priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply_c (naming::address& addr, naming::id_type const& contgid,
-        naming::id_type const& gid,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        naming::id_type const& gid, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         return apply_r_p<Action>(addr, new actions::continuation(contgid),
-            gid, action_priority<Action>(), BOOST_PP_ENUM_PARAMS(N, arg));
+            gid, action_priority<Action>(), BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply_c_p(naming::id_type const& contgid, naming::id_type const& gid,
-        threads::thread_priority priority,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        threads::thread_priority priority, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         return apply<Action>(new actions::continuation(contgid),
-            gid, priority, BOOST_PP_ENUM_PARAMS(N, arg));
+            gid, priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply_c (naming::id_type const& contgid, naming::id_type const& gid,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         return apply_p<Action>(new actions::continuation(contgid),
-            gid, action_priority<Action>(), BOOST_PP_ENUM_PARAMS(N, arg));
+            gid, action_priority<Action>(), BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
+}}
 
+///////////////////////////////////////////////////////////////////////////////
+#undef HPX_FORWARD_ARGS
+#undef HPX_FWD_ARGS
 #undef N
 
 #endif

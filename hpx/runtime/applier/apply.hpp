@@ -225,11 +225,12 @@ namespace hpx { namespace applier
     template <typename Action, typename Arg0>
     inline bool
     apply_r_p(naming::address& addr, naming::id_type const& gid,
-        threads::thread_priority priority, Arg0 const& arg0)
+        threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
     {
         // If remote, create a new parcel to be sent to the destination
         // Create a new parcel with the gid, action, and arguments
-        parcelset::parcel p (gid.get_gid(), new Action(priority, arg0));
+        parcelset::parcel p (gid.get_gid(),
+            new Action(priority, boost::forward<Arg0>(arg0)));
         if (components::component_invalid == addr.type_)
             addr.type_ = components::get_component_type<typename Action::component_type>();
         p.set_destination_addr(addr);   // avoid to resolve address again
@@ -242,19 +243,21 @@ namespace hpx { namespace applier
     template <typename Action, typename Arg0>
     inline bool
     apply_r (naming::address& addr, naming::id_type const& gid,
-        Arg0 const& arg0)
+        BOOST_FWD_REF(Arg0) arg0)
     {
-        return apply_r_p<Action>(addr, gid, action_priority<Action>(), arg0);
+        return apply_r_p<Action>(addr, gid, action_priority<Action>(),
+            boost::forward<Arg0>(arg0));
     }
 
     template <typename Action, typename Arg0>
     inline bool
     apply_r_sync_p(naming::address& addr, naming::id_type const& gid,
-        threads::thread_priority priority, Arg0 const& arg0)
+        threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
     {
         // If remote, create a new parcel to be sent to the destination
         // Create a new parcel with the gid, action, and arguments
-        parcelset::parcel p (gid.get_gid(), new Action(priority, arg0));
+        parcelset::parcel p (gid.get_gid(),
+            new Action(priority, boost::forward<Arg0>(arg0)));
         if (components::component_invalid == addr.type_)
             addr.type_ = components::get_component_type<typename Action::component_type>();
         p.set_destination_addr(addr);   // avoid to resolve address again
@@ -267,48 +270,52 @@ namespace hpx { namespace applier
     template <typename Action, typename Arg0>
     inline bool
     apply_r_sync (naming::address& addr, naming::id_type const& gid,
-        Arg0 const& arg0)
+        BOOST_FWD_REF(Arg0) arg0)
     {
-        return apply_r_sync_p<Action>(addr, gid, action_priority<Action>(), arg0);
+        return apply_r_sync_p<Action>(addr, gid, action_priority<Action>(),
+            boost::forward<Arg0>(arg0));
     }
 
     template <typename Action, typename Arg0>
     inline bool
     apply_l_p(naming::address const& addr, threads::thread_priority priority,
-        Arg0 const& arg0)
+        BOOST_FWD_REF(Arg0) arg0)
     {
         BOOST_ASSERT(components::types_are_compatible(addr.type_,
             components::get_component_type<typename Action::component_type>()));
-        detail::apply_helper1<Action, Arg0>::call(addr.address_, priority, arg0);
+        detail::apply_helper1<Action>::call(addr.address_, priority,
+            boost::forward<Arg0>(arg0));
         return true;     // no parcel has been sent (dest is local)
     }
 
     template <typename Action, typename Arg0>
     inline bool
-    apply_l (naming::address const& addr, Arg0 const& arg0)
+    apply_l (naming::address const& addr, BOOST_FWD_REF(Arg0) arg0)
     {
-        return apply_l_p<Action>(addr, action_priority<Action>(), arg0);
+        return apply_l_p<Action>(addr, action_priority<Action>(),
+            boost::forward<Arg0>(arg0));
     }
 
     template <typename Action, typename Arg0>
     inline bool
     apply_p(naming::id_type const& gid, threads::thread_priority priority,
-        Arg0 const& arg0)
+        BOOST_FWD_REF(Arg0) arg0)
     {
         // Determine whether the gid is local or remote
         naming::address addr;
         if (hpx::applier::get_applier().address_is_local(gid, addr))
-            return apply_l_p<Action>(addr, priority, arg0);   // apply locally
+            return apply_l_p<Action>(addr, priority, boost::forward<Arg0>(arg0));   // apply locally
 
         // apply remotely
-        return apply_r_p<Action>(addr, gid, priority, arg0);
+        return apply_r_p<Action>(addr, gid, priority, boost::forward<Arg0>(arg0));
     }
 
     template <typename Action, typename Arg0>
     inline bool
-    apply (naming::id_type const& gid, Arg0 const& arg0)
+    apply (naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
     {
-        return apply_p<Action>(gid, action_priority<Action>(), arg0);
+        return apply_p<Action>(gid, action_priority<Action>(),
+            boost::forward<Arg0>(arg0));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -316,13 +323,14 @@ namespace hpx { namespace applier
     inline bool
     apply_r_p(naming::address& addr, actions::continuation* c,
         naming::id_type const& gid, threads::thread_priority priority,
-        Arg0 const& arg0)
+        BOOST_FWD_REF(Arg0) arg0)
     {
         actions::continuation_type cont(c);
 
         // If remote, create a new parcel to be sent to the destination
         // Create a new parcel with the gid, action, and arguments
-        parcelset::parcel p (gid.get_gid(), new Action(priority, arg0), cont);
+        parcelset::parcel p (gid.get_gid(),
+            new Action(priority, boost::forward<Arg0>(arg0)), cont);
         if (components::component_invalid == addr.type_)
             addr.type_ = components::get_component_type<typename Action::component_type>();
         p.set_destination_addr(addr);   // avoid to resolve address again
@@ -335,51 +343,55 @@ namespace hpx { namespace applier
     template <typename Action, typename Arg0>
     inline bool
     apply_r (naming::address& addr, actions::continuation* c,
-        naming::id_type const& gid, Arg0 const& arg0)
+        naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
     {
-        return apply_r_p<Action>(addr, c, gid, action_priority<Action>(), arg0);
+        return apply_r_p<Action>(addr, c, gid, action_priority<Action>(),
+            boost::forward<Arg0>(arg0));
     }
 
     template <typename Action, typename Arg0>
     inline bool
     apply_l_p(actions::continuation* c, naming::address const& addr,
-        threads::thread_priority priority, Arg0 const& arg0)
+        threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
     {
         BOOST_ASSERT(components::types_are_compatible(addr.type_,
             components::get_component_type<typename Action::component_type>()));
         actions::continuation_type cont(c);
-        detail::apply_helper1<Action, Arg0>::call(cont, addr.address_, priority, arg0);
+        detail::apply_helper1<Action>::call(cont, addr.address_, priority,
+            boost::forward<Arg0>(arg0));
         return true;     // no parcel has been sent (dest is local)
     }
 
     template <typename Action, typename Arg0>
     inline bool
     apply_l (actions::continuation* c, naming::address const& addr,
-        Arg0 const& arg0)
+        BOOST_FWD_REF(Arg0) arg0)
     {
-        return apply_l_p<Action>(c, addr, action_priority<Action>(), arg0);
+        return apply_l_p<Action>(c, addr, action_priority<Action>(),
+            boost::forward<Arg0>(arg0));
     }
 
     template <typename Action, typename Arg0>
     inline bool
     apply_p(actions::continuation* c, naming::id_type const& gid,
-        threads::thread_priority priority, Arg0 const& arg0)
+        threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
     {
         // Determine whether the gid is local or remote
         naming::address addr;
         if (hpx::applier::get_applier().address_is_local(gid, addr))
-            return apply_l_p<Action>(c, addr, priority, arg0);    // apply locally
+            return apply_l_p<Action>(c, addr, priority, boost::forward<Arg0>(arg0));    // apply locally
 
         // apply remotely
-        return apply_r_p<Action>(addr, c, gid, priority, arg0);
+        return apply_r_p<Action>(addr, c, gid, priority, boost::forward<Arg0>(arg0));
     }
 
     template <typename Action, typename Arg0>
     inline bool
     apply (actions::continuation* c, naming::id_type const& gid,
-        Arg0 const& arg0)
+        BOOST_FWD_REF(Arg0) arg0)
     {
-        return apply_p<Action>(c, gid, action_priority<Action>(), arg0);
+        return apply_p<Action>(c, gid, action_priority<Action>(),
+            boost::forward<Arg0>(arg0));
     }
 
     /// \brief Invoke an unary action with a \b actions::continuation
@@ -389,10 +401,10 @@ namespace hpx { namespace applier
     inline bool
     apply_c_p(naming::address& addr, naming::id_type const& contgid,
         naming::id_type const& gid, threads::thread_priority priority,
-        Arg0 const& arg0)
+        BOOST_FWD_REF(Arg0) arg0)
     {
         return apply_r_p<Action>(addr, new actions::continuation(contgid), gid,
-            action_priority<Action>(), arg0);
+            action_priority<Action>(), boost::forward<Arg0>(arg0));
     }
 
     /// \brief Invoke an unary action with a \b actions::continuation
@@ -401,9 +413,10 @@ namespace hpx { namespace applier
     template <typename Action, typename Arg0>
     inline bool
     apply_c (naming::address& addr, naming::id_type const& contgid,
-        naming::id_type const& gid, Arg0 const& arg0)
+        naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
     {
-        return apply_r<Action>(addr, new actions::continuation(contgid), gid, arg0);
+        return apply_r<Action>(addr, new actions::continuation(contgid), gid,
+            boost::forward<Arg0>(arg0));
     }
 
     /// \brief Invoke an unary action with a \b actions::continuation at a
@@ -412,10 +425,10 @@ namespace hpx { namespace applier
     template <typename Action, typename Arg0>
     inline bool
     apply_c_p(naming::id_type const& contgid, naming::id_type const& gid,
-        threads::thread_priority priority, Arg0 const& arg0)
+        threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
     {
         return apply_p<Action>(new actions::continuation(contgid), gid,
-            priority, arg0);
+            priority, boost::forward<Arg0>(arg0));
     }
 
     /// \brief Invoke an unary action with a \b actions::continuation on a
@@ -428,14 +441,14 @@ namespace hpx { namespace applier
     template <typename Action, typename Arg0>
     inline bool
     apply_c (naming::id_type const& contgid, naming::id_type const& gid,
-        Arg0 const& arg0)
+        BOOST_FWD_REF(Arg0) arg0)
     {
-        return apply<Action>(new actions::continuation(contgid), gid, arg0);
+        return apply<Action>(new actions::continuation(contgid), gid,
+            boost::forward<Arg0>(arg0));
     }
-
-    // bring in the rest of the apply<> overloads (arity 2+)
-    #include <hpx/runtime/applier/apply_implementations.hpp>
-
 }}
+
+// bring in the rest of the apply<> overloads (arity 2+)
+#include <hpx/runtime/applier/apply_implementations.hpp>
 
 #endif
