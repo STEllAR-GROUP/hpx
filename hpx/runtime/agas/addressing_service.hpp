@@ -12,7 +12,6 @@
 
 #include <vector>
 
-#include <boost/atomic.hpp>
 #include <boost/lockfree/fifo.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/cache/entries/lfu_entry.hpp>
@@ -55,9 +54,10 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     typedef symbol_namespace::iterate_names_function_type
         iterate_names_function_type;
 
-    typedef hpx::lcos::local_mutex mutex_type;
+    typedef component_namespace::iterate_types_function_type
+        iterate_types_function_type;
 
-    typedef boost::atomic<boost::uint32_t> console_cache_type;
+    typedef hpx::lcos::local_mutex mutex_type;
     // }}}
 
     // {{{ gva cache
@@ -182,11 +182,13 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     mutable mutex_type gva_cache_mtx_;
     gva_cache_type gva_cache_;
 
-    console_cache_type console_cache_;
+    mutable mutex_type console_cache_mtx_;
+    boost::uint32_t console_cache_;
 
     const service_mode service_type;
     const runtime_mode runtime_type;
 
+    const bool caching_;
     const bool range_caching_;
 
     naming::locality here_;
@@ -382,6 +384,11 @@ public:
     ///                   of hpx#exception.
     components::component_type get_component_id(
         std::string const& name
+      , error_code& ec = throws
+        );
+
+    void iterate_types(
+        iterate_types_function_type const& f
       , error_code& ec = throws
         );
 

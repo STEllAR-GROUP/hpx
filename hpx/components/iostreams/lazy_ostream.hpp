@@ -14,7 +14,6 @@
 #include <boost/swap.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/iostreams/stream.hpp>
-#include <boost/move/move.hpp>
 
 #include <hpx/state.hpp>
 #include <hpx/runtime/components/client_base.hpp>
@@ -40,8 +39,6 @@ struct lazy_ostream
     // }}}
 
   private:
-    BOOST_MOVABLE_BUT_NOT_COPYABLE(lazy_ostream)
-
     mutex_type mtx;
 
     struct data_type
@@ -131,25 +128,6 @@ struct lazy_ostream
       , data(new data_type)
     {}
 
-    lazy_ostream(BOOST_RV_REF(lazy_ostream) other)
-    {
-        mutex_type::scoped_lock l(other.mtx, boost::try_to_lock);
-        if (l)
-        {
-            if (!other.data) {
-                HPX_THROW_EXCEPTION(lock_error, "lazy_ostream::move_ctor"
-                    , "acquired dead rvalue");
-            }
-            data = other.data;
-            other.data = 0;
-        }
-
-        else {
-            HPX_THROW_EXCEPTION(lock_error, "lazy_ostream::move_ctor"
-                , "couldn't acquire lock in move constructor");
-        }
-    }
-
     ~lazy_ostream()
     {
         if (threads::threadmanager_is(running))
@@ -159,8 +137,12 @@ struct lazy_ostream
             {
                 streaming_operator_sync(hpx::sync_flush, l);
             }
-            delete data;
-            data = 0;
+
+            if (data)
+            {
+                delete data;
+                data = 0;
+            }
         }
     }
 

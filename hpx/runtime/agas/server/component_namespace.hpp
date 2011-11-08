@@ -17,6 +17,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/runtime/actions/function.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/response.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -42,6 +43,10 @@ struct HPX_EXPORT component_namespace :
 {
     // {{{ nested types
     typedef lcos::local_mutex mutex_type;
+
+    typedef hpx::actions::function<
+        void(std::string const&, components::component_type)
+    > iterate_types_function_type;
 
     typedef boost::int32_t component_id_type;
 
@@ -98,16 +103,22 @@ struct HPX_EXPORT component_namespace :
       , error_code& ec = throws
         );
 
+    response iterate_types(
+        request const& req
+      , error_code& ec = throws
+        );
+
     enum actions
     { // {{{ action enum
         // Actual actions
-        namespace_service      = BOOST_BINARY_U(0100000)
+        namespace_service       = BOOST_BINARY_U(0100000)
 
         // Pseudo-actions
-      , namespace_bind_prefix  = BOOST_BINARY_U(0100001)
-      , namespace_bind_name    = BOOST_BINARY_U(0100010)
-      , namespace_resolve_id   = BOOST_BINARY_U(0100011)
-      , namespace_unbind       = BOOST_BINARY_U(0100100)
+      , namespace_bind_prefix   = BOOST_BINARY_U(0100001)
+      , namespace_bind_name     = BOOST_BINARY_U(0100010)
+      , namespace_resolve_id    = BOOST_BINARY_U(0100011)
+      , namespace_unbind        = BOOST_BINARY_U(0100100)
+      , namespace_iterate_types = BOOST_BINARY_U(0100101)
     }; // }}}
 
     typedef hpx::actions::result_action1<

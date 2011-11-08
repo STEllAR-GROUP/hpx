@@ -26,6 +26,8 @@ naming::id_type bootstrap_primary_namespace_id()
 namespace server
 {
 
+// TODO: This isn't scalable, we have to update it every time we add a new 
+// AGAS request/response type.
 response primary_namespace::service(
     request const& req
   , error_code& ec
@@ -54,6 +56,7 @@ response primary_namespace::service(
         case component_ns_bind_name:
         case component_ns_resolve_id:
         case component_ns_unbind:
+        case component_ns_iterate_types:
         {
             LAGAS_(warning) <<
                 "component_namespace::service, redirecting request to "

@@ -35,7 +35,7 @@ namespace hpx { namespace lcos
     }
 
     // This overload of wait() will make sure that the passed function will be
-    // invoked as soon as a value gets available, it will not wait for all
+    // invoked as soon as a value becomes available, it will not wait for all
     // results to be there.
     template <typename T1, typename TR1, typename F>
     inline std::size_t
@@ -50,7 +50,7 @@ namespace hpx { namespace lcos
             for (std::size_t i = 0; i < lazy_values.size(); ++i) {
 
                 // loop over all lazy_values, executing the next as soon as its
-                // value gets available
+                // value becomes available
                 if (!handled[i] && lazy_values[i].ready()) {
                     // get the value from the future, invoke the function
                     f(i, lazy_values[i].get());
@@ -86,7 +86,7 @@ namespace hpx { namespace lcos
             for (std::size_t i = 0; i < lazy_values.size(); ++i) {
 
                 // loop over all lazy_values, executing the next as soon as its
-                // value gets available
+                // value becomes available
                 if (!handled[i] && lazy_values[i].ready()) {
                     // get the value from the future, invoke the function
                     lazy_values[i].get();

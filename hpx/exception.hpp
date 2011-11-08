@@ -266,6 +266,8 @@ namespace hpx
     namespace detail
     {
         struct tag_throw_locality {};
+        struct tag_throw_hostname {};
+        struct tag_throw_pid {};
         struct tag_throw_shepherd {};
         struct tag_throw_thread_id {};
         struct tag_throw_thread_name {};
@@ -274,11 +276,23 @@ namespace hpx
         struct tag_throw_stacktrace {};
     }
 
-    /// Stores the information about the locality the exception has been raised
-    /// on. This information will show up in error messages under the
+    /// Stores the information about the locality id the exception has been
+    /// raised on. This information will show up in error messages under the
     /// [locality] tag.
     typedef boost::error_info<detail::tag_throw_locality, boost::uint32_t>
         throw_locality;
+
+    /// Stores the information about the hostname of the locality the exception
+    /// has been raised on. This information will show up in error messages
+    /// under the [hostname] tag.
+    typedef boost::error_info<detail::tag_throw_hostname, std::string>
+        throw_hostname;
+
+    /// Stores the information about the pid of the OS process the exception
+    /// has been raised on. This information will show up in error messages
+    /// under the [pid] tag.
+    typedef boost::error_info<detail::tag_throw_pid, boost::int64_t>
+        throw_pid;
 
     /// Stores the information about the shepherd thread the exception has been
     /// raised on. This information will show up in error messages under the
@@ -330,6 +344,7 @@ namespace hpx
         void rethrow_exception(Exception const& e,
             std::string const& func, std::string const& file, int line,
             std::string const& back_trace, boost::uint32_t node = 0,
+            std::string const& hostname = "", boost::int64_t pid = -1,
             boost::int64_t shepherd = -1, std::size_t thread_id = 0,
             std::string const& thread_name = "");
 

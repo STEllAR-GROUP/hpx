@@ -53,12 +53,15 @@ namespace hpx { namespace iostreams
     // This is a RAII wrapper managing the output stream objects (or their
     // references) for a particular locality
     template <typename Tag>
-    struct stream_raii
+    struct stream_raii : boost::noncopyable
     {
         typedef components::managed_component<server::output_stream> ostream_type;
 
         stream_raii(char const* cout_name)
         {
+            LRT_(info) << "stream_raii::stream_raii: creating '"
+                       << cout_name << "' stream object"; 
+
             naming::resolver_client& agas_client = get_runtime().get_agas_client();
             if (agas_client.is_console())
             {
@@ -67,12 +70,14 @@ namespace hpx { namespace iostreams
                         boost::ref(detail::get_outstream(Tag()))),
                     naming::id_type::managed);
                 client.reset(new lazy_ostream(cout_id));
-                agas::register_name(cout_name, client->get_gid());
+                agas::register_name(cout_name, cout_id);
             }
 
             else
             {
                 naming::gid_type gid;
+
+                // FIXME: Use an error code here?
                 if (!agas::resolve_name(cout_name, gid))
                 {
                     naming::gid_type console;

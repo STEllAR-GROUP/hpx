@@ -23,9 +23,11 @@ addressing_service::addressing_service(
   , util::runtime_configuration const& ini_
   , runtime_mode runtime_type_
     )
-  : service_type(ini_.get_agas_service_mode())
+  : console_cache_(0)
+  , service_type(ini_.get_agas_service_mode())
   , runtime_type(runtime_type_)
-  , range_caching_(ini_.get_agas_range_caching_mode())
+  , caching_(ini_.get_agas_caching_mode())
+  , range_caching_(caching_ ? ini_.get_agas_range_caching_mode() : false)
   , here_(get_runtime().here())
   , rts_lva_(get_runtime().get_runtime_support_lva())
   , state_(starting)
@@ -36,7 +38,8 @@ addressing_service::addressing_service(
 
     create_big_boot_barrier(pp, ini_, runtime_type_);
 
-    gva_cache_.reserve(ini_.get_agas_gva_cache_size());
+    if (caching_)
+        gva_cache_.reserve(ini_.get_agas_gva_cache_size());
 
     if (service_type == service_mode_bootstrap)
         launch_bootstrap(pp, ini_);
@@ -270,6 +273,8 @@ bool addressing_service::get_console_prefix(
             return true;
         }
 
+        mutex_type::scoped_lock lock(console_cache_mtx_);
+
         if (console_cache_)
         {
             prefix = naming::get_gid_from_prefix(console_cache_);
@@ -290,7 +295,13 @@ bool addressing_service::get_console_prefix(
             (rep.get_status() == success))
         {
             prefix = rep.get_gid();
-            console_cache_.store(naming::get_prefix_from_gid(prefix));
+
+            console_cache_ = naming::get_prefix_from_gid(prefix);
+
+            LAS_(debug) <<
+                ( boost::format("caching console locality, prefix(%1%)")
+                % console_cache_);
+
             return true;
         }
 
@@ -408,6 +419,31 @@ components::component_type addressing_service::get_component_id(
         }
 
         return components::component_invalid;
+    }
+} // }}}
+
+void addressing_service::iterate_types(
+    iterate_types_function_type const& f
+  , error_code& ec
+    )
+{ // {{{
+    try {
+        request req(component_ns_iterate_types, f);
+
+        if (is_bootstrap())
+            bootstrap->symbol_ns_server.service(req, ec);
+        else
+            hosted->symbol_ns_.service(req, ec);
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error()
+              , "addressing_service::iterate_types"
+              , e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow);
+        }
     }
 } // }}}
 
@@ -627,14 +663,18 @@ bool addressing_service::bind_range(
         if (ec || (success != s && repeated_request != s))
             return false;
 
-        if (range_caching_)
-            // Put the range into the cache.
-            update_cache(lower_id, g, ec);
-        else
+        if (caching_)
         {
-            // Only put the first GID in the range into the cache.
-            gva const first_g = g.resolve(lower_id, lower_id);
-            update_cache(lower_id, first_g, ec);
+            if (range_caching_)
+                // Put the range into the cache.
+                update_cache(lower_id, g, ec);
+
+            else
+            {
+                // Only put the first GID in the range into the cache.
+                gva const first_g = g.resolve(lower_id, lower_id);
+                update_cache(lower_id, first_g, ec);
+            }
         }
 
         if (ec)
@@ -718,7 +758,7 @@ bool addressing_service::resolve(
     try {
         // {{{ special cases
 
-        // LVA-encoded GIDs
+        // LVA-encoded GIDs (located on this machine)
         if (naming::strip_credit_from_gid(id.get_msb())
             == local_prefix().get_msb())
         {
@@ -770,7 +810,7 @@ bool addressing_service::resolve(
         // }}}
 
         // Try the cache if applicable.
-        if (try_cache)
+        if (try_cache && caching_)
         {
             if (resolve_cached(id, addr, ec))
                 return true;
@@ -798,12 +838,15 @@ bool addressing_service::resolve(
         addr.type_ = g.type;
         addr.address_ = g.lva();
 
-        if (range_caching_)
-            // Put the gva range into the cache.
-            update_cache(rep.get_base_gid(), rep.get_gva(), ec);
-        else
-            // Put the fully resolve gva into the cache.
-            update_cache(id, g, ec);
+        if (caching_)
+        {
+            if (range_caching_)
+                // Put the gva range into the cache.
+                update_cache(rep.get_base_gid(), rep.get_gva(), ec);
+            else
+                // Put the fully resolve gva into the cache.
+                update_cache(id, g, ec);
+        }
 
         if (ec)
             return false;
@@ -831,7 +874,7 @@ bool addressing_service::resolve_cached(
 { // {{{ resolve_cached implementation
     // {{{ special cases
 
-    // LVA-encoded GIDs
+    // LVA-encoded GIDs (located on this machine)
     if (naming::strip_credit_from_gid(id.get_msb()) == local_prefix().get_msb())
     {
         addr.locality_ = here_;
@@ -880,6 +923,14 @@ bool addressing_service::resolve_cached(
         return true;
     }
     // }}}
+
+    // If caching is disabled, bail
+    if (!caching_)
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
+        return false;
+    }
 
     // first look up the requested item in the cache
     gva_cache_key k(id);
@@ -1190,6 +1241,14 @@ void addressing_service::update_cache(
   , error_code& ec
     )
 { // {{{
+    if (!caching_)
+    {
+        HPX_THROWS_IF(ec, service_unavailable
+          , "addressing_service::update_cache"
+          , "AGAS caching is disabled");
+        return;
+    }
+
     try {
         mutex_type::scoped_lock lock(gva_cache_mtx_);
 

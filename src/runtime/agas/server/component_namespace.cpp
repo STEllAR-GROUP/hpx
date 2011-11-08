@@ -27,6 +27,8 @@ naming::id_type bootstrap_component_namespace_id()
 namespace server
 {
 
+// TODO: This isn't scalable, we have to update it every time we add a new 
+// AGAS request/response type.
 response component_namespace::service(
     request const& req
   , error_code& ec
@@ -42,6 +44,8 @@ response component_namespace::service(
             return resolve_id(req, ec);
         case component_ns_unbind:
             return unbind(req, ec);
+        case component_ns_iterate_types:
+            return iterate_types(req, ec);
 
         case primary_ns_allocate:
         case primary_ns_bind_gid:
@@ -282,6 +286,31 @@ response component_namespace::unbind(
         ec = make_success_code();
 
     return response(component_ns_unbind);
+} // }}}
+
+// TODO: catch exceptions
+response component_namespace::iterate_types(
+    request const& req
+  , error_code& ec
+    )
+{ // {{{ iterate implementation
+    iterate_types_function_type f = req.get_iterate_types_function();
+
+    mutex_type::scoped_lock l(mutex_);
+
+    for (component_id_table_type::iterator it = component_ids_.begin()
+                                         , end = component_ids_.end();
+         it != end; ++it)
+    {
+        f(it->first, static_cast<components::component_type>(it->second));
+    }
+
+    LAGAS_(info) << "component_namespace::iterate_types";
+
+    if (&ec != &throws)
+        ec = make_success_code();
+
+    return response(component_ns_iterate_types);
 } // }}}
 
 }}}

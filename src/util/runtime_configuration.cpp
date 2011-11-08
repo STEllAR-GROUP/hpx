@@ -48,7 +48,8 @@ namespace hpx { namespace util
             "service_mode = hosted",
             "gva_cache_size = ${HPX_AGAS_GVA_CACHE_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_GVA_CACHE_SIZE) "}",
-            "use_range_caching = ${HPX_USE_RANGE_CACHING:1}",
+            "use_range_caching = ${HPX_AGAS_USE_RANGE_CACHING:1}",
+            "use_caching = ${HPX_AGAS_USE_CACHING:1}",
 
             "[hpx.components]",
             "load_external = ${HPX_LOAD_EXTERNAL_COMPONENTS:1}",
@@ -256,6 +257,18 @@ namespace hpx { namespace util
             }
         }
         return HPX_INITIAL_AGAS_GVA_CACHE_SIZE;
+    }
+
+    bool runtime_configuration::get_agas_caching_mode() const
+    {
+        if (has_section("hpx.agas")) {
+            util::section const* sec = get_section("hpx.agas");
+            if (NULL != sec) {
+                return boost::lexical_cast<int>(
+                    sec->get_entry("use_caching", "1")) ? true : false;
+            }
+        }
+        return false;
     }
 
     bool runtime_configuration::get_agas_range_caching_mode() const

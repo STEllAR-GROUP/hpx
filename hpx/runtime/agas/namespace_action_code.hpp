@@ -31,6 +31,7 @@ enum namespace_action_code
     component_ns_bind_name      = BOOST_BINARY_U(0100010),
     component_ns_resolve_id     = BOOST_BINARY_U(0100011),
     component_ns_unbind         = BOOST_BINARY_U(0100100),
+    component_ns_iterate_types  = BOOST_BINARY_U(0100101),
     symbol_ns_service           = BOOST_BINARY_U(0010000),
     symbol_ns_bind              = BOOST_BINARY_U(0010001),
     symbol_ns_resolve           = BOOST_BINARY_U(0010010),

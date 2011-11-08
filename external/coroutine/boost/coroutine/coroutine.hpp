@@ -141,15 +141,9 @@ namespace boost { namespace coroutines {
     coroutine() : m_pimpl(0) {}
 
     template<typename Functor>
-    coroutine (Functor const& f, thread_id_type id = 0,
-               std::ptrdiff_t stack_size = detail::default_stack_size)
-      : m_pimpl(impl_type::create(f, id, stack_size))
-    {}
-
-    template<typename Functor>
-    coroutine (BOOST_RV_REF(Functor) f, thread_id_type id = 0,
+    coroutine (BOOST_FWD_REF(Functor) f, thread_id_type id = 0,
             std::ptrdiff_t stack_size = detail::default_stack_size)
-      : m_pimpl(impl_type::create(boost::move(f), id, stack_size))
+      : m_pimpl(impl_type::create(boost::forward<Functor>(f), id, stack_size))
     {}
 
     coroutine (impl_ptr p)

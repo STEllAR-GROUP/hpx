@@ -97,6 +97,7 @@ void hello_world_foreman()
     while (!attendance.empty())
     {
         std::vector<promise<std::size_t> > futures;
+        futures.reserve(attendance.size());
         BOOST_FOREACH(std::size_t os_thread, attendance)
         {
             // Schedule a PX-thread encapsulating the print action on a
@@ -106,7 +107,8 @@ void hello_world_foreman()
 
         // wait for all of the futures to return their values, we re-spawn the
         // future until the action gets executed on the right OS-thread
-        wait(futures, [&](std::size_t, std::size_t t) { attendance.erase(t); });
+        wait(futures, [&](std::size_t, std::size_t t)
+            { if (std::size_t(-1) != t) attendance.erase(t); });
     }
 }
 
@@ -123,6 +125,7 @@ int hpx_main(variables_map&)
         std::vector<id_type> prefixes = find_all_localities();
 
         std::vector<promise<void> > futures;
+        futures.reserve(prefixes.size());
         BOOST_FOREACH(id_type const& node, prefixes)
         {
             futures.push_back(async<hello_world_foreman_action>(node));
