@@ -1,5 +1,0 @@
-EXPORTS
-    switch_to_fiber
-;    ?nedmalloc@nedalloc@@YAPEAX_K@Z
-;    ?nedfree@nedalloc@@YAXPEAX@Z
-;    ?nedrealloc@nedalloc@@YAPEAXPEAX_K@Z
