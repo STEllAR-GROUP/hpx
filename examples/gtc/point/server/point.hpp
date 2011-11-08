@@ -106,4 +106,12 @@ namespace hpx { namespace geometry { namespace server
 
 }}}
 
+// Declaration of serialization support for the actions
+HPX_REGISTER_ACTION_DECLARATION_EX(
+         hpx::geometry::server::point::init_action,
+         gtc_geometry_init_action);  
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+         hpx::geometry::server::point::search_action,
+         gtc_geometry_search_action);
 #endif

@@ -5,7 +5,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
-#include <hpx/runtime/actions/continuation_impl.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
@@ -37,14 +37,14 @@ HPX_REGISTER_ACTION_EX(
     particle_geometry_type::wrapped_type::distance_action,
     gtcparticle_geometry_distance_action);
 
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<std::vector<unsigned long> >,
-    hpx::components::component_base_lco_with_value);
+//HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+//    hpx::lcos::base_lco_with_value<std::vector<unsigned long> >,
+//    hpx::components::component_base_lco_with_value);
 
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<std::vector<unsigned long> >::get_value_action,
-    get_value_action_ulong);
+//HPX_REGISTER_ACTION_EX(
+//    hpx::lcos::base_lco_with_value<std::vector<unsigned long> >::get_value_action,
+//    get_value_action_ulong);
 
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<std::vector<unsigned long>>::set_result_action,
-    set_result_action_ulong);
+//HPX_REGISTER_ACTION_EX(
+//    hpx::lcos::base_lco_with_value<std::vector<unsigned long>>::set_result_action,
+//    set_result_action_ulong);

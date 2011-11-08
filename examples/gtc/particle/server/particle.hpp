@@ -99,4 +99,13 @@ namespace hpx { namespace geometry { namespace server
 
 }}}
 
+// Declaration of serialization support for the actions
+HPX_REGISTER_ACTION_DECLARATION_EX(
+              hpx::geometry::server::particle::init_action,
+              gtcparticle_geometry_init_action)
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+              hpx::geometry::server::particle::distance_action,
+              gtcparticle_geometry_distance_action);
+
 #endif
