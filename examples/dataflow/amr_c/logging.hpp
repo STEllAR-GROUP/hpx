@@ -100,4 +100,9 @@ namespace hpx { namespace components { namespace amr
 
 }}}
 
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::amr::server::logging::logentry_action
+  , dataflow_logentry_action
+);
+
 #endif

@@ -71,6 +71,12 @@ namespace interpolate3d { namespace server
     };
 }}
 
+HPX_REGISTER_ACTION_DECLARATION_EX(interpolate3d::server::partition3d::init_action,
+    interpolate3d_partition3d_init_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(interpolate3d::server::partition3d::interpolate_action,
+    interpolate3d_partition3d_interpolate_action);
+
+
 #endif
 
 

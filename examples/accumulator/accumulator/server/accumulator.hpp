@@ -14,6 +14,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
+#include <hpx/runtime/components/server/memory.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
@@ -102,5 +103,18 @@ namespace hpx { namespace components { namespace server
     };
 
 }}}
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::accumulator::init_action,
+    accumulator_init_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::accumulator::add_action,
+    accumulator_add_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::accumulator::query_action,
+    accumulator_query_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::accumulator::print_action,
+    accumulator_print_action);
 
 #endif

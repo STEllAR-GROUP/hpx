@@ -81,4 +81,14 @@ namespace throttle { namespace server
     };
 }}
 
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    throttle::server::throttle::suspend_action
+  , throttle_suspend_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    throttle::server::throttle::resume_action
+  , throttle_resume_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    throttle::server::throttle::is_suspended_action
+  , throttle_is_suspended_action);
+
 #endif

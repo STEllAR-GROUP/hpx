@@ -107,4 +107,17 @@ namespace hpx { namespace components { namespace server
 
 }}}
 
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::simple_accumulator::init_action,
+    simple_accumulator_init_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::simple_accumulator::add_action,
+    simple_accumulator_add_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::simple_accumulator::query_action,
+    simple_accumulator_query_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::simple_accumulator::print_action,
+    simple_accumulator_print_action);
+
 #endif

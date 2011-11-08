@@ -27,22 +27,6 @@ typedef hpx::components::managed_component<
 
 HPX_DEFINE_GET_COMPONENT_TYPE(int_object_semaphore_type::wrapped_type);
 
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::server::object_semaphore<int>::signal_action,
-    int_object_semaphore_signal);
-
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::server::object_semaphore<int>::get_action,
-    int_object_semaphore_get);
-
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::server::object_semaphore<int>::abort_pending_action,
-    int_object_semaphore_abort_pending);
-
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::server::object_semaphore<int>::wait_action,
-    int_object_semaphore_wait);
-
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::managed_component<
         hpx::lcos::server::object_semaphore<int>

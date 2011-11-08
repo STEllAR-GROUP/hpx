@@ -317,4 +317,29 @@ namespace hpx { namespace components { namespace server
     return 0;
     }
 }}}
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<
+        std::vector<std::vector<double> >
+    >::set_result_action,
+    base_lco_with_value_set_result_vector_vector_double);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::lublock::constructBlock_action,HPLconstructBlock_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::lublock::gcorner_action,HPLgcorner_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::lublock::gtop_action,HPLgtop_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::lublock::gleft_action,HPLgleft_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::lublock::gtrail_action,HPLgtrail_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::lublock::getRows_action,HPLgetRows_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::lublock::getColumns_action,HPLgetColumns_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::lublock::getData_action,HPLgetData_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::lublock::getFuture_action,HPLgetFuture_action);
 #endif
