@@ -55,6 +55,8 @@ namespace hpx { namespace util
         // Get AGAS client-side GVA cache size
         std::size_t get_agas_gva_cache_size() const;
 
+        bool get_agas_range_caching_mode() const;
+
         // Load application specific configuration and merge it with the
         // default configuration loaded from hpx.ini
         bool load_application_configuration(char const* filename,
