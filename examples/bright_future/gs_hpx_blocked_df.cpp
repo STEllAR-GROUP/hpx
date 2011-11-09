@@ -193,7 +193,7 @@ void gs(
         // the init function has the signature
         // void(unsigned n_x, unsigned n_y, double hx, double hy)
         typedef
-            hpx::lcos::dataflow<remote_lse_type::init_action>
+            hpx::lcos::eager_future<remote_lse_type::init_action>
             init_dataflow;
 
         // we create a temporary init_future object. the first parameter is the
@@ -201,7 +201,6 @@ void gs(
         // parameters are the parameters to be passed to the action, see comment
         // above
         init_dataflow(remote_id, n_x, n_y, hx, hy).get();
-
         // this type represents our grid, instead of doubles, we just use
         // promises as value types.
         typedef bright_future::grid<dataflow_type> promise_grid_type;
@@ -224,6 +223,7 @@ void gs(
         // set our initial values, setting the top boundary to be a dirichlet
         // boundary condition
         {
+            cout << "initializing rhs ..." << flush;
             typedef
                 hpx::lcos::dataflow<remote_lse_type::init_rhs_blocked_action>
                 init_rhs_dataflow;
@@ -243,11 +243,13 @@ void gs(
                         );
                 }
             }
+            cout << " done\n" << flush;
 
             typedef
                 hpx::lcos::dataflow<remote_lse_type::init_u_blocked_action>
                 init_u_dataflow;
 
+            cout << "initializing u ..." << flush;
             // initialize our grid. This will serve as the dependency of the
             // first loop below.
             for(size_type y = 0, y_block = 0; y < n_y; y += block_size, ++y_block)
@@ -264,6 +266,7 @@ void gs(
                         );
                 }
             }
+            cout << " done\n" << flush;
 
             // wait for the rhs initialization to finish.
             //BOOST_FOREACH(dataflow_type & promise, init_rhs_promises)
@@ -326,26 +329,36 @@ void gs(
                             // add the right block of the previous iteration
                             // to our list of dependencies
                             //deps.push_back(&prev(x+1,y));
-                            deps = dataflow<dependency_action>(remote_id, deps, prev(x+1, y));
+                            dataflow_base<void> tmp = deps;
+                            deps = dataflow<dependency_action>(remote_id, tmp, prev(x+1, y));
                         }
 
                         if(y + 1 < n_y_block) // are we on the boundary?
+                        {
                             // add the upper block of the previous iteration
                             // to our list of dependencies
                             //deps.push_back(&prev(x,y+1));
-                            deps = dataflow<dependency_action>(remote_id, deps, prev(x, y+1));
+                            dataflow_base<void> tmp = deps;
+                            deps = dataflow<dependency_action>(remote_id, tmp, prev(x, y+1));
+                        }
 
                         if(x > 0) // are we on the boundary?
+                        {
                             // add the upper block of the current iteration
                             // to our list of dependencies
                             //deps.push_back(&current(x-1,y));
-                            deps = dataflow<dependency_action>(remote_id, deps, current(x-1, y));
+                            dataflow_base<void> tmp = deps;
+                            deps = dataflow<dependency_action>(remote_id, tmp, current(x-1, y));
+                        }
 
                         if(y > 0) // are we on the boundary?
+                        {
                             // add the upper block of the current iteration
                             // to our list of dependencies
                             //deps.push_back(&current(x,y-1));
+                            dataflow_base<void> tmp = deps;
                             deps = dataflow<dependency_action>(remote_id, deps, current(x, y-1));
+                        }
 
                         //deps.get();
                         current(x, y) =

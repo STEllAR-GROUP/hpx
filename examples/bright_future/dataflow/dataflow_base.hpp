@@ -39,10 +39,12 @@ namespace hpx { namespace lcos {
 
         virtual ~dataflow_base()
         {
+            /*
             if(!gid_)
             {
                 gid_promise.get();
             }
+            */
         }
 
         dataflow_base(promise<naming::id_type, naming::gid_type> const & promise)
@@ -50,9 +52,12 @@ namespace hpx { namespace lcos {
             , gid_(naming::invalid_id)
         {}
 
+        /*
         dataflow_base(dataflow_base const & other)
-            : gid_(other.get_gid())
+            : gid_promise(other.gid_promise)
+            , gid_(other.gid_)
         {}
+        */
 
         /*
         operator promise<Result, remote_result_type>() const

@@ -12,22 +12,6 @@
 
 namespace hpx { namespace lcos {
 
-    namespace detail {
-        template <typename Action>
-        struct apply_init_helper
-        {
-            naming::id_type target;
-            apply_init_helper(naming::id_type const & target) : target(target) {}
-
-            void operator()(naming::id_type const & gid) const
-            {
-                BOOST_ASSERT(gid);
-                typedef hpx::lcos::server::init_action<Action> action_type;
-                applier::apply<action_type>(gid, target);
-            }
-        };
-    }
-
     template <
         typename Action
       , typename Result
@@ -54,15 +38,17 @@ namespace hpx { namespace lcos {
 
         typedef hpx::components::server::runtime_support::create_component_action create_component_action;
 
+
         // MSVC chokes on having the lambda in the member initializer list below
         static inline lcos::promise<naming::id_type, naming::gid_type>
         create_component(naming::id_type const & target)
         {
             return async_callback<create_component_action>(
-                    [target](naming::id_type const & gid)
+                    [target](naming::id_type const & gid) mutable
                     {
                         typedef hpx::lcos::server::init_action<Action> action_type;
                         applier::apply<action_type>(gid, target);
+                        //target = naming::invalid_id;
                     }
                   , naming::id_type(
                         naming::get_gid_from_prefix(
@@ -80,23 +66,8 @@ namespace hpx { namespace lcos {
         explicit dataflow(naming::id_type const & target)
             : base_type(
                 create_component(target)
-                /*
-                stub_type::create_sync(
-                    naming::get_gid_from_prefix(
-                        naming::get_prefix_from_id(
-                            target
-                        )
-                    )
-                )
-                */
             )
-        {
-            /*
-            BOOST_ASSERT(this->get_gid());
-            typedef hpx::lcos::server::init_action<Action> action_type;
-            applier::apply<action_type>(this->get_gid(), target);
-            */
-        }
+        {}
 
 #define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
         template <BOOST_PP_ENUM_PARAMS(N, typename A)>                          \
@@ -106,7 +77,7 @@ namespace hpx { namespace lcos {
         )                                                                       \
         {                                                                       \
             return async_callback<create_component_action>(                     \
-                    [&, target](naming::id_type const & gid)                    \
+                    [&, target](naming::id_type const & gid) mutable            \
                     {                                                           \
                         typedef hpx::lcos::server::init_action<                 \
                             Action, BOOST_PP_ENUM_PARAMS(N, A)> action_type;    \
@@ -134,30 +105,6 @@ namespace hpx { namespace lcos {
                 , BOOST_PP_ENUM_PARAMS(N, a))                                   \
               )                                                                 \
         {}                                                                      \
-        /*
-                stub_type::create_sync(                                         \
-                    naming::get_gid_from_prefix(                                \
-                        naming::get_prefix_from_id(                             \
-                            target                                              \
-                        )                                                       \
-                    )                                                           \
-                )                                                               \
-            )                                                                   \
-        {                                                                       \
-            BOOST_ASSERT(this->get_gid());                                      \
-            typedef                                                             \
-                hpx::lcos::server::init_action<                                 \
-                    Action                                                      \
-                  , BOOST_PP_ENUM_PARAMS(N, A)                                  \
-                >                                                               \
-                action_type;                                                    \
-            applier::apply<action_type>(                                        \
-                this->get_gid()                                                 \
-              , target                                                          \
-              , BOOST_PP_ENUM_PARAMS(N, a)                                      \
-            );                                                                  \
-        }                                                                       \
-        */
     /**/
         BOOST_PP_REPEAT_FROM_TO(
             1
