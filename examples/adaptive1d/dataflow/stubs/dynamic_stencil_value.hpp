@@ -56,7 +56,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
             // we simply return the initialized promise, the caller needs
             // to call get() on the return value to obtain the result
             typedef adaptive1d::server::dynamic_stencil_value::get_output_ports_action
-            action_type;
+                action_type;
             typedef std::vector<naming::id_type> return_type;
             return lcos::eager_future<action_type, return_type>(gid);
         }
@@ -80,7 +80,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
             typedef
                 adaptive1d::server::dynamic_stencil_value::connect_input_ports_action
             action_type;
-            return lcos::eager_future<action_type, void>(gid, gids);
+            return lcos::eager_future<action_type>(gid, gids);
         }
 
         static void connect_input_ports(naming::id_type const& gid,
@@ -100,7 +100,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
             typedef
                 adaptive1d::server::dynamic_stencil_value::set_functional_component_action
             action_type;
-            return lcos::eager_future<action_type, void>(gid, functiongid, row,
+            return lcos::eager_future<action_type>(gid, functiongid, row,
                 column, instencilsize, outstencilsize,cycle_time, par);
         }
 
@@ -119,7 +119,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
         {
             typedef adaptive1d::server::dynamic_stencil_value::start_action
                 action_type;
-            return lcos::eager_future<action_type, void>(gid);
+            return lcos::eager_future<action_type>(gid);
         }
 
         static void start(naming::id_type const& gid)

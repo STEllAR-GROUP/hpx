@@ -26,7 +26,7 @@ namespace hpx { namespace lcos { namespace stubs
             typedef typename
                 lcos::base_lco_with_value<ValueType, RemoteType>::get_value_action
             action_type;
-            return lcos::eager_future<action_type, ValueType>(gid);
+            return lcos::eager_future<action_type>(gid);
         }
 
         static lcos::promise<void>
@@ -35,7 +35,7 @@ namespace hpx { namespace lcos { namespace stubs
             typedef typename
                 lcos::base_lco_with_value<ValueType, RemoteType>::set_result_action
             action_type;
-            return lcos::eager_future<action_type, void>(gid, val);
+            return lcos::eager_future<action_type>(gid, val);
         }
 
         static lcos::promise<void, util::unused_type>
@@ -43,7 +43,7 @@ namespace hpx { namespace lcos { namespace stubs
             boost::exception_ptr const& e)
         {
             typedef lcos::base_lco::set_error_action action_type;
-            return lcos::eager_future<action_type, void>(gid, e);
+            return lcos::eager_future<action_type>(gid, e);
         }
 
         ///////////////////////////////////////////////////////////////////////

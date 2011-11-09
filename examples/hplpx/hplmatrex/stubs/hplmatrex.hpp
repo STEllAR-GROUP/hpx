@@ -25,14 +25,13 @@ namespace hpx { namespace components { namespace stubs
     //constructor
     static int construct(naming::id_type gid, unsigned int h,
         unsigned int ab, unsigned int bs){
-        return lcos::eager_future<server::hplmatrex::construct_action,
-            int>(gid,gid,h,ab,bs).get();
+        return lcos::eager_future<server::hplmatrex::construct_action>(
+            gid,gid,h,ab,bs).get();
     }
 
     //functions for manipulating the matrix
     static double LUsolve(naming::id_type gid){
-        return lcos::eager_future<server::hplmatrex::solve_action,
-            double>(gid).get();
+        return lcos::eager_future<server::hplmatrex::solve_action>(gid).get();
     }
     };
 }}}

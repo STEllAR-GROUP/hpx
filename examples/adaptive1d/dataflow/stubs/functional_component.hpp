@@ -78,7 +78,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
             naming::id_type const& val)
         {
             typedef adaptive1d::server::functional_component::init_action action_type;
-            return lcos::eager_future<action_type, void>(gid, numsteps, val);
+            return lcos::eager_future<action_type>(gid, numsteps, val);
         }
 
         static void init(naming::id_type const& gid,

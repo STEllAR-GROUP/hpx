@@ -19,7 +19,7 @@ namespace hpx { namespace components { namespace amr { namespace server
 {
     class stencil_value_in_adaptor
       : public lcos::eager_future<
-            stencil_value_out_adaptor::get_value_action,
+            stencil_value_out_adaptor::get_value_action, 
             naming::id_type
         >
     {
