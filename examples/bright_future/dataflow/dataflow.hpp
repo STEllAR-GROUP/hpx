@@ -38,33 +38,31 @@ namespace hpx { namespace lcos {
     {
         typedef typename Action::result_type remote_result_type;
         typedef Result result_type;
-        typedef 
+        typedef
             dataflow_base<Result, typename Action::result_type>
             base_type;
-            
+
         typedef stubs::dataflow stub_type;
 
         dataflow() {}
-        
+
         ~dataflow()
         {
             LLCO_(info)
                 << "~dataflow::dataflow() ";
         }
-            
+
         typedef hpx::components::server::runtime_support::create_component_action create_component_action;
 
-        explicit dataflow(naming::id_type const & target)
-            : base_type(
-                async_callback<create_component_action>(
-                    [
-                        target
-                      , this
-                    ](naming::gid_type const & gid)
+        // MSVC chokes on having the lambda in the member initializer list below
+        static inline lcos::promise<naming::id_type, naming::gid_type>
+        create_component(naming::id_type const & target)
+        {
+            return async_callback<create_component_action>(
+                    [target](naming::id_type const & gid)
                     {
                         typedef hpx::lcos::server::init_action<Action> action_type;
-                        this->gid_ = naming::id_type(gid, naming::id_type::managed);
-                        applier::apply<action_type>(this->gid_, target);
+                        applier::apply<action_type>(gid, target);
                     }
                   , naming::id_type(
                         naming::get_gid_from_prefix(
@@ -76,7 +74,12 @@ namespace hpx { namespace lcos {
                     )
                   , stub_type::get_component_type()
                   , 1
-                )
+                );
+        }
+
+        explicit dataflow(naming::id_type const & target)
+            : base_type(
+                create_component(target)
                 /*
                 stub_type::create_sync(
                     naming::get_gid_from_prefix(
@@ -97,21 +100,18 @@ namespace hpx { namespace lcos {
 
 #define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
         template <BOOST_PP_ENUM_PARAMS(N, typename A)>                          \
-        dataflow(                                                               \
-            naming::id_type const & target                                      \
+        static inline lcos::promise<naming::id_type, naming::gid_type>          \
+        create_component(naming::id_type const & target                         \
           , BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)                        \
         )                                                                       \
-            : base_type(                                                        \
-                async_callback<create_component_action>(                        \
-                    [                                                           \
-                        target                                                  \
-                      , this                                                    \
-                      , BOOST_PP_ENUM_PARAMS(N, a)                              \
-                    ](naming::gid_type const & gid)                             \
+        {                                                                       \
+            return async_callback<create_component_action>(                     \
+                    [&, target](naming::id_type const & gid)                    \
                     {                                                           \
-                        typedef hpx::lcos::server::init_action<Action, BOOST_PP_ENUM_PARAMS(N, A)> action_type; \
-                        this->gid_ = naming::id_type(gid, naming::id_type::managed); \
-                        applier::apply<action_type>(this->gid_, target, BOOST_PP_ENUM_PARAMS(N, a)); \
+                        typedef hpx::lcos::server::init_action<                 \
+                            Action, BOOST_PP_ENUM_PARAMS(N, A)> action_type;    \
+                        applier::apply<action_type>(gid, target                 \
+                          , BOOST_PP_ENUM_PARAMS(N, a));                        \
                     }                                                           \
                   , naming::id_type(                                            \
                         naming::get_gid_from_prefix(                            \
@@ -123,8 +123,16 @@ namespace hpx { namespace lcos {
                     )                                                           \
                   , stub_type::get_component_type()                             \
                   , 1                                                           \
-                )                                                               \
-            )                                                                   \
+                );                                                              \
+        }                                                                       \
+        template <BOOST_PP_ENUM_PARAMS(N, typename A)>                          \
+        dataflow(                                                               \
+            naming::id_type const & target                                      \
+          , BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)                        \
+        )                                                                       \
+            : base_type(create_component(target                                 \
+                , BOOST_PP_ENUM_PARAMS(N, a))                                   \
+              )                                                                 \
         {}                                                                      \
         /*
                 stub_type::create_sync(                                         \

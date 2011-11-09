@@ -23,7 +23,7 @@ namespace hpx { namespace traits
     {};
 
     template <>
-    struct promise_remote_result<naming::gid_type>
+    struct promise_local_result<naming::gid_type>
       : boost::mpl::identity<naming::id_type>
     {};
 }}

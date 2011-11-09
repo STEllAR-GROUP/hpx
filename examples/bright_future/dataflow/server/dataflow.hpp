@@ -33,6 +33,11 @@ namespace hpx { namespace lcos { namespace server
             LLCO_(info)
                 << "~server::dataflow::dataflow()";
             delete component_ptr;
+            if(connect_thread_id != 0)
+            {
+                threads::set_thread_state(connect_thread_id, threads::pending
+                  , threads::wait_abort);
+            }
         }
 
         /// init initializes the dataflow, it creates a dataflow_impl object
@@ -62,6 +67,7 @@ namespace hpx { namespace lcos { namespace server
             if(connect_thread_id != 0)
             {
                 threads::set_thread_state(connect_thread_id, threads::pending);
+                connect_thread_id = 0;
             }
         }
 
@@ -75,7 +81,7 @@ namespace hpx { namespace lcos { namespace server
           , BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)                      \
         )                                                                     \
         {                                                                     \
-            typename hpx::util::spinlock::scoped_lock l(mtx);                 \
+            hpx::util::spinlock::scoped_lock l(mtx);                          \
             typedef                                                           \
                 detail::dataflow_impl<                                        \
                     Action                                                    \
@@ -95,6 +101,7 @@ namespace hpx { namespace lcos { namespace server
             if(connect_thread_id != 0)                                        \
             {                                                                 \
                 threads::set_thread_state(connect_thread_id, threads::pending); \
+                connect_thread_id = 0;                                        \
             }                                                                 \
         }                                                                     \
     /**/
@@ -112,7 +119,7 @@ namespace hpx { namespace lcos { namespace server
         /// to the specified target lco
         void connect(naming::id_type const & target)
         {
-            typename hpx::util::spinlock::scoped_lock l(mtx);
+            hpx::util::spinlock::scoped_lock l(mtx);
 
             // wait until component_ptr is initialized.
             if(component_ptr == 0)
@@ -121,22 +128,25 @@ namespace hpx { namespace lcos { namespace server
                     << "server::dataflow::connect() executed before server::dataflow::init finished.";
                 threads::thread_self *self = threads::get_self_ptr_checked();
                 connect_thread_id = self->get_thread_id();
-                l.unlock();
-                threads::thread_state_ex_enum statex = self->yield(threads::suspended);
-                l.lock();
+
+                threads::thread_state_ex_enum statex = threads::wait_unknown;
+                {
+                    util::unlock_the_lock<hpx::util::spinlock::scoped_lock> ul(l);
+                    statex = self->yield(threads::suspended);
+                }
                 if(statex == threads::wait_abort)
                 {
                     hpx::util::osstream strm;
                     error_code ig;
                     std::string desc = threads::get_thread_description(connect_thread_id, ig);
-                 
+
                     strm << "thread(" << connect_thread_id
                          << (desc.empty() ? "" : ", " ) << desc
                          << ") aborted (yield returned wait_abort)";
-                    HPX_THROWS_IF(ig, yield_aborted,
+                    HPX_THROW_EXCEPTION(yield_aborted,
                         "dataflow::connect()",
                         hpx::util::osstream_get_string(strm));
-                 
+
                     return;
                 }
                 connect_thread_id = 0;

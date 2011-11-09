@@ -43,18 +43,19 @@ namespace hpx { namespace lcos { namespace detail
 
         void set_result (RemoteResult const& result)
         {
-            // We first invoke the callback to make sure that it was called
-            // when the future is set.
-            if (on_completed_) on_completed_(result);
+            // We set the value of the future first as it might get converted
+            // when stored. The callback is to receive the converted value.
             this->base_type::set_result(result);
+            if (on_completed_) {
+                error_code ec;                // this is not supposed to fail
+                on_completed_(this->get_data(0, ec));
+            }
         }
 
         void set_error (boost::exception_ptr const& e)
         {
-            // We first invoke the callback to make sure that it was called
-            // when the future is set.
-            if (on_error_) on_error_(e);
             this->base_type::set_error(e);
+            if (on_error_) on_error_(e);
         }
 
     private:

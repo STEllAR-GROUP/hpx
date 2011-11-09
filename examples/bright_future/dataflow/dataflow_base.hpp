@@ -24,19 +24,19 @@ namespace hpx { namespace lcos {
     {
         typedef RemoteResult remote_result_type;
         typedef Result       result_type;
-        typedef 
+        typedef
             components::client_base<
                 dataflow_base<Result, RemoteResult>
               , stubs::dataflow
             >
             base_type;
-        
+
         typedef stubs::dataflow stub_type;
 
         dataflow_base()
             : gid_(naming::invalid_id)
         {}
-        
+
         virtual ~dataflow_base()
         {
             if(!gid_)
@@ -44,8 +44,8 @@ namespace hpx { namespace lcos {
                 gid_promise.get();
             }
         }
-        
-        dataflow_base(promise<naming::gid_type, naming::gid_type, 1> const & promise)
+
+        dataflow_base(promise<naming::id_type, naming::gid_type> const & promise)
             : gid_promise(promise)
             , gid_(naming::invalid_id)
         {}
@@ -73,6 +73,7 @@ namespace hpx { namespace lcos {
         void invalidate()
         {
             this->get_gid() = naming::invalid_id;
+            gid_promise.reset();
         }
 
         void connect(naming::id_type const & target) const
@@ -89,22 +90,22 @@ namespace hpx { namespace lcos {
         {
             if(!gid_)
             {
-                gid_promise.get();
+                gid_ = gid_promise.get();
             }
             return gid_;
         }
 
-        naming::id_type & get_gid() const
+        naming::id_type const & get_gid() const
         {
             if(!gid_)
             {
-                gid_promise.get();
+                gid_ = gid_promise.get();
             }
             return gid_;
         }
 
     protected:
-        promise<naming::gid_type, naming::gid_type, 1> gid_promise;
+        promise<naming::id_type, naming::gid_type> gid_promise;
         mutable naming::id_type gid_;
 
     private:
