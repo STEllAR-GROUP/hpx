@@ -25,6 +25,7 @@ namespace hpx { namespace lcos { namespace server
     {
         dataflow()
             : component_ptr(0)
+            , connect_thread_id(0)
         {}
 
         ~dataflow()
@@ -56,6 +57,12 @@ namespace hpx { namespace lcos { namespace server
             component_type * w = new component_type(target);
             (*w)->init();
             component_ptr = w;
+
+            // waking up a possible sleeping thread that was trying to connect
+            if(connect_thread_id != 0)
+            {
+                threads::set_thread_state(connect_thread_id, threads::pending);
+            }
         }
 
             // Vertical preprocessor repetition to define the remaining
@@ -84,6 +91,11 @@ namespace hpx { namespace lcos { namespace server
             component_type * w = new component_type(target);                  \
             (*w)->init(BOOST_PP_ENUM_PARAMS(N, a));                           \
             component_ptr = w;                                                \
+                                                                              \
+            if(connect_thread_id != 0)                                        \
+            {                                                                 \
+                threads::set_thread_state(connect_thread_id, threads::pending); \
+            }                                                                 \
         }                                                                     \
     /**/
 
@@ -103,16 +115,38 @@ namespace hpx { namespace lcos { namespace server
             typename hpx::util::spinlock::scoped_lock l(mtx);
 
             // wait until component_ptr is initialized.
-            while(component_ptr == 0)
+            if(component_ptr == 0)
             {
+                LLCO_(info)
+                    << "server::dataflow::connect() executed before server::dataflow::init finished.";
+                threads::thread_self *self = threads::get_self_ptr_checked();
+                connect_thread_id = self->get_thread_id();
                 l.unlock();
+                threads::thread_state_ex_enum statex = self->yield(threads::suspended);
                 l.lock();
+                if(statex == threads::wait_abort)
+                {
+                    hpx::util::osstream strm;
+                    error_code ig;
+                    std::string desc = threads::get_thread_description(connect_thread_id, ig);
+                 
+                    strm << "thread(" << connect_thread_id
+                         << (desc.empty() ? "" : ", " ) << desc
+                         << ") aborted (yield returned wait_abort)";
+                    HPX_THROWS_IF(ig, yield_aborted,
+                        "dataflow::connect()",
+                        hpx::util::osstream_get_string(strm));
+                 
+                    return;
+                }
+                connect_thread_id = 0;
             }
+
             (*component_ptr)->connect_nonvirt(target);
         }
 
         typedef
-            ::hpx::actions::direct_action1<
+            ::hpx::actions::action1<
                 dataflow
               , 0
               , naming::id_type const &
@@ -123,6 +157,7 @@ namespace hpx { namespace lcos { namespace server
     private:
         detail::component_wrapper_base * component_ptr;
         hpx::util::spinlock mtx;
+        threads::thread_id_type connect_thread_id;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -141,20 +176,22 @@ namespace hpx { namespace lcos { namespace server
 
     template <typename Action>
     struct init_action<Action>
-      : hpx::actions::direct_action1<
+      : hpx::actions::action1<
             dataflow
           , 0
           , naming::id_type const &
           , &dataflow::init<Action>
+          , threads::thread_priority_default
           , init_action<Action>
         >
     {
     private:
-        typedef hpx::actions::direct_action1<
+        typedef hpx::actions::action1<
             dataflow
           , 0
           , naming::id_type const &
           , &dataflow::init<Action>
+          , threads::thread_priority_default
           , init_action<Action>
         > base_type;
 

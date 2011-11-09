@@ -11,6 +11,23 @@
 #include <examples/bright_future/dataflow/dataflow_fwd.hpp>
 
 namespace hpx { namespace lcos {
+
+    namespace detail {
+        template <typename Action>
+        struct apply_init_helper
+        {
+            naming::id_type target;
+            apply_init_helper(naming::id_type const & target) : target(target) {}
+
+            void operator()(naming::id_type const & gid) const
+            {
+                BOOST_ASSERT(gid);
+                typedef hpx::lcos::server::init_action<Action> action_type;
+                applier::apply<action_type>(gid, target);
+            }
+        };
+    }
+
     template <
         typename Action
       , typename Result
@@ -34,13 +51,48 @@ namespace hpx { namespace lcos {
             LLCO_(info)
                 << "~dataflow::dataflow() ";
         }
+            
+        typedef hpx::components::server::runtime_support::create_component_action create_component_action;
 
-        dataflow(naming::id_type const & target)
-            : base_type(stub_type::create_sync(target))
+        explicit dataflow(naming::id_type const & target)
+            : base_type(
+                async_callback<create_component_action>(
+                    [
+                        target
+                      , this
+                    ](naming::gid_type const & gid)
+                    {
+                        typedef hpx::lcos::server::init_action<Action> action_type;
+                        this->gid_ = naming::id_type(gid, naming::id_type::managed);
+                        applier::apply<action_type>(this->gid_, target);
+                    }
+                  , naming::id_type(
+                        naming::get_gid_from_prefix(
+                            naming::get_prefix_from_id(
+                                target
+                            )
+                        )
+                      , naming::id_type::unmanaged
+                    )
+                  , stub_type::get_component_type()
+                  , 1
+                )
+                /*
+                stub_type::create_sync(
+                    naming::get_gid_from_prefix(
+                        naming::get_prefix_from_id(
+                            target
+                        )
+                    )
+                )
+                */
+            )
         {
+            /*
             BOOST_ASSERT(this->get_gid());
             typedef hpx::lcos::server::init_action<Action> action_type;
             applier::apply<action_type>(this->get_gid(), target);
+            */
         }
 
 #define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
@@ -49,7 +101,40 @@ namespace hpx { namespace lcos {
             naming::id_type const & target                                      \
           , BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)                        \
         )                                                                       \
-            : base_type(stub_type::create_sync(target))                         \
+            : base_type(                                                        \
+                async_callback<create_component_action>(                        \
+                    [                                                           \
+                        target                                                  \
+                      , this                                                    \
+                      , BOOST_PP_ENUM_PARAMS(N, a)                              \
+                    ](naming::gid_type const & gid)                             \
+                    {                                                           \
+                        typedef hpx::lcos::server::init_action<Action, BOOST_PP_ENUM_PARAMS(N, A)> action_type; \
+                        this->gid_ = naming::id_type(gid, naming::id_type::managed); \
+                        applier::apply<action_type>(this->gid_, target, BOOST_PP_ENUM_PARAMS(N, a)); \
+                    }                                                           \
+                  , naming::id_type(                                            \
+                        naming::get_gid_from_prefix(                            \
+                            naming::get_prefix_from_id(                         \
+                                target                                          \
+                            )                                                   \
+                        )                                                       \
+                      , naming::id_type::unmanaged                              \
+                    )                                                           \
+                  , stub_type::get_component_type()                             \
+                  , 1                                                           \
+                )                                                               \
+            )                                                                   \
+        {}                                                                      \
+        /*
+                stub_type::create_sync(                                         \
+                    naming::get_gid_from_prefix(                                \
+                        naming::get_prefix_from_id(                             \
+                            target                                              \
+                        )                                                       \
+                    )                                                           \
+                )                                                               \
+            )                                                                   \
         {                                                                       \
             BOOST_ASSERT(this->get_gid());                                      \
             typedef                                                             \
@@ -64,6 +149,7 @@ namespace hpx { namespace lcos {
               , BOOST_PP_ENUM_PARAMS(N, a)                                      \
             );                                                                  \
         }                                                                       \
+        */
     /**/
         BOOST_PP_REPEAT_FROM_TO(
             1

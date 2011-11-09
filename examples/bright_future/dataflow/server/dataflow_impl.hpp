@@ -40,18 +40,20 @@ namespace hpx { namespace lcos { namespace server
     /// function from a client
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename A)>
     struct init_action<Action, BOOST_PP_ENUM_PARAMS(N, A)>
-      : BOOST_PP_CAT(hpx::actions::direct_action, BOOST_PP_INC(N))<
+      : BOOST_PP_CAT(hpx::actions::action, BOOST_PP_INC(N))<
             dataflow, 0, hpx::naming::id_type const &
           , BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & BOOST_PP_INTERCEPT)
           , &dataflow::init<Action, BOOST_PP_ENUM_PARAMS(N, A)>
+          , threads::thread_priority_default
           , init_action<Action, BOOST_PP_ENUM_PARAMS(N, A)>
         >
     {
     private:
-        typedef BOOST_PP_CAT(hpx::actions::direct_action, BOOST_PP_INC(N))<
+        typedef BOOST_PP_CAT(hpx::actions::action, BOOST_PP_INC(N))<
             dataflow, 0, hpx::naming::id_type const &
           , BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & BOOST_PP_INTERCEPT)
           , &dataflow::init<Action, BOOST_PP_ENUM_PARAMS(N, A)>
+          , threads::thread_priority_default
           , init_action<Action, BOOST_PP_ENUM_PARAMS(N, A)>
         > base_type;
 

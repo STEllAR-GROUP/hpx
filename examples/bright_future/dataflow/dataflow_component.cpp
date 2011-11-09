@@ -5,7 +5,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
-#include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/spinlock.hpp>
@@ -31,6 +30,6 @@ typedef hpx::components::managed_component<hpx::lcos::server::dataflow> dataflow
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_EX(
     dataflow_type,
-    dataflow_factory, true);
+    bright_future_dataflow, true);
 
 HPX_DEFINE_GET_COMPONENT_TYPE(dataflow_type::wrapped_type);

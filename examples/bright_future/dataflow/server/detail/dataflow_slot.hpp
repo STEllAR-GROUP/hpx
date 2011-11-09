@@ -7,6 +7,7 @@
 #ifndef HPX_LCOS_DATAFLOW_SERVER_DETAIL_DATAFLOW_ARG_HPP
 #define HPX_LCOS_DATAFLOW_SERVER_DETAIL_DATAFLOW_ARG_HPP
 
+#include <examples/bright_future/dataflow/dataflow_base_fwd.hpp>
 #include <examples/bright_future/dataflow/dataflow_fwd.hpp>
 
 namespace hpx { namespace lcos { namespace server { namespace detail {
@@ -72,7 +73,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
     };
 
     template <typename T, int Slot, typename SinkAction>
-    struct dataflow_slot<T, Slot, SinkAction, typename boost::enable_if<hpx::traits::is_dataflow<T>>::type>
+    struct dataflow_slot<T, Slot, SinkAction, typename boost::enable_if<hpx::traits::is_dataflow<T> >::type>
         : hpx::lcos::base_lco_with_value<
             typename boost::mpl::if_<
                 boost::is_void<typename T::result_type>
@@ -115,7 +116,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
                 << "~dataflow_slot<"
                 << util::type_id<T>::typeid_.type_id()
                 << ", " << Slot
-                << util::type_id<SinkAction>::typeid_.type_id()
+                << hpx::actions::detail::get_action_name<SinkAction>()
                 << ">::dataflow_slot(): "
                 << get_gid();
         }
@@ -126,16 +127,15 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
                 << "dataflow_slot<"
                 << util::type_id<T>::typeid_.type_id()
                 << ", " << Slot
-                << util::type_id<SinkAction>::typeid_.type_id()
+                << hpx::actions::detail::get_action_name<SinkAction>()
                 << ">::set_result(): "
-                << get_gid()
-                << "\n";
+                << get_gid();
             dataflow_sink
                 ->template set_arg<Slot>(
                     traits::get_remote_result<result_type, remote_result>
                         ::call(r)
                 );
-            delete this;
+            dataflow_source.invalidate();
         }
 
         void connect()
@@ -144,7 +144,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
                 << "dataflow_slot<"
                 << util::type_id<T>::typeid_.type_id()
                 << ", " << Slot
-                << util::type_id<SinkAction>::typeid_.type_id()
+                << hpx::actions::detail::get_action_name<SinkAction>()
                 << ">::connect() from "
                 << get_gid();
 
@@ -157,13 +157,13 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
 
         void set_event()
         {
-            if(boost::is_void<typename T::result_type>::value)
+            //if(boost::is_void<typename T::result_type>::value)
             {
-                set_result(remote_result());
+                this->set_result_nonvirt(remote_result());
             }
-            else
+            //else
             {
-                BOOST_ASSERT(false);
+                //BOOST_ASSERT(false);
             }
         }
         

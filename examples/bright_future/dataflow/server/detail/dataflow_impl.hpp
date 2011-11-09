@@ -149,6 +149,7 @@ namespace hpx { namespace traits
                 BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A)
             >
             wrapped_type;
+
         typedef
             components::managed_component<
                 dataflow_impl<
@@ -160,7 +161,7 @@ namespace hpx { namespace traits
 
         typedef
             passed_args_transforms<
-                boost::mpl::vector<BOOST_PP_ENUM_PARAMS(N, A)>
+                BOOST_PP_CAT(boost::mpl::vector, N)<BOOST_PP_ENUM_PARAMS(N, A)>
             >
             passed_args;
 
@@ -190,7 +191,7 @@ namespace hpx { namespace traits
         {
             LLCO_(info)
                 << "dataflow_impl<"
-                << util::type_id<Action>::typeid_.type_id()
+                << hpx::actions::detail::get_action_name<Action>()
                 << ">::init(): "
                 << get_gid()
                 ;
@@ -226,9 +227,15 @@ namespace hpx { namespace traits
         ~dataflow_impl()
         {
             BOOST_ASSERT(args_set == args_completed);
+#define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
+            delete arg_ids[N];                                                  \
+    /**/
+            BOOST_PP_REPEAT(N, HPX_LCOS_DATAFLOW_M0, _)
+#undef HPX_LCOS_DATAFLOW_M0
+
             LLCO_(info)
                 << "~dataflow_impl<"
-                << util::type_id<Action>::typeid_.type_id()
+                << hpx::actions::detail::get_action_name<Action>()
                 << ">::dataflow_impl(): "
                 << get_gid()
                 ;
@@ -241,8 +248,9 @@ namespace hpx { namespace traits
             BOOST_ASSERT(!result_set);
             LLCO_(info)
                 << "dataflow_impl<"
-                << util::type_id<Action>::typeid_.type_id()
+                << hpx::actions::detail::get_action_name<Action>()
                 << ">::set_result(): set_result: "
+                << targets.size()
                 ;
 
             std::vector<promise<void> > lazy_results;
@@ -262,7 +270,7 @@ namespace hpx { namespace traits
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_result_action action_type;
-                lazy_results.push_back(async<action_type>(t[i], r));
+                lazy_results.push_back(async<action_type>(t[i], result));
             }
             wait(lazy_results);
         }
@@ -271,7 +279,7 @@ namespace hpx { namespace traits
         {
             LLCO_(info)
                 << "dataflow_impl<"
-                << util::type_id<Action>::typeid_.type_id()
+                << hpx::actions::detail::get_action_name<Action>()
                 << ">::set_target() of "
                 << get_gid()
                 << " ";
@@ -328,7 +336,7 @@ namespace hpx { namespace traits
             args_set |= (1<<Slot);
             LLCO_(info)
                 << "dataflow_impl<"
-                << util::type_id<Action>::typeid_.type_id()
+                << hpx::actions::detail::get_action_name<Action>()
                 << ">::maybe_apply(): "
                 << get_gid()
                 << " args set: "
@@ -356,13 +364,13 @@ namespace hpx { namespace traits
 
         void set_event()
         {
-            if(boost::is_void<Result>::value)
+            //if(boost::is_void<Result>::value)
             {
-                set_result(remote_result());
+                this->set_result_nonvirt(remote_result());
             }
-            else
+            //else
             {
-                BOOST_ASSERT(false);
+                //BOOST_ASSERT(false);
             }
         }
 

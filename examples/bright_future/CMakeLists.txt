@@ -9,6 +9,7 @@ set(bright_future_programs
         gs_single
         gs_hpx
         gs_hpx_blocked
+        gs_hpx_blocked_df
         gs_hpx_grid_ro
         remote_functions
         remote_object
@@ -18,7 +19,6 @@ set(bright_future_programs
 
 add_hpx_component(
     gs_hpx
-    MODULE bright_future
     SOURCES server/remote_lse.cpp
     HEADERS server/remote_lse.hpp grid.hpp
     DEPENDENCIES iostreams_component distributing_factory_component hpx_serialization ${BOOST_serialization_LIBRARY}
@@ -26,15 +26,17 @@ add_hpx_component(
 
 add_hpx_component(
     bright_future_dataflow
-    MODULE bright_future
     SOURCES dataflow/dataflow_component.cpp
     HEADERS dataflow/dataflow.hpp
     DEPENDENCIES iostreams_component
 )
 
+add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=8)
+
 set(gs_single_sources gs.cpp)
 set(gs_hpx_sources gs.cpp)
 set(gs_hpx_blocked_sources gs.cpp)
+set(gs_hpx_blocked_df_sources gs.cpp)
 set(gs_hpx_grid_ro_sources gs.cpp)
 
 set(remote_functions_FLAGS DEPENDENCIES iostreams_component)
@@ -44,6 +46,7 @@ set(vector_root_finder_FLAGS DEPENDENCIES iostreams_component)
 set(gs_single_FLAGS DEPENDENCIES iostreams_component)
 set(gs_hpx_FLAGS DEPENDENCIES gs_hpx_component iostreams_component ${BOOST_serialization_LIBRARY})
 set(gs_hpx_blocked_FLAGS DEPENDENCIES gs_hpx_component iostreams_component ${BOOST_serialization_LIBRARY})
+set(gs_hpx_blocked_df_FLAGS DEPENDENCIES gs_hpx_component bright_future_dataflow_component iostreams_component ${BOOST_serialization_LIBRARY})
 set(gs_hpx_grid_ro_FLAGS DEPENDENCIES remote_object_component iostreams_component ${BOOST_serialization_LIBRARY})
 
 foreach(bright_future_program ${bright_future_programs})

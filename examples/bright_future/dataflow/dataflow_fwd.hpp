@@ -26,8 +26,8 @@ namespace hpx
 {
     namespace traits
     {
-        template <typename Action>
-        struct is_dataflow<hpx::lcos::dataflow<Action> >
+        template <typename Action, typename Result, typename DirectExecute>
+        struct is_dataflow<hpx::lcos::dataflow<Action, Result, DirectExecute> >
             : boost::mpl::true_
         {};
     }

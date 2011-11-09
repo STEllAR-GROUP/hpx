@@ -13,10 +13,12 @@
 namespace hpx { namespace lcos {
     template <>
     struct dataflow_base<void>
+    /*
         : components::client_base<
             dataflow_base<void>
           , stubs::dataflow
         >
+        */
     {
         typedef traits::promise_remote_result<void>::type remote_result_type;
         typedef void result_type;
@@ -29,28 +31,47 @@ namespace hpx { namespace lcos {
         
         typedef stubs::dataflow stub_type;
 
-        dataflow_base() {}
-        
-        dataflow_base(naming::id_type const & id)
-            : base_type(id)
+        dataflow_base()
+            : gid_(naming::invalid_id)
         {}
+        
+        virtual ~dataflow_base()
+        {
+            if(!gid_)
+            {
+                gid_promise.get();
+            }
+        }
+        
+        dataflow_base(promise<naming::gid_type, naming::gid_type, 1> const & promise)
+            : gid_promise(promise)
+            , gid_(naming::invalid_id)
+        {
+        }
 
         dataflow_base(dataflow_base const & other)
-            : base_type(other.get_gid())
+            : gid_(other.get_gid())
         {}
         
+        /*
         operator promise<void, remote_result_type>() const
         {
             promise<void> p;
             connect(p.get_gid());
             return p;
         }
+        */
 
         void get()
         {
             promise<void> p;
             connect(p.get_gid());
             p.get();
+        }
+
+        void invalidate()
+        {
+            this->get_gid() = naming::invalid_id;
         }
 
         void connect(naming::id_type const & target) const
@@ -63,16 +84,47 @@ namespace hpx { namespace lcos {
             return stub_type::connect_async(this->get_gid(), target);
         }
 
-    private:
+        naming::id_type & get_gid()
+        {
+            if(!gid_)
+            {
+                gid_promise.get();
+            }
+            return gid_;
+        }
 
+        naming::id_type & get_gid() const
+        {
+            if(!gid_)
+            {
+                gid_promise.get();
+            }
+            return gid_;
+        }
+
+    protected:
+        promise<naming::gid_type, naming::gid_type, 1> gid_promise;
+        mutable naming::id_type gid_;
+
+    private:
         friend class boost::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
+        void load(Archive & ar, unsigned)
         {
-            ar & this->gid_;
-            BOOST_ASSERT(this->get_gid());
+            BOOST_ASSERT(!gid_);
+            ar & gid_;
+            BOOST_ASSERT(gid_);
         }
+
+        template <typename Archive>
+        void save(Archive & ar, unsigned) const
+        {
+            BOOST_ASSERT(this->get_gid());
+            ar & this->get_gid();
+        }
+
+        BOOST_SERIALIZATION_SPLIT_MEMBER();
     };
 }}
 

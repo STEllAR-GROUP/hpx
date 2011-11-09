@@ -39,6 +39,9 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
           , Vector const & args                                                 \
         ) const                                                                 \
         {                                                                       \
+            LLCO_(info)                                                         \
+                << "dataflow apply action "                                     \
+                << hpx::actions::detail::get_action_name<Action>();             \
             hpx::applier::apply_c<Action>(                                      \
                 cont                                                            \
               , id                                                              \
