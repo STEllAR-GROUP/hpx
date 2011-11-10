@@ -96,7 +96,7 @@ namespace hpx { namespace lcos { namespace server
             component_type * w = new component_type(target);                  \
             (*w)->init(BOOST_PP_ENUM_PARAMS(N, a));                           \
                                                                               \
-            hpx::util::spinlock::scoped_lock l(mtx);                          \
+            typename hpx::util::spinlock::scoped_lock l(mtx);                 \
             component_ptr = w;                                                \
                                                                               \
             if(connect_thread_id != 0)                                        \
