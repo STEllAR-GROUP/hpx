@@ -49,8 +49,6 @@ namespace hpx { namespace lcos { namespace server
         template <typename Action>
         void init(naming::id_type const & target)
         {
-            typename hpx::util::spinlock::scoped_lock l(mtx);
-
             typedef detail::dataflow_impl<Action> wrapped_type;
             typedef
                 detail::component_wrapper<wrapped_type>
@@ -61,6 +59,8 @@ namespace hpx { namespace lcos { namespace server
 
             component_type * w = new component_type(target);
             (*w)->init();
+
+            typename hpx::util::spinlock::scoped_lock l(mtx);
             component_ptr = w;
 
             // waking up a possible sleeping thread that was trying to connect
@@ -81,7 +81,6 @@ namespace hpx { namespace lcos { namespace server
           , BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)                      \
         )                                                                     \
         {                                                                     \
-            hpx::util::spinlock::scoped_lock l(mtx);                          \
             typedef                                                           \
                 detail::dataflow_impl<                                        \
                     Action                                                    \
@@ -96,6 +95,8 @@ namespace hpx { namespace lcos { namespace server
                 component_type;                                               \
             component_type * w = new component_type(target);                  \
             (*w)->init(BOOST_PP_ENUM_PARAMS(N, a));                           \
+                                                                              \
+            hpx::util::spinlock::scoped_lock l(mtx);                          \
             component_ptr = w;                                                \
                                                                               \
             if(connect_thread_id != 0)                                        \
@@ -119,37 +120,42 @@ namespace hpx { namespace lcos { namespace server
         /// to the specified target lco
         void connect(naming::id_type const & target)
         {
-            hpx::util::spinlock::scoped_lock l(mtx);
-
-            // wait until component_ptr is initialized.
-            if(component_ptr == 0)
             {
-                LLCO_(info)
-                    << "server::dataflow::connect() executed before server::dataflow::init finished.";
-                threads::thread_self *self = threads::get_self_ptr_checked();
-                connect_thread_id = self->get_thread_id();
+                hpx::util::spinlock::scoped_lock l(mtx);
 
-                threads::thread_state_ex_enum statex = threads::wait_unknown;
+                // wait until component_ptr is initialized.
+                if(component_ptr == 0)
                 {
-                    util::unlock_the_lock<hpx::util::spinlock::scoped_lock> ul(l);
-                    statex = self->yield(threads::suspended);
-                }
-                if(statex == threads::wait_abort)
-                {
-                    hpx::util::osstream strm;
-                    error_code ig;
-                    std::string desc = threads::get_thread_description(connect_thread_id, ig);
+                    LLCO_(info)
+                        << "server::dataflow::connect() executed before server::dataflow::init finished.";
+                    threads::thread_self *self = threads::get_self_ptr_checked();
+                    connect_thread_id = self->get_thread_id();
 
-                    strm << "thread(" << connect_thread_id
-                         << (desc.empty() ? "" : ", " ) << desc
-                         << ") aborted (yield returned wait_abort)";
-                    HPX_THROW_EXCEPTION(yield_aborted,
-                        "dataflow::connect()",
-                        hpx::util::osstream_get_string(strm));
+                    threads::thread_state_ex_enum statex = threads::wait_unknown;
+                    {
+                        util::unlock_the_lock<hpx::util::spinlock::scoped_lock> ul(l);
+                        statex = self->yield(threads::suspended);
+                    }
 
-                    return;
+                    threads::thread_id_type id = connect_thread_id;
+                    connect_thread_id = 0;
+                    if(statex == threads::wait_abort)
+                    {
+                        hpx::util::osstream strm;
+                        error_code ig;
+                        std::string desc = threads::get_thread_description(id, ig);
+
+                        strm << "thread(" << id
+                             << (desc.empty() ? "" : ", " ) << desc
+                             << ") aborted (yield returned wait_abort)";
+                        HPX_THROW_EXCEPTION(yield_aborted,
+                            "dataflow::connect()",
+                            hpx::util::osstream_get_string(strm));
+
+                        return;
+                    }
                 }
-                connect_thread_id = 0;
+                BOOST_ASSERT(component_ptr);
             }
 
             (*component_ptr)->connect_nonvirt(target);

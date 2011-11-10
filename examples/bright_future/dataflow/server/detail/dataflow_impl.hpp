@@ -122,20 +122,12 @@ namespace hpx { namespace traits
       , Result
     >
         : ::hpx::lcos::base_lco_with_value<
-            typename boost::mpl::if_<
-                boost::is_void<Result>
-              , hpx::util::unused_type
-              , Result
-            >::type
-          , typename Action::result_type
-        >
+              typename traits::promise_remote_result<Result>::type
+            , typename Action::result_type
+          >
     {
         typedef
-            typename boost::mpl::if_<
-                boost::is_void<Result>
-              , hpx::util::unused_type
-              , Result
-            >::type
+            typename traits::promise_remote_result<Result>::type
             result_type;
         typedef
             hpx::lcos::base_lco_with_value<
@@ -332,8 +324,21 @@ namespace hpx { namespace traits
         template <int Slot>
         void maybe_apply()
         {
-            typename hpx::util::spinlock::scoped_lock l(mtx);
-            args_set |= (1<<Slot);
+            {
+                typename hpx::util::spinlock::scoped_lock l(mtx);
+                args_set |= (1<<Slot);
+                if(args_set == args_completed)
+                {
+                    apply_helper<
+                        boost::fusion::result_of::size<args_type>::value
+                      , Action
+                    >()(
+                        get_gid()
+                      , action_id
+                      , args
+                    );
+                }
+            }
             LLCO_(info)
                 << "dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -346,17 +351,6 @@ namespace hpx { namespace traits
                 << ")"
                 << "\n"
                 ;
-            if(args_set == args_completed)
-            {
-                apply_helper<
-                    boost::fusion::result_of::size<args_type>::value
-                  , Action
-                >()(
-                    get_gid()
-                  , action_id
-                  , args
-                );
-            }
         }
 #endif
 
