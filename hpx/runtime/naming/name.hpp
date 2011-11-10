@@ -242,6 +242,11 @@ namespace hpx { namespace naming
         return boost::uint32_t(id.get_msb() >> 32);
     }
 
+    inline gid_type get_locality_from_gid(gid_type const& id)
+    {
+        return get_gid_from_prefix(get_prefix_from_gid(id));
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     inline boost::uint16_t get_credit_from_gid(gid_type const& id) HPX_PURE;
 
@@ -610,6 +615,11 @@ namespace hpx { namespace naming
     inline boost::uint32_t get_prefix_from_id(id_type const& id)
     {
         return boost::uint32_t(id.get_msb() >> 32);
+    }
+
+    inline id_type get_locality_from_id(id_type const& id)
+    {
+        return get_id_from_prefix(get_prefix_from_id(id));
     }
 
     ///////////////////////////////////////////////////////////////////////

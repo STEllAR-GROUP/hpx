@@ -320,8 +320,7 @@ namespace hpx { namespace components { namespace stubs
             }
             else {
                 // apply remotely
-                naming::gid_type prefix = naming::get_gid_from_prefix(
-                    naming::get_prefix_from_gid(gid));
+                naming::gid_type prefix = naming::get_locality_from_gid(gid);
                 lcos::eager_future<action_type, void>(prefix, type, gid).get();
             }
         }
