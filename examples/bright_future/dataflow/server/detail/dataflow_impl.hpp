@@ -212,8 +212,8 @@ namespace hpx { namespace traits
                   , BOOST_PP_CAT(a, N)                                          \
                 );                                                              \
                                                                                 \
-            (*BOOST_PP_CAT(w, N))->connect();                                   \
             arg_ids[N] = BOOST_PP_CAT(w, N);                                    \
+            (*BOOST_PP_CAT(w, N))->connect();                                   \
     /**/
 
             BOOST_PP_REPEAT(N, HPX_LCOS_DATAFLOW_M0, _)
@@ -357,7 +357,6 @@ namespace hpx { namespace traits
                   , args
                 );
             }
-            arg_ids[Slot] = 0;
         }
 #endif
 

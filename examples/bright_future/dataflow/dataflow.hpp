@@ -41,14 +41,14 @@ namespace hpx { namespace lcos {
 
         // MSVC chokes on having the lambda in the member initializer list below
         static inline lcos::promise<naming::id_type, naming::gid_type>
-        create_component(naming::id_type const & target)
+        create_component(naming::id_type target)
         {
             return async_callback<create_component_action>(
                     [target](naming::id_type const & gid) mutable
                     {
                         typedef hpx::lcos::server::init_action<Action> action_type;
                         applier::apply<action_type>(gid, target);
-//                         target = naming::invalid_id;
+                        target = naming::invalid_id;
                     }
                   , naming::id_type(
                         naming::get_gid_from_prefix(
@@ -70,7 +70,7 @@ namespace hpx { namespace lcos {
 #define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
         template <BOOST_PP_ENUM_PARAMS(N, typename A)>                          \
         static inline lcos::promise<naming::id_type, naming::gid_type>          \
-        create_component(naming::id_type const & target                         \
+        create_component(naming::id_type target                                 \
           , BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)                        \
         )                                                                       \
         {                                                                       \
@@ -81,6 +81,7 @@ namespace hpx { namespace lcos {
                             Action, BOOST_PP_ENUM_PARAMS(N, A)> action_type;    \
                         applier::apply<action_type>(gid, target                 \
                           , BOOST_PP_ENUM_PARAMS(N, a));                        \
+                        target = naming::invalid_id;                            \
                     }                                                           \
                   , naming::id_type(                                            \
                         naming::get_gid_from_prefix(                            \

@@ -215,7 +215,7 @@ void gs(
         // is used for the initialization of the grid.
         iteration_dependencies_type
             iteration_dependencies(
-                max_iterations+1
+                2//max_iterations+1
               , promise_grid_type(n_x_block, n_y_block)
             );
         promise_grid_type init_rhs_promises(n_x_block, n_y_block);
@@ -288,8 +288,8 @@ void gs(
         for(unsigned iter = 0; iter < max_iterations; ++iter)
         {
             {
-                promise_grid_type & prev = iteration_dependencies[iter];
-                promise_grid_type & current = iteration_dependencies[(iter + 1)];
+                promise_grid_type & prev = iteration_dependencies[iter%2];
+                promise_grid_type & current = iteration_dependencies[(iter + 1)%2];
 
                 // in every iteration we want to compute this:
                 for(size_type y_block = 0, y = 0; y_block < n_y; y_block += block_size, ++y)
@@ -329,8 +329,7 @@ void gs(
                             // add the right block of the previous iteration
                             // to our list of dependencies
                             //deps.push_back(&prev(x+1,y));
-                            dataflow_base<void> tmp = deps;
-                            deps = dataflow<dependency_action>(remote_id, tmp, prev(x+1, y));
+                            deps = dataflow<dependency_action>(remote_id, deps, prev(x+1, y));
                         }
 
                         if(y + 1 < n_y_block) // are we on the boundary?
@@ -338,8 +337,7 @@ void gs(
                             // add the upper block of the previous iteration
                             // to our list of dependencies
                             //deps.push_back(&prev(x,y+1));
-                            dataflow_base<void> tmp = deps;
-                            deps = dataflow<dependency_action>(remote_id, tmp, prev(x, y+1));
+                            deps = dataflow<dependency_action>(remote_id, deps, prev(x, y+1));
                         }
 
                         if(x > 0) // are we on the boundary?
@@ -347,8 +345,7 @@ void gs(
                             // add the upper block of the current iteration
                             // to our list of dependencies
                             //deps.push_back(&current(x-1,y));
-                            dataflow_base<void> tmp = deps;
-                            deps = dataflow<dependency_action>(remote_id, tmp, current(x-1, y));
+                            deps = dataflow<dependency_action>(remote_id, deps, current(x-1, y));
                         }
 
                         if(y > 0) // are we on the boundary?
@@ -356,7 +353,6 @@ void gs(
                             // add the upper block of the current iteration
                             // to our list of dependencies
                             //deps.push_back(&current(x,y-1));
-                            dataflow_base<void> tmp = deps;
                             deps = dataflow<dependency_action>(remote_id, deps, current(x, y-1));
                         }
 
@@ -376,19 +372,20 @@ void gs(
                               , y_range
                               , deps
                             );
+                        //cout << "." << flush;
                     }
                 }
             }
         }
 
         // wait for the last iteration to finish.
-        BOOST_FOREACH(dataflow_type & promise, iteration_dependencies[max_iterations])
+        BOOST_FOREACH(dataflow_type & promise, iteration_dependencies[max_iterations%2])
         {
             promise.get();
         }
 
         double time_elapsed = t.elapsed();
-        cout << time_elapsed << "\n" << flush;
+        cout << "\n" << time_elapsed << "\n" << flush;
 
         if(!output.empty())
         {
