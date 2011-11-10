@@ -15,12 +15,6 @@
 namespace hpx { namespace lcos {
     template <typename Result, typename RemoteResult>
     struct dataflow_base
-    /*
-        : components::client_base<
-            dataflow_base<Result, RemoteResult>
-          , stubs::dataflow
-        >
-        */
     {
         typedef RemoteResult remote_result_type;
         typedef Result       result_type;
@@ -39,41 +33,12 @@ namespace hpx { namespace lcos {
 
         virtual ~dataflow_base()
         {
-            /*
-            if(!gid_)
-            {
-                gid_promise.get();
-            }
-            */
         }
 
         dataflow_base(promise<naming::id_type, naming::gid_type> const & promise)
             : gid_promise(promise)
             , gid_(naming::invalid_id)
         {}
-
-//         dataflow_base(dataflow_base const & other)
-//             : gid_promise(other.gid_promise)
-//             , gid_(other.gid_)
-//         {}
-//
-//         dataflow_base& operator=(dataflow_base const& rhs)
-//         {
-//             if (this != &rhs) {
-//                 gid_promise = rhs.gid_promise;
-//                 gid_ = rhs.gid_;
-//             }
-//             return *this;
-//         }
-
-        /*
-        operator promise<Result, remote_result_type>() const
-        {
-            promise<Result, remote_result_type> p;
-            connect(p.get_gid());
-            return p;
-        }
-        */
 
         Result get()
         {
@@ -84,7 +49,7 @@ namespace hpx { namespace lcos {
 
         void invalidate()
         {
-            this->get_gid() = naming::invalid_id;
+            gid_ = naming::invalid_id;
             gid_promise.reset();
         }
 

@@ -60,51 +60,60 @@ namespace hpx { namespace lcos { namespace server
             component_type * w = new component_type(target);
             (*w)->init();
 
-            typename hpx::util::spinlock::scoped_lock l(mtx);
-            component_ptr = w;
-
-            // waking up a possible sleeping thread that was trying to connect
-            if(connect_thread_id != 0)
             {
-                threads::set_thread_state(connect_thread_id, threads::pending);
-                connect_thread_id = 0;
+                typename hpx::util::spinlock::scoped_lock l(mtx);
+                component_ptr = w;
+
+                // waking up a possible sleeping thread that was trying to connect
+                if(connect_thread_id != 0)
+                {
+                    threads::set_thread_state(
+                        connect_thread_id
+                      , threads::pending
+                    );
+                    connect_thread_id = 0;
+                }
             }
         }
 
             // Vertical preprocessor repetition to define the remaining
             // init functions and actions
             // TODO: get rid of the call to impl_ptr->init
-#define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                         \
-        template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename A)>       \
-        void init(                                                            \
-            naming::id_type const & target                                    \
-          , BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)                      \
-        )                                                                     \
-        {                                                                     \
-            typedef                                                           \
-                detail::dataflow_impl<                                        \
-                    Action                                                    \
-                  , BOOST_PP_ENUM_PARAMS(N, A)                                \
-                >                                                             \
-                wrapped_type;                                                 \
-                                                                              \
-            typedef                                                           \
-                detail::component_wrapper<                                    \
-                    wrapped_type                                              \
-                >                                                             \
-                component_type;                                               \
-            component_type * w = new component_type(target);                  \
-            (*w)->init(BOOST_PP_ENUM_PARAMS(N, a));                           \
-                                                                              \
-            typename hpx::util::spinlock::scoped_lock l(mtx);                 \
-            component_ptr = w;                                                \
-                                                                              \
-            if(connect_thread_id != 0)                                        \
-            {                                                                 \
-                threads::set_thread_state(connect_thread_id, threads::pending); \
-                connect_thread_id = 0;                                        \
-            }                                                                 \
-        }                                                                     \
+#define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
+        template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename A)>         \
+        void init(                                                              \
+            naming::id_type const & target                                      \
+          , BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)                        \
+        )                                                                       \
+        {                                                                       \
+            typedef                                                             \
+                detail::dataflow_impl<                                          \
+                    Action                                                      \
+                  , BOOST_PP_ENUM_PARAMS(N, A)                                  \
+                >                                                               \
+                wrapped_type;                                                   \
+                                                                                \
+            typedef                                                             \
+                detail::component_wrapper<                                      \
+                    wrapped_type                                                \
+                >                                                               \
+                component_type;                                                 \
+            component_type * w = new component_type(target);                    \
+            (*w)->init(BOOST_PP_ENUM_PARAMS(N, a));                             \
+                                                                                \
+            {                                                                   \
+                typename hpx::util::spinlock::scoped_lock l(mtx);               \
+                component_ptr = w;                                              \
+                                                                                \
+                if(connect_thread_id != 0)                                      \
+                {                                                               \
+                    threads::set_thread_state(                                  \
+                        connect_thread_id                                       \
+                      , threads::pending);                                      \
+                    connect_thread_id = 0;                                      \
+                }                                                               \
+            }                                                                   \
+        }                                                                       \
     /**/
 
         BOOST_PP_REPEAT_FROM_TO(
@@ -127,15 +136,20 @@ namespace hpx { namespace lcos { namespace server
                 if(component_ptr == 0)
                 {
                     LLCO_(info)
-                        << "server::dataflow::connect() executed before server::dataflow::init finished.";
+                        << "server::dataflow::connect() "
+                        << "executed before server::dataflow::init finished.";
                     threads::thread_self *self = threads::get_self_ptr_checked();
                     connect_thread_id = self->get_thread_id();
                     threads::thread_id_type id = connect_thread_id;
-                    threads::set_thread_lco_description(connect_thread_id, "server::dataflow::connect");
+                    threads::set_thread_lco_description(
+                        connect_thread_id
+                      , "server::dataflow::connect"
+                    );
 
                     threads::thread_state_ex_enum statex = threads::wait_unknown;
                     {
-                        util::unlock_the_lock<hpx::util::spinlock::scoped_lock> ul(l);
+                        util::unlock_the_lock<hpx::util::spinlock::scoped_lock>
+                            ul(l);
                         statex = self->yield(threads::suspended);
                     }
 
@@ -145,7 +159,8 @@ namespace hpx { namespace lcos { namespace server
                     {
                         hpx::util::osstream strm;
                         error_code ig;
-                        std::string desc = threads::get_thread_description(id, ig);
+                        std::string
+                            desc = threads::get_thread_description(id, ig);
 
                         strm << "thread(" << id
                              << (desc.empty() ? "" : ", " ) << desc

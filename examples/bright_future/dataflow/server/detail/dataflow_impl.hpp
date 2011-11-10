@@ -245,7 +245,6 @@ namespace hpx { namespace traits
                 << targets.size()
                 ;
 
-            //std::vector<promise<void> > lazy_results;
             std::vector<naming::id_type> t;
 
             {
@@ -262,10 +261,8 @@ namespace hpx { namespace traits
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_result_action action_type;
-                //lazy_results.push_back(async<action_type>(t[i], result));
                 applier::apply<action_type>(t[i], result);
             }
-            //wait(lazy_results);
         }
 
         void connect(naming::id_type const & target)
@@ -282,10 +279,6 @@ namespace hpx { namespace traits
             {
                 typedef typename lco_type::set_result_action action_type;
                 applier::apply<action_type>(target, result);
-                //promise<void> p = async<action_type>(target, result);
-                //l.unlock();
-
-                //wait(p);
             }
             else
             {
@@ -359,14 +352,7 @@ namespace hpx { namespace traits
 
         void set_event()
         {
-            //if(boost::is_void<Result>::value)
-            {
-                this->set_result_nonvirt(remote_result());
-            }
-            //else
-            {
-                //BOOST_ASSERT(false);
-            }
+            this->set_result_nonvirt(remote_result());
         }
 
         result_type get_value()

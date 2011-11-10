@@ -157,14 +157,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
 
         void set_event()
         {
-            //if(boost::is_void<typename T::result_type>::value)
-            {
-                this->set_result_nonvirt(remote_result());
-            }
-            //else
-            {
-                //BOOST_ASSERT(false);
-            }
+            this->set_result_nonvirt(remote_result());
         }
         
         result_type get_value()
