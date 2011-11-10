@@ -52,12 +52,19 @@ namespace hpx { namespace lcos {
             , gid_(naming::invalid_id)
         {}
 
-        /*
-        dataflow_base(dataflow_base const & other)
-            : gid_promise(other.gid_promise)
-            , gid_(other.gid_)
-        {}
-        */
+//         dataflow_base(dataflow_base const & other)
+//             : gid_promise(other.gid_promise)
+//             , gid_(other.gid_)
+//         {}
+//
+//         dataflow_base& operator=(dataflow_base const& rhs)
+//         {
+//             if (this != &rhs) {
+//                 gid_promise = rhs.gid_promise;
+//                 gid_ = rhs.gid_;
+//             }
+//             return *this;
+//         }
 
         /*
         operator promise<Result, remote_result_type>() const
