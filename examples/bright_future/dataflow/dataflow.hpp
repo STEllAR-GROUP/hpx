@@ -48,7 +48,7 @@ namespace hpx { namespace lcos {
                     {
                         typedef hpx::lcos::server::init_action<Action> action_type;
                         applier::apply<action_type>(gid, target);
-                        target = naming::invalid_id;
+                        //target = naming::invalid_id;
                     }
                   , naming::id_type(
                         naming::get_gid_from_prefix(
@@ -65,7 +65,9 @@ namespace hpx { namespace lcos {
 
         explicit dataflow(naming::id_type const & target)
             : base_type(create_component(target))
-        {}
+        {
+            this->get_gid();
+        }
 
 #define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
         template <BOOST_PP_ENUM_PARAMS(N, typename A)>                          \
@@ -81,7 +83,6 @@ namespace hpx { namespace lcos {
                             Action, BOOST_PP_ENUM_PARAMS(N, A)> action_type;    \
                         applier::apply<action_type>(gid, target                 \
                           , BOOST_PP_ENUM_PARAMS(N, a));                        \
-                        target = naming::invalid_id;                            \
                     }                                                           \
                   , naming::id_type(                                            \
                         naming::get_gid_from_prefix(                            \
@@ -103,7 +104,7 @@ namespace hpx { namespace lcos {
             : base_type(create_component(target                                 \
                 , BOOST_PP_ENUM_PARAMS(N, a))                                   \
               )                                                                 \
-        {}                                                                      \
+        {this->get_gid();}                                                      \
     /**/
         BOOST_PP_REPEAT_FROM_TO(
             1
