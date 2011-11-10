@@ -65,5 +65,9 @@ struct HPX_COMPONENT_EXPORT managed_refcnt_checker
 
 }}}
 
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::test::server::managed_refcnt_checker::take_reference_action,
+    managed_refcnt_checker_take_reference_action);
+
 #endif // HPX_2F9C9286_A4A2_451C_BBD6_CD884F57B21D
 
