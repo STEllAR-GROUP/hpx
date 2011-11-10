@@ -13,9 +13,13 @@ set(bright_future_programs
         gs_hpx_grid_ro
         remote_functions
         remote_object
-        dataflow_test
    )
 
+if(HPX_CXX11_LAMBDAS)
+    set(bright_future_programs ${bright_future_programs}
+        dataflow_test
+    )
+endif()
 
 add_hpx_component(
     gs_hpx
@@ -24,12 +28,14 @@ add_hpx_component(
     DEPENDENCIES iostreams_component distributing_factory_component hpx_serialization ${BOOST_serialization_LIBRARY}
 )
 
-add_hpx_component(
-    bright_future_dataflow
-    SOURCES dataflow/dataflow_component.cpp
-    HEADERS dataflow/dataflow.hpp
-    DEPENDENCIES iostreams_component
-)
+if(HPX_CXX11_LAMBDAS)
+    add_hpx_component(
+        bright_future_dataflow
+        SOURCES dataflow/dataflow_component.cpp
+        HEADERS dataflow/dataflow.hpp
+        DEPENDENCIES iostreams_component
+    )
+endif()
 
 add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=8)
 
@@ -40,7 +46,9 @@ set(gs_hpx_blocked_df_sources gs.cpp)
 set(gs_hpx_grid_ro_sources gs.cpp)
 
 set(remote_functions_FLAGS DEPENDENCIES iostreams_component)
-set(dataflow_test_FLAGS DEPENDENCIES iostreams_component bright_future_dataflow_component)
+if(HPX_CXX11_LAMBDAS)
+    set(dataflow_test_FLAGS DEPENDENCIES iostreams_component bright_future_dataflow_component)
+endif()
 set(remote_object_FLAGS DEPENDENCIES remote_object_component iostreams_component)
 set(vector_root_finder_FLAGS DEPENDENCIES iostreams_component)
 set(gs_single_FLAGS DEPENDENCIES iostreams_component)
