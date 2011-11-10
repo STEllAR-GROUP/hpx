@@ -130,6 +130,8 @@ namespace hpx { namespace lcos { namespace server
                         << "server::dataflow::connect() executed before server::dataflow::init finished.";
                     threads::thread_self *self = threads::get_self_ptr_checked();
                     connect_thread_id = self->get_thread_id();
+                    threads::thread_id_type id = connect_thread_id;
+                    threads::set_thread_lco_description(connect_thread_id, "server::dataflow::connect");
 
                     threads::thread_state_ex_enum statex = threads::wait_unknown;
                     {
@@ -137,7 +139,7 @@ namespace hpx { namespace lcos { namespace server
                         statex = self->yield(threads::suspended);
                     }
 
-                    threads::thread_id_type id = connect_thread_id;
+                    threads::set_thread_lco_description(id);
                     connect_thread_id = 0;
                     if(statex == threads::wait_abort)
                     {
