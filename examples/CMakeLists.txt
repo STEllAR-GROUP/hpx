@@ -7,39 +7,23 @@
 
 set(subdirs
     accumulator
-    adaptive1d
     balancing
-    bright_future
-    dataflow
-    heartbeat
-    hplpx
-    nqueen
-    object_semaphore
-    performance_counters
-    queue
     quickstart
+    object_semaphore
     random_mem_access
-    throttle
    )
 
 if(${BOOST_MINOR_VERSION} GREATER 46)
   set(subdirs ${subdirs}
-      geometry
+      bfs
+      gtc
      )
 endif()
 
-if(HDF5_CPP_FOUND)
-  if(HDF5_FOUND)
-    set(subdirs ${subdirs}
-        interpolate1d
-        interpolate3d
-       )
-  endif()
-  if(HPX_CXX11_LAMBDAS AND HPX_CXX11_AUTO)
-    set(subdirs ${subdirs}
-        sheneos
-       )
-  endif()
+if(HDF5_CPP_FOUND AND HPX_CXX11_LAMBDAS AND HPX_CXX11_AUTO)
+  set(subdirs ${subdirs}
+      sheneos
+     )
 endif()
 
 foreach(subdir ${subdirs})
