@@ -16,6 +16,8 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
+#include <hpx/runtime/actions/component_action.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/applier/trigger.hpp>
 #include <hpx/lcos/base_lco.hpp>
 
@@ -120,7 +122,7 @@ struct object_semaphore
                 util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
 
                 // set the LCO's result
-                applier::trigger<ValueType>(id, value);
+                applier::trigger(id, boost::move(value));
             }
         }
     } // }}}
@@ -175,17 +177,6 @@ struct object_semaphore
             naming::id_type id = thread_queue_.front().id_;
             thread_queue_.front().id_ = naming::invalid_id;
             thread_queue_.pop_front();
-
-            // forcefully abort thread, do not throw
-            error_code ec;
-            threads::set_thread_state(id, threads::pending,
-                threads::wait_abort, threads::thread_priority_normal, ec);
-            if (ec) {
-                LERR_(fatal) << "object_semaphore::abort_pending: "
-                                "could not abort thread"
-                    << get_thread_state_name(thrd->get_state())
-                    << "(" << id << "): " << thrd->get_description();
-            }
 
             LLCO_(info)
                 << "object_semaphore::abort_pending: pending thread " << id;

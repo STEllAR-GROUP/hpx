@@ -315,7 +315,7 @@ namespace hpx { namespace components { namespace stubs
             if (/*agas.is_bootstrap() || */appl.address_is_local(gid, addr)) {
                 // apply locally
                 applier::detail::apply_helper2<
-                    action_type, components::component_type, naming::gid_type
+                    action_type
                 >::call(appl.get_runtime_support_raw_gid().get_lsb(),
                         threads::thread_priority_default, type, gid);
             }
