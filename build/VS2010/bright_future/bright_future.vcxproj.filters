@@ -18,7 +18,7 @@
     <ClCompile Include="..\..\..\examples\bright_future\gs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\examples\bright_future\gs_hpx_blocked.cpp">
+    <ClCompile Include="..\..\..\examples\bright_future\gs_hpx_blocked_df.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

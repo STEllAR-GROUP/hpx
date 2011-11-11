@@ -221,6 +221,8 @@
     <ClInclude Include="..\..\..\hpx\lcos\async.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\async_future_wait.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\barrier.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\eager_future_signalling_constructors.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\eager_future_signalling_constructors_direct.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\get_result.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\local_barrier.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\local_counting_semaphore.hpp" />
@@ -232,6 +234,7 @@
     <ClInclude Include="..\..\..\hpx\lcos\server\barrier.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\server\object_semaphore.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\server\queue.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\signalling_promise.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\stubs\barrier.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\stubs\object_semaphore.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\stubs\queue.hpp" />
@@ -245,9 +248,11 @@
     <ClInclude Include="..\..\..\hpx\performance_counters\server\elapsed_time_counter.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\actions\action_registry.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\actions\component_action_registration.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\actions\function.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\actions\function_implementations.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\actions\manage_object_action.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\actions\plain_action_registration.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\actions\signature_implementations.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\agas\addressing_service.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\agas\big_boot_barrier.hpp" />
@@ -304,6 +309,7 @@
     <ClInclude Include="..\..\..\hpx\util\detail\vtable_ptr_base_fwd.hpp" />
     <ClInclude Include="..\..\..\hpx\util\detail\vtable_ptr_fwd.hpp" />
     <ClInclude Include="..\..\..\hpx\util\filesystem_compatibility.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\full_empty_entry.hpp" />
     <ClInclude Include="..\..\..\hpx\util\function.hpp" />
     <ClInclude Include="..\..\..\hpx\util\hardware\bit_manipulation.hpp" />
     <ClInclude Include="..\..\..\hpx\util\hardware\cpuid.hpp" />
@@ -336,7 +342,6 @@
     <ClInclude Include="..\..\..\hpx\util\connection_cache.hpp" />
     <ClInclude Include="..\..\..\hpx\util\container_device.hpp" />
     <ClInclude Include="..\..\..\hpx\util\full_empty_memory.hpp" />
-    <ClInclude Include="..\..\..\hpx\util\full_empty_store.hpp" />
     <ClInclude Include="..\..\..\hpx\util\future.hpp" />
     <ClInclude Include="..\..\..\hpx\util\generate_unique_ids.hpp" />
     <ClInclude Include="..\..\..\hpx\util\high_resolution_timer.hpp" />

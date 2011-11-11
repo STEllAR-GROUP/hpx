@@ -52,7 +52,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;HPX_ACTION_ARGUMENT_LIMIT=5;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -67,7 +67,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;HPX_ACTION_ARGUMENT_LIMIT=5;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -78,7 +78,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\examples\bright_future\gs.cpp" />
-    <ClCompile Include="..\..\..\examples\bright_future\gs_hpx_blocked.cpp" />
+    <ClCompile Include="..\..\..\examples\bright_future\gs_hpx_blocked_df.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\components\distributing_factory\distributing_factory.vcxproj">
@@ -121,13 +121,16 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
-    <ProjectReference Include="remote_lse\remote_lse.vcxproj">
-      <Project>{0615d767-9c56-4b20-9474-e023bb44d4ca}</Project>
+    <ProjectReference Include="dataflow\dataflow.vcxproj">
+      <Project>{268e3fb7-58fd-4a1f-9353-2f0734b802b2}</Project>
       <Private>true</Private>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
+    </ProjectReference>
+    <ProjectReference Include="remote_lse\remote_lse.vcxproj">
+      <Project>{0615d767-9c56-4b20-9474-e023bb44d4ca}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

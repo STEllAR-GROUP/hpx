@@ -685,9 +685,6 @@
     <ClInclude Include="..\..\..\hpx\util\full_empty_memory.hpp">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hpx\util\full_empty_store.hpp">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hpx\util\future.hpp">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
@@ -1092,6 +1089,24 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\runtime\applier\trigger.hpp">
       <Filter>Header Files\Runtime\Applier</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\signalling_promise.hpp">
+      <Filter>Header Files\LCOs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\eager_future_signalling_constructors.hpp">
+      <Filter>Header Files\LCOs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\eager_future_signalling_constructors_direct.hpp">
+      <Filter>Header Files\LCOs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\actions\component_action_registration.hpp">
+      <Filter>Header Files\Runtime\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\actions\plain_action_registration.hpp">
+      <Filter>Header Files\Runtime\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\full_empty_entry.hpp">
+      <Filter>Header Files\Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
