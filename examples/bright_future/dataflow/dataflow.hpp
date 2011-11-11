@@ -59,7 +59,7 @@ namespace hpx { namespace lcos {
         explicit dataflow(naming::id_type const & target)
             : base_type(create_component(target))
         {
-            //this->get_gid();
+            this->get_gid();
         }
 
 #define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
@@ -91,10 +91,9 @@ namespace hpx { namespace lcos {
             : base_type(create_component(target                                 \
                 , BOOST_PP_ENUM_PARAMS(N, a))                                   \
               )                                                                 \
-        {}                                                                      \
-        /*
-        {this->get_gid();}                                                      \
-        */
+        {                                                                       \
+            this->get_gid();                                                    \
+        }
     /**/
         BOOST_PP_REPEAT_FROM_TO(
             1

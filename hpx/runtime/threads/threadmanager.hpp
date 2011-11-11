@@ -7,7 +7,6 @@
 #if !defined(HPX_THREADMANAGER_MAY_20_2008_845AM)
 #define HPX_THREADMANAGER_MAY_20_2008_845AM
 
-#include <map>
 #include <vector>
 #include <memory>
 #include <numeric>
