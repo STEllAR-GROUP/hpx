@@ -36,6 +36,21 @@ macro(hpx_append_flag flag)
   endforeach()
 endmacro()
 
+macro(hpx_remove_flag flag)
+  hpx_parse_arguments(REMOVE "LANGUAGES" "" ${ARGN})
+
+  set(languages "CXX")
+
+  if(REMOVE_LANGUAGES)
+    set(languages ${REMOVE_LANGUAGES})
+  endif()
+
+  foreach(language ${languages})
+    string(REPLACE "${flag}" ""
+           CMAKE_${language}_FLAGS "${CMAKE_${language}_FLAGS}")
+  endforeach()
+endmacro()
+
 macro(hpx_use_flag_if_available flag)
   hpx_parse_arguments(FLAG "NAME;LANGUAGES" "" ${ARGN})
 
