@@ -13,6 +13,12 @@ set(subdirs
 
 add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=7)
 
+# GCC 4.4.6 detects uninitialized variables in this application. These
+# appear to be false positives as newer versions of GCC don't detect these.
+if(NOT MSVC AND 040500 GREATER ${GCC_VERSION})
+  hpx_remove_flag(-Werror=uninitialized)
+endif()
+
 if(RNPL_FOUND)
   # FIXME: HPX_* identifiers please
   add_definitions(-DRNPL_FOUND)
