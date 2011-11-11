@@ -7,7 +7,6 @@ set(subdirs
     agas
     actions
     threads
-    util
    )
 
 foreach(subdir ${subdirs})
