@@ -9,7 +9,6 @@ set(bright_future_programs
         gs_single
         gs_hpx
         gs_hpx_blocked
-        gs_hpx_blocked_df
         gs_hpx_grid_ro
         remote_functions
         remote_object
@@ -18,6 +17,7 @@ set(bright_future_programs
 if(HPX_CXX11_LAMBDAS)
     set(bright_future_programs ${bright_future_programs}
         dataflow_test
+        gs_hpx_blocked_df
     )
 endif()
 
@@ -54,7 +54,9 @@ set(vector_root_finder_FLAGS DEPENDENCIES iostreams_component)
 set(gs_single_FLAGS DEPENDENCIES iostreams_component)
 set(gs_hpx_FLAGS DEPENDENCIES gs_hpx_component iostreams_component ${BOOST_serialization_LIBRARY})
 set(gs_hpx_blocked_FLAGS DEPENDENCIES gs_hpx_component iostreams_component ${BOOST_serialization_LIBRARY})
-set(gs_hpx_blocked_df_FLAGS DEPENDENCIES gs_hpx_component bright_future_dataflow_component iostreams_component ${BOOST_serialization_LIBRARY})
+if(HPX_CXX11_LAMBDAS)
+    set(gs_hpx_blocked_df_FLAGS DEPENDENCIES gs_hpx_component bright_future_dataflow_component iostreams_component ${BOOST_serialization_LIBRARY})
+endif()
 set(gs_hpx_grid_ro_FLAGS DEPENDENCIES remote_object_component iostreams_component ${BOOST_serialization_LIBRARY})
 
 foreach(bright_future_program ${bright_future_programs})
