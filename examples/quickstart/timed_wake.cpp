@@ -4,13 +4,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-
-#include <boost/date_time/posix_time/posix_time.hpp>
-
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
+
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;

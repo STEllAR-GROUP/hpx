@@ -9,6 +9,7 @@
 //
 #define BOOST_BACKTRACE_SOURCE
 
+#include <boost/config.hpp>
 #include <boost/backtrace.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -40,6 +41,7 @@
 
 #if defined(BOOST_MSVC)
 #include <windows.h>
+#include <winbase.h>
 #include <stdlib.h>
 #include <dbghelp.h>
 #endif
@@ -61,7 +63,7 @@ namespace boost {
         {
             if(n>=63)
                 n=62;
-            return RtlCaptureStackBackTrace(0,n,array,0);
+            return RtlCaptureStackBackTrace(ULONG(0),ULONG(n),array,NULL);
         }
 
         #else
