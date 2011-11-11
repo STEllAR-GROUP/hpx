@@ -4,6 +4,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/lcos/base_lco.hpp>
+#include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/components/server/memory.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
