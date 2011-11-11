@@ -12,6 +12,8 @@
 #include <boost/thread/locks.hpp>
 #include <boost/smart_ptr/detail/spinlock.hpp>
 
+#include <hpx/util/itt_notify.hpp>
+
 namespace hpx { namespace util
 {
 
@@ -30,17 +32,27 @@ struct spinlock : boost::noncopyable
 
     void lock()
     {
+        HPX_ITT_SYNC_PREPARE(this);
         m.lock();
+        HPX_ITT_SYNC_ACQUIRED(this);
     }
 
     bool try_lock()
     {
-        return m.try_lock();
+        HPX_ITT_SYNC_PREPARE(this);
+        if (m.try_lock()) {
+            HPX_ITT_SYNC_ACQUIRED(this);
+            return true;
+        }
+        HPX_ITT_SYNC_CANCEL(this);
+        return false;
     }
 
     void unlock()
     {
+        HPX_ITT_SYNC_RELEASING(this);
         m.unlock();
+        HPX_ITT_SYNC_RELEASED(this);
     }
 
     typedef boost::detail::spinlock* native_handle_type;
