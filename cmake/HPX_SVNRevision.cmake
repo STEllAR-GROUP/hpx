@@ -10,7 +10,7 @@ include(HPX_Include)
 hpx_include(Message)
 
 execute_process(
-  COMMAND "${hpx_SOURCE_DIR}/cmake/scripts/hpx_svnversion.py" "${hpx_SOURCE_DIR}"
+  COMMAND "${hpx_SOURCE_DIR}/cmake/scripts/svnversion.py" "${hpx_SOURCE_DIR}"
   OUTPUT_VARIABLE SVN_REVISION ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 if("${SVN_REVISION}" STREQUAL "" OR "${SVN_REVISION}" STREQUAL "None")

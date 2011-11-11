@@ -20,7 +20,6 @@ hpx_include(Message
             AddExecutable
             AddTest
             AddConfigTest
-            AddPythonConfigTest
             AddPseudoDependencies
             AddPseudoTarget
             AddLibrarySources
