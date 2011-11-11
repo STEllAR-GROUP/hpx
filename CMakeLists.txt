@@ -16,12 +16,6 @@ set(CMAKE_USER_MAKE_RULES_OVERRIDE_CXX
     "${CMAKE_SOURCE_DIR}/cmake/HPX_CXXOverrides.cmake")
 
 ################################################################################
-# Fortran overrides
-################################################################################
-set(CMAKE_USER_MAKE_RULES_OVERRIDE_Fortran
-    "${CMAKE_SOURCE_DIR}/cmake/HPX_FortranOverrides.cmake")
-
-################################################################################
 # project metadata
 ################################################################################
 project(hpx CXX)
@@ -47,11 +41,6 @@ hpx_force_out_of_tree_build("This project requires an out-of-source-tree build. 
 if(NOT HPX_CMAKE_LOGLEVEL)
   set(HPX_CMAKE_LOGLEVEL "WARN")
 endif()
-
-################################################################################
-# Fortran compiler detection
-################################################################################
-include(HPX_FortranCompiler)
 
 ################################################################################
 # search path configuration
@@ -131,22 +120,14 @@ add_definitions(-DBOOST_BIGINT_HAS_NATIVE_INT64)
 # C++
 hpx_include(GCCVersion)
 
-if(GCC_VERSION)
-  hpx_info("gcc_config" "Compiler reports compatibility with GCC version ${GCC_VERSION_STR}")
+if(GCC_VERSION AND NOT APPLE)
+  hpx_info("compiler" "Compiler reports compatibility with GCC version ${GCC_VERSION_STR}")
 
-  if(040400 GREATER ${GCC_VERSION})
-    hpx_error("gcc_config" "GCC 4.4.x or higher is required.")
+  if(040406 GREATER ${GCC_VERSION})
+    hpx_error("compiler" "Linux GCC (4.4.6, 4.5.3, 4.6.1 or 4.6.2) or MSVC x64 2010 SP1 is required to build HPX.")
   endif()
 elseif(NOT MSVC10 OR NOT CMAKE_CL_64)
-  hpx_error("msvc_config" "MSVC x64 2010 or higher is required.")
-endif()
-
-# Fortran
-if(CMAKE_Fortran_COMPILER)
-  hpx_include(GFortranVersion)
-  if(GFORTRAN_VERSION)
-    hpx_info("gfortran_config" "Compiler reports compatibility with gfortran version ${GFORTRAN_VERSION_STR}")
-  endif()
+  hpx_error("compiler" "Linux GCC (4.4.6, 4.5.3, 4.6.1 or 4.6.2) or MSVC x64 2010 SP1 is required to build HPX.")
 endif()
 
 hpx_include(CompilerFlags)
@@ -199,16 +180,6 @@ hpx_option(HPX_CXX11 BOOL "Use C++11 support (default: ON)" ON)
 if(HPX_CXX11)
   add_definitions(-DHPX_HAVE_CXX11)
 endif()
-
-################################################################################
-# SDF output
-################################################################################
-find_package(HPX_RNPL)
-
-################################################################################
-# LORENE
-################################################################################
-find_package(HPX_LORENE)
 
 ################################################################################
 # HDF5 output
@@ -266,7 +237,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # Clear CMake defaults
-foreach(language CXX Fortran)
+foreach(language CXX)
   set(CMAKE_${language}_FLAGS_DEBUG "" CACHE STRING "Debug flags (${language})" FORCE)
   set(CMAKE_${language}_FLAGS_MINSIZEREL "" CACHE STRING "MinSizeRel flags (${language})" FORCE)
   set(CMAKE_${language}_FLAGS_RELEASE "" CACHE STRING "Release flags (${language})" FORCE)
@@ -300,46 +271,46 @@ set(CMAKE_RELWITHDEBINFO_POSTFIX "d")
 if(MSVC)
   if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     # No optimizations
-    hpx_append_flag(-Od LANGUAGES CXX Fortran)
+    hpx_append_flag(-Od LANGUAGES CXX)
 
     # Generate debugging information
-    hpx_append_flag(-Zi LANGUAGES CXX Fortran)
+    hpx_append_flag(-Zi LANGUAGES CXX)
 
     # Keep the frame pointer
-    hpx_append_flag(-Oy- LANGUAGES CXX Fortran)
+    hpx_append_flag(-Oy- LANGUAGES CXX)
 
     # Don't inline functions
-    hpx_append_flag(-Ob0 LANGUAGES CXX Fortran)
+    hpx_append_flag(-Ob0 LANGUAGES CXX)
 
     # Use multi-threaded debug runtime
-    hpx_append_flag(-MDd LANGUAGES CXX Fortran)
+    hpx_append_flag(-MDd LANGUAGES CXX)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
     # Optimize for speed
-    hpx_append_flag(-O2 LANGUAGES CXX Fortran)
+    hpx_append_flag(-O2 LANGUAGES CXX)
 
     # Generate debugging information
-    hpx_append_flag(-Zi LANGUAGES CXX Fortran)
+    hpx_append_flag(-Zi LANGUAGES CXX)
 
     # Keep the frame pointer
-    hpx_append_flag(-Oy- LANGUAGES CXX Fortran)
+    hpx_append_flag(-Oy- LANGUAGES CXX)
 
     # Don't inline functions
-    hpx_append_flag(-Ob0 LANGUAGES CXX Fortran)
+    hpx_append_flag(-Ob0 LANGUAGES CXX)
 
     # Use multi-threaded debug runtime
-    hpx_append_flag(-MDd LANGUAGES CXX Fortran)
+    hpx_append_flag(-MDd LANGUAGES CXX)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
     # Optimize for size
-    hpx_append_flag(-O1 LANGUAGES CXX Fortran)
+    hpx_append_flag(-O1 LANGUAGES CXX)
 
     # Use multi-threaded runtime
-    hpx_append_flag(-MD LANGUAGES CXX Fortran)
+    hpx_append_flag(-MD LANGUAGES CXX)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
     # Optimize for speed
-    hpx_append_flag(-O2 LANGUAGES CXX Fortran)
+    hpx_append_flag(-O2 LANGUAGES CXX)
 
     # Use multi-threaded runtime
-    hpx_append_flag(-MD LANGUAGES CXX Fortran)
+    hpx_append_flag(-MD LANGUAGES CXX)
   endif()
 
   # Exceptions
@@ -352,7 +323,7 @@ if(MSVC)
   hpx_append_flag(-MP)
 
   # Increase the maximum size of object file sections
-  hpx_append_flag(-bigobj LANGUAGES CXX Fortran)
+  hpx_append_flag(-bigobj LANGUAGES CXX)
 
   ##############################################################################
   # Stacktraces
@@ -387,7 +358,7 @@ if(MSVC)
     hpx_append_flag(-W3)
 
     # According to the ifort Windows manual, W3 isn't supported
-    hpx_append_flag(-W1 LANGUAGES Fortran)
+    hpx_append_flag(-W1 LANGUAGES)
   endif()
 
   # Display full paths in diagnostics
@@ -422,46 +393,46 @@ if(MSVC)
 else()
   if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     # No optimizations
-    hpx_use_flag_if_available(-O0 LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-O0 LANGUAGES CXX)
 
     # Generate debugging information
-    hpx_use_flag_if_available(-g LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-g LANGUAGES CXX)
 
     # Keep the frame pointer
-    hpx_use_flag_if_available(-fno-omit-frame-pointer LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-fno-omit-frame-pointer LANGUAGES CXX)
 
     # Don't inline functions
-    hpx_use_flag_if_available(-fno-inline LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-fno-inline LANGUAGES CXX)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
     # Optimize for speed
-    hpx_use_flag_if_available(-O3 LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-O3 LANGUAGES CXX)
 
     # Generate debugging information
-    hpx_use_flag_if_available(-g LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-g LANGUAGES CXX)
 
     # Keep the frame pointer
-    hpx_use_flag_if_available(-fno-omit-frame-pointer LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-fno-omit-frame-pointer LANGUAGES CXX)
 
     # Don't inline functions
-    hpx_use_flag_if_available(-fno-inline LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-fno-inline LANGUAGES CXX)
 
     # No tail call optimizations
-    hpx_use_flag_if_available(-fno-optimize-sibling-calls LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-fno-optimize-sibling-calls LANGUAGES CXX)
 
     # Don't allocate registers for wide types (e.g. 128bit ints) independently
-    hpx_use_flag_if_available(-fno-split-wide-types LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-fno-split-wide-types LANGUAGES CXX)
 
     # Disable register allocation webs, which make debugging impossible
-    hpx_use_flag_if_available(-fno-web LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-fno-web LANGUAGES CXX)
 
     # Disable register renaming
-    hpx_use_flag_if_available(-fno-rename-registers LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-fno-rename-registers LANGUAGES CXX)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
     # Optimize for size
-    hpx_use_flag_if_available(-Os LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-Os LANGUAGES CXX)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
     # Optimize for speed
-    hpx_use_flag_if_available(-O3 LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-O3 LANGUAGES CXX)
   endif()
 
   ##############################################################################
@@ -469,7 +440,7 @@ else()
   ##############################################################################
   if(HPX_STACKTRACES)
     # Export all visible symbols, not just those that are used
-    hpx_use_flag_if_available(-rdynamic LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-rdynamic LANGUAGES CXX)
   endif()
 
   ##############################################################################
@@ -508,8 +479,8 @@ else()
   # Diagnostics
   ##############################################################################
   if(HPX_WARNINGS)
-    hpx_use_flag_if_available(-Wall LANGUAGES CXX Fortran)
-    hpx_use_flag_if_available(-Wno-strict-aliasing LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-Wall LANGUAGES CXX)
+    hpx_use_flag_if_available(-Wno-strict-aliasing LANGUAGES CXX)
     hpx_use_flag_if_available(-Wsign-promo)
   endif()
 
@@ -524,50 +495,37 @@ else()
   hpx_use_flag_if_available(-Werror=uninitialized)
 
   # Show the flags that toggle each warning
-  hpx_use_flag_if_available(-fdiagnostics-show-option LANGUAGES CXX Fortran)
+  hpx_use_flag_if_available(-fdiagnostics-show-option LANGUAGES CXX)
 
   # Silence warning about __sync_fetch_and_nand changing semantics
   hpx_use_flag_if_available(-Wno-sync-nand)
 
-  ##############################################################################
-  # GCC-only configuration
-  ##############################################################################
-  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    if(040400 LESS ${GCC_VERSION})
-      option(HPX_ELF_HIDDEN_VISIBILITY
-        "Use -fvisibility=hidden for Release and MinSizeRel builds (default: ON)" ON)
+  option(HPX_ELF_HIDDEN_VISIBILITY
+    "Use -fvisibility=hidden for Release and MinSizeRel builds (default: ON)" ON)
 
-      if(HPX_ELF_HIDDEN_VISIBILITY)
-        if("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel" OR
-           "${CMAKE_BUILD_TYPE}" STREQUAL "Release")
-          add_definitions(-DHPX_ELF_HIDDEN_VISIBILITY)
-          add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
-          add_definitions(-DBOOST_PLUGIN_GCC_HAVE_VISIBILITY)
-          hpx_use_flag_if_available(-fvisibility=hidden LANGUAGES CXX Fortran)
-        endif()
-      endif()
+  if(HPX_ELF_HIDDEN_VISIBILITY)
+    if("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel" OR
+       "${CMAKE_BUILD_TYPE}" STREQUAL "Release")
+      add_definitions(-DHPX_ELF_HIDDEN_VISIBILITY)
+      add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
+      add_definitions(-DBOOST_PLUGIN_GCC_HAVE_VISIBILITY)
+      hpx_use_flag_if_available(-fvisibility=hidden LANGUAGES CXX)
     endif()
-  ##############################################################################
-  # Intel-only configuration
-  ##############################################################################
-  elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-    # warning #1125: virtual function override intended
-    add_definitions(-diag-disable 1125)
   endif()
-
+  
   ##############################################################################
   # x86-64 specific configuration
   ##############################################################################
   # GCC's -march=native will automatically tune generated code for the host
   # environment. This is available on newish versions of GCC only (4.3ish). If
   # this flag is used, the generated binaries will be less portable.
-  hpx_use_flag_if_available(-march=native LANGUAGES CXX Fortran)
+  hpx_use_flag_if_available(-march=native LANGUAGES CXX)
 
   # cmpxchg16b is an x86-64 extension present on most newer x86-64 machines.
   # It allows us to do double quadword (128bit) atomic compare and swap
   # operations, which is AWESOME. Note that early x86-64 processors do lack
   # this instruction.
-  hpx_use_flag_if_available(-mcx16 LANGUAGES CXX Fortran)
+  hpx_use_flag_if_available(-mcx16 LANGUAGES CXX)
 
   if(HPX_CXX_FLAG_MCX16)
     add_definitions(-DHPX_HAVE_GNU_SYNC_16)
@@ -596,7 +554,7 @@ else()
                 BOOST_ATOMIC_HAVE_SSE2)
 
   if(HPX_SSE2)
-    hpx_use_flag_if_available(-msse2 LANGUAGES CXX Fortran)
+    hpx_use_flag_if_available(-msse2 LANGUAGES CXX)
   endif()
 
   # rdtsc is an x86 instruction that reads the value of a CPU time stamp
@@ -711,14 +669,6 @@ if(HPX_RUNTIME)
   add_subdirectory(runtime)
 endif()
 
-option(HPX_TOOLS "Build HPX tools (default: OFF)" OFF)
-
-if(HPX_TOOLS)
-  add_hpx_pseudo_target(tools)
-
-  add_subdirectory(tools)
-endif()
-
 ################################################################################
 # installation instructions
 ################################################################################
@@ -736,39 +686,6 @@ install( # install all hpx cmake utility files
   DIRECTORY cmake/
   DESTINATION share/hpx/cmake
   COMPONENT core
-  PATTERN ".svn" EXCLUDE
-  PATTERN ".git" EXCLUDE)
-
-install( # install hpx python scripts
-  DIRECTORY python/scripts/
-  DESTINATION bin
-  FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                   GROUP_READ GROUP_EXECUTE
-                   WORLD_READ WORLD_EXECUTE
-  COMPONENT core
-  FILES_MATCHING PATTERN "*.py"
-  PATTERN ".svn" EXCLUDE
-  PATTERN ".git" EXCLUDE)
-
-if(UNIX)
-  file(GLOB scripts "${CMAKE_SOURCE_DIR}/python/scripts/*.py")
-  foreach(script ${scripts})
-    get_filename_component(script_name ${script} NAME)
-    get_filename_component(script_name_we ${script} NAME_WE)
-    install(CODE
-      "set(bindir \"${CMAKE_INSTALL_PREFIX}/bin/\")
-       execute_process(
-         COMMAND \"\${CMAKE_COMMAND}\" -E create_symlink
-                 \"${script_name}\" \"${script_name_we}\"
-         WORKING_DIRECTORY \"\${bindir}\")")
-  endforeach()
-endif()
-
-install( # install hpx python module (TODO: this is a temporary hack)
-  DIRECTORY python/hpx
-  DESTINATION share/hpx/python
-  COMPONENT core
-  FILES_MATCHING PATTERN "*.py"
   PATTERN ".svn" EXCLUDE
   PATTERN ".git" EXCLUDE)
 
