@@ -60,7 +60,6 @@ namespace hpx { namespace lcos { namespace server
                 << "server::dataflow::init() " << get_gid();
 
             component_type * w = new component_type(target, mtx);
-            (*w)->init();
             std::vector<naming::id_type> t;
             {
                 typename hpx::util::spinlock::scoped_lock l(mtx);
@@ -79,6 +78,7 @@ namespace hpx { namespace lcos { namespace server
                 }
                 */
             }
+            (*w)->init();
             BOOST_FOREACH(naming::id_type const & target, t)
             {
                 (*component_ptr)->connect_nonvirt(target);
@@ -108,7 +108,6 @@ namespace hpx { namespace lcos { namespace server
                 >                                                               \
                 component_type;                                                 \
             component_type * w = new component_type(target, mtx);               \
-            (*w)->init(BOOST_PP_ENUM_PARAMS(N, a));                             \
                                                                                 \
             std::vector<naming::id_type> t;                                     \
             {                                                                   \
@@ -116,6 +115,7 @@ namespace hpx { namespace lcos { namespace server
                 std::swap(targets, t);                                          \
                 component_ptr = w;                                              \
             }                                                                   \
+            (*w)->init(BOOST_PP_ENUM_PARAMS(N, a));                             \
             BOOST_FOREACH(naming::id_type const & target, t)                    \
             {                                                                   \
                 (*component_ptr)->connect_nonvirt(target);                      \
