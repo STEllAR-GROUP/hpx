@@ -171,11 +171,13 @@ namespace hpx { namespace traits
 
         dataflow_impl(
             naming::id_type const & id
+          , hpx::util::spinlock & mtx
         )
             : back_ptr_(0)
             , args_set(0)
             , result_set(false)
             , action_id(id)
+            , mtx(mtx)
         {
         }
 
@@ -388,7 +390,6 @@ namespace hpx { namespace traits
         args_type args;
         boost::uint32_t args_set;
 
-        hpx::util::spinlock mtx;
         remote_result result;
         bool result_set;
         std::vector<naming::id_type> targets;
@@ -397,6 +398,7 @@ namespace hpx { namespace traits
 #if N > 0
         boost::array<component_wrapper_base *, N> arg_ids;
 #endif
+        hpx::util::spinlock & mtx;
     };
 
 #undef N

@@ -45,6 +45,17 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
         BOOST_PP_REPEAT_FROM_TO(1, 10, HPX_LCOS_DATAFLOW_M0, _)
 #undef HPX_LCOS_DATAFLOW_M0
 
+#define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
+        template <BOOST_PP_ENUM_PARAMS(N, typename A)>                          \
+        component_wrapper(BOOST_PP_ENUM_BINARY_PARAMS(N, A, & a))               \
+        {                                                                       \
+            T * t = new T(BOOST_PP_ENUM_PARAMS(N, a));                          \
+            component_ptr = new component_type(t);                              \
+        }                                                                       \
+    /**/
+        BOOST_PP_REPEAT_FROM_TO(1, 10, HPX_LCOS_DATAFLOW_M0, _)
+#undef HPX_LCOS_DATAFLOW_M0
+
         ~component_wrapper()
         {
             delete component_ptr;
