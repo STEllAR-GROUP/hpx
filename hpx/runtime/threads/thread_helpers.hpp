@@ -203,7 +203,9 @@ namespace hpx { namespace threads
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#invalid_status.
     ///
-    HPX_API_EXPORT thread_state_ex_enum suspend(thread_state_enum state = pending,
+    HPX_API_EXPORT thread_state_ex_enum suspend(
+        thread_state_enum state = pending,
+        char const* description = "threads::suspend",
         error_code& ec = throws);
 
     /// The function \a suspend will return control to the thread manager
@@ -223,7 +225,9 @@ namespace hpx { namespace threads
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#invalid_status.
     ///
-    HPX_API_EXPORT thread_state_ex_enum suspend(boost::posix_time::ptime const&,
+    HPX_API_EXPORT thread_state_ex_enum suspend(
+        boost::posix_time::ptime const&,
+        char const* description = "threads::suspend",
         error_code& ec = throws);
 
     /// The function \a suspend will return control to the thread manager
@@ -243,7 +247,9 @@ namespace hpx { namespace threads
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#invalid_status.
     ///
-    HPX_API_EXPORT thread_state_ex_enum suspend(boost::posix_time::time_duration const&,
+    HPX_API_EXPORT thread_state_ex_enum suspend(
+        boost::posix_time::time_duration const&,
+        char const* description = "threads::suspend",
         error_code& ec = throws);
 }}
 
