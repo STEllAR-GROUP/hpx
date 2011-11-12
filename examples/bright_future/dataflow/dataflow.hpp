@@ -93,9 +93,9 @@ namespace hpx { namespace lcos {
               )                                                                 \
         {                                                                       \
         }
-            /*
+        /*
             this->get_gid();                                                    \
-             */
+            */
     /**/
         BOOST_PP_REPEAT_FROM_TO(
             1

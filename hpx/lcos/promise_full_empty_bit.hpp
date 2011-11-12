@@ -337,11 +337,6 @@ namespace hpx { namespace lcos
           : impl_(impl)
         {}
 
-        void set_local_data(int slot, Result const& result)
-        {
-            (*impl_)->set_local_data(0, result);
-        }
-
     public:
         /// Reset the promise to allow to restart an asynchronous
         /// operation. Allows any subsequent set_data operation to succeed.
@@ -422,6 +417,11 @@ namespace hpx { namespace lcos
         void invalidate(boost::exception_ptr const& e)
         {
             (*impl_)->set_error(0, e);      // set the received error
+        }
+
+        void set_local_data(int slot, Result const& result)
+        {
+            (*impl_)->set_local_data(0, result);
         }
 
     protected:

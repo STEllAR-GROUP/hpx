@@ -51,17 +51,11 @@ namespace hpx { namespace lcos { namespace server
             LLCO_(info)
                 << "server::dataflow::init() " << get_gid();
 
-            component_type * w = new component_type(target, mtx);
-            std::vector<naming::id_type> t;
+            component_type * w = new component_type(target, mtx, targets);
+            (*w)->init();
             {
                 typename hpx::util::spinlock::scoped_lock l(mtx);
-                std::swap(targets, t);
                 component_ptr = w;
-            }
-            (*w)->init();
-            BOOST_FOREACH(naming::id_type const & target, t)
-            {
-                (*component_ptr)->connect_nonvirt(target);
             }
         }
 
@@ -87,18 +81,11 @@ namespace hpx { namespace lcos { namespace server
                     wrapped_type                                                \
                 >                                                               \
                 component_type;                                                 \
-                                                                                \
-            component_type * w = new component_type(target, mtx);               \
-            std::vector<naming::id_type> t;                                     \
+            component_type * w = new component_type(target, mtx, targets);      \
+            (*w)->init(BOOST_PP_ENUM_PARAMS(N, a));                             \
             {                                                                   \
                 typename hpx::util::spinlock::scoped_lock l(mtx);               \
-                std::swap(targets, t);                                          \
                 component_ptr = w;                                              \
-            }                                                                   \
-            (*w)->init(BOOST_PP_ENUM_PARAMS(N, a));                             \
-            BOOST_FOREACH(naming::id_type const & target, t)                    \
-            {                                                                   \
-                (*component_ptr)->connect_nonvirt(target);                      \
             }                                                                   \
         }                                                                       \
     /**/
@@ -117,7 +104,7 @@ namespace hpx { namespace lcos { namespace server
         void connect(naming::id_type const & target)
         {
             {
-                hpx::util::spinlock::scoped_lock l(mtx);
+                typename hpx::util::spinlock::scoped_lock l(mtx);
 
                 // wait until component_ptr is initialized.
                 if(component_ptr == 0)
@@ -126,7 +113,6 @@ namespace hpx { namespace lcos { namespace server
                     return;
                 }
             }
-
             (*component_ptr)->connect_nonvirt(target);
         }
 

@@ -172,10 +172,12 @@ namespace hpx { namespace traits
         dataflow_impl(
             naming::id_type const & id
           , hpx::util::spinlock & mtx
+          , std::vector<naming::id_type> & t
         )
             : back_ptr_(0)
             , args_set(0)
             , result_set(false)
+            , targets(t)
             , action_id(id)
             , mtx(mtx)
         {
@@ -211,7 +213,7 @@ namespace hpx { namespace traits
     /**/
 
             BOOST_PP_REPEAT(N, HPX_LCOS_DATAFLOW_M0, _)
-
+            forward_results();
 #undef HPX_LCOS_DATAFLOW_M0
 #else
             hpx::applier::apply_c<Action>(get_gid(), action_id);
@@ -220,6 +222,9 @@ namespace hpx { namespace traits
 
         ~dataflow_impl()
         {
+            forward_results();
+            BOOST_ASSERT(result_set);
+            BOOST_ASSERT(targets.size() == 0);
             BOOST_ASSERT(args_set == args_completed);
 #define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
             delete arg_ids[N];                                                  \
@@ -247,14 +252,24 @@ namespace hpx { namespace traits
                 << targets.size()
                 ;
 
-            std::vector<naming::id_type> t;
 
             {
                 typename hpx::util::spinlock::scoped_lock l(mtx);
-                std::swap(targets, t);
 
                 result = r;
                 result_set = true;
+            }
+
+            forward_results();
+        }
+
+        void forward_results()
+        {
+            std::vector<naming::id_type> t;
+            {
+                typename hpx::util::spinlock::scoped_lock l(mtx);
+                if(result_set == false) return;
+                std::swap(targets, t);
             }
 
             // Note: lco::set_result is a direct action, for this reason,
@@ -276,15 +291,20 @@ namespace hpx { namespace traits
                 << get_gid()
                 << " ";
 
-            typename hpx::util::spinlock::scoped_lock l(mtx);
-            if(result_set)
+            bool fire_action = false;
             {
-                l.unlock();
+                typename hpx::util::spinlock::scoped_lock l(mtx);
+                fire_action = result_set;
+            }
+
+            if(fire_action)
+            {
                 typedef typename lco_type::set_result_action action_type;
                 applier::apply<action_type>(target, result);
             }
             else
             {
+                typename hpx::util::spinlock::scoped_lock l(mtx);
                 targets.push_back(target);
             }
         }
@@ -322,20 +342,22 @@ namespace hpx { namespace traits
         template <int Slot>
         void maybe_apply()
         {
+            bool apply_it = false;
             {
                 typename hpx::util::spinlock::scoped_lock l(mtx);
                 args_set |= (1<<Slot);
-                if(args_set == args_completed)
-                {
-                    apply_helper<
-                        boost::fusion::result_of::size<args_type>::value
-                      , Action
-                    >()(
-                        get_gid()
-                      , action_id
-                      , args
-                    );
-                }
+                apply_it = (args_set == args_completed);
+            }
+            if(apply_it)
+            {
+                apply_helper<
+                    boost::fusion::result_of::size<args_type>::value
+                  , Action
+                >()(
+                    get_gid()
+                  , action_id
+                  , args
+                );
             }
             LLCO_(info)
                 << "dataflow_impl<"
@@ -393,7 +415,7 @@ namespace hpx { namespace traits
 
         remote_result result;
         bool result_set;
-        std::vector<naming::id_type> targets;
+        std::vector<naming::id_type> & targets;
         naming::id_type action_id;
 
 #if N > 0

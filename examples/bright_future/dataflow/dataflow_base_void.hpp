@@ -26,7 +26,6 @@ namespace hpx { namespace lcos {
         typedef stubs::dataflow stub_type;
 
         dataflow_base()
-            : gid_(naming::invalid_id)
         {}
 
         virtual ~dataflow_base()
@@ -35,7 +34,6 @@ namespace hpx { namespace lcos {
 
         dataflow_base(promise<naming::id_type, naming::gid_type> const & promise)
             : gid_promise(promise)
-            , gid_(naming::invalid_id)
         {
         }
 
@@ -48,7 +46,6 @@ namespace hpx { namespace lcos {
 
         void invalidate()
         {
-            gid_ = naming::invalid_id;
             gid_promise.reset();
         }
 
@@ -62,27 +59,13 @@ namespace hpx { namespace lcos {
             return stub_type::connect_async(this->get_gid(), target);
         }
 
-        naming::id_type & get_gid()
+        naming::id_type get_gid() const
         {
-            if(!gid_)
-            {
-                gid_ = gid_promise.get();
-            }
-            return gid_;
-        }
-
-        naming::id_type const & get_gid() const
-        {
-            if(!gid_)
-            {
-                gid_ = gid_promise.get();
-            }
-            return gid_;
+            return gid_promise.get();
         }
 
     protected:
         promise<naming::id_type, naming::gid_type> gid_promise;
-        mutable naming::id_type gid_;
 
     private:
         friend class boost::serialization::access;
@@ -90,16 +73,17 @@ namespace hpx { namespace lcos {
         template <typename Archive>
         void load(Archive & ar, unsigned)
         {
-            BOOST_ASSERT(!gid_);
-            ar & gid_;
-            BOOST_ASSERT(gid_);
+            naming::id_type id;
+            ar & id;
+            gid_promise.set_local_data(0, id);
         }
 
         template <typename Archive>
         void save(Archive & ar, unsigned) const
         {
             BOOST_ASSERT(this->get_gid());
-            ar & this->get_gid();
+            naming::id_type id = this->get_gid();
+            ar & id;
         }
 
         BOOST_SERIALIZATION_SPLIT_MEMBER();

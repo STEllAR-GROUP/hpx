@@ -224,7 +224,6 @@ void gs(
         // set our initial values, setting the top boundary to be a dirichlet
         // boundary condition
         {
-            cout << "initializing rhs ..." << flush;
             typedef
                 hpx::lcos::dataflow<remote_lse_type::init_rhs_blocked_action>
                 init_rhs_dataflow;
@@ -244,13 +243,11 @@ void gs(
                         );
                 }
             }
-            cout << " done\n" << flush;
 
             typedef
                 hpx::lcos::dataflow<remote_lse_type::init_u_blocked_action>
                 init_u_dataflow;
 
-            cout << "initializing u ..." << flush;
             // initialize our grid. This will serve as the dependency of the
             // first loop below.
             for(size_type y = 0, y_block = 0; y < n_y; y += block_size, ++y_block)
@@ -267,7 +264,6 @@ void gs(
                         );
                 }
             }
-            cout << " done\n" << flush;
 
             // wait for the rhs initialization to finish.
             //BOOST_FOREACH(dataflow_type & promise, init_rhs_promises)
@@ -320,7 +316,8 @@ void gs(
 
                         // we need to be sure to wait for the previous iteration.
                         //deps.push_back(&prev(x,y));
-                        deps = dataflow<dependency_action>(find_here(), deps, prev(x,y));
+                        //deps = dataflow<dependency_action>(find_here(), deps, prev(x,y));
+                        //dataflow<dependency_action>(find_here(), prev(x,y)).get();
 
                         // keep in mind, our loop goes from top-left to bottom
                         // right.
@@ -331,6 +328,7 @@ void gs(
                             // to our list of dependencies
                             //deps.push_back(&prev(x+1,y));
                             deps = dataflow<dependency_action>(find_here(), deps, prev(x+1, y));
+                            //dataflow<dependency_action>(find_here(), prev(x+1, y)).get();
                         }
 
                         if(y + 1 < n_y_block) // are we on the boundary?
@@ -339,6 +337,7 @@ void gs(
                             // to our list of dependencies
                             //deps.push_back(&prev(x,y+1));
                             deps = dataflow<dependency_action>(find_here(), deps, prev(x, y+1));
+                            //dataflow<dependency_action>(find_here(), prev(x, y+1)).get();
                         }
 
                         if(x > 0) // are we on the boundary?
@@ -347,6 +346,7 @@ void gs(
                             // to our list of dependencies
                             //deps.push_back(&current(x-1,y));
                             deps = dataflow<dependency_action>(find_here(), deps, current(x-1, y));
+                            //dataflow<dependency_action>(find_here(), current(x-1, y)).get();
                         }
 
                         if(y > 0) // are we on the boundary?
@@ -355,6 +355,7 @@ void gs(
                             // to our list of dependencies
                             //deps.push_back(&current(x,y-1));
                             deps = dataflow<dependency_action>(find_here(), deps, current(x, y-1));
+                            //dataflow<dependency_action>(find_here(), current(x, y-1)).get();
                         }
 
                         //deps.get();
@@ -368,10 +369,12 @@ void gs(
                             // are finished.
                             apply_region_dataflow(
                                 remote_id
+                              , prev(x, y)
+                              , deps
                               , update_fun()
                               , x_range
                               , y_range
-                              , deps
+                              //, deps
                             );
                         //cout << "." << flush;
                     }
@@ -386,7 +389,7 @@ void gs(
         }
 
         double time_elapsed = t.elapsed();
-        cout << "\n" << time_elapsed << "\n" << flush;
+        cout << time_elapsed << "\n" << flush;
 
         if(!output.empty())
         {

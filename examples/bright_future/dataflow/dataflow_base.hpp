@@ -28,7 +28,6 @@ namespace hpx { namespace lcos {
         typedef stubs::dataflow stub_type;
 
         dataflow_base()
-            : gid_(naming::invalid_id)
         {}
 
         virtual ~dataflow_base()
@@ -61,12 +60,7 @@ namespace hpx { namespace lcos {
             return stub_type::connect_async(this->get_gid(), target);
         }
 
-        naming::id_type & get_gid()
-        {
-            return gid_promise.get();
-        }
-
-        naming::id_type const & get_gid() const
+        naming::id_type get_gid() const
         {
             return gid_promise.get();
         }
@@ -89,7 +83,8 @@ namespace hpx { namespace lcos {
         void save(Archive & ar, unsigned) const
         {
             BOOST_ASSERT(this->get_gid());
-            ar & this->get_gid();
+            naming::id_type id = this->get_gid();
+            ar & id;
         }
 
         BOOST_SERIALIZATION_SPLIT_MEMBER();
