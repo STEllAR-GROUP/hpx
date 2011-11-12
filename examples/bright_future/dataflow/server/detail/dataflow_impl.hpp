@@ -32,6 +32,25 @@
 #include <hpx/util/demangle_helper.hpp>
 
 namespace hpx { namespace lcos { namespace server { namespace detail {
+
+    ///////////////////////////////////////////////////////////////////////////
+    // data structure holding all counters for full_empty entries
+    struct dataflow_counter_data
+    {
+        dataflow_counter_data()
+          : constructed_(0), initialized_(0), fired_(0)
+        {}
+
+        boost::int64_t constructed_;
+        boost::int64_t initialized_;
+        boost::int64_t fired_;
+    };
+    extern HPX_COMPONENT_EXPORT dataflow_counter_data dataflow_counter_data_;
+
+    // call this to install all counters for dataflow objects
+    void install_counters();
+
+    ///////////////////////////////////////////////////////////////////////////
     template <
         typename Action
       , BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT(HPX_ACTION_ARGUMENT_LIMIT, typename A, void)
@@ -358,6 +377,7 @@ namespace hpx { namespace traits
                   , action_id
                   , args
                 );
+                ++dataflow_counter_data_.fired_;
             }
             LLCO_(info)
                 << "dataflow_impl<"

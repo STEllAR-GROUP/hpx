@@ -15,31 +15,31 @@
 namespace hpx { namespace util { namespace detail
 {
     // the counter data instance
-    counter_data counter_data_;
+    full_empty_counter_data full_empty_counter_data_;
 
     boost::int64_t get_constructed_count()
     {
-        return counter_data_.constructed_;
+        return full_empty_counter_data_.constructed_;
     }
 
     boost::int64_t get_destructed_count()
     {
-        return counter_data_.destructed_;
+        return full_empty_counter_data_.destructed_;
     }
 
     boost::int64_t get_read_enqueued_count()
     {
-        return counter_data_.read_enqueued_;
+        return full_empty_counter_data_.read_enqueued_;
     }
 
     boost::int64_t get_read_dequeued_count()
     {
-        return counter_data_.read_dequeued_;
+        return full_empty_counter_data_.read_dequeued_;
     }
 
     boost::int64_t get_set_full_count()
     {
-        return counter_data_.set_full_;
+        return full_empty_counter_data_.set_full_;
     }
 
     // call this to install all counters for full_empty entries

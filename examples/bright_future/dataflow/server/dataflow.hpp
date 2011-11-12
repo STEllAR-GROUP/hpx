@@ -25,7 +25,9 @@ namespace hpx { namespace lcos { namespace server
     {
         dataflow()
             : component_ptr(0)
-        {}
+        {
+            ++detail::dataflow_counter_data_.constructed_;
+        }
 
         ~dataflow()
         {
@@ -52,11 +54,12 @@ namespace hpx { namespace lcos { namespace server
                 << "server::dataflow::init() " << get_gid();
 
             component_type * w = new component_type(target, mtx, targets);
-            (*w)->init();
             {
                 typename hpx::util::spinlock::scoped_lock l(mtx);
                 component_ptr = w;
             }
+            (*w)->init();
+            ++detail::dataflow_counter_data_.initialized_;
         }
 
         // Vertical preprocessor repetition to define the remaining
@@ -82,11 +85,12 @@ namespace hpx { namespace lcos { namespace server
                 >                                                               \
                 component_type;                                                 \
             component_type * w = new component_type(target, mtx, targets);      \
-            (*w)->init(BOOST_PP_ENUM_PARAMS(N, a));                             \
             {                                                                   \
                 typename hpx::util::spinlock::scoped_lock l(mtx);               \
                 component_ptr = w;                                              \
             }                                                                   \
+            (*w)->init(BOOST_PP_ENUM_PARAMS(N, a));                             \
+            ++detail::dataflow_counter_data_.initialized_;                      \
         }                                                                       \
     /**/
 
@@ -104,7 +108,7 @@ namespace hpx { namespace lcos { namespace server
         void connect(naming::id_type const & target)
         {
             {
-                typename hpx::util::spinlock::scoped_lock l(mtx);
+                hpx::util::spinlock::scoped_lock l(mtx);
 
                 // wait until component_ptr is initialized.
                 if(component_ptr == 0)

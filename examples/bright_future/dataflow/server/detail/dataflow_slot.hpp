@@ -18,7 +18,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
     {
         typedef hpx::lcos::server::detail::dataflow_slot<T, Slot, SinkAction> wrapped_type;
         typedef components::managed_component<wrapped_type> wrapping_type;
-        
+
         typedef T result_type;
         typedef T remote_result;
 
@@ -40,7 +40,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
         void set_event()
         {
         }
-        
+
         T get_value()
         {
             BOOST_ASSERT(false);
@@ -68,7 +68,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
             BOOST_ASSERT(bp);
             back_ptr_ = bp;
         }
-        
+
         components::managed_component<dataflow_slot>* back_ptr_;
     };
 
@@ -100,7 +100,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
             >
             wrapped_type;
         typedef components::managed_component<wrapped_type> wrapping_type;
-        
+
         typedef typename T::remote_result_type remote_result;
 
         dataflow_slot(SinkAction * back, dataflow_type const & flow)
@@ -159,7 +159,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
         {
             this->set_result_nonvirt(remote_result());
         }
-        
+
         result_type get_value()
         {
             BOOST_ASSERT(false);
@@ -187,7 +187,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
             BOOST_ASSERT(bp);
             back_ptr_ = bp;
         }
-        
+
         components::managed_component<dataflow_slot>* back_ptr_;
 
         SinkAction * dataflow_sink;
