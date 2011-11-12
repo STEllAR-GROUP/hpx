@@ -811,18 +811,6 @@
     <ClInclude Include="..\..\..\hpx\runtime\threads\policies\queue_helpers.hpp">
       <Filter>Header Files\Runtime\Threads\Policies</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\hpx\util\serialize_asio_address_v4.hpp">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\util\serialize_asio_address_v6.hpp">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\util\serialize_asio_basic_endpoint.hpp">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\hpx\util\serialize_asio_address.hpp">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\hpx\runtime\applier\bind_naming_wrappers.hpp">
       <Filter>Header Files\Runtime\Applier</Filter>
     </ClInclude>
