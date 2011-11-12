@@ -180,6 +180,7 @@ namespace hpx { namespace traits
 
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
 
+#if N > 0
         // generate the bitset for checking if all slots have fired
 #define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
             (1<<N) |                                                            \
@@ -187,6 +188,7 @@ namespace hpx { namespace traits
         static const boost::uint32_t
             args_completed = (BOOST_PP_REPEAT(N, HPX_LCOS_DATAFLOW_M0, _) 0);
 #undef HPX_LCOS_DATAFLOW_M0
+#endif
 
         dataflow_impl(
             naming::id_type const & id
@@ -194,7 +196,9 @@ namespace hpx { namespace traits
           , std::vector<naming::id_type> & t
         )
             : back_ptr_(0)
+#if N > 0
             , args_set(0)
+#endif
             , result_set(false)
             , targets(t)
             , action_id(id)
@@ -210,6 +214,9 @@ namespace hpx { namespace traits
                 << ">::init(): "
                 << get_gid()
                 ;
+#if N == 0
+            hpx::applier::apply_c<Action>(get_gid(), action_id);
+#endif
 #if N > 0
 #define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
             typedef                                                             \
@@ -232,10 +239,7 @@ namespace hpx { namespace traits
     /**/
 
             BOOST_PP_REPEAT(N, HPX_LCOS_DATAFLOW_M0, _)
-            forward_results();
 #undef HPX_LCOS_DATAFLOW_M0
-#else
-            hpx::applier::apply_c<Action>(get_gid(), action_id);
 #endif
         }
 
@@ -244,7 +248,9 @@ namespace hpx { namespace traits
             forward_results();
             BOOST_ASSERT(result_set);
             BOOST_ASSERT(targets.size() == 0);
+#if N > 0
             BOOST_ASSERT(args_set == args_completed);
+#endif
 #define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
             delete arg_ids[N];                                                  \
     /**/
@@ -270,8 +276,6 @@ namespace hpx { namespace traits
                 << ">::set_result(): set_result: "
                 << targets.size()
                 ;
-
-
             {
                 typename hpx::util::spinlock::scoped_lock l(mtx);
 
@@ -430,8 +434,10 @@ namespace hpx { namespace traits
 
         components::managed_component<dataflow_impl>* back_ptr_;
 
+#if N > 0
         args_type args;
         boost::uint32_t args_set;
+#endif
 
         remote_result result;
         bool result_set;

@@ -305,7 +305,7 @@ void gs(
                                 y == 0             ? 1     : y_block
                               , y + 1 == n_y_block ? n_y-1 : y_block + block_size
                               );
-                        dataflow_base<void> deps  = dataflow<dependency_action>(find_here());
+                        dataflow_base<void> deps  = dataflow<dependency_action>(find_here(), prev(x, y));
                         if(iter==0)
                         {
                             deps = dataflow<dependency_action>(find_here(), deps, init_rhs_promises(x, y), prev(x,y));
@@ -369,7 +369,6 @@ void gs(
                             // are finished.
                             apply_region_dataflow(
                                 remote_id
-                              , prev(x, y)
                               , deps
                               , update_fun()
                               , x_range
