@@ -25,7 +25,6 @@ namespace hpx { namespace lcos { namespace server
     {
         dataflow()
             : component_ptr(0)
-            //, connect_thread_id(0)
         {}
 
         ~dataflow()
@@ -33,13 +32,6 @@ namespace hpx { namespace lcos { namespace server
             LLCO_(info)
                 << "~server::dataflow::dataflow()";
             delete component_ptr;
-            /*
-            if(connect_thread_id != 0)
-            {
-                threads::set_thread_state(connect_thread_id, threads::pending
-                  , threads::wait_abort);
-            }
-            */
         }
 
         /// init initializes the dataflow, it creates a dataflow_impl object
@@ -65,18 +57,6 @@ namespace hpx { namespace lcos { namespace server
                 typename hpx::util::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
                 component_ptr = w;
-
-                /*
-                // waking up a possible sleeping thread that was trying to connect
-                if(connect_thread_id != 0)
-                {
-                    threads::set_thread_state(
-                        connect_thread_id
-                      , threads::pending
-                    );
-                    connect_thread_id = 0;
-                }
-                */
             }
             (*w)->init();
             BOOST_FOREACH(naming::id_type const & target, t)
@@ -85,9 +65,9 @@ namespace hpx { namespace lcos { namespace server
             }
         }
 
-            // Vertical preprocessor repetition to define the remaining
-            // init functions and actions
-            // TODO: get rid of the call to impl_ptr->init
+        // Vertical preprocessor repetition to define the remaining
+        // init functions and actions
+        // TODO: get rid of the call to impl_ptr->init
 #define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
         template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename A)>         \
         void init(                                                              \
@@ -107,8 +87,8 @@ namespace hpx { namespace lcos { namespace server
                     wrapped_type                                                \
                 >                                                               \
                 component_type;                                                 \
-            component_type * w = new component_type(target, mtx);               \
                                                                                 \
+            component_type * w = new component_type(target, mtx);               \
             std::vector<naming::id_type> t;                                     \
             {                                                                   \
                 typename hpx::util::spinlock::scoped_lock l(mtx);               \
@@ -120,20 +100,7 @@ namespace hpx { namespace lcos { namespace server
             {                                                                   \
                 (*component_ptr)->connect_nonvirt(target);                      \
             }                                                                   \
-                                                                                \
         }                                                                       \
-/*
-                                                                                \
-                if(connect_thread_id != 0)                                      \
-                {                                                               \
-                    threads::set_thread_state(                                  \
-                        connect_thread_id                                       \
-                      , threads::pending);                                      \
-                    connect_thread_id = 0;                                      \
-                }                                                               \
-            }                                                                   \
-        }                                                                       \
-             */
     /**/
 
         BOOST_PP_REPEAT_FROM_TO(
@@ -156,47 +123,8 @@ namespace hpx { namespace lcos { namespace server
                 if(component_ptr == 0)
                 {
                     targets.push_back(target);
-                    /*
-                    LLCO_(info)
-                        << "server::dataflow::connect() "
-                        << "executed before server::dataflow::init finished.";
-                    threads::thread_self *self = threads::get_self_ptr_checked();
-                    connect_thread_id = self->get_thread_id();
-                    threads::thread_id_type id = connect_thread_id;
-                    threads::set_thread_lco_description(
-                        connect_thread_id
-                      , "server::dataflow::connect"
-                    );
-
-                    threads::thread_state_ex_enum statex = threads::wait_unknown;
-                    {
-                        util::unlock_the_lock<hpx::util::spinlock::scoped_lock>
-                            ul(l);
-                        statex = self->yield(threads::suspended);
-                    }
-
-                    threads::set_thread_lco_description(id);
-                    connect_thread_id = 0;
-                    if(statex == threads::wait_abort)
-                    {
-                        hpx::util::osstream strm;
-                        error_code ig;
-                        std::string
-                            desc = threads::get_thread_description(id, ig);
-
-                        strm << "thread(" << id
-                             << (desc.empty() ? "" : ", " ) << desc
-                             << ") aborted (yield returned wait_abort)";
-                        HPX_THROW_EXCEPTION(yield_aborted,
-                            "dataflow::connect()",
-                            hpx::util::osstream_get_string(strm));
-
-                        return;
-                    }
-                    */
                     return;
                 }
-                BOOST_ASSERT(component_ptr);
             }
 
             (*component_ptr)->connect_nonvirt(target);
@@ -215,7 +143,6 @@ namespace hpx { namespace lcos { namespace server
         detail::component_wrapper_base * component_ptr;
         hpx::util::spinlock mtx;
         std::vector<naming::id_type> targets;
-        //threads::thread_id_type connect_thread_id;
     };
 
     ///////////////////////////////////////////////////////////////////////////

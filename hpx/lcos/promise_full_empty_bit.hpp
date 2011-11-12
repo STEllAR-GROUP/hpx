@@ -165,6 +165,25 @@ namespace hpx { namespace lcos { namespace detail
             }
         }
 
+        void set_local_data(int slot, Result const& result)
+        {
+            // set the received result, reset error status
+            if (slot < 0 || slot >= N) {
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "promise::set_data<Result, N>",
+                    "slot index out of range");
+                return;
+            }
+
+            try {
+                // store the value
+                data_[slot].set(data_type(result));
+            }
+            catch (hpx::exception const&) {
+                data_[slot].set(data_type(boost::current_exception()));
+            }
+        }
+
         // trigger the future with the given error condition
         void set_error(int slot, boost::exception_ptr const& e)
         {
@@ -317,6 +336,11 @@ namespace hpx { namespace lcos
         promise(Impl* impl)
           : impl_(impl)
         {}
+
+        void set_local_data(int slot, Result const& result)
+        {
+            (*impl_)->set_local_data(0, result);
+        }
 
     public:
         /// Reset the promise to allow to restart an asynchronous

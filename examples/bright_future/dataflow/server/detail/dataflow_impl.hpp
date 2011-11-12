@@ -279,6 +279,7 @@ namespace hpx { namespace traits
             typename hpx::util::spinlock::scoped_lock l(mtx);
             if(result_set)
             {
+                l.unlock();
                 typedef typename lco_type::set_result_action action_type;
                 applier::apply<action_type>(target, result);
             }

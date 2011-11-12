@@ -37,7 +37,6 @@ namespace hpx { namespace lcos {
 
         dataflow_base(promise<naming::id_type, naming::gid_type> const & promise)
             : gid_promise(promise)
-            , gid_(naming::invalid_id)
         {}
 
         Result get()
@@ -49,7 +48,6 @@ namespace hpx { namespace lcos {
 
         void invalidate()
         {
-            gid_ = naming::invalid_id;
             gid_promise.reset();
         }
 
@@ -65,25 +63,16 @@ namespace hpx { namespace lcos {
 
         naming::id_type & get_gid()
         {
-            if(!gid_)
-            {
-                gid_ = gid_promise.get();
-            }
-            return gid_;
+            return gid_promise.get();
         }
 
         naming::id_type const & get_gid() const
         {
-            if(!gid_)
-            {
-                gid_ = gid_promise.get();
-            }
-            return gid_;
+            return gid_promise.get();
         }
 
     protected:
         promise<naming::id_type, naming::gid_type> gid_promise;
-        mutable naming::id_type gid_;
 
     private:
         friend class boost::serialization::access;
@@ -91,9 +80,9 @@ namespace hpx { namespace lcos {
         template <typename Archive>
         void load(Archive & ar, unsigned)
         {
-            BOOST_ASSERT(!gid_);
-            ar & gid_;
-            BOOST_ASSERT(gid_);
+            naming::id_type id;
+            ar & id;
+            gid_promise.set_local_data(0, id);
         }
 
         template <typename Archive>

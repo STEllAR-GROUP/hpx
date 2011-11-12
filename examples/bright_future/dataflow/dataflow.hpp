@@ -111,8 +111,7 @@ namespace hpx { namespace lcos {
         template <typename Archive>
         void serialize(Archive & ar, unsigned)
         {
-            ar & this->gid_;
-            BOOST_ASSERT(this->get_gid());
+            ar & boost::serialization::base_object<base_type>(*this);
         }
     };
 }}
