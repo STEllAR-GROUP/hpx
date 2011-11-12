@@ -42,8 +42,8 @@ namespace boost { namespace coroutines { namespace detail
   // build a linked list of available items
   struct context_impl_base
   {
-      context_impl_base() : dummy(0) {}
-      void* dummy;
+      context_impl_base() /*: dummy(0)*/ {}
+//      void* dummy;
   };
 
 }}}
