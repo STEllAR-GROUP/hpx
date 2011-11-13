@@ -420,47 +420,54 @@ void gs(
                         hpx::lcos::dataflow<remote_lse_type::update_right_boundary_action>
                         update_right_boundary_dataflow;
 
-                    for(size_type y = 1; y < n_y_local + 1; y += block_size)
+                    for(size_type y = 1, yy = 0; y < n_y_local + 1; y += block_size, ++yy)
                     {
-                        for(size_type x = 1; x < n_x_local + 1; x += block_size)
+                        for(size_type x = 1, xx = 0; x < n_x_local + 1; x += block_size, ++xx)
                         {
+                            cout << "!." << flush;
                             range_type
                                 x_range(
-                                    x_block == 0 && x == 1
-                                  ? 2
-                                  : x
+                                    xx == 0 ? 2 : x
                                   , x + block_size >= n_x_local + 1
-                                  ? x_block + 1 == n_x_block
-                                    ? n_x - (x_block * n_x_local)
+                                    ? x_block + 1 == n_x_block
+                                        ? n_x - (x_block * n_x_local)
+                                        : n_x_local + 1
                                     : n_x_local + 1
-                                  : n_x_local + 1
                                 );
                             
                             range_type
                                 y_range(
-                                    y_block == 0 && y == 1
-                                  ? 2
-                                  : y
+                                    yy == 0 ? 2 : y
                                   , y + block_size >= n_y_local + 1
-                                  ? y_block + 1 == n_y_block
-                                    ? n_y - (y_block * n_y_local)
-                                    : n_y_local + 1
-                                  : n_y_local + 1
+                                        ? y_block + 1 == n_y_block
+                                            ? n_y - (y_block * n_y_local)
+                                            : n_y_local + 1
+                                        : n_y_local + 1
                                 );
 
-                            if(x == 1 && x_block > 0)
+                            if(yy == 0 && y_block > 0)
                             {
+                                //std::vector<double> v = 
+                                   get_column_dataflow(
+                                        grid_ids(x_block, y_block - 1)
+                                      , n_y_local
+                                      , y_range
+                                    ).get();
+                                /*
                                 update_left_boundary_dataflow(
                                     grid_ids(x_block, y_block)
                                   , get_column_dataflow(
-                                        grid_ids(x_block - 1, y_block)
+                                        grid_ids(x_block, y_block - 1)
                                       , n_y_local
                                       , y_range
-                                    )
+                                    ).get()
                                   , y_range
                                 ).get();
+                                */
                             }
+                            cout << "." << flush;
 
+                            /*
                             if(x == n_x_local && x_block < n_x_local)
                             {
                                 update_right_boundary_dataflow(
@@ -473,6 +480,7 @@ void gs(
                                   , y_range
                                 ).get();
                             }
+                            cout << "." << flush;
                             
                             if(y == 1 && y_block > 0)
                             {
@@ -486,6 +494,7 @@ void gs(
                                   , x_range
                                 ).get();
                             }
+                            cout << "." << flush;
                             
                             if(y == n_y_local && y_block < n_y_local)
                             {
@@ -499,6 +508,8 @@ void gs(
                                   , x_range
                                 ).get();
                             }
+                            cout << "." << flush;
+                            */
 
                             /*
                             cout << "x " << x_range.first << " " << x_range.second << "\n" << flush;
@@ -511,6 +522,7 @@ void gs(
                               , x_range
                               , y_range
                             ).get();
+                            cout << ".!\n" << flush;
                         }
                     }
                 }

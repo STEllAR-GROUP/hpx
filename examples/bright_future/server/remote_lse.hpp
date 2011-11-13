@@ -333,7 +333,6 @@ namespace bright_future {
     };
 }}
 
-/*
 HPX_REGISTER_ACTION_DECLARATION_EX(
     bright_future::server::remote_lse<double>::init_action
   , remote_lse_init_action
@@ -370,6 +369,7 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
     bright_future::server::remote_lse<double>::get_col_action
   , remote_lse_get_col_action
 );
+/*
 HPX_REGISTER_ACTION_DECLARATION_EX(
     bright_future::server::remote_lse<double>::get_row_action
   , remote_lse_get_row_action
