@@ -154,7 +154,7 @@ namespace bright_future { namespace server {
     {
         std::vector<T> result(range.second-range.first);
 
-        for(size_type x = range.second; x < range.second; ++x)
+        for(size_type x = range.first; x < range.second; ++x)
         {
             result[x] = u(x, row);
         }

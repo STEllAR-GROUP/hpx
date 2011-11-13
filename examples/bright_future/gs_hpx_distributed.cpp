@@ -450,81 +450,52 @@ void gs(
 
                             if(x == 1 && x_block > 0)
                             {
-                                dataflow_base<std::vector<double> >
-                                    d = 
-                                    get_column_dataflow(
-                                        grid_ids(x_block - 1, y_block)
-                                      , n_y_local
-                                      , y_range
-                                    );
-
                                 update_left_boundary_dataflow(
                                     grid_ids(x_block, y_block)
-                                  , d/*get_column_dataflow(
+                                  , get_column_dataflow(
                                         grid_ids(x_block - 1, y_block)
                                       , n_y_local
                                       , y_range
-                                    )*/
+                                    )
                                   , y_range
                                 ).get();
                             }
 
                             if(x == n_x_local && x_block < n_x_local)
                             {
-                                dataflow_base<std::vector<double> >
-                                    d = 
-                                    get_column_dataflow(
-                                        grid_ids(x_block + 1, y_block)
-                                      , 1
-                                      , y_range
-                                    );
                                 update_right_boundary_dataflow(
                                     grid_ids(x_block, y_block)
-                                  , d/*get_column_dataflow(
+                                  , get_column_dataflow(
                                         grid_ids(x_block + 1, y_block)
                                       , 1
                                       , y_range
-                                    )*/
+                                    )
                                   , y_range
                                 ).get();
                             }
                             
                             if(y == 1 && y_block > 0)
                             {
-                                dataflow_base<std::vector<double> >
-                                    d = 
-                                    get_row_dataflow(
-                                        grid_ids(x_block, y_block - 1)
-                                      , n_x_local
-                                      , x_range
-                                    );
                                 update_top_boundary_dataflow(
                                     grid_ids(x_block, y_block)
-                                  , d/* get_row_dataflow(
+                                  , get_row_dataflow(
                                         grid_ids(x_block, y_block - 1)
                                       , n_x_local
                                       , x_range
-                                    )*/
+                                    )
                                   , x_range
                                 ).get();
                             }
                             
                             if(y == n_y_local && y_block < n_y_local)
                             {
-                                dataflow_base<std::vector<double> >
-                                    d = 
-                                    get_row_dataflow(
-                                        grid_ids(x_block, y_block + 1)
-                                      , 1
-                                      , x_range
-                                    );
                                 update_bottom_boundary_dataflow(
                                     grid_ids(x_block, y_block)
-                                  , d/*get_row_dataflow(
+                                  , get_row_dataflow(
                                         grid_ids(x_block, y_block + 1)
                                       , 1
                                       , x_range
-                                    )*/
+                                    )
                                   , x_range
                                 ).get();
                             }
