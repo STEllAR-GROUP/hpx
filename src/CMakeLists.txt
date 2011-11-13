@@ -124,9 +124,9 @@ add_hpx_library_headers(hpx
 add_hpx_library_headers(hpx
   GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/lcos/*.hpp")
 
-# libhpx_init sources
+# libhpx_init headers
 add_hpx_library_sources(hpx_init
-  GLOB GLOBS "${hpx_SOURCE_DIR}/src/*hpx_init.cpp")
+  GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/*hpx_init.hpp")
 
 ################################################################################
 # make source groups
