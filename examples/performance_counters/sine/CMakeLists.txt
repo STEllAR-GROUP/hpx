@@ -7,7 +7,7 @@
 # add component
 add_hpx_component(sine
   SOURCES sine.cpp server/sine.cpp
-  HEADERS server/sine.cpp)
+  HEADERS server/sine.hpp)
 
 ###############################################################################
 # add example executable
