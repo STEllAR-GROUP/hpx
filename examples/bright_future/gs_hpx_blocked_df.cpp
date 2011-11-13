@@ -201,7 +201,7 @@ void gs(
         // id on which object we want to call the action. the remaining
         // parameters are the parameters to be passed to the action, see comment
         // above
-        init_dataflow(remote_id, n_x, n_y, hx, hy).get();
+        init_dataflow(remote_id, n_x, n_y, n_x, n_y, hx, hy).get();
         // this type represents our grid, instead of doubles, we just use
         // promises as value types.
         typedef bright_future::grid<dataflow_type> promise_grid_type;
@@ -228,6 +228,7 @@ void gs(
                 hpx::lcos::dataflow<remote_lse_type::init_rhs_blocked_action>
                 init_rhs_dataflow;
 
+            cout << "initializing rhs\n" << flush;
             // we opened another scope to just have this vector temporarily, we
             // won't need it after the initializiation
             for(size_type y = 0, y_block = 0; y < n_y; y += block_size, ++y_block)
@@ -238,8 +239,8 @@ void gs(
                         init_rhs_dataflow(
                             remote_id
                           , init_rhs_fun()
-                          , range_type(x, x+block_size)
-                          , range_type(y, y + block_size)
+                          , range_type(x, std::min(n_x, x + block_size))
+                          , range_type(y, std::min(n_y, y + block_size))
                         );
                 }
             }
@@ -248,6 +249,7 @@ void gs(
                 hpx::lcos::dataflow<remote_lse_type::init_u_blocked_action>
                 init_u_dataflow;
 
+            cout << "initializing u\n" << flush;
             // initialize our grid. This will serve as the dependency of the
             // first loop below.
             for(size_type y = 0, y_block = 0; y < n_y; y += block_size, ++y_block)
@@ -259,8 +261,8 @@ void gs(
                         init_u_dataflow(   // invoke the init future.
                             remote_id
                           , init_u_fun() // pass the initialization function
-                          , range_type(x, x + block_size) // and the ranges
-                          , range_type(y, y + block_size)
+                          , range_type(x, std::min(n_x, x + block_size))
+                          , range_type(y, std::min(n_y, y + block_size))
                         );
                 }
             }
@@ -278,6 +280,8 @@ void gs(
         typedef
             hpx::lcos::dataflow<remote_lse_type::apply_region_df_action>
             apply_region_dataflow;
+
+        cout << "finished initializing ...\n" << flush;
 
         high_resolution_timer t;
 
@@ -305,7 +309,9 @@ void gs(
                                 y == 0             ? 1     : y_block
                               , y + 1 == n_y_block ? n_y-1 : y_block + block_size
                               );
+
                         dataflow_base<void> deps  = dataflow<dependency_action>(find_here(), prev(x, y));
+
                         if(iter==0)
                         {
                             deps = dataflow<dependency_action>(find_here(), deps, init_rhs_promises(x, y), prev(x,y));
@@ -369,10 +375,10 @@ void gs(
                             // are finished.
                             apply_region_dataflow(
                                 remote_id
-                              , deps
                               , update_fun()
                               , x_range
                               , y_range
+                              , deps
                               //, deps
                             );
                         //cout << "." << flush;
@@ -380,12 +386,16 @@ void gs(
                 }
             }
         }
+        
+        cout << "finished building dataflow tree\n" << flush;
 
         // wait for the last iteration to finish.
         BOOST_FOREACH(dataflow_type & promise, iteration_dependencies[max_iterations%2])
         {
             promise.get();
+            std::cout << "." << flush;
         }
+        std::cout << "\n" << flush;
 
         double time_elapsed = t.elapsed();
         cout << time_elapsed << "\n" << flush;

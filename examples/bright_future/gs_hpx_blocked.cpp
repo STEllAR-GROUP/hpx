@@ -190,7 +190,7 @@ void gs(
         // id on which object we want to call the action. the remaining
         // parameters are the parameters to be passed to the action, see comment
         // above
-        init_future(remote_id, n_x, n_y, hx, hy).get();
+        init_future(remote_id, n_x, n_y, n_x, n_y, hx, hy).get();
 
         // this type represents our grid, instead of doubles, we just use
         // promises as value types.
@@ -228,8 +228,8 @@ void gs(
                         init_rhs_future(
                             remote_id
                           , init_rhs_fun()
-                          , range_type(x, x+block_size)
-                          , range_type(y, y + block_size)
+                          , range_type(x, std::min(n_x, x + block_size))
+                          , range_type(y, std::min(n_y, y + block_size))
                         );
                 }
             }
@@ -249,8 +249,8 @@ void gs(
                         init_u_future(   // invoke the init future.
                             remote_id
                           , init_u_fun() // pass the initialization function
-                          , range_type(x, x + block_size) // and the ranges
-                          , range_type(y, y + block_size)
+                          , range_type(x, std::min(n_x, x + block_size))
+                          , range_type(y, std::min(n_y, y + block_size))
                         );
                 }
             }

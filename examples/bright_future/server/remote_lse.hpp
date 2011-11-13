@@ -94,16 +94,20 @@ namespace bright_future {
             };
 
             void init(
-                size_type nx
+                size_type size_x
+              , size_type size_y
+              , size_type nx
               , size_type ny
               , double hx
               , double hy
             );
 
             typedef
-                hpx::actions::action4<
+                hpx::actions::action6<
                     remote_lse<T>
                   , remote_lse_init
+                  , size_type
+                  , size_type
                   , size_type
                   , size_type
                   , double
@@ -256,9 +260,80 @@ namespace bright_future {
                   , &remote_lse<T>::apply_region_df
                 >
                 apply_region_df_action;
+
+            std::vector<T> get_row(size_type r, range_type);
+
+            typedef
+                hpx::actions::result_action2<
+                    remote_lse<T>
+                  , std::vector<T>
+                  , 0
+                  , size_type
+                  , range_type
+                  , &remote_lse<T>::get_row
+                >
+                get_row_action;
+            
+            std::vector<T> get_col(size_type r, range_type);
+
+            typedef
+                hpx::actions::result_action2<
+                    remote_lse<T>
+                  , std::vector<T>
+                  , 0
+                  , size_type
+                  , range_type
+                  , &remote_lse<T>::get_col
+                >
+                get_col_action;
+
+            void update_top_boundary(std::vector<T> const &, range_type);
+            typedef
+                hpx::actions::action2<
+                    remote_lse<T>
+                  , 0
+                  , std::vector<T> const &
+                  , range_type
+                  , &remote_lse<T>::update_top_boundary
+                >
+                update_top_boundary_action;
+
+            void update_bottom_boundary(std::vector<T> const &, range_type);
+            typedef
+                hpx::actions::action2<
+                    remote_lse<T>
+                  , 0
+                  , std::vector<T> const &
+                  , range_type
+                  , &remote_lse<T>::update_bottom_boundary
+                >
+                update_bottom_boundary_action;
+
+            void update_left_boundary(std::vector<T> const &, range_type);
+            typedef
+                hpx::actions::action2<
+                    remote_lse<T>
+                  , 0
+                  , std::vector<T> const &
+                  , range_type
+                  , &remote_lse<T>::update_left_boundary
+                >
+                update_left_boundary_action;
+
+            void update_right_boundary(std::vector<T> const &, range_type);
+            typedef
+                hpx::actions::action2<
+                    remote_lse<T>
+                  , 0
+                  , std::vector<T> const &
+                  , range_type
+                  , &remote_lse<T>::update_right_boundary
+                >
+                update_right_boundary_action;
     };
 }}
 
+/*
 HPX_REGISTER_ACTION_DECLARATION_EX(
     bright_future::server::remote_lse<double>::init_action
   , remote_lse_init_action
@@ -291,5 +366,30 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
     bright_future::server::remote_lse<double>::apply_region_df_action
   , remote_lse_apply_region_df_action
 );
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    bright_future::server::remote_lse<double>::get_col_action
+  , remote_lse_get_col_action
+);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    bright_future::server::remote_lse<double>::get_row_action
+  , remote_lse_get_row_action
+);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    bright_future::server::remote_lse<double>::update_top_boundary_action
+  , remote_lse_update_top_boundary_action
+);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    bright_future::server::remote_lse<double>::update_bottom_boundary_action
+  , remote_lse_update_bottom_boundary_action
+);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    bright_future::server::remote_lse<double>::update_left_boundary_action
+  , remote_lse_update_left_boundary_action
+);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    bright_future::server::remote_lse<double>::update_right_boundary_action
+  , remote_lse_update_right_boundary_action
+);
+*/
 
 #endif
