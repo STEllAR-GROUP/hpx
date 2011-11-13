@@ -3,6 +3,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=8)
+
 set(bright_future_programs
         root_finder
         vector_root_finder
@@ -37,8 +39,6 @@ if(HPX_CXX11_LAMBDAS)
         DEPENDENCIES iostreams_component
     )
 endif()
-
-add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=8)
 
 set(gs_single_sources gs.cpp)
 set(gs_hpx_sources gs.cpp)

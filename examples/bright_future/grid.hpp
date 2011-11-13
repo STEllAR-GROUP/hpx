@@ -55,24 +55,24 @@ namespace bright_future
         {
             BOOST_ASSERT(x < n_x);
             BOOST_ASSERT(y < n_y);
-            return data[x + y * n_x];
+            return data.at(x + y * n_x);
         }
 
         const_reference_type operator()(size_type x, size_type y) const
         {
             BOOST_ASSERT(x < n_x);
             BOOST_ASSERT(y < n_y);
-            return data[x + y * n_x];
+            return data.at(x + y * n_x);
         }
 
         reference_type operator[](size_type i)
         {
-            return data[i];
+            return data.at(i);
         }
 
         const_reference_type operator[](size_type i) const
         {
-            return data[i];
+            return data.at(i);
         }
 
         iterator begin()

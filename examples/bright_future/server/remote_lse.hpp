@@ -275,6 +275,8 @@ namespace bright_future {
                 get_row_action;
             
             std::vector<T> get_col(size_type r, range_type);
+            hpx::lcos::local_mutex mtx;
+            typedef boost::unique_lock<hpx::lcos::local_mutex> scoped_lock;
 
             typedef
                 hpx::actions::result_action2<
@@ -365,9 +367,15 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
     bright_future::server::remote_lse<double>::apply_region_df_action
   , remote_lse_apply_region_df_action
 );
+/*
 HPX_REGISTER_ACTION_DECLARATION_EX(
     bright_future::server::remote_lse<double>::get_col_action
   , remote_lse_get_col_action
+);
+*/
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<std::vector<double> >::set_result_action
+  , remote_lse_base_lco_set_result_action
 );
 /*
 HPX_REGISTER_ACTION_DECLARATION_EX(

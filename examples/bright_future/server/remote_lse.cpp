@@ -152,11 +152,13 @@ namespace bright_future { namespace server {
     template <typename T>
     std::vector<T> remote_lse<T>::get_row(size_type row, range_type range)
     {
-        std::vector<T> result(range.second-range.first);
+        std::vector<T> result;
+        
+        result.reserve((range.second-range.first));
 
         for(size_type x = range.first; x < range.second; ++x)
         {
-            result[x] = u(x, row);
+            result.push_back(u(x, row));
         }
 
         return result;
@@ -168,10 +170,11 @@ namespace bright_future { namespace server {
     template <typename T>
     std::vector<T> remote_lse<T>::get_col(size_type col, range_type range)
     {
-        std::vector<T> result(range.second-range.first);
+        std::vector<T> result;
+        result.reserve(range.second-range.first);
         for(size_type y = range.first; y < range.second; ++y)
         {
-            result[y] = u(col, y);
+            result.push_back(u(col, y));
         }
         return result;
     }
@@ -180,9 +183,9 @@ namespace bright_future { namespace server {
     void remote_lse<T>::update_top_boundary(std::vector<T> const & b, range_type range)
     {
         //std::copy(b.begin(), b.end(), u.begin() + u.y());
-        for(size_type x = range.first; x < range.second; ++x)
+        for(size_type x = range.first, i = 0; x < range.second; ++x, ++i)
         {
-            u(x, 0) = b[x];
+            u(x, 0) = b.at(i);
         }
     }
 
@@ -190,27 +193,27 @@ namespace bright_future { namespace server {
     void remote_lse<T>::update_bottom_boundary(std::vector<T> const & b, range_type range)
     {
         //std::copy(b.begin(), b.end(), u.begin() + u.x() * u.y());
-        for(size_type x = range.first; x < range.second; ++x)
+        for(size_type x = range.first, i = 0; x < range.second; ++x, ++i)
         {
-            u(x, u.y()-1) = b[x];
+            u(x, u.y()-1) = b.at(i);
         }
     }
 
     template <typename T>
     void remote_lse<T>::update_right_boundary(std::vector<T> const & b, range_type range)
     {
-        for(size_type y = range.first; y < range.second; ++y)
+        for(size_type y = range.first, i = 0; y < range.second; ++y, ++i)
         {
-            u(u.x()-1, y) = b[y];
+            u(u.x()-1, y) = b.at(i);
         }
     }
 
     template <typename T>
     void remote_lse<T>::update_left_boundary(std::vector<T> const & b, range_type range)
     {
-        for(size_type y = range.first; y < range.second; ++y)
+        for(size_type y = range.first, i = 0; y < range.second; ++y, ++i)
         {
-            u(0, y) = b[y];
+            u(0, y) = b.at(i);
         }
     }
 
@@ -250,9 +253,15 @@ HPX_REGISTER_ACTION_EX(
     bright_future::server::remote_lse<double>::apply_region_df_action
   , remote_lse_apply_region_df_action
 );
+/*
 HPX_REGISTER_ACTION_EX(
     bright_future::server::remote_lse<double>::get_col_action
   , remote_lse_get_col_action
+);
+*/
+HPX_REGISTER_ACTION_EX(
+    hpx::lcos::base_lco_with_value<std::vector<double> >::set_result_action
+  , remote_lse_base_lco_set_result_action
 );
 /*
 HPX_REGISTER_ACTION_EX(

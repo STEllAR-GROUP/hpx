@@ -40,6 +40,7 @@ using hpx::find_here;
 using hpx::lcos::promise;
 using hpx::lcos::wait;
 using hpx::naming::id_type;
+using hpx::naming::get_locality_from_id;
 
 // this is just a simple base class for my functors to be serializable
 // this is required by my function implementation, because arguments to hpx
@@ -258,6 +259,9 @@ void gs(
         size_type n_x_local = n_x / n_x_block + 1;
         size_type n_y_local = n_y / n_y_block + 1;
 
+        size_type n_x_local_block = n_x_local/block_size+1;
+        size_type n_y_local_block = n_y_local/block_size+1;
+
         cout
             << "N_x       " << n_x << "\n"
             << "N_y       " << n_y << "\n"
@@ -329,6 +333,33 @@ void gs(
 
         cout << "init1\n" << flush;
 
+        typedef grid<dataflow_type> promise_grid_type;
+        typedef grid<promise_grid_type> promise_grid_block_type;
+        typedef std::vector<promise_grid_block_type> iteration_dependencies_type;
+
+        iteration_dependencies_type
+            iteration_dependencies(
+                2
+              , promise_grid_block_type(
+                    n_x_block
+                  , n_y_block
+                  , promise_grid_type(
+                        n_x_local_block
+                      , n_y_local_block
+                    )
+                )
+            );
+
+        promise_grid_block_type
+            rhs_promise(
+                n_x_block
+              , n_y_block
+              , promise_grid_type(
+                    n_x_local_block
+                  , n_y_local_block
+                )
+            );
+
         {
             typedef
                 hpx::lcos::dataflow<remote_lse_type::init_rhs_blocked_action>
@@ -342,45 +373,70 @@ void gs(
             {
                 for(size_type x_block = 0; x_block < n_x_block; ++x_block)
                 {
-                    for(size_type y = 0; y < n_y_local + 2; y += block_size)
+                    for(size_type y = 0, yy = 0; y < n_y_local + 2; y += block_size, ++yy)
                     {
-                        for(size_type x = 0; x < n_x_local + 2; x += block_size)
+                        for(size_type x = 0, xx = 0; x < n_x_local + 2; x += block_size, ++xx)
                         {
                             range_type
                                 x_range(
                                     x
+                                  , std::min(n_x_local + 2, x + block_size)
+                                /*
                                   , x + 1 == n_x_local + 2
                                   ? n_x - (x_block + x * n_x_local + 2)
                                   : std::min(n_x_local + 2, x + block_size)
+                                */
+                                /*
+                                  , x + block_size >= n_x_local + 2
+                                    ? x_block + 1 == n_x_block
+                                        ? n_x - (x_block * n_x_local)
+                                        : n_x_local + 2
+                                    : n_x_local + 2
+                                */
                                 );
                             
                             range_type
                                 y_range(
                                     y
+                                  , std::min(n_y_local + 2, y + block_size)
+                                  /*
                                   , y + 1 == n_y_local + 2
                                   ? n_y - (y_block + y * n_y_local + 2)
                                   : std::min(n_y_local + 2, y + block_size)
+                                  */
+                                /*
+                                  , y + block_size >= n_y_local + 1
+                                        ? y_block + 1 == n_y_block
+                                            ? n_y - (y_block * n_y_local)
+                                            : n_y_local + 1
+                                        : n_y_local + 1
+                                */
                                 );
-
-                            init_rhs_dataflow(
-                                grid_ids(x_block, y_block)
-                              , init_rhs_fun(
-                                    x_block * n_x_local
-                                  , y_block * n_y_local
-                                )
-                              , x_range
-                              , y_range
-                            ).get();
+                            /*
+                            cout << "x " << x_range.first << " " << x_range.second << "\n" << flush;
+                            cout << "y " << y_range.first << " " << y_range.second << "\n" << flush;
+                            */
+                            rhs_promise(x_block, y_block)(xx, yy) =
+                                init_rhs_dataflow(
+                                    grid_ids(x_block, y_block)
+                                  , init_rhs_fun(
+                                        x_block * n_x_local
+                                      , y_block * n_y_local
+                                    )
+                                  , x_range
+                                  , y_range
+                                );
                             
-                            init_u_dataflow(
-                                grid_ids(x_block, y_block)
-                              , init_u_fun(
-                                    x_block * n_x_local
-                                  , y_block * n_y_local
-                                )
-                              , x_range
-                              , y_range
-                            ).get();
+                            iteration_dependencies[0](x_block, y_block)(xx, yy) =
+                                init_u_dataflow(
+                                    grid_ids(x_block, y_block)
+                                  , init_u_fun(
+                                        x_block * n_x_local
+                                      , y_block * n_y_local
+                                    )
+                                  , x_range
+                                  , y_range
+                                );
                         }
                     }
                 }
@@ -396,10 +452,18 @@ void gs(
         
         for(unsigned iter = 0; iter < max_iterations; ++iter)
         {
+            promise_grid_block_type & prev_block = iteration_dependencies[iter%2];
+            promise_grid_block_type & current_block = iteration_dependencies[(iter + 1)%2];
+            /*
+            cout << "iteration " << iter << flush;
+            */
             for(size_type y_block = 0; y_block < n_y_block; ++y_block)
             {
                 for(size_type x_block = 0; x_block < n_x_block; ++x_block)
                 {
+                    /*
+                    cout << " grid " << x_block << " " << y_block << " " << flush;
+                    */
                     // boundary updates ....
                     typedef
                         hpx::lcos::dataflow<remote_lse_type::get_col_action>
@@ -420,114 +484,201 @@ void gs(
                         hpx::lcos::dataflow<remote_lse_type::update_right_boundary_action>
                         update_right_boundary_dataflow;
 
+                    promise_grid_type & prev = prev_block(x_block, y_block);
+                    promise_grid_type & current = current_block(x_block, y_block);
+
                     for(size_type y = 1, yy = 0; y < n_y_local + 1; y += block_size, ++yy)
                     {
                         for(size_type x = 1, xx = 0; x < n_x_local + 1; x += block_size, ++xx)
                         {
-                            cout << "!." << flush;
+                            /*
+                            cout << "!. " << xx << " " << yy << " ." << flush;
+                            cout << "!. " << xx + x_block << " " << yy + y_block << " ." << flush;
+                            */
                             range_type
                                 x_range(
-                                    xx == 0 ? 2 : x
-                                  , x + block_size >= n_x_local + 1
-                                    ? x_block + 1 == n_x_block
-                                        ? n_x - (x_block * n_x_local)
-                                        : n_x_local + 1
-                                    : n_x_local + 1
+                                    xx == 0 && x_block == 0 ? 2 : x
+                                  , xx + 1 == n_x_local_block
+                                        ? x_block + 1 == n_x_block
+                                            ? n_x - (x_block * n_x_local)
+                                            : std::min(n_x_local + 1, x + block_size)
+                                        : std::min(n_x_local + 1, x + block_size)
                                 );
                             
                             range_type
                                 y_range(
-                                    yy == 0 ? 2 : y
-                                  , y + block_size >= n_y_local + 1
+                                    yy == 0 && y_block == 0 ? 2 : y
+                                  , yy + 1 == n_y_local_block
                                         ? y_block + 1 == n_y_block
                                             ? n_y - (y_block * n_y_local)
-                                            : n_y_local + 1
-                                        : n_y_local + 1
+                                            : std::min(n_y_local + 1, y + block_size)
+                                        : std::min(n_y_local + 1, y + block_size)
                                 );
 
+                            dataflow_base<void> deps = prev(xx, yy);
+                            if(iter == 0)
+                            {
+                                deps = dataflow<dependency_action>(
+                                    get_locality_from_id(grid_ids(x_block, y_block))
+                                  , rhs_promise(x_block, y_block)(xx, yy)
+                                  , deps
+                                );
+                            }
+
+                            if(xx + 1 < n_x_local_block)
+                            {
+                                deps = dataflow<dependency_action>(
+                                    get_locality_from_id(grid_ids(x_block, y_block))
+                                  , prev(xx + 1, yy)
+                                  , deps
+                                );
+                            }
+                            //cout << "." << flush;
+                            
+                            if(yy + 1 < n_y_local_block)
+                            {
+                                deps = dataflow<dependency_action>(
+                                    get_locality_from_id(grid_ids(x_block, y_block))
+                                  , prev(xx, yy + 1)
+                                  , deps
+                                );
+                            }
+                            //cout << "." << flush;
+
+                            if(xx > 0)
+                            {
+                                deps = dataflow<dependency_action>(
+                                    get_locality_from_id(grid_ids(x_block, y_block))
+                                  , current(xx - 1, yy)
+                                  , deps
+                                );
+                            }
+                            //cout << "." << flush;
+
+                            if(yy > 0)
+                            {
+                                deps = dataflow<dependency_action>(
+                                    get_locality_from_id(grid_ids(x_block, y_block))
+                                  , current(xx, yy - 1)
+                                  , deps
+                                );
+                            }
+                            //cout << "." << flush;
+
+                            if(xx == 0 && x_block > 0)
+                            {
+                                deps = 
+                                    update_left_boundary_dataflow(
+                                        grid_ids(x_block, y_block)
+                                      , get_column_dataflow(
+                                            grid_ids(x_block - 1, y_block)
+                                          , n_x_local
+                                          , y_range
+                                        )
+                                      , y_range
+                                      , prev_block(x_block - 1, y_block)(
+                                            n_x_local_block -1
+                                          , yy
+                                        )
+                                      , deps
+                                    );
+                                //cout << "l" << flush;
+                            }
+
+                            if(
+                                xx + 1 == n_x_local_block
+                             && x_block + 1 < n_x_block
+                            )
+                            {
+                                deps = 
+                                    update_right_boundary_dataflow(
+                                        grid_ids(x_block, y_block)
+                                      , get_column_dataflow(
+                                            grid_ids(x_block + 1, y_block)
+                                          , 1
+                                          , y_range
+                                        )
+                                      , y_range
+                                      , prev_block(x_block + 1, y_block)(
+                                            0
+                                          , yy
+                                        )
+                                      , deps
+                                    );
+                                //cout << "r" << flush;
+                            }
+                            
                             if(yy == 0 && y_block > 0)
                             {
-                                //std::vector<double> v = 
-                                   get_column_dataflow(
-                                        grid_ids(x_block, y_block - 1)
-                                      , n_y_local
-                                      , y_range
-                                    ).get();
-                                /*
-                                update_left_boundary_dataflow(
-                                    grid_ids(x_block, y_block)
-                                  , get_column_dataflow(
-                                        grid_ids(x_block, y_block - 1)
-                                      , n_y_local
-                                      , y_range
-                                    ).get()
-                                  , y_range
-                                ).get();
-                                */
-                            }
-                            cout << "." << flush;
-
-                            /*
-                            if(x == n_x_local && x_block < n_x_local)
-                            {
-                                update_right_boundary_dataflow(
-                                    grid_ids(x_block, y_block)
-                                  , get_column_dataflow(
-                                        grid_ids(x_block + 1, y_block)
-                                      , 1
-                                      , y_range
-                                    )
-                                  , y_range
-                                ).get();
-                            }
-                            cout << "." << flush;
-                            
-                            if(y == 1 && y_block > 0)
-                            {
-                                update_top_boundary_dataflow(
-                                    grid_ids(x_block, y_block)
-                                  , get_row_dataflow(
-                                        grid_ids(x_block, y_block - 1)
-                                      , n_x_local
+                                deps = 
+                                    update_top_boundary_dataflow(
+                                        grid_ids(x_block, y_block)
+                                      , get_row_dataflow(
+                                            grid_ids(x_block, y_block - 1)
+                                          , n_y_local
+                                          , x_range
+                                        )
                                       , x_range
-                                    )
-                                  , x_range
-                                ).get();
+                                      , prev_block(x_block, y_block - 1)(
+                                            xx
+                                          , n_y_local_block -1
+                                        )
+                                      , deps
+                                    );
+                                //cout << "t" << flush;
                             }
-                            cout << "." << flush;
                             
-                            if(y == n_y_local && y_block < n_y_local)
+                            if(yy + 1 == n_y_local_block && y_block + 1 < n_y_block)
                             {
-                                update_bottom_boundary_dataflow(
-                                    grid_ids(x_block, y_block)
-                                  , get_row_dataflow(
-                                        grid_ids(x_block, y_block + 1)
-                                      , 1
+                                deps = 
+                                    update_bottom_boundary_dataflow(
+                                        grid_ids(x_block, y_block)
+                                      , get_row_dataflow(
+                                            grid_ids(x_block, y_block + 1)
+                                          , 1
+                                          , x_range
+                                        )
                                       , x_range
-                                    )
-                                  , x_range
-                                ).get();
+                                      , prev_block(x_block, y_block + 1)(
+                                            xx
+                                          , 0
+                                        )
+                                      , deps
+                                    );
+                                //cout << "b" << flush;
                             }
-                            cout << "." << flush;
-                            */
 
                             /*
                             cout << "x " << x_range.first << " " << x_range.second << "\n" << flush;
                             cout << "y " << y_range.first << " " << y_range.second << "\n" << flush;
                             */
-
-                            apply_region_dataflow(
-                                grid_ids(x_block, y_block)
-                              , update_fun()
-                              , x_range
-                              , y_range
-                            ).get();
-                            cout << ".!\n" << flush;
+                            current(xx, yy) =
+                                apply_region_dataflow(
+                                    grid_ids(x_block, y_block)
+                                  , update_fun()
+                                  , x_range
+                                  , y_range
+                                  , deps
+                                );
+                            //cout << ".! " << flush;
                         }
                     }
                 }
             }
+            //cout << "done\n" << flush;
         }
+        
+        // wait for the last iteration to finish.
+        //cout << "dataflow tree construction completed" << flush;
+        BOOST_FOREACH(promise_grid_type & block, iteration_dependencies[max_iterations%2])
+        {
+            BOOST_FOREACH(dataflow_base<void> & promise, block)
+            {
+                //cout << "." << flush;
+                promise.get();
+            }
+        }
+        //cout << "\n";
 
         double time_elapsed = t.elapsed();
         cout << time_elapsed << "\n" << flush;

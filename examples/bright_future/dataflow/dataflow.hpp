@@ -48,7 +48,6 @@ namespace hpx { namespace lcos {
                     {
                         typedef hpx::lcos::server::init_action<Action> action_type;
                         applier::apply<action_type>(gid, target);
-                        target = naming::invalid_id;
                     }
                   , naming::get_locality_from_id(target)
                   , stub_type::get_component_type()
@@ -76,7 +75,6 @@ namespace hpx { namespace lcos {
                             Action, BOOST_PP_ENUM_PARAMS(N, A)> action_type;    \
                         applier::apply<action_type>(gid, target                 \
                           , BOOST_PP_ENUM_PARAMS(N, a));                        \
-                        target = naming::invalid_id;                            \
                     }                                                           \
                   , naming::get_locality_from_id(target)                        \
                   , stub_type::get_component_type()                             \
@@ -92,7 +90,7 @@ namespace hpx { namespace lcos {
                 , BOOST_PP_ENUM_PARAMS(N, a))                                   \
               )                                                                 \
         {                                                                       \
-        }
+        }                                                                       \
             /*
             this->get_gid();                                                    \
              */

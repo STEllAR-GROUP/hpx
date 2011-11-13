@@ -310,7 +310,7 @@ void gs(
                               , y + 1 == n_y_block ? n_y-1 : y_block + block_size
                               );
 
-                        dataflow_base<void> deps  = dataflow<dependency_action>(find_here(), prev(x, y));
+                        dataflow_base<void> deps  = prev(x, y);
 
                         if(iter==0)
                         {

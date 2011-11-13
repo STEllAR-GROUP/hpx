@@ -135,7 +135,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
                     traits::get_remote_result<result_type, remote_result>
                         ::call(r)
                 );
-            dataflow_source.invalidate();
+            //dataflow_source.invalidate();
         }
 
         void connect()
