@@ -368,11 +368,21 @@ namespace hpx { namespace applier
         if (naming::strip_credit_from_gid(gid.get_msb()) ==
                 parcel_handler_.get_prefix().get_msb())
         {
-            // a zero address references the local runtime support component
-            if (0 != gid.get_lsb())
-                addr.address_ = gid.get_lsb();
-            else
+            addr.locality_ = parcel_handler_.here();
+
+            // A zero address references the local runtime support component.
+            if (0 == gid.get_lsb() || runtime_support_id_.get_lsb() == gid.get_lsb())
+            {
+                addr.type_ = components::component_runtime_support;
                 addr.address_ = runtime_support_id_.get_lsb();
+            }
+
+            else
+            {
+                addr.type_ = components::component_memory;
+                addr.address_ = gid.get_lsb();
+            }
+
             return true;
         }
 
