@@ -220,7 +220,7 @@ namespace hpx { namespace parcelset
                 resolver_.incref(id.get_gid(), HPX_INITIAL_GLOBALCREDIT * 2);
 
                 const_cast<naming::id_type&>(id).add_credit(HPX_INITIAL_GLOBALCREDIT);
-                newid.add_credit(HPX_INITIAL_GLOBAL_CREDIT);
+                newid.add_credit(HPX_INITIAL_GLOBALCREDIT);
             }
             const_cast<naming::id_type&>(id) = newid;
         }
