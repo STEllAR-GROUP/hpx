@@ -217,8 +217,10 @@ namespace hpx { namespace parcelset
             if (0 == newid.get_credit())
             {
                 BOOST_ASSERT(1 == id.get_credit());
-                resolver_.incref(id.get_gid(), HPX_INITIAL_GLOBALCREDIT/*, id, oldcredits*/);
-                resolver_.incref(newid.get_gid(), HPX_INITIAL_GLOBALCREDIT/*, id, oldcredits*/);
+                resolver_.incref(id.get_gid(), HPX_INITIAL_GLOBALCREDIT * 2);
+
+                id.add_credit(HPX_INITIAL_GLOBALCREDIT);
+                newid.add_credit(HPX_INITIAL_GLOBAL_CREDIT);
             }
             const_cast<naming::id_type&>(id) = newid;
         }
