@@ -861,6 +861,9 @@ bool addressing_service::resolve(
         if (ec)
             return false;
 
+        if (&ec != &throws)
+            ec = make_success_code();
+
         return true;
     }
     catch (hpx::exception const& e) {
