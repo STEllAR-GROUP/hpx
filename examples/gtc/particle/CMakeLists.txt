@@ -21,8 +21,8 @@ set(stubs_headers
 set(server_headers
     server/particle.hpp)
 
-#set(server_sources
-#    server/particle.cpp)
+set(server_sources
+    server/particle.cpp)
 
 ###############################################################################
 set(sources

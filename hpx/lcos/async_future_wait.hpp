@@ -7,6 +7,7 @@
 #define HPX_LCOS_ASYNC_FUTURE_WAIT_AUG_02_2011_1146AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/lcos/eager_future.hpp>
 
 #include <vector>
 

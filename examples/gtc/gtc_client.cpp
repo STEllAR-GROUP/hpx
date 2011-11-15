@@ -14,7 +14,7 @@
 /// connecting them to components created with
 /// \a hpx#components#distributing_factory.
 inline void
-init(hpx::components::server::distributing_factory::iterator_range_type r,
+init(hpx::components::server::distributing_factory::iterator_range_type const& r,
     std::vector<hpx::geometry::point>& point)
 {
     BOOST_FOREACH(hpx::naming::id_type const& id, r)
@@ -27,7 +27,7 @@ init(hpx::components::server::distributing_factory::iterator_range_type r,
 /// connecting them to components created with
 /// \a hpx#components#distributing_factory.
 inline void
-init(hpx::components::server::distributing_factory::iterator_range_type r,
+init(hpx::components::server::distributing_factory::iterator_range_type const& r,
     std::vector<hpx::geometry::particle>& particle)
 {
     BOOST_FOREACH(hpx::naming::id_type const& id, r)
@@ -46,16 +46,18 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         ///////////////////////////////////////////////////////////////////////
         // Retrieve the command line options. 
-        std::size_t num_gridpoints = vm["n"].as<std::size_t>();
-        std::size_t num_particles = vm["np"].as<std::size_t>();
-        std::string meshfile = vm["mesh"].as<std::string>();
-        std::string particlefile = vm["particles"].as<std::string>();
+        std::size_t const num_gridpoints = vm["n"].as<std::size_t>();
+        std::size_t const num_particles = vm["np"].as<std::size_t>();
+        std::size_t const max_num_neighbors
+            = vm["max-num-neighbors"].as<std::size_t>();
+
+        std::string const meshfile = vm["mesh"].as<std::string>();
+        std::string const particlefile = vm["particles"].as<std::string>();
 
         ///////////////////////////////////////////////////////////////////////
-        // Create a distributing factory locally for the gridpoints. The
-        // distributing factory can be used to create a block of components
-        // that are distributed across all localities that support that
-        // component type. 
+        // Create a distributing factory locally. The distributing factory can
+        // be used to create blocks of components that are distributed across
+        // all localities that support that component type. 
         hpx::components::distributing_factory factory;
         factory.create(hpx::find_here());
 
@@ -88,8 +90,8 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::vector<hpx::geometry::particle> particles;
 
         // Populate the client vectors. 
-        init(locality_results(blocks_points), points);
-        init(locality_results(blocks_particles), particles);
+        init(hpx::components::server::locality_results(blocks_points), points);
+        init(hpx::components::server::locality_results(blocks_particles), particles);
 
         ///////////////////////////////////////////////////////////////////////
         // Initialize the particles and points with the data from the input
@@ -97,7 +99,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::vector<hpx::lcos::promise<void> > initial_phase;
 
         for (std::size_t i=0;i<num_gridpoints;i++) {
-          initial_phase.push_back(points[i].init_async(i,meshfile));
+          initial_phase.push_back(points[i].init_async(i,max_num_neighbors,meshfile));
         }
 
         for (std::size_t i=0;i<num_particles;i++) {
@@ -147,20 +149,22 @@ int main(int argc, char* argv[])
 {
     using boost::program_options::value;
 
-    // Configure application-specific options
+    // Configure application-specific options.
     boost::program_options::options_description
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()
         ("n", value<std::size_t>()->default_value(5),
-            "the number of gridpoints in the mesh")
+            "the number of gridpoints")
         ("np", value<std::size_t>()->default_value(5),
-            "the number of particles in the mesh")
+            "the number of particles")
+        ("max-num-neighbors", value<std::size_t>()->default_value(20),
+            "the maximum number of neighbors")
         ("mesh", value<std::string>()->default_value("mesh.txt"),
             "the file containing the mesh")
         ("particles", value<std::string>()->default_value("particles.txt"),
             "the file containing the particles");
 
-    return hpx::init(desc_commandline, argc, argv); // Initialize and run HPX
+    return hpx::init(desc_commandline, argc, argv); // Initialize and run HPX.
 }
 

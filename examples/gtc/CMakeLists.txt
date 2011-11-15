@@ -23,6 +23,7 @@ source_group("Source Files" FILES ${sources})
 set(dependencies
     point_component
     particle_component
+    iostreams_component
     distributing_factory_component)
 
   # add example executable

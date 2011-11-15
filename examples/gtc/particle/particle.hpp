@@ -6,7 +6,6 @@
 #if !defined(HPX_COMPONENTS_CLIENT_PARTICLE)
 #define HPX_COMPONENTS_CLIENT_PARTICLE
 
-#include <hpx/hpx.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 
 #include "stubs/particle.hpp"
@@ -14,63 +13,73 @@
 namespace hpx { namespace geometry
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// The \a stubs#particle class is the client side representation of all
-    /// \a server#particle components
-    class particle
-        : public components::client_base<particle, stubs::particle>
+    /// The client side representation of a \a hpx::geometry::server::particle
+    /// components.
+    class particle : public components::client_base<particle, stubs::particle>
     {
         typedef components::client_base<particle, stubs::particle>
             base_type;
 
     public:
         /// Default construct an empty client side representation (not
-        /// connected to any existing component)
+        /// connected to any existing component).
         particle()
         {}
 
-        /// Create client side representation from a newly create component
-        /// instance.
-        particle(naming::id_type where, double x, double y)
-          : base_type(base_type::create_sync(where))    // create component
-        {
-            //init(x, y);   // initialize coordinates
-        }
-
         /// Create a client side representation for the existing
-        /// \a server#particle instance with the given global id \a gid.
-        particle(naming::id_type gid)
+        /// \a hpx::geometry::server::particle instance with the given GID.
+        particle(naming::id_type const& gid)
           : base_type(gid)
         {}
 
         ///////////////////////////////////////////////////////////////////////
-        // exposed functionality of this component
+        // Exposed functionality of this component.
 
-        /// Initialize the server#particle instance with the given \a gid
-        lcos::promise<void> init_async(std::size_t objectid,std::string graphfile)
+        /// Initialize the \a hpx::geometry::server::particle instance with the
+        /// given particle file. 
+        lcos::promise<void> init_async(std::size_t objectid,std::string const& particlefile)
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::init_async(gid_,objectid,graphfile);
+            return this->base_type::init_async(gid_,objectid,particlefile);
         }
 
-        void init(std::size_t objectid,std::string graphfile)
+        /// Initialize the \a hpx::geometry::server::particle instance with the
+        /// given particle file.  
+        void init(std::size_t objectid,std::string const& particlefile)
         {
             BOOST_ASSERT(gid_);
-            this->base_type::init(gid_,objectid,graphfile);
+            this->base_type::init(gid_,objectid,particlefile);
         }
 
+        /// Compute the distance from the particle to the specified coordinates. 
         lcos::promise<double> distance_async(double posx, double posy, double posz)
         {
-          BOOST_ASSERT(gid_);
-          return this->base_type::distance_async(gid_,posx,posy,posz);
+            BOOST_ASSERT(gid_);
+            return this->base_type::distance_async(gid_,posx,posy,posz);
         }
 
+        /// Compute the distance from the particle to the specified coordinates. 
         double distance(double posx, double posy, double posz) 
         {
-          BOOST_ASSERT(gid_);
-          return this->base_type::distance(gid_,posx,posy,posz);
+            BOOST_ASSERT(gid_);
+            return this->base_type::distance(gid_,posx,posy,posz);
         }
 
+        /// Get the index of the particle.
+        lcos::promise<std::size_t> get_index_async()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_index_async(gid_);
+        }
+
+        /// Get the index of the particle.
+        std::size_t get_index()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_index(gid_);
+        }
     };
 }}
 
 #endif
+

@@ -9,7 +9,6 @@ set(subdirs
     accumulator
     balancing
     quickstart
-    object_semaphore
     random_mem_access
    )
 
