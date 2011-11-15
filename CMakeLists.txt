@@ -6,8 +6,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# We require at least CMake V2.6.4
-cmake_minimum_required(VERSION 2.6.4 FATAL_ERROR)
+# We require at least CMake V2.8.4
+cmake_minimum_required(VERSION 2.8.4 FATAL_ERROR)
 
 ################################################################################
 # C++ overrides
@@ -55,7 +55,6 @@ include_directories(${hpx_SOURCE_DIR}/external/logging)
 include_directories(${hpx_SOURCE_DIR}/external/lockfree)
 include_directories(${hpx_SOURCE_DIR}/external/plugin)
 include_directories(${hpx_SOURCE_DIR}/external/backtrace)
-include_directories(${hpx_SOURCE_DIR}/external/serialization)
 link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
 
 ################################################################################
@@ -217,11 +216,8 @@ endif()
 if(NOT HPX_STACK_SIZE)
   if(MSVC)
     set(HPX_STACK_SIZE "0x4000" CACHE STRING "pxthread stack size" FORCE)
-  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Debug" OR
-     "CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
-    set(HPX_STACK_SIZE "0x10000" CACHE STRING "pxthread stack size" FORCE)
   else()
-    set(HPX_STACK_SIZE "0x8000" CACHE STRING "pxthread stack size" FORCE)
+    set(HPX_STACK_SIZE "0x10000" CACHE STRING "pxthread stack size" FORCE)
   endif()
 else()
   set(HPX_STACK_SIZE "${HPX_STACK_SIZE}" CACHE STRING "pxthread stack size" FORCE)
