@@ -253,7 +253,11 @@ namespace hpx { namespace components { namespace server
     HPX_COMPONENT_EXPORT
     std::pair<locality_result_iterator, locality_result_iterator>
         locality_results(distributing_factory::result_type const& v);
-}}}
+}
+
+using server::locality_results;
+
+}}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace traits
