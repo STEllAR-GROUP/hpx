@@ -6,8 +6,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# We require at least CMake V2.6.4
-cmake_minimum_required(VERSION 2.6.4 FATAL_ERROR)
+# We require at least CMake V2.8.4
+cmake_minimum_required(VERSION 2.8.4 FATAL_ERROR)
 
 ################################################################################
 # C++ overrides
