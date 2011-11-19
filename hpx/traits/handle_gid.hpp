@@ -37,7 +37,7 @@ namespace hpx { namespace traits
     {
         static bool call(naming::id_type const &id, F const& f)
         {
-            f(id);
+            f(boost::ref(id));
             return true;
         }
     };
