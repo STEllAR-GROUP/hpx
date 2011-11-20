@@ -26,6 +26,7 @@ namespace hpx { namespace lcos { namespace server
         dataflow()
             : component_ptr(0)
         {
+            util::spinlock::scoped_lock l(detail::dataflow_counter_data_.mtx_);
             ++detail::dataflow_counter_data_.constructed_;
         }
 
@@ -59,6 +60,8 @@ namespace hpx { namespace lcos { namespace server
                 component_ptr = w;
             }
             (*w)->init();
+
+            util::spinlock::scoped_lock l(detail::dataflow_counter_data_.mtx_);
             ++detail::dataflow_counter_data_.initialized_;
         }
 
@@ -90,6 +93,8 @@ namespace hpx { namespace lcos { namespace server
                 component_ptr = w;                                              \
             }                                                                   \
             (*w)->init(BOOST_PP_ENUM_PARAMS(N, a));                             \
+                                                                                \
+            util::spinlock::scoped_lock l(detail::dataflow_counter_data_.mtx_); \
             ++detail::dataflow_counter_data_.initialized_;                      \
         }                                                                       \
     /**/

@@ -30,6 +30,7 @@
 #include <examples/bright_future/dataflow/server/detail/component_wrapper.hpp>
 
 #include <hpx/util/demangle_helper.hpp>
+#include <hpx/util/spinlock.hpp>
 
 namespace hpx { namespace lcos { namespace server { namespace detail {
 
@@ -44,6 +45,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
         boost::int64_t constructed_;
         boost::int64_t initialized_;
         boost::int64_t fired_;
+        util::spinlock mtx_;
     };
     extern HPX_COMPONENT_EXPORT dataflow_counter_data dataflow_counter_data_;
 
@@ -381,6 +383,8 @@ namespace hpx { namespace traits
                   , action_id
                   , args
                 );
+
+                util::spinlock::scoped_lock l(dataflow_counter_data_.mtx_);
                 ++dataflow_counter_data_.fired_;
             }
             LLCO_(info)

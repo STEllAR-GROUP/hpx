@@ -42,16 +42,19 @@ namespace hpx { namespace lcos { namespace server { namespace detail
 
     boost::int64_t get_constructed_count()
     {
+        util::spinlock::scoped_lock l(dataflow_counter_data_.mtx_);
         return dataflow_counter_data_.constructed_;
     }
 
     boost::int64_t get_initialized_count()
     {
+        util::spinlock::scoped_lock l(dataflow_counter_data_.mtx_);
         return dataflow_counter_data_.initialized_;
     }
 
     boost::int64_t get_fired_count()
     {
+        util::spinlock::scoped_lock l(dataflow_counter_data_.mtx_);
         return dataflow_counter_data_.fired_;
     }
 
@@ -75,15 +78,15 @@ namespace hpx { namespace lcos { namespace server { namespace detail
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
 
         boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
-        boost::format full_empty_counter("/dataflow(locality#%d/total)/%s");
+        boost::format dataflow_counter("/dataflow(locality#%d/total)/%s");
 
         performance_counters::raw_counter_data const counters[] =
         {
-            { boost::str(full_empty_counter % prefix % "constructed"),
+            { boost::str(dataflow_counter % prefix % "constructed"),
               get_constructed_count },
-            { boost::str(full_empty_counter % prefix % "initialized"),
+            { boost::str(dataflow_counter % prefix % "initialized"),
               get_initialized_count },
-            { boost::str(full_empty_counter % prefix % "fired"),
+            { boost::str(dataflow_counter % prefix % "fired"),
               get_fired_count },
         };
 
