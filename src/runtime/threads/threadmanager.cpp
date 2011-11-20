@@ -1041,7 +1041,7 @@ namespace hpx { namespace threads
             // Get the next PX thread from the queue
             thread* thrd = NULL;
             if (scheduler_.get_next_thread(num_thread,
-                    state_.load() == running, idle_loop_count, &thrd))
+                    state_.load() == running, idle_loop_count, thrd))
             {
                 idle_loop_count = 0;
 

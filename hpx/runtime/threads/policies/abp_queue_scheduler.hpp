@@ -162,7 +162,7 @@ struct abp_queue_scheduler : boost::noncopyable
     // Return the next thread to be executed, return false if none is available
     // TODO: shouldn't we try to fill the queue before stealing?
     bool get_next_thread(std::size_t num_thread, bool running,
-                         std::size_t& idle_loop_count, threads::thread** thrd)
+                         std::size_t& idle_loop_count, threads::thread*& thrd)
     {
         // first try to get the next thread from our own queue
         BOOST_ASSERT(num_thread < queues_.size());

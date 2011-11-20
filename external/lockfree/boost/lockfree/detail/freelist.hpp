@@ -1,6 +1,6 @@
 //  lock-free freelist
 //
-//  Copyright (C) 2008, 2009 Tim Blechmann
+//  Copyright (C) 2008, 2009, 2011 Tim Blechmann
 //
 //  Distributed under the Boost Software License, Version 1.0. (See
 //  accompanying file LICENSE_1_0.txt or copy at
@@ -13,7 +13,7 @@
 
 #include <boost/lockfree/detail/tagged_ptr.hpp>
 
-#include <boost/atomic.hpp>
+#include <boost/lockfree/detail/atomic.hpp>
 #include <boost/noncopyable.hpp>
 
 #include <boost/mpl/map.hpp>
@@ -21,222 +21,217 @@
 #include <boost/mpl/at.hpp>
 #include <boost/type_traits/is_pod.hpp>
 
-#include <cstring>
 #include <algorithm>            /* for std::min */
 
 namespace boost
 {
 namespace lockfree
 {
-
-template <typename T, typename Alloc = std::allocator<T> >
-class caching_freelist:
-    private boost::noncopyable,
-    private Alloc
+namespace detail
 {
-    struct freelist_node
-    {
-        lockfree::tagged_ptr<freelist_node> next;
-    };
 
-    typedef lockfree::tagged_ptr<freelist_node> tagged_ptr;
+struct freelist_node
+{
+    tagged_ptr<freelist_node> next;
+};
+
+template <typename T,
+          bool allocate_may_allocate,
+          typename Alloc = std::allocator<T>
+         >
+class freelist_stack:
+    Alloc
+{
+    typedef tagged_ptr<freelist_node> tagged_node_ptr;
 
 public:
-    caching_freelist(void):
-        pool_(tagged_ptr(NULL, 0))
-    {}
-
-    explicit caching_freelist(std::size_t initial_nodes):
-        pool_(tagged_ptr(NULL, 0))
+    freelist_stack (std::size_t n = 0):
+        pool_(tagged_node_ptr(NULL))
     {
-        for (std::size_t i = 0; i != initial_nodes; ++i)
-        {
-            T * node = Alloc::allocate(1);   // initialize once
-            std::memset(node, '\0', sizeof(T));
+        reserve_unsafe(n);
+    }
+
+    void reserve (std::size_t count)
+    {
+        for (std::size_t i = 0; i != count; ++i) {
+            T * node = Alloc::allocate(1);
             deallocate(node);
         }
     }
 
-    ~caching_freelist(void)
+    void reserve_unsafe (std::size_t count)
     {
-        free_memory_pool();
+        for (std::size_t i = 0; i != count; ++i) {
+            T * node = Alloc::allocate(1);
+            deallocate_unsafe(node);
+        }
+    }
+
+    T * construct (void)
+    {
+        T * node = allocate();
+        if (node)
+            new(node) T();
+        return node;
+    }
+
+    template <typename ArgumentType>
+    T * construct (ArgumentType const & arg)
+    {
+        T * node = allocate();
+        if (node)
+            new(node) T(arg);
+        return node;
+    }
+
+    T * construct_unsafe (void)
+    {
+        T * node = allocate_unsafe();
+        if (node)
+            new(node) T();
+        return node;
+    }
+
+    template <typename ArgumentType>
+    T * construct_unsafe (ArgumentType const & arg)
+    {
+        T * node = allocate_unsafe();
+        if (node)
+            new(node) T(arg);
+        return node;
+    }
+
+
+    void destruct (T * n)
+    {
+        n->~T();
+        deallocate(n);
+    }
+
+    void destruct_unsafe (T * n)
+    {
+        n->~T();
+        deallocate_unsafe(n);
     }
 
     T * allocate (void)
     {
-        for(;;)
-        {
-            tagged_ptr old_pool = pool_.load(memory_order_consume);
+        tagged_node_ptr old_pool = pool_.load(memory_order_consume);
 
+        for(;;) {
             if (!old_pool.get_ptr()) {
-                T* node = Alloc::allocate(1);   // initialize once
-                std::memset(node, '\0', sizeof(T));
-                return node;
+                if (allocate_may_allocate)
+                    return Alloc::allocate(1);
+                else
+                    return 0;
             }
 
             freelist_node * new_pool_ptr = old_pool->next.get_ptr();
-            tagged_ptr new_pool (new_pool_ptr, old_pool.get_tag() + 1);
+            tagged_node_ptr new_pool (new_pool_ptr, old_pool.get_tag() + 1);
 
-            if (pool_.compare_exchange_strong(old_pool, new_pool)) {
+            if (pool_.compare_exchange_weak(old_pool, new_pool)) {
                 void * ptr = old_pool.get_ptr();
                 return reinterpret_cast<T*>(ptr);
             }
         }
     }
 
-    T* get(void)
+    T * allocate_unsafe (void)
     {
-        for(;;)
-        {
-            tagged_ptr old_pool = pool_.load(memory_order_consume);
+        tagged_node_ptr old_pool = pool_.load(memory_order_relaxed);
 
-            if (!old_pool.get_ptr())
-                return NULL;
-
-            freelist_node * new_pool_ptr = old_pool->next.get_ptr();
-            tagged_ptr new_pool (new_pool_ptr, old_pool.get_tag() + 1);
-
-            if (pool_.compare_exchange_strong(old_pool, new_pool)) {
-                void * ptr = old_pool.get_ptr();
-                return reinterpret_cast<T*>(ptr);
-            }
+        if (!old_pool.get_ptr()) {
+            if (allocate_may_allocate)
+                return Alloc::allocate(1);
+            else
+                return 0;
         }
+
+        freelist_node * new_pool_ptr = old_pool->next.get_ptr();
+        tagged_node_ptr new_pool (new_pool_ptr, old_pool.get_tag() + 1);
+
+        pool_.store(new_pool, memory_order_relaxed);
+        void * ptr = old_pool.get_ptr();
+        return reinterpret_cast<T*>(ptr);
     }
 
     void deallocate (T * n)
     {
         void * node = n;
-        for(;;)
-        {
-            tagged_ptr old_pool = pool_.load(memory_order_consume);
+        tagged_node_ptr old_pool = pool_.load(memory_order_consume);
+        freelist_node * new_pool_ptr = reinterpret_cast<freelist_node*>(node);
 
-            freelist_node * new_pool_ptr = reinterpret_cast<freelist_node*>(node);
-            tagged_ptr new_pool (new_pool_ptr, old_pool.get_tag() + 1);
-
+        for(;;) {
+            tagged_node_ptr new_pool (new_pool_ptr, old_pool.get_tag());
             new_pool->next.set_ptr(old_pool.get_ptr());
 
-            if (pool_.compare_exchange_strong(old_pool, new_pool))
+            if (pool_.compare_exchange_weak(old_pool, new_pool))
                 return;
         }
     }
 
-private:
-    void free_memory_pool(void)
+    void deallocate_unsafe (T * n)
     {
-        tagged_ptr current (pool_);
+        void * node = n;
+        tagged_node_ptr old_pool = pool_.load(memory_order_relaxed);
+        freelist_node * new_pool_ptr = reinterpret_cast<freelist_node*>(node);
 
-        while (current)
-        {
-            void * n = current.get_ptr();
-            current = current->next;
-            Alloc::deallocate(reinterpret_cast<T*>(n), 1);
+        tagged_node_ptr new_pool (new_pool_ptr, old_pool.get_tag());
+        new_pool->next.set_ptr(old_pool.get_ptr());
+
+        pool_.store(new_pool, memory_order_relaxed);
+    }
+
+    ~freelist_stack(void)
+    {
+        tagged_node_ptr current (pool_);
+
+        while (current) {
+            freelist_node * current_ptr = current.get_ptr();
+            if (current_ptr)
+                current = current_ptr->next;
+            Alloc::deallocate((T*)current_ptr, 1);
         }
     }
 
-    atomic<tagged_ptr> pool_;
+    bool is_lock_free(void) const
+    {
+        return pool_.is_lock_free();
+    }
+
+private:
+    atomic<tagged_node_ptr> pool_;
+};
+
+} /* namespace detail */
+
+
+//////////////////////////////////////////////////////////////////////////////
+// backwards compatibility
+template <typename T, typename Alloc = std::allocator<T> >
+class caching_freelist : public detail::freelist_stack<T, true, Alloc>
+{
+public:
+    caching_freelist (std::size_t n = 0) 
+      : detail::freelist_stack<T, true, Alloc>(n)
+    {}
 };
 
 template <typename T, typename Alloc = std::allocator<T> >
-class static_freelist:
-    private Alloc
+class static_freelist :  public detail::freelist_stack<T, false, Alloc>
 {
-    struct freelist_node
-    {
-        lockfree::tagged_ptr<freelist_node> next;
-    };
-
-    typedef lockfree::tagged_ptr<freelist_node> tagged_ptr;
-
 public:
-    explicit static_freelist(std::size_t max_nodes):
-        pool_(tagged_ptr(NULL, 0)), total_nodes(max_nodes)
-    {
-        chunks = Alloc::allocate(max_nodes);
-        std::memset(chunks, '\0', max_nodes*sizeof(T));
-
-        for (std::size_t i = 0; i != max_nodes; ++i)
-        {
-            T* node = chunks + i;   // initialize once
-            deallocate(node);
-        }
-    }
-
-    ~static_freelist(void)
-    {
-        Alloc::deallocate(chunks, total_nodes);
-    }
-
-    T * allocate (void)
-    {
-        for(;;)
-        {
-            tagged_ptr old_pool = pool_.load(memory_order_consume);
-
-            if (!old_pool.get_ptr())
-                return NULL; /* allocation fails */
-
-            freelist_node * new_pool_ptr = old_pool->next.get_ptr();
-            tagged_ptr new_pool (new_pool_ptr, old_pool.get_tag() + 1);
-
-            if (pool_.compare_exchange_strong(old_pool, new_pool)) {
-                void * ptr = old_pool.get_ptr();
-                return reinterpret_cast<T*>(ptr);
-            }
-        }
-    }
-
-    void deallocate (T * n)
-    {
-        void * node = n;
-        for(;;)
-        {
-            tagged_ptr old_pool = pool_.load(memory_order_consume);
-
-            freelist_node * new_pool_ptr = reinterpret_cast<freelist_node*>(node);
-            tagged_ptr new_pool (new_pool_ptr, old_pool.get_tag());
-
-            new_pool->next.set_ptr(old_pool.get_ptr());
-
-            if (pool_.compare_exchange_strong(old_pool, new_pool))
-                return;
-        }
-    }
-
-private:
-    atomic<tagged_ptr> pool_;
-
-    const std::size_t total_nodes;
-    T* chunks;
+    static_freelist (std::size_t n = 0) 
+      : detail::freelist_stack<T, false, Alloc>(n)
+    {}
 };
 
 
 struct caching_freelist_t {};
 struct static_freelist_t {};
 
-namespace detail
-{
 
-#if 0
-template <typename T, typename Alloc, typename tag>
-struct select_freelist
-{
-private:
-    typedef typename Alloc::template rebind<T>::other Allocator;
 
-    typedef typename boost::lockfree::caching_freelist<T, Allocator> cfl;
-    typedef typename boost::lockfree::static_freelist<T, Allocator> sfl;
-
-    typedef typename boost::mpl::map<
-        boost::mpl::pair < caching_freelist_t, cfl/* typename boost::lockfree::caching_freelist<T, Alloc> */ >,
-        boost::mpl::pair < static_freelist_t,  sfl/* typename boost::lockfree::static_freelist<T, Alloc> */ >,
-        int
-        > freelists;
-public:
-    typedef typename boost::mpl::at<freelists, tag>::type type;
-};
-#endif
-
-} /* namespace detail */
 } /* namespace lockfree */
 } /* namespace boost */
 

@@ -164,7 +164,7 @@ namespace hpx { namespace threads { namespace policies
         /// Return the next thread to be executed, return false if non is
         /// available
         bool get_next_thread(std::size_t num_thread, bool running,
-            std::size_t& idle_loop_count, threads::thread** thrd)
+            std::size_t& idle_loop_count, threads::thread*& thrd)
         {
             // first try to get the next thread from our own queue
             BOOST_ASSERT(num_thread < queues_.size());

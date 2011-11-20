@@ -44,7 +44,7 @@ enum deque_status_type
 template <typename T>
 struct deque_node
 {
-    typedef tagged_ptr<deque_node> pointer;
+    typedef detail::tagged_ptr<deque_node> pointer;
     typedef atomic<pointer> atomic_pointer;
 
     typedef typename pointer::tag_t tag_t;

@@ -44,7 +44,7 @@ namespace hpx { namespace threads { namespace policies
     }
 
     inline bool
-    dequeue(work_item_queue_type& work_items, thread** thrd,
+    dequeue(work_item_queue_type& work_items, thread*& thrd,
         std::size_t num_thread)
     {
         return work_items.dequeue(thrd, num_thread);
@@ -68,7 +68,7 @@ namespace hpx { namespace threads { namespace policies
     }
 
     inline bool
-    dequeue(work_item_queue_type& work_items, thread** thrd,
+    dequeue(work_item_queue_type& work_items, thread*& thrd,
         std::size_t num_thread)
     {
         return work_items.dequeue(thrd);
@@ -131,7 +131,7 @@ namespace hpx { namespace threads { namespace policies
 
             boost::int64_t added = 0;
             task_description* task = 0;
-            while (add_count-- && addfrom->new_tasks_.dequeue(&task))
+            while (add_count-- && addfrom->new_tasks_.dequeue(task))
             {
                 --addfrom->new_tasks_count_;
 
@@ -254,7 +254,7 @@ namespace hpx { namespace threads { namespace policies
             {
                 boost::int64_t delete_count = max_delete_count;   // delete only this many threads
                 thread_id_type todelete;
-                while (delete_count && terminated_items_.dequeue(&todelete))
+                while (delete_count && terminated_items_.dequeue(todelete))
                 {
                     if (thread_map_.erase(todelete))
                         --delete_count;
@@ -354,7 +354,7 @@ namespace hpx { namespace threads { namespace policies
 
         /// Return the next thread to be executed, return false if non is
         /// available
-        bool get_next_thread(threads::thread** thrd, std::size_t num_thread)
+        bool get_next_thread(threads::thread*& thrd, std::size_t num_thread)
         {
             if (dequeue(work_items_, thrd, num_thread)) {
                 --work_items_count_;

@@ -35,11 +35,11 @@ inline void enqueue(Queue& workqueue, Value val)
 { workqueue.push_left(val); }
 
 template <typename Queue, typename Value>
-inline bool dequeue(Queue& workqueue, Value val)
+inline bool dequeue(Queue& workqueue, Value& val)
 { return workqueue.pop_left(val); }
 
 template <typename Queue, typename Value>
-inline bool steal(Queue& workqueue, Value val)
+inline bool steal(Queue& workqueue, Value& val)
 { return workqueue.pop_right(val); }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -83,7 +83,7 @@ struct thread_deque
         std::size_t added = 0;
         task_description const* task = 0;
 
-        while (add_count-- && dequeue(new_tasks_, &task))
+        while (add_count-- && dequeue(new_tasks_, task))
         {
             --new_tasks_count_;
 
@@ -139,7 +139,7 @@ struct thread_deque
         std::size_t added = 0;
         task_description const* task = 0;
 
-        while (add_count-- && steal(addfrom->new_tasks_, &task))
+        while (add_count-- && steal(addfrom->new_tasks_, task))
         {
             --addfrom->new_tasks_count_;
 
@@ -224,7 +224,7 @@ struct thread_deque
             // delete only this many threads
             boost::int64_t delete_count = max_delete_count;
             thread_id_type todelete;
-            while (delete_count && terminated_items_.dequeue(&todelete))
+            while (delete_count && terminated_items_.dequeue(todelete))
             {
                 if (thread_map_.erase(todelete))
                     --delete_count;
@@ -316,7 +316,7 @@ struct thread_deque
         return invalid_thread_id; // thread has not been created yet
     }
 
-    bool get_next_thread(threads::thread** thrd)
+    bool get_next_thread(threads::thread*& thrd)
     {
         if (dequeue(work_items_, thrd)) {
             --work_items_count_;
@@ -325,7 +325,7 @@ struct thread_deque
         return false;
     }
 
-    bool steal_next_thread(threads::thread** thrd)
+    bool steal_next_thread(threads::thread*& thrd)
     {
         if (steal(work_items_, thrd)) {
             --work_items_count_;

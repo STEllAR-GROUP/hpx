@@ -50,7 +50,7 @@ namespace hpx { namespace parcelset { namespace policies
             parcel* tmp;
 
             // Remove parcel from queue and decrement queue length.
-            if (parcels_.dequeue(&tmp))
+            if (parcels_.dequeue(tmp))
             {
                 std::swap(p, *tmp);
                 delete tmp;

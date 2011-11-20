@@ -6,7 +6,7 @@
 
 #include <boost/config.hpp>
 
-#if defined(__GNUC__) && (defined(__i386__) || defined(__amd64__) || defined(__x86_64__))
+#if (defined(__GNUC__) || defined(__INTEL_COMPILER)) && (defined(__i386__) || defined(__amd64__) || defined(__x86_64__))
 
     #include <boost/atomic/detail/gcc-x86.hpp>
 

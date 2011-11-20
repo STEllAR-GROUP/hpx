@@ -42,7 +42,7 @@
     #define BOOST_LOCKFREE_PTR_COMPRESSION 1
     #define BOOST_LOCKFREE_DCAS_ALIGNMENT __attribute__((aligned(16)))
 #elif defined(__alpha__)
-    #define BOOST_LOCKFREE_PTR_COMPRESSION 1
+    // LATER: alpha may benefit from pointer compression. but what is the maximum size of the address space?
     #define BOOST_LOCKFREE_DCAS_ALIGNMENT
 #endif
 #endif /* __GNUC__ */

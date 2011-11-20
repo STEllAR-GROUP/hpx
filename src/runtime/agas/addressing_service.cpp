@@ -515,7 +515,7 @@ struct checkout_promise
     checkout_promise(Pool& pool, Promise*& promise)
       : result_ok_(false), pool_(pool), promise_(promise)
     {
-        pool_.dequeue(&promise_);
+        pool_.dequeue(promise_);
         BOOST_ASSERT(promise_);
 
         promise_->reset(); // reset the promise

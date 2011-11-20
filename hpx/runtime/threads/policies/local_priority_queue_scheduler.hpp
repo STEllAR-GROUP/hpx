@@ -188,7 +188,7 @@ namespace hpx { namespace threads { namespace policies
         /// Return the next thread to be executed, return false if non is
         /// available
         bool get_next_thread(std::size_t num_thread, bool running,
-            std::size_t& idle_loop_count, threads::thread** thrd)
+            std::size_t& idle_loop_count, threads::thread*& thrd)
         {
             // master thread only: first try to get a priority thread
             if (num_thread < high_priority_queues_.size())
