@@ -239,8 +239,8 @@ void gs(
                         init_rhs_dataflow(
                             remote_id
                           , init_rhs_fun()
-                          , range_type(x, std::min(n_x, x + block_size))
-                          , range_type(y, std::min(n_y, y + block_size))
+                          , range_type(x, (std::min)(n_x, x + block_size))
+                          , range_type(y, (std::min)(n_y, y + block_size))
                         );
                 }
             }
@@ -261,8 +261,8 @@ void gs(
                         init_u_dataflow(   // invoke the init future.
                             remote_id
                           , init_u_fun() // pass the initialization function
-                          , range_type(x, std::min(n_x, x + block_size))
-                          , range_type(y, std::min(n_y, y + block_size))
+                          , range_type(x, (std::min)(n_x, x + block_size))
+                          , range_type(y, (std::min)(n_y, y + block_size))
                         );
                 }
             }
@@ -386,7 +386,7 @@ void gs(
                 }
             }
         }
-        
+
         cout << "finished building dataflow tree\n" << flush;
 
         // wait for the last iteration to finish.
