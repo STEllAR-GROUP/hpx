@@ -45,6 +45,7 @@ namespace hpx { namespace util { namespace detail
         boost::int64_t read_enqueued_;
         boost::int64_t read_dequeued_;
         boost::int64_t set_full_;
+        util::spinlock mtx_;
     };
     extern HPX_EXPORT full_empty_counter_data full_empty_counter_data_;
 
@@ -120,6 +121,8 @@ namespace hpx { namespace util { namespace detail
           : state_(empty)
         {
             ::new (get_address()) Data();      // properly initialize memory
+
+            util::spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
             ++full_empty_counter_data_.constructed_;
         }
 
@@ -128,6 +131,8 @@ namespace hpx { namespace util { namespace detail
           : state_(empty)
         {
             ::new (get_address()) Data(t0);    // properly initialize memory
+
+            util::spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
             ++full_empty_counter_data_.constructed_;
         }
 
@@ -140,6 +145,8 @@ namespace hpx { namespace util { namespace detail
                 log_non_empty_queue("read_queue", read_queue_);
             }
             get_address()->Data::~Data();      // properly destruct value in memory
+
+            util::spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
             ++full_empty_counter_data_.destructed_;
         }
 
@@ -188,7 +195,10 @@ namespace hpx { namespace util { namespace detail
                 typename queue_type::const_iterator last = read_queue_.last();
                 threads::thread_state_ex_enum statex;
 
-                ++full_empty_counter_data_.read_enqueued_;
+                {
+                    util::spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
+                    ++full_empty_counter_data_.read_enqueued_;
+                }
 
                 {
                     // yield this thread
@@ -196,7 +206,10 @@ namespace hpx { namespace util { namespace detail
                     statex = self->yield(threads::suspended);
                 }
 
-                ++full_empty_counter_data_.read_dequeued_;
+                {
+                    util::spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
+                    ++full_empty_counter_data_.read_dequeued_;
+                }
 
                 if (f.id_)
                     read_queue_.erase(last);     // remove entry from queue
@@ -248,7 +261,10 @@ namespace hpx { namespace util { namespace detail
                 typename queue_type::const_iterator last = read_queue_.last();
                 threads::thread_state_ex_enum statex;
 
-                ++full_empty_counter_data_.read_enqueued_;
+                {
+                    util::spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
+                    ++full_empty_counter_data_.read_enqueued_;
+                }
 
                 {
                     // yield this thread
@@ -256,7 +272,10 @@ namespace hpx { namespace util { namespace detail
                     statex = self->yield(threads::suspended);
                 }
 
-                ++full_empty_counter_data_.read_dequeued_;
+                {
+                    util::spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
+                    ++full_empty_counter_data_.read_dequeued_;
+                }
 
                 if (f.id_)
                     read_queue_.erase(last);     // remove entry from queue
@@ -576,6 +595,8 @@ namespace hpx { namespace util { namespace detail
                 read_queue_.pop_front();
                 threads::set_thread_lco_description(id);
                 threads::set_thread_state(id, threads::pending);
+
+                util::spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
                 ++full_empty_counter_data_.set_full_;
             }
 
