@@ -123,6 +123,7 @@ add_definitions(-DBOOST_COROUTINE_ARG_MAX=2)
 add_definitions(-DBOOST_LOG_NO_TSS)
 add_definitions(-DBOOST_LOG_NO_TS)
 add_definitions(-DBOOST_BIGINT_HAS_NATIVE_INT64)
+add_definitions(-DBOOST_NO_0X_HDR_ATOMIC)        # disable usage of std::atomics in lockfree
 
 ################################################################################
 # Compiler detection code
