@@ -13,7 +13,7 @@ namespace hpx
 {
     namespace traits
     {
-        template <typename T>
+        template <typename T, typename Dummy = void>
         struct is_dataflow
             : boost::mpl::false_
         {};

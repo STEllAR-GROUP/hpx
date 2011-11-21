@@ -36,7 +36,9 @@ namespace hpx { namespace lcos {
                 << "~dataflow::dataflow() ";
         }
 
-        typedef hpx::components::server::runtime_support::create_component_action create_component_action;
+        typedef
+            hpx::components::server::runtime_support::create_component_action
+            create_component_action;
 
 
         // MSVC chokes on having the lambda in the member initializer list below

@@ -8,6 +8,7 @@
 #define HPX_LCOS_DATAFLOW_SERVER_DETAIL_DATAFLOW_IMPL_HELPERS_HPP
 #include <examples/bright_future/dataflow/dataflow_base_fwd.hpp>
 #include <examples/bright_future/dataflow/dataflow_fwd.hpp>
+#include <examples/bright_future/dataflow/dataflow_trigger_fwd.hpp>
 #include <examples/bright_future/dataflow/is_dataflow.hpp>
 
 namespace hpx { namespace lcos { namespace server { namespace detail {
@@ -35,7 +36,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
         typedef typename boost::mpl::at_c<Vector, 2>::type type;
     };
 
-    template <typename T>
+    template <typename T, typename Dummy = void>
     struct dataflow_is_void
         : boost::mpl::false_
     {};
@@ -47,6 +48,11 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
 
     template <typename RemoteResult>
     struct dataflow_is_void<dataflow_base<void, RemoteResult> >
+        : boost::mpl::true_
+    {};
+    
+    template <typename Dummy>
+    struct dataflow_is_void<dataflow_trigger, Dummy>
         : boost::mpl::true_
     {};
 

@@ -23,6 +23,7 @@
 #include <boost/serialization/version.hpp>
 
 #include <examples/bright_future/dataflow/server/dataflow.hpp>
+#include <examples/bright_future/dataflow/server/dataflow_trigger.hpp>
 
 HPX_REGISTER_COMPONENT_MODULE();
 
@@ -33,6 +34,15 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_EX(
     bright_future_dataflow, true);
 
 HPX_DEFINE_GET_COMPONENT_TYPE(dataflow_type::wrapped_type);
+
+typedef hpx::components::managed_component<hpx::lcos::server::dataflow_trigger>
+    dataflow_trigger_type;
+
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_EX(
+    dataflow_trigger_type,
+    bright_future_dataflow_trigger, true);
+
+HPX_DEFINE_GET_COMPONENT_TYPE(dataflow_trigger_type::wrapped_type);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace server { namespace detail
@@ -63,13 +73,13 @@ namespace hpx { namespace lcos { namespace server { namespace detail
     {
         performance_counters::raw_counter_type_data const counter_types[] =
         {
-            { "/dataflow/constructed", performance_counters::counter_raw,
+            { "/bright_future/dataflow/constructed", performance_counters::counter_raw,
               "returns the number of constructed dataflow objects",
               HPX_PERFORMANCE_COUNTER_V1 },
-            { "/dataflow/initialized", performance_counters::counter_raw,
+            { "/bright_future/dataflow/initialized", performance_counters::counter_raw,
               "returns the number of initialized dataflow objects",
               HPX_PERFORMANCE_COUNTER_V1 },
-            { "/dataflow/fired", performance_counters::counter_raw,
+            { "/bright_future/dataflow/fired", performance_counters::counter_raw,
               "returns the number of fired dataflow objects",
               HPX_PERFORMANCE_COUNTER_V1 }
         };
@@ -78,7 +88,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
 
         boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
-        boost::format dataflow_counter("/dataflow(locality#%d/total)/%s");
+        boost::format dataflow_counter("/bright_future/dataflow(locality#%d/total)/%s");
 
         performance_counters::raw_counter_data const counters[] =
         {
@@ -101,5 +111,5 @@ namespace hpx { namespace lcos { namespace server { namespace detail
 // type and performance counter instances.
 //
 // Note that this macro can be used not more than once in one module.
-HPX_REGISTER_STARTUP_SHUTDOWN_MODULE(::hpx::lcos::server::detail::install_counters, 0);
+//HPX_REGISTER_STARTUP_SHUTDOWN_MODULE(::hpx::lcos::server::detail::install_counters, 0);
 

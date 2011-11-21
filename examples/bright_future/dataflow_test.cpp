@@ -19,6 +19,7 @@
 #include <boost/lockfree/fifo.hpp>
 
 #include <examples/bright_future/dataflow/dataflow.hpp>
+#include <examples/bright_future/dataflow/dataflow_trigger.hpp>
 
 using hpx::cout;
 using hpx::flush;
@@ -32,6 +33,7 @@ using hpx::finalize;
 using hpx::find_here;
 using hpx::lcos::promise;
 using hpx::lcos::dataflow;
+using hpx::lcos::dataflow_trigger;
 using hpx::lcos::dataflow_base;
 using hpx::util::high_resolution_timer;
 
@@ -140,6 +142,18 @@ int hpx_main(variables_map & vm)
                 )
             ).get()
             << "\n" << flush;
+
+        dataflow_trigger trigger(find_here());
+        trigger.add(dataflow<f1action>(find_here()));
+        trigger.add(dataflow<f2action>(find_here()));
+        trigger.add(dataflow<f3action>(find_here()));
+        trigger.add(dataflow<f4action>(find_here()));
+        trigger.add(dataflow<f5action>(find_here()));
+        trigger.add(dataflow<f6action>(find_here()));
+        trigger.add(dataflow<f7action>(find_here()));
+        trigger.add(dataflow<f8action>(find_here()));
+
+        dataflow<f9action>(find_here(), trigger).get();
 
         cout << "entering destruction test scope\n" << flush;
         {

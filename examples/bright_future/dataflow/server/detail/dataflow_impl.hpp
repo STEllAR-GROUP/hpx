@@ -315,21 +315,16 @@ namespace hpx { namespace traits
                 << ">::set_target() of "
                 << get_gid()
                 << " ";
+            typename hpx::util::spinlock::scoped_lock l(mtx);
 
-            bool fire_action = false;
-            {
-                typename hpx::util::spinlock::scoped_lock l(mtx);
-                fire_action = result_set;
-            }
-
-            if(fire_action)
+            if(result_set)
             {
                 typedef typename lco_type::set_result_action action_type;
+                l.unlock();
                 applier::apply<action_type>(target, result);
             }
             else
             {
-                typename hpx::util::spinlock::scoped_lock l(mtx);
                 targets.push_back(target);
             }
         }
@@ -370,8 +365,11 @@ namespace hpx { namespace traits
             bool apply_it = false;
             {
                 typename hpx::util::spinlock::scoped_lock l(mtx);
-                args_set |= (1<<Slot);
-                apply_it = (args_set == args_completed);
+                if(args_set != args_completed)
+                {
+                    args_set |= (1<<Slot);
+                    apply_it = (args_set == args_completed);
+                }
             }
             if(apply_it)
             {
