@@ -152,6 +152,7 @@ int hpx_main(variables_map & vm)
         trigger.add(dataflow<f6action>(find_here()));
         trigger.add(dataflow<f7action>(find_here()));
         trigger.add(dataflow<f8action>(find_here()));
+        trigger.set_trigger_size(8);
 
         dataflow<f9action>(find_here(), trigger).get();
 

@@ -23,6 +23,7 @@
 #include <boost/serialization/version.hpp>
 
 #include <examples/bright_future/dataflow/server/dataflow.hpp>
+#include <hpx/include/iostreams.hpp>
 #include <examples/bright_future/dataflow/server/dataflow_trigger.hpp>
 
 HPX_REGISTER_COMPONENT_MODULE();

@@ -28,11 +28,12 @@ namespace hpx { namespace lcos { namespace server
         dataflow_trigger()
             : all_set(false)
             , slots_set(0)
-            , slots_completed(0)
+            , slots_completed(~0u)
         {}
 
         ~dataflow_trigger()
         {
+            trigger_targets();
             BOOST_FOREACH(detail::component_wrapper_base * c, triggers)
             {
                 delete c;
@@ -51,32 +52,49 @@ namespace hpx { namespace lcos { namespace server
                     >
                 >
                 component_type;
-
-            component_type * w = new component_type(this, source, triggers.size());
-            (*w)->connect();
-
+            component_type * w;
             {
                 hpx::util::spinlock::scoped_lock l(mtx);
-                slots_completed |= (1<<triggers.size());
+                w = new component_type(this, source, triggers.size());
+                //slots_completed |= (1<<triggers.size());
                 triggers.push_back(w);
             }
+            (*w)->connect();
         }
+
+        void set_trigger_size(unsigned size)
+        {
+            {
+                hpx::util::spinlock::scoped_lock l(mtx);
+                slots_completed = 0;
+                for(unsigned i = 0; i < size; ++i)
+                {
+                    slots_completed |= (1<<i);
+                }
+            }
+            trigger_targets();
+        }
+
+        typedef
+            ::hpx::actions::action1<
+                dataflow_trigger
+              , 0
+              , unsigned
+              , &dataflow_trigger::set_trigger_size
+            >
+            set_trigger_size_action;
 
         void connect(naming::id_type const & target)
         {
-            bool all_set_loc = false;
-            {
-                hpx::util::spinlock::scoped_lock l(mtx);
-                all_set_loc = all_set;
-            }
-            if(all_set_loc)
+            hpx::util::spinlock::scoped_lock l(mtx);
+            if(all_set)
             {
                 typedef typename hpx::lcos::base_lco::set_event_action action_type;
+                l.unlock();
                 applier::apply<action_type>(target);
             }
             else
             {
-                hpx::util::spinlock::scoped_lock l(mtx);
                 targets.push_back(target);
             }
         }
@@ -92,17 +110,14 @@ namespace hpx { namespace lcos { namespace server
 
         void set_slot(unsigned index)
         {
-            bool all_set_loc = false;
             {
                 typename hpx::util::spinlock::scoped_lock l(mtx);
-                slots_set |= (1<<index);
-                all_set_loc = (slots_set == slots_completed);
-                all_set = all_set_loc;
+                if(slots_set != slots_completed)
+                {
+                    slots_set |= (1<<index);
+                }
             }
-            if(all_set_loc)
-            {
-                trigger_targets();
-            }
+            trigger_targets();
         }
         
         void trigger_targets()
@@ -110,6 +125,7 @@ namespace hpx { namespace lcos { namespace server
             std::vector<naming::id_type> t;
             {
                 typename hpx::util::spinlock::scoped_lock l(mtx);
+                all_set = (slots_set == slots_completed);
                 if(all_set == false) return;
                 std::swap(targets, t);
             }

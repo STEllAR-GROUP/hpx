@@ -46,6 +46,24 @@ namespace hpx { namespace lcos {
                 action_type;
             applier::apply<action_type>(get_gid(), df);
         }
+
+        template <typename Result, typename RemoteResult>
+        void add_last(dataflow_base<Result, RemoteResult> const & df)
+        {
+            typedef
+                typename hpx::lcos::server::add_action<Result, RemoteResult>::type
+                action_type;
+            //applier::apply<action_type>(get_gid(), df);
+            wait(async<action_type>(get_gid(), df));
+        }
+
+        void set_trigger_size(unsigned size)
+        {
+            typedef
+                typename hpx::lcos::server::dataflow_trigger::set_trigger_size_action
+                action_type;
+            applier::apply<action_type>(get_gid(), size);
+        }
     };
 }}
 
