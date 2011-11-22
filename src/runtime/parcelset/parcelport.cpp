@@ -10,6 +10,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/runtime/naming/locality.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/stringstream.hpp>
@@ -30,7 +31,7 @@ namespace hpx { namespace parcelset
       : io_service_pool_(io_service_pool),
         acceptor_(NULL),
         parcels_(This()),
-        connection_cache_(HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE, "  [PT] "),
+        connection_cache_(HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE),
         here_(here)
     {}
 
@@ -152,7 +153,20 @@ namespace hpx { namespace parcelset
     {
         const boost::uint32_t prefix =
             naming::get_prefix_from_gid(p.get_destination());
+
         parcelport_connection_ptr client_connection(connection_cache_.get(prefix));
+
+//        if (!client_connection) {
+//            if (threads::get_self_ptr()) 
+//                hpx::threads::suspend(
+//                    boost::posix_time::milliseconds(500));
+//            else
+//                boost::this_thread::sleep(boost::get_system_time() +
+//                    boost::posix_time::milliseconds(500));
+           
+            // Try again. 
+//            client_connection = connection_cache_.get(prefix);
+//        }                
 
         if (!client_connection) {
 //                 LPT_(info) << "parcelport: creating new connection to: "
