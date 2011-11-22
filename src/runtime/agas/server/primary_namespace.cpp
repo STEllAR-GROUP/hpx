@@ -413,11 +413,11 @@ response primary_namespace::bind_gid(
     return response(primary_ns_bind_gid);
 } // }}}
 
-response primary_namespace::resolve_gid (
+response primary_namespace::resolve_gid(
     request const& req
   , error_code& ec
     )
-{ // {{{ resolve_gid  implementation
+{ // {{{ resolve_gid implementation
     // parameters
     naming::gid_type id = req.get_gid();
     naming::strip_credit_from_gid(id);
