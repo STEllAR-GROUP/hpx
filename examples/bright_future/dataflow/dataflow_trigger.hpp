@@ -19,13 +19,13 @@ namespace hpx { namespace lcos {
         typedef void result_type;
 
         typedef dataflow_base<void> base_type;
-        
+
         typedef
             hpx::components::server::runtime_support::create_component_action
             create_component_action;
-        
+
         typedef stubs::dataflow_trigger stub_type;
-        
+
         dataflow_trigger() {}
 
         explicit dataflow_trigger(naming::id_type const & id)
@@ -60,7 +60,7 @@ namespace hpx { namespace lcos {
         void set_trigger_size(unsigned size)
         {
             typedef
-                typename hpx::lcos::server::dataflow_trigger::set_trigger_size_action
+                hpx::lcos::server::dataflow_trigger::set_trigger_size_action
                 action_type;
             applier::apply<action_type>(get_gid(), size);
         }
@@ -68,18 +68,18 @@ namespace hpx { namespace lcos {
 }}
 
 namespace hpx { namespace traits {
-        template <typename F>
-        struct handle_gid<hpx::lcos::dataflow_trigger, F>
+    template <typename F>
+    struct handle_gid<hpx::lcos::dataflow_trigger, F>
+    {
+        static bool call(
+            hpx::lcos::dataflow_trigger const &df
+          , F const& f
+        )
         {
-            static bool call(
-                hpx::lcos::dataflow_trigger const &df
-              , F const& f
-            )
-            {
-                f(df.get_gid());
-                return true;
-            }
-        };
+            f(df.get_gid());
+            return true;
+        }
+    };
 }}
 
 #endif
