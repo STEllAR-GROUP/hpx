@@ -851,6 +851,9 @@ bool addressing_service::resolve(
         if (ec)
             return false;
 
+        if (&ec != &throws)
+            ec = make_success_code();
+
         return true;
     }
     catch (hpx::exception const& e) {
@@ -1252,7 +1255,7 @@ void addressing_service::update_cache(
     try {
         mutex_type::scoped_lock lock(gva_cache_mtx_);
 
-        gva_cache_key key(gid, g.count);
+        gva_cache_key key(gid, g.count ? g.count : 1);
         gva_cache_.insert(key, g);
 
         if (&ec != &throws)
