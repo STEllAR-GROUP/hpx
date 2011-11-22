@@ -59,6 +59,8 @@ namespace hpx { namespace util
 
         bool get_agas_range_caching_mode() const;
 
+        std::size_t get_agas_max_resolve_requests() const;
+
         // Load application specific configuration and merge it with the
         // default configuration loaded from hpx.ini
         bool load_application_configuration(char const* filename,

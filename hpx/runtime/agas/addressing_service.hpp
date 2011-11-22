@@ -185,6 +185,8 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     mutable mutex_type console_cache_mtx_;
     boost::uint32_t console_cache_;
 
+    hpx::lcos::local_counting_semaphore resolve_throttle_;
+
     const service_mode service_type;
     const runtime_mode runtime_type;
 

@@ -45,6 +45,8 @@ namespace hpx { namespace util
             "address = ${HPX_AGAS_SERVER_ADDRESS:" HPX_INITIAL_IP_ADDRESS "}",
             "port = ${HPX_AGAS_SERVER_PORT:"
                 BOOST_PP_STRINGIZE(HPX_INITIAL_IP_PORT) "}",
+            "max_resolve_requests = ${HPX_AGAS_MAX_RESOLVE_REQUESTS:"
+                BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_MAX_RESOLVE_REQUESTS) "}",
             "service_mode = hosted",
             "gva_cache_size = ${HPX_AGAS_GVA_CACHE_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_GVA_CACHE_SIZE) "}",
@@ -281,6 +283,19 @@ namespace hpx { namespace util
             }
         }
         return false;
+    }
+
+    std::size_t runtime_configuration::get_agas_max_resolve_requests() const
+    {
+        if (has_section("hpx.agas")) {
+            util::section const* sec = get_section("hpx.agas");
+            if (NULL != sec) {
+                return boost::lexical_cast<std::size_t>(
+                    sec->get_entry("max_resolve_requests",
+                        HPX_INITIAL_AGAS_MAX_RESOLVE_REQUESTS));
+            }
+        }
+        return HPX_INITIAL_AGAS_MAX_RESOLVE_REQUESTS;
     }
 
     bool runtime_configuration::get_itt_notify_mode() const

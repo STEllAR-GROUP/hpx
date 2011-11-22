@@ -24,6 +24,7 @@ addressing_service::addressing_service(
   , runtime_mode runtime_type_
     )
   : console_cache_(0)
+  , resolve_throttle_(ini_.get_agas_max_resolve_requests())
   , service_type(ini_.get_agas_service_mode())
   , runtime_type(runtime_type_)
   , caching_(ini_.get_agas_caching_mode())
@@ -818,6 +819,8 @@ bool addressing_service::resolve(
             return true;
         }
         // }}}
+
+        lock_semaphore lock(resolve_throttle_);
 
         // Try the cache if applicable.
         if (try_cache && caching_)
