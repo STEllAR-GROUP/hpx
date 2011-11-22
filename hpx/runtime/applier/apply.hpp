@@ -35,7 +35,7 @@ namespace hpx { namespace applier
     ///    appl_.apply<add_action>(gid, ...);
     /// \endcode
 
-    // we know, it's remote
+    // We know it is remote.
     template <typename Action>
     inline bool
     apply_r_p(naming::address& addr, naming::id_type const& gid,
@@ -84,7 +84,7 @@ namespace hpx { namespace applier
         return apply_r_p_route<Action>(addr, gid, action_priority<Action>())    ;   
     }
 
-    // we  know, it's local and has to be directly executed
+    // We know it is local and has to be directly executed.
     template <typename Action>
     inline bool
     apply_l_p(naming::address const& addr, threads::thread_priority priority)
@@ -220,8 +220,6 @@ namespace hpx { namespace applier
         return false;     // destination is remote
     }
 
-    //disallow sync apply route
-    
     template <typename Action>
     inline bool
     apply_r_sync (naming::address& addr, naming::id_type const& gid)
@@ -229,7 +227,7 @@ namespace hpx { namespace applier
         return apply_r_sync_p<Action>(addr, gid, action_priority<Action>());
     }
 
-    // we know, it's local and has to be directly executed
+    // We know it is local and has to be directly executed.
     template <typename Action>
     inline bool apply_l_p(actions::continuation* c,
         naming::address const& addr, threads::thread_priority priority)
