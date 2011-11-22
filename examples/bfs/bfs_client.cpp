@@ -7,18 +7,19 @@
 #include <hpx/hpx_init.hpp>
 
 #include "bfs/point.hpp"
+
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
-/// This function initializes a vector of \a hpx#geometry#point clients, 
+/// This function initializes a vector of \a bfs::point clients, 
 /// connecting them to components created with
-/// \a hpx#components#distributing_factory.
+/// \a hpx::components::distributing_factory.
 inline void
 init(hpx::components::server::distributing_factory::iterator_range_type const& r,
-    std::vector<hpx::geometry::point>& p)
+    std::vector<bfs::point>& p)
 {
     BOOST_FOREACH(hpx::naming::id_type const& id, r)
     {
-        p.push_back(hpx::geometry::point(id));
+        p.push_back(bfs::point(id));
     }
 }
 
@@ -49,8 +50,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         // Get the component type for our point component.
         hpx::components::component_type block_type =
-            hpx::components::get_component_type<
-                hpx::geometry::point::server_component_type>();
+            hpx::components::get_component_type<bfs::server::point>();
 
         // Create num_elements point components with distributing factory.
         // These components will be evenly distributed among all available
@@ -61,7 +61,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         ///////////////////////////////////////////////////////////////////////
         // This vector will hold client classes referring to all of the
         // components we just created.
-        std::vector<hpx::geometry::point> points;
+        std::vector<bfs::point> points;
 
         // Populate the client vectors. 
         init(hpx::components::server::locality_results(blocks), points);
@@ -126,7 +126,7 @@ int hpx_main(boost::program_options::variables_map &vm)
                 parents[k].push_back( neighbors[i][j] ); 
 
                 // Create a future encapsulating an asynchronous call to
-                // the traverse action of hpx::geometry::point. 
+                // the traverse action of bfs::point. 
                 traverse_phase.push_back(points[ neighbors[i][j] ].traverse_async(k,parent));
               } 
             }
@@ -146,7 +146,7 @@ int hpx_main(boost::program_options::variables_map &vm)
                 parents[k].push_back( alt_neighbors[i][j] ); 
 
                 // Create a future encapsulating an asynchronous call to
-                // the traverse action of hpx::geometry::point. 
+                // the traverse action of bfs::point. 
                 traverse_phase.push_back(points[ alt_neighbors[i][j] ].traverse_async(k,parent));
               } 
             }

@@ -24,7 +24,7 @@ namespace sheneos
             partition3d, sheneos::stubs::partition3d> base_type;
 
     public:
-        // create a new partition instance and initialize it synchronously
+        /// Create a new partition instance and initialize it synchronously.
         partition3d(std::string const& datafilename, dimension const& dimx,
                 dimension const& dimy, dimension const& dimz)
           : base_type(sheneos::stubs::partition3d::create_sync(hpx::find_here()))
@@ -41,7 +41,7 @@ namespace sheneos
           : base_type(gid)
         {}
 
-        // initialize this partition
+        /// Initialize this partition.
         hpx::lcos::promise<void>
         init_async(std::string const& datafilename,
             dimension const& dimx, dimension const& dimy, dimension const& dimz)
@@ -56,8 +56,9 @@ namespace sheneos
             stubs::partition3d::init(this->gid_, datafilename, dimx, dimy, dimz);
         }
 
-        // ask this partition to interpolate, note that value must be in the
-        // range valid for this partition
+        /// Perform an interpolation on this partition.
+        /// 
+        /// \note \a eosvalues must be in the range of this partition.
         hpx::lcos::promise<std::vector<double> >
         interpolate_async(double ye, double temp, double rho,
             boost::uint32_t eosvalues)

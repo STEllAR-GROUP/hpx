@@ -20,7 +20,7 @@
 #include <fstream>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace geometry { namespace server
+namespace gtc { namespace server
 {
     void point::init(std::size_t objectid,std::size_t max_num_neighbors,
         std::string const& meshfile)
@@ -66,16 +66,16 @@ namespace hpx { namespace geometry { namespace server
         return true; 
     }
 
-    int point::search(std::vector<hpx::naming::id_type> const& particle_components)
+    void point::search(std::vector<hpx::naming::id_type> const& particle_components)
     {
         // For demonstration, a simple search strategy: we check if the
         // particle is within a certain distance of the gridpoint.  If so, then
         // get its charge
-        typedef std::vector<lcos::promise<double> > lazy_results_type;
+        typedef std::vector<hpx::lcos::promise<double> > lazy_results_type;
 
         lazy_results_type lazy_results;
 
-        BOOST_FOREACH(naming::id_type const& gid, particle_components)
+        BOOST_FOREACH(hpx::naming::id_type const& gid, particle_components)
         {
             lazy_results.push_back( stubs::particle::distance_async( gid,posx_,posy_,posz_ ) );
         }
@@ -84,7 +84,7 @@ namespace hpx { namespace geometry { namespace server
         std::list<std::size_t> deposits;
 
         // Wait on the results, and invoke a callback when each result is ready.
-        lcos::wait(lazy_results,
+        hpx::lcos::wait(lazy_results,
             boost::bind(&search_callback, boost::ref(deposits), _1, _2));
 
         // Print out the particles whose charge should be deposited on this
@@ -95,8 +95,6 @@ namespace hpx { namespace geometry { namespace server
                          % idx_ % stubs::particle::get_index(particle_components.at(i)))
                       << hpx::flush; 
         }
-
-        return 0;
     }
-}}}
+}}
 

@@ -13,12 +13,12 @@
 #include <hpx/runtime/actions/component_action.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace geometry { namespace server
+namespace gtc { namespace server
 {
 
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT particle
-      : public components::detail::managed_component_base<particle>
+      : public hpx::components::detail::managed_component_base<particle>
     {
     public:
         enum actions
@@ -99,7 +99,7 @@ namespace hpx { namespace geometry { namespace server
         double posx_,posy_,posz_;
     };
 
-}}}
+}}
 
 #endif
 

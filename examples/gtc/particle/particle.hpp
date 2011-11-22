@@ -3,21 +3,22 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_CLIENT_PARTICLE)
-#define HPX_COMPONENTS_CLIENT_PARTICLE
+#if !defined(HPX_3735DA56_EFCE_4630_8FD7_DBA8CA194BBC)
+#define HPX_3735DA56_EFCE_4630_8FD7_DBA8CA194BBC
 
 #include <hpx/runtime/components/client_base.hpp>
 
 #include "stubs/particle.hpp"
 
-namespace hpx { namespace geometry
+namespace gtc
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// The client side representation of a \a hpx::geometry::server::particle
+    /// The client side representation of a \a gtc::server::particle
     /// components.
-    class particle : public components::client_base<particle, stubs::particle>
+    class particle
+      : public hpx::components::client_base<particle, stubs::particle>
     {
-        typedef components::client_base<particle, stubs::particle>
+        typedef hpx::components::client_base<particle, stubs::particle>
             base_type;
 
     public:
@@ -27,23 +28,24 @@ namespace hpx { namespace geometry
         {}
 
         /// Create a client side representation for the existing
-        /// \a hpx::geometry::server::particle instance with the given GID.
-        particle(naming::id_type const& gid)
+        /// \a gtc::server::particle instance with the given GID.
+        particle(hpx::naming::id_type const& gid)
           : base_type(gid)
         {}
 
         ///////////////////////////////////////////////////////////////////////
         // Exposed functionality of this component.
 
-        /// Initialize the \a hpx::geometry::server::particle instance with the
+        /// Initialize the \a gtc::server::particle instance with the
         /// given particle file. 
-        lcos::promise<void> init_async(std::size_t objectid,std::string const& particlefile)
+        hpx::lcos::promise<void> init_async(std::size_t objectid,
+            std::string const& particlefile)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::init_async(gid_,objectid,particlefile);
         }
 
-        /// Initialize the \a hpx::geometry::server::particle instance with the
+        /// Initialize the \a gtc::server::particle instance with the
         /// given particle file.  
         void init(std::size_t objectid,std::string const& particlefile)
         {
@@ -52,7 +54,8 @@ namespace hpx { namespace geometry
         }
 
         /// Compute the distance from the particle to the specified coordinates. 
-        lcos::promise<double> distance_async(double posx, double posy, double posz)
+        hpx::lcos::promise<double> distance_async(double posx, double posy,
+            double posz)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::distance_async(gid_,posx,posy,posz);
@@ -66,7 +69,7 @@ namespace hpx { namespace geometry
         }
 
         /// Get the index of the particle.
-        lcos::promise<std::size_t> get_index_async()
+        hpx::lcos::promise<std::size_t> get_index_async()
         {
             BOOST_ASSERT(gid_);
             return this->base_type::get_index_async(gid_);
@@ -79,7 +82,7 @@ namespace hpx { namespace geometry
             return this->base_type::get_index(gid_);
         }
     };
-}}
+}
 
 #endif
 

@@ -16,21 +16,23 @@ namespace sheneos
     struct dimension
     {
         enum {
-            ye = 0, temp = 1, rho = 2,
+            ye = 0,
+            temp = 1,
+            rho = 2,
             dim = 3
         };
 
         dimension() : offset_(0), count_(0), size_(0) {}
         dimension(std::size_t size) : offset_(0), count_(0), size_(size) {}
 
-        std::size_t offset_;    // lower index
-        std::size_t count_;     // upper index
-        std::size_t size_;      // overall size of this dimension
+        std::size_t offset_;    ///< Dimension offset. 
+        std::size_t count_;     ///< Dimension count.
+        std::size_t size_;      ///< Overall size of this dimension.
     };
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// non-intrusive serialization
+// Non-intrusive serialization support.
 namespace boost { namespace serialization
 {
     template <typename Archive>

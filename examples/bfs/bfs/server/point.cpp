@@ -15,7 +15,7 @@
 #include <fstream>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace geometry { namespace server
+namespace bfs { namespace server
 {
     void point::init(std::size_t objectid,std::size_t max_num_neighbors,
         std::string const& graphfile)
@@ -62,5 +62,5 @@ namespace hpx { namespace geometry { namespace server
             return tmp;
         }
     }
-}}}
+}}
 

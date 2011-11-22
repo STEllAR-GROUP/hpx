@@ -14,12 +14,12 @@
 #include "../../particle/server/particle.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace geometry { namespace server
+namespace gtc { namespace server
 {
 
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT point
-      : public components::detail::managed_component_base<point>
+      : public hpx::components::detail::managed_component_base<point>
     {
     public:
         enum actions
@@ -38,9 +38,9 @@ namespace hpx { namespace geometry { namespace server
         void init(std::size_t objectid,std::size_t max_num_neighbors,
             std::string const& meshfile);
 
-        /// Perform a search on the \a hpx::geometry::server::particle
+        /// Perform a search on the \a gtc::server::particle
         /// components in \a particle_components.
-        int search(std::vector<hpx::naming::id_type> const& particle_components);
+        void search(std::vector<hpx::naming::id_type> const& particle_components);
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an
@@ -59,11 +59,9 @@ namespace hpx { namespace geometry { namespace server
             &point::init
         > init_action;
 
-        typedef hpx::actions::result_action1<
+        typedef hpx::actions::action1<
             // Component server type.
             point,
-            // Return type.
-            int,
             // Action code.
             point_search,
             // Arguments of this action.
@@ -77,8 +75,7 @@ namespace hpx { namespace geometry { namespace server
         std::vector<std::size_t> neighbors_;
         double posx_,posy_,posz_;
     };
-
-}}}
+}}
 
 #endif
 

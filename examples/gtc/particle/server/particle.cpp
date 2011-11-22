@@ -12,7 +12,7 @@
 #include <fstream>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace geometry { namespace server
+namespace gtc { namespace server
 {
     void particle::init(std::size_t objectid,std::string const& particlefile)
     {
@@ -43,6 +43,6 @@ namespace hpx { namespace geometry { namespace server
             myfile.close();
         } 
     }
-}}}
+}}
 
 

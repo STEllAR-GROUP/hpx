@@ -10,14 +10,13 @@
 
 #include "stubs/point.hpp"
 
-namespace hpx { namespace geometry
+namespace bfs
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// The client side representation of a \a hpx::geometry::server::point
-    /// components.
-    class point : public components::client_base<point, stubs::point>
+    /// The client side representation of a \a bfs::server::point components.
+    class point : public hpx::components::client_base<point, stubs::point>
     {
-        typedef components::client_base<point, stubs::point>
+        typedef hpx::components::client_base<point, stubs::point>
             base_type;
 
     public:
@@ -27,17 +26,17 @@ namespace hpx { namespace geometry
         {}
 
         /// Create a client side representation for the existing
-        /// \a hpx::geometry::server::point instance with the given GID.
-        point(naming::id_type const& gid)
+        /// \a bfs::server::point instance with the given GID.
+        point(hpx::naming::id_type const& gid)
           : base_type(gid)
         {}
 
         ///////////////////////////////////////////////////////////////////////
         // Exposed functionality of this component.
 
-        /// Initialize the \a hpx::geometry::server::point instance with the
+        /// Initialize the \a bfs::server::point instance with the
         /// given graph file. 
-        lcos::promise<void> init_async(std::size_t objectid,
+        hpx::lcos::promise<void> init_async(std::size_t objectid,
             std::size_t max_num_neighbors,std::string const& graphfile)
         {
             BOOST_ASSERT(gid_);
@@ -45,7 +44,7 @@ namespace hpx { namespace geometry
                 graphfile);
         }
 
-        /// Initialize the \a hpx::geometry::server::point instance with the
+        /// Initialize the \a bfs::server::point instance with the
         /// given graph file.  
         void init(std::size_t objectid,std::size_t max_num_neighbors,
             std::string const& graphfile)
@@ -56,7 +55,7 @@ namespace hpx { namespace geometry
         }
 
         /// Traverse the graph. 
-        lcos::promise<std::vector<std::size_t> >
+        hpx::lcos::promise<std::vector<std::size_t> >
         traverse_async(std::size_t level, std::size_t parent)
         {
             BOOST_ASSERT(gid_);
@@ -70,7 +69,7 @@ namespace hpx { namespace geometry
             return this->base_type::traverse(gid_,level,parent);
         }
     };
-}}
+}
 
 #endif
 

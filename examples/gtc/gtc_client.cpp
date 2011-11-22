@@ -8,31 +8,32 @@
 
 #include "point/point.hpp"
 #include "particle/particle.hpp"
+
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
-/// This function initializes a vector of \a hpx#geometry#point clients, 
+/// This function initializes a vector of \a gtc::point clients, 
 /// connecting them to components created with
-/// \a hpx#components#distributing_factory.
+/// \a hpx::components::distributing_factory.
 inline void
 init(hpx::components::server::distributing_factory::iterator_range_type const& r,
-    std::vector<hpx::geometry::point>& point)
+    std::vector<gtc::point>& point)
 {
     BOOST_FOREACH(hpx::naming::id_type const& id, r)
     {
-        point.push_back(hpx::geometry::point(id));
+        point.push_back(gtc::point(id));
     }
 }
 
-/// This function initializes a vector of \a hpx#geometry#particle clients, 
+/// This function initializes a vector of \a gtc::particle clients, 
 /// connecting them to components created with
-/// \a hpx#components#distributing_factory.
+/// \a hpx::components::distributing_factory.
 inline void
 init(hpx::components::server::distributing_factory::iterator_range_type const& r,
-    std::vector<hpx::geometry::particle>& particle)
+    std::vector<gtc::particle>& particle)
 {
     BOOST_FOREACH(hpx::naming::id_type const& id, r)
     {
-        particle.push_back(hpx::geometry::particle(id));
+        particle.push_back(gtc::particle(id));
     }
 }
 
@@ -61,10 +62,9 @@ int hpx_main(boost::program_options::variables_map &vm)
         hpx::components::distributing_factory factory;
         factory.create(hpx::find_here());
 
-        // Get the component type for our point component.
+        // Get the global component type of our point component.
         hpx::components::component_type block_type_points =
-            hpx::components::get_component_type<
-                hpx::geometry::point::server_component_type>();
+            hpx::components::get_component_type<gtc::server::point>();
 
         // Create num_gridpoints point components with distributing factory.
         // These components will be evenly distributed among all available
@@ -74,8 +74,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         // Get the component type for our particle component.
         hpx::components::component_type block_type_particles =
-            hpx::components::get_component_type<
-                hpx::geometry::particle::server_component_type>();
+            hpx::components::get_component_type<gtc::server::particle>();
 
         // Create num_gridpoints particle components with distributing factory.
         // These components will be evenly distributed among all available
@@ -86,8 +85,8 @@ int hpx_main(boost::program_options::variables_map &vm)
         ///////////////////////////////////////////////////////////////////////
         // These two vectors will hold client classes referring to all of the
         // components we just created.
-        std::vector<hpx::geometry::point> points;
-        std::vector<hpx::geometry::particle> particles;
+        std::vector<gtc::point> points;
+        std::vector<gtc::particle> particles;
 
         // Populate the client vectors. 
         init(hpx::components::server::locality_results(blocks_points), points);
@@ -120,7 +119,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         ///////////////////////////////////////////////////////////////////////
         // Start the search/charge depositing phase.
-        std::vector<hpx::lcos::promise<int> > charge_phase;
+        std::vector<hpx::lcos::promise<void> > charge_phase;
 
         // We use the vector of particle component GIDS that we created during
         // the initialization phase as the input to the search action on each
@@ -129,11 +128,8 @@ int hpx_main(boost::program_options::variables_map &vm)
           charge_phase.push_back(points[i].search_async(particle_components));
         }
 
-        // Our results will get copied into this vector.
-        std::vector<int> search_vector;
-
         // Wait for the search/charge depositing phase to complete.
-        hpx::lcos::wait(charge_phase,search_vector);
+        hpx::lcos::wait(charge_phase);
 
         // Print the total walltime that the computation took.
         std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl;

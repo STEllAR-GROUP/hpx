@@ -6,16 +6,17 @@
 #if !defined(HPX_226CC70A_D748_4ADA_BB55_70F85566B5CC)
 #define HPX_226CC70A_D748_4ADA_BB55_70F85566B5CC
 
+#include <vector>
+
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace geometry { namespace server
+namespace bfs { namespace server
 {
-
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT point
-      : public components::detail::managed_component_base<point>
+      : public hpx::components::managed_component_base<point>
     {
     public:
         enum actions
@@ -30,7 +31,7 @@ namespace hpx { namespace geometry { namespace server
         ///////////////////////////////////////////////////////////////////////
         // Exposed functionality of this component.
 
-        /// Initialize the point instance with the given graph file.  
+        /// Initialize the point with the given graph file.  
         void init(std::size_t objectid,std::size_t max_num_neighbors,
             std::string const& graphfile);
 
@@ -50,6 +51,7 @@ namespace hpx { namespace geometry { namespace server
             std::size_t,
             std::size_t,
             std::string const&,
+            // Method bound to this action.
             &point::init
         > init_action;
 
@@ -74,8 +76,7 @@ namespace hpx { namespace geometry { namespace server
         std::vector<std::size_t> neighbors_;
         std::size_t parent_;
     };
-
-}}}
+}}
 
 #endif
 
