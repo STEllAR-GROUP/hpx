@@ -89,7 +89,7 @@ namespace hpx { namespace lcos { namespace server
             hpx::util::spinlock::scoped_lock l(mtx);
             if(all_set)
             {
-                typedef typename hpx::lcos::base_lco::set_event_action action_type;
+                typedef hpx::lcos::base_lco::set_event_action action_type;
                 l.unlock();
                 applier::apply<action_type>(target);
             }
@@ -111,7 +111,7 @@ namespace hpx { namespace lcos { namespace server
         void set_slot(unsigned index)
         {
             {
-                typename hpx::util::spinlock::scoped_lock l(mtx);
+                hpx::util::spinlock::scoped_lock l(mtx);
                 if(slots_set != slots_completed)
                 {
                     slots_set |= (1<<index);
@@ -119,12 +119,12 @@ namespace hpx { namespace lcos { namespace server
             }
             trigger_targets();
         }
-        
+
         void trigger_targets()
         {
             std::vector<naming::id_type> t;
             {
-                typename hpx::util::spinlock::scoped_lock l(mtx);
+                hpx::util::spinlock::scoped_lock l(mtx);
                 all_set = (slots_set == slots_completed);
                 if(all_set == false) return;
                 std::swap(targets, t);
@@ -135,7 +135,7 @@ namespace hpx { namespace lcos { namespace server
             //       targets are local (which is ok)
             for (std::size_t i = 0; i < t.size(); ++i)
             {
-                typedef typename hpx::lcos::base_lco::set_event_action action_type;
+                typedef hpx::lcos::base_lco::set_event_action action_type;
                 applier::apply<action_type>(t[i]);
             }
         }
