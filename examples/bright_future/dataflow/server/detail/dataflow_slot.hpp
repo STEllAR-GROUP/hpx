@@ -238,9 +238,9 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
             LLCO_(info)
                 << "~dataflow_slot<"
                 << util::type_id<T>::typeid_.type_id()
-                << ", " << slot
+                << ", " << slot << ", "
                 << hpx::actions::detail::get_action_name<SinkAction>()
-                << ">::dataflow_slot(): "
+                << ">::dataflow_slot() dynamic: "
                 << get_gid();
         }
 
@@ -249,9 +249,9 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
             LLCO_(info)
                 << "dataflow_slot<"
                 << util::type_id<T>::typeid_.type_id()
-                << ", " << slot
+                << ", " << slot << ", "
                 << hpx::actions::detail::get_action_name<SinkAction>()
-                << ">::set_result(): "
+                << ">::set_result() dynamic: "
                 << get_gid();
             dataflow_sink->set_slot(slot);
             //dataflow_source.invalidate();
@@ -262,9 +262,9 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
             LLCO_(info)
                 << "dataflow_slot<"
                 << util::type_id<T>::typeid_.type_id()
-                << ", " << slot
+                << ", " << slot << ", "
                 << hpx::actions::detail::get_action_name<SinkAction>()
-                << ">::connect() from "
+                << ">::connect() dynamic: "
                 << get_gid();
 
             typedef

@@ -20,6 +20,7 @@
 
 #include "server/remote_lse.hpp"
 #include "dataflow/dataflow.hpp"
+#include "dataflow/dataflow_trigger.hpp"
 
 using bright_future::update;
 using bright_future::update_residuum;
@@ -33,6 +34,7 @@ using hpx::cout;
 using hpx::flush;
 using hpx::lcos::dataflow;
 using hpx::lcos::dataflow_base;
+using hpx::lcos::dataflow_trigger;
 using hpx::find_here;
 
 // this is just a simple base class for my functors to be serializable
@@ -184,6 +186,8 @@ void gs(
 
         hpx::naming::id_type remote_id = *parts.first;
 
+        hpx::cout << typeid(hpx::traits::is_dataflow<dataflow_trigger>::type).name() << "\n" << hpx::endl;
+
         // initalization of hpx component ends here.
 
         typedef hpx::lcos::dataflow_base<void> dataflow_type;
@@ -310,11 +314,16 @@ void gs(
                               , y + 1 == n_y_block ? n_y-1 : y_block + block_size
                               );
 
-                        dataflow_base<void> deps  = prev(x, y);
+                        //dataflow_base<void> deps  = prev(x, y);
+                        dataflow_trigger deps(find_here());
+                        unsigned num_triggers = 1;
+                        deps.add(prev(x, y));
 
                         if(iter==0)
                         {
-                            deps = dataflow<dependency_action>(find_here(), deps, init_rhs_promises(x, y), prev(x,y));
+                            //deps = dataflow<dependency_action>(find_here(), deps, init_rhs_promises(x, y), prev(x,y));
+                            deps.add(init_rhs_promises(x, y));
+                            ++num_triggers;
                             //deps.push_back(&init_rhs_promises(x,y));
                         }
                         // these are our dependencies to update this specific
@@ -333,7 +342,8 @@ void gs(
                             // add the right block of the previous iteration
                             // to our list of dependencies
                             //deps.push_back(&prev(x+1,y));
-                            deps = dataflow<dependency_action>(find_here(), deps, prev(x+1, y));
+                            deps.add(prev(x+1, y));
+                            ++num_triggers;
                             //dataflow<dependency_action>(find_here(), prev(x+1, y)).get();
                         }
 
@@ -342,7 +352,9 @@ void gs(
                             // add the upper block of the previous iteration
                             // to our list of dependencies
                             //deps.push_back(&prev(x,y+1));
-                            deps = dataflow<dependency_action>(find_here(), deps, prev(x, y+1));
+                            //deps = dataflow<dependency_action>(find_here(), deps, prev(x, y+1));
+                            deps.add(prev(x, y+1));
+                            ++num_triggers;
                             //dataflow<dependency_action>(find_here(), prev(x, y+1)).get();
                         }
 
@@ -351,7 +363,9 @@ void gs(
                             // add the upper block of the current iteration
                             // to our list of dependencies
                             //deps.push_back(&current(x-1,y));
-                            deps = dataflow<dependency_action>(find_here(), deps, current(x-1, y));
+                            //deps = dataflow<dependency_action>(find_here(), deps, current(x-1, y));
+                            deps.add(current(x-1, y));
+                            ++num_triggers;
                             //dataflow<dependency_action>(find_here(), current(x-1, y)).get();
                         }
 
@@ -360,9 +374,12 @@ void gs(
                             // add the upper block of the current iteration
                             // to our list of dependencies
                             //deps.push_back(&current(x,y-1));
-                            deps = dataflow<dependency_action>(find_here(), deps, current(x, y-1));
+                            //deps = dataflow<dependency_action>(find_here(), deps, current(x, y-1));
+                            deps.add(current(x, y-1));
+                            ++num_triggers;
                             //dataflow<dependency_action>(find_here(), current(x, y-1)).get();
                         }
+                        deps.set_trigger_size(num_triggers);
 
                         //deps.get();
                         current(x, y) =
@@ -375,11 +392,11 @@ void gs(
                             // are finished.
                             apply_region_dataflow(
                                 remote_id
+                              //, deps
                               , update_fun()
                               , x_range
                               , y_range
                               , deps
-                              //, deps
                             );
                         //cout << "." << flush;
                     }

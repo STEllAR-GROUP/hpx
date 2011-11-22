@@ -112,6 +112,9 @@ namespace hpx { namespace lcos { namespace server
         /// to the specified target lco
         void connect(naming::id_type const & target)
         {
+            LLCO_(info) <<
+                "server::dataflow::connect(" << target << ") {" << get_gid() << "}"
+                ;
             {
                 hpx::util::spinlock::scoped_lock l(mtx);
 

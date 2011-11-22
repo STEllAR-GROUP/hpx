@@ -58,7 +58,15 @@ namespace hpx { namespace lcos {
         }
 
         explicit dataflow(naming::id_type const & target)
-            : base_type(create_component(target))
+            : base_type(
+                create_component(target))
+              /*
+                    hpx::naming::id_type(
+                        hpx::naming::strip_credit_from_gid(target.get_gid())
+                      , hpx::naming::id_type::unmanaged
+                    )
+                )
+            )*/
         {
             //this->get_gid();
         }
@@ -66,7 +74,7 @@ namespace hpx { namespace lcos {
 #define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
         template <BOOST_PP_ENUM_PARAMS(N, typename A)>                          \
         static inline lcos::promise<naming::id_type, naming::gid_type>          \
-        create_component(naming::id_type target                                 \
+        create_component(naming::id_type  target                        \
           , BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)                        \
         )                                                                       \
         {                                                                       \
@@ -88,12 +96,18 @@ namespace hpx { namespace lcos {
             naming::id_type const & target                                      \
           , BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)                        \
         )                                                                       \
-            : base_type(create_component(target                                 \
-                , BOOST_PP_ENUM_PARAMS(N, a))                                   \
-              )                                                                 \
+            : base_type(                                                        \
+                create_component(target                                         \
+                  , BOOST_PP_ENUM_PARAMS(N, a)                                  \
+                )                                                               \
+            )                                                                   \
         {                                                                       \
         }                                                                       \
             /*
+                    hpx::naming::id_type(                                       \
+                        hpx::naming::strip_credit_from_gid(target.get_gid())    \
+                      , hpx::naming::id_type::unmanaged                         \
+                    )                                                           \
             this->get_gid();                                                    \
              */
     /**/

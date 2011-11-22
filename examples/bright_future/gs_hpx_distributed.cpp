@@ -20,6 +20,7 @@
 
 #include "server/remote_lse.hpp"
 #include "dataflow/dataflow.hpp"
+#include "dataflow/dataflow_trigger.hpp"
 
 using bright_future::grid;
 using bright_future::update;
@@ -33,6 +34,7 @@ using hpx::util::high_resolution_timer;
 using hpx::cout;
 using hpx::flush;
 using hpx::lcos::dataflow;
+using hpx::lcos::dataflow_trigger;
 using hpx::lcos::dataflow_base;
 using hpx::find_here;
 using hpx::find_all_localities;
@@ -245,16 +247,31 @@ void gs(
             factory(
                 distributing_factory::create_sync(hpx::find_here())
             );
+        
+        double num_blocks_sqrt = std::floor(std::sqrt(prefixes.size()));
+
+        double num_blocks = 0;
+        if(std::abs(num_blocks_sqrt - std::sqrt(prefixes.size())) > 1e-9)
+        {
+            num_blocks_sqrt = num_blocks_sqrt + 1;
+        }
+        num_blocks = num_blocks_sqrt * num_blocks_sqrt;
 
         distributing_factory::async_create_result_type
-            result = factory.create_components_async(type, prefixes.size());
+            result = factory.create_components_async(type, num_blocks);
+
+        BOOST_FOREACH(id_type const & prefix, prefixes)
+        {
+            hpx::cout << prefix << "\n" << hpx::flush;
+        }
 
         distributing_factory::result_type results = result.get();
         distributing_factory::iterator_range_type
             parts = hpx::components::server::locality_results(results);
 
-        size_type n_x_block = std::sqrt(prefixes.size());
-        size_type n_y_block = std::sqrt(prefixes.size());
+
+        size_type n_x_block = num_blocks_sqrt;
+        size_type n_y_block = num_blocks_sqrt;
 
         size_type n_x_local = n_x / n_x_block + 1;
         size_type n_y_local = n_y / n_y_block + 1;
@@ -282,9 +299,9 @@ void gs(
                 using hpx::naming::id_type;
                 using hpx::naming::strip_credit_from_gid;
  
-                grid_ids(x, y) = id_type(
+                grid_ids(x, y) = id;/*id_type(
                     strip_credit_from_gid(id.get_gid()),
-                    id_type::unmanaged);
+                    id_type::unmanaged);*/
 
                 if(++x > n_x_block - 1)
                 {
@@ -459,16 +476,12 @@ void gs(
         {
             promise_grid_block_type & prev_block = iteration_dependencies[iter%2];
             promise_grid_block_type & current_block = iteration_dependencies[(iter + 1)%2];
-            /*
             cout << "iteration " << iter << flush;
-            */
             for(size_type y_block = 0; y_block < n_y_block; ++y_block)
             {
                 for(size_type x_block = 0; x_block < n_x_block; ++x_block)
                 {
-                    /*
                     cout << " grid " << x_block << " " << y_block << " " << flush;
-                    */
                     // boundary updates ....
                     typedef
                         hpx::lcos::dataflow<remote_lse_type::get_col_action>
@@ -496,10 +509,8 @@ void gs(
                     {
                         for(size_type x = 1, xx = 0; x < n_x_local + 1; x += block_size, ++xx)
                         {
-                            /*
                             cout << "!. " << xx << " " << yy << " ." << flush;
                             cout << "!. " << xx + x_block << " " << yy + y_block << " ." << flush;
-                            */
                             range_type
                                 x_range(
                                     xx == 0 && x_block == 0 ? 2 : x
@@ -520,59 +531,50 @@ void gs(
                                         : std::min(n_y_local + 1, y + block_size)
                                 );
 
-                            dataflow_base<void> deps = prev(xx, yy);
+                            unsigned num_triggers = 1;
+                            hpx::cout << get_locality_from_id(grid_ids(x_block, y_block)) << " " << hpx::flush;
+
+                            dataflow_trigger deps(grid_ids(x_block, y_block));
+
+                            deps.add(prev(xx, yy));
                             if(iter == 0)
                             {
-                                deps = dataflow<dependency_action>(
-                                    get_locality_from_id(grid_ids(x_block, y_block))
-                                  , rhs_promise(x_block, y_block)(xx, yy)
-                                  , deps
-                                );
+                                deps.add(rhs_promise(x_block, y_block)(xx, yy));
+                                ++num_triggers;
+                                cout << "." << flush;
                             }
 
                             if(xx + 1 < n_x_local_block)
                             {
-                                deps = dataflow<dependency_action>(
-                                    get_locality_from_id(grid_ids(x_block, y_block))
-                                  , prev(xx + 1, yy)
-                                  , deps
-                                );
+                                deps.add(prev(xx + 1, yy));
+                                ++num_triggers;
+                                cout << "." << flush;
                             }
-                            //cout << "." << flush;
                             
                             if(yy + 1 < n_y_local_block)
                             {
-                                deps = dataflow<dependency_action>(
-                                    get_locality_from_id(grid_ids(x_block, y_block))
-                                  , prev(xx, yy + 1)
-                                  , deps
-                                );
+                                deps.add(prev(xx, yy + 1));
+                                ++num_triggers;
+                                cout << "." << flush;
                             }
-                            //cout << "." << flush;
 
                             if(xx > 0)
                             {
-                                deps = dataflow<dependency_action>(
-                                    get_locality_from_id(grid_ids(x_block, y_block))
-                                  , current(xx - 1, yy)
-                                  , deps
-                                );
+                                deps.add(current(xx - 1, yy));
+                                ++num_triggers;
+                                cout << "." << flush;
                             }
-                            //cout << "." << flush;
 
                             if(yy > 0)
                             {
-                                deps = dataflow<dependency_action>(
-                                    get_locality_from_id(grid_ids(x_block, y_block))
-                                  , current(xx, yy - 1)
-                                  , deps
-                                );
+                                deps.add(current(xx, yy - 1));
+                                ++num_triggers;
+                                cout << "." << flush;
                             }
-                            //cout << "." << flush;
 
                             if(xx == 0 && x_block > 0)
                             {
-                                deps = 
+                                deps.add(
                                     update_left_boundary_dataflow(
                                         grid_ids(x_block, y_block)
                                       , get_column_dataflow(
@@ -585,9 +587,10 @@ void gs(
                                             n_x_local_block -1
                                           , yy
                                         )
-                                      , deps
-                                    );
-                                //cout << "l" << flush;
+                                    )
+                                );
+                                ++num_triggers;
+                                cout << "l" << flush;
                             }
 
                             if(
@@ -595,7 +598,7 @@ void gs(
                              && x_block + 1 < n_x_block
                             )
                             {
-                                deps = 
+                                deps.add(
                                     update_right_boundary_dataflow(
                                         grid_ids(x_block, y_block)
                                       , get_column_dataflow(
@@ -608,14 +611,15 @@ void gs(
                                             0
                                           , yy
                                         )
-                                      , deps
-                                    );
-                                //cout << "r" << flush;
+                                    )
+                                );
+                                ++num_triggers;
+                                cout << "r" << flush;
                             }
                             
                             if(yy == 0 && y_block > 0)
                             {
-                                deps = 
+                                deps.add(
                                     update_top_boundary_dataflow(
                                         grid_ids(x_block, y_block)
                                       , get_row_dataflow(
@@ -628,14 +632,15 @@ void gs(
                                             xx
                                           , n_y_local_block -1
                                         )
-                                      , deps
-                                    );
-                                //cout << "t" << flush;
+                                    )
+                                );
+                                ++num_triggers;
+                                cout << "t" << flush;
                             }
                             
                             if(yy + 1 == n_y_local_block && y_block + 1 < n_y_block)
                             {
-                                deps = 
+                                deps.add(
                                     update_bottom_boundary_dataflow(
                                         grid_ids(x_block, y_block)
                                       , get_row_dataflow(
@@ -648,10 +653,13 @@ void gs(
                                             xx
                                           , 0
                                         )
-                                      , deps
-                                    );
-                                //cout << "b" << flush;
+                                    )
+                                );
+                                ++num_triggers;
+                                cout << "b" << flush;
                             }
+
+                            deps.set_trigger_size(num_triggers);
 
                             /*
                             cout << "x " << x_range.first << " " << x_range.second << "\n" << flush;
@@ -665,25 +673,25 @@ void gs(
                                   , y_range
                                   , deps
                                 );
-                            //cout << ".! " << flush;
+                            cout << ".! " << flush;
                         }
                     }
                 }
             }
-            //cout << "done\n" << flush;
+            cout << "done\n" << flush;
         }
         
         // wait for the last iteration to finish.
-        //cout << "dataflow tree construction completed" << flush;
+        cout << "dataflow tree construction completed " << flush;
         BOOST_FOREACH(promise_grid_type & block, iteration_dependencies[max_iterations%2])
         {
             BOOST_FOREACH(dataflow_base<void> & promise, block)
             {
-                //cout << "." << flush;
+                cout << "." << flush;
                 promise.get();
             }
         }
-        //cout << "\n";
+        cout << "\n";
 
         double time_elapsed = t.elapsed();
         cout << time_elapsed << "\n" << flush;

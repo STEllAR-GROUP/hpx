@@ -52,6 +52,9 @@ namespace hpx { namespace lcos { namespace server
                     >
                 >
                 component_type;
+            LLCO_(info) <<
+                "server::dataflow_trigger::add() {" << get_gid() << "}"
+                ;
             component_type * w;
             {
                 hpx::util::spinlock::scoped_lock l(mtx);
@@ -86,6 +89,9 @@ namespace hpx { namespace lcos { namespace server
 
         void connect(naming::id_type const & target)
         {
+            LLCO_(info) <<
+                "server::dataflow_trigger::connect(" << target << ") {" << get_gid() << "}"
+                ;
             hpx::util::spinlock::scoped_lock l(mtx);
             if(all_set)
             {
