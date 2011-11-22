@@ -78,7 +78,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// This defines the number of outgoing (parcel-) connections kept alive
 #if !defined(HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE)
-#  define HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE 64
+#  define HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE 256
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -88,6 +88,11 @@
 /// bootstrapping.
 #if !defined(HPX_INITIAL_AGAS_GVA_CACHE_SIZE)
 #  define HPX_INITIAL_AGAS_GVA_CACHE_SIZE 256
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+#if !defined(HPX_INITIAL_AGAS_MAX_RESOLVE_REQUESTS)
+#  define HPX_INITIAL_AGAS_MAX_RESOLVE_REQUESTS 16
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
