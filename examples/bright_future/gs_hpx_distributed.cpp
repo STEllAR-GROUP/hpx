@@ -239,7 +239,7 @@ void gs(
             hpx::components::distributing_factory
             distributing_factory;
         
-        std::vector<id_type> prefixes = find_all_localities();
+        std::vector<id_type> prefixes = find_all_localities(type);
 
         distributing_factory
             factory(
@@ -279,8 +279,13 @@ void gs(
 
             BOOST_FOREACH(hpx::naming::id_type const & id, parts)
             {
-                grid_ids(x, y) = id;
-                
+                using hpx::naming::id_type;
+                using hpx::naming::strip_credit_from_gid;
+ 
+                grid_ids(x, y) = id_type(
+                    strip_credit_from_gid(id.get_gid()),
+                    id_type::unmanaged);
+
                 if(++x > n_x_block - 1)
                 {
                     x = 0;
