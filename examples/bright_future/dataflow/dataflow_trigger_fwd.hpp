@@ -7,7 +7,6 @@
 #ifndef EXAMPLES_BRIGHT_FUTURE_DATAFLOW_TRIGGER_FWD_HPP
 #define EXAMPLES_BRIGHT_FUTURE_DATAFLOW_TRIGGER_FWD_HPP
 
-#include <hpx/traits/handle_gid.hpp>
 #include <examples/bright_future/dataflow/is_dataflow.hpp>
 
 namespace hpx { namespace lcos {

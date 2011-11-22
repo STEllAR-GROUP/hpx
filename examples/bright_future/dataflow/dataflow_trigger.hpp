@@ -10,6 +10,7 @@
 #include <examples/bright_future/dataflow/dataflow_trigger_fwd.hpp>
 #include <examples/bright_future/dataflow/dataflow_base.hpp>
 #include <examples/bright_future/dataflow/stubs/dataflow_trigger.hpp>
+#include <hpx/traits/handle_gid.hpp>
 
 namespace hpx { namespace lcos {
     struct dataflow_trigger
@@ -44,7 +45,7 @@ namespace hpx { namespace lcos {
             typedef
                 typename hpx::lcos::server::add_action<Result, RemoteResult>::type
                 action_type;
-            applier::apply<action_type>(get_gid(), df);
+            async<action_type>(this->get_gid(), df);
             //wait(async<action_type>(get_gid(), df));
         }
 
@@ -53,8 +54,17 @@ namespace hpx { namespace lcos {
             typedef
                 hpx::lcos::server::dataflow_trigger::set_trigger_size_action
                 action_type;
-            applier::apply<action_type>(get_gid(), size);
+            async<action_type>(this->get_gid(), size);
             //wait(async<action_type>(get_gid(), size));
+        }
+    private:
+
+        friend class boost::serialization::access;
+
+        template <typename Archive>
+        void serialize(Archive & ar, unsigned)
+        {
+            ar & boost::serialization::base_object<base_type>(*this);
         }
     };
 }}

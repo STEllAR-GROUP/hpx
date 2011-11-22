@@ -31,8 +31,13 @@ typedef grid_type::size_type size_type;
 
 using hpx::util::high_resolution_timer;
 
+/*
 using hpx::cout;
 using hpx::flush;
+*/
+#include <iostream>
+using std::cout;
+using std::flush;
 using hpx::lcos::dataflow;
 using hpx::lcos::dataflow_trigger;
 using hpx::lcos::dataflow_base;
@@ -262,7 +267,7 @@ void gs(
 
         BOOST_FOREACH(id_type const & prefix, prefixes)
         {
-            hpx::cout << prefix << "\n" << hpx::flush;
+            cout << prefix << "\n" << flush;
         }
 
         distributing_factory::result_type results = result.get();
@@ -474,8 +479,8 @@ void gs(
         
         for(unsigned iter = 0; iter < max_iterations; ++iter)
         {
-            promise_grid_block_type & prev_block = iteration_dependencies[iter%2];
-            promise_grid_block_type & current_block = iteration_dependencies[(iter + 1)%2];
+            promise_grid_block_type & prev_block = iteration_dependencies.at(iter%2);
+            promise_grid_block_type & current_block = iteration_dependencies.at((iter + 1)%2);
             cout << "iteration " << iter << flush;
             for(size_type y_block = 0; y_block < n_y_block; ++y_block)
             {
@@ -532,7 +537,7 @@ void gs(
                                 );
 
                             unsigned num_triggers = 1;
-                            hpx::cout << get_locality_from_id(grid_ids(x_block, y_block)) << " " << hpx::flush;
+                            cout << get_locality_from_id(grid_ids(x_block, y_block)) << " " << flush;
 
                             dataflow_trigger deps(grid_ids(x_block, y_block));
 

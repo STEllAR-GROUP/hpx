@@ -35,6 +35,9 @@ namespace hpx { namespace lcos {
         dataflow_base(promise<naming::id_type, naming::gid_type> const & promise)
             : gid_promise(promise)
         {
+            LLCO_(info)
+                << "dataflow_base<void>: " << gid_promise.get()
+                ;
         }
 
         void get()
