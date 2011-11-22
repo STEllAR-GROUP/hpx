@@ -32,7 +32,7 @@ namespace hpx { namespace util
         ///                 requests
         /// \param start_thread
         ///                 [in]
-        explicit io_service_pool(std::size_t pool_size = 2,
+        explicit io_service_pool(std::size_t pool_size = 4,
             char const* pool_name = "",
             HPX_STD_FUNCTION<void()> on_start_thread = HPX_STD_FUNCTION<void()>(),
             HPX_STD_FUNCTION<void()> on_stop_thread = HPX_STD_FUNCTION<void()>());
