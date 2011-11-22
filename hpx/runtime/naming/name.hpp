@@ -39,7 +39,9 @@ namespace hpx { namespace naming
     /// Global identifier for components across the PX system
     struct HPX_EXPORT gid_type
     {
-        static boost::uint64_t const credit_mask = 0xffff0000ul;
+        static boost::uint64_t const credit_base_mask = 0x7ffful;
+        static boost::uint64_t const credit_mask = credit_base_mask << 16;
+        static boost::uint64_t const was_split_mask = 0x80000000ul;
 
         explicit gid_type (boost::uint64_t lsb_id = 0)
           : id_msb_(0), id_lsb_(lsb_id)
@@ -262,8 +264,9 @@ namespace hpx { namespace naming
         boost::uint32_t c =
             boost::uint16_t((msb & gid_type::credit_mask) >> 16) + credit;
 
-        BOOST_ASSERT(0 == (c & ~0xffff));
-        id.set_msb((msb & ~gid_type::credit_mask) | ((c & 0xffff) << 16));
+        BOOST_ASSERT(0 == (c & ~gid_type::credit_base_mask));
+        id.set_msb((msb & ~gid_type::credit_mask) |
+            ((c & gid_type::credit_base_mask) << 16));
         return c;
     }
 
@@ -271,7 +274,7 @@ namespace hpx { namespace naming
 
     inline boost::uint64_t strip_credit_from_gid(boost::uint64_t msb)
     {
-        return msb & ~gid_type::credit_mask;
+        return msb & ~(gid_type::credit_mask | gid_type::was_split_mask);
     }
 
     inline void strip_credit_from_gid(gid_type& id)
@@ -290,8 +293,9 @@ namespace hpx { namespace naming
 
     inline void set_credit_for_gid(gid_type& id, boost::uint16_t credit)
     {
-        BOOST_ASSERT(0 == (credit & ~0xffff));
-        id.set_msb((id.get_msb() & ~gid_type::credit_mask) | ((credit & 0xffff) << 16));
+        BOOST_ASSERT(0 == (credit & ~gid_type::credit_base_mask));
+        id.set_msb((id.get_msb() & ~gid_type::credit_mask) |
+            ((credit & gid_type::credit_base_mask) << 16));
     }
 
     inline gid_type split_credits_for_gid(gid_type& id, int fraction = 2)
@@ -301,9 +305,15 @@ namespace hpx { namespace naming
         boost::uint16_t newcredits = credits / fraction;
 
         msb &= ~gid_type::credit_mask;
-        id.set_msb(msb | ((credits - newcredits) << 16));
+        id.set_msb(msb | ((credits - newcredits) << 16) | gid_type::was_split_mask);
 
-        return gid_type(msb | (newcredits << 16), id.get_lsb());
+        return gid_type(msb | (newcredits << 16) | gid_type::was_split_mask,
+            id.get_lsb());
+    }
+
+    inline bool gid_was_split(gid_type const& id)
+    {
+        return id.get_msb() & gid_type::was_split_mask ? true : false;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -541,6 +551,11 @@ namespace hpx { namespace naming
         {
             gid_type::mutex_type::scoped_lock l(gid_.get());
             return id_type(split_credits_for_gid(*gid_, fraction), transmission);
+        }
+        bool was_split() const
+        {
+            gid_type::mutex_type::scoped_lock l(gid_.get());
+            return gid_was_split(*gid_);
         }
 
         ///////////////////////////////////////////////////////////////////////

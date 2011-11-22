@@ -29,28 +29,44 @@ namespace hpx { namespace naming
 
         void decrement_refcnt(detail::id_type_impl* p)
         {
-            // guard for wait_abort and other shutdown issues
-            try {
-                // decrement global reference count for the given gid, delete it
-                // if this was the last reference
-                boost::uint32_t credits = get_credit_from_gid(*p);
-                BOOST_ASSERT(0 != credits);
+            // Talk to AGAS only if this gid was split at some time in the past,
+            // i.e. if a reference actually left the original locality.
+            // Alternatively we need to go this way if the id has never been
+            // resolved, which means we don't know anything about the component
+            // type.
+            if (gid_was_split(*p) || !p->is_resolved()) {
+                // guard for wait_abort and other shutdown issues
+                try {
+                    // decrement global reference count for the given gid,
+                    // delete it if this was the last reference
+                    boost::uint32_t credits = get_credit_from_gid(*p);
+                    BOOST_ASSERT(0 != credits);
 
-                applier::applier* app = applier::get_applier_ptr();
+                    applier::applier* app = applier::get_applier_ptr();
 
-                error_code ec;
+                    error_code ec;
 
-                components::component_type t = components::component_invalid;
-                if (app && 0 == app->get_agas_client().decref(*p, t, credits, ec))
-                {
-                    components::stubs::runtime_support::free_component_sync(
-                        (components::component_type)t, *p);
+                    components::component_type t = components::component_invalid;
+                    if (app && 0 == app->get_agas_client().decref(*p, t, credits, ec))
+                    {
+                        components::stubs::runtime_support::free_component_sync(
+                            (components::component_type)t, *p);
+                    }
+                }
+                catch (hpx::exception const& e) {
+                    LTM_(error)
+                        << "Unhandled exception while executing decrement_refcnt:"
+                        << e.what();
                 }
             }
-            catch (hpx::exception const& e) {
-                LTM_(error)
-                    << "Unhandled exception while executing decrement_refcnt:"
-                    << e.what();
+            else {
+                // If the gid was not split at any point in time we can assume
+                // that the referenced object is fully local.
+                components::component_type t =
+                    static_cast<components::component_type>(p->address_.type_);
+
+                BOOST_ASSERT(t != components::component_invalid);
+                components::stubs::runtime_support::free_component_sync(t, *p);
             }
             delete p;   // delete local gid representation in any case
         }
@@ -82,7 +98,7 @@ namespace hpx { namespace naming
                 }
             }
             else {
-                delete p;
+                delete p;   // delete local gid representation if needed
             }
         }
 
@@ -139,14 +155,14 @@ namespace hpx { namespace naming
                 valid = address_ ? true : false;
             }
 
-            if (!valid && !resolve_c()) 
+            if (!valid && !resolve_c())
                 return false;
 
             applier::applier& appl = applier::get_applier();
             gid_type::mutex_type::scoped_lock l(this);
             return address_.locality_ == appl.here();
         }
-        
+
         bool id_type_impl::resolve(naming::address& addr)
         {
             bool valid = false;
@@ -172,7 +188,7 @@ namespace hpx { namespace naming
             }
 
             // if it already has been resolved, just return the address
-            if (!valid && !resolve_c()) 
+            if (!valid && !resolve_c())
                 return false;
 
             addr = address_;
@@ -305,6 +321,5 @@ namespace hpx { namespace naming
             return "invalid";
         return management_type_names[m + 1];
     }
-
 }}
 
