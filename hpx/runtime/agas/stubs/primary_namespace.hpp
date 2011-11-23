@@ -25,37 +25,41 @@ struct primary_namespace
     static lcos::promise<Result, response> service_async(
         naming::id_type const& gid
       , request const& req
+      , threads::thread_priority priority = threads::thread_priority_default
         )
     {
         typedef server_type::service_action action_type;
-        return lcos::eager_future<action_type, Result>(gid, req);
+        return lcos::eager_future<action_type, Result>(gid, priority, req);
     }
 
     static response service(
         naming::id_type const& gid
       , request const& req
+      , threads::thread_priority priority = threads::thread_priority_default
       , error_code& ec = throws
         )
     {
-        return service_async<response>(gid, req).get(ec);
+        return service_async<response>(gid, req, priority).get(ec);
     }
 
     static lcos::promise<bool> route_async(
         naming::id_type const& gid
       , parcelset::parcel const& p
+      , threads::thread_priority priority = threads::thread_priority_default
         )
     {
         typedef server_type::route_action action_type;
-        return lcos::eager_future<action_type, bool>(gid, p);
+        return lcos::eager_future<action_type, bool>(gid, priority, p);
     }
 
     static bool route(
         naming::id_type const& gid
       , parcelset::parcel const& p
+      , threads::thread_priority priority = threads::thread_priority_default
       , error_code& ec = throws
         )
     {
-        return route_async(gid, p).get(ec);
+        return route_async(gid, p, priority).get(ec);
     }
 
 };

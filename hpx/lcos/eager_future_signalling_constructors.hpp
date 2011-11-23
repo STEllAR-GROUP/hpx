@@ -40,6 +40,16 @@
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    void apply_p(naming::id_type const& gid,
+        threads::thread_priority priority,
+        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+    {
+        util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
+        hpx::applier::apply_c_p<Action>(
+            this->get_gid(), gid, priority, BOOST_PP_ENUM_PARAMS(N, arg));
+    }
+
+    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     eager_future(naming::gid_type const& gid,
             completed_callback_type const& data_sink,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
@@ -99,6 +109,72 @@
                     << gid
                     << ") args(" << (N + 1) << ")";
         apply(gid, BOOST_PP_ENUM_PARAMS(N, arg));
+    }
+
+    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    eager_future(naming::gid_type const& gid,
+            completed_callback_type const& data_sink,
+            threads::thread_priority priority,
+            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+      : base_type(data_sink),
+        apply_logger_("eager_future::apply")
+    {
+        LLCO_(info) << "eager_future::eager_future("
+                    << hpx::actions::detail::get_action_name<Action>()
+                    << ", "
+                    << gid
+                    << ") args(" << (N + 1) << ")";
+        apply_p(naming::id_type(gid, naming::id_type::unmanaged),
+            priority, BOOST_PP_ENUM_PARAMS(N, arg));
+    }
+    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    eager_future(naming::id_type const& gid,
+            completed_callback_type const& data_sink,
+            threads::thread_priority priority,
+            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+      : base_type(data_sink),
+        apply_logger_("eager_future::apply")
+    {
+        LLCO_(info) << "eager_future::eager_future("
+                    << hpx::actions::detail::get_action_name<Action>()
+                    << ", "
+                    << gid
+                    << ") args(" << (N + 1) << ")";
+        apply_p(gid, priority, BOOST_PP_ENUM_PARAMS(N, arg));
+    }
+
+    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    eager_future(naming::gid_type const& gid,
+            completed_callback_type const& data_sink,
+            error_callback_type const& error_sink,
+            threads::thread_priority priority,
+            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+      : base_type(data_sink, error_sink),
+        apply_logger_("eager_future::apply")
+    {
+        LLCO_(info) << "eager_future::eager_future("
+                    << hpx::actions::detail::get_action_name<Action>()
+                    << ", "
+                    << gid
+                    << ") args(" << (N + 1) << ")";
+        apply_p(naming::id_type(gid, naming::id_type::unmanaged), priority,
+            BOOST_PP_ENUM_PARAMS(N, arg));
+    }
+    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    eager_future(naming::id_type const& gid,
+            completed_callback_type const& data_sink,
+            error_callback_type const& error_sink,
+            threads::thread_priority priority,
+            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+      : base_type(data_sink, error_sink),
+        apply_logger_("eager_future::apply")
+    {
+        LLCO_(info) << "eager_future::eager_future("
+                    << hpx::actions::detail::get_action_name<Action>()
+                    << ", "
+                    << gid
+                    << ") args(" << (N + 1) << ")";
+        apply_p(gid, priority, BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
 #undef N

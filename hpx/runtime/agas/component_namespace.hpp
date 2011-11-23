@@ -41,10 +41,11 @@ struct component_namespace :
 
     response service(
         request const& req
+      , threads::thread_priority priority = threads::thread_priority_default
       , error_code& ec = throws
         )
     {
-        return this->base_type::service(this->gid_, req, ec);
+        return this->base_type::service(this->gid_, req, priority, ec);
     }
 };
 

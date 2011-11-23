@@ -94,6 +94,12 @@ namespace hpx { namespace lcos
             hpx::applier::apply_c<Action>(this->get_gid(), gid);
         }
 
+        void apply_p(naming::id_type const& gid, threads::thread_priority priority)
+        {
+            util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
+            hpx::applier::apply_c_p<Action>(this->get_gid(), gid, priority);
+        }
+
         /// Construct a new \a eager_future instance. The \a thread
         /// supplied to the function \a eager_future#get will be
         /// notified as soon as the result of the operation associated with
@@ -130,6 +136,27 @@ namespace hpx { namespace lcos
             apply(gid);
         }
 
+        eager_future(naming::gid_type const& gid, threads::thread_priority priority)
+          : apply_logger_("eager_future::apply")
+        {
+            LLCO_(info) << "eager_future::eager_future("
+                        << hpx::actions::detail::get_action_name<Action>()
+                        << ", "
+                        << gid
+                        << ") args(0)";
+            apply_p(naming::id_type(gid, naming::id_type::unmanaged), priority);
+        }
+        eager_future(naming::id_type const& gid, threads::thread_priority priority)
+          : apply_logger_("eager_future::apply")
+        {
+            LLCO_(info) << "eager_future::eager_future("
+                        << hpx::actions::detail::get_action_name<Action>()
+                        << ", "
+                        << gid
+                        << ") args(0)";
+            apply_p(gid, priority);
+        }
+
         /// The apply function starts the asynchronous operations encapsulated
         /// by this eager future.
         ///
@@ -142,6 +169,15 @@ namespace hpx { namespace lcos
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
             hpx::applier::apply_c<Action>(this->get_gid(), gid, arg0);
+        }
+
+        template <typename Arg0>
+        void apply_p(naming::id_type const& gid,
+            threads::thread_priority priority, Arg0 const& arg0)
+        {
+            util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
+            hpx::applier::apply_c_p<Action>(
+                this->get_gid(), gid, priority, arg0);
         }
 
         /// Construct a new \a eager_future instance. The \a thread
@@ -182,6 +218,32 @@ namespace hpx { namespace lcos
                         << gid
                         << ") args(1)";
             apply(gid, arg0);
+        }
+
+        template <typename Arg0>
+        eager_future(naming::gid_type const& gid,
+                threads::thread_priority priority, Arg0 const& arg0)
+          : apply_logger_("eager_future::apply")
+        {
+            LLCO_(info) << "eager_future::eager_future("
+                        << hpx::actions::detail::get_action_name<Action>()
+                        << ", "
+                        << gid
+                        << ") args(1)";
+            apply_p(naming::id_type(gid, naming::id_type::unmanaged),
+                priority, arg0);
+        }
+        template <typename Arg0>
+        eager_future(naming::id_type const& gid,
+                threads::thread_priority priority, Arg0 const& arg0)
+          : apply_logger_("eager_future::apply")
+        {
+            LLCO_(info) << "eager_future::eager_future("
+                        << hpx::actions::detail::get_action_name<Action>()
+                        << ", "
+                        << gid
+                        << ") args(1)";
+            apply_p(gid, priority, arg0);
         }
 
         // pull in remaining constructors
@@ -381,6 +443,12 @@ namespace hpx { namespace lcos
             hpx::applier::apply_c<Action>(this->get_gid(), gid);
         }
 
+        void apply_p(naming::id_type const& gid, threads::thread_priority priority)
+        {
+            util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
+            hpx::applier::apply_c_p<Action>(this->get_gid(), gid, priority);
+        }
+
         /// Construct a new \a eager_future instance. The \a thread
         /// supplied to the function \a eager_future#get will be
         /// notified as soon as the result of the operation associated with
@@ -423,6 +491,33 @@ namespace hpx { namespace lcos
             apply(gid);
         }
 
+        eager_future(naming::gid_type const& gid,
+                completed_callback_type const& data_sink,
+                error_callback_type const& error_sink,
+                threads::thread_priority priority)
+          : apply_logger_("eager_future::apply")
+        {
+            LLCO_(info) << "eager_future::eager_future("
+                        << hpx::actions::detail::get_action_name<Action>()
+                        << ", "
+                        << gid
+                        << ") args(0)";
+            apply_p(naming::id_type(gid, naming::id_type::unmanaged), priority);
+        }
+        eager_future(naming::id_type const& gid,
+                completed_callback_type const& data_sink,
+                error_callback_type const& error_sink,
+                threads::thread_priority priority)
+          : apply_logger_("eager_future::apply")
+        {
+            LLCO_(info) << "eager_future::eager_future("
+                        << hpx::actions::detail::get_action_name<Action>()
+                        << ", "
+                        << gid
+                        << ") args(0)";
+            apply_p(gid, priority);
+        }
+
         /// The apply function starts the asynchronous operations encapsulated
         /// by this eager future.
         ///
@@ -435,6 +530,15 @@ namespace hpx { namespace lcos
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
             hpx::applier::apply_c<Action>(this->get_gid(), gid, arg0);
+        }
+
+        template <typename Arg0>
+        void apply_p(naming::id_type const& gid,
+            threads::thread_priority priority, Arg0 const& arg0)
+        {
+            util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
+            hpx::applier::apply_c_p<Action>(
+                this->get_gid(), gid, priority, arg0);
         }
 
         /// Construct a new \a eager_future instance. The \a thread
@@ -512,6 +616,68 @@ namespace hpx { namespace lcos
                         << gid
                         << ") args(1)";
             apply(gid, arg0);
+        }
+
+        template <typename Arg0>
+        eager_future(naming::gid_type const& gid,
+                completed_callback_type const& data_sink,
+                threads::thread_priority priority, Arg0 const& arg0)
+          : base_type(data_sink),
+            apply_logger_("eager_future::apply")
+        {
+            LLCO_(info) << "eager_future::eager_future("
+                        << hpx::actions::detail::get_action_name<Action>()
+                        << ", "
+                        << gid
+                        << ") args(1)";
+            apply_p(naming::id_type(gid, naming::id_type::unmanaged),
+                priority, arg0);
+        }
+        template <typename Arg0>
+        eager_future(naming::id_type const& gid,
+                completed_callback_type const& data_sink,
+                threads::thread_priority priority, Arg0 const& arg0)
+          : base_type(data_sink),
+            apply_logger_("eager_future::apply")
+        {
+            LLCO_(info) << "eager_future::eager_future("
+                        << hpx::actions::detail::get_action_name<Action>()
+                        << ", "
+                        << gid
+                        << ") args(1)";
+            apply_p(gid, priority, arg0);
+        }
+
+        template <typename Arg0>
+        eager_future(naming::gid_type const& gid,
+                completed_callback_type const& data_sink,
+                error_callback_type const& error_sink,
+                threads::thread_priority priority, Arg0 const& arg0)
+          : base_type(data_sink, error_sink),
+            apply_logger_("eager_future::apply")
+        {
+            LLCO_(info) << "eager_future::eager_future("
+                        << hpx::actions::detail::get_action_name<Action>()
+                        << ", "
+                        << gid
+                        << ") args(1)";
+            apply_p(naming::id_type(gid, naming::id_type::unmanaged),
+                priority, arg0);
+        }
+        template <typename Arg0>
+        eager_future(naming::id_type const& gid,
+                completed_callback_type const& data_sink,
+                error_callback_type const& error_sink,
+                threads::thread_priority priority, Arg0 const& arg0)
+          : base_type(data_sink, error_sink),
+            apply_logger_("eager_future::apply")
+        {
+            LLCO_(info) << "eager_future::eager_future("
+                        << hpx::actions::detail::get_action_name<Action>()
+                        << ", "
+                        << gid
+                        << ") args(1)";
+            apply_p(gid, priority, arg0);
         }
 
         // pull in remaining constructors

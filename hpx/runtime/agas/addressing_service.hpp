@@ -192,6 +192,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     const bool caching_;
     const bool range_caching_;
+    const threads::thread_priority action_priority_;
 
     naming::locality here_;
     boost::uint64_t rts_lva_;
@@ -1004,7 +1005,7 @@ public:
     ///
     /// \returns          The function returns \a true if the global name
     ///                   was registered. It returns false if the global name is
-    ///                   not registered. 
+    ///                   not registered.
     ///
     /// \note             As long as \a ec is not pre-initialized to
     ///                   \a hpx#throws this function doesn't
@@ -1020,7 +1021,7 @@ public:
     static lcos::promise<bool, response> register_name_async(
         std::string const& name
       , naming::gid_type const& id
-        ); 
+        );
 
     /// \brief Unregister a global name (release any existing association)
     ///
@@ -1103,9 +1104,10 @@ public:
       , gva const& gva
       , error_code& ec = throws
         );
- 
+
     bool route_parcel(
         parcelset::parcel const& arg0
+      , error_code& ec = throws
         );
 };
 

@@ -29,6 +29,8 @@ addressing_service::addressing_service(
   , runtime_type(runtime_type_)
   , caching_(ini_.get_agas_caching_mode())
   , range_caching_(caching_ ? ini_.get_agas_range_caching_mode() : false)
+  , action_priority_(ini_.get_agas_dedicated_server() ?
+        threads::thread_priority_normal : threads::thread_priority_critical)
   , here_(get_runtime().here())
   , rts_lva_(get_runtime().get_runtime_support_lva())
   , state_(starting)
@@ -127,7 +129,7 @@ response addressing_service::service(
         if (is_bootstrap())
             return bootstrap->primary_ns_server.service(req, ec);
         else
-            return hosted->primary_ns_.service(req, ec);
+            return hosted->primary_ns_.service(req, action_priority_, ec);
     }
 
     else if (req.get_action_code() & component_ns_service)
@@ -135,7 +137,7 @@ response addressing_service::service(
         if (is_bootstrap())
             return bootstrap->component_ns_server.service(req, ec);
         else
-            return hosted->component_ns_.service(req, ec);
+            return hosted->component_ns_.service(req, action_priority_, ec);
     }
 
     else if (req.get_action_code() & symbol_ns_service)
@@ -143,7 +145,7 @@ response addressing_service::service(
         if (is_bootstrap())
             return bootstrap->symbol_ns_server.service(req, ec);
         else
-            return hosted->symbol_ns_.service(req, ec);
+            return hosted->symbol_ns_.service(req, action_priority_, ec);
     }
 
     HPX_THROWS_IF(ec, bad_action_code
@@ -165,7 +167,7 @@ bool addressing_service::register_locality(
         if (is_bootstrap())
             rep = bootstrap->primary_ns_server.service(req, ec);
         else
-            rep = hosted->primary_ns_.service(req, ec);
+            rep = hosted->primary_ns_.service(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return false;
@@ -199,7 +201,7 @@ boost::uint32_t addressing_service::resolve_locality(
         if (is_bootstrap())
             rep = bootstrap->primary_ns_server.service(req, ec);
         else
-            rep = hosted->primary_ns_.service(req, ec);
+            rep = hosted->primary_ns_.service(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return 0;
@@ -233,7 +235,7 @@ bool addressing_service::unregister_locality(
         if (is_bootstrap())
             rep = bootstrap->primary_ns_server.service(req, ec);
         else
-            rep = hosted->primary_ns_.service(req, ec);
+            rep = hosted->primary_ns_.service(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return false;
@@ -290,7 +292,7 @@ bool addressing_service::get_console_prefix(
         if (is_bootstrap())
             rep = bootstrap->symbol_ns_server.service(req, ec);
         else
-            rep = hosted->symbol_ns_.service(req, ec);
+            rep = hosted->symbol_ns_.service(req, action_priority_, ec);
 
         if (!ec && (rep.get_gid() != naming::invalid_gid) &&
             (rep.get_status() == success))
@@ -336,7 +338,7 @@ bool addressing_service::get_prefixes(
             if (is_bootstrap())
                 rep = bootstrap->component_ns_server.service(req, ec);
             else
-                rep = hosted->component_ns_.service(req, ec);
+                rep = hosted->component_ns_.service(req, action_priority_, ec);
 
             if (ec || (success != rep.get_status()))
                 return false;
@@ -361,7 +363,7 @@ bool addressing_service::get_prefixes(
             if (is_bootstrap())
                 rep = bootstrap->primary_ns_server.service(req, ec);
             else
-                rep = hosted->primary_ns_.service(req, ec);
+                rep = hosted->primary_ns_.service(req, action_priority_, ec);
 
             if (ec || (success != rep.get_status()))
                 return false;
@@ -403,7 +405,7 @@ components::component_type addressing_service::get_component_id(
         if (is_bootstrap())
             rep = bootstrap->component_ns_server.service(req, ec);
         else
-            rep = hosted->component_ns_.service(req, ec);
+            rep = hosted->component_ns_.service(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return components::component_invalid;
@@ -434,7 +436,7 @@ void addressing_service::iterate_types(
         if (is_bootstrap())
             bootstrap->symbol_ns_server.service(req, ec);
         else
-            hosted->symbol_ns_.service(req, ec);
+            hosted->symbol_ns_.service(req, action_priority_, ec);
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
@@ -461,7 +463,7 @@ components::component_type addressing_service::register_factory(
         if (is_bootstrap())
             rep = bootstrap->component_ns_server.service(req, ec);
         else
-            rep = hosted->component_ns_.service(req, ec);
+            rep = hosted->component_ns_.service(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return components::component_invalid;
@@ -483,12 +485,13 @@ components::component_type addressing_service::register_factory(
 
 bool addressing_service::route_parcel(
     parcelset::parcel const& p
+  , error_code& ec
     )
 {
     if (is_bootstrap())
-        return bootstrap->primary_ns_server.route(p);
+        return bootstrap->primary_ns_server.route(p, ec);
     else
-        return hosted->primary_ns_.route(p);
+        return hosted->primary_ns_.route(p, action_priority_, ec);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -729,7 +732,7 @@ bool addressing_service::unbind_range(
         if (is_bootstrap())
             rep = bootstrap->primary_ns_server.service(req, ec);
         else
-            rep = hosted->primary_ns_.service(req, ec);
+            rep = hosted->primary_ns_.service(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return false;
@@ -838,7 +841,7 @@ bool addressing_service::resolve(
         if (is_bootstrap())
             rep = bootstrap->primary_ns_server.service(req, ec);
         else
-            rep = hosted->primary_ns_.service(req, ec);
+            rep = hosted->primary_ns_.service(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return false;
@@ -1009,7 +1012,7 @@ boost::uint64_t addressing_service::incref(
         if (is_bootstrap())
             rep = bootstrap->primary_ns_server.service(req, ec);
         else
-            rep = hosted->primary_ns_.service(req, ec);
+            rep = hosted->primary_ns_.service(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return 0;
@@ -1043,7 +1046,7 @@ boost::uint64_t addressing_service::decref(
         if (is_bootstrap())
             rep = bootstrap->primary_ns_server.service(req, ec);
         else
-            rep = hosted->primary_ns_.service(req, ec);
+            rep = hosted->primary_ns_.service(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return 0;
@@ -1092,7 +1095,7 @@ bool addressing_service::register_name(
         if (is_bootstrap())
             rep = bootstrap->symbol_ns_server.service(req, ec);
         else
-            rep = hosted->symbol_ns_.service(req, ec);
+            rep = hosted->symbol_ns_.service(req, action_priority_, ec);
 
         return !ec && (success == rep.get_status());
     }
@@ -1123,7 +1126,7 @@ bool addressing_service::unregister_name(
         if (is_bootstrap())
             rep = bootstrap->symbol_ns_server.service(req, ec);
         else
-            rep = hosted->symbol_ns_.service(req, ec);
+            rep = hosted->symbol_ns_.service(req, action_priority_, ec);
 
         if (!ec && (success == rep.get_status()))
         {
@@ -1160,7 +1163,7 @@ bool addressing_service::resolve_name(
         if (is_bootstrap())
             rep = bootstrap->symbol_ns_server.service(req, ec);
         else
-            rep = hosted->symbol_ns_.service(req, ec);
+            rep = hosted->symbol_ns_.service(req, action_priority_, ec);
 
         if (!ec && (success == rep.get_status()))
         {
@@ -1198,7 +1201,7 @@ bool addressing_service::iterateids(
         if (is_bootstrap())
             rep = bootstrap->symbol_ns_server.service(req, ec);
         else
-            rep = hosted->symbol_ns_.service(req, ec);
+            rep = hosted->symbol_ns_.service(req, action_priority_, ec);
 
         return !ec && (success == rep.get_status());
     }

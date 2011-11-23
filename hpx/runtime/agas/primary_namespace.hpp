@@ -32,27 +32,30 @@ struct primary_namespace :
 
     response service(
         request const& req
+      , threads::thread_priority priority = threads::thread_priority_default
       , error_code& ec = throws
         )
     {
-        return this->base_type::service(this->gid_, req, ec);
+        return this->base_type::service(this->gid_, req, priority, ec);
     }
 
     lcos::promise<bool> route_async(
         parcelset::parcel const& p
+      , threads::thread_priority priority = threads::thread_priority_default
         )
     {
-        return this->base_type::route_async(this->gid_, p);
+        return this->base_type::route_async(this->gid_, p, priority);
     }
 
     bool route(
         parcelset::parcel const& p
+      , threads::thread_priority priority = threads::thread_priority_default
       , error_code& ec = throws
         )
     {
-        return this->base_type::route(this->gid_, p, ec);
+        return this->base_type::route(this->gid_, p, priority, ec);
     }
- 
+
 };
 
 }}

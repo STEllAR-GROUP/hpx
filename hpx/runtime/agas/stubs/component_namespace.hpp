@@ -28,19 +28,21 @@ struct component_namespace
     static lcos::promise<Result, response> service_async(
         naming::id_type const& gid
       , request const& req
+      , threads::thread_priority priority = threads::thread_priority_default
         )
     {
         typedef server_type::service_action action_type;
-        return lcos::eager_future<action_type, Result>(gid, req);
+        return lcos::eager_future<action_type, Result>(gid, priority, req);
     }
 
     static response service(
         naming::id_type const& gid
       , request const& req
+      , threads::thread_priority priority = threads::thread_priority_default
       , error_code& ec = throws
         )
     {
-        return service_async<response>(gid, req).get(ec);
+        return service_async<response>(gid, req, priority).get(ec);
     }
 };
 

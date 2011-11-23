@@ -298,6 +298,21 @@ namespace hpx { namespace util
         return HPX_INITIAL_AGAS_MAX_RESOLVE_REQUESTS;
     }
 
+    // Get whether the AGAS server is running as a dedicated runtime.
+    // This decides whether the AGAS actions are executed with normal
+    // priority (if dedicated) or with high priority (non-dedicated)
+    bool runtime_configuration::get_agas_dedicated_server() const
+    {
+        if (has_section("hpx.agas")) {
+            util::section const* sec = get_section("hpx.agas");
+            if (NULL != sec) {
+                return boost::lexical_cast<int>(
+                    sec->get_entry("dedicated_server", 0)) ? true : false;
+            }
+        }
+        return false;
+    }
+
     bool runtime_configuration::get_itt_notify_mode() const
     {
 #if HPX_USE_ITT == 1
