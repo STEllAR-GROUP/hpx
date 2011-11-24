@@ -35,7 +35,7 @@ namespace gtc { namespace stubs
             std::string const& particlefile)
         {
             // The following get yields control while the action above
-            // is executed and the result is returned to the promise
+            // is executed and the result is returned to the promise.
             init_async(gid,objectid,particlefile).get();
         }
 
@@ -53,7 +53,7 @@ namespace gtc { namespace stubs
             double posy,double posz)
         {
             // The following get yields control while the action above
-            // is executed and the result is returned to the promise
+            // is executed and the result is returned to the promise.
             return distance_async(gid,posx,posy,posz).get();
         }
 

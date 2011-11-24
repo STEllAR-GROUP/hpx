@@ -36,7 +36,7 @@ namespace gtc { namespace stubs
             std::size_t max_num_neighbors,std::string const& meshfile)
         {
             // The following get yields control while the action above
-            // is executed and the result is returned to the promise
+            // is executed and the result is returned to the promise.
             init_async(gid,objectid,max_num_neighbors,meshfile).get();
         }
 
@@ -56,7 +56,7 @@ namespace gtc { namespace stubs
             std::vector<hpx::naming::id_type> const& particle_components)
         {
             // The following get yields control while the action above
-            // is executed and the result is returned to the promise
+            // is executed and the result is returned to the promise.
             search_async(gid,particle_components).get();
         }
     };
