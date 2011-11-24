@@ -96,7 +96,7 @@ int hpx_main(variables_map& vm)
 
             std::size_t shepherd = 0;
 
-            while (os_threads.dequeue(&shepherd))
+            while (os_threads.dequeue(shepherd))
                 ++results[shepherd];
         }
 
