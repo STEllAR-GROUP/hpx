@@ -136,7 +136,7 @@ int hpx_main(variables_map& vm)
         // {{{ Print results for this iteration.
         std::pair<thread_id_type, std::size_t>* entry = 0;
 
-        while (pxthreads.dequeue(&entry))
+        while (pxthreads.dequeue(entry))
         {
             BOOST_ASSERT(entry);
             std::cout << "  " << entry->first << "," << entry->second << "\n";
