@@ -169,6 +169,14 @@ namespace hpx { namespace components
                 get_component_name() + ")");
             return naming::invalid_gid;
         }
+        
+        naming::gid_type create_one_functor(HPX_STD_FUNCTION<void(void**)> const&)
+        {
+            HPX_THROW_EXCEPTION(bad_request,
+                "component_factory::create_one",
+                "create_one is not supported by this factory instance");
+            return naming::invalid_gid;
+        }
 
         /// \brief Destroy one or more component instances
         ///

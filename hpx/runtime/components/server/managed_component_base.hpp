@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c)      2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -22,21 +23,38 @@
 #include <hpx/util/static.hpp>
 #include <hpx/util/stringstream.hpp>
 
+#include <iostream>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
     template <typename Component, typename Derived>
     class managed_component;
 
+    template <typename T, typename Enable = void>
+    struct component_ctor_policy
+    {
+        typedef construct_without_back_ptr type;
+    };
+
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Wrapper>
+    template <typename Component, typename Wrapper, typename CtorPolicy>
     class managed_component_base
       : public detail::managed_component_tag, boost::noncopyable
     {
     public:
+        typedef void has_managed_component_base;
+        typedef CtorPolicy ctor_policy;
+
         managed_component_base()
           : back_ptr_(0)
         {}
+
+        managed_component_base(managed_component<Component, Wrapper>* back_ptr)
+          : back_ptr_(back_ptr)
+        {
+            BOOST_ASSERT(back_ptr);
+        }
 
         // components must contain a typedef for wrapping_type defining the
         // managed_component type used to encapsulate instances of this
@@ -74,6 +92,15 @@ namespace hpx { namespace components
         }
 
         managed_component<Component, Wrapper>* back_ptr_;
+    };
+
+    template <typename Component>
+    struct component_ctor_policy<
+        Component
+      , typename Component::has_managed_component_base
+    >
+    {
+        typedef typename Component::ctor_policy type;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -175,17 +202,52 @@ namespace hpx { namespace components
         /// \brief Construct a managed_component instance holding a new wrapped
         ///        instance
         managed_component()
-          : component_(new wrapped_type())
+          : component_(0)
         {
+            init(typename component_ctor_policy<Component>::type());
+        }
+
+        void init(construct_with_back_ptr)
+        {
+            component_ = new wrapped_type(this);
+        }
+
+        void init(construct_without_back_ptr)
+        {
+            component_ = new wrapped_type();
             component_->set_back_ptr(this);
         }
 
 #define MANAGED_COMPONENT_CONSTRUCT(Z, N, _)                                  \
         template <BOOST_PP_ENUM_PARAMS(N, typename T)>                        \
-        managed_component(BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t))        \
-          : component_(new wrapped_type(BOOST_PP_ENUM_PARAMS(N, t)))          \
+        void init(                                                            \
+            construct_with_back_ptr                                           \
+          , BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t)                       \
+        )                                                                     \
         {                                                                     \
+            component_ = new wrapped_type(this, BOOST_PP_ENUM_PARAMS(N, t));  \
+        }                                                                     \
+                                                                              \
+        template <BOOST_PP_ENUM_PARAMS(N, typename T)>                        \
+        void init(                                                            \
+            construct_without_back_ptr                                        \
+          , BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t)                       \
+        )                                                                     \
+        {                                                                     \
+            component_ = new wrapped_type(BOOST_PP_ENUM_PARAMS(N, t));        \
             component_->set_back_ptr(this);                                   \
+        }                                                                     \
+                                                                              \
+        template <BOOST_PP_ENUM_PARAMS(N, typename T)>                        \
+        managed_component(                                                    \
+            BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t)                       \
+        )                                                                     \
+          : component_(0)                                                     \
+        {                                                                     \
+            init(                                                             \
+                typename component_ctor_policy<Component>::type()             \
+              , BOOST_PP_ENUM_PARAMS(N, t)                                    \
+            );                                                                \
         }
     /**/
 
@@ -439,16 +501,16 @@ namespace hpx { namespace components
         Component* component_;
     };
 
-    template <typename Component, typename Wrapper>
+    template <typename Component, typename Wrapper, typename CtorPolicy>
     inline naming::id_type
-    managed_component_base<Component, Wrapper>::get_gid() const
+    managed_component_base<Component, Wrapper, CtorPolicy>::get_gid() const
     {
         return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
     }
 
-    template <typename Component, typename Wrapper>
+    template <typename Component, typename Wrapper, typename CtorPolicy>
     inline naming::gid_type
-    managed_component_base<Component, Wrapper>::get_base_gid() const
+    managed_component_base<Component, Wrapper, CtorPolicy>::get_base_gid() const
     {
         BOOST_ASSERT(back_ptr_);
         return back_ptr_->get_base_gid();

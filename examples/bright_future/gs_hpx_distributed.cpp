@@ -31,13 +31,13 @@ typedef grid_type::size_type size_type;
 
 using hpx::util::high_resolution_timer;
 
-/*
 using hpx::cout;
 using hpx::flush;
-*/
+/*
 #include <iostream>
 using std::cout;
 using std::flush;
+*/
 using hpx::lcos::dataflow;
 using hpx::lcos::dataflow_trigger;
 using hpx::lcos::dataflow_base;
@@ -536,50 +536,47 @@ void gs(
                                         : std::min(n_y_local + 1, y + block_size)
                                 );
 
-                            unsigned num_triggers = 1;
                             cout << get_locality_from_id(grid_ids(x_block, y_block)) << " " << flush;
 
-                            dataflow_trigger deps(grid_ids(x_block, y_block));
+                            std::vector<dataflow_base<void> > deps;
+                            //dataflow_trigger deps(grid_ids(x_block, y_block));
+                            //dataflow_trigger deps(find_here());
 
-                            deps.add(prev(xx, yy));
+                            deps.push_back(prev(xx, yy));
                             if(iter == 0)
                             {
-                                deps.add(rhs_promise(x_block, y_block)(xx, yy));
-                                ++num_triggers;
+                                deps.push_back(rhs_promise(x_block, y_block)(xx, yy));
                                 cout << "." << flush;
                             }
 
                             if(xx + 1 < n_x_local_block)
                             {
-                                deps.add(prev(xx + 1, yy));
-                                ++num_triggers;
+                                deps.push_back(prev(xx + 1, yy));
                                 cout << "." << flush;
                             }
                             
                             if(yy + 1 < n_y_local_block)
                             {
-                                deps.add(prev(xx, yy + 1));
-                                ++num_triggers;
+                                deps.push_back(prev(xx, yy + 1));
                                 cout << "." << flush;
                             }
 
                             if(xx > 0)
                             {
-                                deps.add(current(xx - 1, yy));
-                                ++num_triggers;
+                                deps.push_back(current(xx - 1, yy));
                                 cout << "." << flush;
                             }
 
                             if(yy > 0)
                             {
-                                deps.add(current(xx, yy - 1));
-                                ++num_triggers;
+                                deps.push_back(current(xx, yy - 1));
                                 cout << "." << flush;
                             }
 
+#if 0
                             if(xx == 0 && x_block > 0)
                             {
-                                deps.add(
+                                deps.push_back(
                                     update_left_boundary_dataflow(
                                         grid_ids(x_block, y_block)
                                       , get_column_dataflow(
@@ -588,13 +585,14 @@ void gs(
                                           , y_range
                                         )
                                       , y_range
+                                      /*
                                       , prev_block(x_block - 1, y_block)(
                                             n_x_local_block -1
                                           , yy
                                         )
+                                        */
                                     )
                                 );
-                                ++num_triggers;
                                 cout << "l" << flush;
                             }
 
@@ -603,7 +601,7 @@ void gs(
                              && x_block + 1 < n_x_block
                             )
                             {
-                                deps.add(
+                                deps.push_back(
                                     update_right_boundary_dataflow(
                                         grid_ids(x_block, y_block)
                                       , get_column_dataflow(
@@ -612,19 +610,20 @@ void gs(
                                           , y_range
                                         )
                                       , y_range
+                                      /*
                                       , prev_block(x_block + 1, y_block)(
                                             0
                                           , yy
                                         )
+                                        */
                                     )
                                 );
-                                ++num_triggers;
                                 cout << "r" << flush;
                             }
                             
                             if(yy == 0 && y_block > 0)
                             {
-                                deps.add(
+                                deps.push_back(
                                     update_top_boundary_dataflow(
                                         grid_ids(x_block, y_block)
                                       , get_row_dataflow(
@@ -633,19 +632,20 @@ void gs(
                                           , x_range
                                         )
                                       , x_range
+                                      /*
                                       , prev_block(x_block, y_block - 1)(
                                             xx
                                           , n_y_local_block -1
                                         )
+                                        */
                                     )
                                 );
-                                ++num_triggers;
                                 cout << "t" << flush;
                             }
                             
                             if(yy + 1 == n_y_local_block && y_block + 1 < n_y_block)
                             {
-                                deps.add(
+                                deps.push_back(
                                     update_bottom_boundary_dataflow(
                                         grid_ids(x_block, y_block)
                                       , get_row_dataflow(
@@ -654,17 +654,17 @@ void gs(
                                           , x_range
                                         )
                                       , x_range
+                                      /*
                                       , prev_block(x_block, y_block + 1)(
                                             xx
                                           , 0
                                         )
+                                        */
                                     )
                                 );
-                                ++num_triggers;
                                 cout << "b" << flush;
                             }
-
-                            deps.set_trigger_size(num_triggers);
+#endif
 
                             /*
                             cout << "x " << x_range.first << " " << x_range.second << "\n" << flush;
@@ -676,7 +676,7 @@ void gs(
                                   , update_fun()
                                   , x_range
                                   , y_range
-                                  , deps
+                                  , dataflow_trigger(grid_ids(x_block, y_block), deps)
                                 );
                             cout << ".! " << flush;
                         }

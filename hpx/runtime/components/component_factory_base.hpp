@@ -81,6 +81,18 @@ namespace hpx { namespace components
         ///         sequential in a row.
         virtual naming::gid_type create_one (
             components::constructor_argument const&) = 0;
+        
+        /// \brief Create one new component instance using the given constructor
+        ///        argument.
+        ///
+        /// \param Arg0  [in] The type specific constructor argument
+        ///
+        /// \return Returns the GID of the first newly created component
+        ///         instance. If more than one component instance has been
+        ///         created (\a count > 1) the GID's of all new instances are
+        ///         sequential in a row.
+        virtual naming::gid_type create_one_functor(
+            HPX_STD_FUNCTION<void(void**)> const&) = 0;
 
         /// \brief Destroy one or more component instances
         ///

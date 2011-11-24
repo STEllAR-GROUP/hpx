@@ -400,7 +400,6 @@ namespace hpx { namespace traits
         }
 #endif
 
-
         void set_event()
         {
             this->set_result_nonvirt(remote_result());

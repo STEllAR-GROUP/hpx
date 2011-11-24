@@ -143,18 +143,17 @@ int hpx_main(variables_map & vm)
             ).get()
             << "\n" << flush;
 
-        dataflow_trigger trigger(find_here());
-        trigger.add(dataflow<f1action>(find_here()));
-        trigger.add(dataflow<f2action>(find_here()));
-        trigger.add(dataflow<f3action>(find_here()));
-        trigger.add(dataflow<f4action>(find_here()));
-        trigger.add(dataflow<f5action>(find_here()));
-        trigger.add(dataflow<f6action>(find_here()));
-        trigger.add(dataflow<f7action>(find_here()));
-        trigger.add(dataflow<f8action>(find_here()));
-        trigger.set_trigger_size(8);
+        std::vector<dataflow_base<void> > trigger;
+        trigger.push_back(dataflow<f1action>(find_here()));
+        trigger.push_back(dataflow<f2action>(find_here()));
+        trigger.push_back(dataflow<f3action>(find_here()));
+        trigger.push_back(dataflow<f4action>(find_here()));
+        trigger.push_back(dataflow<f5action>(find_here()));
+        trigger.push_back(dataflow<f6action>(find_here()));
+        trigger.push_back(dataflow<f7action>(find_here()));
+        trigger.push_back(dataflow<f8action>(find_here()));
 
-        dataflow<f9action>(find_here(), trigger).get();
+        dataflow<f9action>(find_here(), dataflow_trigger(find_here(), trigger)).get();
 
         cout << "entering destruction test scope\n" << flush;
         {

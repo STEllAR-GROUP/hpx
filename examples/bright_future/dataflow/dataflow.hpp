@@ -12,6 +12,19 @@
 
 namespace hpx { namespace lcos {
 
+    namespace detail
+    {
+        template <typename Action>
+        struct action_wrapper
+        {
+            typedef Action type;
+
+            template <typename Archive>
+            void serialize(Archive & ar, unsigned)
+            {}
+        };
+    }
+
     template <
         typename Action
       , typename Result
@@ -36,59 +49,57 @@ namespace hpx { namespace lcos {
                 << "~dataflow::dataflow() ";
         }
 
-        typedef
-            hpx::components::server::runtime_support::create_component_action
-            create_component_action;
-
-
         // MSVC chokes on having the lambda in the member initializer list below
         static inline lcos::promise<naming::id_type, naming::gid_type>
-        create_component(naming::id_type target)
+        create_component(naming::id_type const & target)
         {
-            return async_callback<create_component_action>(
-                    [target](naming::id_type const & gid) mutable
-                    {
-                        typedef hpx::lcos::server::init_action<Action> action_type;
-                        applier::apply<action_type>(gid, target);
-                    }
-                  , naming::get_locality_from_id(target)
+            typedef
+                typename hpx::components::server::create_one_component_action2<
+                    components::managed_component<server::dataflow>
+                  , detail::action_wrapper<Action>
+                  , naming::id_type
+                >::type
+                create_component_action;
+            return
+                async<create_component_action>(
+                    naming::get_locality_from_id(target)
                   , stub_type::get_component_type()
-                  , 1
+                  , detail::action_wrapper<Action>()
+                  , target
                 );
         }
 
         explicit dataflow(naming::id_type const & target)
             : base_type(
                 create_component(target))
-              /*
-                    hpx::naming::id_type(
-                        hpx::naming::strip_credit_from_gid(target.get_gid())
-                      , hpx::naming::id_type::unmanaged
-                    )
-                )
-            )*/
         {
-            //this->get_gid();
         }
 
 #define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
         template <BOOST_PP_ENUM_PARAMS(N, typename A)>                          \
         static inline lcos::promise<naming::id_type, naming::gid_type>          \
-        create_component(naming::id_type  target                        \
+        create_component(naming::id_type const & target                         \
           , BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)                        \
         )                                                                       \
         {                                                                       \
-            return async_callback<create_component_action>(                     \
-                    [=](naming::id_type const & gid) mutable                    \
-                    {                                                           \
-                        typedef hpx::lcos::server::init_action<                 \
-                            Action, BOOST_PP_ENUM_PARAMS(N, A)> action_type;    \
-                        applier::apply<action_type>(gid, target                 \
-                          , BOOST_PP_ENUM_PARAMS(N, a));                        \
-                    }                                                           \
-                  , naming::get_locality_from_id(target)                        \
+            typedef                                                             \
+                typename BOOST_PP_CAT(                                          \
+                    hpx::components::server::create_one_component_action        \
+                  , BOOST_PP_ADD(N, 2)                                          \
+                )<                                                              \
+                    components::managed_component<server::dataflow>             \
+                  , detail::action_wrapper<Action>                              \
+                  , naming::id_type                                             \
+                  , BOOST_PP_ENUM_PARAMS(N, A)                                  \
+                >::type                                                         \
+                create_component_action;                                        \
+            return                                                              \
+                async<create_component_action>(                                 \
+                    naming::get_locality_from_id(target)                        \
                   , stub_type::get_component_type()                             \
-                  , 1                                                           \
+                  , detail::action_wrapper<Action>()                            \
+                  , target                                                      \
+                  , BOOST_PP_ENUM_PARAMS(N, a)                                  \
                 );                                                              \
         }                                                                       \
         template <BOOST_PP_ENUM_PARAMS(N, typename A)>                          \
@@ -103,17 +114,10 @@ namespace hpx { namespace lcos {
             )                                                                   \
         {                                                                       \
         }                                                                       \
-            /*
-                    hpx::naming::id_type(                                       \
-                        hpx::naming::strip_credit_from_gid(target.get_gid())    \
-                      , hpx::naming::id_type::unmanaged                         \
-                    )                                                           \
-            this->get_gid();                                                    \
-             */
     /**/
         BOOST_PP_REPEAT_FROM_TO(
             1
-          , HPX_ACTION_ARGUMENT_LIMIT
+          , BOOST_PP_SUB(HPX_ACTION_ARGUMENT_LIMIT, 3)
           , HPX_LCOS_DATAFLOW_M0
           , _
         )

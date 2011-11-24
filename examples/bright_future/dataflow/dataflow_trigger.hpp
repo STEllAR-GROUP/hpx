@@ -21,42 +21,40 @@ namespace hpx { namespace lcos {
 
         typedef dataflow_base<void> base_type;
 
-        typedef
-            hpx::components::server::runtime_support::create_component_action
-            create_component_action;
-
         typedef stubs::dataflow_trigger stub_type;
 
         dataflow_trigger() {}
 
-        explicit dataflow_trigger(naming::id_type const & id)
-            : base_type(
+        // MSVC chokes on having the lambda in the member initializer list below
+        static inline lcos::promise<naming::id_type, naming::gid_type>
+        create_component(
+            naming::id_type const & id
+          , std::vector<dataflow_base<void> > const & trigger
+        )
+        {
+            typedef
+                hpx::components::server::create_one_component_action1<
+                    components::managed_component<server::dataflow_trigger>
+                  , std::vector<dataflow_base<void> >
+                >::type
+                create_component_action;
+            return
                 async<create_component_action>(
                     naming::get_locality_from_id(id)
                   , stub_type::get_component_type()
-                  , 1
-                )
+                  , trigger
+                );
+        }
+
+        dataflow_trigger(
+            naming::id_type const & id
+          , std::vector<dataflow_base<void> > const & trigger
+        )
+            : base_type(
+                create_component(id, trigger)
             )
         {}
 
-        template <typename Result, typename RemoteResult>
-        void add(dataflow_base<Result, RemoteResult> const & df)
-        {
-            typedef
-                typename hpx::lcos::server::add_action<Result, RemoteResult>::type
-                action_type;
-            async<action_type>(this->get_gid(), df);
-            //wait(async<action_type>(get_gid(), df));
-        }
-
-        void set_trigger_size(unsigned size)
-        {
-            typedef
-                hpx::lcos::server::dataflow_trigger::set_trigger_size_action
-                action_type;
-            async<action_type>(this->get_gid(), size);
-            //wait(async<action_type>(get_gid(), size));
-        }
     private:
 
         friend class boost::serialization::access;

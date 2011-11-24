@@ -314,25 +314,16 @@ void gs(
                               , y + 1 == n_y_block ? n_y-1 : y_block + block_size
                               );
 
-                        //dataflow_base<void> deps  = prev(x, y);
-                        dataflow_trigger deps(find_here());
-                        unsigned num_triggers = 1;
-                        deps.add(prev(x, y));
+                        std::vector<dataflow_base<void> > deps;
+                        // we need to be sure to wait for the previous iteration.
+                        deps.push_back(prev(x, y));
 
                         if(iter==0)
                         {
-                            //deps = dataflow<dependency_action>(find_here(), deps, init_rhs_promises(x, y), prev(x,y));
-                            deps.add(init_rhs_promises(x, y));
-                            ++num_triggers;
-                            //deps.push_back(&init_rhs_promises(x,y));
+                            deps.push_back(init_rhs_promises(x, y));
                         }
                         // these are our dependencies to update this specific
                         // block
-
-                        // we need to be sure to wait for the previous iteration.
-                        //deps.push_back(&prev(x,y));
-                        //deps = dataflow<dependency_action>(find_here(), deps, prev(x,y));
-                        //dataflow<dependency_action>(find_here(), prev(x,y)).get();
 
                         // keep in mind, our loop goes from top-left to bottom
                         // right.
@@ -341,45 +332,29 @@ void gs(
                         {
                             // add the right block of the previous iteration
                             // to our list of dependencies
-                            //deps.push_back(&prev(x+1,y));
-                            deps.add(prev(x+1, y));
-                            ++num_triggers;
-                            //dataflow<dependency_action>(find_here(), prev(x+1, y)).get();
+                            deps.push_back(prev(x+1, y));
                         }
 
                         if(y + 1 < n_y_block) // are we on the boundary?
                         {
                             // add the upper block of the previous iteration
                             // to our list of dependencies
-                            //deps.push_back(&prev(x,y+1));
-                            //deps = dataflow<dependency_action>(find_here(), deps, prev(x, y+1));
-                            deps.add(prev(x, y+1));
-                            ++num_triggers;
-                            //dataflow<dependency_action>(find_here(), prev(x, y+1)).get();
+                            deps.push_back(prev(x, y+1));
                         }
 
                         if(x > 0) // are we on the boundary?
                         {
                             // add the upper block of the current iteration
                             // to our list of dependencies
-                            //deps.push_back(&current(x-1,y));
-                            //deps = dataflow<dependency_action>(find_here(), deps, current(x-1, y));
-                            deps.add(current(x-1, y));
-                            ++num_triggers;
-                            //dataflow<dependency_action>(find_here(), current(x-1, y)).get();
+                            deps.push_back(current(x-1, y));
                         }
 
                         if(y > 0) // are we on the boundary?
                         {
                             // add the upper block of the current iteration
                             // to our list of dependencies
-                            //deps.push_back(&current(x,y-1));
-                            //deps = dataflow<dependency_action>(find_here(), deps, current(x, y-1));
-                            deps.add(current(x, y-1));
-                            ++num_triggers;
-                            //dataflow<dependency_action>(find_here(), current(x, y-1)).get();
+                            deps.push_back(current(x, y-1));
                         }
-                        deps.set_trigger_size(num_triggers);
 
                         //deps.get();
                         current(x, y) =
@@ -396,7 +371,7 @@ void gs(
                               , update_fun()
                               , x_range
                               , y_range
-                              , deps
+                              , dataflow_trigger(find_here(), deps)
                             );
                         //cout << "." << flush;
                     }

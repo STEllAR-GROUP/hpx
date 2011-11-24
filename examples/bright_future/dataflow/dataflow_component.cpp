@@ -13,6 +13,7 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
+#include <hpx/runtime/components/generic_component_factory.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 
@@ -30,20 +31,35 @@ HPX_REGISTER_COMPONENT_MODULE();
 
 typedef hpx::components::managed_component<hpx::lcos::server::dataflow> dataflow_type;
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_EX(
+HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY_EX(
     dataflow_type,
     bright_future_dataflow, true);
 
 HPX_DEFINE_GET_COMPONENT_TYPE(dataflow_type::wrapped_type);
 
+HPX_REGISTER_ACTION_EX(
+    hpx::lcos::server::dataflow::connect_action
+  , dataflow_type_connect_action
+)
+
 typedef hpx::components::managed_component<hpx::lcos::server::dataflow_trigger>
     dataflow_trigger_type;
 
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_EX(
+HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY_EX(
     dataflow_trigger_type,
     bright_future_dataflow_trigger, true);
 
 HPX_DEFINE_GET_COMPONENT_TYPE(dataflow_trigger_type::wrapped_type);
+
+HPX_REGISTER_ACTION_EX(
+    hpx::lcos::server::dataflow_trigger::connect_action
+  , dataflow_trigger_type_connect_action
+)
+
+HPX_REGISTER_ACTION_EX(
+    hpx::lcos::server::dataflow_trigger::init_action
+  , dataflow_trigger_type_init_action
+)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace server { namespace detail

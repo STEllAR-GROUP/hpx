@@ -13,6 +13,7 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 
+#include <examples/bright_future/dataflow/dataflow_base.hpp>
 #include <examples/bright_future/dataflow/server/detail/dataflow_slot.hpp>
 #include <examples/bright_future/dataflow/server/detail/component_wrapper.hpp>
 
@@ -20,88 +21,108 @@ namespace hpx { namespace lcos { namespace server
 {
     /// The dataflow server side representation
     struct dataflow_trigger
-        : components::managed_component_base<dataflow_trigger>
+        : components::managed_component_base<
+            dataflow_trigger
+          , hpx::components::detail::this_type
+          , hpx::components::construct_with_back_ptr
+        >
     {
-
         typedef dataflow_trigger wrapped_type;
+        typedef
+            components::managed_component_base<
+                dataflow_trigger
+              , hpx::components::detail::this_type
+              , hpx::components::construct_with_back_ptr
+            >
+            base_type;
 
-        dataflow_trigger()
-            : all_set(false)
-            , slots_set(0)
-            , slots_completed(~0u)
-        {}
+        typedef hpx::components::managed_component<dataflow_trigger> component_type;
 
-        ~dataflow_trigger()
-        {
-            trigger_targets();
-            BOOST_FOREACH(detail::component_wrapper_base * c, triggers)
-            {
-                delete c;
-            }
-        }
-
-        template <typename Result, typename RemoteResult>
-        void add(dataflow_base<Result, RemoteResult> const & source)
+        void init(std::vector<dataflow_base<void> > const & trigger)
         {
             typedef
                 detail::component_wrapper<
                     detail::dataflow_slot<
-                        dataflow_base<Result, RemoteResult>
+                        dataflow_base<void>
                       , -1
                       , wrapped_type
                     >
                 >
                 component_type;
-            LLCO_(info) <<
-                "server::dataflow_trigger::add() {" << get_gid() << "}"
-                ;
-            component_type * w;
-            {
-                hpx::util::spinlock::scoped_lock l(mtx);
-                w = new component_type(this, source, triggers.size());
-                //slots_completed |= (1<<triggers.size());
-                triggers.push_back(w);
-            }
-            (*w)->connect();
-        }
-
-        void set_trigger_size(unsigned size)
-        {
             {
                 hpx::util::spinlock::scoped_lock l(mtx);
                 slots_completed = 0;
-                for(unsigned i = 0; i < size; ++i)
+                for(unsigned i = 0; i < trigger.size(); ++i)
                 {
                     slots_completed |= (1<<i);
                 }
             }
-            trigger_targets();
+            triggers.reserve(trigger.size());
+            for(unsigned i = 0; i < trigger.size(); ++i)
+            {
+                component_type * w = new component_type(this, trigger.at(i), i);
+                (*w)->connect();
+                triggers.push_back(w);
+            }
         }
 
         typedef
             ::hpx::actions::action1<
                 dataflow_trigger
               , 0
-              , unsigned
-              , &dataflow_trigger::set_trigger_size
+              , std::vector<dataflow_base<void> > const &
+              , &dataflow_trigger::init
             >
-            set_trigger_size_action;
+            init_action;
+        
+        dataflow_trigger(component_type * back_ptr)
+            : base_type(back_ptr)
+            , all_set(false)
+            , slots_set(0)
+            , slots_completed(~0u)
+        {
+            BOOST_ASSERT(false);
+        }
+
+        dataflow_trigger(component_type * back_ptr, std::vector<dataflow_base<void> > const & trigger)
+            : base_type(back_ptr)
+            , all_set(false)
+            , slots_set(0)
+            , slots_completed(~0u)
+        {
+            BOOST_ASSERT(this->get_gid());
+            applier::apply<init_action>(this->get_gid(), trigger);
+            //init(trigger);
+        }
+
+        ~dataflow_trigger()
+        {
+            trigger_targets();
+            BOOST_ASSERT(all_set);
+            BOOST_FOREACH(detail::component_wrapper_base * c, triggers)
+            {
+                delete c;
+            }
+        }
 
         void connect(naming::id_type const & target)
         {
             LLCO_(info) <<
                 "server::dataflow_trigger::connect(" << target << ") {" << get_gid() << "}"
                 ;
-            hpx::util::spinlock::scoped_lock l(mtx);
-            if(all_set)
             {
-                typedef hpx::lcos::base_lco::set_event_action action_type;
-                l.unlock();
-                applier::apply<action_type>(target);
-            }
-            else
-            {
-                targets.push_back(target);
+                hpx::util::spinlock::scoped_lock l(mtx);
+                if(all_set)
+                {
+                    typedef hpx::lcos::base_lco::set_event_action action_type;
+                    l.unlock();
+                    BOOST_ASSERT(target);
+                    applier::apply<action_type>(target);
+                }
+                else
+                {
+                    targets.push_back(target);
+                }
             }
         }
 
@@ -142,6 +163,7 @@ namespace hpx { namespace lcos { namespace server
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef hpx::lcos::base_lco::set_event_action action_type;
+                BOOST_ASSERT(t[i]);
                 applier::apply<action_type>(t[i]);
             }
         }
@@ -154,19 +176,16 @@ namespace hpx { namespace lcos { namespace server
         std::vector<detail::component_wrapper_base *> triggers;
         std::vector<naming::id_type> targets;
     };
-
-    template <typename Result, typename RemoteResult>
-    struct add_action
-    {
-        typedef
-            hpx::actions::action1<
-                dataflow_trigger
-              , 0
-              , dataflow_base<Result, RemoteResult> const &
-              , &dataflow_trigger::add
-            >
-            type;
-    };
 }}}
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::server::dataflow_trigger::connect_action
+  , dataflow_trigger_type_connect_action
+)
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::server::dataflow_trigger::init_action
+  , dataflow_trigger_type_init_action
+)
 
 #endif
