@@ -373,16 +373,16 @@ if(MSVC)
   if(HPX_CXX11)
     # C++11 support
     set(HPX_CXX11_RVALUE_REFERENCES)
-    add_definitions(-DHPX_CXX11_HAVE_RVALUE_REFERENCES)
+    add_definitions(-DHPX_HAVE_CXX11_RVALUE_REFERENCES)
 
     set(HPX_CXX11_LAMBDAS)
-    add_definitions(-DHPX_CXX11_HAVE_LAMBDAS)
+    add_definitions(-DHPX_HAVE_CXX11_LAMBDAS)
 
     set(HPX_CXX11_AUTO)
-    add_definitions(-DHPX_CXX11_HAVE_AUTO)
+    add_definitions(-DHPX_HAVE_CXX11_AUTO)
 
     set(HPX_CXX11_UNIQUE_PTR)
-    add_definitions(-DHPX_CXX11_HAVE_STD_UNIQUE_PTR)
+    add_definitions(-DHPX_HAVE_CXX11_STD_UNIQUE_PTR)
     add_definitions(-DBOOST_LOCKFREE_HAVE_CXX11_UNIQUE_PTR)
   endif()
 
