@@ -32,7 +32,7 @@ namespace bfs { namespace stubs
             std::size_t max_num_neighbors,std::string const& graphfile)
         {
             // The following get yields control while the action above
-            // is executed and the result is returned to the promise
+            // is executed and the result is returned to the promise.
             init_async(gid,objectid,max_num_neighbors,graphfile).get();
         }
 
@@ -51,7 +51,7 @@ namespace bfs { namespace stubs
             std::size_t parent)
         {
             // The following get yields control while the action above
-            // is executed and the result is returned to the promise
+            // is executed and the result is returned to the promise.
             return traverse_async(gid,level,parent).get();
         }
     };
