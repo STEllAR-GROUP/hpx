@@ -10,14 +10,9 @@ set(subdirs
     balancing
     quickstart
     random_mem_access
+    gtc
+    bfs
    )
-
-if(${BOOST_MINOR_VERSION} GREATER 46)
-  set(subdirs ${subdirs}
-      bfs
-      gtc
-     )
-endif()
 
 if(HDF5_CPP_FOUND AND HPX_CXX11_LAMBDAS AND HPX_CXX11_AUTO)
   set(subdirs ${subdirs}
