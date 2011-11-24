@@ -18,21 +18,22 @@
 #include "dimension.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-// Interpolation helper functions related to hdf5
+// Interpolation helper functions related to HDF5.
 namespace sheneos
 {
-    // extract the lower and upper bounds, etc.
-    boost::uint64_t extract_data_range (std::string const& datafilename,
+    ///////////////////////////////////////////////////////////////////////////
+    /// Extract the lower and upper bounds of a data range from \a datafilename.
+    boost::uint64_t extract_data_range(std::string const& datafilename,
         char const* name, double& minval, double& maxval, double& delta,
         std::size_t start = 0, std::size_t end = std::size_t(-1));
 
     ///////////////////////////////////////////////////////////////////////////
-    // extract the actual 1d data slice
+    /// Extract a 1D data slice from \a datafilename.
     void extract_data(std::string const& datafilename, char const* name,
         double* values, hsize_t offset, hsize_t count);
 
     ///////////////////////////////////////////////////////////////////////////
-    // extract the actual 3d data slice
+    /// Extract a 3D data slice from \a datafilename.
     void extract_data(std::string const& datafilename, char const* name,
         double* values, dimension const& dimx, dimension const& dimy,
         dimension const& dimz);

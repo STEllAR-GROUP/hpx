@@ -15,7 +15,7 @@ namespace sheneos
 {
     struct dimension
     {
-        enum {
+        enum type {
             ye = 0,
             temp = 1,
             rho = 2,
@@ -40,5 +40,4 @@ namespace boost { namespace serialization
 }}
 
 #endif
-
 

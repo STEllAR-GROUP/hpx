@@ -13,11 +13,11 @@
 
 #include "read_values.hpp"
 #include "partition3d.hpp"
-#include "sheneos.hpp"
+#include "interpolator.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-// Add factory registration functionality
-HPX_REGISTER_COMPONENT_MODULE();    // create entry point for component factory
+// Add factory registration functionality.
+HPX_REGISTER_COMPONENT_MODULE(); // Create entry point for component factory.
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef sheneos::partition3d partition_client_type;
@@ -27,11 +27,10 @@ typedef sheneos::configuration configuration_client_type;
 HPX_DEFINE_GET_COMPONENT_TYPE(configuration_client_type);
 
 ///////////////////////////////////////////////////////////////////////////////
-// Interpolation client
+// Interpolation client.
 namespace sheneos
 {
-    // create one partition on each of the localities, initialize the partitions
-    sheneos::sheneos()
+    interpolator::interpolator()
       : num_partitions_per_dim_(0),
         was_created_(false)
     {
@@ -41,17 +40,14 @@ namespace sheneos
         std::memset(num_values_, 0, sizeof(num_values_));
     }
 
-    sheneos::~sheneos()
+    interpolator::~interpolator()
     {
         if (was_created_) {
-            // FIXME: This is currently a fully synchronous operation. AGAS V2
-            //        needs to be extended to expose async functions before this
-            //        can be fixed.
-
-            // unregister all symbolic names
+            // Unregister the config data.
             config_data data = cfg_.get();
-            hpx::agas::unregister_name(data.symbolic_name_);   // unregister config data
+            hpx::agas::unregister_name(data.symbolic_name_);   
 
+            // Unregister all symbolic names.
             for (std::size_t i = 0; i < partitions_.size(); ++i)
             {
                 hpx::agas::unregister_name(data.symbolic_name_ +
@@ -61,24 +57,26 @@ namespace sheneos
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // create a new instance
-    void sheneos::create(std::string const& datafilename,
+    void interpolator::create(std::string const& datafilename,
         std::string const& symbolic_name_base, std::size_t num_instances)
     {
-        // we want to create 'partition' instances
+        // Get the component type of the partition backend.
         hpx::components::component_type type =
             hpx::components::get_component_type<server::partition3d>();
 
-        // create distributing factory and let it create the required amount
-        // of 'partition' objects
         typedef hpx::components::distributing_factory distributing_factory;
 
+        // Create distributing factory and let it create num_instances
+        // objects.
         distributing_factory factory(
             distributing_factory::create_sync(hpx::find_here()));
+
+        // Asynchronously create the components. They will be distributed
+        // fairly across all available localities.
         distributing_factory::async_create_result_type result =
             factory.create_components_async(type, num_instances);
 
-        // initialize the partitions and store the mappings
+        // Initialize the partitions and store the mappings.
         partitions_.reserve(num_instances);
         fill_partitions(datafilename, symbolic_name_base, result);
 
@@ -86,14 +84,9 @@ namespace sheneos
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // create one partition on each of the localities, initialize the partitions
-    void sheneos::connect(std::string symbolic_name_base)
+    void interpolator::connect(std::string symbolic_name_base)
     {
-        // FIXME: This is currently a fully synchronous operation. AGAS V2
-        //        needs to be extended to expose async functions before this
-        //        can be fixed.
-
-        // connect to the config object
+        // Connect to the config object.
         hpx::naming::id_type cfg_gid;
         hpx::agas::resolve_name(symbolic_name_base, cfg_gid);
         cfg_ = configuration(cfg_gid);
@@ -102,7 +95,7 @@ namespace sheneos
         if (data.symbolic_name_[data.symbolic_name_.size()-1] != '/')
             data.symbolic_name_ += "/";
 
-        // reconnect to the partitions
+        // Connect to the partitions.
         partitions_.reserve(data.num_instances_);
         for (std::size_t i = 0; i < data.num_instances_; ++i)
         {
@@ -112,7 +105,7 @@ namespace sheneos
                              partitions_.back());
         }
 
-        // read required data from given file
+        // Read required data from given file.
         num_values_[dimension::ye] = extract_data_range(data.datafile_name_,
             "ye", minval_[dimension::ye], maxval_[dimension::ye], delta_[dimension::ye]);
         num_values_[dimension::temp] = extract_data_range(data.datafile_name_,
@@ -124,10 +117,10 @@ namespace sheneos
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void sheneos::fill_partitions(std::string const& datafilename,
+    void interpolator::fill_partitions(std::string const& datafilename,
         std::string symbolic_name_base, async_create_result_type future)
     {
-        // read required data from file
+        // Read required data from file.
         num_values_[dimension::ye] = extract_data_range(datafilename,
             "ye", minval_[dimension::ye], maxval_[dimension::ye], delta_[dimension::ye]);
         num_values_[dimension::temp] = extract_data_range(datafilename,
@@ -135,7 +128,7 @@ namespace sheneos
         num_values_[dimension::rho] = extract_data_range(datafilename,
             "logrho", minval_[dimension::rho], maxval_[dimension::rho], delta_[dimension::rho]);
 
-        // wait for the partitions to be created
+        // Wait for the partitions to be created.
         distributing_factory::result_type results = future.get();
         distributing_factory::iterator_range_type parts =
             hpx::components::server::locality_results(results);
@@ -143,11 +136,10 @@ namespace sheneos
         BOOST_FOREACH(hpx::naming::id_type id, parts)
             partitions_.push_back(id);
 
-        // initialize all attached partition objects
+        // Initialize all attached partition objects.
         std::size_t num_localities = partitions_.size();
         BOOST_ASSERT(0 != num_localities);
 
-        // cubic root
         num_partitions_per_dim_ = std::exp(std::log(double(num_localities)) / 3);
 
         std::size_t partition_size_x =
@@ -204,21 +196,18 @@ namespace sheneos
             }
         }
 
-        // Register symbolic names of all involved components.
-
-        // FIXME: This is currently a fully synchronous operation. AGAS V2
-        //        needs to be extended to expose async functions before this
-        //        can be fixed.
-        // create the config object locally
+        // Create the config object locally.
         hpx::naming::id_type config_id =
             hpx::find_locality(configuration::get_component_type());
         cfg_ = configuration(config_id, datafilename, symbolic_name_base, num_localities);
         hpx::agas::register_name(symbolic_name_base, cfg_.get_gid());
 
-        if (symbolic_name_base[symbolic_name_base.size()-1] != '/')
+        if (symbolic_name_base[symbolic_name_base.size() - 1] != '/')
             symbolic_name_base += "/";
 
-        int i = 0;
+        std::size_t i = 0;
+
+        // Register symbolic names of all involved components.
         BOOST_FOREACH(hpx::naming::id_type const& id, partitions_)
         {
             using boost::lexical_cast;
@@ -227,23 +216,13 @@ namespace sheneos
                 id);
         }
 
-        // wait for initialization to finish
+        // Wait for initialization to finish.
         hpx::lcos::wait(lazy_sync);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::size_t sheneos::get_partition_index(int d, double value)
-    {
-        std::size_t partition_size = num_values_[d] / num_partitions_per_dim_;
-        std::size_t partition_index = (value - minval_[d]) / (delta_[d] * partition_size);
-        if (partition_index == num_partitions_per_dim_)
-            --partition_index;
-        BOOST_ASSERT(partition_index < num_partitions_per_dim_);
-        return partition_index;
-    }
-
-    hpx::naming::id_type
-    sheneos::get_gid(double ye, double temp, double rho)
+    hpx::naming::id_type const&
+    interpolator::get_gid(double ye, double temp, double rho)
     {
         std::size_t x = get_partition_index(dimension::ye, ye);
         std::size_t y = get_partition_index(dimension::temp, std::log10(temp));
@@ -256,15 +235,18 @@ namespace sheneos
         return partitions_[index];
     }
 
-    // return the description for the given dimension
-    void sheneos::get_dimension(int what, double& min, double& max)
+    std::size_t interpolator::get_partition_index(std::size_t d, double value)
     {
-        if (what < 0 || what > dimension::dim) {
-            HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                "sheneos::get_dimension",
-                "value of parameter 'what' is not valid");
-        }
+        std::size_t partition_size = num_values_[d] / num_partitions_per_dim_;
+        std::size_t partition_index = (value - minval_[d]) / (delta_[d] * partition_size);
+        if (partition_index == num_partitions_per_dim_)
+            --partition_index;
+        BOOST_ASSERT(partition_index < num_partitions_per_dim_);
+        return partition_index;
+    }
 
+    void interpolator::get_dimension(dimension::type what, double& min, double& max)
+    {
         switch (what) {
         case dimension::ye:
             min = minval_[dimension::ye];
@@ -276,6 +258,12 @@ namespace sheneos
             min = std::pow(10., minval_[what]);
             max = std::pow(10., maxval_[what]);
             break;
+
+        default:
+            HPX_THROW_EXCEPTION(hpx::bad_parameter,
+                "sheneos::interpolator::get_dimension",
+                "value of parameter 'what' is not valid");
+            
         }
     }
 }

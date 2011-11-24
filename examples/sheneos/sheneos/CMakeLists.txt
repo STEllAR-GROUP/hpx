@@ -6,7 +6,7 @@
 ###############################################################################
 set(client_sources
     dimension.cpp
-    sheneos.cpp
+    interpolator.cpp
     read_values.cpp)
 
 set(server_sources
@@ -17,7 +17,7 @@ set(server_sources
 set(client_headers
     configuration.hpp
     dimension.hpp
-    sheneos.hpp
+    interpolator.hpp
     partition3d.hpp
     read_values.hpp)
 

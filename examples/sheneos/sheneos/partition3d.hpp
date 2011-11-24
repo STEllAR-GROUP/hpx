@@ -24,24 +24,32 @@ namespace sheneos
             partition3d, sheneos::stubs::partition3d> base_type;
 
     public:
-        /// Create a new partition instance and initialize it synchronously.
+        /// Create a new partition instance locally and initialize it
+        /// synchronously.
         partition3d(std::string const& datafilename, dimension const& dimx,
                 dimension const& dimy, dimension const& dimz)
           : base_type(sheneos::stubs::partition3d::create_sync(hpx::find_here()))
         {
             init(datafilename, dimx, dimy, dimz);
         }
-        partition3d(hpx::naming::id_type gid, std::string const& datafilename,
+
+        /// Create a new partition instance on a specific locality and
+        /// initialize it synchronously.
+        /// 
+        /// \param gid [in] The locality where the partition should be created. 
+        partition3d(hpx::naming::id_type const& gid, std::string const& datafilename,
                 dimension const& dimx, dimension const& dimy, dimension const& dimz)
           : base_type(sheneos::stubs::partition3d::create_sync(gid))
         {
             init(datafilename, dimx, dimy, dimz);
         }
-        partition3d(hpx::naming::id_type gid)
+
+        /// Connect to an existing partition instance. 
+        partition3d(hpx::naming::id_type const& gid)
           : base_type(gid)
         {}
 
-        /// Initialize this partition.
+        /// Initialize this partition asynchronously.
         hpx::lcos::promise<void>
         init_async(std::string const& datafilename,
             dimension const& dimx, dimension const& dimy, dimension const& dimz)
@@ -50,15 +58,20 @@ namespace sheneos
                 dimx, dimy, dimz);
         }
 
+        /// Initialize this partition synchronously.
         void init(std::string const& datafilename,
             dimension const& dimx, dimension const& dimy, dimension const& dimz)
         {
             stubs::partition3d::init(this->gid_, datafilename, dimx, dimy, dimz);
         }
 
-        /// Perform an interpolation on this partition.
+        /// Asynchronously perform an interpolation on this partition.
         /// 
-        /// \note \a eosvalues must be in the range of this partition.
+        /// \param ye        [in] Electron fraction.
+        /// \param temp      [in] Temperature.
+        /// \param rho       [in] Rest mass density of the plasma.
+        /// \param eosvalues [in] The EOS values to interpolate. Must be
+        ///                  in the range of this partition. 
         hpx::lcos::promise<std::vector<double> >
         interpolate_async(double ye, double temp, double rho,
             boost::uint32_t eosvalues)
@@ -67,6 +80,13 @@ namespace sheneos
                 ye, temp, rho, eosvalues);
         }
 
+        /// Synchronously perform an interpolation on this partition.
+        /// 
+        /// \param ye        [in] Electron fraction.
+        /// \param temp      [in] Temperature.
+        /// \param rho       [in] Rest mass density of the plasma.
+        /// \param eosvalues [in] The EOS values to interpolate. Must be
+        ///                  in the range of this partition. 
         std::vector<double> interpolate(double ye, double temp, double rho,
             boost::uint32_t eosvalues)
         {
@@ -77,5 +97,4 @@ namespace sheneos
 }
 
 #endif
-
 

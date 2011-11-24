@@ -23,9 +23,8 @@ namespace sheneos { namespace stubs
         init_async(hpx::naming::id_type const& gid, std::string const& datafilename,
             dimension const& dimx, dimension const& dimy, dimension const& dimz)
         {
-            // Create an eager_future, execute the required action,
-            // we simply return the initialized promise, the caller needs
-            // to call get() on the return value to obtain the result
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise.
             typedef sheneos::server::partition3d::init_action action_type;
             return hpx::lcos::async<action_type>(
                 gid, datafilename, dimx, dimy, dimz);
@@ -43,9 +42,8 @@ namespace sheneos { namespace stubs
         interpolate_async(hpx::naming::id_type const& gid,
             double ye, double temp, double rho, boost::uint32_t eosvalues)
         {
-            // Create an eager_future, execute the required action,
-            // we simply return the initialized promise, the caller needs
-            // to call get() on the return value to obtain the result
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise.
             typedef sheneos::server::partition3d::interpolate_action action_type;
             return hpx::lcos::async<action_type>(gid, ye, temp, rho, eosvalues);
         }
@@ -59,5 +57,4 @@ namespace sheneos { namespace stubs
 }}
 
 #endif
-
 

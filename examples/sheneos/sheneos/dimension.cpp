@@ -11,7 +11,7 @@
 
 namespace boost { namespace serialization
 {
-    ///////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     // Implementation of the serialization function.
     template <typename Archive>
     void serialize(Archive& ar, sheneos::dimension& dim, unsigned int const)
@@ -37,5 +37,4 @@ namespace boost { namespace serialization
         unsigned int const);
 #endif
 }}
-
 

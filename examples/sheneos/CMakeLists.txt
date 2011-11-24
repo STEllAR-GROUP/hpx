@@ -8,15 +8,7 @@ include_directories(${HDF5_CPP_INCLUDE_DIR})
 
 add_subdirectory(sheneos)
 
-source_group("Source Files" FILES sheneos_client.cpp sheneos_test.cpp)
-
-# add example executable
-add_hpx_executable(sheneos_client
-  SOURCES sheneos_client.cpp
-  DEPENDENCIES sheneos_component)
-
-# add dependencies to pseudo-target
-add_hpx_pseudo_dependencies(examples.sheneos sheneos_client_exe)
+source_group("Source Files" FILES sheneos_test.cpp)
 
 add_hpx_executable(sheneos_test
   SOURCES sheneos_test.cpp
