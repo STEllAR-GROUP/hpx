@@ -16,11 +16,6 @@ if(UNIX AND HPX_WARNINGS)
   # interface requirements
   hpx_use_flag_if_available(-Wno-unused-parameter)
 
-  # For some reason the detection tests give false positives for this flag.
-  if(040600 LESS ${GCC_VERSION} OR 040600 EQUAL ${GCC_VERSION})
-    hpx_use_flag_if_available(-Wno-unused-but-set-parameter)
-  endif()
-
   # There are ignored qualifiers in Boost, so we have to ignore them
   hpx_use_flag_if_available(-Wno-ignored-qualifiers)
 
