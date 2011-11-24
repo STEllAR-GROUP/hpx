@@ -532,6 +532,10 @@ else()
   # Show the flags that toggle each warning
   hpx_use_flag_if_available(-fdiagnostics-show-option LANGUAGES CXX Fortran)
 
+  # We get false positives all over the place with this.
+  hpx_use_flag_if_available(-Wno-unused-but-set-parameter)
+  hpx_use_flag_if_available(-Wno-unused-but-set-variable)
+
   # Silence warning about __sync_fetch_and_nand changing semantics
   hpx_use_flag_if_available(-Wno-sync-nand)
 
