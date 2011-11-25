@@ -38,6 +38,63 @@ namespace hpx { namespace components
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        template <typename Component, typename Managed, typename BackPtrTag>
+        struct init;
+
+        template <typename Component, typename Managed>
+        struct init<Component, Managed, construct_with_back_ptr>
+        {
+            static void call(Component*& component, Managed* this_)
+            {
+                typedef typename Managed::wrapped_type wrapped_type;
+                component = new wrapped_type(this_);
+            }
+
+#define MANAGED_COMPONENT_CONSTRUCT_INIT1(Z, N, _)                            \
+            template <BOOST_PP_ENUM_PARAMS(N, typename T)>                    \
+            static void call(Component*& component, Managed* this_,           \
+                BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t))                  \
+            {                                                                 \
+                typedef typename Managed::wrapped_type wrapped_type;          \
+                component = new wrapped_type(this_, BOOST_PP_ENUM_PARAMS(N, t));\
+            }                                                                 \
+    /**/
+            BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARG_MAX,
+                MANAGED_COMPONENT_CONSTRUCT_INIT1, _)
+
+#undef MANAGED_COMPONENT_CONSTRUCT_INIT1
+        };
+
+        template <typename Component, typename Managed>
+        struct init<Component, Managed, construct_without_back_ptr>
+        {
+            static void call(Component*& component, Managed* this_)
+            {
+                typedef typename Managed::wrapped_type wrapped_type;
+                component = new wrapped_type();
+                component->set_back_ptr(this_);
+            }
+
+#define MANAGED_COMPONENT_CONSTRUCT_INIT2(Z, N, _)                            \
+            template <BOOST_PP_ENUM_PARAMS(N, typename T)>                    \
+            static void call(Component*& component, Managed* this_,           \
+                BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t))                  \
+            {                                                                 \
+                typedef typename Managed::wrapped_type wrapped_type;          \
+                component = new wrapped_type(BOOST_PP_ENUM_PARAMS(N, t));     \
+                component->set_back_ptr(this_);                               \
+            }                                                                 \
+    /**/
+            BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARG_MAX,
+                MANAGED_COMPONENT_CONSTRUCT_INIT2, _)
+
+#undef MANAGED_COMPONENT_CONSTRUCT_INIT2
+        };
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Wrapper, typename CtorPolicy>
     class managed_component_base
       : public detail::managed_component_tag, boost::noncopyable
@@ -83,6 +140,8 @@ namespace hpx { namespace components
     private:
         template <typename, typename>
         friend class managed_component;
+        template <typename, typename, typename>
+        friend struct detail::init;
 
         void set_back_ptr(components::managed_component<Component, Wrapper>* bp)
         {
@@ -197,64 +256,15 @@ namespace hpx { namespace components
             component_->set_back_ptr(this);
         }
 
-    private:
-        template <typename BackPtrTag>
-        struct init;
-
-        template <>
-        struct init<construct_with_back_ptr>
-        {
-            static void call(Component*& component, managed_component* this_)
-            {
-                component = new wrapped_type(this_);
-            }
-
-#define MANAGED_COMPONENT_CONSTRUCT_INIT1(Z, N, _)                            \
-            template <BOOST_PP_ENUM_PARAMS(N, typename T)>                    \
-            static void call(Component*& component, managed_component* this_, \
-                BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t))                  \
-            {                                                                 \
-                component = new wrapped_type(this_, BOOST_PP_ENUM_PARAMS(N, t));\
-            }                                                                 \
-    /**/
-            BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARG_MAX,
-                MANAGED_COMPONENT_CONSTRUCT_INIT1, _)
-
-#undef MANAGED_COMPONENT_CONSTRUCT_INIT1
-        };
-
-        template <>
-        struct init<construct_without_back_ptr>
-        {
-            static void call(Component*& component, managed_component* this_)
-            {
-                component = new wrapped_type();
-                component->set_back_ptr(this_);
-            }
-
-#define MANAGED_COMPONENT_CONSTRUCT_INIT2(Z, N, _)                            \
-            template <BOOST_PP_ENUM_PARAMS(N, typename T)>                    \
-            static void call(Component*& component, managed_component* this_, \
-                BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t))                  \
-            {                                                                 \
-                component = new wrapped_type(BOOST_PP_ENUM_PARAMS(N, t));     \
-                component->set_back_ptr(this_);                               \
-            }                                                                 \
-    /**/
-            BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARG_MAX,
-                MANAGED_COMPONENT_CONSTRUCT_INIT2, _)
-
-#undef MANAGED_COMPONENT_CONSTRUCT_INIT2
-        };
-
     public:
         /// \brief Construct a managed_component instance holding a new wrapped
         ///        instance
         managed_component()
           : component_(0)
         {
-            init<typename component_ctor_policy<Component>::type>::
-                call(component_, this);
+            detail::init<Component, managed_component,
+                typename component_ctor_policy<Component>::type
+            >::call(component_, this);
         }
 
 #define MANAGED_COMPONENT_CONSTRUCT(Z, N, _)                                  \
@@ -262,9 +272,10 @@ namespace hpx { namespace components
         managed_component(BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t))        \
           : component_(0)                                                     \
         {                                                                     \
-            init<typename component_ctor_policy<Component>::type>::call(      \
-                component_, this, BOOST_PP_ENUM_PARAMS(N, t));                \
-        }
+            detail::init<Component, managed_component,                        \
+                typename component_ctor_policy<Component>::type               \
+            >::call(component_, this, BOOST_PP_ENUM_PARAMS(N, t));            \
+        }                                                                     \
     /**/
 
         BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARG_MAX,
