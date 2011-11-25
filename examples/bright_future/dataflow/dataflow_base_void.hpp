@@ -8,6 +8,7 @@
 #define EXAMPLES_BRIGHT_FUTURE_DATAFLOW_BASE_VOID_HPP
 
 #include <examples/bright_future/dataflow/dataflow_base_fwd.hpp>
+#include <examples/bright_future/dataflow/dataflow_base_impl.hpp>
 #include <examples/bright_future/dataflow/stubs/dataflow.hpp>
 
 namespace hpx { namespace lcos {
@@ -31,14 +32,34 @@ namespace hpx { namespace lcos {
         virtual ~dataflow_base()
         {
         }
-
+        
         dataflow_base(promise<naming::id_type, naming::gid_type> const & promise)
-            : gid_promise(promise)
-        {
-            LLCO_(info)
-                << "dataflow_base<void>: " << gid_promise.get()
-                ;
-        }
+            : impl(new detail::dataflow_base_impl(promise))
+        {}
+
+#define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
+        template <BOOST_PP_ENUM_PARAMS(N, typename A)>                          \
+        dataflow_base(                                                          \
+            promise<naming::id_type, naming::gid_type> const & promise          \
+          , BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)                        \
+        )                                                                       \
+            : impl(                                                             \
+                new detail::dataflow_base_impl(                                 \
+                    promise                                                     \
+                  , BOOST_PP_ENUM_PARAMS(N, a)                                  \
+                )                                                               \
+            )                                                                   \
+        {                                                                       \
+        }                                                                       \
+    /**/
+        BOOST_PP_REPEAT_FROM_TO(
+            1
+          , BOOST_PP_SUB(HPX_ACTION_ARGUMENT_LIMIT, 3)
+          , HPX_LCOS_DATAFLOW_M0
+          , _
+        )
+
+#undef HPX_LCOS_DATAFLOW_M0
 
         void get()
         {
@@ -49,47 +70,29 @@ namespace hpx { namespace lcos {
 
         void invalidate()
         {
-            gid_promise.reset();
-        }
-
-        void connect(naming::id_type const & target) const
-        {
-            stub_type::connect(this->get_gid(), target);
-        }
-
-        promise<void> connect_async(naming::id_type const & target) const
-        {
-            return stub_type::connect_async(this->get_gid(), target);
+            impl->invalidate();
         }
 
         naming::id_type get_gid() const
         {
-            return gid_promise.get();
+            return impl->get_gid();
         }
 
-    protected:
-        promise<naming::id_type, naming::gid_type> gid_promise;
+        void connect(naming::id_type const & target) const
+        {
+            stub_type::connect(impl->get_gid(), target);
+        }
+        
+        boost::shared_ptr<detail::dataflow_base_impl> impl;
 
     private:
         friend class boost::serialization::access;
 
         template <typename Archive>
-        void load(Archive & ar, unsigned)
+        void serialize(Archive & ar, unsigned)
         {
-            naming::id_type id;
-            ar & id;
-            gid_promise.set_local_data(0, id);
+            ar & impl;
         }
-
-        template <typename Archive>
-        void save(Archive & ar, unsigned) const
-        {
-            BOOST_ASSERT(this->get_gid());
-            naming::id_type id = this->get_gid();
-            ar & id;
-        }
-
-        BOOST_SERIALIZATION_SPLIT_MEMBER();
     };
 }}
 

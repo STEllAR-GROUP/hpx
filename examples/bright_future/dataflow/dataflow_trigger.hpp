@@ -40,7 +40,15 @@ namespace hpx { namespace lcos {
                 create_component_action;
             return
                 async<create_component_action>(
-                    naming::get_locality_from_id(id)
+                /*async_callback<create_component_action>(
+                    [id, trigger](naming::id_type const & gid)
+                    {
+                        LLCO_(info)
+                            << "dataflow_trigger: created component "
+                            << gid
+                            ;
+                    }
+                  ,*/ naming::get_locality_from_id(id)
                   , stub_type::get_component_type()
                   , trigger
                 );
@@ -52,6 +60,7 @@ namespace hpx { namespace lcos {
         )
             : base_type(
                 create_component(id, trigger)
+              , trigger
             )
         {}
 

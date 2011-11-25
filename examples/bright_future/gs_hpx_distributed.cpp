@@ -573,7 +573,6 @@ void gs(
                                 cout << "." << flush;
                             }
 
-#if 0
                             if(xx == 0 && x_block > 0)
                             {
                                 deps.push_back(
@@ -585,12 +584,10 @@ void gs(
                                           , y_range
                                         )
                                       , y_range
-                                      /*
                                       , prev_block(x_block - 1, y_block)(
                                             n_x_local_block -1
                                           , yy
                                         )
-                                        */
                                     )
                                 );
                                 cout << "l" << flush;
@@ -610,12 +607,10 @@ void gs(
                                           , y_range
                                         )
                                       , y_range
-                                      /*
                                       , prev_block(x_block + 1, y_block)(
                                             0
                                           , yy
                                         )
-                                        */
                                     )
                                 );
                                 cout << "r" << flush;
@@ -632,12 +627,10 @@ void gs(
                                           , x_range
                                         )
                                       , x_range
-                                      /*
                                       , prev_block(x_block, y_block - 1)(
                                             xx
                                           , n_y_local_block -1
                                         )
-                                        */
                                     )
                                 );
                                 cout << "t" << flush;
@@ -654,17 +647,14 @@ void gs(
                                           , x_range
                                         )
                                       , x_range
-                                      /*
                                       , prev_block(x_block, y_block + 1)(
                                             xx
                                           , 0
                                         )
-                                        */
                                     )
                                 );
                                 cout << "b" << flush;
                             }
-#endif
 
                             /*
                             cout << "x " << x_range.first << " " << x_range.second << "\n" << flush;

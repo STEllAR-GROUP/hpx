@@ -62,7 +62,17 @@ namespace hpx { namespace lcos {
                 create_component_action;
             return
                 async<create_component_action>(
-                    naming::get_locality_from_id(target)
+                /*async_callback<create_component_action>(
+                    [target](naming::id_type const & gid)
+                    {
+                        LLCO_(info)
+                            << "dataflow: created component "
+                            << gid
+                            << " with target "
+                            << target
+                            ;
+                    }
+                  ,*/ naming::get_locality_from_id(target)
                   , stub_type::get_component_type()
                   , detail::action_wrapper<Action>()
                   , target
@@ -111,9 +121,23 @@ namespace hpx { namespace lcos {
                 create_component(target                                         \
                   , BOOST_PP_ENUM_PARAMS(N, a)                                  \
                 )                                                               \
+                , BOOST_PP_ENUM_PARAMS(N, a)                                    \
             )                                                                   \
         {                                                                       \
         }                                                                       \
+    /*
+                async_callback<create_component_action>(                        \
+                    [target, BOOST_PP_ENUM_PARAMS(N, a)]                        \
+                    (naming::id_type const & gid)                               \
+                    {                                                           \
+                        LLCO_(info)                                             \
+                            << "dataflow: created component "                   \
+                            << gid                                              \
+                            << " with target "                                  \
+                            << target                                           \
+                            ;                                                   \
+                    }                                                           \
+    */
     /**/
         BOOST_PP_REPEAT_FROM_TO(
             1
