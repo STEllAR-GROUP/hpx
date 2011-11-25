@@ -52,7 +52,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;DATAFLOW_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;DATAFLOW_EXPORTS;HPX_ACTION_ARGUMENT_LIMIT=10;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -96,6 +96,9 @@
     <ClCompile Include="..\..\..\..\examples\bright_future\dataflow\dataflow_component.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\components\iostreams\iostreams.vcxproj">
+      <Project>{808c1629-0ff7-4f49-89d2-e42a8383ec6a}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\hpx\hpx.vcxproj">
       <Project>{e6c6c6c4-6959-4b47-b92a-6323a906cc40}</Project>
       <Private>true</Private>
