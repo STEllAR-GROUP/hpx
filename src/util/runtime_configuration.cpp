@@ -48,6 +48,7 @@ namespace hpx { namespace util
             "max_resolve_requests = ${HPX_AGAS_MAX_RESOLVE_REQUESTS:"
                 BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_MAX_RESOLVE_REQUESTS) "}",
             "service_mode = hosted",
+            "dedicated_server = 0",
             "gva_cache_size = ${HPX_AGAS_GVA_CACHE_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_GVA_CACHE_SIZE) "}",
             "use_range_caching = ${HPX_AGAS_USE_RANGE_CACHING:1}",

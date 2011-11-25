@@ -1159,7 +1159,7 @@ namespace hpx
             // Set whether the AGAS server is running as a dedicated runtime.
             // This decides whether the AGAS actions are executed with normal
             // priority (if dedicated) or with high priority (non-dedicated)
-            if (vm.count("run-agas-server-only"))
+            if (vm.count("run-agas-server-only") && (mode != hpx::runtime_mode_console))
                 ini_config += "hpx.agas.dedicated_server=1";
 
             if (vm.count("debug-hpx-log")) {
