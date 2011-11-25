@@ -29,6 +29,49 @@
 
 namespace hpx { namespace components { namespace server
 {
+#define HPX_RUNTIME_SUPPORT_CREATE_ONE_M0(Z, N, D)                            \
+        BOOST_PP_CAT(a, N)(BOOST_PP_CAT(_a, N))                               \
+    /**/
+#define HPX_RUNTIME_SUPPORT_CREATE_ONE_M1(Z, N, D)                            \
+        BOOST_PP_CAT(A, N) const & BOOST_PP_CAT(a, N);                        \
+    /**/
+#define HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT(Z, N, D)                     \
+        template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>    \
+        struct BOOST_PP_CAT(create_one_component_functor, N)                  \
+        {                                                                     \
+            typedef void result_type;                                         \
+            BOOST_PP_CAT(create_one_component_functor, N)(                    \
+                      BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & _a))          \
+              : BOOST_PP_ENUM(N, HPX_RUNTIME_SUPPORT_CREATE_ONE_M0, _)        \
+            {}                                                                \
+            result_type operator()(void ** p) const                           \
+            {                                                                 \
+                *p = Component::create_one(BOOST_PP_ENUM_PARAMS(N, a));       \
+            }                                                                 \
+            BOOST_PP_REPEAT(N, HPX_RUNTIME_SUPPORT_CREATE_ONE_M1, _)          \
+        };                                                                    \
+        template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>    \
+        naming::gid_type create_one_functor(                                  \
+            component_factory_base* factory,                                  \
+            BOOST_PP_ENUM_BINARY_PARAMS(N, A, const& a))                      \
+        {                                                                     \
+            return factory->create_one_functor(                               \
+                BOOST_PP_CAT(create_one_component_functor, N)<                \
+                    Component, BOOST_PP_ENUM_PARAMS(N, A)>(                   \
+                        BOOST_PP_ENUM_PARAMS(N, a))                           \
+            );                                                                \
+        }                                                                     \
+    /**/
+    BOOST_PP_REPEAT_FROM_TO(
+        1
+      , HPX_ACTION_ARGUMENT_LIMIT
+      , HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT
+      , _
+    )
+#undef HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT
+#undef HPX_RUNTIME_SUPPORT_CREATE_ONE_M0
+#undef HPX_RUNTIME_SUPPORT_CREATE_ONE_M1
+
     ///////////////////////////////////////////////////////////////////////////
     class runtime_support
     {
@@ -121,34 +164,7 @@ namespace hpx { namespace components { namespace server
         naming::gid_type create_one_component(components::component_type type,
             constructor_argument const& arg0);
 
-#define HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT_M0(Z, N, D)                    \
-        BOOST_PP_CAT(a, N)(BOOST_PP_CAT(_a, N))                                 \
-    /**/
-#define HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT_M1(Z, N, D)                    \
-        BOOST_PP_CAT(A, N) const & BOOST_PP_CAT(a, N);                          \
-    /**/
-#define HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT(Z, N, D)                       \
-        template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>      \
-        struct BOOST_PP_CAT(create_one_component_functor, N)                    \
-        {                                                                       \
-            typedef void result_type;                                           \
-            BOOST_PP_CAT(                                                       \
-                create_one_component_functor                                    \
-              , N                                                               \
-            )(BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & _a))                    \
-                : BOOST_PP_ENUM(                                                \
-                    N                                                           \
-                  , HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT_M0                 \
-                  , _                                                           \
-                )                                                               \
-            {}                                                                  \
-            result_type operator()(void ** p) const                             \
-            {                                                                   \
-                *p = Component::create_one(BOOST_PP_ENUM_PARAMS(N, a));         \
-            }                                                                   \
-            BOOST_PP_REPEAT(N, HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT_M1, _)  \
-        };                                                                      \
-                                                                                \
+#define HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT_(Z, N, D)                      \
         template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>      \
         naming::gid_type create_one_component_(components::component_type type, \
             BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))                       \
@@ -165,7 +181,7 @@ namespace hpx { namespace components { namespace server
                     hpx::util::osstream_get_string(strm));                      \
                 return naming::invalid_gid;                                     \
             }                                                                   \
-            else if (!(*it).second.first) {                                     \
+            if (!(*it).second.first) {                                          \
                 hpx::util::osstream strm;                                       \
                 strm << "attempt to create component instance of "              \
                      << "invalid/unknown type: "                                \
@@ -177,16 +193,8 @@ namespace hpx { namespace components { namespace server
                 return naming::invalid_gid;                                     \
             }                                                                   \
                                                                                 \
-            naming::gid_type id                                                 \
-                = (*it).second.first->create_one_functor(                       \
-                    BOOST_PP_CAT(create_one_component_functor, N)<              \
-                        Component                                               \
-                      , BOOST_PP_ENUM_PARAMS(N, A)                              \
-                    >(                                                          \
-                        BOOST_PP_ENUM_PARAMS(N, a)                              \
-                    )                                                           \
-                );                                                              \
-                                                                                \
+            naming::gid_type id = server::create_one_functor<Component>(        \
+                (*it).second.first.get(), BOOST_PP_ENUM_PARAMS(N, a));          \
             LRT_(info) << "successfully created component " << id               \
                        << " of type: "                                          \
                        << components::get_component_type_name(type);            \
@@ -194,17 +202,13 @@ namespace hpx { namespace components { namespace server
             return id;                                                          \
         }                                                                       \
     /**/
-
         BOOST_PP_REPEAT_FROM_TO(
             1
           , HPX_ACTION_ARGUMENT_LIMIT
-          , HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT
+          , HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT_
           , _
         )
-
-#undef HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT
-#undef HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT_M0
-#undef HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT_M1
+#undef HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT_
 
         /// \brief Action to create new memory block
         naming::gid_type create_memory_block(std::size_t count,
@@ -390,35 +394,24 @@ namespace hpx { namespace components { namespace server
         std::list<HPX_STD_FUNCTION<void()> > shutdown_functions_;
     };
 
-#define HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT_ACTION(Z, N, D)                \
-    template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>          \
-    struct BOOST_PP_CAT(create_one_component_action, N)                         \
-    {                                                                           \
-        typedef                                                                 \
-            BOOST_PP_CAT( ::hpx::actions::result_action, BOOST_PP_INC(N))<      \
-                runtime_support                                                 \
-              , naming::gid_type                                                \
-              , runtime_support::runtime_support_create_one_component           \
-              , components::component_type                                      \
-              , BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & BOOST_PP_INTERCEPT)   \
-              , static_cast<                                                    \
-                    naming::gid_type                                            \
-                    (runtime_support::*)                                        \
-                    (                                                           \
-                        components::component_type                              \
-                      , BOOST_PP_ENUM_BINARY_PARAMS(                            \
-                            N                                                   \
-                          , A                                                   \
-                          , const & BOOST_PP_INTERCEPT                          \
-                        )                                                       \
-                    )                                                           \
-                >(&runtime_support::create_one_component_<                      \
-                    Component                                                   \
-                  , BOOST_PP_ENUM_PARAMS(N, A)                                  \
-                >)                                                              \
-            >                                                                   \
-            type;                                                               \
-    };                                                                          \
+#define HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT_ACTION(Z, N, D)              \
+    template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>        \
+    struct BOOST_PP_CAT(create_one_component_action, N)                       \
+    {                                                                         \
+        typedef                                                               \
+            BOOST_PP_CAT( ::hpx::actions::result_action, BOOST_PP_INC(N))<    \
+                runtime_support                                               \
+              , naming::gid_type                                              \
+              , runtime_support::runtime_support_create_one_component         \
+              , components::component_type                                    \
+              , BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & BOOST_PP_INTERCEPT) \
+              , &runtime_support::create_one_component_<                      \
+                    Component                                                 \
+                  , BOOST_PP_ENUM_PARAMS(N, A)                                \
+                >                                                             \
+            >                                                                 \
+            type;                                                             \
+    };                                                                        \
     /**/
     BOOST_PP_REPEAT_FROM_TO(
         1
@@ -426,7 +419,7 @@ namespace hpx { namespace components { namespace server
       , HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT_ACTION
       , _
     )
-#undef HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT_ACTION   
+#undef HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT_ACTION
 
 }}}
 

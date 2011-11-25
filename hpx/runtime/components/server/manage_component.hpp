@@ -62,12 +62,13 @@ namespace hpx { namespace components { namespace server
 
         return naming::invalid_gid;
     }
-    
+
     template <typename Component>
-    naming::gid_type create_one (HPX_STD_FUNCTION<void(void**)> const& ctor, error_code& ec = throws)
+    naming::gid_type create_one (HPX_STD_FUNCTION<void(void**)> const& ctor,
+        error_code& ec = throws)
     {
         Component* c;
-        ctor(reinterpret_cast<void **>(&c));
+        ctor(reinterpret_cast<void**>(&c));
         naming::gid_type gid = c->get_base_gid();
         if (gid) {
             if (&ec != &throws)
@@ -81,7 +82,7 @@ namespace hpx { namespace components { namespace server
         strm << "global id " << gid << " is already bound to a different "
                 "component instance";
         HPX_THROWS_IF(ec, hpx::duplicate_component_address,
-            "create<Component>",
+            "create_one<Component>(ctor)",
             hpx::util::osstream_get_string(strm));
 
         return naming::invalid_gid;

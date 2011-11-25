@@ -81,11 +81,12 @@ namespace hpx { namespace components
         ///         sequential in a row.
         virtual naming::gid_type create_one (
             components::constructor_argument const&) = 0;
-        
-        /// \brief Create one new component instance using the given constructor
-        ///        argument.
+
+        /// \brief Create one new component instance and initialize it using
+        ///        the using the given constructor function.
         ///
-        /// \param Arg0  [in] The type specific constructor argument
+        /// \param f  [in] The constructor function to call in order to
+        ///         initialize the newly allocated object.
         ///
         /// \return Returns the GID of the first newly created component
         ///         instance. If more than one component instance has been

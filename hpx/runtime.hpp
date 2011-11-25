@@ -339,8 +339,14 @@ namespace hpx
         ///                   function, in which case all threads have to be
         ///                   scheduled explicitly.
         /// \param num_threads [in] The initial number of threads to be started
-        ///                   by the threadmanager. This parameter is optional
+        ///                   by the thread-manager. This parameter is optional
         ///                   and defaults to 1.
+        /// \num_localities   [in] The overall number of localities which are
+        ///                   initially used for the full application. The
+        ///                   runtime system will block during startup until
+        ///                   this many localities have been brought on line.
+        ///                   If this is not specified the number of localities
+        ///                   is assumed to be one.
         ///
         /// \note             The parameter \a func is optional. If no function
         ///                   is supplied, the runtime system will simply wait
@@ -355,11 +361,17 @@ namespace hpx
                 std::size_t num_threads = 1, std::size_t num_localities = 1);
 
         /// \brief Run the HPX runtime system, initially use the given number
-        ///        of (OS) threads in the threadmanager and block waiting for
+        ///        of (OS) threads in the thread-manager and block waiting for
         ///        all threads to finish.
         ///
         /// \param num_threads [in] The initial number of threads to be started
-        ///                   by the threadmanager.
+        ///                   by the thread-manager.
+        /// \num_localities   [in] The overall number of localities which are
+        ///                   initially used for the full application. The
+        ///                   runtime system will block during startup until
+        ///                   this many localities have been brought on line.
+        ///                   If this is not specified the number of localities
+        ///                   is assumed to be one.
         ///
         /// \returns          This function will always return 0 (zero).
         int run(std::size_t num_threads, std::size_t num_localities = 1);

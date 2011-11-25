@@ -163,7 +163,17 @@ namespace hpx { namespace components
                 "create_one is not supported by this factory instance");
             return naming::invalid_gid;
         }
-        
+
+        /// \brief Create one new component instance and initialize it using
+        ///        the using the given constructor function.
+        ///
+        /// \param ctor  [in] The constructor function to call in order to
+        ///         initialize the newly allocated object.
+        ///
+        /// \return Returns the GID of the first newly created component
+        ///         instance. If more than one component instance has been
+        ///         created (\a count > 1) the GID's of all new instances are
+        ///         sequential in a row.
         naming::gid_type create_one_functor(HPX_STD_FUNCTION<void(void**)> const& ctor)
         {
             if (isenabled_) {
@@ -219,13 +229,13 @@ namespace hpx { namespace components
 /// from a particular module. If more than one factories need to be exposed
 /// the \a HPX_REGISTER_COMPONENT_FACTORY and \a HPX_REGISTER_COMPONENT_MODULE
 /// macros should be used instead.
-#define HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY_EX(                        \
+#define HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY_EX(                    \
             ComponentType, componentname, enable_always)                      \
         HPX_REGISTER_COMPONENT_FACTORY(                                       \
-            hpx::components::generic_component_factory<ComponentType>,            \
+            hpx::components::generic_component_factory<ComponentType>,        \
             componentname);                                                   \
         HPX_DEF_UNIQUE_COMPONENT_NAME(                                        \
-            hpx::components::generic_component_factory<ComponentType>,            \
+            hpx::components::generic_component_factory<ComponentType>,        \
             componentname)                                                    \
         template struct hpx::components::generic_component_factory<ComponentType>;\
         HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_EX(                           \
@@ -233,7 +243,7 @@ namespace hpx { namespace components
     /**/
 
 #define HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY(ComponentType, componentname) \
-        HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_ONE_EX(                        \
+        HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY_EX(                    \
             ComponentType, componentname, false)                              \
     /**/
 
