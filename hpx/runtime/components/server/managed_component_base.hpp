@@ -412,6 +412,7 @@ namespace hpx { namespace components
                 {
                     curr->finalize();
                     curr->~derived_type();
+                    ++curr;
                 }
                 heap_type::free(p, count);     // free memory
                 throw;      // rethrow
@@ -447,18 +448,13 @@ namespace hpx { namespace components
             if (NULL == p || 0 == count)
                 return;     // do nothing if given a NULL pointer
 
-            if (1 == count) {
-                p->finalize();
-                p->~derived_type();
-            }
-            else {
-                // call destructors for all managed_component instances
-                derived_type* curr = p;
-                for (std::size_t i = 0; i < count; ++i)
-                {
-                    curr->finalize();
-                    curr->~derived_type();
-                }
+            // call destructors for all managed_component instances
+            derived_type* curr = p;
+            for (std::size_t i = 0; i < count; ++i)
+            {
+                curr->finalize();
+                curr->~derived_type();
+                ++curr;
             }
 
             // free memory itself
