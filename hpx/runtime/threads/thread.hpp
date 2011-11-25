@@ -384,6 +384,9 @@ namespace hpx { namespace threads { namespace detail
         naming::address::address_type const component_id_;
         mutable thread_state marked_state_;
 
+        template <typename, typename, typename>
+        friend struct components::detail::init;
+
         void set_back_ptr(
             components::managed_component<thread, threads::thread>* bp)
         {
