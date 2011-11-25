@@ -205,8 +205,8 @@ int main(int argc, char* argv[])
         ("num-workers", value<std::size_t>()->default_value(1),
             "number of worker/measurement threads to create")
         ("seed", value<std::size_t>()->default_value(0),
-            "seed for the random shuffling of the queries (if 0, std::time(0) "
-            "is used")
+            "the seed for the pseudo random number generator (if 0, a seed "
+            "is choosen based on the current system time)")
     ;
 
     // Initialize and run HPX.
