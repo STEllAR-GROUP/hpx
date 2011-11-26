@@ -22,6 +22,7 @@ namespace hpx { namespace lcos {
         {
             typedef server::dataflow server_type;
 
+#if 0
             template <typename Action>
             static promise<void>
             init_async(
@@ -90,6 +91,7 @@ namespace hpx { namespace lcos {
           , _
         )
 #undef HPX_LCOS_DATAFLOW_M0
+#endif
 
             static promise<void>
             connect_async(
