@@ -114,6 +114,22 @@ namespace hpx { namespace components
         mutable naming::gid_type gid_;
     };
 
+    namespace detail
+    {
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Component>
+        struct simple_heap_factory
+        {
+            static Component* alloc(std::size_t count)
+            {
+                return Component::create(count);
+            }
+            static void free(void* p, std::size_t count)
+            {
+                Component::destroy(p, count);
+            }
+        };
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     /// \class simple_component simple_component.hpp hpx/runtime/components/server/simple_component_base.hpp
@@ -123,6 +139,7 @@ namespace hpx { namespace components
     {
     public:
         typedef Component type_holder;
+        typedef detail::simple_heap_factory<Component> heap_type;
 
         /// \brief  The function \a create is used for allocation and
         ///         initialization of instances of the derived components.

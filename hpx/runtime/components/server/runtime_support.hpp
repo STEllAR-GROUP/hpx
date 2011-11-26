@@ -44,9 +44,9 @@ namespace hpx { namespace components { namespace server
                       BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & _a))          \
               : BOOST_PP_ENUM(N, HPX_RUNTIME_SUPPORT_CREATE_ONE_M0, _)        \
             {}                                                                \
-            result_type operator()(void ** p) const                           \
+            result_type operator()(void* p) const                             \
             {                                                                 \
-                *p = Component::create_one(BOOST_PP_ENUM_PARAMS(N, a));       \
+                new (p) Component(BOOST_PP_ENUM_PARAMS(N, a));                \
             }                                                                 \
             BOOST_PP_REPEAT(N, HPX_RUNTIME_SUPPORT_CREATE_ONE_M1, _)          \
         };                                                                    \

@@ -62,6 +62,9 @@
     <ClInclude Include="..\..\..\..\examples\bright_future\dataflow\server\dataflow_impl.hpp">
       <Filter>Header Files\Server</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\examples\bright_future\dataflow\server\dataflow_trigger.hpp">
+      <Filter>Header Files\Server</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\examples\bright_future\dataflow\dataflow_component.cpp">

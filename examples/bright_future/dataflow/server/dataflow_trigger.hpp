@@ -12,6 +12,7 @@
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
+#include <hpx/runtime/applier/applier.hpp>
 
 #include <examples/bright_future/dataflow/dataflow_base.hpp>
 #include <examples/bright_future/dataflow/server/detail/dataflow_slot.hpp>
@@ -24,7 +25,7 @@ namespace hpx { namespace lcos { namespace server
         : components::managed_component_base<
             dataflow_trigger
           , hpx::components::detail::this_type
-          , hpx::components::construct_with_back_ptr
+          , hpx::components::detail::construct_with_back_ptr
         >
     {
         typedef dataflow_trigger wrapped_type;
@@ -32,7 +33,7 @@ namespace hpx { namespace lcos { namespace server
             components::managed_component_base<
                 dataflow_trigger
               , hpx::components::detail::this_type
-              , hpx::components::construct_with_back_ptr
+              , hpx::components::detail::construct_with_back_ptr
             >
             base_type;
 
@@ -66,15 +67,15 @@ namespace hpx { namespace lcos { namespace server
             }
         }
 
-        typedef
-            ::hpx::actions::action1<
-                dataflow_trigger
-              , 0
-              , std::vector<dataflow_base<void> > const &
-              , &dataflow_trigger::init
-            >
-            init_action;
-        
+//         typedef
+//             ::hpx::actions::action1<
+//                 dataflow_trigger
+//               , 0
+//               , std::vector<dataflow_base<void> > const &
+//               , &dataflow_trigger::init
+//             >
+//             init_action;
+
         dataflow_trigger(component_type * back_ptr)
             : base_type(back_ptr)
             , all_set(false)
@@ -90,8 +91,11 @@ namespace hpx { namespace lcos { namespace server
             , slots_set(0)
             , slots_completed(~0u)
         {
-            BOOST_ASSERT(this->get_gid());
-            applier::apply<init_action>(this->get_gid(), trigger);
+            applier::register_thread(
+                HPX_STD_BIND(&dataflow_trigger::init, this, trigger),
+                "dataflow_trigger::init<>");
+//             BOOST_ASSERT(this->get_gid());
+//             applier::apply<init_action>(this->get_gid(), trigger);
             //init(trigger);
         }
 
@@ -183,9 +187,9 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
   , dataflow_trigger_type_connect_action
 )
 
-HPX_REGISTER_ACTION_DECLARATION_EX(
-    hpx::lcos::server::dataflow_trigger::init_action
-  , dataflow_trigger_type_init_action
-)
+// HPX_REGISTER_ACTION_DECLARATION_EX(
+//     hpx::lcos::server::dataflow_trigger::init_action
+//   , dataflow_trigger_type_init_action
+// )
 
 #endif

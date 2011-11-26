@@ -93,7 +93,7 @@ namespace hpx { namespace components
         ///         created (\a count > 1) the GID's of all new instances are
         ///         sequential in a row.
         virtual naming::gid_type create_one_functor(
-            HPX_STD_FUNCTION<void(void**)> const&) = 0;
+            HPX_STD_FUNCTION<void(void*)> const&) = 0;
 
         /// \brief Destroy one or more component instances
         ///

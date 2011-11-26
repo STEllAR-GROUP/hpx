@@ -56,10 +56,10 @@ HPX_REGISTER_ACTION_EX(
   , dataflow_trigger_type_connect_action
 )
 
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::server::dataflow_trigger::init_action
-  , dataflow_trigger_type_init_action
-)
+// HPX_REGISTER_ACTION_EX(
+//     hpx::lcos::server::dataflow_trigger::init_action
+//   , dataflow_trigger_type_init_action
+// )
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace server { namespace detail

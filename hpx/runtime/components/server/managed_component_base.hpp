@@ -34,7 +34,7 @@ namespace hpx { namespace components
     template <typename T, typename Enable = void>
     struct component_ctor_policy
     {
-        typedef construct_without_back_ptr type;
+        typedef detail::construct_without_back_ptr type;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -44,7 +44,7 @@ namespace hpx { namespace components
         struct init;
 
         template <typename Component, typename Managed>
-        struct init<Component, Managed, construct_with_back_ptr>
+        struct init<Component, Managed, detail::construct_with_back_ptr>
         {
             static void call(Component*& component, Managed* this_)
             {
@@ -68,7 +68,7 @@ namespace hpx { namespace components
         };
 
         template <typename Component, typename Managed>
-        struct init<Component, Managed, construct_without_back_ptr>
+        struct init<Component, Managed, detail::construct_without_back_ptr>
         {
             static void call(Component*& component, Managed* this_)
             {
@@ -345,10 +345,9 @@ namespace hpx { namespace components
             return component_;
         }
 
-    protected:
+    public:
         typedef detail::heap_factory<Component, derived_type> heap_type;
 
-    public:
         /// \brief  The memory for managed_component objects is managed by
         ///         a class specific allocator. This allocator uses a one size
         ///         heap implementation, ensuring fast memory allocation.
@@ -484,12 +483,6 @@ namespace hpx { namespace components
         }
 
     public:
-        ///
-        /// \brief Return the global id of this \a future instance
-        naming::id_type get_gid() const
-        {
-            return get_checked()->get_gid();
-        }
 
         ///////////////////////////////////////////////////////////////////////
         // The managed_component behaves just like the wrapped object
@@ -515,6 +508,11 @@ namespace hpx { namespace components
         }
 
         ///////////////////////////////////////////////////////////////////////
+        /// \brief Return the global id of this \a future instance
+        naming::id_type get_gid() const
+        {
+            return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
+        }
         naming::gid_type get_base_gid() const
         {
             return heap_type::get_gid(const_cast<managed_component*>(this));
@@ -528,7 +526,8 @@ namespace hpx { namespace components
     inline naming::id_type
     managed_component_base<Component, Wrapper, CtorPolicy>::get_gid() const
     {
-        return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
+        BOOST_ASSERT(back_ptr_);
+        return back_ptr_->get_gid();
     }
 
     template <typename Component, typename Wrapper, typename CtorPolicy>

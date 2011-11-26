@@ -85,6 +85,7 @@
     <ClInclude Include="..\..\..\..\examples\bright_future\dataflow\is_dataflow.hpp" />
     <ClInclude Include="..\..\..\..\examples\bright_future\dataflow\server\dataflow.hpp" />
     <ClInclude Include="..\..\..\..\examples\bright_future\dataflow\server\dataflow_impl.hpp" />
+    <ClInclude Include="..\..\..\..\examples\bright_future\dataflow\server\dataflow_trigger.hpp" />
     <ClInclude Include="..\..\..\..\examples\bright_future\dataflow\server\detail\apply_helper.hpp" />
     <ClInclude Include="..\..\..\..\examples\bright_future\dataflow\server\detail\component_wrapper.hpp" />
     <ClInclude Include="..\..\..\..\examples\bright_future\dataflow\server\detail\dataflow_impl.hpp" />

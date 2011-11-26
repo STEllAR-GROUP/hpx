@@ -1184,7 +1184,13 @@ namespace hpx
             std::string cmd_line;
             for (int i = 0; i < argc; ++i)
             {
-                cmd_line += std::string("'") + argv[i] + "'";
+                // quote only if it contains whitespace
+                std::string arg(argv[i]);
+                if (arg.find_first_of(" \t") != std::string::npos)
+                    cmd_line += std::string("\"") + arg + "\"";
+                else
+                    cmd_line += arg;
+
                 if ((i + 1) != argc)
                     cmd_line += " ";
             }

@@ -682,7 +682,7 @@ namespace hpx
     {
         get_runtime().add_shutdown_function(f);
     }
- 
+
     HPX_EXPORT components::server::runtime_support* get_runtime_support_ptr()
     {
         return reinterpret_cast<components::server::runtime_support*>(

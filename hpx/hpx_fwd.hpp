@@ -347,6 +347,9 @@ namespace hpx
             struct fixed_component_tag {};
             struct simple_component_tag {};
             struct managed_component_tag {};
+
+            struct construct_with_back_ptr {};
+            struct construct_without_back_ptr {};
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -395,10 +398,8 @@ namespace hpx
         template <typename Component>
         class simple_component;
     
-        struct construct_with_back_ptr {};
-        struct construct_without_back_ptr {};
-
-        template <typename Component, typename Wrapper = detail::this_type, typename CtorPolicy = construct_without_back_ptr>
+        template <typename Component, typename Wrapper = detail::this_type, 
+            typename CtorPolicy = detail::construct_without_back_ptr>
         class managed_component_base;
 
         template <typename Component, typename Derived = detail::this_type>
