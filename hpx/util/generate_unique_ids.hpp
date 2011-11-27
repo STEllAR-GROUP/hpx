@@ -23,8 +23,9 @@ namespace hpx { namespace util
     /// unique ids for components, parcels, threads etc.
     class HPX_EXPORT unique_id_ranges
     {
-        struct tag {};
-        typedef hpx::util::spinlock_pool<tag> mutex_type;
+        typedef hpx::util::spinlock mutex_type;
+
+        mutex_type mtx_;
 
         /// size of the id range returned by command_getidrange
         /// FIXME: is this a policy?

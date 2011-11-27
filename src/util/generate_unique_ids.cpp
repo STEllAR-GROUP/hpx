@@ -22,7 +22,7 @@ namespace hpx { namespace util
         naming::resolver_client& resolver, std::size_t count)
     {
         // create a new id
-        mutex_type::scoped_lock l(this);
+        mutex_type::scoped_lock l(mtx_);
 
         // ensure next_id doesn't overflow
         if ((lower_ + count) > upper_)
