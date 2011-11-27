@@ -52,9 +52,6 @@ macro(add_hpx_component name)
     target_link_libraries(${name}_component
       ${${name}_DEPENDENCIES} ${libs} ${BOOST_FOUND_LIBRARIES})
     set(prefix "hpx_component_")
-    set_target_properties(${name}_component PROPERTIES
-      COMPILE_FLAGS "-fno-use-cxa-atexit"
-      LINK_FLAGS "-fno-use-cxa-atexit")
   else()
     target_link_libraries(${name}_component
       ${${name}_DEPENDENCIES} ${libs})
