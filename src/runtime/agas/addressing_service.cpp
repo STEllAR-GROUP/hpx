@@ -823,8 +823,6 @@ bool addressing_service::resolve(
         }
         // }}}
 
-        lock_semaphore lock(resolve_throttle_);
-
         // Try the cache if applicable.
         if (try_cache && caching_)
         {
@@ -838,10 +836,14 @@ bool addressing_service::resolve(
         request req(primary_ns_resolve_gid, id);
         response rep;
 
-        if (is_bootstrap())
-            rep = bootstrap->primary_ns_server.service(req, ec);
-        else
-            rep = hosted->primary_ns_.service(req, action_priority_, ec);
+        {
+            lock_semaphore lock(resolve_throttle_);
+
+            if (is_bootstrap())
+                rep = bootstrap->primary_ns_server.service(req, ec);
+            else
+                rep = hosted->primary_ns_.service(req, action_priority_, ec);
+        }
 
         if (ec || (success != rep.get_status()))
             return false;
