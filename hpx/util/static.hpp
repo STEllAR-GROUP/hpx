@@ -38,7 +38,7 @@ namespace hpx { namespace util
     //          this is a requirement of boost::call_once.
     //
     template <typename T, typename Tag = T, std::size_t N = 1>
-    struct HPX_ALWAYS_EXPORT static_ : boost::noncopyable
+    struct static_ : boost::noncopyable
     {
         BOOST_STATIC_ASSERT(N > 0 && N <= HPX_RUNTIME_INSTANCE_LIMIT);
 
