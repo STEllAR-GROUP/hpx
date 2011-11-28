@@ -56,7 +56,7 @@ namespace hpx { namespace util
                 return result;
             }
 
-            // if we get here then the item is not in the cache
+            // If we get here then the item is not in the cache.
             return connection_type();
         }
 
