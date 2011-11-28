@@ -93,7 +93,6 @@ struct local_spinlock : boost::noncopyable
 
         HPX_ITT_SYNC_CANCEL(this);
         return false;
-#endif
     }
 
     void unlock()
@@ -114,7 +113,7 @@ struct local_spinlock : boost::noncopyable
 
     native_handle_type native_handle()
     {
-        return &m;
+        return &v_;
     }
 
     typedef boost::unique_lock<local_spinlock> scoped_lock;
