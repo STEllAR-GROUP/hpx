@@ -17,13 +17,11 @@ set(bright_future_programs
         remote_object
    )
 
-if(HPX_CXX11_LAMBDAS)
-    set(bright_future_programs ${bright_future_programs}
-        dataflow_test
-        gs_hpx_blocked_df
-        gs_hpx_distributed
-    )
-endif()
+set(bright_future_programs ${bright_future_programs}
+    dataflow_test
+    gs_hpx_blocked_df
+    gs_hpx_distributed
+   )
 
 add_hpx_component(
     gs_hpx
