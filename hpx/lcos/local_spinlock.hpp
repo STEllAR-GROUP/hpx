@@ -10,10 +10,12 @@
 #if !defined(HPX_B3A83B49_92E0_4150_A551_488F9F5E1113)
 #define HPX_B3A83B49_92E0_4150_A551_488F9F5E1113
 
+#include <hpx/util/itt_notify.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
+
 #include <boost/noncopyable.hpp>
 #include <boost/thread/locks.hpp>
-
-#include <boost/smart_ptr/detail/yield_k.hpp>
+#include <boost/config.hpp>
 
 #if defined(BOOST_WINDOWS)
 #  include <boost/smart_ptr/detail/spinlock_w32.hpp>
@@ -21,105 +23,96 @@
 #  include <boost/smart_ptr/detail/spinlock_sync.hpp>
 #endif
 
-#include <hpx/util/itt_notify.hpp>
-
 namespace hpx { namespace lcos
 {
-
-/// boost::mutex-compatible spinlock class
-struct local_spinlock : boost::noncopyable
-{
-  private:
-    boost::uint64_t v_;
-
-    ///////////////////////////////////////////////////////////////////////////
-    static void yield(std::size_t k)
+    /// boost::mutex-compatible spinlock class
+    struct local_spinlock : boost::noncopyable
     {
+    private:
+        boost::uint64_t v_;
+
+        ///////////////////////////////////////////////////////////////////////////
+        static void yield(std::size_t k)
+        {
+            if (k < 4)
+            {
+            }
 #if defined(BOOST_SMT_PAUSE)
-        if(k < 16)
-        {
-            BOOST_SMT_PAUSE
-        }
+            if(k < 16)
+            {
+                BOOST_SMT_PAUSE
+            }
 #endif
-        else if(k < 32)
-        {
-            threads::suspend();
+            else if(k < 32)
+            {
+                threads::suspend();
+            }
+            else
+            {
+                threads::suspend(boost::posix_time::microseconds(100));
+            }
         }
-        else
+
+    public:
+        local_spinlock() : v_(0)
         {
-            threads::suspend(boost::posix_time::microseconds(100));
+            HPX_ITT_SYNC_CREATE(this, "lcos::local_spinlock", "");
         }
-    }
 
-
-  public:
-    local_spinlock() : v_(0)
-    {
-        HPX_ITT_SYNC_CREATE(this, "lcos::local_spinlock", "");
-    }
-
-    ~local_spinlock()
-    {
-        HPX_ITT_SYNC_DESTROY(this);
-    }
-
-    void lock()
-    {
-        HPX_ITT_SYNC_PREPARE(this);
-
-        for (std::size_t k = 0; !try_lock(); ++k)
+        ~local_spinlock()
         {
-            local_spinlock::yield(k); 
-        } 
+            HPX_ITT_SYNC_DESTROY(this);
+        }
 
-        HPX_ITT_SYNC_ACQUIRED(this);
-    }
+        void lock()
+        {
+            HPX_ITT_SYNC_PREPARE(this);
 
-    bool try_lock()
-    {
-        HPX_ITT_SYNC_PREPARE(this);
+            for (std::size_t k = 0; !try_lock(); ++k)
+            {
+                local_spinlock::yield(k);
+            }
 
-#if defined(BOOST_WINDOWS)
-        boost::uint64_t r = BOOST_INTERLOCKED_EXCHANGE(&v_, 1);
-        BOOST_COMPILER_FENCE
-#else
-        boost::uint64_t r = __sync_lock_test_and_set(&v_, 1);
-#endif
-
-        if (r == 0) {
             HPX_ITT_SYNC_ACQUIRED(this);
-            return true;
         }
 
-        HPX_ITT_SYNC_CANCEL(this);
-        return false;
-    }
-
-    void unlock()
-    {
-        HPX_ITT_SYNC_RELEASING(this);
+        bool try_lock()
+        {
+            HPX_ITT_SYNC_PREPARE(this);
 
 #if defined(BOOST_WINDOWS)
-        BOOST_COMPILER_FENCE
-        *const_cast<boost::uint64_t volatile*>(&v_) = 0;
+            boost::uint64_t r = BOOST_INTERLOCKED_EXCHANGE(&v_, 1);
+            BOOST_COMPILER_FENCE
 #else
-        __sync_lock_release(&v_);
+            boost::uint64_t r = __sync_lock_test_and_set(&v_, 1);
 #endif
 
-        HPX_ITT_SYNC_RELEASED(this);
-    }
+            if (r == 0) {
+                HPX_ITT_SYNC_ACQUIRED(this);
+                return true;
+            }
 
-    typedef boost::uint64_t* native_handle_type;
+            HPX_ITT_SYNC_CANCEL(this);
+            return false;
+        }
 
-    native_handle_type native_handle()
-    {
-        return &v_;
-    }
+        void unlock()
+        {
+            HPX_ITT_SYNC_RELEASING(this);
 
-    typedef boost::unique_lock<local_spinlock> scoped_lock;
-    typedef boost::detail::try_lock_wrapper<local_spinlock> scoped_try_lock;
-};
+#if defined(BOOST_WINDOWS)
+            BOOST_COMPILER_FENCE
+            *const_cast<boost::uint64_t volatile*>(&v_) = 0;
+#else
+            __sync_lock_release(&v_);
+#endif
 
+            HPX_ITT_SYNC_RELEASED(this);
+        }
+
+        typedef boost::unique_lock<local_spinlock> scoped_lock;
+        typedef boost::detail::try_lock_wrapper<local_spinlock> scoped_try_lock;
+    };
 }}
 
 #endif // HPX_B3A83B49_92E0_4150_A551_488F9F5E1113
