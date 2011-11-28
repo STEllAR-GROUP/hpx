@@ -10,7 +10,7 @@
 #include <boost/intrusive/slist.hpp>
 
 #include <hpx/exception.hpp>
-#include <hpx/util/spinlock.hpp>
+#include <hpx/lcos/local_spinlock.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/runtime/threads/thread.hpp>
@@ -42,7 +42,7 @@ namespace hpx { namespace lcos { namespace server
         typedef lcos::base_lco_with_value<ValueType, RemoteType> base_type_holder;
 
     private:
-        typedef util::spinlock mutex_type;
+        typedef lcos::local_spinlock mutex_type;
         typedef components::managed_component_base<queue> base_type;
 
         // define data structures needed for intrusive slist container used for

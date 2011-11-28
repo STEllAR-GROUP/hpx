@@ -13,7 +13,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
-#include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/spinlock.hpp>
 #include <hpx/exception.hpp>
 

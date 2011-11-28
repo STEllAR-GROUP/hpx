@@ -9,7 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
 #include <hpx/util/interval_timer.hpp>
-#include <hpx/util/spinlock.hpp>
+#include <hpx/lcos/local_spinlock.hpp>
 
 #include <boost/accumulators/statistics/mean.hpp>
 
@@ -58,7 +58,7 @@ namespace hpx { namespace performance_counters { namespace server
         void evaluate();
 
     private:
-        typedef util::spinlock mutex_type;
+        typedef lcos::local_spinlock mutex_type;
         mutable mutex_type mtx_;
 
         hpx::util::interval_timer timer_; ///< base time interval in milliseconds

@@ -7,7 +7,7 @@
 #define HPX_LCOS_LOCAL_BARRIER_JUN_23_2008_0530PM
 
 #include <boost/intrusive/slist.hpp>
-#include <hpx/util/spinlock.hpp>
+#include <hpx/lcos/local_spinlock.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/stringstream.hpp>
 
@@ -27,7 +27,7 @@ namespace hpx { namespace lcos
     class local_barrier
     {
     private:
-        typedef util::spinlock mutex_type;
+        typedef lcos::local_spinlock mutex_type;
 
         // define data structures needed for intrusive slist container used for
         // the queues

@@ -12,7 +12,7 @@
 #include <boost/intrusive/slist.hpp>
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/spinlock.hpp>
+#include <hpx/lcos/local_spinlock.hpp>
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
@@ -38,7 +38,7 @@ namespace hpx { namespace lcos
     class HPX_EXPORT local_counting_semaphore
     {
     private:
-        typedef util::spinlock mutex_type;
+        typedef lcos::local_spinlock mutex_type;
 
         // define data structures needed for intrusive slist container used for
         // the queues

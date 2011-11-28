@@ -13,7 +13,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/util/spinlock.hpp>
+#include <hpx/lcos/local_spinlock.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/stringstream.hpp>
@@ -81,7 +81,7 @@ namespace hpx { namespace lcos
     class HPX_EXPORT local_mutex : public boost::noncopyable
     {
     private:
-        typedef util::spinlock mutex_type;
+        typedef lcos::local_spinlock mutex_type;
 
         BOOST_STATIC_CONSTANT(boost::uint32_t, lock_flag_bit = 31);
         BOOST_STATIC_CONSTANT(boost::uint32_t, lock_flag_value = 1u << lock_flag_bit);
@@ -180,12 +180,12 @@ namespace hpx { namespace lcos
         }
 
         /// Acquires ownership of the \a local_mutex. Suspends the current
-        /// pxthread if ownership cannot be obtained immediately.
+        /// HPX-thread if ownership cannot be obtained immediately.
         ///
         /// \throws Throws \a hpx#bad_parameter if an error occurs while
         ///         suspending. Throws \a hpx#yield_aborted if the mutex is
         ///         destroyed while suspended. Throws \a hpx#null_thread_id if
-        ///         called outside of a pxthread.
+        ///         called outside of a HPX-thread.
         void lock()
         {
             HPX_ITT_SYNC_PREPARE(this);
@@ -212,7 +212,7 @@ namespace hpx { namespace lcos
         }
 
         /// Attempts to acquire ownership of the \a local_mutex. Suspends the
-        /// current pxthread until \a wait_until if ownership cannot be obtained
+        /// current HPX-thread until \a wait_until if ownership cannot be obtained
         /// immediately.
         ///
         /// \returns \a true if ownership was acquired; otherwise, \a false.
@@ -220,11 +220,11 @@ namespace hpx { namespace lcos
         /// \throws Throws \a hpx#bad_parameter if an error occurs while
         ///         suspending. Throws \a hpx#yield_aborted if the mutex is
         ///         destroyed while suspended. Throws \a hpx#null_thread_id if
-        ///         called outside of a pxthread.
+        ///         called outside of a HPX-thread.
         bool timed_lock(::boost::system_time const& wait_until);
 
         /// Attempts to acquire ownership of the \a local_mutex. Suspends the
-        /// current pxthread until \a timeout if ownership cannot be obtained
+        /// current HPX-thread until \a timeout if ownership cannot be obtained
         /// immediately.
         ///
         /// \returns \a true if ownership was acquired; otherwise, \a false.
@@ -232,7 +232,7 @@ namespace hpx { namespace lcos
         /// \throws Throws \a hpx#bad_parameter if an error occurs while
         ///         suspending. Throws \a hpx#yield_aborted if the mutex is
         ///         destroyed while suspended. Throws \a hpx#null_thread_id if
-        ///         called outside of a pxthread.
+        ///         called outside of a HPX-thread.
         template<typename Duration>
         bool timed_lock(Duration const& timeout)
         {
@@ -248,7 +248,7 @@ namespace hpx { namespace lcos
         ///
         /// \throws Throws \a hpx#bad_parameter if an error occurs while
         ///         releasing the mutex. Throws \a hpx#null_thread_id if called
-        ///         outside of a pxthread.
+        ///         outside of a HPX-thread.
         void unlock()
         {
             HPX_ITT_SYNC_RELEASING(this);
@@ -266,7 +266,7 @@ namespace hpx { namespace lcos
         typedef boost::detail::try_lock_wrapper<local_mutex> scoped_try_lock;
 
     private:
-        mutable util::spinlock mtx_;
+        mutable mutex_type mtx_;
         boost::atomic<boost::uint32_t> active_count_;
         queue_type queue_;
         boost::uint32_t pending_events_;

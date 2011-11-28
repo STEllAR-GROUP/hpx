@@ -227,6 +227,7 @@
     <ClInclude Include="..\..\..\hpx\lcos\local_barrier.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\local_counting_semaphore.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\local_mutex.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\local_spinlock.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\object_semaphore.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\promise.hpp" />
     <ClInclude Include="..\..\..\hpx\lcos\promise_full_empty_bit.hpp" />

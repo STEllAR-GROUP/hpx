@@ -1099,6 +1099,9 @@
     <ClInclude Include="..\..\..\hpx\runtime\components\generic_component_factory.hpp">
       <Filter>Header Files\Runtime\Components</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hpx\lcos\local_spinlock.hpp">
+      <Filter>Header Files\LCOs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\CMakeLists.txt">
