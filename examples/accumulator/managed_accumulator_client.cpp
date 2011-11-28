@@ -6,7 +6,7 @@
 
 #include <hpx/hpx_init.hpp>
 
-#include "accumulators/simple_accumulator.hpp"
+#include "accumulators/managed_accumulator.hpp"
 
 #include <boost/lexical_cast.hpp>
 
@@ -18,7 +18,7 @@ int hpx_main(boost::program_options::variables_map&)
 {
     {
         // Create an accumulator component on this locality.
-        accumulators::simple_accumulator accu;
+        accumulators::managed_accumulator accu;
         accu.create(hpx::find_here());
 
         // Print out the available commands.

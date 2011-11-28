@@ -21,6 +21,7 @@ endif()
 
 set(hello_world_FLAGS DEPENDENCIES iostreams_component)
 set(simplest_hello_world_FLAGS DEPENDENCIES iostreams_component)
+set(quicksort_FLAGS DEPENDENCIES iostreams_component)
 
 foreach(example_program ${example_programs})
   set(sources

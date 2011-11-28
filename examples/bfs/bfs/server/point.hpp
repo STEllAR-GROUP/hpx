@@ -19,12 +19,6 @@ namespace bfs { namespace server
       : public hpx::components::managed_component_base<point>
     {
     public:
-        enum actions
-        {
-            point_init = 0,
-            point_traverse = 1
-        };
-
         point()
         {}
 
@@ -42,6 +36,14 @@ namespace bfs { namespace server
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
+
+        /// Action codes.
+        enum actions
+        {
+            point_init = 0,
+            point_traverse = 1
+        };
+
         typedef hpx::actions::action3<
             // Component server type.
             point,
