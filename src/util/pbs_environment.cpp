@@ -41,21 +41,21 @@ namespace hpx { namespace util
                         if (debug_)
                             std::cerr << "read: '" << line << "'" << std::endl;
 
-                        if (!found_agas_host &&
-                            ((agas_host.empty() && nodes_.empty()) ||
-                             line == agas_host))
-                        {
-                            agas_node_ = line;
-                            found_agas_host = true;
-                            agas_node_num_ = agas_node;
-                        }
+                        if (!found_agas_host) {
+                            if ((agas_host.empty() && nodes_.empty()) ||
+                                line == agas_host)
+                            {
+                                agas_node_ = line;
+                                found_agas_host = true;
+                                agas_node_num_ = agas_node;
+                            }
 
-                        if (0 == nodes_.count(line))
-                        {
-                            if (debug_)
-                                std::cerr << "incrementing agas_node"
-                                          << std::endl;
-                            ++agas_node;
+                            if (0 == nodes_.count(line)) {
+                                if (debug_)
+                                    std::cerr << "incrementing agas_node"
+                                              << std::endl;
+                                ++agas_node;
+                            }
                         }
 
                         ++nodes_[line];
@@ -128,11 +128,11 @@ namespace hpx { namespace util
                 ") not found in node list");
         }
 
-        if (debug_ && !agas_node_.empty())
+        if (debug_ && !agas_node_.empty()) {
             std::cerr << "using AGAS host: '" << agas_node_
                       << "' (node number " << agas_node_num_ << ")"
                       << std::endl;
-
+        }
         return nodes_list;
     }
 
