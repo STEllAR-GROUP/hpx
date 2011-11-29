@@ -18,6 +18,9 @@
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/include/iostreams.hpp>
 
+#include <google/profiler.h>
+#include <google/heap-profiler.h>
+
 #include "server/remote_lse.hpp"
 #include "dataflow/dataflow.hpp"
 #include "dataflow/dataflow_trigger.hpp"
@@ -475,18 +478,20 @@ void gs(
             hpx::lcos::dataflow<remote_lse_type::apply_region_df_action>
             apply_region_dataflow;
 
+        //ProfilerStart("gs_hpx_distributed-cpu.prof");
+        //HeapProfilerStart("gs_hpx_distributed-heap.heap");
         high_resolution_timer t;
         
         for(unsigned iter = 0; iter < max_iterations; ++iter)
         {
             promise_grid_block_type & prev_block = iteration_dependencies.at(iter%2);
             promise_grid_block_type & current_block = iteration_dependencies.at((iter + 1)%2);
-            cout << "iteration " << iter << flush;
+            //cout << "iteration " << iter << flush;
             for(size_type y_block = 0; y_block < n_y_block; ++y_block)
             {
                 for(size_type x_block = 0; x_block < n_x_block; ++x_block)
                 {
-                    cout << " grid " << x_block << " " << y_block << " " << flush;
+                    //cout << " grid " << x_block << " " << y_block << " " << flush;
                     // boundary updates ....
                     typedef
                         hpx::lcos::dataflow<remote_lse_type::get_col_action>
@@ -514,8 +519,8 @@ void gs(
                     {
                         for(size_type x = 1, xx = 0; x < n_x_local + 1; x += block_size, ++xx)
                         {
-                            cout << "!. " << xx << " " << yy << " ." << flush;
-                            cout << "!. " << xx + x_block << " " << yy + y_block << " ." << flush;
+                            //cout << "!. " << xx << " " << yy << " ." << flush;
+                            //cout << "!. " << xx + x_block << " " << yy + y_block << " ." << flush;
                             range_type
                                 x_range(
                                     xx == 0 && x_block == 0 ? 2 : x
@@ -536,9 +541,10 @@ void gs(
                                         : std::min(n_y_local + 1, y + block_size)
                                 );
 
-                            cout << get_locality_from_id(grid_ids(x_block, y_block)) << " " << flush;
+                            //cout << get_locality_from_id(grid_ids(x_block, y_block)) << " " << flush;
 
                             std::vector<dataflow_base<void> > deps;
+                            deps.reserve(9);
                             //dataflow_trigger deps(grid_ids(x_block, y_block));
                             //dataflow_trigger deps(find_here());
 
@@ -546,31 +552,31 @@ void gs(
                             if(iter == 0)
                             {
                                 deps.push_back(rhs_promise(x_block, y_block)(xx, yy));
-                                cout << "." << flush;
+                                //cout << "." << flush;
                             }
 
                             if(xx + 1 < n_x_local_block)
                             {
                                 deps.push_back(prev(xx + 1, yy));
-                                cout << "." << flush;
+                                //cout << "." << flush;
                             }
                             
                             if(yy + 1 < n_y_local_block)
                             {
                                 deps.push_back(prev(xx, yy + 1));
-                                cout << "." << flush;
+                                //cout << "." << flush;
                             }
 
                             if(xx > 0)
                             {
                                 deps.push_back(current(xx - 1, yy));
-                                cout << "." << flush;
+                                //cout << "." << flush;
                             }
 
                             if(yy > 0)
                             {
                                 deps.push_back(current(xx, yy - 1));
-                                cout << "." << flush;
+                                //cout << "." << flush;
                             }
 
                             if(xx == 0 && x_block > 0)
@@ -590,7 +596,7 @@ void gs(
                                         )
                                     )
                                 );
-                                cout << "l" << flush;
+                                //cout << "l" << flush;
                             }
 
                             if(
@@ -613,7 +619,7 @@ void gs(
                                         )
                                     )
                                 );
-                                cout << "r" << flush;
+                                //cout << "r" << flush;
                             }
                             
                             if(yy == 0 && y_block > 0)
@@ -633,7 +639,7 @@ void gs(
                                         )
                                     )
                                 );
-                                cout << "t" << flush;
+                                //cout << "t" << flush;
                             }
                             
                             if(yy + 1 == n_y_local_block && y_block + 1 < n_y_block)
@@ -653,7 +659,7 @@ void gs(
                                         )
                                     )
                                 );
-                                cout << "b" << flush;
+                                //cout << "b" << flush;
                             }
 
                             /*
@@ -668,12 +674,12 @@ void gs(
                                   , y_range
                                   , dataflow_trigger(grid_ids(x_block, y_block), deps)
                                 );
-                            cout << ".! " << flush;
+                            //cout << ".! " << flush;
                         }
                     }
                 }
             }
-            cout << "done\n" << flush;
+            //cout << "done\n" << flush;
         }
         
         // wait for the last iteration to finish.
@@ -690,6 +696,9 @@ void gs(
 
         double time_elapsed = t.elapsed();
         cout << time_elapsed << "\n" << flush;
+        //ProfilerStop();
+        //HeapProfilerDump("computation finished");
+        //HeapProfilerStop();
         
         if(!output.empty())
         {

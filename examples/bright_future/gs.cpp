@@ -81,7 +81,7 @@ int hpx_main(variables_map & vm)
         gs(n_x, n_y, hx, hy, k, relaxation, max_iterations, iteration_block, block_size, output);
 
 #ifndef BRIGHT_FUTURE_NO_HPX
-        finalize(1.0, 1.0);
+        finalize();
 #endif
     }
     return 0;
