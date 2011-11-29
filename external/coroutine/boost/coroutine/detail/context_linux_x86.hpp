@@ -16,7 +16,7 @@
 #endif
 
 #ifdef BOOST_COROUTINE_USE_ATOMIC_COUNT
-#  include <boost/detail/atomic_count.hpp>
+#  include <boost/atomic.hpp>
 #endif
 
 #include <sys/param.h>

@@ -41,7 +41,7 @@
 #endif
 
 #ifdef BOOST_COROUTINE_USE_ATOMIC_COUNT
-#  include <boost/detail/atomic_count.hpp>
+#  include <boost/atomic.hpp>
 #endif
 #include <cstddef>
 #include <algorithm> //for swap
@@ -55,7 +55,6 @@
 #endif
 #include <boost/coroutine/exception.hpp>
 #include <boost/coroutine/detail/noreturn.hpp>
-#include <boost/atomic.hpp>
 
 namespace boost { namespace coroutines { namespace detail
 {
