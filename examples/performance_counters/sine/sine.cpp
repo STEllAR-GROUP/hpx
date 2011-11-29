@@ -124,5 +124,5 @@ namespace performance_counters { namespace sine
 // type and performance counter instances.
 //
 // Note that this macro can be used not more than once in one module.
-HPX_REGISTER_STARTUP_SHUTDOWN_MODULE(::performance_counters::sine::startup, 0);
+HPX_REGISTER_STARTUP_SHUTDOWN_MODULE(::performance_counters::sine::startup, (void(*)())0);
 
