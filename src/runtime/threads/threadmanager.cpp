@@ -1022,14 +1022,10 @@ namespace hpx { namespace threads
 
         for (std::size_t i = 0; i < BOOST_COROUTINE_NUM_HEAPS; ++i)
         {
-            performance_counters::raw_counter_data const counters[] =
-            {
-                // Thread allocation count (instantaneous)
-                { boost::str(thread_created % prefix % i),
-                  boost::bind(&coroutine_type::impl_type::get_allocation_count, i) }
-            };
-            performance_counters::install_counters(
-                counters, sizeof(counters)/sizeof(counters[0]));
+            // Thread allocation count (instantaneous)
+            performance_counters::install_counter(
+                boost::str(thread_created % prefix % i),
+                boost::bind(&coroutine_type::impl_type::get_allocation_count, i));
         }
     }
 
