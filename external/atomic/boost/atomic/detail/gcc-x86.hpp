@@ -2,6 +2,7 @@
 #define BOOST_DETAIL_ATOMIC_GCC_X86_HPP
 
 //  Copyright (c) 2009 Helge Bahmann
+//  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0.
 //  See accompanying file LICENSE_1_0.txt or copy at
@@ -12,8 +13,6 @@
 #include <boost/atomic/detail/builder.hpp>
 
 #include <boost/cstdint.hpp>
-
-#define __BOOST_AMD_64 defined(__amd64__) || defined(__x86_64__)
 
 namespace boost {
 namespace detail {
@@ -44,7 +43,7 @@ static inline void fence_after(memory_order order)
 
 static inline void full_fence(void)
 {
-#if __BOOST_AMD_64
+#if (defined(__amd64__) || defined(__x86_64__))
             __asm__ __volatile__("mfence" ::: "memory");
 #else
             /* could use mfence iff i686, but it does not appear to matter much */
@@ -286,7 +285,7 @@ public:
     platform_atomic_integral(void) {}
 };
 
-#if __BOOST_AMD_64
+#if (defined(__amd64__) || defined(__x86_64__))
 template<typename T>
 class atomic_x86_64 {
 public:
@@ -451,7 +450,7 @@ private:
 
 #endif
 
-#if __BOOST_AMD_64 || defined(__i686__)
+#if (defined(__amd64__) || defined(__x86_64__)) || defined(__i686__)
 template<typename T>
 class platform_atomic_integral<T, 8> : public build_atomic_from_add<atomic_x86_64<T> >{
 public:
@@ -461,7 +460,12 @@ public:
 };
 #endif
 
-#if __BOOST_AMD_64 && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_16)
+// TODO: only use the sync intrinsics as a fallback, prefer inline asm as it
+// allows us to do relaxed memory ordering.
+#if (defined(__amd64__) || defined(__x86_64__)) && \
+    defined(BOOST_ATOMIC_HAVE_SSE2) && \
+    defined(BOOST_ATOMIC_HAVE_GNU_SYNC_16) && \
+    defined(BOOST_ATOMIC_HAVE_GNU_ALIGNED_16)
 template<typename T>
 class atomic_x86_128 {
 public:
@@ -536,7 +540,5 @@ public:
 }
 }
 }
-
-#undef __BOOST_AMD_64
 
 #endif
