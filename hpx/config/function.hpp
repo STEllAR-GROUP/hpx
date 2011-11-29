@@ -8,10 +8,14 @@
 
 #include <hpx/config.hpp>
 
+#if defined(HPX_USE_UTIL_FUNCTION)
+#  include <hpx/util/function.hpp>
+#else
 #if !defined(HPX_HAVE_CXX11_STD_FUNCTION)
 #  include <boost/function.hpp>
 #else
 #  include <functional>
+#endif
 #endif
 
 #endif

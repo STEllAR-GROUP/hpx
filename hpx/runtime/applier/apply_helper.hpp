@@ -102,7 +102,7 @@ namespace hpx { namespace applier { namespace detail
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
         {
             hpx::applier::register_work_plain(
-                Action::construct_thread_function(lva, boost::forward<Arg0>(arg0)),
+                boost::move(Action::construct_thread_function(lva, boost::forward<Arg0>(arg0))),
                 actions::detail::get_action_name<Action>(), lva,
                 threads::pending, priority);
         }
@@ -113,7 +113,7 @@ namespace hpx { namespace applier { namespace detail
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
         {
             hpx::applier::register_work_plain(
-                Action::construct_thread_function(c, lva, boost::forward<Arg0>(arg0)),
+                boost::move(Action::construct_thread_function(c, lva, boost::forward<Arg0>(arg0))),
                 actions::detail::get_action_name<Action>(), lva,
                 threads::pending, priority);
         }

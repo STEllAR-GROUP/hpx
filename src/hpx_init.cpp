@@ -602,17 +602,17 @@ namespace hpx
         template <typename Runtime>
         struct dump_config
         {
-            dump_config(Runtime const& rt) : rt_(rt) {}
+            dump_config(Runtime const& rt) : rt_(boost::cref(rt)) {}
 
             void operator()() const
             {
                 std::cout << "Configuration after runtime start:\n";
                 std::cout << "----------------------------------\n";
-                rt_.get_config().dump(0, std::cout);
+                rt_.get().get_config().dump(0, std::cout);
                 std::cout << "----------------------------------\n";
             }
 
-            Runtime const& rt_;
+            boost::reference_wrapper<Runtime const> rt_;
         };
 
         ///////////////////////////////////////////////////////////////////////

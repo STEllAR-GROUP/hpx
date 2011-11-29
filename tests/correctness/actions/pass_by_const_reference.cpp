@@ -122,6 +122,32 @@ int hpx_main(variables_map& vm)
               << "move_ctor_count:       " << move_ctor_count.load() << "\n"
               << "move_assignment_count: " << move_assignment_count.load() << "\n";
 
+    ctor_count.store(0);
+    copy_ctor_count.store(0);
+    assignment_count.store(0);
+    dtor_count.store(0);
+    move_ctor_count.store(0);
+    move_assignment_count.store(0);
+
+    {
+        const id_type prefix = find_here();
+
+        object obj;
+
+        std::cout << "hpx_main: object(" << &obj << ")\n";
+
+        pass_object_future f(prefix, boost::move(obj));
+
+        f.get();
+    }
+
+    std::cout << "ctor_count:            " << ctor_count.load() << "\n"
+              << "copy_ctor_count:       " << copy_ctor_count.load() << "\n"
+              << "assignment_count:      " << assignment_count.load() << "\n"
+              << "dtor_count:            " << dtor_count.load() << "\n"
+              << "move_ctor_count:       " << move_ctor_count.load() << "\n"
+              << "move_assignment_count: " << move_assignment_count.load() << "\n";
+
     finalize();
 
     return 0;

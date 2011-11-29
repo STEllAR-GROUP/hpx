@@ -55,7 +55,7 @@ namespace hpx { namespace applier
 
     ///////////////////////////////////////////////////////////////////////////
     threads::thread_id_type register_thread_nullary(
-        HPX_STD_FUNCTION<void()> const& func, char const* desc,
+        BOOST_RV_REF(HPX_STD_FUNCTION<void()>) func, char const* desc,
         threads::thread_state_enum state, bool run_now,
         threads::thread_priority priority, std::size_t os_thread, error_code& ec)
     {
@@ -69,14 +69,14 @@ namespace hpx { namespace applier
         }
 
         threads::thread_init_data data(
-            boost::bind(&thread_function_nullary, func), desc ? desc : "<unknown>",
+            boost::bind(&thread_function_nullary, boost::move(func)), desc ? desc : "<unknown>",
             0, priority, os_thread);
         return app->get_thread_manager().
             register_thread(data, state, run_now, ec);
     }
 
     threads::thread_id_type register_thread(
-        HPX_STD_FUNCTION<void(threads::thread_state_ex)> const& func,
+        BOOST_RV_REF(HPX_STD_FUNCTION<void(threads::thread_state_ex)>) func,
         char const* desc, threads::thread_state_enum state, bool run_now,
         threads::thread_priority priority, std::size_t os_thread, error_code& ec)
     {
@@ -90,14 +90,14 @@ namespace hpx { namespace applier
         }
 
         threads::thread_init_data data(
-            boost::bind(&thread_function, func), desc ? desc : "<unknown>", 0,
+            boost::bind(&thread_function, boost::move(func)), desc ? desc : "<unknown>", 0,
             priority, os_thread);
         return app->get_thread_manager().
             register_thread(data, state, run_now, ec);
     }
 
     threads::thread_id_type register_thread_plain(
-        HPX_STD_FUNCTION<threads::thread_function_type> const& func,
+        BOOST_RV_REF(HPX_STD_FUNCTION<threads::thread_function_type>) func,
         char const* desc, threads::thread_state_enum state, bool run_now,
         threads::thread_priority priority, std::size_t os_thread, error_code& ec)
     {
@@ -110,7 +110,7 @@ namespace hpx { namespace applier
             return threads::invalid_thread_id;
         }
 
-        threads::thread_init_data data(func, desc ? desc : "<unknown>",
+        threads::thread_init_data data(boost::move(func), desc ? desc : "<unknown>",
             0, priority, os_thread);
         return app->get_thread_manager().
             register_thread(data, state, run_now, ec);
@@ -135,7 +135,7 @@ namespace hpx { namespace applier
 
     ///////////////////////////////////////////////////////////////////////////
     void register_work_nullary(
-        HPX_STD_FUNCTION<void()> const& func, char const* desc,
+        BOOST_RV_REF(HPX_STD_FUNCTION<void()>) func, char const* desc,
         threads::thread_state_enum state, threads::thread_priority priority,
         std::size_t os_thread, error_code& ec)
     {
@@ -149,13 +149,13 @@ namespace hpx { namespace applier
         }
 
         threads::thread_init_data data(
-            boost::bind(&thread_function_nullary, func),
+            boost::bind(&thread_function_nullary, boost::move(func)),
             desc ? desc : "<unknown>", 0, priority, os_thread);
         app->get_thread_manager().register_work(data, state, ec);
     }
 
     void register_work(
-        HPX_STD_FUNCTION<void(threads::thread_state_ex)> const& func,
+        BOOST_RV_REF(HPX_STD_FUNCTION<void(threads::thread_state_ex)>) func,
         char const* desc, threads::thread_state_enum state,
         threads::thread_priority priority, std::size_t os_thread, error_code& ec)
     {
@@ -169,13 +169,13 @@ namespace hpx { namespace applier
         }
 
         threads::thread_init_data data(
-            boost::bind(&thread_function, func),
+            boost::bind(&thread_function, boost::move(func)),
             desc ? desc : "<unknown>", 0, priority, os_thread);
         app->get_thread_manager().register_work(data, state, ec);
     }
 
     void register_work_plain(
-        HPX_STD_FUNCTION<threads::thread_function_type> const& func,
+        BOOST_RV_REF(HPX_STD_FUNCTION<threads::thread_function_type>) func,
         char const* desc, naming::address::address_type lva,
         threads::thread_state_enum state, threads::thread_priority priority,
         std::size_t os_thread, error_code& ec)
@@ -189,7 +189,7 @@ namespace hpx { namespace applier
             return;
         }
 
-        threads::thread_init_data data(func,
+        threads::thread_init_data data(boost::move(func),
             desc ? desc : "<unknown>", lva, priority, os_thread);
         app->get_thread_manager().register_work(data, state, ec);
     }

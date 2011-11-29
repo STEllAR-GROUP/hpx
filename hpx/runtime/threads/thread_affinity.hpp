@@ -353,7 +353,9 @@ namespace hpx { namespace threads
 
 #else
 
+#if defined(HPX_HAVE_PTHREAD_AFFINITY_NP)
     #include <pthread.h>
+#endif
     #include <sched.h>    // declares the scheduling interface
     #include <sys/syscall.h>
     #include <sys/types.h>

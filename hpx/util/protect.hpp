@@ -21,12 +21,25 @@ namespace hpx { namespace util { namespace detail
     public:
         typedef typename F::result_type result_type;
 
+        /*
         explicit protected_bind(F const& f)
           : f_(f)
         {}
+        */
+        // copy constructor
+        protected_bind(protected_bind const& other)
+          : f_(other.f_)
+        {
+        }
 
-        explicit protected_bind(BOOST_RV_REF(F) f)
-          : f_(boost::move(f))
+        // move constructor
+        protected_bind(BOOST_RV_REF(protected_bind) other)
+          : f_(boost::move(other.f_))
+        {
+        }
+
+        explicit protected_bind(BOOST_FWD_REF(F) f)
+          : f_(boost::forward<F>(f))
         {}
 
         protected_bind& operator=(BOOST_COPY_ASSIGN_REF(protected_bind) rhs)
@@ -129,6 +142,7 @@ namespace hpx { namespace util { namespace detail
 
     private:
         F f_;
+        BOOST_COPYABLE_AND_MOVABLE(protected_bind);
     };
 }}} // namespace hpx::util::detail
 

@@ -300,6 +300,17 @@ endif()
 set(CMAKE_DEBUG_POSTFIX "d")
 set(CMAKE_RELWITHDEBINFO_POSTFIX "d")
 
+
+set(HPX_USE_UTIL_BIND ON CACHE STRING "Use hpx::util::bind instead of boost or std bind" FORCE)
+if(HPX_USE_UTIL_BIND)
+    add_definitions(-DHPX_USE_UTIL_BIND)
+endif()
+
+set(HPX_USE_UTIL_FUNCTION ON CACHE STRING "Use hpx::util::function instead of boost or std function" FORCE)
+if(HPX_USE_UTIL_FUNCTION)
+    add_definitions(-DHPX_USE_UTIL_FUNCTION)
+endif()
+
 ################################################################################
 # MSVC configuration
 ################################################################################
@@ -683,6 +694,17 @@ else()
     hpx_info("malloc" "Using system allocator.")
     hpx_warn("malloc"
       "HPX will perform poorly without tcmalloc or jemalloc. See docs/refmanual/source/build/linux/malloc_allocators.rst.")
+  endif()
+
+  set(HPX_GOOGLE_PERFTOOLS ON CACHE STRING "Compile HPX with google perftools" FORCE)
+
+  if(HPX_GOOGLE_PERFTOOLS)
+    find_package(HPX_GooglePerftools)
+    if(GOOGLE_PERFTOOLS_FOUND AND HPX_GOOGLE_PERFTOOLS)
+      set(hpx_LIBRARIES ${hpx_LIBRARIES} ${GOOGLE_PERFTOOLS_LIBRARY})
+      include_directories(${GOOGLE_PPERFTOOLS_INCLUDE_DIR})
+      add_definitions(-DHPX_GOOGLE_PERFTOOLS)
+    endif()
   endif()
 endif()
 

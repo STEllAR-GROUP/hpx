@@ -8,17 +8,22 @@
 
 #include <hpx/config.hpp>
 
-#if !defined(HPX_HAVE_CXX11_STD_BIND)
-#  if defined(HPX_USE_PHOENIX_BIND)
-#    include <boost/phoenix/bind.hpp>
-#    include <boost/phoenix/scope/lambda.hpp>
+#if defined(HPX_USE_UTIL_BIND)
+#  include <hpx/util/bind/bind.hpp>
+#  include <hpx/util/protect.hpp>
+#else
+#  if !defined(HPX_HAVE_CXX11_STD_BIND)
+#    if defined(HPX_USE_PHOENIX_BIND)
+#      include <boost/phoenix/bind.hpp>
+#      include <boost/phoenix/scope/lambda.hpp>
+#    else
+#      include <boost/bind.hpp>
+#      include <hpx/util/protect.hpp>
+#    endif
 #  else
-#    include <boost/bind.hpp>
+#    include <functional>
 #    include <hpx/util/protect.hpp>
 #  endif
-#else
-#  include <functional>
-#  include <hpx/util/protect.hpp>
 #endif
 
 #endif

@@ -53,7 +53,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// This defines the maximum number of arguments an action can take
 #if !defined(HPX_ACTION_ARGUMENT_LIMIT)
-#  define HPX_ACTION_ARGUMENT_LIMIT 5
+#  define HPX_ACTION_ARGUMENT_LIMIT 4
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -66,7 +66,7 @@
 /// This defines the maximum number of arguments a component constructor can
 /// take
 #if !defined(HPX_COMPONENT_CREATE_ARG_MAX)
-#  define HPX_COMPONENT_CREATE_ARG_MAX 5
+#  define HPX_COMPONENT_CREATE_ARG_MAX 4
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -266,28 +266,38 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Use std::function if it's available and movable
+#if defined(HPX_USE_UTIL_FUNCTION)
+#  define HPX_STD_FUNCTION ::hpx::util::function_nonser
+#else
 #if !defined(HPX_HAVE_CXX11_STD_FUNCTION)
 #  define HPX_STD_FUNCTION ::boost::function
 #else
 #  define HPX_STD_FUNCTION ::std::function
 #endif
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // Use std::bind if it's available and movable
-#if !defined(HPX_HAVE_CXX11_STD_BIND)
-#  if defined(HPX_USE_PHOENIX_BIND)
-#    define HPX_STD_PLACEHOLDERS    ::boost::phoenix::placeholders
-#    define HPX_STD_BIND            ::boost::phoenix::bind
-#    define HPX_STD_PROTECT(f)      ::boost::phoenix::lambda[f]
-#  else
-#    define HPX_STD_PLACEHOLDERS
-#    define HPX_STD_BIND            ::boost::bind
-#    define HPX_STD_PROTECT(f)      ::hpx::util::protect(f)
-#  endif
+#if defined(HPX_USE_UTIL_BIND)
+#  define HPX_STD_PLACEHOLDER         ::hpx::util::placeholders
+#  define HPX_STD_BIND                ::hpx::util::bind
+#  define HPX_STD_PROTECT(f)          ::hpx::util::protect(f)
 #else
-#  define HPX_STD_PLACEHOLDERS      ::std::placeholders
-#  define HPX_STD_BIND              ::std::bind
-#  define HPX_STD_PROTECT(f)        ::hpx::util::protect(f)
+#  if !defined(HPX_HAVE_CXX11_STD_BIND)
+#    if defined(HPX_USE_PHOENIX_BIND)
+#      define HPX_STD_PLACEHOLDERS    ::boost::phoenix::placeholders
+#      define HPX_STD_BIND            ::boost::phoenix::bind
+#      define HPX_STD_PROTECT(f)      ::boost::phoenix::lambda[f]
+#    else
+#      define HPX_STD_PLACEHOLDERS
+#      define HPX_STD_BIND            ::boost::bind
+#      define HPX_STD_PROTECT(f)      ::hpx::util::protect(f)
+#    endif
+#  else
+#    define HPX_STD_PLACEHOLDERS      ::std::placeholders
+#    define HPX_STD_BIND              ::std::bind
+#    define HPX_STD_PROTECT(f)        ::hpx::util::protect(f)
+#  endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

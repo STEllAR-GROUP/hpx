@@ -56,8 +56,8 @@ namespace hpx { namespace applier { namespace detail
             BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
             hpx::applier::register_work_plain(
-                Action::construct_thread_function(lva,
-                    BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)),
+                boost::move(Action::construct_thread_function(lva,
+                    BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))),
                 actions::detail::get_action_name<Action>(), lva,
                 threads::pending, priority);
         }
@@ -69,8 +69,8 @@ namespace hpx { namespace applier { namespace detail
             BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
             hpx::applier::register_work_plain(
-                Action::construct_thread_function(
-                    c, lva, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)),
+                boost::move(Action::construct_thread_function(
+                    c, lva, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))),
                 actions::detail::get_action_name<Action>(), lva,
                 threads::pending, priority);
         }

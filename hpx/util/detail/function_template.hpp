@@ -139,6 +139,29 @@ namespace hpx { namespace util {
             : base_type(boost::move(static_cast<BOOST_RV_REF(base_type)>(other)))
         {}
     };
+   
+
+    template <
+        typename Sig
+    >
+    struct function_nonser : function_base<Sig, void, void>
+    {
+        typedef function_base<Sig, void, void> base_type;
+        function_nonser() : base_type() {}
+        
+        template <typename Functor>
+        function_nonser(Functor f)
+            : base_type(boost::move(f))
+        {}
+
+        function_nonser(function_nonser const & other)
+            : base_type(static_cast<BOOST_COPY_ASSIGN_REF(base_type)>(other))
+        {}
+
+        function_nonser(BOOST_RV_REF(function_nonser) other)
+            : base_type(boost::move(static_cast<BOOST_RV_REF(base_type)>(other)))
+        {}
+    };
 }}
 
 #define BOOST_PP_ITERATION_PARAMS_1                                             \

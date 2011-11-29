@@ -37,6 +37,7 @@ namespace hpx { namespace threads
             num_os_thread(rhs.num_os_thread)
         {}
 
+        /*
         template <typename F>
         thread_init_data(F const& f, char const* desc = 0,
                 naming::address::address_type lva = 0,
@@ -46,6 +47,7 @@ namespace hpx { namespace threads
             lva(lva), parent_prefix(0), parent_id(0), parent_phase(0),
             priority(priority), num_os_thread(os_thread)
         {}
+        */
 
         template <typename F>
         thread_init_data(BOOST_FWD_REF(F) f, char const* desc,

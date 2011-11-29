@@ -413,7 +413,7 @@ namespace hpx { namespace actions
             // cont: continuation
             // func: wrapped function object
             return HPX_STD_BIND(continuation_thread_function_void(), cont,
-                HPX_STD_PROTECT(boost::forward<Func>(func)));
+                boost::move(HPX_STD_PROTECT(boost::forward<Func>(func))));
         }
 
         /// The \a continuation_thread_function will be registered as the thread
@@ -458,7 +458,7 @@ namespace hpx { namespace actions
             // cont: continuation
             // func: wrapped function object
             return HPX_STD_BIND(continuation_thread_function(), cont,
-                HPX_STD_PROTECT(boost::forward<Func>(func)));
+                boost::move(HPX_STD_PROTECT(boost::forward<Func>(func))));
         }
 
     public:
