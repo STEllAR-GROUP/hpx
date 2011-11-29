@@ -17,7 +17,15 @@ namespace hpx { namespace lcos { namespace detail {
         {}
 
         ~dataflow_base_impl()
-        {}
+        {
+            /*
+            {
+                typename hpx::util::spinlock::scoped_lock l(mtx);
+                std::vector<boost::shared_ptr<dataflow_base_impl> > t;
+                std::swap(t, args);
+            }
+            */
+        }
         
         dataflow_base_impl(
             lcos::promise<naming::id_type, naming::gid_type> const & promise
@@ -75,9 +83,14 @@ namespace hpx { namespace lcos { namespace detail {
 
         void invalidate()
         {
-            //gid_promise.reset();
-            //std::vector<boost::shared_ptr<dataflow_base_impl> > t;
-            //std::swap(t, args);
+            /*
+            gid_promise.reset();
+            {
+                typename hpx::util::spinlock::scoped_lock l(mtx);
+                std::vector<boost::shared_ptr<dataflow_base_impl> > t;
+                std::swap(t, args);
+            }
+            */
         }
 
         naming::id_type get_gid() const
@@ -89,6 +102,7 @@ namespace hpx { namespace lcos { namespace detail {
         lcos::promise<naming::id_type, naming::gid_type> gid_promise;
 
     private:
+        //hpx::util::spinlock mtx;
         std::vector<boost::shared_ptr<dataflow_base_impl> > args;
         friend class boost::serialization::access;
 

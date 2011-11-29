@@ -89,12 +89,12 @@ namespace hpx { namespace lcos { namespace server
 
             component_type * w = new component_type(target, mtx, targets);
             {
-                typename hpx::util::spinlock::scoped_lock l(mtx);
+                lcos::local_spinlock::scoped_lock l(mtx);
                 component_ptr = w;
             }
             (*w)->init();
 
-            util::spinlock::scoped_lock l(detail::dataflow_counter_data_.mtx_);
+            lcos::local_spinlock::scoped_lock l(detail::dataflow_counter_data_.mtx_);
             ++detail::dataflow_counter_data_.initialized_;
         }
 
@@ -144,12 +144,13 @@ namespace hpx { namespace lcos { namespace server
                 component_type;                                                 \
             component_type * w = new component_type(target, mtx, targets);      \
             {                                                                   \
-                typename hpx::util::spinlock::scoped_lock l(mtx);               \
+                lcos::local_spinlock::scoped_lock l(mtx);                       \
                 component_ptr = w;                                              \
             }                                                                   \
             (*w)->init(BOOST_PP_ENUM_PARAMS(N, a));                             \
                                                                                 \
-            util::spinlock::scoped_lock l(detail::dataflow_counter_data_.mtx_); \
+            lcos::local_spinlock::scoped_lock                                   \
+                l(detail::dataflow_counter_data_.mtx_);                         \
             ++detail::dataflow_counter_data_.initialized_;                      \
         }                                                                       \
         template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename A)>         \
@@ -208,7 +209,7 @@ namespace hpx { namespace lcos { namespace server
                 "server::dataflow::connect(" << target << ") {" << get_gid() << "}"
                 ;
             {
-                hpx::util::spinlock::scoped_lock l(mtx);
+                lcos::local_spinlock::scoped_lock l(mtx);
 
                 // wait until component_ptr is initialized.
                 if(component_ptr == 0)
@@ -231,7 +232,7 @@ namespace hpx { namespace lcos { namespace server
 
     private:
         detail::component_wrapper_base * component_ptr;
-        hpx::util::spinlock mtx;
+        lcos::local_spinlock mtx;
         std::vector<naming::id_type> targets;
     };
 

@@ -51,7 +51,7 @@ namespace hpx { namespace lcos { namespace server
                 >
                 component_type;
             {
-                hpx::util::spinlock::scoped_lock l(mtx);
+                lcos::local_spinlock::scoped_lock l(mtx);
                 slots_completed = 0;
                 for(unsigned i = 0; i < trigger.size(); ++i)
                 {
@@ -115,7 +115,7 @@ namespace hpx { namespace lcos { namespace server
                 "server::dataflow_trigger::connect(" << target << ") {" << get_gid() << "}"
                 ;
             {
-                hpx::util::spinlock::scoped_lock l(mtx);
+                lcos::local_spinlock::scoped_lock l(mtx);
                 if(all_set)
                 {
                     typedef hpx::lcos::base_lco::set_event_action action_type;
@@ -142,7 +142,7 @@ namespace hpx { namespace lcos { namespace server
         void set_slot(unsigned index)
         {
             {
-                hpx::util::spinlock::scoped_lock l(mtx);
+                lcos::local_spinlock::scoped_lock l(mtx);
                 if(slots_set != slots_completed)
                 {
                     slots_set |= (1<<index);
@@ -155,7 +155,7 @@ namespace hpx { namespace lcos { namespace server
         {
             std::vector<naming::id_type> t;
             {
-                hpx::util::spinlock::scoped_lock l(mtx);
+                lcos::local_spinlock::scoped_lock l(mtx);
                 all_set = (slots_set == slots_completed);
                 if(all_set == false) return;
                 std::swap(targets, t);
@@ -176,7 +176,7 @@ namespace hpx { namespace lcos { namespace server
         bool all_set;
         boost::uint32_t slots_set;
         boost::uint32_t slots_completed;
-        hpx::util::spinlock mtx;
+        lcos::local_spinlock mtx;
         std::vector<detail::component_wrapper_base *> triggers;
         std::vector<naming::id_type> targets;
     };
