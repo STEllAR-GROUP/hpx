@@ -34,22 +34,28 @@ namespace hpx { namespace lcos
         ///////////////////////////////////////////////////////////////////////////
         static void yield(std::size_t k)
         {
-            if (k < 4)
+            //if (k < 4)
+            if (k < 32)
             {
             }
+            //if(k < 16)
+            if(k < 256)
+            {
 #if defined(BOOST_SMT_PAUSE)
-            if(k < 16)
-            {
                 BOOST_SMT_PAUSE
-            }
 #endif
-            else if(k < 32)
+            }
+            //else if(k < 32)
+            /*
+            else if(k < 512)
             {
                 threads::suspend();
             }
+            */
             else
             {
-                threads::suspend(boost::posix_time::microseconds(100));
+                //threads::suspend(boost::posix_time::microseconds(10));
+                threads::suspend();
             }
         }
 
