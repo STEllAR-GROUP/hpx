@@ -30,10 +30,13 @@
 namespace hpx { namespace components { namespace server
 {
 #define HPX_RUNTIME_SUPPORT_CREATE_ONE_M0(Z, N, D)                            \
-        BOOST_PP_CAT(a, N)(BOOST_PP_CAT(_a, N))                               \
+        BOOST_PP_CAT(a, N)(boost::cref(BOOST_PP_CAT(_a, N)))                  \
     /**/
 #define HPX_RUNTIME_SUPPORT_CREATE_ONE_M1(Z, N, D)                            \
-        BOOST_PP_CAT(A, N) const & BOOST_PP_CAT(a, N);                        \
+        boost::reference_wrapper<BOOST_PP_CAT(A, N) const> BOOST_PP_CAT(a, N);\
+    /**/
+#define HPX_RUNTIME_SUPPORT_CREATE_ONE_M2(Z, N, D)                            \
+        BOOST_PP_CAT(a, N).get()                                              \
     /**/
 #define HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT(Z, N, D)                     \
         template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>    \
@@ -46,7 +49,7 @@ namespace hpx { namespace components { namespace server
             {}                                                                \
             result_type operator()(void* p) const                             \
             {                                                                 \
-                new (p) Component(BOOST_PP_ENUM_PARAMS(N, a));                \
+                new (p) Component(BOOST_PP_ENUM(N, HPX_RUNTIME_SUPPORT_CREATE_ONE_M2, _));\
             }                                                                 \
             BOOST_PP_REPEAT(N, HPX_RUNTIME_SUPPORT_CREATE_ONE_M1, _)          \
         };                                                                    \
@@ -71,6 +74,7 @@ namespace hpx { namespace components { namespace server
 #undef HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT
 #undef HPX_RUNTIME_SUPPORT_CREATE_ONE_M0
 #undef HPX_RUNTIME_SUPPORT_CREATE_ONE_M1
+#undef HPX_RUNTIME_SUPPORT_CREATE_ONE_M2
 
     ///////////////////////////////////////////////////////////////////////////
     class runtime_support
