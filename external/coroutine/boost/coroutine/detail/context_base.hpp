@@ -55,7 +55,30 @@
 #endif
 #include <boost/coroutine/exception.hpp>
 #include <boost/coroutine/detail/noreturn.hpp>
-namespace boost { namespace coroutines { namespace detail {
+#include <boost/atomic.hpp>
+
+namespace boost { namespace coroutines { namespace detail
+{
+#ifdef BOOST_COROUTINE_USE_ATOMIC_COUNT
+  /////////////////////////////////////////////////////////////////////////////
+  //
+  struct allocation_counters
+  {
+      allocation_counters()
+      {
+          for(std::size_t i = 0; i < BOOST_COROUTINE_NUM_HEAPS; ++i)
+              m_allocation_counter[i].store(0);
+      }
+
+      boost::atomic_uint64_t& get(std::size_t i)
+      {
+          BOOST_ASSERT(i < BOOST_COROUTINE_NUM_HEAPS);
+          return m_allocation_counter[i];
+      }
+
+      boost::atomic_uint64_t m_allocation_counter[BOOST_COROUTINE_NUM_HEAPS];
+  };
+#endif
 
   /////////////////////////////////////////////////////////////////////////////
   const std::ptrdiff_t default_stack_size = -1;
@@ -347,13 +370,33 @@ namespace boost { namespace coroutines { namespace detail {
       } catch(...) {}
     }
 
-    static boost::uint64_t get_allocation_count()
+    static boost::uint64_t get_allocation_count_all()
     {
-      return m_allocation_counter;
+        boost::uint64_t count = 0;
+#ifndef BOOST_COROUTINE_USE_ATOMIC_COUNT
+        for (std::size_t i = 0; i < BOOST_COROUTINE_NUM_HEAPS; ++i)
+            count += m_allocation_counter[i];
+#else
+        for (std::size_t i = 0; i < BOOST_COROUTINE_NUM_HEAPS; ++i)
+            count += m_allocation_counters.get(i).load();
+#endif
+        return count;
     }
-    static boost::uint64_t increment_allocation_count()
+    static boost::uint64_t get_allocation_count(std::size_t heap_num)
     {
-      return ++m_allocation_counter;
+#ifndef BOOST_COROUTINE_USE_ATOMIC_COUNT
+        return m_allocation_counter[heap_num];
+#else
+        return m_allocation_counters.get(heap_num).load();
+#endif
+    }
+    static boost::uint64_t increment_allocation_count(std::size_t heap_num)
+    {
+#ifndef BOOST_COROUTINE_USE_ATOMIC_COUNT
+        return ++m_allocation_counter[heap_num];
+#else
+        return ++m_allocation_counters.get(heap_num);
+#endif
     }
 
   protected:
@@ -437,10 +480,10 @@ namespace boost { namespace coroutines { namespace detail {
     ctx_type m_caller;
 #ifndef BOOST_COROUTINE_USE_ATOMIC_COUNT
     mutable std::size_t m_counter;
-    static std::size_t m_allocation_counter;
+    static std::size_t m_allocation_counter[BOOST_COROUTINE_NUM_HEAPS];
 #else
-    mutable boost::detail::atomic_count m_counter;
-    static boost::detail::atomic_count m_allocation_counter;
+    mutable boost::atomic_uint64_t m_counter;
+    static allocation_counters m_allocation_counters;
 #endif
     deleter_type * m_deleter;
     context_state m_state;
@@ -457,7 +500,7 @@ namespace boost { namespace coroutines { namespace detail {
 #ifdef BOOST_COROUTINE_USE_ATOMIC_COUNT
   // initialize static allocation counter
   template <typename ContextImpl>
-  boost::detail::atomic_count context_base<ContextImpl>::m_allocation_counter(0);
+  allocation_counters context_base<ContextImpl>::m_allocation_counters;
 #endif
 
 } } }

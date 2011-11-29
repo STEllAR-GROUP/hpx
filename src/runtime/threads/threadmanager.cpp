@@ -882,36 +882,38 @@ namespace hpx { namespace threads
             { "/queue/length", performance_counters::counter_raw,
               "returns the current queue length for the referenced queue",
               HPX_PERFORMANCE_COUNTER_V1 },
+
             // thread counts
             { "/threads/count/cumulative/all", performance_counters::counter_raw,
-              "returns the overall number of executed (retired) px-threads for "
+              "returns the overall number of executed (retired) HPX-thread for "
               "the referenced locality", HPX_PERFORMANCE_COUNTER_V1 },
             { "/threads/count/objects", performance_counters::counter_raw,
-              "returns the overall number of created px-thread objects for "
+              "returns the overall number of created HPX-thread objects for "
               "the referenced locality", HPX_PERFORMANCE_COUNTER_V1 },
             { "/threads/count/stack-recycles", performance_counters::counter_raw,
-              "returns the total number of pxthread recycling operations performed "
+              "returns the total number of HPX-thread recycling operations performed "
               "for the referenced locality", HPX_PERFORMANCE_COUNTER_V1 },
 #if !defined(BOOST_WINDOWS)
             { "/threads/count/stack-unbinds", performance_counters::counter_raw,
-              "returns the total number of pxthread unbind (madvise) operations "
+              "returns the total number of HPX-thread unbind (madvise) operations "
               "performed for the referenced locality", HPX_PERFORMANCE_COUNTER_V1 },
 #endif
             { "/threads/count/instantaneous/all", performance_counters::counter_raw,
-              "returns the overall current number of px-threads instantiated at the "
+              "returns the overall current number of HPX-thread instantiated at the "
               "referenced locality", HPX_PERFORMANCE_COUNTER_V1 },
             { "/threads/count/instantaneous/active", performance_counters::counter_raw,
-              "returns the current number of active px-threads at the referenced locality",
+              "returns the current number of active HPX-thread at the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1 },
             { "/threads/count/instantaneous/pending", performance_counters::counter_raw,
-              "returns the current number of pending px-threads at the referenced locality",
+              "returns the current number of pending HPX-thread at the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1 },
             { "/threads/count/instantaneous/suspended", performance_counters::counter_raw,
-              "returns the current number of suspended px-threads at the referenced locality",
+              "returns the current number of suspended HPX-thread at the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1 },
             { "/threads/count/instantaneous/terminated", performance_counters::counter_raw,
-              "returns the current number of terminated px-threads at the referenced locality",
+              "returns the current number of terminated HPX-thread at the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1 },
+
             // Idle rate of either a thread or the averaging over all threads of a locality
             { "/time/idle-rate", performance_counters::counter_raw,
               "returns the idle rate for the referenced object - thread or locality (in "
@@ -930,14 +932,17 @@ namespace hpx { namespace threads
         boost::format total_avg_maint("/time(locality#%d/total)/idle-rate");
         boost::format total_thread_cumulative("/threads(locality#%d/total)/count/cumulative/all");
         boost::format total_thread_created("/threads(locality#%d/total)/count/objects");
+        boost::format total_thread_instant("/threads(locality#%d/total)/count/instantaneous/%s");
+
         boost::format total_stack_recycles("/threads(locality#%d/total)/count/stack-recycles");
 #if !defined(BOOST_WINDOWS)
         boost::format total_stack_unbinds("/threads(locality#%d/total)/count/stack-unbinds");
 #endif
-        boost::format total_thread_instant("/threads(locality#%d/total)/count/instantaneous/%s");
+
         boost::format queue_length("/queue(locality#%d/os-thread#%d)/length");
         boost::format avg_maint("/time(locality#%d/os-thread#%d)/idle-rate");
         boost::format thread_cumulative("/threads(locality#%d/os-thread#%d)/count/cumulative/all");
+        boost::format thread_created("/threads(locality#%d/os-thread#%d)/count/objects");
         boost::format thread_instant("/threads(locality#%d/os-thread#%d)/count/instantaneous/%s");
 
         performance_counters::raw_counter_data const counters[] =
@@ -953,7 +958,8 @@ namespace hpx { namespace threads
               boost::bind(&ti::get_executed_threads, this, -1) },
             // Locality-wide thread object count
             { boost::str(total_thread_created % prefix),
-              &coroutine_type::impl_type::get_allocation_count },
+              &coroutine_type::impl_type::get_allocation_count_all },
+
             // Locality-wide count of stack recycling operations
             { boost::str(total_stack_recycles % prefix),
               &coroutine_type::impl_type::get_stack_recycle_count },
@@ -1009,6 +1015,18 @@ namespace hpx { namespace threads
                 // Terminated thread count (instantaneous)
                 { boost::str(thread_instant % prefix % i % "terminated"),
                   boost::bind(&spt::get_thread_count, &scheduler_, terminated, i) }
+            };
+            performance_counters::install_counters(
+                counters, sizeof(counters)/sizeof(counters[0]));
+        }
+
+        for (std::size_t i = 0; i < BOOST_COROUTINE_NUM_HEAPS; ++i)
+        {
+            performance_counters::raw_counter_data const counters[] =
+            {
+                // Thread allocation count (instantaneous)
+                { boost::str(thread_created % prefix % i),
+                  boost::bind(&coroutine_type::impl_type::get_allocation_count, i) }
             };
             performance_counters::install_counters(
                 counters, sizeof(counters)/sizeof(counters[0]));

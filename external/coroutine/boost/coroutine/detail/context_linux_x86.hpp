@@ -171,27 +171,27 @@ namespace boost { namespace coroutines {
 #ifndef BOOST_COROUTINE_USE_ATOMIC_COUNT
       typedef std::size_t counter_type;
 #else
-      typedef boost::detail::atomic_count counter_type;
+      typedef boost::atomic_uint64_t counter_type;
 #endif
 
       static counter_type& get_stack_unbind_counter()
       {
-        static counter_type counter(0);
-        return counter;
+          static counter_type counter(0);
+          return counter;
       }
       static boost::uint64_t get_stack_unbind_count()
       {
-        return get_stack_unbind_counter();
+          return get_stack_unbind_counter();
       }
       static boost::uint64_t increment_stack_unbind_count()
       {
-        return ++get_stack_unbind_counter();
+          return ++get_stack_unbind_counter();
       }
 
       static counter_type& get_stack_recycle_counter()
       {
-        static counter_type counter(0);
-        return counter;
+          static counter_type counter(0);
+          return counter;
       }
       static boost::uint64_t get_stack_recycle_count()
       {
@@ -199,7 +199,7 @@ namespace boost { namespace coroutines {
       }
       static boost::uint64_t increment_stack_recycle_count()
       {
-        return ++get_stack_recycle_counter();
+          return ++get_stack_recycle_counter();
       }
 
       friend void swap_context(x86_linux_context_impl_base& from,

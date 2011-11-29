@@ -21,6 +21,9 @@
 #  include <boost/smart_ptr/detail/spinlock_w32.hpp>
 #else
 #  include <boost/smart_ptr/detail/spinlock_sync.hpp>
+#  if defined( __ia64__ ) && defined( __INTEL_COMPILER )
+#    include <ia64intrin.h>
+#  endif
 #endif
 
 namespace hpx { namespace lcos
@@ -34,28 +37,35 @@ namespace hpx { namespace lcos
         ///////////////////////////////////////////////////////////////////////////
         static void yield(std::size_t k)
         {
-            //if (k < 4)
             if (k < 32)
             {
             }
-            //if(k < 16)
             if(k < 256)
             {
 #if defined(BOOST_SMT_PAUSE)
                 BOOST_SMT_PAUSE
 #endif
             }
-            //else if(k < 32)
-            /*
-            else if(k < 512)
+            else if (threads::get_self_ptr())
             {
                 threads::suspend();
             }
-            */
             else
             {
-                //threads::suspend(boost::posix_time::microseconds(10));
-                threads::suspend();
+#if defined(BOOST_WINDOWS)
+                Sleep(0);
+#else
+                // g++ -Wextra warns on {} or {0}
+                struct timespec rqtp = { 0, 0 };
+
+                // POSIX says that timespec has tv_sec and tv_nsec
+                // But it doesn't guarantee order or placement
+
+                rqtp.tv_sec = 0;
+                rqtp.tv_nsec = 1000;
+
+                nanosleep( &rqtp, 0 );
+#endif
             }
         }
 

@@ -194,6 +194,11 @@ namespace boost { namespace coroutines { namespace detail
           return heap_.get();
       }
 
+      Coroutine* try_allocate()
+      {
+          return heap_.try_get();
+      }
+
       void deallocate(Coroutine* p)
       {
           p->reset();          // reset bound function
@@ -369,6 +374,10 @@ private:
     {
         return get_heap(i).allocate();
     }
+    static coroutine_impl_wrapper* try_allocate(std::size_t i)
+    {
+        return get_heap(i).try_allocate();
+    }
     static void deallocate(coroutine_impl_wrapper* wrapper, std::size_t i)
     {
         get_heap(i).deallocate(wrapper);
@@ -390,13 +399,22 @@ private:
       typedef coroutine_impl_wrapper<
           functor_type, CoroutineType, ContextImpl, Heap> wrapper_type;
 
-      wrapper_type* wrapper = wrapper_type::allocate(
-          (std::size_t(id)/8) % BOOST_COROUTINE_NUM_HEAPS);
+      // start looking at the matching heap
+      std::size_t const heap_num = (std::size_t(id)/8) % BOOST_COROUTINE_NUM_HEAPS;
+
+      // look through all heaps to find an available coroutine object
+      wrapper_type* wrapper = wrapper_type::allocate(heap_num);
+      for (std::size_t i = 1; i < BOOST_COROUTINE_NUM_HEAPS && !wrapper; ++i) {
+          wrapper = wrapper_type::try_allocate((heap_num + i) % BOOST_COROUTINE_NUM_HEAPS);
+      }
+
+      // allocate a new coroutine object, if non is available (or all heaps are locked)
       if (NULL == wrapper) {
-          context_base<ContextImpl>::increment_allocation_count();
+          context_base<ContextImpl>::increment_allocation_count(heap_num);
           return new wrapper_type(boost::forward<Functor>(f), id, stack_size);
       }
 
+      // if we reuse an existing  object, we need to rebind its function
       wrapper->rebind(boost::forward<Functor>(f), id);
       return wrapper;
   }
@@ -406,6 +424,7 @@ private:
   inline void
   coroutine_impl_wrapper<Functor, CoroutineType, ContextImpl, Heap>::destroy(type* p)
   {
+      // always hand the stack back to the matching heap
       deallocate(p, (std::size_t(p->get_thread_id())/8) % BOOST_COROUTINE_NUM_HEAPS);
   }
 

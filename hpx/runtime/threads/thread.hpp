@@ -74,13 +74,34 @@ namespace hpx { namespace threads { namespace detail
     template <typename CoroutineImpl>
     struct coroutine_allocator
     {
+        typedef lcos::local_spinlock mutex_type;
+
         coroutine_allocator()
         {}
 
         CoroutineImpl* get()
         {
-            thread_mutex_type::scoped_lock l(this);
+            mutex_type::scoped_lock l(mtx_);
+            return get_locked();
+        }
 
+        CoroutineImpl* try_get()
+        {
+            mutex_type::scoped_lock l(mtx_, boost::try_to_lock);
+            if (!l)
+                return NULL;
+            return get_locked();
+        }
+
+        void deallocate(CoroutineImpl* c)
+        {
+            mutex_type::scoped_lock l(mtx_);
+            heap_.push(c);
+        }
+
+    private:
+        CoroutineImpl* get_locked()
+        {
             if (heap_.empty())
                 return NULL;
 
@@ -89,12 +110,7 @@ namespace hpx { namespace threads { namespace detail
             return next;
         }
 
-        void deallocate(CoroutineImpl* c)
-        {
-            thread_mutex_type::scoped_lock l(this);
-            heap_.push(c);
-        }
-
+        mutex_type mtx_;
         std::stack<CoroutineImpl*> heap_;
     };
 
