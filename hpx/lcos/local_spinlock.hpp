@@ -32,47 +32,68 @@ namespace hpx { namespace lcos
     struct local_spinlock : boost::noncopyable
     {
     private:
+    private:
         boost::uint64_t v_;
 
         ///////////////////////////////////////////////////////////////////////////
         static void yield(std::size_t k)
         {
-            if (k < 32)
+            if (k < 4)
             {
             }
-            if(k < 256)
+            if(k < 16)
             {
 #if defined(BOOST_SMT_PAUSE)
                 BOOST_SMT_PAUSE
 #endif
             }
-            else if (threads::get_self_ptr())
+            else if(k < 32 || k & 1)
             {
-                threads::suspend();
+                if(hpx::threads::get_self_ptr())
+                {
+                    hpx::threads::suspend();
+                }
+                else
+                {
+#if defined(BOOST_WINDOWS)
+                    Sleep(0);
+#elif defined(BOOST_HAS_PTHREADS)
+                    sched_yield();
+#else
+#endif
+                }
             }
             else
             {
+                if (hpx::threads::get_self_ptr())
+                {
+                    hpx::threads::suspend(boost::posix_time::microseconds(1));
+                }
+                else
+                {
 #if defined(BOOST_WINDOWS)
-                Sleep(0);
+                    Sleep(1);
+#elif defined(BOOST_HAS_PTHREADS)
+                    // g++ -Wextra warns on {} or {0}
+                    struct timespec rqtp = { 0, 0 };
+
+                    // POSIX says that timespec has tv_sec and tv_nsec
+                    // But it doesn't guarantee order or placement
+
+                    rqtp.tv_sec = 0;
+                    rqtp.tv_nsec = 1000;
+
+                    nanosleep( &rqtp, 0 );
 #else
-                // g++ -Wextra warns on {} or {0}
-                struct timespec rqtp = { 0, 0 };
-
-                // POSIX says that timespec has tv_sec and tv_nsec
-                // But it doesn't guarantee order or placement
-
-                rqtp.tv_sec = 0;
-                rqtp.tv_nsec = 1000;
-
-                nanosleep( &rqtp, 0 );
 #endif
+                }
             }
         }
 
     public:
         local_spinlock() : v_(0)
         {
-            HPX_ITT_SYNC_CREATE(this, "lcos::local_spinlock", "");
+            HPX_ITT_SYNC_CREATE(this, "test::local_spinlock", "");
         }
 
         ~local_spinlock()

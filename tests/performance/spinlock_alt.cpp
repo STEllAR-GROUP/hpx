@@ -76,11 +76,13 @@ namespace test
             }
             else if(k < k3 || k & 1)
             {
+                /*
                 if(hpx::threads::get_self_ptr())
                 {
                     hpx::threads::suspend();
                 }
                 else
+                */
                 {
 #if defined(BOOST_WINDOWS)
                     Sleep(0);
@@ -92,11 +94,13 @@ namespace test
             }
             else
             {
+                /*
                 if (hpx::threads::get_self_ptr())
                 {
                     hpx::threads::suspend(boost::posix_time::microseconds(1));
                 }
                 else
+                */
                 {
 #if defined(BOOST_WINDOWS)
                     Sleep(1);
@@ -256,19 +260,21 @@ int hpx_main(
                 const double duration = walltime.elapsed();
 
                 if (vm.count("csv"))
-                    cout << ( boost::format("%3%,%4%,%2%\n")
+                    cout << ( boost::format("%3%,%4%,%5%,%2%\n")
                             % count
                             % duration
                             % k1
                             % k2
+                            % k3
                             )
                          << flush;
                 else
-                    cout << ( boost::format("invoked %1% futures in %2% seconds (k1 = %3%, k2 = %4%)\n")
+                    cout << ( boost::format("invoked %1% futures in %2% seconds (k1 = %3%, k2 = %4%, k3 = %5%)\n")
                             % count
                             % duration
                             % k1
                             % k2
+                            % k3
                             )
                          << flush;
             }
