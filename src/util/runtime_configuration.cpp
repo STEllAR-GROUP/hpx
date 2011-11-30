@@ -13,6 +13,12 @@
 #include <boost/assign/std/vector.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
+#include <boost/spirit/include/qi_parse.hpp>
+#include <boost/spirit/include/qi_string.hpp>
+#include <boost/spirit/include/qi_numeric.hpp>
+#include <boost/spirit/include/qi_alternative.hpp>
+#include <boost/spirit/include/qi_sequence.hpp>
+
 namespace hpx { namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -368,9 +374,14 @@ namespace hpx { namespace util
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
-                return boost::lexical_cast<std::size_t>(
-                  sec->get_entry("default_stack_size",
-                      std::size_t(HPX_DEFAULT_STACK_SIZE)));
+                std::string entry = sec->get_entry("default_stack_size",
+                    BOOST_PP_STRINGIZE(HPX_DEFAULT_STACK_SIZE));
+                std::size_t val = HPX_DEFAULT_STACK_SIZE;
+
+                namespace qi = boost::spirit::qi;
+                qi::parse(entry.begin(), entry.end(),
+                    "0x" >> qi::hex | "0" >> qi::oct | qi::int_, val);
+                return val;
             }
         }
         return 1;
