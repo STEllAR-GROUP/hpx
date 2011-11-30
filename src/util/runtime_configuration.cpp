@@ -13,6 +13,13 @@
 #include <boost/assign/std/vector.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
+namespace hpx { namespace threads
+{
+    ///////////////////////////////////////////////////////////////////////////
+    // global variable defining the stack size to use for all HPX-threads
+    extern std::size_t default_stacksize;
+}}
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
@@ -40,6 +47,8 @@ namespace hpx { namespace util
 #endif
             "finalize_wait_time = ${HPX_FINALIZE_WAIT_TIME:-1.0}",
             "shutdown_timeout = ${HPX_SHUTDOWN_TIMEOUT:-1.0}",
+            "default_stack_size = ${HPX_DEFAULT_STACK_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_DEFAULT_STACK_SIZE) "}",
 
             "[hpx.agas]",
             "address = ${HPX_AGAS_SERVER_ADDRESS:" HPX_INITIAL_IP_ADDRESS "}",
@@ -123,6 +132,7 @@ namespace hpx { namespace util
 #if HPX_USE_ITT == 1
         use_ittnotify_api = get_itt_notify_mode();
 #endif
+        threads::default_stacksize = get_default_stack_size();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -144,6 +154,7 @@ namespace hpx { namespace util
 #if HPX_USE_ITT == 1
         use_ittnotify_api = get_itt_notify_mode();
 #endif
+        threads::default_stacksize = get_default_stack_size();
     }
 
     // AGAS configuration information has to be stored in the global hpx.agas
@@ -349,6 +360,20 @@ namespace hpx { namespace util
             }
         }
         return "";
+    }
+
+    // Will return the stack size to use for all HPX-threads.
+    std::size_t runtime_configuration::get_default_stack_size() const
+    {
+        if (has_section("hpx")) {
+            util::section const* sec = get_section("hpx");
+            if (NULL != sec) {
+                return boost::lexical_cast<std::size_t>(
+                  sec->get_entry("default_stack_size",
+                      std::size_t(HPX_DEFAULT_STACK_SIZE)));
+            }
+        }
+        return 1;
     }
 
     ///////////////////////////////////////////////////////////////////////////
