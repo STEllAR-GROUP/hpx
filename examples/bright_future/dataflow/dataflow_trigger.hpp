@@ -64,6 +64,12 @@ namespace hpx { namespace lcos {
             )
         {}
 
+        ~dataflow_trigger()
+        {
+            LLCO_(info)
+                << "~dataflow_trigger::dataflow_trigger() ";
+        }
+
     private:
 
         friend class boost::serialization::access;

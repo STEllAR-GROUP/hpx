@@ -14,7 +14,7 @@
 #include <hpx/util/function.hpp>
 #include "../grid.hpp"
 
-#include <hpx/lcos/local_mutex.hpp>
+#include <hpx/lcos/local_spinlock.hpp>
 
 namespace boost { namespace serialization {
     template <typename Archive>
@@ -73,6 +73,43 @@ namespace bright_future {
             // stuff for the stencil
 
         public:
+            hpx::lcos::local_spinlock mtx;
+            std::vector<double> timestamps;
+
+            void clear_timestamps()
+            {
+                std::vector<double> t;
+                std::swap(t, timestamps);
+            }
+            
+            typedef
+                hpx::actions::action0<
+                    remote_lse<T>
+                  , 0
+                  , &remote_lse<T>::clear_timestamps
+                >
+                clear_timestamps_action;
+
+            void print_timestamps()
+            {
+                double acc = 0;
+                //std::accumulate(timestamps.begin(), timestamps.end(), acc);
+                unsigned n = timestamps.size();
+                for(unsigned i = 0; i < n; ++i)
+                {
+                    acc += timestamps[0]/n;
+                }
+                hpx::cout << "Average time per update: " << acc << "\n" << hpx::flush;
+            }
+            
+            typedef
+                hpx::actions::action0<
+                    remote_lse<T>
+                  , 0
+                  , &remote_lse<T>::print_timestamps
+                >
+                print_timestamps_action;
+
             remote_lse();
 
             typedef typename grid_type::size_type size_type;
@@ -275,8 +312,6 @@ namespace bright_future {
                 get_row_action;
             
             std::vector<T> get_col(size_type r, range_type);
-            hpx::lcos::local_mutex mtx;
-            typedef boost::unique_lock<hpx::lcos::local_mutex> scoped_lock;
 
             typedef
                 hpx::actions::result_action2<

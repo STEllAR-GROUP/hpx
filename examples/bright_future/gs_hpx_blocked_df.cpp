@@ -287,6 +287,8 @@ void gs(
 
         cout << "finished initializing ...\n" << flush;
 
+        hpx::lcos::eager_future<remote_lse_type::clear_timestamps_action>(remote_id).get();
+
         high_resolution_timer t;
 
         // our real work starts here.
@@ -388,6 +390,8 @@ void gs(
             std::cout << "." << flush;
         }
         std::cout << "\n" << flush;
+        
+        hpx::lcos::eager_future<remote_lse_type::print_timestamps_action>(remote_id).get();
 
         double time_elapsed = t.elapsed();
         cout << time_elapsed << "\n" << flush;

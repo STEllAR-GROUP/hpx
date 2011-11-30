@@ -68,6 +68,7 @@ namespace hpx { namespace lcos { namespace detail {
         )                                                                       \
             : gid_promise(promise)                                              \
         {                                                                       \
+            args.reserve(N);                                                    \
             BOOST_PP_REPEAT(N, HPX_LCOS_DATAFLOW_M0, _)                         \
         }                                                                       \
     /**/

@@ -7,6 +7,8 @@
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/include/iostreams.hpp>
 
+#include <hpx/util/hardware/timestamp.hpp>
+
 #include "remote_lse.hpp"
 #include <cmath>
 
@@ -140,6 +142,8 @@ namespace bright_future { namespace server {
       , typename remote_lse<T>::range_type y_range
     )
     {
+        //hpx::util::high_resolution_timer t;
+
         for(size_type y = y_range.first; y < y_range.second; ++y)
         {
             for(size_type x = x_range.first; x < x_range.second; ++x)
@@ -147,6 +151,14 @@ namespace bright_future { namespace server {
                 u(x, y) = f(u, rhs, x, y, config);
             }
         }
+       
+        /*
+        double time = t.elapsed();
+        {
+            hpx::lcos::local_spinlock::scoped_lock l(mtx);
+            timestamps.push_back(time);
+        }
+        */
     }
     
     template <typename T>
