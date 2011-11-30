@@ -41,6 +41,10 @@ namespace hpx { namespace threads
     class thread;
 
     ///////////////////////////////////////////////////////////////////////////
+    // global variable defining the stack size to use for all HPX-threads
+    extern std::size_t default_stacksize;
+
+    ///////////////////////////////////////////////////////////////////////////
     // This overload will be called by the ptr_map<> used in the thread_queue
     // whenever an instance of a threads::thread needs to be deleted. We
     // provide this overload as we need to extract the thread_pool from the
@@ -113,10 +117,6 @@ namespace hpx { namespace threads { namespace detail
         mutex_type mtx_;
         std::stack<CoroutineImpl*> heap_;
     };
-
-    ///////////////////////////////////////////////////////////////////////////
-    // global variable defining the stack size to use for all HPX-threads
-    extern std::size_t default_stacksize;
 
     ///////////////////////////////////////////////////////////////////////////
     // This is the representation of a ParalleX thread
