@@ -2,6 +2,7 @@
 #define BOOST_DETAIL_ATOMIC_INTEGRAL_CASTS_HPP
 
 //  Copyright (c) 2009 Helge Bahmann
+//  Copyright (c) 2011 Bryce Lelbach & Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0.
 //  See accompanying file LICENSE_1_0.txt or copy at
