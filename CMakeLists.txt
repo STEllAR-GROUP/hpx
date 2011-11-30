@@ -647,6 +647,17 @@ else()
 
   hpx_use_flag_if_available(-pthread)
 
+  set(HPX_GOOGLE_PERFTOOLS ON CACHE STRING "Compile HPX with google perftools" FORCE)
+
+  if(HPX_GOOGLE_PERFTOOLS)
+    find_package(HPX_GooglePerftools)
+    if(GOOGLE_PERFTOOLS_FOUND AND HPX_GOOGLE_PERFTOOLS)
+      set(hpx_LIBRARIES ${hpx_LIBRARIES} ${GOOGLE_PERFTOOLS_LIBRARY})
+      include_directories(${GOOGLE_PERFTOOLS_INCLUDE_DIR})
+      add_definitions(-DHPX_GOOGLE_PERFTOOLS)
+    endif()
+  endif()
+
   set(HPX_MALLOC "TCMalloc" CACHE STRING
     "HPX malloc allocator (default: tcmalloc)" FORCE)
 
@@ -695,17 +706,6 @@ else()
     hpx_info("malloc" "Using system allocator.")
     hpx_warn("malloc"
       "HPX will perform poorly without tcmalloc or jemalloc. See docs/refmanual/source/build/linux/malloc_allocators.rst.")
-  endif()
-
-  set(HPX_GOOGLE_PERFTOOLS ON CACHE STRING "Compile HPX with google perftools" FORCE)
-
-  if(HPX_GOOGLE_PERFTOOLS)
-    find_package(HPX_GooglePerftools)
-    if(GOOGLE_PERFTOOLS_FOUND AND HPX_GOOGLE_PERFTOOLS)
-      set(hpx_LIBRARIES ${hpx_LIBRARIES} ${GOOGLE_PERFTOOLS_LIBRARY})
-      include_directories(${GOOGLE_PPERFTOOLS_INCLUDE_DIR})
-      add_definitions(-DHPX_GOOGLE_PERFTOOLS)
-    endif()
   endif()
 endif()
 
