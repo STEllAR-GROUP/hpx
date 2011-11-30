@@ -9,6 +9,7 @@
 #include <boost/format.hpp>
 #include <boost/bind.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/date_time/posix_time/posix_time_duration.hpp>
 
 #include <hpx/runtime.hpp>
 #include <hpx/hpx_init.hpp>
@@ -52,6 +53,7 @@ boost::uint64_t num_iterations = 0;
 
 std::size_t k1 = 0;
 std::size_t k2 = 0;
+std::size_t k3 = 0;
 
 namespace test
 {
@@ -72,26 +74,46 @@ namespace test
                 BOOST_SMT_PAUSE
 #endif
             }
-            else if (hpx::threads::get_self_ptr())
+            else if(k < k3 || k & 1)
             {
-                hpx::threads::suspend();
+                if(hpx::threads::get_self_ptr())
+                {
+                    hpx::threads::suspend();
+                }
+                else
+                {
+#if defined(BOOST_WINDOWS)
+                    Sleep(0);
+#elif defined(BOOST_HAS_PTHREADS)
+                    sched_yield();
+#else
+#endif
+                }
             }
             else
             {
+                if (hpx::threads::get_self_ptr())
+                {
+                    hpx::threads::suspend(boost::posix_time::microseconds(1));
+                }
+                else
+                {
 #if defined(BOOST_WINDOWS)
-                Sleep(0);
+                    Sleep(1);
+#elif defined(BOOST_HAS_PTHREADS)
+                    // g++ -Wextra warns on {} or {0}
+                    struct timespec rqtp = { 0, 0 };
+
+                    // POSIX says that timespec has tv_sec and tv_nsec
+                    // But it doesn't guarantee order or placement
+
+                    rqtp.tv_sec = 0;
+                    rqtp.tv_nsec = 1000;
+
+                    nanosleep( &rqtp, 0 );
 #else
-                // g++ -Wextra warns on {} or {0}
-                struct timespec rqtp = { 0, 0 };
-
-                // POSIX says that timespec has tv_sec and tv_nsec
-                // But it doesn't guarantee order or placement
-
-                rqtp.tv_sec = 0;
-                rqtp.tv_nsec = 1000;
-
-                nanosleep( &rqtp, 0 );
 #endif
+                }
             }
         }
 
@@ -204,6 +226,7 @@ int hpx_main(
 
         k1 = vm["k1"].as<std::size_t>();
         k2 = vm["k2"].as<std::size_t>();
+        k3 = vm["k3"].as<std::size_t>();
 
         const id_type here = find_here();
 
@@ -275,11 +298,15 @@ int main(
         , "number of iterations in the delay loop")
 
         ( "k1"
-        , value<std::size_t>()->default_value(32)
+        , value<std::size_t>()->default_value(4)
         , "")
 
         ( "k2"
-        , value<std::size_t>()->default_value(256)
+        , value<std::size_t>()->default_value(16)
+        , "")
+
+        ( "k3"
+        , value<std::size_t>()->default_value(32)
         , "")
 
         ( "csv"

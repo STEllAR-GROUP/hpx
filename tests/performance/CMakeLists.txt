@@ -10,6 +10,7 @@ set(benchmarks
     delay_baseline
     pxthread
     spinlock
+    spinlock_alt
    )
 
 set(boost_tls_FLAGS NOLIBS DEPENDENCIES ${BOOST_program_options_LIBRARY}
@@ -26,6 +27,7 @@ set(delay_baseline_FLAGS DEPENDENCIES iostreams_component)
 set(pxthread_FLAGS DEPENDENCIES iostreams_component)
 
 set(spinlock_FLAGS DEPENDENCIES iostreams_component)
+set(spinlock_alt_FLAGS DEPENDENCIES iostreams_component)
 
 if(HPX_CXX11_LAMBDAS)
   set(benchmarks ${benchmarks}
