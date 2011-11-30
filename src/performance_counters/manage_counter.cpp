@@ -1,5 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2011 Bryce Adelstein-Lelbach, Hartmut Kaiser
+//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -23,7 +24,7 @@ namespace hpx { namespace performance_counters
     void install_counter(std::string const& name,
         HPX_STD_FUNCTION<boost::int64_t()> const& f, error_code& ec)
     {
-      boost::shared_ptr<manage_counter> p = boost::make_shared<manage_counter>();
+        boost::shared_ptr<manage_counter> p = boost::make_shared<manage_counter>();
 
         // Install the counter instance.
         p->install(name, f, ec);

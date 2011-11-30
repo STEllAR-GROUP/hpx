@@ -2,7 +2,8 @@
 #define BOOST_DETAIL_ATOMIC_INTERLOCKED_HPP
 
 //  Copyright (c) 2009 Helge Bahmann
-//  Copyright (c) 2011 Bryce Lelbach & Hartmut Kaiser
+//  Copyright (c) 2011 Hartmut Kaiser
+//  Copyright (c) 2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0.
 //  See accompanying file LICENSE_1_0.txt or copy at
