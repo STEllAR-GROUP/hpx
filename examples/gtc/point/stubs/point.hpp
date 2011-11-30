@@ -11,47 +11,56 @@
 
 #include "../server/point.hpp"
 
-namespace hpx { namespace geometry { namespace stubs
+namespace gtc { namespace stubs
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// The \a stubs#point class is the client side representation of all
-    /// \a server#point components
-    struct point : components::stub_base<server::point>
+    struct point : hpx::components::stub_base<server::point>
     {
         ///////////////////////////////////////////////////////////////////////
-        // exposed functionality of this component
+        // Exposed functionality of this component.
 
-        /// Initialize the server#point instance with the given \a gid
-        static lcos::promise<void>
-        init_async(naming::id_type gid,std::size_t objectid,std::string graphfile)
+        /// Initialize the \a gtc::server::point instance with the
+        /// given point file. 
+        static hpx::lcos::promise<void>
+        init_async(hpx::naming::id_type gid,std::size_t objectid,
+            std::size_t max_num_neighbors,std::string const& meshfile)
         {
             typedef server::point::init_action action_type;
-            return lcos::eager_future<action_type>(gid,objectid,graphfile);
+            return hpx::lcos::eager_future<action_type>(gid,objectid,
+                max_num_neighbors,meshfile);
         }
 
-        static void init(naming::id_type const& gid,std::size_t objectid,std::string graphfile)
+        /// Initialize the \a gtc::server::point instance with the
+        /// given point file.  
+        static void init(hpx::naming::id_type const& gid,std::size_t objectid,
+            std::size_t max_num_neighbors,std::string const& meshfile)
         {
             // The following get yields control while the action above
-            // is executed and the result is returned to the promise
-            init_async(gid,objectid,graphfile).get();
+            // is executed and the result is returned to the promise.
+            init_async(gid,objectid,max_num_neighbors,meshfile).get();
         }
 
-        static lcos::promise<int>
-        search_async(naming::id_type gid,std::vector<hpx::naming::id_type> const& particle_components)
+        /// Perform a search on the \a gtc::server::point
+        /// components in \a particle_components. 
+        static hpx::lcos::promise<void>
+        search_async(hpx::naming::id_type gid,
+            std::vector<hpx::naming::id_type> const& particle_components)
         {
             typedef server::point::search_action action_type;
-            return lcos::eager_future<action_type>(gid,particle_components);
+            return hpx::lcos::eager_future<action_type>(gid,particle_components);
         }
 
-        static int search(naming::id_type const& gid,std::vector<hpx::naming::id_type> const& particle_components)
+        /// Perform a search on the \a gtc::server::point
+        /// components specified \a particle_components. 
+        static void search(hpx::naming::id_type const& gid,
+            std::vector<hpx::naming::id_type> const& particle_components)
         {
             // The following get yields control while the action above
-            // is executed and the result is returned to the promise
-            return search_async(gid,particle_components).get();
+            // is executed and the result is returned to the promise.
+            search_async(gid,particle_components).get();
         }
-
     };
-
-}}}
+}}
 
 #endif
+

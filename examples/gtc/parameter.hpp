@@ -80,6 +80,9 @@ struct HPX_COMPONENT_EXPORT parameter
     bool nptrack; // track nptrack particles every time step
     bool rng_control; // controls seed and algorithm for random num. gen.
                       // rng_control>0 uses the portable random num. gen.
+    std::size_t isnap;
+    std::size_t idiag1;
+    std::size_t idiag2;
 
     std::vector<std::size_t> nmode,mmode;
 };

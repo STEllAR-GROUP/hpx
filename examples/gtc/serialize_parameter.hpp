@@ -77,6 +77,10 @@ void serialize(Archive &ar, hpx::components::gtc::detail::parameter& par,
     ar & par.track_particles;
     ar & par.nptrack;
     ar & par.rng_control;
+    
+    ar & par.isnap;
+    ar & par.idiag1;
+    ar & par.idiag2;
 
     ar & par.nmode;
     ar & par.mmode;

@@ -3,115 +3,87 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_SERVER_POINT)
-#define HPX_COMPONENTS_SERVER_POINT
+#if !defined(HPX_5EC73F4A_D9BD_4B9B_A02B_87A9BA04C043)
+#define HPX_5EC73F4A_D9BD_4B9B_A02B_87A9BA04C043
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/lcos/local_mutex.hpp>
 
 #include "../../particle/server/particle.hpp"
 
-#include <iostream>
-#include <fstream>
-
-// this is just to optimize performance a little -- this number can be exceeded
-#define MAX_NUM_NEIGHBORS 20
-
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace geometry { namespace server
+namespace gtc { namespace server
 {
 
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT point
-      : public components::detail::managed_component_base<point>
+      : public hpx::components::detail::managed_component_base<point>
     {
     public:
-        // parcel action code: the action to be performed on the destination
-        // object (the accumulator)
         enum actions
         {
             point_init = 0,
             point_search = 1
         };
 
-        // constructor: initialize accumulator value
         point()
         {}
 
         ///////////////////////////////////////////////////////////////////////
-        // exposed functionality of this component
+        // Exposed functionality of this component.
 
-        /// Initialize the accumulator
-        void init(std::size_t objectid,std::string meshfile)
-        {
-            idx_ = objectid;
-            neighbors_.reserve(MAX_NUM_NEIGHBORS);
+        /// Initialize the point with the given point file. 
+        void init(std::size_t objectid,std::size_t max_num_neighbors,
+            std::string const& meshfile);
 
-            std::string line;
-            std::string val1,val2,val3,val4;
-            std::ifstream myfile;
-            myfile.open(meshfile);
-            if (myfile.is_open() ) {
-              while (myfile.good()) { 
-                while(std::getline(myfile,line)) {
-                  std::istringstream isstream(line);
-                  std::getline(isstream,val1,' ');
-                  std::getline(isstream,val2,' ');
-                  std::getline(isstream,val3,' ');
-                  std::getline(isstream,val4,' ');
-                  std::size_t node = atoi(val1.c_str());   
-                  double posx = atof(val2.c_str());   
-                  double posy = atof(val3.c_str());   
-                  double posz = atof(val4.c_str());   
-                  if ( node == objectid ) {
-                    posx_ = posx;
-                    posy_ = posy;
-                    posz_ = posz;
-                  }
-                }
-              }
-              myfile.close(); 
-            } 
-           
-        }
-
-        int search(std::vector<hpx::naming::id_type> const& particle_components);
-        
-        bool search_callback(std::size_t i, double const& distance);
+        /// Perform a search on the \a gtc::server::particle
+        /// components in \a particle_components.
+        void search(std::vector<hpx::naming::id_type> const& particle_components);
 
         ///////////////////////////////////////////////////////////////////////
-        // Each of the exposed functions needs to be encapsulated into an action
-        // type, allowing to generate all required boilerplate code for threads,
+        // Each of the exposed functions needs to be encapsulated into an
+        // action type, generating all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::action2<
-            point, point_init,std::size_t,std::string, &point::init
+        typedef hpx::actions::action3<
+            // Component server type.
+            point,
+            // Action code.
+            point_init,
+            // Arguments of this action.
+            std::size_t,
+            std::size_t,
+            std::string const&,
+            // Method bound to this action. 
+            &point::init
         > init_action;
 
-        typedef hpx::actions::result_action1<
-            point, int,point_search, std::vector<hpx::naming::id_type> const&, &point::search
+        typedef hpx::actions::action1<
+            // Component server type.
+            point,
+            // Action code.
+            point_search,
+            // Arguments of this action.
+            std::vector<hpx::naming::id_type> const&,
+            // Method bound to this action.
+            &point::search
         > search_action;
 
     private:
-        //hpx::lcos::local_mutex mtx_;    // lock for this data block
-
         std::size_t idx_;
         std::vector<std::size_t> neighbors_;
         double posx_,posy_,posz_;
     };
-
-}}}
-
-// Declaration of serialization support for the actions
-HPX_REGISTER_ACTION_DECLARATION_EX(
-         hpx::geometry::server::point::init_action,
-         gtc_geometry_init_action);  
+}}
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-         hpx::geometry::server::point::search_action,
-         gtc_geometry_search_action);
+              gtc::server::point::init_action,
+              gtc_point_init_action)
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+              gtc::server::point::search_action,
+              gtc_point_search_action)
+
 #endif
+
