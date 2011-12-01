@@ -38,22 +38,18 @@ namespace gtc
 
         /// Initialize the \a gtc::server::point instance with the
         /// given point file. 
-        hpx::lcos::promise<void> init_async(std::size_t objectid,
-            std::size_t max_num_neighbors,std::string const& meshfile)
+        hpx::lcos::promise<void> init_async(std::size_t objectid,parameter const& par)
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::init_async(gid_,objectid,max_num_neighbors,
-                meshfile);
+            return this->base_type::init_async(gid_,objectid,par);
         }
 
         /// Initialize the \a gtc::server::point instance with the
         /// given point file.  
-        void init(std::size_t objectid,std::size_t max_num_neighbors,
-            std::string const& meshfile)
+        void init(std::size_t objectid,parameter const& par)
         {
             BOOST_ASSERT(gid_);
-            this->base_type::init_async(gid_,objectid,max_num_neighbors,
-                meshfile);
+            this->base_type::init_async(gid_,objectid,par);
         }
 
         /// Perform a search on the \a gtc::server::particle

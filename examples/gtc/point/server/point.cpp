@@ -27,37 +27,22 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace gtc { namespace server
 {
-    void point::init(std::size_t objectid,std::size_t max_num_neighbors,
-        std::string const& meshfile)
+    void point::init(std::size_t objectid,parameter const& par)
     {
         idx_ = objectid;
-        neighbors_.reserve(max_num_neighbors);
 
-        std::string line;
-        std::string val1,val2,val3,val4;
-        std::ifstream myfile;
-        myfile.open(meshfile);
-        if (myfile.is_open() ) {
-            while (myfile.good()) { 
-                while(std::getline(myfile,line)) {
-                    std::istringstream isstream(line);
-                    std::getline(isstream,val1,' ');
-                    std::getline(isstream,val2,' ');
-                    std::getline(isstream,val3,' ');
-                    std::getline(isstream,val4,' ');
-                    std::size_t node = boost::lexical_cast<std::size_t>(val1);  
-                    double posx = boost::lexical_cast<double>(val2);   
-                    double posy = boost::lexical_cast<double>(val3);
-                    double posz = boost::lexical_cast<double>(val4);   
-                    if ( node == objectid ) {
-                        posx_ = posx;
-                        posy_ = posy;
-                        posz_ = posz;
-                    }
-                }
-            }
-            myfile.close(); 
-        } 
+        // initial mesh
+        std::size_t toroidal_domain_location=objectid/par->npartdom;
+        double pi = 4.0*atan(1.0);
+        std::size_t mzeta = par->mzetamax/par->ntoroidal;
+        double tmp1 = (double) toroidal_domain_location;
+        double tmp2 = (double) par->ntoroidal;
+        double tmp3 = (double) (toroidal_domain_location+1);
+        double zetamin = 2.0*pi*tmp1/tmp2;
+        double zetamax = 2.0*pi*tmp3/tmp2;
+
+        double tmp4 = (double) mzeta;
+        double deltaz = (zetamax-zetamin)/tmp4;
     }
 
     bool search_callback(std::list<std::size_t>& deposits,

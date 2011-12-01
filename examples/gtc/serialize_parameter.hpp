@@ -82,6 +82,9 @@ void serialize(Archive &ar, hpx::components::gtc::detail::parameter& par,
     ar & par.idiag1;
     ar & par.idiag2;
 
+    ar & par.numberpe;
+    ar & par.ntoroidal;
+
     ar & par.nmode;
     ar & par.mmode;
 }

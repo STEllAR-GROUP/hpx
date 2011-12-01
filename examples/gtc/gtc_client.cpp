@@ -156,6 +156,9 @@ int hpx_main(boost::program_options::variables_map &vm)
         par->mmode.push_back(25);
         par->mmode.push_back(28);
 
+        // number of "processors"
+        par->numberpe = 40;
+
         id_type rt_id = get_applier().get_runtime_support_gid();
 
         section root;
@@ -212,6 +215,7 @@ int hpx_main(boost::program_options::variables_map &vm)
           appconfig_option<bool>("track_particles", pars, par->track_particles);
           appconfig_option<bool>("nptrack", pars, par->nptrack);
           appconfig_option<bool>("rng_control", pars, par->rng_control);
+          appconfig_option<std::size_t>("numberpe", pars, par->numberpe);
         }
 
         // Derived parameters
@@ -220,6 +224,26 @@ int hpx_main(boost::program_options::variables_map &vm)
         // Changing the units of a0 and a1 from units of "a" to units of "R_0"
         par->a0 = par->a0*par->a;
         par->a1 = par->a1*par->a;
+
+        // ----- First we verify the consistency of ntoroidal and npartdom ------
+        // The number of toroidal domains (ntoroidal) times the number of particle
+        // "domains" (npartdom) needs to be equal to the number of processor "numberpe".
+        // numberpe must be a multiple of npartdom so change npartdom accordingly
+        while ( (par->numberpe%par->npartdom) != 0 ) {
+          par->npartdom -= 1;
+          if ( par->npartdom == 1 ) break;
+        } 
+        par->ntoroidal = par->numberpe/par->npartdom;
+
+        // make sure that mzetamax is a multiple of ntoroidal
+        double tmp1 = (double) par->mzetamax;
+        double tmp2 = (double) par->ntoroidal;
+        int tmp = tmp1/tmp2 + 0.5;
+        par->mzetamax = par->ntoroidal*std::max(1,tmp);
+
+        // ensure that "mpsi", the total number of flux surfaces, is an even
+        // number since this quantity will be used in Fast Fourier Transforms
+        par->mpsi = 2*(par->mpsi/2);
 
         hpx::cout << ( boost::format("GTC parameters \n")  ) << hpx::flush;
         hpx::cout << ( boost::format("----------------------------\n")  ) << hpx::flush;
@@ -271,6 +295,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         hpx::cout << ( boost::format("track_particles: %1%\n") % par->track_particles) << hpx::flush;
         hpx::cout << ( boost::format("nptrack        : %1%\n") % par->nptrack) << hpx::flush;
         hpx::cout << ( boost::format("rng_control    : %1%\n") % par->rng_control) << hpx::flush;
+        hpx::cout << ( boost::format("numberpe       : %1%\n") % par->numberpe) << hpx::flush;
         BOOST_FOREACH(std::size_t i, par->nmode)
         {
           hpx::cout << ( boost::format("nmode              : %1% \n") % i) << hpx::flush;
@@ -279,13 +304,14 @@ int hpx_main(boost::program_options::variables_map &vm)
         {
           hpx::cout << ( boost::format("mmode              : %1% \n") % i) << hpx::flush;
         }
+        hpx::cout << ( boost::format("**************************************\n")  ) << hpx::flush;
+        hpx::cout << ( boost::format("Using npartdom %1% and ntoroidal %2%\n") % par->npartdom % par->ntoroidal) << hpx::flush;
+        hpx::cout << ( boost::format("**************************************\n")  ) << hpx::flush;
 
         ///////////////////////////////////////////////////////////////////////
         // Retrieve the command line options. 
         std::size_t const num_gridpoints = vm["n"].as<std::size_t>();
         std::size_t const num_particles = vm["np"].as<std::size_t>();
-        std::size_t const max_num_neighbors
-            = vm["max-num-neighbors"].as<std::size_t>();
 
         std::string const meshfile = vm["mesh"].as<std::string>();
         std::string const particlefile = vm["particles"].as<std::string>();
@@ -333,7 +359,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::vector<hpx::lcos::promise<void> > initial_phase;
 
         for (std::size_t i=0;i<num_gridpoints;i++) {
-          initial_phase.push_back(points[i].init_async(i,max_num_neighbors,meshfile));
+          initial_phase.push_back(points[i].init_async(i,par));
         }
 
         for (std::size_t i=0;i<num_particles;i++) {
@@ -389,8 +415,6 @@ int main(int argc, char* argv[])
             "the number of gridpoints")
         ("np", value<std::size_t>()->default_value(5),
             "the number of particles")
-        ("max-num-neighbors", value<std::size_t>()->default_value(20),
-            "the maximum number of neighbors")
         ("mesh", value<std::string>()->default_value("mesh.txt"),
             "the file containing the mesh")
         ("particles", value<std::string>()->default_value("particles.txt"),

@@ -11,7 +11,10 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 
+#include "../../parameter.hpp"
 #include "../../particle/server/particle.hpp"
+
+using hpx::components::gtc::parameter;
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace gtc { namespace server
@@ -35,8 +38,7 @@ namespace gtc { namespace server
         // Exposed functionality of this component.
 
         /// Initialize the point with the given point file. 
-        void init(std::size_t objectid,std::size_t max_num_neighbors,
-            std::string const& meshfile);
+        void init(std::size_t objectid, parameter const& par);
 
         /// Perform a search on the \a gtc::server::particle
         /// components in \a particle_components.
@@ -46,15 +48,14 @@ namespace gtc { namespace server
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
-        typedef hpx::actions::action3<
+        typedef hpx::actions::action2<
             // Component server type.
             point,
             // Action code.
             point_init,
             // Arguments of this action.
             std::size_t,
-            std::size_t,
-            std::string const&,
+            parameter const&,
             // Method bound to this action. 
             &point::init
         > init_action;

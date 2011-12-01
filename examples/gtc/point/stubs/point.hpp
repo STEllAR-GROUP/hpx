@@ -23,21 +23,20 @@ namespace gtc { namespace stubs
         /// given point file. 
         static hpx::lcos::promise<void>
         init_async(hpx::naming::id_type gid,std::size_t objectid,
-            std::size_t max_num_neighbors,std::string const& meshfile)
+            parameter const& par)
         {
             typedef server::point::init_action action_type;
-            return hpx::lcos::eager_future<action_type>(gid,objectid,
-                max_num_neighbors,meshfile);
+            return hpx::lcos::eager_future<action_type>(gid,objectid,par);
         }
 
         /// Initialize the \a gtc::server::point instance with the
         /// given point file.  
         static void init(hpx::naming::id_type const& gid,std::size_t objectid,
-            std::size_t max_num_neighbors,std::string const& meshfile)
+                         parameter const& par)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the promise.
-            init_async(gid,objectid,max_num_neighbors,meshfile).get();
+            init_async(gid,objectid,par).get();
         }
 
         /// Perform a search on the \a gtc::server::point

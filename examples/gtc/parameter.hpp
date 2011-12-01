@@ -84,6 +84,9 @@ struct HPX_COMPONENT_EXPORT parameter
     std::size_t idiag1;
     std::size_t idiag2;
 
+    std::size_t numberpe;
+    std::size_t ntoroidal;
+
     std::vector<std::size_t> nmode,mmode;
 };
 
