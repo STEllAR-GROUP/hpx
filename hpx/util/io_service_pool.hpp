@@ -13,10 +13,12 @@
 
 #include <boost/asio/io_service.hpp>
 #include <boost/thread.hpp>
+#include <boost/thread/mutex.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include <hpx/config.hpp>
+#include <hpx/util/spinlock.hpp>
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -33,16 +35,10 @@ namespace hpx { namespace util
         /// \param start_thread
         ///                 [in]
         explicit io_service_pool(std::size_t pool_size = 4,
-            char const* pool_name = "",
             HPX_STD_FUNCTION<void()> on_start_thread = HPX_STD_FUNCTION<void()>(),
             HPX_STD_FUNCTION<void()> on_stop_thread = HPX_STD_FUNCTION<void()>());
 
-        /// \brief Construct the io_service pool.
-        /// \param start_thread
-        ///                 [in]
-        explicit io_service_pool(HPX_STD_FUNCTION<void()> on_start_thread,
-            HPX_STD_FUNCTION<void()> on_stop_thread = HPX_STD_FUNCTION<void()>(),
-            char const* pool_name = "");
+        ~io_service_pool();
 
         /// \brief Run all io_service objects in the pool. If join_threads is true
         ///        this will also wait for all threads to complete
@@ -57,9 +53,6 @@ namespace hpx { namespace util
         /// \brief Clear all internal data structures
         void clear();
 
-        /// \brief
-        bool is_running() const { return !threads_.empty(); }
-
         /// \brief Get an io_service to use.
         boost::asio::io_service& get_io_service();
 
@@ -71,6 +64,8 @@ namespace hpx { namespace util
         typedef boost::shared_ptr<boost::asio::io_service> io_service_ptr;
         typedef boost::shared_ptr<boost::asio::io_service::work> work_ptr;
 
+        boost::mutex mtx_;
+
         /// The pool of io_services.
         std::vector<io_service_ptr> io_services_;
         std::vector<boost::shared_ptr<boost::thread> > threads_;
@@ -79,19 +74,18 @@ namespace hpx { namespace util
         std::vector<work_ptr> work_;
 
         /// The next io_service to use for a connection.
+        util::spinlock rr_mtx_;
         std::size_t next_io_service_;
 
         /// set to true if stopped
         bool stopped_;
 
         /// initial number of OS threads to execute in this pool
-        std::size_t pool_size_;
+        std::size_t const pool_size_;
 
         /// call this for each thread start/stop
         HPX_STD_FUNCTION<void()> on_start_thread_;
         HPX_STD_FUNCTION<void()> on_stop_thread_;
-
-        char const* pool_name_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////
