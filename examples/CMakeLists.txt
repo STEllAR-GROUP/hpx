@@ -21,6 +21,7 @@ set(subdirs
     queue
     quickstart
     random_mem_access
+    startup_shutdown
     throttle
    )
 
