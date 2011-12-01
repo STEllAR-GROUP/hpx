@@ -32,7 +32,6 @@ namespace hpx { namespace lcos
     struct local_spinlock : boost::noncopyable
     {
     private:
-    private:
         boost::uint64_t v_;
 
         ///////////////////////////////////////////////////////////////////////////
