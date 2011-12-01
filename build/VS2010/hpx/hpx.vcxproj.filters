@@ -389,6 +389,9 @@
     <ClCompile Include="..\..\..\src\runtime\agas\server\route.cpp">
       <Filter>Source Files\Runtime\AGAS\Server</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\util\parse_command_line.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\hpx\config.hpp">
@@ -1101,6 +1104,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\lcos\local_spinlock.hpp">
       <Filter>Header Files\LCOs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\util\parse_command_line.hpp">
+      <Filter>Header Files\Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

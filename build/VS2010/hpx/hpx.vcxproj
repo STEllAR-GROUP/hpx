@@ -166,6 +166,7 @@
     <ClCompile Include="..\..\..\src\util\itt_notify.cpp" />
     <ClCompile Include="..\..\..\src\util\logging.cpp" />
     <ClCompile Include="..\..\..\src\util\map_hostnames.cpp" />
+    <ClCompile Include="..\..\..\src\util\parse_command_line.cpp" />
     <ClCompile Include="..\..\..\src\util\pbs_environment.cpp" />
     <ClCompile Include="..\..\..\src\util\query_counters.cpp" />
     <ClCompile Include="..\..\..\src\util\runtime_configuration.cpp" />
@@ -325,6 +326,7 @@
     <ClInclude Include="..\..\..\hpx\util\itt_notify.hpp" />
     <ClInclude Include="..\..\..\hpx\util\locking_helpers.hpp" />
     <ClInclude Include="..\..\..\hpx\util\map_hostnames.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\parse_command_line.hpp" />
     <ClInclude Include="..\..\..\hpx\util\pbs_environment.hpp" />
     <ClInclude Include="..\..\..\hpx\util\protect.hpp" />
     <ClInclude Include="..\..\..\hpx\util\query_counters.hpp" />
