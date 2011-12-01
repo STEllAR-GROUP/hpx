@@ -107,7 +107,48 @@ namespace gtc { namespace server
         }
 
         // number of grids on a poloidal plane
-        
+        mgrid_ = 0; 
+        for (std::size_t i=0;i<mtheta_.size();i++) {
+          mgrid_ += mtheta_[i] + 1;
+        }
+        std::size_t mi_local = par->micell*(mgrid_-par->mpsi)*mzeta_;  // # of ions in toroidal domain
+        std::size_t mi = par->micell*(mgrid_-par->mpsi)*mzeta_/par->npartdom; // # of ions per processor
+        if ( mi <  (mi_local%par->npartdom) ) mi++;
+        std::size_t me_local = par->mecell*(mgrid_-par->mpsi)*mzeta_;  // # of electrons in toroidal domain
+        std::size_t me = par->mecell*(mgrid_-par->mpsi)*mzeta_/par->npartdom; // # of electrons per processor
+        if ( me < (me_local%par->npartdom) ) me++;
+
+        double tmp13 = (double) mi;
+        double tmp14 = (double) me;
+        std::size_t mimax = mi + 100*std::ceil(sqrt(tmp13)); // ions array upper bound
+        std::size_t memax = me + 100*std::ceil(sqrt(tmp14)); // electrons array upper bound
+
+        pgyro_.resize(4,mgrid_,1);
+        tgyro_.resize(4,mgrid_,1);
+        markeri_.resize(mzeta_,mgrid_,1);
+        densityi_.resize(mzeta_+1,mgrid_,1);
+        phi_.resize(mzeta_+1,mgrid_,1);
+        evector_.resize(3,mzeta_+1,mgrid_);
+        jtp1_.resize(2,mgrid_,mzeta_);
+        jtp2_.resize(2,mgrid_,mzeta_);
+        wtp1_.resize(2,mgrid_,mzeta_);
+        wtp2_.resize(2,mgrid_,mzeta_);
+        dtemper_.resize(mgrid_,mzeta_,1);
+        heatflux_.resize(mgrid_,mzeta_,1);
+
+        // initialize arrays
+        // temperature and density on the grid, T_i=n_0=1 at mid-radius
+        std::fill( rtemi_.begin(),rtemi_.end(),1.0);
+        std::fill( rteme_.begin(),rteme_.end(),1.0);
+        std::fill( rden_.begin(),rden_.end(),1.0);
+        std::fill( phip00_.begin(),phip00_.end(),0.0);
+        std::fill( zonali_.begin(),zonali_.end(),0.0);
+        std::fill( zonale_.begin(),zonale_.end(),0.0);
+        for (std::size_t i=0;i<phi_.size();i++) {
+          phi_[i] = 0.0;
+        }
+
+        //not here yet:  pfluxpsi, rdtemi, rdteme
     }
 
     bool search_callback(std::list<std::size_t>& deposits,

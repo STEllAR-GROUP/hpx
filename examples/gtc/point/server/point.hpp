@@ -87,8 +87,11 @@ namespace gtc { namespace server
         std::vector<double> rden_,pmarki_,pmarke_,phi00_,phip00_;
         std::vector<double> hfluxpsi_,zonali_,zonale_,gradt_;
         array<double> eigenmode_;
+        array<double> pgyro_,tgyro_,markeri_,densityi_,phi_,evector_;
+        array<double> jtp1_,jtp2_,wtp1_,wtp2_,dtemper_,heatflux_;
 
         std::size_t mtdiag_;
+        std::size_t mgrid_;
     };
 }}
 
