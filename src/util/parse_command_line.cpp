@@ -359,7 +359,11 @@ namespace hpx { namespace util
         boost::program_options::options_description* visible)
     {
         using namespace boost::program_options;
+#if defined(BOOST_WINDOWS)
         std::vector<std::string> args = split_winmain(cmdline);
+#else
+        std::vector<std::string> args = split_unix(cmdline);
+#endif
 
         boost::scoped_array<char*> argv(new char* [args.size()]);
         for (std::size_t i = 0; i < args.size(); ++i)
