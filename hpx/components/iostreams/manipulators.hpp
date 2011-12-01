@@ -11,6 +11,7 @@
 #include <ostream>
 
 #include <hpx/config.hpp>
+#include <hpx/components/iostreams/export_definitions.hpp>
 
 namespace hpx { namespace iostreams
 {
@@ -24,25 +25,14 @@ struct async_endl_type { };
 struct local_flush_type { };
 struct local_endl_type { };
 
-// #if !defined(BOOST_WINDOWS)
-HPX_COMPONENT_EXPORT extern sync_flush_type sync_flush;
-HPX_COMPONENT_EXPORT extern sync_endl_type sync_endl;
-HPX_COMPONENT_EXPORT extern flush_type flush; // alias for hpx::sync_flush
-HPX_COMPONENT_EXPORT extern endl_type endl; // alias for hpx::sync_endl
-HPX_COMPONENT_EXPORT extern async_flush_type async_flush;
-HPX_COMPONENT_EXPORT extern async_endl_type async_endl;
-HPX_COMPONENT_EXPORT extern local_flush_type local_flush;
-HPX_COMPONENT_EXPORT extern local_endl_type local_endl;
-// #else
-// sync_flush_type const sync_flush = {};
-// sync_endl_type const sync_endl = {};
-// flush_type const flush = flush_type(); // alias for hpx::sync_flush
-// endl_type const endl = endl_type(); // alias for hpx::sync_endl
-// async_flush_type const async_flush = {};
-// async_endl_type const async_endl= {};
-// local_flush_type const local_flush = {};
-// local_endl_type const local_endl = {};
-// #endif
+HPX_IOSTREAMS_EXPORT extern sync_flush_type sync_flush;
+HPX_IOSTREAMS_EXPORT extern sync_endl_type sync_endl;
+HPX_IOSTREAMS_EXPORT extern flush_type flush; // alias for hpx::sync_flush
+HPX_IOSTREAMS_EXPORT extern endl_type endl; // alias for hpx::sync_endl
+HPX_IOSTREAMS_EXPORT extern async_flush_type async_flush;
+HPX_IOSTREAMS_EXPORT extern async_endl_type async_endl;
+HPX_IOSTREAMS_EXPORT extern local_flush_type local_flush;
+HPX_IOSTREAMS_EXPORT extern local_endl_type local_endl;
 
 inline std::ostream& operator<< (std::ostream& os, sync_flush_type const&)
 { return os << std::flush; }
