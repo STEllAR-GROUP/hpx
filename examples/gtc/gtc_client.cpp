@@ -126,14 +126,18 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         par->r0 = 93.4;
         par->b0 = 19100.0;
+        par->tauii = -1.0;
         par->temperature = 2500.0;
         par->edensity0 = 0.46e14;
+
+        par->mflux = 5;
+        par->num_mode = 8;
+        par->m_poloidal = 9;
 
         par->output = 6;
         par->nbound = true;
         par->umax = 4.0;
         par->iload = false;
-        par->tauii = -1.0;
         par->track_particles = false;
         par->nptrack = false;
         par->rng_control = false;
@@ -205,13 +209,13 @@ int hpx_main(boost::program_options::variables_map &vm)
           appconfig_option<double>("flow2", pars, par->flow2);
           appconfig_option<double>("r0", pars, par->r0);
           appconfig_option<double>("b0", pars, par->b0);
+          appconfig_option<double>("tauii", pars, par->tauii);
           appconfig_option<double>("temperature", pars, par->temperature);
           appconfig_option<double>("edensity0", pars, par->edensity0);
           appconfig_option<std::size_t>("output", pars, par->output);
           appconfig_option<bool>("nbound", pars, par->nbound);
           appconfig_option<double>("umax", pars, par->umax);
           appconfig_option<bool>("iload", pars, par->iload);
-          appconfig_option<double>("tauii", pars, par->tauii);
           appconfig_option<bool>("track_particles", pars, par->track_particles);
           appconfig_option<bool>("nptrack", pars, par->nptrack);
           appconfig_option<bool>("rng_control", pars, par->rng_control);
@@ -224,6 +228,25 @@ int hpx_main(boost::program_options::variables_map &vm)
         // Changing the units of a0 and a1 from units of "a" to units of "R_0"
         par->a0 = par->a0*par->a;
         par->a1 = par->a1*par->a;
+
+        // equilibrium unit: length (unit=cm) and time (unit=second) unit
+        double ulength=par->r0;
+        par->utime=1.0/(9580.0*par->b0); // time unit = inverse gyrofrequency of proton
+        // primary ion thermal gyroradius in equilibrium unit, vthermal=sqrt(T/m)
+        par->gyroradius=102.0*sqrt(par->aion*par->temperature)/
+                            (abs(par->qion)*par->b0)/ulength;
+        par->tstep = par->tstep*par->aion/(abs(par->qion)*par->gyroradius*par->kappati); 
+
+        // basic ion-ion collision time, Braginskii definition
+        bool collision = false;
+        if ( par->tauii > 0.0 ) {
+          double zeff = par->qion; 
+          double tau_vth = 23.0-log(sqrt(zeff*zeff*par->edensity0)/pow(par->temperature,1.5));
+          tau_vth=2.09e7*pow(par->temperature,1.5)*sqrt(par->aion)/
+                             (par->edensity0*tau_vth*par->utime*zeff);
+          par->tauii *= tau_vth;
+          collision = true;
+        }
 
         // ----- First we verify the consistency of ntoroidal and npartdom ------
         // The number of toroidal domains (ntoroidal) times the number of particle
@@ -291,7 +314,6 @@ int hpx_main(boost::program_options::variables_map &vm)
         hpx::cout << ( boost::format("nbound         : %1%\n") % par->nbound) << hpx::flush;
         hpx::cout << ( boost::format("umax           : %1%\n") % par->umax) << hpx::flush;
         hpx::cout << ( boost::format("iload          : %1%\n") % par->iload) << hpx::flush;
-        hpx::cout << ( boost::format("tauii          : %1%\n") % par->tauii) << hpx::flush;
         hpx::cout << ( boost::format("track_particles: %1%\n") % par->track_particles) << hpx::flush;
         hpx::cout << ( boost::format("nptrack        : %1%\n") % par->nptrack) << hpx::flush;
         hpx::cout << ( boost::format("rng_control    : %1%\n") % par->rng_control) << hpx::flush;
@@ -307,6 +329,15 @@ int hpx_main(boost::program_options::variables_map &vm)
         hpx::cout << ( boost::format("**************************************\n")  ) << hpx::flush;
         hpx::cout << ( boost::format("Using npartdom %1% and ntoroidal %2%\n") % par->npartdom % par->ntoroidal) << hpx::flush;
         hpx::cout << ( boost::format("**************************************\n")  ) << hpx::flush;
+        if ( collision ) {
+          double r = 0.5*(par->a0 + par->a1);
+          double q = par->q0 + par->q1*r/par->a + par->q2*r*r/(par->a*par->a); 
+          double tmp = q/(par->tauii*par->gyroradius*pow(r,1.5)); 
+          hpx::cout << ( boost::format("Collision time tauii=%1%   nu_star=%2%  q=%3% \n") % 
+ 				par->tauii % tmp % q ) << hpx::flush;
+        }
+        hpx::cout << ( boost::format("mflux=%1%  num_mode=%2%  m_poloidal=%3% \n") % 
+ 			par->mflux % par->num_mode % par->m_poloidal ) << hpx::flush;
 
         ///////////////////////////////////////////////////////////////////////
         // Retrieve the command line options. 

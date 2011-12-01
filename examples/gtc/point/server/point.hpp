@@ -13,6 +13,7 @@
 
 #include "../../parameter.hpp"
 #include "../../particle/server/particle.hpp"
+#include "../../array1d.hpp"
 
 using hpx::components::gtc::parameter;
 
@@ -73,8 +74,21 @@ namespace gtc { namespace server
 
     private:
         std::size_t idx_;
+        double tauii_;
+        std::size_t mzeta_;
+        double deltaz_;
+        double deltar_;
+        double zetamin_,zetamax_;
         std::vector<std::size_t> neighbors_;
         double posx_,posy_,posz_;
+
+        std::vector<std::size_t> itran_,mtheta_,igrid_;
+        std::vector<double> qtinv_,deltat_,rtemi_,rteme_; 
+        std::vector<double> rden_,pmarki_,pmarke_,phi00_,phip00_;
+        std::vector<double> hfluxpsi_,zonali_,zonale_,gradt_;
+        array<double> eigenmode_;
+
+        std::size_t mtdiag_;
     };
 }}
 

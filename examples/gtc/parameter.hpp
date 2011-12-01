@@ -70,12 +70,19 @@ struct HPX_COMPONENT_EXPORT parameter
     double temperature; // electron temperature (unit=ev)
     double edensity0;   // electron number density (1/cm^3)
 
+    double utime;
+    double gyroradius;
+    double tauii;
+
+    std::size_t mflux;
+    std::size_t num_mode;
+    std::size_t m_poloidal;
+
     // Output
     std::size_t output;
     bool nbound; // 0 for periodic, >0 for zero boundary
     double umax; // unit=v_th, maximum velocity in each direction
     bool iload; // 0: uniform, 1: non-uniform
-    double tauii; // -1.0: no collisions, 1.0: collisions
     bool track_particles; // 1: keep track of some particles
     bool nptrack; // track nptrack particles every time step
     bool rng_control; // controls seed and algorithm for random num. gen.

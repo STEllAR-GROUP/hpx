@@ -69,11 +69,18 @@ void serialize(Archive &ar, hpx::components::gtc::detail::parameter& par,
     ar & par.temperature;
     ar & par.edensity0;
 
+    ar & par.utime;
+    ar & par.gyroradius;
+    ar & par.tauii;
+
+    ar & par.mflux;
+    ar & par.num_mode;
+    ar & par.m_poloidal;
+
     ar & par.output;
     ar & par.nbound;
     ar & par.umax;
     ar & par.iload;
-    ar & par.tauii;
     ar & par.track_particles;
     ar & par.nptrack;
     ar & par.rng_control;
