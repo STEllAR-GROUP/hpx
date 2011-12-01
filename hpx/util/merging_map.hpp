@@ -117,16 +117,25 @@ struct mapping
 
 template <
     typename Key
-  , typename Data
 >
-mapping<Key, Data> partition(
+boost::icl::closed_interval<Key, std::less> partition(
     Key const& base
   , Key const& size
-  , Data&& data 
     )
 {
     Key const upper = size ? (base + size - 1) : 0;
-    return mapping<Key, Data>(base, upper, boost::forward<Data>(data));
+    return boost::icl::closed_interval<Key, std::less>(base, upper);
+}
+
+template <
+    typename Key
+  , typename Data
+>
+boost::icl::closed_interval<Key, std::less> point(
+    Key const& key
+    )
+{
+    return boost::icl::closed_interval<Key, std::less>(key, key);
 }
 
 struct polymorphic_less
@@ -706,12 +715,11 @@ struct merging_map : boost::noncopyable
 
     ///////////////////////////////////////////////////////////////////////////
     /// Call \p f on the data mapped to [\p lower, \p upper]. For any subsets
-    /// of [\p lower, \p upper] that are not mapped, a default-constructed
-    /// \a data_type instance is inserted and \p f is applied to it. \p f may
-    /// be called 0 or more times. The order in which \p f is called is
-    /// unspecified, and may not be sequential. Merges any newly created or
-    /// updated mappings if possible. Overwrites or splits other mappings as
-    /// needed. 
+    /// of [\p lower, \p upper] that are not mapped, a copy of \p default is
+    /// inserted and \p f is applied to it. \p f may be called 0 or more times.
+    /// The order in which \p f is called is unspecified, and may not be
+    /// sequential. Merges any newly created or updated mappings if possible.
+    /// Overwrites or splits other mappings as needed. 
     template <
         typename F
     >
@@ -719,6 +727,7 @@ struct merging_map : boost::noncopyable
         Key const& lower
       , Key const& upper
       , F f
+      , data_type const& default_ = data_type()
         )
     {
         key_type const key(lower, upper);
@@ -727,17 +736,18 @@ struct merging_map : boost::noncopyable
     }
 
     /// Call \p f on the data mapped to [\p lower, \p upper]. For any subsets
-    /// of \p key that are not mapped, a default-constructed \a data_type
-    /// instance is inserted and \p f is applied to it. \p f may be called 0 or
-    /// more times. The order in which \p f is called is unspecified, and may
-    /// not be sequential. Merges any newly created or updated mappings if
-    /// possible. Overwrites or splits other mappings as needed. 
+    /// of \p key that are not mapped, a copy of \p default_ is inserted and
+    /// \p f is applied to it. \p f may be called 0 or more times. The order
+    /// in which \p f is called is unspecified, and may not be sequential.
+    /// Merges any newly created or updated mappings if possible. Overwrites
+    /// or splits other mappings as needed. 
     template <
         typename F
     >
     void apply(
         key_type const& key
       , F f
+      , data_type const& default_ = data_type()
         )
     { // {{{
         std::pair<iterator, iterator> matches = find(key);
@@ -745,7 +755,7 @@ struct merging_map : boost::noncopyable
         if (matches.first == end() && matches.second == end())
         {
             // Insert a new mapping with default constructed data.
-            value_type* node = new value_type(key, data_type());
+            value_type* node = new value_type(key, default_);
             std::pair<iterator, bool> r = map_.insert(*node);
             BOOST_ASSERT(r.second);
  
@@ -773,7 +783,7 @@ struct merging_map : boost::noncopyable
                 f(tmp);
 
                 // Create a new mapping and remap the super object.
-                iterator it = remap(matches.first, key, data_type());
+                iterator it = remap(matches.first, key, default_);
 
                 // Try to merge the new mapping.
                 merge(it);
@@ -859,7 +869,7 @@ struct merging_map : boost::noncopyable
         // We've cleared out all the mappings that intersect with key, so now
         // we can insert the "baseline", a mapping that spans the entire key
         // with default constructed data that f has been applied to. 
-        value_type* node = new value_type(key, data_type());
+        value_type* node = new value_type(key, default_);
 
         // Apply f to the baseline mapping.
         f(node->data_);
@@ -877,6 +887,24 @@ struct merging_map : boost::noncopyable
     } // }}}
 
     ///////////////////////////////////////////////////////////////////////////
+    std::pair<iterator, iterator> find(
+        Key const& lower
+      , Key const& upper
+        )
+    {
+        key_type const key(lower, upper); 
+        return map_.equal_range(key, polymorphic_less());
+    }
+
+    std::pair<const_iterator, const_iterator> find(
+        Key const& lower
+      , Key const& upper
+        ) const
+    {
+        key_type const key(lower, upper); 
+        return map_.equal_range(key, polymorphic_less());
+    }
+
     template <
         typename T
     > 
@@ -933,6 +961,40 @@ struct merging_map : boost::noncopyable
     void clear()
     {
         map_.clear_and_dispose(disposer());
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    size_type erase(
+        Key const& lower
+      , Key const& upper
+        )
+    {
+        key_type const key(lower, upper); 
+        return map_.erase_and_dispose(key, polymorphic_less(), disposer());
+    }
+
+    template <
+        typename T
+    > 
+    size_type erase(
+        T const& key
+        )
+    {
+        return map_.erase_and_dispose(key, polymorphic_less(), disposer());
+    }
+
+    iterator erase(
+        const_iterator pos
+        )
+    {
+        return map_.erase_and_dispose(pos, disposer());
+    }
+
+    iterator erase(
+        iterator pos
+        )
+    {
+        return map_.erase_and_dispose(const_iterator(pos), disposer());
     }
 };
 

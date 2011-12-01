@@ -175,8 +175,7 @@ int main()
 
     // TODO: Add more apply tests.
     {
-        typedef merging_map<boost::uint32_t, boost::uint32_t>
-            map_type;
+        typedef merging_map<boost::uint32_t, boost::uint32_t> map_type;
     
         map_type table;
     
@@ -200,6 +199,26 @@ int main()
         BOOST_FOREACH(map_type::const_reference e, table)
         {
             std::cout << e.key_ << " -> " << e.data_ << "\n";
+        }
+    }
+
+    std::cout << "\n";
+
+    // TODO: Add more find tests.
+    {
+        typedef merging_map<boost::uint32_t, boost::uint32_t> map_type;
+   
+        typedef map_type::iterator iterator;
+ 
+        map_type table;
+    
+        table.bind(2, 2, 50); // [2, 2] 
+    
+        std::pair<iterator, iterator> r = table.find(2);
+
+        for (; r.first != r.second; ++r.first)
+        {
+            std::cout << r.first->key_  << " -> " << r.first->data_ << "\n";
         }
     }
 }
