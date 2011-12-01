@@ -5,7 +5,10 @@
 
 set(tests
     function
+    merging_map
    )
+
+set(merging_map_FLAGS NOLIBS)
 
 foreach(test ${tests})
   set(sources
