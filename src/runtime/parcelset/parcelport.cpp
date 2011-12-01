@@ -100,8 +100,11 @@ namespace hpx { namespace parcelset
             // now it's safe to take everything down
             connection_cache_.clear();
 
-            delete acceptor_;
-            acceptor_ = NULL;
+            if (NULL != acceptor_)
+            {
+                delete acceptor_;
+                acceptor_ = NULL;
+            }
 
             io_service_pool_.clear();
         }
@@ -112,10 +115,10 @@ namespace hpx { namespace parcelset
         server::parcelport_connection_ptr conn)
     {
         if (!e) {
-        // handle this incoming parcel
+            // handle this incoming parcel
             server::parcelport_connection_ptr c(conn);    // hold on to conn
 
-        // create new connection waiting for next incoming parcel
+            // create new connection waiting for next incoming parcel
             conn.reset(new server::parcelport_connection(
                 io_service_pool_.get_io_service(), parcels_,
                 timer_, parcels_received_));
@@ -123,8 +126,8 @@ namespace hpx { namespace parcelset
                 boost::bind(&parcelport::handle_accept, this,
                     boost::asio::placeholders::error, conn));
 
-        // now accept the incoming connection by starting to read from the
-        // socket
+            // now accept the incoming connection by starting to read from the
+            // socket
             c->async_read(
                 boost::bind(&parcelport::handle_read_completion, this,
                 boost::asio::placeholders::error, c));
@@ -135,7 +138,9 @@ namespace hpx { namespace parcelset
     void parcelport::handle_read_completion(boost::system::error_code const& e,
         server::parcelport_connection_ptr c)
     {
-        if (e && e != boost::asio::error::operation_aborted) {
+        if (e && e != boost::asio::error::operation_aborted
+              && e != boost::asio::error::eof)
+        {
             LPT_(error) << "handle read operation completion: error: "
                         << e.message();
         }
@@ -202,6 +207,7 @@ namespace hpx { namespace parcelset
                         break;
 
                     // we wait for a really short amount of time
+                    // TODO: Should this be an hpx::threads::suspend?
                     boost::this_thread::sleep(boost::get_system_time() +
                         boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
                 }
