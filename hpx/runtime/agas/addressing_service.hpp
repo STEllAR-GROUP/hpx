@@ -278,6 +278,11 @@ public:
       , error_code& ec = throws
         );
 
+    std::vector<response> bulk_service(
+        std::vector<request> const& reqs
+      , error_code& ec = throws
+        );
+
     /// \brief Add a locality to the runtime.
     bool register_locality(
         naming::locality const& l

@@ -154,6 +154,21 @@ response addressing_service::service(
     return response();
 } // }}}
 
+std::vector<response> addressing_service::bulk_service(
+    std::vector<request> const& req
+  , error_code& ec
+    )
+{ // {{{
+    // FIXME: For now, we just send it to the primary namespace, assuming that
+    // most requests will end up there anyways. The primary namespace will
+    // route the requests to other namespaces (and the other namespaces would
+    // also route requests intended for the primary namespace).
+    if (is_bootstrap())
+        return bootstrap->primary_ns_server.bulk_service(req, ec);
+    else
+        return hosted->primary_ns_.bulk_service(req, action_priority_, ec);
+} // }}}
+
 bool addressing_service::register_locality(
     naming::locality const& ep
   , naming::gid_type& prefix
@@ -1197,7 +1212,7 @@ bool addressing_service::iterateids(
     )
 { // {{{
     try {
-        request req(symbol_ns_iterate, f);
+        request req(symbol_ns_iterate_names, f);
         response rep;
 
         if (is_bootstrap())

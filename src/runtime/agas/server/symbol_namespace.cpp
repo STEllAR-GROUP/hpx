@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/lcos/async.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
@@ -42,7 +43,7 @@ response symbol_namespace::service(
             return resolve(req, ec);
         case symbol_ns_unbind:
             return unbind(req, ec);
-        case symbol_ns_iterate:
+        case symbol_ns_iterate_names:
             return iterate(req, ec);
 
         case primary_ns_allocate:
@@ -88,6 +89,36 @@ response symbol_namespace::service(
         }
     };
 } // }}}
+
+// TODO: do/undo semantics (e.g. transactions)
+std::vector<response> symbol_namespace::bulk_service(
+    std::vector<request> const& reqs
+  , error_code& ec
+    )
+{
+    std::vector<response> r;
+    std::vector<lcos::promise<response> > promises;
+
+    r.reserve(reqs.size());
+    promises.reserve(reqs.size());
+
+    BOOST_FOREACH(request const& req, reqs)
+    {
+        // Start each request in a separate HPX-thread.
+        promises.push_back(lcos::async<service_action>(get_gid(), req));
+    }
+
+    // This intentionally avoids using asynchronous wait, because I do not want
+    // this action to be suspended on a timer. Additionally, we want to call
+    // get with the error_code that we've been passed. 
+    BOOST_FOREACH(lcos::promise<response> const& promise, promises)
+    {
+        // FIXME: Stop on an error code?
+        r.push_back(promise.get(ec));
+    }
+
+    return r;
+}
 
 response symbol_namespace::bind(
     request const& req
@@ -288,7 +319,7 @@ response symbol_namespace::iterate(
     if (&ec != &throws)
         ec = make_success_code();
 
-    return response(symbol_ns_iterate);
+    return response(symbol_ns_iterate_names);
 } // }}}
 
 }}}

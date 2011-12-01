@@ -30,3 +30,7 @@ HPX_REGISTER_ACTION_EX(
     component_namespace::service_action,
     component_namespace_service_action);
 
+HPX_REGISTER_ACTION_EX(
+    component_namespace::bulk_service_action,
+    component_namespace_bulk_service_action);
+

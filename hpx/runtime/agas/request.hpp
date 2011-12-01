@@ -410,7 +410,7 @@ struct request
             std::string // name
         >
         // 0x9
-        // symbol_ns_iterate
+        // symbol_ns_iterate_names
       , boost::fusion::vector1<
             iterate_names_function_type // f
         >

@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2011 Bryce Lelbach
+//  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -22,6 +22,7 @@ struct symbol_namespace
     typedef server_type::iterate_names_function_type
         iterate_names_function_type;
 
+    /////////////////////////////////////////////////////////////////////////// 
     template <
         typename Result
     >
@@ -43,6 +44,27 @@ struct symbol_namespace
         )
     {
         return service_async<response>(gid, req, priority).get(ec);
+    }
+
+    /////////////////////////////////////////////////////////////////////////// 
+    static lcos::promise<std::vector<response> > bulk_service_async(
+        naming::id_type const& gid
+      , std::vector<request> const& reqs
+      , threads::thread_priority priority = threads::thread_priority_default
+        )
+    {
+        typedef server_type::bulk_service_action action_type;
+        return lcos::eager_future<action_type>(gid, priority, reqs);
+    }
+
+    static std::vector<response> bulk_service(
+        naming::id_type const& gid
+      , std::vector<request> const& reqs
+      , threads::thread_priority priority = threads::thread_priority_default
+      , error_code& ec = throws
+        )
+    {
+        return bulk_service_async(gid, reqs, priority).get(ec);
     }
 };
 

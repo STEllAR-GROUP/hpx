@@ -44,6 +44,15 @@ struct symbol_namespace :
     {
         return this->base_type::service(this->gid_, req, priority, ec);
     }
+
+    std::vector<response> bulk_service(
+        std::vector<request> const& reqs
+      , threads::thread_priority priority = threads::thread_priority_default
+      , error_code& ec = throws
+        )
+    {
+        return this->base_type::bulk_service(this->gid_, reqs, priority, ec);
+    }
 };
 
 }}

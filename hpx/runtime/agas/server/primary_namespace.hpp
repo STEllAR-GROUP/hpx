@@ -150,6 +150,20 @@ struct HPX_EXPORT primary_namespace :
       , error_code& ec
         );
 
+    /// Maps \a service over \p reqs in parallel.
+    std::vector<response> bulk_service(
+        std::vector<request> const& reqs
+        )
+    {
+        return bulk_service(reqs, throws);
+    }
+
+    /// Maps \a service over \p reqs in parallel.
+    std::vector<response> bulk_service(
+        std::vector<request> const& reqs
+      , error_code& ec
+        );
+
     response allocate(
         request const& req
       , error_code& ec = throws
@@ -199,18 +213,19 @@ struct HPX_EXPORT primary_namespace :
     { // {{{ action enum
         // Actual actions
         namespace_service          = BOOST_BINARY_U(1000000)
-      , namespace_route            = BOOST_BINARY_U(1111111)
+      , namespace_bulk_service     = BOOST_BINARY_U(1000001)
+      , namespace_route            = BOOST_BINARY_U(1000010)
 
         // Pseudo-actions
-      , namespace_allocate         = BOOST_BINARY_U(1000001)
-      , namespace_bind_gid         = BOOST_BINARY_U(1000010)
-      , namespace_resolve_gid      = BOOST_BINARY_U(1000011)
-      , namespace_resolve_locality = BOOST_BINARY_U(1000100)
-      , namespace_free             = BOOST_BINARY_U(1000101)
-      , namespace_unbind_gid       = BOOST_BINARY_U(1000110)
-      , namespace_increment        = BOOST_BINARY_U(1000111)
-      , namespace_decrement        = BOOST_BINARY_U(1001000)
-      , namespace_localities       = BOOST_BINARY_U(1001001)
+      , namespace_allocate         = BOOST_BINARY_U(1000011)
+      , namespace_bind_gid         = BOOST_BINARY_U(1000100)
+      , namespace_resolve_gid      = BOOST_BINARY_U(1000101)
+      , namespace_resolve_locality = BOOST_BINARY_U(1000110)
+      , namespace_free             = BOOST_BINARY_U(1000111)
+      , namespace_unbind_gid       = BOOST_BINARY_U(1001000)
+      , namespace_increment        = BOOST_BINARY_U(1001001)
+      , namespace_decrement        = BOOST_BINARY_U(1001010)
+      , namespace_localities       = BOOST_BINARY_U(1001011)
     }; // }}}
 
     typedef hpx::actions::result_action1<
@@ -221,6 +236,15 @@ struct HPX_EXPORT primary_namespace :
       , &primary_namespace::service
       , threads::thread_priority_critical
     > service_action;
+
+    typedef hpx::actions::result_action1<
+        primary_namespace
+      , /* return type */ std::vector<response>
+      , /* enum value */  namespace_bulk_service
+      , /* arguments */   std::vector<request> const&
+      , &primary_namespace::bulk_service
+      , threads::thread_priority_critical
+    > bulk_service_action;
 
     typedef hpx::actions::result_action1<
         primary_namespace
@@ -237,6 +261,10 @@ struct HPX_EXPORT primary_namespace :
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::agas::server::primary_namespace::service_action,
     primary_namespace_service_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::agas::server::primary_namespace::bulk_service_action,
+    primary_namespace_bulk_service_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::agas::server::primary_namespace::route_action,

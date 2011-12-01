@@ -40,6 +40,7 @@ struct HPX_EXPORT symbol_namespace :
     // {{{ nested types
     typedef lcos::local_mutex mutex_type;
 
+    // FIXME: This signature should use id_type, not gid_type
     typedef hpx::actions::function<
         void(std::string const&, naming::gid_type const&)
     > iterate_names_function_type;
@@ -69,6 +70,20 @@ struct HPX_EXPORT symbol_namespace :
       , error_code& ec
         );
 
+    /// Maps \a service over \p reqs in parallel.
+    std::vector<response> bulk_service(
+        std::vector<request> const& reqs
+        )
+    {
+        return bulk_service(reqs, throws);
+    }
+
+    /// Maps \a service over \p reqs in parallel.
+    std::vector<response> bulk_service(
+        std::vector<request> const& reqs
+      , error_code& ec
+        );
+
     response bind(
         request const& req
       , error_code& ec = throws
@@ -92,13 +107,14 @@ struct HPX_EXPORT symbol_namespace :
     enum actions
     { // {{{ action enum
         // Actual actions
-        namespace_service = BOOST_BINARY_U(0010000)
+        namespace_service       = BOOST_BINARY_U(0010000)
+      , namespace_bulk_service  = BOOST_BINARY_U(0010001)
 
         // Pseudo-actions
-      , namespace_bind    = BOOST_BINARY_U(0010001)
-      , namespace_resolve = BOOST_BINARY_U(0010010)
-      , namespace_unbind  = BOOST_BINARY_U(0010011)
-      , namespace_iterate = BOOST_BINARY_U(0010100)
+      , namespace_bind          = BOOST_BINARY_U(0010010)
+      , namespace_resolve       = BOOST_BINARY_U(0010011)
+      , namespace_unbind        = BOOST_BINARY_U(0010100)
+      , namespace_iterate_names = BOOST_BINARY_U(0010101)
     }; // }}}
 
     typedef hpx::actions::result_action1<
@@ -110,9 +126,21 @@ struct HPX_EXPORT symbol_namespace :
       , threads::thread_priority_critical
     > service_action;
 
+    typedef hpx::actions::result_action1<
+        symbol_namespace
+      , /* return type */ std::vector<response>
+      , /* enum value */  namespace_bulk_service
+      , /* arguments */   std::vector<request> const&
+      , &symbol_namespace::bulk_service
+      , threads::thread_priority_critical
+    > bulk_service_action;
 };
 
 }}}
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::agas::server::symbol_namespace::bulk_service_action,
+    symbol_namespace_bulk_service_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::agas::server::symbol_namespace::service_action,

@@ -29,3 +29,8 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
 HPX_REGISTER_ACTION_EX(
     symbol_namespace::service_action,
     symbol_namespace_service_action);
+
+HPX_REGISTER_ACTION_EX(
+    symbol_namespace::bulk_service_action,
+    symbol_namespace_bulk_service_action);
+
