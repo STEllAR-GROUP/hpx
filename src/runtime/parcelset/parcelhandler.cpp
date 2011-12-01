@@ -6,6 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/state.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
@@ -73,11 +74,11 @@ namespace hpx { namespace parcelset
         boost::shared_ptr<std::vector<char> > const& parcel_data,
         threads::thread_priority priority)
     {
-        if (NULL == tm_ || !(tm_->status() == running))
+        // Give up if we're shutting down.
+        if (threads::threadmanager_is(stopping))
         {
-            // this is supported for debugging purposes mainly, it results in
-            // the direct execution of the parcel decoding
-            decode_parcel(parcel_data);
+            LPT_(debug) << "parcel_sink: dropping late parcel";
+            return;
         }
 
         else
