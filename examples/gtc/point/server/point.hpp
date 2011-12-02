@@ -90,6 +90,8 @@ namespace gtc { namespace server
         array<double> pgyro_,tgyro_,markeri_,densityi_,phi_,evector_;
         array<double> jtp1_,jtp2_,wtp1_,wtp2_,dtemper_,heatflux_;
 
+        std::vector<double> pfluxpsi_,rdtemi_,rdteme_;
+
         std::size_t mtdiag_;
         std::size_t mgrid_;
     };

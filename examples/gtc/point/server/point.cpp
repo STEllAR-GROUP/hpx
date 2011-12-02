@@ -125,7 +125,7 @@ namespace gtc { namespace server
 
         pgyro_.resize(4,mgrid_,1);
         tgyro_.resize(4,mgrid_,1);
-        markeri_.resize(mzeta_,mgrid_,1);
+        markeri_.resize(mzeta_+1,mgrid_+1,1);
         densityi_.resize(mzeta_+1,mgrid_,1);
         phi_.resize(mzeta_+1,mgrid_,1);
         evector_.resize(3,mzeta_+1,mgrid_);
@@ -135,6 +135,10 @@ namespace gtc { namespace server
         wtp2_.resize(2,mgrid_,mzeta_);
         dtemper_.resize(mgrid_,mzeta_,1);
         heatflux_.resize(mgrid_,mzeta_,1);
+
+        pfluxpsi_.resize(par->mflux);
+        rdtemi_.resize(par->mflux);
+        rdteme_.resize(par->mflux);
 
         // initialize arrays
         // temperature and density on the grid, T_i=n_0=1 at mid-radius
@@ -147,8 +151,40 @@ namespace gtc { namespace server
         for (std::size_t i=0;i<phi_.size();i++) {
           phi_[i] = 0.0;
         }
+        std::fill( pfluxpsi_.begin(),pfluxpsi_.end(),0.0);
+        std::fill( rdtemi_.begin(),rdtemi_.end(),0.0);
+        std::fill( rdteme_.begin(),rdteme_.end(),0.0);
 
-        //not here yet:  pfluxpsi, rdtemi, rdteme
+        // # of marker per grid, Jacobian=(1.0+r*cos(theta+r*sin(theta)))*(1.0+r*cos(theta))
+        std::fill( pmarki_.begin(),pmarki_.end(),0.0);
+
+        for (std::size_t i=0;i<par->mpsi+1;i++) { 
+          double r = par->a0 + deltar_*i; 
+          for (std::size_t j=1;j<=mtheta_[i];j++) { 
+            std::size_t ij = igrid_[i] + j; 
+            for (std::size_t k=1;k<=mzeta_;k++) {
+              double zdum = zetamin_ + k*deltaz_;
+              double tdum = j*deltat_[i]+zdum*qtinv_[i];
+              markeri_(k,ij,0) = pow(1.0+r*cos(tdum),2);    
+              pmarki_[i] = pmarki_[i] + markeri_(k,ij,0);
+            }
+          }
+          double rmax = std::min(par->a1,r+0.5*deltar_); 
+          double rmin = std::max(par->a0,r-0.5*deltar_); 
+          double tmp15 = (double) mi*par->npartdom;
+          tdum = tmp15*(rmax*rmax-rmin*rmin)/(par->a1*par->a1-par->a0*par->a0);
+          for (std::size_t j=1;j<=mtheta_[i];j++) { 
+            std::size_t ij = igrid_[i] + j; 
+            for (std::size_t k=1;k<=mzeta_;k++) {
+              markeri_(k,ij,0) = tdum*markeri_(k,ij,0)/pmarki_[i];
+              markeri_(k,ij,0) = 1.0/markeri_(i,ij,0);
+            }
+          }
+          pmarki_[i] = 1.0/(par->ntoroidal*tdum);
+          //for (std::size_t j=0;j<markeri_.isize();j++) {
+          //  markeri_(j,igrid_[i],0) = markeri_(j,igrid_[i]+mtheta_[i],0);
+          //}
+        }
     }
 
     bool search_callback(std::list<std::size_t>& deposits,
