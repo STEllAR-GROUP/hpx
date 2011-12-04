@@ -78,7 +78,7 @@ namespace hpx { namespace threads { namespace detail
     template <typename CoroutineImpl>
     struct coroutine_allocator
     {
-        typedef lcos::local_spinlock mutex_type;
+        typedef util::spinlock mutex_type;
 
         coroutine_allocator()
         {}
