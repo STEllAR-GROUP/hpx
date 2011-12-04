@@ -232,45 +232,58 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     // delete an existing instance of a component
     void runtime_support::free_component(
-        components::component_type type, naming::gid_type const& gid)
+        components::component_type type, naming::gid_type const& gid,
+        naming::gid_type const& count)
     {
-    // locate the factory for the requested component type
+        // Special case: component_memory_block.
         if (type == components::component_memory_block) {
-            // retrieve the local address bound to the given global id
             applier::applier& appl = hpx::applier::get_applier();
-            naming::address addr;
-            if (!appl.get_agas_client().resolve(gid, addr))
+
+            for (naming::gid_type i(0, 0); i < count; ++i)
             {
-                hpx::util::osstream strm;
-                strm << "global id " << gid << " is not bound to any "
-                        "component instance";
-                HPX_THROW_EXCEPTION(hpx::unknown_component_address,
-                    "runtime_support::free_component",
-                    hpx::util::osstream_get_string(strm));
-                return;
+                naming::gid_type target = gid + i;
+
+                // retrieve the local address bound to the given global id
+                naming::address addr;
+                if (!appl.get_agas_client().resolve(target, addr))
+                {
+                    hpx::util::osstream strm;
+                    strm << "global id " << target << " is not bound to any "
+                            "component instance";
+                    // FIXME: If this throws then we leak the rest of count.
+                    // What should we do instead?
+                    HPX_THROW_EXCEPTION(hpx::unknown_component_address,
+                        "runtime_support::free_component",
+                        hpx::util::osstream_get_string(strm));
+                    return;
+                }
+
+                // make sure this component is located here
+                if (appl.here() != addr.locality_)
+                {
+                    // FIXME: should the component be re-bound ?
+                    hpx::util::osstream strm;
+                    strm << "global id " << target << " is not bound to any "
+                            "local component instance";
+                    // FIXME: If this throws then we leak the rest of count.
+                    // What should we do instead?
+                    HPX_THROW_EXCEPTION(hpx::unknown_component_address,
+                        "runtime_support::free_component",
+                        hpx::util::osstream_get_string(strm));
+                    return;
+                }
+
+                // free the memory block
+                components::server::memory_block::destroy(
+                    reinterpret_cast<components::server::memory_block*>(addr.address_));
+
+                LRT_(info) << "successfully destroyed memory block " << target;
             }
 
-            // make sure this component is located here
-            if (appl.here() != addr.locality_)
-            {
-                // FIXME: should the component be re-bound ?
-                hpx::util::osstream strm;
-                strm << "global id " << gid << " is not bound to any local "
-                        "component instance";
-                HPX_THROW_EXCEPTION(hpx::unknown_component_address,
-                    "runtime_support::free_component",
-                    hpx::util::osstream_get_string(strm));
-                return;
-            }
-
-            // free the memory block
-            components::server::memory_block::destroy(
-                reinterpret_cast<components::server::memory_block*>(addr.address_));
-
-            LRT_(info) << "successfully destroyed memory block " << gid;
             return;
         }
 
+        // locate the factory for the requested component type
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end()) {
             // we don't know anything about this component
@@ -283,9 +296,9 @@ namespace hpx { namespace components { namespace server
 
             strm << "list of registered components: \n";
             component_map_type::iterator end = components_.end();
-            for (component_map_type::iterator it = components_.begin(); it!= end; ++it)
+            for (component_map_type::iterator cit = components_.begin(); cit!= end; ++cit)
             {
-                strm << "  " << components::get_component_type_name((*it).first)
+                strm << "  " << components::get_component_type_name((*cit).first)
                      << std::endl;
             }
 
@@ -295,11 +308,19 @@ namespace hpx { namespace components { namespace server
             return;
         }
 
-    // destroy the component instance
-        (*it).second.first->destroy(gid);
+        
+        for (naming::gid_type i(0, 0); i < count; ++i)
+        {
+            naming::gid_type target = gid + i;
 
-        LRT_(info) << "successfully destroyed component " << gid
-            << " of type: " << components::get_component_type_name(type);
+            // FIXME: If this throws then we leak the rest of count.
+            // What should we do instead?
+            // destroy the component instance
+            (*it).second.first->destroy(target);
+
+            LRT_(info) << "successfully destroyed component " << target
+                << " of type: " << components::get_component_type_name(type);
+        }
     }
 
     // function to be called during shutdown

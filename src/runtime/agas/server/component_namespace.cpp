@@ -5,7 +5,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/lcos/async.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
@@ -100,29 +99,16 @@ std::vector<response> component_namespace::bulk_service(
     )
 {
     std::vector<response> r;
-    std::vector<lcos::promise<response> > promises;
-
     r.reserve(reqs.size());
-    promises.reserve(reqs.size());
 
     BOOST_FOREACH(request const& req, reqs)
     {
-        // Start each request in a separate HPX-thread.
-        promises.push_back(lcos::async<service_action>(get_gid(), req));
-    }
-
-    // This intentionally avoids using asynchronous wait, because I do not want
-    // this action to be suspended on a timer. Additionally, we want to call
-    // get with the error_code that we've been passed. 
-    BOOST_FOREACH(lcos::promise<response> const& promise, promises)
-    {
-        // FIXME: Stop on an error code?
-        r.push_back(promise.get(ec));
+        error_code ign;
+        r.push_back(service(req, ign));
     }
 
     return r;
 }
-
 
 response component_namespace::bind_prefix(
     request const& req

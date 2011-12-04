@@ -303,7 +303,13 @@ namespace hpx { namespace components { namespace stubs
         }
 
         static void free_component_sync(components::component_type type,
-            naming::gid_type const& gid)
+            naming::gid_type const& gid, boost::uint64_t count)
+        {
+            free_component_sync(type, gid, naming::gid_type(0, count));
+        }
+
+        static void free_component_sync(components::component_type type,
+            naming::gid_type const& gid, naming::gid_type const& count)
         {
             typedef server::runtime_support::free_component_action action_type;
 
@@ -314,14 +320,17 @@ namespace hpx { namespace components { namespace stubs
             //naming::resolver_client& agas = appl.get_agas_client();
             if (/*agas.is_bootstrap() || */appl.address_is_local(gid, addr)) {
                 // apply locally
-                applier::detail::apply_helper2<action_type>::call(
+                applier::detail::apply_helper3<action_type>::call(
                     appl.get_runtime_support_raw_gid().get_lsb(),
-                    threads::thread_priority_default, type, gid);
+                    threads::thread_priority_default, type, gid, count);
             }
             else {
                 // apply remotely
+                // FIXME: Resolve the locality instead of deducing it from
+                // the target GID, otherwise this will break once we start
+                // moving objects.
                 naming::gid_type prefix = naming::get_locality_from_gid(gid);
-                lcos::eager_future<action_type, void>(prefix, type, gid).get();
+                lcos::eager_future<action_type, void>(prefix, type, gid, count).get();
             }
         }
 

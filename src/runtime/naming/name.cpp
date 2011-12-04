@@ -38,19 +38,14 @@ namespace hpx { namespace naming
                 // guard for wait_abort and other shutdown issues
                 try {
                     // decrement global reference count for the given gid,
-                    // delete it if this was the last reference
                     boost::uint32_t credits = get_credit_from_gid(*p);
                     BOOST_ASSERT(0 != credits);
 
-                    applier::applier* app = applier::get_applier_ptr();
-
-                    error_code ec;
-
-                    components::component_type t = components::component_invalid;
-                    if (app && 0 == app->get_agas_client().decref(*p, t, credits, ec))
+                    if (get_runtime_ptr())
                     {
-                        components::stubs::runtime_support::free_component_sync(
-                            (components::component_type)t, *p);
+                        error_code ec;
+                        // Fire-and-forget semantics.
+                        naming::get_agas_client().decref(*p, credits, ec);
                     }
                 }
                 catch (hpx::exception const& e) {
@@ -66,7 +61,8 @@ namespace hpx { namespace naming
                     static_cast<components::component_type>(p->address_.type_);
 
                 BOOST_ASSERT(t != components::component_invalid);
-                components::stubs::runtime_support::free_component_sync(t, *p);
+                // Third parameter is the count of how many components to destroy.
+                components::stubs::runtime_support::free_component_sync(t, *p, 1); 
             }
             delete p;   // delete local gid representation in any case
         }

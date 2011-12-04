@@ -24,6 +24,7 @@
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/util/insert_checked.hpp>
+#include <hpx/util/merging_map.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/lcos/local_mutex.hpp>
 
@@ -106,11 +107,13 @@ struct HPX_EXPORT primary_namespace :
     typedef std::map<naming::locality, partition_type>
         partition_table_type;
 
-    typedef std::map<naming::gid_type, boost::uint64_t>
+    typedef util::merging_map<naming::gid_type, boost::uint64_t>
         refcnt_table_type;
     // }}}
 
   private:
+    // REVIEW: Separate mutexes might reduce contention here. This has to be
+    // investigated carefully.
     mutex_type mutex_;
     gva_table_type gvas_;
     partition_table_type partitions_;
@@ -209,6 +212,13 @@ struct HPX_EXPORT primary_namespace :
       , error_code& ec = throws
         );
 
+  private:
+    boost::fusion::vector2<naming::gid_type, gva> resolve_gid_locked(
+        naming::gid_type const& gid 
+      , error_code& ec
+        );
+
+  public:
     enum actions
     { // {{{ action enum
         // Actual actions

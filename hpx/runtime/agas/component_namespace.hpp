@@ -48,6 +48,14 @@ struct component_namespace :
         return this->base_type::service(this->gid_, req, priority, ec);
     }
 
+    void service_non_blocking(
+        request const& req
+      , threads::thread_priority priority = threads::thread_priority_default
+        )
+    {
+        this->base_type::service_non_blocking(this->gid_, req, priority);
+    }
+
     std::vector<response> bulk_service(
         std::vector<request> const& reqs
       , threads::thread_priority priority = threads::thread_priority_default
@@ -55,6 +63,14 @@ struct component_namespace :
         )
     {
         return this->base_type::bulk_service(this->gid_, reqs, priority, ec);
+    }
+
+    void bulk_service_non_blocking(
+        std::vector<request> const& reqs
+      , threads::thread_priority priority = threads::thread_priority_default
+        )
+    {
+        this->base_type::bulk_service_non_blocking(this->gid_, reqs, priority);
     }
 };
 

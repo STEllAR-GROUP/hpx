@@ -29,7 +29,7 @@
 #include <hpx/lcos/base_lco.hpp>
 
 // The number of types that response's variant can represent.
-#define HPX_AGAS_RESPONSE_SUBTYPES 10
+#define HPX_AGAS_RESPONSE_SUBTYPES 8
 
 namespace hpx { namespace agas
 {
@@ -80,44 +80,6 @@ struct response
       : mc(type_)
       , status(status_)
       , data(boost::fusion::make_vector(gva_))
-    {
-        // TODO: verification of namespace_action_code
-    }
-
-    response(
-        namespace_action_code type_
-      , boost::uint64_t count_
-      , boost::int32_t ctype_
-      , error status_ = success
-        )
-      : mc(type_)
-      , status(status_)
-      , data(boost::fusion::make_vector(count_, ctype_))
-    {
-        // TODO: verification of namespace_action_code
-    }
-
-    response(
-        namespace_action_code type_
-      , boost::uint64_t count_
-      , components::component_type ctype_
-      , error status_ = success
-        )
-      : mc(type_)
-      , status(status_)
-      , data(boost::fusion::make_vector(count_, boost::int32_t(ctype_)))
-    {
-        // TODO: verification of namespace_action_code
-    }
-
-    response(
-        namespace_action_code type_
-      , boost::uint64_t count_
-      , error status_ = success
-        )
-      : mc(type_)
-      , status(status_)
-      , data(boost::fusion::make_vector(count_))
     {
         // TODO: verification of namespace_action_code
     }
@@ -236,25 +198,6 @@ struct response
         return g;
     }
 
-    boost::uint64_t get_count(
-        error_code& ec = throws
-        ) const
-    { // {{{
-        boost::uint64_t count = 0;
-
-        // Don't let the first attempt throw.
-        error_code first_try;
-        count = get_data<subtype_count, 0>(first_try);
-
-        // If the first try failed, check again.
-        if (first_try)
-            count = get_data<subtype_count_ctype, 0>(ec);
-        else if (&ec != &throws)
-            ec = make_success_code();
-
-        return count;
-    } // }}}
-
     std::vector<boost::uint32_t> get_localities(
         error_code& ec = throws
         ) const
@@ -265,21 +208,9 @@ struct response
     boost::int32_t get_component_type(
         error_code& ec = throws
         ) const
-    { // {{{
-        boost::int32_t ctype = 0;
-
-        // Don't let the first attempt throw.
-        error_code first_try;
-        ctype = get_data<subtype_ctype, 0>(first_try);
-
-        // If the first try failed, check again.
-        if (first_try)
-            ctype = get_data<subtype_count_ctype, 1>(ec);
-        else if (&ec != &throws)
-            ec = make_success_code();
-
-        return ctype;
-    } // }}}
+    {
+        return get_data<subtype_ctype, 0>(ec);
+    }
 
     boost::uint32_t get_prefix(
         error_code& ec = throws
@@ -346,13 +277,11 @@ struct response
         subtype_gid_gid_prefix  = 0x0
       , subtype_gid_gva         = 0x1
       , subtype_gva             = 0x2
-      , subtype_count_ctype     = 0x3
-      , subtype_count           = 0x4
-      , subtype_ctype           = 0x5
-      , subtype_prefixes        = 0x6
-      , subtype_gid             = 0x7
-      , subtype_prefix          = 0x8
-      , subtype_void            = 0x9
+      , subtype_ctype           = 0x3
+      , subtype_prefixes        = 0x4
+      , subtype_gid             = 0x5
+      , subtype_prefix          = 0x6
+      , subtype_void            = 0x7
     };
 
     // The order of the variant types is significant, and should not be changed
@@ -376,46 +305,37 @@ struct response
             gva // gva
         >
         // 0x3
-        // primary_ns_decrement
-      , boost::fusion::vector2<
-            boost::uint64_t // count
-          , boost::int32_t  // ctype
-        >
-        // 0x4
-        // primary_ns_increment
-      , boost::fusion::vector1<
-            boost::uint64_t // count
-        >
-        // 0x5
         // component_ns_bind_prefix
         // component_ns_bind_name
       , boost::fusion::vector1<
             boost::int32_t // ctype
         >
-        // 0x6
+        // 0x4
         // primary_ns_localities
         // component_ns_resolve_id
       , boost::fusion::vector1<
             std::vector<boost::uint32_t> // prefixes
         >
-        // 0x7
+        // 0x5
         // symbol_ns_unbind
         // symbol_ns_resolve
       , boost::fusion::vector1<
             naming::gid_type // gid
         >
-        // 0x8
+        // 0x6
         // primary_ns_resolve_locality
       , boost::fusion::vector1<
             boost::uint32_t // prefix
         >
-        // 0x9
+        // 0x7
         // primary_ns_free
         // primary_ns_bind_gid
         // component_ns_unbind
         // component_ns_iterate_types
         // symbol_ns_bind
         // symbol_ns_iterate_names
+        // primary_ns_increment
+        // primary_ns_decrement
       , boost::fusion::vector0<
         >
     > data_type;

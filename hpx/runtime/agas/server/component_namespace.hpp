@@ -58,6 +58,8 @@ struct HPX_EXPORT component_namespace :
     // }}}
 
   private:
+    // REVIEW: Separate mutexes might reduce contention here. This has to be
+    // investigated carefully.
     mutex_type mutex_;
     component_id_table_type component_ids_;
     factory_table_type factories_;

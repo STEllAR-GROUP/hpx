@@ -5,10 +5,14 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/lcos/async.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/runtime/components/stubs/runtime_support.hpp>
+
+#include <list>
+
+#include <boost/foreach.hpp>
 
 namespace hpx { namespace agas
 {
@@ -100,24 +104,12 @@ std::vector<response> primary_namespace::bulk_service(
     )
 {
     std::vector<response> r;
-    std::vector<lcos::promise<response> > promises;
-
     r.reserve(reqs.size());
-    promises.reserve(reqs.size());
 
     BOOST_FOREACH(request const& req, reqs)
     {
-        // Start each request in a separate HPX-thread.
-        promises.push_back(lcos::async<service_action>(get_gid(), req));
-    }
-
-    // This intentionally avoids using asynchronous wait, because I do not want
-    // this action to be suspended on a timer. Additionally, we want to call
-    // get with the error_code that we've been passed. 
-    BOOST_FOREACH(lcos::promise<response> const& promise, promises)
-    {
-        // FIXME: Stop on an error code?
-        r.push_back(promise.get(ec));
+        error_code ign;
+        r.push_back(service(req, ign));
     }
 
     return r;
@@ -144,6 +136,7 @@ response primary_namespace::allocate(
     if (it != end)
     {
         // Just return the prefix
+        // REVIEW: Should this be an error?
         if (0 == count)
         {
             LAGAS_(info) << (boost::format(
@@ -339,7 +332,7 @@ response primary_namespace::bind_gid(
                 return response();
             }
 
-            if (HPX_UNLIKELY(g.type == components::component_invalid))
+            if (HPX_UNLIKELY(components::component_invalid == g.type))
             {
                 HPX_THROWS_IF(ec, bad_parameter
                   , "primary_namespace::bind_gid"
@@ -410,7 +403,7 @@ response primary_namespace::bind_gid(
         return response();
     }
 
-    if (HPX_UNLIKELY(g.type == components::component_invalid))
+    if (HPX_UNLIKELY(components::component_invalid == g.type))
     {
         HPX_THROWS_IF(ec, bad_parameter
           , "primary_namespace::bind_gid"
@@ -449,104 +442,40 @@ response primary_namespace::resolve_gid(
   , error_code& ec
     )
 { // {{{ resolve_gid implementation
+    using boost::fusion::at_c;
+
     // parameters
     naming::gid_type id = req.get_gid();
-    naming::strip_credit_from_gid(id);
 
-    mutex_type::scoped_lock l(mutex_);
+    boost::fusion::vector2<naming::gid_type, gva> r;
 
-    gva_table_type::const_iterator it = gvas_.lower_bound(id)
-                                 , begin = gvas_.begin()
-                                 , end = gvas_.end();
-
-    if (it != end)
     {
-        // Check for exact match
-        if (it->first == id)
-        {
-            LAGAS_(info) << (boost::format(
-                "primary_namespace::resolve_gid, gid(%1%), gva(%2%)")
-                % id % it->second);
-
-            if (&ec != &throws)
-                ec = make_success_code();
-
-            return response(primary_ns_resolve_gid
-                          , it->first
-                          , it->second);
-        }
-
-        // We need to decrement the iterator, first we check that it's safe
-        // to do this.
-        else if (it != begin)
-        {
-            --it;
-
-            // Found the GID in a range
-            if ((it->first + it->second.count) > id)
-            {
-                if (HPX_UNLIKELY(id.get_msb() != it->first.get_msb()))
-                {
-                    HPX_THROWS_IF(ec, internal_server_error
-                      , "primary_namespace::resolve_gid"
-                      , "MSBs of lower and upper range bound do not match");
-                    return response();
-                }
-
-                // Calculation of the lva address occurs in gva<>::resolve()
-                LAGAS_(info) << (boost::format(
-                    "primary_namespace::resolve_gid, gid(%1%), gva(%2%)")
-                    % id % it->second);
-
-                if (&ec != &throws)
-                    ec = make_success_code();
-
-                return response(primary_ns_resolve_gid
-                              , it->first
-                              , it->second);
-            }
-        }
+        mutex_type::scoped_lock l(mutex_);
+        r = resolve_gid_locked(id, ec);
     }
 
-    else if (HPX_LIKELY(!gvas_.empty()))
+    if (at_c<0>(r) == naming::invalid_gid)
     {
-        --it;
+        LAGAS_(info) << (boost::format(
+            "primary_namespace::resolve_gid, gid(%1%), response(no_success)")
+            % id);
 
-        // Found the GID in a range
-        if ((it->first + it->second.count) > id)
-        {
-            if (HPX_UNLIKELY(id.get_msb() != it->first.get_msb()))
-            {
-                HPX_THROWS_IF(ec, internal_server_error
-                  , "primary_namespace::resolve_gid"
-                  , "MSBs of lower and upper range bound do not match");
-                return response();
-            }
-
-            LAGAS_(info) << (boost::format(
-                "primary_namespace::resolve_gid, gid(%1%), gva(%2%)")
-                % id % it->second);
-
-            if (&ec != &throws)
-                ec = make_success_code();
-
-            return response(primary_ns_resolve_gid
-                          , it->first
-                          , it->second);
-        }
+        return response(primary_ns_resolve_gid
+                      , naming::invalid_gid
+                      , gva()
+                      , no_success);
     }
 
-    LAGAS_(info) << (boost::format(
-        "primary_namespace::resolve_gid, gid(%1%), response(no_success)")
-        % id);
+    else
+    {
+        LAGAS_(info) << (boost::format(
+            "primary_namespace::resolve_gid, gid(%1%), base(%2%), gva(%3%)")
+            % id % at_c<0>(r) % at_c<1>(r));
 
-    if (&ec != &throws)
-        ec = make_success_code();
-
-    return response(primary_ns_resolve_gid
-                  , naming::invalid_gid
-                  , gva()
-                  , no_success);
+        return response(primary_ns_resolve_gid
+                      , at_c<0>(r)
+                      , at_c<1>(r));
+    }
 } // }}}
 
 response primary_namespace::resolve_locality(
@@ -707,42 +636,35 @@ response primary_namespace::increment(
 { // {{{ increment implementation
     // parameters
     boost::uint64_t credits = req.get_count();
-    naming::gid_type id = req.get_gid();
-    naming::strip_credit_from_gid(id);
+    naming::gid_type lower = req.get_lower_bound();
+    naming::gid_type upper = req.get_upper_bound();
+
+    naming::strip_credit_from_gid(lower);
+    naming::strip_credit_from_gid(upper);
 
     mutex_type::scoped_lock l(mutex_);
 
-    refcnt_table_type::iterator it = refcnts_.find(id)
-                              , end = refcnts_.end();
+    // TODO: Whine loudly if a reference count overflows. We reserve ~0 for
+    // internal bookkeeping in the decrement algorithm, so the maximum global
+    // reference count is 2^64 - 2. The maximum number of credits a single GID
+    // can hold, however, is limited to 2^32 - 1.
 
-    // If this is the first increment request for this GID, we need to
-    // register the GID in the reference counting table
-    if (it == end)
-    {
-        if (HPX_UNLIKELY(!util::insert_checked(refcnts_.insert(
-                std::make_pair(id,
-                    boost::uint64_t(HPX_INITIAL_GLOBALCREDIT))), it)))
-        {
-            HPX_THROWS_IF(ec, lock_error
-              , "primary_namespace::increment"
-              , boost::str(boost::format(
-                    "refcnt table insertion failed due to a locking error "
-                    "or memory corruption, gid(%1%)")
-                    % id));
-            return response();
-        }
-    }
+    // The third parameter we pass here is the default data to use in case the
+    // key is not mapped. We don't insert GIDs into the refcnt table when we
+    // allocate/bind them, so if a GID is not in the refcnt table, we know that
+    // it's global reference count is the initial global reference count. 
+    refcnts_.apply(lower, upper
+                 , util::incrementer<boost::uint64_t>(credits)
+                 , boost::uint64_t(HPX_INITIAL_GLOBALCREDIT));
 
-    // Add the requested amount and return the new total
     LAGAS_(info) << (boost::format(
-        "primary_namespace::increment, gid(%1%), credits(%2%), "
-        "new_count(%3%)")
-        % id % credits % (it->second + credits));
+        "primary_namespace::increment, lower(%1%), upper(%2%), credits(%2%)")
+        % lower % upper % credits);
 
     if (&ec != &throws)
         ec = make_success_code();
 
-    return response(primary_ns_increment, it->second += credits);
+    return response(primary_ns_increment);
 } // }}}
 
 response primary_namespace::decrement(
@@ -750,283 +672,294 @@ response primary_namespace::decrement(
   , error_code& ec
     )
 { // {{{ decrement implementation
+    using boost::fusion::at_c;
+
     // parameters
     boost::uint64_t credits = req.get_count();
-    naming::gid_type id = req.get_gid();
-    naming::strip_credit_from_gid(id);
+    naming::gid_type lower = req.get_lower_bound();
+    naming::gid_type upper = req.get_upper_bound();
 
-    if (HPX_UNLIKELY(credits > HPX_INITIAL_GLOBALCREDIT))
+    naming::strip_credit_from_gid(lower);
+    naming::strip_credit_from_gid(upper);
+
+    if (HPX_UNLIKELY(0 == credits))
+    {
+        HPX_THROWS_IF(ec, bad_parameter
+          , "primary_namespace::decrement"
+          , "cannot decrement zero credits");
+        return response();
+    }
+
+    // REVIEW: Why do we have this restriction?
+    else if (HPX_UNLIKELY(HPX_INITIAL_GLOBALCREDIT < credits))
     {
         HPX_THROWS_IF(ec, bad_parameter
           , "primary_namespace::decrement"
           , "cannot decrement more than "
             BOOST_PP_STRINGIZE(HPX_INITIAL_GLOBALCREDIT)
-            " credits");
+            " credits at once");
         return response();
     }
 
-    mutex_type::scoped_lock l(mutex_);
+    LAGAS_(info) << (boost::format(
+        "primary_namespace::decrement, lower(%1%), upper(%2%), credits(%3%)")
+        % lower % upper % credits);
 
-    refcnt_table_type::iterator it = refcnts_.find(id)
-                              , end = refcnts_.end();
+    typedef boost::fusion::vector3<
+        gva                 // gva
+      , naming::gid_type    // gid
+      , naming::gid_type    // count
+    > free_entry;
 
-    if (it != end)
+    // Components to be freed.
+    std::list<free_entry> free_list;
+
+    // TODO/REVIEW: Do we ensure that a GID doesn't get reinserted into the
+    // table after it's been decremented to 0 and destroyed? How do we do this
+    // efficiently?
+ 
+    // The new decrement algorithm:
+    //    0.) Apply the decrement across the entire keyspace.
+    //    1.) Search for dead objects (e.g. objects with a reference count of
+    //        0) by iterating over the keyspace.
+    //    2.) Resolve the dead objects (retrieve the GVA, adjust for partial
+    //        matches.
+    //    3.) Kill the dead objects.
+
     {
-        if (HPX_UNLIKELY(it->second < credits))
-        {
-            HPX_THROWS_IF(ec, bad_parameter
-              , "primary_namespace::decrement"
-              , "bogus credit encountered while decrement global reference "
-                "count");
-            return response();
-        }
+        mutex_type::scoped_lock l(mutex_);
 
-        boost::uint64_t cnt = (it->second -= credits);
+        ///////////////////////////////////////////////////////////////////////
+        // Apply the decrement across the entire keyspace (e.g. [lower, upper]).
 
-        if (0 == cnt)
-        {
-            refcnts_.erase(it);
+        // The third parameter we pass here is the default data to use in case
+        // the key is not mapped. We don't insert GIDs into the refcnt table
+        // when we allocate/bind them, so if a GID is not in the refcnt table,
+        // we know that it's global reference count is the initial global
+        // reference count. 
+        refcnts_.apply(lower, upper
+                     , util::decrementer<boost::uint64_t>(credits)
+                     , boost::uint64_t(HPX_INITIAL_GLOBALCREDIT)); 
 
-            gva_table_type::iterator git = gvas_.lower_bound(id)
-                                   , gbegin = gvas_.begin()
-                                   , gend = gvas_.end();
+        ///////////////////////////////////////////////////////////////////////
+        // Search for dead objects.
 
-            if (git != gend)
-            {
-                // Did we get an exact match?
-                if (git->first == id)
-                {
-                    LAGAS_(info) << (boost::format(
-                        "primary_namespace::decrement, gid(%1%), "
-                        "credits(%2%), new_total(0), type(%3%)")
-                        % id % credits % git->second.type);
+        typedef refcnt_table_type::iterator iterator;
 
-                    if (&ec != &throws)
-                        ec = make_success_code();
+        // Find the mappings that we just added or modified.
+        std::pair<iterator, iterator> matches = refcnts_.find(lower, upper);
 
-                    // TODO: Check that git->second.type isn't invalid?
-                    return response(primary_ns_decrement
-                                  , cnt
-                                  , git->second.type);
-                }
-
-                // Check if we can safely decrement the iterator.
-                else if (git != gbegin)
-                {
-                    --git;
-
-                    // See if the previous range covers this GID
-                    if ((git->first + git->second.count) > id)
-                    {
-                        // Make sure that the MSBs match.
-                        // TODO: Shouldn't this be an error if the MSBs
-                        // don't match?
-                        if (id.get_msb() == git->first.get_msb())
-                        {
-                            LAGAS_(info) << (boost::format(
-                                "primary_namespace::decrement, gid(%1%), "
-                                "credits(%2%), new_total(0), type(%3%)")
-                                % id % credits % git->second.type);
-
-                            if (&ec != &throws)
-                                ec = make_success_code();
-
-                            // TODO: Check that git->second.type isn't
-                            // invalid?
-                            return response(primary_ns_decrement
-                                          , cnt
-                                          , git->second.type);
-                        }
-                    }
-                }
-            }
-
-            else if (HPX_LIKELY(!gvas_.empty()))
-            {
-                --git;
-
-                // See if the previous range covers this GID
-                if ((git->first + git->second.count) > id)
-                {
-                    // Make sure that the MSBs match
-                    // TODO: Shouldn't this be an error if the MSBs
-                    // don't match?
-                    if (id.get_msb() == git->first.get_msb())
-                    {
-                        LAGAS_(info) << (boost::format(
-                            "primary_namespace::decrement, gid(%1%), "
-                            "credits(%2%), new_total(0), type(%3%)")
-                            % id % credits % git->second.type);
-
-                        if (&ec != &throws)
-                            ec = make_success_code();
-
-                        // TODO: Check that git->second.type isn't invalid?
-                        return response(primary_ns_decrement
-                                      , cnt
-                                      , git->second.type);
-                    }
-                }
-            }
-
-            // If we didn't find anything, we've got a problem
-            // TODO: Use a better error code + throw message.
-            HPX_THROWS_IF(ec, bad_parameter
-              , "primary_namespace::decrement"
-              , "unregistered GID encountered while decrementing global "
-                "reference count");
-            return response();
-        }
-
-        else
-        {
-            LAGAS_(info) << (boost::format(
-                "primary_namespace::decrement, gid(%1%), credits(%2%), "
-                "new_total(%3%)")
-                % id % credits % cnt);
-
-            if (&ec != &throws)
-                ec = make_success_code();
-
-            return response(primary_ns_decrement
-                          , cnt
-                          , components::component_invalid);
-        }
-    }
-
-    // If the id isn't in the refcnt table and the credit count is
-    // HPX_INITIAL_GLOBALCREDIT, then it needs to be destroyed.
-    else if (HPX_INITIAL_GLOBALCREDIT == credits)
-    {
-        gva_table_type::iterator git = gvas_.lower_bound(id)
-                               , gbegin = gvas_.begin()
-                               , gend = gvas_.end();
-
-        if (git != gend)
-        {
-            // Did we get an exact match?
-            if (git->first == id)
-            {
-                LAGAS_(info) << (boost::format(
-                    "primary_namespace::decrement, gid(%1%), credits(%2%), "
-                    "new_total(0), type(%3%)")
-                    % id % credits % git->second.type);
-
-                if (&ec != &throws)
-                    ec = make_success_code();
-
-                // TODO: Check that git->second.type isn't invalid?
-                return response(primary_ns_decrement
-                              , 0
-                              , git->second.type);
-            }
-
-            // Check if we can safely decrement the iterator.
-            else if (git != gbegin)
-            {
-                --git;
-
-                // See if the previous range covers this GID
-                if ((git->first + git->second.count) > id)
-                {
-                    // Make sure that the MSBs match
-                    // TODO: Shouldn't this be an error if the MSBs
-                    // don't match?
-                    if (id.get_msb() == git->first.get_msb())
-                    {
-                        LAGAS_(info) << (boost::format(
-                            "primary_namespace::decrement, gid(%1%), "
-                            "credits(%2%), new_total(0), type(%3%)")
-                            % id % credits % git->second.type);
-
-                        if (&ec != &throws)
-                            ec = make_success_code();
-
-                        // TODO: Check that git->second.type isn't invalid?
-                        return response(primary_ns_decrement
-                                      , 0
-                                      , git->second.type);
-                    }
-                }
-            }
-        }
-
-        else if (HPX_LIKELY(!gvas_.empty()))
-        {
-            --git;
-
-            // See if the previous range covers this GID
-            if ((git->first + git->second.count) > id)
-            {
-                // Make sure that the MSBs match
-                // TODO: Shouldn't this be an error if the MSBs
-                // don't match?
-                if (id.get_msb() == git->first.get_msb())
-                {
-                    LAGAS_(info) << (boost::format(
-                        "primary_namespace::decrement, gid(%1%), "
-                        "credits(%2%), new_total(0), type(%3%)")
-                        % id % credits % git->second.type);
-
-                    if (&ec != &throws)
-                        ec = make_success_code();
-
-                    // TODO: Check that git->second.type isn't invalid?
-                    return response(primary_ns_decrement
-                                  , 0
-                                  , git->second.type);
-                }
-            }
-        }
-
-        // If we didn't find anything, we've got a problem
-        HPX_THROWS_IF(ec, bad_parameter
-          , "primary_namespace::decrement"
-          , "unknown component type encountered while decrement global "
-            "reference count");
-        return response();
-    }
-
-    // We need to insert a new reference count entry. We assume that
-    // binding has already created a first reference + credits.
-    else
-    {
-        if (HPX_UNLIKELY(!util::insert_checked(refcnts_.insert(
-                std::make_pair(id,
-                    boost::uint64_t(HPX_INITIAL_GLOBALCREDIT))), it)))
+        // This search should always succeed.
+        if (matches.first == refcnts_.end() && matches.second == refcnts_.end())
         {
             HPX_THROWS_IF(ec, lock_error
               , "primary_namespace::decrement"
               , boost::str(boost::format(
-                    "refcnt table insertion failed due to a locking error "
-                    "or memory corruption, gid(%1%)")
-                    % id));
+                    "reference count table insertion failed due to a locking "
+                    "error or memory corruption, lower(%1%), upper(%2%)")
+                    % lower % upper));
             return response();
         }
 
-        if (HPX_UNLIKELY(it->second < credits))
+        // Ranges containing dead objects.
+        std::list<iterator> dead_list;
+
+        for (; matches.first != matches.second; ++matches.first)
         {
-            HPX_THROWS_IF(ec, bad_parameter
-              , "primary_namespace::decrement"
-              , "bogus credit encountered while decrement global reference "
-                "count");
-            return response();
+            // Any object with a reference count of 0 is dead.
+            if (matches.first->data_ == 0)
+                dead_list.push_back(matches.first);
         }
 
-        boost::uint64_t cnt = (it->second -= credits);
+        ///////////////////////////////////////////////////////////////////////
+        // Resolve the dead objects. 
 
+        BOOST_FOREACH(iterator const& it, dead_list)
+        {
+            // Both the client- and server-side merging algorithms are unaware
+            // of component type, so a merged mapping in the reference count
+            // tables might contain multiple component types, or the same
+            // component type on different localities (currently, the latter is
+            // improbable due to the nature of address allocation and the fact
+            // that moving objects is still unsupported).
+
+            typedef refcnt_table_type::key_type key_type;
+
+            // The mapping's keyspace.
+            key_type super = it->key_;
+
+            // Make sure we stay within the bounds of the decrement request.
+            if (boost::icl::lower(super) < lower &&
+                boost::icl::upper(super) > upper)
+            {
+                super = key_type(lower, upper);
+            }
+
+            else if (boost::icl::lower(super) < lower)
+            {
+                super = key_type(lower, boost::icl::upper(super));
+            }
+
+            else if (boost::icl::upper(super) > upper)
+            {
+                super = key_type(boost::icl::lower(super), upper);
+            }
+
+            // Keep resolving GIDs to GVAs until we've covered all of this
+            // mapping's keyspace.
+            while (!boost::icl::is_empty(super))
+            {
+                naming::gid_type base = boost::icl::lower(super);
+
+                // Resolve the base GID. 
+                boost::fusion::vector2<naming::gid_type, gva>
+                    r = resolve_gid_locked(base, ec); 
+
+                if (ec)
+                    return response();
+
+                // Make sure the GVA is valid.
+                // REVIEW: Should we do more to make sure the GVA is valid?
+                if (HPX_UNLIKELY(components::component_invalid
+                                 == at_c<1>(r).type))
+                {
+                    HPX_THROWS_IF(ec, internal_server_error
+                      , "primary_namespace::decrement"
+                      , boost::str(boost::format(
+                            "encountered a GVA with an invalid type while"
+                            "performing a decrement, gid(%1%), gva(%2%)")
+                            % base % at_c<1>(r)));
+                    return response();
+                }
+
+                else if (HPX_UNLIKELY(0 == at_c<1>(r).count))
+                {
+                    HPX_THROWS_IF(ec, internal_server_error
+                      , "primary_namespace::decrement"
+                      , boost::str(boost::format(
+                            "encountered a GVA with a count of zero while"
+                            "performing a decrement, gid(%1%), gva(%2%)")
+                            % base % at_c<1>(r)));
+                    return response();
+                }
+
+                // Determine how much of the mapping's keyspace this GVA covers.
+                // Note that g.count must be greater than 0 if we've reached
+                // this point in the code. 
+                naming::gid_type sub_upper(base + (at_c<1>(r).count - 1));
+
+                // If this GVA ends after the keyspace, we just set the upper
+                // limit to the end of the keyspace. 
+                if (sub_upper > boost::icl::upper(super)) 
+                    sub_upper = boost::icl::upper(super);
+
+                BOOST_ASSERT(base >= sub_upper);
+
+                // We don't use the base gid returned by resolve, but instead
+                // we use the GID that we resolved. This ensures that GVAs
+                // which cover a range that begins before our keyspace are
+                // handled properly.
+                key_type const sub(base, sub_upper); 
+
+                LAGAS_(info) << (boost::format(
+                    "primary_namespace::decrement, resolved match, lower(%1%), "
+                    "upper(%2%), super-object(%3%), sub-object(%4%)")
+                    % lower % upper % super % sub);
+
+                // Subtract the GIDs that are bound to this GVA from the
+                // keyspace.
+                super = boost::icl::left_subtract(super, sub);
+
+                // Compute the length of sub.
+                naming::gid_type const length = boost::icl::length(sub);
+
+                // Fully resolve the range. 
+                gva const g = at_c<1>(r).resolve(base, at_c<0>(r)); 
+
+                // Add the information needed to destroy these components to the
+                // free list.
+                free_list.push_back(free_entry(g, base, length)); 
+            }
+
+            // If this is just a partial match, we need to split it up with a
+            // remapping so that we can erase it.
+            if (super != it->key_)
+                // We use ~0 to prevent merges.
+                refcnts_.erase(refcnts_.bind(super, boost::uint64_t(~0)));
+            else
+                refcnts_.erase(it);
+        }
+
+    } // Unlock the mutex.
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Kill the dead objects.
+
+    naming::gid_type const agas_prefix_
+        = naming::get_gid_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX);
+
+    BOOST_FOREACH(free_entry const& e, free_list)
+    {
+        // Bail if we're in late shutdown.
+        if (HPX_UNLIKELY(!threads::threadmanager_is(running)))
+        {
+            LAGAS_(info) << (boost::format(
+                "primary_namespace::decrement, cancelling free operation "
+                "(threadmanager is down), lower(%1%), upper(%2%), base(%3%), "
+                "gva(%4%), count(%5%)")
+                % lower
+                % upper
+                % at_c<1>(e) % at_c<0>(e) % at_c<2>(e));
+            continue;
+        }
+ 
         LAGAS_(info) << (boost::format(
-            "primary_namespace::decrement, gid(%1%), credits(%2%), "
-            "new_total(%3%)")
-            % id % credits % cnt);
+            "primary_namespace::decrement, freeing component%1%, lower(%2%), "
+            "upper(%3%), base(%4%), gva(%5%), count(%6%)")
+            % ((at_c<2>(e) == naming::gid_type(0, 1)) ? "" : "s")
+            % lower
+            % upper
+            % at_c<1>(e) % at_c<0>(e) % at_c<2>(e));
 
-        if (&ec != &throws)
-            ec = make_success_code();
+        typedef components::server::runtime_support::free_component_action
+            action_type;
 
-        return response(primary_ns_decrement
-                      , cnt
-                      , components::component_invalid);
+        components::component_type const type_ =
+            components::component_type(at_c<0>(e).type);
+
+        // FIXME: Resolve the locality instead of deducing it from the
+        // target GID, otherwise this will break once we start moving
+        // objects.
+        if (agas_prefix_ == naming::get_locality_from_gid(at_c<1>(e))) 
+        {
+            naming::address rts_addr(at_c<0>(e).endpoint,
+                components::component_runtime_support,
+                get_runtime_support_ptr());
+
+            applier::apply_l<action_type>
+                (rts_addr, type_, at_c<1>(e), at_c<2>(e)); 
+        }
+
+        else
+        {
+            // get_lva<> will resolve the LVA to the runtime support pointer
+            // on the target locality.
+            naming::address rts_addr(at_c<0>(e).endpoint,
+                components::component_runtime_support);
+
+            naming::id_type const prefix_(
+                naming::get_locality_from_gid(at_c<1>(e)),
+                naming::id_type::unmanaged);
+
+            applier::apply_r<action_type>
+                (rts_addr, prefix_, type_, at_c<1>(e), at_c<2>(e)); 
+        }
     }
+
+    if (&ec != &throws)
+        ec = make_success_code();
+
+    return response(primary_ns_decrement);
 } // }}}
 
 response primary_namespace::localities(
@@ -1054,6 +987,90 @@ response primary_namespace::localities(
         ec = make_success_code();
 
     return response(primary_ns_localities, p);
+} // }}}
+
+boost::fusion::vector2<naming::gid_type, gva>
+primary_namespace::resolve_gid_locked(
+    naming::gid_type const& gid
+  , error_code& ec
+    )
+{ // {{{ resolve_gid implementation
+    // parameters
+    naming::gid_type id = gid; 
+    naming::strip_credit_from_gid(id);
+
+    gva_table_type::const_iterator it = gvas_.lower_bound(id)
+                                 , begin = gvas_.begin()
+                                 , end = gvas_.end();
+
+    if (it != end)
+    {
+        // Check for exact match
+        if (it->first == id)
+        {
+            if (&ec != &throws)
+                ec = make_success_code();
+
+            return boost::fusion::vector2<naming::gid_type, gva>
+                (it->first, it->second);
+        }
+
+        // We need to decrement the iterator, first we check that it's safe
+        // to do this.
+        else if (it != begin)
+        {
+            --it;
+
+            // Found the GID in a range
+            if ((it->first + it->second.count) > id)
+            {
+                if (HPX_UNLIKELY(id.get_msb() != it->first.get_msb()))
+                {
+                    HPX_THROWS_IF(ec, internal_server_error
+                      , "primary_namespace::resolve_gid_locked"
+                      , "MSBs of lower and upper range bound do not match");
+                    return boost::fusion::vector2<naming::gid_type, gva>
+                        (naming::invalid_gid, gva());
+                }
+
+                if (&ec != &throws)
+                    ec = make_success_code();
+
+                return boost::fusion::vector2<naming::gid_type, gva>
+                    (it->first, it->second);
+            }
+        }
+    }
+
+    else if (HPX_LIKELY(!gvas_.empty()))
+    {
+        --it;
+
+        // Found the GID in a range
+        if ((it->first + it->second.count) > id)
+        {
+            if (HPX_UNLIKELY(id.get_msb() != it->first.get_msb()))
+            {
+                HPX_THROWS_IF(ec, internal_server_error
+                  , "primary_namespace::resolve_gid_locked"
+                  , "MSBs of lower and upper range bound do not match");
+                return boost::fusion::vector2<naming::gid_type, gva>
+                    (naming::invalid_gid, gva());
+            }
+
+            if (&ec != &throws)
+                ec = make_success_code();
+
+            return boost::fusion::vector2<naming::gid_type, gva>
+                (it->first, it->second);
+        }
+    }
+
+    if (&ec != &throws)
+        ec = make_success_code();
+
+    return boost::fusion::vector2<naming::gid_type, gva>
+        (naming::invalid_gid, gva());
 } // }}}
 
 }}}

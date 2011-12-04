@@ -367,9 +367,9 @@ void notify_console(notification_header const& header)
                   % naming::get_prefix_from_gid(header.prefix)));
 
     // store the full addresses of the agas servers in our local router
-    agas_client.hosted->primary_ns_addr_ = header.primary_ns_address;
-    agas_client.hosted->component_ns_addr_ = header.component_ns_address;
-    agas_client.hosted->symbol_ns_addr_ = header.symbol_ns_address;
+    agas_client.primary_ns_addr_ = header.primary_ns_address;
+    agas_client.component_ns_addr_ = header.component_ns_address;
+    agas_client.symbol_ns_addr_ = header.symbol_ns_address;
 
     // Assign the initial parcel gid range to the parcelport. Note that we can't
     // get the parcelport through the parcelhandler because it isn't up yet.
@@ -513,9 +513,9 @@ void notify_worker(notification_header const& header)
                   % naming::get_prefix_from_gid(header.prefix)));
 
     // store the full addresses of the agas servers in our local service
-    agas_client.hosted->primary_ns_addr_ = header.primary_ns_address;
-    agas_client.hosted->component_ns_addr_ = header.component_ns_address;
-    agas_client.hosted->symbol_ns_addr_ = header.symbol_ns_address;
+    agas_client.primary_ns_addr_ = header.primary_ns_address;
+    agas_client.component_ns_addr_ = header.component_ns_address;
+    agas_client.symbol_ns_addr_ = header.symbol_ns_address;
 
     // Assign the initial parcel gid range to the parcelport. Note that we can't
     // get the parcelport through the parcelhandler because it isn't up yet.

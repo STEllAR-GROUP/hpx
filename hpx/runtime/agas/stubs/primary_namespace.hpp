@@ -15,7 +15,7 @@
 namespace hpx { namespace agas { namespace stubs
 {
 
-struct primary_namespace
+struct HPX_EXPORT primary_namespace
 {
     typedef server::primary_namespace server_type;
 
@@ -32,6 +32,15 @@ struct primary_namespace
         typedef server_type::service_action action_type;
         return lcos::eager_future<action_type, Result>(gid, priority, req);
     }
+
+    /// Fire-and-forget semantics.
+    /// 
+    /// \note This is placed out of line to avoid including applier headers.
+    static void service_non_blocking(
+        naming::id_type const& gid
+      , request const& req
+      , threads::thread_priority priority = threads::thread_priority_default
+        );
 
     static response service(
         naming::id_type const& gid
@@ -53,6 +62,15 @@ struct primary_namespace
         typedef server_type::bulk_service_action action_type;
         return lcos::eager_future<action_type>(gid, priority, reqs);
     }
+
+    /// Fire-and-forget semantics.
+    /// 
+    /// \note This is placed out of line to avoid including applier headers.
+    static void bulk_service_non_blocking(
+        naming::id_type const& gid
+      , std::vector<request> const& reqs
+      , threads::thread_priority priority = threads::thread_priority_default
+        );
 
     static std::vector<response> bulk_service(
         naming::id_type const& gid

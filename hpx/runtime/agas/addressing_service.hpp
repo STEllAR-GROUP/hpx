@@ -173,10 +173,6 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
         hpx::lcos::local_counting_semaphore promise_pool_semaphore_;
         promise_pool_type promise_pool_;
-
-        naming::address primary_ns_addr_;
-        naming::address component_ns_addr_;
-        naming::address symbol_ns_addr_;
     }; // }}}
 
     mutable mutex_type gva_cache_mtx_;
@@ -202,6 +198,10 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     atomic_state state_;
     naming::gid_type prefix_;
+
+    naming::address primary_ns_addr_;
+    naming::address component_ns_addr_;
+    naming::address symbol_ns_addr_;
 
     addressing_service(
         parcelset::parcelport& pp
@@ -816,11 +816,21 @@ public:
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    boost::uint64_t incref(
-        naming::gid_type const& id
+    void incref(
+        naming::gid_type const& lower
+      , naming::gid_type const& upper
       , boost::uint64_t credits = 1
       , error_code& ec = throws
         );
+
+    void incref(
+        naming::gid_type const& id
+      , boost::uint64_t credits = 1
+      , error_code& ec = throws
+        )
+    {
+        return incref(id, id, credits, ec);
+    }
 
     /// \brief Decrement the global reference count for the given id
     ///
@@ -844,12 +854,21 @@ public:
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    boost::uint64_t decref(
-        naming::gid_type const& id
-      , components::component_type& t
+    void decref(
+        naming::gid_type const& lower
+      , naming::gid_type const& upper
       , boost::uint64_t credits = 1
       , error_code& ec = throws
         );
+
+    void decref(
+        naming::gid_type const& id
+      , boost::uint64_t credits = 1
+      , error_code& ec = throws
+        )
+    {
+        return decref(id, id, credits, ec);
+    }
 
 #if !defined(HPX_NO_DEPRECATED)
     /// \brief Register a global name with a global address (id)

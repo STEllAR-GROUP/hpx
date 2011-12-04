@@ -219,8 +219,11 @@ namespace hpx { namespace components { namespace server
             hpx::actions::manage_object_action_base const& act);
 
         /// \brief Action to delete existing components
+        ///
+        /// \param count [in] This GID is a count of the number of components
+        ///                   to destroy. It does not represent a global address.
         void free_component(components::component_type type,
-            naming::gid_type const& gid);
+            naming::gid_type const& gid, naming::gid_type const& count);
 
         /// \brief Gracefully shutdown this runtime system instance
         void shutdown(double timeout,
@@ -289,9 +292,9 @@ namespace hpx { namespace components { namespace server
             &runtime_support::call_shutdown_functions
         > call_shutdown_functions_action;
 
-        typedef hpx::actions::direct_action2<
+        typedef hpx::actions::action3<
             runtime_support, runtime_support_free_component,
-            components::component_type, naming::gid_type const&,
+            components::component_type, naming::gid_type const&, naming::gid_type const&,
             &runtime_support::free_component
         > free_component_action;
 

@@ -75,6 +75,16 @@ void addressing_service::launch_bootstrap(
         server::symbol_namespace::get_component_type(), 1U,
             static_cast<void*>(&bootstrap->symbol_ns_server));
 
+    primary_ns_addr_ = naming::address(ep,
+        server::primary_namespace::get_component_type(),
+            static_cast<void*>(&bootstrap->primary_ns_server));
+    component_ns_addr_ = naming::address(ep,
+        server::component_namespace::get_component_type(),
+            static_cast<void*>(&bootstrap->component_ns_server));
+    symbol_ns_addr_ = naming::address(ep,
+        server::symbol_namespace::get_component_type(),
+            static_cast<void*>(&bootstrap->symbol_ns_server));
+
     local_prefix(here);
     get_runtime().get_config().parse("assigned locality",
         boost::str(boost::format("hpx.locality=%1%")
@@ -815,7 +825,7 @@ bool addressing_service::resolve(
         // authoritative AGAS component address resolution
         else if (id == bootstrap_primary_namespace_gid())
         {
-            addr = hosted->primary_ns_addr_;
+            addr = primary_ns_addr_;
             if (&ec != &throws)
                 ec = make_success_code();
             return true;
@@ -823,7 +833,7 @@ bool addressing_service::resolve(
 
         else if (id == bootstrap_component_namespace_gid())
         {
-            addr = hosted->component_ns_addr_;
+            addr = component_ns_addr_;
             if (&ec != &throws)
                 ec = make_success_code();
             return true;
@@ -831,7 +841,7 @@ bool addressing_service::resolve(
 
         else if (id == bootstrap_symbol_namespace_gid())
         {
-            addr = hosted->symbol_ns_addr_;
+            addr = symbol_ns_addr_;
             if (&ec != &throws)
                 ec = make_success_code();
             return true;
@@ -937,7 +947,7 @@ bool addressing_service::resolve_cached(
     // authoritative AGAS component address resolution
     else if (id == bootstrap_primary_namespace_gid())
     {
-        addr = hosted->primary_ns_addr_;
+        addr = primary_ns_addr_;
         if (&ec != &throws)
             ec = make_success_code();
         return true;
@@ -945,7 +955,7 @@ bool addressing_service::resolve_cached(
 
     else if (id == bootstrap_component_namespace_gid())
     {
-        addr = hosted->component_ns_addr_;
+        addr = component_ns_addr_;
         if (&ec != &throws)
             ec = make_success_code();
         return true;
@@ -953,7 +963,7 @@ bool addressing_service::resolve_cached(
 
     else if (id == bootstrap_symbol_namespace_gid())
     {
-        addr = hosted->symbol_ns_addr_;
+        addr = symbol_ns_addr_;
         if (&ec != &throws)
             ec = make_success_code();
         return true;
@@ -1016,25 +1026,28 @@ bool addressing_service::resolve_cached(
     return false;
 } // }}}
 
-boost::uint64_t addressing_service::incref(
-    naming::gid_type const& id
+void addressing_service::incref(
+    naming::gid_type const& lower
+  , naming::gid_type const& upper
   , boost::uint64_t credits
   , error_code& ec
     )
 { // {{{ incref implementation
     try {
-        request req(primary_ns_increment, id, credits);
+        request req(primary_ns_increment, lower, upper, credits);
         response rep;
 
+        // REVIEW: Should we do fire-and-forget here as well?
         if (is_bootstrap())
             rep = bootstrap->primary_ns_server.service(req, ec);
         else
             rep = hosted->primary_ns_.service(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
-            return 0;
+            return;
 
-        return rep.get_count();
+        if (&ec != &throws)
+            ec = make_success_code();
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
@@ -1045,46 +1058,32 @@ boost::uint64_t addressing_service::incref(
             ec = e.get_error_code(hpx::rethrow);
         }
 
-        return 0;
+        return;
     }
 } // }}}
 
-boost::uint64_t addressing_service::decref(
-    naming::gid_type const& id
-  , components::component_type& t
+void addressing_service::decref(
+    naming::gid_type const& lower
+  , naming::gid_type const& upper
   , boost::uint64_t credits
   , error_code& ec
     )
 { // {{{ decref implementation
     try {
-        request req(primary_ns_decrement, id, credits);
-        response rep;
+        request req(primary_ns_decrement, lower, upper, credits);
 
         if (is_bootstrap())
-            rep = bootstrap->primary_ns_server.service(req, ec);
-        else
-            rep = hosted->primary_ns_.service(req, action_priority_, ec);
-
-        if (ec || (success != rep.get_status()))
-            return 0;
-
-        if (0 == rep.get_count())
         {
-            t = (components::component_type) rep.get_component_type();
-
-            if (HPX_UNLIKELY(components::component_invalid != t))
-            {
-                HPX_THROWS_IF(ec, bad_component_type
-                  , "addressing_service::decref"
-                  , boost::str(boost::format(
-                    "received invalid component type when decrementing last "
-                    "GID to 0, gid(%1%)")
-                    % id));
-                return 0;
-            }
+            typedef server::primary_namespace::service_action action_type;
+            applier::apply_l_p<action_type>
+                (primary_ns_addr_, action_priority_, req); 
         }
 
-        return rep.get_count();
+        else
+            hosted->primary_ns_.service_non_blocking(req, action_priority_);
+
+        if (&ec != &throws)
+            ec = make_success_code();
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
@@ -1095,7 +1094,7 @@ boost::uint64_t addressing_service::decref(
             ec = e.get_error_code(hpx::rethrow);
         }
 
-        return false;
+        return;
     }
 } // }}}
 
