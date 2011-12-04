@@ -300,15 +300,14 @@ endif()
 set(CMAKE_DEBUG_POSTFIX "d")
 set(CMAKE_RELWITHDEBINFO_POSTFIX "d")
 
-
-set(HPX_USE_UTIL_BIND ON CACHE STRING "Use hpx::util::bind instead of boost or std bind" FORCE)
+set(HPX_USE_UTIL_BIND ON CACHE STRING "Use hpx::util::bind instead of boost::bind or std::bind." FORCE)
 if(HPX_USE_UTIL_BIND)
-    add_definitions(-DHPX_USE_UTIL_BIND)
+  add_definitions(-DHPX_USE_UTIL_BIND)
 endif()
 
-set(HPX_USE_UTIL_FUNCTION ON CACHE STRING "Use hpx::util::function instead of boost or std function" FORCE)
+set(HPX_USE_UTIL_FUNCTION ON CACHE STRING "Use hpx::util::function instead of boost::function or std::function." FORCE)
 if(HPX_USE_UTIL_FUNCTION)
-    add_definitions(-DHPX_USE_UTIL_FUNCTION)
+  add_definitions(-DHPX_USE_UTIL_FUNCTION)
 endif()
 
 ################################################################################
