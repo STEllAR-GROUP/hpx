@@ -7,9 +7,83 @@
 
 #include <hpx/util/merging_map.hpp>
 
+#include <boost/format.hpp>
+
 using hpx::util::merging_map;
-using hpx::util::incrementer;
-using hpx::util::decrementer;
+
+template <
+    typename T
+>
+struct incrementer
+{
+  private:
+    T const amount_;
+
+  public:
+    explicit incrementer(
+        T const& amount
+        )
+      : amount_(amount)
+    {
+        BOOST_ASSERT(amount);
+    }
+
+    incrementer(
+        incrementer const& other
+        )
+      : amount_(other.amount_)
+    {}
+
+    void operator()(
+        T& v
+        ) const
+    {
+        std::cout << "incrementing " << v << " by " << amount_ << "\n";
+        v += amount_;
+    }
+};
+
+template <
+    typename T
+>
+struct decrementer
+{
+  private:
+    T const amount_;
+
+  public:
+    decrementer(
+        T const& amount
+        )
+      : amount_(amount)
+    {
+        BOOST_ASSERT(amount);
+    }
+
+    decrementer(
+        decrementer const& other
+        )
+      : amount_(other.amount_)
+    {}
+
+    void operator()(
+        T& v
+        ) const
+    {
+        // We don't worry about removing entries when they're at 0. The AGAS
+        // server code handles this after all the counts have been updated.
+        if (amount_ >= v)
+        {
+            std::cout << "decrementing " << v << " by " << v << "\n";
+            v = 0;
+        }
+        else
+        {
+            std::cout << "decrementing " << v << " by " << amount_ << "\n";
+            v -= amount_;
+        }
+    }
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 struct test_data
@@ -173,6 +247,28 @@ int main()
     for (std::size_t i = 0; i < num_tests; ++i)
         run_test(tests[i]);
 
+    std::cout << "\n";
+
+    // TODO: Add more find tests.
+    {
+        typedef merging_map<boost::uint32_t, boost::uint32_t> map_type;
+   
+        typedef map_type::iterator iterator;
+ 
+        map_type table;
+    
+        table.bind(2, 2, 50U); // [2, 2] 
+    
+        std::pair<iterator, iterator> r = table.find(2);
+
+        for (; r.first != r.second; ++r.first)
+        {
+            std::cout << r.first->key_  << " -> " << r.first->data_ << "\n";
+        }
+    }
+
+    std::cout << "\n";
+
     // TODO: Add more apply tests.
     {
         typedef merging_map<boost::uint32_t, boost::uint32_t> map_type;
@@ -185,8 +281,6 @@ int main()
     
         table.apply(3, 10, incrementer<boost::uint32_t>(35)); // [3, 10]
 
-        std::cout << "\n";
-    
         BOOST_FOREACH(map_type::const_reference e, table)
         {
             std::cout << e.key_ << " -> " << e.data_ << "\n";
@@ -194,7 +288,7 @@ int main()
 
         table.apply(0, 11, decrementer<boost::uint32_t>(300)); // [0, 11]
 
-        std::cout << "\n";
+        std::cout << "--\n";
 
         BOOST_FOREACH(map_type::const_reference e, table)
         {
@@ -204,21 +298,144 @@ int main()
 
     std::cout << "\n";
 
-    // TODO: Add more find tests.
+    // TODO: Add more apply tests.
     {
         typedef merging_map<boost::uint32_t, boost::uint32_t> map_type;
-   
-        typedef map_type::iterator iterator;
- 
+    
         map_type table;
     
-        table.bind(2, 2, 50); // [2, 2] 
+        table.bind(2, 3,  125U); // [2, 3] 
+        table.bind(5, 6,  110U); // [5, 6]
+        table.bind(6, 7,  75U);  // [7, 7]
+        table.bind(8, 15, 85U);  // [8, 15]
     
-        std::pair<iterator, iterator> r = table.find(2);
+        std::cout << "-- initial\n";
 
-        for (; r.first != r.second; ++r.first)
+        BOOST_FOREACH(map_type::const_reference e, table)
         {
-            std::cout << r.first->key_  << " -> " << r.first->data_ << "\n";
+            std::cout << e.key_ << " -> " << e.data_ << "\n";
+        }
+
+        table.apply(3, 11, decrementer<boost::uint32_t>(50), 100U); // [3, 11]
+
+        std::cout << "-- [3, 11] -= 50 (default 100)\n";
+
+        BOOST_FOREACH(map_type::const_reference e, table)
+        {
+            std::cout << e.key_ << " -> " << e.data_ << "\n";
+        }
+
+        table.apply(3, 11, decrementer<boost::uint32_t>(60), 100U); // [3, 11]
+
+        std::cout << "-- [3, 11] -= 60 (default 100)\n";
+
+        BOOST_FOREACH(map_type::const_reference e, table)
+        {
+            std::cout << e.key_ << " -> " << e.data_ << "\n";
+        }
+    }
+
+    std::cout << "\n";
+
+    // TODO: Add more apply tests.
+    {
+        typedef merging_map<boost::uint32_t, boost::uint32_t> map_type;
+    
+        map_type table;
+    
+        table.bind(2, 3,  125U); // [2, 3] 
+        table.bind(5, 6,  110U); // [5, 6]
+        table.bind(6, 7,  75U);  // [7, 7]
+        table.bind(8, 15, 85U);  // [8, 15]
+    
+        std::cout << "-- initial\n";
+
+        BOOST_FOREACH(map_type::const_reference e, table)
+        {
+            std::cout << e.key_ << " -> " << e.data_ << "\n";
+        }
+
+        table.apply(5, 5, decrementer<boost::uint32_t>(50), 100U); // [5, 5]
+
+        std::cout << "-- [5, 5] -= 50 (default 100)\n";
+
+        BOOST_FOREACH(map_type::const_reference e, table)
+        {
+            std::cout << e.key_ << " -> " << e.data_ << "\n";
+        }
+
+        table.apply(5, 5, decrementer<boost::uint32_t>(60), 100U); // [5, 5]
+
+        std::cout << "-- [5, 5] -= 60 (default 100)\n";
+
+        BOOST_FOREACH(map_type::const_reference e, table)
+        {
+            std::cout << e.key_ << " -> " << e.data_ << "\n";
+        }
+    }
+
+    std::cout << "\n";
+
+    // TODO: Add more apply tests.
+    {
+        typedef merging_map<boost::uint32_t, boost::uint32_t> map_type;
+        typedef map_type::key_type key_type; 
+
+        boost::format fmt("[0x%04X, 0x%04X] -> %u\n");
+ 
+        key_type const key(0x00FF, 0x00FF); // [0x00FF, 0x00FF]
+   
+        map_type table;
+    
+        table.bind(0x0000, 0xFFFF, 255U); // [0x0000, 0xFFFF] 
+    
+        std::cout << "-- initial\n";
+
+        BOOST_FOREACH(map_type::const_reference e, table)
+        {
+            std::cout << (fmt % boost::icl::lower(e.key_) 
+                              % boost::icl::upper(e.key_)
+                              % e.data_);
+        }
+
+        table.apply(key, decrementer<boost::uint32_t>(127), 255U);
+
+        std::cout << "-- [0x00FF, 0x00FF] -= 127 (default 255)\n";
+
+        BOOST_FOREACH(map_type::const_reference e, table)
+        {
+            std::cout << (fmt % boost::icl::lower(e.key_) 
+                              % boost::icl::upper(e.key_)
+                              % e.data_);
+        }
+
+        table.apply(key, decrementer<boost::uint32_t>(128), 255U);
+
+        std::cout << "-- [0x00FF, 0x00FF] -= 128 (default 255)\n";
+
+        BOOST_FOREACH(map_type::const_reference e, table)
+        {
+            std::cout << (fmt % boost::icl::lower(e.key_) 
+                              % boost::icl::upper(e.key_)
+                              % e.data_);
+        }
+    }
+
+    std::cout << "\n";
+
+    // TODO: Add more apply tests.
+    {
+        typedef merging_map<boost::uint32_t, boost::uint32_t> map_type;
+    
+        map_type table;
+    
+        table.bind(2, 3, 50U); // [2, 3] 
+    
+        table.apply(3, 3, incrementer<boost::uint32_t>(35)); // [3, 3]
+
+        BOOST_FOREACH(map_type::const_reference e, table)
+        {
+            std::cout << e.key_ << " -> " << e.data_ << "\n";
         }
     }
 }
