@@ -36,9 +36,13 @@
 namespace hpx { namespace naming
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// Global identifier for components across the PX system
+    /// Global identifier for components across the HPX system.
     struct HPX_EXPORT gid_type
     {
+        // These typedefs are for Boost.ICL.
+        typedef gid_type size_type;
+        typedef gid_type difference_type;
+
         static boost::uint64_t const credit_base_mask = 0x7ffful;
         static boost::uint64_t const credit_mask = credit_base_mask << 16;
         static boost::uint64_t const was_split_mask = 0x80000000ul;
@@ -109,9 +113,9 @@ namespace hpx { namespace naming
         // GID - GID
         friend gid_type operator- (gid_type const& lhs, gid_type const& rhs)
         {
-            boost::uint64_t lsb = rhs.id_lsb_ - lhs.id_lsb_;
-            boost::uint64_t msb = rhs.id_msb_ - lhs.id_msb_;
-            if (lsb > lhs.id_lsb_ || lsb > rhs.id_lsb_)
+            boost::uint64_t lsb = lhs.id_lsb_ - rhs.id_lsb_;
+            boost::uint64_t msb = lhs.id_msb_ - rhs.id_msb_;
+            if (lsb > lhs.id_lsb_)
                 --msb;
             return gid_type(msb, lsb);
         }
@@ -291,6 +295,15 @@ namespace hpx { namespace naming
         return gid_type(msb, lsb);
     }
 
+    inline gid_type strip_credit_from_cgid(gid_type const& id) HPX_PURE;
+
+    inline gid_type strip_credit_from_cgid(gid_type const& id)
+    {
+        boost::uint64_t const msb = strip_credit_from_gid(id.get_msb());
+        boost::uint64_t const lsb = id.get_lsb();
+        return gid_type(msb, lsb);
+    }
+
     inline void set_credit_for_gid(gid_type& id, boost::uint16_t credit)
     {
         BOOST_ASSERT(0 == (credit & ~gid_type::credit_base_mask));
@@ -313,7 +326,7 @@ namespace hpx { namespace naming
 
     inline bool gid_was_split(gid_type const& id)
     {
-        return id.get_msb() & gid_type::was_split_mask ? true : false;
+        return (id.get_msb() & gid_type::was_split_mask) ? true : false;
     }
 
     ///////////////////////////////////////////////////////////////////////////
