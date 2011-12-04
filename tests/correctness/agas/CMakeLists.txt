@@ -16,6 +16,7 @@ set(tests
     refcnted_symbol_to_remote_object
     uncounted_symbol_to_local_object
     uncounted_symbol_to_remote_object
+    gid_type
    )
 
 set(scoped_ref_to_local_object_FLAGS
