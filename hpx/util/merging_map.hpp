@@ -731,7 +731,7 @@ struct merging_map : boost::noncopyable
         )
     {
         key_type const key(lower, upper);
-        apply(key, f); 
+        apply(key, f, default_); 
         return;
     }
 
@@ -776,14 +776,15 @@ struct merging_map : boost::noncopyable
             // Is key a subset of match?
             if (boost::icl::contains(match, key)) 
             {
-                // Default construct an instance of data_type.
-                data_type tmp;
+                // Construct an instance of data_type and initialize it with
+                // the value of the parent mapping.
+                data_type tmp = matches.first->data_;
 
                 // Call f on the temporary.
                 f(tmp);
 
                 // Create a new mapping and remap the super object.
-                iterator it = remap(matches.first, key, default_);
+                iterator it = remap(matches.first, key, tmp);
 
                 // Try to merge the new mapping.
                 merge(it);
