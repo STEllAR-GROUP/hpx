@@ -251,11 +251,12 @@ namespace hpx { namespace util
                   "the number of operating system threads to dedicate as "
                   "shepherd threads for this HPX locality (default: 1)")
                 ("queueing,q", value<std::string>(),
-                  "the queue scheduling policy to use, options are `global/g', "
-                  "`local/l', `priority_local/p', `abp/a' and hierarchy/h (default: priority_local/p)")
+                  "the queue scheduling policy to use, options are 'global/g', "
+                  "'local/l', 'priority_local/p', 'abp/a', and 'hierarchy/h' "
+                  "(default: priority_local/p)")
                 ("hierarchy-arity", value<std::size_t>()->default_value(2),
                   "the arity of the of the thread queue tree, valid for "
-                   "--queueing=hierarchy only")
+                   "--queueing=hierarchy only (default: 2)")
                 ("high-priority-threads", value<std::size_t>(),
                   "the number of operating system threads maintaining a high "
                   "priority queue (default: number of OS threads), valid for "
@@ -279,8 +280,7 @@ namespace hpx { namespace util
                 ("exit", "exit after configuring the runtime")
             ;
 
-            options_description debugging_options(
-                "HPX debugging options");
+            options_description debugging_options("HPX debugging options");
             debugging_options.add_options()
                 ("list-symbolic-names", "list all registered symbolic "
                   "names after startup")

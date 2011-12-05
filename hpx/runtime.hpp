@@ -14,10 +14,16 @@
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/runtime/threads/policies/global_queue_scheduler.hpp>
-#include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
+#if defined(HPX_ENABLE_GLOBAL_SCHEDULER)
+#  include <hpx/runtime/threads/policies/global_queue_scheduler.hpp>
+#endif
+#if defined(HPX_ENABLE_LOCAL_SCHEDULER)
+#  include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
+#endif
+#if defined(HPX_ENABLE_ABP_SCHEDULER)
+#  include <hpx/runtime/threads/policies/abp_queue_scheduler.hpp>
+#endif
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
-#include <hpx/runtime/threads/policies/abp_queue_scheduler.hpp>
 #include <hpx/runtime/threads/policies/hierarchy_scheduler.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>

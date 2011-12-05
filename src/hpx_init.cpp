@@ -429,6 +429,7 @@ namespace hpx
             return rt.run(num_threads, num_localities);
         }
 
+#if defined(HPX_ENABLE_GLOBAL_SCHEDULER)
         ///////////////////////////////////////////////////////////////////////
         // global scheduler (one queue for all OS threads)
         int run_global(hpx_main_func f, boost::program_options::variables_map& vm,
@@ -449,6 +450,11 @@ namespace hpx
                     "--queueing=priority_local only");
             }
 #endif
+            if (vm.count("hierarchy-arity")) {
+                throw std::logic_error("Invalid command line option "
+                    "--hierarchy-arity, valid for --queueing=hierarchy only.");
+            }
+
             // scheduling policy
             typedef hpx::threads::policies::global_queue_scheduler
                 global_queue_policy;
@@ -461,7 +467,9 @@ namespace hpx
             return run(rt, f, vm, mode, startup, shutdown, num_threads,
                 num_localities);
         }
+#endif
 
+#if defined(HPX_ENABLE_LOCAL_SCHEDULER)
         ///////////////////////////////////////////////////////////////////////
         // local scheduler (one queue for each OS threads)
         int run_local(hpx_main_func f, boost::program_options::variables_map& vm,
@@ -482,6 +490,11 @@ namespace hpx
                     "--queueing=priority_local only");
             }
 #endif
+            if (vm.count("hierarchy-arity")) {
+                throw std::logic_error("Invalid command line option "
+                    "--hierarchy-arity, valid for --queueing=hierarchy only.");
+            }
+
             // scheduling policy
             typedef hpx::threads::policies::local_queue_scheduler
                 local_queue_policy;
@@ -495,6 +508,7 @@ namespace hpx
             return run(rt, f, vm, mode, startup, shutdown, num_threads,
                 num_localities);
         }
+#endif
 
         ///////////////////////////////////////////////////////////////////////
         // local scheduler with priority queue (one queue for each OS threads
@@ -515,6 +529,11 @@ namespace hpx
             if (vm.count("numa-sensitive"))
                 numa_sensitive = true;
 #endif
+            if (vm.count("hierarchy-arity")) {
+                throw std::logic_error("Invalid command line option "
+                    "--hierarchy-arity, valid for --queueing=hierarchy only.");
+            }
+
             // scheduling policy
             typedef hpx::threads::policies::local_priority_queue_scheduler
                 local_queue_policy;
@@ -530,8 +549,9 @@ namespace hpx
                 num_localities);
         }
 
+#if defined(HPX_ENABLE_ABP_SCHEDULER)
         ///////////////////////////////////////////////////////////////////////
-        //  and hierarchyabp scheduler: local deques for each OS thread, with work
+        // abp scheduler: local deques for each OS thread, with work
         // stealing from the "bottom" of each.
         int run_abp(hpx_main_func f, boost::program_options::variables_map& vm,
             runtime_mode mode, std::vector<std::string> const& ini_config,
@@ -551,6 +571,11 @@ namespace hpx
                     "--queueing=priority_local only");
             }
 #endif
+            if (vm.count("hierarchy-arity")) {
+                throw std::logic_error("Invalid command line option "
+                    "--hierarchy-arity, valid for --queueing=hierarchy only.");
+            }
+
             // scheduling policy
             typedef hpx::threads::policies::abp_queue_scheduler
                 abp_queue_policy;
@@ -564,6 +589,7 @@ namespace hpx
             return run(rt, f, vm, mode, startup, shutdown, num_threads,
                 num_localities);
         }
+#endif
 
         ///////////////////////////////////////////////////////////////////////
         // hierarchical scheduler: The thread queues are built up hierarchically
@@ -852,8 +878,8 @@ namespace hpx
             }
             if (1 == num_localities && vm.count("run-agas-server-only")) {
                 std::cerr  << "hpx::init: command line warning: --run-agas-server-only "
-                       "used for single locality execution, application might "
-                       "not run properly." << std::endl;
+                    "used for single locality execution, application might "
+                    "not run properly." << std::endl;
             }
 
             // Set whether the AGAS server is running as a dedicated runtime.
@@ -925,12 +951,24 @@ namespace hpx
 
             // Initialize and start the HPX runtime.
             if (0 == std::string("global").find(queueing)) {
+#if defined(HPX_ENABLE_GLOBAL_SCHEDULER)
                 result = detail::run_global(f, vm, mode, ini_config,
                     startup, shutdown, num_threads, num_localities);
+#else
+                throw std::logic_error("Command line option --queueing=global "
+                    "is not configured in this build. Please rebuild with "
+                    "'cmake -DHPX_ENABLE_GLOBAL_SCHEDULER'.");
+#endif
             }
             else if (0 == std::string("local").find(queueing)) {
+#if defined(HPX_ENABLE_LOCAL_SCHEDULER)
                 result = detail::run_local(f, vm, mode, ini_config,
                     startup, shutdown, num_threads, num_localities);
+#else
+                throw std::logic_error("Command line option --queueing=local "
+                    "is not configured in this build. Please rebuild with "
+                    "'cmake -DHPX_ENABLE_LOCAL_SCHEDULER'.");
+#endif
             }
             else if (0 == std::string("priority_local").find(queueing)) {
                 // local scheduler with priority queue (one queue for each OS threads
@@ -939,14 +977,20 @@ namespace hpx
                     startup, shutdown, num_threads, num_localities);
             }
             else if (0 == std::string("abp").find(queueing)) {
-                // abp scheduler: local deques for each OS thread, with work
+                // abp scheduler: local dequeues for each OS thread, with work
                 // stealing from the "bottom" of each.
+#if defined(HPX_ENABLE_ABP_SCHEDULER)
                 result = detail::run_abp(f, vm, mode, ini_config,
                     startup, shutdown, num_threads, num_localities);
+#else
+                throw std::logic_error("Command line option --queueing=abp "
+                    "is not configured in this build. Please rebuild with "
+                    "'cmake -DHPX_ENABLE_ABP_SCHEDULER'.");
+#endif
             }
             else if (0 == std::string("hierarchy").find(queueing)) {
-                // abp scheduler: local deques for each OS thread, with work
-                // stealing from the "bottom" of each.
+                // hierarchy scheduler: tree of dequeues, with work
+                // stealing from the parent queue in that tree.
                 result = detail::run_hierarchy(f, vm, mode, ini_config,
                     startup, shutdown, num_threads, num_localities);
             }

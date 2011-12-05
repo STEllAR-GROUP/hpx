@@ -133,14 +133,23 @@ namespace hpx
     {
         namespace policies
         {
+#if defined(HPX_ENABLE_GLOBAL_SCHEDULER)
             class HPX_API_EXPORT global_queue_scheduler;
+#endif
+#if defined(HPX_ENABLE_LOCAL_SCHEDULER)
             class HPX_API_EXPORT local_queue_scheduler;
-            class HPX_API_EXPORT local_priority_queue_scheduler;
+#endif
+#if defined(HPX_ENABLE_ABP_SCHEDULER)
             struct HPX_API_EXPORT abp_queue_scheduler;
+#endif
+
+            class HPX_API_EXPORT local_priority_queue_scheduler;
+            class HPX_API_EXPORT hierarchy_scheduler;
+
             class HPX_API_EXPORT callback_notifier;
 
             // define the default scheduler to use
-            typedef local_queue_scheduler queue_scheduler;
+            typedef local_priority_queue_scheduler queue_scheduler;
         }
 
         struct HPX_API_EXPORT threadmanager_base;
@@ -397,8 +406,8 @@ namespace hpx
 
         template <typename Component>
         class simple_component;
-    
-        template <typename Component, typename Wrapper = detail::this_type, 
+
+        template <typename Component, typename Wrapper = detail::this_type,
             typename CtorPolicy = detail::construct_without_back_ptr>
         class managed_component_base;
 

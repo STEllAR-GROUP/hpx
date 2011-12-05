@@ -300,14 +300,32 @@ endif()
 set(CMAKE_DEBUG_POSTFIX "d")
 set(CMAKE_RELWITHDEBINFO_POSTFIX "d")
 
-set(HPX_USE_UTIL_BIND ON CACHE STRING "Use hpx::util::bind instead of boost::bind or std::bind." FORCE)
+set(HPX_USE_UTIL_BIND ON CACHE BOOL "Use hpx::util::bind instead of boost::bind or std::bind." FORCE)
 if(HPX_USE_UTIL_BIND)
   add_definitions(-DHPX_USE_UTIL_BIND)
 endif()
 
-set(HPX_USE_UTIL_FUNCTION ON CACHE STRING "Use hpx::util::function instead of boost::function or std::function." FORCE)
+set(HPX_USE_UTIL_FUNCTION ON CACHE BOOL "Use hpx::util::function instead of boost::function or std::function." FORCE)
 if(HPX_USE_UTIL_FUNCTION)
   add_definitions(-DHPX_USE_UTIL_FUNCTION)
+endif()
+
+################################################################################
+# Scheduler support
+################################################################################
+set(HPX_ENABLE_GLOBAL_SCHEDULER OFF CACHE BOOL "Enable the use of --queueing=global." FORCE)
+if(HPX_ENABLE_GLOBAL_SCHEDULER)
+  add_definitions(-DHPX_ENABLE_GLOBAL_SCHEDULER)
+endif()
+
+set(HPX_ENABLE_LOCAL_SCHEDULER OFF CACHE BOOL "Enable the use of --queueing=local." FORCE)
+if(HPX_ENABLE_LOCAL_SCHEDULER)
+  add_definitions(-DHPX_ENABLE_LOCAL_SCHEDULER)
+endif()
+
+set(HPX_ENABLE_ABP_SCHEDULER OFF CACHE BOOL "Enable the use of --queueing=abp." FORCE)
+if(HPX_ENABLE_ABP_SCHEDULER)
+  add_definitions(-DHPX_ENABLE_ABP_SCHEDULER)
 endif()
 
 ################################################################################

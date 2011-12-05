@@ -367,25 +367,23 @@ namespace hpx { namespace threads { namespace policies
                 std::size_t core_mask = get_thread_affinity_mask(num_thread, numa_sensitive_);
                 std::size_t node_mask = get_numa_node_affinity_mask(num_thread, numa_sensitive_);
 
+                std::size_t queues_size = queues_.size();
                 if (core_mask != std::size_t(-1) && node_mask != std::size_t(-1)) {
                     std::size_t m = 0x01LL;
-                    for (std::size_t i = 0; (0 == added) && i < queues_.size();
+                    for (std::size_t i = 0; (0 == added) && i < queues_size;
                          m <<= 1, ++i)
                     {
                         if (m == core_mask || !(m & node_mask))
                             continue;         // don't steal from ourselves
 
-                        std::size_t idx = least_significant_bit_set(m);
-                        BOOST_ASSERT(idx < queues_.size());
-
-                        result = queues_[num_thread]->wait_or_add_new(idx,
-                            running, idle_loop_count, added, queues_[idx]) && result;
+                        result = queues_[num_thread]->wait_or_add_new(i,
+                            running, idle_loop_count, added, queues_[i]) && result;
                     }
                 }
 
                 // if nothing found ask everybody else
-                for (std::size_t i = 1; 0 == added && i < queues_.size(); ++i) {
-                    std::size_t idx = (i + num_thread) % queues_.size();
+                for (std::size_t i = 1; 0 == added && i < queues_size; ++i) {
+                    std::size_t idx = (i + num_thread) % queues_size;
                     result = queues_[num_thread]->wait_or_add_new(idx, running,
                         idle_loop_count, added, queues_[idx]) && result;
                 }

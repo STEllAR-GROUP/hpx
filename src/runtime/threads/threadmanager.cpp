@@ -1367,28 +1367,39 @@ namespace hpx { namespace threads
 
 ///////////////////////////////////////////////////////////////////////////////
 /// explicit template instantiation for the thread manager of our choice
-#include <hpx/runtime/threads/policies/global_queue_scheduler.hpp>
-#include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
-#include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
-#include <hpx/runtime/threads/policies/abp_queue_scheduler.hpp>
-#include <hpx/runtime/threads/policies/hierarchy_scheduler.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
+
+#if defined(HPX_ENABLE_GLOBAL_SCHEDULER)
+#include <hpx/runtime/threads/policies/global_queue_scheduler.hpp>
 
 template HPX_EXPORT class hpx::threads::threadmanager_impl<
     hpx::threads::policies::global_queue_scheduler,
     hpx::threads::policies::callback_notifier>;
+#endif
+
+#if defined(HPX_ENABLE_LOCAL_SCHEDULER)
+#include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 
 template HPX_EXPORT class hpx::threads::threadmanager_impl<
     hpx::threads::policies::local_queue_scheduler,
     hpx::threads::policies::callback_notifier>;
+#endif
+
+#if defined(HPX_ENABLE_ABP_SCHEDULER)
+#include <hpx/runtime/threads/policies/abp_queue_scheduler.hpp>
+
+template HPX_EXPORT class hpx::threads::threadmanager_impl<
+    hpx::threads::policies::abp_queue_scheduler,
+    hpx::threads::policies::callback_notifier>;
+#endif
+
+#include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
+#include <hpx/runtime/threads/policies/hierarchy_scheduler.hpp>
 
 template HPX_EXPORT class hpx::threads::threadmanager_impl<
     hpx::threads::policies::local_priority_queue_scheduler,
     hpx::threads::policies::callback_notifier>;
 
-template HPX_EXPORT class hpx::threads::threadmanager_impl<
-    hpx::threads::policies::abp_queue_scheduler,
-    hpx::threads::policies::callback_notifier>;
 
 template HPX_EXPORT class hpx::threads::threadmanager_impl<
     hpx::threads::policies::hierarchy_scheduler,
