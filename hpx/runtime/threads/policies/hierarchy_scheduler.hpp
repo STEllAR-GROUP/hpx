@@ -78,13 +78,13 @@ namespace hpx { namespace threads { namespace policies
             bool numa_sensitive_;
         };
         typedef init_parameter init_parameter_type;
-        
+
         typedef std::vector<thread_queue<false>*> level_type;
         typedef std::vector<level_type> tree_type;
         tree_type tree;
 
-        typedef typename tree_type::size_type size_type;
-        typedef typename tree_type::difference_type difference_type;
+        typedef tree_type::size_type size_type;
+        typedef tree_type::difference_type difference_type;
         size_type d;
 
         void init_tree(size_type n, std::size_t max_queue_thread_count)
@@ -331,7 +331,7 @@ namespace hpx { namespace threads { namespace policies
             BOOST_ASSERT(level > 0);
             if(level >= tree.size())
                 return;
-            
+
             /*
             BOOST_ASSERT(tree.size());
             std::cout
@@ -355,7 +355,7 @@ namespace hpx { namespace threads { namespace policies
             {
                 transfer_tasks(idx/d, idx, level + 1);
             }
-  
+
             /*
             std::cout << tree.size() << "\n";
             std::cout << tree.at(level).size() << "\n";
