@@ -38,7 +38,7 @@ namespace hpx { namespace components
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
+    namespace detail_adl_barrier
     {
         template <typename Component, typename Managed, typename BackPtrTag>
         struct init;
@@ -141,7 +141,7 @@ namespace hpx { namespace components
         template <typename, typename>
         friend class managed_component;
         template <typename, typename, typename>
-        friend struct detail::init;
+        friend struct detail_adl_barrier::init;
 
         void set_back_ptr(components::managed_component<Component, Wrapper>* bp)
         {
@@ -262,7 +262,7 @@ namespace hpx { namespace components
         managed_component()
           : component_(0)
         {
-            detail::init<Component, managed_component,
+            detail_adl_barrier::init<Component, managed_component,
                 typename component_ctor_policy<Component>::type
             >::call(component_, this);
         }
@@ -272,7 +272,7 @@ namespace hpx { namespace components
         managed_component(BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t))        \
           : component_(0)                                                     \
         {                                                                     \
-            detail::init<Component, managed_component,                        \
+            detail_adl_barrier::init<Component, managed_component,            \
                 typename component_ctor_policy<Component>::type               \
             >::call(component_, this, BOOST_PP_ENUM_PARAMS(N, t));            \
         }                                                                     \

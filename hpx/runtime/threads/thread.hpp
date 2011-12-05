@@ -405,7 +405,7 @@ namespace hpx { namespace threads { namespace detail
         mutable thread_state marked_state_;
 
         template <typename, typename, typename>
-        friend struct components::detail::init;
+        friend struct components::detail_adl_barrier::init;
 
         void set_back_ptr(
             components::managed_component<thread, threads::thread>* bp)
