@@ -34,9 +34,17 @@ namespace hpx { namespace util
         ///                 requests
         /// \param start_thread
         ///                 [in]
-        explicit io_service_pool(std::size_t pool_size = 4,
+        explicit io_service_pool(std::size_t pool_size = 2,
             HPX_STD_FUNCTION<void()> on_start_thread = HPX_STD_FUNCTION<void()>(),
-            HPX_STD_FUNCTION<void()> on_stop_thread = HPX_STD_FUNCTION<void()>());
+            HPX_STD_FUNCTION<void()> on_stop_thread = HPX_STD_FUNCTION<void()>(),
+            char const* pool_name = "");
+
+        /// \brief Construct the io_service pool.
+        /// \param start_thread
+        ///                 [in]
+        explicit io_service_pool(HPX_STD_FUNCTION<void()> on_start_thread,
+            HPX_STD_FUNCTION<void()> on_stop_thread = HPX_STD_FUNCTION<void()>(),
+            char const* pool_name = "");
 
         ~io_service_pool();
 
@@ -60,6 +68,10 @@ namespace hpx { namespace util
         ///
         void thread_run(int index);
 
+        void stop_locked();
+        void join_locked();
+        void clear_locked();
+
     private:
         typedef boost::shared_ptr<boost::asio::io_service> io_service_ptr;
         typedef boost::shared_ptr<boost::asio::io_service::work> work_ptr;
@@ -74,7 +86,6 @@ namespace hpx { namespace util
         std::vector<work_ptr> work_;
 
         /// The next io_service to use for a connection.
-        util::spinlock rr_mtx_;
         std::size_t next_io_service_;
 
         /// set to true if stopped
@@ -86,6 +97,10 @@ namespace hpx { namespace util
         /// call this for each thread start/stop
         HPX_STD_FUNCTION<void()> on_start_thread_;
         HPX_STD_FUNCTION<void()> on_stop_thread_;
+
+#if defined(_DEBUG)
+        char const* pool_name_;
+#endif
     };
 
 ///////////////////////////////////////////////////////////////////////////////
