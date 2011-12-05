@@ -6,6 +6,7 @@
 
 #include <sstream>
 
+#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/hpx_init.hpp>
 
 #include "throttle/throttle.hpp"
@@ -22,28 +23,6 @@ using boost::algorithm::split;
 using hpx::naming::get_agas_client;
 
 ///////////////////////////////////////////////////////////////////////////////
-// AGAS helpers
-inline void
-register_name(hpx::naming::id_type const& id, std::string const& name)
-{
-    get_agas_client().registerid(name, id.get_gid());
-}
-
-inline void unregister_name(std::string const& name)
-{
-    get_agas_client().unregisterid(name);
-}
-
-inline hpx::naming::id_type query_name(std::string const& name)
-{
-    hpx::naming::gid_type gid;
-    if (get_agas_client().queryid(name, gid))
-      return hpx::naming::id_type(gid, hpx::naming::id_type::unmanaged);
-
-    return hpx::naming::invalid_id;
-}
-
-///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
 {
     try {
@@ -54,7 +33,9 @@ int hpx_main(variables_map& vm)
         // Try to connect to existing throttle instance, create a new one if
         // this fails.
         char const* throttle_component_name = "/throttle/0";
-        throttle::throttle t(query_name(throttle_component_name));
+        hpx::naming::id_type gid;
+        hpx::agas::resolve_name(throttle_component_name, gid);
+        throttle::throttle t;
         if (!t.get_gid()) {
             std::vector<hpx::naming::id_type> prefixes;
             hpx::applier::applier& appl = hpx::applier::get_applier();
@@ -69,8 +50,7 @@ int hpx_main(variables_map& vm)
                 std::cout << "throttle component type: " << (int)type << std::endl;
 
                 t.create(prefixes[0], type);
-                register_name(t.get_gid(), throttle_component_name);
-                get_agas_client().incref(t.get_gid().get_gid());
+                hpx::agas::register_name(throttle_component_name, t.get_gid());
             }
             else {
                 std::cerr << "Can't find throttle component." << std::endl;
@@ -88,9 +68,7 @@ int hpx_main(variables_map& vm)
             else if (vm.count("release")) {
                 // unregister from AGAS, remove additional reference count which
                 // will allow for the throttle instance to be released
-                hpx::components::component_type type;
-                get_agas_client().decref(t.get_gid().get_gid(), type);
-                unregister_name(throttle_component_name);
+                hpx::agas::unregister_name(throttle_component_name);
             }
         }
     }
