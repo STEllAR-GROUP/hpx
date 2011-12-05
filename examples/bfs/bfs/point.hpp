@@ -3,74 +3,73 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_CLIENT_POINT)
-#define HPX_COMPONENTS_CLIENT_POINT
+#if !defined(HPX_68F602E3_C235_4660_AEAC_D5BD7AEC4805)
+#define HPX_68F602E3_C235_4660_AEAC_D5BD7AEC4805
 
-#include <hpx/hpx.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 
 #include "stubs/point.hpp"
 
-namespace hpx { namespace geometry
+namespace bfs
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// The \a stubs#point class is the client side representation of all
-    /// \a server#point components
-    class point
-        : public components::client_base<point, stubs::point>
+    /// The client side representation of a \a bfs::server::point components.
+    class point : public hpx::components::client_base<point, stubs::point>
     {
-        typedef components::client_base<point, stubs::point>
+        typedef hpx::components::client_base<point, stubs::point>
             base_type;
 
     public:
         /// Default construct an empty client side representation (not
-        /// connected to any existing component)
+        /// connected to any existing component).
         point()
         {}
 
-        /// Create client side representation from a newly create component
-        /// instance.
-        point(naming::id_type where, double x, double y)
-          : base_type(base_type::create_sync(where))    // create component
-        {
-            //init(x, y);   // initialize coordinates
-        }
-
         /// Create a client side representation for the existing
-        /// \a server#point instance with the given global id \a gid.
-        point(naming::id_type gid)
+        /// \a bfs::server::point instance with the given GID.
+        point(hpx::naming::id_type const& gid)
           : base_type(gid)
         {}
 
         ///////////////////////////////////////////////////////////////////////
-        // exposed functionality of this component
+        // Exposed functionality of this component.
 
-        /// Initialize the server#point instance with the given \a gid
-        lcos::promise<void> init_async(std::size_t objectid,std::string graphfile)
+        /// Initialize the \a bfs::server::point instance with the
+        /// given graph file. 
+        hpx::lcos::promise<void> init_async(std::size_t objectid,
+            std::size_t max_num_neighbors,std::string const& graphfile)
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::init_async(gid_,objectid,graphfile);
+            return this->base_type::init_async(gid_,objectid,max_num_neighbors,
+                graphfile);
         }
 
-        void init(std::size_t objectid,std::string graphfile)
+        /// Initialize the \a bfs::server::point instance with the
+        /// given graph file.  
+        void init(std::size_t objectid,std::size_t max_num_neighbors,
+            std::string const& graphfile)
         {
             BOOST_ASSERT(gid_);
-            this->base_type::init_async(gid_,objectid,graphfile);
+            this->base_type::init_async(gid_,objectid,max_num_neighbors,
+                graphfile);
         }
 
-        lcos::promise< std::vector<std::size_t> > traverse_async(std::size_t level, std::size_t parent)
+        /// Traverse the graph. 
+        hpx::lcos::promise<std::vector<std::size_t> >
+        traverse_async(std::size_t level, std::size_t parent)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::traverse_async(gid_,level,parent);
         }
 
+        /// Traverse the graph. 
         std::vector<std::size_t> traverse(std::size_t level,std::size_t parent)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::traverse(gid_,level,parent);
         }
-
     };
-}}
+}
 
 #endif
+
