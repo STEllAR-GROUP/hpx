@@ -723,8 +723,8 @@ response primary_namespace::decrement(
     //    1.) Search for dead objects (e.g. objects with a reference count of
     //        0) by iterating over the keyspace.
     //    2.) Resolve the dead objects (retrieve the GVA, adjust for partial
-    //        matches.
-    //    3.) Kill the dead objects.
+    //        matches) and remove them from the reference counting table.
+    //    3.) Kill the dead objects (fire-and-forget semantics).
 
     {
         mutex_type::scoped_lock l(mutex_);
