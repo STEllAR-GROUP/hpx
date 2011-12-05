@@ -168,6 +168,9 @@
     <Filter Include="Header Files\Traits">
       <UniqueIdentifier>{d3434298-3a41-4879-a63d-8a79071a6e41}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Runtime\AGAS\Stubs">
+      <UniqueIdentifier>{247a344c-22ae-44a7-83ec-4e17f2081dd4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\external\chrono\libs\chrono\src\chrono.cpp">
@@ -391,6 +394,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\util\parse_command_line.cpp">
       <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\stubs\primary_namespace.cpp">
+      <Filter>Source Files\Runtime\AGAS\Stubs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\stubs\symbol_namespace.cpp">
+      <Filter>Source Files\Runtime\AGAS\Stubs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\stubs\component_namespace.cpp">
+      <Filter>Source Files\Runtime\AGAS\Stubs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1107,6 +1119,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\hpx\util\parse_command_line.hpp">
       <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\threads\policies\hierarchy_scheduler.hpp">
+      <Filter>Header Files\Runtime\Threads\Policies</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

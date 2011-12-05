@@ -141,6 +141,18 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)\symbol_namespace1.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)\symbol_namespace1.obj</ObjectFileName>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\stubs\component_namespace.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)\component_namespace2.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)\component_namespace2.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\stubs\primary_namespace.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)\primary_namespace2.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)\primary_namespace2.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\stubs\symbol_namespace.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)\symbol_namespace2.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)\symbol_namespace2.obj</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\runtime\agas\symbol_namespace.cpp">
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -291,6 +303,7 @@
     <ClInclude Include="..\..\..\hpx\runtime\threads\policies\abp_queue_scheduler.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\threads\policies\accel_defs.h" />
     <ClInclude Include="..\..\..\hpx\runtime\threads\policies\accel_fifo.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\threads\policies\hierarchy_scheduler.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\threads\policies\local_priority_queue_scheduler.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\threads\policies\queue_helpers.hpp" />
     <ClInclude Include="..\..\..\hpx\runtime\threads\policies\thread_deque.hpp" />
