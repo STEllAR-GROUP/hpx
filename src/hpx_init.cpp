@@ -612,15 +612,12 @@ namespace hpx
                     "--queueing=priority_local only");
             }
 #endif
-            std::size_t arity = 2;
-            if (vm.count("hierarchy-arity")) {
-                arity = vm["hierarchy-arity"].as<std::size_t>();
-            }
             // scheduling policy
-            typedef hpx::threads::policies::hierarchy_scheduler
-                queue_policy;
-            queue_policy::init_parameter_type
-                init(num_threads, arity, 1000);
+            typedef hpx::threads::policies::hierarchy_scheduler queue_policy;
+            std::size_t arity = 2;
+            if (vm.count("hierarchy-arity"))
+                arity = vm["hierarchy-arity"].as<std::size_t>();
+            queue_policy::init_parameter_type init(num_threads, arity, 1000);
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<queue_policy> runtime_type;
@@ -937,6 +934,14 @@ namespace hpx
             // even if this information is only used by the AGAS server).
             ini_config += "hpx.localities=" +
                 boost::lexical_cast<std::string>(num_localities);
+
+//             // If we are running on one locality we should not throttle the 
+//             // number of concurrent AGAS resolve requests.
+//             if (1 == num_localities) {
+//                 ini_config += "hpx.agas.max_resolve_requests=" +
+//                     boost::lexical_cast<std::string>(
+//                         (std::numeric_limits<int>::max)());
+//             }
 
             // FIXME: AGAS V2: if a locality is supposed to run the AGAS
             //        service only and requests to use 'priority_local' as the
