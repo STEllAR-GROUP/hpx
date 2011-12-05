@@ -612,11 +612,15 @@ namespace hpx
                     "--queueing=priority_local only");
             }
 #endif
+            std::size_t arity = 2;
+            if (vm.count("hierarchy-arity")) {
+                arity = vm["hierarchy-arity"].as<std::size_t>();
+            }
             // scheduling policy
             typedef hpx::threads::policies::hierarchy_scheduler
                 queue_policy;
             queue_policy::init_parameter_type
-                init(num_threads, vm["hierarchy-arity"].as<std::size_t>(), 1000);
+                init(num_threads, arity, 1000);
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<queue_policy> runtime_type;
