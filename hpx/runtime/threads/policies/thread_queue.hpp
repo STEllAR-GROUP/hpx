@@ -299,6 +299,18 @@ namespace hpx { namespace threads { namespace policies
         {
             return work_items_count_ + new_tasks_count_;
         }
+        ///////////////////////////////////////////////////////////////////////
+        // This returns the current length of the work queue
+        boost::int64_t get_work_length() const
+        {
+            return work_items_count_;
+        }
+        ///////////////////////////////////////////////////////////////////////
+        // This returns the current length of the work queue
+        boost::int64_t get_task_length() const
+        {
+            return new_tasks_count_;
+        }
 
         ///////////////////////////////////////////////////////////////////////
         // create a new thread and schedule it if the initial state is equal to
@@ -350,6 +362,57 @@ namespace hpx { namespace threads { namespace policies
                 ec = make_success_code();
 
             return invalid_thread_id;     // thread has not been created yet
+        }
+
+        void move_work_items_from(
+            thread_queue<Global> *src
+          , boost::int64_t count
+          , std::size_t num_thread
+        )
+        {
+            boost::int64_t actual_count = 0;
+            for(;;)//boost::int64_t i = 0; i < src->work_items_count_; ++i)
+            {
+                threads::thread * trd;
+                if(dequeue(src->work_items_, trd, num_thread))
+                {
+                    --src->work_items_count_;
+                    enqueue(work_items_, trd, num_thread);
+                    ++work_items_count_;
+                    ++actual_count;
+                    if(actual_count == count)
+                    {
+                        break;
+                    }
+                }
+                else
+                    break;
+            }
+        }
+
+        void move_task_items_from(
+            thread_queue<Global> *src
+          , boost::int64_t count
+        )
+        {
+            boost::int64_t actual_count = 0;
+            for(;;)//boost::int64_t i = 0; i < src->new_tasks_count_; ++i)
+            {
+                task_description * td;
+                if(src->new_tasks_.dequeue(td))
+                {
+                    --src->new_tasks_count_;
+                    new_tasks_.enqueue(td);
+                    ++new_tasks_count_;
+                    ++actual_count;
+                    if(actual_count == count)
+                    {
+                        break;
+                    }
+                }
+                else
+                    break;
+            }
         }
 
         /// Return the next thread to be executed, return false if non is

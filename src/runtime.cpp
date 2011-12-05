@@ -743,3 +743,7 @@ template HPX_EXPORT class hpx::runtime_impl<
     hpx::threads::policies::abp_queue_scheduler,
     hpx::threads::policies::callback_notifier>;
 
+template HPX_EXPORT class hpx::runtime_impl<
+    hpx::threads::policies::hierarchy_scheduler,
+    hpx::threads::policies::callback_notifier>;
+

@@ -531,7 +531,7 @@ namespace hpx
         }
 
         ///////////////////////////////////////////////////////////////////////
-        // abp scheduler: local deques for each OS thread, with work
+        //  and hierarchyabp scheduler: local deques for each OS thread, with work
         // stealing from the "bottom" of each.
         int run_abp(hpx_main_func f, boost::program_options::variables_map& vm,
             runtime_mode mode, std::vector<std::string> const& ini_config,
@@ -558,6 +558,42 @@ namespace hpx
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<abp_queue_policy> runtime_type;
+            runtime_type rt(mode, init, vm["hpx-config"].as<std::string>(),
+                ini_config);
+
+            return run(rt, f, vm, mode, startup, shutdown, num_threads,
+                num_localities);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // hierarchical scheduler: The thread queues are built up hierarchically
+        // this avoids contention during work stealing
+        int run_hierarchy(hpx_main_func f, boost::program_options::variables_map& vm,
+            runtime_mode mode, std::vector<std::string> const& ini_config,
+            startup_function_type const& startup,
+            shutdown_function_type const& shutdown, std::size_t num_threads,
+            std::size_t num_localities)
+        {
+            if (vm.count("high-priority-threads")) {
+                throw std::logic_error("Invalid command line option "
+                    "--high-priority-threads, valid for "
+                    "--queueing=priority_local only.");
+            }
+#if defined(BOOST_WINDOWS)
+            if (vm.count("numa-sensitive")) {
+                throw std::logic_error("Invalid command line option "
+                    "--numa-sensitive, valid for "
+                    "--queueing=priority_local only");
+            }
+#endif
+            // scheduling policy
+            typedef hpx::threads::policies::hierarchy_scheduler
+                queue_policy;
+            queue_policy::init_parameter_type
+                init(num_threads, vm["hierarchy-arity"].as<std::size_t>(), 1000);
+
+            // Build and configure this runtime instance.
+            typedef hpx::runtime_impl<queue_policy> runtime_type;
             runtime_type rt(mode, init, vm["hpx-config"].as<std::string>(),
                 ini_config);
 
@@ -906,6 +942,12 @@ namespace hpx
                 // abp scheduler: local deques for each OS thread, with work
                 // stealing from the "bottom" of each.
                 result = detail::run_abp(f, vm, mode, ini_config,
+                    startup, shutdown, num_threads, num_localities);
+            }
+            else if (0 == std::string("hierarchy").find(queueing)) {
+                // abp scheduler: local deques for each OS thread, with work
+                // stealing from the "bottom" of each.
+                result = detail::run_hierarchy(f, vm, mode, ini_config,
                     startup, shutdown, num_threads, num_localities);
             }
             else {
