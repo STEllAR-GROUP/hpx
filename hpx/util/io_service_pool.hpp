@@ -98,7 +98,7 @@ namespace hpx { namespace util
         HPX_STD_FUNCTION<void()> on_start_thread_;
         HPX_STD_FUNCTION<void()> on_stop_thread_;
 
-#if defined(_DEBUG)
+#if defined(DEBUG)
         char const* pool_name_;
 #endif
     };

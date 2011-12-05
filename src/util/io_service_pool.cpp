@@ -26,8 +26,10 @@ namespace hpx { namespace util
             HPX_STD_FUNCTION<void()> on_stop_thread,
             char const* pool_name)
       : next_io_service_(0), stopped_(false), pool_size_(pool_size),
-        on_start_thread_(on_start_thread), on_stop_thread_(on_stop_thread),
-        pool_name_(pool_name)
+        on_start_thread_(on_start_thread), on_stop_thread_(on_stop_thread)
+#if defined(DEBUG)
+      , pool_name_(pool_name)
+#endif
     {
         if (pool_size == 0)
         {
@@ -50,8 +52,10 @@ namespace hpx { namespace util
     io_service_pool::io_service_pool(HPX_STD_FUNCTION<void()> on_start_thread,
             HPX_STD_FUNCTION<void()> on_stop_thread, char const* pool_name)
       : next_io_service_(0), stopped_(false), pool_size_(2),
-        on_start_thread_(on_start_thread), on_stop_thread_(on_stop_thread),
-        pool_name_(pool_name)
+        on_start_thread_(on_start_thread), on_stop_thread_(on_stop_thread)
+#if defined(DEBUG)
+      , pool_name_(pool_name)
+#endif
     {
         for (std::size_t i = 0; i < pool_size_; ++i)
         {
