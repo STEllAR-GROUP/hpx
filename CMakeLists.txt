@@ -672,7 +672,11 @@ else()
       set(hpx_LIBRARIES ${hpx_LIBRARIES} ${GOOGLE_PERFTOOLS_LIBRARY})
       include_directories(${GOOGLE_PERFTOOLS_INCLUDE_DIR})
       add_definitions(-DHPX_GOOGLE_PERFTOOLS)
+    else()
+      set(GOOGLE_PERFTOOLS_LIBRARY "")
     endif()
+  else()
+    set(GOOGLE_PERFTOOLS_LIBRARY "")
   endif()
 
   set(HPX_MALLOC "TCMalloc" CACHE STRING
