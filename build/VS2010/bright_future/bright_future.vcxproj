@@ -67,7 +67,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;HPX_ACTION_ARGUMENT_LIMIT=6;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;HPX_ACTION_ARGUMENT_LIMIT=10;HPX_COMPONENT_CREATE_ARG_MAX=10;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -132,6 +132,11 @@
     <ProjectReference Include="remote_lse\remote_lse.vcxproj">
       <Project>{0615d767-9c56-4b20-9474-e023bb44d4ca}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="My Inspector Results\r002ti2\r002ti2.insp" />
+    <None Include="My Inspector Results\r005ti3\r005ti3.insp" />
+    <None Include="My Inspector Results\r008ti3\r008ti3.insp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
