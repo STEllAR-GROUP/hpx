@@ -138,9 +138,9 @@ namespace hpx { namespace threads { namespace policies
             BOOST_ASSERT(tree.size());
             for(size_type i = 0; i < tree.size(); ++i)
             {
-                for(size_type j = 0; j < tree.at(i).size(); ++j)
+                for(size_type j = 0; j < tree[i].size(); ++j)
                 {
-                    delete tree.at(i).at(j);
+                    delete tree[i][j];
                 }
             }
         }
@@ -155,8 +155,8 @@ namespace hpx { namespace threads { namespace policies
             // Return queue length of one specific queue.
             if (std::size_t(-1) != num_thread)
             {
-                BOOST_ASSERT(num_thread < tree.at(0).size());
-                return tree.at(0).at(num_thread)->get_queue_length();
+                BOOST_ASSERT(num_thread < tree[0].size());
+                return tree[0][num_thread]->get_queue_length();
             }
 
             // Cumulative queue lengths of all queues.
@@ -165,7 +165,7 @@ namespace hpx { namespace threads { namespace policies
             {
                 for(size_type j = 0; j < tree.at(i).size(); ++j)
                 {
-                    result += tree.at(i).at(j)->get_queue_length();
+                    result += tree[i][j]->get_queue_length();
                 }
             }
             return result;
@@ -180,17 +180,17 @@ namespace hpx { namespace threads { namespace policies
             // Return thread count of one specific queue.
             if (std::size_t(-1) != num_thread)
             {
-                BOOST_ASSERT(num_thread < tree.at(0).size());
-                return tree.at(0).at(num_thread)->get_thread_count(state);
+                BOOST_ASSERT(num_thread < tree[0].size());
+                return tree[0][num_thread]->get_thread_count(state);
             }
 
             // Return the cumulative count for all queues.
             boost::int64_t result = 0;
             for(size_type i = 0; i < tree.size(); ++i)
             {
-                for(size_type j = 0; j < tree.at(i).size(); ++j)
+                for(size_type j = 0; j < tree[i].size(); ++j)
                 {
-                    result += tree.at(i).at(j)->get_thread_count(state);
+                    result += tree[i][j]->get_thread_count(state);
                 }
             }
             return result;
@@ -202,9 +202,9 @@ namespace hpx { namespace threads { namespace policies
             BOOST_ASSERT(tree.size());
             for(size_type i = 0; i < tree.size(); ++i)
             {
-                for(size_type j = 0; j < tree.at(i).size(); ++j)
+                for(size_type j = 0; j < tree[i].size(); ++j)
                 {
-                    tree.at(i).at(j)->abort_all_suspended_threads(j);
+                    tree[i][j]->abort_all_suspended_threads(j);
                 }
             }
         }
@@ -216,9 +216,9 @@ namespace hpx { namespace threads { namespace policies
             bool empty = true;
             for(size_type i = 0; i < tree.size(); ++i)
             {
-                for(size_type j = 0; j < tree.at(i).size(); ++j)
+                for(size_type j = 0; j < tree[i].size(); ++j)
                 {
-                    empty = tree.at(i).at(j)->cleanup_terminated() && empty;
+                    empty = tree[i][j]->cleanup_terminated() && empty;
                 }
             }
             return empty;
@@ -233,7 +233,7 @@ namespace hpx { namespace threads { namespace policies
         {
             BOOST_ASSERT(tree.size());
             BOOST_ASSERT(tree.back().size());
-            return tree.back().at(0)->create_thread(data, initial_state,
+            return tree.back()[0]->create_thread(data, initial_state,
                 run_now, 0, ec);
         }
 
@@ -244,35 +244,25 @@ namespace hpx { namespace threads { namespace policies
           , std::size_t num_thread
         )
         {
-            if(level >= tree.size())
+            if(level == tree.size())
                 return;
 
-            /*
-            BOOST_ASSERT(tree.size());
-            std::cout
-                << "transfer threads from "
-                << idx
-                << " to "
-                << parent
-                << " ("
-                << level
-                << ")\n";
-                */
             BOOST_ASSERT(level > 0);
             BOOST_ASSERT(level < tree.size());
             BOOST_ASSERT(idx < tree.at(level).size());
             BOOST_ASSERT(parent < tree.at(level-1).size());
 
-            thread_queue<false> * tq = tree.at(level).at(idx);
-            if(tq->get_work_length() == 0)
+            thread_queue<false> * tq = tree[level][idx];
+			boost::int64_t num = tq->get_work_length();
+            if(num == 0)
             {
-                transfer_threads(idx/d, idx, level + 1, num_thread);
+				transfer_threads(idx/d, idx, level + 1, num_thread);
             }
 
-            thread_queue<false> * dest = tree.at(level-1).at(parent);
+            thread_queue<false> * dest = tree[level-1][parent];
             dest->move_work_items_from(
                 tq
-              , tq->get_work_length()/d + 1
+              , num/d + 1
               , num_thread
             );
         }
@@ -283,16 +273,16 @@ namespace hpx { namespace threads { namespace policies
             std::size_t& idle_loop_count, threads::thread*& thrd)
         {
             BOOST_ASSERT(tree.size());
-            BOOST_ASSERT(num_thread < tree.at(0).size());
+            BOOST_ASSERT(num_thread < tree[0].size());
 
             //std::cout << "get next thread " << num_thread << "\n";
-            thread_queue<false> * tq = tree.at(0).at(num_thread);
+            thread_queue<false> * tq = tree[0][num_thread];
 
             // check if we need to collect new work from parents
-            if(tq->get_work_length() == 0)
-            {
-                transfer_threads(num_thread/d, num_thread, 1, num_thread);
-            }
+			if(tq->get_work_length() == 0)
+			{
+				transfer_threads(num_thread/d, num_thread, 1, num_thread);
+			}
 
             if(tq->get_next_thread(thrd, num_thread))
                 return true;
@@ -305,7 +295,7 @@ namespace hpx { namespace threads { namespace policies
         {
             BOOST_ASSERT(tree.size());
             BOOST_ASSERT(tree.back().size());
-            tree.back().at(0)->schedule_thread(thrd, 0);
+            tree.back()[0]->schedule_thread(thrd, 0);
         }
 
         /// Destroy the passed thread as it has been terminated
@@ -313,9 +303,9 @@ namespace hpx { namespace threads { namespace policies
         {
             for(size_type i = 0; i < tree.size(); ++i)
             {
-                for(size_type j = 0; j < tree.at(i).size(); ++j)
+                for(size_type j = 0; j < tree[i].size(); ++j)
                 {
-                    if(tree.at(i).at(j)->destroy_thread(thrd))
+                    if(tree[i][j]->destroy_thread(thrd))
                         return true;
                 }
             }
@@ -329,43 +319,26 @@ namespace hpx { namespace threads { namespace policies
         )
         {
             BOOST_ASSERT(level > 0);
-            if(level >= tree.size())
+            if(level == tree.size())
                 return;
-
-            /*
-            BOOST_ASSERT(tree.size());
-            std::cout
-                << "transfer tasks from "
-                << idx
-                << " to "
-                << parent
-                << " ("
-                << level
-                << ")\n";
-                */
 
             BOOST_ASSERT(level > 0);
             BOOST_ASSERT(level < tree.size());
             BOOST_ASSERT(idx < tree.at(level).size());
             BOOST_ASSERT(parent < tree.at(level-1).size());
 
-            thread_queue<false> * tq = tree.at(level).at(idx);
+            thread_queue<false> * tq = tree[level][idx];
 
-            if(tq->get_task_length() == 0)
-            {
-                transfer_tasks(idx/d, idx, level + 1);
-            }
+			boost::int64_t num = tq->get_task_length();
+			if(num == 0)
+			{
+				transfer_tasks(idx/d, idx, level + 1);
+			}
 
-            /*
-            std::cout << tree.size() << "\n";
-            std::cout << tree.at(level).size() << "\n";
-            std::cout << tree.at(level-1).size() << "\n";
-            */
-
-            thread_queue<false> * dest = tree.at(level-1).at(parent);
+            thread_queue<false> * dest = tree[level-1][parent];
             dest->move_task_items_from(
                 tq
-              , tq->get_task_length()/d + 1
+              , num/d + 1
             );
         }
 
@@ -380,12 +353,13 @@ namespace hpx { namespace threads { namespace policies
             BOOST_ASSERT(num_thread < tree.at(0).size());
             std::size_t added = 0;
 
-            if(tree.at(0).at(num_thread)->get_task_length() == 0)
-            {
-                transfer_tasks(num_thread/d, num_thread, 1);
-            }
+			thread_queue<false> * tq = tree[0][num_thread];
+			if(tq->get_task_length() == 0)
+			{
+				transfer_tasks(num_thread/d, num_thread, 1);
+			}
 
-            bool result = tree.at(0).at(num_thread)->wait_or_add_new(
+            bool result = tq->wait_or_add_new(
                 num_thread, running, idle_loop_count, added);
 
             return result && 0 == added;
