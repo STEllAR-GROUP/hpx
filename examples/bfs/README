@@ -1,15 +1,4 @@
 Code written/maintained by Matt Anderson (matt@phys.lsu.edu)
 
-This code implements graph traversal using Breadth-first search.  It reads the graph in
-from the file g1.txt as default and outputs the parent and level of each node.
-
-Options:  --n gives the maximum number of nodes to search in the graph
-          --root selects the node number specified as the root
-          --graph reads in a different graph file
-
- Example:
-
-   bfs_client --n 64 --graph g7.txt --root 7
-
-  would look for the file g7.txt, read in the first 64 nodes, and traverse the graph with root at node
-number 7.
+This code implements the graph 500 problem using Breadth-first search.  The provided 
+files g10.txt and g10_search.txt are generated from the graph 500 reference specification.

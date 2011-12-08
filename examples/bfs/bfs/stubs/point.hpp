@@ -15,8 +15,7 @@ namespace bfs { namespace stubs
     ///////////////////////////////////////////////////////////////////////////
     struct point : hpx::components::stub_base<server::point>
     {
-        /// Initialize the \a bfs::server::point instance with the
-        /// given graph file.  
+        /// Kernel 1
         static hpx::lcos::promise<void>
         init_async(hpx::naming::id_type const& gid,std::size_t objectid,
             std::size_t max_num_neighbors,std::string graphfile)
@@ -26,14 +25,32 @@ namespace bfs { namespace stubs
                 max_num_neighbors,graphfile);
         }
 
-        /// Initialize the \a bfs::server::point instance with the
-        /// given graph file.  
+        /// Kernel 1
         static void init(hpx::naming::id_type const& gid,std::size_t objectid,
             std::size_t max_num_neighbors,std::string const& graphfile)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the promise.
             init_async(gid,objectid,max_num_neighbors,graphfile).get();
+        }
+
+        // Read the graph
+        static hpx::lcos::promise<void>
+        read_async(hpx::naming::id_type const& gid,std::size_t objectid,std::size_t grainsize,
+            std::size_t max_num_neighbors,std::string graphfile)
+        {
+            typedef server::point::read_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid,objectid,grainsize,
+                max_num_neighbors,graphfile);
+        }
+
+        // Read the graph
+        static void read(hpx::naming::id_type const& gid,std::size_t objectid,std::size_t grainsize,
+            std::size_t max_num_neighbors,std::string const& graphfile)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise.
+            read_async(gid,objectid,grainsize,max_num_neighbors,graphfile).get();
         }
 
         /// Traverse the graph. 
