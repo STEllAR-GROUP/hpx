@@ -39,20 +39,20 @@ namespace bfs { namespace stubs
         /// Traverse the graph. 
         static hpx::lcos::promise<std::vector<std::size_t> >
         traverse_async(hpx::naming::id_type const& gid,std::size_t level,
-            std::size_t parent)
+            std::size_t parent,std::size_t edge)
         {
             typedef server::point::traverse_action action_type;
-            return hpx::lcos::eager_future<action_type>(gid,level,parent);
+            return hpx::lcos::eager_future<action_type>(gid,level,parent,edge);
         }
 
         /// Traverse the graph. 
         static std::vector<std::size_t>
         traverse(hpx::naming::id_type const& gid,std::size_t level,
-            std::size_t parent)
+            std::size_t parent,std::size_t edge)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the promise.
-            return traverse_async(gid,level,parent).get();
+            return traverse_async(gid,level,parent,edge).get();
         }
     };
 }}

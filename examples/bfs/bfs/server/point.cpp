@@ -24,8 +24,10 @@ namespace bfs { namespace server
         idx_ = objectid;
         grainsize_ = grainsize;
         neighbors_.resize(grainsize);
+        visited_.resize(grainsize);
         for (std::size_t i=0;i<grainsize;i++) {
           neighbors_[i].reserve(max_num_neighbors);
+          visited_[i] = false;
         }
 
         for (std::size_t i=0;i<nodelist.size();i++) {
@@ -35,33 +37,30 @@ namespace bfs { namespace server
             neighbors_[node-idx_*grainsize_].push_back(neighbor); 
           }
           // symmetrize
-          if ( neighbor >= idx_*grainsize && neighbor < (idx_+1)*grainsize && node != neighbor ) {
+          if ( neighbor >= idx_*grainsize_ && neighbor < (idx_+1)*grainsize && node != neighbor ) {
             neighbors_[neighbor-idx_*grainsize_].push_back(node); 
           }
         } 
     }
 
-    std::vector<std::size_t> point::traverse(std::size_t level,std::size_t parent)
+    std::vector<std::size_t> point::traverse(std::size_t level,std::size_t parent,std::size_t edge)
     {
-            std::vector<std::size_t> tmp;
-            return tmp;
-#if 0
-        if ( visited_ == false ) {
-            visited_ = true;
+
+        if ( visited_[edge-idx_*grainsize_] == false ) {
+            visited_[edge-idx_*grainsize_] = true;
             parent_ = parent;
             level_ = level; 
 
-            hpx::cout << ( boost::format("node id %1%, parent id %2%, level %3%\n")
-                         % idx_ % parent_ % level_) << hpx::flush; 
+            //hpx::cout << ( boost::format("node id %1%, parent id %2%, level %3%\n")
+            //             % idx_ % parent_ % level_) << hpx::flush; 
 
             // Return the neighbors.
-            return neighbors_;
+            return neighbors_[edge-idx_*grainsize_];
         } else {
             // Don't return neighbors.
             std::vector<std::size_t> tmp;
             return tmp;
         }
-#endif
     }
 }}
 

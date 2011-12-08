@@ -31,7 +31,7 @@ namespace bfs { namespace server
         std::vector<std::size_t> const& neighborlist);
 
         /// Traverse the graph. 
-        std::vector<std::size_t> traverse(std::size_t level, std::size_t parent);
+        std::vector<std::size_t> traverse(std::size_t level, std::size_t parent,std::size_t edge);
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an
@@ -60,7 +60,7 @@ namespace bfs { namespace server
             &point::init
         > init_action;
 
-        typedef hpx::actions::result_action2<
+        typedef hpx::actions::result_action3<
             // Component server type.
             point,
             // Return type.
@@ -70,6 +70,7 @@ namespace bfs { namespace server
             // Arguments of this action.
             std::size_t,
             std::size_t,
+            std::size_t,
             // Method bound to this action.
             &point::traverse
         > traverse_action;
@@ -77,7 +78,7 @@ namespace bfs { namespace server
     private:
         std::size_t idx_;
         std::size_t level_;
-        bool visited_;
+        std::vector<bool> visited_;
         std::vector< std::vector<std::size_t> > neighbors_;
         std::size_t parent_;
         std::size_t grainsize_;
