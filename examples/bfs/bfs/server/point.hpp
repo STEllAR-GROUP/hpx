@@ -25,12 +25,10 @@ namespace bfs { namespace server
         ///////////////////////////////////////////////////////////////////////
         // Exposed functionality of this component.
 
-        void read(std::size_t objectid,std::size_t grainsize,
-        std::size_t max_num_neighbors,std::string const& graphfile);
-
-        /// Initialize the point with the given graph file.  
-        void init(std::size_t objectid,std::size_t max_num_neighbors,
-            std::string const& graphfile);
+        // kernel 1
+        void init(std::size_t objectid,std::size_t grainsize,
+        std::size_t max_num_neighbors,std::vector<std::size_t> const& nodelist,
+        std::vector<std::size_t> const& neighborlist);
 
         /// Traverse the graph. 
         std::vector<std::size_t> traverse(std::size_t level, std::size_t parent);
@@ -44,11 +42,10 @@ namespace bfs { namespace server
         enum actions
         {
             point_init = 0,
-            point_traverse = 1,
-            point_read = 2
+            point_traverse = 1
         };
 
-        typedef hpx::actions::action3<
+        typedef hpx::actions::action5<
             // Component server type.
             point,
             // Action code.
@@ -56,24 +53,12 @@ namespace bfs { namespace server
             // Arguments of this action.
             std::size_t,
             std::size_t,
-            std::string const&,
+            std::size_t,
+            std::vector<std::size_t> const&,
+            std::vector<std::size_t> const&,
             // Method bound to this action.
             &point::init
         > init_action;
-
-        typedef hpx::actions::action4<
-            // Component server type.
-            point,
-            // Action code.
-            point_init,
-            // Arguments of this action.
-            std::size_t,
-            std::size_t,
-            std::size_t,
-            std::string const&,
-            // Method bound to this action.
-            &point::read
-        > read_action;
 
         typedef hpx::actions::result_action2<
             // Component server type.
@@ -103,10 +88,6 @@ namespace bfs { namespace server
 HPX_REGISTER_ACTION_DECLARATION_EX(
     bfs::server::point::init_action,
     bfs_point_init_action);
-
-HPX_REGISTER_ACTION_DECLARATION_EX(
-    bfs::server::point::read_action,
-    bfs_point_read_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     bfs::server::point::traverse_action,

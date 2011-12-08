@@ -17,8 +17,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace bfs { namespace server
 {
-    void point::read(std::size_t objectid,std::size_t grainsize,
-        std::size_t max_num_neighbors,std::string const& graphfile)
+    void point::init(std::size_t objectid,std::size_t grainsize,
+        std::size_t max_num_neighbors,std::vector<std::size_t> const& nodelist,
+        std::vector<std::size_t> const& neighborlist)
     {
         idx_ = objectid;
         grainsize_ = grainsize;
@@ -27,32 +28,17 @@ namespace bfs { namespace server
           neighbors_[i].reserve(max_num_neighbors);
         }
 
-        // Read in the graph file
-        std::string line;
-        std::string val1,val2;
-        std::ifstream myfile;
-        myfile.open(graphfile);
-        if (myfile.is_open()) {
-            while (myfile.good()) { 
-                while (std::getline(myfile,line)) {
-                    std::istringstream isstream(line);
-                    std::getline(isstream,val1,' ');
-                    std::getline(isstream,val2,' ');
-                    std::size_t node = boost::lexical_cast<std::size_t>(val1);   
-                    std::size_t neighbor = boost::lexical_cast<std::size_t>(val2);   
-                    if ( node >= idx_*grainsize && node < (idx_+1)*grainsize && node != neighbor ) {
-                        neighbors_[node-idx_*grainsize_].push_back(neighbor); 
-                    }
-                }
-            }
+        for (std::size_t i=0;i<nodelist.size();i++) {
+          std::size_t node = nodelist[i];
+          std::size_t neighbor = neighborlist[i];
+          if ( node >= idx_*grainsize && node < (idx_+1)*grainsize && node != neighbor ) {
+            neighbors_[node-idx_*grainsize_].push_back(neighbor); 
+          }
+          // symmetrize
+          if ( neighbor >= idx_*grainsize && neighbor < (idx_+1)*grainsize && node != neighbor ) {
+            neighbors_[neighbor-idx_*grainsize_].push_back(node); 
+          }
         } 
-    }
-
-    void point::init(std::size_t objectid,std::size_t max_num_neighbors,
-        std::string const& graphfile)
-    {
-         // make this a vector
-        //visited_ = false;
     }
 
     std::vector<std::size_t> point::traverse(std::size_t level,std::size_t parent)

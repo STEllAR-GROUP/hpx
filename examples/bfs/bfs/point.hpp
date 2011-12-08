@@ -34,40 +34,26 @@ namespace bfs
         ///////////////////////////////////////////////////////////////////////
         // Exposed functionality of this component.
 
-        /// Kernel 1
+        // kernel 1
         hpx::lcos::promise<void> init_async(std::size_t objectid,
-            std::size_t max_num_neighbors,std::string const& graphfile)
+            std::size_t grainsize,std::size_t max_num_neighbors,
+            std::vector<std::size_t> const& nodefile,
+            std::vector<std::size_t> const& neighborfile)
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::init_async(gid_,objectid,max_num_neighbors,
-                graphfile);
+            return this->base_type::init_async(gid_,objectid,grainsize,
+                                                max_num_neighbors,nodefile,neighborfile);
         }
 
-        /// Kernel 1
-        void init(std::size_t objectid,std::size_t max_num_neighbors,
-            std::string const& graphfile)
+        // kernel 1
+        void init(std::size_t objectid,std::size_t grainsize,
+            std::size_t max_num_neighbors,
+            std::vector<std::size_t> const& nodefile,
+            std::vector<std::size_t> const& neighborfile)
         {
             BOOST_ASSERT(gid_);
-            this->base_type::init_async(gid_,objectid,max_num_neighbors,
-                graphfile);
-        }
-
-        // Read in the graph
-        hpx::lcos::promise<void> read_async(std::size_t objectid,
-            std::size_t grainsize,std::size_t max_num_neighbors,std::string const& graphfile)
-        {
-            BOOST_ASSERT(gid_);
-            return this->base_type::read_async(gid_,objectid,grainsize,
-                                                max_num_neighbors, graphfile);
-        }
-
-        // Read in the graph
-        void read(std::size_t objectid,std::size_t grainsize,
-            std::size_t max_num_neighbors, std::string const& graphfile)
-        {
-            BOOST_ASSERT(gid_);
-            this->base_type::read_async(gid_,objectid, grainsize,
-                                        max_num_neighbors, graphfile);
+            this->base_type::init_async(gid_,objectid, grainsize,
+                                        max_num_neighbors,nodefile,neighborfile);
         }
 
         /// Traverse the graph. 

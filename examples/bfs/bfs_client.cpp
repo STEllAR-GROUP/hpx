@@ -44,6 +44,53 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         std::size_t ne = num_elements/grainsize;
 
+        // Read in the graph file -- timing not reported
+        hpx::util::high_resolution_timer readtime;
+        std::vector<std::size_t> nodelist,neighborlist;
+        {
+          std::string line;
+          std::string val1,val2;
+          std::ifstream myfile;
+          myfile.open(graphfile);
+          if (myfile.is_open()) {
+            while (myfile.good()) {
+              while (std::getline(myfile,line)) {
+                std::istringstream isstream(line);
+                std::getline(isstream,val1,' ');
+                std::getline(isstream,val2,' ');
+                std::size_t node = boost::lexical_cast<std::size_t>(val1);
+                std::size_t neighbor = boost::lexical_cast<std::size_t>(val2);
+                nodelist.push_back(node);
+                neighborlist.push_back(neighbor);
+              }
+            }
+          }
+        }
+
+        // read in the searchfile containing the root vertices to search -- timing not reported
+        std::vector<std::size_t> searchroot;
+        {
+          std::string line;
+          std::string val1;
+          std::ifstream myfile;
+          myfile.open(searchfile);
+          if (myfile.is_open()) {
+            while (myfile.good()) {
+              while (std::getline(myfile,line)) {
+                  std::istringstream isstream(line);
+                  std::getline(isstream,val1);
+                  std::size_t root = boost::lexical_cast<std::size_t>(val1);
+                  searchroot.push_back(root);
+              }
+            }
+          }
+        }
+        std::cout << "Elapsed time during read: " << readtime.elapsed() << " [s]" << std::endl;
+
+        ///////////////////////////////////////////////////////////////////////
+        // KERNEL 1  --- TIMED
+        hpx::util::high_resolution_timer kernel1time;
+
         ///////////////////////////////////////////////////////////////////////
         // Create a distributing factory locally. The distributing factory can
         // be used to create blocks of components that are distributed across
@@ -70,43 +117,11 @@ int hpx_main(boost::program_options::variables_map &vm)
         init(hpx::components::server::locality_results(blocks), points);
 
         ///////////////////////////////////////////////////////////////////////
-        // Read in the graph and the searchfile
-        hpx::util::high_resolution_timer readtime;
-        std::vector<hpx::lcos::promise<void> > read_phase;
+        // Put the graph in the data structure
+        std::vector<hpx::lcos::promise<void> > init_phase;
 
         for (std::size_t i=0;i<ne;i++) {
-          read_phase.push_back(points[i].read_async(i,grainsize,max_num_neighbors,graphfile));
-        }
-
-        // read in the searchfile containing the root vertices to search
-        std::vector<std::size_t> searchroot;
-        std::string line;
-        std::string val1;
-        std::ifstream myfile;
-        myfile.open(searchfile);
-        if (myfile.is_open()) {
-            while (myfile.good()) {
-                while (std::getline(myfile,line)) {
-                    std::istringstream isstream(line);
-                    std::getline(isstream,val1);
-                    std::size_t root = boost::lexical_cast<std::size_t>(val1);
-                    searchroot.push_back(root);
-                }
-            }
-        }
-
-        // We have to wait for the initialization to complete before we begin
-        // the next phase of computation. 
-        hpx::lcos::wait(read_phase);
-        std::cout << "Elapsed time during read: " << readtime.elapsed() << " [s]" << std::endl;
-#if 0
-        ///////////////////////////////////////////////////////////////////////
-        // KERNEL 1  --- TIMED
-        // Initialize the points with the data from the input file. 
-        std::vector<hpx::lcos::promise<void> > initial_phase;
-
-        for (std::size_t i=0;i<ne;i++) {
-          initial_phase.push_back(points[i].init_async(i,max_num_neighbors,graphfile));
+          init_phase.push_back(points[i].init_async(i,grainsize,max_num_neighbors,nodelist,neighborlist));
         }
 
         // While we're waiting for the initialization phase to complete, we 
@@ -119,9 +134,12 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         // We have to wait for the initialization to complete before we begin
         // the next phase of computation. 
-        hpx::lcos::wait(initial_phase);
-
+        hpx::lcos::wait(init_phase);
+        std::cout << "Elapsed time during kernel 1: " << kernel1time.elapsed() << " [s]" << std::endl;
+#if 0
         ///////////////////////////////////////////////////////////////////////
+        // KERNEL 2  --- TIMED
+
         std::vector<hpx::lcos::promise<std::vector<std::size_t> > > traverse_phase;
 
         // Traverse the graph.

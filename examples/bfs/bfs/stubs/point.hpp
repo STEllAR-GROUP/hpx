@@ -15,42 +15,25 @@ namespace bfs { namespace stubs
     ///////////////////////////////////////////////////////////////////////////
     struct point : hpx::components::stub_base<server::point>
     {
-        /// Kernel 1
+        // Read the graph
         static hpx::lcos::promise<void>
-        init_async(hpx::naming::id_type const& gid,std::size_t objectid,
-            std::size_t max_num_neighbors,std::string graphfile)
+        init_async(hpx::naming::id_type const& gid,std::size_t objectid,std::size_t grainsize,
+            std::size_t max_num_neighbors,std::vector<std::size_t> const& nodefile,
+                                          std::vector<std::size_t> const& neighborfile)
         {
             typedef server::point::init_action action_type;
-            return hpx::lcos::eager_future<action_type>(gid,objectid,
-                max_num_neighbors,graphfile);
-        }
-
-        /// Kernel 1
-        static void init(hpx::naming::id_type const& gid,std::size_t objectid,
-            std::size_t max_num_neighbors,std::string const& graphfile)
-        {
-            // The following get yields control while the action above
-            // is executed and the result is returned to the promise.
-            init_async(gid,objectid,max_num_neighbors,graphfile).get();
-        }
-
-        // Read the graph
-        static hpx::lcos::promise<void>
-        read_async(hpx::naming::id_type const& gid,std::size_t objectid,std::size_t grainsize,
-            std::size_t max_num_neighbors,std::string graphfile)
-        {
-            typedef server::point::read_action action_type;
             return hpx::lcos::eager_future<action_type>(gid,objectid,grainsize,
-                max_num_neighbors,graphfile);
+                max_num_neighbors,nodefile,neighborfile);
         }
 
         // Read the graph
-        static void read(hpx::naming::id_type const& gid,std::size_t objectid,std::size_t grainsize,
-            std::size_t max_num_neighbors,std::string const& graphfile)
+        static void init(hpx::naming::id_type const& gid,std::size_t objectid,std::size_t grainsize,
+            std::size_t max_num_neighbors,std::vector<std::size_t> const& nodefile,
+                                          std::vector<std::size_t> const& neighborfile)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the promise.
-            read_async(gid,objectid,grainsize,max_num_neighbors,graphfile).get();
+            init_async(gid,objectid,grainsize,max_num_neighbors,nodefile,neighborfile).get();
         }
 
         /// Traverse the graph. 

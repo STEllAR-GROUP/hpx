@@ -31,9 +31,6 @@ HPX_REGISTER_ACTION_EX(
     bfs_point_type::wrapped_type::init_action,
     bfs_point_init_action);
 HPX_REGISTER_ACTION_EX(
-    bfs_point_type::wrapped_type::read_action,
-    bfs_point_read_action);
-HPX_REGISTER_ACTION_EX(
     bfs_point_type::wrapped_type::traverse_action,
     bfs_point_traverse_action);
 
