@@ -672,7 +672,6 @@ else()
     set(GOOGLE_PERFTOOLS_LIBRARY "")
   endif()
 
-
   if(NOT HPX_MALLOC)
     set(HPX_MALLOC "TCMalloc")
   endif() 
