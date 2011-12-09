@@ -83,6 +83,21 @@ namespace hpx { namespace threads { namespace policies
         typedef std::vector<level_type> tree_type;
         tree_type tree;
 
+		struct flag_type : boost::atomic<bool>
+		{
+			boost::atomic<bool> v;
+			flag_type() { v = false; }
+			flag_type(flag_type const & f) { v.store(f.load()); }
+			flag_type & operator=(flag_type const & f) { v.store(f.load()); return *this; }
+			flag_type & operator=(bool b) { v.store(b); return *this;}
+			bool operator==(bool b) { return v == b; }
+		};
+
+        typedef std::vector<flag_type > level_flag_type;
+        typedef std::vector<level_flag_type> flag_tree_type;
+        flag_tree_type work_flag_tree;
+        flag_tree_type task_flag_tree;
+
         typedef tree_type::size_type size_type;
         typedef tree_type::difference_type difference_type;
         size_type d;
@@ -100,13 +115,29 @@ namespace hpx { namespace threads { namespace policies
                       , new thread_queue<false>(max_queue_thread_count)
                     )
                 );
+                work_flag_tree.push_back(
+                    level_flag_type(
+                        1
+                    )
+                );
+                work_flag_tree.back()[0] = false;
+                task_flag_tree.push_back(
+                    level_flag_type(
+                        1
+                    )
+                );
+                task_flag_tree.back()[0] = false;
                 return;
             }
 
             level_type level(n);
+            work_flag_tree.push_back(level_flag_type(n));
+            task_flag_tree.push_back(level_flag_type(n));
             for(size_type i = 0; i < n; ++i)
             {
                 level.at(i) = new thread_queue<false>(max_queue_thread_count);
+                work_flag_tree.back()[i] = false;
+                task_flag_tree.back()[i] = false;
             }
 
             tree.push_back(level);
@@ -254,15 +285,32 @@ namespace hpx { namespace threads { namespace policies
 
             thread_queue<false> * tq = tree[level][idx];
 			boost::int64_t num = tq->get_work_length();
+            thread_queue<false> * dest = tree[level-1][parent];
             if(num == 0)
             {
-				transfer_threads(idx/d, idx, level + 1, num_thread);
+                if(work_flag_tree[level][idx] == false)
+                {
+                    work_flag_tree[level][idx] = true;
+                    transfer_threads(idx/d, idx, level + 1, num_thread);
+                    work_flag_tree[level][idx] = false;
+                }
+                else
+                {
+                    while(work_flag_tree[level][idx])
+                    {
+						#if defined(BOOST_WINDOWS)
+                    Sleep(1);
+#elif defined(BOOST_HAS_PTHREADS)
+                    sched_yield();
+#else
+#endif
+                    }
+                }
             }
 
-            thread_queue<false> * dest = tree[level-1][parent];
             dest->move_work_items_from(
                 tq
-              , num/d + 1
+              , tq->get_work_length()/d + 1
               , num_thread
             );
         }
@@ -332,13 +380,30 @@ namespace hpx { namespace threads { namespace policies
 			boost::int64_t num = tq->get_task_length();
 			if(num == 0)
 			{
-				transfer_tasks(idx/d, idx, level + 1);
+                if(task_flag_tree[level][idx] == false)
+                {
+                    task_flag_tree[level][idx] = true;
+                    transfer_tasks(idx/d, idx, level + 1);
+                    task_flag_tree[level][idx] = false;
+                }
+                else
+                {
+                    while(task_flag_tree[level][idx])
+                    {
+						#if defined(BOOST_WINDOWS)
+                    Sleep(1);
+#elif defined(BOOST_HAS_PTHREADS)
+                    sched_yield();
+#else
+#endif
+                    }
+                }
 			}
 
             thread_queue<false> * dest = tree[level-1][parent];
             dest->move_task_items_from(
                 tq
-              , num/d + 1
+              , tq->get_task_length()/d + 1
             );
         }
 

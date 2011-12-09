@@ -465,7 +465,7 @@ namespace hpx { namespace threads { namespace policies
         /// manager to allow for maintenance tasks to be executed in the
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
-        bool wait_or_add_new(std::size_t num_thread, bool running,
+        inline bool wait_or_add_new(std::size_t num_thread, bool running,
             std::size_t& idle_loop_count, std::size_t& added,
             thread_queue* addfrom_ = 0) HPX_HOT;
 
@@ -521,8 +521,57 @@ namespace hpx { namespace threads { namespace policies
 
     // FIXME: This function is HOT, we should probably disable logging here for
     // release builds. It'll slow us down, even with log level 0.
-    template <bool Global>
-    bool thread_queue<Global>::wait_or_add_new(std::size_t num_thread,
+    template <>
+    inline bool thread_queue<false>::wait_or_add_new(std::size_t num_thread,
+        bool running, std::size_t& idle_loop_count, std::size_t& added,
+        thread_queue* addfrom_)
+    {
+        thread_queue* addfrom = addfrom_ ? addfrom_ : this;
+
+        bool terminate = false;
+        while (0 == work_items_count_) {
+            // No obvious work has to be done, so a lock won't hurt too much
+            // but we lock only one of the threads, assuming this thread
+            // will do the maintenance
+            //
+            // We prefer to exit this while loop (some kind of very short
+            // busy waiting) to blocking on this lock. Locking fails either
+            // when a thread is currently doing thread maintenance, which
+            // means there might be new work, or the thread owning the lock
+            // just falls through to the wait below (no work is available)
+            // in which case the current thread (which failed to acquire
+            // the lock) will just retry to enter this loop.
+            util::try_lock_wrapper<mutex_type> lk(mtx_);
+            if (!lk)
+                break;            // avoid long wait on lock
+
+            // this thread acquired the lock, do maintenance and finally
+            // call wait() if no work is available
+//            LTM_(debug) << "tfunc(" << num_thread << "): queues empty"
+//                        << ", threads left: " << thread_map_.size();
+
+            // stop running after all PX threads have been terminated
+            bool added_new = add_new_always(added, addfrom, num_thread);
+            if (!added_new && !running) {
+                // Before exiting each of the OS threads deletes the
+                // remaining terminated PX threads
+                if (cleanup_terminated_locked()) {
+                    // we don't have any registered work items anymore
+                    //do_some_work();       // notify possibly waiting threads
+                    terminate = true;
+                    break;                // terminate scheduling loop
+                }
+            }
+            else {
+                cleanup_terminated_locked();
+            }
+			break;
+        }
+        return terminate;
+    }
+
+	template <>
+    inline bool thread_queue<true>::wait_or_add_new(std::size_t num_thread,
         bool running, std::size_t& idle_loop_count, std::size_t& added,
         thread_queue* addfrom_)
     {
@@ -531,7 +580,7 @@ namespace hpx { namespace threads { namespace policies
         // only one dedicated OS thread is allowed to acquire the
         // lock for the purpose of inserting the new threads into the
         // thread-map and deleting all terminated threads
-        if (Global && 0 == num_thread) {
+        if (0 == num_thread) {
             // first clean up terminated threads
             util::try_lock_wrapper<mutex_type> lk(mtx_);
             if (lk) {
@@ -585,9 +634,6 @@ namespace hpx { namespace threads { namespace policies
                 cleanup_terminated_locked();
             }
 
-            if (!Global)
-                break;
-
             if (added_new) {
                 // dump list of suspended threads once a second
                 if (HPX_UNLIKELY(LHPX_ENABLED(error) && addfrom->new_tasks_.empty())) {
@@ -625,7 +671,6 @@ namespace hpx { namespace threads { namespace policies
         }
         return terminate;
     }
-
 }}}
 
 #endif
