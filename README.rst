@@ -54,8 +54,8 @@ Windows
    to use. Select the x64 Visual Studio 10 compilers (they are usually the
    default if available).
 
-5) Press "Configure" again. Repeat this step until the "Generate" button becomes
-   clickable.
+5) If the "Generate" button is not clickable, press "Configure" again. Repeat
+   this step until the "Generate" button becomes clickable.
 
 6) Press "Generate".
 
