@@ -27,13 +27,13 @@
 #define HPX_VERSION_MINOR        7
 #define HPX_VERSION_SUBMINOR     0
 
-#define HPX_VERSION_DATE         20110818
+#define HPX_VERSION_DATE         20111109
 
 #if !defined(HPX_AGAS_VERSION)
     #define HPX_AGAS_VERSION 0x21
 #endif
 
-#define HPX_VERSION_TAG          "-trunk"
+#define HPX_VERSION_TAG          " Beta (codename \"Archaeopteryx\")"
 
 #if !defined(HPX_SVN_REVISION)
     #define HPX_SVN_REVISION     "$Revision$"
