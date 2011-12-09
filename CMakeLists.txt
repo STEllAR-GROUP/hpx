@@ -583,8 +583,9 @@ else()
 
   hpx_use_flag_if_available(-pthread)
 
-  set(HPX_MALLOC "TCMalloc" CACHE STRING
-    "HPX malloc allocator (default: tcmalloc)" FORCE)
+  if(NOT HPX_MALLOC)
+    set(HPX_MALLOC "TCMalloc")
+  endif() 
 
   find_package(HPX_TCMalloc)
   find_package(HPX_Jemalloc)
