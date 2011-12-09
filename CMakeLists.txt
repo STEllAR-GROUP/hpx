@@ -10,6 +10,15 @@
 cmake_minimum_required(VERSION 2.8.4 FATAL_ERROR)
 
 ################################################################################
+# Build type 
+################################################################################
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release")
+endif()
+
+set(CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}" CACHE STRING "Configuration types" FORCE)
+
+################################################################################
 # C++ overrides
 ################################################################################
 set(CMAKE_USER_MAKE_RULES_OVERRIDE_CXX
@@ -211,16 +220,16 @@ if(HPX_NATIVE_TLS)
 endif()
 
 ################################################################################
-# pxthread stack size
+# HPX-thread stack size
 ################################################################################
 if(NOT HPX_STACK_SIZE)
   if(MSVC)
-    set(HPX_STACK_SIZE "0x4000" CACHE STRING "pxthread stack size" FORCE)
+    set(HPX_STACK_SIZE "0x4000" CACHE STRING "HPX-thread stack size" FORCE)
   else()
-    set(HPX_STACK_SIZE "0x10000" CACHE STRING "pxthread stack size" FORCE)
+    set(HPX_STACK_SIZE "0x10000" CACHE STRING "HPX-thread stack size" FORCE)
   endif()
 else()
-  set(HPX_STACK_SIZE "${HPX_STACK_SIZE}" CACHE STRING "pxthread stack size" FORCE)
+  set(HPX_STACK_SIZE "${HPX_STACK_SIZE}" CACHE STRING "HPX-thread stack size" FORCE)
 endif()
 
 add_definitions(-DHPX_DEFAULT_STACK_SIZE=${HPX_STACK_SIZE})
@@ -228,10 +237,6 @@ add_definitions(-DHPX_DEFAULT_STACK_SIZE=${HPX_STACK_SIZE})
 ################################################################################
 # Compiler configuration
 ################################################################################
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release")
-endif()
-
 # Clear CMake defaults
 foreach(language CXX)
   set(CMAKE_${language}_FLAGS_DEBUG "" CACHE STRING "Debug flags (${language})" FORCE)
@@ -321,11 +326,13 @@ if(MSVC)
   # Increase the maximum size of object file sections
   hpx_append_flag(-bigobj LANGUAGES CXX)
 
+  set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} psapi)
+
   ##############################################################################
   # Stacktraces
   ##############################################################################
   if(HPX_STACKTRACES)
-    set(hpx_RUNTIME_LIBRARIES dbghelp)
+    set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} dbghelp)
   endif()
 
   ##############################################################################
@@ -382,6 +389,7 @@ if(MSVC)
   add_definitions(-DBOOST_USE_WINDOWS_H)
   add_definitions(-DBOOST_SERIALIZATION_DYN_LINK)
   add_definitions(-DBOOST_COROUTINE_USE_FIBERS)
+  add_definitions(-DPSAPI_VERSION=1)
 
 ################################################################################
 # GCC-compatible compiler configuration
