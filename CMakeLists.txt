@@ -401,13 +401,13 @@ if(MSVC)
   # Increase the maximum size of object file sections
   hpx_append_flag(-bigobj LANGUAGES CXX Fortran)
 
-  set(hpx_RUNTIME_LIBRARIES psapi)
+  set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} psapi)
 
   ##############################################################################
   # Stacktraces
   ##############################################################################
   if(HPX_STACKTRACES)
-    set(hpx_RUNTIME_LIBRARIES dbghelp)
+    set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} dbghelp)
   endif()
 
   ##############################################################################
