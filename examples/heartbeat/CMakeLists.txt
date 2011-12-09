@@ -28,5 +28,5 @@ add_hpx_executable(heartbeat
                    DEPENDENCIES iostreams_component)
 
 # add pseudo-target dependencies
-add_dependencies(examples.heartbeat heartbeat_exe)
+add_hpx_pseudo_dependencies(examples.heartbeat heartbeat_exe)
 
