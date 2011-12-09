@@ -273,12 +273,12 @@ namespace hpx { namespace traits
           , Enable
         >
     {
-        static HPX_ALWAYS_EXPORT components::component_type get()
+        static components::component_type get()
         {
             return components::component_base_lco_with_value;
         }
 
-        static HPX_ALWAYS_EXPORT void set(components::component_type)
+        static void set(components::component_type)
         {
             BOOST_ASSERT(false);
         }

@@ -303,14 +303,10 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
   , distributing_factory_create_partitioned_action
 )
 
-namespace hpx { namespace distributing_factory { namespace create_result_ns {
-    typedef hpx::lcos::base_lco_with_value<
-            hpx::components::server::distributing_factory::remote_result_type
-        > type;
-}}}
-
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    hpx::distributing_factory::create_result_ns::type::set_result_action
-  , set_result_action_distributing_factory_result
-)
+    hpx::lcos::base_lco_with_value<
+        hpx::components::server::distributing_factory::remote_result_type
+    >::set_result_action
+  , set_result_action_distributing_factory_result);
+
 #endif

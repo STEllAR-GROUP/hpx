@@ -37,10 +37,6 @@ HPX_DEFINE_GET_COMPONENT_TYPE(distributing_factory_type);
 typedef hpx::lcos::base_lco_with_value<
         distributing_factory_type::remote_result_type
     > create_result_type;
-typedef hpx::lcos::base_lco_with_value<
-        distributing_factory_type::result_type,
-        distributing_factory_type::remote_result_type
-    > remote_create_result_type;
 
 HPX_REGISTER_ACTION_EX(
     create_result_type::set_result_action,

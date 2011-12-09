@@ -49,17 +49,3 @@ HPX_REGISTER_ACTION_EX(
     hpx::lcos::base_lco_with_value<boost::uint64_t>::set_result_action,
     set_result_action_uint64_t);
 
-/*
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<boost::uint8_t>,
-    hpx::components::component_base_lco_with_value);
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<boost::uint16_t>,
-    hpx::components::component_base_lco_with_value);
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<boost::uint32_t>,
-    hpx::components::component_base_lco_with_value);
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<boost::uint64_t>,
-    hpx::components::component_base_lco_with_value);
-*/
