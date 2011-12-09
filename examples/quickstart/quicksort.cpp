@@ -50,7 +50,7 @@ std::size_t partition(boost::uint32_t* data, std::size_t begin, std::size_t end)
     boost::uint32_t* const first = data + begin;
     boost::uint32_t* const last = first + (end - begin);
 
-    std::less<boost::uint32_t> const less_; 
+    std::less<boost::uint32_t> less_; 
 
     boost::uint32_t* const middle =
         std::partition(first, last, std::bind2nd(less_, *first));
