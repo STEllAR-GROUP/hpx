@@ -339,7 +339,7 @@ namespace hpx { namespace performance_counters
 
                 return T(value_) * scaling_;
             }
-            return value_;
+            return T(value_);
         }
 
     private:

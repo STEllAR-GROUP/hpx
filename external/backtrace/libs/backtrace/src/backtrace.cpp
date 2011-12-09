@@ -52,14 +52,14 @@ namespace boost {
     namespace stack_trace {
         #if defined(BOOST_HAVE_EXECINFO)
 
-        int trace(void **array,int n)
+        int trace(void **array,std::size_t n)
         {
             return :: backtrace(array,n);
         }
 
         #elif defined(BOOST_MSVC)
 
-        int trace(void **array,int n)
+        int trace(void **array,std::size_t n)
         {
             if(n>=63)
                 n=62;
@@ -68,7 +68,7 @@ namespace boost {
 
         #else
 
-        int trace(void ** /*array*/,int /*n*/)
+        int trace(void ** /*array*/,std::size_t /*n*/)
         {
             return 0;
         }
@@ -113,10 +113,10 @@ namespace boost {
            return res.str();
         }
 
-        std::string get_symbols(void *const *addresses,int size)
+        std::string get_symbols(void *const *addresses,std::size_t size)
         {
             std::string res = boost::lexical_cast<std::string>(size) + ((1==size)?" frame:":" frames:");
-            for(int i=0;i<size;i++) {
+            for(std::size_t i=0;i<size;i++) {
                 std::string tmp = get_symbol(addresses[i]);
                 if(!tmp.empty()) {
                     res+='\n';
@@ -125,10 +125,10 @@ namespace boost {
             }
             return res;
         }
-        void write_symbols(void *const *addresses,int size,std::ostream &out)
+        void write_symbols(void *const *addresses,std::size_t size,std::ostream &out)
         {
             out << size << ((1==size)?" frame:":" frames:");
-            for(int i=0;i<size;i++) {
+            for(std::size_t i=0;i<size;i++) {
                 std::string tmp = get_symbol(addresses[i]);
                 if(!tmp.empty()) {
                     out << '\n' << tmp;
@@ -155,14 +155,14 @@ namespace boost {
             }
         }
 
-        std::string get_symbols(void * const *address,int size)
+        std::string get_symbols(void * const *address,std::size_t size)
         {
             char ** ptr = backtrace_symbols(address,size);
             try {
                 if(ptr==0)
                     return std::string();
                 std::string res = boost::lexical_cast<std::string>(size) + ((1==size)?" frame:":" frames:");
-                for(int i=0;i<size;i++) {
+                for(std::size_t i=0;i<size;i++) {
                     res+='\n';
                     res+=ptr[i];
                 }
@@ -177,7 +177,7 @@ namespace boost {
         }
 
 
-        void write_symbols(void *const *addresses,int size,std::ostream &out)
+        void write_symbols(void *const *addresses,std::size_t size,std::ostream &out)
         {
             char ** ptr = backtrace_symbols(addresses,size);
             out << size << ((1==size)?" frame:":" frames:");
@@ -245,10 +245,10 @@ namespace boost {
             return ss.str();
         }
 
-        std::string get_symbols(void *const *addresses,int size)
+        std::string get_symbols(void *const *addresses,std::size_t size)
         {
             std::string res = boost::lexical_cast<std::string>(size) + ((1==size)?" frame:":" frames:");
-            for(int i=0;i<size;i++) {
+            for(std::size_t i=0;i<size;i++) {
                 std::string tmp = get_symbol(addresses[i]);
                 if(!tmp.empty()) {
                     res+='\n';
@@ -257,10 +257,10 @@ namespace boost {
             }
             return res;
         }
-        void write_symbols(void *const *addresses,int size,std::ostream &out)
+        void write_symbols(void *const *addresses,std::size_t size,std::ostream &out)
         {
             out << size << ((1==size)?" frame:":" frames:");
-            for(int i=0;i<size;i++) {
+            for(std::size_t i=0;i<size;i++) {
                 std::string tmp = get_symbol(addresses[i]);
                 if(!tmp.empty()) {
                     out << '\n' << tmp;
@@ -281,7 +281,7 @@ namespace boost {
             return res.str();
         }
 
-        std::string get_symbols(void *const *ptrs,int size)
+        std::string get_symbols(void *const *ptrs,std::size_t size)
         {
             if(!ptrs)
                 return std::string();
@@ -291,10 +291,10 @@ namespace boost {
             return res.str();
         }
 
-        void write_symbols(void *const *addresses,int size,std::ostream &out)
+        void write_symbols(void *const *addresses,std::size_t size,std::ostream &out)
         {
             out << size << ((1==size)?" frame:":" frames:");
-            for(int i=0;i<size;i++) {
+            for(std::size_t i=0;i<size;i++) {
                 if(addresses[i]!=0)
                     out << '\n' << std::left << std::setw(sizeof(void*)*2) << std::setfill(' ') << addresses[i];
             }

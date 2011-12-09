@@ -34,7 +34,7 @@ namespace hpx { namespace components
     }
 
     // Return the string representation for a given component type id
-    std::string const get_component_type_name(int type)
+    std::string const get_component_type_name(boost::int32_t type)
     {
         std::string result;
 

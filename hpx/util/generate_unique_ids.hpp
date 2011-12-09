@@ -16,6 +16,9 @@
 #include <hpx/util/spinlock.hpp>
 #include <hpx/exception.hpp>
 
+#pragma warning(push)
+#pragma warning(disable: 4251)
+
 namespace hpx { namespace util
 {
     /// The unique_id_ranges class is a type responsible for generating
@@ -108,6 +111,8 @@ namespace hpx { namespace util
         }
     };
 }}
+
+#pragma warning(pop)
 
 #endif
 

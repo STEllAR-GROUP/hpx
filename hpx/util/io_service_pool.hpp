@@ -66,7 +66,7 @@ namespace hpx { namespace util
 
     protected:
         ///
-        void thread_run(int index);
+        void thread_run(std::size_t index);
 
         void stop_locked();
         void join_locked();

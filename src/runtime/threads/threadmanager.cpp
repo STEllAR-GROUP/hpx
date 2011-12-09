@@ -1198,7 +1198,7 @@ namespace hpx { namespace threads
         try {
             // run threads and wait for initialization to complete
             BOOST_ASSERT (NULL == startup_);
-            startup_ = new boost::barrier(num_threads+1);
+            startup_ = new boost::barrier(static_cast<unsigned>(num_threads+1));
 
             state_.store(running);
 
@@ -1357,7 +1357,7 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     // Return the number of the NUMA node the current thread is running on
-    int get_numa_node_number()
+    std::size_t get_numa_node_number()
     {
         bool numa_sensitive = false;
         std::size_t thread_num = threadmanager_base::get_thread_num(&numa_sensitive);

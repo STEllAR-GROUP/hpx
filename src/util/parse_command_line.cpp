@@ -373,7 +373,7 @@ namespace hpx { namespace util
             argv[i] = const_cast<char*>(args[i].c_str());
 
         return parse_commandline(
-            app_options, args.size(), argv.get(), vm, mode, visible);
+            app_options, static_cast<int>(args.size()), argv.get(), vm, mode, visible);
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -94,8 +94,8 @@ namespace bright_future {
             {
                 double acc = 0;
                 //std::accumulate(timestamps.begin(), timestamps.end(), acc);
-                unsigned n = timestamps.size();
-                for(unsigned i = 0; i < n; ++i)
+                std::size_t n = timestamps.size();
+                for(std::size_t i = 0; i < n; ++i)
                 {
                     acc += timestamps[0]/n;
                 }

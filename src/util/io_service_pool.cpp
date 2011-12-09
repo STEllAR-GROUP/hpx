@@ -74,7 +74,7 @@ namespace hpx { namespace util
         clear_locked();
     }
 
-    void io_service_pool::thread_run(int index)
+    void io_service_pool::thread_run(std::size_t index)
     {
         if (on_start_thread_)
             on_start_thread_();

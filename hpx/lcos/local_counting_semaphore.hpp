@@ -14,6 +14,9 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/local_spinlock.hpp>
 
+#pragma warning(push)
+#pragma warning(disable: 4251)
+
 ////////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
 {
@@ -143,6 +146,8 @@ namespace hpx { namespace lcos
     };
 
 }}
+
+#pragma warning(pop)
 
 #endif
 

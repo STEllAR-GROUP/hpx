@@ -764,7 +764,7 @@ namespace hpx
                     mode = hpx::runtime_mode_console;
                 }
                 else {
-                    hpx_port += node;         // each node gets an unique port
+                    hpx_port += static_cast<boost::uint16_t>(node);         // each node gets an unique port
                     mode = hpx::runtime_mode_worker;
 
                     // do not execute any explicit hpx_main except if asked

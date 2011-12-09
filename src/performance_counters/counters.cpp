@@ -47,16 +47,6 @@ HPX_DEFINE_GET_COMPONENT_TYPE(
     hpx::performance_counters::server::base_performance_counter);
 
 ///////////////////////////////////////////////////////////////////////////////
-// HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-//     hpx::performance_counters::server::base_performance_counter);
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<hpx::performance_counters::counter_info>,
-    hpx::components::component_base_lco_with_value);
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<hpx::performance_counters::counter_value>,
-    hpx::components::component_base_lco_with_value);
-
-///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters
 {
     /// \brief Create a full name of a counter from the contents of the given

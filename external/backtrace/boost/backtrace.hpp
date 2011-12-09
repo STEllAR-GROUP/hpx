@@ -39,10 +39,10 @@
 namespace boost {
 
     namespace stack_trace {
-        BOOST_BACKTRACE_DECL int trace(void **addresses,int size);
-        BOOST_BACKTRACE_DECL void write_symbols(void *const *addresses,int size,std::ostream &);
+        BOOST_BACKTRACE_DECL int trace(void **addresses,std::size_t size);
+        BOOST_BACKTRACE_DECL void write_symbols(void *const *addresses,std::size_t size,std::ostream &);
         BOOST_BACKTRACE_DECL std::string get_symbol(void *address);
-        BOOST_BACKTRACE_DECL std::string get_symbols(void * const *address,int size);
+        BOOST_BACKTRACE_DECL std::string get_symbols(void * const *address,std::size_t size);
     } // stack_trace
 
     class backtrace {

@@ -12,6 +12,9 @@
 #include <iostream>
 #include <fstream>
 
+#pragma warning(push)
+#pragma warning(disable:4251)
+
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -41,5 +44,7 @@ namespace hpx { namespace util
         bool debug_;
     };
 }}
+
+#pragma warning(pop)
 
 #endif

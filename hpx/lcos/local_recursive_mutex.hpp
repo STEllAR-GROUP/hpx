@@ -13,6 +13,12 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/local_mutex.hpp>
 
+// Disable warning C4275: non dll-interface class used as base for dll-interface
+// class
+#pragma warning(push)
+#pragma warning(disable: 4275)
+#pragma warning(disable: 4251)
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
 {
@@ -130,6 +136,8 @@ namespace hpx { namespace lcos
         }
     };
 }}
+
+#pragma warning(pop)
 
 #endif
 

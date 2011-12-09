@@ -139,13 +139,6 @@ struct update_residuum_fun
     }
 };
 
-void dependency()
-{
-    //cout << "dependency complete\n" << flush;
-}
-typedef hpx::actions::plain_action0<&dependency> dependency_action;
-HPX_REGISTER_PLAIN_ACTION(dependency_action);
-
 void gs(
     size_type n_x
   , size_type n_y

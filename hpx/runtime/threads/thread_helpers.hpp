@@ -184,7 +184,7 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     // Return the number of the NUMA node the current thread is running on
-    HPX_API_EXPORT int get_numa_node_number();
+    HPX_API_EXPORT std::size_t get_numa_node_number();
 
     ///////////////////////////////////////////////////////////////////////////
     /// The function \a suspend will return control to the thread manager
