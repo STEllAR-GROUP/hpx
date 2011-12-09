@@ -271,6 +271,8 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release")
 endif()
 
+set(CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}")
+
 # Clear CMake defaults
 foreach(language CXX Fortran)
   set(CMAKE_${language}_FLAGS_DEBUG "" CACHE STRING "Debug flags (${language})" FORCE)
