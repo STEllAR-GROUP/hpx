@@ -29,7 +29,7 @@ namespace hpx { namespace naming
     ///
     struct HPX_EXPORT address
     {
-        typedef boost::int64_t component_type;
+        typedef boost::int32_t component_type;
         typedef boost::uint64_t address_type;
 
         ///////////////////////////////////////////////////////////////////////

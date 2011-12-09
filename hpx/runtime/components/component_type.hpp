@@ -19,7 +19,7 @@
 namespace hpx { namespace components
 {
     /// \brief Return the string representation for a given component type id
-    HPX_EXPORT std::string const get_component_type_name(int type);
+    HPX_EXPORT std::string const get_component_type_name(boost::int32_t type);
 
     /// The lower short word of the component type is the type of the component
     /// exposing the actions.
