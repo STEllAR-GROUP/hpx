@@ -9,7 +9,6 @@
 
   prerequisites
   instructions
-  amr_support_libraries
   elf_visibility
   malloc_allocators
  

@@ -4,7 +4,7 @@
  Log Levels 
 ************
 
-.. sectionauthor:: Hartmut Kaiser, Bryce Lelbach 
+.. sectionauthor:: Hartmut Kaiser, Bryce Adelstein-Lelbach 
 
 Introduction
 ------------

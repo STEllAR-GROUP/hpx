@@ -8,7 +8,7 @@ source_suffix = '.rst'
 source_encoding = 'utf-8'
 master_doc = 'index'
 project = u'HPX Reference Manual'
-copyright = u'2011, Hartmut Kaiser, Bryce Lelbach and others'
+copyright = u'2011, Hartmut Kaiser, Bryce Adelstein-Lelbach and others'
 version = '0.7'
 release = '0.7.0'
 today_fmt = '%Y.%m.%d %H.%M.%S'
@@ -26,17 +26,17 @@ latex_documents = [
     ( 'index'
     , 'refmanual.tex'
     , ''
-    , 'Hartmut Kaiser, Bryce Lelbach and others'
+    , 'Hartmut Kaiser, Bryce Adelstein-Lelbach and others'
     , 'manual'
     , False) ]
 
 # -- Epilog for all global substitution ----------------------------------------
 
 rst_epilog = """
-.. |amr_only|   replace:: :ref:`AMR only <linux_amr_support_libraries>`
-.. |malloc|     replace:: :ref:`malloc allocator <linux_malloc_allocators>`
-.. |env_vars|   replace:: :ref:`INI environmental variable syntax <ini_env_var_syntax>`
-.. |logs|       replace:: :ref:`log levels <diagnostics_log_levels>`
+.. |io_support|     replace:: :ref:`I/O support <io_support>`
+.. |malloc|         replace:: :ref:`malloc allocator <linux_malloc_allocators>`
+.. |env_vars|       replace:: :ref:`INI environmental variable syntax <ini_env_var_syntax>`
+.. |logs|           replace:: :ref:`log levels <diagnostics_log_levels>`
 
 .. |bsl| replace:: Boost Software License
 .. _bsl: http://www.boost.org/LICENSE_1_0.txt
@@ -47,32 +47,14 @@ rst_epilog = """
 .. |gcc| replace:: GNU Compiler Collection
 .. _gcc: http://gcc.gnu.org 
 
-.. |gmake| replace:: GNU Make
-.. _gmake: http://www.gnu.org/software/make
-
-.. |libstdc++| replace:: GNU Standard C++ Library
-.. _libstdc++: http://gcc.gnu.org/libstdc++
-
-.. |eglibc| replace:: Embedded GLIBC
-.. _eglibc: http://eglibc.org/home
-
-.. |glibc| replace:: GNU C Library
-.. _glibc: http://gnu.org/s/libc
-
 .. |cmake| replace:: CMake
 .. _cmake: http://cmake.org
-
-.. |gmp| replace:: GNU Multi-Precision Library
-.. _gmp: http://gmplib.org
-
-.. |rnpl| replace:: RNPL
-.. _rnpl: http://relativity.phys.lsu.edu/postdocs/matt/software.php
 
 .. |jemalloc| replace:: jemalloc
 .. _jemalloc: http://www.canonware.com/jemalloc
 
 .. |google-perftools| replace:: google-perftools
-.. _google-perftools: http://goog-perftools.sourceforge.net
+.. _google-perftools: http://code.google.com/p/google-perftools 
 
 .. |tcmalloc| replace:: tcmalloc
 .. _tcmalloc: http://goog-perftools.sourceforge.net/doc/tcmalloc.html 
@@ -83,16 +65,13 @@ rst_epilog = """
 .. |visualc++| replace:: Visual C++
 .. _visualc++: http://msdn.microsoft.com/en-us/visualc/default.aspx
 
-.. |msbuild| replace:: MSBuild
-.. _msbuild: http://msdn.microsoft.com/en-us/library/ms171452(v=vs.90).aspx
-
 .. |elf| replace:: Executable and Linkable Format (ELF)
 .. _elf: http://www.ibm.com/developerworks/power/library/pa-spec12
 
-.. |amr| replace:: Adaptive Mesh Refinment (AMR)
-.. _amr: http://en.wikipedia.org/wiki/Adaptive_mesh_refinement
+.. |hdf5| replace:: HDF5 Libraries
+.. _hdf5: http://www.hdfgroup.org/HDF5 
 
-.. |matt| replace:: Matthew Anderson
-.. _matt: http://relativity.phys.lsu.edu/postdocs/matt/
+.. |zlib| replace:: zlib 
+.. _zlib: http://zlib.net 
 """
 

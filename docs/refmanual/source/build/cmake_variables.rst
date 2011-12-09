@@ -4,7 +4,7 @@
  CMake Variable Reference 
 **************************
 
-.. sectionauthor:: Bryce Lelbach 
+.. sectionauthor:: Bryce Adelstein-Lelbach 
 
 Entries take the following format:
 
@@ -53,34 +53,31 @@ HPX_CMAKE_LOGLEVEL : STRING : WARN : Error Warn Info Debug
 HPX_WARNINGS : BOOL : ON
   If true, compiler warnings are enabled.
 
-HPX_EXAMPLES : BOOL : ON (Linux) OFF (Windows)
+HPX_TESTS : BOOL : ON
+  If true, HPX tests are configured when CMake is run.
+
+HPX_EXAMPLES : BOOL : ON
   If true, HPX examples are configured when CMake is run.
 
-HPX_STACKTRACES : BOOL : ON (Linux) OFF (Windows)
+HPX_RUNTIME : BOOL : ON
+  If true, build the hpx_runtime application. 
+
+HPX_STACKTRACES : BOOL : ON
   If true, exceptions thrown by HPX will include stack traces.
 
-HPX_AGAS_VERSION : STRING : 2 : 1 2
-  The version of the AGAS subsystem to use.
+HPX_NATIVE_TLS : BOOL : ON
+  If true, OS/compiler support for TLS is used. 
+
+HPX_CXX11 : BOOL : ON
+  If true, use C++11 features if the compiler supports them.
+
+HPX_STACK_SIZE : STRING : 0x10000 (Linux) 0x4000 (Windows)
+  Default stack size for HPX-threads.
 
 Linux-Specific Variables
 ------------------------
 
-GMP_FOUND : BOOL 
-  Set to true if the GMP library is found.
-
-GMP_INCLUDE_DIR : PATH
-  The include directory for GMP.
-
-GMP_LIBRARY : FILEPATH
-  Path to the GMP library. 
-
-GMP_ROOT : PATH 
-  The root of a GMP installation.
-
-GMP_USE_SYSTEM : BOOL : OFF
-  Explicitly instruct CMake to search for a system installation of GMP.
-
-HPX_COMPILER_AUTO_TUNE : STRING : DETECT : ON OFF DETECT
+HPX_CXX_FLAG_MARCH_NATIVE : STRING : DETECT : ON OFF DETECT
   Use compiler automated tuning to improve code optimization. Decreases the
   portability of the compiled binaries.
 
@@ -94,14 +91,14 @@ HPX_GNU_128BIT_INTEGERS : STRING : DETECT : ON OFF DETECT
 HPX_GNU_ALIGNED_16 : STRING : DETECT : ON OFF DETECT
   Use GCC-style __attribute__((aligned(16))).
 
-HPX_GNU_MCX16 : STRING : DETECT : ON OFF DETECT
+HPX_CXX_FLAG_MCX16 : STRING : DETECT : ON OFF DETECT
   Use GCC-style support for the CMPXCHG16B instruction.
 
 HPX_INTERNAL_CHRONO : BOOL : ON 
   Use HPX's internal version of Boost.Chrono.
 
 HPX_MALLOC : STRING : TCMalloc : TCMalloc Jemalloc System
-  The Malloc allocator to use for HPX. 
+  The malloc allocator to use for HPX. 
 
 HPX_PTHREAD_AFFINITY_NP : STRING : DETECT : ON OFF DETECT
   Use pthread_setaffinity_np and pthread_getaffinity_np.
@@ -125,25 +122,10 @@ JEMALLOC_LIBRARY : FILEPATH
   Path to the jemalloc library. 
 
 JEMALLOC_ROOT : PATH
-  The root of a jemalloc installation.
+  The root of the jemalloc installation.
 
 JEMALLOC_USE_SYSTEM : BOOL : OFF
   Explicitly instruct CMake to search for a system installation of jemalloc.
-
-RNPL_FOUND : BOOL
-  Set to true if the RNPL library is found.
-
-RNPL_INCLUDE_DIR : PATH
-  The include directory for RNPL.
-
-RNPL_LIBRARY : FILEPATH
-  Path to the RNPL library. 
-
-RNPL_ROOT : PATH
-  The root of a RNPL installation.
-
-RNPL_USE_SYSTEM : BOOL : OFF
-  Explicitly instruct CMake to search for a system installation of RNPL.
 
 TCMALLOC_FOUND : BOOL
   Set to true if the tcmalloc library is found.
@@ -155,8 +137,40 @@ TCMALLOC_LIBRARY : FILEPATH
   Path to the tcmalloc library. 
 
 TCMALLOC_ROOT : PATH
-  The root of a tcmalloc installation.
+  The root of the tcmalloc installation.
 
 TCMALLOC_USE_SYSTEM : BOOL : OFF
   Explicitly instruct CMake to search for a system installation of tcmalloc.
+
+HDF5_FOUND : BOOL
+  Set to true if the main HDF5 library is found.
+
+HDF5_INCLUDE_DIR : PATH
+  The include directory for the main HDF5 library.
+
+HDF5_LIBRARY : FILEPATH
+  Path to the main HDF5 library. 
+
+HDF5_ROOT : PATH
+  The root of the main HDF5 installation.
+
+HDF5_USE_SYSTEM : BOOL : OFF
+  Explicitly instruct CMake to search for a system installation of the main HDF5
+  library.
+
+HDF5_CPP_FOUND : BOOL
+  Set to true if the HDF5 C++ library is found.
+
+HDF5_CPP_INCLUDE_DIR : PATH : ${HDF5_INCLUDE_DIR}
+  The include directory for the HDF5 C++ library.
+
+HDF5_CPP_LIBRARY : FILEPATH
+  Path to the HDF5 C++ library. 
+
+HDF5_CPP_ROOT : PATH : ${HDF5_ROOT}
+  The root of the HDF5 C++ installation.
+
+HDF5_CPP_USE_SYSTEM : BOOL : ${HDF5_USE_SYSTEM}
+  Explicitly instruct CMake to search for a system installation of the HDF5 C++
+  library.
 

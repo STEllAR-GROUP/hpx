@@ -4,7 +4,7 @@
  HPX Documentation 
 *******************
 
-.. sectionauthor:: Bryce Lelbach 
+.. sectionauthor:: Bryce Adelstein-Lelbach 
 
 Distributed under the |bsl|_, Version 1.0. 
 
