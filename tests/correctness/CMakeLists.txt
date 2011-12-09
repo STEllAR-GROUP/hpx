@@ -5,7 +5,6 @@
 
 set(subdirs
     agas
-    actions
     threads
    )
 
