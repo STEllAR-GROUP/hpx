@@ -544,7 +544,6 @@ else()
   if(HPX_WARNINGS)
     hpx_use_flag_if_available(-Wall LANGUAGES CXX Fortran)
     hpx_use_flag_if_available(-Wno-strict-aliasing LANGUAGES CXX Fortran)
-    hpx_use_flag_if_available(-Wno-unused-but-set-variable)
     hpx_use_flag_if_available(-Wsign-promo)
   endif()
 
@@ -589,12 +588,6 @@ else()
         endif()
       endif()
     endif()
-  ##############################################################################
-  # Intel-only configuration
-  ##############################################################################
-  elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-    # warning #1125: virtual function override intended
-    add_definitions(-diag-disable 1125)
   endif()
 
   ##############################################################################
@@ -679,8 +672,10 @@ else()
     set(GOOGLE_PERFTOOLS_LIBRARY "")
   endif()
 
-  set(HPX_MALLOC "TCMalloc" CACHE STRING
-    "HPX malloc allocator (default: tcmalloc)" FORCE)
+
+  if(NOT HPX_MALLOC)
+    set(HPX_MALLOC "TCMalloc")
+  endif() 
 
   find_package(HPX_TCMalloc)
   find_package(HPX_Jemalloc)
