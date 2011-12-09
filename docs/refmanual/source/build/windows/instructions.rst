@@ -4,7 +4,7 @@
  Instructions 
 **************
 
-.. sectionauthor:: Bryce Lelbach 
+.. sectionauthor:: Bryce Adelstein-Lelbach 
 
 0) Download the latest Subversion revision of HPX (or a stable tag). You can
    use TortoiseSVN, or the subversion client that Cygwin provides. The latest
@@ -26,8 +26,8 @@
    to use. Select the x64 Visual Studio 10 compilers (they are usually the
    default if available).
 
-5) Press "Configure" again. Repeat this step until the "Generate" button becomes
-   clickable.
+5) If the "Generate" button is not clickable, press "Configure" again. Repeat
+   this step until the "Generate" button becomes clickable.
 
 6) Press "Generate".
 

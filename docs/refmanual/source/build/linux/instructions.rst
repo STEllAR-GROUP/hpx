@@ -4,7 +4,7 @@
  Instructions 
 **************
 
-.. sectionauthor:: Bryce Lelbach 
+.. sectionauthor:: Bryce Adelstein-Lelbach 
 
 0) Download the latest Subversion revision of HPX (or a stable tag):::
 

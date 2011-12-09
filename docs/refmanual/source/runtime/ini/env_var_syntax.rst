@@ -4,7 +4,7 @@
  INI Environmental Variable Syntax
 ***********************************
 
-.. sectionauthor:: Hartmut Kaiser, Bryce Lelbach 
+.. sectionauthor:: Hartmut Kaiser, Bryce Adelstein-Lelbach 
 
 In HPX ini files, the following syntax:::
 
