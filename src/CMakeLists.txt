@@ -168,7 +168,6 @@ set_target_properties(hpx PROPERTIES
 
 target_link_libraries(hpx
   hpx_serialization
-  Psapi
   ${hpx_MALLOC_LIBRARY}
   ${hpx_RUNTIME_LIBRARIES}
   ${BOOST_FOUND_LIBRARIES})

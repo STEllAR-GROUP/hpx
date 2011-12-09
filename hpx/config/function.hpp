@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_USE_UTIL_FUNCTION)
+#if defined(HPX_UTIL_FUNCTION)
 #  include <hpx/util/function.hpp>
 #else
 #if !defined(HPX_HAVE_CXX11_STD_FUNCTION)

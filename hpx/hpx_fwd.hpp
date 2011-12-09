@@ -133,13 +133,13 @@ namespace hpx
     {
         namespace policies
         {
-#if defined(HPX_ENABLE_GLOBAL_SCHEDULER)
+#if defined(HPX_GLOBAL_SCHEDULER)
             class HPX_API_EXPORT global_queue_scheduler;
 #endif
-#if defined(HPX_ENABLE_LOCAL_SCHEDULER)
+#if defined(HPX_LOCAL_SCHEDULER)
             class HPX_API_EXPORT local_queue_scheduler;
 #endif
-#if defined(HPX_ENABLE_ABP_SCHEDULER)
+#if defined(HPX_ABP_SCHEDULER)
             struct HPX_API_EXPORT abp_queue_scheduler;
 #endif
 

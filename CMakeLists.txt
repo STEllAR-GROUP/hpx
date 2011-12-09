@@ -302,32 +302,40 @@ endif()
 set(CMAKE_DEBUG_POSTFIX "d")
 set(CMAKE_RELWITHDEBINFO_POSTFIX "d")
 
-set(HPX_USE_UTIL_BIND ON CACHE BOOL "Use hpx::util::bind instead of boost::bind or std::bind." FORCE)
-if(HPX_USE_UTIL_BIND)
-  add_definitions(-DHPX_USE_UTIL_BIND)
+################################################################################
+# Utility configuration 
+################################################################################
+hpx_option(HPX_UTIL_BIND BOOL "Use hpx::util::bind instead of boost::bind or std::bind (default: ON)" ON)
+
+if(HPX_UTIL_BIND)
+  add_definitions(-DHPX_UTIL_BIND)
 endif()
 
-set(HPX_USE_UTIL_FUNCTION ON CACHE BOOL "Use hpx::util::function instead of boost::function or std::function." FORCE)
+hpx_option(HPX_UTIL_FUNCTION BOOL "Use hpx::util::function instead of boost::function or std::function (default: ON)" ON)
+
 if(HPX_USE_UTIL_FUNCTION)
-  add_definitions(-DHPX_USE_UTIL_FUNCTION)
+  add_definitions(-DHPX_UTIL_FUNCTION)
 endif()
 
 ################################################################################
-# Scheduler support
+# Scheduler configuration
 ################################################################################
-set(HPX_ENABLE_GLOBAL_SCHEDULER OFF CACHE BOOL "Enable the use of --queueing=global." FORCE)
-if(HPX_ENABLE_GLOBAL_SCHEDULER)
-  add_definitions(-DHPX_ENABLE_GLOBAL_SCHEDULER)
+hpx_option(HPX_GLOBAL_SCHEDULER BOOL "Enable the use of --queueing=global (default: OFF)" OFF)
+
+if(HPX_GLOBAL_SCHEDULER)
+  add_definitions(-DHPX_GLOBAL_SCHEDULER)
 endif()
 
-set(HPX_ENABLE_LOCAL_SCHEDULER OFF CACHE BOOL "Enable the use of --queueing=local." FORCE)
-if(HPX_ENABLE_LOCAL_SCHEDULER)
-  add_definitions(-DHPX_ENABLE_LOCAL_SCHEDULER)
+hpx_option(HPX_LOCAL_SCHEDULER BOOL "Enable the use of --queueing=global (default: OFF)" OFF)
+
+if(HPX_LOCAL_SCHEDULER)
+  add_definitions(-DHPX_LOCAL_SCHEDULER)
 endif()
 
-set(HPX_ENABLE_ABP_SCHEDULER OFF CACHE BOOL "Enable the use of --queueing=abp." FORCE)
-if(HPX_ENABLE_ABP_SCHEDULER)
-  add_definitions(-DHPX_ENABLE_ABP_SCHEDULER)
+hpx_option(HPX_ABP_SCHEDULER BOOL "Enable the use of --queueing=abp (default: OFF)" OFF)
+
+if(HPX_ABP_SCHEDULER)
+  add_definitions(-DHPX_ABP_SCHEDULER)
 endif()
 
 ################################################################################
@@ -389,6 +397,8 @@ if(MSVC)
 
   # Increase the maximum size of object file sections
   hpx_append_flag(-bigobj LANGUAGES CXX Fortran)
+
+  set(hpx_RUNTIME_LIBRARIES psapi)
 
   ##############################################################################
   # Stacktraces

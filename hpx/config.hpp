@@ -266,7 +266,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Use std::function if it's available and movable
-#if defined(HPX_USE_UTIL_FUNCTION)
+#if defined(HPX_UTIL_FUNCTION)
 #  define HPX_STD_FUNCTION ::hpx::util::function_nonser
 #else
 #if !defined(HPX_HAVE_CXX11_STD_FUNCTION)
@@ -278,13 +278,13 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Use std::bind if it's available and movable
-#if defined(HPX_USE_UTIL_BIND)
+#if defined(HPX_UTIL_BIND)
 #  define HPX_STD_PLACEHOLDER         ::hpx::util::placeholders
 #  define HPX_STD_BIND                ::hpx::util::bind
 #  define HPX_STD_PROTECT(f)          ::hpx::util::protect(f)
 #else
 #  if !defined(HPX_HAVE_CXX11_STD_BIND)
-#    if defined(HPX_USE_PHOENIX_BIND)
+#    if defined(HPX_PHOENIX_BIND)
 #      define HPX_STD_PLACEHOLDERS    ::boost::phoenix::placeholders
 #      define HPX_STD_BIND            ::boost::phoenix::bind
 #      define HPX_STD_PROTECT(f)      ::boost::phoenix::lambda[f]

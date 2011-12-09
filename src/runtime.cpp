@@ -727,13 +727,13 @@ namespace hpx { namespace threads
 
 ///////////////////////////////////////////////////////////////////////////////
 /// explicit template instantiation for the thread manager of our choice
-#if defined(HPX_ENABLE_GLOBAL_SCHEDULER)
+#if defined(HPX_GLOBAL_SCHEDULER)
 template HPX_EXPORT class hpx::runtime_impl<
     hpx::threads::policies::global_queue_scheduler,
     hpx::threads::policies::callback_notifier>;
 #endif
 
-#if defined(HPX_ENABLE_LOCAL_SCHEDULER)
+#if defined(HPX_LOCAL_SCHEDULER)
 template HPX_EXPORT class hpx::runtime_impl<
     hpx::threads::policies::local_queue_scheduler,
     hpx::threads::policies::callback_notifier>;
@@ -743,7 +743,7 @@ template HPX_EXPORT class hpx::runtime_impl<
     hpx::threads::policies::local_priority_queue_scheduler,
     hpx::threads::policies::callback_notifier>;
 
-#if defined(HPX_ENABLE_ABP_SCHEDULER)
+#if defined(HPX_ABP_SCHEDULER)
 template HPX_EXPORT class hpx::runtime_impl<
     hpx::threads::policies::abp_queue_scheduler,
     hpx::threads::policies::callback_notifier>;

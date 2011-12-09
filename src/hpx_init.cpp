@@ -429,7 +429,7 @@ namespace hpx
             return rt.run(num_threads, num_localities);
         }
 
-#if defined(HPX_ENABLE_GLOBAL_SCHEDULER)
+#if defined(HPX_GLOBAL_SCHEDULER)
         ///////////////////////////////////////////////////////////////////////
         // global scheduler (one queue for all OS threads)
         int run_global(hpx_main_func f, boost::program_options::variables_map& vm,
@@ -469,7 +469,7 @@ namespace hpx
         }
 #endif
 
-#if defined(HPX_ENABLE_LOCAL_SCHEDULER)
+#if defined(HPX_LOCAL_SCHEDULER)
         ///////////////////////////////////////////////////////////////////////
         // local scheduler (one queue for each OS threads)
         int run_local(hpx_main_func f, boost::program_options::variables_map& vm,
@@ -549,7 +549,7 @@ namespace hpx
                 num_localities);
         }
 
-#if defined(HPX_ENABLE_ABP_SCHEDULER)
+#if defined(HPX_ABP_SCHEDULER)
         ///////////////////////////////////////////////////////////////////////
         // abp scheduler: local deques for each OS thread, with work
         // stealing from the "bottom" of each.
@@ -960,23 +960,23 @@ namespace hpx
 
             // Initialize and start the HPX runtime.
             if (0 == std::string("global").find(queueing)) {
-#if defined(HPX_ENABLE_GLOBAL_SCHEDULER)
+#if defined(HPX_GLOBAL_SCHEDULER)
                 result = detail::run_global(f, vm, mode, ini_config,
                     startup, shutdown, num_threads, num_localities);
 #else
                 throw std::logic_error("Command line option --queueing=global "
                     "is not configured in this build. Please rebuild with "
-                    "'cmake -DHPX_ENABLE_GLOBAL_SCHEDULER'.");
+                    "'cmake -DHPX_GLOBAL_SCHEDULER'.");
 #endif
             }
             else if (0 == std::string("local").find(queueing)) {
-#if defined(HPX_ENABLE_LOCAL_SCHEDULER)
+#if defined(HPX_LOCAL_SCHEDULER)
                 result = detail::run_local(f, vm, mode, ini_config,
                     startup, shutdown, num_threads, num_localities);
 #else
                 throw std::logic_error("Command line option --queueing=local "
                     "is not configured in this build. Please rebuild with "
-                    "'cmake -DHPX_ENABLE_LOCAL_SCHEDULER'.");
+                    "'cmake -DHPX_LOCAL_SCHEDULER'.");
 #endif
             }
             else if (0 == std::string("priority_local").find(queueing)) {
@@ -988,13 +988,13 @@ namespace hpx
             else if (0 == std::string("abp").find(queueing)) {
                 // abp scheduler: local dequeues for each OS thread, with work
                 // stealing from the "bottom" of each.
-#if defined(HPX_ENABLE_ABP_SCHEDULER)
+#if defined(HPX_ABP_SCHEDULER)
                 result = detail::run_abp(f, vm, mode, ini_config,
                     startup, shutdown, num_threads, num_localities);
 #else
                 throw std::logic_error("Command line option --queueing=abp "
                     "is not configured in this build. Please rebuild with "
-                    "'cmake -DHPX_ENABLE_ABP_SCHEDULER'.");
+                    "'cmake -DHPX_ABP_SCHEDULER'.");
 #endif
             }
             else if (0 == std::string("hierarchy").find(queueing)) {
