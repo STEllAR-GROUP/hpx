@@ -15,9 +15,11 @@
 
 // Disable warning C4275: non dll-interface class used as base for dll-interface
 // class
+#if defined(BOOST_MSVC)
 #pragma warning(push)
 #pragma warning(disable: 4275)
 #pragma warning(disable: 4251)
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
@@ -137,7 +139,9 @@ namespace hpx { namespace lcos
     };
 }}
 
+#if defined(BOOST_MSVC)
 #pragma warning(pop)
+#endif
 
 #endif
 

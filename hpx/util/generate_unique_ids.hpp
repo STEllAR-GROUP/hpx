@@ -16,8 +16,10 @@
 #include <hpx/util/spinlock.hpp>
 #include <hpx/exception.hpp>
 
+#if defined(BOOST_MSVC)
 #pragma warning(push)
 #pragma warning(disable: 4251)
+#endif
 
 namespace hpx { namespace util
 {
@@ -112,7 +114,9 @@ namespace hpx { namespace util
     };
 }}
 
+#if defined(BOOST_MSVC)
 #pragma warning(pop)
+#endif
 
 #endif
 

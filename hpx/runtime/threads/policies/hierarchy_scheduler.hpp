@@ -83,14 +83,15 @@ namespace hpx { namespace threads { namespace policies
         typedef std::vector<level_type> tree_type;
         tree_type tree;
 
-		struct flag_type : boost::atomic<bool>
+		struct flag_type
 		{
 			boost::atomic<bool> v;
 			flag_type() { v = false; }
-			flag_type(flag_type const & f) { v.store(f.load()); }
-			flag_type & operator=(flag_type const & f) { v.store(f.load()); return *this; }
+			flag_type(flag_type const & f) { v.store(f.v.load()); }
+			flag_type & operator=(flag_type const & f) { v.store(f.v.load()); return *this; }
 			flag_type & operator=(bool b) { v.store(b); return *this;}
 			bool operator==(bool b) { return v == b; }
+            operator bool() { return v; }
 		};
 
         typedef std::vector<flag_type > level_flag_type;
