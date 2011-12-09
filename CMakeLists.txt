@@ -10,6 +10,15 @@
 cmake_minimum_required(VERSION 2.8.4 FATAL_ERROR)
 
 ################################################################################
+# Build type 
+################################################################################
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release")
+endif()
+
+set(CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}" CACHE STRING "Configuration types" FORCE)
+
+################################################################################
 # C++ overrides
 ################################################################################
 set(CMAKE_USER_MAKE_RULES_OVERRIDE_CXX
@@ -267,12 +276,6 @@ add_definitions(-DHPX_DEFAULT_STACK_SIZE=${HPX_STACK_SIZE})
 ################################################################################
 # Compiler configuration
 ################################################################################
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release")
-endif()
-
-set(CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}")
-
 # Clear CMake defaults
 foreach(language CXX Fortran)
   set(CMAKE_${language}_FLAGS_DEBUG "" CACHE STRING "Debug flags (${language})" FORCE)
