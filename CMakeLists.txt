@@ -493,9 +493,12 @@ else()
   # Show the flags that toggle each warning
   hpx_use_flag_if_available(-fdiagnostics-show-option LANGUAGES CXX)
 
-  # We get false positives all over the place with this.
-  hpx_use_flag_if_available(-Wno-unused-but-set-parameter)
-  hpx_use_flag_if_available(-Wno-unused-but-set-variable)
+  # We get false positives all over the place with this. Also, detection for
+  # this flag fails with GCC 4.4 and 4.5.
+  if(040600 LESS ${GCC_VERSION} OR 040600 EQUAL ${GCC_VERSION})
+    hpx_use_flag_if_available(-Wno-unused-but-set-parameter)
+    hpx_use_flag_if_available(-Wno-unused-but-set-variable)
+  endif()
 
   # Silence warning about __sync_fetch_and_nand changing semantics
   hpx_use_flag_if_available(-Wno-sync-nand)
@@ -580,8 +583,9 @@ else()
 
   hpx_use_flag_if_available(-pthread)
 
-  set(HPX_MALLOC "TCMalloc" CACHE STRING
-    "HPX malloc allocator (default: tcmalloc)" FORCE)
+  if(NOT HPX_MALLOC)
+    set(HPX_MALLOC "TCMalloc")
+  endif() 
 
   find_package(HPX_TCMalloc)
   find_package(HPX_Jemalloc)
