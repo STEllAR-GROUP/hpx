@@ -451,6 +451,7 @@ if(MSVC)
   add_definitions(-DBOOST_USE_WINDOWS_H)
   add_definitions(-DBOOST_SERIALIZATION_DYN_LINK)
   add_definitions(-DBOOST_COROUTINE_USE_FIBERS)
+  add_definitions(-DPSAPI_VERSION=1)
 
 ################################################################################
 # GCC-compatible compiler configuration
