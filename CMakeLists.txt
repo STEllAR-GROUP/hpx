@@ -13,7 +13,7 @@ cmake_minimum_required(VERSION 2.8.4 FATAL_ERROR)
 # Build type 
 ################################################################################
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release")
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Configuration type" FORCE)
 endif()
 
 set(CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}" CACHE STRING "Configuration types" FORCE)
