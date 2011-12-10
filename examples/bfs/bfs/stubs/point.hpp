@@ -19,21 +19,23 @@ namespace bfs { namespace stubs
         static hpx::lcos::promise<void>
         init_async(hpx::naming::id_type const& gid,std::size_t objectid,std::size_t grainsize,
             std::size_t max_num_neighbors,std::vector<std::size_t> const& nodefile,
-                                          std::vector<std::size_t> const& neighborfile)
+            std::vector<std::size_t> const& neighborfile,
+            boost::numeric::ublas::mapped_vector<std::size_t> const& index)
         {
             typedef server::point::init_action action_type;
             return hpx::lcos::eager_future<action_type>(gid,objectid,grainsize,
-                max_num_neighbors,nodefile,neighborfile);
+                max_num_neighbors,nodefile,neighborfile,index);
         }
 
         // Read the graph
         static void init(hpx::naming::id_type const& gid,std::size_t objectid,std::size_t grainsize,
             std::size_t max_num_neighbors,std::vector<std::size_t> const& nodefile,
-                                          std::vector<std::size_t> const& neighborfile)
+            std::vector<std::size_t> const& neighborfile,
+            boost::numeric::ublas::mapped_vector<std::size_t> const& index)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the promise.
-            init_async(gid,objectid,grainsize,max_num_neighbors,nodefile,neighborfile).get();
+            init_async(gid,objectid,grainsize,max_num_neighbors,nodefile,neighborfile,index).get();
         }
 
         /// Traverse the graph. 
@@ -53,6 +55,23 @@ namespace bfs { namespace stubs
             // The following get yields control while the action above
             // is executed and the result is returned to the promise.
             return traverse_async(gid,level,parent,edge).get();
+        }
+
+        /// get parent
+        static hpx::lcos::promise<std::size_t >
+        get_parent_async(hpx::naming::id_type const& gid,std::size_t edge)
+        {
+            typedef server::point::get_parent_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid,edge);
+        }
+
+        /// get parent
+        static std::size_t
+        get_parent(hpx::naming::id_type const& gid,std::size_t edge)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise.
+            return get_parent_async(gid,edge).get();
         }
     };
 }}

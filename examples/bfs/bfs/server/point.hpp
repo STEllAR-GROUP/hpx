@@ -10,6 +10,7 @@
 
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
+#include <boost/numeric/ublas/vector_sparse.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace bfs { namespace server
@@ -28,12 +29,15 @@ namespace bfs { namespace server
         // kernel 1
         void init(std::size_t objectid,std::size_t grainsize,
         std::size_t max_num_neighbors,std::vector<std::size_t> const& nodelist,
-        std::vector<std::size_t> const& neighborlist);
+        std::vector<std::size_t> const& neighborlist,
+        boost::numeric::ublas::mapped_vector<std::size_t> const& index);
 
         /// Traverse the graph. 
         std::vector<std::size_t> traverse(std::size_t level, std::size_t parent,std::size_t edge);
 
-        ///////////////////////////////////////////////////////////////////////
+
+        std::size_t get_parent(std::size_t edge);
+
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
@@ -42,10 +46,11 @@ namespace bfs { namespace server
         enum actions
         {
             point_init = 0,
-            point_traverse = 1
+            point_traverse = 1,
+            point_get_parent = 2
         };
 
-        typedef hpx::actions::action5<
+        typedef hpx::actions::action6<
             // Component server type.
             point,
             // Action code.
@@ -56,6 +61,7 @@ namespace bfs { namespace server
             std::size_t,
             std::vector<std::size_t> const&,
             std::vector<std::size_t> const&,
+            boost::numeric::ublas::mapped_vector<std::size_t> const&,
             // Method bound to this action.
             &point::init
         > init_action;
@@ -75,13 +81,27 @@ namespace bfs { namespace server
             &point::traverse
         > traverse_action;
 
+        typedef hpx::actions::result_action1<
+            // Component server type.
+            point,
+            // Return type.
+            std::size_t,
+            // Action code.
+            point_get_parent,
+            // Arguments of this action.
+            std::size_t,
+            // Method bound to this action.
+            &point::get_parent
+        > get_parent_action;
+
     private:
         std::size_t idx_;
-        std::size_t level_;
+        std::vector<std::size_t> level_;
         std::vector<bool> visited_;
         std::vector< std::vector<std::size_t> > neighbors_;
-        std::size_t parent_;
+        std::vector<std::size_t> parent_;
         std::size_t grainsize_;
+        boost::numeric::ublas::mapped_vector<std::size_t> mapping_;
     };
 }}
 
@@ -93,6 +113,10 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     bfs::server::point::traverse_action,
     bfs_point_traverse_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    bfs::server::point::get_parent_action,
+    bfs_point_get_parent_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::lcos::base_lco_with_value<std::vector<std::size_t> >::get_value_action,

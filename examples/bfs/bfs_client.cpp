@@ -7,6 +7,7 @@
 #include <hpx/hpx_init.hpp>
 
 #include "bfs/point.hpp"
+#include <boost/numeric/ublas/vector_sparse.hpp>
 
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
@@ -23,41 +24,15 @@ init(hpx::components::server::distributing_factory::iterator_range_type const& r
     }
 }
 
-static int compare_doubles(const void* a, const void* b) {
-  double aa = *(const double*)a;
-  double bb = *(const double*)b;
-  return (aa < bb) ? -1 : (aa == bb) ? 0 : 1;
-}
+// this routine mirrors the matlab validation routine
+int validate(std::vector<std::size_t> const& parent,
+             std::vector<std::size_t> const& nodelist,
+             std::vector<std::size_t> const& neighborlist,
+             std::size_t searchkey);
 
-void get_statistics(std::vector<double> const& x, double &minimum, double &mean, double &stdev, double &firstquartile,
-                                                  double &median, double &thirdquartile, double &maximum)
-{
-  // Compute mean
-  double temp = 0.0;
-  std::size_t n = x.size();
-  for (std::size_t i=0;i<n;i++) temp += x[i];
-  temp /= n;
-  mean = temp;
-
-  // Compute std dev
-  temp = 0.0;
-  for (std::size_t i=0;i<n;i++) temp += (x[i] - mean)*(x[i]-mean);
-  temp /= n-1;
-  stdev = sqrt(temp);
-
-  // Sort x
-  std::vector<double> xx;    
-  xx.resize(n);
-  for (std::size_t i=0;i<n;i++) {
-    xx[i] = x[i];
-  }
-  qsort(&*xx.begin(),n,sizeof(double),compare_doubles);
-  minimum = xx[0];
-  firstquartile = (xx[(n - 1) / 4] + xx[n / 4]) * .5;
-  median = (xx[(n - 1) / 2] + xx[n / 2]) * .5;
-  thirdquartile = (xx[n - 1 - (n - 1) / 4] + xx[n - 1 - n / 4]) * .5; 
-  maximum = xx[n - 1];
-};
+void get_statistics(std::vector<double> const& x, double &minimum, double &mean, 
+                    double &stdev, double &firstquartile,
+                    double &median, double &thirdquartile, double &maximum);
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map &vm)
@@ -69,7 +44,6 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         ///////////////////////////////////////////////////////////////////////
         // Retrieve the command line options. 
-        std::size_t const num_elements = vm["n"].as<std::size_t>();
         std::size_t const grainsize = vm["grainsize"].as<std::size_t>();
         std::string const searchfile = vm["searchfile"].as<std::string>();
         std::size_t const max_levels = vm["max-levels"].as<std::size_t>();
@@ -77,8 +51,6 @@ int hpx_main(boost::program_options::variables_map &vm)
             = vm["max-num-neighbors"].as<std::size_t>();
 
         std::string const graphfile = vm["graph"].as<std::string>();
-
-        std::size_t ne = num_elements/grainsize;
 
         // Read in the graph file -- timing not reported
         hpx::util::high_resolution_timer readtime;
@@ -96,8 +68,10 @@ int hpx_main(boost::program_options::variables_map &vm)
                 std::getline(isstream,val2,' ');
                 std::size_t node = boost::lexical_cast<std::size_t>(val1);
                 std::size_t neighbor = boost::lexical_cast<std::size_t>(val2);
-                nodelist.push_back(node);
-                neighborlist.push_back(neighbor);
+                // increment all nodes and neighbors by 1; the smallest edge number is 1
+                // edge 0 is reserved for the parent of the root and for unvisited edges
+                nodelist.push_back(node+1);
+                neighborlist.push_back(neighbor+1);
               }
             }
           }
@@ -116,7 +90,9 @@ int hpx_main(boost::program_options::variables_map &vm)
                   std::istringstream isstream(line);
                   std::getline(isstream,val1);
                   std::size_t root = boost::lexical_cast<std::size_t>(val1);
-                  searchroot.push_back(root);
+                  // increment all nodes and neighbors by 1; the smallest edge number is 1
+                  // edge 0 is reserved for the parent of the root and for unvisited edges
+                  searchroot.push_back(root+1);
               }
             }
           }
@@ -138,6 +114,35 @@ int hpx_main(boost::program_options::variables_map &vm)
         hpx::components::component_type block_type =
             hpx::components::get_component_type<bfs::server::point>();
 
+        // ---------------------------------------------------------------
+        // get a unique list of nodes -- this is what determines ne, the number of components
+        boost::numeric::ublas::mapped_vector<std::size_t> index;
+        for (std::size_t i=0;i<nodelist.size();i++) {
+          index.insert_element( nodelist[i],1);
+          index.insert_element( neighborlist[i],1);
+        }
+        // sum index
+        std::size_t num_elements = std::accumulate( index.begin(), index.end(), 0);
+        if ( num_elements%grainsize != 0 ) num_elements += grainsize-(num_elements%grainsize);
+        std::size_t ne = num_elements/grainsize;
+
+        // Decide where everyone should go
+        std::size_t component_id = 0;
+        std::size_t count = 0;
+        for (boost::numeric::ublas::mapped_vector<std::size_t>::iterator it=index.begin();
+                         it!=index.end();++it) {
+          if ( *it != 0 ) {
+            *it = component_id;
+            count++;
+          }
+          if ( count == grainsize-1 ) {
+            component_id++;
+            count = 0;
+          }
+        }
+
+        // ---------------------------------------------------------------
+
         // Create ne point components with distributing factory.
         // These components will be evenly distributed among all available
         // localities supporting the component type.
@@ -157,15 +162,8 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::vector<hpx::lcos::promise<void> > init_phase;
 
         for (std::size_t i=0;i<ne;i++) {
-          init_phase.push_back(points[i].init_async(i,grainsize,max_num_neighbors,nodelist,neighborlist));
-        }
-
-        // While we're waiting for the initialization phase to complete, we 
-        // build a vector of all of the point GIDs. This will be used as the
-        // input for the next phase.
-        std::vector<hpx::naming::id_type> master_objects;
-        for (std::size_t i=0;i<ne;i++) {
-          master_objects.push_back(points[i].get_gid());
+          init_phase.push_back(points[i].init_async(i,grainsize,max_num_neighbors,
+                                                    nodelist,neighborlist,index));
         }
 
         // We have to wait for the initialization to complete before we begin
@@ -179,6 +177,8 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::vector<double> kernel2_time;
         kernel2_time.resize(searchroot.size());
         hpx::util::high_resolution_timer kernel2time;
+
+        bool validation;
   
         // go through each root position
         for (std::size_t step=0;step<searchroot.size();step++) {
@@ -190,7 +190,7 @@ int hpx_main(boost::program_options::variables_map &vm)
           std::size_t level = 0; 
 
           // The root node's parent.
-          std::size_t parent = 9999999999; 
+          std::size_t parent = 0; 
 
           // Create the parent vectors.
           std::vector<std::vector<std::size_t> > parents;
@@ -202,10 +202,8 @@ int hpx_main(boost::program_options::variables_map &vm)
 
           // Install the root node. 
           parents[level].push_back( searchroot[step] ); 
-
           // identify the component which has the root
-          std::size_t pointmap = searchroot[step]/grainsize;
-          traverse_phase.push_back( points[ pointmap ].traverse_async(level,parent,searchroot[step]) );
+          traverse_phase.push_back( points[ index(searchroot[step]) ].traverse_async(level,parent,searchroot[step]) );
 
           // Wait for the first part of the traverse phase to complete.
           hpx::lcos::wait(traverse_phase,neighbors);
@@ -227,8 +225,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
                   // Create a future encapsulating an asynchronous call to
                   // the traverse action of bfs::point. 
-                  pointmap = neighbors[i][j]/grainsize;
-                  traverse_phase.push_back(points[ pointmap ].traverse_async(k,parent,neighbors[i][j]));
+                  traverse_phase.push_back(points[ index(neighbors[i][j]) ].traverse_async(k,parent,neighbors[i][j]));
                 } 
               }
 
@@ -248,8 +245,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
                   // Create a future encapsulating an asynchronous call to
                   // the traverse action of bfs::point. 
-                  pointmap = alt_neighbors[i][j]/grainsize;
-                  traverse_phase.push_back(points[ pointmap ].traverse_async(k,parent,alt_neighbors[i][j]));
+                  traverse_phase.push_back(points[ index(alt_neighbors[i][j]) ].traverse_async(k,parent,alt_neighbors[i][j]));
                 } 
               }
 
@@ -258,29 +254,48 @@ int hpx_main(boost::program_options::variables_map &vm)
             }
           }
           kernel2_time[step] = kernel2time.elapsed();
+
+          // Validate  -- Not timed
+          //std::cout << " Validating searchkey " << step << std::endl;
+          // Get the parent of every edge
+          std::vector<std::size_t> nodeparents;
+          for (std::size_t i=0;i<nodelist.size();i++) {
+            nodeparents.push_back(points[ index(nodelist[i]) ].get_parent(nodelist[i]));
+          }
+
+          validation = true;
+          // Still working on the validation routine
+          //int rc = validate(nodeparents,nodelist,neighborlist,searchroot[step]); 
+          int rc = 1;
+          if ( rc <= 0 ) { 
+            validation = false;
+            std::cout << " Validation failed for searchroot " << searchroot[step] << " rc " << rc << std::endl;
+            break;
+          }
         }
 
-        // Prep output statistics
-        double minimum,mean,stdev,firstquartile,median,thirdquartile,maximum;
-        get_statistics(kernel2_time,minimum,mean,stdev,firstquartile,
-                       median,thirdquartile,maximum);
+        if ( validation ) {
+          // Prep output statistics
+          double minimum,mean,stdev,firstquartile,median,thirdquartile,maximum;
+          get_statistics(kernel2_time,minimum,mean,stdev,firstquartile,
+                         median,thirdquartile,maximum);
 
-        // Print time statistics
-        //std::cout << " SCALE: " << SCALE << std::endl;
-        //std::cout << " edgefactor: " << edgefactor << std::endl;
-        //std::cout << " NBFS: " << NBFS << std::endl;
-        std::cout << " construction_time:  " << kernel1_time << std::endl;
-
-        std::cout << " min_time:           " << minimum << std::endl;
-        std::cout << " firstquartile_time: " << firstquartile << std::endl;
-        std::cout << " median_time:        " << median << std::endl;
-        std::cout << " thirdquartile_time: " << thirdquartile << std::endl;
-        std::cout << " max_time:           " << maximum << std::endl;
-        std::cout << " stddev_time:        " << stdev << std::endl;
+          // Print time statistics
+          //std::cout << " SCALE: " << SCALE << std::endl;
+          //std::cout << " edgefactor: " << edgefactor << std::endl;
+          //std::cout << " NBFS: " << NBFS << std::endl;
+          std::cout << " construction_time:  " << kernel1_time << std::endl;
+  
+          std::cout << " min_time:           " << minimum << std::endl;
+          std::cout << " firstquartile_time: " << firstquartile << std::endl;
+          std::cout << " median_time:        " << median << std::endl;
+          std::cout << " thirdquartile_time: " << thirdquartile << std::endl;
+          std::cout << " max_time:           " << maximum << std::endl;
+          std::cout << " stddev_time:        " << stdev << std::endl;
+        }
 
         // Print the total walltime that the computation took.
         std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl;
-
     } // Ensure things go out of scope before hpx::finalize is called.
 
     hpx::finalize();
@@ -297,8 +312,6 @@ int main(int argc, char* argv[])
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()
-        ("n", value<std::size_t>()->default_value(20000),
-            "the number of nodes in the graph")
         ("grainsize", value<std::size_t>()->default_value(500),
             "the grainsize of the components")
         ("max-num-neighbors", value<std::size_t>()->default_value(20),

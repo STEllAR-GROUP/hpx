@@ -38,22 +38,24 @@ namespace bfs
         hpx::lcos::promise<void> init_async(std::size_t objectid,
             std::size_t grainsize,std::size_t max_num_neighbors,
             std::vector<std::size_t> const& nodefile,
-            std::vector<std::size_t> const& neighborfile)
+            std::vector<std::size_t> const& neighborfile,
+            boost::numeric::ublas::mapped_vector<std::size_t> const& index)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::init_async(gid_,objectid,grainsize,
-                                                max_num_neighbors,nodefile,neighborfile);
+                                                max_num_neighbors,nodefile,neighborfile,index);
         }
 
         // kernel 1
         void init(std::size_t objectid,std::size_t grainsize,
             std::size_t max_num_neighbors,
             std::vector<std::size_t> const& nodefile,
-            std::vector<std::size_t> const& neighborfile)
+            std::vector<std::size_t> const& neighborfile,
+            boost::numeric::ublas::mapped_vector<std::size_t> const& index)
         {
             BOOST_ASSERT(gid_);
             this->base_type::init_async(gid_,objectid, grainsize,
-                                        max_num_neighbors,nodefile,neighborfile);
+                                        max_num_neighbors,nodefile,neighborfile,index);
         }
 
         /// Traverse the graph. 
@@ -69,6 +71,21 @@ namespace bfs
         {
             BOOST_ASSERT(gid_);
             return this->base_type::traverse(gid_,level,parent,edge);
+        }
+
+        /// get parent
+        hpx::lcos::promise<std::size_t>
+        get_parent_async(std::size_t edge)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_parent_async(gid_,edge);
+        }
+
+        /// get parent
+        std::size_t get_parent(std::size_t edge)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_parent(gid_,edge);
         }
     };
 }
