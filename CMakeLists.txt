@@ -415,16 +415,16 @@ if(MSVC)
   ##############################################################################
   if(HPX_CXX11)
     # C++11 support
-    set(HPX_CXX11_RVALUE_REFERENCES)
+    set(HPX_CXX11_RVALUE_REFERENCES ON CACHE STRING "cxx11_rvalue_references state.")
     add_definitions(-DHPX_HAVE_CXX11_RVALUE_REFERENCES)
 
-    set(HPX_CXX11_LAMBDAS)
+    set(HPX_CXX11_LAMBDAS ON CACHE STRING "cxx11_lambdas state.")
     add_definitions(-DHPX_HAVE_CXX11_LAMBDAS)
 
-    set(HPX_CXX11_AUTO)
+    set(HPX_CXX11_AUTO ON CACHE STRING "cxx11_auto state.")
     add_definitions(-DHPX_HAVE_CXX11_AUTO)
 
-    set(HPX_CXX11_UNIQUE_PTR)
+    set(HPX_CXX11_UNIQUE_PTR ON CACHE STRING "cxx11_std_unique_ptr state.")
     add_definitions(-DHPX_HAVE_CXX11_STD_UNIQUE_PTR)
     add_definitions(-DBOOST_LOCKFREE_HAVE_CXX11_UNIQUE_PTR)
   endif()
