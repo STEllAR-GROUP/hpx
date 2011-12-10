@@ -27,9 +27,11 @@
 
 // Disable warning C4275: non dll-interface class used as base for dll-interface
 // class
+#if defined(BOOST_MSVC)
 #pragma warning(push)
 #pragma warning(disable: 4275)
 #pragma warning(disable: 4251)
+#endif
 
 // Description of the mutex algorithm is explained here:
 // http://lists.boost.org/Archives/boost/2006/09/110367.php
@@ -279,6 +281,8 @@ namespace hpx { namespace lcos
         char const* const description_;
     };
 }}
+#if defined(BOOST_MSVC)
 #pragma warning(pop)
+#endif
 #endif
 
