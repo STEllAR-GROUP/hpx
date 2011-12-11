@@ -54,7 +54,7 @@ struct request
         namespace_action_code type_
       , naming::gid_type const& lower_
       , naming::gid_type const& upper_
-      , boost::uint64_t count_
+      , boost::int64_t count_
         )
       : mc(type_)
       , data(boost::fusion::make_vector(lower_, upper_, count_))
@@ -228,9 +228,6 @@ struct request
     { // {{{
         switch (data.which())
         {
-            case subtype_gid_gid_count:
-                return get_data<subtype_gid_gid_count, 2>(ec);
-
             case subtype_gid_count:
                 return get_data<subtype_gid_count, 1>(ec);
 
@@ -245,6 +242,13 @@ struct request
             }
         };
     } // }}}
+
+    boost::int64_t get_credit(
+        error_code& ec = throws
+        ) const
+    {
+        return get_data<subtype_gid_gid_credit, 2>(ec);
+    }
 
     boost::int32_t get_component_type(
         error_code& ec = throws
@@ -324,14 +328,14 @@ struct request
         error_code& ec = throws
         ) const
     {
-        return get_data<subtype_gid_gid_count, 0>(ec);
+        return get_data<subtype_gid_gid_credit, 0>(ec);
     }
 
     naming::gid_type get_upper_bound(
         error_code& ec = throws
         ) const
     {
-        return get_data<subtype_gid_gid_count, 1>(ec);
+        return get_data<subtype_gid_gid_credit, 1>(ec);
     }
 
     std::string get_name(
@@ -368,7 +372,7 @@ struct request
 
     enum subtype
     {
-        subtype_gid_gid_count           = 0x0
+        subtype_gid_gid_credit          = 0x0
       , subtype_gid_count               = 0x1
       , subtype_gid_gva                 = 0x2
       , subtype_gid                     = 0x3
@@ -386,12 +390,11 @@ struct request
     // The order of the variant types is significant, and should not be changed
     typedef boost::variant<
         // 0x0
-        // primary_ns_increment
-        // primary_ns_decrement
+        // primary_ns_change_credit
         boost::fusion::vector3<
             naming::gid_type // lower
           , naming::gid_type // upper
-          , boost::uint64_t  // count
+          , boost::int64_t   // credit
         >
         // 0x1
         // primary_ns_unbind_gid

@@ -819,13 +819,13 @@ public:
     void incref(
         naming::gid_type const& lower
       , naming::gid_type const& upper
-      , boost::uint64_t credits = 1
+      , boost::int64_t credits = 1
       , error_code& ec = throws
         );
 
     void incref(
         naming::gid_type const& id
-      , boost::uint64_t credits = 1
+      , boost::int64_t credits = 1
       , error_code& ec = throws
         )
     {
@@ -857,13 +857,13 @@ public:
     void decref(
         naming::gid_type const& lower
       , naming::gid_type const& upper
-      , boost::uint64_t credits = 1
+      , boost::int64_t credits = 1
       , error_code& ec = throws
         );
 
     void decref(
         naming::gid_type const& id
-      , boost::uint64_t credits = 1
+      , boost::int64_t credits = 1
       , error_code& ec = throws
         )
     {

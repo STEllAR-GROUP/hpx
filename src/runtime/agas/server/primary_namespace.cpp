@@ -50,10 +50,8 @@ response primary_namespace::service(
             return free(req, ec);
         case primary_ns_unbind_gid:
             return unbind_gid(req, ec);
-        case primary_ns_increment:
-            return increment(req, ec);
-        case primary_ns_decrement:
-            return decrement(req, ec);
+        case primary_ns_change_credit:
+            return change_credit(req, ec);
         case primary_ns_localities:
             return localities(req, ec);
 
@@ -629,19 +627,45 @@ response primary_namespace::unbind_gid(
     }
 } // }}}
 
-response primary_namespace::increment(
+response primary_namespace::change_credit(
     request const& req
   , error_code& ec
     )
-{ // {{{ increment implementation
+{ // change_credit implementation
     // parameters
-    boost::uint64_t credits = req.get_count();
+    boost::int64_t credits = req.get_credit();
     naming::gid_type lower = req.get_lower_bound();
     naming::gid_type upper = req.get_upper_bound();
 
     naming::strip_credit_from_gid(lower);
     naming::strip_credit_from_gid(upper);
 
+    // Increment
+    if (0 < credits)
+        increment(lower, upper, credits, ec);
+
+    // Decrement
+    else if (0 > credits)
+        decrement(lower, upper, -credits, ec);
+
+    else 
+    {
+        HPX_THROWS_IF(ec, bad_parameter
+          , "primary_namespace::change_credit"
+          , boost::str(boost::format("invalid credit count of %1%") % credits));
+        return response();
+    }
+
+    return response(primary_ns_change_credit);
+}
+
+void primary_namespace::increment(
+    naming::gid_type const& lower
+  , naming::gid_type const& upper
+  , boost::int64_t credits
+  , error_code& ec
+    )
+{ // {{{ increment implementation
     mutex_type::scoped_lock l(mutex_);
 
     // TODO: Whine loudly if a reference count overflows. We reserve ~0 for
@@ -654,8 +678,8 @@ response primary_namespace::increment(
     // allocate/bind them, so if a GID is not in the refcnt table, we know that
     // it's global reference count is the initial global reference count. 
     refcnts_.apply(lower, upper
-                 , util::incrementer<boost::uint64_t>(credits)
-                 , boost::uint64_t(HPX_INITIAL_GLOBALCREDIT));
+                 , util::incrementer<boost::int64_t>(credits)
+                 , boost::int64_t(HPX_INITIAL_GLOBALCREDIT));
 
     LAGAS_(info) << (boost::format(
         "primary_namespace::increment, lower(%1%), upper(%2%), credits(%2%)")
@@ -663,42 +687,26 @@ response primary_namespace::increment(
 
     if (&ec != &throws)
         ec = make_success_code();
-
-    return response(primary_ns_increment);
 } // }}}
 
-response primary_namespace::decrement(
-    request const& req
+void primary_namespace::decrement(
+    naming::gid_type const& lower
+  , naming::gid_type const& upper
+  , boost::int64_t credits
   , error_code& ec
     )
 { // {{{ decrement implementation
     using boost::fusion::at_c;
 
-    // parameters
-    boost::uint64_t credits = req.get_count();
-    naming::gid_type lower = req.get_lower_bound();
-    naming::gid_type upper = req.get_upper_bound();
-
-    naming::strip_credit_from_gid(lower);
-    naming::strip_credit_from_gid(upper);
-
-    if (HPX_UNLIKELY(0 == credits))
-    {
-        HPX_THROWS_IF(ec, bad_parameter
-          , "primary_namespace::decrement"
-          , "cannot decrement zero credits");
-        return response();
-    }
-
     // REVIEW: Why do we have this restriction?
-    else if (HPX_UNLIKELY(HPX_INITIAL_GLOBALCREDIT < credits))
+    if (HPX_UNLIKELY(HPX_INITIAL_GLOBALCREDIT < credits))
     {
         HPX_THROWS_IF(ec, bad_parameter
           , "primary_namespace::decrement"
           , "cannot decrement more than "
             BOOST_PP_STRINGIZE(HPX_INITIAL_GLOBALCREDIT)
             " credits at once");
-        return response();
+        return;
     }
 
     LAGAS_(info) << (boost::format(
@@ -738,8 +746,8 @@ response primary_namespace::decrement(
         // we know that it's global reference count is the initial global
         // reference count. 
         refcnts_.apply(lower, upper
-                     , util::decrementer<boost::uint64_t>(credits)
-                     , boost::uint64_t(HPX_INITIAL_GLOBALCREDIT)); 
+                     , util::decrementer<boost::int64_t>(credits)
+                     , boost::int64_t(HPX_INITIAL_GLOBALCREDIT)); 
 
         ///////////////////////////////////////////////////////////////////////
         // Search for dead objects.
@@ -758,7 +766,7 @@ response primary_namespace::decrement(
                     "reference count table insertion failed due to a locking "
                     "error or memory corruption, lower(%1%), upper(%2%)")
                     % lower % upper));
-            return response();
+            return;
         }
 
         // Ranges containing dead objects.
@@ -816,7 +824,7 @@ response primary_namespace::decrement(
                     r = resolve_gid_locked(base, ec); 
 
                 if (ec)
-                    return response();
+                    return;
 
                 // Make sure the GVA is valid.
                 // REVIEW: Should we do more to make sure the GVA is valid?
@@ -829,7 +837,7 @@ response primary_namespace::decrement(
                             "encountered a GVA with an invalid type while"
                             "performing a decrement, gid(%1%), gva(%2%)")
                             % base % at_c<1>(r)));
-                    return response();
+                    return;
                 }
 
                 else if (HPX_UNLIKELY(0 == at_c<1>(r).count))
@@ -840,7 +848,7 @@ response primary_namespace::decrement(
                             "encountered a GVA with a count of zero while"
                             "performing a decrement, gid(%1%), gva(%2%)")
                             % base % at_c<1>(r)));
-                    return response();
+                    return;
                 }
 
                 // Determine how much of the mapping's keyspace this GVA covers.
@@ -885,7 +893,7 @@ response primary_namespace::decrement(
             // remapping so that we can erase it.
             if (super != it->key_)
                 // We use ~0 to prevent merges.
-                refcnts_.erase(refcnts_.bind(super, boost::uint64_t(~0)));
+                refcnts_.erase(refcnts_.bind(super, boost::int64_t(~0)));
             else
                 refcnts_.erase(it);
         }
@@ -958,8 +966,6 @@ response primary_namespace::decrement(
 
     if (&ec != &throws)
         ec = make_success_code();
-
-    return response(primary_ns_decrement);
 } // }}}
 
 response primary_namespace::localities(

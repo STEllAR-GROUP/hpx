@@ -334,8 +334,7 @@ struct response
         // component_ns_iterate_types
         // symbol_ns_bind
         // symbol_ns_iterate_names
-        // primary_ns_increment
-        // primary_ns_decrement
+        // primary_ns_change_credit
       , boost::fusion::vector0<
         >
     > data_type;

@@ -107,7 +107,7 @@ struct HPX_EXPORT primary_namespace :
     typedef std::map<naming::locality, partition_type>
         partition_table_type;
 
-    typedef util::merging_map<naming::gid_type, boost::uint64_t>
+    typedef util::merging_map<naming::gid_type, boost::int64_t>
         refcnt_table_type;
     // }}}
 
@@ -197,12 +197,7 @@ struct HPX_EXPORT primary_namespace :
       , error_code& ec = throws
         );
 
-    response increment(
-        request const& req
-      , error_code& ec = throws
-        );
-
-    response decrement(
+    response change_credit(
         request const& req
       , error_code& ec = throws
         );
@@ -215,6 +210,20 @@ struct HPX_EXPORT primary_namespace :
   private:
     boost::fusion::vector2<naming::gid_type, gva> resolve_gid_locked(
         naming::gid_type const& gid 
+      , error_code& ec
+        );
+
+    void increment(
+        naming::gid_type const& lower
+      , naming::gid_type const& upper
+      , boost::int64_t credits
+      , error_code& ec
+        );
+
+    void decrement(
+        naming::gid_type const& lower
+      , naming::gid_type const& upper
+      , boost::int64_t credits
       , error_code& ec
         );
 
@@ -233,9 +242,8 @@ struct HPX_EXPORT primary_namespace :
       , namespace_resolve_locality = BOOST_BINARY_U(1000110)
       , namespace_free             = BOOST_BINARY_U(1000111)
       , namespace_unbind_gid       = BOOST_BINARY_U(1001000)
-      , namespace_increment        = BOOST_BINARY_U(1001001)
-      , namespace_decrement        = BOOST_BINARY_U(1001010)
-      , namespace_localities       = BOOST_BINARY_U(1001011)
+      , namespace_change_credit    = BOOST_BINARY_U(1001001)
+      , namespace_localities       = BOOST_BINARY_U(1001010)
     }; // }}}
 
     typedef hpx::actions::result_action1<

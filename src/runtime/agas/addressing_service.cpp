@@ -1029,12 +1029,20 @@ bool addressing_service::resolve_cached(
 void addressing_service::incref(
     naming::gid_type const& lower
   , naming::gid_type const& upper
-  , boost::uint64_t credits
+  , boost::int64_t credit
   , error_code& ec
     )
 { // {{{ incref implementation
+    if (HPX_UNLIKELY(0 >= credit))
+    {
+        HPX_THROWS_IF(ec, bad_parameter
+          , "addressing_service::incref"
+          , boost::str(boost::format("invalid credit count of %1%") % credit));
+        return;
+    }
+
     try {
-        request req(primary_ns_increment, lower, upper, credits);
+        request req(primary_ns_change_credit, lower, upper, credit);
         response rep;
 
         // REVIEW: Should we do fire-and-forget here as well?
@@ -1065,12 +1073,20 @@ void addressing_service::incref(
 void addressing_service::decref(
     naming::gid_type const& lower
   , naming::gid_type const& upper
-  , boost::uint64_t credits
+  , boost::int64_t credit
   , error_code& ec
     )
 { // {{{ decref implementation
+    if (HPX_UNLIKELY(0 >= credit))
+    {
+        HPX_THROWS_IF(ec, bad_parameter
+          , "addressing_service::decref"
+          , boost::str(boost::format("invalid credit count of %1%") % credit));
+        return;
+    }
+
     try {
-        request req(primary_ns_decrement, lower, upper, credits);
+        request req(primary_ns_change_credit, lower, upper, credit);
 
         if (is_bootstrap())
         {
