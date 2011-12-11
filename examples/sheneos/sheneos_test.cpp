@@ -193,17 +193,17 @@ int main(int argc, char* argv[])
     cmdline.add_options()
         ("file", value<std::string>()->default_value(
                 "sheneos_220r_180t_50y_extT_analmu_20100322_SVNr28.h5"),
-            "name of HDF5 data file containing the Shen EOS tables")
+            "the HDF5 data file containing the ShenEOS tables")
         ("num-ye-points,Y", value<std::size_t>()->default_value(20),
-            "number of points to interpolate on the ye axis")
+            "the number of points to interpolate on the ye axis")
         ("num-temp-points,T", value<std::size_t>()->default_value(20),
-            "number of points to interpolate on the temp axis")
+            "the number of points to interpolate on the temp axis")
         ("num-rho-points,R", value<std::size_t>()->default_value(20),
-            "number of points to interpolate on the rho axis")
+            "the number of points to interpolate on the rho axis")
         ("num-partitions", value<std::size_t>()->default_value(32),
-            "number of partitions to create")
+            "the number of partitions to create")
         ("num-workers", value<std::size_t>()->default_value(1),
-            "number of worker/measurement threads to create")
+            "the number of worker/measurement threads to create per locality")
         ("seed", value<std::size_t>()->default_value(0),
             "the seed for the pseudo random number generator (if 0, a seed "
             "is choosen based on the current system time)")
