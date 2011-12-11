@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(HPX_VERSION_AUG_18_2011_0854PM)
-#define HPX_VERSION_AUG_18_2011_0854PM
+#define HPX_VERSION_AUG_18_2011_0854PM 
 
 #include <string>
 
