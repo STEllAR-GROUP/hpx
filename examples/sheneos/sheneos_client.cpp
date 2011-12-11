@@ -8,14 +8,14 @@
 
 #include <boost/assign/std.hpp>
 
-#include "sheneos/sheneos.hpp"
+#include "sheneos/interpolator.hpp"
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 
 ///////////////////////////////////////////////////////////////////////////////
 inline bool
-eval(char const* expr, sheneos::sheneos& shen, double ye,
+eval(char const* expr, sheneos::interpolator& shen, double ye,
     double temp, double rho, std::vector<double>& expected)
 {
     std::vector<double> results = shen.interpolate(ye, temp, rho);
@@ -57,7 +57,7 @@ int hpx_main(variables_map& vm)
         expected += 3.556341e+14;       // dpderho
 
         // create the distributed interpolation object on num_localities
-        sheneos::sheneos shen;
+        sheneos::interpolator shen;
         shen.create(datafilename, shen_symbolic_name, num_localities);
 
         eval("shen(0.2660725, 63.0, std::pow(10., 14.74994))", shen,
@@ -67,7 +67,7 @@ int hpx_main(variables_map& vm)
 
         // create a second client instance connected to the already existing
         // interpolation object
-        sheneos::sheneos shen_connected;
+        sheneos::interpolator shen_connected;
         shen_connected.connect(shen_symbolic_name);
 
         eval("shen(0.2660725, 63.0, std::pow(10., 14.74994))", shen_connected,

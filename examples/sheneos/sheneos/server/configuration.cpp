@@ -4,7 +4,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
@@ -17,10 +16,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace sheneos { namespace server
 {
-    configuration::configuration()
-    {
-    }
-
     void configuration::init(std::string const& datafilename,
         std::string const& symbolic_name, std::size_t num_instances)
     {
@@ -39,7 +34,7 @@ namespace sheneos { namespace server
 namespace boost { namespace serialization
 {
     ///////////////////////////////////////////////////////////////////////////
-    // implement the serialization functions
+    // Implement the serialization functions.
     template <typename Archive>
     void serialize(Archive& ar, sheneos::config_data& cfg, unsigned int const)
     {
@@ -47,7 +42,7 @@ namespace boost { namespace serialization
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // explicit instantiation for the correct archive types
+    // Explicit instantiation for the correct archive types.
 #if HPX_USE_PORTABLE_ARCHIVES != 0
     template HPX_COMPONENT_EXPORT void
     serialize(hpx::util::portable_binary_iarchive&, sheneos::config_data&,
@@ -69,7 +64,7 @@ namespace boost { namespace serialization
 typedef sheneos::server::configuration configuration_type;
 
 ///////////////////////////////////////////////////////////////////////////////
-// Serialization support for the actions
+// Serialization support for the actions.
 HPX_REGISTER_ACTION_EX(configuration_type::init_action,
     sheneos_configuration_init_action);
 HPX_REGISTER_ACTION_EX(configuration_type::get_action,
@@ -86,3 +81,4 @@ HPX_REGISTER_ACTION_EX(
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco_with_value<sheneos::config_data>,
     hpx::components::component_base_lco_with_value);
+

@@ -23,9 +23,8 @@ namespace sheneos { namespace stubs
         init_async(hpx::naming::id_type const& gid, std::string const& datafile,
             std::string const& symbolic_name, std::size_t num_instances)
         {
-            // Create an eager_future, execute the required action,
-            // we simply return the initialized promise, the caller needs
-            // to call get() on the return value to obtain the result
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise.
             typedef sheneos::server::configuration::init_action action_type;
             return hpx::lcos::eager_future<action_type>(
                 gid, datafile, symbolic_name, num_instances);
@@ -42,9 +41,8 @@ namespace sheneos { namespace stubs
         static hpx::lcos::promise<config_data>
         get_async(hpx::naming::id_type const& gid)
         {
-            // Create an eager_future, execute the required action,
-            // we simply return the initialized promise, the caller needs
-            // to call get() on the return value to obtain the result
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise.
             typedef sheneos::server::configuration::get_action action_type;
             return hpx::lcos::eager_future<action_type>(gid);
         }

@@ -4,7 +4,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 
 #include <boost/serialization/vector.hpp>
@@ -34,23 +33,23 @@ namespace sheneos { namespace server
     partition3d::init_dimension(std::string const& datafilename, int d,
         dimension const& dim, char const* name, boost::scoped_array<double>& values)
     {
-        // store all parameters
+        // Store all parameters.
         dim_[d] = dim;
 
-        // Account for necessary overlap on the right hand end of the data
-        // interval (the interpolation algorithm used does not go beyond the
-        // left hand end).
+        // Account for necessary overlap on the right hand side of the data
+        // interval (the interpolation algorithm we're using does not go beyond
+        // the left hand side).
         std::size_t count = dim.count_;
         if (dim.offset_ + dim.count_ < dim.size_-2) {
             dim_[d].count_ += 2;
             ++count;
         }
 
-        // read the full data range
+        // Read the full data range.
         values.reset(new double[dim_[d].count_]);
         extract_data(datafilename, name, values.get(), dim.offset_, dim_[d].count_);
 
-        // extract range (without ghost-zones)
+        // Extract range (without ghost-zones).
         min_value_[d] = values[0];
         max_value_[d] = values[count-1];
         delta_[d] = values[1] - values[0];
@@ -73,10 +72,10 @@ namespace sheneos { namespace server
         init_dimension(datafilename, dimension::temp, dimy, "logtemp", logtemp_values_);
         init_dimension(datafilename, dimension::rho, dimz, "logrho", logrho_values_);
 
-        // init energy shift
+        // Initialize the energy shift.
         extract_data(datafilename, "energy_shift", &energy_shift_, 0, 1);
 
-        // read the slice of our data
+        // Read our slice of data.
         std::size_t array_size = dim_[dimension::ye].count_ *
             dim_[dimension::temp].count_ * dim_[dimension::rho].count_;
 
@@ -103,12 +102,12 @@ namespace sheneos { namespace server
 #endif
     }
 
-    // do the actual interpolation
     inline std::size_t
-    partition3d::get_index(int d, double value)
+    partition3d::get_index(dimension::type d, double value)
     {
         if (value < min_value_[d] || value > max_value_[d]) {
-            HPX_THROW_EXCEPTION(hpx::bad_parameter, "verify_value",
+            HPX_THROW_EXCEPTION(hpx::bad_parameter,
+                "sheneos::partition3d::get_index",
                 "argument out of range");
             return 0;
         }
@@ -124,7 +123,6 @@ namespace sheneos { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // get index of a given value in the one-dimensional array-slice
     inline std::size_t
     index(std::size_t x, std::size_t y, std::size_t z, dimension const* dim)
     {
@@ -138,7 +136,6 @@ namespace sheneos { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // tri-linear interpolation routine
     inline double
     partition3d::interpolate(double* values,
         std::size_t idx_x, std::size_t idx_y, std::size_t idx_z,
@@ -168,9 +165,6 @@ namespace sheneos { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // ye: electron fraction
-    // temp: temperature
-    // rho: rest mass density of the plasma
     std::vector<double>
     partition3d::interpolate(double ye, double temp,
         double rho, boost::uint32_t eosvalues)
@@ -189,7 +183,7 @@ namespace sheneos { namespace server
         std::vector<double> results;
         results.reserve(19);
 
-        // calculate all required values
+        // Calculate all required values.
         if (eosvalues & logpress) {
             double value = interpolate(logpress_values_.get(),
                 idx_ye, idx_logtemp, idx_logrho,
@@ -233,9 +227,6 @@ namespace sheneos { namespace server
                 delta_ye, delta_logtemp, delta_logrho));
         }
 
-#if SHENEOS_SUPPORT_FULL_API
-#endif
-
         return results;
     }
 }}
@@ -244,7 +235,7 @@ namespace sheneos { namespace server
 typedef sheneos::server::partition3d partition3d_type;
 
 ///////////////////////////////////////////////////////////////////////////////
-// Serialization support for the actions
+// Serialization support for the actions.
 HPX_REGISTER_ACTION_EX(partition3d_type::init_action,
     sheneos_partition3d_init_action);
 HPX_REGISTER_ACTION_EX(partition3d_type::interpolate_action,
@@ -261,3 +252,4 @@ HPX_REGISTER_ACTION_EX(
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco_with_value<std::vector<double> >,
     hpx::components::component_base_lco_with_value);
+

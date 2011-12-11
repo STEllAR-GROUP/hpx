@@ -11,8 +11,8 @@
 
 namespace boost { namespace serialization
 {
-    ///////////////////////////////////////////////////////////////////////////////
-    // implement the serialization functions
+    ///////////////////////////////////////////////////////////////////////////
+    // Implementation of the serialization function.
     template <typename Archive>
     void serialize(Archive& ar, sheneos::dimension& dim, unsigned int const)
     {
@@ -20,7 +20,7 @@ namespace boost { namespace serialization
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // explicit instantiation for the correct archive types
+    // Explicit instantiation for the correct archive types.
 #if HPX_USE_PORTABLE_ARCHIVES != 0
     template HPX_COMPONENT_EXPORT void
     serialize(hpx::util::portable_binary_iarchive&, sheneos::dimension&,
@@ -37,5 +37,4 @@ namespace boost { namespace serialization
         unsigned int const);
 #endif
 }}
-
 

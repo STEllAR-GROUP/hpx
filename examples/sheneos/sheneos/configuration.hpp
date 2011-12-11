@@ -24,7 +24,7 @@ namespace sheneos
             configuration, sheneos::stubs::configuration> base_type;
 
     public:
-        // create a new partition instance and initialize it synchronously
+        /// Create a new partition instance and initialize it synchronously.
         configuration(std::string const& datafilename,
                 std::string const& symbolic_name, std::size_t num_instances)
           : base_type(sheneos::stubs::configuration::create_sync(hpx::find_here()))
@@ -73,3 +73,4 @@ namespace sheneos
 }
 
 #endif
+
