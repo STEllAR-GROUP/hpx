@@ -144,7 +144,10 @@ namespace hpx
 #endif
 
             class HPX_API_EXPORT local_priority_queue_scheduler;
+
+#if defined(HPX_HIERARCHY_SCHEDULER)
             class HPX_API_EXPORT hierarchy_scheduler;
+#endif
 
             class HPX_API_EXPORT callback_notifier;
 

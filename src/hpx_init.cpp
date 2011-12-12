@@ -591,6 +591,7 @@ namespace hpx
         }
 #endif
 
+#if defined(HPX_HIERARCHY_SCHEDULER)
         ///////////////////////////////////////////////////////////////////////
         // hierarchical scheduler: The thread queues are built up hierarchically
         // this avoids contention during work stealing
@@ -627,6 +628,7 @@ namespace hpx
             return run(rt, f, vm, mode, startup, shutdown, num_threads,
                 num_localities);
         }
+#endif
 
         ///////////////////////////////////////////////////////////////////////
         void set_signal_handlers()
@@ -966,7 +968,7 @@ namespace hpx
 #else
                 throw std::logic_error("Command line option --queueing=global "
                     "is not configured in this build. Please rebuild with "
-                    "'cmake -DHPX_GLOBAL_SCHEDULER'.");
+                    "'cmake -DHPX_GLOBAL_SCHEDULER=ON'.");
 #endif
             }
             else if (0 == std::string("local").find(queueing)) {
@@ -976,7 +978,7 @@ namespace hpx
 #else
                 throw std::logic_error("Command line option --queueing=local "
                     "is not configured in this build. Please rebuild with "
-                    "'cmake -DHPX_LOCAL_SCHEDULER'.");
+                    "'cmake -DHPX_LOCAL_SCHEDULER=ON'.");
 #endif
             }
             else if (0 == std::string("priority_local").find(queueing)) {
@@ -994,14 +996,20 @@ namespace hpx
 #else
                 throw std::logic_error("Command line option --queueing=abp "
                     "is not configured in this build. Please rebuild with "
-                    "'cmake -DHPX_ABP_SCHEDULER'.");
+                    "'cmake -DHPX_ABP_SCHEDULER=ON'.");
 #endif
             }
             else if (0 == std::string("hierarchy").find(queueing)) {
-                // hierarchy scheduler: tree of dequeues, with work
+#if defined(HPX_HIERARCHY_SCHEDULER)
+                // hierarchy scheduler: tree of queues, with work
                 // stealing from the parent queue in that tree.
                 result = detail::run_hierarchy(f, vm, mode, ini_config,
                     startup, shutdown, num_threads, num_localities);
+#else
+                throw std::logic_error("Command line option --queueing=abp "
+                    "is not configured in this build. Please rebuild with "
+                    "'cmake -DHPX_HIERARCHY_SCHEDULER=ON'.");
+#endif
             }
             else {
                 throw std::logic_error("Bad value for command line option "

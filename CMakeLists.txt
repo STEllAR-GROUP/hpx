@@ -341,6 +341,12 @@ if(HPX_ABP_SCHEDULER)
   add_definitions(-DHPX_ABP_SCHEDULER)
 endif()
 
+hpx_option(HPX_HIERARCHY_SCHEDULER BOOL "Enable the use of --queueing=hierarchy (default: OFF)" OFF)
+
+if(HPX_HIERARCHY_SCHEDULER)
+  add_definitions(-DHPX_HIERARCHY_SCHEDULER)
+endif()
+
 ################################################################################
 # MSVC configuration
 ################################################################################
