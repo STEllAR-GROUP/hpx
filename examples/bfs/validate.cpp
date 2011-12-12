@@ -19,7 +19,7 @@ int validate(std::vector<std::size_t> const& preorder_parent,
              std::vector<std::size_t> const& preorder_parentindex,
              std::vector<std::size_t> const& nodelist,
              std::vector<std::size_t> const& neighborlist,
-             std::size_t searchkey) {
+             std::size_t searchkey,std::size_t &num_edges) {
   // find the largest edge number
   // octave:  N = max (max (ij));
   std::size_t N = 0;
@@ -43,6 +43,24 @@ int validate(std::vector<std::size_t> const& preorder_parent,
       }
     }
   }
+
+  // Get the number of edges for perfomance counting
+  std::vector<std::size_t> nedge_bins;
+  nedge_bins.resize(N);
+  std::fill(nedge_bins.begin(),nedge_bins.end(),0);
+  for (std::size_t i=0;i<nodelist.size();i++) {
+    nedge_bins[nodelist[i] ] += 1;
+    nedge_bins[neighborlist[i] ] += 1;
+  }  
+
+  num_edges = 0;
+  for (std::size_t i=0;i<N;i++) {
+    if ( parent[i] > 0 ) {
+      num_edges += nedge_bins[i];
+    }
+  }
+  // Volume/2
+  num_edges = num_edges/2;
 
   if ( parent[searchkey] != searchkey ) {
     // the parent of the searchkey is always itself

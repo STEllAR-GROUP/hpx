@@ -30,7 +30,7 @@ int validate(std::vector<std::size_t> const& parent,
              std::vector<std::size_t> const& parentindex,
              std::vector<std::size_t> const& nodelist,
              std::vector<std::size_t> const& neighborlist,
-             std::size_t searchkey);
+             std::size_t searchkey,std::size_t &num_edges);
 
 void get_statistics(std::vector<double> const& x, double &minimum, double &mean, 
                     double &stdev, double &firstquartile,
@@ -177,7 +177,9 @@ int hpx_main(boost::program_options::variables_map &vm)
         ///////////////////////////////////////////////////////////////////////
         // KERNEL 2  --- TIMED
         std::vector<double> kernel2_time;
+        std::vector<double> kernel2_nedge;
         kernel2_time.resize(searchroot.size());
+        kernel2_nedge.resize(searchroot.size());
         hpx::util::high_resolution_timer kernel2time;
 
         bool validation;
@@ -269,7 +271,10 @@ int hpx_main(boost::program_options::variables_map &vm)
 
           validation = true;
           //std::cout << " Validating graph for " << searchroot[step] << std::endl;
-          int rc = validate(nodeparents,nodelevels,nodeparentsindex,nodelist,neighborlist,searchroot[step]); 
+          std::size_t num_edges;
+          int rc = validate(nodeparents,nodelevels,nodeparentsindex,nodelist,
+                            neighborlist,searchroot[step],num_edges); 
+          kernel2_nedge[step] = num_edges;
           if ( rc <= 0 ) { 
             validation = false;
             std::cout << " Validation failed for searchroot " << searchroot[step] << " rc " << rc << std::endl;
@@ -291,18 +296,55 @@ int hpx_main(boost::program_options::variables_map &vm)
           get_statistics(kernel2_time,minimum,mean,stdev,firstquartile,
                          median,thirdquartile,maximum);
 
+          double n_min,n_mean,n_stdev,n_firstquartile,n_median,n_thirdquartile,n_maximum;
+          get_statistics(kernel2_nedge,n_min,n_mean,n_stdev,n_firstquartile,
+                         n_median,n_thirdquartile,n_maximum);
+
           // Print time statistics
           //std::cout << " SCALE: " << SCALE << std::endl;
           //std::cout << " edgefactor: " << edgefactor << std::endl;
           //std::cout << " NBFS: " << NBFS << std::endl;
           std::cout << " construction_time:  " << kernel1_time << std::endl;
   
-          std::cout << " min_time:           " << minimum << std::endl;
-          std::cout << " firstquartile_time: " << firstquartile << std::endl;
-          std::cout << " median_time:        " << median << std::endl;
-          std::cout << " thirdquartile_time: " << thirdquartile << std::endl;
-          std::cout << " max_time:           " << maximum << std::endl;
-          std::cout << " stddev_time:        " << stdev << std::endl;
+          std::cout << " min_time:             " << minimum << std::endl;
+          std::cout << " firstquartile_time:   " << firstquartile << std::endl;
+          std::cout << " median_time:          " << median << std::endl;
+          std::cout << " thirdquartile_time:   " << thirdquartile << std::endl;
+          std::cout << " max_time:             " << maximum << std::endl;
+          std::cout << " mean_time:            " << mean << std::endl;
+          std::cout << " stddev_time:          " << stdev << std::endl;
+
+          std::cout << " min_nedge:            " << n_min << std::endl;
+          std::cout << " firstquartile_nedge:  " << n_firstquartile << std::endl;
+          std::cout << " median_nedge:         " << n_median << std::endl;
+          std::cout << " thirdquartile_nedge:  " << n_thirdquartile << std::endl;
+          std::cout << " max_nedge:            " << n_maximum << std::endl;
+          std::cout << " mean_nedge:           " << n_mean << std::endl;
+          std::cout << " stddev_nedge:         " << n_stdev << std::endl;
+
+          std::vector<double> TEPS; 
+          TEPS.resize(kernel2_nedge.size());
+          for (std::size_t i=0;i<kernel2_nedge.size();i++) {
+            TEPS[i] = kernel2_nedge[i]/kernel2_time[i];
+          }
+          std::size_t N = TEPS.size();
+          double TEPS_min,TEPS_mean,TEPS_stdev,TEPS_firstquartile,TEPS_median,TEPS_thirdquartile,TEPS_maximum;
+          get_statistics(TEPS,TEPS_min,TEPS_mean,TEPS_stdev,TEPS_firstquartile,
+                         TEPS_median,TEPS_thirdquartile,TEPS_maximum);
+
+          // Harmonic standard deviation from:
+          // Nilan Norris, The Standard Errors of the Geometric and Harmonic
+          // Means and Their Application to Index Numbers, 1940.
+          // http://www.jstor.org/stable/2235723
+          TEPS_stdev = TEPS_stdev/(TEPS_mean*TEPS_mean*sqrt(N-1));
+
+          std::cout << " min_TEPS:            " << TEPS_min << std::endl;
+          std::cout << " firstquartile_TEPS:  " << TEPS_firstquartile << std::endl;
+          std::cout << " median_TEPS:         " << TEPS_median << std::endl;
+          std::cout << " thirdquartile_TEPS:  " << TEPS_thirdquartile << std::endl;
+          std::cout << " max_TEPS:            " << TEPS_maximum << std::endl;
+          std::cout << " harmonic_mean_TEPS:  " << TEPS_mean << std::endl;
+          std::cout << " harmonic_stddev_TEPS:" << TEPS_stdev << std::endl;
         }
 
         // Print the total walltime that the computation took.
