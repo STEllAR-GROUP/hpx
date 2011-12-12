@@ -937,7 +937,7 @@ namespace hpx
             ini_config += "hpx.localities=" +
                 boost::lexical_cast<std::string>(num_localities);
 
-//             // If we are running on one locality we should not throttle the 
+//             // If we are running on one locality we should not throttle the
 //             // number of concurrent AGAS resolve requests.
 //             if (1 == num_localities) {
 //                 ini_config += "hpx.agas.max_resolve_requests=" +
@@ -1006,7 +1006,7 @@ namespace hpx
                 result = detail::run_hierarchy(f, vm, mode, ini_config,
                     startup, shutdown, num_threads, num_localities);
 #else
-                throw std::logic_error("Command line option --queueing=abp "
+                throw std::logic_error("Command line option --queueing=hierarchy "
                     "is not configured in this build. Please rebuild with "
                     "'cmake -DHPX_HIERARCHY_SCHEDULER=ON'.");
 #endif
