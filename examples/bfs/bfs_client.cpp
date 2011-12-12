@@ -26,6 +26,8 @@ init(hpx::components::server::distributing_factory::iterator_range_type const& r
 
 // this routine mirrors the matlab validation routine
 int validate(std::vector<std::size_t> const& parent,
+             std::vector<std::size_t> const& levels,
+             std::vector<std::size_t> const& parentindex,
              std::vector<std::size_t> const& nodelist,
              std::vector<std::size_t> const& neighborlist,
              std::size_t searchkey);
@@ -189,9 +191,6 @@ int hpx_main(boost::program_options::variables_map &vm)
           // Traverse the graph.
           std::size_t level = 0; 
 
-          // The root node's parent.
-          std::size_t parent = 0; 
-
           // Create the parent vectors.
           std::vector<std::vector<std::size_t> > parents;
           for (std::size_t i=0;i<max_levels;i++) {
@@ -203,7 +202,7 @@ int hpx_main(boost::program_options::variables_map &vm)
           // Install the root node. 
           parents[level].push_back( searchroot[step] ); 
           // identify the component which has the root
-          traverse_phase.push_back( points[ index(searchroot[step]) ].traverse_async(level,parent,searchroot[step]) );
+          traverse_phase.push_back( points[ index(searchroot[step]) ].traverse_async(level,searchroot[step],searchroot[step]) );
 
           // Wait for the first part of the traverse phase to complete.
           hpx::lcos::wait(traverse_phase,neighbors);
@@ -218,7 +217,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
               for (std::size_t i=0;i<neighbors.size();i++) {
                 // Set the current parent.
-                parent = parents[k-1][i];
+                std::size_t parent = parents[k-1][i];
 
                 for (std::size_t j=0;j<neighbors[i].size();j++) {
                   parents[k].push_back( neighbors[i][j] ); 
@@ -238,7 +237,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
               for (std::size_t i=0;i<alt_neighbors.size();i++) {
                 // Set the current parent.
-                parent = parents[k-1][i];
+                std::size_t parent = parents[k-1][i];
 
                 for (std::size_t j=0;j<alt_neighbors[i].size();j++) {
                   parents[k].push_back( alt_neighbors[i][j] ); 
@@ -259,19 +258,31 @@ int hpx_main(boost::program_options::variables_map &vm)
           //std::cout << " Validating searchkey " << step << std::endl;
           // Get the parent of every edge
           std::vector<std::size_t> nodeparents;
-          for (std::size_t i=0;i<nodelist.size();i++) {
-            nodeparents.push_back(points[ index(nodelist[i]) ].get_parent(nodelist[i]));
+          std::vector<std::size_t> nodelevels;
+          std::vector<std::size_t> nodeparentsindex;
+          for (boost::numeric::ublas::mapped_vector<std::size_t>::iterator it=index.begin();
+                         it!=index.end();++it) {
+            nodeparents.push_back(points[ *it ].get_parent(it.index()));
+            nodelevels.push_back(points[ *it ].get_level(it.index()));
+            nodeparentsindex.push_back(it.index());
           }
 
           validation = true;
-          // Still working on the validation routine
-          //int rc = validate(nodeparents,nodelist,neighborlist,searchroot[step]); 
-          int rc = 1;
+          //std::cout << " Validating graph for " << searchroot[step] << std::endl;
+          int rc = validate(nodeparents,nodelevels,nodeparentsindex,nodelist,neighborlist,searchroot[step]); 
           if ( rc <= 0 ) { 
             validation = false;
             std::cout << " Validation failed for searchroot " << searchroot[step] << " rc " << rc << std::endl;
             break;
           }
+          //std::cout << " Validation for " << searchroot[step] << " passed! " << std::endl;
+
+          // Reset for the next root
+          std::vector<hpx::lcos::promise<void> > reset_phase;
+          for (std::size_t i=0;i<ne;i++) {
+            reset_phase.push_back(points[i].reset_visited_async(i));
+          }
+          hpx::lcos::wait(reset_phase);
         }
 
         if ( validation ) {

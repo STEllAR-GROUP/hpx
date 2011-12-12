@@ -73,6 +73,38 @@ namespace bfs { namespace stubs
             // is executed and the result is returned to the promise.
             return get_parent_async(gid,edge).get();
         }
+
+        /// get level
+        static hpx::lcos::promise<std::size_t >
+        get_level_async(hpx::naming::id_type const& gid,std::size_t edge)
+        {
+            typedef server::point::get_level_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid,edge);
+        }
+
+        /// get level
+        static std::size_t
+        get_level(hpx::naming::id_type const& gid,std::size_t edge)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise.
+            return get_level_async(gid,edge).get();
+        }
+
+        static hpx::lcos::promise<void>
+        reset_visited_async(hpx::naming::id_type const& gid,std::size_t objectid)
+        {
+            typedef server::point::reset_visited_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid,objectid);
+        }
+
+        static void reset_visited(hpx::naming::id_type const& gid,std::size_t objectid)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise.
+            reset_visited_async(gid,objectid).get();
+        }
+
     };
 }}
 

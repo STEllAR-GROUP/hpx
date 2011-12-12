@@ -15,6 +15,8 @@ static int compare_doubles(const void* a, const void* b) {
 
 // this routine mirrors the matlab validation routine
 int validate(std::vector<std::size_t> const& preorder_parent,
+             std::vector<std::size_t> const& preorder_level,
+             std::vector<std::size_t> const& preorder_parentindex,
              std::vector<std::size_t> const& nodelist,
              std::vector<std::size_t> const& neighborlist,
              std::size_t searchkey) {
@@ -25,22 +27,26 @@ int validate(std::vector<std::size_t> const& preorder_parent,
     if ( nodelist[i] > N ) N = nodelist[i];
     if ( neighborlist[i] > N ) N = neighborlist[i];
   }  
+  N++;
 
   std::vector<std::size_t> parent;
+  std::vector<std::size_t> levels;
   parent.resize( N );
+  levels.resize( N );
   std::fill( parent.begin(),parent.end(),0 );
   //order the parent so that the indices correspond to the node parent it refers to
   for (std::size_t i=0;i<N;i++) {
-    for (std::size_t j=0;j<nodelist.size();j++) {
-      if ( i == nodelist[j] ) {
-        parent[ i ] = preorder_parent[ i ];
-        break;
+    for (std::size_t j=0;j<preorder_parentindex.size();j++) {
+      if ( i == preorder_parentindex[j] ) {
+        parent[ i ] = preorder_parent[ j ];
+        levels[ i ] = preorder_level[ j ];
       }
     }
   }
 
-  if ( parent[searchkey] != 0 ) {
-    // the parent of the searchkey is always 0
+  if ( parent[searchkey] != searchkey ) {
+    // the parent of the searchkey is always itself
+    std::cout << " searchkey " << searchkey << " parent " << parent[searchkey] << std::endl;
     return 0;
   }  
 
@@ -128,6 +134,7 @@ int validate(std::vector<std::size_t> const& preorder_parent,
   }
 
   // octave: neither_in = lij(1,:) == 0 & lij(2,:) == 0;
+  // both_in = lij(1,:) > 0 & lij(2,:) > 0;
   std::vector<bool> neither_in,both_in;
   neither_in.resize(nodelist.size()); 
   both_in.resize(nodelist.size()); 
@@ -142,7 +149,9 @@ int validate(std::vector<std::size_t> const& preorder_parent,
   //  return
   //end
   for (std::size_t i=0;i<nodelist.size();i++) {
-    if ( !(neither_in[i] || both_in[i] ) ) return -4;
+    if ( !(neither_in[i] || both_in[i] ) ) {
+      return -4;
+    }
   }
 
   // octave: respects_tree_level = abs (lij(1,:) - lij(2,:)) <= 1;

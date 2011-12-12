@@ -37,6 +37,8 @@ namespace bfs { namespace server
 
 
         std::size_t get_parent(std::size_t edge);
+        std::size_t get_level(std::size_t edge);
+        void reset_visited(std::size_t objectid);
 
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
@@ -47,7 +49,9 @@ namespace bfs { namespace server
         {
             point_init = 0,
             point_traverse = 1,
-            point_get_parent = 2
+            point_get_parent = 2,
+            point_get_level = 3,
+            point_reset_visited = 4
         };
 
         typedef hpx::actions::action6<
@@ -65,6 +69,17 @@ namespace bfs { namespace server
             // Method bound to this action.
             &point::init
         > init_action;
+
+        typedef hpx::actions::action1<
+            // Component server type.
+            point,
+            // Action code.
+            point_reset_visited,
+            // Arguments of this action.
+            std::size_t,
+            // Method bound to this action.
+            &point::reset_visited
+        > reset_visited_action;
 
         typedef hpx::actions::result_action3<
             // Component server type.
@@ -94,6 +109,19 @@ namespace bfs { namespace server
             &point::get_parent
         > get_parent_action;
 
+        typedef hpx::actions::result_action1<
+            // Component server type.
+            point,
+            // Return type.
+            std::size_t,
+            // Action code.
+            point_get_level,
+            // Arguments of this action.
+            std::size_t,
+            // Method bound to this action.
+            &point::get_level
+        > get_level_action;
+
     private:
         std::size_t idx_;
         std::vector<std::size_t> level_;
@@ -117,6 +145,14 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     bfs::server::point::get_parent_action,
     bfs_point_get_parent_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    bfs::server::point::get_level_action,
+    bfs_point_get_level_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    bfs::server::point::reset_visited_action,
+    bfs_point_reset_visited_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::lcos::base_lco_with_value<std::vector<std::size_t> >::get_value_action,

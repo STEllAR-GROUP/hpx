@@ -87,6 +87,36 @@ namespace bfs
             BOOST_ASSERT(gid_);
             return this->base_type::get_parent(gid_,edge);
         }
+
+        /// get level
+        hpx::lcos::promise<std::size_t>
+        get_level_async(std::size_t edge)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_level_async(gid_,edge);
+        }
+
+        /// get level
+        std::size_t get_level(std::size_t edge)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_level(gid_,edge);
+        }
+
+        // reset_visited
+        hpx::lcos::promise<void> reset_visited_async(std::size_t objectid)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::reset_visited_async(gid_,objectid);
+        }
+
+        // reset_visited
+        void reset_visited(std::size_t objectid)
+        {
+            BOOST_ASSERT(gid_);
+            this->base_type::reset_visited_async(gid_,objectid);
+        }
+
     };
 }
 
