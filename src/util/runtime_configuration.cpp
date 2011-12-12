@@ -62,6 +62,10 @@ namespace hpx { namespace util
                 BOOST_PP_STRINGIZE(HPX_INITIAL_IP_PORT) "}",
             "max_resolve_requests = ${HPX_AGAS_MAX_RESOLVE_REQUESTS:"
                 BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_MAX_RESOLVE_REQUESTS) "}",
+            "max_pending_refcnt_requests = "
+                "${HPX_AGAS_MAX_PENDING_REFCNT_REQUESTS:1"
+                BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS)
+                "}",
             "service_mode = hosted",
             "dedicated_server = 0",
             "gva_cache_size = ${HPX_AGAS_GVA_CACHE_SIZE:"
@@ -314,6 +318,20 @@ namespace hpx { namespace util
             }
         }
         return HPX_INITIAL_AGAS_MAX_RESOLVE_REQUESTS;
+    }
+
+    std::size_t
+    runtime_configuration::get_agas_max_pending_refcnt_requests() const
+    {
+        if (has_section("hpx.agas")) {
+            util::section const* sec = get_section("hpx.agas");
+            if (NULL != sec) {
+                return boost::lexical_cast<std::size_t>(
+                    sec->get_entry("max_pending_refcnt_requests",
+                        HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS));
+            }
+        }
+        return HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS;
     }
 
     // Get whether the AGAS server is running as a dedicated runtime.

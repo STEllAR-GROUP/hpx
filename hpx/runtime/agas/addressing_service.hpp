@@ -157,6 +157,9 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     // }}}
 
     typedef boost::lockfree::fifo<lcos::promise<response>*> promise_pool_type;
+    
+    typedef util::merging_map<naming::gid_type, boost::int64_t>
+        refcnt_requests_type;
 
     struct bootstrap_data_type
     { // {{{
@@ -175,20 +178,28 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         promise_pool_type promise_pool_;
     }; // }}}
 
+    // REVIEW: Does this have to be mutable?
     mutable mutex_type gva_cache_mtx_;
     gva_cache_type gva_cache_;
 
+    // REVIEW: Does this have to be mutable?
     mutable mutex_type console_cache_mtx_;
     boost::uint32_t console_cache_;
 
+    std::size_t const max_refcnt_requests_;
+
+    mutex_type refcnt_requests_mtx_;
+    std::size_t refcnt_requests_count_;
+    boost::shared_ptr<refcnt_requests_type> refcnt_requests_;
+
     hpx::lcos::local_counting_semaphore resolve_throttle_;
 
-    const service_mode service_type;
-    const runtime_mode runtime_type;
+    service_mode const service_type;
+    runtime_mode const runtime_type;
 
-    const bool caching_;
-    const bool range_caching_;
-    const threads::thread_priority action_priority_;
+    bool const caching_;
+    bool const range_caching_;
+    threads::thread_priority const action_priority_;
 
     naming::locality here_;
     boost::uint64_t rts_lva_;
@@ -265,7 +276,22 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     ///        local cache.
     void install_counters();
 
+    void trigger_refcnt_requests(
+        error_code& ec = throws
+        );
+
 private:
+    /// Assumes that \a refcnt_requests_mtx_ is locked.
+    void increment_refcnt_requests(
+        mutex_type::scoped_lock& l
+      , error_code& ec
+        );
+
+    void send_refcnt_requests(
+        mutex_type::scoped_lock& l
+      , error_code& ec
+        );
+
     // Helper functions to access the current cache statistics
     std::size_t get_cache_hits() const;
     std::size_t get_cache_misses() const;

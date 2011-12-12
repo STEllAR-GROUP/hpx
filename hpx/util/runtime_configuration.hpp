@@ -61,6 +61,8 @@ namespace hpx { namespace util
 
         std::size_t get_agas_max_resolve_requests() const;
 
+        std::size_t get_agas_max_pending_refcnt_requests() const;
+
         // Get whether the AGAS server is running as a dedicated runtime.
         // This decides whether the AGAS actions are executed with normal
         // priority (if dedicated) or with high priority (non-dedicated)

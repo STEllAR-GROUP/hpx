@@ -81,17 +81,17 @@ namespace hpx { namespace naming
                 // as the shared_ptr is assuming it has been properly deleted
                 // already. The actual deletion happens in the decrement_refcnt
                 // once it is executed.
-                error_code ec;
-                applier::register_work(boost::bind(decrement_refcnt, p),
-                    "decrement global gid reference count",
-                    threads::thread_state(threads::pending),
-                    threads::thread_priority_normal, std::size_t(-1), ec);
-                if (ec)
-                {
+                //error_code ec;
+                //applier::register_work(boost::bind(decrement_refcnt, p),
+                //    "decrement global gid reference count",
+                //    threads::thread_state(threads::pending),
+                //    threads::thread_priority_normal, std::size_t(-1), ec);
+                //if (ec)
+                //{
                     // if we are not able to spawn a new thread, we need to execute
                     // the deleter directly
                     decrement_refcnt(p);
-                }
+                //}
             }
             else {
                 delete p;   // delete local gid representation if needed

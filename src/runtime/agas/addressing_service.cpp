@@ -24,6 +24,9 @@ addressing_service::addressing_service(
   , runtime_mode runtime_type_
     )
   : console_cache_(0)
+  , max_refcnt_requests_(ini_.get_agas_max_pending_refcnt_requests())
+  , refcnt_requests_count_(0)
+  , refcnt_requests_(new refcnt_requests_type) 
   , resolve_throttle_(ini_.get_agas_max_resolve_requests())
   , service_type(ini_.get_agas_service_mode())
   , runtime_type(runtime_type_)
@@ -1086,20 +1089,12 @@ void addressing_service::decref(
     }
 
     try {
-        request req(primary_ns_change_credit, lower, upper, credit);
+        mutex_type::scoped_lock l(refcnt_requests_mtx_);
 
-        if (is_bootstrap())
-        {
-            typedef server::primary_namespace::service_action action_type;
-            applier::apply_l_p<action_type>
-                (primary_ns_addr_, action_priority_, req); 
-        }
+        refcnt_requests_->apply(lower, upper
+                              , util::incrementer<boost::int64_t>(-credit));
 
-        else
-            hosted->primary_ns_.service_non_blocking(req, action_priority_);
-
-        if (&ec != &throws)
-            ec = make_success_code();
+        increment_refcnt_requests(l, ec);
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
@@ -1352,6 +1347,88 @@ void addressing_service::install_counters()
     performance_counters::install_counters(
         counters, sizeof(counters)/sizeof(counters[0]));
 } // }}}
+
+void addressing_service::trigger_refcnt_requests(
+    error_code& ec
+    )
+{
+    mutex_type::scoped_lock l(refcnt_requests_mtx_);
+    send_refcnt_requests(l, ec);
+}
+
+void addressing_service::increment_refcnt_requests(
+    addressing_service::mutex_type::scoped_lock& l
+  , error_code& ec
+    )
+{
+    if (!l.owns_lock())
+    {
+        HPX_THROWS_IF(ec, lock_error
+          , "addressing_service::increment_refcnt_requests"
+          , "mutex is not locked");
+        return;
+    }
+
+    if (max_refcnt_requests_ == ++refcnt_requests_count_) 
+        send_refcnt_requests(l, ec);
+
+    else if (&ec != &throws)
+        ec = make_success_code();
+}
+
+void addressing_service::send_refcnt_requests(
+    addressing_service::mutex_type::scoped_lock& l
+  , error_code& ec
+    )
+{
+    try {
+        boost::shared_ptr<refcnt_requests_type> p(new refcnt_requests_type);
+
+        p.swap(refcnt_requests_);
+
+        refcnt_requests_count_ = 0;
+
+        l.unlock();
+
+        std::vector<request> requests;
+
+        BOOST_FOREACH(refcnt_requests_type::const_reference e, *p)
+        {
+            request const req(primary_ns_change_credit
+                            , boost::icl::lower(e.key())
+                            , boost::icl::upper(e.key())
+                            , e.data());
+            requests.push_back(req);
+        }
+
+        if (is_bootstrap())
+        {
+            typedef server::primary_namespace::bulk_service_action
+                action_type;
+            applier::apply_l_p<action_type>
+                (primary_ns_addr_, action_priority_, requests); 
+        }
+
+        else
+            hosted->primary_ns_.bulk_service_non_blocking
+                (requests, action_priority_);
+
+        if (&ec != &throws)
+            ec = make_success_code();
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error()
+              , "addressing_service::increment_refcnt_requests"
+              , e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow);
+        }
+
+        return;
+    }
+}
 
 }}
 

@@ -96,6 +96,11 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+#if !defined(HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS)
+#  define HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS 4096 
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 /// This defines whether to use the portable binary archives for parcel
 /// serialization
 #if !defined(HPX_USE_PORTABLE_ARCHIVES)

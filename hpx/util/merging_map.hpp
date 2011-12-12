@@ -113,6 +113,16 @@ struct mapping
     {
         return boost::icl::exclusive_less(a.key_, b);
     }
+
+    key_type const& key() const
+    {
+        return key_;
+    }
+
+    data_type const& data() const
+    {
+        return data_;
+    }
 };
 
 template <

@@ -175,6 +175,16 @@ void pre_main(runtime_mode mode)
         components::stubs::runtime_support::call_startup_functions(find_here());
         LBT_(info) << "(3rd stage) pre_main: ran startup functions";
 
+        // Register pre-shutdown and shutdown functions to flush pending
+        // reference counting operations. 
+        register_pre_shutdown_function(boost::bind(
+            &agas::addressing_service::trigger_refcnt_requests
+          , &agas_client, boost::ref(throws)));
+
+        register_shutdown_function(boost::bind(
+            &agas::addressing_service::trigger_refcnt_requests
+          , &agas_client, boost::ref(throws)));
+
         // Third stage bootstrap synchronizes startup functions across all
         // localities. This is done after component loading to guarantee that
         // all user code, including startup functions, are only run after the
