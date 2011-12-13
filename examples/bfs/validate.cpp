@@ -185,7 +185,9 @@ int validate(std::vector<std::size_t> const& preorder_parent,
   //  out = -5;
   //  return
   for (std::size_t i=0;i<nodelist.size();i++) {
-    if ( !(neither_in[i] || respects_tree_level[i] ) ) return -5;
+    if ( !(neither_in[i] || respects_tree_level[i] ) ) {
+      return -5;
+    }
   }
   
   return 1;

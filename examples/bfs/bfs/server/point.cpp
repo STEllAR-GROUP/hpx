@@ -33,28 +33,31 @@ namespace bfs { namespace server
           neighbors_[i].reserve(max_num_neighbors);
           visited_[i] = false;
         }
-
+ 
+        boost::numeric::ublas::mapped_vector<bool> initialized;
         // initialize the mapping
         for (std::size_t i=0;i<nodelist.size();i++) {
           std::size_t node = nodelist[i];
           std::size_t neighbor = neighborlist[i];
           if ( index(node) == idx_ && node != neighbor ) {
             mapping_.insert_element(node,0);
+            initialized.insert_element(node,false);
           }
           if ( index(neighbor) == idx_ && node != neighbor ) {
             mapping_.insert_element(neighbor,0);
+            initialized.insert_element(neighbor,false);
           }
         }
 
         std::size_t count = 0;
-        std::size_t const zero = 0;
         for (std::size_t i=0;i<nodelist.size();i++) {
           std::size_t node = nodelist[i];
           std::size_t neighbor = neighborlist[i];
           BOOST_ASSERT(count < grainsize_);
           if ( index(node) == idx_ && node != neighbor ) {
-            if ( mapping_(node) == zero ) {
+            if ( initialized(node) == false ) {
               mapping_(node) = count;
+              initialized(node) = true;
               count++;
             } 
             neighbors_[ mapping_(node) ].push_back(neighbor);
@@ -63,11 +66,13 @@ namespace bfs { namespace server
           BOOST_ASSERT(count < grainsize_);
           // symmetrize
           if ( index(neighbor) == idx_ && node != neighbor ) {
-            if ( mapping_(neighbor) == zero ) {
+            if ( initialized(neighbor) == false ) {
               mapping_(neighbor) = count;
+              initialized(neighbor) = true;
               count++;
             }
             neighbors_[ mapping_(neighbor) ].push_back(node);
+    
           }
         } 
     }
@@ -84,9 +89,6 @@ namespace bfs { namespace server
             visited_[mapping_(edge)] = true;
             parent_[mapping_(edge)] = parent;
             level_[mapping_(edge)] = level; 
-
-            //hpx::cout << ( boost::format("node id %1%, parent id %2%, level %3%\n")
-            //             % idx_ % parent_ % level_) << hpx::flush; 
 
             // Return the neighbors.
             return neighbors_[mapping_(edge)];
