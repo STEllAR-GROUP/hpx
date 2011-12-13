@@ -22,6 +22,7 @@ namespace bfs { namespace server
         std::vector<std::size_t> const& neighborlist,
         boost::numeric::ublas::mapped_vector<std::size_t> const& index)
     {
+        hpx::lcos::local_mutex::scoped_lock l(mtx_);
         idx_ = objectid;
         grainsize_ = grainsize; 
         neighbors_.resize(grainsize_);
@@ -72,11 +73,13 @@ namespace bfs { namespace server
     }
 
     void point::reset_visited(std::size_t id) {
+      hpx::lcos::local_mutex::scoped_lock l(mtx_);
       std::fill( visited_.begin(),visited_.end(),false);
     }
 
     std::vector<std::size_t> point::traverse(std::size_t level,std::size_t parent,std::size_t edge)
     {
+        hpx::lcos::local_mutex::scoped_lock l(mtx_);
         if ( visited_[mapping_(edge)] == false ) {
             visited_[mapping_(edge)] = true;
             parent_[mapping_(edge)] = parent;
@@ -96,8 +99,7 @@ namespace bfs { namespace server
 
     std::size_t point::get_parent(std::size_t edge)
     {
-         //   hpx::cout << ( boost::format("node id %1%, parent id %2%, edge %3%\n")
-         //                % idx_ % parent_ % edge) << hpx::flush; 
+      hpx::lcos::local_mutex::scoped_lock l(mtx_);
       if ( visited_[mapping_(edge)] == false ) {
         return 0;
       } else {
@@ -107,8 +109,7 @@ namespace bfs { namespace server
 
     std::size_t point::get_level(std::size_t edge)
     {
-         //   hpx::cout << ( boost::format("node id %1%, parent id %2%, edge %3%\n")
-         //                % idx_ % parent_ % edge) << hpx::flush; 
+      hpx::lcos::local_mutex::scoped_lock l(mtx_);
       if ( visited_[mapping_(edge)] == false ) {
         return 0;
       } else {

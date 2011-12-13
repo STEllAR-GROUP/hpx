@@ -123,6 +123,7 @@ namespace bfs { namespace server
         > get_level_action;
 
     private:
+        hpx::lcos::local_mutex mtx_;
         std::size_t idx_;
         std::vector<std::size_t> level_;
         std::vector<bool> visited_;

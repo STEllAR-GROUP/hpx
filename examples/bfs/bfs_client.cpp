@@ -36,6 +36,12 @@ void get_statistics(std::vector<double> const& x, double &minimum, double &mean,
                     double &stdev, double &firstquartile,
                     double &median, double &thirdquartile, double &maximum);
 
+bool fexists(std::string const filename)
+{
+  std::ifstream ifile(filename);
+  return ifile;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map &vm)
 {
@@ -53,6 +59,21 @@ int hpx_main(boost::program_options::variables_map &vm)
             = vm["max-num-neighbors"].as<std::size_t>();
 
         std::string const graphfile = vm["graph"].as<std::string>();
+
+        // Verify the input files are available for reading
+        bool rc;
+        rc = fexists(graphfile);
+        if ( !rc ) {
+          std::cerr << " File " << graphfile << " not found! Exiting... " << std::endl;
+          hpx::finalize();
+          return 0;
+        }
+        rc = fexists(searchfile);
+        if ( !rc ) {
+          std::cerr << " File " << searchfile << " not found! Exiting... " << std::endl;
+          hpx::finalize();
+          return 0;
+        }
 
         // Read in the graph file -- timing not reported
         hpx::util::high_resolution_timer readtime;
