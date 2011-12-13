@@ -788,8 +788,14 @@ namespace hpx
             if (vm.count("hpx"))
                 util::split_ip_address(vm["hpx"].as<std::string>(), hpx_host, hpx_port);
 
-            if (vm.count("threads"))
+            if (vm.count("threads")) {
+                if (env.run_with_pbs()) {
+                    std::cerr  << "hpx::init: command line warning: --threads/-t "
+                        "used used when running with PBS, the application might"
+                        "not run properly." << std::endl;
+                }
                 num_threads = vm["threads"].as<std::size_t>();
+            }
 
             std::string queueing("priority_local");
             if (vm.count("queueing"))
