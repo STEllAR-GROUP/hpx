@@ -60,8 +60,15 @@ namespace hpx { namespace lcos {
         )
 
 #undef HPX_LCOS_DATAFLOW_M0
+        
+        promise<void> get_promise() const
+        {
+            promise<void> p;
+            connect(p.get_gid());
+            return p;
+        }
 
-        void get()
+        void get() const
         {
             promise<void> p;
             connect(p.get_gid());

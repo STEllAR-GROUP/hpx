@@ -62,8 +62,15 @@ namespace hpx { namespace lcos {
         )
 
 #undef HPX_LCOS_DATAFLOW_M0
+        
+        promise<Result, remote_result_type> get_promise() const
+        {
+            promise<Result, remote_result_type> p;
+            connect(p.get_gid());
+            return p;
+        }
 
-        Result get()
+        Result get() const
         {
             promise<Result, remote_result_type> p;
             connect(p.get_gid());
