@@ -817,11 +817,11 @@ void primary_namespace::decrement(
             // mapping's keyspace.
             while (!boost::icl::is_empty(super))
             {
-                naming::gid_type base = boost::icl::lower(super);
+                naming::gid_type query = boost::icl::lower(super);
 
-                // Resolve the base GID. 
+                // Resolve the query GID. 
                 boost::fusion::vector2<naming::gid_type, gva>
-                    r = resolve_gid_locked(base, ec); 
+                    r = resolve_gid_locked(query, ec); 
 
                 if (ec)
                     return;
@@ -836,7 +836,7 @@ void primary_namespace::decrement(
                       , boost::str(boost::format(
                             "encountered a GVA with an invalid type while"
                             "performing a decrement, gid(%1%), gva(%2%)")
-                            % base % at_c<1>(r)));
+                            % query % at_c<1>(r)));
                     return;
                 }
 
@@ -847,27 +847,27 @@ void primary_namespace::decrement(
                       , boost::str(boost::format(
                             "encountered a GVA with a count of zero while"
                             "performing a decrement, gid(%1%), gva(%2%)")
-                            % base % at_c<1>(r)));
+                            % query % at_c<1>(r)));
                     return;
                 }
 
                 // Determine how much of the mapping's keyspace this GVA covers.
-                // Note that g.count must be greater than 0 if we've reached
-                // this point in the code. 
-                naming::gid_type sub_upper(base + (at_c<1>(r).count - 1));
+                // Note that at_c<1>(r).countmust be greater than 0 if we've
+                // reached this point in the code. 
+                naming::gid_type sub_upper(at_c<0>(r) + (at_c<1>(r).count - 1));
 
                 // If this GVA ends after the keyspace, we just set the upper
                 // limit to the end of the keyspace. 
                 if (sub_upper > boost::icl::upper(super)) 
                     sub_upper = boost::icl::upper(super);
 
-                BOOST_ASSERT(base >= sub_upper);
+                BOOST_ASSERT(query <= sub_upper);
 
-                // We don't use the base gid returned by resolve, but instead
-                // we use the GID that we resolved. This ensures that GVAs
-                // which cover a range that begins before our keyspace are
-                // handled properly.
-                key_type const sub(base, sub_upper); 
+                // We don't use the base GID returned by resolve_gid_locked, but
+                // instead we use the GID that we queried the GVA table with.
+                // This ensures that GVAs which cover a range that begins before
+                // our keyspace are handled properly.
+                key_type const sub(query, sub_upper); 
 
                 LAGAS_(info) << (boost::format(
                     "primary_namespace::decrement, resolved match, lower(%1%), "
@@ -882,11 +882,11 @@ void primary_namespace::decrement(
                 naming::gid_type const length = boost::icl::length(sub);
 
                 // Fully resolve the range. 
-                gva const g = at_c<1>(r).resolve(base, at_c<0>(r)); 
+                gva const g = at_c<1>(r).resolve(query, at_c<0>(r)); 
 
                 // Add the information needed to destroy these components to the
                 // free list.
-                free_list.push_back(free_entry(g, base, length)); 
+                free_list.push_back(free_entry(g, query, length)); 
             }
 
             // If this is just a partial match, we need to split it up with a
