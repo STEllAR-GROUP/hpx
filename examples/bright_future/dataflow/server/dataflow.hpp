@@ -67,7 +67,7 @@ namespace hpx { namespace lcos { namespace server
         {
             LLCO_(info)
                 << "~server::dataflow::dataflow()";
-            delete component_ptr;
+            //delete component_ptr;
         }
 
         /// init initializes the dataflow, it creates a dataflow_impl object
