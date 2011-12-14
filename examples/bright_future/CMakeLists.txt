@@ -15,14 +15,16 @@ set(bright_future_programs
         gs_hpx_grid_ro
         remote_functions
         remote_object
-        dataflow_overhead
-   )
-
-set(bright_future_programs ${bright_future_programs}
     dataflow_test
     gs_hpx_blocked_df
-    gs_hpx_distributed
    )
+
+if(HPX_CXX11_LAMBDAS)
+set(bright_future_programs ${bright_future_programs}
+    gs_hpx_distributed
+        dataflow_overhead
+   )
+endif()
 
 add_hpx_component(
     gs_hpx
@@ -59,11 +61,13 @@ set(gs_hpx_blocked_FLAGS DEPENDENCIES gs_hpx_component iostreams_component)
 set(gs_hpx_blocked_df_FLAGS DEPENDENCIES gs_hpx_component bright_future_dataflow_component iostreams_component
 #${GOOGLE_PERFTOOLS_LIBRARY}
         )
+if(HPX_CXX11_LAMBDAS)
 set(gs_hpx_distributed_FLAGS DEPENDENCIES gs_hpx_component bright_future_dataflow_component iostreams_component
 #${GOOGLE_PERFTOOLS_LIBRARY}
         )
 set(dataflow_overhead_FLAGS DEPENDENCIES gs_hpx_component
         bright_future_dataflow_component iostreams_component)
+endif()
 set(gs_hpx_grid_ro_FLAGS DEPENDENCIES remote_object_component iostreams_component)
 
 foreach(bright_future_program ${bright_future_programs})
