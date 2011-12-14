@@ -18,8 +18,10 @@
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/include/iostreams.hpp>
 
+/*
 #include <google/profiler.h>
 #include <google/heap-profiler.h>
+*/
 
 #include "server/remote_lse.hpp"
 #include "dataflow/dataflow.hpp"
@@ -307,9 +309,9 @@ void gs(
                 using hpx::naming::id_type;
                 using hpx::naming::strip_credit_from_gid;
  
-                grid_ids(x, y) = id;/*id_type(
+                grid_ids(x, y) = id_type(
                     strip_credit_from_gid(id.get_gid()),
-                    id_type::unmanaged);*/
+                    id_type::unmanaged);
 
                 if(++x > n_x_block - 1)
                 {
