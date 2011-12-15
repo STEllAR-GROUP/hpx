@@ -47,5 +47,6 @@ source_group("Header Files" FILES ${common_headers})
 add_hpx_component(bfs
     MODULE bfs
     SOURCES ${sources}
-    HEADERS ${headers})
+    HEADERS ${headers}
+    DEPENDENCIES iostreams_component)
 
