@@ -176,7 +176,7 @@ int validate(std::vector<std::size_t> const& preorder_parent,
   std::vector<bool> respects_tree_level;
   respects_tree_level.resize( nodelist.size() );
   for (std::size_t i=0;i<nodelist.size();i++) {
-    if ( abs( li[i] - lj[i] ) <= 1 ) respects_tree_level[i] = true;
+    if ( abs( (int) (li[i] - lj[i]) ) <= 1 ) respects_tree_level[i] = true;
     else respects_tree_level[i] = false;
   }
 

@@ -295,7 +295,7 @@ int hpx_main(boost::program_options::variables_map &vm)
           std::size_t num_edges;
           int rc = validate(nodeparents,nodelevels,nodeparentsindex,nodelist,
                             neighborlist,searchroot[step],num_edges); 
-          kernel2_nedge[step] = num_edges;
+          kernel2_nedge[step] = (double) num_edges;
           if ( rc <= 0 ) { 
             validation = false;
             std::cout << " Validation failed for searchroot " << searchroot[step] << " rc " << rc << std::endl;
@@ -357,7 +357,7 @@ int hpx_main(boost::program_options::variables_map &vm)
           // Nilan Norris, The Standard Errors of the Geometric and Harmonic
           // Means and Their Application to Index Numbers, 1940.
           // http://www.jstor.org/stable/2235723
-          TEPS_stdev = TEPS_stdev/(TEPS_mean*TEPS_mean*sqrt(N-1));
+          TEPS_stdev = TEPS_stdev/(TEPS_mean*TEPS_mean*sqrt( (double) (N-1) ) );
 
           std::cout << " min_TEPS:            " << TEPS_min << std::endl;
           std::cout << " firstquartile_TEPS:  " << TEPS_firstquartile << std::endl;
