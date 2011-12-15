@@ -177,13 +177,13 @@ namespace gtc { namespace server
             std::size_t ij = igrid_[i] + j; 
             for (std::size_t k=1;k<=mzeta_;k++) {
               markeri_(k,ij,0) = tdum*markeri_(k,ij,0)/pmarki_[i];
-              markeri_(k,ij,0) = 1.0/markeri_(i,ij,0);
+              markeri_(k,ij,0) = 1.0/markeri_(k,ij,0);
             }
           }
           pmarki_[i] = 1.0/(par->ntoroidal*tdum);
-          //for (std::size_t j=0;j<markeri_.isize();j++) {
-          //  markeri_(j,igrid_[i],0) = markeri_(j,igrid_[i]+mtheta_[i],0);
-          //}
+          for (std::size_t j=0;j<markeri_.isize();j++) {
+            markeri_(j,igrid_[i],0) = markeri_(j,igrid_[i]+mtheta_[i],0);
+          }
         }
     }
 
