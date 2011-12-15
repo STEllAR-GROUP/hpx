@@ -15,14 +15,15 @@ set(bright_future_programs
         gs_hpx_grid_ro
         remote_functions
         remote_object
-    dataflow_test
-    gs_hpx_blocked_df
+        dataflow_test
+        gs_hpx_blocked_df
    )
 
 if(HPX_CXX11_LAMBDAS)
 set(bright_future_programs ${bright_future_programs}
-    gs_hpx_distributed
+        gs_hpx_distributed
         dataflow_overhead
+        dataflow_overhead2
    )
 endif()
 
@@ -65,8 +66,8 @@ if(HPX_CXX11_LAMBDAS)
 set(gs_hpx_distributed_FLAGS DEPENDENCIES gs_hpx_component bright_future_dataflow_component iostreams_component
 #${GOOGLE_PERFTOOLS_LIBRARY}
         )
-set(dataflow_overhead_FLAGS DEPENDENCIES gs_hpx_component
-        bright_future_dataflow_component iostreams_component)
+set(dataflow_overhead_FLAGS DEPENDENCIES bright_future_dataflow_component iostreams_component)
+set(dataflow_overhead2_FLAGS DEPENDENCIES bright_future_dataflow_component iostreams_component)
 endif()
 set(gs_hpx_grid_ro_FLAGS DEPENDENCIES remote_object_component iostreams_component)
 

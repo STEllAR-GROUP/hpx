@@ -40,8 +40,7 @@ using hpx::lcos::wait;
 using hpx::naming::id_type;
 using hpx::util::high_resolution_timer;
 
-
-using hpx::actions::plain_result_action0;
+using hpx::actions::plain_result_action1;
 
 ///////////////////////////////////////////////////////////////////////////////
 // we use globals here to prevent the delay from being optimized away
@@ -49,18 +48,18 @@ double global_scratch = 0;
 boost::uint64_t num_iterations = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
-double null_function()
+double null_function(double d)
 {
-    double d = 0.0;
     for (boost::uint64_t i = 0; i < num_iterations; ++i)
         d += 1 / (2. * i + 1);
     return d;
 }
 
-typedef plain_result_action0<
+typedef plain_result_action1<
     // result type
     double
     // arguments
+  , double
     // function
   , null_function
 > null_action;
@@ -77,30 +76,32 @@ int hpx_main(variables_map & vm)
         const boost::uint64_t count = vm["dataflows"].as<boost::uint64_t>();
         
         std::vector<id_type> prefixes = find_all_localities();
-        
-        double function_time;
+
+        double function_time = 0.0;
         {    
             high_resolution_timer walltime;
             for(std::size_t i = 0; i < 10000; ++i)
             {
-                global_scratch += null_function();
+                global_scratch += null_function(0.0);
             }
             function_time = walltime.elapsed()/10000;
         }
 
         BOOST_FOREACH(id_type const & prefix, prefixes)
         {
-            std::vector<dataflow_base<double> > dataflows;
-            dataflows.reserve(count);
+            //std::vector<dataflow_base<std::pair<double, double> > > dataflows;
+            //dataflows.reserve(count);
 
+            dataflow_base<double> d;
             high_resolution_timer walltime;
 
-            for(boost::uint64_t i = 0; i < count; ++i)
+            d = null_dataflow(prefix, 0.0);
+            for(boost::uint64_t i = 1; i < count; ++i)
             {
-                dataflows.push_back(null_dataflow(prefix));
+                d = null_dataflow(prefix, d);
             }
 
-            wait(dataflows, [&] (std::size_t, double r) { global_scratch += r;});
+            global_scratch += d.get();
             const double duration = walltime.elapsed();
             
             if (vm.count("csv"))

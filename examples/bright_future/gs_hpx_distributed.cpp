@@ -243,6 +243,7 @@ void gs(
 )
 {
     {
+        bool debug = false;
         // initialization of hpx component. this can be hidden nicely
         // this is not something to worry about right now.
         // it creates the remote_lse_type and registers it with the hpx agas
@@ -274,9 +275,12 @@ void gs(
         distributing_factory::async_create_result_type
             result = factory.create_components_async(type, num_blocks);
 
-        BOOST_FOREACH(id_type const & prefix, prefixes)
+        if(debug)
         {
-            cout << prefix << "\n" << flush;
+            BOOST_FOREACH(id_type const & prefix, prefixes)
+            {
+                cout << prefix << "\n" << flush;
+            }
         }
 
         distributing_factory::result_type results = result.get();
@@ -293,14 +297,17 @@ void gs(
         size_type n_x_local_block = n_x_local/block_size+1;
         size_type n_y_local_block = n_y_local/block_size+1;
 
-        cout
-            << "N_x       " << n_x << "\n"
-            << "N_y       " << n_y << "\n"
-            << "N_x_block " << n_x_block << "\n"
-            << "N_y_block " << n_y_block << "\n"
-            << "N_x_local " << n_x_local << "\n"
-            << "N_y_local " << n_y_local << "\n"
-            << flush;
+        if(debug)
+        {
+            cout
+                << "N_x       " << n_x << "\n"
+                << "N_y       " << n_y << "\n"
+                << "N_x_block " << n_x_block << "\n"
+                << "N_y_block " << n_y_block << "\n"
+                << "N_x_local " << n_x_local << "\n"
+                << "N_y_local " << n_y_local << "\n"
+                << flush;
+        }
 
         typedef grid<hpx::naming::id_type> id_grid_type;
         id_grid_type grid_ids(n_x_block, n_y_block);
@@ -342,19 +349,6 @@ void gs(
         {
             for(size_type x_block = 0; x_block < n_x_block; ++x_block)
             {
-                /*
-                size_type x_end
-                    = x_block == n_x_block - 1
-                    ? n_x - x_block* n_x_local + 1
-                    : n_x_local + 1;
-                size_type y_end
-                    = y_block == n_y_block - 1
-                    ? n_y - y_block * n_y_local + 1
-                    : n_y_local + 1;
-
-                cout << "x range: " << x_block * n_x_local << " " << (x_block + 1) * n_x_local << "\n" << flush;
-                cout << "y range: " << y_block * n_y_local << " " << (y_block + 1) * n_y_local << "\n" << flush;
-                */
                 init_dataflow(
                     grid_ids(x_block, y_block)
                   , n_x_local + 2
@@ -367,7 +361,7 @@ void gs(
             }
         }
 
-        cout << "init1\n" << flush;
+        if(debug) cout << "init1\n" << flush;
 
         typedef grid<dataflow_type> promise_grid_type;
         typedef grid<promise_grid_type> promise_grid_block_type;
@@ -451,7 +445,7 @@ void gs(
                 }
             }
         }
-        cout << "init2\n" << flush;
+        if(debug) cout << "init2\n" << flush;
 
         typedef
             hpx::lcos::dataflow<remote_lse_type::apply_region_df_action>
@@ -465,13 +459,10 @@ void gs(
         {
             promise_grid_block_type & prev_block = iteration_dependencies.at(iter%2);
             promise_grid_block_type & current_block = iteration_dependencies.at((iter + 1)%2);
-            //cout << "iteration " << iter << flush;
             for(size_type y_block = 0; y_block < n_y_block; ++y_block)
             {
                 for(size_type x_block = 0; x_block < n_x_block; ++x_block)
                 {
-                    //cout << " grid " << x_block << " " << y_block << " " << flush;
-                    // boundary updates ....
                     typedef
                         hpx::lcos::dataflow<remote_lse_type::get_col_action>
                         get_column_dataflow;
@@ -498,8 +489,6 @@ void gs(
                     {
                         for(size_type x = 1, xx = 0; x < n_x_local + 1; x += block_size, ++xx)
                         {
-                            //cout << "!. " << xx << " " << yy << " ." << flush;
-                            //cout << "!. " << xx + x_block << " " << yy + y_block << " ." << flush;
                             range_type
                                 x_range(
                                     xx == 0 && x_block == 0 ? 2 : x
@@ -520,42 +509,33 @@ void gs(
                                         : std::min(n_y_local + 1, y + block_size)
                                 );
 
-                            //cout << get_locality_from_id(grid_ids(x_block, y_block)) << " " << flush;
-
                             std::vector<dataflow_base<void> > deps;
                             deps.reserve(9);
-                            //dataflow_trigger deps(grid_ids(x_block, y_block));
-                            //dataflow_trigger deps(find_here());
 
                             deps.push_back(prev(xx, yy));
                             if(iter == 0)
                             {
                                 deps.push_back(rhs_promise(x_block, y_block)(xx, yy));
-                                //cout << "." << flush;
                             }
 
                             if(xx + 1 < n_x_local_block)
                             {
                                 deps.push_back(prev(xx + 1, yy));
-                                //cout << "." << flush;
                             }
                             
                             if(yy + 1 < n_y_local_block)
                             {
                                 deps.push_back(prev(xx, yy + 1));
-                                //cout << "." << flush;
                             }
 
                             if(xx > 0)
                             {
                                 deps.push_back(current(xx - 1, yy));
-                                //cout << "." << flush;
                             }
 
                             if(yy > 0)
                             {
                                 deps.push_back(current(xx, yy - 1));
-                                //cout << "." << flush;
                             }
 
                             if(xx == 0 && x_block > 0)
@@ -575,7 +555,6 @@ void gs(
                                         )
                                     )
                                 );
-                                //cout << "l" << flush;
                             }
 
                             if(
@@ -662,10 +641,10 @@ void gs(
         }
         
         // wait for the last iteration to finish.
-        cout << "dataflow tree construction completed " << flush;
+        if(debug) cout << "dataflow tree construction completed " << flush;
         BOOST_FOREACH(promise_grid_type & block, iteration_dependencies[max_iterations%2])
         {
-            wait(block.data_handle(), [](size_t){cout << "." << flush; });
+            wait(block.data_handle(), [&](size_t){if(debug) cout << "." << flush; });
             /*
             BOOST_FOREACH(dataflow_base<void> & promise, block)
             {
@@ -674,7 +653,7 @@ void gs(
             }
             */
         }
-        cout << "\n";
+        if(debug) cout << "\n";
 
         double time_elapsed = t.elapsed();
         cout << time_elapsed << "\n" << flush;
