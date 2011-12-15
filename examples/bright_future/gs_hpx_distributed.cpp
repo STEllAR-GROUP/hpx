@@ -17,6 +17,7 @@
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <algorithm>
 
 /*
 #include <google/profiler.h>
@@ -26,6 +27,9 @@
 #include "server/remote_lse.hpp"
 #include "dataflow/dataflow.hpp"
 #include "dataflow/dataflow_trigger.hpp"
+#include "dataflow/async_dataflow_wait.hpp"
+
+#undef min
 
 using bright_future::grid;
 using bright_future::update;
@@ -258,10 +262,10 @@ void gs(
                 distributing_factory::create_sync(hpx::find_here())
             );
         
-        double num_blocks_sqrt = std::floor(std::sqrt(prefixes.size()));
+        double num_blocks_sqrt = std::floor(std::sqrt(static_cast<double>(prefixes.size())));
 
         double num_blocks = 0;
-        if(std::abs(num_blocks_sqrt - std::sqrt(prefixes.size())) > 1e-9)
+        if(std::abs(num_blocks_sqrt - std::sqrt(static_cast<double>(prefixes.size()))) > 1e-9)
         {
             num_blocks_sqrt = num_blocks_sqrt + 1;
         }
@@ -413,41 +417,14 @@ void gs(
                                 x_range(
                                     x
                                   , std::min(n_x_local + 2, x + block_size)
-                                /*
-                                  , x + 1 == n_x_local + 2
-                                  ? n_x - (x_block + x * n_x_local + 2)
-                                  : std::min(n_x_local + 2, x + block_size)
-                                */
-                                /*
-                                  , x + block_size >= n_x_local + 2
-                                    ? x_block + 1 == n_x_block
-                                        ? n_x - (x_block * n_x_local)
-                                        : n_x_local + 2
-                                    : n_x_local + 2
-                                */
                                 );
                             
                             range_type
                                 y_range(
                                     y
                                   , std::min(n_y_local + 2, y + block_size)
-                                  /*
-                                  , y + 1 == n_y_local + 2
-                                  ? n_y - (y_block + y * n_y_local + 2)
-                                  : std::min(n_y_local + 2, y + block_size)
-                                  */
-                                /*
-                                  , y + block_size >= n_y_local + 1
-                                        ? y_block + 1 == n_y_block
-                                            ? n_y - (y_block * n_y_local)
-                                            : n_y_local + 1
-                                        : n_y_local + 1
-                                */
                                 );
-                            /*
-                            cout << "x " << x_range.first << " " << x_range.second << "\n" << flush;
-                            cout << "y " << y_range.first << " " << y_range.second << "\n" << flush;
-                            */
+
                             rhs_promise(x_block, y_block)(xx, yy) =
                                 init_rhs_dataflow(
                                     grid_ids(x_block, y_block)
@@ -688,11 +665,14 @@ void gs(
         cout << "dataflow tree construction completed " << flush;
         BOOST_FOREACH(promise_grid_type & block, iteration_dependencies[max_iterations%2])
         {
+            wait(block.data_handle(), [](size_t){cout << "." << flush; });
+            /*
             BOOST_FOREACH(dataflow_base<void> & promise, block)
             {
                 cout << "." << flush;
                 promise.get();
             }
+            */
         }
         cout << "\n";
 

@@ -110,6 +110,11 @@ namespace bright_future
             return n_y;
         }
 
+	vector_type const & data_handle() const
+	{
+	    return data;
+	}
+
         private:
             size_type n_x;
             size_type n_y;
