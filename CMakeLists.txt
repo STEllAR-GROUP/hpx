@@ -9,6 +9,10 @@
 # We require at least CMake V2.8.4
 cmake_minimum_required(VERSION 2.8.4 FATAL_ERROR)
 
+if(MSVC)
+ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+endif()
+
 ################################################################################
 # Build type 
 ################################################################################
@@ -16,6 +20,7 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Configuration type" FORCE)
 endif()
 
+# FIXME: should be possible to generate working versions for all configurations
 set(CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}" CACHE STRING "Configuration types" FORCE)
 
 ################################################################################
@@ -187,11 +192,44 @@ set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}"
 
 hpx_info("install" "Install root is ${CMAKE_INSTALL_PREFIX}.")
 
-add_definitions("-DHPX_PREFIX=\"${CMAKE_INSTALL_PREFIX}\"")
+set(HPX_NO_INSTALL OFF CACHE BOOL "Run hpx applications without installing them")
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+################################################################################
+# HPX_PREFIX
+# If you want to run hpx applications without installing them, set this to
+# ${CMAKE_BINARY_DIR}/bin when using Makefiles or
+# ${CMAKE_BINARY_DIR}/bin/$(Configuration) when using Visual Studio
+if(HPX_NO_INSTALL)
+  if(MSVC)
+	  set(HPX_PREFIX "${CMAKE_BINARY_DIR}/$(Configuration)" CACHE PATH "Where the hpx applications look for component dlls")
+  else()
+	  set(HPX_PREFIX "${CMAKE_BINARY_DIR}/" CACHE PATH "Where the hpx applications look for component dlls")
+  endif()
+else() 
+  set(HPX_PREFIX "${CMAKE_INSTALL_PREFIX}" CACHE PATH "Where the hpx applications look for component dlls")
+endif()
+
+add_definitions("-DHPX_PREFIX=\"${HPX_PREFIX}\"")
+################################################################################
+
+if(MSVC)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release/bin)
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release/lib/hpx)
+  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release/lib/hpx)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/Debug/bin)
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/Debug/lib/hpx)
+  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/Debug/lib/hpx)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_BINARY_DIR}/MinSizeRel/bin)
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_BINARY_DIR}/MinSizeRel/lib/hpx)
+  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_BINARY_DIR}/MinSizeRel/lib/hpx)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/RelWithDebInfo/bin)
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/RelWithDebInfo/lib/hpx)
+  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/RelWithDebInfo/lib/hpx)
+else()
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/hpx)
+  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/hpx)
+endif()
 
 ################################################################################
 # RPATH configuration
@@ -284,21 +322,29 @@ foreach(language CXX Fortran)
   set(CMAKE_${language}_FLAGS_RELWITHDEBINFO ""  CACHE STRING "RelWithDebInfo flags (${language})" FORCE)
 endforeach()
 
-if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-  add_definitions(-DDEBUG)
-  add_definitions(-DHPX_BUILD_TYPE="debug")
-elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
-  add_definitions(-DDEBUG)
-  add_definitions(-DHPX_BUILD_TYPE="relwithdebinfo")
-elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
-  add_definitions(-DNDEBUG)
-  add_definitions(-DHPX_BUILD_TYPE="minsizerel")
-elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
-  add_definitions(-DNDEBUG)
-  add_definitions(-DBOOST_DISABLE_ASSERTS)
-  add_definitions(-DHPX_BUILD_TYPE="release")
+if(MSVC)
+  add_definitions(-DHPX_BUILD_TYPE="$(Configuration)")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
+  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -DDEBUG")
+  set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -DNDEBUG")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG -DDBOOST_DISABLE_ASSERTS")
 else()
-  hpx_error("build_type" "\"${CMAKE_BUILD_TYPE}\" is not a valid build type.")
+  if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    add_definitions(-DDEBUG)
+    add_definitions(-DHPX_BUILD_TYPE="debug")
+  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
+    add_definitions(-DDEBUG)
+    add_definitions(-DHPX_BUILD_TYPE="relwithdebinfo")
+  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
+    add_definitions(-DNDEBUG)
+    add_definitions(-DHPX_BUILD_TYPE="minsizerel")
+  elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
+    add_definitions(-DNDEBUG)
+    add_definitions(-DBOOST_DISABLE_ASSERTS)
+    add_definitions(-DHPX_BUILD_TYPE="release")
+  else()
+    hpx_error("build_type" "\"${CMAKE_BUILD_TYPE}\" is not a valid build type.")
+  endif()
 endif()
 
 # Debug library postfix
