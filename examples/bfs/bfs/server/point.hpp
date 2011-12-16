@@ -30,10 +30,11 @@ namespace bfs { namespace server
         void init(std::size_t objectid,std::size_t grainsize,
         std::size_t max_num_neighbors,std::vector<std::size_t> const& nodelist,
         std::vector<std::size_t> const& neighborlist,
-        boost::numeric::ublas::mapped_vector<std::size_t> const& index);
+        boost::numeric::ublas::mapped_vector<std::size_t> const& index,
+        std::vector<hpx::naming::id_type> const& tm_components);
 
         /// Traverse the graph. 
-        std::vector<std::size_t> traverse(std::size_t level, std::size_t parent,std::size_t edge);
+        void traverse(std::size_t level, std::size_t parent,std::size_t edge);
 
 
         std::size_t get_parent(std::size_t edge);
@@ -54,7 +55,7 @@ namespace bfs { namespace server
             point_reset_visited = 4
         };
 
-        typedef hpx::actions::action6<
+        typedef hpx::actions::action7<
             // Component server type.
             point,
             // Action code.
@@ -66,6 +67,7 @@ namespace bfs { namespace server
             std::vector<std::size_t> const&,
             std::vector<std::size_t> const&,
             boost::numeric::ublas::mapped_vector<std::size_t> const&,
+            std::vector<hpx::naming::id_type> const&,
             // Method bound to this action.
             &point::init
         > init_action;
@@ -81,11 +83,9 @@ namespace bfs { namespace server
             &point::reset_visited
         > reset_visited_action;
 
-        typedef hpx::actions::result_action3<
+        typedef hpx::actions::action3<
             // Component server type.
             point,
-            // Return type.
-            std::vector<std::size_t>,
             // Action code.
             point_traverse,
             // Arguments of this action.
@@ -131,6 +131,8 @@ namespace bfs { namespace server
         std::vector<std::size_t> parent_;
         std::size_t grainsize_;
         boost::numeric::ublas::mapped_vector<std::size_t> mapping_;
+        boost::numeric::ublas::mapped_vector<std::size_t> index_;
+        hpx::naming::id_type my_thread_manager_;
     };
 }}
 

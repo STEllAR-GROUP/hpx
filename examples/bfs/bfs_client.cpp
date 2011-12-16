@@ -7,6 +7,7 @@
 #include <hpx/hpx_init.hpp>
 
 #include "bfs/point.hpp"
+#include "bfs_tm/point.hpp"
 #include <boost/numeric/ublas/vector_sparse.hpp>
 
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
@@ -21,6 +22,16 @@ init(hpx::components::server::distributing_factory::iterator_range_type const& r
     BOOST_FOREACH(hpx::naming::id_type const& id, r)
     {
         p.push_back(bfs::point(id));
+    }
+}
+
+inline void
+init(hpx::components::server::distributing_factory::iterator_range_type const& r,
+    std::vector<bfs_tm::point>& p)
+{
+    BOOST_FOREACH(hpx::naming::id_type const& id, r)
+    {
+        p.push_back(bfs_tm::point(id));
     }
 }
 
@@ -169,8 +180,19 @@ int hpx_main(boost::program_options::variables_map &vm)
         // Create ne point components with distributing factory.
         // These components will be evenly distributed among all available
         // localities supporting the component type.
+        // blocks is a vector of datastructures containing information about the
+        // locality and the gids of the components which got created on that
+        // locality
+
         hpx::components::distributing_factory::result_type blocks =
             factory.create_components(block_type, ne);
+
+        // Get the component type for our point component.
+        hpx::components::component_type block_tm_type =
+            hpx::components::get_component_type<bfs_tm::server::point>();
+
+        hpx::components::distributing_factory::result_type blocks_tm =
+            factory.create_components(block_tm_type, blocks.size() );
 
         ///////////////////////////////////////////////////////////////////////
         // This vector will hold client classes referring to all of the
@@ -178,7 +200,22 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::vector<bfs::point> points;
 
         // Populate the client vectors. 
+        // locality_results extracts only the gids from the blocks above
         init(hpx::components::server::locality_results(blocks), points);
+
+        std::vector<hpx::naming::id_type> points_components;
+        for (std::size_t i=0;i<ne;i++) {
+          points_components.push_back(points[i].get_gid());
+        }
+
+        // same for bfs_tm class
+        std::vector<bfs_tm::point> points_tm;
+        init(hpx::components::server::locality_results(blocks_tm), points_tm);
+
+        std::vector<hpx::naming::id_type> tm_components;
+        for (std::size_t i=0;i<blocks.size();i++) {
+          tm_components.push_back(points_tm[i].get_gid());
+        }
 
         ///////////////////////////////////////////////////////////////////////
         // Put the graph in the data structure
@@ -186,12 +223,16 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         for (std::size_t i=0;i<ne;i++) {
           init_phase.push_back(points[i].init_async(i,grainsize,max_num_neighbors,
-                                                    nodelist,neighborlist,index));
+                                                    nodelist,neighborlist,index,tm_components));
+        }
+        for (std::size_t i=0;i<blocks.size();i++) {
+          init_phase.push_back(points_tm[i].init_async(i,index,points_components));
         }
 
         // We have to wait for the initialization to complete before we begin
         // the next phase of computation. 
         hpx::lcos::wait(init_phase);
+
         double kernel1_time = kernel1time.elapsed();
         std::cout << "Elapsed time during kernel 1: " << kernel1_time << " [s]" << std::endl;
 
@@ -209,72 +250,17 @@ int hpx_main(boost::program_options::variables_map &vm)
         for (std::size_t step=0;step<searchroot.size();step++) {
           hpx::util::high_resolution_timer kernel2time;
 
-          std::vector<hpx::lcos::promise<std::vector<std::size_t> > > traverse_phase;
+          std::vector<hpx::lcos::promise<void> > traverse_phase;
 
           // Traverse the graph.
           std::size_t level = 0; 
 
-          // Create the parent vectors.
-          std::vector<std::vector<std::size_t> > parents;
-          for (std::size_t i=0;i<max_levels;i++) {
-            parents.push_back(std::vector<std::size_t>());
-          }
-
-          std::vector<std::vector<std::size_t> > neighbors,alt_neighbors;
-
-          // Install the root node. 
-          parents[level].push_back( searchroot[step] ); 
           // identify the component which has the root
           traverse_phase.push_back( points[ index(searchroot[step]) ].traverse_async(level,searchroot[step],searchroot[step]) );
 
           // Wait for the first part of the traverse phase to complete.
-          hpx::lcos::wait(traverse_phase,neighbors);
+          hpx::lcos::wait(traverse_phase);
 
-          for (std::size_t k=1;k<max_levels;k++) {
-            // Clear the traversal vector. 
-            traverse_phase.resize(0);
-    
-            if ( (k+1)%2 == 0 ) {
-              // Clear the alt_neighbor vector.
-              alt_neighbors.resize(0);
-
-              for (std::size_t i=0;i<neighbors.size();i++) {
-                // Set the current parent.
-                std::size_t parent = parents[k-1][i];
-
-                for (std::size_t j=0;j<neighbors[i].size();j++) {
-                  parents[k].push_back( neighbors[i][j] ); 
-
-                  // Create a future encapsulating an asynchronous call to
-                  // the traverse action of bfs::point. 
-                  traverse_phase.push_back(points[ index(neighbors[i][j]) ].traverse_async(k,parent,neighbors[i][j]));
-                } 
-              }
-
-              // Wait for this phase to finish
-              hpx::lcos::wait(traverse_phase,alt_neighbors);
-
-            } else {
-              // Clear the neighbor vector.
-              neighbors.resize(0);
-
-              for (std::size_t i=0;i<alt_neighbors.size();i++) {
-                // Set the current parent.
-                std::size_t parent = parents[k-1][i];
-
-                for (std::size_t j=0;j<alt_neighbors[i].size();j++) {
-                  parents[k].push_back( alt_neighbors[i][j] ); 
-
-                  // Create a future encapsulating an asynchronous call to
-                  // the traverse action of bfs::point. 
-                  traverse_phase.push_back(points[ index(alt_neighbors[i][j]) ].traverse_async(k,parent,alt_neighbors[i][j]));
-                } 
-              }
-
-              // Wait for this phase to finish
-              hpx::lcos::wait(traverse_phase,neighbors);
-            }
-          }
           kernel2_time[step] = kernel2time.elapsed();
 
           // Validate  -- Not timed

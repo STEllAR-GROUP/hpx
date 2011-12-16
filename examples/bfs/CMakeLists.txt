@@ -5,29 +5,32 @@
 
 # just recurse into all components subdirectories and execute the scripts there
 set(subdirs
-    bfs)
+    bfs bfs_tm)
 
 add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=8)
 
 # for all targets specified above
 foreach(subdir ${subdirs})
   add_subdirectory(${subdir})
+endforeach()
 
-  set(sources
-      ${subdir}_client.cpp
-      validate.cpp)
+set(sources
+    bfs_client.cpp
+    validate.cpp)
 
-  source_group("Source Files" FILES ${sources})
+source_group("Source Files" FILES ${sources})
 
-  set(dependencies
-      distributing_factory_component
-      iostreams_component)
+set(dependencies
+    distributing_factory_component
+    bfs_component
+    bfs_tm_component
+    iostreams_component)
 
-  # add example executable
-  add_hpx_executable(${subdir}_client
-    MODULE bfs
-    SOURCES ${sources}
-    DEPENDENCIES ${subdir}_component ${dependencies})
+# add example executable
+add_hpx_executable(bfs_client
+  MODULE bfs
+  SOURCES ${sources}
+  DEPENDENCIES ${dependencies})
 
   # add a custom target for this example
   add_hpx_pseudo_target(examples.bfs.${subdir})
@@ -38,6 +41,5 @@ foreach(subdir ${subdirs})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(examples.bfs.${subdir}
-                              ${subdir}_client_exe)
-endforeach()
+                              bfs_client_exe)
 
