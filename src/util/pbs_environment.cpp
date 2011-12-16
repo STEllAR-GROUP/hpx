@@ -209,7 +209,7 @@ namespace hpx { namespace util
 
     std::string pbs_environment::host_name() const
     {
-        if (!!transform_)
+        if (!transform_.empty()) // If the transform is not empty
             return transform_(boost::asio::ip::host_name());
         return boost::asio::ip::host_name();
     }
@@ -219,7 +219,7 @@ namespace hpx { namespace util
         std::string host = nodes_.empty() ? def_hpx_name : host_name();
         if (debug_)
             std::cerr << "host_name: " << host << std::endl;
-        if(!!transform_)
+        if (!transform_.empty()) // If the transform is not empty
             return transform_(host);
         return host;
     }
@@ -231,7 +231,7 @@ namespace hpx { namespace util
         std::string host = agas_node_.empty() ? def_agas : agas_node_;
         if (debug_)
             std::cerr << "agas host_name: " << host << std::endl;
-        if(!!transform_)
+        if (!transform_.empty()) // If the transform is not empty
             return transform_(host);
         return host;
     }
