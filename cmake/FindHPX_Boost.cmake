@@ -117,9 +117,9 @@ macro(build_boost_libname BOOST_RAW_NAME)
   if(BOOST_SUFFIX)
     # user suffix
     set(BOOST_SUFFIX ${BOOST_SUFFIX} CACHE STRING
-      "Boost library suffix (default: `d' for Debug and RelWithDebInfo builds)." FORCE)
+      "Boost library suffix (default: `d' for Debug builds)." FORCE)
     set(BOOST_LIB_SUFFIX -${BOOST_SUFFIX})
-  elseif("${CMAKE_BUILD_TYPE}" MATCHES "Debug|RelWithDebInfo")
+  elseif("${CMAKE_BUILD_TYPE}" MATCHES "Debug")
     set(BOOST_LIB_SUFFIX "-gd")
   endif()
 

@@ -325,7 +325,7 @@ endforeach()
 if(MSVC)
   add_definitions(-DHPX_BUILD_TYPE="$(Configuration)")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
-  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -DDEBUG")
+  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -DNDEBUG -DBOOST_DISABLE_ASSERTS")
   set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -DNDEBUG -DBOOST_DISABLE_ASSERTS")
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG -DDBOOST_DISABLE_ASSERTS")
 else()
@@ -350,7 +350,7 @@ endif()
 
 # Debug library postfix
 set(CMAKE_DEBUG_POSTFIX "d")
-set(CMAKE_RELWITHDEBINFO_POSTFIX "d")
+#set(CMAKE_RELWITHDEBINFO_POSTFIX "d")
 
 ################################################################################
 # Utility configuration 
@@ -420,14 +420,8 @@ if(MSVC)
     # Generate debugging information
     hpx_append_flag(-Zi LANGUAGES CXX Fortran)
 
-    # Keep the frame pointer
-    hpx_append_flag(-Oy- LANGUAGES CXX Fortran)
-
-    # Don't inline functions
-    hpx_append_flag(-Ob0 LANGUAGES CXX Fortran)
-
     # Use multi-threaded debug runtime
-    hpx_append_flag(-MDd LANGUAGES CXX Fortran)
+    hpx_append_flag(-MD LANGUAGES CXX Fortran)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
     # Optimize for size
     hpx_append_flag(-O1 LANGUAGES CXX Fortran)
@@ -541,24 +535,6 @@ else()
 
     # Generate debugging information
     hpx_use_flag_if_available(-g LANGUAGES CXX Fortran)
-
-    # Keep the frame pointer
-    hpx_use_flag_if_available(-fno-omit-frame-pointer LANGUAGES CXX Fortran)
-
-    # Don't inline functions
-    hpx_use_flag_if_available(-fno-inline LANGUAGES CXX Fortran)
-
-    # No tail call optimizations
-    hpx_use_flag_if_available(-fno-optimize-sibling-calls LANGUAGES CXX Fortran)
-
-    # Don't allocate registers for wide types (e.g. 128bit ints) independently
-    hpx_use_flag_if_available(-fno-split-wide-types LANGUAGES CXX Fortran)
-
-    # Disable register allocation webs, which make debugging impossible
-    hpx_use_flag_if_available(-fno-web LANGUAGES CXX Fortran)
-
-    # Disable register renaming
-    hpx_use_flag_if_available(-fno-rename-registers LANGUAGES CXX Fortran)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
     # Optimize for size
     hpx_use_flag_if_available(-Os LANGUAGES CXX Fortran)
@@ -649,7 +625,8 @@ else()
 
       if(HPX_ELF_HIDDEN_VISIBILITY)
         if("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel" OR
-           "${CMAKE_BUILD_TYPE}" STREQUAL "Release")
+	   "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
+	   "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
           add_definitions(-DHPX_ELF_HIDDEN_VISIBILITY)
           add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
           add_definitions(-DBOOST_PLUGIN_GCC_HAVE_VISIBILITY)
