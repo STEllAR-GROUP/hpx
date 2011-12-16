@@ -50,7 +50,7 @@ macro(hpx_library_install lib)
 
   foreach(target ${targets})
     set(install_code
-      "file(INSTALL FILES ${CMAKE_BINARY_DIR}/bin/${target}
+      "file(INSTALL FILES ${CMAKE_BINARY_DIR}/lib/hpx/${target}
             DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/hpx
             TYPE SHARED_LIBRARY
             OPTIONAL
@@ -63,7 +63,7 @@ endmacro()
 
 macro(hpx_archive_install lib)
   set(install_code
-    "file(INSTALL FILES ${CMAKE_BINARY_DIR}/bin/${lib}
+    "file(INSTALL FILES ${CMAKE_BINARY_DIR}/lib/hpx/${lib}
           DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/hpx
           OPTIONAL
           PERMISSIONS OWNER_READ OWNER_READ OWNER_READ
