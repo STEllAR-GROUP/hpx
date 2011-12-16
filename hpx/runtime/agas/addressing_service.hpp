@@ -111,7 +111,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
             // Is lhs in rhs?
             if (1 == lhs.count && 1 != rhs.count)
                 return (lhs.id >= rhs.id)
-                    && (lhs.id <= (rhs.id + (lhs.count - 1)));
+                    && (lhs.id <= (rhs.id + (rhs.count - 1)));
 
             // Is rhs in lhs?
             else if (1 != lhs.count && 1 == rhs.count)
