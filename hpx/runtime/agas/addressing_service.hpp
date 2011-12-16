@@ -61,6 +61,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     // }}}
 
     // {{{ gva cache
+    // FIXME: Broken.
     struct gva_cache_key
     { // {{{ gva_cache_key implementation
       private:
@@ -101,6 +102,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
             return (lhs.id + (lhs.count - 1)) < rhs.id;
         }
 
+        // FIXME: Broken.
         friend bool operator==(
             gva_cache_key const& lhs
           , gva_cache_key const& rhs
