@@ -491,7 +491,7 @@ namespace hpx { namespace naming
         // comparison is required as well
         friend bool operator== (id_type const& lhs, id_type const& rhs)
         {
-            return lhs.gid_.get() == rhs.gid_.get();
+            return *lhs.gid_ == *rhs.gid_;
         }
         friend bool operator!= (id_type const& lhs, id_type const& rhs)
         {
