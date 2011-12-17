@@ -6,7 +6,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/include/iostreams.hpp>
 
-#include "../../bfs_tm/stubs/point.hpp"
+#include "../stubs/point_tm.hpp"
 #include "../stubs/point.hpp"
 #include "point.hpp"
 

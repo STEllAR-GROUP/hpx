@@ -6,6 +6,7 @@
 ###############################################################################
 set(client_sources
     point_module.cpp
+    point_module_tm.cpp
     )
 
 ###############################################################################
@@ -13,16 +14,20 @@ set(common_headers
     )
 
 set(client_headers
-    point.hpp)
+    point.hpp
+    point_tm.hpp)
 
 set(stubs_headers
-    stubs/point.hpp)
+    stubs/point.hpp
+    stubs/point_tm.hpp)
 
 set(server_headers
-    server/point.hpp)
+    server/point.hpp
+    server/point_tm.hpp)
 
 set(server_sources
-    server/point.cpp)
+    server/point.cpp
+    server/point_tm.cpp)
 
 ###############################################################################
 set(sources

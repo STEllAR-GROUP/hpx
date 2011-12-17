@@ -6,8 +6,8 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/include/iostreams.hpp>
 
-#include "../stubs/point.hpp"
-#include "point.hpp"
+#include "../stubs/point_tm.hpp"
+#include "point_tm.hpp"
 
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>

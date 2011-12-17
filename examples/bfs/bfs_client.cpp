@@ -7,7 +7,7 @@
 #include <hpx/hpx_init.hpp>
 
 #include "bfs/point.hpp"
-#include "bfs_tm/point.hpp"
+#include "bfs/point_tm.hpp"
 #include <boost/numeric/ublas/vector_sparse.hpp>
 
 #include <hpx/components/distributing_factory/distributing_factory.hpp>

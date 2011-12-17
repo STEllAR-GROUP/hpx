@@ -5,7 +5,7 @@
 
 # just recurse into all components subdirectories and execute the scripts there
 set(subdirs
-    bfs bfs_tm)
+    bfs)
 
 add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=8)
 
@@ -23,7 +23,7 @@ source_group("Source Files" FILES ${sources})
 set(dependencies
     distributing_factory_component
     bfs_component
-    bfs_tm_component
+#    bfs_tm_component
     iostreams_component)
 
 # add example executable

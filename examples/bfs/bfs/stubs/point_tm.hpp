@@ -8,7 +8,7 @@
 
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 
-#include "../server/point.hpp"
+#include "../server/point_tm.hpp"
 
 namespace bfs_tm { namespace stubs
 {
