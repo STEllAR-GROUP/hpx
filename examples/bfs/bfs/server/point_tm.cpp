@@ -20,7 +20,7 @@ namespace bfs_tm { namespace server
 {
     void point::manager(std::size_t level,std::size_t edge,std::vector<std::size_t> const& neighbors)
     {
-      std::cout << " HELLO WORLD TEST " << neighbors.size() << std::endl;
+//      std::cout << " HELLO WORLD TEST " << neighbors.size() << std::endl;
       //for (std::size_t i=0;i<neighbors.size();i++) {
       //  traverse_async(points_gids[neighbors[i]],level,searchroot[step],searchroot[step]) );
       //}

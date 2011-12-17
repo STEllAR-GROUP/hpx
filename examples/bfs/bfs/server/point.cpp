@@ -69,6 +69,8 @@ namespace bfs { namespace server
             if ( initialized.find_element(neighbor) == 0 ) initialized.insert_element(neighbor,false);
           }
         }
+        mapping_.resize(nodelist.size());
+        initialized.resize(nodelist.size());
 
         std::size_t count = 0;
         for (std::size_t i=0;i<nodelist.size();i++) {
@@ -124,7 +126,7 @@ namespace bfs { namespace server
             }
           }
           bfs_tm::stubs::point::manager_async(my_thread_manager_,level+1,edge,stored_elsewhere);  
-          std::cout << " TEST TEST " << std::endl;
+//           std::cout << " TEST TEST " << std::endl;
         }
     }
 

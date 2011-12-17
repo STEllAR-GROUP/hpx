@@ -156,7 +156,9 @@ int hpx_main(boost::program_options::variables_map &vm)
           if ( index.find_element(neighborlist[i]) == 0) index.insert_element( neighborlist[i],1);
         }
         // sum index
-        std::size_t num_elements = std::accumulate( index.begin(), index.end(), 0);
+        std::size_t num_elements = index.nnz(); //std::accumulate( index.begin(), index.end(), 0);
+        index.resize(nodelist.size());     // work around a bug in sparse_vector
+
         if ( num_elements%grainsize != 0 ) num_elements += grainsize-(num_elements%grainsize);
         std::size_t ne = num_elements/grainsize;
 
