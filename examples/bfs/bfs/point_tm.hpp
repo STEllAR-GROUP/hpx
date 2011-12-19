@@ -34,11 +34,11 @@ namespace bfs_tm
         ///////////////////////////////////////////////////////////////////////
         // Exposed functionality of this component.
 
-        void manager_async(std::size_t level,std::size_t edge,
+        hpx::lcos::promise<void> manager_async(std::size_t level,std::size_t edge,
                            std::vector<std::size_t> const& neighbors)
         {
             BOOST_ASSERT(gid_);
-            this->base_type::manager_async(gid_,level,edge,neighbors);
+            return this->base_type::manager_async(gid_,level,edge,neighbors);
         }
 
         void manager(std::size_t level,std::size_t edge,

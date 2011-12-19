@@ -3,6 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/hpx.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/include/iostreams.hpp>
 
@@ -36,7 +37,7 @@ namespace bfs { namespace server
           neighbors_[i].reserve(max_num_neighbors);
           visited_[i] = false;
           // initialize the level
-          level_[i] = 9999;
+          level_[i] = 5;
         }
 
         index_ = index;
@@ -125,9 +126,13 @@ namespace bfs { namespace server
               stored_elsewhere.push_back(neighbors_[me][i]); 
             }
           }
-          bfs_tm::stubs::point::manager_async(my_thread_manager_,level+1,edge,stored_elsewhere);  
-//           std::cout << " TEST TEST " << std::endl;
+          futures_.push_back(bfs_tm::stubs::point::manager_async(my_thread_manager_,level+1,edge,stored_elsewhere));  
         }
+    }
+
+    void point::waitforfutures(std::size_t objectid)
+    {
+      hpx::lcos::wait(futures_);
     }
 
     std::size_t point::get_parent(std::size_t edge)

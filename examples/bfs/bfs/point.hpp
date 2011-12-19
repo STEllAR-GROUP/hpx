@@ -121,6 +121,20 @@ namespace bfs
             this->base_type::reset_visited_async(gid_,objectid);
         }
 
+        // wait for futures
+        hpx::lcos::promise<void> waitforfutures_async(std::size_t objectid)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::waitforfutures_async(gid_,objectid);
+        }
+
+        // wait for futures
+        void waitforfurtures(std::size_t objectid)
+        {
+            BOOST_ASSERT(gid_);
+            this->base_type::waitforfutures_async(gid_,objectid);
+        }
+
     };
 }
 

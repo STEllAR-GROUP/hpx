@@ -37,6 +37,7 @@ namespace bfs { namespace server
         void traverse(std::size_t level, std::size_t parent,std::size_t edge);
 
 
+        void waitforfutures(std::size_t objectid);
         std::size_t get_parent(std::size_t edge);
         std::size_t get_level(std::size_t edge);
         void reset_visited(std::size_t objectid);
@@ -52,7 +53,8 @@ namespace bfs { namespace server
             point_traverse = 1,
             point_get_parent = 2,
             point_get_level = 3,
-            point_reset_visited = 4
+            point_reset_visited = 4,
+            point_waitforfutures = 5
         };
 
         typedef hpx::actions::action7<
@@ -82,6 +84,17 @@ namespace bfs { namespace server
             // Method bound to this action.
             &point::reset_visited
         > reset_visited_action;
+
+        typedef hpx::actions::action1<
+            // Component server type.
+            point,
+            // Action code.
+            point_waitforfutures,
+            // Arguments of this action.
+            std::size_t,
+            // Method bound to this action.
+            &point::waitforfutures
+        > waitforfutures_action;
 
         typedef hpx::actions::action3<
             // Component server type.
@@ -133,6 +146,7 @@ namespace bfs { namespace server
         boost::numeric::ublas::mapped_vector<std::size_t> mapping_;
         boost::numeric::ublas::mapped_vector<std::size_t> index_;
         hpx::naming::id_type my_thread_manager_;
+        std::vector<hpx::lcos::promise<void> > futures_;
     };
 }}
 
@@ -156,6 +170,10 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     bfs::server::point::reset_visited_action,
     bfs_point_reset_visited_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    bfs::server::point::waitforfutures_action,
+    bfs_point_waitforfutures_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::lcos::base_lco_with_value<std::vector<std::size_t> >::get_value_action,

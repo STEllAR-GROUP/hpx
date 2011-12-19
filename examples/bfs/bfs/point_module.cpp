@@ -43,6 +43,9 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     bfs_point_type::wrapped_type::reset_visited_action,
     bfs_point_reset_visited_action);
+HPX_REGISTER_ACTION_EX(
+    bfs_point_type::wrapped_type::waitforfutures_action,
+    bfs_point_waitforfutures_action);
 
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco_with_value<std::vector<std::size_t> >,

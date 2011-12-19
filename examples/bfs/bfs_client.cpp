@@ -65,7 +65,6 @@ int hpx_main(boost::program_options::variables_map &vm)
         // Retrieve the command line options. 
         std::size_t const grainsize = vm["grainsize"].as<std::size_t>();
         std::string const searchfile = vm["searchfile"].as<std::string>();
-        std::size_t const max_levels = vm["max-levels"].as<std::size_t>();
         std::size_t const max_num_neighbors
             = vm["max-num-neighbors"].as<std::size_t>();
 
@@ -260,7 +259,9 @@ int hpx_main(boost::program_options::variables_map &vm)
           // identify the component which has the root
           traverse_phase.push_back( points[ index(searchroot[step]) ].traverse_async(level,searchroot[step],searchroot[step]) );
 
-          // Wait for the first part of the traverse phase to complete.
+          for (std::size_t i=0;i<ne;i++) {
+            traverse_phase.push_back( points[i].waitforfutures_async(i) );
+          }
           hpx::lcos::wait(traverse_phase);
 
           kernel2_time[step] = kernel2time.elapsed();
@@ -279,7 +280,7 @@ int hpx_main(boost::program_options::variables_map &vm)
           }
 
           validation = true;
-          //std::cout << " Validating graph for " << searchroot[step] << std::endl;
+          std::cout << " Validating graph for " << searchroot[step] << std::endl;
           std::size_t num_edges;
           int rc = validate(nodeparents,nodelevels,nodeparentsindex,nodelist,
                             neighborlist,searchroot[step],num_edges); 

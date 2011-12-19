@@ -107,6 +107,20 @@ namespace bfs { namespace stubs
             reset_visited_async(gid,objectid).get();
         }
 
+        static hpx::lcos::promise<void>
+        waitforfutures_async(hpx::naming::id_type const& gid,std::size_t objectid)
+        {
+            typedef server::point::waitforfutures_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid,objectid);
+        }
+
+        static void waitforfutures(hpx::naming::id_type const& gid,std::size_t objectid)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise.
+            waitforfutures_async(gid,objectid).get();
+        }
+
     };
 }}
 

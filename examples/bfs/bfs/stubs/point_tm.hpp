@@ -16,14 +16,13 @@ namespace bfs_tm { namespace stubs
     struct point : hpx::components::stub_base<server::point>
     {
         // Read the graph
-        static void
-        //static hpx::lcos::promise<void>
+        static hpx::lcos::promise<void>
         manager_async(hpx::naming::id_type const& gid,std::size_t level,std::size_t edge,
                       std::vector<std::size_t> const& neighbors)
         {
             typedef server::point::manager_action action_type;
-            hpx::applier::apply<action_type>(gid,level,edge,neighbors);
-            //return hpx::lcos::eager_future<action_type>(gid,level,edge,neighbors);
+           // hpx::applier::apply<action_type>(gid,level,edge,neighbors);
+            return hpx::lcos::eager_future<action_type>(gid,level,edge,neighbors);
         }
 
         // Read the graph
