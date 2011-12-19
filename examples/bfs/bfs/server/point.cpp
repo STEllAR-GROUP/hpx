@@ -41,14 +41,16 @@ namespace bfs { namespace server
           std::size_t node = nodelist[i];
           std::size_t neighbor = neighborlist[i];
           if ( index(node) == idx_ && node != neighbor ) {
-            mapping_.insert_element(node,0);
-            initialized.insert_element(node,false);
+            if ( mapping_.find_element(node) == 0 ) mapping_.insert_element(node,0);
+            if ( initialized.find_element(node) == 0 ) initialized.insert_element(node,false);
           }
           if ( index(neighbor) == idx_ && node != neighbor ) {
-            mapping_.insert_element(neighbor,0);
-            initialized.insert_element(neighbor,false);
+            if ( mapping_.find_element(neighbor) == 0 ) mapping_.insert_element(neighbor,0);
+            if ( initialized.find_element(neighbor) == 0 ) initialized.insert_element(neighbor,false);
           }
         }
+        mapping_.resize(nodelist.size());
+        initialized.resize(nodelist.size());
 
         std::size_t count = 0;
         for (std::size_t i=0;i<nodelist.size();i++) {

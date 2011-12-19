@@ -142,11 +142,12 @@ int hpx_main(boost::program_options::variables_map &vm)
         // get a unique list of nodes -- this is what determines ne, the number of components
         boost::numeric::ublas::mapped_vector<std::size_t> index;
         for (std::size_t i=0;i<nodelist.size();i++) {
-          index.insert_element( nodelist[i],1);
-          index.insert_element( neighborlist[i],1);
+          if ( index.find_element(nodelist[i]) == 0)  index.insert_element( nodelist[i],1);
+          if ( index.find_element(neighborlist[i]) == 0) index.insert_element( neighborlist[i],1);
         }
         // sum index
-        std::size_t num_elements = std::accumulate( index.begin(), index.end(), 0);
+        std::size_t num_elements = index.nnz(); //std::accumulate( index.begin(), index.end(), 0);
+        index.resize(nodelist.size());     // work around a bug in sparse_vector
         if ( num_elements%grainsize != 0 ) num_elements += grainsize-(num_elements%grainsize);
         std::size_t ne = num_elements/grainsize;
 
