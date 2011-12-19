@@ -1,0 +1,23 @@
+///////////////////////////////////////////////////////////////////////////////
+This file is a template for how to lay out a coordinate file.
+
+Units of input should be in meters, kilograms, and meters per second.
+
+Author: Adrian Serio
+Date: October 18, 2011
+///////////////////////////////////////////////////////////////////////////////
+
+Each line contains information for a single point.  Therefore, for every line,
+the program will create a single point.
+
+This is the template:
+x-coordinate, y-coord., z-coord., mass, inital x-velocity, int.y-vel., int.z-vel
+
+Example: a point at (8,9,7) which has a mass of 20 kilograms and an inital
+ velocity of 15 meter per second in the x-direction, 5 meters per second in the
+ y-direction, and 3 meters per second in the z direction would be written like
+ this:
+
+8 9 7 20 15 5 3
+
+

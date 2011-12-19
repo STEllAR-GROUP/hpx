@@ -12,6 +12,7 @@ set(subdirs
     bfs
     bright_future
     dataflow
+    gravity
     gtc
     heartbeat
     hplpx

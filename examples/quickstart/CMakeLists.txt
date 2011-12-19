@@ -11,6 +11,7 @@ set(example_programs
     quicksort
     timed_wake
     simplest_hello_world
+    gravity_hpx
    )
 
 if(HPX_CXX11_LAMBDAS)
