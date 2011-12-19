@@ -4,3 +4,5 @@ This code implements the graph 500 problem using Breadth-first search.  The prov
 files g10.txt and g10_search.txt are generated from the graph 500 reference specification.
 
 First implementation working: 6592
+
+Re-design effort: 6606

@@ -7,7 +7,6 @@
 #include <hpx/hpx_init.hpp>
 
 #include "bfs/point.hpp"
-#include "bfs/point_tm.hpp"
 #include <boost/numeric/ublas/vector_sparse.hpp>
 
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
@@ -22,16 +21,6 @@ init(hpx::components::server::distributing_factory::iterator_range_type const& r
     BOOST_FOREACH(hpx::naming::id_type const& id, r)
     {
         p.push_back(bfs::point(id));
-    }
-}
-
-inline void
-init(hpx::components::server::distributing_factory::iterator_range_type const& r,
-    std::vector<bfs_tm::point>& p)
-{
-    BOOST_FOREACH(hpx::naming::id_type const& id, r)
-    {
-        p.push_back(bfs_tm::point(id));
     }
 }
 
@@ -65,6 +54,8 @@ int hpx_main(boost::program_options::variables_map &vm)
         // Retrieve the command line options. 
         std::size_t const grainsize = vm["grainsize"].as<std::size_t>();
         std::string const searchfile = vm["searchfile"].as<std::string>();
+        std::size_t const max_levels = vm["max-levels"].as<std::size_t>();
+        bool const validater = vm["validater"].as<bool>();
         std::size_t const max_num_neighbors
             = vm["max-num-neighbors"].as<std::size_t>();
 
@@ -151,13 +142,11 @@ int hpx_main(boost::program_options::variables_map &vm)
         // get a unique list of nodes -- this is what determines ne, the number of components
         boost::numeric::ublas::mapped_vector<std::size_t> index;
         for (std::size_t i=0;i<nodelist.size();i++) {
-          if ( index.find_element(nodelist[i]) == 0)  index.insert_element( nodelist[i],1);
-          if ( index.find_element(neighborlist[i]) == 0) index.insert_element( neighborlist[i],1);
+          index.insert_element( nodelist[i],1);
+          index.insert_element( neighborlist[i],1);
         }
         // sum index
-        std::size_t num_elements = index.nnz(); //std::accumulate( index.begin(), index.end(), 0);
-        index.resize(nodelist.size());     // work around a bug in sparse_vector
-
+        std::size_t num_elements = std::accumulate( index.begin(), index.end(), 0);
         if ( num_elements%grainsize != 0 ) num_elements += grainsize-(num_elements%grainsize);
         std::size_t ne = num_elements/grainsize;
 
@@ -181,19 +170,8 @@ int hpx_main(boost::program_options::variables_map &vm)
         // Create ne point components with distributing factory.
         // These components will be evenly distributed among all available
         // localities supporting the component type.
-        // blocks is a vector of datastructures containing information about the
-        // locality and the gids of the components which got created on that
-        // locality
-
         hpx::components::distributing_factory::result_type blocks =
             factory.create_components(block_type, ne);
-
-        // Get the component type for our point component.
-        hpx::components::component_type block_tm_type =
-            hpx::components::get_component_type<bfs_tm::server::point>();
-
-        hpx::components::distributing_factory::result_type blocks_tm =
-            factory.create_components(block_tm_type, blocks.size() );
 
         ///////////////////////////////////////////////////////////////////////
         // This vector will hold client classes referring to all of the
@@ -201,22 +179,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::vector<bfs::point> points;
 
         // Populate the client vectors. 
-        // locality_results extracts only the gids from the blocks above
         init(hpx::components::server::locality_results(blocks), points);
-
-        std::vector<hpx::naming::id_type> points_components;
-        for (std::size_t i=0;i<ne;i++) {
-          points_components.push_back(points[i].get_gid());
-        }
-
-        // same for bfs_tm class
-        std::vector<bfs_tm::point> points_tm;
-        init(hpx::components::server::locality_results(blocks_tm), points_tm);
-
-        std::vector<hpx::naming::id_type> tm_components;
-        for (std::size_t i=0;i<blocks.size();i++) {
-          tm_components.push_back(points_tm[i].get_gid());
-        }
 
         ///////////////////////////////////////////////////////////////////////
         // Put the graph in the data structure
@@ -224,16 +187,12 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         for (std::size_t i=0;i<ne;i++) {
           init_phase.push_back(points[i].init_async(i,grainsize,max_num_neighbors,
-                                                    nodelist,neighborlist,index,tm_components));
-        }
-        for (std::size_t i=0;i<blocks.size();i++) {
-          init_phase.push_back(points_tm[i].init_async(i,index,points_components));
+                                                    nodelist,neighborlist,index));
         }
 
         // We have to wait for the initialization to complete before we begin
         // the next phase of computation. 
         hpx::lcos::wait(init_phase);
-
         double kernel1_time = kernel1time.elapsed();
         std::cout << "Elapsed time during kernel 1: " << kernel1_time << " [s]" << std::endl;
 
@@ -245,52 +204,107 @@ int hpx_main(boost::program_options::variables_map &vm)
         kernel2_nedge.resize(searchroot.size());
         hpx::util::high_resolution_timer kernel2time;
 
-        bool validation;
+        bool validation = false;
   
         // go through each root position
         for (std::size_t step=0;step<searchroot.size();step++) {
           hpx::util::high_resolution_timer kernel2time;
 
-          std::vector<hpx::lcos::promise<void> > traverse_phase;
+          std::vector<hpx::lcos::promise<std::vector<std::size_t> > > traverse_phase;
 
           // Traverse the graph.
           std::size_t level = 0; 
 
+          // Create the parent vectors.
+          std::vector<std::vector<std::size_t> > parents;
+          for (std::size_t i=0;i<max_levels;i++) {
+            parents.push_back(std::vector<std::size_t>());
+          }
+
+          std::vector<std::vector<std::size_t> > neighbors,alt_neighbors;
+
+          // Install the root node. 
+          parents[level].push_back( searchroot[step] ); 
           // identify the component which has the root
           traverse_phase.push_back( points[ index(searchroot[step]) ].traverse_async(level,searchroot[step],searchroot[step]) );
 
-          for (std::size_t i=0;i<ne;i++) {
-            traverse_phase.push_back( points[i].waitforfutures_async(i) );
-          }
-          hpx::lcos::wait(traverse_phase);
+          // Wait for the first part of the traverse phase to complete.
+          hpx::lcos::wait(traverse_phase,neighbors);
 
+          for (std::size_t k=1;k<max_levels;k++) {
+            // Clear the traversal vector. 
+            traverse_phase.resize(0);
+    
+            if ( (k+1)%2 == 0 ) {
+              // Clear the alt_neighbor vector.
+              alt_neighbors.resize(0);
+
+              for (std::size_t i=0;i<neighbors.size();i++) {
+                // Set the current parent.
+                std::size_t parent = parents[k-1][i];
+
+                for (std::size_t j=0;j<neighbors[i].size();j++) {
+                  parents[k].push_back( neighbors[i][j] ); 
+
+                  // Create a future encapsulating an asynchronous call to
+                  // the traverse action of bfs::point. 
+                  traverse_phase.push_back(points[ index(neighbors[i][j]) ].traverse_async(k,parent,neighbors[i][j]));
+                } 
+              }
+
+              // Wait for this phase to finish
+              hpx::lcos::wait(traverse_phase,alt_neighbors);
+
+            } else {
+              // Clear the neighbor vector.
+              neighbors.resize(0);
+
+              for (std::size_t i=0;i<alt_neighbors.size();i++) {
+                // Set the current parent.
+                std::size_t parent = parents[k-1][i];
+
+                for (std::size_t j=0;j<alt_neighbors[i].size();j++) {
+                  parents[k].push_back( alt_neighbors[i][j] ); 
+
+                  // Create a future encapsulating an asynchronous call to
+                  // the traverse action of bfs::point. 
+                  traverse_phase.push_back(points[ index(alt_neighbors[i][j]) ].traverse_async(k,parent,alt_neighbors[i][j]));
+                } 
+              }
+
+              // Wait for this phase to finish
+              hpx::lcos::wait(traverse_phase,neighbors);
+            }
+          }
           kernel2_time[step] = kernel2time.elapsed();
 
-          // Validate  -- Not timed
-          //std::cout << " Validating searchkey " << step << std::endl;
-          // Get the parent of every edge
-          std::vector<std::size_t> nodeparents;
-          std::vector<std::size_t> nodelevels;
-          std::vector<std::size_t> nodeparentsindex;
-          for (boost::numeric::ublas::mapped_vector<std::size_t>::iterator it=index.begin();
-                         it!=index.end();++it) {
-            nodeparents.push_back(points[ *it ].get_parent(it.index()));
-            nodelevels.push_back(points[ *it ].get_level(it.index()));
-            nodeparentsindex.push_back(it.index());
-          }
+          if ( validater ) {
+            // Validate  -- Not timed
+            //std::cout << " Validating searchkey " << step << std::endl;
+            // Get the parent of every edge
+            std::vector<std::size_t> nodeparents;
+            std::vector<std::size_t> nodelevels;
+            std::vector<std::size_t> nodeparentsindex;
+            for (boost::numeric::ublas::mapped_vector<std::size_t>::iterator it=index.begin();
+                           it!=index.end();++it) {
+              nodeparents.push_back(points[ *it ].get_parent(it.index()));
+              nodelevels.push_back(points[ *it ].get_level(it.index()));
+              nodeparentsindex.push_back(it.index());
+            }
 
-          validation = true;
-          std::cout << " Validating graph for " << searchroot[step] << std::endl;
-          std::size_t num_edges;
-          int rc = validate(nodeparents,nodelevels,nodeparentsindex,nodelist,
-                            neighborlist,searchroot[step],num_edges); 
-          kernel2_nedge[step] = (double) num_edges;
-          if ( rc <= 0 ) { 
-            validation = false;
-            std::cout << " Validation failed for searchroot " << searchroot[step] << " rc " << rc << std::endl;
-            break;
+            validation = true;
+            //std::cout << " Validating graph for " << searchroot[step] << std::endl;
+            std::size_t num_edges;
+            int rc = validate(nodeparents,nodelevels,nodeparentsindex,nodelist,
+                              neighborlist,searchroot[step],num_edges); 
+            kernel2_nedge[step] = (double) num_edges;
+            if ( rc <= 0 ) { 
+              validation = false;
+              std::cout << " Validation failed for searchroot " << searchroot[step] << " rc " << rc << std::endl;
+              break;
+            }
+            //std::cout << " Validation for " << searchroot[step] << " passed! " << std::endl;
           }
-          //std::cout << " Validation for " << searchroot[step] << " passed! " << std::endl;
 
           // Reset for the next root
           std::vector<hpx::lcos::promise<void> > reset_phase;
@@ -300,7 +314,7 @@ int hpx_main(boost::program_options::variables_map &vm)
           hpx::lcos::wait(reset_phase);
         }
 
-        if ( validation ) {
+        if ( validation && validater ) {
           // Prep output statistics
           double minimum,mean,stdev,firstquartile,median,thirdquartile,maximum;
           get_statistics(kernel2_time,minimum,mean,stdev,firstquartile,
@@ -384,7 +398,9 @@ int main(int argc, char* argv[])
         ("searchfile", value<std::string>()->default_value("g10_search.txt"),
             "the file containing the roots to search in the graph")
         ("graph", value<std::string>()->default_value("g10.txt"),
-            "the file containing the graph");
+            "the file containing the graph")
+        ("validater", value<bool>()->default_value(true),
+            "whether to run the validation (slow)");
 
     return hpx::init(desc_commandline, argc, argv); // Initialize and run HPX.
 }

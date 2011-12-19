@@ -20,28 +20,26 @@ namespace bfs { namespace stubs
         init_async(hpx::naming::id_type const& gid,std::size_t objectid,std::size_t grainsize,
             std::size_t max_num_neighbors,std::vector<std::size_t> const& nodefile,
             std::vector<std::size_t> const& neighborfile,
-            boost::numeric::ublas::mapped_vector<std::size_t> const& index,
-            std::vector<hpx::naming::id_type> const& tm_components)
+            boost::numeric::ublas::mapped_vector<std::size_t> const& index)
         {
             typedef server::point::init_action action_type;
             return hpx::lcos::eager_future<action_type>(gid,objectid,grainsize,
-                max_num_neighbors,nodefile,neighborfile,index,tm_components);
+                max_num_neighbors,nodefile,neighborfile,index);
         }
 
         // Read the graph
         static void init(hpx::naming::id_type const& gid,std::size_t objectid,std::size_t grainsize,
             std::size_t max_num_neighbors,std::vector<std::size_t> const& nodefile,
             std::vector<std::size_t> const& neighborfile,
-            boost::numeric::ublas::mapped_vector<std::size_t> const& index,
-            std::vector<hpx::naming::id_type> const& tm_components)
+            boost::numeric::ublas::mapped_vector<std::size_t> const& index)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the promise.
-            init_async(gid,objectid,grainsize,max_num_neighbors,nodefile,neighborfile,index,tm_components).get();
+            init_async(gid,objectid,grainsize,max_num_neighbors,nodefile,neighborfile,index).get();
         }
 
         /// Traverse the graph. 
-        static hpx::lcos::promise<void>
+        static hpx::lcos::promise<std::vector<std::size_t> >
         traverse_async(hpx::naming::id_type const& gid,std::size_t level,
             std::size_t parent,std::size_t edge)
         {
@@ -50,13 +48,13 @@ namespace bfs { namespace stubs
         }
 
         /// Traverse the graph. 
-        static void
+        static std::vector<std::size_t>
         traverse(hpx::naming::id_type const& gid,std::size_t level,
             std::size_t parent,std::size_t edge)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the promise.
-            traverse_async(gid,level,parent,edge).get();
+            return traverse_async(gid,level,parent,edge).get();
         }
 
         /// get parent
@@ -105,20 +103,6 @@ namespace bfs { namespace stubs
             // The following get yields control while the action above
             // is executed and the result is returned to the promise.
             reset_visited_async(gid,objectid).get();
-        }
-
-        static hpx::lcos::promise<void>
-        waitforfutures_async(hpx::naming::id_type const& gid,std::size_t objectid)
-        {
-            typedef server::point::waitforfutures_action action_type;
-            return hpx::lcos::eager_future<action_type>(gid,objectid);
-        }
-
-        static void waitforfutures(hpx::naming::id_type const& gid,std::size_t objectid)
-        {
-            // The following get yields control while the action above
-            // is executed and the result is returned to the promise.
-            waitforfutures_async(gid,objectid).get();
         }
 
     };
