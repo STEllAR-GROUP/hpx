@@ -1,11 +1,12 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
+//  Copyright (c) 2011      Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_THREADMANAGER_SCHEDULING_LOCAL_PRIOTITY_QUEUE_MAR_15_2011_0926AM)
-#define HPX_THREADMANAGER_SCHEDULING_LOCAL_PRIOTITY_QUEUE_MAR_15_2011_0926AM
+#if !defined(HPX_THREADMANAGER_SCHEDULING_PERIODIC_PRIORITY_QUEUE_HPP)
+#define HPX_THREADMANAGER_SCHEDULING_PERIODIC_PRIORITY_QUEUE_HPP
 
 #include <memory>
 
@@ -31,14 +32,14 @@
 namespace hpx { namespace threads { namespace policies
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// The local_priority_queue_scheduler maintains exactly one queue of work
+    /// The local_periodic_priority_scheduler maintains exactly one queue of work
     /// items (threads) per OS thread, where this OS thread pulls its next work
     /// from. Additionally it maintains separate queues: several for high
     /// priority threads and one for low priority threads.
     /// High priority threads are executed by the first N OS threads before any
     /// other work is executed. Low priority threads are executed by the last
     /// OS thread whenever no other work is available.
-    class local_priority_queue_scheduler : boost::noncopyable
+    class local_periodic_priority_scheduler : boost::noncopyable
     {
     private:
         // The maximum number of active threads this thread manager should
@@ -46,10 +47,15 @@ namespace hpx { namespace threads { namespace policies
         // items queue is not empty. Otherwise the number of active threads
         // will be incremented in steps equal to the \a min_add_new_count
         // specified above.
-        enum { max_thread_count = 1000 };
+        enum {
+            max_thread_count = 1000,
+            min_thread_count = 10
+        };
 
     public:
-        typedef boost::mpl::false_ has_periodic_maintenance;
+
+        typedef boost::mpl::true_ has_periodic_maintenance;
+
         // the scheduler type takes two initialization parameters:
         //    the number of queues
         //    the number of high priority queues
@@ -87,7 +93,7 @@ namespace hpx { namespace threads { namespace policies
         };
         typedef init_parameter init_parameter_type;
 
-        local_priority_queue_scheduler(init_parameter_type const& init)
+        local_periodic_priority_scheduler(init_parameter_type const& init)
           : queues_(init.num_queues_),
             high_priority_queues_(init.num_high_priority_queues_),
             low_priority_queue_(init.max_queue_thread_count_),
@@ -106,7 +112,7 @@ namespace hpx { namespace threads { namespace policies
             }
         }
 
-        ~local_priority_queue_scheduler()
+        ~local_periodic_priority_scheduler()
         {
             for (std::size_t i = 0; i < queues_.size(); ++i)
                 delete queues_[i];
@@ -214,6 +220,7 @@ namespace hpx { namespace threads { namespace policies
 
             // steal thread from other queue, first try high priority queues,
             // then normal ones
+            /*
             for (std::size_t i = 1; i < high_priority_queues_.size(); ++i) {
                 std::size_t idx = (i + num_thread) % high_priority_queues_.size();
                 if (high_priority_queues_[idx]->
@@ -228,6 +235,7 @@ namespace hpx { namespace threads { namespace policies
                 if (queues_[idx]->get_next_thread(thrd, num_thread))
                     return true;
             }
+            */
             return false;
         }
 
@@ -363,6 +371,23 @@ namespace hpx { namespace threads { namespace policies
             }
 
             if (0 == added) {
+#if defined(BOOST_WINDOWS)
+                    Sleep(1);
+#elif defined(BOOST_HAS_PTHREADS)
+                    // g++ -Wextra warns on {} or {0}
+                    struct timespec rqtp = { 0, 0 };
+
+                    // POSIX says that timespec has tv_sec and tv_nsec
+                    // But it doesn't guarantee order or placement
+
+                    rqtp.tv_sec = 0;
+                    rqtp.tv_nsec = 2000;
+
+                    nanosleep( &rqtp, 0 );
+#else
+#endif
+                return !running;
+#if 0
                 // steal work items: first try to steal from other cores in
                 // the same NUMA node
                 std::size_t core_mask = get_thread_affinity_mask(num_thread, numa_sensitive_);
@@ -411,8 +436,72 @@ namespace hpx { namespace threads { namespace policies
                         }
                     }
                 }
+#endif
             }
             return result && 0 == added;
+        }
+        
+        bool periodic_maintenance(bool running)
+        {
+            // periodid maintenance redistributes work and is responsible that
+            // every OS-Thread has enough work
+
+            // First, make sure, every queue has at least min_work_count items
+            // in their queue
+            for(std::size_t i = 0; i < high_priority_queues_.size(); ++i)
+            {
+                if(high_priority_queues_[i]->get_work_length() < min_thread_count)
+                {
+                    for(std::size_t j = 0; j < high_priority_queues_.size(); ++j)
+                    {
+                        if(i == j) continue;
+
+                        threads::thread* thrd;
+                        if(high_priority_queues_[j]->get_work_length() > min_thread_count)
+                        {
+                            if(high_priority_queues_[j]->get_next_thread(thrd, j + queues_.size()))
+                            {
+                                high_priority_queues_[i]->schedule_thread(thrd, i + queues_.size());
+                            }
+                        }
+                    }
+                }
+
+                if(queues_[i]->get_work_length() < min_thread_count)
+                {
+                    for(std::size_t j = 0; j < queues_.size(); ++j)
+                    {
+                        if(i == j) continue;
+
+                        threads::thread* thrd;
+                        if(queues_[j]->get_work_length() > min_thread_count)
+                        {
+                            if(queues_[j]->get_next_thread(thrd, j))
+                            {
+                                queues_[i]->schedule_thread(thrd, i);
+                            }
+                        }
+                    }
+                }
+            }
+
+            std::size_t added = 0;
+            std::size_t idle_loop_count = 0;
+            for(std::size_t num_thread = 0; num_thread < queues_.size(); ++num_thread)
+            {
+                if(queues_[num_thread]->get_task_length() < min_thread_count)
+                {
+                    for (std::size_t i = 0; i < queues_.size(); ++i) {
+                        if(i == num_thread) continue;
+                        queues_[num_thread]->wait_or_add_new(i, running,
+                            idle_loop_count, added, queues_[i]);
+                    }
+                }
+            }
+
+            // Second, steal work via wait_or_add_new
+
+            return true;
         }
 
         /// This function gets called by the thread-manager whenever new work

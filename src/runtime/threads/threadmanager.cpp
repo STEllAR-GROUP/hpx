@@ -1051,6 +1051,8 @@ namespace hpx { namespace threads
         boost::uint64_t& exec_time = exec_times[num_thread];
         boost::uint64_t overall_timestamp = util::hardware::timestamp();
 
+        start_periodic_maintenance<SchedulingPolicy>(typename SchedulingPolicy::has_periodic_maintenance());
+
         while (true) {
             // Get the next PX thread from the queue
             thread* thrd = NULL;
@@ -1320,6 +1322,41 @@ namespace hpx { namespace threads
         return boost::int64_t(1000. * percent);   // 0.1 percent
     }
 
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    template <typename C>
+    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        start_periodic_maintenance(boost::mpl::true_)
+    {
+        boost::posix_time::microseconds expire(1);
+        // create timer firing in correspondence with given time
+        boost::asio::deadline_timer t (timer_pool_.get_io_service(), expire);
+
+        void (threadmanager_impl::*handler)(boost::mpl::true_)
+            = &threadmanager_impl::periodic_maintenance_handler<SchedulingPolicy>;
+
+        t.async_wait(boost::bind(handler, this, boost::mpl::true_()));
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    template <typename C>
+    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        periodic_maintenance_handler(boost::mpl::true_)
+    {
+        scheduler_.periodic_maintenance(state_.load() == running);
+
+        if(state_.load() == running)
+        {
+            boost::posix_time::microseconds expire(10);
+            // create timer firing in correspondence with given time
+            boost::asio::deadline_timer t (timer_pool_.get_io_service(), expire);
+
+            void (threadmanager_impl::*handler)(boost::mpl::true_)
+                = &threadmanager_impl::periodic_maintenance_handler<SchedulingPolicy>;
+
+            t.async_wait(boost::bind(handler, this, boost::mpl::true_()));
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     hpx::util::thread_specific_ptr<std::size_t, threadmanager_base::tls_tag>
         threadmanager_base::thread_num_;
@@ -1404,6 +1441,14 @@ template HPX_EXPORT class hpx::threads::threadmanager_impl<
 
 template HPX_EXPORT class hpx::threads::threadmanager_impl<
     hpx::threads::policies::hierarchy_scheduler,
+    hpx::threads::policies::callback_notifier>;
+#endif
+
+#if defined(HPX_PERIODIC_PRIORITY_SCHEDULER)
+#include <hpx/runtime/threads/policies/periodic_priority_scheduler.hpp>
+
+template HPX_EXPORT class hpx::threads::threadmanager_impl<
+    hpx::threads::policies::local_periodic_priority_scheduler,
     hpx::threads::policies::callback_notifier>;
 #endif
 

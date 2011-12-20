@@ -626,6 +626,22 @@ namespace hpx { namespace threads
             thread_state_enum newstate, thread_state_ex_enum newstate_ex,
             thread_priority priority);
 
+        template <typename C>
+        void start_periodic_maintenance(boost::mpl::true_);
+
+        template <typename C>
+        void start_periodic_maintenance(boost::mpl::false_)
+        {
+        }
+
+        template <typename C>
+        void periodic_maintenance_handler(boost::mpl::true_);
+
+        template <typename C>
+        void periodic_maintenance_handler(boost::mpl::false_)
+        {
+        }
+
     public:
         /// install_counters is called during startup to allow registration of
         /// performance counters

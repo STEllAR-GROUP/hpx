@@ -43,6 +43,7 @@ namespace hpx { namespace threads { namespace policies
         enum { max_thread_count = 1000 };
 
     public:
+        typedef boost::mpl::false_ has_periodic_maintenance;
         // the scheduler type takes two initialization parameters:
         //    the number of queues
         //    the maxcount per queue

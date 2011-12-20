@@ -19,6 +19,22 @@
 #include <hpx/runtime/actions/function.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#if defined(HPX_GLOBAL_SCHEDULER)
+#include <hpx/runtime/threads/policies/global_queue_scheduler.hpp>
+#endif
+#if defined(HPX_LOCAL_SCHEDULER)
+#include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
+#endif
+#if defined(HPX_ABP_SCHEDULER)
+#include <hpx/runtime/threads/policies/abp_queue_scheduler.hpp>
+#endif
+#include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
+#if defined(HPX_HIERARCHY_SCHEDULER)
+#include <hpx/runtime/threads/policies/hierarchy_scheduler.hpp>
+#endif
+#if defined(HPX_PERIODIC_PRIORITY_SCHEDULER)
+#include <hpx/runtime/threads/policies/periodic_priority_scheduler.hpp>
+#endif
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/util/query_counters.hpp>
@@ -630,6 +646,47 @@ namespace hpx
         }
 #endif
 
+#if defined(HPX_PERIODIC_PRIORITY_SCHEDULER)
+        ///////////////////////////////////////////////////////////////////////
+        // hierarchical scheduler: The thread queues are built up hierarchically
+        // this avoids contention during work stealing
+        int run_periodic(hpx_main_func f, boost::program_options::variables_map& vm,
+            runtime_mode mode, std::vector<std::string> const& ini_config,
+            startup_function_type const& startup,
+            shutdown_function_type const& shutdown, std::size_t num_threads,
+            std::size_t num_localities)
+        {
+            std::size_t num_high_priority_queues = num_threads;
+            if (vm.count("high-priority-threads")) {
+                num_high_priority_queues =
+                    vm["high-priority-threads"].as<std::size_t>();
+            }
+            bool numa_sensitive = false;
+#if defined(BOOST_WINDOWS)
+            if (vm.count("numa-sensitive"))
+                numa_sensitive = true;
+#endif
+            if (vm.count("hierarchy-arity")) {
+                throw std::logic_error("Invalid command line option "
+                    "--hierarchy-arity, valid for --queueing=hierarchy only.");
+            }
+
+            // scheduling policy
+            typedef hpx::threads::policies::local_periodic_priority_scheduler
+                local_queue_policy;
+            local_queue_policy::init_parameter_type init(
+                num_threads, num_high_priority_queues, 1000, numa_sensitive);
+
+            // Build and configure this runtime instance.
+            typedef hpx::runtime_impl<local_queue_policy> runtime_type;
+            runtime_type rt(mode, init, vm["hpx-config"].as<std::string>(),
+                ini_config);
+
+            return run(rt, f, vm, mode, startup, shutdown, num_threads,
+                num_localities);
+        }
+#endif
+
         ///////////////////////////////////////////////////////////////////////
         void set_signal_handlers()
         {
@@ -1015,6 +1072,16 @@ namespace hpx
                 throw std::logic_error("Command line option --queueing=hierarchy "
                     "is not configured in this build. Please rebuild with "
                     "'cmake -DHPX_HIERARCHY_SCHEDULER=ON'.");
+#endif
+            }
+            else if (0 == std::string("periodic").find(queueing)) {
+#if defined(HPX_PERIODIC_PRIORITY_SCHEDULER)
+                result = detail::run_periodic(f, vm, mode, ini_config,
+                    startup, shutdown, num_threads, num_localities);
+#else
+                throw std::logic_error("Command line option --queueing=periodic "
+                    "is not configured in this build. Please rebuild with "
+                    "'cmake -DHPX_PERIODIC_PRIORITY_SCHEDULER=ON'.");
 #endif
             }
             else {

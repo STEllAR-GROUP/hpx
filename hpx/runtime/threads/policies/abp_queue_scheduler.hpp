@@ -33,6 +33,7 @@ namespace hpx { namespace threads { namespace policies
 
 struct abp_queue_scheduler : boost::noncopyable
 {
+    typedef boost::mpl::false_ has_periodic_maintenance;
     enum { max_thread_count = 1000 };
 
     // the scheduler type takes two initialization parameters:

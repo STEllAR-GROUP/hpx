@@ -395,6 +395,12 @@ if(HPX_HIERARCHY_SCHEDULER)
   add_definitions(-DHPX_HIERARCHY_SCHEDULER)
 endif()
 
+hpx_option(HPX_PERIODIC_PRIORITY_SCHEDULER BOOL "Enable the use of --queueing=periodic (default: OFF)" OFF)
+
+if(HPX_PERIODIC_PRIORITY_SCHEDULER)
+  add_definitions(-DHPX_PERIODIC_PRIORITY_SCHEDULER)
+endif()
+
 ################################################################################
 # MSVC configuration
 ################################################################################

@@ -149,6 +149,10 @@ namespace hpx
             class HPX_API_EXPORT hierarchy_scheduler;
 #endif
 
+#if defined(HPX_PERIODIC_PRIORITY_SCHEDULER)
+            class HPX_API_EXPORT periodic_priority_scheduler;
+#endif
+
             class HPX_API_EXPORT callback_notifier;
 
             // define the default scheduler to use
