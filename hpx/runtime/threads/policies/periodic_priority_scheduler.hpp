@@ -93,6 +93,9 @@ namespace hpx { namespace threads { namespace policies
         };
         typedef init_parameter init_parameter_type;
 
+        typedef hpx::util::spinlock mutex_type;
+
+
         local_periodic_priority_scheduler(init_parameter_type const& init)
           : queues_(init.num_queues_),
             high_priority_queues_(init.num_high_priority_queues_),
@@ -102,7 +105,9 @@ namespace hpx { namespace threads { namespace policies
         {
             BOOST_ASSERT(init.num_queues_ != 0);
             for (std::size_t i = 0; i < init.num_queues_; ++i)
+            {
                 queues_[i] = new thread_queue<false>(init.max_queue_thread_count_);
+            }
 
             BOOST_ASSERT(init.num_high_priority_queues_ != 0);
             BOOST_ASSERT(init.num_high_priority_queues_ <= init.num_queues_);
@@ -115,7 +120,9 @@ namespace hpx { namespace threads { namespace policies
         ~local_periodic_priority_scheduler()
         {
             for (std::size_t i = 0; i < queues_.size(); ++i)
+            {
                 delete queues_[i];
+            }
             for (std::size_t i = 0; i < high_priority_queues_.size(); ++i)
                 delete high_priority_queues_[i];
         }
@@ -175,6 +182,7 @@ namespace hpx { namespace threads { namespace policies
             if (std::size_t(-1) == num_thread)
                 num_thread = ++curr_queue_ % queues_.size();
 
+            
             // now create the thread
             if (data.priority == thread_priority_critical) {
                 BOOST_ASSERT(run_now == true);
@@ -220,7 +228,7 @@ namespace hpx { namespace threads { namespace policies
 
             // steal thread from other queue, first try high priority queues,
             // then normal ones
-            /*
+            
             for (std::size_t i = 1; i < high_priority_queues_.size(); ++i) {
                 std::size_t idx = (i + num_thread) % high_priority_queues_.size();
                 if (high_priority_queues_[idx]->
@@ -235,7 +243,6 @@ namespace hpx { namespace threads { namespace policies
                 if (queues_[idx]->get_next_thread(thrd, num_thread))
                     return true;
             }
-            */
             return false;
         }
 
@@ -358,7 +365,6 @@ namespace hpx { namespace threads { namespace policies
             std::size_t& idle_loop_count)
         {
             BOOST_ASSERT(num_thread < queues_.size());
-
             std::size_t added = 0;
             bool result = queues_[num_thread]->wait_or_add_new(
                 num_thread, running, idle_loop_count, added);
@@ -371,23 +377,6 @@ namespace hpx { namespace threads { namespace policies
             }
 
             if (0 == added) {
-#if defined(BOOST_WINDOWS)
-                    Sleep(1);
-#elif defined(BOOST_HAS_PTHREADS)
-                    // g++ -Wextra warns on {} or {0}
-                    struct timespec rqtp = { 0, 0 };
-
-                    // POSIX says that timespec has tv_sec and tv_nsec
-                    // But it doesn't guarantee order or placement
-
-                    rqtp.tv_sec = 0;
-                    rqtp.tv_nsec = 1000;
-
-                    nanosleep( &rqtp, 0 );
-#else
-#endif
-                return !running;
-#if 0
                 // steal work items: first try to steal from other cores in
                 // the same NUMA node
                 std::size_t core_mask = get_thread_affinity_mask(num_thread, numa_sensitive_);
@@ -436,7 +425,6 @@ namespace hpx { namespace threads { namespace policies
                         }
                     }
                 }
-#endif
             }
             return result && 0 == added;
         }
@@ -446,53 +434,131 @@ namespace hpx { namespace threads { namespace policies
             // periodid maintenance redistributes work and is responsible that
             // every OS-Thread has enough work
 
-            // First, make sure, every queue has at least min_work_count items
-            // in their queue
-            for(std::size_t i = 0; i < high_priority_queues_.size(); ++i)
             {
+                // Calculate the average ...
+                std::size_t average_task_count = 0;
+                std::size_t average_work_count = 0;
+                for(std::size_t i = 0; i < high_priority_queues_.size(); ++i)
                 {
-                    for(std::size_t j = 0;high_priority_queues_[i]->get_work_length() < min_thread_count &&  j < high_priority_queues_.size(); ++j)
+                    average_task_count += high_priority_queues_[i]->get_task_length();
+                    average_work_count += high_priority_queues_[i]->get_work_length();
+                }
+                average_task_count = average_task_count / high_priority_queues_.size();
+                average_work_count = average_work_count / high_priority_queues_.size();
+                // Remove items from queues that have more than the average
+                thread_queue<false> tmp_queue;
+                for(std::size_t i = 0; i < high_priority_queues_.size(); ++i)
+                {
+                    std::size_t task_items = high_priority_queues_[i]->get_task_length();
+                    std::size_t work_items = high_priority_queues_[i]->get_work_length();
+                    if(task_items > average_task_count)
                     {
-                        if(i == j) continue;
-
-                        if(high_priority_queues_[j]->get_work_length() > min_thread_count)
-                        {
-                            high_priority_queues_[i]->move_work_items_from(
-                                high_priority_queues_[j], min_thread_count, j);
-                        }
+                        std::size_t count = task_items - average_task_count;
+                        tmp_queue.move_task_items_from(high_priority_queues_[i], count);
+                    }
+                    if(work_items > average_work_count)
+                    {
+                        std::size_t count = work_items - average_work_count;
+                        tmp_queue.move_work_items_from(high_priority_queues_[i], count, i + queues_.size());
                     }
                 }
-
+                // And readd them to the queues which didn't have enough work ...
+                for(std::size_t i = 0; i < high_priority_queues_.size(); ++i)
                 {
-                    for(std::size_t j = 0;queues_[i]->get_work_length() < min_thread_count && j < queues_.size(); ++j)
+                    std::size_t task_items = high_priority_queues_[i]->get_task_length();
+                    std::size_t work_items = high_priority_queues_[i]->get_work_length();
+                    if(task_items < average_task_count)
                     {
-                        if(i == j) continue;
-
-                        if(queues_[j]->get_work_length() > min_thread_count)
-                        {
-                            queues_[i]->move_work_items_from(
-                                queues_[j], min_thread_count, j);
-                        }
+                        std::size_t count = average_task_count - task_items;
+                        high_priority_queues_[i]->move_task_items_from(&tmp_queue, count);
+                    }
+                    if(work_items < average_work_count)
+                    {
+                        std::size_t count = average_work_count - work_items;
+                        high_priority_queues_[i]->move_work_items_from(&tmp_queue, count, i + queues_.size());
+                    }
+                }
+                // Some items might remain in the tmp_queue ... readd them round robin
+                {
+                    std::size_t i = 0;
+                    while(tmp_queue.get_task_length())
+                    {
+                        high_priority_queues_[i]->move_task_items_from(&tmp_queue, 1);
+                        i = (i + 1) % high_priority_queues_.size();
+                    }
+                }
+                {
+                    std::size_t i = 0;
+                    while(tmp_queue.get_work_length())
+                    {
+                        high_priority_queues_[i]->move_work_items_from(&tmp_queue, 1, i + queues_.size());
+                        i = (i + 1) % high_priority_queues_.size();
                     }
                 }
             }
 
-            for(std::size_t num_thread = 0; num_thread < queues_.size(); ++num_thread)
             {
+                // Calculate the average ...
+                std::size_t average_task_count = 0;
+                std::size_t average_work_count = 0;
+                for(std::size_t i = 0; i < queues_.size(); ++i)
                 {
-                    for (std::size_t i = 0;queues_[num_thread]->get_task_length() < min_thread_count && i < queues_.size(); ++i)
+                    average_task_count += queues_[i]->get_task_length();
+                    average_work_count += queues_[i]->get_work_length();
+                }
+                average_task_count = average_task_count / queues_.size();
+                average_work_count = average_work_count / queues_.size();
+                // Remove items from queues that have more than the average
+                thread_queue<false> tmp_queue;
+                for(std::size_t i = 0; i < queues_.size(); ++i)
+                {
+                    std::size_t task_items = queues_[i]->get_task_length();
+                    std::size_t work_items = queues_[i]->get_work_length();
+                    if(task_items > average_task_count)
                     {
-                        if(i == num_thread) continue;
-
-                        if(queues_[i]->get_task_length() > min_thread_count)
-                        {
-                            queues_[num_thread]->move_task_items_from(queues_[i], min_thread_count);
-                        }
+                        std::size_t count = task_items - average_task_count;
+                        tmp_queue.move_task_items_from(queues_[i], count);
+                    }
+                    if(work_items > average_work_count)
+                    {
+                        std::size_t count = work_items - average_work_count;
+                        tmp_queue.move_work_items_from(queues_[i], count, i + queues_.size());
+                    }
+                }
+                // And readd them to the queues which didn't have enough work ...
+                for(std::size_t i = 0; i < queues_.size(); ++i)
+                {
+                    std::size_t task_items = queues_[i]->get_task_length();
+                    std::size_t work_items = queues_[i]->get_work_length();
+                    if(task_items < average_task_count)
+                    {
+                        std::size_t count = average_task_count - task_items;
+                        queues_[i]->move_task_items_from(&tmp_queue, count);
+                    }
+                    if(work_items < average_work_count)
+                    {
+                        std::size_t count = average_work_count - work_items;
+                        queues_[i]->move_work_items_from(&tmp_queue, count, i + queues_.size());
+                    }
+                }
+                // Some items might remain in the tmp_queue ... readd them round robin
+                {
+                    std::size_t i = 0;
+                    while(tmp_queue.get_task_length())
+                    {
+                        queues_[i]->move_task_items_from(&tmp_queue, 1);
+                        i = (i + 1) % queues_.size();
+                    }
+                }
+                {
+                    std::size_t i = 0;
+                    while(tmp_queue.get_work_length())
+                    {
+                        queues_[i]->move_work_items_from(&tmp_queue, 1, i + queues_.size());
+                        i = (i + 1) % queues_.size();
                     }
                 }
             }
-
-            // Second, steal work via wait_or_add_new
 
             return true;
         }
