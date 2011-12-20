@@ -381,7 +381,7 @@ namespace hpx { namespace threads { namespace policies
                     // But it doesn't guarantee order or placement
 
                     rqtp.tv_sec = 0;
-                    rqtp.tv_nsec = 2000;
+                    rqtp.tv_nsec = 1000;
 
                     nanosleep( &rqtp, 0 );
 #else
@@ -450,51 +450,44 @@ namespace hpx { namespace threads { namespace policies
             // in their queue
             for(std::size_t i = 0; i < high_priority_queues_.size(); ++i)
             {
-                if(high_priority_queues_[i]->get_work_length() < min_thread_count)
                 {
-                    for(std::size_t j = 0; j < high_priority_queues_.size(); ++j)
+                    for(std::size_t j = 0;high_priority_queues_[i]->get_work_length() < min_thread_count &&  j < high_priority_queues_.size(); ++j)
                     {
                         if(i == j) continue;
 
-                        threads::thread* thrd;
                         if(high_priority_queues_[j]->get_work_length() > min_thread_count)
                         {
-                            if(high_priority_queues_[j]->get_next_thread(thrd, j + queues_.size()))
-                            {
-                                high_priority_queues_[i]->schedule_thread(thrd, i + queues_.size());
-                            }
+                            high_priority_queues_[i]->move_work_items_from(
+                                high_priority_queues_[j], min_thread_count, j);
                         }
                     }
                 }
 
-                if(queues_[i]->get_work_length() < min_thread_count)
                 {
-                    for(std::size_t j = 0; j < queues_.size(); ++j)
+                    for(std::size_t j = 0;queues_[i]->get_work_length() < min_thread_count && j < queues_.size(); ++j)
                     {
                         if(i == j) continue;
 
-                        threads::thread* thrd;
                         if(queues_[j]->get_work_length() > min_thread_count)
                         {
-                            if(queues_[j]->get_next_thread(thrd, j))
-                            {
-                                queues_[i]->schedule_thread(thrd, i);
-                            }
+                            queues_[i]->move_work_items_from(
+                                queues_[j], min_thread_count, j);
                         }
                     }
                 }
             }
 
-            std::size_t added = 0;
-            std::size_t idle_loop_count = 0;
             for(std::size_t num_thread = 0; num_thread < queues_.size(); ++num_thread)
             {
-                if(queues_[num_thread]->get_task_length() < min_thread_count)
                 {
-                    for (std::size_t i = 0; i < queues_.size(); ++i) {
+                    for (std::size_t i = 0;queues_[num_thread]->get_task_length() < min_thread_count && i < queues_.size(); ++i)
+                    {
                         if(i == num_thread) continue;
-                        queues_[num_thread]->wait_or_add_new(i, running,
-                            idle_loop_count, added, queues_[i]);
+
+                        if(queues_[i]->get_task_length() > min_thread_count)
+                        {
+                            queues_[num_thread]->move_task_items_from(queues_[i], min_thread_count);
+                        }
                     }
                 }
             }

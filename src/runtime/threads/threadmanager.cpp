@@ -1327,7 +1327,7 @@ namespace hpx { namespace threads
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         start_periodic_maintenance(boost::mpl::true_)
     {
-        boost::posix_time::microseconds expire(1);
+        boost::posix_time::microseconds expire(100);
         // create timer firing in correspondence with given time
         boost::asio::deadline_timer t (timer_pool_.get_io_service(), expire);
 
@@ -1346,7 +1346,7 @@ namespace hpx { namespace threads
 
         if(state_.load() == running)
         {
-            boost::posix_time::microseconds expire(10);
+            boost::posix_time::microseconds expire(100);
             // create timer firing in correspondence with given time
             boost::asio::deadline_timer t (timer_pool_.get_io_service(), expire);
 
