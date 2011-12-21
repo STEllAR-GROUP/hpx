@@ -877,13 +877,15 @@ install( # install hpx python module (TODO: this is a temporary hack)
   PATTERN ".git" EXCLUDE)
 
 install( # install external dependencies
-  DIRECTORY external/cache/boost
+  DIRECTORY external/atomic/boost
+            external/cache/boost
             external/coroutine/boost
-            external/atomic/boost
             external/endian/boost
             external/lockfree/boost
             external/logging/boost
+            external/move/boost
             external/plugin/boost
+            external/serialization/boost
   DESTINATION include
   COMPONENT core
   FILES_MATCHING PATTERN "*.hpp"
