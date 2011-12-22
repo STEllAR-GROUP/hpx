@@ -151,6 +151,8 @@ namespace boost { namespace coroutines { namespace detail
   public:
     BOOST_COROUTINE_EXPORT static void set_self(self_type* self);
     BOOST_COROUTINE_EXPORT static self_type* get_self();
+    BOOST_COROUTINE_EXPORT static void init_self();
+    BOOST_COROUTINE_EXPORT static void reset_self();
 
   protected:
     void rebind(thread_id_type id)
@@ -168,7 +170,7 @@ namespace boost { namespace coroutines { namespace detail
     thread_id_type m_thread_id;
   };
 
-  // the TSS holds a pointer to the self instance as stored on the stack
+  // the TLS holds a pointer to the self instance as stored on the stack
   template<typename CoroutineType, typename ContextImpl,
       template <typename> class Heap>
   hpx::util::thread_specific_ptr<

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,6 +25,7 @@
 #include <hpx/runtime/parcelset/policies/global_parcelhandler_queue.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/include/performance_counters.hpp>
+#include <boost/coroutine/detail/coroutine_impl_impl.hpp>
 
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 
@@ -521,12 +522,16 @@ namespace hpx
     {
         // initialize our TSS
         BOOST_ASSERT(NULL == runtime::runtime_.get());    // shouldn't be initialized yet
+        BOOST_ASSERT(NULL == threads::coroutine_type::impl_type::get_self());
+
         runtime::runtime_.reset(new runtime* (this));
+        threads::coroutine_type::impl_type::init_self();
     }
 
     void runtime::deinit_tss()
     {
         // reset our TSS
+        threads::coroutine_type::impl_type::reset_self();
         runtime::runtime_.reset();
     }
 
@@ -663,9 +668,9 @@ namespace hpx
         return get_runtime().get_next_id();
     }
 
-    std::size_t get_num_os_threads()
+    std::size_t get_os_thread_count()
     {
-        return get_runtime().get_config().get_num_os_threads();
+        return get_runtime().get_config().get_os_thread_count();
     }
 
     ///////////////////////////////////////////////////////////////////////////
