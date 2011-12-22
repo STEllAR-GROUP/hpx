@@ -219,8 +219,9 @@ public:
             tagged_node_ptr next = head->next.load(memory_order_acquire);
             node * next_ptr = next.get_ptr();
 
-            tagged_node_ptr head2 = head_.load(memory_order_acquire);
-            if (likely(head == head2)) {
+//             tagged_node_ptr head2 = head_.load(memory_order_acquire);
+//             if (likely(head == head2)) 
+            {
                 if (head.get_ptr() == tail.get_ptr()) {
                     if (next_ptr == 0)
                         return false;
@@ -260,7 +261,7 @@ public:
             tagged_node_ptr next = head->next.load(memory_order_relaxed);
             node * next_ptr = next.get_ptr();
 
-            tagged_node_ptr head2 = head_.load(memory_order_relaxed);
+//             tagged_node_ptr head2 = head_.load(memory_order_relaxed);
             if (head.get_ptr() == tail.get_ptr()) {
                 if (next_ptr == 0)
                     return false;
