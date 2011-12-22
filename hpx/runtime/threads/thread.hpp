@@ -665,7 +665,7 @@ namespace hpx { namespace threads
         thread_state_enum operator()()
         {
             detail::thread* t = get();
-            return t ? t->execute() : thread_state(terminated);
+            return t ? t->execute() : terminated;
         }
 
         /// \brief Get the (optional) description of this thread

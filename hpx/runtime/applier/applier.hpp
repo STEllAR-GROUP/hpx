@@ -1,5 +1,5 @@
 //  Copyright (c) 2007-2008 Anshul Tandon
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -194,8 +194,8 @@ namespace hpx { namespace applier
     /// \param func       [in] The function to be executed as the thread-function.
     ///                   This function has to expose the minimal low level
     ///                   PX-thread interface, i.e. it takes one argument (a
-    ///                   \a threads#thread_state_ex) and returns a
-    ///                   \a threads#thread_state.
+    ///                   \a threads#thread_state_ex_enum) and returns a
+    ///                   \a threads#thread_state_enum.
     /// \param description [in] A optional string describing the newly created
     ///                   thread. This is useful for debugging and logging
     ///                   purposes as this string will be inserted in the logs.
@@ -256,14 +256,14 @@ namespace hpx { namespace applier
     /// \param func       [in] The function to be executed as the thread-function.
     ///                   This function has to expose the minimal low level
     ///                   PX-thread interface, i.e. it takes one argument (a
-    ///                   \a threads#thread_state_ex). The thread will be
+    ///                   \a threads#thread_state_ex_enum). The thread will be
     ///                   terminated after the function returns.
     ///
     /// \note All other arguments are equivalent to those of the function
     ///       \a applier#register_thread_plain
     ///
     HPX_API_EXPORT threads::thread_id_type register_thread(
-        BOOST_RV_REF(HPX_STD_FUNCTION<void(threads::thread_state_ex)>) func,
+        BOOST_RV_REF(HPX_STD_FUNCTION<void(threads::thread_state_ex_enum)>) func,
         char const* description = 0,
         threads::thread_state_enum initial_state = threads::pending,
         bool run_now = true,
@@ -313,8 +313,8 @@ namespace hpx { namespace applier
     /// \param func       [in] The function to be executed as the thread-function.
     ///                   This function has to expose the minimal low level
     ///                   PX-thread interface, i.e. it takes one argument (a
-    ///                   \a threads#thread_state_ex) and returns a
-    ///                   \a threads#thread_state.
+    ///                   \a threads#thread_state_ex_enum) and returns a
+    ///                   \a threads#thread_state_enum.
     /// \param description [in] A optional string describing the newly created
     ///                   thread. This is useful for debugging and logging
     ///                   purposes as this string will be inserted in the logs.
@@ -364,14 +364,14 @@ namespace hpx { namespace applier
     /// \param func       [in] The function to be executed as the thread-function.
     ///                   This function has to expose the minimal low level
     ///                   PX-thread interface, i.e. it takes one argument (a
-    ///                   \a threads#thread_state_ex). The thread will be
+    ///                   \a threads#thread_state_ex_enum). The thread will be
     ///                   terminated after the function returns.
     ///
     /// \note All other arguments are equivalent to those of the function
     ///       \a applier#register_work_plain
     ///
     HPX_API_EXPORT void register_work(
-        BOOST_RV_REF(HPX_STD_FUNCTION<void(threads::thread_state_ex)>) func,
+        BOOST_RV_REF(HPX_STD_FUNCTION<void(threads::thread_state_ex_enum)>) func,
         char const* description = 0,
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,

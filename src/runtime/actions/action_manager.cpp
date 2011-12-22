@@ -80,14 +80,12 @@ namespace hpx { namespace actions
             // direct execution of the action
                 if (!cont) {
                 // no continuation is to be executed
-                    act->get_thread_function(lva)(
-                        threads::thread_state_ex(threads::wait_signaled));
+                    act->get_thread_function(lva)(threads::wait_signaled);
                 }
                 else {
                 // this parcel carries a continuation, we execute a wrapper
                 // handling all related functionality
-                    act->get_thread_function(cont, lva)(
-                        threads::thread_state_ex(threads::wait_signaled));
+                    act->get_thread_function(cont, lva)(threads::wait_signaled);
                 }
             }
             else {

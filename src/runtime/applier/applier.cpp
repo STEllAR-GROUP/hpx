@@ -1,5 +1,5 @@
 //  Copyright (c) 2007-2008 Anshul Tandon
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -39,18 +39,18 @@ namespace hpx { namespace applier
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    static inline threads::thread_state thread_function(
-        HPX_STD_FUNCTION<void(threads::thread_state_ex)> const& func)
+    static inline threads::thread_state_enum thread_function(
+        HPX_STD_FUNCTION<void(threads::thread_state_ex_enum)> const& func)
     {
-        func(threads::thread_state_ex(threads::wait_signaled));
-        return threads::thread_state(threads::terminated);
+        func(threads::wait_signaled);
+        return threads::terminated;
     }
 
-    static inline threads::thread_state thread_function_nullary(
+    static inline threads::thread_state_enum thread_function_nullary(
         HPX_STD_FUNCTION<void()> const& func)
     {
         func();
-        return threads::thread_state(threads::terminated);
+        return threads::terminated;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -76,7 +76,7 @@ namespace hpx { namespace applier
     }
 
     threads::thread_id_type register_thread(
-        BOOST_RV_REF(HPX_STD_FUNCTION<void(threads::thread_state_ex)>) func,
+        BOOST_RV_REF(HPX_STD_FUNCTION<void(threads::thread_state_ex_enum)>) func,
         char const* desc, threads::thread_state_enum state, bool run_now,
         threads::thread_priority priority, std::size_t os_thread, error_code& ec)
     {
@@ -155,7 +155,7 @@ namespace hpx { namespace applier
     }
 
     void register_work(
-        BOOST_RV_REF(HPX_STD_FUNCTION<void(threads::thread_state_ex)>) func,
+        BOOST_RV_REF(HPX_STD_FUNCTION<void(threads::thread_state_ex_enum)>) func,
         char const* desc, threads::thread_state_enum state,
         threads::thread_priority priority, std::size_t os_thread, error_code& ec)
     {
