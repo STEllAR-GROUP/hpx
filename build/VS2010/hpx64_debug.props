@@ -5,7 +5,7 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
-      <PreprocessorDefinitions>HPX_ITT_AMPLIFIER=0;HPX_USE_ITT=0;DEBUG=1;HPX_EMULATE_SWAP_CONTEXT=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HPX_ITT_AMPLIFIER=0;HPX_USE_ITT=1;DEBUG=1;HPX_EMULATE_SWAP_CONTEXT=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />

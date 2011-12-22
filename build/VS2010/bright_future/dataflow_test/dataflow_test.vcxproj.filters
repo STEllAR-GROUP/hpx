@@ -14,5 +14,8 @@
     <ClCompile Include="..\..\..\..\examples\bright_future\dataflow_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\tests\performance\pxthread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

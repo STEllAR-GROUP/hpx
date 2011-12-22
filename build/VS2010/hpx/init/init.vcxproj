@@ -77,6 +77,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\hpx_init.cpp">
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</WholeProgramOptimization>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

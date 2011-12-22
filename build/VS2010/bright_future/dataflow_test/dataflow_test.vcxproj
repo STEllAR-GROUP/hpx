@@ -77,7 +77,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\examples\bright_future\dataflow_test.cpp" />
+    <ClCompile Include="..\..\..\..\examples\bright_future\dataflow_test.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\tests\performance\pxthread.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\components\iostreams\iostreams.vcxproj">

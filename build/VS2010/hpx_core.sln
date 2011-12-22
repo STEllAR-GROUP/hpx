@@ -32,6 +32,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dataflow_test", "bright_fut
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sine", "components\performance_counters\sine\sine.vcxproj", "{97D176F8-DF75-4CCB-8BAF-94C74974611E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BFS", "BFS", "{1FCCD530-A150-49E1-A860-65A3D241A2F9}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bfs", "bfs\bfs\bfs.vcxproj", "{65DFACEB-C57A-4D75-B822-8FD406CB4B22}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bfs_client", "bfs\bfs_client\bfs_client.vcxproj", "{726F021D-C5D3-4376-B9BA-598E6CE6F0E4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -107,7 +113,6 @@ Global
 		{BB7A04C9-8F0C-4BF1-80C2-D9437F598D5B}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{BB7A04C9-8F0C-4BF1-80C2-D9437F598D5B}.Debug|Win32.ActiveCfg = Debug|x64
 		{BB7A04C9-8F0C-4BF1-80C2-D9437F598D5B}.Debug|x64.ActiveCfg = Debug|x64
-		{BB7A04C9-8F0C-4BF1-80C2-D9437F598D5B}.Debug|x64.Build.0 = Debug|x64
 		{BB7A04C9-8F0C-4BF1-80C2-D9437F598D5B}.Release|Mixed Platforms.ActiveCfg = Release|x64
 		{BB7A04C9-8F0C-4BF1-80C2-D9437F598D5B}.Release|Mixed Platforms.Build.0 = Release|x64
 		{BB7A04C9-8F0C-4BF1-80C2-D9437F598D5B}.Release|Win32.ActiveCfg = Release|x64
@@ -117,7 +122,6 @@ Global
 		{0615D767-9C56-4B20-9474-E023BB44D4CA}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{0615D767-9C56-4B20-9474-E023BB44D4CA}.Debug|Win32.ActiveCfg = Debug|x64
 		{0615D767-9C56-4B20-9474-E023BB44D4CA}.Debug|x64.ActiveCfg = Debug|x64
-		{0615D767-9C56-4B20-9474-E023BB44D4CA}.Debug|x64.Build.0 = Debug|x64
 		{0615D767-9C56-4B20-9474-E023BB44D4CA}.Release|Mixed Platforms.ActiveCfg = Release|x64
 		{0615D767-9C56-4B20-9474-E023BB44D4CA}.Release|Mixed Platforms.Build.0 = Release|x64
 		{0615D767-9C56-4B20-9474-E023BB44D4CA}.Release|Win32.ActiveCfg = Release|x64
@@ -127,7 +131,6 @@ Global
 		{01820105-DD4E-4BA5-B571-F7784CF0F56B}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{01820105-DD4E-4BA5-B571-F7784CF0F56B}.Debug|Win32.ActiveCfg = Debug|x64
 		{01820105-DD4E-4BA5-B571-F7784CF0F56B}.Debug|x64.ActiveCfg = Debug|x64
-		{01820105-DD4E-4BA5-B571-F7784CF0F56B}.Debug|x64.Build.0 = Debug|x64
 		{01820105-DD4E-4BA5-B571-F7784CF0F56B}.Release|Mixed Platforms.ActiveCfg = Release|x64
 		{01820105-DD4E-4BA5-B571-F7784CF0F56B}.Release|Mixed Platforms.Build.0 = Release|x64
 		{01820105-DD4E-4BA5-B571-F7784CF0F56B}.Release|Win32.ActiveCfg = Release|x64
@@ -137,7 +140,6 @@ Global
 		{268E3FB7-58FD-4A1F-9353-2F0734B802B2}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{268E3FB7-58FD-4A1F-9353-2F0734B802B2}.Debug|Win32.ActiveCfg = Debug|x64
 		{268E3FB7-58FD-4A1F-9353-2F0734B802B2}.Debug|x64.ActiveCfg = Debug|x64
-		{268E3FB7-58FD-4A1F-9353-2F0734B802B2}.Debug|x64.Build.0 = Debug|x64
 		{268E3FB7-58FD-4A1F-9353-2F0734B802B2}.Release|Mixed Platforms.ActiveCfg = Release|x64
 		{268E3FB7-58FD-4A1F-9353-2F0734B802B2}.Release|Mixed Platforms.Build.0 = Release|x64
 		{268E3FB7-58FD-4A1F-9353-2F0734B802B2}.Release|Win32.ActiveCfg = Release|x64
@@ -147,7 +149,6 @@ Global
 		{98EEED4C-091D-47EE-886E-1739BB6ED328}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{98EEED4C-091D-47EE-886E-1739BB6ED328}.Debug|Win32.ActiveCfg = Debug|x64
 		{98EEED4C-091D-47EE-886E-1739BB6ED328}.Debug|x64.ActiveCfg = Debug|x64
-		{98EEED4C-091D-47EE-886E-1739BB6ED328}.Debug|x64.Build.0 = Debug|x64
 		{98EEED4C-091D-47EE-886E-1739BB6ED328}.Release|Mixed Platforms.ActiveCfg = Release|x64
 		{98EEED4C-091D-47EE-886E-1739BB6ED328}.Release|Mixed Platforms.Build.0 = Release|x64
 		{98EEED4C-091D-47EE-886E-1739BB6ED328}.Release|Win32.ActiveCfg = Release|x64
@@ -157,12 +158,28 @@ Global
 		{97D176F8-DF75-4CCB-8BAF-94C74974611E}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{97D176F8-DF75-4CCB-8BAF-94C74974611E}.Debug|Win32.ActiveCfg = Debug|x64
 		{97D176F8-DF75-4CCB-8BAF-94C74974611E}.Debug|x64.ActiveCfg = Debug|x64
-		{97D176F8-DF75-4CCB-8BAF-94C74974611E}.Debug|x64.Build.0 = Debug|x64
 		{97D176F8-DF75-4CCB-8BAF-94C74974611E}.Release|Mixed Platforms.ActiveCfg = Release|x64
 		{97D176F8-DF75-4CCB-8BAF-94C74974611E}.Release|Mixed Platforms.Build.0 = Release|x64
 		{97D176F8-DF75-4CCB-8BAF-94C74974611E}.Release|Win32.ActiveCfg = Release|x64
 		{97D176F8-DF75-4CCB-8BAF-94C74974611E}.Release|x64.ActiveCfg = Release|x64
-		{97D176F8-DF75-4CCB-8BAF-94C74974611E}.Release|x64.Build.0 = Release|x64
+		{65DFACEB-C57A-4D75-B822-8FD406CB4B22}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{65DFACEB-C57A-4D75-B822-8FD406CB4B22}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{65DFACEB-C57A-4D75-B822-8FD406CB4B22}.Debug|Win32.ActiveCfg = Debug|x64
+		{65DFACEB-C57A-4D75-B822-8FD406CB4B22}.Debug|x64.ActiveCfg = Debug|x64
+		{65DFACEB-C57A-4D75-B822-8FD406CB4B22}.Debug|x64.Build.0 = Debug|x64
+		{65DFACEB-C57A-4D75-B822-8FD406CB4B22}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{65DFACEB-C57A-4D75-B822-8FD406CB4B22}.Release|Mixed Platforms.Build.0 = Release|x64
+		{65DFACEB-C57A-4D75-B822-8FD406CB4B22}.Release|Win32.ActiveCfg = Release|x64
+		{65DFACEB-C57A-4D75-B822-8FD406CB4B22}.Release|x64.ActiveCfg = Release|x64
+		{726F021D-C5D3-4376-B9BA-598E6CE6F0E4}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{726F021D-C5D3-4376-B9BA-598E6CE6F0E4}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{726F021D-C5D3-4376-B9BA-598E6CE6F0E4}.Debug|Win32.ActiveCfg = Debug|x64
+		{726F021D-C5D3-4376-B9BA-598E6CE6F0E4}.Debug|x64.ActiveCfg = Debug|x64
+		{726F021D-C5D3-4376-B9BA-598E6CE6F0E4}.Debug|x64.Build.0 = Debug|x64
+		{726F021D-C5D3-4376-B9BA-598E6CE6F0E4}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{726F021D-C5D3-4376-B9BA-598E6CE6F0E4}.Release|Mixed Platforms.Build.0 = Release|x64
+		{726F021D-C5D3-4376-B9BA-598E6CE6F0E4}.Release|Win32.ActiveCfg = Release|x64
+		{726F021D-C5D3-4376-B9BA-598E6CE6F0E4}.Release|x64.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -175,5 +192,7 @@ Global
 		{0615D767-9C56-4B20-9474-E023BB44D4CA} = {11E4EB56-7157-4B0A-94BC-4530C2D90FCE}
 		{BB7A04C9-8F0C-4BF1-80C2-D9437F598D5B} = {11E4EB56-7157-4B0A-94BC-4530C2D90FCE}
 		{268E3FB7-58FD-4A1F-9353-2F0734B802B2} = {11E4EB56-7157-4B0A-94BC-4530C2D90FCE}
+		{65DFACEB-C57A-4D75-B822-8FD406CB4B22} = {1FCCD530-A150-49E1-A860-65A3D241A2F9}
+		{726F021D-C5D3-4376-B9BA-598E6CE6F0E4} = {1FCCD530-A150-49E1-A860-65A3D241A2F9}
 	EndGlobalSection
 EndGlobal
