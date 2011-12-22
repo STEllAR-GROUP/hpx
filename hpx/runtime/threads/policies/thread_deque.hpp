@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,6 +21,7 @@
 #include <boost/lockfree/deque.hpp>
 #include <boost/lockfree/fifo.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
+#include <boost/move/move.hpp>
 
 // TODO: add branch prediction and function heat
 
@@ -188,7 +189,6 @@ struct thread_deque
 
     boost::int64_t compute_count()
     {
-
         // create new threads from pending tasks (if appropriate)
         boost::int64_t add_count = -1; // default is no constraint
 
@@ -266,7 +266,19 @@ struct thread_deque
 
     // This returns the current length of the queues (work items and new items)
     boost::int64_t get_queue_length() const
-    { return work_items_count_ + new_tasks_count_; }
+    { 
+        return work_items_count_ + new_tasks_count_; 
+    }
+    // This returns the current length of the work queue
+    boost::int64_t get_work_length() const
+    {
+        return work_items_count_;
+    }
+    // This returns the current length of the work queue
+    boost::int64_t get_task_length() const
+    {
+        return new_tasks_count_;
+    }
 
     // create a new thread and schedule it if the initial state is equal to
     // pending
@@ -307,8 +319,9 @@ struct thread_deque
 
         // do not execute the work, but register a task description for
         // later thread creation
+        enqueue(new_tasks_, 
+            new task_description(boost::move(data), initial_state));
         ++new_tasks_count_;
-        enqueue(new_tasks_, new task_description(data, initial_state));
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -390,7 +403,7 @@ struct thread_deque
     bool add_new_or_terminate(std::size_t num_thread, bool running,
                               std::size_t& added)
     {
-        if (0 == work_items_count_) {
+        if (0 == work_items_count_.load(boost::memory_order_relaxed)) {
             util::try_lock_wrapper<mutex_type> lk(mtx_);
             if (!lk)
                 return false;
@@ -426,7 +439,7 @@ struct thread_deque
     bool steal_new_or_terminate(std::size_t num_thread, bool running,
                                 std::size_t& added, thread_deque* addfrom)
     {
-        if (0 == work_items_count_) {
+        if (0 == work_items_count_.load(boost::memory_order_relaxed)) {
             util::try_lock_wrapper<mutex_type> lk(mtx_);
             if (!lk)
                 return false;

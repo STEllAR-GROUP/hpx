@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -183,8 +183,8 @@ namespace hpx { namespace threads { namespace policies
         bool add_new_if_possible(std::size_t& added, thread_queue* addfrom,
             std::size_t num_thread)
         {
-//             if (0 == addfrom->new_tasks_count_)
-//                 return false;
+            if (0 == addfrom->new_tasks_count_.load(boost::memory_order_relaxed))
+                return false;
 
             // create new threads from pending tasks (if appropriate)
             boost::int64_t add_count = -1;                  // default is no constraint
@@ -212,8 +212,8 @@ namespace hpx { namespace threads { namespace policies
         bool add_new_always(std::size_t& added, thread_queue* addfrom,
             std::size_t num_thread)
         {
-//             if (0 == addfrom->new_tasks_count_)
-//                 return false;
+            if (0 == addfrom->new_tasks_count_.load(boost::memory_order_relaxed))
+                return false;
 
             // create new threads from pending tasks (if appropriate)
             boost::int64_t add_count = -1;                  // default is no constraint
@@ -372,11 +372,11 @@ namespace hpx { namespace threads { namespace policies
             {
                 --src->work_items_count_;
                 enqueue(work_items_, trd, num_thread);
-				{
-				    ++work_items_count_;
-					if (count == work_items_count_)
-						break;
-				}
+                {
+                    ++work_items_count_;
+                  if (count == work_items_count_)
+                    break;
+                }
             }
         }
 
@@ -388,11 +388,11 @@ namespace hpx { namespace threads { namespace policies
             {
                 --src->new_tasks_count_;
                 if(new_tasks_.enqueue(td))
-				{
-					++new_tasks_count_;
-					if (count == new_tasks_count_)
-						break;
-				}
+                {
+                  ++new_tasks_count_;
+                  if (count == new_tasks_count_)
+                    break;
+                }
             }
         }
 
@@ -519,38 +519,35 @@ namespace hpx { namespace threads { namespace policies
         util::block_profiler<add_new_tag> add_new_logger_;
     };
 
-    // FIXME: This function is HOT, we should probably disable logging here for
-    // release builds. It'll slow us down, even with log level 0.
+    ///////////////////////////////////////////////////////////////////////////
     template <>
     inline bool thread_queue<false>::wait_or_add_new(std::size_t num_thread,
         bool running, std::size_t& idle_loop_count, std::size_t& added,
         thread_queue* addfrom_)
     {
-        thread_queue* addfrom = addfrom_ ? addfrom_ : this;
+        // this thread acquired the lock, do maintenance, if needed
+        if (0 == work_items_count_.load(boost::memory_order_relaxed)) {
 
-        bool terminate = false;
-        while (0 == work_items_count_) {
             // No obvious work has to be done, so a lock won't hurt too much
             // but we lock only one of the threads, assuming this thread
             // will do the maintenance
             //
-            // We prefer to exit this while loop (some kind of very short
+            // We prefer to exit this function (some kind of very short
             // busy waiting) to blocking on this lock. Locking fails either
             // when a thread is currently doing thread maintenance, which
             // means there might be new work, or the thread owning the lock
-            // just falls through to the wait below (no work is available)
+            // just falls through to the cleanup work below (no work is available)
             // in which case the current thread (which failed to acquire
             // the lock) will just retry to enter this loop.
             util::try_lock_wrapper<mutex_type> lk(mtx_);
             if (!lk)
-                break;            // avoid long wait on lock
+                return false;            // avoid long wait on lock
 
-            // this thread acquired the lock, do maintenance and finally
-            // call wait() if no work is available
 //            LTM_(debug) << "tfunc(" << num_thread << "): queues empty"
 //                        << ", threads left: " << thread_map_.size();
 
             // stop running after all PX threads have been terminated
+            thread_queue* addfrom = addfrom_ ? addfrom_ : this;
             bool added_new = add_new_always(added, addfrom, num_thread);
             if (!added_new && !running) {
                 // Before exiting each of the OS threads deletes the
@@ -558,19 +555,17 @@ namespace hpx { namespace threads { namespace policies
                 if (cleanup_terminated_locked()) {
                     // we don't have any registered work items anymore
                     //do_some_work();       // notify possibly waiting threads
-                    terminate = true;
-                    break;                // terminate scheduling loop
+                    return true;            // terminate scheduling loop
                 }
             }
             else {
                 cleanup_terminated_locked();
             }
-			break;
         }
-        return terminate;
+        return false;
     }
 
-	template <>
+    template <>
     inline bool thread_queue<true>::wait_or_add_new(std::size_t num_thread,
         bool running, std::size_t& idle_loop_count, std::size_t& added,
         thread_queue* addfrom_)

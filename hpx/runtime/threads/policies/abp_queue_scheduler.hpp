@@ -165,15 +165,17 @@ struct abp_queue_scheduler : boost::noncopyable
     bool get_next_thread(std::size_t num_thread, bool running,
                          std::size_t& idle_loop_count, threads::thread*& thrd)
     {
-        // first try to get the next thread from our own queue
         BOOST_ASSERT(num_thread < queues_.size());
+
+        // first try to get the next thread from our own queue
+        std::size_t queue_size = queues_.size();
         if (queues_[num_thread]->get_next_thread(thrd))
             return true;
 
         // FIXME: steal from NUMA neighbors first
         // steal thread from other queue
-        for (std::size_t i = 1; i < queues_.size(); ++i) {
-            std::size_t idx = (i + num_thread) % queues_.size();
+        for (std::size_t i = 1; i < queue_size; ++i) {
+            std::size_t idx = (i + num_thread) % queue_size;
             if (queues_[idx]->steal_next_thread(thrd))
                 return true;
         }
@@ -212,55 +214,54 @@ struct abp_queue_scheduler : boost::noncopyable
         std::size_t added = 0;
         bool result = queues_[num_thread]->add_new_or_terminate(
             num_thread, running, added);
+        if (0 != added) return result;
 
-        if (!result) {
-            // steal work items: first try to steal from other cores in the same numa node
-            std::size_t core_mask = get_thread_affinity_mask(num_thread, numa_sensitive_);
-            std::size_t node_mask = get_numa_node_affinity_mask(num_thread, numa_sensitive_);
+        // steal work items: first try to steal from other cores in the 
+        // same NUMA node
+        std::size_t core_mask = get_thread_affinity_mask(num_thread, numa_sensitive_);
+        std::size_t node_mask = get_numa_node_affinity_mask(num_thread, numa_sensitive_);
 
-            if (core_mask != std::size_t(-1) && node_mask != std::size_t(-1)) {
-                std::size_t m = 0x01LL;
-                for (std::size_t i = 1; (0 == added) && i < queues_.size();
-                     m <<= 1, ++i)
-                {
-                    if (m == core_mask || !(m & node_mask))
-                        continue;         // don't steal from ourselves
+        std::size_t queue_size = queues_.size();
+        if (core_mask != std::size_t(-1) && node_mask != std::size_t(-1)) {
+            std::size_t m = 0x01LL;
+            for (std::size_t i = 1; i < queue_size; m <<= 1, ++i)
+            {
+                if (i == num_thread || !(m & node_mask))
+                    continue;         // don't steal from ourselves
 
-                    std::size_t idx = least_significant_bit_set(m);
-                    BOOST_ASSERT(idx < queues_.size());
+                result = queues_[num_thread]->steal_new_or_terminate(
+                    i, running, added, queues_[i]) && result;
+                if (0 != added) return result;
+            }
+        }
 
-                    queues_[num_thread]->steal_new_or_terminate(
-                        idx, running, added, queues_[idx]);
-                }
+        // if nothing found ask everybody else
+        for (std::size_t i = 1; i < queue_size; ++i) {
+            std::size_t idx = (i + num_thread) % queue_size;
+            result = queues_[num_thread]->steal_new_or_terminate(
+                idx, running, added, queues_[idx]) && result;
+            if (0 != added) return result;
+        }
+
+        // no new work is available, are we deadlocked?
+        if (/*0 == num_thread &&*/ LHPX_ENABLED(error)) {
+            bool suspended_only = true;
+
+            for (std::size_t i = 0; suspended_only && i < queue_size; ++i) {
+                suspended_only = queues_[i]->dump_suspended_threads(
+                    i, idle_loop_count, running);
             }
 
-            // if nothing found ask everybody else
-            for (std::size_t i = 1; 0 == added && i < queues_.size(); ++i) {
-                std::size_t idx = (i + num_thread) % queues_.size();
-                queues_[num_thread]->steal_new_or_terminate(
-                    idx, running, added, queues_[idx]);
-            }
-
-            // no new work is available, are we deadlocked?
-            if (0 == added /*&& 0 == num_thread*/ && LHPX_ENABLED(error)) {
-                bool suspended_only = true;
-
-                for (std::size_t i = 0; suspended_only && i < queues_.size(); ++i) {
-                    suspended_only = queues_[i]->dump_suspended_threads(
-                        i, idle_loop_count, running);
+            if (HPX_UNLIKELY(suspended_only)) {
+                if (running) {
+                    LTM_(error)
+                        << "queue(" << num_thread << "): "
+                        << "no new work available, are we deadlocked?";
                 }
-
-                if (HPX_UNLIKELY(suspended_only)) {
-                    if (running) {
-                        LTM_(error)
-                            << "queue(" << num_thread << "): "
-                            << "no new work available, are we deadlocked?";
-                    }
-                    else {
-                        LHPX_CONSOLE_(boost::logging::level::error) << "  [TM] "
-                              << "queue(" << num_thread << "): "
-                              << "no new work available, are we deadlocked?\n";
-                    }
+                else {
+                    LHPX_CONSOLE_(boost::logging::level::error) << "  [TM] "
+                          << "queue(" << num_thread << "): "
+                          << "no new work available, are we deadlocked?\n";
                 }
             }
         }

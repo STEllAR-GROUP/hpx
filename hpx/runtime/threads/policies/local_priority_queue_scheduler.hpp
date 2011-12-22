@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -192,39 +192,41 @@ namespace hpx { namespace threads { namespace policies
             std::size_t& idle_loop_count, threads::thread*& thrd)
         {
             // master thread only: first try to get a priority thread
-            if (num_thread < high_priority_queues_.size())
+            std::size_t high_priority_queue_size = high_priority_queues_.size();
+            std::size_t queue_size = queues_.size();
+            if (num_thread < high_priority_queue_size)
             {
                 bool result = high_priority_queues_[num_thread]->
-                    get_next_thread(thrd, queues_.size()+num_thread);
+                    get_next_thread(thrd, queue_size + num_thread);
                 if (result) return true;
             }
 
             // try to get the next thread from our own queue
-            BOOST_ASSERT(num_thread < queues_.size());
+            BOOST_ASSERT(num_thread < queue_size);
             if (queues_[num_thread]->get_next_thread(thrd, num_thread))
                 return true;
 
             // try to execute low priority work if no other work is available
-            if (queues_.size()-1 == num_thread &&
-                low_priority_queue_.get_next_thread(
-                    thrd, queues_.size()+high_priority_queues_.size()))
+            if (queue_size-1 == num_thread) 
             {
-                return true;
+                bool result = low_priority_queue_.get_next_thread(
+                    thrd, queue_size + high_priority_queue_size);
+                if (result) return true;
             }
 
             // steal thread from other queue, first try high priority queues,
             // then normal ones
-            for (std::size_t i = 1; i < high_priority_queues_.size(); ++i) {
-                std::size_t idx = (i + num_thread) % high_priority_queues_.size();
+            for (std::size_t i = 1; i < high_priority_queue_size; ++i) {
+                std::size_t idx = (i + num_thread) % high_priority_queue_size;
                 if (high_priority_queues_[idx]->
-                        get_next_thread(thrd, queues_.size()+num_thread))
+                        get_next_thread(thrd, queue_size + num_thread))
                 {
                     return true;
                 }
             }
 
-            for (std::size_t i = 1; i < queues_.size(); ++i) {
-                std::size_t idx = (i + num_thread) % queues_.size();
+            for (std::size_t i = 1; i < queue_size; ++i) {
+                std::size_t idx = (i + num_thread) % queue_size;
                 if (queues_[idx]->get_next_thread(thrd, num_thread))
                     return true;
             }
@@ -354,65 +356,66 @@ namespace hpx { namespace threads { namespace policies
             std::size_t added = 0;
             bool result = queues_[num_thread]->wait_or_add_new(
                 num_thread, running, idle_loop_count, added);
+            if (0 != added) return result;
 
-            if ((queues_.size()-1 == num_thread) && (0 == added)) {
+            std::size_t queues_size = queues_.size();
+            if (queues_size-1 == num_thread) {
                 // Convert low priority tasks to threads before attempting to
                 // steal from other OS thread.
                 result = low_priority_queue_.wait_or_add_new(
                     num_thread, running, idle_loop_count, added) && result;
+                if (0 != added) return result;
             }
 
-            if (0 == added) {
-                // steal work items: first try to steal from other cores in
-                // the same NUMA node
-                std::size_t core_mask = get_thread_affinity_mask(num_thread, numa_sensitive_);
-                std::size_t node_mask = get_numa_node_affinity_mask(num_thread, numa_sensitive_);
+            // steal work items: first try to steal from other cores in
+            // the same NUMA node
+            std::size_t core_mask = get_thread_affinity_mask(num_thread, numa_sensitive_);
+            std::size_t node_mask = get_numa_node_affinity_mask(num_thread, numa_sensitive_);
 
-                std::size_t queues_size = queues_.size();
-                if (core_mask != std::size_t(-1) && node_mask != std::size_t(-1)) {
-                    std::size_t m = 0x01LL;
-                    for (std::size_t i = 0; (0 == added) && i < queues_size;
-                         m <<= 1, ++i)
-                    {
-                        if (m == core_mask || !(m & node_mask))
-                            continue;         // don't steal from ourselves
+            if (core_mask != std::size_t(-1) && node_mask != std::size_t(-1)) {
+                std::size_t m = 0x01LL;
+                for (std::size_t i = 0; i < queues_size; m <<= 1, ++i)
+                {
+                    if (i == num_thread || !(m & node_mask))
+                        continue;         // don't steal from ourselves
 
-                        result = queues_[num_thread]->wait_or_add_new(i,
-                            running, idle_loop_count, added, queues_[i]) && result;
-                    }
+                    result = queues_[num_thread]->wait_or_add_new(i,
+                        running, idle_loop_count, added, queues_[i]) && result;
+                    if (0 != added) return result;
+                }
+            }
+
+            // if nothing found ask everybody else
+            for (std::size_t i = 1; i < queues_size; ++i) {
+                std::size_t idx = (i + num_thread) % queues_size;
+                result = queues_[num_thread]->wait_or_add_new(idx, running,
+                    idle_loop_count, added, queues_[idx]) && result;
+                if (0 != added) return result;
+            }
+
+            // no new work is available, are we deadlocked?
+            if (HPX_UNLIKELY(/*0 == num_thread &&*/ LHPX_ENABLED(error))) {
+                bool suspended_only = true;
+
+                for (std::size_t i = 0; suspended_only && i < queues_.size(); ++i) {
+                    suspended_only = queues_[i]->dump_suspended_threads(
+                        i, idle_loop_count, running);
                 }
 
-                // if nothing found ask everybody else
-                for (std::size_t i = 1; 0 == added && i < queues_size; ++i) {
-                    std::size_t idx = (i + num_thread) % queues_size;
-                    result = queues_[num_thread]->wait_or_add_new(idx, running,
-                        idle_loop_count, added, queues_[idx]) && result;
-                }
-
-                // no new work is available, are we deadlocked?
-                if (HPX_UNLIKELY(0 == added /*&& 0 == num_thread*/ && LHPX_ENABLED(error))) {
-                    bool suspended_only = true;
-
-                    for (std::size_t i = 0; suspended_only && i < queues_.size(); ++i) {
-                        suspended_only = queues_[i]->dump_suspended_threads(
-                            i, idle_loop_count, running);
+                if (HPX_UNLIKELY(suspended_only)) {
+                    if (running) {
+                        LTM_(error)
+                            << "queue(" << num_thread << "): "
+                            << "no new work available, are we deadlocked?";
                     }
-
-                    if (HPX_UNLIKELY(suspended_only)) {
-                        if (running) {
-                            LTM_(error)
-                                << "queue(" << num_thread << "): "
-                                << "no new work available, are we deadlocked?";
-                        }
-                        else {
-                            LHPX_CONSOLE_(boost::logging::level::error) << "  [TM] "
-                                  << "queue(" << num_thread << "): "
-                                  << "no new work available, are we deadlocked?\n";
-                        }
+                    else {
+                        LHPX_CONSOLE_(boost::logging::level::error) << "  [TM] "
+                              << "queue(" << num_thread << "): "
+                              << "no new work available, are we deadlocked?\n";
                     }
                 }
             }
-            return result && 0 == added;
+            return result;
         }
 
         /// This function gets called by the thread-manager whenever new work
