@@ -1,7 +1,12 @@
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#include <hpx/hpx_init.hpp>
+#include <hpx/include/util.hpp>
+#include <hpx/include/iostreams.hpp>
 
 #include <stdexcept>
 
@@ -9,27 +14,18 @@
 #include <boost/bind.hpp>
 #include <boost/cstdint.hpp>
 
-#include <hpx/hpx_init.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/runtime/actions/continuation_impl.hpp>
-#include <hpx/runtime/components/plain_component_factory.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/include/iostreams.hpp>
-
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
 
 using hpx::init;
 using hpx::finalize;
+using hpx::get_os_thread_count;
 
 using hpx::applier::register_work;
-using hpx::applier::get_applier;
 
 using hpx::threads::suspend;
-using hpx::threads::threadmanager_base;
+using hpx::threads::get_thread_count;
 
 using hpx::util::high_resolution_timer;
 
@@ -39,6 +35,7 @@ using hpx::flush;
 ///////////////////////////////////////////////////////////////////////////////
 // we use globals here to prevent the delay from being optimized away
 double global_scratch = 0;
+double global_delay = 0;
 boost::uint64_t num_iterations = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -53,7 +50,9 @@ double delay()
 ///////////////////////////////////////////////////////////////////////////////
 void null_thread()
 {
+    high_resolution_timer walltime;
     global_scratch = delay();
+    global_delay = walltime.elapsed();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -64,38 +63,39 @@ int hpx_main(
     {
         num_iterations = vm["delay-iterations"].as<boost::uint64_t>();
 
-        const boost::uint64_t count = vm["pxthreads"].as<boost::uint64_t>();
-
+        boost::uint64_t const count = vm["px-threads"].as<boost::uint64_t>();
         if (HPX_UNLIKELY(0 == count))
-            throw std::logic_error("error: count of 0 pxthreads specified\n");
-
-        threadmanager_base& tm = get_applier().get_thread_manager();
+            throw std::logic_error("error: count of 0 px-threads specified\n");
 
         // start the clock
         high_resolution_timer walltime;
 
         for (boost::uint64_t i = 0; i < count; ++i)
-            register_work(boost::bind(&null_thread));
+            register_work(HPX_STD_BIND(&null_thread));
 
-        // Reschedule hpx_main until all other pxthreads have finished. We
-        // should be resumed after most of the null pxthreads have been
+        // Reschedule hpx_main until all other px-threads have finished. We
+        // should be resumed after most of the null px-threads have been
         // executed. If we haven't, we just reschedule ourselves again.
         do {
             suspend();
-        } while (tm.get_thread_count() > 1);
+        } while (get_thread_count() > 1);
 
-        const double duration = walltime.elapsed();
+        double const duration = walltime.elapsed();
 
-        if (vm.count("csv"))
-            cout << ( boost::format("%1%,%2%\n")
+        if (vm.count("csv")) {
+            cout << ( boost::format("%1%,%2%,%3%,%4%\n")
+                    % get_os_thread_count()
+                    % global_delay
                     % count
                     % duration)
                  << flush;
-        else
-            cout << ( boost::format("invoked %1% pxthreads in %2% seconds\n")
+        }
+        else {
+            cout << ( boost::format("invoked %1% px-threads in %2% seconds\n")
                     % count
                     % duration)
                  << flush;
+        }
     }
 
     finalize();
@@ -112,9 +112,9 @@ int main(
     options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
 
     cmdline.add_options()
-        ( "pxthreads"
+        ( "px-threads"
         , value<boost::uint64_t>()->default_value(500000)
-        , "number of pxthreads to invoke")
+        , "number of px-threads to invoke")
 
         ( "delay-iterations"
         , value<boost::uint64_t>()->default_value(0)
