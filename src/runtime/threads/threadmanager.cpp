@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach, Katelyn Kufahl
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //
@@ -1401,6 +1401,12 @@ namespace hpx { namespace threads
         bool numa_sensitive = false;
         std::size_t thread_num = threadmanager_base::get_thread_num(&numa_sensitive);
         return get_numa_node(thread_num, numa_sensitive);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    boost::int64_t get_thread_count(thread_state_enum state)
+    {
+        return get_thread_manager().get_thread_count(state);
     }
 }}
 

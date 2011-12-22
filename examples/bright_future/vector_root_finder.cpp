@@ -29,7 +29,7 @@ using hpx::finalize;
 using hpx::find_here;
 using hpx::cout;
 using hpx::flush;
-using hpx::get_num_os_threads;
+using hpx::get_os_thread_count;
 
 double update(double x, double x_n)
 {
@@ -117,7 +117,7 @@ int hpx_main(variables_map & vm)
     cout
         //<< "sqrt(" << x << ") = " << x_n
         //<< " (calculated in " << time_elapsed << " seconds)\n"
-        << get_num_os_threads() << " " << time_elapsed << "\n" << flush
+        << get_os_thread_count() << " " << time_elapsed << "\n" << flush
         ;
 
     finalize();

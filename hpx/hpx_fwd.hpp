@@ -268,6 +268,11 @@ namespace hpx
         /// The function \a get_thread_manager returns a reference to the
         /// current thread manager.
         HPX_API_EXPORT threadmanager_base& get_thread_manager();
+
+        /// The function \a get_thread_count returns the number of currently 
+        /// known threads. 
+        HPX_API_EXPORT boost::int64_t get_thread_count(
+            thread_state_enum state = unknown);
     }
 
     class HPX_API_EXPORT runtime;
@@ -535,7 +540,7 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of OS-threads running in the runtime instance
     ///        the current thread is associated with
-    HPX_API_EXPORT std::size_t get_num_os_threads();
+    HPX_API_EXPORT std::size_t get_os_thread_count();
 }
 
 #endif

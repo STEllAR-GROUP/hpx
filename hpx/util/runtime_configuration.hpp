@@ -77,7 +77,7 @@ namespace hpx { namespace util
         bool get_itt_notify_mode() const;
 
         // Returns the number of OS threads this locality is running.
-        std::size_t get_num_os_threads() const;
+        std::size_t get_os_thread_count() const;
 
         // Returns the command line that this locality was invoked with.
         std::string get_cmd_line() const;

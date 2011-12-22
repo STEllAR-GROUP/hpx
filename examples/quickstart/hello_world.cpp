@@ -26,7 +26,7 @@ using boost::format;
 
 using hpx::init;
 using hpx::finalize;
-using hpx::get_num_os_threads;
+using hpx::get_os_thread_count;
 using hpx::find_here;
 using hpx::find_all_localities;
 
@@ -86,7 +86,7 @@ HPX_REGISTER_PLAIN_ACTION(hello_world_worker_action);
 ///////////////////////////////////////////////////////////////////////////////
 void hello_world_foreman()
 {
-    std::size_t const os_threads = get_num_os_threads();
+    std::size_t const os_threads = get_os_thread_count();
     id_type const prefix = find_here();
 
     std::set<std::size_t> attendance;

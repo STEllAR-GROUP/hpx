@@ -435,11 +435,11 @@ namespace hpx { namespace threads
         //        here.
         bool cleanup_terminated();
 
-        /// \brief Return the number of OS threads running in this threadmanager
+        /// \brief Return the number of OS threads running in this thread-manager
         ///
-        /// This function will return correct results only if the threadmanager
+        /// This function will return correct results only if the thread-manager
         /// is running.
-        std::size_t get_num_os_threads() const
+        std::size_t get_os_thread_count() const
         {
             mutex_type::scoped_lock lk(mtx_);
             return threads_.size();

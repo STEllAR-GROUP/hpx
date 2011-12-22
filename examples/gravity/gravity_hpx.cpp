@@ -58,7 +58,7 @@ using hpx::util::high_resolution_timer;
 using hpx::init;
 using hpx::finalize;
 using hpx::find_here;
-using hpx::get_num_os_threads;
+using hpx::get_os_thread_count;
 
 // dummy serialize function in order to be able to pass a promise, or
 // vector of promises to a future
@@ -173,7 +173,7 @@ int hpx_main(variables_map& vm)
      debug=vm.count("debug");
      cout <<"Config File Location: "<< vm["config-file"].as<std::string>() 
           << "\n";
-     param.num_cores=get_num_os_threads();
+     param.num_cores=get_os_thread_count();
 
     //This section opens an input file
      loadconfig(param,vm); //load the configuraton file

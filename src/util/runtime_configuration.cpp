@@ -264,7 +264,7 @@ namespace hpx { namespace util
             if (NULL != sec) {
                 return boost::lexical_cast<std::size_t>(
                     sec->get_entry("promise_pool_size"
-                                 , 4 * get_num_os_threads()));
+                                 , 4 * get_os_thread_count()));
             }
         }
         return 16;
@@ -363,7 +363,7 @@ namespace hpx { namespace util
         return false;
     }
 
-    std::size_t runtime_configuration::get_num_os_threads() const
+    std::size_t runtime_configuration::get_os_thread_count() const
     {
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
