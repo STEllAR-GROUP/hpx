@@ -177,7 +177,7 @@ int hpx_main(variables_map& vm)
 
     //This section opens an input file
      loadconfig(param,vm); //load the configuraton file
-     ifstream ist(param.input.c_str()); //Name of input file equals "param.input"
+     ifstream ist(param.input.c_str()); //Name of input file ="param.input"
      if(!ist) {
       cout<<"Cannot open input file!\n";
      }
@@ -208,7 +208,13 @@ int hpx_main(variables_map& vm)
      for (int t=0;t<param.steps;t++) {
       if (debug) cout<<"\nFor step "<<t<<":\n";
       cfp=calc(k,t);  //This is the calculation of force
+      for (int i=0;i<k;++i) { ///////////////////////////
+       if(i<k-1) {  ////////////////////////////////////
+        wait(cfp[i]);  /////////////////////////////////
+       } ////////////////////////////////////////////////
+      }  /////////////////////!!!!!!!!!!!!/////////////////////
       mp=move_future(find_here(),cfp,param,k,t);
+      wait(mp); ////////////////////////////////!!!!//////////
       printval(mp,k,t,coorfile,trbst); //Writes output
      }
      ct=ht.elapsed();
@@ -269,10 +275,10 @@ void move(vector<promise<void> >const& cfp,config_f const & param,int k,int t) {
  double timestep=param.timestep; //the timestep
  
  for (int i=0;i<k;++i) {
-  if(i<k-1)
-  {
-     wait(cfp[i]);
-  }
+//  if(i<k-1)
+//  {
+//     wait(cfp[i]);
+//  }
   //calc x displ. and add to x-coord.
   pts_timestep[tn][i].x =pts_timestep[t][i].x+pts_timestep[t][i].vx*timestep+
    .5*fvec_timestep[t][i].fx*(timestep*timestep)/pts_timestep[t][i].m;
@@ -302,7 +308,7 @@ void move(vector<promise<void> >const& cfp,config_f const & param,int k,int t) {
 void printval(promise<void> const & mp,int k,int t,
                ofstream &coorfile, ofstream &trbst) {
  int tn=t+1;
- wait(mp);
+// wait(mp);
  for (int i=0;i<k;i++) {
   coorfile<<pts_timestep[tn][i].x<<","<<pts_timestep[tn][i].y<<","
           <<pts_timestep[tn][i].z<<",";
