@@ -62,7 +62,7 @@ struct thread_specific_ptr
 };
 
 template <typename T, typename Tag>
-HPX_NATIVE_TLS T* thread_specific_ptr<T, Tag>::ptr_;
+HPX_NATIVE_TLS T* thread_specific_ptr<T, Tag>::ptr_ = 0;
 
 }}
 
