@@ -385,7 +385,11 @@ protected:
 
 #define BOOST_ATOMIC_HAVE_128BIT_SUPPORT
 
+}}}
+
 #include <emmintrin.h>
+
+namespace boost { namespace detail { namespace atomic {
 
 template<typename T>
 class platform_atomic<T, 16> : private platform_atomic_integral<__m128i> {
