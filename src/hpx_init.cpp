@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
 //  Copyright (c)      2011 Bryce Lelbach
 //
@@ -19,22 +19,7 @@
 #include <hpx/runtime/actions/function.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#if defined(HPX_GLOBAL_SCHEDULER)
-#include <hpx/runtime/threads/policies/global_queue_scheduler.hpp>
-#endif
-#if defined(HPX_LOCAL_SCHEDULER)
-#include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
-#endif
-#if defined(HPX_ABP_SCHEDULER)
-#include <hpx/runtime/threads/policies/abp_queue_scheduler.hpp>
-#endif
-#include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
-#if defined(HPX_HIERARCHY_SCHEDULER)
-#include <hpx/runtime/threads/policies/hierarchy_scheduler.hpp>
-#endif
-#if defined(HPX_PERIODIC_PRIORITY_SCHEDULER)
-#include <hpx/runtime/threads/policies/periodic_priority_scheduler.hpp>
-#endif
+#include <hpx/runtime/threads/policies/schedulers.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/util/query_counters.hpp>
@@ -292,7 +277,7 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Runtime>
-        int run_special(Runtime& rt, hpx::hpx_main_func f,
+        int run_special(Runtime& rt, hpx_main_func f,
             boost::program_options::variables_map& vm, std::size_t num_threads,
             std::size_t num_localities, int& result)
         {
@@ -427,7 +412,7 @@ namespace hpx
 
             int result = 0;
             if (vm.count("exit")) {
-                run_special(rt, hpx::hpx_main_func(0), vm, num_threads,
+                run_special(rt, hpx_main_func(0), vm, num_threads,
                     num_localities, result);
                 return result;
             }
@@ -463,7 +448,7 @@ namespace hpx
             if (vm.count("numa-sensitive")) {
                 throw std::logic_error("Invalid command line option "
                     "--numa-sensitive, valid for "
-                    "--queueing=priority_local only");
+                    "--queueing=priority_local  or priority_abp only");
             }
 #endif
             if (vm.count("hierarchy-arity")) {
@@ -503,7 +488,7 @@ namespace hpx
             if (vm.count("numa-sensitive")) {
                 throw std::logic_error("Invalid command line option "
                     "--numa-sensitive, valid for "
-                    "--queueing=priority_local only");
+                    "--queueing=priority_local or priority_abp only");
             }
 #endif
             if (vm.count("hierarchy-arity")) {
@@ -584,7 +569,7 @@ namespace hpx
             if (vm.count("numa-sensitive")) {
                 throw std::logic_error("Invalid command line option "
                     "--numa-sensitive, valid for "
-                    "--queueing=priority_local only");
+                    "--queueing=priority_local or priority_abp only");
             }
 #endif
             if (vm.count("hierarchy-arity")) {
@@ -599,6 +584,48 @@ namespace hpx
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<abp_queue_policy> runtime_type;
+            runtime_type rt(mode, init, vm["hpx-config"].as<std::string>(),
+                ini_config);
+
+            return run(rt, f, vm, mode, startup, shutdown, num_threads,
+                num_localities);
+        }
+#endif
+
+#if defined(HPX_ABP_PRIORITY_SCHEDULER)
+        ///////////////////////////////////////////////////////////////////////
+        // priority abp scheduler: local priority deques for each OS thread,
+        // with work stealing from the "bottom" of each.
+        int run_priority_abp(
+            hpx_main_func f, boost::program_options::variables_map& vm,
+            runtime_mode mode, std::vector<std::string> const& ini_config,
+            startup_function_type const& startup,
+            shutdown_function_type const& shutdown, std::size_t num_threads,
+            std::size_t num_localities)
+        {
+            std::size_t num_high_priority_queues = num_threads;
+            if (vm.count("high-priority-threads")) {
+                num_high_priority_queues =
+                    vm["high-priority-threads"].as<std::size_t>();
+            }
+            bool numa_sensitive = false;
+#if defined(BOOST_WINDOWS)
+            if (vm.count("numa-sensitive"))
+                numa_sensitive = true;
+#endif
+            if (vm.count("hierarchy-arity")) {
+                throw std::logic_error("Invalid command line option "
+                    "--hierarchy-arity, valid for --queueing=hierarchy only.");
+            }
+
+            // scheduling policy
+            typedef hpx::threads::policies::abp_priority_queue_scheduler
+                abp_priority_queue_policy;
+            abp_priority_queue_policy::init_parameter_type init(
+                num_threads, num_high_priority_queues, 1000, numa_sensitive);
+
+            // Build and configure this runtime instance.
+            typedef hpx::runtime_impl<abp_priority_queue_policy> runtime_type;
             runtime_type rt(mode, init, vm["hpx-config"].as<std::string>(),
                 ini_config);
 
@@ -626,7 +653,7 @@ namespace hpx
             if (vm.count("numa-sensitive")) {
                 throw std::logic_error("Invalid command line option "
                     "--numa-sensitive, valid for "
-                    "--queueing=priority_local only");
+                    "--queueing=priority_local or priority_abp only");
             }
 #endif
             // scheduling policy
@@ -1060,6 +1087,18 @@ namespace hpx
                 throw std::logic_error("Command line option --queueing=abp "
                     "is not configured in this build. Please rebuild with "
                     "'cmake -DHPX_ABP_SCHEDULER=ON'.");
+#endif
+            }
+            else if (0 == std::string("priority_abp").find(queueing)) {
+                // priority abp scheduler: local priority dequeues for each
+                // OS thread, with work stealing from the "bottom" of each.
+#if defined(HPX_ABP_PRIORITY_SCHEDULER)
+                result = detail::run_priority_abp(f, vm, mode, ini_config,
+                    startup, shutdown, num_threads, num_localities);
+#else
+                throw std::logic_error("Command line option --queueing=priority_abp "
+                    "is not configured in this build. Please rebuild with "
+                    "'cmake -DHPX_ABP_PRIORITY_SCHEDULER=ON'.");
 #endif
             }
             else if (0 == std::string("hierarchy").find(queueing)) {

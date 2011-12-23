@@ -6,24 +6,19 @@
 #if !defined(HPX_D7E5D248_4886_4F46_AA1F_36D81397E5D5)
 #define HPX_D7E5D248_4886_4F46_AA1F_36D81397E5D5
 
+#include <vector>
 #include <memory>
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/util/block_profiler.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/thread_affinity.hpp>
 #include <hpx/runtime/threads/policies/thread_deque.hpp>
 
-#include <boost/thread.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/bind.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/lockfree/fifo.hpp>
-#include <boost/ptr_container/ptr_map.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/atomic.hpp>
+#include <boost/mpl/bool.hpp>
 
 // TODO: add branch prediction and function heat
 
@@ -216,7 +211,7 @@ struct abp_queue_scheduler : boost::noncopyable
             num_thread, running, added);
         if (0 != added) return result;
 
-        // steal work items: first try to steal from other cores in the 
+        // steal work items: first try to steal from other cores in the
         // same NUMA node
         std::size_t core_mask = get_thread_affinity_mask(num_thread, numa_sensitive_);
         std::size_t node_mask = get_numa_node_affinity_mask(num_thread, numa_sensitive_);

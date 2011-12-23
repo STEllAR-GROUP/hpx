@@ -1438,6 +1438,14 @@ template HPX_EXPORT class hpx::threads::threadmanager_impl<
     hpx::threads::policies::callback_notifier>;
 #endif
 
+#if defined(HPX_ABP_PRIORITY_SCHEDULER)
+#include <hpx/runtime/threads/policies/abp_priority_queue_scheduler.hpp>
+
+template HPX_EXPORT class hpx::threads::threadmanager_impl<
+    hpx::threads::policies::abp_priority_queue_scheduler,
+    hpx::threads::policies::callback_notifier>;
+#endif
+
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
 
 template HPX_EXPORT class hpx::threads::threadmanager_impl<

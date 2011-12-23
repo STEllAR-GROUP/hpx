@@ -1123,6 +1123,15 @@
     <ClInclude Include="..\..\..\hpx\runtime\threads\policies\hierarchy_scheduler.hpp">
       <Filter>Header Files\Runtime\Threads\Policies</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\threads\policies\periodic_priority_scheduler.hpp">
+      <Filter>Header Files\Runtime\Threads\Policies</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\threads\policies\abp_priority_queue_scheduler.hpp">
+      <Filter>Header Files\Runtime\Threads\Policies</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\hpx\runtime\threads\policies\schedulers.hpp">
+      <Filter>Header Files\Runtime\Threads\Policies</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\CMakeLists.txt">
@@ -1140,12 +1149,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="..\..\..\external\coroutine\libs\coroutine\src\swapcontext_windows.asm">
-      <Filter>Assembly Files</Filter>
-    </MASM>
-    <MASM Include="..\..\..\external\lockfree\libs\lockfree\src\CAS2.asm">
-      <Filter>Assembly Files</Filter>
-    </MASM>
     <MASM Include="..\..\..\external\coroutine\libs\coroutine\src\switch_to_fiber.asm">
       <Filter>Assembly Files</Filter>
     </MASM>

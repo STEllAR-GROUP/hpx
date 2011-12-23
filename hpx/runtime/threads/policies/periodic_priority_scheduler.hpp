@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //  Copyright (c) 2011      Thomas Heller
 //
@@ -8,6 +8,7 @@
 #if !defined(HPX_THREADMANAGER_SCHEDULING_PERIODIC_PRIORITY_QUEUE_HPP)
 #define HPX_THREADMANAGER_SCHEDULING_PERIODIC_PRIORITY_QUEUE_HPP
 
+#include <vector>
 #include <memory>
 
 #include <hpx/config.hpp>
@@ -18,13 +19,9 @@
 #include <hpx/runtime/threads/thread_affinity.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
 
-#include <boost/thread.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/bind.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/lockfree/fifo.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/atomic.hpp>
+#include <boost/mpl/bool.hpp>
 
 // TODO: add branch prediction and function heat
 
@@ -182,7 +179,7 @@ namespace hpx { namespace threads { namespace policies
             if (std::size_t(-1) == num_thread)
                 num_thread = ++curr_queue_ % queues_.size();
 
-            
+
             // now create the thread
             if (data.priority == thread_priority_critical) {
                 BOOST_ASSERT(run_now == true);
@@ -228,7 +225,7 @@ namespace hpx { namespace threads { namespace policies
 
             // steal thread from other queue, first try high priority queues,
             // then normal ones
-            
+
             for (std::size_t i = 1; i < high_priority_queues_.size(); ++i) {
                 std::size_t idx = (i + num_thread) % high_priority_queues_.size();
                 if (high_priority_queues_[idx]->
@@ -428,7 +425,7 @@ namespace hpx { namespace threads { namespace policies
             }
             return result && 0 == added;
         }
-        
+
         bool periodic_maintenance(bool running)
         {
             // periodid maintenance redistributes work and is responsible that

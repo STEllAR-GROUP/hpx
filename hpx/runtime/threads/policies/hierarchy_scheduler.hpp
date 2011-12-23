@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,7 +7,7 @@
 #if !defined(HPX_THREADMANAGER_SCHEDULING_HIERARCHY)
 #define HPX_THREADMANAGER_SCHEDULING_HIERARCHY
 
-#include <map>
+#include <vector>
 #include <memory>
 
 #include <hpx/config.hpp>
@@ -18,16 +18,9 @@
 #include <hpx/runtime/threads/thread_affinity.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
 
-#include <boost/thread.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/bind.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/lockfree/fifo.hpp>
-#include <boost/ptr_container/ptr_map.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/atomic.hpp>
-
-#include <iostream>
+#include <boost/mpl/bool.hpp>
 
 namespace hpx { namespace threads { namespace policies
 {
@@ -84,16 +77,16 @@ namespace hpx { namespace threads { namespace policies
         typedef std::vector<level_type> tree_type;
         tree_type tree;
 
-		struct flag_type
-		{
-			boost::atomic<bool> v;
-			flag_type() { v = false; }
-			flag_type(flag_type const & f) { v.store(f.v.load()); }
-			flag_type & operator=(flag_type const & f) { v.store(f.v.load()); return *this; }
-			flag_type & operator=(bool b) { v.store(b); return *this;}
-			bool operator==(bool b) { return v == b; }
+        struct flag_type
+        {
+            boost::atomic<bool> v;
+            flag_type() { v = false; }
+            flag_type(flag_type const & f) { v.store(f.v.load()); }
+            flag_type & operator=(flag_type const & f) { v.store(f.v.load()); return *this; }
+            flag_type & operator=(bool b) { v.store(b); return *this;}
+            bool operator==(bool b) { return v == b; }
             operator bool() { return v; }
-		};
+        };
 
         typedef std::vector<flag_type > level_flag_type;
         typedef std::vector<level_flag_type> flag_tree_type;
@@ -286,7 +279,7 @@ namespace hpx { namespace threads { namespace policies
             BOOST_ASSERT(parent < tree.at(level-1).size());
 
             thread_queue<false> * tq = tree[level][idx];
-			boost::int64_t num = tq->get_work_length();
+            boost::int64_t num = tq->get_work_length();
             thread_queue<false> * dest = tree[level-1][parent];
             if(num == 0)
             {
@@ -300,7 +293,7 @@ namespace hpx { namespace threads { namespace policies
                 {
                     while(work_flag_tree[level][idx])
                     {
-						#if defined(BOOST_WINDOWS)
+                        #if defined(BOOST_WINDOWS)
                     Sleep(1);
 #elif defined(BOOST_HAS_PTHREADS)
                     sched_yield();
@@ -329,10 +322,10 @@ namespace hpx { namespace threads { namespace policies
             thread_queue<false> * tq = tree[0][num_thread];
 
             // check if we need to collect new work from parents
-			if(tq->get_work_length() == 0)
-			{
-				transfer_threads(num_thread/d, num_thread, 1, num_thread);
-			}
+            if(tq->get_work_length() == 0)
+            {
+                transfer_threads(num_thread/d, num_thread, 1, num_thread);
+            }
 
             if(tq->get_next_thread(thrd, num_thread))
                 return true;
@@ -379,9 +372,9 @@ namespace hpx { namespace threads { namespace policies
 
             thread_queue<false> * tq = tree[level][idx];
 
-			boost::int64_t num = tq->get_task_length();
-			if(num == 0)
-			{
+            boost::int64_t num = tq->get_task_length();
+            if(num == 0)
+            {
                 if(task_flag_tree[level][idx] == false)
                 {
                     task_flag_tree[level][idx] = true;
@@ -392,7 +385,7 @@ namespace hpx { namespace threads { namespace policies
                 {
                     while(task_flag_tree[level][idx])
                     {
-						#if defined(BOOST_WINDOWS)
+                        #if defined(BOOST_WINDOWS)
                     Sleep(1);
 #elif defined(BOOST_HAS_PTHREADS)
                     sched_yield();
@@ -400,7 +393,7 @@ namespace hpx { namespace threads { namespace policies
 #endif
                     }
                 }
-			}
+            }
 
             thread_queue<false> * dest = tree[level-1][parent];
             dest->move_task_items_from(
@@ -420,11 +413,11 @@ namespace hpx { namespace threads { namespace policies
             BOOST_ASSERT(num_thread < tree.at(0).size());
             std::size_t added = 0;
 
-			thread_queue<false> * tq = tree[0][num_thread];
-			if(tq->get_task_length() == 0)
-			{
-				transfer_tasks(num_thread/d, num_thread, 1);
-			}
+            thread_queue<false> * tq = tree[0][num_thread];
+            if(tq->get_task_length() == 0)
+            {
+                transfer_tasks(num_thread/d, num_thread, 1);
+            }
 
             bool result = tq->wait_or_add_new(
                 num_thread, running, idle_loop_count, added);
@@ -462,10 +455,6 @@ namespace hpx { namespace threads { namespace policies
         }
 
     private:
-        /*
-        std::vector<thread_queue<false>*> queues_;   ///< this manages all the PX threads
-        boost::atomic<std::size_t> curr_queue_;
-        */
         bool numa_sensitive_;
     };
 

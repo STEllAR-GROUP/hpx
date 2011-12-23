@@ -142,13 +142,15 @@ namespace hpx
 #if defined(HPX_ABP_SCHEDULER)
             struct HPX_API_EXPORT abp_queue_scheduler;
 #endif
+#if defined(HPX_ABP_PRIORITY_SCHEDULER)
+            class HPX_API_EXPORT abp_priority_queue_scheduler;
+#endif
 
             class HPX_API_EXPORT local_priority_queue_scheduler;
 
 #if defined(HPX_HIERARCHY_SCHEDULER)
             class HPX_API_EXPORT hierarchy_scheduler;
 #endif
-
 #if defined(HPX_PERIODIC_PRIORITY_SCHEDULER)
             class HPX_API_EXPORT periodic_priority_scheduler;
 #endif
@@ -269,8 +271,8 @@ namespace hpx
         /// current thread manager.
         HPX_API_EXPORT threadmanager_base& get_thread_manager();
 
-        /// The function \a get_thread_count returns the number of currently 
-        /// known threads. 
+        /// The function \a get_thread_count returns the number of currently
+        /// known threads.
         HPX_API_EXPORT boost::int64_t get_thread_count(
             thread_state_enum state = unknown);
     }

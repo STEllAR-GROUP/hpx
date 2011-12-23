@@ -1,5 +1,6 @@
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
-//  Copyright (c)      2011 Bryce Lelbach, Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -14,7 +15,7 @@
 #include <boost/lexical_cast.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-// This function must be implemented by the application when for the console
+// This function must be implemented by the application for the console
 // locality.
 int hpx_main(boost::program_options::variables_map& vm);
 

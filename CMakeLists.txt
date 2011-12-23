@@ -14,7 +14,7 @@ if(MSVC)
 endif()
 
 ################################################################################
-# Build type 
+# Build type
 ################################################################################
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Configuration type" FORCE)
@@ -201,11 +201,11 @@ set(HPX_NO_INSTALL OFF CACHE BOOL "Run hpx applications without installing them"
 # ${CMAKE_BINARY_DIR}/bin/$(Configuration) when using Visual Studio
 if(HPX_NO_INSTALL)
   if(MSVC)
-	  set(HPX_PREFIX "${CMAKE_BINARY_DIR}/$(Configuration)" CACHE PATH "Where the hpx applications look for component dlls")
+      set(HPX_PREFIX "${CMAKE_BINARY_DIR}/$(Configuration)" CACHE PATH "Where the hpx applications look for component dlls")
   else()
-	  set(HPX_PREFIX "${CMAKE_BINARY_DIR}" CACHE PATH "Where the hpx applications look for component dlls")
+      set(HPX_PREFIX "${CMAKE_BINARY_DIR}" CACHE PATH "Where the hpx applications look for component dlls")
   endif()
-else() 
+else()
   set(HPX_PREFIX "${CMAKE_INSTALL_PREFIX}" CACHE PATH "Where the hpx applications look for component dlls")
 endif()
 
@@ -354,7 +354,7 @@ set(CMAKE_DEBUG_POSTFIX "d")
 #set(CMAKE_RELWITHDEBINFO_POSTFIX "d")
 
 ################################################################################
-# Utility configuration 
+# Utility configuration
 ################################################################################
 hpx_option(HPX_UTIL_BIND BOOL "Use hpx::util::bind instead of boost::bind or std::bind (default: ON)" ON)
 
@@ -377,7 +377,7 @@ if(HPX_GLOBAL_SCHEDULER)
   add_definitions(-DHPX_GLOBAL_SCHEDULER)
 endif()
 
-hpx_option(HPX_LOCAL_SCHEDULER BOOL "Enable the use of --queueing=global (default: OFF)" OFF)
+hpx_option(HPX_LOCAL_SCHEDULER BOOL "Enable the use of --queueing=local (default: OFF)" OFF)
 
 if(HPX_LOCAL_SCHEDULER)
   add_definitions(-DHPX_LOCAL_SCHEDULER)
@@ -387,6 +387,12 @@ hpx_option(HPX_ABP_SCHEDULER BOOL "Enable the use of --queueing=abp (default: OF
 
 if(HPX_ABP_SCHEDULER)
   add_definitions(-DHPX_ABP_SCHEDULER)
+endif()
+
+hpx_option(HPX_ABP_PRIORITY_SCHEDULER BOOL "Enable the use of --queueing=priority_abp (default: OFF)" OFF)
+
+if(HPX_ABP_PRIORITY_SCHEDULER)
+  add_definitions(-DHPX_ABP_PRIORITY_SCHEDULER)
 endif()
 
 hpx_option(HPX_HIERARCHY_SCHEDULER BOOL "Enable the use of --queueing=hierarchy (default: OFF)" OFF)
@@ -632,8 +638,8 @@ else()
 
       if(HPX_ELF_HIDDEN_VISIBILITY)
         if("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel" OR
-	   "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
-	   "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
+       "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
+       "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
           add_definitions(-DHPX_ELF_HIDDEN_VISIBILITY)
           add_definitions(-DBOOST_COROUTINE_GCC_HAVE_VISIBILITY)
           add_definitions(-DBOOST_PLUGIN_GCC_HAVE_VISIBILITY)
@@ -727,7 +733,7 @@ else()
 
   if(NOT HPX_MALLOC)
     set(HPX_MALLOC "TCMalloc")
-  endif() 
+  endif()
 
   find_package(HPX_TCMalloc)
   find_package(HPX_Jemalloc)

@@ -252,8 +252,8 @@ namespace hpx { namespace util
                   "shepherd threads for this HPX locality (default: 1)")
                 ("queueing,q", value<std::string>(),
                   "the queue scheduling policy to use, options are 'global/g', "
-                  "'local/l', 'priority_local/p', 'abp/a', and 'hierarchy/h' "
-                  "(default: priority_local/p)")
+                  "'local/l', 'priority_local/pr', 'abp/a', 'priority_abp', "
+                  "'hierarchy/h', and 'periodic/pe' (default: priority_local/p)")
                 ("hierarchy-arity", value<std::size_t>(),
                   "the arity of the of the thread queue tree, valid for "
                    "--queueing=hierarchy only (default: 2)")

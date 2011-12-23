@@ -6,7 +6,7 @@
 #if !defined(HPX_THREADMANAGER_SCHEDULING_GLOBAL_QUEUE_JUN_18_2009_1116AM)
 #define HPX_THREADMANAGER_SCHEDULING_GLOBAL_QUEUE_JUN_18_2009_1116AM
 
-#include <map>
+#include <vector>
 #include <memory>
 
 #include <hpx/config.hpp>
@@ -15,12 +15,7 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
 
-#include <boost/thread.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/bind.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/lockfree/fifo.hpp>
-#include <boost/ptr_container/ptr_map.hpp>
+#include <boost/mpl/bool.hpp>
 
 // TODO: add branch prediction and function heat
 
