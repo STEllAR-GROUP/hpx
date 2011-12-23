@@ -201,6 +201,12 @@ namespace hpx { namespace threads { namespace policies
             }
         }
 
+        void schedule_thread_last(threads::thread* thrd, std::size_t num_thread,
+            thread_priority priority = thread_priority_normal)
+        {
+            schedule_thread(thrd, num_thread, priority);
+        }
+
         /// Destroy the passed thread as it has been terminated
         bool destroy_thread(threads::thread* thrd)
         {

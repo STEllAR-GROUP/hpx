@@ -190,6 +190,18 @@ struct abp_queue_scheduler : boost::noncopyable
         }
     }
 
+    void schedule_thread_last(threads::thread* thrd, std::size_t num_thread,
+        thread_priority /*priority*/ = thread_priority_normal)
+    {
+        if (std::size_t(-1) != num_thread) {
+            BOOST_ASSERT(num_thread < queues_.size());
+            queues_[num_thread]->schedule_thread_last(thrd);
+        }
+        else {
+            queues_[++curr_queue_ % queues_.size()]->schedule_thread_last(thrd);
+        }
+    }
+
     /// Destroy the passed thread as it has been terminated
     bool destroy_thread(threads::thread* thrd)
     {

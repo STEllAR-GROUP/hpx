@@ -36,6 +36,10 @@ inline void enqueue(Queue& workqueue, Value val)
 { workqueue.push_left(val); }
 
 template <typename Queue, typename Value>
+inline void enqueue_last(Queue& workqueue, Value val)
+{ workqueue.push_right(val); }
+
+template <typename Queue, typename Value>
 inline bool dequeue(Queue& workqueue, Value& val)
 { return workqueue.pop_left(val); }
 
@@ -266,8 +270,8 @@ struct thread_deque
 
     // This returns the current length of the queues (work items and new items)
     boost::int64_t get_queue_length() const
-    { 
-        return work_items_count_ + new_tasks_count_; 
+    {
+        return work_items_count_ + new_tasks_count_;
     }
     // This returns the current length of the work queue
     boost::int64_t get_work_length() const
@@ -319,7 +323,7 @@ struct thread_deque
 
         // do not execute the work, but register a task description for
         // later thread creation
-        enqueue(new_tasks_, 
+        enqueue(new_tasks_,
             new task_description(boost::move(data), initial_state));
         ++new_tasks_count_;
 
@@ -351,6 +355,12 @@ struct thread_deque
     void schedule_thread(threads::thread* thrd)
     {
         enqueue(work_items_, thrd);
+        ++work_items_count_;
+    }
+
+    void schedule_thread_last(threads::thread* thrd)
+    {
+        enqueue_last(work_items_, thrd);
         ++work_items_count_;
     }
 

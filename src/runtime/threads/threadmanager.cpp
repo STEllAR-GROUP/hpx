@@ -1128,8 +1128,9 @@ namespace hpx { namespace threads
                         // schedule other work
                         scheduler_.wait_or_add_new(num_thread, state_.load() == running, idle_loop_count);
 
-                        // schedule this thread again
-                        scheduler_.schedule_thread(thrd, num_thread);
+                        // schedule this thread again, make sure it ends up at
+                        // the end of the queue
+                        scheduler_.schedule_thread_last(thrd, num_thread);
                         do_some_work(num_thread);
                     }
                 }
