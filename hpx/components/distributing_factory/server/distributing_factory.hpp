@@ -110,8 +110,8 @@ namespace hpx { namespace components { namespace server
         // return the overall size of a partition described by this info
         std::size_t size() const
         {
-            return std::accumulate(dim_sizes_.begin(), dim_sizes_.end(), 1U,
-                std::multiplies<std::size_t>());
+            return std::accumulate(dim_sizes_.begin(), dim_sizes_.end(), 
+                std::size_t(1), std::multiplies<std::size_t>());
         }
 
         std::size_t dims_;                    ///< dimensionality of the partitions
