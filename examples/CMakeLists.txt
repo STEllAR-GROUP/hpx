@@ -16,7 +16,6 @@ set(subdirs
     gtc
     heartbeat
     hplpx
-    neutron_star
     nqueen
     object_semaphore
     performance_counters
@@ -46,6 +45,12 @@ if(HDF5_CPP_FOUND)
        )
   endif()
 endif()
+
+if(LORENE_FOUND)
+  set(subdirs ${subdirs}
+      neutron_star
+     )
+endif
 
 foreach(subdir ${subdirs})
   add_hpx_pseudo_target(examples.${subdir})
