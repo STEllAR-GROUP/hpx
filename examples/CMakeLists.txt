@@ -50,7 +50,7 @@ if(LORENE_FOUND)
   set(subdirs ${subdirs}
       neutron_star
      )
-endif
+endif()
 
 foreach(subdir ${subdirs})
   add_hpx_pseudo_target(examples.${subdir})
