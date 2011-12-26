@@ -9,6 +9,20 @@
 # We require at least CMake V2.8.4
 cmake_minimum_required(VERSION 2.8.4 FATAL_ERROR)
 
+# Overrides must go before the project() statement, otherwise they are ignored.
+
+################################################################################
+# C++ overrides
+################################################################################
+set(CMAKE_USER_MAKE_RULES_OVERRIDE_CXX
+    "${CMAKE_SOURCE_DIR}/cmake/HPX_CXXOverrides.cmake")
+
+################################################################################
+# Fortran overrides
+################################################################################
+set(CMAKE_USER_MAKE_RULES_OVERRIDE_Fortran
+    "${CMAKE_SOURCE_DIR}/cmake/HPX_FortranOverrides.cmake")
+
 ################################################################################
 # project metadata
 ################################################################################
@@ -28,24 +42,12 @@ endif()
 # Build type
 ################################################################################
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Configuration type (one of Debug,RelWithDebInfo,Release,MinSizeRel)," FORCE)
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Configuration type (one of Debug, RelWithDebInfo, Release, MinSizeRel)" FORCE)
 endif()
 
 if(NOT MSVC AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}" CACHE STRING "Configuration types" FORCE)
 endif()
-
-################################################################################
-# C++ overrides
-################################################################################
-set(CMAKE_USER_MAKE_RULES_OVERRIDE_CXX
-    "${CMAKE_SOURCE_DIR}/cmake/HPX_CXXOverrides.cmake")
-
-################################################################################
-# Fortran overrides
-################################################################################
-set(CMAKE_USER_MAKE_RULES_OVERRIDE_Fortran
-    "${CMAKE_SOURCE_DIR}/cmake/HPX_FortranOverrides.cmake")
 
 ################################################################################
 # CMake configuration
