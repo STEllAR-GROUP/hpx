@@ -29,7 +29,7 @@ set(CMAKE_USER_MAKE_RULES_OVERRIDE_Fortran
 project(hpx CXX)
 
 set(HPX_MAJOR_VERSION 0)
-set(HPX_MINOR_VERSION 9)
+set(HPX_MINOR_VERSION 8)
 set(HPX_PATCH_LEVEL   0)
 set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
 set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
@@ -441,9 +441,6 @@ if(MSVC)
 
     # Use multi-threaded debug runtime
     hpx_append_flag(-MDd LANGUAGES CXX Fortran)
-
-    # enable minimal rebuild
-    hpx_append_flag(-Gm LANGUAGES CXX)
 
     # basic runtime checks
     hpx_append_flag(-RTC1 LANGUAGES CXX)
