@@ -21,11 +21,12 @@ namespace bfs { namespace server
     void point::init(std::size_t objectid,std::size_t grainsize,
         std::size_t max_num_neighbors,std::vector<std::size_t> const& nodelist,
         std::vector<std::size_t> const& neighborlist,
-        boost::numeric::ublas::mapped_vector<std::size_t> const& index)
+        boost::numeric::ublas::mapped_vector<std::size_t> const& index,std::size_t max_levels)
     {
         hpx::lcos::local_mutex::scoped_lock l(mtx_);
         idx_ = objectid;
         grainsize_ = grainsize; 
+        max_levels_ = max_levels;
         neighbors_.resize(grainsize_);
         visited_.resize(grainsize_);
         parent_.resize(grainsize_);
@@ -34,17 +35,19 @@ namespace bfs { namespace server
           neighbors_[i].reserve(max_num_neighbors);
           visited_[i] = false;
         }
+
+        index_ = index;
  
         boost::numeric::ublas::mapped_vector<bool> initialized;
         // initialize the mapping
         for (std::size_t i=0;i<nodelist.size();i++) {
           std::size_t node = nodelist[i];
           std::size_t neighbor = neighborlist[i];
-          if ( index(node) == idx_ && node != neighbor ) {
+          if ( index_(node) == idx_ && node != neighbor ) {
             if ( mapping_.find_element(node) == 0 ) mapping_.insert_element(node,0);
             if ( initialized.find_element(node) == 0 ) initialized.insert_element(node,false);
           }
-          if ( index(neighbor) == idx_ && node != neighbor ) {
+          if ( index_(neighbor) == idx_ && node != neighbor ) {
             if ( mapping_.find_element(neighbor) == 0 ) mapping_.insert_element(neighbor,0);
             if ( initialized.find_element(neighbor) == 0 ) initialized.insert_element(neighbor,false);
           }
@@ -57,7 +60,7 @@ namespace bfs { namespace server
           std::size_t node = nodelist[i];
           std::size_t neighbor = neighborlist[i];
           BOOST_ASSERT(count < grainsize_);
-          if ( index(node) == idx_ && node != neighbor ) {
+          if ( index_(node) == idx_ && node != neighbor ) {
             if ( initialized(node) == false ) {
               mapping_(node) = count;
               initialized(node) = true;
@@ -68,7 +71,7 @@ namespace bfs { namespace server
 
           BOOST_ASSERT(count < grainsize_);
           // symmetrize
-          if ( index(neighbor) == idx_ && node != neighbor ) {
+          if ( index_(neighbor) == idx_ && node != neighbor ) {
             if ( initialized(neighbor) == false ) {
               mapping_(neighbor) = count;
               initialized(neighbor) = true;
@@ -85,23 +88,55 @@ namespace bfs { namespace server
       std::fill( visited_.begin(),visited_.end(),false);
     }
 
+    // tradional traverse
     std::vector<std::size_t> point::traverse(std::size_t level,std::size_t parent,std::size_t edge)
     {
         hpx::lcos::local_mutex::scoped_lock l(mtx_);
         if ( visited_[mapping_(edge)] == false ) {
-            visited_[mapping_(edge)] = true;
-            parent_[mapping_(edge)] = parent;
-            level_[mapping_(edge)] = level; 
-
-            // Return the neighbors.
-            return neighbors_[mapping_(edge)];
+          visited_[mapping_(edge)] = true;
+          parent_[mapping_(edge)] = parent;
+          level_[mapping_(edge)] = level; 
+          return neighbors_[mapping_(edge)];
         } else {
-            // Don't return neighbors.
-            std::vector<std::size_t> tmp;
-            return tmp;
+          std::vector<std::size_t> tmp;
+          return tmp;
         }
     }
 
+    // depth traverse
+    std::vector<nodedata> point::depth_traverse(std::size_t level,std::size_t parent,std::size_t edge)
+    {
+        hpx::lcos::local_mutex::scoped_lock l(mtx_);
+        std::vector<nodedata> result,lresult;
+
+        // verify the edge is local first
+        if ( index_(edge) == idx_ ) { 
+          std::size_t mapping = mapping_(edge);
+          if ( visited_[mapping] == false || level_[mapping] > level ) {
+            visited_[mapping] = true;
+            parent_[mapping] = parent;
+            level_[mapping] = level; 
+            // search all neighbors local to this component to the max_levels depth
+            if ( level < max_levels_ ) {
+              for (std::size_t i=0;i<neighbors_[mapping].size();i++) {
+                std::size_t neighbor = neighbors_[mapping][i];
+                hpx::util::unlock_the_lock<hpx::lcos::local_mutex::scoped_lock> ul(l); 
+                lresult = depth_traverse(level+1,edge,neighbor);
+                result.insert(result.end(),lresult.begin(),lresult.end());
+              }
+            }
+          }
+        } else {
+          nodedata nonlocal;
+          nonlocal.neighbor = edge; 
+          nonlocal.parent = parent; 
+          nonlocal.level = level;
+          result.push_back(nonlocal);
+        }
+
+        return result;
+    }
+ 
     std::size_t point::get_parent(std::size_t edge)
     {
       hpx::lcos::local_mutex::scoped_lock l(mtx_);

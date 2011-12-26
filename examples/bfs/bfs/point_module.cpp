@@ -35,6 +35,9 @@ HPX_REGISTER_ACTION_EX(
     bfs_point_type::wrapped_type::traverse_action,
     bfs_point_traverse_action);
 HPX_REGISTER_ACTION_EX(
+    bfs_point_type::wrapped_type::depth_traverse_action,
+    bfs_point_depth_traverse_action);
+HPX_REGISTER_ACTION_EX(
     bfs_point_type::wrapped_type::get_parent_action,
     bfs_point_get_parent_action);
 HPX_REGISTER_ACTION_EX(

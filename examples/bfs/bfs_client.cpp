@@ -188,7 +188,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         for (std::size_t i=0;i<ne;i++) {
           init_phase.push_back(points[i].init_async(i,grainsize,max_num_neighbors,
-                                                    nodelist,neighborlist,index));
+                                                    nodelist,neighborlist,index,max_levels));
         }
 
         // We have to wait for the initialization to complete before we begin
@@ -222,6 +222,13 @@ int hpx_main(boost::program_options::variables_map &vm)
             parents.push_back(std::vector<std::size_t>());
           }
 
+          // TEST
+          std::vector<hpx::lcos::promise<std::vector<nodedata> > > depth_traverse_phase;
+          std::vector<std::vector<nodedata> > result;
+          depth_traverse_phase.push_back( points[ index(searchroot[step]) ].depth_traverse_async(level,searchroot[step],searchroot[step]) );
+          hpx::lcos::wait(depth_traverse_phase,result);
+          // END TEST
+#if 0
           std::vector<std::vector<std::size_t> > neighbors,alt_neighbors;
 
           // Install the root node. 
@@ -277,6 +284,7 @@ int hpx_main(boost::program_options::variables_map &vm)
               hpx::lcos::wait(traverse_phase,neighbors);
             }
           }
+#endif
           kernel2_time[step] = kernel2time.elapsed();
 
           if ( validater ) {
@@ -394,7 +402,7 @@ int main(int argc, char* argv[])
             "the grainsize of the components")
         ("max-num-neighbors", value<std::size_t>()->default_value(20),
             "the maximum number of neighbors")
-        ("max-levels", value<std::size_t>()->default_value(20),
+        ("max-levels", value<std::size_t>()->default_value(10),
             "the maximum number of levels to traverse")
         ("searchfile", value<std::string>()->default_value("g10_search.txt"),
             "the file containing the roots to search in the graph")

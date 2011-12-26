@@ -39,11 +39,12 @@ namespace bfs
             std::size_t grainsize,std::size_t max_num_neighbors,
             std::vector<std::size_t> const& nodefile,
             std::vector<std::size_t> const& neighborfile,
-            boost::numeric::ublas::mapped_vector<std::size_t> const& index)
+            boost::numeric::ublas::mapped_vector<std::size_t> const& index,
+            std::size_t max_levels)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::init_async(gid_,objectid,grainsize,
-                                                max_num_neighbors,nodefile,neighborfile,index);
+                                                max_num_neighbors,nodefile,neighborfile,index,max_levels);
         }
 
         // kernel 1
@@ -51,11 +52,12 @@ namespace bfs
             std::size_t max_num_neighbors,
             std::vector<std::size_t> const& nodefile,
             std::vector<std::size_t> const& neighborfile,
-            boost::numeric::ublas::mapped_vector<std::size_t> const& index)
+            boost::numeric::ublas::mapped_vector<std::size_t> const& index,
+            std::size_t max_levels)
         {
             BOOST_ASSERT(gid_);
             this->base_type::init_async(gid_,objectid, grainsize,
-                                        max_num_neighbors,nodefile,neighborfile,index);
+                                        max_num_neighbors,nodefile,neighborfile,index,max_levels);
         }
 
         /// Traverse the graph. 
@@ -71,6 +73,21 @@ namespace bfs
         {
             BOOST_ASSERT(gid_);
             return this->base_type::traverse(gid_,level,parent,edge);
+        }
+
+        /// Traverse the graph. 
+        hpx::lcos::promise<std::vector<nodedata> >
+        depth_traverse_async(std::size_t level, std::size_t parent,std::size_t edge)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::depth_traverse_async(gid_,level,parent,edge);
+        }
+
+        /// Traverse the graph. 
+        std::vector<nodedata> depth_traverse(std::size_t level,std::size_t parent,std::size_t edge)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::depth_traverse(gid_,level,parent,edge);
         }
 
         /// get parent
