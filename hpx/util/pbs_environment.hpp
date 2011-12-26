@@ -13,6 +13,11 @@
 #include <string>
 #include <vector>
 
+#if defined(BOOST_MSVC)
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
+
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////
@@ -80,5 +85,9 @@ namespace hpx { namespace util
         transform_function_type transform_;
     };
 }}
+
+#if defined(BOOST_MSVC)
+#pragma warning(pop)
+#endif
 
 #endif

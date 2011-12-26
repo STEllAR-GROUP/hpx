@@ -65,7 +65,7 @@ namespace hpx { namespace performance_counters { namespace server
         std::string base_counter_name_;   ///< name of base counter to be queried
         naming::id_type base_counter_id_;
         typedef boost::accumulators::accumulator_set<
-            boost::int64_t,
+            double,
             boost::accumulators::stats<boost::accumulators::tag::mean>
         > mean_accumulator_type;
         mean_accumulator_type value_;

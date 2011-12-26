@@ -443,7 +443,7 @@ namespace hpx
         ///            thread the number of executed PX threads should be
         ///            returned for. If this is std::size_t(-1) the function
         ///            will return the overall number of executed PX threads.
-        std::size_t get_executed_threads(std::size_t num = std::size_t(-1)) const
+        boost::int64_t get_executed_threads(std::size_t num = std::size_t(-1)) const
         {
             return thread_manager_.get_executed_threads(num);
         }

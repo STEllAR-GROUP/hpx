@@ -66,18 +66,18 @@ int main(
 
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
-    boost::uint64_t threads, updates;
+    boost::uint32_t threads, updates;
 
     cmdline.add_options()
         ( "help,h"
         , "print out program usage (this message)")
 
         ( "threads,t"
-        , value<boost::uint64_t>(&threads)->default_value(1),
+        , value<boost::uint32_t>(&threads)->default_value(1),
          "number of OS-threads")
 
         ( "updates,u"
-        , value<boost::uint64_t>(&updates)->default_value(1 << 22)
+        , value<boost::uint32_t>(&updates)->default_value(1 << 22)
         , "updates made to the TLS variable per OS-thread")
 
         ( "csv"
@@ -105,7 +105,7 @@ int main(
 
     high_resolution_timer t;
 
-    for (boost::uint64_t i = 0; i != threads; ++i)
+    for (boost::uint32_t i = 0; i != threads; ++i)
         workers.add_thread(new boost::thread(worker, boost::ref(b), updates));
 
     workers.join_all();

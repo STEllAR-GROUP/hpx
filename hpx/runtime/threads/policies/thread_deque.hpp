@@ -14,10 +14,8 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
 
-#include <boost/thread/condition.hpp>
-#include <boost/bind.hpp>
+#include <boost/thread/mutex.hpp>
 #include <boost/atomic.hpp>
-#include <boost/tuple/tuple.hpp>
 #include <boost/lockfree/deque.hpp>
 #include <boost/lockfree/fifo.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
@@ -72,7 +70,7 @@ struct thread_deque
 
     // this is the type of the queue of new tasks not yet converted to
     // threads
-    typedef boost::tuple<thread_init_data, thread_state_enum> task_description;
+    typedef HPX_STD_TUPLE<thread_init_data, thread_state_enum> task_description;
 
     typedef boost::lockfree::deque<task_description const*> task_items_type;
 
@@ -96,10 +94,10 @@ struct thread_deque
             util::block_profiler_wrapper<add_new_tag> bp(add_new_logger_);
 
             // create the new thread
-            thread_state_enum state = boost::get<1>(*task);
+            thread_state_enum state = HPX_STD_GET(1, *task);
             HPX_STD_UNIQUE_PTR<threads::thread> thrd(
                 new (memory_pool_) threads::thread(
-                    boost::get<0>(*task), memory_pool_, state));
+                    boost::move(HPX_STD_GET(0, *task)), memory_pool_, state));
 
             delete task;
 
@@ -152,10 +150,10 @@ struct thread_deque
             util::block_profiler_wrapper<add_new_tag> bp(add_new_logger_);
 
             // create the new thread
-            thread_state_enum state = boost::get<1>(*task);
+            thread_state_enum state = HPX_STD_GET(1, *task);
             HPX_STD_UNIQUE_PTR<threads::thread> thrd(
                 new (memory_pool_) threads::thread(
-                    boost::get<0>(*task), memory_pool_, state));
+                    boost::move(HPX_STD_GET(0, *task)), memory_pool_, state));
 
             delete task;
 
@@ -294,7 +292,7 @@ struct thread_deque
 
             HPX_STD_UNIQUE_PTR<threads::thread> thrd(
                 new (memory_pool_) threads::thread(
-                    data, memory_pool_, initial_state));
+                    boost::move(data), memory_pool_, initial_state));
 
             // add a new entry in the map for this thread
             thread_id_type id = thrd->get_thread_id();
@@ -509,7 +507,6 @@ struct thread_deque
 
 private:
     mutable mutex_type mtx_;            ///< mutex protecting the members
-    boost::condition cond_;             ///< used to trigger some action
 
     thread_map_type thread_map_;        ///< mapping of thread id's to PX-threads
     work_items_type work_items_;        ///< list of active work items

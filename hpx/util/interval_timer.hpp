@@ -14,6 +14,11 @@
 #include <string>
 #include <vector>
 
+#if defined(BOOST_MSVC)
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
+
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -48,5 +53,9 @@ namespace hpx { namespace util
         bool pre_shutdown_;           ///< execute termination during pre-shutdown
     };
 }}
+
+#if defined(BOOST_MSVC)
+#pragma warning(pop)
+#endif
 
 #endif

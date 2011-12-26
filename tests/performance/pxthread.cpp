@@ -50,6 +50,9 @@ double delay()
 ///////////////////////////////////////////////////////////////////////////////
 void null_thread()
 {
+    if (num_iterations == 0)
+        return;
+
     high_resolution_timer walltime;
     global_scratch = delay();
     global_delay = walltime.elapsed();
@@ -83,12 +86,24 @@ int hpx_main(
         double const duration = walltime.elapsed();
 
         if (vm.count("csv")) {
-            cout << ( boost::format("%1%,%2%,%3%,%4%\n")
-                    % get_os_thread_count()
-                    % global_delay
-                    % count
-                    % duration)
-                 << flush;
+            if (0 != num_iterations) {
+                cout << ( boost::format("%1%,%2%,%3%,%4%,%5%\n")
+                        % get_os_thread_count()
+                        % global_delay
+                        % count
+                        % duration
+                        % (duration / ((count * global_delay) / get_os_thread_count())))
+                     << flush;
+            }
+            else {
+                global_delay = 0;
+                cout << ( boost::format("%1%,%2%,%3%,%4%\n")
+                        % get_os_thread_count()
+                        % global_delay
+                        % count
+                        % duration)
+                     << flush;
+            }
         }
         else {
             cout << ( boost::format("invoked %1% px-threads in %2% seconds\n")

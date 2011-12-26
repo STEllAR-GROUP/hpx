@@ -315,12 +315,12 @@ namespace hpx { namespace naming
     {
         boost::uint64_t msb = id.get_msb();
         boost::uint16_t credits = boost::uint16_t((msb & gid_type::credit_mask) >> 16);
-        boost::uint16_t newcredits = credits / fraction;
+        boost::uint32_t newcredits = credits / fraction;
 
         msb &= ~gid_type::credit_mask;
-        id.set_msb(msb | ((credits - newcredits) << 16) | gid_type::was_split_mask);
+        id.set_msb(msb | (((credits - newcredits) << 16) & gid_type::credit_mask) | gid_type::was_split_mask);
 
-        return gid_type(msb | (newcredits << 16) | gid_type::was_split_mask,
+        return gid_type(msb | ((newcredits << 16) & gid_type::credit_mask) | gid_type::was_split_mask,
             id.get_lsb());
     }
 

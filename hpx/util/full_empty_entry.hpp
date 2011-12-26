@@ -196,7 +196,7 @@ namespace hpx { namespace util { namespace detail
                 threads::thread_state_ex_enum statex;
 
                 {
-                    lcos::local_spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
+                    lcos::local_spinlock::scoped_lock ll(full_empty_counter_data_.mtx_);
                     ++full_empty_counter_data_.read_enqueued_;
                 }
 
@@ -207,7 +207,7 @@ namespace hpx { namespace util { namespace detail
                 }
 
                 {
-                    lcos::local_spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
+                    lcos::local_spinlock::scoped_lock ll(full_empty_counter_data_.mtx_);
                     ++full_empty_counter_data_.read_dequeued_;
                 }
 
@@ -262,7 +262,7 @@ namespace hpx { namespace util { namespace detail
                 threads::thread_state_ex_enum statex;
 
                 {
-                    lcos::local_spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
+                    lcos::local_spinlock::scoped_lock ll(full_empty_counter_data_.mtx_);
                     ++full_empty_counter_data_.read_enqueued_;
                 }
 
@@ -273,7 +273,7 @@ namespace hpx { namespace util { namespace detail
                 }
 
                 {
-                    lcos::local_spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
+                    lcos::local_spinlock::scoped_lock ll(full_empty_counter_data_.mtx_);
                     ++full_empty_counter_data_.read_dequeued_;
                 }
 

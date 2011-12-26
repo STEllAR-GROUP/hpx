@@ -61,10 +61,10 @@ namespace hpx { namespace detail
                     << throw_file(file)
                     << throw_line(line));
         }
-        catch (boost::exception const& e) {
+        catch (boost::exception const& ee) {
             // log the exception information in any case
             LERR_(always) << "rethrow_exception: throwing exception: "
-                << diagnostic_information(e);
+                << diagnostic_information(ee);
             throw;      // rethrow whatever has been caught
         }
     }

@@ -423,16 +423,16 @@ namespace boost
 // exception
 #define HPX_THROW_EXCEPTION_EX(except, errcode, func, msg, mode)              \
     {                                                                         \
-        boost::filesystem::path p(hpx::util::create_path(__FILE__));          \
+        boost::filesystem::path p__(hpx::util::create_path(__FILE__));        \
         hpx::detail::throw_exception(except((hpx::error)errcode, msg, mode),  \
-            func, p.string(), __LINE__);                                      \
+            func, p__.string(), __LINE__);                                    \
     }                                                                         \
     /**/
 
 #define HPX_THROW_STD_EXCEPTION(except, func)                                 \
     {                                                                         \
-        boost::filesystem::path p(hpx::util::create_path(__FILE__));          \
-        hpx::detail::throw_exception(except, func, p.string(), __LINE__);     \
+        boost::filesystem::path p__(hpx::util::create_path(__FILE__));        \
+        hpx::detail::throw_exception(except, func, p__.string(), __LINE__);   \
     }                                                                         \
     /**/
 

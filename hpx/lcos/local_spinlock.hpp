@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2011 Hartmut Kaiser
+//  Copyright (c) 2011-2012 Hartmut Kaiser
 //  Copyright (c) 2008 Peter Dimov
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -34,7 +34,7 @@ namespace hpx { namespace lcos
     private:
         boost::uint64_t v_;
 
-        ///////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////
         static void yield(std::size_t k)
         {
             if (k < 4)

@@ -164,7 +164,7 @@ namespace hpx { namespace threads { namespace policies
         {
             // try to figure out the NUMA node where the data lives
             if (numa_sensitive_ && std::size_t(-1) == num_thread) {
-                std::size_t mask = get_thread_affinity_mask_from_lva(data.lva);
+                boost::uint64_t mask = get_thread_affinity_mask_from_lva(data.lva);
                 if (mask != std::size_t(-1)) {
                     std::size_t m = 0x01LL;
                     for (std::size_t i = 0; i < queues_.size(); m <<= 1, ++i)
@@ -372,7 +372,8 @@ namespace hpx { namespace threads { namespace policies
             bool result = queues_[num_thread]->wait_or_add_new(
                 num_thread, running, idle_loop_count, added);
 
-            if ((queues_.size()-1 == num_thread) && (0 == added)) {
+            std::size_t queues_size = queues_.size();
+            if ((queues_size-1 == num_thread) && (0 == added)) {
                 // Convert low priority tasks to threads before attempting to
                 // steal from other OS thread.
                 result = low_priority_queue_.wait_or_add_new(
@@ -382,12 +383,11 @@ namespace hpx { namespace threads { namespace policies
             if (0 == added) {
                 // steal work items: first try to steal from other cores in
                 // the same NUMA node
-                std::size_t core_mask = get_thread_affinity_mask(num_thread, numa_sensitive_);
-                std::size_t node_mask = get_numa_node_affinity_mask(num_thread, numa_sensitive_);
+                boost::uint64_t core_mask = get_thread_affinity_mask(num_thread, numa_sensitive_);
+                boost::uint64_t node_mask = get_numa_node_affinity_mask(num_thread, numa_sensitive_);
 
-                std::size_t queues_size = queues_.size();
-                if (core_mask != std::size_t(-1) && node_mask != std::size_t(-1)) {
-                    std::size_t m = 0x01LL;
+                if (core_mask != boost::uint64_t(-1) && node_mask != boost::uint64_t(-1)) {
+                    boost::uint64_t m = 0x01LL;
                     for (std::size_t i = 0; (0 == added) && i < queues_size;
                          m <<= 1, ++i)
                     {
@@ -434,13 +434,13 @@ namespace hpx { namespace threads { namespace policies
 
         bool periodic_maintenance(bool running)
         {
-            // periodid maintenance redistributes work and is responsible that
+            // periodic maintenance redistributes work and is responsible that
             // every OS-Thread has enough work
 
             {
                 // Calculate the average ...
-                std::size_t average_task_count = 0;
-                std::size_t average_work_count = 0;
+                boost::int64_t average_task_count = 0;
+                boost::int64_t average_work_count = 0;
                 for(std::size_t i = 0; i < high_priority_queues_.size(); ++i)
                 {
                     average_task_count += high_priority_queues_[i]->get_task_length();
@@ -448,39 +448,42 @@ namespace hpx { namespace threads { namespace policies
                 }
                 average_task_count = average_task_count / high_priority_queues_.size();
                 average_work_count = average_work_count / high_priority_queues_.size();
+
                 // Remove items from queues that have more than the average
                 thread_queue<false> tmp_queue;
                 for(std::size_t i = 0; i < high_priority_queues_.size(); ++i)
                 {
-                    std::size_t task_items = high_priority_queues_[i]->get_task_length();
-                    std::size_t work_items = high_priority_queues_[i]->get_work_length();
+                    boost::int64_t task_items = high_priority_queues_[i]->get_task_length();
+                    boost::int64_t work_items = high_priority_queues_[i]->get_work_length();
                     if(task_items > average_task_count)
                     {
-                        std::size_t count = task_items - average_task_count;
+                        boost::int64_t count = task_items - average_task_count;
                         tmp_queue.move_task_items_from(high_priority_queues_[i], count);
                     }
                     if(work_items > average_work_count)
                     {
-                        std::size_t count = work_items - average_work_count;
+                        boost::int64_t count = work_items - average_work_count;
                         tmp_queue.move_work_items_from(high_priority_queues_[i], count, i + queues_.size());
                     }
                 }
+
                 // And readd them to the queues which didn't have enough work ...
                 for(std::size_t i = 0; i < high_priority_queues_.size(); ++i)
                 {
-                    std::size_t task_items = high_priority_queues_[i]->get_task_length();
-                    std::size_t work_items = high_priority_queues_[i]->get_work_length();
+                    boost::int64_t task_items = high_priority_queues_[i]->get_task_length();
+                    boost::int64_t work_items = high_priority_queues_[i]->get_work_length();
                     if(task_items < average_task_count)
                     {
-                        std::size_t count = average_task_count - task_items;
+                        boost::int64_t count = average_task_count - task_items;
                         high_priority_queues_[i]->move_task_items_from(&tmp_queue, count);
                     }
                     if(work_items < average_work_count)
                     {
-                        std::size_t count = average_work_count - work_items;
+                        boost::int64_t count = average_work_count - work_items;
                         high_priority_queues_[i]->move_work_items_from(&tmp_queue, count, i + queues_.size());
                     }
                 }
+
                 // Some items might remain in the tmp_queue ... readd them round robin
                 {
                     std::size_t i = 0;
@@ -502,8 +505,8 @@ namespace hpx { namespace threads { namespace policies
 
             {
                 // Calculate the average ...
-                std::size_t average_task_count = 0;
-                std::size_t average_work_count = 0;
+                boost::int64_t average_task_count = 0;
+                boost::int64_t average_work_count = 0;
                 for(std::size_t i = 0; i < queues_.size(); ++i)
                 {
                     average_task_count += queues_[i]->get_task_length();
@@ -511,36 +514,38 @@ namespace hpx { namespace threads { namespace policies
                 }
                 average_task_count = average_task_count / queues_.size();
                 average_work_count = average_work_count / queues_.size();
+
                 // Remove items from queues that have more than the average
                 thread_queue<false> tmp_queue;
                 for(std::size_t i = 0; i < queues_.size(); ++i)
                 {
-                    std::size_t task_items = queues_[i]->get_task_length();
-                    std::size_t work_items = queues_[i]->get_work_length();
+                    boost::int64_t task_items = queues_[i]->get_task_length();
+                    boost::int64_t work_items = queues_[i]->get_work_length();
                     if(task_items > average_task_count)
                     {
-                        std::size_t count = task_items - average_task_count;
+                        boost::int64_t count = task_items - average_task_count;
                         tmp_queue.move_task_items_from(queues_[i], count);
                     }
                     if(work_items > average_work_count)
                     {
-                        std::size_t count = work_items - average_work_count;
+                        boost::int64_t count = work_items - average_work_count;
                         tmp_queue.move_work_items_from(queues_[i], count, i + queues_.size());
                     }
                 }
+
                 // And readd them to the queues which didn't have enough work ...
                 for(std::size_t i = 0; i < queues_.size(); ++i)
                 {
-                    std::size_t task_items = queues_[i]->get_task_length();
-                    std::size_t work_items = queues_[i]->get_work_length();
+                    boost::int64_t task_items = queues_[i]->get_task_length();
+                    boost::int64_t work_items = queues_[i]->get_work_length();
                     if(task_items < average_task_count)
                     {
-                        std::size_t count = average_task_count - task_items;
+                        boost::int64_t count = average_task_count - task_items;
                         queues_[i]->move_task_items_from(&tmp_queue, count);
                     }
                     if(work_items < average_work_count)
                     {
-                        std::size_t count = average_work_count - work_items;
+                        boost::int64_t count = average_work_count - work_items;
                         queues_[i]->move_work_items_from(&tmp_queue, count, i + queues_.size());
                     }
                 }

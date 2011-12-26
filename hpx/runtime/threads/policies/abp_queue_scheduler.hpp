@@ -225,12 +225,12 @@ struct abp_queue_scheduler : boost::noncopyable
 
         // steal work items: first try to steal from other cores in the
         // same NUMA node
-        std::size_t core_mask = get_thread_affinity_mask(num_thread, numa_sensitive_);
-        std::size_t node_mask = get_numa_node_affinity_mask(num_thread, numa_sensitive_);
+        boost::uint64_t core_mask = get_thread_affinity_mask(num_thread, numa_sensitive_);
+        boost::uint64_t node_mask = get_numa_node_affinity_mask(num_thread, numa_sensitive_);
 
         std::size_t queue_size = queues_.size();
-        if (core_mask != std::size_t(-1) && node_mask != std::size_t(-1)) {
-            std::size_t m = 0x01LL;
+        if (core_mask != boost::uint64_t(-1) && node_mask != boost::uint64_t(-1)) {
+            boost::uint64_t m = 0x01LL;
             for (std::size_t i = 1; i < queue_size; m <<= 1, ++i)
             {
                 if (i == num_thread || !(m & node_mask))

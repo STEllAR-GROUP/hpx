@@ -120,7 +120,7 @@ namespace boost { namespace coroutines { namespace detail
       return count() == 1;
     }
 
-    std::size_t count() const {
+    boost::int64_t count() const {
       return m_counter;
     }
 

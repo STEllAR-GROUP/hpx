@@ -18,7 +18,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
 {
-    inline std::size_t least_significant_bit(std::size_t mask)
+    inline std::size_t least_significant_bit(boost::uint64_t mask)
     {
         if (mask) {
             int c = 0;    // will count v's trailing zero bits
@@ -33,7 +33,7 @@ namespace hpx { namespace threads
         return std::size_t(1);
     }
 
-    inline std::size_t least_significant_bit_set(std::size_t mask)
+    inline std::size_t least_significant_bit_set(boost::uint64_t mask)
     {
         if (mask) {
             std::size_t c = 0;    // will count v's trailing zero bits
@@ -129,7 +129,7 @@ namespace hpx { namespace threads
             }
         }
 
-        std::size_t get_numa_node_affinity_mask(std::size_t thread_num,
+        boost::uint64_t get_numa_node_affinity_mask(std::size_t thread_num,
             bool numa_sensitive)
         {
             BOOST_ASSERT(0 <= thread_num && thread_num < data_.size());
@@ -138,10 +138,10 @@ namespace hpx { namespace threads
         }
 
     private:
-        std::size_t init_numa_node_affinity_mask(std::size_t num_thread,
+        boost::uint64_t init_numa_node_affinity_mask(std::size_t num_thread,
             bool numa_sensitive)
         {
-			std::size_t num_of_cores = hardware_concurrency();
+            std::size_t num_of_cores = hardware_concurrency();
             if (0 == num_of_cores)
                 num_of_cores = 1;     // assume one core
             UCHAR affinity = static_cast<UCHAR>(num_thread % num_of_cores);
@@ -150,7 +150,7 @@ namespace hpx { namespace threads
             if (GetNumaHighestNodeNumber(&numa_nodes))
                 ++numa_nodes;
 
-            DWORD_PTR node_affinity_mask = 0;
+            boost::uint64_t node_affinity_mask = 0;
             if (numa_sensitive) {
                 UCHAR numa_node = affinity % numa_nodes;
                 if (!GetNumaNodeProcessorMask(numa_node, &node_affinity_mask))
@@ -166,11 +166,11 @@ namespace hpx { namespace threads
             return node_affinity_mask;
         }
 
-        std::vector<std::size_t> data_;
-        std::vector<std::size_t> numa_sensitve_data_;
+        std::vector<boost::uint64_t> data_;
+        std::vector<boost::uint64_t> numa_sensitve_data_;
     };
 
-    inline std::size_t
+    inline boost::uint64_t
     get_numa_node_affinity_mask(std::size_t num_thread, bool numa_sensitive)
     {
         util::static_<numa_affinity_mask_data, numa_affinity_mask_data::tag> data;
@@ -193,7 +193,7 @@ namespace hpx { namespace threads
             }
         }
 
-        std::size_t get_thread_affinity_mask(std::size_t thread_num,
+        boost::uint64_t get_thread_affinity_mask(std::size_t thread_num,
             bool numa_sensitive)
         {
             BOOST_ASSERT(0 <= thread_num && thread_num < data_.size());
@@ -202,7 +202,7 @@ namespace hpx { namespace threads
         }
 
     private:
-        std::size_t init_thread_affinity_mask(std::size_t num_thread,
+        boost::uint64_t init_thread_affinity_mask(std::size_t num_thread,
             bool numa_sensitive)
         {
             std::size_t num_of_cores = hardware_concurrency();
@@ -215,8 +215,8 @@ namespace hpx { namespace threads
                 ++numa_nodes;
 
             std::size_t num_of_cores_per_numa_node = num_of_cores / numa_nodes;
-            DWORD_PTR node_affinity_mask = 0;
-            DWORD_PTR mask = 0x01LL;
+            boost::uint64_t node_affinity_mask = 0;
+            boost::uint64_t mask = 0x01LL;
             if (numa_sensitive) {
                 UCHAR numa_node = static_cast<UCHAR>(affinity % numa_nodes);
                 if (!GetNumaNodeProcessorMask(numa_node, &node_affinity_mask))
@@ -243,11 +243,11 @@ namespace hpx { namespace threads
             return mask;
         }
 
-        std::vector<std::size_t> data_;
-        std::vector<std::size_t> numa_sensitve_data_;
+        std::vector<boost::uint64_t> data_;
+        std::vector<boost::uint64_t> numa_sensitve_data_;
     };
 
-    inline std::size_t
+    inline boost::uint64_t
     get_thread_affinity_mask(std::size_t num_thread, bool numa_sensitive)
     {
         util::static_<thread_affinity_mask_data, thread_affinity_mask_data::tag> data;
@@ -258,8 +258,8 @@ namespace hpx { namespace threads
     inline bool
     set_affinity(boost::thread& thrd, std::size_t num_thread, bool numa_sensitive)
     {
-        DWORD_PTR mask = get_thread_affinity_mask(num_thread, numa_sensitive);
-        return SetThreadAffinityMask(thrd.native_handle(), mask) != 0;
+        boost::uint64_t mask = get_thread_affinity_mask(num_thread, numa_sensitive);
+        return SetThreadAffinityMask(thrd.native_handle(), DWORD_PTR(mask)) != 0;
     }
 
     inline bool set_affinity(std::size_t affinity, bool numa_sensitive)
@@ -268,7 +268,7 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline std::size_t
+    inline boost::uint64_t
     get_thread_affinity_mask_from_lva(naming::address::address_type lva)
     {
         PSAPI_WORKING_SET_EX_INFORMATION info;
@@ -277,7 +277,7 @@ namespace hpx { namespace threads
         if (!QueryWorkingSetEx(GetCurrentProcess(), &info, sizeof(info)))
             return std::size_t(-1);
 
-        DWORD_PTR node_affinity_mask = 0;
+        boost::uint64_t node_affinity_mask = 0;
         if (!GetNumaNodeProcessorMask(info.VirtualAttributes.Node, &node_affinity_mask))
             return std::size_t(-1);
 

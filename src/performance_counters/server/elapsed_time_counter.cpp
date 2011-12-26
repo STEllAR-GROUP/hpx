@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -38,8 +38,9 @@ namespace hpx { namespace performance_counters { namespace server
 
     void elapsed_time_counter::get_counter_value(counter_value& value)
     {
-        value.value_ = timer_.elapsed() * 10e8;     // gather the current value
-        value.scaling_ = 10e8;
+        // gather the current value
+        value.value_ = static_cast<boost::int64_t>(timer_.elapsed() * 10e8);
+        value.scaling_ = 100000000LL;
         value.scale_inverse_ = true;
         value.status_ = status_new_data;
         value.time_ = boost::chrono::high_resolution_clock::now().

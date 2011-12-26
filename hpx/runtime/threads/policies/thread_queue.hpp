@@ -15,10 +15,9 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
 
+#include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
-#include <boost/bind.hpp>
 #include <boost/atomic.hpp>
-#include <boost/tuple/tuple.hpp>
 #include <boost/lockfree/fifo.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/move/move.hpp>
@@ -129,7 +128,7 @@ namespace hpx { namespace threads { namespace policies
             if (HPX_UNLIKELY(0 == add_count))
                 return 0;
 
-            boost::int64_t added = 0;
+            std::size_t added = 0;
             task_description* task = 0;
             while (add_count-- && addfrom->new_tasks_.dequeue(task))
             {
