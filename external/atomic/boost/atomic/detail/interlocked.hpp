@@ -283,9 +283,14 @@ public:
 private:
     T i;
 };
+
+}}}
+
 #endif
 
 #endif
+
+namespace boost { namespace detail { namespace atomic {
 
 template<typename T>
 class platform_atomic_integral<T, 4> : public build_atomic_from_add<atomic_interlocked_32<T> > {
