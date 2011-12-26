@@ -39,7 +39,7 @@ void get_statistics(std::vector<double> const& x, double &minimum, double &mean,
 bool fexists(std::string const filename)
 {
   std::ifstream ifile(filename);
-  return ifile;
+  return ifile ? true : false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

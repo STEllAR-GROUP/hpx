@@ -16,6 +16,7 @@ set(subdirs
     gtc
     heartbeat
     hplpx
+    neutron_star
     nqueen
     object_semaphore
     performance_counters
