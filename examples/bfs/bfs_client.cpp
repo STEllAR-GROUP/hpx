@@ -55,7 +55,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::size_t const grainsize = vm["grainsize"].as<std::size_t>();
         std::string const searchfile = vm["searchfile"].as<std::string>();
         std::size_t const max_levels = vm["max-levels"].as<std::size_t>();
-        bool const validater = vm["validater"].as<bool>();
+        bool const validator = vm["validator"].as<bool>();
         std::size_t const max_num_neighbors
             = vm["max-num-neighbors"].as<std::size_t>();
 
@@ -287,7 +287,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 #endif
           kernel2_time[step] = kernel2time.elapsed();
 
-          if ( validater ) {
+          if ( validator ) {
             // Validate  -- Not timed
             //std::cout << " Validating searchkey " << step << std::endl;
             // Get the parent of every edge
@@ -323,7 +323,7 @@ int hpx_main(boost::program_options::variables_map &vm)
           hpx::lcos::wait(reset_phase);
         }
 
-        if ( validation && validater ) {
+        if ( validation && validator ) {
           // Prep output statistics
           double minimum,mean,stdev,firstquartile,median,thirdquartile,maximum;
           get_statistics(kernel2_time,minimum,mean,stdev,firstquartile,
@@ -408,7 +408,7 @@ int main(int argc, char* argv[])
             "the file containing the roots to search in the graph")
         ("graph", value<std::string>()->default_value("g10.txt"),
             "the file containing the graph")
-        ("validater", value<bool>()->default_value(true),
+        ("validator", value<bool>()->default_value(true),
             "whether to run the validation (slow)");
 
     return hpx::init(desc_commandline, argc, argv); // Initialize and run HPX.
