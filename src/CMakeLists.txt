@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2011 Hartmut Kaiser
+# Copyright (c) 2007-2012 Hartmut Kaiser
 # Copyright (c)      2011 Bryce Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -91,8 +91,10 @@ if(HPX_STACKTRACES)
     GLOB GLOBS "${hpx_SOURCE_DIR}/external/backtrace/libs/backtrace/src/backtrace.cpp")
 endif()
 
-add_hpx_library_sources(hpx
-  GLOB GLOBS "${hpx_SOURCE_DIR}/external/coroutine/libs/coroutine/src/swapcontext.cpp")
+if(NOT MSVC)
+  add_hpx_library_sources(hpx
+    GLOB GLOBS "${hpx_SOURCE_DIR}/external/coroutine/libs/coroutine/src/swapcontext.cpp")
+endif()
 
 ################################################################################
 # gather headers
@@ -141,7 +143,7 @@ set_target_properties(hpx_serialization PROPERTIES
   SOVERSION ${HPX_SOVERSION}
   CLEAN_DIRECT_OUTPUT 1
   OUTPUT_NAME hpx_serialization
-  FOLDER "core"
+  FOLDER "Core"
   RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE}
   RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG}
   RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL}
@@ -160,7 +162,9 @@ set_property(TARGET hpx_serialization APPEND
   "HPX_EXPORTS"
   "BOOST_COROUTINE_EXPORTS")
 
-hpx_library_install(${name})
+if(NOT HPX_NO_INSTALL)
+  hpx_library_install(${name})
+endif()
 
 ################################################################################
 # libhpx
@@ -170,7 +174,7 @@ set_target_properties(hpx PROPERTIES
   SOVERSION ${HPX_SOVERSION}
   CLEAN_DIRECT_OUTPUT 1
   OUTPUT_NAME hpx
-  FOLDER "core"
+  FOLDER "Core"
   RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE}
   RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG}
   RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL}
@@ -192,7 +196,9 @@ set_property(TARGET hpx APPEND
   "BOOST_ENABLE_ASSERT_HANDLER"
   "BOOST_COROUTINE_EXPORTS") # Do we still need this?
 
-hpx_library_install(${name})
+if(NOT HPX_NO_INSTALL)
+  hpx_library_install(${name})
+endif()
 
 ################################################################################
 # libhpx_init
@@ -204,7 +210,7 @@ set_property(TARGET hpx_init APPEND
   "HPX_ACTION_ARGUMENT_LIMIT=3"
   "BOOST_ENABLE_ASSERT_HANDLER")
 
-set_property(TARGET hpx_init PROPERTY FOLDER "core")
+set_property(TARGET hpx_init PROPERTY FOLDER "Core")
 
 hpx_mangle_name(name hpx_init)
 

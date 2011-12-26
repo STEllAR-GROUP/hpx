@@ -1,4 +1,3 @@
-
 #  Copyright (c) 2011 Thomas Heller
 #
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,6 +13,7 @@ add_hpx_component(
     SOURCES managed_test_component.cpp
     HEADERS managed_test_component.hpp
     DEPENDENCIES iostreams_component
+    FOLDER "Tests/Correctness/Components"
 )
 
 
@@ -30,7 +30,8 @@ foreach(test ${tests})
   # add example executable
   add_hpx_executable(${test}
                      SOURCES ${sources}
-                     ${${test}_FLAGS})
+                     ${${test}_FLAGS}
+                     FOLDER "Tests/Correctness/Components")
 
   # add a custom target for this example
   add_hpx_pseudo_target(tests.correctness.components.${test})

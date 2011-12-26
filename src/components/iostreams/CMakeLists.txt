@@ -10,5 +10,6 @@ add_hpx_component(iostreams
   SOURCES component_module.cpp
           manipulators.cpp
           standard_streams.cpp
-          server/output_stream.cpp)
+          server/output_stream.cpp
+  FOLDER "Core")
 

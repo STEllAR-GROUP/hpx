@@ -30,7 +30,8 @@ set(dependencies
 add_hpx_executable(gtc_client
   MODULE gtc
   SOURCES ${sources}
-  DEPENDENCIES ${dependencies})
+  DEPENDENCIES ${dependencies}
+  FOLDER "Examples/GTC")
 
 # add a custom target for this example
 add_hpx_pseudo_target(examples.gtc.point)

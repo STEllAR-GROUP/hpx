@@ -27,5 +27,6 @@ add_hpx_component(adaptive1d_stencil
   MODULE adaptive1d
   SOURCES ${sources}
   HEADERS ${headers}
-  DEPENDENCIES adaptive1d_application_lib)
+  DEPENDENCIES adaptive1d_application_lib
+  FOLDER "Examples/Adaptive1d")
 

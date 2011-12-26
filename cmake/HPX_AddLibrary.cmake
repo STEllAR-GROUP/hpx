@@ -16,7 +16,7 @@ hpx_include(Message
 macro(add_hpx_library name)
   # retrieve arguments
   hpx_parse_arguments(${name}
-    "SOURCES;HEADERS;DEPENDENCIES;INI" "ESSENTIAL;NOLIBS" ${ARGN})
+    "SOURCES;HEADERS;DEPENDENCIES;INI;FOLDER" "ESSENTIAL;NOLIBS" ${ARGN})
 
   hpx_print_list("DEBUG" "add_library.${name}" "Sources for ${name}" ${name}_SOURCES)
   hpx_print_list("DEBUG" "add_library.${name}" "Headers for ${name}" ${name}_HEADERS)
@@ -74,16 +74,21 @@ macro(add_hpx_library name)
     RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL}
     RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO})
 
+  if(${name}_FOLDER)
+    set_target_properties(${name}_lib PROPERTIES FOLDER ${${name}_FOLDER})
+  endif()
 
   set_property(TARGET ${name}_lib APPEND
                PROPERTY COMPILE_DEFINITIONS "HPX_EXPORTS")
 
-  hpx_mangle_name(install_target ${name}_lib)
+  if(NOT HPX_NO_INSTALL)
+    hpx_mangle_name(install_target ${name}_lib)
 
-  hpx_library_install(${install_target})
+    hpx_library_install(${install_target})
 
-  foreach(target ${${name}_INI})
-    hpx_ini_install(${install_target} ${target})
-  endforeach()
+    foreach(target ${${name}_INI})
+      hpx_ini_install(${install_target} ${target})
+    endforeach()
+  endif()
 endmacro()
 

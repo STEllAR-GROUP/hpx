@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Hartmut Kaiser
+# Copyright (c) 2007-2012 Hartmut Kaiser
 # Copyright (c)      2011 Bryce Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -42,5 +42,6 @@ source_group("Header Files\\Server" FILES ${server_headers})
 ###############################################################################
 add_hpx_component(remote_object
   SOURCES ${sources}
-  HEADERS ${headers})
+  HEADERS ${headers}
+  FOLDER "Core")
 

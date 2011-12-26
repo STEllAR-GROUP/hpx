@@ -14,7 +14,8 @@ set(hplmatrex_SOURCES
 
 add_hpx_component(hplmatrex
     SOURCES ${hplmatrex_SOURCES}
-    HEADERS ${hplmatrex_HEADERS})
+    HEADERS ${hplmatrex_HEADERS}
+    FOLDER "Examples/HplPx")
 
 set(lublock_HEADERS
     lublock.hpp
@@ -26,5 +27,6 @@ set(lublock_SOURCES
 
 add_hpx_component(lublock
     SOURCES ${lublock_SOURCES}
-    HEADERS ${lublock_HEADERS})
+    HEADERS ${lublock_HEADERS}
+    FOLDER "Examples/HplPx")
 

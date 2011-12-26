@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Hartmut Kaiser
+# Copyright (c) 2007-2012 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,7 +21,8 @@ foreach(subdir ${subdirs})
   # add example executable
   add_hpx_executable(${subdir}_client
     SOURCES ${sources}
-    DEPENDENCIES ${subdir}_component)
+    DEPENDENCIES ${subdir}_component
+    FOLDER "Examples/Quickstart/${subdir}")
 
   # add a custom target for this example
   add_hpx_pseudo_target(examples.accumulator.${subdir})

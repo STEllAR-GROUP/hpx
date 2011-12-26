@@ -46,7 +46,8 @@ foreach(benchmark ${benchmarks})
   # add example executable
   add_hpx_executable(${benchmark}
                      SOURCES ${sources}
-                     ${${benchmark}_FLAGS})
+                     ${${benchmark}_FLAGS}
+                     FOLDER "Benchmarks/${benchmark}")
 
   # add a custom target for this example
   add_hpx_pseudo_target(tests.performance.${benchmark})
@@ -61,9 +62,10 @@ foreach(benchmark ${benchmarks})
 endforeach()
 
 
-add_hpx_executable(util.function
+add_hpx_executable(util_function
                    SOURCES util/function.cpp
-                   ${util_function_FLAGS})
+                   ${util_function_FLAGS}
+                   FOLDER "Benchmarks/util_function")
 
 add_hpx_pseudo_target(tests.performance.util.function)
 

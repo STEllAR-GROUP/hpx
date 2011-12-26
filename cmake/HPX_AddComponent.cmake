@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2011 Hartmut Kaiser
+# Copyright (c) 2007-2012 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,7 +15,7 @@ hpx_include(Message
 macro(add_hpx_component name)
   # retrieve arguments
   hpx_parse_arguments(${name}
-    "SOURCES;HEADERS;DEPENDENCIES;INI" "ESSENTIAL;NOLIBS" ${ARGN})
+    "SOURCES;HEADERS;DEPENDENCIES;INI;FOLDER" "ESSENTIAL;NOLIBS" ${ARGN})
 
   hpx_print_list("DEBUG" "add_component.${name}" "Sources for ${name}" ${name}_SOURCES)
   hpx_print_list("DEBUG" "add_component.${name}" "Headers for ${name}" ${name}_HEADERS)
@@ -70,18 +70,24 @@ macro(add_hpx_component name)
     RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL}
     RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO})
 
+  if(${name}_FOLDER)
+    set_target_properties(${name}_component PROPERTIES FOLDER ${${name}_FOLDER})
+  endif()
+
   set_property(TARGET ${name}_component APPEND
                PROPERTY COMPILE_DEFINITIONS
                "HPX_COMPONENT_NAME=${name}"
                "HPX_COMPONENT_STRING=\"${name}\""
                "HPX_COMPONENT_EXPORTS")
 
-  hpx_mangle_name(install_target ${name}_component)
+  if(NOT HPX_NO_INSTALL)
+    hpx_mangle_name(install_target ${name}_component)
 
-  hpx_library_install(${install_target})
+    hpx_library_install(${install_target})
 
-  foreach(target ${${name}_INI})
-    hpx_ini_install(${install_target} ${target})
-  endforeach()
+    foreach(target ${${name}_INI})
+      hpx_ini_install(${install_target} ${target})
+    endforeach()
+  endif()
 endmacro()
 

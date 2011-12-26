@@ -14,5 +14,6 @@ set(smphplmatrex_SOURCES
 
 add_hpx_component(smphplmatrex
     SOURCES ${smphplmatrex_SOURCES}
-    HEADERS ${smphplmatrex_HEADERS})
+    HEADERS ${smphplmatrex_HEADERS}
+    FOLDER "Examples/HplPx")
 

@@ -12,11 +12,13 @@ foreach(type ${types})
   source_group("Source Files" FILES ${type}_object_semaphore_client.cpp)
 
   add_hpx_component(${type}_object_semaphore
-    SOURCES ${type}_object_semaphore/${type}_object_semaphore.cpp)
+    SOURCES ${type}_object_semaphore/${type}_object_semaphore.cpp
+    FOLDER "Examples/ObjectSemaphore")
 
   add_hpx_executable(${type}_object_semaphore_client
     SOURCES ${type}_object_semaphore_client.cpp
-    DEPENDENCIES ${type}_object_semaphore_component)
+    DEPENDENCIES ${type}_object_semaphore_component
+    FOLDER "Examples/ObjectSemaphore")
 
   add_hpx_pseudo_target(examples.object_semaphore.${type}_object_semaphore)
 

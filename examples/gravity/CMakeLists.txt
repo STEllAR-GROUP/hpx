@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2010 Hartmut Kaiser
+# Copyright (c) 2007-2012 Hartmut Kaiser
 # Copyright (c) 2009-2010 Matt Anderson
 # Copyright (c) 2011      Bryce Lelbach
 # Copyright (c) 2011      Adrian Serio
@@ -22,7 +22,8 @@ source_group("Source Files" FILES ${sources})
 add_hpx_executable(gravity_hpx
   MODULE gravity_module
   SOURCES ${sources}
-  DEPENDENCIES ${dependencies})
+  DEPENDENCIES ${dependencies}
+  FOLDER "Examples/Gravity")
 
 # add a dependency to the pseudo-target
 add_hpx_pseudo_target(examples.gravity_hpx)

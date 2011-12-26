@@ -9,7 +9,9 @@ set(tools
 set(cpu_features NOLIBS DEPENDENCIES ${BOOST_program_options_LIBRARY})
 
 foreach(tool ${tools})
-  add_hpx_executable(${tool} SOURCES ${tool}.cpp ${${tool}})
+  add_hpx_executable(${tool} 
+    SOURCES ${tool}.cpp ${${tool}}
+    FOLDER "Tools/${tool}")
   add_hpx_pseudo_dependencies(tools ${tool}_exe)
 endforeach()
 

@@ -34,7 +34,8 @@ foreach(subdir ${subdirs})
   add_hpx_executable(${subdir}_client
     MODULE point_geometry
     SOURCES ${sources}
-    DEPENDENCIES ${subdir}_component ${dependencies})
+    DEPENDENCIES ${subdir}_component ${dependencies}
+    FOLDER "Examples/Geometry/${subdir}")
 
   # add a custom target for this example
   add_hpx_pseudo_target(examples.geometry.${subdir})

@@ -47,5 +47,6 @@ source_group("Header Files" FILES ${common_headers})
 add_hpx_component(point
     MODULE gtc
     SOURCES ${sources}
-    HEADERS ${headers})
+    HEADERS ${headers}
+    FOLDER "Examples/GTC")
 

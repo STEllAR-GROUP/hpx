@@ -44,7 +44,8 @@ source_group("Source Files" FILES ${sources})
 add_hpx_executable(adaptive1d
   MODULE adaptive1d_module
   SOURCES ${sources}
-  DEPENDENCIES ${dependencies})
+  DEPENDENCIES ${dependencies}
+  FOLDER "Examples/Adaptive1d")
 
 # add a dependency to the pseudo-target
 add_hpx_pseudo_dependencies(examples.adaptive1d adaptive1d_exe)

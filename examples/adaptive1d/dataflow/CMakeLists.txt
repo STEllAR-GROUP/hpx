@@ -57,5 +57,6 @@ add_hpx_component(adaptive1d_dataflow
   SOURCES ${sources}
   HEADERS ${headers}
   DEPENDENCIES adaptive1d_stencil_component
-               distributing_factory_component)
+               distributing_factory_component
+  FOLDER "Examples/Adaptive1d")
 

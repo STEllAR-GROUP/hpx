@@ -20,11 +20,11 @@ set(bright_future_programs
    )
 
 if(HPX_CXX11_LAMBDAS)
-set(bright_future_programs ${bright_future_programs}
+  set(bright_future_programs ${bright_future_programs}
         gs_hpx_distributed
         dataflow_overhead
         dataflow_overhead2
-   )
+      )
 endif()
 
 add_hpx_component(
@@ -32,7 +32,8 @@ add_hpx_component(
     SOURCES server/remote_lse.cpp
     HEADERS server/remote_lse.hpp grid.hpp
     DEPENDENCIES iostreams_component distributing_factory_component
-#${GOOGLE_PERFTOOLS_LIBRARY}
+    FOLDER "Examples/BrightFuture"
+#  ${GOOGLE_PERFTOOLS_LIBRARY}
 )
 
 add_hpx_component(
@@ -40,7 +41,8 @@ add_hpx_component(
     SOURCES dataflow/dataflow_component.cpp
     HEADERS dataflow/dataflow.hpp
     DEPENDENCIES iostreams_component
-#${GOOGLE_PERFTOOLS_LIBRARY}
+    FOLDER "Examples/BrightFuture"
+#  ${GOOGLE_PERFTOOLS_LIBRARY}
 )
 
 set(gs_single_sources gs.cpp)
@@ -51,23 +53,26 @@ set(gs_hpx_grid_ro_sources gs.cpp)
 set(gs_hpx_distributed_sources gs.cpp)
 
 set(remote_functions_FLAGS DEPENDENCIES iostreams_component)
-set(dataflow_test_FLAGS DEPENDENCIES iostreams_component bright_future_dataflow_component
-#${GOOGLE_PERFTOOLS_LIBRARY}
-        )
+set(dataflow_test_FLAGS 
+  DEPENDENCIES iostreams_component bright_future_dataflow_component
+#  ${GOOGLE_PERFTOOLS_LIBRARY}
+  )
 set(remote_object_FLAGS DEPENDENCIES remote_object_component iostreams_component)
 set(vector_root_finder_FLAGS DEPENDENCIES iostreams_component)
 set(gs_single_FLAGS DEPENDENCIES iostreams_component)
 #set(gs_hpx_FLAGS DEPENDENCIES gs_hpx_component iostreams_component)
 set(gs_hpx_blocked_FLAGS DEPENDENCIES gs_hpx_component iostreams_component)
-set(gs_hpx_blocked_df_FLAGS DEPENDENCIES gs_hpx_component bright_future_dataflow_component iostreams_component
-#${GOOGLE_PERFTOOLS_LIBRARY}
+set(gs_hpx_blocked_df_FLAGS 
+  DEPENDENCIES gs_hpx_component bright_future_dataflow_component iostreams_component
+#  ${GOOGLE_PERFTOOLS_LIBRARY}
         )
 if(HPX_CXX11_LAMBDAS)
-set(gs_hpx_distributed_FLAGS DEPENDENCIES gs_hpx_component bright_future_dataflow_component iostreams_component
-#${GOOGLE_PERFTOOLS_LIBRARY}
-        )
-set(dataflow_overhead_FLAGS DEPENDENCIES bright_future_dataflow_component iostreams_component)
-set(dataflow_overhead2_FLAGS DEPENDENCIES bright_future_dataflow_component iostreams_component)
+  set(gs_hpx_distributed_FLAGS 
+    DEPENDENCIES gs_hpx_component bright_future_dataflow_component iostreams_component
+#    ${GOOGLE_PERFTOOLS_LIBRARY}
+    )
+  set(dataflow_overhead_FLAGS DEPENDENCIES bright_future_dataflow_component iostreams_component)
+  set(dataflow_overhead2_FLAGS DEPENDENCIES bright_future_dataflow_component iostreams_component)
 endif()
 set(gs_hpx_grid_ro_FLAGS DEPENDENCIES remote_object_component iostreams_component)
 
@@ -81,7 +86,8 @@ foreach(bright_future_program ${bright_future_programs})
   add_hpx_executable(${bright_future_program}
                      MODULE bright_future
                      SOURCES ${sources}
-                     ${${bright_future_program}_FLAGS})
+                     ${${bright_future_program}_FLAGS}
+                     FOLDER "Examples/BrightFuture")
 
   # add a custom target for this example
   add_hpx_pseudo_target(examples.bright_future.${bright_future_program})
@@ -104,6 +110,7 @@ set_target_properties(gs_single_exe PROPERTIES LINK_FLAGS -fopenmp)
 #    MODULE bright_future
 #    SOURCES gs.cpp
 #    DEPENDENCIES iostreams_component gs_hpx_component
+#    FOLDER "Examples/BrightFuture"
 #)
 
 # add a custom target for this example

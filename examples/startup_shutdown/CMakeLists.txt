@@ -19,5 +19,6 @@ source_group("Header Files\\Server" FILES ${server_headers})
 ###############################################################################
 add_hpx_component(startup_shutdown
   SOURCES ${server_sources}
-  HEADERS ${server_headers})
+  HEADERS ${server_headers}
+  FOLDER "Examples/StartupShutdown")
 

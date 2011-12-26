@@ -28,5 +28,6 @@ add_hpx_component(dataflow_c
   SOURCES ${sources}
   HEADERS ${headers}
   DEPENDENCIES dataflow_c_test_lib
-               dataflow_mesh_component)
+               dataflow_mesh_component
+  FOLDER "Examples/AMR")
 

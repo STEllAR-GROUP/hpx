@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2011 Hartmut Kaiser
+# Copyright (c) 2007-2012 Hartmut Kaiser
 # Copyright (c) 2007-2008 Chirag Dekate
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2011 Vinay C Amatya
@@ -9,6 +9,17 @@
 # We require at least CMake V2.8.4
 cmake_minimum_required(VERSION 2.8.4 FATAL_ERROR)
 
+################################################################################
+# project metadata
+################################################################################
+project(hpx CXX)
+
+set(HPX_MAJOR_VERSION 0)
+set(HPX_MINOR_VERSION 9)
+set(HPX_PATCH_LEVEL   0)
+set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
+set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
+
 if(MSVC)
  set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 endif()
@@ -17,11 +28,16 @@ endif()
 # Build type
 ################################################################################
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Configuration type" FORCE)
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Configuration type (one of Debug,RelWithDebInfo,Release)," FORCE)
 endif()
 
-# FIXME: should be possible to generate working versions for all configurations
-set(CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}" CACHE STRING "Configuration types" FORCE)
+if(NOT CMAKE_CONFIGURATION_TYPES)
+  if(MSVC)
+    set(CMAKE_CONFIGURATION_TYPES "Debug;Release;MinSizeRel;RelWithDebInfo") # CACHE STRING "Configuration types" FORCE)
+  else()
+    set(CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}" CACHE STRING "Configuration types" FORCE)
+  endif()
+endif()
 
 ################################################################################
 # C++ overrides
@@ -34,17 +50,6 @@ set(CMAKE_USER_MAKE_RULES_OVERRIDE_CXX
 ################################################################################
 set(CMAKE_USER_MAKE_RULES_OVERRIDE_Fortran
     "${CMAKE_SOURCE_DIR}/cmake/HPX_FortranOverrides.cmake")
-
-################################################################################
-# project metadata
-################################################################################
-project(hpx CXX)
-
-set(HPX_MAJOR_VERSION 1)
-set(HPX_MINOR_VERSION 0)
-set(HPX_PATCH_LEVEL   0)
-set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
-set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
 
 ################################################################################
 # CMake configuration
@@ -152,8 +157,12 @@ if(GCC_VERSION)
   if(040400 GREATER ${GCC_VERSION})
     hpx_error("gcc_config" "GCC 4.4.x or higher is required.")
   endif()
-elseif(NOT MSVC10 OR NOT CMAKE_CL_64)
-  hpx_error("msvc_config" "MSVC x64 2010 or higher is required.")
+elseif(MSVC) 
+  if(NOT MSVC10)
+    hpx_error("msvc_config" "MSVC x64 2010 or higher is required.")
+  elseif(NOT CMAKE_CL_64)
+    hpx_warn("msvc_config" "MSVC 2010 (32Bit) will compile but will fail running larger applications because of limitations in the Windows OS.")
+  endif()
 endif()
 
 # Fortran
@@ -174,25 +183,27 @@ include(HPX_SVNRevision)
 ################################################################################
 # installation configuration
 ################################################################################
-# for backwards compatibility
-if(CMAKE_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "${CMAKE_PREFIX}")
-endif()
-
-if(NOT CMAKE_INSTALL_PREFIX)
-  if(UNIX)
-    set(CMAKE_INSTALL_PREFIX "/opt/hpx" CACHE PATH "Prefix prepended to install directories.")
-  else()
-    set(CMAKE_INSTALL_PREFIX "C:/Program Files/hpx" CACHE PATH "Prefix prepended to install directories.")
-  endif()
-endif()
-
-set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}"
-  CACHE PATH "Where to install ${PROJECT_NAME} (default: /opt/hpx for POSIX, C:/Program Files/hpx for Windows)." FORCE)
-
-hpx_info("install" "Install root is ${CMAKE_INSTALL_PREFIX}.")
-
 set(HPX_NO_INSTALL OFF CACHE BOOL "Run hpx applications without installing them")
+
+if(NOT HPX_NO_INSTALL)
+  # for backwards compatibility
+  if(CMAKE_PREFIX)
+    set(CMAKE_INSTALL_PREFIX "${CMAKE_PREFIX}")
+  endif()
+
+  if(NOT CMAKE_INSTALL_PREFIX)
+    if(UNIX)
+      set(CMAKE_INSTALL_PREFIX "/opt/hpx" CACHE PATH "Prefix prepended to install directories.")
+    else()
+      set(CMAKE_INSTALL_PREFIX "C:/Program Files/hpx" CACHE PATH "Prefix prepended to install directories.")
+    endif()
+  endif()
+
+  set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}"
+    CACHE PATH "Where to install ${PROJECT_NAME} (default: /opt/hpx for POSIX, C:/Program Files/hpx for Windows)." FORCE)
+
+  hpx_info("install" "Install root is ${CMAKE_INSTALL_PREFIX}.")
+endif()
 
 ################################################################################
 # HPX_PREFIX
@@ -211,6 +222,14 @@ endif()
 
 add_definitions("-DHPX_PREFIX=\"${HPX_PREFIX}\"")
 ################################################################################
+
+# Make sure the specified build type is valid
+if(NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug" OR 
+        "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo" OR
+        "${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel" OR
+        "${CMAKE_BUILD_TYPE}" STREQUAL "Release"))
+  hpx_error("build_type" "\"${CMAKE_BUILD_TYPE}\" is not a valid build type, must be Debug, Release, RelWithDebInfo, or MinSizeRel.")
+endif()
 
 if(MSVC)
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release/bin)
@@ -235,9 +254,11 @@ endif()
 # RPATH configuration
 ################################################################################
 set(CMAKE_SKIP_BUILD_RPATH TRUE)
-set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
-set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib/hpx:${CMAKE_BINARY_DIR}/bin")
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+if(NOT HPX_NO_INSTALL)
+  set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib/hpx:${CMAKE_BINARY_DIR}/bin")
+  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+endif()
 
 ################################################################################
 # C++11 configuration
@@ -298,15 +319,15 @@ endif()
 ################################################################################
 if(NOT HPX_STACK_SIZE)
   if(MSVC)
-    set(HPX_STACK_SIZE "0x4000" CACHE STRING "pxthread stack size" FORCE)
+    set(HPX_STACK_SIZE "0x4000" CACHE STRING "HPX-thread stack size" FORCE)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Debug" OR
      "CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
-    set(HPX_STACK_SIZE "0x10000" CACHE STRING "pxthread stack size" FORCE)
+    set(HPX_STACK_SIZE "0x10000" CACHE STRING "HPX-thread stack size" FORCE)
   else()
-    set(HPX_STACK_SIZE "0x10000" CACHE STRING "pxthread stack size" FORCE)
+    set(HPX_STACK_SIZE "0x10000" CACHE STRING "HPX-thread stack size" FORCE)
   endif()
 else()
-  set(HPX_STACK_SIZE "${HPX_STACK_SIZE}" CACHE STRING "pxthread stack size" FORCE)
+  set(HPX_STACK_SIZE "${HPX_STACK_SIZE}" CACHE STRING "HPX-thread stack size" FORCE)
 endif()
 
 add_definitions(-DHPX_DEFAULT_STACK_SIZE=${HPX_STACK_SIZE})
@@ -324,7 +345,7 @@ endforeach()
 
 if(MSVC)
   add_definitions(-DHPX_BUILD_TYPE="$(Configuration)")
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
   set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -DNDEBUG -DBOOST_DISABLE_ASSERTS")
   set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -DNDEBUG -DBOOST_DISABLE_ASSERTS")
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG -DDBOOST_DISABLE_ASSERTS")
@@ -344,14 +365,11 @@ else()
     add_definitions(-DNDEBUG)
     add_definitions(-DBOOST_DISABLE_ASSERTS)
     add_definitions(-DHPX_BUILD_TYPE="release")
-  else()
-    hpx_error("build_type" "\"${CMAKE_BUILD_TYPE}\" is not a valid build type.")
   endif()
 endif()
 
 # Debug library postfix
 set(CMAKE_DEBUG_POSTFIX "d")
-#set(CMAKE_RELWITHDEBINFO_POSTFIX "d")
 
 ################################################################################
 # Utility configuration
@@ -421,11 +439,14 @@ if(MSVC)
     # Keep the frame pointer
     hpx_append_flag(-Oy- LANGUAGES CXX Fortran)
 
-    # Don't inline functions
-    hpx_append_flag(-Ob0 LANGUAGES CXX Fortran)
-
     # Use multi-threaded debug runtime
     hpx_append_flag(-MDd LANGUAGES CXX Fortran)
+
+    # enable minimal rebuild
+    hpx_append_flag(-Gm LANGUAGES CXX)
+
+    # basic runtime checks
+    hpx_append_flag(-RTC1 LANGUAGES CXX)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
     # Optimize for speed
     hpx_append_flag(-O2 LANGUAGES CXX Fortran)
@@ -443,10 +464,13 @@ if(MSVC)
     hpx_append_flag(-MD LANGUAGES CXX Fortran)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
     # Optimize for speed
-    hpx_append_flag(-O2 LANGUAGES CXX Fortran)
+    hpx_append_flag(-Ox LANGUAGES CXX Fortran)
 
     # Use multi-threaded runtime
     hpx_append_flag(-MD LANGUAGES CXX Fortran)
+
+    # Use full programm optimization (FPO)
+    hpx_append_flag(-GL LANGUAGES CXX Fortran)
   endif()
 
   # Exceptions
@@ -475,16 +499,16 @@ if(MSVC)
   ##############################################################################
   if(HPX_CXX11)
     # C++11 support
-    set(HPX_CXX11_RVALUE_REFERENCES ON CACHE STRING "cxx11_rvalue_references state.")
+    set(HPX_CXX11_RVALUE_REFERENCES ON CACHE BOOL "cxx11_rvalue_references state.")
     add_definitions(-DHPX_HAVE_CXX11_RVALUE_REFERENCES)
 
-    set(HPX_CXX11_LAMBDAS ON CACHE STRING "cxx11_lambdas state.")
+    set(HPX_CXX11_LAMBDAS ON CACHE BOOL "cxx11_lambdas state.")
     add_definitions(-DHPX_HAVE_CXX11_LAMBDAS)
 
-    set(HPX_CXX11_AUTO ON CACHE STRING "cxx11_auto state.")
+    set(HPX_CXX11_AUTO ON CACHE BOOL "cxx11_auto state.")
     add_definitions(-DHPX_HAVE_CXX11_AUTO)
 
-    set(HPX_CXX11_UNIQUE_PTR ON CACHE STRING "cxx11_std_unique_ptr state.")
+    set(HPX_CXX11_UNIQUE_PTR ON CACHE BOOL "cxx11_std_unique_ptr state.")
     add_definitions(-DHPX_HAVE_CXX11_STD_UNIQUE_PTR)
     add_definitions(-DBOOST_LOCKFREE_HAVE_CXX11_UNIQUE_PTR)
   endif()
@@ -716,7 +740,7 @@ else()
 
   hpx_use_flag_if_available(-pthread)
 
-  set(HPX_GOOGLE_PERFTOOLS ON CACHE STRING "Compile HPX with google perftools" FORCE)
+  set(HPX_GOOGLE_PERFTOOLS ON CACHE BOOL "Compile HPX with google perftools" FORCE)
 
   if(HPX_GOOGLE_PERFTOOLS)
     find_package(HPX_GooglePerftools)
@@ -832,79 +856,81 @@ endif()
 ################################################################################
 # installation instructions
 ################################################################################
-install( # install all hpx header files
-  DIRECTORY hpx/
-  DESTINATION include/hpx
-  COMPONENT core
-  FILES_MATCHING PATTERN "*.hpp"
-  PATTERN ".svn" EXCLUDE
-  PATTERN ".git" EXCLUDE
-  PATTERN "CMakeFiles" EXCLUDE
-  PATTERN "CTestFiles" EXCLUDE)
+if(NOT HPX_NO_INSTALL)
+  install( # install all hpx header files
+    DIRECTORY hpx/
+    DESTINATION include/hpx
+    COMPONENT core
+    FILES_MATCHING PATTERN "*.hpp"
+    PATTERN ".svn" EXCLUDE
+    PATTERN ".git" EXCLUDE
+    PATTERN "CMakeFiles" EXCLUDE
+    PATTERN "CTestFiles" EXCLUDE)
 
-install( # install all hpx cmake utility files
-  DIRECTORY cmake/
-  DESTINATION share/hpx/cmake
-  COMPONENT core
-  PATTERN ".svn" EXCLUDE
-  PATTERN ".git" EXCLUDE)
+  install( # install all hpx cmake utility files
+    DIRECTORY cmake/
+    DESTINATION share/hpx/cmake
+    COMPONENT core
+    PATTERN ".svn" EXCLUDE
+    PATTERN ".git" EXCLUDE)
 
-install( # install hpx python scripts
-  DIRECTORY python/scripts/
-  DESTINATION bin
-  FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                   GROUP_READ GROUP_EXECUTE
-                   WORLD_READ WORLD_EXECUTE
-  COMPONENT core
-  FILES_MATCHING PATTERN "*.py"
-  PATTERN ".svn" EXCLUDE
-  PATTERN ".git" EXCLUDE)
+  install( # install hpx python scripts
+    DIRECTORY python/scripts/
+    DESTINATION bin
+    FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                     GROUP_READ GROUP_EXECUTE
+                     WORLD_READ WORLD_EXECUTE
+    COMPONENT core
+    FILES_MATCHING PATTERN "*.py"
+    PATTERN ".svn" EXCLUDE
+    PATTERN ".git" EXCLUDE)
 
-if(UNIX)
-  file(GLOB scripts "${CMAKE_SOURCE_DIR}/python/scripts/*.py")
-  foreach(script ${scripts})
-    get_filename_component(script_name ${script} NAME)
-    get_filename_component(script_name_we ${script} NAME_WE)
-    install(CODE
-      "set(bindir \"${CMAKE_INSTALL_PREFIX}/bin/\")
-       execute_process(
-         COMMAND \"\${CMAKE_COMMAND}\" -E create_symlink
-                 \"${script_name}\" \"${script_name_we}\"
-         WORKING_DIRECTORY \"\${bindir}\")")
-  endforeach()
-endif()
+  if(UNIX)
+    file(GLOB scripts "${CMAKE_SOURCE_DIR}/python/scripts/*.py")
+    foreach(script ${scripts})
+      get_filename_component(script_name ${script} NAME)
+      get_filename_component(script_name_we ${script} NAME_WE)
+      install(CODE
+        "set(bindir \"${CMAKE_INSTALL_PREFIX}/bin/\")
+         execute_process(
+           COMMAND \"\${CMAKE_COMMAND}\" -E create_symlink
+                   \"${script_name}\" \"${script_name_we}\"
+           WORKING_DIRECTORY \"\${bindir}\")")
+    endforeach()
+  endif()
 
-install( # install hpx python module (TODO: this is a temporary hack)
-  DIRECTORY python/hpx
-  DESTINATION share/hpx/python
-  COMPONENT core
-  FILES_MATCHING PATTERN "*.py"
-  PATTERN ".svn" EXCLUDE
-  PATTERN ".git" EXCLUDE)
+  install( # install hpx python module (TODO: this is a temporary hack)
+    DIRECTORY python/hpx
+    DESTINATION share/hpx/python
+    COMPONENT core
+    FILES_MATCHING PATTERN "*.py"
+    PATTERN ".svn" EXCLUDE
+    PATTERN ".git" EXCLUDE)
 
-install( # install external dependencies
-  DIRECTORY external/atomic/boost
-            external/cache/boost
-            external/coroutine/boost
-            external/endian/boost
-            external/lockfree/boost
-            external/logging/boost
-            external/move/boost
-            external/plugin/boost
-            external/serialization/boost
-  DESTINATION include
-  COMPONENT core
-  FILES_MATCHING PATTERN "*.hpp"
-  PATTERN ".svn" EXCLUDE
-  PATTERN ".git" EXCLUDE)
-
-if(HPX_INTERNAL_CHRONO AND ${BOOST_MINOR_VERSION} LESS 47)
-  install( # install Boost.Chrono headers if we're using our internal version
-    DIRECTORY external/chrono/boost
+  install( # install external dependencies
+    DIRECTORY external/atomic/boost
+              external/cache/boost
+              external/coroutine/boost
+              external/endian/boost
+              external/lockfree/boost
+              external/logging/boost
+              external/move/boost
+              external/plugin/boost
+              external/serialization/boost
     DESTINATION include
     COMPONENT core
     FILES_MATCHING PATTERN "*.hpp"
     PATTERN ".svn" EXCLUDE
     PATTERN ".git" EXCLUDE)
+
+  if(HPX_INTERNAL_CHRONO AND ${BOOST_MINOR_VERSION} LESS 47)
+    install( # install Boost.Chrono headers if we're using our internal version
+      DIRECTORY external/chrono/boost
+      DESTINATION include
+      COMPONENT core
+      FILES_MATCHING PATTERN "*.hpp"
+      PATTERN ".svn" EXCLUDE
+      PATTERN ".git" EXCLUDE)
+  endif()
 endif()
 

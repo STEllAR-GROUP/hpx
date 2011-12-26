@@ -7,13 +7,15 @@
 # add component
 add_hpx_component(sine
   SOURCES sine.cpp server/sine.cpp
-  HEADERS server/sine.hpp)
+  HEADERS server/sine.hpp
+  FOLDER "Examples/PerformanceCounters/Sine")
 
 ###############################################################################
 # add example executable
 add_hpx_executable(sine_client
   SOURCES sine_client.cpp
-  DEPENDENCIES sine_component)
+  DEPENDENCIES sine_component
+  FOLDER "Examples/PerformanceCounters/Sine")
 
 # add a custom target for this example
 add_hpx_pseudo_target(examples.performance_counters.sine_client)

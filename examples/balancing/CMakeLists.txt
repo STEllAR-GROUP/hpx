@@ -17,7 +17,8 @@ foreach(example_program ${example_programs})
   # add example executable
   add_hpx_executable(${example_program}
                      SOURCES ${sources}
-                     ${${example_program}_FLAGS})
+                     ${${example_program}_FLAGS}
+                     FOLDER "Examples/Balancing/${example_program}")
 
   # add a custom target for this example
   add_hpx_pseudo_target(examples.balancing.${example_program})

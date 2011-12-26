@@ -68,7 +68,8 @@ foreach(test ${tests})
   # add example executable
   add_hpx_executable(${test}
                      SOURCES ${sources}
-                     ${${test}_FLAGS})
+                     ${${test}_FLAGS}
+                     FOLDER "Tests/Correctness/AGAS/${test}")
 
   # add a custom target for this example
   add_hpx_pseudo_target(tests.correctness.agas.${test})

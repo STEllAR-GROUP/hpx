@@ -48,5 +48,6 @@ source_group("Header Files" FILES ${common_headers})
 add_hpx_component(point_geometry
     MODULE point_geometry
     SOURCES ${sources}
-    HEADERS ${headers})
+    HEADERS ${headers}
+    FOLDER "Examples/Geometry/point_geometry")
 

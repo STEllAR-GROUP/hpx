@@ -56,5 +56,6 @@ add_hpx_component(dataflow_mesh
   MODULE dataflow_mesh
   SOURCES ${sources}
   HEADERS ${headers}
-  DEPENDENCIES distributing_factory_component)
+  DEPENDENCIES distributing_factory_component
+  FOLDER "Examples/AMR")
 

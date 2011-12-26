@@ -48,5 +48,6 @@ add_hpx_component(bfs
     MODULE bfs
     SOURCES ${sources}
     HEADERS ${headers}
-    DEPENDENCIES iostreams_component)
+    DEPENDENCIES iostreams_component
+    FOLDER "Examples/Bfs")
 

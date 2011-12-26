@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Hartmut Kaiser
+# Copyright (c) 2007-2012 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Adelstein-Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -31,7 +31,8 @@ foreach(example_program ${example_programs})
   # add example executable
   add_hpx_executable(${example_program}
                      SOURCES ${sources}
-                     ${${example_program}_FLAGS})
+                     ${${example_program}_FLAGS}
+                     FOLDER "Examples/Quickstart/${example_program}")
 
   # add a custom target for this example
   add_hpx_pseudo_target(examples.quickstart.${example_program})

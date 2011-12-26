@@ -20,7 +20,8 @@ foreach(subdir ${subdirs})
   # add example executable
   add_hpx_executable(${subdir}_client
     SOURCES ${sources}
-    DEPENDENCIES ${subdir}_component)
+    DEPENDENCIES ${subdir}_component
+    FOLDER "Examples/Throttle")
 
   # add a custom target for this example
   add_hpx_pseudo_target(examples.throttle.${subdir})
@@ -34,7 +35,9 @@ foreach(subdir ${subdirs})
                               ${subdir}_client_exe)
 endforeach()
 
-add_hpx_executable(spin SOURCES spin.cpp)
+add_hpx_executable(spin 
+  SOURCES spin.cpp
+  FOLDER "Examples/Throttle")
 
 # add a custom target for this example
 add_hpx_pseudo_target(examples.throttle.spin)

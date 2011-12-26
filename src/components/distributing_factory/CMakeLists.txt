@@ -41,5 +41,6 @@ source_group("Header Files\\Server" FILES ${server_headers})
 ###############################################################################
 add_hpx_component(distributing_factory
   SOURCES ${sources}
-  HEADERS ${headers})
+  HEADERS ${headers}
+  FOLDER "Core")
 

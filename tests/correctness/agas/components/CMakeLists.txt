@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Hartmut Kaiser
+# Copyright (c) 2007-2012 Hartmut Kaiser
 # Copyright (c)      2011 Bryce Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,10 +7,12 @@
 add_hpx_component(simple_refcnt_checker
   SOURCES simple_refcnt_checker.cpp
           server/simple_refcnt_checker.cpp
-  DEPENDENCIES iostreams_component)
+  DEPENDENCIES iostreams_component
+  FOLDER "Tests/Correctness/AGAS")
 
 add_hpx_component(managed_refcnt_checker
   SOURCES managed_refcnt_checker.cpp
           server/managed_refcnt_checker.cpp
-  DEPENDENCIES iostreams_component)
+  DEPENDENCIES iostreams_component
+  FOLDER "Tests/Correctness/AGAS")
 

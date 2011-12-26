@@ -29,17 +29,19 @@ source_group("Source Files\\Client" FILES ${sources})
 
 add_hpx_component(nqueen
   SOURCES ${client_sources}
-  HEADERS ${headers})
+  HEADERS ${headers}
+  FOLDER "Examples/NQueen")
 
-if(MSVC)
-  set_property(TARGET nqueen_component APPEND
-    PROPERTY COMPILE_FLAGS
-    "-bigobj")
-endif()
+#if(MSVC)
+#  set_property(TARGET nqueen_component APPEND
+#    PROPERTY COMPILE_FLAGS
+#    "-bigobj")
+#endif()
 
 add_hpx_executable(nqueen_client
   SOURCES ${sources}
-  DEPENDENCIES nqueen_component)
+  DEPENDENCIES nqueen_component
+  FOLDER "Examples/NQueen")
 
 # add dependencies to pseudo-target
 add_hpx_pseudo_dependencies(examples.nqueen nqueen_client_exe)
