@@ -28,15 +28,11 @@ endif()
 # Build type
 ################################################################################
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Configuration type (one of Debug,RelWithDebInfo,Release)," FORCE)
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Configuration type (one of Debug,RelWithDebInfo,Release,MinSizeRel)," FORCE)
 endif()
 
-if(NOT CMAKE_CONFIGURATION_TYPES)
-  if(MSVC)
-    set(CMAKE_CONFIGURATION_TYPES "Debug;Release;MinSizeRel;RelWithDebInfo") # CACHE STRING "Configuration types" FORCE)
-  else()
-    set(CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}" CACHE STRING "Configuration types" FORCE)
-  endif()
+if(NOT MSVC AND NOT CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}" CACHE STRING "Configuration types" FORCE)
 endif()
 
 ################################################################################
@@ -208,10 +204,11 @@ endif()
 ################################################################################
 # HPX_PREFIX
 # If you want to run hpx applications without installing them, set this to
-# ${CMAKE_BINARY_DIR}/bin when using Makefiles or
-# ${CMAKE_BINARY_DIR}/bin/$(Configuration) when using Visual Studio
+# ${CMAKE_BINARY_DIR} when using Makefiles or
+# ${CMAKE_BINARY_DIR}/$(Configuration) when using Visual Studio
 if(HPX_NO_INSTALL)
   if(MSVC)
+      set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/$(Configuration)")
       set(HPX_PREFIX "${CMAKE_BINARY_DIR}/$(Configuration)" CACHE PATH "Where the hpx applications look for component dlls")
   else()
       set(HPX_PREFIX "${CMAKE_BINARY_DIR}" CACHE PATH "Where the hpx applications look for component dlls")
@@ -224,7 +221,8 @@ add_definitions("-DHPX_PREFIX=\"${HPX_PREFIX}\"")
 ################################################################################
 
 # Make sure the specified build type is valid
-if(NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug" OR 
+if(NOT MSVC AND
+   NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug" OR 
         "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo" OR
         "${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel" OR
         "${CMAKE_BUILD_TYPE}" STREQUAL "Release"))
