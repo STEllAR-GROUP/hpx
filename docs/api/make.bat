@@ -1,5 +1,10 @@
 @ECHO OFF
 
+rem Copyright (c) 2011 Bryce Lelbach
+rem
+rem Distributed under the Boost Software License, Version 1.0. (See accompanying
+rem file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
+
 REM Command file for Sphinx documentation
 
 set SPHINXDIR=%PYTHON_ROOT%/scripts
