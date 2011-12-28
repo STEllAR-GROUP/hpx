@@ -55,6 +55,7 @@ namespace bfs { namespace server
         /// Traverse the graph. 
         std::vector<std::size_t> traverse(std::size_t level, std::size_t parent,std::size_t edge);
         std::vector<nodedata> depth_traverse(std::size_t level,std::size_t parent,std::size_t edge);
+        std::vector<nodedata> unlocked_depth_traverse(std::size_t level,std::size_t parent,std::size_t edge);
 
 
         std::size_t get_parent(std::size_t edge);

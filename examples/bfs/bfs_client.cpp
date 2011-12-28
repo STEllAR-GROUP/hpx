@@ -398,7 +398,7 @@ int main(int argc, char* argv[])
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()
-        ("grainsize", value<std::size_t>()->default_value(500),
+        ("grainsize", value<std::size_t>()->default_value(10000),
             "the grainsize of the components")
         ("max-num-neighbors", value<std::size_t>()->default_value(20),
             "the maximum number of neighbors")

@@ -103,11 +103,12 @@ namespace bfs { namespace server
         }
     }
 
-    // depth traverse
-    std::vector<nodedata> point::depth_traverse(std::size_t level,std::size_t parent,std::size_t edge)
+    // eliminate a lock
+    std::vector<nodedata> point::unlocked_depth_traverse(std::size_t level,std::size_t parent,std::size_t edge)
     {
-        hpx::lcos::local_mutex::scoped_lock l(mtx_);
         std::vector<nodedata> result,lresult;
+        //result.reserve(10000);
+        //lresult.reserve(10000);
 
         // verify the edge is local first
         if ( index_(edge) == idx_ ) { 
@@ -120,8 +121,44 @@ namespace bfs { namespace server
             if ( level < max_levels_ ) {
               for (std::size_t i=0;i<neighbors_[mapping].size();i++) {
                 std::size_t neighbor = neighbors_[mapping][i];
-                hpx::util::unlock_the_lock<hpx::lcos::local_mutex::scoped_lock> ul(l); 
-                lresult = depth_traverse(level+1,edge,neighbor);
+                lresult = unlocked_depth_traverse(level+1,edge,neighbor);
+                result.insert(result.end(),lresult.begin(),lresult.end());
+              }
+            }
+          }
+        } else {
+          nodedata nonlocal;
+          nonlocal.neighbor = edge; 
+          nonlocal.parent = parent; 
+          nonlocal.level = level;
+          result.push_back(nonlocal);
+        }
+
+        return result;
+    }
+
+    // depth traverse
+    std::vector<nodedata> point::depth_traverse(std::size_t level,std::size_t parent,std::size_t edge)
+    {
+        hpx::lcos::local_mutex::scoped_lock l(mtx_);
+        std::vector<nodedata> result,lresult;
+        //result.reserve(10000);
+        //lresult.reserve(10000);
+
+        // verify the edge is local first
+        if ( index_(edge) == idx_ ) { 
+          std::size_t mapping = mapping_(edge);
+          if ( visited_[mapping] == false || level_[mapping] > level ) {
+            visited_[mapping] = true;
+            parent_[mapping] = parent;
+            level_[mapping] = level; 
+            // search all neighbors local to this component to the max_levels depth
+            if ( level < max_levels_ ) {
+              for (std::size_t i=0;i<neighbors_[mapping].size();i++) {
+                std::size_t neighbor = neighbors_[mapping][i];
+                //hpx::util::unlock_the_lock<hpx::lcos::local_mutex::scoped_lock> ul(l); 
+                //lresult = depth_traverse(level+1,edge,neighbor);
+                lresult = unlocked_depth_traverse(level+1,edge,neighbor);
                 result.insert(result.end(),lresult.begin(),lresult.end());
               }
             }
