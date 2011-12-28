@@ -634,7 +634,7 @@ else()
   hpx_use_flag_if_available(-Werror=return-type)
 
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    if(040400 LESS ${GCC_VERSION})
+    if(040404 LESS ${GCC_VERSION})
       # Uninitialized variables are bad
       hpx_use_flag_if_available(-Werror=uninitialized)
     endif()
