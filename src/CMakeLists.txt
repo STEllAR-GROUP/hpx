@@ -149,10 +149,18 @@ set_target_properties(hpx_serialization PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL}
   RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO})
 
-target_link_libraries(hpx_serialization
+set(hpx_serialization_lib_dependencies
   ${hpx_MALLOC_LIBRARY}
-  ${BOOST_serialization_LIBRARY}
-  ${BOOST_system_LIBRARY})
+  ${BOOST_serialization_LIBRARY})
+
+if(NOT MSVC)
+  set(hpx_serialization_lib_dependencies
+      ${hpx_serialization_lib_dependencies}
+      ${BOOST_system_LIBRARY})
+endif()
+
+target_link_libraries(hpx_serialization
+  ${hpx_serialization_lib_dependencies})
 
 hpx_mangle_name(name hpx_serialization)
 
