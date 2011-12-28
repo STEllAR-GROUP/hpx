@@ -155,7 +155,7 @@ if(GCC_VERSION)
   if(040400 GREATER ${GCC_VERSION})
     hpx_error("gcc_config" "GCC 4.4.x or higher is required.")
   endif()
-elseif(MSVC) 
+elseif(MSVC)
   if(NOT MSVC10)
     hpx_error("msvc_config" "MSVC x64 2010 or higher is required.")
   elseif(NOT CMAKE_CL_64)
@@ -224,7 +224,7 @@ add_definitions("-DHPX_PREFIX=\"${HPX_PREFIX}\"")
 
 # Make sure the specified build type is valid
 if(NOT MSVC AND
-   NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug" OR 
+   NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug" OR
         "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo" OR
         "${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel" OR
         "${CMAKE_BUILD_TYPE}" STREQUAL "Release"))
@@ -633,8 +633,12 @@ else()
   # in GCC.
   hpx_use_flag_if_available(-Werror=return-type)
 
-  # Uninitialized variables are bad
-  hpx_use_flag_if_available(-Werror=uninitialized)
+  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    if(040400 LESS ${GCC_VERSION})
+      # Uninitialized variables are bad
+      hpx_use_flag_if_available(-Werror=uninitialized)
+    endif()
+  endif()
 
   # Show the flags that toggle each warning
   hpx_use_flag_if_available(-fdiagnostics-show-option LANGUAGES CXX Fortran)
