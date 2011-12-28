@@ -79,7 +79,7 @@ macro(add_hpx_library name)
   endif()
 
   set_property(TARGET ${name}_lib APPEND
-               PROPERTY COMPILE_DEFINITIONS "HPX_EXPORTS")
+               PROPERTY COMPILE_DEFINITIONS "HPX_LIBRARY_EXPORTS")
 
   if(NOT HPX_NO_INSTALL)
     hpx_mangle_name(install_target ${name}_lib)
