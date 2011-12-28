@@ -633,13 +633,6 @@ else()
   # in GCC.
   hpx_use_flag_if_available(-Werror=return-type)
 
-  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    if(040404 LESS ${GCC_VERSION})
-      # Uninitialized variables are bad
-      hpx_use_flag_if_available(-Werror=uninitialized)
-    endif()
-  endif()
-
   # Show the flags that toggle each warning
   hpx_use_flag_if_available(-fdiagnostics-show-option LANGUAGES CXX Fortran)
 
@@ -648,6 +641,9 @@ else()
   if(040600 LESS ${GCC_VERSION} OR 040600 EQUAL ${GCC_VERSION})
     hpx_use_flag_if_available(-Wno-unused-but-set-parameter)
     hpx_use_flag_if_available(-Wno-unused-but-set-variable)
+
+    # Uninitialized variables are bad, earlier compilers issue spurious warnings
+    hpx_use_flag_if_available(-Werror=uninitialized)
   endif()
 
   # Silence warning about __sync_fetch_and_nand changing semantics
