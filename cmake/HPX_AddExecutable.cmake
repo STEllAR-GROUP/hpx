@@ -23,7 +23,7 @@ macro(add_hpx_executable name)
 
   # add the executable build target
   if(NOT MSVC)
-    if(${name}_ESSENTIAL)
+    if(${${name}_ESSENTIAL})
       add_executable(${name}_exe
         ${${name}_SOURCES} ${${name}_HEADERS})
     else()
@@ -54,7 +54,7 @@ macro(add_hpx_executable name)
   endif()
 
   # linker instructions
-  if(NOT ${name}_NOLIBS)
+  if(NOT ${${name}_NOLIBS})
     target_link_libraries(${name}_exe
       ${${name}_DEPENDENCIES}
       ${hpx_LIBRARIES}

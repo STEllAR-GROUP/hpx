@@ -23,7 +23,7 @@ macro(add_hpx_component name)
   hpx_print_list("DEBUG" "add_component.${name}" "Configuration files for ${name}" ${name}_INI)
 
   if(NOT MSVC)
-    if(${name}_ESSENTIAL)
+    if(${${name}_ESSENTIAL})
       add_library(${name}_component SHARED
         ${${name}_SOURCES} ${${name}_HEADERS})
     else()
@@ -31,7 +31,7 @@ macro(add_hpx_component name)
         ${${name}_SOURCES} ${${name}_HEADERS})
     endif()
   else()
-    if(${name}_ESSENTIAL)
+    if(${${name}_ESSENTIAL})
       add_library(${name}_component SHARED ${${name}_SOURCES})
     else()
       add_library(${name}_component SHARED EXCLUDE_FROM_ALL ${${name}_SOURCES})
@@ -41,7 +41,7 @@ macro(add_hpx_component name)
   set(prefix "")
   set(libs "")
 
-  if(NOT ${name}_NOLIBS)
+  if(NOT ${${name}_NOLIBS})
     set(libs ${hpx_LIBRARIES})
     set_property(TARGET ${name}_component APPEND
                  PROPERTY COMPILE_DEFINITIONS
