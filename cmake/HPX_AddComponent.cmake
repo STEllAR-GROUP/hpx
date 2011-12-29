@@ -10,17 +10,45 @@ include(HPX_Include)
 
 hpx_include(Message
             ParseArguments
-            Install)
+            Install
+            AddSourceGroup)
 
 macro(add_hpx_component name)
   # retrieve arguments
   hpx_parse_arguments(${name}
-    "SOURCES;HEADERS;DEPENDENCIES;INI;FOLDER" "ESSENTIAL;NOLIBS" ${ARGN})
+    "SOURCES;HEADERS;DEPENDENCIES;INI;FOLDER;HEADER_ROOT;SOURCE_ROOT" "ESSENTIAL;NOLIBS" ${ARGN})
 
   hpx_print_list("DEBUG" "add_component.${name}" "Sources for ${name}" ${name}_SOURCES)
   hpx_print_list("DEBUG" "add_component.${name}" "Headers for ${name}" ${name}_HEADERS)
   hpx_print_list("DEBUG" "add_component.${name}" "Dependencies for ${name}" ${name}_DEPENDENCIES)
   hpx_print_list("DEBUG" "add_component.${name}" "Configuration files for ${name}" ${name}_INI)
+
+
+  if(${name}_SOURCE_ROOT)
+    add_hpx_library_sources(${name}_component
+      GLOB_RECURSE GLOBS "${${name}_SOURCE_ROOT}/*.cpp")
+
+    add_hpx_source_group(
+      NAME ${name}
+      CLASS "Source Files"
+      ROOT ${${name}_SOURCE_ROOT}
+      TARGETS ${${name}_component_SOURCES})
+
+    set(${name}_SOURCES ${${name}_component_SOURCES})
+  endif()
+
+  if(${name}_HEADER_ROOT)
+    add_hpx_library_headers(${name}_component
+      GLOB_RECURSE GLOBS "${${name}_HEADER_ROOT}/*.hpp")
+
+    add_hpx_source_group(
+      NAME ${name}
+      CLASS "Header Files"
+      ROOT ${${name}_HEADER_ROOT}
+      TARGETS ${${name}_component_HEADERS})
+
+    set(${name}_HEADERS ${${name}_component_HEADERS})
+  endif()
 
   if(NOT MSVC)
     if(${${name}_ESSENTIAL})
@@ -32,9 +60,11 @@ macro(add_hpx_component name)
     endif()
   else()
     if(${${name}_ESSENTIAL})
-      add_library(${name}_component SHARED ${${name}_SOURCES})
+      add_library(${name}_component SHARED
+        ${${name}_SOURCES} ${${name}_HEADERS})
     else()
-      add_library(${name}_component SHARED EXCLUDE_FROM_ALL ${${name}_SOURCES})
+      add_library(${name}_component SHARED EXCLUDE_FROM_ALL
+        ${${name}_SOURCES} ${${name}_HEADERS})
     endif()
   endif()
 

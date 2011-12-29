@@ -66,14 +66,18 @@ add_hpx_library_sources(hpx
   GLOB GLOBS "${hpx_SOURCE_DIR}/src/*.cpp"
   EXCLUDE ".*hpx_init.cpp")
 add_hpx_library_sources(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/runtime/*.cpp")
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/runtime/*.cpp"
+  APPEND)
 add_hpx_library_sources(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/performance_counters/*.cpp")
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/performance_counters/*.cpp"
+  APPEND)
 add_hpx_library_sources(hpx
   GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/util/*.cpp"
-  EXCLUDE ".*portable_binary_.*archive[.]cpp")
+  EXCLUDE ".*portable_binary_.*archive[.]cpp"
+  APPEND)
 add_hpx_library_sources(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/lcos/*.cpp")
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/lcos/*.cpp"
+  APPEND)
 
 # libhpx_init sources
 add_hpx_library_sources(hpx_init
@@ -81,19 +85,22 @@ add_hpx_library_sources(hpx_init
 
 # Boost Chrono sources (as long as this library is not in Boost)
 if(HPX_INTERNAL_CHRONO AND ${BOOST_MINOR_VERSION} LESS 47)
-  add_hpx_library_sources(hpx
-    GLOB GLOBS "${hpx_SOURCE_DIR}/external/chrono/libs/chrono/src/chrono.cpp")
+  add_hpx_library_sources(hpx_external
+    GLOB GLOBS "${hpx_SOURCE_DIR}/external/chrono/libs/chrono/src/chrono.cpp"
+    APPEND)
 endif()
 
 # Add Boost.Backtrace sources if stack traces are enabled
 if(HPX_STACKTRACES)
-  add_hpx_library_sources(hpx
-    GLOB GLOBS "${hpx_SOURCE_DIR}/external/backtrace/libs/backtrace/src/backtrace.cpp")
+  add_hpx_library_sources(hpx_external
+    GLOB GLOBS "${hpx_SOURCE_DIR}/external/backtrace/libs/backtrace/src/backtrace.cpp"
+    APPEND)
 endif()
 
 if(NOT MSVC)
-  add_hpx_library_sources(hpx
-    GLOB GLOBS "${hpx_SOURCE_DIR}/external/coroutine/libs/coroutine/src/swapcontext.cpp")
+  add_hpx_library_sources(hpx_external
+    GLOB GLOBS "${hpx_SOURCE_DIR}/external/coroutine/libs/coroutine/src/swapcontext.cpp"
+    APPEND)
 endif()
 
 ################################################################################
@@ -108,30 +115,70 @@ add_hpx_library_headers(hpx
   GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/*.hpp"
   EXCLUDE ".*hpx_init.hpp")
 add_hpx_library_headers(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/runtime/*.hpp")
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/runtime/*.hpp"
+  APPEND)
 add_hpx_library_headers(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/include/*.hpp")
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/include/*.hpp"
+  APPEND)
 add_hpx_library_headers(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/config/*.hpp")
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/config/*.hpp"
+  APPEND)
 add_hpx_library_headers(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/performance_counters/*.hpp")
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/performance_counters/*.hpp"
+  APPEND)
 add_hpx_library_headers(hpx
   GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/util/*.h*"
-  EXCLUDE ".*portable_binary_.*archive[.]hpp")
+  EXCLUDE ".*portable_binary_.*archive[.]hpp"
+  APPEND)
 add_hpx_library_headers(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/lcos/*.hpp")
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/lcos/*.hpp"
+  APPEND)
 
 # libhpx_init headers
-add_hpx_library_sources(hpx_init
-  GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/*hpx_init.hpp")
+add_hpx_library_headers(hpx_init
+  GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/hpx_init.hpp")
 
 ################################################################################
 # make source groups
-add_hpx_source_group(CLASS "Source Files" ROOT ${hpx_SOURCE_DIR}/src
-  TARGETS ${hpx_serialization_SOURCES} ${hpx_SOURCES} ${hpx_init_SOURCES})
+add_hpx_source_group(
+  NAME hpx_serialization
+  CLASS "Source Files"
+  ROOT ${hpx_SOURCE_DIR}/src/util
+  TARGETS ${hpx_serialization_SOURCES})
 
-add_hpx_source_group(CLASS "Header Files" ROOT ${hpx_SOURCE_DIR}/hpx
-  TARGETS ${hpx_serialization_HEADERS} ${hpx_HEADERS} ${hpx_init_HEADERS})
+add_hpx_source_group(
+  NAME hpx_serialization
+  CLASS "Header Files"
+  ROOT ${hpx_SOURCE_DIR}/hpx/util
+  TARGETS ${hpx_serialization_HEADERS})
+
+add_hpx_source_group(
+  NAME hpx CLASS "Source Files"
+  ROOT ${hpx_SOURCE_DIR}/src
+  TARGETS ${hpx_SOURCES})
+
+add_hpx_source_group(
+  NAME hpx CLASS "External Source Files"
+  ROOT ${hpx_SOURCE_DIR}/external
+  TARGETS ${hpx_external_SOURCES})
+
+add_hpx_source_group(
+  NAME hpx
+  CLASS "Header Files"
+  ROOT ${hpx_SOURCE_DIR}/hpx
+  TARGETS ${hpx_HEADERS})
+
+add_hpx_source_group(
+  NAME hpx_init
+  CLASS "Source Files"
+  ROOT ${hpx_SOURCE_DIR}/src
+  TARGETS ${hpx_init_SOURCES})
+
+add_hpx_source_group(
+  NAME hpx_init
+  CLASS "Header Files"
+  ROOT ${hpx_SOURCE_DIR}/hpx
+  TARGETS ${hpx_init_HEADERS})
 
 ################################################################################
 # libhpx_serialization
@@ -176,7 +223,7 @@ endif()
 
 ################################################################################
 # libhpx
-add_library(hpx SHARED ${hpx_SOURCES} ${hpx_HEADERS})
+add_library(hpx SHARED ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_HEADERS})
 set_target_properties(hpx PROPERTIES
   VERSION ${HPX_VERSION}
   SOVERSION ${HPX_SOVERSION}

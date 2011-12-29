@@ -10,9 +10,13 @@ hpx_include(Message
             ParseArguments)
 
 macro(add_hpx_library_sources name globtype)
-  hpx_parse_arguments(SOURCES "EXCLUDE;GLOBS" "" ${ARGN})
+  hpx_parse_arguments(SOURCES "EXCLUDE;GLOBS" "APPEND" ${ARGN})
 
   file(${globtype} sources ${SOURCES_GLOBS})
+
+  if(NOT ${SOURCES_APPEND})
+    set(${name}_SOURCES "" CACHE INTERNAL "Sources for lib${name}." FORCE)
+  endif()
 
   foreach(source ${sources})
     get_filename_component(absolute_path ${source} ABSOLUTE)

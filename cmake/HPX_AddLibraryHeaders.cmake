@@ -11,7 +11,11 @@ hpx_include(Message
 
 macro(add_hpx_library_headers name globtype)
   if(MSVC)
-    hpx_parse_arguments(HEADERS "EXCLUDE;GLOBS" "" ${ARGN})
+    hpx_parse_arguments(HEADERS "EXCLUDE;GLOBS" "APPEND" ${ARGN})
+
+    if(NOT ${HEADERS_APPEND})
+      set(${name}_HEADERS "" CACHE INTERNAL "Headers for lib${name}." FORCE)
+    endif()
 
     file(${globtype} headers ${HEADERS_GLOBS})
 

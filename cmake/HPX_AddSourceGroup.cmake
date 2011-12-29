@@ -10,19 +10,32 @@ hpx_include(ParseArguments)
 
 macro(add_hpx_source_group)
   if(MSVC)
-    hpx_parse_arguments(GROUP "CLASS;ROOT;TARGETS" "" ${ARGN})
+    hpx_parse_arguments(GROUP "NAME;CLASS;ROOT;TARGETS" "" ${ARGN})
 
     set(targets "${GROUP_TARGETS}")
 
-    foreach(target ${GROUP_TARGETS})
-      string(REGEX REPLACE "${GROUP_ROOT}" "" relpath "${target}")
+    set(name "")
+    if(GROUP_NAME)
+      set(name ${GROUP_NAME})
+    endif()
+
+    get_filename_component(root ${GROUP_ROOT} ABSOLUTE)
+
+    foreach(target ${targets})
+      string(REGEX REPLACE "${root}" "" relpath "${target}")
       string(REGEX REPLACE "[\\\\/][^\\\\/]*$" "" relpath "${relpath}")
       string(REGEX REPLACE "^[\\\\/]" "" relpath "${relpath}")
       string(REGEX REPLACE "/" "\\\\\\\\" relpath "${relpath}")
 
       if(GROUP_CLASS)
-        source_group("${GROUP_CLASS}\\${relpath}" FILES ${target})
+        if(NOT ("${relpath}" STREQUAL ""))
+          hpx_debug("add_source_group.${name}"
+                    "Adding ${target} to source list ${root}\\\\${relpath}")
+          source_group("${GROUP_CLASS}\\${relpath}" FILES ${target})
+        endif()
       else()
+        hpx_debug("add_source_group.${name}"
+                  "Adding ${target} to source list ${root}\\\\${relpath}")
         source_group("${relpath}" FILES ${target})
       endif()
     endforeach()
