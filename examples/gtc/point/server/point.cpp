@@ -123,8 +123,8 @@ namespace gtc { namespace server
         std::size_t mimax = mi + 100*std::ceil(sqrt(tmp13)); // ions array upper bound
         std::size_t memax = me + 100*std::ceil(sqrt(tmp14)); // electrons array upper bound
 
-        pgyro_.resize(4,mgrid_,1);
-        tgyro_.resize(4,mgrid_,1);
+        pgyro_.resize(5,mgrid_+1,1);
+        tgyro_.resize(5,mgrid_+1,1);
         markeri_.resize(mzeta_+1,mgrid_+1,1);
         densityi_.resize(mzeta_+1,mgrid_,1);
         phi_.resize(mzeta_+1,mgrid_,1);
@@ -183,6 +183,55 @@ namespace gtc { namespace server
           pmarki_[i] = 1.0/(par->ntoroidal*tdum);
           for (std::size_t j=0;j<markeri_.isize();j++) {
             markeri_(j,igrid_[i],0) = markeri_(j,igrid_[i]+mtheta_[i],0);
+          }
+        }
+        std::size_t nparam;
+        if ( par->track_particles ) {
+          // Not implemented yet
+          nparam = 7;
+        } else {
+          // No tagging of the particles
+          nparam = 6;
+        }
+        zion_.resize(nparam,mimax,1);
+        zion0_.resize(nparam,mimax,1);
+        jtion0_.resize(nparam,mimax,1);
+        jtion1_.resize(4,mimax,1);
+        kzion_.resize(mimax);
+        wzion_.resize(mimax);
+        wpion_.resize(4,mimax,1);
+        wtion0_.resize(4,mimax,1);
+        wtion1_.resize(4,mimax,1);
+
+        if ( par->nhybrid > 0 ) {
+          BOOST_ASSERT(false);
+          // not implemented yet
+        }
+
+        // 4-point gyro-averaging for sqrt(mu)=gyroradius on grid of magnetic coordinates
+        // rho=gyroradius*sqrt(2/(b/b_0))*sqrt(mu/mu_0), mu_0*b_0=m*v_th^2
+        // dtheta/delta_x=1/(r*(1+r*cos(theta))), delta_x=poloidal length increase
+        for (std::size_t i=0;i<par->mpsi+1;i++) {
+          double r = par->a0 + deltar_*i; 
+          for (std::size_t j=0;j<=mtheta_[i];j++) { 
+            std::size_t ij = igrid_[i] + j; 
+            double tdum = deltat_[i]*j;
+            double b = 1.0/(1.0+r*cos(tdum));  
+            double dtheta_dx = 1.0/r;
+            // first two points perpendicular to field line on poloidal surface
+            double rhoi = sqrt(2.0/b)*par->gyroradius;
+
+            pgyro_(1,ij,0) = -rhoi;
+            pgyro_(2,ij,0) = rhoi;
+            // non-orthorgonality between psi and theta: tgyro=-rhoi*dtheta_dx*r*sin(tdum)
+            tgyro_(1,ij,0) = 0.0;
+            tgyro_(2,ij,0) = 0.0;
+ 
+            // the other two points tangential to field line
+            tgyro_(3,ij,0) = -rhoi*dtheta_dx;
+            tgyro_(4,ij,0) = rhoi*dtheta_dx;
+            pgyro_(3,ij,0) = rhoi*0.5*rhoi/r;
+            pgyro_(4,ij,0) = rhoi*0.5*rhoi/r;
           }
         }
     }
