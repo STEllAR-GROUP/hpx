@@ -305,6 +305,23 @@ if(HPX_STACKTRACES)
 endif()
 
 ################################################################################
+# Emulation of SwapContext on Windows
+################################################################################
+if(MSVC)
+  hpx_option(HPX_EMULATE_SWAP_CONTEXT BOOL "Emulate SwapContext API for coroutines (default: OFF)" OFF)
+
+  if(HPX_EMULATE_SWAP_CONTEXT)
+    enable_language(ASM_MASM)
+    if(CMAKE_ASM_MASM_COMPILER)
+      hpx_info("swap_context" "SwitchToFiber emulation is enabled, using compiler: '${CMAKE_ASM_MASM_COMPILER}'")
+    else()
+      hpx_warning("swap_context" "SwitchToFiber emulation is disabled, try setting the ASM_MASM environment variable to the assembler executable (ml.exe/ml64.exe)")
+      set(HPX_EMULATE_SWAP_CONTEXT OFF CACHE BOOL "Emulate SwitchToFiber API for coroutines (default: OFF)" FORCE)
+    endif()
+  endif()
+endif()
+
+################################################################################
 # Native TLS configuration
 ################################################################################
 hpx_option(HPX_NATIVE_TLS BOOL "Use native TLS support if available (default: ON)" ON)

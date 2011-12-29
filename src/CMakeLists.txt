@@ -83,6 +83,8 @@ add_hpx_library_sources(hpx
 add_hpx_library_sources(hpx_init
   GLOB GLOBS "${hpx_SOURCE_DIR}/src/*hpx_init.cpp")
 
+set(hpx_external_SOURCES "" CACHE INTERNAL "Sources for libhpx_external." FORCE)
+
 # Boost Chrono sources (as long as this library is not in Boost)
 if(HPX_INTERNAL_CHRONO AND ${BOOST_MINOR_VERSION} LESS 47)
   add_hpx_library_sources(hpx_external
@@ -101,6 +103,19 @@ if(NOT MSVC)
   add_hpx_library_sources(hpx_external
     GLOB GLOBS "${hpx_SOURCE_DIR}/external/coroutine/libs/coroutine/src/swapcontext.cpp"
     APPEND)
+else()
+  if(HPX_EMULATE_SWAP_CONTEXT)
+    set(switch_to_fiber_source "${hpx_SOURCE_DIR}/external/coroutine/libs/coroutine/src/switch_to_fiber.asm")
+    add_hpx_library_sources(hpx_external_objects
+      GLOB GLOBS "${switch_to_fiber_source}")
+    add_custom_command(
+      OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/switch_to_fiber.obj
+      COMMAND ${CMAKE_ASM_MASM_COMPILER} /Fo ${CMAKE_CURRENT_BINARY_DIR}/switch_to_fiber.obj /c ${switch_to_fiber_source}
+      DEPENDS ${switch_to_fiber_source})
+    set(hpx_external_OBJECTS ${CMAKE_CURRENT_BINARY_DIR}/switch_to_fiber.obj
+      CACHE INTERNAL "Object files for libhpx_external." FORCE)
+    add_definitions(-DHPX_EMULATE_SWAP_CONTEXT)
+  endif()
 endif()
 
 ################################################################################
@@ -223,7 +238,7 @@ endif()
 
 ################################################################################
 # libhpx
-add_library(hpx SHARED ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_HEADERS})
+add_library(hpx SHARED ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
 set_target_properties(hpx PROPERTIES
   VERSION ${HPX_VERSION}
   SOVERSION ${HPX_SOVERSION}
