@@ -23,7 +23,6 @@ macro(add_hpx_component name)
   hpx_print_list("DEBUG" "add_component.${name}" "Dependencies for ${name}" ${name}_DEPENDENCIES)
   hpx_print_list("DEBUG" "add_component.${name}" "Configuration files for ${name}" ${name}_INI)
 
-
   if(${name}_SOURCE_ROOT)
     add_hpx_library_sources(${name}_component
       GLOB_RECURSE GLOBS "${${name}_SOURCE_ROOT}/*.cpp")

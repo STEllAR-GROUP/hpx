@@ -15,7 +15,7 @@ hpx_include(Message
 macro(add_hpx_executable name)
   # retrieve arguments
   hpx_parse_arguments(${name}
-    "SOURCES;HEADERS;DEPENDENCIES;FOLDER" "ESSENTIAL;NOLIBS" ${ARGN})
+    "SOURCES;HEADERS;DEPENDENCIES;FOLDER;HEADER_ROOT;SOURCE_ROOT" "ESSENTIAL;NOLIBS" ${ARGN})
 
   hpx_print_list("DEBUG" "add_executable.${name}" "Sources for ${name}" ${name}_SOURCES)
   hpx_print_list("DEBUG" "add_executable.${name}" "Headers for ${name}" ${name}_HEADERS)
@@ -28,11 +28,16 @@ macro(add_hpx_executable name)
         ${${name}_SOURCES} ${${name}_HEADERS})
     else()
       add_executable(${name}_exe EXCLUDE_FROM_ALL
-        ${${name}_SOURCES})
+        ${${name}_SOURCES} ${${name}_HEADERS})
     endif()
   else()
-    add_executable(${name}_exe
-      ${${name}_SOURCES} ${${name}_HEADERS})
+    if(${${name}_ESSENTIAL})
+      add_executable(${name}_exe
+        ${${name}_SOURCES} ${${name}_HEADERS})
+    else()
+      add_executable(${name}_exe EXCLUDE_FROM_ALL
+        ${${name}_SOURCES} ${${name}_HEADERS})
+    endif()
   endif()
 
   set_target_properties(${name}_exe PROPERTIES OUTPUT_NAME ${name})
