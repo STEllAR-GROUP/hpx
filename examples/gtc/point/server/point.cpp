@@ -129,10 +129,10 @@ namespace gtc { namespace server
         densityi_.resize(mzeta_+1,mgrid_,1);
         phi_.resize(mzeta_+1,mgrid_,1);
         evector_.resize(3,mzeta_+1,mgrid_);
-        jtp1_.resize(2,mgrid_,mzeta_);
-        jtp2_.resize(2,mgrid_,mzeta_);
-        wtp1_.resize(2,mgrid_,mzeta_);
-        wtp2_.resize(2,mgrid_,mzeta_);
+        jtp1_.resize(3,mgrid_,mzeta_+1);
+        jtp2_.resize(3,mgrid_,mzeta_+1);
+        wtp1_.resize(3,mgrid_,mzeta_+1);
+        wtp2_.resize(3,mgrid_,mzeta_+1);
         dtemper_.resize(mgrid_,mzeta_,1);
         heatflux_.resize(mgrid_,mzeta_,1);
 
@@ -232,6 +232,45 @@ namespace gtc { namespace server
             tgyro_(4,ij,0) = rhoi*dtheta_dx;
             pgyro_(3,ij,0) = rhoi*0.5*rhoi/r;
             pgyro_(4,ij,0) = rhoi*0.5*rhoi/r;
+          }
+        }
+
+        // initiate radial interpolation for grid
+        for (std::size_t k=1;k<=mzeta_;k++) {
+          double zdum = zetamin_ + k*deltaz_;
+          for (std::size_t i=1;i<par->mpsi;i++) {
+            for (std::size_t ip=1;ip<=2;ip++) {
+              std::size_t indp = std::min(par->mpsi,i+ip);
+              double tmp = std::max(0.0,(double) i-ip); 
+              std::size_t indt = (std::size_t) tmp;
+              for (std::size_t j=1;j<=mtheta_[i];j++) { 
+                std::size_t ij = igrid_[i] + j; 
+// upward
+                double tdum = (j*deltat_[i]+zdum*(qtinv_[i]-qtinv_[indp]))/deltat_[indp];
+                std::size_t jt = floor(tdum);
+                double wt = tdum - jt; 
+                jt = (jt+mtheta_[indp])%(mtheta_[indp]);
+                if ( ip == 1 ) {
+                  wtp1_(1,ij,k) = wt;
+                  jtp1_(1,ij,k) = igrid_[indp] + jt;
+                } else {
+                  wtp2_(1,ij,k) = wt;
+                  jtp2_(1,ij,k) = igrid_[indp] + jt;
+                }
+// downward
+                tdum = (j*deltat_[i]+zdum*(qtinv_[i]-qtinv_[indt]))/deltat_[indt];
+                jt = floor(tdum);
+                wt = tdum - jt;
+                jt = (jt+mtheta_[indt])%mtheta_[indt]; 
+                if ( ip == 1 ) {
+                  wtp1_(2,ij,k) = wt;
+                  jtp1_(2,ij,k) = igrid_[indt] + jt;
+                } else {
+                  wtp2_(2,ij,k) = wt;
+                  jtp2_(2,ij,k) = igrid_[indt] + jt;
+                }
+              }
+            }
           }
         }
     }
