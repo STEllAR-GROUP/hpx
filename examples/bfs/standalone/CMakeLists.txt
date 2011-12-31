@@ -22,5 +22,5 @@ add_hpx_pseudo_target(examples.bfs.standalone.bfsc)
 add_hpx_pseudo_dependencies(examples.bfs.standalone examples.bfs.standalone.bfsc)
 
 # add dependencies to pseudo-target
-add_hpx_pseudo_dependencies(examples.bfs.standalone.bsfc bsfc)
+add_hpx_pseudo_dependencies(examples.bfs.standalone.bfsc bfsc)
 
