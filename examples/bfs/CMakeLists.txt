@@ -5,14 +5,14 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 ###############################################################################
-# the standalone subdirectory is special
-add_subdirectory(standalone)
-
 # add a custom target for this example
 add_hpx_pseudo_target(examples.bfs.standalone)
 
 # make pseudo-targets depend on master pseudo-target
 add_hpx_pseudo_dependencies(examples.bfs examples.bfs.standalone)
+
+# the standalone subdirectory is special
+add_subdirectory(standalone)
 
 ###############################################################################
 # all other subdirectories follow the usual pattern
