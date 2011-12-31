@@ -1,10 +1,15 @@
+//  Copyright (c) 2011 Matthew Anderson
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <queue>
 #include <boost/lexical_cast.hpp>
-#include <sys/time.h>
 #include <math.h>
+#include <hpx/util/high_resolution_timer.hpp>
 
 bool fexists(std::string const filename)
 {
@@ -23,25 +28,55 @@ int validate(std::vector<std::size_t> const& parent,
              std::vector<std::size_t> const& neighborlist,
              std::size_t searchkey,std::size_t &num_edges);
 
-void depth_traverse(std::size_t level,std::size_t parent,std::size_t edge,
-                    std::vector<bool> & visited_,
-                    std::vector<std::size_t> & level_,
-                    std::vector<std::size_t> & parent_,
-                    std::vector<std::vector<std::size_t> > const& neighbors,
-                    std::size_t max_level)    
+// void depth_traverse(std::size_t level,std::size_t parent,std::size_t edge,
+//                     std::vector<char> & visited_,
+//                     std::vector<std::size_t> & level_,
+//                     std::vector<std::size_t> & parent_,
+//                     std::vector<std::vector<std::size_t> > const& neighbors,
+//                     std::size_t max_level)
+// {
+//   if ( visited_[edge] == false || level_[edge] > level ) {
+//     visited_[edge] = true;
+//     parent_[edge] = parent;
+//     level_[edge] = level;
+//     if ( level < max_level ) {
+//       for (std::size_t i=0;i<neighbors[edge].size();i++) {
+//         std::size_t neighbor = neighbors[edge][i];
+//         depth_traverse(level+1,edge,neighbor,visited_,level_,parent_,neighbors,max_level);
+//       }
+//     }
+//   }
+//   return;
+// }
+
+void bfs(std::size_t root,
+         std::vector<char> & visited,
+         std::vector<std::size_t> & parent,
+         std::vector<std::vector<std::size_t> > const& neighbors)
 {
-  if ( visited_[edge] == false || level_[edge] > level ) {
-    visited_[edge] = true;
-    parent_[edge] = parent;
-    level_[edge] = level;
-    if ( level < max_level ) {
-      for (std::size_t i=0;i<neighbors[edge].size();i++) {
-        std::size_t neighbor = neighbors[edge][i];
-        depth_traverse(level+1,edge,neighbor,visited_,level_,parent_,neighbors,max_level);
+  std::queue<std::size_t> q;
+
+  visited[root] = true;
+  parent[root] = root;
+  q.push(root);
+
+  while (!q.empty()) {
+    std::size_t node = q.front(); q.pop();
+
+    std::vector<std::size_t> const& node_neighbors = neighbors[node];
+    std::vector<std::size_t>::const_iterator end = node_neighbors.end();
+    for (std::vector<std::size_t>::const_iterator it = node_neighbors.begin();
+         it != end; ++it)
+    {
+      std::size_t neighbor = *it;
+      char& node_visited = visited[neighbor];
+      if (!node_visited) {
+        node_visited = true;
+        parent[neighbor] = node;
+        q.push(neighbor);
       }
     }
   }
-  return;
 }
 
 int main() {
@@ -65,23 +100,14 @@ int main() {
 
   std::vector<std::size_t> nodelist,neighborlist;
   {
-    std::string line;
-    std::string val1,val2;
-    std::ifstream myfile;
-    myfile.open(graphfile.c_str());
+    std::ifstream myfile(graphfile.c_str());
     if (myfile.is_open()) {
-      while (myfile.good()) {
-        while (std::getline(myfile,line)) {
-          std::istringstream isstream(line);
-          std::getline(isstream,val1,' ');
-          std::getline(isstream,val2,' ');
-          std::size_t node = boost::lexical_cast<std::size_t>(val1);
-          std::size_t neighbor = boost::lexical_cast<std::size_t>(val2);
-          // increment all nodes and neighbors by 1; the smallest edge number is 1
-          // edge 0 is reserved for the parent of the root and for unvisited edges
-          nodelist.push_back(node+1);
-          neighborlist.push_back(neighbor+1);
-        }
+      std::size_t node, neighbor;
+      while (myfile >> node >> neighbor) {
+        // increment all nodes and neighbors by 1; the smallest edge number is 1
+        // edge 0 is reserved for the parent of the root and for unvisited edges
+        nodelist.push_back(node+1);
+        neighborlist.push_back(neighbor+1);
       }
     }
   }
@@ -89,20 +115,13 @@ int main() {
   // read in the searchfile containing the root vertices to search -- timing not reported
   std::vector<std::size_t> searchroot;
   {
-    std::string line;
-    std::string val1;
-    std::ifstream myfile;
-    myfile.open(searchfile.c_str());
+    std::ifstream myfile(searchfile.c_str());
     if (myfile.is_open()) {
-      while (myfile.good()) {
-        while (std::getline(myfile,line)) {
-            std::istringstream isstream(line);
-            std::getline(isstream,val1);
-            std::size_t root = boost::lexical_cast<std::size_t>(val1);
-            // increment all nodes and neighbors by 1; the smallest edge number is 1
-            // edge 0 is reserved for the parent of the root and for unvisited edges
-            searchroot.push_back(root+1);
-        }
+      std::size_t root;
+      while (myfile >> root) {
+          // increment all nodes and neighbors by 1; the smallest edge number is 1
+          // edge 0 is reserved for the parent of the root and for unvisited edges
+          searchroot.push_back(root+1);
       }
     }
   }
@@ -117,7 +136,7 @@ int main() {
 
   std::vector< std::vector<std::size_t> > neighbors;
   std::vector<std::size_t> level,parent;
-  std::vector<bool> visited;
+  std::vector<char> visited;
   neighbors.resize(N);
 
   for (std::size_t i=0;i<nodelist.size();i++) {
@@ -135,7 +154,7 @@ int main() {
   std::fill( visited.begin(),visited.end(),false);
   std::fill( level.begin(),level.end(),0);
   std::fill( parent.begin(),parent.end(),0);
-  
+
   std::vector<double> kernel2_time;
   std::vector<double> kernel2_nedge;
   kernel2_time.resize(searchroot.size());
@@ -143,18 +162,13 @@ int main() {
 
   std::size_t max_level = 10;
   std::size_t zero = 0;
-  timeval t1,t2;
-  double elapsedTime;
   // go through each root position
   for (std::size_t step=0;step<searchroot.size();step++) {
     // time this
-    gettimeofday(&t1,NULL);
-    depth_traverse(zero,searchroot[step],searchroot[step],visited,level,parent,neighbors,max_level);    
-    gettimeofday(&t2,NULL);
-
-    elapsedTime = (t2.tv_sec - t1.tv_sec) * 1000.0;      // sec to ms
-    elapsedTime += (t2.tv_usec - t1.tv_usec) / 1000.0;
-    kernel2_time[step] = elapsedTime/1000;
+    hpx::util::high_resolution_timer t1;
+//     depth_traverse(zero,searchroot[step],searchroot[step],visited,level,parent,neighbors,max_level);
+    bfs(searchroot[step], visited, parent, neighbors);
+    kernel2_time[step] = t1.elapsed();
     // end timing
 
     // Validate
@@ -169,7 +183,7 @@ int main() {
       std::cout << " Validation failed for searchroot " << searchroot[step] << " rc " << rc << std::endl;
       break;
     }
-    
+
     // reset -- not timed
     std::fill( visited.begin(),visited.end(),false);
     std::fill( level.begin(),level.end(),0);
