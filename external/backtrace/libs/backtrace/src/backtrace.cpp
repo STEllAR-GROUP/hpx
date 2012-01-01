@@ -1,6 +1,6 @@
 //
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2011 Hartmut Kaiser
+//  Copyright (c) 2011-2012 Hartmut Kaiser
 //  Copyright (c) 2010 Artyom Beilis (Tonkikh)
 //
 //  Distributed under the Boost Software License, Version 1.0. (See

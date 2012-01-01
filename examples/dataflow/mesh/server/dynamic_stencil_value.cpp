@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2009 Matt Anderson
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying

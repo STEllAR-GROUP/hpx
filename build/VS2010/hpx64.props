@@ -4,6 +4,7 @@
     <BOOST_ROOT>$(HPX_BOOST_ROOT)</BOOST_ROOT>
     <TBB_ROOT>$(HPX_TBB_ROOT)</TBB_ROOT>
     <BUILD_OPTIONS>$(HPX_BUILD_OPTIONS)</BUILD_OPTIONS>
+    <AMPLIFIER_2011_DIR>$(VTUNE_AMPLIFIER_XE_2011_DIR)</AMPLIFIER_2011_DIR>
   </PropertyGroup>
   <PropertyGroup>
     <_ProjectFileVersion>10.0.21006.1</_ProjectFileVersion>
@@ -57,6 +58,10 @@ xcopy /Y/F "$(TargetDir)\$(TargetName).lib" "$(HPX_ROOT)\bin64\$(Configuration)\
     </BuildMacro>
     <BuildMacro Include="BUILD_OPTIONS">
       <Value>$(BUILD_OPTIONS)</Value>
+    </BuildMacro>
+    <BuildMacro Include="AMPLIFIER_2011_DIR">
+      <Value>$(AMPLIFIER_2011_DIR)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
   </ItemGroup>
 </Project>

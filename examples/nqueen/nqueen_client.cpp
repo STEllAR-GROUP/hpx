@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser, Richard D Guidry Jr.
+//  Copyright (c) 2007-2012 Hartmut Kaiser, Richard D Guidry Jr.
 //  Copyright (c) 2011 Vinay C Amatya
 //  Copyright (c) 2011 Bryce Lelbach
 //

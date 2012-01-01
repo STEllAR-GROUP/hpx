@@ -94,8 +94,12 @@
 #  endif /* ITT_PLATFORM==ITT_PLATFORM_WIN */
 #endif /* STDCALL */
 
+#ifndef ITTAPI
 #define ITTAPI    CDECL
+#endif
+#ifndef LIBITTAPI
 #define LIBITTAPI /* nothing */
+#endif
 
 #define ITT_JOIN_AUX(p,n) p##n
 #define ITT_JOIN(p,n)     ITT_JOIN_AUX(p,n)
@@ -107,8 +111,10 @@
 #  define INTEL_ITTNOTIFY_POSTFIX _ptr_
 #endif /* INTEL_ITTNOTIFY_POSTFIX */
 
+#ifndef ITTNOTIFY_NAME
 #define ITTNOTIFY_NAME_AUX(n) ITT_JOIN(INTEL_ITTNOTIFY_PREFIX,n)
 #define ITTNOTIFY_NAME(n)     ITTNOTIFY_NAME_AUX(ITT_JOIN(n,INTEL_ITTNOTIFY_POSTFIX))
+#endif
 
 #define ITTNOTIFY_VOID(n) (!ITTNOTIFY_NAME(n)) ? (void)0 : ITTNOTIFY_NAME(n)
 #define ITTNOTIFY_DATA(n) (!ITTNOTIFY_NAME(n)) ?       0 : ITTNOTIFY_NAME(n)

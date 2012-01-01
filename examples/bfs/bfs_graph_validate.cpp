@@ -161,12 +161,10 @@ void get_statistics(std::vector<double> x,
 {
     // Compute mean
     std::size_t n = x.size();
-    double temp = std::accumulate(x.begin(), x.end(), 0.0);
-    mean = temp / n;
+    mean = std::accumulate(x.begin(), x.end(), 0.0) / n;
 
     // Compute std deviation
-    temp = std::accumulate(x.begin(), x.end(), 0.0, stddev(mean));
-    deviation = temp / std::sqrt(n - 1.0);
+    deviation = std::accumulate(x.begin(), x.end(), 0.0, stddev(mean)) / std::sqrt(n - 1.0);
 
     // Sort x
     std::sort(x.begin(), x.end());

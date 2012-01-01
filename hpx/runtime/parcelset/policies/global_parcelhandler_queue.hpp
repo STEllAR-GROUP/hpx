@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2011 Katelyn Kufahl & Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
