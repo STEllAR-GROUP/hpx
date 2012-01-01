@@ -143,8 +143,20 @@ int validate(std::size_t searchkey,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+struct stddev
+{
+    stddev(double mean) : mean_(mean) {}
+
+    double operator()(double curr, double x) const
+    {
+        return curr + (x - mean_) * (x  - mean_);
+    }
+
+    double mean_;
+};
+
 void get_statistics(std::vector<double> x,
-    double &minimum, double &mean, double &stddev, double &firstquartile,
+    double &minimum, double &mean, double &deviation, double &firstquartile,
     double &median, double &thirdquartile, double &maximum)
 {
     // Compute mean
@@ -153,11 +165,8 @@ void get_statistics(std::vector<double> x,
     mean = temp / n;
 
     // Compute std deviation
-    temp = std::accumulate(x.begin(), x.end(), 0.0,
-        [mean](double curr, double x) {
-            return curr + (x - mean) * (x  - mean);
-        });
-    stddev = temp / std::sqrt(n - 1.0);
+    temp = std::accumulate(x.begin(), x.end(), 0.0, stddev(mean));
+    deviation = temp / std::sqrt(n - 1.0);
 
     // Sort x
     std::sort(x.begin(), x.end());
