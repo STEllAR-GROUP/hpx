@@ -110,7 +110,7 @@ else()
       GLOB GLOBS "${switch_to_fiber_source}")
     add_custom_command(
       OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/switch_to_fiber.obj
-      COMMAND ${CMAKE_ASM_MASM_COMPILER} /Fo ${CMAKE_CURRENT_BINARY_DIR}/switch_to_fiber.obj /c ${switch_to_fiber_source}
+      COMMAND ${CMAKE_ASM_MASM_COMPILER} /Fo ${CMAKE_CURRENT_BINARY_DIR}/switch_to_fiber.obj /nologo /c ${switch_to_fiber_source}
       DEPENDS ${switch_to_fiber_source})
     set(hpx_external_OBJECTS ${CMAKE_CURRENT_BINARY_DIR}/switch_to_fiber.obj
       CACHE INTERNAL "Object files for libhpx_external." FORCE)
@@ -239,6 +239,12 @@ endif()
 ################################################################################
 # libhpx
 add_library(hpx SHARED ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
+
+set(hpx_SPECIAL_LINK_PROPERTIES "")
+if(MSVC AND HPX_EMULATE_SWAP_CONTEXT)
+  set(hpx_SPECIAL_LINK_PROPERTIES "/EXPORT:switch_to_fiber")
+endif()
+
 set_target_properties(hpx PROPERTIES
   VERSION ${HPX_VERSION}
   SOVERSION ${HPX_SOVERSION}
@@ -248,7 +254,8 @@ set_target_properties(hpx PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE}
   RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG}
   RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL}
-  RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO})
+  RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO}
+  LINK_FLAGS ${hpx_SPECIAL_LINK_PROPERTIES})
 
 target_link_libraries(hpx
   hpx_serialization
