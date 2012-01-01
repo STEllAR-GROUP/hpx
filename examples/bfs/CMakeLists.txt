@@ -19,7 +19,8 @@ add_subdirectory(standalone)
 
 # just recurse into all components subdirectories and execute the scripts there
 set(subdirs
-    bfs)
+    bfs
+    bfs_graph)
 
 add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=8)
 
@@ -28,11 +29,11 @@ foreach(subdir ${subdirs})
   add_subdirectory(${subdir})
 
   add_hpx_library_sources(${subdir}_exe
-    GLOB GLOBS ${subdir}_client.cpp validate.cpp)
+    GLOB GLOBS ${subdir}_client.cpp ${subdir}_validate.cpp)
 
   add_hpx_source_group(
     NAME ${subdir}_exe
-    CLASS "Source Files" 
+    CLASS "Source Files"
     ROOT "."
     TARGETS ${${subdir}_exe_SOURCES})
 
