@@ -6,7 +6,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
-#include "bfs/point.hpp"
+#include "bfs_partitioned/point.hpp"
 #include <boost/numeric/ublas/vector_sparse.hpp>
 
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
