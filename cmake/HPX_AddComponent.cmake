@@ -16,16 +16,18 @@ hpx_include(Message
 macro(add_hpx_component name)
   # retrieve arguments
   hpx_parse_arguments(${name}
-    "SOURCES;HEADERS;DEPENDENCIES;INI;FOLDER;HEADER_ROOT;SOURCE_ROOT" "ESSENTIAL;NOLIBS" ${ARGN})
+    "SOURCES;HEADERS;DEPENDENCIES;INI;FOLDER;HEADER_ROOT;SOURCE_ROOT"
+    "ESSENTIAL;NOLIBS;NOAUTOGLOB" ${ARGN})
 
-  hpx_print_list("DEBUG" "add_component.${name}" "Sources for ${name}" ${name}_SOURCES)
-  hpx_print_list("DEBUG" "add_component.${name}" "Headers for ${name}" ${name}_HEADERS)
-  hpx_print_list("DEBUG" "add_component.${name}" "Dependencies for ${name}" ${name}_DEPENDENCIES)
-  hpx_print_list("DEBUG" "add_component.${name}" "Configuration files for ${name}" ${name}_INI)
+  # Collect sources and headers from the given (current) directory
+  # (recursively), but only if NOAUTOGLOB flag is not specified.
+  if(NOT ${${name}_NOAUTOGLOB})
+    if(NOT ${name}_SOURCE_ROOT)
+      set(${name}_SOURCE_ROOT ".")
+    endif()
 
-  if(${name}_SOURCE_ROOT)
     add_hpx_library_sources(${name}_component
-      GLOB_RECURSE GLOBS "${${name}_SOURCE_ROOT}/*.cpp")
+      GLOB_RECURSE GLOBS "${${name}_SOURCE_ROOT}/*.c*")
 
     add_hpx_source_group(
       NAME ${name}
@@ -33,12 +35,16 @@ macro(add_hpx_component name)
       ROOT ${${name}_SOURCE_ROOT}
       TARGETS ${${name}_component_SOURCES})
 
-    set(${name}_SOURCES ${${name}_component_SOURCES})
-  endif()
+    if(NOT ${name}_SOURCES)
+      set(${name}_SOURCES ${${name}_component_SOURCES})
+    endif()
 
-  if(${name}_HEADER_ROOT)
+    if(NOT ${name}_HEADER_ROOT)
+      set(${name}_HEADER_ROOT ".")
+    endif()
+
     add_hpx_library_headers(${name}_component
-      GLOB_RECURSE GLOBS "${${name}_HEADER_ROOT}/*.hpp")
+      GLOB_RECURSE GLOBS "${${name}_HEADER_ROOT}/*.h*")
 
     add_hpx_source_group(
       NAME ${name}
@@ -46,8 +52,15 @@ macro(add_hpx_component name)
       ROOT ${${name}_HEADER_ROOT}
       TARGETS ${${name}_component_HEADERS})
 
-    set(${name}_HEADERS ${${name}_component_HEADERS})
+    if(NOT ${name}_HEADERS)
+      set(${name}_HEADERS ${${name}_component_HEADERS})
+    endif()
   endif()
+
+  hpx_print_list("DEBUG" "add_component.${name}" "Sources for ${name}" ${name}_SOURCES)
+  hpx_print_list("DEBUG" "add_component.${name}" "Headers for ${name}" ${name}_HEADERS)
+  hpx_print_list("DEBUG" "add_component.${name}" "Dependencies for ${name}" ${name}_DEPENDENCIES)
+  hpx_print_list("DEBUG" "add_component.${name}" "Configuration files for ${name}" ${name}_INI)
 
   if(NOT MSVC)
     if(${${name}_ESSENTIAL})

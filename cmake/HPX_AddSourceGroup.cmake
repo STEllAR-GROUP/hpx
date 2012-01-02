@@ -19,6 +19,9 @@ macro(add_hpx_source_group)
       set(name ${GROUP_NAME})
     endif()
 
+    if (NOT GROUP_ROOT)
+      set(GROUP_ROOT ".")
+    endif()
     get_filename_component(root ${GROUP_ROOT} ABSOLUTE)
 
     foreach(target ${targets})
