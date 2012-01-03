@@ -21,7 +21,7 @@ macro(add_hpx_component name)
 
   # Collect sources and headers from the given (current) directory
   # (recursively), but only if NOAUTOGLOB flag is not specified.
-  if(NOT ${${name}_NOAUTOGLOB})
+  if(NOT ${${name}_NOAUTOGLOB} and NOT ${name}_SOURCES})
     if(NOT ${name}_SOURCE_ROOT)
       set(${name}_SOURCE_ROOT ".")
     endif()
@@ -36,7 +36,9 @@ macro(add_hpx_component name)
       TARGETS ${${name}_component_SOURCES})
 
     set(${name}_SOURCES ${${name}_component_SOURCES})
+  endif()
 
+  if(NOT ${${name}_NOAUTOGLOB} and NOT ${name}_HEADERS})
     if(NOT ${name}_HEADER_ROOT)
       set(${name}_HEADER_ROOT ".")
     endif()
