@@ -14,6 +14,9 @@
 #if !defined(HPX_EXAMPLE_BFS_CONCURRENT_BGL_BFS_JAN_02_2012_0734PM)
 #define HPX_EXAMPLE_BFS_CONCURRENT_BGL_BFS_JAN_02_2012_0734PM
 
+#include <boost/concept/assert.hpp>
+#include <boost/graph/breadth_first_search.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace concurrent_bgl
 {
