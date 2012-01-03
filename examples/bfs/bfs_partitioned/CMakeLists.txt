@@ -6,5 +6,6 @@
 
 add_hpx_component(bfs_partitioned
   DEPENDENCIES iostreams_component
-  FOLDER "Examples/Bfs")
+  FOLDER "Examples/Bfs"
+  AUTOGLOB)
 

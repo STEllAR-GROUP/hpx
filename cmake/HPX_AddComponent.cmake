@@ -17,11 +17,11 @@ macro(add_hpx_component name)
   # retrieve arguments
   hpx_parse_arguments(${name}
     "SOURCES;HEADERS;DEPENDENCIES;INI;FOLDER;HEADER_ROOT;SOURCE_ROOT"
-    "ESSENTIAL;NOLIBS;NOAUTOGLOB" ${ARGN})
+    "ESSENTIAL;NOLIBS;AUTOGLOB" ${ARGN})
 
   # Collect sources and headers from the given (current) directory
   # (recursively), but only if NOAUTOGLOB flag is not specified.
-  if((NOT ${${name}_NOAUTOGLOB}) AND (NOT ${name}_SOURCES))
+  if(${${name}_AUTOGLOB})
     if(NOT ${name}_SOURCE_ROOT)
       set(${name}_SOURCE_ROOT ".")
     endif()
@@ -38,7 +38,7 @@ macro(add_hpx_component name)
     set(${name}_SOURCES ${${name}_component_SOURCES})
   endif()
 
-  if((NOT ${${name}_NOAUTOGLOB}) AND (NOT ${name}_HEADERS))
+  if(${${name}_AUTOGLOB})
     if(NOT ${name}_HEADER_ROOT)
       set(${name}_HEADER_ROOT ".")
     endif()

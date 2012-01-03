@@ -6,5 +6,6 @@
 # add component with sources from current directory (recursively)
 add_hpx_component(bfs_graph
   DEPENDENCIES iostreams_component
-  FOLDER "Examples/Bfs")
+  FOLDER "Examples/Bfs"
+  AUTOGLOB)
 
