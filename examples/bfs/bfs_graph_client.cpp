@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "bfs_graph_util.hpp"
-#include "bfs_graph_single_threaded.hpp"
+#include "bfs_graph_single_locality.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 int do_work(boost::program_options::variables_map &vm)
@@ -46,7 +46,7 @@ int do_work(boost::program_options::variables_map &vm)
               << " [s]" << std::endl;
 
     // start benchmarking: single threaded BFS variants
-    bfs_graph::single_threaded::run_benchmarks(
+    bfs_graph::single_locality::run_benchmarks(
         validate, grainsize, edgelist, searchroots);
 
     // Print the total wall-time that the computation took.

@@ -11,13 +11,16 @@
 
 #include <boost/foreach.hpp>
 
-#include "bgl_graph.hpp"
+#include "concurrent_bgl/queue.hpp"
+#include "concurrent_bgl/colormap.hpp"
+#include "concurrent_bgl/breadth_first_search.hpp"
+#include "concurrent_bgl_graph.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace bfs { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
-    void bgl_graph::init(std::size_t idx, std::size_t grainsize,
+    void concurrent_bgl_graph::init(std::size_t idx, std::size_t grainsize,
         std::vector<std::pair<std::size_t, std::size_t> > const& edgelist)
     {
         idx_ = idx;
@@ -48,25 +51,30 @@ namespace bfs { namespace server
         std::vector<std::size_t>& parents_;
     };
 
-    double bgl_graph::bfs(std::size_t root)
+    double concurrent_bgl_graph::bfs(std::size_t root)
     {
         hpx::util::high_resolution_timer t;
 
-        bfs_visitor vis(parents_);
-        breadth_first_search(graph_, vertex(root, graph_), visitor(vis));
-        parents_[root] = root;
+        typedef boost::graph_traits<graph_type> graph_traits;
 
+        boost::identity_property_map pmap;
+        concurrent_bgl::queue<graph_traits::vertex_descriptor> q;
+        concurrent_bgl::breadth_first_search(
+            graph_, vertex(root, graph_), q, bfs_visitor(parents_),
+            concurrent_bgl::make_color_map(num_vertices(graph_), pmap));
+
+        parents_[root] = root;
         return t.elapsed();
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::vector<std::size_t> bgl_graph::get_parents()
+    std::vector<std::size_t> concurrent_bgl_graph::get_parents()
     {
         return parents_;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void bgl_graph::reset()
+    void concurrent_bgl_graph::reset()
     {
         std::fill(parents_.begin(), parents_.end(), 0);
     }

@@ -14,6 +14,7 @@
 
 #include "server/graph.hpp"
 #include "server/bgl_graph.hpp"
+#include "server/concurrent_bgl_graph.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality
@@ -60,4 +61,26 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     bfs_bgl_graph_type::wrapped_type::reset_action,
     bfs_bgl_graph_reset_action);
+
+///////////////////////////////////////////////////////////////////////////////
+typedef hpx::components::managed_component<
+    bfs::server::concurrent_bgl_graph
+> bfs_concurrent_bgl_graph_type;
+
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
+    bfs_concurrent_bgl_graph_type, bfs_concurrent_bgl_graph);
+HPX_DEFINE_GET_COMPONENT_TYPE(bfs_concurrent_bgl_graph_type::wrapped_type);
+
+HPX_REGISTER_ACTION_EX(
+    bfs_concurrent_bgl_graph_type::wrapped_type::init_action,
+    bfs_concurrent_bgl_graph_init_action);
+HPX_REGISTER_ACTION_EX(
+    bfs_concurrent_bgl_graph_type::wrapped_type::bfs_action,
+    bfs_concurrent_bgl_graph_bfs_action);
+HPX_REGISTER_ACTION_EX(
+    bfs_concurrent_bgl_graph_type::wrapped_type::get_parents_action,
+    bfs_concurrent_bgl_graph_get_parents_action);
+HPX_REGISTER_ACTION_EX(
+    bfs_concurrent_bgl_graph_type::wrapped_type::reset_action,
+    bfs_concurrent_bgl_graph_reset_action);
 

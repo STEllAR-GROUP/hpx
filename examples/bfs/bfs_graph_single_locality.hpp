@@ -3,13 +3,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_EXAMPLES_BFS_GRAPH_SINGLE_THREADED_JAN_01_2012_0622PM)
-#define HPX_EXAMPLES_BFS_GRAPH_SINGLE_THREADED_JAN_01_2012_0622PM
+#if !defined(HPX_EXAMPLES_BFS_GRAPH_SINGLE_LOCALITY_JAN_01_2012_0622PM)
+#define HPX_EXAMPLES_BFS_GRAPH_SINGLE_LOCALITY_JAN_01_2012_0622PM
 
 #include <vector>
 #include <cstdlib>
 
-namespace bfs_graph { namespace single_threaded
+namespace bfs_graph { namespace single_locality
 {
     // run benchmarks for all single threaded graph variants
     void run_benchmarks(bool validate, std::size_t grainsize,

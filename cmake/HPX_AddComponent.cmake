@@ -35,9 +35,7 @@ macro(add_hpx_component name)
       ROOT ${${name}_SOURCE_ROOT}
       TARGETS ${${name}_component_SOURCES})
 
-    if(NOT ${name}_SOURCES)
-      set(${name}_SOURCES ${${name}_component_SOURCES})
-    endif()
+    set(${name}_SOURCES ${${name}_component_SOURCES})
 
     if(NOT ${name}_HEADER_ROOT)
       set(${name}_HEADER_ROOT ".")
@@ -52,9 +50,7 @@ macro(add_hpx_component name)
       ROOT ${${name}_HEADER_ROOT}
       TARGETS ${${name}_component_HEADERS})
 
-    if(NOT ${name}_HEADERS)
-      set(${name}_HEADERS ${${name}_component_HEADERS})
-    endif()
+    set(${name}_HEADERS ${${name}_component_HEADERS})
   endif()
 
   hpx_print_list("DEBUG" "add_component.${name}" "Sources for ${name}" ${name}_SOURCES)

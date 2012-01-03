@@ -12,12 +12,13 @@
 
 #include "bfs_graph/graph.hpp"
 #include "bfs_graph/bgl_graph.hpp"
+#include "bfs_graph/concurrent_bgl_graph.hpp"
 
 #include "bfs_graph_validate.hpp"
 #include "bfs_graph_util.hpp"
-#include "bfs_graph_single_threaded.hpp"
+#include "bfs_graph_single_locality.hpp"
 
-namespace bfs_graph { namespace single_threaded
+namespace bfs_graph { namespace single_locality
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename GraphComponent>
@@ -139,12 +140,16 @@ namespace bfs_graph { namespace single_threaded
         std::vector<std::pair<std::size_t, std::size_t> > const& edgelist,
         std::vector<std::size_t> const& searchroots)
     {
-        bfs_graph::single_threaded::bfs<bfs::graph>(
-            "Single threaded BFS", validate, grainsize, edgelist, searchroots);
+        // single threaded (vanilla) BFS
+        bfs<bfs::graph>("Single threaded BFS",
+            validate, grainsize, edgelist, searchroots);
 
-        // start benchmarking: single threaded (BGL) BFS
-        bfs_graph::single_threaded::bfs<bfs::bgl_graph>(
-            "Single threaded BFS (based on BGL)", validate, grainsize, edgelist,
-            searchroots);
+        // single threaded (BGL) BFS
+        bfs<bfs::bgl_graph>("Single threaded BFS (based on BGL)",
+            validate, grainsize, edgelist, searchroots);
+
+        // multi threaded (BGL) BFS
+        bfs<bfs::concurrent_bgl_graph>("Multi threaded BFS (based on BGL)",
+            validate, grainsize, edgelist, searchroots);
     }
 }}
