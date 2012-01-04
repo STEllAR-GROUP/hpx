@@ -27,6 +27,7 @@
 #include<vector>
 #include<algorithm>
 #include<stdexcept>
+#include<deque>
 
 #include<boost/cstdint.hpp>
 #include<boost/format.hpp>
@@ -78,23 +79,35 @@ class point {
   point(double xx, double yy, double zz, double mm, double vxx, double vyy,
    double vzz)
    :x(xx),y(yy),z(zz),m(mm),vx(vxx),vy(vyy),vz(vzz){}
-  point():x(0),y(0),m(0),vx(0),vy(0),vz(0) {}
+  point():x(0),y(0),m(0),vx(0),vy(0),vz(0),fx(0),fy(0),fz(0),ft(0) {}
   ~point(){}
-  double x; //x-coordinate
-  double y; //y-coordinate
-  double z; //z-coordinate
-  double m; //mass
+  double x;  //x-coordinate
+  double y;  //y-coordinate
+  double z;  //z-coordinate
+  double m;  //mass
   double vx; //velocity in the x direction
   double vy; //velocity in the y direction
   double vz; //velocity in the z direction
-  double d; //distance
-  double xc; //x-component
-  double yc; //y-component
-  double zc; //z-component
   double fx; //force in the x direction
   double fy; //force in the y direction
   double fz; //force in the z direction
   double ft; //the sum of the forces
+  double d;  //distance
+  double xc; //x-component
+  double yc; //y-component
+  double zc; //z-component
+};
+
+class abacus { 
+ public:
+  abacus ():t(0),p(0),fx(0),fy(0),fz(0) {}
+  ~abacus(){}
+  int t;     //timestep
+  int p;     //point
+  double fx;     //the force value
+  double fy;
+  double fz;
+  void adder();
 };
 
 struct config_f {
@@ -126,7 +139,6 @@ void closefile(ofstream &coorfile,ofstream &trbst,ofstream &notes,
 void loadconfig(config_f& param,variables_map& vm);
 void setup(ofstream &coorfile,ofstream &trbst,int k);
 vector<point> createvecs(ifstream &ist);
-vector<point> createvecs(int k);
 void calc_force(int k,int t,int i);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -156,7 +168,7 @@ typedef eager_future<move_action> move_future;
 ///////////////////////////////////////////////////////////////////////////////
 //Global Variables
 vector<vector<point> > pts_timestep;
-vector<vector<point> > fvec_timestep;
+deque<abacus> bin; 
 bool debug;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -200,7 +212,6 @@ int hpx_main(variables_map& vm)
     //This section sets up the rest of the program
      pts_timestep = vector<vector<point> >(param.steps+1,createvecs(ist));
      k=pts_timestep[0].size();
-     fvec_timestep = vector<vector<point> >(param.steps+1,createvecs(k));
      setup(coorfile,trbst,k); // sets up the output files
      
      high_resolution_timer ht;
@@ -281,21 +292,21 @@ void move(vector<promise<void> >const& cfp,config_f const & param,int k,int t) {
 //  }
   //calc x displ. and add to x-coord.
   pts_timestep[tn][i].x =pts_timestep[t][i].x+pts_timestep[t][i].vx*timestep+
-   .5*fvec_timestep[t][i].fx*(timestep*timestep)/pts_timestep[t][i].m;
+   .5*pts_timestep[t][i].fx*(timestep*timestep)/pts_timestep[t][i].m;
   //calc new x velocity
-  pts_timestep[tn][i].vx =pts_timestep[t][i].vx+fvec_timestep[t][i].fx/
+  pts_timestep[tn][i].vx =pts_timestep[t][i].vx+pts_timestep[t][i].fx/
                             pts_timestep[t][i].m*timestep;
   //calc y displ. and add to y-coord.
   pts_timestep[tn][i].y =pts_timestep[t][i].y+pts_timestep[t][i].vy*timestep+
-   .5*fvec_timestep[t][i].fy*(timestep*timestep)/pts_timestep[t][i].m;
+   .5*pts_timestep[t][i].fy*(timestep*timestep)/pts_timestep[t][i].m;
   //calc new y velocity
-  pts_timestep[tn][i].vy =pts_timestep[t][i].vy+fvec_timestep[t][i].fy/
+  pts_timestep[tn][i].vy =pts_timestep[t][i].vy+pts_timestep[t][i].fy/
                             pts_timestep[t][i].m*timestep;
   //calc z displ. and add to z-coord.
   pts_timestep[tn][i].z =pts_timestep[t][i].z+pts_timestep[t][i].vz*timestep+
-   .5*fvec_timestep[t][i].fz*(timestep*timestep)/pts_timestep[t][i].m;
+   .5*pts_timestep[t][i].fz*(timestep*timestep)/pts_timestep[t][i].m;
   //calc new z velocity
-  pts_timestep[tn][i].vz =pts_timestep[t][i].vz+fvec_timestep[t][i].fz/
+  pts_timestep[tn][i].vz =pts_timestep[t][i].vz+pts_timestep[t][i].fz/
                             pts_timestep[t][i].m*timestep;
  
  if(debug) {
@@ -314,7 +325,7 @@ void printval(promise<void> const & mp,int k,int t,
           <<pts_timestep[tn][i].z<<",";
   trbst<<"v:,"<<pts_timestep[tn][i].vx<<","<<pts_timestep[tn][i].vy<<","
        <<pts_timestep[tn][i].vz<<",";
-  trbst<<"f:,"<<fvec_timestep[t][i].ft<<",";
+  trbst<<"f:,"<<pts_timestep[t][i].ft<<",";
  }
  coorfile<<'\n';
  trbst<<'\n';
@@ -328,7 +339,7 @@ void closefile(ofstream &coorfile,ofstream &trbst,ofstream &notes,
    <<"\nTimestep: "<<param.timestep
    <<"\nNumber of threads: "<<param.num_cores
    <<"\nComputation time: "<<ct
-   <<"\n\nProgram version: gravity_hpx.2.1\n"; //REMEBER TO UPDATE THIS!!!!!
+   <<"\n\nProgram version: gravity_hpx.3.2\n"; //REMEBER TO UPDATE THIS!!!!!
 
  coorfile.close();
  trbst.close();
@@ -399,19 +410,6 @@ vector<point> createvecs(ifstream &ist) {
  return pts;
 }
 
-vector<point> createvecs(int k) {
-//This section creates the vector that holds the current forces on each point
- vector<point>fvec(k);
- 
- for(int q=0;q<k;++q) {
-  fvec[q].fx=0;
-  fvec[q].fy=0;
-  fvec[q].fz=0;
-  fvec[q].ft=0;
- }
- return fvec;
-}
-
 void calc_force(int k,int t,int i) {
  double mt; //the multiple of the masses
  double const g=6.673e-11; //the Gravitational Constant
@@ -419,40 +417,65 @@ void calc_force(int k,int t,int i) {
  vector<point> comp2; //vector to copy unit vector info to
  
  for (int l=i+1;l<k;++l) { //moves through the second points 1-2, 1-3, etc.
-   comp2 = dist(t,i,l); //copy in unit vector data
-   mt=pts_timestep[t][l].m*pts_timestep[t][i].m*g;
-   F=mt/comp2[0].d;
-
+  abacus quipu_red; 
+  abacus quipu_blue;
+  quipu_red.p=i;
+  quipu_red.t=t;
+  quipu_blue.p=l;
+  quipu_blue.t=t;
+  comp2 = dist(t,i,l); //copy in unit vector data
+  mt=pts_timestep[t][l].m*pts_timestep[t][i].m*g;
+  F=mt/comp2[0].d;
+  
   if (pts_timestep[t][i].x<pts_timestep[t][l].x || 
          pts_timestep[t][i].x==pts_timestep[t][l].x) {
-   fvec_timestep[t][i].fx=fvec_timestep[t][i].fx+F*comp2[0].xc;
-   fvec_timestep[t][l].fx=fvec_timestep[t][l].fx-F*comp2[0].xc;
+   quipu_red.fx=F*comp2[0].xc;
+   quipu_blue.fx=-F*comp2[0].xc;
   }
   if (pts_timestep[t][i].x>pts_timestep[t][l].x) {
-   fvec_timestep[t][i].fx=fvec_timestep[t][i].fx-F*comp2[0].xc;
-   fvec_timestep[t][l].fx=fvec_timestep[t][l].fx+F*comp2[0].xc;
+   quipu_red.fx=-F*comp2[0].xc;
+   quipu_blue.fx=F*comp2[0].xc;
   }
   if (pts_timestep[t][i].y<pts_timestep[t][l].y || 
          pts_timestep[t][i].y==pts_timestep[t][l].y) {
-   fvec_timestep[t][i].fy=fvec_timestep[t][i].fy+F*comp2[0].yc;
-   fvec_timestep[t][l].fy=fvec_timestep[t][l].fy-F*comp2[0].yc;
+   quipu_red.fy=F*comp2[0].yc;
+   quipu_blue.fy=-F*comp2[0].yc;
   }
   if (pts_timestep[t][i].y>pts_timestep[t][l].y) {
-   fvec_timestep[t][i].fy=fvec_timestep[t][i].fy-F*comp2[0].yc;
-   fvec_timestep[t][l].fy=fvec_timestep[t][l].fy+F*comp2[0].yc;
+   quipu_red.fy=-F*comp2[0].yc;
+   quipu_blue.fy=F*comp2[0].yc;
   }
   if (pts_timestep[t][i].z<pts_timestep[t][l].z || 
          pts_timestep[t][i].z==pts_timestep[t][l].z) {
-   fvec_timestep[t][i].fz=fvec_timestep[t][i].fz+F*comp2[0].zc;
-   fvec_timestep[t][l].fz=fvec_timestep[t][l].fz-F*comp2[0].zc;
+   quipu_red.fz=F*comp2[0].zc;
+   quipu_blue.fz=-F*comp2[0].zc;
   }
   if (pts_timestep[t][i].z>pts_timestep[t][l].z) {
-   fvec_timestep[t][i].fz=fvec_timestep[t][i].fz-F*comp2[0].zc;
-   fvec_timestep[t][l].fz=fvec_timestep[t][l].fz+F*comp2[0].zc;
+   quipu_red.fz=-F*comp2[0].zc;
+   quipu_blue.fz=F*comp2[0].zc;
   }
-  fvec_timestep[t][i].ft=sqrt(fvec_timestep[t][i].fx*fvec_timestep[t][i].fx+
-                              fvec_timestep[t][i].fy*fvec_timestep[t][i].fy);
-  fvec_timestep[t][l].ft=sqrt(fvec_timestep[t][l].fx*fvec_timestep[t][l].fx+
-                              fvec_timestep[t][l].fy*fvec_timestep[t][l].fy);
+  if (debug) {
+   cout<<"quipu_red.fx= "<<quipu_red.fx<<"\nquipu_red.fy= "
+       <<quipu_red.fy<<"\nquipu_red.fz= "<<quipu_red.fz<<"\n\n";
+  }
+  bin.push_back(quipu_red);
+  bin.push_back(quipu_blue);
+  quipu_red.adder();
+//  quipu_blue.adder(); //////////////////////!!!!!!!!!!!////////////
  }
+}
+
+void abacus::adder() {
+ while (bin.size()>0) { ///////////////////!!!!!!!!!!!!!!////////////////
+  abacus quitemp=bin.front();
+  int t=quitemp.t;
+  int p=quitemp.p;
+
+  pts_timestep[t][p].fx+=quitemp.fx;
+  pts_timestep[t][p].fy+=quitemp.fy;
+  pts_timestep[t][p].fz+=quitemp.fz;
+  pts_timestep[t][p].ft=sqrt(pts_timestep[t][p].fx*pts_timestep[t][p].fx+
+                              pts_timestep[t][p].fy*pts_timestep[t][p].fy);
+  bin.pop_front();
+ } /////////////////////////////!!!!!!!!!!!!!!!!!!!/////////////////////
 }
