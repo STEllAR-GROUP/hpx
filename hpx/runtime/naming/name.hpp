@@ -491,6 +491,11 @@ namespace hpx { namespace naming
         // comparison is required as well
         friend bool operator== (id_type const& lhs, id_type const& rhs)
         {
+            if (!lhs)
+                return !rhs;
+            if (!rhs)
+                return !lhs;
+
             return *lhs.gid_ == *rhs.gid_;
         }
         friend bool operator!= (id_type const& lhs, id_type const& rhs)
