@@ -187,3 +187,12 @@ macro(hpx_check_for_cxx11_std_function variable)
     FLAGS -I${BOOST_INCLUDE_DIR} ${include_dir} "-std=c++0x" FILE ${ARGN})
 endmacro()
 
+###############################################################################
+macro(hpx_check_for_thread_safe_hdf5 variable)
+  hpx_get_include_directory(include_dir)
+
+  add_hpx_config_test("hdf5_thread_safe" ${variable} LANGUAGE CXX
+    SOURCE cmake/tests/hdf5_thread_safe.cpp
+    FLAGS -I${HDF5_INCLUDE_DIR} ${include_dir} "-std=c++0x" FILE ${ARGN})
+endmacro()
+
