@@ -29,7 +29,7 @@ public:
     {
         detail::spinlock_pool<0>::scoped_lock guard(const_cast<T*>(&i));
         T tmp;
-        memcpy(&tmp, (T*)&i, sizeof(T));
+        memcpy(&tmp, const_cast<T*>(&i), sizeof(T));
         return tmp;
     }
     bool compare_exchange_strong(
