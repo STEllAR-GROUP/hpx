@@ -8,6 +8,10 @@ if(NOT HPX_FINDPACKAGE_LOADED)
   include(HPX_FindPackage)
 endif()
 
+if(NOT GSL_ROOT AND NOT $ENV{HOME_GSL} STREQUAL "")
+  set(GSL_ROOT $ENV{HOME_GSL})
+endif()
+
 if(GSL_USE_SYSTEM)
   set(GSLCBLAS_CPP_USE_SYSTEM ON)
 endif()
