@@ -109,6 +109,12 @@ namespace gtc { namespace server
         array<double> zion_;
         array<double> zion0_;
         double zetamin_,zetamax_;
+        std::vector<double> deltat_;
+        std::vector<std::size_t> igrid_;
+        double deltaz_;
+        std::vector<double> kzion_,wzion_;
+        array<double> pgyro_,tgyro_,wpion_;
+        std::vector<double> qtinv_;
     };
 
 }}

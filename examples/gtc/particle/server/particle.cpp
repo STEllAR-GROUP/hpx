@@ -43,15 +43,24 @@ namespace gtc { namespace server
         double tmp5 = (double) par->mpsi;
         deltar_ = (par->a1-par->a0)/tmp5;
 
+        deltat_.resize(par->mpsi+1);
+
         // grid shift associated with fieldline following coordinates
         double tmp6 = (double) par->mthetamax;
         double tdum = 2.0*pi*par->a1/tmp6;
+        qtinv_.resize(par->mpsi+1);
         for (std::size_t i=0;i<par->mpsi+1;i++) {
           double r = par->a0 + deltar_*i;
           std::size_t two = 2;
           double tmp7 = pi*r/tdum + 0.5;
           std::size_t tmp8 = (std::size_t) tmp7;
           mtheta_[i] = std::max(two,std::min(par->mthetamax,two*tmp8)); // even # poloidal grid
+          deltat_[i] = 2.0*pi/mtheta_[i];  
+          double q = par->q0 + par->q1*r/par->a + par->q2*r*r/(par->a*par->a);
+          double tmp9 = mtheta_[i]/q + 0.5;
+          double tmp11 = (double) mtheta_[i];
+          qtinv_[i] = tmp11/tmp9;  // q value for coordinate transformation
+          qtinv_[i] = 1.0/qtinv_[i]; // inverse q to avoid divide operation
         }
 
         // number of grids on a poloidal plane
@@ -171,6 +180,95 @@ namespace gtc { namespace server
         if ( par->nhybrid > 0 ) {
           std::cerr << " Not implemented yet " << std::endl;
         }
+
+        // calculate ion gather-scatter coefficients
+        igrid_.resize(par->mpsi+1);
+        igrid_[0] = 1;
+        for (std::size_t i=1;i<par->mpsi+1;i++) {
+          igrid_[i] = igrid_[i-1]+mtheta_[i-1]+1;
+        }
+
+        double tmp4 = (double) mzeta_;
+        deltaz_ = (zetamax_-zetamin_)/tmp4;
+        double delz = 1.0/deltaz_;
+        std::vector<double> delt; 
+        delt.resize( deltat_.size() );
+        for (std::size_t i=0;i<deltat_.size();i++) {
+          delt[i] = 2.0*pi/deltat_[i];
+        }
+        double smu_inv = sqrt(par->aion)/(abs(par->qion)*par->gyroradius); 
+        double densityi = 0.0; 
+        std::size_t zero = 0;
+        kzion_.resize(mimax+1);
+        wzion_.resize(mimax+1);
+
+        pgyro_.resize(5,mgrid_+1,1);
+        tgyro_.resize(5,mgrid_+1,1);
+        // 4-point gyro-averaging for sqrt(mu)=gyroradius on grid of magnetic coordinates
+        // rho=gyroradius*sqrt(2/(b/b_0))*sqrt(mu/mu_0), mu_0*b_0=m*v_th^2
+        // dtheta/delta_x=1/(r*(1+r*cos(theta))), delta_x=poloidal length increase
+        for (std::size_t i=0;i<par->mpsi+1;i++) {
+          double r = par->a0 + deltar_*i;
+          for (std::size_t j=0;j<=mtheta_[i];j++) {
+            std::size_t ij = igrid_[i] + j;
+            double tdum = deltat_[i]*j;
+            double b = 1.0/(1.0+r*cos(tdum));
+            double dtheta_dx = 1.0/r;
+            // first two points perpendicular to field line on poloidal surface
+            double rhoi = sqrt(2.0/b)*par->gyroradius;
+
+            pgyro_(1,ij,0) = -rhoi;
+            pgyro_(2,ij,0) = rhoi;
+            // non-orthorgonality between psi and theta: tgyro=-rhoi*dtheta_dx*r*sin(tdum)
+            tgyro_(1,ij,0) = 0.0;
+            tgyro_(2,ij,0) = 0.0;
+
+            // the other two points tangential to field line
+            tgyro_(3,ij,0) = -rhoi*dtheta_dx;
+            tgyro_(4,ij,0) = rhoi*dtheta_dx;
+            pgyro_(3,ij,0) = rhoi*0.5*rhoi/r;
+            pgyro_(4,ij,0) = rhoi*0.5*rhoi/r;
+          }
+        }
+
+        wpion_.resize(5,mimax+1,1);
+        for (std::size_t m=1;m<=mi;m++) {
+          double psitmp = zion_(1,m,0);
+          double thetatmp = zion_(2,m,0);
+          double zetatmp = zion_(3,m,0);
+          double rhoi = zion_(6,m,0)*smu_inv;
+
+          double r = sqrt(2.0*psitmp);
+          std::size_t tmp = (std::size_t) ((r-par->a0)*delr+0.5);
+          double dip = std::max(0.0,(double) std::min(par->mpsi,tmp));
+          std::size_t ip = (std::size_t) dip;
+          std::size_t tmp2 = (std::size_t) (thetatmp*pi2_inv*delt[ip]+0.5); 
+          double djt = std::max(0.0,(double) std::min(mtheta_[ip],tmp2));
+          std::size_t jt = (std::size_t) djt;
+          std::size_t ipjt = igrid_[ip] + jt;
+
+          double wz1 = (zetatmp-zetamin_)*delz;
+          std::size_t kk = std::max(zero,std::min(par->mpsi-1,(std::size_t) wz1));
+          kzion_[m] = kk;
+          wzion_[m] = wz1 - kk;
+
+          for (std::size_t larmor=1;larmor<=4;larmor++) {
+            double rdum = delr*std::max(0.0,std::min(par->a1-par->a0,r+rhoi*pgyro_(larmor,ipjt,0)-par->a0));
+            std::size_t ii = std::max(zero,std::min(par->mpsi-1,(std::size_t) rdum));
+            double wp1 = rdum - ii;
+            wpion_(larmor,m,0) = wp1;
+
+            // particle position in theta
+            double tflr = thetatmp + rhoi*tgyro_(larmor,ipjt,0);
+ 
+            // inner flux surface
+            //std::size_t im = ii;
+            //double tdum = pi2_inv*(tflr-zetatmp*qtinv_[im])+10.0;
+            //tdum = (tdum - floor(tdum))*delt[im];
+            //std::size_t j00 = std::max(zero,std::min(mtheta_[im]-1,(std::size_t) tdum));
+          }
+        }
+        
     }
 }}
 
