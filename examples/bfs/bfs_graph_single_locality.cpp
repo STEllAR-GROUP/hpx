@@ -144,9 +144,9 @@ namespace bfs_graph { namespace single_locality
         bfs<bfs::graph>("Single threaded BFS",
             validate, grainsize, edgelist, searchroots);
 
-        // single threaded (BGL) BFS
-        bfs<bfs::bgl_graph>("Single threaded BFS (based on BGL)",
-            validate, grainsize, edgelist, searchroots);
+//         // single threaded (BGL) BFS
+//         bfs<bfs::bgl_graph>("Single threaded BFS (based on BGL)",
+//             validate, grainsize, edgelist, searchroots);
 
         // multi threaded (BGL) BFS
         bfs<bfs::concurrent_bgl_graph>("Multi threaded BFS (based on BGL)",

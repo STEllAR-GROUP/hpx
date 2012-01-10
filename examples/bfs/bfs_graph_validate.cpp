@@ -62,18 +62,14 @@ namespace bfs_graph
             }
         }
 
-        // octave: P = parent (slice);
-        std::vector<std::size_t> P(slice.size());
-        for (std::size_t i=0;i<slice.size();i++)
-            P[i] = parents[slice[i]];
-
         // Define a mask
+        // octave: P = parent (slice);
         // octave:  mask = P != search_key;
+        std::vector<std::size_t> P(slice.size());
         boost::dynamic_bitset<> mask(slice.size());
         for (std::size_t i = 0; i < slice.size(); ++i) {
-            if (P[i] != searchkey) {
-                mask[i] = true;
-            }
+            P[i] = parents[slice[i]];
+            mask[i] = P[i] != searchkey;
         }
 
         // octave:  while any (mask)
@@ -86,11 +82,10 @@ namespace bfs_graph
             }
 
             // octave:  P = parent(P)
-            for (std::size_t i = 0; i < P.size(); ++i)
+            for (std::size_t i = 0; i < P.size(); ++i) {
                 P[i] = parents[P[i]];
-
-            for (std::size_t i = 0; i < P.size(); ++i)
                 mask[i] = P[i] != searchkey;
+            }
 
             if (++k > N)     // there is a cycle in the tree -- something wrong
                 return -3;

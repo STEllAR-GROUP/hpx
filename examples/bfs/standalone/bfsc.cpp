@@ -50,13 +50,11 @@ int validate(std::vector<std::size_t> const& parent,
 // }
 
 void bfs(std::size_t root,
-         std::vector<char> & visited,
          std::vector<std::size_t> & parent,
          std::vector<std::vector<std::size_t> > const& neighbors)
 {
   std::queue<std::size_t> q;
 
-  visited[root] = true;
   parent[root] = root;
   q.push(root);
 
@@ -68,12 +66,10 @@ void bfs(std::size_t root,
     for (std::vector<std::size_t>::const_iterator it = node_neighbors.begin();
          it != end; ++it)
     {
-      std::size_t neighbor = *it;
-      char& node_visited = visited[neighbor];
-      if (!node_visited) {
-        node_visited = true;
-        parent[neighbor] = node;
-        q.push(neighbor);
+      std::size_t& node_parent = parent[*it];
+      if (!node_parent) {
+        node_parent = node;
+        q.push(*it);
       }
     }
   }
@@ -167,7 +163,7 @@ int main() {
     // time this
     hpx::util::high_resolution_timer t1;
 //     depth_traverse(zero,searchroot[step],searchroot[step],visited,level,parent,neighbors,max_level);
-    bfs(searchroot[step], visited, parent, neighbors);
+    bfs(searchroot[step], /*visited, */parent, neighbors);
     kernel2_time[step] = t1.elapsed();
     // end timing
 

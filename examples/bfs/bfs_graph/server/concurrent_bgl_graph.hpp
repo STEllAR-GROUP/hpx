@@ -23,9 +23,10 @@ namespace bfs { namespace server
     class HPX_COMPONENT_EXPORT concurrent_bgl_graph
       : public hpx::components::managed_component_base<concurrent_bgl_graph>
     {
-        typedef boost::adjacency_list <
+        typedef boost::adjacency_list<
             boost::vecS, boost::vecS, boost::undirectedS
         > graph_type;
+        typedef boost::graph_traits<graph_type>::vertex_descriptor vertex_type;
 
     public:
         /// Action codes.
@@ -67,7 +68,8 @@ namespace bfs { namespace server
 
         typedef hpx::actions::result_action0<
             concurrent_bgl_graph, std::vector<std::size_t>, graph_get_parents,
-            &concurrent_bgl_graph::get_parents
+            &concurrent_bgl_graph::get_parents,
+            hpx::threads::thread_priority_critical
         > get_parents_action;
 
         typedef hpx::actions::action0<

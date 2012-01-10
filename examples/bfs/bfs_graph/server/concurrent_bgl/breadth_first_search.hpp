@@ -25,7 +25,7 @@ namespace concurrent_bgl
         typename ColorMap>
     void breadth_first_visit(IncidenceGraph const& g,
         typename boost::graph_traits<IncidenceGraph>::vertex_descriptor s,
-        Buffer& Q, BFSVisitor vis, ColorMap color)
+        Buffer& Q, BFSVisitor vis, ColorMap& color)
     {
         BOOST_CONCEPT_ASSERT((boost::IncidenceGraphConcept<IncidenceGraph>));
         BOOST_CONCEPT_ASSERT((boost::BFSVisitorConcept<BFSVisitor, IncidenceGraph>));
