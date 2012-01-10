@@ -39,18 +39,18 @@ namespace gtc
         /// Initialize the \a gtc::server::particle instance with the
         /// given particle file. 
         hpx::lcos::promise<void> init_async(std::size_t objectid,
-            std::string const& particlefile)
+            parameter const& par)
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::init_async(gid_,objectid,particlefile);
+            return this->base_type::init_async(gid_,objectid,par);
         }
 
         /// Initialize the \a gtc::server::particle instance with the
         /// given particle file.  
-        void init(std::size_t objectid,std::string const& particlefile)
+        void init(std::size_t objectid,parameter const& par)
         {
             BOOST_ASSERT(gid_);
-            this->base_type::init(gid_,objectid,particlefile);
+            this->base_type::init(gid_,objectid,par);
         }
 
         /// Compute the distance from the particle to the specified coordinates. 

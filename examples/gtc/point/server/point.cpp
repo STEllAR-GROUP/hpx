@@ -273,6 +273,7 @@ namespace gtc { namespace server
             }
           }
         }
+
     }
 
     bool search_callback(std::list<std::size_t>& deposits,

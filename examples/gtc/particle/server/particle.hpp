@@ -12,6 +12,10 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 
+#include "../../parameter.hpp"
+
+using hpx::components::gtc::parameter;
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace gtc { namespace server
 {
@@ -35,7 +39,7 @@ namespace gtc { namespace server
         // Exposed functionality of this component.
 
         /// Initialize the point with the given particle file. 
-        void init(std::size_t objectid,std::string const& particlefile);
+        void init(std::size_t objectid,parameter const& par);
 
         /// Calculate the distance from this particle to the specified
         /// coordinates.
@@ -63,7 +67,7 @@ namespace gtc { namespace server
             particle_init,
             // Arguments of this action.
             std::size_t,
-            std::string const&,
+            parameter const&,
             // Method bound to this action.
             &particle::init
         > init_action;
@@ -97,6 +101,10 @@ namespace gtc { namespace server
     private:
         std::size_t idx_;
         double posx_,posy_,posz_;
+        double deltar_;
+        std::vector<std::size_t> mtheta_;
+        std::size_t mgrid_;
+        std::size_t mzeta_;
     };
 
 }}

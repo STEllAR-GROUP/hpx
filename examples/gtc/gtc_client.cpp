@@ -344,9 +344,6 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::size_t const num_gridpoints = vm["n"].as<std::size_t>();
         std::size_t const num_particles = vm["np"].as<std::size_t>();
 
-        std::string const meshfile = vm["mesh"].as<std::string>();
-        std::string const particlefile = vm["particles"].as<std::string>();
-
         ///////////////////////////////////////////////////////////////////////
         // Create a distributing factory locally. The distributing factory can
         // be used to create blocks of components that are distributed across
@@ -394,7 +391,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         }
 
         for (std::size_t i=0;i<num_particles;i++) {
-          initial_phase.push_back(particles[i].init_async(i,particlefile));
+          initial_phase.push_back(particles[i].init_async(i,par));
         }
 
         // While we're waiting for the initialization phase to complete, we 
@@ -445,11 +442,7 @@ int main(int argc, char* argv[])
         ("n", value<std::size_t>()->default_value(5),
             "the number of gridpoints")
         ("np", value<std::size_t>()->default_value(5),
-            "the number of particles")
-        ("mesh", value<std::string>()->default_value("mesh.txt"),
-            "the file containing the mesh")
-        ("particles", value<std::string>()->default_value("particles.txt"),
-            "the file containing the particles");
+            "the number of particles");
 
     return hpx::init(desc_commandline, argc, argv); // Initialize and run HPX.
 }
