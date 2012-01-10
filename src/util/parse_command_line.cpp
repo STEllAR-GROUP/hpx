@@ -185,9 +185,9 @@ namespace hpx { namespace util
             options_description cmdline_options(
                 "HPX options (allowed on command line only)");
             cmdline_options.add_options()
-                ("help,h", "print out program usage (this message)")
-                ("fullhelp", "print out full program usage (including additional "
-                    "options supported by separate components)")
+                ("help,h", value<std::string>()->implicit_value("minimal"),
+                    "print out program usage (default: this message), possible "
+                    "values: 'full' (additionally prints options from components)")
                 ("version,v", "print out HPX version and copyright information")
                 ("options-file", value<std::vector<std::string> >()->composing(),
                     "specify a file containing command line options "
@@ -370,7 +370,7 @@ namespace hpx { namespace util
             detail::handle_config_options(vm, desc_cfgfile);
 
             // print help screen
-            if (visible && (vm.count("help") || vm.count("fullhelp"))) {
+            if (visible && vm.count("help")) {
                 (*visible)
                     .add(app_options).add(cmdline_options)
                     .add(hpx_options).add(counter_options)

@@ -765,13 +765,19 @@ namespace hpx { namespace components { namespace server
 
             std::string fullhelp(ini.get_entry("hpx.cmd_line_help", ""));
             if (!fullhelp.empty()) {
-                std::cout << decode_string(fullhelp);
-                std::cout << options << std::endl;
+                std::string help_option(ini.get_entry("hpx.cmd_line_help_option", ""));
+                if (0 == std::string("full").find(help_option)) {
+                    std::cout << decode_string(fullhelp);
+                    std::cout << options << std::endl;
+                }
+                else {
+                    throw std::logic_error("unknown help option: " + help_option);
+                }
                 return false;
             }
         }
         catch (std::exception const& e) {
-            std::cerr << "runtime_support::load_components:"
+            std::cerr << "runtime_support::load_components: "
                       << "command line processing: " << e.what() << std::endl;
             return false;
         }
@@ -913,8 +919,8 @@ namespace hpx { namespace components { namespace server
                 return false;   // duplicate component id?
             }
 
-            load_startup_shutdown_functions(d);
             load_commandline_options(d, options);
+            load_startup_shutdown_functions(d);
 
             LRT_(info) << "dynamic loading succeeded: " << lib.string()
                        << ": " << instance << ": "

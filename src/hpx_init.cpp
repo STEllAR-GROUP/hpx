@@ -800,15 +800,19 @@ namespace hpx
                 return detail::print_version(std::cout);
 
             if (vm.count("help")) {
-                std::cout << help << std::endl;
-                return 0;
-            }
-
-            if (vm.count("fullhelp")) {
-                hpx::util::osstream strm;
-                strm << help << std::endl;
-                ini_config += "hpx.cmd_line_help=" +
-                    detail::encode_string(strm.str());
+                std::string help_option(vm["help"].as<std::string>());
+                if (0 == std::string("minimal").find(help_option))
+                {
+                    std::cout << help << std::endl;
+                    return 0;
+                }
+                else {
+                    hpx::util::osstream strm;
+                    strm << help << std::endl;
+                    ini_config += "hpx.cmd_line_help=" +
+                        detail::encode_string(strm.str());
+                    ini_config += "hpx.cmd_line_help_option=" + help_option;
+                }
             }
 
             bool debug_clp = vm.count("debug-clp") ? true : false;
