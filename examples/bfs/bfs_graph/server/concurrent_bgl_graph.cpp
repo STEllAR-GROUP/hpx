@@ -72,7 +72,8 @@ namespace bfs { namespace server
             vertex_type v = target(e_, graph_);
             vis_.examine_edge(e_, graph_);
 
-            typedef boost::property_traits<ColorMap>::value_type color_value_type;
+            typedef typename boost::property_traits<ColorMap>::value_type
+                color_value_type;
             typedef boost::color_traits<color_value_type> color_type;
 
             vis_.tree_edge(e_, graph_);
