@@ -115,6 +115,8 @@ namespace gtc { namespace server
         std::vector<double> kzion_,wzion_;
         array<double> pgyro_,tgyro_,wpion_;
         std::vector<double> qtinv_;
+        array<double> jtion0_,wtion0_;
+        array<double> jtion1_,wtion1_;
     };
 
 }}

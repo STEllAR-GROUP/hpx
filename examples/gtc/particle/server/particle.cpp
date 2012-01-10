@@ -93,6 +93,9 @@ namespace gtc { namespace server
 
         zion_.resize(nparam+1,mimax+1,1);
         zion0_.resize(nparam+1,mimax+1,1);
+        jtion0_.resize(nparam+1,mimax+1,1);
+        jtion1_.resize(5,mimax+1,1);
+        wtion1_.resize(5,mimax+1,1);
         for (std::size_t m=1;m<=mi;m++) {
           zion_(1,m,0) = sqrt(par->a0*par->a0 + ( (m+objectid*mi)-0.5 )*(par->a1*par->a1-par->a0*par->a0)*rmi);
         }
@@ -201,6 +204,7 @@ namespace gtc { namespace server
         std::size_t zero = 0;
         kzion_.resize(mimax+1);
         wzion_.resize(mimax+1);
+        wtion0_.resize(5,mimax+1,1);
 
         pgyro_.resize(5,mgrid_+1,1);
         tgyro_.resize(5,mgrid_+1,1);
@@ -262,10 +266,20 @@ namespace gtc { namespace server
             double tflr = thetatmp + rhoi*tgyro_(larmor,ipjt,0);
  
             // inner flux surface
-            //std::size_t im = ii;
-            //double tdum = pi2_inv*(tflr-zetatmp*qtinv_[im])+10.0;
-            //tdum = (tdum - floor(tdum))*delt[im];
-            //std::size_t j00 = std::max(zero,std::min(mtheta_[im]-1,(std::size_t) tdum));
+            std::size_t im = ii;
+            double tdum = pi2_inv*(tflr-zetatmp*qtinv_[im])+10.0;
+            tdum = (tdum - floor(tdum))*delt[im];
+            std::size_t j00 = std::max(zero,std::min(mtheta_[im]-1,(std::size_t) tdum));
+            jtion0_(larmor,m,0) = igrid_[im] + j00;
+            wtion0_(larmor,m,0) = tdum - j00;
+
+            // outer flux surface
+            im = ii; 
+            tdum = pi2_inv*(tflr-zetatmp*qtinv_[im])+10.0;
+            tdum = (tdum - floor(tdum))*delt[im];
+            std::size_t j01 = std::max(zero,std::min(mtheta_[im]-1,(std::size_t) tdum));
+            jtion1_(larmor,m,0) = igrid_[im] + j01;
+            wtion1_(larmor,m,0) = tdum - j01;
           }
         }
         
