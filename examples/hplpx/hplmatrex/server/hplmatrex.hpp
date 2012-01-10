@@ -234,7 +234,7 @@ namespace hpx { namespace components { namespace server
                 offset = (int)(offset*.5);
         }   }
         //initialize the assigned row
-        int temp = std::min((int)offset, (int)(rows - row));
+        int temp = (std::min)((int)offset, (int)(rows - row));
         int location;
         for(int i=0;i<temp;i++){
             location = row+i;
@@ -333,7 +333,7 @@ namespace hpx { namespace components { namespace server
                 tempivotarr[j] = pivotarr[j];
         }   }
 //***************************************************************************//
-        for(i=i;i<std::min((outer+1)*blocksize,rows-1);i++){
+        for(i=i;i<(std::min)((outer+1)*blocksize,rows-1);i++){
 //**********involved in predictions******************************************//
             good = true;
             if(outer > 0 && outer <= brows/2){
@@ -398,7 +398,7 @@ namespace hpx { namespace components { namespace server
     int i, j, maxRow, temp_piv;
     double max, temp;
 
-    for(i=row;i<std::min(row+blocksize,rows);i++){
+    for(i=row;i<(std::min)(row+blocksize,rows);i++){
         maxRow = i-blocksize;
         max = fabs(transData[i][tempivotarr[i-blocksize]]);
         temp_piv = tempivotarr[i];
@@ -549,7 +549,7 @@ namespace hpx { namespace components { namespace server
         }
 
     //accumulate the total error for a subset of the solutions
-        int temp = std::min((int)offset, (int)(rows - row));
+        int temp = (std::min)((int)offset, (int)(rows - row));
         int i,j;
         double sum;
         for(i=0;i<temp;i++){

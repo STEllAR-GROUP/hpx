@@ -246,7 +246,7 @@ namespace hpx { namespace components { namespace server
             }
         }
     //initialize the assigned row
-    int temp = std::min((int)offset, (int)(rows - row));
+    int temp = (std::min)((int)offset, (int)(rows - row));
     int location;
     for(int i=0;i<temp;i++){
         location = row+i;
@@ -347,7 +347,7 @@ namespace hpx { namespace components { namespace server
                 tempivotarr[j] = pivotarr[j];
         }   }
 //***************************************************************************//
-        for(i=i;i<std::min((outer+1)*blocksize,rows-1);i++){
+        for(i=i;i<(std::min)((outer+1)*blocksize,rows-1);i++){
 //**********involved in predictions******************************************//
             good = true;
             if(outer > 0 && outer <= brows/2){
@@ -410,7 +410,7 @@ namespace hpx { namespace components { namespace server
     int i, j, maxRow, temp_piv;
     double max, temp;
 
-    for(i=row;i<std::min(row+blocksize,rows);i++){
+    for(i=row;i<(std::min)(row+blocksize,rows);i++){
         maxRow = i-blocksize;
         max = fabs(transData[i][tempivotarr[i-blocksize]]);
         temp_piv = tempivotarr[i];
@@ -615,7 +615,7 @@ namespace hpx { namespace components { namespace server
     //middle loop: iterates over the rows of the current block
     //inner loop: iterates across the columns of the current block
     for(jj=0;jj<datablock[brow][bcol]->rows;jj+=litBlock){
-    for(j=jj;j<std::min(jj+litBlock,datablock[brow][bcol]->rows);j++){
+    for(j=jj;j<(std::min)(jj+litBlock,datablock[brow][bcol]->rows);j++){
         for(i=0;i<datablock[iter][iter]->rows;i++){
             factor = factorData[j+offset][i+offsetCol];
             for(k=0;k<datablock[brow][bcol]->columns;k++){
@@ -726,7 +726,7 @@ namespace hpx { namespace components { namespace server
         }
 
     //accumulate the total error for a subset of the solutions
-        int temp = std::min((int)offset, (int)(rows - row));
+        int temp = (std::min)((int)offset, (int)(rows - row));
         int i,j;
         double sum;
         for(i=0;i<temp;i++){
