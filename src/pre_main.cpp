@@ -83,7 +83,7 @@ void install_counters()
 
 ///////////////////////////////////////////////////////////////////////////////
 // Implements second and third stage bootstrapping.
-void pre_main(runtime_mode mode)
+bool pre_main(runtime_mode mode)
 {
     naming::resolver_client& agas_client = naming::get_agas_client();
     util::runtime_configuration const& cfg = get_runtime().get_config();
@@ -129,8 +129,13 @@ void pre_main(runtime_mode mode)
         // }}}
 
         // Load components, so that we can use the barrier LCO.
-        components::stubs::runtime_support::load_components
-            (find_here());
+        if (!components::stubs::runtime_support::load_components(find_here()))
+        {
+            components::stubs::runtime_support::shutdown_all(
+                naming::get_id_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX), -1.0);
+            return false;
+        }
+
         LBT_(info) << "(2nd stage) pre_main: loaded components";
 
         lcos::barrier second_stage, third_stage;
@@ -176,7 +181,7 @@ void pre_main(runtime_mode mode)
         LBT_(info) << "(3rd stage) pre_main: ran startup functions";
 
         // Register pre-shutdown and shutdown functions to flush pending
-        // reference counting operations. 
+        // reference counting operations.
         register_pre_shutdown_function(boost::bind(
             &agas::addressing_service::trigger_refcnt_requests
           , &agas_client, boost::ref(throws)));
@@ -196,6 +201,8 @@ void pre_main(runtime_mode mode)
     // Enable logging.
     components::activate_logging();
     LBT_(info) << "(3rd stage) pre_main: activated logging";
+
+    return true;
 }
 
 }

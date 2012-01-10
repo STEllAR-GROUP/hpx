@@ -78,7 +78,17 @@ int hpx_main(boost::program_options::variables_map& vm)
 
     // do main work, i.e. query the performance counters
     std::cout << "starting sine monitoring..." << std::endl;
-    int result = monitor(pause, values);
+
+    int result = 0;
+    try {
+        result = monitor(pause, values);
+    }
+    catch(hpx::exception const& e) {
+        std::cerr << "sine_client: caught exception: " << e.what() << std::endl;
+        std::cerr << "Have you specified the command line option "
+                     "--sine to enable the sine component?"
+                  << std::endl;
+    }
 
     // Initiate shutdown of the runtime system.
     hpx::finalize();

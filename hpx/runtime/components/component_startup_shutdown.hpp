@@ -61,30 +61,32 @@ namespace hpx { namespace components
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_DEF_COMPONENT_STARTUP_SHUTDOWN(startup_, shutdown_)               \
+#define HPX_DEFINE_COMPONENT_STARTUP_SHUTDOWN(startup_, shutdown_)            \
     namespace hpx { namespace components { namespace startup_shutdown_provider\
     {                                                                         \
         bool startup(HPX_STD_FUNCTION<void()>& startup_func)                  \
         {                                                                     \
-            HPX_STD_FUNCTION<void()> tmp = startup_;                          \
-            if (!!tmp) { startup_func = startup_; return true; }              \
+            HPX_STD_FUNCTION<bool(HPX_STD_FUNCTION<void()>&)> tmp = startup_; \
+            if (!!tmp) { return tmp(startup_func); }                          \
             return false;                                                     \
         }                                                                     \
         bool shutdown(HPX_STD_FUNCTION<void()>& shutdown_func)                \
         {                                                                     \
-            HPX_STD_FUNCTION<void()> tmp = shutdown_;                         \
-            if (!!tmp) { shutdown_func = shutdown_; return true; }            \
+            HPX_STD_FUNCTION<bool(HPX_STD_FUNCTION<void()>&)> tmp = shutdown_;\
+            if (!!tmp) { return tmp(shutdown_func); }                         \
             return false;                                                     \
         }                                                                     \
     }}}                                                                       \
     /***/
+
+#define HPX_NULL_STARTUP_SHUTDOWN_PTR ((bool(*)(HPX_STD_FUNCTION<void()>&))0)
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_STARTUP_SHUTDOWN_MODULE(startup, shutdown)               \
         HPX_REGISTER_STARTUP_SHUTDOWN_FUNCTIONS()                             \
         HPX_REGISTER_STARTUP_SHUTDOWN_REGISTRY(                               \
             hpx::components::component_startup_shutdown, startup_shutdown)    \
-        HPX_DEF_COMPONENT_STARTUP_SHUTDOWN(startup, shutdown)                 \
+        HPX_DEFINE_COMPONENT_STARTUP_SHUTDOWN(startup, shutdown)              \
     /**/
 
 #endif // HPX_A7F46A4F_9AF9_4909_B0D8_5304FEFC5649

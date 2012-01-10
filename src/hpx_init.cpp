@@ -734,6 +734,31 @@ namespace hpx
             sigaction(SIGSYS, &new_action, NULL);  // Bad syscall
 #endif
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        inline void encode (std::string &str, char s, char const *r)
+        {
+            std::string::size_type pos = 0;
+            while ((pos = str.find_first_of(s, pos)) != std::string::npos)
+            {
+                str.replace (pos, 1, r);
+                ++pos;
+            }
+        }
+
+        inline std::string encode_string(std::string str)
+        {
+            encode(str, '\n', "\\n");
+            return str;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        inline std::string enquote(std::string const& arg)
+        {
+            if (arg.find_first_of(" \t") != std::string::npos)
+                return std::string("\"") + arg + "\"";
+            return arg;
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -753,8 +778,22 @@ namespace hpx
             // Analyze the command line.
             variables_map vm;
             boost::program_options::options_description help;
-            if (!util::parse_commandline(desc_cmdline, argc, argv, vm, mode, &help))
+            std::vector<std::string> unregistered_options;
+            bool cmd_result = util::parse_commandline(desc_cmdline, argc, argv,
+                vm, util::allow_unregistered, mode, &help, &unregistered_options);
+            if (!cmd_result)
                 return -1;
+
+            //  store unregistered command line arguments
+            if (!unregistered_options.empty()) {
+                typedef std::vector<std::string>::const_iterator iterator_type;
+                std::string options;
+                iterator_type  end = unregistered_options.end();
+                for (iterator_type  it = unregistered_options.begin(); it != end; ++it)
+                    options += " " + detail::enquote(*it);
+                ini_config += "hpx.unknown_cmd_line=" +
+                    detail::enquote(argv[0]) + options;
+            }
 
             // print version/copyright information
             if (vm.count("version"))
@@ -763,6 +802,13 @@ namespace hpx
             if (vm.count("help")) {
                 std::cout << help << std::endl;
                 return 0;
+            }
+
+            if (vm.count("fullhelp")) {
+                hpx::util::osstream strm;
+                strm << help << std::endl;
+                ini_config += "hpx.cmd_line_help=" +
+                    detail::encode_string(strm.str());
             }
 
             bool debug_clp = vm.count("debug-clp") ? true : false;
@@ -1005,10 +1051,7 @@ namespace hpx
             {
                 // quote only if it contains whitespace
                 std::string arg(argv[i]);
-                if (arg.find_first_of(" \t") != std::string::npos)
-                    cmd_line += std::string("\"") + arg + "\"";
-                else
-                    cmd_line += arg;
+                cmd_line += detail::enquote(arg);
 
                 if ((i + 1) != argc)
                     cmd_line += " ";
@@ -1179,8 +1222,8 @@ namespace hpx
             shutdown_timeout = detail::get_option("hpx.shutdown_timeout", -1.0);
 
         components::stubs::runtime_support::shutdown_all(
-            naming::get_id_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX)
-          , shutdown_timeout);
+            naming::get_id_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX),
+            shutdown_timeout);
     }
 
     ///////////////////////////////////////////////////////////////////////////

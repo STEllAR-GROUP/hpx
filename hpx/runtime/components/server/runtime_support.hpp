@@ -15,6 +15,7 @@
 #include <boost/thread/condition.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/plugin.hpp>
+#include <boost/program_options/options_description.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/agas/gva.hpp>
@@ -243,7 +244,7 @@ namespace hpx { namespace components { namespace server
 
         void update_agas_cache(naming::gid_type const&, agas::gva const&);
 
-        void load_components();
+        bool load_components();
 
         void call_startup_functions();
         void call_shutdown_functions(bool pre_shutdown);
@@ -277,8 +278,8 @@ namespace hpx { namespace components { namespace server
             &runtime_support::create_memory_block
         > create_memory_block_action;
 
-        typedef hpx::actions::direct_action0<
-            runtime_support, runtime_support_load_components,
+        typedef hpx::actions::direct_result_action0<
+            runtime_support, bool, runtime_support_load_components,
             &runtime_support::load_components
         > load_components_action;
 
@@ -376,14 +377,17 @@ namespace hpx { namespace components { namespace server
 
     protected:
         // Load all components from the ini files found in the configuration
-        void load_components(util::section& ini, naming::gid_type const& prefix,
+        bool load_components(util::section& ini, naming::gid_type const& prefix,
             naming::resolver_client& agas_client);
         bool load_component(util::section& ini, std::string const& instance,
             std::string const& component, boost::filesystem::path lib,
             naming::gid_type const& prefix, naming::resolver_client& agas_client,
-            bool isdefault, bool isenabled);
+            bool isdefault, bool isenabled, 
+            boost::program_options::options_description& options);
 
         bool load_startup_shutdown_functions(boost::plugin::dll& d);
+        bool load_commandline_options(boost::plugin::dll& d,
+            boost::program_options::options_description& options);
 
     private:
         mutex_type mtx_;

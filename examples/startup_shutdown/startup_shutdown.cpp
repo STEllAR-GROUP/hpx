@@ -12,14 +12,14 @@
 // is guaranteed to be executed before hpx_main() is invoked.
 //
 // The HPX API function retrieve_commandline_arguments() demonstrated below
-// expectes 2 arguments: a) an options_description object describing any 
+// expectes 2 arguments: a) an options_description object describing any
 // special options to be recognized by this component and b) a variables_map
 // object which on return will be initialized with all found command line
 // options and arguments passed while invoking the application on the locality
 // where this component got loaded.
 
 // The actual component of this module (see the subdirectory /server) does not
-// expose any useful functionality. It has been added for the sole purpose of 
+// expose any useful functionality. It has been added for the sole purpose of
 // turning this module into a HPX component, as otherwise the startup function
 // would not be executed by the runtime system.
 
@@ -63,6 +63,13 @@ namespace startup_shutdown
                       << std::endl;
         }
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    bool get_startup(HPX_STD_FUNCTION<void()>& startup_func)
+    {
+        startup_func = startup;     // return our startup-function
+        return true;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -73,5 +80,6 @@ namespace startup_shutdown
 // of the 2 parameters for the macro below can be zero (0), which means no
 // function will be called. We leave the shutdown function out as we don't need
 // it for the purpose of this example.
-HPX_REGISTER_STARTUP_SHUTDOWN_MODULE(::startup_shutdown::startup, (void(*)())0);
+HPX_REGISTER_STARTUP_SHUTDOWN_MODULE(
+    ::startup_shutdown::startup, HPX_NULL_STARTUP_SHUTDOWN_PTR);
 

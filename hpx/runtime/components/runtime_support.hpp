@@ -118,14 +118,14 @@ namespace hpx { namespace components
             return this->base_type::create_memory_block_async(gid_, count, act);
         }
 
-        lcos::promise<void> load_components_async()
+        lcos::promise<bool> load_components_async()
         {
             return this->base_type::load_components_async(gid_);
         }
 
-        void load_components()
+        bool load_components()
         {
-            this->base_type::load_components(gid_);
+            return this->base_type::load_components(gid_);
         }
 
         lcos::promise<void> call_startup_functions_async()

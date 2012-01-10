@@ -3,12 +3,15 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+set(root "${hpx_SOURCE_DIR}/examples/performance_counters/sine")
+
 ###############################################################################
 # add component
 add_hpx_component(sine
-  SOURCES sine.cpp server/sine.cpp
-  HEADERS server/sine.hpp
-  FOLDER "Examples/PerformanceCounters/Sine")
+  FOLDER "Examples/PerformanceCounters/Sine"
+  HEADER_GLOB "${root}/*.h*"
+  SOURCE_GLOB "${root}/sine.c*"
+  AUTOGLOB)
 
 ###############################################################################
 # add example executable

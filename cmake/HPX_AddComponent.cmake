@@ -16,7 +16,7 @@ hpx_include(Message
 macro(add_hpx_component name)
   # retrieve arguments
   hpx_parse_arguments(${name}
-    "SOURCES;HEADERS;DEPENDENCIES;INI;FOLDER;HEADER_ROOT;SOURCE_ROOT"
+    "SOURCES;HEADERS;DEPENDENCIES;INI;FOLDER;HEADER_ROOT;SOURCE_ROOT;HEADER_GLOB;SOURCE_GLOB"
     "ESSENTIAL;NOLIBS;AUTOGLOB" ${ARGN})
 
   # Collect sources and headers from the given (current) directory
@@ -26,8 +26,12 @@ macro(add_hpx_component name)
       set(${name}_SOURCE_ROOT ".")
     endif()
 
+    if(NOT ${name}_SOURCE_GLOB)
+      set(${name}_SOURCE_GLOB "${${name}_SOURCE_ROOT}/*.c*")
+    endif()
+
     add_hpx_library_sources(${name}_component
-      GLOB_RECURSE GLOBS "${${name}_SOURCE_ROOT}/*.c*")
+      GLOB_RECURSE GLOBS "${${name}_SOURCE_GLOB}")
 
     add_hpx_source_group(
       NAME ${name}
@@ -36,15 +40,17 @@ macro(add_hpx_component name)
       TARGETS ${${name}_component_SOURCES})
 
     set(${name}_SOURCES ${${name}_component_SOURCES})
-  endif()
 
-  if(${${name}_AUTOGLOB})
     if(NOT ${name}_HEADER_ROOT)
       set(${name}_HEADER_ROOT ".")
     endif()
 
+    if(NOT ${name}_HEADER_GLOB)
+      set(${name}_HEADER_GLOB "${${name}_SOURCE_ROOT}/*.h*")
+    endif()
+
     add_hpx_library_headers(${name}_component
-      GLOB_RECURSE GLOBS "${${name}_HEADER_ROOT}/*.h*")
+      GLOB_RECURSE GLOBS "${${name}_HEADER_GLOB}")
 
     add_hpx_source_group(
       NAME ${name}

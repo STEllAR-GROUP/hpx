@@ -266,16 +266,16 @@ namespace hpx { namespace components { namespace stubs
             return create_memory_block_async(id.get_gid(), count, act).get();
         }
 
-        static lcos::promise<void>
+        static lcos::promise<bool>
         load_components_async(naming::id_type const& gid)
         {
             typedef server::runtime_support::load_components_action action_type;
-            return lcos::eager_future<action_type, void>(gid.get_gid());
+            return lcos::eager_future<action_type>(gid.get_gid());
         }
 
-        static void load_components(naming::id_type const& gid)
+        static bool load_components(naming::id_type const& gid)
         {
-            load_components_async(gid).get();
+            return load_components_async(gid).get();
         }
 
         static lcos::promise<void>

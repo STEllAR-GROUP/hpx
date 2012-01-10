@@ -4,6 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
+#include <hpx/util/parse_command_line.hpp>
 
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
@@ -33,7 +34,7 @@ namespace performance_counters { namespace sine
             high_resolution_clock::now();
 
         duration<double> up_time = high_resolution_clock::now() - started_at;
-        return std::sin(up_time.count() / 10.) * 100000.;
+        return boost::int64_t(std::sin(up_time.count() / 10.) * 100000.);
     }
 
     // create an averaging performance counter based on the immediate sine
@@ -66,6 +67,45 @@ namespace performance_counters { namespace sine
         hpx::performance_counters::install_counter(id, info);
     }
 
+
+    ///////////////////////////////////////////////////////////////////////////
+    // This will be called to return special command line options supported by
+    // this component.
+    boost::program_options::options_description command_line_options()
+    {
+        boost::program_options::options_description opts(
+            "Additional command line options for the sine component");
+        opts.add_options()
+            ("sine", "enables the performance counters implemented by the "
+                "sine component")
+            ;
+        return opts;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Parse the command line to figure out whether the sine performance
+    // counters need to be created.
+    bool need_perf_counters()
+    {
+        using boost::program_options::options_description;
+        using boost::program_options::variables_map;
+        using hpx::util::retrieve_commandline_arguments;
+
+        // Retrieve command line using the Boost.ProgramOptions library.
+        variables_map vm;
+        if (!retrieve_commandline_arguments(command_line_options(), vm))
+        {
+            HPX_THROW_EXCEPTION(hpx::not_implemented,
+                "sine::startup", "Failed to handle command line options");
+            return false;
+        }
+
+        // We enable the performance counters if --sine is specified on the
+        // command line.
+        return (vm.count("sine") != 0) ? true : false;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     // This function will be registered as a startup function for HPX below.
     //
     // That means it will be executed in a px-thread before hpx_main, but after
@@ -116,6 +156,22 @@ namespace performance_counters { namespace sine
         // first counter above
         create_averaging_sine();
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    bool get_startup(HPX_STD_FUNCTION<void()>& startup_func)
+    {
+        // check whether the performance counters need to be enabled
+        if (!need_perf_counters()) {
+            HPX_THROW_EXCEPTION(hpx::not_implemented, "sine::startup",
+                "The Sine component is not enabled on the commandline "
+                "(--sine), bailing out.");
+            return false;
+        }
+
+        // return our startup-function if performance counters are required
+        startup_func = startup;
+        return true;
+    }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -124,5 +180,14 @@ namespace performance_counters { namespace sine
 // type and performance counter instances.
 //
 // Note that this macro can be used not more than once in one module.
-HPX_REGISTER_STARTUP_SHUTDOWN_MODULE(::performance_counters::sine::startup, (void(*)())0);
+HPX_REGISTER_STARTUP_SHUTDOWN_MODULE(
+    ::performance_counters::sine::get_startup, HPX_NULL_STARTUP_SHUTDOWN_PTR);
+
+///////////////////////////////////////////////////////////////////////////////
+// Register a function to be called to populate the special command line
+// options supported by this component.
+//
+// Note that this macro can be used not more than once in one module.
+HPX_REGISTER_COMMANDLINE_MODULE(
+    ::performance_counters::sine::command_line_options);
 

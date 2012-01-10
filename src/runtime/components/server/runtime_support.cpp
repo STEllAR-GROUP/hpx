@@ -21,11 +21,13 @@
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/component_registry_base.hpp>
 #include <hpx/runtime/components/component_startup_shutdown_base.hpp>
+#include <hpx/runtime/components/component_commandline_base.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/lcos/future_wait.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
+#include <hpx/util/parse_command_line.hpp>
 
 #include <algorithm>
 
@@ -308,7 +310,7 @@ namespace hpx { namespace components { namespace server
             return;
         }
 
-        
+
         for (naming::gid_type i(0, 0); i < count; ++i)
         {
             naming::gid_type target = gid + i;
@@ -605,13 +607,13 @@ namespace hpx { namespace components { namespace server
         }
     }
 
-    void runtime_support::load_components()
+    bool runtime_support::load_components()
     {
         // load components now that AGAS is up
         get_runtime().get_config().load_components();
-        load_components(get_runtime().get_config()
-                      , get_runtime().get_agas_client().local_prefix()
-                      , get_runtime().get_agas_client());
+        return load_components(get_runtime().get_config(),
+            get_runtime().get_agas_client().local_prefix(),
+            get_runtime().get_agas_client());
     }
 
     void runtime_support::call_startup_functions()
@@ -638,16 +640,32 @@ namespace hpx { namespace components { namespace server
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////
+    inline void decode (std::string &str, char const *s, char const *r)
+    {
+        std::string::size_type pos = 0;
+        while ((pos = str.find(s, pos)) != std::string::npos)
+        {
+            str.replace(pos, 2, r);
+        }
+    }
+
+    inline std::string decode_string(std::string str)
+    {
+        decode(str, "\\n", "\n");
+        return str;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // Load all components from the ini files found in the configuration
-    void runtime_support::load_components(util::section& ini,
+    bool runtime_support::load_components(util::section& ini,
         naming::gid_type const& prefix, naming::resolver_client& agas_client)
     {
         // load all components as described in the configuration information
         if (!ini.has_section("hpx.components")) {
             LRT_(info) << "No components found/loaded, HPX will be mostly "
                           "non-functional (no section [hpx.components] found).";
-            return;     // no components to load
+            return true;     // no components to load
         }
 
         // each shared library containing components may have an ini section
@@ -666,11 +684,13 @@ namespace hpx { namespace components { namespace server
         if (NULL == sec)
         {
             LRT_(error) << "NULL section found";
-            return;     // something bad happened
+            return false;     // something bad happened
         }
 
-        util::section::section_map const& s = (*sec).get_sections();
+        // collect additional command-line options
+        boost::program_options::options_description options;
 
+        util::section::section_map const& s = (*sec).get_sections();
         typedef util::section::section_map::const_iterator iterator;
         iterator end = s.end();
         for (iterator i = s.begin (); i != end; ++i)
@@ -713,13 +733,13 @@ namespace hpx { namespace components { namespace server
                     lib = hpx::util::create_path(HPX_DEFAULT_COMPONENT_PATH);
 
                 if (!load_component(ini, instance, component, lib, prefix,
-                        agas_client, isdefault, isenabled))
+                        agas_client, isdefault, isenabled, options))
                 {
                     // build path to component to load
                     std::string libname(component + HPX_SHARED_LIB_EXTENSION);
                     lib /= hpx::util::create_path(libname);
                     if (!load_component(ini, instance, component, lib, prefix,
-                            agas_client, isdefault, isenabled))
+                            agas_client, isdefault, isenabled, options))
                     {
                         continue;   // next please :-P
                     }
@@ -731,6 +751,31 @@ namespace hpx { namespace components { namespace server
                               << ": " << e.what();
             }
         } // for
+
+        // do secondary command line processing, check validity of options only
+        try {
+            std::string unknown_cmd_line(ini.get_entry("hpx.unknown_cmd_line", ""));
+            if (!unknown_cmd_line.empty()) {
+                std::string runtime_mode(ini.get_entry("hpx.runtime_mode", ""));
+
+                boost::program_options::variables_map vm;
+                util::parse_commandline(options, unknown_cmd_line, vm,
+                    util::rethrow_on_error, get_runtime_mode_from_name(runtime_mode));
+            }
+
+            std::string fullhelp(ini.get_entry("hpx.cmd_line_help", ""));
+            if (!fullhelp.empty()) {
+                std::cout << decode_string(fullhelp);
+                std::cout << options << std::endl;
+                return false;
+            }
+        }
+        catch (std::exception const& e) {
+            std::cerr << "runtime_support::load_components:"
+                      << "command line processing: " << e.what() << std::endl;
+            return false;
+        }
+        return true;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -753,6 +798,9 @@ namespace hpx { namespace components { namespace server
             if (startup_shutdown->get_shutdown_function(shutdown))
                 shutdown_functions_.push_back(shutdown);
         }
+        catch (hpx::exception const&) {
+            throw;
+        }
         catch (std::logic_error const& e) {
             LRT_(debug) << "loading of startup/shutdown functions failed: "
                         << d.get_name() << ": " << e.what();
@@ -767,10 +815,42 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    bool runtime_support::load_commandline_options(boost::plugin::dll& d,
+        boost::program_options::options_description& options)
+    {
+        try {
+            // get the factory, may fail
+            boost::plugin::plugin_factory<component_commandline_base> pf (d,
+                BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME(commandline_options)));
+
+            // create the startup_shutdown object
+            boost::shared_ptr<component_commandline_base>
+                commandline_options(pf.create("commandline_options"));
+
+            options.add(commandline_options->add_commandline_options());
+        }
+        catch (hpx::exception const&) {
+            throw;
+        }
+        catch (std::logic_error const& e) {
+            LRT_(debug) << "loading of command-line options failed: "
+                        << d.get_name() << ": " << e.what();
+            return false;
+        }
+        catch (std::exception const& e) {
+            LRT_(debug) << "loading of command-line options failed: "
+                        << d.get_name() << ": " << e.what();
+            return false;
+        }
+        return true;    // startup/shutdown functions got registered
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     bool runtime_support::load_component(util::section& ini,
         std::string const& instance, std::string const& component,
         boost::filesystem::path lib, naming::gid_type const& prefix,
-        naming::resolver_client& agas_client, bool isdefault, bool isenabled)
+        naming::resolver_client& agas_client, bool isdefault, bool isenabled,
+        boost::program_options::options_description& options)
     {
         namespace fs = boost::filesystem;
         if (fs::extension(lib) != HPX_SHARED_LIB_EXTENSION)
@@ -834,10 +914,14 @@ namespace hpx { namespace components { namespace server
             }
 
             load_startup_shutdown_functions(d);
+            load_commandline_options(d, options);
 
             LRT_(info) << "dynamic loading succeeded: " << lib.string()
                        << ": " << instance << ": "
                        << components::get_component_type_name(t);
+        }
+        catch (hpx::exception const&) {
+            throw;
         }
         catch (std::logic_error const& e) {
             LRT_(warning) << "dynamic loading failed: " << lib.string()

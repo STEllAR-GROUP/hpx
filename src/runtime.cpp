@@ -133,6 +133,15 @@ namespace hpx
         return strings::runtime_mode_names[state+1];
     }
 
+    runtime_mode get_runtime_mode_from_name(std::string const& mode)
+    {
+        for (std::size_t i = 0; i < runtime_mode_last; ++i) {
+            if (mode == strings::runtime_mode_names[i])
+                return static_cast<runtime_mode>(i-1);
+        }
+        return runtime_mode_invalid;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     boost::atomic<int> runtime::instance_number_counter_(-1);
 
@@ -187,7 +196,7 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void pre_main(hpx::runtime_mode);
+    bool pre_main(hpx::runtime_mode);
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     threads::thread_state
@@ -200,7 +209,11 @@ namespace hpx
         threads::set_thread_description(threads::get_self_id(), "pre_main");
 
         // Finish the bootstrap
-        hpx::pre_main(mode_);
+        if (!hpx::pre_main(mode_)) {
+            LBT_(info) << "(3rd stage) runtime_impl::run_helper: bootstrap "
+                          "aborted, bailing out";
+            return threads::thread_state(threads::terminated);
+        }
 
         LBT_(info) << "(3rd stage) runtime_impl::run_helper: bootstrap complete";
 

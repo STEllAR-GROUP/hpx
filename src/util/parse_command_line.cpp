@@ -152,6 +152,15 @@ namespace hpx { namespace util
                 }
             }
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        boost::program_options::basic_command_line_parser<char>&
+        get_commandline_parser(
+            boost::program_options::basic_command_line_parser<char>& p,
+            commandline_error_mode mode)
+        {
+            return (mode == allow_unregistered) ? p.allow_unregistered() : p;
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -159,14 +168,17 @@ namespace hpx { namespace util
     bool parse_commandline(
         boost::program_options::options_description const& app_options,
         int argc, char *argv[], boost::program_options::variables_map& vm,
+        commandline_error_mode error_mode,
         hpx::runtime_mode mode,
-        boost::program_options::options_description* visible)
+        boost::program_options::options_description* visible,
+        std::vector<std::string>* unregistered_options)
     {
         using boost::program_options::options_description;
         using boost::program_options::value;
         using boost::program_options::store;
         using boost::program_options::command_line_parser;
         using boost::program_options::parsed_options;
+        using boost::program_options::basic_command_line_parser;
         using namespace boost::program_options::command_line_style;
 
         try {
@@ -174,6 +186,8 @@ namespace hpx { namespace util
                 "HPX options (allowed on command line only)");
             cmdline_options.add_options()
                 ("help,h", "print out program usage (this message)")
+                ("fullhelp", "print out full program usage (including additional "
+                    "options supported by separate components)")
                 ("version,v", "print out HPX version and copyright information")
                 ("options-file", value<std::vector<std::string> >()->composing(),
                     "specify a file containing command line options "
@@ -323,8 +337,26 @@ namespace hpx { namespace util
                 .add(config_options).add(debugging_options)
                 .add(hidden_options)
             ;
-            parsed_options opts(parse_command_line(argc, argv,
-                desc_cmdline, unix_style, detail::option_parser));
+
+            // parse command line, allow for unregistered options this point
+            parsed_options opts(
+                detail::get_commandline_parser(
+                    command_line_parser(argc, argv)
+                        .options(desc_cmdline)
+                        .style(unix_style)
+                        .extra_parser(detail::option_parser),
+                    error_mode
+                ).run()
+            );
+
+            // collect unregistered options, if needed
+            if (unregistered_options) {
+                using boost::program_options::collect_unrecognized;
+                using boost::program_options::exclude_positional;
+                *unregistered_options =
+                    collect_unrecognized(opts.options, exclude_positional);
+            }
+
             store(opts, vm);
             notify(vm);
 
@@ -338,7 +370,7 @@ namespace hpx { namespace util
             detail::handle_config_options(vm, desc_cfgfile);
 
             // print help screen
-            if (visible && vm.count("help")) {
+            if (visible && (vm.count("help") || vm.count("fullhelp"))) {
                 (*visible)
                     .add(app_options).add(cmdline_options)
                     .add(hpx_options).add(counter_options)
@@ -347,6 +379,9 @@ namespace hpx { namespace util
             }
         }
         catch (std::exception const& e) {
+            if (error_mode == rethrow_on_error)
+                throw;
+
             std::cerr << "hpx::init: exception caught: "
                       << e.what() << std::endl;
             return false;
@@ -358,8 +393,9 @@ namespace hpx { namespace util
     bool parse_commandline(
         boost::program_options::options_description const& app_options,
         std::string const& cmdline, boost::program_options::variables_map& vm,
-        hpx::runtime_mode mode,
-        boost::program_options::options_description* visible)
+        commandline_error_mode error_mode, hpx::runtime_mode mode,
+        boost::program_options::options_description* visible,
+        std::vector<std::string>* unregistered_options)
     {
         using namespace boost::program_options;
 #if defined(BOOST_WINDOWS)
@@ -373,7 +409,8 @@ namespace hpx { namespace util
             argv[i] = const_cast<char*>(args[i].c_str());
 
         return parse_commandline(
-            app_options, static_cast<int>(args.size()), argv.get(), vm, mode, visible);
+            app_options, static_cast<int>(args.size()), argv.get(), vm,
+            error_mode, mode, visible, unregistered_options);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -394,13 +431,10 @@ namespace hpx { namespace util
         //
         std::string cmdline;
         hpx::util::runtime_configuration& cfg = hpx::get_runtime().get_config();
-        if (cfg.has_section("hpx")) {
-            hpx::util::section const* sec = cfg.get_section("hpx");
-            if (NULL != sec)
-                cmdline = sec->get_entry("cmd_line", "");
-        }
+        if (cfg.has_entry("hpx.cmd_line"))
+            cmdline = cfg.get_entry("hpx.cmd_line", "");
 
-        return parse_commandline(app_options, cmdline, vm);
+        return parse_commandline(app_options, cmdline, vm, allow_unregistered);
     }
 
     ///////////////////////////////////////////////////////////////////////////

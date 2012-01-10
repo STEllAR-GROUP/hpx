@@ -296,6 +296,7 @@ namespace hpx
     /// Get the readable string representing the name of the given runtime_mode
     /// constant.
     HPX_API_EXPORT char const* get_runtime_mode_name(runtime_mode state);
+    HPX_API_EXPORT runtime_mode get_runtime_mode_from_name(std::string const& mode);
 
     namespace agas
     {

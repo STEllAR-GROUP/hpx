@@ -16,6 +16,7 @@
 #include <hpx/runtime/components/plain_component_factory.hpp>
 
 #include <hpx/runtime/components/component_startup_shutdown.hpp>
+#include <hpx/runtime/components/component_commandline.hpp>
 
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/constructor_argument.hpp>

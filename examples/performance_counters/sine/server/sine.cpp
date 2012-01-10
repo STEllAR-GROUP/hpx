@@ -40,9 +40,10 @@ namespace performance_counters { namespace sine { namespace server
     {
         boost::int64_t const scaling = 100000;
 
+        // gather the current value
         {
             mutex_type::scoped_lock mtx(mtx_);
-            value.value_ = current_value_ * scaling;    // gather the current value
+            value.value_ = boost::int64_t(current_value_ * scaling);
         }
 
         value.scaling_ = scaling;
