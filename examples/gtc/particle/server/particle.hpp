@@ -13,6 +13,7 @@
 #include <hpx/runtime/actions/component_action.hpp>
 
 #include "../../parameter.hpp"
+#include "../../array1d.hpp"
 
 using hpx::components::gtc::parameter;
 
@@ -105,6 +106,9 @@ namespace gtc { namespace server
         std::vector<std::size_t> mtheta_;
         std::size_t mgrid_;
         std::size_t mzeta_;
+        array<double> zion_;
+        array<double> zion0_;
+        double zetamin_,zetamax_;
     };
 
 }}
