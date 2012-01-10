@@ -80,6 +80,5 @@ namespace startup_shutdown
 // of the 2 parameters for the macro below can be zero (0), which means no
 // function will be called. We leave the shutdown function out as we don't need
 // it for the purpose of this example.
-HPX_REGISTER_STARTUP_SHUTDOWN_MODULE(
-    ::startup_shutdown::startup, HPX_NULL_STARTUP_SHUTDOWN_PTR);
+HPX_REGISTER_STARTUP_MODULE(::startup_shutdown::get_startup);
 

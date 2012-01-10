@@ -180,8 +180,7 @@ namespace performance_counters { namespace sine
 // type and performance counter instances.
 //
 // Note that this macro can be used not more than once in one module.
-HPX_REGISTER_STARTUP_SHUTDOWN_MODULE(
-    ::performance_counters::sine::get_startup, HPX_NULL_STARTUP_SHUTDOWN_PTR);
+HPX_REGISTER_STARTUP_MODULE(::performance_counters::sine::get_startup);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Register a function to be called to populate the special command line
