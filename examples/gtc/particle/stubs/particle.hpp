@@ -39,6 +39,23 @@ namespace gtc { namespace stubs
             init_async(gid,objectid,par).get();
         }
 
+        static hpx::lcos::promise<void>
+        chargei_async(hpx::naming::id_type const& gid,std::size_t objectid,std::size_t istep,
+            parameter const& par)
+        {
+            typedef server::particle::chargei_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid,objectid,istep,
+                par);
+        }
+
+        static void chargei(hpx::naming::id_type const& gid,std::size_t objectid,std::size_t istep,
+            parameter const& par)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise.
+            chargei_async(gid,objectid,istep,par).get();
+        }
+
         /// Compute the distance from the particle to the specified coordinates. 
         static hpx::lcos::promise<double>
         distance_async(hpx::naming::id_type const& gid,double posx,double posy,

@@ -406,6 +406,13 @@ int hpx_main(boost::program_options::variables_map &vm)
         // the next phase of computation. 
         hpx::lcos::wait(initial_phase);
 
+        std::size_t istep = 0;
+        std::vector<hpx::lcos::promise<void> > chargei_phase;
+        for (std::size_t i=0;i<num_particles;i++) {
+          initial_phase.push_back(particles[i].chargei_async(i,istep,par));
+        }
+        hpx::lcos::wait(chargei_phase);
+
         ///////////////////////////////////////////////////////////////////////
         // Start the search/charge depositing phase.
         std::vector<hpx::lcos::promise<void> > charge_phase;

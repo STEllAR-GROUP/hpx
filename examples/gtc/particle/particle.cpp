@@ -32,6 +32,10 @@ HPX_REGISTER_ACTION_EX(
     gtc_particle_init_action);
 
 HPX_REGISTER_ACTION_EX(
+    gtc_particle_type::wrapped_type::chargei_action,
+    gtc_particle_chargei_action);
+
+HPX_REGISTER_ACTION_EX(
     gtc_particle_type::wrapped_type::distance_action,
     gtc_particle_distance_action);
 

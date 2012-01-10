@@ -30,7 +30,8 @@ namespace gtc { namespace server
         {
             particle_init = 0,
             particle_distance = 1,
-            particle_get_index = 2
+            particle_get_index = 2,
+            particle_chargei = 3
         };
 
         particle()
@@ -41,6 +42,8 @@ namespace gtc { namespace server
 
         /// Initialize the point with the given particle file. 
         void init(std::size_t objectid,parameter const& par);
+  
+        void chargei(std::size_t objectid,std::size_t istep,parameter const& par);
 
         /// Calculate the distance from this particle to the specified
         /// coordinates.
@@ -72,6 +75,19 @@ namespace gtc { namespace server
             // Method bound to this action.
             &particle::init
         > init_action;
+
+        typedef hpx::actions::action3<
+            // Component server type.
+            particle,
+            // Action code.
+            particle_init,
+            // Arguments of this action.
+            std::size_t,
+            std::size_t,
+            parameter const&,
+            // Method bound to this action.
+            &particle::chargei
+        > chargei_action;
 
         typedef hpx::actions::result_action3<
             // Component server type.
@@ -117,6 +133,8 @@ namespace gtc { namespace server
         std::vector<double> qtinv_;
         array<double> jtion0_,wtion0_;
         array<double> jtion1_,wtion1_;
+        std::size_t mi_;
+        array<double> densityi_;
     };
 
 }}
@@ -124,6 +142,10 @@ namespace gtc { namespace server
 HPX_REGISTER_ACTION_DECLARATION_EX(
               gtc::server::particle::init_action,
               gtc_particle_init_action)
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+              gtc::server::particle::chargei_action,
+              gtc_particle_chargei_action)
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
               gtc::server::particle::distance_action,
