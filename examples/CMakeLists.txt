@@ -13,6 +13,7 @@ set(subdirs
     bright_future
     dataflow
     gravity
+    gtc
     heartbeat
     hplpx
     neutron_star

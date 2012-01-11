@@ -4,7 +4,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include "particle.hpp"
-#include "../stubs/particle.hpp"
 
 #include <boost/lexical_cast.hpp>
 
@@ -360,6 +359,10 @@ namespace gtc { namespace server
           // All reduce on densityi
           typedef std::vector<hpx::lcos::promise< array<double> > > lazy_results_type;
 
+#if 0
+          // We have to fix something here
+          // if I include ../stubs/particle.hpp, I get an error that
+          // /shared/boost/1.47.0-debug/boost/serialization/vector.hpp:69:22: error: ‘STD’ was not declared in this scope
           lazy_results_type lazy_results;
           BOOST_FOREACH(hpx::naming::id_type const& gid, particle_components)
           {
@@ -367,6 +370,7 @@ namespace gtc { namespace server
           }
           hpx::lcos::wait(lazy_results,
                 boost::bind(&chargei_callback, _1, _2));
+#endif
         }
     }
 
