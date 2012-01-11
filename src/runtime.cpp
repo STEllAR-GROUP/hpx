@@ -49,7 +49,7 @@ namespace hpx
                   << "."
 #endif
                   << std::endl;
-        std::abort();
+        std::terminate();
     }
 
     HPX_EXPORT BOOL WINAPI termination_handler(DWORD ctrl_type)
@@ -104,7 +104,7 @@ namespace hpx
                   << "."
 #endif
                   << std::endl;
-        std::abort();
+        std::terminate();
     }
 }
 
@@ -401,19 +401,19 @@ namespace hpx
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::report_error(
         std::size_t num_thread, boost::exception_ptr const& e)
     {
-        // Early and late exceptions, errors outside of pxthreads
-        if (!threads::get_self_ptr() || !threads::threadmanager_is(running))
-        {
-            detail::report_exception_and_abort(e);
-            return;
-        }
-
         // The console error sink is only applied at the console, so default
         // error sink never gets called on the locality, meaning that the user
         // never sees errors that kill the system before the error parcel gets
         // sent out. So, before we try to send the error parcel (which might
         // cause a double fault), print local diagnostics.
         components::server::console_error_sink(e);
+
+        // Early and late exceptions, errors outside of pxthreads
+        if (!threads::get_self_ptr() || !threads::threadmanager_is(running))
+        {
+            detail::report_exception_and_terminate(e);
+            return;
+        }
 
         // Report this error to the console.
         naming::gid_type console_prefix;
@@ -476,6 +476,10 @@ namespace hpx
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::default_errorsink(
         std::string const& msg)
     {
+        // log the exception information in any case
+        LERR_(always) << "report_exception_and_terminate: unhandled exception: "
+                      << msg;
+
         std::cerr << msg << std::endl;
     }
 
@@ -590,7 +594,7 @@ namespace hpx
         // Early and late exceptions
         if (!threads::threadmanager_is(running))
         {
-            detail::report_exception_and_abort(e);
+            detail::report_exception_and_terminate(e);
             return;
         }
 
@@ -602,7 +606,7 @@ namespace hpx
         // Early and late exceptions
         if (!threads::threadmanager_is(running))
         {
-            detail::report_exception_and_abort(e);
+            detail::report_exception_and_terminate(e);
             return;
         }
 

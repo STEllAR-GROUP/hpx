@@ -5,6 +5,8 @@
 
 set(tests
     sizeof
+    handled_exception
+    unhandled_exception
    )
 
 set(sizeof_FLAGS DEPENDENCIES iostreams_component)

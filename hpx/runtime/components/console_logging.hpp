@@ -43,7 +43,7 @@ namespace hpx { namespace components
             activated_.store(true);
         }
 
-      private:
+    private:
         bool ensure_prefix();
         void send();
 
@@ -67,7 +67,6 @@ namespace hpx { namespace components
         void init_timing_console_log(util::section const& ini);
         void init_hpx_console_log(util::section const& ini);
     }
-
 }}
 
 #endif

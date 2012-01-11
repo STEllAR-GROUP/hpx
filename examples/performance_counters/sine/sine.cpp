@@ -164,7 +164,7 @@ namespace performance_counters { namespace sine
         if (!need_perf_counters()) {
             HPX_THROW_EXCEPTION(hpx::not_implemented, "sine::startup",
                 "The Sine component is not enabled on the commandline "
-                "(--sine), bailing out.");
+                "(--sine), bailing out");
             return false;
         }
 
