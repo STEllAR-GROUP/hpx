@@ -342,7 +342,6 @@ int hpx_main(boost::program_options::variables_map &vm)
         ///////////////////////////////////////////////////////////////////////
         // Retrieve the command line options. 
         std::size_t const num_gridpoints = vm["n"].as<std::size_t>();
-        std::size_t const num_particles = vm["np"].as<std::size_t>();
 
         ///////////////////////////////////////////////////////////////////////
         // Create a distributing factory locally. The distributing factory can
@@ -369,7 +368,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         // These components will be evenly distributed among all available
         // localities supporting the component type.
         hpx::components::distributing_factory::result_type blocks_particles =
-            factory.create_components(block_type_particles, num_particles);
+            factory.create_components(block_type_particles, par->npartdom);
 
         ///////////////////////////////////////////////////////////////////////
         // These two vectors will hold client classes referring to all of the
@@ -390,7 +389,7 @@ int hpx_main(boost::program_options::variables_map &vm)
           initial_phase.push_back(points[i].init_async(i,par));
         }
 
-        for (std::size_t i=0;i<num_particles;i++) {
+        for (std::size_t i=0;i<par->npartdom;i++) {
           initial_phase.push_back(particles[i].init_async(i,par));
         }
 
@@ -398,7 +397,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         // build a vector of all of the particle GIDs. This will be used as the
         // input for the next phase.
         std::vector<hpx::naming::id_type> particle_components;
-        for (std::size_t i=0;i<num_particles;i++) {
+        for (std::size_t i=0;i<par->npartdom;i++) {
           particle_components.push_back(particles[i].get_gid());
         }
 
@@ -408,8 +407,9 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         std::size_t istep = 0;
         std::vector<hpx::lcos::promise<void> > chargei_phase;
-        for (std::size_t i=0;i<num_particles;i++) {
-          initial_phase.push_back(particles[i].chargei_async(i,istep,par));
+        for (std::size_t i=0;i<par->npartdom;i++) {
+          initial_phase.push_back(particles[i].chargei_async(i,istep,
+                              particle_components,par));
         }
         hpx::lcos::wait(chargei_phase);
 

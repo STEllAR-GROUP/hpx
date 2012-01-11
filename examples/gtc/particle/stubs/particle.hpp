@@ -40,20 +40,20 @@ namespace gtc { namespace stubs
         }
 
         static hpx::lcos::promise<void>
-        chargei_async(hpx::naming::id_type const& gid,std::size_t objectid,std::size_t istep,
+        chargei_async(hpx::naming::id_type const& gid,std::size_t objectid,std::size_t istep,std::vector<hpx::naming::id_type> const& particle_components,
             parameter const& par)
         {
             typedef server::particle::chargei_action action_type;
             return hpx::lcos::eager_future<action_type>(gid,objectid,istep,
-                par);
+                particle_components,par);
         }
 
-        static void chargei(hpx::naming::id_type const& gid,std::size_t objectid,std::size_t istep,
+        static void chargei(hpx::naming::id_type const& gid,std::size_t objectid,std::size_t istep,std::vector<hpx::naming::id_type> const& particle_components,
             parameter const& par)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the promise.
-            chargei_async(gid,objectid,istep,par).get();
+            chargei_async(gid,objectid,istep,particle_components,par).get();
         }
 
         /// Compute the distance from the particle to the specified coordinates. 
@@ -88,6 +88,20 @@ namespace gtc { namespace stubs
             // The following get yields control while the action above
             // is executed and the result is returned to the promise
             return get_index_async(gid).get();
+        }
+
+        static hpx::lcos::promise< array<double> >
+        get_densityi_async(hpx::naming::id_type const& gid)
+        {
+            typedef server::particle::get_densityi_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid);
+        }
+
+        static array<double> get_densityi(hpx::naming::id_type const& gid)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise
+            return get_densityi_async(gid).get();
         }
     };
 }}

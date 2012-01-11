@@ -53,17 +53,17 @@ namespace gtc
             this->base_type::init(gid_,objectid,par);
         }
 
-        hpx::lcos::promise<void> chargei_async(std::size_t objectid,std::size_t istep,
+        hpx::lcos::promise<void> chargei_async(std::size_t objectid,std::size_t istep, std::vector<hpx::naming::id_type> const& particle_components,
             parameter const& par)
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::chargei_async(gid_,objectid,istep,par);
+            return this->base_type::chargei_async(gid_,objectid,istep,particle_components,par);
         }
 
-        void chargei(std::size_t objectid,std::size_t istep,parameter const& par)
+        void chargei(std::size_t objectid,std::size_t istep,std::vector<hpx::naming::id_type> const& particle_components,parameter const& par)
         {
             BOOST_ASSERT(gid_);
-            this->base_type::chargei(gid_,objectid,istep,par);
+            this->base_type::chargei(gid_,objectid,istep,particle_components,par);
         }
 
         /// Compute the distance from the particle to the specified coordinates. 
@@ -93,6 +93,20 @@ namespace gtc
         {
             BOOST_ASSERT(gid_);
             return this->base_type::get_index(gid_);
+        }
+
+        /// Get the index of the particle.
+        hpx::lcos::promise< array<double> > get_densityi_async()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_densityi_async(gid_);
+        }
+
+        /// Get the index of the particle.
+        array<double> get_densityi()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_densityi(gid_);
         }
     };
 }

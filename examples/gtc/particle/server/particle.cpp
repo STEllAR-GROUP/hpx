@@ -4,6 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include "particle.hpp"
+#include "../stubs/particle.hpp"
 
 #include <boost/lexical_cast.hpp>
 
@@ -19,11 +20,21 @@ double unifRand(double a,double b)
   return (b-a)*unifRand() + a;
 }
 
+namespace hpx { namespace traits
+{
+    template <typename T>
+    struct promise_remote_result<array<T> >
+    {
+        typedef array<T> type;
+    };
+}}
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace gtc { namespace server
 {
     void particle::init(std::size_t objectid,parameter const& par)
     {
+        idx_ = objectid;
         // 
         srand(objectid+5);
 
@@ -227,7 +238,19 @@ namespace gtc { namespace server
         densityi_.resize(mzeta_+1,mgrid_+1,1);
     }
 
-    void particle::chargei(std::size_t objectid,std::size_t istep,parameter const& par)
+    bool particle::chargei_callback(std::size_t i,array<double> density)
+    {
+      if ( i != idx_ ) {
+        for (std::size_t ij=1;ij<=mgrid_;ij++) {
+          for (std::size_t kk=0;kk<=mzeta_;kk++) {
+            densityi_(kk,ij,0) += density(kk,ij,0);
+          }
+        }
+      }
+      return true;
+    }
+
+    void particle::chargei(std::size_t objectid,std::size_t istep,std::vector<hpx::naming::id_type> const& particle_components,parameter const& par)
     {
         // calculate ion gather-scatter coefficients
         double pi = 4.0*atan(1.0);
@@ -332,8 +355,26 @@ namespace gtc { namespace server
           }
 
         }
-         
+
+        if ( par->npartdom > 1 ) {
+          // All reduce on densityi
+          typedef std::vector<hpx::lcos::promise< array<double> > > lazy_results_type;
+
+          lazy_results_type lazy_results;
+          BOOST_FOREACH(hpx::naming::id_type const& gid, particle_components)
+          {
+            lazy_results.push_back( stubs::particle::get_densityi( gid ) );
+          }
+          hpx::lcos::wait(lazy_results,
+                boost::bind(&chargei_callback, _1, _2));
+        }
     }
+
+    array<double> particle::get_densityi()
+    {
+      return densityi_;
+    }
+
 }}
 
 

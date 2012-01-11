@@ -16,6 +16,7 @@
 
 #include <hpx/exception.hpp>
 #include <hpx/util/stringstream.hpp>
+#include <boost/serialization/valarray.hpp>
 
 template<typename T>
 
@@ -294,6 +295,23 @@ protected:
   std::size_t jsize_;
   std::size_t ksize_;
   std::valarray<T> data_;
+
+private:
+  friend class boost::serialization::access;
+
+  BOOST_SERIALIZATION_SPLIT_MEMBER()
+
+  template<class Archive>
+  void save(Archive & ar, const unsigned int version) const
+  {
+    do_save(ar, 6, vsize_);
+  }
+
+  template<class Archive>
+  void load(Archive & ar, const unsigned int version)
+  {
+    do_load(ar);
+  }
 
 };
 #endif

@@ -31,7 +31,8 @@ namespace gtc { namespace server
             particle_init = 0,
             particle_distance = 1,
             particle_get_index = 2,
-            particle_chargei = 3
+            particle_chargei = 3,
+            particle_get_densityi = 4
         };
 
         particle()
@@ -42,8 +43,12 @@ namespace gtc { namespace server
 
         /// Initialize the point with the given particle file. 
         void init(std::size_t objectid,parameter const& par);
+
+        array<double> get_densityi();
+
+        bool chargei_callback(std::size_t i,array<double> density);
   
-        void chargei(std::size_t objectid,std::size_t istep,parameter const& par);
+        void chargei(std::size_t objectid,std::size_t istep,std::vector<hpx::naming::id_type> const& particle_components,parameter const& par);
 
         /// Calculate the distance from this particle to the specified
         /// coordinates.
@@ -76,7 +81,7 @@ namespace gtc { namespace server
             &particle::init
         > init_action;
 
-        typedef hpx::actions::action3<
+        typedef hpx::actions::action4<
             // Component server type.
             particle,
             // Action code.
@@ -84,6 +89,7 @@ namespace gtc { namespace server
             // Arguments of this action.
             std::size_t,
             std::size_t,
+            std::vector<hpx::naming::id_type> const&,
             parameter const&,
             // Method bound to this action.
             &particle::chargei
@@ -114,6 +120,17 @@ namespace gtc { namespace server
             // Method bound to this action.
             &particle::get_index
         > get_index_action;
+
+        typedef hpx::actions::result_action0<
+            // Component server type.
+            particle,
+            // Return type.
+            array<double>,
+            // Action code.
+            particle_get_densityi,
+            // Method bound to this action.
+            &particle::get_densityi
+        > get_densityi_action;
 
     private:
         std::size_t idx_;
@@ -154,6 +171,10 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
               gtc::server::particle::get_index_action,
               gtc_particle_get_index_action)
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+              gtc::server::particle::get_densityi_action,
+              gtc_particle_get_densityi_action)
 
 
 #endif
