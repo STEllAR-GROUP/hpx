@@ -340,10 +340,6 @@ int hpx_main(boost::program_options::variables_map &vm)
  			par->mflux % par->num_mode % par->m_poloidal ) << hpx::flush;
 
         ///////////////////////////////////////////////////////////////////////
-        // Retrieve the command line options. 
-        std::size_t const num_gridpoints = vm["n"].as<std::size_t>();
-
-        ///////////////////////////////////////////////////////////////////////
         // Create a distributing factory locally. The distributing factory can
         // be used to create blocks of components that are distributed across
         // all localities that support that component type. 
@@ -354,17 +350,17 @@ int hpx_main(boost::program_options::variables_map &vm)
         hpx::components::component_type block_type_points =
             hpx::components::get_component_type<gtc::server::point>();
 
-        // Create num_gridpoints point components with distributing factory.
+        // Create ntoroidal point components with distributing factory.
         // These components will be evenly distributed among all available
         // localities supporting the component type.
         hpx::components::distributing_factory::result_type blocks_points =
-            factory.create_components(block_type_points, num_gridpoints);
+            factory.create_components(block_type_points, par->ntoroidal);
 
         // Get the component type for our particle component.
         hpx::components::component_type block_type_particles =
             hpx::components::get_component_type<gtc::server::particle>();
 
-        // Create num_gridpoints particle components with distributing factory.
+        // Create par->npartdom particle components with distributing factory.
         // These components will be evenly distributed among all available
         // localities supporting the component type.
         hpx::components::distributing_factory::result_type blocks_particles =
@@ -385,7 +381,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         // files. 
         std::vector<hpx::lcos::promise<void> > initial_phase;
 
-        for (std::size_t i=0;i<num_gridpoints;i++) {
+        for (std::size_t i=0;i<par->ntoroidal;i++) {
           initial_phase.push_back(points[i].init_async(i,par));
         }
 
@@ -420,7 +416,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         // We use the vector of particle component GIDS that we created during
         // the initialization phase as the input to the search action on each
         // point. 
-        for (std::size_t i=0;i<num_gridpoints;i++) {
+        for (std::size_t i=0;i<par->ntoroidal;i++) {
           charge_phase.push_back(points[i].search_async(particle_components));
         }
 
@@ -444,12 +440,6 @@ int main(int argc, char* argv[])
     // Configure application-specific options.
     boost::program_options::options_description
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
-
-    desc_commandline.add_options()
-        ("n", value<std::size_t>()->default_value(5),
-            "the number of gridpoints")
-        ("np", value<std::size_t>()->default_value(5),
-            "the number of particles");
 
     return hpx::init(desc_commandline, argc, argv); // Initialize and run HPX.
 }

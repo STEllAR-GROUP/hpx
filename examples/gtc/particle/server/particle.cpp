@@ -372,6 +372,18 @@ namespace gtc { namespace server
                 boost::bind(&chargei_callback, _1, _2));
 #endif
         }
+
+        // poloidal end cell, discard ghost cell j=0
+        for (std::size_t i=0;i<=par->mpsi;i++) {
+          for (std::size_t j=0;j<densityi_.isize();j++) {
+          densityi_(j,igrid_[i]+mtheta_[i],0) = densityi_(j,igrid_[i]+mtheta_[i],0) + densityi_(j,igrid_[i],0);
+          }
+        }
+
+        // toroidal end cell
+        // send idensity information to the left; receive from right 
+        // toroidal mesh
+
     }
 
     array<double> particle::get_densityi()
