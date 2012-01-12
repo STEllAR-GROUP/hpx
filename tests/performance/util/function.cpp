@@ -1,3 +1,7 @@
+//  Copyright (c) 2011 Thomas Heller
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/util/function.hpp>
 #include <boost/function.hpp>
@@ -29,7 +33,7 @@ void run(F const & f, unsigned max_iterations)
 
 int main()
 {
-    unsigned max_iterations = std::numeric_limits<unsigned>::max();
+    unsigned max_iterations = (std::numeric_limits<unsigned>::max)();
     {
         hpx::util::function<void(), void, void> f = foo();
         std::cout << "hpx::util::function";
