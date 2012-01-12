@@ -1,3 +1,4 @@
+//  Copyright (c) 2006, Giovanni P. Deretta
 //  Copyright (c) 2007 Robert Perricone
 //  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
@@ -27,6 +28,7 @@
 #include <boost/coroutine/detail/posix_utility.hpp>
 #include <boost/coroutine/detail/swap_context.hpp>
 #include <boost/coroutine/detail/static.hpp>
+#include <boost/assert.hpp>
 
 /*
  * Defining BOOST_COROUTINE_NO_SEPARATE_CALL_SITES will disable separate
@@ -36,9 +38,15 @@
  * default.
  */
 
+#if defined(__x86_64__)
 extern "C" void swapcontext_stack (void***, void**) throw();
 extern "C" void swapcontext_stack2 (void***, void**) throw();
 extern "C" void swapcontext_stack3 (void***, void**) throw();
+#else
+extern "C" void swapcontext_stack (void***, void**) throw() __attribute((regparm(2)));
+extern "C" void swapcontext_stack2 (void***, void**) throw()__attribute((regparm(2)));
+extern "C" void swapcontext_stack3 (void***, void**) throw()__attribute((regparm(2)));
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace boost { namespace coroutines {
@@ -72,6 +80,12 @@ namespace boost { namespace coroutines {
 
       void prefetch() const
       {
+#if defined(__x86_64__)
+        BOOST_ASSERT(sizeof(void*) == 8);
+#else
+        BOOST_ASSERT(sizeof(void*) == 4);
+#endif
+
         __builtin_prefetch (m_sp, 1, 3);
         __builtin_prefetch (m_sp, 0, 3);
         __builtin_prefetch ((void**)m_sp+64/sizeof(void*), 1, 3);
@@ -123,7 +137,8 @@ namespace boost { namespace coroutines {
       x86_linux_context_impl(Functor& cb, std::ptrdiff_t stack_size = -1)
         : m_stack_size(stack_size == -1
                       ? static_cast<std::ptrdiff_t>(default_stack_size)
-                      : stack_size)
+                      : stack_size),
+          m_stack(0)
       {
         BOOST_ASSERT(0 == (m_stack_size % EXEC_PAGESIZE));
         m_stack = posix::alloc_stack(m_stack_size);
@@ -135,6 +150,7 @@ namespace boost { namespace coroutines {
         typedef void fun(Functor*);
         fun * funp = trampoline;
 
+#if defined(__x86_64__)
         // we have to make sure that the stack pointer is aligned on a 16 Byte
         // boundary when the code is entering the trampoline (the stack itself
         // is already properly aligned)
@@ -151,6 +167,15 @@ namespace boost { namespace coroutines {
         *--m_sp = 0;       // r13
         *--m_sp = 0;       // r14
         *--m_sp = 0;       // r15
+#else
+        *--m_sp = &cb;     // parm 0 of trampoline;
+        *--m_sp = 0;        // dummy return address for trampoline
+        *--m_sp = (void*) funp ;// return addr (here: start addr)
+        *--m_sp = 0;       // ebp
+        *--m_sp = 0;       // ebx
+        *--m_sp = 0;       // esi
+        *--m_sp = 0;       // edi
+#endif
       }
 
       ~x86_linux_context_impl()
