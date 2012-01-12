@@ -80,119 +80,123 @@ macro(add_hpx_config_test name variable)
 endmacro()
 
 ###############################################################################
-# prevent undefined variables from messing up the compilation flags
-if(BOOST_INCLUDE_DIR)
-  set(boost_include_flag "-I${BOOST_INCLUDE_DIR}")
-else()
-  set(boost_include_flag)
-endif()
-
-###############################################################################
 macro(hpx_check_for_gnu_128bit_integers variable)
   hpx_get_include_directory(include_dir)
+  hpx_get_boost_include_directory(boost_include_dir)
 
   add_hpx_config_test("gnu_int128" ${variable} LANGUAGE CXX
     SOURCE cmake/tests/gnu_128bit_integers.cpp
-    FLAGS ${boost_include_flag} ${include_dir} FILE ${ARGN})
+    FLAGS ${boost_include_dir} ${include_dir} FILE ${ARGN})
 endmacro()
 
 macro(hpx_check_for_gnu_aligned_16 variable)
   hpx_get_include_directory(include_dir)
+  hpx_get_boost_include_directory(boost_include_dir)
 
   add_hpx_config_test("gnu_aligned_16" ${variable} LANGUAGE CXX
     SOURCE cmake/tests/gnu_aligned_16.cpp
-    FLAGS ${boost_include_flag} ${include_dir} FILE ${ARGN})
+    FLAGS ${boost_include_dir} ${include_dir} FILE ${ARGN})
 endmacro()
 
 ###############################################################################
 macro(hpx_check_for_pthread_affinity_np variable)
   hpx_get_include_directory(include_dir)
+  hpx_get_boost_include_directory(boost_include_dir)
 
   add_hpx_config_test("pthread_affinity_np" ${variable} LANGUAGE CXX
     SOURCE cmake/tests/pthread_affinity_np.cpp
-    FLAGS -pthread ${boost_include_flag} ${include_dir} FILE ${ARGN})
+    FLAGS -pthread ${boost_include_dir} ${include_dir} FILE ${ARGN})
 endmacro()
 
 ###############################################################################
 macro(hpx_cpuid target variable)
   hpx_get_include_directory(include_dir)
+  hpx_get_boost_include_directory(boost_include_dir)
 
   add_hpx_config_test("${target}" ${variable} LANGUAGE CXX
     SOURCE cmake/tests/cpuid.cpp
-    FLAGS ${boost_include_flag} ${include_dir}
+    FLAGS ${boost_include_dir} ${include_dir}
     FILE ARGS "${target}" ${ARGN})
 endmacro()
 
 ###############################################################################
 macro(hpx_check_for_cxx11_rvalue_references variable)
   hpx_get_include_directory(include_dir)
+  hpx_get_boost_include_directory(boost_include_dir)
 
   add_hpx_config_test("cxx11_rvalue_references" ${variable} LANGUAGE CXX
     SOURCE cmake/tests/cxx11_rvalue_references.cpp
-    FLAGS ${boost_include_flag} ${include_dir} "-std=c++0x" FILE ${ARGN})
+    FLAGS ${boost_include_dir} ${include_dir} "-std=c++0x" FILE ${ARGN})
 endmacro()
 
 ###############################################################################
 macro(hpx_check_for_cxx11_variadic_templates variable)
   hpx_get_include_directory(include_dir)
+  hpx_get_boost_include_directory(boost_include_dir)
 
   add_hpx_config_test("cxx11_variadic_templates" ${variable} LANGUAGE CXX
     SOURCE cmake/tests/cxx11_variadic_templates.cpp
-    FLAGS ${boost_include_flag} ${include_dir} "-std=c++0x" FILE ${ARGN})
+    FLAGS ${boost_include_dir} ${include_dir} "-std=c++0x" FILE ${ARGN})
 endmacro()
 
 ###############################################################################
 macro(hpx_check_for_cxx11_lambdas variable)
   hpx_get_include_directory(include_dir)
+  hpx_get_boost_include_directory(boost_include_dir)
 
   add_hpx_config_test("cxx11_lambdas" ${variable} LANGUAGE CXX
     SOURCE cmake/tests/cxx11_lambdas.cpp
-    FLAGS ${boost_include_flag} ${include_dir} "-std=c++0x" FILE ${ARGN})
+    FLAGS ${boost_include_dir} ${include_dir} "-std=c++0x" FILE ${ARGN})
 endmacro()
 
 ###############################################################################
 macro(hpx_check_for_cxx11_auto variable)
   hpx_get_include_directory(include_dir)
+  hpx_get_boost_include_directory(boost_include_dir)
 
   add_hpx_config_test("cxx11_auto" ${variable} LANGUAGE CXX
     SOURCE cmake/tests/cxx11_auto.cpp
-    FLAGS ${boost_include_flag} ${include_dir} "-std=c++0x" FILE ${ARGN})
+    FLAGS ${boost_include_dir} ${include_dir} "-std=c++0x" FILE ${ARGN})
 endmacro()
 
 ###############################################################################
 macro(hpx_check_for_cxx11_std_unique_ptr variable)
   hpx_get_include_directory(include_dir)
+  hpx_get_boost_include_directory(boost_include_dir)
 
   add_hpx_config_test("cxx11_std_unique_ptr" ${variable} LANGUAGE CXX
     SOURCE cmake/tests/cxx11_std_unique_ptr.cpp
-    FLAGS ${boost_include_flag} ${include_dir} "-std=c++0x" FILE ${ARGN})
+    FLAGS ${boost_include_dir} ${include_dir} "-std=c++0x" FILE ${ARGN})
 endmacro()
 
 ###############################################################################
 macro(hpx_check_for_cxx11_std_tuple variable)
   hpx_get_include_directory(include_dir)
+  hpx_get_boost_include_directory(boost_include_dir)
 
   add_hpx_config_test("cxx11_std_tuple" ${variable} LANGUAGE CXX
     SOURCE cmake/tests/cxx11_std_tuple.cpp
-    FLAGS ${boost_include_flag} ${include_dir} "-std=c++0x" FILE ${ARGN})
+    FLAGS ${boost_include_dir} ${include_dir} "-std=c++0x" FILE ${ARGN})
 endmacro()
 
 ###############################################################################
 macro(hpx_check_for_cxx11_std_bind variable)
   hpx_get_include_directory(include_dir)
+  hpx_get_boost_include_directory(boost_include_dir)
 
   add_hpx_config_test("cxx11_std_bind" ${variable} LANGUAGE CXX
     SOURCE cmake/tests/cxx11_std_bind.cpp
-    FLAGS ${boost_include_flag} ${include_dir} "-std=c++0x" FILE ${ARGN})
+    FLAGS ${boost_include_dir} ${include_dir} "-std=c++0x" FILE ${ARGN})
 endmacro()
 
 ###############################################################################
 macro(hpx_check_for_cxx11_std_function variable)
   hpx_get_include_directory(include_dir)
+  hpx_get_boost_include_directory(boost_include_dir)
 
   add_hpx_config_test("cxx11_std_function" ${variable} LANGUAGE CXX
     SOURCE cmake/tests/cxx11_std_function.cpp
-    FLAGS ${boost_include_flag} ${include_dir} "-std=c++0x" FILE ${ARGN})
+    FLAGS ${boost_include_dir} ${include_dir} "-std=c++0x" FILE ${ARGN})
 endmacro()
 
 ###############################################################################
@@ -203,3 +207,4 @@ macro(hpx_check_for_thread_safe_hdf5 variable)
     SOURCE cmake/tests/hdf5_thread_safe.cpp
     FLAGS -I${HDF5_INCLUDE_DIR} ${include_dir} "-std=c++0x" FILE ${ARGN})
 endmacro()
+
