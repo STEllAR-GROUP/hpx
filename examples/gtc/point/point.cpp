@@ -33,6 +33,9 @@ HPX_REGISTER_ACTION_EX(
     gtc_point_init_action);
 
 HPX_REGISTER_ACTION_EX(
-    gtc_point_type::wrapped_type::search_action,
-    gtc_point_search_action);
+    gtc_point_type::wrapped_type::load_action,
+    gtc_point_load_action);
 
+HPX_REGISTER_ACTION_EX(
+    gtc_point_type::wrapped_type::chargei_action,
+    gtc_point_chargei_action);

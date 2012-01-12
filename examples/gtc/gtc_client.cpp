@@ -8,7 +8,6 @@
 #include <hpx/include/iostreams.hpp>
 
 #include "point/point.hpp"
-#include "particle/particle.hpp"
 #include "parameter.hpp"
 
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
@@ -35,19 +34,6 @@ init(hpx::components::server::distributing_factory::iterator_range_type const& r
     BOOST_FOREACH(hpx::naming::id_type const& id, r)
     {
         point.push_back(gtc::point(id));
-    }
-}
-
-/// This function initializes a vector of \a gtc::particle clients,
-/// connecting them to components created with
-/// \a hpx::components::distributing_factory.
-inline void
-init(hpx::components::server::distributing_factory::iterator_range_type const& r,
-    std::vector<gtc::particle>& particle)
-{
-    BOOST_FOREACH(hpx::naming::id_type const& id, r)
-    {
-        particle.push_back(gtc::particle(id));
     }
 }
 
@@ -356,72 +342,47 @@ int hpx_main(boost::program_options::variables_map &vm)
         hpx::components::distributing_factory::result_type blocks_points =
             factory.create_components(block_type_points, par->ntoroidal);
 
-        // Get the component type for our particle component.
-        hpx::components::component_type block_type_particles =
-            hpx::components::get_component_type<gtc::server::particle>();
-
-        // Create par->npartdom particle components with distributing factory.
-        // These components will be evenly distributed among all available
-        // localities supporting the component type.
-        hpx::components::distributing_factory::result_type blocks_particles =
-            factory.create_components(block_type_particles, par->npartdom);
-
         ///////////////////////////////////////////////////////////////////////
-        // These two vectors will hold client classes referring to all of the
+        // This will hold client classes referring to all of the
         // components we just created.
         std::vector<gtc::point> points;
-        std::vector<gtc::particle> particles;
 
         // Populate the client vectors.
         init(hpx::components::server::locality_results(blocks_points), points);
-        init(hpx::components::server::locality_results(blocks_particles), particles);
 
         ///////////////////////////////////////////////////////////////////////
-        // Initialize the particles and points with the data from the input
-        // files.
         std::vector<hpx::lcos::promise<void> > initial_phase;
 
         for (std::size_t i=0;i<par->ntoroidal;i++) {
           initial_phase.push_back(points[i].init_async(i,par));
         }
 
-        for (std::size_t i=0;i<par->npartdom;i++) {
-          initial_phase.push_back(particles[i].init_async(i,par));
-        }
-
-        // While we're waiting for the initialization phase to complete, we
-        // build a vector of all of the particle GIDs. This will be used as the
-        // input for the next phase.
-        std::vector<hpx::naming::id_type> particle_components;
-        for (std::size_t i=0;i<par->npartdom;i++) {
-          particle_components.push_back(particles[i].get_gid());
-        }
-
         // We have to wait for the initialization to complete before we begin
         // the next phase of computation.
         hpx::lcos::wait(initial_phase);
 
+        std::vector<hpx::lcos::promise<void> > load_phase;
+        for (std::size_t i=0;i<par->ntoroidal;i++) {
+          load_phase.push_back(points[i].load_async(i,par));
+        }
+        hpx::lcos::wait(load_phase);
+
+        std::vector<hpx::naming::id_type> point_components;
+        for (std::size_t i=0;i<par->ntoroidal;i++) {
+          point_components.push_back(points[i].get_gid());
+        }
+
         std::size_t istep = 0;
         std::vector<hpx::lcos::promise<void> > chargei_phase;
-        for (std::size_t i=0;i<par->npartdom;i++) {
-          initial_phase.push_back(particles[i].chargei_async(i,istep,
-                              particle_components,par));
+        for (std::size_t i=0;i<par->ntoroidal;i++) {
+          chargei_phase.push_back(points[i].chargei_async(istep,
+                              point_components,par));
         }
         hpx::lcos::wait(chargei_phase);
 
         ///////////////////////////////////////////////////////////////////////
         // Start the search/charge depositing phase.
         std::vector<hpx::lcos::promise<void> > charge_phase;
-
-        // We use the vector of particle component GIDS that we created during
-        // the initialization phase as the input to the search action on each
-        // point.
-        for (std::size_t i=0;i<par->ntoroidal;i++) {
-          charge_phase.push_back(points[i].search_async(particle_components));
-        }
-
-        // Wait for the search/charge depositing phase to complete.
-        hpx::lcos::wait(charge_phase);
 
         // Print the total walltime that the computation took.
         std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl;

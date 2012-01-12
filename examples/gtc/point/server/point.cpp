@@ -17,12 +17,19 @@
 #include <boost/ref.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include "../../particle/stubs/particle.hpp"
 #include "point.hpp"
 
 #include <string>
 #include <sstream>
 #include <fstream>
+
+double unifRand() {
+  return rand()/double(RAND_MAX);
+}
+double unifRand(double a,double b)
+{
+  return (b-a)*unifRand() + a;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace gtc { namespace server
@@ -34,14 +41,14 @@ namespace gtc { namespace server
         tauii_ = -1.0; // initially collisionless
 
         // initial mesh
-        std::size_t toroidal_domain_location=objectid/par->npartdom;
-        double pi = 4.0*atan(1.0);
+        toroidal_domain_location_=objectid/par->npartdom;
+        pi_ = 4.0*atan(1.0);
         mzeta_ = par->mzetamax/par->ntoroidal;
-        double tmp1 = (double) toroidal_domain_location;
+        double tmp1 = (double) toroidal_domain_location_;
         double tmp2 = (double) par->ntoroidal;
-        double tmp3 = (double) (toroidal_domain_location+1);
-        zetamin_ = 2.0*pi*tmp1/tmp2;
-        zetamax_ = 2.0*pi*tmp3/tmp2;
+        double tmp3 = (double) (toroidal_domain_location_+1);
+        zetamin_ = 2.0*pi_*tmp1/tmp2;
+        zetamax_ = 2.0*pi_*tmp3/tmp2;
 
         double tmp4 = (double) mzeta_;
         deltaz_ = (zetamax_-zetamin_)/tmp4;
@@ -70,16 +77,16 @@ namespace gtc { namespace server
 
         // grid shift associated with fieldline following coordinates
         double tmp6 = (double) par->mthetamax;
-        double tdum = 2.0*pi*par->a1/tmp6;
+        double tdum = 2.0*pi_*par->a1/tmp6;
 
         // initial data
         for (std::size_t i=0;i<par->mpsi+1;i++) {
           double r = par->a0 + deltar_*i;
           std::size_t two = 2;
-          double tmp7 = pi*r/tdum + 0.5;
+          double tmp7 = pi_*r/tdum + 0.5;
           std::size_t tmp8 = (std::size_t) tmp7;
           mtheta_[i] = (std::max)(two,(std::min)(par->mthetamax,two*tmp8)); // even # poloidal grid
-          deltat_[i] = 2.0*pi/mtheta_[i];
+          deltat_[i] = 2.0*pi_/mtheta_[i];
           double q = par->q0 + par->q1*r/par->a + par->q2*r*r/(par->a*par->a);
           double tmp9 = mtheta_[i]/q + 0.5;
           std::size_t tmp10 = (std::size_t) tmp9;
@@ -112,22 +119,22 @@ namespace gtc { namespace server
           mgrid_ += mtheta_[i] + 1;
         }
         std::size_t mi_local = par->micell*(mgrid_-par->mpsi)*mzeta_;  // # of ions in toroidal domain
-        std::size_t mi = par->micell*(mgrid_-par->mpsi)*mzeta_/par->npartdom; // # of ions per processor
-        if ( mi <  (mi_local%par->npartdom) ) mi++;
+        mi_ = par->micell*(mgrid_-par->mpsi)*mzeta_/par->npartdom; // # of ions per processor
+        if ( mi_ <  (mi_local%par->npartdom) ) mi_++;
         std::size_t me_local = par->mecell*(mgrid_-par->mpsi)*mzeta_;  // # of electrons in toroidal domain
-        std::size_t me = par->mecell*(mgrid_-par->mpsi)*mzeta_/par->npartdom; // # of electrons per processor
-        if ( me < (me_local%par->npartdom) ) me++;
+        std::size_t me_ = par->mecell*(mgrid_-par->mpsi)*mzeta_/par->npartdom; // # of electrons per processor
+        if ( me_ < (me_local%par->npartdom) ) me_++;
 
-        double tmp13 = (double) mi;
-        double tmp14 = (double) me;
-        std::size_t mimax = static_cast<std::size_t>(mi + 100*std::ceil(sqrt(tmp13))); // ions array upper bound
-        std::size_t memax = static_cast<std::size_t>(me + 100*std::ceil(sqrt(tmp14))); // electrons array upper bound
+        double tmp13 = (double) mi_;
+        double tmp14 = (double) me_;
+        std::size_t mimax = static_cast<std::size_t>(mi_ + 100*std::ceil(sqrt(tmp13))); // ions array upper bound
+        std::size_t memax = static_cast<std::size_t>(me_ + 100*std::ceil(sqrt(tmp14))); // electrons array upper bound
 
         pgyro_.resize(5,mgrid_+1,1);
         tgyro_.resize(5,mgrid_+1,1);
         markeri_.resize(mzeta_+1,mgrid_+1,1);
-        densityi_.resize(mzeta_+1,mgrid_,1);
-        phi_.resize(mzeta_+1,mgrid_,1);
+        densityi_.resize(mzeta_+1,mgrid_+1,1);
+        phi_.resize(mzeta_+1,mgrid_+1,1);
         evector_.resize(3,mzeta_+1,mgrid_);
         jtp1_.resize(3,mgrid_,mzeta_+1);
         jtp2_.resize(3,mgrid_,mzeta_+1);
@@ -171,7 +178,7 @@ namespace gtc { namespace server
           }
           double rmax = (std::min)(par->a1,r+0.5*deltar_);
           double rmin = (std::max)(par->a0,r-0.5*deltar_);
-          double tmp15 = (double) mi*par->npartdom;
+          double tmp15 = (double) mi_*par->npartdom;
           tdum = tmp15*(rmax*rmax-rmin*rmin)/(par->a1*par->a1-par->a0*par->a0);
           for (std::size_t j=1;j<=mtheta_[i];j++) {
             std::size_t ij = igrid_[i] + j;
@@ -193,15 +200,15 @@ namespace gtc { namespace server
           // No tagging of the particles
           nparam = 6;
         }
-        zion_.resize(nparam,mimax,1);
-        zion0_.resize(nparam,mimax,1);
-        jtion0_.resize(nparam,mimax,1);
-        jtion1_.resize(4,mimax,1);
-        kzion_.resize(mimax);
-        wzion_.resize(mimax);
-        wpion_.resize(4,mimax,1);
-        wtion0_.resize(4,mimax,1);
-        wtion1_.resize(4,mimax,1);
+        zion_.resize(nparam+1,mimax+1,1);
+        zion0_.resize(nparam+1,mimax+1,1);
+        jtion0_.resize(nparam+1,mimax+1,1);
+        jtion1_.resize(5,mimax+1,1);
+        kzion_.resize(mimax+1);
+        wzion_.resize(mimax+1);
+        wpion_.resize(5,mimax+1,1);
+        wtion0_.resize(5,mimax+1,1);
+        wtion1_.resize(5,mimax+1,1);
 
         if ( par->nhybrid > 0 ) {
           BOOST_ASSERT(false);
@@ -276,46 +283,223 @@ namespace gtc { namespace server
 
     }
 
-    bool search_callback(std::list<std::size_t>& deposits,
-        std::size_t i,double const& distance)
+    void point::load(std::size_t objectid,parameter const& par)
     {
-        double neighbor_distance = 0.1;
-        if ( distance < neighbor_distance ) {
-            // deposit the charge of this particle on the gridpoint
-            deposits.push_back(i);
+      // initialize random number generator
+      srand((unsigned int)(objectid+5));
+
+      double rmi = 1.0/(mi_*par->npartdom);
+      double pi2_inv = 0.5/pi_;
+      double w_initial = 1.0e-3;
+      if ( par->nonlinear < 0.5 ) w_initial = 1.0e-12;
+      std::size_t ntracer = 0;
+      if ( objectid == 0 ) ntracer = 1;
+
+      for (std::size_t m=1;m<=mi_;m++) {
+        zion_(1,m,0) = sqrt(par->a0*par->a0 + ( (m+objectid*mi_)-0.5 )*(par->a1*par->a1-par->a0*par->a0)*rmi);
+      } 
+
+      if ( par->track_particles ) BOOST_ASSERT(false); // not implemented yet 
+
+      // Set zion(2:6,1:mi) to uniformly distributed random values between 0 and 1
+      // set random zion 
+      for (std::size_t i=2;i<=6;i++) {
+        for (std::size_t j=1;j<=mi_;j++) {
+          zion_(i,j,0) = unifRand(0,1);
         }
-        return true;
+      }
+
+      // poloidal: uniform in alpha=theta_0+r*sin(alpha_0), theta_0=theta+r*sin(theta)
+      for (std::size_t m=1;m<=mi_;m++) {
+        zion_(2,m,0) = 2.0*pi_*(zion_(2,m,0)-0.5);
+        zion0_(2,m,0) = zion_(2,m,0); // zion0(2,:) for temporary storage
+      }
+
+      for (std::size_t i=1;i<=10;i++) {
+        for (std::size_t m=1;m<=mi_;m++) {
+          zion_(2,m,0) = zion_(2,m,0)*pi2_inv+10.0; // period of 1
+          zion_(2,m,0) = 2.0*pi_*(zion_(2,m,0)-floor(zion_(2,m,0)));
+        }
+      }
+
+      // Maxwellian distribution in v_para, <v_para^2>=1.0, use zion0(4,:) as temporary storage
+      double SMALL = 1.e-20;
+      double c0 = 2.515517;
+      double c1 = 0.802853;
+      double c2 = 0.010328;
+      double d1 = 1.432788;
+      double d2 = 0.189269;
+      double d3 = 0.001308;
+
+      for (std::size_t m=1;m<=mi_;m++) {
+        double z4tmp = zion_(4,m,0);
+        zion_(4,m,0) = zion_(4,m,0)-0.5;
+        if ( zion_(4,m,0) > 0.0 ) zion0_(4,m,0) = 1.0;
+        else zion0_(4,m,0) = -1.0;
+        zion_(4,m,0) = sqrt( (std::max)(SMALL,log(1.0/(std::max)(SMALL,pow(zion_(4,m,0),2)))));
+        zion_(4,m,0) = zion_(4,m,0) - (c0+c1*zion_(4,m,0)+c2*pow(zion_(4,m,0),2))/
+                                    (1.0+d1*zion_(4,m,0)+d2*pow(zion_(4,m,0),2)+d3*pow(zion_(4,m,0),3));
+        if ( zion_(4,m,0) > par->umax ) zion_(4,m,0) = z4tmp;
+      }
+
+      for (std::size_t m=1;m<=mi_;m++) {
+        // toroidal:  uniformly distributed in zeta
+        zion_(3,m,0) = zetamin_+(zetamax_-zetamin_)*zion_(3,m,0);
+        zion_(4,m,0) = zion0_(4,m,0)*(std::min)(par->umax,zion_(4,m,0));
+
+        // initial random weight
+        zion_(5,m,0) = 2.0*w_initial*(zion_(5,m,0)-0.5)*(1.0+cos(zion_(2,m,0)));
+
+        // Maxwellian distribution in v_perp, <v_perp^2>=1.0
+        zion_(6,m,0) = (std::max)(SMALL,(std::min)(par->umax*par->umax,-log((std::max)(SMALL,zion_(6,m,0)))));
+      }
+
+      // transform zion(1,:) to psi, zion(4,:) to rho_para, zion(6,:) to sqrt(mu)
+      double vthi = par->gyroradius*abs(par->qion)/par->aion;
+      for (std::size_t m=1;m<=mi_;m++) {
+        zion0_(1,m,0) = 1.0/(1.0+zion_(1,m,0)*cos(zion_(2,m,0))); // B-field
+        zion_(1,m,0) = 0.5*zion_(1,m,0)*zion_(1,m,0);
+        zion_(4,m,0) = vthi*zion_(4,m,0)*par->aion/(par->qion*zion0_(1,m,0));
+        zion_(6,m,0) = sqrt(par->aion*vthi*vthi*zion_(6,m,0)/zion0_(1,m,0));
+      }
+
+      if ( objectid == 0 ) {
+        zion_(1,ntracer,0) = 0.5*pow((0.5*(par->a0+par->a1)),2);
+        zion_(2,ntracer,0) = 0.0;
+        zion_(3,ntracer,0) = 0.5*(zetamin_+zetamax_);
+        zion_(4,ntracer,0) = 0.5*vthi*par->aion/par->qion;
+        zion_(5,ntracer,0) = 0.0;
+        zion_(6,ntracer,0) = sqrt(par->aion*vthi*vthi);
+      }
+
+      if ( par->iload == false ) {
+        for (std::size_t m=1;m<=mi_;m++) {
+          zion0_(6,m,0) = 1.0;
+        }
+      } else {
+        std::cerr << " Not implemented yet " << std::endl;
+      }
+
+      if ( par->nhybrid > 0 ) {
+        std::cerr << " Not implemented yet " << std::endl;
+      }
     }
 
-    void point::search(std::vector<hpx::naming::id_type> const& particle_components)
+    void point::chargei(std::size_t istep, std::vector<hpx::naming::id_type> const& point_components, parameter const& par)
     {
-        // For demonstration, a simple search strategy: we check if the
-        // particle is within a certain distance of the gridpoint.  If so, then
-        // get its charge
-        typedef std::vector<hpx::lcos::promise<double> > lazy_results_type;
 
-        lazy_results_type lazy_results;
-
-        BOOST_FOREACH(hpx::naming::id_type const& gid, particle_components)
-        {
-            lazy_results.push_back( stubs::particle::distance_async( gid,posx_,posy_,posz_ ) );
+      double delr = 1.0/deltar_;
+      double delz = 1.0/deltaz_;
+      std::vector<double> delt;
+      delt.resize( deltat_.size() );
+      for (std::size_t i=0;i<deltat_.size();i++) {
+        delt[i] = 2.0*pi_/deltat_[i];
+      }
+      double smu_inv = sqrt(par->aion)/(abs(par->qion)*par->gyroradius);
+      double pi2_inv = 0.5/pi_;
+      for (std::size_t i=0;i<=mzeta_;i++) {
+        for (std::size_t j=0;j<=mgrid_;j++) {
+          densityi_(i,j,0) = 0.0;
         }
+      }
+      std::size_t zero = 0;
 
-        // List of particles whose charge should deposited on this gridpoint.
-        std::list<std::size_t> deposits;
+      for (std::size_t m=1;m<=mi_;m++) {
+        double psitmp = zion_(1,m,0);
+        double thetatmp = zion_(2,m,0);
+        double zetatmp = zion_(3,m,0);
+        double rhoi = zion_(6,m,0)*smu_inv;
 
-        // Wait on the results, and invoke a callback when each result is ready.
-        hpx::lcos::wait(lazy_results,
-            boost::bind(&search_callback, boost::ref(deposits), _1, _2));
+        double r = sqrt(2.0*psitmp);
+        std::size_t tmp = (std::size_t) ((r-par->a0)*delr+0.5);
+        double dip = (std::max)(0.0,(double) (std::min)(par->mpsi,tmp));
+        std::size_t ip = (std::size_t) dip;
+        std::size_t tmp2 = (std::size_t) (thetatmp*pi2_inv*delt[ip]+0.5);
+        double djt = (std::max)(0.0,(double) (std::min)(mtheta_[ip],tmp2));
+        std::size_t jt = (std::size_t) djt;
+        std::size_t ipjt = igrid_[ip] + jt;
 
-        // Print out the particles whose charge should be deposited on this
-        // point.
-        BOOST_FOREACH(std::size_t i, deposits)
-        {
-            hpx::cout << ( boost::format("deposit particle %1% on point %2%\n")
-                         % idx_ % stubs::particle::get_index(particle_components.at(i)))
-                      << hpx::flush;
+        double wz1 = (zetatmp-zetamin_)*delz;
+        std::size_t kk = (std::max)(zero,(std::min)(par->mpsi-1,(std::size_t) wz1));
+        kzion_[m] = static_cast<double>(kk);
+        wzion_[m] = wz1 - kk;
+
+        for (std::size_t larmor=1;larmor<=4;larmor++) {
+          double rdum = delr*(std::max)(0.0,(std::min)(par->a1-par->a0,r+rhoi*pgyro_(larmor,ipjt,0)-par->a0));
+          std::size_t ii = (std::max)(zero,(std::min)(par->mpsi-1,(std::size_t) rdum));
+          double wp1 = rdum - ii;
+          wpion_(larmor,m,0) = wp1;
+
+          // particle position in theta
+          double tflr = thetatmp + rhoi*tgyro_(larmor,ipjt,0);
+
+          // inner flux surface
+          std::size_t im = ii;
+          double tdum = pi2_inv*(tflr-zetatmp*qtinv_[im])+10.0;
+          tdum = (tdum - floor(tdum))*delt[im];
+          std::size_t j00 = (std::max)(zero,(std::min)(mtheta_[im]-1,(std::size_t) tdum));
+          jtion0_(larmor,m,0) = static_cast<double>(igrid_[im] + j00);
+          wtion0_(larmor,m,0) = tdum - j00;
+
+          // outer flux surface
+          im = ii;
+          tdum = pi2_inv*(tflr-zetatmp*qtinv_[im])+10.0;
+          tdum = (tdum - floor(tdum))*delt[im];
+          std::size_t j01 = (std::max)(zero,(std::min)(mtheta_[im]-1,(std::size_t) tdum));
+          jtion1_(larmor,m,0) = static_cast<double>(igrid_[im] + j01);
+          wtion1_(larmor,m,0) = tdum - j01;
         }
+      }
+
+      if ( istep == 0 ) return;
+
+      for (std::size_t m=1;m<=mi_;m++) {
+        double weight = zion_(5,m,0);
+
+        std::size_t kk = static_cast<std::size_t>(kzion_[m]);
+        double wz1 = weight*wzion_[m];
+        double wz0 = weight-wz1;
+
+        for (std::size_t larmor=1;larmor<=4;larmor++) {
+          double wp1 = wpion_(larmor,m,0);
+          double wp0 = 1.0-wp1;
+
+          double wt10 = wp0*wtion0_(larmor,m,0);
+          double wt00 = wp0 - wt10;
+
+          double wt11 = wp1*wtion1_(larmor,m,0);
+          double wt01 = wp1-wt11;
+
+          std::size_t ij = static_cast<std::size_t>(jtion0_(larmor,m,0));
+          densityi_(kk,ij,0) = densityi_(kk,ij,0) + wz0*wt00;
+          densityi_(kk+1,ij,0) = densityi_(kk+1,ij,0) + wz1*wt00;
+
+          ij = ij + 1;
+          densityi_(kk,ij,0) = densityi_(kk,ij,0) + wz0*wt10;
+          densityi_(kk+1,ij,0)   = densityi_(kk+1,ij,0)   + wz1*wt10;
+
+          ij = static_cast<std::size_t>(jtion1_(larmor,m,0));
+          densityi_(kk,ij,0) = densityi_(kk,ij,0) + wz0*wt01;
+          densityi_(kk+1,ij,0)   = densityi_(kk+1,ij,0)   + wz1*wt01;
+
+          ij = ij + 1;
+          densityi_(kk,ij,0) = densityi_(kk,ij,0) + wz0*wt11;
+          densityi_(kk+1,ij,0)   = densityi_(kk+1,ij,0)   + wz1*wt11;
+        }
+      }
+
+      if ( par->npartdom > 1 ) {
+        std::cerr << " Not implemented yet " << std::endl;
+        BOOST_ASSERT(false);
+      }
+
+      // poloidal end cell, discard ghost cell j=0
+      for (std::size_t i=0;i<=par->mpsi;i++) {
+        for (std::size_t j=0;j<densityi_.isize();j++) {
+          densityi_(j,igrid_[i]+mtheta_[i],0) = densityi_(j,igrid_[i]+mtheta_[i],0) + densityi_(j,igrid_[i],0);
+        }
+      }
+
     }
 }}
 

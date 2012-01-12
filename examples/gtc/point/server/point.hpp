@@ -12,7 +12,6 @@
 #include <hpx/runtime/actions/component_action.hpp>
 
 #include "../../parameter.hpp"
-#include "../../particle/server/particle.hpp"
 #include "../../array1d.hpp"
 
 using hpx::components::gtc::parameter;
@@ -29,7 +28,8 @@ namespace gtc { namespace server
         enum actions
         {
             point_init = 0,
-            point_search = 1
+            point_load = 1,
+            point_chargei = 2
         };
 
         point()
@@ -40,12 +40,12 @@ namespace gtc { namespace server
 
         /// Initialize the point with the given point file. 
         void init(std::size_t objectid, parameter const& par);
+            
+        void load(std::size_t objectid,parameter const& par);
 
-        /// Perform a search on the \a gtc::server::particle
-        /// components in \a particle_components.
-        void search(std::vector<hpx::naming::id_type> const& particle_components);
+        void chargei(std::size_t istep, std::vector<hpx::naming::id_type> const& point_components, parameter const& par);
 
-        ///////////////////////////////////////////////////////////////////////
+       ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
@@ -61,16 +61,30 @@ namespace gtc { namespace server
             &point::init
         > init_action;
 
-        typedef hpx::actions::action1<
+        typedef hpx::actions::action2<
             // Component server type.
             point,
             // Action code.
-            point_search,
+            point_load,
             // Arguments of this action.
+            std::size_t,
+            parameter const&,
+            // Method bound to this action. 
+            &point::load
+        > load_action;
+
+        typedef hpx::actions::action3<
+            // Component server type.
+            point,
+            // Action code.
+            point_chargei,
+            // Arguments of this action.
+            std::size_t,
             std::vector<hpx::naming::id_type> const&,
-            // Method bound to this action.
-            &point::search
-        > search_action;
+            parameter const&,
+            // Method bound to this action. 
+            &point::chargei
+        > chargei_action;
 
     private:
         std::size_t idx_;
@@ -79,8 +93,10 @@ namespace gtc { namespace server
         double deltaz_;
         double deltar_;
         double zetamin_,zetamax_;
-        std::vector<std::size_t> neighbors_;
-        double posx_,posy_,posz_;
+        std::size_t toroidal_domain_location_;
+        double pi_;
+        std::size_t mi_; // # of ions per proc
+        std::size_t me_; // # of electrons per proc
 
         std::vector<std::size_t> itran_,mtheta_,igrid_;
         std::vector<double> qtinv_,deltat_,rtemi_,rteme_; 
@@ -104,8 +120,12 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
               gtc_point_init_action)
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-              gtc::server::point::search_action,
-              gtc_point_search_action)
+              gtc::server::point::load_action,
+              gtc_point_load_action)
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+              gtc::server::point::chargei_action,
+              gtc_point_chargei_action)
 
 #endif
 

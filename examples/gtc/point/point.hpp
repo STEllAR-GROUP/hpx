@@ -52,22 +52,34 @@ namespace gtc
             this->base_type::init_async(gid_,objectid,par);
         }
 
-        /// Perform a search on the \a gtc::server::particle
-        /// components specified. 
-        hpx::lcos::promise<void>
-        search_async(std::vector<hpx::naming::id_type> const& particle_components)
+        hpx::lcos::promise<void> load_async(std::size_t objectid,parameter const& par)
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::search_async(gid_,particle_components);
+            return this->base_type::load_async(gid_,objectid,par);
         }
 
-        /// Perform a search on the \a gtc::server::particle
-        /// components specified. 
-        void search(std::vector<hpx::naming::id_type> const& particle_components)
+        void load(std::size_t objectid,parameter const& par)
         {
             BOOST_ASSERT(gid_);
-            this->base_type::search(gid_,particle_components);
+            this->base_type::load_async(gid_,objectid,par);
         }
+
+        hpx::lcos::promise<void> chargei_async(std::size_t istep, 
+            std::vector<hpx::naming::id_type> const& point_components,
+            parameter const& par)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::chargei_async(gid_,istep,point_components,par);
+        }
+
+        void chargei(std::size_t istep,
+                    std::vector<hpx::naming::id_type> const& point_components,
+                    parameter const& par)
+        {
+            BOOST_ASSERT(gid_);
+            this->base_type::chargei(gid_,istep,point_components,par);
+        }
+
 
     };
 }

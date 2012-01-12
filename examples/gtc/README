@@ -14,3 +14,5 @@ Options:
  Example:
 
    gtc_client --n 64 --np 150 --mesh mesh.txt --particles particle.txt
+
+Prior to redesign which removes particle component:  6705

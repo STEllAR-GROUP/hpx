@@ -39,25 +39,41 @@ namespace gtc { namespace stubs
             init_async(gid,objectid,par).get();
         }
 
-        /// Perform a search on the \a gtc::server::point
-        /// components in \a particle_components. 
         static hpx::lcos::promise<void>
-        search_async(hpx::naming::id_type gid,
-            std::vector<hpx::naming::id_type> const& particle_components)
+        load_async(hpx::naming::id_type gid,std::size_t objectid,
+            parameter const& par)
         {
-            typedef server::point::search_action action_type;
-            return hpx::lcos::eager_future<action_type>(gid,particle_components);
+            typedef server::point::load_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid,objectid,par);
         }
 
-        /// Perform a search on the \a gtc::server::point
-        /// components specified \a particle_components. 
-        static void search(hpx::naming::id_type const& gid,
-            std::vector<hpx::naming::id_type> const& particle_components)
+        static void load(hpx::naming::id_type const& gid,std::size_t objectid,
+                         parameter const& par)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the promise.
-            search_async(gid,particle_components).get();
+            load_async(gid,objectid,par).get();
         }
+
+        static hpx::lcos::promise<void>
+        chargei_async(hpx::naming::id_type const& gid,
+           std::size_t istep,std::vector<hpx::naming::id_type> const& point_components,
+            hpx::components::gtc::parameter const& par)
+        {
+            typedef server::point::chargei_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid,istep,
+                point_components,par);
+        }
+
+        static void chargei(hpx::naming::id_type const& gid,
+               std::size_t istep,std::vector<hpx::naming::id_type> const& point_components,
+               hpx::components::gtc::parameter const& par)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise.
+            chargei_async(gid,istep,point_components,par).get();
+        }
+
     };
 }}
 
