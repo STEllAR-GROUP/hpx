@@ -157,8 +157,48 @@ public:
     }
   }
 
+  T const& operator[](std::size_t i) const
+  { 
+    if (i >= 0 && i < data_.size() ) {
+        return data_[i]; 
+    } else {
+        hpx::util::osstream strm;
+        strm << "array out of bounds, index(" << i << "), "
+             << "datasize(" << data_.size() << ")";
+        HPX_THROW_EXCEPTION(hpx::bad_parameter
+          , "array1d::operator[]"
+          , hpx::util::osstream_get_string(strm));
+    }
+  }
+
   // basic item reference
   T & operator()(std::size_t i,std::size_t j,std::size_t k) 
+  { 
+     if(i-istart_ >= 0 && i-istart_ < isize_ &&
+        j-jstart_ >= 0 && j-jstart_ < jsize_ &&
+        k-kstart_ >= 0 && k-kstart_ < ksize_ &&
+        (i-istart_) + isize_*(j-jstart_ + jsize_*( k-kstart_) ) < data_.size() ) {
+       return data_[(i-istart_) + isize_*(j-jstart_ + jsize_*( k-kstart_) )]; 
+     } 
+
+     hpx::util::osstream strm;
+     strm << "array out of bounds, index(" << i << "), "
+          << "datasize(" << data_.size() << ")\n"
+          << "  istart " << istart_ << "\n"
+          << "  j == " << j << "\n"
+          << "  jstart == " << jstart_ << "\n"
+          << "  k == " << k << "\n"
+          << "  kstart == " << kstart_ << "\n"
+          << "  isize == " << isize_ << "\n"
+          << "  jsize == " << jsize_ << "\n"
+          << "  (i-istart_) + isize_*(j-jstart_ + jsize_*( k-kstart_) ) == "
+          << (i-istart_) + isize_*(j-jstart_ + jsize_*( k-kstart_) );
+     HPX_THROW_EXCEPTION(hpx::bad_parameter
+       , "array1d::operator()"
+       , hpx::util::osstream_get_string(strm));
+  }
+
+  T const& operator()(std::size_t i,std::size_t j,std::size_t k) const
   { 
      if(i-istart_ >= 0 && i-istart_ < isize_ &&
         j-jstart_ >= 0 && j-jstart_ < jsize_ &&

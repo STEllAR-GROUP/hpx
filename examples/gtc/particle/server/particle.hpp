@@ -15,11 +15,15 @@
 #include "../../parameter.hpp"
 #include "../../array1d.hpp"
 
-using hpx::components::gtc::parameter;
+#if defined(BOOST_MSVC)
+#pragma warning(push)
+#pragma warning(disable:4251 4275)
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace gtc { namespace server
 {
+    using hpx::components::gtc::parameter;
 
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT particle
@@ -41,13 +45,13 @@ namespace gtc { namespace server
         ///////////////////////////////////////////////////////////////////////
         // Exposed functionality of this component.
 
-        /// Initialize the point with the given particle file. 
+        /// Initialize the point with the given particle file.
         void init(std::size_t objectid,parameter const& par);
 
         array<double> get_densityi();
 
-        bool chargei_callback(std::size_t i,array<double> density);
-  
+        bool chargei_callback(std::size_t i,array<double> const& density);
+
         void chargei(std::size_t objectid,std::size_t istep,std::vector<hpx::naming::id_type> const& particle_components,parameter const& par);
 
         /// Calculate the distance from this particle to the specified
@@ -85,7 +89,7 @@ namespace gtc { namespace server
             // Component server type.
             particle,
             // Action code.
-            particle_init,
+            particle_chargei,
             // Arguments of this action.
             std::size_t,
             std::size_t,
@@ -155,6 +159,10 @@ namespace gtc { namespace server
     };
 
 }}
+
+#if defined(BOOST_MSVC)
+#pragma warning(pop)
+#endif
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
               gtc::server::particle::init_action,

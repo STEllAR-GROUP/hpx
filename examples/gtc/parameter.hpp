@@ -10,6 +10,11 @@
 
 #include <boost/config.hpp>
 
+#if defined(BOOST_MSVC)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace gtc
 {
@@ -128,6 +133,10 @@ struct HPX_COMPONENT_EXPORT parameter
 }}}
 
 #include <examples/gtc/serialize_parameter.hpp>
+
+#if defined(BOOST_MSVC)
+#pragma warning(pop)
+#endif
 
 #endif
 

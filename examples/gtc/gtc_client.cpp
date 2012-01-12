@@ -25,7 +25,7 @@ using hpx::util::high_resolution_timer;
 
 using hpx::components::gtc::parameter;
 
-/// This function initializes a vector of \a gtc::point clients, 
+/// This function initializes a vector of \a gtc::point clients,
 /// connecting them to components created with
 /// \a hpx::components::distributing_factory.
 inline void
@@ -38,7 +38,7 @@ init(hpx::components::server::distributing_factory::iterator_range_type const& r
     }
 }
 
-/// This function initializes a vector of \a gtc::particle clients, 
+/// This function initializes a vector of \a gtc::particle clients,
 /// connecting them to components created with
 /// \a hpx::components::distributing_factory.
 inline void
@@ -168,9 +168,9 @@ int hpx_main(boost::program_options::variables_map &vm)
         section root;
         hpx::components::stubs::runtime_support::get_config(rt_id, root);
         if (root.has_section("gtc"))
-        { 
+        {
           section pars = *(root.get_section("gtc"));
-           
+
           appconfig_option<bool>("irun", pars, par->irun);
           appconfig_option<std::size_t>("mstep", pars, par->mstep);
           appconfig_option<std::size_t>("msnap", pars, par->msnap);
@@ -235,12 +235,12 @@ int hpx_main(boost::program_options::variables_map &vm)
         // primary ion thermal gyroradius in equilibrium unit, vthermal=sqrt(T/m)
         par->gyroradius=102.0*sqrt(par->aion*par->temperature)/
                             (abs(par->qion)*par->b0)/ulength;
-        par->tstep = par->tstep*par->aion/(abs(par->qion)*par->gyroradius*par->kappati); 
+        par->tstep = par->tstep*par->aion/(abs(par->qion)*par->gyroradius*par->kappati);
 
         // basic ion-ion collision time, Braginskii definition
         bool collision = false;
         if ( par->tauii > 0.0 ) {
-          double zeff = par->qion; 
+          double zeff = par->qion;
           double tau_vth = 23.0-log(sqrt(zeff*zeff*par->edensity0)/pow(par->temperature,1.5));
           tau_vth=2.09e7*pow(par->temperature,1.5)*sqrt(par->aion)/
                              (par->edensity0*tau_vth*par->utime*zeff);
@@ -255,14 +255,14 @@ int hpx_main(boost::program_options::variables_map &vm)
         while ( (par->numberpe%par->npartdom) != 0 ) {
           par->npartdom -= 1;
           if ( par->npartdom == 1 ) break;
-        } 
+        }
         par->ntoroidal = par->numberpe/par->npartdom;
 
         // make sure that mzetamax is a multiple of ntoroidal
         double tmp1 = (double) par->mzetamax;
         double tmp2 = (double) par->ntoroidal;
-        int tmp = tmp1/tmp2 + 0.5;
-        par->mzetamax = par->ntoroidal*std::max(1,tmp);
+        int tmp = static_cast<int>(tmp1/tmp2 + 0.5);
+        par->mzetamax = par->ntoroidal*(std::max)(1,tmp);
 
         // ensure that "mpsi", the total number of flux surfaces, is an even
         // number since this quantity will be used in Fast Fourier Transforms
@@ -331,18 +331,18 @@ int hpx_main(boost::program_options::variables_map &vm)
         hpx::cout << ( boost::format("**************************************\n")  ) << hpx::flush;
         if ( collision ) {
           double r = 0.5*(par->a0 + par->a1);
-          double q = par->q0 + par->q1*r/par->a + par->q2*r*r/(par->a*par->a); 
-          double tmp = q/(par->tauii*par->gyroradius*pow(r,1.5)); 
-          hpx::cout << ( boost::format("Collision time tauii=%1%   nu_star=%2%  q=%3% \n") % 
- 				par->tauii % tmp % q ) << hpx::flush;
+          double q = par->q0 + par->q1*r/par->a + par->q2*r*r/(par->a*par->a);
+          double tmp = q/(par->tauii*par->gyroradius*pow(r,1.5));
+          hpx::cout << ( boost::format("Collision time tauii=%1%   nu_star=%2%  q=%3% \n") %
+                 par->tauii % tmp % q ) << hpx::flush;
         }
-        hpx::cout << ( boost::format("mflux=%1%  num_mode=%2%  m_poloidal=%3% \n") % 
- 			par->mflux % par->num_mode % par->m_poloidal ) << hpx::flush;
+        hpx::cout << ( boost::format("mflux=%1%  num_mode=%2%  m_poloidal=%3% \n") %
+             par->mflux % par->num_mode % par->m_poloidal ) << hpx::flush;
 
         ///////////////////////////////////////////////////////////////////////
         // Create a distributing factory locally. The distributing factory can
         // be used to create blocks of components that are distributed across
-        // all localities that support that component type. 
+        // all localities that support that component type.
         hpx::components::distributing_factory factory;
         factory.create(hpx::find_here());
 
@@ -372,13 +372,13 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::vector<gtc::point> points;
         std::vector<gtc::particle> particles;
 
-        // Populate the client vectors. 
+        // Populate the client vectors.
         init(hpx::components::server::locality_results(blocks_points), points);
         init(hpx::components::server::locality_results(blocks_particles), particles);
 
         ///////////////////////////////////////////////////////////////////////
         // Initialize the particles and points with the data from the input
-        // files. 
+        // files.
         std::vector<hpx::lcos::promise<void> > initial_phase;
 
         for (std::size_t i=0;i<par->ntoroidal;i++) {
@@ -389,7 +389,7 @@ int hpx_main(boost::program_options::variables_map &vm)
           initial_phase.push_back(particles[i].init_async(i,par));
         }
 
-        // While we're waiting for the initialization phase to complete, we 
+        // While we're waiting for the initialization phase to complete, we
         // build a vector of all of the particle GIDs. This will be used as the
         // input for the next phase.
         std::vector<hpx::naming::id_type> particle_components;
@@ -398,7 +398,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         }
 
         // We have to wait for the initialization to complete before we begin
-        // the next phase of computation. 
+        // the next phase of computation.
         hpx::lcos::wait(initial_phase);
 
         std::size_t istep = 0;
@@ -415,7 +415,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         // We use the vector of particle component GIDS that we created during
         // the initialization phase as the input to the search action on each
-        // point. 
+        // point.
         for (std::size_t i=0;i<par->ntoroidal;i++) {
           charge_phase.push_back(points[i].search_async(particle_components));
         }

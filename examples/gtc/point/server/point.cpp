@@ -67,21 +67,21 @@ namespace gtc { namespace server
         // --- Define poloidal grid ---
         double tmp5 = (double) par->mpsi;
         deltar_ = (par->a1-par->a0)/tmp5;
-   
+
         // grid shift associated with fieldline following coordinates
         double tmp6 = (double) par->mthetamax;
         double tdum = 2.0*pi*par->a1/tmp6;
 
         // initial data
         for (std::size_t i=0;i<par->mpsi+1;i++) {
-          double r = par->a0 + deltar_*i; 
+          double r = par->a0 + deltar_*i;
           std::size_t two = 2;
           double tmp7 = pi*r/tdum + 0.5;
           std::size_t tmp8 = (std::size_t) tmp7;
-          mtheta_[i] = std::max(two,std::min(par->mthetamax,two*tmp8)); // even # poloidal grid
+          mtheta_[i] = (std::max)(two,(std::min)(par->mthetamax,two*tmp8)); // even # poloidal grid
           deltat_[i] = 2.0*pi/mtheta_[i];
-          double q = par->q0 + par->q1*r/par->a + par->q2*r*r/(par->a*par->a); 
-          double tmp9 = mtheta_[i]/q + 0.5; 
+          double q = par->q0 + par->q1*r/par->a + par->q2*r*r/(par->a*par->a);
+          double tmp9 = mtheta_[i]/q + 0.5;
           std::size_t tmp10 = (std::size_t) tmp9;
           itran_[i] = tmp10;
           double tmp11 = (double) mtheta_[i];
@@ -107,7 +107,7 @@ namespace gtc { namespace server
         }
 
         // number of grids on a poloidal plane
-        mgrid_ = 0; 
+        mgrid_ = 0;
         for (std::size_t i=0;i<mtheta_.size();i++) {
           mgrid_ += mtheta_[i] + 1;
         }
@@ -120,8 +120,8 @@ namespace gtc { namespace server
 
         double tmp13 = (double) mi;
         double tmp14 = (double) me;
-        std::size_t mimax = mi + 100*std::ceil(sqrt(tmp13)); // ions array upper bound
-        std::size_t memax = me + 100*std::ceil(sqrt(tmp14)); // electrons array upper bound
+        std::size_t mimax = static_cast<std::size_t>(mi + 100*std::ceil(sqrt(tmp13))); // ions array upper bound
+        std::size_t memax = static_cast<std::size_t>(me + 100*std::ceil(sqrt(tmp14))); // electrons array upper bound
 
         pgyro_.resize(5,mgrid_+1,1);
         tgyro_.resize(5,mgrid_+1,1);
@@ -158,23 +158,23 @@ namespace gtc { namespace server
         // # of marker per grid, Jacobian=(1.0+r*cos(theta+r*sin(theta)))*(1.0+r*cos(theta))
         std::fill( pmarki_.begin(),pmarki_.end(),0.0);
 
-        for (std::size_t i=0;i<par->mpsi+1;i++) { 
-          double r = par->a0 + deltar_*i; 
-          for (std::size_t j=1;j<=mtheta_[i];j++) { 
-            std::size_t ij = igrid_[i] + j; 
+        for (std::size_t i=0;i<par->mpsi+1;i++) {
+          double r = par->a0 + deltar_*i;
+          for (std::size_t j=1;j<=mtheta_[i];j++) {
+            std::size_t ij = igrid_[i] + j;
             for (std::size_t k=1;k<=mzeta_;k++) {
               double zdum = zetamin_ + k*deltaz_;
               double tdum = j*deltat_[i]+zdum*qtinv_[i];
-              markeri_(k,ij,0) = pow(1.0+r*cos(tdum),2);    
+              markeri_(k,ij,0) = pow(1.0+r*cos(tdum),2);
               pmarki_[i] = pmarki_[i] + markeri_(k,ij,0);
             }
           }
-          double rmax = std::min(par->a1,r+0.5*deltar_); 
-          double rmin = std::max(par->a0,r-0.5*deltar_); 
+          double rmax = (std::min)(par->a1,r+0.5*deltar_);
+          double rmin = (std::max)(par->a0,r-0.5*deltar_);
           double tmp15 = (double) mi*par->npartdom;
           tdum = tmp15*(rmax*rmax-rmin*rmin)/(par->a1*par->a1-par->a0*par->a0);
-          for (std::size_t j=1;j<=mtheta_[i];j++) { 
-            std::size_t ij = igrid_[i] + j; 
+          for (std::size_t j=1;j<=mtheta_[i];j++) {
+            std::size_t ij = igrid_[i] + j;
             for (std::size_t k=1;k<=mzeta_;k++) {
               markeri_(k,ij,0) = tdum*markeri_(k,ij,0)/pmarki_[i];
               markeri_(k,ij,0) = 1.0/markeri_(k,ij,0);
@@ -212,11 +212,11 @@ namespace gtc { namespace server
         // rho=gyroradius*sqrt(2/(b/b_0))*sqrt(mu/mu_0), mu_0*b_0=m*v_th^2
         // dtheta/delta_x=1/(r*(1+r*cos(theta))), delta_x=poloidal length increase
         for (std::size_t i=0;i<par->mpsi+1;i++) {
-          double r = par->a0 + deltar_*i; 
-          for (std::size_t j=0;j<=mtheta_[i];j++) { 
-            std::size_t ij = igrid_[i] + j; 
+          double r = par->a0 + deltar_*i;
+          for (std::size_t j=0;j<=mtheta_[i];j++) {
+            std::size_t ij = igrid_[i] + j;
             double tdum = deltat_[i]*j;
-            double b = 1.0/(1.0+r*cos(tdum));  
+            double b = 1.0/(1.0+r*cos(tdum));
             double dtheta_dx = 1.0/r;
             // first two points perpendicular to field line on poloidal surface
             double rhoi = sqrt(2.0/b)*par->gyroradius;
@@ -226,7 +226,7 @@ namespace gtc { namespace server
             // non-orthorgonality between psi and theta: tgyro=-rhoi*dtheta_dx*r*sin(tdum)
             tgyro_(1,ij,0) = 0.0;
             tgyro_(2,ij,0) = 0.0;
- 
+
             // the other two points tangential to field line
             tgyro_(3,ij,0) = -rhoi*dtheta_dx;
             tgyro_(4,ij,0) = rhoi*dtheta_dx;
@@ -240,34 +240,34 @@ namespace gtc { namespace server
           double zdum = zetamin_ + k*deltaz_;
           for (std::size_t i=1;i<par->mpsi;i++) {
             for (std::size_t ip=1;ip<=2;ip++) {
-              std::size_t indp = std::min(par->mpsi,i+ip);
-              double tmp = std::max(0.0,(double) i-ip); 
+              std::size_t indp = (std::min)(par->mpsi,i+ip);
+              double tmp = (std::max)(0.0,(double) i-ip);
               std::size_t indt = (std::size_t) tmp;
-              for (std::size_t j=1;j<=mtheta_[i];j++) { 
-                std::size_t ij = igrid_[i] + j; 
+              for (std::size_t j=1;j<=mtheta_[i];j++) {
+                std::size_t ij = igrid_[i] + j;
 // upward
                 double tdum = (j*deltat_[i]+zdum*(qtinv_[i]-qtinv_[indp]))/deltat_[indp];
-                std::size_t jt = floor(tdum);
-                double wt = tdum - jt; 
+                std::size_t jt = static_cast<std::size_t>(floor(tdum));
+                double wt = tdum - jt;
                 jt = (jt+mtheta_[indp])%(mtheta_[indp]);
                 if ( ip == 1 ) {
                   wtp1_(1,ij,k) = wt;
-                  jtp1_(1,ij,k) = igrid_[indp] + jt;
+                  jtp1_(1,ij,k) = static_cast<double>(igrid_[indp] + jt);
                 } else {
                   wtp2_(1,ij,k) = wt;
-                  jtp2_(1,ij,k) = igrid_[indp] + jt;
+                  jtp2_(1,ij,k) = static_cast<double>(igrid_[indp] + jt);
                 }
 // downward
                 tdum = (j*deltat_[i]+zdum*(qtinv_[i]-qtinv_[indt]))/deltat_[indt];
-                jt = floor(tdum);
+                jt = static_cast<std::size_t>(floor(tdum));
                 wt = tdum - jt;
-                jt = (jt+mtheta_[indt])%mtheta_[indt]; 
+                jt = (jt+mtheta_[indt])%mtheta_[indt];
                 if ( ip == 1 ) {
                   wtp1_(2,ij,k) = wt;
-                  jtp1_(2,ij,k) = igrid_[indt] + jt;
+                  jtp1_(2,ij,k) = static_cast<double>(igrid_[indt] + jt);
                 } else {
                   wtp2_(2,ij,k) = wt;
-                  jtp2_(2,ij,k) = igrid_[indt] + jt;
+                  jtp2_(2,ij,k) = static_cast<double>(igrid_[indt] + jt);
                 }
               }
             }
@@ -282,9 +282,9 @@ namespace gtc { namespace server
         double neighbor_distance = 0.1;
         if ( distance < neighbor_distance ) {
             // deposit the charge of this particle on the gridpoint
-            deposits.push_back(i); 
+            deposits.push_back(i);
         }
-        return true; 
+        return true;
     }
 
     void point::search(std::vector<hpx::naming::id_type> const& particle_components)
@@ -301,7 +301,7 @@ namespace gtc { namespace server
             lazy_results.push_back( stubs::particle::distance_async( gid,posx_,posy_,posz_ ) );
         }
 
-        // List of particles whose charge should deposited on this gridpoint. 
+        // List of particles whose charge should deposited on this gridpoint.
         std::list<std::size_t> deposits;
 
         // Wait on the results, and invoke a callback when each result is ready.
@@ -314,7 +314,7 @@ namespace gtc { namespace server
         {
             hpx::cout << ( boost::format("deposit particle %1% on point %2%\n")
                          % idx_ % stubs::particle::get_index(particle_components.at(i)))
-                      << hpx::flush; 
+                      << hpx::flush;
         }
     }
 }}

@@ -43,3 +43,7 @@ HPX_REGISTER_ACTION_EX(
     gtc_particle_type::wrapped_type::get_index_action,
     gtc_particle_get_index_action);
 
+HPX_REGISTER_ACTION_EX(
+    gtc_particle_type::wrapped_type::get_densityi_action,
+    gtc_particle_get_densityi_action);
+

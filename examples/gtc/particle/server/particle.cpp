@@ -3,7 +3,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include "particle.hpp"
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/include/lcos.hpp>
+
+#include "../stubs/particle.hpp"
 
 #include <boost/lexical_cast.hpp>
 
@@ -19,14 +22,14 @@ double unifRand(double a,double b)
   return (b-a)*unifRand() + a;
 }
 
-namespace hpx { namespace traits
-{
-    template <typename T>
-    struct promise_remote_result<array<T> >
-    {
-        typedef array<T> type;
-    };
-}}
+// namespace hpx { namespace traits
+// {
+//     template <typename T>
+//     struct promise_remote_result<array<T> >
+//     {
+//         typedef array<T> type;
+//     };
+// }}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace gtc { namespace server
@@ -34,8 +37,8 @@ namespace gtc { namespace server
     void particle::init(std::size_t objectid,parameter const& par)
     {
         idx_ = objectid;
-        // 
-        srand(objectid+5);
+        //
+        srand((unsigned int)(objectid+5));
 
         // initial data
 
@@ -64,8 +67,8 @@ namespace gtc { namespace server
           std::size_t two = 2;
           double tmp7 = pi*r/tdum + 0.5;
           std::size_t tmp8 = (std::size_t) tmp7;
-          mtheta_[i] = std::max(two,std::min(par->mthetamax,two*tmp8)); // even # poloidal grid
-          deltat_[i] = 2.0*pi/mtheta_[i];  
+          mtheta_[i] = (std::max)(two,(std::min)(par->mthetamax,two*tmp8)); // even # poloidal grid
+          deltat_[i] = 2.0*pi/mtheta_[i];
           double q = par->q0 + par->q1*r/par->a + par->q2*r*r/(par->a*par->a);
           double tmp9 = mtheta_[i]/q + 0.5;
           double tmp11 = (double) mtheta_[i];
@@ -87,7 +90,7 @@ namespace gtc { namespace server
         if ( par->nonlinear < 0.5 ) w_initial = 1.0e-12;
         std::size_t ntracer = 0;
         if ( objectid == 0 ) ntracer = 1;
-       
+
         std::size_t nparam;
         if ( par->track_particles ) {
           // Not implemented yet
@@ -97,7 +100,7 @@ namespace gtc { namespace server
           nparam = 6;
         }
         double tmp13 = (double) mi_;
-        std::size_t mimax = mi_ + 100*std::ceil(sqrt(tmp13)); // ions array upper bound
+        std::size_t mimax = mi_ + static_cast<std::size_t>(100*std::ceil(sqrt(tmp13))); // ions array upper bound
 
         zion_.resize(nparam+1,mimax+1,1);
         zion0_.resize(nparam+1,mimax+1,1);
@@ -142,9 +145,9 @@ namespace gtc { namespace server
         for (std::size_t m=1;m<=mi_;m++) {
           double z4tmp = zion_(4,m,0);
           zion_(4,m,0) = zion_(4,m,0)-0.5;
-          if ( zion_(4,m,0) > 0.0 ) zion0_(4,m,0) = 1.0; 
+          if ( zion_(4,m,0) > 0.0 ) zion0_(4,m,0) = 1.0;
           else zion0_(4,m,0) = -1.0;
-          zion_(4,m,0) = sqrt( std::max(SMALL,log(1.0/std::max(SMALL,pow(zion_(4,m,0),2)))));
+          zion_(4,m,0) = sqrt( (std::max)(SMALL,log(1.0/(std::max)(SMALL,pow(zion_(4,m,0),2)))));
           zion_(4,m,0) = zion_(4,m,0) - (c0+c1*zion_(4,m,0)+c2*pow(zion_(4,m,0),2))/
                                       (1.0+d1*zion_(4,m,0)+d2*pow(zion_(4,m,0),2)+d3*pow(zion_(4,m,0),3));
           if ( zion_(4,m,0) > par->umax ) zion_(4,m,0) = z4tmp;
@@ -153,16 +156,16 @@ namespace gtc { namespace server
         for (std::size_t m=1;m<=mi_;m++) {
           // toroidal:  uniformly distributed in zeta
           zion_(3,m,0) = zetamin_+(zetamax_-zetamin_)*zion_(3,m,0);
-          zion_(4,m,0) = zion0_(4,m,0)*std::min(par->umax,zion_(4,m,0));
+          zion_(4,m,0) = zion0_(4,m,0)*(std::min)(par->umax,zion_(4,m,0));
 
           // initial random weight
           zion_(5,m,0) = 2.0*w_initial*(zion_(5,m,0)-0.5)*(1.0+cos(zion_(2,m,0)));
 
           // Maxwellian distribution in v_perp, <v_perp^2>=1.0
-          zion_(6,m,0) = std::max(SMALL,std::min(par->umax*par->umax,-log(std::max(SMALL,zion_(6,m,0)))));
+          zion_(6,m,0) = (std::max)(SMALL,(std::min)(par->umax*par->umax,-log((std::max)(SMALL,zion_(6,m,0)))));
         }
 
-        // transform zion(1,:) to psi, zion(4,:) to rho_para, zion(6,:) to sqrt(mu) 
+        // transform zion(1,:) to psi, zion(4,:) to rho_para, zion(6,:) to sqrt(mu)
         double vthi = par->gyroradius*abs(par->qion)/par->aion;
         for (std::size_t m=1;m<=mi_;m++) {
           zion0_(1,m,0) = 1.0/(1.0+zion_(1,m,0)*cos(zion_(2,m,0))); // B-field
@@ -170,7 +173,7 @@ namespace gtc { namespace server
           zion_(4,m,0) = vthi*zion_(4,m,0)*par->aion/(par->qion*zion0_(1,m,0));
           zion_(6,m,0) = sqrt(par->aion*vthi*vthi*zion_(6,m,0)/zion0_(1,m,0));
         }
-        
+
         if ( objectid == 0 ) {
           zion_(1,ntracer,0) = 0.5*pow((0.5*(par->a0+par->a1)),2);
           zion_(2,ntracer,0) = 0.0;
@@ -237,7 +240,7 @@ namespace gtc { namespace server
         densityi_.resize(mzeta_+1,mgrid_+1,1);
     }
 
-    bool particle::chargei_callback(std::size_t i,array<double> density)
+    bool particle::chargei_callback(std::size_t i,array<double> const& density)
     {
       if ( i != idx_ ) {
         for (std::size_t ij=1;ij<=mgrid_;ij++) {
@@ -256,16 +259,16 @@ namespace gtc { namespace server
 
         double delr = 1.0/deltar_;
         double delz = 1.0/deltaz_;
-        std::vector<double> delt; 
+        std::vector<double> delt;
         delt.resize( deltat_.size() );
         for (std::size_t i=0;i<deltat_.size();i++) {
           delt[i] = 2.0*pi/deltat_[i];
         }
-        double smu_inv = sqrt(par->aion)/(abs(par->qion)*par->gyroradius); 
+        double smu_inv = sqrt(par->aion)/(abs(par->qion)*par->gyroradius);
         double pi2_inv = 0.5/pi;
         for (std::size_t i=0;i<=mzeta_;i++) {
           for (std::size_t j=0;j<=mgrid_;j++) {
-            densityi_(i,j,0) = 0.0; 
+            densityi_(i,j,0) = 0.0;
           }
         }
         std::size_t zero = 0;
@@ -278,41 +281,41 @@ namespace gtc { namespace server
 
           double r = sqrt(2.0*psitmp);
           std::size_t tmp = (std::size_t) ((r-par->a0)*delr+0.5);
-          double dip = std::max(0.0,(double) std::min(par->mpsi,tmp));
+          double dip = (std::max)(0.0,(double) (std::min)(par->mpsi,tmp));
           std::size_t ip = (std::size_t) dip;
-          std::size_t tmp2 = (std::size_t) (thetatmp*pi2_inv*delt[ip]+0.5); 
-          double djt = std::max(0.0,(double) std::min(mtheta_[ip],tmp2));
+          std::size_t tmp2 = (std::size_t) (thetatmp*pi2_inv*delt[ip]+0.5);
+          double djt = (std::max)(0.0,(double) (std::min)(mtheta_[ip],tmp2));
           std::size_t jt = (std::size_t) djt;
           std::size_t ipjt = igrid_[ip] + jt;
 
           double wz1 = (zetatmp-zetamin_)*delz;
-          std::size_t kk = std::max(zero,std::min(par->mpsi-1,(std::size_t) wz1));
-          kzion_[m] = kk;
+          std::size_t kk = (std::max)(zero,(std::min)(par->mpsi-1,(std::size_t) wz1));
+          kzion_[m] = static_cast<double>(kk);
           wzion_[m] = wz1 - kk;
 
           for (std::size_t larmor=1;larmor<=4;larmor++) {
-            double rdum = delr*std::max(0.0,std::min(par->a1-par->a0,r+rhoi*pgyro_(larmor,ipjt,0)-par->a0));
-            std::size_t ii = std::max(zero,std::min(par->mpsi-1,(std::size_t) rdum));
+            double rdum = delr*(std::max)(0.0,(std::min)(par->a1-par->a0,r+rhoi*pgyro_(larmor,ipjt,0)-par->a0));
+            std::size_t ii = (std::max)(zero,(std::min)(par->mpsi-1,(std::size_t) rdum));
             double wp1 = rdum - ii;
             wpion_(larmor,m,0) = wp1;
 
             // particle position in theta
             double tflr = thetatmp + rhoi*tgyro_(larmor,ipjt,0);
- 
+
             // inner flux surface
             std::size_t im = ii;
             double tdum = pi2_inv*(tflr-zetatmp*qtinv_[im])+10.0;
             tdum = (tdum - floor(tdum))*delt[im];
-            std::size_t j00 = std::max(zero,std::min(mtheta_[im]-1,(std::size_t) tdum));
-            jtion0_(larmor,m,0) = igrid_[im] + j00;
+            std::size_t j00 = (std::max)(zero,(std::min)(mtheta_[im]-1,(std::size_t) tdum));
+            jtion0_(larmor,m,0) = static_cast<double>(igrid_[im] + j00);
             wtion0_(larmor,m,0) = tdum - j00;
 
             // outer flux surface
-            im = ii; 
+            im = ii;
             tdum = pi2_inv*(tflr-zetatmp*qtinv_[im])+10.0;
             tdum = (tdum - floor(tdum))*delt[im];
-            std::size_t j01 = std::max(zero,std::min(mtheta_[im]-1,(std::size_t) tdum));
-            jtion1_(larmor,m,0) = igrid_[im] + j01;
+            std::size_t j01 = (std::max)(zero,(std::min)(mtheta_[im]-1,(std::size_t) tdum));
+            jtion1_(larmor,m,0) = static_cast<double>(igrid_[im] + j01);
             wtion1_(larmor,m,0) = tdum - j01;
           }
         }
@@ -322,7 +325,7 @@ namespace gtc { namespace server
         for (std::size_t m=1;m<=mi_;m++) {
           double weight = zion_(5,m,0);
 
-          std::size_t kk = kzion_[m];
+          std::size_t kk = static_cast<std::size_t>(kzion_[m]);
           double wz1 = weight*wzion_[m];
           double wz0 = weight-wz1;
 
@@ -336,15 +339,15 @@ namespace gtc { namespace server
             double wt11 = wp1*wtion1_(larmor,m,0);
             double wt01 = wp1-wt11;
 
-            std::size_t ij = jtion0_(larmor,m,0);
+            std::size_t ij = static_cast<std::size_t>(jtion0_(larmor,m,0));
             densityi_(kk,ij,0) = densityi_(kk,ij,0) + wz0*wt00;
             densityi_(kk+1,ij,0) = densityi_(kk+1,ij,0) + wz1*wt00;
-         
+
             ij = ij + 1;
             densityi_(kk,ij,0) = densityi_(kk,ij,0) + wz0*wt10;
             densityi_(kk+1,ij,0)   = densityi_(kk+1,ij,0)   + wz1*wt10;
 
-            ij = jtion1_(larmor,m,0);
+            ij = static_cast<std::size_t>(jtion1_(larmor,m,0));
             densityi_(kk,ij,0) = densityi_(kk,ij,0) + wz0*wt01;
             densityi_(kk+1,ij,0)   = densityi_(kk+1,ij,0)   + wz1*wt01;
 
@@ -359,18 +362,13 @@ namespace gtc { namespace server
           // All reduce on densityi
           typedef std::vector<hpx::lcos::promise< array<double> > > lazy_results_type;
 
-#if 0
-          // We have to fix something here
-          // if I include ../stubs/particle.hpp, I get an error that
-          // /shared/boost/1.47.0-debug/boost/serialization/vector.hpp:69:22: error: ‘STD’ was not declared in this scope
           lazy_results_type lazy_results;
           BOOST_FOREACH(hpx::naming::id_type const& gid, particle_components)
           {
-            lazy_results.push_back( stubs::particle::get_densityi( gid ) );
+            lazy_results.push_back( stubs::particle::get_densityi_async( gid ) );
           }
           hpx::lcos::wait(lazy_results,
-                boost::bind(&chargei_callback, _1, _2));
-#endif
+                boost::bind(&particle::chargei_callback, this, _1, _2));
         }
 
         // poloidal end cell, discard ghost cell j=0
@@ -381,7 +379,7 @@ namespace gtc { namespace server
         }
 
         // toroidal end cell
-        // send idensity information to the left; receive from right 
+        // send idensity information to the left; receive from right
         // toroidal mesh
 
     }

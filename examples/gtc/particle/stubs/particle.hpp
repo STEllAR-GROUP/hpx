@@ -22,7 +22,7 @@ namespace gtc { namespace stubs
         /// given particle file.  
         static hpx::lcos::promise<void>
         init_async(hpx::naming::id_type const& gid,std::size_t objectid,
-            parameter const& par)
+            hpx::components::gtc::parameter const& par)
         {
             typedef server::particle::init_action action_type;
             return hpx::lcos::eager_future<action_type>(gid,objectid,
@@ -32,7 +32,7 @@ namespace gtc { namespace stubs
         /// Initialize the \a gtc::server::particle instance with the
         /// given particle file.  
         static void init(hpx::naming::id_type const& gid,std::size_t objectid,
-            parameter const& par)
+            hpx::components::gtc::parameter const& par)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the promise.
@@ -41,7 +41,7 @@ namespace gtc { namespace stubs
 
         static hpx::lcos::promise<void>
         chargei_async(hpx::naming::id_type const& gid,std::size_t objectid,std::size_t istep,std::vector<hpx::naming::id_type> const& particle_components,
-            parameter const& par)
+            hpx::components::gtc::parameter const& par)
         {
             typedef server::particle::chargei_action action_type;
             return hpx::lcos::eager_future<action_type>(gid,objectid,istep,
@@ -49,7 +49,7 @@ namespace gtc { namespace stubs
         }
 
         static void chargei(hpx::naming::id_type const& gid,std::size_t objectid,std::size_t istep,std::vector<hpx::naming::id_type> const& particle_components,
-            parameter const& par)
+            hpx::components::gtc::parameter const& par)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the promise.
