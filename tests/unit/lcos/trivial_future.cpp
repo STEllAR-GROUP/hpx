@@ -45,7 +45,7 @@ int hpx_main(variables_map&)
     // create an implicit future
     null_thread_executed = false;
     {
-        BOOST_TEST(wait(hpx::lcos::async<null_action>(hpx::find_here())));
+        BOOST_TEST(hpx::lcos::wait(hpx::lcos::async<null_action>(hpx::find_here())));
     }
     BOOST_TEST(null_thread_executed);
 
