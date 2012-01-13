@@ -27,7 +27,7 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 
-#if !defined(i386)
+#if !defined(__i386__)
 #error This file is for x86 CPUs only.
 #endif
 
