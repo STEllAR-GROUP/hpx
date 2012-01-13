@@ -28,6 +28,7 @@
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 #include <boost/type_traits/is_same.hpp>
+#include <boost/type_traits/is_convertible.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/move/move.hpp>
 
@@ -75,7 +76,7 @@ namespace hpx { namespace actions
             using namespace boost::archive::detail::extra_detail;
             init_guid<Action>::g.initialize();
         }
-        
+
         template <typename Action>
         void guid_initialization()
         {
