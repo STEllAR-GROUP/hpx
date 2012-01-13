@@ -18,6 +18,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include "point.hpp"
+#include "../stubs/point.hpp"
 
 #include <string>
 #include <sstream>
@@ -41,8 +42,11 @@ namespace gtc { namespace server
         tauii_ = -1.0; // initially collisionless
 
         // initial mesh
+        particle_domain_location_=objectid%par->npartdom;
         toroidal_domain_location_=objectid/par->npartdom;
         pi_ = 4.0*atan(1.0);
+   
+        // Domain decomposition in toroidal direction
         mzeta_ = par->mzetamax/par->ntoroidal;
         double tmp1 = (double) toroidal_domain_location_;
         double tmp2 = (double) par->ntoroidal;
@@ -52,6 +56,10 @@ namespace gtc { namespace server
 
         double tmp4 = (double) mzeta_;
         deltaz_ = (zetamax_-zetamin_)/tmp4;
+
+        myrank_toroidal_ = objectid;
+        left_pe_ = (myrank_toroidal_-1+par->ntoroidal)% par->ntoroidal;
+        right_pe_ = (myrank_toroidal_+1)% par->ntoroidal;
 
         qtinv_.resize(par->mpsi+1);
         itran_.resize(par->mpsi+1);
@@ -500,6 +508,133 @@ namespace gtc { namespace server
         }
       }
 
+      // send densityi to the left; receive from the right
+      {
+        typedef std::vector<hpx::lcos::promise< std::valarray<double> > > lazy_results_type;
+        lazy_results_type lazy_results;
+        lazy_results.push_back( stubs::point::get_densityi_async( point_components[right_pe_] ) );
+        hpx::lcos::wait(lazy_results,
+              boost::bind(&point::chargei_callback, this, _1, _2));
+      }
+
+      if ( myrank_toroidal_ == par->ntoroidal-1 ) {
+        // B.C. at zeta=2*pi is shifted
+        size_t strides[]= {1,1};
+        std::size_t lengths[2];
+        for (std::size_t i=0;i<=par->mpsi;i++) {
+          std::size_t ii = igrid_[i];
+          std::size_t jt = mtheta_[i];
+          std::size_t start = ii+1;
+          lengths[0]= jt+1;
+          lengths[1]= 1; 
+          std::gslice mygslice (start,std::valarray<size_t>(lengths,2),std::valarray<size_t>(strides,2)); 
+          std::valarray<double> trecv = recvr_[mygslice];
+          trecv.cshift(itran_[i]);
+          for (std::size_t j=ii+1;j<=ii+jt;j++) {
+            densityi_(mzeta_,j,0) += trecv[j-(ii+1)];
+          }
+        }
+      } else {
+        // B.C. at zeta<2*pi is continuous
+        for (std::size_t j=0;j<densityi_.jsize();j++) {
+          densityi_(mzeta_,j,0) += recvr_[j];
+        }
+      }
+
+      // zero out charge in radial boundary cell
+      for (std::size_t i=0;i<par->nbound;i++) {
+        for (std::size_t j=0;j<densityi_.isize();j++) {
+          for (std::size_t k=igrid_[i];k<igrid_[i]+mtheta_[i];k++) {
+            densityi_(j,k,0) *= ((double) i)/par->nbound;
+          } 
+          for (std::size_t k=igrid_[par->mpsi-i];k<igrid_[par->mpsi-i]+mtheta_[par->mpsi-i];k++) {
+            densityi_(j,k,0) *= ((double) i)/par->nbound;
+          }
+        }
+      }
+
+      // flux surface average and normalization
+      std::fill( zonali_.begin(),zonali_.end(),0.0);
+
+      for (std::size_t i=0;i<=par->mpsi;i++) {
+        for (std::size_t j=1;j<=mtheta_[i];j++) {
+          for (std::size_t k=1;k<=mzeta_;k++) {
+            std::size_t ij = igrid_[i] + j; 
+            zonali_[i] += 0.25*densityi_(k,ij,0);
+            densityi_(k,ij,0) *= 0.25*markeri_(k,ij,0);
+          }
+        }
+      }
+
+      // global sum of phi00 broadcast to every toroidal PE
+      {
+        adum_.resize(zonali_.size());
+        std::fill( adum_.begin(),adum_.end(),0.0);
+        typedef std::vector<hpx::lcos::promise< std::vector<double> > > lazy_results_type;
+        lazy_results_type lazy_results;
+        BOOST_FOREACH(hpx::naming::id_type const& gid, point_components)
+        {
+          lazy_results.push_back( stubs::point::get_zonali_async( gid ) );
+        }
+        hpx::lcos::wait(lazy_results,
+              boost::bind(&point::chargei_zonali_callback, this, _1, _2));
+      }
+      for (std::size_t i=0;i<zonali_.size();i++) {
+        zonali_[i] = adum_[i]*pmarki_[i];
+      }
+
+      for (std::size_t i=0;i<=par->mpsi;i++) {
+        for (std::size_t j=1;j<=mtheta_[i];j++) {
+          for (std::size_t k=1;k<=mzeta_;k++) {
+            std::size_t ij = igrid_[i] + j;
+            densityi_(k,ij,0) -= zonali_[i];
+          }
+        }
+        // poloidal BC condition
+        for (std::size_t j=1;j<=mzeta_;j++) {
+          densityi_(j,igrid_[i],0) = densityi_(j,igrid_[i]+mtheta_[i],0);
+        } 
+      } 
+
+      // enforce charge conservation for zonal flow mode
+      double rdum = 0.0;      
+      double tdum = 0.0;
+      for (std::size_t i=1;i<=par->mpsi-1;i++) {
+        double r = par->a0 + deltar_*i;
+        rdum += r;
+        tdum += r*zonali_[i];
+      }
+      tdum /= rdum;
+      for (std::size_t i=1;i<=par->mpsi-1;i++) {
+        zonali_[i] -= tdum;
+      }
+
     }
+
+    bool point::chargei_zonali_callback(std::size_t i,std::vector<double> const& zonali)
+    {
+      for (std::size_t i=0;i<zonali.size();i++) {
+        adum_[i] += zonali[i];
+      }
+      return true;
+    }
+
+    bool point::chargei_callback(std::size_t i,std::valarray<double> const& density)
+    {
+      recvr_.resize(density.size());
+      recvr_ = density;
+      return true;
+    }
+
+    std::valarray<double> point::get_densityi()
+    {
+      return densityi_.slicer(6,0);
+    }
+
+    std::vector<double> point::get_zonali()
+    {
+      return zonali_;
+    }
+
 }}
 

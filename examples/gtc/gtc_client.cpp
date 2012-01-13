@@ -121,7 +121,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         par->m_poloidal = 9;
 
         par->output = 6;
-        par->nbound = true;
+        par->nbound = 4;
         par->umax = 4.0;
         par->iload = false;
         par->track_particles = false;
@@ -199,7 +199,7 @@ int hpx_main(boost::program_options::variables_map &vm)
           appconfig_option<double>("temperature", pars, par->temperature);
           appconfig_option<double>("edensity0", pars, par->edensity0);
           appconfig_option<std::size_t>("output", pars, par->output);
-          appconfig_option<bool>("nbound", pars, par->nbound);
+          appconfig_option<std::size_t>("nbound", pars, par->nbound);
           appconfig_option<double>("umax", pars, par->umax);
           appconfig_option<bool>("iload", pars, par->iload);
           appconfig_option<bool>("track_particles", pars, par->track_particles);
@@ -372,7 +372,7 @@ int hpx_main(boost::program_options::variables_map &vm)
           point_components.push_back(points[i].get_gid());
         }
 
-        std::size_t istep = 0;
+        std::size_t istep = 1;
         std::vector<hpx::lcos::promise<void> > chargei_phase;
         for (std::size_t i=0;i<par->ntoroidal;i++) {
           chargei_phase.push_back(points[i].chargei_async(istep,

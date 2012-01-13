@@ -39,3 +39,11 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     gtc_point_type::wrapped_type::chargei_action,
     gtc_point_chargei_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtc_point_type::wrapped_type::get_densityi_action,
+    gtc_point_get_densityi_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtc_point_type::wrapped_type::get_zonali_action,
+    gtc_point_get_zonali_action);

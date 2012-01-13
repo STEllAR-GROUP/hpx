@@ -85,7 +85,7 @@ struct HPX_COMPONENT_EXPORT parameter
 
     // Output
     std::size_t output;
-    bool nbound; // 0 for periodic, >0 for zero boundary
+    std::size_t nbound; // 0 for periodic, >0 for zero boundary
     double umax; // unit=v_th, maximum velocity in each direction
     bool iload; // 0: uniform, 1: non-uniform
     bool track_particles; // 1: keep track of some particles

@@ -29,7 +29,9 @@ namespace gtc { namespace server
         {
             point_init = 0,
             point_load = 1,
-            point_chargei = 2
+            point_chargei = 2,
+            point_get_densityi = 3,
+            point_get_zonali = 4
         };
 
         point()
@@ -44,6 +46,15 @@ namespace gtc { namespace server
         void load(std::size_t objectid,parameter const& par);
 
         void chargei(std::size_t istep, std::vector<hpx::naming::id_type> const& point_components, parameter const& par);
+
+        bool chargei_callback(std::size_t i,std::valarray<double> const& density);
+
+        bool chargei_zonali_callback(std::size_t i,
+                           std::vector<double> const& zonali);
+
+        std::valarray<double> get_densityi();
+
+        std::vector<double> get_zonali();
 
        ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an
@@ -86,6 +97,28 @@ namespace gtc { namespace server
             &point::chargei
         > chargei_action;
 
+        typedef hpx::actions::result_action0<
+            // Component server type.
+            point,
+            // Return type.
+            std::valarray<double>,
+            // Action code.
+            point_get_densityi,
+            // Method bound to this action.
+            &point::get_densityi
+        > get_densityi_action;
+
+        typedef hpx::actions::result_action0<
+            // Component server type.
+            point,
+            // Return type.
+            std::vector<double>,
+            // Action code.
+            point_get_zonali,
+            // Method bound to this action.
+            &point::get_zonali
+        > get_zonali_action;
+
     private:
         std::size_t idx_;
         double tauii_;
@@ -98,6 +131,11 @@ namespace gtc { namespace server
         std::size_t mi_; // # of ions per proc
         std::size_t me_; // # of electrons per proc
 
+        std::size_t left_pe_;
+        std::size_t right_pe_;
+        std::size_t particle_domain_location_;
+        std::size_t myrank_toroidal_;
+
         std::vector<std::size_t> itran_,mtheta_,igrid_;
         std::vector<double> qtinv_,deltat_,rtemi_,rteme_; 
         std::vector<double> rden_,pmarki_,pmarke_,phi00_,phip00_;
@@ -109,6 +147,9 @@ namespace gtc { namespace server
         std::vector<double> kzion_,wzion_;
 
         std::vector<double> pfluxpsi_,rdtemi_,rdteme_;
+
+        std::valarray<double> recvr_;
+        std::vector<double> adum_;
 
         std::size_t mtdiag_;
         std::size_t mgrid_;
@@ -126,6 +167,14 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
               gtc::server::point::chargei_action,
               gtc_point_chargei_action)
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+              gtc::server::point::get_densityi_action,
+              gtc_point_get_densityi_action)
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+              gtc::server::point::get_zonali_action,
+              gtc_point_get_zonali_action)
 
 #endif
 

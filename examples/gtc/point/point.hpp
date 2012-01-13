@@ -80,6 +80,31 @@ namespace gtc
             this->base_type::chargei(gid_,istep,point_components,par);
         }
 
+        hpx::lcos::promise< std::valarray<double> > get_densityi_async()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_densityi_async(gid_);
+        }
+
+        std::valarray<double> get_densityi()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_densityi(gid_);
+        }
+
+        hpx::lcos::promise< std::vector<double> > get_zonali_async()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_zonali_async(gid_);
+        }
+
+        std::vector<double> get_zonali()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_zonali(gid_);
+        }
+
+
 
     };
 }

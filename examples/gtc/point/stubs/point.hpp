@@ -74,6 +74,35 @@ namespace gtc { namespace stubs
             chargei_async(gid,istep,point_components,par).get();
         }
 
+        static hpx::lcos::promise< std::valarray<double> >
+        get_densityi_async(hpx::naming::id_type const& gid)
+        {
+            typedef server::point::get_densityi_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid);
+        }
+
+        static std::valarray<double> get_densityi(hpx::naming::id_type const& gid)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise
+            return get_densityi_async(gid).get();
+        }
+
+        static hpx::lcos::promise< std::vector<double> >
+        get_zonali_async(hpx::naming::id_type const& gid)
+        {
+            typedef server::point::get_zonali_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid);
+        }
+
+        static std::vector<double> get_zonali(hpx::naming::id_type const& gid)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise
+            return get_zonali_async(gid).get();
+        }
+
+
     };
 }}
 

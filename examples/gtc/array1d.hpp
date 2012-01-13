@@ -65,7 +65,7 @@ public:
 
   std::valarray<T> slicer(std::size_t face,std::size_t depth) const 
   {
-    if ( face > 5 ) {
+    if ( face > 6 ) {
       hpx::util::osstream strm;
       strm << "face error, face(" << face << ")";
       HPX_THROW_EXCEPTION(hpx::bad_parameter
@@ -118,6 +118,13 @@ public:
       lengths[1]= isize_;
       strides[0]= isize_;      
       strides[1]= 1;
+    } else if ( face == 6 ) {
+      // this returns the array(depth,:,0) -- used in gtc
+      start = depth;
+      lengths[0] = jsize_;
+      lengths[1] = 1;
+      strides[0] = isize_;
+      strides[1] = 1;
     }
 
     std::gslice mygslice (start,std::valarray<size_t>(lengths,2),std::valarray<size_t>(strides,2));
