@@ -36,15 +36,6 @@ add_hpx_component(
   ${GOOGLE_PERFTOOLS_LIBRARY}
 )
 
-#add_hpx_component(
-#    bright_future_dataflow
-#    SOURCES dataflow/dataflow_component.cpp
-#    HEADERS dataflow/dataflow.hpp
-#    DEPENDENCIES iostreams_component
-#    FOLDER "Examples/BrightFuture"
-#  ${GOOGLE_PERFTOOLS_LIBRARY}
-#)
-
 set(gs_single_sources gs.cpp)
 #set(gs_hpx_sources gs.cpp)
 set(gs_hpx_blocked_sources gs.cpp)
@@ -54,7 +45,7 @@ set(gs_hpx_distributed_sources gs.cpp)
 
 set(remote_functions_FLAGS DEPENDENCIES iostreams_component)
 set(dataflow_test_FLAGS 
-  DEPENDENCIES iostreams_component bright_future_dataflow_component
+  DEPENDENCIES iostreams_component dataflow_component
 #  ${GOOGLE_PERFTOOLS_LIBRARY}
   )
 set(remote_object_FLAGS DEPENDENCIES remote_object_component iostreams_component)
@@ -63,16 +54,16 @@ set(gs_single_FLAGS DEPENDENCIES iostreams_component)
 #set(gs_hpx_FLAGS DEPENDENCIES gs_hpx_component iostreams_component)
 set(gs_hpx_blocked_FLAGS DEPENDENCIES gs_hpx_component iostreams_component)
 set(gs_hpx_blocked_df_FLAGS 
-  DEPENDENCIES gs_hpx_component bright_future_dataflow_component iostreams_component
+  DEPENDENCIES gs_hpx_component dataflow_component iostreams_component
 #  ${GOOGLE_PERFTOOLS_LIBRARY}
         )
 if(HPX_CXX11_LAMBDAS)
   set(gs_hpx_distributed_FLAGS 
-    DEPENDENCIES gs_hpx_component bright_future_dataflow_component iostreams_component
+    DEPENDENCIES gs_hpx_component dataflow_component iostreams_component
 #    ${GOOGLE_PERFTOOLS_LIBRARY}
     )
-  set(dataflow_overhead_FLAGS DEPENDENCIES bright_future_dataflow_component iostreams_component)
-  set(dataflow_overhead2_FLAGS DEPENDENCIES bright_future_dataflow_component iostreams_component)
+  set(dataflow_overhead_FLAGS DEPENDENCIES dataflow_component iostreams_component)
+  set(dataflow_overhead2_FLAGS DEPENDENCIES dataflow_component iostreams_component)
 endif()
 set(gs_hpx_grid_ro_FLAGS DEPENDENCIES remote_object_component iostreams_component)
 
