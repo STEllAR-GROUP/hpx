@@ -1,4 +1,3 @@
-
 //  Copyright (c) 2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,12 +6,13 @@
 #ifndef EXAMPLES_BRIGHT_FUTURE_DATAFLOW_TRIGGER_HPP
 #define EXAMPLES_BRIGHT_FUTURE_DATAFLOW_TRIGGER_HPP
 
-#include <examples/bright_future/dataflow/dataflow_trigger_fwd.hpp>
-#include <examples/bright_future/dataflow/dataflow_base.hpp>
-#include <examples/bright_future/dataflow/stubs/dataflow_trigger.hpp>
+#include <hpx/components/dataflow/dataflow_trigger_fwd.hpp>
+#include <hpx/components/dataflow/dataflow_base.hpp>
+#include <hpx/components/dataflow/stubs/dataflow_trigger.hpp>
 #include <hpx/traits/handle_gid.hpp>
 
-namespace hpx { namespace lcos {
+namespace hpx { namespace lcos 
+{
     struct dataflow_trigger
         : dataflow_base<void>
     {
@@ -82,7 +82,8 @@ namespace hpx { namespace lcos {
     };
 }}
 
-namespace hpx { namespace traits {
+namespace hpx { namespace traits 
+{
     template <typename F>
     struct handle_gid<hpx::lcos::dataflow_trigger, F>
     {

@@ -43,8 +43,8 @@
         BOOST_PP_CAT(data, n) const&                                          \
         BOOST_PP_CAT(BOOST_PP_CAT(data, n), _)                                \
     /**/
-#define HPX_PARAM_ARGUMENT(z, n, data)                                       \
-        BOOST_PP_COMMA_IF(n) BOOST_PP_CAT(BOOST_PP_CAT(data, n), _)          \
+#define HPX_PARAM_ARGUMENT(z, n, data)                                        \
+        BOOST_PP_COMMA_IF(n) BOOST_PP_CAT(BOOST_PP_CAT(data, n), _)           \
     /**/
 
 #define HPX_FWD_ARGS(z, n, _)                                                 \
@@ -76,7 +76,8 @@ namespace hpx { namespace actions
     {
     public:
         typedef Result result_type;
-        typedef boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
+        typedef boost::fusion::vector<
+            BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
         typedef action<
             components::server::plain_function<Derived>,
             BOOST_PP_CAT(function_result_action_arg, N), result_type,
@@ -1060,78 +1061,79 @@ namespace hpx { namespace actions
 }}
 
 // Disabling the guid initialization stuff for plain actions
-namespace hpx { namespace actions { namespace detail {
-        template <
-            BOOST_PP_ENUM_PARAMS(N, typename Arg)
-          , void (*F)(BOOST_PP_ENUM_PARAMS(N, Arg))
-          , hpx::threads::thread_priority Priority
-          , typename Enable
+namespace hpx { namespace actions { namespace detail 
+{
+    template <
+        BOOST_PP_ENUM_PARAMS(N, typename Arg)
+      , void (*F)(BOOST_PP_ENUM_PARAMS(N, Arg))
+      , hpx::threads::thread_priority Priority
+      , typename Enable
+    >
+    struct needs_guid_initialization<
+        BOOST_PP_CAT(hpx::actions::plain_action, N)<
+            BOOST_PP_ENUM_PARAMS(N, Arg)
+          , F
+          , Priority
         >
-        struct needs_guid_initialization<
-            BOOST_PP_CAT(hpx::actions::plain_action, N)<
-                BOOST_PP_ENUM_PARAMS(N, Arg)
-              , F
-              , Priority
-            >
-          , Enable
-        >
-            : boost::mpl::false_
-        {};
+      , Enable
+    >
+        : boost::mpl::false_
+    {};
         
-        template <
-            BOOST_PP_ENUM_PARAMS(N, typename Arg)
-          , void (*F)(BOOST_PP_ENUM_PARAMS(N, Arg))
-          , typename Derived
-          , typename Enable
+    template <
+        BOOST_PP_ENUM_PARAMS(N, typename Arg)
+      , void (*F)(BOOST_PP_ENUM_PARAMS(N, Arg))
+      , typename Derived
+      , typename Enable
+    >
+    struct needs_guid_initialization<
+        BOOST_PP_CAT(hpx::actions::plain_direct_action, N)<
+            BOOST_PP_ENUM_PARAMS(N, Arg)
+          , F
+          , Derived
         >
-        struct needs_guid_initialization<
-            BOOST_PP_CAT(hpx::actions::plain_direct_action, N)<
-                BOOST_PP_ENUM_PARAMS(N, Arg)
-              , F
-              , Derived
-            >
-          , Enable
-        >
-            : boost::mpl::false_
-        {};
+      , Enable
+    >
+        : boost::mpl::false_
+    {};
 
-        template <
-            typename R
-          , BOOST_PP_ENUM_PARAMS(N, typename Arg)
-          , R(*F)(BOOST_PP_ENUM_PARAMS(N, Arg))
-          , hpx::threads::thread_priority Priority
-          , typename Enable
+    template <
+        typename R
+      , BOOST_PP_ENUM_PARAMS(N, typename Arg)
+      , R(*F)(BOOST_PP_ENUM_PARAMS(N, Arg))
+      , hpx::threads::thread_priority Priority
+      , typename Enable
+    >
+    struct needs_guid_initialization<
+        BOOST_PP_CAT(hpx::actions::plain_result_action, N)<
+            R
+          , BOOST_PP_ENUM_PARAMS(N, Arg)
+          , F
+          , Priority
         >
-        struct needs_guid_initialization<
-            BOOST_PP_CAT(hpx::actions::plain_result_action, N)<
-                R
-              , BOOST_PP_ENUM_PARAMS(N, Arg)
-              , F
-              , Priority
-            >
-          , Enable
-        >
-            : boost::mpl::false_
-        {};
+      , Enable
+    >
+        : boost::mpl::false_
+    {};
 
-        template <
-            typename R
-          , BOOST_PP_ENUM_PARAMS(N, typename Arg)
-          , R(*F)(BOOST_PP_ENUM_PARAMS(N, Arg))
-          , typename Derived
-          , typename Enable
+    template <
+        typename R
+      , BOOST_PP_ENUM_PARAMS(N, typename Arg)
+      , R(*F)(BOOST_PP_ENUM_PARAMS(N, Arg))
+      , typename Derived
+      , typename Enable
+    >
+    struct needs_guid_initialization<
+        BOOST_PP_CAT(hpx::actions::plain_direct_result_action, N)<
+            R
+          , BOOST_PP_ENUM_PARAMS(N, Arg)
+          , F
+          , Derived
         >
-        struct needs_guid_initialization<
-            BOOST_PP_CAT(hpx::actions::plain_direct_result_action, N)<
-                R
-              , BOOST_PP_ENUM_PARAMS(N, Arg)
-              , F
-              , Derived
-            >
-          , Enable
-        >
-            : boost::mpl::false_
-        {};
+      , Enable
+    >
+        : boost::mpl::false_
+    {};
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////

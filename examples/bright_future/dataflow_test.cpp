@@ -18,8 +18,8 @@
 
 #include <boost/lockfree/fifo.hpp>
 
-#include <examples/bright_future/dataflow/dataflow.hpp>
-#include <examples/bright_future/dataflow/dataflow_trigger.hpp>
+#include <hpx/components/dataflow/dataflow.hpp>
+#include <hpx/components/dataflow/dataflow_trigger.hpp>
 
 using hpx::cout;
 using hpx::flush;

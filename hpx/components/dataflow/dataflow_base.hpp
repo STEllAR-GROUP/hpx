@@ -1,4 +1,3 @@
-
 //  Copyright (c) 2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,13 +6,14 @@
 #ifndef EXAMPLES_BRIGHT_FUTURE_DATAFLOW_BASE_HPP
 #define EXAMPLES_BRIGHT_FUTURE_DATAFLOW_BASE_HPP
 
-#include <examples/bright_future/dataflow/dataflow_base_fwd.hpp>
-#include <examples/bright_future/dataflow/dataflow_base_void.hpp>
-#include <examples/bright_future/dataflow/dataflow_base_impl.hpp>
-#include <examples/bright_future/dataflow/dataflow_fwd.hpp>
-#include <examples/bright_future/dataflow/stubs/dataflow.hpp>
+#include <hpx/components/dataflow/dataflow_base_fwd.hpp>
+#include <hpx/components/dataflow/dataflow_base_void.hpp>
+#include <hpx/components/dataflow/dataflow_base_impl.hpp>
+#include <hpx/components/dataflow/dataflow_fwd.hpp>
+#include <hpx/components/dataflow/stubs/dataflow.hpp>
 
-namespace hpx { namespace lcos {
+namespace hpx { namespace lcos 
+{
     template <typename Result, typename RemoteResult>
     struct dataflow_base
     {

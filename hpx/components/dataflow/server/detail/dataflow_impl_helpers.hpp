@@ -1,4 +1,3 @@
-
 //  Copyright (c) 2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,12 +5,14 @@
 
 #ifndef HPX_LCOS_DATAFLOW_SERVER_DETAIL_DATAFLOW_IMPL_HELPERS_HPP
 #define HPX_LCOS_DATAFLOW_SERVER_DETAIL_DATAFLOW_IMPL_HELPERS_HPP
-#include <examples/bright_future/dataflow/dataflow_base_fwd.hpp>
-#include <examples/bright_future/dataflow/dataflow_fwd.hpp>
-#include <examples/bright_future/dataflow/dataflow_trigger_fwd.hpp>
-#include <examples/bright_future/dataflow/is_dataflow.hpp>
 
-namespace hpx { namespace lcos { namespace server { namespace detail {
+#include <hpx/components/dataflow/dataflow_base_fwd.hpp>
+#include <hpx/components/dataflow/dataflow_fwd.hpp>
+#include <hpx/components/dataflow/dataflow_trigger_fwd.hpp>
+#include <hpx/components/dataflow/is_dataflow.hpp>
+
+namespace hpx { namespace lcos { namespace server { namespace detail
+{
     template <typename T>
     struct dataflow_result
     {
@@ -50,7 +51,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
     struct dataflow_is_void<dataflow_base<void, RemoteResult> >
         : boost::mpl::true_
     {};
-    
+
     template <typename Dummy>
     struct dataflow_is_void<dataflow_trigger, Dummy>
         : boost::mpl::true_
@@ -63,7 +64,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
         typedef boost::mpl::at_c<Vector, 1> slot_type;
         typedef boost::mpl::at_c<Vector, 1> arg_type;
 
-        typedef 
+        typedef
             typename boost::mpl::insert<
                 typename map_type::type
               , boost::mpl::pair<
@@ -72,7 +73,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
                 >
             >
             map_insert;
-        
+
         typedef
             boost::mpl::vector<
                 typename map_insert::type
@@ -85,7 +86,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
             >
             type;
     };
-    
+
     template <typename Vector>
     struct advance_slot
     {
@@ -132,7 +133,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
                 >::type
             >::type
             results_type;
-    
+
         typedef
             typename boost::mpl::at_c<
                 typename boost::mpl::fold<

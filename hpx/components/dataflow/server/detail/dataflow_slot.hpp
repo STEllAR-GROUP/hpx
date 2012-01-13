@@ -1,4 +1,3 @@
-
 //  Copyright (c) 2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,11 +6,11 @@
 #ifndef HPX_LCOS_DATAFLOW_SERVER_DETAIL_DATAFLOW_ARG_HPP
 #define HPX_LCOS_DATAFLOW_SERVER_DETAIL_DATAFLOW_ARG_HPP
 
-#include <examples/bright_future/dataflow/dataflow_base_fwd.hpp>
-#include <examples/bright_future/dataflow/dataflow_fwd.hpp>
+#include <hpx/components/dataflow/dataflow_base_fwd.hpp>
+#include <hpx/components/dataflow/dataflow_fwd.hpp>
 
-namespace hpx { namespace lcos { namespace server { namespace detail {
-
+namespace hpx { namespace lcos { namespace server { namespace detail
+{
     template <typename T, int Slot, typename SinkAction, typename Enable = void>
     struct dataflow_slot
         : base_lco_with_value<T, T>
@@ -201,7 +200,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
         SinkAction * dataflow_sink;
         dataflow_type dataflow_source;
     };
-    
+
     template <typename T, typename SinkAction>
     struct dataflow_slot<T, -1, SinkAction, typename boost::enable_if<hpx::traits::is_dataflow<T> >::type>
         : hpx::lcos::base_lco_with_value<
@@ -325,7 +324,6 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
         dataflow_type dataflow_source;
         unsigned slot;
     };
-
 }}}}
 
 namespace hpx { namespace traits

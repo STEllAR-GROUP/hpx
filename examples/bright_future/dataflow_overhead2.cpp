@@ -18,8 +18,8 @@
 
 #include <boost/lockfree/fifo.hpp>
 
-#include <examples/bright_future/dataflow/dataflow.hpp>
-#include <examples/bright_future/dataflow/async_dataflow_wait.hpp>
+#include <hpx/components/dataflow/dataflow.hpp>
+#include <hpx/components/dataflow/async_dataflow_wait.hpp>
 
 #include <utility>
 

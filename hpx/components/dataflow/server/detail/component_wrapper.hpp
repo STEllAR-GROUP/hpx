@@ -1,4 +1,3 @@
-
 //  Copyright (c) 2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,7 +9,8 @@
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 
-namespace hpx { namespace lcos { namespace server { namespace detail {
+namespace hpx { namespace lcos { namespace server { namespace detail 
+{
     struct component_wrapper_base
     {
         virtual ~component_wrapper_base() {}

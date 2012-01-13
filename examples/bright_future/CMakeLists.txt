@@ -33,17 +33,17 @@ add_hpx_component(
     HEADERS server/remote_lse.hpp grid.hpp
     DEPENDENCIES iostreams_component distributing_factory_component
     FOLDER "Examples/BrightFuture"
-#  ${GOOGLE_PERFTOOLS_LIBRARY}
+  ${GOOGLE_PERFTOOLS_LIBRARY}
 )
 
-add_hpx_component(
-    bright_future_dataflow
-    SOURCES dataflow/dataflow_component.cpp
-    HEADERS dataflow/dataflow.hpp
-    DEPENDENCIES iostreams_component
-    FOLDER "Examples/BrightFuture"
+#add_hpx_component(
+#    bright_future_dataflow
+#    SOURCES dataflow/dataflow_component.cpp
+#    HEADERS dataflow/dataflow.hpp
+#    DEPENDENCIES iostreams_component
+#    FOLDER "Examples/BrightFuture"
 #  ${GOOGLE_PERFTOOLS_LIBRARY}
-)
+#)
 
 set(gs_single_sources gs.cpp)
 #set(gs_hpx_sources gs.cpp)

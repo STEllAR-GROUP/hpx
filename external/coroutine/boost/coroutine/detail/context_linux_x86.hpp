@@ -167,7 +167,7 @@ namespace boost { namespace coroutines {
         *--m_sp = 0;       // r15
 #else
         *--m_sp = &cb;     // parm 0 of trampoline;
-        *--m_sp = 0;        // dummy return address for trampoline
+        *--m_sp = 0;       // dummy return address for trampoline
         *--m_sp = (void*) funp ;// return addr (here: start addr)
         *--m_sp = 0;       // ebp
         *--m_sp = 0;       // ebx

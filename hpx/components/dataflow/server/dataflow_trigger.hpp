@@ -6,17 +6,15 @@
 #ifndef EXAMPLES_BRIGHT_FUTURE_DATAFLOW_SERVER_DATAFLOW_TRIGGER_HPP
 #define EXAMPLES_BRIGHT_FUTURE_DATAFLOW_SERVER_DATAFLOW_TRIGGER_HPP
 
-#include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-
-#include <examples/bright_future/dataflow/dataflow_base.hpp>
-#include <examples/bright_future/dataflow/server/detail/dataflow_slot.hpp>
-#include <examples/bright_future/dataflow/server/detail/component_wrapper.hpp>
+#include <hpx/components/dataflow/dataflow_base.hpp>
+#include <hpx/components/dataflow/server/detail/dataflow_slot.hpp>
+#include <hpx/components/dataflow/server/detail/component_wrapper.hpp>
 
 namespace hpx { namespace lcos { namespace server
 {

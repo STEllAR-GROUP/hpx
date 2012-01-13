@@ -1,4 +1,3 @@
-
 //  Copyright (c) 2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,11 +6,12 @@
 #ifndef EXAMPLES_BRIGHT_FUTURE_DATAFLOW_BASE_VOID_HPP
 #define EXAMPLES_BRIGHT_FUTURE_DATAFLOW_BASE_VOID_HPP
 
-#include <examples/bright_future/dataflow/dataflow_base_fwd.hpp>
-#include <examples/bright_future/dataflow/dataflow_base_impl.hpp>
-#include <examples/bright_future/dataflow/stubs/dataflow.hpp>
+#include <hpx/components/dataflow/dataflow_base_fwd.hpp>
+#include <hpx/components/dataflow/dataflow_base_impl.hpp>
+#include <hpx/components/dataflow/stubs/dataflow.hpp>
 
-namespace hpx { namespace lcos {
+namespace hpx { namespace lcos
+{
     template <>
     struct dataflow_base<void>
     {
@@ -32,7 +32,7 @@ namespace hpx { namespace lcos {
         virtual ~dataflow_base()
         {
         }
-        
+
         dataflow_base(promise<naming::id_type, naming::gid_type> const & promise)
             : impl(new detail::dataflow_base_impl(promise))
         {}
@@ -60,7 +60,7 @@ namespace hpx { namespace lcos {
         )
 
 #undef HPX_LCOS_DATAFLOW_M0
-        
+
         promise<void> get_promise() const
         {
             promise<void> p;
@@ -89,7 +89,7 @@ namespace hpx { namespace lcos {
         {
             stub_type::connect(impl->get_gid(), target);
         }
-        
+
         boost::shared_ptr<detail::dataflow_base_impl> impl;
 
     private:

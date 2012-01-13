@@ -1,4 +1,3 @@
-
 //  Copyright (c) 2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,15 +8,12 @@
 
 #include <boost/mpl/bool.hpp>
 
-namespace hpx
+namespace hpx { namespace traits
 {
-    namespace traits
-    {
-        template <typename T, typename Dummy = void>
-        struct is_dataflow
-            : boost::mpl::false_
-        {};
-    }
-}
+    template <typename T, typename Dummy = void>
+    struct is_dataflow
+        : boost::mpl::false_
+    {};
+}}
 
 #endif

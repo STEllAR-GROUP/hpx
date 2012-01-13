@@ -19,7 +19,7 @@
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (1, BOOST_PP_DEC(HPX_ACTION_ARGUMENT_LIMIT),                          \
-    <examples/bright_future/dataflow/server/dataflow_impl.hpp>))              \
+    <hpx/components/dataflow/server/dataflow_impl.hpp>))                      \
     /**/
 
 #include BOOST_PP_ITERATE()

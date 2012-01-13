@@ -1,4 +1,3 @@
-
 //  Copyright (c) 2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,17 +22,17 @@
 #include <boost/preprocessor/arithmetic/sub.hpp>
 #include <boost/preprocessor/facilities/intercept.hpp>
 #include <boost/utility/enable_if.hpp>
-#include <examples/bright_future/dataflow/is_dataflow.hpp>
-#include <examples/bright_future/dataflow/server/detail/dataflow_slot.hpp>
-#include <examples/bright_future/dataflow/server/detail/apply_helper.hpp>
-#include <examples/bright_future/dataflow/server/detail/dataflow_impl_helpers.hpp>
-#include <examples/bright_future/dataflow/server/detail/component_wrapper.hpp>
+#include <hpx/components/dataflow/is_dataflow.hpp>
+#include <hpx/components/dataflow/server/detail/dataflow_slot.hpp>
+#include <hpx/components/dataflow/server/detail/apply_helper.hpp>
+#include <hpx/components/dataflow/server/detail/dataflow_impl_helpers.hpp>
+#include <hpx/components/dataflow/server/detail/component_wrapper.hpp>
 
 #include <hpx/util/demangle_helper.hpp>
 #include <hpx/lcos/local_spinlock.hpp>
 
-namespace hpx { namespace lcos { namespace server { namespace detail {
-
+namespace hpx { namespace lcos { namespace server { namespace detail 
+{
     ///////////////////////////////////////////////////////////////////////////
     // data structure holding all counters for full_empty entries
     struct dataflow_counter_data
@@ -67,7 +66,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
       , (                                                                       \
             0                                                                   \
           , HPX_ACTION_ARGUMENT_LIMIT                                           \
-          , <examples/bright_future/dataflow/server/detail/dataflow_impl.hpp> \
+          , <hpx/components/dataflow/server/detail/dataflow_impl.hpp>           \
         )                                                                       \
     )                                                                           \
 /**/

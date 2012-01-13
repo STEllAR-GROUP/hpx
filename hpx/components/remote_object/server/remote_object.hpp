@@ -11,6 +11,11 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/util/function.hpp>
 
+#if defined(BOOST_MSVC)
+#pragma warning(push)
+#pragma warning(disable:4251 4275)
+#endif
+
 namespace hpx { namespace components { namespace server
 {
     // component to hold a pointer to an object, ability to apply arbitrary
@@ -18,39 +23,39 @@ namespace hpx { namespace components { namespace server
     class HPX_COMPONENT_EXPORT remote_object
         : public simple_component_base<remote_object>
     {
-        public:
-            remote_object()
-                : object(0)
-            {}
-            ~remote_object()
-            {
-                BOOST_ASSERT(dtor);
-                dtor(&object);
-            }
+    public:
+        remote_object()
+            : object(0)
+        {}
+        ~remote_object()
+        {
+            BOOST_ASSERT(dtor);
+            dtor(&object);
+        }
 
-            enum actions
-            {
-                remote_object_apply    = 1
-              , remote_object_set_dtor = 2
-            };
+        enum actions
+        {
+            remote_object_apply    = 1
+          , remote_object_set_dtor = 2
+        };
 
-            template <typename R>
-            R apply(hpx::util::function<R(void**)> const & f, std::size_t count);
+        template <typename R>
+        R apply(hpx::util::function<R(void**)> const & f, std::size_t count);
 
-            void set_dtor(hpx::util::function<void(void**)> const & dtor, std::size_t count);
+        void set_dtor(hpx::util::function<void(void**)> const & dtor, std::size_t count);
 
-            typedef
-                hpx::actions::action2<
-                    remote_object
-                  , remote_object_set_dtor
-                  , hpx::util::function<void(void**)> const &
-                  , std::size_t
-                  , &remote_object::set_dtor
-                >
-                set_dtor_action;
-        private:
-            void *object;
-            hpx::util::function<void(void**)> dtor;
+        typedef
+            hpx::actions::action2<
+                remote_object
+              , remote_object_set_dtor
+              , hpx::util::function<void(void**)> const &
+              , std::size_t
+              , &remote_object::set_dtor
+            >
+            set_dtor_action;
+    private:
+        void *object;
+        hpx::util::function<void(void**)> dtor;
     };
 
     template <typename R>
@@ -176,6 +181,10 @@ namespace hpx { namespace components { namespace server
         }
     };
 }}}
+
+#if defined(BOOST_MSVC)
+#pragma warning(pop)
+#endif
 
 HPX_SERIALIZATION_REGISTER_TEMPLATE(
     (template <typename R>)

@@ -1,4 +1,3 @@
-
 //  Copyright (c) 2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,8 +5,9 @@
 
 #ifndef HPX_LCOS_DATAFLOW_SERVER_DETAIL_APPLY_HELPER_HPP
 #define HPX_LCOS_DATAFLOW_SERVER_DETAIL_APPLY_HELPER_HPP
-    
-namespace hpx { namespace lcos { namespace server { namespace detail {
+
+namespace hpx { namespace lcos { namespace server { namespace detail
+{
     template <int N, typename Action>
     struct apply_helper;
 
@@ -50,11 +50,13 @@ namespace hpx { namespace lcos { namespace server { namespace detail {
         }                                                                       \
     };                                                                          \
     /**/
-    BOOST_PP_REPEAT_FROM_TO(1, HPX_ACTION_ARGUMENT_LIMIT, HPX_LCOS_DATAFLOW_M1, _)
+
+BOOST_PP_REPEAT_FROM_TO(1, HPX_ACTION_ARGUMENT_LIMIT, HPX_LCOS_DATAFLOW_M1, _)
+
 #undef HPX_LCOS_DATAFLOW_M0
 #undef HPX_LCOS_DATAFLOW_M1
 
 }}}}
-    
+
 
 #endif

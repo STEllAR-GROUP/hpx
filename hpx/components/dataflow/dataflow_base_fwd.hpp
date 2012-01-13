@@ -1,4 +1,3 @@
-
 //  Copyright (c) 2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,9 +8,10 @@
 
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/handle_gid.hpp>
-#include <examples/bright_future/dataflow/is_dataflow.hpp>
+#include <hpx/components/dataflow/is_dataflow.hpp>
 
-namespace hpx { namespace lcos {
+namespace hpx { namespace lcos 
+{
     template <
         typename Result
       , typename RemoteResult

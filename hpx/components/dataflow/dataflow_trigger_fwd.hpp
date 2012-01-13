@@ -1,4 +1,3 @@
-
 //  Copyright (c) 2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,21 +6,19 @@
 #ifndef EXAMPLES_BRIGHT_FUTURE_DATAFLOW_TRIGGER_FWD_HPP
 #define EXAMPLES_BRIGHT_FUTURE_DATAFLOW_TRIGGER_FWD_HPP
 
-#include <examples/bright_future/dataflow/is_dataflow.hpp>
+#include <hpx/components/dataflow/is_dataflow.hpp>
 
-namespace hpx { namespace lcos {
+namespace hpx { namespace lcos 
+{
     struct dataflow_trigger;
 }}
 
-namespace hpx
+namespace hpx { namespace traits
 {
-    namespace traits
-    {
-        template <typename Dummy>
-        struct is_dataflow<hpx::lcos::dataflow_trigger, Dummy>
-            : boost::mpl::true_
-        {};
-    }
-}
+    template <typename Dummy>
+    struct is_dataflow<hpx::lcos::dataflow_trigger, Dummy>
+        : boost::mpl::true_
+    {};
+}}
 
 #endif

@@ -52,19 +52,19 @@ namespace hpx { namespace util { namespace detail
     {
         performance_counters::raw_counter_type_data const counter_types[] =
         {
-            { "/full_empty/constructed", performance_counters::counter_raw,
+            { "/lcos/full_empty/constructed", performance_counters::counter_raw,
               "returns the number of constructed full_empty entries",
               HPX_PERFORMANCE_COUNTER_V1 },
-            { "/full_empty/destructed", performance_counters::counter_raw,
+            { "/lcos/full_empty/destructed", performance_counters::counter_raw,
               "returns the number of destructed full_empty entries",
               HPX_PERFORMANCE_COUNTER_V1 },
-            { "/full_empty/read_enqueued", performance_counters::counter_raw,
+            { "/lcos/full_empty/read_enqueued", performance_counters::counter_raw,
               "returns the number of full_empty 'read' enqueue operations",
               HPX_PERFORMANCE_COUNTER_V1 },
-            { "/full_empty/read_dequeued", performance_counters::counter_raw,
+            { "/lcos/full_empty/read_dequeued", performance_counters::counter_raw,
               "returns the number of full_empty 'read' dequeue operations",
               HPX_PERFORMANCE_COUNTER_V1 },
-            { "/full_empty/set_full", performance_counters::counter_raw,
+            { "/lcos/full_empty/set_full", performance_counters::counter_raw,
               "returns the number of full_empty 'set' operations",
               HPX_PERFORMANCE_COUNTER_V1 }
         };
@@ -73,7 +73,7 @@ namespace hpx { namespace util { namespace detail
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
 
         boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
-        boost::format full_empty_counter("/full_empty(locality#%d/total)/%s");
+        boost::format full_empty_counter("/lcos/full_empty(locality#%d/total)/%s");
 
         performance_counters::raw_counter_data const counters[] =
         {

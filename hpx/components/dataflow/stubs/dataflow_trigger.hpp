@@ -1,4 +1,3 @@
-
 //  Copyright (c) 2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,7 +9,7 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/lcos/eager_future.hpp>
-#include <examples/bright_future/dataflow/server/dataflow_trigger.hpp>
+#include <hpx/components/dataflow/server/dataflow_trigger.hpp>
 
 namespace hpx { namespace lcos {
     namespace stubs

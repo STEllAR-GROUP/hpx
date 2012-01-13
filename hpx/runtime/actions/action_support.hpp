@@ -638,10 +638,12 @@ namespace hpx { namespace actions
     }}}                                                                       \
 /**/
 #define HPX_REGISTER_ACTION_DECLARATION_GUID(action)                          \
-    namespace boost { namespace archive { namespace detail { namespace extra_detail {           \
-        template <>                                                           \
-        struct init_guid<action>;                                             \
-    }}}}                                                                      \
+    namespace boost { namespace archive { namespace detail {                  \
+        namespace extra_detail {                                              \
+            template <>                                                       \
+            struct init_guid<action>;                                         \
+        }                                                                     \
+    }}}                                                                       \
 /**/
 #define HPX_REGISTER_ACTION_DECLARATION_EX(action, actionname)                \
     HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID(action)                   \
@@ -650,6 +652,7 @@ namespace hpx { namespace actions
 /**/
 #define HPX_REGISTER_ACTION_DECLARATION(action)                               \
     HPX_REGISTER_ACTION_DECLARATION_EX(action, action)                        \
+/**/
 
 #endif
 

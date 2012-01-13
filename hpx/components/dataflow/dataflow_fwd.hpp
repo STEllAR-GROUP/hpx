@@ -1,4 +1,3 @@
-
 //  Copyright (c) 2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,9 +7,10 @@
 #define EXAMPLES_BRIGHT_FUTURE_DATAFLOW_FWD_HPP
 
 #include <hpx/traits/promise_local_result.hpp>
-#include <examples/bright_future/dataflow/is_dataflow.hpp>
+#include <hpx/components/dataflow/is_dataflow.hpp>
 
-namespace hpx { namespace lcos {
+namespace hpx { namespace lcos 
+{
     template <
         typename Action
       , typename Result =

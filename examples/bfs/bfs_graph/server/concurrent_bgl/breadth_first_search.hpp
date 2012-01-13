@@ -69,7 +69,7 @@ namespace concurrent_bgl
         typename ColorMap>
     void breadth_first_search(VertexListGraph const& g,
         typename boost::graph_traits<VertexListGraph>::vertex_descriptor s,
-        Buffer& Q, BFSVisitor vis, ColorMap color)
+        Buffer& Q, BFSVisitor vis, ColorMap& color)
     {
         // Initialization
         typedef typename boost::property_traits<ColorMap>::value_type ColorValue;

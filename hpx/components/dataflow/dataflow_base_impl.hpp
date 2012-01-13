@@ -1,4 +1,3 @@
-
 //  Copyright (c) 2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,9 +7,10 @@
 #define EXAMPLES_BRIGHT_FUTURE_DATAFLOW_BASE_IMPL_HPP
 
 #include <hpx/hpx_fwd.hpp>
-#include <examples/bright_future/dataflow/is_dataflow.hpp>
+#include <hpx/components/dataflow/is_dataflow.hpp>
 
-namespace hpx { namespace lcos { namespace detail {
+namespace hpx { namespace lcos { namespace detail 
+{
     struct dataflow_base_impl
     {
         dataflow_base_impl()

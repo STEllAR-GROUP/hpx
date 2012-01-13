@@ -1,4 +1,3 @@
-
 //  Copyright (c) 2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,11 +6,11 @@
 #ifndef EXAMPLES_BRIGHT_FUTURE_DATAFLOW_HPP
 #define EXAMPLES_BRIGHT_FUTURE_DATAFLOW_HPP
 
-#include <examples/bright_future/dataflow/dataflow_base.hpp>
-#include <examples/bright_future/dataflow/dataflow_fwd.hpp>
+#include <hpx/components/dataflow/dataflow_base.hpp>
+#include <hpx/components/dataflow/dataflow_fwd.hpp>
 
-namespace hpx { namespace lcos {
-
+namespace hpx { namespace lcos 
+{
     namespace detail
     {
         template <typename Action>

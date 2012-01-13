@@ -8,7 +8,7 @@
 #define HPX_LCOS_ASYNC_DATAFLOW_WAIT_HPP
 
 #include <hpx/hpx_fwd.hpp>
-#include <examples/bright_future/dataflow/dataflow.hpp>
+#include <hpx/components/dataflow/dataflow.hpp>
 
 #include <vector>
 
