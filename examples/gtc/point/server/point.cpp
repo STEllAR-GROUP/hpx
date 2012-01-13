@@ -638,6 +638,49 @@ namespace gtc { namespace server
 
     void point::smooth(std::size_t iflag, std::vector<hpx::naming::id_type> const& point_components, parameter const& par)
     {
+      array<double> phitmp;
+      phitmp.resize(mzeta_+1,mgrid_+1,1);
+      for (std::size_t j=0;j<phitmp.jsize();j++) {
+        for (std::size_t i=0;i<phitmp.isize();i++) {
+          phitmp(i,j,0) = 0.0;
+        }
+      }  
+
+      if ( iflag == 0 ) {
+        for (std::size_t i=1;i<=mgrid_;i++) {
+          for (std::size_t j=1;j<=mzeta_;j++) {
+            phitmp(j,i,0) = densityi_(j,i,0);
+          }
+        }
+      } else if ( iflag == 1 ) {
+        for (std::size_t i=1;i<=mgrid_;i++) {
+          for (std::size_t j=1;j<=mzeta_;j++) {
+            phitmp(j,i,0) = densityi_(j,i,0);
+          }
+        }
+      } else {
+        for (std::size_t i=1;i<=mgrid_;i++) {
+          for (std::size_t j=1;j<=mzeta_;j++) {
+            phitmp(j,i,0) = phi_(j,i,0);
+          }
+        }
+      }
+
+      std::size_t ismooth;
+      ismooth = 1;
+      if ( par->nonlinear < 0.5 ) ismooth = 0;
+      
+      for (std::size_t ip=1;ip<=ismooth;ip++) {
+        // radial smoothing
+        for (std::size_t i=1;i<=par->mpsi-1;i++) {
+          for (std::size_t j=0;j<phitmp.isize();j++) {
+            phitmp(j,igrid_[i],0) = phitmp(j,igrid_[i]+mtheta_[i],0);
+          } 
+        }
+
+       
+      }
+
     }
 
 }}
