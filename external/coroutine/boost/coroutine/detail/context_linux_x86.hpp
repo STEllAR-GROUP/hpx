@@ -106,13 +106,11 @@ namespace boost { namespace coroutines {
       friend void swap_context(x86_linux_context_impl_base& from,
           x86_linux_context_impl const& to, default_hint);
 
-#ifndef BOOST_COROUTINE_NO_SEPARATE_CALL_SITES
       friend void swap_context(x86_linux_context_impl& from,
           x86_linux_context_impl_base const& to, yield_hint);
 
       friend void swap_context(x86_linux_context_impl& from,
           x86_linux_context_impl_base const& to, yield_to_hint);
-#endif
 
     protected:
       void ** m_sp;
@@ -230,13 +228,11 @@ namespace boost { namespace coroutines {
       friend void swap_context(x86_linux_context_impl_base& from,
           x86_linux_context_impl const& to, default_hint);
 
-#ifndef BOOST_COROUTINE_NO_SEPARATE_CALL_SITES
       friend void swap_context(x86_linux_context_impl& from,
           x86_linux_context_impl_base const& to, yield_hint);
 
       friend void swap_context(x86_linux_context_impl& from,
           x86_linux_context_impl_base const& to, yield_to_hint);
-#endif
 
     private:
       std::ptrdiff_t m_stack_size;
@@ -258,13 +254,16 @@ namespace boost { namespace coroutines {
         swapcontext_stack(&from.m_sp, to.m_sp);
     }
 
-#ifndef BOOST_COROUTINE_NO_SEPARATE_CALL_SITES
     inline void swap_context(x86_linux_context_impl& from,
         x86_linux_context_impl_base const& to, yield_hint)
     {
 //        BOOST_ASSERT(*(void**)from.m_stack == (void*)~0);
         to.prefetch();
+#ifndef BOOST_COROUTINE_NO_SEPARATE_CALL_SITES
         swapcontext_stack2(&from.m_sp, to.m_sp);
+#else
+        swapcontext_stack(&from.m_sp, to.m_sp);
+#endif
     }
 
     inline void swap_context(x86_linux_context_impl& from,
@@ -272,9 +271,12 @@ namespace boost { namespace coroutines {
     {
 //        BOOST_ASSERT(*(void**)from.m_stack == (void*)~0);
         to.prefetch();
+#ifndef BOOST_COROUTINE_NO_SEPARATE_CALL_SITES
         swapcontext_stack3(&from.m_sp, to.m_sp);
-    }
+#else
+        swapcontext_stack(&from.m_sp, to.m_sp);
 #endif
+    }
 
   }
 }}}
