@@ -636,5 +636,9 @@ namespace gtc { namespace server
       return zonali_;
     }
 
+    void point::smooth(std::size_t iflag, std::vector<hpx::naming::id_type> const& point_components, parameter const& par)
+    {
+    }
+
 }}
 

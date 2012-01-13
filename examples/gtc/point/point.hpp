@@ -104,6 +104,22 @@ namespace gtc
             return this->base_type::get_zonali(gid_);
         }
 
+        hpx::lcos::promise<void> smooth_async(std::size_t iflag, 
+            std::vector<hpx::naming::id_type> const& point_components,
+            parameter const& par)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::smooth_async(gid_,iflag,point_components,par);
+        }
+
+        void smooth(std::size_t iflag,
+                    std::vector<hpx::naming::id_type> const& point_components,
+                    parameter const& par)
+        {
+            BOOST_ASSERT(gid_);
+            this->base_type::smooth(gid_,iflag,point_components,par);
+        }
+
 
 
     };

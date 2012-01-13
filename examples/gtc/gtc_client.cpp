@@ -71,7 +71,8 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         // Default parameters
         par->irun = false;
-        par->mstep = 1500;
+        //par->mstep = 1500;
+        par->mstep = 1;
         par->msnap = 1;
         par->ndiag = 4;
         par->nonlinear = 1.0;
@@ -351,34 +352,57 @@ int hpx_main(boost::program_options::variables_map &vm)
         init(hpx::components::server::locality_results(blocks_points), points);
 
         ///////////////////////////////////////////////////////////////////////
-        std::vector<hpx::lcos::promise<void> > initial_phase;
-
-        for (std::size_t i=0;i<par->ntoroidal;i++) {
-          initial_phase.push_back(points[i].init_async(i,par));
+        { // SETUP
+          std::vector<hpx::lcos::promise<void> > initial_phase;
+          for (std::size_t i=0;i<par->ntoroidal;i++) {
+            initial_phase.push_back(points[i].init_async(i,par));
+          }
+          hpx::lcos::wait(initial_phase);
         }
 
-        // We have to wait for the initialization to complete before we begin
-        // the next phase of computation.
-        hpx::lcos::wait(initial_phase);
-
-        std::vector<hpx::lcos::promise<void> > load_phase;
-        for (std::size_t i=0;i<par->ntoroidal;i++) {
-          load_phase.push_back(points[i].load_async(i,par));
+        { // LOAD
+          std::vector<hpx::lcos::promise<void> > load_phase;
+          for (std::size_t i=0;i<par->ntoroidal;i++) {
+            load_phase.push_back(points[i].load_async(i,par));
+          }
+          hpx::lcos::wait(load_phase);
         }
-        hpx::lcos::wait(load_phase);
 
         std::vector<hpx::naming::id_type> point_components;
         for (std::size_t i=0;i<par->ntoroidal;i++) {
           point_components.push_back(points[i].get_gid());
         }
 
+        // For testing
         std::size_t istep = 1;
-        std::vector<hpx::lcos::promise<void> > chargei_phase;
-        for (std::size_t i=0;i<par->ntoroidal;i++) {
-          chargei_phase.push_back(points[i].chargei_async(istep,
-                              point_components,par));
+        //std::size_t istep = 0;
+        { // CHARGEI
+          std::vector<hpx::lcos::promise<void> > chargei_phase;
+          for (std::size_t i=0;i<par->ntoroidal;i++) {
+            chargei_phase.push_back(points[i].chargei_async(istep,
+                                point_components,par));
+          }
+          hpx::lcos::wait(chargei_phase);
         }
-        hpx::lcos::wait(chargei_phase);
+
+        // main time loop
+        for (istep=1;istep<=par->mstep;istep++) {
+          for (std::size_t irk=1;irk<=2;irk++) {
+            // idiag=0: do time history diagnosis
+            std::size_t idiag = ((irk+1)%2) + (istep%par->ndiag);
+
+            {  // SMOOTH(3)
+              std::vector<hpx::lcos::promise<void> > smooth_phase;
+              std::size_t iflag = 3;
+              for (std::size_t i=0;i<par->ntoroidal;i++) {
+                smooth_phase.push_back(points[i].smooth_async(iflag,
+                                      point_components,par));
+              }
+              hpx::lcos::wait(smooth_phase);
+            }
+
+          }
+        };
 
         ///////////////////////////////////////////////////////////////////////
         // Start the search/charge depositing phase.

@@ -31,7 +31,8 @@ namespace gtc { namespace server
             point_load = 1,
             point_chargei = 2,
             point_get_densityi = 3,
-            point_get_zonali = 4
+            point_get_zonali = 4,
+            point_smooth = 5
         };
 
         point()
@@ -46,6 +47,8 @@ namespace gtc { namespace server
         void load(std::size_t objectid,parameter const& par);
 
         void chargei(std::size_t istep, std::vector<hpx::naming::id_type> const& point_components, parameter const& par);
+
+        void smooth(std::size_t iflag, std::vector<hpx::naming::id_type> const& point_components, parameter const& par);
 
         bool chargei_callback(std::size_t i,std::valarray<double> const& density);
 
@@ -96,6 +99,19 @@ namespace gtc { namespace server
             // Method bound to this action. 
             &point::chargei
         > chargei_action;
+
+        typedef hpx::actions::action3<
+            // Component server type.
+            point,
+            // Action code.
+            point_smooth,
+            // Arguments of this action.
+            std::size_t,
+            std::vector<hpx::naming::id_type> const&,
+            parameter const&,
+            // Method bound to this action. 
+            &point::smooth
+        > smooth_action;
 
         typedef hpx::actions::result_action0<
             // Component server type.
@@ -175,6 +191,10 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
               gtc::server::point::get_zonali_action,
               gtc_point_get_zonali_action)
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+              gtc::server::point::smooth_action,
+              gtc_point_smooth_action)
 
 #endif
 
