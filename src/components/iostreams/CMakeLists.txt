@@ -6,18 +6,10 @@
 
 set(root "${hpx_SOURCE_DIR}/hpx/components/iostreams")
 
-add_hpx_library_headers(iostreams
-  GLOB_RECURSE GLOBS "${root}/*.h*")
-
-add_hpx_library_sources(iostreams
-  GLOB_RECURSE GLOBS "*.c*")
-
 add_definitions(-DHPX_IOSTREAMS_MODULE_EXPORTS)
 
 add_hpx_component(iostreams
-  SOURCES ${iostreams_SOURCES}
-  HEADERS ${iostreams_HEADERS}
   FOLDER "Core"
   HEADER_ROOT ${root}
-  SOURCE_ROOT ".")
+  AUTOGLOB)
 
