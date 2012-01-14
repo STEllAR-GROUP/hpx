@@ -6,7 +6,7 @@
 ################################################################################
 # C++-style include guard to prevent multiple searches in the same build
 if(NOT BOOST_SEARCHED)
-set(BOOST_SEARCHED ON CACHE INTERNAL "Found Boost libraries")
+set(BOOST_SEARCHED OFF CACHE INTERNAL "Found Boost libraries")
 
 include(HPX_Utils)
 
@@ -15,7 +15,8 @@ if(NOT CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCT)
 endif()
 
 ################################################################################
-option(BOOST_USE_MULTITHREADED "Set to true if multi-threaded boost libraries should be used (default: ON)." ON)
+#option(BOOST_USE_MULTITHREADED "Set to true if multi-threaded boost libraries should be used (default: ON)." ON)
+#option(BOOST_USE_STATIC_LIBS "Set to true if static boost libraries should be used (default: OFF)." OFF)
 
 # backwards compatibility
 if(BOOST_LIB_DIR AND NOT BOOST_LIBRARY_DIR)
@@ -123,19 +124,22 @@ macro(build_boost_libname BOOST_RAW_NAME)
     set(BOOST_LIB_SUFFIX "-gd")
   endif()
 
-  if(BOOST_USE_MULTITHREADED)
+#  if(BOOST_USE_MULTITHREADED)
     set(BOOST_LIB_SUFFIX -mt${BOOST_LIB_SUFFIX})
-  endif()
+#  endif()
 
   set(BOOST_LIBNAMES
-      libboost_${BOOST_RAW_NAME}${BOOST_COMPILER_VERSION}${BOOST_LIB_SUFFIX}-${BOOST_VERSION}
       boost_${BOOST_RAW_NAME}${BOOST_COMPILER_VERSION}${BOOST_LIB_SUFFIX}-${BOOST_VERSION}
-      libboost_${BOOST_RAW_NAME}${BOOST_COMPILER_VERSION}-${BOOST_VERSION}
       boost_${BOOST_RAW_NAME}${BOOST_COMPILER_VERSION}-${BOOST_VERSION}
-      libboost_${BOOST_RAW_NAME}${BOOST_LIB_SUFFIX}
       boost_${BOOST_RAW_NAME}${BOOST_LIB_SUFFIX}
-      libboost_${BOOST_RAW_NAME}
       boost_${BOOST_RAW_NAME})
+  if(NOT MSVC)
+    set(BOOST_LIBNAMES ${BOOST_LIBNAMES}
+        libboost_${BOOST_RAW_NAME}${BOOST_COMPILER_VERSION}${BOOST_LIB_SUFFIX}-${BOOST_VERSION}
+        libboost_${BOOST_RAW_NAME}${BOOST_COMPILER_VERSION}-${BOOST_VERSION}
+        libboost_${BOOST_RAW_NAME}${BOOST_LIB_SUFFIX}
+        libboost_${BOOST_RAW_NAME})
+  endif()
 endmacro()
 
 macro(find_boost_library TARGET_LIB)
@@ -150,6 +154,7 @@ macro(find_boost_library TARGET_LIB)
     hpx_print_list("DEBUG" "boost.${TARGET_LIB}" "Searching in ${BOOST_LIBRARY_DIR} for" BOOST_LIBNAMES)
 
     foreach(BOOST_TARGET ${BOOST_LIBNAMES})
+      unset(BOOST_${TARGET_LIB}_LIBRARY CACHE)      # force the library to be found again
       find_library(BOOST_${TARGET_LIB}_LIBRARY NAMES ${BOOST_TARGET} PATHS ${BOOST_LIBRARY_DIR} NO_DEFAULT_PATH)
 
       if(BOOST_${TARGET_LIB}_LIBRARY)
@@ -188,6 +193,7 @@ macro(find_boost_library TARGET_LIB)
     else()
       set(BOOST_${TARGET_LIB}_LIBRARY ${BOOST_${TARGET_LIB}_LIBRARY}
         CACHE FILEPATH "Boost ${TARGET_LIB} shared library." FORCE)
+      set(BOOST_SEARCHED ON CACHE INTERNAL "Found Boost libraries")
     endif()
 
     list(APPEND BOOST_FOUND_LIBRARIES ${BOOST_${TARGET_LIB}_LIBRARY})
@@ -199,6 +205,7 @@ macro(find_boost_library TARGET_LIB)
     hpx_print_list("DEBUG" "boost.${TARGET_LIB}" "Searching in system path for" BOOST_LIBNAMES)
 
     foreach(BOOST_TARGET ${BOOST_LIBNAMES})
+      unset(BOOST_${TARGET_LIB}_LIBRARY CACHE)      # force thelibrary to be found again
       find_library(BOOST_${TARGET_LIB}_LIBRARY NAMES ${BOOST_TARGET})
 
       if(BOOST_${TARGET_LIB}_LIBRARY)
@@ -216,11 +223,14 @@ macro(find_boost_library TARGET_LIB)
     else()
       set(BOOST_${TARGET_LIB}_LIBRARY ${BOOST_${TARGET_LIB}_LIBRARY}
         CACHE FILEPATH "Boost ${TARGET_LIB} shared library." FORCE)
+      set(BOOST_SEARCHED ON CACHE INTERNAL "Found Boost libraries")
     endif()
 
     list(APPEND BOOST_FOUND_LIBRARIES ${BOOST_${TARGET_LIB}_LIBRARY})
   endif()
 endmacro()
+
+unset(BOOST_FOUND_LIBRARIES CACHE)
 
 foreach(BOOST_LIB ${BOOST_LIBRARIES})
   find_boost_library(${BOOST_LIB})

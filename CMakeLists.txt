@@ -39,17 +39,6 @@ if(MSVC)
 endif()
 
 ################################################################################
-# Build type
-################################################################################
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Configuration type (one of Debug, RelWithDebInfo, Release, MinSizeRel)" FORCE)
-endif()
-
-if(NOT MSVC AND NOT CMAKE_CONFIGURATION_TYPES)
-  set(CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}" CACHE STRING "Configuration types" FORCE)
-endif()
-
-################################################################################
 # CMake configuration
 ################################################################################
 set(CMAKE_MODULE_PATH ${hpx_SOURCE_DIR}/cmake)
@@ -63,6 +52,28 @@ hpx_force_out_of_tree_build("This project requires an out-of-source-tree build. 
 
 if(NOT HPX_CMAKE_LOGLEVEL)
   set(HPX_CMAKE_LOGLEVEL "WARN")
+endif()
+
+################################################################################
+# Build type
+################################################################################
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Configuration type (one of Debug, RelWithDebInfo, Release, MinSizeRel)" FORCE)
+endif()
+
+# reconfigure Boost library information if configuration type has been
+# changed since last configure
+if(CMAKE_BUILD_TYPE AND NOT (CMAKE_BUILD_TYPE STREQUAL CMAKE_CONFIGURATION_TYPES))
+  set(BOOST_VERSION_SEARCHED OFF CACHE INTERNAL "Found Boost version" FORCE)
+  set(BOOST_SEARCHED OFF CACHE INTERNAL "Found Boost libraries" FORCE)
+endif()
+
+# Set CMAKE_CONFIGURATION_TYPES if not already set
+# On MSVC force CMAKE_CONFIGURATION_TYPES to be the same as CMAKE_BUILD_TYPE
+# (at least for now, until we figure out how to use multiple build types in
+# the same project).
+if((NOT MSVC AND NOT CMAKE_CONFIGURATION_TYPES) OR MSVC)
+  set(CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}" CACHE INTERNAL "Configuration types" FORCE)
 endif()
 
 ################################################################################
@@ -335,7 +346,7 @@ if(MSVC)
     if(CMAKE_ASM_MASM_COMPILER)
       hpx_info("swap_context" "SwitchToFiber emulation is enabled, using compiler: '${CMAKE_ASM_MASM_COMPILER}'")
     else()
-      hpx_warning("swap_context" "SwitchToFiber emulation is disabled, try setting the ASM_MASM environment variable to the assembler executable (ml.exe/ml64.exe)")
+      hpx_warning("swap_context" "SwitchToFiber emulation will be disabled, try setting the ASM_MASM environment variable to the assembler executable (ml.exe/ml64.exe)")
       set(HPX_EMULATE_SWAP_CONTEXT OFF CACHE BOOL "Emulate SwitchToFiber API for coroutines (default: OFF)" FORCE)
     endif()
   endif()
@@ -482,7 +493,7 @@ if(MSVC)
     # basic runtime checks
     hpx_append_flag(-RTC1 LANGUAGES CXX)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
-    # Optimize for speed
+    # Optimize for speed with debug info
     hpx_append_flag(-O2 LANGUAGES CXX Fortran)
 
     # Generate debugging information
