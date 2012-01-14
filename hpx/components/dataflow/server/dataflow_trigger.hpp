@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef EXAMPLES_BRIGHT_FUTURE_DATAFLOW_SERVER_DATAFLOW_TRIGGER_HPP
-#define EXAMPLES_BRIGHT_FUTURE_DATAFLOW_SERVER_DATAFLOW_TRIGGER_HPP
+#ifndef HPX_LCOS_DATAFLOW_SERVER_DATAFLOW_TRIGGER_HPP
+#define HPX_LCOS_DATAFLOW_SERVER_DATAFLOW_TRIGGER_HPP
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
@@ -19,7 +19,7 @@
 namespace hpx { namespace lcos { namespace server
 {
     /// The dataflow server side representation
-    struct dataflow_trigger
+    struct HPX_COMPONENT_EXPORT dataflow_trigger
         : components::managed_component_base<
             dataflow_trigger
           , hpx::components::detail::this_type
@@ -65,15 +65,6 @@ namespace hpx { namespace lcos { namespace server
             }
         }
 
-//         typedef
-//             ::hpx::actions::action1<
-//                 dataflow_trigger
-//               , 0
-//               , std::vector<dataflow_base<void> > const &
-//               , &dataflow_trigger::init
-//             >
-//             init_action;
-
         dataflow_trigger(component_type * back_ptr)
             : base_type(back_ptr)
             , all_set(false)
@@ -92,9 +83,6 @@ namespace hpx { namespace lcos { namespace server
             applier::register_thread(
                 HPX_STD_BIND(&dataflow_trigger::init, this, trigger),
                 "dataflow_trigger::init<>");
-//             BOOST_ASSERT(this->get_gid());
-//             applier::apply<init_action>(this->get_gid(), trigger);
-            //init(trigger);
         }
 
         ~dataflow_trigger()
@@ -182,12 +170,6 @@ namespace hpx { namespace lcos { namespace server
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::lcos::server::dataflow_trigger::connect_action
-  , dataflow_trigger_type_connect_action
-)
-
-// HPX_REGISTER_ACTION_DECLARATION_EX(
-//     hpx::lcos::server::dataflow_trigger::init_action
-//   , dataflow_trigger_type_init_action
-// )
+  , dataflow_trigger_type_connect_action)
 
 #endif

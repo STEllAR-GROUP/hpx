@@ -15,7 +15,6 @@ set(bright_future_programs
         gs_hpx_grid_ro
         remote_functions
         remote_object
-        dataflow_test
         gs_hpx_blocked_df
    )
 
@@ -33,7 +32,7 @@ add_hpx_component(
     HEADERS server/remote_lse.hpp grid.hpp
     DEPENDENCIES iostreams_component distributing_factory_component
     FOLDER "Examples/BrightFuture"
-  ${GOOGLE_PERFTOOLS_LIBRARY}
+    ${GOOGLE_PERFTOOLS_LIBRARY}
 )
 
 set(gs_single_sources gs.cpp)
@@ -44,10 +43,6 @@ set(gs_hpx_grid_ro_sources gs.cpp)
 set(gs_hpx_distributed_sources gs.cpp)
 
 set(remote_functions_FLAGS DEPENDENCIES iostreams_component)
-set(dataflow_test_FLAGS 
-  DEPENDENCIES iostreams_component dataflow_component
-#  ${GOOGLE_PERFTOOLS_LIBRARY}
-  )
 set(remote_object_FLAGS DEPENDENCIES remote_object_component iostreams_component)
 set(vector_root_finder_FLAGS DEPENDENCIES iostreams_component)
 set(gs_single_FLAGS DEPENDENCIES iostreams_component)

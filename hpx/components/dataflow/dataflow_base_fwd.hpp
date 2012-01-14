@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef EXAMPLES_BRIGHT_FUTURE_DATAFLOW_BASE_FWD_HPP
-#define EXAMPLES_BRIGHT_FUTURE_DATAFLOW_BASE_FWD_HPP
+#ifndef HPX_LCOS_DATAFLOW_BASE_FWD_HPP
+#define HPX_LCOS_DATAFLOW_BASE_FWD_HPP
 
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/handle_gid.hpp>

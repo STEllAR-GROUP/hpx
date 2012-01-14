@@ -3,13 +3,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef EXAMPLES_BRIGHT_FUTURE_DATAFLOW_HPP
-#define EXAMPLES_BRIGHT_FUTURE_DATAFLOW_HPP
+#ifndef HPX_LCOS_DATAFLOW_HPP
+#define HPX_LCOS_DATAFLOW_HPP
 
 #include <hpx/components/dataflow/dataflow_base.hpp>
 #include <hpx/components/dataflow/dataflow_fwd.hpp>
 
-namespace hpx { namespace lcos 
+namespace hpx { namespace lcos
 {
     namespace detail
     {
@@ -61,17 +61,7 @@ namespace hpx { namespace lcos
                 create_component_action;
             return
                 async<create_component_action>(
-                /*async_callback<create_component_action>(
-                    [target](naming::id_type const & gid)
-                    {
-                        LLCO_(info)
-                            << "dataflow: created component "
-                            << gid
-                            << " with target "
-                            << target
-                            ;
-                    }
-                  ,*/ naming::get_locality_from_id(target)
+                    naming::get_locality_from_id(target)
                   , stub_type::get_component_type()
                   , detail::action_wrapper<Action>()
                   , target
@@ -124,19 +114,6 @@ namespace hpx { namespace lcos
             )                                                                   \
         {                                                                       \
         }                                                                       \
-    /*
-                async_callback<create_component_action>(                        \
-                    [target, BOOST_PP_ENUM_PARAMS(N, a)]                        \
-                    (naming::id_type const & gid)                               \
-                    {                                                           \
-                        LLCO_(info)                                             \
-                            << "dataflow: created component "                   \
-                            << gid                                              \
-                            << " with target "                                  \
-                            << target                                           \
-                            ;                                                   \
-                    }                                                           \
-    */
     /**/
         BOOST_PP_REPEAT_FROM_TO(
             1

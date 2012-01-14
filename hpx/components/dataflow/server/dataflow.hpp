@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef EXAMPLES_BRIGHT_FUTURE_DATAFLOW_SERVER_DATAFLOW_HPP
-#define EXAMPLES_BRIGHT_FUTURE_DATAFLOW_SERVER_DATAFLOW_HPP
+#ifndef HPX_LCOS_DATAFLOW_SERVER_DATAFLOW_HPP
+#define HPX_LCOS_DATAFLOW_SERVER_DATAFLOW_HPP
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
@@ -18,19 +18,8 @@
 
 namespace hpx { namespace lcos { namespace server
 {
-//     template <
-//         typename Action
-//       , BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT(
-//             HPX_ACTION_ARGUMENT_LIMIT
-//           , typename A
-//           , void
-//         )
-//       , typename Enable = void
-//     >
-//     struct init_action;
-
     /// The dataflow server side representation
-    struct dataflow
+    struct HPX_COMPONENT_EXPORT dataflow
         : components::managed_component_base<
             dataflow
           , hpx::components::detail::this_type
@@ -112,10 +101,6 @@ namespace hpx { namespace lcos { namespace server
                 )
               , "dataflow::init<>"
             );
-//             BOOST_ASSERT(this->get_gid());
-//             typedef init_action<typename Action::type> action_type;
-//             applier::apply<action_type>(this->get_gid(), target);
-            //init<typename Action::type>(target);
         }
 
         // Vertical preprocessor repetition to define the remaining
@@ -173,22 +158,6 @@ namespace hpx { namespace lcos { namespace server
             );                                                                  \
         }                                                                       \
     /**/
-/*
-            BOOST_ASSERT(this->get_gid());                                      \
-            typedef                                                             \
-                init_action<typename Action::type, BOOST_PP_ENUM_PARAMS(N, A)>  \
-                action_type;                                                    \
-            applier::apply<action_type>(                                        \
-                this->get_gid()                                                 \
-              , target                                                          \
-              , BOOST_PP_ENUM_PARAMS(N, a)                                      \
-            );                                                                  \
-        }                                                                       \
-*/
-        /*
-            init<typename Action::type>(target, BOOST_PP_ENUM_PARAMS(N, a));    \
-        */
-    /**/
 
         BOOST_PP_REPEAT_FROM_TO(
             1
@@ -233,75 +202,10 @@ namespace hpx { namespace lcos { namespace server
         lcos::local_spinlock mtx;
         std::vector<naming::id_type> targets;
     };
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// init_action is the action that can be used to call the variadic
-    /// function from a client
-
-//     template <typename Action>
-//     struct init_action<Action>
-//       : hpx::actions::action1<
-//             dataflow
-//           , 0
-//           , naming::id_type const &
-//           , &dataflow::init<Action>
-//           , threads::thread_priority_default
-//           , init_action<Action>
-//         >
-//     {
-//     private:
-//         typedef hpx::actions::action1<
-//             dataflow
-//           , 0
-//           , naming::id_type const &
-//           , &dataflow::init<Action>
-//           , threads::thread_priority_default
-//           , init_action<Action>
-//         > base_type;
-//
-//     public:
-//         init_action() {}
-//
-//         // construct an action from its arguments
-//         init_action(naming::id_type const & target)
-//           : base_type(target)
-//         {}
-//
-//         init_action(threads::thread_priority p, naming::id_type const & target)
-//           : base_type(p, target)
-//         {}
-//
-//         /// serialization support
-//         static void register_base()
-//         {
-//             using namespace boost::serialization;
-//             void_cast_register<init_action, base_type>();
-//             base_type::register_base();
-//         }
-//
-//     private:
-//         // serialization support
-//         friend class boost::serialization::access;
-//
-//         template<class Archive>
-//         void serialize(Archive& ar, const unsigned int /*version*/)
-//         {
-//             ar & boost::serialization::base_object<base_type>(*this);
-//         }
-//     };
 }}}
-
-// HPX_SERIALIZATION_REGISTER_TEMPLATE(
-//     (template <typename Action>)
-//   , (hpx::lcos::server::init_action<Action>)
-// )
-
-// bring in the remaining specializations for init_action
-// #include <hpx/components/dataflow/server/dataflow_impl.hpp>
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::lcos::server::dataflow::connect_action
-  , dataflow_type_connect_action
-)
+  , dataflow_type_connect_action)
 
 #endif

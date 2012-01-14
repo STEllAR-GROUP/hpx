@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef EXAMPLES_BRIGHT_FUTURE_DATAFLOW_TRIGGER_HPP
-#define EXAMPLES_BRIGHT_FUTURE_DATAFLOW_TRIGGER_HPP
+#ifndef HPX_LCOS_DATAFLOW_TRIGGER_HPP
+#define HPX_LCOS_DATAFLOW_TRIGGER_HPP
 
 #include <hpx/components/dataflow/dataflow_trigger_fwd.hpp>
 #include <hpx/components/dataflow/dataflow_base.hpp>
@@ -40,15 +40,7 @@ namespace hpx { namespace lcos
                 create_component_action;
             return
                 async<create_component_action>(
-                /*async_callback<create_component_action>(
-                    [id, trigger](naming::id_type const & gid)
-                    {
-                        LLCO_(info)
-                            << "dataflow_trigger: created component "
-                            << gid
-                            ;
-                    }
-                  ,*/ naming::get_locality_from_id(id)
+                    naming::get_locality_from_id(id)
                   , stub_type::get_component_type()
                   , trigger
                 );

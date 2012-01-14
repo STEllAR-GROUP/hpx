@@ -3,13 +3,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef EXAMPLES_BRIGHT_FUTURE_DATAFLOW_BASE_IMPL_HPP
-#define EXAMPLES_BRIGHT_FUTURE_DATAFLOW_BASE_IMPL_HPP
+#ifndef HPX_LCOS_DATAFLOW_BASE_IMPL_HPP
+#define HPX_LCOS_DATAFLOW_BASE_IMPL_HPP
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/components/dataflow/is_dataflow.hpp>
 
-namespace hpx { namespace lcos { namespace detail 
+namespace hpx { namespace lcos { namespace detail
 {
     struct dataflow_base_impl
     {
@@ -26,7 +26,7 @@ namespace hpx { namespace lcos { namespace detail
             }
             */
         }
-        
+
         dataflow_base_impl(
             lcos::promise<naming::id_type, naming::gid_type> const & promise
         )

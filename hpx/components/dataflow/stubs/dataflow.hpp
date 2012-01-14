@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef EXAMPLES_BRIGHT_FUTURE_DATAFLOW_STUBS_DATAFLOW_HPP
-#define EXAMPLES_BRIGHT_FUTURE_DATAFLOW_STUBS_DATAFLOW_HPP
+#ifndef HPX_LCOS_DATAFLOW_STUBS_DATAFLOW_HPP
+#define HPX_LCOS_DATAFLOW_STUBS_DATAFLOW_HPP
 
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>

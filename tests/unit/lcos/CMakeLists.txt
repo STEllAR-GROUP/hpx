@@ -5,8 +5,13 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    dataflow_test
     trivial_future
    )
+
+set(dataflow_test_FLAGS
+  DEPENDENCIES iostreams_component dataflow_component
+  )
 
 foreach(test ${tests})
   set(sources
@@ -32,3 +37,7 @@ foreach(test ${tests})
                               ${test}_exe)
 endforeach()
 
+set_target_properties(dataflow_test_exe
+    PROPERTIES COMPILE_FLAGS
+        "-DHPX_ACTION_ARGUMENT_LIMIT=10 -DHPX_COMPONENT_CREATE_ARG_MAX=10"
+)
