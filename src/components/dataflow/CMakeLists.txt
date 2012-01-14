@@ -7,7 +7,7 @@ set(root "${hpx_SOURCE_DIR}/hpx/components/dataflow")
 
 add_hpx_component(dataflow
   DEPENDENCIES iostreams_component
-  FOLDER "Core"
+  FOLDER "Core/Components"
   HEADER_ROOT ${root}
   AUTOGLOB)
 

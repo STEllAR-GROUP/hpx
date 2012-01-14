@@ -35,7 +35,7 @@ add_hpx_executable(dataflow
   MODULE dataflow_module
   SOURCES ${sources}
   DEPENDENCIES ${dependencies}
-  FOLDER "Examples/AMR")
+  FOLDER "Examples/Applications/AMR")
 
 # add a dependency to the pseudo-target
 add_hpx_pseudo_dependencies(examples.dataflow dataflow_exe)

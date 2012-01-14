@@ -277,7 +277,7 @@ endif()
 ################################################################################
 # C++11 configuration
 ################################################################################
-hpx_option(HPX_CXX11 BOOL "Use C++11 support (default: ON)" ON)
+hpx_option(HPX_CXX11 BOOL "Use C++11 support, if available (default: ON)" ON)
 
 if(HPX_CXX11)
   add_definitions(-DHPX_HAVE_CXX11)
@@ -430,7 +430,7 @@ endif()
 
 hpx_option(HPX_UTIL_FUNCTION BOOL "Use hpx::util::function instead of boost::function or std::function (default: ON)" ON)
 
-if(HPX_USE_UTIL_FUNCTION)
+if(HPX_UTIL_FUNCTION)
   add_definitions(-DHPX_UTIL_FUNCTION)
 endif()
 
@@ -544,18 +544,34 @@ if(MSVC)
   ##############################################################################
   if(HPX_CXX11)
     # C++11 support
-    set(HPX_CXX11_RVALUE_REFERENCES ON CACHE BOOL "cxx11_rvalue_references state.")
+    set(HPX_CXX11_RVALUE_REFERENCES ON CACHE BOOL "Compiler supports C++11 rvalue references.")
     add_definitions(-DHPX_HAVE_CXX11_RVALUE_REFERENCES)
 
-    set(HPX_CXX11_LAMBDAS ON CACHE BOOL "cxx11_lambdas state.")
+    set(HPX_CXX11_LAMBDAS ON CACHE BOOL "Compiler supports C++11 lambda functions.")
     add_definitions(-DHPX_HAVE_CXX11_LAMBDAS)
 
-    set(HPX_CXX11_AUTO ON CACHE BOOL "cxx11_auto state.")
+    set(HPX_CXX11_AUTO ON CACHE BOOL "Compiler supports C++11 auto keyword.")
     add_definitions(-DHPX_HAVE_CXX11_AUTO)
 
-    set(HPX_CXX11_UNIQUE_PTR ON CACHE BOOL "cxx11_std_unique_ptr state.")
+    set(HPX_CXX11_UNIQUE_PTR ON CACHE BOOL "Compiler supports C++11 std::unique_ptr.")
     add_definitions(-DHPX_HAVE_CXX11_STD_UNIQUE_PTR)
     add_definitions(-DBOOST_LOCKFREE_HAVE_CXX11_UNIQUE_PTR)
+
+    if(NOT HPX_UTIL_BIND)
+      set(HPX_HAVE_CXX11_STD_BIND ON CACHE BOOL "Compiler supports C++11 std::bind.")
+      add_definitions(-DHPX_HAVE_CXX11_STD_BIND)
+    else()
+      set(HPX_HAVE_CXX11_STD_BIND OFF CACHE BOOL "Compiler supports C++11 std::bind." FORCE)
+      hpx_info("C++11" "HPX_UTIL_BIND is enabled: while std::bind is available it will not be used.")
+    endif()
+
+    if(NOT HPX_UTIL_FUNCTION)
+      set(HPX_HAVE_CXX11_STD_FUNCTION ON CACHE BOOL "Compiler supports C++11 std::function.")
+      add_definitions(-DHPX_HAVE_CXX11_STD_FUNCTION)
+    else()
+      set(HPX_HAVE_CXX11_STD_FUNCTION OFF CACHE BOOL "Compiler supports C++11 std::function." FORCE)
+      hpx_info("C++11" "HPX_UTIL_FUNCTION is enabled: while std::function is available it will not be used.")
+    endif()
   endif()
 
   ##############################################################################
@@ -658,11 +674,19 @@ else()
     hpx_check_for_cxx11_std_tuple(HPX_CXX11_STD_TUPLE
       DEFINITIONS HPX_HAVE_CXX11_STD_TUPLE)
 
-    hpx_check_for_cxx11_std_bind(HPX_CXX11_STD_BIND
-      DEFINITIONS HPX_HAVE_CXX11_STD_BIND)
+    if(NOT HPX_UTIL_BIND)
+      hpx_check_for_cxx11_std_bind(HPX_CXX11_STD_BIND
+        DEFINITIONS HPX_HAVE_CXX11_STD_BIND)
+    else()
+      hpx_info("C++11" "HPX_UTIL_BIND is enabled: even if std::bind is available it will not be used.")
+    endif()
 
-    hpx_check_for_cxx11_std_function(HPX_CXX11_STD_FUNCTION
-      DEFINITIONS HPX_HAVE_CXX11_STD_FUNCTION)
+    if(NOT HPX_UTIL_FUNCTION)
+      hpx_check_for_cxx11_std_function(HPX_CXX11_STD_FUNCTION
+        DEFINITIONS HPX_HAVE_CXX11_STD_FUNCTION)
+    else()
+      hpx_info("C++11" "HPX_UTIL_FUNCTION is enabled: even if std::function is available it will not be used.")
+    endif()
   endif()
 
   ##############################################################################
@@ -864,37 +888,45 @@ set(hpx_LIBRARIES hpx hpx_serialization)
 # directory structure.
 add_subdirectory(src)
 
-option(HPX_EXAMPLES "Build HPX examples (default: ON)" ON)
+option(HPX_BUILD_EXAMPLES "Build HPX examples (default: ON)" ON)
 
-if(HPX_EXAMPLES)
+if(HPX_BUILD_EXAMPLES)
   add_hpx_pseudo_target(examples)
-
   include_directories(examples)
   add_subdirectory(examples)
 endif()
 
-option(HPX_TESTS "Build HPX tests (default: ON)" ON)
+option(HPX_BUILD_TESTS "Build HPX tests (default: ON)" ON)
 
-if(HPX_TESTS)
+if(HPX_BUILD_TESTS)
+  set(HPX_BUILD_TESTS_ABI ON CACHE BOOL "Build HPX ABI tests (default: ON)")
+  set(HPX_BUILD_TESTS_BENCHMARKS ON CACHE BOOL "Build HPX benchmark tests (default: ON)")
+  set(HPX_BUILD_TESTS_CORRECTNESS ON CACHE BOOL "Build HPX correctness tests (default: ON)")
+  set(HPX_BUILD_TESTS_REGRESSIONS ON CACHE BOOL "Build HPX regression tests (default: ON)")
+  set(HPX_BUILD_TESTS_UNIT ON CACHE BOOL "Build HPX unit tests (default: ON)")
+
   add_hpx_pseudo_target(tests)
-
   include_directories(tests)
   add_subdirectory(tests)
+else()
+  unset(HPX_BUILD_TESTS_ABI CACHE)
+  unset(HPX_BUILD_TESTS_BENCHMARKS CACHE)
+  unset(HPX_BUILD_TESTS_CORRECTNESS CACHE)
+  unset(HPX_BUILD_TESTS_REGRESSIONS CACHE)
+  unset(HPX_BUILD_TESTS_UNIT CACHE)
 endif()
 
-option(HPX_RUNTIME "Build HPX runtime (default: ON)" ON)
+option(HPX_BUILD_RUNTIME "Build HPX runtime (default: ON)" ON)
 
-if(HPX_RUNTIME)
+if(HPX_BUILD_RUNTIME)
   add_hpx_pseudo_target(runtime)
-
   add_subdirectory(runtime)
 endif()
 
-option(HPX_TOOLS "Build HPX tools (default: OFF)" OFF)
+option(HPX_BUILD_TOOLS "Build HPX tools (default: OFF)" OFF)
 
-if(HPX_TOOLS)
+if(HPX_BUILD_TOOLS)
   add_hpx_pseudo_target(tools)
-
   add_subdirectory(tools)
 endif()
 

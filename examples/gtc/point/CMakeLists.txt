@@ -6,6 +6,6 @@
 add_hpx_component(point
 #    DEPENDENCIES particle_component iostreams_component
     DEPENDENCIES iostreams_component
-    FOLDER "Examples/GTC"
+    FOLDER "Examples/Applications/GTC"
     AUTOGLOB)
 

@@ -23,5 +23,5 @@ add_hpx_library(adaptive1d_application
   MODULE adaptive1d
   SOURCES ${sources}
   DEPENDENCIES ${dependencies}
-  FOLDER "Examples/Adaptive1d")
+  FOLDER "Examples/Applications/Adaptive1d")
 

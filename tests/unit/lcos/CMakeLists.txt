@@ -6,12 +6,10 @@
 
 set(tests
     dataflow_test
-    trivial_future
-   )
+    trivial_future)
 
 set(dataflow_test_FLAGS
-  DEPENDENCIES iostreams_component dataflow_component
-  )
+  DEPENDENCIES iostreams_component dataflow_component)
 
 foreach(test ${tests})
   set(sources
@@ -39,5 +37,5 @@ endforeach()
 
 set_target_properties(dataflow_test_exe
     PROPERTIES COMPILE_FLAGS
-        "-DHPX_ACTION_ARGUMENT_LIMIT=10 -DHPX_COMPONENT_CREATE_ARG_MAX=10"
-)
+        "-DHPX_ACTION_ARGUMENT_LIMIT=10 -DHPX_COMPONENT_CREATE_ARG_MAX=10")
+

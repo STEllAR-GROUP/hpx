@@ -5,21 +5,21 @@
 
 set(tests
     managed_component_lifetime
+    remote_object_test
 )
 
-add_hpx_component(
-    managed_test
-    MODULE tests_correctness_component
-    SOURCES managed_test_component.cpp
-    HEADERS managed_test_component.hpp
+add_hpx_component(managed_test
+    SOURCE_GLOB managed_test_component.c*
+    HEADER_GLOB managed_test_component.h*
     DEPENDENCIES iostreams_component
     FOLDER "Tests/Correctness/Components"
-)
-
+    AUTOGLOB)
 
 set(managed_component_lifetime_FLAGS
-    DEPENDENCIES iostreams_component managed_test_component
-)
+    DEPENDENCIES iostreams_component managed_test_component)
+
+set(remote_object_test_FLAGS
+    DEPENDENCIES iostreams_component remote_object_component)
 
 foreach(test ${tests})
   set(sources

@@ -9,7 +9,7 @@ set(root "${hpx_SOURCE_DIR}/hpx/components/iostreams")
 add_definitions(-DHPX_IOSTREAMS_MODULE_EXPORTS)
 
 add_hpx_component(iostreams
-  FOLDER "Core"
+  FOLDER "Core/Components"
   HEADER_ROOT ${root}
   AUTOGLOB)
 

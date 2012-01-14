@@ -45,7 +45,7 @@ add_hpx_executable(adaptive1d
   MODULE adaptive1d_module
   SOURCES ${sources}
   DEPENDENCIES ${dependencies}
-  FOLDER "Examples/Adaptive1d")
+  FOLDER "Examples/Applications/Adaptive1d")
 
 # add a dependency to the pseudo-target
 add_hpx_pseudo_dependencies(examples.adaptive1d adaptive1d_exe)

@@ -8,7 +8,7 @@
 set(root "${hpx_SOURCE_DIR}/hpx/components/remote_object")
 
 add_hpx_component(remote_object
-  FOLDER "Core"
+  FOLDER "Core/Components"
   HEADER_ROOT ${root}
   AUTOGLOB)
 

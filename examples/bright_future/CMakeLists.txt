@@ -14,7 +14,6 @@ set(bright_future_programs
         gs_hpx_blocked
         gs_hpx_grid_ro
         remote_functions
-        remote_object
         gs_hpx_blocked_df
    )
 
@@ -43,17 +42,16 @@ set(gs_hpx_grid_ro_sources gs.cpp)
 set(gs_hpx_distributed_sources gs.cpp)
 
 set(remote_functions_FLAGS DEPENDENCIES iostreams_component)
-set(remote_object_FLAGS DEPENDENCIES remote_object_component iostreams_component)
 set(vector_root_finder_FLAGS DEPENDENCIES iostreams_component)
 set(gs_single_FLAGS DEPENDENCIES iostreams_component)
 #set(gs_hpx_FLAGS DEPENDENCIES gs_hpx_component iostreams_component)
 set(gs_hpx_blocked_FLAGS DEPENDENCIES gs_hpx_component iostreams_component)
-set(gs_hpx_blocked_df_FLAGS 
+set(gs_hpx_blocked_df_FLAGS
   DEPENDENCIES gs_hpx_component dataflow_component iostreams_component
 #  ${GOOGLE_PERFTOOLS_LIBRARY}
         )
 if(HPX_CXX11_LAMBDAS)
-  set(gs_hpx_distributed_FLAGS 
+  set(gs_hpx_distributed_FLAGS
     DEPENDENCIES gs_hpx_component dataflow_component iostreams_component
 #    ${GOOGLE_PERFTOOLS_LIBRARY}
     )

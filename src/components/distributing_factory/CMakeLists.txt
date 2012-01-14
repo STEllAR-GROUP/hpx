@@ -8,7 +8,7 @@
 set(root "${hpx_SOURCE_DIR}/hpx/components/distributing_factory")
 
 add_hpx_component(distributing_factory
-  FOLDER "Core"
+  FOLDER "Core/Components"
   HEADER_ROOT ${root}
   AUTOGLOB)
 

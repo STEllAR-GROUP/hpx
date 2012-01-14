@@ -15,5 +15,5 @@ source_group("Source Files" FILES ${sources})
 add_hpx_library(dataflow_c_test
   MODULE dataflow_c_test
   SOURCES ${sources}
-  FOLDER "Examples/AMR")
+  FOLDER "Examples/Applications/AMR")
 

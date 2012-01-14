@@ -16,12 +16,12 @@ set(hplpx_DEPENDENCIES
 add_hpx_executable(hplpx
   SOURCES hplpx.cpp
   DEPENDENCIES ${hplpx_DEPENDENCIES}
-  FOLDER "Examples/HplPx")
+  FOLDER "Examples/Applications/HplPx")
 
 add_hpx_executable(smphplpx
   SOURCES smphplpx.cpp
   DEPENDENCIES smphplmatrex_component
-  FOLDER "Examples/HplPx")
+  FOLDER "Examples/Applications/HplPx")
 
 add_hpx_pseudo_dependencies(examples.hplpx hplpx_exe)
 add_hpx_pseudo_dependencies(examples.hplpx smphplpx_exe)

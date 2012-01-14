@@ -5,43 +5,16 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(client_sources nqueen.cpp)
-
-set(client_headers nqueen.hpp)
-
-set(stubs_headers stubs/nqueen.hpp)
-
-set(server_headers server/nqueen.hpp)
-
-set(sources nqueen_client.cpp)
-
-set(headers
-   ${client_headers}
-   ${stubs_headers}
-   ${server_headers})
-
-source_group("Source Files\\Client" FILES ${client_sources})
-source_group("Header Files\\Client" FILES ${client_headers})
-source_group("Header Files\\Client" FILES ${stubs_sources})
-source_group("Header Files\\Client" FILES ${server_sources})
-source_group("Source Files\\Client" FILES ${sources})
-
-
 add_hpx_component(nqueen
-  SOURCES ${client_sources}
-  HEADERS ${headers}
-  FOLDER "Examples/NQueen")
-
-#if(MSVC)
-#  set_property(TARGET nqueen_component APPEND
-#    PROPERTY COMPILE_FLAGS
-#    "-bigobj")
-#endif()
+  SOURCE_GLOB "nqueen.cp*"
+  HEADER_GLOB "nqueen.hp*"
+  FOLDER "Examples/Applications/NQueen"
+  AUTOGLOB)
 
 add_hpx_executable(nqueen_client
-  SOURCES ${sources}
+  SOURCES nqueen_client.cpp
   DEPENDENCIES nqueen_component
-  FOLDER "Examples/NQueen")
+  FOLDER "Examples/Applications/NQueen")
 
 # add dependencies to pseudo-target
 add_hpx_pseudo_dependencies(examples.nqueen nqueen_client_exe)
