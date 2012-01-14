@@ -73,7 +73,7 @@ namespace hpx { namespace util { namespace detail
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
 
         boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
-        boost::format full_empty_counter("/lcos/full_empty(locality#%d/total)/%s");
+        boost::format full_empty_counter("/lcos(locality#%d/total)/full_empty/%s");
 
         performance_counters::raw_counter_data const counters[] =
         {

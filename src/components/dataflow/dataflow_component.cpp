@@ -99,7 +99,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
 
         boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
-        boost::format dataflow_counter("/lcos/dataflow(locality#%d/total)/%s");
+        boost::format dataflow_counter("/lcos(locality#%d/total)/dataflow/%s");
 
         performance_counters::raw_counter_data const counters[] =
         {
