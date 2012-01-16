@@ -670,6 +670,12 @@ namespace gtc { namespace server
       ismooth = 1;
       if ( par->nonlinear < 0.5 ) ismooth = 0;
       
+      // ------------------- Added in flight -----------------
+      std::vector<double> phism;
+      std::valarray<double> pright;
+      phism.resize(mgrid_+1);
+      pright.resize(mthetamax_+1);
+      // ------------------- End Added in flight -----------------
       for (std::size_t ip=1;ip<=ismooth;ip++) {
         // radial smoothing
         for (std::size_t i=1;i<=par->mpsi-1;i++) {
@@ -677,6 +683,51 @@ namespace gtc { namespace server
             phitmp(j,igrid_[i],0) = phitmp(j,igrid_[i]+mtheta_[i],0);
           } 
         }
+        // ------------------- Added in flight -----------------
+        for (std::size_t k=1;k<=mzeta_;k++) {
+          std::fill( phism.begin(),phism.end(),0.0);
+          for (std::size_t i=1;i<=par->mpsi-1;i++) {
+            for (std::size_t j=1;i<=mtheta_[i];j++) {
+              std::size_t ij = igrid_[i] + j;
+              phism[ij] = 0.25*((1.0-wtp1_(1,ij,k))*phitmp(k,jtp1_(1,ij,k),0)+
+                   wtp1_(1,ij,k)*phitmp(k,jtp1(1,ij,k)+1,0)+
+                   (1.0-wtp1_(2,ij,k))*phitmp(k,jtp1_(2,ij,k),0)+
+                   wtp1_(2,ij,k)*phitmp(k,jtp1(2,ij,k)+1,0))-
+                   0.0625*((1.0-wtp2_(1,ij,k))*phitmp(k,jtp2_(1,ij,k),0)+
+                   wtp2_(1,ij,k)*phitmp(k,jtp2_(1,ij,k)+1,0)+
+                   (1.0-wtp2_(2,ij,k))*phitmp(k,jtp2_(2,ij,k),0)+
+                   wtp2_(2,ij,k)*phitmp(k,jtp2_(2,ij,k)+1,0));
+            }
+          }
+          for (std::size_t i=0;i<phism.size();i++) {
+            phitmp(k,i,0) = 0.625*phitmp(k,i,0) + phism[i];
+          }
+        }
+
+        // poloidal smoothing (-0.0625 0.25 0.625 0.25 -0.0625)
+        for (std::size_t i=1;i<=par->mpsi-1;i++) {
+          std::size_t ii = igrid_[i];
+          std::size_t jt = mtheta_[i];
+          for (std::size_t k=1;k<=mzeta_;k++) {
+            for (std::size_t kk=1;kk<=jt;kk++) {
+              pright[kk] = phitmp(k,ii+kk,0);
+            }
+            std::valarray<double> m_pright = pright.cshift(-1);
+            std::valarray<double> p_pright = pright.cshift(1);
+            std::valarray<double> m2_pright = pright.cshift(-2);
+            std::valarray<double> p2_pright = pright.cshift(2);
+            for (std::size_t kk=1;kk<=jt;kk++) {
+              phitmp(k,ii+kk,0) = 0.625*pright[kk] +
+                 0.25*(m_pright[kk]+p_pright[kk])-
+                 0.0625*(m2_pright[kk]+p2_pright[kk]);
+            }
+          }
+        }
+ 
+        // parallel smoothing
+ 
+
+        // ------------------- End Added in flight -----------------
 
        
       }
