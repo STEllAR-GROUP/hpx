@@ -670,12 +670,11 @@ namespace gtc { namespace server
       ismooth = 1;
       if ( par->nonlinear < 0.5 ) ismooth = 0;
       
-      // ------------------- Added in flight -----------------
       std::vector<double> phism;
       std::valarray<double> pright;
       phism.resize(mgrid_+1);
-      pright.resize(mthetamax_+1);
-      // ------------------- End Added in flight -----------------
+      pright.resize(par->mthetamax+1);
+
       for (std::size_t ip=1;ip<=ismooth;ip++) {
         // radial smoothing
         for (std::size_t i=1;i<=par->mpsi-1;i++) {
@@ -683,22 +682,24 @@ namespace gtc { namespace server
             phitmp(j,igrid_[i],0) = phitmp(j,igrid_[i]+mtheta_[i],0);
           } 
         }
-        // ------------------- Added in flight -----------------
+
         for (std::size_t k=1;k<=mzeta_;k++) {
           std::fill( phism.begin(),phism.end(),0.0);
           for (std::size_t i=1;i<=par->mpsi-1;i++) {
-            for (std::size_t j=1;i<=mtheta_[i];j++) {
+            for (std::size_t j=1;j<=mtheta_[i];j++) {
               std::size_t ij = igrid_[i] + j;
+
               phism[ij] = 0.25*((1.0-wtp1_(1,ij,k))*phitmp(k,jtp1_(1,ij,k),0)+
-                   wtp1_(1,ij,k)*phitmp(k,jtp1(1,ij,k)+1,0)+
+                   wtp1_(1,ij,k)*phitmp(k,jtp1_(1,ij,k)+1,0)+
                    (1.0-wtp1_(2,ij,k))*phitmp(k,jtp1_(2,ij,k),0)+
-                   wtp1_(2,ij,k)*phitmp(k,jtp1(2,ij,k)+1,0))-
+                   wtp1_(2,ij,k)*phitmp(k,jtp1_(2,ij,k)+1,0))-
                    0.0625*((1.0-wtp2_(1,ij,k))*phitmp(k,jtp2_(1,ij,k),0)+
                    wtp2_(1,ij,k)*phitmp(k,jtp2_(1,ij,k)+1,0)+
                    (1.0-wtp2_(2,ij,k))*phitmp(k,jtp2_(2,ij,k),0)+
                    wtp2_(2,ij,k)*phitmp(k,jtp2_(2,ij,k)+1,0));
             }
           }
+
           for (std::size_t i=0;i<phism.size();i++) {
             phitmp(k,i,0) = 0.625*phitmp(k,i,0) + phism[i];
           }
@@ -725,11 +726,6 @@ namespace gtc { namespace server
         }
  
         // parallel smoothing
- 
-
-        // ------------------- End Added in flight -----------------
-
-       
       }
 
     }
