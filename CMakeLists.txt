@@ -156,12 +156,13 @@ add_definitions(-DBOOST_LOG_NO_TS)
 add_definitions(-DBOOST_BIGINT_HAS_NATIVE_INT64)
 add_definitions(-DBOOST_NO_0X_HDR_ATOMIC)        # disable usage of std::atomics in lockfree
 
-
-find_package(HPX_NUMA)
-if(NUMA_FOUND)
-    include_directories(${NUMA_INCLUDE_DIR})
-    link_directories(${NUMA_LIBRARY_DIR})
-    add_definitions(-DHPX_HAVE_NUMA)
+if(NOT MSVC)
+  find_package(HPX_NUMA)
+  if(NUMA_FOUND)
+      include_directories(${NUMA_INCLUDE_DIR})
+      link_directories(${NUMA_LIBRARY_DIR})
+      add_definitions(-DHPX_HAVE_NUMA)
+  endif()
 endif()
 
 ################################################################################
