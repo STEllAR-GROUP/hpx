@@ -656,7 +656,7 @@ void gs(
         if(debug) cout << "\n";
 
         double time_elapsed = t.elapsed();
-        cout << time_elapsed << "\n" << flush;
+        cout << ((((n_x-2)*(n_y-2) * max_iterations)/1e6)/time_elapsed) << " MLUP/S\n" << flush;
         //ProfilerStop();
         //HeapProfilerDump("computation finished");
         //HeapProfilerStop();

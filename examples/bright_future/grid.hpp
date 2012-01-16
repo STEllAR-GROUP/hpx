@@ -15,10 +15,116 @@
 
 namespace bright_future
 {
+
+#ifdef OPENMP_GRID
+
+#include <omp.h>
+    template <typename T>
+    struct numa_allocator;
+
+    template <>
+    struct numa_allocator<void>
+    {
+        typedef void * pointer;
+        typedef const void * const_pointer;
+        typedef void value_type;
+
+        template <typename U> struct rebind { typedef numa_allocator<U> other; };
+    };
+
+    template <typename T>
+    struct numa_allocator
+    {
+        typedef std::size_t size_type;
+        typedef ptrdiff_t difference_type;
+        typedef T* pointer;
+        typedef const T* const_pointer;
+        typedef T& reference;
+        typedef const T& const_reference;
+        typedef T value_type;
+        
+        template <typename U> struct rebind { typedef numa_allocator<U> other; };
+
+        numa_allocator() noexcept {}
+        numa_allocator(numa_allocator const & ) noexcept {}
+        template <typename U>
+        numa_allocator(numa_allocator<U> const & ) noexcept {}
+        ~numa_allocator() {}
+
+        pointer allocate(size_type n, numa_allocator<void>::const_pointer locality_hint = 0)
+        {
+            size_type len = n * sizeof(value_type);
+            char *p = static_cast<char *>(std::malloc(len));
+
+            if(p == 0) throw std::bad_alloc();
+
+            if(!omp_in_parallel())
+            {
+#pragma omp parallel for schedule(static)
+                for(size_type i_block = 0; i_block < len; i_block += 128)
+                {
+                    size_type i_end = std::min(i_block + 128, len);
+                    for(size_type i = i_block; i < i_end; i += sizeof(value_type))
+                    {
+                        for(size_type j = 0; j < sizeof(value_type); ++j)
+                        {
+                            p[i+j] = 0;
+                        }
+                    }
+                }
+            }
+            return reinterpret_cast<pointer>(p);
+        }
+
+        void deallocate(pointer p, size_type)
+        {
+            std::free(p);
+        }
+
+        size_type max_size() const noexcept
+        {
+            return std::allocator<T>().max_size();
+        }
+
+        void construct(pointer p, const value_type& x)
+        {
+            new (p) value_type(x);
+        }
+
+        template <typename U, typename... Args>
+        void construct(U* p, const Args&&... args)
+        {
+            new ((void *)p) U(std::forward<Args>(args)...);
+        }
+
+        template <typename U>
+        void destroy(U * p)
+        {
+            p->~U();
+        }
+    };
+
+    template <typename T1, typename T2>
+    bool operator==(const numa_allocator<T1>&, const numa_allocator<T2>&) noexcept
+    {
+        return true;
+    }
+
+    template <typename T1, typename T2>
+    bool operator!=(const numa_allocator<T1>&, const numa_allocator<T2>&) noexcept
+    {
+        return false;
+    }
+#endif
+
     template <typename T>
     struct grid
     {
+#ifdef OPENMP_GRID
+        typedef std::vector<T, numa_allocator<T> > vector_type;
+#else
         typedef std::vector<T> vector_type;
+#endif
         typedef typename vector_type::size_type size_type;
         typedef typename vector_type::value_type value_type;
         typedef typename vector_type::reference reference_type;
@@ -55,24 +161,24 @@ namespace bright_future
         {
             BOOST_ASSERT(x < n_x);
             BOOST_ASSERT(y < n_y);
-            return data.at(x + y * n_x);
+            return data[x + y * n_x];
         }
 
         const_reference_type operator()(size_type x, size_type y) const
         {
             BOOST_ASSERT(x < n_x);
             BOOST_ASSERT(y < n_y);
-            return data.at(x + y * n_x);
+            return data[x + y * n_x];
         }
 
         reference_type operator[](size_type i)
         {
-            return data.at(i);
+            return data[i];
         }
 
         const_reference_type operator[](size_type i) const
         {
-            return data.at(i);
+            return data[i];
         }
 
         iterator begin()
