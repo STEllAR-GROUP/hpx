@@ -729,7 +729,11 @@ void gs(
         std::cout << "dataflow construction complete\n";
         BOOST_FOREACH(promise_grid_type & block, deps)
         {
-            wait(block.data_handle(), [&](size_t){if(debug) cout << "." << flush; });
+            BOOST_FOREACH(promise & p, block)
+            {
+                p.get();
+            }
+            //wait(block.data_handle(), [&](size_t){if(debug) cout << "." << flush; });
         }
 
         double time_elapsed = t.elapsed();

@@ -13,12 +13,32 @@
 #include <boost/serialization/access.hpp>
 #include <boost/assert.hpp>
 
+#ifdef OPENMP_GRID
+#include <omp.h>
+#else
+#include <hpx/hpx.hpp>
+#include <hpx/lcos/async.hpp>
+#include <hpx/lcos/async_future_wait.hpp>
+#endif
+     
+#ifndef OPENMP_GRID
+std::size_t touch_mem(std::size_t, std::size_t, std::size_t, std::size_t);
+typedef
+    hpx::actions::plain_result_action4<
+        std::size_t
+      , std::size_t
+      , std::size_t
+      , std::size_t
+      , std::size_t
+      , touch_mem
+    >
+    touch_mem_action;
+HPX_REGISTER_PLAIN_ACTION_DECLARATION(touch_mem_action);
+#endif
+
 namespace bright_future
 {
 
-#ifdef OPENMP_GRID
-
-#include <omp.h>
     template <typename T>
     struct numa_allocator;
 
@@ -51,6 +71,7 @@ namespace bright_future
         numa_allocator(numa_allocator<U> const & ) noexcept {}
         ~numa_allocator() {}
 
+
         pointer allocate(size_type n, numa_allocator<void>::const_pointer locality_hint = 0)
         {
             size_type len = n * sizeof(value_type);
@@ -58,6 +79,7 @@ namespace bright_future
 
             if(p == 0) throw std::bad_alloc();
 
+#ifdef OPENMP_GRID
             if(!omp_in_parallel())
             {
 #pragma omp parallel for schedule(static)
@@ -73,6 +95,39 @@ namespace bright_future
                     }
                 }
             }
+#else
+            std::size_t const os_threads = hpx::get_os_thread_count();
+            hpx::naming::id_type const prefix = hpx::find_here();
+            std::set<std::size_t> attendance;
+            for(std::size_t os_thread = 0; os_thread < os_threads; ++os_thread)
+                attendance.insert(os_thread);
+
+            std::size_t len_per_thread = len / os_threads + 1;
+
+            while(!attendance.empty())
+            {
+                std::vector<hpx::lcos::promise<std::size_t> > futures;
+                futures.reserve(attendance.size());
+                BOOST_FOREACH(std::size_t os_thread, attendance)
+                {
+                    futures.push_back(
+                        hpx::lcos::async<touch_mem_action>(
+                            prefix
+                          , os_thread
+                          , reinterpret_cast<std::size_t>(p)
+                          , len_per_thread
+                          , len
+                        )
+                    );
+                }
+
+                hpx::lcos::wait(
+                    futures
+                  , [&](std::size_t, std::size_t t)
+                    {if(std::size_t(-1) != t) attendance.erase(t); }
+                );
+            }
+#endif
             return reinterpret_cast<pointer>(p);
         }
 
@@ -115,16 +170,11 @@ namespace bright_future
     {
         return false;
     }
-#endif
-
+    
     template <typename T>
     struct grid
     {
-#ifdef OPENMP_GRID
         typedef std::vector<T, numa_allocator<T> > vector_type;
-#else
-        typedef std::vector<T> vector_type;
-#endif
         typedef typename vector_type::size_type size_type;
         typedef typename vector_type::value_type value_type;
         typedef typename vector_type::reference reference_type;
@@ -300,7 +350,5 @@ namespace bright_future
             - (u(x, y) * k * k)
             ;
     }
-
 }
-
 #endif
