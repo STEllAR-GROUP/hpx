@@ -356,9 +356,13 @@ namespace hpx { namespace threads
 #if defined(HPX_HAVE_PTHREAD_AFFINITY_NP)
     #include <pthread.h>
 #endif
+#if HPX_HAVE_NUMA
+    #include <numa.h>
+#endif
     #include <sched.h>    // declares the scheduling interface
     #include <sys/syscall.h>
     #include <sys/types.h>
+    #include <iostream>
 
     inline bool set_affinity(boost::thread& thrd, std::size_t num_thread,
         bool numa_sensitive)
@@ -405,7 +409,33 @@ namespace hpx { namespace threads
           assert(0);
         }
 
+#if HPX_HAVE_NUMA
+        int numa_cpus       = numa_num_configured_cpus();
+        int numa_nodes      = numa_num_configured_nodes();
+        int cpus_per_node   = numa_cpus/numa_nodes;
+        struct bitmask * mask = numa_bitmask_alloc(numa_cpus);
+        int node            = affinity / cpus_per_node;
+        int node_id         = affinity % cpus_per_node;
+
+        numa_bitmask_clearall(mask);
+        numa_node_to_cpus(node, mask);
+        unsigned real_affinity = 0;
+        int index = 0;
+        for(real_affinity = 0; real_affinity < mask->size; ++real_affinity)
+        {
+            if(numa_bitmask_isbitset(mask, real_affinity))
+            {
+                if(index == node_id) break;
+                ++index;
+            }
+        }
+        numa_bitmask_free(mask);
+
+        CPU_SET(real_affinity, &cpu);
+#else
         CPU_SET(affinity, &cpu);
+#endif
+
 #if defined(HPX_HAVE_PTHREAD_AFFINITY_NP)
         if (0 == pthread_setaffinity_np(pthread_self(), sizeof(cpu), &cpu))
 #else

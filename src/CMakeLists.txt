@@ -259,7 +259,8 @@ target_link_libraries(hpx
   hpx_serialization
   ${hpx_MALLOC_LIBRARY}
   ${hpx_RUNTIME_LIBRARIES}
-  ${BOOST_FOUND_LIBRARIES})
+  ${BOOST_FOUND_LIBRARIES}
+  ${NUMA_LIBRARY})
 
 hpx_mangle_name(name hpx)
 
