@@ -357,7 +357,7 @@ namespace hpx { namespace components { namespace server
             }
         }
 
-        std::terminate();
+        std::abort();
     }
 
     ///////////////////////////////////////////////////////////////////////////

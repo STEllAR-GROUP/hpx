@@ -226,7 +226,7 @@ namespace hpx { namespace detail
             std::cerr << "Runtime is not available, reporting error locally\n"
                          "[what]: " << str << std::endl;
         }
-        std::terminate();
+        std::abort();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -331,7 +331,7 @@ namespace hpx { namespace detail
         }
         catch (boost::exception const& be) {
             std::cerr << hpx::diagnostic_information(be) << std::endl;
-            std::terminate();
+            std::abort();
         }
     }
 }}

@@ -49,7 +49,7 @@ namespace hpx
                   << "."
 #endif
                   << std::endl;
-        std::terminate();
+        std::abort();
     }
 
     HPX_EXPORT BOOL WINAPI termination_handler(DWORD ctrl_type)
@@ -104,7 +104,7 @@ namespace hpx
                   << "."
 #endif
                   << std::endl;
-        std::terminate();
+        std::abort();
     }
 }
 

@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <iostream>
+#include <boost/detail/lightweight_test.hpp>
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
@@ -20,17 +20,7 @@ using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
 
-using hpx::cout;
-using hpx::flush;
-using hpx::init;
-using hpx::finalize;
-using hpx::find_here;
-using hpx::naming::id_type;
-using hpx::lcos::promise;
-using hpx::lcos::wait;
-using hpx::find_all_localities;
-using hpx::components::new_;
-
+///////////////////////////////////////////////////////////////////////////////
 struct foo
 {
     foo() : i(-1) {}
@@ -41,17 +31,18 @@ struct foo
 
 std::ostream & operator<<(std::ostream & os, foo const & f)
 {
-    os << "foo : " << find_here() << " " << f.i;
+    os << "foo : " << hpx::find_here() << " " << f.i;
     return os;
 }
 
+///////////////////////////////////////////////////////////////////////////////
 struct output
 {
     typedef void result_type;
 
     void operator()(foo const & f) const
     {
-        cout << f << "\n" << flush;
+        hpx::cout << f << "\n" << hpx::flush;
     }
 
     template <typename Archive>
@@ -59,6 +50,7 @@ struct output
     {}
 };
 
+///////////////////////////////////////////////////////////////////////////////
 int cctor_counter = 0;
 
 struct plus
@@ -83,20 +75,22 @@ struct plus
     }
 };
 
+///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map &)
 {
     {
         typedef hpx::components::object<foo> object_type;
-        typedef promise<object_type> object_promise_type;
+        typedef hpx::lcos::promise<object_type> object_promise_type;
         typedef std::vector<object_promise_type> object_promises_type;
         typedef std::vector<object_type> objects_type;
 
-        std::vector<id_type> prefixes = find_all_localities();
+        std::vector<hpx::naming::id_type> prefixes = hpx::find_all_localities();
         object_promises_type object_promises;
 
         int count = 0;
-        BOOST_FOREACH(id_type const & prefix, prefixes)
+        BOOST_FOREACH(hpx::naming::id_type const & prefix, prefixes)
         {
+            using hpx::components::new_;
             object_promises.push_back(new_<foo>(prefix));
             object_promises.push_back(new_<foo>(prefix, count++));
         }
@@ -109,24 +103,22 @@ int hpx_main(variables_map &)
 
         BOOST_FOREACH(object_type & o, objects)
         {
-            wait(o <= output());
+            hpx::lcos::wait(o <= output());
             cctor_counter = 0;
             hpx::util::function<int(foo const &)> f = plus(9);
-            cout << (o <= f).get() << "\n" << flush;
-            cout << cctor_counter << "\n" << flush;
+            hpx::cout << (o <= f).get() << "\n" << hpx::flush;
+            hpx::cout << cctor_counter << "\n" << hpx::flush;
         }
     }
-    finalize();
-    return 0;
+
+    hpx::finalize();
+    return boost::report_errors();
 }
 
 int main(int argc, char **argv)
 {
-    options_description
-        cmdline("usage: " HPX_APPLICATION_STRING " [options]");
-
-    return init(cmdline, argc, argv);
-
+    options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
+    return hpx::init(cmdline, argc, argv);
 }
 
 

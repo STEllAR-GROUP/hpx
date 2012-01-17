@@ -100,7 +100,7 @@ void early_parcel_sink(
         }
         catch (boost::exception const& be) {
             std::cerr << hpx::diagnostic_information(be) << std::endl;
-            std::terminate();
+            std::abort();
         }
     }
 } // }}}
