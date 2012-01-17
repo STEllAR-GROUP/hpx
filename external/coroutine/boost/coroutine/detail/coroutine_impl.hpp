@@ -28,6 +28,7 @@
 
 #ifndef BOOST_COROUTINE_COROUTINE_IMPL_HPP_20060601
 #define BOOST_COROUTINE_COROUTINE_IMPL_HPP_20060601
+
 #if defined(_MSC_VER)
 #pragma warning (push)
 #pragma warning (disable: 4355) //this used in base member initializer
@@ -75,7 +76,7 @@ namespace boost { namespace coroutines { namespace detail
     typedef boost::intrusive_ptr<type> pointer;
 
     template<typename DerivedType>
-        coroutine_impl(DerivedType * this_, thread_id_type id,
+        coroutine_impl(DerivedType *this_, thread_id_type id,
             std::ptrdiff_t stack_size)
       : context_base_(*this_, stack_size),
         m_arg(0),
@@ -429,10 +430,11 @@ private:
       // always hand the stack back to the matching heap
       deallocate(p, (std::size_t(p->get_thread_id())/8) % BOOST_COROUTINE_NUM_HEAPS);
   }
-
-} } }
+}}}
 
 #if defined(_MSC_VER)
 #pragma warning(pop)
 #endif
+
 #endif
+

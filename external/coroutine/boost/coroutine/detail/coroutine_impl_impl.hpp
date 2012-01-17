@@ -10,8 +10,8 @@
 #include <boost/assert.hpp>
 #include <boost/coroutine/detail/coroutine_impl.hpp>
 
-namespace boost { namespace coroutines { namespace detail {
-
+namespace boost { namespace coroutines { namespace detail 
+{
     template<typename CoroutineType, typename ContextImpl,
         template <typename> class Heap>
     void coroutine_impl<CoroutineType, ContextImpl, Heap>::set_self(self_type* self)
@@ -42,7 +42,6 @@ namespace boost { namespace coroutines { namespace detail {
     {
         self_.reset(NULL);
     }
-
-} } }
+}}}
 
 #endif
