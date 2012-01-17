@@ -61,37 +61,38 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     // }}}
 
     // {{{ gva cache
-    // FIXME: Broken.
     struct gva_cache_key
     { // {{{ gva_cache_key implementation
       private:
-        naming::gid_type id;
-        boost::uint64_t count;
+        typedef boost::icl::closed_interval<naming::gid_type, std::less>
+            key_type;
+
+        key_type key_;
 
       public:
         gva_cache_key()
-          : id()
-          , count(0)
+          : key_()
         {}
 
         explicit gva_cache_key(
             naming::gid_type const& id_
           , boost::uint64_t count_ = 1
             )
-          : id(id_)
-          , count(count_)
-        {
-            naming::strip_credit_from_gid(id);
-        }
+          : key_(naming::strip_credit_from_cgid(id_)
+               , naming::strip_credit_from_cgid(id_) +
+                 (count_ ? (count_ - 1) : 1))
+        {}
 
-        naming::gid_type const& get_gid() const
+        naming::gid_type get_gid() const
         {
-            return id;
+            return boost::icl::lower(key_);
         }
 
         boost::uint64_t get_count() const
         {
-            return count;
+            naming::gid_type const size = boost::icl::length(key_);
+            BOOST_ASSERT(size.get_msb() == 0);
+            return size.get_lsb();
         }
 
         friend bool operator<(
@@ -99,28 +100,17 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
           , gva_cache_key const& rhs
             )
         {
-            return (lhs.id + (lhs.count - 1)) < rhs.id;
+            return boost::icl::exclusive_less(lhs.key_, rhs.key_); 
         }
 
-        // FIXME: Broken.
         friend bool operator==(
             gva_cache_key const& lhs
           , gva_cache_key const& rhs
             )
         {
-            // Is lhs in rhs?
-            if (1 == lhs.count && 1 != rhs.count)
-                return (lhs.id >= rhs.id)
-                    && (lhs.id <= (rhs.id + (rhs.count - 1)));
-
-            // Is rhs in lhs?
-            else if (1 != lhs.count && 1 == rhs.count)
-                return (rhs.id >= lhs.id)
-                    && (rhs.id <= (lhs.id + (lhs.count - 1)));
-
-            // Direct hit
-            else
-                return (lhs.id == rhs.id) && (lhs.count == rhs.count);
+            // Does lhs contain rhs or does rhs contain lhs?
+            return boost::icl::contains(lhs.key_, rhs.key_)
+                || boost::icl::contains(rhs.key_, lhs.key_); 
         }
     }; // }}}
 
