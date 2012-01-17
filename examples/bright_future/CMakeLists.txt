@@ -35,9 +35,12 @@ add_hpx_component(
     FOLDER "Examples/BrightFuture"
 )
 
-add_library(grid SHARED grid.cpp)
+add_hpx_library(grid
+  MODULE bright_future
+  SOURCES grid.cpp)
+
 if(NOT MSVC AND NUMA_FOUND)
-  target_link_libraries(grid ${NUMA_LIBRARY})
+  target_link_libraries(grid_lib ${NUMA_LIBRARY})
 endif()
 
 set(gs_single_sources gs.cpp)
@@ -63,7 +66,7 @@ if(HPX_CXX11_LAMBDAS)
   set(dataflow_overhead_FLAGS DEPENDENCIES dataflow_component iostreams_component)
   set(dataflow_overhead2_FLAGS DEPENDENCIES dataflow_component iostreams_component)
 endif()
-set(jacobi_hpx_FLAGS DEPENDENCIES dataflow_component iostreams_component remote_object_component grid)
+set(jacobi_hpx_FLAGS DEPENDENCIES dataflow_component iostreams_component remote_object_component grid_lib)
 #set(jacobi_openmp_FLAGS DEPENDENCIES ${BOOST_FOUND_LIBRARIES})
 set(gs_hpx_grid_ro_FLAGS DEPENDENCIES remote_object_component iostreams_component)
 
