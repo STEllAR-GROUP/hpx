@@ -65,7 +65,7 @@ public:
 
   std::valarray<T> slicer(std::size_t face,std::size_t depth) const 
   {
-    if ( face > 6 ) {
+    if ( face > 7 ) {
       hpx::util::osstream strm;
       strm << "face error, face(" << face << ")";
       HPX_THROW_EXCEPTION(hpx::bad_parameter
@@ -124,6 +124,13 @@ public:
       lengths[0] = jsize_;
       lengths[1] = 1;
       strides[0] = isize_;
+      strides[1] = 1;
+    } else if ( face == 7 ) {
+      // this returns the array(:,depth,0) -- used in gtc
+      start = isize_*depth;
+      lengths[0] = 1;
+      lengths[1] = isize_;
+      strides[0] = isize_*jsize_;
       strides[1] = 1;
     }
 

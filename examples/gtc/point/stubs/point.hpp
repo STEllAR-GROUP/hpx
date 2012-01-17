@@ -121,6 +121,20 @@ namespace gtc { namespace stubs
             smooth_async(gid,iflag,point_components,par).get();
         }
 
+        static hpx::lcos::promise< std::valarray<double> >
+        get_phi_async(hpx::naming::id_type const& gid,std::size_t depth)
+        {
+            typedef server::point::get_phi_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid,depth);
+        }
+
+        static std::valarray<double> get_phi(hpx::naming::id_type const& gid,std::size_t depth)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise
+            return get_phi_async(gid,depth).get();
+        }
+
 
     };
 }}

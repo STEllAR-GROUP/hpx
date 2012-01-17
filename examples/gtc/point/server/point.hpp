@@ -32,7 +32,8 @@ namespace gtc { namespace server
             point_chargei = 2,
             point_get_densityi = 3,
             point_get_zonali = 4,
-            point_smooth = 5
+            point_smooth = 5,
+            point_get_phi = 6
         };
 
         point()
@@ -55,9 +56,15 @@ namespace gtc { namespace server
         bool chargei_zonali_callback(std::size_t i,
                            std::vector<double> const& zonali);
 
+        bool phir_callback(std::size_t i,std::valarray<double> const& phi);
+
+        bool phil_callback(std::size_t i,std::valarray<double> const& phi);
+
         std::valarray<double> get_densityi();
 
         std::vector<double> get_zonali();
+
+        std::valarray<double> get_phi(std::size_t depth);
 
        ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an
@@ -135,6 +142,19 @@ namespace gtc { namespace server
             &point::get_zonali
         > get_zonali_action;
 
+        typedef hpx::actions::result_action1<
+            // Component server type.
+            point,
+            // Return type.
+            std::valarray<double>,
+            // Action code.
+            point_get_phi,
+            // Arguments of this action.
+            std::size_t,
+            // Method bound to this action.
+            &point::get_phi
+        > get_phi_action;
+
     private:
         std::size_t idx_;
         double tauii_;
@@ -165,10 +185,13 @@ namespace gtc { namespace server
         std::vector<double> pfluxpsi_,rdtemi_,rdteme_;
 
         std::valarray<double> recvr_;
+        std::valarray<double> recvl_;
         std::vector<double> adum_;
 
         std::size_t mtdiag_;
         std::size_t mgrid_;
+
+        array<double> phitmp_;
     };
 }}
 
@@ -195,6 +218,10 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
               gtc::server::point::smooth_action,
               gtc_point_smooth_action)
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+              gtc::server::point::get_phi_action,
+              gtc_point_get_phi_action)
 
 #endif
 

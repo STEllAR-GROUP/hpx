@@ -120,7 +120,17 @@ namespace gtc
             this->base_type::smooth(gid_,iflag,point_components,par);
         }
 
+        hpx::lcos::promise< std::valarray<double> > get_phi_async(std::size_t depth)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_phi_async(gid_,depth);
+        }
 
+        std::valarray<double> get_phi(std::size_t depth)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_phi(gid_,depth);
+        }
 
     };
 }

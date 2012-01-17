@@ -151,6 +151,8 @@ namespace gtc { namespace server
         dtemper_.resize(mgrid_,mzeta_,1);
         heatflux_.resize(mgrid_,mzeta_,1);
 
+        phitmp_.resize(mzeta_+1,mgrid_+1,1);
+
         pfluxpsi_.resize(par->mflux);
         rdtemi_.resize(par->mflux);
         rdteme_.resize(par->mflux);
@@ -638,30 +640,28 @@ namespace gtc { namespace server
 
     void point::smooth(std::size_t iflag, std::vector<hpx::naming::id_type> const& point_components, parameter const& par)
     {
-      array<double> phitmp;
-      phitmp.resize(mzeta_+1,mgrid_+1,1);
-      for (std::size_t j=0;j<phitmp.jsize();j++) {
-        for (std::size_t i=0;i<phitmp.isize();i++) {
-          phitmp(i,j,0) = 0.0;
+      for (std::size_t j=0;j<phitmp_.jsize();j++) {
+        for (std::size_t i=0;i<phitmp_.isize();i++) {
+          phitmp_(i,j,0) = 0.0;
         }
       }  
 
       if ( iflag == 0 ) {
         for (std::size_t i=1;i<=mgrid_;i++) {
           for (std::size_t j=1;j<=mzeta_;j++) {
-            phitmp(j,i,0) = densityi_(j,i,0);
+            phitmp_(j,i,0) = densityi_(j,i,0);
           }
         }
       } else if ( iflag == 1 ) {
         for (std::size_t i=1;i<=mgrid_;i++) {
           for (std::size_t j=1;j<=mzeta_;j++) {
-            phitmp(j,i,0) = densityi_(j,i,0);
+            phitmp_(j,i,0) = densityi_(j,i,0);
           }
         }
       } else {
         for (std::size_t i=1;i<=mgrid_;i++) {
           for (std::size_t j=1;j<=mzeta_;j++) {
-            phitmp(j,i,0) = phi_(j,i,0);
+            phitmp_(j,i,0) = phi_(j,i,0);
           }
         }
       }
@@ -671,15 +671,16 @@ namespace gtc { namespace server
       if ( par->nonlinear < 0.5 ) ismooth = 0;
       
       std::vector<double> phism;
-      std::valarray<double> pright;
+      std::valarray<double> pright,pleft;
       phism.resize(mgrid_+1);
       pright.resize(par->mthetamax+1);
+      pleft.resize(par->mthetamax+1);
 
       for (std::size_t ip=1;ip<=ismooth;ip++) {
         // radial smoothing
         for (std::size_t i=1;i<=par->mpsi-1;i++) {
-          for (std::size_t j=0;j<phitmp.isize();j++) {
-            phitmp(j,igrid_[i],0) = phitmp(j,igrid_[i]+mtheta_[i],0);
+          for (std::size_t j=0;j<phitmp_.isize();j++) {
+            phitmp_(j,igrid_[i],0) = phitmp_(j,igrid_[i]+mtheta_[i],0);
           } 
         }
 
@@ -689,19 +690,19 @@ namespace gtc { namespace server
             for (std::size_t j=1;j<=mtheta_[i];j++) {
               std::size_t ij = igrid_[i] + j;
 
-              phism[ij] = 0.25*((1.0-wtp1_(1,ij,k))*phitmp(k,jtp1_(1,ij,k),0)+
-                   wtp1_(1,ij,k)*phitmp(k,jtp1_(1,ij,k)+1,0)+
-                   (1.0-wtp1_(2,ij,k))*phitmp(k,jtp1_(2,ij,k),0)+
-                   wtp1_(2,ij,k)*phitmp(k,jtp1_(2,ij,k)+1,0))-
-                   0.0625*((1.0-wtp2_(1,ij,k))*phitmp(k,jtp2_(1,ij,k),0)+
-                   wtp2_(1,ij,k)*phitmp(k,jtp2_(1,ij,k)+1,0)+
-                   (1.0-wtp2_(2,ij,k))*phitmp(k,jtp2_(2,ij,k),0)+
-                   wtp2_(2,ij,k)*phitmp(k,jtp2_(2,ij,k)+1,0));
+              phism[ij] = 0.25*((1.0-wtp1_(1,ij,k))*phitmp_(k,jtp1_(1,ij,k),0)+
+                   wtp1_(1,ij,k)*phitmp_(k,jtp1_(1,ij,k)+1,0)+
+                   (1.0-wtp1_(2,ij,k))*phitmp_(k,jtp1_(2,ij,k),0)+
+                   wtp1_(2,ij,k)*phitmp_(k,jtp1_(2,ij,k)+1,0))-
+                   0.0625*((1.0-wtp2_(1,ij,k))*phitmp_(k,jtp2_(1,ij,k),0)+
+                   wtp2_(1,ij,k)*phitmp_(k,jtp2_(1,ij,k)+1,0)+
+                   (1.0-wtp2_(2,ij,k))*phitmp_(k,jtp2_(2,ij,k),0)+
+                   wtp2_(2,ij,k)*phitmp_(k,jtp2_(2,ij,k)+1,0));
             }
           }
 
           for (std::size_t i=0;i<phism.size();i++) {
-            phitmp(k,i,0) = 0.625*phitmp(k,i,0) + phism[i];
+            phitmp_(k,i,0) = 0.625*phitmp_(k,i,0) + phism[i];
           }
         }
 
@@ -711,14 +712,14 @@ namespace gtc { namespace server
           std::size_t jt = mtheta_[i];
           for (std::size_t k=1;k<=mzeta_;k++) {
             for (std::size_t kk=1;kk<=jt;kk++) {
-              pright[kk] = phitmp(k,ii+kk,0);
+              pright[kk] = phitmp_(k,ii+kk,0);
             }
             std::valarray<double> m_pright = pright.cshift(-1);
             std::valarray<double> p_pright = pright.cshift(1);
             std::valarray<double> m2_pright = pright.cshift(-2);
             std::valarray<double> p2_pright = pright.cshift(2);
             for (std::size_t kk=1;kk<=jt;kk++) {
-              phitmp(k,ii+kk,0) = 0.625*pright[kk] +
+              phitmp_(k,ii+kk,0) = 0.625*pright[kk] +
                  0.25*(m_pright[kk]+p_pright[kk])-
                  0.0625*(m2_pright[kk]+p2_pright[kk]);
             }
@@ -726,9 +727,97 @@ namespace gtc { namespace server
         }
  
         // parallel smoothing
+        // get phi from the left
+        {
+          typedef std::vector<hpx::lcos::promise< std::valarray<double> > > lazy_results_type;
+          lazy_results_type lazy_results;
+          lazy_results.push_back( stubs::point::get_phi_async( point_components[left_pe_],mzeta_ ) );
+          hpx::lcos::wait(lazy_results,
+                boost::bind(&point::phil_callback, this, _1, _2));
+        }
+
+        // get phi from the right
+        {
+          typedef std::vector<hpx::lcos::promise< std::valarray<double> > > lazy_results_type;
+          lazy_results_type lazy_results;
+          std::size_t one = 1; 
+          lazy_results.push_back( stubs::point::get_phi_async( point_components[right_pe_],one ) );
+          hpx::lcos::wait(lazy_results,
+                boost::bind(&point::phir_callback, this, _1, _2));
+        }
+
+        for (std::size_t i=1;i<=par->mpsi-1;i++) {
+          std::size_t ii = igrid_[i]; 
+          std::size_t jt = mtheta_[i]; 
+          if (myrank_toroidal_ == 0 ) { // down-shift for zeta=0
+            std::valarray<double> trecvl;
+            trecvl.resize(jt);
+            for (std::size_t jj=ii+1;jj<=ii+jt;jj++) {
+              trecvl[jj-(ii+1)] = recvl_[jj];
+            }
+            trecvl.cshift(-itran_[i]);
+            for (std::size_t jj=1;jj<=jt;jj++) {
+              pleft[jj] = trecvl[jj-1];  
+              pright[jj] = recvr_[ii+jj];
+            }
+          } else if (myrank_toroidal_ == par->ntoroidal-1 ) { // up-shift for zeta=2*pi
+            std::valarray<double> trecvr;
+            trecvr.resize(jt);
+            for (std::size_t jj=ii+1;jj<=ii+jt;jj++) {
+              trecvr[jj-(ii+1)] = recvr_[jj];
+            }
+            trecvr.cshift(itran_[i]);
+            for (std::size_t jj=1;jj<=jt;jj++) {
+              pright[jj] = trecvr[jj-1]; // pesky fortran/C++ index difference
+              pleft[jj] = recvl_[ii+jj];  
+            }
+          } else {
+            for (std::size_t jj=1;jj<=jt;jj++) {
+              pleft[jj] = recvl_[ii+jj];
+              pright[jj] = recvr_[ii+jj];
+            }
+          }
+
+          for (std::size_t j=1;j<=mtheta_[i];j++) {
+            std::size_t ij = igrid_[i] + j;
+            std::valarray<double> ptemp = phitmp_.slicer(7,ij); 
+            if ( mzeta_ == 1 ) {
+              phitmp_(1,ij,0) = 0.5*ptemp[1] + 0.25*(pleft[j] + pright[j]);
+            } else if ( mzeta_ == 2 ) {
+              phitmp_(1,ij,0) = 0.5*ptemp[1] + 0.25*(pleft[j] + pright[j]);
+              phitmp_(2,ij,0) = 0.5*ptemp[2] + 0.25*(ptemp[1] + pright[j]);
+            } else {
+              phitmp_(1,ij,0) = 0.5*ptemp[1] + 0.25*(pleft[j] + pright[j]);
+              phitmp_(mzeta_,ij,0) = 0.5*ptemp[mzeta_] + 0.25*(ptemp[mzeta_-1]+pright[j]);
+              for (std::size_t k=2;k<=mzeta_-1;k++) {
+                phitmp_(k,ij,0) = 0.5*ptemp[k] + 0.25*(ptemp[k-1]+ptemp[k+1]);
+              }
+            }
+          }
+        }
       }
 
     }
+
+    std::valarray<double> point::get_phi(std::size_t depth)
+    {
+      return phitmp_.slicer(6,depth);
+    }
+
+    bool point::phir_callback(std::size_t i,std::valarray<double> const& phi)
+    {
+      recvr_.resize(phi.size());
+      recvr_ = phi;
+      return true;
+    }
+
+    bool point::phil_callback(std::size_t i,std::valarray<double> const& phi)
+    {
+      recvl_.resize(phi.size());
+      recvl_ = phi;
+      return true;
+    }
+    
 
 }}
 
