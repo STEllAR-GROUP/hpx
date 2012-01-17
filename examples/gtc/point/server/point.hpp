@@ -182,6 +182,8 @@ namespace gtc { namespace server
         array<double> zion_,zion0_,jtion0_,jtion1_,wpion_,wtion0_,wtion1_;
         std::vector<double> kzion_,wzion_;
 
+        array<double> densitye_;
+
         std::vector<double> pfluxpsi_,rdtemi_,rdteme_;
 
         std::valarray<double> recvr_;

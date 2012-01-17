@@ -142,6 +142,7 @@ namespace gtc { namespace server
         tgyro_.resize(5,mgrid_+1,1);
         markeri_.resize(mzeta_+1,mgrid_+1,1);
         densityi_.resize(mzeta_+1,mgrid_+1,1);
+        densitye_.resize(mzeta_+1,mgrid_+1,1);
         phi_.resize(mzeta_+1,mgrid_+1,1);
         evector_.resize(3,mzeta_+1,mgrid_);
         jtp1_.resize(3,mgrid_,mzeta_+1);
@@ -794,6 +795,136 @@ namespace gtc { namespace server
               }
             }
           }
+        }
+      }
+
+      // toroidal BC: send phi to right and receive from left
+      {
+        typedef std::vector<hpx::lcos::promise< std::valarray<double> > > lazy_results_type;
+        lazy_results_type lazy_results;
+        lazy_results.push_back( stubs::point::get_phi_async( point_components[left_pe_],mzeta_ ) );
+        hpx::lcos::wait(lazy_results,
+              boost::bind(&point::phil_callback, this, _1, _2));
+      }
+
+      if ( myrank_toroidal_ == 0 ) {
+        for (std::size_t i=1;i<=par->mpsi-1;i++) {
+          std::size_t ii = igrid_[i];
+          std::size_t jt = mtheta_[i];
+          std::valarray<double> trecvl;
+          trecvl.resize(jt);
+          for (std::size_t jj=ii+1;jj<=ii+jt;jj++) {
+            trecvl[jj-(ii+1)] = recvl_[jj];
+          }
+          trecvl.cshift(-itran_[i]);
+          for (std::size_t jj=ii+1;jj<=ii+jt;jj++) {
+            phitmp_(0,jj,0) = trecvl[jj-(ii+1)];
+          }
+        }
+      } else {
+        for (std::size_t j=0;j<recvl_.size();j++) {
+          phitmp_(0,j,0) = recvl_[j];
+        }
+      }
+
+      // poloidal BC
+      for (std::size_t i=1;i<=par->mpsi-1;i++) {
+        for (std::size_t j=0;j<phitmp_.isize();j++) {
+          phitmp_(j,igrid_[i],0) = phitmp_(j,igrid_[i] + mtheta_[i],0);
+        } 
+      }
+
+      // radial boundary
+      for (std::size_t i=igrid_[0];i<=igrid_[0]+mtheta_[0];i++) {
+        for (std::size_t j=0;j<phitmp_.isize();j++) {
+          phitmp_(j,i,0) = 0.0;
+        }
+      } 
+      for (std::size_t i=igrid_[par->mpsi];i<=igrid_[par->mpsi]+mtheta_[par->mpsi];i++) {
+        for (std::size_t j=0;j<phitmp_.isize();j++) {
+          phitmp_(j,i,0) = 0.0;
+        }
+      } 
+
+      if ( iflag == 0 ) {
+        for (std::size_t i=1;i<=mgrid_;i++) {
+          for (std::size_t j=0;j<phitmp_.isize();j++) {
+            densityi_(j,i,0)  = phitmp_(j,i,0);
+          } 
+        }
+      } else if ( iflag == 1 ) {
+        for (std::size_t i=1;i<=mgrid_;i++) {
+          for (std::size_t j=0;j<phitmp_.isize();j++) {
+            densitye_(j,i,0)  = phitmp_(j,i,0);
+          } 
+        }
+      } else {
+        for (std::size_t i=1;i<=mgrid_;i++) {
+          for (std::size_t j=0;j<phitmp_.isize();j++) {
+            phi_(j,i,0)  = phitmp_(j,i,0);
+          } 
+        }
+      }
+
+      // solve zonal flow: phi00=r*E_r, E_r(a0)=0. Trapezoid rule
+      std::vector<double> den00;
+      den00.resize(par->mpsi+1);
+      if ( iflag == 3 ) {
+        if ( par->nhybrid == 0 ) {
+          for(std::size_t i=0;i<phip00_.size();i++) {
+            phip00_[i] = par->qion*zonali_[i];
+          }
+        } 
+        if ( par->nhybrid > 0 ) {
+          for(std::size_t i=0;i<phip00_.size();i++) {
+            phip00_[i] = par->qion*zonali_[i] + par->qelectron*zonale_[i] ;
+          }
+        }
+
+        for(std::size_t ismooth=1;ismooth<=1;ismooth++) {
+          den00[0] = phip00_[0]; 
+          den00[par->mpsi] = phip00_[par->mpsi];
+          den00[1] = phip00_[3];
+          den00[par->mpsi-1] = phip00_[par->mpsi-3];
+          for(std::size_t j=2;j<=par->mpsi-2;j++) {
+            den00[j] = phip00_[j-2] + phip00_[j+2];
+          }
+          for(std::size_t j=1;j<=par->mpsi-1;j++) {
+            den00[j] = 0.625*phip00_[j] + 0.25*(phip00_[j-1] + phip00_[j+1])
+                          -0.0625*den00[j];
+          }
+          phip00_ = den00;
+        }
+
+        den00 = phip00_;
+        std::fill( phip00_.begin(),phip00_.end(),0.0);
+        for (std::size_t i=1;i<=par->mpsi;i++) {
+          double r = par->a0 + deltar_*i;
+          phip00_[i] = phip00_[i-1] + 0.5*deltar_*( (r-deltar_)*den00[i-1]+r*den00[i] );
+        }
+
+        // d phi/dr, in equilibrium unit
+        for (std::size_t i=0;i<=par->mpsi;i++) {
+          double r = par->a0 + deltar_*i;
+          phip00_[i] = -phip00_[i]/r;
+        }
+
+        // add FLR contribution using Pade approximation: b*<phi>=(1+b)*<n>
+        phi00_ = den00;
+        for (std::size_t i=0;i<phi00_.size();i++) {
+          phi00_[i] *= par->gyroradius*par->gyroradius;
+        }
+        for (std::size_t i=1;i<=par->mpsi-1;i++) {
+          phi00_[i] = phi00_[i] + 0.5*(phip00_[i+1]+phip00_[i-1])/deltar_;
+        }
+
+        // (0,0) mode potential store in phi00
+        std::fill( phip00_.begin(),phip00_.end(),0.0);
+        for (std::size_t i=1;i<=par->mpsi;i++) {
+          phi00_[i] = phi00_[i-1] + 0.5*deltar_*(phip00_[i-1]+phip00_[i]);
+        }
+        if ( par->mode00 == 0 ) {
+          std::fill( phip00_.begin(),phip00_.end(),0.0);
         }
       }
 
