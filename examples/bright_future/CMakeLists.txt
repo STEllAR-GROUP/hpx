@@ -36,7 +36,9 @@ add_hpx_component(
 )
 
 add_library(grid SHARED grid.cpp)
-target_link_libraries(grid ${NUMA_LIBRARY})
+if(NOT MSVC AND NUMA_FOUND)
+  target_link_libraries(grid ${NUMA_LIBRARY})
+endif()
 
 set(gs_single_sources gs.cpp)
 set(jacobi_openmp_sources gs.cpp)
