@@ -14,6 +14,10 @@
 #include "../../parameter.hpp"
 #include "../../array1d.hpp"
 
+#include <complex>
+
+typedef std::complex<double> dcmplx;
+
 using hpx::components::gtc::parameter;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -213,6 +217,7 @@ namespace gtc { namespace server
         array<double> phitmp_;
         std::vector<double> eachzeta_;
         std::vector<double> allzeta_;
+        std::vector<dcmplx> y_eigen_;
     };
 }}
 

@@ -23,9 +23,6 @@
 #include <string>
 #include <sstream>
 #include <fstream>
-#include <complex>
-
-typedef std::complex<double> dcmplx;
 
 double unifRand() {
   return rand()/double(RAND_MAX);
@@ -934,18 +931,19 @@ namespace gtc { namespace server
       // Interpolate on a flux surface from fieldline coordinates to magnetic
       // coordinates. Use mtdiag for both poloidal and toroidal grid points.
       std::size_t zero = 0;
-      std::vector<double> xv,filter;
+      std::vector<double> xz,filter;
       std::vector<dcmplx> yz;
-      xv.resize(mtdiag_);
+      xz.resize(mtdiag_);
       yz.resize(mtdiag_/2+1 + 1);
       eachzeta_.resize((par->idiag2-par->idiag1+1)*mtdiag_*mtdiag_/par->ntoroidal/par->ntoroidal + 1 );
       array<double> phiflux;
       phiflux.resize(mtdiag_/par->ntoroidal+1,mtdiag_+1,par->idiag2-par->idiag1);
       filter.resize(mtdiag_/2+1 + 1);
       allzeta_.resize((par->idiag2-par->idiag1+1)*mtdiag_*mtdiag_/par->ntoroidal + 1 );
+      y_eigen_.resize(mtdiag_/par->ntoroidal*par->num_mode + 1);
       if ( iflag > 1 ) {
         if ( par->nonlinear < 0.5 || (iflag == 3 && idiag == 0 ) ) {
-          std::fill( xv.begin(),xv.end(),0.0);
+          std::fill( xz.begin(),xz.end(),0.0);
           std::fill( yz.begin(),yz.end(),0.0);
           // ESSL would normally go here
           std::size_t one = 1; 
@@ -1010,10 +1008,65 @@ namespace gtc { namespace server
 
           }
 
+          // transform to k space
+          for (std::size_t j=1;j<=meachtheta;j++) {
+            std::size_t indt1 = (j-1)*mz;
+            for (std::size_t i=par->idiag1;i<=par->idiag2;i++) {
+              std::size_t indt=indt1+(i-par->idiag1)*meachtheta*mz;
+
+              for (std::size_t kz=0;kz<=par->ntoroidal-1;kz++) {
+                for (std::size_t k=1;k<=mz;k++) {
+                  std::size_t indp = kz*icount+indt+k;
+                  xz[kz*mz+k] = allzeta_[indp];
+                }
+              }
+              // ifdef ESSL
+              // TEST
+              // call fftr1d(1,mtdiag,scale,xz,yz,2)
+
+              // record mode information for diagnostic
+              if ( i == par->mpsi/2 ) {
+                for (std::size_t kz=1;kz<=par->num_mode;kz++) {
+                  y_eigen_[j+meachtheta*(kz-1)] = yz[par->nmode[kz]+1];
+                }
+              }
+
+              if ( par->nonlinear < 0.5 ) {
+                // linear run only keep a few modes
+                for (std::size_t kk=0;kk<yz.size();kk++) {
+                  yz[kk] *= filter[kk];
+                }
+                // transform back to real space
+                // ESSL
+                // TEST
+                // call fftr1d(-1,mtdiag,scale,xz,yz,2)
+ 
+                // transpose back to (ntoroidal,mz)
+                for (std::size_t kz=0;kz<=par->ntoroidal-1;kz++) {
+                  for (std::size_t k=1;k<=mz;k++) { 
+                    std::size_t indp = kz*icount+indt+k;
+                    allzeta_[indp] = xz[kz*mz+k];
+                  }
+                }
+              }
+            }
+          }
+
+          if ( par->nonlinear < 0.5 ) {
+            std::cerr << " This condition is not fully implemented yet. Sorry " << std::endl;
+            BOOST_ASSERT(false);
+          }
+
         }
       }
 
-      
+      if ( iflag == 2 ) {
+        std::cerr << " This only occurs if nhybrid > 0, which is not fully implemented yet.  Sorry " << std::endl;
+      }
+
+      if ( iflag == 3 && idiag == 0 ) { 
+        // Diagnostic not implemented yet
+      }
 
     }
 

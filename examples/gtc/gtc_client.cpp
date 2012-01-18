@@ -419,33 +419,6 @@ int hpx_main(boost::program_options::variables_map &vm)
               }
               hpx::lcos::wait(smooth_phase);
             }
-            {  // SMOOTH(0)
-              std::vector<hpx::lcos::promise<void> > smooth_phase;
-              std::size_t iflag = 0;
-              for (std::size_t i=0;i<par->ntoroidal;i++) {
-                smooth_phase.push_back(points[i].smooth_async(iflag,
-                                      point_components,idiag,par));
-              }
-              hpx::lcos::wait(smooth_phase);
-            }
-            {  // SMOOTH(1)
-              std::vector<hpx::lcos::promise<void> > smooth_phase;
-              std::size_t iflag = 1;
-              for (std::size_t i=0;i<par->ntoroidal;i++) {
-                smooth_phase.push_back(points[i].smooth_async(iflag,
-                                      point_components,idiag,par));
-              }
-              hpx::lcos::wait(smooth_phase);
-            }
-            {  // SMOOTH(2)
-              std::vector<hpx::lcos::promise<void> > smooth_phase;
-              std::size_t iflag = 2;
-              for (std::size_t i=0;i<par->ntoroidal;i++) {
-                smooth_phase.push_back(points[i].smooth_async(iflag,
-                                      point_components,idiag,par));
-              }
-              hpx::lcos::wait(smooth_phase);
-            }
 
           }
         };
