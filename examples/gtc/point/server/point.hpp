@@ -33,7 +33,8 @@ namespace gtc { namespace server
             point_get_densityi = 3,
             point_get_zonali = 4,
             point_smooth = 5,
-            point_get_phi = 6
+            point_get_phi = 6,
+            point_get_eachzeta = 7
         };
 
         point()
@@ -60,11 +61,15 @@ namespace gtc { namespace server
 
         bool phil_callback(std::size_t i,std::valarray<double> const& phi);
 
+        bool eachzeta_callback(std::size_t i,std::vector<double> const& eachzeta,std::size_t length);
+
         std::valarray<double> get_densityi();
 
         std::vector<double> get_zonali();
 
         std::valarray<double> get_phi(std::size_t depth);
+
+        std::vector<double> get_eachzeta();
 
        ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an
@@ -156,6 +161,17 @@ namespace gtc { namespace server
             &point::get_phi
         > get_phi_action;
 
+        typedef hpx::actions::result_action0<
+            // Component server type.
+            point,
+            // Return type.
+            std::vector<double>,
+            // Action code.
+            point_get_eachzeta,
+            // Method bound to this action.
+            &point::get_eachzeta
+        > get_eachzeta_action;
+
     private:
         std::size_t idx_;
         double tauii_;
@@ -195,6 +211,8 @@ namespace gtc { namespace server
         std::size_t mgrid_;
 
         array<double> phitmp_;
+        std::vector<double> eachzeta_;
+        std::vector<double> allzeta_;
     };
 }}
 
@@ -225,6 +243,10 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
               gtc::server::point::get_phi_action,
               gtc_point_get_phi_action)
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+              gtc::server::point::get_eachzeta_action,
+              gtc_point_get_eachzeta_action)
 
 #endif
 

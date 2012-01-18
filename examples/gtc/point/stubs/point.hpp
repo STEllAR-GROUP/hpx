@@ -137,6 +137,20 @@ namespace gtc { namespace stubs
             return get_phi_async(gid,depth).get();
         }
 
+        static hpx::lcos::promise< std::vector<double> >
+        get_eachzeta_async(hpx::naming::id_type const& gid)
+        {
+            typedef server::point::get_eachzeta_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid);
+        }
+
+        static std::vector<double> get_eachzeta(hpx::naming::id_type const& gid)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise
+            return get_eachzeta_async(gid).get();
+        }
+
 
     };
 }}

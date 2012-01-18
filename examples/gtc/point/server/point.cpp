@@ -934,14 +934,15 @@ namespace gtc { namespace server
       // Interpolate on a flux surface from fieldline coordinates to magnetic
       // coordinates. Use mtdiag for both poloidal and toroidal grid points.
       std::size_t zero = 0;
-      std::vector<double> xv,filter,allzeta;
+      std::vector<double> xv,filter;
       std::vector<dcmplx> yz;
       xv.resize(mtdiag_);
       yz.resize(mtdiag_/2+1 + 1);
+      eachzeta_.resize((par->idiag2-par->idiag1+1)*mtdiag_*mtdiag_/par->ntoroidal/par->ntoroidal + 1 );
       array<double> phiflux;
       phiflux.resize(mtdiag_/par->ntoroidal+1,mtdiag_+1,par->idiag2-par->idiag1);
-      //filter.resize(mtdiag_/2+1 + 1);
-      //allzeta.resize((par->idiag2-par->idiag1+1)*mtdiag_*mtdiag_/par->ntoroidal);
+      filter.resize(mtdiag_/2+1 + 1);
+      allzeta_.resize((par->idiag2-par->idiag1+1)*mtdiag_*mtdiag_/par->ntoroidal + 1 );
       if ( iflag > 1 ) {
         if ( par->nonlinear < 0.5 || (iflag == 3 && idiag == 0 ) ) {
           std::fill( xv.begin(),xv.end(),0.0);
@@ -959,7 +960,7 @@ namespace gtc { namespace server
           for (std::size_t i=0;i<par->nmode.size();i++) {
             filter[par->nmode[i]+1] = 1.0/mzmax;
           }
-          std::fill( allzeta.begin(),allzeta.end(),0.0);
+          std::fill( allzeta_.begin(),allzeta_.end(),0.0);
 
           for (std::size_t k=1;k<=mzeta_;k++) {
             for (std::size_t kz=1;kz<=mzbig;kz++) {
@@ -980,8 +981,39 @@ namespace gtc { namespace server
             } 
           }
 
+          // transpose 2-d matrix from (ntoroidal,mzeta*mzbig) to (1,mzetamax*mzbig)
+          for (std::size_t jpe=0;jpe<=par->ntoroidal-1;jpe++) {
+            for (std::size_t j=1;j<=meachtheta;j++) {
+              std::size_t jt = jpe*meachtheta+j;
+              std::size_t indt = (j-1)*mz;
+              for (std::size_t i=par->idiag1;i<=par->idiag2;i++) {
+                std::size_t indp1 = indt + (i-par->idiag1)*meachtheta*mz;
+                for (std::size_t k=1;k<=mz;k++) {
+                  std::size_t indp = indp1 + k;
+                  eachzeta_[indp] = phiflux(k,jt,i-par->idiag1);
+                }
+              }
+            }
+
+            // Gather
+            {
+              typedef std::vector<hpx::lcos::promise< std::vector<double> > > lazy_results_type;
+              lazy_results_type lazy_results;
+              BOOST_FOREACH(hpx::naming::id_type const& gid, point_components)
+              {
+                lazy_results.push_back( stubs::point::get_eachzeta_async( gid ) );
+              }
+              std::size_t length = (par->idiag2-par->idiag1+1)*mtdiag_*mtdiag_/par->ntoroidal/par->ntoroidal;
+              hpx::lcos::wait(lazy_results,
+                    boost::bind(&point::eachzeta_callback, this, _1, _2,boost::ref(length)));
+            }
+
+          }
+
         }
       }
+
+      
 
     }
 
@@ -1002,6 +1034,20 @@ namespace gtc { namespace server
       recvl_.resize(phi.size());
       recvl_ = phi;
       return true;
+    }
+
+    bool point::eachzeta_callback(std::size_t i,std::vector<double> const& eachzeta,std::size_t length)
+    {
+      //std::size_t length = (par->idiag2-par->idiag1+1)*mtdiag_*mtdiag_/par->ntoroidal/par->ntoroidal;
+      for (std::size_t j=1;j<=length;j++) {
+        allzeta_[i*length + j] = eachzeta[j];
+      }
+      return true;
+    }
+
+    std::vector<double> point::get_eachzeta()
+    {
+      return eachzeta_;
     }
     
 

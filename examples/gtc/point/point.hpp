@@ -134,6 +134,18 @@ namespace gtc
             return this->base_type::get_phi(gid_,depth);
         }
 
+        hpx::lcos::promise< std::vector<double> > get_eachzeta_async()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_eachzeta_async(gid_);
+        }
+
+        std::vector<double> get_eachzeta()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_eachzeta(gid_);
+        }
+
     };
 }
 
