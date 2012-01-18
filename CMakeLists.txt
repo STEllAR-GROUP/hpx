@@ -156,6 +156,15 @@ add_definitions(-DBOOST_LOG_NO_TS)
 add_definitions(-DBOOST_BIGINT_HAS_NATIVE_INT64)
 add_definitions(-DBOOST_NO_0X_HDR_ATOMIC)        # disable usage of std::atomics in lockfree
 
+find_package(HPX_Hwloc)
+if(HWLOC_FOUND)
+  include_directories(${HWLOC_INCLUDE_DIR})
+  link_directories(${HWLOC_LIBRARY_DIR})
+  add_definitions(-DHPX_HAVE_HWLOC)
+  set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${HWLOC_LIBRARY})
+endif()
+
+
 if(NOT MSVC)
   find_package(HPX_NUMA)
   if(NUMA_FOUND)
@@ -811,7 +820,7 @@ else()
   ##############################################################################
   # System libraries
   ##############################################################################
-  set(hpx_RUNTIME_LIBRARIES dl rt)
+  set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} dl rt)
 
   hpx_check_for_pthread_affinity_np(HPX_PTHREAD_AFFINITY_NP
     DEFINITIONS HPX_HAVE_PTHREAD_AFFINITY_NP)

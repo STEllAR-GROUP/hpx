@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
+//  Copyright (c)      2012 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -14,6 +15,10 @@
 #include <boost/lexical_cast.hpp>
 
 #include <vector>
+
+#if HPX_HAVE_HWLOC
+#include <hwloc.h>
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
@@ -53,6 +58,268 @@ namespace hpx { namespace threads
         static std::size_t num_of_cores = boost::thread::hardware_concurrency();
         return num_of_cores;
     }
+
+#if HPX_HAVE_HWLOC
+    struct numa_node_data
+    {
+        struct tag {};
+        numa_node_data()
+        {
+            data_.reserve(hardware_concurrency());
+            numa_sensitve_data_.reserve(hardware_concurrency());
+            for (std::size_t i = 0; i < hardware_concurrency(); ++i)
+            {
+                data_.push_back(init_numa_node(i, false));
+                numa_sensitve_data_.push_back(init_numa_node(i, true));
+            }
+        }
+        
+        std::size_t get_numa_node(std::size_t thread_num, bool numa_sensitive)
+        {
+            BOOST_ASSERT(thread_num < data_.size());
+            return numa_sensitive ?
+                numa_sensitve_data_[thread_num] : data_[thread_num];
+        }
+
+    private:
+        std::size_t init_numa_node(std::size_t thread_num, bool numa_sensitive)
+        {
+            if(numa_sensitive == false)
+                 return std::size_t(-1);
+
+            if (std::size_t(-1) == thread_num)
+                 return std::size_t(-1);
+
+            hwloc_topology_t topology;
+            hwloc_obj_t obj;
+            hwloc_topology_init(&topology);
+            hwloc_topology_load(topology);
+
+            obj = hwloc_get_obj_by_type(topology, HWLOC_OBJ_PU, thread_num);
+            while(obj)
+            {
+                if(hwloc_compare_types(obj->type, HWLOC_OBJ_NODE) == 0)
+                {
+                    std::size_t numa_node = obj->logical_index;
+                    hwloc_topology_destroy(topology);
+                    return numa_node;
+                }
+                obj = obj->parent;
+            }
+            hwloc_topology_destroy(topology);
+            return std::size_t(-1);
+        }
+
+        std::vector<std::size_t> data_;
+        std::vector<std::size_t> numa_sensitve_data_;
+
+    };
+    inline std::size_t get_numa_node(std::size_t thread_num, bool numa_sensitive)
+    {
+        util::static_<numa_node_data, numa_node_data::tag> data;
+        return data.get().get_numa_node(thread_num, numa_sensitive);
+    }
+
+    struct numa_affinity_mask_data
+    {
+        struct tag {};
+
+        numa_affinity_mask_data()
+        {
+            data_.reserve(hardware_concurrency());
+            numa_sensitve_data_.reserve(hardware_concurrency());
+            for (std::size_t i = 0; i < hardware_concurrency(); ++i)
+            {
+                data_.push_back(init_numa_node_affinity_mask(i, false));
+                numa_sensitve_data_.push_back(init_numa_node_affinity_mask(i, true));
+            }
+        }
+
+        boost::uint64_t get_numa_node_affinity_mask(std::size_t thread_num,
+            bool numa_sensitive)
+        {
+            BOOST_ASSERT(thread_num < data_.size());
+            return numa_sensitive ?
+                numa_sensitve_data_[thread_num] : data_[thread_num];
+        }
+
+    private:
+
+        void extract_node_mask(
+            hwloc_topology_t topology
+          , hwloc_obj_t parent
+          , boost::uint64_t & mask
+        )
+        {
+            hwloc_obj_t obj = hwloc_get_next_child(topology, parent, NULL);
+            while(obj)
+            {
+                if(hwloc_compare_types(HWLOC_OBJ_PU, obj->type) == 0)
+                {
+                    mask |= (1<<obj->logical_index);
+                    return;
+                }
+                extract_node_mask(topology, obj, mask);
+                obj = hwloc_get_next_child(topology, parent, obj);
+            }
+        }
+
+        boost::uint64_t init_numa_node_affinity_mask(std::size_t num_thread,
+            bool numa_sensitive)
+        {
+            boost::uint64_t const error = boost::uint64_t(-1);
+            if(numa_sensitive == false)
+                return error;
+
+            boost::uint64_t node_affinity_mask = 0;
+            std::size_t numa_node = get_numa_node(num_thread, numa_sensitive);
+            if(numa_node == error)
+                return error;
+
+            hwloc_topology_t topology;
+            hwloc_topology_init(&topology);
+            hwloc_topology_load(topology);
+
+            hwloc_obj_t numa_node_obj = hwloc_get_obj_by_type(topology, HWLOC_OBJ_NODE, numa_node);
+            if(numa_node_obj)
+            {
+                extract_node_mask(topology, numa_node_obj, node_affinity_mask);
+                hwloc_topology_destroy(topology);
+                return node_affinity_mask;
+            }
+            hwloc_topology_destroy(topology);
+            return error;
+        }
+
+        std::vector<boost::uint64_t> data_;
+        std::vector<boost::uint64_t> numa_sensitve_data_;
+    };
+
+    inline boost::uint64_t
+    get_numa_node_affinity_mask(std::size_t num_thread, bool numa_sensitive)
+    {
+        util::static_<numa_affinity_mask_data, numa_affinity_mask_data::tag> data;
+        return data.get().get_numa_node_affinity_mask(num_thread, numa_sensitive);
+    }
+
+    struct thread_affinity_mask_data
+    {
+        struct tag {};
+
+        thread_affinity_mask_data()
+        {
+            data_.reserve(hardware_concurrency());
+            numa_sensitve_data_.reserve(hardware_concurrency());
+            for (std::size_t i = 0; i < hardware_concurrency(); ++i)
+            {
+                data_.push_back(init_thread_affinity_mask(i, false));
+                numa_sensitve_data_.push_back(init_thread_affinity_mask(i, true));
+            }
+        }
+
+        boost::uint64_t get_thread_affinity_mask(std::size_t thread_num,
+            bool numa_sensitive)
+        {
+            BOOST_ASSERT(thread_num < data_.size());
+            return numa_sensitive ?
+                numa_sensitve_data_[thread_num] : data_[thread_num];
+        }
+
+    private:
+        boost::uint64_t init_thread_affinity_mask(std::size_t num_thread,
+            bool numa_sensitive)
+        {
+            boost::uint64_t const error = boost::uint64_t(-1);
+            if (numa_sensitive == false)
+                return error;
+
+            std::size_t num_of_cores = hardware_concurrency();
+            if (0 == num_of_cores)
+                num_of_cores = 1;     // assume one core
+            std::size_t affinity = num_thread % num_of_cores;
+
+            hwloc_topology_t topology;
+            hwloc_topology_init(&topology);
+            hwloc_topology_load(topology);
+
+            int numa_nodes = hwloc_get_nbobjs_by_type(topology, HWLOC_OBJ_NODE);
+            hwloc_topology_destroy(topology);
+            if(numa_nodes == -1)
+                return error;
+
+            boost::uint64_t node_affinity_mask = 0;
+            boost::uint64_t mask = 0x01LL;
+
+            node_affinity_mask = get_numa_node_affinity_mask(num_thread, numa_sensitive);
+
+            if(node_affinity_mask == error)
+                return error;
+
+            mask = least_significant_bit(node_affinity_mask) <<
+                (affinity / numa_nodes);
+
+            while (!(mask & node_affinity_mask)) {
+                mask <<= 1LL;
+                if (0 == mask)
+                    mask = 0x01LL;
+            }
+
+            return mask;
+        }
+
+        std::vector<boost::uint64_t> data_;
+        std::vector<boost::uint64_t> numa_sensitve_data_;
+    };
+
+    inline boost::uint64_t
+    get_thread_affinity_mask(std::size_t num_thread, bool numa_sensitive)
+    {
+        util::static_<thread_affinity_mask_data, thread_affinity_mask_data::tag> data;
+        return data.get().get_thread_affinity_mask(num_thread, numa_sensitive);
+    }
+    
+    inline std::size_t
+    get_thread_affinity_mask_from_lva(naming::address::address_type lva)
+    {
+        return std::size_t(-1);
+    }
+
+    inline bool set_affinity(boost::thread& thrd, std::size_t num_thread,
+        bool numa_sensitive)
+    {
+        return true;
+    }
+    inline bool set_affinity(std::size_t num_thread, bool numa_sensitive)
+    {
+        hwloc_topology_t topology;
+        hwloc_obj_t obj;
+        hwloc_topology_init(&topology);
+        hwloc_topology_load(topology);
+
+        obj = hwloc_get_obj_by_type(topology, HWLOC_OBJ_PU, num_thread);
+        if(obj)
+        {
+            hwloc_cpuset_t cpuset;
+            cpuset = hwloc_bitmap_dup(obj->cpuset);
+            hwloc_bitmap_singlify(cpuset);
+            if(
+                hwloc_set_cpubind(
+                    topology
+                  , cpuset
+                  , HWLOC_CPUBIND_STRICT | HWLOC_CPUBIND_THREAD
+                )
+            )
+            {
+                // TODO: proper error handling
+            }
+            hwloc_bitmap_free(cpuset);
+        }
+        hwloc_topology_destroy(topology);
+
+        return true;
+    }
+
+#else
 
 #if defined(BOOST_WINDOWS)
 
@@ -472,6 +739,7 @@ namespace hpx { namespace threads
         return std::size_t(-1);
     }
 
+#endif
 #endif
 
 }}

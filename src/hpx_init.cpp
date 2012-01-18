@@ -444,13 +444,11 @@ namespace hpx
                     "--high-priority-threads, valid for "
                     "--queueing=priority_local only");
             }
-#if defined(BOOST_WINDOWS)
             if (vm.count("numa-sensitive")) {
                 throw std::logic_error("Invalid command line option "
                     "--numa-sensitive, valid for "
                     "--queueing=priority_local  or priority_abp only");
             }
-#endif
             if (vm.count("hierarchy-arity")) {
                 throw std::logic_error("Invalid command line option "
                     "--hierarchy-arity, valid for --queueing=hierarchy only.");
@@ -484,13 +482,11 @@ namespace hpx
                     "--high-priority-threads, valid for "
                     "--queueing=priority_local only.");
             }
-#if defined(BOOST_WINDOWS)
             if (vm.count("numa-sensitive")) {
                 throw std::logic_error("Invalid command line option "
                     "--numa-sensitive, valid for "
                     "--queueing=priority_local or priority_abp only");
             }
-#endif
             if (vm.count("hierarchy-arity")) {
                 throw std::logic_error("Invalid command line option "
                     "--hierarchy-arity, valid for --queueing=hierarchy only.");
@@ -526,10 +522,9 @@ namespace hpx
                     vm["high-priority-threads"].as<std::size_t>();
             }
             bool numa_sensitive = false;
-#if defined(BOOST_WINDOWS)
             if (vm.count("numa-sensitive"))
                 numa_sensitive = true;
-#endif
+
             if (vm.count("hierarchy-arity")) {
                 throw std::logic_error("Invalid command line option "
                     "--hierarchy-arity, valid for --queueing=hierarchy only.");
@@ -565,13 +560,11 @@ namespace hpx
                     "--high-priority-threads, valid for "
                     "--queueing=priority_local only.");
             }
-#if defined(BOOST_WINDOWS)
             if (vm.count("numa-sensitive")) {
                 throw std::logic_error("Invalid command line option "
                     "--numa-sensitive, valid for "
                     "--queueing=priority_local or priority_abp only");
             }
-#endif
             if (vm.count("hierarchy-arity")) {
                 throw std::logic_error("Invalid command line option "
                     "--hierarchy-arity, valid for --queueing=hierarchy only.");
@@ -609,10 +602,8 @@ namespace hpx
                     vm["high-priority-threads"].as<std::size_t>();
             }
             bool numa_sensitive = false;
-#if defined(BOOST_WINDOWS)
             if (vm.count("numa-sensitive"))
                 numa_sensitive = true;
-#endif
             if (vm.count("hierarchy-arity")) {
                 throw std::logic_error("Invalid command line option "
                     "--hierarchy-arity, valid for --queueing=hierarchy only.");
@@ -649,13 +640,11 @@ namespace hpx
                     "--high-priority-threads, valid for "
                     "--queueing=priority_local only.");
             }
-#if defined(BOOST_WINDOWS)
             if (vm.count("numa-sensitive")) {
                 throw std::logic_error("Invalid command line option "
                     "--numa-sensitive, valid for "
                     "--queueing=priority_local or priority_abp only");
             }
-#endif
             // scheduling policy
             typedef hpx::threads::policies::hierarchy_scheduler queue_policy;
             std::size_t arity = 2;
@@ -689,10 +678,8 @@ namespace hpx
                     vm["high-priority-threads"].as<std::size_t>();
             }
             bool numa_sensitive = false;
-#if defined(BOOST_WINDOWS)
             if (vm.count("numa-sensitive"))
                 numa_sensitive = true;
-#endif
             if (vm.count("hierarchy-arity")) {
                 throw std::logic_error("Invalid command line option "
                     "--hierarchy-arity, valid for --queueing=hierarchy only.");

@@ -275,11 +275,9 @@ namespace hpx { namespace util
                   "the number of operating system threads maintaining a high "
                   "priority queue (default: number of OS threads), valid for "
                   "--queueing=priority_local only")
-#if defined(BOOST_WINDOWS)
                 ("numa-sensitive",
                   "makes the priority_local scheduler NUMA sensitive, valid for "
                   "--queueing=priority_local only")
-#endif
             ;
 
             options_description config_options("HPX configuration options");

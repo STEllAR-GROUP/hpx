@@ -255,21 +255,11 @@ if(MSVC AND HPX_EMULATE_SWAP_CONTEXT)
   set_target_properties(hpx PROPERTIES LINK_FLAGS "/EXPORT:switch_to_fiber")
 endif()
 
-
-if(NOT MSVC AND NUMA_FOUND)
-  target_link_libraries(hpx
-    hpx_serialization
-    ${hpx_MALLOC_LIBRARY}
-    ${hpx_RUNTIME_LIBRARIES}
-    ${BOOST_FOUND_LIBRARIES}
-    ${NUMA_LIBRARY})
-else()
-  target_link_libraries(hpx
-    hpx_serialization
-    ${hpx_MALLOC_LIBRARY}
-    ${hpx_RUNTIME_LIBRARIES}
-    ${BOOST_FOUND_LIBRARIES})
-endif()
+target_link_libraries(hpx
+  hpx_serialization
+  ${hpx_MALLOC_LIBRARY}
+  ${hpx_RUNTIME_LIBRARIES}
+  ${BOOST_FOUND_LIBRARIES})
 
 hpx_mangle_name(name hpx)
 
