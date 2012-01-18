@@ -9,8 +9,8 @@ set(subdirs
     accumulator
     adaptive1d
     balancing
-    bfs
-    bright_future
+    #bfs
+    #bright_future
     dataflow
     gravity
     gtc
