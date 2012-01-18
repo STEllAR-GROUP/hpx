@@ -79,18 +79,12 @@ struct update_fun
             for(size_type x_block = x_range.first; x_block < x_range.second; x_block += 128)
             {
                 size_type x_end = std::min(x_block + 128, x_range.second);
-                for(size_type y = y_block; y < y_end; ++y)
-                {
-                    for(size_type x = x_block; x < x_end; ++x)
-                    {
-                        jacobi_kernel_simple(
-                            u
-                          , range_type(x, x_end)
-                          , range_type(y, y_end)
-                          , old, n
-                        );
-                    }
-                }
+                jacobi_kernel_simple(
+                    u
+                  , range_type(x_block, x_end)
+                  , range_type(y_block, y_end)
+                  , old, n
+                );
             }
         }
     }
@@ -192,6 +186,7 @@ void gs(
                         trigger.push_back(deps(xx, yy+1));
                     if(yy > 0)
                         trigger.push_back(deps(xx, yy-1));
+
                     deps(xx, yy)
                         = u.apply(
                             update_fun(
@@ -200,7 +195,7 @@ void gs(
                               , old
                               , n
                             )
-                          , dataflow_trigger(find_here(), trigger)
+                          , dataflow_trigger(u.gid_, trigger)
                         );
                 }
                 else
