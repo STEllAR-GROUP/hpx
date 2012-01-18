@@ -198,6 +198,19 @@ namespace bright_future
             , data(x_size * y_size, init)
         {}
 
+        grid(grid const & g)
+            : n_x(g.n_x)
+            , n_y(g.n_y)
+            , data(g.data)
+        {}
+
+        grid &operator=(grid const & g)
+        {
+            grid tmp(g);
+            std::swap(*this, tmp);
+            return *this;
+        }
+
         template <typename F>
         void init(F f)
         {

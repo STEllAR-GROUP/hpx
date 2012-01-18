@@ -69,9 +69,13 @@ struct update_fun
 
     void operator()(std::vector<grid_type> & u) const
     {
+        /*
         std::cout << old << " " << n << "\n";
         std::cout << u[old].x() << " " << u[old].y() << "\n";
         std::cout << u[n].x() << " " << u[n].y() << "\n";
+        std::cout << x_range.first << " " << x_range.second << "\n";
+        std::cout << y_range.first << " " << y_range.second << "\n";
+        */
 
         for(size_type y_block = y_range.first; y_block < y_range.second; y_block += 128)
         {
@@ -157,8 +161,8 @@ void gs(
     high_resolution_timer t;
     size_type old = 0;
     size_type n = 1;
-    size_type n_x_block = n_x/block_size + 1;
-    size_type n_y_block = n_y/block_size + 1;
+    size_type n_x_block = (n_x - 2)/block_size + 1;
+    size_type n_y_block = (n_y - 2)/block_size + 1;
     typedef dataflow_base<void> promise;
     typedef grid<promise> promise_grid_type;
     promise_grid_type deps(n_x_block, n_y_block);
@@ -172,7 +176,6 @@ void gs(
             for(size_type x = 1, xx = 0; x < n_x - 1; x += block_size, ++xx)
             {
                 size_type x_end = std::min(x + block_size, n_x-1);
-                
                 if(iter > 0)
                 {
                     std::vector<promise > trigger;
@@ -214,9 +217,12 @@ void gs(
         }
         std::swap(old, n);
     }
-    BOOST_FOREACH(promise & p, deps)
+    for(size_type y = 1, yy = 0; y < n_y - 1; y += block_size, ++yy)
     {
-        p.get();
+        for(size_type x = 1, xx = 0; x < n_x - 1; x += block_size, ++xx)
+        {
+            deps(xx, yy).get();
+        }
     }
 
     double time_elapsed = t.elapsed();
