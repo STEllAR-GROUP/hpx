@@ -71,6 +71,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         // Default parameters
         par->irun = false;
+        // TEST
         //par->mstep = 1500;
         par->mstep = 1;
         par->msnap = 1;
@@ -215,6 +216,24 @@ int hpx_main(boost::program_options::variables_map &vm)
         // Changing the units of a0 and a1 from units of "a" to units of "R_0"
         par->a0 = par->a0*par->a;
         par->a1 = par->a1*par->a;
+        // TEST
+        //std::size_t two = 2;
+        //par->mstep = (std::max)(two,par->mstep);
+
+        // I don't think this is right
+        //  par->msnap = (std::min)(par->msnap,par->mstep/par->ndiag);
+
+        par->isnap = par->mstep/par->msnap;
+        par->idiag1 = par->mpsi/2;
+        par->idiag2 = par->mpsi/2;
+        if ( par->nonlinear < 0.5 ) {
+          par->paranl = 0.0;
+          par->mode00 = false;
+          par->idiag1 = 1;
+          par->idiag2 = par->mpsi;
+        }
+        par->rc = par->rc*(par->a0 + par->a1);
+        par->rw = 1.0/(par->rw*(par->a1-par->a0));
 
         // equilibrium unit: length (unit=cm) and time (unit=second) unit
         double ulength=par->r0;
@@ -396,7 +415,34 @@ int hpx_main(boost::program_options::variables_map &vm)
               std::size_t iflag = 3;
               for (std::size_t i=0;i<par->ntoroidal;i++) {
                 smooth_phase.push_back(points[i].smooth_async(iflag,
-                                      point_components,par));
+                                      point_components,idiag,par));
+              }
+              hpx::lcos::wait(smooth_phase);
+            }
+            {  // SMOOTH(0)
+              std::vector<hpx::lcos::promise<void> > smooth_phase;
+              std::size_t iflag = 0;
+              for (std::size_t i=0;i<par->ntoroidal;i++) {
+                smooth_phase.push_back(points[i].smooth_async(iflag,
+                                      point_components,idiag,par));
+              }
+              hpx::lcos::wait(smooth_phase);
+            }
+            {  // SMOOTH(1)
+              std::vector<hpx::lcos::promise<void> > smooth_phase;
+              std::size_t iflag = 1;
+              for (std::size_t i=0;i<par->ntoroidal;i++) {
+                smooth_phase.push_back(points[i].smooth_async(iflag,
+                                      point_components,idiag,par));
+              }
+              hpx::lcos::wait(smooth_phase);
+            }
+            {  // SMOOTH(2)
+              std::vector<hpx::lcos::promise<void> > smooth_phase;
+              std::size_t iflag = 2;
+              for (std::size_t i=0;i<par->ntoroidal;i++) {
+                smooth_phase.push_back(points[i].smooth_async(iflag,
+                                      point_components,idiag,par));
               }
               hpx::lcos::wait(smooth_phase);
             }

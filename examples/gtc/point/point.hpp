@@ -106,18 +106,20 @@ namespace gtc
 
         hpx::lcos::promise<void> smooth_async(std::size_t iflag, 
             std::vector<hpx::naming::id_type> const& point_components,
+            std::size_t idiag,
             parameter const& par)
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::smooth_async(gid_,iflag,point_components,par);
+            return this->base_type::smooth_async(gid_,iflag,point_components,idiag,par);
         }
 
         void smooth(std::size_t iflag,
                     std::vector<hpx::naming::id_type> const& point_components,
+                    std::size_t idiag,
                     parameter const& par)
         {
             BOOST_ASSERT(gid_);
-            this->base_type::smooth(gid_,iflag,point_components,par);
+            this->base_type::smooth(gid_,iflag,point_components,idiag,par);
         }
 
         hpx::lcos::promise< std::valarray<double> > get_phi_async(std::size_t depth)

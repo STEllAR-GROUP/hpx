@@ -49,7 +49,7 @@ namespace gtc { namespace server
 
         void chargei(std::size_t istep, std::vector<hpx::naming::id_type> const& point_components, parameter const& par);
 
-        void smooth(std::size_t iflag, std::vector<hpx::naming::id_type> const& point_components, parameter const& par);
+        void smooth(std::size_t iflag, std::vector<hpx::naming::id_type> const& point_components, std::size_t idiag, parameter const& par);
 
         bool chargei_callback(std::size_t i,std::valarray<double> const& density);
 
@@ -107,7 +107,7 @@ namespace gtc { namespace server
             &point::chargei
         > chargei_action;
 
-        typedef hpx::actions::action3<
+        typedef hpx::actions::action4<
             // Component server type.
             point,
             // Action code.
@@ -115,6 +115,7 @@ namespace gtc { namespace server
             // Arguments of this action.
             std::size_t,
             std::vector<hpx::naming::id_type> const&,
+            std::size_t,
             parameter const&,
             // Method bound to this action. 
             &point::smooth

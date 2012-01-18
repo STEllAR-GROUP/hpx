@@ -105,20 +105,22 @@ namespace gtc { namespace stubs
         static hpx::lcos::promise<void>
         smooth_async(hpx::naming::id_type const& gid,
            std::size_t iflag,std::vector<hpx::naming::id_type> const& point_components,
+            std::size_t idiag,
             hpx::components::gtc::parameter const& par)
         {
             typedef server::point::smooth_action action_type;
             return hpx::lcos::eager_future<action_type>(gid,iflag,
-                point_components,par);
+                point_components,idiag,par);
         }
 
         static void smooth(hpx::naming::id_type const& gid,
                std::size_t iflag,std::vector<hpx::naming::id_type> const& point_components,
+               std::size_t idiag,
                hpx::components::gtc::parameter const& par)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the promise.
-            smooth_async(gid,iflag,point_components,par).get();
+            smooth_async(gid,iflag,point_components,idiag,par).get();
         }
 
         static hpx::lcos::promise< std::valarray<double> >

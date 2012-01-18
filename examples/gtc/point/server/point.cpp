@@ -23,6 +23,9 @@
 #include <string>
 #include <sstream>
 #include <fstream>
+#include <complex>
+
+typedef std::complex<double> dcmplx;
 
 double unifRand() {
   return rand()/double(RAND_MAX);
@@ -639,7 +642,7 @@ namespace gtc { namespace server
       return zonali_;
     }
 
-    void point::smooth(std::size_t iflag, std::vector<hpx::naming::id_type> const& point_components, parameter const& par)
+    void point::smooth(std::size_t iflag, std::vector<hpx::naming::id_type> const& point_components, std::size_t idiag, parameter const& par)
     {
       for (std::size_t j=0;j<phitmp_.jsize();j++) {
         for (std::size_t i=0;i<phitmp_.isize();i++) {
@@ -925,6 +928,58 @@ namespace gtc { namespace server
         }
         if ( par->mode00 == 0 ) {
           std::fill( phip00_.begin(),phip00_.end(),0.0);
+        }
+      }
+
+      // Interpolate on a flux surface from fieldline coordinates to magnetic
+      // coordinates. Use mtdiag for both poloidal and toroidal grid points.
+      std::size_t zero = 0;
+      std::vector<double> xv,filter,allzeta;
+      std::vector<dcmplx> yz;
+      xv.resize(mtdiag_);
+      yz.resize(mtdiag_/2+1 + 1);
+      array<double> phiflux;
+      phiflux.resize(mtdiag_/par->ntoroidal+1,mtdiag_+1,par->idiag2-par->idiag1);
+      //filter.resize(mtdiag_/2+1 + 1);
+      //allzeta.resize((par->idiag2-par->idiag1+1)*mtdiag_*mtdiag_/par->ntoroidal);
+      if ( iflag > 1 ) {
+        if ( par->nonlinear < 0.5 || (iflag == 3 && idiag == 0 ) ) {
+          std::fill( xv.begin(),xv.end(),0.0);
+          std::fill( yz.begin(),yz.end(),0.0);
+          // ESSL would normally go here
+          std::size_t one = 1; 
+          std::size_t mzbig = (std::max)(one,mtdiag_/par->mzetamax);
+          std::size_t mzmax = par->mzetamax*mzbig;
+          std::size_t mz = mzeta_*mzbig;
+          std::size_t meachtheta = mtdiag_/par->ntoroidal;
+          std::size_t icount = meachtheta*mz*(par->idiag2-par->idiag1+1);
+          double dt = 2.0*pi_/mtdiag_; 
+          double pi2_inv = 0.5/pi_;
+          std::fill( filter.begin(),filter.end(),0.0);
+          for (std::size_t i=0;i<par->nmode.size();i++) {
+            filter[par->nmode[i]+1] = 1.0/mzmax;
+          }
+          std::fill( allzeta.begin(),allzeta.end(),0.0);
+
+          for (std::size_t k=1;k<=mzeta_;k++) {
+            for (std::size_t kz=1;kz<=mzbig;kz++) {
+              double wz = ((double) kz)/((double)mzbig);
+              double zdum = zetamin_ + deltaz_*((k-1)+wz);
+              for (std::size_t i=par->idiag1;i<=par->idiag2;i++) {
+                std::size_t ii = igrid_[i];
+                for (std::size_t j=1;j<=mtdiag_;j++) {
+                  double tdum = pi2_inv*(dt*j-zdum*qtinv_[i]) + 10.0;
+                  tdum = (tdum - floor(tdum))*mtheta_[i];
+                  std::size_t jt = (std::max)(zero,(std::min)(mtheta_[i]-1,(std::size_t) tdum));
+                  double wt = tdum - jt; 
+                  phiflux(kz+(k-1)*mzbig,j,i-par->idiag1) = 
+                    ((1.0-wt)*phi_(k,ii+jt,0) + wt*phi_(k,ii+jt+1,0))*wz
+                  + (1.0-wz)*((1.0-wt)*phi_(k-1,ii+jt,0)+wt*phi_(k-1,ii+jt+1,0)); 
+                }
+              }
+            } 
+          }
+
         }
       }
 
