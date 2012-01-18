@@ -1,6 +1,9 @@
 
+#ifndef OPENMP_GRID
 #include <hpx/hpx_fwd.hpp>
+#endif
 #include "grid.hpp"
+#ifndef OPENMP_GRID
 #include <hpx/runtime/actions/plain_action.hpp>
 
 HPX_REGISTER_PLAIN_ACTION(touch_mem_action);
@@ -13,7 +16,7 @@ HPX_EXPORT std::size_t touch_mem(std::size_t desired, std::size_t ps, std::size_
     {
         // Yes! The PX-thread is run by the designated OS-thread.
         char * p = reinterpret_cast<char *>(ps);
-        for(int i = desired * l; i < std::min((desired+1) * l, n); ++i)
+        for(std::size_t i = desired * l; i < std::min((desired+1) * l, n); ++i)
         {
             p[i] = 0;
         }
@@ -22,4 +25,10 @@ HPX_EXPORT std::size_t touch_mem(std::size_t desired, std::size_t ps, std::size_
 
     // this PX-thread is run by the wrong OS-thread, make the foreman retry
     return std::size_t(-1);
+}
+
+#endif
+
+namespace bright_future
+{
 }

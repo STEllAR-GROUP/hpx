@@ -9,14 +9,6 @@ add_definitions(-DHPX_COMPONENT_CREATE_ARG_MAX=10)
 set(bright_future_programs
         root_finder
         vector_root_finder
-        gs_single
-#        gs_hpx
-        gs_hpx_blocked
-        gs_hpx_grid_ro
-        remote_functions
-        gs_hpx_blocked_df
-        jacobi_openmp
-        jacobi_hpx
    )
 
 if(HPX_CXX11_LAMBDAS)
@@ -24,8 +16,16 @@ if(HPX_CXX11_LAMBDAS)
         gs_hpx_distributed
         dataflow_overhead
         dataflow_overhead2
+        gs_single
+        gs_hpx_blocked
+        gs_hpx_grid_ro
+        remote_functions
+        gs_hpx_blocked_df
+        jacobi_openmp
+        jacobi_hpx
+        jacobi_openmp_simple
+        jacobi_hpx_simple
       )
-endif()
 
 add_hpx_component(
     gs_hpx
@@ -34,19 +34,13 @@ add_hpx_component(
     DEPENDENCIES iostreams_component distributing_factory_component
     FOLDER "Examples/BrightFuture"
 )
-
-add_hpx_library(grid
-  MODULE bright_future
-  SOURCES grid.cpp)
-
-if(NOT MSVC AND NUMA_FOUND)
-  target_link_libraries(grid_lib ${NUMA_LIBRARY})
 endif()
 
 set(gs_single_sources gs.cpp)
 set(jacobi_openmp_sources gs.cpp)
-set(jacobi_hpx_sources gs.cpp)
-#set(gs_hpx_sources gs.cpp)
+set(jacobi_hpx_sources gs.cpp grid.cpp)
+set(jacobi_openmp_simple_sources gs.cpp grid.cpp)
+set(jacobi_hpx_simple_sources gs.cpp grid.cpp)
 set(gs_hpx_blocked_sources gs.cpp)
 set(gs_hpx_blocked_df_sources gs.cpp)
 set(gs_hpx_grid_ro_sources gs.cpp)
@@ -54,21 +48,16 @@ set(gs_hpx_distributed_sources gs.cpp)
 
 set(remote_functions_FLAGS DEPENDENCIES iostreams_component)
 set(vector_root_finder_FLAGS DEPENDENCIES iostreams_component)
-#set(gs_single_FLAGS DEPENDENCIES iostreams_component)
-#set(gs_hpx_FLAGS DEPENDENCIES gs_hpx_component iostreams_component)
-set(gs_hpx_blocked_FLAGS DEPENDENCIES gs_hpx_component iostreams_component)
-set(gs_hpx_blocked_df_FLAGS
-  DEPENDENCIES gs_hpx_component dataflow_component iostreams_component
-#  ${GOOGLE_PERFTOOLS_LIBRARY}
-        )
 if(HPX_CXX11_LAMBDAS)
+  set(gs_hpx_blocked_FLAGS DEPENDENCIES gs_hpx_component iostreams_component)
+  set(gs_hpx_blocked_df_FLAGS DEPENDENCIES gs_hpx_component dataflow_component iostreams_component)
   set(gs_hpx_distributed_FLAGS DEPENDENCIES gs_hpx_component dataflow_component iostreams_component)
   set(dataflow_overhead_FLAGS DEPENDENCIES dataflow_component iostreams_component)
   set(dataflow_overhead2_FLAGS DEPENDENCIES dataflow_component iostreams_component)
+  set(jacobi_hpx_FLAGS DEPENDENCIES dataflow_component iostreams_component remote_object_component)
+  set(jacobi_hpx_simple_FLAGS DEPENDENCIES dataflow_component iostreams_component remote_object_component)
+  set(gs_hpx_grid_ro_FLAGS DEPENDENCIES remote_object_component iostreams_component)
 endif()
-set(jacobi_hpx_FLAGS DEPENDENCIES dataflow_component iostreams_component remote_object_component grid_lib)
-#set(jacobi_openmp_FLAGS DEPENDENCIES ${BOOST_FOUND_LIBRARIES})
-set(gs_hpx_grid_ro_FLAGS DEPENDENCIES remote_object_component iostreams_component)
 
 foreach(bright_future_program ${bright_future_programs})
   set(sources
@@ -95,13 +84,19 @@ foreach(bright_future_program ${bright_future_programs})
                               ${bright_future_program}_exe)
 endforeach()
 
-set_target_properties(gs_single_exe PROPERTIES COMPILE_DEFINITIONS BRIGHT_FUTURE_NO_HPX)
-set_target_properties(gs_single_exe PROPERTIES COMPILE_FLAGS -fopenmp)
-set_target_properties(gs_single_exe PROPERTIES LINK_FLAGS -fopenmp)
+if(HPX_CXX11_LAMBDAS)
+  set_target_properties(gs_single_exe PROPERTIES COMPILE_DEFINITIONS BRIGHT_FUTURE_NO_HPX)
+  set_target_properties(gs_single_exe PROPERTIES COMPILE_FLAGS -fopenmp)
+  set_target_properties(gs_single_exe PROPERTIES LINK_FLAGS -fopenmp)
 
-set_target_properties(jacobi_openmp_exe PROPERTIES COMPILE_DEFINITIONS BRIGHT_FUTURE_NO_HPX)
-set_target_properties(jacobi_openmp_exe PROPERTIES COMPILE_FLAGS "-fopenmp -DOPENMP_GRID")
-set_target_properties(jacobi_openmp_exe PROPERTIES LINK_FLAGS -fopenmp)
+  set_target_properties(jacobi_openmp_exe PROPERTIES COMPILE_DEFINITIONS BRIGHT_FUTURE_NO_HPX)
+  set_target_properties(jacobi_openmp_exe PROPERTIES COMPILE_FLAGS "-fopenmp -DOPENMP_GRID")
+  set_target_properties(jacobi_openmp_exe PROPERTIES LINK_FLAGS -fopenmp)
+
+  set_target_properties(jacobi_openmp_simple_exe PROPERTIES COMPILE_DEFINITIONS BRIGHT_FUTURE_NO_HPX)
+  set_target_properties(jacobi_openmp_simple_exe PROPERTIES COMPILE_FLAGS "-fopenmp -DOPENMP_GRID")
+  set_target_properties(jacobi_openmp_simple_exe PROPERTIES LINK_FLAGS -fopenmp)
+endif()
 
 #add_hpx_executable(
 #    gs_hpx

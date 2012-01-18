@@ -147,7 +147,7 @@ namespace bright_future
         }
 
         template <typename U, typename... Args>
-        void construct(U* p, const Args&&... args)
+        void construct(U* p, Args&&... args)
         {
             new ((void *)p) U(std::forward<Args>(args)...);
         }
@@ -182,6 +182,9 @@ namespace bright_future
         typedef typename vector_type::iterator iterator;
         typedef typename vector_type::const_iterator const_iterator;
         typedef value_type result_type;
+
+        grid()
+        {}
 
         grid(size_type x_size, size_type y_size)
             : n_x(x_size)
@@ -301,6 +304,31 @@ namespace bright_future
         }
 
         return os;
+    }
+
+    typedef std::pair<std::size_t, std::size_t> range_type;
+
+    inline void jacobi_kernel_simple(
+        std::vector<grid<double> > & u
+      , range_type const & x_range
+      , range_type const & y_range
+      , std::size_t old
+      , std::size_t new_
+    )
+    {
+        grid<double> & u_new = u[new_];
+        grid<double> & u_old = u[old];
+        for(std::size_t y = y_range.first; y < y_range.second; ++y)
+        {
+            for(std::size_t x = x_range.first; x < x_range.second; ++x)
+            {
+                u_new(x, y)
+                    =(
+                        u_old(x+1,y) + u_old(x-1,y)
+                      + u_old(x,y+1) + u_old(x,y-1)
+                    ) * 0.25;
+            }
+        }
     }
 
     template <typename T>
