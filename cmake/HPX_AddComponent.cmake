@@ -70,22 +70,12 @@ macro(add_hpx_component name)
   hpx_print_list("DEBUG" "add_component.${name}" "Dependencies for ${name}" ${name}_DEPENDENCIES)
   hpx_print_list("DEBUG" "add_component.${name}" "Configuration files for ${name}" ${name}_INI)
 
-  if(NOT MSVC)
-    if(${${name}_ESSENTIAL})
-      add_library(${name}_component SHARED
-        ${${name}_SOURCES} ${${name}_HEADERS})
-    else()
-      add_library(${name}_component SHARED EXCLUDE_FROM_ALL
-        ${${name}_SOURCES} ${${name}_HEADERS})
-    endif()
+  if(${${name}_ESSENTIAL})
+    add_library(${name}_component SHARED
+      ${${name}_SOURCES} ${${name}_HEADERS})
   else()
-    if(${${name}_ESSENTIAL})
-      add_library(${name}_component SHARED
-        ${${name}_SOURCES} ${${name}_HEADERS})
-    else()
-      add_library(${name}_component SHARED EXCLUDE_FROM_ALL
-        ${${name}_SOURCES} ${${name}_HEADERS})
-    endif()
+    add_library(${name}_component SHARED EXCLUDE_FROM_ALL
+      ${${name}_SOURCES} ${${name}_HEADERS})
   endif()
 
   set(prefix "")
