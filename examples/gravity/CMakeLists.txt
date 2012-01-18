@@ -26,6 +26,5 @@ add_hpx_executable(gravity_hpx
   FOLDER "Examples/Gravity")
 
 # add a dependency to the pseudo-target
-add_hpx_pseudo_target(examples.gravity_hpx)
-add_hpx_pseudo_dependencies(examples.gravity_hpx gravity_hpx_exe)
+add_hpx_pseudo_dependencies(examples.gravity gravity_hpx_exe)
 
