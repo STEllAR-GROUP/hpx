@@ -18,9 +18,10 @@
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/include/iostreams.hpp>
 
+#include <hpx/components/dataflow/dataflow.hpp>
+#include <hpx/components/dataflow/dataflow_trigger.hpp>
+
 #include "server/remote_lse.hpp"
-#include "dataflow/dataflow.hpp"
-#include "dataflow/dataflow_trigger.hpp"
 
 using bright_future::update;
 using bright_future::update_residuum;
@@ -383,7 +384,7 @@ void gs(
             std::cout << "." << flush;
         }
         std::cout << "\n" << flush;
-        
+
         hpx::lcos::eager_future<remote_lse_type::print_timestamps_action>(remote_id).get();
 
         double time_elapsed = t.elapsed();

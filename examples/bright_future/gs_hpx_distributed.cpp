@@ -19,17 +19,16 @@
 #include <hpx/include/iostreams.hpp>
 #include <algorithm>
 
+#include <hpx/components/dataflow/dataflow.hpp>
+#include <hpx/components/dataflow/dataflow_trigger.hpp>
+#include <hpx/components/dataflow/async_dataflow_wait.hpp>
+
 /*
 #include <google/profiler.h>
 #include <google/heap-profiler.h>
 */
 
 #include "server/remote_lse.hpp"
-#include "dataflow/dataflow.hpp"
-#include "dataflow/dataflow_trigger.hpp"
-#include "dataflow/async_dataflow_wait.hpp"
-
-#undef min
 
 using bright_future::grid;
 using bright_future::update;
@@ -98,7 +97,7 @@ struct init_rhs_fun
         return
             39.478 * sin((x * c.hx) * 6.283) * sinh((y * c.hy) * 6.283);
     }
-    
+
     template <typename Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
@@ -129,7 +128,7 @@ struct init_u_fun
 
         return value;
     }
-    
+
     template <typename Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
@@ -193,7 +192,7 @@ struct output_fun
         file << x * c.hx << " " << y * c.hy << " " << u(x_local, y_local) << "\n";
         return u(x_local, y_local);
     }
-    
+
     template <typename Archive>
     void load(Archive & ar, const unsigned int version)
     {
@@ -201,7 +200,7 @@ struct output_fun
         ar & x_start;
         ar & y_start;
     }
-    
+
     template <typename Archive>
     void save(Archive & ar, const unsigned int version) const
     {
@@ -255,14 +254,14 @@ void gs(
         typedef
             hpx::components::distributing_factory
             distributing_factory;
-        
+
         std::vector<id_type> prefixes = find_all_localities(type);
 
         distributing_factory
             factory(
                 distributing_factory::create_sync(hpx::find_here())
             );
-        
+
         double num_blocks_sqrt = std::floor(std::sqrt(static_cast<double>(prefixes.size())));
 
         double num_blocks = 0;
@@ -319,7 +318,7 @@ void gs(
             {
                 using hpx::naming::id_type;
                 using hpx::naming::strip_credit_from_gid;
- 
+
                 grid_ids(x, y) = id_type(
                     strip_credit_from_gid(id.get_gid()),
                     id_type::unmanaged);
@@ -412,7 +411,7 @@ void gs(
                                     x
                                   , (std::min)(n_x_local + 2, x + block_size)
                                 );
-                            
+
                             range_type
                                 y_range(
                                     y
@@ -429,7 +428,7 @@ void gs(
                                   , x_range
                                   , y_range
                                 );
-                            
+
                             iteration_dependencies[0](x_block, y_block)(xx, yy) =
                                 init_u_dataflow(
                                     grid_ids(x_block, y_block)
@@ -454,7 +453,7 @@ void gs(
         //ProfilerStart("gs_hpx_distributed-cpu.prof");
         //HeapProfilerStart("gs_hpx_distributed-heap.heap");
         high_resolution_timer t;
-        
+
         for(unsigned iter = 0; iter < max_iterations; ++iter)
         {
             promise_grid_block_type & prev_block = iteration_dependencies.at(iter%2);
@@ -498,7 +497,7 @@ void gs(
                                             : (std::min)(n_x_local + 1, x + block_size)
                                         : (std::min)(n_x_local + 1, x + block_size)
                                 );
-                            
+
                             range_type
                                 y_range(
                                     yy == 0 && y_block == 0 ? 2 : y
@@ -522,7 +521,7 @@ void gs(
                             {
                                 deps.push_back(prev(xx + 1, yy));
                             }
-                            
+
                             if(yy + 1 < n_y_local_block)
                             {
                                 deps.push_back(prev(xx, yy + 1));
@@ -579,7 +578,7 @@ void gs(
                                 );
                                 //cout << "r" << flush;
                             }
-                            
+
                             if(yy == 0 && y_block > 0)
                             {
                                 deps.push_back(
@@ -599,7 +598,7 @@ void gs(
                                 );
                                 //cout << "t" << flush;
                             }
-                            
+
                             if(yy + 1 == n_y_local_block && y_block + 1 < n_y_block)
                             {
                                 deps.push_back(
@@ -639,19 +638,17 @@ void gs(
             }
             //cout << "done\n" << flush;
         }
-        
+
         // wait for the last iteration to finish.
         if(debug) cout << "dataflow tree construction completed " << flush;
         BOOST_FOREACH(promise_grid_type & block, iteration_dependencies[max_iterations%2])
         {
-            wait(block.data_handle(), [&](size_t){if(debug) cout << "." << flush; });
-            /*
+//             wait(block.data_handle(), [&](size_t){if(debug) cout << "." << flush; });
             BOOST_FOREACH(dataflow_base<void> & promise, block)
             {
                 cout << "." << flush;
                 promise.get();
             }
-            */
         }
         if(debug) cout << "\n";
 
@@ -660,7 +657,7 @@ void gs(
         //ProfilerStop();
         //HeapProfilerDump("computation finished");
         //HeapProfilerStop();
-        
+
         if(!output.empty())
         {
             // make sure to have an empty file
@@ -678,7 +675,7 @@ void gs(
                           ? n_x - x_block * n_x_local + 1
                           : n_x_local+1
                         );
-                    
+
                     range_type
                         y_range(
                             1
