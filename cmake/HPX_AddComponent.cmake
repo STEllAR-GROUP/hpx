@@ -72,10 +72,10 @@ macro(add_hpx_component name)
 
   if(${${name}_ESSENTIAL})
     add_library(${name}_component SHARED
-      ${${name}_SOURCES} ${${name}_HEADERS})
+      ${${name}_SOURCES})
   else()
     add_library(${name}_component SHARED EXCLUDE_FROM_ALL
-      ${${name}_SOURCES} ${${name}_HEADERS})
+      ${${name}_SOURCES})
   endif()
 
   set(prefix "")

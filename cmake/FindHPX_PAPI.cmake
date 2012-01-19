@@ -22,3 +22,4 @@ hpx_find_package(PAPI
 if(PAPI_FOUND)
   add_definitions(-DHPX_HAVE_PAPI)
 endif()
+

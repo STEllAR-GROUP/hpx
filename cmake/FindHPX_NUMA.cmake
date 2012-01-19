@@ -11,6 +11,5 @@ hpx_find_package(NUMA
   LIBRARIES numa
   LIBRARY_PATHS lib64 lib
   HEADERS numa.h
-  HEADER_PATHS include
-)
+  HEADER_PATHS include)
 

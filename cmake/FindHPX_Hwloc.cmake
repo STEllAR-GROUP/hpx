@@ -1,4 +1,3 @@
-
 # Copyright (c) 2012 Thomas Heller
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,11 +5,11 @@
 
 if(NOT HPX_FINDPACKAGE_LOADED)
   include(HPX_FindPackage)
-endif(NOT HPX_FINDPACKAGE_LOADED)
+endif()
 
 hpx_find_package(HWLOC
-  LIBRARIES hwloc
+  LIBRARIES hwloc libhwloc
   LIBRARY_PATHS lib64 lib
   HEADERS hwloc.h
-  HEADER_PATHS include
-)
+  HEADER_PATHS include)
+
