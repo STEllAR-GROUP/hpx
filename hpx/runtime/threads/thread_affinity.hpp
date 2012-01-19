@@ -16,7 +16,7 @@
 
 #include <vector>
 
-#if HPX_HAVE_HWLOC
+#if defined(HPX_HAVE_HWLOC)
 #include <hwloc.h>
 #endif
 
@@ -59,7 +59,7 @@ namespace hpx { namespace threads
         return num_of_cores;
     }
 
-#if HPX_HAVE_HWLOC
+#if defined(HPX_HAVE_HWLOC)
     struct numa_node_data
     {
         struct tag {};
@@ -73,7 +73,7 @@ namespace hpx { namespace threads
                 numa_sensitve_data_.push_back(init_numa_node(i, true));
             }
         }
-        
+
         std::size_t get_numa_node(std::size_t thread_num, bool numa_sensitive)
         {
             BOOST_ASSERT(thread_num < data_.size());
@@ -84,21 +84,22 @@ namespace hpx { namespace threads
     private:
         std::size_t init_numa_node(std::size_t thread_num, bool numa_sensitive)
         {
-            if(numa_sensitive == false)
-                 return std::size_t(-1);
+            std::size_t const error = std::size_t(-1);
+            if (!numa_sensitive)
+                return error;
 
-            if (std::size_t(-1) == thread_num)
-                 return std::size_t(-1);
+            if (error == thread_num)
+                return error;
 
             hwloc_topology_t topology;
-            hwloc_obj_t obj;
             hwloc_topology_init(&topology);
             hwloc_topology_load(topology);
 
-            obj = hwloc_get_obj_by_type(topology, HWLOC_OBJ_PU, thread_num);
-            while(obj)
+            hwloc_obj_t obj = hwloc_get_obj_by_type(topology, HWLOC_OBJ_PU,
+                static_cast<unsigned>(thread_num));
+            while (obj)
             {
-                if(hwloc_compare_types(obj->type, HWLOC_OBJ_NODE) == 0)
+                if (hwloc_compare_types(obj->type, HWLOC_OBJ_NODE) == 0)
                 {
                     std::size_t numa_node = obj->logical_index;
                     hwloc_topology_destroy(topology);
@@ -107,7 +108,7 @@ namespace hpx { namespace threads
                 obj = obj->parent;
             }
             hwloc_topology_destroy(topology);
-            return std::size_t(-1);
+            return error;
         }
 
         std::vector<std::size_t> data_;
@@ -144,19 +145,15 @@ namespace hpx { namespace threads
         }
 
     private:
-
-        void extract_node_mask(
-            hwloc_topology_t topology
-          , hwloc_obj_t parent
-          , boost::uint64_t & mask
-        )
+        void extract_node_mask(hwloc_topology_t topology, hwloc_obj_t parent,
+            boost::uint64_t & mask)
         {
             hwloc_obj_t obj = hwloc_get_next_child(topology, parent, NULL);
-            while(obj)
+            while (obj)
             {
-                if(hwloc_compare_types(HWLOC_OBJ_PU, obj->type) == 0)
+                if (hwloc_compare_types(HWLOC_OBJ_PU, obj->type) == 0)
                 {
-                    mask |= (1<<obj->logical_index);
+                    mask |= (1ULL << obj->logical_index);
                     return;
                 }
                 extract_node_mask(topology, obj, mask);
@@ -168,20 +165,21 @@ namespace hpx { namespace threads
             bool numa_sensitive)
         {
             boost::uint64_t const error = boost::uint64_t(-1);
-            if(numa_sensitive == false)
+            if (numa_sensitive == false)
                 return error;
 
             boost::uint64_t node_affinity_mask = 0;
             std::size_t numa_node = get_numa_node(num_thread, numa_sensitive);
-            if(numa_node == error)
+            if (numa_node == error)
                 return error;
 
             hwloc_topology_t topology;
             hwloc_topology_init(&topology);
             hwloc_topology_load(topology);
 
-            hwloc_obj_t numa_node_obj = hwloc_get_obj_by_type(topology, HWLOC_OBJ_NODE, numa_node);
-            if(numa_node_obj)
+            hwloc_obj_t numa_node_obj = hwloc_get_obj_by_type(topology,
+                HWLOC_OBJ_NODE, static_cast<unsigned>(numa_node));
+            if (numa_node_obj)
             {
                 extract_node_mask(topology, numa_node_obj, node_affinity_mask);
                 hwloc_topology_destroy(topology);
@@ -244,15 +242,14 @@ namespace hpx { namespace threads
 
             int numa_nodes = hwloc_get_nbobjs_by_type(topology, HWLOC_OBJ_NODE);
             hwloc_topology_destroy(topology);
-            if(numa_nodes == -1)
+            if (numa_nodes == -1)
                 return error;
 
             boost::uint64_t node_affinity_mask = 0;
             boost::uint64_t mask = 0x01LL;
 
             node_affinity_mask = get_numa_node_affinity_mask(num_thread, numa_sensitive);
-
-            if(node_affinity_mask == error)
+            if (node_affinity_mask == error)
                 return error;
 
             mask = least_significant_bit(node_affinity_mask) <<
@@ -277,7 +274,7 @@ namespace hpx { namespace threads
         util::static_<thread_affinity_mask_data, thread_affinity_mask_data::tag> data;
         return data.get().get_thread_affinity_mask(num_thread, numa_sensitive);
     }
-    
+
     inline std::size_t
     get_thread_affinity_mask_from_lva(naming::address::address_type lva)
     {
@@ -292,31 +289,31 @@ namespace hpx { namespace threads
     inline bool set_affinity(std::size_t num_thread, bool numa_sensitive)
     {
         hwloc_topology_t topology;
-        hwloc_obj_t obj;
         hwloc_topology_init(&topology);
         hwloc_topology_load(topology);
 
-        obj = hwloc_get_obj_by_type(topology, HWLOC_OBJ_PU, num_thread);
-        if(obj)
+        bool result = true;
+        hwloc_obj_t obj = hwloc_get_obj_by_type(topology, HWLOC_OBJ_PU,
+            static_cast<unsigned>(num_thread));
+        if (obj)
         {
             hwloc_cpuset_t cpuset;
             cpuset = hwloc_bitmap_dup(obj->cpuset);
             hwloc_bitmap_singlify(cpuset);
-            if(
-                hwloc_set_cpubind(
-                    topology
-                  , cpuset
-                  , HWLOC_CPUBIND_STRICT | HWLOC_CPUBIND_THREAD
-                )
-            )
+
+            if (hwloc_set_cpubind(topology, cpuset,
+                  HWLOC_CPUBIND_STRICT | HWLOC_CPUBIND_THREAD))
             {
-                // TODO: proper error handling
+                // strict binding not supported or failed, try weak binding
+                if (hwloc_set_cpubind(topology, cpuset, HWLOC_CPUBIND_THREAD))
+                {
+                    result = false;   // couldn't bind thread to core
+                }
             }
             hwloc_bitmap_free(cpuset);
         }
         hwloc_topology_destroy(topology);
-
-        return true;
+        return result;
     }
 
 #else
