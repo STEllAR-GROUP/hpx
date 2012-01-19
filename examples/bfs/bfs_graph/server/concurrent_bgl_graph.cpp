@@ -63,7 +63,7 @@ namespace bfs { namespace server
           : graph_(graph), e_(e), vis_(vis), cm_(cm), sem_(sem)
         {}
 
-        void operator()()
+        void call()
         {
             typedef typename boost::graph_traits<Graph>::vertex_descriptor
                 vertex_type;
@@ -122,9 +122,9 @@ namespace bfs { namespace server
         for (boost::tie(ei, ei_end) = out_edges(v, graph_); ei != ei_end; ++ei)
         {
             typedef do_bfs<graph_type, bfs_visitor, colormap_type> do_bfs_type;
+            do_bfs_type bfs(graph_, *ei, bfs_visitor(parents_), cm, sem);
             hpx::applier::register_thread_nullary(
-                do_bfs_type(graph_, *ei, bfs_visitor(parents_), cm, sem),
-                "do_bfs");
+                HPX_STD_BIND(&do_bfs_type::call, &bfs), "do_bfs");
             break;
         }
 
