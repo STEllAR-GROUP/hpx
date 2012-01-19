@@ -334,9 +334,9 @@ if(HWLOC_FOUND)
 endif()
 
 ################################################################################
-# NUMA 
+# NUMA (needed only if hwloc is not available)
 ################################################################################
-if(NOT MSVC)
+if(NOT MSVC AND NOT HWLOC_FOUND)
   find_package(HPX_NUMA)
   if(NUMA_FOUND)
     include_directories(${NUMA_INCLUDE_DIR})
@@ -617,7 +617,7 @@ if(MSVC)
   ##############################################################################
   add_definitions(-D_WINDOWS)
   add_definitions(-D_WIN32)
-  add_definitions(-D_WIN32_WINNT=0x0600)
+  add_definitions(-D_WIN32_WINNT=0x0601)
   add_definitions(-D_SCL_SECURE_NO_WARNINGS)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
   add_definitions(-D_SCL_SECURE_NO_DEPRECATE)
