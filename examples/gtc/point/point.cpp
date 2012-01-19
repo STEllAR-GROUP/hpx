@@ -59,3 +59,11 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     gtc_point_type::wrapped_type::get_eachzeta_action,
     gtc_point_get_eachzeta_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtc_point_type::wrapped_type::field_action,
+    gtc_point_field_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtc_point_type::wrapped_type::get_evector_action,
+    gtc_point_get_evector_action);

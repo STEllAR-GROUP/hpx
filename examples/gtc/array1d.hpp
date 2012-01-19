@@ -140,6 +140,34 @@ public:
     return result;
   }
 
+  std::valarray<T> full_slicer(std::size_t face,std::size_t depth,std::size_t extent) const 
+  {
+    if ( face > 0 ) {
+      hpx::util::osstream strm;
+      strm << "face error, face(" << face << ")";
+      HPX_THROW_EXCEPTION(hpx::bad_parameter
+        , "array1d::full_slicer"
+        , hpx::util::osstream_get_string(strm));
+    }
+
+    std::size_t start;
+    std::size_t lengths[2];
+    std::size_t strides[2];
+    if ( face == 0 ) {
+      // returns array(depth,extent,:)
+      start=depth + isize_*extent;
+      lengths[0]= ksize_;
+      lengths[1]= 1;
+      strides[0]= isize_*jsize_;
+      strides[1]= 1;
+    }
+
+    std::gslice mygslice (start,std::valarray<size_t>(lengths,2),std::valarray<size_t>(strides,2));
+    std::valarray<T> result = data_[mygslice];
+
+    return result;
+  }
+
   array & operator=(array const& other)
   {
     if (this != &other) 

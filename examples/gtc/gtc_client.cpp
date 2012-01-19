@@ -420,6 +420,15 @@ int hpx_main(boost::program_options::variables_map &vm)
               hpx::lcos::wait(smooth_phase);
             }
 
+            {  // FIELD
+              std::vector<hpx::lcos::promise<void> > field_phase;
+              for (std::size_t i=0;i<par->ntoroidal;i++) {
+                field_phase.push_back(points[i].field_async(
+                                      point_components,par));
+              }
+              hpx::lcos::wait(field_phase);
+            }
+
           }
         };
 

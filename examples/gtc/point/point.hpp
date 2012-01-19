@@ -146,6 +146,34 @@ namespace gtc
             return this->base_type::get_eachzeta(gid_);
         }
 
+        hpx::lcos::promise<void> field_async(
+            std::vector<hpx::naming::id_type> const& point_components,
+            parameter const& par)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::field_async(gid_,point_components,par);
+        }
+
+        void field( std::vector<hpx::naming::id_type> const& point_components,
+                    parameter const& par)
+        {
+            BOOST_ASSERT(gid_);
+            this->base_type::field(gid_,point_components,par);
+        }
+
+        hpx::lcos::promise< std::valarray<double> > get_evector_async(std::size_t depth,std::size_t extent)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_evector_async(gid_,depth,extent);
+        }
+
+        std::valarray<double> get_evector(std::size_t depth,std::size_t extent)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_evector(gid_,depth,extent);
+        }
+
+
     };
 }
 

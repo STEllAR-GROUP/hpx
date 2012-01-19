@@ -151,6 +151,38 @@ namespace gtc { namespace stubs
             return get_eachzeta_async(gid).get();
         }
 
+        static hpx::lcos::promise<void>
+        field_async(hpx::naming::id_type const& gid,
+           std::vector<hpx::naming::id_type> const& point_components,
+            hpx::components::gtc::parameter const& par)
+        {
+            typedef server::point::field_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid,
+                point_components,par);
+        }
+
+        static void field(hpx::naming::id_type const& gid,
+               std::vector<hpx::naming::id_type> const& point_components,
+               hpx::components::gtc::parameter const& par)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise.
+            field_async(gid,point_components,par).get();
+        }
+
+        static hpx::lcos::promise< std::valarray<double> >
+        get_evector_async(hpx::naming::id_type const& gid,std::size_t depth,std::size_t extent)
+        {
+            typedef server::point::get_evector_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid,depth,extent);
+        }
+
+        static std::valarray<double> get_evector(hpx::naming::id_type const& gid,std::size_t depth,std::size_t extent)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise
+            return get_evector_async(gid,depth,extent).get();
+        }
 
     };
 }}

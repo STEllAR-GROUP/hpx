@@ -144,7 +144,8 @@ namespace gtc { namespace server
         densityi_.resize(mzeta_+1,mgrid_+1,1);
         densitye_.resize(mzeta_+1,mgrid_+1,1);
         phi_.resize(mzeta_+1,mgrid_+1,1);
-        evector_.resize(3,mzeta_+1,mgrid_);
+        evector_.resize(4,mzeta_+1,mgrid_+1);
+        recvls_.resize(4,mgrid_+1,1);
         jtp1_.resize(3,mgrid_,mzeta_+1);
         jtp2_.resize(3,mgrid_,mzeta_+1);
         wtp1_.resize(3,mgrid_,mzeta_+1);
@@ -1101,6 +1102,217 @@ namespace gtc { namespace server
     std::vector<double> point::get_eachzeta()
     {
       return eachzeta_;
+    }
+
+    void point::field(std::vector<hpx::naming::id_type> const& point_components,                      parameter const& par)
+    {
+      std::valarray<double> pright,pleft;
+      pright.resize(par->mthetamax+1);
+      pleft.resize(par->mthetamax+1);
+
+      // finite difference for e-field in equilibrium unit
+      double diffr = 0.5/deltar_;
+      std::vector<double> difft;
+      difft.resize(deltat_.size());
+      for (std::size_t i=0;i<deltat_.size();i++) {
+        difft[i] = 0.5/deltat_[i];
+      }
+      double diffz = 0.5/deltaz_;
+      for (std::size_t i=1;i<=mgrid_;i++) {
+        for (std::size_t j=0;j<=mzeta_;j++) {
+          for (std::size_t k=1;k<=3;k++) {
+            evector_(k,j,i) = 0.0;
+          }
+        }
+      }
+
+      for (std::size_t k=1;k<=mzeta_;k++) {
+        for (std::size_t i=1;i<=par->mpsi-1;i++) {
+          double r = par->a0 + deltar_*i;
+          double drdp = 1.0/r;
+          for (std::size_t j=1;j<=mtheta_[i];j++) {
+            std::size_t ij = igrid_[i] + j; 
+ 
+            evector_(1,k,ij) = drdp*diffr*((1.0-wtp1_(1,ij,k))*phi_(k,jtp1_(1,ij,k),0)+
+                   wtp1_(1,ij,k)*phi_(k,jtp1_(1,ij,k)+1,0)-
+                   ((1.0-wtp1_(2,ij,k))*phi_(k,jtp1_(2,ij,k),0)+ 
+                   wtp1_(2,ij,k)*phi_(k,jtp1_(2,ij,k)+1,0)));
+          } 
+        }
+      }
+
+      for (std::size_t i=1;i<=par->mpsi-1;i++) {
+        for (std::size_t k=1;k<=mzeta_;k++) {
+          for (std::size_t j=1;j<=mtheta_[i];j++) {
+            std::size_t ij = igrid_[i] + j; 
+            std::size_t jt = j+1-mtheta_[i]*(j/mtheta_[i]);
+            evector_(2,k,ij) = difft[i]*(phi_(k,igrid_[i]+jt,0)-phi_(k,igrid_[i]+j-1,0));
+          }
+        }
+      }
+
+      // get phi from the left
+      {
+        typedef std::vector<hpx::lcos::promise< std::valarray<double> > > lazy_results_type;
+        lazy_results_type lazy_results;
+        lazy_results.push_back( stubs::point::get_phi_async( point_components[left_pe_],mzeta_ ) );
+        hpx::lcos::wait(lazy_results,
+              boost::bind(&point::phil_callback, this, _1, _2));
+      }
+
+      // get phi from the right
+      {
+        typedef std::vector<hpx::lcos::promise< std::valarray<double> > > lazy_results_type;
+        lazy_results_type lazy_results;
+        std::size_t one = 1; 
+        lazy_results.push_back( stubs::point::get_phi_async( point_components[right_pe_],one ) );
+        hpx::lcos::wait(lazy_results,
+              boost::bind(&point::phir_callback, this, _1, _2));
+      }
+
+      // unpack phi_boundary and calculate E_zeta at boundaries, mzeta=1
+      for (std::size_t i=1;i<=par->mpsi-1;i++) {
+        std::size_t ii = igrid_[i]; 
+        std::size_t jt = mtheta_[i]; 
+        if (myrank_toroidal_ == 0 ) { // down-shift for zeta=0
+          std::valarray<double> trecvl;
+          trecvl.resize(jt);
+          for (std::size_t jj=ii+1;jj<=ii+jt;jj++) {
+            trecvl[jj-(ii+1)] = recvl_[jj];
+          }
+          trecvl.cshift(-itran_[i]);
+          for (std::size_t jj=1;jj<=jt;jj++) {
+            pleft[jj] = trecvl[jj-1];  
+            pright[jj] = recvr_[ii+jj];
+          }
+        } else if (myrank_toroidal_ == par->ntoroidal-1 ) { // up-shift for zeta=2*pi
+          std::valarray<double> trecvr;
+          trecvr.resize(jt);
+          for (std::size_t jj=ii+1;jj<=ii+jt;jj++) {
+            trecvr[jj-(ii+1)] = recvr_[jj];
+          }
+          trecvr.cshift(itran_[i]);
+          for (std::size_t jj=1;jj<=jt;jj++) {
+            pright[jj] = trecvr[jj-1]; // pesky fortran/C++ index difference
+            pleft[jj] = recvl_[ii+jj];  
+          }
+        } else {
+          for (std::size_t jj=1;jj<=jt;jj++) {
+            pleft[jj] = recvl_[ii+jj];
+            pright[jj] = recvr_[ii+jj];
+          }
+        }
+
+        // d_phi/d_zeta
+        for (std::size_t j=1;j<=mtheta_[i];j++) {
+          std::size_t ij = igrid_[i] + j;
+          if ( mzeta_ == 1 ) {
+            evector_(3,1,ij) = (pright[j]-pleft[j])*diffz;
+          } else if ( mzeta_ == 2 ) {
+            evector_(3,1,ij) = (phi_(2,ij,0)-pleft[j])*diffz;
+            evector_(3,2,ij) = (pright[j] - phi_(1,ij,0))*diffz;
+          } else {
+            evector_(3,1,ij) = (phi_(2,ij,0)-pleft[j])*diffz;
+            evector_(3,mzeta_,ij) = (pright[j]-phi_(mzeta_-1,ij,0))*diffz;
+            for (std::size_t jj=2;jj<=mzeta_-1;jj++) {
+              evector_(3,jj,ij) = (phi_(jj+1,ij,0)-phi_(jj-1,ij,0))*diffz;
+            }
+          }
+        }
+      }
+
+      // adjust the difference between safety factor q and qtinv for fieldline coordinate
+      for (std::size_t i=1;i<=par->mpsi-1;i++) {
+        double r = par->a0 + deltar_*i;
+        double q = par->q0 + par->q1*r/par->a + par->q2*r*r/(par->a*par->a);
+        double delq = (1.0/q - qtinv_[i]);
+
+        for (std::size_t j=1;j<=mtheta_[i];j++) {
+          std::size_t ij = igrid_[i] + j;
+          for (std::size_t jj=0;jj<evector_.jsize();jj++) {
+            evector_(3,jj,ij) += delq*evector_(2,jj,ij); 
+          }
+        }
+      }
+
+      // add (0,0) mode, d phi/d psi
+      if ( par->mode00 == 1 ) {
+        for (std::size_t i=1;i<=par->mpsi-1;i++) {
+          double r = par->a0 + deltar_*i;
+          std::size_t ii = igrid_[i]; 
+          std::size_t jt = mtheta_[i];
+          for (std::size_t j=ii+1;j<=ii+jt;j++) {
+            for (std::size_t k=1;k<=mzeta_;k++) {
+              evector_(1,k,j) += phip00_[i]/r;
+            }
+          }
+        }
+      }
+
+      // get evector from the left
+      {
+        typedef std::vector<hpx::lcos::promise< std::valarray<double> > > lazy_results_type;
+        lazy_results_type lazy_results;
+        lazy_results.push_back( stubs::point::get_evector_async( point_components[left_pe_],1,mzeta_ ) );
+        lazy_results.push_back( stubs::point::get_evector_async( point_components[left_pe_],2,mzeta_ ) );
+        lazy_results.push_back( stubs::point::get_evector_async( point_components[left_pe_],3,mzeta_ ) );
+        hpx::lcos::wait(lazy_results,
+              boost::bind(&point::evector_callback, this, _1, _2));
+      }
+
+      // unpack end point data for k=0
+      if (myrank_toroidal_ == 0 ) { // down-shift for zeta=0
+        std::valarray<double> trecvlA,trecvlB,trecvlC;
+        for (std::size_t i=1;i<=par->mpsi-1;i++) {
+          std::size_t ii = igrid_[i]; 
+          std::size_t jt = mtheta_[i]; 
+          trecvlA.resize(jt);
+          trecvlB.resize(jt);
+          trecvlC.resize(jt);
+          for (std::size_t jj=ii+1;jj<=ii+jt;jj++) {
+            trecvlA[jj-(ii+1)] = recvls_(1,jj,0);
+            trecvlB[jj-(ii+1)] = recvls_(2,jj,0);
+            trecvlC[jj-(ii+1)] = recvls_(3,jj,0);
+          }
+          trecvlA.cshift(-itran_[i]);
+          trecvlB.cshift(-itran_[i]);
+          trecvlC.cshift(-itran_[i]);
+          for (std::size_t jj=ii+1;jj<=ii+jt;jj++) {
+            evector_(1,0,jj) = trecvlA[jj-(ii+1)]; 
+            evector_(2,0,jj) = trecvlB[jj-(ii+1)]; 
+            evector_(3,0,jj) = trecvlC[jj-(ii+1)]; 
+          }
+        }
+      } else {
+        for (std::size_t i=1;i<=mgrid_;i++) { 
+          evector_(1,0,i) = recvls_(1,i,0);
+          evector_(2,0,i) = recvls_(2,i,0);
+          evector_(3,0,i) = recvls_(3,i,0);
+        }
+      }
+
+      // poloidal end point
+      for (std::size_t i=1;i<=par->mpsi-1;i++) {
+        for (std::size_t j=0;j<=mzeta_;j++) {
+          evector_(1,j,igrid_[i]) = evector_(1,j,igrid_[i]+mtheta_[i]);
+          evector_(2,j,igrid_[i]) = evector_(2,j,igrid_[i]+mtheta_[i]);
+          evector_(3,j,igrid_[i]) = evector_(3,j,igrid_[i]+mtheta_[i]);
+        }
+      } 
+ 
+    }
+
+    bool point::evector_callback(std::size_t i,std::valarray<double> const& evector)
+    {
+      for (std::size_t j=1;j<=mgrid_;j++) {
+        recvls_(i,j,0) = evector[j];
+      }
+      return true;
+    }
+
+    std::valarray<double> point::get_evector(std::size_t depth,std::size_t extent)
+    {
+      return evector_.full_slicer(0,depth,extent);
     }
     
 
