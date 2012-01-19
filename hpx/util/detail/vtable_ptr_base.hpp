@@ -53,7 +53,7 @@ namespace hpx { namespace util { namespace detail {
         void (*static_delete)(void**);
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
-        void (*move)(void * const*, void **);
+        void (*copy)(void * const*, void **);
         R (*invoke)(void ** BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A));
 
         virtual void save_object(void *const*, OArchive & ar, unsigned) = 0;
@@ -82,7 +82,7 @@ namespace hpx { namespace util { namespace detail {
         void (*static_delete)(void**);
         void (*destruct)(void**);
         void (*clone)(void * const*, void **);
-        void (*move)(void * const*, void **);
+        void (*copy)(void * const*, void **);
         R (*invoke)(void ** BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A));
     };
 

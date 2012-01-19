@@ -358,10 +358,10 @@ struct update_fun
     {
         for(size_type y_block = y_range.first; y_block < y_range.second; y_block += 128)
         {
-            size_type y_end = std::min(y_block + 128, y_range.second);
+            size_type y_end = (std::min)(y_block + 128, y_range.second);
             for(size_type x_block = x_range.first; x_block < x_range.second; x_block += 128)
             {
-                size_type x_end = std::min(x_block + 128, x_range.second);
+                size_type x_end = (std::min)(x_block + 128, x_range.second);
                 for(size_type y = y_block; y < y_end; ++y)
                 {
                     for(size_type x = x_block; x < x_end; ++x)
@@ -584,13 +584,13 @@ void gs(
                         range_type
                             x_range(
                                 x
-                              , std::min(n_x_local + 2, x + block_size)
+                              , (std::min)(n_x_local + 2, x + block_size)
                             );
                         
                         range_type
                             y_range(
                                 y
-                              , std::min(n_y_local + 2, y + block_size)
+                              , (std::min)(n_y_local + 2, y + block_size)
                             );
 
                         deps(x_block, y_block)(xx,yy)
@@ -630,8 +630,8 @@ void gs(
                                   , xx + 1 == n_x_local_block
                                         ? x_block + 1 == n_x_block
                                             ? n_x - (x_block * n_x_local)
-                                            : std::min(n_x_local + 1, x + block_size)
-                                        : std::min(n_x_local + 1, x + block_size)
+                                            : (std::min)(n_x_local + 1, x + block_size)
+                                        : (std::min)(n_x_local + 1, x + block_size)
                                 );
                             
                             range_type
@@ -640,8 +640,8 @@ void gs(
                                   , yy + 1 == n_y_local_block
                                         ? y_block + 1 == n_y_block
                                             ? n_y - (y_block * n_y_local)
-                                            : std::min(n_y_local + 1, y + block_size)
-                                        : std::min(n_y_local + 1, y + block_size)
+                                            : (std::min)(n_y_local + 1, y + block_size)
+                                        : (std::min)(n_y_local + 1, y + block_size)
                                 );
 
                             std::vector<promise > trigger;

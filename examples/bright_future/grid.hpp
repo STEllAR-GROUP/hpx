@@ -7,12 +7,6 @@
 #ifndef HPX_EXAMPLES_GRID_HPP
 #define HPX_EXAMPLES_GRID_HPP
 
-#include <vector>
-#include <iostream>
-
-#include <boost/serialization/access.hpp>
-#include <boost/assert.hpp>
-
 #ifdef OPENMP_GRID
 #include <omp.h>
 #else
@@ -20,9 +14,27 @@
 #include <hpx/lcos/async.hpp>
 #include <hpx/lcos/async_future_wait.hpp>
 #endif
-     
+
+#include <vector>
+#include <iostream>
+
+#include <boost/config.hpp>
+#include <boost/serialization/access.hpp>
+#include <boost/assert.hpp>
+#include <boost/move/move.hpp>
+
+#if defined(BOOST_NO_VARIADIC_TEMPLATES)
+#include <boost/preprocessor/dec.hpp>
+#include <boost/preprocessor/cat.hpp>
+#include <boost/preprocessor/comma_if.hpp>
+#include <boost/preprocessor/enum_params.hpp>
+#include <boost/preprocessor/repeat.hpp>
+#endif
+
 #ifndef OPENMP_GRID
-std::size_t touch_mem(std::size_t, std::size_t, std::size_t, std::size_t);
+HPX_ALWAYS_EXPORT std::size_t
+    touch_mem(std::size_t, std::size_t, std::size_t, std::size_t);
+
 typedef
     hpx::actions::plain_result_action4<
         std::size_t
@@ -36,9 +48,12 @@ typedef
 HPX_REGISTER_PLAIN_ACTION_DECLARATION(touch_mem_action);
 #endif
 
+#if defined(BOOST_NO_NOEXCEPT)
+#define noexcept throw()
+#endif
+
 namespace bright_future
 {
-
     template <typename T>
     struct numa_allocator;
 
@@ -62,7 +77,7 @@ namespace bright_future
         typedef T& reference;
         typedef const T& const_reference;
         typedef T value_type;
-        
+
         template <typename U> struct rebind { typedef numa_allocator<U> other; };
 
         numa_allocator() noexcept {}
@@ -85,7 +100,7 @@ namespace bright_future
 #pragma omp parallel for schedule(static)
                 for(size_type i_block = 0; i_block < len; i_block += 128)
                 {
-                    size_type i_end = std::min(i_block + 128, len);
+                    size_type i_end = (std::min)(i_block + 128, len);
                     for(size_type i = i_block; i < i_end; i += sizeof(value_type))
                     {
                         for(size_type j = 0; j < sizeof(value_type); ++j)
@@ -146,11 +161,36 @@ namespace bright_future
             new (p) value_type(x);
         }
 
+#if defined(BOOST_NO_VARIADIC_TEMPLATES)
+#define HPX_GRID_FWD_ARGS(z, n, _)                                            \
+        BOOST_PP_COMMA() BOOST_FWD_REF(BOOST_PP_CAT(A, n)) BOOST_PP_CAT(a, n) \
+    /**/
+#define HPX_GRID_FORWARD_ARGS(z, n, _)                                        \
+        BOOST_PP_COMMA_IF(n)                                                  \
+            boost::forward<BOOST_PP_CAT(A, n)>(BOOST_PP_CAT(a, n))            \
+    /**/
+#define HPX_GRID_CONSTRUCT(z, n, _)                                           \
+        template <typename U BOOST_PP_COMMA_IF(n)                             \
+            BOOST_PP_ENUM_PARAMS(n, typename A) >                             \
+        void construct(U* p BOOST_PP_REPEAT(n, HPX_GRID_FWD_ARGS, _))         \
+        {                                                                     \
+            new (p) U(BOOST_PP_REPEAT(n, HPX_GRID_FORWARD_ARGS, _));          \
+        }                                                                     \
+    /**/
+
+    BOOST_PP_REPEAT(HPX_ACTION_ARGUMENT_LIMIT, HPX_GRID_CONSTRUCT, _)
+
+#undef HPX_GRID_CONSTRUCT
+#undef HPX_GRID_FORWARD_ARGS
+#undef HPX_GRID_FWD_ARGS
+
+#else
         template <typename U, typename... Args>
-        void construct(U* p, Args&&... args)
+        void construct(U* p, BOOST_FWD_REF(Args)... args)
         {
-            new ((void *)p) U(std::forward<Args>(args)...);
+            new (p) U(boost::forward<Args>(args)...);
         }
+#endif
 
         template <typename U>
         void destroy(U * p)
@@ -170,7 +210,7 @@ namespace bright_future
     {
         return false;
     }
-    
+
     template <typename T>
     struct grid
     {
@@ -191,7 +231,7 @@ namespace bright_future
             , n_y(y_size)
             , data(x_size * y_size)
         {}
-        
+
         grid(size_type x_size, size_type y_size, T const & init)
             : n_x(x_size)
             , n_y(y_size)
@@ -282,24 +322,24 @@ namespace bright_future
             return n_y;
         }
 
-	vector_type const & data_handle() const
-	{
-	    return data;
-	}
+        vector_type const & data_handle() const
+        {
+            return data;
+        }
 
-        private:
-            size_type n_x;
-            size_type n_y;
-            vector_type data;
+    private:
+        size_type n_x;
+        size_type n_y;
+        vector_type data;
 
-            // serialization support
-            friend class boost::serialization::access;
+        // serialization support
+        friend class boost::serialization::access;
 
-            template<class Archive>
-            void serialize(Archive & ar, const unsigned int version)
-            {
-                ar & n_x & n_y & data;
-            }
+        template<class Archive>
+        void serialize(Archive & ar, const unsigned int version)
+        {
+            ar & n_x & n_y & data;
+        }
     };
 
     template <typename T>

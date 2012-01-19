@@ -46,10 +46,10 @@ void gs(
 #pragma omp parallel for shared(u) schedule(static)
         for(size_type y_block = 1; y_block < n_y-1; y_block += block_size)
         {
-            size_type y_end = std::min(y_block + block_size, n_y-1);
+            size_type y_end = (std::min)(y_block + block_size, n_y-1);
             for(size_type x_block = 1; x_block < n_x-1; x_block += block_size)
             {
-                size_type x_end = std::min(x_block + block_size, n_x-1);
+                size_type x_end = (std::min)(x_block + block_size, n_x-1);
                 jacobi_kernel_simple(
                     u
                   , range_type(x_block, x_end)

@@ -94,7 +94,7 @@ namespace hpx { namespace util { namespace detail {
             {
                 return BOOST_SP_TYPEID(Functor);
             }
-            
+
             static Functor & construct(void ** f)
             {
                 new (f) Functor;
@@ -126,7 +126,7 @@ namespace hpx { namespace util { namespace detail {
                 new (dest) Functor(*reinterpret_cast<Functor const*>(src));
             }
 
-            static void move(void *const* f, void ** dest)
+            static void copy(void *const* f, void ** dest)
             {
                 reinterpret_cast<Functor*>(dest)->~Functor();
                 *reinterpret_cast<Functor*>(dest) =
@@ -138,7 +138,7 @@ namespace hpx { namespace util { namespace detail {
                 return (*reinterpret_cast<Functor*>(f))(BOOST_PP_ENUM_PARAMS(N, a));
             }
         };
-        
+
         template <
             typename Functor
           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
@@ -169,7 +169,7 @@ namespace hpx { namespace util { namespace detail {
             {
                 return BOOST_SP_TYPEID(Functor);
             }
-            
+
             static Functor & construct(void ** f)
             {
                 new (f) Functor;
@@ -201,7 +201,7 @@ namespace hpx { namespace util { namespace detail {
                 new (dest) Functor(*reinterpret_cast<Functor const*>(src));
             }
 
-            static void move(void *const* f, void ** dest)
+            static void copy(void *const* f, void ** dest)
             {
                 reinterpret_cast<Functor*>(dest)->~Functor();
                 *reinterpret_cast<Functor*>(dest) =
@@ -250,7 +250,7 @@ namespace hpx { namespace util { namespace detail {
             {
                 return BOOST_SP_TYPEID(Functor);
             }
-            
+
             static Functor & construct(void ** f)
             {
                 *f = new Functor;
@@ -282,19 +282,19 @@ namespace hpx { namespace util { namespace detail {
                 *dest = new Functor(**reinterpret_cast<Functor *const*>(src));
             }
 
-            static void move(void *const* f, void ** dest)
+            static void copy(void *const* f, void ** dest)
             {
                 (*reinterpret_cast<Functor**>(dest))->~Functor();
                 **reinterpret_cast<Functor**>(dest) =
                     **reinterpret_cast<Functor * const *>(f);
             }
-            
+
             static R invoke(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
             {
                 return (**reinterpret_cast<Functor**>(f))(BOOST_PP_ENUM_PARAMS(N, a));
             }
         };
-        
+
         template <
             typename Functor
           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
@@ -325,7 +325,7 @@ namespace hpx { namespace util { namespace detail {
             {
                 return BOOST_SP_TYPEID(Functor);
             }
-            
+
             static Functor & construct(void ** f)
             {
                 *f = new Functor;
@@ -357,13 +357,13 @@ namespace hpx { namespace util { namespace detail {
                 *dest = new Functor(**reinterpret_cast<Functor *const*>(src));
             }
 
-            static void move(void *const* f, void ** dest)
+            static void copy(void *const* f, void ** dest)
             {
                 (*reinterpret_cast<Functor**>(dest))->~Functor();
                 **reinterpret_cast<Functor**>(dest) =
                     **reinterpret_cast<Functor * const *>(f);
             }
-            
+
             static void invoke(void ** f BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))
             {
                 (**reinterpret_cast<Functor**>(f))(BOOST_PP_ENUM_PARAMS(N, a));

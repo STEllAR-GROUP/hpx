@@ -65,7 +65,7 @@ namespace hpx { namespace util {
     {
         typedef function_base<Sig, IArchive, OArchive> base_type;
         function() : base_type() {}
-        
+
         template <typename Functor>
         function(Functor f)
             : base_type(boost::move(f))
@@ -81,7 +81,7 @@ namespace hpx { namespace util {
 
     private:
         BOOST_COPYABLE_AND_MOVABLE(function);
-    
+
         friend class boost::serialization::access;
 
         void load(IArchive &ar, const unsigned version)
@@ -117,7 +117,7 @@ namespace hpx { namespace util {
         BOOST_SERIALIZATION_SPLIT_MEMBER();
 
     };
-    
+
     template <
         typename Sig
     >
@@ -125,7 +125,7 @@ namespace hpx { namespace util {
     {
         typedef function_base<Sig, void, void> base_type;
         function() : base_type() {}
-        
+
         template <typename Functor>
         function(Functor f)
             : base_type(boost::move(f))
@@ -138,8 +138,23 @@ namespace hpx { namespace util {
         function(BOOST_RV_REF(function) other)
             : base_type(boost::move(static_cast<BOOST_RV_REF(base_type)>(other)))
         {}
+
+        function& operator=(BOOST_COPY_ASSIGN_REF(function) t)
+        {
+            this->base_type::operator=(t);
+            return *this;
+        }
+
+        function& operator=(BOOST_RV_REF(function) t)
+        {
+            this->base_type::operator=(boost::move(static_cast<BOOST_RV_REF(base_type)>(t)));
+            return *this;
+        }
+
+    private:
+        BOOST_COPYABLE_AND_MOVABLE(function);
     };
-   
+
 
     template <
         typename Sig
@@ -148,7 +163,7 @@ namespace hpx { namespace util {
     {
         typedef function_base<Sig, void, void> base_type;
         function_nonser() : base_type() {}
-        
+
         template <typename Functor>
         function_nonser(Functor f)
             : base_type(boost::move(f))
@@ -161,6 +176,21 @@ namespace hpx { namespace util {
         function_nonser(BOOST_RV_REF(function_nonser) other)
             : base_type(boost::move(static_cast<BOOST_RV_REF(base_type)>(other)))
         {}
+
+        function_nonser& operator=(BOOST_COPY_ASSIGN_REF(function_nonser) t)
+        {
+            this->base_type::operator=(t);
+            return *this;
+        }
+
+        function_nonser& operator=(BOOST_RV_REF(function_nonser) t)
+        {
+            this->base_type::operator=(boost::move(static_cast<BOOST_RV_REF(base_type)>(t)));
+            return *this;
+        }
+
+    private:
+        BOOST_COPYABLE_AND_MOVABLE(function);
     };
 }}
 
@@ -268,7 +298,7 @@ namespace hpx { namespace util {
             {
                 if(vptr == other.vptr && !empty())
                 {
-                    vptr->move(&other.object, &object);
+                    vptr->copy(&other.object, &object);
                 }
                 else
                 {
@@ -335,12 +365,12 @@ namespace hpx { namespace util {
         {
             return assign(boost::forward<T>(t));
         }
-        
+
         function_base & operator=(BOOST_COPY_ASSIGN_REF(function_base) t)
         {
             return assign(t);
         }
-        
+
         function_base & operator=(BOOST_RV_REF(function_base) t)
         {
             if(this != &t)

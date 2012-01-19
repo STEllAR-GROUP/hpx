@@ -82,7 +82,7 @@ namespace hpx { namespace util { namespace detail {
             base_type::static_delete = Vtable::static_delete;
             base_type::destruct = Vtable::destruct;
             base_type::clone = Vtable::clone;
-            base_type::move = Vtable::move;
+            base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
 
             // make sure the global gets instantiated;
@@ -147,7 +147,7 @@ namespace hpx { namespace util { namespace detail {
             base_type::static_delete = Vtable::static_delete;
             base_type::destruct = Vtable::destruct;
             base_type::clone = Vtable::clone;
-            base_type::move = Vtable::move;
+            base_type::copy = Vtable::copy;
             base_type::invoke = Vtable::invoke;
         }
 

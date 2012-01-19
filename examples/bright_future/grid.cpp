@@ -3,12 +3,13 @@
 #include <hpx/hpx_fwd.hpp>
 #endif
 #include "grid.hpp"
+
 #ifndef OPENMP_GRID
 #include <hpx/runtime/actions/plain_action.hpp>
 
 HPX_REGISTER_PLAIN_ACTION(touch_mem_action);
 
-HPX_EXPORT std::size_t touch_mem(std::size_t desired, std::size_t ps, std::size_t l, std::size_t n)
+std::size_t touch_mem(std::size_t desired, std::size_t ps, std::size_t l, std::size_t n)
 {
     std::size_t current = hpx::threads::threadmanager_base::get_thread_num();
 
@@ -16,7 +17,7 @@ HPX_EXPORT std::size_t touch_mem(std::size_t desired, std::size_t ps, std::size_
     {
         // Yes! The PX-thread is run by the designated OS-thread.
         char * p = reinterpret_cast<char *>(ps);
-        for(std::size_t i = desired * l; i < std::min((desired+1) * l, n); ++i)
+        for(std::size_t i = desired * l; i < (std::min)((desired+1) * l, n); ++i)
         {
             p[i] = 0;
         }

@@ -91,8 +91,8 @@ void gs(
                 {
                     for(size_type x_block = 1; x_block < n_x-1; x_block += block_size)
                     {
-                        size_type y_end = std::min(y_block + block_size, n_y-1);
-                        size_type x_end = std::min(x_block + block_size, n_x-1);
+                        size_type y_end = (std::min)(y_block + block_size, n_y-1);
+                        size_type x_end = (std::min)(x_block + block_size, n_x-1);
                         for(size_type y = y_block; y < y_end; ++y)
                         {
                             for(size_type x = x_block; x < x_end; ++x)

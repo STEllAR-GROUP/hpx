@@ -410,13 +410,13 @@ void gs(
                             range_type
                                 x_range(
                                     x
-                                  , std::min(n_x_local + 2, x + block_size)
+                                  , (std::min)(n_x_local + 2, x + block_size)
                                 );
                             
                             range_type
                                 y_range(
                                     y
-                                  , std::min(n_y_local + 2, y + block_size)
+                                  , (std::min)(n_y_local + 2, y + block_size)
                                 );
 
                             rhs_promise(x_block, y_block)(xx, yy) =
@@ -495,8 +495,8 @@ void gs(
                                   , xx + 1 == n_x_local_block
                                         ? x_block + 1 == n_x_block
                                             ? n_x - (x_block * n_x_local)
-                                            : std::min(n_x_local + 1, x + block_size)
-                                        : std::min(n_x_local + 1, x + block_size)
+                                            : (std::min)(n_x_local + 1, x + block_size)
+                                        : (std::min)(n_x_local + 1, x + block_size)
                                 );
                             
                             range_type
@@ -505,8 +505,8 @@ void gs(
                                   , yy + 1 == n_y_local_block
                                         ? y_block + 1 == n_y_block
                                             ? n_y - (y_block * n_y_local)
-                                            : std::min(n_y_local + 1, y + block_size)
-                                        : std::min(n_y_local + 1, y + block_size)
+                                            : (std::min)(n_y_local + 1, y + block_size)
+                                        : (std::min)(n_y_local + 1, y + block_size)
                                 );
 
                             std::vector<dataflow_base<void> > deps;

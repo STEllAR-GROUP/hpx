@@ -79,10 +79,10 @@ struct update_fun
 
         for(size_type y_block = y_range.first; y_block < y_range.second; y_block += 128)
         {
-            size_type y_end = std::min(y_block + 128, y_range.second);
+            size_type y_end = (std::min)(y_block + 128, y_range.second);
             for(size_type x_block = x_range.first; x_block < x_range.second; x_block += 128)
             {
-                size_type x_end = std::min(x_block + 128, x_range.second);
+                size_type x_end = (std::min)(x_block + 128, x_range.second);
                 jacobi_kernel_simple(
                     u
                   , range_type(x_block, x_end)
@@ -172,10 +172,10 @@ void gs(
     {
         for(size_type y = 1, yy = 0; y < n_y - 1; y += block_size, ++yy)
         {
-            size_type y_end = std::min(y + block_size, n_y-1);
+            size_type y_end = (std::min)(y + block_size, n_y-1);
             for(size_type x = 1, xx = 0; x < n_x - 1; x += block_size, ++xx)
             {
-                size_type x_end = std::min(x + block_size, n_x-1);
+                size_type x_end = (std::min)(x + block_size, n_x-1);
                 if(iter > 0)
                 {
                     std::vector<promise > trigger;
