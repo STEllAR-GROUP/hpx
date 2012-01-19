@@ -14,14 +14,3 @@ hpx_find_package(HWLOC
   HEADERS hwloc.h
   HEADER_PATHS include
 )
-
-if(MSVC AND NOT HWLOC_FOUND)
-  # the binary distribution of hwloc has strange naming conventions for the
-  # library file
-  hpx_find_package(HWLOC
-    LIBRARIES libhwloc
-    LIBRARY_PATHS lib64 lib
-    HEADERS hwloc.h
-    HEADER_PATHS include
-  )
-endif(MSVC AND NOT HWLOC_FOUND)
