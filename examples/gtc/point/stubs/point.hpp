@@ -184,6 +184,25 @@ namespace gtc { namespace stubs
             return get_evector_async(gid,depth,extent).get();
         }
 
+        static hpx::lcos::promise<void>
+        pushi_async(hpx::naming::id_type const& gid,std::size_t irk,
+           std::vector<hpx::naming::id_type> const& point_components,
+            hpx::components::gtc::parameter const& par)
+        {
+            typedef server::point::pushi_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid,irk,
+                point_components,par);
+        }
+
+        static void pushi(hpx::naming::id_type const& gid,std::size_t irk,
+               std::vector<hpx::naming::id_type> const& point_components,
+               hpx::components::gtc::parameter const& par)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise.
+            pushi_async(gid,irk,point_components,par).get();
+        }
+
     };
 }}
 

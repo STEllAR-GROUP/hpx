@@ -1314,6 +1314,12 @@ namespace gtc { namespace server
     {
       return evector_.full_slicer(0,depth,extent);
     }
+
+    void point::pushi(std::size_t irk, 
+               std::vector<hpx::naming::id_type> const& point_components,
+                     parameter const& par)
+    {
+    }
     
 
 }}

@@ -40,7 +40,8 @@ namespace gtc { namespace server
             point_get_phi = 6,
             point_get_eachzeta = 7,
             point_field = 8,
-            point_get_evector = 9
+            point_get_evector = 9,
+            point_pushi = 10
         };
 
         point()
@@ -83,6 +84,10 @@ namespace gtc { namespace server
         bool evector_callback(std::size_t i,std::valarray<double> const& evector);
 
         std::valarray<double> get_evector(std::size_t depth,std::size_t extent);
+
+        void pushi(std::size_t irk,
+                   std::vector<hpx::naming::id_type> const& point_components, 
+                          parameter const& par);
 
        ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an
@@ -211,6 +216,19 @@ namespace gtc { namespace server
             &point::get_evector
         > get_evector_action;
 
+        typedef hpx::actions::action3<
+            // Component server type.
+            point,
+            // Action code.
+            point_pushi,
+            // Arguments of this action.
+            std::size_t,
+            std::vector<hpx::naming::id_type> const&,
+            parameter const&,
+            // Method bound to this action. 
+            &point::pushi
+        > pushi_action;
+
     private:
         std::size_t idx_;
         double tauii_;
@@ -297,6 +315,10 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
               gtc::server::point::get_evector_action,
               gtc_point_get_evector_action)
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+              gtc::server::point::pushi_action,
+              gtc_point_pushi_action)
 
 #endif
 
