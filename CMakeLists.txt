@@ -35,7 +35,7 @@ set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
 set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
 
 if(MSVC)
- set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+  set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 endif()
 
 ################################################################################
@@ -154,25 +154,9 @@ endif()
 add_definitions(-DBOOST_LOG_NO_TSS)
 add_definitions(-DBOOST_LOG_NO_TS)
 add_definitions(-DBOOST_BIGINT_HAS_NATIVE_INT64)
-add_definitions(-DBOOST_NO_0X_HDR_ATOMIC)        # disable usage of std::atomics in lockfree
 
-find_package(HPX_Hwloc)
-if(HWLOC_FOUND)
-  include_directories(${HWLOC_INCLUDE_DIR})
-  link_directories(${HWLOC_LIBRARY_DIR})
-  add_definitions(-DHPX_HAVE_HWLOC)
-  set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${HWLOC_LIBRARY})
-endif()
-
-
-if(NOT MSVC)
-  find_package(HPX_NUMA)
-  if(NUMA_FOUND)
-    include_directories(${NUMA_INCLUDE_DIR})
-    link_directories(${NUMA_LIBRARY_DIR})
-    add_definitions(-DHPX_HAVE_NUMA)
-  endif()
-endif()
+# disable usage of std::atomics in lockfree
+add_definitions(-DBOOST_NO_0X_HDR_ATOMIC)
 
 ################################################################################
 # Compiler detection code
@@ -211,9 +195,9 @@ hpx_include(CompilerFlags)
 include(HPX_SVNRevision)
 
 ################################################################################
-# installation configuration
+# Installation configuration
 ################################################################################
-set(HPX_NO_INSTALL OFF CACHE BOOL "Run hpx applications without installing them")
+set(HPX_NO_INSTALL OFF CACHE BOOL "Build hpx applications so that they can be run without installation.")
 
 if(NOT HPX_NO_INSTALL)
   # for backwards compatibility
@@ -237,6 +221,7 @@ endif()
 
 ################################################################################
 # HPX_PREFIX
+################################################################################
 # If you want to run hpx applications without installing them, set this to
 # ${CMAKE_BINARY_DIR} when using Makefiles or
 # ${CMAKE_BINARY_DIR}/$(Configuration) when using Visual Studio
@@ -252,7 +237,6 @@ else()
 endif()
 
 add_definitions("-DHPX_PREFIX=\"${HPX_PREFIX}\"")
-################################################################################
 
 # Make sure the specified build type is valid
 if(NOT MSVC AND
@@ -337,6 +321,29 @@ hpx_check_for_thread_safe_hdf5(HDF5_THREAD_SAFE)
 # PAPI event counters
 ################################################################################
 find_package(HPX_PAPI)
+
+################################################################################
+# hwloc 
+################################################################################
+find_package(HPX_Hwloc)
+if(HWLOC_FOUND)
+  include_directories(${HWLOC_INCLUDE_DIR})
+  link_directories(${HWLOC_LIBRARY_DIR})
+  add_definitions(-DHPX_HAVE_HWLOC)
+  set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${HWLOC_LIBRARY})
+endif()
+
+################################################################################
+# NUMA 
+################################################################################
+if(NOT MSVC)
+  find_package(HPX_NUMA)
+  if(NUMA_FOUND)
+    include_directories(${NUMA_INCLUDE_DIR})
+    link_directories(${NUMA_LIBRARY_DIR})
+    add_definitions(-DHPX_HAVE_NUMA)
+  endif()
+endif()
 
 ################################################################################
 # Warning configuration
@@ -651,6 +658,21 @@ else()
 
     # Generate debugging information
     hpx_use_flag_if_available(-g LANGUAGES CXX Fortran)
+
+    # Don't inline functions
+    hpx_use_flag_if_available(-fno-inline LANGUAGES CXX Fortran)
+
+    # No tail call optimizations
+    hpx_use_flag_if_available(-fno-optimize-sibling-calls LANGUAGES CXX Fortran)
+
+    # Don't allocate registers for wide types (e.g. 128bit ints) independently
+    hpx_use_flag_if_available(-fno-split-wide-types LANGUAGES CXX Fortran)
+
+    # Disable register allocation webs, which make debugging impossible
+    hpx_use_flag_if_available(-fno-web LANGUAGES CXX Fortran)
+
+    # Disable register renaming
+    hpx_use_flag_if_available(-fno-rename-registers LANGUAGES CXX Fortran)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
     # Optimize for size
     hpx_use_flag_if_available(-Os LANGUAGES CXX Fortran)
