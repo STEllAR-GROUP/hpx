@@ -8,7 +8,7 @@ if(NOT HPX_FINDPACKAGE_LOADED)
 endif()
 
 hpx_find_package(HWLOC
-  LIBRARIES hwloc libhwloc
+  LIBRARIES hwloc
   LIBRARY_PATHS lib64 lib
   HEADERS hwloc.h
   HEADER_PATHS include)
