@@ -36,7 +36,7 @@ set(headers
 
 ###############################################################################
 set(dependencies
-    ${HDF5_CPP_LIBRARY}
+    ${HDF5_CPP_LIBRARY} ${HDF5_LIBRARY} 
     distributing_factory_component)
 
 ###############################################################################
