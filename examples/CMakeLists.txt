@@ -41,17 +41,12 @@ if(HDF5_CPP_FOUND)
        )
   endif()
   
-#  if(!MSVC)
-	if(HPX_CXX11_LAMBDAS AND HPX_CXX11_AUTO AND HDF5_THREAD_SAFE)
-		set(subdirs ${subdirs}
-			sheneos
-		)
-	endif()
- # elseif(MSVC)
-#		set(subdirs ${subdirs}
-#			sheneos
-#		)
-  #endif()
+
+  if(HPX_CXX11_LAMBDAS AND HPX_CXX11_AUTO AND HDF5_THREAD_SAFE)
+	set(subdirs ${subdirs}
+		sheneos
+	)
+  endif()
 endif()
 
 foreach(subdir ${subdirs})
