@@ -175,19 +175,21 @@ namespace gtc
 
         hpx::lcos::promise<void> pushi_async(
             std::size_t irk,
+            std::size_t istep,
             std::vector<hpx::naming::id_type> const& point_components,
             parameter const& par)
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::pushi_async(gid_,irk,point_components,par);
+            return this->base_type::pushi_async(gid_,irk,istep,point_components,par);
         }
 
         void pushi( std::size_t irk,
+                    std::size_t istep,
                     std::vector<hpx::naming::id_type> const& point_components,
                     parameter const& par)
         {
             BOOST_ASSERT(gid_);
-            this->base_type::pushi(gid_,irk,point_components,par);
+            this->base_type::pushi(gid_,irk,istep,point_components,par);
         }
 
 

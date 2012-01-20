@@ -85,7 +85,7 @@ namespace gtc { namespace server
 
         std::valarray<double> get_evector(std::size_t depth,std::size_t extent);
 
-        void pushi(std::size_t irk,
+        void pushi(std::size_t irk,std::size_t istep,
                    std::vector<hpx::naming::id_type> const& point_components, 
                           parameter const& par);
 
@@ -216,12 +216,13 @@ namespace gtc { namespace server
             &point::get_evector
         > get_evector_action;
 
-        typedef hpx::actions::action3<
+        typedef hpx::actions::action4<
             // Component server type.
             point,
             // Action code.
             point_pushi,
             // Arguments of this action.
+            std::size_t,
             std::size_t,
             std::vector<hpx::naming::id_type> const&,
             parameter const&,

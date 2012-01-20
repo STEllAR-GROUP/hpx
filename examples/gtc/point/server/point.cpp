@@ -155,9 +155,9 @@ namespace gtc { namespace server
 
         phitmp_.resize(mzeta_+1,mgrid_+1,1);
 
-        pfluxpsi_.resize(par->mflux);
-        rdtemi_.resize(par->mflux);
-        rdteme_.resize(par->mflux);
+        pfluxpsi_.resize(par->mflux+1);
+        rdtemi_.resize(par->mflux+1);
+        rdteme_.resize(par->mflux+1);
 
         // initialize arrays
         // temperature and density on the grid, T_i=n_0=1 at mid-radius
@@ -1315,10 +1315,222 @@ namespace gtc { namespace server
       return evector_.full_slicer(0,depth,extent);
     }
 
-    void point::pushi(std::size_t irk, 
+    void point::pushi(std::size_t irk,std::size_t istep,
                std::vector<hpx::naming::id_type> const& point_components,
                      parameter const& par)
     {
+      std::size_t limit_vpara = 0; // limit_vpara=1 :  parallel velocity kept <= abs(umax)
+      std::size_t conserve_particles = 0;
+      double delr = 1.0/deltar_;
+      double pi2 = 2.0*pi_;
+      double sbound = 1.0;
+      if ( par->nbound == 0 ) sbound = 0.0;
+      double psimax = 0.5*par->a1*par->a1;
+      double psimin = 0.5*par->a0*par->a0;
+      double paxis = 0.5*pow(8.0*par->gyroradius,2);
+      double cmratio = par->qion/par->aion;
+      double cinv = 1.0/par->qion;
+      double vthi = par->gyroradius*abs(par->qion)/par->aion;
+      double tem_inv = 1.0/(par->aion*vthi*vthi);
+      double d_inv = par->mflux/(par->a1-par->a0);
+      double uright = par->umax*vthi;
+      double uleft = -uright;
+
+      std::vector<double> vdrtmp;
+      double dtime;
+      vdrtmp.resize(par->mflux+1);
+      if ( irk == 1 ) {
+        // 1st step of Runge-Kutta method
+        dtime = 0.5*par->tstep;
+        for (std::size_t m=1;m<=mi_;m++) {
+          for (std::size_t ii=1;ii<=5;ii++) {
+            zion0_(ii,m,0) = zion_(ii,m,0);
+          }
+        }
+
+        std::fill( vdrtmp.begin(),vdrtmp.end(),0.0);
+        // 2nd step of Runge-Kutta method
+      } else {
+        dtime = par->tstep;
+
+        if ( par->nonlinear < 0.5 ) std::fill( vdrtmp.begin(),vdrtmp.end(),0.0);
+        if ( par->nonlinear > 0.5 ) {
+          vdrtmp = pfluxpsi_;
+        }
+      }
+
+      // gather e_field using 4-point gyro-averaging, sorting in poloidal angle
+      array<double> wpi;
+      wpi.resize(4,mi_+1,1);
+      for ( std::size_t m=1;m<=mi_;m++) {
+        double e1 = 0.0;
+        double e2 = 0.0;
+        double e3 = 0.0;
+        std::size_t kk = kzion_[m];
+        double wz1 = wzion_[m];
+        double wz0 = 1.0 - wz1;
+        for (std::size_t larmor=1;larmor<=4;larmor++) {
+          std::size_t ij = jtion0_(larmor,m,0);
+          double wp0 = 1.0 - wpion_(larmor,m,0);
+          double wt00 = 1.0 - wtion0_(larmor,m,0);
+          e1=e1+wp0*wt00*(wz0*evector_(1,kk,ij)+wz1*evector_(1,kk+1,ij));
+          e2=e2+wp0*wt00*(wz0*evector_(2,kk,ij)+wz1*evector_(2,kk+1,ij));
+          e3=e3+wp0*wt00*(wz0*evector_(3,kk,ij)+wz1*evector_(3,kk+1,ij));
+
+          ij = ij + 1;
+          double wt10 = 1.0-wt00;
+          e1=e1+wp0*wt10*(wz0*evector_(1,kk,ij)+wz1*evector_(1,kk+1,ij));
+          e2=e2+wp0*wt10*(wz0*evector_(2,kk,ij)+wz1*evector_(2,kk+1,ij));
+          e3=e3+wp0*wt10*(wz0*evector_(3,kk,ij)+wz1*evector_(3,kk+1,ij));
+
+          ij = jtion1_(larmor,m,0);
+          double wp1 = 1.0-wp0;
+          double wt01 = 1.0-wtion1_(larmor,m,0);
+          e1=e1+wp1*wt01*(wz0*evector_(1,kk,ij)+wz1*evector_(1,kk+1,ij));
+          e2=e2+wp1*wt01*(wz0*evector_(2,kk,ij)+wz1*evector_(2,kk+1,ij));
+          e3=e3+wp1*wt01*(wz0*evector_(3,kk,ij)+wz1*evector_(3,kk+1,ij));
+
+          ij = ij + 1;
+          double wt11 = 1.0-wt01;
+          e1=e1+wp1*wt11*(wz0*evector_(1,kk,ij)+wz1*evector_(1,kk+1,ij));
+          e2=e2+wp1*wt11*(wz0*evector_(2,kk,ij)+wz1*evector_(2,kk+1,ij));
+          e3=e3+wp1*wt11*(wz0*evector_(3,kk,ij)+wz1*evector_(3,kk+1,ij));
+        }
+
+        wpi(1,m,0) = 0.25*e1;
+        wpi(2,m,0) = 0.25*e2;
+        wpi(3,m,0) = 0.25*e3;
+      }
+
+      // primary ion marker temperature and parallel flow velocity
+      std::vector<double> temp,dtemp;
+      temp.resize(par->mpsi+1);
+      dtemp.resize(par->mpsi+1);
+      std::fill( temp.begin(),temp.end(),1.0);
+      std::fill( dtemp.begin(),dtemp.end(),0.0);
+      for (std::size_t ii=0;ii<temp.size();ii++) {
+        temp[ii] = 1.0/( temp[ii]*rtemi_[ii]*par->aion*vthi*vthi );
+      }
+      double ainv = 1.0/par->a;
+
+      //!********** test gradual kappan **********
+      //!     kappati=min(6.9_wp,(kappan+(6.9_wp-kappan)*real(istep,wp)/4000._wp))
+      //!     if(mype==0.and.irk==2)write(36,*)istep,kappan,kappati
+      //! ****************************************
+
+      //! update GC position
+      std::size_t zero = 0;
+      std::size_t one = 1;
+      for (std::size_t m=1;m<=mi_;m++) {
+        double r = sqrt(2.0*zion_(1,m,0));
+        double rinv = 1.0/r;
+        std::size_t ii = (std::max)(zero,(std::min)(par->mpsi-1,(std::size_t) ((r-par->a0)*delr)));
+        std::size_t ip = (std::max)(one,(std::min)(par->mflux,1+(std::size_t) ((r-par->a0)*d_inv) ));
+        double wp0 = (ii+1)-(r-par->a0)*delr;
+        double wp1 = 1.0-wp0;
+        double tem = wp0*temp[ii] + wp1*temp[ii+1];
+        double q = par->q0 + par->q1*r*ainv + par->q2*r*r*ainv*ainv;
+        double qinv = 1.0/q;
+        double cost = cos(zion_(2,m,0));
+        double sint = sin(zion_(2,m,0));
+        double b = 1.0/(1.0+r*cost);
+        double g = 1.0;
+        double gp = 0.0;
+        double ri = 0.0;
+        double rip = 0.0;
+        double dbdp = -b*b*cost*rinv;
+        double dbdt = b*b*r*sint;
+        double dedb = cinv*(zion_(4,m,0)*zion_(4,m,0)*par->qion*b*cmratio+zion_(6,m,0)*zion_(6,m,0));
+        double deni = 1.0/(g*q + ri + zion_(4,m,0)*(g*rip-ri*gp));
+        double upara = zion_(4,m,0)*b*cmratio;
+        double energy = 0.5*par->aion*upara*upara+zion_(6,m,0)*zion_(6,m,0)*b;
+        double rfac = par->rw*(r-par->rc);
+        rfac=rfac*rfac;
+        rfac=rfac*rfac*rfac;
+        rfac=exp(-rfac);
+        double kappa = 1.0-sbound+sbound*rfac;
+        kappa=((energy*tem-1.5)*par->kappati+par->kappan)*kappa*rinv;
+
+        // perturbed quantities
+        double dptdp = wpi(1,m,0);
+        double dptdt = wpi(2,m,0);
+        double dptdz = wpi(3,m,0) - wpi(2,m,0)*qinv;
+        double epara = -wpi(3,m,0)*b*q*deni;
+
+        // subtract net particle flow
+        dptdt = dptdt + vdrtmp[ip];
+
+        // ExB drift in radial direction for w-dot and flux diagnostics
+        double vdr = q*(ri*dptdz-g*dptdt)*deni;
+        double wdrive=vdr*kappa;
+        double wpara=epara*(upara-dtemp[ii])*par->qion*tem;
+        double wdrift=q*(g*dbdt*dptdp-g*dbdp*dptdt+ri*dbdp*dptdz)*deni*dedb*par->qion*tem;
+        double wdot=(zion0_(6,m,0)-par->paranl*zion_(5,m,0))*(wdrive+wpara+wdrift);
+
+        // self-consistent and external electric field for marker orbits
+        dptdp=dptdp*par->nonlinear+par->gyroradius*(par->flow0+par->flow1*r*ainv+par->flow2*r*r*ainv*ainv);
+        dptdt=dptdt*par->nonlinear;
+        dptdz=dptdz*par->nonlinear;
+
+        // particle velocity
+        double pdot = q*(-g*dedb*dbdt - g*dptdt + ri*dptdz)*deni;
+        double tdot = (upara*b*(1.0-q*gp*zion_(4,m,0)) + q*g*(dedb*dbdp + dptdp))*deni;
+        double zdot = (upara*b*q*(1.0+rip*zion_(4,m,0)) - q*ri*(dedb*dbdp + dptdp))*deni;
+        double rdot = ((gp*zion_(4,m,0)-1.0)*(dedb*dbdt + par->paranl*dptdt)-
+          par->paranl*q*(1.0+rip*zion_(4,m,0))*dptdz)*deni;
+
+        zion_(1,m,0) = (std::max)(1.0e-8*psimax,zion0_(1,m,0)+dtime*pdot);
+        zion_(2,m,0) = zion0_(2,m,0)+dtime*tdot;
+        zion_(3,m,0) = zion0_(3,m,0)+dtime*zdot;
+        zion_(4,m,0) = zion0_(4,m,0)+dtime*rdot;
+        zion_(5,m,0) = zion0_(5,m,0)+dtime*wdot;
+
+        // theta and zeta normalize to [0,2*pi), modulo is slower than hand coded
+        // zion(2,m)=modulo(zion(2,m),pi2)
+        // zion(3,m)=modulo(zion(3,m),pi2)
+        zion_(2,m,0) = zion_(2,m,0) - floor( zion_(2,m,0)/pi2 ) * pi2;
+        zion_(3,m,0) = zion_(3,m,0) - floor( zion_(3,m,0)/pi2 ) * pi2;
+
+        wpi(1,m,0) = vdr*rinv;
+        wpi(2,m,0) = energy;
+        wpi(3,m,0) = b;
+      }
+
+      if ( irk == 2 ) {
+        if ( limit_vpara == 1 ) {
+          std::cerr << " Not a default parameter; not implemented " << std::endl;
+        }
+        //! out of boundary particle
+        for (std::size_t m=1;m<=mi_;m++) {
+          if ( zion_(1,m,0) > psimax ) {
+            zion_(1,m,0)=zion0_(1,m,0);
+            zion_(2,m,0)=2.0*pi_-zion0_(2,m,0);
+            zion_(3,m,0)=zion0_(3,m,0);
+            zion_(4,m,0)=zion0_(4,m,0);
+            zion_(5,m,0)=zion0_(5,m,0);
+          } else if ( zion_(1,m,0) < psimin ) {
+            zion_(1,m,0)=zion0_(1,m,0);
+            zion_(2,m,0)=2.0*pi_-zion0_(2,m,0);
+            zion_(3,m,0)=zion0_(3,m,0);
+            zion_(4,m,0)=zion0_(4,m,0);
+            zion_(5,m,0)=zion0_(5,m,0);
+          }
+        }
+
+        if ( conserve_particles == 1 ) {
+          std::cerr << " conserve_particles not a parameter activated by default.  Not implemented " << std::endl;
+        }
+
+        // Restore temperature profile when running a nonlinear calculation
+        // (nonlinear=1.0) and parameter fixed_Tprofile > 0.
+        if ( par->nonlinear > 0.5 && par->fixed_Tprofile > 0 ) {
+          if ( istep%par->ndiag == 0 ) {
+     
+          }
+        }
+
+      }
+
     }
     
 

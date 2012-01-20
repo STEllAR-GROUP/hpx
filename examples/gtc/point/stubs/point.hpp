@@ -185,22 +185,22 @@ namespace gtc { namespace stubs
         }
 
         static hpx::lcos::promise<void>
-        pushi_async(hpx::naming::id_type const& gid,std::size_t irk,
+        pushi_async(hpx::naming::id_type const& gid,std::size_t irk,std::size_t istep,
            std::vector<hpx::naming::id_type> const& point_components,
             hpx::components::gtc::parameter const& par)
         {
             typedef server::point::pushi_action action_type;
-            return hpx::lcos::eager_future<action_type>(gid,irk,
+            return hpx::lcos::eager_future<action_type>(gid,irk,istep,
                 point_components,par);
         }
 
-        static void pushi(hpx::naming::id_type const& gid,std::size_t irk,
+        static void pushi(hpx::naming::id_type const& gid,std::size_t irk,std::size_t istep,
                std::vector<hpx::naming::id_type> const& point_components,
                hpx::components::gtc::parameter const& par)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the promise.
-            pushi_async(gid,irk,point_components,par).get();
+            pushi_async(gid,irk,istep,point_components,par).get();
         }
 
     };

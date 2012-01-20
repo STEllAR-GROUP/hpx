@@ -432,7 +432,7 @@ int hpx_main(boost::program_options::variables_map &vm)
             {  // PUSHI
               std::vector<hpx::lcos::promise<void> > pushi_phase;
               for (std::size_t i=0;i<par->ntoroidal;i++) {
-                pushi_phase.push_back(points[i].pushi_async(irk,
+                pushi_phase.push_back(points[i].pushi_async(irk,istep,
                                       point_components,par));
               }
               hpx::lcos::wait(pushi_phase);
