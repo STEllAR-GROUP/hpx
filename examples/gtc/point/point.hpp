@@ -218,6 +218,21 @@ namespace gtc
             return this->base_type::get_dtem(gid_);
         }
 
+        hpx::lcos::promise<void> shifti_async(
+            std::vector<hpx::naming::id_type> const& point_components,
+            parameter const& par)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::shifti_async(gid_,point_components,par);
+        }
+
+        void shifti( std::vector<hpx::naming::id_type> const& point_components,
+                    parameter const& par)
+        {
+            BOOST_ASSERT(gid_);
+            this->base_type::shifti(gid_,point_components,par);
+        }
+
 
     };
 }

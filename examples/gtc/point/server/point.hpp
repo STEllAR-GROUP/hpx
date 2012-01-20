@@ -43,7 +43,8 @@ namespace gtc { namespace server
             point_get_evector = 9,
             point_pushi = 10,
             point_get_dden = 11,
-            point_get_dtem = 12
+            point_get_dtem = 12,
+            point_shifti = 13
         };
 
         point()
@@ -98,6 +99,9 @@ namespace gtc { namespace server
         std::vector<double> get_dden();
 
         std::vector<double> get_dtem();
+
+        void shifti(std::vector<hpx::naming::id_type> const& point_components,
+                     parameter const& par);
 
        ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an
@@ -263,6 +267,18 @@ namespace gtc { namespace server
             &point::get_dtem
         > get_dtem_action;
 
+        typedef hpx::actions::action2<
+            // Component server type.
+            point,
+            // Action code.
+            point_shifti,
+            // Arguments of this action.
+            std::vector<hpx::naming::id_type> const&,
+            parameter const&,
+            // Method bound to this action. 
+            &point::shifti
+        > shifti_action;
+
     private:
         std::size_t idx_;
         double tauii_;
@@ -366,6 +382,10 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
               gtc::server::point::get_dtem_action,
               gtc_point_get_dtem_action)
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+              gtc::server::point::shifti_action,
+              gtc_point_shifti_action)
 
 #endif
 

@@ -231,6 +231,25 @@ namespace gtc { namespace stubs
             return get_dtem_async(gid).get();
         }
 
+        static hpx::lcos::promise<void>
+        shifti_async(hpx::naming::id_type const& gid,
+           std::vector<hpx::naming::id_type> const& point_components,
+            hpx::components::gtc::parameter const& par)
+        {
+            typedef server::point::shifti_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid,
+                point_components,par);
+        }
+
+        static void shifti(hpx::naming::id_type const& gid,
+               std::vector<hpx::naming::id_type> const& point_components,
+               hpx::components::gtc::parameter const& par)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise.
+            shifti_async(gid,point_components,par).get();
+        }
+
     };
 }}
 

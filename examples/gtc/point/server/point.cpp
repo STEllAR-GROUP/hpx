@@ -1620,7 +1620,11 @@ namespace gtc { namespace server
     {
       return dtem_;
     }
-    
+
+    void point::shifti(std::vector<hpx::naming::id_type> const& point_components,
+                     parameter const& par)
+    {
+    }
 
 }}
 

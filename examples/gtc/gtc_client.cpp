@@ -429,6 +429,7 @@ int hpx_main(boost::program_options::variables_map &vm)
               hpx::lcos::wait(field_phase);
             }
 
+            // push ion
             {  // PUSHI
               std::vector<hpx::lcos::promise<void> > pushi_phase;
               for (std::size_t i=0;i<par->ntoroidal;i++) {
@@ -436,6 +437,16 @@ int hpx_main(boost::program_options::variables_map &vm)
                                       point_components,par));
               }
               hpx::lcos::wait(pushi_phase);
+            }
+
+            // redistribute ion across PEs
+            {  // SHIFTI
+              std::vector<hpx::lcos::promise<void> > shifti_phase;
+              for (std::size_t i=0;i<par->ntoroidal;i++) {
+                shifti_phase.push_back(points[i].shifti_async(
+                                      point_components,par));
+              }
+              hpx::lcos::wait(shifti_phase);
             }
 
           }

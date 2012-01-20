@@ -79,3 +79,7 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     gtc_point_type::wrapped_type::get_dtem_action,
     gtc_point_get_dtem_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtc_point_type::wrapped_type::shifti_action,
+    gtc_point_shifti_action);
