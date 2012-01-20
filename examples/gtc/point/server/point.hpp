@@ -41,7 +41,9 @@ namespace gtc { namespace server
             point_get_eachzeta = 7,
             point_field = 8,
             point_get_evector = 9,
-            point_pushi = 10
+            point_pushi = 10,
+            point_get_dden = 11,
+            point_get_dtem = 12
         };
 
         point()
@@ -85,9 +87,17 @@ namespace gtc { namespace server
 
         std::valarray<double> get_evector(std::size_t depth,std::size_t extent);
 
-        void pushi(std::size_t irk,std::size_t istep,
+        void pushi(std::size_t irk,std::size_t istep,std::size_t idiag,
                    std::vector<hpx::naming::id_type> const& point_components, 
                           parameter const& par);
+
+        bool dtem_callback(std::size_t i,std::vector<double> const& dtem);
+
+        bool dden_callback(std::size_t i,std::vector<double> const& dden);
+
+        std::vector<double> get_dden();
+
+        std::vector<double> get_dtem();
 
        ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an
@@ -216,7 +226,7 @@ namespace gtc { namespace server
             &point::get_evector
         > get_evector_action;
 
-        typedef hpx::actions::action4<
+        typedef hpx::actions::action5<
             // Component server type.
             point,
             // Action code.
@@ -224,11 +234,34 @@ namespace gtc { namespace server
             // Arguments of this action.
             std::size_t,
             std::size_t,
+            std::size_t,
             std::vector<hpx::naming::id_type> const&,
             parameter const&,
             // Method bound to this action. 
             &point::pushi
         > pushi_action;
+
+        typedef hpx::actions::result_action0<
+            // Component server type.
+            point,
+            // Return type.
+            std::vector<double>,
+            // Action code.
+            point_get_dden,
+            // Method bound to this action.
+            &point::get_dden
+        > get_dden_action;
+
+        typedef hpx::actions::result_action0<
+            // Component server type.
+            point,
+            // Return type.
+            std::vector<double>,
+            // Action code.
+            point_get_dtem,
+            // Method bound to this action.
+            &point::get_dtem
+        > get_dtem_action;
 
     private:
         std::size_t idx_;
@@ -274,6 +307,11 @@ namespace gtc { namespace server
         std::vector<dcmplx> y_eigen_;
 
         array<double> recvls_;
+
+        std::vector<double> dtem_;
+        std::vector<double> dden_;
+        std::vector<double> dtemtmp_;
+        std::vector<double> ddentmp_;
     };
 }}
 
@@ -320,6 +358,14 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
               gtc::server::point::pushi_action,
               gtc_point_pushi_action)
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+              gtc::server::point::get_dden_action,
+              gtc_point_get_dden_action)
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+              gtc::server::point::get_dtem_action,
+              gtc_point_get_dtem_action)
 
 #endif
 

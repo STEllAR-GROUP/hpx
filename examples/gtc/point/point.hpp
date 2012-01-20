@@ -176,20 +176,46 @@ namespace gtc
         hpx::lcos::promise<void> pushi_async(
             std::size_t irk,
             std::size_t istep,
+            std::size_t idiag,
             std::vector<hpx::naming::id_type> const& point_components,
             parameter const& par)
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::pushi_async(gid_,irk,istep,point_components,par);
+            return this->base_type::pushi_async(gid_,irk,istep,idiag,point_components,par);
         }
 
         void pushi( std::size_t irk,
                     std::size_t istep,
+                    std::size_t idiag,
                     std::vector<hpx::naming::id_type> const& point_components,
                     parameter const& par)
         {
             BOOST_ASSERT(gid_);
-            this->base_type::pushi(gid_,irk,istep,point_components,par);
+            this->base_type::pushi(gid_,irk,istep,idiag,point_components,par);
+        }
+
+        hpx::lcos::promise< std::vector<double> > get_dden_async()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_dden_async(gid_);
+        }
+
+        std::vector<double> get_dden()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_dden(gid_);
+        }
+
+        hpx::lcos::promise< std::vector<double> > get_dtem_async()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_dtem_async(gid_);
+        }
+
+        std::vector<double> get_dtem()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_dtem(gid_);
         }
 
 

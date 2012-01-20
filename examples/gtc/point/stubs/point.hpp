@@ -185,22 +185,50 @@ namespace gtc { namespace stubs
         }
 
         static hpx::lcos::promise<void>
-        pushi_async(hpx::naming::id_type const& gid,std::size_t irk,std::size_t istep,
+        pushi_async(hpx::naming::id_type const& gid,std::size_t irk,std::size_t istep,std::size_t idiag,
            std::vector<hpx::naming::id_type> const& point_components,
             hpx::components::gtc::parameter const& par)
         {
             typedef server::point::pushi_action action_type;
-            return hpx::lcos::eager_future<action_type>(gid,irk,istep,
+            return hpx::lcos::eager_future<action_type>(gid,irk,istep,idiag,
                 point_components,par);
         }
 
-        static void pushi(hpx::naming::id_type const& gid,std::size_t irk,std::size_t istep,
+        static void pushi(hpx::naming::id_type const& gid,std::size_t irk,std::size_t istep,std::size_t idiag,
                std::vector<hpx::naming::id_type> const& point_components,
                hpx::components::gtc::parameter const& par)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the promise.
-            pushi_async(gid,irk,istep,point_components,par).get();
+            pushi_async(gid,irk,istep,idiag,point_components,par).get();
+        }
+
+        static hpx::lcos::promise< std::vector<double> >
+        get_dden_async(hpx::naming::id_type const& gid)
+        {
+            typedef server::point::get_dden_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid);
+        }
+
+        static std::vector<double> get_dden(hpx::naming::id_type const& gid)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise
+            return get_dden_async(gid).get();
+        }
+
+        static hpx::lcos::promise< std::vector<double> >
+        get_dtem_async(hpx::naming::id_type const& gid)
+        {
+            typedef server::point::get_dtem_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid);
+        }
+
+        static std::vector<double> get_dtem(hpx::naming::id_type const& gid)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise
+            return get_dtem_async(gid).get();
         }
 
     };

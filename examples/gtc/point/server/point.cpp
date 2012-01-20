@@ -1315,7 +1315,7 @@ namespace gtc { namespace server
       return evector_.full_slicer(0,depth,extent);
     }
 
-    void point::pushi(std::size_t irk,std::size_t istep,
+    void point::pushi(std::size_t irk,std::size_t istep,std::size_t idiag,
                std::vector<hpx::naming::id_type> const& point_components,
                      parameter const& par)
     {
@@ -1327,14 +1327,14 @@ namespace gtc { namespace server
       if ( par->nbound == 0 ) sbound = 0.0;
       double psimax = 0.5*par->a1*par->a1;
       double psimin = 0.5*par->a0*par->a0;
-      double paxis = 0.5*pow(8.0*par->gyroradius,2);
+      //double paxis = 0.5*pow(8.0*par->gyroradius,2);
       double cmratio = par->qion/par->aion;
       double cinv = 1.0/par->qion;
       double vthi = par->gyroradius*abs(par->qion)/par->aion;
       double tem_inv = 1.0/(par->aion*vthi*vthi);
       double d_inv = par->mflux/(par->a1-par->a0);
-      double uright = par->umax*vthi;
-      double uleft = -uright;
+      //double uright = par->umax*vthi;
+      //double uleft = -uright;
 
       std::vector<double> vdrtmp;
       double dtime;
@@ -1523,14 +1523,102 @@ namespace gtc { namespace server
 
         // Restore temperature profile when running a nonlinear calculation
         // (nonlinear=1.0) and parameter fixed_Tprofile > 0.
+        dtem_.resize(par->mflux+1);
+        dden_.resize(par->mflux+1);
         if ( par->nonlinear > 0.5 && par->fixed_Tprofile > 0 ) {
           if ( istep%par->ndiag == 0 ) {
-     
+            std::fill( dtem_.begin(),dtem_.end(),0.0);
+            std::fill( dden_.begin(),dden_.end(),0.0);
+            for (std::size_t m=1;m<=mi_;m++) {
+              wpi(1,m,0) = sqrt(2.0*zion_(1,m,0));    
+              double cost = cos(zion_(2,m,0));
+              double b = 1.0/(1.0+wpi(1,m,0)*cost);
+              double upara = zion_(4,m,0)*b*cmratio;
+              wpi(2,m,0) = 0.5*par->aion*upara*upara+zion_(6,m,0)*zion_(6,m,0)*b;
+            }
+            std::size_t one = 1;
+            for (std::size_t m=1;m<=mi_;m++) {
+              std::size_t ip = (std::max)(one,(std::min)(par->mflux,1+(std::size_t)((wpi(1,m,0)-par->a0)*d_inv)));
+              dtem_[ip] = dtem_[ip] + wpi(2,m,0)*zion_(5,m,0); 
+              dden_[ip] = dden_[ip] + 1.0;
+            }
+
+            // global sum of dtem broadcast to every toroidal PE
+            {
+              dtemtmp_.resize(dtem_.size());
+              std::fill( dtemtmp_.begin(),dtemtmp_.end(),0.0);
+              typedef std::vector<hpx::lcos::promise< std::vector<double> > > lazy_results_type;
+              lazy_results_type lazy_results;
+              BOOST_FOREACH(hpx::naming::id_type const& gid, point_components)
+              {
+                lazy_results.push_back( stubs::point::get_dtem_async( gid ) );
+              }
+              hpx::lcos::wait(lazy_results,
+                    boost::bind(&point::dtem_callback, this, _1, _2));
+            }
+
+            // global sum of dden broadcast to every toroidal PE
+            {
+              ddentmp_.resize(dden_.size());
+              std::fill( ddentmp_.begin(),ddentmp_.end(),0.0);
+              typedef std::vector<hpx::lcos::promise< std::vector<double> > > lazy_results_type;
+              lazy_results_type lazy_results;
+              BOOST_FOREACH(hpx::naming::id_type const& gid, point_components)
+              {
+                lazy_results.push_back( stubs::point::get_dden_async( gid ) );
+              }
+              hpx::lcos::wait(lazy_results,
+                    boost::bind(&point::dden_callback, this, _1, _2));
+            }
+
+            for (std::size_t ii=1;ii<dtem_.size();ii++) {
+              dtem_[ii] = dtemtmp_[ii]*tem_inv/(std::max)(1.0,ddentmp_[ii]); // perturbed temperature
+            }
+            double tdum = 0.01*par->ndiag;
+            for (std::size_t ii=1;ii<rdtemi_.size();ii++) {
+              rdtemi_[ii] = (1.0-tdum)*rdtemi_[ii]+tdum*dtem_[ii];
+            }
+
+            for (std::size_t m=1;m<=mi_;m++) {
+              std::size_t ip = (std::max)(one,(std::min)(par->mflux,1+(std::size_t)((wpi(1,m,0)-par->a0)*d_inv)));
+              zion_(5,m,0)=zion_(5,m,0)-(wpi(2,m,0)*tem_inv-1.5)*rdtemi_[ip];
+            }
+             
           }
         }
-
       }
 
+      if ( idiag == 0 ) {
+        // flux diagnosis at irk=1
+        // Not implemented at this time 
+      }
+
+    }
+
+    bool point::dtem_callback(std::size_t i,std::vector<double> const& dtem)
+    {
+      for (std::size_t i=1;i<dtem.size();i++) {
+        dtemtmp_[i] += dtem[i];  
+      }
+      return true;
+    }
+
+    bool point::dden_callback(std::size_t i,std::vector<double> const& dden)
+    {
+      for (std::size_t i=1;i<dden.size();i++) {
+        ddentmp_[i] += dden[i];  
+      }
+      return true;
+    }
+
+    std::vector<double> point::get_dden()
+    {
+      return dden_;
+    }
+
+    std::vector<double> point::get_dtem()
+    {
+      return dtem_;
     }
     
 
