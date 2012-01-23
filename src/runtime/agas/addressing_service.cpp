@@ -1261,9 +1261,17 @@ void addressing_service::update_cache(
     }
 
     try {
+        // The entry in AGAS for a locality's RTS component has a count of 0,
+        // so we convert it to 1 here so that the cache doesn't break.
+        const boost::uint64_t count = (g.count ? g.count : 1); 
+
+        LAS_(debug) <<
+            ( boost::format("updating cache, gid(%1%), count(%2%)")
+            % gid % count);
+
         mutex_type::scoped_lock lock(gva_cache_mtx_);
 
-        gva_cache_key key(gid, g.count);
+        gva_cache_key key(gid, count);
         gva_cache_.insert(key, g);
 
         if (&ec != &throws)

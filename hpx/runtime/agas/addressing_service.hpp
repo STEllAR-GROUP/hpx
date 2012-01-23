@@ -79,9 +79,10 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
           , boost::uint64_t count_ = 1
             )
           : key_(naming::strip_credit_from_cgid(id_)
-               , naming::strip_credit_from_cgid(id_) +
-                 (count_ ? (count_ - 1) : 1))
-        {}
+               , naming::strip_credit_from_cgid(id_) + (count_ - 1))
+        {
+            BOOST_ASSERT(count_);
+        }
 
         naming::gid_type get_gid() const
         {
@@ -108,9 +109,16 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
           , gva_cache_key const& rhs
             )
         {
-            // Does lhs contain rhs or does rhs contain lhs?
-            return boost::icl::contains(lhs.key_, rhs.key_)
-                || boost::icl::contains(rhs.key_, lhs.key_); 
+            // Is lhs in rhs?
+            if (1 == lhs.get_count() && 1 != rhs.get_count())
+                return boost::icl::contains(rhs.key_, lhs.key_);
+ 
+            // Is rhs in lhs?
+            else if (1 != lhs.get_count() && 1 == rhs.get_count())
+                return boost::icl::contains(lhs.key_, lhs.key_);
+
+            // Direct hit 
+            return lhs.key_ == rhs.key_;
         }
     }; // }}}
 
