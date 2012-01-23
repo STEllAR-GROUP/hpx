@@ -250,6 +250,20 @@ namespace gtc { namespace stubs
             shifti_async(gid,point_components,par).get();
         }
 
+        static hpx::lcos::promise< std::size_t >
+        get_msend_async(hpx::naming::id_type const& gid)
+        {
+            typedef server::point::get_msend_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid);
+        }
+
+        static std::size_t get_msend(hpx::naming::id_type const& gid)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise
+            return get_msend_async(gid).get();
+        }
+
     };
 }}
 

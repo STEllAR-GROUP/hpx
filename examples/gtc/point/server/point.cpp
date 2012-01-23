@@ -135,7 +135,9 @@ namespace gtc { namespace server
 
         double tmp13 = (double) mi_;
         double tmp14 = (double) me_;
-        std::size_t mimax = static_cast<std::size_t>(mi_ + 100*std::ceil(sqrt(tmp13))); // ions array upper bound
+        mimax_ = static_cast<std::size_t>(mi_ + 100*std::ceil(sqrt(tmp13))); // ions array upper bound
+       
+        //mimax_ = mi_ + 100*(std::size_t)(std::ceil(sqrt(mi_))); // ions array upper bound
         std::size_t memax = static_cast<std::size_t>(me_ + 100*std::ceil(sqrt(tmp14))); // electrons array upper bound
 
         pgyro_.resize(5,mgrid_+1,1);
@@ -204,23 +206,22 @@ namespace gtc { namespace server
             markeri_(j,igrid_[i],0) = markeri_(j,igrid_[i]+mtheta_[i],0);
           }
         }
-        std::size_t nparam;
         if ( par->track_particles ) {
           // Not implemented yet
-          nparam = 7;
+          nparam_ = 7;
         } else {
           // No tagging of the particles
-          nparam = 6;
+          nparam_ = 6;
         }
-        zion_.resize(nparam+1,mimax+1,1);
-        zion0_.resize(nparam+1,mimax+1,1);
-        jtion0_.resize(nparam+1,mimax+1,1);
-        jtion1_.resize(5,mimax+1,1);
-        kzion_.resize(mimax+1);
-        wzion_.resize(mimax+1);
-        wpion_.resize(5,mimax+1,1);
-        wtion0_.resize(5,mimax+1,1);
-        wtion1_.resize(5,mimax+1,1);
+        zion_.resize(nparam_+1,mimax_+1,1);
+        zion0_.resize(nparam_+1,mimax_+1,1);
+        jtion0_.resize(nparam_+1,mimax_+1,1);
+        jtion1_.resize(5,mimax_+1,1);
+        kzion_.resize(mimax_+1);
+        wzion_.resize(mimax_+1);
+        wpion_.resize(5,mimax_+1,1);
+        wtion0_.resize(5,mimax_+1,1);
+        wtion1_.resize(5,mimax_+1,1);
 
         if ( par->nhybrid > 0 ) {
           BOOST_ASSERT(false);
@@ -1624,6 +1625,135 @@ namespace gtc { namespace server
     void point::shifti(std::vector<hpx::naming::id_type> const& point_components,
                      parameter const& par)
     {
+       if ( par->numberpe == 1 ) return;
+
+       std::size_t nzion = 2*nparam_; // nzion=14 if track_particles=1, =12 otherwise
+       double pi_inv = 1.0/pi_; 
+       std::size_t m0 = 1;
+       std::size_t iteration = 0;
+       std::size_t one = 1;
+
+       std::vector<std::size_t> kzi;
+       std::vector<std::size_t> iright,ileft;
+       kzi.resize(mimax_+1);
+       iright.resize(mimax_+1);
+       ileft.resize(mimax_+1);
+
+       std::vector<std::size_t> msendright;
+       std::vector<std::size_t> msendleft;
+       msendright.resize(3);
+       msendleft.resize(3);
+
+       while (true) {
+         iteration = iteration + 1;
+         if ( iteration > par->ntoroidal ) {
+           std::cerr << "endless particle sorting loop at PE=" << idx_ << std::endl;
+           break;
+         }
+
+         msend_ = 0;
+         std::fill( msendright.begin(),msendright.end(),0 );
+         std::fill( msendleft.begin(),msendleft.end(),0 );
+
+         if ( m0 <= mi_ ) {
+           std::fill( kzi.begin(),kzi.end(),0.0 );
+         }
+         for (std::size_t m=m0;m<=mi_;m++) {
+           double zetaright = (std::min)(2.0*pi_,zion_(3,m,0)) - zetamax_;
+           double zetaleft = zion_(3,m,0) - zetamin_;
+
+           if ( zetaright*zetaleft > 0.0 ) {
+             zetaright = zetaright*0.5*pi_inv;
+             zetaright = zetaright - floor(zetaright);
+             msend_++;
+             kzi[msend_] = m;
+ 
+             if ( zetaright < 0.5 ) {
+               // # of particle to move right
+               msendright[1] += 1;
+               iright[msendright[1]] = m;
+             } else {
+               // # of particle to move left
+               msendleft[1] += 1;
+               ileft[msendleft[1]] = m;
+             }
+           }
+         }
+
+         if ( iteration > 1 ) {
+           // global sum of msend broadcast to every toroidal PE
+           {
+             mrecv_ = 0;
+             typedef std::vector<hpx::lcos::promise< std::size_t > > lazy_results_type;
+             lazy_results_type lazy_results;
+             BOOST_FOREACH(hpx::naming::id_type const& gid, point_components)
+             {
+               lazy_results.push_back( stubs::point::get_msend_async( gid ) );
+             }
+             hpx::lcos::wait(lazy_results,
+                   boost::bind(&point::msend_callback, this, _1, _2));
+           }
+           if ( mrecv_ == 0 ) {
+             // no particle to be shifted, return
+             return;
+           }
+         }
+
+         // an extra space to prevent zero size when msendright(1)=msendleft(1)=0
+         sendright_.resize(nzion+1,(std::max)(msendright[1],one)+1,1);
+         sendleft_.resize(nzion+1,(std::max)(msendleft[1],one)+1,1);
+
+         // pack particle to move right
+         for (std::size_t m=1;m<=msendright[1];m++) {
+           for (std::size_t jj=1;jj<=nparam_;jj++) {
+             sendright_(jj,m,0) = zion_(jj,iright[m],0);
+             sendright_(jj+nparam_,m,0) = zion0_(jj,iright[m],0);
+           }
+         }
+
+         // pack particle to move left
+         for (std::size_t m=1;m<=msendleft[1];m++) {
+           for (std::size_t jj=1;jj<=nparam_;jj++) {
+             sendleft_(jj,m,0) = zion_(jj,ileft[m],0);
+             sendleft_(jj+nparam_,m,0) = zion0_(jj,ileft[m],0);
+           }
+         }
+
+         std::size_t mtop = mi_;
+         // # of particles remain on local PE
+         mi_ = mi_ - msendleft[1] - msendright[1]; 
+         // fill the hole 
+         std::size_t lasth = msend_;
+         for (std::size_t i=1;i<=msend_;i++) {
+           std::size_t m = kzi[i]; 
+           if ( m > mi_ ) break; // Break out of the DO loop if m > mi
+           while(mtop == kzi[lasth]) {
+             mtop--;
+             lasth--;
+           }
+           for (std::size_t jj=1;jj<=nparam_;jj++) {
+             zion_(jj,m,0) = zion_(jj,mtop,0);
+             zion0_(jj,m,0) = zion0_(jj,mtop,0);
+           }
+           mtop--;
+           if ( mtop == mi_ ) break; // Break out of the DO loo
+         }
+          
+         // TEST
+         break;
+       }
+       
+    }
+
+    bool point::msend_callback(std::size_t i,std::size_t msend)
+    {
+      mrecv_ += msend;
+      return true;
+    }
+
+    std::size_t point::get_msend()
+    {
+      return msend_;
     }
 
 }}

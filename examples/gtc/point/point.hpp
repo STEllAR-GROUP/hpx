@@ -233,6 +233,18 @@ namespace gtc
             this->base_type::shifti(gid_,point_components,par);
         }
 
+        hpx::lcos::promise< std::size_t > get_msend_async()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_msend_async(gid_);
+        }
+
+        std::size_t get_msend()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_msend(gid_);
+        }
+
 
     };
 }

@@ -44,7 +44,8 @@ namespace gtc { namespace server
             point_pushi = 10,
             point_get_dden = 11,
             point_get_dtem = 12,
-            point_shifti = 13
+            point_shifti = 13,
+            point_get_msend = 14
         };
 
         point()
@@ -102,6 +103,10 @@ namespace gtc { namespace server
 
         void shifti(std::vector<hpx::naming::id_type> const& point_components,
                      parameter const& par);
+
+        bool msend_callback(std::size_t i,std::size_t msend);
+
+        std::size_t get_msend();
 
        ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an
@@ -279,6 +284,17 @@ namespace gtc { namespace server
             &point::shifti
         > shifti_action;
 
+        typedef hpx::actions::result_action0<
+            // Component server type.
+            point,
+            // Return type.
+            std::size_t,
+            // Action code.
+            point_get_msend,
+            // Method bound to this action.
+            &point::get_msend
+        > get_msend_action;
+
     private:
         std::size_t idx_;
         double tauii_;
@@ -328,6 +344,15 @@ namespace gtc { namespace server
         std::vector<double> dden_;
         std::vector<double> dtemtmp_;
         std::vector<double> ddentmp_;
+
+        std::size_t nparam_;
+        std::size_t mimax_;
+
+        std::size_t msend_;
+        std::size_t mrecv_;
+
+        array<double> sendright_;
+        array<double> sendleft_;
     };
 }}
 
@@ -386,6 +411,10 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
               gtc::server::point::shifti_action,
               gtc_point_shifti_action)
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+              gtc::server::point::get_msend_action,
+              gtc_point_get_msend_action)
 
 #endif
 
