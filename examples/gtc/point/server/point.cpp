@@ -1639,10 +1639,10 @@ namespace gtc { namespace server
        iright.resize(mimax_+1);
        ileft.resize(mimax_+1);
 
-       std::vector<std::size_t> msendright;
-       std::vector<std::size_t> msendleft;
-       msendright.resize(3);
-       msendleft.resize(3);
+       msendright_.resize(3);
+       msendleft_.resize(3);
+       mrecvleft_.resize(3);
+       mrecvright_.resize(3);
 
        while (true) {
          iteration = iteration + 1;
@@ -1652,8 +1652,8 @@ namespace gtc { namespace server
          }
 
          msend_ = 0;
-         std::fill( msendright.begin(),msendright.end(),0 );
-         std::fill( msendleft.begin(),msendleft.end(),0 );
+         std::fill( msendright_.begin(),msendright_.end(),0 );
+         std::fill( msendleft_.begin(),msendleft_.end(),0 );
 
          if ( m0 <= mi_ ) {
            std::fill( kzi.begin(),kzi.end(),0.0 );
@@ -1670,12 +1670,12 @@ namespace gtc { namespace server
  
              if ( zetaright < 0.5 ) {
                // # of particle to move right
-               msendright[1] += 1;
-               iright[msendright[1]] = m;
+               msendright_[1] += 1;
+               iright[msendright_[1]] = m;
              } else {
                // # of particle to move left
-               msendleft[1] += 1;
-               ileft[msendleft[1]] = m;
+               msendleft_[1] += 1;
+               ileft[msendleft_[1]] = m;
              }
            }
          }
@@ -1700,11 +1700,11 @@ namespace gtc { namespace server
          }
 
          // an extra space to prevent zero size when msendright(1)=msendleft(1)=0
-         sendright_.resize(nzion+1,(std::max)(msendright[1],one)+1,1);
-         sendleft_.resize(nzion+1,(std::max)(msendleft[1],one)+1,1);
+         sendright_.resize(nzion+1,(std::max)(msendright_[1],one)+1,1);
+         sendleft_.resize(nzion+1,(std::max)(msendleft_[1],one)+1,1);
 
          // pack particle to move right
-         for (std::size_t m=1;m<=msendright[1];m++) {
+         for (std::size_t m=1;m<=msendright_[1];m++) {
            for (std::size_t jj=1;jj<=nparam_;jj++) {
              sendright_(jj,m,0) = zion_(jj,iright[m],0);
              sendright_(jj+nparam_,m,0) = zion0_(jj,iright[m],0);
@@ -1712,7 +1712,7 @@ namespace gtc { namespace server
          }
 
          // pack particle to move left
-         for (std::size_t m=1;m<=msendleft[1];m++) {
+         for (std::size_t m=1;m<=msendleft_[1];m++) {
            for (std::size_t jj=1;jj<=nparam_;jj++) {
              sendleft_(jj,m,0) = zion_(jj,ileft[m],0);
              sendleft_(jj+nparam_,m,0) = zion0_(jj,ileft[m],0);
@@ -1721,7 +1721,7 @@ namespace gtc { namespace server
 
          std::size_t mtop = mi_;
          // # of particles remain on local PE
-         mi_ = mi_ - msendleft[1] - msendright[1]; 
+         mi_ = mi_ - msendleft_[1] - msendright_[1]; 
          // fill the hole 
          std::size_t lasth = msend_;
          for (std::size_t i=1;i<=msend_;i++) {
@@ -1738,9 +1738,74 @@ namespace gtc { namespace server
            mtop--;
            if ( mtop == mi_ ) break; // Break out of the DO loo
          }
-          
+
+         // send # of particle to move right to neighboring PEs of same particle
+         {
+           typedef std::vector<hpx::lcos::promise< std::vector<std::size_t> > > lazy_results_type;
+           lazy_results_type lazy_results;
+           lazy_results.push_back( stubs::point::get_msendright_async( point_components[left_pe_] ) );
+           hpx::lcos::wait(lazy_results,
+                 boost::bind(&point::msendright_callback, this, _1, _2));
+         }
+
+         // send particle to right and receive from left
+         {
+           recvleft_.resize(nzion+1,(std::max)(mrecvleft_[1],one)+1,1);
+           typedef std::vector<hpx::lcos::promise< array<double> > > lazy_results_type;
+           lazy_results_type lazy_results;
+           lazy_results.push_back( stubs::point::get_sendright_async( point_components[left_pe_] ) );
+           hpx::lcos::wait(lazy_results,
+                 boost::bind(&point::sendright_callback, this, _1, _2));
+         }
+
+         // send # of particle to move left
+         {
+           typedef std::vector<hpx::lcos::promise< std::vector<std::size_t> > > lazy_results_type;
+           lazy_results_type lazy_results;
+           lazy_results.push_back( stubs::point::get_msendleft_async( point_components[right_pe_] ) );
+           hpx::lcos::wait(lazy_results,
+                 boost::bind(&point::msendleft_callback, this, _1, _2));
+         }
+
+         // send particle to left and receive from right
+         {
+           recvright_.resize(nzion+1,(std::max)(mrecvright_[1],one)+1,1);
+           typedef std::vector<hpx::lcos::promise< array<double> > > lazy_results_type;
+           lazy_results_type lazy_results;
+           lazy_results.push_back( stubs::point::get_sendleft_async( point_components[right_pe_] ) );
+           hpx::lcos::wait(lazy_results,
+                 boost::bind(&point::sendleft_callback, this, _1, _2));
+         }
+
+         // tracer particle -- not implemented yet
+
+         // need extra particle array 
+         if ( mi_ + mrecvleft_[1] + mrecvright_[1] > mimax_ ) {
+           std::cerr << " Need bigger particle array " << std::endl;
+         }
+
+         // unpack particle, particle moved from left
+         for (std::size_t m=1;m<=mrecvleft_[1];m++) {
+           for (std::size_t jj=1;jj<=nparam_;jj++) {
+             zion_(jj,m+mi_,0) = recvleft_(jj,m,0);
+             zion0_(jj,m+mi_,0) = recvleft_(nparam_+jj,m,0);
+           }
+         }
+
+         // particle moved from right
+         for (std::size_t m=1;m<=mrecvright_[1];m++) {
+           for (std::size_t jj=1;jj<=nparam_;jj++) {
+             zion_(jj,m+mi_+mrecvleft_[1],0) = recvright_(jj,m,0);
+             zion0_(jj,m+mi_+mrecvleft_[1],0) = recvright_(nparam_+jj,m,0);
+           }
+         }
+
+         mi_ = mi_ + mrecvleft_[1]+mrecvright_[1];
+
+         m0 = mi_ - mrecvright_[1] - mrecvleft_[1] + 1;
+
          // TEST
-         break;
+         if ( iteration > 1 ) break;
        }
        
     }
@@ -1754,6 +1819,52 @@ namespace gtc { namespace server
     std::size_t point::get_msend()
     {
       return msend_;
+    }
+
+    bool point::msendright_callback(std::size_t i,std::vector<std::size_t> const& msendright)
+    {
+      mrecvleft_[1] = msendright[1];
+      mrecvleft_[2] = msendright[2];
+      return true;
+    }
+
+    std::vector<std::size_t> point::get_msendright()
+    {
+      return msendright_;
+    }
+
+    bool point::msendleft_callback(std::size_t i,std::vector<std::size_t> const& msendleft)
+    {
+      mrecvright_[1] = msendleft[1];
+      mrecvright_[2] = msendleft[2];
+      return true;
+    }
+
+    std::vector<std::size_t> point::get_msendleft()
+    {
+      return msendleft_;
+    }
+
+    bool point::sendright_callback(std::size_t i,array<double> const& sendright)
+    {
+      recvleft_ = sendright;
+      return true;
+    }
+
+    array<double> point::get_sendright()
+    {
+      return sendright_;
+    }
+
+    bool point::sendleft_callback(std::size_t i,array<double> const& sendleft)
+    {
+      recvright_ = sendleft;
+      return true;
+    }
+
+    array<double> point::get_sendleft()
+    {
+      return sendleft_;
     }
 
 }}

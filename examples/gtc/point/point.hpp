@@ -245,6 +245,54 @@ namespace gtc
             return this->base_type::get_msend(gid_);
         }
 
+        hpx::lcos::promise< std::vector<std::size_t> > get_msendright_async()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_msendright_async(gid_);
+        }
+
+        std::vector<std::size_t> get_msendright()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_msendright(gid_);
+        }
+
+        hpx::lcos::promise< array<double> > get_sendright_async()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_sendright_async(gid_);
+        }
+
+        array<double> get_sendright()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_sendright(gid_);
+        }
+
+        hpx::lcos::promise< std::vector<std::size_t> > get_msendleft_async()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_msendleft_async(gid_);
+        }
+
+        std::vector<std::size_t> get_msendleft()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_msendleft(gid_);
+        }
+
+        hpx::lcos::promise< array<double> > get_sendleft_async()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_sendleft_async(gid_);
+        }
+
+        array<double> get_sendleft()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_sendleft(gid_);
+        }
+
 
     };
 }

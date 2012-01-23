@@ -264,6 +264,62 @@ namespace gtc { namespace stubs
             return get_msend_async(gid).get();
         }
 
+        static hpx::lcos::promise< std::vector<std::size_t> >
+        get_msendright_async(hpx::naming::id_type const& gid)
+        {
+            typedef server::point::get_msendright_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid);
+        }
+
+        static std::vector<std::size_t> get_msendright(hpx::naming::id_type const& gid)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise
+            return get_msendright_async(gid).get();
+        }
+
+        static hpx::lcos::promise< array<double> >
+        get_sendright_async(hpx::naming::id_type const& gid)
+        {
+            typedef server::point::get_sendright_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid);
+        }
+
+        static array<double> get_sendright(hpx::naming::id_type const& gid)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise
+            return get_sendright_async(gid).get();
+        }
+
+        static hpx::lcos::promise< std::vector<std::size_t> >
+        get_msendleft_async(hpx::naming::id_type const& gid)
+        {
+            typedef server::point::get_msendleft_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid);
+        }
+
+        static std::vector<std::size_t> get_msendleft(hpx::naming::id_type const& gid)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise
+            return get_msendleft_async(gid).get();
+        }
+
+        static hpx::lcos::promise< array<double> >
+        get_sendleft_async(hpx::naming::id_type const& gid)
+        {
+            typedef server::point::get_sendleft_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid);
+        }
+
+        static array<double> get_sendleft(hpx::naming::id_type const& gid)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise
+            return get_sendleft_async(gid).get();
+        }
+
     };
 }}
 

@@ -87,3 +87,19 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     gtc_point_type::wrapped_type::get_msend_action,
     gtc_point_get_msend_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtc_point_type::wrapped_type::get_msendright_action,
+    gtc_point_get_msendright_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtc_point_type::wrapped_type::get_sendright_action,
+    gtc_point_get_sendright_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtc_point_type::wrapped_type::get_msendleft_action,
+    gtc_point_get_msendleft_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtc_point_type::wrapped_type::get_sendleft_action,
+    gtc_point_get_sendleft_action);

@@ -45,7 +45,11 @@ namespace gtc { namespace server
             point_get_dden = 11,
             point_get_dtem = 12,
             point_shifti = 13,
-            point_get_msend = 14
+            point_get_msend = 14,
+            point_get_msendright = 15,
+            point_get_sendright = 16,
+            point_get_msendleft = 17,
+            point_get_sendleft = 18
         };
 
         point()
@@ -107,6 +111,22 @@ namespace gtc { namespace server
         bool msend_callback(std::size_t i,std::size_t msend);
 
         std::size_t get_msend();
+
+        bool msendright_callback(std::size_t i,std::vector<std::size_t> const& msendright);
+
+        std::vector<std::size_t> get_msendright();
+
+        bool sendright_callback(std::size_t i,array<double> const& sendright);
+
+        array<double> get_sendright();
+
+        bool msendleft_callback(std::size_t i,std::vector<std::size_t> const& msendleft);
+
+        std::vector<std::size_t> get_msendleft();
+
+        bool sendleft_callback(std::size_t i,array<double> const& sendleft);
+
+        array<double> get_sendleft();
 
        ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an
@@ -295,6 +315,50 @@ namespace gtc { namespace server
             &point::get_msend
         > get_msend_action;
 
+        typedef hpx::actions::result_action0<
+            // Component server type.
+            point,
+            // Return type.
+            std::vector<std::size_t>,
+            // Action code.
+            point_get_msendright,
+            // Method bound to this action.
+            &point::get_msendright
+        > get_msendright_action;
+
+        typedef hpx::actions::result_action0<
+            // Component server type.
+            point,
+            // Return type.
+            array<double>,
+            // Action code.
+            point_get_sendright,
+            // Method bound to this action.
+            &point::get_sendright
+        > get_sendright_action;
+
+        typedef hpx::actions::result_action0<
+            // Component server type.
+            point,
+            // Return type.
+            std::vector<std::size_t>,
+            // Action code.
+            point_get_msendleft,
+            // Method bound to this action.
+            &point::get_msendleft
+        > get_msendleft_action;
+
+        typedef hpx::actions::result_action0<
+            // Component server type.
+            point,
+            // Return type.
+            array<double>,
+            // Action code.
+            point_get_sendleft,
+            // Method bound to this action.
+            &point::get_sendleft
+        > get_sendleft_action;
+
     private:
         std::size_t idx_;
         double tauii_;
@@ -353,6 +417,13 @@ namespace gtc { namespace server
 
         array<double> sendright_;
         array<double> sendleft_;
+        array<double> recvleft_;
+        array<double> recvright_;
+
+        std::vector<std::size_t> msendright_;
+        std::vector<std::size_t> msendleft_;
+        std::vector<std::size_t> mrecvleft_;
+        std::vector<std::size_t> mrecvright_;
     };
 }}
 
@@ -415,6 +486,22 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
               gtc::server::point::get_msend_action,
               gtc_point_get_msend_action)
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+              gtc::server::point::get_msendright_action,
+              gtc_point_get_msendright_action)
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+              gtc::server::point::get_sendright_action,
+              gtc_point_get_sendright_action)
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+              gtc::server::point::get_msendleft_action,
+              gtc_point_get_msendleft_action)
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+              gtc::server::point::get_sendleft_action,
+              gtc_point_get_sendleft_action)
 
 #endif
 
