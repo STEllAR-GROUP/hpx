@@ -103,3 +103,7 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     gtc_point_type::wrapped_type::get_sendleft_action,
     gtc_point_get_sendleft_action);
+
+HPX_REGISTER_ACTION_EX(
+    gtc_point_type::wrapped_type::poisson_action,
+    gtc_point_poisson_action);

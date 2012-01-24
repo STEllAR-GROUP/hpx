@@ -449,8 +449,19 @@ int hpx_main(boost::program_options::variables_map &vm)
               hpx::lcos::wait(shifti_phase);
             }
 
+            {  // POISSON(0)
+              std::vector<hpx::lcos::promise<void> > poisson_phase;
+              std::size_t iflag = 0;
+              for (std::size_t i=0;i<par->ntoroidal;i++) {
+                poisson_phase.push_back(points[i].poisson_async(
+                                      iflag,istep,irk,
+                                      point_components,par));
+              }
+              hpx::lcos::wait(poisson_phase);
+            }
+
           }
-        };
+        }
 
         ///////////////////////////////////////////////////////////////////////
         // Start the search/charge depositing phase.

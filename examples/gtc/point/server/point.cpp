@@ -1867,5 +1867,11 @@ namespace gtc { namespace server
       return sendleft_;
     }
 
+    void point::poisson(std::size_t iflag, std::size_t istep, std::size_t irk, 
+                    std::vector<hpx::naming::id_type> const& point_components, 
+                    parameter const& par)
+    {
+    }
+
 }}
 

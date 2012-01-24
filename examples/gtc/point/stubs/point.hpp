@@ -320,6 +320,31 @@ namespace gtc { namespace stubs
             return get_sendleft_async(gid).get();
         }
 
+        static hpx::lcos::promise<void>
+        poisson_async(hpx::naming::id_type const& gid,
+           std::size_t iflag,
+           std::size_t istep,
+           std::size_t irk,
+            std::vector<hpx::naming::id_type> const& point_components,
+            hpx::components::gtc::parameter const& par)
+        {
+            typedef server::point::poisson_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid,iflag,istep,irk,
+                point_components,par);
+        }
+
+        static void poisson(hpx::naming::id_type const& gid,
+               std::size_t iflag,
+               std::size_t istep,
+               std::size_t irk,
+               std::vector<hpx::naming::id_type> const& point_components,
+               hpx::components::gtc::parameter const& par)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise.
+            poisson_async(gid,iflag,istep,irk,point_components,par).get();
+        }
+
     };
 }}
 

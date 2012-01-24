@@ -49,7 +49,8 @@ namespace gtc { namespace server
             point_get_msendright = 15,
             point_get_sendright = 16,
             point_get_msendleft = 17,
-            point_get_sendleft = 18
+            point_get_sendleft = 18,
+            point_poisson = 19
         };
 
         point()
@@ -127,6 +128,9 @@ namespace gtc { namespace server
         bool sendleft_callback(std::size_t i,array<double> const& sendleft);
 
         array<double> get_sendleft();
+
+        void poisson(std::size_t iflag, std::size_t istep, std::size_t irk, 
+                    std::vector<hpx::naming::id_type> const& point_components,                      parameter const& par);
 
        ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an
@@ -359,6 +363,21 @@ namespace gtc { namespace server
             &point::get_sendleft
         > get_sendleft_action;
 
+        typedef hpx::actions::action5<
+            // Component server type.
+            point,
+            // Action code.
+            point_poisson,
+            // Arguments of this action.
+            std::size_t,
+            std::size_t,
+            std::size_t,
+            std::vector<hpx::naming::id_type> const&,
+            parameter const&,
+            // Method bound to this action. 
+            &point::poisson
+        > poisson_action;
+
     private:
         std::size_t idx_;
         double tauii_;
@@ -502,6 +521,10 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
               gtc::server::point::get_sendleft_action,
               gtc_point_get_sendleft_action)
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+              gtc::server::point::poisson_action,
+              gtc_point_poisson_action)
 
 #endif
 

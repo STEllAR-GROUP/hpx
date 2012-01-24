@@ -293,6 +293,28 @@ namespace gtc
             return this->base_type::get_sendleft(gid_);
         }
 
+        hpx::lcos::promise<void> poisson_async(
+            std::size_t iflag,
+            std::size_t istep,
+            std::size_t irk,
+            std::vector<hpx::naming::id_type> const& point_components,
+            parameter const& par)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::poisson_async(gid_,iflag,istep,irk,
+                                                   point_components,par);
+        }
+
+        void poisson( std::size_t iflag,
+                      std::size_t istep,
+                      std::size_t irk,
+                      std::vector<hpx::naming::id_type> const& point_components,
+                    parameter const& par)
+        {
+            BOOST_ASSERT(gid_);
+            this->base_type::poisson(gid_,iflag,istep,irk,point_components,par);
+        }
+
 
     };
 }
