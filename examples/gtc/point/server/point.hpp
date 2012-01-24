@@ -130,7 +130,10 @@ namespace gtc { namespace server
         array<double> get_sendleft();
 
         void poisson(std::size_t iflag, std::size_t istep, std::size_t irk, 
-                    std::vector<hpx::naming::id_type> const& point_components,                      parameter const& par);
+                    std::vector<hpx::naming::id_type> const& point_components,                      
+                    parameter const& par);
+
+        void poisson_initial(std::size_t mring,std::size_t mindex,parameter const& par);
 
        ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an
@@ -443,6 +446,9 @@ namespace gtc { namespace server
         std::vector<std::size_t> msendleft_;
         std::vector<std::size_t> mrecvleft_;
         std::vector<std::size_t> mrecvright_;
+
+        array<double> ring_;
+        array<std::size_t> indexp_,nindex_;
     };
 }}
 

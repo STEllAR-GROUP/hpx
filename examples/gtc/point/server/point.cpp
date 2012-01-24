@@ -1871,6 +1871,296 @@ namespace gtc { namespace server
                     std::vector<hpx::naming::id_type> const& point_components, 
                     parameter const& par)
     {
+
+      // number of gyro-ring
+      std::size_t mring = 2;
+
+      // number of summation: maximum is 32*mring+1
+      std::size_t mindex = 32*mring+1;
+
+      // gamma=0.75: max. resolution for k=0.577
+      double gamma = 0.75;
+
+      std::size_t iteration = 5;
+
+      // initialize poisson solver
+      if ( istep == 1 && irk == 1 && iflag == 0 ) {
+        indexp_.resize(mindex+1,mgrid_+1,mzeta_+1);
+        ring_.resize(mindex+1,mgrid_+1,mzeta_+1);
+        nindex_.resize(mgrid_+1,mzeta_+1,1);
+
+        poisson_initial(mring,mindex,par);
+      }
+
+      double tmp = 1.0/(par->tite+1.0-gamma);
+
+      std::size_t ipartd,izeta1,izeta2;
+      if (par->npartdom > 1 && mzeta_%par->npartdom == 0 ) {
+        std::cerr << " This version of GTC does not support npartdom > 1 at present: " << par->npartdom << std::endl;
+        ipartd = 0;
+        izeta1 = 1;
+        izeta2 = mzeta_;
+      } else {
+        ipartd = 0;
+        izeta1 = 1;
+        izeta2 = mzeta_;
+      }
+
+      std::vector<double> dentmp,phitmp,ptilde,perr;
+      dentmp.resize(mgrid_+1);
+      phitmp.resize(mgrid_+1);
+      ptilde.resize(mgrid_+1);
+      perr.resize(mgrid_+1);
+
+      for (std::size_t k=izeta1;k<=izeta2;k++) {
+
+        // first iteration, first guess of phi. (1+T_i/T_e) phi - phi_title = n_i
+        if (iflag == 0 ) {
+          for (std::size_t i=1;i<=mgrid_;i++) {
+            dentmp[i] = par->qion*densityi_(k,i,0);
+          }
+        } else {
+          for (std::size_t i=1;i<=mgrid_;i++) {
+            dentmp[i] = par->qion*densityi_(k,i,0) + par->qelectron*densitye_(k,i,0);
+          }
+        }
+
+        for (std::size_t i=1;i<=mgrid_;i++) {
+          phitmp[i] = dentmp[i]*tmp;
+        }
+
+        for (std::size_t it=2;it<=iteration;it++) {
+          for (std::size_t i=1;i<=mgrid_;i++) {
+            ptilde[i] = 0.0;
+            for (std::size_t j=1;j<=nindex_(i,k,0);j++) {
+              ptilde[i] += ring_(j,i,k)*phitmp[indexp_(j,i,k)];
+            }
+          } 
+        }
+
+        for (std::size_t i=1;i<=mgrid_;i++) {
+          perr[i] = ptilde[i] - gamma*phitmp[i];  
+          phitmp[i] = (dentmp[i]+perr[i])*tmp;
+        }
+
+        for (std::size_t i=igrid_[0];i<=igrid_[0]+mtheta_[0];i++) {
+          phitmp[i] = 0.0;
+        }
+        for (std::size_t i=igrid_[par->mpsi];i<=igrid_[par->mpsi]+mtheta_[par->mpsi];i++) {
+          phitmp[i] = 0.0;
+        }
+
+        for (std::size_t i=1;i<=mgrid_;i++) {
+          phi_(k,i,0) = phitmp[i];
+        }
+      }
+
+      if ( ipartd == 1 ) {
+        std::cerr << " Unsupported at this time. " << std::endl;
+      }
+
+      // in equilibrium unit
+      for (std::size_t i=0;i<=par->mpsi;i++) {
+        for (std::size_t jj=igrid_[i]+1;jj<=igrid_[i]+mtheta_[i];jj++) {
+          for (std::size_t ii=1;ii<=mzeta_;ii++) {
+            phi_(ii,jj,0) *= rtemi_[i]*pow(par->qion*par->gyroradius,2)/par->aion; 
+          }
+        }
+        for (std::size_t ii=1;ii<=mzeta_;ii++) {
+          // poloidal BC
+          phi_(ii,igrid_[i],0) = phi_(ii,igrid_[i]+mtheta_[i],0); 
+        }
+      }
+
+    }
+
+    void point::poisson_initial(std::size_t mring,std::size_t mindex,parameter const& par)
+    {
+
+      double vring[4];
+      double fring[4];
+
+      if ( mring == 1 ) {
+        // one ring, velocity in unit of gyroradius
+        vring[1] = sqrt(2.0);
+        fring[1] = 1.0;
+      } else if ( mring == 2 ) {
+        // two rings good for up to k_perp=1.5
+        vring[1]=0.9129713024553;
+        vring[2]=2.233935334042;
+        fring[1]=0.7193896325719;
+        fring[2]=0.2806103674281;
+      } else {
+        // three rings: exact(<0.8%) for up to k_perp=1.5
+        vring[1]=0.388479356715;
+        vring[2]=1.414213562373;
+        vring[3]=2.647840808818;
+        fring[1]=0.3043424333839;
+        fring[2]=0.5833550690524;
+        fring[3]=0.1123024975637;
+      }
+
+      double pi2_inv = 0.5/pi_;
+      double delr = 1.0/deltar_;
+      std::vector<double> delt;
+      delt.resize(deltat_.size());
+      for (std::size_t i=0;i<deltat_.size();i++) {
+        delt[i] = 2.0*pi_/deltat_[i];
+      }
+
+        indexp_.resize(mindex+1,mgrid_+1,mzeta_+1);
+        ring_.resize(mindex+1,mgrid_+1,mzeta_+1);
+        nindex_.resize(mgrid_+1,mzeta_+1,1);
+      // initialize
+      for (std::size_t k=0;k<indexp_.ksize();k++) {
+        for (std::size_t j=0;j<indexp_.jsize();j++) {
+          for (std::size_t i=0;i<indexp_.isize();i++) {
+            indexp_(i,j,k) = 1;
+          }
+        }
+      }
+      for (std::size_t k=0;k<nindex_.ksize();k++) {
+        for (std::size_t j=0;j<nindex_.jsize();j++) {
+          for (std::size_t i=0;i<nindex_.isize();i++) {
+            nindex_(i,j,k) = 0;
+          }
+        }
+      }
+      for (std::size_t k=0;k<ring_.ksize();k++) {
+        for (std::size_t j=0;j<ring_.jsize();j++) {
+          for (std::size_t i=0;i<ring_.isize();i++) {
+            ring_(i,j,k) = 0.0;
+          }
+        }
+      }
+
+      std::size_t zero = 0;
+      for (std::size_t k=1;k<=mzeta_;k++) {
+        double zdum = zetamin_ + deltaz_*k;
+        for ( std::size_t i=0;i<=par->mpsi;i++) {
+          for ( std::size_t j=1;j<=mtheta_[i];j++) {
+            std::size_t ij0 = igrid_[i] + j;
+
+            // 1st point is the original grid point
+            nindex_(ij0,k,0) = 1;
+            indexp_(1,ij0,k) = ij0;
+            ring_(1,ij0,k) = 0.25;
+
+            // position of grid points
+            double rgrid = par->a0 + deltar_*i;
+            double tgrid = deltat_[i]*j+zdum*qtinv_[i];
+            tgrid = tgrid*pi2_inv;
+            tgrid = 2.0*pi_*(tgrid-floor(tgrid)); 
+            std::size_t jt = (std::max)(zero,(std::min)(mtheta_[i],(std::size_t) (pi2_inv*delt[i]*tgrid+0.5)));
+            // B-field
+            double b = 1.0/(1.0+rgrid*cos(tgrid));
+            std::size_t ipjt = igrid_[i] + jt;
+
+            // I don't like the risk of using variables unitialized
+            double wght = -9999999;
+            for (std::size_t kr=1;kr<=mring;kr++) {
+              for (std::size_t kp=1;kp<=8;kp++) {
+                double ddelr,ddelt;
+                if(kp<5) {
+                    ddelr=pgyro_(kp,ipjt,0);
+                    ddelt=tgyro_(kp,ipjt,0);
+                    wght=0.0625*fring[kr];
+                } else if(kp==5) {
+                    ddelr=0.5*(pgyro_(1,ipjt,0)+pgyro_(3,ipjt,0));
+                    ddelt=0.5*(tgyro_(1,ipjt,0)+tgyro_(3,ipjt,0));
+                    wght=0.125*fring[kr];
+                } else if(kp==6) {
+                    ddelr=0.5*(pgyro_(2,ipjt,0)+pgyro_(3,ipjt,0));
+                    ddelt=0.5*(tgyro_(2,ipjt,0)+tgyro_(3,ipjt,0));
+                } else if(kp==7) {
+                    ddelr=0.5*(pgyro_(2,ipjt,0)+pgyro_(4,ipjt,0));
+                    ddelt=0.5*(tgyro_(2,ipjt,0)+tgyro_(4,ipjt,0));
+                } else if(kp==8) {
+                    ddelr=0.5*(pgyro_(1,ipjt,0)+pgyro_(4,ipjt,0));
+                    ddelt=0.5*(tgyro_(1,ipjt,0)+tgyro_(4,ipjt,0));
+                }
+
+                // position for each point with rho_i=2.0*vring
+                double r=rgrid+ddelr*2.0*vring[kr]*sqrt(0.5/b);
+                double t=tgrid+ddelt*2.0*vring[kr]*sqrt(0.5/b);
+
+                // linear interpolation
+                double rdum = delr*(std::max)(0.0,(std::min)(par->a1-par->a0,r-par->a0));
+                std::size_t ii = (std::max)(zero,(std::min)(par->mpsi-1,(std::size_t)(rdum)));
+                double wr = rdum - ii;
+                if ( wr > 0.95 ) wr = 1.0;
+                if ( wr < 0.05 ) wr = 0.0;
+
+                // outer flux surface
+                double tdum=t-zdum*qtinv_[ii+1];
+                tdum=tdum*pi2_inv+10.0;
+                tdum=delt[ii+1]*(tdum-floor(tdum));
+                std::size_t j1=(std::max)(zero,(std::min)(mtheta_[ii+1]-1,(std::size_t)(tdum)));
+                double wt1=tdum-j1;
+                if(wt1>0.95) wt1=1.0;
+                if(wt1<0.05) wt1=0.0;
+
+                // inner flux surface
+                tdum=t-zdum*qtinv_[ii];
+                tdum=tdum*pi2_inv+10.0;
+                tdum=delt[ii]*(tdum-floor(tdum));
+                std::size_t j0=(std::max)(zero,(std::min)(mtheta_[ii]-1,(std::size_t)(tdum)));
+                double wt0=tdum-j0;
+                if(wt0>0.95) wt0=1.0;
+                if(wt0<0.05) wt0=0.0;
+
+                // index and weight of each point
+                for (std::size_t np=1;np<=4;np++ ) {
+                  std::size_t ij;
+                  double rr;
+                  if ( np == 1 ) {
+                    ij = igrid_[ii+1]+j1+1;
+                    rr = wght*wr*wt1; 
+                  } else if ( np == 2 ) {
+                    if ( j1 == 0 ) j1 = mtheta_[ii+1];
+                    ij = igrid_[ii+1]+j1;
+                    rr = wght*wr*(1.0-wt1);
+                  } else if ( np == 3 ) {
+                    ij = igrid_[ii]+j0+1;
+                    rr=wght*(1.0-wr)*wt0;
+                  } else {
+                    if(j0==0)j0=mtheta_[ii];
+                    ij=igrid_[ii]+j0;
+                    rr=wght*(1.0-wr)*(1.0-wt0);
+                  }
+         
+                  // insignificant point replaced by the original grid point
+                  if ( rr < 0.001 ) {
+                    ring_(1,ij0,k) = ring_(1,ij0,k) + rr;
+                  } else {
+                    bool found = false;
+                    for (std::size_t nt=1;nt<=nindex_(ij0,k,0);nt++) {
+                      if ( ij == indexp_(nt,ij0,k) ) {
+                        found = true;
+                        ring_(nt,ij0,k) = ring_(nt,ij0,k) + rr;
+                        break;
+                      }
+                    }
+                    if ( !found ) {
+                      nindex_(ij0,k,0) = nindex_(ij0,k,0)+1;
+                      std::size_t nt = nindex_(ij0,k,0);
+                      indexp_(nt,ij0,k) = ij;
+                      ring_(nt,ij0,k) = rr;
+                    }
+
+                  }
+
+                }
+
+              }
+            }
+
+
+          }
+        }
+      }
+
+
     }
 
 }}
