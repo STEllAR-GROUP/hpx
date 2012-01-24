@@ -12,3 +12,6 @@ add_hpx_component(remote_object
   HEADER_ROOT ${root}
   AUTOGLOB)
 
+add_hpx_pseudo_dependencies(components.remote_object
+                            remote_object_component)
+

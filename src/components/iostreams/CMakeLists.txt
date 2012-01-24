@@ -13,3 +13,6 @@ add_hpx_component(iostreams
   HEADER_ROOT ${root}
   AUTOGLOB)
 
+add_hpx_pseudo_dependencies(components.iostreams
+                            iostreams_component)
+

@@ -12,3 +12,6 @@ add_hpx_component(distributing_factory
   HEADER_ROOT ${root}
   AUTOGLOB)
 
+add_hpx_pseudo_dependencies(components.distributing_factory
+                            distributing_factory_component)
+

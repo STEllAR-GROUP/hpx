@@ -11,3 +11,6 @@ add_hpx_component(dataflow
   HEADER_ROOT ${root}
   AUTOGLOB)
 
+add_hpx_pseudo_dependencies(components.dataflow
+                            dataflow_component)
+
