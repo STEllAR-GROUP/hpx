@@ -290,7 +290,7 @@ namespace gtc { namespace server
 
           double wz1 = (zetatmp-zetamin_)*delz;
           std::size_t kk = (std::max)(zero,(std::min)(par->mpsi-1,(std::size_t) wz1));
-          kzion_[m] = static_cast<double>(kk);
+          kzion_[m] = kk;
           wzion_[m] = wz1 - kk;
 
           for (std::size_t larmor=1;larmor<=4;larmor++) {
@@ -325,7 +325,7 @@ namespace gtc { namespace server
         for (std::size_t m=1;m<=mi_;m++) {
           double weight = zion_(5,m,0);
 
-          std::size_t kk = static_cast<std::size_t>(kzion_[m]);
+          std::size_t kk = kzion_[m];
           double wz1 = weight*wzion_[m];
           double wz0 = weight-wz1;
 

@@ -404,8 +404,10 @@ namespace gtc { namespace server
         std::vector<double> hfluxpsi_,zonali_,zonale_,gradt_;
         array<double> eigenmode_;
         array<double> pgyro_,tgyro_,markeri_,densityi_,phi_,evector_;
-        array<double> jtp1_,jtp2_,wtp1_,wtp2_,dtemper_,heatflux_;
-        array<double> zion_,zion0_,jtion0_,jtion1_,wpion_,wtion0_,wtion1_;
+        array<double> wtp1_,wtp2_,dtemper_,heatflux_;
+        array<double> zion_,zion0_,wpion_,wtion0_,wtion1_;
+        array<std::size_t> jtion0_,jtion1_;
+        array<std::size_t> jtp1_,jtp2_;
         std::vector<double> wzion_;
         std::vector<size_t> kzion_;
 

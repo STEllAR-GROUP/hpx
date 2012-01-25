@@ -134,7 +134,7 @@ namespace gtc { namespace server
         if ( me_ < (me_local%par->npartdom) ) me_++;
 
         double tmp13 = (double) mi_;
-        double tmp14 = (double) me_;
+        //double tmp14 = (double) me_;
         mimax_ = static_cast<std::size_t>(mi_ + 100*std::ceil(sqrt(tmp13))); // ions array upper bound
        
         //mimax_ = mi_ + 100*(std::size_t)(std::ceil(sqrt(mi_))); // ions array upper bound
@@ -148,12 +148,12 @@ namespace gtc { namespace server
         phi_.resize(mzeta_+1,mgrid_+1,1);
         evector_.resize(4,mzeta_+1,mgrid_+1);
         recvls_.resize(4,mgrid_+1,1);
-        jtp1_.resize(3,mgrid_,mzeta_+1);
-        jtp2_.resize(3,mgrid_,mzeta_+1);
-        wtp1_.resize(3,mgrid_,mzeta_+1);
-        wtp2_.resize(3,mgrid_,mzeta_+1);
-        dtemper_.resize(mgrid_,mzeta_,1);
-        heatflux_.resize(mgrid_,mzeta_,1);
+        jtp1_.resize(3,mgrid_+1,mzeta_+1);
+        jtp2_.resize(3,mgrid_+1,mzeta_+1);
+        wtp1_.resize(3,mgrid_+1,mzeta_+1);
+        wtp2_.resize(3,mgrid_+1,mzeta_+1);
+        dtemper_.resize(mgrid_+1,mzeta_,1);
+        heatflux_.resize(mgrid_+1,mzeta_,1);
 
         phitmp_.resize(mzeta_+1,mgrid_+1,1);
 
@@ -206,6 +206,7 @@ namespace gtc { namespace server
             markeri_(j,igrid_[i],0) = markeri_(j,igrid_[i]+mtheta_[i],0);
           }
         }
+  
         if ( par->track_particles ) {
           // Not implemented yet
           nparam_ = 7;
@@ -272,10 +273,10 @@ namespace gtc { namespace server
                 jt = (jt+mtheta_[indp])%(mtheta_[indp]);
                 if ( ip == 1 ) {
                   wtp1_(1,ij,k) = wt;
-                  jtp1_(1,ij,k) = static_cast<double>(igrid_[indp] + jt);
+                  jtp1_(1,ij,k) = igrid_[indp] + jt;
                 } else {
                   wtp2_(1,ij,k) = wt;
-                  jtp2_(1,ij,k) = static_cast<double>(igrid_[indp] + jt);
+                  jtp2_(1,ij,k) = igrid_[indp] + jt;
                 }
 // downward
                 tdum = (j*deltat_[i]+zdum*(qtinv_[i]-qtinv_[indt]))/deltat_[indt];
@@ -284,10 +285,10 @@ namespace gtc { namespace server
                 jt = (jt+mtheta_[indt])%mtheta_[indt];
                 if ( ip == 1 ) {
                   wtp1_(2,ij,k) = wt;
-                  jtp1_(2,ij,k) = static_cast<double>(igrid_[indt] + jt);
+                  jtp1_(2,ij,k) = igrid_[indt] + jt;
                 } else {
                   wtp2_(2,ij,k) = wt;
-                  jtp2_(2,ij,k) = static_cast<double>(igrid_[indt] + jt);
+                  jtp2_(2,ij,k) = igrid_[indt] + jt;
                 }
               }
             }
@@ -451,7 +452,7 @@ namespace gtc { namespace server
           double tdum = pi2_inv*(tflr-zetatmp*qtinv_[im])+10.0;
           tdum = (tdum - floor(tdum))*delt[im];
           std::size_t j00 = (std::max)(zero,(std::min)(mtheta_[im]-1,(std::size_t) tdum));
-          jtion0_(larmor,m,0) = static_cast<double>(igrid_[im] + j00);
+          jtion0_(larmor,m,0) = igrid_[im] + j00;
           wtion0_(larmor,m,0) = tdum - j00;
 
           // outer flux surface
@@ -459,7 +460,7 @@ namespace gtc { namespace server
           tdum = pi2_inv*(tflr-zetatmp*qtinv_[im])+10.0;
           tdum = (tdum - floor(tdum))*delt[im];
           std::size_t j01 = (std::max)(zero,(std::min)(mtheta_[im]-1,(std::size_t) tdum));
-          jtion1_(larmor,m,0) = static_cast<double>(igrid_[im] + j01);
+          jtion1_(larmor,m,0) = igrid_[im] + j01;
           wtion1_(larmor,m,0) = tdum - j01;
         }
       }
@@ -482,7 +483,7 @@ namespace gtc { namespace server
           double wt11 = wp1*wtion1_(larmor,m,0);
           double wt01 = wp1-wt11;
 
-          std::size_t ij = static_cast<std::size_t>(jtion0_(larmor,m,0));
+          std::size_t ij = jtion0_(larmor,m,0);
           //if ( kk >= densityi_.isize() || ij >= densityi_.jsize() || 
           //     kk+1 >= densityi_.isize() ) {
           //  std::cout << " TEST kk " << kk << " ij " << ij << " isize " << densityi_.isize() << " jsize " << densityi_.jsize() << " mzeta " << mzeta_ << std::endl;
@@ -494,7 +495,7 @@ namespace gtc { namespace server
           densityi_(kk,ij,0) = densityi_(kk,ij,0) + wz0*wt10;
           densityi_(kk+1,ij,0)   = densityi_(kk+1,ij,0)   + wz1*wt10;
 
-          ij = static_cast<std::size_t>(jtion1_(larmor,m,0));
+          ij = jtion1_(larmor,m,0);
           densityi_(kk,ij,0) = densityi_(kk,ij,0) + wz0*wt01;
           densityi_(kk+1,ij,0)   = densityi_(kk+1,ij,0)   + wz1*wt01;
 
@@ -1025,8 +1026,7 @@ namespace gtc { namespace server
                   xz[kz*mz+k] = allzeta_[indp];
                 }
               }
-              // ifdef ESSL
-              // TEST
+              std::cerr << " fftr1d is not ported to C++ yet " << std::endl;
               // call fftr1d(1,mtdiag,scale,xz,yz,2)
 
               // record mode information for diagnostic
@@ -1042,8 +1042,7 @@ namespace gtc { namespace server
                   yz[kk] *= filter[kk];
                 }
                 // transform back to real space
-                // ESSL
-                // TEST
+                std::cerr << " fftr1d is not ported to C++ yet " << std::endl;
                 // call fftr1d(-1,mtdiag,scale,xz,yz,2)
  
                 // transpose back to (ntoroidal,mz)
@@ -1807,8 +1806,6 @@ namespace gtc { namespace server
 
          m0 = mi_ - mrecvright_[1] - mrecvleft_[1] + 1;
 
-         // TEST
-         if ( iteration > 1 ) break;
        }
        
     }

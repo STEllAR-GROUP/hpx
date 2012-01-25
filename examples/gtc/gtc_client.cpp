@@ -73,7 +73,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         par->irun = false;
         // TEST
         //par->mstep = 1500;
-        par->mstep = 1;
+        par->mstep = 4;
         par->msnap = 1;
         par->ndiag = 4;
         par->nonlinear = 1.0;
@@ -149,7 +149,8 @@ int hpx_main(boost::program_options::variables_map &vm)
         par->mmode.push_back(28);
 
         // number of "processors"
-        par->numberpe = 40;
+        //par->numberpe = 40;
+        par->numberpe = 1;
 
         id_type rt_id = get_applier().get_runtime_support_gid();
 
@@ -411,6 +412,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         // main time loop
         for (istep=1;istep<=par->mstep;istep++) {
+          std::cout << " Step : " << istep << std::endl;
           for (std::size_t irk=1;irk<=2;irk++) {
             // idiag=0: do time history diagnosis
             std::size_t idiag = ((irk+1)%2) + (istep%par->ndiag);
