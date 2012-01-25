@@ -138,7 +138,7 @@ namespace gtc { namespace server
         mimax_ = static_cast<std::size_t>(mi_ + 100*std::ceil(sqrt(tmp13))); // ions array upper bound
        
         //mimax_ = mi_ + 100*(std::size_t)(std::ceil(sqrt(mi_))); // ions array upper bound
-        std::size_t memax = static_cast<std::size_t>(me_ + 100*std::ceil(sqrt(tmp14))); // electrons array upper bound
+        //std::size_t memax = static_cast<std::size_t>(me_ + 100*std::ceil(sqrt(tmp14))); // electrons array upper bound
 
         pgyro_.resize(5,mgrid_+1,1);
         tgyro_.resize(5,mgrid_+1,1);
@@ -434,7 +434,7 @@ namespace gtc { namespace server
 
         double wz1 = (zetatmp-zetamin_)*delz;
         std::size_t kk = (std::max)(zero,(std::min)(par->mpsi-1,(std::size_t) wz1));
-        kzion_[m] = static_cast<double>(kk);
+        kzion_[m] = kk;
         wzion_[m] = wz1 - kk;
 
         for (std::size_t larmor=1;larmor<=4;larmor++) {
@@ -469,14 +469,13 @@ namespace gtc { namespace server
       for (std::size_t m=1;m<=mi_;m++) {
         double weight = zion_(5,m,0);
 
-        std::size_t kk = static_cast<std::size_t>(kzion_[m]);
+        std::size_t kk = kzion_[m];
         double wz1 = weight*wzion_[m];
         double wz0 = weight-wz1;
 
         for (std::size_t larmor=1;larmor<=4;larmor++) {
           double wp1 = wpion_(larmor,m,0);
           double wp0 = 1.0-wp1;
-
           double wt10 = wp0*wtion0_(larmor,m,0);
           double wt00 = wp0 - wt10;
 
@@ -484,6 +483,10 @@ namespace gtc { namespace server
           double wt01 = wp1-wt11;
 
           std::size_t ij = static_cast<std::size_t>(jtion0_(larmor,m,0));
+          //if ( kk >= densityi_.isize() || ij >= densityi_.jsize() || 
+          //     kk+1 >= densityi_.isize() ) {
+          //  std::cout << " TEST kk " << kk << " ij " << ij << " isize " << densityi_.isize() << " jsize " << densityi_.jsize() << " mzeta " << mzeta_ << std::endl;
+          //}
           densityi_(kk,ij,0) = densityi_(kk,ij,0) + wz0*wt00;
           densityi_(kk+1,ij,0) = densityi_(kk+1,ij,0) + wz1*wt00;
 

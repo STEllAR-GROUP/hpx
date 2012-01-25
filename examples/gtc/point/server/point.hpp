@@ -406,7 +406,8 @@ namespace gtc { namespace server
         array<double> pgyro_,tgyro_,markeri_,densityi_,phi_,evector_;
         array<double> jtp1_,jtp2_,wtp1_,wtp2_,dtemper_,heatflux_;
         array<double> zion_,zion0_,jtion0_,jtion1_,wpion_,wtion0_,wtion1_;
-        std::vector<double> kzion_,wzion_;
+        std::vector<double> wzion_;
+        std::vector<size_t> kzion_;
 
         array<double> densitye_;
 

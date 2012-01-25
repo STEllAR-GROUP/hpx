@@ -379,6 +379,13 @@ int hpx_main(boost::program_options::variables_map &vm)
           hpx::lcos::wait(initial_phase);
         }
 
+        bool do_collision;
+        if ( par->tauii > 0.0 ) {
+          do_collision = true;
+        } else {
+          do_collision = false;
+        }
+
         { // LOAD
           std::vector<hpx::lcos::promise<void> > load_phase;
           for (std::size_t i=0;i<par->ntoroidal;i++) {
@@ -392,9 +399,7 @@ int hpx_main(boost::program_options::variables_map &vm)
           point_components.push_back(points[i].get_gid());
         }
 
-        // For testing
-        std::size_t istep = 1;
-        //std::size_t istep = 0;
+        std::size_t istep = 0;
         { // CHARGEI
           std::vector<hpx::lcos::promise<void> > chargei_phase;
           for (std::size_t i=0;i<par->ntoroidal;i++) {
@@ -449,6 +454,32 @@ int hpx_main(boost::program_options::variables_map &vm)
               hpx::lcos::wait(shifti_phase);
             }
 
+            if ( irk == 2 && do_collision ) { 
+              std::cerr << " Collision not implemented yet.  Not a default parameter " << std::endl;
+            }
+
+            // ion perturbed density
+            { // CHARGEI
+              std::vector<hpx::lcos::promise<void> > chargei_phase;
+              for (std::size_t i=0;i<par->ntoroidal;i++) {
+                chargei_phase.push_back(points[i].chargei_async(istep,
+                                    point_components,par));
+              }
+              hpx::lcos::wait(chargei_phase);
+            }
+
+            // smooth ion density
+            {  // SMOOTH(0)
+              std::vector<hpx::lcos::promise<void> > smooth_phase;
+              std::size_t iflag = 0;
+              for (std::size_t i=0;i<par->ntoroidal;i++) {
+                smooth_phase.push_back(points[i].smooth_async(iflag,
+                                      point_components,idiag,par));
+              }
+              hpx::lcos::wait(smooth_phase);
+            }
+
+            // solve GK Poisson equation using adiabatic electron
             {  // POISSON(0)
               std::vector<hpx::lcos::promise<void> > poisson_phase;
               std::size_t iflag = 0;
@@ -460,12 +491,12 @@ int hpx_main(boost::program_options::variables_map &vm)
               hpx::lcos::wait(poisson_phase);
             }
 
+            for (std::size_t ihybrid=1;ihybrid<=par->nhybrid;ihybrid++) {
+              std::cerr << " par->nybrid > 0 not supported yet " << std::endl;
+            }
           }
         }
-
         ///////////////////////////////////////////////////////////////////////
-        // Start the search/charge depositing phase.
-        std::vector<hpx::lcos::promise<void> > charge_phase;
 
         // Print the total walltime that the computation took.
         std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl;
