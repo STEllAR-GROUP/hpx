@@ -9,8 +9,10 @@
 
 #include <string>
 
+#include <boost/version.hpp>
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/preprocessor/cat.hpp>
 
 #include <hpx/config/export_definitions.hpp>
 
@@ -39,6 +41,22 @@
     #define HPX_SVN_REVISION     "$Revision$"
 #endif
 
+///////////////////////////////////////////////////////////////////////////////
+// The version check enforces the major and minor version numbers to match for
+// every compilation unit to be compiled.
+#define HPX_CHECK_VERSION                                                     \
+    BOOST_PP_CAT(hpx_check_version_,                                          \
+        BOOST_PP_CAT(HPX_VERSION_MAJOR,                                       \
+            BOOST_PP_CAT(_, HPX_VERSION_MINOR)))                              \
+    /**/
+
+// The version check enforces the major and minor version numbers to match for
+// every compilation unit to be compiled.
+#define HPX_CHECK_BOOST_VERSION                                               \
+    BOOST_PP_CAT(hpx_check_boost_version_, BOOST_VERSION)                     \
+    /**/
+
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
     // Returns the major HPX version.
@@ -47,7 +65,7 @@ namespace hpx
     // Returns the minor HPX version.
     HPX_EXPORT boost::uint8_t minor_version();
 
-    // Returns the subminor/patchlevel HPX version.
+    // Returns the sub-minor/patch-level HPX version.
     HPX_EXPORT boost::uint8_t subminor_version();
 
     // Returns the full HPX version.
@@ -70,7 +88,29 @@ namespace hpx
 
     // Returns the full version string.
     HPX_EXPORT std::string complete_version();
+
+    // Helper data structures allowing to automatically detect version problems
+    // between applications and the core libraries.
+    extern HPX_EXPORT char const HPX_CHECK_VERSION[];
+    extern HPX_EXPORT char const HPX_CHECK_BOOST_VERSION[];
 }
+
+///////////////////////////////////////////////////////////////////////////////
+#if !defined(HPX_EXPORTS)
+    // This is instantiated for each translation unit outside of the HPX core
+    // library, forcing to resolve the variable HPX_CHECK_VERSION.
+    namespace
+    {
+        // Note: this function is never executed.
+        char const* check_hpx_version()
+        {
+            char const* versions[] = {
+                hpx::HPX_CHECK_VERSION, hpx::HPX_CHECK_BOOST_VERSION
+            };
+            return versions[0];
+        }
+    }
+#endif
 
 #endif
 

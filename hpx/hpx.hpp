@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_DISTPX_MAR_24_2008_1118AM)
-#define HPX_DISTPX_MAR_24_2008_1118AM
+#if !defined(HPX_MAR_24_2008_1118AM)
+#define HPX_MAR_24_2008_1118AM
 
 #include <hpx/config.hpp>
 #include <hpx/version.hpp>
