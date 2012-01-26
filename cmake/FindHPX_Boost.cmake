@@ -120,12 +120,16 @@ macro(build_boost_libname BOOST_RAW_NAME)
     set(BOOST_SUFFIX ${BOOST_SUFFIX} CACHE STRING
       "Boost library suffix (default: `-gd' for Debug builds)." FORCE)
     set(BOOST_LIB_SUFFIX ${BOOST_SUFFIX})
+    set(BOOST_FULL_LIB_SUFFIX ${BOOST_LIB_SUFFIX})
   elseif("${CMAKE_BUILD_TYPE}" MATCHES "Debug")
     set(BOOST_LIB_SUFFIX "-gd")
   endif()
 
-  set(BOOST_FULL_LIB_SUFFIX -mt${BOOST_LIB_SUFFIX})
-  set(BOOST_LIB_SUFFIX -mt)
+  # if BOOST_SUFFIX is specified the user takes full responsibility for it
+  if(NOT BOOST_SUFFIX)
+    set(BOOST_FULL_LIB_SUFFIX -mt${BOOST_LIB_SUFFIX})
+    set(BOOST_LIB_SUFFIX -mt)
+  endif()
 
   set(BOOST_LIBNAMES
       boost_${BOOST_RAW_NAME}${BOOST_COMPILER_VERSION}${BOOST_FULL_LIB_SUFFIX}-${BOOST_VERSION}
