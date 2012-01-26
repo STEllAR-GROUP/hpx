@@ -144,7 +144,7 @@ endif()
 
 if(${BOOST_MINOR_VERSION} LESS 48)
   hpx_warn("boost" "Using internal version of Boost.Move.")
-  set(HPX_INTERNAL_MOVE ON CACHE BOOL "Use HPX's internal version of Boost.Chrono (default: ON)" FORCE)
+  set(HPX_INTERNAL_MOVE ON CACHE BOOL "Use HPX's internal version of Boost.Chrono (default: OFF)" FORCE)
   include_directories(${hpx_SOURCE_DIR}/external/move)
 endif()
 
