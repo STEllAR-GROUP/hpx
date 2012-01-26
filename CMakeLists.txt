@@ -151,8 +151,6 @@ endif()
 if(${HPX_INTERNAL_MOVE})
   add_definitions(-DHPX_INTERNAL_MOVE)
   include_directories(${hpx_SOURCE_DIR}/external/move)
-else()
-  set(BOOST_LIBRARIES ${BOOST_LIBRARIES} move)
 endif()
 
 # We have a patched version of FindBoost loosely based on the one that Kitware ships
