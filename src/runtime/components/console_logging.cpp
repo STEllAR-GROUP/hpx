@@ -87,11 +87,23 @@ namespace hpx { namespace components
             ++queue_size_;
         }
 
-        // invoke actual logging immediately if we're on the console
-        if (naming::get_agas_client().is_console())
+        if (0 == hpx::get_runtime_ptr()) {
+            // the is_console call below would fail
+            messages_type msgs;
+            {
+                queue_mutex_type::scoped_lock l(queue_mtx_);
+                queue_.swap(msgs);
+                queue_size_.store(0);
+            }
+            fallback_console_logging_locked(msgs);
+        }
+        else if (naming::get_agas_client().is_console()) {
+            // invoke actual logging immediately if we're on the console
             send();
-        else if (max_pending < queue_size_.load())
+        }
+        else if (max_pending < queue_size_.load()) {
             send();
+        }
     }
 
     void pending_logs::cleanup()
