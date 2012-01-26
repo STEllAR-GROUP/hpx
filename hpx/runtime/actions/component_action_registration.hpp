@@ -191,4 +191,5 @@ HPX_SERIALIZATION_REGISTER_TEMPLATE(
     )
 )
 
+#undef N
 #endif

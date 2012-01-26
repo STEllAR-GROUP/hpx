@@ -814,4 +814,7 @@ namespace hpx { namespace util {
             );
     }
 
+#undef NN
+#undef N
+
 #endif

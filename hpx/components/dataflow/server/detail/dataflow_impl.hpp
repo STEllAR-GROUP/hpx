@@ -480,6 +480,7 @@ namespace hpx { namespace traits
         lcos::local_spinlock & mtx;
     };
 
+#undef REMAINDER
 #undef N
 
 #endif

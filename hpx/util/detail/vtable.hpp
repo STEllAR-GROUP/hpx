@@ -370,6 +370,7 @@ namespace hpx { namespace util { namespace detail {
             }
         };
 
+#undef N
 
 #endif
 

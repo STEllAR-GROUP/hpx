@@ -91,4 +91,5 @@ HPX_SERIALIZATION_REGISTER_TEMPLATE(
         BOOST_PP_ENUM_PARAMS(N, T), F, Derived>)
 )
 
+#undef N
 #endif

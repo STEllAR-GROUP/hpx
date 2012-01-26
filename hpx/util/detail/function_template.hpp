@@ -485,5 +485,6 @@ namespace hpx { namespace util {
     };
 }}
 
+#undef N
 #endif
 

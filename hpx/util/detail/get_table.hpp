@@ -74,7 +74,8 @@ namespace hpx { namespace util { namespace detail {
             return &ptr;
         }
     };
-
 }}}
+
+#undef N
 
 #endif

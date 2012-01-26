@@ -96,4 +96,5 @@ namespace hpx { namespace components
             );
     }
 
+#undef N
 #endif

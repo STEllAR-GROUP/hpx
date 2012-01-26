@@ -85,7 +85,7 @@ namespace hpx { namespace util { namespace detail {
         void (*copy)(void * const*, void **);
         R (*invoke)(void ** BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, A));
     };
-
 }}}
 
+#undef N
 #endif

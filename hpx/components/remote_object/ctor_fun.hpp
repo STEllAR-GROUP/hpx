@@ -146,4 +146,5 @@ namespace hpx { namespace components { namespace remote_object
         BOOST_COPYABLE_AND_MOVABLE(ctor_fun);
     };
 
+#undef N
 #endif

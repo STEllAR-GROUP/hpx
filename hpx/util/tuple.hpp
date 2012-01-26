@@ -64,7 +64,7 @@ namespace hpx { namespace util
     struct BOOST_PP_CAT(tuple, N)
     {
         BOOST_PP_REPEAT(N, M0, _)
-        
+
         typedef boost::mpl::int_<N> size_type;
         static const int size_value = N;
     };
@@ -75,5 +75,7 @@ BOOST_FUSION_ADAPT_TPL_STRUCT(
   , (BOOST_PP_CAT(hpx::util::tuple, N))BOOST_PP_REPEAT(N, M1, _)
   , BOOST_PP_REPEAT(N, M3, _)
 )
+
+#undef N
 
 #endif
