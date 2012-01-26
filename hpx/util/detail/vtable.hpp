@@ -374,4 +374,7 @@ namespace hpx { namespace util { namespace detail {
 
 #endif
 
+#undef N
+
 #endif
+
