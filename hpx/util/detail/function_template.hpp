@@ -25,13 +25,19 @@
 #include <hpx/util/detail/vtable_ptr_fwd.hpp>
 #include <hpx/util/detail/serialization_registration.hpp>
 #include <hpx/util/safe_bool.hpp>
+
 #include <boost/move/move.hpp>
+#include <boost/type_traits/is_pointer.hpp>
+#include <boost/type_traits/is_member_pointer.hpp>
+#include <boost/mpl/bool.hpp>
+#include <boost/mpl/or.hpp>
 
 #ifndef HPX_FUNCTION_VERSION
 #define HPX_FUNCTION_VERSION 0x10
 #endif
 
-namespace hpx { namespace util {
+namespace hpx { namespace util
+{
     namespace detail
     {
         template <
@@ -42,6 +48,38 @@ namespace hpx { namespace util {
 
         template <bool>
         struct vtable;
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Functor>
+        struct is_empty_function_impl
+        {
+            // in the general case the functor is not empty
+            static bool call(Functor const& f, boost::mpl::false_)
+            {
+                return false;
+            }
+
+            static bool call(Functor const& f, boost::mpl::true_)
+            {
+                return f == 0;
+            }
+
+            static bool call(Functor const& f)
+            {
+                return call(f
+                    , boost::mpl::or_<
+                          boost::is_pointer<Functor>
+                        , boost::is_member_pointer<Functor>
+                      >()
+                );
+            }
+        };
+
+        template <typename Functor>
+        bool is_empty_function(Functor const& f)
+        {
+            return is_empty_function_impl<Functor>::call(f);
+        }
     }
 
     template <
@@ -250,30 +288,33 @@ namespace hpx { namespace util {
 
         template <typename Functor>
         explicit function_base(BOOST_FWD_REF(Functor) f)
-            : vptr(
-                detail::get_table<
-                    typename boost::decay<Functor>::type
-                  , R(BOOST_PP_ENUM_PARAMS(N, A))
-                >::template get<
-                    IArchive
-                  , OArchive
-                >()
-            )
+            : vptr(0)
             , object(0)
         {
-            typedef
-                typename boost::remove_const<
-                    typename boost::decay<Functor>::type
-                >::type
-                functor_type;
-            static const bool is_small = sizeof(functor_type) <= sizeof(void *);
-            if(is_small)
+            if (!detail::is_empty_function(f))
             {
-                new (&object) functor_type(boost::forward<Functor>(f));
-            }
-            else
-            {
-                object = new functor_type(boost::forward<Functor>(f));
+                vptr = detail::get_table<
+                            typename boost::decay<Functor>::type
+                          , R(BOOST_PP_ENUM_PARAMS(N, A))
+                        >::template get<
+                            IArchive
+                          , OArchive
+                        >();
+
+                typedef
+                    typename boost::remove_const<
+                        typename boost::decay<Functor>::type
+                    >::type
+                    functor_type;
+                static const bool is_small = sizeof(functor_type) <= sizeof(void *);
+                if(is_small)
+                {
+                    new (&object) functor_type(boost::forward<Functor>(f));
+                }
+                else
+                {
+                    object = new functor_type(boost::forward<Functor>(f));
+                }
             }
         }
 
@@ -345,17 +386,22 @@ namespace hpx { namespace util {
                 if(!empty())
                 {
                     vptr->destruct(&object);
+                    vptr = 0;
+                    object = 0;
                 }
 
-                if(is_small)
+                if (!detail::is_empty_function(f))
                 {
-                    new (&object) functor_type(boost::forward<Functor>(f));
+                    if(is_small)
+                    {
+                        new (&object) functor_type(boost::forward<Functor>(f));
+                    }
+                    else
+                    {
+                        object = new functor_type(boost::forward<Functor>(f));
+                    }
+                    vptr = f_vptr;
                 }
-                else
-                {
-                    object = new functor_type(boost::forward<Functor>(f));
-                }
-                vptr = f_vptr;
             }
             return *this;
         }
