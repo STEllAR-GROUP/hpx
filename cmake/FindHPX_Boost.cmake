@@ -118,23 +118,22 @@ macro(build_boost_libname BOOST_RAW_NAME)
   if(BOOST_SUFFIX)
     # user suffix
     set(BOOST_SUFFIX ${BOOST_SUFFIX} CACHE STRING
-      "Boost library suffix (default: `d' for Debug builds)." FORCE)
-    set(BOOST_LIB_SUFFIX -${BOOST_SUFFIX})
+      "Boost library suffix (default: `-gd' for Debug builds)." FORCE)
+    set(BOOST_LIB_SUFFIX ${BOOST_SUFFIX})
   elseif("${CMAKE_BUILD_TYPE}" MATCHES "Debug")
     set(BOOST_LIB_SUFFIX "-gd")
   endif()
 
-#  if(BOOST_USE_MULTITHREADED)
-    set(BOOST_LIB_SUFFIX -mt${BOOST_LIB_SUFFIX})
-#  endif()
+  set(BOOST_FULL_LIB_SUFFIX -mt${BOOST_LIB_SUFFIX})
 
   set(BOOST_LIBNAMES
-      boost_${BOOST_RAW_NAME}${BOOST_COMPILER_VERSION}${BOOST_LIB_SUFFIX}-${BOOST_VERSION}
+      boost_${BOOST_RAW_NAME}${BOOST_COMPILER_VERSION}${BOOST_FULL_LIB_SUFFIX}-${BOOST_VERSION}
       boost_${BOOST_RAW_NAME}${BOOST_COMPILER_VERSION}-${BOOST_VERSION}
       boost_${BOOST_RAW_NAME}${BOOST_LIB_SUFFIX}
       boost_${BOOST_RAW_NAME})
   if(NOT MSVC)
     set(BOOST_LIBNAMES ${BOOST_LIBNAMES}
+        libboost_${BOOST_RAW_NAME}${BOOST_COMPILER_VERSION}${BOOST_FULL_LIB_SUFFIX}-${BOOST_VERSION}
         libboost_${BOOST_RAW_NAME}${BOOST_COMPILER_VERSION}${BOOST_LIB_SUFFIX}-${BOOST_VERSION}
         libboost_${BOOST_RAW_NAME}${BOOST_COMPILER_VERSION}-${BOOST_VERSION}
         libboost_${BOOST_RAW_NAME}${BOOST_LIB_SUFFIX}
