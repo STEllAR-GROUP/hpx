@@ -100,11 +100,11 @@ link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
 # Boost configuration
 ################################################################################
 
-# Boost.Chrono is in the Boost trunk, but has not been in a Boost release yet
-hpx_option(HPX_INTERNAL_CHRONO BOOL "Use HPX's internal version of Boost.Chrono if Boost version is < 1.47.0 (default: ON)" ON)
+# Boost.Chrono is in newer versions of Boost
+hpx_option(HPX_INTERNAL_CHRONO BOOL "Use HPX's internal version of Boost.Chrono (default: OFF)" OFF ADVANCED)
 
-# Boost.Move is in newer version of Boost
-hpx_option(HPX_INTERNAL_MOVE BOOL "Use HPX's internal version of Boost.Move if Boost version is < 1.48.0 (default: ON)" ON)
+# Boost.Move is in newer versions of Boost
+hpx_option(HPX_INTERNAL_MOVE BOOL "Use HPX's internal version of Boost.Move (default: OFF)" OFF ADVANCED)
 
 # this cmake module will snag the Boost version we'll be using (which we need
 # to know to specify the Boost libraries that we want to look for).
@@ -118,30 +118,41 @@ if(NOT MSVC AND ${BOOST_MINOR_VERSION} LESS 47)
   hpx_warn("boost" "Applications will segfault at shutdown with this version of Boost, please use 1.47.0 or higher.")
 endif()
 
-if(NOT HPX_INTERNAL_CHRONO OR ${BOOST_MINOR_VERSION} GREATER 46)
-  set(BOOST_LIBRARIES chrono
-                      date_time
-                      filesystem
-                      program_options
-                      regex
-                      serialization
-                      system
-                      thread)
-else()
-  set(BOOST_LIBRARIES date_time
-                      filesystem
-                      program_options
-                      regex
-                      serialization
-                      system
-                      thread)
+###############################################################################
+# Boost libraries which are always used from the installed version
+set(BOOST_LIBRARIES date_time
+                    filesystem
+                    program_options
+                    regex
+                    serialization
+                    system
+                    thread)
+
+# Decide whether to use internal version of Boost.Chrono
+if(${BOOST_MINOR_VERSION} LESS 47)
+  hpx_warn("boost" "Using internal version of Boost.Chrono, setting HPX_INTERNAL_CHRONO=ON.")
+  set(HPX_INTERNAL_CHRONO ON CACHE BOOL "Use HPX's internal version of Boost.Chrono (default: OFF)" FORCE)
+endif()
+
+if(${HPX_INTERNAL_CHRONO})
   add_definitions(-DHPX_INTERNAL_CHRONO)
   add_definitions(-DBOOST_CHRONO_NO_LIB)
   include_directories(${hpx_SOURCE_DIR}/external/chrono)
+else()
+  set(BOOST_LIBRARIES ${BOOST_LIBRARIES} chrono)
 endif()
 
-if(HPX_INTERNAL_MOVE AND ${BOOST_MINOR_VERSION} LESS 48)
+# Decide whether to use internal version of Boost.Move
+if(${BOOST_MINOR_VERSION} LESS 48)
+  hpx_warn("boost" "Using internal version of Boost.Move, setting HPX_INTERNAL_MOVE=ON.")
+  set(HPX_INTERNAL_MOVE ON CACHE BOOL "Use HPX's internal version of Boost.Move (default: OFF)" FORCE)
+endif()
+
+if(${HPX_INTERNAL_MOVE})
+  add_definitions(-DHPX_INTERNAL_MOVE)
   include_directories(${hpx_SOURCE_DIR}/external/move)
+else()
+  set(BOOST_LIBRARIES ${BOOST_LIBRARIES} move)
 endif()
 
 # We have a patched version of FindBoost loosely based on the one that Kitware ships
@@ -203,7 +214,7 @@ include(HPX_SVNRevision)
 ################################################################################
 # Installation configuration
 ################################################################################
-set(HPX_NO_INSTALL OFF CACHE BOOL "Build hpx applications so that they can be run without installation.")
+hpx_option(HPX_NO_INSTALL BOOL "Build hpx applications so that they can be run without installation (default: OFF)." OFF ADVANCED)
 
 if(NOT HPX_NO_INSTALL)
   # for backwards compatibility
@@ -329,7 +340,7 @@ hpx_check_for_thread_safe_hdf5(HDF5_THREAD_SAFE)
 find_package(HPX_PAPI)
 
 ################################################################################
-# hwloc 
+# hwloc
 ################################################################################
 find_package(HPX_Hwloc)
 if(HWLOC_FOUND)
@@ -355,12 +366,12 @@ endif()
 ################################################################################
 # Warning configuration
 ################################################################################
-hpx_option(HPX_WARNINGS BOOL "Enable compiler warnings (default: ON)" ON)
+hpx_option(HPX_WARNINGS BOOL "Enable compiler warnings (default: ON)" ON ADVANCED)
 
 ################################################################################
 # Backtrace configuration
 ################################################################################
-hpx_option(HPX_STACKTRACES BOOL "Attach backtraces to HPX exceptions (default: ON)" ON)
+hpx_option(HPX_STACKTRACES BOOL "Attach backtraces to HPX exceptions (default: ON)" ON ADVANCED)
 
 if(HPX_STACKTRACES)
   hpx_info("stacktraces" "Stack traces are enabled.")
@@ -371,7 +382,7 @@ endif()
 # Emulation of SwapContext on Windows
 ################################################################################
 if(MSVC)
-  hpx_option(HPX_EMULATE_SWAP_CONTEXT BOOL "Emulate SwapContext API for coroutines (default: OFF)" OFF)
+  hpx_option(HPX_EMULATE_SWAP_CONTEXT BOOL "Emulate SwapContext API for coroutines (default: OFF)" OFF ADVANCED)
 
   if(HPX_EMULATE_SWAP_CONTEXT)
     enable_language(ASM_MASM)
@@ -387,7 +398,7 @@ endif()
 ################################################################################
 # Native TLS configuration
 ################################################################################
-hpx_option(HPX_NATIVE_TLS BOOL "Use native TLS support if available (default: ON)" ON)
+hpx_option(HPX_NATIVE_TLS BOOL "Use native TLS support if available (default: ON)" ON ADVANCED)
 
 if(HPX_NATIVE_TLS)
   hpx_info("tls" "Native TLS is enabled.")
@@ -409,6 +420,7 @@ if(NOT HPX_STACK_SIZE)
 else()
   set(HPX_STACK_SIZE "${HPX_STACK_SIZE}" CACHE STRING "HPX-thread stack size" FORCE)
 endif()
+mark_as_advanced(HPX_STACK_SIZE)
 
 add_definitions(-DHPX_DEFAULT_STACK_SIZE=${HPX_STACK_SIZE})
 
@@ -454,13 +466,13 @@ set(CMAKE_DEBUG_POSTFIX "d")
 ################################################################################
 # Utility configuration
 ################################################################################
-hpx_option(HPX_UTIL_BIND BOOL "Use hpx::util::bind instead of boost::bind or std::bind (default: ON)" ON)
+hpx_option(HPX_UTIL_BIND BOOL "Use hpx::util::bind instead of boost::bind or std::bind (default: ON)" ON ADVANCED)
 
 if(HPX_UTIL_BIND)
   add_definitions(-DHPX_UTIL_BIND)
 endif()
 
-hpx_option(HPX_UTIL_FUNCTION BOOL "Use hpx::util::function instead of boost::function or std::function (default: ON)" ON)
+hpx_option(HPX_UTIL_FUNCTION BOOL "Use hpx::util::function instead of boost::function or std::function (default: ON)" ON ADVANCED)
 
 if(HPX_UTIL_FUNCTION)
   add_definitions(-DHPX_UTIL_FUNCTION)
@@ -469,37 +481,37 @@ endif()
 ################################################################################
 # Scheduler configuration
 ################################################################################
-hpx_option(HPX_GLOBAL_SCHEDULER BOOL "Enable the use of --queueing=global (default: OFF)" OFF)
+hpx_option(HPX_GLOBAL_SCHEDULER BOOL "Enable the use of --queueing=global (default: OFF)" OFF ADVANCED)
 
 if(HPX_GLOBAL_SCHEDULER)
   add_definitions(-DHPX_GLOBAL_SCHEDULER)
 endif()
 
-hpx_option(HPX_LOCAL_SCHEDULER BOOL "Enable the use of --queueing=local (default: OFF)" OFF)
+hpx_option(HPX_LOCAL_SCHEDULER BOOL "Enable the use of --queueing=local (default: OFF)" OFF ADVANCED)
 
 if(HPX_LOCAL_SCHEDULER)
   add_definitions(-DHPX_LOCAL_SCHEDULER)
 endif()
 
-hpx_option(HPX_ABP_SCHEDULER BOOL "Enable the use of --queueing=abp (default: OFF)" OFF)
+hpx_option(HPX_ABP_SCHEDULER BOOL "Enable the use of --queueing=abp (default: OFF)" OFF ADVANCED)
 
 if(HPX_ABP_SCHEDULER)
   add_definitions(-DHPX_ABP_SCHEDULER)
 endif()
 
-hpx_option(HPX_ABP_PRIORITY_SCHEDULER BOOL "Enable the use of --queueing=priority_abp (default: OFF)" OFF)
+hpx_option(HPX_ABP_PRIORITY_SCHEDULER BOOL "Enable the use of --queueing=priority_abp (default: OFF)" OFF ADVANCED)
 
 if(HPX_ABP_PRIORITY_SCHEDULER)
   add_definitions(-DHPX_ABP_PRIORITY_SCHEDULER)
 endif()
 
-hpx_option(HPX_HIERARCHY_SCHEDULER BOOL "Enable the use of --queueing=hierarchy (default: OFF)" OFF)
+hpx_option(HPX_HIERARCHY_SCHEDULER BOOL "Enable the use of --queueing=hierarchy (default: OFF)" OFF ADVANCED)
 
 if(HPX_HIERARCHY_SCHEDULER)
   add_definitions(-DHPX_HIERARCHY_SCHEDULER)
 endif()
 
-hpx_option(HPX_PERIODIC_PRIORITY_SCHEDULER BOOL "Enable the use of --queueing=periodic (default: OFF)" OFF)
+hpx_option(HPX_PERIODIC_PRIORITY_SCHEDULER BOOL "Enable the use of --queueing=periodic (default: OFF)" OFF ADVANCED)
 
 if(HPX_PERIODIC_PRIORITY_SCHEDULER)
   add_definitions(-DHPX_PERIODIC_PRIORITY_SCHEDULER)
@@ -938,7 +950,7 @@ set(hpx_LIBRARIES hpx hpx_serialization)
 # directory structure.
 add_subdirectory(src)
 
-option(HPX_BUILD_EXAMPLES "Build HPX examples (default: ON)" ON)
+hpx_option(HPX_BUILD_EXAMPLES BOOL "Build HPX examples (default: ON)" ON ADVANCED)
 
 if(HPX_BUILD_EXAMPLES)
   add_hpx_pseudo_target(examples)
@@ -946,14 +958,14 @@ if(HPX_BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif()
 
-option(HPX_BUILD_TESTS "Build HPX tests (default: ON)" ON)
+hpx_option(HPX_BUILD_TESTS BOOL "Build HPX tests (default: ON)" ON ADVANCED)
 
 if(HPX_BUILD_TESTS)
-  set(HPX_BUILD_TESTS_ABI ON CACHE BOOL "Build HPX ABI tests (default: ON)")
-  set(HPX_BUILD_TESTS_BENCHMARKS ON CACHE BOOL "Build HPX benchmark tests (default: ON)")
-  set(HPX_BUILD_TESTS_CORRECTNESS ON CACHE BOOL "Build HPX correctness tests (default: ON)")
-  set(HPX_BUILD_TESTS_REGRESSIONS ON CACHE BOOL "Build HPX regression tests (default: ON)")
-  set(HPX_BUILD_TESTS_UNIT ON CACHE BOOL "Build HPX unit tests (default: ON)")
+  hpx_option(HPX_BUILD_TESTS_ABI BOOL "Build HPX ABI tests (default: ON)" ON ADVANCED)
+  hpx_option(HPX_BUILD_TESTS_BENCHMARKS BOOL "Build HPX benchmark tests (default: ON)" ON ADVANCED)
+  hpx_option(HPX_BUILD_TESTS_CORRECTNESS BOOL "Build HPX correctness tests (default: ON)" ON ADVANCED)
+  hpx_option(HPX_BUILD_TESTS_REGRESSIONS BOOL "Build HPX regression tests (default: ON)" ON ADVANCED)
+  hpx_option(HPX_BUILD_TESTS_UNIT BOOL "Build HPX unit tests (default: ON)" ON ADVANCED)
 
   add_hpx_pseudo_target(tests)
   include_directories(tests)
@@ -966,14 +978,14 @@ else()
   unset(HPX_BUILD_TESTS_UNIT CACHE)
 endif()
 
-option(HPX_BUILD_RUNTIME "Build HPX runtime (default: ON)" ON)
+hpx_option(HPX_BUILD_RUNTIME BOOL "Build HPX runtime (default: ON)" ON ADVANCED)
 
 if(HPX_BUILD_RUNTIME)
   add_hpx_pseudo_target(runtime)
   add_subdirectory(runtime)
 endif()
 
-option(HPX_BUILD_TOOLS "Build HPX tools (default: OFF)" OFF)
+hpx_option(HPX_BUILD_TOOLS BOOL "Build HPX tools (default: OFF)" OFF ADVANCED)
 
 if(HPX_BUILD_TOOLS)
   add_hpx_pseudo_target(tools)
@@ -1049,7 +1061,7 @@ if(NOT HPX_NO_INSTALL)
     PATTERN ".svn" EXCLUDE
     PATTERN ".git" EXCLUDE)
 
-  if(HPX_INTERNAL_MOVE AND ${BOOST_MINOR_VERSION} LESS 48)
+  if(HPX_INTERNAL_MOVE)
     install( # install external dependencies
       DIRECTORY external/move/boost
       DESTINATION include
@@ -1059,7 +1071,7 @@ if(NOT HPX_NO_INSTALL)
       PATTERN ".git" EXCLUDE)
   endif()
 
-  if(HPX_INTERNAL_CHRONO AND ${BOOST_MINOR_VERSION} LESS 47)
+  if(HPX_INTERNAL_CHRONO)
     install( # install Boost.Chrono headers if we're using our internal version
       DIRECTORY external/chrono/boost
       DESTINATION include
