@@ -100,13 +100,11 @@ link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
 # Boost configuration
 ################################################################################
 
-# Boost.Chrono is in newer versions of Boost
-hpx_option(HPX_INTERNAL_CHRONO BOOL "Use HPX's internal version of Boost.Chrono (default: OFF)" OFF)
-mark_as_advanced(HPX_INTERNAL_CHRONO)
+# Boost.Chrono is in the Boost trunk, but has not been in a Boost release yet
+hpx_option(HPX_INTERNAL_CHRONO BOOL "Use HPX's internal version of Boost.Chrono if Boost version is < 1.47.0 (default: ON)" ON)
 
-# Boost.Move is in newer versions of Boost
-hpx_option(HPX_INTERNAL_MOVE BOOL "Use HPX's internal version of Boost.Move (default: OFF)" OFF)
-mark_as_advanced(HPX_INTERNAL_MOVE)
+# Boost.Move is in newer version of Boost
+hpx_option(HPX_INTERNAL_MOVE BOOL "Use HPX's internal version of Boost.Move if Boost version is < 1.48.0 (default: ON)" ON)
 
 # this cmake module will snag the Boost version we'll be using (which we need
 # to know to specify the Boost libraries that we want to look for).
@@ -142,9 +140,7 @@ else()
   include_directories(${hpx_SOURCE_DIR}/external/chrono)
 endif()
 
-if(${BOOST_MINOR_VERSION} LESS 48)
-  hpx_warn("boost" "Using internal version of Boost.Move.")
-  set(HPX_INTERNAL_MOVE ON CACHE BOOL "Use HPX's internal version of Boost.Chrono (default: OFF)" FORCE)
+if(HPX_INTERNAL_MOVE AND ${BOOST_MINOR_VERSION} LESS 48)
   include_directories(${hpx_SOURCE_DIR}/external/move)
 endif()
 
@@ -333,7 +329,7 @@ hpx_check_for_thread_safe_hdf5(HDF5_THREAD_SAFE)
 find_package(HPX_PAPI)
 
 ################################################################################
-# hwloc
+# hwloc 
 ################################################################################
 find_package(HPX_Hwloc)
 if(HWLOC_FOUND)
@@ -365,7 +361,6 @@ hpx_option(HPX_WARNINGS BOOL "Enable compiler warnings (default: ON)" ON)
 # Backtrace configuration
 ################################################################################
 hpx_option(HPX_STACKTRACES BOOL "Attach backtraces to HPX exceptions (default: ON)" ON)
-mark_as_advanced(HPX_STACKTRACES)
 
 if(HPX_STACKTRACES)
   hpx_info("stacktraces" "Stack traces are enabled.")
@@ -377,7 +372,6 @@ endif()
 ################################################################################
 if(MSVC)
   hpx_option(HPX_EMULATE_SWAP_CONTEXT BOOL "Emulate SwapContext API for coroutines (default: OFF)" OFF)
-  mark_as_advanced(HPX_EMULATE_SWAP_CONTEXT)
 
   if(HPX_EMULATE_SWAP_CONTEXT)
     enable_language(ASM_MASM)
@@ -394,7 +388,6 @@ endif()
 # Native TLS configuration
 ################################################################################
 hpx_option(HPX_NATIVE_TLS BOOL "Use native TLS support if available (default: ON)" ON)
-mark_as_advanced(HPX_NATIVE_TLS)
 
 if(HPX_NATIVE_TLS)
   hpx_info("tls" "Native TLS is enabled.")
@@ -416,7 +409,6 @@ if(NOT HPX_STACK_SIZE)
 else()
   set(HPX_STACK_SIZE "${HPX_STACK_SIZE}" CACHE STRING "HPX-thread stack size" FORCE)
 endif()
-mark_as_advanced(HPX_STACK_SIZE)
 
 add_definitions(-DHPX_DEFAULT_STACK_SIZE=${HPX_STACK_SIZE})
 
@@ -1057,7 +1049,7 @@ if(NOT HPX_NO_INSTALL)
     PATTERN ".svn" EXCLUDE
     PATTERN ".git" EXCLUDE)
 
-  if(HPX_INTERNAL_MOVE)
+  if(HPX_INTERNAL_MOVE AND ${BOOST_MINOR_VERSION} LESS 48)
     install( # install external dependencies
       DIRECTORY external/move/boost
       DESTINATION include
