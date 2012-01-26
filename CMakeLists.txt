@@ -85,7 +85,6 @@ include(HPX_FortranCompiler)
 # search path configuration
 ################################################################################
 include_directories(${hpx_SOURCE_DIR})
-include_directories(${hpx_SOURCE_DIR}/external/move)
 include_directories(${hpx_SOURCE_DIR}/external/atomic)
 include_directories(${hpx_SOURCE_DIR}/external/cache)
 include_directories(${hpx_SOURCE_DIR}/external/coroutine)
@@ -100,9 +99,12 @@ link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
 ################################################################################
 # Boost configuration
 ################################################################################
-# Boost.Chrono is in the Boost trunk, but has not been in a Boost release yet
 
+# Boost.Chrono is in the Boost trunk, but has not been in a Boost release yet
 hpx_option(HPX_INTERNAL_CHRONO BOOL "Use HPX's internal version of Boost.Chrono (default: ON)" ON)
+
+# Boost.Move is in newer version of Boost
+hpx_option(HPX_INTERNAL_MOVE BOOL "Use HPX's internal version of Boost.Move (default: ON)" ON)
 
 # this cmake module will snag the Boost version we'll be using (which we need
 # to know to specify the Boost libraries that we want to look for).
@@ -136,6 +138,10 @@ else()
   add_definitions(-DHPX_INTERNAL_CHRONO)
   add_definitions(-DBOOST_CHRONO_NO_LIB)
   include_directories(${hpx_SOURCE_DIR}/external/chrono)
+endif()
+
+if(HPX_INTERNAL_MOVE AND ${BOOST_MINOR_VERSION} LESS 48)
+  include_directories(${hpx_SOURCE_DIR}/external/move)
 endif()
 
 # We have a patched version of FindBoost loosely based on the one that Kitware ships
@@ -1035,7 +1041,6 @@ if(NOT HPX_NO_INSTALL)
               external/endian/boost
               external/lockfree/boost
               external/logging/boost
-              external/move/boost
               external/plugin/boost
               external/serialization/boost
     DESTINATION include
@@ -1043,6 +1048,16 @@ if(NOT HPX_NO_INSTALL)
     FILES_MATCHING PATTERN "*.hpp"
     PATTERN ".svn" EXCLUDE
     PATTERN ".git" EXCLUDE)
+
+  if(HPX_INTERNAL_MOVE AND ${BOOST_MINOR_VERSION} LESS 48)
+    install( # install external dependencies
+      DIRECTORY external/move/boost
+      DESTINATION include
+      COMPONENT core
+      FILES_MATCHING PATTERN "*.hpp"
+      PATTERN ".svn" EXCLUDE
+      PATTERN ".git" EXCLUDE)
+  endif()
 
   if(HPX_INTERNAL_CHRONO AND ${BOOST_MINOR_VERSION} LESS 47)
     install( # install Boost.Chrono headers if we're using our internal version
