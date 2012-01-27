@@ -23,12 +23,16 @@ macro(hpx_compile_object name)
             ${${build_type_flags}}
             ${definitions})
 
-  # FIXME: This is POSIX only, I think (-c should work on MSVC, not sure about
-  # -o, Hartmut says it might be -Fo).
+  if(NOT MSVC)
+    set(${name}_${${name}_LANGUAGE}_COMPILEROUTNAME "-o ${${name}_OUTPUT}")
+  else()
+    set(${name}_${${name}_LANGUAGE}_COMPILEROUTNAME "-Fo${${name}_OUTPUT}")
+  endif()
+
   add_custom_command(OUTPUT ${${name}_OUTPUT}
     COMMAND "${CMAKE_${${name}_LANGUAGE}_COMPILER}" ${flags}
             "-c" "${CMAKE_CURRENT_SOURCE_DIR}/${${name}_SOURCE}"
-            "-o" "${${name}_OUTPUT}"
+            ${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}
     DEPENDS ${${name}_SOURCE}
     VERBATIM)
 
@@ -43,17 +47,29 @@ macro(hpx_compile name)
   hpx_parse_arguments(${name}
     "SOURCE;LANGUAGE;FLAGS;OUTPUT" "QUIET" ${ARGN})
 
+  if(NOT MSVC)
+    set(${name}_${${name}_LANGUAGE}_COMPILEROUTNAME "-o ${${name}_OUTPUT}")
+  else()
+    set(${name}_${${name}_LANGUAGE}_COMPILEROUTNAME "-Fo${${name}_OUTPUT}")
+  endif()
+
   if(${name}_QUIET)
+    hpx_debug("hpx_compile.quiet" "${CMAKE_${${name}_LANGUAGE}_COMPILER_WITH_PATH}"
+        "${${name}_FLAGS} ${${name}_SOURCE}"
+        "${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}")
     execute_process(
-      COMMAND "${CMAKE_${${name}_LANGUAGE}_COMPILER}" ${${name}_FLAGS}
+      COMMAND "${CMAKE_${${name}_LANGUAGE}_COMPILER_WITH_PATH}" ${${name}_FLAGS}
               "${${name}_SOURCE}"
-              "-o" "${${name}_OUTPUT}"
+              ${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}
       RESULT_VARIABLE ${name}_RESULT OUTPUT_QUIET ERROR_QUIET)
   else()
+    hpx_debug("hpx_compile" "${CMAKE_${${name}_LANGUAGE}_COMPILER_WITH_PATH}"
+        "${${name}_FLAGS} ${${name}_SOURCE}"
+        "${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}")
     execute_process(
-      COMMAND "${CMAKE_${${name}_LANGUAGE}_COMPILER}" ${${name}_FLAGS}
+      COMMAND "${CMAKE_${${name}_LANGUAGE}_COMPILER_WITH_PATH}" ${${name}_FLAGS}
               "${${name}_SOURCE}"
-              "-o" "${${name}_OUTPUT}"
+              ${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}
       RESULT_VARIABLE ${name}_RESULT
       OUTPUT_FILE ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.stdout
       ERROR_FILE ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.stderr)

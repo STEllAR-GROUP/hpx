@@ -23,11 +23,13 @@ macro(add_hpx_config_test name variable)
   #  ${${name}_DEFAULT})
 
   if("${variable}" STREQUAL "ON")
+    hpx_debug("config_test.${name}" "${variable} is currently set to ON, test will not be performed.")
     set(${variable} ON CACHE STRING "${name} state.")
     foreach(definition ${${name}_DEFINITIONS})
       add_definitions(-D${definition})
     endforeach()
   elseif("${variable}" STREQUAL "OFF")
+    hpx_debug("config_test.${name}" "${variable} is currently set to OFF, test will not be performed.")
     set(${variable} OFF CACHE STRING "${name} state.")
   else()
     file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests)
@@ -205,6 +207,6 @@ macro(hpx_check_for_thread_safe_hdf5 variable)
 
   add_hpx_config_test("hdf5_thread_safe" ${variable} LANGUAGE CXX
     SOURCE cmake/tests/hdf5_thread_safe.cpp
-    FLAGS -I${HDF5_INCLUDE_DIR} ${include_dir} "-std=c++0x" FILE ${ARGN})
+    FLAGS -I${HDF5_INCLUDE_DIR} ${include_dir} FILE ${ARGN})
 endmacro()
 
