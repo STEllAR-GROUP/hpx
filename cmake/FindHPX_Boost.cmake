@@ -6,18 +6,10 @@
 ################################################################################
 # C++-style include guard to prevent multiple searches in the same build
 if(NOT BOOST_SEARCHED)
-set(BOOST_SEARCHED OFF CACHE INTERNAL "Found Boost libraries")
 
 include(HPX_Utils)
 
-if(NOT CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCT)
-  set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
-endif()
-
 ################################################################################
-#option(BOOST_USE_MULTITHREADED "Set to true if multi-threaded boost libraries should be used (default: ON)." ON)
-#option(BOOST_USE_STATIC_LIBS "Set to true if static boost libraries should be used (default: OFF)." OFF)
-
 # backwards compatibility
 if(BOOST_LIB_DIR AND NOT BOOST_LIBRARY_DIR)
   set(BOOST_LIBRARY_DIR "${BOOST_LIB_DIR}")

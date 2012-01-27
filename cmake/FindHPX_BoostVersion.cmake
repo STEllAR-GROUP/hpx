@@ -6,13 +6,8 @@
 ################################################################################
 # C++-style include guard to prevent multiple searches in the same build
 if(NOT BOOST_VERSION_SEARCHED)
-set(BOOST_VERSION_SEARCHED OFF CACHE INTERNAL "Found Boost version")
 
 include(HPX_Utils)
-
-if(NOT CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCT)
-  set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
-endif()
 
 ################################################################################
 macro(get_boost_version)

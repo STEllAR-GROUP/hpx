@@ -5,10 +5,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(NOT CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCT)
-  set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
-endif()
-
 set(HPX_FINDPACKAGE_LOADED TRUE)
 
 if(NOT HPX_UTILS_LOADED)
@@ -61,7 +57,7 @@ macro(hpx_get_version name)
       else()
         hpx_warn("get_version.${name}" "Header not found in system path.")
       endif()
-      set(${name}_VERSION_SEARCHED OFF CACHE INTERNAL "Searched for ${name} library version.")
+      unset(${name}_VERSION_SEARCHED CACHE)
       unset(${name}_ROOT)
     else()
       set(${name}_VERSION_SEARCHED ON CACHE INTERNAL "Searched for ${name} library version.")
@@ -115,7 +111,7 @@ macro(hpx_find_package name)
       else()
         hpx_warn("find_package.${name}" "Library not found in system path.")
       endif()
-      set(${name}_SEARCHED OFF CACHE INTERNAL "Searched for ${name} library.")
+      unset(${name}_SEARCHED CACHE)
       unset(${name}_ROOT)
     else()
       set(${name}_SEARCHED ON CACHE INTERNAL "Searched for ${name} library.")

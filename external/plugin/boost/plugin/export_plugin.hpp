@@ -1,4 +1,5 @@
 // Copyright Vladimir Prus 2004.
+// Copyright (c) 2005-2012 Hartmut Kaiser
 // Distributed under the Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -29,23 +30,27 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #define BOOST_PLUGIN_LIST_NAME(name, base)                                    \
-    BOOST_PP_CAT(boost_exported_plugins_list_,                                \
+    BOOST_PP_CAT(                                                             \
+        BOOST_PP_CAT(BOOST_PLUGIN_PREFIX, _exported_plugins_list_),           \
         BOOST_PLUGIN_NAME_2(name, base))                                      \
     /**/
 
 #define BOOST_PLUGIN_EXPORTER_NAME(name, base, cname)                         \
-    BOOST_PP_CAT(boost_plugin_exporter_,                                      \
+    BOOST_PP_CAT(                                                             \
+        BOOST_PP_CAT(BOOST_PLUGIN_PREFIX, _plugin_exporter_),                 \
         BOOST_PLUGIN_NAME_3(name, base, cname))                               \
     /**/
 
 #define BOOST_PLUGIN_EXPORTER_INSTANCE_NAME(name, base, cname)                \
-    BOOST_PP_CAT(boost_plugin_exporter_instance_,                             \
+    BOOST_PP_CAT(                                                             \
+        BOOST_PP_CAT(BOOST_PLUGIN_PREFIX, _plugin_exporter_instance_),        \
         BOOST_PLUGIN_NAME_3(name, base, cname))                               \
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////
 #define BOOST_PLUGIN_FORCE_LOAD_NAME(name, base)                              \
-    BOOST_PP_CAT(boost_exported_plugins_force_load_,                          \
+    BOOST_PP_CAT(                                                             \
+        BOOST_PP_CAT(BOOST_PLUGIN_PREFIX, _exported_plugins_force_load_),     \
         BOOST_PLUGIN_NAME_2(name, base))                                      \
     /**/
 

@@ -169,6 +169,7 @@ endif()
 add_definitions(-DBOOST_LOG_NO_TSS)
 add_definitions(-DBOOST_LOG_NO_TS)
 add_definitions(-DBOOST_BIGINT_HAS_NATIVE_INT64)
+add_definitions(-DBOOST_PLUGIN_PREFIX=hpx)
 
 # disable usage of std::atomics in lockfree
 add_definitions(-DBOOST_NO_0X_HDR_ATOMIC)
