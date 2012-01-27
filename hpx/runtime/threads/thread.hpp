@@ -383,6 +383,11 @@ namespace hpx { namespace threads { namespace detail
             return back_ptr_->get_base_gid();
         }
 
+        void reset()
+        {
+            coroutine_.reset();
+        }
+
     private:
         friend class threads::thread;
         friend void threads::delete_clone(threads::thread const*);
@@ -711,6 +716,14 @@ namespace hpx { namespace threads
         {
             detail::thread const* t = get();
             return t ? t->is_created_from(pool) : false;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // This function will be called when the thread is about to be deleted
+        void reset()
+        {
+            detail::thread* t = get();
+            if (t) t->reset();
         }
     };
 

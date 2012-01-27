@@ -55,6 +55,7 @@
 #endif
 #include <boost/coroutine/exception.hpp>
 #include <boost/coroutine/detail/noreturn.hpp>
+#include <boost/assert.hpp>
 
 namespace boost { namespace coroutines { namespace detail
 {
@@ -83,13 +84,19 @@ namespace boost { namespace coroutines { namespace detail
   const std::ptrdiff_t default_stack_size = -1;
 
   template<typename ContextImpl>
-  class context_base : public ContextImpl {
+  class context_base : public ContextImpl
+  {
   public:
+    enum deleter_mode
+    {
+        deleter_delete = 1,
+        deleter_reset = 2
+    };
 
     typedef ContextImpl context_impl;
     typedef context_base<context_impl> type;
     typedef boost::intrusive_ptr<type> pointer;
-    typedef void deleter_type(const type*);
+    typedef void deleter_type(type const*, deleter_mode);
 
     template<typename Derived>
         context_base(Derived& derived,
@@ -131,8 +138,12 @@ namespace boost { namespace coroutines { namespace detail
     void release() const {
       BOOST_ASSERT(m_counter);
       if(--m_counter == 0) {
-        m_deleter(this);
+        m_deleter(this, deleter_delete);
       }
+    }
+
+    void reset() const {
+      m_deleter(this, deleter_reset);
     }
 
     void count_down() throw() {
@@ -470,9 +481,15 @@ namespace boost { namespace coroutines { namespace detail
     }
 
     template <typename ActualCtx>
-    static void deleter (const type* ctx)
+    static void deleter (type const* ctx, deleter_mode mode)
     {
-        ActualCtx::destroy(static_cast<ActualCtx*>(const_cast<type*>(ctx)));
+        if (deleter_delete == mode)
+            ActualCtx::destroy(static_cast<ActualCtx*>(const_cast<type*>(ctx)));
+        else if (deleter_reset == mode)
+            ActualCtx::reset(static_cast<ActualCtx*>(const_cast<type*>(ctx)));
+        else {
+            BOOST_ASSERT(deleter_delete == mode || deleter_reset == mode);
+        }
     }
 
     typedef typename context_impl::context_impl_base ctx_type;
@@ -502,5 +519,6 @@ namespace boost { namespace coroutines { namespace detail
   allocation_counters context_base<ContextImpl>::m_allocation_counters;
 #endif
 
-} } }
+}}}
+
 #endif

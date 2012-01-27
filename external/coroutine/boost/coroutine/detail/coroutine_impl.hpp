@@ -75,8 +75,8 @@ namespace boost { namespace coroutines { namespace detail
 
     typedef boost::intrusive_ptr<type> pointer;
 
-    template<typename DerivedType>
-        coroutine_impl(DerivedType *this_, thread_id_type id,
+    template <typename DerivedType>
+    coroutine_impl(DerivedType *this_, thread_id_type id,
             std::ptrdiff_t stack_size)
       : context_base_(*this_, stack_size),
         m_arg(0),
@@ -204,7 +204,7 @@ namespace boost { namespace coroutines { namespace detail
 
       void deallocate(Coroutine* p)
       {
-          p->reset();          // reset bound function
+//          p->reset();          // reset bound function
           heap_.deallocate(p);
       }
 
@@ -345,6 +345,7 @@ private:
     }
 
     static inline void destroy(type* p);
+    static inline void reset(type* p);
 
     void reset()
     {
@@ -429,6 +430,15 @@ private:
   {
       // always hand the stack back to the matching heap
       deallocate(p, (std::size_t(p->get_thread_id())/8) % BOOST_COROUTINE_NUM_HEAPS);
+  }
+
+
+  template<typename Functor, typename CoroutineType, typename ContextImpl,
+      template <typename> class Heap>
+  inline void
+  coroutine_impl_wrapper<Functor, CoroutineType, ContextImpl, Heap>::reset(type* p)
+  {
+      p->reset();
   }
 }}}
 

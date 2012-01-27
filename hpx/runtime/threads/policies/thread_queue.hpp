@@ -363,7 +363,7 @@ namespace hpx { namespace threads { namespace policies
             return invalid_thread_id;     // thread has not been created yet
         }
 
-        void move_work_items_from(thread_queue<Global> *src, 
+        void move_work_items_from(thread_queue<Global> *src,
             boost::int64_t count, std::size_t num_thread)
         {
             threads::thread* trd;
@@ -379,7 +379,7 @@ namespace hpx { namespace threads { namespace policies
             }
         }
 
-        void move_task_items_from(thread_queue<Global> *src, 
+        void move_task_items_from(thread_queue<Global> *src,
             boost::int64_t count)
         {
             task_description* td;
@@ -419,6 +419,7 @@ namespace hpx { namespace threads { namespace policies
         {
             if (thrd->is_created_from(&memory_pool_)) {
                 thread_id_type id = thrd->get_thread_id();
+                reinterpret_cast<thread*>(id)->reset();     // reset bound function object
                 terminated_items_.enqueue(id);
                 return true;
             }

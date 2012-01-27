@@ -181,11 +181,17 @@ namespace boost { namespace coroutines {
         return m_pimpl->get_thread_phase();
     }
 
-    template<typename Functor>
+    template <typename Functor>
     void rebind(Functor f, thread_id_type id = 0)
     {
         BOOST_ASSERT(exited());
         impl_type::rebind(m_pimpl, f, id);
+    }
+
+    void reset()
+    {
+        BOOST_ASSERT(exited());
+        m_pimpl->reset();
     }
 
 #   define BOOST_COROUTINE_generate_argument_n_type(z, n, traits_type) \
