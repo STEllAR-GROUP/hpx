@@ -24,15 +24,15 @@ macro(hpx_compile_object name)
             ${definitions})
 
   if(NOT MSVC)
-    set(outflag "-o")
+    set(${name}_${${name}_LANGUAGE}_COMPILEROUTNAME "-o ${${name}_OUTPUT}")
   else()
-    set(outflag "-Fo")
+    set(${name}_${${name}_LANGUAGE}_COMPILEROUTNAME "-Fo${${name}_OUTPUT}")
   endif()
 
   add_custom_command(OUTPUT ${${name}_OUTPUT}
     COMMAND "${CMAKE_${${name}_LANGUAGE}_COMPILER}" ${flags}
             "-c" "${CMAKE_CURRENT_SOURCE_DIR}/${${name}_SOURCE}"
-            "${outflag}" "${${name}_OUTPUT}"
+            ${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}
     DEPENDS ${${name}_SOURCE}
     VERBATIM)
 
@@ -48,19 +48,19 @@ macro(hpx_compile name)
     "SOURCE;LANGUAGE;FLAGS;OUTPUT" "QUIET" ${ARGN})
 
   if(NOT MSVC)
-    set(outflag "-o")
+    set(${name}_${${name}_LANGUAGE}_COMPILEROUTNAME "-o ${${name}_OUTPUT}")
   else()
-    set(outflag "-Fo")
+    set(${name}_${${name}_LANGUAGE}_COMPILEROUTNAME "-Fo${${name}_OUTPUT}")
   endif()
 
   if(${name}_QUIET)
     hpx_debug("hpx_compile.quiet" "${CMAKE_${${name}_LANGUAGE}_COMPILER}"
         "${${name}_FLAGS} ${${name}_SOURCE}"
-        "${outflag}" "${${name}_OUTPUT}")
+        "${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}")
     execute_process(
       COMMAND "${CMAKE_${${name}_LANGUAGE}_COMPILER}" ${${name}_FLAGS}
               "${${name}_SOURCE}"
-              "${outflag}" "${${name}_OUTPUT}"
+              ${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}
       RESULT_VARIABLE ${name}_RESULT OUTPUT_QUIET ERROR_QUIET)
   else()
     hpx_debug("hpx_compile" "${CMAKE_${${name}_LANGUAGE}_COMPILER}"
@@ -69,7 +69,7 @@ macro(hpx_compile name)
     execute_process(
       COMMAND "${CMAKE_${${name}_LANGUAGE}_COMPILER}" ${${name}_FLAGS}
               "${${name}_SOURCE}"
-              "${outflag}" "${${name}_OUTPUT}"
+              ${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}
       RESULT_VARIABLE ${name}_RESULT
       OUTPUT_FILE ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.stdout
       ERROR_FILE ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.stderr)
