@@ -24,15 +24,15 @@ macro(hpx_compile_object name)
             ${definitions})
 
   if(NOT MSVC)
-    set(${name}_${${name}_LANGUAGE}_COMPILEROUTNAME "-o ${${name}_OUTPUT}")
+    set(outflag "-o")
   else()
-    set(${name}_${${name}_LANGUAGE}_COMPILEROUTNAME "-Fo${${name}_OUTPUT}")
+    set(outflag "-Fo")
   endif()
 
   add_custom_command(OUTPUT ${${name}_OUTPUT}
     COMMAND "${CMAKE_${${name}_LANGUAGE}_COMPILER}" ${flags}
             "-c" "${CMAKE_CURRENT_SOURCE_DIR}/${${name}_SOURCE}"
-            ${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}
+            "${outflag}" "${${name}_OUTPUT}"
     DEPENDS ${${name}_SOURCE}
     VERBATIM)
 
@@ -48,28 +48,28 @@ macro(hpx_compile name)
     "SOURCE;LANGUAGE;FLAGS;OUTPUT" "QUIET" ${ARGN})
 
   if(NOT MSVC)
-    set(${name}_${${name}_LANGUAGE}_COMPILEROUTNAME "-o ${${name}_OUTPUT}")
+    set(outflag "-o")
   else()
-    set(${name}_${${name}_LANGUAGE}_COMPILEROUTNAME "-Fo${${name}_OUTPUT}")
+    set(outflag "-Fo")
   endif()
 
   if(${name}_QUIET)
-    hpx_debug("hpx_compile.quiet" "${CMAKE_${${name}_LANGUAGE}_COMPILER_WITH_PATH}"
+    hpx_debug("hpx_compile.quiet" "${CMAKE_${${name}_LANGUAGE}_COMPILER}"
         "${${name}_FLAGS} ${${name}_SOURCE}"
-        "${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}")
+        "${outflag}" "${${name}_OUTPUT}")
     execute_process(
-      COMMAND "${CMAKE_${${name}_LANGUAGE}_COMPILER_WITH_PATH}" ${${name}_FLAGS}
+      COMMAND "${CMAKE_${${name}_LANGUAGE}_COMPILER}" ${${name}_FLAGS}
               "${${name}_SOURCE}"
-              ${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}
+              "${outflag}" "${${name}_OUTPUT}"
       RESULT_VARIABLE ${name}_RESULT OUTPUT_QUIET ERROR_QUIET)
   else()
-    hpx_debug("hpx_compile" "${CMAKE_${${name}_LANGUAGE}_COMPILER_WITH_PATH}"
+    hpx_debug("hpx_compile" "${CMAKE_${${name}_LANGUAGE}_COMPILER}"
         "${${name}_FLAGS} ${${name}_SOURCE}"
         "${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}")
     execute_process(
-      COMMAND "${CMAKE_${${name}_LANGUAGE}_COMPILER_WITH_PATH}" ${${name}_FLAGS}
+      COMMAND "${CMAKE_${${name}_LANGUAGE}_COMPILER}" ${${name}_FLAGS}
               "${${name}_SOURCE}"
-              ${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}
+              "${outflag}" "${${name}_OUTPUT}"
       RESULT_VARIABLE ${name}_RESULT
       OUTPUT_FILE ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.stdout
       ERROR_FILE ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.stderr)
