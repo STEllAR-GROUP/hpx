@@ -6,7 +6,7 @@
 #if !defined(HPX_INTERPOLATE3D_READ_VALUES_AUG_05_2011_1056AM)
 #define HPX_INTERPOLATE3D_READ_VALUES_AUG_05_2011_1056AM
 
-#include <cpp/H5Cpp.h>
+#include <H5Cpp.h>
 #include <boost/cstdint.hpp>
 
 #include "dimension.hpp"

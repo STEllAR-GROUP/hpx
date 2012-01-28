@@ -6,7 +6,7 @@
 #if !defined(HPX_SHENEOS_READ_VALUES_AUG_08_2011_1225PM)
 #define HPX_SHENEOS_READ_VALUES_AUG_08_2011_1225PM
 
-#include <cpp/H5Cpp.h>
+#include <H5Cpp.h>
 #include <H5pubconf.h>
 
 #if !defined(H5_HAVE_THREADSAFE)

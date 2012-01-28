@@ -30,6 +30,6 @@ hpx_find_package(HDF5
 hpx_find_package(HDF5_CPP
   LIBRARIES hdf5_cpp libhdf5_cpp hdf5_cppdll
   LIBRARY_PATHS lib64 lib
-  HEADERS H5Cpp.h cpp/H5Cpp.h
-  HEADER_PATHS include)
+  HEADERS H5Cpp.h
+  HEADER_PATHS include include/cpp)
 

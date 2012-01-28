@@ -5,7 +5,7 @@
 
 // Create some test data for the interpolate1d example
 
-#include <cpp/H5Cpp.h>
+#include <H5Cpp.h>
 #include <vector>
 #include <cmath>
 
