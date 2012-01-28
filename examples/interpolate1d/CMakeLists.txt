@@ -23,7 +23,8 @@ foreach(subdir ${subdirs})
   # add example executable
   add_hpx_executable(${subdir}_client
     SOURCES ${sources}
-    DEPENDENCIES ${subdir}_component)
+    DEPENDENCIES ${subdir}_component
+    FOLDER "Examples/Interpolate1D")
 
   # add a custom target for this example
   add_hpx_pseudo_target(examples.interpolate1d.${subdir})
@@ -40,7 +41,8 @@ endforeach()
 add_hpx_executable(create_1d_testdata
   SOURCES create_testdata.cpp
   DEPENDENCIES ${HDF5_LIBRARY} ${HDF5_CPP_LIBRARY}
-  NOLIBS)
+  NOLIBS
+  FOLDER "Examples/Interpolate1D")
 
 # add a custom target for this example
 add_hpx_pseudo_target(examples.interpolate1d.create_1d_testdata)

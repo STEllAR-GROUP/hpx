@@ -113,7 +113,8 @@ namespace sheneos
         num_values_[dimension::rho] = extract_data_range(data.datafile_name_,
             "logrho", minval_[dimension::rho], maxval_[dimension::rho], delta_[dimension::rho]);
 
-        num_partitions_per_dim_ = std::exp(std::log(double(data.num_instances_)) / 3);
+        num_partitions_per_dim_ = static_cast<std::size_t>(
+            std::exp(std::log(double(data.num_instances_)) / 3));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -140,7 +141,8 @@ namespace sheneos
         std::size_t num_localities = partitions_.size();
         BOOST_ASSERT(0 != num_localities);
 
-        num_partitions_per_dim_ = std::exp(std::log(double(num_localities)) / 3);
+        num_partitions_per_dim_ = static_cast<std::size_t>(
+            std::exp(std::log(double(num_localities)) / 3));
 
         std::size_t partition_size_x =
             num_values_[dimension::ye] / num_partitions_per_dim_;
@@ -238,7 +240,8 @@ namespace sheneos
     std::size_t interpolator::get_partition_index(std::size_t d, double value)
     {
         std::size_t partition_size = num_values_[d] / num_partitions_per_dim_;
-        std::size_t partition_index = (value - minval_[d]) / (delta_[d] * partition_size);
+        std::size_t partition_index = static_cast<std::size_t>(
+            (value - minval_[d]) / (delta_[d] * partition_size));
         if (partition_index == num_partitions_per_dim_)
             --partition_index;
         BOOST_ASSERT(partition_index < num_partitions_per_dim_);

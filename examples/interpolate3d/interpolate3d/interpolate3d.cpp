@@ -138,7 +138,8 @@ namespace interpolate3d
         num_values_[dimension::z] = extract_data_range(data.datafile_name_, "z",
             minval_[dimension::z], maxval, delta_[dimension::z]);
 
-        num_partitions_per_dim_ = std::exp(std::log(double(data.num_instances_)) / 3);
+        num_partitions_per_dim_ = static_cast<std::size_t>(
+            std::exp(std::log(double(data.num_instances_)) / 3));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -167,7 +168,8 @@ namespace interpolate3d
         BOOST_ASSERT(0 != num_localities);
 
         // cubic root
-        num_partitions_per_dim_ = std::exp(std::log(double(num_localities)) / 3);
+        num_partitions_per_dim_ = static_cast<std::size_t>(
+            std::exp(std::log(double(num_localities)) / 3));
 
         std::size_t partition_size_x =
             num_values_[dimension::x] / num_partitions_per_dim_;
@@ -251,7 +253,8 @@ namespace interpolate3d
     std::size_t interpolate3d::get_index(int d, double value)
     {
         std::size_t partition_size = num_values_[d] / num_partitions_per_dim_;
-        std::size_t index = (value - minval_[d]) / (delta_[d] * partition_size);
+        std::size_t index = static_cast<std::size_t>(
+            (value - minval_[d]) / (delta_[d] * partition_size));
         if (index == num_partitions_per_dim_)
             --index;
         BOOST_ASSERT(index < num_partitions_per_dim_);

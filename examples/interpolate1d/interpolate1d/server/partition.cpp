@@ -56,7 +56,7 @@ namespace interpolate1d { namespace server
             return 0;
         }
 
-        std::size_t index = (value - min_value_) / delta_;
+        std::size_t index = static_cast<std::size_t>((value - min_value_) / delta_);
         BOOST_ASSERT(0 <= index && index < dim_.count_);
 
         return values_[index];

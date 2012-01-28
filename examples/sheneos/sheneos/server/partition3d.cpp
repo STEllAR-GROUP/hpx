@@ -112,7 +112,8 @@ namespace sheneos { namespace server
             return 0;
         }
 
-        std::size_t index = (value - min_value_[d]) / delta_[d];
+        std::size_t index = static_cast<std::size_t>(
+            (value - min_value_[d]) / delta_[d]);
 
         // Either the index has to be inside bounds or the requested value
         // corresponds to the right end edge of the managed data range.

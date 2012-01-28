@@ -6,7 +6,7 @@
 #if !defined(HPX_INTERPOLATE1D_READ_VALUES_AUG_05_2011_1056AM)
 #define HPX_INTERPOLATE1D_READ_VALUES_AUG_05_2011_1056AM
 
-#include <H5Cpp.h>
+#include <cpp/H5Cpp.h>
 #include <boost/cstdint.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

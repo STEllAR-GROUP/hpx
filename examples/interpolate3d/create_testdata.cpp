@@ -5,7 +5,7 @@
 
 // Create some 3D test data for the interpolate3d example
 
-#include <H5Cpp.h>
+#include <cpp/H5Cpp.h>
 #include <vector>
 #include <cmath>
 
