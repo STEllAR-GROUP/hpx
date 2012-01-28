@@ -76,7 +76,7 @@ void test_sheneos(std::size_t num_ye_points, std::size_t num_temp_points,
     // performing the test, so we randomly shuffle the sequences. We combine
     // the shared seed with the locality id to ensure that each locality has
     // a unique, reproducible seed.
-    std::srand(seed + hpx::applier::get_prefix_id());
+    std::srand(static_cast<unsigned int>(seed + hpx::applier::get_prefix_id()));
     std::random_shuffle(sequence_ye.begin(), sequence_ye.end());
     std::random_shuffle(sequence_temp.begin(), sequence_temp.end());
     std::random_shuffle(sequence_rho.begin(), sequence_rho.end());
@@ -206,7 +206,7 @@ int main(int argc, char* argv[])
             "number of worker/measurement threads to create")
         ("seed", value<std::size_t>()->default_value(0),
             "the seed for the pseudo random number generator (if 0, a seed "
-            "is choosen based on the current system time)")
+            "is chosen based on the current system time)")
     ;
 
     // Initialize and run HPX.
