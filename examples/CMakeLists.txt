@@ -16,7 +16,6 @@ set(subdirs
     gtc
     heartbeat
     hplpx
-    neutron_star
     nqueen
     object_semaphore
     performance_counters
@@ -45,6 +44,7 @@ if(HDF5_CPP_FOUND)
   if(HPX_CXX11_LAMBDAS AND HPX_CXX11_AUTO AND HDF5_THREAD_SAFE)
 	set(subdirs ${subdirs}
 		sheneos
+                neutron_star
 	)
   endif()
 endif()
