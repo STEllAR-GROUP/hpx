@@ -10,6 +10,8 @@
 #include <boost/throw_exception.hpp>
 #include <boost/cstdint.hpp>
 
+#include <stdexcept>
+
 #if defined(BOOST_HAS_UNISTD_H)
 #include <unistd.h>
 #endif
@@ -17,7 +19,6 @@
 
 #if defined(BOOST_WINDOWS)
 
-#include <stdexcept>
 #include <limits>
 #include <windows.h>
 
