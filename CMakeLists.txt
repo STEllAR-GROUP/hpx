@@ -363,6 +363,11 @@ if(NOT MSVC AND NOT HWLOC_FOUND)
 endif()
 
 ################################################################################
+# Qthreads (for benchmark comparisons) 
+################################################################################
+find_package(HPX_Qthreads)
+
+################################################################################
 # Warning configuration
 ################################################################################
 hpx_option(HPX_WARNINGS BOOL "Enable compiler warnings (default: ON)" ON ADVANCED)
