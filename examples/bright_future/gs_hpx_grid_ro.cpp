@@ -416,7 +416,8 @@ void gs(
   , double relaxation
   , unsigned max_iterations
   , unsigned iteration_block
-  , unsigned block_size
+  , unsigned
+  , std::size_t block_size
   , std::string const & output
 )
 {

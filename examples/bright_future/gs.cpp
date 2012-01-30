@@ -49,6 +49,7 @@ extern void gs(
   , unsigned max_iterations
   , unsigned iteration_block
   , unsigned block_size
+  , std::size_t cache_block
   , std::string const & output
 );
 
@@ -68,6 +69,7 @@ int hpx_main(variables_map & vm)
         unsigned max_iterations  = vm["max_iterations"].as<unsigned>();
         unsigned iteration_block = vm["iteration_block"].as<unsigned>();
         unsigned block_size      = vm["block_size"].as<unsigned>();
+        std::size_t cache_block     = vm["cache_block"].as<std::size_t>();
 
         double k = 6.283185307179586232;
         double relaxation = 1.0;
@@ -78,7 +80,7 @@ int hpx_main(variables_map & vm)
             output = vm["output"].as<std::string>();
         }
 
-        gs(n_x, n_y, hx, hy, k, relaxation, max_iterations, iteration_block, block_size, output);
+        gs(n_x, n_y, hx, hy, k, relaxation, max_iterations, iteration_block, block_size, cache_block, output);
 
 #ifndef BRIGHT_FUTURE_NO_HPX
         finalize();
@@ -130,7 +132,12 @@ int main(int argc, char **argv)
         )
         (
             "block_size"
-          , value<unsigned>()->default_value(64)
+          , value<unsigned>()->default_value(256)
+          , "How to block the iteration"
+        )
+        (
+            "cache_block"
+          , value<std::size_t>()->default_value(128)
           , "How to block the iteration"
         )
         ;

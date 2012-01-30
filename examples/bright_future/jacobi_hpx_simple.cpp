@@ -57,40 +57,27 @@ struct update_fun
     range_type y_range;
     size_type old;
     size_type n;
+    size_type cache_block;
 
     update_fun() {}
 
-    update_fun(range_type x, range_type y, size_type old, size_type n)
+    update_fun(range_type x, range_type y, size_type old, size_type n, size_type c)
         : x_range(x)
         , y_range(y)
         , old(old)
         , n(n)
+        , cache_block(c)
     {}
 
     void operator()(std::vector<grid_type> & u) const
     {
-        /*
-        std::cout << old << " " << n << "\n";
-        std::cout << u[old].x() << " " << u[old].y() << "\n";
-        std::cout << u[n].x() << " " << u[n].y() << "\n";
-        std::cout << x_range.first << " " << x_range.second << "\n";
-        std::cout << y_range.first << " " << y_range.second << "\n";
-        */
-
-        for(size_type y_block = y_range.first; y_block < y_range.second; y_block += 128)
-        {
-            size_type y_end = (std::min)(y_block + 128, y_range.second);
-            for(size_type x_block = x_range.first; x_block < x_range.second; x_block += 128)
-            {
-                size_type x_end = (std::min)(x_block + 128, x_range.second);
-                jacobi_kernel_simple(
-                    u
-                  , range_type(x_block, x_end)
-                  , range_type(y_block, y_end)
-                  , old, n
-                );
-            }
-        }
+        jacobi_kernel_simple(
+            u
+          , x_range
+          , y_range
+          , old, n
+          , cache_block
+        );
     }
     
     template <typename Archive>
@@ -151,12 +138,13 @@ void gs(
   , unsigned max_iterations
   , unsigned iteration_block
   , unsigned block_size
+  , std::size_t cache_block
   , std::string const & output
 )
 {
     typedef dataflow_object<std::vector<grid_type> > object_type;
 
-    object_type u(new_<std::vector<grid_type> >(find_here(), 2, grid_type(n_x, n_y, 1)).get());
+    object_type u(new_<std::vector<grid_type> >(find_here(), 2, grid_type(n_x, n_y, block_size, 1)).get());
 
     high_resolution_timer t;
     size_type old = 0;
@@ -165,7 +153,7 @@ void gs(
     size_type n_y_block = (n_y - 2)/block_size + 1;
     typedef dataflow_base<void> promise;
     typedef grid<promise> promise_grid_type;
-    promise_grid_type deps(n_x_block, n_y_block);
+    std::vector<promise_grid_type> deps(2, promise_grid_type(n_x_block, n_y_block));
 
     t.restart();
     for(std::size_t iter = 0; iter < max_iterations; ++iter)//iter += iteration_block)
@@ -180,36 +168,38 @@ void gs(
                 {
                     std::vector<promise > trigger;
                     trigger.reserve(5);
-                    trigger.push_back(deps(xx,yy));
+                    trigger.push_back(deps[old](xx,yy));
                     if(xx + 1 < n_x_block)
-                        trigger.push_back(deps(xx+1, yy));
+                        trigger.push_back(deps[old](xx+1, yy));
                     if(xx > 0)
-                        trigger.push_back(deps(xx-1, yy));
+                        trigger.push_back(deps[old](xx-1, yy));
                     if(yy + 1 < n_y_block)
-                        trigger.push_back(deps(xx, yy+1));
+                        trigger.push_back(deps[old](xx, yy+1));
                     if(yy > 0)
-                        trigger.push_back(deps(xx, yy-1));
+                        trigger.push_back(deps[old](xx, yy-1));
 
-                    deps(xx, yy)
+                    deps[n](xx, yy)
                         = u.apply(
                             update_fun(
                                 range_type(x, x_end)
                               , range_type(y, y_end)
                               , old
                               , n
+                              , cache_block
                             )
                           , dataflow_trigger(u.gid_, trigger)
                         );
                 }
                 else
                 {
-                    deps(xx, yy)
+                    deps[n](xx, yy)
                         = u.apply(
                             update_fun(
                                 range_type(x, x_end)
                               , range_type(y, y_end)
                               , old
                               , n
+                              , cache_block
                             )
                         );
                 }
@@ -221,7 +211,7 @@ void gs(
     {
         for(size_type x = 1, xx = 0; x < n_x - 1; x += block_size, ++xx)
         {
-            deps(xx, yy).get();
+            deps[old](xx, yy).get();
         }
     }
 

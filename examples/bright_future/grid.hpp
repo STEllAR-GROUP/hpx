@@ -78,14 +78,27 @@ namespace bright_future
         typedef const T& const_reference;
         typedef T value_type;
 
+        std::size_t block_size;
+        
         template <typename U> struct rebind { typedef numa_allocator<U> other; };
 
         numa_allocator() noexcept {}
-        numa_allocator(numa_allocator const & ) noexcept {}
+        explicit numa_allocator(std::size_t block_size) noexcept  : block_size(block_size){}
+        numa_allocator(numa_allocator const & n) noexcept  : block_size(n.block_size) {}
         template <typename U>
-        numa_allocator(numa_allocator<U> const & ) noexcept {}
+        numa_allocator(numa_allocator<U> const & n) noexcept : block_size(n.block_size)  {}
         ~numa_allocator() {}
 
+        numa_allocator & operator=(numa_allocator const & n) noexcept
+        {
+            block_size = n.block_size;
+        }
+
+        template <typename U>
+        numa_allocator & operator=(numa_allocator<U> const & n) noexcept
+        {
+            block_size = n.block_size;
+        }
 
         pointer allocate(size_type n, numa_allocator<void>::const_pointer locality_hint = 0)
         {
@@ -98,9 +111,9 @@ namespace bright_future
             if(!omp_in_parallel())
             {
 #pragma omp parallel for schedule(static)
-                for(size_type i_block = 0; i_block < len; i_block += 128)
+                for(size_type i_block = 0; i_block < len; i_block += block_size)
                 {
-                    size_type i_end = (std::min)(i_block + 128, len);
+                    size_type i_end = std::min(i_block + block_size, len);
                     for(size_type i = i_block; i < i_end; i += sizeof(value_type))
                     {
                         for(size_type j = 0; j < sizeof(value_type); ++j)
@@ -111,6 +124,48 @@ namespace bright_future
                 }
             }
 #else
+            std::size_t const os_threads = hpx::get_os_thread_count();
+            hpx::naming::id_type const prefix = hpx::find_here();
+            std::size_t num_thread = 0;
+            std::set<std::size_t> attendance;
+
+            if(block_size == 0)
+            {
+                block_size = len / os_threads + 1;
+            }
+
+            for(size_type i_block = 0; i_block < len; i_block += block_size)
+            {
+                attendance.insert(num_thread);
+                num_thread = (num_thread+1) % os_threads;
+            }
+
+            while(!attendance.empty())
+            {
+                std::vector<hpx::lcos::promise<std::size_t> > futures;
+                futures.reserve(attendance.size());
+                std::size_t start = 0;
+                BOOST_FOREACH(std::size_t os_thread, attendance)
+                {
+                    futures.push_back(
+                        hpx::lcos::async<touch_mem_action>(
+                            prefix
+                          , os_thread
+                          , reinterpret_cast<std::size_t>(p)
+                          , start
+                          , std::min(start + block_size, len)
+                        )
+                    );
+                    start += block_size;
+                }
+
+                hpx::lcos::wait(
+                    futures
+                  , [&](std::size_t, std::size_t t)
+                    {if(std::size_t(-1) != t) attendance.erase(t); }
+                );
+            }
+            /*
             std::size_t const os_threads = hpx::get_os_thread_count();
             hpx::naming::id_type const prefix = hpx::find_here();
             std::set<std::size_t> attendance;
@@ -142,6 +197,7 @@ namespace bright_future
                     {if(std::size_t(-1) != t) attendance.erase(t); }
                 );
             }
+            */
 #endif
             return reinterpret_cast<pointer>(p);
         }
@@ -232,10 +288,10 @@ namespace bright_future
             , data(x_size * y_size)
         {}
 
-        grid(size_type x_size, size_type y_size, T const & init)
+        grid(size_type x_size, size_type y_size, size_type block_size, T const & init)
             : n_x(x_size)
             , n_y(y_size)
-            , data(x_size * y_size, init)
+            , data(x_size * y_size, init, numa_allocator<T>(block_size))
         {}
 
         grid(grid const & g)
@@ -367,19 +423,28 @@ namespace bright_future
       , range_type const & y_range
       , std::size_t old
       , std::size_t new_
+      , std::size_t cache_block
     )
     {
         grid<double> & u_new = u[new_];
         grid<double> & u_old = u[old];
-        for(std::size_t y = y_range.first; y < y_range.second; ++y)
+        for(std::size_t y_block = y_range.first; y_block < y_range.second; y_block += cache_block)
         {
-            for(std::size_t x = x_range.first; x < x_range.second; ++x)
+            std::size_t y_end = std::min(y_block + cache_block, y_range.second);
+            for(std::size_t x_block = x_range.first; x_block < x_range.second; x_block += cache_block)
             {
-                u_new(x, y)
-                    =(
-                        u_old(x+1,y) + u_old(x-1,y)
-                      + u_old(x,y+1) + u_old(x,y-1)
-                    ) * 0.25;
+                std::size_t x_end = std::min(x_block + cache_block, x_range.second);
+                for(std::size_t y = y_block; y < y_end; ++y)
+                {
+                    for(std::size_t x = x_block; x < x_end; ++x)
+                    {
+                        u_new(x, y)
+                            =(
+                                u_old(x+1,y) + u_old(x-1,y)
+                              + u_old(x,y+1) + u_old(x,y-1)
+                            ) * 0.25;
+                    }
+                }
             }
         }
     }

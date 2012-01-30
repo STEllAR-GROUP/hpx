@@ -37,6 +37,7 @@ void gs(
   , unsigned max_iterations
   , unsigned iteration_block
   , unsigned block_size
+  , std::size_t cache_block
   , std::string const & output
 )
 {

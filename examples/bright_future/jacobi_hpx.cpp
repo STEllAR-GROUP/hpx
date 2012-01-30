@@ -454,6 +454,7 @@ void gs(
   , unsigned max_iterations
   , unsigned iteration_block
   , unsigned block_size
+  , std::size_t cache_block
   , std::string const & output
 )
 {
@@ -566,6 +567,7 @@ void gs(
                 block_promise_grid_type(
                     n_x_block
                   , n_y_block
+                  , block_size
                   , promise_grid_type(
                         n_x_local_block
                       , n_y_local_block

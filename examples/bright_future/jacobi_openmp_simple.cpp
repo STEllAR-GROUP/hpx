@@ -32,10 +32,11 @@ void gs(
   , unsigned max_iterations
   , unsigned iteration_block
   , unsigned block_size
+  , std::size_t cache_block
   , std::string const & output
 )
 {
-    std::vector<grid_type> u(2, grid_type(n_x, n_y, 1));
+    std::vector<grid_type> u(2, grid_type(n_x, n_y, block_size, 1));
 
     high_resolution_timer t;
     size_type old = 0;
@@ -55,6 +56,7 @@ void gs(
                   , range_type(x_block, x_end)
                   , range_type(y_block, y_end)
                   , old, new_
+                  , cache_block
                 );
             }
         }

@@ -25,10 +25,6 @@ typedef bright_future::grid<double> grid_type;
 typedef grid_type::size_type size_type;
 
 void gs(
-    /*
-    bright_future::grid<double> & u
-  , bright_future::grid<double> const & rhs
-  */
     size_type n_x
   , size_type n_y
   , double hx_
@@ -38,6 +34,7 @@ void gs(
   , unsigned max_iterations
   , unsigned iteration_block
   , unsigned block_size
+  , std::size_t cache_block
   , std::string const & output
 )
 {

@@ -9,7 +9,7 @@
 
 HPX_REGISTER_PLAIN_ACTION(touch_mem_action);
 
-std::size_t touch_mem(std::size_t desired, std::size_t ps, std::size_t l, std::size_t n)
+HPX_EXPORT std::size_t touch_mem(std::size_t desired, std::size_t ps, std::size_t start, std::size_t end)
 {
     std::size_t current = hpx::threads::threadmanager_base::get_thread_num();
 
@@ -17,7 +17,7 @@ std::size_t touch_mem(std::size_t desired, std::size_t ps, std::size_t l, std::s
     {
         // Yes! The PX-thread is run by the designated OS-thread.
         char * p = reinterpret_cast<char *>(ps);
-        for(std::size_t i = desired * l; i < (std::min)((desired+1) * l, n); ++i)
+        for(std::size_t i = start; i < end; ++i)
         {
             p[i] = 0;
         }
