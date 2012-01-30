@@ -284,7 +284,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Use std::bind if it's available and movable
 #if defined(HPX_UTIL_BIND)
-#  define HPX_STD_PLACEHOLDER         ::hpx::util::placeholders
+#  define HPX_STD_PLACEHOLDERS        ::hpx::util::placeholders
 #  define HPX_STD_BIND                ::hpx::util::bind
 #  define HPX_STD_PROTECT(f)          ::hpx::util::protect(f)
 #else
