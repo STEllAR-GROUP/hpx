@@ -202,8 +202,10 @@ int hpx_main(
         }
 
         // Randomly shuffle the entire sequence to deal with drift.
+        boost::function<boost::uint64_t(boost::uint64_t)> shuffler_f =
+            boost::bind(&shuffler, boost::ref(prng), _1);
         std::random_shuffle(payloads.begin(), payloads.end()
-                          , boost::bind(&shuffler, boost::ref(prng), _1));
+                          , shuffler_f);
 
         ///////////////////////////////////////////////////////////////////////
         // Validate the payloads.
