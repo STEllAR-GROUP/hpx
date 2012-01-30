@@ -288,7 +288,6 @@ namespace hpx { namespace threads
     }
     inline bool set_affinity(std::size_t num_thread, bool numa_sensitive)
     {
-        /*
         hwloc_topology_t topology;
         hwloc_topology_init(&topology);
         hwloc_topology_load(topology);
@@ -314,9 +313,8 @@ namespace hpx { namespace threads
             hwloc_bitmap_free(cpuset);
         }
         hwloc_topology_destroy(topology);
-        */
 
-        return true;
+        return result;
     }
 
 #else
