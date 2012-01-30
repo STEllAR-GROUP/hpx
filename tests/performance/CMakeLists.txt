@@ -3,21 +3,39 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-include_directories(${QTHREADS_INCLUDE_DIR})
-
 set(benchmarks
     boost_tls
     native_tls
     hpx_tls
     delay_baseline
     hpx_null_thread
-    qthreads_fork_null_thread
-    qthreads_qloop_null_thread
     openmp_null_thread
     hpx_heterogeneous_task_spawn
-    qthreads_heterogeneous_task_spawn
     print_heterogeneous_payloads
    )
+
+if(QTHREADS_FOUND)
+  include_directories(${QTHREADS_INCLUDE_DIR})
+
+  set(benchmarks
+      ${benchmarks}
+      qthreads_fork_null_thread
+      qthreads_qloop_null_thread
+      qthreads_heterogeneous_task_spawn
+     )
+
+  set(qthreads_heterogeneous_task_spawn_FLAGS NOLIBS
+      DEPENDENCIES ${BOOST_program_options_LIBRARY}
+                   ${QTHREADS_LIBRARY})
+
+  set(qthreads_fork_null_thread_FLAGS NOLIBS
+      DEPENDENCIES ${BOOST_program_options_LIBRARY}
+                   ${QTHREADS_LIBRARY})
+
+  set(qthreads_qloop_null_thread_FLAGS NOLIBS
+      DEPENDENCIES ${BOOST_program_options_LIBRARY}
+                   ${QTHREADS_LIBRARY})
+endif()
 
 set(boost_tls_FLAGS NOLIBS DEPENDENCIES ${BOOST_program_options_LIBRARY}
                                         ${BOOST_thread_LIBRARY})
@@ -32,26 +50,10 @@ set(delay_baseline_FLAGS DEPENDENCIES iostreams_component)
 
 set(hpx_null_thread_FLAGS DEPENDENCIES iostreams_component)
 
-set(qthreads_fork_null_thread_FLAGS NOLIBS
-    DEPENDENCIES ${BOOST_program_options_LIBRARY}
-                 ${QTHREADS_LIBRARY})
-
-set(qthreads_qloop_null_thread_FLAGS NOLIBS
-    DEPENDENCIES ${BOOST_program_options_LIBRARY}
-                 ${QTHREADS_LIBRARY})
-
-set(qthreads_qloop_null_thread_FLAGS NOLIBS
-    DEPENDENCIES ${BOOST_program_options_LIBRARY}
-                 ${QTHREADS_LIBRARY})
-
 set(openmp_null_thread_FLAGS NOLIBS
     DEPENDENCIES ${BOOST_program_options_LIBRARY})
 
 set(hpx_heterogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component)
-
-set(qthreads_heterogeneous_task_spawn_FLAGS NOLIBS
-    DEPENDENCIES ${BOOST_program_options_LIBRARY}
-                 ${QTHREADS_LIBRARY})
 
 set(print_heterogeneous_payloads_FLAGS NOLIBS
     DEPENDENCIES ${BOOST_program_options_LIBRARY})
