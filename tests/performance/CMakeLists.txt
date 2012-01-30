@@ -3,12 +3,20 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+include_directories(${QTHREADS_INCLUDE_DIR})
+
 set(benchmarks
     boost_tls
     native_tls
     hpx_tls
     delay_baseline
-    pxthread
+    hpx_null_thread
+    qthreads_fork_null_thread
+    qthreads_qloop_null_thread
+    openmp_null_thread
+    hpx_heterogeneous_task_spawn
+    qthreads_heterogeneous_task_spawn
+    print_heterogeneous_payloads
    )
 
 set(boost_tls_FLAGS NOLIBS DEPENDENCIES ${BOOST_program_options_LIBRARY}
@@ -22,9 +30,34 @@ set(hpx_tls_FLAGS NOLIBS DEPENDENCIES ${BOOST_program_options_LIBRARY}
 
 set(delay_baseline_FLAGS DEPENDENCIES iostreams_component)
 
-set(pxthread_FLAGS DEPENDENCIES iostreams_component)
+set(hpx_null_thread_FLAGS DEPENDENCIES iostreams_component)
+
+set(qthreads_fork_null_thread_FLAGS NOLIBS
+    DEPENDENCIES ${BOOST_program_options_LIBRARY}
+                 ${QTHREADS_LIBRARY})
+
+set(qthreads_qloop_null_thread_FLAGS NOLIBS
+    DEPENDENCIES ${BOOST_program_options_LIBRARY}
+                 ${QTHREADS_LIBRARY})
+
+set(qthreads_qloop_null_thread_FLAGS NOLIBS
+    DEPENDENCIES ${BOOST_program_options_LIBRARY}
+                 ${QTHREADS_LIBRARY})
+
+set(openmp_null_thread_FLAGS NOLIBS
+    DEPENDENCIES ${BOOST_program_options_LIBRARY})
+
+set(hpx_heterogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component)
+
+set(qthreads_heterogeneous_task_spawn_FLAGS NOLIBS
+    DEPENDENCIES ${BOOST_program_options_LIBRARY}
+                 ${QTHREADS_LIBRARY})
+
+set(print_heterogeneous_payloads_FLAGS NOLIBS
+    DEPENDENCIES ${BOOST_program_options_LIBRARY})
 
 set(spinlock_FLAGS DEPENDENCIES iostreams_component)
+
 set(spinlock_alt_FLAGS DEPENDENCIES iostreams_component)
 
 if(HPX_CXX11_LAMBDAS)
@@ -61,6 +94,8 @@ foreach(benchmark ${benchmarks})
                               ${benchmark}_exe)
 endforeach()
 
+set_target_properties(openmp_null_thread_exe PROPERTIES COMPILE_FLAGS -fopenmp)
+set_target_properties(openmp_null_thread_exe PROPERTIES LINK_FLAGS -fopenmp)
 
 add_hpx_executable(util_function
                    SOURCES util/function.cpp
@@ -70,6 +105,8 @@ add_hpx_executable(util_function
 add_hpx_pseudo_target(tests.performance.util.function)
 
 add_hpx_pseudo_dependencies(tests.performance
-                              tests.performance.util.function)
+                            tests.performance.util.function)
+
 add_hpx_pseudo_dependencies(tests.performance.util.function
-                              util.function_exe)
+                            util.function_exe)
+
