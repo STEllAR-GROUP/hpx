@@ -63,7 +63,7 @@ namespace hpx { namespace util
             "max_resolve_requests = ${HPX_AGAS_MAX_RESOLVE_REQUESTS:"
                 BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_MAX_RESOLVE_REQUESTS) "}",
             "max_pending_refcnt_requests = "
-                "${HPX_AGAS_MAX_PENDING_REFCNT_REQUESTS:1"
+                "${HPX_AGAS_MAX_PENDING_REFCNT_REQUESTS:"
                 BOOST_PP_STRINGIZE(HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS)
                 "}",
             "service_mode = hosted",
