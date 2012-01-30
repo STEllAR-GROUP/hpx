@@ -8,12 +8,8 @@ if(NOT HPX_FINDPACKAGE_LOADED)
   include(HPX_FindPackage)
 endif()
 
-if(NOT GSL_ROOT AND NOT $ENV{HOME_GSL} STREQUAL "")
-  set(GSL_ROOT $ENV{HOME_GSL})
-endif()
-
 if(GSL_USE_SYSTEM)
-  set(GSLCBLAS_CPP_USE_SYSTEM ON)
+  set(GSLCBLAS_USE_SYSTEM ON)
 endif()
 
 if(GSL_ROOT)
@@ -23,12 +19,12 @@ endif()
 hpx_find_package(GSL
   LIBRARIES gsl libgsl 
   LIBRARY_PATHS lib64 lib
-  HEADERS gsl_test.h
-  HEADER_PATHS include include/gsl)
+  HEADERS gsl/gsl_test.h
+  HEADER_PATHS include)
 
 hpx_find_package(GSLCBLAS
   LIBRARIES gslcblas libgslcblas
   LIBRARY_PATHS lib64 lib
-  HEADERS gsl_test.h
-  HEADER_PATHS include include/gsl)
+  HEADERS gsl/gsl_test.h
+  HEADER_PATHS include)
 

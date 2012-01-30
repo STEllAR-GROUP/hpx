@@ -8,7 +8,7 @@ if(NOT HPX_FINDPACKAGE_LOADED)
 endif()
 
 hpx_find_package(NUMA
-  LIBRARIES numa
+  LIBRARIES numa libnuma
   LIBRARY_PATHS lib64 lib
   HEADERS numa.h
   HEADER_PATHS include)
