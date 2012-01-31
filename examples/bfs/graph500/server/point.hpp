@@ -7,11 +7,13 @@
 #define HPX_226CC70A_D748_4ADA_BB55_70F85566B5CC
 
 #include <vector>
+#include <queue>
 
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include "graph_generator.h"
 #include "splittable_mrg.h"
+#include "../../array.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace graph500 { namespace server
@@ -69,8 +71,7 @@ namespace graph500 { namespace server
         hpx::lcos::local_mutex mtx_;
         std::size_t idx_;
         std::vector< std::vector<std::size_t> > neighbors_;
-        std::vector<std::size_t> level_,parent_;
-        std::vector<char> visited_;
+        array<std::size_t> parent_;
         std::size_t minnode_;
         std::vector<packed_edge> local_edges_;
     };

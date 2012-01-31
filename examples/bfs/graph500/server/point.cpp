@@ -107,16 +107,52 @@ namespace graph500 { namespace server
         }
       }
 
-      level_.resize(N);
-      parent_.resize(N);
-      visited_.resize(N);
-      std::fill( visited_.begin(),visited_.end(),false);
-      std::fill( level_.begin(),level_.end(),0);
-      std::fill( parent_.begin(),parent_.end(),0);
+      parent_.resize(N,N,1);
+      // initialize
+      for (std::size_t k=0;k<parent_.ksize();k++) {
+        for (std::size_t j=0;j<parent_.jsize();j++) {
+          for (std::size_t i=0;i<parent_.isize();i++) {
+            parent_(i,j,k) = 0;
+          }
+        }  
+      }
+
     }
 
     void point::bfs()
     {
+      // search the local graph with each node as root
+      for (std::size_t i=0;i<local_edges_.size();i++) {
+        std::size_t root_node;
+        for (std::size_t j=0;j<2;j++) {
+          if ( j == 0 ) root_node = local_edges_[i].v0;
+          else root_node = local_edges_[i].v1;
+          // see if the root_node has been searched already
+          if ( parent_(root_node-minnode_,root_node-minnode_,0) != root_node ) {
+            std::queue<std::size_t> q;
+            parent_(root_node-minnode_,root_node-minnode_,0) = root_node;
+            q.push(root_node);
+
+            while (!q.empty()) {
+              std::size_t node = q.front(); q.pop();
+
+              std::vector<std::size_t> const& node_neighbors = neighbors_[node-minnode_];
+              std::vector<std::size_t>::const_iterator end = node_neighbors.end();
+              for (std::vector<std::size_t>::const_iterator it = node_neighbors.begin();
+                           it != end; ++it)
+              {
+                std::size_t& node_parent = parent_(root_node-minnode_,*it-minnode_,0);
+                if (!node_parent) {
+                  node_parent = node;
+                  q.push(*it);
+                }
+              }
+            }
+          } 
+        }
+     
+      }
+   
     }
 
 }}
