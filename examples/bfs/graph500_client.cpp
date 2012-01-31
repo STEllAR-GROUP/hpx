@@ -93,6 +93,13 @@ int hpx_main(boost::program_options::variables_map &vm)
         double kernel1_time = kernel1time.elapsed();
         std::cout << "Elapsed time during kernel 1: " << kernel1_time << " [s]" << std::endl;
 
+        std::vector<hpx::lcos::promise<void> > bfs_phase;
+
+        for (std::size_t i=0;i<number_partitions;i++) {
+          bfs_phase.push_back(points[i].bfs_async());
+        }
+        hpx::lcos::wait(bfs_phase);
+
         // Print the total walltime that the computation took.
         std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl;
     } // Ensure things go out of scope before hpx::finalize is called.
