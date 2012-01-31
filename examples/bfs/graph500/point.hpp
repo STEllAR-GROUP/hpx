@@ -48,6 +48,18 @@ namespace graph500
             BOOST_ASSERT(gid_);
             this->base_type::init_async(gid_,objectid, scale,number_partitions);
         }
+
+        hpx::lcos::promise<void> bfs_async()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::bfs_async(gid_);
+        }
+
+        void bfs()
+        {
+            BOOST_ASSERT(gid_);
+            this->base_type::bfs(gid_);
+        }
     };
 }
 

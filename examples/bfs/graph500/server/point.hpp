@@ -27,8 +27,9 @@ namespace graph500 { namespace server
         ///////////////////////////////////////////////////////////////////////
         // Exposed functionality of this component.
 
-        // kernel 1
         void init(std::size_t objectid,std::size_t scale,std::size_t number_partitions);
+
+        void bfs();
 
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
@@ -37,7 +38,8 @@ namespace graph500 { namespace server
         /// Action codes.
         enum actions
         {
-            point_init = 0
+            point_init = 0,
+            point_bfs = 1
         };
 
         typedef hpx::actions::action3<
@@ -53,9 +55,24 @@ namespace graph500 { namespace server
             &point::init
         > init_action;
 
+        typedef hpx::actions::action0<
+            // Component server type.
+            point,
+            // Action code.
+            point_bfs,
+            // Arguments of this action.
+            // Method bound to this action.
+            &point::bfs
+        > bfs_action;
+
     private:
         hpx::lcos::local_mutex mtx_;
         std::size_t idx_;
+        std::vector< std::vector<std::size_t> > neighbors_;
+        std::vector<std::size_t> level_,parent_;
+        std::vector<char> visited_;
+        std::size_t minnode_;
+        std::vector<packed_edge> local_edges_;
     };
 }}
 
@@ -63,6 +80,10 @@ namespace graph500 { namespace server
 HPX_REGISTER_ACTION_DECLARATION_EX(
     graph500::server::point::init_action,
     graph500_point_init_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    graph500::server::point::bfs_action,
+    graph500_point_bfs_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::lcos::base_lco_with_value<std::vector<std::size_t> >::get_value_action,
