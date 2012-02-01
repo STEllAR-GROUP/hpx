@@ -97,7 +97,7 @@ int omp_main(
     #pragma omp parallel
     #pragma omp single
     {
-    	for (boost::uint64_t i = 0; i < tasks; ++i)
+        for (boost::uint64_t i = 0; i < tasks; ++i)
             #pragma omp task untied
             null_thread();
 

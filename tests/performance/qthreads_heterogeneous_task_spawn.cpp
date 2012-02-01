@@ -256,7 +256,7 @@ int qthreads_main(
 
         ///////////////////////////////////////////////////////////////////////
         // Queue the tasks in a serial loop. 
-	    for (boost::uint64_t i = 0; i < tasks; ++i)
+        for (boost::uint64_t i = 0; i < tasks; ++i)
         { 
             void* const ptr = reinterpret_cast<void*>(payloads[i]);
             qthread_fork(&null_thread, ptr, NULL);
@@ -266,8 +266,8 @@ int qthreads_main(
         // Wait for the work to finish.
         do {
             // Yield until all our null qthreads are done.
-    	    qthread_yield();
-    	} while (donecount != tasks);
+            qthread_yield();
+        } while (donecount != tasks);
 
         ///////////////////////////////////////////////////////////////////////
         // Print the results.

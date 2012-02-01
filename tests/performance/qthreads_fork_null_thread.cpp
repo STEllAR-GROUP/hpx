@@ -104,13 +104,13 @@ int qthreads_main(
     // Start the clock.
     high_resolution_timer t;
 
-	for (boost::uint64_t i = 0; i < tasks; ++i)
+    for (boost::uint64_t i = 0; i < tasks; ++i)
         qthread_fork(&null_thread, NULL, NULL);
 
     // Yield until all our null qthreads are done.
-	do {
-	    qthread_yield();
-	} while (donecount != tasks);
+    do {
+        qthread_yield();
+    } while (donecount != tasks);
 
     print_results(qthread_num_workers(), tasks, delay, t.elapsed());
 
