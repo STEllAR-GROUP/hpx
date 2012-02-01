@@ -57,7 +57,7 @@ namespace graph500 { namespace server
 
       local_edges_.resize(nedges);
 
-    //  generate_kronecker_range(seed, log_numverts, start_idx, end_idx, &*local_edges_.begin());
+      generate_kronecker_range(seed, log_numverts, start_idx, end_idx, &*local_edges_.begin());
       // As this doesn't work yet without C support, read the file as a stop-gap measure 
       {
         // stop-gap measure

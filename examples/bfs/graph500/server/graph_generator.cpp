@@ -7,17 +7,26 @@
 /*  Authors: Jeremiah Willcock                                             */
 /*           Andrew Lumsdaine                                              */
 
-#include <stdlib.h>
-#include <stdint.h>
-#include <assert.h>
+#ifndef __STDC_CONSTANT_MACROS
+#define __STDC_CONSTANT_MACROS
+#endif
+
+#ifndef __STDC_LIMIT_MACROS
+#define __STDC_LIMIT_MACROS
+#endif
 
 #ifndef __STDC_FORMAT_MACROS
 #define __STDC_FORMAT_MACROS
 #endif
+
+#include <stdlib.h>
+#include <stdint.h>
+#include <assert.h>
+
 #include <inttypes.h>
 
-#include "splittable_mrg.h"
-#include "graph_generator.h"
+#include "splittable_mrg.hpp"
+#include "graph_generator.hpp"
 
 /* Initiator settings: for faster random number generation, the initiator
  * probabilities are defined as fractions (a = INITIATOR_A_NUMERATOR /

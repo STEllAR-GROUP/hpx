@@ -11,8 +11,8 @@
 
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-#include "graph_generator.h"
-#include "splittable_mrg.h"
+#include "graph_generator.hpp"
+#include "splittable_mrg.hpp"
 #include "../../array.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////

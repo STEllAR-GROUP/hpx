@@ -15,15 +15,15 @@ set(stubs_headers
 
 set(server_headers
     server/point.hpp
-    server/graph_generator.h
-    server/mod_arith_64bit.h
-    server/splittable_mrg.h
-    server/mrg_transitions.c)
+    server/graph_generator.hpp
+    server/mod_arith_64bit.hpp
+    server/splittable_mrg.hpp
+    server/mrg_transitions.hpp)
 
 set(server_sources
     server/point.cpp
-    server/graph_generator.c
-    server/splittable_mrg.c)
+    server/graph_generator.cpp
+    server/splittable_mrg.cpp)
 
 set(sources
     ${client_sources}
