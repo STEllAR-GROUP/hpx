@@ -155,5 +155,14 @@ namespace graph500 { namespace server
    
     }
 
+    void point::merge_graph(std::size_t parent, std::vector<std::size_t> const& neighbors) {
+      // Check to see if the any of the neighbors are on this partition
+      //for (std::size_t i=0;i<neighbors;i++) {
+      //  if ( parent_( parent - minnode_ , neighbors[i] - minnode_ , 0 ) != parent ) {
+          // Correct this, add to the reset list, and follow on with the neighbors 
+      //  }
+      //}
+    }
+
 }}
 

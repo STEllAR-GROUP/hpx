@@ -46,6 +46,24 @@ namespace graph500 { namespace stubs
             // is executed and the result is returned to the promise.
             bfs_async(gid).get();
         }
+
+        static hpx::lcos::promise<void>
+        merge_graph_async(hpx::naming::id_type const& gid,
+                          std::size_t parent,
+                          std::vector<std::size_t> const& neighbors)
+        {
+            typedef server::point::merge_graph_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid,parent,neighbors);
+        }
+
+        static void merge_graph(hpx::naming::id_type const& gid,
+                          std::size_t parent,
+                          std::vector<std::size_t> const& neighbors)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise.
+            merge_graph_async(gid,parent,neighbors).get();
+        }
     };
 }}
 

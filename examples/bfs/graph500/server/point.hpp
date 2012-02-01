@@ -33,6 +33,8 @@ namespace graph500 { namespace server
 
         void bfs();
 
+        void merge_graph(std::size_t parent, std::vector<std::size_t> const& neighbors);
+
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
@@ -41,7 +43,8 @@ namespace graph500 { namespace server
         enum actions
         {
             point_init = 0,
-            point_bfs = 1
+            point_bfs = 1,
+            point_merge_graph = 2
         };
 
         typedef hpx::actions::action3<
@@ -67,6 +70,18 @@ namespace graph500 { namespace server
             &point::bfs
         > bfs_action;
 
+        typedef hpx::actions::action2<
+            // Component server type.
+            point,
+            // Action code.
+            point_merge_graph,
+            // Arguments of this action.
+            std::size_t,
+            std::vector<std::size_t> const&,
+            // Method bound to this action.
+            &point::merge_graph
+        > merge_graph_action;
+
     private:
         hpx::lcos::local_mutex mtx_;
         std::size_t idx_;
@@ -85,6 +100,10 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     graph500::server::point::bfs_action,
     graph500_point_bfs_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    graph500::server::point::merge_graph_action,
+    graph500_point_merge_graph_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::lcos::base_lco_with_value<std::vector<std::size_t> >::get_value_action,
