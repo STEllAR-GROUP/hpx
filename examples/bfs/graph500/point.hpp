@@ -36,17 +36,19 @@ namespace graph500
 
         // kernel 1
         hpx::lcos::promise<void> init_async(std::size_t objectid,
-            std::size_t scale,std::size_t number_partitions)
+            std::size_t scale,std::size_t number_partitions,
+            std::vector<hpx::naming::id_type> const& point_components)
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::init_async(gid_,objectid,scale,number_partitions);
+            return this->base_type::init_async(gid_,objectid,scale,number_partitions,point_components);
         }
 
         // kernel 1
-        void init(std::size_t objectid,std::size_t scale,std::size_t number_partitions)
+        void init(std::size_t objectid,std::size_t scale,std::size_t number_partitions,
+                  std::vector<hpx::naming::id_type> const& point_components)
         {
             BOOST_ASSERT(gid_);
-            this->base_type::init_async(gid_,objectid, scale,number_partitions);
+            this->base_type::init_async(gid_,objectid, scale,number_partitions,point_components);
         }
 
         hpx::lcos::promise<void> bfs_async()
@@ -72,6 +74,18 @@ namespace graph500
         {
             BOOST_ASSERT(gid_);
             this->base_type::merge_graph_async(gid_,parent,neighbors);
+        }
+
+        hpx::lcos::promise<void> reset_async()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::reset_async(gid_);
+        }
+
+        void reset()
+        {
+            BOOST_ASSERT(gid_);
+            this->base_type::reset(gid_);
         }
     };
 }

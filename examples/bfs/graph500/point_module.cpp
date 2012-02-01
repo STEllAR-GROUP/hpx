@@ -40,6 +40,10 @@ HPX_REGISTER_ACTION_EX(
     graph500_point_type::wrapped_type::merge_graph_action,
     graph500_point_merge_graph_action);
 
+HPX_REGISTER_ACTION_EX(
+    graph500_point_type::wrapped_type::reset_action,
+    graph500_point_reset_action);
+
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco_with_value<std::vector<std::size_t> >,
     hpx::components::component_base_lco_with_value);

@@ -5,6 +5,8 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async_future_wait.hpp>
 
 #include "../stubs/point.hpp"
 #include "point.hpp"
@@ -35,8 +37,11 @@ static void compute_edge_range(int rank, int size, int64_t M, int64_t* start_idx
 ///////////////////////////////////////////////////////////////////////////////
 namespace graph500 { namespace server
 {
-    void point::init(std::size_t objectid,std::size_t log_numverts,std::size_t number_partitions)
+    void point::init(std::size_t objectid,std::size_t log_numverts,std::size_t number_partitions,
+                     std::vector<hpx::naming::id_type> const& point_components)
     {
+      idx_ = objectid;
+      point_components_ = point_components;
       // Spread the two 64-bit numbers into five nonzero values in the correct
       //  range.
       uint_fast32_t seed[5];
@@ -95,6 +100,8 @@ namespace graph500 { namespace server
       }
       maxnode++;
       std::size_t N = maxnode-minnode_;
+      size_est_ = N;
+      reset_list_.reserve(size_est_);
 
       neighbors_.resize(maxnode-minnode_);
 
@@ -156,12 +163,59 @@ namespace graph500 { namespace server
     }
 
     void point::merge_graph(std::size_t parent, std::vector<std::size_t> const& neighbors) {
+      hpx::lcos::local_mutex::scoped_lock l(mtx_);
       // Check to see if the any of the neighbors are on this partition
-      //for (std::size_t i=0;i<neighbors;i++) {
-      //  if ( parent_( parent - minnode_ , neighbors[i] - minnode_ , 0 ) != parent ) {
-          // Correct this, add to the reset list, and follow on with the neighbors 
-      //  }
-      //}
+      for (std::size_t i=0;i<neighbors.size();i++) {
+        std::size_t node = neighbors[i];
+        if ( node - minnode_ < parent_.isize() && node - minnode_ < parent_.jsize() ) {
+          if ( parent_( node - minnode_ , node - minnode_ , 0 ) == node ) {
+            // Correct this, add to the reset list, and follow on with the neighbors 
+            reset_list_.push_back(node);
+            parent_( node - minnode_ , node - minnode_ , 0 ) = parent;  
+#if 0
+            // It is possible that the neighbors of this node are located remotely; fix that by
+            // calling merge_graph for all non-local components on the neighbors of node
+            {
+             typedef std::vector<hpx::lcos::promise< void > > lazy_results_type;
+             lazy_results_type lazy_results;
+              for (std::size_t j=0;j<point_components_.size();j++) {
+                if ( j != idx_ ) { // only look non-locally
+                  lazy_results.push_back(stubs::point::merge_graph_async(point_components_[j],
+                                                                         node,
+                                                                         neighbors_[node-minnode_]));
+                }
+              }
+              hpx::lcos::wait(lazy_results,
+                   boost::bind(&point::merge_callback, this, _1));
+
+              //std::vector<hpx::lcos::promise<void> > followup_phase;
+              //for (std::size_t j=0;j<point_components_.size();j++) {
+              //  if ( j != idx_ ) { // only look non-locally
+              //    followup_phase.push_back(stubs::point::merge_graph_async(point_components_[j],
+              //                                                      node,
+              //                                                      neighbors_[node-minnode_]));
+              //  }
+              //}
+              //hpx::lcos::wait(followup_phase);
+            }
+#endif
+          }
+        }
+      }
+    }
+
+    bool point::merge_callback(std::size_t i) {
+      return true;
+    }
+
+    void point::reset()
+    {
+      for (std::size_t i=0;i<reset_list_.size();i++) {
+        std::size_t node = reset_list_[i];
+        parent_( node - minnode_ , node - minnode_ , 0 ) = node;  
+      }
+      reset_list_.resize(0);
+      reset_list_.reserve(size_est_);
     }
 
 }}

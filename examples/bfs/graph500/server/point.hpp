@@ -29,11 +29,16 @@ namespace graph500 { namespace server
         ///////////////////////////////////////////////////////////////////////
         // Exposed functionality of this component.
 
-        void init(std::size_t objectid,std::size_t scale,std::size_t number_partitions);
+        void init(std::size_t objectid,std::size_t scale,std::size_t number_partitions,
+                  std::vector<hpx::naming::id_type> const& point_components);
 
         void bfs();
 
         void merge_graph(std::size_t parent, std::vector<std::size_t> const& neighbors);
+
+        void reset();
+
+        bool merge_callback(std::size_t i);
 
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
@@ -44,10 +49,11 @@ namespace graph500 { namespace server
         {
             point_init = 0,
             point_bfs = 1,
-            point_merge_graph = 2
+            point_merge_graph = 2,
+            point_reset = 3
         };
 
-        typedef hpx::actions::action3<
+        typedef hpx::actions::action4<
             // Component server type.
             point,
             // Action code.
@@ -56,6 +62,7 @@ namespace graph500 { namespace server
             std::size_t,
             std::size_t,
             std::size_t,
+            std::vector<hpx::naming::id_type> const&,
             // Method bound to this action.
             &point::init
         > init_action;
@@ -82,13 +89,26 @@ namespace graph500 { namespace server
             &point::merge_graph
         > merge_graph_action;
 
+        typedef hpx::actions::action0<
+            // Component server type.
+            point,
+            // Action code.
+            point_reset,
+            // Arguments of this action.
+            // Method bound to this action.
+            &point::reset
+        > reset_action;
+
     private:
         hpx::lcos::local_mutex mtx_;
         std::size_t idx_;
+        std::size_t size_est_;
         std::vector< std::vector<std::size_t> > neighbors_;
         array<std::size_t> parent_;
         std::size_t minnode_;
         std::vector<packed_edge> local_edges_;
+        std::vector<std::size_t> reset_list_;
+        std::vector<hpx::naming::id_type> point_components_;
     };
 }}
 
@@ -104,6 +124,10 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     graph500::server::point::merge_graph_action,
     graph500_point_merge_graph_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    graph500::server::point::reset_action,
+    graph500_point_reset_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::lcos::base_lco_with_value<std::vector<std::size_t> >::get_value_action,
