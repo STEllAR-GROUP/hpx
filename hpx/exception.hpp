@@ -242,7 +242,7 @@ namespace hpx
             BOOST_ASSERT(e >= success && e < last_error);
             LERR_(error) << "created exception: " << this->what();
         }
-        ~exception (void) throw()
+        ~exception() throw()
         {
         }
 
@@ -260,6 +260,98 @@ namespace hpx
               , mode);
         }
     };
+
+    struct HPX_EXCEPTION_EXPORT std_exception : std::exception 
+    {
+      private:
+        std::string what_;
+
+      public:
+        explicit std_exception(std::string const& what)
+          : what_(what)
+        {}   
+
+        ~std_exception() throw() {}
+
+        const char* what() const throw()
+        {
+            return what_.c_str();
+        }
+    };
+
+    struct HPX_EXCEPTION_EXPORT bad_alloc : std::bad_alloc 
+    {
+      private:
+        std::string what_;
+
+      public:
+        explicit bad_alloc(std::string const& what)
+          : what_(what)
+        {}   
+
+        ~bad_alloc() throw() {}
+
+        const char* what() const throw()
+        {
+            return what_.c_str();
+        }
+    };
+
+    struct HPX_EXCEPTION_EXPORT bad_exception : std::bad_exception 
+    {
+      private:
+        std::string what_;
+
+      public:
+        explicit bad_exception(std::string const& what)
+          : what_(what)
+        {}   
+
+        ~bad_exception() throw() {}
+
+        const char* what() const throw()
+        {
+            return what_.c_str();
+        }
+    };
+
+#ifndef BOOST_NO_TYPEID
+    struct HPX_EXCEPTION_EXPORT bad_cast : std::bad_cast 
+    {
+      private:
+        std::string what_;
+
+      public:
+        explicit bad_cast(std::string const& what)
+          : what_(what)
+        {}   
+
+        ~bad_cast() throw() {}
+
+        const char* what() const throw()
+        {
+            return what_.c_str();
+        }
+    };
+
+    struct HPX_EXCEPTION_EXPORT bad_typeid : std::bad_typeid 
+    {
+      private:
+        std::string what_;
+
+      public:
+        explicit bad_typeid(std::string const& what)
+          : what_(what)
+        {}   
+
+        ~bad_typeid() throw() {}
+
+        const char* what() const throw()
+        {
+            return what_.c_str();
+        }
+    };
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     // types needed to add additional information to the thrown exceptions

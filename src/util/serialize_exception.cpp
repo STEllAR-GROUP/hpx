@@ -231,7 +231,7 @@ namespace boost { namespace serialization
             switch (type) {
             case hpx::util::std_exception:
             case hpx::util::unknown_exception:
-                hpx::detail::rethrow_exception(std::exception(),
+                hpx::detail::rethrow_exception(hpx::std_exception(what),
                     throw_function_, throw_file_, throw_line_, back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_);
@@ -267,7 +267,7 @@ namespace boost { namespace serialization
                 break;
 
             case hpx::util::std_bad_alloc:
-                hpx::detail::rethrow_exception(std::bad_alloc(),
+                hpx::detail::rethrow_exception(hpx::bad_alloc(what),
                     throw_function_, throw_file_, throw_line_, back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_);
@@ -275,21 +275,21 @@ namespace boost { namespace serialization
 
 #ifndef BOOST_NO_TYPEID
             case hpx::util::std_bad_cast:
-                hpx::detail::rethrow_exception(std::bad_cast(),
+                hpx::detail::rethrow_exception(hpx::bad_cast(what),
                     throw_function_, throw_file_, throw_line_, back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_);
                 break;
 
             case hpx::util::std_bad_typeid:
-                hpx::detail::rethrow_exception(std::bad_typeid(),
+                hpx::detail::rethrow_exception(hpx::bad_typeid(what),
                     throw_function_, throw_file_, throw_line_, back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_);
                 break;
 #endif
             case hpx::util::std_bad_exception:
-                hpx::detail::rethrow_exception(std::bad_exception(),
+                hpx::detail::rethrow_exception(hpx::bad_exception(what),
                     throw_function_, throw_file_, throw_line_, back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_);
