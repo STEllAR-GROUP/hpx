@@ -104,11 +104,18 @@ int hpx_main(boost::program_options::variables_map &vm)
         }
 
         ///////////////////////////////////////////////////////////////////////
+        // Get the gids of each component
+        std::vector<hpx::naming::id_type> point_components;
+        for (std::size_t i=0;i<number_partitions;i++) {
+          point_components.push_back(points[i].get_gid());
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         // Put the graph in the data structure
         std::vector<hpx::lcos::promise<void> > init_phase;
 
         for (std::size_t i=0;i<number_partitions;i++) {
-          init_phase.push_back(points[i].init_async(i,scale,number_partitions));
+          init_phase.push_back(points[i].init_async(i,scale,number_partitions,point_components));
         }
 
         // We have to wait for the initialization to complete before we begin
@@ -149,7 +156,13 @@ int hpx_main(boost::program_options::variables_map &vm)
 
           // validate
 
-          // reset tightening
+          {  // reset tightening
+            std::vector<hpx::lcos::promise<void> > reset_phase;
+            for (std::size_t i=0;i<number_partitions;i++) {
+              reset_phase.push_back(points[i].reset_async());
+            }
+            hpx::lcos::wait(reset_phase);
+          }
         } 
 
         // Print the total walltime that the computation took.
