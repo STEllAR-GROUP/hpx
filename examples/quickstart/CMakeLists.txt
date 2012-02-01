@@ -7,6 +7,7 @@
 set(example_programs
     factorial
     fibonacci
+    1Dwave
     non_atomic_rma
     quicksort
     timed_wake
