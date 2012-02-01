@@ -23,8 +23,8 @@ public:
 
   // creates an empty rows array
   array() 
-    : istart_(0), jstart_(0), kstart_(0), vsize_(0),
-      isize_(0), jsize_(0), ksize_(0), data_()
+    : istart_(0), jstart_(0), kstart_(0), 
+      isize_(0), jsize_(0), ksize_(0), vsize_(0), data_()
   {}
 
   std::size_t size() const
