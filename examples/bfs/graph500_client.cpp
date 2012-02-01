@@ -79,6 +79,30 @@ int hpx_main(boost::program_options::variables_map &vm)
         // Populate the client vectors.
         init(hpx::components::server::locality_results(blocks), points);
 
+        // Generate the search roots
+        //  This part isn't functional yet (need C support); 
+        //   the following is a stop-gap measure
+        std::string const searchfile = "g10_search.txt";
+        std::vector<std::size_t> searchroot;
+        {
+          std::string line;
+          std::string val1;
+          std::ifstream myfile;
+          myfile.open(searchfile);
+          if (myfile.is_open()) {
+            while (myfile.good()) {
+              while (std::getline(myfile,line)) {
+                  std::istringstream isstream(line);
+                  std::getline(isstream,val1);
+                  std::size_t root = boost::lexical_cast<std::size_t>(val1);
+                  // increment all nodes and neighbors by 1; the smallest edge number is 1
+                  // edge 0 is reserved for the parent of the root and for unvisited edges
+                  searchroot.push_back(root+1);
+              }
+            }
+          }
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // Put the graph in the data structure
         std::vector<hpx::lcos::promise<void> > init_phase;
@@ -93,12 +117,40 @@ int hpx_main(boost::program_options::variables_map &vm)
         double kernel1_time = kernel1time.elapsed();
         std::cout << "Elapsed time during kernel 1: " << kernel1_time << " [s]" << std::endl;
 
+        // Begin Kernel 2
+        std::vector<double> kernel2_time;
+        std::vector<double> kernel2_nedge;
+        kernel2_time.resize(searchroot.size());
+        kernel2_nedge.resize(searchroot.size());
+
+        hpx::util::high_resolution_timer part_kernel2time;
         std::vector<hpx::lcos::promise<void> > bfs_phase;
 
         for (std::size_t i=0;i<number_partitions;i++) {
           bfs_phase.push_back(points[i].bfs_async());
         }
         hpx::lcos::wait(bfs_phase);
+        double part_kernel2_time = part_kernel2time.elapsed();
+        part_kernel2_time /= searchroot.size();
+
+        std::vector<std::size_t> startup_neighbor;
+        startup_neighbor.resize(1);
+        for (std::size_t step=0;step<searchroot.size();step++) {
+          hpx::util::high_resolution_timer kernel2time;
+          {  // tighten up the edges for each root
+            std::vector<hpx::lcos::promise<void> > merge_phase;
+            startup_neighbor[0] = searchroot[step];
+            for (std::size_t i=0;i<number_partitions;i++) {
+              merge_phase.push_back(points[i].merge_graph_async(searchroot[step],startup_neighbor));
+            }
+            hpx::lcos::wait(merge_phase);
+          }
+          kernel2_time[step] = kernel2time.elapsed() + part_kernel2_time;
+
+          // validate
+
+          // reset tightening
+        } 
 
         // Print the total walltime that the computation took.
         std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl;
