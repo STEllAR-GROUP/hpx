@@ -38,8 +38,6 @@ namespace graph500 { namespace server
 
         void reset();
 
-        bool merge_callback(std::size_t i);
-
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.

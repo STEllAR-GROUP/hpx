@@ -58,35 +58,6 @@ namespace graph500 { namespace server
       local_edges_.resize(nedges);
 
       generate_kronecker_range(seed, log_numverts, start_idx, end_idx, &*local_edges_.begin());
-      // As this doesn't work yet without C support, read the file as a stop-gap measure 
-      {
-        // stop-gap measure
-        std::string const graphfile = "g10.txt";
-        std::string line;
-        std::string val1,val2;
-        std::ifstream myfile;
-        myfile.open(graphfile);
-        std::size_t count = 0;
-        if (myfile.is_open()) {
-          while (myfile.good()) {
-            while (std::getline(myfile,line)) {
-              std::istringstream isstream(line);
-              std::getline(isstream,val1,' ');
-              std::getline(isstream,val2,' ');
-              std::size_t node = boost::lexical_cast<std::size_t>(val1);
-              std::size_t neighbor = boost::lexical_cast<std::size_t>(val2);
-              if ( count >= start_idx && count < end_idx ) {
-                // Record it
-                // increment all nodes and neighbors by 1; the smallest edge number is 1
-                // edge 0 is reserved for the parent of the root and for unvisited edges
-                local_edges_[count-start_idx].v0 = node + 1; 
-                local_edges_[count-start_idx].v1 = neighbor + 1;
-              }
-              count++;
-            }
-          }
-        }
-      }
 
       // find the biggest node or neighbor
       std::size_t maxnode = 0;
@@ -163,7 +134,6 @@ namespace graph500 { namespace server
     }
 
     void point::merge_graph(std::size_t parent, std::vector<std::size_t> const& neighbors) {
-      hpx::lcos::local_mutex::scoped_lock l(mtx_);
       // Check to see if the any of the neighbors are on this partition
       for (std::size_t i=0;i<neighbors.size();i++) {
         std::size_t node = neighbors[i];
@@ -172,40 +142,9 @@ namespace graph500 { namespace server
             // Correct this, add to the reset list, and follow on with the neighbors 
             reset_list_.push_back(node);
             parent_( node - minnode_ , node - minnode_ , 0 ) = parent;  
-#if 0
-            // It is possible that the neighbors of this node are located remotely; fix that by
-            // calling merge_graph for all non-local components on the neighbors of node
-            {
-             typedef std::vector<hpx::lcos::promise< void > > lazy_results_type;
-             lazy_results_type lazy_results;
-              for (std::size_t j=0;j<point_components_.size();j++) {
-                if ( j != idx_ ) { // only look non-locally
-                  lazy_results.push_back(stubs::point::merge_graph_async(point_components_[j],
-                                                                         node,
-                                                                         neighbors_[node-minnode_]));
-                }
-              }
-              hpx::lcos::wait(lazy_results,
-                   boost::bind(&point::merge_callback, this, _1));
-
-              //std::vector<hpx::lcos::promise<void> > followup_phase;
-              //for (std::size_t j=0;j<point_components_.size();j++) {
-              //  if ( j != idx_ ) { // only look non-locally
-              //    followup_phase.push_back(stubs::point::merge_graph_async(point_components_[j],
-              //                                                      node,
-              //                                                      neighbors_[node-minnode_]));
-              //  }
-              //}
-              //hpx::lcos::wait(followup_phase);
-            }
-#endif
           }
         }
       }
-    }
-
-    bool point::merge_callback(std::size_t i) {
-      return true;
     }
 
     void point::reset()
