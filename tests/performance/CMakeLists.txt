@@ -9,10 +9,19 @@ set(benchmarks
     hpx_tls
     delay_baseline
     hpx_null_thread
-    openmp_null_thread
     hpx_heterogeneous_task_spawn
     print_heterogeneous_payloads
    )
+
+if(OPENMP_FOUND)
+  set(benchmarks
+      ${benchmarks}
+      openmp_null_thread
+     )
+
+  set(openmp_null_thread_FLAGS NOLIBS
+      DEPENDENCIES ${BOOST_program_options_LIBRARY})
+endif()
 
 if(QTHREADS_FOUND)
   include_directories(${QTHREADS_INCLUDE_DIR})
@@ -49,9 +58,6 @@ set(hpx_tls_FLAGS NOLIBS DEPENDENCIES ${BOOST_program_options_LIBRARY}
 set(delay_baseline_FLAGS DEPENDENCIES iostreams_component)
 
 set(hpx_null_thread_FLAGS DEPENDENCIES iostreams_component)
-
-set(openmp_null_thread_FLAGS NOLIBS
-    DEPENDENCIES ${BOOST_program_options_LIBRARY})
 
 set(hpx_heterogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component)
 
@@ -96,8 +102,10 @@ foreach(benchmark ${benchmarks})
                               ${benchmark}_exe)
 endforeach()
 
-set_target_properties(openmp_null_thread_exe PROPERTIES COMPILE_FLAGS -fopenmp)
-set_target_properties(openmp_null_thread_exe PROPERTIES LINK_FLAGS -fopenmp)
+if(OPENMP_FOUND)
+  set_target_properties(openmp_null_thread_exe PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
+  set_target_properties(openmp_null_thread_exe PROPERTIES LINK_FLAGS ${OpenMP_CXX_FLAGS})
+endif()
 
 add_hpx_executable(util_function
                    SOURCES util/function.cpp

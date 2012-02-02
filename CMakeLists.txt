@@ -368,6 +368,11 @@ endif()
 find_package(HPX_Qthreads)
 
 ################################################################################
+# OpenMP (for benchmark comparisons) 
+################################################################################
+find_package(OpenMP)
+
+################################################################################
 # Warning configuration
 ################################################################################
 hpx_option(HPX_WARNINGS BOOL "Enable compiler warnings (default: ON)" ON ADVANCED)
