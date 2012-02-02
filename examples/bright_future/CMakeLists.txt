@@ -3,8 +3,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-include(FindOpenMP)
-
 add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=10)
 add_definitions(-DHPX_COMPONENT_CREATE_ARG_MAX=10)
 
@@ -104,19 +102,19 @@ if(HPX_CXX11_LAMBDAS)
 
   if(OPENMP_FOUND)
     set_target_properties(gs_single_exe PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
-    set_target_properties(gs_single_exe PROPERTIES LINK_FLAGS "${OpenMP_EXE_LINKER_FLAGS}")
+    set_target_properties(gs_single_exe PROPERTIES LINK_FLAGS "${OpenMP_CXX_FLAGS}")
 
     set_target_properties(jacobi_openmp_exe PROPERTIES COMPILE_DEFINITIONS BRIGHT_FUTURE_NO_HPX)
     set_target_properties(jacobi_openmp_exe PROPERTIES COMPILE_FLAGS "${OpenMP_CXX_FLAGS} -DOPENMP_GRID")
-    set_target_properties(jacobi_openmp_exe PROPERTIES LINK_FLAGS "${OpenMP_EXE_LINKER_FLAGS}")
+    set_target_properties(jacobi_openmp_exe PROPERTIES LINK_FLAGS "${OpenMP_CXX_FLAGS}")
 
     set_target_properties(jacobi_openmp_simple_exe PROPERTIES COMPILE_DEFINITIONS BRIGHT_FUTURE_NO_HPX)
     set_target_properties(jacobi_openmp_simple_exe PROPERTIES COMPILE_FLAGS "${OpenMP_CXX_FLAGS} -DOPENMP_GRID")
-    set_target_properties(jacobi_openmp_simple_exe PROPERTIES LINK_FLAGS "${OpenMP_EXE_LINKER_FLAGS}")
+    set_target_properties(jacobi_openmp_simple_exe PROPERTIES LINK_FLAGS "${OpenMP_CXX_FLAGS}")
 
     set_target_properties(jacobi_nonuniform_openmp_exe PROPERTIES COMPILE_DEFINITIONS BRIGHT_FUTURE_NO_HPX)
     set_target_properties(jacobi_nonuniform_openmp_exe PROPERTIES COMPILE_FLAGS "${OpenMP_CXX_FLAGS} -DOPENMP_GRID")
-    set_target_properties(jacobi_nonuniform_openmp_exe PROPERTIES LINK_FLAGS "${OpenMP_EXE_LINKER_FLAGS}")
+    set_target_properties(jacobi_nonuniform_openmp_exe PROPERTIES LINK_FLAGS "${OpenMP_CXX_FLAGS}")
   endif()
 endif()
 
