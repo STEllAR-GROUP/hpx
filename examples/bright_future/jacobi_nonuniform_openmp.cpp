@@ -31,13 +31,13 @@ void solve(
     for(std::size_t iter = 0; iter < max_iterations; ++iter)
     {
 #pragma omp parallel for shared(u) schedule(static)
-        for(std::size_t i = 0; i < x.size(); i += block_size)
+        for(int i = 0; i < (int)x.size(); i += (int)block_size)
         {
             bright_future::jacobi_kernel_nonuniform(
                 A
               , u
               , b_
-              , std::pair<std::size_t, std::size_t>(i, std::min(i + block_size, x.size()))
+              , std::pair<std::size_t, std::size_t>(i, (std::min)(i + block_size, x.size()))
               , old
               , new_
             );

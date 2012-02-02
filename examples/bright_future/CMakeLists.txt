@@ -3,6 +3,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+include(FindOpenMP)
+
 add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=10)
 add_definitions(-DHPX_COMPONENT_CREATE_ARG_MAX=10)
 
@@ -21,34 +23,42 @@ if(HPX_CXX11_LAMBDAS)
         gs_hpx_grid_ro
         remote_functions
         gs_hpx_blocked_df
-        jacobi_openmp
         jacobi_hpx
-        jacobi_openmp_simple
         jacobi_hpx_simple
         jacobi_nonuniform_hpx
-        jacobi_nonuniform_openmp
       )
 
-add_hpx_component(
+  if(OPENMP_FOUND)
+    set(bright_future_programs ${bright_future_programs}
+      jacobi_openmp
+      jacobi_openmp_simple
+      jacobi_nonuniform_openmp
+    )
+  endif()
+
+  add_hpx_component(
     gs_hpx
     SOURCES server/remote_lse.cpp
     HEADERS server/remote_lse.hpp grid.hpp
     DEPENDENCIES iostreams_component distributing_factory_component
     FOLDER "Examples/BrightFuture"
-)
+  )
 endif()
 
 set(gs_single_sources gs.cpp grid.cpp)
-set(jacobi_openmp_sources gs.cpp)
 set(jacobi_hpx_sources gs.cpp grid.cpp)
-set(jacobi_openmp_simple_sources gs.cpp grid.cpp)
 set(jacobi_hpx_simple_sources gs.cpp grid.cpp)
 set(jacobi_nonuniform_hpx_sources jacobi_nonuniform.cpp grid.cpp)
-set(jacobi_nonuniform_openmp_sources jacobi_nonuniform.cpp grid.cpp)
 set(gs_hpx_blocked_sources gs.cpp grid.cpp)
 set(gs_hpx_blocked_df_sources gs.cpp grid.cpp)
 set(gs_hpx_grid_ro_sources gs.cpp grid.cpp)
 set(gs_hpx_distributed_sources gs.cpp grid.cpp)
+
+if(OPENMP_FOUND)
+  set(jacobi_openmp_sources gs.cpp)
+  set(jacobi_openmp_simple_sources gs.cpp grid.cpp)
+  set(jacobi_nonuniform_openmp_sources jacobi_nonuniform.cpp grid.cpp)
+endif()
 
 set(remote_functions_FLAGS DEPENDENCIES iostreams_component)
 set(vector_root_finder_FLAGS DEPENDENCIES iostreams_component)
@@ -91,20 +101,23 @@ endforeach()
 
 if(HPX_CXX11_LAMBDAS)
   set_target_properties(gs_single_exe PROPERTIES COMPILE_DEFINITIONS BRIGHT_FUTURE_NO_HPX)
-  set_target_properties(gs_single_exe PROPERTIES COMPILE_FLAGS -fopenmp)
-  set_target_properties(gs_single_exe PROPERTIES LINK_FLAGS -fopenmp)
 
-  set_target_properties(jacobi_openmp_exe PROPERTIES COMPILE_DEFINITIONS BRIGHT_FUTURE_NO_HPX)
-  set_target_properties(jacobi_openmp_exe PROPERTIES COMPILE_FLAGS "-fopenmp -DOPENMP_GRID")
-  set_target_properties(jacobi_openmp_exe PROPERTIES LINK_FLAGS -fopenmp)
+  if(OPENMP_FOUND)
+    set_target_properties(gs_single_exe PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
+    set_target_properties(gs_single_exe PROPERTIES LINK_FLAGS "${OpenMP_EXE_LINKER_FLAGS}")
 
-  set_target_properties(jacobi_openmp_simple_exe PROPERTIES COMPILE_DEFINITIONS BRIGHT_FUTURE_NO_HPX)
-  set_target_properties(jacobi_openmp_simple_exe PROPERTIES COMPILE_FLAGS "-fopenmp -DOPENMP_GRID")
-  set_target_properties(jacobi_openmp_simple_exe PROPERTIES LINK_FLAGS -fopenmp)
+    set_target_properties(jacobi_openmp_exe PROPERTIES COMPILE_DEFINITIONS BRIGHT_FUTURE_NO_HPX)
+    set_target_properties(jacobi_openmp_exe PROPERTIES COMPILE_FLAGS "${OpenMP_CXX_FLAGS} -DOPENMP_GRID")
+    set_target_properties(jacobi_openmp_exe PROPERTIES LINK_FLAGS "${OpenMP_EXE_LINKER_FLAGS}")
 
-  set_target_properties(jacobi_nonuniform_openmp_exe PROPERTIES COMPILE_DEFINITIONS BRIGHT_FUTURE_NO_HPX)
-  set_target_properties(jacobi_nonuniform_openmp_exe PROPERTIES COMPILE_FLAGS "-fopenmp -DOPENMP_GRID")
-  set_target_properties(jacobi_nonuniform_openmp_exe PROPERTIES LINK_FLAGS -fopenmp)
+    set_target_properties(jacobi_openmp_simple_exe PROPERTIES COMPILE_DEFINITIONS BRIGHT_FUTURE_NO_HPX)
+    set_target_properties(jacobi_openmp_simple_exe PROPERTIES COMPILE_FLAGS "${OpenMP_CXX_FLAGS} -DOPENMP_GRID")
+    set_target_properties(jacobi_openmp_simple_exe PROPERTIES LINK_FLAGS "${OpenMP_EXE_LINKER_FLAGS}")
+
+    set_target_properties(jacobi_nonuniform_openmp_exe PROPERTIES COMPILE_DEFINITIONS BRIGHT_FUTURE_NO_HPX)
+    set_target_properties(jacobi_nonuniform_openmp_exe PROPERTIES COMPILE_FLAGS "${OpenMP_CXX_FLAGS} -DOPENMP_GRID")
+    set_target_properties(jacobi_nonuniform_openmp_exe PROPERTIES LINK_FLAGS "${OpenMP_EXE_LINKER_FLAGS}")
+  endif()
 endif()
 
 #add_hpx_executable(

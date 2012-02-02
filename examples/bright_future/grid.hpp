@@ -3,7 +3,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-
 #ifndef HPX_EXAMPLES_GRID_HPP
 #define HPX_EXAMPLES_GRID_HPP
 
@@ -79,7 +78,7 @@ namespace bright_future
         typedef T value_type;
 
         std::size_t block_size;
-        
+
         template <typename U> struct rebind { typedef numa_allocator<U> other; };
 
         numa_allocator() noexcept {}
@@ -113,7 +112,7 @@ namespace bright_future
 #pragma omp parallel for schedule(static)
                 for(size_type i_block = 0; i_block < len; i_block += block_size)
                 {
-                    size_type i_end = std::min(i_block + block_size, len);
+                    size_type i_end = (std::min)(i_block + block_size, len);
                     for(size_type i = i_block; i < i_end; i += sizeof(value_type))
                     {
                         for(size_type j = 0; j < sizeof(value_type); ++j)
@@ -153,7 +152,7 @@ namespace bright_future
                           , os_thread
                           , reinterpret_cast<std::size_t>(p)
                           , start
-                          , std::min(start + block_size, len)
+                          , (std::min)(start + block_size, len)
                         )
                     );
                     start += block_size;
@@ -430,10 +429,10 @@ namespace bright_future
         grid<double> & u_old = u[old];
         for(std::size_t y_block = y_range.first; y_block < y_range.second; y_block += cache_block)
         {
-            std::size_t y_end = std::min(y_block + cache_block, y_range.second);
+            std::size_t y_end = (std::min)(y_block + cache_block, y_range.second);
             for(std::size_t x_block = x_range.first; x_block < x_range.second; x_block += cache_block)
             {
-                std::size_t x_end = std::min(x_block + cache_block, x_range.second);
+                std::size_t x_end = (std::min)(x_block + cache_block, x_range.second);
                 for(std::size_t y = y_block; y < y_end; ++y)
                 {
                     for(std::size_t x = x_block; x < x_end; ++x)

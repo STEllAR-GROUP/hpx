@@ -17,7 +17,14 @@
 
 #include "sparse_matrix.hpp"
 
-#include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/qi_numeric.hpp>
+#include <boost/spirit/include/qi_char.hpp>
+#include <boost/spirit/include/qi_string.hpp>
+#include <boost/spirit/include/qi_action.hpp>
+#include <boost/spirit/include/qi_parse.hpp>
+#include <boost/spirit/include/qi_auxiliary.hpp>
+#include <boost/spirit/include/qi_operator.hpp>
+#include <boost/spirit/include/support_istream_iterator.hpp>
 #include <boost/spirit/include/phoenix.hpp>
 
 using boost::program_options::variables_map;
@@ -186,7 +193,7 @@ int hpx_main(variables_map & vm)
         }
         else if(mode == "statistics")
         {
-            std::size_t min_per_row = std::numeric_limits<std::size_t>::max();
+            std::size_t min_per_row = (std::numeric_limits<std::size_t>::max)();
             std::size_t max_per_row = 0;
             double mean_per_row = 0.0;
             for(std::size_t r = 0; r < b.size(); ++r)
@@ -229,7 +236,7 @@ int main(int argc, char **argv)
 {
     options_description
         desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
-    
+
     desc_commandline.add_options()
         (
             "format"

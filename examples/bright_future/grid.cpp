@@ -1,3 +1,7 @@
+//  Copyright (c) 2012 Thomas Heller
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef OPENMP_GRID
 #include <hpx/hpx_fwd.hpp>
@@ -9,7 +13,7 @@
 
 HPX_REGISTER_PLAIN_ACTION(touch_mem_action);
 
-HPX_EXPORT std::size_t touch_mem(std::size_t desired, std::size_t ps, std::size_t start, std::size_t end)
+std::size_t touch_mem(std::size_t desired, std::size_t ps, std::size_t start, std::size_t end)
 {
     std::size_t current = hpx::threads::threadmanager_base::get_thread_num();
 
