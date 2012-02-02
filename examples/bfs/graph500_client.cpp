@@ -198,7 +198,7 @@ int hpx_main(boost::program_options::variables_map &vm)
             std::vector<hpx::lcos::promise<std::vector<vertex_data> > > merge_phase;
             for (std::size_t j=0;j<merge_result.size();j++) {
               for (std::size_t i=0;i<number_partitions;i++) {
-                if ( i != j ) {
+                if ( i != j && merge_result[j].size() > 0 ) {
                   merge_phase.push_back(points[i].merge_graph_async(merge_result[j]));
                 }
               }
