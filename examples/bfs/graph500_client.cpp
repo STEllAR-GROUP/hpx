@@ -3,12 +3,52 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include<iostream>
+#include<vector>
+#include<math.h>
+
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
 #include "graph500/point.hpp"
 
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
+
+static int compare_doubles(const void* a, const void* b) {
+  double aa = *(const double*)a;
+  double bb = *(const double*)b;
+  return (aa < bb) ? -1 : (aa == bb) ? 0 : 1;
+}
+
+void get_statistics(std::vector<double> const& x, double &minimum, double &mean, double &stdev, double &firstquartile,
+                                                  double &median, double &thirdquartile, double &maximum)
+{
+  // Compute mean
+  double temp = 0.0;
+  std::size_t n = x.size();
+  for (std::size_t i=0;i<n;i++) temp += x[i];
+  temp /= n;
+  mean = temp;
+
+  // Compute std dev
+  temp = 0.0;
+  for (std::size_t i=0;i<n;i++) temp += (x[i] - mean)*(x[i]-mean);
+  temp /= n-1;
+  stdev = sqrt(temp);
+
+  // Sort x
+  std::vector<double> xx;    
+  xx.resize(n);
+  for (std::size_t i=0;i<n;i++) {
+    xx[i] = x[i];
+  }
+  qsort(&*xx.begin(),n,sizeof(double),compare_doubles);
+  minimum = xx[0];
+  firstquartile = (xx[(n - 1) / 4] + xx[n / 4]) * .5;
+  median = (xx[(n - 1) / 2] + xx[n / 2]) * .5;
+  thirdquartile = (xx[n - 1 - (n - 1) / 4] + xx[n - 1 - n / 4]) * .5; 
+  maximum = xx[n - 1];
+};
 
 void make_random_numbers(
        /* in */ int64_t nvalues    /* Number of values to generate */,
@@ -57,6 +97,11 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::size_t const scale = vm["scale"].as<std::size_t>();
         bool const validator = vm["validator"].as<bool>();
 
+        std::size_t num_pe = number_partitions; // actual number of partitions
+        if ( number_partitions > 1 ) {
+          num_pe += 10;
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // KERNEL 1  --- TIMED 
         hpx::util::high_resolution_timer kernel1time;
@@ -77,7 +122,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         // These components will be evenly distributed among all available
         // localities supporting the component type.
         hpx::components::distributing_factory::result_type blocks =
-            factory.create_components(block_type, number_partitions);
+            factory.create_components(block_type, num_pe);
 
         ///////////////////////////////////////////////////////////////////////
         // This vector will hold client classes referring to all of the
@@ -90,7 +135,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         ///////////////////////////////////////////////////////////////////////
         // Get the gids of each component
         std::vector<hpx::naming::id_type> point_components;
-        for (std::size_t i=0;i<number_partitions;i++) {
+        for (std::size_t i=0;i<num_pe;i++) {
           point_components.push_back(points[i].get_gid());
         }
 
@@ -98,7 +143,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         // Put the graph in the data structure
         std::vector<hpx::lcos::promise<void> > init_phase;
 
-        for (std::size_t i=0;i<number_partitions;i++) {
+        for (std::size_t i=0;i<num_pe;i++) {
           init_phase.push_back(points[i].init_async(i,scale,number_partitions,point_components));
         }
 
@@ -158,67 +203,86 @@ int hpx_main(boost::program_options::variables_map &vm)
         }
 
         // Begin Kernel 2
-        std::vector<double> kernel2_time;
-        std::vector<double> kernel2_nedge;
-        kernel2_time.resize(bfs_roots.size());
+        std::vector<double> kernel2_nedge,kernel2_time;
         kernel2_nedge.resize(bfs_roots.size());
+        kernel2_time.resize(bfs_roots.size());
 
-        hpx::util::high_resolution_timer part_kernel2time;
+        hpx::util::high_resolution_timer kernel2time;
         std::vector<hpx::lcos::promise<void> > bfs_phase;
 
-        for (std::size_t i=0;i<number_partitions;i++) {
+        for (std::size_t i=0;i<num_pe;i++) {
           bfs_phase.push_back(points[i].bfs_async());
         }
         hpx::lcos::wait(bfs_phase);
-        double part_kernel2_time = part_kernel2time.elapsed();
-        part_kernel2_time /= bfs_roots.size();
+        double k2time = kernel2time.elapsed();
 
-        for (std::size_t step=0;step<bfs_roots.size();step++) {
-          hpx::util::high_resolution_timer kernel2time;
+        // get statistics
+        if ( validator ) {
+          // Validate
+          //for (std::size_t step=0;step<bfs_roots.size();step++) {
+            // validate the graph for each root 
+          //}
 
-          std::vector<std::vector<vertex_data> > merge_result;
-          {  // tighten up the edges for each root
-            std::vector<hpx::lcos::promise<std::vector<vertex_data> > > merge_phase;
-            std::vector<vertex_data> startup;
-            std::vector<std::size_t> startup_neighbor;
-            startup_neighbor.push_back(bfs_roots[step]);
-            vertex_data data;
-            data.node = bfs_roots[step];
-            data.neighbors = startup_neighbor;
-            startup.push_back(data);
-            for (std::size_t i=0;i<number_partitions;i++) {
-              merge_phase.push_back(points[i].merge_graph_async(startup));
-            }
-            hpx::lcos::wait(merge_phase,merge_result);
+          for (std::size_t i=0;i<bfs_roots.size();i++) {
+            kernel2_time[i] = k2time/bfs_roots.size();
+            kernel2_nedge[i] = 1; // this comes from the validation
           }
 
-          // next levels
-          for (std::size_t level=1;level<3;level++) {  
-            // tighten up the edges for each root
-            std::vector<hpx::lcos::promise<std::vector<vertex_data> > > merge_phase;
-            for (std::size_t j=0;j<merge_result.size();j++) {
-              for (std::size_t i=0;i<number_partitions;i++) {
-                if ( i != j && merge_result[j].size() > 0 ) {
-                  merge_phase.push_back(points[i].merge_graph_async(merge_result[j]));
-                }
-              }
-            }
-            merge_result.resize(0);
-            hpx::lcos::wait(merge_phase,merge_result);
+          // Prep output statistics
+          double minimum,mean,stdev,firstquartile,median,thirdquartile,maximum;
+          get_statistics(kernel2_time,minimum,mean,stdev,firstquartile,
+                         median,thirdquartile,maximum);
+
+          double n_min,n_mean,n_stdev,n_firstquartile,n_median,n_thirdquartile,n_maximum;
+          get_statistics(kernel2_nedge,n_min,n_mean,n_stdev,n_firstquartile,
+                         n_median,n_thirdquartile,n_maximum);
+
+          // Print time statistics
+          //std::cout << " SCALE: " << SCALE << std::endl;
+          //std::cout << " edgefactor: " << edgefactor << std::endl;
+          //std::cout << " NBFS: " << NBFS << std::endl;
+          std::cout << " construction_time:  " << kernel1_time << std::endl;
+
+          std::cout << " min_time:             " << minimum << std::endl;
+          std::cout << " firstquartile_time:   " << firstquartile << std::endl;
+          std::cout << " median_time:          " << median << std::endl;
+          std::cout << " thirdquartile_time:   " << thirdquartile << std::endl;
+          std::cout << " max_time:             " << maximum << std::endl;
+          std::cout << " mean_time:            " << mean << std::endl;
+          std::cout << " stddev_time:          " << stdev << std::endl;
+
+          std::cout << " min_nedge:            " << n_min << std::endl;
+          std::cout << " firstquartile_nedge:  " << n_firstquartile << std::endl;
+          std::cout << " median_nedge:         " << n_median << std::endl;
+          std::cout << " thirdquartile_nedge:  " << n_thirdquartile << std::endl;
+          std::cout << " max_nedge:            " << n_maximum << std::endl;
+          std::cout << " mean_nedge:           " << n_mean << std::endl;
+          std::cout << " stddev_nedge:         " << n_stdev << std::endl;
+
+          std::vector<double> TEPS;
+          TEPS.resize(kernel2_nedge.size());
+          for (std::size_t i=0;i<kernel2_nedge.size();i++) {
+            TEPS[i] = kernel2_nedge[i]/kernel2_time[i];
           }
+          std::size_t N = TEPS.size();
+          double TEPS_min,TEPS_mean,TEPS_stdev,TEPS_firstquartile,TEPS_median,TEPS_thirdquartile,TEPS_maximum;
+          get_statistics(TEPS,TEPS_min,TEPS_mean,TEPS_stdev,TEPS_firstquartile,
+                         TEPS_median,TEPS_thirdquartile,TEPS_maximum);
 
-          kernel2_time[step] = kernel2time.elapsed() + part_kernel2_time;
+          // Harmonic standard deviation from:
+          // Nilan Norris, The Standard Errors of the Geometric and Harmonic
+          // Means and Their Application to Index Numbers, 1940.
+          // http://www.jstor.org/stable/2235723
+          TEPS_stdev = TEPS_stdev/(TEPS_mean*TEPS_mean*sqrt( (double) (N-1) ) );
 
-          // validate
-
-          {  // reset or loosening phase (make individual graphs disjoint again)
-            std::vector<hpx::lcos::promise<void> > reset_phase;
-            for (std::size_t i=0;i<number_partitions;i++) {
-              reset_phase.push_back(points[i].reset_async());
-            }
-            hpx::lcos::wait(reset_phase);
-          }
-        } 
+          std::cout << " min_TEPS:            " << TEPS_min << std::endl;
+          std::cout << " firstquartile_TEPS:  " << TEPS_firstquartile << std::endl;
+          std::cout << " median_TEPS:         " << TEPS_median << std::endl;
+          std::cout << " thirdquartile_TEPS:  " << TEPS_thirdquartile << std::endl;
+          std::cout << " max_TEPS:            " << TEPS_maximum << std::endl;
+          std::cout << " harmonic_mean_TEPS:  " << TEPS_mean << std::endl;
+          std::cout << " harmonic_stddev_TEPS:" << TEPS_stdev << std::endl;
+        }
 
         // Print the total walltime that the computation took.
         std::cout << "Elapsed time: " << t.elapsed() << " [s]" << std::endl;

@@ -51,13 +51,64 @@ namespace graph500 { namespace server
 
       int64_t M = INT64_C(16) << log_numverts;
 
-      int64_t start_idx, end_idx;
-      compute_edge_range(objectid, number_partitions, M, &start_idx, &end_idx);
-      int64_t nedges = end_idx - start_idx;
+      if ( objectid < number_partitions ) {
+        int64_t start_idx, end_idx;
+        compute_edge_range(objectid, number_partitions, M, &start_idx, &end_idx);
+        int64_t nedges = end_idx - start_idx;
 
-      local_edges_.resize(nedges);
+        local_edges_.resize(nedges);
 
-      generate_kronecker_range(seed, log_numverts, start_idx, end_idx, &*local_edges_.begin());
+        generate_kronecker_range(seed, log_numverts, start_idx, end_idx, &*local_edges_.begin());
+      } else {
+        // additive Schwarz approach 
+        // this gives us the size of a standard partition
+        int64_t start_idx, end_idx;
+        compute_edge_range(number_partitions-1, number_partitions, M, &start_idx, &end_idx);
+        int64_t nedges = end_idx - start_idx;
+
+        // standard additive schwarz -- increase the partition size to guarantee overlap
+        std::size_t size = 2*nedges;
+ 
+        // compute an array of length 'size' containing non-repeating int's in [0,end_idx)
+        std::vector<std::size_t> edges;
+        local_edges_.resize(size);
+        edges.resize(size);
+        {
+          int64_t nglobalverts = end_idx;
+          uint64_t counter = 0;
+          uint64_t seed1 = 2;
+          uint64_t seed2 = 3;
+          for (std::size_t j=0;j<edges.size();j++) {
+            int64_t root;
+            while (1) {
+              double d[2];
+              make_random_numbers(2, seed1, seed2, counter, d);
+              root = (int64_t)((d[0] + d[1]) * nglobalverts) % nglobalverts;
+              counter += 2;
+              if ( counter > (uint64_t) 2 * nglobalverts) break;
+              int is_duplicate = 0;
+              for (std::size_t i = 0; i < j; ++i) {
+                if ( (std::size_t) root == edges[i]) {
+                  is_duplicate = 1;
+                  break;
+                }
+              }
+              if (is_duplicate) continue; /* Everyone takes the same path here */
+              int root_ok = 0;
+              if ( root >= 0 && root < end_idx ) root_ok = 1;
+              if (root_ok) break;
+
+            }
+            edges[j] = root;
+          }
+        }
+
+        packed_edge tmp[1];
+        for (std::size_t i=0;i<edges.size();i++) {
+          generate_kronecker_range(seed, log_numverts, edges[i], edges[i]+1, tmp);
+          local_edges_[i] = tmp[0];
+        }
+      }
 
       // find the biggest node or neighbor
       std::size_t maxnode = 0;
