@@ -14,6 +14,7 @@ foreach(subdir ${subdirs})
   add_subdirectory(${subdir})
 
   set(sources
+      make_graph.c
       ${subdir}_client.cpp)
 
   source_group("Source Files" FILES ${sources})

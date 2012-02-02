@@ -10,6 +10,20 @@
 
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
+#define BITMAPSIZE (1UL << 29)
+
+static inline int64_t int64_min(int64_t a, int64_t b) {
+  return a < b ? a : b;
+}
+
+void make_random_numbers(
+       /* in */ int64_t nvalues    /* Number of values to generate */,
+       /* in */ uint64_t userseed1 /* Arbitrary 64-bit seed value */,
+       /* in */ uint64_t userseed2 /* Arbitrary 64-bit seed value */,
+       /* in */ int64_t position   /* Start index in random number stream */,
+       /* out */ double* result    /* Returned array of values */
+);
+
 /// This function initializes a vector of \a graph500::point clients,
 /// connecting them to components created with
 /// \a hpx::components::distributing_factory.
@@ -78,8 +92,49 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         // Populate the client vectors.
         init(hpx::components::server::locality_results(blocks), points);
-
+        
         // Generate the search roots
+        std::vector<std::size_t> bfs_roots;
+        bfs_roots.resize(64);  // the graph500 specifies 64 search roots 
+                                // must be used
+
+        {  // generate the bfs roots
+          int64_t nglobalverts = (int64_t)(1) << scale;
+          uint64_t counter = 0;
+          uint64_t seed1 = 2;
+          uint64_t seed2 = 3;
+          unsigned char* has_edge = NULL;
+          int64_t bitmap_size_in_bytes = int64_min(BITMAPSIZE, (nglobalverts + CHAR_BIT - 1) / CHAR_BIT);
+          has_edge = (unsigned char*) malloc(bitmap_size_in_bytes);
+          memset(has_edge, 0, bitmap_size_in_bytes);
+          for (std::size_t bfs_root_idx=0;bfs_root_idx<bfs_roots.size();bfs_root_idx++) {
+            int64_t root;
+            while (1) {
+              double d[2];
+              make_random_numbers(2, seed1, seed2, counter, d);
+              root = (int64_t)((d[0] + d[1]) * nglobalverts) % nglobalverts;
+              counter += 2;
+              if (counter > 2 * nglobalverts) break;
+              int is_duplicate = 0;
+              int i;
+              for (i = 0; i < bfs_root_idx; ++i) {
+                if (root == bfs_roots[i]) {
+                  is_duplicate = 1;
+                  break;
+                }
+              }
+              if (is_duplicate) continue; /* Everyone takes the same path here */
+              int root_ok = 0;
+              //root_ok = (has_edge[(root / CHAR_BIT) % bitmap_size_in_bytes] & (1 << (root % CHAR_BIT))) != 0;
+              if (root_ok) break;
+  
+              // TEST
+              break;
+            }          
+            bfs_roots[bfs_root_idx] = root;
+          }
+        }
+        
         //  This part isn't functional yet (need C support); 
         //   the following is a stop-gap measure
         std::string const searchfile = "g10_search.txt";
