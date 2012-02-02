@@ -31,7 +31,6 @@
 #include<boost/cstdint.hpp>
 #include<boost/format.hpp>
 
-#define HPX_ACTION_ARGUMENT_LIMIT 10
 #include<hpx/hpx.hpp>
 #include<hpx/hpx_fwd.hpp>
 #include<hpx/hpx_init.hpp>

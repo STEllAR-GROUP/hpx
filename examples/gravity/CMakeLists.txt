@@ -8,7 +8,7 @@
 
 # just recurse into all components subdirectories and execute the scripts there
 
-add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=7)
+add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=10)
 
 # define build target for this directory
 set(sources
