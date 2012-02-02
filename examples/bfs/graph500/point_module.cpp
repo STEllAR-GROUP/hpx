@@ -59,4 +59,3 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     hpx::lcos::base_lco_with_value<std::vector<std::size_t> >::set_result_action,
     set_result_action_vector_size_t);
-

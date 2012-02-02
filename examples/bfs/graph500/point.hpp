@@ -63,17 +63,17 @@ namespace graph500
             this->base_type::bfs(gid_);
         }
 
-        hpx::lcos::promise<void> merge_graph_async(std::size_t parent,
-            std::vector<std::size_t> const& neighbors)
+        hpx::lcos::promise<std::vector<vertex_data> > merge_graph_async(
+                                           std::vector<vertex_data> const& data)
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::merge_graph_async(gid_,parent,neighbors);
+            return this->base_type::merge_graph_async(gid_,data);
         }
 
-        void merge_graph(std::size_t parent,std::vector<std::size_t> const& neighbors)
+        std::vector<vertex_data> merge_graph(std::vector<vertex_data> const& data)
         {
             BOOST_ASSERT(gid_);
-            this->base_type::merge_graph_async(gid_,parent,neighbors);
+            return this->base_type::merge_graph(gid_,data);
         }
 
         hpx::lcos::promise<void> reset_async()

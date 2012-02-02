@@ -124,7 +124,7 @@ int hpx_main(boost::program_options::variables_map &vm)
               make_random_numbers(2, seed1, seed2, counter, d);
               root = (int64_t)((d[0] + d[1]) * nglobalverts) % nglobalverts;
               counter += 2;
-              if ( counter > 2 * nglobalverts) break;
+              if ( counter > (uint64_t) 2 * nglobalverts) break;
               int is_duplicate = 0;
               for (std::size_t i = 0; i < bfs_root_idx; ++i) {
                 if ( (std::size_t) root == bfs_roots[i]) {
@@ -173,23 +173,45 @@ int hpx_main(boost::program_options::variables_map &vm)
         double part_kernel2_time = part_kernel2time.elapsed();
         part_kernel2_time /= bfs_roots.size();
 
-        std::vector<std::size_t> startup_neighbor;
-        startup_neighbor.resize(1);
         for (std::size_t step=0;step<bfs_roots.size();step++) {
           hpx::util::high_resolution_timer kernel2time;
+
+          std::vector<std::vector<vertex_data> > merge_result;
           {  // tighten up the edges for each root
-            std::vector<hpx::lcos::promise<void> > merge_phase;
-            startup_neighbor[0] = bfs_roots[step];
+            std::vector<hpx::lcos::promise<std::vector<vertex_data> > > merge_phase;
+            std::vector<vertex_data> startup;
+            std::vector<std::size_t> startup_neighbor;
+            startup_neighbor.push_back(bfs_roots[step]);
+            vertex_data data;
+            data.node = bfs_roots[step];
+            data.neighbors = startup_neighbor;
+            startup.push_back(data);
             for (std::size_t i=0;i<number_partitions;i++) {
-              merge_phase.push_back(points[i].merge_graph_async(bfs_roots[step],startup_neighbor));
+              merge_phase.push_back(points[i].merge_graph_async(startup));
             }
-            hpx::lcos::wait(merge_phase);
+            hpx::lcos::wait(merge_phase,merge_result);
           }
+
+          // next levels
+          for (std::size_t level=1;level<3;level++) {  
+            // tighten up the edges for each root
+            std::vector<hpx::lcos::promise<std::vector<vertex_data> > > merge_phase;
+            for (std::size_t j=0;j<merge_result.size();j++) {
+              for (std::size_t i=0;i<number_partitions;i++) {
+                if ( i != j ) {
+                  merge_phase.push_back(points[i].merge_graph_async(merge_result[j]));
+                }
+              }
+            }
+            merge_result.resize(0);
+            hpx::lcos::wait(merge_phase,merge_result);
+          }
+
           kernel2_time[step] = kernel2time.elapsed() + part_kernel2_time;
 
           // validate
 
-          {  // reset tightening
+          {  // reset or loosening phase (make individual graphs disjoint again)
             std::vector<hpx::lcos::promise<void> > reset_phase;
             for (std::size_t i=0;i<number_partitions;i++) {
               reset_phase.push_back(points[i].reset_async());

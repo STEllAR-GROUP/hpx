@@ -63,11 +63,11 @@ namespace graph500 { namespace server
       std::size_t maxnode = 0;
       minnode_ = 99999;
       for (std::size_t i=0;i<local_edges_.size();i++) {
-        if ( local_edges_[i].v0 > maxnode ) maxnode = local_edges_[i].v0;
-        if ( local_edges_[i].v1 > maxnode ) maxnode = local_edges_[i].v1;
+        if ( (std::size_t) local_edges_[i].v0 > maxnode ) maxnode = local_edges_[i].v0;
+        if ( (std::size_t) local_edges_[i].v1 > maxnode ) maxnode = local_edges_[i].v1;
 
-        if ( local_edges_[i].v0 < minnode_ ) minnode_ = local_edges_[i].v0;
-        if ( local_edges_[i].v1 < minnode_ ) minnode_ = local_edges_[i].v1;
+        if ( (std::size_t) local_edges_[i].v0 < minnode_ ) minnode_ = local_edges_[i].v0;
+        if ( (std::size_t) local_edges_[i].v1 < minnode_ ) minnode_ = local_edges_[i].v1;
       }
       maxnode++;
       std::size_t N = maxnode-minnode_;
@@ -101,7 +101,7 @@ namespace graph500 { namespace server
     {
       bool found = false;
       for (std::size_t i=0;i<local_edges_.size();i++) {
-        if ( edge == local_edges_[i].v0 || edge == local_edges_[i].v1 ) {
+        if ( edge == (std::size_t) local_edges_[i].v0 || edge == (std::size_t) local_edges_[i].v1 ) {
           found = true;
           break;
         }
@@ -145,18 +145,31 @@ namespace graph500 { namespace server
    
     }
 
-    void point::merge_graph(std::size_t parent, std::vector<std::size_t> const& neighbors) {
-      // Check to see if the any of the neighbors are on this partition
-      for (std::size_t i=0;i<neighbors.size();i++) {
-        std::size_t node = neighbors[i];
-        if ( node - minnode_ < parent_.isize() && node - minnode_ < parent_.jsize() ) {
-          if ( parent_( node - minnode_ , node - minnode_ , 0 ) == node ) {
-            // Correct this, add to the reset list, and follow on with the neighbors 
-            reset_list_.push_back(node);
-            parent_( node - minnode_ , node - minnode_ , 0 ) = parent;  
+    std::vector<vertex_data> point::merge_graph(std::vector<vertex_data> const& data)
+    {
+      hpx::lcos::local_mutex::scoped_lock l(mtx_);
+      std::vector<vertex_data> result;
+      for ( std::size_t j=0;j<data.size();j++) {
+        // Check to see if the any of the neighbors are on this partition
+        for (std::size_t i=0;i<data[j].neighbors.size();i++) {
+          std::size_t node = data[j].neighbors[i];
+          if ( node - minnode_ < parent_.isize() && node - minnode_ < parent_.jsize() ) {
+            // see if the node is listed as its own parent; if so, then correct (tighten) it with the correct parent
+            // tightening is the process of joining something disjoint 
+            if ( parent_( node - minnode_ , node - minnode_ , 0 ) == node ) {
+              // Correct this, add to the reset list, and follow on with the neighbors 
+              reset_list_.push_back(node);
+              // the correct parent; this constitutes "tightening" 
+              parent_( node - minnode_ , node - minnode_ , 0 ) = data[j].node;
+              vertex_data v;
+              v.node = node;
+              v.neighbors = neighbors_[node-minnode_];
+              result.push_back(v);
+            }
           }
-        }
+        } 
       }
+      return result;
     }
 
     void point::reset()

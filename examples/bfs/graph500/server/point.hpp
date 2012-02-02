@@ -15,9 +15,29 @@
 #include "splittable_mrg.hpp"
 #include "../../array.hpp"
 
+struct vertex_data
+{
+  std::size_t node;
+  std::vector<std::size_t> neighbors;
+
+  vertex_data() {}
+
+  private:
+    // serialization support
+    friend class boost::serialization::access;
+
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version)
+    {
+        ar & node & neighbors;
+    }
+
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace graph500 { namespace server
 {
+
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT point
       : public hpx::components::managed_component_base<point>
@@ -34,7 +54,7 @@ namespace graph500 { namespace server
 
         void bfs();
 
-        void merge_graph(std::size_t parent, std::vector<std::size_t> const& neighbors);
+        std::vector<vertex_data> merge_graph(std::vector<vertex_data> const& data);
 
         void reset();
     
@@ -78,14 +98,14 @@ namespace graph500 { namespace server
             &point::bfs
         > bfs_action;
 
-        typedef hpx::actions::action2<
+        typedef hpx::actions::result_action1<
             // Component server type.
             point,
+            std::vector<vertex_data>,
             // Action code.
             point_merge_graph,
             // Arguments of this action.
-            std::size_t,
-            std::vector<std::size_t> const&,
+            std::vector<vertex_data> const&,
             // Method bound to this action.
             &point::merge_graph
         > merge_graph_action;
@@ -154,7 +174,6 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::lcos::base_lco_with_value<std::vector<std::size_t>>::set_result_action,
     set_result_action_vector_size_t);
-
 
 #endif
 

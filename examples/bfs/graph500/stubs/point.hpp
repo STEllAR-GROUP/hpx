@@ -49,22 +49,20 @@ namespace graph500 { namespace stubs
             bfs_async(gid).get();
         }
 
-        static hpx::lcos::promise<void>
+        static hpx::lcos::promise<std::vector<vertex_data> >
         merge_graph_async(hpx::naming::id_type const& gid,
-                          std::size_t parent,
-                          std::vector<std::size_t> const& neighbors)
+                          std::vector<vertex_data> const& data)
         {
             typedef server::point::merge_graph_action action_type;
-            return hpx::lcos::eager_future<action_type>(gid,parent,neighbors);
+            return hpx::lcos::eager_future<action_type>(gid,data);
         }
 
-        static void merge_graph(hpx::naming::id_type const& gid,
-                          std::size_t parent,
-                          std::vector<std::size_t> const& neighbors)
+        static std::vector<vertex_data> merge_graph(hpx::naming::id_type const& gid,
+                          std::vector<vertex_data> const& data)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the promise.
-            merge_graph_async(gid,parent,neighbors).get();
+            return merge_graph_async(gid,data).get();
         }
 
         static hpx::lcos::promise<void>
