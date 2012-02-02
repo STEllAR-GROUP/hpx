@@ -80,6 +80,21 @@ namespace graph500 { namespace stubs
             // is executed and the result is returned to the promise.
             reset_async(gid).get();
         }
+
+        static hpx::lcos::promise< bool >
+        has_edge_async(hpx::naming::id_type const& gid,std::size_t edge)
+        {
+            typedef server::point::has_edge_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid,edge);
+        }
+
+        static bool has_edge(hpx::naming::id_type const& gid,std::size_t edge)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise
+            return has_edge_async(gid,edge).get();
+        }
+
     };
 }}
 

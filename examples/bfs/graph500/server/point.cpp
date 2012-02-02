@@ -97,6 +97,18 @@ namespace graph500 { namespace server
 
     }
 
+    bool point::has_edge(std::size_t edge) 
+    {
+      bool found = false;
+      for (std::size_t i=0;i<local_edges_.size();i++) {
+        if ( edge == local_edges_[i].v0 || edge == local_edges_[i].v1 ) {
+          found = true;
+          break;
+        }
+      }
+      return true;
+    }
+
     void point::bfs()
     {
       // search the local graph with each node as root

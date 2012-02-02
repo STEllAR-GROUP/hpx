@@ -37,6 +37,8 @@ namespace graph500 { namespace server
         void merge_graph(std::size_t parent, std::vector<std::size_t> const& neighbors);
 
         void reset();
+    
+        bool has_edge(std::size_t edge);
 
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
@@ -48,7 +50,8 @@ namespace graph500 { namespace server
             point_init = 0,
             point_bfs = 1,
             point_merge_graph = 2,
-            point_reset = 3
+            point_reset = 3,
+            point_has_edge = 4
         };
 
         typedef hpx::actions::action4<
@@ -97,6 +100,19 @@ namespace graph500 { namespace server
             &point::reset
         > reset_action;
 
+        typedef hpx::actions::result_action1<
+            // Component server type.
+            point,
+            // Return type.
+            bool,
+            // Action code.
+            point_has_edge,
+            // Arguments of this action.
+            std::size_t,
+            // Method bound to this action.
+            &point::has_edge
+        > has_edge_action;
+
     private:
         hpx::lcos::local_mutex mtx_;
         std::size_t idx_;
@@ -126,6 +142,10 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     graph500::server::point::reset_action,
     graph500_point_reset_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    graph500::server::point::has_edge_action,
+    graph500_point_has_edge_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::lcos::base_lco_with_value<std::vector<std::size_t> >::get_value_action,

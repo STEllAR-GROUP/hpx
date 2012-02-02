@@ -10,12 +10,6 @@
 
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
-#define BITMAPSIZE (1UL << 29)
-
-static inline int64_t int64_min(int64_t a, int64_t b) {
-  return a < b ? a : b;
-}
-
 void make_random_numbers(
        /* in */ int64_t nvalues    /* Number of values to generate */,
        /* in */ uint64_t userseed1 /* Arbitrary 64-bit seed value */,
@@ -93,71 +87,6 @@ int hpx_main(boost::program_options::variables_map &vm)
         // Populate the client vectors.
         init(hpx::components::server::locality_results(blocks), points);
         
-        // Generate the search roots
-        std::vector<std::size_t> bfs_roots;
-        bfs_roots.resize(64);  // the graph500 specifies 64 search roots 
-                                // must be used
-
-        {  // generate the bfs roots
-          int64_t nglobalverts = (int64_t)(1) << scale;
-          uint64_t counter = 0;
-          uint64_t seed1 = 2;
-          uint64_t seed2 = 3;
-          unsigned char* has_edge = NULL;
-          int64_t bitmap_size_in_bytes = int64_min(BITMAPSIZE, (nglobalverts + CHAR_BIT - 1) / CHAR_BIT);
-          has_edge = (unsigned char*) malloc(bitmap_size_in_bytes);
-          memset(has_edge, 0, bitmap_size_in_bytes);
-          for (std::size_t bfs_root_idx=0;bfs_root_idx<bfs_roots.size();bfs_root_idx++) {
-            int64_t root;
-            while (1) {
-              double d[2];
-              make_random_numbers(2, seed1, seed2, counter, d);
-              root = (int64_t)((d[0] + d[1]) * nglobalverts) % nglobalverts;
-              counter += 2;
-              if (counter > 2 * nglobalverts) break;
-              int is_duplicate = 0;
-              int i;
-              for (i = 0; i < bfs_root_idx; ++i) {
-                if (root == bfs_roots[i]) {
-                  is_duplicate = 1;
-                  break;
-                }
-              }
-              if (is_duplicate) continue; /* Everyone takes the same path here */
-              int root_ok = 0;
-              //root_ok = (has_edge[(root / CHAR_BIT) % bitmap_size_in_bytes] & (1 << (root % CHAR_BIT))) != 0;
-              if (root_ok) break;
-  
-              // TEST
-              break;
-            }          
-            bfs_roots[bfs_root_idx] = root;
-          }
-        }
-        
-        //  This part isn't functional yet (need C support); 
-        //   the following is a stop-gap measure
-        std::string const searchfile = "g10_search.txt";
-        std::vector<std::size_t> searchroot;
-        {
-          std::string line;
-          std::string val1;
-          std::ifstream myfile;
-          myfile.open(searchfile);
-          if (myfile.is_open()) {
-            while (myfile.good()) {
-              while (std::getline(myfile,line)) {
-                  std::istringstream isstream(line);
-                  std::getline(isstream,val1);
-                  std::size_t root = boost::lexical_cast<std::size_t>(val1);
-                  // increment all nodes and neighbors by 1; the smallest edge number is 1
-                  // edge 0 is reserved for the parent of the root and for unvisited edges
-                  searchroot.push_back(root+1);
-              }
-            }
-          }
-        }
-
         ///////////////////////////////////////////////////////////////////////
         // Get the gids of each component
         std::vector<hpx::naming::id_type> point_components;
@@ -178,12 +107,61 @@ int hpx_main(boost::program_options::variables_map &vm)
         hpx::lcos::wait(init_phase);
         double kernel1_time = kernel1time.elapsed();
         std::cout << "Elapsed time during kernel 1: " << kernel1_time << " [s]" << std::endl;
+        // Generate the search roots
+        std::vector<std::size_t> bfs_roots;
+        bfs_roots.resize(64);  // the graph500 specifies 64 search roots 
+                                // must be used
+
+        {  // generate the bfs roots
+          int64_t nglobalverts = (int64_t)(1) << scale;
+          uint64_t counter = 0;
+          uint64_t seed1 = 2;
+          uint64_t seed2 = 3;
+          for (std::size_t bfs_root_idx=0;bfs_root_idx<bfs_roots.size();bfs_root_idx++) {
+            int64_t root;
+            while (1) {
+              double d[2];
+              make_random_numbers(2, seed1, seed2, counter, d);
+              root = (int64_t)((d[0] + d[1]) * nglobalverts) % nglobalverts;
+              counter += 2;
+              if ( counter > 2 * nglobalverts) break;
+              int is_duplicate = 0;
+              for (std::size_t i = 0; i < bfs_root_idx; ++i) {
+                if ( (std::size_t) root == bfs_roots[i]) {
+                  is_duplicate = 1;
+                  break;
+                }
+              }
+              if (is_duplicate) continue; /* Everyone takes the same path here */
+              int root_ok = 0;
+              // check if the root is in the graph; if so, set root_ok to be true
+              {
+                std::size_t test_root = (std::size_t) root;
+                std::vector<bool> search_vector;
+                std::vector<hpx::lcos::promise<bool> > has_edge_phase;
+                for (std::size_t i=0;i<number_partitions;i++) {
+                  has_edge_phase.push_back(points[i].has_edge_async(test_root));
+                }
+                hpx::lcos::wait(has_edge_phase,search_vector);
+                for (std::size_t jj=0;jj<search_vector.size();jj++) {
+                  if ( search_vector[jj] ) {
+                    root_ok = 1;
+                    break;
+                  }
+                }
+              }
+              if (root_ok) break;
+  
+            }          
+            bfs_roots[bfs_root_idx] = root;
+          }
+        }
 
         // Begin Kernel 2
         std::vector<double> kernel2_time;
         std::vector<double> kernel2_nedge;
-        kernel2_time.resize(searchroot.size());
-        kernel2_nedge.resize(searchroot.size());
+        kernel2_time.resize(bfs_roots.size());
+        kernel2_nedge.resize(bfs_roots.size());
 
         hpx::util::high_resolution_timer part_kernel2time;
         std::vector<hpx::lcos::promise<void> > bfs_phase;
@@ -193,17 +171,17 @@ int hpx_main(boost::program_options::variables_map &vm)
         }
         hpx::lcos::wait(bfs_phase);
         double part_kernel2_time = part_kernel2time.elapsed();
-        part_kernel2_time /= searchroot.size();
+        part_kernel2_time /= bfs_roots.size();
 
         std::vector<std::size_t> startup_neighbor;
         startup_neighbor.resize(1);
-        for (std::size_t step=0;step<searchroot.size();step++) {
+        for (std::size_t step=0;step<bfs_roots.size();step++) {
           hpx::util::high_resolution_timer kernel2time;
           {  // tighten up the edges for each root
             std::vector<hpx::lcos::promise<void> > merge_phase;
-            startup_neighbor[0] = searchroot[step];
+            startup_neighbor[0] = bfs_roots[step];
             for (std::size_t i=0;i<number_partitions;i++) {
-              merge_phase.push_back(points[i].merge_graph_async(searchroot[step],startup_neighbor));
+              merge_phase.push_back(points[i].merge_graph_async(bfs_roots[step],startup_neighbor));
             }
             hpx::lcos::wait(merge_phase);
           }

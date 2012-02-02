@@ -87,6 +87,19 @@ namespace graph500
             BOOST_ASSERT(gid_);
             this->base_type::reset(gid_);
         }
+
+        hpx::lcos::promise< bool > has_edge_async(std::size_t edge)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::has_edge_async(gid_,edge);
+        }
+
+        bool has_edge(std::size_t edge)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::has_edge(gid_,edge);
+        }
+
     };
 }
 
