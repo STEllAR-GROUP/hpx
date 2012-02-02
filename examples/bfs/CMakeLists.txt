@@ -15,6 +15,7 @@ foreach(subdir ${subdirs})
 
   set(sources
       make_graph.c
+      graph500_validate.cpp
       ${subdir}_client.cpp)
 
   source_group("Source Files" FILES ${sources})
