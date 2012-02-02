@@ -20,7 +20,6 @@
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
-
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
