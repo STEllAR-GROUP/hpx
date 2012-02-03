@@ -10,18 +10,26 @@
 
 add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=10)
 
+include_directories (${HDF5_INCLUDE_DIR} ${HDF5_CPP_INCLUDE_DIR})
+
 # define build target for this directory
 set(sources
-    gravity_hpx.cpp)
+    gravity_hpx.cpp
+    HDF5_reader.cpp)
+
+set(headers
+    gravity.hpp)
 
 # define basic dependencies
-#set(dependencies )
+set(dependencies 
+    ${HDF5_CPP_LIBRARY} ${HDF5_LIBRARY})
 
 source_group("Source Files" FILES ${sources})
 
 add_hpx_executable(gravity_hpx
   MODULE gravity_module
   SOURCES ${sources}
+  HEADERS ${headers}
   DEPENDENCIES ${dependencies}
   FOLDER "Examples/Gravity")
 

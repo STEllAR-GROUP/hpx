@@ -39,6 +39,8 @@
 #include<hpx/util/high_resolution_timer.hpp>
 #include<hpx/lcos/eager_future.hpp>
 
+#include "gravity.hpp"
+
 using namespace std;
 
 using boost::program_options::variables_map;
@@ -71,7 +73,7 @@ namespace boost
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
+#if 0
 class point {
  public:
   point(double xx, double yy, double zz, double mm, double vxx, double vyy,
@@ -95,7 +97,6 @@ class point {
   double yc; //y-component
   double zc; //z-component
 };
-
 struct config_f {
  string input;
  string output;
@@ -112,7 +113,7 @@ struct config_f {
    ar & timestep;
  }
 };
-
+#endif
 ///////////////////////////////////////////////////////////////////////////////
 //Forward Declarations
 vector<promise<void> > calc(int k,int t);
@@ -124,7 +125,8 @@ void closefile(ofstream &coorfile,ofstream &trbst,ofstream &notes,
                config_f& param,float ct);
 void loadconfig(config_f& param,variables_map& vm);
 void setup(ofstream &coorfile,ofstream &trbst,int k);
-vector<point> createvecs(ifstream &ist);
+//vector<point> createvecs(ifstream &ist);
+vector<point> createvecs(config_f& param);
 void calc_force(int k,int t,int i);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -195,7 +197,8 @@ int hpx_main(variables_map& vm)
      notes.open(j.c_str());
 
     //This section sets up the rest of the program
-     pts_timestep = vector<vector<point> >(param.steps+1,createvecs(ist));
+//     pts_timestep = vector<vector<point> >(param.steps+1,createvecs(ist));
+     pts_timestep = vector<vector<point> >(param.steps+1,createvecs(param));
      k=pts_timestep[0].size();
      setup(coorfile,trbst,k); // sets up the output files
      
@@ -315,7 +318,7 @@ void closefile(ofstream &coorfile,ofstream &trbst,ofstream &notes,
    <<"\nTimestep: "<<param.timestep
    <<"\nNumber of threads: "<<param.num_cores
    <<"\nComputation time: "<<ct
-   <<"\n\nProgram version: gravity_hpx.3.3\n"; //REMEBER TO UPDATE THIS!!!!!
+   <<"\n\nProgram version: gravity_hpx.3.4\n"; //REMEBER TO UPDATE THIS!!!!!
 
  coorfile.close();
  trbst.close();
@@ -367,6 +370,7 @@ void setup(ofstream &coorfile,ofstream &trbst,int k) {
  coorfile<<'\n';
 }
 
+#if 0
 vector<point> createvecs(ifstream &ist) {
 //This section creates and fills the vector to store coordinate and mass data
  vector<point>pts;
@@ -385,6 +389,7 @@ vector<point> createvecs(ifstream &ist) {
  }
  return pts;
 }
+#endif
 
 void calc_force(int k,int t,int i) {
  double mt; //the multiple of the masses
