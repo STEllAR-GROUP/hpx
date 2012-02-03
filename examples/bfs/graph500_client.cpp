@@ -29,6 +29,8 @@ int validate(std::vector<std::size_t> const& parent,
              std::vector<std::size_t> const& neighborlist,
              std::size_t searchkey,std::size_t &num_edges);
 
+void clean_up(std::vector<nodedata> &full);
+
 void get_statistics(std::vector<double> const& x, double &minimum, double &mean, double &stdev, double &firstquartile,
                                                   double &median, double &thirdquartile, double &maximum);
 
@@ -199,15 +201,28 @@ int hpx_main(boost::program_options::variables_map &vm)
           kernel2_time[j] = kernel2time.elapsed();
 
           // Validate
-          // Return all nodes visited and their parents to pass to validator
+          // Return all nodes visited and their parents
           {
+            // This is an all-gather on the parents
             std::vector<hpx::lcos::promise< std::vector< nodedata > > > validate_phase;
             std::vector<std::vector<nodedata> > result;
             for (std::size_t i=0;i<num_pe;i++) {
               validate_phase.push_back(points[i].validate_async());
             }
             hpx::lcos::wait(validate_phase,result);
+
+            // Prep prior to scatter to all components
+            std::vector<nodedata> full;
+            for (std::size_t i=0;i<num_pe;i++) {
+              for (std::size_t j=0;j<result[i].size();j++) {
+                full.push_back( result[i][j] );
+              }       
+            }
+            // remove duplicate nodes
+            clean_up(full);
           }
+
+          // Distribute parent list to each component for local validation
 
           // Reset
           {

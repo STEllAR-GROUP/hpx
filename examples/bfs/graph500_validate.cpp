@@ -6,6 +6,7 @@
 #include<iostream>
 #include<vector>
 #include<math.h>
+#include "graph500/point.hpp"
 
 static int compare_doubles(const void* a, const void* b) {
   double aa = *(const double*)a;
@@ -222,3 +223,28 @@ void get_statistics(std::vector<double> const& x, double &minimum, double &mean,
   thirdquartile = (xx[n - 1 - (n - 1) / 4] + xx[n - 1 - n / 4]) * .5; 
   maximum = xx[n - 1];
 };
+
+void clean_up(std::vector<nodedata> &full) 
+{
+  // find duplicates and resolve discrepancies
+  std::vector<std::size_t> done;
+  bool move_on;
+  //for (std::size_t i=0;i<full.size();i++) {
+  //  std::size_t node = full[i].node;
+   // move_on = false; 
+   // for (std::size_t j=0;j<done.size();j++) {
+   //   if ( node == done[j] ) move_on = true; 
+   // }
+   // if ( !move_on ) { 
+   //   std::vector<std::size_t> index;
+   //   for (std::size_t j=0;j<full.size();j++) {
+   //     std::size_t edge = full[j].node; 
+   //     if ( j != i && node == edge  ) index.push_back(j);
+   //   } 
+      // find the node with the smallest level
+      //for (std::size_t j=0;j<full.size();j++) {
+      //}
+   //   done.push_back(node);
+  //  }
+  //}
+}
