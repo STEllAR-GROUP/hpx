@@ -82,6 +82,11 @@ struct abp_queue_scheduler : boost::noncopyable
 
     bool numa_sensitive() const { return numa_sensitive_; }
 
+    std::size_t get_pu_num(std::size_t num_thread) const
+    {
+        return num_thread;
+    }
+
     ///////////////////////////////////////////////////////////////////////
     // Queries the current length of the queues (work items and new items).
     boost::int64_t get_queue_length(std::size_t num_thread = std::size_t(-1)) const
@@ -229,7 +234,7 @@ struct abp_queue_scheduler : boost::noncopyable
         boost::uint64_t node_mask = get_numa_node_affinity_mask(num_thread, numa_sensitive_);
 
         std::size_t queue_size = queues_.size();
-        if (core_mask != boost::uint64_t(-1) && node_mask != boost::uint64_t(-1)) {
+        if (core_mask && node_mask) {
             boost::uint64_t m = 0x01LL;
             for (std::size_t i = 1; i < queue_size; m <<= 1, ++i)
             {

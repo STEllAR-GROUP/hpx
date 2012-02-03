@@ -261,6 +261,12 @@ namespace hpx { namespace util
                 ("node", value<std::size_t>(),
                   "number of the node this locality is run on "
                   "(must be unique, alternatively: -1, -2, etc.)")
+                ("pu-offset", value<std::size_t>(),
+                  "the first processing unit this instance of HPX should be "
+                  "run on (default: 0)")
+                ("pu-step", value<std::size_t>(),
+                  "the step between used processing unit numbers for this "
+                  "instance of HPX (default: 1)")
                 ("threads,t", value<std::size_t>(),
                   "the number of operating system threads to dedicate as "
                   "shepherd threads for this HPX locality (default: 1)")

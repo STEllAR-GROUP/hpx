@@ -290,6 +290,9 @@ namespace hpx { namespace threads
         /// performance counters
         virtual void install_counters() = 0;
 
+        /// Return number of the processing unit the given thread is running on
+        virtual std::size_t get_pu_num(std::size_t num_thread) = 0;
+
         static std::size_t get_thread_num(bool* numa_sensitive = 0);
 
         void init_tss(std::size_t thread_num, bool numa_sensitive);
@@ -626,26 +629,29 @@ namespace hpx { namespace threads
             thread_state_enum newstate, thread_state_ex_enum newstate_ex,
             thread_priority priority);
 
+        ///
         template <typename C>
         void start_periodic_maintenance(boost::mpl::true_);
 
         template <typename C>
-        void start_periodic_maintenance(boost::mpl::false_)
-        {
-        }
+        void start_periodic_maintenance(boost::mpl::false_) {}
 
         template <typename C>
         void periodic_maintenance_handler(boost::mpl::true_);
 
         template <typename C>
-        void periodic_maintenance_handler(boost::mpl::false_)
-        {
-        }
+        void periodic_maintenance_handler(boost::mpl::false_) {}
 
     public:
         /// install_counters is called during startup to allow registration of
         /// performance counters
         void install_counters();
+
+        /// Return number of the processing unit the given thread is running on
+        std::size_t get_pu_num(std::size_t num_thread)
+        {
+            return scheduler_.get_pu_num(num_thread);
+        }
 
     private:
         /// this thread manager has exactly as much threads as requested

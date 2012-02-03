@@ -350,20 +350,7 @@ if(HWLOC_FOUND)
 endif()
 
 ################################################################################
-# NUMA (needed only if hwloc is not available)
-################################################################################
-if(NOT MSVC AND NOT HWLOC_FOUND)
-  find_package(HPX_NUMA)
-  if(NUMA_FOUND)
-    include_directories(${NUMA_INCLUDE_DIR})
-    link_directories(${NUMA_LIBRARY_DIR})
-    add_definitions(-DHPX_HAVE_NUMA)
-    set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${NUMA_LIBRARY})
-  endif()
-endif()
-
-################################################################################
-# Qthreads (for benchmark comparisons) 
+# Qthreads (for benchmark comparisons)
 ################################################################################
 find_package(HPX_Qthreads)
 

@@ -89,6 +89,11 @@ namespace hpx { namespace threads { namespace policies
 
         bool numa_sensitive() const { return numa_sensitive_; }
 
+        std::size_t get_pu_num(std::size_t num_thread) const
+        {
+            return num_thread;
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // Queries the current length of the queues (work items and new items).
         boost::int64_t get_queue_length(std::size_t num_thread = std::size_t(-1)) const
@@ -236,7 +241,7 @@ namespace hpx { namespace threads { namespace policies
                 boost::uint64_t core_mask = get_thread_affinity_mask(num_thread, numa_sensitive_);
                 boost::uint64_t node_mask = get_numa_node_affinity_mask(num_thread, numa_sensitive_);
 
-                if (core_mask != boost::uint64_t(-1) && node_mask != boost::uint64_t(-1)) {
+                if (core_mask && node_mask) {
                     boost::uint64_t m = 0x01LL;
                     for (std::size_t i = 0; (0 == added) && i < queues_.size();
                          m <<= 1, ++i)

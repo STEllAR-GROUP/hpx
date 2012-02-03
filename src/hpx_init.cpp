@@ -453,6 +453,14 @@ namespace hpx
                 throw std::logic_error("Invalid command line option "
                     "--hierarchy-arity, valid for --queueing=hierarchy only.");
             }
+            if (vm.count("pu-offset")) {
+                throw std::logic_error("Invalid command line option "
+                    "--pu-offset, valid for --queueing=priority_local only.");
+            }
+            if (vm.count("pu-step")) {
+                throw std::logic_error("Invalid command line option "
+                    "--pu-step, valid for --queueing=priority_local only.");
+            }
 
             // scheduling policy
             typedef hpx::threads::policies::global_queue_scheduler
@@ -490,6 +498,14 @@ namespace hpx
             if (vm.count("hierarchy-arity")) {
                 throw std::logic_error("Invalid command line option "
                     "--hierarchy-arity, valid for --queueing=hierarchy only.");
+            }
+            if (vm.count("pu-offset")) {
+                throw std::logic_error("Invalid command line option "
+                    "--pu-offset, valid for --queueing=priority_local only.");
+            }
+            if (vm.count("pu-step")) {
+                throw std::logic_error("Invalid command line option "
+                    "--pu-step, valid for --queueing=priority_local only.");
             }
 
             // scheduling policy
@@ -530,11 +546,20 @@ namespace hpx
                     "--hierarchy-arity, valid for --queueing=hierarchy only.");
             }
 
+            std::size_t pu_offset = 0;
+            if (vm.count("pu-offset"))
+                pu_offset = vm["pu-offset"].as<std::size_t>();
+
+            std::size_t pu_step = 1;
+            if (vm.count("pu-step"))
+                pu_step = vm["pu-step"].as<std::size_t>();
+
             // scheduling policy
             typedef hpx::threads::policies::local_priority_queue_scheduler
                 local_queue_policy;
             local_queue_policy::init_parameter_type init(
-                num_threads, num_high_priority_queues, 1000, numa_sensitive);
+                num_threads, num_high_priority_queues, 1000, numa_sensitive,
+                pu_offset, pu_step);
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
@@ -568,6 +593,14 @@ namespace hpx
             if (vm.count("hierarchy-arity")) {
                 throw std::logic_error("Invalid command line option "
                     "--hierarchy-arity, valid for --queueing=hierarchy only.");
+            }
+            if (vm.count("pu-offset")) {
+                throw std::logic_error("Invalid command line option "
+                    "--pu-offset, valid for --queueing=priority_local only.");
+            }
+            if (vm.count("pu-step")) {
+                throw std::logic_error("Invalid command line option "
+                    "--pu-step, valid for --queueing=priority_local only.");
             }
 
             // scheduling policy
@@ -608,6 +641,14 @@ namespace hpx
                 throw std::logic_error("Invalid command line option "
                     "--hierarchy-arity, valid for --queueing=hierarchy only.");
             }
+            if (vm.count("pu-offset")) {
+                throw std::logic_error("Invalid command line option "
+                    "--pu-offset, valid for --queueing=priority_local only.");
+            }
+            if (vm.count("pu-step")) {
+                throw std::logic_error("Invalid command line option "
+                    "--pu-step, valid for --queueing=priority_local only.");
+            }
 
             // scheduling policy
             typedef hpx::threads::policies::abp_priority_queue_scheduler
@@ -645,6 +686,15 @@ namespace hpx
                     "--numa-sensitive, valid for "
                     "--queueing=priority_local or priority_abp only");
             }
+            if (vm.count("pu-offset")) {
+                throw std::logic_error("Invalid command line option "
+                    "--pu-offset, valid for --queueing=priority_local only.");
+            }
+            if (vm.count("pu-step")) {
+                throw std::logic_error("Invalid command line option "
+                    "--pu-step, valid for --queueing=priority_local only.");
+            }
+
             // scheduling policy
             typedef hpx::threads::policies::hierarchy_scheduler queue_policy;
             std::size_t arity = 2;
@@ -683,6 +733,14 @@ namespace hpx
             if (vm.count("hierarchy-arity")) {
                 throw std::logic_error("Invalid command line option "
                     "--hierarchy-arity, valid for --queueing=hierarchy only.");
+            }
+            if (vm.count("pu-offset")) {
+                throw std::logic_error("Invalid command line option "
+                    "--pu-offset, valid for --queueing=priority_local only.");
+            }
+            if (vm.count("pu-step")) {
+                throw std::logic_error("Invalid command line option "
+                    "--pu-step, valid for --queueing=priority_local only.");
             }
 
             // scheduling policy

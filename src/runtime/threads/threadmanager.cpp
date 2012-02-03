@@ -1039,7 +1039,8 @@ namespace hpx { namespace threads
 
         manage_active_thread_count count(thread_count_);
 
-        set_affinity(num_thread, scheduler_.numa_sensitive());     // set affinity on Linux systems
+        // set affinity on Linux systems or when using hwloc
+        set_affinity(scheduler_.get_pu_num(num_thread), scheduler_.numa_sensitive());
 
         std::size_t idle_loop_count = 0;
 
@@ -1323,6 +1324,7 @@ namespace hpx { namespace threads
         return boost::int64_t(1000. * percent);   // 0.1 percent
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     template <typename C>
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
@@ -1401,7 +1403,7 @@ namespace hpx { namespace threads
     {
         bool numa_sensitive = false;
         std::size_t thread_num = threadmanager_base::get_thread_num(&numa_sensitive);
-        return get_numa_node(thread_num, numa_sensitive);
+        return get_numa_node(get_thread_manager().get_pu_num(thread_num), numa_sensitive);
     }
 
     ///////////////////////////////////////////////////////////////////////////

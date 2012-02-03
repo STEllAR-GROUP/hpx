@@ -23,10 +23,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
 {
+    ///////////////////////////////////////////////////////////////////////////
     inline std::size_t least_significant_bit(boost::uint64_t mask)
     {
         if (mask) {
-            int c = 0;    // will count v's trailing zero bits
+            int c = 0;    // will count mask's trailing zero bits
 
             // Set mask's trailing 0s to 1s and zero rest
             mask = (mask ^ (mask - 1)) >> 1;
@@ -41,7 +42,7 @@ namespace hpx { namespace threads
     inline std::size_t least_significant_bit_set(boost::uint64_t mask)
     {
         if (mask) {
-            std::size_t c = 0;    // will count v's trailing zero bits
+            std::size_t c = 0;    // will count mask's trailing zero bits
 
             // Set mask's trailing 0s to 1s and zero rest
             mask = (mask ^ (mask - 1)) >> 1;
@@ -60,6 +61,7 @@ namespace hpx { namespace threads
     }
 
 #if defined(HPX_HAVE_HWLOC)
+    ///////////////////////////////////////////////////////////////////////////
     struct numa_node_data
     {
         struct tag {};
@@ -85,28 +87,28 @@ namespace hpx { namespace threads
         std::size_t init_numa_node(std::size_t thread_num, bool numa_sensitive)
         {
             std::size_t const error = std::size_t(-1);
-            if (!numa_sensitive)
-                return error;
-
             if (error == thread_num)
                 return error;
 
             hwloc_topology_t topology;
-            hwloc_topology_init(&topology);
-            hwloc_topology_load(topology);
 
-            hwloc_obj_t obj = hwloc_get_obj_by_type(topology, HWLOC_OBJ_PU,
-                static_cast<unsigned>(thread_num));
-            while (obj)
+            if (0 == hwloc_topology_init(&topology) &&
+                0 == hwloc_topology_load(topology))
             {
-                if (hwloc_compare_types(obj->type, HWLOC_OBJ_NODE) == 0)
+                hwloc_obj_t obj = hwloc_get_obj_by_type(topology, HWLOC_OBJ_PU,
+                    static_cast<unsigned>(thread_num));
+                while (obj)
                 {
-                    std::size_t numa_node = obj->logical_index;
-                    hwloc_topology_destroy(topology);
-                    return numa_node;
+                    if (hwloc_compare_types(obj->type, HWLOC_OBJ_NODE) == 0)
+                    {
+                        std::size_t numa_node = obj->logical_index;
+                        hwloc_topology_destroy(topology);
+                        return numa_node;
+                    }
+                    obj = obj->parent;
                 }
-                obj = obj->parent;
             }
+
             hwloc_topology_destroy(topology);
             return error;
         }
@@ -115,12 +117,14 @@ namespace hpx { namespace threads
         std::vector<std::size_t> numa_sensitve_data_;
 
     };
+
     inline std::size_t get_numa_node(std::size_t thread_num, bool numa_sensitive)
     {
         util::static_<numa_node_data, numa_node_data::tag> data;
         return data.get().get_numa_node(thread_num, numa_sensitive);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     struct numa_affinity_mask_data
     {
         struct tag {};
@@ -153,7 +157,10 @@ namespace hpx { namespace threads
             {
                 if (hwloc_compare_types(HWLOC_OBJ_PU, obj->type) == 0)
                 {
-                    mask |= (1ULL << obj->logical_index);
+                    do {
+                        mask |= (1ULL << obj->logical_index);
+                        obj = hwloc_get_next_child(topology, parent, obj);
+                    } while (obj != NULL && hwloc_compare_types(HWLOC_OBJ_PU, obj->type) == 0);
                     return;
                 }
                 extract_node_mask(topology, obj, mask);
@@ -165,28 +172,29 @@ namespace hpx { namespace threads
             bool numa_sensitive)
         {
             boost::uint64_t const error = boost::uint64_t(-1);
-            if (numa_sensitive == false)
-                return error;
 
             boost::uint64_t node_affinity_mask = 0;
             std::size_t numa_node = get_numa_node(num_thread, numa_sensitive);
             if (numa_node == error)
-                return error;
+                return 0;
 
             hwloc_topology_t topology;
-            hwloc_topology_init(&topology);
-            hwloc_topology_load(topology);
 
-            hwloc_obj_t numa_node_obj = hwloc_get_obj_by_type(topology,
-                HWLOC_OBJ_NODE, static_cast<unsigned>(numa_node));
-            if (numa_node_obj)
+            if (0 == hwloc_topology_init(&topology) &&
+                0 == hwloc_topology_load(topology))
             {
-                extract_node_mask(topology, numa_node_obj, node_affinity_mask);
-                hwloc_topology_destroy(topology);
-                return node_affinity_mask;
+                hwloc_obj_t numa_node_obj = hwloc_get_obj_by_type(topology,
+                    HWLOC_OBJ_NODE, static_cast<unsigned>(numa_node));
+                if (numa_node_obj)
+                {
+                    extract_node_mask(topology, numa_node_obj, node_affinity_mask);
+                    hwloc_topology_destroy(topology);
+                    return node_affinity_mask;
+                }
             }
+
             hwloc_topology_destroy(topology);
-            return error;
+            return 0;
         }
 
         std::vector<boost::uint64_t> data_;
@@ -200,6 +208,7 @@ namespace hpx { namespace threads
         return data.get().get_numa_node_affinity_mask(num_thread, numa_sensitive);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     struct thread_affinity_mask_data
     {
         struct tag {};
@@ -228,8 +237,6 @@ namespace hpx { namespace threads
             bool numa_sensitive)
         {
             boost::uint64_t const error = boost::uint64_t(-1);
-            if (numa_sensitive == false)
-                return error;
 
             std::size_t num_of_cores = hardware_concurrency();
             if (0 == num_of_cores)
@@ -237,31 +244,35 @@ namespace hpx { namespace threads
             std::size_t affinity = num_thread % num_of_cores;
 
             hwloc_topology_t topology;
-            hwloc_topology_init(&topology);
-            hwloc_topology_load(topology);
 
-            int numa_nodes = hwloc_get_nbobjs_by_type(topology, HWLOC_OBJ_NODE);
-            hwloc_topology_destroy(topology);
-            if (numa_nodes == -1)
-                return error;
+            if (0 == hwloc_topology_init(&topology) &&
+                0 == hwloc_topology_load(topology))
+            {
+                int numa_nodes = hwloc_get_nbobjs_by_type(topology, HWLOC_OBJ_NODE);
+                hwloc_topology_destroy(topology);
+                if (numa_nodes == -1)
+                    return error;
 
-            boost::uint64_t node_affinity_mask = 0;
-            boost::uint64_t mask = 0x01LL;
+                boost::uint64_t node_affinity_mask = 0;
+                boost::uint64_t mask = 0x01LL;
 
-            node_affinity_mask = get_numa_node_affinity_mask(num_thread, numa_sensitive);
-            if (node_affinity_mask == error)
-                return error;
+                node_affinity_mask = get_numa_node_affinity_mask(num_thread, numa_sensitive);
+                if (node_affinity_mask == 0)
+                    return error;
 
-            mask = least_significant_bit(node_affinity_mask) <<
-                (affinity / numa_nodes);
+                mask = least_significant_bit(node_affinity_mask) <<
+                    (affinity / numa_nodes);
 
-            while (!(mask & node_affinity_mask)) {
-                mask <<= 1LL;
-                if (0 == mask)
-                    mask = 0x01LL;
+                while (!(mask & node_affinity_mask)) {
+                    mask <<= 1LL;
+                    if (0 == mask)
+                        mask = 0x01LL;
+                }
+                return mask;
             }
 
-            return mask;
+            hwloc_topology_destroy(topology);
+            return error;
         }
 
         std::vector<boost::uint64_t> data_;
@@ -275,32 +286,38 @@ namespace hpx { namespace threads
         return data.get().get_thread_affinity_mask(num_thread, numa_sensitive);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     inline std::size_t
     get_thread_affinity_mask_from_lva(naming::address::address_type lva)
     {
-        return std::size_t(-1);
+        return 0;
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     inline bool set_affinity(boost::thread& thrd, std::size_t num_thread,
         bool numa_sensitive)
     {
         return true;
     }
+
     inline bool set_affinity(std::size_t num_thread, bool numa_sensitive)
     {
+        // figure out how many cores are available
         hwloc_topology_t topology;
-        hwloc_topology_init(&topology);
-        hwloc_topology_load(topology);
+        bool result = false;
 
-        bool result = true;
-        hwloc_obj_t obj = hwloc_get_obj_by_type(topology, HWLOC_OBJ_PU,
-            static_cast<unsigned>(num_thread));
-        if (obj)
+        if (0 == hwloc_topology_init(&topology) &&
+            0 == hwloc_topology_load(topology))
         {
-            hwloc_cpuset_t cpuset;
-            cpuset = hwloc_bitmap_dup(obj->cpuset);
+            // now set the affinity to the required PU
+            boost::uint64_t mask = get_thread_affinity_mask(num_thread, numa_sensitive);
+            hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();
+
+            hwloc_bitmap_set_ith_ulong(cpuset, 0, mask & 0xFFFFFFFF);
+            hwloc_bitmap_set_ith_ulong(cpuset, 1, (mask >> 32) & 0xFFFFFFFF);
             hwloc_bitmap_singlify(cpuset);
 
+            result = true;
             if (hwloc_set_cpubind(topology, cpuset,
                   HWLOC_CPUBIND_STRICT | HWLOC_CPUBIND_THREAD))
             {
@@ -310,10 +327,11 @@ namespace hpx { namespace threads
                     result = false;   // couldn't bind thread to core
                 }
             }
+
             hwloc_bitmap_free(cpuset);
         }
-        hwloc_topology_destroy(topology);
 
+        hwloc_topology_destroy(topology);
         return result;
     }
 
@@ -419,14 +437,14 @@ namespace hpx { namespace threads
             if (numa_sensitive) {
                 UCHAR numa_node = affinity % numa_nodes;
                 if (!GetNumaNodeProcessorMask(numa_node, &node_affinity_mask))
-                    return false;
+                    return 0;
 
                 return node_affinity_mask;
             }
 
             UCHAR numa_node = static_cast<UCHAR>(get_numa_node(num_thread, numa_sensitive));
             if (!GetNumaNodeProcessorMask(numa_node, &node_affinity_mask))
-                return false;
+                return 0;
 
             return node_affinity_mask;
         }
@@ -527,7 +545,8 @@ namespace hpx { namespace threads
         return SetThreadAffinityMask(thrd.native_handle(), DWORD_PTR(mask)) != 0;
     }
 
-    inline bool set_affinity(std::size_t affinity, bool numa_sensitive)
+    inline bool set_affinity(std::size_t affinity, bool numa_sensitive,
+        affinity_data const& affinity)
     {
         return true;
     }
@@ -540,11 +559,11 @@ namespace hpx { namespace threads
         info.VirtualAddress = reinterpret_cast<void*>(lva);
 
         if (!QueryWorkingSetEx(GetCurrentProcess(), &info, sizeof(info)))
-            return std::size_t(-1);
+            return 0;
 
         boost::uint64_t node_affinity_mask = 0;
         if (!GetNumaNodeProcessorMask(info.VirtualAttributes.Node, &node_affinity_mask))
-            return std::size_t(-1);
+            return 0;
 
         return node_affinity_mask;
     }
@@ -566,7 +585,8 @@ namespace hpx { namespace threads
     {
         return true;
     }
-    inline bool set_affinity(std::size_t num_thread, bool numa_sensitive)
+    inline bool set_affinity(std::size_t num_thread, bool numa_sensitive,
+        affinity_data const& affinity)
     {
 #ifdef AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
         thread_extended_policy_data_t epolicy;
@@ -595,13 +615,13 @@ namespace hpx { namespace threads
     inline std::size_t
     get_thread_affinity_mask(std::size_t thread_num, bool numa_sensitive)
     {
-        return std::size_t(-1);
+        return 0;
     }
 
     inline std::size_t
     get_numa_node_affinity_mask(std::size_t thread_num, bool numa_sensitive)
     {
-        return std::size_t(-1);
+        return 0;
     }
 
     inline int get_numa_node(std::size_t thread_num, bool numa_sensitive)
@@ -613,16 +633,13 @@ namespace hpx { namespace threads
     inline std::size_t
     get_thread_affinity_mask_from_lva(naming::address::address_type lva)
     {
-        return std::size_t(-1);
+        return 0;
     }
 
 #else
 
 #if defined(HPX_HAVE_PTHREAD_AFFINITY_NP)
     #include <pthread.h>
-#endif
-#if HPX_HAVE_NUMA
-    #include <numa.h>
 #endif
     #include <sched.h>    // declares the scheduling interface
     #include <sys/syscall.h>
@@ -634,7 +651,8 @@ namespace hpx { namespace threads
     {
         return true;
     }
-    inline bool set_affinity(std::size_t num_thread, bool numa_sensitive)
+    inline bool set_affinity(std::size_t num_thread, bool numa_sensitive,
+        affinity_data const& affinity)
     {
         std::size_t num_of_cores = hardware_concurrency();
         if (0 == num_of_cores)
@@ -674,32 +692,7 @@ namespace hpx { namespace threads
           assert(0);
         }
 
-#if HPX_HAVE_NUMA
-        int numa_cpus       = numa_num_configured_cpus();
-        int numa_nodes      = numa_num_configured_nodes();
-        int cpus_per_node   = numa_cpus/numa_nodes;
-        struct bitmask * mask = numa_bitmask_alloc(numa_cpus);
-        int node            = affinity / cpus_per_node;
-        int node_id         = affinity % cpus_per_node;
-
-        numa_bitmask_clearall(mask);
-        numa_node_to_cpus(node, mask);
-        unsigned real_affinity = 0;
-        int index = 0;
-        for(real_affinity = 0; real_affinity < mask->size; ++real_affinity)
-        {
-            if(numa_bitmask_isbitset(mask, real_affinity))
-            {
-                if(index == node_id) break;
-                ++index;
-            }
-        }
-        numa_bitmask_free(mask);
-
-        CPU_SET(real_affinity, &cpu);
-#else
         CPU_SET(affinity, &cpu);
-#endif
 
 #if defined(HPX_HAVE_PTHREAD_AFFINITY_NP)
         if (0 == pthread_setaffinity_np(pthread_self(), sizeof(cpu), &cpu))
@@ -716,13 +709,13 @@ namespace hpx { namespace threads
     inline std::size_t
     get_thread_affinity_mask(std::size_t thread_num, bool numa_sensitive)
     {
-        return std::size_t(-1);
+        return 0;
     }
 
     inline std::size_t
     get_numa_node_affinity_mask(std::size_t thread_num, bool numa_sensitive)
     {
-        return std::size_t(-1);
+        return 0;
     }
 
     inline int get_numa_node(std::size_t thread_num, bool numa_sensitive)
@@ -734,7 +727,7 @@ namespace hpx { namespace threads
     inline std::size_t
     get_thread_affinity_mask_from_lva(naming::address::address_type lva)
     {
-        return std::size_t(-1);
+        return 0;
     }
 
 #endif

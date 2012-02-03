@@ -27,6 +27,25 @@
 namespace hpx { namespace threads { namespace policies
 {
     ///////////////////////////////////////////////////////////////////////////
+    // Structure holding the information related to thread affinity selection
+    // for the shepherd threads of this instance
+    struct affinity_data
+    {
+        affinity_data() : pu_offset_(0), pu_step_(1) {}
+        affinity_data(std::size_t pu_offset, std::size_t pu_step)
+          : pu_offset_(pu_offset), pu_step_(pu_step) {}
+
+
+        std::size_t get_pu_num(std::size_t num_thread) const
+        {
+            return (pu_offset_ + pu_step_ * num_thread) % hardware_concurrency();
+        }
+
+        std::size_t pu_offset_; ///< offset of the first processing unit to use
+        std::size_t pu_step_;   ///< step between used processing units
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     /// The local_priority_queue_scheduler maintains exactly one queue of work
     /// items (threads) per OS thread, where this OS thread pulls its next work
     /// from. Additionally it maintains separate queues: several for high
@@ -56,30 +75,29 @@ namespace hpx { namespace threads { namespace policies
             init_parameter()
               : num_queues_(1),
                 max_queue_thread_count_(max_thread_count),
+                pu_offset_(0),
+                pu_step_(1),
                 numa_sensitive_(false)
             {}
 
             init_parameter(std::size_t num_queues,
                     std::size_t num_high_priority_queues,
                     std::size_t max_queue_thread_count = max_thread_count,
-                    bool numa_sensitive = false)
+                    bool numa_sensitive = false,
+                    std::size_t pu_offset = 0,
+                    std::size_t pu_step = 1)
               : num_queues_(num_queues),
                 num_high_priority_queues_(num_high_priority_queues),
                 max_queue_thread_count_(max_queue_thread_count),
-                numa_sensitive_(numa_sensitive)
-            {}
-
-            init_parameter(std::pair<std::size_t, std::size_t> const& init,
-                    bool numa_sensitive = false)
-              : num_queues_(init.first),
-                num_high_priority_queues_(init.first),
-                max_queue_thread_count_(init.second),
+                pu_offset_(pu_offset), pu_step_(pu_step),
                 numa_sensitive_(numa_sensitive)
             {}
 
             std::size_t num_queues_;
             std::size_t num_high_priority_queues_;
             std::size_t max_queue_thread_count_;
+            std::size_t pu_offset_;
+            std::size_t pu_step_;
             bool numa_sensitive_;
         };
         typedef init_parameter init_parameter_type;
@@ -89,6 +107,7 @@ namespace hpx { namespace threads { namespace policies
             high_priority_queues_(init.num_high_priority_queues_),
             low_priority_queue_(init.max_queue_thread_count_),
             curr_queue_(0),
+            affinity_data_(init.pu_offset_, init.pu_step_),
             numa_sensitive_(init.numa_sensitive_)
         {
             BOOST_ASSERT(init.num_queues_ != 0);
@@ -112,6 +131,11 @@ namespace hpx { namespace threads { namespace policies
         }
 
         bool numa_sensitive() const { return numa_sensitive_; }
+
+        std::size_t get_pu_num(std::size_t num_thread) const
+        {
+            return affinity_data_.get_pu_num(num_thread);
+        }
 
         ///////////////////////////////////////////////////////////////////////
         void abort_all_suspended_threads()
@@ -152,7 +176,7 @@ namespace hpx { namespace threads { namespace policies
             // try to figure out the NUMA node where the data lives
             if (numa_sensitive_ && std::size_t(-1) == num_thread) {
                 boost::uint64_t mask = get_thread_affinity_mask_from_lva(data.lva);
-                if (mask != std::size_t(-1)) {
+                if (mask) {
                     std::size_t m = 0x01LL;
                     for (std::size_t i = 0; i < queues_.size(); m <<= 1, ++i)
                     {
@@ -366,10 +390,11 @@ namespace hpx { namespace threads { namespace policies
 
             // steal work items: first try to steal from other cores in
             // the same NUMA node
-            boost::uint64_t core_mask = get_thread_affinity_mask(num_thread, numa_sensitive_);
-            boost::uint64_t node_mask = get_numa_node_affinity_mask(num_thread, numa_sensitive_);
+            std::size_t num_pu = get_pu_num(num_thread);
+            boost::uint64_t core_mask = get_thread_affinity_mask(num_pu, numa_sensitive_);
+            boost::uint64_t node_mask = get_numa_node_affinity_mask(num_pu, numa_sensitive_);
 
-            if (core_mask != boost::uint64_t(-1) && node_mask != boost::uint64_t(-1)) {
+            if (core_mask && node_mask) {
                 boost::uint64_t m = 0x01LL;
                 for (std::size_t i = 0; i < queues_size; m <<= 1, ++i)
                 {
@@ -452,6 +477,7 @@ namespace hpx { namespace threads { namespace policies
         std::vector<thread_queue<false>*> high_priority_queues_;
         thread_queue<false> low_priority_queue_;
         boost::atomic<std::size_t> curr_queue_;
+        affinity_data affinity_data_;
         bool numa_sensitive_;
     };
 }}}
