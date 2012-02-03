@@ -12,7 +12,6 @@ set(subdirs
     bfs
     bright_future
     dataflow
-    distributed_test
     gtc
     heartbeat
     hplpx
