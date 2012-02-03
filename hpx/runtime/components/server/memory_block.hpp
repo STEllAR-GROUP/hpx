@@ -710,7 +710,7 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
     memory_block_get_action);
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::components::server::detail::memory_block::get_config_action,
-    memory_block_get_action);
+    memory_block_get_config_action);
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::components::server::detail::memory_block::checkout_action,
     memory_block_checkout_action);
