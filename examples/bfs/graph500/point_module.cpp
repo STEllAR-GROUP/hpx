@@ -37,10 +37,6 @@ HPX_REGISTER_ACTION_EX(
     graph500_point_bfs_action);
 
 HPX_REGISTER_ACTION_EX(
-    graph500_point_type::wrapped_type::merge_graph_action,
-    graph500_point_merge_graph_action);
-
-HPX_REGISTER_ACTION_EX(
     graph500_point_type::wrapped_type::reset_action,
     graph500_point_reset_action);
 

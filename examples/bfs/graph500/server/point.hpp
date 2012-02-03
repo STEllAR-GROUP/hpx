@@ -15,25 +15,6 @@
 #include "splittable_mrg.hpp"
 #include "../../array.hpp"
 
-struct vertex_data
-{
-  std::size_t node;
-  std::vector<std::size_t> neighbors;
-
-  vertex_data() {}
-
-  private:
-    // serialization support
-    friend class boost::serialization::access;
-
-    template<class Archive>
-    void serialize(Archive & ar, const unsigned int version)
-    {
-        ar & node & neighbors;
-    }
-
-};
-
 void make_random_numbers(
        /* in */ int64_t nvalues    /* Number of values to generate */,
        /* in */ uint64_t userseed1 /* Arbitrary 64-bit seed value */,
@@ -57,16 +38,13 @@ namespace graph500 { namespace server
         ///////////////////////////////////////////////////////////////////////
         // Exposed functionality of this component.
 
-        void init(std::size_t objectid,std::size_t scale,std::size_t number_partitions,
-                  std::vector<hpx::naming::id_type> const& point_components);
+        void init(std::size_t objectid,std::size_t scale,std::size_t number_partitions);
 
-        void bfs();
+        void bfs(std::size_t root_node);
 
-        std::vector<vertex_data> merge_graph(std::vector<vertex_data> const& data);
+        bool has_edge(std::size_t edge);
 
         void reset();
-    
-        bool has_edge(std::size_t edge);
 
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
@@ -77,12 +55,11 @@ namespace graph500 { namespace server
         {
             point_init = 0,
             point_bfs = 1,
-            point_merge_graph = 2,
-            point_reset = 3,
-            point_has_edge = 4
+            point_has_edge = 2,
+            point_reset = 3
         };
 
-        typedef hpx::actions::action4<
+        typedef hpx::actions::action3<
             // Component server type.
             point,
             // Action code.
@@ -91,32 +68,20 @@ namespace graph500 { namespace server
             std::size_t,
             std::size_t,
             std::size_t,
-            std::vector<hpx::naming::id_type> const&,
             // Method bound to this action.
             &point::init
         > init_action;
 
-        typedef hpx::actions::action0<
+        typedef hpx::actions::action1<
             // Component server type.
             point,
             // Action code.
             point_bfs,
             // Arguments of this action.
+            std::size_t,
             // Method bound to this action.
             &point::bfs
         > bfs_action;
-
-        typedef hpx::actions::result_action1<
-            // Component server type.
-            point,
-            std::vector<vertex_data>,
-            // Action code.
-            point_merge_graph,
-            // Arguments of this action.
-            std::vector<vertex_data> const&,
-            // Method bound to this action.
-            &point::merge_graph
-        > merge_graph_action;
 
         typedef hpx::actions::action0<
             // Component server type.
@@ -144,13 +109,10 @@ namespace graph500 { namespace server
     private:
         hpx::lcos::local_mutex mtx_;
         std::size_t idx_;
-        std::size_t size_est_;
         std::vector< std::vector<std::size_t> > neighbors_;
-        array<std::size_t> parent_;
+        std::vector<std::size_t> parent_;
         std::size_t minnode_;
         std::vector<packed_edge> local_edges_;
-        std::vector<std::size_t> reset_list_;
-        std::vector<hpx::naming::id_type> point_components_;
     };
 }}
 
@@ -162,10 +124,6 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     graph500::server::point::bfs_action,
     graph500_point_bfs_action);
-
-HPX_REGISTER_ACTION_DECLARATION_EX(
-    graph500::server::point::merge_graph_action,
-    graph500_point_merge_graph_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     graph500::server::point::reset_action,

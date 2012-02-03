@@ -36,44 +36,29 @@ namespace graph500
 
         // kernel 1
         hpx::lcos::promise<void> init_async(std::size_t objectid,
-            std::size_t scale,std::size_t number_partitions,
-            std::vector<hpx::naming::id_type> const& point_components)
+            std::size_t scale,std::size_t number_partitions)
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::init_async(gid_,objectid,scale,number_partitions,point_components);
+            return this->base_type::init_async(gid_,objectid,scale,number_partitions);
         }
 
         // kernel 1
-        void init(std::size_t objectid,std::size_t scale,std::size_t number_partitions,
-                  std::vector<hpx::naming::id_type> const& point_components)
+        void init(std::size_t objectid,std::size_t scale,std::size_t number_partitions)
         {
             BOOST_ASSERT(gid_);
-            this->base_type::init_async(gid_,objectid, scale,number_partitions,point_components);
+            this->base_type::init_async(gid_,objectid, scale,number_partitions);
         }
 
-        hpx::lcos::promise<void> bfs_async()
+        hpx::lcos::promise<void> bfs_async(std::size_t root)
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::bfs_async(gid_);
+            return this->base_type::bfs_async(gid_,root);
         }
 
-        void bfs()
+        void bfs(std::size_t root)
         {
             BOOST_ASSERT(gid_);
-            this->base_type::bfs(gid_);
-        }
-
-        hpx::lcos::promise<std::vector<vertex_data> > merge_graph_async(
-                                           std::vector<vertex_data> const& data)
-        {
-            BOOST_ASSERT(gid_);
-            return this->base_type::merge_graph_async(gid_,data);
-        }
-
-        std::vector<vertex_data> merge_graph(std::vector<vertex_data> const& data)
-        {
-            BOOST_ASSERT(gid_);
-            return this->base_type::merge_graph(gid_,data);
+            this->base_type::bfs(gid_,root);
         }
 
         hpx::lcos::promise<void> reset_async()

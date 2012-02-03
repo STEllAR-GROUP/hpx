@@ -37,11 +37,9 @@ static void compute_edge_range(int rank, int size, int64_t M, int64_t* start_idx
 ///////////////////////////////////////////////////////////////////////////////
 namespace graph500 { namespace server
 {
-    void point::init(std::size_t objectid,std::size_t log_numverts,std::size_t number_partitions,
-                     std::vector<hpx::naming::id_type> const& point_components)
+    void point::init(std::size_t objectid,std::size_t log_numverts,std::size_t number_partitions)
     {
       idx_ = objectid;
-      point_components_ = point_components;
       // Spread the two 64-bit numbers into five nonzero values in the correct
       //  range.
       uint_fast32_t seed[5];
@@ -59,6 +57,14 @@ namespace graph500 { namespace server
         local_edges_.resize(nedges);
 
         generate_kronecker_range(seed, log_numverts, start_idx, end_idx, &*local_edges_.begin());
+
+        for (std::size_t i=0;i<local_edges_.size();i++) {
+          // the smallest node is 1 ( 0 is reserved for unvisited edges )
+          // increment everyone by 1
+          local_edges_[i].v0 += 1; 
+          local_edges_[i].v1 += 1; 
+        }
+
       } else {
         // additive Schwarz approach 
         // this gives us the size of a standard partition
@@ -107,6 +113,11 @@ namespace graph500 { namespace server
         for (std::size_t i=0;i<edges.size();i++) {
           generate_kronecker_range(seed, log_numverts, edges[i], edges[i]+1, tmp);
           local_edges_[i] = tmp[0];
+
+          // the smallest node is 1 ( 0 is reserved for unvisited edges )
+          // increment everyone by 1
+          local_edges_[i].v0 += 1; 
+          local_edges_[i].v1 += 1; 
         }
       }
 
@@ -122,10 +133,8 @@ namespace graph500 { namespace server
       }
       maxnode++;
       std::size_t N = maxnode-minnode_;
-      size_est_ = N;
-      reset_list_.reserve(size_est_);
 
-      neighbors_.resize(maxnode-minnode_);
+      neighbors_.resize(N);
 
       for (std::size_t i=0;i<local_edges_.size();i++) {
         std::size_t node = local_edges_[i].v0;
@@ -136,16 +145,9 @@ namespace graph500 { namespace server
         }
       }
 
-      parent_.resize(N,N,1);
-      // initialize
-      for (std::size_t k=0;k<parent_.ksize();k++) {
-        for (std::size_t j=0;j<parent_.jsize();j++) {
-          for (std::size_t i=0;i<parent_.isize();i++) {
-            parent_(i,j,k) = 0;
-          }
-        }  
-      }
-
+      parent_.resize(N);
+      // initialize to 0 -- no edge is identified as 0
+      std::fill( parent_.begin(),parent_.end(),0 );
     }
 
     bool point::has_edge(std::size_t edge) 
@@ -160,77 +162,34 @@ namespace graph500 { namespace server
       return true;
     }
 
-    void point::bfs()
+    void point::bfs(std::size_t root_node)
     {
-      // search the local graph with each node as root
-      for (std::size_t i=0;i<local_edges_.size();i++) {
-        std::size_t root_node;
-        for (std::size_t j=0;j<2;j++) {
-          if ( j == 0 ) root_node = local_edges_[i].v0;
-          else root_node = local_edges_[i].v1;
-          // see if the root_node has been searched already
-          if ( parent_(root_node-minnode_,root_node-minnode_,0) != root_node ) {
-            std::queue<std::size_t> q;
-            parent_(root_node-minnode_,root_node-minnode_,0) = root_node;
-            q.push(root_node);
+      if ( root_node - minnode_ >= parent_.size() ) return; // the root node is not on this partition
 
-            while (!q.empty()) {
-              std::size_t node = q.front(); q.pop();
+      std::queue<std::size_t> q;
+      parent_[root_node-minnode_] = root_node;
+      q.push(root_node);
 
-              std::vector<std::size_t> const& node_neighbors = neighbors_[node-minnode_];
-              std::vector<std::size_t>::const_iterator end = node_neighbors.end();
-              for (std::vector<std::size_t>::const_iterator it = node_neighbors.begin();
-                           it != end; ++it)
-              {
-                std::size_t& node_parent = parent_(root_node-minnode_,*it-minnode_,0);
-                if (!node_parent) {
-                  node_parent = node;
-                  q.push(*it);
-                }
-              }
-            }
-          } 
-        }
-     
-      }
-   
-    }
+      while (!q.empty()) {
+        std::size_t node = q.front(); q.pop();
 
-    std::vector<vertex_data> point::merge_graph(std::vector<vertex_data> const& data)
-    {
-      hpx::lcos::local_mutex::scoped_lock l(mtx_);
-      std::vector<vertex_data> result;
-      for ( std::size_t j=0;j<data.size();j++) {
-        // Check to see if the any of the neighbors are on this partition
-        for (std::size_t i=0;i<data[j].neighbors.size();i++) {
-          std::size_t node = data[j].neighbors[i];
-          if ( node - minnode_ < parent_.isize() && node - minnode_ < parent_.jsize() ) {
-            // see if the node is listed as its own parent; if so, then correct (tighten) it with the correct parent
-            // tightening is the process of joining something disjoint 
-            if ( parent_( node - minnode_ , node - minnode_ , 0 ) == node ) {
-              // Correct this, add to the reset list, and follow on with the neighbors 
-              reset_list_.push_back(node);
-              // the correct parent; this constitutes "tightening" 
-              parent_( node - minnode_ , node - minnode_ , 0 ) = data[j].node;
-              vertex_data v;
-              v.node = node;
-              v.neighbors = neighbors_[node-minnode_];
-              result.push_back(v);
-            }
+        std::vector<std::size_t> const& node_neighbors = neighbors_[node-minnode_];
+        std::vector<std::size_t>::const_iterator end = node_neighbors.end();
+        for (std::vector<std::size_t>::const_iterator it = node_neighbors.begin();
+                     it != end; ++it)
+        {
+          std::size_t& node_parent = parent_[*it-minnode_];
+          if (!node_parent) {
+            node_parent = node;
+            q.push(*it);
           }
-        } 
+        }
       }
-      return result;
     }
 
     void point::reset()
     {
-      for (std::size_t i=0;i<reset_list_.size();i++) {
-        std::size_t node = reset_list_[i];
-        parent_( node - minnode_ , node - minnode_ , 0 ) = node;  
-      }
-      reset_list_.resize(0);
-      reset_list_.reserve(size_est_);
+      std::fill( parent_.begin(),parent_.end(),0);
     }
 
 }}

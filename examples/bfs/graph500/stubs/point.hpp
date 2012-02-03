@@ -18,51 +18,34 @@ namespace graph500 { namespace stubs
         // Read the graph
         static hpx::lcos::promise<void>
         init_async(hpx::naming::id_type const& gid,std::size_t objectid,std::size_t scale,
-                   std::size_t number_partitions,std::vector<hpx::naming::id_type> const& point_components)
+                   std::size_t number_partitions)
         {
             typedef server::point::init_action action_type;
             return hpx::lcos::eager_future<action_type>(gid,objectid,scale,
-                                             number_partitions,point_components);
+                                             number_partitions);
         }
 
         // Read the graph
         static void init(hpx::naming::id_type const& gid,std::size_t objectid,std::size_t scale,
-                         std::size_t number_partitions,
-                         std::vector<hpx::naming::id_type> const& point_components)
+                         std::size_t number_partitions)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the promise.
-            init_async(gid,objectid,scale,number_partitions,point_components).get();
+            init_async(gid,objectid,scale,number_partitions).get();
         }
 
         static hpx::lcos::promise<void>
-        bfs_async(hpx::naming::id_type const& gid)
+        bfs_async(hpx::naming::id_type const& gid,std::size_t root)
         {
             typedef server::point::bfs_action action_type;
-            return hpx::lcos::eager_future<action_type>(gid);
+            return hpx::lcos::eager_future<action_type>(gid,root);
         }
 
-        static void bfs(hpx::naming::id_type const& gid)
+        static void bfs(hpx::naming::id_type const& gid,std::size_t root)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the promise.
-            bfs_async(gid).get();
-        }
-
-        static hpx::lcos::promise<std::vector<vertex_data> >
-        merge_graph_async(hpx::naming::id_type const& gid,
-                          std::vector<vertex_data> const& data)
-        {
-            typedef server::point::merge_graph_action action_type;
-            return hpx::lcos::eager_future<action_type>(gid,data);
-        }
-
-        static std::vector<vertex_data> merge_graph(hpx::naming::id_type const& gid,
-                          std::vector<vertex_data> const& data)
-        {
-            // The following get yields control while the action above
-            // is executed and the result is returned to the promise.
-            return merge_graph_async(gid,data).get();
+            bfs_async(gid,root).get();
         }
 
         static hpx::lcos::promise<void>
