@@ -545,8 +545,7 @@ namespace hpx { namespace threads
         return SetThreadAffinityMask(thrd.native_handle(), DWORD_PTR(mask)) != 0;
     }
 
-    inline bool set_affinity(std::size_t affinity, bool numa_sensitive,
-        affinity_data const& affinity)
+    inline bool set_affinity(std::size_t affinity, bool numa_sensitive)
     {
         return true;
     }
@@ -585,8 +584,7 @@ namespace hpx { namespace threads
     {
         return true;
     }
-    inline bool set_affinity(std::size_t num_thread, bool numa_sensitive,
-        affinity_data const& affinity)
+    inline bool set_affinity(std::size_t num_thread, bool numa_sensitive)
     {
 #ifdef AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
         thread_extended_policy_data_t epolicy;
@@ -651,8 +649,7 @@ namespace hpx { namespace threads
     {
         return true;
     }
-    inline bool set_affinity(std::size_t num_thread, bool numa_sensitive,
-        affinity_data const& affinity)
+    inline bool set_affinity(std::size_t num_thread, bool numa_sensitive)
     {
         std::size_t num_of_cores = hardware_concurrency();
         if (0 == num_of_cores)
