@@ -124,7 +124,8 @@ protected:
 
     // default fall through for any types not specified here
     template<class T>
-    void save(const T & t){
+    void save(const T & val){
+        boost::intmax_t t = val;
         save_impl(t, sizeof(T));
     }
     void save(const std::string & t){
@@ -132,11 +133,11 @@ protected:
     }
 #if BOOST_VERSION >= 104400
     void save(const boost::archive::class_id_type & t){
-        boost::int16_t l = t;
+        /*boost::int16_t*/boost::intmax_t l = t;
         save_impl(l, sizeof(boost::int16_t));
     }
     void save(const boost::archive::object_id_type & t){
-        boost::uint32_t l = t;
+        /*boost::uint32_t*/boost::intmax_t l = t;
         save_impl(l, sizeof(boost::uint32_t));
     }
     void save(const boost::archive::tracking_type & t){
@@ -144,11 +145,11 @@ protected:
         this->primitive_base_t::save(l);
     }
     void save(const boost::archive::version_type & t){
-        boost::uint32_t l = t;
+        /*boost::uint32_t*/boost::intmax_t l = t;
         save_impl(l, sizeof(boost::uint32_t));
     }
     void save(const boost::archive::library_version_type & t){
-        boost::uint16_t l = t;
+        /*boost::uint16_t*/boost::intmax_t l = t;
         save_impl(l, sizeof(boost::uint16_t));
     }
     void save(const boost::serialization::item_version_type & t){
