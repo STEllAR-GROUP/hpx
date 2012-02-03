@@ -192,5 +192,26 @@ namespace graph500 { namespace server
       std::fill( parent_.begin(),parent_.end(),0);
     }
 
+    std::vector<nodedata> point::validate() 
+    {
+      std::vector<nodedata> result;
+      nodedata tmp;
+      for (std::size_t i=0;i<local_edges_.size();i++) {
+        std::size_t node0 = local_edges_[i].v0;      
+        std::size_t node1 = local_edges_[i].v1;      
+        if ( !parent_[node0-minnode_] ) {
+          tmp.node = node0;
+          tmp.parent = parent_[node0-minnode_];
+          result.push_back(tmp);
+        }
+        if ( !parent_[node1-minnode_] ) {
+          tmp.node = node1;
+          tmp.parent = parent_[node1-minnode_];
+          result.push_back(tmp);
+        }
+      }
+      return result;
+    }
+
 }}
 

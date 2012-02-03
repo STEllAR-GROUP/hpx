@@ -76,6 +76,20 @@ namespace graph500 { namespace stubs
             return has_edge_async(gid,edge).get();
         }
 
+        static hpx::lcos::promise< std::vector<nodedata> >
+        validate_async(hpx::naming::id_type const& gid)
+        {
+            typedef server::point::validate_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid);
+        }
+
+        static std::vector<nodedata> validate(hpx::naming::id_type const& gid)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise
+            return validate_async(gid).get();
+        }
+
     };
 }}
 

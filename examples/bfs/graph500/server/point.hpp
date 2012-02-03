@@ -23,6 +23,26 @@ void make_random_numbers(
        /* out */ double* result    /* Returned array of values */
 );
 
+struct nodedata
+{
+  std::size_t node;
+  std::size_t parent;
+  std::size_t level;
+
+  nodedata() {}
+
+  private:
+  // serialization support
+  friend class boost::serialization::access;
+
+  template<class Archive>
+  void serialize(Archive & ar, const unsigned int version)
+  {
+    ar & node & parent & level;
+  }
+};
+
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace graph500 { namespace server
 {
@@ -44,7 +64,11 @@ namespace graph500 { namespace server
 
         bool has_edge(std::size_t edge);
 
+        std::vector<nodedata> validate();
+
         void reset();
+
+        std::vector<nodedata> validator();
 
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
@@ -56,7 +80,8 @@ namespace graph500 { namespace server
             point_init = 0,
             point_bfs = 1,
             point_has_edge = 2,
-            point_reset = 3
+            point_reset = 3,
+            point_validate = 4
         };
 
         typedef hpx::actions::action3<
@@ -106,6 +131,18 @@ namespace graph500 { namespace server
             &point::has_edge
         > has_edge_action;
 
+        typedef hpx::actions::result_action0<
+            // Component server type.
+            point,
+            // Return type.
+            std::vector<nodedata>,
+            // Action code.
+            point_validate,
+            // Arguments of this action.
+            // Method bound to this action.
+            &point::validate
+        > validate_action;
+
     private:
         hpx::lcos::local_mutex mtx_;
         std::size_t idx_;
@@ -132,6 +169,10 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     graph500::server::point::has_edge_action,
     graph500_point_has_edge_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    graph500::server::point::validate_action,
+    graph500_point_validate_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::lcos::base_lco_with_value<std::vector<std::size_t> >::get_value_action,

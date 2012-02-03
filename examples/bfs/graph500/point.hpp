@@ -85,6 +85,18 @@ namespace graph500
             return this->base_type::has_edge(gid_,edge);
         }
 
+        hpx::lcos::promise< std::vector<nodedata> > validate_async()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::validate_async(gid_);
+        }
+
+        std::vector<nodedata> validate()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::validate(gid_);
+        }
+
     };
 }
 

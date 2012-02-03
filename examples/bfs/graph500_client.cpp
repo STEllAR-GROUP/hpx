@@ -186,24 +186,37 @@ int hpx_main(boost::program_options::variables_map &vm)
         kernel2_time.resize(bfs_roots.size());
 
         hpx::util::high_resolution_timer kernel2time;
-        std::vector<hpx::lcos::promise<void> > bfs_phase;
 
         for (std::size_t j=0;j<bfs_roots.size();j++) {
           hpx::util::high_resolution_timer kernel2time;
-          for (std::size_t i=0;i<num_pe;i++) {
-            bfs_phase.push_back(points[i].bfs_async(bfs_roots[j]));
+          {
+            std::vector<hpx::lcos::promise<void> > bfs_phase;
+            for (std::size_t i=0;i<num_pe;i++) {
+              bfs_phase.push_back(points[i].bfs_async(bfs_roots[j]));
+            }
+            hpx::lcos::wait(bfs_phase);
           }
-          hpx::lcos::wait(bfs_phase);
           kernel2_time[j] = kernel2time.elapsed();
 
           // Validate
+          // Return all nodes visited and their parents to pass to validator
+          {
+            std::vector<hpx::lcos::promise< std::vector< nodedata > > > validate_phase;
+            std::vector<std::vector<nodedata> > result;
+            for (std::size_t i=0;i<num_pe;i++) {
+              validate_phase.push_back(points[i].validate_async());
+            }
+            hpx::lcos::wait(validate_phase,result);
+          }
 
           // Reset
-          std::vector<hpx::lcos::promise<void> > reset_phase;
-          for (std::size_t i=0;i<num_pe;i++) {
-            reset_phase.push_back(points[i].reset_async());
+          {
+            std::vector<hpx::lcos::promise<void> > reset_phase;
+            for (std::size_t i=0;i<num_pe;i++) {
+              reset_phase.push_back(points[i].reset_async());
+            }
+            hpx::lcos::wait(reset_phase);
           }
-          hpx::lcos::wait(reset_phase);
         }
 
         // get statistics
