@@ -12,7 +12,7 @@ set(subdirs
     bfs
     bright_future
     dataflow
-    gravity
+    distributed_test
     gtc
     heartbeat
     hplpx
@@ -37,6 +37,7 @@ if(HDF5_CPP_FOUND)
     set(subdirs ${subdirs}
         interpolate1d
         interpolate3d
+        gravity
        )
   endif()
   
