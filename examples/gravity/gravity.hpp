@@ -50,3 +50,7 @@ struct config_f {
  }
 };
 
+///////////////////////////////////////////////////////////////////////////////
+//Global Variables
+extern vector<vector<point> > pts_timestep;
+extern bool debug;

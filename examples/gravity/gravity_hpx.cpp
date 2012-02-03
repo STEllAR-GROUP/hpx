@@ -73,59 +73,17 @@ namespace boost
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-#if 0
-class point {
- public:
-  point(double xx, double yy, double zz, double mm, double vxx, double vyy,
-   double vzz)
-   :x(xx),y(yy),z(zz),m(mm),vx(vxx),vy(vyy),vz(vzz){}
-  point():x(0),y(0),m(0),vx(0),vy(0),vz(0),fx(0),fy(0),fz(0),ft(0) {}
-  ~point(){}
-  double x;  //x-coordinate
-  double y;  //y-coordinate
-  double z;  //z-coordinate
-  double m;  //mass
-  double vx; //velocity in the x direction
-  double vy; //velocity in the y direction
-  double vz; //velocity in the z direction
-  double fx; //force in the x direction
-  double fy; //force in the y direction
-  double fz; //force in the z direction
-  double ft; //the sum of the forces
-  double d;  //distance
-  double xc; //x-component
-  double yc; //y-component
-  double zc; //z-component
-};
-struct config_f {
- string input;
- string output;
- int steps;
- int timestep;
- int num_cores;
-
- template <typename Archive>
- void serialize(Archive & ar, unsigned)
- {
-   ar & input;
-   ar & output;
-   ar & steps;
-   ar & timestep;
- }
-};
-#endif
-///////////////////////////////////////////////////////////////////////////////
 //Forward Declarations
 vector<promise<void> > calc(int k,int t);
 vector<point> dist(int t,int i,int l);
 void move(vector<promise<void> > const& cfp,config_f const& param,int k,int t);
-void printval(promise<void> const & mp,int k,int t,ofstream &coorfile,
-               ofstream &trbst);
+//void printval(promise<void> const & mp,int k,int t,ofstream &coorfile,
+//               ofstream &trbst);
+void printval(promise<void> const & mp,config_f& param,int k,int t);///!!!!//
 void closefile(ofstream &coorfile,ofstream &trbst,ofstream &notes,
                config_f& param,float ct);
 void loadconfig(config_f& param,variables_map& vm);
 void setup(ofstream &coorfile,ofstream &trbst,int k);
-//vector<point> createvecs(ifstream &ist);
 vector<point> createvecs(config_f& param);
 void calc_force(int k,int t,int i);
 
@@ -197,7 +155,6 @@ int hpx_main(variables_map& vm)
      notes.open(j.c_str());
 
     //This section sets up the rest of the program
-//     pts_timestep = vector<vector<point> >(param.steps+1,createvecs(ist));
      pts_timestep = vector<vector<point> >(param.steps+1,createvecs(param));
      k=pts_timestep[0].size();
      setup(coorfile,trbst,k); // sets up the output files
@@ -208,7 +165,8 @@ int hpx_main(variables_map& vm)
       if (debug) cout<<"\nFor step "<<t<<":\n";
       cfp=calc(k,t);  //This is the calculation of force
       mp=move_future(find_here(),cfp,param,k,t);
-      printval(mp,k,t,coorfile,trbst); //Writes output
+//      printval(mp,k,t,coorfile,trbst); //Writes output
+      printval(mp,param,k,t); //Writes output
      }
      ct=ht.elapsed();
      cout<<"Computation Time: "<<ct<<" [s]\n";
@@ -295,6 +253,7 @@ void move(vector<promise<void> >const& cfp,config_f const & param,int k,int t) {
  }
 }
 
+#if 0
 void printval(promise<void> const & mp,int k,int t,
                ofstream &coorfile, ofstream &trbst) {
  int tn=t+1;
@@ -309,6 +268,7 @@ void printval(promise<void> const & mp,int k,int t,
  coorfile<<'\n';
  trbst<<'\n';
 }
+#endif
 
 void closefile(ofstream &coorfile,ofstream &trbst,ofstream &notes,
                config_f& param,float ct) {
@@ -369,27 +329,6 @@ void setup(ofstream &coorfile,ofstream &trbst,int k) {
  }
  coorfile<<'\n';
 }
-
-#if 0
-vector<point> createvecs(ifstream &ist) {
-//This section creates and fills the vector to store coordinate and mass data
- vector<point>pts;
-  double x;
-  double y;
-  double z;
-  double m;
-  double vx;
-  double vy;
-  double vz;
-  while (ist>>x>>y>>z>>m>>vx>>vy>>vz) {
-  pts.push_back(point(x,y,z,m,vx,vy,vz));
-  if (m/abs(m)==-1) {
-   throw invalid_argument("The weight cannot be negative!");
-  }
- }
- return pts;
-}
-#endif
 
 void calc_force(int k,int t,int i) {
  double mt; //the multiple of the masses

@@ -15,7 +15,8 @@ include_directories (${HDF5_INCLUDE_DIR} ${HDF5_CPP_INCLUDE_DIR})
 # define build target for this directory
 set(sources
     gravity_hpx.cpp
-    HDF5_reader.cpp)
+    HDF5_reader.cpp
+    HDF5_writer.cpp)
 
 set(headers
     gravity.hpp)
