@@ -45,7 +45,7 @@ namespace sheneos
         if (was_created_) {
             // Unregister the config data.
             config_data data = cfg_.get();
-            hpx::agas::unregister_name(data.symbolic_name_);   
+            hpx::agas::unregister_name(data.symbolic_name_);
 
             // Unregister all symbolic names.
             for (std::size_t i = 0; i < partitions_.size(); ++i)
@@ -224,7 +224,7 @@ namespace sheneos
 
     ///////////////////////////////////////////////////////////////////////////
     hpx::naming::id_type const&
-    interpolator::get_gid(double ye, double temp, double rho)
+    interpolator::get_gid(double ye, double temp, double rho)  const
     {
         std::size_t x = get_partition_index(dimension::ye, ye);
         std::size_t y = get_partition_index(dimension::temp, std::log10(temp));
@@ -237,7 +237,8 @@ namespace sheneos
         return partitions_[index];
     }
 
-    std::size_t interpolator::get_partition_index(std::size_t d, double value)
+    std::size_t
+    interpolator::get_partition_index(std::size_t d, double value) const
     {
         std::size_t partition_size = num_values_[d] / num_partitions_per_dim_;
         std::size_t partition_index = static_cast<std::size_t>(
@@ -248,7 +249,8 @@ namespace sheneos
         return partition_index;
     }
 
-    void interpolator::get_dimension(dimension::type what, double& min, double& max)
+    void interpolator::get_dimension(
+        dimension::type what, double& min, double& max)  const
     {
         switch (what) {
         case dimension::ye:
@@ -266,7 +268,7 @@ namespace sheneos
             HPX_THROW_EXCEPTION(hpx::bad_parameter,
                 "sheneos::interpolator::get_dimension",
                 "value of parameter 'what' is not valid");
-            
+            break;
         }
     }
 }
