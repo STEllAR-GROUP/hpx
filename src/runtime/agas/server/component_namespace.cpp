@@ -29,7 +29,7 @@ naming::id_type bootstrap_component_namespace_id()
 namespace server
 {
 
-// TODO: This isn't scalable, we have to update it every time we add a new 
+// TODO: This isn't scalable, we have to update it every time we add a new
 // AGAS request/response type.
 response component_namespace::service(
     request const& req
@@ -224,6 +224,11 @@ response component_namespace::resolve_id(
 { // {{{ resolve_id implementation
     // parameters
     component_id_type key = req.get_component_type();
+
+    // If the requested component type is a derived type, use only its derived
+    // part for the lookup.
+    if (key != components::get_base_type(key))
+        key = components::get_derived_type(key);
 
     mutex_type::scoped_lock l(mutex_);
 
