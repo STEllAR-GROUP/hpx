@@ -90,6 +90,20 @@ namespace graph500 { namespace stubs
             return validate_async(gid).get();
         }
 
+        static hpx::lcos::promise< int >
+        scatter_async(hpx::naming::id_type const& gid,std::vector<std::size_t> const&parent)
+        {
+            typedef server::point::scatter_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid,parent);
+        }
+
+        static int scatter(hpx::naming::id_type const& gid,std::vector<std::size_t> const&parent)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise.
+            return scatter_async(gid,parent).get();
+        }
+
     };
 }}
 

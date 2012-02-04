@@ -27,7 +27,6 @@ struct nodedata
 {
   std::size_t node;
   std::size_t parent;
-  std::size_t level;
 
   nodedata() {}
 
@@ -38,7 +37,7 @@ struct nodedata
   template<class Archive>
   void serialize(Archive & ar, const unsigned int version)
   {
-    ar & node & parent & level;
+    ar & node & parent;
   }
 };
 
@@ -70,6 +69,8 @@ namespace graph500 { namespace server
 
         std::vector<nodedata> validator();
 
+        int scatter(std::vector<std::size_t> const&parent);
+
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
@@ -81,7 +82,8 @@ namespace graph500 { namespace server
             point_bfs = 1,
             point_has_edge = 2,
             point_reset = 3,
-            point_validate = 4
+            point_validate = 4,
+            point_scatter = 5
         };
 
         typedef hpx::actions::action3<
@@ -107,6 +109,19 @@ namespace graph500 { namespace server
             // Method bound to this action.
             &point::bfs
         > bfs_action;
+
+        typedef hpx::actions::result_action1<
+            // Component server type.
+            point,
+            // Return type.
+            int, 
+            // Action code.
+            point_scatter,
+            // Arguments of this action.
+            std::vector<std::size_t> const&,
+            // Method bound to this action.
+            &point::scatter
+        > scatter_action;
 
         typedef hpx::actions::action0<
             // Component server type.
@@ -173,6 +188,10 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     graph500::server::point::validate_action,
     graph500_point_validate_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    graph500::server::point::scatter_action,
+    graph500_point_scatter_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::lcos::base_lco_with_value<std::vector<std::size_t> >::get_value_action,

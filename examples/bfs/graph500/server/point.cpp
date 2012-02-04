@@ -213,5 +213,10 @@ namespace graph500 { namespace server
       return result;
     }
 
+    int point::scatter(std::vector<std::size_t> const& parent)
+    {
+       return 1;
+    }
+
 }}
 

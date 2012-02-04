@@ -224,27 +224,39 @@ void get_statistics(std::vector<double> const& x, double &minimum, double &mean,
   maximum = xx[n - 1];
 };
 
-void clean_up(std::vector<nodedata> &full) 
+void clean_up(std::vector<nodedata> &full,std::size_t scale,std::vector<std::size_t> &parent) 
 {
+  int64_t nglobalverts = (int64_t)(1) << scale;
+
   // find duplicates and resolve discrepancies
-  std::vector<std::size_t> done;
-  bool move_on;
-  //for (std::size_t i=0;i<full.size();i++) {
-  //  std::size_t node = full[i].node;
-   // move_on = false; 
-   // for (std::size_t j=0;j<done.size();j++) {
-   //   if ( node == done[j] ) move_on = true; 
-   // }
-   // if ( !move_on ) { 
-   //   std::vector<std::size_t> index;
-   //   for (std::size_t j=0;j<full.size();j++) {
-   //     std::size_t edge = full[j].node; 
-   //     if ( j != i && node == edge  ) index.push_back(j);
-   //   } 
-      // find the node with the smallest level
-      //for (std::size_t j=0;j<full.size();j++) {
-      //}
-   //   done.push_back(node);
-  //  }
-  //}
+  std::vector< std::vector<std::size_t> >  nodes;
+  // add one since we increment all edges by one so that zero remains special
+  nodes.resize(nglobalverts+1);
+  for (std::size_t i=0;i<full.size();i++) {
+    std::size_t node = full[i].node;
+    nodes[node].push_back(full[i].parent); 
+  }
+  // some nodes will list multiple parents; resolve the discrepancy (if any) by
+  // choosing the parent corresponding to the smallest level 
+  parent.resize(nglobalverts+1);
+  for (std::size_t i=0;i<nodes.size();i++) {
+    if ( nodes[i].size() == 0 ) {
+      // this node never visited
+      parent[i] = 0;
+    } else if ( nodes[i].size() == 1 ) {
+      // just one answer
+      parent[i] = nodes[i][0];
+    } else {
+      // there are multiple responses -- check them
+      std::size_t ld = 0;
+      for (std::size_t j=0;j<nodes[i].size();j++) {
+        if ( nodes[i][j] != 0 && ld == 0 ) ld = nodes[i][j];
+        if ( ld != 0 && ld != nodes[i][j] ) {
+          // multiple opinions -- distinguish them
+          std::cout << " Multiple opinion for:  i " << i << " ld " << ld << " " << nodes[i][j] << std::endl;
+        }
+      } 
+      parent[i] = ld;
+    }
+  }
 }

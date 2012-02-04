@@ -29,7 +29,7 @@ int validate(std::vector<std::size_t> const& parent,
              std::vector<std::size_t> const& neighborlist,
              std::size_t searchkey,std::size_t &num_edges);
 
-void clean_up(std::vector<nodedata> &full);
+void clean_up(std::vector<nodedata> &full,std::size_t scale,std::vector<std::size_t> &parent);
 
 void get_statistics(std::vector<double> const& x, double &minimum, double &mean, double &stdev, double &firstquartile,
                                                   double &median, double &thirdquartile, double &maximum);
@@ -202,7 +202,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
           // Validate
           // Return all nodes visited and their parents
-          {
+          if ( validator ) {
             // This is an all-gather on the parents
             std::vector<hpx::lcos::promise< std::vector< nodedata > > > validate_phase;
             std::vector<std::vector<nodedata> > result;
@@ -219,10 +219,17 @@ int hpx_main(boost::program_options::variables_map &vm)
               }       
             }
             // remove duplicate nodes
-            clean_up(full);
-          }
+            std::vector<std::size_t> parent;
+            clean_up(full,scale,parent);
 
-          // Distribute parent list to each component for local validation
+            // broadcast full parent list to the number_partition components for validation
+            std::vector<int> validate_result;
+            std::vector<hpx::lcos::promise< int > > scatter_phase;
+            for (std::size_t i=0;i<number_partitions;i++) {
+              scatter_phase.push_back(points[i].scatter_async(parent));
+            }
+            hpx::lcos::wait(scatter_phase,validate_result);
+          }
 
           // Reset
           {
@@ -235,7 +242,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         }
 
         // get statistics
-        //if ( !validator ) {
+        if ( !validator ) {
           int64_t start_idx, end_idx;
           int64_t M = INT64_C(16) << scale;
           compute_edge_range(number_partitions-1, number_partitions, M, &start_idx, &end_idx);
@@ -243,7 +250,7 @@ int hpx_main(boost::program_options::variables_map &vm)
           for (std::size_t i=0;i<bfs_roots.size();i++) {
             kernel2_nedge[i] = end_idx; // this normally comes from the validation; it is an estimate here
           }
-        //}
+        }
 
         // Prep output statistics
         double minimum,mean,stdev,firstquartile,median,thirdquartile,maximum;
@@ -322,7 +329,7 @@ int main(int argc, char* argv[])
             "the number of components")
         ("scale", value<std::size_t>()->default_value(10),
             "the scale of the graph problem size assuming edge factor 16")
-        ("validator", value<bool>()->default_value(true),
+        ("validator", value<bool>()->default_value(false),
             "whether to run the validation (slow)");
 
     return hpx::init(desc_commandline, argc, argv); // Initialize and run HPX.

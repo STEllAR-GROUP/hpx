@@ -48,6 +48,10 @@ HPX_REGISTER_ACTION_EX(
     graph500_point_type::wrapped_type::validate_action,
     graph500_point_validate_action);
 
+HPX_REGISTER_ACTION_EX(
+    graph500_point_type::wrapped_type::scatter_action,
+    graph500_point_scatter_action);
+
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco_with_value<std::vector<std::size_t> >,
     hpx::components::component_base_lco_with_value);
