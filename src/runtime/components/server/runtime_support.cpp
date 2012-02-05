@@ -783,7 +783,7 @@ namespace hpx { namespace components { namespace server
 
                 boost::program_options::variables_map vm;
                 util::parse_commandline(options, cmd_line, vm,
-                    util::rethrow_on_error, get_runtime_mode_from_name(runtime_mode));
+                    util::allow_unregistered, get_runtime_mode_from_name(runtime_mode));
 
                 if (vm.count("exit"))
                     return false;
