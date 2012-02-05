@@ -8,7 +8,7 @@ set(benchmarks
     native_tls
     hpx_tls
     delay_baseline
-    hpx_null_thread
+    hpx_homogeneous_task_spawn
     hpx_heterogeneous_task_spawn
     print_heterogeneous_payloads
    )
@@ -16,10 +16,10 @@ set(benchmarks
 if(OPENMP_FOUND)
   set(benchmarks
       ${benchmarks}
-      openmp_null_thread
+      openmp_homogeneous_task_spawn
      )
 
-  set(openmp_null_thread_FLAGS NOLIBS
+  set(openmp_homogeneous_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${BOOST_program_options_LIBRARY})
 endif()
 
@@ -28,22 +28,30 @@ if(QTHREADS_FOUND)
 
   set(benchmarks
       ${benchmarks}
-      qthreads_fork_null_thread
-      qthreads_qloop_null_thread
+      qthreads_homogeneous_task_spawn
       qthreads_heterogeneous_task_spawn
      )
+
+  set(qthreads_homogeneous_task_spawn_FLAGS NOLIBS
+      DEPENDENCIES ${BOOST_program_options_LIBRARY}
+                   ${QTHREADS_LIBRARY})
 
   set(qthreads_heterogeneous_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${BOOST_program_options_LIBRARY}
                    ${QTHREADS_LIBRARY})
+endif()
 
-  set(qthreads_fork_null_thread_FLAGS NOLIBS
-      DEPENDENCIES ${BOOST_program_options_LIBRARY}
-                   ${QTHREADS_LIBRARY})
+if(TBB_FOUND)
+  include_directories(${TBB_INCLUDE_DIR})
 
-  set(qthreads_qloop_null_thread_FLAGS NOLIBS
+  set(benchmarks
+      ${benchmarks}
+      tbb_homogeneous_task_spawn
+     )
+
+  set(tbb_homogeneous_task_spawn_FLAGS NOLIBS
       DEPENDENCIES ${BOOST_program_options_LIBRARY}
-                   ${QTHREADS_LIBRARY})
+                   ${TBB_LIBRARY})
 endif()
 
 set(boost_tls_FLAGS NOLIBS DEPENDENCIES ${BOOST_program_options_LIBRARY}
@@ -57,7 +65,7 @@ set(hpx_tls_FLAGS NOLIBS DEPENDENCIES ${BOOST_program_options_LIBRARY}
 
 set(delay_baseline_FLAGS DEPENDENCIES iostreams_component)
 
-set(hpx_null_thread_FLAGS DEPENDENCIES iostreams_component)
+set(hpx_homogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component)
 
 set(hpx_heterogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component)
 
@@ -103,8 +111,8 @@ foreach(benchmark ${benchmarks})
 endforeach()
 
 if(OPENMP_FOUND)
-  set_target_properties(openmp_null_thread_exe PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
-  set_target_properties(openmp_null_thread_exe PROPERTIES LINK_FLAGS ${OpenMP_CXX_FLAGS})
+  set_target_properties(openmp_homogeneous_task_spawn_exe PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
+  set_target_properties(openmp_homogeneous_task_spawn_exe PROPERTIES LINK_FLAGS ${OpenMP_CXX_FLAGS})
 endif()
 
 add_hpx_executable(util_function

@@ -31,14 +31,14 @@
 
 #include <hpx/util/high_resolution_timer.hpp>
 
+#include <tbb/task.h>
+#include <tbb/task_scheduler_init.h>
+
 #include <stdexcept>
 #include <iostream>
 
-#include <qthread/qthread.h>
-#include <qthread/qloop.h>
-
+#include <boost/assert.hpp>
 #include <boost/format.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
 
 using boost::program_options::variables_map;
@@ -54,16 +54,48 @@ using hpx::util::high_resolution_timer;
 boost::uint64_t delay = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
-extern "C" void null_thread(
-    std::size_t start
-  , std::size_t stop
-  , void* args
-    )
+struct worker : tbb::task
 {
-    double volatile d = 0.;
-    for (boost::uint64_t i = 0; i < delay; ++i)
-        d += 1 / (2. * i + 1);
-}
+    tbb::task* execute()
+    {
+        double volatile d = 0.;
+        for (boost::uint64_t i = 0; i < delay; ++i)
+            d += 1 / (2. * i + 1);
+
+        return 0;
+    }
+};
+
+///////////////////////////////////////////////////////////////////////////////
+struct spawner : tbb::task
+{
+  private:
+    boost::uint64_t tasks_;
+
+  public:
+    spawner(
+        boost::uint64_t tasks
+        )
+      : tasks_(tasks)
+    {}
+
+    tbb::task* execute()
+    {
+        set_ref_count(tasks_ + 1);
+
+        for (boost::uint64_t i = 0; i < tasks_; ++i)
+        {
+            worker& a = *new (tbb::task::allocate_child()) worker();
+
+            if (i == (tasks_ - 1))
+                spawn_and_wait_for_all(a);
+            else
+                spawn(a);
+        }
+
+        return 0;
+    }
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 void print_results(
@@ -85,25 +117,32 @@ void print_results(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int qthreads_main(
+int tbb_main(
     variables_map& vm
     )
 {
     delay = vm["delay"].as<boost::uint64_t>();
     boost::uint64_t const tasks = vm["tasks"].as<boost::uint64_t>();
+    boost::uint64_t const threads = vm["threads"].as<boost::uint64_t>();
 
     if (0 == tasks)
-        throw std::logic_error("count of 0 tasks specified\n");
+        throw std::invalid_argument("count of 0 tasks specified\n");
 
-    if (qthread_initialize() != 0)
-        throw std::logic_error("qthreads failed to initialize\n");
+    if (0 == threads)
+        throw std::invalid_argument("count of 0 OS-threads specified\n");
+
+    tbb::task_scheduler_init init(threads);
 
     // Start the clock.
     high_resolution_timer t;
 
-    qt_loop(0, tasks, &null_thread, NULL);
+    {
+        spawner& a = *new (tbb::task::allocate_root()) spawner(tasks);
 
-    print_results(qthread_num_workers(), tasks, delay, t.elapsed());
+        tbb::task::spawn_root_and_wait(a);
+
+        print_results(threads, tasks, delay, t.elapsed());
+    }
 
     return 0;
 }
@@ -123,17 +162,13 @@ int main(
         ( "help,h"
         , "print out program usage (this message)")
         
-        ( "shepherds,s"
+        ( "threads,t"
         , value<boost::uint64_t>()->default_value(1),
-         "number of shepherds to use")
-
-        ( "workers-per-shepherd,w"
-        , value<boost::uint64_t>()->default_value(1),
-         "number of worker OS-threads per shepherd")
+         "number of OS-threads to use")
 
         ( "tasks"
         , value<boost::uint64_t>()->default_value(500000)
-        , "number of tasks (e.g. qthreads) to invoke")
+        , "number of tasks to invoke")
 
         ( "delay"
         , value<boost::uint64_t>()->default_value(0)
@@ -152,15 +187,6 @@ int main(
         return 0;
     }
 
-    // Set qthreads environment variables.
-    std::string const shepherds = boost::lexical_cast<std::string>
-        (vm["shepherds"].as<boost::uint64_t>());
-    std::string const workers = boost::lexical_cast<std::string>
-        (vm["workers-per-shepherd"].as<boost::uint64_t>());
-
-    setenv("QT_NUM_SHEPHERDS", shepherds.c_str(), 1);
-    setenv("QT_NUM_WORKERS_PER_SHEPHERD", workers.c_str(), 1);
-
-    return qthreads_main(vm);
+    return tbb_main(vm);
 }
 
