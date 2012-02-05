@@ -8,8 +8,7 @@
 #define HPX_4A2DF0C5_AD6E_489D_95C9_84ED1BACA41B
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
+#include <hpx/include/serialization.hpp>
 
 #include <boost/serialization/detail/get_data.hpp>
 #include <boost/serialization/string.hpp>
