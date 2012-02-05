@@ -116,8 +116,7 @@ namespace hpx { namespace actions
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<base_result_action0, base_type>();
+            util::void_cast_register_nonvirt<base_result_action0, base_type>();
             base_type::register_base();
         }
 
@@ -160,7 +159,7 @@ namespace hpx { namespace actions
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            ar & boost::serialization::base_object<base_type>(*this);
+            ar & util::base_object_nonvirt<base_type>(*this);
         }
     };
 
@@ -212,8 +211,7 @@ namespace hpx { namespace actions
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<result_action0, base_type>();
+            util::void_cast_register_nonvirt<result_action0, base_type>();
             base_type::register_base();
         }
 
@@ -224,7 +222,7 @@ namespace hpx { namespace actions
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            ar & boost::serialization::base_object<base_type>(*this);
+            ar & util::base_object_nonvirt<base_type>(*this);
         }
 
     private:
@@ -323,8 +321,7 @@ namespace hpx { namespace actions
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<direct_result_action0, base_type>();
+            util::void_cast_register_nonvirt<direct_result_action0, base_type>();
             base_type::register_base();
         }
 
@@ -335,7 +332,7 @@ namespace hpx { namespace actions
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            ar & boost::serialization::base_object<base_type>(*this);
+            ar & util::base_object_nonvirt<base_type>(*this);
         }
 
     private:
@@ -472,8 +469,7 @@ namespace hpx { namespace actions
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<base_action0, base_type>();
+            util::void_cast_register_nonvirt<base_action0, base_type>();
             base_type::register_base();
         }
 
@@ -512,7 +508,7 @@ namespace hpx { namespace actions
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            ar & boost::serialization::base_object<base_type>(*this);
+            ar & util::base_object_nonvirt<base_type>(*this);
         }
     };
 
@@ -564,8 +560,7 @@ namespace hpx { namespace actions
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<action0, base_type>();
+            util::void_cast_register_nonvirt<action0, base_type>();
             base_type::register_base();
         }
 
@@ -576,7 +571,7 @@ namespace hpx { namespace actions
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            ar & boost::serialization::base_object<base_type>(*this);
+            ar & util::base_object_nonvirt<base_type>(*this);
         }
 
     private:
@@ -678,8 +673,7 @@ namespace hpx { namespace actions
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<direct_action0, base_type>();
+            util::void_cast_register_nonvirt<direct_action0, base_type>();
             base_type::register_base();
         }
 
@@ -690,7 +684,7 @@ namespace hpx { namespace actions
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            ar & boost::serialization::base_object<base_type>(*this);
+            ar & util::base_object_nonvirt<base_type>(*this);
         }
 
     private:
@@ -766,8 +760,7 @@ namespace hpx { namespace actions
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<result_action0, base_type>();
+            util::void_cast_register_nonvirt<result_action0, base_type>();
             base_type::register_base();
         }
 
@@ -778,7 +771,7 @@ namespace hpx { namespace actions
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            ar & boost::serialization::base_object<base_type>(*this);
+            ar & util::base_object_nonvirt<base_type>(*this);
         }
     };
 }}

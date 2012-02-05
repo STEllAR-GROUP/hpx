@@ -19,8 +19,6 @@
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/ref.hpp>
 #include <boost/foreach.hpp>
-#include <boost/serialization/base_object.hpp>
-#include <boost/serialization/void_cast.hpp>
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/export.hpp>
 #include <boost/serialization/extended_type_info.hpp>
@@ -38,6 +36,8 @@
 #include <hpx/util/serialize_sequence.hpp>
 #include <hpx/util/serialize_exception.hpp>
 #include <hpx/util/demangle_helper.hpp>
+#include <hpx/util/base_object.hpp>
+#include <hpx/util/void_cast.hpp>
 
 #include <hpx/config/bind.hpp>
 #include <hpx/config/tuple.hpp>
@@ -252,8 +252,7 @@ namespace hpx { namespace actions
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<signature, base_action>();
+            util::void_cast_register_nonvirt<signature, base_action>();
         }
     };
 
@@ -472,8 +471,8 @@ namespace hpx { namespace actions
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<action, signature<Result, Arguments> >();
+            util::void_cast_register_nonvirt<
+                action, signature<Result, Arguments> >();
             signature<Result, Arguments>::register_base();
         }
 
