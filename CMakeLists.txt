@@ -655,8 +655,9 @@ if(MSVC)
 # GCC-compatible compiler configuration
 ################################################################################
 else()
-  # Workaround for GCC 4.6 in Ubuntu 11
-  hpx_use_flag_if_available(-Wl,--no-as-needed LANGUAGES CXX Fortran NAME no_as_needed)
+  # Workaround for Ubuntu GCC 4.6.2 and Boost 1.49.0 with Debian GCC 4.6.2 
+  hpx_use_flag_if_available(-Wl,--copy-dt-needed-entries LANGUAGES CXX Fortran
+                            NAME copy_dt_needed_entries)
 
   if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     # No optimizations
