@@ -101,8 +101,13 @@ bool pre_main(runtime_mode mode)
         LBT_(info) << "(2nd stage) pre_main: addressing services enabled";
 
         // Load components, so that we can use the barrier LCO.
-        components::stubs::runtime_support::load_components
-            (find_here());
+        if (!components::stubs::runtime_support::load_components(find_here()))
+        {
+            components::stubs::runtime_support::shutdown_all(
+                naming::get_id_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX), -1.0);
+            return false;
+        }
+
         LBT_(info) << "(2nd stage) pre_main: loaded components";
 
         install_counters();

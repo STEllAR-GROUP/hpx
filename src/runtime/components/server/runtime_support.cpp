@@ -775,6 +775,19 @@ namespace hpx { namespace components { namespace server
                 }
                 return false;
             }
+
+            // secondary command line handling, looking for --exit option
+            std::string cmd_line(ini.get_entry("hpx.cmd_line", ""));
+            if (!cmd_line.empty()) {
+                std::string runtime_mode(ini.get_entry("hpx.runtime_mode", ""));
+
+                boost::program_options::variables_map vm;
+                util::parse_commandline(options, cmd_line, vm,
+                    util::rethrow_on_error, get_runtime_mode_from_name(runtime_mode));
+
+                if (vm.count("exit"))
+                    return false;
+            }
         }
         catch (std::exception const& e) {
             std::cerr << "runtime_support::load_components: "
