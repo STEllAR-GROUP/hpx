@@ -12,6 +12,10 @@ set(subdirs
     remote_object
    )
 
+if(PAPI_FOUND)
+  set(subdirs ${subdirs} papi)
+endif()
+
 add_hpx_pseudo_target(components)
 
 foreach(subdir ${subdirs})
