@@ -132,6 +132,11 @@ macro(hpx_find_package name)
     set(${name}_INCLUDE_DIR ${${name}_INCLUDE_DIR} CACHE PATH "${name} include directory.")
   endif()
 
+  if(${NAME}_DISABLE)
+    hpx_info("find_package.${name}" "Library disabled by user.")
+    set(${name}_FOUND OFF CACHE BOOL "Found ${name}.")
+  endif()
+
   endif()
 endmacro()
 
