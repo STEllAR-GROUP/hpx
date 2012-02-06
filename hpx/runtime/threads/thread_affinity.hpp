@@ -171,7 +171,7 @@ namespace hpx { namespace threads
         boost::uint64_t init_numa_node_affinity_mask(std::size_t num_thread,
             bool numa_sensitive)
         {
-            boost::uint64_t const error = boost::uint64_t(-1);
+            size_t const error = size_t(-1);
 
             boost::uint64_t node_affinity_mask = 0;
             std::size_t numa_node = get_numa_node(num_thread, numa_sensitive);
