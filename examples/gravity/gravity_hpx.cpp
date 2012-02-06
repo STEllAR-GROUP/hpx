@@ -10,7 +10,7 @@
 //
 //Remember to change the program version when program is updated! 
 ///////////////////////////////////////////////////////////////////////////////
-//Copyright (c) 2011 Adrian Serio
+//Copyright (c) 2011-2012 Adrian Serio
 //
 //Distributed under the Boost Software License, Version 1.0. (See accompanying
 //file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt
@@ -80,6 +80,7 @@ void move(vector<promise<void> > const& cfp,config_f const& param,int k,int t);
 //void printval(promise<void> const & mp,int k,int t,ofstream &coorfile,
 //               ofstream &trbst);
 void printval(promise<void> const & mp,config_f& param,int k,int t);///!!!!//
+void printfinalcoord(config_f& param,int k);
 void closefile(ofstream &coorfile,ofstream &trbst,ofstream &notes,
                config_f& param,float ct);
 void loadconfig(config_f& param,variables_map& vm);
@@ -168,6 +169,7 @@ int hpx_main(variables_map& vm)
 //      printval(mp,k,t,coorfile,trbst); //Writes output
       printval(mp,param,k,t); //Writes output
      }
+     printfinalcoord(param,k); ////////////!!!!!!!!!!!!////////////
      ct=ht.elapsed();
      cout<<"Computation Time: "<<ct<<" [s]\n";
      closefile(coorfile,trbst,notes,param,ct);
