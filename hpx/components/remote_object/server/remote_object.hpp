@@ -10,6 +10,7 @@
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/util/void_cast.hpp>
 
 #if defined(BOOST_MSVC)
 #pragma warning(push)
@@ -108,8 +109,7 @@ namespace hpx { namespace components { namespace server
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<remote_object_apply_action, base_type>();
+            util::void_cast_register_nonvirt<remote_object_apply_action, base_type>();
             base_type::register_base();
         }
 
@@ -165,8 +165,7 @@ namespace hpx { namespace components { namespace server
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<remote_object_apply_action, base_type>();
+            util::void_cast_register_nonvirt<remote_object_apply_action, base_type>();
             base_type::register_base();
         }
 
