@@ -145,6 +145,9 @@ namespace hpx { namespace components
         messages_type msgs;
         {
             queue_mutex_type::scoped_lock l(queue_mtx_);
+            if (queue_.empty())
+                return;
+
             queue_.swap(msgs);
             queue_size_.store(0);
         }
