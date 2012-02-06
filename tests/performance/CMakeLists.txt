@@ -54,6 +54,19 @@ if(TBB_FOUND)
                    ${TBB_LIBRARY})
 endif()
 
+if(SWARM_FOUND)
+  include_directories(${SWARM_INCLUDE_DIR})
+
+  set(benchmarks
+      ${benchmarks}
+      swarm_homogeneous_task_spawn
+     )
+
+  set(swarm_homogeneous_task_spawn_FLAGS NOLIBS
+      DEPENDENCIES ${BOOST_program_options_LIBRARY}
+                   ${SWARM_LIBRARY})
+endif()
+
 set(boost_tls_FLAGS NOLIBS DEPENDENCIES ${BOOST_program_options_LIBRARY}
                                         ${BOOST_thread_LIBRARY})
 
