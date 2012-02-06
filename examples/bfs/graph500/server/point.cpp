@@ -158,12 +158,13 @@ namespace graph500 { namespace server
     {
       bool found = false;
       for (std::size_t i=0;i<local_edges_.size();i++) {
-        if ( edge == (std::size_t) local_edges_[i].v0 || edge == (std::size_t) local_edges_[i].v1 ) {
+        if ( edge == (std::size_t) local_edges_[i].v0 || 
+             edge == (std::size_t) local_edges_[i].v1 ) {
           found = true;
           break;
         }
       }
-      return true;
+      return found;
     }
 
     void point::bfs(std::size_t root_node)
