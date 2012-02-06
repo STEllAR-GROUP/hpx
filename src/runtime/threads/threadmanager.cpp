@@ -1040,7 +1040,10 @@ namespace hpx { namespace threads
         manage_active_thread_count count(thread_count_);
 
         // set affinity on Linux systems or when using hwloc
-        set_affinity(scheduler_.get_pu_num(num_thread), scheduler_.numa_sensitive());
+        std::size_t pu_num = scheduler_.get_pu_num(num_thread);
+        LTM_(info) << "tfunc(" << num_thread
+                   << "): will run on processing unit: " << pu_num;
+        set_affinity(pu_num, scheduler_.numa_sensitive());
 
         std::size_t idle_loop_count = 0;
 
@@ -1215,7 +1218,8 @@ namespace hpx { namespace threads
                     &threadmanager_impl::tfunc, this, thread_num)));
 
                 // set the new threads affinity (on Windows systems)
-                set_affinity(threads_.back(), thread_num, scheduler_.numa_sensitive());
+                std::size_t pu_num = scheduler_.get_pu_num(thread_num);
+                set_affinity(threads_.back(), pu_num, scheduler_.numa_sensitive());
             }
 
             // start timer pool as well
