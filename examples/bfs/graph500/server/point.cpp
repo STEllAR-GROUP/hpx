@@ -135,6 +135,7 @@ namespace graph500 { namespace server
       std::size_t N = maxnode-minnode_;
 
       neighbors_.resize(N);
+      nedge_bins_.resize(N);
 
       for (std::size_t i=0;i<local_edges_.size();i++) {
         std::size_t node = local_edges_[i].v0;
@@ -225,9 +226,34 @@ namespace graph500 { namespace server
       return result;
     }
 
-    int point::scatter(std::vector<std::size_t> const& parent)
+    validatedata point::scatter(std::vector<std::size_t> const& parent)
     {
-       return 1;
+       validatedata result;
+       // Get the number of edges for performance counting
+       std::fill(nedge_bins_.begin(),nedge_bins_.end(),0);
+
+       for (std::size_t i=0;i<local_edges_.size();i++) {
+         std::size_t node = local_edges_[i].v0;
+         std::size_t neighbor = local_edges_[i].v1;
+         if ( node != neighbor ) {
+           nedge_bins_[node-minnode_] += 1;
+           nedge_bins_[neighbor-minnode_] += 1;
+         }
+       }
+
+       std::size_t num_edges = 0;
+       for (std::size_t i=0;i<nedge_bins_.size();i++) {
+         if ( parent[i + minnode_] > 0 ) {
+           num_edges += nedge_bins_[i];  
+         }
+       }
+
+       // Volume/2
+       num_edges = num_edges/2;
+       
+       result.num_edges = num_edges;
+
+       return result;
     }
 
 }}

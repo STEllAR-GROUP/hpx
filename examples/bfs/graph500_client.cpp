@@ -84,7 +84,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::size_t num_pe = number_partitions; // actual number of partitions
         if ( number_partitions > 1 ) {
           // TEST
-          //num_pe += 10;
+          num_pe += 10;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -231,12 +231,18 @@ int hpx_main(boost::program_options::variables_map &vm)
             }
 
             // broadcast full parent list to the number_partition components for validation
-            std::vector<int> validate_result;
-            std::vector<hpx::lcos::promise< int > > scatter_phase;
+            std::vector<validatedata> validate_result;
+            std::vector<hpx::lcos::promise< validatedata > > scatter_phase;
             for (std::size_t i=0;i<number_partitions;i++) {
               scatter_phase.push_back(points[i].scatter_async(parent));
             }
             hpx::lcos::wait(scatter_phase,validate_result);
+
+            // find the number of edges
+            kernel2_nedge[j] = 0; 
+            for (std::size_t i=0;i<validate_result.size();i++) {
+              kernel2_nedge[j] +=  validate_result[i].num_edges;
+            }
           }
 
           // Reset

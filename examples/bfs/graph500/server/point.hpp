@@ -60,6 +60,24 @@ struct leveldata
   }
 };
 
+struct validatedata
+{
+  std::size_t num_edges;
+  int rc;
+
+  validatedata() {}
+
+  private:
+  // serialization support
+  friend class boost::serialization::access;
+
+  template<class Archive>
+  void serialize(Archive & ar, const unsigned int version)
+  {
+    ar & num_edges & rc;
+  }
+};
+
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace graph500 { namespace server
@@ -88,7 +106,7 @@ namespace graph500 { namespace server
 
         std::vector<nodedata> validator();
 
-        int scatter(std::vector<std::size_t> const&parent);
+        validatedata scatter(std::vector<std::size_t> const&parent);
 
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
@@ -133,7 +151,7 @@ namespace graph500 { namespace server
             // Component server type.
             point,
             // Return type.
-            int, 
+            validatedata, 
             // Action code.
             point_scatter,
             // Arguments of this action.
@@ -184,6 +202,7 @@ namespace graph500 { namespace server
         std::vector<leveldata> parent_;
         std::size_t minnode_;
         std::vector<packed_edge> local_edges_;
+        std::vector<std::size_t> nedge_bins_;
     };
 }}
 
