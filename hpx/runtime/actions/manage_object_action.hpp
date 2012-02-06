@@ -16,6 +16,7 @@
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/util/void_cast.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
@@ -198,8 +199,7 @@ namespace hpx { namespace actions
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<manage_object_action, manage_object_action_base>();
+            util::void_cast_register_nonvirt<manage_object_action, manage_object_action_base>();
         }
 
     private:
@@ -223,8 +223,7 @@ namespace hpx { namespace actions
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<manage_object_action, manage_object_action_base>();
+            util::void_cast_register_nonvirt<manage_object_action, manage_object_action_base>();
         }
 
     private:
@@ -300,8 +299,8 @@ namespace hpx { namespace actions
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<manage_object_action, manage_object_action<T> >();
+            util::void_cast_register_nonvirt<manage_object_action, manage_object_action<T> >();
+            manage_object_action<T>::register_base();
         }
 
     private:

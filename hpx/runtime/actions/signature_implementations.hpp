@@ -74,8 +74,7 @@ struct signature<
     /// serialization support
     static void register_base()
     {
-        using namespace boost::serialization;
-        void_cast_register<signature, base_action>();
+        util::void_cast_register_nonvirt<signature, base_action>();
     }
 };
 

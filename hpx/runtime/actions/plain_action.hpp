@@ -20,9 +20,9 @@
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/components/server/plain_function.hpp>
 #include <hpx/util/unused.hpp>
+#include <hpx/util/void_cast.hpp>
 
 #include <boost/version.hpp>
-#include <boost/serialization/void_cast.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repeat.hpp>

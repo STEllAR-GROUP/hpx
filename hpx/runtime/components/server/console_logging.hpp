@@ -11,9 +11,10 @@
 #include <vector>
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/logging.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/util/logging.hpp>
+#include <hpx/util/void_cast.hpp>
 
 #include <boost/fusion/include/vector.hpp>
 
@@ -71,8 +72,7 @@ namespace hpx { namespace components { namespace server
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<console_logging_action, base_type>();
+            util::void_cast_register_nonvirt<console_logging_action, base_type>();
             base_type::register_base();
         }
 

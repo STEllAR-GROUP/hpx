@@ -14,6 +14,7 @@
 #include <hpx/util/detail/vtable_ptr_fwd.hpp>
 #include <hpx/util/detail/vtable_ptr_base_fwd.hpp>
 #include <hpx/util/detail/serialization_registration.hpp>
+#include <hpx/util/void_cast.hpp>
 
 #define BOOST_PP_ITERATION_PARAMS_1                                             \
     (                                                                           \
@@ -91,15 +92,14 @@ namespace hpx { namespace util { namespace detail {
 
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<vtable_ptr, base_type>();
+            util::void_cast_register_nonvirt<vtable_ptr, base_type>();
         }
 
         virtual base_type * get_ptr()
         {
             return Vtable::get_ptr();
         }
-        
+
         void save_object(void *const* object, OArchive & ar, unsigned)
         {
             ar & Vtable::get(object);
@@ -115,7 +115,7 @@ namespace hpx { namespace util { namespace detail {
             ar & boost::serialization::base_object<base_type>(*this);
         }
     };
-    
+
     template <
         typename R
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
