@@ -32,7 +32,7 @@ using hpx::lcos::wait;
 void printval (promise<void> const & mp,config_f& param,int k,int t) {
  int tn=t+1;
  string a=boost::lexical_cast<string>(t);
- string j=param.output+a;
+ string j=param.output+"_"+a+".h5";
  wait(mp);
  const H5std_string FILE_NAME(j);
  const H5std_string DATASET_NAME("Coordinates");
@@ -41,7 +41,7 @@ void printval (promise<void> const & mp,config_f& param,int k,int t) {
  DataSpace fspace(2,fdim);
  DataSet dataset=file.createDataSet(DATASET_NAME, PredType::NATIVE_DOUBLE,
                                     fspace);
- dataset.write(pts_timestep[tn],PredType::NATIVE_DOUBLE);//Willnot print forces
+ dataset.write(&pts_timestep[tn][0],PredType::NATIVE_DOUBLE);//Willnot print forces
  dataset.close();
  file.close();
 }
