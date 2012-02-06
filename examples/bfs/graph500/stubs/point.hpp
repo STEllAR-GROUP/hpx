@@ -91,17 +91,20 @@ namespace graph500 { namespace stubs
         }
 
         static hpx::lcos::promise< validatedata >
-        scatter_async(hpx::naming::id_type const& gid,std::vector<std::size_t> const&parent)
+        scatter_async(hpx::naming::id_type const& gid,std::vector<std::size_t> const&parent,
+                      std::size_t searchkey,std::size_t scale)
         {
             typedef server::point::scatter_action action_type;
-            return hpx::lcos::eager_future<action_type>(gid,parent);
+            return hpx::lcos::eager_future<action_type>(gid,parent,searchkey,scale);
         }
 
-        static validatedata scatter(hpx::naming::id_type const& gid,std::vector<std::size_t> const&parent)
+        static validatedata scatter(hpx::naming::id_type const& gid,
+                                    std::vector<std::size_t> const&parent,
+                                    std::size_t searchkey,std::size_t scale)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the promise.
-            return scatter_async(gid,parent).get();
+            return scatter_async(gid,parent,searchkey,scale).get();
         }
 
     };

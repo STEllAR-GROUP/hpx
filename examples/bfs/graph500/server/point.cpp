@@ -228,7 +228,8 @@ namespace graph500 { namespace server
       return result;
     }
 
-    validatedata point::scatter(std::vector<std::size_t> const& parent)
+    validatedata point::scatter(std::vector<std::size_t> const& parent,std::size_t searchkey,
+                                std::size_t scale)
     {
        validatedata result;
        // Get the number of edges for performance counting
@@ -254,6 +255,136 @@ namespace graph500 { namespace server
        num_edges = num_edges/2;
        
        result.num_edges = num_edges;
+
+       // Find the indices of the nodeparents list that are nonzero
+       // octave: level = zeros (size (parent));
+       // octave: level (slice) = 1;
+       std::vector<std::size_t> slice,level;
+       level.resize( parent.size() );
+       for (std::size_t i=0;i<parent.size();i++) {
+         if ( parent[i] > 0 ) {
+           slice.push_back(i);
+           level[i] = 1;
+         } else {
+           level[i] = 0;
+         }
+       }
+
+       // octave: P = parent (slice);
+       std::vector<std::size_t> P;
+       P.resize( slice.size() );
+       for (std::size_t i=0;i<slice.size();i++) {
+         P[i] = parent[ slice[i] ];
+       }
+  
+       std::vector<bool> mask;
+       mask.resize(slice.size());
+
+       // fill the mask with zeros
+       std::fill( mask.begin(),mask.end(),false);
+
+       // Define a mask
+       // octave:  mask = P != search_key;
+       for (std::size_t i=0;i<slice.size();i++) {
+         if ( P[i] != searchkey ) {
+           mask[i] = true;
+         }
+       }
+
+       std::size_t k = 0;
+
+       int64_t N = INT64_C(16) << scale;
+       N++; 
+
+       // octave:  while any (mask)
+       bool keep_going = false;
+       while (1) {
+         // check if there are any nonzero entries in mask  
+         keep_going = false;
+         for (std::size_t i=0;i<mask.size();i++) {
+           if ( mask[i] == true ) {
+             keep_going = true;
+             break;
+           }
+         }
+         if ( keep_going == false ) break;
+
+         // octave:  level(slice(mask)) = level(slice(mask)) + 1;
+         for (std::size_t i=0;i<slice.size();i++) {
+           if ( mask[i] ) {
+             level[ slice[i] ] += 1;
+           }
+         }
+
+         // octave:  P = parent(P)
+         for (std::size_t i=0;i<P.size();i++) {
+           P[i] = parent[ P[i] ];
+         }
+
+         for (std::size_t i=0;i<P.size();i++) {
+           if ( P[i] != searchkey ) mask[i] = true;
+           else mask[i] = false;
+         }
+
+         k++;
+         if ( k > (std::size_t) N ) {
+           // there is a cycle in the tree -- something wrong
+           result.rc = -3;
+           return result;
+         }
+       }
+
+       // octave: lij = level (ij);
+       std::vector<std::size_t> li,lj;
+       li.resize(local_edges_.size());
+       lj.resize(local_edges_.size());
+       for (std::size_t i=0;i<local_edges_.size();i++) {
+         std::size_t node = local_edges_[i].v0;
+         std::size_t neighbor = local_edges_[i].v1;
+         li[i] = level[node];
+         lj[i] = level[neighbor];
+       }
+
+       // octave: neither_in = lij(1,:) == 0 & lij(2,:) == 0;
+       // both_in = lij(1,:) > 0 & lij(2,:) > 0;
+       std::vector<bool> neither_in,both_in;
+       neither_in.resize(local_edges_.size());
+       both_in.resize(local_edges_.size());
+       for (std::size_t i=0;i<local_edges_.size();i++) {
+         if ( li[i] == 0 && lj[i] == 0 ) neither_in[i] = true;
+         if ( li[i] > 0 && lj[i] > 0 ) both_in[i] = true;
+       }
+
+       // octave: 
+       //  if any (not (neither_in | both_in)),
+       //  out = -4;
+       //  return
+       //end
+       for (std::size_t i=0;i<local_edges_.size();i++) {
+         if ( !(neither_in[i] || both_in[i] ) ) {
+           result.rc = -4;
+           return result;
+         }
+       }
+
+       // octave: respects_tree_level = abs (lij(1,:) - lij(2,:)) <= 1;
+       std::vector<bool> respects_tree_level;
+       respects_tree_level.resize( local_edges_.size() );
+       for (std::size_t i=0;i<local_edges_.size();i++) {
+         if ( abs( (int) (li[i] - lj[i]) ) <= 1 ) respects_tree_level[i] = true;
+         else respects_tree_level[i] = false;
+       }
+
+       // octave:
+       // if any (not (neither_in | respects_tree_level)),
+       //  out = -5;
+       //  return
+       for (std::size_t i=0;i<local_edges_.size();i++) {
+         if ( !(neither_in[i] || respects_tree_level[i] ) ) {
+           result.rc = -5;
+           return result;
+         }
+       }
 
        return result;
     }

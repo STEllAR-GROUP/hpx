@@ -227,7 +227,7 @@ int hpx_main(boost::program_options::variables_map &vm)
             std::vector<validatedata> validate_result;
             std::vector<hpx::lcos::promise< validatedata > > scatter_phase;
             for (std::size_t i=0;i<number_partitions;i++) {
-              scatter_phase.push_back(points[i].scatter_async(parent));
+              scatter_phase.push_back(points[i].scatter_async(parent,bfs_roots[j],scale));
             }
             hpx::lcos::wait(scatter_phase,validate_result);
 
@@ -235,6 +235,9 @@ int hpx_main(boost::program_options::variables_map &vm)
             kernel2_nedge[j] = 0; 
             for (std::size_t i=0;i<validate_result.size();i++) {
               kernel2_nedge[j] +=  validate_result[i].num_edges;
+              if ( validate_result[i].rc < 0 ) {
+                std::cerr << " Validation failed for bfs_root " << bfs_roots[j] << " rc: " << validate_result[i].rc << std::endl;
+              }
             }
           }
 

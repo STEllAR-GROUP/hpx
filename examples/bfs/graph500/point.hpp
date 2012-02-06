@@ -97,16 +97,20 @@ namespace graph500
             return this->base_type::validate(gid_);
         }
 
-        hpx::lcos::promise< validatedata > scatter_async(std::vector<std::size_t> const&parent)
+        hpx::lcos::promise< validatedata > scatter_async(std::vector<std::size_t> const&parent,
+                                                         std::size_t searchkey,
+                                                         std::size_t scale)
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::scatter_async(gid_,parent);
+            return this->base_type::scatter_async(gid_,parent,searchkey,scale);
         }
 
-        validatedata scatter(std::vector<std::size_t> const&parent)
+        validatedata scatter(std::vector<std::size_t> const&parent,
+                             std::size_t searchkey,
+                             std::size_t scale)
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::scatter(gid_,parent);
+            return this->base_type::scatter(gid_,parent,searchkey,scale);
         }
 
     };

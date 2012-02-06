@@ -98,7 +98,8 @@ namespace graph500 { namespace server
 
         std::vector<nodedata> validator();
 
-        validatedata scatter(std::vector<std::size_t> const&parent);
+        validatedata scatter(std::vector<std::size_t> const&parent,std::size_t searchkey,
+                             std::size_t scale);
 
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
@@ -139,7 +140,7 @@ namespace graph500 { namespace server
             &point::bfs
         > bfs_action;
 
-        typedef hpx::actions::result_action1<
+        typedef hpx::actions::result_action3<
             // Component server type.
             point,
             // Return type.
@@ -148,6 +149,8 @@ namespace graph500 { namespace server
             point_scatter,
             // Arguments of this action.
             std::vector<std::size_t> const&,
+            std::size_t,
+            std::size_t,
             // Method bound to this action.
             &point::scatter
         > scatter_action;
