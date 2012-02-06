@@ -147,7 +147,10 @@ namespace graph500 { namespace server
 
       parent_.resize(N);
       // initialize to 0 -- no edge is identified as 0
-      std::fill( parent_.begin(),parent_.end(),0 );
+      for (std::size_t i=0;i<parent_.size();i++) {
+        parent_[i].parent = 0;
+        parent_[i].level = 0;
+      }
     }
 
     bool point::has_edge(std::size_t edge) 
@@ -167,7 +170,8 @@ namespace graph500 { namespace server
       if ( root_node - minnode_ >= parent_.size() ) return; // the root node is not on this partition
 
       std::queue<std::size_t> q;
-      parent_[root_node-minnode_] = root_node;
+      parent_[root_node-minnode_].parent = root_node;
+      parent_[root_node-minnode_].level = 0;
       q.push(root_node);
 
       while (!q.empty()) {
@@ -178,9 +182,10 @@ namespace graph500 { namespace server
         for (std::vector<std::size_t>::const_iterator it = node_neighbors.begin();
                      it != end; ++it)
         {
-          std::size_t& node_parent = parent_[*it-minnode_];
+          std::size_t& node_parent = parent_[*it-minnode_].parent;
           if (!node_parent) {
             node_parent = node;
+            parent_[*it-minnode_].level = parent_[node-minnode_].level + 1;
             q.push(*it);
           }
         }
@@ -189,7 +194,10 @@ namespace graph500 { namespace server
 
     void point::reset()
     {
-      std::fill( parent_.begin(),parent_.end(),0);
+      for (std::size_t i=0;i<parent_.size();i++) {
+        parent_[i].parent = 0;
+        parent_[i].level = 0;
+      }
     }
 
     std::vector<nodedata> point::validate() 
@@ -199,14 +207,18 @@ namespace graph500 { namespace server
       for (std::size_t i=0;i<local_edges_.size();i++) {
         std::size_t node0 = local_edges_[i].v0;      
         std::size_t node1 = local_edges_[i].v1;      
-        if ( !parent_[node0-minnode_] ) {
+        if ( parent_[node0-minnode_].parent != 0 ) {
           tmp.node = node0;
-          tmp.parent = parent_[node0-minnode_];
+          tmp.parent = parent_[node0-minnode_].parent;
+          tmp.level = parent_[node0-minnode_].level;
+
           result.push_back(tmp);
         }
-        if ( !parent_[node1-minnode_] ) {
+        if ( parent_[node1-minnode_].parent != 0 ) {
           tmp.node = node1;
-          tmp.parent = parent_[node1-minnode_];
+          tmp.parent = parent_[node1-minnode_].parent;
+          tmp.level = parent_[node1-minnode_].level;
+
           result.push_back(tmp);
         }
       }

@@ -83,7 +83,8 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         std::size_t num_pe = number_partitions; // actual number of partitions
         if ( number_partitions > 1 ) {
-          num_pe += 10;
+          // TEST
+          //num_pe += 10;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -221,6 +222,13 @@ int hpx_main(boost::program_options::variables_map &vm)
             // remove duplicate nodes
             std::vector<std::size_t> parent;
             clean_up(full,scale,parent);
+
+            // some validation can be done here
+            if ( parent[bfs_roots[j]] != bfs_roots[j] ) {
+              // the parent of the root is always itself; 
+              // if not, validation fails
+              std::cerr << " Validation for root " << bfs_roots[j] << " fails; bfs_root parent " << parent[bfs_roots[j]] << std::endl; 
+            }
 
             // broadcast full parent list to the number_partition components for validation
             std::vector<int> validate_result;

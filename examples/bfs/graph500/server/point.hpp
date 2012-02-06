@@ -27,6 +27,7 @@ struct nodedata
 {
   std::size_t node;
   std::size_t parent;
+  std::size_t level;
 
   nodedata() {}
 
@@ -37,7 +38,25 @@ struct nodedata
   template<class Archive>
   void serialize(Archive & ar, const unsigned int version)
   {
-    ar & node & parent;
+    ar & node & parent & level;
+  }
+};
+
+struct leveldata
+{
+  std::size_t level;
+  std::size_t parent;
+
+  leveldata() {}
+
+  private:
+  // serialization support
+  friend class boost::serialization::access;
+
+  template<class Archive>
+  void serialize(Archive & ar, const unsigned int version)
+  {
+    ar & level & parent;
   }
 };
 
@@ -162,7 +181,7 @@ namespace graph500 { namespace server
         hpx::lcos::local_mutex mtx_;
         std::size_t idx_;
         std::vector< std::vector<std::size_t> > neighbors_;
-        std::vector<std::size_t> parent_;
+        std::vector<leveldata> parent_;
         std::size_t minnode_;
         std::vector<packed_edge> local_edges_;
     };

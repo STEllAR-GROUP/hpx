@@ -229,13 +229,17 @@ void clean_up(std::vector<nodedata> &full,std::size_t scale,std::vector<std::siz
   int64_t nglobalverts = (int64_t)(1) << scale;
 
   // find duplicates and resolve discrepancies
-  std::vector< std::vector<std::size_t> >  nodes;
+  std::vector< std::vector<leveldata> >  nodes;
   // add one since we increment all edges by one so that zero remains special
   nodes.resize(nglobalverts+1);
+  leveldata tmp;
   for (std::size_t i=0;i<full.size();i++) {
     std::size_t node = full[i].node;
-    nodes[node].push_back(full[i].parent); 
+    tmp.parent = full[i].parent;
+    tmp.level = full[i].level;
+    nodes[node].push_back(tmp); 
   }
+
   // some nodes will list multiple parents; resolve the discrepancy (if any) by
   // choosing the parent corresponding to the smallest level 
   parent.resize(nglobalverts+1);
@@ -245,15 +249,23 @@ void clean_up(std::vector<nodedata> &full,std::size_t scale,std::vector<std::siz
       parent[i] = 0;
     } else if ( nodes[i].size() == 1 ) {
       // just one answer
-      parent[i] = nodes[i][0];
+      parent[i] = nodes[i][0].parent;
     } else {
       // there are multiple responses -- check them
       std::size_t ld = 0;
+      std::size_t ll = 0;
       for (std::size_t j=0;j<nodes[i].size();j++) {
-        if ( nodes[i][j] != 0 && ld == 0 ) ld = nodes[i][j];
-        if ( ld != 0 && ld != nodes[i][j] ) {
-          // multiple opinions -- distinguish them
-          std::cout << " Multiple opinion for:  i " << i << " ld " << ld << " " << nodes[i][j] << std::endl;
+        if ( nodes[i][j].parent != 0 && ld == 0 ) {
+          ld = nodes[i][j].parent;
+          ll = nodes[i][j].level;
+        }
+        if ( ld != 0 && ld != nodes[i][j].parent ) {
+          // multiple opinions for the opinion -- distinguish them by level
+          if ( ll > nodes[i][j].level ) {
+            ld = nodes[i][j].parent;
+            ll = nodes[i][j].level;
+          }
+          //std::cout << " Multiple opinion for:  i " << i << " ld " << ld << " " << nodes[i][j] << std::endl;
         }
       } 
       parent[i] = ld;
