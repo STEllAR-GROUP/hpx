@@ -113,7 +113,7 @@ int monitor(
 
     promise<void> stop_flag;
     const std::string stop_flag_name
-        = str(format("/stop_flag(locality#%d]/heartbeat)") % prefix);
+        = str(format("/stop_flag(locality#%d)/heartbeat)") % (prefix-1));
 
     // Associate the stop flag with a symbolic name.
     get_agas_client().registerid(stop_flag_name, stop_flag.get_gid().get_gid());

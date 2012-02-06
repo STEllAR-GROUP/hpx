@@ -1337,7 +1337,7 @@ void addressing_service::install_counters()
     performance_counters::install_counter_types(
         counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
 
-    boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
+    boost::uint32_t const prefix = applier::get_applier().get_prefix_id()-1;
     boost::format cache_statistics("/agas(locality#%d/total)/cache/%s");
 
     performance_counters::raw_counter_data const counters[] =

@@ -48,7 +48,7 @@ namespace performance_counters { namespace sine
             "an arbitrary time line");
 
         // Second, create and register the counter instance
-        boost::uint32_t const prefix = hpx::applier::get_applier().get_prefix_id();
+        boost::uint32_t const prefix = hpx::applier::get_applier().get_prefix_id()-1;
         boost::format sine_instance("/sine(locality#%d/instance#0)/average");
 
         // full info of the counter to create, help text and version will be
@@ -132,7 +132,7 @@ namespace performance_counters { namespace sine
         // The first counter uses our own full counter implementation, we create
         // the sine_type counter locally and install it to the local counter
         // registry.
-        boost::uint32_t const prefix = hpx::applier::get_applier().get_prefix_id();
+        boost::uint32_t const prefix = hpx::applier::get_applier().get_prefix_id()-1;
         boost::format sine_instance("/sine(locality#%d/instance#%d)/immediate");
 
         // full info of the counter to create, help text and version will be

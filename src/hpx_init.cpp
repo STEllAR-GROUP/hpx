@@ -102,7 +102,9 @@ namespace hpx { namespace detail
 
             naming::gid_type console;
             naming::get_agas_client().get_console_prefix(console);
-            future_type(console, name).get();
+            future_type(console,
+                name.substr(sizeof(hpx::performance_counters::counter_prefix)-1)
+            ).get();
         }
     }
 

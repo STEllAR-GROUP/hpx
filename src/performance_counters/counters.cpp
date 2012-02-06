@@ -326,7 +326,7 @@ namespace hpx { namespace performance_counters
 
         if (p.parentinstancename_.empty()) {
             p.parentinstancename_ = boost::str(boost::format("locality#%d") %
-                applier::get_applier().get_prefix_id());
+                (applier::get_applier().get_prefix_id()-1));
         }
 
         return get_counter_name(p, info.fullname_, ec);

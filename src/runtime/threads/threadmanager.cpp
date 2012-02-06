@@ -926,7 +926,7 @@ namespace hpx { namespace threads
         typedef threadmanager_impl ti;
 
         std::size_t const shepherd_count = threads_.size();
-        boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
+        boost::uint32_t const prefix = applier::get_applier().get_prefix_id()-1;
 
         boost::format total_queue_length("/queue(locality#%d/total)/length");
         boost::format total_avg_maint("/time(locality#%d/total)/idle-rate");
@@ -942,7 +942,6 @@ namespace hpx { namespace threads
         boost::format queue_length("/queue(locality#%d/os-thread#%d)/length");
         boost::format avg_maint("/time(locality#%d/os-thread#%d)/idle-rate");
         boost::format thread_cumulative("/threads(locality#%d/os-thread#%d)/count/cumulative/all");
-        boost::format thread_created("/threads(locality#%d/os-thread#%d)/count/objects");
         boost::format thread_instant("/threads(locality#%d/os-thread#%d)/count/instantaneous/%s");
 
         performance_counters::raw_counter_data const counters[] =
@@ -1019,6 +1018,8 @@ namespace hpx { namespace threads
             performance_counters::install_counters(
                 counters, sizeof(counters)/sizeof(counters[0]));
         }
+
+        boost::format thread_created("/threads(locality#%d/allocator#%d)/count/objects");
 
         for (std::size_t i = 0; i < BOOST_COROUTINE_NUM_HEAPS; ++i)
         {
