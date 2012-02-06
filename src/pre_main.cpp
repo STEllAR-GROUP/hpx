@@ -103,6 +103,8 @@ bool pre_main(runtime_mode mode)
         // Load components, so that we can use the barrier LCO.
         if (!components::stubs::runtime_support::load_components(find_here()))
         {
+            // If load_components returns false, shutdown the system. This
+            // essentially only happens if the command line contained --exit.
             components::stubs::runtime_support::shutdown_all(
                 naming::get_id_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX), -1.0);
             return false;
