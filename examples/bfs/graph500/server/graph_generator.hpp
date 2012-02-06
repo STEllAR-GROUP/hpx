@@ -17,7 +17,9 @@
 #ifndef __STDC_FORMAT_MACROS
 #define __STDC_FORMAT_MACROS
 #endif
+#if !defined(_MSC_VER)
 #include <inttypes.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {

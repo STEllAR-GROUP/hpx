@@ -23,7 +23,9 @@
 #include <stdint.h>
 #include <assert.h>
 
+#if !defined(_MSC_VER)
 #include <inttypes.h>
+#endif
 
 #include "splittable_mrg.hpp"
 #include "graph_generator.hpp"

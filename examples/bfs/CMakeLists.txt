@@ -8,13 +8,11 @@
 set(subdirs
     graph500)
 
-
 # for all targets specified above
 foreach(subdir ${subdirs})
   add_subdirectory(${subdir})
 
   set(sources
-      make_graph.c
       graph500_validate.cpp
       ${subdir}_client.cpp)
 
@@ -24,8 +22,7 @@ foreach(subdir ${subdirs})
       distributing_factory_component)
 
   # add example executable
-   add_hpx_executable(${subdir}_client
-    MODULE graph500
+  add_hpx_executable(${subdir}_client
     SOURCES ${sources}
     DEPENDENCIES ${subdir}_component ${dependencies}
     FOLDER "Examples/Bfs/${subdir}")

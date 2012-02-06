@@ -8,6 +8,7 @@
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/lcos/async_future_wait.hpp>
 
+#include "../make_graph.h"
 #include "../stubs/point.hpp"
 #include "point.hpp"
 
@@ -61,12 +62,12 @@ namespace graph500 { namespace server
         for (std::size_t i=0;i<local_edges_.size();i++) {
           // the smallest node is 1 ( 0 is reserved for unvisited edges )
           // increment everyone by 1
-          local_edges_[i].v0 += 1; 
-          local_edges_[i].v1 += 1; 
+          local_edges_[i].v0 += 1;
+          local_edges_[i].v1 += 1;
         }
 
       } else {
-        // additive Schwarz approach 
+        // additive Schwarz approach
         // this gives us the size of a standard partition
         int64_t start_idx, end_idx;
         compute_edge_range(number_partitions-1, number_partitions, M, &start_idx, &end_idx);
@@ -74,7 +75,7 @@ namespace graph500 { namespace server
 
         // standard additive schwarz -- increase the partition size to guarantee overlap
         std::size_t size = 2*nedges;
- 
+
         // compute an array of length 'size' containing non-repeating int's in [0,end_idx)
         std::vector<std::size_t> edges;
         local_edges_.resize(size);
@@ -116,8 +117,8 @@ namespace graph500 { namespace server
 
           // the smallest node is 1 ( 0 is reserved for unvisited edges )
           // increment everyone by 1
-          local_edges_[i].v0 += 1; 
-          local_edges_[i].v1 += 1; 
+          local_edges_[i].v0 += 1;
+          local_edges_[i].v1 += 1;
         }
       }
 
@@ -154,7 +155,7 @@ namespace graph500 { namespace server
       }
     }
 
-    bool point::has_edge(std::size_t edge) 
+    bool point::has_edge(std::size_t edge)
     {
       bool found = false;
       for (std::size_t i=0;i<local_edges_.size();i++) {
@@ -202,13 +203,13 @@ namespace graph500 { namespace server
       }
     }
 
-    std::vector<nodedata> point::validate() 
+    std::vector<nodedata> point::validate()
     {
       std::vector<nodedata> result;
       nodedata tmp;
       for (std::size_t i=0;i<local_edges_.size();i++) {
-        std::size_t node0 = local_edges_[i].v0;      
-        std::size_t node1 = local_edges_[i].v1;      
+        std::size_t node0 = local_edges_[i].v0;
+        std::size_t node1 = local_edges_[i].v1;
         if ( parent_[node0-minnode_].parent != 0 ) {
           tmp.node = node0;
           tmp.parent = parent_[node0-minnode_].parent;

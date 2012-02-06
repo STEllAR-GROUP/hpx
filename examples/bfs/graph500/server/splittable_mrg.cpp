@@ -11,7 +11,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #define __STDC_FORMAT_MACROS
+#if !defined(_MSC_VER)
 #include <inttypes.h>
+#endif
 #include "mod_arith_64bit.hpp"
 #include "splittable_mrg.hpp"
 

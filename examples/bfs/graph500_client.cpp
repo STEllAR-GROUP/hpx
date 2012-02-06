@@ -10,6 +10,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
+#include "graph500/make_graph.h"
 #include "graph500/point.hpp"
 
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
@@ -33,14 +34,6 @@ void clean_up(std::vector<nodedata> &full,std::size_t scale,std::vector<std::siz
 
 void get_statistics(std::vector<double> const& x, double &minimum, double &mean, double &stdev, double &firstquartile,
                                                   double &median, double &thirdquartile, double &maximum);
-
-void make_random_numbers(
-       /* in */ int64_t nvalues    /* Number of values to generate */,
-       /* in */ uint64_t userseed1 /* Arbitrary 64-bit seed value */,
-       /* in */ uint64_t userseed2 /* Arbitrary 64-bit seed value */,
-       /* in */ int64_t position   /* Start index in random number stream */,
-       /* out */ double* result    /* Returned array of values */
-);
 
 /// This function initializes a vector of \a graph500::point clients,
 /// connecting them to components created with
@@ -88,7 +81,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         }
 
         ///////////////////////////////////////////////////////////////////////
-        // KERNEL 1  --- TIMED 
+        // KERNEL 1  --- TIMED
         hpx::util::high_resolution_timer kernel1time;
 
         ///////////////////////////////////////////////////////////////////////
@@ -116,7 +109,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         // Populate the client vectors.
         init(hpx::components::server::locality_results(blocks), points);
-        
+
         ///////////////////////////////////////////////////////////////////////
         // Put the graph in the data structure
         std::vector<hpx::lcos::promise<void> > init_phase;
@@ -132,7 +125,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::cout << "Elapsed time during kernel 1: " << kernel1_time << " [s]" << std::endl;
         // Generate the search roots
         std::vector<std::size_t> bfs_roots;
-        bfs_roots.resize(64);  // the graph500 specifies 64 search roots 
+        bfs_roots.resize(64);  // the graph500 specifies 64 search roots
                                 // must be used
 
         {  // generate the bfs roots
@@ -177,8 +170,8 @@ int hpx_main(boost::program_options::variables_map &vm)
                 }
               }
               if (root_ok) break;
-  
-            }          
+
+            }
             bfs_roots[bfs_root_idx] = root;
           }
         }
@@ -217,7 +210,7 @@ int hpx_main(boost::program_options::variables_map &vm)
             for (std::size_t i=0;i<num_pe;i++) {
               for (std::size_t j=0;j<result[i].size();j++) {
                 full.push_back( result[i][j] );
-              }       
+              }
             }
             // remove duplicate nodes
             std::vector<std::size_t> parent;
@@ -225,9 +218,9 @@ int hpx_main(boost::program_options::variables_map &vm)
 
             // some validation can be done here
             if ( parent[bfs_roots[j]] != bfs_roots[j] ) {
-              // the parent of the root is always itself; 
+              // the parent of the root is always itself;
               // if not, validation fails
-              std::cerr << " Validation for root " << bfs_roots[j] << " fails; bfs_root parent " << parent[bfs_roots[j]] << std::endl; 
+              std::cerr << " Validation for root " << bfs_roots[j] << " fails; bfs_root parent " << parent[bfs_roots[j]] << std::endl;
             }
 
             // broadcast full parent list to the number_partition components for validation

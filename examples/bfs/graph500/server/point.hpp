@@ -15,14 +15,6 @@
 #include "splittable_mrg.hpp"
 #include "../../array.hpp"
 
-void make_random_numbers(
-       /* in */ int64_t nvalues    /* Number of values to generate */,
-       /* in */ uint64_t userseed1 /* Arbitrary 64-bit seed value */,
-       /* in */ uint64_t userseed2 /* Arbitrary 64-bit seed value */,
-       /* in */ int64_t position   /* Start index in random number stream */,
-       /* out */ double* result    /* Returned array of values */
-);
-
 struct nodedata
 {
   std::size_t node;

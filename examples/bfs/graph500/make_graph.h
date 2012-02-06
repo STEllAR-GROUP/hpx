@@ -7,39 +7,18 @@
 /*  Authors: Jeremiah Willcock                                             */
 /*           Andrew Lumsdaine                                              */
 
-#include <stdlib.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-#include <limits.h>
-#include <assert.h>
-#include <math.h>
+#ifndef MAKE_GRAPH_H
+#define MAKE_GRAPH_H
 
-#include "graph500/server/graph_generator.hpp"
-#include "graph500/server/splittable_mrg.hpp"
+#include <hpx/hpx_fwd.hpp>
 
-void make_mrg_seed(uint64_t userseed1, uint64_t userseed2, uint_fast32_t* seed);
-
-/* PRNG interface for implementations; takes seed in same format as given by
- * users, and creates a vector of doubles in a reproducible (and
- * random-access) way. */
-void make_random_numbers(
+void HPX_COMPONENT_EXPORT make_random_numbers(
        /* in */ int64_t nvalues    /* Number of values to generate */,
        /* in */ uint64_t userseed1 /* Arbitrary 64-bit seed value */,
        /* in */ uint64_t userseed2 /* Arbitrary 64-bit seed value */,
        /* in */ int64_t position   /* Start index in random number stream */,
        /* out */ double* result    /* Returned array of values */
-) {
-  int64_t i;
-  uint_fast32_t seed[5];
-  make_mrg_seed(userseed1, userseed2, seed);
+);
 
-  mrg_state st;
-  mrg_seed(&st, seed);
+#endif
 
-  mrg_skip(&st, 2, 0, 2 * position); /* Each double takes two PRNG outputs */
-
-  for (i = 0; i < nvalues; ++i) {
-    result[i] = mrg_get_double_orig(&st);
-  }
-}
