@@ -60,6 +60,8 @@ namespace hpx
         null_thread_id = 26,
         invalid_data = 27,
         yield_aborted = 28,
+        component_load_failure = 29,
+        commandline_option_error = 30,
         last_error
     };
 
@@ -94,6 +96,8 @@ namespace hpx
         "null_thread_id",
         "invalid_data",
         "yield_aborted",
+        "component_load_failure",
+        "commandline_option_error",
         ""
     };
 
