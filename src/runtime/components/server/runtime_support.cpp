@@ -749,6 +749,12 @@ namespace hpx { namespace components { namespace server
                 LRT_(warning) << "caught exception while loading " << instance
                               << ", " << get_hpx_category().message(e.get_error())
                               << ": " << e.what();
+                if (e.get_error_code().value() == hpx::commandline_option_error)
+                {
+                    std::cerr << "runtime_support::load_components: "
+                              << "invalid command line option(s) to "
+                              << instance << " component: " << e.what() << std::endl;
+                }
             }
         } // for
 
