@@ -126,7 +126,7 @@ struct HPX_EXPORT primary_namespace :
       , gvas_()
       , partitions_()
       , refcnts_()
-      , prefix_counter_(0)
+      , prefix_counter_(HPX_AGAS_BOOTSTRAP_PREFIX)
     {}
 
     bool route(
@@ -209,7 +209,7 @@ struct HPX_EXPORT primary_namespace :
 
   private:
     boost::fusion::vector2<naming::gid_type, gva> resolve_gid_locked(
-        naming::gid_type const& gid 
+        naming::gid_type const& gid
       , error_code& ec
         );
 

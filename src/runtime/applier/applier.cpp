@@ -359,28 +359,37 @@ namespace hpx { namespace applier
 //         return false;   // non-local
 //     }
 
+    inline bool
+    set_local_address(naming::address& addr, naming::gid_type const& gid,
+        parcelset::parcelhandler& parcel_handler, boost::uint64_t rts)
+    {
+        addr.locality_ = parcel_handler.here();
+
+        // A zero address references the local runtime support component.
+        boost::uint64_t lsb = gid.get_lsb();
+        if (0 == lsb || rts == lsb) {
+            addr.type_ = components::component_runtime_support;
+            addr.address_ = rts;
+            return true;
+        }
+        else if (false/*...is memory...*/){  // FIXME: figure this out
+            addr.type_ = components::component_memory;
+            addr.address_ = lsb;
+            return true;
+        }
+        return false;
+    }
+
     bool applier::address_is_local(naming::gid_type const& gid,
         naming::address& addr) const
     {
         // test if the gid is of one of the non-movable objects
         // this is certainly an optimization relying on the fact that the
         // LSB of the local objects is equal to their address
-        if (parcel_handler_.get_resolver().is_local_address(gid))
+        boost::uint64_t rts = runtime_support_id_.get_lsb();
+        if (parcel_handler_.get_resolver().is_local_address(gid) &&
+            set_local_address(addr, gid, parcel_handler_, rts))
         {
-            addr.locality_ = parcel_handler_.here();
-
-            // A zero address references the local runtime support component.
-            if (0 == gid.get_lsb() || runtime_support_id_.get_lsb() == gid.get_lsb())
-            {
-                addr.type_ = components::component_runtime_support;
-                addr.address_ = runtime_support_id_.get_lsb();
-            }
-            else
-            {
-                addr.type_ = components::component_memory;
-                addr.address_ = gid.get_lsb();
-            }
-
             return true;
         }
 
@@ -393,7 +402,7 @@ namespace hpx { namespace applier
                 "applier::address_is_local", hpx::util::osstream_get_string(strm));
         }
 
-        return addr.locality_ == parcel_handler_.here();
+        return addr.locality_ != parcel_handler_.here();
     }
 
     bool applier::address_is_local_c_cache(naming::gid_type const& gid,
@@ -402,21 +411,10 @@ namespace hpx { namespace applier
         // test if the gid is of one of the non-movable objects
         // this is certainly an optimization relying on the fact that the
         // LSB of the local objects is equal to their address
-        if (parcel_handler_.get_resolver().is_local_address(gid))
+        boost::uint64_t rts = runtime_support_id_.get_lsb();
+        if (parcel_handler_.get_resolver().is_local_address(gid) &&
+            set_local_address(addr, gid, parcel_handler_, rts))
         {
-            addr.locality_ = parcel_handler_.here();
-
-            // a zero address references the local runtime support component
-            if (0 == gid.get_lsb() || runtime_support_id_.get_lsb() == gid.get_lsb())
-            {
-                addr.type_ = components::component_runtime_support;
-                addr.address_ = runtime_support_id_.get_lsb();
-            }
-            else
-            {
-                addr.type_ = components::component_memory;
-                addr.address_ = gid.get_lsb();
-            }
             return true;
         }
 
@@ -429,7 +427,7 @@ namespace hpx { namespace applier
                 "applier::address_is_local", hpx::util::osstream_get_string(strm));
         }
 
-        return addr.locality_ == parcel_handler_.here();
+        return addr.locality_ != parcel_handler_.here();
     }
 
     // parcel forwarding.

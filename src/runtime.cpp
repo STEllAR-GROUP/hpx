@@ -568,7 +568,7 @@ namespace hpx
         boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
         boost::format runtime_uptime("/runtime(locality#%d/total)/uptime");
         performance_counters::install_counter(
-            boost::str(runtime_uptime % (prefix-1)));
+            boost::str(runtime_uptime % prefix));
     }
 
     ///////////////////////////////////////////////////////////////////////////

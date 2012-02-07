@@ -31,7 +31,7 @@ naming::id_type bootstrap_primary_namespace_id()
 namespace server
 {
 
-// TODO: This isn't scalable, we have to update it every time we add a new 
+// TODO: This isn't scalable, we have to update it every time we add a new
 // AGAS request/response type.
 response primary_namespace::service(
     request const& req
@@ -213,18 +213,13 @@ response primary_namespace::allocate(
         }
 
         // Compute the locality's prefix.
-        boost::uint32_t prefix = ++prefix_counter_;
-
-        // Don't allow 0 to be used as a prefix.
-        if (0 == prefix)
-            prefix = ++prefix_counter_;
-
+        boost::uint32_t prefix = prefix_counter_++;
         naming::gid_type id(naming::get_gid_from_prefix(prefix));
 
         // Check if this prefix has already been assigned.
         while (gvas_.count(id))
         {
-            prefix = ++prefix_counter_;
+            prefix = prefix_counter_++;
             id = naming::get_gid_from_prefix(prefix);
         }
 
@@ -648,7 +643,7 @@ response primary_namespace::change_credit(
     else if (0 > credits)
         decrement(lower, upper, -credits, ec);
 
-    else 
+    else
     {
         HPX_THROWS_IF(ec, bad_parameter
           , "primary_namespace::change_credit"
@@ -676,7 +671,7 @@ void primary_namespace::increment(
     // The third parameter we pass here is the default data to use in case the
     // key is not mapped. We don't insert GIDs into the refcnt table when we
     // allocate/bind them, so if a GID is not in the refcnt table, we know that
-    // it's global reference count is the initial global reference count. 
+    // it's global reference count is the initial global reference count.
     refcnts_.apply(lower, upper
                  , util::incrementer<boost::int64_t>(credits)
                  , boost::int64_t(HPX_INITIAL_GLOBALCREDIT));
@@ -725,7 +720,7 @@ void primary_namespace::decrement(
     // TODO/REVIEW: Do we ensure that a GID doesn't get reinserted into the
     // table after it's been decremented to 0 and destroyed? How do we do this
     // efficiently?
- 
+
     // The new decrement algorithm:
     //    0.) Apply the decrement across the entire keyspace.
     //    1.) Search for dead objects (e.g. objects with a reference count of
@@ -744,10 +739,10 @@ void primary_namespace::decrement(
         // the key is not mapped. We don't insert GIDs into the refcnt table
         // when we allocate/bind them, so if a GID is not in the refcnt table,
         // we know that it's global reference count is the initial global
-        // reference count. 
+        // reference count.
         refcnts_.apply(lower, upper
                      , util::decrementer<boost::int64_t>(credits)
-                     , boost::int64_t(HPX_INITIAL_GLOBALCREDIT)); 
+                     , boost::int64_t(HPX_INITIAL_GLOBALCREDIT));
 
         ///////////////////////////////////////////////////////////////////////
         // Search for dead objects.
@@ -780,7 +775,7 @@ void primary_namespace::decrement(
         }
 
         ///////////////////////////////////////////////////////////////////////
-        // Resolve the dead objects. 
+        // Resolve the dead objects.
 
         BOOST_FOREACH(iterator const& it, dead_list)
         {
@@ -819,9 +814,9 @@ void primary_namespace::decrement(
             {
                 naming::gid_type query = boost::icl::lower(super);
 
-                // Resolve the query GID. 
+                // Resolve the query GID.
                 boost::fusion::vector2<naming::gid_type, gva>
-                    r = resolve_gid_locked(query, ec); 
+                    r = resolve_gid_locked(query, ec);
 
                 if (ec)
                     return;
@@ -853,12 +848,12 @@ void primary_namespace::decrement(
 
                 // Determine how much of the mapping's keyspace this GVA covers.
                 // Note that at_c<1>(r).countmust be greater than 0 if we've
-                // reached this point in the code. 
+                // reached this point in the code.
                 naming::gid_type sub_upper(at_c<0>(r) + (at_c<1>(r).count - 1));
 
                 // If this GVA ends after the keyspace, we just set the upper
-                // limit to the end of the keyspace. 
-                if (sub_upper > boost::icl::upper(super)) 
+                // limit to the end of the keyspace.
+                if (sub_upper > boost::icl::upper(super))
                     sub_upper = boost::icl::upper(super);
 
                 BOOST_ASSERT(query <= sub_upper);
@@ -867,7 +862,7 @@ void primary_namespace::decrement(
                 // instead we use the GID that we queried the GVA table with.
                 // This ensures that GVAs which cover a range that begins before
                 // our keyspace are handled properly.
-                key_type const sub(query, sub_upper); 
+                key_type const sub(query, sub_upper);
 
                 LAGAS_(info) << (boost::format(
                     "primary_namespace::decrement, resolved match, lower(%1%), "
@@ -881,12 +876,12 @@ void primary_namespace::decrement(
                 // Compute the length of sub.
                 naming::gid_type const length = boost::icl::length(sub);
 
-                // Fully resolve the range. 
-                gva const g = at_c<1>(r).resolve(query, at_c<0>(r)); 
+                // Fully resolve the range.
+                gva const g = at_c<1>(r).resolve(query, at_c<0>(r));
 
                 // Add the information needed to destroy these components to the
                 // free list.
-                free_list.push_back(free_entry(g, query, length)); 
+                free_list.push_back(free_entry(g, query, length));
             }
 
             // If this is just a partial match, we need to split it up with a
@@ -920,7 +915,7 @@ void primary_namespace::decrement(
                 % at_c<1>(e) % at_c<0>(e) % at_c<2>(e));
             continue;
         }
- 
+
         LAGAS_(info) << (boost::format(
             "primary_namespace::decrement, freeing component%1%, lower(%2%), "
             "upper(%3%), base(%4%), gva(%5%), count(%6%)")
@@ -938,14 +933,14 @@ void primary_namespace::decrement(
         // FIXME: Resolve the locality instead of deducing it from the
         // target GID, otherwise this will break once we start moving
         // objects.
-        if (agas_prefix_ == naming::get_locality_from_gid(at_c<1>(e))) 
+        if (agas_prefix_ == naming::get_locality_from_gid(at_c<1>(e)))
         {
             naming::address rts_addr(at_c<0>(e).endpoint,
                 components::component_runtime_support,
                 get_runtime_support_ptr());
 
             applier::apply_l<action_type>
-                (rts_addr, type_, at_c<1>(e), at_c<2>(e)); 
+                (rts_addr, type_, at_c<1>(e), at_c<2>(e));
         }
 
         else
@@ -960,7 +955,7 @@ void primary_namespace::decrement(
                 naming::id_type::unmanaged);
 
             applier::apply_r<action_type>
-                (rts_addr, prefix_, type_, at_c<1>(e), at_c<2>(e)); 
+                (rts_addr, prefix_, type_, at_c<1>(e), at_c<2>(e));
         }
     }
 
@@ -1002,7 +997,7 @@ primary_namespace::resolve_gid_locked(
     )
 { // {{{ resolve_gid implementation
     // parameters
-    naming::gid_type id = gid; 
+    naming::gid_type id = gid;
     naming::strip_credit_from_gid(id);
 
     gva_table_type::const_iterator it = gvas_.lower_bound(id)

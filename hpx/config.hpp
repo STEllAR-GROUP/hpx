@@ -97,7 +97,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS)
-#  define HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS 4096 
+#  define HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS 4096
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -324,7 +324,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_AGAS_BOOTSTRAP_PREFIX   1U
+#define HPX_AGAS_BOOTSTRAP_PREFIX   0U
 #define HPX_AGAS_PRIMARY_NS_MSB     0x0000000100000001ULL
 #define HPX_AGAS_PRIMARY_NS_LSB     0x0000000000000001ULL
 #define HPX_AGAS_COMPONENT_NS_MSB   0x0000000100000001ULL

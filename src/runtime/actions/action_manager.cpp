@@ -30,8 +30,10 @@ namespace hpx { namespace actions
         if (parcel_handler.get_parcel(p))  // if new parcel is found
         {
             while (threads::threadmanager_is(starting))
+            {
                 boost::this_thread::sleep(boost::get_system_time() +
                     boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
+            }
 
             // Give up if we're shutting down.
             if (threads::threadmanager_is(stopping))
@@ -96,8 +98,7 @@ namespace hpx { namespace actions
                 // and the local-virtual address with the TM only
                     threads::thread_init_data data;
                     appl_.get_thread_manager().register_work(
-                        act->get_thread_init_data(lva, data),
-                        threads::thread_state(threads::pending));
+                        act->get_thread_init_data(lva, data), threads::pending);
                 }
                 else {
                 // this parcel carries a continuation, register a wrapper which
@@ -106,7 +107,7 @@ namespace hpx { namespace actions
                     threads::thread_init_data data;
                     appl_.get_thread_manager().register_work(
                         act->get_thread_init_data(cont, lva, data),
-                        threads::thread_state(threads::pending));
+                        threads::pending);
                 }
             }
         }
