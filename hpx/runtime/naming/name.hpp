@@ -16,8 +16,8 @@
 #include <boost/cstdint.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/serialization.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/enable_shared_from_this.hpp>
+#include <boost/intrusive_ptr.hpp>
+#include <boost/detail/atomic_count.hpp>
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
@@ -238,14 +238,14 @@ namespace hpx { namespace naming
 
     inline gid_type get_gid_from_prefix(boost::uint32_t prefix)
     {
-        return gid_type(boost::uint64_t(prefix) << 32, 0);
+        return gid_type(boost::uint64_t(prefix+1) << 32, 0);
     }
 
     inline boost::uint32_t get_prefix_from_gid(gid_type const& id) HPX_PURE;
 
     inline boost::uint32_t get_prefix_from_gid(gid_type const& id)
     {
-        return boost::uint32_t(id.get_msb() >> 32);
+        return boost::uint32_t(id.get_msb() >> 32)-1;
     }
 
     inline gid_type get_locality_from_gid(gid_type const& id)
@@ -329,86 +329,21 @@ namespace hpx { namespace naming
         return (id.get_msb() & gid_type::was_split_mask) ? true : false;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    gid_type const invalid_gid = gid_type();
+    ///////////////////////////////////////////////////////////////////////
+    inline bool is_local_address(gid_type const& gid, gid_type const& prefix) HPX_PURE;
 
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
+    inline bool is_local_address(gid_type const& gid, gid_type const& prefix)
     {
-        struct HPX_EXPORT id_type_impl
-          : public gid_type
-        {
-            explicit id_type_impl (boost::uint64_t lsb_id = 0)
-              : gid_type(0, lsb_id), address_()
-            {}
-
-            explicit id_type_impl (boost::uint64_t msb_id, boost::uint64_t lsb_id)
-              : gid_type(msb_id, lsb_id), address_()
-            {}
-
-            explicit id_type_impl (gid_type const& gid)
-              : gid_type(gid), address_()
-            {}
-
-            explicit id_type_impl (boost::uint64_t msb_id, boost::uint64_t lsb_id,
-                locality const& l, naming::address::component_type type,
-                naming::address::address_type a)
-              : gid_type(msb_id, lsb_id), address_(l, type, a)
-            {}
-
-            bool is_local_cached();
-            bool is_cached() const;
-            bool is_local();
-            bool is_local_c_cache();
-            bool resolve(naming::address& addr);
-            bool resolve_c();
-            bool resolve_c(naming::address& addr);
-            bool is_resolved() const { return address_; }
-            bool get_local_address(naming::address& addr)
-            {
-                if (!is_local_cached() && !resolve())
-                    return false;
-                gid_type::mutex_type::scoped_lock l(this);
-                addr = address_;
-                return true;
-            }
-
-            bool get_local_address_c_cache(naming::address& addr)
-            {
-                if (!is_local_cached() && !resolve_c())
-                    return false;
-                gid_type::mutex_type::scoped_lock l(this);
-                addr = address_;
-                return true;
-            }
-
-            bool get_address_cached(naming::address& addr) const
-            {
-                if (!is_cached())
-                    return false;
-                gid_type::mutex_type::scoped_lock l(this);
-                addr = address_;
-                return true;
-            }
-
-            // cached resolved address
-            naming::address address_;
-
-        protected:
-            bool resolve();
-        };
-
-        // custom deleter for id_type_impl above
-        void HPX_EXPORT gid_managed_deleter (id_type_impl* p);
-        void HPX_EXPORT gid_unmanaged_deleter (id_type_impl* p);
-        void HPX_EXPORT gid_transmission_deleter (id_type_impl* p);
+        return strip_credit_from_gid(gid.get_msb()) == prefix.get_msb();
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // the local gid is actually just a wrapper around the real thing
-    struct HPX_EXPORT id_type
+    gid_type const invalid_gid = gid_type();
+
+    namespace detail
     {
-        enum management_type
+        ///////////////////////////////////////////////////////////////////////
+        enum id_type_management
         {
             unknown_deleter = -1,
             unmanaged = 0,          // unmanaged GID
@@ -417,13 +352,23 @@ namespace hpx { namespace naming
                                     // inside the parcelhandler
         };
 
-        typedef void (*deleter_type)(detail::id_type_impl*);
+        // forward declaration
+        struct HPX_EXPORT id_type_impl;
 
-    private:
-        static deleter_type get_deleter(management_type t)
+        // custom deleter for id_type_impl above
+        void HPX_EXPORT gid_managed_deleter (id_type_impl* p);
+        void HPX_EXPORT gid_unmanaged_deleter (id_type_impl* p);
+        void HPX_EXPORT gid_transmission_deleter (id_type_impl* p);
+
+        ///////////////////////////////////////////////////////////////////////
+        struct HPX_EXPORT id_type_impl : gid_type
         {
-            switch (t)
+        private:
+            typedef void (*deleter_type)(detail::id_type_impl*);
+
+            static deleter_type get_deleter(id_type_management t)
             {
+                switch (t) {
                 case unmanaged:
                     return &detail::gid_unmanaged_deleter;
                 case managed:
@@ -431,46 +376,155 @@ namespace hpx { namespace naming
                 case transmission:
                     return &detail::gid_transmission_deleter;
                 default:
-                    return 0;
-            };
+                    BOOST_ASSERT(false);          // invalid management type
+                    return &detail::gid_unmanaged_deleter;
+                };
+                return 0;
+            }
+
+        public:
+            explicit id_type_impl (boost::uint64_t lsb_id, id_type_management t)
+              : gid_type(0, lsb_id), count_(0), type_(t)
+            {}
+
+            explicit id_type_impl (boost::uint64_t msb_id, boost::uint64_t lsb_id,
+                    id_type_management t)
+              : gid_type(msb_id, lsb_id), count_(0), type_(t)
+            {}
+
+            explicit id_type_impl (gid_type const& gid, id_type_management t)
+              : gid_type(gid), count_(0), type_(t)
+            {}
+
+            id_type_management get_management_type() const
+            {
+                return type_;
+            }
+
+//             explicit id_type_impl (boost::uint64_t msb_id, boost::uint64_t lsb_id,
+//                 locality const& l, naming::address::component_type type,
+//                 naming::address::address_type a)
+//               : gid_type(msb_id, lsb_id), address_(l, type, a)
+//             {}
+//
+//             bool resolve(naming::address& addr);
+//             bool is_resolved() const { return address_; }
+//
+//             bool resolve_c();
+//             bool resolve_c(naming::address& addr);
+//
+//             bool get_local_address(naming::address& addr)
+//             {
+//                 if (!is_local_cached() && !resolve())
+//                     return false;
+//                 gid_type::mutex_type::scoped_lock l(this);
+//                 addr = address_;
+//                 return true;
+//             }
+//
+//             bool get_local_address_c_cache(naming::address& addr)
+//             {
+//                 if (!is_local_cached() && !resolve_c())
+//                     return false;
+//                 gid_type::mutex_type::scoped_lock l(this);
+//                 addr = address_;
+//                 return true;
+//             }
+//
+//             bool get_address_cached(naming::address& addr) const
+//             {
+//                 if (!is_cached())
+//                     return false;
+//                 gid_type::mutex_type::scoped_lock l(this);
+//                 addr = address_;
+//                 return true;
+//             }
+//
+//             // cached resolved address
+//             naming::address address_;
+//
+//         protected:
+//             bool is_local_cached();
+//             bool is_cached() const;
+//
+//             bool is_local();
+//             bool is_local_c_cache();
+//
+//             bool resolve();
+
+        private:
+            friend void intrusive_ptr_add_ref(id_type_impl* p);
+            friend void intrusive_ptr_release(id_type_impl* p);
+
+            boost::detail::atomic_count count_;
+            id_type_management type_;
+        };
+
+        /// support functions for boost::intrusive_ptr
+        inline void intrusive_ptr_add_ref(id_type_impl* p)
+        {
+            ++p->count_;
         }
 
+        inline void intrusive_ptr_release(id_type_impl* p)
+        {
+            if (0 == --p->count_)
+                id_type_impl::get_deleter(p->get_management_type())(p);
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // the local gid is actually just a wrapper around the real thing
+    struct HPX_EXPORT id_type
+    {
     public:
+        enum management_type
+        {
+            unknown_deleter = detail::unknown_deleter,
+            unmanaged = detail::unmanaged,          ///< unmanaged GID
+            managed = detail::managed,              ///< managed GID
+            transmission = detail::transmission     ///< special deleter for temporaries created
+                                                    ///< inside the parcelhandler
+        };
+
         id_type() {}
 
-        explicit id_type(boost::uint64_t lsb_id, management_type t/* = unmanaged*/)
-          : gid_(new detail::id_type_impl(0, lsb_id), get_deleter(t))
+        explicit id_type(boost::uint64_t lsb_id, management_type t)
+          : gid_(new detail::id_type_impl(0, lsb_id,
+                static_cast<detail::id_type_management>(t)))
         {}
 
-        explicit id_type(gid_type const& gid, management_type t/* = unmanaged*/)
-          : gid_(new detail::id_type_impl(gid), get_deleter(t))
+        explicit id_type(gid_type const& gid, management_type t)
+          : gid_(new detail::id_type_impl(gid,
+                static_cast<detail::id_type_management>(t)))
         {
             BOOST_ASSERT(get_credit_from_gid(*gid_) || t == unmanaged ||
-                         t == transmission);
-        }
-
-        explicit id_type(boost::uint64_t msb_id, boost::uint64_t lsb_id
-                       , management_type t/* = unmanaged*/)
-          : gid_(new detail::id_type_impl(msb_id, lsb_id), get_deleter(t))
-        {
-            BOOST_ASSERT(get_credit_from_gid(*gid_) || t == unmanaged ||
-                         t == transmission);
+                t == transmission);
         }
 
         explicit id_type(boost::uint64_t msb_id, boost::uint64_t lsb_id,
-              locality const& l, naming::address::component_type type_,
-              naming::address::address_type a, management_type t/* = unmanaged*/)
-          : gid_(new detail::id_type_impl(msb_id, lsb_id, l, type_, a),
-                         get_deleter(t))
+                management_type t)
+          : gid_(new detail::id_type_impl(msb_id, lsb_id,
+                static_cast<detail::id_type_management>(t)))
         {
             BOOST_ASSERT(get_credit_from_gid(*gid_) || t == unmanaged ||
-                         t == transmission);
+                t == transmission);
         }
+
+//         explicit id_type(boost::uint64_t msb_id, boost::uint64_t lsb_id,
+//               locality const& l, naming::address::component_type type_,
+//               naming::address::address_type a, id_type_management t/* = unmanaged*/)
+//           : gid_(new detail::id_type_impl(msb_id, lsb_id, l, type_, a),
+//                          get_deleter(t))
+//         {
+//             BOOST_ASSERT(get_credit_from_gid(*gid_) || t == unmanaged ||
+//                          t == transmission);
+//         }
 
         gid_type& get_gid() { return *gid_; }
         gid_type const& get_gid() const { return *gid_; }
 
-        management_type get_management_type() const;
+//         id_type_management get_management_type() const;
 
         id_type& operator++()       // pre-increment
         {
@@ -577,39 +631,39 @@ namespace hpx { namespace naming
         }
 
         ///////////////////////////////////////////////////////////////////////
-        bool is_local_cached() const
-        {
-            return gid_->is_local_cached();
-        }
-        bool is_local() const
-        {
-            return gid_->is_local();
-        }
-        bool is_local_c_cache() const
-        {
-            return gid_->is_local_c_cache();
-        }
-        bool get_local_address(naming::address& addr) const
-        {
-            return gid_->get_local_address(addr);
-        }
-        bool get_local_address_c_cache(naming::address& addr) const
-        {
-            return gid_->get_local_address_c_cache(addr);
-        }
-        bool get_address_cached(naming::address& addr) const
-        {
-            return gid_->get_address_cached(addr);
-        }
-
-        bool resolve(address& addr)
-        {
-            return gid_->resolve(addr);
-        }
-        bool is_resolved() const
-        {
-            return gid_->is_resolved();
-        }
+//         bool is_local_cached() const
+//         {
+//             return gid_->is_local_cached();
+//         }
+//         bool is_local() const
+//         {
+//             return gid_->is_local();
+//         }
+//         bool is_local_c_cache() const
+//         {
+//             return gid_->is_local_c_cache();
+//         }
+//         bool get_local_address(naming::address& addr) const
+//         {
+//             return gid_->get_local_address(addr);
+//         }
+//         bool get_local_address_c_cache(naming::address& addr) const
+//         {
+//             return gid_->get_local_address_c_cache(addr);
+//         }
+//         bool get_address_cached(naming::address& addr) const
+//         {
+//             return gid_->get_address_cached(addr);
+//         }
+//
+//         bool resolve(address& addr)
+//         {
+//             return gid_->resolve(addr);
+//         }
+//         bool is_resolved() const
+//         {
+//             return gid_->is_resolved();
+//         }
 
     private:
         friend std::ostream& operator<< (std::ostream& os, id_type const& id);
@@ -624,7 +678,7 @@ namespace hpx { namespace naming
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()
 
-        boost::shared_ptr<detail::id_type_impl> gid_;
+        boost::intrusive_ptr<detail::id_type_impl> gid_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -640,14 +694,14 @@ namespace hpx { namespace naming
 
     inline id_type get_id_from_prefix(boost::uint32_t prefix)
     {
-        return id_type(boost::uint64_t(prefix) << 32, 0, id_type::unmanaged);
+        return id_type(boost::uint64_t(prefix+1) << 32, 0, id_type::unmanaged);
     }
 
     inline boost::uint32_t get_prefix_from_id(id_type const& id) HPX_PURE;
 
     inline boost::uint32_t get_prefix_from_id(id_type const& id)
     {
-        return boost::uint32_t(id.get_msb() >> 32);
+        return boost::uint32_t(id.get_msb() >> 32)-1;
     }
 
     inline id_type get_locality_from_id(id_type const& id)
@@ -660,7 +714,7 @@ namespace hpx { namespace naming
 
     inline bool is_local_address(id_type const& gid, id_type const& prefix)
     {
-        return strip_credit_from_gid(gid.get_msb()) == prefix.get_msb();
+        return is_local_address(gid.get_gid(), prefix.get_gid());
     }
 
     ///////////////////////////////////////////////////////////////////////

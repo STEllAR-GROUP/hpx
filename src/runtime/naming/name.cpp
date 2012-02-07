@@ -21,11 +21,11 @@ namespace hpx { namespace naming
 {
     namespace detail
     {
-        // thread function called while serializing a gid
-        void increment_refcnt(id_type id)
-        {
-            applier::get_applier().get_agas_client().incref(id.get_gid());
-        }
+//         // thread function called while serializing a gid
+//         void increment_refcnt(id_type id)
+//         {
+//             applier::get_applier().get_agas_client().incref(id.get_gid());
+//         }
 
         void decrement_refcnt(detail::id_type_impl* p)
         {
@@ -34,7 +34,8 @@ namespace hpx { namespace naming
             // Alternatively we need to go this way if the id has never been
             // resolved, which means we don't know anything about the component
             // type.
-            if (gid_was_split(*p) || !p->is_resolved()) {
+            //if (gid_was_split(*p) || !p->is_resolved())
+            {
                 // guard for wait_abort and other shutdown issues
                 try {
                     // decrement global reference count for the given gid,
@@ -54,16 +55,16 @@ namespace hpx { namespace naming
                         << e.what();
                 }
             }
-            else {
-                // If the gid was not split at any point in time we can assume
-                // that the referenced object is fully local.
-                components::component_type t =
-                    static_cast<components::component_type>(p->address_.type_);
-
-                BOOST_ASSERT(t != components::component_invalid);
-                // Third parameter is the count of how many components to destroy.
-                components::stubs::runtime_support::free_component_sync(t, *p, 1); 
-            }
+//             else {
+//                 // If the gid was not split at any point in time we can assume
+//                 // that the referenced object is fully local.
+//                 components::component_type t =
+//                     static_cast<components::component_type>(p->address_.type_);
+//
+//                 BOOST_ASSERT(t != components::component_invalid);
+//                 // Third parameter is the count of how many components to destroy.
+//                 components::stubs::runtime_support::free_component_sync(t, *p, 1);
+//             }
             delete p;   // delete local gid representation in any case
         }
 
@@ -110,138 +111,136 @@ namespace hpx { namespace naming
             delete p;   // delete local gid representation only
         }
 
-        bool id_type_impl::is_local_cached()
-        {
-            applier::applier& appl = applier::get_applier();
-            gid_type::mutex_type::scoped_lock l(this);
-            return address_ ? address_.locality_ == appl.here() : false;
-        }
-
-        bool id_type_impl::is_cached() const
-        {
-            gid_type::mutex_type::scoped_lock l(this);
-            return address_ ? true : false;
-        }
-
-        bool id_type_impl::is_local()
-        {
-//             if (applier::get_applier().get_agas_client().is_smp_mode())
+//         bool id_type_impl::is_local_cached()
+//         {
+//             applier::applier& appl = applier::get_applier();
+//             gid_type::mutex_type::scoped_lock l(this);
+//             return address_ ? address_.locality_ == appl.here() : false;
+//         }
+//
+//         bool id_type_impl::is_cached() const
+//         {
+//             gid_type::mutex_type::scoped_lock l(this);
+//             return address_ ? true : false;
+//         }
+//
+//         bool id_type_impl::is_local()
+//         {
+//             bool valid = false;
+//             {
+//                 gid_type::mutex_type::scoped_lock l(this);
+//                 valid = address_ ? true : false;
+//             }
+//
+//             if (!valid && !resolve())
+//                 return false;
+//
+//             // is_local_cached()
+//             applier::applier& appl = applier::get_applier();
+//             gid_type::mutex_type::scoped_lock l(this);
+//             return address_.locality_ == appl.here();
+//         }
+//
+//         // check just local cache_
+//         bool id_type_impl::is_local_c_cache()
+//         {
+//             bool valid = false;
+//             {
+//                 gid_type::mutex_type::scoped_lock l(this);
+//                 valid = address_ ? true : false;
+//             }
+//
+//             if (!valid && !resolve_c())
+//                 return false;
+//
+//             applier::applier& appl = applier::get_applier();
+//             gid_type::mutex_type::scoped_lock l(this);
+//             return address_.locality_ == appl.here();
+//         }
+//
+//         bool id_type_impl::resolve(naming::address& addr)
+//         {
+//             bool valid = false;
+//             {
+//                 gid_type::mutex_type::scoped_lock l(this);
+//                 valid = address_ ? true : false;
+//             }
+//
+//             // if it already has been resolved, just return the address
+//             if (!valid && !resolve())
+//                 return false;
+//
+//             addr = address_;
+//             return true;
+//         }
+//
+//         bool id_type_impl::resolve_c(naming::address& addr)
+//         {
+//             bool valid = false;
+//             {
+//                 gid_type::mutex_type::scoped_lock l(this);
+//                 valid = address_ ? true : false;
+//             }
+//
+//             // if it already has been resolved, just return the address
+//             if (!valid && !resolve_c())
+//                 return false;
+//
+//             addr = address_;
+//             return true;
+//         }
+//
+//         bool id_type_impl::resolve()
+//         {
+//             // call only if not already resolved
+//             applier::applier& appl = applier::get_applier();
+//
+//             error_code ec;
+//             address addr;
+//             if (appl.get_agas_client().resolve(*this, addr, true, ec) && !ec)
+//             {
+//                 gid_type::mutex_type::scoped_lock l(this);
+//                 address_ = addr;
 //                 return true;
-
-            bool valid = false;
-            {
-                gid_type::mutex_type::scoped_lock l(this);
-                valid = address_ ? true : false;
-            }
-
-            if (!valid && !resolve())
-                return false;
-
-            applier::applier& appl = applier::get_applier();
-            gid_type::mutex_type::scoped_lock l(this);
-            return address_.locality_ == appl.here();
-        }
-
-        // check just local cache_
-        bool id_type_impl::is_local_c_cache()
-        {
-            bool valid = false;
-            {
-                gid_type::mutex_type::scoped_lock l(this);
-                valid = address_ ? true : false;
-            }
-
-            if (!valid && !resolve_c())
-                return false;
-
-            applier::applier& appl = applier::get_applier();
-            gid_type::mutex_type::scoped_lock l(this);
-            return address_.locality_ == appl.here();
-        }
-
-        bool id_type_impl::resolve(naming::address& addr)
-        {
-            bool valid = false;
-            {
-                gid_type::mutex_type::scoped_lock l(this);
-                valid = address_ ? true : false;
-            }
-
-            // if it already has been resolved, just return the address
-            if (!valid && !resolve())
-                return false;
-
-            addr = address_;
-            return true;
-        }
-
-        bool id_type_impl::resolve_c(naming::address& addr)
-        {
-            bool valid = false;
-            {
-                gid_type::mutex_type::scoped_lock l(this);
-                valid = address_ ? true : false;
-            }
-
-            // if it already has been resolved, just return the address
-            if (!valid && !resolve_c())
-                return false;
-
-            addr = address_;
-            return true;
-        }
-
-        bool id_type_impl::resolve()
-        {
-            // call only if not already resolved
-            applier::applier& appl = applier::get_applier();
-
-            error_code ec;
-            address addr;
-            if (appl.get_agas_client().resolve(*this, addr, true, ec) && !ec)
-            {
-                gid_type::mutex_type::scoped_lock l(this);
-                address_ = addr;
-                return true;
-            }
-            return false;
-        }
-
-        bool id_type_impl::resolve_c()
-        {
-            // call only if not already resolved
-            applier::applier& appl = applier::get_applier();
-
-            error_code ec;
-            address addr;
-            if (appl.get_agas_client().resolve_cached(*this, addr, ec) && !ec)
-            {
-                gid_type::mutex_type::scoped_lock l(this);
-                address_ = addr;
-                return true;
-            }
-            return false;
-        }
+//             }
+//             return false;
+//         }
+//
+//         bool id_type_impl::resolve_c()
+//         {
+//             // call only if not already resolved
+//             applier::applier& appl = applier::get_applier();
+//
+//             error_code ec;
+//             address addr;
+//             if (appl.get_agas_client().resolve_cached(*this, addr, ec) && !ec)
+//             {
+//                 gid_type::mutex_type::scoped_lock l(this);
+//                 address_ = addr;
+//                 return true;
+//             }
+//             return false;
+//         }
     }   // detail
 
-    id_type::management_type id_type::get_management_type() const
-    {
-        if (!gid_)
-            return unknown_deleter;
-
-        deleter_type* d = boost::get_deleter<deleter_type>(gid_);
-
-        if (!d)
-            return unknown_deleter;
-
-        if (*d == &detail::gid_managed_deleter)
-            return managed;
-        else if (*d == &detail::gid_unmanaged_deleter)
-            return unmanaged;
-        else if (*d == &detail::gid_transmission_deleter)
-            return transmission;
-        return unknown_deleter;
-    }
+//     id_type_management id_type::get_management_type() const
+//     {
+//         if (!gid_)
+//             return unknown_deleter;
+//
+//         deleter_type* d = boost::get_deleter<deleter_type>(gid_);
+//
+//         if (!d)
+//             return unknown_deleter;
+//
+//         if (*d == &detail::gid_managed_deleter)
+//             return managed;
+//         else if (*d == &detail::gid_unmanaged_deleter)
+//             return unmanaged;
+//         else if (*d == &detail::gid_transmission_deleter)
+//             return transmission;
+//         return unknown_deleter;
+//     }
 
     template <class Archive>
     void id_type::save(Archive& ar, const unsigned int version) const
@@ -249,8 +248,8 @@ namespace hpx { namespace naming
         bool isvalid = gid_ ? true : false;
         ar << isvalid;
         if (isvalid) {
-            management_type m = get_management_type();
             gid_type const& g = *gid_;
+            detail::id_type_management m = gid_->get_management_type();
             ar << m;
             ar << g;
         }
@@ -262,27 +261,27 @@ namespace hpx { namespace naming
         if (version > HPX_IDTYPE_VERSION)
         {
             HPX_THROW_EXCEPTION(version_too_new, "id_type::load",
-                "trying to load id_type with unknown version");
+                "trying to load id_type of unknown version");
         }
 
         bool isvalid;
         ar >> isvalid;
         if (isvalid) {
-            management_type m;
-            gid_type g;
+            detail::id_type_management m;
             ar >> m;
 
-            if (unknown_deleter == m)
+            if (detail::unknown_deleter == m)
             {
                 HPX_THROW_EXCEPTION(version_too_new, "id_type::load",
                     "trying to load id_type with unknown deleter");
             }
 
-            if (transmission == m)
-                m = managed;
+            if (detail::transmission == m)
+                m = detail::managed;
 
+            gid_type g;
             ar >> g;
-            gid_.reset(new detail::id_type_impl(g), get_deleter(m));
+            gid_.reset(new detail::id_type_impl(g, m));
         }
     }
 

@@ -309,7 +309,7 @@ namespace hpx { namespace parcelset
         performance_counters::install_counter_types(
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
 
-        boost::uint32_t const prefix = applier::get_applier().get_prefix_id()-1;
+        boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
         boost::format parcel_count("/parcels(locality#%d/total)/count/%s");
         boost::format queue_length("/parcelqueue(locality#%d/total)/length/instantaneous");
 

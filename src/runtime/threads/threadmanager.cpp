@@ -926,7 +926,7 @@ namespace hpx { namespace threads
         typedef threadmanager_impl ti;
 
         std::size_t const shepherd_count = threads_.size();
-        boost::uint32_t const prefix = applier::get_applier().get_prefix_id()-1;
+        boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
 
         boost::format total_queue_length("/queue(locality#%d/total)/length");
         boost::format total_avg_maint("/time(locality#%d/total)/idle-rate");

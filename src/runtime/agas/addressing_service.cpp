@@ -26,7 +26,7 @@ addressing_service::addressing_service(
   : console_cache_(0)
   , max_refcnt_requests_(ini_.get_agas_max_pending_refcnt_requests())
   , refcnt_requests_count_(0)
-  , refcnt_requests_(new refcnt_requests_type) 
+  , refcnt_requests_(new refcnt_requests_type)
   , resolve_throttle_(ini_.get_agas_max_resolve_requests())
   , service_type(ini_.get_agas_service_mode())
   , runtime_type(runtime_type_)
@@ -790,6 +790,20 @@ bool addressing_service::unbind_range(
     }
 } // }}}
 
+/// This function will test whether the given address refers to an object
+/// living on the locality of the caller.
+bool addressing_service::is_local_address(
+    naming::gid_type const& id
+  , error_code& ec
+    )
+{
+    // For now we fall back to the primitive implementation which just compares
+    // the prefixes. That will have to be changed, though.
+    if (&ec != &throws)
+        ec = make_success_code();
+    return naming::is_local_address(id, local_prefix());
+}
+
 bool addressing_service::resolve(
     naming::gid_type const& id
   , naming::address& addr
@@ -801,8 +815,7 @@ bool addressing_service::resolve(
         // {{{ special cases
 
         // LVA-encoded GIDs (located on this machine)
-        if (naming::strip_credit_from_gid(id.get_msb())
-            == local_prefix().get_msb())
+        if (is_local_address(id))
         {
             addr.locality_ = here_;
 
@@ -924,7 +937,7 @@ bool addressing_service::resolve_cached(
     // {{{ special cases
 
     // LVA-encoded GIDs (located on this machine)
-    if (naming::strip_credit_from_gid(id.get_msb()) == local_prefix().get_msb())
+    if (is_local_address(id))
     {
         addr.locality_ = here_;
 
@@ -1263,7 +1276,7 @@ void addressing_service::update_cache(
     try {
         // The entry in AGAS for a locality's RTS component has a count of 0,
         // so we convert it to 1 here so that the cache doesn't break.
-        const boost::uint64_t count = (g.count ? g.count : 1); 
+        const boost::uint64_t count = (g.count ? g.count : 1);
 
         LAS_(debug) <<
             ( boost::format("updating cache, gid(%1%), count(%2%)")
@@ -1337,7 +1350,7 @@ void addressing_service::install_counters()
     performance_counters::install_counter_types(
         counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
 
-    boost::uint32_t const prefix = applier::get_applier().get_prefix_id()-1;
+    boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
     boost::format cache_statistics("/agas(locality#%d/total)/cache/%s");
 
     performance_counters::raw_counter_data const counters[] =
@@ -1377,7 +1390,7 @@ void addressing_service::increment_refcnt_requests(
         return;
     }
 
-    if (max_refcnt_requests_ == ++refcnt_requests_count_) 
+    if (max_refcnt_requests_ == ++refcnt_requests_count_)
         send_refcnt_requests(l, ec);
 
     else if (&ec != &throws)
@@ -1414,7 +1427,7 @@ void addressing_service::send_refcnt_requests(
             typedef server::primary_namespace::bulk_service_action
                 action_type;
             applier::apply_l_p<action_type>
-                (primary_ns_addr_, action_priority_, requests); 
+                (primary_ns_addr_, action_priority_, requests);
         }
 
         else

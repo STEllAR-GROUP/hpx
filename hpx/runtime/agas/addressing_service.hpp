@@ -101,7 +101,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
           , gva_cache_key const& rhs
             )
         {
-            return boost::icl::exclusive_less(lhs.key_, rhs.key_); 
+            return boost::icl::exclusive_less(lhs.key_, rhs.key_);
         }
 
         friend bool operator==(
@@ -112,12 +112,12 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
             // Is lhs in rhs?
             if (1 == lhs.get_count() && 1 != rhs.get_count())
                 return boost::icl::contains(rhs.key_, lhs.key_);
- 
+
             // Is rhs in lhs?
             else if (1 != lhs.get_count() && 1 == rhs.get_count())
                 return boost::icl::contains(lhs.key_, lhs.key_);
 
-            // Direct hit 
+            // Direct hit
             return lhs.key_ == rhs.key_;
         }
     }; // }}}
@@ -157,7 +157,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     // }}}
 
     typedef boost::lockfree::fifo<lcos::promise<response>*> promise_pool_type;
-    
+
     typedef util::merging_map<naming::gid_type, boost::int64_t>
         refcnt_requests_type;
 
@@ -770,6 +770,29 @@ public:
         naming::gid_type const& lower_id
       , boost::uint64_t count
       , naming::address& addr
+      , error_code& ec = throws
+        );
+
+    /// \brief Test whether the given address refers to a local object.
+    ///
+    /// This function will test whether the given address refers to an object
+    /// living on the locality of the caller.
+    ///
+    /// \param addr       [in] The address to test.
+    /// \param ec         [in,out] this represents the error status on exit,
+    ///                   if this is pre-initialized to \a hpx#throws
+    ///                   the function will throw on error instead.
+    /// \returns          This function returns \a true if the passed address
+    ///                   refers to an object which lives on the locality of
+    ///                   the caller.
+    ///
+    /// \note             As long as \a ec is not pre-initialized to
+    ///                   \a hpx#throws this function doesn't
+    ///                   throw but returns the result code using the
+    ///                   parameter \a ec. Otherwise it throws an instance
+    ///                   of hpx#exception.
+    bool addressing_service::is_local_address(
+        naming::gid_type const& id
       , error_code& ec = throws
         );
 
