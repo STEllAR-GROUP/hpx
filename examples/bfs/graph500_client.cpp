@@ -48,14 +48,6 @@ init(hpx::components::server::distributing_factory::iterator_range_type const& r
     }
 }
 
-// this routine mirrors the matlab validation routine
-int validate(std::vector<std::size_t> const& parent,
-             std::vector<std::size_t> const& levels,
-             std::vector<std::size_t> const& parentindex,
-             std::vector<std::size_t> const& nodelist,
-             std::vector<std::size_t> const& neighborlist,
-             std::size_t searchkey,std::size_t &num_edges);
-
 void get_statistics(std::vector<double> const& x, double &minimum, double &mean,
                     double &stdev, double &firstquartile,
                     double &median, double &thirdquartile, double &maximum);
