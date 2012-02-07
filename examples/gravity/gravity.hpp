@@ -27,6 +27,9 @@ class point {
   double fy; //force in the y direction
   double fz; //force in the z direction
   double ft; //the sum of the forces
+};  
+
+struct components {
   double d;  //distance
   double xc; //x-component
   double yc; //y-component
@@ -38,6 +41,7 @@ struct config_f {
  string output;
  int steps;
  int timestep;
+ int print;
  int num_cores;
 
  template <typename Archive>

@@ -75,14 +75,13 @@ namespace boost
 ///////////////////////////////////////////////////////////////////////////////
 //Forward Declarations
 vector<promise<void> > calc(int k,int t);
-vector<point> dist(int t,int i,int l);
+vector<components> dist(int t,int i,int l);
 void move(vector<promise<void> > const& cfp,config_f const& param,int k,int t);
-//void printval(promise<void> const & mp,int k,int t,ofstream &coorfile,
-//               ofstream &trbst);
-void printval(promise<void> const & mp,config_f& param,int k,int t);///!!!!//
+void printval(promise<void> const & mp,config_f& param,int k,int t,
+               ofstream &coorfile, ofstream &trbst);///!!!!//
 void printfinalcoord(config_f& param,int k);
-void closefile(ofstream &coorfile,ofstream &trbst,ofstream &notes,
-               config_f& param,float ct);
+void closefile(ofstream &notes,config_f& param,float ct);
+void closedebugfile(ofstream &coorfile,ofstream &trbst); //closefile for debug
 void loadconfig(config_f& param,variables_map& vm);
 void setup(ofstream &coorfile,ofstream &trbst,int k);
 vector<point> createvecs(config_f& param);
@@ -122,6 +121,8 @@ int hpx_main(variables_map& vm)
 {
   {
      config_f param;
+     ofstream coorfile; //optional output file
+     ofstream trbst; //optional output file
      string j; // Buffer
      int k=0; //Number of points in simulation
      float ct=0; //Computation time
@@ -140,15 +141,15 @@ int hpx_main(variables_map& vm)
       cout<<"Cannot open input file!\n";
      }
 
-    // This section creates and opens the coordinate output file
-     ofstream coorfile;
-     j=param.output+".cf.txt";
-     coorfile.open(j.c_str());
-
-    //This section opens the trb output file
-     j=param.output+".trb.txt";
-     ofstream trbst;
-     trbst.open(j.c_str());
+     if (debug) {
+      // This section creates and opens the coordinate output file
+      j=param.output+".cf.txt";
+      coorfile.open(j.c_str());
+      
+      //This section opens the trb output file
+      j=param.output+".trb.txt";
+      trbst.open(j.c_str());
+     }
 
     //This section opens and creates a documentation output file
      j=param.output+".notes.txt";
@@ -158,23 +159,28 @@ int hpx_main(variables_map& vm)
     //This section sets up the rest of the program
      pts_timestep = vector<vector<point> >(param.steps+1,createvecs(param));
      k=pts_timestep[0].size();
-     setup(coorfile,trbst,k); // sets up the output files
-     
+     cout<<"Number of Points= "<<k<<"\n";
+     if (debug) { setup(coorfile,trbst,k); } // sets up the output files
      high_resolution_timer ht;
-    //This section outlines the program
+     
+     //This section outlines the program
      for (int t=0;t<param.steps;t++) {
       if (debug) cout<<"\nFor step "<<t<<":\n";
       cfp=calc(k,t);  //This is the calculation of force
       mp=move_future(find_here(),cfp,param,k,t);
-//      printval(mp,k,t,coorfile,trbst); //Writes output
-      printval(mp,param,k,t); //Writes output
+      printval(mp,param,k,t,coorfile,trbst); //Writes output
      }
-     printfinalcoord(param,k); ////////////!!!!!!!!!!!!////////////
+     printfinalcoord(param,k); 
      ct=ht.elapsed();
      cout<<"Computation Time: "<<ct<<" [s]\n";
-     closefile(coorfile,trbst,notes,param,ct);
+     closefile(notes,param,ct); //normal closefile
+cout<<"Hi! 1\n";
+     if (debug) { closedebugfile(coorfile,trbst); } //debug closefile
+cout<<"Hi 2\n";
  }
+cout<<"Hi 3\n";
  hpx::finalize();
+cout<<"Hi 4\n";
  return 0;
 }
 
@@ -200,7 +206,7 @@ vector<promise<void> > calc(int k,int t) {
  return cfp;
 }
 
-vector<point> dist(int t,int i,int l) {
+vector<components> dist(int t,int i,int l) {
  double rx; //distance in the x direction
  double ry; //distance in the y direction
  double rz; //distance in the z direction
@@ -213,7 +219,7 @@ vector<point> dist(int t,int i,int l) {
  r2t=(rx*rx)+(ry*ry)+(rz*rz);
  rt=sqrt(r2t);
 
- vector<point>comp(1);
+ vector<components>comp(1);
  
  comp[0].d=r2t;
  comp[0].xc=rx/rt;
@@ -255,25 +261,7 @@ void move(vector<promise<void> >const& cfp,config_f const & param,int k,int t) {
  }
 }
 
-#if 0
-void printval(promise<void> const & mp,int k,int t,
-               ofstream &coorfile, ofstream &trbst) {
- int tn=t+1;
- wait(mp);
- for (int i=0;i<k;i++) {
-  coorfile<<pts_timestep[tn][i].x<<","<<pts_timestep[tn][i].y<<","
-          <<pts_timestep[tn][i].z<<",";
-  trbst<<"v:,"<<pts_timestep[tn][i].vx<<","<<pts_timestep[tn][i].vy<<","
-       <<pts_timestep[tn][i].vz<<",";
-  trbst<<"f:,"<<pts_timestep[t][i].ft<<",";
- }
- coorfile<<'\n';
- trbst<<'\n';
-}
-#endif
-
-void closefile(ofstream &coorfile,ofstream &trbst,ofstream &notes,
-               config_f& param,float ct) {
+void closefile(ofstream &notes,config_f& param,float ct) {
  notes<<"Here are the notes of the "<<param.output<<" run:\n\n"
    <<"Input file: "<<param.input
    <<"\nNumber of steps: "<<param.steps
@@ -282,9 +270,12 @@ void closefile(ofstream &coorfile,ofstream &trbst,ofstream &notes,
    <<"\nComputation time: "<<ct
    <<"\n\nProgram version: gravity_hpx.3.4\n"; //REMEBER TO UPDATE THIS!!!!!
 
+ notes.close();
+}
+
+void closedebugfile(ofstream &coorfile,ofstream &trbst) { //debug overload
  coorfile.close();
  trbst.close();
- notes.close();
 }
 
 void loadconfig(config_f& param,variables_map& vm) {
@@ -301,22 +292,22 @@ void loadconfig(config_f& param,variables_map& vm) {
    sin>>param.steps;
   else if (line.find("timestep") != std::string::npos)
    sin>>param.timestep;
+  else if (line.find("print") != std::string::npos)
+   sin>>param.print;
  }
 }
 
 void setup(ofstream &coorfile,ofstream &trbst,int k) {
 //This section prints out the coordinants and sets up the output files.
- if (debug) cout<<'\n';
+ cout<<'\n';
  for (int i=0; i<k; ++i) {
-  if (debug) {
-   cout<<"Point "<<i<<": "<<'('<<pts_timestep[0][i].x<<','
-       <<pts_timestep[0][i].y<<','<<pts_timestep[0][i].z<<')'
-       <<" "<< pts_timestep[0][i].m<<'\n';
-  }
+  cout<<"Point "<<i<<": "<<'('<<pts_timestep[0][i].x<<','
+      <<pts_timestep[0][i].y<<','<<pts_timestep[0][i].z<<')'
+      <<" "<< pts_timestep[0][i].m<<'\n';
+ 
   coorfile<<"Pt:"<<i<<"     ";
   trbst<<"Pt:"<<i<<"                       ";
  }
- cout<<"Number of Points= "<<k<<"\n";
  coorfile<<'\n';
  trbst<<'\n';
  for (int p=0;p<k;p++) {
@@ -336,7 +327,7 @@ void calc_force(int k,int t,int i) {
  double mt; //the multiple of the masses
  double const g=6.673e-11; //the Gravitational Constant
  double F; //the force
- vector<point> comp2; //vector to copy unit vector info to
+ vector<components> comp2; //vector to copy unit vector info to
  
  for (int l=0;l<k;++l) { //moves through points 1-2, 1-3, etc.
   if (i != l) {
