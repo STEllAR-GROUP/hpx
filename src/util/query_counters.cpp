@@ -10,6 +10,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 
 #include <boost/assert.hpp>
+#include <boost/foreach.hpp>
 
 namespace hpx { namespace util
 {
@@ -18,7 +19,14 @@ namespace hpx { namespace util
       : out_(out), names_(names),
         timer_(boost::bind(&query_counters::evaluate, this),
             interval*1000, "query_counters", true)
-    {}
+    {
+        // add counter prefix, if necessary
+        BOOST_FOREACH(std::string& name, names_)
+        {
+            if (0 != name.find(hpx::performance_counters::counter_prefix))
+                name = hpx::performance_counters::counter_prefix + name;
+        }
+    }
 
     void query_counters::find_counters()
     {
