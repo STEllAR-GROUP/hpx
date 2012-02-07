@@ -3,8 +3,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <map>
+
 #include <boost/format.hpp>
 #include <boost/asio/ip/host_name.hpp>
+#include <boost/assign/list_of.hpp>
 
 #include "hpx/util/parse_command_line.hpp"
 #include "hpx/components/papi/util/papi.hpp"
@@ -15,6 +18,30 @@
 namespace hpx { namespace performance_counters { namespace papi { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
+    // PAPI domain description strings
+    const std::map<std::string, int> papi_domain_map = boost::assign::map_list_of
+        ("user",   PAPI_DOM_USER)
+        ("kernel", PAPI_DOM_KERNEL)
+        ("other",  PAPI_DOM_OTHER)
+        ("super",  PAPI_DOM_SUPERVISOR)
+        ("all",    PAPI_DOM_ALL)
+        ("min",    PAPI_DOM_MIN)
+        ("max",    PAPI_DOM_MAX)
+        ;
+
+    int map_domain(std::string const& s)
+    {
+        std::map<std::string, int>::const_iterator it = papi_domain_map.find(s);
+        if (it == papi_domain_map.end())
+        {
+            boost::format fmt("invalid argument %s for --papi-domain");
+            HPX_THROW_EXCEPTION(hpx::commandline_option_error,
+                                NS_STR "check_options()", str(fmt % s));
+        }
+        return it->second;
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////
     options_description get_options_description()
     {
         using boost::program_options::value;
@@ -23,13 +50,26 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
         options_description papi_opts("PAPI counter options");
         papi_opts.add_options()
             ("papi-events", value<std::vector<std::string> >()->composing(),
-             "comma delimited list of PAPI events to monitor")
+             "list of monitored PAPI events in the following format: "
+             "[host@]event1[,event2...]. If the host name is specified and "
+             "matches the local machine name, the associated event list is "
+             "used, otherwise events from the host-less lists are applied.")
+            ("papi-domain", value<std::string>()->default_value("user"),
+             "sets monitoring scope to one of:\n"
+             "  user   - user context only,\n"
+             "  kernel - kernel/OS context only,\n"
+             "  super  - supervisor or hypervisor context,\n"
+             "  other  - exception and transient mode,\n"
+             "  all    - all above contexts,\n"
+             "  min    - smallest available context,\n"
+             "  max    - largest available context.")
             ("papi-multiplex", value<long>()->implicit_value(0),
-             "enable low level counter multiplexing")
+             "enable low level counter multiplexing.")
             ("papi-list-events", value<std::string>()->implicit_value("short"),
-             "list events available on local host; the optional argument is one of:\n"
-             "  full  - for detailed event description\n"
-             "  short - for minimal description")
+             "list events available on local host (mutually exclusive with "
+             "--papi-events); the optional argument is one of:\n"
+             "  full  - for detailed event description,\n"
+             "  short - for minimal description.")
             ;
         return papi_opts;
     }
@@ -50,24 +90,28 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
 
     bool check_options(variables_map const& vm)
     {
-        if (vm.count("papi_events") && vm.count("papi_events"))
-            HPX_THROW_EXCEPTION(hpx::bad_request,
+        if (vm.count("papi-events") && vm.count("papi-list-events"))
+            HPX_THROW_EXCEPTION(hpx::commandline_option_error,
                 NS_STR "check_options()",
-                "Mutually exclusive options specified for PAPI component");
+                "--papi-events and --papi-event-list are mutually exclusive");
         bool needed = false;
         if (vm.count("papi-events")) needed = true;
         if (vm.count("papi-list-events"))
         {
             std::string v = vm["papi-list-events"].as<std::string>();
             if (v != "short" && v != "full")
-                HPX_THROW_EXCEPTION(hpx::bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::commandline_option_error,
                     NS_STR"check_options()",
-                    "invalid option to \"--papi-list-events\"");
+                    "invalid option to --papi-list-events");
+        }
+        if (vm.count("papi-domain"))
+        {
+            std::string v = vm["papi-domain"].as<std::string>();
+            map_domain(v); // throws if not found
         }
         if (vm.count("papi-multiplex") && vm["papi-multiplex"].as<long>() < 0)
-            HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                NS_STR"check_options()",
-                "argument to \"--papi-multiplex\" must be positive");
+            HPX_THROW_EXCEPTION(hpx::commandline_option_error, NS_STR "check_options()",
+                "argument to --papi-multiplex must be positive");
         return needed;
     }
 
@@ -86,8 +130,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
         {
             boost::format efmt("Missing host name in \"%s\"");
             HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                                NS_STR "local_mode()",
-                                str(efmt % opt));
+                                NS_STR "local_mode()", str(efmt % opt));
         }
         if (i == std::string::npos) return DEFAULT_LOCAL;
 

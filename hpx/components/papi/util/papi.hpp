@@ -15,16 +15,18 @@
 #include "hpx/hpx.hpp"
 #include "hpx/config/export_definitions.hpp"
 
-
 namespace hpx { namespace performance_counters { namespace papi { namespace util
 {
     using boost::program_options::options_description;
     using boost::program_options::variables_map;
 
-    // consts
+    ///////////////////////////////////////////////////////////////////////////
+    // event list delimiters
     char const EVENT_DELIMITER = ',';
     char const HOST_DELIMITER  = '@'; // ':' might be used in event names
 
+    
+    ///////////////////////////////////////////////////////////////////////////
     // PAPI call wrapper
     inline void papi_call(int rc, char const *info, char const *fname,
                           int ok = PAPI_OK)
@@ -48,6 +50,9 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
                 PAPI_VER_CURRENT);
         }
     }
+
+    // map domain description to a number
+    int map_domain(std::string const&);
     
     // command line option description for PAPI counters
     options_description get_options_description();

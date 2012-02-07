@@ -55,7 +55,14 @@ namespace hpx { namespace performance_counters { namespace papi
             multiplexed = true;
             // FIXME: setting of multiplexing period if other than default
         }
-
+        if (vm.count("papi-domain"))
+        {
+            std::string ds = vm["papi-domain"].as<std::string>();
+            int dom = util::map_domain(ds);
+            boost::format fmt("cannot switch to \"%s\" domain monitoring");
+            papi_call(PAPI_set_domain(dom), boost::str(fmt % ds).c_str(), srcloc);
+        }
+        
         // obtain local prefix
         boost::uint32_t const prefix = hpx::applier::get_applier().get_prefix_id();
 
@@ -99,7 +106,7 @@ namespace hpx { namespace performance_counters { namespace papi
                 // full info of the counter to create, help text and version will be
                 // complemented from counter type info as specified above
                 counter_info info(counter_raw,
-                    boost::str(instance_name % (prefix-1) % events[i]));
+                    boost::str(instance_name % prefix % events[i]));
 
                 // create the PAPI performance counter component locally
                 hpx::naming::id_type id(

@@ -73,6 +73,8 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         typedef hpx::util::spinlock mutex_type;
         typedef std::vector<papi_counter *> cnttab_type;
 
+        ///////////////////////////////////////////////////////////////////////
+        // shared state
         // mutex to protect shared state
         static mutex_type base_mtx_;
         // shared PAPI event set
@@ -83,15 +85,19 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         // counter values array accessible to PAPI
         static std::vector<long long> counts_;
 
+        // internal PAPI counter index
+        unsigned index_;
+
+    protected:
         // ctor/dtor
         papi_counter_base();
         ~papi_counter_base();
         // register and activate new single event counter
         bool add_counter(papi_counter *);
         // remove counter from active set
-        bool remove_counter(papi_counter *, long long& last_count);
+        bool remove_counter(long long& last_count);
         // obtain current value for active counter i
-        bool read_value(papi_counter *, long long &);
+        bool read_value(long long &);
         // enable multiplexing with specified interval
         bool enable_multiplexing(long ival);
 
@@ -100,8 +106,8 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
 
         // add new PAPI event to the event set
         bool add_event(papi_counter *);
-        // remove an event at a given index from the event set
-        bool remove_event(size_t index);
+        // remove an event from the event set
+        bool remove_event();
         // start all active counters
         void start_all();
         // safely stop all counters in event set and accumulate values in counts_
@@ -118,8 +124,6 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         typedef hpx::components::managed_component_base<papi_counter> base_type;
 
     private:
-        friend class papi_counter_base;
-        
         typedef hpx::util::spinlock mutex_type;
 
         // mutex for internal state updates
@@ -132,8 +136,6 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         boost::int64_t timestamp_;
         // counting status
         counter_state status_;
-        // internal PAPI counter index
-        size_t index_;
 
     public:
         enum actions
@@ -151,7 +153,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
 
         papi_counter():
             event_(PAPI_NULL), value_(0), timestamp_(-1),
-            status_(PAPI_COUNTER_STOPPED), index_((size_t)-1) { }
+            status_(PAPI_COUNTER_STOPPED) { }
         papi_counter(hpx::performance_counters::counter_info const& info):
             base_type_holder(info), event_(PAPI_NULL), value_(0), timestamp_(-1),
             status_(PAPI_COUNTER_STOPPED) { }

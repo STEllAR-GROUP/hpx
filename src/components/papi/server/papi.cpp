@@ -61,7 +61,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
 
     ///////////////////////////////////////////////////////////////////////////
     // methods
-    papi_counter_base::papi_counter_base()
+    papi_counter_base::papi_counter_base(): index_((unsigned)-1)
     {
         mutex_type::scoped_lock m(base_mtx_); // is locking required here?
 
@@ -91,25 +91,25 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         return rc;
     }
 
-    bool papi_counter_base::remove_counter(papi_counter *c, long long& last_val)
+    bool papi_counter_base::remove_counter(long long& last_val)
     {
         mutex_type::scoped_lock m(base_mtx_);
 
         stop_all();
-        last_val = counts_[c->index_];
-        bool rc = remove_event(c->index_);
+        last_val = counts_[index_];
+        bool rc = remove_event();
         // resume counting if any events left
         if (cnttab_.size() > 0) start_all();
         return rc;
     }
 
-    bool papi_counter_base::read_value(papi_counter *c, long long& val)
+    bool papi_counter_base::read_value(long long& val)
     {
         mutex_type::scoped_lock m(base_mtx_);
 
         papi_call(PAPI_accum(evset_, &counts_[0]), "PAPI_accum failed",
                              NS_STR "papi_counter_base::read_value()");
-        val = counts_[c->index_];
+        val = counts_[index_];
         return true;
     }
 
@@ -142,11 +142,11 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
                   NS_STR "papi_counter_base::add_event()");
         counts_.push_back(c->get_value());
         cnttab_.push_back(c);
-        c->index_ = counts_.size()-1;
+        index_ = counts_.size()-1;
         return true;
     }
 
-    bool papi_counter_base::remove_event(size_t index)
+    bool papi_counter_base::remove_event()
     {
         papi_call(PAPI_cleanup_eventset(evset_),
                   "could not clean up event set",
@@ -156,21 +156,21 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         // order as before. This avoids reordering of remaining counter values
         // and at least some surprises on architectures with asymmetric
         // functionality of counting registers.
-        for (size_t i = 0; i < counts_.size(); ++i)
+        for (unsigned i = 0; i < counts_.size(); ++i)
         {
             papi_counter *c = cnttab_[i];
-            if (i != index)
+            if (i != index_)
             {
                 papi_call(PAPI_add_event(evset_, c->get_event()),
                           "cannot add event to event set",
                           NS_STR "papi_counter_base::remove_event()");
                 // adjust indices of remaining counters
-                if (i > index) c->index_--;
+                if (i > index_) c->index_--;
             }
         }
         // erase entries corresponding to removed event
-        counts_.erase(counts_.begin()+index);
-        cnttab_.erase(cnttab_.begin()+index);
+        counts_.erase(counts_.begin()+index_);
+        cnttab_.erase(cnttab_.begin()+index_);
         return true;
     }
 
@@ -206,7 +206,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         if (status_ == PAPI_COUNTER_ACTIVE)
         {
             long long cnt;
-            if (read_value(this, cnt)) update_state(cnt);
+            if (read_value(cnt)) update_state(cnt);
         }
 
         if (timestamp_ != -1) update_value(value);
@@ -285,7 +285,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         if (status_ == PAPI_COUNTER_ACTIVE)
         {
             long long cnt;
-            if (!remove_counter(this, cnt))
+            if (!remove_counter(cnt))
             {   // FIXME: revisit when more permissive handling is implemented
                 return false;
             }
