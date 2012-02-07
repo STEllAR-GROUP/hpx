@@ -791,7 +791,7 @@ public:
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    bool addressing_service::is_local_address(
+    bool is_local_address(
         naming::gid_type const& id
       , error_code& ec = throws
         );
