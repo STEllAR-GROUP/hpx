@@ -1419,7 +1419,7 @@ void addressing_service::install_counters()
         counters, sizeof(counters)/sizeof(counters[0]));
 } // }}}
 
-void addressing_service::trigger_refcnt_requests(
+void addressing_service::garbage_collect(
     error_code& ec
     )
 {

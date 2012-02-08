@@ -238,5 +238,12 @@ bool is_local_lva_encoded_address(
     return naming::get_agas_client().is_local_lva_encoded_address(gid);
 }
 
+void garbage_collect(
+    error_code& ec
+    )
+{
+    return naming::get_agas_client().garbage_collect(ec);
+}
+
 }}
 

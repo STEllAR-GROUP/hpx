@@ -276,7 +276,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     ///        local cache.
     void install_counters();
 
-    void trigger_refcnt_requests(
+    void garbage_collect(
         error_code& ec = throws
         );
 

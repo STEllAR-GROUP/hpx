@@ -137,6 +137,11 @@ inline bool is_local_lva_encoded_address(
     return is_local_lva_encoded_address(gid.get_gid());
 }
 
+///////////////////////////////////////////////////////////////////////////////
+HPX_EXPORT void garbage_collect(
+    error_code& ec = throws
+    );
+
 }}
 
 #endif // HPX_A55506A4_4AC7_4FD0_AB0D_ED0D1368FCC5
