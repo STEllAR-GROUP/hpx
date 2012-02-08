@@ -285,7 +285,7 @@ namespace hpx { namespace detail
 
         boost::uint32_t const* locality =
             boost::get_error_info<hpx::throw_locality>(e);
-        if (locality && 0 != *locality)
+        if (locality)
             strm << "[locality]: " << *locality << "\n";
 
         std::string const* hostname_ =
