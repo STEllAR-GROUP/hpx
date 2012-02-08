@@ -31,7 +31,7 @@ namespace hpx { namespace components
         enum { max_pending = 128 };
 
         pending_logs()
-          : prefix_(naming::invalid_id), activated_(false), queue_size_(0)
+          : prefix_(naming::invalid_id), activated_(false)
         {}
 
         void add(message_type const& msg);
@@ -46,6 +46,7 @@ namespace hpx { namespace components
     private:
         bool ensure_prefix();
         void send();
+        bool is_active();
 
         prefix_mutex_type prefix_mtx_;
         naming::id_type prefix_;
@@ -54,8 +55,6 @@ namespace hpx { namespace components
         messages_type queue_;
 
         boost::atomic<bool> activated_;
-
-        boost::atomic<std::size_t> queue_size_;
     };
 
     struct pending_logs_tag {};
