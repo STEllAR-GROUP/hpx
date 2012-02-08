@@ -370,6 +370,11 @@ find_package(HPX_SWARM)
 find_package(OpenMP)
 
 ################################################################################
+# MPI (for benchmark comparisons) 
+################################################################################
+find_package(MPI)
+
+################################################################################
 # Warning configuration
 ################################################################################
 hpx_option(HPX_WARNINGS BOOL "Enable compiler warnings (default: ON)" ON ADVANCED)

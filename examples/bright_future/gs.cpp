@@ -11,6 +11,9 @@
 #include <hpx/util/high_resolution_timer.hpp>
 #ifdef BRIGHT_FUTURE_NO_HPX
 #include <iostream>
+#ifdef BRIGHT_FUTURE_WITH_MPI
+#include <mpi.h>
+#endif
 #else
 #include <hpx/include/iostreams.hpp>
 #endif
@@ -86,11 +89,21 @@ int hpx_main(variables_map & vm)
         finalize();
 #endif
     }
+
+#ifdef BRIGHT_FUTURE_WITH_MPI
+    MPI_Finalize();
+#endif
+
     return 0;
 }
 
 int main(int argc, char **argv)
 {
+
+#ifdef BRIGHT_FUTURE_WITH_MPI
+    MPI_Init(&argc, &argv);
+#endif
+
     options_description
         desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
 
@@ -158,7 +171,6 @@ int main(int argc, char **argv)
         cout << desc_commandline;
         return 0;
     }
-
     return hpx_main(vm);
 #else
     return init(desc_commandline, argc, argv);

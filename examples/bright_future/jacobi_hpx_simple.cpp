@@ -85,6 +85,9 @@ struct update_fun
     {
         ar & x_range;
         ar & y_range;
+        ar & old;
+        ar & n;
+        ar & cache_block;
     }
 };
 
@@ -145,6 +148,9 @@ void gs(
     typedef dataflow_object<std::vector<grid_type> > object_type;
 
     object_type u(new_<std::vector<grid_type> >(find_here(), 2, grid_type(n_x, n_y, block_size, 1)).get());
+
+    n_x = n_x -1;
+    n_y = n_y -1;
 
     high_resolution_timer t;
     size_type old = 0;
