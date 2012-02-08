@@ -192,12 +192,10 @@ bool pre_main(runtime_mode mode)
         // Register pre-shutdown and shutdown functions to flush pending
         // reference counting operations.
         register_pre_shutdown_function(boost::bind(
-            &agas::addressing_service::trigger_refcnt_requests
-          , &agas_client, boost::ref(throws)));
+            &agas::garbage_collect, boost::ref(throws)));
 
         register_shutdown_function(boost::bind(
-            &agas::addressing_service::trigger_refcnt_requests
-          , &agas_client, boost::ref(throws)));
+            &agas::garbage_collect, boost::ref(throws)));
 
         // Third stage bootstrap synchronizes startup functions across all
         // localities. This is done after component loading to guarantee that
