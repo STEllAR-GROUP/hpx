@@ -9,8 +9,8 @@
 #include <boost/asio/ip/host_name.hpp>
 #include <boost/assign/list_of.hpp>
 
-#include "hpx/util/parse_command_line.hpp"
-#include "hpx/components/papi/util/papi.hpp"
+#include <hpx/util/parse_command_line.hpp>
+#include <hpx/components/papi/util/papi.hpp>
 
 #define NS_STR "hpx::performance_counters::papi::util::"
 

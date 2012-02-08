@@ -11,8 +11,8 @@
 
 #include <boost/version.hpp>
 
-#include "hpx/components/papi/server/papi.hpp"
-#include "hpx/components/papi/util/papi.hpp"
+#include <hpx/components/papi/server/papi.hpp>
+#include <hpx/components/papi/util/papi.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 

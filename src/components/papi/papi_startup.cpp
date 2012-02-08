@@ -13,10 +13,9 @@
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
 
-#include "hpx/components/papi/server/papi.hpp"
-#include "hpx/components/papi/stubs/papi.hpp"
-#include "hpx/components/papi/util/papi.hpp"
-
+#include <hpx/components/papi/server/papi.hpp>
+#include <hpx/components/papi/stubs/papi.hpp>
+#include <hpx/components/papi/util/papi.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality
