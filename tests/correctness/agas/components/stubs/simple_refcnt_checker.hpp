@@ -37,6 +37,21 @@ struct simple_refcnt_checker
         take_reference_async(this_, gid).get();
     }
 
+    static lcos::promise<void> garbage_collect_async(
+        naming::id_type const& this_
+        )
+    {
+        typedef server::simple_refcnt_checker::garbage_collect_action
+            action_type;
+        return lcos::eager_future<action_type>(this_);
+    }
+
+    static void garbage_collect(
+        naming::id_type const& this_
+        )
+    {
+        garbage_collect_async(this_).get();
+    }
 };
 
 }}}

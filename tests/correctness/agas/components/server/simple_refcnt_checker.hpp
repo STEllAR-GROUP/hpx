@@ -24,6 +24,7 @@ struct HPX_COMPONENT_EXPORT simple_refcnt_checker
   private:
     naming::id_type target_;
     std::vector<naming::id_type> references_;
+
   public:
     simple_refcnt_checker()
       : target_(naming::invalid_id)
@@ -46,9 +47,15 @@ struct HPX_COMPONENT_EXPORT simple_refcnt_checker
         references_.push_back(gid);
     }
 
+    void garbage_collect()
+    {
+        agas::garbage_collect();
+    }
+
     enum actions
     {
         action_take_reference
+      , action_garbage_collect
     };
 
     typedef hpx::actions::action1<
@@ -61,6 +68,15 @@ struct HPX_COMPONENT_EXPORT simple_refcnt_checker
         // method
       , &simple_refcnt_checker::take_reference
     > take_reference_action;
+
+    typedef hpx::actions::action0<
+        // component
+        simple_refcnt_checker
+        // action code
+      , action_garbage_collect
+        // method
+      , &simple_refcnt_checker::garbage_collect
+    > garbage_collect_action;
 };
 
 }}}
@@ -68,6 +84,10 @@ struct HPX_COMPONENT_EXPORT simple_refcnt_checker
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::test::server::simple_refcnt_checker::take_reference_action,
     simple_refcnt_checker_take_reference_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::test::server::simple_refcnt_checker::garbage_collect_action,
+    simple_refcnt_checker_garbage_collect_action);
 
 #endif // HPX_CDD12289_0A65_47A4_BC53_A4670CDAF5A7
 

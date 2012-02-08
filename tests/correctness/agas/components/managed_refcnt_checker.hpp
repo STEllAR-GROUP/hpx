@@ -72,6 +72,9 @@ struct managed_refcnt_checker
 
     bool ready()
     {
+        // Do a round of garbage collection on the target.
+        this->base_type::garbage_collect(gid_);
+
         return flag_.ready();
     }
 
@@ -82,6 +85,9 @@ struct managed_refcnt_checker
         Duration const& d
         )
     {
+        // Do a round of garbage collection on the target.
+        this->base_type::garbage_collect(gid_);
+
         // Schedule a wakeup.
         threads::set_thread_state(threads::get_self_id(), d, threads::pending);
 
