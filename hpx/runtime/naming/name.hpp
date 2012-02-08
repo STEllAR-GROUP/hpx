@@ -524,7 +524,8 @@ namespace hpx { namespace naming
         gid_type& get_gid() { return *gid_; }
         gid_type const& get_gid() const { return *gid_; }
 
-//         id_type_management get_management_type() const;
+        // This function is used in AGAS unit tests, do not remove. 
+        id_type::management_type get_management_type() const;
 
         id_type& operator++()       // pre-increment
         {

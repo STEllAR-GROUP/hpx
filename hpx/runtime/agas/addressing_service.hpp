@@ -796,6 +796,10 @@ public:
       , error_code& ec = throws
         );
 
+    bool is_local_lva_encoded_gid(
+        naming::gid_type const& id
+        );
+
     /// \brief Resolve a given global address (\a id) to its associated local
     ///        address.
     ///

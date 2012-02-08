@@ -804,6 +804,15 @@ bool addressing_service::is_local_address(
     return naming::is_local_address(id, local_prefix());
 }
 
+bool addressing_service::is_local_lva_encoded_gid(
+    naming::gid_type const& id
+  , error_code& ec
+    )
+{
+    return naming::strip_credit_from_gid(id.get_msb())
+        == local_prefix().get_msb() 
+}
+
 bool addressing_service::resolve(
     naming::gid_type const& id
   , naming::address& addr
@@ -815,7 +824,7 @@ bool addressing_service::resolve(
         // {{{ special cases
 
         // LVA-encoded GIDs (located on this machine)
-        if (is_local_address(id))
+        if (is_local_lva_encoded_gid(id))
         {
             addr.locality_ = here_;
 
@@ -937,7 +946,7 @@ bool addressing_service::resolve_cached(
     // {{{ special cases
 
     // LVA-encoded GIDs (located on this machine)
-    if (is_local_address(id))
+    if (is_local_lva_encoded_gid(id))
     {
         addr.locality_ = here_;
 

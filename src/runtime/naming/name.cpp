@@ -223,24 +223,25 @@ namespace hpx { namespace naming
 //         }
     }   // detail
 
-//     id_type_management id_type::get_management_type() const
-//     {
-//         if (!gid_)
-//             return unknown_deleter;
-//
-//         deleter_type* d = boost::get_deleter<deleter_type>(gid_);
-//
-//         if (!d)
-//             return unknown_deleter;
-//
-//         if (*d == &detail::gid_managed_deleter)
-//             return managed;
-//         else if (*d == &detail::gid_unmanaged_deleter)
-//             return unmanaged;
-//         else if (*d == &detail::gid_transmission_deleter)
-//             return transmission;
-//         return unknown_deleter;
-//     }
+    // This function is used in AGAS unit tests, do not remove. 
+    id_type::management_type id_type::get_management_type() const
+    {
+        if (!gid_)
+            return unknown_deleter;
+
+        deleter_type* d = boost::get_deleter<deleter_type>(gid_);
+
+        if (!d)
+            return unknown_deleter;
+
+        if (*d == &detail::gid_managed_deleter)
+            return managed;
+        else if (*d == &detail::gid_unmanaged_deleter)
+            return unmanaged;
+        else if (*d == &detail::gid_transmission_deleter)
+            return transmission;
+        return unknown_deleter;
+    }
 
     template <class Archive>
     void id_type::save(Archive& ar, const unsigned int version) const
