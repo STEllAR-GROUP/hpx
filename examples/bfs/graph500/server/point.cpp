@@ -38,7 +38,8 @@ static void compute_edge_range(int rank, int size, int64_t M, int64_t* start_idx
 ///////////////////////////////////////////////////////////////////////////////
 namespace graph500 { namespace server
 {
-    void point::init(std::size_t objectid,std::size_t log_numverts,std::size_t number_partitions)
+    void point::init(std::size_t objectid,std::size_t log_numverts,std::size_t number_partitions,
+                     double overlap)
     {
       idx_ = objectid;
       // Spread the two 64-bit numbers into five nonzero values in the correct
@@ -71,7 +72,7 @@ namespace graph500 { namespace server
         compute_edge_range(number_partitions-1, number_partitions, M, &start_idx, &end_idx);
         int64_t nedges = end_idx - start_idx;
 
-        std::size_t size = 2*nedges;
+        std::size_t size = (std::size_t) floor(overlap*nedges);
         local_edges_.resize(size);
 
         std::vector<std::size_t> edges;

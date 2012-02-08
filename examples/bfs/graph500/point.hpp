@@ -36,17 +36,17 @@ namespace graph500
 
         // kernel 1
         hpx::lcos::promise<void> init_async(std::size_t objectid,
-            std::size_t scale,std::size_t number_partitions)
+            std::size_t scale,std::size_t number_partitions,double overlap)
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::init_async(gid_,objectid,scale,number_partitions);
+            return this->base_type::init_async(gid_,objectid,scale,number_partitions,overlap);
         }
 
         // kernel 1
-        void init(std::size_t objectid,std::size_t scale,std::size_t number_partitions)
+        void init(std::size_t objectid,std::size_t scale,std::size_t number_partitions,double overlap)
         {
             BOOST_ASSERT(gid_);
-            this->base_type::init_async(gid_,objectid, scale,number_partitions);
+            this->base_type::init_async(gid_,objectid, scale,number_partitions,overlap);
         }
 
         hpx::lcos::promise<void> bfs_async(std::size_t root)

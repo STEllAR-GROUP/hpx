@@ -65,6 +65,8 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::size_t const number_partitions = vm["number_partitions"].as<std::size_t>();
         std::size_t const scale = vm["scale"].as<std::size_t>();
         bool const validator = vm["validator"].as<bool>();
+        double const overlap = vm["overlap"].as<double>();
+        std::size_t const schwarzdomains = vm["schwarzdomains"].as<std::size_t>();
 
         // number_partitions defines the size of the partition
         // for Additive Schwarz to work, we will need more partitions 
@@ -74,7 +76,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::size_t num_pe = number_partitions; // actual number of partitions is num_pe
         if ( number_partitions > 1 ) {
           // the additional paritions contain the additive Schwarz overlap 
-          num_pe += 1;
+          num_pe += schwarzdomains;
         }
         std::cout << " Number of components: " << num_pe << std::endl;
 
@@ -113,7 +115,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::vector<hpx::lcos::promise<void> > init_phase;
 
         for (std::size_t i=0;i<num_pe;i++) {
-          init_phase.push_back(points[i].init_async(i,scale,number_partitions));
+          init_phase.push_back(points[i].init_async(i,scale,number_partitions,overlap));
         }
 
         // We have to wait for the initialization to complete before we begin
@@ -123,7 +125,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::cout << "Elapsed time during kernel 1: " << kernel1_time << " [s]" << std::endl;
         // Generate the search roots
         std::vector<std::size_t> bfs_roots;
-        bfs_roots.resize(1);  // the graph500 specifies 64 search roots
+        bfs_roots.resize(64);  // the graph500 specifies 64 search roots
                                 // must be used
 
         {  // generate the bfs roots
@@ -338,7 +340,11 @@ int main(int argc, char* argv[])
         ("scale", value<std::size_t>()->default_value(10),
             "the scale of the graph problem size assuming edge factor 16")
         ("validator", value<bool>()->default_value(false),
-            "whether to run the validation (slow)");
+            "whether to run the validation (slow)")
+        ("overlap", value<double>()->default_value(1.5),
+            "overlap factor for additive Schwarz")
+        ("schwarzdomains", value<std::size_t>()->default_value(1),
+            "number of additive Schwarz domains");
 
     return hpx::init(desc_commandline, argc, argv); // Initialize and run HPX.
 }

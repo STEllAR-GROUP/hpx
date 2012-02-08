@@ -86,7 +86,7 @@ namespace graph500 { namespace server
         ///////////////////////////////////////////////////////////////////////
         // Exposed functionality of this component.
 
-        void init(std::size_t objectid,std::size_t scale,std::size_t number_partitions);
+        void init(std::size_t objectid,std::size_t scale,std::size_t number_partitions,double overlap);
 
         void bfs(std::size_t root_node);
 
@@ -116,7 +116,7 @@ namespace graph500 { namespace server
             point_scatter = 5
         };
 
-        typedef hpx::actions::action3<
+        typedef hpx::actions::action4<
             // Component server type.
             point,
             // Action code.
@@ -125,6 +125,7 @@ namespace graph500 { namespace server
             std::size_t,
             std::size_t,
             std::size_t,
+            double,
             // Method bound to this action.
             &point::init
         > init_action;

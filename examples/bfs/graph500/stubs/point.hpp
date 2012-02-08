@@ -18,20 +18,20 @@ namespace graph500 { namespace stubs
         // Read the graph
         static hpx::lcos::promise<void>
         init_async(hpx::naming::id_type const& gid,std::size_t objectid,std::size_t scale,
-                   std::size_t number_partitions)
+                   std::size_t number_partitions,double overlap)
         {
             typedef server::point::init_action action_type;
             return hpx::lcos::eager_future<action_type>(gid,objectid,scale,
-                                             number_partitions);
+                                             number_partitions,overlap);
         }
 
         // Read the graph
         static void init(hpx::naming::id_type const& gid,std::size_t objectid,std::size_t scale,
-                         std::size_t number_partitions)
+                         std::size_t number_partitions,double overlap)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the promise.
-            init_async(gid,objectid,scale,number_partitions).get();
+            init_async(gid,objectid,scale,number_partitions,overlap).get();
         }
 
         static hpx::lcos::promise<void>
