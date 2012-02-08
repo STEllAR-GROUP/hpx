@@ -66,11 +66,17 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::size_t const scale = vm["scale"].as<std::size_t>();
         bool const validator = vm["validator"].as<bool>();
 
-        std::size_t num_pe = number_partitions; // actual number of partitions
+        // number_partitions defines the size of the partition
+        // for Additive Schwarz to work, we will need more partitions 
+        // than just number_partitions.  number_partitions should be as 
+        // small as possible for performance reasons; however, it can't be too
+        // small since the partitioned graph won't fit into memory if it is too small
+        std::size_t num_pe = number_partitions; // actual number of partitions is num_pe
         if ( number_partitions > 1 ) {
-          // TEST
-          num_pe += 10;
+          // the additional paritions contain the additive Schwarz overlap 
+          num_pe += 1;
         }
+        std::cout << " Number of components: " << num_pe << std::endl;
 
         ///////////////////////////////////////////////////////////////////////
         // KERNEL 1  --- TIMED
@@ -117,7 +123,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::cout << "Elapsed time during kernel 1: " << kernel1_time << " [s]" << std::endl;
         // Generate the search roots
         std::vector<std::size_t> bfs_roots;
-        bfs_roots.resize(64);  // the graph500 specifies 64 search roots
+        bfs_roots.resize(1);  // the graph500 specifies 64 search roots
                                 // must be used
 
         {  // generate the bfs roots

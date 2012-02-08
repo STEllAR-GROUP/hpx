@@ -67,52 +67,39 @@ namespace graph500 { namespace server
         }
 
       } else {
-        // additive Schwarz approach
-        // this gives us the size of a standard partition
         int64_t start_idx, end_idx;
         compute_edge_range(number_partitions-1, number_partitions, M, &start_idx, &end_idx);
         int64_t nedges = end_idx - start_idx;
 
-        // standard additive schwarz -- increase the partition size to guarantee overlap
         std::size_t size = 2*nedges;
-
-        // compute an array of length 'size' containing non-repeating int's in [0,end_idx)
-        std::vector<std::size_t> edges;
         local_edges_.resize(size);
-        edges.resize(size);
-        {
-          int64_t nglobalverts = end_idx;
-          uint64_t counter = 0;
-          uint64_t seed1 = 2;
-          uint64_t seed2 = 3;
-          for (std::size_t j=0;j<edges.size();j++) {
-            int64_t root;
-            while (1) {
-              double d[2];
-              make_random_numbers(2, seed1, seed2, counter, d);
-              root = (int64_t)((d[0] + d[1]) * nglobalverts) % nglobalverts;
-              counter += 2;
-              if ( counter > (uint64_t) 2 * nglobalverts) break;
-              int is_duplicate = 0;
-              for (std::size_t i = 0; i < j; ++i) {
-                if ( (std::size_t) root == edges[i]) {
-                  is_duplicate = 1;
-                  break;
-                }
-              }
-              if (is_duplicate) continue; /* Everyone takes the same path here */
-              int root_ok = 0;
-              if ( root >= 0 && root < end_idx ) root_ok = 1;
-              if (root_ok) break;
 
+        std::vector<std::size_t> edges;
+        edges.resize(size);
+
+        bool found;
+        std::size_t edge;
+        for ( std::size_t i=0;i<edges.size();i++) {
+          while(1) {
+            edge = rand() % end_idx;
+            found = false;
+            // make sure it's not a duplicate
+            for (std::size_t j=0;j<i;j++) {
+              if ( edges[j] == edge ) {
+                //duplicate
+                found = true;
+                break;
+              }
             }
-            edges[j] = root;
-          }
+            if ( !found ) break;
+          }    
+          edges[i] = edge;
         }
 
         packed_edge tmp[1];
-        for (std::size_t i=0;i<edges.size();i++) {
+        for (std::size_t i=0;i<local_edges_.size();i++) {
           generate_kronecker_range(seed, log_numverts, edges[i], edges[i]+1, tmp);
+
           local_edges_[i] = tmp[0];
 
           // the smallest node is 1 ( 0 is reserved for unvisited edges )
@@ -362,6 +349,25 @@ namespace graph500 { namespace server
        //end
        for (std::size_t i=0;i<local_edges_.size();i++) {
          if ( !(neither_in[i] || both_in[i] ) ) {
+#if 0
+           std::cout << " TEST scatter " << li[i] << " " << lj[i] << std::endl;
+           std::size_t node = local_edges_[i].v0;
+           std::size_t neighbor = local_edges_[i].v1;
+           std::cout << " TEST node " << node << " neighbor " << neighbor << std::endl;
+           // let's examine the neighbors
+           for ( std::size_t j=0;j<neighbors_[node-minnode_].size();j++) {
+             std::cout << " TEST neighbors of node " << node << " : " << neighbors_[node-minnode_][j] << std::endl;
+           }
+           std::cout << " TEST B " << parent[neighbor]  << std::endl;
+           std::cout << " TEST C " << parent_[neighbor-minnode_].parent  << std::endl;
+           std::cout << " TEST D " << parent_[neighbor-minnode_].level  << std::endl;
+           std::cout << " TEST E " << parent[node]  << std::endl;
+           std::cout << " TEST F " << parent_[node-minnode_].parent  << std::endl;
+           std::cout << " TEST G " << parent_[node-minnode_].level  << std::endl;
+           std::cout << " TEST H " << parent[searchkey]  << std::endl;
+           std::cout << " TEST I " << parent_[searchkey-minnode_].parent  << std::endl;
+           std::cout << " TEST J " << parent_[searchkey-minnode_].level  << std::endl;
+#endif
            result.rc = -4;
            return result;
          }
@@ -386,6 +392,7 @@ namespace graph500 { namespace server
          }
        }
 
+       result.rc = 0;
        return result;
     }
 
