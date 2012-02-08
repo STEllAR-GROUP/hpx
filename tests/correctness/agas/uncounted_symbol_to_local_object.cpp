@@ -6,7 +6,6 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/lightweight_test.hpp>
-#include <hpx/runtime/actions/continuation_impl.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
