@@ -24,7 +24,6 @@ hpx_find_package(RNPL
   HEADER_PATHS include)
 
 if(RNPL_FOUND AND NOT HPX_SET_RNPL_MACRO)
-  set(HPX_SET_RNPL_MACRO ON CACHE BOOL "Added the RNPL detection macro" FORCE)
   add_definitions(-DSDF_FOUND)
   add_definitions(-DRNPL_FOUND)
 endif()

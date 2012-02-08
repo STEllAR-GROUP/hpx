@@ -13,7 +13,7 @@ endif()
 
 macro(hpx_get_version name)
 
-  if(${NAME}_DISABLE)
+  if(${name}_DISABLE)
     hpx_info("hpx_get_version.${name}" "Library disabled by user.")
     unset(${name}_VERSION_SEARCHED CACHE)
     unset(${name}_ROOT)
@@ -78,7 +78,7 @@ endmacro()
 
 macro(hpx_find_package name)
 
-  if(${NAME}_DISABLE)
+  if(${name}_DISABLE)
     hpx_info("hpx_get_version.${name}" "Library disabled by user.")
     unset(${name}_VERSION_SEARCHED CACHE)
     unset(${name}_ROOT)

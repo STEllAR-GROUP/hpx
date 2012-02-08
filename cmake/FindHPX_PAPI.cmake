@@ -9,10 +9,6 @@ if(NOT HPX_FINDPACKAGE_LOADED)
   include(HPX_FindPackage)
 endif()
 
-if(NOT PAPI_ROOT AND NOT $ENV{HOME_PAPI} STREQUAL "")
-  set(PAPI_ROOT $ENV{HOME_PAPI})
-endif()
-
 hpx_find_package(PAPI
   LIBRARIES papi libpapi
   LIBRARY_PATHS lib64 lib

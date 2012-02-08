@@ -7,21 +7,9 @@ if(NOT HPX_FINDPACKAGE_LOADED)
   include(HPX_FindPackage)
 endif()
 
-if(NOT BLAS_ROOT AND NOT $ENV{HOME_BLAS} STREQUAL "")
-  set(BLAS_ROOT $ENV{HOME_BLAS})
-endif()
-
-if(BLAS_USE_SYSTEM)
-  set(BLAS_F77_CPP_USE_SYSTEM ON)
-endif()
-
-if(BLAS_USE_SYSTEM)
-  set(BLAS_EXPORT_CPP_USE_SYSTEM ON)
-endif()
-
 hpx_find_package(BLAS
   LIBRARIES blas libblas
-  LIBRARY_PATHS lib64 lib Lib
-  HEADERS bbhutil.h
-  HEADER_PATHS include include/C++/Include C++/Include)
+  LIBRARY_PATHS lib64 lib 
+  HEADERS cblas.h bbhutil.h
+  HEADER_PATHS include)
 

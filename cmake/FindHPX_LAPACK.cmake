@@ -7,20 +7,9 @@ if(NOT HPX_FINDPACKAGE_LOADED)
   include(HPX_FindPackage)
 endif()
 
-if(NOT LAPACK_ROOT AND NOT $ENV{HOME_LAPACK} STREQUAL "")
-  set(LAPACK_ROOT $ENV{HOME_LAPACK})
-endif()
-
-if(LAPACK_USE_SYSTEM)
-  set(LAPACK_F77_CPP_USE_SYSTEM ON)
-endif()
-
-if(LAPACK_USE_SYSTEM)
-  set(LAPACK_EXPORT_CPP_USE_SYSTEM ON)
-endif()
-
 hpx_find_package(LAPACK
   LIBRARIES lapack liblapack
-  LIBRARY_PATHS lib64 lib Lib
-  HEADERS bbhutil.h
-  HEADER_PATHS include include/C++/Include C++/Include)
+  LIBRARY_PATHS lib64 lib 
+  HEADERS clapack.h bbhutil.h
+  HEADER_PATHS include)
+

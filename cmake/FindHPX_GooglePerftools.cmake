@@ -12,6 +12,6 @@ endif()
 hpx_find_package(GOOGLE_PERFTOOLS
   LIBRARIES profiler libprofiler
   LIBRARY_PATHS lib64 lib
-  HEADERS google/profiler.h google/heap-profiler.h
+  HEADERS google/profiler.h 
   HEADER_PATHS include)
 
