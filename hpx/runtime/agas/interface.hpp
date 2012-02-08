@@ -67,6 +67,76 @@ HPX_EXPORT bool resolve_name(
   , error_code& ec = throws
     );
 
+///////////////////////////////////////////////////////////////////////////////
+HPX_EXPORT bool is_local_address(
+    naming::gid_type const& gid
+  , error_code& ec = throws
+    );
+
+HPX_EXPORT bool is_local_address(
+    naming::gid_type const& gid
+  , naming::address& addr
+  , error_code& ec = throws
+    );
+
+inline bool is_local_address(
+    naming::id_type const& gid
+  , error_code& ec = throws
+    )
+{
+    return is_local_address(gid.get_gid(), ec);
+}
+
+inline bool is_local_address(
+    naming::id_type const& gid
+  , naming::address& addr
+  , error_code& ec = throws
+    )
+{
+    return is_local_address(gid.get_gid(), addr, ec);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+HPX_EXPORT bool is_local_address_cached(
+    naming::gid_type const& gid
+  , error_code& ec = throws
+    );
+
+HPX_EXPORT bool is_local_address_cached(
+    naming::gid_type const& gid
+  , naming::address& addr
+  , error_code& ec = throws
+    );
+
+inline bool is_local_address_cached(
+    naming::id_type const& gid
+  , error_code& ec = throws
+    )
+{
+    return is_local_address_cached(gid.get_gid(), ec);
+}
+
+inline bool is_local_address_cached(
+    naming::id_type const& gid
+  , naming::address& addr
+  , error_code& ec = throws
+    )
+{
+    return is_local_address_cached(gid.get_gid(), addr, ec);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+HPX_EXPORT bool is_local_lva_encoded_address(
+    naming::gid_type const& gid
+    );
+
+inline bool is_local_lva_encoded_address(
+    naming::id_type const& gid
+    )
+{
+    return is_local_lva_encoded_address(gid.get_gid());
+}
+
 }}
 
 #endif // HPX_A55506A4_4AC7_4FD0_AB0D_ED0D1368FCC5

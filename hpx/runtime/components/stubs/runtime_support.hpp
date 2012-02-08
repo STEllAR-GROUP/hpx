@@ -11,6 +11,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/apply.hpp>
+#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/util/ini.hpp>
@@ -315,13 +316,11 @@ namespace hpx { namespace components { namespace stubs
 
             // Determine whether the gid of the component to delete is local or
             // remote
-            naming::address addr;
-            applier::applier& appl = hpx::applier::get_applier();
             //naming::resolver_client& agas = appl.get_agas_client();
-            if (/*agas.is_bootstrap() || */appl.address_is_local(gid, addr)) {
+            if (/*agas.is_bootstrap() || */agas::is_local_address(gid)) {
                 // apply locally
                 applier::detail::apply_helper3<action_type>::call(
-                    appl.get_runtime_support_raw_gid().get_lsb(),
+                    applier::get_applier().get_runtime_support_raw_gid().get_lsb(),
                     threads::thread_priority_default, type, gid, count);
             }
             else {

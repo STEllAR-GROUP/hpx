@@ -329,14 +329,6 @@ namespace hpx { namespace naming
         return (id.get_msb() & gid_type::was_split_mask) ? true : false;
     }
 
-    ///////////////////////////////////////////////////////////////////////
-    inline bool is_local_address(gid_type const& gid, gid_type const& prefix) HPX_PURE;
-
-    inline bool is_local_address(gid_type const& gid, gid_type const& prefix)
-    {
-        return strip_credit_from_gid(gid.get_msb()) == prefix.get_msb();
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     gid_type const invalid_gid = gid_type();
 
@@ -525,7 +517,10 @@ namespace hpx { namespace naming
         gid_type const& get_gid() const { return *gid_; }
 
         // This function is used in AGAS unit tests, do not remove. 
-        id_type::management_type get_management_type() const;
+        management_type get_management_type() const
+        {
+            return management_type(gid_->get_management_type());
+        }
 
         id_type& operator++()       // pre-increment
         {
@@ -708,14 +703,6 @@ namespace hpx { namespace naming
     inline id_type get_locality_from_id(id_type const& id)
     {
         return get_id_from_prefix(get_prefix_from_id(id));
-    }
-
-    ///////////////////////////////////////////////////////////////////////
-    inline bool is_local_address(id_type const& gid, id_type const& prefix) HPX_PURE;
-
-    inline bool is_local_address(id_type const& gid, id_type const& prefix)
-    {
-        return is_local_address(gid.get_gid(), prefix.get_gid());
     }
 
     ///////////////////////////////////////////////////////////////////////

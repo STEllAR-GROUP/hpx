@@ -197,5 +197,46 @@ lcos::promise<naming::id_type, response> resolve_name_async(
     return stubs::symbol_namespace::service_async<naming::id_type>(gid, req);
 }
 
+bool is_local_address(
+    naming::gid_type const& gid
+  , error_code& ec
+    )
+{
+    return naming::get_agas_client().is_local_address(gid, ec);
+}
+
+bool is_local_address(
+    naming::gid_type const& gid
+  , naming::address& addr
+  , error_code& ec
+    )
+{
+    return naming::get_agas_client().is_local_address(gid, addr, ec);
+}
+
+bool is_local_address_cached(
+    naming::gid_type const& gid
+  , error_code& ec
+    )
+{
+    return naming::get_agas_client().is_local_address_cached(gid, ec);
+}
+
+bool is_local_address_cached(
+    naming::gid_type const& gid
+  , naming::address& addr
+  , error_code& ec
+    )
+{
+    return naming::get_agas_client().is_local_address_cached(gid, addr, ec);
+}
+
+bool is_local_lva_encoded_address(
+    naming::gid_type const& gid
+    )
+{
+    return naming::get_agas_client().is_local_lva_encoded_address(gid);
+}
+
 }}
 

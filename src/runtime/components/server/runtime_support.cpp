@@ -12,6 +12,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
 
+#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
@@ -345,8 +346,7 @@ namespace hpx { namespace components { namespace server
             typedef void_lco_type::set_event_action action_type;
 
             naming::address addr;
-            applier::applier& appl = hpx::applier::get_applier();
-            if (appl.address_is_local(respond_to.get_gid(), addr)) {
+            if (agas::is_local_address(respond_to, addr)) {
                 // execute locally, action is executed immediately as it is
                 // a direct_action
                 hpx::applier::apply_l<action_type>(addr);
@@ -581,7 +581,7 @@ namespace hpx { namespace components { namespace server
                 typedef void_lco_type::set_event_action action_type;
 
                 naming::address addr;
-                if (appl.address_is_local(respond_to.get_gid(), addr)) {
+                if (agas::is_local_address(respond_to, addr)) {
                     // execute locally, action is executed immediately as it is
                     // a direct_action
                     hpx::applier::apply_l<action_type>(addr);

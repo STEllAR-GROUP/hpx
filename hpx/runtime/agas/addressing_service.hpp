@@ -796,7 +796,24 @@ public:
       , error_code& ec = throws
         );
 
-    bool is_local_lva_encoded_gid(
+    bool is_local_address(
+        naming::gid_type const& id
+      , naming::address& addr
+      , error_code& ec = throws
+        );
+
+    bool is_local_address_cached(
+        naming::gid_type const& id
+      , error_code& ec = throws
+        );
+
+    bool is_local_address_cached(
+        naming::gid_type const& id
+      , naming::address& addr
+      , error_code& ec = throws
+        );
+
+    bool is_local_lva_encoded_address(
         naming::gid_type const& id
         );
 
@@ -832,18 +849,44 @@ public:
     bool resolve(
         naming::gid_type const& id
       , naming::address& addr
-      , bool try_cache = true
       , error_code& ec = throws
-        );
+        )
+    {  
+        // Try the cache
+        if (caching_)
+        {
+            if (resolve_cached(id, addr, ec))
+                return true;
+
+            if (ec)
+                return false;
+        }
+
+        return resolve_full(id, addr, ec); 
+    }
 
     bool resolve(
         naming::id_type const& id
       , naming::address& addr
-      , bool try_cache = true
       , error_code& ec = throws
         )
     {
-        return resolve(id.get_gid(), addr, try_cache, ec);
+        return resolve(id.get_gid(), addr, ec);
+    }
+
+    bool resolve_full(
+        naming::gid_type const& id
+      , naming::address& addr
+      , error_code& ec = throws
+        );
+
+    bool resolve_full(
+        naming::id_type const& id
+      , naming::address& addr
+      , error_code& ec = throws
+        )
+    {
+        return resolve_full(id.get_gid(), addr, ec);
     }
 
     bool resolve_cached(

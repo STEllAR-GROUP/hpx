@@ -797,25 +797,76 @@ bool addressing_service::is_local_address(
   , error_code& ec
     )
 {
-    // For now we fall back to the primitive implementation which just compares
-    // the prefixes. That will have to be changed, though.
     if (&ec != &throws)
         ec = make_success_code();
-    return naming::is_local_address(id, local_prefix());
+
+    // For now we fall back to the primitive implementation which just compares
+    // the prefixes. That will have to be changed, though.
+    return naming::get_prefix_from_gid(local_prefix())
+        == naming::get_prefix_from_gid(id); 
 }
 
-bool addressing_service::is_local_lva_encoded_gid(
+bool addressing_service::is_local_address(
+    naming::gid_type const& id
+  , naming::address& addr
+  , error_code& ec
+    )
+{
+    // Resolve the address of the GID.
+    if (!resolve(id, addr, ec))
+    {
+        HPX_THROWS_IF(ec, unknown_component_address
+          , "addressing_service::is_local_address"
+          , boost::str(boost::format("cannot resolve gid(%1%)") % id));
+        return false;
+    }
+
+    if (ec)
+        return false;
+
+    return addr.locality_ == here_;
+}
+
+bool addressing_service::is_local_address_cached(
+    naming::gid_type const& id
+  , error_code& ec
+    )
+{
+    if (&ec != &throws)
+        ec = make_success_code();
+
+    // For now we fall back to the primitive implementation which just compares
+    // the prefixes. That will have to be changed, though.
+    return naming::get_prefix_from_gid(local_prefix())
+        == naming::get_prefix_from_gid(id); 
+}
+
+bool addressing_service::is_local_address_cached(
+    naming::gid_type const& id
+  , naming::address& addr
+  , error_code& ec
+    )
+{
+    // Try to resolve the address of the GID.
+    // NOTE: We do not throw here for a reason; it is perfectly valid for the
+    // GID to not be found in the cache.
+    if (!resolve_cached(id, addr, ec) || ec)
+        return false;
+
+    return addr.locality_ == here_;
+}
+
+bool addressing_service::is_local_lva_encoded_address(
     naming::gid_type const& id
     )
 {
     return naming::strip_credit_from_gid(id.get_msb())
-        == local_prefix().get_msb() 
+        == local_prefix().get_msb(); 
 }
-
-bool addressing_service::resolve(
+        
+bool addressing_service::resolve_full(
     naming::gid_type const& id
   , naming::address& addr
-  , bool try_cache
   , error_code& ec
     )
 { // {{{ resolve implementation
@@ -823,7 +874,7 @@ bool addressing_service::resolve(
         // {{{ special cases
 
         // LVA-encoded GIDs (located on this machine)
-        if (is_local_lva_encoded_gid(id))
+        if (is_local_lva_encoded_address(id))
         {
             addr.locality_ = here_;
 
@@ -872,16 +923,6 @@ bool addressing_service::resolve(
         }
         // }}}
 
-        // Try the cache if applicable.
-        if (try_cache && caching_)
-        {
-            if (resolve_cached(id, addr, ec))
-                return true;
-
-            if (ec)
-                return false;
-        }
-
         request req(primary_ns_resolve_gid, id);
         response rep;
 
@@ -925,8 +966,9 @@ bool addressing_service::resolve(
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error(), "addressing_service::resolve",
-                e.what());
+            HPX_RETHROW_EXCEPTION(e.get_error()
+                , "addressing_service::resolve_full"
+                , e.what());
         }
         else {
             ec = e.get_error_code(hpx::rethrow);
@@ -945,7 +987,7 @@ bool addressing_service::resolve_cached(
     // {{{ special cases
 
     // LVA-encoded GIDs (located on this machine)
-    if (is_local_lva_encoded_gid(id))
+    if (is_local_lva_encoded_address(id))
     {
         addr.locality_ = here_;
 

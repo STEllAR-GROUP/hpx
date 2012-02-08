@@ -123,7 +123,7 @@ namespace hpx { namespace applier
     {
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local(gid, addr)) {
+        if (agas::is_local_address(gid, addr)) {
             return apply_l_p<Action>(addr, priority,
                 BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
         }
@@ -140,7 +140,7 @@ namespace hpx { namespace applier
     {
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local_c_cache(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return apply_l_p<Action>(addr, priority,
                 BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
         }
@@ -260,7 +260,7 @@ namespace hpx { namespace applier
     {
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local(gid, addr)) {
+        if (agas::is_local_address(gid, addr)) {
             return apply_l_p<Action>(c, addr, priority,
                 BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
         }
@@ -277,7 +277,7 @@ namespace hpx { namespace applier
     {
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local_c_cache(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return apply_l_p<Action>(c, addr, priority,
                 BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
         }

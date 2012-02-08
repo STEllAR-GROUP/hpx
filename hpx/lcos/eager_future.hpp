@@ -7,20 +7,19 @@
 #if !defined(HPX_LCOS_EAGER_FUTURE_JUN_27_2008_0420PM)
 #define HPX_LCOS_EAGER_FUTURE_JUN_27_2008_0420PM
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/runtime/applier/apply.hpp>
-#include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/base_lco.hpp>
-#include <hpx/util/full_empty_memory.hpp>
-#include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/applier/apply.hpp>
 #include <hpx/lcos/promise.hpp>
 #include <hpx/lcos/signalling_promise.hpp>
+#include <hpx/runtime/actions/component_action.hpp>
+#include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime/applier/apply.hpp>
+#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/block_profiler.hpp>
+#include <hpx/util/full_empty_memory.hpp>
 
 #include <boost/variant.hpp>
 #include <boost/mpl/bool.hpp>
@@ -284,7 +283,7 @@ namespace hpx { namespace lcos
 
             // Determine whether the gid is local or remote
             naming::address addr;
-            if (hpx::applier::get_applier().address_is_local(gid, addr)) {
+            if (agas::is_local_address(gid, addr)) {
                 // local, direct execution
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<typename Action::component_type>()));
@@ -347,7 +346,7 @@ namespace hpx { namespace lcos
 
             // Determine whether the gid is local or remote
             naming::address addr;
-            if (hpx::applier::get_applier().address_is_local(gid, addr)) {
+            if (agas::is_local_address(gid, addr)) {
                 // local, direct execution
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<typename Action::component_type>()));
@@ -723,7 +722,7 @@ namespace hpx { namespace lcos
 
             // Determine whether the gid is local or remote
             naming::address addr;
-            if (hpx::applier::get_applier().address_is_local(gid, addr)) {
+            if (agas::is_local_address(gid, addr)) {
                 // local, direct execution
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<typename Action::component_type>()));
@@ -792,7 +791,7 @@ namespace hpx { namespace lcos
 
             // Determine whether the gid is local or remote
             naming::address addr;
-            if (hpx::applier::get_applier().address_is_local(gid, addr)) {
+            if (agas::is_local_address(gid, addr)) {
                 // local, direct execution
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<typename Action::component_type>()));

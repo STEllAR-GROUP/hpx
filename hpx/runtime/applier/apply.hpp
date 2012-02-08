@@ -10,6 +10,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 
+#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -108,7 +109,7 @@ namespace hpx { namespace applier
     {
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local(gid, addr))
+        if (agas::is_local_address(gid, addr))
             return apply_l_p<Action>(addr, priority);   // apply locally
 
         // apply remotely
@@ -123,7 +124,7 @@ namespace hpx { namespace applier
         // check if the address is in the local cache
         // send a parcel to agas if address is not found in cache
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local_c_cache(gid, addr))
+        if (agas::is_local_address_cached(gid, addr))
             return apply_l_p<Action>(addr, priority);   // apply locally
 
         // since we already know the address is local and its value
@@ -251,7 +252,7 @@ namespace hpx { namespace applier
     {
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local(gid, addr))
+        if (agas::is_local_address(gid, addr))
             return apply_l_p<Action>(c, addr, priority);
 
         // apply remotely
@@ -262,9 +263,9 @@ namespace hpx { namespace applier
     inline bool apply_p_route(actions::continuation* c, naming::id_type const& gid,
         threads::thread_priority priority)
     {
-        // Determine whether gid is local or remote (checking cache: c_cache    )   
+        // Determine whether gid is local or remote
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local_c_cache(gid, addr))
+        if (agas::is_local_address_cached(gid, addr))
             return apply_l_p<Action>(c, addr, priority); // apply locally
         
         // apply remotely
@@ -457,7 +458,7 @@ namespace hpx { namespace applier
     {
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local(gid, addr))
+        if (agas::is_local_address(gid, addr))
             return apply_l_p<Action>(addr, priority, boost::forward<Arg0>(arg0));   // apply locally
 
         // apply remotely
@@ -469,12 +470,12 @@ namespace hpx { namespace applier
     apply_p_route(naming::id_type const& gid, threads::thread_priority priority, 
         BOOST_FWD_REF(Arg0) arg0)
     {
-        //determine if the gid is local, if yes, resolve address from cache
+        // Determine if the gid is local, if it is, resolve it from the cache.
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local_c_cache(gid, addr))
+        if (agas::is_local_address_cached(gid, addr))
         {   
-        // addr. is in cache, apply locally
-        return apply_l_p<Action>(addr, priority, boost::forward<Arg0>(arg0)); 
+            // addr. is in cache, apply locally
+            return apply_l_p<Action>(addr, priority, boost::forward<Arg0>(arg0)); 
         }
 
         // apply remote - route
@@ -586,7 +587,7 @@ namespace hpx { namespace applier
     {
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local(gid, addr))
+        if (agas::is_local_address(gid, addr))
             return apply_l_p<Action>(c, addr, priority, boost::forward<Arg0>(arg0));    // apply locally
 
         // apply remotely
@@ -599,7 +600,7 @@ namespace hpx { namespace applier
         threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
     {
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local_c_cache(gid, addr))
+        if (agas::is_local_address_cached(gid, addr))
             return apply_l_p<Action>(c, addr, priority, 
                 boost::forward<Arg0>(arg0));  // apply locally
 

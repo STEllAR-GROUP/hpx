@@ -37,7 +37,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local_c_cache(gid, addr)) {
+        if (agas::is_local_address(gid, addr)) {
             // local, direct execution
             BOOST_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));

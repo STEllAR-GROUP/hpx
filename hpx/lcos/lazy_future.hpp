@@ -8,6 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/lcos/base_lco.hpp>
@@ -327,7 +328,7 @@ namespace hpx { namespace lcos
 
             // Determine whether the gid is local or remote
             naming::address addr;
-            if (hpx::applier::get_applier().address_is_local(gid, addr)) {
+            if (agas::is_local_address(gid, addr)) {
                 // local, direct execution
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<typename Action::component_type>()));
@@ -407,7 +408,7 @@ namespace hpx { namespace lcos
 
             // Determine whether the gid is local or remote
             naming::address addr;
-            if (hpx::applier::get_applier().address_is_local(gid, addr)) {
+            if (agas::is_local_address(gid, addr)) {
                 // local, direct execution
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<typename Action::component_type>()));
