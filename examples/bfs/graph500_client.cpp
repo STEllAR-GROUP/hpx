@@ -65,8 +65,8 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::size_t const number_partitions = vm["number_partitions"].as<std::size_t>();
         std::size_t const scale = vm["scale"].as<std::size_t>();
         bool const validator = vm["validator"].as<bool>();
-        double const overlap = vm["overlap"].as<double>();
-        std::size_t const schwarzdomains = vm["schwarzdomains"].as<std::size_t>();
+        double overlap = vm["overlap"].as<double>();
+        std::size_t schwarzdomains = vm["schwarzdomains"].as<std::size_t>();
 
         // number_partitions defines the size of the partition
         // for Additive Schwarz to work, we will need more partitions 
@@ -335,15 +335,15 @@ int main(int argc, char* argv[])
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()
-        ("number_partitions", value<std::size_t>()->default_value(10),
+        ("number_partitions", value<std::size_t>()->default_value(2),
             "the number of components")
         ("scale", value<std::size_t>()->default_value(10),
             "the scale of the graph problem size assuming edge factor 16")
         ("validator", value<bool>()->default_value(false),
             "whether to run the validation (slow)")
-        ("overlap", value<double>()->default_value(1.5),
+        ("overlap", value<double>()->default_value(1.3),
             "overlap factor for additive Schwarz")
-        ("schwarzdomains", value<std::size_t>()->default_value(1),
+        ("schwarzdomains", value<std::size_t>()->default_value(30),
             "number of additive Schwarz domains");
 
     return hpx::init(desc_commandline, argc, argv); // Initialize and run HPX.
