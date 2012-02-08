@@ -30,6 +30,13 @@ namespace hpx { namespace components
             gid_ = o.gid_;
             return *this;
         }
+
+        dataflow_object & operator=(naming::id_type const & gid)
+        {
+            gid_ = gid;
+            return *this;
+        }
+
         naming::id_type gid_;
 
         template <typename F>

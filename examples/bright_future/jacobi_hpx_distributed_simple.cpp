@@ -351,9 +351,16 @@ void gs(
 
         BOOST_FOREACH(hpx::lcos::promise<object<data_type> > const & o, objects)
         {
+            using hpx::naming::id_type;
             using hpx::naming::strip_credit_from_gid;
 
-            object_grid(x, y) = o.get();
+            strip_credit_from_gid(o.get().gid_.get_gid());
+            id_type
+                id(
+                    o.get().gid_.get_gid()
+                  , id_type::unmanaged
+                );
+            object_grid(x, y) = id;
 
             if(++x > dims[0] - 1)
             {
@@ -427,7 +434,7 @@ void gs(
                                 );
                             }
 
-                            if(xx + 1 == n_x_local_block && x_block + 1 < dims[0])
+                            if(xx + 1 == n_x_local && x_block + 1 < dims[0])
                             {
                                 trigger.push_back(
                                     object_grid(x_block, y_block).apply(
@@ -453,7 +460,7 @@ void gs(
                                 );
                             }
 
-                            if(yy + 1 == n_y_local_block && y_block + 1 < dims[1])
+                            if(yy + 1 == n_y_local && y_block + 1 < dims[1])
                             {
                                 trigger.push_back(
                                     object_grid(x_block, y_block).apply(
