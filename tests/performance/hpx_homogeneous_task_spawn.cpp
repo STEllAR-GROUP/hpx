@@ -32,10 +32,14 @@ using hpx::cout;
 using hpx::flush;
 
 ///////////////////////////////////////////////////////////////////////////////
+// Command-line variables.
+boost::uint64_t tasks = 500000;
 boost::uint64_t delay = 0;
+boost::uint64_t current_trial = 0;
+boost::uint64_t total_trials = 1; 
 
 ///////////////////////////////////////////////////////////////////////////////
-void null_thread()
+void worker()
 {
     double volatile d = 0.;
     for (boost::uint64_t i = 0; i < delay; ++i)
@@ -45,18 +49,26 @@ void null_thread()
 ///////////////////////////////////////////////////////////////////////////////
 void print_results(
     boost::uint64_t cores
-  , boost::uint64_t tasks
-  , boost::uint64_t delay
   , double walltime
     )
 {
-    std::string const cores_str = boost::str(boost::format("%lu,") % cores);
-    std::string const tasks_str = boost::str(boost::format("%lu,") % tasks);
-    std::string const delay_str = boost::str(boost::format("%lu,") % delay);
+    if (current_trial == 0)
+    {
+        std::string const cores_str = boost::str(boost::format("%lu,") % cores);
+        std::string const tasks_str = boost::str(boost::format("%lu,") % tasks);
+        std::string const delay_str = boost::str(boost::format("%lu,") % delay);
 
-    cout << ( boost::format("%-21s %-21s %-21s %-08.8g\n")
-            % cores_str % tasks_str % delay_str % walltime)
-         << flush;
+        cout << ( boost::format("%-21s %-21s %-21s %10.10s")
+                % cores_str % tasks_str % delay_str % walltime);
+    }
+
+    else
+        cout << (boost::format(", %10.10s") % walltime); 
+
+    if ((total_trials ? (total_trials - 1) : 0) <= current_trial)
+        cout << "\n";
+
+    cout << flush;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -65,9 +77,6 @@ int hpx_main(
     )
 {
     {
-        delay = vm["delay"].as<boost::uint64_t>();
-        boost::uint64_t const tasks = vm["tasks"].as<boost::uint64_t>();
-
         if (0 == tasks)
             throw std::invalid_argument("count of 0 tasks specified\n");
 
@@ -75,7 +84,7 @@ int hpx_main(
         high_resolution_timer t;
 
         for (boost::uint64_t i = 0; i < tasks; ++i)
-            register_work(HPX_STD_BIND(&null_thread));
+            register_work(HPX_STD_BIND(&worker));
 
         // Reschedule hpx_main until all other px-threads have finished. We
         // should be resumed after most of the null px-threads have been
@@ -84,7 +93,7 @@ int hpx_main(
             suspend();
         } while (get_thread_count() > 1);
 
-        print_results(get_os_thread_count(), tasks, delay, t.elapsed());
+        print_results(get_os_thread_count(), t.elapsed());
     }
 
     finalize();
@@ -102,12 +111,20 @@ int main(
 
     cmdline.add_options()
         ( "tasks"
-        , value<boost::uint64_t>()->default_value(500000)
-        , "number of tasks (e.g. px-threads) to invoke")
+        , value<boost::uint64_t>(&tasks)->default_value(500000)
+        , "number of tasks to invoke")
 
         ( "delay"
-        , value<boost::uint64_t>()->default_value(0)
+        , value<boost::uint64_t>(&delay)->default_value(0)
         , "number of iterations in the delay loop")
+        
+        ( "current-trial"
+        , value<boost::uint64_t>(&current_trial)->default_value(0)
+        , "current trial")
+
+        ( "total-trials"
+        , value<boost::uint64_t>(&total_trials)->default_value(1)
+        , "total number of trial runs")
         ;
 
     // Initialize and run HPX.

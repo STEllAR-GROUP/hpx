@@ -76,7 +76,8 @@ set(native_tls_FLAGS NOLIBS DEPENDENCIES ${BOOST_program_options_LIBRARY}
 set(hpx_tls_FLAGS NOLIBS DEPENDENCIES ${BOOST_program_options_LIBRARY}
                                       ${BOOST_thread_LIBRARY})
 
-set(delay_baseline_FLAGS DEPENDENCIES iostreams_component)
+set(delay_baseline_FLAGS NOLIBS
+    DEPENDENCIES ${BOOST_program_options_LIBRARY})
 
 set(hpx_homogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component)
 

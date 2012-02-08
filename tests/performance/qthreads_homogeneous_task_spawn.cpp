@@ -51,12 +51,41 @@ using boost::program_options::notify;
 using hpx::util::high_resolution_timer;
 
 ///////////////////////////////////////////////////////////////////////////////
+// Applications globals.
 boost::atomic<boost::uint64_t> donecount(0);
+
+// Command-line variables.
+boost::uint64_t tasks = 500000;
 boost::uint64_t delay = 0;
+boost::uint64_t current_trial = 0;
+boost::uint64_t total_trials = 1; 
 
 ///////////////////////////////////////////////////////////////////////////////
-extern "C" aligned_t null_thread(
-    void* args
+void print_results(
+    boost::uint64_t cores
+  , double walltime
+    )
+{
+    if (current_trial == 0)
+    {
+        std::string const cores_str = boost::str(boost::format("%lu,") % cores);
+        std::string const tasks_str = boost::str(boost::format("%lu,") % tasks);
+        std::string const delay_str = boost::str(boost::format("%lu,") % delay);
+
+        std::cout << ( boost::format("%-21s %-21s %-21s %10.10s")
+                     % cores_str % tasks_str % delay_str % walltime);
+    }
+
+    else
+        std::cout << (boost::format(", %10.10s") % walltime);
+
+    if ((total_trials ? (total_trials - 1) : 0) <= current_trial)
+        std::cout << "\n";
+}
+
+///////////////////////////////////////////////////////////////////////////////
+extern "C" aligned_t worker(
+    void* 
     )
 {
     double volatile d = 0.;
@@ -69,50 +98,26 @@ extern "C" aligned_t null_thread(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void print_results(
-    boost::uint64_t cores
-  , boost::uint64_t tasks
-  , boost::uint64_t delay
-  , double walltime
-    )
-{
-    std::string const cores_str = boost::str(boost::format("%lu,") % cores);
-    std::string const tasks_str = boost::str(boost::format("%lu,") % tasks);
-    std::string const delay_str = boost::str(boost::format("%lu,") % delay);
-
-    std::cout << ( boost::format("%-21s %-21s %-21s %-08.8g\n")
-                 % cores_str 
-                 % tasks_str
-                 % delay_str 
-                 % walltime);
-}
-
-///////////////////////////////////////////////////////////////////////////////
 int qthreads_main(
     variables_map& vm
     )
 {
-    delay = vm["delay"].as<boost::uint64_t>();
-    boost::uint64_t const tasks = vm["tasks"].as<boost::uint64_t>();
-
+    // Validate command line.
     if (0 == tasks)
         throw std::invalid_argument("count of 0 tasks specified\n");
-
-    if (qthread_initialize() != 0)
-        throw std::runtime_error("qthreads failed to initialize\n");
 
     // Start the clock.
     high_resolution_timer t;
 
     for (boost::uint64_t i = 0; i < tasks; ++i)
-        qthread_fork(&null_thread, NULL, NULL);
+        qthread_fork(&worker, NULL, NULL);
 
     // Yield until all our null qthreads are done.
     do {
         qthread_yield();
     } while (donecount != tasks);
 
-    print_results(qthread_num_workers(), tasks, delay, t.elapsed());
+    print_results(qthread_num_workers(), t.elapsed());
 
     return 0;
 }
@@ -141,12 +146,20 @@ int main(
          "number of worker OS-threads per shepherd")
 
         ( "tasks"
-        , value<boost::uint64_t>()->default_value(500000)
+        , value<boost::uint64_t>(&tasks)->default_value(500000)
         , "number of tasks (e.g. qthreads) to invoke")
 
         ( "delay"
-        , value<boost::uint64_t>()->default_value(0)
+        , value<boost::uint64_t>(&delay)->default_value(0)
         , "number of iterations in the delay loop")
+
+        ( "current-trial"
+        , value<boost::uint64_t>(&current_trial)->default_value(0)
+        , "current trial")
+
+        ( "total-trials"
+        , value<boost::uint64_t>(&total_trials)->default_value(1)
+        , "total number of trial runs")
         ;
     ;
 
@@ -169,6 +182,10 @@ int main(
 
     setenv("QT_NUM_SHEPHERDS", shepherds.c_str(), 1);
     setenv("QT_NUM_WORKERS_PER_SHEPHERD", workers.c_str(), 1);
+
+    // Setup the qthreads environment.
+    if (qthread_initialize() != 0)
+        throw std::runtime_error("qthreads failed to initialize\n");
 
     return qthreads_main(vm);
 }

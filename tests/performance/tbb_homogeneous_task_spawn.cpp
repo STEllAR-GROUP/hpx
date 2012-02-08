@@ -51,7 +51,34 @@ using boost::program_options::notify;
 using hpx::util::high_resolution_timer;
 
 ///////////////////////////////////////////////////////////////////////////////
+// Command-line variables.
+boost::uint64_t tasks = 500000;
 boost::uint64_t delay = 0;
+boost::uint64_t current_trial = 0;
+boost::uint64_t total_trials = 1; 
+
+///////////////////////////////////////////////////////////////////////////////
+void print_results(
+    boost::uint64_t cores
+  , double walltime
+    )
+{
+    if (current_trial == 0)
+    {
+        std::string const cores_str = boost::str(boost::format("%lu,") % cores);
+        std::string const tasks_str = boost::str(boost::format("%lu,") % tasks);
+        std::string const delay_str = boost::str(boost::format("%lu,") % delay);
+
+        std::cout << ( boost::format("%-21s %-21s %-21s %10.10s")
+                     % cores_str % tasks_str % delay_str % walltime);
+    }
+
+    else
+        std::cout << (boost::format(", %10.10s") % walltime);
+
+    if ((total_trials ? (total_trials - 1) : 0) <= current_trial)
+        std::cout << "\n";
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 struct worker : tbb::task
@@ -69,25 +96,15 @@ struct worker : tbb::task
 ///////////////////////////////////////////////////////////////////////////////
 struct spawner : tbb::task
 {
-  private:
-    boost::uint64_t tasks_;
-
-  public:
-    spawner(
-        boost::uint64_t tasks
-        )
-      : tasks_(tasks)
-    {}
-
     tbb::task* execute()
     {
-        set_ref_count(tasks_ + 1);
+        set_ref_count(tasks + 1);
 
-        for (boost::uint64_t i = 0; i < tasks_; ++i)
+        for (boost::uint64_t i = 0; i < tasks; ++i)
         {
             worker& a = *new (tbb::task::allocate_child()) worker();
 
-            if (i == (tasks_ - 1))
+            if (i == (tasks - 1))
                 spawn_and_wait_for_all(a);
             else
                 spawn(a);
@@ -98,51 +115,22 @@ struct spawner : tbb::task
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-void print_results(
-    boost::uint64_t cores
-  , boost::uint64_t tasks
-  , boost::uint64_t delay
-  , double walltime
-    )
-{
-    std::string const cores_str = boost::str(boost::format("%lu,") % cores);
-    std::string const tasks_str = boost::str(boost::format("%lu,") % tasks);
-    std::string const delay_str = boost::str(boost::format("%lu,") % delay);
-
-    std::cout << ( boost::format("%-21s %-21s %-21s %-08.8g\n")
-                 % cores_str 
-                 % tasks_str
-                 % delay_str 
-                 % walltime);
-}
-
-///////////////////////////////////////////////////////////////////////////////
 int tbb_main(
     variables_map& vm
     )
 {
-    delay = vm["delay"].as<boost::uint64_t>();
-    boost::uint64_t const tasks = vm["tasks"].as<boost::uint64_t>();
-    boost::uint64_t const threads = vm["threads"].as<boost::uint64_t>();
-
+    // Validate command line.
     if (0 == tasks)
         throw std::invalid_argument("count of 0 tasks specified\n");
-
-    if (0 == threads)
-        throw std::invalid_argument("count of 0 OS-threads specified\n");
-
-    tbb::task_scheduler_init init(threads);
 
     // Start the clock.
     high_resolution_timer t;
 
-    {
-        spawner& a = *new (tbb::task::allocate_root()) spawner(tasks);
+    spawner& a = *new (tbb::task::allocate_root()) spawner();
 
-        tbb::task::spawn_root_and_wait(a);
+    tbb::task::spawn_root_and_wait(a);
 
-        print_results(threads, tasks, delay, t.elapsed());
-    }
+    print_results(vm["threads"].as<boost::uint64_t>(), t.elapsed());
 
     return 0;
 }
@@ -167,12 +155,20 @@ int main(
          "number of OS-threads to use")
 
         ( "tasks"
-        , value<boost::uint64_t>()->default_value(500000)
-        , "number of tasks to invoke")
+        , value<boost::uint64_t>(&tasks)->default_value(500000)
+        , "number of tasks (e.g. px-threads) to invoke")
 
         ( "delay"
-        , value<boost::uint64_t>()->default_value(0)
+        , value<boost::uint64_t>(&delay)->default_value(0)
         , "number of iterations in the delay loop")
+        
+        ( "current-trial"
+        , value<boost::uint64_t>(&current_trial)->default_value(0)
+        , "current trial")
+
+        ( "total-trials"
+        , value<boost::uint64_t>(&total_trials)->default_value(1)
+        , "total number of trial runs")
         ;
     ;
 
@@ -186,6 +182,9 @@ int main(
         std::cout << cmdline;
         return 0;
     }
+
+    // Setup the TBB environment.
+    tbb::task_scheduler_init init(vm["threads"].as<boost::uint64_t>());
 
     return tbb_main(vm);
 }

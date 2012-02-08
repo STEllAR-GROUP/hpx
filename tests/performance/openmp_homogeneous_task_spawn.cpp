@@ -50,10 +50,37 @@ using boost::program_options::notify;
 using hpx::util::high_resolution_timer;
 
 ///////////////////////////////////////////////////////////////////////////////
+// Command-line variables.
+boost::uint64_t tasks = 500000;
 boost::uint64_t delay = 0;
+boost::uint64_t current_trial = 0;
+boost::uint64_t total_trials = 1; 
 
 ///////////////////////////////////////////////////////////////////////////////
-void null_thread()
+void print_results(
+    boost::uint64_t cores
+  , double walltime
+    )
+{
+    if (current_trial == 0)
+    {
+        std::string const cores_str = boost::str(boost::format("%lu,") % cores);
+        std::string const tasks_str = boost::str(boost::format("%lu,") % tasks);
+        std::string const delay_str = boost::str(boost::format("%lu,") % delay);
+
+        std::cout << ( boost::format("%-21s %-21s %-21s %10.10s")
+                     % cores_str % tasks_str % delay_str % walltime);
+    }
+
+    else
+        std::cout << (boost::format(", %10.10s") % walltime);
+
+    if ((total_trials ? (total_trials - 1) : 0) <= current_trial)
+        std::cout << "\n";
+}
+
+///////////////////////////////////////////////////////////////////////////////
+void worker()
 {
     double volatile d = 0.;
     for (boost::uint64_t i = 0; i < delay; ++i)
@@ -61,32 +88,11 @@ void null_thread()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void print_results(
-    boost::uint64_t cores
-  , boost::uint64_t tasks
-  , boost::uint64_t delay
-  , double walltime
-    )
-{
-    std::string const cores_str = boost::str(boost::format("%lu,") % cores);
-    std::string const tasks_str = boost::str(boost::format("%lu,") % tasks);
-    std::string const delay_str = boost::str(boost::format("%lu,") % delay);
-
-    std::cout << ( boost::format("%-21s %-21s %-21s %-08.8g\n")
-                 % cores_str 
-                 % tasks_str
-                 % delay_str 
-                 % walltime);
-}
-
-///////////////////////////////////////////////////////////////////////////////
 int omp_main(
     variables_map& vm
     )
 {
-    delay = vm["delay"].as<boost::uint64_t>();
-    boost::uint64_t const tasks = vm["tasks"].as<boost::uint64_t>();
-
+    // Validate command line.
     if (0 == tasks)
         throw std::invalid_argument("count of 0 tasks specified\n");
 
@@ -98,12 +104,12 @@ int omp_main(
     {
         for (boost::uint64_t i = 0; i < tasks; ++i)
             #pragma omp task untied
-            null_thread();
+            worker();
 
         // Yield until all work is done.
         #pragma omp taskwait
 
-        print_results(omp_get_num_threads(), tasks, delay, t.elapsed());
+        print_results(omp_get_num_threads(), t.elapsed());
     }
 
     return 0;
@@ -129,12 +135,20 @@ int main(
          "number of OS-threads to use")
 
         ( "tasks"
-        , value<boost::uint64_t>()->default_value(500000)
+        , value<boost::uint64_t>(&tasks)->default_value(500000)
         , "number of tasks to invoke")
 
         ( "delay"
-        , value<boost::uint64_t>()->default_value(0)
+        , value<boost::uint64_t>(&delay)->default_value(0)
         , "number of iterations in the delay loop")
+
+        ( "current-trial"
+        , value<boost::uint64_t>(&current_trial)->default_value(0)
+        , "current trial")
+
+        ( "total-trials"
+        , value<boost::uint64_t>(&total_trials)->default_value(1)
+        , "total number of trial runs")
         ;
     ;
 

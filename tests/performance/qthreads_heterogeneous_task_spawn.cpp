@@ -56,38 +56,25 @@ using boost::program_options::notify;
 using hpx::util::high_resolution_timer;
 
 ///////////////////////////////////////////////////////////////////////////////
+// Applications globals.
 boost::atomic<boost::uint64_t> donecount(0);
 
-///////////////////////////////////////////////////////////////////////////////
-extern "C" aligned_t null_thread(
-    void* args
-    )
-{
-    boost::uint64_t const delay = reinterpret_cast<boost::uint64_t>(args);
-
-    double volatile d = 0.;
-    for (boost::uint64_t i = 0; i < delay; ++i)
-        d += 1 / (2. * i + 1);
-
-    ++donecount;
-
-    return aligned_t();
-}
+// Command-line variables.
+boost::uint64_t tasks = 500000;
+boost::uint64_t min_delay = 0;
+boost::uint64_t max_delay = 0;
+boost::uint64_t total_delay = 0;
+boost::uint64_t current_trial = 0;
+boost::uint64_t total_trials = 1; 
+boost::uint64_t seed = 0; 
 
 ///////////////////////////////////////////////////////////////////////////////
 void print_results(
     boost::uint64_t cores
-  , boost::uint64_t seed
-  , boost::uint64_t tasks
-  , boost::uint64_t min_delay
-  , boost::uint64_t max_delay
-  , boost::uint64_t total_delay
   , double walltime
-  , boost::uint64_t current_trial
-  , boost::uint64_t total_trials
     )
 {
-    if (current_trial == 1)
+    if (current_trial == 0)
     {
         std::string const cores_str = boost::str(boost::format("%lu,") % cores);
         std::string const seed_str  = boost::str(boost::format("%lu,") % seed);
@@ -101,16 +88,16 @@ void print_results(
             = boost::str(boost::format("%lu,") % total_delay);
 
         std::cout <<
-            ( boost::format("%-21s %-21s %-21s %-21s %-21s %-21s %-08.8g")
+            ( boost::format("%-21s %-21s %-21s %-21s %-21s %-21s %10.10s")
             % cores_str % seed_str % tasks_str
             % min_delay_str % max_delay_str % total_delay_str
             % walltime);
     }
 
     else
-        std::cout << (boost::format(", %-08.8g") % walltime);
+        std::cout << (boost::format(", %10.10s") % walltime);
 
-    if (current_trial == total_trials)
+    if ((total_trials ? (total_trials - 1) : 0) <= current_trial)
         std::cout << "\n";
 }
 
@@ -131,27 +118,29 @@ boost::uint64_t shuffler(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+extern "C" aligned_t worker(
+    void* p
+    )
+{
+    boost::uint64_t const delay_ = reinterpret_cast<boost::uint64_t>(p);
+
+    double volatile d = 0.;
+    for (boost::uint64_t i = 0; i < delay_; ++i)
+        d += 1 / (2. * i + 1);
+
+    ++donecount;
+
+    return aligned_t();
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int qthreads_main(
     variables_map& vm
     )
 {
     {
-        boost::uint64_t const min_delay = vm["min-delay"].as<boost::uint64_t>();
-        boost::uint64_t const max_delay = vm["max-delay"].as<boost::uint64_t>();
-        boost::uint64_t const total_delay
-            = vm["total-delay"].as<boost::uint64_t>();
-
-        boost::uint64_t const tasks = vm["tasks"].as<boost::uint64_t>();
-
-        boost::uint64_t const current_trial
-            = vm["current-trial"].as<boost::uint64_t>();
-        boost::uint64_t const total_trials
-            = vm["total-trials"].as<boost::uint64_t>();
-
         ///////////////////////////////////////////////////////////////////////
         // Initialize the PRNG seed. 
-        boost::uint64_t seed = vm["seed"].as<boost::uint64_t>();
-
         if (!seed)
             seed = boost::uint64_t(std::time(0));
 
@@ -246,11 +235,6 @@ int qthreads_main(
             throw std::logic_error("incorrect total delay generated");
  
         ///////////////////////////////////////////////////////////////////////
-        // Initialize qthreads. 
-        if (qthread_initialize() != 0)
-            throw std::runtime_error("qthreads failed to initialize\n");
-
-        ///////////////////////////////////////////////////////////////////////
         // Start the clock.
         high_resolution_timer t;
 
@@ -259,7 +243,7 @@ int qthreads_main(
         for (boost::uint64_t i = 0; i < tasks; ++i)
         { 
             void* const ptr = reinterpret_cast<void*>(payloads[i]);
-            qthread_fork(&null_thread, ptr, NULL);
+            qthread_fork(&worker, ptr, NULL);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -271,15 +255,7 @@ int qthreads_main(
 
         ///////////////////////////////////////////////////////////////////////
         // Print the results.
-        print_results(qthread_num_workers()
-                    , seed
-                    , tasks
-                    , min_delay
-                    , max_delay
-                    , total_delay
-                    , t.elapsed()
-                    , current_trial
-                    , total_trials);
+        print_results(qthread_num_workers(), t.elapsed());
     }
 
     return 0;
@@ -310,31 +286,31 @@ int main(
          "number of worker OS-threads per shepherd")
 
         ( "tasks"
-        , value<boost::uint64_t>()->default_value(500000)
-        , "number of tasks (e.g. px-threads)")
+        , value<boost::uint64_t>(&tasks)->default_value(500000)
+        , "number of tasks to invoke")
 
         ( "min-delay"
-        , value<boost::uint64_t>()->default_value(0)
+        , value<boost::uint64_t>(&min_delay)->default_value(0)
         , "minimum number of iterations in the delay loop")
 
         ( "max-delay"
-        , value<boost::uint64_t>()->default_value(0)
+        , value<boost::uint64_t>(&max_delay)->default_value(0)
         , "maximum number of iterations in the delay loop")
 
         ( "total-delay"
-        , value<boost::uint64_t>()->default_value(0)
+        , value<boost::uint64_t>(&total_delay)->default_value(0)
         , "total number of delay iterations to be executed")
         
         ( "current-trial"
-        , value<boost::uint64_t>()->default_value(1)
-        , "current trial (must be greater than 0 and less than --total-trials)")
+        , value<boost::uint64_t>(&current_trial)->default_value(0)
+        , "current trial")
 
         ( "total-trials"
-        , value<boost::uint64_t>()->default_value(1)
+        , value<boost::uint64_t>(&total_trials)->default_value(1)
         , "total number of trial runs")
 
         ( "seed"
-        , value<boost::uint64_t>()->default_value(0)
+        , value<boost::uint64_t>(&seed)->default_value(0)
         , "seed for the pseudo random number generator (if 0, a seed is "
           "choosen based on the current system time)")
         ;
@@ -358,6 +334,10 @@ int main(
 
     setenv("QT_NUM_SHEPHERDS", shepherds.c_str(), 1);
     setenv("QT_NUM_WORKERS_PER_SHEPHERD", workers.c_str(), 1);
+
+    // Setup the qthreads environment.
+    if (qthread_initialize() != 0)
+        throw std::runtime_error("qthreads failed to initialize\n");
 
     return qthreads_main(vm);
 }
