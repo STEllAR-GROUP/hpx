@@ -81,34 +81,68 @@ namespace hpx { namespace components
 
     void pending_logs::add(message_type const& msg)
     {
-        {
-            queue_mutex_type::scoped_lock l(queue_mtx_);
-            queue_.push_back(msg);
-            ++queue_size_;
+        if (0 == hpx::get_runtime_ptr()) {
+            // just log it locally 
+            messages_type msgs;
+            msgs.push_back(msg);
+            fallback_console_logging_locked(msgs);
+            return;
         }
 
-        if (0 == hpx::get_runtime_ptr()) {
-            // the is_console call below would fail
+        // we can only invoke send from within a pxthread
+        if (threads::threadmanager_is(running) && threads::get_self_ptr() &&
+            activated_.load())
+        {
+            {
+                queue_mutex_type::scoped_lock l(queue_mtx_);
+                queue_.push_back(msg);
+                ++queue_size_;
+            }
+
+            // invoke actual logging immediately if we're on the console
+            if (naming::get_agas_client().is_console())
+                send();
+            else if (max_pending < queue_size_.load())
+                send();
+
+            return;
+        }
+
+        // is_console can be called outside of a pxthread
+        if (!naming::get_agas_client().is_console())
+        {
+            // queue it for the console
+            {
+                queue_mutex_type::scoped_lock l(queue_mtx_);
+                queue_.push_back(msg);
+                ++queue_size_;
+            }
+
+            // and log it locally
+            messages_type msgs;
+            msgs.push_back(msg);
+            fallback_console_logging_locked(msgs);
+        }
+    }
+
+    void pending_logs::cleanup()
+    {
+        if (threads::threadmanager_is(running) && threads::get_self_ptr())
+        {
+            send();
+        }
+
+        else
+        {
             messages_type msgs;
             {
                 queue_mutex_type::scoped_lock l(queue_mtx_);
                 queue_.swap(msgs);
                 queue_size_.store(0);
             }
+
             fallback_console_logging_locked(msgs);
         }
-        else if (naming::get_agas_client().is_console()) {
-            // invoke actual logging immediately if we're on the console
-            send();
-        }
-        else if (max_pending < queue_size_.load()) {
-            send();
-        }
-    }
-
-    void pending_logs::cleanup()
-    {
-        send();
     }
 
     bool pending_logs::ensure_prefix()
@@ -134,32 +168,21 @@ namespace hpx { namespace components
         return true;
     }
 
+    // WARNING: Never, ever call this outside of a pxthread.
     void pending_logs::send()
     {
+        // nothing to send
         if (0 == queue_size_.load())
-            return;         // nothing to send
+            return;
 
         if (!ensure_prefix())
-            return;         // some other thread tries to do logging
+            return;
 
         messages_type msgs;
         {
             queue_mutex_type::scoped_lock l(queue_mtx_);
-            if (queue_.empty())
-                return;
-
             queue_.swap(msgs);
             queue_size_.store(0);
-        }
-        BOOST_ASSERT(!msgs.empty());
-
-        // we can only invoke send() from within a HPX-thread
-        if (!(threads::threadmanager_is(running) && threads::get_self_ptr() &&
-              activated_.load()))
-        {
-            // write locally into a file
-            fallback_console_logging_locked(msgs);
-            return;
         }
 
         console_logging_locked(prefix_, msgs);
