@@ -226,6 +226,8 @@ namespace hpx { namespace naming
     // This function is used in AGAS unit tests, do not remove. 
     id_type::management_type id_type::get_management_type() const
     {
+        typedef detail::id_type_impl::deleter_type deleter_type;
+
         if (!gid_)
             return unknown_deleter;
 

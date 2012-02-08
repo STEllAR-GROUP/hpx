@@ -806,7 +806,6 @@ bool addressing_service::is_local_address(
 
 bool addressing_service::is_local_lva_encoded_gid(
     naming::gid_type const& id
-  , error_code& ec
     )
 {
     return naming::strip_credit_from_gid(id.get_msb())
