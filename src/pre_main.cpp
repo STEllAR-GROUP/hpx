@@ -100,15 +100,6 @@ bool pre_main(runtime_mode mode)
         agas_client.hosted->promise_pool_semaphore_.signal(pool_size);
         LBT_(info) << "(2nd stage) pre_main: addressing services enabled";
 
-        // Register pre-shutdown and shutdown functions to flush pending
-        // reference counting operations. The first sweep is the first
-        // pre-shutdown function and the second is the first shutdown function. 
-        register_pre_shutdown_function(boost::bind(
-            &agas::garbage_collect, boost::ref(throws)));
-
-        register_shutdown_function(boost::bind(
-            &agas::garbage_collect, boost::ref(throws)));
-
         // Load components, so that we can use the barrier LCO.
         if (!components::stubs::runtime_support::load_components(find_here()))
         {
@@ -143,15 +134,6 @@ bool pre_main(runtime_mode mode)
             LBT_(info) << "(2nd stage) pre_main: addressing services enabled";
         }
         // }}}
-
-        // Register pre-shutdown and shutdown functions to flush pending
-        // reference counting operations. The first sweep is the first
-        // pre-shutdown function and the second is the first shutdown function. 
-        register_pre_shutdown_function(boost::bind(
-            &agas::garbage_collect, boost::ref(throws)));
-
-        register_shutdown_function(boost::bind(
-            &agas::garbage_collect, boost::ref(throws)));
 
         // Load components, so that we can use the barrier LCO.
         if (!components::stubs::runtime_support::load_components(find_here()))
@@ -206,6 +188,16 @@ bool pre_main(runtime_mode mode)
 
         components::stubs::runtime_support::call_startup_functions(find_here());
         LBT_(info) << "(3rd stage) pre_main: ran startup functions";
+
+        // Register pre-shutdown and shutdown functions to flush pending
+        // reference counting operations.
+        register_pre_shutdown_function(boost::bind(
+            &agas::addressing_service::trigger_refcnt_requests
+          , &agas_client, boost::ref(throws)));
+
+        register_shutdown_function(boost::bind(
+            &agas::addressing_service::trigger_refcnt_requests
+          , &agas_client, boost::ref(throws)));
 
         // Third stage bootstrap synchronizes startup functions across all
         // localities. This is done after component loading to guarantee that
