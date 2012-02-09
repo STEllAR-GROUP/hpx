@@ -238,11 +238,18 @@ bool is_local_lva_encoded_address(
     return naming::get_agas_client().is_local_lva_encoded_address(gid);
 }
 
-void garbage_collect(
+void garbage_collect_non_blocking(
     error_code& ec
     )
 {
-    return naming::get_agas_client().garbage_collect(ec);
+    return naming::get_agas_client().garbage_collect_non_blocking(ec);
+}
+
+void garbage_collect_sync(
+    error_code& ec
+    )
+{
+    return naming::get_agas_client().garbage_collect_sync(ec);
 }
 
 }}

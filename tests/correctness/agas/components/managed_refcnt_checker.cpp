@@ -25,10 +25,6 @@ HPX_REGISTER_ACTION_EX(
     managed_refcnt_checker::take_reference_action,
     managed_refcnt_checker_take_reference_action);
 
-HPX_REGISTER_ACTION_EX(
-    managed_refcnt_checker::garbage_collect_action,
-    managed_refcnt_checker_garbage_collect_action);
-
 HPX_DEFINE_GET_COMPONENT_TYPE(managed_refcnt_checker);
 
 

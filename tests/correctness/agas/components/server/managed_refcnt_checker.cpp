@@ -40,6 +40,10 @@ managed_refcnt_checker::~managed_refcnt_checker()
         }
     }
 
+    // Flush garbage collection.
+    references_.clear();
+    agas::garbage_collect_sync();
+
     if (naming::invalid_id != target_)
     {
         strm << ( boost::format("[%1%/%2%]: triggering flag %3%\n")

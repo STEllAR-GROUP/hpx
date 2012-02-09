@@ -315,7 +315,7 @@ namespace hpx { namespace applier
     apply_c_route (naming::address& addr, naming::id_type const& contgid, 
         naming::id_type const& gid)
     {
-        return apply_r_route<Action>(addr, new actions::continuation(contgid    ), gid);
+        return apply_r_route<Action>(addr, new actions::continuation(contgid), gid);
     }
 
     template <typename Action>

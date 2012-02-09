@@ -116,6 +116,14 @@ bool pre_main(runtime_mode mode)
 
         components::stubs::runtime_support::call_startup_functions(find_here());
         LBT_(info) << "(3rd stage) pre_main: ran startup functions";
+
+        // Register pre-shutdown and shutdown functions to flush pending
+        // reference counting operations.
+        register_pre_shutdown_function(boost::bind(
+            &agas::garbage_collect_non_blocking, boost::ref(throws)));
+
+        register_shutdown_function(boost::bind(
+            &agas::garbage_collect_sync, boost::ref(throws)));
     }
 
     else
@@ -189,20 +197,20 @@ bool pre_main(runtime_mode mode)
         components::stubs::runtime_support::call_startup_functions(find_here());
         LBT_(info) << "(3rd stage) pre_main: ran startup functions";
 
-        // Register pre-shutdown and shutdown functions to flush pending
-        // reference counting operations.
-        register_pre_shutdown_function(boost::bind(
-            &agas::garbage_collect, boost::ref(throws)));
-
-        register_shutdown_function(boost::bind(
-            &agas::garbage_collect, boost::ref(throws)));
-
         // Third stage bootstrap synchronizes startup functions across all
         // localities. This is done after component loading to guarantee that
         // all user code, including startup functions, are only run after the
         // component tables are populated.
         third_stage.wait();
         LBT_(info) << "(3rd stage) pre_main: passed 3rd stage boot barrier";
+
+        // Register pre-shutdown and shutdown functions to flush pending
+        // reference counting operations. 
+        register_pre_shutdown_function(boost::bind(
+            &agas::garbage_collect_non_blocking, boost::ref(throws)));
+
+        register_shutdown_function(boost::bind(
+            &agas::garbage_collect_sync, boost::ref(throws)));
     }
 
     // Enable logging.

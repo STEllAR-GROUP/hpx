@@ -50,8 +50,10 @@ response primary_namespace::service(
             return free(req, ec);
         case primary_ns_unbind_gid:
             return unbind_gid(req, ec);
-        case primary_ns_change_credit:
-            return change_credit(req, ec);
+        case primary_ns_change_credit_non_blocking:
+            return change_credit_non_blocking(req, ec);
+        case primary_ns_change_credit_sync:
+            return change_credit_sync(req, ec);
         case primary_ns_localities:
             return localities(req, ec);
 
@@ -622,11 +624,11 @@ response primary_namespace::unbind_gid(
     }
 } // }}}
 
-response primary_namespace::change_credit(
+response primary_namespace::change_credit_non_blocking(
     request const& req
   , error_code& ec
     )
-{ // change_credit implementation
+{ // change_credit_non_blocking implementation
     // parameters
     boost::int64_t credits = req.get_credit();
     naming::gid_type lower = req.get_lower_bound();
@@ -635,23 +637,87 @@ response primary_namespace::change_credit(
     naming::strip_credit_from_gid(lower);
     naming::strip_credit_from_gid(upper);
 
-    // Increment
+    // Increment.
     if (0 < credits)
+    {
         increment(lower, upper, credits, ec);
 
-    // Decrement
+        if (ec)
+            return response();
+    }
+
+    // Decrement.
     else if (0 > credits)
-        decrement(lower, upper, -credits, ec);
+    {
+        std::list<free_entry> free_list;
+        decrement_sweep(free_list, lower, upper, -credits, ec);
+
+        if (ec)
+            return response();
+
+        kill_non_blocking(free_list, lower, upper, ec); 
+
+        if (ec)
+            return response();
+    }
 
     else
     {
         HPX_THROWS_IF(ec, bad_parameter
-          , "primary_namespace::change_credit"
+          , "primary_namespace::change_credit_non_blocking"
           , boost::str(boost::format("invalid credit count of %1%") % credits));
         return response();
     }
 
-    return response(primary_ns_change_credit);
+    return response(primary_ns_change_credit_non_blocking);
+}
+
+response primary_namespace::change_credit_sync(
+    request const& req
+  , error_code& ec
+    )
+{ // change_credit_sync implementation
+    // parameters
+    boost::int64_t credits = req.get_credit();
+    naming::gid_type lower = req.get_lower_bound();
+    naming::gid_type upper = req.get_upper_bound();
+
+    naming::strip_credit_from_gid(lower);
+    naming::strip_credit_from_gid(upper);
+
+    // Increment.
+    if (0 < credits)
+    {
+        increment(lower, upper, credits, ec);
+
+        if (ec)
+            return response();
+    }
+
+    // Decrement.
+    else if (0 > credits)
+    {
+        std::list<free_entry> free_list;
+        decrement_sweep(free_list, lower, upper, -credits, ec);
+
+        if (ec)
+            return response();
+
+        kill_sync(free_list, lower, upper, ec); 
+
+        if (ec)
+            return response();
+    }
+
+    else
+    {
+        HPX_THROWS_IF(ec, bad_parameter
+          , "primary_namespace::change_credit_sync"
+          , boost::str(boost::format("invalid credit count of %1%") % credits));
+        return response();
+    }
+
+    return response(primary_ns_change_credit_sync);
 }
 
 void primary_namespace::increment(
@@ -684,20 +750,21 @@ void primary_namespace::increment(
         ec = make_success_code();
 } // }}}
 
-void primary_namespace::decrement(
-    naming::gid_type const& lower
+void primary_namespace::decrement_sweep(
+    std::list<free_entry>& free_list
+  , naming::gid_type const& lower
   , naming::gid_type const& upper
   , boost::int64_t credits
   , error_code& ec
     )
-{ // {{{ decrement implementation
+{ // {{{ decrement_sweep implementation
     using boost::fusion::at_c;
 
     // REVIEW: Why do we have this restriction?
     if (HPX_UNLIKELY(HPX_INITIAL_GLOBALCREDIT < credits))
     {
         HPX_THROWS_IF(ec, bad_parameter
-          , "primary_namespace::decrement"
+          , "primary_namespace::decrement_sweep"
           , "cannot decrement more than "
             BOOST_PP_STRINGIZE(HPX_INITIAL_GLOBALCREDIT)
             " credits at once");
@@ -705,29 +772,11 @@ void primary_namespace::decrement(
     }
 
     LAGAS_(info) << (boost::format(
-        "primary_namespace::decrement, lower(%1%), upper(%2%), credits(%3%)")
+        "primary_namespace::decrement_sweep, lower(%1%), upper(%2%), "
+        "credits(%3%)")
         % lower % upper % credits);
 
-    typedef boost::fusion::vector3<
-        gva                 // gva
-      , naming::gid_type    // gid
-      , naming::gid_type    // count
-    > free_entry;
-
-    // Components to be freed.
-    std::list<free_entry> free_list;
-
-    // TODO/REVIEW: Do we ensure that a GID doesn't get reinserted into the
-    // table after it's been decremented to 0 and destroyed? How do we do this
-    // efficiently?
-
-    // The new decrement algorithm:
-    //    0.) Apply the decrement across the entire keyspace.
-    //    1.) Search for dead objects (e.g. objects with a reference count of
-    //        0) by iterating over the keyspace.
-    //    2.) Resolve the dead objects (retrieve the GVA, adjust for partial
-    //        matches) and remove them from the reference counting table.
-    //    3.) Kill the dead objects (fire-and-forget semantics).
+    free_list.clear();
 
     {
         mutex_type::scoped_lock l(mutex_);
@@ -756,7 +805,7 @@ void primary_namespace::decrement(
         if (matches.first == refcnts_.end() && matches.second == refcnts_.end())
         {
             HPX_THROWS_IF(ec, lock_error
-              , "primary_namespace::decrement"
+              , "primary_namespace::decrement_sweep"
               , boost::str(boost::format(
                     "reference count table insertion failed due to a locking "
                     "error or memory corruption, lower(%1%), upper(%2%)")
@@ -827,7 +876,7 @@ void primary_namespace::decrement(
                                  == at_c<1>(r).type))
                 {
                     HPX_THROWS_IF(ec, internal_server_error
-                      , "primary_namespace::decrement"
+                      , "primary_namespace::decrement_sweep"
                       , boost::str(boost::format(
                             "encountered a GVA with an invalid type while"
                             "performing a decrement, gid(%1%), gva(%2%)")
@@ -838,7 +887,7 @@ void primary_namespace::decrement(
                 else if (HPX_UNLIKELY(0 == at_c<1>(r).count))
                 {
                     HPX_THROWS_IF(ec, internal_server_error
-                      , "primary_namespace::decrement"
+                      , "primary_namespace::decrement_sweep"
                       , boost::str(boost::format(
                             "encountered a GVA with a count of zero while"
                             "performing a decrement, gid(%1%), gva(%2%)")
@@ -865,8 +914,9 @@ void primary_namespace::decrement(
                 key_type const sub(query, sub_upper);
 
                 LAGAS_(info) << (boost::format(
-                    "primary_namespace::decrement, resolved match, lower(%1%), "
-                    "upper(%2%), super-object(%3%), sub-object(%4%)")
+                    "primary_namespace::decrement_sweep, resolved match, "
+                    "lower(%1%), upper(%2%), super-object(%3%), "
+                    "sub-object(%4%)")
                     % lower % upper % super % sub);
 
                 // Subtract the GIDs that are bound to this GVA from the
@@ -895,11 +945,24 @@ void primary_namespace::decrement(
 
     } // Unlock the mutex.
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Kill the dead objects.
+    if (&ec != &throws)
+        ec = make_success_code();
+}
+
+void primary_namespace::kill_non_blocking(
+    std::list<free_entry>& free_list
+  , naming::gid_type const& lower
+  , naming::gid_type const& upper
+  , error_code& ec
+    )
+{ // {{{ kill_non_blocking implementation
+    using boost::fusion::at_c;
 
     naming::gid_type const agas_prefix_
         = naming::get_gid_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX);
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Kill the dead objects.
 
     BOOST_FOREACH(free_entry const& e, free_list)
     {
@@ -907,9 +970,9 @@ void primary_namespace::decrement(
         if (HPX_UNLIKELY(!threads::threadmanager_is(running)))
         {
             LAGAS_(info) << (boost::format(
-                "primary_namespace::decrement, cancelling free operation "
-                "(threadmanager is down), lower(%1%), upper(%2%), base(%3%), "
-                "gva(%4%), count(%5%)")
+                "primary_namespace::kill_non_blocking, cancelling free "
+                "operation because the threadmanager is down, lower(%1%), "
+                "upper(%2%), base(%3%), gva(%4%), count(%5%)")
                 % lower
                 % upper
                 % at_c<1>(e) % at_c<0>(e) % at_c<2>(e));
@@ -917,8 +980,8 @@ void primary_namespace::decrement(
         }
 
         LAGAS_(info) << (boost::format(
-            "primary_namespace::decrement, freeing component%1%, lower(%2%), "
-            "upper(%3%), base(%4%), gva(%5%), count(%6%)")
+            "primary_namespace::kill_non_blocking, freeing component%1%, "
+            "lower(%2%), upper(%3%), base(%4%), gva(%5%), count(%6%)")
             % ((at_c<2>(e) == naming::gid_type(0, 1)) ? "" : "s")
             % lower
             % upper
@@ -939,6 +1002,7 @@ void primary_namespace::decrement(
                 components::component_runtime_support,
                 get_runtime_support_ptr());
 
+            // FIXME: Priority?
             applier::apply_l<action_type>
                 (rts_addr, type_, at_c<1>(e), at_c<2>(e));
         }
@@ -954,9 +1018,79 @@ void primary_namespace::decrement(
                 naming::get_locality_from_gid(at_c<1>(e)),
                 naming::id_type::unmanaged);
 
+            // FIXME: Priority?
             applier::apply_r<action_type>
                 (rts_addr, prefix_, type_, at_c<1>(e), at_c<2>(e));
         }
+    }
+
+    if (&ec != &throws)
+        ec = make_success_code();
+} // }}}
+
+void primary_namespace::kill_sync(
+    std::list<free_entry>& free_list
+  , naming::gid_type const& lower
+  , naming::gid_type const& upper
+  , error_code& ec
+    )
+{ // {{{ kill_sync implementation
+    using boost::fusion::at_c;
+
+    naming::gid_type const agas_prefix_
+        = naming::get_gid_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX);
+
+    std::list<lcos::promise<void> > futures;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Kill the dead objects.
+
+    BOOST_FOREACH(free_entry const& e, free_list)
+    {
+        // Bail if we're in late shutdown.
+        if (HPX_UNLIKELY(!threads::threadmanager_is(running)))
+        {
+            LAGAS_(info) << (boost::format(
+                "primary_namespace::kill_sync, cancelling free "
+                "operation because the threadmanager is down, lower(%1%), "
+                "upper(%2%), base(%3%), gva(%4%), count(%5%)")
+                % lower
+                % upper
+                % at_c<1>(e) % at_c<0>(e) % at_c<2>(e));
+            continue;
+        }
+
+        LAGAS_(info) << (boost::format(
+            "primary_namespace::kill_sync, freeing component%1%, "
+            "lower(%2%), upper(%3%), base(%4%), gva(%5%), count(%6%)")
+            % ((at_c<2>(e) == naming::gid_type(0, 1)) ? "" : "s")
+            % lower
+            % upper
+            % at_c<1>(e) % at_c<0>(e) % at_c<2>(e));
+
+        typedef components::server::runtime_support::free_component_action
+            action_type;
+
+        components::component_type const type_ =
+            components::component_type(at_c<0>(e).type);
+
+        // FIXME: Resolve the locality instead of deducing it from the
+        // target GID, otherwise this will break once we start moving
+        // objects.
+        naming::id_type const prefix_(
+            naming::get_locality_from_gid(at_c<1>(e))
+          , naming::id_type::unmanaged);
+
+        futures.push_back(lcos::promise<void>());
+
+        // FIXME: Priority?
+        applier::apply_c<action_type>
+            (futures.back().get_gid(), prefix_, type_, at_c<1>(e), at_c<2>(e));
+    }
+
+    BOOST_FOREACH(lcos::promise<void> const& f, futures)
+    {
+        f.get();
     }
 
     if (&ec != &throws)

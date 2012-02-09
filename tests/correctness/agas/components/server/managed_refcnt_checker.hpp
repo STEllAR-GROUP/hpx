@@ -14,7 +14,6 @@
 #include <hpx/runtime/components/constructor_argument.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/runtime/agas/interface.hpp>
 
 namespace hpx { namespace test { namespace server
 {
@@ -48,15 +47,9 @@ struct HPX_COMPONENT_EXPORT managed_refcnt_checker
         references_.push_back(gid);
     }
 
-    void garbage_collect()
-    {
-        agas::garbage_collect();
-    }
-
     enum actions
     {
         action_take_reference
-      , action_garbage_collect
     };
 
     typedef hpx::actions::action1<
@@ -69,15 +62,6 @@ struct HPX_COMPONENT_EXPORT managed_refcnt_checker
         // method
       , &managed_refcnt_checker::take_reference
     > take_reference_action;
-
-    typedef hpx::actions::action0<
-        // component
-        managed_refcnt_checker
-        // action code
-      , action_garbage_collect
-        // method
-      , &managed_refcnt_checker::garbage_collect
-    > garbage_collect_action;
 };
 
 }}}
@@ -85,10 +69,6 @@ struct HPX_COMPONENT_EXPORT managed_refcnt_checker
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::test::server::managed_refcnt_checker::take_reference_action,
     managed_refcnt_checker_take_reference_action);
-
-HPX_REGISTER_ACTION_DECLARATION_EX(
-    hpx::test::server::managed_refcnt_checker::garbage_collect_action,
-    managed_refcnt_checker_garbage_collect_action);
 
 #endif // HPX_2F9C9286_A4A2_451C_BBD6_CD884F57B21D
 

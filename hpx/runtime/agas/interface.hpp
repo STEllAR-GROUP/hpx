@@ -16,6 +16,7 @@
 
 namespace hpx { namespace agas
 {
+
 ///////////////////////////////////////////////////////////////////////////////
 HPX_EXPORT bool register_name(
     std::string const& name
@@ -138,7 +139,11 @@ inline bool is_local_lva_encoded_address(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_EXPORT void garbage_collect(
+HPX_EXPORT void garbage_collect_non_blocking(
+    error_code& ec = throws
+    );
+
+HPX_EXPORT void garbage_collect_sync(
     error_code& ec = throws
     );
 

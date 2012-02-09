@@ -276,7 +276,11 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     ///        local cache.
     void install_counters();
 
-    void garbage_collect(
+    void garbage_collect_non_blocking(
+        error_code& ec = throws
+        );
+    
+    void garbage_collect_sync(
         error_code& ec = throws
         );
 
@@ -287,7 +291,14 @@ private:
       , error_code& ec
         );
 
-    void send_refcnt_requests(
+    /// Assumes that \a refcnt_requests_mtx_ is locked.
+    void send_refcnt_requests_non_blocking(
+        mutex_type::scoped_lock& l
+      , error_code& ec
+        );
+
+    /// Assumes that \a refcnt_requests_mtx_ is locked.
+    void send_refcnt_requests_sync(
         mutex_type::scoped_lock& l
       , error_code& ec
         );

@@ -12,6 +12,7 @@
 #include <hpx/lcos/promise.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/agas/remote_interface.hpp>
 
 #include <tests/correctness/agas/components/stubs/simple_refcnt_checker.hpp>
 
@@ -31,6 +32,7 @@ struct simple_refcnt_checker
 
   private:
     lcos::promise<void> flag_;
+    naming::id_type const locality_;
 
     using base_type::create;
     using base_type::create_one;
@@ -42,6 +44,8 @@ struct simple_refcnt_checker
     explicit simple_refcnt_checker(
         naming::gid_type const& locality
         )
+      : locality_(naming::get_locality_from_gid(locality)
+                , naming::id_type::unmanaged)
     {
         this->base_type::create_one(locality, flag_.get_gid());
     }
@@ -50,6 +54,7 @@ struct simple_refcnt_checker
     explicit simple_refcnt_checker(
         naming::id_type const& locality
         )
+      : locality_(naming::get_locality_from_id(locality))
     {
         this->base_type::create_one(locality, flag_.get_gid());
     }
@@ -72,6 +77,9 @@ struct simple_refcnt_checker
 
     bool ready()
     {
+        // Flush pending reference counting operations on the target locality. 
+        agas::garbage_collect_sync(locality_);
+
         return flag_.ready();
     }
 
@@ -82,6 +90,9 @@ struct simple_refcnt_checker
         Duration const& d
         )
     {
+        // Flush pending reference counting operations on the target locality. 
+        agas::garbage_collect_sync(locality_);
+
         // Schedule a wakeup.
         threads::set_thread_state(threads::get_self_id(), d, threads::pending);
 

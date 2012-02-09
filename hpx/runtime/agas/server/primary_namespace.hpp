@@ -197,7 +197,12 @@ struct HPX_EXPORT primary_namespace :
       , error_code& ec = throws
         );
 
-    response change_credit(
+    response change_credit_non_blocking(
+        request const& req
+      , error_code& ec = throws
+        );
+
+    response change_credit_sync(
         request const& req
       , error_code& ec = throws
         );
@@ -220,10 +225,45 @@ struct HPX_EXPORT primary_namespace :
       , error_code& ec
         );
 
-    void decrement(
-        naming::gid_type const& lower
+    /// TODO/REVIEW: Do we ensure that a GID doesn't get reinserted into the
+    /// table after it's been decremented to 0 and destroyed? How do we do this
+    /// efficiently?
+    /// 
+    /// The new decrement algorithm (decrement_sweep handles 0-2,
+    /// kill_non_blocking or kill_sync handles 3):
+    ///
+    ///    0.) Apply the decrement across the entire keyspace.
+    ///    1.) Search for dead objects (e.g. objects with a reference count of
+    ///        0) by iterating over the keyspace.
+    ///    2.) Resolve the dead objects (retrieve the GVA, adjust for partial
+    ///        matches) and remove them from the reference counting table.
+    ///    3.) Kill the dead objects (fire-and-forget semantics).
+
+    typedef boost::fusion::vector3<
+        gva                 // gva
+      , naming::gid_type    // gid
+      , naming::gid_type    // count
+    > free_entry;
+
+    void decrement_sweep(
+        std::list<free_entry>& free_list
+      , naming::gid_type const& lower
       , naming::gid_type const& upper
       , boost::int64_t credits
+      , error_code& ec
+        );
+
+    void kill_non_blocking(
+        std::list<free_entry>& free_list
+      , naming::gid_type const& lower
+      , naming::gid_type const& upper
+      , error_code& ec
+        );
+
+    void kill_sync(
+        std::list<free_entry>& free_list
+      , naming::gid_type const& lower
+      , naming::gid_type const& upper
       , error_code& ec
         );
 
@@ -231,19 +271,20 @@ struct HPX_EXPORT primary_namespace :
     enum actions
     { // {{{ action enum
         // Actual actions
-        namespace_service          = BOOST_BINARY_U(1000000)
-      , namespace_bulk_service     = BOOST_BINARY_U(1000001)
-      , namespace_route            = BOOST_BINARY_U(1000010)
+        namespace_service                       = BOOST_BINARY_U(1000000)
+      , namespace_bulk_service                  = BOOST_BINARY_U(1000001)
+      , namespace_route                         = BOOST_BINARY_U(1000010)
 
         // Pseudo-actions
-      , namespace_allocate         = BOOST_BINARY_U(1000011)
-      , namespace_bind_gid         = BOOST_BINARY_U(1000100)
-      , namespace_resolve_gid      = BOOST_BINARY_U(1000101)
-      , namespace_resolve_locality = BOOST_BINARY_U(1000110)
-      , namespace_free             = BOOST_BINARY_U(1000111)
-      , namespace_unbind_gid       = BOOST_BINARY_U(1001000)
-      , namespace_change_credit    = BOOST_BINARY_U(1001001)
-      , namespace_localities       = BOOST_BINARY_U(1001010)
+      , namespace_allocate                      = BOOST_BINARY_U(1000011)
+      , namespace_bind_gid                      = BOOST_BINARY_U(1000100)
+      , namespace_resolve_gid                   = BOOST_BINARY_U(1000101)
+      , namespace_resolve_locality              = BOOST_BINARY_U(1000110)
+      , namespace_free                          = BOOST_BINARY_U(1000111)
+      , namespace_unbind_gid                    = BOOST_BINARY_U(1001000)
+      , namespace_change_credit_non_blocking    = BOOST_BINARY_U(1001001)
+      , namespace_change_credit_sync            = BOOST_BINARY_U(1001010)
+      , namespace_localities                    = BOOST_BINARY_U(1001011)
     }; // }}}
 
     typedef hpx::actions::result_action1<

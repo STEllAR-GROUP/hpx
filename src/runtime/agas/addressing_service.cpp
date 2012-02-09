@@ -1108,7 +1108,8 @@ void addressing_service::incref(
     }
 
     try {
-        request req(primary_ns_change_credit, lower, upper, credit);
+        request req(primary_ns_change_credit_non_blocking
+                  , lower, upper, credit);
         response rep;
 
         // REVIEW: Should we do fire-and-forget here as well?
@@ -1419,12 +1420,20 @@ void addressing_service::install_counters()
         counters, sizeof(counters)/sizeof(counters[0]));
 } // }}}
 
-void addressing_service::garbage_collect(
+void addressing_service::garbage_collect_non_blocking(
     error_code& ec
     )
 {
     mutex_type::scoped_lock l(refcnt_requests_mtx_);
-    send_refcnt_requests(l, ec);
+    send_refcnt_requests_non_blocking(l, ec);
+}
+
+void addressing_service::garbage_collect_sync(
+    error_code& ec
+    )
+{
+    mutex_type::scoped_lock l(refcnt_requests_mtx_);
+    send_refcnt_requests_sync(l, ec);
 }
 
 void addressing_service::increment_refcnt_requests(
@@ -1441,13 +1450,13 @@ void addressing_service::increment_refcnt_requests(
     }
 
     if (max_refcnt_requests_ == ++refcnt_requests_count_)
-        send_refcnt_requests(l, ec);
+        send_refcnt_requests_non_blocking(l, ec);
 
     else if (&ec != &throws)
         ec = make_success_code();
 }
 
-void addressing_service::send_refcnt_requests(
+void addressing_service::send_refcnt_requests_non_blocking(
     addressing_service::mutex_type::scoped_lock& l
   , error_code& ec
     )
@@ -1465,7 +1474,7 @@ void addressing_service::send_refcnt_requests(
 
         BOOST_FOREACH(refcnt_requests_type::const_reference e, *p)
         {
-            request const req(primary_ns_change_credit
+            request const req(primary_ns_change_credit_non_blocking
                             , boost::icl::lower(e.key())
                             , boost::icl::upper(e.key())
                             , e.data());
@@ -1483,6 +1492,56 @@ void addressing_service::send_refcnt_requests(
         else
             hosted->primary_ns_.bulk_service_non_blocking
                 (requests, action_priority_);
+
+        if (&ec != &throws)
+            ec = make_success_code();
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error()
+              , "addressing_service::increment_refcnt_requests"
+              , e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow);
+        }
+
+        return;
+    }
+}
+
+void addressing_service::send_refcnt_requests_sync(
+    addressing_service::mutex_type::scoped_lock& l
+  , error_code& ec
+    )
+{
+    try {
+        boost::shared_ptr<refcnt_requests_type> p(new refcnt_requests_type);
+
+        p.swap(refcnt_requests_);
+
+        refcnt_requests_count_ = 0;
+
+        l.unlock();
+
+        std::vector<request> requests;
+
+        BOOST_FOREACH(refcnt_requests_type::const_reference e, *p)
+        {
+            request const req(primary_ns_change_credit_sync
+                            , boost::icl::lower(e.key())
+                            , boost::icl::upper(e.key())
+                            , e.data());
+            requests.push_back(req);
+        }
+
+        if (is_bootstrap())
+            bulk_service(requests, ec);
+        else
+            bulk_service(requests, ec);
+
+        if (ec)
+            return;
 
         if (&ec != &throws)
             ec = make_success_code();
