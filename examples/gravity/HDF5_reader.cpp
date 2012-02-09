@@ -32,7 +32,7 @@ vector<point> createvecs (config_f& param) {
  DataSet dataset=file.openDataSet(DATASET_NAME); //Open dataset
  DataSpace dataspace=dataset.getSpace(); //Get the dataspace
  hsize_t dims_out[2];
- int ndims=0;
+ uint64_t ndims=0;
  ndims=dataspace.getSimpleExtentDims(dims_out,NULL); //Get dimentions
 
  //Define a memory block

@@ -39,10 +39,10 @@ struct components {
 struct config_f {
  string input;
  string output;
- int steps;
- int timestep;
- int print;
- int num_cores;
+ uint64_t steps;
+ uint64_t timestep;
+ uint64_t print;
+ uint64_t num_cores;
 
  template <typename Archive>
  void serialize(Archive & ar, unsigned)

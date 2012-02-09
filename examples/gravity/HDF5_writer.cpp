@@ -12,9 +12,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <cstdlib>
+#include <iostream>
 #include <stdlib.h>
 #include <string>
 
+#include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include <hpx/lcos/async.hpp>
@@ -29,13 +31,15 @@ using namespace H5;
 using hpx::lcos::promise;
 using hpx::lcos::wait;
 
-void printval (promise<void> const & mp,config_f& param,int k,int t,
+void printval (promise<void> const & mp,config_f& param,uint64_t k,uint64_t t,
                 ofstream &coorfile, ofstream &trbst) {
  wait(mp);
  if (t%param.print==0) {
+  uint64_t width=log10(param.steps)+1;
   string a=boost::lexical_cast<string>(t);
-  string j=param.output+"_"+a+".h5";
-  const H5std_string FILE_NAME(j);
+  string frm=boost::str(boost::format("%%s_%%0%dd.h5") %width);
+  string name=boost::str(boost::format(frm) %param.output %a);
+  const H5std_string FILE_NAME(name);
   const H5std_string DATASET_NAME("Coordinates");
   H5File file(FILE_NAME, H5F_ACC_TRUNC);
   hsize_t fdim[]={k,11};
@@ -47,8 +51,8 @@ void printval (promise<void> const & mp,config_f& param,int k,int t,
   file.close();
  }
  if (debug) {
-  int tn=t+1;
-  for (int i=0;i<k;i++) {
+  uint64_t tn=t+1;
+  for (uint64_t i=0;i<k;i++) {
    coorfile<<pts_timestep[tn][i].x<<","<<pts_timestep[tn][i].y<<","
            <<pts_timestep[tn][i].z<<",";
    trbst<<"v:,"<<pts_timestep[tn][i].vx<<","<<pts_timestep[tn][i].vy<<","
@@ -60,7 +64,7 @@ void printval (promise<void> const & mp,config_f& param,int k,int t,
  }
 }
 
-void printfinalcoord (config_f& param, int k) { ///Not done with this function
+void printfinalcoord (config_f& param, uint64_t k) { ///Not done with this function
  string j=param.output+"_finalcoord.h5";
  const H5std_string FILE_NAME(j);
  const H5std_string DATASET_NAME("Coordinates");

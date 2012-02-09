@@ -74,25 +74,26 @@ namespace boost
 
 ///////////////////////////////////////////////////////////////////////////////
 //Forward Declarations
-vector<promise<void> > calc(int k,int t);
-vector<components> dist(int t,int i,int l);
-void move(vector<promise<void> > const& cfp,config_f const& param,int k,int t);
-void printval(promise<void> const & mp,config_f& param,int k,int t,
+vector<promise<void> > calc(uint64_t k,uint64_t t);
+vector<components> dist(uint64_t t,uint64_t i,uint64_t l);
+void move(vector<promise<void> > const& cfp,config_f const& param,uint64_t k,
+          uint64_t t);
+void printval(promise<void> const & mp,config_f& param,uint64_t k,uint64_t t,
                ofstream &coorfile, ofstream &trbst);///!!!!//
-void printfinalcoord(config_f& param,int k);
+void printfinalcoord(config_f& param,uint64_t k);
 void closefile(ofstream &notes,config_f& param,float ct);
 void closedebugfile(ofstream &coorfile,ofstream &trbst); //closefile for debug
 void loadconfig(config_f& param,variables_map& vm);
-void setup(ofstream &coorfile,ofstream &trbst,int k);
+void setup(ofstream &coorfile,ofstream &trbst,uint64_t k);
 vector<point> createvecs(config_f& param);
-void calc_force(int k,int t,int i);
+void calc_force(uint64_t k,uint64_t t,uint64_t i);
 
 ///////////////////////////////////////////////////////////////////////////////
 //Action Declarations
 typedef plain_action3<
-     int,         // argument 
-     int,         // argument
-     int,         // argument
+     uint64_t,    // argument 
+     uint64_t,    // argument
+     uint64_t,    // argument
      calc_force   // function
  > calc_force_action;
 HPX_REGISTER_PLAIN_ACTION(calc_force_action);
@@ -100,8 +101,8 @@ HPX_REGISTER_PLAIN_ACTION(calc_force_action);
 typedef plain_action4< 
      vector<promise<void> > const &,
      config_f const &,
-     int,
-     int,
+     uint64_t,
+     uint64_t,
      move
  > move_action;
 HPX_REGISTER_PLAIN_ACTION(move_action);
@@ -124,7 +125,7 @@ int hpx_main(variables_map& vm)
      ofstream coorfile; //optional output file
      ofstream trbst; //optional output file
      string j; // Buffer
-     int k=0; //Number of points in simulation
+     uint64_t k=0; //Number of points in simulation
      float ct=0; //Computation time
      vector<promise<void> > cfp; // calc_force promises
      promise<void> mp; //move promise
@@ -164,7 +165,7 @@ int hpx_main(variables_map& vm)
      high_resolution_timer ht;
      
      //This section outlines the program
-     for (int t=0;t<param.steps;t++) {
+     for (uint64_t t=0;t<param.steps;t++) {
       if (debug) cout<<"\nFor step "<<t<<":\n";
       cfp=calc(k,t);  //This is the calculation of force
       mp=move_future(find_here(),cfp,param,k,t);
@@ -174,13 +175,9 @@ int hpx_main(variables_map& vm)
      ct=ht.elapsed();
      cout<<"Computation Time: "<<ct<<" [s]\n";
      closefile(notes,param,ct); //normal closefile
-cout<<"Hi! 1\n";
      if (debug) { closedebugfile(coorfile,trbst); } //debug closefile
-cout<<"Hi 2\n";
  }
-cout<<"Hi 3\n";
  hpx::finalize();
-cout<<"Hi 4\n";
  return 0;
 }
 
@@ -197,16 +194,16 @@ int main(int argc, char*argv[])
  return init(desc_commandline, argc, argv);
 }
 
-vector<promise<void> > calc(int k,int t) {
+vector<promise<void> > calc(uint64_t k,uint64_t t) {
   
  vector<promise<void> > cfp;
- for (int i=0;i<k;++i) { //moves through the points ie 1, 2, etc.
+ for (uint64_t i=0;i<k;++i) { //moves through the points ie 1, 2, etc.
   cfp.push_back(calc_force_future(find_here(),k,t,i));
  }
  return cfp;
 }
 
-vector<components> dist(int t,int i,int l) {
+vector<components> dist(uint64_t t,uint64_t i,uint64_t l) {
  double rx; //distance in the x direction
  double ry; //distance in the y direction
  double rz; //distance in the z direction
@@ -229,11 +226,11 @@ vector<components> dist(int t,int i,int l) {
  return comp;
 }
 
-void move(vector<promise<void> >const& cfp,config_f const & param,int k,int t) {
- int tn=t+1;
+void move(vector<promise<void> >const& cfp,config_f const & param,uint64_t k,uint64_t t) {
+ uint64_t tn=t+1;
  double timestep=param.timestep; //the timestep
  
- for (int i=0;i<k;++i) {
+ for (uint64_t i=0;i<k;++i) {
      wait(cfp[i]);
   //calc x displ. and add to x-coord.
   pts_timestep[tn][i].x =pts_timestep[t][i].x+pts_timestep[t][i].vx*timestep+
@@ -268,7 +265,7 @@ void closefile(ofstream &notes,config_f& param,float ct) {
    <<"\nTimestep: "<<param.timestep
    <<"\nNumber of threads: "<<param.num_cores
    <<"\nComputation time: "<<ct
-   <<"\n\nProgram version: gravity_hpx.3.4\n"; //REMEBER TO UPDATE THIS!!!!!
+   <<"\n\nProgram version: gravity_hpx.3.5\n"; //REMEBER TO UPDATE THIS!!!!!
 
  notes.close();
 }
@@ -297,10 +294,10 @@ void loadconfig(config_f& param,variables_map& vm) {
  }
 }
 
-void setup(ofstream &coorfile,ofstream &trbst,int k) {
+void setup(ofstream &coorfile,ofstream &trbst,uint64_t k) {
 //This section prints out the coordinants and sets up the output files.
  cout<<'\n';
- for (int i=0; i<k; ++i) {
+ for (uint64_t i=0; i<k; ++i) {
   cout<<"Point "<<i<<": "<<'('<<pts_timestep[0][i].x<<','
       <<pts_timestep[0][i].y<<','<<pts_timestep[0][i].z<<')'
       <<" "<< pts_timestep[0][i].m<<'\n';
@@ -310,26 +307,26 @@ void setup(ofstream &coorfile,ofstream &trbst,int k) {
  }
  coorfile<<'\n';
  trbst<<'\n';
- for (int p=0;p<k;p++) {
+ for (uint64_t p=0;p<k;p++) {
   coorfile<<"(x,y,z), ";
   trbst<<"v: velx,vely,velz f: ftot, ";
  }
  coorfile<<'\n';
  trbst<<'\n';
- for (int o=0;o<k;o++){
+ for (uint64_t o=0;o<k;o++){
   coorfile<<pts_timestep[0][o].x<<","<<pts_timestep[0][o].y
   <<","<<pts_timestep[0][o].z<<",";
  }
  coorfile<<'\n';
 }
 
-void calc_force(int k,int t,int i) {
+void calc_force(uint64_t k,uint64_t t,uint64_t i) {
  double mt; //the multiple of the masses
  double const g=6.673e-11; //the Gravitational Constant
  double F; //the force
  vector<components> comp2; //vector to copy unit vector info to
  
- for (int l=0;l<k;++l) { //moves through points 1-2, 1-3, etc.
+ for (uint64_t l=0;l<k;++l) { //moves through points 1-2, 1-3, etc.
   if (i != l) {
    comp2 = dist(t,i,l); //copy in unit vector data
    mt=pts_timestep[t][l].m*pts_timestep[t][i].m*g;
