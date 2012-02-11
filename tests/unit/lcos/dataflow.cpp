@@ -3,11 +3,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/detail/lightweight_test.hpp>
-
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 #if HPX_ACTION_ARGUMENT_LIMIT < 10
 #error "Please define HPX_ACTION_ARGUMENT_LIMIT to be at least 10."
@@ -113,7 +112,7 @@ int hpx_main(variables_map & vm)
 
         // blocks until the result is delivered! (constructs a promise and sets
         // this as the target of the dataflow)
-        BOOST_TEST(18003 == c.get());
+        HPX_TEST_EQ(18003, c.get());
 
         hpx::util::high_resolution_timer t;
         boost::uint64_t r = fib(n).get();
@@ -121,10 +120,10 @@ int hpx_main(variables_map & vm)
         hpx::cout << "fib(" << n << ") = " << r << " calculated in "
                   << time << " seconds\n" << hpx::flush;
 
-        BOOST_TEST(55 == r);
-        BOOST_TEST(9005 == hpx::lcos::dataflow<h_action>(here, a, 4).get());
-        BOOST_TEST(9007 == hpx::lcos::dataflow<h_action>(here, 5, b).get());
-        BOOST_TEST(9003 == hpx::lcos::dataflow<g_action>(here,
+        HPX_TEST_EQ(55U, r);
+        HPX_TEST_EQ(9005, hpx::lcos::dataflow<h_action>(here, a, 4).get());
+        HPX_TEST_EQ(9007, hpx::lcos::dataflow<h_action>(here, 5, b).get());
+        HPX_TEST_EQ(9003, hpx::lcos::dataflow<g_action>(here,
             hpx::lcos::dataflow<trigger_action>(here)).get());
 
         std::vector<hpx::lcos::dataflow_base<void> > trigger;
@@ -139,16 +138,16 @@ int hpx_main(variables_map & vm)
 
         hpx::lcos::dataflow<f9action>(
             here, hpx::lcos::dataflow_trigger(here, trigger)).get();
-        BOOST_TEST(called_trigger);
-        BOOST_TEST(called_f1);
-        BOOST_TEST(called_f2);
-        BOOST_TEST(called_f3);
-        BOOST_TEST(called_f4);
-        BOOST_TEST(called_f5);
-        BOOST_TEST(called_f6);
-        BOOST_TEST(called_f7);
-        BOOST_TEST(called_f8);
-        BOOST_TEST(called_f9);
+        HPX_TEST(called_trigger);
+        HPX_TEST(called_f1);
+        HPX_TEST(called_f2);
+        HPX_TEST(called_f3);
+        HPX_TEST(called_f4);
+        HPX_TEST(called_f5);
+        HPX_TEST(called_f6);
+        HPX_TEST(called_f7);
+        HPX_TEST(called_f8);
+        HPX_TEST(called_f9);
 
         hpx::cout << "entering destruction test scope\n" << hpx::flush;
         {
@@ -176,7 +175,7 @@ int hpx_main(variables_map & vm)
     hpx::cout << "end of hpx_main\n" << hpx::flush;
     hpx::finalize();
 
-    return boost::report_errors();
+    return hpx::util::report_errors();
 }
 
 int main(int argc, char ** argv)

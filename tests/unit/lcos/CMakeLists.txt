@@ -1,15 +1,24 @@
 # Copyright (c) 2007-2012 Hartmut Kaiser
-# Copyright (c) 2011 Bryce Adelstein-Lelbach
+# Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    dataflow_test
-    trivial_future)
+    barrier
+    dataflow
+    eager_future
+    lazy_future
+    local_barrier
+    local_mutex_lock
+    local_mutex_lock_raii
+    local_mutex_lock_sanity
+    local_mutex_try_lock
+    local_mutex_try_lock_raii
+    local_mutex_try_lock_sanity
+   )
 
-set(dataflow_test_FLAGS
-  DEPENDENCIES iostreams_component dataflow_component)
+set(dataflow_FLAGS DEPENDENCIES iostreams_component dataflow_component)
 
 foreach(test ${tests})
   set(sources
@@ -18,7 +27,7 @@ foreach(test ${tests})
   source_group("Source Files" FILES ${sources})
 
   # add example executable
-  add_hpx_executable(${test}
+  add_hpx_executable(${test}_test
                      SOURCES ${sources}
                      ${${test}_FLAGS}
                      FOLDER "Tests/Unit/LCOs")
@@ -32,7 +41,7 @@ foreach(test ${tests})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(tests.unit.lcos.${test}
-                              ${test}_exe)
+                              ${test}_test_exe)
 endforeach()
 
 set_target_properties(dataflow_test_exe
