@@ -17,6 +17,8 @@ set(tests
     uncounted_symbol_to_local_object
     uncounted_symbol_to_remote_object
     gid_type
+    credit_exhaustion
+    split_credit
    )
 
 set(scoped_ref_to_local_object_FLAGS
@@ -56,6 +58,14 @@ set(uncounted_symbol_to_local_object_FLAGS
                  managed_refcnt_checker_component)
 
 set(uncounted_symbol_to_remote_object_FLAGS
+    DEPENDENCIES simple_refcnt_checker_component
+                 managed_refcnt_checker_component)
+
+set(credit_exhaustion_FLAGS
+    DEPENDENCIES simple_refcnt_checker_component
+                 managed_refcnt_checker_component)
+
+set(split_credit_FLAGS
     DEPENDENCIES simple_refcnt_checker_component
                  managed_refcnt_checker_component)
 

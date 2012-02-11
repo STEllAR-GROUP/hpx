@@ -31,8 +31,8 @@ using hpx::naming::strip_credit_from_gid;
 using hpx::agas::register_name;
 using hpx::agas::unregister_name;
 
-using hpx::test::simple_refcnt_checker;
-using hpx::test::managed_refcnt_checker;
+using hpx::test::simple_refcnt_monitor;
+using hpx::test::managed_refcnt_monitor;
 
 using hpx::util::report_errors;
 
@@ -99,13 +99,13 @@ int hpx_main(
              << "simple component test\n"
              << std::string(80, '#') << "\n" << flush;
 
-        hpx_test_main<simple_refcnt_checker>(vm);
+        hpx_test_main<simple_refcnt_monitor>(vm);
 
         cout << std::string(80, '#') << "\n"
              << "managed component test\n"
              << std::string(80, '#') << "\n" << flush;
 
-        hpx_test_main<managed_refcnt_checker>(vm);
+        hpx_test_main<managed_refcnt_monitor>(vm);
     }
 
     finalize();

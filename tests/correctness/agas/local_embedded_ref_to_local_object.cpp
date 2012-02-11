@@ -25,8 +25,8 @@ using boost::posix_time::milliseconds;
 using hpx::naming::id_type;
 using hpx::naming::get_management_type_name;
 
-using hpx::test::simple_refcnt_checker;
-using hpx::test::managed_refcnt_checker;
+using hpx::test::simple_refcnt_monitor;
+using hpx::test::managed_refcnt_monitor;
 
 using hpx::util::report_errors;
 
@@ -91,13 +91,13 @@ int hpx_main(
              << "simple component test\n"
              << std::string(80, '#') << "\n" << flush;
 
-        hpx_test_main<simple_refcnt_checker>(vm);
+        hpx_test_main<simple_refcnt_monitor>(vm);
 
         cout << std::string(80, '#') << "\n"
              << "managed component test\n"
              << std::string(80, '#') << "\n" << flush;
 
-        hpx_test_main<managed_refcnt_checker>(vm);
+        hpx_test_main<managed_refcnt_monitor>(vm);
     }
 
     finalize();

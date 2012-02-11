@@ -24,9 +24,6 @@ managed_refcnt_checker::~managed_refcnt_checker()
 
     util::osstream strm;
 
-    strm << ( boost::format("[%1%/%2%]: destroying object\n")
-            % prefix_ % this_);
-
     if (!references_.empty())
     {
         strm << ( boost::format("[%1%/%2%]: held references\n")
@@ -38,20 +35,27 @@ managed_refcnt_checker::~managed_refcnt_checker()
                  << naming::get_management_type_name(ref.get_management_type())
                  << "\n";
         }
-    }
 
-    // Flush garbage collection.
-    references_.clear();
-    agas::garbage_collect_sync();
+        // Flush garbage collection.
+        references_.clear();
+        agas::garbage_collect_sync();
+    }
 
     if (naming::invalid_id != target_)
     {
+        strm << ( boost::format("[%1%/%2%]: destroying object\n")
+                % prefix_ % this_);
+
         strm << ( boost::format("[%1%/%2%]: triggering flag %3%\n")
                 % prefix_ % this_ % target_);
+
         applier::trigger(target_);
     }
 
-    cout << util::osstream_get_string(strm) << flush;
+    std::string const str = util::osstream_get_string(strm); 
+
+    if (!str.empty())
+        cout << str << flush;
 }
 
 }}}

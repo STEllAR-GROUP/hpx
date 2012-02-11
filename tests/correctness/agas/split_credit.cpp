@@ -6,8 +6,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/lightweight_test.hpp>
-
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include <hpx/include/plain_actions.hpp>
 
 #include <tests/correctness/agas/components/simple_refcnt_checker.hpp>
 #include <tests/correctness/agas/components/managed_refcnt_checker.hpp>
@@ -20,18 +19,25 @@ using hpx::init;
 using hpx::finalize;
 using hpx::find_here;
 
-using boost::posix_time::milliseconds;
-
 using hpx::naming::id_type;
 using hpx::naming::get_management_type_name;
+using hpx::naming::get_prefix_from_id;
 
-using hpx::test::simple_refcnt_monitor;
-using hpx::test::managed_refcnt_monitor;
+using hpx::components::component_type;
+using hpx::components::get_component_type;
+
+using hpx::applier::get_applier;
+
+using hpx::lcos::async;
+
+using hpx::test::simple_object;
+using hpx::test::managed_object;
 
 using hpx::util::report_errors;
 
 using hpx::cout;
 using hpx::flush;
+using hpx::find_here;
 
 ///////////////////////////////////////////////////////////////////////////////
 template <
@@ -41,31 +47,18 @@ void hpx_test_main(
     variables_map& vm
     )
 {
-    boost::uint64_t const delay = vm["delay"].as<boost::uint64_t>();
-
     {
-        /// AGAS reference-counting test 1 (from #126):
-        ///
-        ///     Create a component locally and let all references to it go out
-        ///     of scope. The component should be deleted.
+        Client object(find_here());
 
-        Client monitor(find_here());
+        id_type g0 = object.get_gid().split_credits();
+        id_type g1 = object.get_gid().split_credits();
 
-        cout << "id: " << monitor.get_gid() << " "
-             << get_management_type_name
-                    (monitor.get_gid().get_management_type()) << "\n"
-             << flush;
-
-        {
-            // Detach the reference.
-            id_type id = monitor.detach();
-
-            // The component should still be alive.
-            HPX_TEST_EQ(false, monitor.ready(milliseconds(delay)));
-        }
-
-        // The component should be out of scope now.
-        HPX_TEST_EQ(true, monitor.ready(milliseconds(delay)));
+        cout << "  " << object.get_gid() << " : "
+                     << object.get_gid().get_credit() << "\n"
+             << "  " << g0 << " : " 
+                     << g0.get_credit() << "\n"
+             << "  " << g1 << " : "
+                     << g1.get_credit() << "\n" << flush; 
     }
 }
 
@@ -79,13 +72,13 @@ int hpx_main(
              << "simple component test\n"
              << std::string(80, '#') << "\n" << flush;
 
-        hpx_test_main<simple_refcnt_monitor>(vm);
+        hpx_test_main<simple_object>(vm);
 
         cout << std::string(80, '#') << "\n"
              << "managed component test\n"
              << std::string(80, '#') << "\n" << flush;
 
-        hpx_test_main<managed_refcnt_monitor>(vm);
+        hpx_test_main<managed_object>(vm);
     }
 
     finalize();
@@ -103,7 +96,7 @@ int main(
 
     cmdline.add_options()
         ( "delay"
-        , value<boost::uint64_t>()->default_value(500)
+        , value<boost::uint64_t>()->default_value(1000)
         , "number of milliseconds to wait for object destruction")
         ;
 

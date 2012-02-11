@@ -19,14 +19,14 @@
 namespace hpx { namespace test
 {
 
-struct managed_refcnt_checker
+struct managed_refcnt_monitor
   : components::client_base<
-        managed_refcnt_checker
+        managed_refcnt_monitor
       , stubs::managed_refcnt_checker
     >
 {
     typedef components::client_base<
-        managed_refcnt_checker
+        managed_refcnt_monitor
       , stubs::managed_refcnt_checker
     > base_type;
 
@@ -41,7 +41,7 @@ struct managed_refcnt_checker
     typedef server::managed_refcnt_checker server_type;
 
     /// Create a new component on the target locality.
-    explicit managed_refcnt_checker(
+    explicit managed_refcnt_monitor(
         naming::gid_type const& locality
         )
       : locality_(naming::get_locality_from_gid(locality)
@@ -51,7 +51,7 @@ struct managed_refcnt_checker
     }
 
     /// Create a new component on the target locality.
-    explicit managed_refcnt_checker(
+    explicit managed_refcnt_monitor(
         naming::id_type const& locality
         )
       : locality_(naming::get_locality_from_id(locality))
@@ -100,6 +100,41 @@ struct managed_refcnt_checker
         threads::get_self().yield(threads::suspended);
 
         return flag_.ready();
+    }
+};
+
+struct managed_object
+  : components::client_base<
+        managed_object
+      , stubs::managed_refcnt_checker
+    >
+{
+    typedef components::client_base<
+        managed_object
+      , stubs::managed_refcnt_checker
+    > base_type;
+
+  private:
+    using base_type::create;
+    using base_type::create_one;
+
+  public:
+    typedef server::managed_refcnt_checker server_type;
+
+    /// Create a new component on the target locality.
+    explicit managed_object(
+        naming::gid_type const& locality
+        )
+    {
+        this->base_type::create_one(locality, naming::invalid_id);
+    }
+
+    /// Create a new component on the target locality.
+    explicit managed_object(
+        naming::id_type const& locality
+        )
+    {
+        this->base_type::create_one(locality, naming::invalid_id);
     }
 };
 

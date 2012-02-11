@@ -7,9 +7,8 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/agas/interface.hpp>
-
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include <hpx/include/plain_actions.hpp>
+#include <hpx/lcos/async.hpp>
 
 #include <tests/correctness/agas/components/simple_refcnt_checker.hpp>
 #include <tests/correctness/agas/components/managed_refcnt_checker.hpp>
@@ -20,26 +19,68 @@ using boost::program_options::value;
 
 using hpx::init;
 using hpx::finalize;
-
-using boost::posix_time::milliseconds;
+using hpx::find_here;
 
 using hpx::naming::id_type;
 using hpx::naming::get_management_type_name;
+using hpx::naming::get_prefix_from_id;
 
 using hpx::components::component_type;
 using hpx::components::get_component_type;
 
 using hpx::applier::get_applier;
 
-using hpx::agas::garbage_collect_sync;
+using hpx::actions::plain_action3;
 
-using hpx::test::simple_refcnt_monitor;
-using hpx::test::managed_refcnt_monitor;
+using hpx::lcos::async;
+
+using hpx::test::simple_object;
+using hpx::test::managed_object;
 
 using hpx::util::report_errors;
 
 using hpx::cout;
 using hpx::flush;
+using hpx::find_here;
+
+void split(
+    id_type const& from
+  , id_type const& target
+  , boost::uint16_t old_credit
+    );
+
+typedef plain_action3<
+    // arguments
+    id_type const&
+  , id_type const&
+  , boost::uint16_t
+    // function
+  , split
+> split_action;
+
+HPX_REGISTER_PLAIN_ACTION(split_action);
+
+void split(
+    id_type const& from
+  , id_type const& target
+  , boost::uint16_t old_credit
+    )
+{
+    std::cout << "[" << find_here() << "/" << target << "]: " << old_credit << ", " << target.get_credit() << "\n";
+
+    // If we have more credits than the sender, then we're done. 
+    if (old_credit < target.get_credit())
+        return; 
+
+    id_type const here = find_here();
+
+    if (get_prefix_from_id(from) == get_prefix_from_id(here)) 
+        throw std::logic_error("infinite recursion detected, split was "
+                               "invoked locally");
+
+    // Recursively call split on the sender locality.
+    async<split_action>(from, here, target, target.get_credit()).get();
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 template <
@@ -49,16 +90,7 @@ void hpx_test_main(
     variables_map& vm
     )
 {
-    boost::uint64_t const delay = vm["delay"].as<boost::uint64_t>();
-
     {
-        /// AGAS reference-counting test 6 (from #126):
-        ///
-        ///     Create two components remotely, and have the second component
-        ///     store a reference to the first component. Let the original
-        ///     references to both components go out of scope. Both components
-        ///     should be deleted.
-
         std::vector<id_type> remote_localities;
 
         typedef typename Client::server_type server_type;
@@ -68,36 +100,19 @@ void hpx_test_main(
         if (!get_applier().get_remote_prefixes(remote_localities, ctype))
             throw std::logic_error("this test cannot be run on one locality");
 
-        Client monitor0(remote_localities[0]);
-        Client monitor1(remote_localities[0]);
+        id_type const here = find_here();
 
-        cout << "id0: " << monitor0.get_gid() << " "
+        Client object(here);
+
+        cout << "id: " << object.get_gid() << " "
              << get_management_type_name
-                    (monitor0.get_gid().get_management_type()) << "\n"
-             << "id1: " << monitor1.get_gid() << " "
-             << get_management_type_name
-                    (monitor1.get_gid().get_management_type()) << "\n"
+                    (object.get_gid().get_management_type()) << "\n"
              << flush;
 
-        {
-            // Have the second object store a reference to the first object.
-            monitor1.take_reference(monitor0.get_gid());
-
-            // Detach the references.
-            id_type id0 = monitor0.detach()
-                  , id1 = monitor1.detach();
-
-            // Both components should still be alive.
-            HPX_TEST_EQ(false, monitor0.ready(milliseconds(delay)));
-            HPX_TEST_EQ(false, monitor1.ready(milliseconds(delay)));
-        }
-
-        // Flush pending reference counting operations.
-        garbage_collect_sync();
-
-        // Both components should be out of scope now.
-        HPX_TEST_EQ(true, monitor0.ready(milliseconds(delay)));
-        HPX_TEST_EQ(true, monitor1.ready(milliseconds(delay)));
+        async<split_action>(remote_localities[0]
+                          , here
+                          , object.get_gid()
+                          , object.get_gid().get_credit()).get();
     }
 }
 
@@ -111,13 +126,13 @@ int hpx_main(
              << "simple component test\n"
              << std::string(80, '#') << "\n" << flush;
 
-        hpx_test_main<simple_refcnt_monitor>(vm);
+        hpx_test_main<simple_object>(vm);
 
         cout << std::string(80, '#') << "\n"
              << "managed component test\n"
              << std::string(80, '#') << "\n" << flush;
 
-        hpx_test_main<managed_refcnt_monitor>(vm);
+        hpx_test_main<managed_object>(vm);
     }
 
     finalize();

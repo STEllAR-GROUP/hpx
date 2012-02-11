@@ -7,7 +7,7 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/agas/remote_interface.hpp>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
@@ -26,6 +26,7 @@ using boost::posix_time::milliseconds;
 
 using hpx::naming::id_type;
 using hpx::naming::get_management_type_name;
+using hpx::naming::get_locality_from_id;
 
 using hpx::components::component_type;
 using hpx::components::get_component_type;
@@ -34,9 +35,10 @@ using hpx::applier::get_applier;
 
 using hpx::agas::register_name;
 using hpx::agas::unregister_name;
+using hpx::agas::garbage_collect_sync;
 
-using hpx::test::simple_refcnt_checker;
-using hpx::test::managed_refcnt_checker;
+using hpx::test::simple_refcnt_monitor;
+using hpx::test::managed_refcnt_monitor;
 
 using hpx::util::report_errors;
 
@@ -99,6 +101,9 @@ void hpx_test_main(
         // to AGAS.
         HPX_TEST_EQ(true, unregister_name(name));
 
+        // Flush pending reference counting operations.
+        garbage_collect_sync();
+
         // The component should be destroyed.
         HPX_TEST_EQ(true, monitor.ready(milliseconds(delay)));
     }
@@ -114,13 +119,13 @@ int hpx_main(
              << "simple component test\n"
              << std::string(80, '#') << "\n" << flush;
 
-        hpx_test_main<simple_refcnt_checker>(vm);
+        hpx_test_main<simple_refcnt_monitor>(vm);
 
         cout << std::string(80, '#') << "\n"
              << "managed component test\n"
              << std::string(80, '#') << "\n" << flush;
 
-        hpx_test_main<managed_refcnt_checker>(vm);
+        hpx_test_main<managed_refcnt_monitor>(vm);
     }
 
     finalize();

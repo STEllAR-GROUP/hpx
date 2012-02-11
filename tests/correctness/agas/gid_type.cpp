@@ -8,12 +8,12 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/runtime/naming/name.hpp>
 
+using hpx::naming::gid_type;
+
 // TODO: Subtraction tests.
 
 int main()
 {
-    using hpx::naming::gid_type;
-
     { // constructor and retrieval (get_msb/get_lsb) tests 
       gid_type gid0(0xdeadbeefULL); // lsb ctor
       gid_type gid1(0xdeadbeefULL, 0xcededeedULL); // msb + lsb ctor 
