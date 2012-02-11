@@ -15,7 +15,7 @@
 #include <boost/fusion/include/vector.hpp>
 #include <boost/fusion/include/at.hpp>
 #include <boost/fusion/include/size.hpp>
-#include <boost/fusion/include/any.hpp>
+#include <boost/fusion/include/for_each.hpp>
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/ref.hpp>
 #include <boost/foreach.hpp>
@@ -529,7 +529,7 @@ namespace hpx { namespace actions
 
         void enumerate_argument_gids(enum_gid_handler_type f)
         {
-            boost::fusion::any(arguments_, enum_gid_handler(f));
+            boost::fusion::for_each(arguments_, enum_gid_handler(f));
         }
 
     private:
