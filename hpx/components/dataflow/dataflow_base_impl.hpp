@@ -129,4 +129,23 @@ namespace hpx { namespace lcos { namespace detail
     };
 }}}
 
+namespace hpx
+{
+    namespace traits
+    {
+        template <typename F>
+        struct handle_gid<hpx::lcos::detail::dataflow_base_impl, F>
+        {
+            static bool call(
+                hpx::lcos::detail::dataflow_base_impl const &df
+              , F const& f
+            )
+            {
+                f(boost::ref(df.get_gid()));
+                return true;
+            }
+        };
+    }
+}
+
 #endif

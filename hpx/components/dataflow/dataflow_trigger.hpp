@@ -84,7 +84,7 @@ namespace hpx { namespace traits
           , F const& f
         )
         {
-            f(df.get_gid());
+            f(boost::cref(df.get_gid()));
             return true;
         }
     };
