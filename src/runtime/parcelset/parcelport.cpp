@@ -23,15 +23,39 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/bind.hpp>
 
+namespace
+{
+    struct call_for_each
+    {
+        typedef void result_type;
+        
+        typedef std::vector<hpx::parcelset::parcelport::write_handler_type> data_type;
+        data_type fv;
+        call_for_each(data_type const & fv)
+            : fv(fv)
+        {}
+
+        result_type operator()(boost::system::error_code const& e, std::size_t bytes_written)
+        {
+            BOOST_FOREACH(hpx::parcelset::parcelport::write_handler_type f, fv)
+            {
+                f(e, bytes_written);
+            }
+        }
+    };
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
 {
     parcelport::parcelport(util::io_service_pool& io_service_pool,
-            naming::locality here)
+            naming::locality here
+          , std::size_t max_cache_size
+          , std::size_t max_connections_per_loc)
       : io_service_pool_(io_service_pool),
         acceptor_(NULL),
         parcels_(This()),
-        connection_cache_(HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE),
+        connection_cache_(max_cache_size, max_connections_per_loc),
         here_(here)
     {}
 
@@ -156,10 +180,18 @@ namespace hpx { namespace parcelset
     void parcelport::send_parcel(parcel const& p, naming::address const& addr,
         write_handler_type f)
     {
+        typedef pending_parcels_map::iterator iterator;
         const boost::uint32_t prefix =
             naming::get_prefix_from_gid(p.get_destination());
 
         parcelport_connection_ptr client_connection(connection_cache_.get(prefix));
+
+        // enqueue the incoming parcel ...
+        {
+            util::spinlock::scoped_lock l(mtx_);
+            pending_parcels_[prefix].first.push_back(p);
+            pending_parcels_[prefix].second.push_back(f);
+        }
 
 //        if (!client_connection) {
 //            if (threads::get_self_ptr()) 
@@ -173,17 +205,21 @@ namespace hpx { namespace parcelset
 //            client_connection = connection_cache_.get(prefix);
 //        }                
 
-        if (!client_connection) {
+        if (!client_connection)
+        {
 //                 LPT_(info) << "parcelport: creating new connection to: "
 //                            << addr.locality_;
+
+            if(connection_cache_.full(prefix))
+            {
+                return;
+            }
 
         // The parcel gets serialized inside the connection constructor, no
         // need to keep the original parcel alive after this call returned.
             client_connection.reset(new parcelport_connection(
                 io_service_pool_.get_io_service(), prefix,
                 connection_cache_, timer_, parcels_sent_));
-
-            client_connection->set_parcel(p);
 
         // connect to the target locality, retry if needed
             boost::system::error_code error = boost::asio::error::try_again;
@@ -229,17 +265,86 @@ namespace hpx { namespace parcelset
                     "parcelport::send_parcel",
                     hpx::util::osstream_get_string(strm));
             }
-
-        // Start an asynchronous write operation.
-            client_connection->async_write(f);
         }
         else {
 //                 LPT_(info) << "parcelport: reusing existing connection to: "
 //                            << addr.locality_;
+        }
 
-        // reuse an existing connection
-            client_connection->set_parcel(p);
-            client_connection->async_write(f);
+        std::vector<parcel> parcels;
+        std::vector<write_handler_type> handlers;
+        {
+            util::spinlock::scoped_lock l(mtx_);
+            std::swap(parcels, pending_parcels_[prefix].first);
+            std::swap(handlers, pending_parcels_[prefix].second);
+        }
+        
+        // if the parcels didn't get sent by another connection ... 
+        if(!parcels.empty() && !handlers.empty())
+        {
+            client_connection->set_parcel(parcels);
+            // ... start an asynchronous write operation now.
+            client_connection->async_write(
+                call_for_each(handlers)
+              , boost::bind(
+                    &parcelport::send_pending_parcels_trampoline
+                  , this
+                  , ::_1
+                )
+            );
+        }
+        else
+        {
+            // ... or readd the stuff to the cache
+            connection_cache_.add(prefix, client_connection);
+        }
+    }
+    
+    void parcelport::send_pending_parcels_trampoline(boost::uint32_t prefix)
+    {
+        // create a new thread which sends parcels that might still be pending
+        hpx::applier::register_thread_nullary(
+            boost::bind(&parcelport::send_pending_parcels, this, prefix)
+          , "send_pending_parcels"
+        );
+    }
+
+    void parcelport::send_pending_parcels(boost::uint32_t prefix)
+    {
+        typedef pending_parcels_map::iterator iterator;
+        std::vector<parcel> parcels;
+        std::vector<write_handler_type> handlers;
+        parcelport_connection_ptr client_connection = connection_cache_.get(prefix);
+        // If another thread was faster ... try again
+        if(!client_connection)
+            return;
+
+        {
+            util::spinlock::scoped_lock l(mtx_);
+            iterator it = pending_parcels_.find(prefix);
+
+            if(it != pending_parcels_.end())
+            {
+                std::swap(parcels, it->second.first);
+                std::swap(handlers, it->second.second);
+            }
+        }
+            
+        if(!parcels.empty() && !handlers.empty())
+        {
+            client_connection->set_parcel(parcels);
+            client_connection->async_write(
+                call_for_each(handlers)
+              , boost::bind(
+                    &parcelport::send_pending_parcels_trampoline
+                  , this
+                  , ::_1
+                )
+            );
+        }
+        else
+        {
+            connection_cache_.add(prefix, client_connection);
         }
     }
 }}

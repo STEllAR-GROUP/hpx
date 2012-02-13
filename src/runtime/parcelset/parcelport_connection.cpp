@@ -18,7 +18,7 @@
 namespace hpx { namespace parcelset
 {
     ///////////////////////////////////////////////////////////////////////////
-    void parcelport_connection::set_parcel (parcel const& p)
+    void parcelport_connection::set_parcel(std::vector<parcel> const& pv)
     {
         typedef util::container_device<std::vector<char> > io_device_type;
 
@@ -34,19 +34,27 @@ namespace hpx { namespace parcelset
 #else
             boost::archive::binary_oarchive archive(io);
 #endif
-            archive << p;
+
+            std::size_t count = pv.size();
+            archive << count;
+            BOOST_FOREACH(parcel const & p, pv)
+            {
+                archive << p;
+            }
         }
         catch (std::exception const& e) {
             hpx::util::osstream strm;
+            // TODO: add proper error report
             strm << "parcelport: parcel serialization failed: " << e.what()
-                 << " parcel(" << p << ")";
+                 << " parcel(";// << p << ")";
             HPX_THROW_EXCEPTION(no_success,
                 "parcelport_connection::set_parcel",
                 hpx::util::osstream_get_string(strm));
             return;
         }
 
-        out_priority_ = boost::integer::ulittle8_t(p.get_thread_priority());
+        // TODO: better priority
+        out_priority_ = boost::integer::ulittle8_t(pv[0].get_thread_priority());
         out_size_ = out_buffer_.size();
     }
 }}

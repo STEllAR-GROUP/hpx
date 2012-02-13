@@ -97,7 +97,6 @@ namespace hpx { namespace parcelset
         // protect from unhandled exceptions bubbling up into thread manager
         try
         {
-            parcel p;
             {
                 // create a special io stream on top of in_buffer_
                 typedef util::container_device<std::vector<char> > io_device_type;
@@ -109,11 +108,16 @@ namespace hpx { namespace parcelset
 #else
                 boost::archive::binary_iarchive archive(io);
 #endif
-                archive >> p;
+                std::size_t parcel_count = 0;
+                archive >> parcel_count;
+                while(parcel_count-- != 0)
+                {
+                    parcel p;
+                    // add parcel to incoming parcel queue
+                    archive >> p;
+                    parcels_->add_parcel(p);
+                }
             }
-
-            // add parcel to incoming parcel queue
-            parcels_->add_parcel(p);
         }
 
         catch (hpx::exception const& e)

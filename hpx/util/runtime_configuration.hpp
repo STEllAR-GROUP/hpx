@@ -52,6 +52,10 @@ namespace hpx { namespace util
         // Get the HPX network address to use
         naming::locality get_parcelport_address() const;
 
+        // Get the number of maximum concurrent connections per locality
+        std::size_t get_max_connections_per_loc() const;
+        std::size_t get_connection_cache_size() const;
+
         // Get AGAS client-side GVA cache size
         std::size_t get_agas_gva_cache_size() const;
 

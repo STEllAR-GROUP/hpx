@@ -77,30 +77,35 @@ void early_parcel_sink(
         boost::archive::binary_iarchive archive(io);
     #endif
 
-    archive >> p;
+    std::size_t count = 0;
+    archive >> count;
+    while(count-- != 0)
+    {
+        archive >> p;
 
-    // decode the action-type in the parcel
-    actions::action_type act = p.get_action();
+        // decode the action-type in the parcel
+        actions::action_type act = p.get_action();
 
-    // early parcels should only be plain actions
-    BOOST_ASSERT(actions::base_action::plain_action == act->get_action_type());
+        // early parcels should only be plain actions
+        BOOST_ASSERT(actions::base_action::plain_action == act->get_action_type());
 
-    // early parcels can't have continuations
-    BOOST_ASSERT(!p.get_continuation());
+        // early parcels can't have continuations
+        BOOST_ASSERT(!p.get_continuation());
 
-    // We should not allow any exceptions to escape the execution of the
-    // action as this would bring down the ASIO thread we execute in.
-    try {
-        act->get_thread_function(0)
-            (threads::thread_state_ex(threads::wait_signaled));
-    }
-    catch (...) {
+        // We should not allow any exceptions to escape the execution of the
+        // action as this would bring down the ASIO thread we execute in.
         try {
-            boost::rethrow_exception(boost::current_exception());
+            act->get_thread_function(0)
+                (threads::thread_state_ex(threads::wait_signaled));
         }
-        catch (boost::exception const& be) {
-            std::cerr << hpx::diagnostic_information(be) << std::endl;
-            std::abort();
+        catch (...) {
+            try {
+                boost::rethrow_exception(boost::current_exception());
+            }
+            catch (boost::exception const& be) {
+                std::cerr << hpx::diagnostic_information(be) << std::endl;
+                std::abort();
+            }
         }
     }
 } // }}}
@@ -109,6 +114,11 @@ void early_write_handler(
     boost::system::error_code const& e
   , std::size_t size
     )
+{
+    // no-op
+}
+
+void early_pending_parcel_handler(boost::uint32_t)
 {
     // no-op
 }
@@ -667,7 +677,7 @@ void big_boot_barrier::apply(
     else
         client_connection->set_parcel(p);
 
-    client_connection->async_write(early_write_handler);
+    client_connection->async_write(early_write_handler, early_pending_parcel_handler);
 } // }}}
 
 void big_boot_barrier::wait()

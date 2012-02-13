@@ -81,6 +81,10 @@
 #  define HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE 256
 #endif
 
+#if !defined(HPX_MAX_PARCEL_CONNECTIONS_PER_LOC)
+#  define HPX_MAX_PARCEL_CONNECTIONS_PER_LOC 2
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 /// This defines the number of AGAS address translations kept in the local
 /// cache. This is just the initial size which may be adjusted depending on the
