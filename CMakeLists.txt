@@ -365,14 +365,14 @@ find_package(HPX_TBB)
 find_package(HPX_SWARM)
 
 ################################################################################
-# OpenMP (for benchmark comparisons) 
+# OpenMP (for benchmark comparisons)
 ################################################################################
 find_package(OpenMP)
 
 ################################################################################
-# MPI (for benchmark comparisons) 
+# MPI (for benchmark comparisons)
 ################################################################################
-find_package(MPI)
+find_package(HPX_MPI)
 
 ################################################################################
 # Warning configuration
@@ -670,7 +670,7 @@ if(MSVC)
 # GCC-compatible compiler configuration
 ################################################################################
 else()
-  # Workaround for Ubuntu GCC 4.6.2 and Boost 1.49.0 with Debian GCC 4.6.2 
+  # Workaround for Ubuntu GCC 4.6.2 and Boost 1.49.0 with Debian GCC 4.6.2
   hpx_use_flag_if_available(-Wl,--copy-dt-needed-entries LANGUAGES CXX Fortran
                             NAME copy_dt_needed_entries)
 

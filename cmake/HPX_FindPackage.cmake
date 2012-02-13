@@ -79,7 +79,7 @@ endmacro()
 macro(hpx_find_package name)
 
   if(${name}_DISABLE)
-    hpx_info("hpx_get_version.${name}" "Library disabled by user.")
+    hpx_info("find_package.${name}" "Library disabled by user.")
     unset(${name}_VERSION_SEARCHED CACHE)
     unset(${name}_ROOT)
     set(${name}_FOUND OFF CACHE BOOL "Found ${name}.")
