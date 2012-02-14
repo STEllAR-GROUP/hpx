@@ -8,6 +8,12 @@ if(NOT HPX_FINDPACKAGE_LOADED)
   include(HPX_FindPackage)
 endif()
 
+# This if statement is specific to GSL, and should not be copied into other
+# Find cmake scripts.
+if(NOT GSL_ROOT AND NOT $ENV{HOME_GSL} STREQUAL "")
+  set(GSL_ROOT $ENV{HOME_GSL})
+endif()
+
 if(GSL_USE_SYSTEM)
   set(GSLCBLAS_USE_SYSTEM ON)
 endif()
