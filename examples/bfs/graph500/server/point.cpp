@@ -121,10 +121,10 @@ namespace graph500 { namespace server
         if ( (std::size_t) local_edges_[i].v1 < minnode_ ) minnode_ = local_edges_[i].v1;
       }
       maxnode++;
-      std::size_t N = maxnode-minnode_;
+      N_ = maxnode-minnode_;
 
-      neighbors_.resize(N);
-      nedge_bins_.resize(N);
+      neighbors_.resize(N_);
+      nedge_bins_.resize(N_);
 
       for (std::size_t i=0;i<local_edges_.size();i++) {
         std::size_t node = local_edges_[i].v0;
@@ -134,12 +134,19 @@ namespace graph500 { namespace server
           neighbors_[neighbor-minnode_].push_back(node);
         }
       }
+    }
 
-      parent_.resize(N);
+    void point::root(std::vector<std::size_t> const& bfs_roots)
+    {
+      bfs_roots_ = bfs_roots;
+
+      parent_.resize(N_,bfs_roots.size(),1);
       // initialize to 0 -- no edge is identified as 0
-      for (std::size_t i=0;i<parent_.size();i++) {
-        parent_[i].parent = 0;
-        parent_[i].level = 0;
+      for (std::size_t j=0;j<parent_.jsize();j++) {
+        for (std::size_t i=0;i<parent_.isize();i++) {
+          parent_(i,j,0).parent = 0;
+          parent_(i,j,0).level = 0;
+        }
       }
     }
 
@@ -156,44 +163,42 @@ namespace graph500 { namespace server
       return found;
     }
 
-    void point::bfs(std::size_t root_node)
+    void point::bfs()
     {
-      if ( root_node - minnode_ >= parent_.size() ) return; // the root node is not on this partition
+      for (std::size_t step=0;step<bfs_roots_.size();step++) {
+        std::size_t root_node = bfs_roots_[step];
 
-      std::queue<std::size_t> q;
-      parent_[root_node-minnode_].parent = root_node;
-      parent_[root_node-minnode_].level = 0;
-      q.push(root_node);
+        if ( root_node - minnode_ >= parent_.isize() ) return; // the root node is not on this partition
 
-      while (!q.empty()) {
-        std::size_t node = q.front(); q.pop();
+        std::queue<std::size_t> q;
+        parent_(root_node-minnode_,step,0).parent = root_node;
+        parent_(root_node-minnode_,step,0).level = 0;
+        q.push(root_node);
 
-        std::vector<std::size_t> const& node_neighbors = neighbors_[node-minnode_];
-        std::vector<std::size_t>::const_iterator end = node_neighbors.end();
-        for (std::vector<std::size_t>::const_iterator it = node_neighbors.begin();
-                     it != end; ++it)
-        {
-          std::size_t& node_parent = parent_[*it-minnode_].parent;
-          if (!node_parent) {
-            node_parent = node;
-            parent_[*it-minnode_].level = parent_[node-minnode_].level + 1;
-            q.push(*it);
+        while (!q.empty()) {
+          std::size_t node = q.front(); q.pop();
+  
+          std::vector<std::size_t> const& node_neighbors = neighbors_[node-minnode_];
+          std::vector<std::size_t>::const_iterator end = node_neighbors.end();
+          for (std::vector<std::size_t>::const_iterator it = node_neighbors.begin();
+                       it != end; ++it)
+          {
+            std::size_t& node_parent = parent_(*it-minnode_,step,0).parent;
+            if (!node_parent) {
+              node_parent = node;
+              parent_(*it-minnode_,step,0).level = parent_(node-minnode_,step,0).level + 1;
+              q.push(*it);
+            }
           }
         }
-      }
-    }
 
-    void point::reset()
-    {
-      for (std::size_t i=0;i<parent_.size();i++) {
-        parent_[i].parent = 0;
-        parent_[i].level = 0;
       }
     }
 
     std::vector<nodedata> point::validate()
     {
       std::vector<nodedata> result;
+#if 0
       nodedata tmp;
       for (std::size_t i=0;i<local_edges_.size();i++) {
         std::size_t node0 = local_edges_[i].v0;
@@ -213,6 +218,7 @@ namespace graph500 { namespace server
           result.push_back(tmp);
         }
       }
+#endif
       return result;
     }
 
@@ -220,6 +226,7 @@ namespace graph500 { namespace server
                                 std::size_t scale)
     {
        validatedata result;
+#if 0
        // Get the number of edges for performance counting
        std::fill(nedge_bins_.begin(),nedge_bins_.end(),0);
 
@@ -350,25 +357,6 @@ namespace graph500 { namespace server
        //end
        for (std::size_t i=0;i<local_edges_.size();i++) {
          if ( !(neither_in[i] || both_in[i] ) ) {
-#if 0
-           std::cout << " TEST scatter " << li[i] << " " << lj[i] << std::endl;
-           std::size_t node = local_edges_[i].v0;
-           std::size_t neighbor = local_edges_[i].v1;
-           std::cout << " TEST node " << node << " neighbor " << neighbor << std::endl;
-           // let's examine the neighbors
-           for ( std::size_t j=0;j<neighbors_[node-minnode_].size();j++) {
-             std::cout << " TEST neighbors of node " << node << " : " << neighbors_[node-minnode_][j] << std::endl;
-           }
-           std::cout << " TEST B " << parent[neighbor]  << std::endl;
-           std::cout << " TEST C " << parent_[neighbor-minnode_].parent  << std::endl;
-           std::cout << " TEST D " << parent_[neighbor-minnode_].level  << std::endl;
-           std::cout << " TEST E " << parent[node]  << std::endl;
-           std::cout << " TEST F " << parent_[node-minnode_].parent  << std::endl;
-           std::cout << " TEST G " << parent_[node-minnode_].level  << std::endl;
-           std::cout << " TEST H " << parent[searchkey]  << std::endl;
-           std::cout << " TEST I " << parent_[searchkey-minnode_].parent  << std::endl;
-           std::cout << " TEST J " << parent_[searchkey-minnode_].level  << std::endl;
-#endif
            result.rc = -4;
            return result;
          }
@@ -394,6 +382,7 @@ namespace graph500 { namespace server
        }
 
        result.rc = 0;
+#endif
        return result;
     }
 

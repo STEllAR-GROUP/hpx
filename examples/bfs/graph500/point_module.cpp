@@ -33,12 +33,12 @@ HPX_REGISTER_ACTION_EX(
     graph500_point_init_action);
 
 HPX_REGISTER_ACTION_EX(
-    graph500_point_type::wrapped_type::bfs_action,
-    graph500_point_bfs_action);
+    graph500_point_type::wrapped_type::root_action,
+    graph500_point_root_action);
 
 HPX_REGISTER_ACTION_EX(
-    graph500_point_type::wrapped_type::reset_action,
-    graph500_point_reset_action);
+    graph500_point_type::wrapped_type::bfs_action,
+    graph500_point_bfs_action);
 
 HPX_REGISTER_ACTION_EX(
     graph500_point_type::wrapped_type::has_edge_action,

@@ -35,31 +35,29 @@ namespace graph500 { namespace stubs
         }
 
         static hpx::lcos::promise<void>
-        bfs_async(hpx::naming::id_type const& gid,std::size_t root)
+        root_async(hpx::naming::id_type const& gid,std::vector<std::size_t> const& bfs_roots)
         {
-            typedef server::point::bfs_action action_type;
-            return hpx::lcos::eager_future<action_type>(gid,root);
+            typedef server::point::root_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid,bfs_roots);
         }
 
-        static void bfs(hpx::naming::id_type const& gid,std::size_t root)
+        static void root(hpx::naming::id_type const& gid,std::vector<std::size_t> const& bfs_roots)
         {
-            // The following get yields control while the action above
-            // is executed and the result is returned to the promise.
-            bfs_async(gid,root).get();
+            root_async(gid,bfs_roots).get();
         }
 
         static hpx::lcos::promise<void>
-        reset_async(hpx::naming::id_type const& gid)
+        bfs_async(hpx::naming::id_type const& gid)
         {
-            typedef server::point::reset_action action_type;
+            typedef server::point::bfs_action action_type;
             return hpx::lcos::eager_future<action_type>(gid);
         }
 
-        static void reset(hpx::naming::id_type const& gid)
+        static void bfs(hpx::naming::id_type const& gid)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the promise.
-            reset_async(gid).get();
+            bfs_async(gid).get();
         }
 
         static hpx::lcos::promise< bool >

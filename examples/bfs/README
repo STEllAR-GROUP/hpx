@@ -6,3 +6,7 @@ files g10.txt and g10_search.txt are generated from the graph 500 reference spec
 First implementation working: 6592
 
 Re-design effort: 6606
+
+Complete re-design: graph500_client 6912
+
+Additivie Schwarz implemented: 6997

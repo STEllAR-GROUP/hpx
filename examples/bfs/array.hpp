@@ -16,6 +16,8 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/stringstream.hpp>
 
+namespace bfsg {
+
 template<typename T>
 
 class array {
@@ -298,4 +300,5 @@ protected:
   std::valarray<T> data_;
 
 };
+}
 #endif

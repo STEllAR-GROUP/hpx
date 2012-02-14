@@ -88,13 +88,13 @@ namespace graph500 { namespace server
 
         void init(std::size_t objectid,std::size_t scale,std::size_t number_partitions,double overlap);
 
-        void bfs(std::size_t root_node);
+        void root(std::vector<std::size_t> const& bfs_roots);
+
+        void bfs();
 
         bool has_edge(std::size_t edge);
 
         std::vector<nodedata> validate();
-
-        void reset();
 
         std::vector<nodedata> validator();
 
@@ -111,9 +111,9 @@ namespace graph500 { namespace server
             point_init = 0,
             point_bfs = 1,
             point_has_edge = 2,
-            point_reset = 3,
-            point_validate = 4,
-            point_scatter = 5
+            point_validate = 3,
+            point_scatter = 4,
+            point_root = 5
         };
 
         typedef hpx::actions::action4<
@@ -134,9 +134,19 @@ namespace graph500 { namespace server
             // Component server type.
             point,
             // Action code.
+            point_root,
+            // Arguments of this action.
+            std::vector<std::size_t> const&,
+            // Method bound to this action.
+            &point::root
+        > root_action;
+
+        typedef hpx::actions::action0<
+            // Component server type.
+            point,
+            // Action code.
             point_bfs,
             // Arguments of this action.
-            std::size_t,
             // Method bound to this action.
             &point::bfs
         > bfs_action;
@@ -155,16 +165,6 @@ namespace graph500 { namespace server
             // Method bound to this action.
             &point::scatter
         > scatter_action;
-
-        typedef hpx::actions::action0<
-            // Component server type.
-            point,
-            // Action code.
-            point_reset,
-            // Arguments of this action.
-            // Method bound to this action.
-            &point::reset
-        > reset_action;
 
         typedef hpx::actions::result_action1<
             // Component server type.
@@ -194,11 +194,13 @@ namespace graph500 { namespace server
     private:
         hpx::lcos::local_mutex mtx_;
         std::size_t idx_;
+        std::size_t N_;
         std::vector< std::vector<std::size_t> > neighbors_;
-        std::vector<leveldata> parent_;
+        bfsg::array<leveldata> parent_;
         std::size_t minnode_;
         std::vector<packed_edge> local_edges_;
         std::vector<std::size_t> nedge_bins_;
+        std::vector<std::size_t> bfs_roots_;
     };
 }}
 
@@ -208,12 +210,12 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
     graph500_point_init_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    graph500::server::point::bfs_action,
-    graph500_point_bfs_action);
+    graph500::server::point::root_action,
+    graph500_point_root_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    graph500::server::point::reset_action,
-    graph500_point_reset_action);
+    graph500::server::point::bfs_action,
+    graph500_point_bfs_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     graph500::server::point::has_edge_action,
