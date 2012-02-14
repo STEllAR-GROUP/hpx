@@ -5,8 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-
-#include <boost/detail/lightweight_test.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -38,11 +37,11 @@ int hpx_main(variables_map& vm)
         caught_exception = true;
     }
 
-    BOOST_TEST(thrown_exception);
-    BOOST_TEST(caught_exception);
+    HPX_TEST(thrown_exception);
+    HPX_TEST(caught_exception);
 
     hpx::finalize();
-    return boost::report_errors();
+    return hpx::util::report_errors();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
