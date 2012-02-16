@@ -22,7 +22,7 @@ namespace hpx { namespace util
     public:
 
         query_counters(std::vector<std::string> const& names,
-            std::size_t interval, std::ostream& out);
+          std::size_t interval, std::string const& dest);
 
         void start();
         void evaluate();
@@ -34,10 +34,10 @@ namespace hpx { namespace util
         typedef lcos::local_mutex mutex_type;
 
         mutex_type mtx_;
-        std::ostream& out_;
 
         std::vector<std::string> names_;
         std::vector<naming::id_type> ids_;
+        std::string destination_;
 
         interval_timer timer_;
     };

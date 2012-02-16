@@ -49,8 +49,8 @@ namespace hpx { namespace util { namespace detail
     };
     extern HPX_EXPORT full_empty_counter_data full_empty_counter_data_;
 
-    // call this to install all counters for full_empty entries
-    void install_counters();
+    // call this to register all counter types for full_empty entries
+    void register_counter_types();
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Data>

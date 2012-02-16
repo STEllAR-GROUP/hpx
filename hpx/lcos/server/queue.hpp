@@ -151,10 +151,7 @@ namespace hpx { namespace lcos { namespace server
 
         // standard LCO action implementations
 
-        /// The function \a set_event will block the number of entering
-        /// \a threads (as given by the constructor parameter \a number_of_threads),
-        /// releasing all waiting threads as soon as the last \a thread
-        /// entered this function.
+        /// Add a value to the queue.
         void set_result (RemoteType const& result)
         {
             // push back the new value onto the queue
@@ -178,9 +175,7 @@ namespace hpx { namespace lcos { namespace server
         }
 
         /// The \a function set_error is called whenever a
-        /// \a set_error_action is applied on an instance of a LCO. This
-        /// function just forwards to the virtual function \a set_error, which
-        /// is overloaded by the derived concrete LCO.
+        /// \a set_error_action is applied on an instance of a LCO.
         ///
         /// \param e      [in] The exception encapsulating the error to report
         ///               to this LCO instance.

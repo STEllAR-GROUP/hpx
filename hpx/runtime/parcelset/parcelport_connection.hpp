@@ -119,7 +119,7 @@ namespace hpx { namespace parcelset
 
             // complete data point and push back onto gatherer
             send_data_.timer_ = timer_.elapsed_microseconds() - send_data_.timer_;
-            parcels_sent_.push_back(send_data_);
+            parcels_sent_.add_data(send_data_);
 
             // now we can give this connection back to the cache
             out_buffer_.clear();

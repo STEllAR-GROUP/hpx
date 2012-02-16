@@ -160,7 +160,7 @@ namespace hpx { namespace detail
         {
             if (threads::threadmanager_is(running))
             {
-                node = applier::get_applier().get_prefix_id();
+                node = get_locality_id();
                 shepherd = threads::threadmanager_base::get_thread_num();
             }
 

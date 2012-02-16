@@ -4,7 +4,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
-#include <hpx/util/parse_command_line.hpp>
+#include <hpx/include/util.hpp>
+#include <hpx/include/performance_counters.hpp>
 
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
@@ -24,7 +25,8 @@ typedef hpx::components::managed_component<
 ///////////////////////////////////////////////////////////////////////////////
 namespace performance_counters { namespace sine
 {
-    // This function will be invoked whenever the second counter is queried.
+    ///////////////////////////////////////////////////////////////////////////
+    // This function will be invoked whenever the implicit counter is queried.
     boost::int64_t immediate_sine()
     {
         using boost::chrono::high_resolution_clock;
@@ -36,37 +38,6 @@ namespace performance_counters { namespace sine
         duration<double> up_time = high_resolution_clock::now() - started_at;
         return boost::int64_t(std::sin(up_time.count() / 10.) * 100000.);
     }
-
-    // create an averaging performance counter based on the immediate sine
-    // counter
-    void create_averaging_sine()
-    {
-        // First, register the counter type
-        hpx::performance_counters::install_counter_type(
-            "/sine/average", hpx::performance_counters::counter_average_count,
-            "returns the averaged value of a sine wave calculated over "
-            "an arbitrary time line");
-
-        // Second, create and register the counter instance
-        boost::uint32_t const prefix = hpx::applier::get_applier().get_prefix_id();
-        boost::format sine_instance("/sine(locality#%d/instance#0)/average");
-
-        // full info of the counter to create, help text and version will be
-        // complemented from counter type info as specified above
-        hpx::performance_counters::counter_info info(
-            hpx::performance_counters::counter_average_count,
-            boost::str(sine_instance % prefix));
-
-        // create the 'sine' performance counter component locally
-        boost::format base_instance("/sine(locality#%d/instance#0)/immediate");
-        hpx::naming::id_type id =
-            hpx::performance_counters::create_average_count_counter(info,
-                boost::str(base_instance % prefix), 100);
-
-        // install the counter instance
-        hpx::performance_counters::install_counter(id, info);
-    }
-
 
     ///////////////////////////////////////////////////////////////////////////
     // This will be called to return special command line options supported by
@@ -106,6 +77,102 @@ namespace performance_counters { namespace sine
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // Discoverer for the explicit (hand-rolled performance counter. The
+    // purpose of this function is to invoke the supplied function f for all
+    // allowed counter instance names supported by the counter type this
+    // function has been registered with.
+    bool explicit_sine_counter_discoverer(
+        hpx::performance_counters::counter_info const& info,
+        HPX_STD_FUNCTION<hpx::performance_counters::discover_counter_func> const& f,
+        hpx::error_code& ec)
+    {
+        hpx::performance_counters::counter_info i = info;
+
+        // compose the counter name templates
+        hpx::performance_counters::counter_path_elements p;
+        hpx::performance_counters::counter_status status =
+            get_counter_path_elements(info.fullname_, p, ec);
+        if (!status_is_valid(status)) return false;
+
+        p.parentinstancename_ = "locality";
+        p.instancename_ = "instance#<*>";
+        p.instanceindex_ = -1;
+
+        boost::uint32_t last_locality = hpx::get_locality_id();
+        for (boost::uint32_t l = 0; l <= last_locality; ++l)
+        {
+            p.parentinstanceindex_ = static_cast<boost::int32_t>(l);
+            status = get_counter_name(p, i.fullname_, ec);
+            if (!status_is_valid(status) || !f(i, ec) || ec)
+                return false;
+        }
+
+        if (&ec != &hpx::throws)
+            ec = hpx::make_success_code();
+        return true;    // everything is ok
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Creation function for explicit sine performance counter. It's purpose is
+    // to create and register a new instance of the given name (or reuse an
+    // existing instance).
+    hpx::naming::id_type explicit_sine_counter_creator(
+        hpx::performance_counters::counter_info const& info, hpx::error_code& ec)
+    {
+        // verify the validity of the counter instance name
+        hpx::performance_counters::counter_path_elements paths;
+        get_counter_path_elements(info.fullname_, paths, ec);
+        if (ec) return hpx::naming::invalid_id;
+
+        if (paths.parentinstance_is_basename_) {
+            HPX_THROWS_IF(ec, hpx::bad_parameter, "locality_raw_counter_creator",
+                "invalid counter instance parent name: " +
+                    paths.parentinstancename_);
+            return hpx::naming::invalid_id;
+        }
+
+        if (paths.parentinstancename_ != "locality" ||
+            paths.parentinstanceindex_ != hpx::get_locality_id())
+        {
+            HPX_THROWS_IF(ec, hpx::bad_parameter, "locality_raw_counter_creator",
+                "attempt to create counter on wrong locality");
+            return hpx::naming::invalid_id;
+        }
+
+        // create individual counter
+        if (paths.instancename_ == "instance" && paths.instanceindex_ != -1) {
+            // make sure parent instance name is set properly
+            hpx::performance_counters::counter_info complemented_info = info;
+            complement_counter_info(complemented_info, info, ec);
+            if (ec) return hpx::naming::invalid_id;
+
+            // create the counter as requested
+            hpx::naming::id_type id;
+            try {
+                // create the 'sine' performance counter component locally, we
+                // only get here if this instance does not exist yet
+                id = hpx::naming::id_type(
+                    hpx::components::server::create_one<sine_counter_type>(
+                        complemented_info), hpx::naming::id_type::managed);
+            }
+            catch (hpx::exception const& e) {
+                if (&ec == &hpx::throws)
+                    throw;
+                ec = make_error_code(e.get_error(), e.what());
+                return hpx::naming::invalid_id;
+            }
+
+            if (&ec != &hpx::throws)
+                ec = hpx::make_success_code();
+            return id;
+        }
+
+        HPX_THROWS_IF(ec, hpx::bad_parameter, "locality_raw_counter_creator",
+            "invalid counter instance name: " + paths.instancename_);
+        return hpx::naming::invalid_id;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     // This function will be registered as a startup function for HPX below.
     //
     // That means it will be executed in a px-thread before hpx_main, but after
@@ -115,46 +182,44 @@ namespace performance_counters { namespace sine
         using namespace hpx::performance_counters;
 
         // define the counter types
-        raw_counter_type_data const counter_types[] =
+        generic_counter_type_data const counter_types[] =
         {
-            { "/sine/immediate", counter_raw,
+            { "/sine/immediate/explicit", counter_raw,
               "returns the current value of a sine wave calculated over "
-              "an arbitrary time line",
-              HPX_PERFORMANCE_COUNTER_V1 }
+              "an arbitrary time line (explicit, hand-rolled version)",
+              HPX_PERFORMANCE_COUNTER_V1,
+              // We assume that valid counter names have the following scheme:
+              //
+              //  /sine(locality#<locality_id>/instance#<instance_id>)/immediate/implicit
+              //
+              // where '<locality_id>' is the number of the locality the
+              // counter has to be instantiated on and '<instance_id>' is the
+              // instance number to use for the particular counter. We allow
+              // any arbitrary number of instances.
+              &explicit_sine_counter_creator,
+              &explicit_sine_counter_discoverer
+            },
+            { "/sine/immediate/implicit", counter_raw,
+              "returns the current value of a sine wave calculated over "
+              "an arbitrary time line (implicit version, using HPX facilities)",
+              HPX_PERFORMANCE_COUNTER_V1,
+              // We assume that valid counter names have the following scheme:
+              //
+              //  /sine(locality#<locality_id>/total)/immediate/implicit
+              //
+              // where '<locality_id>' is the number of the locality the
+              // counter has to be instantiated on. The function 'immediate_sine'
+              // is used as the source of counter data for the created counter.
+              boost::bind(&hpx::performance_counters::locality_raw_counter_creator,
+                  _1, &immediate_sine, _2),
+              &hpx::performance_counters::locality_counter_discoverer
+            }
         };
 
-        // install the counter types, un-installation is handled automatically
+        // Install the counter types, de-installation of the types is handled
+        // automatically.
         install_counter_types(counter_types,
             sizeof(counter_types)/sizeof(counter_types[0]));
-
-        // create the counter instances
-
-        // The first counter uses our own full counter implementation, we create
-        // the sine_type counter locally and install it to the local counter
-        // registry.
-        boost::uint32_t const prefix = hpx::applier::get_applier().get_prefix_id();
-        boost::format sine_instance("/sine(locality#%d/instance#%d)/immediate");
-
-        // full info of the counter to create, help text and version will be
-        // complemented from counter type info as specified above
-        counter_info info(counter_raw, boost::str(sine_instance % prefix % 0));
-
-        // create the 'sine' performance counter component locally
-        hpx::naming::id_type id(
-            hpx::components::server::create_one<sine_counter_type>(info),
-            hpx::naming::id_type::managed);
-
-        // install the created counter, un-installation is automatic
-        install_counter(id, info);
-
-        // The second counter is based on the built-in counter type allowing
-        // to use a plain function to return the counter values. We do not need
-        // to explicitly create the counter instance in this case.
-        install_counter(boost::str(sine_instance % prefix % 1), immediate_sine);
-
-        // The third counter is an averaging performance counter based on the
-        // first counter above
-        create_averaging_sine();
     }
 
     ///////////////////////////////////////////////////////////////////////////

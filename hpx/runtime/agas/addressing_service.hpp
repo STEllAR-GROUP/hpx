@@ -272,14 +272,16 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         return runtime_type == runtime_mode_console;
     }
 
-    /// \brief Install performance counters exposing properties from the
+    /// \brief Register performance counter types exposing properties from the
     ///        local cache.
-    void install_counters();
+    void register_counter_types();
 
+    // FIXME: document (add comments)
     void garbage_collect_non_blocking(
         error_code& ec = throws
         );
-    
+
+    // FIXME: document (add comments)
     void garbage_collect_sync(
         error_code& ec = throws
         );
@@ -862,7 +864,7 @@ public:
       , naming::address& addr
       , error_code& ec = throws
         )
-    {  
+    {
         // Try the cache
         if (caching_)
         {
@@ -873,7 +875,7 @@ public:
                 return false;
         }
 
-        return resolve_full(id, addr, ec); 
+        return resolve_full(id, addr, ec);
     }
 
     bool resolve(

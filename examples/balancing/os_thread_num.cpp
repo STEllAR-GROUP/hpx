@@ -51,7 +51,7 @@ double delay()
 void get_os_thread_num(local_barrier& barr, fifo<std::size_t>& os_threads)
 {
     global_scratch = delay();
-    os_threads.enqueue(threadmanager_base::get_thread_num());
+    os_threads.enqueue(hpx::get_thread_num());
     barr.wait();
 }
 

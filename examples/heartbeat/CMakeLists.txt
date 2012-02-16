@@ -25,7 +25,7 @@ endif()
 add_hpx_executable(heartbeat
                    SOURCES ${heartbeat_SOURCES}
                    HEADERS ${heartbeat_HEADERS}
-                   FOLDER "Examples"
+                   FOLDER "Examples/HeartBeat"
                    DEPENDENCIES iostreams_component)
 
 # add pseudo-target dependencies

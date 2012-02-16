@@ -4,7 +4,7 @@
 //  Parts of this code were taken from the Boost.Regex library
 //  Copyright (c) 2004 John Maddock
 //
-//  Parts of this code werer taking from this article:
+//  Parts of this code were taking from this article:
 //  http://timday.bitbucket.org/lru.html
 //  Copyright (c) 2010-2011 Tim Day
 //
@@ -66,7 +66,8 @@ namespace hpx { namespace util
         {
             if(max_connections_per_locality_ > max_cache_size)
             {
-                HPX_THROW_EXCEPTION(bad_parameter, "connection_cache ctor", "max_connections_per_locality_ > max_cache_size");
+                HPX_THROW_EXCEPTION(bad_parameter, "connection_cache ctor",
+                    "max_connections_per_locality_ > max_cache_size");
             }
         }
 
@@ -77,7 +78,7 @@ namespace hpx { namespace util
             // Check if entry already exists ...
             const typename cache_type::iterator it = cache_.find(l);
 
-            // If it does ... 
+            // If it does ...
             if(it != cache_.end())
             {
                 // .. update LRU meta data
@@ -94,7 +95,7 @@ namespace hpx { namespace util
                     boost::get<0>(it->second).pop_front();
                     --boost::get<1>(it->second);
                     --cache_size_;
-                    
+
                     return result;
                 }
             }
@@ -155,13 +156,14 @@ namespace hpx { namespace util
                     break;
                 }
             }
-            
+
 
             // If we reach here, we can safely add a new entry ...
             if(jt == cache_.end())
             {
                 // cache doesn't hold the key yet ... insert
-                typename key_tracker_type::iterator it = key_tracker_.insert(key_tracker_.end(), l);
+                typename key_tracker_type::iterator it =
+                    key_tracker_.insert(key_tracker_.end(), l);
                 cache_.insert(
                     std::make_pair(
                         l
@@ -197,7 +199,7 @@ namespace hpx { namespace util
             mutex_type::scoped_lock lock(mtx_);
             return cache_.count(l) && boost::get<1>(cache_[l]) >= max_connections_per_locality_;
         }
-        
+
         bool contains(key_type const & l)
         {
             mutex_type::scoped_lock lock(mtx_);
@@ -208,7 +210,7 @@ namespace hpx { namespace util
         {
             mutex_type::scoped_lock lock(mtx_);
             cache_.clear();
-            cache_size_ = 0; 
+            cache_size_ = 0;
         }
 
     private:
@@ -219,7 +221,6 @@ namespace hpx { namespace util
         cache_type cache_;
         size_type cache_size_;
     };
-
 }}
 
 #endif

@@ -159,7 +159,8 @@ namespace hpx
             boost::bind(&runtime_impl::deinit_tss, This()), "parcel_pool"),
         timer_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
-        parcel_port_(parcel_pool_, ini_.get_parcelport_address(), ini_.get_connection_cache_size(), ini_.get_max_connections_per_loc()),
+        parcel_port_(parcel_pool_, ini_.get_parcelport_address(), 
+            ini_.get_connection_cache_size(), ini_.get_max_connections_per_loc()),
         agas_client_(parcel_port_, ini_, mode_),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_,
             new parcelset::policies::global_parcelhandler_queue),
@@ -552,23 +553,53 @@ namespace hpx
         runtime::runtime_.reset();
     }
 
-    /// \brief Install all performance counters related to this runtime
+    /// \brief Register all performance counter types related to this runtime
     ///        instance
-    void runtime::install_counters()
+    void runtime::register_counter_types()
     {
-        performance_counters::raw_counter_type_data counter_types[] =
+        performance_counters::generic_counter_type_data statistic_counter_types[] =
         {
+            // averaging counter
+            { "/statistics/average", performance_counters::counter_average_count,
+              "returns the averaged value of its base counter over "
+              "an arbitrary time line; pass required base counter as the instance "
+              "name: /statistics(<base_counter_name>)/average",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::statistics_counter_creator,
+              &performance_counters::default_counter_discoverer
+            },
+
+            // max counter
+            { "/statistics/max", performance_counters::counter_statistics_max,
+              "returns the averaged value of its base counter over "
+              "an arbitrary time line; pass required base counter as the instance "
+              "name: /statistics(<base_counter_name>)/max",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::statistics_counter_creator,
+              &performance_counters::default_counter_discoverer
+            },
+
+            // min counter
+            { "/statistics/min", performance_counters::counter_statistics_min,
+              "returns the averaged value of its base counter over "
+              "an arbitrary time line; pass required base counter as the instance "
+              "name: /statistics(<base_counter_name>)/min",
+              HPX_PERFORMANCE_COUNTER_V1,
+               &performance_counters::detail::statistics_counter_creator,
+               &performance_counters::default_counter_discoverer
+            },
+
+            // uptime counters
             { "/runtime/uptime", performance_counters::counter_elapsed_time,
               "returns the up time of the runtime instance for the referenced locality",
-              HPX_PERFORMANCE_COUNTER_V1 }
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::uptime_counter_creator,
+              &performance_counters::default_counter_discoverer
+            }
         };
         performance_counters::install_counter_types(
-            counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
-
-        boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
-        boost::format runtime_uptime("/runtime(locality#%d/total)/uptime");
-        performance_counters::install_counter(
-            boost::str(runtime_uptime % prefix));
+            statistic_counter_types,
+            sizeof(statistic_counter_types)/sizeof(statistic_counter_types[0]));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -688,6 +719,11 @@ namespace hpx
     std::size_t get_os_thread_count()
     {
         return get_runtime().get_config().get_os_thread_count();
+    }
+
+    std::size_t get_thread_num()
+    {
+        return get_runtime().get_thread_manager().get_thread_num();
     }
 
     ///////////////////////////////////////////////////////////////////////////

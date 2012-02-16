@@ -57,9 +57,6 @@ namespace hpx
         /// specific) applier instance.
         HPX_API_EXPORT applier& get_applier();
         HPX_API_EXPORT applier* get_applier_ptr();
-
-        /// The function \a get_prefix_id returns the id of this locality
-        HPX_API_EXPORT boost::uint32_t get_prefix_id();
     }
 
     /// \namespace actions
@@ -542,8 +539,24 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of OS-threads running in the runtime instance
-    ///        the current thread is associated with
+    ///        the current HPX-thread is associated with.
     HPX_API_EXPORT std::size_t get_os_thread_count();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the number of the current OS-thread running in the
+    ///        runtime instance the current HPX-thread is associated with.
+    ///
+    /// \note   The returned value is zero based and it's maximum value is
+    ///         smaller than the overall number of OS-threads executed (as
+    ///         returned by \a get_os_thread_count().
+    /// \note   This function needs to be executed on a HPX-thread. It will
+    ///         fail otherwise (it will return -1).
+    HPX_API_EXPORT std::size_t get_thread_num();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the number of the locality this function is being called
+    ///        from.
+    HPX_API_EXPORT boost::uint32_t get_locality_id();
 }
 
 #endif

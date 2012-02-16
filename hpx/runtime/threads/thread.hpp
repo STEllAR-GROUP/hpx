@@ -154,7 +154,7 @@ namespace hpx { namespace threads { namespace detail
                 }
             }
             if (0 == parent_locality_prefix_)
-                parent_locality_prefix_ = applier::get_prefix_id();
+                parent_locality_prefix_ = get_locality_id();
         }
 
         thread(BOOST_RV_REF(thread_init_data) init_data, thread_id_type id,
@@ -186,7 +186,7 @@ namespace hpx { namespace threads { namespace detail
                 }
             }
             if (0 == parent_locality_prefix_)
-                parent_locality_prefix_ = applier::get_prefix_id();
+                parent_locality_prefix_ = get_locality_id();
         }
 
         /// This constructor is provided just for compatibility with the scheme

@@ -49,8 +49,6 @@ namespace hpx { namespace detail
 {
     // forward declarations only
     void console_print(std::string const& name);
-    void list_counter(std::string const& name, naming::gid_type const& gid);
-    void list_counter_info(std::string const& name, naming::gid_type const& gid);
     void list_symbolic_name(std::string const& name, naming::gid_type const& gid);
     void list_component_type(std::string const& name, components::component_type);
 }}
@@ -59,18 +57,6 @@ typedef hpx::actions::plain_action1<
     std::string const&, hpx::detail::console_print
 > console_print_action;
 HPX_REGISTER_PLAIN_ACTION_EX2(console_print_action, console_print_action, true);
-
-typedef hpx::actions::plain_action2<
-    std::string const&, hpx::naming::gid_type const&,
-    hpx::detail::list_counter
-> list_counter_action;
-HPX_REGISTER_PLAIN_ACTION_EX2(list_counter_action, list_counter_action, true);
-
-typedef hpx::actions::plain_action2<
-    std::string const&, hpx::naming::gid_type const&,
-    hpx::detail::list_counter_info
-> list_counter_info_action;
-HPX_REGISTER_PLAIN_ACTION_EX2(list_counter_info_action, list_counter_info_action, true);
 
 typedef hpx::actions::plain_action2<
     std::string const&, hpx::naming::gid_type const&,
@@ -86,155 +72,127 @@ HPX_REGISTER_PLAIN_ACTION_EX2(list_component_type_action, list_component_type_ac
 
 namespace hpx { namespace detail
 {
+    ///////////////////////////////////////////////////////////////////////////
     // print string on the console
     void console_print(std::string const& name)
     {
         std::cout << name << std::endl;
     }
 
+    inline void print(std::string const& name, error_code& ec = throws)
+    {
+        naming::gid_type console;
+        naming::get_agas_client().get_console_prefix(console, ec);
+        if (ec) return;
+
+        typedef lcos::eager_future<console_print_action> future_type;
+        future_type(console, name).get(ec);
+        if (ec) return;
+
+        if (&ec != &throws)
+            ec = make_success_code();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     // redirect the printing of the given counter name to the console
-    void list_counter(std::string const& name, naming::gid_type const& gid)
+    bool list_counter(performance_counters::counter_info const& info,
+        error_code& ec)
     {
-        if (sizeof(hpx::performance_counters::counter_prefix)-1 <= name.size() &&
-            0 == name.find(hpx::performance_counters::counter_prefix))
-        {
-            typedef lcos::eager_future<console_print_action> future_type;
-
-            naming::gid_type console;
-            naming::get_agas_client().get_console_prefix(console);
-            future_type(console,
-                name.substr(sizeof(hpx::performance_counters::counter_prefix)-1)
-            ).get();
-        }
+        print(info.fullname_, ec);
+        return true;
     }
 
+    // List the names of all registered performance counters.
+    void list_counter_names()
+    {
+        // list all counter names
+        performance_counters::discover_counter_types(&list_counter);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     // redirect the printing of the full counter info to the console
-    void list_counter_info(std::string const& name, naming::gid_type const& gid)
+    bool list_counter_info(performance_counters::counter_info const& info,
+        error_code& ec)
     {
-        if (sizeof(hpx::performance_counters::counter_prefix)-1 <= name.size() &&
-            0 == name.find(hpx::performance_counters::counter_prefix))
-        {
-            using hpx::performance_counters::stubs::performance_counter;
+        // compose the information to be printed for each of the counters
+        util::osstream strm;
 
-            performance_counters::counter_info info =
-                performance_counter::get_info(gid);
+        strm << std::string(78, '-') << '\n';
+        strm << "fullname: " << info.fullname_ << '\n';
+        strm << "helptext: " << info.helptext_ << '\n';
+        strm << "type:     "
+              << performance_counters::get_counter_type_name(info.type_)
+              << '\n';
 
-            // compose the information to be printed for each of the counters
-            util::osstream strm;
-            strm << std::string(78, '-') << '\n';
-            strm << "fullname: " << info.fullname_ << '\n';
-            strm << "helptext: " << info.helptext_ << '\n';
-            strm << "type:     "
-                 << performance_counters::get_counter_type_name(info.type_)
-                 << '\n';
+        boost::format fmt("%d.%d.%d\n");
+        strm << "version:  "        // 0xMMmmrrrr
+              << boost::str(fmt % (info.version_ / 0x1000000) %
+                    (info.version_ / 0x10000 % 0x100) %
+                    (info.version_ % 0x10000));
+        strm << std::string(78, '-') << '\n';
 
-            boost::format fmt("%d.%d.%d\n");
-            strm << "version:  "        // 0xMMmmrrrr
-                 << boost::str(fmt % (info.version_ / 0x1000000) %
-                        (info.version_ / 0x10000 % 0x100) %
-                        (info.version_ % 0x10000));
-            strm << std::string(78, '-') << '\n';
+        print(strm.str(), ec);
 
-            typedef lcos::eager_future<console_print_action> future_type;
-            naming::gid_type console;
-            naming::get_agas_client().get_console_prefix(console);
-            future_type(console, strm.str()).get();
-        }
+        if (&ec != &throws)
+            ec = make_success_code();
+        return true;
     }
 
-    void list_symbolic_name(std::string const& name,
-        naming::gid_type const& gid)
+    // List the names of all registered performance counters.
+    void list_counter_infos()
+    {
+        // list all counter information
+        performance_counters::discover_counter_types(&list_counter_info);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void list_symbolic_name(std::string const& name, naming::gid_type const& gid)
     {
         util::osstream strm;
 
-        strm << name << ", "
-             << gid << ", "
-             << ( naming::get_credit_from_gid(gid)
-                ? "managed"
-                : "unmanaged");
+        strm << name << ", " << gid << ", "
+             << (naming::get_credit_from_gid(gid) ? "managed" : "unmanaged");
 
-        typedef lcos::eager_future<console_print_action> future_type;
-
-        naming::gid_type console;
-        naming::get_agas_client().get_console_prefix(console);
-        future_type(console, strm.str()).get();
+        print(strm.str());
     }
 
-    template <typename Action>
-    int list_symbolic_names(boost::program_options::variables_map& vm,
-        hpx_main_func f, std::string const& text)
+    void list_symbolic_names()
     {
-        {
-            if (!text.empty())
-                std::cout << text << std::endl;
+        naming::gid_type console;
+        naming::get_agas_client().get_console_prefix(console);
 
-            typedef void iter_func(std::string const&, naming::gid_type const&);
+        print(std::string("registered symbolic names"));
 
-            hpx::actions::function<iter_func> cb(new Action);
-            naming::get_agas_client().iterateids(cb);
-        }
-
-        if (0 != f)
-            return f(vm);
-
-        // we assume that we need to exit execution if no hpx_main is given
-        finalize();
-        return 0;
+        typedef void iter_func(std::string const&, naming::gid_type const&);
+        hpx::actions::function<iter_func> cb(new list_symbolic_name_action);
+        naming::get_agas_client().iterateids(cb);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     void list_component_type(std::string const& name,
         components::component_type ctype)
     {
-        char const* fmt = "%1%, %|40t|%2%";
+        print(boost::str(boost::format("%1%, %|40t|%2%") %
+            name % components::get_component_type_name(ctype)));
+    }
 
-        std::string const s = boost::str(boost::format(fmt)
-            % name % components::get_component_type_name(ctype));
-
-        typedef lcos::eager_future<console_print_action> future_type;
-
+    void list_component_types()
+    {
         naming::gid_type console;
         naming::get_agas_client().get_console_prefix(console);
-        future_type(console, s).get();
+
+        print(std::string("registered component types"));
+
+        typedef void iter_func(std::string const&, components::component_type);
+        hpx::actions::function<iter_func> cb(new list_component_type_action);
+        naming::get_agas_client().iterate_types(cb);
     }
 
-    template <typename Action>
-    int list_component_types(boost::program_options::variables_map& vm,
-        hpx_main_func f, std::string const& text)
+    ///////////////////////////////////////////////////////////////////////////
+    void print_counters(boost::shared_ptr<util::query_counters> const& qc)
     {
-        {
-            if (!text.empty())
-                std::cout << text << std::endl;
-
-            typedef void iter_func(std::string const&,
-                components::component_type);
-
-            hpx::actions::function<iter_func> cb(new Action);
-            naming::get_agas_client().iterate_types(cb);
-        }
-
-        if (0 != f)
-            return f(vm);
-
-        // we assume that we need to exit execution if no hpx_main is given
-        finalize();
-        return 0;
-    }
-
-    int print_counters(boost::program_options::variables_map& vm,
-        hpx_main_func f, boost::shared_ptr<util::query_counters> const& qc)
-    {
-        {
-            BOOST_ASSERT(qc);
-            qc->start();
-        }
-
-        if (0 != f)
-            return f(vm);
-
-        // we assume that we need to exit execution if no hpx_main is given
-        finalize();
-        return 0;
+        BOOST_ASSERT(qc);
+        qc->start();
     }
 }}
 
@@ -279,65 +237,24 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Runtime>
-        int run_special(Runtime& rt, hpx_main_func f,
-            boost::program_options::variables_map& vm, std::size_t num_threads,
-            std::size_t num_localities, int& result)
+        void handle_list_and_print_options(Runtime& rt,
+            boost::program_options::variables_map& vm)
         {
-            // sanity checking
-            std::size_t const list_count = vm.count("list-counters") +
-                vm.count("list-counter-infos") +
-                vm.count("list-symbolic-names") +
-                vm.count("list-component-types");
-            std::size_t const print_count = vm.count("print-counter") +
-                vm.count("print-counter-interval");
-
-            if (list_count && print_count) {
-                throw std::logic_error("The --list-* options cannot be used "
-                    "in conjunction with any of the --print-* options.");
-            }
-
-            if (list_count > 1) {
-                throw std::logic_error("Only one --list-* option may be "
-                    "specified");
-            }
-
             if (vm.count("list-counters")) {
-                // Print the names of all registered performance counters and
-                // then call f (if f is NULL, hpx::finalize() is called instead
-                // and 0 is returned).
-                result = rt.run(
-                    boost::bind(&list_symbolic_names<list_counter_action>,
-                        vm, f, "registered performance counters"),
-                    num_threads, num_localities);
-                return true;
+                // Print the names of all registered performance counters.
+                rt.add_startup_function(&list_counter_names);
             }
-            else if (vm.count("list-counter-infos")) {
-                // Print info about all registered performance counters and
-                // then call f (if f is NULL, hpx::finalize() is called instead
-                // and 0 is returned).
-                result = rt.run(
-                    boost::bind(&list_symbolic_names<list_counter_info_action>,
-                        vm, f, "registered performance counters"),
-                    num_threads, num_localities);
-                return true;
+            if (vm.count("list-counter-infos")) {
+                // Print info about all registered performance counters.
+                rt.add_startup_function(&list_counter_infos);
             }
-            else if (vm.count("list-symbolic-names")) {
-                // Print all registered symbolic names and then call f (if f is
-                // NULL, hpx::finalize() is called instead and 0 is returned).
-                result = rt.run(
-                    boost::bind(&list_symbolic_names<list_symbolic_name_action>,
-                        vm, f, "registered symbolic names"),
-                    num_threads, num_localities);
-                return true;
+            if (vm.count("list-symbolic-names")) {
+                // Print all registered symbolic names.
+                rt.add_startup_function(&list_symbolic_names);
             }
-            else if (vm.count("list-component-types")) {
-                // Print all registered component types and then call f (if f is
-                // NULL, hpx::finalize() is called instead and 0 is returned).
-                result = rt.run(
-                    boost::bind(&list_component_types<list_component_type_action>,
-                        vm, f, "registered dynamic component types"),
-                    num_threads, num_localities);
-                return true;
+            if (vm.count("list-component-types")) {
+                // Print all registered component types.
+                rt.add_startup_function(&list_component_types);
             }
 
             if (vm.count("print-counter")) {
@@ -348,32 +265,35 @@ namespace hpx
                 std::vector<std::string> counters =
                     vm["print-counter"].as<std::vector<std::string> >();
 
+                std::string destination("cout");
+                if (vm.count("print-counter-destination"))
+                    destination = vm["print-counter-destination"].as<std::string>();
+
                 // schedule the query function at startup, which will schedule
                 // itself to run after the given interval
                 boost::shared_ptr<util::query_counters> qc =
                     boost::make_shared<util::query_counters>(
-                        boost::ref(counters), interval, boost::ref(std::cout));
+                        boost::ref(counters), interval, destination);
 
                 // schedule to run at shutdown
                 rt.add_pre_shutdown_function(
                     boost::bind(&util::query_counters::evaluate, qc));
 
-                if (0 != interval) {
-                    result = rt.run(boost::bind(&print_counters, vm, f, qc),
-                        num_threads, num_localities);
-                    return true;
-                }
+                if (0 != interval)
+                    rt.add_startup_function(boost::bind(&print_counters, qc));
             }
             else if (vm.count("print-counter-interval")) {
                 throw std::logic_error("Invalid command line option "
                     "--print-counter-interval, valid in conjunction with "
                     "--print-counter only");
             }
-
-            return false;
+            else if (vm.count("print-counter-destination")) {
+                throw std::logic_error("Invalid command line option "
+                    "--print-counter-destination, valid in conjunction with "
+                    "--print-counter only");
+            }
         }
 
-        ///////////////////////////////////////////////////////////////////////
         template <typename Runtime>
         int run(Runtime& rt, hpx_main_func f,
             boost::program_options::variables_map& vm, runtime_mode mode,
@@ -393,6 +313,10 @@ namespace hpx
             if (!!shutdown)
                 rt.add_shutdown_function(shutdown);
 
+            // add startup function related to listing counter names or counter
+            // infos
+            handle_list_and_print_options(rt, vm);
+
             // Dump the configuration before all components have been loaded.
             if (vm.count("dump-config-initial")) {
                 std::cout << "Configuration after runtime construction:\n";
@@ -403,26 +327,7 @@ namespace hpx
 
             // Dump the configuration after all components have been loaded.
             if (vm.count("dump-config"))
-            {
-                if (vm.count("exit")) {
-                    throw std::logic_error("The command line option --exit "
-                        "cannot be used in conjunction with --dump-config, try "
-                        "--dump-config-init --exit instead.");
-                }
                 rt.add_startup_function(dump_config<Runtime>(rt));
-            }
-
-            int result = 0;
-            if (vm.count("exit")) {
-                run_special(rt, hpx_main_func(0), vm, num_threads,
-                    num_localities, result);
-                return result;
-            }
-
-            // Run this runtime instance with a special hpx_main, returns false
-            // otherwise
-            if (run_special(rt, f, vm, num_threads, num_localities, result))
-                return result;
 
             // Run this runtime instance using the given function f.
             if (0 != f)

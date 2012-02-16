@@ -31,7 +31,7 @@
 #include <hpx/util/demangle_helper.hpp>
 #include <hpx/lcos/local_spinlock.hpp>
 
-namespace hpx { namespace lcos { namespace server { namespace detail 
+namespace hpx { namespace lcos { namespace server { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     // data structure holding all counters for full_empty entries
@@ -48,8 +48,8 @@ namespace hpx { namespace lcos { namespace server { namespace detail
     };
     extern HPX_COMPONENT_EXPORT dataflow_counter_data dataflow_counter_data_;
 
-    // call this to install all counters for dataflow objects
-    void install_counters();
+    // call this to register all counter types for dataflow objects
+    void register_counter_types();
 
     ///////////////////////////////////////////////////////////////////////////
     template <

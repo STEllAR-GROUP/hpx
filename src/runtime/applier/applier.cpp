@@ -250,7 +250,7 @@ namespace hpx { namespace applier
         return hpx::naming::get_agas_client().local_prefix();
     }
 
-    boost::uint32_t applier::get_prefix_id() const
+    boost::uint32_t applier::get_locality_id() const
     {
         return naming::get_prefix_from_gid(get_prefix());
     }
@@ -390,9 +390,19 @@ namespace hpx { namespace applier
     }
 
     // The function \a get_prefix_id returns the id of this locality
-    boost::uint32_t get_prefix_id()
+    boost::uint32_t get_locality_id()
     {
         applier** appl = applier::applier_.get();
-        return appl ? (*appl)->get_prefix_id() : 0;
+        return appl ? (*appl)->get_locality_id() : 0;
     }
 }}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx
+{
+    HPX_API_EXPORT boost::uint32_t get_locality_id()
+    {
+        return applier::get_applier().get_locality_id();
+    }
+}
+

@@ -19,7 +19,7 @@ namespace hpx { namespace test { namespace server
 
 managed_refcnt_checker::~managed_refcnt_checker()
 {
-    const boost::uint32_t prefix_ = applier::get_prefix_id();
+    const boost::uint32_t prefix_ = get_locality_id();
     const naming::gid_type this_ = get_base_gid();
 
     util::osstream strm;

@@ -33,16 +33,12 @@ using hpx::find_all_localities;
 
 using hpx::naming::id_type;
 
-using hpx::applier::get_prefix_id;
-
 using hpx::actions::plain_action0;
 using hpx::actions::plain_result_action1;
 
 using hpx::lcos::promise;
 using hpx::lcos::async;
 using hpx::lcos::wait;
-
-using hpx::threads::threadmanager_base;
 
 using hpx::cout;
 using hpx::flush;
@@ -61,14 +57,14 @@ using hpx::flush;
 ///////////////////////////////////////////////////////////////////////////////
 std::size_t hello_world_worker(std::size_t desired)
 {
-    std::size_t current = threadmanager_base::get_thread_num();
+    std::size_t current = hpx::get_thread_num();
 
     if (current == desired)
     {
         // Yes! The PX-thread is run by the designated OS-thread.
         cout << ( format("hello world from OS-thread %1% on locality %2%\n")
                   % desired
-                  % get_prefix_id())
+                  % hpx::get_locality_id())
             << flush;
         return desired;
     }

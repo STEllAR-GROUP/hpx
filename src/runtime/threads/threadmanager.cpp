@@ -13,6 +13,7 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/include/performance_counters.hpp>
+#include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/logging.hpp>
@@ -190,7 +191,7 @@ namespace hpx { namespace threads
             }
         }
         if (0 == data.parent_prefix)
-            data.parent_prefix = applier::get_prefix_id();
+            data.parent_prefix = get_locality_id();
 
         // NOTE: This code overrides a request to schedule a thread on a scheduler
         // selected queue. The schedulers are written to select a queue to put
@@ -271,7 +272,7 @@ namespace hpx { namespace threads
             }
         }
         if (0 == data.parent_prefix)
-            data.parent_prefix = applier::get_prefix_id();
+            data.parent_prefix = get_locality_id();
 
         // NOTE: This code overrides a request to schedule a thread on a scheduler
         // selected queue. The schedulers are written to select a queue to put
@@ -872,162 +873,380 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // counter creator and discovery functions
+
+    // queue length(s) counter creation function
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        install_counters()
+    naming::id_type threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        queue_length_counter_creator(
+            performance_counters::counter_info const& info, error_code& ec)
     {
-        performance_counters::raw_counter_type_data const counter_types[] =
+        // verify the validity of the counter instance name
+        performance_counters::counter_path_elements paths;
+        performance_counters::get_counter_path_elements(info.fullname_, paths, ec);
+        if (ec) return naming::invalid_id;
+
+        // /threadqueue(locality#%d/total)/length
+        // /threadqueue(locality#%d/os-thread%d)/length
+        if (paths.parentinstance_is_basename_) {
+            HPX_THROWS_IF(ec, bad_parameter, "queue_length_counter_creator",
+                "invalid counter instance parent name: " +
+                    paths.parentinstancename_);
+            return naming::invalid_id;
+        }
+
+        if (paths.parentinstancename_ != "locality" ||
+            paths.parentinstanceindex_ != get_locality_id())
         {
-            // queue length
-            { "/queue/length", performance_counters::counter_raw,
-              "returns the current queue length for the referenced queue",
-              HPX_PERFORMANCE_COUNTER_V1 },
+            HPX_THROWS_IF(ec, bad_parameter, "queue_length_counter_creator",
+                "attempt to create counter on wrong locality");
+            return naming::invalid_id;
+        }
 
-            // thread counts
-            { "/threads/count/cumulative/all", performance_counters::counter_raw,
-              "returns the overall number of executed (retired) HPX-thread for "
-              "the referenced locality", HPX_PERFORMANCE_COUNTER_V1 },
-            { "/threads/count/objects", performance_counters::counter_raw,
-              "returns the overall number of created HPX-thread objects for "
-              "the referenced locality", HPX_PERFORMANCE_COUNTER_V1 },
-            { "/threads/count/stack-recycles", performance_counters::counter_raw,
-              "returns the total number of HPX-thread recycling operations performed "
-              "for the referenced locality", HPX_PERFORMANCE_COUNTER_V1 },
-#if !defined(BOOST_WINDOWS)
-            { "/threads/count/stack-unbinds", performance_counters::counter_raw,
-              "returns the total number of HPX-thread unbind (madvise) operations "
-              "performed for the referenced locality", HPX_PERFORMANCE_COUNTER_V1 },
-#endif
-            { "/threads/count/instantaneous/all", performance_counters::counter_raw,
-              "returns the overall current number of HPX-thread instantiated at the "
-              "referenced locality", HPX_PERFORMANCE_COUNTER_V1 },
-            { "/threads/count/instantaneous/active", performance_counters::counter_raw,
-              "returns the current number of active HPX-thread at the referenced locality",
-              HPX_PERFORMANCE_COUNTER_V1 },
-            { "/threads/count/instantaneous/pending", performance_counters::counter_raw,
-              "returns the current number of pending HPX-thread at the referenced locality",
-              HPX_PERFORMANCE_COUNTER_V1 },
-            { "/threads/count/instantaneous/suspended", performance_counters::counter_raw,
-              "returns the current number of suspended HPX-thread at the referenced locality",
-              HPX_PERFORMANCE_COUNTER_V1 },
-            { "/threads/count/instantaneous/terminated", performance_counters::counter_raw,
-              "returns the current number of terminated HPX-thread at the referenced locality",
-              HPX_PERFORMANCE_COUNTER_V1 },
+        typedef scheduling_policy_type spt;
 
-            // Idle rate of either a thread or the averaging over all threads of a locality
-            { "/time/idle-rate", performance_counters::counter_raw,
-              "returns the idle rate for the referenced object - thread or locality (in "
-              "0.1%)", HPX_PERFORMANCE_COUNTER_V1 }
+        if (paths.instancename_ == "total" && paths.instanceindex_ == -1)
+        {
+            // overall counter
+            using performance_counters::detail::create_raw_counter;
+            return create_raw_counter(info,
+                HPX_STD_BIND(&spt::get_queue_length, &scheduler_, -1), ec);
+        }
+        else if (paths.instancename_ == "os-thread" &&
+            paths.instanceindex_ >= 0 && paths.instanceindex_ < threads_.size())
+        {
+            // specific counter
+            using performance_counters::detail::create_raw_counter;
+            return create_raw_counter(info,
+                HPX_STD_BIND(&spt::get_queue_length, &scheduler_,
+                    paths.instanceindex_), ec);
+        }
+
+        HPX_THROWS_IF(ec, bad_parameter, "queue_length_counter_creator",
+            "invalid counter instance name: " + paths.instancename_);
+        return naming::invalid_id;
+    }
+
+    bool locality_allocator_counter_discoverer(
+        performance_counters::counter_info const& info,
+        HPX_STD_FUNCTION<performance_counters::discover_counter_func> const& f,
+        error_code& ec)
+    {
+        performance_counters::counter_info i = info;
+
+        // compose the counter name templates
+        performance_counters::counter_path_elements p;
+        performance_counters::counter_status status =
+            get_counter_path_elements(info.fullname_, p, ec);
+        if (!status_is_valid(status)) return false;
+
+        p.parentinstancename_ = "locality";
+
+        boost::uint32_t last_locality = get_locality_id();
+        for (boost::uint32_t l = 0; l <= last_locality; ++l)
+        {
+            p.parentinstanceindex_ = static_cast<boost::int32_t>(l);
+            p.instancename_ = "total";
+            p.instanceindex_ = -1;
+            status = get_counter_name(p, i.fullname_, ec);
+            if (!status_is_valid(status) || !f(i, ec) || ec)
+                return false;
+
+            for (std::size_t t = 0; t < BOOST_COROUTINE_NUM_HEAPS; ++t)
+            {
+                p.instancename_ = "allocator";
+                p.instanceindex_ = static_cast<boost::int32_t>(t);
+                status = get_counter_name(p, i.fullname_, ec);
+                if (!status_is_valid(status) || !f(i, ec) || ec)
+                    return false;
+            }
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+        return true;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // idle rate counter creation function
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    naming::id_type threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        idle_rate_counter_creator(
+            performance_counters::counter_info const& info, error_code& ec)
+    {
+        // verify the validity of the counter instance name
+        performance_counters::counter_path_elements paths;
+        performance_counters::get_counter_path_elements(info.fullname_, paths, ec);
+        if (ec) return naming::invalid_id;
+
+        // /time(locality#%d/total)/idle-rate
+        // /time(locality#%d/os-thread%d)/idle-rate
+        if (paths.parentinstance_is_basename_) {
+            HPX_THROWS_IF(ec, bad_parameter, "idle_rate_counter_creator",
+                "invalid counter instance parent name: " +
+                    paths.parentinstancename_);
+            return naming::invalid_id;
+        }
+
+        if (paths.parentinstancename_ != "locality" ||
+            paths.parentinstanceindex_ != get_locality_id())
+        {
+            HPX_THROWS_IF(ec, bad_parameter, "idle_rate_counter_creator",
+                "attempt to create counter on wrong locality");
+            return naming::invalid_id;
+        }
+
+        typedef threadmanager_impl ti;
+
+        if (paths.instancename_ == "total" && paths.instanceindex_ == -1)
+        {
+            // overall counter
+            using performance_counters::detail::create_raw_counter;
+            return create_raw_counter(info,
+                HPX_STD_BIND(&ti::avg_idle_rate, this), ec);
+        }
+        else if (paths.instancename_ == "os-thread" &&
+            paths.instanceindex_ >= 0 && paths.instanceindex_ < threads_.size())
+        {
+            // specific counter
+            using performance_counters::detail::create_raw_counter;
+            return create_raw_counter(info,
+                HPX_STD_BIND(&ti::avg_idle_rate, this, paths.instanceindex_), ec);
+        }
+
+        HPX_THROWS_IF(ec, bad_parameter, "idle_rate_counter_creator",
+            "invalid counter instance name: " + paths.instancename_);
+        return naming::invalid_id;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    naming::id_type
+    counter_creator(performance_counters::counter_info const& info,
+        performance_counters::counter_path_elements const& paths,
+        HPX_STD_FUNCTION<boost::uint64_t()> const& total_creator,
+        HPX_STD_FUNCTION<boost::uint64_t()> const& individual_creator,
+        char const* individual_name, std::size_t individual_count,
+        error_code& ec)
+    {
+        if (paths.parentinstance_is_basename_) {
+            HPX_THROWS_IF(ec, bad_parameter, "counter_creator",
+                "invalid counter instance parent name: " +
+                    paths.parentinstancename_);
+            return naming::invalid_id;
+        }
+
+        if (paths.parentinstancename_ != "locality" ||
+            paths.parentinstanceindex_ != get_locality_id())
+        {
+            HPX_THROWS_IF(ec, bad_parameter, "counter_creator",
+                "attempt to create counter on wrong locality");
+            return naming::invalid_id;
+        }
+
+        if (!total_creator.empty() &&
+            paths.instancename_ == "total" && paths.instanceindex_ == -1)
+        {
+            // overall counter
+            using performance_counters::detail::create_raw_counter;
+            return create_raw_counter(info, total_creator, ec);
+        }
+        else if (!individual_creator.empty() &&
+            paths.instancename_ == individual_name &&
+            paths.instanceindex_ >= 0 && paths.instanceindex_ < individual_count)
+        {
+            // specific counter
+            using performance_counters::detail::create_raw_counter;
+            return create_raw_counter(info, individual_creator, ec);
+        }
+
+        HPX_THROWS_IF(ec, bad_parameter, "counter_creator",
+            "invalid counter instance name: " + paths.instancename_);
+        return naming::invalid_id;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // thread counts counter creation function
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    naming::id_type threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        thread_counts_counter_creator(
+            performance_counters::counter_info const& info, error_code& ec)
+    {
+        // verify the validity of the counter instance name
+        performance_counters::counter_path_elements paths;
+        performance_counters::get_counter_path_elements(info.fullname_, paths, ec);
+        if (ec) return naming::invalid_id;
+
+        struct creator_data
+        {
+            char const* const countername;
+            HPX_STD_FUNCTION<boost::uint64_t()> total_func;
+            HPX_STD_FUNCTION<boost::uint64_t()> individual_func;
+            char const* const individual_name;
+            std::size_t individual_count;
         };
-        performance_counters::install_counter_types(
-            counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
 
         typedef scheduling_policy_type spt;
         typedef threadmanager_impl ti;
 
-        std::size_t const shepherd_count = threads_.size();
-        boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
-
-        boost::format total_queue_length("/queue(locality#%d/total)/length");
-        boost::format total_avg_maint("/time(locality#%d/total)/idle-rate");
-        boost::format total_thread_cumulative("/threads(locality#%d/total)/count/cumulative/all");
-        boost::format total_thread_created("/threads(locality#%d/total)/count/objects");
-        boost::format total_thread_instant("/threads(locality#%d/total)/count/instantaneous/%s");
-
-        boost::format total_stack_recycles("/threads(locality#%d/total)/count/stack-recycles");
-#if !defined(BOOST_WINDOWS)
-        boost::format total_stack_unbinds("/threads(locality#%d/total)/count/stack-unbinds");
-#endif
-
-        boost::format queue_length("/queue(locality#%d/os-thread#%d)/length");
-        boost::format avg_maint("/time(locality#%d/os-thread#%d)/idle-rate");
-        boost::format thread_cumulative("/threads(locality#%d/os-thread#%d)/count/cumulative/all");
-        boost::format thread_instant("/threads(locality#%d/os-thread#%d)/count/instantaneous/%s");
-
-        performance_counters::raw_counter_data const counters[] =
+        std::size_t shepherd_count = threads_.size();
+        creator_data data[] =
         {
-            // Locality-wide queue length
-            { boost::str(total_queue_length % prefix),
-              boost::bind(&spt::get_queue_length, &scheduler_, -1) },
-            // Locality-wide % time spent in maintenance
-            { boost::str(total_avg_maint % prefix),
-              boost::bind(&ti::avg_idle_rate, this) },
-            // Locality-wide thread count (cumulative)
-            { boost::str(total_thread_cumulative % prefix),
-              boost::bind(&ti::get_executed_threads, this, -1) },
-            // Locality-wide thread object count
-            { boost::str(total_thread_created % prefix),
-              &coroutine_type::impl_type::get_allocation_count_all },
-
-            // Locality-wide count of stack recycling operations
-            { boost::str(total_stack_recycles % prefix),
-              &coroutine_type::impl_type::get_stack_recycle_count },
+            // /threads(locality#%d/total)/count/cumulative/all
+            // /threads(locality#%d/os-thread%d)/count/cumulative/all
+            { "count/cumulative/all",
+              HPX_STD_BIND(&ti::get_executed_threads, this, -1),
+              HPX_STD_BIND(&ti::get_executed_threads, this, paths.instanceindex_),
+              "os-thread", shepherd_count
+            },
+            // /threads(locality#%d/total)/count/instantaneous/all
+            // /threads(locality#%d/os-thread%d)/count/instantaneous/all
+            { "count/instantaneous/all",
+              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, unknown, -1),
+              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, unknown, paths.instanceindex_),
+              "os-thread", shepherd_count
+            },
+            // /threads(locality#%d/total)/count/instantaneous/active
+            // /threads(locality#%d/os-thread%d)/count/instantaneous/active
+            { "count/instantaneous/active",
+              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, active, -1),
+              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, active, paths.instanceindex_),
+              "os-thread", shepherd_count
+            },
+            // /threads(locality#%d/total)/count/instantaneous/pending
+            // /threads(locality#%d/os-thread%d)/count/instantaneous/pending
+            { "count/instantaneous/pending",
+              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, pending, -1),
+              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, pending, paths.instanceindex_),
+              "os-thread", shepherd_count
+            },
+            // /threads(locality#%d/total)/count/instantaneous/suspended
+            // /threads(locality#%d/os-thread%d)/count/instantaneous/suspended
+            { "count/instantaneous/suspended",
+              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, suspended, -1),
+              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, suspended, paths.instanceindex_),
+              "os-thread", shepherd_count
+            },
+            // /threads(locality#%d/total)/count/instantaneous/terminated
+            // /threads(locality#%d/os-thread%d)/count/instantaneous/terminated
+            { "count/instantaneous/terminated",
+              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, terminated, -1),
+              HPX_STD_BIND(&spt::get_thread_count, &scheduler_, terminated, paths.instanceindex_),
+              "os-thread", shepherd_count
+            },
+            // /threads(locality#%d/total)/count/stack-recycles
+            { "count/stack-recycles",
+              &coroutine_type::impl_type::get_stack_recycle_count,
+              HPX_STD_FUNCTION<boost::uint64_t()>(), "", 0
+            },
 #if !defined(BOOST_WINDOWS)
-            // Locality-wide count of stack unbinding operations
-            { boost::str(total_stack_unbinds % prefix),
-              &coroutine_type::impl_type::get_stack_unbind_count },
+            // /threads(locality#%d/total)/count/stack-unbinds
+            { "count/stack-unbinds",
+              &coroutine_type::impl_type::get_stack_unbind_count,
+              HPX_STD_FUNCTION<boost::uint64_t()>(), "", 0
+            },
 #endif
-            // Locality-wide thread count (instantaneous)
-            { boost::str(total_thread_instant % prefix % "all"),
-              boost::bind(&spt::get_thread_count, &scheduler_, unknown, -1) },
-            // Locality-wide active thread count (instantaneous)
-            { boost::str(total_thread_instant % prefix % "active"),
-              boost::bind(&spt::get_thread_count, &scheduler_, active, -1) },
-            // Locality-wide pending thread count (instantaneous)
-            { boost::str(total_thread_instant % prefix % "pending"),
-              boost::bind(&spt::get_thread_count, &scheduler_, pending, -1) },
-            // Locality-wide suspended thread count (instantaneous)
-            { boost::str(total_thread_instant % prefix % "suspended"),
-              boost::bind(&spt::get_thread_count, &scheduler_, suspended, -1) },
-            // Locality-wide terminated thread count (instantaneous)
-            { boost::str(total_thread_instant % prefix % "terminated"),
-              boost::bind(&spt::get_thread_count, &scheduler_, terminated, -1) }
+            // /threads(locality#%d/total)/count/objects
+            // /threads(locality#%d/allocator%d)/count/objects
+            { "count/objects",
+              &coroutine_type::impl_type::get_allocation_count_all,
+              HPX_STD_BIND(&coroutine_type::impl_type::get_allocation_count, paths.instanceindex_),
+              "allocator", BOOST_COROUTINE_NUM_HEAPS
+            },
         };
-        performance_counters::install_counters(
-            counters, sizeof(counters)/sizeof(counters[0]));
+        std::size_t const data_size = sizeof(data)/sizeof(data[0]);
 
-        for (std::size_t i = 0; i < shepherd_count; ++i)
+        for (creator_data const* d = data; d < &d[data_size]; ++d)
         {
-            performance_counters::raw_counter_data const counters[] =
+            if (paths.countername_ == d->countername)
             {
-                // Queue length
-                { boost::str(queue_length % prefix % i),
-                  boost::bind(&spt::get_queue_length, &scheduler_, i) },
-                // % time spent in maintenance
-                { boost::str(avg_maint % prefix % i),
-                  boost::bind(&ti::avg_idle_rate, this, i) },
-                // Thread count (instantaneous)
-                { boost::str(thread_cumulative % prefix % i),
-                  boost::bind(&ti::get_executed_threads, this, i) },
-                // Thread count (instantaneous)
-                { boost::str(thread_instant % prefix % i % "all"),
-                  boost::bind(&spt::get_thread_count, &scheduler_, unknown, i) },
-                // Active thread count (instantaneous)
-                { boost::str(thread_instant % prefix % i % "active"),
-                  boost::bind(&spt::get_thread_count, &scheduler_, active, i) },
-                // Pending thread count (instantaneous)
-                { boost::str(thread_instant % prefix % i % "pending"),
-                  boost::bind(&spt::get_thread_count, &scheduler_, pending, i) },
-                // Suspended thread count (instantaneous)
-                { boost::str(thread_instant % prefix % i % "suspended"),
-                  boost::bind(&spt::get_thread_count, &scheduler_, suspended, i) },
-                // Terminated thread count (instantaneous)
-                { boost::str(thread_instant % prefix % i % "terminated"),
-                  boost::bind(&spt::get_thread_count, &scheduler_, terminated, i) }
-            };
-            performance_counters::install_counters(
-                counters, sizeof(counters)/sizeof(counters[0]));
+                return counter_creator(info, paths, d->total_func,
+                    d->individual_func, d->individual_name,
+                    d->individual_count, ec);
+            }
         }
 
-        boost::format thread_created("/threads(locality#%d/allocator#%d)/count/objects");
+        HPX_THROWS_IF(ec, bad_parameter, "thread_counts_counter_creator",
+            "invalid counter instance name: " + paths.instancename_);
+        return naming::invalid_id;
+    }
 
-        for (std::size_t i = 0; i < BOOST_COROUTINE_NUM_HEAPS; ++i)
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        register_counter_types()
+    {
+        typedef threadmanager_impl ti;
+        HPX_STD_FUNCTION<performance_counters::create_counter_func> counts_creator(
+            boost::bind(&ti::thread_counts_counter_creator, this, _1, _2));
+
+        performance_counters::generic_counter_type_data counter_types[] =
         {
-            // Thread allocation count (instantaneous)
-            performance_counters::install_counter(
-                boost::str(thread_created % prefix % i),
-                boost::bind(&coroutine_type::impl_type::get_allocation_count, i));
-        }
+            // length of thread queue(s)
+            { "/threadqueue/length", performance_counters::counter_raw,
+              "returns the current queue length for the referenced queue",
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&ti::queue_length_counter_creator, this, _1, _2),
+              &performance_counters::locality_thread_counter_discoverer
+            },
+            // idle rate
+            { "/time/idle-rate", performance_counters::counter_raw,
+              "returns the idle rate for the referenced object  (in 0.1%)",
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&ti::idle_rate_counter_creator, this, _1, _2),
+              &performance_counters::locality_thread_counter_discoverer
+            },
+            // thread counts
+            { "/threads/count/cumulative/all", performance_counters::counter_raw,
+              "returns the overall number of executed (retired) HPX-thread for "
+              "the referenced locality", HPX_PERFORMANCE_COUNTER_V1, counts_creator,
+              &performance_counters::locality_thread_counter_discoverer
+            },
+            { "/threads/count/instantaneous/all", performance_counters::counter_raw,
+              "returns the overall current number of HPX-thread instantiated at the "
+              "referenced locality", HPX_PERFORMANCE_COUNTER_V1, counts_creator,
+              &performance_counters::locality_thread_counter_discoverer
+            },
+            { "/threads/count/instantaneous/active", performance_counters::counter_raw,
+              "returns the current number of active HPX-thread at the referenced locality",
+              HPX_PERFORMANCE_COUNTER_V1, counts_creator,
+              &performance_counters::locality_thread_counter_discoverer
+            },
+            { "/threads/count/instantaneous/pending", performance_counters::counter_raw,
+              "returns the current number of pending HPX-thread at the referenced locality",
+              HPX_PERFORMANCE_COUNTER_V1, counts_creator,
+              &performance_counters::locality_thread_counter_discoverer
+            },
+            { "/threads/count/instantaneous/suspended", performance_counters::counter_raw,
+              "returns the current number of suspended HPX-thread at the referenced locality",
+              HPX_PERFORMANCE_COUNTER_V1, counts_creator,
+              &performance_counters::locality_thread_counter_discoverer
+            },
+            { "/threads/count/instantaneous/terminated", performance_counters::counter_raw,
+              "returns the current number of terminated HPX-thread at the referenced locality",
+              HPX_PERFORMANCE_COUNTER_V1, counts_creator,
+              &performance_counters::locality_thread_counter_discoverer
+            },
+            { "/threads/count/stack-recycles", performance_counters::counter_raw,
+              "returns the total number of HPX-thread recycling operations performed "
+              "for the referenced locality", HPX_PERFORMANCE_COUNTER_V1,
+              counts_creator, &performance_counters::locality_counter_discoverer
+            },
+#if !defined(BOOST_WINDOWS)
+            { "/threads/stack-unbinds", performance_counters::counter_raw,
+              "returns the total number of HPX-thread unbind (madvise) operations "
+              "performed for the referenced locality", HPX_PERFORMANCE_COUNTER_V1,
+              counts_creator, &performance_counters::locality_counter_discoverer
+            },
+#endif
+            { "/threads/count/objects", performance_counters::counter_raw,
+              "returns the overall number of created HPX-thread objects for "
+              "the referenced locality", HPX_PERFORMANCE_COUNTER_V1,
+              counts_creator,
+              &locality_allocator_counter_discoverer
+            },
+        };
+        performance_counters::install_counter_types(
+            counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
     }
 
     ///////////////////////////////////////////////////////////////////////////

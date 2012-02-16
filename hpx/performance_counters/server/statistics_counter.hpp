@@ -11,7 +11,7 @@
 #include <hpx/util/interval_timer.hpp>
 #include <hpx/lcos/local_spinlock.hpp>
 
-#include <boost/accumulators/statistics/mean.hpp>
+#include <boost/accumulators/accumulators.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server
@@ -19,18 +19,21 @@ namespace hpx { namespace performance_counters { namespace server
     // This counter exposes the average count of items processed during the
     // given base time interval. The counter relies on querying a steadily
     // growing counter value.
-    class HPX_EXPORT average_count_counter
+    template <typename Statistic>
+    class HPX_EXPORT statistics_counter
       : public base_performance_counter,
-        public components::managed_component_base<average_count_counter>
+        public components::managed_component_base<
+            statistics_counter<Statistic> >
     {
-        typedef components::managed_component_base<average_count_counter> base_type;
+        typedef components::managed_component_base<
+            statistics_counter<Statistic> > base_type;
 
     public:
-        typedef average_count_counter type_holder;
+        typedef statistics_counter type_holder;
         typedef base_performance_counter base_type_holder;
 
-        average_count_counter() {}
-        average_count_counter(counter_info const& info,
+        statistics_counter() {}
+        statistics_counter(counter_info const& info,
             std::string const& base_counter_name,
             std::size_t base_time_interval);
 
@@ -65,8 +68,7 @@ namespace hpx { namespace performance_counters { namespace server
         std::string base_counter_name_;   ///< name of base counter to be queried
         naming::id_type base_counter_id_;
         typedef boost::accumulators::accumulator_set<
-            double,
-            boost::accumulators::stats<boost::accumulators::tag::mean>
+            double, boost::accumulators::stats<Statistic>
         > mean_accumulator_type;
         mean_accumulator_type value_;
         counter_value prev_value_;

@@ -73,13 +73,13 @@ namespace boost { namespace cache
     ///                       cache items. The container must be an associative
     ///                       and STL compatible container.The default is a
     ///                       std::map<Key, Entry>.
-    /// \tparam Statistics    A (optional) allowing to collect some basic
+    /// \tparam Statistics    A (optional) type allowing to collect some basic
     ///                       statistics about the operation of the cache
     ///                       instance. The type must conform to the
     ///                       CacheStatistics concept. The default value is
     ///                       the type \a statistics#no_statistics which does
-    ///                       not any numbers, but provides emty stubs allowing
-    ///                       the code to compile.
+    ///                       not collect any numbers, but provides empty stubs 
+    ///                       allowing the code to compile.
     template <
         typename Key, typename Entry,
         typename UpdatePolicy = std::less<Entry>,

@@ -7,6 +7,7 @@
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/server/elapsed_time_counter.hpp>
 
 #include <boost/version.hpp>
@@ -45,6 +46,49 @@ namespace hpx { namespace performance_counters { namespace server
         value.status_ = status_new_data;
         value.time_ = boost::chrono::high_resolution_clock::now().
             time_since_epoch().count();
+    }
+}}}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace performance_counters { namespace detail
+{
+    /// Creation function for uptime counters.
+    naming::id_type uptime_counter_creator(counter_info const& info,
+        error_code& ec)
+    {
+        switch (info.type_) {
+        case counter_elapsed_time:
+            {
+                // verify the validity of the counter instance name
+                counter_path_elements paths;
+                get_counter_path_elements(info.fullname_, paths, ec);
+                if (ec) return naming::invalid_id;
+
+                // allowed counter names: /runtime(locality#%d/*)/uptime
+                if (paths.parentinstance_is_basename_) {
+                    HPX_THROWS_IF(ec, bad_parameter, "uptime_counter_creator",
+                        "invalid counter instance parent name: " +
+                            paths.parentinstancename_);
+                    return naming::invalid_id;
+                }
+
+                if (paths.parentinstancename_ == "locality" &&
+                    paths.parentinstanceindex_ != get_locality_id())
+                {
+                    HPX_THROWS_IF(ec, bad_parameter, "uptime_counter_creator",
+                        "attempt to create counter on wrong locality");
+                    return naming::invalid_id;
+                }
+
+                // create the counter
+                return create_counter(info, ec);
+            }
+
+        default:
+            HPX_THROWS_IF(ec, bad_parameter, "uptime_counter_creator",
+                "invalid counter type requested");
+            return naming::invalid_id;
+        }
     }
 }}}
 

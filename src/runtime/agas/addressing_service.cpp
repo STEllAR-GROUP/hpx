@@ -12,6 +12,7 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/include/performance_counters.hpp>
+#include <hpx/performance_counters/counter_creators.hpp>
 
 #include <boost/format.hpp>
 
@@ -803,7 +804,7 @@ bool addressing_service::is_local_address(
     // For now we fall back to the primitive implementation which just compares
     // the prefixes. That will have to be changed, though.
     return naming::get_prefix_from_gid(local_prefix())
-        == naming::get_prefix_from_gid(id); 
+        == naming::get_prefix_from_gid(id);
 }
 
 bool addressing_service::is_local_address(
@@ -838,7 +839,7 @@ bool addressing_service::is_local_address_cached(
     // For now we fall back to the primitive implementation which just compares
     // the prefixes. That will have to be changed, though.
     return naming::get_prefix_from_gid(local_prefix())
-        == naming::get_prefix_from_gid(id); 
+        == naming::get_prefix_from_gid(id);
 }
 
 bool addressing_service::is_local_address_cached(
@@ -861,9 +862,9 @@ bool addressing_service::is_local_lva_encoded_address(
     )
 {
     return naming::strip_credit_from_gid(id.get_msb())
-        == local_prefix().get_msb(); 
+        == local_prefix().get_msb();
 }
-        
+
 bool addressing_service::resolve_full(
     naming::gid_type const& id
   , naming::address& addr
@@ -1379,45 +1380,52 @@ std::size_t addressing_service::get_cache_insertions() const
     return gva_cache_.get_statistics().insertions();
 }
 
-/// Install performance counters exposing properties from the local cache.
-void addressing_service::install_counters()
+/// Install performance counter types exposing properties from the local cache.
+void addressing_service::register_counter_types()
 { // {{{
     // install
-    performance_counters::raw_counter_type_data const counter_types[] =
+    HPX_STD_FUNCTION<boost::int64_t()> cache_hits(
+        boost::bind(&addressing_service::get_cache_hits, this));
+    HPX_STD_FUNCTION<boost::int64_t()> cache_misses(
+        boost::bind(&addressing_service::get_cache_misses, this));
+    HPX_STD_FUNCTION<boost::int64_t()> cache_evictions(
+        boost::bind(&addressing_service::get_cache_evictions, this));
+    HPX_STD_FUNCTION<boost::int64_t()> cache_insertions(
+        boost::bind(&addressing_service::get_cache_insertions, this));
+
+    performance_counters::generic_counter_type_data const counter_types[] =
     {
         { "/agas/cache/hits", performance_counters::counter_raw,
           "returns the number of cache hits while accessing the AGAS cache",
-          HPX_PERFORMANCE_COUNTER_V1 },
+          HPX_PERFORMANCE_COUNTER_V1,
+          boost::bind(&performance_counters::locality_raw_counter_creator,
+              _1, cache_hits, _2),
+          &performance_counters::locality_counter_discoverer
+        },
         { "/agas/cache/misses", performance_counters::counter_raw,
           "returns the number of cache misses while accessing the AGAS cache",
-          HPX_PERFORMANCE_COUNTER_V1 },
+          HPX_PERFORMANCE_COUNTER_V1,
+          boost::bind(&performance_counters::locality_raw_counter_creator,
+              _1, cache_misses, _2),
+          &performance_counters::locality_counter_discoverer
+        },
         { "/agas/cache/evictions", performance_counters::counter_raw,
           "returns the number of cache evictions from the AGAS cache",
-          HPX_PERFORMANCE_COUNTER_V1 },
+          HPX_PERFORMANCE_COUNTER_V1,
+          boost::bind(&performance_counters::locality_raw_counter_creator,
+              _1, cache_evictions, _2),
+          &performance_counters::locality_counter_discoverer
+        },
         { "/agas/cache/insertions", performance_counters::counter_raw,
           "returns the number of cache insertions into the AGAS cache",
-          HPX_PERFORMANCE_COUNTER_V1 }
+          HPX_PERFORMANCE_COUNTER_V1,
+          boost::bind(&performance_counters::locality_raw_counter_creator,
+              _1, cache_insertions, _2),
+          &performance_counters::locality_counter_discoverer
+        }
     };
     performance_counters::install_counter_types(
         counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
-
-    boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
-    boost::format cache_statistics("/agas(locality#%d/total)/cache/%s");
-
-    performance_counters::raw_counter_data const counters[] =
-    {
-        { boost::str(cache_statistics % prefix % "hits"),
-          boost::bind(&addressing_service::get_cache_hits, this) },
-        { boost::str(cache_statistics % prefix % "misses"),
-          boost::bind(&addressing_service::get_cache_misses, this) },
-        { boost::str(cache_statistics % prefix % "evictions"),
-          boost::bind(&addressing_service::get_cache_evictions, this) },
-        { boost::str(cache_statistics % prefix % "insertions"),
-          boost::bind(&addressing_service::get_cache_insertions, this) }
-    };
-
-    performance_counters::install_counters(
-        counters, sizeof(counters)/sizeof(counters[0]));
 } // }}}
 
 void addressing_service::garbage_collect_non_blocking(

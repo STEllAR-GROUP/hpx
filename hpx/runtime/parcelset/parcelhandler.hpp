@@ -285,9 +285,10 @@ namespace hpx { namespace parcelset
             return pp_.here();
         }
 
-        /// install_counters is called during startup to allow registration of
-        /// performance counters
-        void install_counters();
+        /// The function register_counter_types() is called during startup to
+        /// allow the registration of all performance counter types for this
+        /// parcel-handler instance.
+        void register_counter_types();
 
     protected:
         boost::int64_t get_queue_length() const

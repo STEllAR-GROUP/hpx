@@ -215,7 +215,7 @@ namespace hpx { namespace util
         }
         return naming::locality(HPX_INITIAL_IP_ADDRESS, HPX_INITIAL_IP_PORT);
     }
-    
+
     std::size_t runtime_configuration::get_max_connections_per_loc() const
     {
         if (has_section("hpx"))
@@ -224,14 +224,15 @@ namespace hpx { namespace util
             if(NULL != sec)
             {
                 std::string cfg_max_connections(
-                    sec->get_entry("max_connections_per_locality", HPX_MAX_PARCEL_CONNECTIONS_PER_LOC));
+                    sec->get_entry("max_connections_per_locality",
+                        HPX_MAX_PARCEL_CONNECTIONS_PER_LOC));
 
                 return boost::lexical_cast<std::size_t>(cfg_max_connections);
             }
         }
-        return HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE;
+        return HPX_MAX_PARCEL_CONNECTIONS_PER_LOC;
     }
-    
+
     std::size_t runtime_configuration::get_connection_cache_size() const
     {
         if (has_section("hpx"))
@@ -240,7 +241,8 @@ namespace hpx { namespace util
             if(NULL != sec)
             {
                 std::string cfg_max_connections(
-                    sec->get_entry("max_connections_cache_size", HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE));
+                    sec->get_entry("max_connections_cache_size",
+                        HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE));
 
                 return boost::lexical_cast<std::size_t>(cfg_max_connections);
             }

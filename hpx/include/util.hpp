@@ -7,6 +7,7 @@
 #define HPX_UTIL_DEC_21_2011_0340PM
 
 #include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/util/parse_command_line.hpp>
 
 #endif
 

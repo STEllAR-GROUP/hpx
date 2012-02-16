@@ -328,6 +328,9 @@ namespace hpx { namespace util
                   "print the performance counter(s) specified with --print-counter "
                   "repeatedly after the time interval (specified in milliseconds) "
                   "(default: 0, which means print once at shutdown)")
+                ("print-counter-destination", value<std::string>(),
+                  "print the performance counter(s) specified with --print-counter "
+                  "to the given file (default: console)")
                 ("list-counters", "list the names of all registered performance "
                   "counters")
                 ("list-counter-infos", "list the description of all registered "

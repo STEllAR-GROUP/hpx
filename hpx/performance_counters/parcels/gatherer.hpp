@@ -29,7 +29,7 @@ namespace hpx { namespace performance_counters { namespace parcels
             gatherer_size_(0)
         {}
 
-        void push_back(data_point const& x);
+        void add_data(data_point const& x);
 
         boost::int64_t size() const;
         boost::int64_t total_bytes() const;
@@ -44,7 +44,7 @@ namespace hpx { namespace performance_counters { namespace parcels
         mutable mutex_type acc_mtx;
     };
 
-    inline void gatherer::push_back(data_point const& x)
+    inline void gatherer::add_data(data_point const& x)
     {
         mutex_type::scoped_lock mtx(acc_mtx);
 

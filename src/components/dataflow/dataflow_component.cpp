@@ -13,6 +13,8 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components/generic_component_factory.hpp>
+#include <hpx/include/performance_counters.hpp>
+#include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/components/dataflow/server/dataflow.hpp>
@@ -79,48 +81,35 @@ namespace hpx { namespace lcos { namespace server { namespace detail
         return dataflow_counter_data_.fired_;
     }
 
-    // call this to install all counters for full_empty entries
-    void install_counters()
+    // call this to register all counter types for dataflow entries
+    void register_counter_types()
     {
-        performance_counters::raw_counter_type_data const counter_types[] =
+        performance_counters::generic_counter_type_data const counter_types[] =
         {
             { "/lcos/dataflow/constructed", performance_counters::counter_raw,
               "returns the number of constructed dataflow objects",
-              HPX_PERFORMANCE_COUNTER_V1 },
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, get_constructed_count, _2),
+              &performance_counters::locality_counter_discoverer
+            },
             { "/lcos/dataflow/initialized", performance_counters::counter_raw,
               "returns the number of initialized dataflow objects",
-              HPX_PERFORMANCE_COUNTER_V1 },
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, get_initialized_count, _2),
+              &performance_counters::locality_counter_discoverer
+            },
             { "/lcos/dataflow/fired", performance_counters::counter_raw,
               "returns the number of fired dataflow objects",
-              HPX_PERFORMANCE_COUNTER_V1 }
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, get_fired_count, _2),
+              &performance_counters::locality_counter_discoverer
+            }
         };
-
         performance_counters::install_counter_types(
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
-
-        boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
-        boost::format dataflow_counter("/lcos(locality#%d/total)/dataflow/%s");
-
-        performance_counters::raw_counter_data const counters[] =
-        {
-            { boost::str(dataflow_counter % prefix % "constructed"),
-              get_constructed_count },
-            { boost::str(dataflow_counter % prefix % "initialized"),
-              get_initialized_count },
-            { boost::str(dataflow_counter % prefix % "fired"),
-              get_fired_count },
-        };
-
-        performance_counters::install_counters(
-            counters, sizeof(counters)/sizeof(counters[0]));
     }
 }}}}
-
-///////////////////////////////////////////////////////////////////////////////
-// Register a startup function which will be called as a px-thread during
-// runtime startup. We use this function to register our performance counter
-// type and performance counter instances.
-//
-// Note that this macro can be used not more than once in one module.
-//HPX_REGISTER_STARTUP_SHUTDOWN_MODULE(::hpx::lcos::server::detail::install_counters, 0);
 

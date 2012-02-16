@@ -330,7 +330,7 @@ namespace hpx { namespace actions
         template <typename Arg0>
         action(BOOST_FWD_REF(Arg0) arg0)
           : arguments_(boost::forward<Arg0>(arg0)),
-            parent_locality_(applier::get_prefix_id()),
+            parent_locality_(get_locality_id()),
             parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
             parent_phase_(threads::get_parent_phase()),
             priority_(detail::thread_priority<Priority>::call(Priority))
@@ -339,7 +339,7 @@ namespace hpx { namespace actions
         template <typename Arg0>
         action(threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
           : arguments_(boost::forward<Arg0>(arg0)),
-            parent_locality_(applier::get_prefix_id()),
+            parent_locality_(get_locality_id()),
             parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
             parent_phase_(threads::get_parent_phase()),
             priority_(detail::thread_priority<Priority>::call(priority))

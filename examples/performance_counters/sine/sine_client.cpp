@@ -14,16 +14,17 @@
 int monitor(boost::uint64_t pause, boost::uint64_t values)
 {
     // Resolve the GID of the performances counter using it's symbolic name.
-    boost::uint32_t const prefix = hpx::applier::get_applier().get_prefix_id();
-    boost::format sine_immediate("/sine(locality#%d/instance#%d)/immediate");
-    boost::format sine_average("/sine(locality#%d/instance#0)/average");
+    boost::uint32_t const prefix = hpx::get_locality_id();
+    boost::format sine_implicit("/sine(locality#%d/total)/immediate/implicit");
+    boost::format sine_explicit("/sine(locality#%d/instance#%d)/immediate/explicit");
+    boost::format sine_average("/statistics(/sine(locality#%d/instance#%d)/immediate/explicit)/average,100");
 
     using hpx::naming::id_type;
     using hpx::performance_counters::get_counter;
 
-    id_type id1 = get_counter(boost::str(sine_immediate % prefix % 0));
-    id_type id2 = get_counter(boost::str(sine_immediate % prefix % 1));
-    id_type id3 = get_counter(boost::str(sine_average % prefix));
+    id_type id1 = get_counter(boost::str(sine_explicit % prefix % 0));
+    id_type id2 = get_counter(boost::str(sine_implicit % prefix));
+    id_type id3 = get_counter(boost::str(sine_average % prefix % 0));
 
     // retrieve the counter values
     boost::int64_t start_time = 0;
@@ -49,22 +50,9 @@ int monitor(boost::uint64_t pause, boost::uint64_t values)
                 value3.get_value<double>());
         }
 
-        // Schedule a wakeup.
-        using hpx::threads::set_thread_state;
-        using hpx::threads::get_self_id;
-        using hpx::threads::pending;
-        using hpx::threads::wait_timeout;
-        using hpx::threads::thread_priority_critical;
-
-        set_thread_state(get_self_id(), boost::posix_time::milliseconds(pause),
-            pending, wait_timeout, thread_priority_critical);
-
         // give up control to the thread manager, we will be resumed after
-        // 'pause' ms as specified above
-        using hpx::threads::get_self;
-        using hpx::threads::suspended;
-
-        get_self().yield(suspended);
+        // 'pause' ms
+        hpx::threads::suspend(boost::posix_time::milliseconds(pause));
     }
     return 0;
 }

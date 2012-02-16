@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/manage_counter.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>

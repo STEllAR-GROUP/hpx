@@ -18,6 +18,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/lcos/local_counting_semaphore.hpp>
 #include <hpx/include/performance_counters.hpp>
+#include <hpx/performance_counters/counter_creators.hpp>
 
 #include <string>
 #include <algorithm>
@@ -80,7 +81,6 @@ namespace hpx { namespace parcelset
             LPT_(debug) << "parcel_sink: dropping late parcel";
             return;
         }
-
         else
         {
             // create a new thread which decodes and handles the parcel
@@ -95,31 +95,27 @@ namespace hpx { namespace parcelset
         boost::shared_ptr<std::vector<char> > const& parcel_data)
     {
         // protect from unhandled exceptions bubbling up into thread manager
-        try
-        {
-            {
-                // create a special io stream on top of in_buffer_
-                typedef util::container_device<std::vector<char> > io_device_type;
-                boost::iostreams::stream<io_device_type> io(*parcel_data.get());
+        try {
+            // create a special io stream on top of in_buffer_
+            typedef util::container_device<std::vector<char> > io_device_type;
+            boost::iostreams::stream<io_device_type> io(*parcel_data.get());
 
-                // De-serialize the parcel data
+            // De-serialize the parcel data
 #if HPX_USE_PORTABLE_ARCHIVES != 0
-                hpx::util::portable_binary_iarchive archive(io);
+            hpx::util::portable_binary_iarchive archive(io);
 #else
-                boost::archive::binary_iarchive archive(io);
+            boost::archive::binary_iarchive archive(io);
 #endif
-                std::size_t parcel_count = 0;
-                archive >> parcel_count;
-                while(parcel_count-- != 0)
-                {
-                    parcel p;
-                    // add parcel to incoming parcel queue
-                    archive >> p;
-                    parcels_->add_parcel(p);
-                }
+            std::size_t parcel_count = 0;
+            archive >> parcel_count;
+            while(parcel_count-- != 0)
+            {
+                // de-serialize parcel and add it to incoming parcel queue
+                parcel p;
+                archive >> p;
+                parcels_->add_parcel(p);
             }
         }
-
         catch (hpx::exception const& e)
         {
             LPT_(error)
@@ -127,7 +123,6 @@ namespace hpx { namespace parcelset
                 << e.what();
             hpx::report_error(boost::current_exception());
         }
-
         catch (boost::system::system_error const& e)
         {
             LPT_(error)
@@ -135,7 +130,6 @@ namespace hpx { namespace parcelset
                 << e.what();
             hpx::report_error(boost::current_exception());
         }
-
         catch (std::exception const& e)
         {
             LPT_(error)
@@ -143,10 +137,9 @@ namespace hpx { namespace parcelset
                 << e.what();
             hpx::report_error(boost::current_exception());
         }
-
-        // Prevent exceptions from boiling up into the thread-manager.
         catch (...)
         {
+            // Prevent exceptions from boiling up into the thread-manager.
             LPT_(error)
                 << "decode_parcel: caught unknown exception.";
             hpx::report_error(boost::current_exception());
@@ -296,41 +289,41 @@ namespace hpx { namespace parcelset
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void parcelhandler::install_counters()
+    void parcelhandler::register_counter_types()
     {
-        performance_counters::raw_counter_type_data const counter_types[] =
+        HPX_STD_FUNCTION<boost::int64_t()> num_sends(
+            boost::bind(&parcelport::total_sends_completed, &pp_));
+        HPX_STD_FUNCTION<boost::int64_t()> num_receives(
+            boost::bind(&parcelport::total_receives_completed, &pp_));
+        HPX_STD_FUNCTION<boost::int64_t()> queue_length(
+            boost::bind(&parcelhandler::get_queue_length, this));
+
+        performance_counters::generic_counter_type_data const counter_types[] =
         {
             { "/parcels/count/sent", performance_counters::counter_raw,
               "returns the number of sent parcels for the referenced locality",
-              HPX_PERFORMANCE_COUNTER_V1 },
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, num_sends, _2),
+              &performance_counters::locality_counter_discoverer
+            },
             { "/parcels/count/received", performance_counters::counter_raw,
               "returns the number of received parcels for the referenced locality",
-              HPX_PERFORMANCE_COUNTER_V1 },
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, num_receives, _2),
+              &performance_counters::locality_counter_discoverer
+            },
             { "/parcelqueue/length/instantaneous", performance_counters::counter_raw,
-              "returns the number current length of the queue of incomming threads",
-              HPX_PERFORMANCE_COUNTER_V1 }
+              "returns the number current length of the queue of incoming threads",
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, queue_length, _2),
+              &performance_counters::locality_counter_discoverer
+            }
         };
         performance_counters::install_counter_types(
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
-
-        boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
-        boost::format parcel_count("/parcels(locality#%d/total)/count/%s");
-        boost::format queue_length("/parcelqueue(locality#%d/total)/length/instantaneous");
-
-        performance_counters::raw_counter_data const counters[] =
-        {
-            // Total parcels sent (completed)
-            { boost::str(parcel_count % prefix % "sent"),
-              boost::bind(&parcelport::total_sends_completed, &pp_) },
-            // Total parcels received (completed)
-            { boost::str(parcel_count % prefix % "received"),
-              boost::bind(&parcelport::total_receives_completed, &pp_) },
-            // Current length of incoming parcel queue
-            { boost::str(queue_length % prefix),
-              boost::bind(&parcelhandler::get_queue_length, this) }
-        };
-        performance_counters::install_counters(
-            counters, sizeof(counters)/sizeof(counters[0]));
     }
 }}
 

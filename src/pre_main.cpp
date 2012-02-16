@@ -58,27 +58,27 @@ const char* third_barrier = "/barrier(agas#0)/third_stage";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Install performance counter startup functions for core subsystems.
-void install_counters()
+void register_counter_types()
 {
-     naming::get_agas_client().install_counters();
-     LBT_(info) << "(3rd stage) pre_main: installed AGAS client-side "
-                   "performance counters";
+     naming::get_agas_client().register_counter_types();
+     LBT_(info) << "(3rd stage) pre_main: registered AGAS client-side "
+                   "performance counter types";
 
-     get_runtime().install_counters();
-     LBT_(info) << "(3rd stage) pre_main: installed runtime performance "
-                   "counters";
+     get_runtime().register_counter_types();
+     LBT_(info) << "(3rd stage) pre_main: registered runtime performance "
+                   "counter types";
 
-     threads::get_thread_manager().install_counters();
-     LBT_(info) << "(3rd stage) pre_main: installed thread-manager performance "
-                   "counters";
+     threads::get_thread_manager().register_counter_types();
+     LBT_(info) << "(3rd stage) pre_main: registered thread-manager performance "
+                   "counter types";
 
-     applier::get_applier().get_parcel_handler().install_counters();
-     LBT_(info) << "(3rd stage) pre_main: installed parcelset performance "
-                   "counters";
+     applier::get_applier().get_parcel_handler().register_counter_types();
+     LBT_(info) << "(3rd stage) pre_main: registered parcelset performance "
+                   "counter types";
 
-     util::detail::install_counters();
-     LBT_(info) << "(3rd stage) pre_main: installed full_empty_entry "
-                   "performance counters";
+     util::detail::register_counter_types();
+     LBT_(info) << "(3rd stage) pre_main: registered full_empty_entry "
+                   "performance counter types";
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -88,6 +88,7 @@ bool pre_main(runtime_mode mode)
     naming::resolver_client& agas_client = naming::get_agas_client();
     util::runtime_configuration const& cfg = get_runtime().get_config();
 
+    bool exit_requested = false;
     if (runtime_mode_connect == mode)
     {
         LBT_(info) << "(2nd stage) pre_main: locality is in connect mode, "
@@ -101,29 +102,14 @@ bool pre_main(runtime_mode mode)
         LBT_(info) << "(2nd stage) pre_main: addressing services enabled";
 
         // Load components, so that we can use the barrier LCO.
-        if (!components::stubs::runtime_support::load_components(find_here()))
-        {
-            // If load_components returns false, shutdown the system. This
-            // essentially only happens if the command line contained --exit.
-            components::stubs::runtime_support::shutdown_all(
-                naming::get_id_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX), -1.0);
-            return false;
-        }
+        exit_requested = !components::stubs::runtime_support::load_components(find_here());
+        LBT_(info) << "(2nd stage) pre_main: loaded components"
+            << (exit_requested ? ", application exit has been requested" : "");
 
-        LBT_(info) << "(2nd stage) pre_main: loaded components";
-
-        install_counters();
+        register_counter_types();
 
         components::stubs::runtime_support::call_startup_functions(find_here());
         LBT_(info) << "(3rd stage) pre_main: ran startup functions";
-
-        // Register pre-shutdown and shutdown functions to flush pending
-        // reference counting operations.
-        register_pre_shutdown_function(boost::bind(
-            &agas::garbage_collect_non_blocking, boost::ref(throws)));
-
-        register_shutdown_function(boost::bind(
-            &agas::garbage_collect_sync, boost::ref(throws)));
     }
 
     else
@@ -144,16 +130,9 @@ bool pre_main(runtime_mode mode)
         // }}}
 
         // Load components, so that we can use the barrier LCO.
-        if (!components::stubs::runtime_support::load_components(find_here()))
-        {
-            // If load_components returns false, shutdown the system. This
-            // essentially only happens if the command line contained --exit.
-            components::stubs::runtime_support::shutdown_all(
-                naming::get_id_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX), -1.0);
-            return false;
-        }
-
-        LBT_(info) << "(2nd stage) pre_main: loaded components";
+        exit_requested = !components::stubs::runtime_support::load_components(find_here());
+        LBT_(info) << "(2nd stage) pre_main: loaded components"
+            << (exit_requested ? ", application exit has been requested" : "");
 
         lcos::barrier second_stage, third_stage;
 
@@ -192,7 +171,7 @@ bool pre_main(runtime_mode mode)
         second_stage.wait();
         LBT_(info) << "(2nd stage) pre_main: passed 2nd stage boot barrier";
 
-        install_counters();
+        register_counter_types();
 
         components::stubs::runtime_support::call_startup_functions(find_here());
         LBT_(info) << "(3rd stage) pre_main: ran startup functions";
@@ -203,19 +182,31 @@ bool pre_main(runtime_mode mode)
         // component tables are populated.
         third_stage.wait();
         LBT_(info) << "(3rd stage) pre_main: passed 3rd stage boot barrier";
-
-        // Register pre-shutdown and shutdown functions to flush pending
-        // reference counting operations. 
-        register_pre_shutdown_function(boost::bind(
-            &agas::garbage_collect_non_blocking, boost::ref(throws)));
-
-        register_shutdown_function(boost::bind(
-            &agas::garbage_collect_sync, boost::ref(throws)));
     }
 
-    // Enable logging.
+    // Enable logging. Even if we terminate at this point we will see all
+    // pending log messages so far.
     components::activate_logging();
     LBT_(info) << "(3rd stage) pre_main: activated logging";
+
+    // Register pre-shutdown and shutdown functions to flush pending
+    // reference counting operations.
+    register_pre_shutdown_function(boost::bind(
+        &agas::garbage_collect_non_blocking, boost::ref(throws)));
+
+    register_shutdown_function(boost::bind(
+        &agas::garbage_collect_sync, boost::ref(throws)));
+
+    // Any error in post-command line handling or any explicit --exit command
+    // line option will cause the application to terminate at this point.
+    if (exit_requested)
+    {
+        // If load_components returns false, shutdown the system. This
+        // essentially only happens if the command line contained --exit.
+        components::stubs::runtime_support::shutdown_all(
+            naming::get_id_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX), -1.0);
+        return false;
+    }
 
     return true;
 }

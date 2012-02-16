@@ -47,49 +47,48 @@ namespace hpx { namespace util { namespace detail
         return full_empty_counter_data_.set_full_;
     }
 
-    // call this to install all counters for full_empty entries
-    void install_counters()
+    // call this to register all counter types for full_empty entries
+    void register_counter_types()
     {
-        performance_counters::raw_counter_type_data const counter_types[] =
+        performance_counters::generic_counter_type_data const counter_types[] =
         {
             { "/lcos/full_empty/constructed", performance_counters::counter_raw,
               "returns the number of constructed full_empty entries",
-              HPX_PERFORMANCE_COUNTER_V1 },
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, get_constructed_count, _2),
+              &performance_counters::locality_counter_discoverer
+            },
             { "/lcos/full_empty/destructed", performance_counters::counter_raw,
               "returns the number of destructed full_empty entries",
-              HPX_PERFORMANCE_COUNTER_V1 },
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, get_destructed_count, _2),
+              &performance_counters::locality_counter_discoverer
+            },
             { "/lcos/full_empty/read_enqueued", performance_counters::counter_raw,
               "returns the number of full_empty 'read' enqueue operations",
-              HPX_PERFORMANCE_COUNTER_V1 },
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, get_read_enqueued_count, _2),
+              &performance_counters::locality_counter_discoverer
+            },
             { "/lcos/full_empty/read_dequeued", performance_counters::counter_raw,
               "returns the number of full_empty 'read' dequeue operations",
-              HPX_PERFORMANCE_COUNTER_V1 },
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, get_read_dequeued_count, _2),
+              &performance_counters::locality_counter_discoverer
+            },
             { "/lcos/full_empty/set_full", performance_counters::counter_raw,
               "returns the number of full_empty 'set' operations",
-              HPX_PERFORMANCE_COUNTER_V1 }
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, get_set_full_count, _2),
+              &performance_counters::locality_counter_discoverer
+            }
         };
-
         performance_counters::install_counter_types(
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
-
-        boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
-        boost::format full_empty_counter("/lcos(locality#%d/total)/full_empty/%s");
-
-        performance_counters::raw_counter_data const counters[] =
-        {
-            { boost::str(full_empty_counter % prefix % "constructed"),
-              get_constructed_count },
-            { boost::str(full_empty_counter % prefix % "destructed"),
-              get_destructed_count },
-            { boost::str(full_empty_counter % prefix % "read_enqueued"),
-              get_read_enqueued_count },
-            { boost::str(full_empty_counter % prefix % "read_dequeued"),
-              get_read_dequeued_count },
-            { boost::str(full_empty_counter % prefix % "set_full"),
-              get_set_full_count }
-        };
-
-        performance_counters::install_counters(
-            counters, sizeof(counters)/sizeof(counters[0]));
     }
 }}}

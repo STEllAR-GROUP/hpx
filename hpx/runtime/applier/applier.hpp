@@ -81,7 +81,7 @@ namespace hpx { namespace applier
         ///
         /// This function returns a reference to the id of the locality this
         /// applier instance is associated with.
-        boost::uint32_t get_prefix_id() const;
+        boost::uint32_t get_locality_id() const;
 
         /// \brief Return list of prefixes of all remote localities
         ///        registered with the AGAS service for a specific component

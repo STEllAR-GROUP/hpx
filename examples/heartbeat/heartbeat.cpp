@@ -39,8 +39,6 @@ using hpx::running;
 using hpx::runtime_mode_connect;
 using hpx::network_error;
 
-using hpx::applier::get_applier;
-
 using hpx::threads::threadmanager_is;
 using hpx::threads::thread_priority_critical;
 using hpx::threads::wait_timeout;
@@ -101,7 +99,7 @@ int monitor(
         return 1;
     }
 
-    const boost::uint32_t prefix = get_applier().get_prefix_id();
+    const boost::uint32_t prefix = hpx::get_locality_id();
 
     if (prefix == get_prefix_from_gid(gid))
     {

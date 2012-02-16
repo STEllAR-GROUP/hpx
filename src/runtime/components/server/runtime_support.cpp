@@ -392,7 +392,7 @@ namespace hpx { namespace components { namespace server
 
         // shut down all localities except the the local one
         {
-            boost::uint32_t prefix = applier::get_prefix_id();
+            boost::uint32_t prefix = get_locality_id();
             std::vector<lcos::promise<void> > lazy_actions;
 
             BOOST_FOREACH(naming::gid_type gid, prefixes)
@@ -424,7 +424,7 @@ namespace hpx { namespace components { namespace server
 
         // terminate all localities except the the local one
         {
-            boost::uint32_t prefix = applier::get_prefix_id();
+            boost::uint32_t prefix = get_locality_id();
             std::vector<lcos::promise<void> > lazy_actions;
 
             BOOST_FOREACH(naming::gid_type gid, prefixes)

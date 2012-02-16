@@ -26,6 +26,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/performance_counters/counters.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
@@ -286,9 +287,10 @@ namespace hpx { namespace threads
         /// object, which in turn will report it to the console, etc.).
         virtual void report_error(std::size_t, boost::exception_ptr const&) = 0;
 
-        /// install_counters is called during startup to allow registration of
-        /// performance counters
-        virtual void install_counters() = 0;
+        /// The function register_counter_types() is called during startup to
+        /// allow the registration of all performance counter types for this
+        /// thread-manager instance.
+        virtual void register_counter_types() = 0;
 
         /// Return number of the processing unit the given thread is running on
         virtual std::size_t get_pu_num(std::size_t num_thread) = 0;
@@ -643,15 +645,25 @@ namespace hpx { namespace threads
         void periodic_maintenance_handler(boost::mpl::false_) {}
 
     public:
-        /// install_counters is called during startup to allow registration of
-        /// performance counters
-        void install_counters();
+        /// The function register_counter_types() is called during startup to
+        /// allow the registration of all performance counter types for this
+        /// thread-manager instance.
+        void register_counter_types();
 
         /// Return number of the processing unit the given thread is running on
         std::size_t get_pu_num(std::size_t num_thread)
         {
             return scheduler_.get_pu_num(num_thread);
         }
+
+    private:
+        // counter creator functions
+        naming::id_type queue_length_counter_creator(
+            performance_counters::counter_info const& info, error_code& ec);
+        naming::id_type thread_counts_counter_creator(
+            performance_counters::counter_info const& info, error_code& ec);
+        naming::id_type idle_rate_counter_creator(
+            performance_counters::counter_info const& info, error_code& ec);
 
     private:
         /// this thread manager has exactly as much threads as requested

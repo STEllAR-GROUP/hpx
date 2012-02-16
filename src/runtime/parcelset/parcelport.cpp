@@ -23,19 +23,22 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/bind.hpp>
 
-namespace
+namespace hpx { namespace detail
 {
     struct call_for_each
     {
         typedef void result_type;
-        
+
         typedef std::vector<hpx::parcelset::parcelport::write_handler_type> data_type;
         data_type fv;
+
         call_for_each(data_type const & fv)
             : fv(fv)
         {}
 
-        result_type operator()(boost::system::error_code const& e, std::size_t bytes_written)
+        result_type operator()(
+            boost::system::error_code const& e,
+            std::size_t bytes_written) const
         {
             BOOST_FOREACH(hpx::parcelset::parcelport::write_handler_type f, fv)
             {
@@ -43,7 +46,7 @@ namespace
             }
         }
     };
-}
+}}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
@@ -172,7 +175,7 @@ namespace hpx { namespace parcelset
             // complete data point and push back
             performance_counters::parcels::data_point& data = c->get_receive_data();
             data.timer_ = timer_.elapsed_microseconds() - data.timer_;
-            parcels_received_.push_back(data);
+            parcels_received_.add_data(data);
         }
     }
 
@@ -194,16 +197,16 @@ namespace hpx { namespace parcelset
         }
 
 //        if (!client_connection) {
-//            if (threads::get_self_ptr()) 
+//            if (threads::get_self_ptr())
 //                hpx::threads::suspend(
 //                    boost::posix_time::milliseconds(500));
 //            else
 //                boost::this_thread::sleep(boost::get_system_time() +
 //                    boost::posix_time::milliseconds(500));
-           
-            // Try again. 
+
+            // Try again.
 //            client_connection = connection_cache_.get(prefix);
-//        }                
+//        }
 
         if (!client_connection)
         {
@@ -278,14 +281,14 @@ namespace hpx { namespace parcelset
             std::swap(parcels, pending_parcels_[prefix].first);
             std::swap(handlers, pending_parcels_[prefix].second);
         }
-        
-        // if the parcels didn't get sent by another connection ... 
+
+        // if the parcels didn't get sent by another connection ...
         if(!parcels.empty() && !handlers.empty())
         {
             client_connection->set_parcel(parcels);
             // ... start an asynchronous write operation now.
             client_connection->async_write(
-                call_for_each(handlers)
+                detail::call_for_each(handlers)
               , boost::bind(
                     &parcelport::send_pending_parcels_trampoline
                   , this
@@ -295,31 +298,32 @@ namespace hpx { namespace parcelset
         }
         else
         {
-            // ... or readd the stuff to the cache
+            // ... or re-add the stuff to the cache
             connection_cache_.add(prefix, client_connection);
         }
     }
-    
+
     void parcelport::send_pending_parcels_trampoline(boost::uint32_t prefix)
     {
         // create a new thread which sends parcels that might still be pending
         hpx::applier::register_thread_nullary(
-            boost::bind(&parcelport::send_pending_parcels, this, prefix)
+            HPX_STD_BIND(&parcelport::send_pending_parcels, this, prefix)
           , "send_pending_parcels"
         );
     }
 
     void parcelport::send_pending_parcels(boost::uint32_t prefix)
     {
-        typedef pending_parcels_map::iterator iterator;
-        std::vector<parcel> parcels;
-        std::vector<write_handler_type> handlers;
         parcelport_connection_ptr client_connection = connection_cache_.get(prefix);
         // If another thread was faster ... try again
         if(!client_connection)
             return;
 
+        std::vector<parcel> parcels;
+        std::vector<write_handler_type> handlers;
         {
+            typedef pending_parcels_map::iterator iterator;
+
             util::spinlock::scoped_lock l(mtx_);
             iterator it = pending_parcels_.find(prefix);
 
@@ -329,12 +333,12 @@ namespace hpx { namespace parcelset
                 std::swap(handlers, it->second.second);
             }
         }
-            
+
         if(!parcels.empty() && !handlers.empty())
         {
             client_connection->set_parcel(parcels);
             client_connection->async_write(
-                call_for_each(handlers)
+                detail::call_for_each(handlers)
               , boost::bind(
                     &parcelport::send_pending_parcels_trampoline
                   , this

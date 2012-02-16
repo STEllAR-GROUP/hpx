@@ -136,13 +136,16 @@ namespace hpx
 
         /// \brief Install all performance counters related to this runtime
         ///        instance
-        void install_counters();
+        void register_counter_types();
 
+        ///////////////////////////////////////////////////////////////////////
         virtual util::io_service_pool& get_io_pool() = 0;
 
         virtual parcelset::parcelport& get_parcel_port() = 0;
 
         virtual parcelset::parcelhandler& get_parcel_handler() = 0;
+
+        virtual threads::threadmanager_base& get_thread_manager() = 0;
 
         virtual naming::resolver_client& get_agas_client() = 0;
 

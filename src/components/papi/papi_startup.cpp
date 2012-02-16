@@ -63,7 +63,7 @@ namespace hpx { namespace performance_counters { namespace papi
         }
         
         // obtain local prefix
-        boost::uint32_t const prefix = hpx::applier::get_applier().get_prefix_id();
+        boost::uint32_t const prefix = hpx::get_locality_id();
 
         // create counter component for every monitored event
         if (vm.count("papi-events"))
