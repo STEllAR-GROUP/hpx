@@ -78,7 +78,7 @@ struct managed_refcnt_monitor
     bool ready()
     {
         // Flush pending reference counting operations on the target locality. 
-        agas::garbage_collect_sync(locality_);
+        agas::garbage_collect(locality_);
 
         return flag_.ready();
     }
@@ -91,7 +91,7 @@ struct managed_refcnt_monitor
         )
     {
         // Flush pending reference counting operations on the target locality. 
-        agas::garbage_collect_sync(locality_);
+        agas::garbage_collect(locality_);
 
         // Schedule a wakeup.
         threads::set_thread_state(threads::get_self_id(), d, threads::pending);

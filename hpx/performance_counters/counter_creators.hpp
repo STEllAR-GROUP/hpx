@@ -49,7 +49,7 @@ namespace hpx { namespace performance_counters
     ///
     ///   /<objectname>(locality#<locality_id>/total)/<instancename>
     ///
-    HPX_API_EXPORT naming::id_type locality_raw_counter_creator(
+    HPX_API_EXPORT naming::gid_type locality_raw_counter_creator(
         counter_info const&, HPX_STD_FUNCTION<boost::int64_t()> const&,
         error_code&);
 }}

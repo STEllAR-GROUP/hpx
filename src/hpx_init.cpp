@@ -1197,7 +1197,7 @@ namespace hpx
             shutdown_timeout = detail::get_option("hpx.shutdown_timeout", -1.0);
 
         components::stubs::runtime_support::shutdown_all(
-            naming::get_id_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX),
+            naming::get_id_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX),
             shutdown_timeout);
     }
 
@@ -1232,7 +1232,7 @@ namespace hpx
     void terminate()
     {
         components::stubs::runtime_support::terminate_all(
-            naming::get_id_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX));
+            naming::get_id_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX));
     }
 }
 

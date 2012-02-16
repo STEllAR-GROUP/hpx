@@ -1,5 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,10 +8,10 @@
 
 #include <hpx/version.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/lcos/barrier.hpp>
+#include <hpx/lcos/future_wait.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 
 namespace hpx
@@ -79,6 +80,17 @@ void register_counter_types()
      util::detail::register_counter_types();
      LBT_(info) << "(3rd stage) pre_main: registered full_empty_entry "
                    "performance counter types";
+}
+
+///////////////////////////////////////////////////////////////////////////////
+void garbage_collect_non_blocking()
+{
+    agas::garbage_collect_non_blocking();
+}
+
+void garbage_collect()
+{
+    agas::garbage_collect();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -191,11 +203,8 @@ bool pre_main(runtime_mode mode)
 
     // Register pre-shutdown and shutdown functions to flush pending
     // reference counting operations.
-    register_pre_shutdown_function(boost::bind(
-        &agas::garbage_collect_non_blocking, boost::ref(throws)));
-
-    register_shutdown_function(boost::bind(
-        &agas::garbage_collect_sync, boost::ref(throws)));
+    register_pre_shutdown_function(&garbage_collect_non_blocking);
+    register_shutdown_function(&garbage_collect);
 
     // Any error in post-command line handling or any explicit --exit command
     // line option will cause the application to terminate at this point.
@@ -204,7 +213,7 @@ bool pre_main(runtime_mode mode)
         // If load_components returns false, shutdown the system. This
         // essentially only happens if the command line contained --exit.
         components::stubs::runtime_support::shutdown_all(
-            naming::get_id_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX), -1.0);
+            naming::get_id_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX), -1.0);
         return false;
     }
 

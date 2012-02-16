@@ -67,7 +67,8 @@ namespace performance_counters { namespace sine
         if (!retrieve_commandline_arguments(command_line_options(), vm))
         {
             HPX_THROW_EXCEPTION(hpx::commandline_option_error,
-                "sine::startup", "Failed to handle command line options");
+                "sine::need_perf_counters",
+                "Failed to handle command line options");
             return false;
         }
 
@@ -94,18 +95,22 @@ namespace performance_counters { namespace sine
             get_counter_path_elements(info.fullname_, p, ec);
         if (!status_is_valid(status)) return false;
 
-        p.parentinstancename_ = "locality";
+        p.parentinstancename_ = "locality#<*>";
+        p.parentinstanceindex_ = -1;
         p.instancename_ = "instance#<*>";
         p.instanceindex_ = -1;
 
-        boost::uint32_t last_locality = hpx::get_locality_id();
-        for (boost::uint32_t l = 0; l <= last_locality; ++l)
-        {
-            p.parentinstanceindex_ = static_cast<boost::int32_t>(l);
-            status = get_counter_name(p, i.fullname_, ec);
-            if (!status_is_valid(status) || !f(i, ec) || ec)
-                return false;
-        }
+        if (!f(i, ec) || ec)
+            return false;
+
+//         boost::uint32_t last_locality = hpx::get_num_localities();
+//         for (boost::uint32_t l = 0; l <= last_locality; ++l)
+//         {
+//             p.parentinstanceindex_ = static_cast<boost::int32_t>(l);
+//             status = get_counter_name(p, i.fullname_, ec);
+//             if (!status_is_valid(status) || !f(i, ec) || ec)
+//                 return false;
+//         }
 
         if (&ec != &hpx::throws)
             ec = hpx::make_success_code();
@@ -116,27 +121,29 @@ namespace performance_counters { namespace sine
     // Creation function for explicit sine performance counter. It's purpose is
     // to create and register a new instance of the given name (or reuse an
     // existing instance).
-    hpx::naming::id_type explicit_sine_counter_creator(
+    hpx::naming::gid_type explicit_sine_counter_creator(
         hpx::performance_counters::counter_info const& info, hpx::error_code& ec)
     {
         // verify the validity of the counter instance name
         hpx::performance_counters::counter_path_elements paths;
         get_counter_path_elements(info.fullname_, paths, ec);
-        if (ec) return hpx::naming::invalid_id;
+        if (ec) return hpx::naming::invalid_gid;
 
         if (paths.parentinstance_is_basename_) {
-            HPX_THROWS_IF(ec, hpx::bad_parameter, "locality_raw_counter_creator",
+            HPX_THROWS_IF(ec, hpx::bad_parameter,
+                "sine::explicit_sine_counter_creator",
                 "invalid counter instance parent name: " +
                     paths.parentinstancename_);
-            return hpx::naming::invalid_id;
+            return hpx::naming::invalid_gid;
         }
 
         if (paths.parentinstancename_ != "locality" ||
-            paths.parentinstanceindex_ != hpx::get_locality_id())
+            paths.parentinstanceindex_ != static_cast<boost::int32_t>(hpx::get_locality_id()))
         {
-            HPX_THROWS_IF(ec, hpx::bad_parameter, "locality_raw_counter_creator",
+            HPX_THROWS_IF(ec, hpx::bad_parameter,
+                "sine::explicit_sine_counter_creator",
                 "attempt to create counter on wrong locality");
-            return hpx::naming::invalid_id;
+            return hpx::naming::invalid_gid;
         }
 
         // create individual counter
@@ -144,22 +151,21 @@ namespace performance_counters { namespace sine
             // make sure parent instance name is set properly
             hpx::performance_counters::counter_info complemented_info = info;
             complement_counter_info(complemented_info, info, ec);
-            if (ec) return hpx::naming::invalid_id;
+            if (ec) return hpx::naming::invalid_gid;
 
             // create the counter as requested
-            hpx::naming::id_type id;
+            hpx::naming::gid_type id;
             try {
                 // create the 'sine' performance counter component locally, we
                 // only get here if this instance does not exist yet
-                id = hpx::naming::id_type(
-                    hpx::components::server::create_one<sine_counter_type>(
-                        complemented_info), hpx::naming::id_type::managed);
+                id = hpx::components::server::create_one<sine_counter_type>(
+                        complemented_info);
             }
             catch (hpx::exception const& e) {
                 if (&ec == &hpx::throws)
                     throw;
                 ec = make_error_code(e.get_error(), e.what());
-                return hpx::naming::invalid_id;
+                return hpx::naming::invalid_gid;
             }
 
             if (&ec != &hpx::throws)
@@ -167,9 +173,10 @@ namespace performance_counters { namespace sine
             return id;
         }
 
-        HPX_THROWS_IF(ec, hpx::bad_parameter, "locality_raw_counter_creator",
+        HPX_THROWS_IF(ec, hpx::bad_parameter,
+            "sine::explicit_sine_counter_creator",
             "invalid counter instance name: " + paths.instancename_);
-        return hpx::naming::invalid_id;
+        return hpx::naming::invalid_gid;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -227,7 +234,7 @@ namespace performance_counters { namespace sine
     {
         // check whether the performance counters need to be enabled
         if (!need_perf_counters()) {
-            HPX_THROW_EXCEPTION(hpx::component_load_failure, "sine::startup",
+            HPX_THROW_EXCEPTION(hpx::component_load_failure, "sine::get_startup",
                 "The Sine component is not enabled on the commandline "
                 "(--sine), bailing out");
             return false;

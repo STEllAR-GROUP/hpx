@@ -282,7 +282,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         );
 
     // FIXME: document (add comments)
-    void garbage_collect_sync(
+    void garbage_collect(
         error_code& ec = throws
         );
 

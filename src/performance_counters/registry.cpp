@@ -185,13 +185,13 @@ namespace hpx { namespace performance_counters
 
     ///////////////////////////////////////////////////////////////////////////
     counter_status registry::create_raw_counter_value(counter_info const& info,
-        boost::int64_t* countervalue, naming::id_type& id, error_code& ec)
+        boost::int64_t* countervalue, naming::gid_type& id, error_code& ec)
     {
         return create_raw_counter(info, boost::bind(wrap_counter, countervalue), id, ec);
     }
 
     counter_status registry::create_raw_counter(counter_info const& info,
-        HPX_STD_FUNCTION<boost::int64_t()> const& f, naming::id_type& id,
+        HPX_STD_FUNCTION<boost::int64_t()> const& f, naming::gid_type& id,
         error_code& ec)
     {
         // create canonical type name
@@ -222,17 +222,13 @@ namespace hpx { namespace performance_counters
         // create the counter as requested
         try {
             typedef components::managed_component<server::raw_counter> counter_type;
-            naming::gid_type const newid =
-                components::server::create_one<counter_type>(complemented_info, f);
+            id = components::server::create_one<counter_type>(complemented_info, f);
 
             std::string name(complemented_info.fullname_);
-            ensure_counter_prefix(name);      // prepend prefix, if necessary
-
-            // register the canonical name with AGAS
-            id = naming::id_type(newid, naming::id_type::managed);
+            ensure_counter_prefix(name);      // pre-pend prefix, if necessary
         }
         catch (hpx::exception const& e) {
-            id = naming::invalid_id;        // reset result
+            id = naming::invalid_gid;        // reset result
             if (&ec == &throws)
                 throw;
             ec = make_error_code(e.get_error(), e.what());
@@ -251,7 +247,7 @@ namespace hpx { namespace performance_counters
 
     ///////////////////////////////////////////////////////////////////////////
     counter_status registry::create_counter(counter_info const& info,
-        naming::id_type& id, error_code& ec)
+        naming::gid_type& id, error_code& ec)
     {
         // create canonical type name
         std::string type_name;
@@ -272,13 +268,11 @@ namespace hpx { namespace performance_counters
 
         // create the counter as requested
         try {
-            naming::gid_type newid;
-
             switch (complemented_info.type_) {
             case counter_elapsed_time:
                 {
                     typedef components::managed_component<server::elapsed_time_counter> counter_type;
-                    newid = components::server::create_one<counter_type>(complemented_info);
+                    id = components::server::create_one<counter_type>(complemented_info);
                 }
                 break;
 
@@ -292,12 +286,9 @@ namespace hpx { namespace performance_counters
                     "invalid counter type requested");
                 return status_counter_type_unknown;
             }
-
-            // register the canonical name with AGAS
-            id = naming::id_type(newid, naming::id_type::managed);
         }
         catch (hpx::exception const& e) {
-            id = naming::invalid_id;        // reset result
+            id = naming::invalid_gid;        // reset result
             if (&ec == &throws)
                 throw;
             ec = make_error_code(e.get_error(), e.what());
@@ -319,7 +310,7 @@ namespace hpx { namespace performance_counters
     ///        (milliseconds).
     counter_status registry::create_statistics_counter(
         counter_info const& info, std::string const& base_counter_name,
-        std::size_t base_time_interval, naming::id_type& id, error_code& ec)
+        std::size_t base_time_interval, naming::gid_type& gid, error_code& ec)
     {
         // create canonical type name
         std::string type_name;
@@ -350,7 +341,6 @@ namespace hpx { namespace performance_counters
         // create the counter as requested
         try {
             // create base counter only if it does not exist yet
-            naming::gid_type gid;
             switch (complemented_info.type_) {
             case counter_average_count:
                 {
@@ -391,11 +381,9 @@ namespace hpx { namespace performance_counters
                     "invalid counter type requested");
                 return status_counter_type_unknown;
             }
-
-            id = naming::id_type(gid, naming::id_type::managed);
         }
         catch (hpx::exception const& e) {
-            id = naming::invalid_id;        // reset result
+            gid = naming::invalid_gid;        // reset result
             if (&ec == &throws)
                 throw;
             ec = make_error_code(e.get_error(), e.what());
@@ -405,7 +393,7 @@ namespace hpx { namespace performance_counters
         }
 
         LPCS_(info) << (boost::format("counter %s created at %s")
-            % complemented_info.fullname_ % id);
+            % complemented_info.fullname_ % gid);
 
         if (&ec != &throws)
             ec = make_success_code();

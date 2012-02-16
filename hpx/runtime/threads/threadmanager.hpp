@@ -658,11 +658,11 @@ namespace hpx { namespace threads
 
     private:
         // counter creator functions
-        naming::id_type queue_length_counter_creator(
+        naming::gid_type queue_length_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
-        naming::id_type thread_counts_counter_creator(
+        naming::gid_type thread_counts_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
-        naming::id_type idle_rate_counter_creator(
+        naming::gid_type idle_rate_counter_creator(
             performance_counters::counter_info const& info, error_code& ec);
 
     private:

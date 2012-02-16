@@ -419,6 +419,50 @@ namespace hpx { namespace components { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
+        static void
+        garbage_collect_non_blocking(naming::id_type const& targetgid)
+        {
+            typedef server::runtime_support::garbage_collect_action
+                action_type;
+            hpx::applier::apply<action_type>(targetgid);
+        }
+
+        static lcos::promise<void>
+        garbage_collect_async(naming::id_type const& targetgid)
+        {
+            typedef server::runtime_support::garbage_collect_action
+                action_type;
+            return lcos::eager_future<action_type, void>(targetgid);
+        }
+
+        static void
+        garbage_collect(naming::id_type const& targetgid)
+        {
+            typedef server::runtime_support::garbage_collect_action
+                action_type;
+            lcos::eager_future<action_type, void>(targetgid).get();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        static lcos::promise<naming::gid_type>
+        create_performance_counter_async(naming::id_type targetgid,
+            performance_counters::counter_info const& info)
+        {
+            typedef server::runtime_support::create_performance_counter_action
+                action_type;
+            return lcos::eager_future<action_type, naming::gid_type>(targetgid, info);
+        }
+
+        static naming::gid_type 
+        create_performance_counter(naming::id_type targetgid,
+            performance_counters::counter_info const& info)
+        {
+            typedef server::runtime_support::create_performance_counter_action
+                action_type;
+            return lcos::eager_future<action_type, naming::gid_type>(targetgid, info).get();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         /// \brief Retrieve configuration information
         static lcos::promise<util::section> get_config_async(
             naming::id_type const& targetgid)

@@ -143,10 +143,24 @@ HPX_EXPORT void garbage_collect_non_blocking(
     error_code& ec = throws
     );
 
-HPX_EXPORT void garbage_collect_sync(
+HPX_EXPORT void garbage_collect(
     error_code& ec = throws
     );
 
+///////////////////////////////////////////////////////////////////////////////
+/// \brief Invoke an asynchronous garbage collection step on the given target
+///        locality.
+HPX_EXPORT void garbage_collect_non_blocking(
+    naming::id_type const& id
+  , error_code& ec = throws
+    );
+
+/// \brief Invoke a synchronous garbage collection step on the given target
+///        locality.
+HPX_EXPORT void garbage_collect(
+    naming::id_type const& id
+  , error_code& ec = throws
+    );
 }}
 
 #endif // HPX_A55506A4_4AC7_4FD0_AB0D_ED0D1368FCC5

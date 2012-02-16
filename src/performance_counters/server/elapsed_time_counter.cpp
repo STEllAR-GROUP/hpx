@@ -53,7 +53,7 @@ namespace hpx { namespace performance_counters { namespace server
 namespace hpx { namespace performance_counters { namespace detail
 {
     /// Creation function for uptime counters.
-    naming::id_type uptime_counter_creator(counter_info const& info,
+    naming::gid_type uptime_counter_creator(counter_info const& info,
         error_code& ec)
     {
         switch (info.type_) {
@@ -62,23 +62,23 @@ namespace hpx { namespace performance_counters { namespace detail
                 // verify the validity of the counter instance name
                 counter_path_elements paths;
                 get_counter_path_elements(info.fullname_, paths, ec);
-                if (ec) return naming::invalid_id;
+                if (ec) return naming::invalid_gid;
 
                 // allowed counter names: /runtime(locality#%d/*)/uptime
                 if (paths.parentinstance_is_basename_) {
                     HPX_THROWS_IF(ec, bad_parameter, "uptime_counter_creator",
                         "invalid counter instance parent name: " +
                             paths.parentinstancename_);
-                    return naming::invalid_id;
+                    return naming::invalid_gid;
                 }
 
                 if (paths.parentinstancename_ != "locality" ||
                     paths.parentinstanceindex_ < 0 ||   
-                    boost::uint32_t(paths.parentinstanceindex_) != get_locality_id())
+                    paths.parentinstanceindex_ != static_cast<boost::int32_t>(hpx::get_locality_id()))
                 {
                     HPX_THROWS_IF(ec, bad_parameter, "uptime_counter_creator",
                         "attempt to create counter on wrong locality");
-                    return naming::invalid_id;
+                    return naming::invalid_gid;
                 }
 
                 // create the counter
@@ -88,7 +88,7 @@ namespace hpx { namespace performance_counters { namespace detail
         default:
             HPX_THROWS_IF(ec, bad_parameter, "uptime_counter_creator",
                 "invalid counter type requested");
-            return naming::invalid_id;
+            return naming::invalid_gid;
         }
     }
 }}}

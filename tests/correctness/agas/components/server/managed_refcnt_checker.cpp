@@ -38,7 +38,7 @@ managed_refcnt_checker::~managed_refcnt_checker()
 
         // Flush garbage collection.
         references_.clear();
-        agas::garbage_collect_sync();
+        agas::garbage_collect();
     }
 
     if (naming::invalid_id != target_)

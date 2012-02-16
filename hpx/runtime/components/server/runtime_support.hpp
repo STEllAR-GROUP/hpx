@@ -24,6 +24,7 @@
 #include <hpx/runtime/components/constructor_argument.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
+#include <hpx/performance_counters/counters.hpp>
 #include <hpx/util/spinlock.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -123,6 +124,8 @@ namespace hpx { namespace components { namespace server
             runtime_support_call_startup_functions = 11,
             runtime_support_call_shutdown_functions = 12,
             runtime_support_update_agas_cache = 13,
+            runtime_support_garbage_collect = 14,
+            runtime_support_create_performance_counter = 15
         };
 
         static component_type get_component_type()
@@ -242,12 +245,22 @@ namespace hpx { namespace components { namespace server
         /// \brief Retrieve configuration information
         util::section get_config();
 
+        /// \brief Insert the given name mapping into the AGAS cache of this
+        ///        locality.
         void update_agas_cache(naming::gid_type const&, agas::gva const&);
 
+        /// \brief Load all components on this locality.
         bool load_components();
 
         void call_startup_functions();
         void call_shutdown_functions(bool pre_shutdown);
+
+        /// \brief Force a garbage collection operation in the AGAS layer.
+        void garbage_collect();
+
+        /// \brief Create the given performance counter instance.
+        naming::gid_type create_performance_counter(
+            performance_counters::counter_info const& info);
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into a action
@@ -334,6 +347,19 @@ namespace hpx { namespace components { namespace server
             &runtime_support::update_agas_cache
         > update_agas_cache_action;
 
+        typedef hpx::actions::action0<
+            runtime_support, runtime_support_garbage_collect,
+            &runtime_support::garbage_collect
+        > garbage_collect_action;
+
+        typedef hpx::actions::result_action1<
+            runtime_support, naming::gid_type,
+            runtime_support_create_performance_counter,
+            performance_counters::counter_info const&,
+            &runtime_support::create_performance_counter
+        > create_performance_counter_action;
+
+        ///////////////////////////////////////////////////////////////////////
         /// \brief Start the runtime_support component
         void run();
 
@@ -382,7 +408,7 @@ namespace hpx { namespace components { namespace server
         bool load_component(util::section& ini, std::string const& instance,
             std::string const& component, boost::filesystem::path lib,
             naming::gid_type const& prefix, naming::resolver_client& agas_client,
-            bool isdefault, bool isenabled, 
+            bool isdefault, bool isenabled,
             boost::program_options::options_description& options);
 
         bool load_startup_shutdown_functions(boost::plugin::dll& d);
@@ -478,6 +504,12 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::components::server::runtime_support::update_agas_cache_action,
     update_agas_cache_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::garbage_collect_action,
+    garbage_collect_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::create_performance_counter_action,
+    create_performance_counter_action);
 
 #include <hpx/config/warnings_suffix.hpp>
 

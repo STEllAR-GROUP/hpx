@@ -9,6 +9,7 @@
 #include <hpx/include/runtime.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/components/stubs/runtime_support.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
@@ -69,7 +70,7 @@ namespace hpx { namespace performance_counters
 
         if (!path.parentinstancename_.empty() || !path.instancename_.empty())
         {
-            result += "(";
+            result += "{";
             if (!path.parentinstancename_.empty())
             {
                 result += path.parentinstancename_;
@@ -89,7 +90,7 @@ namespace hpx { namespace performance_counters
                     result += boost::lexical_cast<std::string>(path.instanceindex_);
                 }
             }
-            result += ")";
+            result += "}";
         }
         if (path.countername_.empty()) {
             HPX_THROWS_IF(ec, bad_parameter, "get_counter_name",
@@ -101,7 +102,7 @@ namespace hpx { namespace performance_counters
         result += path.countername_;
 
         if (!path.parameters_.empty()) {
-            result += ",";
+            result += "#";
             result += path.parameters_;
         }
 
@@ -165,7 +166,7 @@ namespace hpx { namespace performance_counters
         result += path.countername_;
 
         if (!path.parameters_.empty()) {
-            result += ",";
+            result += "#";
             result += path.parameters_;
         }
 
@@ -177,7 +178,7 @@ namespace hpx { namespace performance_counters
     /// \brief Fill the given \a counter_type_path_elements instance from the
     ///        given full name of a counter
     ///
-    ///    /objectname(...)/countername
+    ///    /objectname{...}/countername
     ///
     counter_status get_counter_path_elements(std::string const& name,
         counter_type_path_elements& path, error_code& ec)
@@ -192,10 +193,10 @@ namespace hpx { namespace performance_counters
         if (name.find(counter_prefix) == 0)
             pstart = sizeof(counter_prefix);
 
-        std::string::size_type p = name.find_first_of("(/", pstart + 1);
+        std::string::size_type p = name.find_first_of("{/", pstart + 1);
         if (p == std::string::npos) {
             HPX_THROWS_IF(ec, bad_parameter, "get_counter_path_elements",
-                    "expected delimiter: '(' or '/'");
+                    "expected delimiter: '{' or '/'");
             return status_invalid_data;
         }
 
@@ -207,18 +208,18 @@ namespace hpx { namespace performance_counters
             return status_invalid_data;
         }
 
-        if (name[p] == '(') {
-            std::string::size_type p1 = name.find_last_of(")");
+        if (name[p] == '{') {
+            std::string::size_type p1 = name.find_last_of("}");
             if (p1 == std::string::npos || p1 >= name.size()) {
                 HPX_THROWS_IF(ec, bad_parameter, "get_counter_path_elements",
-                        "mismatched parenthesis, expected: ')'");
+                        "mismatched parenthesis, expected: '}'");
                 return status_invalid_data;
             }
             p = p1+1;
         }
 
         // counter name is always the last part of the full name
-        std::string::size_type p1 = name.find_last_of(",");
+        std::string::size_type p1 = name.find_last_of("#");
         if (p1 != std::string::npos) {
             path.parameters_ = name.substr(p1+1);
             p1 = p1 - p - 1;
@@ -285,8 +286,8 @@ BOOST_FUSION_ADAPT_STRUCT(
 namespace hpx { namespace performance_counters
 {
     ///
-    ///    /objectname(parentinstancename#parentindex/instancename#instanceindex)/countername,parameters
-    ///    /objectname(/basecounter)/countername,parameters
+    ///    /objectname{parentinstancename#parentindex/instancename#instanceindex}/countername#parameters
+    ///    /objectname{/basecounter}/countername,parameters
     ///
     namespace qi = boost::spirit::qi;
 
@@ -297,14 +298,14 @@ namespace hpx { namespace performance_counters
           : path_parser::base_type(start)
         {
           start = -qi::lit(counter_prefix)
-                >> '/' >> +~qi::char_("(/") >> -instance
-                >> '/' >>  +~qi::char_(",)") >> -(',' >> +qi::char_);
-            instance = '(' >> parent >> -('/' >> child) >> ')';
+                >> '/' >> +~qi::char_("{/") >> -instance
+                >> '/' >>  +~qi::char_("#}") >> -('#' >> +qi::char_);
+            instance = '{' >> parent >> -('/' >> child) >> '}';
             parent =
                     &qi::lit('/') >> qi::raw[start] >> qi::attr(-1) >> qi::attr(true)  // base counter
-                |  +~qi::char_("#/)") >> -('#' >> qi::uint_) >> qi::attr(false) // counter instance name
+                |  +~qi::char_("#/}") >> -('#' >> qi::uint_) >> qi::attr(false) // counter instance name
                 ;
-            child = +~qi::char_("#)") >> -('#' >> qi::uint_) >> qi::attr(true);
+            child = +~qi::char_("#}") >> -('#' >> qi::uint_) >> qi::attr(true);
         }
 
         qi::rule<Iterator, path_elements()> start;
@@ -316,7 +317,7 @@ namespace hpx { namespace performance_counters
     /// \brief Fill the given \a counter_path_elements instance from the given
     ///        full name of a counter
     ///
-    ///    /objectname(parentinstancename#parentindex/instancename#instanceindex)/countername
+    ///    /objectname{parentinstancename#parentindex/instancename#instanceindex}/countername
     ///
     counter_status get_counter_path_elements(std::string const& name,
         counter_path_elements& path, error_code& ec)
@@ -463,61 +464,91 @@ namespace hpx { namespace performance_counters
 
     namespace detail
     {
-        naming::id_type create_raw_counter_value(
+        naming::gid_type create_raw_counter_value(
             counter_info const& info, boost::int64_t* countervalue,
             error_code& ec)
         {
-            naming::id_type id;
+            naming::gid_type gid;
             get_runtime().get_counter_registry().create_raw_counter_value(
-                info, countervalue, id, ec);
-            return id;
+                info, countervalue, gid, ec);
+            return gid;
         }
 
-        naming::id_type create_raw_counter(
-            counter_info const& info, HPX_STD_FUNCTION<boost::int64_t()> const& f,
-            error_code& ec)
+        naming::gid_type create_raw_counter(counter_info const& info,
+            HPX_STD_FUNCTION<boost::int64_t()> const& f, error_code& ec)
         {
-            naming::id_type id;
+            naming::gid_type gid;
             get_runtime().get_counter_registry().create_raw_counter(
-                info, f, id, ec);
-            return id;
+                info, f, gid, ec);
+            return gid;
         }
 
         // \brief Create a new performance counter instance based on given
         //        counter info
-        naming::id_type create_counter(counter_info const& info, error_code& ec)
+        naming::gid_type create_counter(counter_info const& info, error_code& ec)
         {
-            naming::id_type id;
-            get_runtime().get_counter_registry().create_counter(info, id, ec);
-            return id;
+            naming::gid_type gid;
+            get_runtime().get_counter_registry().create_counter(info, gid, ec);
+            return gid;
         }
 
         // \brief Create a new statistics performance counter instance based on
         //        given base counter name and given base time interval
         //        (milliseconds).
-        naming::id_type create_statistics_counter(
+        naming::gid_type create_statistics_counter(
             counter_info const& info, std::string const& base_counter_name,
             std::size_t base_time_interval, error_code& ec)
         {
-            naming::id_type id;
+            naming::gid_type gid;
             get_runtime().get_counter_registry().
                 create_statistics_counter(info, base_counter_name,
-                    base_time_interval, id, ec);
-            return id;
+                    base_time_interval, gid, ec);
+            return gid;
         }
     }
 
-    counter_status add_counter(naming::id_type const& id,
-        counter_info const& info, error_code& ec)
+    namespace detail
     {
-        return get_runtime().get_counter_registry().add_counter(id, info, ec);
-    }
+        counter_status add_counter(naming::id_type const& id,
+            counter_info const& info, error_code& ec)
+        {
+            return get_runtime().get_counter_registry().add_counter(id, info, ec);
+        }
 
-    counter_status remove_counter(counter_info const& info,
-        naming::id_type const& id, error_code& ec)
-    {
-        return get_runtime().get_counter_registry().remove_counter(
-            info, id, ec);
+        counter_status remove_counter(counter_info const& info,
+            naming::id_type const& id, error_code& ec)
+        {
+            return get_runtime().get_counter_registry().remove_counter(
+                info, id, ec);
+        }
+
+        // create an arbitrary counter on this locality
+        naming::gid_type create_counter_local(counter_info const& info)
+        {
+            // find create function for given counter
+            error_code ec;
+
+            HPX_STD_FUNCTION<create_counter_func> f;
+            get_runtime().get_counter_registry().get_counter_create_function(
+                info, f, ec);
+            if (ec) {
+                HPX_THROW_EXCEPTION(bad_parameter, "create_counter_local",
+                    "no create function for performance counter found: " +
+                        info.fullname_);
+                return naming::invalid_gid;
+            }
+
+            // attempt to create the new counter instance
+            naming::gid_type gid = f(info, ec);
+            if (ec) {
+                HPX_THROW_EXCEPTION(bad_parameter, "create_counter_local",
+                    "couldn't create performance counter: " +
+                        info.fullname_);
+                return naming::invalid_gid;
+            }
+
+            return gid;
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -534,29 +565,49 @@ namespace hpx { namespace performance_counters
         naming::id_type id;
         bool result = agas::resolve_name(complemented_info.fullname_, id, ec);
         if (!result) {
-            // find create function for given counter
-            HPX_STD_FUNCTION<create_counter_func> f;
-            get_runtime().get_counter_registry().get_counter_create_function(
-                info, f, ec);
+            try {
+                // figure out target locality
+                counter_path_elements p;
+                get_counter_path_elements(complemented_info.fullname_, p, ec);
+                if (ec) return naming::invalid_id;
 
-            if (ec) {
-                HPX_THROWS_IF(ec, bad_parameter, "get_or_create_counter",
-                    "no create function for performance counter found: " +
-                        complemented_info.fullname_);
-                return naming::invalid_id;
+                // Take target locality from base counter if if this is an
+                // aggregating counter (the instance name is a base counter).
+                if (p.parentinstance_is_basename_)
+                {
+                    get_counter_path_elements(p.parentinstancename_, p, ec);
+                    if (ec) return naming::invalid_id;
+                }
+
+                if (p.parentinstancename_ != "locality" ||
+                    p.parentinstanceindex_ < 0 ||
+                    p.parentinstanceindex_ >= static_cast<boost::int32_t>(get_num_localities()))
+                {
+                    HPX_THROWS_IF(ec, bad_parameter, "get_counter",
+                        "attempt to create counter on non-existing locality");
+                    return naming::invalid_id;
+                }
+
+                // use the runtime_support component of the target locality to
+                // create the new performance counter
+                using namespace components::stubs;
+                naming::gid_type gid = runtime_support::create_performance_counter(
+                    naming::get_id_from_locality_id(p.parentinstanceindex_),
+                    complemented_info);
+
+                id = naming::id_type(gid, naming::id_type::managed);
             }
-
-            // attempt to create the new counter instance
-            id = f(info, ec);
-            if (ec) {
-                HPX_THROWS_IF(ec, bad_parameter, "get_or_create_counter",
-                    "couldn't create performance counter: " +
-                        complemented_info.fullname_);
+            catch (hpx::exception const& e) {
+                if (&ec == &throws)
+                    throw;
+                ec = make_error_code(e.get_error(), e.what());
+                LPCS_(warning) << (boost::format("failed to create counter %s (%s)")
+                    % complemented_info.fullname_ % e.what());
                 return naming::invalid_id;
             }
 
             // register the canonical name with AGAS
-            agas::register_name(complemented_info.fullname_, id);
+            agas::register_name(complemented_info.fullname_, id, ec);
         }
         if (ec)
             return naming::invalid_id;

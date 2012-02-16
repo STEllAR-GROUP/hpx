@@ -22,6 +22,10 @@ namespace hpx { namespace performance_counters { namespace server
     {
         performance_counter_get_counter_info = 0,
         performance_counter_get_counter_value = 1,
+        performance_counter_reset_counter_value = 2,
+        performance_counter_set_counter_value = 3,
+        performance_counter_start_counter = 4,
+        performance_counter_stop_counter = 5
     };
 
     class base_performance_counter
@@ -32,6 +36,32 @@ namespace hpx { namespace performance_counters { namespace server
         virtual ~base_performance_counter() {}
 
         virtual void get_counter_value(counter_value& value) = 0;
+
+        /// the following functions are not implemented by default, they will
+        /// just throw
+        virtual void reset_counter_value()
+        {
+            HPX_THROW_EXCEPTION(invalid_status, "reset_counter_value",
+                "reset_counter_value is not implemented for this counter");
+        }
+
+        virtual void set_counter_value(counter_value const& value)
+        {
+            HPX_THROW_EXCEPTION(invalid_status, "set_counter_value",
+                "set_counter_value is not implemented for this counter");
+        }
+
+        virtual void start()
+        {
+            HPX_THROW_EXCEPTION(invalid_status, "start",
+                "start is not implemented for this counter");
+        }
+
+        virtual void stop()
+        {
+            HPX_THROW_EXCEPTION(invalid_status, "stop",
+                "stop is not implemented for this counter");
+        }
 
     public:
         base_performance_counter() {}
@@ -71,6 +101,26 @@ namespace hpx { namespace performance_counters { namespace server
             return value;
         }
 
+        void set_counter_value_nonvirt(counter_value const& info)
+        {
+            set_counter_value(info);
+        }
+
+        void reset_counter_value_nonvirt()
+        {
+            reset_counter_value();
+        }
+
+        void start_nonvirt()
+        {
+            start();
+        }
+
+        void stop_nonvirt()
+        {
+            stop();
+        }
+
         /// Each of the exposed functions needs to be encapsulated into an action
         /// type, allowing to generate all required boilerplate code for threads,
         /// serialization, etc.
@@ -93,10 +143,42 @@ namespace hpx { namespace performance_counters { namespace server
             threads::thread_priority_critical
         > get_counter_value_action;
 
+        /// The \a set_counter_value_action
+        typedef hpx::actions::action1<
+            base_performance_counter,
+            performance_counter_set_counter_value,
+            counter_value const&,
+            &base_performance_counter::set_counter_value_nonvirt,
+            threads::thread_priority_critical
+        > set_counter_value_action;
+
+        /// The \a reset_counter_value_action
+        typedef hpx::actions::action0<
+            base_performance_counter,
+            performance_counter_reset_counter_value,
+            &base_performance_counter::reset_counter_value_nonvirt,
+            threads::thread_priority_critical
+        > reset_counter_value_action;
+
+        /// The \a start_action
+        typedef hpx::actions::action0<
+            base_performance_counter,
+            performance_counter_start_counter,
+            &base_performance_counter::start_nonvirt,
+            threads::thread_priority_critical
+        > start_action;
+
+        /// The \a stop_action
+        typedef hpx::actions::action0<
+            base_performance_counter,
+            performance_counter_stop_counter,
+            &base_performance_counter::stop_nonvirt,
+            threads::thread_priority_critical
+        > stop_action;
+
     protected:
         hpx::performance_counters::counter_info info_;
     };
-
 }}}
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
@@ -105,6 +187,18 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::performance_counters::server::base_performance_counter::get_counter_value_action,
     performance_counter_get_counter_value_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::performance_counters::server::base_performance_counter::set_counter_value_action,
+    performance_counter_set_counter_value_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::performance_counters::server::base_performance_counter::reset_counter_value_action,
+    performance_counter_reset_counter_value_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::performance_counters::server::base_performance_counter::start_action,
+    performance_counter_start_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::performance_counters::server::base_performance_counter::stop_action,
+    performance_counter_stop_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::lcos::base_lco_with_value<hpx::performance_counters::counter_info>::set_result_action,

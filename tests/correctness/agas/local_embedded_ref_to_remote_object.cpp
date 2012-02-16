@@ -32,7 +32,7 @@ using hpx::components::get_component_type;
 
 using hpx::applier::get_applier;
 
-using hpx::agas::garbage_collect_sync;
+using hpx::agas::garbage_collect;
 
 using hpx::test::simple_refcnt_monitor;
 using hpx::test::managed_refcnt_monitor;
@@ -94,7 +94,7 @@ void hpx_test_main(
         }
 
         // Flush pending reference counting operations.
-        garbage_collect_sync();
+        garbage_collect();
 
         // Both components should be out of scope now.
         HPX_TEST_EQ(true, monitor_remote.ready(milliseconds(delay)));

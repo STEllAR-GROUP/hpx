@@ -36,10 +36,9 @@ namespace hpx { namespace performance_counters { namespace server
 
             enum { value = counter_average_count };
 
-            static boost::uint64_t call(accumulator_type& accum)
+            static boost::int64_t call(accumulator_type& accum)
             {
-                return static_cast<boost::uint64_t>(
-                    boost::accumulators::mean(accum));
+                return boost::accumulators::mean(accum);
             }
         };
 
@@ -53,10 +52,9 @@ namespace hpx { namespace performance_counters { namespace server
 
             enum { value = counter_statistics_max };
 
-            static boost::uint64_t call(accumulator_type& accum)
+            static boost::int64_t call(accumulator_type& accum)
             {
-                return static_cast<boost::uint64_t>(
-                    (boost::accumulators::max)(accum));
+                return (boost::accumulators::max)(accum);
             }
         };
 
@@ -70,10 +68,9 @@ namespace hpx { namespace performance_counters { namespace server
 
             enum { value = counter_statistics_min };
 
-            static boost::uint64_t call(accumulator_type& accum)
+            static boost::int64_t call(accumulator_type& accum)
             {
-                return static_cast<boost::uint64_t>(
-                    (boost::accumulators::min)(accum));
+                return (boost::accumulators::min)(accum);
             }
         };
     }
@@ -234,7 +231,7 @@ namespace hpx { namespace performance_counters { namespace detail
 {
     /// Creation function for statistics performance counters to be registered
     /// with the counter types.
-    naming::id_type statistics_counter_creator(counter_info const& info,
+    naming::gid_type statistics_counter_creator(counter_info const& info,
         error_code& ec)
     {
         switch (info.type_) {
@@ -244,18 +241,18 @@ namespace hpx { namespace performance_counters { namespace detail
             {
                 counter_path_elements paths;
                 get_counter_path_elements(info.fullname_, paths, ec);
-                if (ec) return naming::invalid_id;
+                if (ec) return naming::invalid_gid;
 
                 if (!paths.parentinstance_is_basename_) {
                     HPX_THROWS_IF(ec, bad_parameter,
                         "statistics_counter_creator", "invalid aggregate counter "
                             "name (instance name must be valid base counter name)");
-                    return naming::invalid_id;
+                    return naming::invalid_gid;
                 }
 
                 std::string base_name;
                 get_counter_name(paths.parentinstancename_, base_name, ec);
-                if (ec) return naming::invalid_id;
+                if (ec) return naming::invalid_gid;
 
                 std::size_t interval = 1000;
                 if (!paths.parameters_.empty()) {
@@ -267,7 +264,7 @@ namespace hpx { namespace performance_counters { namespace detail
                     catch (boost::bad_lexical_cast const& e) {
                         HPX_THROWS_IF(ec, bad_parameter,
                             "statistics_counter_creator", e.what());
-                        return naming::invalid_id;
+                        return naming::invalid_gid;
                     }
                 }
                 return create_statistics_counter(info, base_name, interval, ec);
@@ -277,7 +274,7 @@ namespace hpx { namespace performance_counters { namespace detail
         default:
             HPX_THROWS_IF(ec, bad_parameter, "statistics_counter_creator",
                 "invalid counter type requested");
-            return naming::invalid_id;
+            return naming::invalid_gid;
         }
     }
 }}}

@@ -686,23 +686,23 @@ namespace hpx { namespace naming
 
     ///////////////////////////////////////////////////////////////////////
     //  Handle conversion to/from prefix
-    inline id_type get_id_from_prefix(boost::uint32_t prefix) HPX_SUPER_PURE;
+    inline id_type get_id_from_locality_id(boost::uint32_t prefix) HPX_SUPER_PURE;
 
-    inline id_type get_id_from_prefix(boost::uint32_t prefix)
+    inline id_type get_id_from_locality_id(boost::uint32_t prefix)
     {
         return id_type(boost::uint64_t(prefix+1) << 32, 0, id_type::unmanaged);
     }
 
-    inline boost::uint32_t get_prefix_from_id(id_type const& id) HPX_PURE;
+    inline boost::uint32_t get_locality_id_from_id(id_type const& id) HPX_PURE;
 
-    inline boost::uint32_t get_prefix_from_id(id_type const& id)
+    inline boost::uint32_t get_locality_id_from_id(id_type const& id)
     {
         return boost::uint32_t(id.get_msb() >> 32)-1;
     }
 
     inline id_type get_locality_from_id(id_type const& id)
     {
-        return get_id_from_prefix(get_prefix_from_id(id));
+        return get_id_from_locality_id(get_locality_id_from_id(id));
     }
 
     ///////////////////////////////////////////////////////////////////////

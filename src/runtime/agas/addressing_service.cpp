@@ -1436,7 +1436,7 @@ void addressing_service::garbage_collect_non_blocking(
     send_refcnt_requests_non_blocking(l, ec);
 }
 
-void addressing_service::garbage_collect_sync(
+void addressing_service::garbage_collect(
     error_code& ec
     )
 {
@@ -1543,10 +1543,8 @@ void addressing_service::send_refcnt_requests_sync(
             requests.push_back(req);
         }
 
-        if (is_bootstrap())
-            bulk_service(requests, ec);
-        else
-            bulk_service(requests, ec);
+        // same for local and remote requests
+        bulk_service(requests, ec);
 
         if (ec)
             return;

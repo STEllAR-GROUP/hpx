@@ -15,9 +15,9 @@ int monitor(boost::uint64_t pause, boost::uint64_t values)
 {
     // Resolve the GID of the performances counter using it's symbolic name.
     boost::uint32_t const prefix = hpx::get_locality_id();
-    boost::format sine_implicit("/sine(locality#%d/total)/immediate/implicit");
-    boost::format sine_explicit("/sine(locality#%d/instance#%d)/immediate/explicit");
-    boost::format sine_average("/statistics(/sine(locality#%d/instance#%d)/immediate/explicit)/average,100");
+    boost::format sine_implicit("/sine{locality#%d/total}/immediate/implicit");
+    boost::format sine_explicit("/sine{locality#%d/instance#%d}/immediate/explicit");
+    boost::format sine_average("/statistics{/sine{locality#%d/instance#%d}/immediate/explicit}/average#100");
 
     using hpx::naming::id_type;
     using hpx::performance_counters::get_counter;

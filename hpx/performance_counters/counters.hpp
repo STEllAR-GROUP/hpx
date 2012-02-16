@@ -192,10 +192,10 @@ namespace hpx { namespace performance_counters
     /// instance. Generally, a full name of a counter instance has the
     /// structure:
     ///
-    ///    /objectname(parentinstancename#parentindex/instancename#instanceindex)/countername,parameters
+    ///    /objectname{parentinstancename#parentindex/instancename#instanceindex}/countername#parameters
     ///
     /// i.e.
-    ///    /queue(localityprefix/thread#2)/length
+    ///    /queue{localityprefix/thread#2}/length
     ///
     struct counter_path_elements : counter_type_path_elements
     {
@@ -304,7 +304,7 @@ namespace hpx { namespace performance_counters
     /// \brief This definition declares the type of a function, which will be
     ///        called by HPX whenever a new performance counter instance of a
     ///        particular type needs to be created.
-    typedef naming::id_type create_counter_func(counter_info const&, error_code&);
+    typedef naming::gid_type create_counter_func(counter_info const&, error_code&);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief This definition declares a type of a function, which will be
@@ -415,16 +415,6 @@ namespace hpx { namespace performance_counters
     HPX_API_EXPORT counter_status get_counter_type(std::string const& name,
         counter_info& info, error_code& ec = throws);
 
-    /// \brief Add an existing performance counter instance to the registry
-    HPX_API_EXPORT counter_status add_counter(naming::id_type const& id,
-        counter_info const& info, error_code& ec = throws);
-
-    /// \brief Remove an existing performance counter instance with the
-    ///        given id (as returned from \a create_counter)
-    HPX_API_EXPORT counter_status remove_counter(
-        counter_info const& info, naming::id_type const& id,
-        error_code& ec = throws);
-
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Get the global id of an existing performance counter, if the
     ///        counter does not exist yet, the function attempts to create the
@@ -441,37 +431,50 @@ namespace hpx { namespace performance_counters
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
+        /// \brief Add an existing performance counter instance to the registry
+        HPX_API_EXPORT counter_status add_counter(naming::id_type const& id,
+            counter_info const& info, error_code& ec = throws);
+
+        /// \brief Remove an existing performance counter instance with the
+        ///        given id (as returned from \a create_counter)
+        HPX_API_EXPORT counter_status remove_counter(
+            counter_info const& info, naming::id_type const& id,
+            error_code& ec = throws);
+
         ///////////////////////////////////////////////////////////////////////
         // Helper function for creating counters encapsulating a function
         // returning the counter value.
-        naming::id_type create_raw_counter(counter_info const&,
+        naming::gid_type create_raw_counter(counter_info const&,
             HPX_STD_FUNCTION<boost::int64_t()> const&, error_code&);
 
         // Helper function for creating a new performance counter instance
         // based on a given counter value.
-        naming::id_type create_raw_counter_value(counter_info const&,
+        naming::gid_type create_raw_counter_value(counter_info const&,
             boost::int64_t*, error_code&);
 
         // Creation function for statistics performance counters; to be
         // registered with the counter types.
-        naming::id_type statistics_counter_creator(counter_info const&,
+        naming::gid_type statistics_counter_creator(counter_info const&,
             error_code&);
 
         // Creation function for uptime counters.
-        naming::id_type uptime_counter_creator(counter_info const&,
+        naming::gid_type uptime_counter_creator(counter_info const&,
             error_code&);
 
         // \brief Create a new statistics performance counter instance based on
         //        given base counter name and given base time interval
         //        (milliseconds).
-        naming::id_type create_statistics_counter(
+        naming::gid_type create_statistics_counter(
             counter_info const& info, std::string const& base_counter_name,
             std::size_t base_time_interval, error_code& ec = throws);
 
         // \brief Create a new performance counter instance based on given
         //        counter info
-        naming::id_type create_counter(counter_info const& info,
+        naming::gid_type create_counter(counter_info const& info,
             error_code& ec = throws);
+
+        // \brief Create an arbitrary counter on this locality
+        naming::gid_type create_counter_local(counter_info const& info);
     }
 }}
 

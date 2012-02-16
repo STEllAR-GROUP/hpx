@@ -535,6 +535,11 @@ namespace hpx
         components::component_type);
     HPX_API_EXPORT naming::id_type find_locality(components::component_type);
 
+    /// \brief Return the number of localities which are currently registered
+    ///        for the running application.
+    HPX_API_EXPORT boost::uint32_t get_num_localities();
+    HPX_API_EXPORT boost::uint32_t get_num_localities(components::component_type);
+
     HPX_API_EXPORT naming::gid_type get_next_id();
 
     ///////////////////////////////////////////////////////////////////////////

@@ -86,6 +86,12 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::update_agas_cache_action,
     update_agas_cache_action);
+HPX_REGISTER_ACTION_EX(
+    hpx::components::server::runtime_support::garbage_collect_action,
+    update_agas_cache_action);
+HPX_REGISTER_ACTION_EX(
+    hpx::components::server::runtime_support::create_performance_counter_action,
+    update_agas_cache_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
@@ -452,12 +458,30 @@ namespace hpx { namespace components { namespace server
         return *(get_runtime().get_config().get_section("application"));
     }
 
+    /// \brief Insert the given name mapping into the AGAS cache of this
+    ///        locality.
     void runtime_support::update_agas_cache(naming::gid_type const& gid,
         agas::gva const& g)
     {
         naming::get_agas_client().update_cache(gid, g);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Force a garbage collection operation in the AGAS layer.
+    void runtime_support::garbage_collect()
+    {
+        naming::get_agas_client().garbage_collect_non_blocking();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Create the given performance counter instance.
+    naming::gid_type runtime_support::create_performance_counter(
+        performance_counters::counter_info const& info)
+    {
+        return performance_counters::detail::create_counter_local(info);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     void runtime_support::tidy()
     {
         mutex_type::scoped_lock l(mtx_);

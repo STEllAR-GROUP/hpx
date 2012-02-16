@@ -8,6 +8,7 @@
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/components/stubs/runtime_support.hpp>
 
 namespace hpx { namespace agas
 {
@@ -242,15 +243,48 @@ void garbage_collect_non_blocking(
     error_code& ec
     )
 {
-    return naming::get_agas_client().garbage_collect_non_blocking(ec);
+    naming::get_agas_client().garbage_collect_non_blocking(ec);
 }
 
-void garbage_collect_sync(
+void garbage_collect(
     error_code& ec
     )
 {
-    return naming::get_agas_client().garbage_collect_sync(ec);
+    naming::get_agas_client().garbage_collect(ec);
 }
 
+/// \brief Invoke an asynchronous garbage collection step on the given target
+///        locality.
+void garbage_collect_non_blocking(
+    naming::id_type const& id
+  , error_code& ec
+    )
+{
+    try {
+        components::stubs::runtime_support::garbage_collect_non_blocking(id);
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws)
+            throw;
+        ec = make_error_code(e.get_error(), e.what());
+    }
+}
+
+/// \brief Invoke a synchronous garbage collection step on the given target
+///        locality.
+void garbage_collect(
+    naming::id_type const& id
+  , error_code& ec
+    )
+{
+    try {
+        components::stubs::runtime_support::garbage_collect(id);
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws)
+            throw;
+        ec = make_error_code(e.get_error(), e.what());
+    }
+}
 }}
 

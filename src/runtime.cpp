@@ -159,7 +159,7 @@ namespace hpx
             boost::bind(&runtime_impl::deinit_tss, This()), "parcel_pool"),
         timer_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
-        parcel_port_(parcel_pool_, ini_.get_parcelport_address(), 
+        parcel_port_(parcel_pool_, ini_.get_parcelport_address(),
             ini_.get_connection_cache_size(), ini_.get_max_connections_per_loc()),
         agas_client_(parcel_port_, ini_, mode_),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_,
@@ -409,7 +409,7 @@ namespace hpx
         // cause a double fault), print local diagnostics.
         components::server::console_error_sink(e);
 
-        // Early and late exceptions, errors outside of pxthreads
+        // Early and late exceptions, errors outside of px-threads
         if (!threads::get_self_ptr() || !threads::threadmanager_is(running))
         {
             detail::report_exception_and_terminate(e);
@@ -428,7 +428,7 @@ namespace hpx
         }
 
         components::stubs::runtime_support::terminate_all(
-            naming::get_id_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX));
+            naming::get_id_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX));
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -563,7 +563,7 @@ namespace hpx
             { "/statistics/average", performance_counters::counter_average_count,
               "returns the averaged value of its base counter over "
               "an arbitrary time line; pass required base counter as the instance "
-              "name: /statistics(<base_counter_name>)/average",
+              "name: /statistics{<base_counter_name>}/average",
               HPX_PERFORMANCE_COUNTER_V1,
               &performance_counters::detail::statistics_counter_creator,
               &performance_counters::default_counter_discoverer
@@ -573,7 +573,7 @@ namespace hpx
             { "/statistics/max", performance_counters::counter_statistics_max,
               "returns the averaged value of its base counter over "
               "an arbitrary time line; pass required base counter as the instance "
-              "name: /statistics(<base_counter_name>)/max",
+              "name: /statistics{<base_counter_name>}/max",
               HPX_PERFORMANCE_COUNTER_V1,
               &performance_counters::detail::statistics_counter_creator,
               &performance_counters::default_counter_discoverer
@@ -583,7 +583,7 @@ namespace hpx
             { "/statistics/min", performance_counters::counter_statistics_min,
               "returns the averaged value of its base counter over "
               "an arbitrary time line; pass required base counter as the instance "
-              "name: /statistics(<base_counter_name>)/min",
+              "name: /statistics{<base_counter_name>}/min",
               HPX_PERFORMANCE_COUNTER_V1,
                &performance_counters::detail::statistics_counter_creator,
                &performance_counters::default_counter_discoverer
@@ -708,6 +708,24 @@ namespace hpx
 
         // chose first locality to host the object
         return prefixes.front();
+    }
+
+    /// \brief Return the number of localities which are currently registered
+    ///        for the running application.
+    boost::uint32_t get_num_localities()
+    {
+        // FIXME: this is overkill
+        std::vector<naming::id_type> prefixes;
+        hpx::applier::get_applier().get_prefixes(prefixes);
+        return static_cast<boost::uint32_t>(prefixes.size());
+    }
+
+    boost::uint32_t get_num_localities(components::component_type type)
+    {
+        // FIXME: this is overkill
+        std::vector<naming::id_type> prefixes;
+        hpx::applier::get_applier().get_prefixes(prefixes, type);
+        return static_cast<boost::uint32_t>(prefixes.size());
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -41,18 +41,22 @@ namespace hpx { namespace performance_counters
             get_counter_path_elements(info.fullname_, p, ec);
         if (!status_is_valid(status)) return false;
 
-        p.parentinstancename_ = "locality";
+        p.parentinstancename_ = "locality#<*>";
+        p.parentinstanceindex_ = -1;
         p.instancename_ = "total";
         p.instanceindex_ = -1;
 
-        boost::uint32_t last_locality = get_locality_id();
-        for (boost::uint32_t l = 0; l <= last_locality; ++l)
-        {
-            p.parentinstanceindex_ = static_cast<boost::int32_t>(l);
-            status = get_counter_name(p, i.fullname_, ec);
-            if (!status_is_valid(status) || !f(i, ec) || ec)
-                return false;
-        }
+        if (!f(i, ec) || ec)
+            return false;
+
+//         boost::uint32_t last_locality = get_num_localities();
+//         for (boost::uint32_t l = 0; l < last_locality; ++l)
+//         {
+//             p.parentinstanceindex_ = static_cast<boost::int32_t>(l);
+//             status = get_counter_name(p, i.fullname_, ec);
+//             if (!status_is_valid(status) || !f(i, ec) || ec)
+//                 return false;
+//         }
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -76,28 +80,34 @@ namespace hpx { namespace performance_counters
             get_counter_path_elements(info.fullname_, p, ec);
         if (!status_is_valid(status)) return false;
 
-        p.parentinstancename_ = "locality";
+        p.parentinstancename_ = "locality#<*>";
+        p.parentinstanceindex_ = -1;
+        p.instancename_ = "worker-thread#<*>";
+        p.instanceindex_ = -1;
 
-        boost::uint32_t last_locality = get_locality_id();
-        std::size_t num_threads = get_os_thread_count();
-        for (boost::uint32_t l = 0; l <= last_locality; ++l)
-        {
-            p.parentinstanceindex_ = static_cast<boost::int32_t>(l);
-            p.instancename_ = "total";
-            p.instanceindex_ = -1;
-            status = get_counter_name(p, i.fullname_, ec);
-            if (!status_is_valid(status) || !f(i, ec) || ec)
-                return false;
+        if (!f(i, ec) || ec)
+            return false;
 
-            for (std::size_t t = 0; t < num_threads; ++t)
-            {
-                p.instancename_ = "os-thread";
-                p.instanceindex_ = static_cast<boost::int32_t>(t);
-                status = get_counter_name(p, i.fullname_, ec);
-                if (!status_is_valid(status) || !f(i, ec) || ec)
-                    return false;
-            }
-        }
+//         boost::uint32_t last_locality = get_num_localities();
+//         std::size_t num_threads = get_os_thread_count();
+//         for (boost::uint32_t l = 0; l <= last_locality; ++l)
+//         {
+//             p.parentinstanceindex_ = static_cast<boost::int32_t>(l);
+//             p.instancename_ = "total";
+//             p.instanceindex_ = -1;
+//             status = get_counter_name(p, i.fullname_, ec);
+//             if (!status_is_valid(status) || !f(i, ec) || ec)
+//                 return false;
+//
+//             for (std::size_t t = 0; t < num_threads; ++t)
+//             {
+//                 p.instancename_ = "worker-thread";
+//                 p.instanceindex_ = static_cast<boost::int32_t>(t);
+//                 status = get_counter_name(p, i.fullname_, ec);
+//                 if (!status_is_valid(status) || !f(i, ec) || ec)
+//                     return false;
+//             }
+//         }
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -111,28 +121,28 @@ namespace hpx { namespace performance_counters
     ///
     ///   /<objectname>(locality#<locality_id>/total)/<instancename>
     ///
-    naming::id_type locality_raw_counter_creator(counter_info const& info,
+    naming::gid_type locality_raw_counter_creator(counter_info const& info,
         HPX_STD_FUNCTION<boost::int64_t()> const& f, error_code& ec)
     {
         // verify the validity of the counter instance name
         counter_path_elements paths;
         get_counter_path_elements(info.fullname_, paths, ec);
-        if (ec) return naming::invalid_id;
+        if (ec) return naming::invalid_gid;
 
         if (paths.parentinstance_is_basename_) {
             HPX_THROWS_IF(ec, bad_parameter, "locality_raw_counter_creator",
                 "invalid counter instance parent name: " +
                     paths.parentinstancename_);
-            return naming::invalid_id;
+            return naming::invalid_gid;
         }
 
         if (paths.parentinstancename_ != "locality" ||
             paths.parentinstanceindex_ == -1 || 
-            boost::uint32_t(paths.parentinstanceindex_) != get_locality_id())
+            paths.parentinstanceindex_ != static_cast<boost::int32_t>(hpx::get_locality_id()))
         {
             HPX_THROWS_IF(ec, bad_parameter, "locality_raw_counter_creator",
                 "attempt to create counter on wrong locality");
-            return naming::invalid_id;
+            return naming::invalid_gid;
         }
 
         if (paths.instancename_ == "total" && paths.instanceindex_ == -1)
@@ -140,6 +150,6 @@ namespace hpx { namespace performance_counters
 
         HPX_THROWS_IF(ec, bad_parameter, "locality_raw_counter_creator",
             "invalid counter instance name: " + paths.instancename_);
-        return naming::invalid_id;
+        return naming::invalid_gid;
     }
 }}
