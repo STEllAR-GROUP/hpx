@@ -38,7 +38,7 @@ namespace hpx { namespace performance_counters { namespace server
 
             static boost::uint64_t call(accumulator_type& accum)
             {
-                return static_cast<boost::int64_t>(
+                return static_cast<boost::uint64_t>(
                     boost::accumulators::mean(accum));
             }
         };
@@ -55,7 +55,7 @@ namespace hpx { namespace performance_counters { namespace server
 
             static boost::uint64_t call(accumulator_type& accum)
             {
-                return static_cast<boost::int64_t>(
+                return static_cast<boost::uint64_t>(
                     (boost::accumulators::max)(accum));
             }
         };
@@ -72,7 +72,7 @@ namespace hpx { namespace performance_counters { namespace server
 
             static boost::uint64_t call(accumulator_type& accum)
             {
-                return static_cast<boost::int64_t>(
+                return static_cast<boost::uint64_t>(
                     (boost::accumulators::min)(accum));
             }
         };
@@ -94,7 +94,10 @@ namespace hpx { namespace performance_counters { namespace server
                 "base interval is specified to be zero");
         }
 
-        if (info.type_ != detail::counter_type_from_statistic<Statistic>::value) {
+        boost::uint64_t type
+            = detail::counter_type_from_statistic<Statistic>::value;
+
+        if (info.type_ != type) {
             HPX_THROW_EXCEPTION(bad_parameter,
                 "average_count_counter<Statistic>::statistics_counter",
                 "unexpected counter type specified for elapsed_time_counter");
