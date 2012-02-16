@@ -127,7 +127,8 @@ namespace hpx { namespace performance_counters
         }
 
         if (paths.parentinstancename_ != "locality" ||
-            paths.parentinstanceindex_ != get_locality_id())
+            paths.parentinstanceindex_ == -1 || 
+            boost::uint32_t(paths.parentinstanceindex_) != get_locality_id())
         {
             HPX_THROWS_IF(ec, bad_parameter, "locality_raw_counter_creator",
                 "attempt to create counter on wrong locality");

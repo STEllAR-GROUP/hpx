@@ -896,7 +896,8 @@ namespace hpx { namespace threads
         }
 
         if (paths.parentinstancename_ != "locality" ||
-            paths.parentinstanceindex_ != get_locality_id())
+            paths.parentinstanceindex_ < 0 ||
+            boost::uint32_t(paths.parentinstanceindex_) != get_locality_id())
         {
             HPX_THROWS_IF(ec, bad_parameter, "queue_length_counter_creator",
                 "attempt to create counter on wrong locality");
@@ -913,7 +914,8 @@ namespace hpx { namespace threads
                 HPX_STD_BIND(&spt::get_queue_length, &scheduler_, -1), ec);
         }
         else if (paths.instancename_ == "os-thread" &&
-            paths.instanceindex_ >= 0 && paths.instanceindex_ < threads_.size())
+            paths.instanceindex_ >= 0 &&
+            std::size_t(paths.instanceindex_) < threads_.size())
         {
             // specific counter
             using performance_counters::detail::create_raw_counter;
@@ -989,7 +991,8 @@ namespace hpx { namespace threads
         }
 
         if (paths.parentinstancename_ != "locality" ||
-            paths.parentinstanceindex_ != get_locality_id())
+            paths.parentinstanceindex_ < 0 ||
+            boost::uint32_t(paths.parentinstanceindex_) != get_locality_id())
         {
             HPX_THROWS_IF(ec, bad_parameter, "idle_rate_counter_creator",
                 "attempt to create counter on wrong locality");
@@ -1006,7 +1009,8 @@ namespace hpx { namespace threads
                 HPX_STD_BIND(&ti::avg_idle_rate, this), ec);
         }
         else if (paths.instancename_ == "os-thread" &&
-            paths.instanceindex_ >= 0 && paths.instanceindex_ < threads_.size())
+            paths.instanceindex_ >= 0 &&
+            std::size_t(paths.instanceindex_) < threads_.size())
         {
             // specific counter
             using performance_counters::detail::create_raw_counter;
@@ -1036,7 +1040,8 @@ namespace hpx { namespace threads
         }
 
         if (paths.parentinstancename_ != "locality" ||
-            paths.parentinstanceindex_ != get_locality_id())
+            paths.parentinstanceindex_ < 0 ||
+            boost::uint32_t(paths.parentinstanceindex_) != get_locality_id())
         {
             HPX_THROWS_IF(ec, bad_parameter, "counter_creator",
                 "attempt to create counter on wrong locality");
@@ -1052,7 +1057,8 @@ namespace hpx { namespace threads
         }
         else if (!individual_creator.empty() &&
             paths.instancename_ == individual_name &&
-            paths.instanceindex_ >= 0 && paths.instanceindex_ < individual_count)
+            paths.instanceindex_ >= 0 &&
+            std::size_t(paths.instanceindex_) < individual_count)
         {
             // specific counter
             using performance_counters::detail::create_raw_counter;

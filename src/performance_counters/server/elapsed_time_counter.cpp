@@ -72,8 +72,9 @@ namespace hpx { namespace performance_counters { namespace detail
                     return naming::invalid_id;
                 }
 
-                if (paths.parentinstancename_ == "locality" &&
-                    paths.parentinstanceindex_ != get_locality_id())
+                if (paths.parentinstancename_ != "locality" ||
+                    paths.parentinstanceindex_ < 0 ||   
+                    boost::uint32_t(paths.parentinstanceindex_) != get_locality_id())
                 {
                     HPX_THROWS_IF(ec, bad_parameter, "uptime_counter_creator",
                         "attempt to create counter on wrong locality");

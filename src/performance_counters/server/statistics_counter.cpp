@@ -94,7 +94,7 @@ namespace hpx { namespace performance_counters { namespace server
                 "base interval is specified to be zero");
         }
 
-        if (info.type_ != typename detail::counter_type_from_statistic<Statistic>::value) {
+        if (info.type_ != detail::counter_type_from_statistic<Statistic>::value) {
             HPX_THROW_EXCEPTION(bad_parameter,
                 "average_count_counter<Statistic>::statistics_counter",
                 "unexpected counter type specified for elapsed_time_counter");
@@ -190,9 +190,12 @@ typedef hpx::components::managed_component<
         boost::accumulators::tag::mean>
 > average_count_counter_type;
 
-template hpx::performance_counters::server::statistics_counter<boost::accumulators::tag::mean>;
-template hpx::performance_counters::server::statistics_counter<boost::accumulators::tag::max>;
-template hpx::performance_counters::server::statistics_counter<boost::accumulators::tag::min>;
+template HPX_EXPORT class hpx::performance_counters::server::statistics_counter<
+    boost::accumulators::tag::mean>;
+template HPX_EXPORT class hpx::performance_counters::server::statistics_counter<
+    boost::accumulators::tag::max>;
+template HPX_EXPORT class hpx::performance_counters::server::statistics_counter<
+    boost::accumulators::tag::min>;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY_EX(
     average_count_counter_type, average_count_counter,
