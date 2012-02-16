@@ -91,8 +91,8 @@ namespace hpx { namespace performance_counters { namespace server
                 "base interval is specified to be zero");
         }
 
-        boost::uint64_t type
-            = detail::counter_type_from_statistic<Statistic>::value;
+        boost::int64_t type =
+            detail::counter_type_from_statistic<Statistic>::value;
 
         if (info.type_ != type) {
             HPX_THROW_EXCEPTION(bad_parameter,
