@@ -44,8 +44,13 @@ if(HDF5_CPP_FOUND)
   if(HPX_CXX11_LAMBDAS AND HPX_CXX11_AUTO AND HDF5_THREAD_SAFE)
     set(subdirs ${subdirs}
         sheneos
-        neutron_star
        )
+
+    if(CMAKE_Fortran_COMPILER)
+      set(subdirs ${subdirs}
+          neutron_star
+         )
+    endif()
   endif()
 endif()
 
