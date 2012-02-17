@@ -136,7 +136,7 @@ namespace graph500 { namespace server
       }
     }
 
-    void point::root(std::vector<std::size_t> const& bfs_roots)
+    void point::root(std::vector<int64_t> const& bfs_roots)
     {
       bfs_roots_ = bfs_roots;
 
@@ -154,16 +154,18 @@ namespace graph500 { namespace server
     void point::receive_duplicates(int64_t j,
                 std::vector<hpx::naming::id_type> const& duplicate_components)
     {
+      hpx::lcos::local_mutex::scoped_lock l(mtx_);
       duplicates_[j] = duplicate_components;
       return;
     }
 
-    bool point::has_edge(std::size_t edge)
+    bool point::has_edge(int64_t edge)
     {
+      hpx::lcos::local_mutex::scoped_lock l(mtx_);
       bool found = false;
       for (std::size_t i=0;i<local_edges_.size();i++) {
-        if ( edge == (std::size_t) local_edges_[i].v0 || 
-             edge == (std::size_t) local_edges_[i].v1 ) {
+        if ( edge == local_edges_[i].v0 || 
+             edge == local_edges_[i].v1 ) {
           found = true;
           break;
         }

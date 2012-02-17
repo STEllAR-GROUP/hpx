@@ -49,13 +49,13 @@ namespace graph500
             this->base_type::init_async(gid_,objectid, scale,number_partitions,overlap);
         }
 
-        hpx::lcos::promise<void> root_async(std::vector<std::size_t> const& bfs_roots)
+        hpx::lcos::promise<void> root_async(std::vector<int64_t> const& bfs_roots)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::root_async(gid_,bfs_roots);
         }
 
-        void root(std::vector<std::size_t> const& bfs_roots)
+        void root(std::vector<int64_t> const& bfs_roots)
         {
             BOOST_ASSERT(gid_);
             this->base_type::root(gid_,bfs_roots);
@@ -87,13 +87,13 @@ namespace graph500
             this->base_type::bfs(gid_);
         }
 
-        hpx::lcos::promise< bool > has_edge_async(std::size_t edge)
+        hpx::lcos::promise< bool > has_edge_async(int64_t edge)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::has_edge_async(gid_,edge);
         }
 
-        bool has_edge(std::size_t edge)
+        bool has_edge(int64_t edge)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::has_edge(gid_,edge);

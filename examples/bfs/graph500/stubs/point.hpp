@@ -35,13 +35,13 @@ namespace graph500 { namespace stubs
         }
 
         static hpx::lcos::promise<void>
-        root_async(hpx::naming::id_type const& gid,std::vector<std::size_t> const& bfs_roots)
+        root_async(hpx::naming::id_type const& gid,std::vector<int64_t> const& bfs_roots)
         {
             typedef server::point::root_action action_type;
             return hpx::lcos::eager_future<action_type>(gid,bfs_roots);
         }
 
-        static void root(hpx::naming::id_type const& gid,std::vector<std::size_t> const& bfs_roots)
+        static void root(hpx::naming::id_type const& gid,std::vector<int64_t> const& bfs_roots)
         {
             root_async(gid,bfs_roots).get();
         }
@@ -77,13 +77,13 @@ namespace graph500 { namespace stubs
         }
 
         static hpx::lcos::promise< bool >
-        has_edge_async(hpx::naming::id_type const& gid,std::size_t edge)
+        has_edge_async(hpx::naming::id_type const& gid,int64_t edge)
         {
             typedef server::point::has_edge_action action_type;
             return hpx::lcos::eager_future<action_type>(gid,edge);
         }
 
-        static bool has_edge(hpx::naming::id_type const& gid,std::size_t edge)
+        static bool has_edge(hpx::naming::id_type const& gid,int64_t edge)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the promise

@@ -178,7 +178,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         hpx::lcos::wait(init_phase);
 
         // Generate the search roots
-        std::vector<std::size_t> bfs_roots;
+        std::vector<int64_t> bfs_roots;
         bfs_roots.resize(64);  // the graph500 specifies 64 search roots
                                 // must be used
 
@@ -200,7 +200,7 @@ int hpx_main(boost::program_options::variables_map &vm)
               if ( counter > (uint64_t) 2 * nglobalverts) break;
               int is_duplicate = 0;
               for (std::size_t i = 0; i < bfs_root_idx; ++i) {
-                if ( (std::size_t) root == bfs_roots[i]) {
+                if ( root == bfs_roots[i]) {
                   is_duplicate = 1;
                   break;
                 }
@@ -209,11 +209,10 @@ int hpx_main(boost::program_options::variables_map &vm)
               int root_ok = 0;
               // check if the root is in the graph; if so, set root_ok to be true
               {
-                std::size_t test_root = (std::size_t) root;
                 std::vector<bool> search_vector;
                 std::vector<hpx::lcos::promise<bool> > has_edge_phase;
                 for (std::size_t i=0;i<number_partitions;i++) {
-                  has_edge_phase.push_back(points[i].has_edge_async(test_root));
+                  has_edge_phase.push_back(points[i].has_edge_async(root));
                 }
                 hpx::lcos::wait(has_edge_phase,search_vector);
                 for (std::size_t jj=0;jj<search_vector.size();jj++) {

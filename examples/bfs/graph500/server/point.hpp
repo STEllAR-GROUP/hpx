@@ -88,11 +88,11 @@ namespace graph500 { namespace server
 
         void init(std::size_t objectid,std::size_t scale,std::size_t number_partitions,double overlap);
 
-        void root(std::vector<std::size_t> const& bfs_roots);
+        void root(std::vector<int64_t> const& bfs_roots);
 
         void bfs();
 
-        bool has_edge(std::size_t edge);
+        bool has_edge(int64_t edge);
 
         std::vector<nodedata> validate();
 
@@ -140,7 +140,7 @@ namespace graph500 { namespace server
             // Action code.
             point_root,
             // Arguments of this action.
-            std::vector<std::size_t> const&,
+            std::vector<int64_t> const&,
             // Method bound to this action.
             &point::root
         > root_action;
@@ -190,7 +190,7 @@ namespace graph500 { namespace server
             // Action code.
             point_has_edge,
             // Arguments of this action.
-            std::size_t,
+            int64_t,
             // Method bound to this action.
             &point::has_edge
         > has_edge_action;
@@ -217,7 +217,7 @@ namespace graph500 { namespace server
         std::size_t minnode_;
         std::vector<packed_edge> local_edges_;
         std::vector<std::size_t> nedge_bins_;
-        std::vector<std::size_t> bfs_roots_;
+        std::vector<int64_t> bfs_roots_;
     };
 }}
 
