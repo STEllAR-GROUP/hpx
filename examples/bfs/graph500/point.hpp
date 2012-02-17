@@ -61,6 +61,20 @@ namespace graph500
             this->base_type::root(gid_,bfs_roots);
         }
 
+        hpx::lcos::promise<void> receive_duplicates_async(int64_t j,
+                          std::vector<hpx::naming::id_type> const& duplicate_components)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::receive_duplicates_async(gid_,j,duplicate_components);
+        }
+
+        void receive_duplicates(int64_t j,
+                          std::vector<hpx::naming::id_type> const& duplicate_components)
+        {
+            BOOST_ASSERT(gid_);
+            this->base_type::receive_duplicates(gid_,j,duplicate_components);
+        }
+
         hpx::lcos::promise<void> bfs_async()
         {
             BOOST_ASSERT(gid_);

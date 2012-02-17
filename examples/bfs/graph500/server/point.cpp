@@ -141,6 +141,7 @@ namespace graph500 { namespace server
       bfs_roots_ = bfs_roots;
 
       parent_.resize(N_,bfs_roots.size(),1);
+      duplicates_.resize(N_);
       // initialize to 0 -- no edge is identified as 0
       for (std::size_t j=0;j<parent_.jsize();j++) {
         for (std::size_t i=0;i<parent_.isize();i++) {
@@ -148,6 +149,13 @@ namespace graph500 { namespace server
           parent_(i,j,0).level = 0;
         }
       }
+    }
+
+    void point::receive_duplicates(int64_t j,
+                std::vector<hpx::naming::id_type> const& duplicate_components)
+    {
+      duplicates_[j] = duplicate_components;
+      return;
     }
 
     bool point::has_edge(std::size_t edge)
@@ -193,6 +201,7 @@ namespace graph500 { namespace server
         }
 
       }
+
     }
 
     std::vector<nodedata> point::validate()

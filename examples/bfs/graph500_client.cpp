@@ -12,6 +12,7 @@
 
 #include "graph500/make_graph.h"
 #include "graph500/point.hpp"
+#include "graph500/stubs/point.hpp"
 
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
@@ -51,6 +52,54 @@ init(hpx::components::server::distributing_factory::iterator_range_type const& r
 void get_statistics(std::vector<double> const& x, double &minimum, double &mean,
                     double &stdev, double &firstquartile,
                     double &median, double &thirdquartile, double &maximum);
+
+bool whohasthisedge_callback(int64_t j,std::vector<bool> const& has_edge,
+                             std::vector<hpx::naming::id_type> const& point_components)
+{
+  // let the components which have duplicates know about each other
+  std::vector<hpx::naming::id_type> duplicate;
+  for ( std::size_t i=0;i<has_edge.size();i++) {
+    if ( has_edge[i] == true ) duplicate.push_back(point_components[i]);
+  }
+
+  std::vector<hpx::lcos::promise<void> > send_duplicates_phase;
+  for (std::size_t i=0;i<duplicate.size();i++) {
+    send_duplicates_phase.push_back(
+             graph500::stubs::point::receive_duplicates_async(duplicate[i],j,duplicate));
+  }
+  hpx::lcos::wait(send_duplicates_phase);
+
+  return true;
+}
+
+std::vector<bool> whohasthisedge(int64_t edge,std::vector<hpx::naming::id_type> const& point_components)
+{
+  std::vector<bool> search_vector;
+  std::vector<hpx::lcos::promise<bool> > has_edge_phase;
+  for (std::size_t i=0;i<point_components.size();i++) {
+    has_edge_phase.push_back(graph500::stubs::point::has_edge_async(point_components[i],edge));
+  }
+  hpx::lcos::wait(has_edge_phase,search_vector);
+  return search_vector;
+}
+
+// Any global function needs to be wrapped into a plain_action if it should be
+// invoked as a HPX-thread.
+typedef hpx::actions::plain_result_action2<
+    std::vector<bool>,          // result type
+    int64_t,                // argument
+    std::vector<hpx::naming::id_type> const&,    // argument
+    whohasthisedge              // function
+> whohasthisedge_action;
+
+// this is to generate the required boilerplate we need for the remote
+// invocation to work
+HPX_REGISTER_PLAIN_ACTION(whohasthisedge_action);
+
+///////////////////////////////////////////////////////////////////////////////
+// An eager_future is a HPX construct exposing the semantics of a Future
+// object. It starts executing the bound action immediately (eagerly).
+typedef hpx::lcos::eager_future<whohasthisedge_action> whohasthisedge_future;
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map &vm)
@@ -110,6 +159,12 @@ int hpx_main(boost::program_options::variables_map &vm)
         // Populate the client vectors.
         init(hpx::components::server::locality_results(blocks), points);
 
+        // Get the gids of each component
+        std::vector<hpx::naming::id_type> point_components;
+        for (std::size_t i=0;i<num_pe;i++) {
+          point_components.push_back(points[i].get_gid());
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // Put the graph in the data structure
         std::vector<hpx::lcos::promise<void> > init_phase;
@@ -121,15 +176,14 @@ int hpx_main(boost::program_options::variables_map &vm)
         // We have to wait for the initialization to complete before we begin
         // the next phase of computation.
         hpx::lcos::wait(init_phase);
-        double kernel1_time = kernel1time.elapsed();
-        std::cout << "Elapsed time during kernel 1: " << kernel1_time << " [s]" << std::endl;
+
         // Generate the search roots
         std::vector<std::size_t> bfs_roots;
         bfs_roots.resize(64);  // the graph500 specifies 64 search roots
                                 // must be used
 
+        int64_t nglobalverts = (int64_t)(1) << scale;
         {  // generate the bfs roots
-          int64_t nglobalverts = (int64_t)(1) << scale;
           uint64_t counter = 0;
           uint64_t seed1 = 2;
           uint64_t seed2 = 3;
@@ -181,6 +235,18 @@ int hpx_main(boost::program_options::variables_map &vm)
           root_phase.push_back(points[i].root_async(bfs_roots));
         }
         hpx::lcos::wait(root_phase);
+
+        // Search for duplicates among the partitions
+        // this determines the communication pattern for finalization
+        std::vector<hpx::lcos::promise< std::vector<bool> > > whohasthisedge_phase;
+        for (int64_t j=1;j<= nglobalverts;j++) {
+          whohasthisedge_phase.push_back(whohasthisedge_future(hpx::find_here(),j,point_components));
+        }
+        // put a callback here instead of search_vector
+        hpx::lcos::wait(whohasthisedge_phase,boost::bind(&whohasthisedge_callback,_1,_2,boost::ref(point_components)));
+
+        double kernel1_time = kernel1time.elapsed();
+        std::cout << "Elapsed time during kernel 1: " << kernel1_time << " [s]" << std::endl;
 
         // Begin Kernel 2
         std::vector<double> kernel2_nedge,kernel2_time;

@@ -98,6 +98,9 @@ namespace graph500 { namespace server
 
         std::vector<nodedata> validator();
 
+        void receive_duplicates(int64_t j,                
+                  std::vector<hpx::naming::id_type> const& duplicate_components);
+
         validatedata scatter(std::vector<std::size_t> const&parent,std::size_t searchkey,
                              std::size_t scale);
 
@@ -113,7 +116,8 @@ namespace graph500 { namespace server
             point_has_edge = 2,
             point_validate = 3,
             point_scatter = 4,
-            point_root = 5
+            point_root = 5,
+            point_receive_duplicates = 6
         };
 
         typedef hpx::actions::action4<
@@ -140,6 +144,18 @@ namespace graph500 { namespace server
             // Method bound to this action.
             &point::root
         > root_action;
+
+        typedef hpx::actions::action2<
+            // Component server type.
+            point,
+            // Action code.
+            point_receive_duplicates,
+            // Arguments of this action.
+            int64_t,
+            std::vector<hpx::naming::id_type> const&,
+            // Method bound to this action.
+            &point::receive_duplicates
+        > receive_duplicates_action;
 
         typedef hpx::actions::action0<
             // Component server type.
@@ -197,6 +213,7 @@ namespace graph500 { namespace server
         std::size_t N_;
         std::vector< std::vector<std::size_t> > neighbors_;
         bfsg::array<leveldata> parent_;
+        std::vector< std::vector<hpx::naming::id_type> > duplicates_;
         std::size_t minnode_;
         std::vector<packed_edge> local_edges_;
         std::vector<std::size_t> nedge_bins_;
@@ -212,6 +229,10 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     graph500::server::point::root_action,
     graph500_point_root_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    graph500::server::point::receive_duplicates_action,
+    graph500_point_receive_duplicates_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     graph500::server::point::bfs_action,
