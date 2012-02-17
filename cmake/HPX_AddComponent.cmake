@@ -28,7 +28,7 @@ macro(add_hpx_component name)
     hpx_debug("add_hpx_component.${name}_component" "${name}_SOURCE_ROOT: ${${name}_SOURCE_ROOT}")
 
     if(NOT ${name}_SOURCE_GLOB)
-      set(${name}_SOURCE_GLOB "${${name}_SOURCE_ROOT}/*.c*")
+      set(${name}_SOURCE_GLOB "${${name}_SOURCE_ROOT}/*.cpp")
     endif()
     hpx_debug("add_hpx_component.${name}_component" "${name}_SOURCE_GLOB: ${${name}_SOURCE_GLOB}")
 
@@ -49,7 +49,7 @@ macro(add_hpx_component name)
     hpx_debug("add_hpx_component.${name}_component" "${name}_HEADER_ROOT: ${${name}_HEADER_ROOT}")
 
     if(NOT ${name}_HEADER_GLOB)
-      set(${name}_HEADER_GLOB "${${name}_HEADER_ROOT}/*.h*")
+      set(${name}_HEADER_GLOB "${${name}_HEADER_ROOT}/*.hpp")
     endif()
     hpx_debug("add_hpx_component.${name}_component" "${name}_HEADER_GLOB: ${${name}_HEADER_GLOB}")
 
