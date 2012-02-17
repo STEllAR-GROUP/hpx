@@ -21,6 +21,8 @@
 #include <boost/atomic.hpp>
 #include <boost/mpl/bool.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
 {
@@ -324,7 +326,8 @@ namespace hpx { namespace threads { namespace policies
         boost::atomic<std::size_t> curr_queue_;
         bool numa_sensitive_;
     };
-
 }}}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

@@ -20,6 +20,8 @@
 #include <hpx/runtime/components/server/console_logging.hpp>
 #include <hpx/util/static.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
@@ -67,5 +69,7 @@ namespace hpx { namespace components
         void init_hpx_console_log(util::section const& ini);
     }
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

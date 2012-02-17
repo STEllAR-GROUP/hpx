@@ -17,6 +17,8 @@
 
 #include <boost/mpl/bool.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 // TODO: add branch prediction and function heat
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -152,7 +154,8 @@ namespace hpx { namespace threads { namespace policies
     private:
         thread_queue<true> queue_;                ///< this manages all the threads
     };
-
 }}}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

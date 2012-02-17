@@ -38,7 +38,8 @@ namespace hpx { namespace performance_counters { namespace server
 
             static boost::int64_t call(accumulator_type& accum)
             {
-                return boost::accumulators::mean(accum);
+                return static_cast<boost::int64_t>(
+                    boost::accumulators::mean(accum));
             }
         };
 
@@ -54,7 +55,8 @@ namespace hpx { namespace performance_counters { namespace server
 
             static boost::int64_t call(accumulator_type& accum)
             {
-                return (boost::accumulators::max)(accum);
+                return static_cast<boost::int64_t>(
+                    (boost::accumulators::max)(accum));
             }
         };
 
@@ -70,7 +72,8 @@ namespace hpx { namespace performance_counters { namespace server
 
             static boost::int64_t call(accumulator_type& accum)
             {
-                return (boost::accumulators::min)(accum);
+                return static_cast<boost::int64_t>(
+                    (boost::accumulators::min)(accum));
             }
         };
     }

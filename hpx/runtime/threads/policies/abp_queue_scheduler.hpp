@@ -20,6 +20,8 @@
 #include <boost/atomic.hpp>
 #include <boost/mpl/bool.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 // TODO: add branch prediction and function heat
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -304,6 +306,8 @@ private:
 };
 
 }}}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif // HPX_D7E5D248_4886_4F46_AA1F_36D81397E5D5
 

@@ -23,6 +23,8 @@
 #include <boost/atomic.hpp>
 #include <boost/mpl/bool.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 // TODO: add branch prediction and function heat
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -637,5 +639,7 @@ namespace hpx { namespace threads { namespace policies
         bool numa_sensitive_;
     };
 }}}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif
