@@ -12,7 +12,6 @@
 #include <hpx/lcos/promise.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/agas/remote_interface.hpp>
 
 #include <tests/correctness/agas/components/stubs/managed_refcnt_checker.hpp>
 

@@ -12,7 +12,6 @@
 #include <hpx/lcos/promise.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/agas/remote_interface.hpp>
 
 #include <tests/correctness/agas/components/stubs/simple_refcnt_checker.hpp>
 
@@ -77,7 +76,7 @@ struct simple_refcnt_monitor
 
     bool ready()
     {
-        // Flush pending reference counting operations on the target locality. 
+        // Flush pending reference counting operations on the target locality.
         agas::garbage_collect(locality_);
 
         return flag_.ready();
@@ -90,7 +89,7 @@ struct simple_refcnt_monitor
         Duration const& d
         )
     {
-        // Flush pending reference counting operations on the target locality. 
+        // Flush pending reference counting operations on the target locality.
         agas::garbage_collect(locality_);
 
         // Schedule a wakeup.

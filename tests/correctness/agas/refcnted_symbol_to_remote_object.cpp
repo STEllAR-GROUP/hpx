@@ -7,7 +7,6 @@
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/agas/remote_interface.hpp>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
