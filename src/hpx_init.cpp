@@ -105,6 +105,11 @@ namespace hpx { namespace detail
     // List the names of all registered performance counters.
     void list_counter_names()
     {
+        // print header
+        print("List of available counter instances");
+        print("(replace <*> below with the appropriate sequence number)");
+        print(std::string(72, '-'));
+
         // list all counter names
         performance_counters::discover_counter_types(&list_counter);
     }
@@ -141,6 +146,10 @@ namespace hpx { namespace detail
     // List the names of all registered performance counters.
     void list_counter_infos()
     {
+        // print header
+        print("Information about available counter instances");
+        print("(replace <*> below with the appropriate sequence number)");
+
         // list all counter information
         performance_counters::discover_counter_types(&list_counter_info);
     }

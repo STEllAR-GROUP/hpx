@@ -100,7 +100,8 @@ namespace performance_counters { namespace sine
         p.instancename_ = "instance#<*>";
         p.instanceindex_ = -1;
 
-        if (!f(i, ec) || ec)
+        status = get_counter_name(p, i.fullname_, ec);
+        if (!status_is_valid(status) || !f(i, ec) || ec)
             return false;
 
 //         boost::uint32_t last_locality = hpx::get_num_localities();
@@ -197,7 +198,7 @@ namespace performance_counters { namespace sine
               HPX_PERFORMANCE_COUNTER_V1,
               // We assume that valid counter names have the following scheme:
               //
-              //  /sine(locality#<locality_id>/instance#<instance_id>)/immediate/implicit
+              //  /sine(locality#<locality_id>/instance#<instance_id>)/immediate/explicit
               //
               // where '<locality_id>' is the number of the locality the
               // counter has to be instantiated on and '<instance_id>' is the

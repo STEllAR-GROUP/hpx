@@ -46,7 +46,8 @@ namespace hpx { namespace performance_counters
         p.instancename_ = "total";
         p.instanceindex_ = -1;
 
-        if (!f(i, ec) || ec)
+        status = get_counter_name(p, i.fullname_, ec);
+        if (!status_is_valid(status) || !f(i, ec) || ec)
             return false;
 
 //         boost::uint32_t last_locality = get_num_localities();
@@ -85,7 +86,8 @@ namespace hpx { namespace performance_counters
         p.instancename_ = "worker-thread#<*>";
         p.instanceindex_ = -1;
 
-        if (!f(i, ec) || ec)
+        status = get_counter_name(p, i.fullname_, ec);
+        if (!status_is_valid(status) || !f(i, ec) || ec)
             return false;
 
 //         boost::uint32_t last_locality = get_num_localities();

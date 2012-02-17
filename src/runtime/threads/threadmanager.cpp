@@ -947,7 +947,8 @@ namespace hpx { namespace threads
         p.instancename_ = "allocator#<*>";
         p.instanceindex_ = -1;
 
-        if (!f(i, ec) || ec)
+        status = get_counter_name(p, i.fullname_, ec);
+        if (!status_is_valid(status) || !f(i, ec) || ec)
             return false;
 
 //         boost::uint32_t last_locality = get_locality_id();
