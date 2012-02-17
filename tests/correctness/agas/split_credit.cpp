@@ -5,8 +5,9 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/util/lightweight_test.hpp>
+#include <hpx/include/util.hpp>
 #include <hpx/include/plain_actions.hpp>
+#include <hpx/include/lcos.hpp>
 
 #include <tests/correctness/agas/components/simple_refcnt_checker.hpp>
 #include <tests/correctness/agas/components/managed_refcnt_checker.hpp>
@@ -55,10 +56,10 @@ void hpx_test_main(
 
         cout << "  " << object.get_gid() << " : "
                      << object.get_gid().get_credit() << "\n"
-             << "  " << g0 << " : " 
+             << "  " << g0 << " : "
                      << g0.get_credit() << "\n"
              << "  " << g1 << " : "
-                     << g1.get_credit() << "\n" << flush; 
+                     << g1.get_credit() << "\n" << flush;
     }
 }
 
