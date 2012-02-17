@@ -148,10 +148,9 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
-            runtime_mode locality_mode, init_scheduler_type const& init,
-            std::string const& hpx_ini_file,
-            std::vector<std::string> const& cmdline_ini_defs)
-      : runtime(agas_client_, hpx_ini_file, cmdline_ini_defs),
+            util::runtime_configuration& rtcfg,
+            runtime_mode locality_mode, init_scheduler_type const& init)
+      : runtime(agas_client_, rtcfg),
         mode_(locality_mode), result_(0),
         io_pool_(boost::bind(&runtime_impl::init_tss, This()),
             boost::bind(&runtime_impl::deinit_tss, This()), "io_pool"),

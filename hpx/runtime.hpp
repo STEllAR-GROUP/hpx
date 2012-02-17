@@ -51,11 +51,8 @@ namespace hpx
 
         /// construct a new instance of a runtime
         runtime(naming::resolver_client& agas_client,
-                std::string const& hpx_ini_file = "",
-                std::vector<std::string> const& cmdline_ini_defs
-                    = std::vector<std::string>())
-          : ini_(util::detail::get_logging_data(), hpx_ini_file,
-                 cmdline_ini_defs),
+                util::runtime_configuration& rtcfg)
+          : ini_(rtcfg),
             instance_number_(++instance_number_counter_),
             stopped_(true)
         {
@@ -187,8 +184,7 @@ namespace hpx
         on_exit_type on_exit_functions_;
         boost::mutex on_exit_functions_mtx_;
 
-        util::runtime_configuration ini_;
-
+        util::runtime_configuration& ini_;
         boost::shared_ptr<performance_counters::registry> counters_;
 
         long instance_number_;
@@ -233,11 +229,9 @@ namespace hpx
         ///
         /// \param locality_mode  [in] This is the mode the given runtime
         ///                       instance should be executed in.
-        explicit runtime_impl(runtime_mode locality_mode = runtime_mode_console,
-            init_scheduler_type const& init = init_scheduler_type(),
-            std::string const& hpx_ini_file = "",
-            std::vector<std::string> const& cmdline_ini_defs =
-                std::vector<std::string>());
+        explicit runtime_impl(util::runtime_configuration& rtcfg,
+            runtime_mode locality_mode = runtime_mode_console,
+            init_scheduler_type const& init = init_scheduler_type());
 
         /// \brief The destructor makes sure all HPX runtime services are
         ///        properly shut down before exiting.

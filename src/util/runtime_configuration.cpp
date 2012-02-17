@@ -56,6 +56,31 @@ namespace hpx { namespace util
             "default_stack_size = ${HPX_DEFAULT_STACK_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_DEFAULT_STACK_SIZE) "}",
 
+            // predefine command line aliases
+            "[hpx.commandline]",
+            "-a = --agas",
+            "-c = --console",
+            "-h = --help",
+            "-I = --ini",
+            "-l = --localities",
+            "-p = --app-config",
+            "-q = --queuing",
+            "-r = --run-agas-server",
+            "-t = --threads",
+            "-v = --version",
+            "-w = --worker",
+            "-x = --hpx",
+            "-0 = --node=0",
+            "-1 = --node=1",
+            "-2 = --node=2",
+            "-3 = --node=3",
+            "-4 = --node=4",
+            "-5 = --node=5",
+            "-6 = --node=6",
+            "-7 = --node=7",
+            "-8 = --node=8",
+            "-9 = --node=9",
+
             "[hpx.agas]",
             "address = ${HPX_AGAS_SERVER_ADDRESS:" HPX_INITIAL_IP_ADDRESS "}",
             "port = ${HPX_AGAS_SERVER_PORT:"
@@ -100,11 +125,12 @@ namespace hpx { namespace util
         ini.parse("static defaults", lines);
     }
 
-    void post_initialize_ini(section& ini, std::string const& hpx_ini_file = "",
-        std::vector<std::string> const& cmdline_ini_defs = std::vector<std::string>())
+    void post_initialize_ini(section& ini, std::string const& hpx_ini_file,
+        std::vector<std::string> const& cmdline_ini_defs)
     {
         // add explicit configuration information if its provided
-        util::init_ini_data_base(ini, hpx_ini_file);
+        if (!hpx_ini_file.empty())
+            util::init_ini_data_base(ini, hpx_ini_file);
 
         // let the command line override the config file.
         if (!cmdline_ini_defs.empty())
@@ -136,7 +162,6 @@ namespace hpx { namespace util
     runtime_configuration::runtime_configuration()
     {
         pre_initialize_ini(*this);
-        post_initialize_ini(*this);
 
         // set global config options
 #if HPX_USE_ITT == 1
@@ -146,19 +171,40 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    runtime_configuration::runtime_configuration(
-        std::vector<std::string> const& prefill,
-        std::string const& hpx_ini_file_,
-        std::vector<std::string> const& cmdline_ini_defs_)
-        : hpx_ini_file(hpx_ini_file_)
-        , cmdline_ini_defs(cmdline_ini_defs_)
+    void runtime_configuration::reconfigure(
+        std::string const& hpx_ini_file_)
     {
+        hpx_ini_file = hpx_ini_file_;
+
         pre_initialize_ini(*this);
 
+        std::vector<std::string> const& prefill =
+            util::detail::get_logging_data();
         if (!prefill.empty())
             this->parse("static prefill defaults", prefill);
 
-        post_initialize_ini(*this, hpx_ini_file_, cmdline_ini_defs_);
+        post_initialize_ini(*this, hpx_ini_file, cmdline_ini_defs);
+
+        // set global config options
+#if HPX_USE_ITT == 1
+        use_ittnotify_api = get_itt_notify_mode();
+#endif
+        threads::default_stacksize = get_default_stack_size();
+    }
+
+    void runtime_configuration::reconfigure(
+        std::vector<std::string> const& cmdline_ini_defs_)
+    {
+        cmdline_ini_defs = cmdline_ini_defs_;
+
+        pre_initialize_ini(*this);
+
+        std::vector<std::string> const& prefill =
+            util::detail::get_logging_data();
+        if (!prefill.empty())
+            this->parse("static prefill defaults", prefill);
+
+        post_initialize_ini(*this, hpx_ini_file, cmdline_ini_defs);
 
         // set global config options
 #if HPX_USE_ITT == 1

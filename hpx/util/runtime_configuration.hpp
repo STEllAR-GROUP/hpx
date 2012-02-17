@@ -29,10 +29,14 @@ namespace hpx { namespace util
     public:
         // initialize and load configuration information
         runtime_configuration();
-        runtime_configuration(std::vector<std::string> const& prefill,
-                              std::string const& hpx_ini_file_ = "",
-                              std::vector<std::string> const& cmdline_ini_defs_
-                                  = std::vector<std::string>());
+
+        // re-initialize all entries based on the additional information from
+        // the given configuration file
+        void reconfigure(std::string const& ini_file);
+
+        // re-initialize all entries based on the additional information from
+        // any explicit command line options
+        void reconfigure(std::vector<std::string> const& ini_defs);
 
         void load_components();
 

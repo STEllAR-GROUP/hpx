@@ -22,6 +22,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // parse the command line
     HPX_API_EXPORT bool parse_commandline(
+        hpx::util::section const& rtcfg,
         boost::program_options::options_description const& app_options,
         std::string const& cmdline, boost::program_options::variables_map& vm,
         commandline_error_mode error_mode = return_on_error,
@@ -81,6 +82,7 @@ namespace hpx { namespace util
     ///                               be unique, alternatively: -1, -2, etc.)
     ///</code>
     HPX_API_EXPORT bool parse_commandline(
+        hpx::util::section const& rtcfg,
         boost::program_options::options_description const& app_options,
         int argc, char *argv[], boost::program_options::variables_map& vm,
         commandline_error_mode error_mode = return_on_error,

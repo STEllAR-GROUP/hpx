@@ -5,6 +5,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime.hpp>
+#include <hpx/util/ini.hpp>
 #include <hpx/util/parse_command_line.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
@@ -24,31 +25,6 @@ namespace hpx { namespace util
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
-        // Additional command line parser which interprets '@something' as an
-        // option "options-file" with the value "something". Additionally we
-        // map any option -N (where N is a integer) to --node=N.
-        inline std::pair<std::string, std::string>
-        option_parser(std::string const& s)
-        {
-            if ('@' == s[0])
-                return std::make_pair(std::string("options-file"), s.substr(1));
-
-            if ('-' == s[0] && s.size() > 1 && std::isdigit(s[1])) {
-                try {
-                    // test, whether next argument is an integer
-                    boost::lexical_cast<std::size_t>(s.substr(1));
-                    return std::make_pair(std::string("node"), s.substr(1));
-                }
-                catch (boost::bad_lexical_cast const&) {
-                    ;   // ignore
-                }
-            }
-            return std::pair<std::string, std::string>();
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        // Read all options from a given config file, parse and add them to the
-        // given variables_map
         inline std::string
         trim_whitespace (std::string const &s)
         {
@@ -62,6 +38,73 @@ namespace hpx { namespace util
             return s.substr(first, last - first + 1);
         }
 
+        ///////////////////////////////////////////////////////////////////////
+        // Handle aliasing of command line options based on information stored
+        // in the ini-configuration
+        std::pair<std::string, std::string> handle_aliasing(
+            util::section const& ini, std::string const& option)
+        {
+            std::pair<std::string, std::string> result;
+
+            std::string opt(trim_whitespace(option));
+            if (opt.size() < 2 || !(opt[0] == '-' && opt[1] != '-'))
+                return result;
+
+            util::section const* sec = ini.get_section("hpx.commandline");
+            if (NULL == sec)
+                return result;     // no alias mappings are defined
+
+            // we found a shortcut option, try to find mapping
+            std::string k(opt.substr(0, 2));
+            if (!sec->has_entry(k))
+                return result;     // no alias for this option defined
+
+            std::string expand_to = trim_whitespace(sec->get_entry(k, ""));
+            if (expand_to.empty() || expand_to.size() < 2)
+                return result;     // no sensible alias is defined for this option
+
+            if (expand_to.substr(0, 2) != "--")
+                return result;
+            expand_to.erase(0, 2);
+
+            std::string::size_type p = expand_to.find_first_of('=');
+            if (p != std::string::npos) {
+                // the option defines its own value
+                std::string o(trim_whitespace(expand_to.substr(0, p)));
+                std::string v(trim_whitespace(expand_to.substr(p+1)));
+                result = std::make_pair(o, v);
+            }
+            else {
+                result = std::make_pair(expand_to, opt.substr(2));
+            }
+
+            return result;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // Additional command line parser which interprets '@something' as an
+        // option "options-file" with the value "something". Additionally we
+        // resolve defined command line option aliases.
+        struct option_parser
+        {
+            option_parser(util::section const& ini)
+              : ini_(ini)
+            {}
+
+            std::pair<std::string, std::string> operator()(std::string const& s) const
+            {
+                if ('@' == s[0])
+                    return std::make_pair(std::string("options-file"), s.substr(1));
+
+                return handle_aliasing(ini_, s);
+            }
+
+            util::section const& ini_;
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        // Read all options from a given config file, parse and add them to the
+        // given variables_map
         bool read_config_file_options(std::string const &filename,
             boost::program_options::options_description const &desc,
             boost::program_options::variables_map &vm, bool may_fail = false)
@@ -166,6 +209,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // parse the command line
     bool parse_commandline(
+        util::section const& rtcfg,
         boost::program_options::options_description const& app_options,
         int argc, char *argv[], boost::program_options::variables_map& vm,
         commandline_error_mode error_mode,
@@ -185,10 +229,10 @@ namespace hpx { namespace util
             options_description cmdline_options(
                 "HPX options (allowed on command line only)");
             cmdline_options.add_options()
-                ("help,h", value<std::string>()->implicit_value("minimal"),
+                ("help", value<std::string>()->implicit_value("minimal"),
                     "print out program usage (default: this message), possible "
                     "values: 'full' (additionally prints options from components)")
-                ("version,v", "print out HPX version and copyright information")
+                ("version", "print out HPX version and copyright information")
                 ("options-file", value<std::vector<std::string> >()->composing(),
                     "specify a file containing command line options "
                     "(alternatively: @filepath)")
@@ -201,8 +245,8 @@ namespace hpx { namespace util
             switch (mode) {
             case runtime_mode_default:
                 hpx_options.add_options()
-                    ("worker,w", "run this instance in worker mode")
-                    ("console,c", "run this instance in console mode")
+                    ("worker", "run this instance in worker mode")
+                    ("console", "run this instance in console mode")
                     ("connect", "run this instance in worker mode, but connecting late")
                 ;
                 break;
@@ -214,8 +258,8 @@ namespace hpx { namespace util
                 // worker mode, silently ignore the worker option for
                 // hpx_pbs compatibility.
                 hidden_options.add_options()
-                    ("worker,w", "run this instance in worker mode")
-                    ("console,c", "run this instance in console mode")
+                    ("worker", "run this instance in worker mode")
+                    ("console", "run this instance in console mode")
                     ("connect", "run this instance in worker mode, but connecting late")
                 ;
                 break;
@@ -227,16 +271,16 @@ namespace hpx { namespace util
 
             // general options definitions
             hpx_options.add_options()
-                ("run-agas-server,r",
+                ("run-agas-server",
                   "run AGAS server as part of this runtime instance")
                 ("run-hpx-main",
                   "run the hpx_main function, regardless of locality mode")
-                ("agas,a", value<std::string>(),
+                ("agas", value<std::string>(),
                   "the IP address the AGAS server is running on, "
                   "expected format: `address:port' (default: "
                   "127.0.0.1:7910)")
                 ("run-agas-server-only", "run only the AGAS server")
-                ("hpx,x", value<std::string>(),
+                ("hpx", value<std::string>(),
                   "the IP address the HPX parcelport is listening on, "
                   "expected format: `address:port' (default: "
                   "127.0.0.1:7910)")
@@ -255,12 +299,12 @@ namespace hpx { namespace util
                 ("iftransform", value<std::string>(),
                   "sed-style search and replace (s/search/replace/) used to "
                   "transform host names to the proper network interconnect")
-                ("localities,l", value<std::size_t>(),
+                ("localities", value<std::size_t>(),
                   "the number of localities to wait for at application "
                   "startup (default: 1)")
                 ("node", value<std::size_t>(),
                   "number of the node this locality is run on "
-                  "(must be unique, alternatively: -1, -2, etc.)")
+                  "(must be unique, alternatively: -0, -1, ..., -9)")
 #if defined(HPX_HAVE_HWLOC)
                 ("pu-offset", value<std::size_t>(),
                   "the first processing unit this instance of HPX should be "
@@ -269,32 +313,32 @@ namespace hpx { namespace util
                   "the step between used processing unit numbers for this "
                   "instance of HPX (default: 1)")
 #endif
-                ("threads,t", value<std::size_t>(),
+                ("threads", value<std::size_t>(),
                   "the number of operating system threads to dedicate as "
                   "shepherd threads for this HPX locality (default: 1)")
-                ("queueing,q", value<std::string>(),
+                ("queuing", value<std::string>(),
                   "the queue scheduling policy to use, options are 'global/g', "
                   "'local/l', 'priority_local/pr', 'abp/a', 'priority_abp', "
                   "'hierarchy/h', and 'periodic/pe' (default: priority_local/p)")
                 ("hierarchy-arity", value<std::size_t>(),
                   "the arity of the of the thread queue tree, valid for "
-                   "--queueing=hierarchy only (default: 2)")
+                   "--queuing=hierarchy only (default: 2)")
                 ("high-priority-threads", value<std::size_t>(),
                   "the number of operating system threads maintaining a high "
                   "priority queue (default: number of OS threads), valid for "
-                  "--queueing=priority_local only")
+                  "--queuing=priority_local only")
                 ("numa-sensitive",
                   "makes the priority_local scheduler NUMA sensitive, valid for "
-                  "--queueing=priority_local only")
+                  "--queuing=priority_local only")
             ;
 
             options_description config_options("HPX configuration options");
             config_options.add_options()
-                ("app-config,p", value<std::string>(),
+                ("app-config", value<std::string>(),
                   "load the specified application configuration (ini) file")
                 ("hpx-config", value<std::string>()->default_value(""),
                   "load the specified hpx configuration (ini) file")
-                ("ini,I", value<std::vector<std::string> >()->composing(),
+                ("ini", value<std::vector<std::string> >()->composing(),
                   "add a configuration definition to the default runtime "
                   "configuration")
                 ("exit", "exit after configuring the runtime")
@@ -353,7 +397,7 @@ namespace hpx { namespace util
                     command_line_parser(argc, argv)
                         .options(desc_cmdline)
                         .style(unix_style)
-                        .extra_parser(detail::option_parser),
+                        .extra_parser(detail::option_parser(rtcfg)),
                     error_mode
                 ).run()
             );
@@ -400,6 +444,7 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     bool parse_commandline(
+        util::section const& rtcfg,
         boost::program_options::options_description const& app_options,
         std::string const& cmdline, boost::program_options::variables_map& vm,
         commandline_error_mode error_mode, hpx::runtime_mode mode,
@@ -418,7 +463,7 @@ namespace hpx { namespace util
             argv[i] = const_cast<char*>(args[i].c_str());
 
         return parse_commandline(
-            app_options, static_cast<int>(args.size()), argv.get(), vm,
+            rtcfg, app_options, static_cast<int>(args.size()), argv.get(), vm,
             error_mode, mode, visible, unregistered_options);
     }
 
@@ -439,11 +484,11 @@ namespace hpx { namespace util
         //     cmd_line=....
         //
         std::string cmdline;
-        hpx::util::runtime_configuration& cfg = hpx::get_runtime().get_config();
+        hpx::util::section& cfg = hpx::get_runtime().get_config();
         if (cfg.has_entry("hpx.cmd_line"))
             cmdline = cfg.get_entry("hpx.cmd_line", "");
 
-        return parse_commandline(app_options, cmdline, vm, allow_unregistered);
+        return parse_commandline(cfg, app_options, cmdline, vm, allow_unregistered);
     }
 
     ///////////////////////////////////////////////////////////////////////////
