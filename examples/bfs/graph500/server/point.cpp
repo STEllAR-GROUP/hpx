@@ -75,11 +75,11 @@ namespace graph500 { namespace server
         std::size_t size = (std::size_t) floor(overlap*nedges);
         local_edges_.resize(size);
 
-        std::vector<std::size_t> edges;
+        std::vector<int64_t> edges;
         edges.resize(size);
 
         bool found;
-        std::size_t edge;
+        int64_t edge;
         for ( std::size_t i=0;i<edges.size();i++) {
           while(1) {
             edge = rand() % end_idx;
@@ -111,14 +111,14 @@ namespace graph500 { namespace server
       }
 
       // find the biggest node or neighbor
-      std::size_t maxnode = 0;
+      int64_t maxnode = 0;
       minnode_ = 99999;
       for (std::size_t i=0;i<local_edges_.size();i++) {
-        if ( (std::size_t) local_edges_[i].v0 > maxnode ) maxnode = local_edges_[i].v0;
-        if ( (std::size_t) local_edges_[i].v1 > maxnode ) maxnode = local_edges_[i].v1;
+        if ( local_edges_[i].v0 > maxnode ) maxnode = local_edges_[i].v0;
+        if ( local_edges_[i].v1 > maxnode ) maxnode = local_edges_[i].v1;
 
-        if ( (std::size_t) local_edges_[i].v0 < minnode_ ) minnode_ = local_edges_[i].v0;
-        if ( (std::size_t) local_edges_[i].v1 < minnode_ ) minnode_ = local_edges_[i].v1;
+        if ( local_edges_[i].v0 < minnode_ ) minnode_ = local_edges_[i].v0;
+        if ( local_edges_[i].v1 < minnode_ ) minnode_ = local_edges_[i].v1;
       }
       maxnode++;
       N_ = maxnode-minnode_;
@@ -127,8 +127,8 @@ namespace graph500 { namespace server
       nedge_bins_.resize(N_);
 
       for (std::size_t i=0;i<local_edges_.size();i++) {
-        std::size_t node = local_edges_[i].v0;
-        std::size_t neighbor = local_edges_[i].v1;
+        int64_t node = local_edges_[i].v0;
+        int64_t neighbor = local_edges_[i].v1;
         if ( node != neighbor ) {
           neighbors_[node-minnode_].push_back(neighbor);
           neighbors_[neighbor-minnode_].push_back(node);
@@ -155,7 +155,7 @@ namespace graph500 { namespace server
                 std::vector<hpx::naming::id_type> const& duplicate_components)
     {
       hpx::lcos::local_mutex::scoped_lock l(mtx_);
-      duplicates_[j] = duplicate_components;
+      duplicates_[j-minnode_] = duplicate_components;
       return;
     }
 
@@ -176,24 +176,24 @@ namespace graph500 { namespace server
     void point::bfs()
     {
       for (std::size_t step=0;step<bfs_roots_.size();step++) {
-        std::size_t root_node = bfs_roots_[step];
+        int64_t root_node = bfs_roots_[step];
 
-        if ( root_node - minnode_ >= parent_.isize() ) return; // the root node is not on this partition
+        if ( (std::size_t) (root_node - minnode_) >= parent_.isize() ) return; // the root node is not on this partition
 
-        std::queue<std::size_t> q;
+        std::queue<int64_t> q;
         parent_(root_node-minnode_,step,0).parent = root_node;
         parent_(root_node-minnode_,step,0).level = 0;
         q.push(root_node);
 
         while (!q.empty()) {
-          std::size_t node = q.front(); q.pop();
+          int64_t node = q.front(); q.pop();
   
-          std::vector<std::size_t> const& node_neighbors = neighbors_[node-minnode_];
-          std::vector<std::size_t>::const_iterator end = node_neighbors.end();
-          for (std::vector<std::size_t>::const_iterator it = node_neighbors.begin();
+          std::vector<int64_t> const& node_neighbors = neighbors_[node-minnode_];
+          std::vector<int64_t>::const_iterator end = node_neighbors.end();
+          for (std::vector<int64_t>::const_iterator it = node_neighbors.begin();
                        it != end; ++it)
           {
-            std::size_t& node_parent = parent_(*it-minnode_,step,0).parent;
+            int64_t& node_parent = parent_(*it-minnode_,step,0).parent;
             if (!node_parent) {
               node_parent = node;
               parent_(*it-minnode_,step,0).level = parent_(node-minnode_,step,0).level + 1;

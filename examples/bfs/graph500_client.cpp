@@ -64,8 +64,9 @@ bool whohasthisedge_callback(int64_t j,std::vector<bool> const& has_edge,
 
   std::vector<hpx::lcos::promise<void> > send_duplicates_phase;
   for (std::size_t i=0;i<duplicate.size();i++) {
+    // j+1 since edge number 0 is a special number
     send_duplicates_phase.push_back(
-             graph500::stubs::point::receive_duplicates_async(duplicate[i],j,duplicate));
+             graph500::stubs::point::receive_duplicates_async(duplicate[i],j+1,duplicate));
   }
   hpx::lcos::wait(send_duplicates_phase);
 

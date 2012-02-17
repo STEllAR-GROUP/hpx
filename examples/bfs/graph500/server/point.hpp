@@ -37,7 +37,7 @@ struct nodedata
 struct leveldata
 {
   std::size_t level;
-  std::size_t parent;
+  int64_t parent;
 
   leveldata() {}
 
@@ -210,11 +210,11 @@ namespace graph500 { namespace server
     private:
         hpx::lcos::local_mutex mtx_;
         std::size_t idx_;
-        std::size_t N_;
-        std::vector< std::vector<std::size_t> > neighbors_;
+        int64_t N_;
+        std::vector< std::vector<int64_t> > neighbors_;
         bfsg::array<leveldata> parent_;
         std::vector< std::vector<hpx::naming::id_type> > duplicates_;
-        std::size_t minnode_;
+        int64_t minnode_;
         std::vector<packed_edge> local_edges_;
         std::vector<std::size_t> nedge_bins_;
         std::vector<int64_t> bfs_roots_;
