@@ -168,7 +168,7 @@ naming::id_type set_initialdata (int i)
     components::access_memory_block<data> val(
                 components::stubs::memory_block::checkout(result));
 
-    int locality = get_prefix_from_id( here );
+    int locality = get_locality_id_from_id( here );
 
     val->val_ = i;
     std::cout << " locality : " << locality << " index : " << i << std::endl;
@@ -184,7 +184,7 @@ void update (naming::id_type in)
                 components::stubs::memory_block::checkout(in));
 
     naming::id_type here = applier::get_applier().get_runtime_support_gid();
-    int locality = get_prefix_from_id( here );
+    int locality = get_locality_id_from_id( here );
     std::cout << " locality update " << locality << std::endl;
 
     result->val_ += 1;

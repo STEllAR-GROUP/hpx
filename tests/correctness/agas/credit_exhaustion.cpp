@@ -23,7 +23,7 @@ using hpx::find_here;
 
 using hpx::naming::id_type;
 using hpx::naming::get_management_type_name;
-using hpx::naming::get_prefix_from_id;
+using hpx::naming::get_locality_id_from_id;
 
 using hpx::components::component_type;
 using hpx::components::get_component_type;
@@ -74,7 +74,7 @@ void split(
 
     id_type const here = find_here();
 
-    if (get_prefix_from_id(from) == get_prefix_from_id(here)) 
+    if (get_locality_id_from_id(from) == get_locality_id_from_id(here)) 
         throw std::logic_error("infinite recursion detected, split was "
                                "invoked locally");
 

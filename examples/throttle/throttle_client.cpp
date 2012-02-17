@@ -27,7 +27,7 @@ int hpx_main(variables_map& vm)
 {
     try {
         std::cout << ( boost::format("prefix: %d")
-                     % hpx::naming::get_prefix_from_id(hpx::find_here()))
+                     % hpx::naming::get_locality_id_from_id(hpx::find_here()))
                   << std::endl;
 
         // Try to connect to existing throttle instance, create a new one if

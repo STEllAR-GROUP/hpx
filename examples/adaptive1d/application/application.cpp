@@ -101,7 +101,7 @@ int generate_initial_data(stencil_data* val, int item, int maxitems, int row,
       char fname[80];
       applier::applier& appl = applier::get_applier();
       naming::id_type this_prefix = appl.get_runtime_support_gid();
-      int locality = get_prefix_from_id( this_prefix );
+      int locality = get_locality_id_from_id( this_prefix );
       std::vector<double> xcoord,value;
       xcoord.resize(val->value_.size());
       value.resize(val->value_.size());
@@ -341,7 +341,7 @@ int rkupdate3(std::vector<access_memory_block<stencil_data> > &val,
       char fname[80];
       applier::applier& appl = applier::get_applier();
       naming::id_type this_prefix = appl.get_runtime_support_gid();
-      int locality = get_prefix_from_id( this_prefix );
+      int locality = get_locality_id_from_id( this_prefix );
       std::vector<double> xcoord,value;
       xcoord.resize(val[3]->value_.size());
       value.resize(val[3]->value_.size());
@@ -552,7 +552,7 @@ int rkupdate2a(std::vector<access_memory_block<stencil_data> > &val,
       char fname[80];
       applier::applier& appl = applier::get_applier();
       naming::id_type this_prefix = appl.get_runtime_support_gid();
-      int locality = get_prefix_from_id( this_prefix );
+      int locality = get_locality_id_from_id( this_prefix );
       std::vector<double> xcoord,value;
       xcoord.resize(val[2]->value_.size());
       value.resize(val[2]->value_.size());
@@ -764,7 +764,7 @@ int rkupdate2b(std::vector<access_memory_block<stencil_data> > &val,
       char fname[80];
       applier::applier& appl = applier::get_applier();
       naming::id_type this_prefix = appl.get_runtime_support_gid();
-      int locality = get_prefix_from_id( this_prefix );
+      int locality = get_locality_id_from_id( this_prefix );
       std::vector<double> xcoord,value;
       xcoord.resize(val[2]->value_.size());
       value.resize(val[2]->value_.size());
@@ -967,7 +967,7 @@ int rkupdate1(std::vector<access_memory_block<stencil_data> > &val,
       char fname[80];
       applier::applier& appl = applier::get_applier();
       naming::id_type this_prefix = appl.get_runtime_support_gid();
-      int locality = get_prefix_from_id( this_prefix );
+      int locality = get_locality_id_from_id( this_prefix );
       std::vector<double> xcoord,value;
       xcoord.resize(val[1]->value_.size());
       value.resize(val[1]->value_.size());

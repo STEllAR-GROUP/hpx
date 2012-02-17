@@ -106,14 +106,14 @@ int hpx_main(variables_map & vm)
             
             if (vm.count("csv"))
                 cout << ( boost::format("%1%,%2%,%3%,%4%\n")
-                        % get_prefix_from_id(prefix)
+                        % get_locality_id_from_id(prefix)
                         % count
                         % duration
                         % function_time)
                      << flush;
             else
                 cout << ( boost::format("Locality %1%: invoked %2% futures in %3% seconds (average workload %4% s)\n")
-                        % get_prefix_from_id(prefix)
+                        % get_locality_id_from_id(prefix)
                         % count
                         % duration
                         % function_time)
