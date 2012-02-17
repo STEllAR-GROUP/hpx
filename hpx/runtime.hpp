@@ -25,6 +25,7 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
+#include <hpx/util/papi_threads.hpp>
 #include <boost/foreach.hpp>
 #include <boost/detail/atomic_count.hpp>
 
@@ -134,6 +135,12 @@ namespace hpx
             return *counters_;
         }
 
+        /// \brief Return a reference to the internal PAPI thread manager
+        util::papi_thread_mapper& get_papi_thread_mapper()
+        {
+            return papi_support;
+        }
+
         /// \brief Install all performance counters related to this runtime
         ///        instance
         void register_counter_types();
@@ -186,6 +193,9 @@ namespace hpx
 
         long instance_number_;
         static boost::atomic<int> instance_number_counter_;
+
+        // PAPI support requires to register all threads with the library
+        util::papi_thread_mapper papi_support;
 
         bool stopped_;
     };

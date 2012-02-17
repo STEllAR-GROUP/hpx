@@ -488,6 +488,9 @@ namespace hpx
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::init_tss()
     {
+        // initialize PAPI
+        papi_support.register_thread();
+
         // initialize our TSS
         this->runtime::init_tss();
 
@@ -503,6 +506,9 @@ namespace hpx
 
         // reset our TSS
         this->runtime::deinit_tss();
+
+        // reset PAPI support
+        papi_support.unregister_thread();
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
