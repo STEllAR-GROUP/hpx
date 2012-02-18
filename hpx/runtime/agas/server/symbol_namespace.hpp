@@ -14,12 +14,12 @@
 #include <boost/utility/binary.hpp>
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/actions/function.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/response.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/function.hpp>
 #include <hpx/lcos/local_mutex.hpp>
 
 namespace hpx { namespace agas
@@ -41,7 +41,7 @@ struct HPX_EXPORT symbol_namespace :
     typedef lcos::local_mutex mutex_type;
 
     // FIXME: This signature should use id_type, not gid_type
-    typedef hpx::actions::function<
+    typedef hpx::util::function<
         void(std::string const&, naming::gid_type const&)
     > iterate_names_function_type;
 

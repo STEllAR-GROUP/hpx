@@ -175,24 +175,6 @@ namespace hpx { namespace actions
         {
             return construct_thread_function(cont, lva);
         }
-
-        /// This \a get_thread_function will be invoked to retrieve the thread
-        /// function for an action which has to be invoked without continuations.
-        HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(naming::address::address_type lva,
-            arguments_type const& arg) const
-        {
-            return construct_thread_function(lva);
-        }
-
-        /// This \a get_thread_function will be invoked to retrieve the thread
-        /// function for an action which has to be invoked with continuations.
-        HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(continuation_type& cont,
-            naming::address::address_type lva, arguments_type const& arg) const
-        {
-            return construct_thread_function(cont, lva);
-        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -280,23 +262,6 @@ namespace hpx { namespace actions
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
             return data;
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const&)
-        {
-            return this->get_thread_init_data(lva, data);
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const&)
-        {
-            return this->get_thread_init_data(cont, lva, data);
         }
     };
 
@@ -399,23 +364,6 @@ namespace hpx { namespace actions
             data.priority = this->priority_;
             return data;
         }
-
-        threads::thread_init_data&
-        get_thread_init_data(naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const&)
-        {
-            return this->get_thread_init_data(lva, data);
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const&)
-        {
-            return this->get_thread_init_data(cont, lva, data);
-        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -513,20 +461,6 @@ namespace hpx { namespace actions
         HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
             naming::address::address_type lva) const
-        {
-            return construct_thread_function(cont, lva);
-        }
-
-        HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(naming::address::address_type lva,
-            arguments_type const& arg) const
-        {
-            return construct_thread_function(lva);
-        }
-
-        HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(continuation_type& cont,
-            naming::address::address_type lva, arguments_type const& arg) const
         {
             return construct_thread_function(cont, lva);
         }
@@ -634,23 +568,6 @@ namespace hpx { namespace actions
             data.priority = this->priority_;
             return data;
         }
-
-        threads::thread_init_data&
-        get_thread_init_data(naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const&)
-        {
-            return this->get_thread_init_data(lva, data);
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const&)
-        {
-            return this->get_thread_init_data(cont, lva, data);
-        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -752,23 +669,6 @@ namespace hpx { namespace actions
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
             return data;
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const&)
-        {
-            return this->get_thread_init_data(lva, data);
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const&)
-        {
-            return this->get_thread_init_data(cont, lva, data);
         }
     };
 

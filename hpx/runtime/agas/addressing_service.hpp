@@ -1117,7 +1117,7 @@ public:
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    bool iterateids(
+    bool iterate_ids(
         iterate_names_function_type const& f
       , error_code& ec = throws
         );

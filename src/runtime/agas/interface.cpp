@@ -286,5 +286,17 @@ void garbage_collect(
         ec = make_error_code(e.get_error(), e.what());
     }
 }
+
+/// \brief Return an id_type referring to the console locality.
+naming::id_type get_console_prefix(
+    error_code& ec
+    )
+{
+    naming::gid_type console;
+    naming::get_agas_client().get_console_prefix(console, ec);
+    if (ec) return naming::invalid_id;
+
+    return naming::id_type(console, naming::id_type::unmanaged);
+}
 }}
 

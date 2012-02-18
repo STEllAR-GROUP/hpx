@@ -315,7 +315,7 @@ bool addressing_service::get_console_prefix(
             return true;
         }
 
-        request req(symbol_ns_resolve, "/locality(console)");
+        request req(symbol_ns_resolve, std::string("/locality(console)"));
         response rep;
 
         if (is_bootstrap())
@@ -1281,7 +1281,7 @@ bool addressing_service::resolve_name(
 } // }}}
 
 /// Invoke the supplied hpx::function for every registered global name
-bool addressing_service::iterateids(
+bool addressing_service::iterate_ids(
     iterate_names_function_type const& f
   , error_code& ec
     )
@@ -1300,7 +1300,7 @@ bool addressing_service::iterateids(
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
             HPX_RETHROW_EXCEPTION(e.get_error()
-              , "addressing_service::iterateids"
+              , "addressing_service::iterate_ids"
               , e.what());
         }
         else {

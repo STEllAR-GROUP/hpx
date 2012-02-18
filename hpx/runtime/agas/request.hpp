@@ -20,13 +20,13 @@
 
 #include <hpx/exception.hpp>
 #include <hpx/util/serialize_sequence.hpp>
-#include <hpx/runtime/actions/function.hpp>
+#include <hpx/util/function.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 
-// The number of types that request's variant can represent.
+// The number of types that the request's variant can represent.
 #define HPX_AGAS_REQUEST_SUBTYPES 13
 
 namespace hpx { namespace agas
@@ -37,11 +37,11 @@ namespace hpx { namespace agas
 struct request
 {
   public:
-    typedef hpx::actions::function<
+    typedef hpx::util::function<
         void(std::string const&, naming::gid_type const&)
     > iterate_names_function_type;
 
-    typedef hpx::actions::function<
+    typedef hpx::util::function<
         void(std::string const&, components::component_type)
     > iterate_types_function_type;
 

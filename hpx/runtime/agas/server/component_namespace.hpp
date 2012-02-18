@@ -17,13 +17,13 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/runtime/actions/function.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/response.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
+#include <hpx/util/function.hpp>
 #include <hpx/lcos/local_mutex.hpp>
 
 namespace hpx { namespace agas
@@ -44,7 +44,7 @@ struct HPX_EXPORT component_namespace :
     // {{{ nested types
     typedef lcos::local_mutex mutex_type;
 
-    typedef hpx::actions::function<
+    typedef hpx::util::function<
         void(std::string const&, components::component_type)
     > iterate_types_function_type;
 

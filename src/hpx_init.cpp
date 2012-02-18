@@ -16,7 +16,6 @@
 
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
-#include <hpx/runtime/actions/function.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/policies/schedulers.hpp>
@@ -24,6 +23,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/stringstream.hpp>
+#include <hpx/util/function.hpp>
 
 #if !defined(BOOST_WINDOWS)
 #  include <signal.h>
@@ -73,6 +73,44 @@ HPX_REGISTER_PLAIN_ACTION_EX2(list_component_type_action, list_component_type_ac
 namespace hpx { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
+    // Functional wrapper for any action2
+    template <typename Action>
+    struct action_wrapper2
+    {
+        typedef typename boost::add_const<
+            typename Action::arguments_type
+        >::type arguments_type;
+
+        typedef typename
+            boost::fusion::result_of::at_c<arguments_type, 0>::type
+        arg1_type;
+        typedef typename
+            boost::fusion::result_of::at_c<arguments_type, 1>::type
+        arg2_type;
+
+        // default constructor is required for serialization
+        action_wrapper2()
+        {}
+
+        action_wrapper2(naming::id_type const& target)
+          : target_(target)
+        {}
+
+        void operator() (arg1_type s, arg2_type t) const
+        {
+            applier::apply<Action>(target_, s, t);
+        }
+
+        template <typename Archive>
+        void serialize(Archive& ar, unsigned /*version*/)
+        {
+            ar & target_;
+        }
+
+        naming::id_type target_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     // print string on the console
     void console_print(std::string const& name)
     {
@@ -108,7 +146,7 @@ namespace hpx { namespace detail
         // print header
         print("List of available counter instances");
         print("(replace <*> below with the appropriate sequence number)");
-        print(std::string(72, '-'));
+        print(std::string(78, '-'));
 
         // list all counter names
         performance_counters::discover_counter_types(&list_counter);
@@ -167,14 +205,12 @@ namespace hpx { namespace detail
 
     void list_symbolic_names()
     {
-        naming::gid_type console;
-        naming::get_agas_client().get_console_prefix(console);
+        print(std::string("List of all registered symbolic names:"));
+        print(std::string(78, '-'));
 
-        print(std::string("registered symbolic names"));
-
-        typedef void iter_func(std::string const&, naming::gid_type const&);
-        hpx::actions::function<iter_func> cb(new list_symbolic_name_action);
-        naming::get_agas_client().iterateids(cb);
+        naming::id_type console(agas::get_console_prefix());
+        naming::get_agas_client().iterate_ids(
+            action_wrapper2<list_symbolic_name_action>(console));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -187,14 +223,12 @@ namespace hpx { namespace detail
 
     void list_component_types()
     {
-        naming::gid_type console;
-        naming::get_agas_client().get_console_prefix(console);
+        print(std::string("List of all registered component types:"));
+        print(std::string(78, '-'));
 
-        print(std::string("registered component types"));
-
-        typedef void iter_func(std::string const&, components::component_type);
-        hpx::actions::function<iter_func> cb(new list_component_type_action);
-        naming::get_agas_client().iterate_types(cb);
+        naming::id_type console(agas::get_console_prefix());
+        naming::get_agas_client().iterate_types(
+            action_wrapper2<list_component_type_action>(console));
     }
 
     ///////////////////////////////////////////////////////////////////////////

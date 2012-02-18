@@ -161,6 +161,12 @@ HPX_EXPORT void garbage_collect(
     naming::id_type const& id
   , error_code& ec = throws
     );
+
+///////////////////////////////////////////////////////////////////////////////
+/// \brief Return an id_type referring to the console locality.
+HPX_EXPORT naming::id_type get_console_prefix(
+    error_code& ec = throws
+    );
 }}
 
 #endif // HPX_A55506A4_4AC7_4FD0_AB0D_ED0D1368FCC5

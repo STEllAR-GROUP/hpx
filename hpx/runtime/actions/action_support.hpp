@@ -88,7 +88,7 @@ namespace hpx { namespace actions
         template <typename Action>
         char const* get_action_name()
         {
-            /// If you encounter this assert whil compiling code, that means that
+            /// If you encounter this assert while compiling code, that means that
             /// you have a HPX_REGISTER_ACTION macro somewhere in a source file,
             /// but the header in which the action is defined misses a
             /// HPX_REGISTER_ACTION_DECLARATION
@@ -216,49 +216,6 @@ namespace hpx { namespace actions
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Result, typename Arguments>
-    struct signature;
-
-    template <typename Result>
-    struct signature<Result, boost::fusion::vector<> > : base_action
-    {
-        typedef boost::fusion::vector<> arguments_type;
-        typedef Result result_type;
-
-        virtual result_type execute_function(
-            naming::address::address_type lva) const = 0;
-
-        virtual HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(naming::address::address_type lva,
-            arguments_type const& args) const = 0;
-
-        virtual HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(continuation_type& cont,
-            naming::address::address_type lva,
-            arguments_type const& args) const = 0;
-
-        virtual threads::thread_init_data&
-        get_thread_init_data(naming::address::address_type lva,
-            threads::thread_init_data& data,
-            arguments_type const& args) = 0;
-
-        virtual threads::thread_init_data&
-        get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva,
-            threads::thread_init_data& data,
-            arguments_type const& args) = 0;
-
-    public:
-        /// serialization support
-        static void register_base()
-        {
-            util::void_cast_register_nonvirt<signature, base_action>();
-        }
-    };
-
-    #include <hpx/runtime/actions/signature_implementations.hpp>
-
-    ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
         // Figure out what priority the action has to be be associated with
@@ -291,6 +248,7 @@ namespace hpx { namespace actions
         };
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     /// \tparam Component         component type
     /// \tparam Action            action code
     /// \tparam Result            return type
@@ -300,7 +258,7 @@ namespace hpx { namespace actions
     template <typename Component, int Action, typename Result,
         typename Arguments, typename Derived,
         threads::thread_priority Priority>
-    class action : public signature<Result, Arguments>
+    class action : public base_action
     {
     public:
         typedef Component component_type;
@@ -471,9 +429,7 @@ namespace hpx { namespace actions
         /// serialization support
         static void register_base()
         {
-            util::void_cast_register_nonvirt<
-                action, signature<Result, Arguments> >();
-            signature<Result, Arguments>::register_base();
+            util::void_cast_register_nonvirt<action, base_action>();
         }
 
     private:

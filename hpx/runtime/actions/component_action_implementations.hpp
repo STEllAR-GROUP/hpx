@@ -191,22 +191,6 @@ namespace hpx { namespace actions
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
         }
 
-        HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(naming::address::address_type lva,
-            arguments_type const& arg) const
-        {
-            return construct_thread_function(lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
-        }
-
-        HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(continuation_type& cont,
-            naming::address::address_type lva, arguments_type const& arg) const
-        {
-            return construct_thread_function(cont, lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
-        }
-
     private:
         // serialization support
         friend class boost::serialization::access;
@@ -344,39 +328,6 @@ namespace hpx { namespace actions
             data.priority = this->priority_;
             return data;
         }
-
-        threads::thread_init_data&
-        get_thread_init_data(naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const& arg)
-        {
-            data.lva = lva;
-            data.func = this->construct_thread_function(lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
-            data.description = detail::get_action_name<derived_type>();
-            data.parent_id =
-                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
-            data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_;
-            return data;
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const& arg)
-        {
-            data.lva = lva;
-            data.func = this->construct_thread_function(cont, lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
-            data.description = detail::get_action_name<derived_type>();
-            data.parent_id =
-                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
-            data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_;
-            return data;
-        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -496,39 +447,6 @@ namespace hpx { namespace actions
             data.lva = lva;
             data.func = this->construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
-            data.description = detail::get_action_name<derived_type>();
-            data.parent_id =
-                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
-            data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_;
-            return data;
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const& arg)
-        {
-            data.lva = lva;
-            data.func = this->construct_thread_function(lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
-            data.description = detail::get_action_name<derived_type>();
-            data.parent_id =
-                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
-            data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_;
-            return data;
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const& arg)
-        {
-            data.lva = lva;
-            data.func = this->construct_thread_function(cont, lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
             data.description = detail::get_action_name<derived_type>();
             data.parent_id =
                 reinterpret_cast<threads::thread_id_type>(this->parent_id_);
@@ -673,23 +591,6 @@ namespace hpx { namespace actions
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
         }
 
-        ///
-        HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(naming::address::address_type lva,
-            arguments_type const& arg) const
-        {
-            return construct_thread_function(lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
-        }
-
-        HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(continuation_type& cont,
-            naming::address::address_type lva, arguments_type const& arg) const
-        {
-            return construct_thread_function(cont, lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
-        }
-
     private:
         // serialization support
         friend class boost::serialization::access;
@@ -826,39 +727,6 @@ namespace hpx { namespace actions
             data.priority = this->priority_;
             return data;
         }
-
-        threads::thread_init_data&
-        get_thread_init_data(naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const& arg)
-        {
-            data.lva = lva;
-            data.func = this->construct_thread_function(lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
-            data.description = detail::get_action_name<derived_type>();
-            data.parent_id =
-                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
-            data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_;
-            return data;
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const& arg)
-        {
-            data.lva = lva;
-            data.func = this->construct_thread_function(cont, lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
-            data.description = detail::get_action_name<derived_type>();
-            data.parent_id =
-                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
-            data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_;
-            return data;
-        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -986,39 +854,6 @@ namespace hpx { namespace actions
             data.lva = lva;
             data.func = this->construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
-            data.description = detail::get_action_name<derived_type>();
-            data.parent_id =
-                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
-            data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_;
-            return data;
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const& arg)
-        {
-            data.lva = lva;
-            data.func = this->construct_thread_function(lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
-            data.description = detail::get_action_name<derived_type>();
-            data.parent_id =
-                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
-            data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_;
-            return data;
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const& arg)
-        {
-            data.lva = lva;
-            data.func = this->construct_thread_function(cont, lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
             data.description = detail::get_action_name<derived_type>();
             data.parent_id =
                 reinterpret_cast<threads::thread_id_type>(this->parent_id_);
