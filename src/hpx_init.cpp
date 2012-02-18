@@ -37,6 +37,7 @@
 #include <boost/format.hpp>
 #include <boost/assign/std/vector.hpp>
 #include <boost/foreach.hpp>
+#include <boost/fusion/include/at_c.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
