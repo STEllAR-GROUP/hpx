@@ -46,7 +46,7 @@ addressing_service::addressing_service(
     create_big_boot_barrier(pp, ini_, runtime_type_);
 
     if (caching_)
-        gva_cache_.reserve(ini_.get_agas_gva_cache_size());
+        gva_cache_.reserve(ini_.get_agas_local_cache_size());
 
     if (service_type == service_mode_bootstrap)
         launch_bootstrap(pp, ini_);

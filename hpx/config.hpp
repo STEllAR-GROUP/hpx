@@ -90,8 +90,8 @@
 /// cache. This is just the initial size which may be adjusted depending on the
 /// load of the system, etc. It must be a minimum of 3 for AGAS v3
 /// bootstrapping.
-#if !defined(HPX_INITIAL_AGAS_GVA_CACHE_SIZE)
-#  define HPX_INITIAL_AGAS_GVA_CACHE_SIZE 256
+#if !defined(HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE)
+#  define HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE 256
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
