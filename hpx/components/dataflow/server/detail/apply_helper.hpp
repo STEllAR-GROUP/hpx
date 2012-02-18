@@ -6,6 +6,8 @@
 #ifndef HPX_LCOS_DATAFLOW_SERVER_DETAIL_APPLY_HELPER_HPP
 #define HPX_LCOS_DATAFLOW_SERVER_DETAIL_APPLY_HELPER_HPP
 
+#include <boost/fusion/include/at_c.hpp>
+
 namespace hpx { namespace lcos { namespace server { namespace detail
 {
     template <int N, typename Action>

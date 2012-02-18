@@ -13,6 +13,7 @@
 #include <list>
 
 #include <boost/foreach.hpp>
+#include <boost/fusion/include/at_c.hpp>
 
 namespace hpx { namespace agas
 {
@@ -655,7 +656,7 @@ response primary_namespace::change_credit_non_blocking(
         if (ec)
             return response();
 
-        kill_non_blocking(free_list, lower, upper, ec); 
+        kill_non_blocking(free_list, lower, upper, ec);
 
         if (ec)
             return response();
@@ -703,7 +704,7 @@ response primary_namespace::change_credit_sync(
         if (ec)
             return response();
 
-        kill_sync(free_list, lower, upper, ec); 
+        kill_sync(free_list, lower, upper, ec);
 
         if (ec)
             return response();

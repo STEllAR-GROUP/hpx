@@ -8,6 +8,15 @@
 #if !defined(HPX_AB01A9FE_45BE_43EF_B9AD_05B701B06685)
 #define HPX_AB01A9FE_45BE_43EF_B9AD_05B701B06685
 
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/exception.hpp>
+#include <hpx/util/serialize_sequence.hpp>
+#include <hpx/util/function.hpp>
+#include <hpx/runtime/agas/namespace_action_code.hpp>
+#include <hpx/runtime/agas/gva.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/components/component_type.hpp>
+
 #include <boost/variant.hpp>
 #include <boost/mpl/at.hpp>
 #include <boost/fusion/include/value_at.hpp>
@@ -17,14 +26,7 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/tracking.hpp>
-
-#include <hpx/exception.hpp>
-#include <hpx/util/serialize_sequence.hpp>
-#include <hpx/util/function.hpp>
-#include <hpx/runtime/agas/namespace_action_code.hpp>
-#include <hpx/runtime/agas/gva.hpp>
-#include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/components/component_type.hpp>
+#include <boost/fusion/include/at_c.hpp>
 
 // The number of types that the request's variant can represent.
 #define HPX_AGAS_REQUEST_SUBTYPES 13

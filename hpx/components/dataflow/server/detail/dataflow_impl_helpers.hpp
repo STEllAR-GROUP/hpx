@@ -11,6 +11,8 @@
 #include <hpx/components/dataflow/dataflow_trigger_fwd.hpp>
 #include <hpx/components/dataflow/is_dataflow.hpp>
 
+#include <boost/mpl/at.hpp>
+
 namespace hpx { namespace lcos { namespace server { namespace detail
 {
     template <typename T>

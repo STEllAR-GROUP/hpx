@@ -8,6 +8,16 @@
 #if !defined(HPX_FB40C7A4_33B0_4C64_A16B_2A3FEEB237ED)
 #define HPX_FB40C7A4_33B0_4C64_A16B_2A3FEEB237ED
 
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/exception.hpp>
+#include <hpx/util/serialize_sequence.hpp>
+#include <hpx/traits/get_remote_result.hpp>
+#include <hpx/runtime/agas/namespace_action_code.hpp>
+#include <hpx/runtime/agas/gva.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/lcos/base_lco.hpp>
+
 #include <boost/variant.hpp>
 #include <boost/mpl/at.hpp>
 #include <boost/fusion/include/at_c.hpp>
@@ -18,15 +28,6 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/tracking.hpp>
-
-#include <hpx/exception.hpp>
-#include <hpx/util/serialize_sequence.hpp>
-#include <hpx/traits/get_remote_result.hpp>
-#include <hpx/runtime/agas/namespace_action_code.hpp>
-#include <hpx/runtime/agas/gva.hpp>
-#include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/components/component_type.hpp>
-#include <hpx/lcos/base_lco.hpp>
 
 // The number of types that response's variant can represent.
 #define HPX_AGAS_RESPONSE_SUBTYPES 8

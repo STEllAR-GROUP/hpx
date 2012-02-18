@@ -12,7 +12,6 @@
 #include <boost/preprocessor/stringize.hpp>
 
 #include <boost/fusion/include/vector.hpp>
-#include <boost/fusion/include/at_c.hpp>
 #include <boost/utility/binary.hpp>
 
 #include <hpx/hpx_fwd.hpp>
