@@ -101,11 +101,8 @@ namespace hpx { namespace parcelset
             boost::iostreams::stream<io_device_type> io(*parcel_data.get());
 
             // De-serialize the parcel data
-#if HPX_USE_PORTABLE_ARCHIVES != 0
             hpx::util::portable_binary_iarchive archive(io);
-#else
-            boost::archive::binary_iarchive archive(io);
-#endif
+
             std::size_t parcel_count = 0;
             archive >> parcel_count;
             while(parcel_count-- != 0)

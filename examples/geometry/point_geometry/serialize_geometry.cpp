@@ -48,7 +48,6 @@ namespace boost { namespace serialization
 
     ///////////////////////////////////////////////////////////////////////////
     // explicit instantiation for the correct archive types
-#if HPX_USE_PORTABLE_ARCHIVES != 0
 //     template HPX_COMPONENT_EXPORT void
 //     save(hpx::util::portable_binary_oarchive&,
 //         hpx::geometry::plain_point_type const&, unsigned int const);
@@ -62,21 +61,6 @@ namespace boost { namespace serialization
     template HPX_COMPONENT_EXPORT void
     load(hpx::util::portable_binary_iarchive&,
         hpx::geometry::plain_polygon_type&, unsigned int const);
-#else
-    template HPX_COMPONENT_EXPORT void
-    save(boost::archive::binary_oarchive&,
-        hpx::geometry::plain_point_type const&, unsigned int const);
-    template HPX_COMPONENT_EXPORT void
-    load(boost::archive::binary_iarchive&,
-        hpx::geometry::plain_point_type&, unsigned int const);
-
-    template HPX_COMPONENT_EXPORT void
-    save(boost::archive::binary_oarchive&,
-        hpx::geometry::plain_polygon_type const&, unsigned int const);
-    template HPX_COMPONENT_EXPORT void
-    load(boost::archive::binary_iarchive&,
-        hpx::geometry::plain_polygon_type&, unsigned int const);
-#endif
 }}
 
 

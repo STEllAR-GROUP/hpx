@@ -48,21 +48,12 @@ namespace boost { namespace serialization
 
     ///////////////////////////////////////////////////////////////////////////
     // explicit instantiation for the correct archive types
-#if HPX_USE_PORTABLE_ARCHIVES != 0
     template HPX_COMPONENT_EXPORT void
     serialize(hpx::util::portable_binary_iarchive&, interpolate3d::config_data&,
         unsigned int const);
     template HPX_COMPONENT_EXPORT void
     serialize(hpx::util::portable_binary_oarchive&, interpolate3d::config_data&,
         unsigned int const);
-#else
-    template HPX_COMPONENT_EXPORT void
-    serialize(boost::archive::binary_iarchive&, interpolate3d::config_data&,
-        unsigned int const);
-    template HPX_COMPONENT_EXPORT void
-    serialize(boost::archive::binary_oarchive&, interpolate3d::config_data&,
-        unsigned int const);
-#endif
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

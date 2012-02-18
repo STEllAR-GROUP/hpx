@@ -42,7 +42,6 @@ namespace boost { namespace serialization
         hpx::util::serialize_sequence(ar, r);
     }
 
-#if HPX_USE_PORTABLE_ARCHIVES != 0
     template HPX_EXPORT void
     serialize(hpx::util::portable_binary_oarchive&,
         hpx::components::message_type&, unsigned int version);
@@ -50,15 +49,6 @@ namespace boost { namespace serialization
     template HPX_EXPORT void
     serialize(hpx::util::portable_binary_iarchive&,
         hpx::components::message_type&, unsigned int version);
-#else
-    template HPX_EXPORT void
-    serialize(boost::archive::binary_oarchive&, hpx::components::message_type&,
-        unsigned int version);
-
-    template HPX_EXPORT void
-    serialize(boost::archive::binary_iarchive&, hpx::components::message_type&,
-        unsigned int version);
-#endif
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

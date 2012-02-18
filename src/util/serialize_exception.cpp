@@ -327,7 +327,6 @@ namespace boost { namespace serialization
 
     ///////////////////////////////////////////////////////////////////////////
     // explicit instantiation for the correct archive types
-#if HPX_USE_PORTABLE_ARCHIVES != 0
     template HPX_EXPORT void
     save(hpx::util::portable_binary_oarchive&, boost::exception_ptr const&,
         unsigned int);
@@ -335,14 +334,5 @@ namespace boost { namespace serialization
     template HPX_EXPORT void
     load(hpx::util::portable_binary_iarchive&, boost::exception_ptr&,
         unsigned int);
-#else
-    template HPX_EXPORT void
-    save(boost::archive::binary_oarchive&, boost::exception_ptr const&,
-        unsigned int);
-
-    template HPX_EXPORT void
-    load(boost::archive::binary_iarchive&, boost::exception_ptr&,
-        unsigned int);
-#endif
 }}
 

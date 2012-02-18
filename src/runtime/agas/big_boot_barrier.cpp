@@ -71,11 +71,7 @@ void early_parcel_sink(
     boost::iostreams::stream<io_device_type> io (*parcel_data.get());
 
     // De-serialize the parcel data
-    #if HPX_USE_PORTABLE_ARCHIVES != 0
-        util::portable_binary_iarchive archive(io);
-    #else
-        boost::archive::binary_iarchive archive(io);
-    #endif
+    util::portable_binary_iarchive archive(io);
 
     std::size_t count = 0;
     archive >> count;

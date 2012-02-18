@@ -268,19 +268,11 @@ namespace hpx { namespace naming
 
     ///////////////////////////////////////////////////////////////////////////
     // explicit instantiation for the correct archive types
-#if HPX_USE_PORTABLE_ARCHIVES != 0
     template HPX_EXPORT void
     id_type::save(util::portable_binary_oarchive&, const unsigned int version) const;
 
     template HPX_EXPORT void
     id_type::load(util::portable_binary_iarchive&, const unsigned int version);
-#else
-    template HPX_EXPORT void
-    id_type::save(boost::archive::binary_oarchive&, const unsigned int version) const;
-
-    template HPX_EXPORT void
-    id_type::load(boost::archive::binary_iarchive&, const unsigned int version);
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     char const* const management_type_names[] =

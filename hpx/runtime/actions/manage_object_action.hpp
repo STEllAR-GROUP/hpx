@@ -28,13 +28,10 @@ namespace hpx { namespace actions
         typedef void (*clone_function)(void*, void const*, std::size_t);
         typedef void (*assign_function)(void*, void const*, std::size_t);
         typedef void (*destruct_function)(void*);
-#if HPX_USE_PORTABLE_ARCHIVES != 0
+
         typedef util::portable_binary_oarchive oarchive_type;
         typedef util::portable_binary_iarchive iarchive_type;
-#else
-        typedef boost::archive::binary_oarchive oarchive_type;
-        typedef boost::archive::binary_iarchive iarchive_type;
-#endif
+
         typedef void (*serialize_save_function)(
             boost::uint8_t const*, std::size_t, oarchive_type&,
             const unsigned int, boost::uint8_t const*);

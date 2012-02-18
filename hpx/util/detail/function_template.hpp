@@ -91,13 +91,8 @@ namespace hpx { namespace util
 
     template <
         typename Sig
-#if HPX_USE_PORTABLE_ARCHIVES != 0
       , typename IArchive = portable_binary_iarchive
       , typename OArchive = portable_binary_oarchive
-#else
-      , typename IArchive = boost::archive::binary_iarchive
-      , typename OArchive = boost::archive::binary_oarchive
-#endif
     >
     struct function : function_base<Sig, IArchive, OArchive>
     {

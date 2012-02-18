@@ -247,20 +247,11 @@ namespace boost { namespace serialization
 
     ///////////////////////////////////////////////////////////////////////////
     // explicit instantiation for the correct archive types
-#if HPX_USE_PORTABLE_ARCHIVES != 0
     template HPX_COMPONENT_EXPORT void
     serialize(hpx::util::portable_binary_iarchive&,
         hpx::components::server::partition_info&, unsigned int const);
     template HPX_COMPONENT_EXPORT void
     serialize(hpx::util::portable_binary_oarchive&,
         hpx::components::server::partition_info&, unsigned int const);
-#else
-    template HPX_COMPONENT_EXPORT void
-    serialize(boost::archive::binary_iarchive&,
-        hpx::components::server::partition_info&, unsigned int const);
-    template HPX_COMPONENT_EXPORT void
-    serialize(boost::archive::binary_oarchive&,
-        hpx::components::server::partition_info&, unsigned int const);
-#endif
 }}
 
