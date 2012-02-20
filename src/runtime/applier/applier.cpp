@@ -402,7 +402,8 @@ namespace hpx
 {
     HPX_API_EXPORT boost::uint32_t get_locality_id()
     {
-        return applier::get_applier().get_locality_id();
+        applier::applier** appl = applier::applier::applier_.get();
+        return appl ? (*appl)->get_locality_id() : 0;
     }
 }
 
