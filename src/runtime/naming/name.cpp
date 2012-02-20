@@ -215,12 +215,6 @@ namespace hpx { namespace naming
 //             }
 //             return false;
 //         }
-
-            if (detail::unknown_deleter == m) {
-            }
-
-
-            type_ = m;
         }
 
         // explicit instantiation for the correct archive types
