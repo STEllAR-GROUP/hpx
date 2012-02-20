@@ -11,6 +11,7 @@
 #include <hpx/components/dataflow/dataflow_base_impl.hpp>
 #include <hpx/components/dataflow/dataflow_fwd.hpp>
 #include <hpx/components/dataflow/stubs/dataflow.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 
 namespace hpx { namespace lcos 
 {
