@@ -20,5 +20,7 @@ if(NOT HPX_FORTRAN_SEARCHED)
   endif()
 
   set(HPX_FORTRAN_SEARCHED ON CACHE INTERNAL "Searched for a Fortran compiler.")
+elseif(CMAKE_Fortran_COMPILER)
+  enable_language(Fortran)
 endif()
 
