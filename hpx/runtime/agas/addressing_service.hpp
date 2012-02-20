@@ -1151,11 +1151,6 @@ public:
       , error_code& ec = throws
         );
 
-    static lcos::promise<bool, response> register_name_async(
-        std::string const& name
-      , naming::gid_type const& id
-        );
-
     /// \brief Unregister a global name (release any existing association)
     ///
     /// This function releases any existing association of the given global
@@ -1191,10 +1186,6 @@ public:
         std::string const& name
       , naming::gid_type& id
       , error_code& ec = throws
-        );
-
-    static lcos::promise<naming::id_type, response> unregister_name_async(
-        std::string const& name
         );
 
     /// \brief Query for the global address associated with a given global name.
