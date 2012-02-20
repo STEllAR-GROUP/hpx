@@ -18,7 +18,7 @@ using hpx::finalize;
 using hpx::naming::get_agas_client;
 
 using hpx::naming::address;
-using hpx::naming::gid_type;
+using hpx::naming::id_type;
 using hpx::naming::resolver_client;
 using hpx::naming::get_locality_id_from_gid;
 
@@ -45,16 +45,15 @@ int hpx_main(variables_map& vm)
 
             else if (0 == std::string("localities").find(arg))
             {
-                std::vector<gid_type> localities;
-                agas_client.get_locality_ids(localities);
+                std::vector<id_type> localities = hpx::find_all_localities();
 
-                BOOST_FOREACH(gid_type const& locality_id, localities)
+                BOOST_FOREACH(id_type const& locality_, localities)
                 {
                     address addr;
-                    agas_client.resolve(locality_id, addr);
+                    agas_client.resolve(locality_.get_gid(), addr);
 
                     std::cout << ( boost::format("  [%1%] %2%\n")
-                                 % get_locality_id_from_gid(locality_id)
+                                 % get_locality_id_from_gid(locality_.get_gid())
                                  % addr.locality_);
                 }
 
