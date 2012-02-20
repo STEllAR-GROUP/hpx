@@ -272,15 +272,15 @@ namespace hpx { namespace parcelset
         }
 
         // prepare all additional AGAS related operations for this parcel
-        error_code ec;
-        prepare_parcel(resolver_, p, ec);
-
-        if (ec)
-        {
-            // parcel preparation failed
-            HPX_THROW_EXCEPTION(no_success,
-                "parcelhandler::put_parcel", ec.get_message());
-        }
+//         error_code ec;
+//         prepare_parcel(resolver_, p, ec);
+//
+//         if (ec)
+//         {
+//             // parcel preparation failed
+//             HPX_THROW_EXCEPTION(no_success,
+//                 "parcelhandler::put_parcel", ec.get_message());
+//         }
 
         pp_.put_parcel(p, f);
     }

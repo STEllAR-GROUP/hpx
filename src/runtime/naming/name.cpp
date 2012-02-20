@@ -9,13 +9,13 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
+#include <hpx/util/base_object.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
-#include <boost/serialization/shared_ptr.hpp>
 
 namespace hpx { namespace naming
 {
@@ -105,116 +105,49 @@ namespace hpx { namespace naming
             delete p;   // delete local gid representation only
         }
 
-//         bool id_type_impl::is_local_cached()
-//         {
-//             applier::applier& appl = applier::get_applier();
-//             gid_type::mutex_type::scoped_lock l(this);
-//             return address_ ? address_.locality_ == appl.here() : false;
-//         }
-//
-//         bool id_type_impl::is_cached() const
-//         {
-//             gid_type::mutex_type::scoped_lock l(this);
-//             return address_ ? true : false;
-//         }
-//
-//         bool id_type_impl::is_local()
-//         {
-//             bool valid = false;
-//             {
-//                 gid_type::mutex_type::scoped_lock l(this);
-//                 valid = address_ ? true : false;
-//             }
-//
-//             if (!valid && !resolve())
-//                 return false;
-//
-//             // is_local_cached()
-//             applier::applier& appl = applier::get_applier();
-//             gid_type::mutex_type::scoped_lock l(this);
-//             return address_.locality_ == appl.here();
-//         }
-//
-//         // check just local cache_
-//         bool id_type_impl::is_local_c_cache()
-//         {
-//             bool valid = false;
-//             {
-//                 gid_type::mutex_type::scoped_lock l(this);
-//                 valid = address_ ? true : false;
-//             }
-//
-//             if (!valid && !resolve_c())
-//                 return false;
-//
-//             applier::applier& appl = applier::get_applier();
-//             gid_type::mutex_type::scoped_lock l(this);
-//             return address_.locality_ == appl.here();
-//         }
-//
-//         bool id_type_impl::resolve(naming::address& addr)
-//         {
-//             bool valid = false;
-//             {
-//                 gid_type::mutex_type::scoped_lock l(this);
-//                 valid = address_ ? true : false;
-//             }
-//
-//             // if it already has been resolved, just return the address
-//             if (!valid && !resolve())
-//                 return false;
-//
-//             addr = address_;
-//             return true;
-//         }
-//
-//         bool id_type_impl::resolve_c(naming::address& addr)
-//         {
-//             bool valid = false;
-//             {
-//                 gid_type::mutex_type::scoped_lock l(this);
-//                 valid = address_ ? true : false;
-//             }
-//
-//             // if it already has been resolved, just return the address
-//             if (!valid && !resolve_c())
-//                 return false;
-//
-//             addr = address_;
-//             return true;
-//         }
-//
-//         bool id_type_impl::resolve()
-//         {
-//             // call only if not already resolved
-//             applier::applier& appl = applier::get_applier();
-//
-//             error_code ec;
-//             address addr;
-//             if (appl.get_agas_client().resolve(*this, addr, true, ec) && !ec)
-//             {
-//                 gid_type::mutex_type::scoped_lock l(this);
-//                 address_ = addr;
-//                 return true;
-//             }
-//             return false;
-//         }
-//
-//         bool id_type_impl::resolve_c()
-//         {
-//             // call only if not already resolved
-//             applier::applier& appl = applier::get_applier();
-//
-//             error_code ec;
-//             address addr;
-//             if (appl.get_agas_client().resolve_cached(*this, addr, ec) && !ec)
-//             {
-//                 gid_type::mutex_type::scoped_lock l(this);
-//                 address_ = addr;
-//                 return true;
-//             }
-//             return false;
-//         }
+        ///////////////////////////////////////////////////////////////////////
+        id_type_impl::deleter_type id_type_impl::get_deleter(id_type_management t)
+        {
+            switch (t) {
+            case unmanaged:
+                return &detail::gid_unmanaged_deleter;
+            case managed:
+                return &detail::gid_managed_deleter;
+            case transmission:
+                return &detail::gid_transmission_deleter;
+            default:
+                BOOST_ASSERT(false);          // invalid management type
+                return &detail::gid_unmanaged_deleter;
+            }
+            return 0;
+        }
+
+        // serialization
+        template <typename Archive>
+        void id_type_impl::save(Archive& ar, const unsigned int version) const
+        {
+            ar & util::base_object_nonvirt<gid_type>(*this) & type_;
+        }
+
+        template <typename Archive>
+        void id_type_impl::load(Archive& ar, const unsigned int version)
+        {
+            // serialize base class
+            ar & util::base_object_nonvirt<gid_type>(*this);
+
+            // serialize management type
+            id_type_management m;
+            ar >> m;
+
+            if (detail::unknown_deleter == m) {
+                HPX_THROW_EXCEPTION(version_too_new, "id_type::load",
+                    "trying to load id_type with unknown deleter");
+            }
+
+            if (detail::transmission == m)
+                m = detail::managed;
+
+            type_ = m;
         }
 
         // explicit instantiation for the correct archive types
@@ -225,56 +158,36 @@ namespace hpx { namespace naming
             util::portable_binary_iarchive&, const unsigned int version);
     }   // detail
 
+    ///////////////////////////////////////////////////////////////////////////
     template <class Archive>
     void id_type::save(Archive& ar, const unsigned int version) const
     {
         bool isvalid = gid_ ? true : false;
         ar << isvalid;
-        if (isvalid) {
-            gid_type const& g = *gid_;
-            detail::id_type_management m = gid_->get_management_type();
-            ar << m;
-            ar << g;
-        }
+        if (isvalid)
+            ar << gid_;
     }
 
     template <class Archive>
     void id_type::load(Archive& ar, const unsigned int version)
     {
-        if (version > HPX_IDTYPE_VERSION)
-        {
+        if (version > HPX_IDTYPE_VERSION) {
             HPX_THROW_EXCEPTION(version_too_new, "id_type::load",
                 "trying to load id_type of unknown version");
         }
 
         bool isvalid;
         ar >> isvalid;
-        if (isvalid) {
-            detail::id_type_management m;
-            ar >> m;
-
-            if (detail::unknown_deleter == m)
-            {
-                HPX_THROW_EXCEPTION(version_too_new, "id_type::load",
-                    "trying to load id_type with unknown deleter");
-            }
-
-            if (detail::transmission == m)
-                m = detail::managed;
-
-            gid_type g;
-            ar >> g;
-            gid_.reset(new detail::id_type_impl(g, m));
-        }
+        if (isvalid)
+            ar >> gid_;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
     // explicit instantiation for the correct archive types
-    template HPX_EXPORT void
-    id_type::save(util::portable_binary_oarchive&, const unsigned int version) const;
+    template HPX_EXPORT void id_type::save(
+        util::portable_binary_oarchive&, const unsigned int version) const;
 
-    template HPX_EXPORT void
-    id_type::load(util::portable_binary_iarchive&, const unsigned int version);
+    template HPX_EXPORT void id_type::load(
+        util::portable_binary_iarchive&, const unsigned int version);
 
     ///////////////////////////////////////////////////////////////////////////
     char const* const management_type_names[] =

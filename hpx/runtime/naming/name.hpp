@@ -23,6 +23,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/util/spinlock_pool.hpp>
+#include <hpx/util/serialize_intrusive_ptr.hpp>
 #include <hpx/runtime/naming/address.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -357,24 +358,13 @@ namespace hpx { namespace naming
         {
         private:
             typedef void (*deleter_type)(detail::id_type_impl*);
-
-            static deleter_type get_deleter(id_type_management t)
-            {
-                switch (t) {
-                case unmanaged:
-                    return &detail::gid_unmanaged_deleter;
-                case managed:
-                    return &detail::gid_managed_deleter;
-                case transmission:
-                    return &detail::gid_transmission_deleter;
-                default:
-                    BOOST_ASSERT(false);          // invalid management type
-                    return &detail::gid_unmanaged_deleter;
-                };
-                return 0;
-            }
+            static deleter_type get_deleter(id_type_management t);
 
         public:
+            id_type_impl()
+              : count_(0), type_(unknown_deleter)
+            {}
+
             explicit id_type_impl (boost::uint64_t lsb_id, id_type_management t)
               : gid_type(0, lsb_id), count_(0), type_(t)
             {}
@@ -393,58 +383,19 @@ namespace hpx { namespace naming
                 return type_;
             }
 
-//             explicit id_type_impl (boost::uint64_t msb_id, boost::uint64_t lsb_id,
-//                 locality const& l, naming::address::component_type type,
-//                 naming::address::address_type a)
-//               : gid_type(msb_id, lsb_id), address_(l, type, a)
-//             {}
-//
-//             bool resolve(naming::address& addr);
-//             bool is_resolved() const { return address_; }
-//
-//             bool resolve_c();
-//             bool resolve_c(naming::address& addr);
-//
-//             bool get_local_address(naming::address& addr)
-//             {
-//                 if (!is_local_cached() && !resolve())
-//                     return false;
-//                 gid_type::mutex_type::scoped_lock l(this);
-//                 addr = address_;
-//                 return true;
-//             }
-//
-//             bool get_local_address_c_cache(naming::address& addr)
-//             {
-//                 if (!is_local_cached() && !resolve_c())
-//                     return false;
-//                 gid_type::mutex_type::scoped_lock l(this);
-//                 addr = address_;
-//                 return true;
-//             }
-//
-//             bool get_address_cached(naming::address& addr) const
-//             {
-//                 if (!is_cached())
-//                     return false;
-//                 gid_type::mutex_type::scoped_lock l(this);
-//                 addr = address_;
-//                 return true;
-//             }
-//
-//             // cached resolved address
-//             naming::address address_;
-//
-//         protected:
-//             bool is_local_cached();
-//             bool is_cached() const;
-//
-//             bool is_local();
-//             bool is_local_c_cache();
-//
-//             bool resolve();
-
         private:
+            // serialization
+            friend class boost::serialization::access;
+
+            template <class Archive>
+            void save(Archive & ar, const unsigned int version) const;
+
+            template <class Archive>
+            void load(Archive & ar, const unsigned int version);
+
+            BOOST_SERIALIZATION_SPLIT_MEMBER()
+
+            // reference counting
             friend void intrusive_ptr_add_ref(id_type_impl* p);
             friend void intrusive_ptr_release(id_type_impl* p);
 
@@ -502,16 +453,6 @@ namespace hpx { namespace naming
             BOOST_ASSERT(get_credit_from_gid(*gid_) || t == unmanaged ||
                 t == transmission);
         }
-
-//         explicit id_type(boost::uint64_t msb_id, boost::uint64_t lsb_id,
-//               locality const& l, naming::address::component_type type_,
-//               naming::address::address_type a, id_type_management t/* = unmanaged*/)
-//           : gid_(new detail::id_type_impl(msb_id, lsb_id, l, type_, a),
-//                          get_deleter(t))
-//         {
-//             BOOST_ASSERT(get_credit_from_gid(*gid_) || t == unmanaged ||
-//                          t == transmission);
-//         }
 
         gid_type& get_gid() { return *gid_; }
         gid_type const& get_gid() const { return *gid_; }
@@ -626,41 +567,6 @@ namespace hpx { namespace naming
             return gid_was_split(*gid_);
         }
 
-        ///////////////////////////////////////////////////////////////////////
-//         bool is_local_cached() const
-//         {
-//             return gid_->is_local_cached();
-//         }
-//         bool is_local() const
-//         {
-//             return gid_->is_local();
-//         }
-//         bool is_local_c_cache() const
-//         {
-//             return gid_->is_local_c_cache();
-//         }
-//         bool get_local_address(naming::address& addr) const
-//         {
-//             return gid_->get_local_address(addr);
-//         }
-//         bool get_local_address_c_cache(naming::address& addr) const
-//         {
-//             return gid_->get_local_address_c_cache(addr);
-//         }
-//         bool get_address_cached(naming::address& addr) const
-//         {
-//             return gid_->get_address_cached(addr);
-//         }
-//
-//         bool resolve(address& addr)
-//         {
-//             return gid_->resolve(addr);
-//         }
-//         bool is_resolved() const
-//         {
-//             return gid_->is_resolved();
-//         }
-
     private:
         friend std::ostream& operator<< (std::ostream& os, id_type const& id);
 
@@ -718,6 +624,7 @@ BOOST_CLASS_VERSION(hpx::naming::gid_type, HPX_GIDTYPE_VERSION)
 BOOST_CLASS_TRACKING(hpx::naming::gid_type, boost::serialization::track_never)
 BOOST_CLASS_VERSION(hpx::naming::id_type, HPX_IDTYPE_VERSION)
 BOOST_CLASS_TRACKING(hpx::naming::id_type, boost::serialization::track_never)
+BOOST_SERIALIZATION_INTRUSIVE_PTR(hpx::naming::detail::id_type_impl)
 
 #include <hpx/config/warnings_suffix.hpp>
 
