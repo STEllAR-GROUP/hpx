@@ -10,7 +10,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
-#include "graph500/make_graph.h"
+#include "graph500/make_graph.hpp"
 #include "graph500/point.hpp"
 #include "graph500/stubs/point.hpp"
 

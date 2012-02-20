@@ -8,7 +8,7 @@
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/lcos/async_future_wait.hpp>
 
-#include "../make_graph.h"
+#include "../make_graph.hpp"
 #include "../stubs/point.hpp"
 #include "point.hpp"
 

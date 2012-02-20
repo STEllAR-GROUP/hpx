@@ -15,7 +15,7 @@
 #include <assert.h>
 #include <math.h>
 
-#include "make_graph.h"
+#include "make_graph.hpp"
 #include "server/graph_generator.hpp"
 #include "server/splittable_mrg.hpp"
 
