@@ -5,12 +5,13 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <boost/foreach.hpp>
-
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/trigger.hpp>
+
+#include <boost/foreach.hpp>
 
 #include <tests/unit/agas/components/server/simple_refcnt_checker.hpp>
 
@@ -52,7 +53,7 @@ simple_refcnt_checker::~simple_refcnt_checker()
         applier::trigger(target_);
     }
 
-    std::string const str = util::osstream_get_string(strm); 
+    std::string const str = util::osstream_get_string(strm);
 
     if (!str.empty())
         cout << str << flush;
