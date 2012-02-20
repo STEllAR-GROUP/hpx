@@ -49,7 +49,7 @@ namespace hpx { namespace components
 
         // retrieve console locality
         naming::gid_type console_gid;
-        naming::get_agas_client().get_console_prefix(console_gid);
+        naming::get_agas_client().get_console_locality(console_gid);
         naming::id_type dst(console_gid, naming::id_type::unmanaged);
 
         // Report the error only if the thread-manager is up.

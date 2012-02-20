@@ -24,7 +24,7 @@ create_barrier(naming::resolver_client& agas_client,
     std::size_t num_localities, char const* symname)
 {
     lcos::barrier barrier;
-    barrier.create_one(agas_client.local_prefix(), num_localities);
+    barrier.create_one(agas_client.local_locality(), num_localities);
 
     agas::register_name(symname, barrier.get_gid());
     return barrier;
@@ -153,7 +153,7 @@ bool pre_main(runtime_mode mode)
         {
             naming::gid_type console_;
 
-            if (HPX_UNLIKELY(!agas_client.get_console_prefix(console_)))
+            if (HPX_UNLIKELY(!agas_client.get_console_locality(console_)))
             {
                 HPX_THROW_EXCEPTION(network_error
                     , "pre_main"

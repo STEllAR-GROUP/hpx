@@ -154,7 +154,7 @@ namespace hpx { namespace util
             boost::uint32_t prefix = 0;
             applier::applier* appl = applier::get_applier_ptr();
             if (appl)
-                prefix = naming::get_prefix_from_gid(appl->get_prefix());
+                prefix = naming::get_locality_id_from_gid(appl->get_locality());
 
             std::stringstream out;
             out << std::hex << std::setw(sizeof(boost::uint32_t)*2) << std::setfill('0') << prefix;

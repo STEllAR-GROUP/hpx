@@ -121,7 +121,7 @@ namespace hpx { namespace detail
     inline void print(std::string const& name, error_code& ec = throws)
     {
         naming::gid_type console;
-        naming::get_agas_client().get_console_prefix(console, ec);
+        naming::get_agas_client().get_console_locality(console, ec);
         if (ec) return;
 
         typedef lcos::eager_future<console_print_action> future_type;
@@ -209,7 +209,7 @@ namespace hpx { namespace detail
         print(std::string("List of all registered symbolic names:"));
         print(std::string(78, '-'));
 
-        naming::id_type console(agas::get_console_prefix());
+        naming::id_type console(agas::get_console_locality());
         naming::get_agas_client().iterate_ids(
             action_wrapper2<list_symbolic_name_action>(console));
     }
@@ -227,7 +227,7 @@ namespace hpx { namespace detail
         print(std::string("List of all registered component types:"));
         print(std::string(78, '-'));
 
-        naming::id_type console(agas::get_console_prefix());
+        naming::id_type console(agas::get_console_locality());
         naming::get_agas_client().iterate_types(
             action_wrapper2<list_component_type_action>(console));
     }

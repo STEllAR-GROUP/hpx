@@ -217,13 +217,13 @@ response primary_namespace::allocate(
 
         // Compute the locality's prefix.
         boost::uint32_t prefix = prefix_counter_++;
-        naming::gid_type id(naming::get_gid_from_prefix(prefix));
+        naming::gid_type id(naming::get_gid_from_locality_id(prefix));
 
         // Check if this prefix has already been assigned.
         while (gvas_.count(id))
         {
             prefix = prefix_counter_++;
-            id = naming::get_gid_from_prefix(prefix);
+            id = naming::get_gid_from_locality_id(prefix);
         }
 
         // Start assigning ids with the second block of 64bit numbers only.
@@ -531,7 +531,7 @@ response primary_namespace::free(
     if (pit != pend)
     {
         gva_table_type::iterator git = gvas_.find
-            (naming::get_gid_from_prefix(at_c<0>(pit->second)));
+            (naming::get_gid_from_locality_id(at_c<0>(pit->second)));
         gva_table_type::iterator gend = gvas_.end();
 
         if (HPX_UNLIKELY(git == gend))
@@ -960,7 +960,7 @@ void primary_namespace::kill_non_blocking(
     using boost::fusion::at_c;
 
     naming::gid_type const agas_prefix_
-        = naming::get_gid_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX);
+        = naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX);
 
     ///////////////////////////////////////////////////////////////////////////
     // Kill the dead objects.
@@ -1039,7 +1039,7 @@ void primary_namespace::kill_sync(
     using boost::fusion::at_c;
 
     naming::gid_type const agas_prefix_
-        = naming::get_gid_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX);
+        = naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX);
 
     std::list<lcos::promise<void> > futures;
 

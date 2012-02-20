@@ -21,12 +21,6 @@ namespace hpx { namespace naming
 {
     namespace detail
     {
-//         // thread function called while serializing a gid
-//         void increment_refcnt(id_type id)
-//         {
-//             applier::get_applier().get_agas_client().incref(id.get_gid());
-//         }
-
         void decrement_refcnt(detail::id_type_impl* p)
         {
             // Talk to AGAS only if this gid was split at some time in the past,
@@ -221,6 +215,20 @@ namespace hpx { namespace naming
 //             }
 //             return false;
 //         }
+
+            if (detail::unknown_deleter == m) {
+            }
+
+
+            type_ = m;
+        }
+
+        // explicit instantiation for the correct archive types
+        template HPX_EXPORT void id_type_impl::save(
+            util::portable_binary_oarchive&, const unsigned int version) const;
+
+        template HPX_EXPORT void id_type_impl::load(
+            util::portable_binary_iarchive&, const unsigned int version);
     }   // detail
 
     template <class Archive>

@@ -38,7 +38,7 @@ addressing_service::addressing_service(
   , here_(get_runtime().here())
   , rts_lva_(get_runtime().get_runtime_support_lva())
   , state_(starting)
-  , prefix_()
+  , locality_()
 { // {{{
     // boot the parcel port
     pp.run(false);
@@ -63,7 +63,7 @@ void addressing_service::launch_bootstrap(
 
     const naming::locality ep = ini_.get_agas_locality();
     const naming::gid_type here
-        = naming::get_gid_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX);
+        = naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX);
 
     const naming::gid_type primary_gid = bootstrap_primary_namespace_gid();
     const naming::gid_type component_gid = bootstrap_component_namespace_gid();
@@ -89,10 +89,10 @@ void addressing_service::launch_bootstrap(
         server::symbol_namespace::get_component_type(),
             static_cast<void*>(&bootstrap->symbol_ns_server));
 
-    local_prefix(here);
+    local_locality(here);
     get_runtime().get_config().parse("assigned locality",
         boost::str(boost::format("hpx.locality=%1%")
-                  % naming::get_prefix_from_gid(here)));
+                  % naming::get_locality_id_from_gid(here)));
 
     request reqs[] =
     {
@@ -201,7 +201,7 @@ bool addressing_service::register_locality(
         if (ec || (success != rep.get_status()))
             return false;
 
-        prefix = naming::get_gid_from_prefix(rep.get_prefix());
+        prefix = naming::get_gid_from_locality_id(rep.get_locality_id());
 
         return true;
     }
@@ -235,7 +235,7 @@ boost::uint32_t addressing_service::resolve_locality(
         if (ec || (success != rep.get_status()))
             return 0;
 
-        return rep.get_prefix();
+        return rep.get_locality_id();
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
@@ -284,7 +284,7 @@ bool addressing_service::unregister_locality(
     }
 } // }}}
 
-bool addressing_service::get_console_prefix(
+bool addressing_service::get_console_locality(
     naming::gid_type& prefix
   , error_code& ec
     )
@@ -299,7 +299,7 @@ bool addressing_service::get_console_prefix(
 
         if (is_console())
         {
-            prefix = local_prefix();
+            prefix = local_locality();
             if (&ec != &throws)
                 ec = make_success_code();
             return true;
@@ -309,7 +309,7 @@ bool addressing_service::get_console_prefix(
 
         if (console_cache_)
         {
-            prefix = naming::get_gid_from_prefix(console_cache_);
+            prefix = naming::get_gid_from_locality_id(console_cache_);
             if (&ec != &throws)
                 ec = make_success_code();
             return true;
@@ -328,7 +328,7 @@ bool addressing_service::get_console_prefix(
         {
             prefix = rep.get_gid();
 
-            console_cache_ = naming::get_prefix_from_gid(prefix);
+            console_cache_ = naming::get_locality_id_from_gid(prefix);
 
             LAS_(debug) <<
                 ( boost::format("caching console locality, prefix(%1%)")
@@ -342,7 +342,7 @@ bool addressing_service::get_console_prefix(
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
             HPX_RETHROW_EXCEPTION(e.get_error(),
-                "addressing_service::get_console_prefix", e.what());
+                "addressing_service::get_console_locality", e.what());
         }
         else {
             ec = e.get_error_code(hpx::rethrow);
@@ -352,12 +352,12 @@ bool addressing_service::get_console_prefix(
     }
 } // }}}
 
-bool addressing_service::get_prefixes(
-    std::vector<naming::gid_type>& prefixes
+bool addressing_service::get_localities(
+    std::vector<naming::gid_type>& locality_ids
   , components::component_type type
   , error_code& ec
     )
-{ // {{{ get_prefixes implementation
+{ // {{{ get_locality_ids implementation
     try {
         if (type != components::component_invalid)
         {
@@ -377,9 +377,9 @@ bool addressing_service::get_prefixes(
             if (!p.size())
                 return false;
 
-            prefixes.clear();
+            locality_ids.clear();
             for (boost::uint64_t i = 0; i < p.size(); ++i)
-                prefixes.push_back(naming::get_gid_from_prefix(p[i]));
+                locality_ids.push_back(naming::get_gid_from_locality_id(p[i]));
 
             return true;
         }
@@ -402,9 +402,9 @@ bool addressing_service::get_prefixes(
             if (!p.size())
                 return false;
 
-            prefixes.clear();
+            locality_ids.clear();
             for (boost::uint64_t i = 0; i < p.size(); ++i)
-                prefixes.push_back(naming::get_gid_from_prefix(p[i]));
+                locality_ids.push_back(naming::get_gid_from_locality_id(p[i]));
 
             return true;
         }
@@ -412,7 +412,7 @@ bool addressing_service::get_prefixes(
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
             HPX_RETHROW_EXCEPTION(e.get_error(),
-                "addressing_service::get_prefixes", e.what());
+                "addressing_service::get_locality_ids", e.what());
         }
         else {
             ec = e.get_error_code(hpx::rethrow);
@@ -803,8 +803,8 @@ bool addressing_service::is_local_address(
 
     // For now we fall back to the primitive implementation which just compares
     // the prefixes. That will have to be changed, though.
-    return naming::get_prefix_from_gid(local_prefix())
-        == naming::get_prefix_from_gid(id);
+    return naming::get_locality_id_from_gid(local_locality())
+        == naming::get_locality_id_from_gid(id);
 }
 
 bool addressing_service::is_local_address(
@@ -838,8 +838,8 @@ bool addressing_service::is_local_address_cached(
 
     // For now we fall back to the primitive implementation which just compares
     // the prefixes. That will have to be changed, though.
-    return naming::get_prefix_from_gid(local_prefix())
-        == naming::get_prefix_from_gid(id);
+    return naming::get_locality_id_from_gid(local_locality())
+        == naming::get_locality_id_from_gid(id);
 }
 
 bool addressing_service::is_local_address_cached(
@@ -862,7 +862,7 @@ bool addressing_service::is_local_lva_encoded_address(
     )
 {
     return naming::strip_credit_from_gid(id.get_msb())
-        == local_prefix().get_msb();
+        == local_locality().get_msb();
 }
 
 bool addressing_service::resolve_full(

@@ -217,10 +217,10 @@ namespace hpx { namespace applier
     applier::applier(parcelset::parcelhandler &ph, threads::threadmanager_base& tm,
                 boost::uint64_t rts, boost::uint64_t mem)
       : parcel_handler_(ph), thread_manager_(tm),
-        runtime_support_id_(parcel_handler_.get_prefix().get_msb(), // rts,
+        runtime_support_id_(parcel_handler_.get_locality().get_msb(), // rts,
 //             parcel_handler_.here(), components::component_runtime_support,
             rts, naming::id_type::unmanaged),
-        memory_id_(parcel_handler_.get_prefix().get_msb(), // mem,
+        memory_id_(parcel_handler_.get_locality().get_msb(), // mem,
 //             parcel_handler_.here(), components::component_runtime_support,
             mem, naming::id_type::unmanaged)
     {}
@@ -245,27 +245,27 @@ namespace hpx { namespace applier
         return hpx::get_locality();
     }
 
-    naming::gid_type const& applier::get_prefix() const
+    naming::gid_type const& applier::get_locality() const
     {
-        return hpx::naming::get_agas_client().local_prefix();
+        return hpx::naming::get_agas_client().local_locality();
     }
 
     boost::uint32_t applier::get_locality_id() const
     {
-        return naming::get_prefix_from_gid(get_prefix());
+        return naming::get_locality_id_from_gid(get_locality());
     }
 
-    bool applier::get_raw_remote_prefixes(std::vector<naming::gid_type>& prefixes,
+    bool applier::get_raw_remote_locality_ids(std::vector<naming::gid_type>& prefixes,
         components::component_type type) const
     {
-        return parcel_handler_.get_raw_remote_prefixes(prefixes, type);
+        return parcel_handler_.get_raw_remote_localities(prefixes, type);
     }
 
-    bool applier::get_remote_prefixes(std::vector<naming::id_type>& prefixes,
+    bool applier::get_remote_locality_ids(std::vector<naming::id_type>& prefixes,
         components::component_type type) const
     {
         std::vector<naming::gid_type> raw_prefixes;
-        if (!parcel_handler_.get_raw_remote_prefixes(raw_prefixes, type))
+        if (!parcel_handler_.get_raw_remote_localities(raw_prefixes, type))
             return false;
 
         BOOST_FOREACH(naming::gid_type& gid, raw_prefixes)
@@ -274,17 +274,17 @@ namespace hpx { namespace applier
         return true;
     }
 
-    bool applier::get_raw_prefixes(std::vector<naming::gid_type>& prefixes,
+    bool applier::get_raw_localities(std::vector<naming::gid_type>& prefixes,
         components::component_type type) const
     {
-        return parcel_handler_.get_raw_prefixes(prefixes, type);
+        return parcel_handler_.get_raw_localities(prefixes, type);
     }
 
-    bool applier::get_prefixes(std::vector<naming::id_type>& prefixes,
+    bool applier::get_localities(std::vector<naming::id_type>& prefixes,
         components::component_type type) const
     {
         std::vector<naming::gid_type> raw_prefixes;
-        if (!parcel_handler_.get_raw_prefixes(raw_prefixes, type))
+        if (!parcel_handler_.get_raw_localities(raw_prefixes, type))
             return false;
 
         BOOST_FOREACH(naming::gid_type& gid, raw_prefixes)
@@ -292,73 +292,6 @@ namespace hpx { namespace applier
 
         return true;
     }
-
-//     bool applier::address_is_local(naming::id_type const& id,
-//         naming::address& addr) const
-//     {
-//         if (id.is_local()) {    // address gets resolved if not already
-//             if (!id.get_local_address(addr)) {
-//                 hpx::util::osstream strm;
-//                 strm << "gid" << id.get_gid();
-//                 HPX_THROW_EXCEPTION(invalid_status,
-//                     "applier::address_is_local",
-//                     hpx::util::osstream_get_string(strm));
-//             }
-//             return true;
-//         }
-//
-//         if (!id.is_resolved()) {
-//             hpx::util::osstream strm;
-//             strm << "gid" << id.get_gid();
-//             HPX_THROW_EXCEPTION(unknown_component_address,
-//                 "applier::address_is_local", hpx::util::osstream_get_string(strm));
-//         }
-//
-//         if (!id.get_address_cached(addr)) {
-//             hpx::util::osstream strm;
-//             strm << "gid" << id.get_gid();
-//             HPX_THROW_EXCEPTION(invalid_status,
-//                 "applier::address_is_local",
-//                 hpx::util::osstream_get_string(strm));
-//         }
-//         return false;   // non-local
-//     }
-
-//     bool applier::address_is_local_c_cache(naming::id_type const& id,
-//         naming::address& addr) const
-//     {
-//         bool is_local = id.is_local_c_cache();
-//         bool in_cache = id.get_local_address_c_cache(addr);
-//         if(is_local) {     // check address if it is in cache
-//             if (!in_cache) {
-//                 //object is local, but cannot be found in cache
-//                 //or should local object be always be in cache?
-//                 //TODO: validate this argument
-//                 return false;
-//             }
-//             hpx::applier::get_applier().get_agas_client().resolve_cached(
-//                     id.get_gid(), addr, throws);
-//             return true;
-//         }
-//
-//         if (!id.is_resolved() && is_local) {
-//             //object is local, but it is not resolved
-//             //object is not local, and id is not resolved
-//             //in both cases need to send parcel to agas to resolve address.
-//             //TODO: remove this test
-//         }
-//
-//         if (!id.get_address_cached(addr) && in_cache) {
-//             //object is in cache, but cannot retrieve address from cache
-//             //should throw
-//             hpx::util::osstream strm;
-//             strm << "gid" << id.get_gid();
-//             HPX_THROW_EXCEPTION(invalid_status,
-//                 "applier::address_is_local_c_cache",
-//                 hpx::util::osstream_get_string(strm));
-//         }
-//         return false;   // non-local
-//     }
 
     // parcel forwarding.
     bool applier::route(parcelset::parcel const& p)
@@ -389,7 +322,7 @@ namespace hpx { namespace applier
         return appl ? *appl : NULL;
     }
 
-    // The function \a get_prefix_id returns the id of this locality
+    // The function \a get_locality_id returns the id of this locality
     boost::uint32_t get_locality_id()
     {
         applier** appl = applier::applier_.get();

@@ -387,23 +387,23 @@ namespace hpx { namespace components { namespace server
 
     void runtime_support::shutdown_all(double timeout)
     {
-        std::vector<naming::gid_type> prefixes;
+        std::vector<naming::gid_type> locality_ids;
         applier::applier& appl = hpx::applier::get_applier();
-        appl.get_agas_client().get_prefixes(prefixes);
-        std::reverse(prefixes.begin(), prefixes.end());
+        appl.get_agas_client().get_localities(locality_ids);
+        std::reverse(locality_ids.begin(), locality_ids.end());
 
         // execute registered shutdown functions on all localities
-        invoke_shutdown_functions(prefixes, true);
-        invoke_shutdown_functions(prefixes, false);
+        invoke_shutdown_functions(locality_ids, true);
+        invoke_shutdown_functions(locality_ids, false);
 
         // shut down all localities except the the local one
         {
-            boost::uint32_t prefix = get_locality_id();
+            boost::uint32_t locality_id = get_locality_id();
             std::vector<lcos::promise<void> > lazy_actions;
 
-            BOOST_FOREACH(naming::gid_type gid, prefixes)
+            BOOST_FOREACH(naming::gid_type gid, locality_ids)
             {
-                if (prefix != naming::get_prefix_from_gid(gid))
+                if (locality_id != naming::get_locality_id_from_gid(gid))
                 {
                     using components::stubs::runtime_support;
                     naming::id_type id(gid, naming::id_type::unmanaged);
@@ -423,19 +423,19 @@ namespace hpx { namespace components { namespace server
     // initiate system shutdown for all localities
     void runtime_support::terminate_all()
     {
-        std::vector<naming::gid_type> prefixes;
+        std::vector<naming::gid_type> locality_ids;
         applier::applier& appl = hpx::applier::get_applier();
-        appl.get_agas_client().get_prefixes(prefixes);
-        std::reverse(prefixes.begin(), prefixes.end());
+        appl.get_agas_client().get_localities(locality_ids);
+        std::reverse(locality_ids.begin(), locality_ids.end());
 
         // terminate all localities except the the local one
         {
-            boost::uint32_t prefix = get_locality_id();
+            boost::uint32_t locality_id = get_locality_id();
             std::vector<lcos::promise<void> > lazy_actions;
 
-            BOOST_FOREACH(naming::gid_type gid, prefixes)
+            BOOST_FOREACH(naming::gid_type gid, locality_ids)
             {
-                if (prefix != naming::get_prefix_from_gid(gid))
+                if (locality_id != naming::get_locality_id_from_gid(gid))
                 {
                     using components::stubs::runtime_support;
                     naming::id_type id(gid, naming::id_type::unmanaged);
@@ -636,7 +636,7 @@ namespace hpx { namespace components { namespace server
         // load components now that AGAS is up
         get_runtime().get_config().load_components();
         return load_components(get_runtime().get_config(),
-            get_runtime().get_agas_client().local_prefix(),
+            get_runtime().get_agas_client().local_locality(),
             get_runtime().get_agas_client());
     }
 

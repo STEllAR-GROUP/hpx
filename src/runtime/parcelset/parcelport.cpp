@@ -185,7 +185,7 @@ namespace hpx { namespace parcelset
     {
         typedef pending_parcels_map::iterator iterator;
         const boost::uint32_t prefix =
-            naming::get_prefix_from_gid(p.get_destination());
+            naming::get_locality_id_from_gid(p.get_destination());
 
         parcelport_connection_ptr client_connection(connection_cache_.get(prefix));
 

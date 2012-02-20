@@ -48,7 +48,7 @@ namespace hpx { namespace parcelset
         {
             // ensure the source locality id is set (if no component id is given)
             if (!p.get_source())
-                p.set_source(naming::id_type(prefix_, naming::id_type::unmanaged));
+                p.set_source(naming::id_type(locality_, naming::id_type::unmanaged));
 
             // set the current local time for this locality
             p.set_start_time(get_current_time());
@@ -95,22 +95,22 @@ namespace hpx { namespace parcelset
             return pp_;
         }
 
-        /// Return the prefix of this locality
+        /// Return the locality_id of this locality
         ///
-        /// This accessor allows to retrieve the prefix value being assigned to
+        /// This accessor allows to retrieve the locality_id value being assigned to
         /// the locality this parcelhandler is associated with. This returns the
         /// same value as would be returned by:
         ///
         /// \code
-        ///     naming::id_type prefix;
-        ///     get_resolver().get_prefix(here, prefix);
+        ///     naming::id_type locality_id;
+        ///     get_resolver().get_locality_id(here, locality_id);
         /// \endcode
         ///
         /// but doesn't require the full AGAS round trip as the prefix value
         /// is cached inside the parcelhandler.
-        naming::gid_type const& get_prefix() const
+        naming::gid_type const& get_locality() const
         {
-            return prefix_;
+            return locality_;
         }
 
         /// Return the list of all remote localities supporting the given
@@ -124,7 +124,7 @@ namespace hpx { namespace parcelset
         /// \returns The function returns \a true if there is at least one
         ///          remote locality known by AGAS
         ///          (!prefixes.empty()).
-        bool get_raw_remote_prefixes(std::vector<naming::gid_type>& prefixes,
+        bool get_raw_remote_localities(std::vector<naming::gid_type>& locality_ids,
             components::component_type type = components::component_invalid) const;
 
         /// Return the list of all localities supporting the given
@@ -138,7 +138,7 @@ namespace hpx { namespace parcelset
         /// \returns The function returns \a true if there is at least one
         ///          locality known by AGAS
         ///          (!prefixes.empty()).
-        bool get_raw_prefixes(std::vector<naming::gid_type>& prefixes,
+        bool get_raw_localities(std::vector<naming::gid_type>& locality_ids,
             components::component_type type = components::component_invalid) const;
 
         /// A parcel is submitted for transport at the source locality site to
@@ -301,7 +301,7 @@ namespace hpx { namespace parcelset
         naming::resolver_client& resolver_;
 
         /// The site prefix of the locality
-        naming::gid_type prefix_;
+        naming::gid_type locality_;
 
         /// the parcelport this handler is associated with
         parcelport& pp_;

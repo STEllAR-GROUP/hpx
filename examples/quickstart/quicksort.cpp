@@ -146,18 +146,16 @@ int hpx_main(variables_map& vm)
         elements = vm["elements"].as<std::size_t>();
 
     // get list of all known localities
-    std::vector<id_type> prefixes;
+    std::vector<id_type> prefixes = hpx::find_remote_localities();
     id_type prefix;
 
-    applier& appl = get_applier();
-
     // execute the qsort() function on any of the remote localities
-    if (appl.get_remote_prefixes(prefixes))
+    if (!prefixes.empty())
         prefix = prefixes[0];
 
     // execute the qsort() function locally
     else
-        prefix = appl.get_runtime_support_gid();
+      prefix = hpx::find_here();
 
     {
         // create a (remote) memory block

@@ -172,7 +172,7 @@ namespace hpx
         applier_(parcel_handler_, thread_manager_,
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_),
-        runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_, applier_)
+        runtime_support_(ini_, parcel_handler_.get_locality(), agas_client_, applier_)
     {
         components::server::get_error_dispatcher().register_error_sink(
             &runtime_impl::default_errorsink, default_error_sink_);
@@ -417,9 +417,9 @@ namespace hpx
 
         // Report this error to the console.
         naming::gid_type console_prefix;
-        if (agas_client_.get_console_prefix(console_prefix))
+        if (agas_client_.get_console_locality(console_prefix))
         {
-            if (parcel_handler_.get_prefix() != console_prefix) {
+            if (parcel_handler_.get_locality() != console_prefix) {
                 components::console_error_sink(
                     naming::id_type(console_prefix, naming::id_type::unmanaged),
                     e);
@@ -680,39 +680,54 @@ namespace hpx
     // Helpers
     naming::id_type find_here()
     {
-        return naming::id_type(hpx::applier::get_applier().get_prefix(),
+        return naming::id_type(hpx::applier::get_applier().get_locality(),
             naming::id_type::unmanaged);
     }
 
     std::vector<naming::id_type>
     find_all_localities(components::component_type type)
     {
-        std::vector<naming::id_type> prefixes;
-        hpx::applier::get_applier().get_prefixes(prefixes, type);
-        return prefixes;
+        std::vector<naming::id_type> locality_ids;
+        hpx::applier::get_applier().get_localities(locality_ids, type);
+        return locality_ids;
     }
 
     std::vector<naming::id_type> find_all_localities()
     {
-        std::vector<naming::id_type> prefixes;
-        hpx::applier::get_applier().get_prefixes(prefixes);
-        return prefixes;
+        std::vector<naming::id_type> locality_ids;
+        hpx::applier::get_applier().get_localities(locality_ids);
+        return locality_ids;
+    }
+
+    std::vector<naming::id_type>
+    find_remote_localities(components::component_type type)
+    {
+        std::vector<naming::id_type> locality_ids;
+        hpx::applier::get_applier().get_remote_locality_ids(locality_ids, type);
+        return locality_ids;
+    }
+
+    std::vector<naming::id_type> find_remote_localities()
+    {
+        std::vector<naming::id_type> locality_ids;
+        hpx::applier::get_applier().get_remote_locality_ids(locality_ids);
+        return locality_ids;
     }
 
     // find a locality supporting the given component
     naming::id_type find_locality(components::component_type type)
     {
-        std::vector<naming::id_type> prefixes;
-        hpx::applier::get_applier().get_prefixes(prefixes, type);
+        std::vector<naming::id_type> locality_ids;
+        hpx::applier::get_applier().get_localities(locality_ids, type);
 
-        if (prefixes.empty()) {
+        if (locality_ids.empty()) {
             HPX_THROW_EXCEPTION(hpx::bad_component_type, "find_locality",
                 "no locality supporting sheneos configuration component found");
             return naming::invalid_id;
         }
 
         // chose first locality to host the object
-        return prefixes.front();
+        return locality_ids.front();
     }
 
     /// \brief Return the number of localities which are currently registered
@@ -720,17 +735,17 @@ namespace hpx
     boost::uint32_t get_num_localities()
     {
         // FIXME: this is overkill
-        std::vector<naming::id_type> prefixes;
-        hpx::applier::get_applier().get_prefixes(prefixes);
-        return static_cast<boost::uint32_t>(prefixes.size());
+        std::vector<naming::id_type> locality_ids;
+        hpx::applier::get_applier().get_localities(locality_ids);
+        return static_cast<boost::uint32_t>(locality_ids.size());
     }
 
     boost::uint32_t get_num_localities(components::component_type type)
     {
         // FIXME: this is overkill
-        std::vector<naming::id_type> prefixes;
-        hpx::applier::get_applier().get_prefixes(prefixes, type);
-        return static_cast<boost::uint32_t>(prefixes.size());
+        std::vector<naming::id_type> locality_ids;
+        hpx::applier::get_applier().get_localities(locality_ids, type);
+        return static_cast<boost::uint32_t>(locality_ids.size());
     }
 
     ///////////////////////////////////////////////////////////////////////////

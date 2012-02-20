@@ -208,7 +208,7 @@ namespace hpx { namespace naming
 
         friend class boost::serialization::access;
 
-        template<class Archive>
+        template <typename Archive>
         void serialize(Archive & ar, const unsigned int version)
         {
             ar & id_msb_;
@@ -234,23 +234,23 @@ namespace hpx { namespace naming
 
     ///////////////////////////////////////////////////////////////////////////
     //  Handle conversion to/from prefix
-    inline gid_type get_gid_from_prefix(boost::uint32_t prefix) HPX_SUPER_PURE;
+    inline gid_type get_gid_from_locality_id(boost::uint32_t prefix) HPX_SUPER_PURE;
 
-    inline gid_type get_gid_from_prefix(boost::uint32_t prefix)
+    inline gid_type get_gid_from_locality_id(boost::uint32_t prefix)
     {
         return gid_type(boost::uint64_t(prefix+1) << 32, 0);
     }
 
-    inline boost::uint32_t get_prefix_from_gid(gid_type const& id) HPX_PURE;
+    inline boost::uint32_t get_locality_id_from_gid(gid_type const& id) HPX_PURE;
 
-    inline boost::uint32_t get_prefix_from_gid(gid_type const& id)
+    inline boost::uint32_t get_locality_id_from_gid(gid_type const& id)
     {
         return boost::uint32_t(id.get_msb() >> 32)-1;
     }
 
     inline gid_type get_locality_from_gid(gid_type const& id)
     {
-        return get_gid_from_prefix(get_prefix_from_gid(id));
+        return get_gid_from_locality_id(get_locality_id_from_gid(id));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -516,7 +516,7 @@ namespace hpx { namespace naming
         gid_type& get_gid() { return *gid_; }
         gid_type const& get_gid() const { return *gid_; }
 
-        // This function is used in AGAS unit tests, do not remove. 
+        // This function is used in AGAS unit tests, do not remove.
         management_type get_management_type() const
         {
             return management_type(gid_->get_management_type());

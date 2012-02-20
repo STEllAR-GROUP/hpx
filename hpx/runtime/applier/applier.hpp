@@ -74,7 +74,7 @@ namespace hpx { namespace applier
         ///
         /// This function returns a reference to the locality this applier
         /// instance is associated with.
-        naming::gid_type const& get_prefix() const;
+        naming::gid_type const& get_locality() const;
 
         /// \brief Allow access to the id of the locality this applier
         ///        instance is associated with.
@@ -83,7 +83,7 @@ namespace hpx { namespace applier
         /// applier instance is associated with.
         boost::uint32_t get_locality_id() const;
 
-        /// \brief Return list of prefixes of all remote localities
+        /// \brief Return list of locality_ids of all remote localities
         ///        registered with the AGAS service for a specific component
         ///        type.
         ///
@@ -91,7 +91,7 @@ namespace hpx { namespace applier
         /// localities known to AGAS except the local one) supporting the given
         /// component type.
         ///
-        /// \param prefixes [out] The reference to a vector of id_types filled
+        /// \param locality_ids [out] The reference to a vector of id_types filled
         ///                 by the function.
         /// \param type     [in] The type of the component which needs to exist
         ///                 on the returned localities.
@@ -99,13 +99,13 @@ namespace hpx { namespace applier
         /// \returns The function returns \a true if there is at least one
         ///          remote locality known to the AGASservice
         ///          (!prefixes.empty()).
-        bool get_raw_remote_prefixes(std::vector<naming::gid_type>& prefixes,
+        bool get_raw_remote_locality_ids(std::vector<naming::gid_type>& locality_ids,
             components::component_type type = components::component_invalid) const;
 
-        bool get_remote_prefixes(std::vector<naming::id_type>& prefixes,
+        bool get_remote_locality_ids(std::vector<naming::id_type>& locality_ids,
             components::component_type type = components::component_invalid) const;
 
-        /// \brief Return list of prefixes of all localities
+        /// \brief Return list of locality_ids of all localities
         ///        registered with the AGAS service for a specific component
         ///        type.
         ///
@@ -113,7 +113,7 @@ namespace hpx { namespace applier
         /// localities known to AGAS except the local one) supporting the given
         /// component type.
         ///
-        /// \param prefixes [out] The reference to a vector of id_types filled
+        /// \param locality_ids [out] The reference to a vector of id_types filled
         ///                 by the function.
         /// \param type     [in] The type of the component which needs to exist
         ///                 on the returned localities.
@@ -121,10 +121,10 @@ namespace hpx { namespace applier
         /// \returns The function returns \a true if there is at least one
         ///          remote locality known to the AGASservice
         ///          (!prefixes.empty()).
-        bool get_raw_prefixes(std::vector<naming::gid_type>& prefixes,
+        bool get_raw_localities(std::vector<naming::gid_type>& locality_ids,
             components::component_type type = components::component_invalid) const;
 
-        bool get_prefixes(std::vector<naming::id_type>& prefixes,
+        bool get_localities(std::vector<naming::id_type>& locality_ids,
             components::component_type type = components::component_invalid) const;
 
         /// By convention the runtime_support has a gid identical to the prefix

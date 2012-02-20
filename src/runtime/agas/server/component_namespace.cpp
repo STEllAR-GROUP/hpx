@@ -117,7 +117,7 @@ response component_namespace::bind_prefix(
 { // {{{ bind_prefix implementation
     // parameters
     std::string key = req.get_name();
-    boost::uint32_t prefix = req.get_prefix();
+    boost::uint32_t prefix = req.get_locality_id();
 
     mutex_type::scoped_lock l(mutex_);
 

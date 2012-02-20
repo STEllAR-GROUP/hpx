@@ -336,7 +336,7 @@ void register_console(registration_header const& header)
     HPX_STD_FUNCTION<void()>* thunk = new HPX_STD_FUNCTION<void()>
         (boost::bind(&big_boot_barrier::apply
                    , boost::ref(get_big_boot_barrier())
-                   , naming::get_prefix_from_gid(prefix)
+                   , naming::get_locality_id_from_gid(prefix)
                    , naming::address(header.locality)
                    , p));
 
@@ -367,10 +367,10 @@ void notify_console(notification_header const& header)
     }
 
     // set our prefix
-    agas_client.local_prefix(header.prefix);
+    agas_client.local_locality(header.prefix);
     get_runtime().get_config().parse("assigned locality",
         boost::str(boost::format("hpx.locality=%1%")
-                  % naming::get_prefix_from_gid(header.prefix)));
+                  % naming::get_locality_id_from_gid(header.prefix)));
 
     // store the full addresses of the agas servers in our local router
     agas_client.primary_ns_addr_ = header.primary_ns_address;
@@ -484,7 +484,7 @@ void register_worker(registration_header const& header)
     {
         // We can just send the parcel now, the connecting locality isn't a part
         // of startup synchronization.
-        get_big_boot_barrier().apply(naming::get_prefix_from_gid(prefix)
+        get_big_boot_barrier().apply(naming::get_locality_id_from_gid(prefix)
                                    , naming::address(header.locality), p);
     }
 
@@ -493,7 +493,7 @@ void register_worker(registration_header const& header)
         HPX_STD_FUNCTION<void()>* thunk = new HPX_STD_FUNCTION<void()>
             (boost::bind(&big_boot_barrier::apply
                        , boost::ref(get_big_boot_barrier())
-                       , naming::get_prefix_from_gid(prefix)
+                       , naming::get_locality_id_from_gid(prefix)
                        , naming::address(header.locality)
                        , p));
 
@@ -513,10 +513,10 @@ void notify_worker(notification_header const& header)
     naming::resolver_client& agas_client = get_runtime().get_agas_client();
 
     // set our prefix
-    agas_client.local_prefix(header.prefix);
+    agas_client.local_locality(header.prefix);
     get_runtime().get_config().parse("assigned locality",
         boost::str(boost::format("hpx.locality=%1%")
-                  % naming::get_prefix_from_gid(header.prefix)));
+                  % naming::get_locality_id_from_gid(header.prefix)));
 
     // store the full addresses of the agas servers in our local service
     agas_client.primary_ns_addr_ = header.primary_ns_address;

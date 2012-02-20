@@ -208,7 +208,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     boost::shared_ptr<hosted_data_type> hosted;
 
     atomic_state state_;
-    naming::gid_type prefix_;
+    naming::gid_type locality_;
 
     naming::address primary_ns_addr_;
     naming::address component_ns_addr_;
@@ -249,15 +249,15 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         state_.store(new_state);
     }
 
-    naming::gid_type const& local_prefix() const
+    naming::gid_type const& local_locality() const
     {
-        BOOST_ASSERT(prefix_ != naming::invalid_gid);
-        return prefix_;
+        BOOST_ASSERT(locality_ != naming::invalid_gid);
+        return locality_;
     }
 
-    void local_prefix(naming::gid_type const& g)
+    void local_locality(naming::gid_type const& g)
     {
-        prefix_ = g;
+        locality_ = g;
     }
 
     bool is_bootstrap() const
@@ -343,20 +343,20 @@ public:
       , error_code& ec = throws
         );
 
-    /// \brief Get locality prefix of the console locality.
+    /// \brief Get locality locality_id of the console locality.
     ///
-    /// \param prefix     [out] The prefix value uniquely identifying the
+    /// \param locality_id     [out] The locality_id value uniquely identifying the
     ///                   console locality. This is valid only, if the
     ///                   return value of this function is true.
     /// \param try_cache  [in] If this is set to true the console is first
     ///                   tried to be found in the local cache. Otherwise
     ///                   this function will always query AGAS, even if the
-    ///                   console prefix is already known locally.
+    ///                   console locality_id is already known locally.
     /// \param ec         [in,out] this represents the error status on exit,
     ///                   if this is pre-initialized to \a hpx#throws
     ///                   the function will throw on error instead.
     ///
-    /// \returns          This function returns \a true if a console prefix
+    /// \returns          This function returns \a true if a console locality_id
     ///                   exists and returns \a false otherwise.
     ///
     /// \note             As long as \a ec is not pre-initialized to
@@ -364,18 +364,18 @@ public:
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    bool get_console_prefix(
-        naming::gid_type& prefix
+    bool get_console_locality(
+        naming::gid_type& locality_id
       , error_code& ec = throws
         );
 
-    /// \brief Query for the prefixes of all known localities.
+    /// \brief Query for the locality_ids of all known localities.
     ///
-    /// This function returns the prefixes of all localities known to the
+    /// This function returns the locality_ids of all localities known to the
     /// AGAS server or all localities having a registered factory for a
     /// given component type.
     ///
-    /// \param prefixes   [out] The vector will contain the prefixes of all
+    /// \param locality_ids [out] The vector will contain the prefixes of all
     ///                   localities registered with the AGAS server. The
     ///                   returned vector holds the prefixes representing
     ///                   the runtime_support components of these
@@ -394,18 +394,18 @@ public:
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    bool get_prefixes(
-        std::vector<naming::gid_type>& prefixes
+    bool get_localities(
+        std::vector<naming::gid_type>& locality_ids
       , components::component_type type
       , error_code& ec = throws
         );
 
-    bool get_prefixes(
-        std::vector<naming::gid_type>& prefixes
+    bool get_localities(
+        std::vector<naming::gid_type>& locality_ids
       , error_code& ec = throws
         )
     {
-        return get_prefixes(prefixes, components::component_invalid, ec);
+        return get_localities(locality_ids, components::component_invalid, ec);
     }
 
     /// \brief Return a unique id usable as a component type.
@@ -444,7 +444,7 @@ public:
     /// This function allows to register a component factory for a given
     /// locality and component type.
     ///
-    /// \param prefix     [in] The prefix value uniquely identifying the
+    /// \param locality_id  [in] The locality value uniquely identifying the
     ///                   given locality the factory needs to be registered
     ///                   for.
     /// \param name       [in] The component name (string) to register a
@@ -466,16 +466,16 @@ public:
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     components::component_type register_factory(
-        naming::gid_type const& prefix
+        naming::gid_type const& locality_id
       , std::string const& name
       , error_code& ec = throws
         )
     {
-        return register_factory(naming::get_prefix_from_gid(prefix), name, ec);
+        return register_factory(naming::get_locality_id_from_gid(locality_id), name, ec);
     }
 
     components::component_type register_factory(
-        boost::uint32_t prefix
+        boost::uint32_t locality_id
       , std::string const& name
       , error_code& ec = throws
         );
@@ -489,7 +489,7 @@ public:
     ///
     /// \param l          [in] The locality the locality id needs to be
     ///                   generated for. Repeating calls using the same
-    ///                   locality results in identical prefix values.
+    ///                   locality results in identical locality_id values.
     /// \param count      [in] The number of global ids to be generated.
     /// \param lower_bound
     ///                   [out] The lower bound of the assigned id range.

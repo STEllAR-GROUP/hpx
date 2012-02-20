@@ -12,64 +12,65 @@
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map&)
 {
-    // get list of all known localities
-    std::vector<hpx::naming::id_type> prefixes;
+    // get list of all known remote localities supporting our accumulator type
+    hpx::components::component_type t =
+        hpx::components::accumulator::get_component_type();
+    std::vector<hpx::naming::id_type> localities =
+        hpx::find_remote_localities(t);
     hpx::naming::id_type prefix;
-    hpx::applier::applier& appl = hpx::applier::get_applier();
 
-    if (appl.get_remote_prefixes(prefixes))
+    if (!localities.empty())
         // create accumulator on any of the remote localities
-        prefix = prefixes[0];
+        prefix = localities[0];
     else
         // create an accumulator locally
-        prefix = appl.get_runtime_support_gid();
+        prefix = hpx::find_here();
 
-    // create an accumulator locally
-    hpx::components::accumulator accu;
-    accu.create(prefix);
-
-    // print some message
-    std::cout << "accumulator client, you may enter some commands "
-                 "(try 'help' if in doubt...)" << std::endl;
-
-    // execute a couple of commands on this component
-    std::string cmd;
-    std::cin >> cmd;
-    while (std::cin.good())
     {
-        if (cmd == "init")
-            accu.init();
+        // create an accumulator locally
+        hpx::components::accumulator accu;
+        accu.create(prefix);
 
-        else if (cmd == "add")
-        {
-            std::string arg;
-            std::cin >> arg;
-            accu.add(boost::lexical_cast<unsigned long>(arg));
-        }
+        // print some message
+        std::cout << "accumulator client, you may enter some commands "
+                     "(try 'help' if in doubt...)" << std::endl;
 
-        else if (cmd == "print")
-            accu.print();
-
-        else if (cmd == "query")
-            std::cout << accu.get_gid() << "> " << accu.query() << std::endl;
-
-        else if (cmd == "help")
-            std::cout << "commands: init, add [amount], print, query, help, quit"
-                      << std::endl;
-
-        else if (cmd == "quit")
-            break;
-
-        else
-            std::cout << "Invalid command.\n"
-                         "commands: init, add [amount], print, help, quit"
-                      << std::endl;
-
+        // execute a couple of commands on this component
+        std::string cmd;
         std::cin >> cmd;
-    }
+        while (std::cin.good())
+        {
+            if (cmd == "init")
+                accu.init();
 
-    // free the accumulator component
-    accu.free(); // this invalidates the remote reference
+            else if (cmd == "add")
+            {
+                std::string arg;
+                std::cin >> arg;
+                accu.add(boost::lexical_cast<unsigned long>(arg));
+            }
+
+            else if (cmd == "print")
+                accu.print();
+
+            else if (cmd == "query")
+                std::cout << accu.get_gid() << "> " << accu.query() << std::endl;
+
+            else if (cmd == "help")
+                std::cout << "commands: init, add [amount], print, query, help, quit"
+                          << std::endl;
+
+            else if (cmd == "quit")
+                break;
+
+            else
+                std::cout << "Invalid command.\n"
+                             "commands: init, add [amount], print, help, quit"
+                          << std::endl;
+
+            std::cin >> cmd;
+        }
+    }
 
     // initiate shutdown of the runtime systems on all localities
     hpx::finalize();

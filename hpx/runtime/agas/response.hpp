@@ -213,7 +213,7 @@ struct response
         return get_data<subtype_ctype, 0>(ec);
     }
 
-    boost::uint32_t get_prefix(
+    boost::uint32_t get_locality_id(
         error_code& ec = throws
         ) const
     {

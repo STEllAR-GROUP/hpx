@@ -97,7 +97,7 @@ void hpx_test_main(
 
         component_type ctype = get_component_type<server_type>();
 
-        if (!get_applier().get_remote_prefixes(remote_localities, ctype))
+        if (!get_applier().get_remote_locality_ids(remote_localities, ctype))
             throw std::logic_error("this test cannot be run on one locality");
 
         id_type const here = find_here();

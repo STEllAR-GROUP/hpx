@@ -288,12 +288,12 @@ void garbage_collect(
 }
 
 /// \brief Return an id_type referring to the console locality.
-naming::id_type get_console_prefix(
+naming::id_type get_console_locality(
     error_code& ec
     )
 {
     naming::gid_type console;
-    naming::get_agas_client().get_console_prefix(console, ec);
+    naming::get_agas_client().get_console_locality(console, ec);
     if (ec) return naming::invalid_id;
 
     return naming::id_type(console, naming::id_type::unmanaged);

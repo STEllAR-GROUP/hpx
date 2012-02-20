@@ -37,19 +37,19 @@ int hpx_main(variables_map& vm)
         hpx::agas::resolve_name(throttle_component_name, gid);
         throttle::throttle t;
         if (!t.get_gid()) {
-            std::vector<hpx::naming::id_type> prefixes;
-            hpx::applier::applier& appl = hpx::applier::get_applier();
+            std::vector<hpx::naming::id_type> localities =
+                hpx::find_remote_localities();
 
             // create throttle on the console, register the instance with AGAS
             // and add an additional reference count to keep it alive
-            if (appl.get_remote_prefixes(prefixes)) {
+            if (!localities.empty()) {
                 // use AGAS client to get the component type as we do not
                 // register any factories
                 hpx::components::component_type type =
                     get_agas_client().get_component_id("throttle_throttle_type");
                 std::cout << "throttle component type: " << (int)type << std::endl;
 
-                t.create(prefixes[0], type);
+                t.create(localities[0], type);
                 hpx::agas::register_name(throttle_component_name, t.get_gid());
             }
             else {

@@ -54,7 +54,7 @@ namespace hpx { namespace components { namespace server
         {
             applier::applier* appl = applier::get_applier_ptr();
             if (appl)
-                prefix_ = naming::get_prefix_from_gid(appl->get_prefix());
+                prefix_ = appl->get_locality_id();
         }
 
         ///////////////////////////////////////////////////////////////////////

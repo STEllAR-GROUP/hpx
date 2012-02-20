@@ -157,7 +157,7 @@ namespace hpx { namespace parcelset
 
         // AGAS v2 registers itself in the client before the parcelhandler
         // is booted.
-        prefix_ = resolver_.local_prefix();
+        locality_ = resolver_.local_locality();
 
         parcels_->set_parcelhandler(this);
 
@@ -171,30 +171,30 @@ namespace hpx { namespace parcelset
         return resolver_;
     }
 
-    bool parcelhandler::get_raw_remote_prefixes(
-        std::vector<naming::gid_type>& prefixes,
+    bool parcelhandler::get_raw_remote_localities(
+        std::vector<naming::gid_type>& locality_ids,
         components::component_type type) const
     {
         std::vector<naming::gid_type> allprefixes;
         error_code ec;
-        bool result = resolver_.get_prefixes(allprefixes, type, ec);
+        bool result = resolver_.get_localities(allprefixes, type, ec);
         if (ec || !result) return false;
 
         using boost::lambda::_1;
         std::remove_copy_if(allprefixes.begin(), allprefixes.end(),
-            std::back_inserter(prefixes), _1 == prefix_);
-        return !prefixes.empty();
+            std::back_inserter(locality_ids), _1 == locality_);
+        return !locality_ids.empty();
     }
 
-    bool parcelhandler::get_raw_prefixes(
-        std::vector<naming::gid_type>& prefixes,
+    bool parcelhandler::get_raw_localities(
+        std::vector<naming::gid_type>& locality_ids,
         components::component_type type) const
     {
         error_code ec;
-        bool result = resolver_.get_prefixes(prefixes, type, ec);
+        bool result = resolver_.get_localities(locality_ids, type, ec);
         if (ec || !result) return false;
 
-        return !prefixes.empty();
+        return !locality_ids.empty();
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -164,7 +164,7 @@ HPX_EXPORT void garbage_collect(
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Return an id_type referring to the console locality.
-HPX_EXPORT naming::id_type get_console_prefix(
+HPX_EXPORT naming::id_type get_console_locality(
     error_code& ec = throws
     );
 }}

@@ -19,7 +19,7 @@ int hpx_main(boost::program_options::variables_map&)
 
     std::size_t soln_count_total = 0;
 
-    hpx::naming::gid_type prefix = hpx::applier::get_applier().get_prefix();
+    hpx::naming::gid_type prefix = hpx::applier::get_applier().get_locality_id();
 
     std::cout << "Enter size of board. Default size is 8." << std::endl;
     std::cout << "Command Options: size[value] | default | print | quit"

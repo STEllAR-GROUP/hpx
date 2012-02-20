@@ -527,13 +527,20 @@ namespace hpx
     /// \brief Return the global id representing this locality
     HPX_API_EXPORT naming::id_type find_here();
 
-    /// \brief Return the list of prefixes of the localities supporting the
+    /// \brief Return the list of locality ids of the localities supporting the
     ///        given component type. By default this function will return the
     ///        list of all localities.
     HPX_API_EXPORT std::vector<naming::id_type> find_all_localities();
     HPX_API_EXPORT std::vector<naming::id_type> find_all_localities(
         components::component_type);
     HPX_API_EXPORT naming::id_type find_locality(components::component_type);
+
+    /// \brief Return the list of locality ids of remote localities supporting
+    ///        the given component type. By default this function will return
+    ///        the list of all remote localities (all but the current locality).
+    HPX_API_EXPORT std::vector<naming::id_type> find_remote_localities();
+    HPX_API_EXPORT std::vector<naming::id_type> find_remote_localities(
+        components::component_type);
 
     /// \brief Return the number of localities which are currently registered
     ///        for the running application.

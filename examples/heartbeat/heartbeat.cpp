@@ -54,7 +54,7 @@ using hpx::performance_counters::status_is_valid;
 
 using hpx::naming::resolver_client;
 using hpx::naming::gid_type;
-using hpx::naming::get_prefix_from_gid;
+using hpx::naming::get_locality_id_from_gid;
 using hpx::naming::get_agas_client;
 
 using hpx::lcos::promise;
@@ -101,7 +101,7 @@ int monitor(
 
     const boost::uint32_t prefix = hpx::get_locality_id();
 
-    if (prefix == get_prefix_from_gid(gid))
+    if (prefix == get_locality_id_from_gid(gid))
     {
         std::cout << (format(
             "error: cannot query performance counters on its own locality (%s)")
