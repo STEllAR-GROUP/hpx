@@ -50,7 +50,7 @@ namespace hpx { namespace performance_counters
             type_name, counter_data(info, create_counter, discover_counters)));
 
         if (p.second) {
-            LPCS_(info) << (boost::format("counter type %s created") %
+            LPCS_(info) << (boost::format("counter type %s registered") %
                 type_name);
 
             if (&ec != &throws)
@@ -58,8 +58,8 @@ namespace hpx { namespace performance_counters
             return status_valid_data;
         }
 
-        LPCS_(warning) << (boost::format("failed to create counter type %s") %
-            type_name);
+        LPCS_(warning) << (
+            boost::format("failed to register counter type %s") %type_name);
         return status_invalid_data;
     }
 
@@ -168,7 +168,8 @@ namespace hpx { namespace performance_counters
             return status_counter_type_unknown;
         }
 
-        LPCS_(info) << (boost::format("counter type %s destroyed") % type_name);
+        LPCS_(info) << (
+            boost::format("counter type %s unregistered") % type_name);
 
         countertypes_.erase(it);
 
@@ -232,12 +233,13 @@ namespace hpx { namespace performance_counters
             if (&ec == &throws)
                 throw;
             ec = make_error_code(e.get_error(), e.what());
-            LPCS_(warning) << (boost::format("failed to create counter %s (%s)")
-                % complemented_info.fullname_ % e.what());
+            LPCS_(warning) << (
+                boost::format("failed to create raw counter %s (%s)") %
+                    complemented_info.fullname_ % e.what());
             return status_invalid_data;
         }
 
-        LPCS_(info) << (boost::format("counter %s created at %s")
+        LPCS_(info) << (boost::format("raw counter %s created at %s")
             % complemented_info.fullname_ % id);
 
         if (&ec != &throws)
@@ -387,13 +389,14 @@ namespace hpx { namespace performance_counters
             if (&ec == &throws)
                 throw;
             ec = make_error_code(e.get_error(), e.what());
-            LPCS_(warning) << (boost::format("failed to create counter %s (%s)")
-                % complemented_info.fullname_ % e.what());
+            LPCS_(warning) << (
+                boost::format("failed to create statistics counter %s (%s)") %
+                    complemented_info.fullname_ % e.what());
             return status_invalid_data;
         }
 
-        LPCS_(info) << (boost::format("counter %s created at %s")
-            % complemented_info.fullname_ % gid);
+        LPCS_(info) << (boost::format("statistics counter %s created at %s") %
+            complemented_info.fullname_ % gid);
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -454,7 +457,7 @@ namespace hpx { namespace performance_counters
         ensure_counter_prefix(name);      // pre-pend prefix, if necessary
         agas::unregister_name(name, ec);
         if (ec) {
-            LPCS_(warning) << ( boost::format("failed to destroy counter %s")
+            LPCS_(warning) << ( boost::format("failed to remove counter %s")
                 % complemented_info.fullname_);
             return status_invalid_data;
         }

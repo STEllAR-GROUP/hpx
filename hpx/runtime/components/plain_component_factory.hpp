@@ -125,7 +125,7 @@ namespace hpx { namespace components
         naming::gid_type create (std::size_t count)
         {
             HPX_THROW_EXCEPTION(bad_request,
-                "derived_component_factory_one::create",
+                "plain_component_factory::create",
                 "create is not supported by this factory instance (" +
                 get_component_name() + ")");
             return naming::invalid_gid;
@@ -143,14 +143,14 @@ namespace hpx { namespace components
         naming::gid_type create_one (components::constructor_argument const&)
         {
             HPX_THROW_EXCEPTION(bad_request,
-                "derived_component_factory::create_one",
+                "plain_component_factory::create_one",
                 "create_one is not supported by this factory instance");
             return naming::invalid_gid;
         }
         naming::gid_type create_one_functor(HPX_STD_FUNCTION<void(void*)> const&)
         {
             HPX_THROW_EXCEPTION(bad_request,
-                "component_factory::create_one",
+                "plain_component_factory::create_one",
                 "create_one is not supported by this factory instance");
             return naming::invalid_gid;
         }

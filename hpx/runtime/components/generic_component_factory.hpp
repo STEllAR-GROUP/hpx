@@ -159,7 +159,7 @@ namespace hpx { namespace components
         naming::gid_type create_one (components::constructor_argument const&)
         {
             HPX_THROW_EXCEPTION(bad_request,
-                "component_factory::create_one",
+                "generic_component_factory::create_one",
                 "create_one is not supported by this factory instance");
             return naming::invalid_gid;
         }

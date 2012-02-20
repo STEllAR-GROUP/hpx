@@ -157,7 +157,7 @@ namespace hpx { namespace components
             }
 
             HPX_THROW_EXCEPTION(bad_request,
-                "derived_component_factory::create",
+                "derived_component_factory_one::create",
                 "this factory instance is disabled for this locality (" +
                 get_component_name() + ")");
             return naming::invalid_gid;
@@ -201,7 +201,7 @@ namespace hpx { namespace components
         naming::gid_type create_one_functor(HPX_STD_FUNCTION<void(void*)> const&)
         {
             HPX_THROW_EXCEPTION(bad_request,
-                "component_factory::create_one",
+                "derived_component_factory_one::create_one",
                 "create_one is not supported by this factory instance");
             return naming::invalid_gid;
         }
