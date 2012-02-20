@@ -8,6 +8,7 @@ set(subdirs
     actions
     agas
     components
+    diagnostics
     lcos
     threads
     util
