@@ -16,9 +16,10 @@ set(tests
     local_mutex_try_lock
     local_mutex_try_lock_raii
     local_mutex_try_lock_sanity
+    signalling_promise
    )
 
-set(dataflow_FLAGS DEPENDENCIES iostreams_component dataflow_component)
+set(dataflow_FLAGS DEPENDENCIES dataflow_component)
 
 foreach(test ${tests})
   set(sources

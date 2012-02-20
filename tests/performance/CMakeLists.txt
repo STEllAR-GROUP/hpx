@@ -11,6 +11,7 @@ set(benchmarks
     hpx_homogeneous_task_spawn
     hpx_heterogeneous_task_spawn
     print_heterogeneous_payloads
+    sizeof
    )
 
 if(OPENMP_FOUND)
@@ -99,6 +100,8 @@ if(HPX_CXX11_LAMBDAS)
 
   set(eager_future_FLAGS DEPENDENCIES iostreams_component)
 endif()
+
+set(sizeof_FLAGS DEPENDENCIES iostreams_component)
 
 foreach(benchmark ${benchmarks})
   set(sources

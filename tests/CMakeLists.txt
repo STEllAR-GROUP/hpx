@@ -5,19 +5,9 @@
 
 set(subdirs "")
 
-if(HPX_BUILD_TESTS_ABI)
-  set(subdirs
-    ${subdirs} abi)
-endif()
-
 if(HPX_BUILD_TESTS_BENCHMARKS)
   set(subdirs
     ${subdirs} performance)
-endif()
-
-if(HPX_BUILD_TESTS_CORRECTNESS)
-  set(subdirs
-    ${subdirs} correctness)
 endif()
 
 if(HPX_BUILD_TESTS_REGRESSIONS)

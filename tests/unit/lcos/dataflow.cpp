@@ -5,7 +5,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/iostreams.hpp>
+//#include <hpx/include/iostreams.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #if HPX_ACTION_ARGUMENT_LIMIT < 10
@@ -114,11 +114,11 @@ int hpx_main(variables_map & vm)
         // this as the target of the dataflow)
         HPX_TEST_EQ(18003, c.get());
 
-        hpx::util::high_resolution_timer t;
+        //hpx::util::high_resolution_timer t;
         boost::uint64_t r = fib(n).get();
-        double time = t.elapsed();
-        hpx::cout << "fib(" << n << ") = " << r << " calculated in "
-                  << time << " seconds\n" << hpx::flush;
+        //double time = t.elapsed();
+        //hpx::cout << "fib(" << n << ") = " << r << " calculated in "
+        //          << time << " seconds\n" << hpx::flush;
 
         HPX_TEST_EQ(55U, r);
         HPX_TEST_EQ(9005, hpx::lcos::dataflow<h_action>(here, a, 4).get());
@@ -149,7 +149,7 @@ int hpx_main(variables_map & vm)
         HPX_TEST(called_f8);
         HPX_TEST(called_f9);
 
-        hpx::cout << "entering destruction test scope\n" << hpx::flush;
+        //hpx::cout << "entering destruction test scope\n" << hpx::flush;
         {
             hpx::lcos::dataflow<f_action>(
                 here
@@ -170,9 +170,9 @@ int hpx_main(variables_map & vm)
                 )
             ).get();
         }
-        hpx::cout << "leaving destruction test scope\n" << hpx::flush;
+        //hpx::cout << "leaving destruction test scope\n" << hpx::flush;
     }
-    hpx::cout << "end of hpx_main\n" << hpx::flush;
+    //hpx::cout << "end of hpx_main\n" << hpx::flush;
     hpx::finalize();
 
     return hpx::util::report_errors();
