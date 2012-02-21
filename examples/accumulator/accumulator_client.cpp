@@ -17,6 +17,7 @@ int hpx_main(boost::program_options::variables_map&)
         hpx::components::accumulator::get_component_type();
     std::vector<hpx::naming::id_type> localities =
         hpx::find_remote_localities(t);
+
     hpx::naming::id_type prefix;
 
     if (!localities.empty())
