@@ -60,26 +60,34 @@ typedef plain_action3<
 
 HPX_REGISTER_PLAIN_ACTION(split_action);
 
+///////////////////////////////////////////////////////////////////////////////
+// helper functions
+inline boost::uint32_t get_credit(id_type const& id)
+{
+    return get_credit_from_gid(id.get_gid());
+}
+
+///////////////////////////////////////////////////////////////////////////////
 void split(
     id_type const& from
   , id_type const& target
   , boost::uint16_t old_credit
     )
 {
-    std::cout << "[" << find_here() << "/" << target << "]: " << old_credit << ", " << target.get_credit() << "\n";
+    std::cout << "[" << find_here() << "/" << target << "]: " << old_credit << ", " << get_credit(target) << "\n";
 
-    // If we have more credits than the sender, then we're done. 
-    if (old_credit < target.get_credit())
-        return; 
+    // If we have more credits than the sender, then we're done.
+    if (old_credit < get_credit(target))
+        return;
 
     id_type const here = find_here();
 
-    if (get_locality_id_from_id(from) == get_locality_id_from_id(here)) 
+    if (get_locality_id_from_id(from) == get_locality_id_from_id(here))
         throw std::logic_error("infinite recursion detected, split was "
                                "invoked locally");
 
     // Recursively call split on the sender locality.
-    async<split_action>(from, here, target, target.get_credit()).get();
+    async<split_action>(from, here, target, get_credit(target)).get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -112,7 +120,7 @@ void hpx_test_main(
         async<split_action>(remote_localities[0]
                           , here
                           , object.get_gid()
-                          , object.get_gid().get_credit()).get();
+                          , get_credit(object.get_gid())).get();
     }
 }
 

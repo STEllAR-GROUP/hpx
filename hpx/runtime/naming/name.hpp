@@ -535,22 +535,6 @@ namespace hpx { namespace naming
             gid_->set_lsb(lsb);
         }
 
-        // functions for credit management
-        boost::uint16_t get_credit() const
-        {
-            return get_credit_from_gid(*gid_);
-        }
-
-        id_type split_credits(int fraction = 2) const
-        {
-            return id_type(split_credits_for_gid(*gid_, fraction), managed);
-        }
-
-        bool was_split() const
-        {
-            return gid_was_split(*gid_);
-        }
-
     private:
         friend std::ostream& operator<< (std::ostream& os, id_type const& id);
 

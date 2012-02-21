@@ -41,6 +41,19 @@ using hpx::flush;
 using hpx::find_here;
 
 ///////////////////////////////////////////////////////////////////////////////
+// helper functions
+inline boost::uint32_t get_credit(id_type const& id)
+{
+    return hpx::naming::get_credit_from_gid(id.get_gid());
+}
+
+inline id_type split_credits(id_type const& id, int frac = 2)
+{
+    return id_type(split_credits_for_gid(
+        const_cast<id_type&>(id).get_gid(), frac), id_type::managed);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 template <
     typename Client
 >
@@ -51,15 +64,15 @@ void hpx_test_main(
     {
         Client object(find_here());
 
-        id_type g0 = object.get_gid().split_credits();
-        id_type g1 = object.get_gid().split_credits();
+        id_type g0 = split_credits(object.get_gid());
+        id_type g1 = split_credits(object.get_gid());
 
         cout << "  " << object.get_gid() << " : "
-                     << object.get_gid().get_credit() << "\n"
+                     << get_credit(object.get_gid()) << "\n"
              << "  " << g0 << " : "
-                     << g0.get_credit() << "\n"
+                     << get_credit(g0) << "\n"
              << "  " << g1 << " : "
-                     << g1.get_credit() << "\n" << flush;
+                     << get_credit(g1) << "\n" << flush;
     }
 }
 
