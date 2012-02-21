@@ -386,8 +386,7 @@ namespace hpx
         // global scheduler (one queue for all OS threads)
         int run_global(util::runtime_configuration& rtcfg,
             hpx_main_func f, boost::program_options::variables_map& vm,
-            runtime_mode mode, std::vector<std::string> const& ini_config,
-            startup_function_type const& startup,
+            runtime_mode mode, startup_function_type const& startup,
             shutdown_function_type const& shutdown, std::size_t num_threads,
             std::size_t num_localities)
         {
@@ -435,8 +434,7 @@ namespace hpx
         // local scheduler (one queue for each OS threads)
         int run_local(util::runtime_configuration& rtcfg,
             hpx_main_func f, boost::program_options::variables_map& vm,
-            runtime_mode mode, std::vector<std::string> const& ini_config,
-            startup_function_type const& startup,
+            runtime_mode mode, startup_function_type const& startup,
             shutdown_function_type const& shutdown, std::size_t num_threads,
             std::size_t num_localities)
         {
@@ -483,8 +481,7 @@ namespace hpx
         // plus one separate queue for high priority PX-threads)
         int run_priority_local(util::runtime_configuration& rtcfg,
             hpx_main_func f, boost::program_options::variables_map& vm,
-            runtime_mode mode, std::vector<std::string> const& ini_config,
-            startup_function_type const& startup,
+            runtime_mode mode, startup_function_type const& startup,
             shutdown_function_type const& shutdown, std::size_t num_threads,
             std::size_t num_localities)
         {
@@ -544,8 +541,7 @@ namespace hpx
         // stealing from the "bottom" of each.
         int run_abp(util::runtime_configuration& rtcfg,
             hpx_main_func f, boost::program_options::variables_map& vm,
-            runtime_mode mode, std::vector<std::string> const& ini_config,
-            startup_function_type const& startup,
+            runtime_mode mode, startup_function_type const& startup,
             shutdown_function_type const& shutdown, std::size_t num_threads,
             std::size_t num_localities)
         {
@@ -593,8 +589,7 @@ namespace hpx
         // with work stealing from the "bottom" of each.
         int run_priority_abp(util::runtime_configuration& rtcfg,
             hpx_main_func f, boost::program_options::variables_map& vm,
-            runtime_mode mode, std::vector<std::string> const& ini_config,
-            startup_function_type const& startup,
+            runtime_mode mode, startup_function_type const& startup,
             shutdown_function_type const& shutdown, std::size_t num_threads,
             std::size_t num_localities)
         {
@@ -641,8 +636,7 @@ namespace hpx
         // this avoids contention during work stealing
         int run_hierarchy(util::runtime_configuration& rtcfg,
             hpx_main_func f, boost::program_options::variables_map& vm,
-            runtime_mode mode, std::vector<std::string> const& ini_config,
-            startup_function_type const& startup,
+            runtime_mode mode, startup_function_type const& startup,
             shutdown_function_type const& shutdown, std::size_t num_threads,
             std::size_t num_localities)
         {
@@ -688,8 +682,7 @@ namespace hpx
         // this avoids contention during work stealing
         int run_periodic(util::runtime_configuration& rtcfg,
             hpx_main_func f, boost::program_options::variables_map& vm,
-            runtime_mode mode, std::vector<std::string> const& ini_config,
-            startup_function_type const& startup,
+            runtime_mode mode, startup_function_type const& startup,
             shutdown_function_type const& shutdown, std::size_t num_threads,
             std::size_t num_localities)
         {
@@ -1136,7 +1129,7 @@ namespace hpx
             // Initialize and start the HPX runtime.
             if (0 == std::string("global").find(queueing)) {
 #if defined(HPX_GLOBAL_SCHEDULER)
-                result = detail::run_global(rtcfg, f, vm, mode, ini_config,
+                result = detail::run_global(rtcfg, f, vm, mode,
                     startup, shutdown, num_threads, num_localities);
 #else
                 throw std::logic_error("Command line option --queueing=global "
@@ -1146,7 +1139,7 @@ namespace hpx
             }
             else if (0 == std::string("local").find(queueing)) {
 #if defined(HPX_LOCAL_SCHEDULER)
-                result = detail::run_local(rtcfg, f, vm, mode, ini_config,
+                result = detail::run_local(rtcfg, f, vm, mode,
                     startup, shutdown, num_threads, num_localities);
 #else
                 throw std::logic_error("Command line option --queueing=local "
@@ -1157,14 +1150,14 @@ namespace hpx
             else if (0 == std::string("priority_local").find(queueing)) {
                 // local scheduler with priority queue (one queue for each OS threads
                 // plus one separate queue for high priority PX-threads)
-                result = detail::run_priority_local(rtcfg, f, vm, mode, ini_config,
+                result = detail::run_priority_local(rtcfg, f, vm, mode,
                     startup, shutdown, num_threads, num_localities);
             }
             else if (0 == std::string("abp").find(queueing)) {
                 // abp scheduler: local dequeues for each OS thread, with work
                 // stealing from the "bottom" of each.
 #if defined(HPX_ABP_SCHEDULER)
-                result = detail::run_abp(rtcfg, f, vm, mode, ini_config,
+                result = detail::run_abp(rtcfg, f, vm, mode,
                     startup, shutdown, num_threads, num_localities);
 #else
                 throw std::logic_error("Command line option --queueing=abp "
@@ -1176,7 +1169,7 @@ namespace hpx
                 // priority abp scheduler: local priority dequeues for each
                 // OS thread, with work stealing from the "bottom" of each.
 #if defined(HPX_ABP_PRIORITY_SCHEDULER)
-                result = detail::run_priority_abp(rtcfg, f, vm, mode, ini_config,
+                result = detail::run_priority_abp(rtcfg, f, vm, mode,
                     startup, shutdown, num_threads, num_localities);
 #else
                 throw std::logic_error("Command line option --queueing=priority_abp "
@@ -1188,7 +1181,7 @@ namespace hpx
 #if defined(HPX_HIERARCHY_SCHEDULER)
                 // hierarchy scheduler: tree of queues, with work
                 // stealing from the parent queue in that tree.
-                result = detail::run_hierarchy(rtcfg, f, vm, mode, ini_config,
+                result = detail::run_hierarchy(rtcfg, f, vm, mode,
                     startup, shutdown, num_threads, num_localities);
 #else
                 throw std::logic_error("Command line option --queueing=hierarchy "
@@ -1198,7 +1191,7 @@ namespace hpx
             }
             else if (0 == std::string("periodic").find(queueing)) {
 #if defined(HPX_PERIODIC_PRIORITY_SCHEDULER)
-                result = detail::run_periodic(rtcfg, f, vm, mode, ini_config,
+                result = detail::run_periodic(rtcfg, f, vm, mode,
                     startup, shutdown, num_threads, num_localities);
 #else
                 throw std::logic_error("Command line option --queueing=periodic "
