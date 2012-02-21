@@ -19,7 +19,7 @@ int hpx_main(boost::program_options::variables_map&)
 
     std::size_t soln_count_total = 0;
 
-    hpx::naming::gid_type prefix = hpx::applier::get_applier().get_locality_id();
+    hpx::naming::id_type locality_ = hpx::find_here();
 
     std::cout << "Enter size of board. Default size is 8." << std::endl;
     std::cout << "Command Options: size[value] | default | print | quit"
@@ -49,7 +49,7 @@ int hpx_main(boost::program_options::variables_map&)
             for(std::list<nqueen::board>::iterator iter = b.begin();
                 iter != b.end(); ++iter)
             {
-                iter->create(prefix);
+                iter->create(locality_);
                 iter->init_board(sz);
                 soln_count_total+= iter->solve_board(iter->access_board(),
                                                      sz, 0, i);
@@ -73,7 +73,7 @@ int hpx_main(boost::program_options::variables_map&)
             for(std::vector<nqueen::board>::iterator iter = b.begin();
                 iter != b.end(); ++iter)
             {
-                iter->create(prefix);
+                iter->create(locality_);
                 iter->init_board(default_size);
                 soln_count_total+= iter->solve_board(iter->access_board(),
                                                      default_size, 0, i);
