@@ -87,6 +87,18 @@ namespace graph500
             this->base_type::bfs(gid_);
         }
 
+        hpx::lcos::promise<void> resolve_conflict_async()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::resolve_conflict_async(gid_);
+        }
+
+        void resolve_conflict()
+        {
+            BOOST_ASSERT(gid_);
+            this->base_type::resolve_conflict(gid_);
+        }
+
         hpx::lcos::promise< bool > has_edge_async(int64_t edge)
         {
             BOOST_ASSERT(gid_);
@@ -97,6 +109,18 @@ namespace graph500
         {
             BOOST_ASSERT(gid_);
             return this->base_type::has_edge(gid_,edge);
+        }
+
+        hpx::lcos::promise< resolvedata > get_parent_async(int64_t edge,int64_t root)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_parent_async(gid_,edge,root);
+        }
+
+        resolvedata get_parent(int64_t edge,int64_t root)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_parent(gid_,edge,root);
         }
 
         hpx::lcos::promise< std::vector<nodedata> > validate_async()

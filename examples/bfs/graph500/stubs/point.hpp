@@ -76,6 +76,20 @@ namespace graph500 { namespace stubs
             bfs_async(gid).get();
         }
 
+        static hpx::lcos::promise<void>
+        resolve_conflict_async(hpx::naming::id_type const& gid)
+        {
+            typedef server::point::resolve_conflict_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid);
+        }
+
+        static void resolve_conflict(hpx::naming::id_type const& gid)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise.
+            resolve_conflict_async(gid).get();
+        }
+
         static hpx::lcos::promise< bool >
         has_edge_async(hpx::naming::id_type const& gid,int64_t edge)
         {
@@ -88,6 +102,20 @@ namespace graph500 { namespace stubs
             // The following get yields control while the action above
             // is executed and the result is returned to the promise
             return has_edge_async(gid,edge).get();
+        }
+
+        static hpx::lcos::promise< resolvedata >
+        get_parent_async(hpx::naming::id_type const& gid,int64_t edge,int64_t root)
+        {
+            typedef server::point::get_parent_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid,edge,root);
+        }
+
+        static resolvedata get_parent(hpx::naming::id_type const& gid,int64_t edge,int64_t root)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise
+            return get_parent_async(gid,edge,root).get();
         }
 
         static hpx::lcos::promise< std::vector<nodedata> >

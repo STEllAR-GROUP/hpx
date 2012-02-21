@@ -41,8 +41,16 @@ HPX_REGISTER_ACTION_EX(
     graph500_point_receive_duplicates_action);
 
 HPX_REGISTER_ACTION_EX(
+    graph500_point_type::wrapped_type::get_parent_action,
+    graph500_point_get_parent_action);
+
+HPX_REGISTER_ACTION_EX(
     graph500_point_type::wrapped_type::bfs_action,
     graph500_point_bfs_action);
+
+HPX_REGISTER_ACTION_EX(
+    graph500_point_type::wrapped_type::resolve_conflict_action,
+    graph500_point_resolve_conflict_action);
 
 HPX_REGISTER_ACTION_EX(
     graph500_point_type::wrapped_type::has_edge_action,

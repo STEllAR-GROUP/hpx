@@ -178,7 +178,7 @@ namespace graph500 { namespace server
       for (std::size_t step=0;step<bfs_roots_.size();step++) {
         int64_t root_node = bfs_roots_[step];
 
-        if ( (std::size_t) (root_node - minnode_) >= parent_.isize() ) return; // the root node is not on this partition
+        if ( root_node - minnode_ >= (int64_t) parent_.isize() ) return; // the root node is not on this partition
 
         std::queue<int64_t> q;
         parent_(root_node-minnode_,step,0).parent = root_node;
@@ -204,6 +204,50 @@ namespace graph500 { namespace server
 
       }
 
+    }
+
+    bool point::resolve_conflict_callback(std::size_t i,resolvedata r)
+    {
+      std::cout << " TEST edge " << r.edge << " root " << r.root << std::endl;
+      // if there is a dispute about a parent, pick the edge with the lowest level
+      if ( r.level != 0 && r.level < parent_(r.edge-minnode_,r.root,0).level ) {
+        parent_(r.edge-minnode_,r.root,0).level = r.level;
+        parent_(r.edge-minnode_,r.root,0).parent = r.parent;
+      }
+      return true;
+    }
+
+    void point::resolve_conflict()
+    {
+      // go through each particle on this component; if there are duplicates (i.e. the
+      // same particle is on a different component as well), communicate with those components
+      // to resolve the controversy over who is the real parent
+      typedef std::vector<hpx::lcos::promise< resolvedata > > lazy_results_type;
+      lazy_results_type lazy_results;
+      for (int64_t i=0;i< (int64_t) duplicates_.size();i++) {
+        if ( duplicates_[i].size() > 1 ) {  
+          for (int64_t j=0;j< (int64_t) bfs_roots_.size();j++) {
+            BOOST_FOREACH(hpx::naming::id_type const& gid, duplicates_[i])   
+            {
+              lazy_results.push_back( stubs::point::get_parent_async( gid,i+minnode_,j ) ); 
+            }
+          }
+        }
+      } 
+      hpx::lcos::wait(lazy_results,
+           boost::bind(&point::resolve_conflict_callback, this, _1, _2));
+
+    }
+
+    resolvedata point::get_parent(int64_t edge,int64_t root)
+    {
+      hpx::lcos::local_mutex::scoped_lock l(mtx_);
+      resolvedata result;
+      result.level = parent_(edge,root,0).level;
+      result.parent = parent_(edge,root,0).parent;
+      result.edge = edge; 
+      result.root = root; 
+      return result;
     }
 
     std::vector<nodedata> point::validate()

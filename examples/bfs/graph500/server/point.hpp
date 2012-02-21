@@ -52,6 +52,26 @@ struct leveldata
   }
 };
 
+struct resolvedata
+{
+  std::size_t level;
+  int64_t parent;
+  int64_t edge;
+  int64_t root;
+
+  resolvedata() {}
+
+  private:
+  // serialization support
+  friend class boost::serialization::access;
+
+  template<class Archive>
+  void serialize(Archive & ar, const unsigned int version)
+  {
+    ar & level & parent & edge & root;
+  }
+};
+
 struct validatedata
 {
   std::size_t num_edges;
@@ -92,7 +112,13 @@ namespace graph500 { namespace server
 
         void bfs();
 
+        void resolve_conflict();
+
+        resolvedata get_parent(int64_t edge,int64_t root);
+
         bool has_edge(int64_t edge);
+
+        bool resolve_conflict_callback(std::size_t i,resolvedata r);
 
         std::vector<nodedata> validate();
 
@@ -117,7 +143,9 @@ namespace graph500 { namespace server
             point_validate = 3,
             point_scatter = 4,
             point_root = 5,
-            point_receive_duplicates = 6
+            point_receive_duplicates = 6,
+            point_resolve_conflict = 7,
+            point_get_parent = 8
         };
 
         typedef hpx::actions::action4<
@@ -166,6 +194,30 @@ namespace graph500 { namespace server
             // Method bound to this action.
             &point::bfs
         > bfs_action;
+
+        typedef hpx::actions::action0<
+            // Component server type.
+            point,
+            // Action code.
+            point_resolve_conflict,
+            // Arguments of this action.
+            // Method bound to this action.
+            &point::resolve_conflict
+        > resolve_conflict_action;
+
+        typedef hpx::actions::result_action2<
+            // Component server type.
+            point,
+            // Return type.
+            resolvedata, 
+            // Action code.
+            point_get_parent,
+            // Arguments of this action.
+            int64_t,
+            int64_t,
+            // Method bound to this action.
+            &point::get_parent
+        > get_parent_action;
 
         typedef hpx::actions::result_action3<
             // Component server type.
@@ -235,8 +287,16 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
     graph500_point_receive_duplicates_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
+    graph500::server::point::get_parent_action,
+    graph500_point_get_parent_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
     graph500::server::point::bfs_action,
     graph500_point_bfs_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    graph500::server::point::resolve_conflict_action,
+    graph500_point_resolve_conflict_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     graph500::server::point::has_edge_action,
