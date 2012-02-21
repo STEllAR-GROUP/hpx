@@ -100,11 +100,6 @@ namespace hpx { namespace naming
             delete p;   // delete local gid representation only
         }
 
-        void gid_transmission_deleter (id_type_impl* p)
-        {
-            delete p;   // delete local gid representation only
-        }
-
         ///////////////////////////////////////////////////////////////////////
         id_type_impl::deleter_type id_type_impl::get_deleter(id_type_management t)
         {
@@ -113,8 +108,6 @@ namespace hpx { namespace naming
                 return &detail::gid_unmanaged_deleter;
             case managed:
                 return &detail::gid_managed_deleter;
-            case transmission:
-                return &detail::gid_transmission_deleter;
             default:
                 BOOST_ASSERT(false);          // invalid management type
                 return &detail::gid_unmanaged_deleter;
@@ -122,30 +115,75 @@ namespace hpx { namespace naming
             return 0;
         }
 
+        ///////////////////////////////////////////////////////////////////////
+        // prepare the given id, note: this function modifies the passed id
+        naming::gid_type id_type_impl::prepare_gid() const
+        {
+            gid_type::mutex_type::scoped_lock l(this);
+
+            // If the initial credit is zero the gid is 'unmanaged' and no
+            // additional action needs to be performed.
+            boost::uint16_t oldcredits = get_credit_from_gid(*this);
+            if (0 != oldcredits)
+            {
+                // Request new credits from AGAS if needed (i.e. the initial
+                // gid's credit is equal to one and the new gid has no credits
+                // after splitting).
+                naming::gid_type newid =
+                    split_credits_for_gid(const_cast<id_type_impl&>(*this));
+                if (0 == get_credit_from_gid(newid))
+                {
+                    // We add the new credits to the gids first to avoid
+                    // duplicate splitting during concurrent serialization
+                    // operations.
+                    BOOST_ASSERT(1 == get_credit_from_gid(*this));
+                    add_credit_to_gid(const_cast<id_type_impl&>(*this),
+                        HPX_INITIAL_GLOBALCREDIT);
+                    add_credit_to_gid(newid, HPX_INITIAL_GLOBALCREDIT);
+
+                    // We unlock the lock as all operations on the local credit
+                    // have been performed and we don't want the lock to be
+                    // pending during the (possibly remote) AGAS operation.
+                    l.unlock();
+
+                    // If something goes wrong during the reference count
+                    // increment below we will have already added credits to
+                    // the split gid. In the worst case this will cause a
+                    // memory leak. I'm not sure if it is possible to reliably
+                    // handle this problem.
+                    naming::resolver_client& resolver =
+                        naming::get_agas_client();
+                    resolver.incref(*this, HPX_INITIAL_GLOBALCREDIT * 2);
+                }
+                return newid;
+            }
+
+            BOOST_ASSERT(unmanaged == type_);
+            return *this;
+        }
+
         // serialization
         template <typename Archive>
         void id_type_impl::save(Archive& ar, const unsigned int version) const
         {
-            ar & util::base_object_nonvirt<gid_type>(*this) & type_;
+            naming::gid_type split_id(prepare_gid());
+            ar << split_id << type_;
         }
 
         template <typename Archive>
         void id_type_impl::load(Archive& ar, const unsigned int version)
         {
             // serialize base class
-            ar & util::base_object_nonvirt<gid_type>(*this);
+            ar >> static_cast<gid_type&>(*this);
 
             // serialize management type
             id_type_management m;
             ar >> m;
 
-            if (detail::unknown_deleter == m) {
+            if (detail::unmanaged != m && detail::managed != m) {
                 HPX_THROW_EXCEPTION(version_too_new, "id_type::load",
                     "trying to load id_type with unknown deleter");
             }
-
-            if (detail::transmission == m)
-                m = detail::managed;
 
             type_ = m;
         }
@@ -194,13 +232,12 @@ namespace hpx { namespace naming
     {
         "unknown_deleter",    // -1
         "unmanaged",          // 0
-        "managed",            // 1
-        "transmission"        // 2
+        "managed"             // 1
     };
 
     char const* get_management_type_name(id_type::management_type m)
     {
-        if (m < id_type::unknown_deleter || m > id_type::transmission)
+        if (m < id_type::unknown_deleter || m > id_type::managed)
             return "invalid";
         return management_type_names[m + 1];
     }

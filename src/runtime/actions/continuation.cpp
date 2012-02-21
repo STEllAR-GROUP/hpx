@@ -31,11 +31,5 @@ namespace hpx { namespace actions
         hpx::applier::apply<lcos::base_lco::set_error_action>(
             gid_, boost::move(e));
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    void continuation::enumerate_argument_gids(enum_gid_handler_type f)
-    {
-        f (boost::ref(gid_));
-    }
 }}
 

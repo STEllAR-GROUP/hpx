@@ -9,7 +9,6 @@
 #include <hpx/components/dataflow/dataflow_trigger_fwd.hpp>
 #include <hpx/components/dataflow/dataflow_base.hpp>
 #include <hpx/components/dataflow/stubs/dataflow_trigger.hpp>
-#include <hpx/traits/handle_gid.hpp>
 
 namespace hpx { namespace lcos 
 {
@@ -70,22 +69,6 @@ namespace hpx { namespace lcos
         void serialize(Archive & ar, unsigned)
         {
             ar & boost::serialization::base_object<base_type>(*this);
-        }
-    };
-}}
-
-namespace hpx { namespace traits 
-{
-    template <typename F>
-    struct handle_gid<hpx::lcos::dataflow_trigger, F>
-    {
-        static bool call(
-            hpx::lcos::dataflow_trigger const &df
-          , F const& f
-        )
-        {
-            f(boost::cref(df.get_gid()));
-            return true;
         }
     };
 }}

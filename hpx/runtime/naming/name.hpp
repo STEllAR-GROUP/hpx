@@ -234,7 +234,7 @@ namespace hpx { namespace naming
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    //  Handle conversion to/from prefix
+    //  Handle conversion to/from locality_id
     inline gid_type get_gid_from_locality_id(boost::uint32_t prefix) HPX_SUPER_PURE;
 
     inline gid_type get_gid_from_locality_id(boost::uint32_t prefix)
@@ -253,6 +253,8 @@ namespace hpx { namespace naming
     {
         return get_gid_from_locality_id(get_locality_id_from_gid(id));
     }
+
+    boost::uint32_t const invalid_locality_id = ~0U;
 
     ///////////////////////////////////////////////////////////////////////////
     inline boost::uint16_t get_credit_from_gid(gid_type const& id) HPX_PURE;
@@ -340,9 +342,7 @@ namespace hpx { namespace naming
         {
             unknown_deleter = -1,
             unmanaged = 0,          // unmanaged GID
-            managed = 1,            // managed GID
-            transmission = 2        // special deleter for temporaries created
-                                    // inside the parcelhandler
+            managed = 1             // managed GID
         };
 
         // forward declaration
@@ -351,7 +351,6 @@ namespace hpx { namespace naming
         // custom deleter for id_type_impl above
         void HPX_EXPORT gid_managed_deleter (id_type_impl* p);
         void HPX_EXPORT gid_unmanaged_deleter (id_type_impl* p);
-        void HPX_EXPORT gid_transmission_deleter (id_type_impl* p);
 
         ///////////////////////////////////////////////////////////////////////
         struct HPX_EXPORT id_type_impl : gid_type
@@ -387,13 +386,17 @@ namespace hpx { namespace naming
             // serialization
             friend class boost::serialization::access;
 
-            template <class Archive>
-            void save(Archive & ar, const unsigned int version) const;
+            template <typename Archive>
+            void save(Archive& ar, const unsigned int version) const;
 
-            template <class Archive>
-            void load(Archive & ar, const unsigned int version);
+            template <typename Archive>
+            void load(Archive& ar, const unsigned int version);
 
             BOOST_SERIALIZATION_SPLIT_MEMBER()
+
+            // credit management (called during serialization), this function
+            // has to be 'const' as save() above has to be 'const'.
+            naming::gid_type prepare_gid() const;
 
             // reference counting
             friend void intrusive_ptr_add_ref(id_type_impl* p);
@@ -425,9 +428,7 @@ namespace hpx { namespace naming
         {
             unknown_deleter = detail::unknown_deleter,
             unmanaged = detail::unmanaged,          ///< unmanaged GID
-            managed = detail::managed,              ///< managed GID
-            transmission = detail::transmission     ///< special deleter for temporaries created
-                                                    ///< inside the parcelhandler
+            managed = detail::managed               ///< managed GID
         };
 
         id_type() {}
@@ -441,8 +442,7 @@ namespace hpx { namespace naming
           : gid_(new detail::id_type_impl(gid,
                 static_cast<detail::id_type_management>(t)))
         {
-            BOOST_ASSERT(get_credit_from_gid(*gid_) || t == unmanaged ||
-                t == transmission);
+            BOOST_ASSERT(get_credit_from_gid(*gid_) || t == unmanaged);
         }
 
         explicit id_type(boost::uint64_t msb_id, boost::uint64_t lsb_id,
@@ -450,8 +450,7 @@ namespace hpx { namespace naming
           : gid_(new detail::id_type_impl(msb_id, lsb_id,
                 static_cast<detail::id_type_management>(t)))
         {
-            BOOST_ASSERT(get_credit_from_gid(*gid_) || t == unmanaged ||
-                t == transmission);
+            BOOST_ASSERT(get_credit_from_gid(*gid_) || t == unmanaged);
         }
 
         gid_type& get_gid() { return *gid_; }
@@ -514,6 +513,7 @@ namespace hpx { namespace naming
             return lhs.gid_.get() >= rhs.gid_.get();
         }
 
+        // access the internal parts of the gid
         boost::uint64_t get_msb() const
         {
             return gid_->get_msb();
@@ -533,38 +533,6 @@ namespace hpx { namespace naming
         void set_lsb(void* lsb)
         {
             gid_->set_lsb(lsb);
-        }
-
-        // functions for credit management
-        boost::uint16_t get_credit() const
-        {
-            gid_type::mutex_type::scoped_lock l(gid_.get());
-            return get_credit_from_gid(*gid_);
-        }
-        void strip_credit()
-        {
-            gid_type::mutex_type::scoped_lock l(gid_.get());
-            strip_credit_from_gid(*gid_);
-        }
-        boost::uint16_t add_credit(boost::uint16_t credit)
-        {
-            gid_type::mutex_type::scoped_lock l(gid_.get());
-            return add_credit_to_gid(*gid_, credit);
-        }
-        void set_credit(boost::uint16_t credit) const
-        {
-            gid_type::mutex_type::scoped_lock l(gid_.get());
-            set_credit_for_gid(*gid_, credit);
-        }
-        id_type split_credits(int fraction = 2) const
-        {
-            gid_type::mutex_type::scoped_lock l(gid_.get());
-            return id_type(split_credits_for_gid(*gid_, fraction), transmission);
-        }
-        bool was_split() const
-        {
-            gid_type::mutex_type::scoped_lock l(gid_.get());
-            return gid_was_split(*gid_);
         }
 
     private:

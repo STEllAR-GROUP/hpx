@@ -40,7 +40,7 @@ namespace hpx { namespace components
                 f = other.f;
                 return *this;
             }
-            
+
             invoke_apply_fun & operator=(BOOST_RV_REF(invoke_apply_fun) other)
             {
                 f = boost::move(other.f);
@@ -122,19 +122,6 @@ namespace hpx { namespace traits
             BOOST_ASSERT(false);
         }
     };
-    
-    template <typename T, typename F>
-    struct handle_gid<hpx::components::object<T>, F>
-    {
-        static bool call(
-            hpx::components::object<T> const &ro
-              , F const& f
-            )
-            {
-                f(boost::ref(ro.gid_));
-                return true;
-            }
-        };
 }}
 
 #endif

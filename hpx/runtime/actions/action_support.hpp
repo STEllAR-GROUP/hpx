@@ -42,7 +42,6 @@
 #include <hpx/config/bind.hpp>
 #include <hpx/config/tuple.hpp>
 #include <hpx/config/function.hpp>
-#include <hpx/traits/handle_gid.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -190,29 +189,6 @@ namespace hpx { namespace actions
         get_thread_init_data(continuation_type& cont,
             naming::address::address_type lva,
             threads::thread_init_data& data) = 0;
-
-        /// Enumerate all GIDs which stored as arguments
-        typedef HPX_STD_FUNCTION<void(naming::id_type const&)> enum_gid_handler_type;
-        virtual void enumerate_argument_gids(enum_gid_handler_type) = 0;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    struct enum_gid_handler
-    {
-        /// Enumerate all GIDs which stored as arguments
-        typedef base_action::enum_gid_handler_type enum_gid_handler_type;
-
-        enum_gid_handler(enum_gid_handler_type f)
-          : f_(f)
-        {}
-
-        template <typename T>
-        bool operator()(T const& t) const
-        {
-            return traits::handle_gid<T, enum_gid_handler_type>::call(t, f_);
-        }
-
-        enum_gid_handler_type f_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -265,10 +241,6 @@ namespace hpx { namespace actions
         typedef Derived derived_type;
         typedef Result result_type;
         typedef Arguments arguments_type;
-
-        /// Enumerate all GIDs which stored as arguments
-        typedef HPX_STD_FUNCTION<void(naming::id_type const&)>
-            enum_gid_handler_type;
 
         // This is the action code (id) of this action. It is exposed to allow
         // generic handling of actions.
@@ -481,11 +453,6 @@ namespace hpx { namespace actions
         threads::thread_priority get_thread_priority() const
         {
             return priority_;
-        }
-
-        void enumerate_argument_gids(enum_gid_handler_type f)
-        {
-            boost::fusion::for_each(arguments_, enum_gid_handler(f));
         }
 
     private:

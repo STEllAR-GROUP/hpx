@@ -68,9 +68,6 @@ namespace actions
         void trigger_error(boost::exception_ptr const& e);
         void trigger_error(BOOST_RV_REF(boost::exception_ptr) e);
 
-        typedef HPX_STD_FUNCTION<void(naming::id_type&)> enum_gid_handler_type;
-        void enumerate_argument_gids(enum_gid_handler_type);
-
         naming::gid_type const& get_raw_gid()
         {
             return gid_.get_gid();

@@ -197,60 +197,6 @@ namespace hpx { namespace parcelset
         return !locality_ids.empty();
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // prepare the given gid, note: this function modifies the passed id
-    void prepare_gid(
-        naming::resolver_client& resolver_,
-        naming::id_type const& id)
-    {
-        // request new credits from AGAS if needed (i.e. gid is credit managed
-        // and the new gid has no credits after splitting)
-        boost::uint16_t oldcredits = id.get_credit();
-        if (0 != oldcredits)
-        {
-            naming::id_type newid(id.split_credits());
-            if (0 == newid.get_credit())
-            {
-                BOOST_ASSERT(1 == id.get_credit());
-                resolver_.incref(id.get_gid(), HPX_INITIAL_GLOBALCREDIT * 2);
-
-                const_cast<naming::id_type&>(id).add_credit(HPX_INITIAL_GLOBALCREDIT);
-                newid.add_credit(HPX_INITIAL_GLOBALCREDIT);
-            }
-            const_cast<naming::id_type&>(id) = newid;
-        }
-    }
-
-    // prepare all GIDs stored in an action
-    void prepare_action(
-        naming::resolver_client& resolver_,
-        actions::action_type action)
-    {
-        action->enumerate_argument_gids(boost::bind(prepare_gid, boost::ref(resolver_), _1));
-    }
-
-    // prepare all GIDs stored in a continuation
-    void prepare_continuation(
-        naming::resolver_client& resolver_,
-        actions::continuation_type cont)
-    {
-        if (cont)
-            cont->enumerate_argument_gids(boost::bind(prepare_gid, boost::ref(resolver_), _1));
-    }
-
-    // walk through all data in this parcel and register all required AGAS
-    // operations with the given resolver_helper
-    void prepare_parcel(
-        naming::resolver_client& resolver_,
-        parcel& p, error_code& ec)
-    {
-        prepare_gid(resolver_, p.get_source());                // we need to register the source gid
-        prepare_action(resolver_, p.get_action());             // all gids stored in the action
-        prepare_continuation(resolver_, p.get_continuation()); // all gids in the continuation
-        if (&ec != &throws)
-            ec = make_success_code();
-    }
-
     void parcelhandler::put_parcel(parcel& p, write_handler_type f)
     {
         // properly initialize parcel
@@ -270,17 +216,6 @@ namespace hpx { namespace parcelset
             else
                 p.set_destination_addr(addr);
         }
-
-        // prepare all additional AGAS related operations for this parcel
-//         error_code ec;
-//         prepare_parcel(resolver_, p, ec);
-//
-//         if (ec)
-//         {
-//             // parcel preparation failed
-//             HPX_THROW_EXCEPTION(no_success,
-//                 "parcelhandler::put_parcel", ec.get_message());
-//         }
 
         pp_.put_parcel(p, f);
     }

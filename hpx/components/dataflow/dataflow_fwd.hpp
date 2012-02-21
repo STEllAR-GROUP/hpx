@@ -30,19 +30,6 @@ namespace hpx
         struct is_dataflow<hpx::lcos::dataflow<Action, Result, DirectExecute> >
             : boost::mpl::true_
         {};
-
-        template <typename Action, typename Result, typename DirectExecute, typename F>
-        struct handle_gid<hpx::lcos::dataflow<Action, Result, DirectExecute>, F>
-        {
-            static bool call(
-                hpx::lcos::dataflow<Action, Result, DirectExecute> const &df
-              , F const& f
-            )
-            {
-                f(boost::cref(df.get_gid()));
-                return true;
-            }
-        };
     }
 }
 

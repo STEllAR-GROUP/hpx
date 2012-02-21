@@ -7,10 +7,9 @@
 #define HPX_LCOS_DATAFLOW_BASE_FWD_HPP
 
 #include <hpx/traits/promise_remote_result.hpp>
-#include <hpx/traits/handle_gid.hpp>
 #include <hpx/components/dataflow/is_dataflow.hpp>
 
-namespace hpx { namespace lcos 
+namespace hpx { namespace lcos
 {
     template <
         typename Result
@@ -28,19 +27,6 @@ namespace hpx
         struct is_dataflow<hpx::lcos::dataflow_base<Result, RemoteResult> >
             : boost::mpl::true_
         {};
-
-        template <typename Result, typename RemoteResult, typename F>
-        struct handle_gid<hpx::lcos::dataflow_base<Result, RemoteResult>, F>
-        {
-            static bool call(
-                hpx::lcos::dataflow_base<Result, RemoteResult> const &df
-              , F const& f
-            )
-            {
-                f(boost::cref(df.get_gid()));
-                return true;
-            }
-        };
     }
 }
 

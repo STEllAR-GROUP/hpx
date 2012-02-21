@@ -20,22 +20,6 @@ namespace hpx { namespace traits
     struct get_remote_result;
 
     ///////////////////////////////////////////////////////////////////////////
-    // The customization point handle_gid is used to handle reference
-    // counting of GIDs while they are transferred to a different locality.
-    // It has to be specialized for arbitrary types, which may hold GIDs.
-    //
-    // It is important to make sure that all GID instances which are
-    // contained in any transferred data structure are handled during
-    // serialization. For this reason any user defined data type, which
-    // is passed as an parameter to a action or which is returned from
-    // a result_action needs to provide a corresponding specialization.
-    //
-    // The purpose of this customization point is to call the provided
-    // function for all GIDs held in the data type.
-    template <typename T, typename F, typename Enable = void>
-    struct handle_gid;
-
-    ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Enable = void>
     struct component_type_database;
 }}

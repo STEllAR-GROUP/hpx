@@ -326,7 +326,7 @@ namespace hpx { namespace applier
     boost::uint32_t get_locality_id()
     {
         applier** appl = applier::applier_.get();
-        return appl ? (*appl)->get_locality_id() : 0;
+        return appl ? (*appl)->get_locality_id() : naming::invalid_locality_id;
     }
 }}
 
@@ -335,8 +335,7 @@ namespace hpx
 {
     HPX_API_EXPORT boost::uint32_t get_locality_id()
     {
-        applier::applier** appl = applier::applier::applier_.get();
-        return appl ? (*appl)->get_locality_id() : 0;
+        return hpx::applier::get_locality_id();
     }
 }
 
