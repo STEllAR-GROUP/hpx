@@ -17,20 +17,20 @@ foreach(test ${tests})
   source_group("Source Files" FILES ${sources})
 
   # add example executable
-  add_hpx_executable(${test}
+  add_hpx_executable(${test}_test
                      SOURCES ${sources}
                      ${${test}_FLAGS}
-                     FOLDER "Tests/Regressions")
+                     FOLDER "Tests/Regressions/Util")
 
   # add a custom target for this example
-  add_hpx_pseudo_target(tests.regressions.${test})
+  add_hpx_pseudo_target(tests.regressions.util.${test})
 
   # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions
-                              tests.regressions.${test})
+  add_hpx_pseudo_dependencies(tests.regressions.util
+                              tests.regressions.util.${test})
 
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(tests.regressions.${test}
-                              ${test}_exe)
+  add_hpx_pseudo_dependencies(tests.regressions.util.${test}
+                              ${test}_test_exe)
 endforeach()
 
