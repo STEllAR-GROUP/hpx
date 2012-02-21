@@ -13,6 +13,8 @@
 #include <tests/unit/agas/components/simple_refcnt_checker.hpp>
 #include <tests/unit/agas/components/managed_refcnt_checker.hpp>
 
+#include <boost/assign/std/vector.hpp>
+
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
@@ -162,7 +164,13 @@ int main(
         , "number of milliseconds to wait for object destruction")
         ;
 
+    // we need to explicitly enable the test components used by this test
+    using namespace boost::assign;
+    std::vector<std::string> cfg;
+    cfg += "hpx.components.simple_refcnt_checker.enabled = 1";
+    cfg += "hpx.components.managed_refcnt_checker.enabled = 1";
+
     // Initialize and run HPX.
-    return init(cmdline, argc, argv);
+    return init(cmdline, argc, argv, cfg);
 }
 
