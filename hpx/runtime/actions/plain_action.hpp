@@ -137,8 +137,7 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva)
         {
-            return base_type::construct_continuation_thread_function(
-                HPX_STD_BIND(F), cont);
+            return base_type::construct_continuation_thread_function(cont, F);
         }
 
         /// serialization support
@@ -441,7 +440,7 @@ namespace hpx { namespace actions
             naming::address::address_type lva)
         {
             return base_type::construct_continuation_thread_function_void(
-                HPX_STD_BIND(F), cont);
+                cont, F);
         }
 
         /// serialization support

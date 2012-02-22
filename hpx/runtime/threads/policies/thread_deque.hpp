@@ -72,7 +72,7 @@ struct thread_deque
     // threads
     typedef HPX_STD_TUPLE<thread_init_data, thread_state_enum> task_description;
 
-    typedef boost::lockfree::deque<task_description const*> task_items_type;
+    typedef boost::lockfree::deque<task_description*> task_items_type;
 
     typedef boost::lockfree::fifo<thread_id_type> thread_id_queue_type;
 
@@ -84,7 +84,7 @@ struct thread_deque
             return 0;
 
         std::size_t added = 0;
-        task_description const* task = 0;
+        task_description* task = 0;
 
         while (add_count-- && dequeue(new_tasks_, task))
         {
@@ -97,7 +97,7 @@ struct thread_deque
             thread_state_enum state = HPX_STD_GET(1, *task);
             HPX_STD_UNIQUE_PTR<threads::thread> thrd(
                 new (memory_pool_) threads::thread(
-                    boost::move(HPX_STD_GET(0, *task)), memory_pool_, state));
+                    HPX_STD_GET(0, *task), memory_pool_, state));
 
             delete task;
 
@@ -140,7 +140,7 @@ struct thread_deque
             return 0;
 
         std::size_t added = 0;
-        task_description const* task = 0;
+        task_description* task = 0;
 
         while (add_count-- && steal(addfrom->new_tasks_, task))
         {
@@ -153,7 +153,7 @@ struct thread_deque
             thread_state_enum state = HPX_STD_GET(1, *task);
             HPX_STD_UNIQUE_PTR<threads::thread> thrd(
                 new (memory_pool_) threads::thread(
-                    boost::move(HPX_STD_GET(0, *task)), memory_pool_, state));
+                    HPX_STD_GET(0, *task), memory_pool_, state));
 
             delete task;
 
@@ -321,8 +321,7 @@ struct thread_deque
 
         // do not execute the work, but register a task description for
         // later thread creation
-        enqueue(new_tasks_,
-            new task_description(boost::move(data), initial_state));
+        enqueue(new_tasks_, new task_description(data, initial_state));
         ++new_tasks_count_;
 
         if (&ec != &throws)

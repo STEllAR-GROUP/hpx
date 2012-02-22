@@ -1,5 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
+//  Copyright (c) 2011-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -20,6 +21,7 @@ using boost::program_options::value;
 using hpx::naming::id_type;
 
 using hpx::actions::plain_action1;
+using hpx::actions::plain_result_action1;
 
 using hpx::lcos::eager_future;
 
@@ -66,18 +68,21 @@ private:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-void pass_movable_object(movable_object const& obj) {}
+void pass_movable_object_void(movable_object const& obj) {}
+int pass_movable_object(movable_object const& obj) { return 0; }
 
-typedef plain_action1<
-    // Arguments.
-    movable_object const&
-    // Function.
-  , pass_movable_object
-> pass_movable_object_action;
+typedef plain_action1<movable_object const&, pass_movable_object_void>
+    pass_movable_object_void_action;
+typedef plain_result_action1<int, movable_object const&, pass_movable_object>
+    pass_movable_object_action;
 
+HPX_REGISTER_PLAIN_ACTION(pass_movable_object_void_action);
 HPX_REGISTER_PLAIN_ACTION(pass_movable_object_action);
 
-typedef eager_future<pass_movable_object_action> pass_movable_object_future;
+typedef eager_future<pass_movable_object_void_action>
+    pass_movable_object_void_future;
+typedef eager_future<pass_movable_object_action>
+    pass_movable_object_future;
 
 ///////////////////////////////////////////////////////////////////////////////
 struct non_movable_object
@@ -104,52 +109,46 @@ struct non_movable_object
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-void pass_non_movable_object(non_movable_object const& obj) {}
+void pass_non_movable_object_void(non_movable_object const& obj) {}
+int pass_non_movable_object(non_movable_object const& obj) { return 0; }
 
-typedef plain_action1<
-    // Arguments.
-    non_movable_object const&
-    // Function.
-  , pass_non_movable_object
-> pass_non_movable_object_action;
+typedef plain_action1<non_movable_object const&, pass_non_movable_object_void>
+    pass_non_movable_object_void_action;
+typedef plain_result_action1<int, non_movable_object const&, pass_non_movable_object>
+    pass_non_movable_object_action;
 
+HPX_REGISTER_PLAIN_ACTION(pass_non_movable_object_void_action);
 HPX_REGISTER_PLAIN_ACTION(pass_non_movable_object_action);
 
-typedef eager_future<pass_non_movable_object_action> pass_non_movable_object_future;
+typedef eager_future<pass_non_movable_object_void_action>
+    pass_non_movable_object_void_future;
+typedef eager_future<pass_non_movable_object_action>
+    pass_non_movable_object_future;
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename Future, typename Object>
+void pass_object(unsigned count)
+{
+    copy_count.store(0);
+
+    Object obj;
+    Future f(find_here(), obj);
+
+    f.get();
+
+    HPX_TEST_EQ(count, copy_count.load());
+}
+
 int hpx_main(variables_map& vm)
 {
     // test for movable object
-    {
-        id_type const here = find_here();
-
-        movable_object obj;
-
-        copy_count.store(0);
-
-        pass_movable_object_future f(here, obj);
-
-        f.get();
-
-        HPX_TEST_EQ(1U, copy_count.load());
-    }
+    pass_object<pass_movable_object_void_future, movable_object>(1);
+    pass_object<pass_movable_object_future, movable_object>(1);
 
     // test for a non-movable object
-    {
-        id_type const here = find_here();
-
-        non_movable_object obj;
-
-        copy_count.store(0);
-
-        pass_non_movable_object_future f(here, obj);
-
-        f.get();
-
-        // FIXME: Can we reduce this even further?
-        HPX_TEST_EQ(4U, copy_count.load());
-    }
+    // FIXME: Can we get down to one copy for non-movable objects as well?
+    pass_object<pass_non_movable_object_void_future, non_movable_object>(2);
+    pass_object<pass_non_movable_object_future, non_movable_object>(2);
 
     finalize();
 

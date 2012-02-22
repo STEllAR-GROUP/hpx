@@ -15,7 +15,6 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/coroutine/coroutine.hpp>
-//#include <boost/pool/object_pool.hpp>
 #include <boost/lockfree/detail/freelist.hpp>
 #include <boost/lockfree/detail/branch_hints.hpp>
 
@@ -125,39 +124,7 @@ namespace hpx { namespace threads { namespace detail
         typedef HPX_STD_FUNCTION<thread_function_type> function_type;
 
     public:
-        thread(thread_init_data const& init_data, thread_id_type id,
-               thread_state_enum newstate, thread_pool& pool)
-          : coroutine_(init_data.func, id, default_stacksize), //coroutine_type::impl_type::create(init_data.func, id)),
-            current_state_(thread_state(newstate)),
-            current_state_ex_(thread_state_ex(wait_signaled)),
-            description_(init_data.description ? init_data.description : ""),
-            lco_description_(""),
-            parent_locality_prefix_(init_data.parent_prefix),
-            parent_thread_id_(init_data.parent_id),
-            parent_thread_phase_(init_data.parent_phase),
-            component_id_(init_data.lva),
-            marked_state_(unknown),
-            back_ptr_(0),
-            pool_(&pool)
-        {
-            LTM_(debug) << "thread::thread(" << this << "), description("
-                        << init_data.description << ")";
-
-            // store the thread id of the parent thread, mainly for debugging
-            // purposes
-            if (0 == parent_thread_id_) {
-                thread_self* self = get_self_ptr();
-                if (self)
-                {
-                    parent_thread_id_ = self->get_thread_id();
-                    parent_thread_phase_ = self->get_thread_phase();
-                }
-            }
-            if (0 == parent_locality_prefix_)
-                parent_locality_prefix_ = get_locality_id();
-        }
-
-        thread(BOOST_RV_REF(thread_init_data) init_data, thread_id_type id,
+        thread(thread_init_data& init_data, thread_id_type id,
                thread_state_enum newstate, thread_pool& pool)
           : coroutine_(boost::move(init_data.func), id, HPX_DEFAULT_STACK_SIZE), //coroutine_type::impl_type::create(init_data.func, id)),
             current_state_(thread_state(newstate)),
@@ -472,10 +439,7 @@ namespace hpx { namespace threads
         ///                 \a thread will be associated with.
         /// \param newstate [in] The initial thread state this instance will
         ///                 be initialized with.
-        inline thread(thread_init_data const& init_data, thread_pool& pool,
-            thread_state_enum new_state);
-
-        inline thread(BOOST_RV_REF(thread_init_data) init_data,
+        inline thread(thread_init_data& init_data,
             thread_pool& pool, thread_state_enum new_state);
 
         ~thread() {}
@@ -748,13 +712,7 @@ namespace hpx { namespace threads
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    inline thread::thread(thread_init_data const& init_data,
-            thread_pool& pool, thread_state_enum new_state)
-      : thread::base_type(new (pool) detail::thread(
-            init_data, This(), new_state, pool))
-    {}
-
-    inline thread::thread(BOOST_RV_REF(thread_init_data) init_data,
+    inline thread::thread(thread_init_data& init_data,
             thread_pool& pool, thread_state_enum new_state)
       : thread::base_type(new (pool) detail::thread(
             boost::move(init_data), This(), new_state, pool))

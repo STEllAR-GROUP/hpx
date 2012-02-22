@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_UTIL_BIND)
-#  include <hpx/util/bind/bind.hpp>
+#  include <hpx/util/bind.hpp>
 #  include <hpx/util/protect.hpp>
 #else
 #  if !defined(HPX_HAVE_CXX11_STD_BIND)

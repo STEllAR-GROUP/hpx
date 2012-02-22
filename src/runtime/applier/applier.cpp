@@ -70,8 +70,8 @@ namespace hpx { namespace applier
         }
 
         threads::thread_init_data data(
-            boost::bind(&thread_function_nullary, boost::move(func)), desc ? desc : "<unknown>",
-            0, priority, os_thread);
+            HPX_STD_BIND(&thread_function_nullary, boost::move(func)),
+            desc ? desc : "<unknown>", 0, priority, os_thread);
         return app->get_thread_manager().
             register_thread(data, state, run_now, ec);
     }
@@ -91,8 +91,8 @@ namespace hpx { namespace applier
         }
 
         threads::thread_init_data data(
-            boost::bind(&thread_function, boost::move(func)), desc ? desc : "<unknown>", 0,
-            priority, os_thread);
+            HPX_STD_BIND(&thread_function, boost::move(func)),
+            desc ? desc : "<unknown>", 0, priority, os_thread);
         return app->get_thread_manager().
             register_thread(data, state, run_now, ec);
     }
@@ -111,8 +111,8 @@ namespace hpx { namespace applier
             return threads::invalid_thread_id;
         }
 
-        threads::thread_init_data data(boost::move(func), desc ? desc : "<unknown>",
-            0, priority, os_thread);
+        threads::thread_init_data data(
+            boost::move(func), desc ? desc : "<unknown>", 0, priority, os_thread);
         return app->get_thread_manager().
             register_thread(data, state, run_now, ec);
     }
@@ -150,7 +150,7 @@ namespace hpx { namespace applier
         }
 
         threads::thread_init_data data(
-            boost::bind(&thread_function_nullary, boost::move(func)),
+            HPX_STD_BIND(&thread_function_nullary, boost::move(func)),
             desc ? desc : "<unknown>", 0, priority, os_thread);
         app->get_thread_manager().register_work(data, state, ec);
     }
@@ -170,7 +170,7 @@ namespace hpx { namespace applier
         }
 
         threads::thread_init_data data(
-            boost::bind(&thread_function, boost::move(func)),
+            HPX_STD_BIND(&thread_function, boost::move(func)),
             desc ? desc : "<unknown>", 0, priority, os_thread);
         app->get_thread_manager().register_work(data, state, ec);
     }
@@ -217,11 +217,9 @@ namespace hpx { namespace applier
     applier::applier(parcelset::parcelhandler &ph, threads::threadmanager_base& tm,
                 boost::uint64_t rts, boost::uint64_t mem)
       : parcel_handler_(ph), thread_manager_(tm),
-        runtime_support_id_(parcel_handler_.get_locality().get_msb(), // rts,
-//             parcel_handler_.here(), components::component_runtime_support,
+        runtime_support_id_(parcel_handler_.get_locality().get_msb(),
             rts, naming::id_type::unmanaged),
-        memory_id_(parcel_handler_.get_locality().get_msb(), // mem,
-//             parcel_handler_.here(), components::component_runtime_support,
+        memory_id_(parcel_handler_.get_locality().get_msb(),
             mem, naming::id_type::unmanaged)
     {}
 

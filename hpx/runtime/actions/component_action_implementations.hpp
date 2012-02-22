@@ -158,9 +158,9 @@ namespace hpx { namespace actions
             naming::address::address_type lva,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
-            return base_type::construct_continuation_thread_function(
-                HPX_STD_BIND(F, get_lva<Component>::call(lva),
-                    BOOST_PP_ENUM_PARAMS(N, arg)), cont);
+            return base_type::construct_continuation_thread_object_function(
+                cont, F, get_lva<Component>::call(lva), 
+                BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
         /// serialization support
@@ -561,9 +561,8 @@ namespace hpx { namespace actions
             naming::address::address_type lva,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
-            return base_type::construct_continuation_thread_function_void(
-                HPX_STD_BIND(F, get_lva<Component>::call(lva),
-                    BOOST_PP_ENUM_PARAMS(N, arg)), cont);
+            return base_type::construct_continuation_thread_object_function_void(
+                cont, F, get_lva<Component>::call(lva), BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
         /// serialization support

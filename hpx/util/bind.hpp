@@ -281,7 +281,7 @@ namespace hpx { namespace util {
       , (                                                                       \
             1                                                                   \
           , HPX_FUNCTION_LIMIT                                                  \
-          , <hpx/util/bind/bind.hpp>                                            \
+          , <hpx/util/bind.hpp>                                                 \
         )                                                                       \
     )                                                                           \
 /**/

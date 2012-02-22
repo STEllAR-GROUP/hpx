@@ -300,96 +300,12 @@ namespace hpx { namespace actions
         }
 
     protected:
-        /// The \a continuation_thread_function will be registered as the thread
-        /// function of a thread. It encapsulates the execution of the
-        /// original function (given by \a func), and afterwards triggers all
-        /// continuations using the result value obtained from the execution
-        /// of the original thread function.
-        struct continuation_thread_function_void
-        {
-            typedef threads::thread_state_enum result_type;
-
-            template <typename Func>
-            result_type operator()(continuation_type cont,
-                Func const & func) const
-            {
-                try {
-                    LTM_(debug) << "Executing action("
-                                << detail::get_action_name<derived_type>()
-                                << ") with continuation("
-                                << cont->get_raw_gid()
-                                << ")";
-                    func();
-                    cont->trigger();
-                }
-                catch (hpx::exception const&) {
-                    // make sure hpx::exceptions are propagated back to the client
-                    cont->trigger_error(boost::current_exception());
-                }
-                return threads::terminated;
-             }
-        };
-
-        /// The \a construct_continuation_thread_function is a helper function
-        /// for constructing the wrapped thread function needed for
-        /// continuation support
-        template <typename Func>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
-        construct_continuation_thread_function_void(BOOST_FWD_REF(Func) func,
-            continuation_type cont)
-        {
-            // The following bind constructs the wrapped thread function
-            //    f:  is the wrapping thread function
-            // cont: continuation
-            // func: wrapped function object
-            return HPX_STD_BIND(continuation_thread_function_void(), cont,
-                boost::move(HPX_STD_PROTECT(boost::forward<Func>(func))));
-        }
-
-        /// The \a continuation_thread_function will be registered as the thread
-        /// function of a thread. It encapsulates the execution of the
-        /// original function (given by \a func), and afterwards triggers all
-        /// continuations using the result value obtained from the execution
-        /// of the original thread function.
-        struct continuation_thread_function
-        {
-            typedef threads::thread_state_enum result_type;
-
-            template <typename Func>
-            result_type operator()(continuation_type cont,
-                Func const & func) const
-            {
-                try {
-                    LTM_(debug) << "Executing action("
-                                << detail::get_action_name<derived_type>()
-                                << ") with continuation("
-                                << cont->get_raw_gid()
-                                << ")";
-                    cont->trigger(boost::move(func()));
-                }
-                catch (hpx::exception const&) {
-                    // make sure hpx::exceptions are propagated back to the client
-                    cont->trigger_error(boost::current_exception());
-                }
-                return threads::terminated;
-            }
-        };
-
-        /// The \a construct_continuation_thread_function is a helper function
-        /// for constructing the wrapped thread function needed for
-        /// continuation support
-        template <typename Func>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
-        construct_continuation_thread_function(BOOST_FWD_REF(Func) func,
-            continuation_type cont)
-        {
-            // The following bind constructs the wrapped thread function
-            //    f:  is the wrapping thread function
-            // cont: continuation
-            // func: wrapped function object
-            return HPX_STD_BIND(continuation_thread_function(), cont,
-                boost::move(HPX_STD_PROTECT(boost::forward<Func>(func))));
-        }
+        // bring in all overloads for
+        //    construct_continuation_thread_function_void()
+        //    construct_continuation_thread_object_function_void()
+        //    construct_continuation_thread_function()
+        //    construct_continuation_thread_object_function()
+        #include <hpx/runtime/actions/construct_continuation_functions.hpp>
 
     public:
         /// retrieve component type
