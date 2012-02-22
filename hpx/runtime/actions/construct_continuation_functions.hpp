@@ -175,11 +175,11 @@
     {
         typedef threads::thread_state_enum result_type;
 
-        template <typename Result, typename Object
+        template <typename Result_, typename Object
             BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename FArg)
             BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         result_type operator()(continuation_type cont,
-            Result (Object::* func)(BOOST_PP_ENUM_BINARY_PARAMS(N, FArg, arg)),
+            Result_ (Object::* func)(BOOST_PP_ENUM_BINARY_PARAMS(N, FArg, arg)),
             Object* obj
             BOOST_PP_COMMA_IF(N)
                 BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) const
@@ -202,13 +202,13 @@
         }
     };
 
-    template <typename Result, typename Object
+    template <typename Result_, typename Object
         BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename FArg)
         BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     static HPX_STD_FUNCTION<threads::thread_function_type>
     construct_continuation_thread_object_function(
         continuation_type cont,
-        Result (Object::* func)(BOOST_PP_ENUM_PARAMS(N, FArg)), Object* obj
+        Result_ (Object::* func)(BOOST_PP_ENUM_PARAMS(N, FArg)), Object* obj
         BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
         return HPX_STD_BIND(
