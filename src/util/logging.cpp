@@ -151,13 +151,14 @@ namespace hpx { namespace util
 
         void operator()(param str) const
         {
-            boost::uint32_t prefix = 0;
+            boost::uint32_t locality_id = 0;
             applier::applier* appl = applier::get_applier_ptr();
             if (appl)
-                prefix = naming::get_locality_id_from_gid(appl->get_locality());
+                locality_id = appl->get_locality_id();
 
             std::stringstream out;
-            out << std::hex << std::setw(sizeof(boost::uint32_t)*2) << std::setfill('0') << prefix;
+            out << std::hex << std::setw(sizeof(boost::uint32_t)*2)
+                << std::setfill('0') << locality_id;
             str.prepend_string(out.str());
         }
     };

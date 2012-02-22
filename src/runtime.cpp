@@ -679,7 +679,7 @@ namespace hpx
     // Helpers
     naming::id_type find_here()
     {
-        return naming::id_type(hpx::applier::get_applier().get_locality(),
+        return naming::id_type(hpx::applier::get_applier().get_raw_locality(),
             naming::id_type::unmanaged);
     }
 
@@ -702,14 +702,14 @@ namespace hpx
     find_remote_localities(components::component_type type)
     {
         std::vector<naming::id_type> locality_ids;
-        hpx::applier::get_applier().get_remote_locality_ids(locality_ids, type);
+        hpx::applier::get_applier().get_remote_localities(locality_ids, type);
         return locality_ids;
     }
 
     std::vector<naming::id_type> find_remote_localities()
     {
         std::vector<naming::id_type> locality_ids;
-        hpx::applier::get_applier().get_remote_locality_ids(locality_ids);
+        hpx::applier::get_applier().get_remote_localities(locality_ids);
         return locality_ids;
     }
 

@@ -245,23 +245,23 @@ namespace hpx { namespace applier
         return hpx::get_locality();
     }
 
-    naming::gid_type const& applier::get_locality() const
+    naming::gid_type const& applier::get_raw_locality() const
     {
         return hpx::naming::get_agas_client().local_locality();
     }
 
     boost::uint32_t applier::get_locality_id() const
     {
-        return naming::get_locality_id_from_gid(get_locality());
+        return naming::get_locality_id_from_gid(get_raw_locality());
     }
 
-    bool applier::get_raw_remote_locality_ids(std::vector<naming::gid_type>& prefixes,
+    bool applier::get_raw_remote_localities(std::vector<naming::gid_type>& prefixes,
         components::component_type type) const
     {
         return parcel_handler_.get_raw_remote_localities(prefixes, type);
     }
 
-    bool applier::get_remote_locality_ids(std::vector<naming::id_type>& prefixes,
+    bool applier::get_remote_localities(std::vector<naming::id_type>& prefixes,
         components::component_type type) const
     {
         std::vector<naming::gid_type> raw_prefixes;

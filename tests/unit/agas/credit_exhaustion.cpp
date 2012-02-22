@@ -101,13 +101,12 @@ void hpx_test_main(
     )
 {
     {
-        std::vector<id_type> remote_localities;
-
         typedef typename Client::server_type server_type;
 
         component_type ctype = get_component_type<server_type>();
+        std::vector<id_type> remote_localities = hpx::find_remote_localities(ctype);
 
-        if (!get_applier().get_remote_locality_ids(remote_localities, ctype))
+        if (remote_localities.empty())
             throw std::logic_error("this test cannot be run on one locality");
 
         id_type const here = find_here();

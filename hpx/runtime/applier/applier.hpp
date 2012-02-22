@@ -55,7 +55,7 @@ namespace hpx { namespace applier
         /// applier instance has been created with.
         parcelset::parcelhandler& get_parcel_handler();
 
-        /// \brief Access the \a threadmanager instance associated with this
+        /// \brief Access the \a thread-manager instance associated with this
         ///        \a applier
         ///
         /// This function returns a reference to the thread manager this
@@ -69,12 +69,12 @@ namespace hpx { namespace applier
         /// instance is associated with.
         naming::locality const& here() const;
 
-        /// \brief Allow access to the prefix of the locality this applier
+        /// \brief Allow access to the locality of the locality this applier
         ///        instance is associated with.
         ///
         /// This function returns a reference to the locality this applier
         /// instance is associated with.
-        naming::gid_type const& get_locality() const;
+        naming::gid_type const& get_raw_locality() const;
 
         /// \brief Allow access to the id of the locality this applier
         ///        instance is associated with.
@@ -83,7 +83,7 @@ namespace hpx { namespace applier
         /// applier instance is associated with.
         boost::uint32_t get_locality_id() const;
 
-        /// \brief Return list of locality_ids of all remote localities
+        /// \brief Return list of localities of all remote localities
         ///        registered with the AGAS service for a specific component
         ///        type.
         ///
@@ -99,10 +99,10 @@ namespace hpx { namespace applier
         /// \returns The function returns \a true if there is at least one
         ///          remote locality known to the AGASservice
         ///          (!prefixes.empty()).
-        bool get_raw_remote_locality_ids(std::vector<naming::gid_type>& locality_ids,
+        bool get_raw_remote_localities(std::vector<naming::gid_type>& locality_ids,
             components::component_type type = components::component_invalid) const;
 
-        bool get_remote_locality_ids(std::vector<naming::id_type>& locality_ids,
+        bool get_remote_localities(std::vector<naming::id_type>& locality_ids,
             components::component_type type = components::component_invalid) const;
 
         /// \brief Return list of locality_ids of all localities
