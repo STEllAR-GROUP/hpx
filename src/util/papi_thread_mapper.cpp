@@ -7,9 +7,9 @@
 
 #include <hpx/util/papi_thread_mapper.hpp>
 
-#include <papi.h>
-
 #if defined(HPX_HAVE_PAPI)
+
+#include <papi.h>
 
 namespace hpx { namespace util
 {
@@ -31,7 +31,7 @@ namespace hpx { namespace util
     }
 
     papi_thread_mapper::thread_data::thread_data(): evset_(PAPI_NULL) { }
-    
+
     papi_thread_mapper::papi_thread_mapper()
     {
         if (PAPI_is_initialized() == PAPI_NOT_INITED)
@@ -48,7 +48,7 @@ namespace hpx { namespace util
     papi_thread_mapper::~papi_thread_mapper()
     {
         mutex_type::scoped_lock m(mtx_);
-        
+
         for (std::size_t i = 0; i < thread_info_.size(); i++)
             destroy_event_set(thread_info_[i].evset_);
     }
