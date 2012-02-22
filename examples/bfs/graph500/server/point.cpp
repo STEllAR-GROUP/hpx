@@ -178,7 +178,7 @@ namespace graph500 { namespace server
       for (std::size_t step=0;step<bfs_roots_.size();step++) {
         int64_t root_node = bfs_roots_[step];
 
-        if ( root_node - minnode_ >= (int64_t) parent_.isize() ) return; // the root node is not on this partition
+        if ( root_node - minnode_ >= (int64_t) parent_.isize() || root_node < minnode_ ) return; // the root node is not on this partition
 
         std::queue<int64_t> q;
         parent_(root_node-minnode_,step,0).parent = root_node;
@@ -201,9 +201,7 @@ namespace graph500 { namespace server
             }
           }
         }
-
       }
-
     }
 
     bool point::resolve_conflict_callback(std::size_t i,resolvedata r)
