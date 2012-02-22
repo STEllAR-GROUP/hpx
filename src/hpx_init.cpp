@@ -791,26 +791,35 @@ namespace hpx
             using boost::program_options::variables_map;
             using namespace boost::assign;
 
-            variables_map vm;
-            bool cmd_result = util::parse_commandline(rtcfg, desc_cmdline,
-                argc, argv, vm, util::allow_unregistered, mode);
-            if (!cmd_result)
-                return -1;
+            bool cmd_result = false;
 
-            // re-initialize runtime configuration object
-            rtcfg.reconfigure(vm["hpx-config"].as<std::string>());
+            {
+                // Boost V1.47 and before do not properly reset a variables_map
+                // when calling vm.clear(). We work around that problems by
+                // creating a separate instance just for the preliminary
+                // command line handling.
+                variables_map prevm;
+                cmd_result = util::parse_commandline(rtcfg, desc_cmdline,
+                    argc, argv, prevm, util::allow_unregistered, mode);
+                if (!cmd_result)
+                    return -1;
 
-            // re-run program option analysis
+                // re-initialize runtime configuration object
+                rtcfg.reconfigure(prevm["hpx-config"].as<std::string>());
+            }
+
+            // Re-run program option analysis, ini setting (such as aliases)
+            // will be considered now.
             boost::program_options::options_description help;
             std::vector<std::string> unregistered_options;
-            vm.clear();
+            variables_map vm;
             cmd_result = util::parse_commandline(rtcfg, desc_cmdline,
                 argc, argv, vm, util::allow_unregistered, mode, &help,
                 &unregistered_options);
             if (!cmd_result)
                 return -1;
 
-            //  store unregistered command line arguments
+            // store unregistered command line arguments
             if (!unregistered_options.empty()) {
                 typedef std::vector<std::string>::const_iterator iterator_type;
                 std::string options;
