@@ -41,10 +41,12 @@ struct test_mutexed_data
 
     void operator()()
     {
-        lock_type lock(*mtx);
-        HPX_TEST(lock ? true : false);
+        {
+            lock_type lock(*mtx);
+            HPX_TEST(lock ? true : false);
 
-        ++(*data);
+            ++(*data);
+        }
  
         barr->wait();
     }

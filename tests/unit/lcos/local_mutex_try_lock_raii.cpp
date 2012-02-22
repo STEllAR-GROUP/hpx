@@ -41,15 +41,16 @@ struct test_mutexed_data
 
     void operator()()
     {
-        try_lock_type lock(*mtx, boost::defer_lock);
-        HPX_TEST(!lock);
+        {
+            try_lock_type lock(*mtx);
 
-        while (!lock.try_lock())
-            {}
+            while (!lock)
+            {
+                lock.try_lock();
+            }
 
-        HPX_TEST(lock ? true : false);
-
-        ++(*data);
+            ++(*data);
+        }
  
         barr->wait();
     }
