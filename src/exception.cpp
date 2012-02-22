@@ -274,19 +274,14 @@ namespace hpx { namespace detail
 
         // Try a cast to std::exception - this should handle boost.system
         // error codes in addition to the standard library exceptions.
-        try {
-            std::exception const* se = dynamic_cast<std::exception const*>(&e);
-            if (se)
-                strm << "[what]: " << se->what() << "\n";
-        }
-        catch (std::bad_cast&)
-        {
-        }
+        std::exception const* se = dynamic_cast<std::exception const*>(&e);
+        if (se)
+            strm << "[what]: " << se->what() << "\n";
 
         boost::uint32_t const* locality =
             boost::get_error_info<hpx::throw_locality>(e);
         if (locality)
-            strm << "[locality]: " << *locality << "\n";
+            strm << "[locality-id]: " << *locality << "\n";
 
         std::string const* hostname_ =
             boost::get_error_info<hpx::throw_hostname>(e);
