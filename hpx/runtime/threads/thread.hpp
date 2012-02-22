@@ -714,8 +714,8 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     inline thread::thread(thread_init_data& init_data,
             thread_pool& pool, thread_state_enum new_state)
-      : thread::base_type(new (pool) detail::thread(
-            boost::move(init_data), This(), new_state, pool))
+      : thread::base_type(
+            new (pool) detail::thread(init_data, This(), new_state, pool))
     {}
 }}
 
