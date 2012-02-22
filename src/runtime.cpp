@@ -487,7 +487,7 @@ namespace hpx
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::init_tss()
     {
         // initialize PAPI
-        papi_support.register_thread();
+        papi_support.register_thread("worker-thread");
 
         // initialize our TSS
         this->runtime::init_tss();

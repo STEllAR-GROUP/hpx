@@ -25,7 +25,7 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
-#include <hpx/util/papi_threads.hpp>
+#include <hpx/util/papi_thread_mapper.hpp>
 #include <boost/foreach.hpp>
 #include <boost/detail/atomic_count.hpp>
 
