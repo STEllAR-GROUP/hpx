@@ -11,7 +11,6 @@
 
 #include <boost/config.hpp>
 #include <boost/move/move.hpp>
-#include <boost/detail/workaround.hpp>
 
 namespace hpx { namespace util { namespace detail
 {
@@ -21,11 +20,6 @@ namespace hpx { namespace util { namespace detail
     public:
         typedef typename F::result_type result_type;
 
-        /*
-        explicit protected_bind(F const& f)
-          : f_(f)
-        {}
-        */
         // copy constructor
         protected_bind(protected_bind const& other)
           : f_(other.f_)

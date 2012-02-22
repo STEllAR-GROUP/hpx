@@ -599,33 +599,46 @@ if(MSVC)
   ##############################################################################
   if(HPX_CXX11)
     # C++11 support
-    set(HPX_CXX11_RVALUE_REFERENCES ON CACHE BOOL "Compiler supports C++11 rvalue references.")
-    add_definitions(-DHPX_HAVE_CXX11_RVALUE_REFERENCES)
-
-    set(HPX_CXX11_LAMBDAS ON CACHE BOOL "Compiler supports C++11 lambda functions.")
-    add_definitions(-DHPX_HAVE_CXX11_LAMBDAS)
-
-    set(HPX_CXX11_AUTO ON CACHE BOOL "Compiler supports C++11 auto keyword.")
-    add_definitions(-DHPX_HAVE_CXX11_AUTO)
-
-    set(HPX_CXX11_UNIQUE_PTR ON CACHE BOOL "Compiler supports C++11 std::unique_ptr.")
-    add_definitions(-DHPX_HAVE_CXX11_STD_UNIQUE_PTR)
-    add_definitions(-DBOOST_LOCKFREE_HAVE_CXX11_UNIQUE_PTR)
-
-    if(NOT HPX_UTIL_BIND)
-      set(HPX_HAVE_CXX11_STD_BIND ON CACHE BOOL "Compiler supports C++11 std::bind.")
-      add_definitions(-DHPX_HAVE_CXX11_STD_BIND)
-    else()
-      set(HPX_HAVE_CXX11_STD_BIND OFF CACHE BOOL "Compiler supports C++11 std::bind." FORCE)
-      hpx_info("C++11" "HPX_UTIL_BIND is enabled: while std::bind is available it will not be used.")
+    hpx_option(HPX_CXX11_RVALUE_REFERENCES BOOL "Compiler supports C++11 rvalue references (default: ON)." ON ADVANCED)
+    if(HPX_CXX11_RVALUE_REFERENCES)
+      add_definitions(-DHPX_HAVE_CXX11_RVALUE_REFERENCES)
     endif()
 
+    hpx_option(HPX_CXX11_LAMBDAS BOOL "Compiler supports C++11 lambda functions (default: ON)." ON ADVANCED)
+    if(HPX_CXX11_LAMBDAS)
+      add_definitions(-DHPX_HAVE_CXX11_LAMBDAS)
+    endif()
+
+    hpx_option(HPX_CXX11_AUTO BOOL "Compiler supports C++11 auto keyword (default: ON)." ON ADVANCED)
+    if(HPX_CXX11_AUTO)
+      add_definitions(-DHPX_HAVE_CXX11_AUTO)
+    endif()
+
+    hpx_option(HPX_CXX11_UNIQUE_PTR BOOL "Compiler supports C++11 std::unique_ptr (default: ON)." ON ADVANCED)
+    if(HPX_CXX11_UNIQUE_PTR)
+      add_definitions(-DHPX_HAVE_CXX11_STD_UNIQUE_PTR)
+      add_definitions(-DBOOST_LOCKFREE_HAVE_CXX11_UNIQUE_PTR)
+    endif()
+
+    hpx_option(HPX_HAVE_CXX11_STD_TUPLE BOOL "Compiler supports C++11 (movable) std::tuple (default: ON)." ON ADVANCED)
+    if(HPX_HAVE_CXX11_STD_TUPLE)
+      add_definitions(-DHPX_HAVE_CXX11_STD_TUPLE)
+    endif()
+
+    hpx_option(HPX_HAVE_CXX11_STD_BIND  BOOL "Compiler supports C++11 (movable) std::bind (default: OFF)." OFF ADVANCED)
+    if(NOT HPX_UTIL_BIND)
+      add_definitions(-DHPX_HAVE_CXX11_STD_BIND)
+    else()
+      set(HPX_HAVE_CXX11_STD_BIND OFF CACHE BOOL "Compiler supports C++11 (movable) std::bind." FORCE)
+      hpx_info("C++11" "HPX_UTIL_BIND is enabled: even while std::bind is available it will not be used.")
+    endif()
+
+    hpx_option(HPX_HAVE_CXX11_STD_FUNCTION BOOL "Compiler supports C++11 (movable) std::function (default: OFF)." OFF ADVANCED)
     if(NOT HPX_UTIL_FUNCTION)
-      set(HPX_HAVE_CXX11_STD_FUNCTION ON CACHE BOOL "Compiler supports C++11 std::function.")
       add_definitions(-DHPX_HAVE_CXX11_STD_FUNCTION)
     else()
-      set(HPX_HAVE_CXX11_STD_FUNCTION OFF CACHE BOOL "Compiler supports C++11 std::function." FORCE)
-      hpx_info("C++11" "HPX_UTIL_FUNCTION is enabled: while std::function is available it will not be used.")
+      set(HPX_HAVE_CXX11_STD_FUNCTION OFF CACHE BOOL "Compiler supports C++11 (movable) std::function." FORCE)
+      hpx_info("C++11" "HPX_UTIL_FUNCTION is enabled: even while std::function is available it will not be used.")
     endif()
   endif()
 

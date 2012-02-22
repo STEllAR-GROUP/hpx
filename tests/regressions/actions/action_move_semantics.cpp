@@ -29,68 +29,126 @@ using hpx::find_here;
 
 boost::atomic<std::size_t> copy_count;
 
-struct object
+///////////////////////////////////////////////////////////////////////////////
+struct movable_object
 {
-    object() { }
+    movable_object() {}
 
     // Copy constructor.
-    object(object const& other)
+    movable_object(movable_object const& other)
     {
         ++copy_count;
     }
 
     // Move constructor.
-    object(BOOST_RV_REF(object) other) { }
+    movable_object(BOOST_RV_REF(movable_object) other) {}
 
-    ~object() { }
+    ~movable_object() {}
 
     // Copy assignment.
-    object& operator=(BOOST_COPY_ASSIGN_REF(object) other)
+    movable_object& operator=(BOOST_COPY_ASSIGN_REF(movable_object) other)
     {
         ++copy_count;
         return *this;
     }
 
     // Move assignment.
-    object& operator=(BOOST_RV_REF(object) other)
+    movable_object& operator=(BOOST_RV_REF(movable_object) other)
     {
         return *this;
     }
 
     template <typename Archive>
-    void serialize(Archive& ar, const unsigned int) { }
+    void serialize(Archive& ar, const unsigned int) {}
 
-  private:
-    BOOST_COPYABLE_AND_MOVABLE(object);
+private:
+    BOOST_COPYABLE_AND_MOVABLE(movable_object);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-void pass_object(object const& obj) {}
+void pass_movable_object(movable_object const& obj) {}
 
 typedef plain_action1<
     // Arguments.
-    object const&
+    movable_object const&
     // Function.
-  , pass_object
-> pass_object_action;
+  , pass_movable_object
+> pass_movable_object_action;
 
-HPX_REGISTER_PLAIN_ACTION(pass_object_action);
+HPX_REGISTER_PLAIN_ACTION(pass_movable_object_action);
 
-typedef eager_future<pass_object_action> pass_object_future;
+typedef eager_future<pass_movable_object_action> pass_movable_object_future;
+
+///////////////////////////////////////////////////////////////////////////////
+struct non_movable_object
+{
+    non_movable_object() {}
+
+    // Copy constructor.
+    non_movable_object(non_movable_object const& other)
+    {
+        ++copy_count;
+    }
+
+    ~non_movable_object() {}
+
+    // Copy assignment.
+    non_movable_object& operator=(non_movable_object const& other)
+    {
+        ++copy_count;
+        return *this;
+    }
+
+    template <typename Archive>
+    void serialize(Archive& ar, const unsigned int) {}
+};
+
+///////////////////////////////////////////////////////////////////////////////
+void pass_non_movable_object(non_movable_object const& obj) {}
+
+typedef plain_action1<
+    // Arguments.
+    non_movable_object const&
+    // Function.
+  , pass_non_movable_object
+> pass_non_movable_object_action;
+
+HPX_REGISTER_PLAIN_ACTION(pass_non_movable_object_action);
+
+typedef eager_future<pass_non_movable_object_action> pass_non_movable_object_future;
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
 {
+    // test for movable object
     {
         id_type const here = find_here();
 
-        object obj;
+        movable_object obj;
 
-        pass_object_future f(here, obj);
+        copy_count.store(0);
+
+        pass_movable_object_future f(here, obj);
 
         f.get();
 
         HPX_TEST_EQ(1U, copy_count.load());
+    }
+
+    // test for a non-movable object
+    {
+        id_type const here = find_here();
+
+        non_movable_object obj;
+
+        copy_count.store(0);
+
+        pass_non_movable_object_future f(here, obj);
+
+        f.get();
+
+        // FIXME: Can we reduce this even further?
+        HPX_TEST_EQ(4U, copy_count.load());
     }
 
     finalize();
