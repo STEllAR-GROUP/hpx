@@ -17,8 +17,6 @@
 namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class component_startup_shutdown_base component_registry_base.hpp hpx/runtime/components/component_startup_shutdown_base.hpp
-    ///
     /// The \a component_startup_shutdown_base has to be used as a base class
     /// for all component startup/shutdown registries.
     struct HPX_EXPORT component_startup_shutdown_base

@@ -17,8 +17,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
-    /// \class get_lva get_lva.hpp hpx/runtime/get_lva.hpp
-    ///
     /// The \a get_lva template is a helper structure allowing to convert a
     /// local virtual address as stored in a local address (returned from
     /// the function \a resolver_client#resolve) to the address of the

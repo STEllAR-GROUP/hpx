@@ -15,8 +15,6 @@
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class full_empty full_empty_memory.hpp hpx/lcos/full_empty_memory.hpp
-    ///
     /// The \a full_empty data type is a implementation of memory areas guarded
     /// by full/empty bits, a very low level synchronization primitive. The
     /// class has been modeled after the FEB implementation in the QThread

@@ -27,8 +27,6 @@ namespace hpx { namespace lcos
         lco_set_target = 4
     };
 
-    /// \class base_lco base_lco.hpp hpx/lcos/base_lco.hpp
-    ///
     /// The \a base_lco class is the common base class for all LCO's
     /// implementing a simple set_event action
     class base_lco
@@ -153,8 +151,6 @@ namespace hpx { namespace lcos
         > disconnect_action;
     };
 
-    /// \class base_lco_with_value base_lco.hpp hpx/lcos/base_lco.hpp
-    ///
     /// The \a base_lco_with_value class is the common base class for all LCO's
     /// synchronizing on a value.
     /// The \a RemoteResult template argument should be set to the type of the
@@ -241,8 +237,6 @@ namespace hpx { namespace lcos
         > get_value_action;
     };
 
-    /// \class base_lco_with_value base_lco.hpp hpx/lcos/base_lco.hpp
-    ///
     /// The base_lco<void> specialization is used whenever the set_event action
     /// for a particular LCO doesn't carry any argument.
     ///

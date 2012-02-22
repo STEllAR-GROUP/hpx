@@ -25,8 +25,6 @@
 namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class generic_component_factory generic_component_factory.hpp hpx/runtime/components/generic_component_factory.hpp
-    ///
     /// The \a generic_component_factory provides a minimal implementation of a
     /// component's factory. If no additional functionality is required this
     /// type can be used to implement the full set of minimally required

@@ -16,7 +16,6 @@
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class exception_list exception_list.hpp hpx/exception_list.hpp
     class HPX_EXCEPTION_EXPORT exception_list
     {
     private:

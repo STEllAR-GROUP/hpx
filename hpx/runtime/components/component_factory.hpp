@@ -23,8 +23,6 @@
 namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class component_factory component_factory.hpp hpx/runtime/components/component_factory.hpp
-    ///
     /// The \a component_factory provides a minimal implementation of a
     /// component's factory. If no additional functionality is required this
     /// type can be used to implement the full set of minimally required

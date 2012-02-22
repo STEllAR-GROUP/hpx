@@ -18,8 +18,6 @@
 namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class component_commandline_base component_commandline_base.hpp hpx/runtime/components/component_commandline_base.hpp
-    ///
     /// The \a component_commandline_base has to be used as a base class
     /// for all component command-line line handling registries.
     struct HPX_EXPORT component_commandline_base

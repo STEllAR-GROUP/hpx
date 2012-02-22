@@ -68,8 +68,6 @@ namespace hpx { namespace lcos { namespace detail
 namespace hpx { namespace lcos
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class signalling_promise signalling_promise.hpp hpx/lcos/signalling_promise.hpp
-    ///
     /// A signalling_promise can be used by a single \a thread to invoke a
     /// (remote) action and wait for the result. The result is expected to be
     /// sent back to the promise using the LCO's set_event action

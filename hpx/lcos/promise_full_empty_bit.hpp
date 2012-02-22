@@ -271,8 +271,6 @@ namespace hpx { namespace lcos { namespace detail
 namespace hpx { namespace lcos
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class promise promise.hpp hpx/lcos/promise.hpp
-    ///
     /// A promise can be used by a single \a thread to invoke a
     /// (remote) action and wait for the result. The result is expected to be
     /// sent back to the promise using the LCO's set_event action

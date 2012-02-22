@@ -212,8 +212,6 @@ namespace hpx { namespace components
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \class managed_component managed_component.hpp hpx/runtime/components/server/managed_component.hpp
-    ///
     /// The managed_component template is used as a indirection layer
     /// for components allowing to gracefully handle the access to non-existing
     /// components.

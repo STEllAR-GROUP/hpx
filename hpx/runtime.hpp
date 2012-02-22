@@ -37,7 +37,6 @@ namespace hpx
     template <typename SchedulingPolicy, typename NotificationPolicy>
     class HPX_EXPORT runtime_impl;
 
-    /// \class runtime runtime.hpp hpx/runtime.hpp
     class HPX_EXPORT runtime
     {
     public:
@@ -196,8 +195,6 @@ namespace hpx
         bool stopped_;
     };
 
-    /// \class runtime_impl runtime.hpp hpx/runtime.hpp
-    ///
     /// The \a runtime class encapsulates the HPX runtime system in a simple to
     /// use way. It makes sure all required parts of the HPX runtime system are
     /// properly initialized.

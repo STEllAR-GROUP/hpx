@@ -22,8 +22,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
 {
-    /// \class local_counting_semaphore local_counting_semaphore hpx/lcos/local_counting_semaphore.hpp
-    ///
     /// A semaphore is a protected variable (an entity storing a value) or
     /// abstract data type (an entity grouping several variables that may or
     /// may not be numerical) which constitutes the classic method for

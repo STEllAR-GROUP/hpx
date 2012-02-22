@@ -24,8 +24,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace server
 {
-    /// \class queue queue.hpp hpx/lcos/server/queue.hpp
-    ///
     /// A queue can be used to 'collect' (queue) a number of incoming values
     /// for consumption of an internal thread, which will invoke a given action
     /// for each of the values.

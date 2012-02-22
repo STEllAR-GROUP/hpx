@@ -25,8 +25,6 @@
 namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class plain_component_factory component_factory.hpp hpx/runtime/components/plain_component_factory.hpp
-    ///
     /// The \a plain_component_factory provides a minimal implementation of a
     /// component's factory usable for plain_actions.
     ///

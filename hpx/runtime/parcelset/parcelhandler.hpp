@@ -25,8 +25,6 @@
 
 namespace hpx { namespace parcelset
 {
-    /// \class parcelhandler parcelhandler.hpp hpx/runtime/parcelset/parcelhandler.hpp
-    ///
     /// The \a parcelhandler is the representation of the parcelset inside a
     /// locality. It is built on top of a single parcelport. Several
     /// parcelhandler's may be connected to a single parcelport.

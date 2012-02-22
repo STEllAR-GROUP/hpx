@@ -20,8 +20,6 @@
 namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class simple_component_base simple_component_base.hpp hpx/runtime/components/server/simple_component_base.hpp
-    ///
     template <typename Component>
     class simple_component_base : public detail::simple_component_tag
     {
@@ -132,8 +130,6 @@ namespace hpx { namespace components
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \class simple_component simple_component.hpp hpx/runtime/components/server/simple_component_base.hpp
-    ///
     template <typename Component>
     class simple_component : public Component
     {

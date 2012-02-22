@@ -20,8 +20,6 @@
 namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class test_component_registry test_component_registry.hpp hpx/runtime/components/test_component_registry.hpp
-    ///
     /// The \a test_component_registry provides a minimal implementation of a
     /// component's registry. It is special in the sense that it disables the
     /// component by default, requiring the application to explicitly enable it

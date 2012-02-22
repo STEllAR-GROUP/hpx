@@ -24,8 +24,6 @@
 namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class derived_component_factory derived_component_factory.hpp hpx/runtime/components/derived_component_factory.hpp
-    ///
     /// The \a derived_component_factory provides a minimal implementation of a
     /// component's factory. If no additional functionality is required this
     /// type can be used to implement the full set of minimally required

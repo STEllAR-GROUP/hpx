@@ -29,9 +29,6 @@
 namespace hpx { namespace parcelset
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class parcel parcel.hpp hpx/runtime/parcelset/parcel.hpp
-    ///
-    ///
     class HPX_EXPORT parcel
     {
     public:

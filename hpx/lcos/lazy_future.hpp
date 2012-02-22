@@ -25,8 +25,6 @@
 namespace hpx { namespace lcos
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class lazy_future lazy_future.hpp hpx/lcos/lazy_future.hpp
-    ///
     /// A lazy_future can be used by a single \a thread to invoke a
     /// (remote) action and wait for the result. The result is expected to be
     /// sent back to the lazy_future using the LCO's set_event action

@@ -45,7 +45,6 @@ namespace hpx { namespace threads
     struct set_state_tag {};
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \class threadmanager_base threadmanager.hpp hpx/runtime/threads/threadmanager.hpp
     struct threadmanager_base : private boost::noncopyable
     {
     protected:
@@ -307,10 +306,8 @@ namespace hpx { namespace threads
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \class threadmanager threadmanager.hpp hpx/runtime/threads/threadmanager.hpp
-    ///
     /// The \a threadmanager class is the central instance of management for
-    /// all (non-depleted) \a thread's
+    /// all (non-depleted) threads
     template <typename SchedulingPolicy, typename NotificationPolicy>
     class threadmanager_impl : public threadmanager_base
     {

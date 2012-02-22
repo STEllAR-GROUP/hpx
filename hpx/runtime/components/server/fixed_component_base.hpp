@@ -25,7 +25,6 @@ template <boost::uint64_t MSB, boost::uint64_t LSB>
 struct gid_tag;
 
 ///////////////////////////////////////////////////////////////////////////
-/// \class fixed_component_base fixed_component_base.hpp hpx/runtime/components/server/fixed_component_base.hpp
 template <boost::uint64_t MSB, boost::uint64_t LSB, typename Component>
 struct fixed_component_base : detail::fixed_component_tag
 {
@@ -130,7 +129,6 @@ struct fixed_component_base : detail::fixed_component_tag
 
 
 ///////////////////////////////////////////////////////////////////////////
-/// \class fixed_component fixed_component.hpp hpx/runtime/components/server/fixed_component_base.hpp
 template <typename Component>
 struct fixed_component : Component
 {

@@ -24,9 +24,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming
 {
-    /// \class address address.hpp hpx/runtime/naming/address.hpp
-    ///
-    ///
     struct HPX_EXPORT address
     {
         typedef boost::int32_t component_type;

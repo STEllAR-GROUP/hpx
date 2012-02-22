@@ -432,8 +432,6 @@ namespace hpx { namespace threads
     struct thread_pool;
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \class thread thread.hpp hpx/runtime/threads/thread.hpp
-    ///
     /// A \a thread is the representation of a ParalleX thread. It's a first
     /// class object in ParalleX. In our implementation this is a user level
     /// thread running on top of one of the OS threads spawned by the \a

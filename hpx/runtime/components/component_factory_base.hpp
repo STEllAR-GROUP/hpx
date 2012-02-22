@@ -21,8 +21,6 @@
 namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class component_factory_base component_factory_base.hpp hpx/runtime/components/component_factory_base.hpp
-    ///
     /// The \a component_factory_base has to be used as a base class for all
     /// component factories.
     struct HPX_EXPORT component_factory_base

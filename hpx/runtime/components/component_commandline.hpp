@@ -19,8 +19,6 @@ namespace hpx { namespace components
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \class component_startup_shutdown component_startup_shutdown.hpp hpx/runtime/components/component_startup_shutdown.hpp
-    ///
     /// The \a component_startup_shutdown provides a minimal implementation of
     /// a component's startup/shutdown function provider.
     ///

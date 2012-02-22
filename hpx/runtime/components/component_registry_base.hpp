@@ -23,8 +23,6 @@
 namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class component_registry_base component_registry_base.hpp hpx/runtime/components/component_registry_base.hpp
-    ///
     /// The \a component_registry_base has to be used as a base class for all
     /// component registries.
     struct HPX_EXPORT component_registry_base

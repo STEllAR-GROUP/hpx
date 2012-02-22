@@ -29,8 +29,6 @@
 namespace hpx { namespace lcos
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class eager_future eager_future.hpp hpx/lcos/eager_future.hpp
-    ///
     /// A eager_future can be used by a single \a thread to invoke a
     /// (remote) action and wait for the result. The result is expected to be
     /// sent back to the eager_future using the LCO's set_event action

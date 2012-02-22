@@ -24,8 +24,6 @@
 
 namespace hpx { namespace applier
 {
-    /// \class applier applier.hpp hpx/runtime/applier/applier.hpp
-    ///
     /// The \a applier class is used to decide whether a particular action
     /// has to be issued on a local or a remote resource. If the target
     /// component is local a new \a thread will be created, if the target is

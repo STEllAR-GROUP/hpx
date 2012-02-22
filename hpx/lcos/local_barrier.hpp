@@ -14,8 +14,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
 {
-    /// \class local_barrier local_barrier.hpp hpx/lcos/local_barrier.hpp
-    ///
     /// A local_barrier can be used to synchronize a specific number of threads,
     /// blocking all of the entering threads until all of the threads have
     /// entered the local_barrier.
