@@ -54,10 +54,9 @@ struct leveldata
 
 struct resolvedata
 {
-  std::size_t level;
-  int64_t parent;
+  std::vector<std::size_t> level;
+  std::vector<int64_t> parent;
   int64_t edge;
-  int64_t root;
 
   resolvedata() {}
 
@@ -68,7 +67,7 @@ struct resolvedata
   template<class Archive>
   void serialize(Archive & ar, const unsigned int version)
   {
-    ar & level & parent & edge & root;
+    ar & level & parent & edge;
   }
 };
 
@@ -114,7 +113,7 @@ namespace graph500 { namespace server
 
         void resolve_conflict();
 
-        resolvedata get_parent(int64_t edge,int64_t root);
+        resolvedata get_parent(int64_t edge);
 
         bool has_edge(int64_t edge);
 
@@ -205,7 +204,7 @@ namespace graph500 { namespace server
             &point::resolve_conflict
         > resolve_conflict_action;
 
-        typedef hpx::actions::result_action2<
+        typedef hpx::actions::result_action1<
             // Component server type.
             point,
             // Return type.
@@ -213,7 +212,6 @@ namespace graph500 { namespace server
             // Action code.
             point_get_parent,
             // Arguments of this action.
-            int64_t,
             int64_t,
             // Method bound to this action.
             &point::get_parent

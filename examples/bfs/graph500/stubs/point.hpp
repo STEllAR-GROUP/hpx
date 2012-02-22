@@ -105,17 +105,17 @@ namespace graph500 { namespace stubs
         }
 
         static hpx::lcos::promise< resolvedata >
-        get_parent_async(hpx::naming::id_type const& gid,int64_t edge,int64_t root)
+        get_parent_async(hpx::naming::id_type const& gid,int64_t edge)
         {
             typedef server::point::get_parent_action action_type;
-            return hpx::lcos::eager_future<action_type>(gid,edge,root);
+            return hpx::lcos::eager_future<action_type>(gid,edge);
         }
 
-        static resolvedata get_parent(hpx::naming::id_type const& gid,int64_t edge,int64_t root)
+        static resolvedata get_parent(hpx::naming::id_type const& gid,int64_t edge)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the promise
-            return get_parent_async(gid,edge,root).get();
+            return get_parent_async(gid,edge).get();
         }
 
         static hpx::lcos::promise< std::vector<nodedata> >

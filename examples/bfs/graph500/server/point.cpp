@@ -208,11 +208,12 @@ namespace graph500 { namespace server
 
     bool point::resolve_conflict_callback(std::size_t i,resolvedata r)
     {
-      std::cout << " TEST edge " << r.edge << " root " << r.root << std::endl;
       // if there is a dispute about a parent, pick the edge with the lowest level
-      if ( r.level != 0 && r.level < parent_(r.edge-minnode_,r.root,0).level ) {
-        parent_(r.edge-minnode_,r.root,0).level = r.level;
-        parent_(r.edge-minnode_,r.root,0).parent = r.parent;
+      for (std::size_t i=0;i<bfs_roots_.size();i++) {
+        if ( r.level[i] != 0 && r.level[i] < parent_(r.edge-minnode_,i,0).level ) {
+          parent_(r.edge-minnode_,i,0).level = r.level[i];
+          parent_(r.edge-minnode_,i,0).parent = r.parent[i];
+        }
       }
       return true;
     }
@@ -224,13 +225,11 @@ namespace graph500 { namespace server
       // to resolve the controversy over who is the real parent
       typedef std::vector<hpx::lcos::promise< resolvedata > > lazy_results_type;
       lazy_results_type lazy_results;
+      hpx::naming::id_type this_gid = get_gid(); 
       for (int64_t i=0;i< (int64_t) duplicates_.size();i++) {
-        if ( duplicates_[i].size() > 1 ) {  
-          for (int64_t j=0;j< (int64_t) bfs_roots_.size();j++) {
-            BOOST_FOREACH(hpx::naming::id_type const& gid, duplicates_[i])   
-            {
-              lazy_results.push_back( stubs::point::get_parent_async( gid,i+minnode_,j ) ); 
-            }
+        if ( duplicates_[i].size() > 1 && duplicates_[i][0] == this_gid ) {  
+          for (std::size_t j=1;j<duplicates_[i].size();j++) {
+            lazy_results.push_back( stubs::point::get_parent_async(duplicates_[i][j],i+minnode_) ); 
           }
         }
       } 
@@ -239,14 +238,17 @@ namespace graph500 { namespace server
 
     }
 
-    resolvedata point::get_parent(int64_t edge,int64_t root)
+    resolvedata point::get_parent(int64_t edge)
     {
       hpx::lcos::local_mutex::scoped_lock l(mtx_);
       resolvedata result;
-      result.level = parent_(edge,root,0).level;
-      result.parent = parent_(edge,root,0).parent;
+      result.level.resize(bfs_roots_.size());
+      result.parent.resize(bfs_roots_.size());
+      for (std::size_t i=0;i<bfs_roots_.size();i++) {
+        result.level[i] = parent_(edge-minnode_,i,0).level;
+        result.parent[i] = parent_(edge-minnode_,i,0).parent;
+      }
       result.edge = edge; 
-      result.root = root; 
       return result;
     }
 

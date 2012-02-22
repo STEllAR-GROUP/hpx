@@ -111,16 +111,16 @@ namespace graph500
             return this->base_type::has_edge(gid_,edge);
         }
 
-        hpx::lcos::promise< resolvedata > get_parent_async(int64_t edge,int64_t root)
+        hpx::lcos::promise< resolvedata > get_parent_async(int64_t edge)
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::get_parent_async(gid_,edge,root);
+            return this->base_type::get_parent_async(gid_,edge);
         }
 
-        resolvedata get_parent(int64_t edge,int64_t root)
+        resolvedata get_parent(int64_t edge)
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::get_parent(gid_,edge,root);
+            return this->base_type::get_parent(gid_,edge);
         }
 
         hpx::lcos::promise< std::vector<nodedata> > validate_async()

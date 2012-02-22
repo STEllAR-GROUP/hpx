@@ -261,13 +261,13 @@ int hpx_main(boost::program_options::variables_map &vm)
           }
           hpx::lcos::wait(bfs_phase);
         }
-        //{
-        //  std::vector<hpx::lcos::promise<void> > resolve_conflict_phase;
-        //  for (std::size_t i=0;i<num_pe;i++) {
-        //    resolve_conflict_phase.push_back(points[i].resolve_conflict_async());
-        //  }
-        //  hpx::lcos::wait(resolve_conflict_phase);
-        //}
+        {
+          std::vector<hpx::lcos::promise<void> > resolve_conflict_phase;
+          for (std::size_t i=0;i<num_pe;i++) {
+            resolve_conflict_phase.push_back(points[i].resolve_conflict_async());
+          }
+          hpx::lcos::wait(resolve_conflict_phase);
+        }
 
         double k2time = kernel2time.elapsed();
 
