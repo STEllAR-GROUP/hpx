@@ -13,7 +13,7 @@ foreach(subdir ${subdirs})
   add_subdirectory(${subdir})
 
   set(sources
-      graph500_validate.cpp
+      graph500_util.cpp
       ${subdir}_client.cpp)
 
   source_group("Source Files" FILES ${sources})
