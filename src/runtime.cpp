@@ -152,11 +152,11 @@ namespace hpx
             runtime_mode locality_mode, init_scheduler_type const& init)
       : runtime(agas_client_, rtcfg),
         mode_(locality_mode), result_(0),
-        io_pool_(boost::bind(&runtime_impl::init_tss, This()),
+        io_pool_(boost::bind(&runtime_impl::init_tss, This(), "io-thread"),
             boost::bind(&runtime_impl::deinit_tss, This()), "io_pool"),
-        parcel_pool_(boost::bind(&runtime_impl::init_tss, This()),
+        parcel_pool_(boost::bind(&runtime_impl::init_tss, This(), "parcel-thread"),
             boost::bind(&runtime_impl::deinit_tss, This()), "parcel_pool"),
-        timer_pool_(boost::bind(&runtime_impl::init_tss, This()),
+        timer_pool_(boost::bind(&runtime_impl::init_tss, This(), "timer-thread"),
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
         parcel_port_(parcel_pool_, ini_.get_parcelport_address(),
             ini_.get_connection_cache_size(), ini_.get_max_connections_per_loc()),
@@ -164,7 +164,7 @@ namespace hpx
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_,
             new parcelset::policies::global_parcelhandler_queue),
         scheduler_(init),
-        notifier_(boost::bind(&runtime_impl::init_tss, This()),
+        notifier_(boost::bind(&runtime_impl::init_tss, This(), "worker-thread"),
             boost::bind(&runtime_impl::deinit_tss, This()),
             boost::bind(&runtime_impl::report_error, This(), _1, _2)),
         thread_manager_(timer_pool_, scheduler_, notifier_),
@@ -484,10 +484,11 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    void runtime_impl<SchedulingPolicy, NotificationPolicy>::init_tss()
+    void runtime_impl<SchedulingPolicy, NotificationPolicy>::init_tss(
+        char const* context)
     {
         // initialize PAPI
-        papi_support.register_thread("worker-thread");
+        papi_support_.register_thread(context);
 
         // initialize our TSS
         this->runtime::init_tss();
@@ -506,7 +507,7 @@ namespace hpx
         this->runtime::deinit_tss();
 
         // reset PAPI support
-        papi_support.unregister_thread();
+        papi_support_.unregister_thread();
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>

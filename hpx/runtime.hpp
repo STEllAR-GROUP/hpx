@@ -134,7 +134,7 @@ namespace hpx
         /// \brief Return a reference to the internal PAPI thread manager
         util::papi_thread_mapper& get_papi_thread_mapper()
         {
-            return papi_support;
+            return papi_support_;
         }
 
         /// \brief Install all performance counters related to this runtime
@@ -190,7 +190,7 @@ namespace hpx
         static boost::atomic<int> instance_number_counter_;
 
         // PAPI support requires to register all threads with the library
-        util::papi_thread_mapper papi_support;
+        util::papi_thread_mapper papi_support_;
 
         bool stopped_;
     };
@@ -505,7 +505,7 @@ namespace hpx
         void add_shutdown_function(HPX_STD_FUNCTION<void()> const& f);
 
     private:
-        void init_tss();
+        void init_tss(char const* context);
         void deinit_tss();
 
     private:
