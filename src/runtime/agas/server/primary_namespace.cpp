@@ -808,6 +808,20 @@ void primary_namespace::decrement_sweep(
 
         for (; matches.first != matches.second; ++matches.first)
         {
+            // Sanity check.
+            if (matches.first->data_ < 0)
+            {
+                HPX_THROWS_IF(ec, invalid_data 
+                  , "primary_namespace::decrement_sweep"
+                  , boost::str(boost::format(
+                        "negative entry in reference count table, lower(%1%) "
+                        "upper(%2%), count(%3%)")
+                        % boost::icl::lower(matches.first->key_)
+                        % boost::icl::upper(matches.first->key_)
+                        % matches.first->data_));
+                return;
+            }
+
             // Any object with a reference count of 0 is dead.
             if (matches.first->data_ == 0)
                 dead_list.push_back(matches.first);
