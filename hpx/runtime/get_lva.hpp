@@ -10,6 +10,7 @@
 #include <boost/mpl/or.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/type_traits/is_base_and_derived.hpp>
+#include <boost/type_traits/add_const.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/address.hpp>
@@ -66,6 +67,42 @@ namespace hpx
         }
     };
 
+    template <typename Component>
+    struct get_lva<Component const>
+    {
+        struct is_simple_or_fixed_component
+          : boost::mpl::or_<
+                boost::is_base_and_derived<
+                    components::detail::simple_component_tag, Component
+                >,
+                boost::is_base_and_derived<
+                    components::detail::fixed_component_tag, Component
+                >
+            >
+        {};
+
+        static Component const*
+        call(naming::address::address_type lva, boost::mpl::false_)
+        {
+            typedef typename add_const<
+                typename Component::wrapping_type
+            >::type wrapping_type;
+            return reinterpret_cast<wrapping_type*>(lva)->get_checked();
+        }
+
+        static Component const*
+        call(naming::address::address_type lva, boost::mpl::true_)
+        {
+            return reinterpret_cast<Component const*>(lva);
+        }
+
+        static Component const*
+        call(naming::address::address_type lva)
+        {
+            return call(lva, is_simple_or_fixed_component());
+        }
+    };
+
     // specialization for components::server::runtime_support
     template <>
     struct get_lva<components::server::runtime_support>
@@ -76,6 +113,17 @@ namespace hpx
         call(naming::address::address_type lva)
         {
             return reinterpret_cast<components::server::runtime_support*>(lva);
+        }
+    };
+    template <>
+    struct get_lva<components::server::runtime_support const>
+    {
+        // for server::runtime_support the provided lva is directly usable
+        // as the required local address
+        static components::server::runtime_support const*
+        call(naming::address::address_type lva)
+        {
+            return reinterpret_cast<components::server::runtime_support const*>(lva);
         }
     };
 
@@ -89,6 +137,17 @@ namespace hpx
         call(naming::address::address_type lva)
         {
             return reinterpret_cast<components::server::memory*>(lva);
+        }
+    };
+    template <>
+    struct get_lva<components::server::memory const>
+    {
+        // for server::memory the provided lva is directly usable as the
+        // required local address
+        static components::server::memory const*
+        call(naming::address::address_type lva)
+        {
+            return reinterpret_cast<components::server::memory const*>(lva);
         }
     };
 
@@ -105,6 +164,17 @@ namespace hpx
         }
     };
 
+    template <>
+    struct get_lva<components::server::memory_block const>
+    {
+        // for server::memory_block the provided lva is directly usable as the
+        // required local address
+        static components::server::memory_block const*
+        call(naming::address::address_type lva)
+        {
+            return reinterpret_cast<components::server::memory_block const*>(lva);
+        }
+    };
 }
 
 #endif
