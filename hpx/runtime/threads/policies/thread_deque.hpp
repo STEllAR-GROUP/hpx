@@ -292,7 +292,7 @@ struct thread_deque
 
             HPX_STD_UNIQUE_PTR<threads::thread> thrd(
                 new (memory_pool_) threads::thread(
-                    boost::move(data), memory_pool_, initial_state));
+                    data, memory_pool_, initial_state));
 
             // add a new entry in the map for this thread
             thread_id_type id = thrd->get_thread_id();
@@ -321,7 +321,8 @@ struct thread_deque
 
         // do not execute the work, but register a task description for
         // later thread creation
-        enqueue(new_tasks_, new task_description(data, initial_state));
+        enqueue(new_tasks_,
+            new task_description(boost::move(data), initial_state));
         ++new_tasks_count_;
 
         if (&ec != &throws)

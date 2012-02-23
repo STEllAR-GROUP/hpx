@@ -141,7 +141,7 @@ namespace hpx { namespace threads { namespace policies
                 thread_state_enum state = HPX_STD_GET(1, *task);
                 HPX_STD_UNIQUE_PTR<threads::thread> thrd (
                     new (memory_pool_) threads::thread(
-                        boost::move(HPX_STD_GET(0, *task)), memory_pool_, state));
+                        HPX_STD_GET(0, *task), memory_pool_, state));
 
                 delete task;
 
@@ -323,7 +323,7 @@ namespace hpx { namespace threads { namespace policies
 
                 HPX_STD_UNIQUE_PTR<threads::thread> thrd (
                     new (memory_pool_) threads::thread(
-                        boost::move(data), memory_pool_, initial_state));
+                        data, memory_pool_, initial_state));
 
                 // add a new entry in the map for this thread
                 thread_id_type id = thrd->get_thread_id();
