@@ -23,11 +23,13 @@ inline lcos::barrier
 create_barrier(naming::resolver_client& agas_client,
     std::size_t num_localities, char const* symname)
 {
-    lcos::barrier barrier;
-    barrier.create_one(agas_client.local_locality(), num_localities);
+    lcos::barrier b;
+    b.create_one(agas_client.local_locality(), num_localities);
 
-    agas::register_name(symname, barrier.get_gid());
-    return barrier;
+    using naming::strip_credit_from_cgid;
+
+    agas::register_name(symname, strip_credit_from_cgid(b.get_gid().get_gid()));
+    return b;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
