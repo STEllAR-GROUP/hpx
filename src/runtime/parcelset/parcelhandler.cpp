@@ -75,8 +75,12 @@ namespace hpx { namespace parcelset
         boost::shared_ptr<std::vector<char> > const& parcel_data,
         threads::thread_priority priority)
     {
+        // wait for thread-manager to become active
+        while (tm_->status() & starting)
+            ;
+
         // Give up if we're shutting down.
-        if (threads::threadmanager_is(stopping))
+        if (tm_->status() & stopping)
         {
             LPT_(debug) << "parcel_sink: dropping late parcel";
             return;
