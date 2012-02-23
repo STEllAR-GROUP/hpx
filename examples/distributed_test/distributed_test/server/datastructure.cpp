@@ -36,7 +36,7 @@ namespace distributed { namespace server
     }
     datastructure::~datastructure(){}
 
-    typedef std::vector<std::size_t> client_data_type;
+    typedef std::vector<std::size_t> data_type;
 
     void datastructure::data_init(std::string const& symbolic_name
         , std::size_t num_instances, std::size_t my_cardinality
@@ -65,7 +65,7 @@ namespace distributed { namespace server
 
     void datastructure::data_write(std::string const& symbolic_name
         , std::size_t num_instances, std::size_t my_cardinality
-        , client_data_type client_data)
+        , data_type client_data)
     {
         // get_config(gid_component);  implement?
         //distributed::config_comp config_data = get_config();
@@ -74,6 +74,21 @@ namespace distributed { namespace server
         if(data_.size() != client_data.size())
             data_.resize(client_data.size());
         data_ = client_data;
+    }
+
+    distributed::config_comp datastructure::get_config_info() const
+    {
+        return config_data_;
+    }
+
+    data_type datastructure::get_data()
+    {
+        return data_;
+    }
+
+    std::size_t datastructure::get_data_at(std::size_t pos)
+    {
+        return data_.at(pos);
     }
 }}
 
@@ -115,9 +130,15 @@ typedef distributed::server::datastructure datastructure_type;
 //////////////////////////////////////////////////////////////////////
 // Serialization support for the actions
 HPX_REGISTER_ACTION_EX(datastructure_type::init_action,
-        distributed_datastructure_init_action);
+    distributed_datastructure_init_action);
 HPX_REGISTER_ACTION_EX(datastructure_type::write_action,
-        distributed_datastructure_write_action);
+    distributed_datastructure_write_action);
+HPX_REGISTER_ACTION_EX(distributed::server::datastructure::get_config_action,
+    distributed_datastructure_get_config_action);
+HPX_REGISTER_ACTION_EX(distributed::server::datastructure::get_data_action,
+    distributed_datastructure_get_data_action);
+HPX_REGISTER_ACTION_EX(distributed::server::datastructure::get_data_at_action,
+    distributed_datastructure_get_data_at_action);
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<datastructure_type>,

@@ -41,16 +41,17 @@ namespace distributed { namespace server
         enum actions
         {
             datastructure_init = 0,
-            //datastructure_read = 1;
+            datastructure_get_data = 1,
             datastructure_write = 2,
-            datastructure_config_get = 3
+            datastructure_config_get = 3,
+            datastructure_get_data_at = 4
             //datastructure_config_init = 4;
         };
     
         datastructure();// {}
         ~datastructure();//{}
 
-        typedef std::vector<std::size_t> client_data_type;
+        typedef std::vector<std::size_t> data_type;
 
         void data_init(std::string const& symbolic_name
             , std::size_t num_instances
@@ -61,9 +62,28 @@ namespace distributed { namespace server
         void data_write(std::string const& symbolic_name
             , std::size_t num_instances
             , std::size_t my_cardinality
-            , client_data_type client_data);
+            , data_type client_data);
 
         config_comp get_config_info() const;
+
+        data_type get_data();
+
+        std::size_t get_data_at(std::size_t pos);
+
+        typedef hpx::actions::result_action1<
+        datastructure
+        , std::size_t
+        , datastructure_get_data_at
+        , std::size_t
+        , &datastructure::get_data_at
+        > get_data_at_action;
+
+        typedef hpx::actions::result_action0<
+        datastructure
+        , data_type
+        , datastructure_get_data
+        , &datastructure::get_data
+        > get_data_action;
 
         typedef hpx::actions::result_action0<
         datastructure const
@@ -78,11 +98,10 @@ namespace distributed { namespace server
         , std::string const&
         , std::size_t
         , std::size_t
-        , client_data_type 
+        , data_type 
         , &datastructure::data_write
         > write_action;
 
-    
         typedef hpx::actions::action5<
         datastructure
         , datastructure_init
@@ -120,6 +139,12 @@ HPX_REGISTER_ACTION_DECLARATION_EX(distributed::server::datastructure::init_acti
     distributed_datastructure_init_action);
 HPX_REGISTER_ACTION_DECLARATION_EX(distributed::server::datastructure::write_action,
     distributed_datastructure_write_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(distributed::server::datastructure::get_config_action,
+    distributed_datastructure_get_config_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(distributed::server::datastructure::get_data_action,
+    distributed_datastructure_get_data_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(distributed::server::datastructure::get_data_at_action,
+    distributed_datastructure_get_data_at_action);
 
 //HPX_REGISTER_ACTION_DECLARATION_EX(distributed::server::datastructure::
     //get_config_action, distributed_datastructure_get_config_action);

@@ -81,6 +81,39 @@ namespace distributed
                 num_instances, my_cardinality, client_data);
         }
         //////////////////////////////////////////////////////////////////////
+        hpx::lcos::promise<distributed::config_comp>
+        get_config_info_async()
+        {
+            return stubs::datastructure::get_config_info_async(this->gid_);
+        }
+
+        distributed::config_comp get_config_info()
+        {
+            return stubs::datastructure::get_config_info(this->gid_);
+        }
+        //////////////////////////////////////////////////////////////////////
+        hpx::lcos::promise<std::vector<std::size_t>>
+        get_data_async()
+        {
+            return stubs::datastructure::get_data_async(this->gid_);
+        }
+
+        std::vector<std::size_t> get_data()
+        {
+            return stubs::datastructure::get_data(this->gid_);
+        }
+        //////////////////////////////////////////////////////////////////////
+        hpx::lcos::promise<std::size_t>
+        get_data_at_async(std::size_t pos)
+        {
+            return stubs::datastructure::get_data_at_async(this->gid_, pos);
+        }
+
+        std::size_t get_data_at(std::size_t pos)
+        {
+            return stubs::datastructure::get_data_at(this->gid_, pos);
+        }
+//////////////////////////////////////////////////////////////////////////////
     };
 }
 

@@ -59,6 +59,46 @@ namespace distributed { namespace stubs
                 , client_data);
         }
         ////////////////////////////////////////////////////////////////////
+        static hpx::lcos::promise<distributed::config_comp>
+        get_config_info_async (hpx::naming::id_type const& gid)
+        {
+            typedef distributed::server::datastructure::get_config_action 
+                action_type;
+            return hpx::lcos::eager_future<action_type>(gid);
+        }
+
+        static distributed::config_comp get_config_info(
+            hpx::naming::id_type const& gid)
+        {
+            return get_config_info_async(gid).get();
+        }
+        ////////////////////////////////////////////////////////////////////
+        static hpx::lcos::promise<std::vector<std::size_t>>
+        get_data_async (hpx::naming::id_type const& gid)
+        {
+            typedef distributed::server::datastructure::get_data_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid);
+        }
+
+        static std::vector<std::size_t> get_data( hpx::naming::id_type const& gid)
+        {
+            return get_data_async(gid).get();
+        }
+        ////////////////////////////////////////////////////////////////////
+        static hpx::lcos::promise<std::size_t>
+        get_data_at_async(hpx::naming::id_type const& gid, std::size_t pos)
+        {
+            typedef distributed::server::datastructure::get_data_at_action
+                action_type;
+            return hpx::lcos::eager_future<action_type>(gid, pos);
+        }
+
+        static std::size_t get_data_at(hpx::naming::id_type const& gid
+            , std::size_t pos)
+        {
+            return get_data_at_async(gid, pos).get();
+        }
+        ////////////////////////////////////////////////////////////////////
     };
     
 }}
