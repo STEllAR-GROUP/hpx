@@ -155,7 +155,7 @@ namespace hpx { namespace components
         {}                                                                    \
     /**/
 
-        BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARG_MAX,
+        BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARGUMENT_LIMIT,
             MANAGED_COMPONENT_CONSTRUCT, _)
 
 #undef MANAGED_COMPONENT_CONSTRUCT

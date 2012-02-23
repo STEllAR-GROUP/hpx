@@ -23,7 +23,7 @@
 #include <hpx/util/stringstream.hpp>
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (1, HPX_COMPONENT_CREATE_ARG_MAX,                                     \
+    (3, (1, HPX_COMPONENT_CREATE_ARGUMENT_LIMIT,                              \
     "hpx/runtime/components/server/manage_component.hpp"))                    \
     /**/
 

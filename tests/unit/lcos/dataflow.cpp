@@ -11,8 +11,8 @@
 #if HPX_ACTION_ARGUMENT_LIMIT < 10
 #error "Please define HPX_ACTION_ARGUMENT_LIMIT to be at least 10."
 #endif
-#if HPX_COMPONENT_CREATE_ARG_MAX < 10
-#error "Please define HPX_COMPONENT_CREATE_ARG_MAX to be at least 10."
+#if HPX_COMPONENT_CREATE_ARGUMENT_LIMIT < 10
+#error "Please define HPX_COMPONENT_CREATE_ARGUMENT_LIMIT to be at least 10."
 #endif
 
 #include <hpx/components/dataflow/dataflow.hpp>

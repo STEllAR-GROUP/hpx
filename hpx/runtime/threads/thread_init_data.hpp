@@ -51,6 +51,7 @@ namespace hpx { namespace threads
 
     private:
         // we don't use the assignment operator
+        thread_init_data(thread_init_data const& rhs);
         thread_init_data& operator=(thread_init_data const& rhs);
     };
 }}

@@ -61,7 +61,7 @@ namespace hpx { namespace components
                 component = new wrapped_type(this_, BOOST_PP_ENUM_PARAMS(N, t));\
             }                                                                 \
     /**/
-            BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARG_MAX,
+            BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARGUMENT_LIMIT,
                 MANAGED_COMPONENT_CONSTRUCT_INIT1, _)
 
 #undef MANAGED_COMPONENT_CONSTRUCT_INIT1
@@ -87,7 +87,7 @@ namespace hpx { namespace components
                 component->set_back_ptr(this_);                               \
             }                                                                 \
     /**/
-            BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARG_MAX,
+            BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARGUMENT_LIMIT,
                 MANAGED_COMPONENT_CONSTRUCT_INIT2, _)
 
 #undef MANAGED_COMPONENT_CONSTRUCT_INIT2
@@ -276,7 +276,7 @@ namespace hpx { namespace components
         }                                                                     \
     /**/
 
-        BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARG_MAX,
+        BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARGUMENT_LIMIT,
             MANAGED_COMPONENT_CONSTRUCT, _)
 
 #undef MANAGED_COMPONENT_CONSTRUCT
@@ -444,7 +444,7 @@ namespace hpx { namespace components
         }                                                                     \
     /**/
 
-        BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARG_MAX,
+        BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARGUMENT_LIMIT,
             HPX_MANAGED_COMPONENT_CREATE_ONE, _)
 
 #undef HPX_MANAGED_COMPONENT_CREATE_ONE

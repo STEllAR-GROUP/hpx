@@ -154,7 +154,7 @@ struct fixed_component : Component
         }                                                                     \
     /**/
 
-        BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARG_MAX,
+        BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARGUMENT_LIMIT,
             HPX_FIXED_COMPONENT_CREATE_ONE, _)
 
 #undef HPX_FIXED_COMPONENT_CREATE_ONE

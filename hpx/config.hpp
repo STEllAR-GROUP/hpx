@@ -65,24 +65,46 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// This defines the maximum number of arguments a component constructor can
 /// take
-#if !defined(HPX_COMPONENT_CREATE_ARG_MAX)
-#  define HPX_COMPONENT_CREATE_ARG_MAX 4
+#if !defined(HPX_COMPONENT_CREATE_ARGUMENT_LIMIT)
+#  define HPX_COMPONENT_CREATE_ARGUMENT_LIMIT 4
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This defines the maximum number of arguments a util::function can take
-#ifndef HPX_FUNCTION_LIMIT
+/// This defines the maximum number of arguments a util::function can take.
+/// Note that this needs to be larger than HPX_ACTION_ARGUMENT_LIMIT by at
+/// least 3.
+#if !defined(HPX_FUNCTION_LIMIT)
 #  define HPX_FUNCTION_LIMIT 10
 #endif
 
+#if (HPX_FUNCTION_LIMIT+3) < HPX_ACTION_ARGUMENT_LIMIT
+#  error "The specified HPX_FUNCTION_LIMIT (default is 10) has to be larger than HPX_ACTION_ARGUMENT_LIMIT by at least 3."
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
-/// This defines the number of outgoing (parcel-) connections kept alive
+/// This defines the number of outgoing (parcel-) connections kept alive (to
+/// all other localities). This value can be changed at runtime by setting
+/// the configuration parameter:
+///
+///   hpx.max_connections_cache_size = ...
+///
+/// (or by setting the corresponding environment variable
+/// HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE).
 #if !defined(HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE)
 #  define HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE 256
 #endif
 
-#if !defined(HPX_MAX_PARCEL_CONNECTIONS_PER_LOC)
-#  define HPX_MAX_PARCEL_CONNECTIONS_PER_LOC 2
+///////////////////////////////////////////////////////////////////////////////
+/// This defines the number of outgoing (parcel-) connections kept alive (to
+/// each of the other localities). This value can be changed at runtime by
+/// setting the configuration parameter:
+///
+///   hpx.max_connections_per_locality = ...
+///
+/// (or by setting the corresponding environment variable
+/// HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY).
+#if !defined(HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY)
+#  define HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY 2
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

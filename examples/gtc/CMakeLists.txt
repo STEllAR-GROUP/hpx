@@ -8,6 +8,7 @@ set(subdirs
     point)
 
 add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=8)
+add_definitions(-DHPX_FUNCTION_LIMIT=11)
 
 # for all targets specified above
 foreach(subdir ${subdirs})

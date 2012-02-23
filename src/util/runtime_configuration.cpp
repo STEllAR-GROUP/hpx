@@ -56,6 +56,15 @@ namespace hpx { namespace util
             "default_stack_size = ${HPX_DEFAULT_STACK_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_DEFAULT_STACK_SIZE) "}",
 
+            "[hpx.parcel]",
+            "address = ${HPX_PARCEL_SERVER_ADDRESS:" HPX_INITIAL_IP_ADDRESS "}",
+            "port = ${HPX_PARCEL_SERVER_PORT:"
+                BOOST_PP_STRINGIZE(HPX_INITIAL_IP_PORT) "}",
+            "max_connections_cache_size = ${HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE) "}",
+            "max_connections_per_locality = ${HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY:"
+                BOOST_PP_STRINGIZE(HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY) "}",
+
             // predefine command line aliases
             "[hpx.commandline]",
             "-a = --agas",
@@ -241,15 +250,15 @@ namespace hpx { namespace util
     // HPX network address configuration information has to be stored in the
     // global hpx configuration section:
     //
-    //    [hpx]
+    //    [hpx.parcel]
     //    address=<ip address>   # this defaults to HPX_INITIAL_IP_PORT
     //    port=<ip port>         # this defaults to HPX_INITIAL_IP_ADDRESS
     //
     naming::locality runtime_configuration::get_parcelport_address() const
     {
         // load all components as described in the configuration information
-        if (has_section("hpx")) {
-            util::section const* sec = get_section("hpx");
+        if (has_section("hpx.parcel")) {
+            util::section const* sec = get_section("hpx.parcel");
             if (NULL != sec) {
                 std::string cfg_port(
                     sec->get_entry("port", HPX_INITIAL_IP_PORT));
@@ -264,26 +273,26 @@ namespace hpx { namespace util
 
     std::size_t runtime_configuration::get_max_connections_per_loc() const
     {
-        if (has_section("hpx"))
+        if (has_section("hpx.parcel"))
         {
-            util::section const * sec = get_section("hpx");
+            util::section const * sec = get_section("hpx.parcel");
             if(NULL != sec)
             {
                 std::string cfg_max_connections(
                     sec->get_entry("max_connections_per_locality",
-                        HPX_MAX_PARCEL_CONNECTIONS_PER_LOC));
+                        HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY));
 
                 return boost::lexical_cast<std::size_t>(cfg_max_connections);
             }
         }
-        return HPX_MAX_PARCEL_CONNECTIONS_PER_LOC;
+        return HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY;
     }
 
     std::size_t runtime_configuration::get_connection_cache_size() const
     {
-        if (has_section("hpx"))
+        if (has_section("hpx.parcel"))
         {
-            util::section const * sec = get_section("hpx");
+            util::section const * sec = get_section("hpx.parcel");
             if(NULL != sec)
             {
                 std::string cfg_max_connections(
@@ -343,8 +352,8 @@ namespace hpx { namespace util
             util::section const* sec = get_section("hpx.agas");
             if (NULL != sec) {
                 return boost::lexical_cast<std::size_t>(
-                    sec->get_entry("promise_pool_size"
-                                 , 4 * get_os_thread_count()));
+                    sec->get_entry("promise_pool_size",
+                        4 * get_os_thread_count()));
             }
         }
         return 16;
