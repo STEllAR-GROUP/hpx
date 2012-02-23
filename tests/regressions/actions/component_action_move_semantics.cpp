@@ -12,7 +12,7 @@
 #include <boost/assign/std/vector.hpp>
 
 #include <tests/regressions/actions/action_move_semantics/action_move_semantics.hpp>
-#include <tests/regressions/actions/action_move_semantics.hpp>
+#include <tests/regressions/actions/action_move_semantics/movable_objects.hpp>
 
 using hpx::test::movable_object;
 using hpx::test::non_movable_object;
@@ -25,6 +25,8 @@ std::size_t pass_object(hpx::naming::id_type id)
 
     action_move_semantics test(action_move_semantics::create_sync(id));
     Object obj;
+    obj.reset_count();
+
     return hpx::lcos::eager_future<Action>(test.get_gid(), obj).get();
 }
 
@@ -41,26 +43,34 @@ int hpx_main(boost::program_options::variables_map& vm)
         bool is_local = (id == hpx::find_here()) ? true : false;
 
         // test for movable object ('normal' actions)
-        HPX_TEST_EQ((pass_object<
-            action_move_semantics::test_movable_action, movable_object>(id)),
-            is_local ? 1 : 2);
+        HPX_TEST_EQ((
+            pass_object<
+                action_move_semantics::test_movable_action, movable_object
+            >(id)
+        ), is_local ? 1 : 2);
 
         // test for movable object (direct actions)
-        HPX_TEST_EQ((pass_object<
-            action_move_semantics::test_movable_direct_action, movable_object>(id)),
-            is_local ? 0 : 2);
+        HPX_TEST_EQ((
+            pass_object<
+                action_move_semantics::test_movable_direct_action, movable_object
+            >(id)
+        ), is_local ? 0 : 2);
 
         // FIXME: Can we get down to one copy for non-movable objects as well?
 
         // test for a non-movable object ('normal' actions)
-        HPX_TEST_EQ((pass_object<
-            action_move_semantics::test_non_movable_action, non_movable_object>(id)),
-            is_local ? 2 : 3);
+        HPX_TEST_EQ((
+            pass_object<
+                action_move_semantics::test_non_movable_action, non_movable_object
+            >(id)
+        ), is_local ? 2 : 3);
 
         // test for a non-movable object (direct actions)
-        HPX_TEST_EQ((pass_object<
-            action_move_semantics::test_non_movable_direct_action, non_movable_object>(id)),
-            is_local ? 0 : 3);
+        HPX_TEST_EQ((
+            pass_object<
+                action_move_semantics::test_non_movable_direct_action, non_movable_object
+            >(id)
+        ), is_local ? 0 : 3);
     }
 
     hpx::finalize();

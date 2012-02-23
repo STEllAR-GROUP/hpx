@@ -11,7 +11,9 @@
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <tests/regressions/actions/action_move_semantics.hpp>
+#include <boost/foreach.hpp>
+
+#include <tests/regressions/actions/action_move_semantics/movable_objects.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -32,17 +34,22 @@ using hpx::find_here;
 
 using hpx::test::movable_object;
 using hpx::test::non_movable_object;
+// using hpx::test::movable_object;
+// using hpx::test::non_movable_object;
 
 ///////////////////////////////////////////////////////////////////////////////
 void pass_movable_object_void(movable_object const& obj) {}
-int pass_movable_object(movable_object const& obj) { return 0; }
+std::size_t pass_movable_object(movable_object const& obj)
+{
+    return obj.get_count();
+}
 
 // 'normal' actions (execution is scheduled on a new thread
 typedef plain_action1<
     movable_object const&, pass_movable_object_void
 > pass_movable_object_void_action;
 typedef plain_result_action1<
-    int, movable_object const&, pass_movable_object
+    std::size_t, movable_object const&, pass_movable_object
 > pass_movable_object_action;
 
 HPX_REGISTER_PLAIN_ACTION(pass_movable_object_void_action);
@@ -53,7 +60,7 @@ typedef plain_direct_action1<
     movable_object const&, pass_movable_object_void
 > pass_movable_object_void_direct_action;
 typedef plain_direct_result_action1<
-    int, movable_object const&, pass_movable_object
+    std::size_t, movable_object const&, pass_movable_object
 > pass_movable_object_direct_action;
 
 HPX_REGISTER_PLAIN_ACTION(pass_movable_object_void_direct_action);
@@ -61,14 +68,17 @@ HPX_REGISTER_PLAIN_ACTION(pass_movable_object_direct_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 void pass_non_movable_object_void(non_movable_object const& obj) {}
-int pass_non_movable_object(non_movable_object const& obj) { return 0; }
+std::size_t pass_non_movable_object(non_movable_object const& obj)
+{
+    return obj.get_count();
+}
 
 // 'normal' actions (execution is scheduled on a new thread
 typedef plain_action1<
     non_movable_object const&, pass_non_movable_object_void
 > pass_non_movable_object_void_action;
 typedef plain_result_action1<
-    int, non_movable_object const&, pass_non_movable_object
+    std::size_t, non_movable_object const&, pass_non_movable_object
 > pass_non_movable_object_action;
 
 HPX_REGISTER_PLAIN_ACTION(pass_non_movable_object_void_action);
@@ -79,7 +89,7 @@ typedef plain_direct_action1<
     non_movable_object const&, pass_non_movable_object_void
 > pass_non_movable_object_void_direct_action;
 typedef plain_direct_result_action1<
-    int, non_movable_object const&, pass_non_movable_object
+    std::size_t, non_movable_object const&, pass_non_movable_object
 > pass_non_movable_object_direct_action;
 
 HPX_REGISTER_PLAIN_ACTION(pass_non_movable_object_void_direct_action);
@@ -87,34 +97,76 @@ HPX_REGISTER_PLAIN_ACTION(pass_non_movable_object_direct_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Action, typename Object>
-std::size_t pass_object()
+std::size_t pass_object_void()
 {
     Object obj;
-    eager_future<Action> f(find_here(), obj);
-    f.get();
+    eager_future<Action>(find_here(), obj).get();
 
-    return obj.copy_count;
+    return obj.get_count();
 }
 
+template <typename Action, typename Object>
+std::size_t pass_object(id_type id)
+{
+    Object obj;
+    return eager_future<Action>(id, obj).get();
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
 {
-    // test for movable object ('normal' actions)
-    HPX_TEST((pass_object<pass_movable_object_void_action, movable_object>() == 1));
-    HPX_TEST((pass_object<pass_movable_object_action, movable_object>() == 1));
+    std::vector<id_type> localities = hpx::find_all_localities();
 
-    // test for movable object (direct actions)
-    HPX_TEST((pass_object<pass_movable_object_void_direct_action, movable_object>() == 0));
-    HPX_TEST((pass_object<pass_movable_object_direct_action, movable_object>(), 0));
+    BOOST_FOREACH(id_type id, localities)
+    {
+        bool is_local = (id == find_here()) ? true : false;
 
-    // FIXME: Can we get down to one copy for non-movable objects as well?
+        if (is_local) {
+            // test the void actions locally only (there is no way to get the
+            // overall copy count back)
+            HPX_TEST_EQ((
+                pass_object_void<
+                    pass_movable_object_void_action, movable_object
+                >()
+            ), 1);
+            HPX_TEST_EQ((
+                pass_object_void<
+                    pass_movable_object_void_direct_action, movable_object
+                >()
+            ), 0);
 
-    // test for a non-movable object ('normal' actions)
-    HPX_TEST((pass_object<pass_non_movable_object_void_action, non_movable_object>() == 2));
-    HPX_TEST((pass_object<pass_non_movable_object_action, non_movable_object>() == 2));
+            HPX_TEST_EQ((
+                pass_object_void<
+                    pass_non_movable_object_void_action, non_movable_object
+                >()
+            ),2);
+            HPX_TEST_EQ((
+                pass_object_void<
+                    pass_non_movable_object_void_direct_action, non_movable_object
+                >()
+            ), 0);
+        }
 
-    // test for a non-movable object (direct actions)
-    HPX_TEST((pass_object<pass_non_movable_object_void_direct_action, non_movable_object>() == 0));
-    HPX_TEST((pass_object<pass_non_movable_object_direct_action, non_movable_object>() == 0));
+        // test for movable object ('normal' actions)
+        HPX_TEST_EQ((
+            pass_object<pass_movable_object_action, movable_object>(id)
+        ), is_local ? 1 : 2);
+
+        // test for movable object (direct actions)
+        HPX_TEST_EQ((
+            pass_object<pass_movable_object_direct_action, movable_object>(id)
+        ), is_local ? 0 : 2);
+
+        // test for a non-movable object ('normal' actions)
+        HPX_TEST_EQ((
+            pass_object<pass_non_movable_object_action, non_movable_object>(id)
+        ), is_local ? 2 : 3);
+
+        // test for a non-movable object (direct actions)
+        HPX_TEST_EQ((
+            pass_object<pass_non_movable_object_direct_action, non_movable_object>(id)
+        ), is_local ? 0 : 3);
+    }
 
     finalize();
 

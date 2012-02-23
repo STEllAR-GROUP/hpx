@@ -9,7 +9,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
 
-#include <tests/regressions/actions/action_move_semantics.hpp>
+#include <tests/regressions/actions/action_move_semantics/movable_objects.hpp>
 
 namespace hpx { namespace test { namespace server
 {
@@ -27,12 +27,12 @@ namespace hpx { namespace test { namespace server
         ///////////////////////////////////////////////////////////////////////
         std::size_t test_movable(movable_object const& obj)
         {
-            return obj.copy_count;
+            return obj.get_count();
         }
 
         std::size_t test_non_movable(non_movable_object const& obj)
         {
-            return obj.copy_count;
+            return obj.get_count();
         }
 
         ///////////////////////////////////////////////////////////////////////
