@@ -84,7 +84,7 @@ namespace hpx
         static Component const*
         call(naming::address::address_type lva, boost::mpl::false_)
         {
-            typedef typename add_const<
+            typedef typename boost::add_const<
                 typename Component::wrapping_type
             >::type wrapping_type;
             return reinterpret_cast<wrapping_type*>(lva)->get_checked();
