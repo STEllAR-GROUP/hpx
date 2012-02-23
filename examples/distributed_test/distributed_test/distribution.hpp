@@ -26,7 +26,7 @@ namespace distributed
         void create(std::string const& symbolic_name_base
             , std::size_t num_iinstances, std::vector<std::size_t> temp_data);
         
-        void distribution::split_client_data(std::size_t num_instances
+        void split_client_data(std::size_t num_instances
             , std::vector<std::size_t> &data_received
             , std::vector<std::vector<std::size_t>> &dd_vector);
 
