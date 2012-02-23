@@ -26,9 +26,7 @@ create_barrier(naming::resolver_client& agas_client,
     lcos::barrier b;
     b.create_one(agas_client.local_locality(), num_localities);
 
-    using naming::strip_credit_from_cgid;
-
-    agas::register_name(symname, strip_credit_from_cgid(b.get_gid().get_gid()));
+    agas::register_name(symname, b.get_gid());
     return b;
 }
 
