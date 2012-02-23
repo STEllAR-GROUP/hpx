@@ -76,7 +76,9 @@ namespace graph500 { namespace server
 
         void resolve_conflict();
 
-        void distributed_validate();
+        int distributed_validate();
+
+        std::vector<int64_t> get_numedges();
 
         resolvedata get_parent(int64_t edge);
 
@@ -101,7 +103,8 @@ namespace graph500 { namespace server
             point_receive_duplicates = 4,
             point_resolve_conflict = 5,
             point_get_parent = 6,
-            point_distributed_validate = 7
+            point_distributed_validate = 7,
+            point_get_numedges = 8
         };
 
         typedef hpx::actions::action4<
@@ -161,15 +164,29 @@ namespace graph500 { namespace server
             &point::resolve_conflict
         > resolve_conflict_action;
 
-        typedef hpx::actions::action0<
+        typedef hpx::actions::result_action0<
             // Component server type.
             point,
+            // Return type.
+            int,
             // Action code.
             point_distributed_validate,
             // Arguments of this action.
             // Method bound to this action.
             &point::distributed_validate
         > distributed_validate_action;
+
+        typedef hpx::actions::result_action0<
+            // Component server type.
+            point,
+            // Return type.
+            std::vector<int64_t>,
+            // Action code.
+            point_get_numedges,
+            // Arguments of this action.
+            // Method bound to this action.
+            &point::get_numedges
+        > get_numedges_action;
 
         typedef hpx::actions::result_action1<
             // Component server type.
@@ -206,7 +223,7 @@ namespace graph500 { namespace server
         std::vector< std::vector<hpx::naming::id_type> > duplicates_;
         int64_t minnode_;
         std::vector<packed_edge> local_edges_;
-        std::vector<std::size_t> nedge_bins_;
+        std::vector<int64_t> nedge_bins_;
         std::vector<int64_t> bfs_roots_;
     };
 }}
@@ -235,6 +252,10 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     graph500::server::point::resolve_conflict_action,
     graph500_point_resolve_conflict_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    graph500::server::point::get_numedges_action,
+    graph500_point_get_numedges_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     graph500::server::point::distributed_validate_action,

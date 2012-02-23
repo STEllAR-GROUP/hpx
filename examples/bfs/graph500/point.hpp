@@ -99,16 +99,28 @@ namespace graph500
             this->base_type::resolve_conflict(gid_);
         }
 
-        hpx::lcos::promise<void> distributed_validate_async()
+        hpx::lcos::promise< int > distributed_validate_async()
         {
             BOOST_ASSERT(gid_);
             return this->base_type::distributed_validate_async(gid_);
         }
 
-        void distributed_validate()
+        int distributed_validate()
         {
             BOOST_ASSERT(gid_);
-            this->base_type::distributed_validate(gid_);
+            return this->base_type::distributed_validate(gid_);
+        }
+
+        hpx::lcos::promise< std::vector<int64_t> > get_numedges_async()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_numedges_async(gid_);
+        }
+
+        std::vector<int64_t> get_numedges()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_numedges(gid_);
         }
 
         hpx::lcos::promise< bool > has_edge_async(int64_t edge)

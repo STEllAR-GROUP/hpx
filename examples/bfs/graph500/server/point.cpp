@@ -236,7 +236,7 @@ namespace graph500 { namespace server
 
     }
 
-    void point::distributed_validate()
+    int point::distributed_validate()
     {
       // the parent of the root is always itself
       for (std::size_t step=0;step<bfs_roots_.size();step++) {
@@ -246,19 +246,40 @@ namespace graph500 { namespace server
           if ( parent_(root_node-minnode_,step,0).parent != root_node ) {
             std::cerr << " Validation for root " << root_node << " false; bfs_root parent is "
                       << parent_(root_node-minnode_,step,0).parent << std::endl;
+            return -1;
           } 
         } 
       }
+      return 0;
+    }
 
-      // The correct parent of any duplicate is identified in the component duplicates_[i][0]
-      //typedef std::vector<hpx::lcos::promise< resolvedata > > lazy_results_type;
-      //lazy_results_type lazy_results;
-      //hpx::naming::id_type this_gid = get_gid(); 
-      //for (int64_t i=0;i< (int64_t) duplicates_.size();i++) {
-      //  if ( duplicates_[i].size() > 0 && duplicates_[i][0] != this_gid ) {  
-      //  }
-      //} 
+    std::vector<int64_t> point::get_numedges()
+    {
+      // Get the number of edges for performance counting
+      std::vector<int64_t> num_edges;
+      num_edges.resize(bfs_roots_.size());
+      std::fill(num_edges.begin(),num_edges.end(),0);
 
+      for (std::size_t i=0;i<local_edges_.size();i++) {
+        std::size_t node = local_edges_[i].v0;
+        std::size_t neighbor = local_edges_[i].v1;
+        if ( node != neighbor ) {
+          nedge_bins_[node-minnode_] += 1;
+          nedge_bins_[neighbor-minnode_] += 1;
+        }
+      }
+
+      for (std::size_t step=0;step<bfs_roots_.size();step++) {
+        for (std::size_t i=0;i<nedge_bins_.size();i++) {
+          if ( parent_(i,step,0).parent > 0 ) {
+            num_edges[step] += nedge_bins_[i];
+          }
+        }
+        // Volume/2
+        num_edges[step] = num_edges[step]/2;
+      }
+
+      return num_edges;
     }
 
     resolvedata point::get_parent(int64_t edge)

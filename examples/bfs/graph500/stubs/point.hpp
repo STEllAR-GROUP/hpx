@@ -90,18 +90,32 @@ namespace graph500 { namespace stubs
             resolve_conflict_async(gid).get();
         }
 
-        static hpx::lcos::promise<void>
+        static hpx::lcos::promise< int >
         distributed_validate_async(hpx::naming::id_type const& gid)
         {
             typedef server::point::distributed_validate_action action_type;
             return hpx::lcos::eager_future<action_type>(gid);
         }
 
-        static void distributed_validate(hpx::naming::id_type const& gid)
+        static int distributed_validate(hpx::naming::id_type const& gid)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the promise.
-            distributed_validate_async(gid).get();
+            return distributed_validate_async(gid).get();
+        }
+
+        static hpx::lcos::promise< std::vector<int64_t> >
+        get_numedges_async(hpx::naming::id_type const& gid)
+        {
+            typedef server::point::get_numedges_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid);
+        }
+
+        static std::vector<int64_t> get_numedges(hpx::naming::id_type const& gid)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise.
+            return get_numedges_async(gid).get();
         }
 
         static hpx::lcos::promise< bool >

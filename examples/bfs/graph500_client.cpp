@@ -266,21 +266,27 @@ int hpx_main(boost::program_options::variables_map &vm)
         }
 
         if ( validator ) {
-          // TEST
-          int64_t start_idx, end_idx;
-          int64_t M = INT64_C(16) << scale;
-          compute_edge_range(number_partitions-1, number_partitions, M, &start_idx, &end_idx);
-          // needed for statistics -- this is an estimate unless validator is run
-          for (std::size_t i=0;i<bfs_roots.size();i++) {
-            kernel2_nedge[i] = end_idx; // this normally comes from the validation; it is an estimate here
-          }
-
           {
-            std::vector<hpx::lcos::promise<void> > distributed_validate_phase;
+            std::vector<hpx::lcos::promise< std::vector<int64_t> > > get_numedges_phase;
+            std::vector< std::vector<int64_t> > numedges;
+            for (std::size_t i=0;i<number_partitions;i++) {
+              get_numedges_phase.push_back(points[i].get_numedges_async());
+            }
+            hpx::lcos::wait(get_numedges_phase,numedges);
+            for (std::size_t i=0;i<bfs_roots.size();i++) {
+              kernel2_nedge[i] = 0;
+              for (std::size_t j=0;j<numedges.size();j++) {
+                kernel2_nedge[i] += numedges[j][i]; 
+              }
+            }
+          }
+          {
+            std::vector<hpx::lcos::promise< int > > distributed_validate_phase;
+            std::vector< int > rc;
             for (std::size_t i=0;i<num_pe;i++) {
               distributed_validate_phase.push_back(points[i].distributed_validate_async());
             }
-            hpx::lcos::wait(distributed_validate_phase);
+            hpx::lcos::wait(distributed_validate_phase,rc);
           }
         }
 

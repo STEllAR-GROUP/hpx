@@ -57,6 +57,10 @@ HPX_REGISTER_ACTION_EX(
     graph500_point_distributed_validate_action);
 
 HPX_REGISTER_ACTION_EX(
+    graph500_point_type::wrapped_type::get_numedges_action,
+    graph500_point_get_numedges_action);
+
+HPX_REGISTER_ACTION_EX(
     graph500_point_type::wrapped_type::has_edge_action,
     graph500_point_has_edge_action);
 
