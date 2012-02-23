@@ -21,8 +21,11 @@ namespace distributed
         ~distribution();
     
         void create(std::string const& symbolic_name_base
-            , std::size_t num_instances, std::size_t my_cardinality
-            , std::size_t initial_length, std::size_t initial_value);
+            , std::size_t num_iinstances, std::vector<std::size_t> temp_data);
+        
+        void distribution::split_client_data(std::size_t num_instances
+            , std::vector<std::size_t> &data_received
+            , std::vector<std::vector<std::size_t>> &dd_vector);
 
     private:
         //find GID of object containing specified cardinality/data
@@ -31,7 +34,7 @@ namespace distributed
         typedef distributing_factory::async_create_result_type 
             async_create_relsult_type;
     private:
-        std::vector<hpx::naming::id_type> localities_;
+        std::vector<hpx::naming::id_type> comp_instances_;
         bool comp_created_;
         datastructure data_struct_;
     };

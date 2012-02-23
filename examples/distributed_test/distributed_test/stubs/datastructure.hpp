@@ -14,7 +14,8 @@ namespace distributed { namespace stubs
     struct datastructure
         : hpx::components::stubs::stub_base<distributed::server::datastructure>
     {
-        ////////////////////////
+        typedef std::vector<std::size_t> client_data_type;
+        /////////////////////////////////////////////////////////////////////
         static hpx::lcos::promise<void>
         data_init_async(hpx::naming::id_type const& gid
             ,std::string const& symbolic_name, std::size_t num_instances
@@ -36,7 +37,25 @@ namespace distributed { namespace stubs
             data_init_async(gid, symbolic_name, num_instances, my_cardinality
             , init_length, init_value).get();
         }
-        ////////////////////////
+        ////////////////////////////////////////////////////////////////////
+        static hpx::lcos::promise<void>
+        data_write_async(hpx::naming::id_type const& gid
+            , std::string const& symbolic_name, std::size_t num_instances
+            , std::size_t my_cardinality, client_data_type client_data)
+        {
+            typedef distributed::server::datastructure::write_action action_type;
+            return hpx::lcos::eager_future<action_type>(
+                gid, symbolic_name, num_instances, my_cardinality, client_data);
+        }
+
+        static void data_write(hpx::naming::id_type const& gid
+            , std::string const& symbolic_name, std::size_t num_instances
+            , std::size_t my_cardinality, client_data_type client_data)
+        {
+            data_write_async(gid, symbolic_name, num_instances, my_cardinality
+                , client_data);
+        }
+        ////////////////////////////////////////////////////////////////////
     };
     
 }}

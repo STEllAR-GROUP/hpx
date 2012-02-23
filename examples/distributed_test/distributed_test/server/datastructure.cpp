@@ -26,8 +26,15 @@ namespace distributed {
 namespace distributed { namespace server
 {
 //  Initialize data for this component
-    datastructure::datastructure(){}
+    datastructure::datastructure()
+    {
+        config_data_.my_cardinality_ = 0;
+        config_data_.num_instances_ = 0;
+    }
     datastructure::~datastructure(){}
+
+    typedef std::vector<std::size_t> client_data_type;
+
     void datastructure::data_init(std::string const& symbolic_name
         , std::size_t num_instances, std::size_t my_cardinality
         , std::size_t init_length, std::size_t init_value)
@@ -40,10 +47,30 @@ namespace distributed { namespace server
         
         std::cout << "My Cardinality:" << my_cardinality << std::endl;
         std::cout << "Num Instances:" << num_instances << std::endl;
-        BOOST_FOREACH(std::size_t temp, data_)
+        //BOOST_FOREACH(std::size_t temp, data_)
+        //{
+        //    std::cout << temp << std::endl;
+        //} 
+        std::vector<size_t>::iterator itr;
+        itr = data_.begin();
+        while(itr != data_.end())
         {
-            std::cout << temp << std::endl;
-        } 
+            std::cout << *itr << std::endl;
+            ++itr;
+        }
+    }
+
+    void datastructure::data_write(std::string const& symbolic_name
+        , std::size_t num_instances, std::size_t my_cardinality
+        , client_data_type client_data)
+    {
+        // get_config(gid_component);  implement?
+        //distributed::config_comp config_data = get_config();
+        if(config_data_.my_cardinality_ != my_cardinality)
+            config_data_.my_cardinality_ = my_cardinality;
+        if(data_.size() != client_data.size())
+            data_.resize(client_data.size());
+        data_ = client_data;
     }
 }}
 
@@ -86,6 +113,8 @@ typedef distributed::server::datastructure datastructure_type;
 // Serialization support for the actions
 HPX_REGISTER_ACTION_EX(datastructure_type::init_action,
         distributed_datastructure_init_action);
+HPX_REGISTER_ACTION_EX(datastructure_type::write_action,
+        distributed_datastructure_write_action);
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<datastructure_type>,

@@ -22,9 +22,9 @@ namespace distributed
     distribution::~distribution(){}
 
     void distribution::create(std::string const& symbolic_name_base
-        , std::size_t num_instances, std::size_t my_cardinality
-        , std::size_t init_length, std::size_t init_value)
+        , std::size_t num_instances, std::vector<std::size_t> data_received)
     {
+        std::size_t init_length = 1, init_value = 0;
         hpx::components::component_type type = 
             hpx::components::get_component_type<server::datastructure>();
         
@@ -32,17 +32,13 @@ namespace distributed
     
         distributing_factory factory(
             distributing_factory::create_sync(hpx::find_here()));
-
-        //hpx::naming::id_type temp_myid = hpx::find_here();
-
         //asyncronously create comonents, which will be distributed across
         //all available localities
-        
         distributing_factory::async_create_result_type result = 
             factory.create_components_async(type, num_instances);
 
-        //initialize locality mappings
-        localities_.reserve(num_instances);
+        //initialize locality mappings: Total Component instances
+        comp_instances_.reserve(num_instances);
 
         //wait for the components to be created
         distributing_factory::result_type results = result.get();
@@ -50,33 +46,96 @@ namespace distributed
             hpx::components::server::locality_results(results);
 
         std::size_t cardinality = 0;
-        //Also define cardinality here
+        //Also define cardinality here: TO DO
         BOOST_FOREACH(hpx::naming::id_type id, parts){
-            localities_.push_back(id);
+            comp_instances_.push_back(id);
         }
 
         //Initialize all attached component objects
-        std::size_t num_localities = localities_.size();
-        BOOST_ASSERT( 0 != num_localities);
-
+        std::size_t num_comps = comp_instances_.size();
+        BOOST_ASSERT( 0 != num_comps);
+        BOOST_ASSERT( 0 != num_instances);
         std::vector<hpx::naming::id_type> prefixes = hpx::find_all_localities();
        
         std::vector<hpx::lcos::promise<void> > result_future;
 
-        std::vector<hpx::naming::id_type>::iterator loc_itr = localities_.begin();
-        while(loc_itr != localities_.end())
+        std::vector<hpx::naming::id_type>::iterator loc_itr = comp_instances_.begin();
+        while(loc_itr != comp_instances_.end())
         {
             result_future.push_back(stubs::datastructure::data_init_async(*loc_itr
-                , symbolic_name_base, num_localities, cardinality
+                , symbolic_name_base, num_comps, cardinality
                 , init_length, init_value));
             ++cardinality;
             ++loc_itr;
         }
+        hpx::lcos::wait(result_future);
 
+        typedef std::vector<std::vector<std::size_t> > client_data_type;
+        
+        client_data_type dd_vector;
+        
+        split_client_data(num_instances, data_received, dd_vector);
+        loc_itr = comp_instances_.begin();
+        result_future.resize(0);
+        client_data_type::iterator dd_itr;
+        dd_itr = dd_vector.begin();
+        loc_itr = comp_instances_.begin();
+        cardinality = 0;
+        while(loc_itr != comp_instances_.end())
+        {
+            result_future.push_back(stubs::datastructure::data_write_async(
+                *loc_itr, symbolic_name_base, num_comps, cardinality
+                , *dd_itr));
+            ++cardinality;
+            ++dd_itr;
+            ++loc_itr;
+        }
         hpx::lcos::wait(result_future);
         //Create component object locally. 
-
         comp_created_ = true;
-        
+    }
+
+    void distribution::split_client_data(
+        std::size_t num_instances, std::vector<std::size_t> &data_received
+        , std::vector<std::vector<std::size_t>> &dd_vector)
+    {
+
+        dd_vector.resize(0);
+        std::size_t client_vec_length = data_received.size();
+        std::size_t quotient = client_vec_length / num_instances;
+        std::size_t rem = client_vec_length%num_instances;
+        std::vector<std::size_t>::iterator itr;
+        itr = data_received.begin();
+        std::vector<std::size_t> temp;
+        if(rem == 0)
+        {
+            for(std::size_t i = 0; i<num_instances; ++i)
+            {
+                temp.resize(0);
+                if(itr <= (data_received.end() - quotient))
+                {
+                    temp.assign(itr, itr + quotient);
+                    dd_vector.push_back(temp);
+                    itr+=quotient+1;
+                }
+            }
+        }
+        else
+        {
+            for(std::size_t i = 0; i<num_instances - 1; ++ i)
+            {
+                temp.resize(0);
+                if(itr <= (data_received.end() - quotient))
+                {
+                    temp.assign(itr, itr+(quotient+1));
+                    dd_vector.push_back(temp);
+                    itr+=quotient+1;
+                }
+            }
+
+            temp.resize(0);
+            temp.assign(itr, data_received.end());
+            dd_vector.push_back(temp);
+        }
     }
 }

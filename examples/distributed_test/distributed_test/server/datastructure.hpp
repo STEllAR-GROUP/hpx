@@ -37,31 +37,58 @@ namespace distributed { namespace server
     
         enum actions
         {
-            datastructure_init = 0
+            datastructure_init = 0,
             //datastructure_read = 1;
-            //datastructure_write = 2;
-            //datastructure_config_get = 3;
+            datastructure_write = 2,
+            datastructure_config_get = 3
             //datastructure_config_init = 4;
         };
     
         datastructure();// {}
         ~datastructure();//{}
-    
+
+        typedef std::vector<std::size_t> client_data_type;
+
         void data_init(std::string const& symbolic_name
             , std::size_t num_instances
             , std::size_t my_cardinality
             ,std::size_t const init_length
             , std::size_t const init_value);
+
+        void data_write(std::string const& symbolic_name
+            , std::size_t num_instances
+            , std::size_t my_cardinality
+            , client_data_type client_data);
+
+        config_comp get_config_info() const;
+
+        typedef hpx::actions::result_action0<
+        datastructure const
+        , config_comp
+        , datastructure_config_get
+        , &datastructure::get_config_info
+        > get_config_action;
+
+        typedef hpx::actions::action4<
+        datastructure
+        , datastructure_write
+        , std::string const&
+        , std::size_t
+        , std::size_t
+        , client_data_type 
+        , &datastructure::data_write
+        > write_action;
+
     
         typedef hpx::actions::action5<
-        datastructure,
-        datastructure_init,
-        std::string const&,
-        std::size_t,
-        std::size_t,
-        std::size_t,
-        std::size_t,
-        &datastructure::data_init       
+        datastructure
+        , datastructure_init
+        , std::string const&
+        , std::size_t
+        , std::size_t
+        , std::size_t
+        , std::size_t
+        , &datastructure::data_init       
         > init_action;
 
     private:
@@ -88,6 +115,9 @@ namespace boost { namespace serialization
 
 HPX_REGISTER_ACTION_DECLARATION_EX(distributed::server::datastructure::init_action,
     distributed_datastructure_init_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(distributed::server::datastructure::write_action,
+    distributed_datastructure_write_action);
+
 //HPX_REGISTER_ACTION_DECLARATION_EX(distributed::server::datastructure::
     //get_config_action, distributed_datastructure_get_config_action);
 //HPX_REGISTER_ACTION_DECLARATION_EX(

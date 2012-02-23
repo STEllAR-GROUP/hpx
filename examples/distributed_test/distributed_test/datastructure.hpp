@@ -62,6 +62,21 @@ namespace distributed
                 num_instances, my_cardinality, initial_length, initial_value);
         }
         //////////////////////////////////////////////////////////////////////
+        hpx::lcos::promise<void>
+        data_write_async(std::string const& symbolic_name, std::size_t num_instances
+            , std::size_t my_cardinality, std::vector<std::size_t> client_data)
+        {
+            return stubs::datastructure::data_write_async(this->gid_,
+                symbolic_name, num_instances, my_cardinality, client_data);
+        }
+        
+        void data_write(std::string const& symbolic_name, std::size_t num_instances
+            , std::size_t my_cardinality, std::vector<std::size_t> client_data)
+        {
+            stubs::datastructure::data_write(this->gid_, symbolic_name,
+                num_instances, my_cardinality, client_data);
+        }
+        //////////////////////////////////////////////////////////////////////
     };
 }
 
