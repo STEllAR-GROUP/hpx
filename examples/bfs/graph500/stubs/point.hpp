@@ -90,6 +90,20 @@ namespace graph500 { namespace stubs
             resolve_conflict_async(gid).get();
         }
 
+        static hpx::lcos::promise<void>
+        distributed_validate_async(hpx::naming::id_type const& gid)
+        {
+            typedef server::point::distributed_validate_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid);
+        }
+
+        static void distributed_validate(hpx::naming::id_type const& gid)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise.
+            distributed_validate_async(gid).get();
+        }
+
         static hpx::lcos::promise< bool >
         has_edge_async(hpx::naming::id_type const& gid,int64_t edge)
         {
@@ -117,38 +131,6 @@ namespace graph500 { namespace stubs
             // is executed and the result is returned to the promise
             return get_parent_async(gid,edge).get();
         }
-
-        static hpx::lcos::promise< std::vector<nodedata> >
-        validate_async(hpx::naming::id_type const& gid)
-        {
-            typedef server::point::validate_action action_type;
-            return hpx::lcos::eager_future<action_type>(gid);
-        }
-
-        static std::vector<nodedata> validate(hpx::naming::id_type const& gid)
-        {
-            // The following get yields control while the action above
-            // is executed and the result is returned to the promise
-            return validate_async(gid).get();
-        }
-
-        static hpx::lcos::promise< validatedata >
-        scatter_async(hpx::naming::id_type const& gid,std::vector<std::size_t> const&parent,
-                      std::size_t searchkey,std::size_t scale)
-        {
-            typedef server::point::scatter_action action_type;
-            return hpx::lcos::eager_future<action_type>(gid,parent,searchkey,scale);
-        }
-
-        static validatedata scatter(hpx::naming::id_type const& gid,
-                                    std::vector<std::size_t> const&parent,
-                                    std::size_t searchkey,std::size_t scale)
-        {
-            // The following get yields control while the action above
-            // is executed and the result is returned to the promise.
-            return scatter_async(gid,parent,searchkey,scale).get();
-        }
-
     };
 }}
 

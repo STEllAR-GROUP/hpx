@@ -99,6 +99,18 @@ namespace graph500
             this->base_type::resolve_conflict(gid_);
         }
 
+        hpx::lcos::promise<void> distributed_validate_async()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::distributed_validate_async(gid_);
+        }
+
+        void distributed_validate()
+        {
+            BOOST_ASSERT(gid_);
+            this->base_type::distributed_validate(gid_);
+        }
+
         hpx::lcos::promise< bool > has_edge_async(int64_t edge)
         {
             BOOST_ASSERT(gid_);
@@ -122,35 +134,6 @@ namespace graph500
             BOOST_ASSERT(gid_);
             return this->base_type::get_parent(gid_,edge);
         }
-
-        hpx::lcos::promise< std::vector<nodedata> > validate_async()
-        {
-            BOOST_ASSERT(gid_);
-            return this->base_type::validate_async(gid_);
-        }
-
-        std::vector<nodedata> validate()
-        {
-            BOOST_ASSERT(gid_);
-            return this->base_type::validate(gid_);
-        }
-
-        hpx::lcos::promise< validatedata > scatter_async(std::vector<std::size_t> const&parent,
-                                                         std::size_t searchkey,
-                                                         std::size_t scale)
-        {
-            BOOST_ASSERT(gid_);
-            return this->base_type::scatter_async(gid_,parent,searchkey,scale);
-        }
-
-        validatedata scatter(std::vector<std::size_t> const&parent,
-                             std::size_t searchkey,
-                             std::size_t scale)
-        {
-            BOOST_ASSERT(gid_);
-            return this->base_type::scatter(gid_,parent,searchkey,scale);
-        }
-
     };
 }
 

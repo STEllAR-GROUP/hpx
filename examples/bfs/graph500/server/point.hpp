@@ -15,25 +15,6 @@
 #include "splittable_mrg.hpp"
 #include "../../array.hpp"
 
-struct nodedata
-{
-  std::size_t node;
-  std::size_t parent;
-  std::size_t level;
-
-  nodedata() {}
-
-  private:
-  // serialization support
-  friend class boost::serialization::access;
-
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int version)
-  {
-    ar & node & parent & level;
-  }
-};
-
 struct leveldata
 {
   std::size_t level;
@@ -71,24 +52,6 @@ struct resolvedata
   }
 };
 
-struct validatedata
-{
-  std::size_t num_edges;
-  int rc;
-
-  validatedata() {}
-
-  private:
-  // serialization support
-  friend class boost::serialization::access;
-
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int version)
-  {
-    ar & num_edges & rc;
-  }
-};
-
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace graph500 { namespace server
@@ -113,21 +76,16 @@ namespace graph500 { namespace server
 
         void resolve_conflict();
 
+        void distributed_validate();
+
         resolvedata get_parent(int64_t edge);
 
         bool has_edge(int64_t edge);
 
         bool resolve_conflict_callback(std::size_t i,resolvedata r);
 
-        std::vector<nodedata> validate();
-
-        std::vector<nodedata> validator();
-
         void receive_duplicates(int64_t j,                
                   std::vector<hpx::naming::id_type> const& duplicate_components);
-
-        validatedata scatter(std::vector<std::size_t> const&parent,std::size_t searchkey,
-                             std::size_t scale);
 
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
@@ -139,12 +97,11 @@ namespace graph500 { namespace server
             point_init = 0,
             point_bfs = 1,
             point_has_edge = 2,
-            point_validate = 3,
-            point_scatter = 4,
-            point_root = 5,
-            point_receive_duplicates = 6,
-            point_resolve_conflict = 7,
-            point_get_parent = 8
+            point_root = 3,
+            point_receive_duplicates = 4,
+            point_resolve_conflict = 5,
+            point_get_parent = 6,
+            point_distributed_validate = 7
         };
 
         typedef hpx::actions::action4<
@@ -204,6 +161,16 @@ namespace graph500 { namespace server
             &point::resolve_conflict
         > resolve_conflict_action;
 
+        typedef hpx::actions::action0<
+            // Component server type.
+            point,
+            // Action code.
+            point_distributed_validate,
+            // Arguments of this action.
+            // Method bound to this action.
+            &point::distributed_validate
+        > distributed_validate_action;
+
         typedef hpx::actions::result_action1<
             // Component server type.
             point,
@@ -217,21 +184,6 @@ namespace graph500 { namespace server
             &point::get_parent
         > get_parent_action;
 
-        typedef hpx::actions::result_action3<
-            // Component server type.
-            point,
-            // Return type.
-            validatedata, 
-            // Action code.
-            point_scatter,
-            // Arguments of this action.
-            std::vector<std::size_t> const&,
-            std::size_t,
-            std::size_t,
-            // Method bound to this action.
-            &point::scatter
-        > scatter_action;
-
         typedef hpx::actions::result_action1<
             // Component server type.
             point,
@@ -244,18 +196,6 @@ namespace graph500 { namespace server
             // Method bound to this action.
             &point::has_edge
         > has_edge_action;
-
-        typedef hpx::actions::result_action0<
-            // Component server type.
-            point,
-            // Return type.
-            std::vector<nodedata>,
-            // Action code.
-            point_validate,
-            // Arguments of this action.
-            // Method bound to this action.
-            &point::validate
-        > validate_action;
 
     private:
         hpx::lcos::local_mutex mtx_;
@@ -297,16 +237,12 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
     graph500_point_resolve_conflict_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
+    graph500::server::point::distributed_validate_action,
+    graph500_point_distributed_validate_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
     graph500::server::point::has_edge_action,
     graph500_point_has_edge_action);
-
-HPX_REGISTER_ACTION_DECLARATION_EX(
-    graph500::server::point::validate_action,
-    graph500_point_validate_action);
-
-HPX_REGISTER_ACTION_DECLARATION_EX(
-    graph500::server::point::scatter_action,
-    graph500_point_scatter_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::lcos::base_lco_with_value<std::vector<std::size_t> >::get_value_action,

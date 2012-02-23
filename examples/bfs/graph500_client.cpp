@@ -23,16 +23,6 @@ static void compute_edge_range(int rank, int size, int64_t M, int64_t* start_idx
   *end_idx = (rankc + 1) * (M / sizec) + (rankc + 1 < (M % sizec) ? rankc + 1 : (M % sizec));
 }
 
-// this routine mirrors the matlab validation routine
-int validate(std::vector<std::size_t> const& parent,
-             std::vector<std::size_t> const& levels,
-             std::vector<std::size_t> const& parentindex,
-             std::vector<std::size_t> const& nodelist,
-             std::vector<std::size_t> const& neighborlist,
-             std::size_t searchkey,std::size_t &num_edges);
-
-void clean_up(std::vector<nodedata> &full,std::size_t scale,std::vector<std::size_t> &parent);
-
 void get_statistics(std::vector<double> const& x, double &minimum, double &mean, double &stdev, double &firstquartile,
                                                   double &median, double &thirdquartile, double &maximum);
 
@@ -274,54 +264,25 @@ int hpx_main(boost::program_options::variables_map &vm)
         for ( std::size_t i=0;i<bfs_roots.size();i++) {
           kernel2_time[i] = k2time/bfs_roots.size();
         }
-#if 0
-        // Validate
-        // Return all nodes visited and their parents
+
         if ( validator ) {
-          // This is an all-gather on the parents
-          std::vector<hpx::lcos::promise< std::vector< nodedata > > > validate_phase;
-          std::vector<std::vector<nodedata> > result;
-          for (std::size_t i=0;i<num_pe;i++) {
-            validate_phase.push_back(points[i].validate_async());
+          // TEST
+          int64_t start_idx, end_idx;
+          int64_t M = INT64_C(16) << scale;
+          compute_edge_range(number_partitions-1, number_partitions, M, &start_idx, &end_idx);
+          // needed for statistics -- this is an estimate unless validator is run
+          for (std::size_t i=0;i<bfs_roots.size();i++) {
+            kernel2_nedge[i] = end_idx; // this normally comes from the validation; it is an estimate here
           }
-          hpx::lcos::wait(validate_phase,result);
 
-          // Prep prior to scatter to all components
-          std::vector<nodedata> full;
-          for (std::size_t i=0;i<num_pe;i++) {
-            for (std::size_t j=0;j<result[i].size();j++) {
-              full.push_back( result[i][j] );
+          {
+            std::vector<hpx::lcos::promise<void> > distributed_validate_phase;
+            for (std::size_t i=0;i<num_pe;i++) {
+              distributed_validate_phase.push_back(points[i].distributed_validate_async());
             }
-          }
-          // remove duplicate nodes
-          std::vector<std::size_t> parent;
-          clean_up(full,scale,parent);
-
-          // some validation can be done here
-          if ( parent[bfs_roots[j]] != bfs_roots[j] ) {
-            // the parent of the root is always itself;
-            // if not, validation fails
-            std::cerr << " Validation for root " << bfs_roots[j] << " fails; bfs_root parent " << parent[bfs_roots[j]] << std::endl;
-          }
-
-          // broadcast full parent list to the number_partition components for validation
-          std::vector<validatedata> validate_result;
-          std::vector<hpx::lcos::promise< validatedata > > scatter_phase;
-          for (std::size_t i=0;i<number_partitions;i++) {
-            scatter_phase.push_back(points[i].scatter_async(parent,bfs_roots[j],scale));
-          }
-          hpx::lcos::wait(scatter_phase,validate_result);
-
-          // find the number of edges
-          kernel2_nedge[j] = 0; 
-          for (std::size_t i=0;i<validate_result.size();i++) {
-            kernel2_nedge[j] +=  validate_result[i].num_edges;
-            if ( validate_result[i].rc < 0 ) {
-              std::cerr << " Validation failed for bfs_root " << bfs_roots[j] << " rc: " << validate_result[i].rc << std::endl;
-            }
+            hpx::lcos::wait(distributed_validate_phase);
           }
         }
-#endif
 
         // get statistics
         if ( !validator ) {
