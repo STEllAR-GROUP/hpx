@@ -6,6 +6,7 @@
 #if !defined(HPX_6EB418B5_DC41_45A3_ADF4_C45A068F73D4)
 #define HPX_6EB418B5_DC41_45A3_ADF4_C45A068F73D4
 
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/local_barrier.hpp>
 #include <hpx/lcos/local_counting_semaphore.hpp>
 #include <hpx/lcos/local_mutex.hpp>

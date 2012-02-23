@@ -8,6 +8,7 @@
 #if !defined(HPX_28391A68_5D15_4616_9453_963891EE34D1)
 #define HPX_28391A68_5D15_4616_9453_963891EE34D1
 
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/components/iostreams/standard_streams.hpp>
 
 #endif // HPX_28391A68_5D15_4616_9453_963891EE34D1

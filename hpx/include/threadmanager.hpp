@@ -7,6 +7,7 @@
 #if !defined(HPX_THREADMANAGER_MAY_20_2008_840AM)
 #define HPX_THREADMANAGER_MAY_20_2008_840AM
 
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>

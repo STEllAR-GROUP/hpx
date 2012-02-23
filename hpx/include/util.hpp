@@ -6,6 +6,7 @@
 #if !defined(HPX_UTIL_DEC_21_2011_0340PM)
 #define HPX_UTIL_DEC_21_2011_0340PM
 
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/parse_command_line.hpp>
 #include <hpx/util/lightweight_test.hpp>
