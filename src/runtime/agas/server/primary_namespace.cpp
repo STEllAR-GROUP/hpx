@@ -744,7 +744,7 @@ void primary_namespace::increment(
                  , boost::int64_t(HPX_INITIAL_GLOBALCREDIT));
 
     LAGAS_(info) << (boost::format(
-        "primary_namespace::increment, lower(%1%), upper(%2%), credits(%2%)")
+        "primary_namespace::increment, lower(%1%), upper(%2%), credits(%3%)")
         % lower % upper % credits);
 
     if (&ec != &throws)
@@ -760,17 +760,6 @@ void primary_namespace::decrement_sweep(
     )
 { // {{{ decrement_sweep implementation
     using boost::fusion::at_c;
-
-    // REVIEW: Why do we have this restriction?
-    if (HPX_UNLIKELY(HPX_INITIAL_GLOBALCREDIT < credits))
-    {
-        HPX_THROWS_IF(ec, bad_parameter
-          , "primary_namespace::decrement_sweep"
-          , "cannot decrement more than "
-            BOOST_PP_STRINGIZE(HPX_INITIAL_GLOBALCREDIT)
-            " credits at once");
-        return;
-    }
 
     LAGAS_(info) << (boost::format(
         "primary_namespace::decrement_sweep, lower(%1%), upper(%2%), "
