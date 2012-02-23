@@ -815,7 +815,7 @@ namespace hpx { namespace components { namespace server
                 util::parse_commandline(ini, options, cmd_line, vm,
                     util::allow_unregistered, get_runtime_mode_from_name(runtime_mode));
 
-                if (vm.count("exit"))
+                if (vm.count("hpx:exit"))
                     return false;
             }
         }

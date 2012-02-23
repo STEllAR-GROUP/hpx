@@ -94,7 +94,7 @@ namespace hpx { namespace util
             std::pair<std::string, std::string> operator()(std::string const& s) const
             {
                 if ('@' == s[0])
-                    return std::make_pair(std::string("options-file"), s.substr(1));
+                    return std::make_pair(std::string("hpx:options-file"), s.substr(1));
 
                 return handle_aliasing(ini_, s);
             }
@@ -185,9 +185,9 @@ namespace hpx { namespace util
             boost::program_options::options_description const& desc_cfgfile)
         {
             using boost::program_options::options_description;
-            if (vm.count("options-file")) {
+            if (vm.count("hpx:options-file")) {
                 std::vector<std::string> const &cfg_files =
-                    vm["options-file"].as<std::vector<std::string> >();
+                    vm["hpx:options-file"].as<std::vector<std::string> >();
                 BOOST_FOREACH(std::string const& cfg_file, cfg_files)
                 {
                     // parse a single config file and store the results
@@ -218,6 +218,7 @@ namespace hpx { namespace util
         std::vector<std::string>* unregistered_options)
     {
         using boost::program_options::options_description;
+        using boost::program_options::positional_options_description;
         using boost::program_options::value;
         using boost::program_options::store;
         using boost::program_options::command_line_parser;
@@ -229,11 +230,11 @@ namespace hpx { namespace util
             options_description cmdline_options(
                 "HPX options (allowed on command line only)");
             cmdline_options.add_options()
-                ("help", value<std::string>()->implicit_value("minimal"),
+                ("hpx:help", value<std::string>()->implicit_value("minimal"),
                     "print out program usage (default: this message), possible "
                     "values: 'full' (additionally prints options from components)")
-                ("version", "print out HPX version and copyright information")
-                ("options-file", value<std::vector<std::string> >()->composing(),
+                ("hpx:version", "print out HPX version and copyright information")
+                ("hpx:options-file", value<std::vector<std::string> >()->composing(),
                     "specify a file containing command line options "
                     "(alternatively: @filepath)")
             ;
@@ -245,9 +246,9 @@ namespace hpx { namespace util
             switch (mode) {
             case runtime_mode_default:
                 hpx_options.add_options()
-                    ("worker", "run this instance in worker mode")
-                    ("console", "run this instance in console mode")
-                    ("connect", "run this instance in worker mode, but connecting late")
+                    ("hpx:worker", "run this instance in worker mode")
+                    ("hpx:console", "run this instance in console mode")
+                    ("hpx:connect", "run this instance in worker mode, but connecting late")
                 ;
                 break;
 
@@ -258,9 +259,9 @@ namespace hpx { namespace util
                 // worker mode, silently ignore the worker option for
                 // hpx_pbs compatibility.
                 hidden_options.add_options()
-                    ("worker", "run this instance in worker mode")
-                    ("console", "run this instance in console mode")
-                    ("connect", "run this instance in worker mode, but connecting late")
+                    ("hpx:worker", "run this instance in worker mode")
+                    ("hpx:console", "run this instance in console mode")
+                    ("hpx:connect", "run this instance in worker mode, but connecting late")
                 ;
                 break;
 
@@ -271,114 +272,123 @@ namespace hpx { namespace util
 
             // general options definitions
             hpx_options.add_options()
-                ("run-agas-server",
+                ("hpx:run-agas-server",
                   "run AGAS server as part of this runtime instance")
-                ("run-hpx-main",
+                ("hpx:run-hpx-main",
                   "run the hpx_main function, regardless of locality mode")
-                ("agas", value<std::string>(),
+                ("hpx:agas", value<std::string>(),
                   "the IP address the AGAS server is running on, "
                   "expected format: `address:port' (default: "
                   "127.0.0.1:7910)")
-                ("run-agas-server-only", "run only the AGAS server")
-                ("hpx", value<std::string>(),
+                ("hpx:run-agas-server-only", "run only the AGAS server")
+                ("hpx:hpx", value<std::string>(),
                   "the IP address the HPX parcelport is listening on, "
                   "expected format: `address:port' (default: "
                   "127.0.0.1:7910)")
-                ("nodefile", value<std::string>(),
+                ("hpx:nodefile", value<std::string>(),
                   "the file name of a node file to use (list of nodes, one "
                   "node name per line and core)")
-                ("nodes", value<std::vector<std::string> >()->multitoken(),
+                ("hpx:nodes", value<std::vector<std::string> >()->multitoken(),
                   "the (space separated) list of the nodes to use (usually "
                   "this is extracted from a node file)")
-                ("ifsuffix", value<std::string>(),
+                ("hpx:ifsuffix", value<std::string>(),
                   "suffix to append to host names in order to resolve them "
                   "to the proper network interconnect")
-                ("ifprefix", value<std::string>(),
+                ("hpx:ifprefix", value<std::string>(),
                   "prefix to prepend to host names in order to resolve them "
                   "to the proper network interconnect")
-                ("iftransform", value<std::string>(),
+                ("hpx:iftransform", value<std::string>(),
                   "sed-style search and replace (s/search/replace/) used to "
                   "transform host names to the proper network interconnect")
-                ("localities", value<std::size_t>(),
+                ("hpx:localities", value<std::size_t>(),
                   "the number of localities to wait for at application "
                   "startup (default: 1)")
-                ("node", value<std::size_t>(),
+                ("hpx:node", value<std::size_t>(),
                   "number of the node this locality is run on "
                   "(must be unique, alternatively: -0, -1, ..., -9)")
 #if defined(HPX_HAVE_HWLOC)
-                ("pu-offset", value<std::size_t>(),
+                ("hpx:pu-offset", value<std::size_t>(),
                   "the first processing unit this instance of HPX should be "
                   "run on (default: 0)")
-                ("pu-step", value<std::size_t>(),
+                ("hpx:pu-step", value<std::size_t>(),
                   "the step between used processing unit numbers for this "
                   "instance of HPX (default: 1)")
 #endif
-                ("threads", value<std::size_t>(),
+                ("hpx:threads", value<std::size_t>(),
                   "the number of operating system threads to dedicate as "
                   "shepherd threads for this HPX locality (default: 1)")
-                ("queuing", value<std::string>(),
+                ("hpx:queuing", value<std::string>(),
                   "the queue scheduling policy to use, options are 'global/g', "
                   "'local/l', 'priority_local/pr', 'abp/a', 'priority_abp', "
                   "'hierarchy/h', and 'periodic/pe' (default: priority_local/p)")
-                ("hierarchy-arity", value<std::size_t>(),
+                ("hpx:hierarchy-arity", value<std::size_t>(),
                   "the arity of the of the thread queue tree, valid for "
                    "--queuing=hierarchy only (default: 2)")
-                ("high-priority-threads", value<std::size_t>(),
+                ("hpx:high-priority-threads", value<std::size_t>(),
                   "the number of operating system threads maintaining a high "
                   "priority queue (default: number of OS threads), valid for "
                   "--queuing=priority_local only")
-                ("numa-sensitive",
+                ("hpx:numa-sensitive",
                   "makes the priority_local scheduler NUMA sensitive, valid for "
                   "--queuing=priority_local only")
             ;
 
             options_description config_options("HPX configuration options");
             config_options.add_options()
-                ("app-config", value<std::string>(),
+                ("hpx:app-config", value<std::string>(),
                   "load the specified application configuration (ini) file")
-                ("hpx-config", value<std::string>()->default_value(""),
+                ("hpx:config", value<std::string>()->default_value(""),
                   "load the specified hpx configuration (ini) file")
-                ("ini", value<std::vector<std::string> >()->composing(),
+                ("hpx:ini", value<std::vector<std::string> >()->composing(),
                   "add a configuration definition to the default runtime "
                   "configuration")
-                ("exit", "exit after configuring the runtime")
+                ("hpx:exit", "exit after configuring the runtime")
             ;
 
             options_description debugging_options("HPX debugging options");
             debugging_options.add_options()
-                ("list-symbolic-names", "list all registered symbolic "
+                ("hpx:list-symbolic-names", "list all registered symbolic "
                   "names after startup")
-                ("list-component-types", "list all dynamic component types "
+                ("hpx:list-component-types", "list all dynamic component types "
                   "after startup")
-                ("dump-config-initial", "print the initial runtime configuration")
-                ("dump-config", "print the final runtime configuration")
-                ("debug-hpx-log", value<std::string>()->implicit_value("cout"),
+                ("hpx:dump-config-initial", "print the initial runtime configuration")
+                ("hpx:dump-config", "print the final runtime configuration")
+                ("hpx:debug-hpx-log", value<std::string>()->implicit_value("cout"),
                   "enable all messages on the HPX log channel and send all "
                   "HPX logs to the target destination")
-                ("debug-agas-log", value<std::string>()->implicit_value("cout"),
+                ("hpx:debug-agas-log", value<std::string>()->implicit_value("cout"),
                   "enable all messages on the AGAS log channel and send all "
                   "AGAS logs to the target destination")
                 // enable debug output from command line handling
-                ("debug-clp", "debug command line processing")
+                ("hpx:debug-clp", "debug command line processing")
             ;
 
             options_description counter_options(
                 "HPX options related to performance counters");
             counter_options.add_options()
-                ("print-counter", value<std::vector<std::string> >()->composing(),
+                ("hpx:print-counter", value<std::vector<std::string> >()->composing(),
                   "print the specified performance counter either repeatedly or "
                   "before shutting down the system (see option --print-counter-interval)")
-                ("print-counter-interval", value<std::size_t>(),
+                ("hpx:print-counter-interval", value<std::size_t>(),
                   "print the performance counter(s) specified with --print-counter "
                   "repeatedly after the time interval (specified in milliseconds) "
                   "(default: 0, which means print once at shutdown)")
-                ("print-counter-destination", value<std::string>(),
+                ("hpx:print-counter-destination", value<std::string>(),
                   "print the performance counter(s) specified with --print-counter "
                   "to the given file (default: console)")
-                ("list-counters", "list the names of all registered performance "
+                ("hpx:list-counters", "list the names of all registered performance "
                   "counters")
-                ("list-counter-infos", "list the description of all registered "
+                ("hpx:list-counter-infos", "list the description of all registered "
                   "performance counters")
+            ;
+
+            // move all positional options into the hpx:positional option group
+            positional_options_description pd;
+            pd.add("hpx:positional", -1);
+
+            hidden_options.add_options()
+                ("hpx:positional", value<std::vector<std::string> >(),
+                  "positional options")
             ;
 
             // construct the overall options description and parse the
@@ -396,6 +406,7 @@ namespace hpx { namespace util
                 detail::get_commandline_parser(
                     command_line_parser(argc, argv)
                         .options(desc_cmdline)
+                        .positional(pd)
                         .style(unix_style)
                         .extra_parser(detail::option_parser(rtcfg)),
                     error_mode
@@ -423,7 +434,7 @@ namespace hpx { namespace util
             detail::handle_config_options(vm, desc_cfgfile);
 
             // print help screen
-            if (visible && vm.count("help")) {
+            if (visible && vm.count("hpx:help")) {
                 (*visible)
                     .add(app_options).add(cmdline_options)
                     .add(hpx_options).add(counter_options)
