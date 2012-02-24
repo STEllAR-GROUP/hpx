@@ -78,6 +78,8 @@ namespace graph500 { namespace server
 
         int distributed_validate();
 
+        bool get_numedges_callback(std::size_t i,resolvedata r);
+
         std::vector<int64_t> get_numedges();
 
         resolvedata get_parent(int64_t edge);

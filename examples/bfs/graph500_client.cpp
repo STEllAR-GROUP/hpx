@@ -283,7 +283,7 @@ int hpx_main(boost::program_options::variables_map &vm)
           {
             std::vector<hpx::lcos::promise< int > > distributed_validate_phase;
             std::vector< int > rc;
-            for (std::size_t i=0;i<num_pe;i++) {
+            for (std::size_t i=0;i<number_partitions;i++) {
               distributed_validate_phase.push_back(points[i].distributed_validate_async());
             }
             hpx::lcos::wait(distributed_validate_phase,rc);

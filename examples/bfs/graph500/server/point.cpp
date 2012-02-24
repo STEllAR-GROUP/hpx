@@ -253,6 +253,16 @@ namespace graph500 { namespace server
       return 0;
     }
 
+    bool point::get_numedges_callback(std::size_t i,resolvedata r)
+    {
+      // if there is a dispute about a parent, pick the edge with the lowest level
+      for (std::size_t i=0;i<bfs_roots_.size();i++) {
+        parent_(r.edge-minnode_,i,0).level = r.level[i];
+        parent_(r.edge-minnode_,i,0).parent = r.parent[i];
+      }
+      return true;
+    }
+
     std::vector<int64_t> point::get_numedges()
     {
       // Get the number of edges for performance counting
@@ -278,6 +288,19 @@ namespace graph500 { namespace server
         // Volume/2
         num_edges[step] = num_edges[step]/2;
       }
+
+      // This method also ensures the duplicate parent information is found
+      // on the first number_partitions components
+      typedef std::vector<hpx::lcos::promise< resolvedata > > lazy_results_type;
+      lazy_results_type lazy_results;
+      hpx::naming::id_type this_gid = get_gid();
+      for (int64_t i=0;i< (int64_t) duplicates_.size();i++) {
+        if ( duplicates_[i].size() > 1 && duplicates_[i][0] != this_gid ) {
+          lazy_results.push_back( stubs::point::get_parent_async(duplicates_[i][0],i+minnode_) );
+        }
+      }
+      hpx::lcos::wait(lazy_results,
+           boost::bind(&point::get_numedges_callback, this, _1, _2));
 
       return num_edges;
     }
