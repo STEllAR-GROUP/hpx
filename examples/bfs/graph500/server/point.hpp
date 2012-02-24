@@ -76,7 +76,7 @@ namespace graph500 { namespace server
 
         void resolve_conflict();
 
-        int distributed_validate();
+        int distributed_validate(std::size_t scale);
 
         bool get_numedges_callback(std::size_t i,resolvedata r);
 
@@ -166,7 +166,7 @@ namespace graph500 { namespace server
             &point::resolve_conflict
         > resolve_conflict_action;
 
-        typedef hpx::actions::result_action0<
+        typedef hpx::actions::result_action1<
             // Component server type.
             point,
             // Return type.
@@ -174,6 +174,7 @@ namespace graph500 { namespace server
             // Action code.
             point_distributed_validate,
             // Arguments of this action.
+            std::size_t,
             // Method bound to this action.
             &point::distributed_validate
         > distributed_validate_action;

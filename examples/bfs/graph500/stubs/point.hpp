@@ -91,17 +91,17 @@ namespace graph500 { namespace stubs
         }
 
         static hpx::lcos::promise< int >
-        distributed_validate_async(hpx::naming::id_type const& gid)
+        distributed_validate_async(hpx::naming::id_type const& gid,std::size_t scale)
         {
             typedef server::point::distributed_validate_action action_type;
-            return hpx::lcos::eager_future<action_type>(gid);
+            return hpx::lcos::eager_future<action_type>(gid,scale);
         }
 
-        static int distributed_validate(hpx::naming::id_type const& gid)
+        static int distributed_validate(hpx::naming::id_type const& gid,std::size_t scale)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the promise.
-            return distributed_validate_async(gid).get();
+            return distributed_validate_async(gid,scale).get();
         }
 
         static hpx::lcos::promise< std::vector<int64_t> >

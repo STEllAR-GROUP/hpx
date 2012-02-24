@@ -236,7 +236,7 @@ namespace graph500 { namespace server
 
     }
 
-    int point::distributed_validate()
+    int point::distributed_validate(std::size_t scale)
     {
       // the parent of the root is always itself
       for (std::size_t step=0;step<bfs_roots_.size();step++) {
@@ -246,9 +246,61 @@ namespace graph500 { namespace server
           if ( parent_(root_node-minnode_,step,0).parent != root_node ) {
             std::cerr << " Validation for root " << root_node << " false; bfs_root parent is "
                       << parent_(root_node-minnode_,step,0).parent << std::endl;
-            return -1;
+          //  return -1;
           } 
         } 
+
+        // octave: lij = level (ij);
+        std::vector<std::size_t> li,lj;
+        li.resize(local_edges_.size());
+        lj.resize(local_edges_.size());
+        for (std::size_t i=0;i<local_edges_.size();i++) {
+          int64_t node = local_edges_[i].v0;
+          int64_t neighbor = local_edges_[i].v1;
+          li[i] = parent_(node-minnode_,step,0).level;
+          lj[i] = parent_(neighbor-minnode_,step,0).level;
+        }
+ 
+        // octave: neither_in = lij(1,:) == 0 & lij(2,:) == 0;
+        // both_in = lij(1,:) > 0 & lij(2,:) > 0;
+        std::vector<bool> neither_in,both_in;
+        neither_in.resize(local_edges_.size());
+        both_in.resize(local_edges_.size());
+        for (std::size_t i=0;i<local_edges_.size();i++) {
+          if ( li[i] == 0 && lj[i] == 0 ) neither_in[i] = true;
+          if ( li[i] > 0 && lj[i] > 0 ) both_in[i] = true;
+        }
+ 
+        // octave:
+        //  if any (not (neither_in | both_in)),
+        //  out = -4;
+        //  return
+        //end
+        for (std::size_t i=0;i<local_edges_.size();i++) {
+          if ( !(neither_in[i] || both_in[i] ) ) {
+            std::cerr << " Validation step " << step << " failed " << -4 << std::endl;
+           // return -4;
+          }
+        }
+ 
+        // octave: respects_tree_level = abs (lij(1,:) - lij(2,:)) <= 1;
+        std::vector<bool> respects_tree_level;
+        respects_tree_level.resize( local_edges_.size() );
+        for (std::size_t i=0;i<local_edges_.size();i++) {
+          if ( abs( (int) (li[i] - lj[i]) ) <= 1 ) respects_tree_level[i] = true;
+          else respects_tree_level[i] = false;
+        }
+ 
+        // octave:
+        // if any (not (neither_in | respects_tree_level)),
+        //  out = -5;
+        //  return
+        for (std::size_t i=0;i<local_edges_.size();i++) {
+          if ( !(neither_in[i] || respects_tree_level[i] ) ) {
+            std::cerr << " Validation step " << step << " failed " << -5 << std::endl;
+            //return -5;
+          }
+        }
       }
       return 0;
     }
