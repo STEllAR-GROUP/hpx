@@ -59,7 +59,7 @@ const char* third_barrier = "/barrier(agas#0)/third_stage";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Install performance counter startup functions for core subsystems.
-void register_counter_types()
+inline void register_counter_types()
 {
      naming::get_agas_client().register_counter_types();
      LBT_(info) << "(3rd stage) pre_main: registered AGAS client-side "
@@ -83,12 +83,12 @@ void register_counter_types()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void garbage_collect_non_blocking()
+inline void garbage_collect_non_blocking()
 {
     agas::garbage_collect_non_blocking();
 }
 
-void garbage_collect()
+inline void garbage_collect()
 {
     agas::garbage_collect();
 }
@@ -183,6 +183,10 @@ bool pre_main(runtime_mode mode)
         second_stage.wait();
         LBT_(info) << "(2nd stage) pre_main: passed 2nd stage boot barrier";
 
+        // Tear down the second stage barrier.
+        if (agas_client.is_bootstrap()) 
+            agas::unregister_name(second_barrier);
+
         register_counter_types();
 
         components::stubs::runtime_support::call_startup_functions(find_here());
@@ -194,6 +198,10 @@ bool pre_main(runtime_mode mode)
         // component tables are populated.
         third_stage.wait();
         LBT_(info) << "(3rd stage) pre_main: passed 3rd stage boot barrier";
+
+        // Tear down the second stage barrier.
+        if (agas_client.is_bootstrap()) 
+            agas::unregister_name(third_barrier);
     }
 
     // Enable logging. Even if we terminate at this point we will see all
