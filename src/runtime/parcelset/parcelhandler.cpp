@@ -77,7 +77,10 @@ namespace hpx { namespace parcelset
     {
         // wait for thread-manager to become active
         while (tm_->status() & starting)
-            ;
+        {
+            boost::this_thread::sleep(boost::get_system_time() +
+                boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
+        }
 
         // Give up if we're shutting down.
         if (tm_->status() & stopping)
