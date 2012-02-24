@@ -387,6 +387,15 @@ find_package(HPX_BoostBook)
 find_package(HPX_QuickBook)
 find_package(HPX_Xsltproc)
 
+if(   (NOT DOCBOOK_DTD_PATH_FOUND)
+   OR (NOT DOCBOOK_XSL_PATH_FOUND)
+   OR (NOT BOOSTBOOK_DTD_PATH_FOUND)
+   OR (NOT BOOSTBOOK_XSL_PATH_FOUND)
+   OR (NOT QUICKBOOK_FOUND)
+   OR (NOT XSLTPROC_FOUND))
+  hpx_warn("documentation" "Documentation toolchain is incomplete, documentation generation will be unavailable.")
+endif() 
+
 ################################################################################
 # Warning configuration
 ################################################################################
