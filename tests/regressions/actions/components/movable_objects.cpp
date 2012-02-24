@@ -6,11 +6,11 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/include/serialization.hpp>
 
-#include <tests/regressions/actions/action_move_semantics/movable_objects.hpp>
+#include <tests/regressions/actions/components/movable_objects.hpp>
 
 namespace hpx { namespace test
 {
-    ///////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     std::size_t movable_object::count = 0;
 
     movable_object::movable_object()

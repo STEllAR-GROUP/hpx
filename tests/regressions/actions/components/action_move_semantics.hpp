@@ -8,7 +8,7 @@
 
 #include <hpx/include/components.hpp>
 
-#include <tests/regressions/actions/action_move_semantics/stubs/action_move_semantics.hpp>
+#include <tests/regressions/actions/components/stubs/action_move_semantics.hpp>
 
 namespace hpx { namespace test 
 {

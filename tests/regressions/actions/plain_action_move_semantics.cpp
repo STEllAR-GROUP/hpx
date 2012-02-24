@@ -13,7 +13,7 @@
 
 #include <boost/foreach.hpp>
 
-#include <tests/regressions/actions/action_move_semantics/movable_objects.hpp>
+#include <tests/regressions/actions/components/movable_objects.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;

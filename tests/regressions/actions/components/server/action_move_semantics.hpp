@@ -9,7 +9,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
 
-#include <tests/regressions/actions/action_move_semantics/movable_objects.hpp>
+#include <tests/regressions/actions/components/movable_objects.hpp>
 
 namespace hpx { namespace test { namespace server
 {
