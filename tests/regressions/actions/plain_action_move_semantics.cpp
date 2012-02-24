@@ -139,7 +139,7 @@ int hpx_main(variables_map& vm)
                 pass_object_void<
                     pass_non_movable_object_void_action, non_movable_object
                 >()
-            ),2);
+            ), 2);
             HPX_TEST_EQ((
                 pass_object_void<
                     pass_non_movable_object_void_direct_action, non_movable_object

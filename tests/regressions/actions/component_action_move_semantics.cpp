@@ -33,9 +33,6 @@ std::size_t pass_object(hpx::naming::id_type id)
 int hpx_main(boost::program_options::variables_map& vm)
 {
     using hpx::test::server::action_move_semantics;
-    using hpx::test::server::action_move_semantics;
-    using hpx::test::server::action_move_semantics;
-    using hpx::test::server::action_move_semantics;
 
     std::vector<hpx::naming::id_type> localities = hpx::find_all_localities();
     BOOST_FOREACH(hpx::naming::id_type id, localities)
