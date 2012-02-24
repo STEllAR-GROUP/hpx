@@ -47,7 +47,7 @@ namespace hpx { namespace util
             std::pair<std::string, std::string> result;
 
             std::string opt(trim_whitespace(option));
-            if (opt.size() < 2 || !(opt[0] == '-' && opt[1] != '-'))
+            if (opt.size() < 2 || opt[0] != '-')
                 return result;
 
             util::section const* sec = ini.get_section("hpx.commandline");
@@ -55,27 +55,48 @@ namespace hpx { namespace util
                 return result;     // no alias mappings are defined
 
             // we found a shortcut option, try to find mapping
-            std::string k(opt.substr(0, 2));
-            if (!sec->has_entry(k))
-                return result;     // no alias for this option defined
+            std::string expand_to;
+            std::string::size_type start_at = 2;
+            bool long_option = false;
+            if (opt.size() > 2 && opt[1] != '-') {
+                // short option with value: first two letters have to match
+                expand_to = trim_whitespace(sec->get_entry(opt.substr(0, start_at), ""));
+            }
+            else {
+                // short option (no value) or long option
+                if (opt[1] == '-') {
+                    start_at = opt.find_last_of("=");
+                    long_option = true;
+                }
 
-            std::string expand_to = trim_whitespace(sec->get_entry(k, ""));
-            if (expand_to.empty() || expand_to.size() < 2)
+                if (start_at != std::string::npos) {
+                    expand_to = trim_whitespace(
+                        sec->get_entry(opt.substr(0, start_at), ""));
+                }
+                else {
+                    expand_to = trim_whitespace(sec->get_entry(opt, ""));
+                }
+            }
+
+            if (expand_to.size() < 2 || expand_to.substr(0, 2) != "--")
                 return result;     // no sensible alias is defined for this option
-
-            if (expand_to.substr(0, 2) != "--")
-                return result;
             expand_to.erase(0, 2);
 
             std::string::size_type p = expand_to.find_first_of('=');
             if (p != std::string::npos) {
-                // the option defines its own value
+                // the option alias defines its own value
                 std::string o(trim_whitespace(expand_to.substr(0, p)));
                 std::string v(trim_whitespace(expand_to.substr(p+1)));
                 result = std::make_pair(o, v);
             }
+            else if (start_at != std::string::npos && start_at < opt.size()) {
+                // extract value from original option
+                result = std::make_pair(expand_to,
+                    opt.substr(start_at + (long_option ? 1 : 0)));
+            }
             else {
-                result = std::make_pair(expand_to, opt.substr(2));
+                // no value
+                result = std::make_pair(expand_to, "");
             }
 
             return result;
