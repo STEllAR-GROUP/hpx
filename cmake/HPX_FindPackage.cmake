@@ -12,9 +12,8 @@ if(NOT HPX_UTILS_LOADED)
 endif()
 
 macro(hpx_get_version name)
-
   if(${name}_DISABLE)
-    hpx_info("hpx_get_version.${name}" "Library disabled by user.")
+    hpx_info("hpx_get_version.${name}" "Library search disabled by user.")
     unset(${name}_VERSION_SEARCHED CACHE)
     unset(${name}_ROOT)
     set(${name}_FOUND OFF CACHE BOOL "Found ${name}.")
@@ -77,9 +76,8 @@ macro(hpx_get_version name)
 endmacro()
 
 macro(hpx_find_package name)
-
   if(${name}_DISABLE)
-    hpx_info("find_package.${name}" "Library disabled by user.")
+    hpx_info("find_package.${name}" "Library search disabled by user.")
     unset(${name}_VERSION_SEARCHED CACHE)
     unset(${name}_ROOT)
     set(${name}_FOUND OFF CACHE BOOL "Found ${name}.")
@@ -93,17 +91,17 @@ macro(hpx_find_package name)
         hpx_get_version(${name} ${ARGN})
       endif()
 
-      set(rooted_lib_paths)
+      set(rooted_paths)
       foreach(path ${${name}_LIBRARY_PATHS})
-        list(APPEND rooted_lib_paths ${${name}_ROOT}/${path})
+        list(APPEND rooted_paths ${${name}_ROOT}/${path})
       endforeach()
 
       if(${name}_ROOT)
         hpx_print_list("DEBUG" "find_package.${name}" "Library names" ${name}_LIBRARIES)
-        hpx_print_list("DEBUG" "find_package.${name}" "Library paths" rooted_lib_paths)
+        hpx_print_list("DEBUG" "find_package.${name}" "Library paths" rooted_paths)
         find_library(${name}_LIBRARY
           NAMES ${${name}_LIBRARIES}
-          PATHS ${rooted_lib_paths}
+          PATHS ${rooted_paths}
           NO_DEFAULT_PATH)
 
         if(NOT ${name}_LIBRARY)
