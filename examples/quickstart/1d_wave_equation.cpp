@@ -209,7 +209,7 @@ int hpx_main(variables_map& vm)
 
   c = 1.0;
 
-  dt = 5.0/(nt-1);
+  dt = 1.0/(nt-1);
   dx = 1.0/(nx-1);
   alpha_squared = (c*dt/dx)*(c*dt/dx);
   
@@ -232,9 +232,16 @@ int hpx_main(variables_map& vm)
     std::vector<promise<double> > futures;
     for (boost::uint64_t i=0;i<nx;i++)
       futures.push_back(async<wave_action>(here,nt-1,i));
+    
+    // open file for output
+    std::ofstream outfile;
+    outfile.open ("output.dat");
+
     wait(futures, [&](std::size_t i, double n)
          { double x_here = i*dx;
-           cout << (boost::format("%1% %2%\n") % x_here % n) << flush; });
+           outfile << (boost::format("%1% %2%\n") % x_here % n) << flush; });
+
+    outfile.close();
 
     char const* fmt = "elapsed time: %1% [s]\n";
     std::cout << (boost::format(fmt) % t.elapsed());
@@ -266,11 +273,11 @@ int main(int argc, char* argv[])
       , "c parameter of the wave equation")
 
     ( "nx-value"
-      , value<boost::uint64_t>()->default_value(50)
+      , value<boost::uint64_t>()->default_value(100)
       , "nx parameter of the wave equation")
 
     ( "nt-value"
-      , value<boost::uint64_t>()->default_value(1000)
+      , value<boost::uint64_t>()->default_value(400)
       , "nt parameter of the wave equation")
     ;
 
