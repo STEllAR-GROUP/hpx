@@ -72,12 +72,29 @@ boost::uint64_t const nx = 100;
 boost::uint64_t const nt = 1000;
 
 struct data{
-  hpx::lcos::local_mutex mtx;
-  double u_value;
-  bool computed;
+    // Default constructor: data d1;
+    data()
+      : mtx()
+      , u_value(0.0)
+      , computed(false)
+    {}
+
+    // Copy constructor: data d1; data d2(d1);
+    // We can't copy the mutex, because mutexs are noncopyable.
+    data(
+        data const& other
+        )
+      : mtx()
+      , u_value(other.u_value)
+      , computed(other.computed)
+    {}
+ 
+    hpx::lcos::local_mutex mtx;
+    double u_value;
+    bool computed;
 };
 
-data u[nt][nx];
+std::vector<std::vector<data> > u; 
 
  
 ///////////////////////////////////////////////////////////////////////////////
@@ -198,6 +215,8 @@ int hpx_main(variables_map& vm)
     dt = 5.0/(nt-1);
     dx = 1.0/(nx-1);
     alpha_squared = (c*dt/dx)*(c*dt/dx);
+
+    u = std::vector<std::vector<data> >(nt, std::vector<data>(nx));
 
     cout << (boost::format("dt = %1%\n") % dt) << flush;
     cout << (boost::format("dx = %1%\n") % dx) << flush;
