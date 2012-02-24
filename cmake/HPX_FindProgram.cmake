@@ -30,7 +30,7 @@ macro(hpx_find_program name)
         hpx_print_list("DEBUG" "find_program.${name}" "Program names" ${name}_PROGRAMS)
         hpx_print_list("DEBUG" "find_program.${name}" "Program paths" rooted_paths)
         find_program(${name}_PROGRAM
-          NAMES ${${name}_NAMES}
+          NAMES ${${name}_PROGRAMS}
           PATHS ${rooted_paths}
           NO_DEFAULT_PATH)
 

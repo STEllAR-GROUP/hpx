@@ -30,7 +30,7 @@ macro(hpx_find_path name)
         hpx_print_list("DEBUG" "find_path.${name}" "File names" ${name}_FILES)
         hpx_print_list("DEBUG" "find_path.${name}" "File paths" rooted_paths)
         find_path(${name}_PATH
-          NAMES ${${name}_NAMES}
+          NAMES ${${name}_FILES}
           PATHS ${rooted_paths}
           NO_DEFAULT_PATH)
 
