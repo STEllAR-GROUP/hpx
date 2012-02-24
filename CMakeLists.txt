@@ -181,7 +181,7 @@ add_definitions(-DBOOST_NO_0X_HDR_ATOMIC)
 # C++
 hpx_include(GCCVersion)
 
-if(GCC_VERSION)
+if(GCC_VERSION AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
   hpx_info("gcc_config" "Compiler reports compatibility with GCC version ${GCC_VERSION_STR}")
 
   if(040400 GREATER ${GCC_VERSION})
@@ -378,6 +378,14 @@ find_package(OpenMP)
 # MPI (for benchmark comparisons)
 ################################################################################
 find_package(HPX_MPI)
+
+################################################################################
+# Documentation toolchain (DocBook, BoostBook, QuickBook, xsltproc) 
+################################################################################
+find_package(HPX_DocBook)
+find_package(HPX_BoostBook)
+find_package(HPX_QuickBook)
+find_package(HPX_Xsltproc)
 
 ################################################################################
 # Warning configuration
