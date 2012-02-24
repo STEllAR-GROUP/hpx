@@ -382,19 +382,7 @@ find_package(HPX_MPI)
 ################################################################################
 # Documentation toolchain (DocBook, BoostBook, QuickBook, xsltproc) 
 ################################################################################
-find_package(HPX_DocBook)
-find_package(HPX_BoostBook)
-find_package(HPX_QuickBook)
-find_package(HPX_Xsltproc)
-
-if(   (NOT DOCBOOK_DTD_PATH_FOUND)
-   OR (NOT DOCBOOK_XSL_PATH_FOUND)
-   OR (NOT BOOSTBOOK_DTD_PATH_FOUND)
-   OR (NOT BOOSTBOOK_XSL_PATH_FOUND)
-   OR (NOT QUICKBOOK_FOUND)
-   OR (NOT XSLTPROC_FOUND))
-  hpx_warn("documentation" "Documentation toolchain is incomplete, documentation generation will be unavailable.")
-endif() 
+hpx_include(Documentation)
 
 ################################################################################
 # Warning configuration
@@ -1033,6 +1021,10 @@ hpx_option(HPX_BUILD_TOOLS BOOL "Build HPX tools (default: OFF)" OFF ADVANCED)
 if(HPX_BUILD_TOOLS)
   add_hpx_pseudo_target(tools)
   add_subdirectory(tools)
+endif()
+
+if(HPX_DOCUMENTATION_GENERATION)
+  add_subdirectory(docs)
 endif()
 
 ################################################################################

@@ -1,0 +1,25 @@
+[/==============================================================================
+    Copyright (C) 2012 Bryce Adelstein-Lelbach, Hartmut Kaiser and Adrian Serio 
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+===============================================================================/]
+
+[article HPX
+    [quickbook 1.5]
+    [version 0.8.0]
+    [authors [Adelstein-Lelbach, Bryce], [Kaiser, Hartmut], [Serio, Adrian]]
+    [copyright 2012 Bryce Adelstein-Lelbach, Hartmut Kaiser and Adrian Serio]
+    [license
+        Distributed under the Boost Software License, Version 1.0.
+        (See accompanying file LICENSE_1_0.txt or copy at
+        [@http://www.boost.org/LICENSE_1_0.txt])
+    ]
+]
+
+[/ DEFINITIONS]
+
+[/ CONTENT]
+
+Hello world!
+
