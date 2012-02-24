@@ -4,7 +4,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(NOT HPX_FINDPATH_LOADED)
-  include(HPX_FindPATH)
+  include(HPX_FindPath)
 endif()
 
 if(DOCBOOK_USE_SYSTEM)
@@ -23,5 +23,5 @@ hpx_find_path(DOCBOOK_DTD
 
 hpx_find_path(DOCBOOK_XSL
   FILES html/html.xsl # Do not move the html/ part into FILE_PATHS
-  FILE_PATHS share/xml/docbook/stylesheet/docbook/xsl)
+  FILE_PATHS share/xml/docbook/stylesheet/docbook-xsl)
 

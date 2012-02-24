@@ -4,7 +4,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(NOT HPX_FINDPATH_LOADED)
-  include(HPX_FindPATH)
+  include(HPX_FindPath)
 endif()
 
 if(BOOST_USE_SYSTEM)
