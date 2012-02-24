@@ -3,6 +3,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+# FIXME: This should use the standard HPX macros for an exhaustive search.
+
 # This is a wrapper for FindMPI.cmake avoiding to re-detect MPI during each
 # cmake configuration
 
