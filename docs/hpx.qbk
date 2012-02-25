@@ -1,22 +1,43 @@
 [/==============================================================================
-    Copyright (C) 2012 Bryce Adelstein-Lelbach, Hartmut Kaiser and Adrian Serio 
+    Copyright (C) 2007-2012 Hartmut Kaiser
+    Copyright (C) 2012 Bryce Adelstein-Lelbach and Adrian Serio
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ===============================================================================/]
 
-[article HPX
+[article High Performance ParalleX - HPX
     [quickbook 1.5]
+    [authors [Kaiser, Hartmut], [Adelstein-Lelbach, Bryce], [Serio, Adrian]]
     [version 0.8.0]
-    [copyright 2012 Bryce Adelstein-Lelbach, Hartmut Kaiser and Adrian Serio]
+    [copyright 2007 2008 2009 2010 2011 2012 The STE||AR Group]
     [license
-        Distributed under the [@boost:LICENSE_1_0.txt Boost Software License, Version 1.0].
+        Distributed under the Boost Software License, Version 1.0.
+        (See accompanying file LICENSE_1_0.txt or copy at
+        [@http://www.boost.org/LICENSE_1_0.txt])
     ]
 ]
 
 [/ DEFINITIONS]
+[def __version__                V0.8.0]
+
+[def __stellar__                [@http://stellar.cct.lsu.edu STE||AR]]
+[def __stellar_list__           [@email:gopx@cct.lsu.edu HPX General List]]
+[def __stellar_irc__            [@irc://irc.freenode.net:6667/#ste||ar #stellar at Freenet]]
+
+[def __boost__                  [@http://www.boost.org/ Boost]]
+[def __boost_tools__            [@http://www.boost.org/tools/index.html Boost Tools]]
+
+[/ Some images ]
+[def __note__                   [$./images/note.png]]
+[def __tip__                    [$./images/tip.png]]
+[def __important__              [$./images/important.png]]
+[def __caution__                [$./images/caution.png]]
+[def __danger__                 [$./images/alert.png]]
 
 [/ CONTENT]
 
-Hello world!
+[include preface.qbk]
+[include whats_new.qbk]
+[include introduction.qbk]
 
