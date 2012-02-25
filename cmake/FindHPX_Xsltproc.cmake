@@ -7,6 +7,12 @@ if(NOT HPX_FINDPROGRAM_LOADED)
   include(HPX_FindProgram)
 endif()
 
+if(NOT XSLTPROC_ROOT)
+  if($ENV{XSLTPROC_ROOT})
+    set(XSLTPROC_ROOT $ENV{XSLTPROC_ROOT})
+  endif()
+endif()
+
 hpx_find_program(XSLTPROC
   PROGRAMS xsltproc
   PROGRAM_PATHS bin)

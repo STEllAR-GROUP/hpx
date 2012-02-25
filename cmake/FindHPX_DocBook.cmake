@@ -15,13 +15,18 @@ endif()
 if(DOCBOOK_ROOT)
   set(DOCBOOK_DTD_ROOT ${DOCBOOK_ROOT})
   set(DOCBOOK_XSL_ROOT ${DOCBOOK_ROOT})
+else()
+  if($ENV{DOCBOOK_ROOT})
+    set(DOCBOOK_DTD_ROOT $ENV{DOCBOOK_ROOT})
+    set(DOCBOOK_XSL_ROOT $ENV{DOCBOOK_ROOT})
+  endif()
 endif()
 
 hpx_find_path(DOCBOOK_DTD
   FILES docbookx.dtd
-  FILE_PATHS share/xml/docbook/schema/dtd/4.2)
+  FILE_PATHS share/xml/docbook/schema/dtd/4.2 docbook-dtd)
 
 hpx_find_path(DOCBOOK_XSL
   FILES html/html.xsl # Do not move the html/ part into FILE_PATHS
-  FILE_PATHS share/xml/docbook/stylesheet/docbook-xsl)
+  FILE_PATHS share/xml/docbook/stylesheet/docbook-xsl docbook-xsl)
 
