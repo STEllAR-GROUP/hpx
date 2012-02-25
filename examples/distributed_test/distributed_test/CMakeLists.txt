@@ -8,5 +8,5 @@ set(dependencies
 
 add_hpx_component(distributed_test
     DEPENDENCIES ${dependencies}
-    FOLDER "Examples/Distributed_test"
+    FOLDER "Examples/Distributed Test"
     AUTOGLOB)

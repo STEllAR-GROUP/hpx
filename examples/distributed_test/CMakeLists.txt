@@ -21,7 +21,7 @@ source_group("Source Files" FILES distributed_client.cpp)
 add_hpx_executable(distributed_client
     SOURCES distributed_client.cpp
     DEPENDENCIES distributed_test_component
-    FOLDER "Examples/Distributed_test")
+    FOLDER "Examples/Distributed Test")
 
 # add dependencies to pseudo-target
 add_hpx_pseudo_dependencies(examples.distributed_test distributed_client_exe)

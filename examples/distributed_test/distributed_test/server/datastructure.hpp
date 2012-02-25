@@ -16,7 +16,7 @@ namespace distributed
 
 {
     //Information for component configuration
-    struct config_comp
+    struct HPX_COMPONENT_EXPORT config_comp
     { 
         config_comp();//: num_instances_(0) {}
         config_comp(std::string const& symbolic_name, std::size_t num_instances
