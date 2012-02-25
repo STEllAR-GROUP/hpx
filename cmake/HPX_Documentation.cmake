@@ -25,19 +25,23 @@ if(   (NOT DOCBOOK_DTD_PATH_FOUND)
   set(HPX_DOCUMENTATION_GENERATION OFF CACHE BOOL "True if the HPX documentation toolchain is available.")
 
   macro(hpx_write_boostbook_catalog file)
-    hpx_error("hpx_write_boostbook_catalog" "Documentation toolchain is unavailable")
+    hpx_error("write_boostbook_catalog" "Documentation toolchain is unavailable.")
   endmacro()
 
   macro(hpx_quickbook_to_boostbook name)
-    hpx_error("hpx_quickbook_to_boostbook" "Documentation toolchain is unavailable")
+    hpx_error("quickbook_to_boostbook" "Documentation toolchain is unavailable.")
   endmacro()
 
   macro(hpx_boostbook_to_docbook name)
-    hpx_error("hpx_boostbook_to_docbook" "Documentation toolchain is unavailable")
+    hpx_error("boostbook_to_docbook" "Documentation toolchain is unavailable.")
   endmacro()
 
   macro(hpx_quickbook_to_docbook name)
-    hpx_error("hpx_quickbook_to_docbook" "Documentation toolchain is unavailable")
+    hpx_error("quickbook_to_docbook" "Documentation toolchain is unavailable.")
+  endmacro()
+
+  macro(hpx_docbook_to_html name)
+    hpx_error("docbook_to_html" "Documentation toolchain is unavailable.")
   endmacro()
 else() 
   set(HPX_DOCUMENTATION_GENERATION ON CACHE BOOL "True if the HPX documentation toolchain is available.")
@@ -98,19 +102,46 @@ else()
   macro(hpx_boostbook_to_docbook name)
     hpx_parse_arguments(${name} "SOURCE;DEPENDENCIES;CATALOG;XSLTPROC_ARGS" "" ${ARGN})
 
+    if(NOT BOOST_ROOT)
+      hpx_error("boostbook_to_docbook" "\${BOOST_ROOT} must be defined to generate HPX documentation")
+    endif()
+
     add_custom_command(OUTPUT ${name}.dbk 
       COMMAND "XML_CATALOG_FILES=${${name}_CATALOG}" ${XSLTPROC_PROGRAM}
               ${${name}_XSLTPROC_ARGS}
-              "-o" ${name}.dbk 
+              "--stringparam" "boost.root" "${BOOST_ROOT}"
+              "--stringparam" "html.stylesheet" "${BOOST_ROOT}/doc/src/boostbook.css"
+              "--xinclude" "-o" ${name}.dbk
               "--path" ${CMAKE_CURRENT_BINARY_DIR}
               ${BOOSTBOOK_XSL_PATH}/docbook.xsl ${${name}_SOURCE}
       COMMENT "Generating DocBook file ${name}.dbk from ${${name}_SOURCE}."
       DEPENDS ${${name}_SOURCE} ${${name}_DEPENDENCIES})
   endmacro()
 
-  # Quickbook -> BoostBook XML -> DocBook
-  macro(hpx_quickbook_to_docbook name)
+  # DocBook -> HTML
+  macro(hpx_docbook_to_html name)
     hpx_parse_arguments(${name} "SOURCE;DEPENDENCIES;CATALOG;XSLTPROC_ARGS" "" ${ARGN})
+
+    if(NOT BOOST_ROOT)
+      hpx_error("dockbook_to_html" "\${BOOST_ROOT} must be defined to generate HPX documentation")
+    endif()
+
+    add_custom_command(OUTPUT ${name}_HTML.manifest 
+      COMMAND "XML_CATALOG_FILES=${${name}_CATALOG}" ${XSLTPROC_PROGRAM}
+              ${${name}_XSLTPROC_ARGS}
+              "--stringparam" "boost.root" "${BOOST_ROOT}"
+              "--stringparam" "html.stylesheet" "${BOOST_ROOT}/doc/src/boostbook.css"
+              "--stringparam" "manifest" "${name}_HTML.manifest"
+              "--xinclude" "-o" ${name}_html/
+              "--path" ${CMAKE_CURRENT_BINARY_DIR}
+              ${BOOSTBOOK_XSL_PATH}/html.xsl ${${name}_SOURCE}
+      COMMENT "Generating HTML from ${${name}_SOURCE}."
+      DEPENDS ${${name}_SOURCE} ${${name}_DEPENDENCIES})
+  endmacro()
+
+  # Quickbook -> BoostBook XML -> DocBook -> HTML
+  macro(hpx_quickbook_to_html name)
+    hpx_parse_arguments(${name} "SOURCE;DEPENDENCIES;CATALOG;XSLTPROC_ARGS;TARGET" "" ${ARGN})
 
     hpx_quickbook_to_boostbook(${name}
       SOURCE ${${name}_SOURCE}
@@ -120,6 +151,15 @@ else()
       SOURCE ${name}.xml
       CATALOG ${${name}_CATALOG}
       XSLTPROC_ARGS ${${name}_XSLTPROC_ARGS})
+
+    hpx_docbook_to_html(${name}
+      SOURCE ${name}.dbk
+      CATALOG ${${name}_CATALOG}
+      XSLTPROC_ARGS ${${name}_XSLTPROC_ARGS})
+
+    if(${name}_TARGET)
+      add_custom_target(${${name}_TARGET} DEPENDS ${name}_HTML.manifest)
+    endif()
   endmacro()
 endif()
 
