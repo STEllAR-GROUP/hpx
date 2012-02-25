@@ -76,7 +76,7 @@ namespace graph500 { namespace server
 
         void resolve_conflict();
 
-        int distributed_validate(std::size_t scale);
+        std::vector<int> distributed_validate(std::size_t scale);
 
         bool get_numedges_callback(std::size_t i,resolvedata r);
 
@@ -170,7 +170,7 @@ namespace graph500 { namespace server
             // Component server type.
             point,
             // Return type.
-            int,
+            std::vector<int>,
             // Action code.
             point_distributed_validate,
             // Arguments of this action.

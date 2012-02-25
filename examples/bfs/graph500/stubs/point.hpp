@@ -90,14 +90,14 @@ namespace graph500 { namespace stubs
             resolve_conflict_async(gid).get();
         }
 
-        static hpx::lcos::promise< int >
+        static hpx::lcos::promise< std::vector<int> >
         distributed_validate_async(hpx::naming::id_type const& gid,std::size_t scale)
         {
             typedef server::point::distributed_validate_action action_type;
             return hpx::lcos::eager_future<action_type>(gid,scale);
         }
 
-        static int distributed_validate(hpx::naming::id_type const& gid,std::size_t scale)
+        static std::vector<int> distributed_validate(hpx::naming::id_type const& gid,std::size_t scale)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the promise.

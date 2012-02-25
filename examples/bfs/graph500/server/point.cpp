@@ -236,19 +236,26 @@ namespace graph500 { namespace server
 
     }
 
-    int point::distributed_validate(std::size_t scale)
+    std::vector<int> point::distributed_validate(std::size_t scale)
     {
       // the parent of the root is always itself
+      std::vector<int> rc;
+      rc.resize(bfs_roots_.size());
       for (std::size_t step=0;step<bfs_roots_.size();step++) {
+        // initialize the return code
+        rc[step] = 1;
+
         int64_t root_node = bfs_roots_[step];
         if ( root_node - minnode_ >= (int64_t) parent_.isize() || root_node < minnode_ ) continue; // the root node is not on this partition
         else {
           if ( parent_(root_node-minnode_,step,0).parent != root_node ) {
-            std::cerr << " Validation for root " << root_node << " false; bfs_root parent is "
-                      << parent_(root_node-minnode_,step,0).parent << std::endl;
-          //  return -1;
+            //std::cerr << " Validation for root " << root_node << " false; bfs_root parent is "
+            //          << parent_(root_node-minnode_,step,0).parent << std::endl;
+            if ( rc[step] == 1 ) rc[step] = -1;
           } 
         } 
+
+        if ( rc[step] < 0 ) continue;
 
         // octave: lij = level (ij);
         std::vector<std::size_t> li,lj;
@@ -259,6 +266,14 @@ namespace graph500 { namespace server
           int64_t neighbor = local_edges_[i].v1;
           li[i] = parent_(node-minnode_,step,0).level;
           lj[i] = parent_(neighbor-minnode_,step,0).level;
+
+          // validation assumes level >= 1 (it reserves level 0 for unvisited edges)
+          // We have level 0 as the root_node also.  So change the level of any root
+          // node to be 1
+
+          if ( node == root_node ) li[i] += 1;
+          if ( neighbor == root_node ) lj[i] += 1;
+
         }
  
         // octave: neither_in = lij(1,:) == 0 & lij(2,:) == 0;
@@ -278,11 +293,13 @@ namespace graph500 { namespace server
         //end
         for (std::size_t i=0;i<local_edges_.size();i++) {
           if ( !(neither_in[i] || both_in[i] ) ) {
-            std::cerr << " Validation step " << step << " failed " << -4 << std::endl;
-           // return -4;
+            //std::cerr << " Validation step " << step << " failed " << -4 << std::endl;
+            if ( rc[step] == 1 ) rc[step] = -4;
           }
         }
  
+        if ( rc[step] < 0 ) continue;
+
         // octave: respects_tree_level = abs (lij(1,:) - lij(2,:)) <= 1;
         std::vector<bool> respects_tree_level;
         respects_tree_level.resize( local_edges_.size() );
@@ -297,12 +314,14 @@ namespace graph500 { namespace server
         //  return
         for (std::size_t i=0;i<local_edges_.size();i++) {
           if ( !(neither_in[i] || respects_tree_level[i] ) ) {
-            std::cerr << " Validation step " << step << " failed " << -5 << std::endl;
-            //return -5;
+            //std::cerr << " Validation step " << step << " failed " << -5 << std::endl;
+            if ( rc[step] == 1 ) rc[step] = -5;
           }
         }
+
+        if ( rc[step] == 1 ) rc[step] = 0;
       }
-      return 0;
+      return rc;
     }
 
     bool point::get_numedges_callback(std::size_t i,resolvedata r)

@@ -99,13 +99,13 @@ namespace graph500
             this->base_type::resolve_conflict(gid_);
         }
 
-        hpx::lcos::promise< int > distributed_validate_async(std::size_t scale)
+        hpx::lcos::promise< std::vector<int> > distributed_validate_async(std::size_t scale)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::distributed_validate_async(gid_,scale);
         }
 
-        int distributed_validate(std::size_t scale)
+        std::vector<int> distributed_validate(std::size_t scale)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::distributed_validate(gid_,scale);

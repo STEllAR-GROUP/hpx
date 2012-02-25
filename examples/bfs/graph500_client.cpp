@@ -281,12 +281,18 @@ int hpx_main(boost::program_options::variables_map &vm)
             }
           }
           {
-            std::vector<hpx::lcos::promise< int > > distributed_validate_phase;
-            std::vector< int > rc;
+            std::vector<hpx::lcos::promise< std::vector<int> > > distributed_validate_phase;
+            std::vector< std::vector<int> > rc;
             for (std::size_t i=0;i<number_partitions;i++) {
               distributed_validate_phase.push_back(points[i].distributed_validate_async(scale));
             }
             hpx::lcos::wait(distributed_validate_phase,rc);
+            // Check that everyone validated
+            for (std::size_t i=0;i<rc.size();i++) {
+              for (std::size_t j=0;j<rc[i].size();j++) {
+                if ( rc[i][j] < 0 ) std::cout << " Validation failed for " << j << " component " << i << " rc " << rc[i][j] << std::endl;     
+              }
+            }
           }
         }
 
