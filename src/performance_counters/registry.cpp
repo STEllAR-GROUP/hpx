@@ -10,7 +10,7 @@
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/performance_counters/server/raw_counter.hpp>
 #include <hpx/performance_counters/server/elapsed_time_counter.hpp>
-#include <hpx/performance_counters/server/statistics_counter.hpp>
+#include <hpx/performance_counters/server/aggregating_counter.hpp>
 #include <hpx/util/logging.hpp>
 
 #include <boost/foreach.hpp>
@@ -106,11 +106,6 @@ namespace hpx { namespace performance_counters
         }
 
         func = (*it).second.create_counter_;
-        if (func.empty()) {
-            HPX_THROWS_IF(ec, bad_parameter, "registry::get_counter_create_function",
-                "counter type has no valid associated create function");
-            return status_invalid_data;
-        }
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -141,11 +136,6 @@ namespace hpx { namespace performance_counters
         }
 
         func = (*it).second.discover_counters_;
-        if (func.empty()) {
-            HPX_THROWS_IF(ec, bad_parameter, "registry::get_counter_discovery_function",
-                "counter type has no valid associated discovery function");
-            return status_invalid_data;
-        }
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -307,10 +297,10 @@ namespace hpx { namespace performance_counters
         return status_valid_data;
     }
 
-    /// \brief Create a new statistics performance counter instance based
+    /// \brief Create a new aggregating performance counter instance based
     ///        on given base counter name and given base time interval
     ///        (milliseconds).
-    counter_status registry::create_statistics_counter(
+    counter_status registry::create_aggregating_counter(
         counter_info const& info, std::string const& base_counter_name,
         std::size_t base_time_interval, naming::gid_type& gid, error_code& ec)
     {
@@ -321,17 +311,17 @@ namespace hpx { namespace performance_counters
 
         counter_type_map_type::iterator it = countertypes_.find(type_name);
         if (it == countertypes_.end()) {
-            HPX_THROWS_IF(ec, bad_parameter, "registry::create_average_count_counter",
+            HPX_THROWS_IF(ec, bad_parameter, "registry::create_aggregating_counter",
                 boost::str(boost::format("unknown counter type %s") % type_name));
             return status_counter_type_unknown;
         }
 
         // make sure the counter type requested is supported
-        if (counter_average_count != (*it).second.info_.type_ ||
-            counter_average_count != info.type_)
+        if (counter_aggregating != (*it).second.info_.type_ ||
+            counter_aggregating != info.type_)
         {
-            HPX_THROWS_IF(ec, bad_parameter, "registry::create_average_count_counter",
-                "invalid counter type requested (only counter_raw is supported)");
+            HPX_THROWS_IF(ec, bad_parameter, "registry::create_aggregating_counter",
+                "invalid counter type requested (only counter_aggregating is supported)");
             return status_counter_type_unknown;
         }
 
@@ -340,46 +330,41 @@ namespace hpx { namespace performance_counters
         complement_counter_info(complemented_info, (*it).second.info_, ec);
         if (ec) return status_invalid_data;
 
+        // split name
+        counter_path_elements p;
+        get_counter_path_elements(complemented_info.fullname_, p, ec);
+        if (ec) return status_invalid_data;
+
         // create the counter as requested
         try {
             // create base counter only if it does not exist yet
-            switch (complemented_info.type_) {
-            case counter_average_count:
-                {
-                    typedef hpx::components::managed_component<
-                        hpx::performance_counters::server::statistics_counter<
-                            boost::accumulators::tag::mean>
-                    > counter_type;
-                    gid = components::server::create_one<counter_type>(
-                        complemented_info, base_counter_name, base_time_interval);
-                }
-                break;
-
-            case counter_statistics_max:
-                {
-                    typedef hpx::components::managed_component<
-                        hpx::performance_counters::server::statistics_counter<
-                            boost::accumulators::tag::max>
-                    > counter_type;
-                    gid = components::server::create_one<counter_type>(
-                        complemented_info, base_counter_name, base_time_interval);
-                }
-                break;
-
-            case counter_statistics_min:
-                {
-                    typedef hpx::components::managed_component<
-                        hpx::performance_counters::server::statistics_counter<
-                            boost::accumulators::tag::min>
-                    > counter_type;
-                    gid = components::server::create_one<counter_type>(
-                        complemented_info, base_counter_name, base_time_interval);
-                }
-                break;
-
-            default:
+            if (p.countername_ == "average") {
+                typedef hpx::components::managed_component<
+                    hpx::performance_counters::server::aggregating_counter<
+                        boost::accumulators::tag::mean>
+                > counter_type;
+                gid = components::server::create_one<counter_type>(
+                    complemented_info, base_counter_name, base_time_interval);
+            }
+            else if (p.countername_ == "max") {
+                typedef hpx::components::managed_component<
+                    hpx::performance_counters::server::aggregating_counter<
+                        boost::accumulators::tag::max>
+                > counter_type;
+                gid = components::server::create_one<counter_type>(
+                    complemented_info, base_counter_name, base_time_interval);
+            }
+            else if (p.countername_ == "min") {
+                typedef hpx::components::managed_component<
+                    hpx::performance_counters::server::aggregating_counter<
+                        boost::accumulators::tag::min>
+                > counter_type;
+                gid = components::server::create_one<counter_type>(
+                    complemented_info, base_counter_name, base_time_interval);
+            }
+            else {
                 HPX_THROWS_IF(ec, bad_parameter,
-                    "registry::create_statistics_counter",
+                    "registry::create_aggregating_counter",
                     "invalid counter type requested");
                 return status_counter_type_unknown;
             }
@@ -390,12 +375,12 @@ namespace hpx { namespace performance_counters
                 throw;
             ec = make_error_code(e.get_error(), e.what());
             LPCS_(warning) << (
-                boost::format("failed to create statistics counter %s (%s)") %
+                boost::format("failed to create aggregating counter %s (%s)") %
                     complemented_info.fullname_ % e.what());
             return status_invalid_data;
         }
 
-        LPCS_(info) << (boost::format("statistics counter %s created at %s") %
+        LPCS_(info) << (boost::format("aggregating counter %s created at %s") %
             complemented_info.fullname_ % gid);
 
         if (&ec != &throws)
@@ -462,24 +447,24 @@ namespace hpx { namespace performance_counters
             return status_invalid_data;
         }
 
-        // delete the counter
-        switch (info.type_) {
-        case counter_elapsed_time:
-        case counter_raw:
-//             {
-//                 typedef
-//                     components::managed_component<server::raw_counter>
-//                 counter_type;
-//                 components::server::destroy<counter_type>(id.get_gid(), ec);
-//                 if (ec) return status_invalid_data;
-//             }
-            break;
-
-        default:
-            HPX_THROWS_IF(ec, bad_parameter, "registry::remove_counter",
-                "invalid counter type requested");
-            return status_counter_type_unknown;
-        }
+//         // delete the counter
+//         switch (info.type_) {
+//         case counter_elapsed_time:
+//         case counter_raw:
+// //             {
+// //                 typedef
+// //                     components::managed_component<server::raw_counter>
+// //                 counter_type;
+// //                 components::server::destroy<counter_type>(id.get_gid(), ec);
+// //                 if (ec) return status_invalid_data;
+// //             }
+//             break;
+//
+//         default:
+//             HPX_THROWS_IF(ec, bad_parameter, "registry::remove_counter",
+//                 "invalid counter type requested");
+//             return status_counter_type_unknown;
+//         }
         return status_valid_data;
     }
 
@@ -488,17 +473,9 @@ namespace hpx { namespace performance_counters
     counter_status registry::get_counter_type(std::string const& name,
         counter_info& info, error_code& ec)
     {
-        // make sure parent instance name is set properly
-        counter_info complemented_info = info;
-        complemented_info.fullname_ = name;
-
-        complement_counter_info(complemented_info, ec);
-        if (ec) return status_invalid_data;
-
         // create canonical type name
         std::string type_name;
-        counter_status status = get_counter_type_name(
-            complemented_info.fullname_, type_name, ec);
+        counter_status status = get_counter_type_name(name, type_name, ec);
         if (!status_is_valid(status)) return status;
 
         // make sure the type of the counter is known to the registry

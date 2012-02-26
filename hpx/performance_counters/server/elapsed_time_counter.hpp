@@ -46,7 +46,7 @@ namespace hpx { namespace performance_counters { namespace server
         }
 
     private:
-        util::high_resolution_timer timer_;
+        boost::uint64_t started_at_;
     };
 }}}
 

@@ -51,16 +51,14 @@ namespace hpx { namespace performance_counters { namespace server
                 "set_counter_value is not implemented for this counter");
         }
 
-        virtual void start()
+        virtual bool start()
         {
-            HPX_THROW_EXCEPTION(invalid_status, "start",
-                "start is not implemented for this counter");
+            return false;
         }
 
-        virtual void stop()
+        virtual bool stop()
         {
-            HPX_THROW_EXCEPTION(invalid_status, "stop",
-                "stop is not implemented for this counter");
+            return false;
         }
 
     public:
@@ -111,14 +109,14 @@ namespace hpx { namespace performance_counters { namespace server
             reset_counter_value();
         }
 
-        void start_nonvirt()
+        bool start_nonvirt()
         {
-            start();
+            return start();
         }
 
-        void stop_nonvirt()
+        bool stop_nonvirt()
         {
-            stop();
+            return stop();
         }
 
         /// Each of the exposed functions needs to be encapsulated into an action
@@ -161,16 +159,16 @@ namespace hpx { namespace performance_counters { namespace server
         > reset_counter_value_action;
 
         /// The \a start_action
-        typedef hpx::actions::action0<
-            base_performance_counter,
+        typedef hpx::actions::result_action0<
+            base_performance_counter, bool,
             performance_counter_start_counter,
             &base_performance_counter::start_nonvirt,
             threads::thread_priority_critical
         > start_action;
 
         /// The \a stop_action
-        typedef hpx::actions::action0<
-            base_performance_counter,
+        typedef hpx::actions::result_action0<
+            base_performance_counter, bool,
             performance_counter_stop_counter,
             &base_performance_counter::stop_nonvirt,
             threads::thread_priority_critical

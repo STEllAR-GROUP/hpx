@@ -895,15 +895,6 @@ namespace hpx { namespace threads
             return naming::invalid_gid;
         }
 
-        if (paths.parentinstancename_ != "locality" ||
-            paths.parentinstanceindex_ < 0 ||
-            paths.parentinstanceindex_ != static_cast<boost::int32_t>(hpx::get_locality_id()))
-        {
-            HPX_THROWS_IF(ec, bad_parameter, "queue_length_counter_creator",
-                "attempt to create counter on wrong locality");
-            return naming::invalid_gid;
-        }
-
         typedef scheduling_policy_type spt;
 
         if (paths.instancename_ == "total" && paths.instanceindex_ == -1)
@@ -997,15 +988,6 @@ namespace hpx { namespace threads
             return naming::invalid_gid;
         }
 
-        if (paths.parentinstancename_ != "locality" ||
-            paths.parentinstanceindex_ < 0 ||
-            paths.parentinstanceindex_ != static_cast<boost::int32_t>(hpx::get_locality_id()))
-        {
-            HPX_THROWS_IF(ec, bad_parameter, "idle_rate_counter_creator",
-                "attempt to create counter on wrong locality");
-            return naming::invalid_gid;
-        }
-
         typedef threadmanager_impl ti;
 
         if (paths.instancename_ == "total" && paths.instanceindex_ == -1)
@@ -1043,15 +1025,6 @@ namespace hpx { namespace threads
             HPX_THROWS_IF(ec, bad_parameter, "counter_creator",
                 "invalid counter instance parent name: " +
                     paths.parentinstancename_);
-            return naming::invalid_gid;
-        }
-
-        if (paths.parentinstancename_ != "locality" ||
-            paths.parentinstanceindex_ < 0 ||
-            paths.parentinstanceindex_ != static_cast<boost::int32_t>(hpx::get_locality_id()))
-        {
-            HPX_THROWS_IF(ec, bad_parameter, "counter_creator",
-                "attempt to create counter on wrong locality");
             return naming::invalid_gid;
         }
 

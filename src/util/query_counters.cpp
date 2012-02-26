@@ -29,13 +29,12 @@ namespace hpx { namespace util
     void query_counters::find_counters()
     {
         mutex_type::scoped_lock l(mtx_);
-
-        // do INI expansion on all counter names
-        for (std::size_t i = 0; i < names_.size(); ++i)
-            util::expand(names_[i]);
-
         if (ids_.empty())
         {
+            // do INI expansion on all counter names
+            for (std::size_t i = 0; i < names_.size(); ++i)
+                util::expand(names_[i]);
+
             ids_.reserve(names_.size());
             BOOST_FOREACH(std::string const& name, names_)
             {
@@ -67,6 +66,15 @@ namespace hpx { namespace util
 
     void query_counters::start()
     {
+        find_counters();
+
+        for (std::size_t i = 0; i < names_.size(); ++i)
+        {
+            // start the performance counter
+            using performance_counters::stubs::performance_counter;
+            performance_counter::start(ids_[i]);
+        }
+
         // this will invoke the evaluate function for the first time
         timer_.start();
     }

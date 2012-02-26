@@ -20,7 +20,6 @@ namespace hpx { namespace util
     class HPX_EXPORT query_counters
     {
     public:
-
         query_counters(std::vector<std::string> const& names,
           std::size_t interval, std::string const& dest);
 

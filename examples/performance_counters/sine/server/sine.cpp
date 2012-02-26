@@ -7,9 +7,7 @@
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/performance_counters/counters.hpp>
-
-#include <boost/version.hpp>
-#include <boost/chrono/chrono.hpp>
+#include <hpx/performance_counters/high_resolution_clock.hpp>
 
 #include "sine.hpp"
 
@@ -30,9 +28,18 @@ namespace performance_counters { namespace sine { namespace server
       : base_type_holder(info), current_value_(0),
         timer_(boost::bind(&sine_counter::evaluate, this), 1000000,
             "sine example performance counter"),
-        started_at_(boost::chrono::high_resolution_clock::now())
+        started_at_(hpx::performance_counters::high_resolution_clock::now())
     {
-        timer_.start();
+    }
+
+    bool sine_counter::start()
+    {
+        return timer_.start();
+    }
+
+    bool sine_counter::stop()
+    {
+        return timer_.stop();
     }
 
     void sine_counter::get_counter_value(
@@ -44,14 +51,12 @@ namespace performance_counters { namespace sine { namespace server
         {
             mutex_type::scoped_lock mtx(mtx_);
             value.value_ = boost::int64_t(current_value_ * scaling);
+            value.time_ = evaluated_at_;
         }
 
         value.scaling_ = scaling;
         value.scale_inverse_ = true;
         value.status_ = hpx::performance_counters::status_new_data;
-
-        using namespace boost::chrono;
-        value.time_ = high_resolution_clock::now().time_since_epoch().count();
     }
 
     void sine_counter::finalize()
@@ -63,11 +68,9 @@ namespace performance_counters { namespace sine { namespace server
 
     void sine_counter::evaluate()
     {
-        using namespace boost::chrono;
-
         mutex_type::scoped_lock mtx(mtx_);
-        duration<double> up_time = high_resolution_clock::now() - started_at_;
-        current_value_ = std::sin(up_time.count() / 10.);
+        evaluated_at_ = hpx::performance_counters::high_resolution_clock::now();
+        current_value_ = std::sin((evaluated_at_ - started_at_) / 1e10);
     }
 }}}
 

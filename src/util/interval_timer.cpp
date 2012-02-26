@@ -23,28 +23,46 @@ namespace hpx { namespace util
             std::size_t microsecs, std::string const& description,
             bool pre_shutdown)
       : f_(f), microsecs_(microsecs), id_(0), description_(description),
-        pre_shutdown_(pre_shutdown)
+        pre_shutdown_(pre_shutdown), is_started_(false), first_start_(true)
     {}
 
-    void interval_timer::start()
-    {
-        if (pre_shutdown_)
-            register_pre_shutdown_function(boost::bind(&interval_timer::stop, this));
-        else
-            register_shutdown_function(boost::bind(&interval_timer::stop, this));
-
-        evaluate(threads::wait_signaled);
-    }
-
-    void interval_timer::stop()
+    bool interval_timer::start()
     {
         mutex_type::scoped_lock l(mtx_);
-        if (id_) {
-            error_code ec;       // avoid throwing on error
-            threads::set_thread_state(id_, threads::pending,
-                threads::wait_abort, threads::thread_priority_critical, ec);
-            id_ = 0;
+        if (!is_started_) {
+            is_started_ = true;
+            l.unlock();
+
+            if (first_start_) {
+                first_start_ = false;
+                if (pre_shutdown_)
+                    register_pre_shutdown_function(boost::bind(&interval_timer::stop, this));
+                else
+                    register_shutdown_function(boost::bind(&interval_timer::stop, this));
+            }
+
+            evaluate(threads::wait_signaled);
+            return true;
         }
+        return false;
+    }
+
+    bool interval_timer::stop()
+    {
+        mutex_type::scoped_lock l(mtx_);
+        if (is_started_) {
+            is_started_ = false;
+
+            if (id_) {
+                error_code ec;       // avoid throwing on error
+                threads::set_thread_state(id_, threads::pending,
+                    threads::wait_abort, threads::thread_priority_critical, ec);
+                id_ = 0;
+            }
+            return true;
+        }
+        BOOST_ASSERT(id_ == 0);
+        return false;
     }
 
     interval_timer::~interval_timer()

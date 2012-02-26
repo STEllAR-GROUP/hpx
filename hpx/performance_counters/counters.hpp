@@ -79,25 +79,12 @@ namespace hpx { namespace performance_counters
         /// Type:     Average
         counter_average_count,
 
-        /// \a counter_max_count shows the largest value of how many items are
-        /// processed, during an operation.
+        /// \a counter_aggregating applies a function to an embedded counter
+        /// instance. The embedded counter is usually evaluated repeatedly
+        /// after a fixed (but configurable) time interval.
         ///
-        /// Formula:  max(N1) , where the numerator (N) represents
-        ///           the number of items processed during the last sample
-        ///           interval.
-        /// Average:  max(Nx)
-        /// Type:     Max
-        counter_statistics_max,
-
-        /// \a counter_min_count shows the smallest value of how many items are
-        /// processed, during an operation.
-        ///
-        /// Formula:  min(N1) , where the numerator (N) represents
-        ///           the number of items processed during the last sample
-        ///           interval.
-        /// Average:  min(Nx)
-        /// Type:     Min
-        counter_statistics_min,
+        /// Formula:  F(Nx)
+        counter_aggregating,
 
         /// \a counter_average_timer measures the average time it takes to
         /// complete a process or operation. Counters of this type display a
@@ -275,6 +262,11 @@ namespace hpx { namespace performance_counters
             status_(status_invalid_data)
         {}
 
+        counter_info(std::string const& name)
+          : type_(counter_raw), version_(HPX_PERFORMANCE_COUNTER_V1),
+            status_(status_invalid_data), fullname_(name)
+        {}
+
         counter_info(counter_type type, std::string const& name,
                 std::string const& helptext = "",
                 boost::uint32_t version = HPX_PERFORMANCE_COUNTER_V1)
@@ -301,20 +293,21 @@ namespace hpx { namespace performance_counters
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief This definition declares the type of a function, which will be
+    /// \brief This declares the type of a function, which will be
     ///        called by HPX whenever a new performance counter instance of a
     ///        particular type needs to be created.
-    typedef naming::gid_type create_counter_func(counter_info const&, error_code&);
+    typedef naming::gid_type create_counter_func(counter_info const&,
+        error_code&);
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief This definition declares a type of a function, which will be
-    ///        passed to a \a discover_counters_func in order to be called for
-    ///        each discovered performance counter instance.
+    /// \brief This declares a type of a function, which will be passed to
+    ///        a \a discover_counters_func in order to be called for each
+    ///        discovered performance counter instance.
     typedef bool discover_counter_func(counter_info const&, error_code&);
 
-    /// \brief This definition declares the type of a function, which will be
-    ///        called by HPX whenever it needs to discover all performance
-    ///        counter instances of a particular type.
+    /// \brief This declares the type of a function, which will be called by
+    ///        HPX whenever it needs to discover all performance counter
+    ///        instances of a particular type.
     typedef bool discover_counters_func(counter_info const&,
         HPX_STD_FUNCTION<discover_counter_func> const&, error_code&);
 
@@ -336,7 +329,7 @@ namespace hpx { namespace performance_counters
         {}
 
         counter_status status_;     ///< The status of the counter value
-        boost::int64_t time_;       ///< The local time when data was collected
+        boost::uint64_t time_;      ///< The local time when data was collected
         boost::int64_t value_;      ///< The current counter value
         boost::int64_t scaling_;    ///< The scaling of the current counter value
         bool scale_inverse_;        ///< If true, value_ needs to be deleted by
@@ -429,6 +422,16 @@ namespace hpx { namespace performance_counters
         counter_info const& info, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieve the meta data specific for the given counter instance
+    HPX_API_EXPORT void get_counter_infos(counter_info const& info,
+        counter_type& type, std::string& helptext, boost::uint32_t& version,
+        error_code& ec = throws);
+
+    /// \brief Retrieve the meta data specific for the given counter instance
+    HPX_API_EXPORT void get_counter_infos(std::string name, counter_type& type,
+        std::string& helptext, boost::uint32_t& version, error_code& ec = throws);
+
+    ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
         /// \brief Add an existing performance counter instance to the registry
@@ -452,19 +455,19 @@ namespace hpx { namespace performance_counters
         naming::gid_type create_raw_counter_value(counter_info const&,
             boost::int64_t*, error_code&);
 
-        // Creation function for statistics performance counters; to be
+        // Creation function for aggregating performance counters; to be
         // registered with the counter types.
-        naming::gid_type statistics_counter_creator(counter_info const&,
+        naming::gid_type aggregating_counter_creator(counter_info const&,
             error_code&);
 
         // Creation function for uptime counters.
         naming::gid_type uptime_counter_creator(counter_info const&,
             error_code&);
 
-        // \brief Create a new statistics performance counter instance based on
+        // \brief Create a new aggregating performance counter instance based on
         //        given base counter name and given base time interval
         //        (milliseconds).
-        naming::gid_type create_statistics_counter(
+        naming::gid_type create_aggregating_counter(
             counter_info const& info, std::string const& base_counter_name,
             std::size_t base_time_interval, error_code& ec = throws);
 

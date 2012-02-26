@@ -9,7 +9,6 @@
 
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
-#include <boost/chrono/chrono.hpp>
 
 #include "server/sine.hpp"
 
@@ -29,14 +28,12 @@ namespace performance_counters { namespace sine
     // This function will be invoked whenever the implicit counter is queried.
     boost::int64_t immediate_sine()
     {
-        using boost::chrono::high_resolution_clock;
-        using boost::chrono::duration;
+        static boost::uint64_t started_at =
+            hpx::performance_counters::high_resolution_clock::now();
 
-        static high_resolution_clock::time_point started_at =
-            high_resolution_clock::now();
-
-        duration<double> up_time = high_resolution_clock::now() - started_at;
-        return boost::int64_t(std::sin(up_time.count() / 10.) * 100000.);
+        boost::uint64_t up_time =
+            hpx::performance_counters::high_resolution_clock::now() - started_at;
+        return boost::int64_t(std::sin(up_time / 1e10) * 100000.);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -135,15 +132,6 @@ namespace performance_counters { namespace sine
                 "sine::explicit_sine_counter_creator",
                 "invalid counter instance parent name: " +
                     paths.parentinstancename_);
-            return hpx::naming::invalid_gid;
-        }
-
-        if (paths.parentinstancename_ != "locality" ||
-            paths.parentinstanceindex_ != static_cast<boost::int32_t>(hpx::get_locality_id()))
-        {
-            HPX_THROWS_IF(ec, hpx::bad_parameter,
-                "sine::explicit_sine_counter_creator",
-                "attempt to create counter on wrong locality");
             return hpx::naming::invalid_gid;
         }
 

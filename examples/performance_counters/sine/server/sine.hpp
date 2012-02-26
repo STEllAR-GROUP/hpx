@@ -32,6 +32,11 @@ namespace performance_counters { namespace sine { namespace server
         /// this performance counter
         void get_counter_value(hpx::performance_counters::counter_value& value);
 
+        /// The functions below will be called to start and stop collecting
+        /// counter values from this counter.
+        bool start();
+        bool stop();
+
         ///////////////////////////////////////////////////////////////////////
         // Disambiguate several functions defined in both base classes
 
@@ -50,9 +55,10 @@ namespace performance_counters { namespace sine { namespace server
 
         mutable mutex_type mtx_;
         double current_value_;
+        boost::uint64_t evaluated_at_;
 
         hpx::util::interval_timer timer_;
-        boost::chrono::high_resolution_clock::time_point started_at_;
+        boost::uint64_t started_at_;
     };
 }}}
 

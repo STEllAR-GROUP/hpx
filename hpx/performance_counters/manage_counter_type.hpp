@@ -131,23 +131,6 @@ namespace hpx { namespace performance_counters
         boost::uint32_t version = HPX_PERFORMANCE_COUNTER_V1,
         error_code& ec = throws);
 
-    /// A small data structure holding all data needed to install a counter type
-    struct raw_counter_type_data
-    {
-        std::string name_;          ///< Name of the counter type
-        counter_type type_;         ///< Type of the counter instances of this
-                                    ///< counter type
-        std::string helptext_;      ///< Longer descriptive text explaining the
-                                    ///< counter type
-        boost::uint32_t version_;   ///< Version of this counter type definition
-                                    ///< (default: HPX_PERFORMANCE_COUNTER_V1)
-    };
-
-    /// Install several new performance counter types in a way, which will
-    /// uninstall them automatically during shutdown.
-    HPX_EXPORT void install_counter_types(raw_counter_type_data const* data,
-        std::size_t count, error_code& ec = throws);
-
     /// \brief Install a new generic performance counter type in a way, which
     ///        will uninstall it automatically during shutdown.
     ///
@@ -165,6 +148,8 @@ namespace hpx { namespace performance_counters
     ///               expected to be set to HPX_PERFORMANCE_COUNTER_V1.
     /// \param create_counter [in] The function which will be called to create
     ///               a new instance of this counter type.
+    /// \param discover_counters [in] The function will be called to discover
+    ///               counter instances which can be created.
     /// \param ec     [in,out] this represents the error status on exit,
     ///               if this is pre-initialized to \a hpx#throws
     ///               the function will throw on error instead.
@@ -199,11 +184,10 @@ namespace hpx { namespace performance_counters
         boost::uint32_t version_;   ///< Version of this counter type definition
                                     ///< (default: HPX_PERFORMANCE_COUNTER_V1)
         HPX_STD_FUNCTION<create_counter_func> create_counter_;
-                                    ///< Function used to create a counter
-                                    ///< instance of this type.
+            ///< Function used to create a counter instance of this type.
         HPX_STD_FUNCTION<discover_counters_func> discover_counters_;
-                                    ///< Function used to discover all
-                                    ///< supported counter instances of this type.
+            ///< Function used to discover all supported counter instances of
+            ///< this type.
     };
 
     /// Install several new performance counter types in a way, which will

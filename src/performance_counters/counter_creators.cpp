@@ -28,7 +28,7 @@ namespace hpx { namespace performance_counters
     /// with the counter types. It is suitable to be used for all counters
     /// following the naming scheme:
     ///
-    ///   /<objectname>(locality#<locality_id>/total)/<instancename>
+    ///   /<objectname>{locality#<locality_id>/total}/<instancename>
     ///
     bool locality_counter_discoverer(counter_info const& info,
         HPX_STD_FUNCTION<discover_counter_func> const& f, error_code& ec)
@@ -68,7 +68,7 @@ namespace hpx { namespace performance_counters
     /// with the counter types. It is suitable to be used for all counters
     /// following the naming scheme:
     ///
-    ///   /<objectname>(locality#<locality_id>/thread#<threadnum>)/<instancename>
+    ///   /<objectname>{locality#<locality_id>/thread#<threadnum>}/<instancename>
     ///
     bool locality_thread_counter_discoverer(counter_info const& info,
         HPX_STD_FUNCTION<discover_counter_func> const& f, error_code& ec)
@@ -121,7 +121,7 @@ namespace hpx { namespace performance_counters
     /// the actual value to monitor. This function checks the validity of the
     /// supplied counter name, it has to follow the scheme:
     ///
-    ///   /<objectname>(locality#<locality_id>/total)/<instancename>
+    ///   /<objectname>{locality#<locality_id>/total}/<instancename>
     ///
     naming::gid_type locality_raw_counter_creator(counter_info const& info,
         HPX_STD_FUNCTION<boost::int64_t()> const& f, error_code& ec)
@@ -135,15 +135,6 @@ namespace hpx { namespace performance_counters
             HPX_THROWS_IF(ec, bad_parameter, "locality_raw_counter_creator",
                 "invalid counter instance parent name: " +
                     paths.parentinstancename_);
-            return naming::invalid_gid;
-        }
-
-        if (paths.parentinstancename_ != "locality" ||
-            paths.parentinstanceindex_ == -1 || 
-            paths.parentinstanceindex_ != static_cast<boost::int32_t>(hpx::get_locality_id()))
-        {
-            HPX_THROWS_IF(ec, bad_parameter, "locality_raw_counter_creator",
-                "attempt to create counter on wrong locality");
             return naming::invalid_gid;
         }
 

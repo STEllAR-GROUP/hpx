@@ -565,32 +565,32 @@ namespace hpx
         performance_counters::generic_counter_type_data statistic_counter_types[] =
         {
             // averaging counter
-            { "/statistics/average", performance_counters::counter_average_count,
+            { "/statistics/average", performance_counters::counter_aggregating,
               "returns the averaged value of its base counter over "
               "an arbitrary time line; pass required base counter as the instance "
               "name: /statistics{<base_counter_name>}/average",
               HPX_PERFORMANCE_COUNTER_V1,
-              &performance_counters::detail::statistics_counter_creator,
+              &performance_counters::detail::aggregating_counter_creator,
               &performance_counters::default_counter_discoverer
             },
 
             // max counter
-            { "/statistics/max", performance_counters::counter_statistics_max,
+            { "/statistics/max", performance_counters::counter_aggregating,
               "returns the averaged value of its base counter over "
               "an arbitrary time line; pass required base counter as the instance "
               "name: /statistics{<base_counter_name>}/max",
               HPX_PERFORMANCE_COUNTER_V1,
-              &performance_counters::detail::statistics_counter_creator,
+              &performance_counters::detail::aggregating_counter_creator,
               &performance_counters::default_counter_discoverer
             },
 
             // min counter
-            { "/statistics/min", performance_counters::counter_statistics_min,
+            { "/statistics/min", performance_counters::counter_aggregating,
               "returns the averaged value of its base counter over "
               "an arbitrary time line; pass required base counter as the instance "
               "name: /statistics{<base_counter_name>}/min",
               HPX_PERFORMANCE_COUNTER_V1,
-               &performance_counters::detail::statistics_counter_creator,
+               &performance_counters::detail::aggregating_counter_creator,
                &performance_counters::default_counter_discoverer
             },
 

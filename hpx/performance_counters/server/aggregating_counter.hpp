@@ -20,24 +20,31 @@ namespace hpx { namespace performance_counters { namespace server
     // given base time interval. The counter relies on querying a steadily
     // growing counter value.
     template <typename Statistic>
-    class HPX_EXPORT statistics_counter
+    class HPX_EXPORT aggregating_counter
       : public base_performance_counter,
         public components::managed_component_base<
-            statistics_counter<Statistic> >
+            aggregating_counter<Statistic> >
     {
         typedef components::managed_component_base<
-            statistics_counter<Statistic> > base_type;
+            aggregating_counter<Statistic> > base_type;
 
     public:
-        typedef statistics_counter type_holder;
+        typedef aggregating_counter type_holder;
         typedef base_performance_counter base_type_holder;
 
-        statistics_counter() {}
-        statistics_counter(counter_info const& info,
+        aggregating_counter() {}
+        aggregating_counter(counter_info const& info,
             std::string const& base_counter_name,
             std::size_t base_time_interval);
 
+        /// Overloads from the base_counter base class.
         void get_counter_value(counter_value& value);
+
+        bool start();
+
+        bool stop();
+
+        void reset_counter_value();
 
         /// \brief finalize() will be called just before the instance gets
         ///        destructed

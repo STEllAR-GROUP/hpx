@@ -30,8 +30,10 @@ namespace hpx { namespace util
                 std::string const& description, bool pre_shutdown = false);
         ~interval_timer();
 
-        void start();
-        void stop();
+        bool start();
+        bool stop();
+
+        bool is_started() const { return is_started_; }
 
         std::size_t get_interval() const { return microsecs_; }
 
@@ -50,7 +52,10 @@ namespace hpx { namespace util
         std::size_t microsecs_;       ///< time interval
         threads::thread_id_type id_;  ///< id of currently scheduled thread
         std::string description_;     ///< description of this interval timer
+
         bool pre_shutdown_;           ///< execute termination during pre-shutdown
+        bool is_started_;             ///< timer has been started
+        bool first_start_;            ///< flag to distinguish first invocation of start()
     };
 }}
 

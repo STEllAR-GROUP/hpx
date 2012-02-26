@@ -8,10 +8,10 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
+#include <hpx/performance_counters/high_resolution_clock.hpp>
 #include <hpx/performance_counters/server/elapsed_time_counter.hpp>
 
 #include <boost/version.hpp>
-#include <boost/chrono/chrono.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::managed_component<
@@ -28,7 +28,8 @@ HPX_DEFINE_GET_COMPONENT_TYPE(
 namespace hpx { namespace performance_counters { namespace server
 {
     elapsed_time_counter::elapsed_time_counter(counter_info const& info)
-      : base_type_holder(info)
+      : base_type_holder(info),
+        started_at_(high_resolution_clock::now())
     {
         if (info.type_ != counter_elapsed_time) {
             HPX_THROW_EXCEPTION(bad_parameter,
@@ -40,12 +41,12 @@ namespace hpx { namespace performance_counters { namespace server
     void elapsed_time_counter::get_counter_value(counter_value& value)
     {
         // gather the current value
-        value.value_ = static_cast<boost::int64_t>(timer_.elapsed() * 10e8);
-        value.scaling_ = 100000000LL;
+        boost::uint64_t now = high_resolution_clock::now();
+        value.value_ = now - started_at_;
+        value.scaling_ = 1000000000LL;      // coefficient to get seconds
         value.scale_inverse_ = true;
         value.status_ = status_new_data;
-        value.time_ = boost::chrono::high_resolution_clock::now().
-            time_since_epoch().count();
+        value.time_ = now;
     }
 }}}
 
@@ -69,15 +70,6 @@ namespace hpx { namespace performance_counters { namespace detail
                     HPX_THROWS_IF(ec, bad_parameter, "uptime_counter_creator",
                         "invalid counter instance parent name: " +
                             paths.parentinstancename_);
-                    return naming::invalid_gid;
-                }
-
-                if (paths.parentinstancename_ != "locality" ||
-                    paths.parentinstanceindex_ < 0 ||   
-                    paths.parentinstanceindex_ != static_cast<boost::int32_t>(hpx::get_locality_id()))
-                {
-                    HPX_THROWS_IF(ec, bad_parameter, "uptime_counter_creator",
-                        "attempt to create counter on wrong locality");
                     return naming::invalid_gid;
                 }
 
