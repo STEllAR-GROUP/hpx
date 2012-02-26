@@ -31,67 +31,44 @@ using boost::posix_time::milliseconds;
 using boost::format;
 using boost::str;
 
-using hpx::init;
-using hpx::disconnect;
-using hpx::get_runtime;
 using hpx::register_shutdown_function;
 using hpx::running;
 using hpx::runtime_mode_connect;
 using hpx::network_error;
 
 using hpx::threads::threadmanager_is;
-using hpx::threads::thread_priority_critical;
-using hpx::threads::wait_timeout;
-using hpx::threads::pending;
-using hpx::threads::suspended;
-using hpx::threads::get_self_id;
-using hpx::threads::get_self;
-using hpx::threads::set_thread_state;
 
 using hpx::performance_counters::stubs::performance_counter;
 using hpx::performance_counters::counter_value;
 using hpx::performance_counters::status_is_valid;
 
-using hpx::naming::resolver_client;
-using hpx::naming::gid_type;
 using hpx::naming::get_locality_id_from_gid;
-using hpx::naming::get_agas_client;
 
 using hpx::lcos::promise;
 using hpx::lcos::eager_future;
 using hpx::lcos::base_lco;
 
 ///////////////////////////////////////////////////////////////////////////////
-void stop_monitor(
-    std::string const& name
-) {
+void stop_monitor(std::string const& name)
+{
     // Kill the monitor.
-    resolver_client& agas_client = get_agas_client();
-    gid_type gid;
-
-    if (!agas_client.queryid(name, gid))
+    hpx::naming::id_type id;
+    if (!hpx::agas::resolve_name(name, id))
     {
         HPX_THROW_EXCEPTION(network_error, "stop_monitor",
             "couldn't find stop flag");
     }
+    BOOST_ASSERT(id);
 
-    BOOST_ASSERT(gid);
-
-    eager_future<base_lco::set_event_action> stop_future(gid);
-
-    stop_future.get();
+    eager_future<base_lco::set_event_action>(id).get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int monitor(
-    std::string const& name
-  , boost::uint64_t pause
-) {
+int monitor(std::string const& name, boost::uint64_t pause)
+{
     // Resolve the GID of the performance counter using it's symbolic name.
-    gid_type gid;
-    get_agas_client().queryid(name, gid);
-
-    if (!gid)
+    hpx::naming::id_type id = hpx::performance_counters::get_counter(name);
+    if (!id)
     {
         std::cout << (format(
             "error: performance counter not found (%s)")
@@ -99,9 +76,8 @@ int monitor(
         return 1;
     }
 
-    const boost::uint32_t prefix = hpx::get_locality_id();
-
-    if (prefix == get_locality_id_from_gid(gid))
+    boost::uint32_t const locality_id = hpx::get_locality_id();
+    if (locality_id == get_locality_id_from_gid(id.get_gid()))
     {
         std::cout << (format(
             "error: cannot query performance counters on its own locality (%s)")
@@ -110,11 +86,11 @@ int monitor(
     }
 
     promise<void> stop_flag;
-    const std::string stop_flag_name
-        = str(format("/stop_flag(locality#%d)/heartbeat)") % (prefix-1));
+    const std::string stop_flag_name =
+        str(format("/stop_flag(locality#%d)/heartbeat)") % locality_id);
 
     // Associate the stop flag with a symbolic name.
-    get_agas_client().registerid(stop_flag_name, stop_flag.get_gid().get_gid());
+    hpx::agas::register_name(stop_flag_name, stop_flag.get_gid());
 
     register_shutdown_function(boost::bind(&stop_monitor, stop_flag_name));
 
@@ -126,7 +102,7 @@ int monitor(
             return 0;
 
         // Query the performance counter.
-        counter_value value = performance_counter::get_value(gid);
+        counter_value value = performance_counter::get_value(id);
 
         if (HPX_LIKELY(status_is_valid(value.status_)))
         {
@@ -144,11 +120,10 @@ int monitor(
         }
 
         // Schedule a wakeup.
-        set_thread_state(get_self_id(), milliseconds(pause)
-                       , pending, wait_timeout, thread_priority_critical);
-
-        get_self().yield(suspended);
+        hpx::threads::suspend(milliseconds(pause));
     }
+
+    hpx::agas::unregister_name(stop_flag_name, stop_flag.get_gid());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -165,7 +140,7 @@ int hpx_main(variables_map& vm)
         r = monitor(name, pause);
     }
 
-    disconnect();
+    hpx::disconnect();
     return r;
 }
 
@@ -177,23 +152,21 @@ int main(int argc, char* argv[])
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()
-        ( "name"
-        , value<std::string>()->default_value
-            ("/counter/queue(locality#0/total)/length")
+        ( "name", value<std::string>()->default_value(
+              "/threadqueue{locality#0/total}/length")
         , "symbolic name of the performance counter")
 
-        ( "pause"
-        , value<boost::uint64_t>()->default_value(500)
+        ( "pause", value<boost::uint64_t>()->default_value(500)
         , "milliseconds between each performance counter query")
         ;
 
     // Initialize and run HPX, enforce connect mode as we connect to an existing
     // application.
 #if defined(BOOST_WINDOWS)
-    return init(desc_commandline, argc, argv, install_windows_counters,
+    return hpx::init(desc_commandline, argc, argv, install_windows_counters,
         uninstall_windows_counters, runtime_mode_connect);
 #else
-    return init(desc_commandline, argc, argv, runtime_mode_connect);
+    return hpx::init(desc_commandline, argc, argv, runtime_mode_connect);
 #endif
 }
 
