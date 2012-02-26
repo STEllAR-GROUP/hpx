@@ -8,6 +8,7 @@ hpx_write_boostbook_catalog(${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml)
 hpx_quickbook_to_html(hpx
     SOURCE hpx.qbk
     DEPENDENCIES hpx.qbk preface.qbk whats_new.qbk introduction.qbk
+                 gettingstarted.qbk
     CATALOG ${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml
     XSLTPROC_ARGS --stringparam chunk.section.depth 4
                   --stringparam chunk.first.sections 1
