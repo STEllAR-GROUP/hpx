@@ -18,12 +18,24 @@
 #include <boost/preprocessor/iterate.hpp>
 #include <boost/preprocessor/enum_params.hpp>
 
+#define HPX_FWD_ARGS(z, n, _)                                                 \
+        BOOST_PP_COMMA_IF(n)                                                  \
+            BOOST_FWD_REF(BOOST_PP_CAT(Arg, n)) BOOST_PP_CAT(arg, n)          \
+    /**/
+#define HPX_FORWARD_ARGS(z, n, _)                                             \
+        BOOST_PP_COMMA_IF(n)                                                  \
+            boost::forward<BOOST_PP_CAT(Arg, n)>(BOOST_PP_CAT(arg, n))        \
+    /**/
+
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (0, HPX_ACTION_ARGUMENT_LIMIT,                                        \
     "hpx/runtime/actions/construct_continuation_functions.hpp"))              \
     /**/
 
 #include BOOST_PP_ITERATE()
+
+#undef HPX_FWD_ARGS
+#undef HPX_FORWARD_ARGS
 
 #endif
 
@@ -49,7 +61,7 @@
             BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         result_type operator()(continuation_type cont, Func const& func
             BOOST_PP_COMMA_IF(N)
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) const
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)) const
         {
             try {
                 LTM_(debug) << "Executing action("
@@ -57,7 +69,7 @@
                             << ") with continuation("
                             << cont->get_raw_gid()
                             << ")";
-                func(BOOST_PP_ENUM_PARAMS(N, arg));
+                func(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));//BOOST_PP_ENUM_PARAMS(N, arg));
                 cont->trigger();
             }
             catch (hpx::exception const&) {
@@ -76,12 +88,13 @@
     static HPX_STD_FUNCTION<threads::thread_function_type>
     construct_continuation_thread_function_void(
         continuation_type cont, BOOST_FWD_REF(Func) func
-        BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        BOOST_PP_COMMA_IF(N)
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         return HPX_STD_BIND(
             BOOST_PP_CAT(continuation_thread_function_void_, N)(),
             cont, boost::forward<Func>(func)
-            BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, arg));
+            BOOST_PP_COMMA_IF(N) BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -93,7 +106,7 @@
             BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         result_type operator()(continuation_type cont, Func const& func
             BOOST_PP_COMMA_IF(N)
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) const
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)) const
         {
             try {
                 LTM_(debug) << "Executing action("
@@ -101,7 +114,7 @@
                             << ") with continuation("
                             << cont->get_raw_gid()
                             << ")";
-                cont->trigger(boost::move(func(BOOST_PP_ENUM_PARAMS(N, arg))));
+                cont->trigger(boost::move(func(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))));
             }
             catch (hpx::exception const&) {
                 // make sure hpx::exceptions are propagated back to the client
@@ -116,12 +129,13 @@
     static HPX_STD_FUNCTION<threads::thread_function_type>
     construct_continuation_thread_function(
         continuation_type cont, BOOST_FWD_REF(Func) func
-        BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        BOOST_PP_COMMA_IF(N)
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         return HPX_STD_BIND(
             BOOST_PP_CAT(continuation_thread_function_, N)(),
             cont, boost::forward<Func>(func)
-            BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, arg));
+            BOOST_PP_COMMA_IF(N) BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -137,13 +151,13 @@
             void (Object::* func)(BOOST_PP_ENUM_BINARY_PARAMS(N, FArg, arg)),
             Object* obj
             BOOST_PP_COMMA_IF(N)
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) const
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_raw_gid() << ")";
-                (obj->*func)(BOOST_PP_ENUM_PARAMS(N, arg));
+                (obj->*func)(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
                 cont->trigger();
             }
             catch (hpx::exception const&) {
@@ -161,13 +175,13 @@
                 BOOST_PP_ENUM_BINARY_PARAMS(N, FArg, arg)) const,
             Component* obj
             BOOST_PP_COMMA_IF(N)
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) const
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_raw_gid() << ")";
-                (obj->*func)(BOOST_PP_ENUM_PARAMS(N, arg));
+                (obj->*func)(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
                 cont->trigger();
             }
             catch (hpx::exception const&) {
@@ -185,11 +199,12 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(BOOST_PP_ENUM_PARAMS(N, FArg)), Object* obj
-        BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        BOOST_PP_COMMA_IF(N)
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         return HPX_STD_BIND(
             BOOST_PP_CAT(continuation_thread_object_function_void_, N)(),
-            cont, func, obj BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, arg));
+            cont, func, obj BOOST_PP_COMMA_IF(N) BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
     template <typename Object
@@ -200,11 +215,12 @@
         continuation_type cont,
         void (Object::* const func)(BOOST_PP_ENUM_PARAMS(N, FArg)) const,
         Component* obj
-        BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        BOOST_PP_COMMA_IF(N)
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         return HPX_STD_BIND(
             BOOST_PP_CAT(continuation_thread_object_function_void_, N)(),
-            cont, func, obj BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, arg));
+            cont, func, obj BOOST_PP_COMMA_IF(N) BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -219,14 +235,14 @@
             Result (Object::* func)(BOOST_PP_ENUM_BINARY_PARAMS(N, FArg, arg)),
             Component* obj
             BOOST_PP_COMMA_IF(N)
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) const
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_raw_gid() << ")";
                 cont->trigger(
-                    boost::move((obj->*func)(BOOST_PP_ENUM_PARAMS(N, arg))));
+                    boost::move((obj->*func)(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))));
             }
             catch (hpx::exception const&) {
                 // make sure hpx::exceptions are propagated back to the client
@@ -243,14 +259,14 @@
                 BOOST_PP_ENUM_BINARY_PARAMS(N, FArg, arg)) const,
             Component* obj
             BOOST_PP_COMMA_IF(N)
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) const
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_raw_gid() << ")";
                 cont->trigger(
-                    boost::move((obj->*func)(BOOST_PP_ENUM_PARAMS(N, arg))));
+                    boost::move((obj->*func)(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))));
             }
             catch (hpx::exception const&) {
                 // make sure hpx::exceptions are propagated back to the client
@@ -267,11 +283,12 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(BOOST_PP_ENUM_PARAMS(N, FArg)), Component* obj
-        BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        BOOST_PP_COMMA_IF(N)
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         return HPX_STD_BIND(
             BOOST_PP_CAT(continuation_thread_object_function_, N)(),
-            cont, func, obj BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, arg));
+            cont, func, obj BOOST_PP_COMMA_IF(N) BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
     template <typename Object
@@ -282,11 +299,12 @@
         continuation_type cont,
         Result (Object::* const func)(BOOST_PP_ENUM_PARAMS(N, FArg)) const,
         Component* obj
-        BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        BOOST_PP_COMMA_IF(N)
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         return HPX_STD_BIND(
             BOOST_PP_CAT(continuation_thread_object_function_, N)(),
-            cont, func, obj BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, arg));
+            cont, func, obj BOOST_PP_COMMA_IF(N) BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
 #undef M

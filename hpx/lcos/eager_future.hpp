@@ -162,19 +162,19 @@ namespace hpx { namespace lcos
         /// \param arg0   [in] The parameter \a arg0 will be passed on to the
         ///               apply operation for the embedded action.
         template <typename Arg0>
-        void apply(naming::id_type const& gid, Arg0 const& arg0)
+        void apply(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-            hpx::applier::apply_c<Action>(this->get_gid(), gid, arg0);
+            hpx::applier::apply_c<Action>(this->get_gid(), gid, boost::forward<Arg0>(arg0));
         }
 
         template <typename Arg0>
         void apply_p(naming::id_type const& gid,
-            threads::thread_priority priority, Arg0 const& arg0)
+            threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
             hpx::applier::apply_c_p<Action>(
-                this->get_gid(), gid, priority, arg0);
+                this->get_gid(), gid, priority, boost::forward<Arg0>(arg0));
         }
 
         /// Construct a new \a eager_future instance. The \a thread
@@ -195,7 +195,7 @@ namespace hpx { namespace lcos
         ///               eager_future instance (as it has to be sent along
         ///               with the action as the continuation parameter).
         template <typename Arg0>
-        eager_future(naming::gid_type const& gid, Arg0 const& arg0)
+        eager_future(naming::gid_type const& gid, BOOST_FWD_REF(Arg0) arg0)
           : apply_logger_("eager_future::apply")
         {
             LLCO_(info) << "eager_future::eager_future("
@@ -203,10 +203,10 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply(naming::id_type(gid, naming::id_type::unmanaged), arg0);
+            apply(naming::id_type(gid, naming::id_type::unmanaged), boost::forward<Arg0>(arg0));
         }
         template <typename Arg0>
-        eager_future(naming::id_type const& gid, Arg0 const& arg0)
+        eager_future(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
           : apply_logger_("eager_future::apply")
         {
             LLCO_(info) << "eager_future::eager_future("
@@ -214,12 +214,12 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply(gid, arg0);
+            apply(gid, boost::forward<Arg0>(arg0));
         }
 
         template <typename Arg0>
         eager_future(naming::gid_type const& gid,
-                threads::thread_priority priority, Arg0 const& arg0)
+                threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
           : apply_logger_("eager_future::apply")
         {
             LLCO_(info) << "eager_future::eager_future("
@@ -228,11 +228,11 @@ namespace hpx { namespace lcos
                         << gid
                         << ") args(1)";
             apply_p(naming::id_type(gid, naming::id_type::unmanaged),
-                priority, arg0);
+                priority, boost::forward<Arg0>(arg0));
         }
         template <typename Arg0>
         eager_future(naming::id_type const& gid,
-                threads::thread_priority priority, Arg0 const& arg0)
+                threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
           : apply_logger_("eager_future::apply")
         {
             LLCO_(info) << "eager_future::eager_future("
@@ -240,7 +240,7 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply_p(gid, priority, arg0);
+            apply_p(gid, priority, boost::forward<Arg0>(arg0));
         }
 
         // pull in remaining constructors
@@ -338,7 +338,7 @@ namespace hpx { namespace lcos
         /// \param arg0   [in] The parameter \a arg0 will be passed on to the
         ///               apply operation for the embedded action.
         template <typename Arg0>
-        void apply(naming::id_type const& gid, Arg0 const& arg0)
+        void apply(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
@@ -349,11 +349,11 @@ namespace hpx { namespace lcos
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<typename Action::component_type>()));
                 (*this->impl_)->set_data(
-                    0, Action::execute_function_nonvirt(addr.address_, arg0));
+                    0, Action::execute_function_nonvirt(addr.address_, boost::forward<Arg0>(arg0)));
             }
             else {
                 // remote execution
-                hpx::applier::apply_c<Action>(addr, this->get_gid(), gid, arg0);
+                hpx::applier::apply_c<Action>(addr, this->get_gid(), gid, boost::forward<Arg0>(arg0));
             }
         }
 
@@ -375,7 +375,7 @@ namespace hpx { namespace lcos
         ///               eager_future instance (as it has to be sent along
         ///               with the action as the continuation parameter).
         template <typename Arg0>
-        eager_future(naming::gid_type const& gid, Arg0 const& arg0)
+        eager_future(naming::gid_type const& gid, BOOST_FWD_REF(Arg0) arg0)
           : apply_logger_("eager_future_direct::apply")
         {
             LLCO_(info) << "eager_future::eager_future("
@@ -383,10 +383,10 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply(naming::id_type(gid, naming::id_type::unmanaged), arg0);
+            apply(naming::id_type(gid, naming::id_type::unmanaged), boost::forward<Arg0>(arg0));
         }
         template <typename Arg0>
-        eager_future(naming::id_type const& gid, Arg0 const& arg0)
+        eager_future(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
           : apply_logger_("eager_future_direct::apply")
         {
             LLCO_(info) << "eager_future::eager_future("
@@ -394,7 +394,7 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply(gid, arg0);
+            apply(gid, boost::forward<Arg0>(arg0));
         }
 
         // pull in remaining constructors
@@ -523,19 +523,19 @@ namespace hpx { namespace lcos
         /// \param arg0   [in] The parameter \a arg0 will be passed on to the
         ///               apply operation for the embedded action.
         template <typename Arg0>
-        void apply(naming::id_type const& gid, Arg0 const& arg0)
+        void apply(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-            hpx::applier::apply_c<Action>(this->get_gid(), gid, arg0);
+            hpx::applier::apply_c<Action>(this->get_gid(), gid, boost::forward<Arg0>(arg0));
         }
 
         template <typename Arg0>
         void apply_p(naming::id_type const& gid,
-            threads::thread_priority priority, Arg0 const& arg0)
+            threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
             hpx::applier::apply_c_p<Action>(
-                this->get_gid(), gid, priority, arg0);
+                this->get_gid(), gid, priority, boost::forward<Arg0>(arg0));
         }
 
         /// Construct a new \a eager_future instance. The \a thread
@@ -558,7 +558,7 @@ namespace hpx { namespace lcos
         template <typename Arg0>
         eager_future(naming::gid_type const& gid,
                 completed_callback_type const& data_sink,
-                Arg0 const& arg0)
+                BOOST_FWD_REF(Arg0) arg0)
           : base_type(data_sink),
             apply_logger_("eager_future::apply")
         {
@@ -567,12 +567,12 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply(naming::id_type(gid, naming::id_type::unmanaged), arg0);
+            apply(naming::id_type(gid, naming::id_type::unmanaged), boost::forward<Arg0>(arg0));
         }
         template <typename Arg0>
         eager_future(naming::id_type const& gid,
                 completed_callback_type const& data_sink,
-                Arg0 const& arg0)
+                BOOST_FWD_REF(Arg0) arg0)
           : base_type(data_sink),
             apply_logger_("eager_future::apply")
         {
@@ -581,14 +581,14 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply(gid, arg0);
+            apply(gid, boost::forward<Arg0>(arg0));
         }
 
         template <typename Arg0>
         eager_future(naming::gid_type const& gid,
                 completed_callback_type const& data_sink,
                 error_callback_type const& error_sink,
-                Arg0 const& arg0)
+                BOOST_FWD_REF(Arg0) arg0)
           : base_type(data_sink, error_sink),
             apply_logger_("eager_future::apply")
         {
@@ -597,13 +597,13 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply(naming::id_type(gid, naming::id_type::unmanaged), arg0);
+            apply(naming::id_type(gid, naming::id_type::unmanaged), boost::forward<Arg0>(arg0));
         }
         template <typename Arg0>
         eager_future(naming::id_type const& gid,
                 completed_callback_type const& data_sink,
                 error_callback_type const& error_sink,
-                Arg0 const& arg0)
+                BOOST_FWD_REF(Arg0) arg0)
           : base_type(data_sink, error_sink),
             apply_logger_("eager_future::apply")
         {
@@ -612,13 +612,13 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply(gid, arg0);
+            apply(gid, boost::forward<Arg0>(arg0));
         }
 
         template <typename Arg0>
         eager_future(naming::gid_type const& gid,
                 completed_callback_type const& data_sink,
-                threads::thread_priority priority, Arg0 const& arg0)
+                threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
           : base_type(data_sink),
             apply_logger_("eager_future::apply")
         {
@@ -628,12 +628,12 @@ namespace hpx { namespace lcos
                         << gid
                         << ") args(1)";
             apply_p(naming::id_type(gid, naming::id_type::unmanaged),
-                priority, arg0);
+                priority, boost::forward<Arg0>(arg0));
         }
         template <typename Arg0>
         eager_future(naming::id_type const& gid,
                 completed_callback_type const& data_sink,
-                threads::thread_priority priority, Arg0 const& arg0)
+                threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
           : base_type(data_sink),
             apply_logger_("eager_future::apply")
         {
@@ -642,14 +642,14 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply_p(gid, priority, arg0);
+            apply_p(gid, priority, boost::forward<Arg0>(arg0));
         }
 
         template <typename Arg0>
         eager_future(naming::gid_type const& gid,
                 completed_callback_type const& data_sink,
                 error_callback_type const& error_sink,
-                threads::thread_priority priority, Arg0 const& arg0)
+                threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
           : base_type(data_sink, error_sink),
             apply_logger_("eager_future::apply")
         {
@@ -659,13 +659,13 @@ namespace hpx { namespace lcos
                         << gid
                         << ") args(1)";
             apply_p(naming::id_type(gid, naming::id_type::unmanaged),
-                priority, arg0);
+                priority, boost::forward<Arg0>(arg0));
         }
         template <typename Arg0>
         eager_future(naming::id_type const& gid,
                 completed_callback_type const& data_sink,
                 error_callback_type const& error_sink,
-                threads::thread_priority priority, Arg0 const& arg0)
+                threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
           : base_type(data_sink, error_sink),
             apply_logger_("eager_future::apply")
         {
@@ -674,7 +674,7 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply_p(gid, priority, arg0);
+            apply_p(gid, priority, boost::forward<Arg0>(arg0));
         }
 
         // pull in remaining constructors
@@ -783,7 +783,7 @@ namespace hpx { namespace lcos
         /// \param arg0   [in] The parameter \a arg0 will be passed on to the
         ///               apply operation for the embedded action.
         template <typename Arg0>
-        void apply(naming::id_type const& gid, Arg0 const& arg0)
+        void apply(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
@@ -794,11 +794,11 @@ namespace hpx { namespace lcos
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<typename Action::component_type>()));
                 (*this->impl_)->set_data(
-                    0, Action::execute_function_nonvirt(addr.address_, arg0));
+                    0, Action::execute_function_nonvirt(addr.address_, boost::forward<Arg0>(arg0)));
             }
             else {
                 // remote execution
-                hpx::applier::apply_c<Action>(addr, this->get_gid(), gid, arg0);
+                hpx::applier::apply_c<Action>(addr, this->get_gid(), gid, boost::forward<Arg0>(arg0));
             }
         }
 
@@ -822,7 +822,7 @@ namespace hpx { namespace lcos
         template <typename Arg0>
         eager_future(naming::gid_type const& gid,
                 completed_callback_type const& data_sink,
-                Arg0 const& arg0)
+                BOOST_FWD_REF(Arg0) arg0)
           : base_type(data_sink),
             apply_logger_("eager_future_direct::apply")
         {
@@ -831,12 +831,12 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply(naming::id_type(gid, naming::id_type::unmanaged), arg0);
+            apply(naming::id_type(gid, naming::id_type::unmanaged), boost::forward<Arg0>(arg0));
         }
         template <typename Arg0>
         eager_future(naming::id_type const& gid,
                 completed_callback_type const& data_sink,
-                Arg0 const& arg0)
+                BOOST_FWD_REF(Arg0) arg0)
           : base_type(data_sink),
             apply_logger_("eager_future_direct::apply")
         {
@@ -845,14 +845,14 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply(gid, arg0);
+            apply(gid, boost::forward<Arg0>(arg0));
         }
 
         template <typename Arg0>
         eager_future(naming::gid_type const& gid,
                 completed_callback_type const& data_sink,
                 error_callback_type const& error_sink,
-                Arg0 const& arg0)
+                BOOST_FWD_REF(Arg0) arg0)
           : base_type(data_sink, error_sink),
             apply_logger_("eager_future_direct::apply")
         {
@@ -861,13 +861,13 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply(naming::id_type(gid, naming::id_type::unmanaged), arg0);
+            apply(naming::id_type(gid, naming::id_type::unmanaged), boost::forward<Arg0>(arg0));
         }
         template <typename Arg0>
         eager_future(naming::id_type const& gid,
                 completed_callback_type const& data_sink,
                 error_callback_type const& error_sink,
-                Arg0 const& arg0)
+                BOOST_FWD_REF(Arg0) arg0)
           : base_type(data_sink, error_sink),
             apply_logger_("eager_future_direct::apply")
         {
@@ -876,7 +876,7 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply(gid, arg0);
+            apply(gid, boost::forward<Arg0>(arg0));
         }
 
         // pull in remaining constructors

@@ -106,14 +106,17 @@ namespace hpx { namespace actions
         /// The \a thread_function will be registered as the thread
         /// function of a thread. It encapsulates the execution of the
         /// original function (given by \a func).
+        // TODO: implement proper rvalue ref handling
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static threads::thread_state_enum thread_function(
+            //BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
             try {
                 LTM_(debug) << "Executing plain action("
                             << detail::get_action_name<Derived>()
                             << ").";
+                //F(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));      // call the function, ignoring the return value
                 F(BOOST_PP_ENUM_PARAMS(N, arg));      // call the function, ignoring the return value
             }
             catch (hpx::exception const& e) {
@@ -135,16 +138,19 @@ namespace hpx { namespace actions
         // a proper thread function for a thread without having to
         // instantiate the base_result_actionN type. This is used by the applier in
         // case no continuation has been supplied.
+        // TODO: implement proper rvalue ref handling
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(naming::address::address_type lva,
+            //BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
             // we need to assign the address of the thread function to a
             // variable to  help the compiler to deduce the function type
-            threads::thread_state_enum (*f)(BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) =
+            threads::thread_state_enum (*f)(BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) = //BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)) =
                 &Derived::template thread_function<BOOST_PP_ENUM_PARAMS(N, Arg)>;
 
+            //return HPX_STD_BIND(f, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
             return HPX_STD_BIND(f, BOOST_PP_ENUM_PARAMS(N, arg));
         }
 
@@ -156,10 +162,10 @@ namespace hpx { namespace actions
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva,
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+            BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
             return base_type::construct_continuation_thread_function(
-                cont, F, BOOST_PP_ENUM_PARAMS(N, arg));
+                cont, F, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
         }
 
         /// serialization support
@@ -494,14 +500,17 @@ namespace hpx { namespace actions
         /// The \a thread_function will be registered as the thread
         /// function of a thread. It encapsulates the execution of the
         /// original function (given by \a func).
+        // TODO: implement proper rvalue ref handling
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static threads::thread_state_enum thread_function(
+            //BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
             try {
                 LTM_(debug) << "Executing plain action("
                             << detail::get_action_name<Derived>()
                             << ").";
+                //F(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));      // call the function, ignoring the return value
                 F(BOOST_PP_ENUM_PARAMS(N, arg));      // call the function, ignoring the return value
             }
             catch (hpx::exception const& e) {
@@ -523,17 +532,19 @@ namespace hpx { namespace actions
         // a proper thread function for a thread without having to
         // instantiate the base_actionN type. This is used by the applier in
         // case no continuation has been supplied.
+        // TODO: implement proper rvalue ref handling
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(naming::address::address_type lva,
+            //BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
         {
             // we need to assign the address of the thread function to a
             // variable to  help the compiler to deduce the function type
-            threads::thread_state_enum (*f)(BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) =
+            threads::thread_state_enum (*f)(BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) =//BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)) =
                 &Derived::template thread_function<BOOST_PP_ENUM_PARAMS(N, Arg)>;
 
-            return HPX_STD_BIND(f, BOOST_PP_ENUM_PARAMS(N, arg));
+            return HPX_STD_BIND(f, BOOST_PP_ENUM_PARAMS(N, arg));//BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
         }
 
         // This static construct_thread_function allows to construct
@@ -544,10 +555,10 @@ namespace hpx { namespace actions
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva,
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+            BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
             return base_type::construct_continuation_thread_function_void(
-                cont, F, BOOST_PP_ENUM_PARAMS(N, arg));
+                cont, F, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
         }
 
         /// serialization support

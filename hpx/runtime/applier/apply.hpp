@@ -398,7 +398,6 @@ namespace hpx { namespace applier
     inline bool
     apply_r_route (naming::address& addr, naming::id_type const& gid, 
         BOOST_FWD_REF(Arg0) arg0)
-        //Arg0 const& arg0)
     {
         return apply_r_p_route<Action>(addr, gid, action_priority<Action>(), 
             boost::forward<Arg0>(arg0));

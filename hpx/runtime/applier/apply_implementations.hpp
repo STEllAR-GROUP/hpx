@@ -64,12 +64,10 @@ namespace hpx { namespace applier
     inline bool
     apply_r_p_route(naming::address& addr, naming::id_type const& gid, 
         threads::thread_priority priority, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
-        //BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
         //creat parcel 
         parcelset::parcel p(gid.get_gid(),
             new Action(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)));
-            //new Action(priority, BOOST_PP_ENUM_PARAMS(N, arg)));
         if (components::component_invalid == addr.type_)
             addr.type_ = components::get_component_type<typename Action::component_type>();
         p.set_destination_addr(addr); // redundant
@@ -162,10 +160,8 @@ namespace hpx { namespace applier
     inline bool 
     apply_route (naming::id_type const& gid, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
 //    apply_route (naming::id_type const& gid, 
-  //      BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
         return apply_p_route<Action>(gid, action_priority<Action>(), 
-            //BOOST_PP_ENUM_PARAMS(N, arg));
             BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
@@ -196,14 +192,12 @@ namespace hpx { namespace applier
     apply_r_p_route(naming::address& addr, actions::continuation* c, 
         naming::id_type const& gid, threads::thread_priority priority,
         BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
-        //BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
         actions::continuation_type cont(c);
 
         // Create a new parcel with the gid, action, and arguments
         parcelset::parcel p (gid.get_gid(), 
             new Action(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)), cont);
-//            new Action(priority, BOOST_PP_ENUM_PARAMS(N, arg)), cont);
         if (components::component_invalid == addr.type_)
             addr.type_ = components::get_component_type<typename Action::    component_type>();
         p.set_destination_addr(addr);   // redundant

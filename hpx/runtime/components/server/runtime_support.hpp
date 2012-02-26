@@ -449,6 +449,24 @@ namespace hpx { namespace components { namespace server
             >                                                                 \
             type;                                                             \
     };                                                                        \
+                                                                              \
+    template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>        \
+    struct BOOST_PP_CAT(create_one_component_direct_action, N)                \
+    {                                                                         \
+        typedef                                                               \
+            BOOST_PP_CAT( ::hpx::actions::direct_result_action, BOOST_PP_INC(N))<\
+                runtime_support                                               \
+              , naming::gid_type                                              \
+              , runtime_support::runtime_support_create_one_component         \
+              , components::component_type                                    \
+              , BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & BOOST_PP_INTERCEPT) \
+              , &runtime_support::create_one_component_<                      \
+                    Component                                                 \
+                  , BOOST_PP_ENUM_PARAMS(N, A)                                \
+                >                                                             \
+            >                                                                 \
+            type;                                                             \
+    };                                                                        \
     /**/
     BOOST_PP_REPEAT_FROM_TO(
         1

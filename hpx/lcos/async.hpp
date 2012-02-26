@@ -79,12 +79,25 @@ namespace hpx { namespace lcos
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 
+#define HPX_FWD_ARGS(z, n, _)                                                 \
+        BOOST_PP_COMMA_IF(n)                                                  \
+            BOOST_FWD_REF(BOOST_PP_CAT(Arg, n)) BOOST_PP_CAT(arg, n)          \
+    /**/
+
+#define HPX_FORWARD_ARGS(z, n, _)                                             \
+        BOOST_PP_COMMA_IF(n)                                                  \
+            boost::forward<BOOST_PP_CAT(Arg, n)>(BOOST_PP_CAT(arg, n))        \
+    /**/
+
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (1, HPX_ACTION_ARGUMENT_LIMIT,                                        \
     "hpx/lcos/async.hpp"))                                                    \
     /**/
 
 #include BOOST_PP_ITERATE()
+
+#undef HPX_FWD_ARGS
+#undef HPX_FORWARD_ARGS
 
 #endif
 
@@ -105,9 +118,9 @@ namespace hpx { namespace lcos
         typename Action::result_type
     >
     async (naming::id_type const& gid,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
-        return eager_future<Action>(gid, BOOST_PP_ENUM_PARAMS(N, arg));
+        return eager_future<Action>(gid, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
@@ -121,14 +134,14 @@ namespace hpx { namespace lcos
         HPX_STD_FUNCTION<void(typename traits::promise_local_result<
             typename Action::result_type
         >::type const&)> const& data_sink, naming::id_type const& gid,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         typedef typename traits::promise_local_result<
             typename Action::result_type
         >::type result_type;
         typedef eager_future<Action, result_type, signalling_tag> future_type;
 
-        return future_type(gid, data_sink, BOOST_PP_ENUM_PARAMS(N, arg));
+        return future_type(gid, data_sink, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
@@ -144,14 +157,14 @@ namespace hpx { namespace lcos
         >::type const&)> const& data_sink,
         HPX_STD_FUNCTION<void(boost::exception_ptr const&)> const& error_sink,
         naming::id_type const& gid,
-        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         typedef typename traits::promise_local_result<
             typename Action::result_type
         >::type result_type;
         typedef eager_future<Action, result_type, signalling_tag> future_type;
 
-        return future_type(gid, data_sink, error_sink, BOOST_PP_ENUM_PARAMS(N, arg));
+        return future_type(gid, data_sink, error_sink, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 }}
 
