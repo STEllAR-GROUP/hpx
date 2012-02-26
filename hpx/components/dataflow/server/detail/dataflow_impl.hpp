@@ -360,13 +360,13 @@ namespace hpx { namespace traits
             boost::mpl::has_key<slot_to_args_map, boost::mpl::int_<Slot> >
         >::type
         set_arg(
-            typename boost::fusion::result_of::value_at<
+            typename boost::fusion::result_of::at<
                 args_type
               , typename boost::mpl::at<
                     slot_to_args_map
                   , boost::mpl::int_<Slot>
                 >::type
-            >::type const & value
+            >::type value
         )
         {
             boost::fusion::at<

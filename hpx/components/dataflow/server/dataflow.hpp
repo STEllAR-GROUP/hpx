@@ -1,8 +1,10 @@
-//  Copyright (c) 2011 Thomas Heller
+//  Copyright (c) 2011-2012 Thomas Heller
 //  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#if !BOOST_PP_IS_ITERATING
 
 #ifndef HPX_LCOS_DATAFLOW_SERVER_DATAFLOW_HPP
 #define HPX_LCOS_DATAFLOW_SERVER_DATAFLOW_HPP
@@ -35,14 +37,6 @@ namespace hpx { namespace lcos { namespace server
             base_type;
         typedef hpx::components::managed_component<dataflow> component_type;
 
-        /*
-        dataflow()
-            : component_ptr(0)
-        {
-            util::spinlock::scoped_lock l(detail::dataflow_counter_data_.mtx_);
-            ++detail::dataflow_counter_data_.constructed_;
-        }
-        */
         dataflow(component_type * back_ptr)
             : base_type(back_ptr)
             , component_ptr(0)
@@ -54,7 +48,8 @@ namespace hpx { namespace lcos { namespace server
         {
             LLCO_(info)
                 << "~server::dataflow::dataflow()";
-            //delete component_ptr;
+            BOOST_ASSERT(component_ptr);
+            delete component_ptr;
         }
 
         /// init initializes the dataflow, it creates a dataflow_impl object
@@ -105,68 +100,17 @@ namespace hpx { namespace lcos { namespace server
 
         // Vertical preprocessor repetition to define the remaining
         // init functions and actions
-        // TODO: get rid of the call to impl_ptr->init
-#define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
-        template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename A)>         \
-        void init(                                                              \
-            naming::id_type const & target                                      \
-          , BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)                        \
+#define BOOST_PP_ITERATION_PARAMS_1                                             \
+    (                                                                           \
+        3                                                                       \
+      , (                                                                       \
+            1                                                                   \
+          , BOOST_PP_SUB(HPX_ACTION_ARGUMENT_LIMIT, 3)                          \
+          , <hpx/components/dataflow/server/dataflow.hpp>                       \
         )                                                                       \
-        {                                                                       \
-            typedef                                                             \
-                detail::dataflow_impl<                                          \
-                    Action                                                      \
-                  , BOOST_PP_ENUM_PARAMS(N, A)                                  \
-                >                                                               \
-                wrapped_type;                                                   \
-                                                                                \
-            typedef                                                             \
-                detail::component_wrapper<                                      \
-                    wrapped_type                                                \
-                >                                                               \
-                component_type;                                                 \
-            component_type * w = new component_type(target, mtx, targets);      \
-            {                                                                   \
-                lcos::local_spinlock::scoped_lock l(mtx);                       \
-                component_ptr = w;                                              \
-            }                                                                   \
-            (*w)->init(BOOST_PP_ENUM_PARAMS(N, a));                             \
-                                                                                \
-            lcos::local_spinlock::scoped_lock                                   \
-                l(detail::dataflow_counter_data_.mtx_);                         \
-            ++detail::dataflow_counter_data_.initialized_;                      \
-        }                                                                       \
-        template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename A)>         \
-        dataflow(                                                               \
-            component_type * back_ptr                                           \
-          , Action                                                              \
-          , naming::id_type const & target                                      \
-          , BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)                        \
-        )                                                                       \
-            : base_type(back_ptr)                                               \
-            , component_ptr(0)                                                  \
-        {                                                                       \
-            applier::register_thread(                                           \
-                HPX_STD_BIND(&dataflow::init<                                   \
-                        typename Action::type, BOOST_PP_ENUM_PARAMS(N, A)       \
-                    >                                                           \
-                  , this                                                        \
-                  , target                                                      \
-                  , BOOST_PP_ENUM_PARAMS(N, a)                                  \
-                )                                                               \
-              , "dataflow::init<>"                                              \
-            );                                                                  \
-        }                                                                       \
-    /**/
-
-        BOOST_PP_REPEAT_FROM_TO(
-            1
-          , BOOST_PP_SUB(HPX_ACTION_ARGUMENT_LIMIT, 3)
-          , HPX_LCOS_DATAFLOW_M0
-          , _
-        )
-
-#undef HPX_LCOS_DATAFLOW_M0
+    )                                                                           \
+/**/
+#include BOOST_PP_ITERATE()
 
         /// the connect function is used to connect the current dataflow
         /// to the specified target lco
@@ -208,4 +152,79 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::lcos::server::dataflow::connect_action
   , dataflow_type_connect_action)
 
+#endif
+
+#else // BOOST_PP_IS_ITERATING
+#define N BOOST_PP_ITERATION()
+        // TODO: get rid of the call to impl_ptr->init
+
+#define M0(Z, N, D) BOOST_FWD_REF(BOOST_PP_CAT(A, N)) BOOST_PP_CAT(a, N)
+#define M1(Z, N, D) boost::forward<BOOST_PP_CAT(A, N)>(BOOST_PP_CAT(a, N))
+#define M2(Z, N, D)                                                             \
+    typename boost::remove_const<                                               \
+            typename hpx::util::detail::remove_reference<                       \
+                BOOST_PP_CAT(A, N)                                              \
+            >::type                                                             \
+        >::type                                                                 \
+/**/
+
+        template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename A)>
+        void init(
+            naming::id_type const & target
+          , BOOST_PP_ENUM(N, M0, _) // A0 && a0, A1 && a1, ..., AN && aN
+        )
+        {
+            typedef
+                detail::dataflow_impl<
+                    Action
+                  , BOOST_PP_ENUM(N, M2, _)
+                >
+                wrapped_type;
+
+            typedef
+                detail::component_wrapper<
+                    wrapped_type
+                >
+                component_type;
+            component_type * w = new component_type(target, mtx, targets);
+            {
+                lcos::local_spinlock::scoped_lock l(mtx);
+                component_ptr = w;
+            }
+            (*w)->init(BOOST_PP_ENUM(N, M1, _));
+
+            lcos::local_spinlock::scoped_lock
+                l(detail::dataflow_counter_data_.mtx_);
+            ++detail::dataflow_counter_data_.initialized_;
+        }
+
+        template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename A)>
+        dataflow(
+            component_type * back_ptr
+          , Action
+          , naming::id_type const & target
+          , BOOST_PP_ENUM(N, M0, _) // A0 && a0, A1 && a1, ..., AN && aN
+        )
+            : base_type(back_ptr)
+            , component_ptr(0)
+        {
+            /*
+            applier::register_thread(
+                HPX_STD_BIND(&dataflow::init<
+                        typename Action::type, BOOST_PP_ENUM_PARAMS(N, A)
+                    >
+                  , this
+                  , target
+                  , BOOST_PP_ENUM_PARAMS(N, a)
+                )
+              , "dataflow::init<>"
+            );
+            */
+            init<typename Action::type>(target, BOOST_PP_ENUM(N, M1, _));
+        }
+
+#undef M2
+#undef M1
+#undef M0
+#undef N
 #endif

@@ -49,10 +49,7 @@ namespace hpx { namespace lcos
             naming::id_type const & id
           , std::vector<dataflow_base<void> > const & trigger
         )
-            : base_type(
-                create_component(id, trigger)
-              , trigger
-            )
+            : base_type(create_component(id, trigger))
         {}
 
         ~dataflow_trigger()

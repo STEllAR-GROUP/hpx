@@ -33,7 +33,7 @@ namespace hpx { namespace lcos
         typedef dataflow_base<T1, TR1> dataflow_type;
         BOOST_FOREACH(dataflow_type const & d, dataflows)
         {
-            lazy_values.push_back(d.get_promise());
+            lazy_values.push_back(d.get_async());
         }
 
         while (handled_count < lazy_values.size()) {
@@ -77,7 +77,7 @@ namespace hpx { namespace lcos
         lazy_values.reserve(dataflows.size());
         BOOST_FOREACH(dataflow_base<void> const & d, dataflows)
         {
-            lazy_values.push_back(d.get_promise());
+            lazy_values.push_back(d.get_async());
         }
 
         while (handled_count < lazy_values.size()) {

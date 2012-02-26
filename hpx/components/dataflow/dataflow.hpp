@@ -3,11 +3,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#ifndef BOOST_PP_IS_ITERATING
+
 #ifndef HPX_LCOS_DATAFLOW_HPP
 #define HPX_LCOS_DATAFLOW_HPP
 
 #include <hpx/components/dataflow/dataflow_base.hpp>
 #include <hpx/components/dataflow/dataflow_fwd.hpp>
+#include <hpx/lcos/async.hpp>
 
 namespace hpx { namespace lcos
 {
@@ -69,59 +72,41 @@ namespace hpx { namespace lcos
         }
 
         explicit dataflow(naming::id_type const & target)
-            : base_type(
-                create_component(target))
+            : base_type(create_component(target))
         {
         }
 
-#define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
-        template <BOOST_PP_ENUM_PARAMS(N, typename A)>                          \
-        static inline lcos::promise<naming::id_type, naming::gid_type>          \
-        create_component(naming::id_type const & target                         \
-          , BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)                        \
-        )                                                                       \
-        {                                                                       \
-            typedef                                                             \
-                typename BOOST_PP_CAT(                                          \
-                    hpx::components::server::create_one_component_action        \
-                  , BOOST_PP_ADD(N, 2)                                          \
-                )<                                                              \
-                    components::managed_component<server::dataflow>             \
-                  , detail::action_wrapper<Action>                              \
-                  , naming::id_type                                             \
-                  , BOOST_PP_ENUM_PARAMS(N, A)                                  \
-                >::type                                                         \
-                create_component_action;                                        \
-            return                                                              \
-                async<create_component_action>(                                 \
-                    naming::get_locality_from_id(target)                        \
-                  , stub_type::get_component_type()                             \
-                  , detail::action_wrapper<Action>()                            \
-                  , target                                                      \
-                  , BOOST_PP_ENUM_PARAMS(N, a)                                  \
-                );                                                              \
-        }                                                                       \
-        template <BOOST_PP_ENUM_PARAMS(N, typename A)>                          \
-        dataflow(                                                               \
-            naming::id_type const & target                                      \
-          , BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)                        \
-        )                                                                       \
-            : base_type(                                                        \
-                create_component(target                                         \
-                  , BOOST_PP_ENUM_PARAMS(N, a)                                  \
-                )                                                               \
-                , BOOST_PP_ENUM_PARAMS(N, a)                                    \
-            )                                                                   \
-        {                                                                       \
-        }                                                                       \
+#define HPX_FWD_ARGS(z, n, _)                                                 \
+        BOOST_PP_COMMA_IF(n)                                                  \
+            BOOST_FWD_REF(BOOST_PP_CAT(A, n)) BOOST_PP_CAT(a, n)              \
     /**/
-        BOOST_PP_REPEAT_FROM_TO(
-            1
-          , BOOST_PP_SUB(HPX_ACTION_ARGUMENT_LIMIT, 3)
-          , HPX_LCOS_DATAFLOW_M0
-          , _
-        )
-#undef HPX_LCOS_DATAFLOW_M0
+
+#define HPX_A(z, n, _)                                                 \
+        BOOST_PP_COMMA_IF(n)                                                  \
+            typename boost::remove_const<typename hpx::util::detail::remove_reference<BOOST_FWD_REF(BOOST_PP_CAT(A, n))>::type>::type              \
+    /**/
+
+#define HPX_FORWARD_ARGS(z, n, _)                                             \
+        BOOST_PP_COMMA_IF(n)                                                  \
+            boost::forward<BOOST_PP_CAT(A, n)>(BOOST_PP_CAT(a, n))            \
+    /**/
+
+#define BOOST_PP_ITERATION_PARAMS_1                                           \
+    (                                                                         \
+        3                                                                     \
+      , (                                                                     \
+            1                                                                 \
+          , BOOST_PP_SUB(HPX_ACTION_ARGUMENT_LIMIT, 4)                        \
+          , "hpx/components/dataflow/dataflow.hpp"                            \
+        )                                                                     \
+    )                                                                         \
+    /**/
+
+#include BOOST_PP_ITERATE()
+
+#undef HPX_FWD_ARGS
+#undef HPX_A
+#undef HPX_FORWARD_ARGS
     private:
 
         friend class boost::serialization::access;
@@ -133,5 +118,81 @@ namespace hpx { namespace lcos
         }
     };
 }}
+
+#endif
+
+#else
+
+#define N BOOST_PP_ITERATION()
+
+        template <BOOST_PP_ENUM_PARAMS(N, typename A)>
+        static inline lcos::promise<naming::id_type, naming::gid_type>
+        create_component(naming::id_type const & target
+          , BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)
+          , boost::mpl::false_
+        )
+        {
+            typedef
+                typename BOOST_PP_CAT(
+                    hpx::components::server::create_one_component_action
+                  , BOOST_PP_ADD(N, 2)
+                )<
+                    components::managed_component<server::dataflow>
+                  , detail::action_wrapper<Action>
+                  , naming::id_type
+                  , BOOST_PP_REPEAT(N, HPX_A, _)
+                >::type
+                create_component_action;
+            return
+                async<create_component_action>(
+                    naming::get_locality_from_id(target)
+                  , stub_type::get_component_type()
+                  , detail::action_wrapper<Action>()
+                  , target
+                  , BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)
+                );
+        }
+
+        template <BOOST_PP_ENUM_PARAMS(N, typename A)>
+        static inline lcos::promise<naming::id_type, naming::gid_type>
+        create_component(naming::id_type const & target
+          , BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)
+          , boost::mpl::true_
+        )
+        {
+            typedef
+                typename BOOST_PP_CAT(
+                    hpx::components::server::create_one_component_direct_action
+                  , BOOST_PP_ADD(N, 2)
+                )<
+                    components::managed_component<server::dataflow>
+                  , detail::action_wrapper<Action>
+                  , naming::id_type
+                  , BOOST_PP_REPEAT(N, HPX_A, _)
+                >::type
+                create_component_action;
+            return
+                async<create_component_action>(
+                    naming::get_locality_from_id(target)
+                  , stub_type::get_component_type()
+                  , detail::action_wrapper<Action>()
+                  , target
+                  , BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)
+                );
+        }
+
+        template <BOOST_PP_ENUM_PARAMS(N, typename A)>
+        dataflow(
+            naming::id_type const & target
+          , BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)
+        )
+            : base_type(
+                create_component(target
+                  , BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)
+                  , typename Action::direct_execution()
+                )
+            )
+        {
+        }
 
 #endif

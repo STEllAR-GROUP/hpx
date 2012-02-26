@@ -30,38 +30,13 @@ namespace hpx { namespace lcos
         {}
 
         virtual ~dataflow_base()
-        {
-        }
+        {}
 
         dataflow_base(promise<naming::id_type, naming::gid_type> const & promise)
             : impl(new detail::dataflow_base_impl(promise))
         {}
 
-#define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
-        template <BOOST_PP_ENUM_PARAMS(N, typename A)>                          \
-        dataflow_base(                                                          \
-            promise<naming::id_type, naming::gid_type> const & promise          \
-          , BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)                        \
-        )                                                                       \
-            : impl(                                                             \
-                new detail::dataflow_base_impl(                                 \
-                    promise                                                     \
-                  , BOOST_PP_ENUM_PARAMS(N, a)                                  \
-                )                                                               \
-            )                                                                   \
-        {                                                                       \
-        }                                                                       \
-    /**/
-        BOOST_PP_REPEAT_FROM_TO(
-            1
-          , BOOST_PP_SUB(HPX_ACTION_ARGUMENT_LIMIT, 3)
-          , HPX_LCOS_DATAFLOW_M0
-          , _
-        )
-
-#undef HPX_LCOS_DATAFLOW_M0
-
-        promise<void> get_promise() const
+        promise<void> get_async() const
         {
             promise<void> p;
             connect(p.get_gid());
