@@ -136,7 +136,8 @@ namespace hpx { namespace lcos
             apply(gid);
         }
 
-        eager_future_route(naming::gid_type const& gid, threads::thread_priority priority)
+        eager_future_route(naming::gid_type const& gid, 
+                threads::thread_priority priority)
           : apply_logger_("eager_future::apply")
         {
             LLCO_(info) << "eager_future::eager_future("
@@ -146,7 +147,8 @@ namespace hpx { namespace lcos
                         << ") args(0)";
             apply_p(naming::id_type(gid, naming::id_type::unmanaged), priority);
         }
-        eager_future_route(naming::id_type const& gid, threads::thread_priority priority)
+        eager_future_route(naming::id_type const& gid, 
+                threads::thread_priority priority)
           : apply_logger_("eager_future::apply")
         {
             LLCO_(info) << "eager_future::eager_future("
@@ -289,7 +291,7 @@ namespace hpx { namespace lcos
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<typename Action::component_type>()));
                 (*this->impl_)->set_data(0,
-                    Action::execute_function_nonvirt(addr.address_));
+                    Action::execute_function(addr.address_));
             }
             else {
                 // remote execution
@@ -352,7 +354,7 @@ namespace hpx { namespace lcos
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<typename Action::component_type>()));
                 (*this->impl_)->set_data(
-                    0, Action::execute_function_nonvirt(addr.address_, arg0));
+                    0, Action::execute_function(addr.address_, arg0));
             }
             else {
                 // remote execution
@@ -728,7 +730,7 @@ namespace hpx { namespace lcos
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<typename Action::component_type>()));
                 (*this->impl_)->set_data(0,
-                    Action::execute_function_nonvirt(addr.address_));
+                    Action::execute_function(addr.address_));
             }
             else {
                 // remote execution
@@ -797,7 +799,7 @@ namespace hpx { namespace lcos
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<typename Action::component_type>()));
                 (*this->impl_)->set_data(
-                    0, Action::execute_function_nonvirt(addr.address_, arg0));
+                    0, Action::execute_function(addr.address_, arg0));
             }
             else {
                 // remote execution

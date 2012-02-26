@@ -165,7 +165,8 @@ namespace hpx { namespace lcos
         void apply(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-            hpx::applier::apply_c<Action>(this->get_gid(), gid, boost::forward<Arg0>(arg0));
+            hpx::applier::apply_c<Action>(this->get_gid(), gid,
+                boost::forward<Arg0>(arg0));
         }
 
         template <typename Arg0>
@@ -203,7 +204,8 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply(naming::id_type(gid, naming::id_type::unmanaged), boost::forward<Arg0>(arg0));
+            apply(naming::id_type(gid, naming::id_type::unmanaged),
+                boost::forward<Arg0>(arg0));
         }
         template <typename Arg0>
         eager_future(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
@@ -286,7 +288,7 @@ namespace hpx { namespace lcos
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<typename Action::component_type>()));
                 (*this->impl_)->set_data(0,
-                    Action::execute_function_nonvirt(addr.address_));
+                    Action::execute_function(addr.address_));
             }
             else {
                 // remote execution
@@ -348,12 +350,13 @@ namespace hpx { namespace lcos
                 // local, direct execution
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<typename Action::component_type>()));
-                (*this->impl_)->set_data(
-                    0, Action::execute_function_nonvirt(addr.address_, boost::forward<Arg0>(arg0)));
+                (*this->impl_)->set_data(0,
+                    Action::execute_function(addr.address_, boost::forward<Arg0>(arg0)));
             }
             else {
                 // remote execution
-                hpx::applier::apply_c<Action>(addr, this->get_gid(), gid, boost::forward<Arg0>(arg0));
+                hpx::applier::apply_c<Action>(addr, this->get_gid(), gid,
+                    boost::forward<Arg0>(arg0));
             }
         }
 
@@ -383,7 +386,8 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply(naming::id_type(gid, naming::id_type::unmanaged), boost::forward<Arg0>(arg0));
+            apply(naming::id_type(gid, naming::id_type::unmanaged),
+                boost::forward<Arg0>(arg0));
         }
         template <typename Arg0>
         eager_future(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
@@ -567,7 +571,8 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply(naming::id_type(gid, naming::id_type::unmanaged), boost::forward<Arg0>(arg0));
+            apply(naming::id_type(gid, naming::id_type::unmanaged),
+                boost::forward<Arg0>(arg0));
         }
         template <typename Arg0>
         eager_future(naming::id_type const& gid,
@@ -597,7 +602,8 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply(naming::id_type(gid, naming::id_type::unmanaged), boost::forward<Arg0>(arg0));
+            apply(naming::id_type(gid, naming::id_type::unmanaged),
+                boost::forward<Arg0>(arg0));
         }
         template <typename Arg0>
         eager_future(naming::id_type const& gid,
@@ -725,7 +731,7 @@ namespace hpx { namespace lcos
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<typename Action::component_type>()));
                 (*this->impl_)->set_data(0,
-                    Action::execute_function_nonvirt(addr.address_));
+                    Action::execute_function(addr.address_));
             }
             else {
                 // remote execution
@@ -794,11 +800,12 @@ namespace hpx { namespace lcos
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<typename Action::component_type>()));
                 (*this->impl_)->set_data(
-                    0, Action::execute_function_nonvirt(addr.address_, boost::forward<Arg0>(arg0)));
+                    0, Action::execute_function(addr.address_, boost::forward<Arg0>(arg0)));
             }
             else {
                 // remote execution
-                hpx::applier::apply_c<Action>(addr, this->get_gid(), gid, boost::forward<Arg0>(arg0));
+                hpx::applier::apply_c<Action>(addr, this->get_gid(), gid,
+                    boost::forward<Arg0>(arg0));
             }
         }
 
@@ -831,7 +838,8 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply(naming::id_type(gid, naming::id_type::unmanaged), boost::forward<Arg0>(arg0));
+            apply(naming::id_type(gid, naming::id_type::unmanaged),
+                boost::forward<Arg0>(arg0));
         }
         template <typename Arg0>
         eager_future(naming::id_type const& gid,
@@ -861,7 +869,8 @@ namespace hpx { namespace lcos
                         << ", "
                         << gid
                         << ") args(1)";
-            apply(naming::id_type(gid, naming::id_type::unmanaged), boost::forward<Arg0>(arg0));
+            apply(naming::id_type(gid, naming::id_type::unmanaged),
+                boost::forward<Arg0>(arg0));
         }
         template <typename Arg0>
         eager_future(naming::id_type const& gid,

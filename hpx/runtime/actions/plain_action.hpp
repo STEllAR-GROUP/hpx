@@ -199,18 +199,11 @@ namespace hpx { namespace actions
           : base_type(priority)
         {}
 
-        Result execute_function(naming::address::address_type lva) const {
-            LTM_(debug)
-                << "plain_result_action0::execute_function: name("
-                << detail::get_action_name<derived_type>()
-                << ")";
-            return F();
-        }
-
-        static Result execute_function_nonvirt(naming::address::address_type lva)
+        static Result 
+        execute_function(naming::address::address_type lva)
         {
             LTM_(debug)
-                << "plain_result_action0::execute_function_nonvirt: name("
+                << "plain_result_action0::execute_function: name("
                 << detail::get_action_name<derived_type>()
                 << ")";
             return F();
@@ -290,19 +283,11 @@ namespace hpx { namespace actions
     public:
         typedef boost::mpl::true_ direct_execution;
 
-        Result execute_function(naming::address::address_type lva) const
+        static Result 
+        execute_function(naming::address::address_type lva)
         {
             LTM_(debug)
                 << "plain_direct_result_action0::execute_function: name("
-                << detail::get_action_name<derived_type>()
-                << ")";
-            return F();
-        }
-
-        static Result execute_function_nonvirt(naming::address::address_type lva)
-        {
-            LTM_(debug)
-                << "plain_direct_result_action0::execute_function_nonvirt: name("
                 << detail::get_action_name<derived_type>()
                 << ")";
             return F();
@@ -497,22 +482,11 @@ namespace hpx { namespace actions
           : base_type(priority)
         {}
 
-        util::unused_type
-        execute_function(naming::address::address_type lva) const
+        static util::unused_type
+        execute_function(naming::address::address_type lva)
         {
             LTM_(debug)
                 << "plain_action0::execute_function: name("
-                << detail::get_action_name<derived_type>()
-                << ")";
-            F();
-            return util::unused;
-        }
-
-        static util::unused_type
-        execute_function_nonvirt(naming::address::address_type lva)
-        {
-            LTM_(debug)
-                << "plain_action0::execute_function_nonvirt: name("
                 << detail::get_action_name<derived_type>()
                 << ")";
             F();
@@ -594,22 +568,11 @@ namespace hpx { namespace actions
     public:
         typedef boost::mpl::true_ direct_execution;
 
-        util::unused_type
-        execute_function(naming::address::address_type lva) const
+        static util::unused_type
+        execute_function(naming::address::address_type lva)
         {
             LTM_(debug)
                 << "plain_base_action0::execute_function: name("
-                << detail::get_action_name<derived_type>()
-                << ")";
-            F();
-            return util::unused;
-        }
-
-        static util::unused_type
-        execute_function_nonvirt(naming::address::address_type lva)
-        {
-            LTM_(debug)
-                << "plain_base_action0::execute_function_nonvirt: name("
                 << detail::get_action_name<derived_type>()
                 << ")";
             F();

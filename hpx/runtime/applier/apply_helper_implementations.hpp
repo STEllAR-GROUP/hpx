@@ -86,7 +86,7 @@ namespace hpx { namespace applier { namespace detail
             threads::thread_priority priority,
             BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
-            Action::execute_function_nonvirt(lva,
+            Action::execute_function(lva,
                 BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
         }
 
@@ -97,7 +97,7 @@ namespace hpx { namespace applier { namespace detail
             BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
             try {
-                c->trigger(boost::move(Action::execute_function_nonvirt(
+                c->trigger(boost::move(Action::execute_function(
                     lva, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))));
             }
             catch (hpx::exception const& e) {

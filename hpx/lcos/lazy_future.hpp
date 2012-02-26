@@ -331,7 +331,7 @@ namespace hpx { namespace lcos
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<typename Action::component_type>()));
                 (*this->impl_)->set_data(0,
-                    Action::execute_function_nonvirt(addr.address_));
+                    Action::execute_function(addr.address_));
             }
             else {
                 // remote execution
@@ -411,7 +411,7 @@ namespace hpx { namespace lcos
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<typename Action::component_type>()));
                 (*this->impl_)->set_data(
-                    0, Action::execute_function_nonvirt(addr.address_, arg0));
+                    0, Action::execute_function(addr.address_, arg0));
             }
             else {
                 // remote execution

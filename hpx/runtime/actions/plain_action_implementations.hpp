@@ -252,25 +252,15 @@ namespace hpx { namespace actions
           : base_type(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
-        Result execute_function(
-            naming::address::address_type lva,
-            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)) const
+        static Result
+        execute_function(naming::address::address_type lva,
+            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T))
         {
             LTM_(debug)
                 << "plain_result_action" << N
                 << "::execute_function name("
                 << detail::get_action_name<derived_type>() << ")";
-            return F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
-        }
 
-        static Result execute_function_nonvirt(
-            naming::address::address_type lva,
-            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T))
-        {
-            LTM_(debug)
-                << "plain_result_action" << N
-                << "::execute_function_nonvirt name("
-                << detail::get_action_name<derived_type>() << ")";
             return F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
         }
 
@@ -371,25 +361,15 @@ namespace hpx { namespace actions
     public:
         typedef boost::mpl::true_ direct_execution;
 
-        Result execute_function(
-            naming::address::address_type lva,
-            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)) const
+        static Result
+        execute_function(naming::address::address_type lva,
+            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T))
         {
             LTM_(debug)
                 << "plain_direct_result_action" << N
                 << "::execute_function name("
                 << detail::get_action_name<derived_type>() << ")";
-            return F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
-        }
 
-        static Result execute_function_nonvirt(
-            naming::address::address_type lva,
-            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T))
-        {
-            LTM_(debug)
-                << "plain_direct_result_action" << N
-                << "::execute_function_nonvirt name("
-                << detail::get_action_name<derived_type>() << ")";
             return F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
         }
 
@@ -639,26 +619,15 @@ namespace hpx { namespace actions
           : base_type(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
-        util::unused_type execute_function(
-            naming::address::address_type lva,
-            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)) const
+        static util::unused_type
+        execute_function(naming::address::address_type lva,
+            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T))
         {
             LTM_(debug)
                 << "plain_action" << N
                 << "::execute_function name("
                 << detail::get_action_name<derived_type>() << ")";
-            F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
-            return util::unused;
-        }
 
-        static util::unused_type execute_function_nonvirt(
-            naming::address::address_type lva,
-            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T))
-        {
-            LTM_(debug)
-                << "plain_action" << N
-                << "::execute_function_nonvirt name("
-                << detail::get_action_name<derived_type>() << ")";
             F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
             return util::unused;
         }
@@ -759,26 +728,15 @@ namespace hpx { namespace actions
     public:
         typedef boost::mpl::true_ direct_execution;
 
-        util::unused_type execute_function(
-            naming::address::address_type lva,
-            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)
-        ) const {
+        static util::unused_type
+        execute_function(naming::address::address_type lva,
+            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T))
+        {
             LTM_(debug)
                 << "plain_base_action" << N
                 << "::execute_function name("
                 << detail::get_action_name<derived_type>() << ")";
-            F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
-            return util::unused;
-        }
 
-        static util::unused_type execute_function_nonvirt(
-            naming::address::address_type lva,
-            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)
-        ) {
-            LTM_(debug)
-                << "plain_base_action" << N
-                << "::execute_function_nonvirt name("
-                << detail::get_action_name<derived_type>() << ")";
             F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
             return util::unused;
         }

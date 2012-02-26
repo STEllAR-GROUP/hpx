@@ -57,8 +57,8 @@
         BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::applier::apply_c_p<Action>(
-            this->get_gid(), gid, priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+        hpx::applier::apply_c_p<Action>(this->get_gid(), gid, priority, 
+            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>

@@ -77,22 +77,8 @@ namespace hpx { namespace components { namespace server
         }
 
     public:
-        util::unused_type
-        execute_function(naming::address::address_type lva,
-            messages_type const& msgs)
-        {
-            try {
-                // call the function, ignoring the return value
-                console_logging(msgs);
-            }
-            catch (hpx::exception const& /*e*/) {
-                /**/;      // no logging!
-            }
-            return util::unused;
-        }
-
         static util::unused_type
-        execute_function_nonvirt(naming::address::address_type lva,
+        execute_function(naming::address::address_type lva,
             messages_type const& msgs)
         {
             try {

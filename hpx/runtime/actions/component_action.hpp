@@ -176,21 +176,15 @@ namespace hpx { namespace actions
           : base_type(priority)
         {}
 
-        Result execute_function(naming::address::address_type lva) const
+        static Result
+        execute_function(naming::address::address_type lva)
         {
-            LTM_(debug) << "result_action0::execute_function: name("
-                        << detail::get_action_name<derived_type>()
-                        << ") lva(" << reinterpret_cast<void const*>
-                            (get_lva<Component>::call(lva)) << ")";
-            return (get_lva<Component>::call(lva)->*F)();
-        }
+            LTM_(debug)
+                << "result_action0::execute_function: name("
+                << detail::get_action_name<derived_type>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component>::call(lva)) << ")";
 
-        static Result execute_function_nonvirt(naming::address::address_type lva)
-        {
-            LTM_(debug) << "result_action0::execute_function_nonvirt: name("
-                        << detail::get_action_name<derived_type>()
-                        << ") lva(" << reinterpret_cast<void const*>
-                            (get_lva<Component>::call(lva)) << ")";
             return (get_lva<Component>::call(lva)->*F)();
         }
 
@@ -271,19 +265,15 @@ namespace hpx { namespace actions
     public:
         typedef boost::mpl::true_ direct_execution;
 
-        Result execute_function(naming::address::address_type lva) const
+        static Result
+        execute_function(naming::address::address_type lva)
         {
-            LTM_(debug) << "direct_result_action0::execute_function: name("
-                        << detail::get_action_name<derived_type>()
-                        << ") lva(" << lva << ")";
-            return (get_lva<Component>::call(lva)->*F)();
-        }
+            LTM_(debug)
+                << "direct_result_action0::execute_function: name("
+                << detail::get_action_name<derived_type>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component>::call(lva)) << ")";
 
-        static Result execute_function_nonvirt(naming::address::address_type lva)
-        {
-            LTM_(debug) << "direct_result_action0::execute_function_nonvirt: name("
-                        << detail::get_action_name<derived_type>()
-                        << ") lva(" << lva << ")";
             return (get_lva<Component>::call(lva)->*F)();
         }
 
@@ -473,24 +463,15 @@ namespace hpx { namespace actions
           : base_type(priority)
         {}
 
-        util::unused_type
-        execute_function(naming::address::address_type lva) const
-        {
-            LTM_(debug) << "action0::execute_function: name("
-                        << detail::get_action_name<derived_type>()
-                        << ") lva(" << reinterpret_cast<void const*>
-                            (get_lva<Component>::call(lva)) << ")";
-            (get_lva<Component>::call(lva)->*F)();
-            return util::unused;
-        }
-
         static util::unused_type
-        execute_function_nonvirt(naming::address::address_type lva)
+        execute_function(naming::address::address_type lva)
         {
-            LTM_(debug) << "action0::execute_function_nonvirt: name("
-                        << detail::get_action_name<derived_type>()
-                        << ") lva(" << reinterpret_cast<void const*>
-                            (get_lva<Component>::call(lva)) << ")";
+            LTM_(debug)
+                << "action0::execute_function: name("
+                << detail::get_action_name<derived_type>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component>::call(lva)) << ")";
+
             (get_lva<Component>::call(lva)->*F)();
             return util::unused;
         }
@@ -569,24 +550,14 @@ namespace hpx { namespace actions
     public:
         typedef boost::mpl::true_ direct_execution;
 
-        util::unused_type
-        execute_function(naming::address::address_type lva) const
-        {
-            LTM_(debug) << "direct_action0::execute_function: name("
-                        << detail::get_action_name<derived_type>()
-                        << ") lva(" << reinterpret_cast<void const*>
-                            (get_lva<Component>::call(lva)) << ")";
-            (get_lva<Component>::call(lva)->*F)();
-            return util::unused;
-        }
-
         static util::unused_type
-        execute_function_nonvirt(naming::address::address_type lva)
+        execute_function(naming::address::address_type lva)
         {
-            LTM_(debug) << "direct_action0::execute_function_nonvirt: name("
-                        << detail::get_action_name<derived_type>()
-                        << ") lva(" << reinterpret_cast<void const*>
-                            (get_lva<Component>::call(lva)) << ")";
+            LTM_(debug)
+                << "direct_action0::execute_function: name("
+                << detail::get_action_name<derived_type>()
+                << ") lva(" << reinterpret_cast<void const*>(
+                    get_lva<Component>::call(lva)) << ")";
             (get_lva<Component>::call(lva)->*F)();
             return util::unused;
         }
