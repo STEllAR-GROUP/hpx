@@ -1,6 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //  Copyright (c) 2011-2012 Hartmut Kaiser
+//  Copyright (c) 2012 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -40,8 +41,6 @@ using hpx::find_here;
 
 using hpx::test::movable_object;
 using hpx::test::non_movable_object;
-// using hpx::test::movable_object;
-// using hpx::test::non_movable_object;
 
 ///////////////////////////////////////////////////////////////////////////////
 void pass_movable_object_void(movable_object const& obj) {}
@@ -202,7 +201,7 @@ int hpx_main(variables_map& vm)
                     eager_future<pass_non_movable_object_void_direct_action>, non_movable_object
                 >()
             ), 0u);
-            
+
             HPX_TEST_EQ((
                 move_object_void<
                     eager_future<pass_movable_object_void_action>, movable_object
@@ -224,7 +223,7 @@ int hpx_main(variables_map& vm)
                     eager_future<pass_non_movable_object_void_direct_action>, non_movable_object
                 >()
             ), 0u);
-            
+
             HPX_TEST_EQ((
                 pass_object_void<
                     dataflow<pass_movable_object_void_action>, movable_object
@@ -246,7 +245,7 @@ int hpx_main(variables_map& vm)
                     dataflow<pass_non_movable_object_void_direct_action>, non_movable_object
                 >()
             ), 0u);
-            
+
             HPX_TEST_EQ((
                 move_object_void<
                     dataflow<pass_movable_object_void_action>, movable_object
@@ -269,7 +268,7 @@ int hpx_main(variables_map& vm)
                     dataflow<pass_non_movable_object_void_direct_action>, non_movable_object
                 >()
             ), 0u);
-            
+
             HPX_TEST_EQ((
                 async_pass_object_void<
                     pass_movable_object_void_action, movable_object
@@ -291,7 +290,7 @@ int hpx_main(variables_map& vm)
                     pass_non_movable_object_void_direct_action, non_movable_object
                 >()
             ), 0u);
-            
+
             HPX_TEST_EQ((
                 async_move_object_void<
                     pass_movable_object_void_action, movable_object
@@ -334,7 +333,7 @@ int hpx_main(variables_map& vm)
         HPX_TEST_EQ((
             pass_object<eager_future<pass_non_movable_object_direct_action>, non_movable_object>(id)
         ), is_local ? 0u : 3u);
-        
+
         // test for movable object ('normal' actions)
         HPX_TEST_EQ((
             move_object<eager_future<pass_movable_object_action>, movable_object>(id)
@@ -374,7 +373,7 @@ int hpx_main(variables_map& vm)
         HPX_TEST_EQ((
             pass_object<dataflow<pass_non_movable_object_direct_action>, non_movable_object>(id)
         ), is_local ? 0u : 0u);
-        
+
         // test for movable object ('normal' actions)
         HPX_TEST_EQ((
             move_object<dataflow<pass_movable_object_action>, movable_object>(id)
@@ -414,7 +413,7 @@ int hpx_main(variables_map& vm)
         HPX_TEST_EQ((
             async_pass_object<pass_non_movable_object_direct_action, non_movable_object>(id)
         ), is_local ? 0u : 3u);
-        
+
         // test for movable object ('normal' actions)
         HPX_TEST_EQ((
             async_move_object<pass_movable_object_action, movable_object>(id)
