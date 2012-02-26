@@ -5,7 +5,7 @@
 
 hpx_write_boostbook_catalog(${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml)
 
-hpx_quickbook_to_html(guide
+hpx_quickbook_to_html(hpx
     SOURCE hpx.qbk
     DEPENDENCIES hpx.qbk preface.qbk whats_new.qbk introduction.qbk
     CATALOG ${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml
@@ -15,5 +15,5 @@ hpx_quickbook_to_html(guide
                   --stringparam toc.max.depth 3
                   --stringparam generate.section.toc.level 4)
 
-add_custom_target(docs DEPENDS guide_HTML.manifest)
+add_custom_target(docs DEPENDS hpx_HTML.manifest)
 

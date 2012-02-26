@@ -110,8 +110,9 @@ else()
       add_custom_command(OUTPUT ${name}.dbk
         COMMAND set XML_CATALOG_FILES=${${name}_CATALOG}
         COMMAND ${XSLTPROC_PROGRAM} ${${name}_XSLTPROC_ARGS}
+                "--stringparam" "admon.graphics.path" "images/"
                 "--stringparam" "boost.root" "${BOOST_ROOT}"
-                "--stringparam" "html.stylesheet" "${BOOST_ROOT}/doc/src/boostbook.css"
+                "--stringparam" "html.stylesheet" "../src/boostbook.css"
                 "--xinclude" "-o" ${name}.dbk
                 "--path" ${CMAKE_CURRENT_BINARY_DIR}
                 ${BOOSTBOOK_XSL_PATH}/docbook.xsl ${${name}_SOURCE}
@@ -121,8 +122,9 @@ else()
       add_custom_command(OUTPUT ${name}.dbk
         COMMAND "XML_CATALOG_FILES=${${name}_CATALOG}" ${XSLTPROC_PROGRAM}
                 ${${name}_XSLTPROC_ARGS}
+                "--stringparam" "admon.graphics.path" "images/"
                 "--stringparam" "boost.root" "${BOOST_ROOT}"
-                "--stringparam" "html.stylesheet" "${BOOST_ROOT}/doc/src/boostbook.css"
+                "--stringparam" "html.stylesheet" "../src/boostbook.css"
                 "--xinclude" "-o" ${name}.dbk
                 "--path" ${CMAKE_CURRENT_BINARY_DIR}
                 ${BOOSTBOOK_XSL_PATH}/docbook.xsl ${${name}_SOURCE}
@@ -143,10 +145,11 @@ else()
       add_custom_command(OUTPUT ${name}_HTML.manifest
         COMMAND set XML_CATALOG_FILES=${${name}_CATALOG}
         COMMAND ${XSLTPROC_PROGRAM} ${${name}_XSLTPROC_ARGS}
+                "--stringparam" "admon.graphics.path" "images/"
                 "--stringparam" "boost.root" "${BOOST_ROOT}"
-                "--stringparam" "html.stylesheet" "${BOOST_ROOT}/doc/src/boostbook.css"
+                "--stringparam" "html.stylesheet" "../src/boostbook.css"
                 "--stringparam" "manifest" "${name}_HTML.manifest"
-                "--xinclude" "-o" ${name}_html/
+                "--xinclude" "-o" ${hpx_SOURCE_DIR}/docs/html/${name}/
                 "--path" ${CMAKE_CURRENT_BINARY_DIR}
                 ${BOOSTBOOK_XSL_PATH}/html.xsl ${${name}_SOURCE}
         COMMENT "Generating HTML from ${${name}_SOURCE}."
@@ -155,10 +158,11 @@ else()
       add_custom_command(OUTPUT ${name}_HTML.manifest
         COMMAND "XML_CATALOG_FILES=${${name}_CATALOG}" ${XSLTPROC_PROGRAM}
                 ${${name}_XSLTPROC_ARGS}
+                "--stringparam" "admon.graphics.path" "images/"
                 "--stringparam" "boost.root" "${BOOST_ROOT}"
-                "--stringparam" "html.stylesheet" "${BOOST_ROOT}/doc/src/boostbook.css"
+                "--stringparam" "html.stylesheet" "../src/boostbook.css"
                 "--stringparam" "manifest" "${name}_HTML.manifest"
-                "--xinclude" "-o" ${name}_html/
+                "--xinclude" "-o" ${hpx_SOURCE_DIR}/docs/html/${name}/
                 "--path" ${CMAKE_CURRENT_BINARY_DIR}
                 ${BOOSTBOOK_XSL_PATH}/html.xsl ${${name}_SOURCE}
         COMMENT "Generating HTML from ${${name}_SOURCE}."
