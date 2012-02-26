@@ -149,7 +149,7 @@ else()
                 "--stringparam" "boost.root" "${BOOST_ROOT}"
                 "--stringparam" "html.stylesheet" "../src/boostbook.css"
                 "--stringparam" "manifest" "${name}_HTML.manifest"
-                "--xinclude" "-o" ${hpx_SOURCE_DIR}/docs/html/${name}/
+                "--xinclude" "-o" "file:///${hpx_SOURCE_DIR}/docs/html/${name}/"
                 "--path" ${CMAKE_CURRENT_BINARY_DIR}
                 ${BOOSTBOOK_XSL_PATH}/html.xsl ${${name}_SOURCE}
         COMMENT "Generating HTML from ${${name}_SOURCE}."
@@ -162,7 +162,7 @@ else()
                 "--stringparam" "boost.root" "${BOOST_ROOT}"
                 "--stringparam" "html.stylesheet" "../src/boostbook.css"
                 "--stringparam" "manifest" "${name}_HTML.manifest"
-                "--xinclude" "-o" ${hpx_SOURCE_DIR}/docs/html/${name}/
+                "--xinclude" "-o" "file:///${hpx_SOURCE_DIR}/docs/html/${name}/"
                 "--path" ${CMAKE_CURRENT_BINARY_DIR}
                 ${BOOSTBOOK_XSL_PATH}/html.xsl ${${name}_SOURCE}
         COMMENT "Generating HTML from ${${name}_SOURCE}."

@@ -7,4 +7,69 @@
 
 [section:whats_new What's New]
 
+[/////////////////////////////////////////////////////////////////////////////]
+[section:hpx_0_8_0 HPX V0.8.0]
+
+[endsect]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:hpx_0_7_0 HPX V0.7.0]
+
+We have had roughly 1000 commits since the last release, closed approximately
+120 tickets (bugs, feature requests, etc.).
+
+[heading General Changes]
+
+* Completely removed code related to deprecated AGAS V1, started to work on
+  AGAS V2.1
+* Started to clean up and streamline the exposed APIs (see 'API changes' below
+  for more details)
+* Revamped and unified performance counter framework, added a lot of new
+  performance counter instances for monitoring of a diverse set of internal
+  HPX parameters (queue lengths, access statistics, etc.)
+* Improved general error handling and logging support
+* Fixed several race conditions, improved overall stability, decreased memory
+  footprint, improved overall performance (major optimizations include native
+  TLS support and ranged-based AGAS caching)
+* Added support for running HPX applications with PBS
+* Many updates to the build system, added support for gcc 4.5.x and 4.6.x,
+  added C++11 support
+* Many updates to default command line options
+* Added many tests, set up buildbot for continuous integration testing
+* Better shutdown handling of distributed applications
+
+[heading Example Applications]
+
+* quickstart/factorial and quickstart/fibonacci, future-recursive parallel
+  algorithms
+* quickstart/hello_world, distributed hello world example
+* quickstart/rma, simple remote memory access example
+* quickstart/quicksort, parallel quicksort implementation
+* gtc, gyrokinetic torodial code
+* bfs, breadth-first-search, example code for a graph application
+* sheneos, partitioning of large data sets
+* accumulator, simple component example
+* balancing/os_thread_num, balancing/px_thread_phase, examples demonstrating
+  load balancing and work stealing
+
+[heading API Changes]
+
+* Added `hpx::find_all_localities`
+* Added `hpx::terminate` for non-graceful termination of applications
+* Added `hpx::lcos::async` functions for simpler asynchronous programming
+* Added new AGAS interface for handling of symbolic namespace (`hpx::agas::*`)
+* Renamed `hpx::components::wait` to `hpx::lcos::wait`
+* Renamed `hpx::lcos::future_value` to `hpx::lcos::promise`
+* Renamed `hpx::lcos::recursive_mutex` to `hpx::lcos::local_recursive_mutex`,
+  `hpx::lcos::mutex` to `hpx::lcos::local_mutex`
+* Removed support for Boost versions older than V1.38, recommended Boost version
+  is now V1.47 and newer
+* Removed `hpx::process` (this will be repalced by a real process implementation
+  in the future
+* Removed non-functional LCO code (`hpx::lcos::dataflow`, `hpx::lcos::thunk`,
+  `hpx::lcos::dataflow_variable`)
+* Removed deprecated `hpx::naming::full_address`
+
+[endsect]
+
 [endsect] [/ What's New]
