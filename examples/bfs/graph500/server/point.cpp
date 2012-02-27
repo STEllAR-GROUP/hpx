@@ -221,16 +221,21 @@ namespace graph500 { namespace server
 
     void point::resolve_conflict()
     {
-      // go through each particle on this component; if there are duplicates (i.e. the
-      // same particle is on a different component as well), communicate with those components
-      // to resolve the controversy over who is the real parent
-      typedef std::vector<hpx::lcos::promise< resolvedata > > lazy_results_type;
-      lazy_results_type lazy_results;
-      hpx::naming::id_type this_gid = get_gid(); 
-      for (int64_t i=0;i< (int64_t) duplicates_.size();i++) {
-        if ( duplicates_[i].size() > 1 && duplicates_[i][0] == this_gid ) {  
-          for (std::size_t j=1;j<duplicates_[i].size();j++) {
-            lazy_results.push_back( stubs::point::get_parent_async(duplicates_[i][j],i+minnode_) ); 
+      {
+        hpx::lcos::local_mutex::scoped_lock l(mtx_);
+        // go through each particle on this component; if there are duplicates (i.e. the
+        // same particle is on a different component as well), communicate with those components
+        // to resolve the controversy over who is the real parent
+        typedef std::vector<hpx::lcos::promise< resolvedata > > lazy_results_type;
+        lazy_results_type lazy_results;
+        hpx::naming::id_type this_gid = get_gid(); 
+        for (int64_t i=0;i< (int64_t) duplicates_.size();i++) {
+          if ( duplicates_[i].size() > 1 && duplicates_[i][0] == this_gid ) {  
+            for (std::size_t j=1;j<duplicates_[i].size();j++) {
+              hpx::naming::id_type id = duplicates_[i][j];
+              util::unlock_the_lock<hpx::lcos::local_mutex> ul(l);
+              lazy_results.push_back( stubs::point::get_parent_async(id,i+minnode_) ); 
+            }
           }
         }
       } 
