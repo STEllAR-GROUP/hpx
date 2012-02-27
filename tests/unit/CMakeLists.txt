@@ -9,6 +9,7 @@ set(subdirs
     components
     diagnostics
     lcos
+    performance_counters
     threads
     util
    )

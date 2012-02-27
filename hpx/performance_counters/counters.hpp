@@ -158,6 +158,13 @@ namespace hpx { namespace performance_counters
         counter_type_path_elements()
         {}
 
+        counter_type_path_elements(std::string const& objectname,
+                std::string const& countername, std::string const& parameters)
+          : objectname_(objectname),
+            countername_(countername),
+            parameters_(parameters)
+        {}
+
         std::string objectname_;          ///< the name of the performance object
         std::string countername_;         ///< contains the counter name
         std::string parameters_;          ///< optional parameters for the
@@ -193,6 +200,17 @@ namespace hpx { namespace performance_counters
             parentinstance_is_basename_(false)
         {}
 
+        counter_path_elements(std::string const& objectname,
+                std::string const& countername, std::string const& parameters,
+                std::string const& parentname, std::string const& instancename,
+                boost::int32_t parentindex = -1, boost::int32_t instanceindex = -1,
+                bool parentinstance_is_basename = false)
+          : counter_type_path_elements(objectname, countername, parameters),
+            parentinstancename_(parentname), parentinstanceindex_(parentindex),
+            instancename_(instancename), instanceindex_(instanceindex),
+            parentinstance_is_basename_(parentinstance_is_basename)
+        {}
+
         std::string parentinstancename_;  ///< the name of the parent instance
         std::string instancename_;        ///< the name of the object instance
         boost::int32_t parentinstanceindex_;    ///< the parent instance index
@@ -216,8 +234,16 @@ namespace hpx { namespace performance_counters
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a full name of a counter type from the contents of the
-    ///        given \a counter_type_path_elements instance.
-    HPX_API_EXPORT counter_status get_counter_name(
+    ///        given \a counter_type_path_elements instance.The generated
+    ///        counter type name will not contain any parameters.
+    HPX_API_EXPORT counter_status get_counter_type_name(
+        counter_type_path_elements const& path, std::string& result,
+        error_code& ec = throws);
+
+    /// \brief Create a full name of a counter type from the contents of the
+    ///        given \a counter_type_path_elements instance. The generated
+    ///        counter type name will contain all parameters.
+    HPX_API_EXPORT counter_status get_full_counter_type_name(
         counter_type_path_elements const& path, std::string& result,
         error_code& ec = throws);
 
@@ -229,7 +255,7 @@ namespace hpx { namespace performance_counters
 
     /// \brief Fill the given \a counter_type_path_elements instance from the
     ///        given full name of a counter type
-    HPX_API_EXPORT counter_status get_counter_path_elements(
+    HPX_API_EXPORT counter_status get_counter_type_path_elements(
         std::string const& name, counter_type_path_elements& path,
         error_code& ec = throws);
 

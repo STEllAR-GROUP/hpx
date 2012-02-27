@@ -106,11 +106,11 @@ namespace hpx { namespace performance_counters
         if (!path.countername_.empty()) {
             result += "/";
             result += path.countername_;
+        }
 
-            if (!path.parameters_.empty()) {
-                result += "#";
-                result += path.parameters_;
-            }
+        if (!path.parameters_.empty()) {
+            result += "#";
+            result += path.parameters_;
         }
 
         if (&ec != &throws)
@@ -160,74 +160,11 @@ namespace hpx { namespace performance_counters
         if (!path.countername_.empty()) {
             result += "/";
             result += path.countername_;
-
-            if (!path.parameters_.empty()) {
-                result += "#";
-                result += path.parameters_;
-            }
         }
 
-        if (&ec != &throws)
-            ec = make_success_code();
-        return status_valid_data;
-    }
-
-    /// \brief Fill the given \a counter_type_path_elements instance from the
-    ///        given full name of a counter
-    ///
-    ///    /objectname{...}/countername
-    ///    /objectname
-    ///
-    counter_status get_counter_path_elements(std::string const& name,
-        counter_type_path_elements& path, error_code& ec)
-    {
-        if (name.empty() || name[0] != '/') {
-            HPX_THROWS_IF(ec, bad_parameter, "get_counter_path_elements",
-                    "empty name parameter");
-            return status_invalid_data;
-        }
-
-        std::string::size_type pstart = 1;
-        if (name.find(counter_prefix) == 0)
-            pstart = sizeof(counter_prefix);
-
-        std::string::size_type p = name.find_first_of("{/", pstart + 1);
-        if (p == std::string::npos) {
-            HPX_THROWS_IF(ec, bad_parameter, "get_counter_path_elements",
-                    "expected delimiter: '{' or '/'");
-            return status_invalid_data;
-        }
-
-        // object name is the first part of the full name
-        path.objectname_ = name.substr(pstart, p-pstart);
-        if (path.objectname_.empty()) {
-            HPX_THROWS_IF(ec, bad_parameter, "get_counter_path_elements",
-                    "empty object name");
-            return status_invalid_data;
-        }
-
-        if (name[p] == '{') {
-            std::string::size_type p1 = name.find_last_of("}");
-            if (p1 == std::string::npos || p1 >= name.size()) {
-                HPX_THROWS_IF(ec, bad_parameter, "get_counter_path_elements",
-                        "mismatched parenthesis, expected: '}'");
-                return status_invalid_data;
-            }
-            p = p1+1;
-        }
-
-        // counter name is always the last part of the full name
-        std::string::size_type p1 = name.find_last_of("#");
-        if (p1 != std::string::npos) {
-            path.parameters_ = name.substr(p1+1);
-            p1 = p1 - p - 1;
-        }
-
-        path.countername_ = name.substr(p+1, p1);
-        if (path.countername_.empty()) {
-            HPX_THROWS_IF(ec, bad_parameter, "get_counter_path_elements",
-                    "empty counter name");
-            return status_invalid_data;
+        if (!path.parameters_.empty()) {
+            result += "#";
+            result += path.parameters_;
         }
 
         if (&ec != &throws)
@@ -296,7 +233,7 @@ namespace hpx { namespace performance_counters
           : path_parser::base_type(start)
         {
           start = -qi::lit(counter_prefix)
-                >> '/' >> +~qi::char_("{/") >> -instance
+                >> '/' >> +~qi::char_("/{#") >> -instance
                 >> -('/' >>  +~qi::char_("#}")) >> -('#' >> +qi::char_);
             instance = '{' >> parent >> -('/' >> child) >> '}';
             parent =
@@ -346,13 +283,45 @@ namespace hpx { namespace performance_counters
         return status_valid_data;
     }
 
+    /// \brief Fill the given \a counter_type_path_elements instance from the
+    ///        given full name of a counter
+    ///
+    ///    /objectname{...}/countername
+    ///    /objectname
+    ///
+    counter_status get_counter_type_path_elements(std::string const& name,
+        counter_type_path_elements& path, error_code& ec)
+    {
+        path_elements elements;
+        path_parser<std::string::const_iterator> p;
+
+        // parse the full name
+        std::string::const_iterator begin = name.begin();
+        if (!qi::parse(begin, name.end(), p, elements) || begin != name.end())
+        {
+            HPX_THROWS_IF(ec, bad_parameter, "get_counter_type_path_elements",
+                    "invalid counter name format");
+            return status_invalid_data;
+        }
+
+        // but extract only counter type elements
+        path.objectname_ = elements.object_;
+        path.countername_ = elements.counter_;
+        path.parameters_ = elements.parameters_;
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        return status_valid_data;
+    }
+
     /// \brief Return the counter type name from a given full instance name
     counter_status get_counter_type_name(std::string const& name,
         std::string& type_name, error_code& ec)
     {
         counter_type_path_elements p;
 
-        counter_status status = get_counter_path_elements(name, p, ec);
+        counter_status status = get_counter_type_path_elements(name, p, ec);
         if (!status_is_valid(status)) return status;
 
         return get_counter_type_name(p, type_name, ec);
