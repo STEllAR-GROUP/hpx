@@ -18,7 +18,7 @@ if(NOT BOOSTBOOK_ROOT)
   else()
     if($ENV{BOOST_ROOT})
       set(BOOSTBOOK_ROOT $ENV{BOOST_ROOT})
-    endif
+    endif()
   endif()
 endif()
 
