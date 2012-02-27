@@ -106,7 +106,7 @@ else()
       hpx_error("boostbook_to_docbook" "\${BOOST_ROOT} must be defined to generate HPX documentation")
     endif()
 
-    if(MSVC)
+    if(WIN32)
       add_custom_command(OUTPUT ${name}.dbk
         COMMAND set XML_CATALOG_FILES=${${name}_CATALOG}
         COMMAND ${XSLTPROC_PROGRAM} ${${name}_XSLTPROC_ARGS}
@@ -141,7 +141,7 @@ else()
       hpx_error("dockbook_to_html" "\${BOOST_ROOT} must be defined to generate HPX documentation")
     endif()
 
-    if(MSVC)
+    if(WIN32)
       add_custom_command(OUTPUT ${name}_HTML.manifest
         COMMAND set XML_CATALOG_FILES=${${name}_CATALOG}
         COMMAND ${XSLTPROC_PROGRAM} ${${name}_XSLTPROC_ARGS}
