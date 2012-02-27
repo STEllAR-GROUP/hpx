@@ -34,6 +34,7 @@ namespace hpx { namespace util
         bool stop();
 
         bool is_started() const { return is_started_; }
+        bool is_terminated() const { return is_terminated_; }
 
         std::size_t get_interval() const { return microsecs_; }
 
@@ -44,18 +45,22 @@ namespace hpx { namespace util
         threads::thread_state_enum
             evaluate(threads::thread_state_ex_enum statex);
 
+        void terminate();             // handle system shutdown
+        bool stop_locked();
+
     private:
         typedef lcos::local_spinlock mutex_type;
 
         mutable mutex_type mtx_;
-        HPX_STD_FUNCTION<void()> f_;   ///< function to call
+        HPX_STD_FUNCTION<void()> f_;  ///< function to call
         std::size_t microsecs_;       ///< time interval
         threads::thread_id_type id_;  ///< id of currently scheduled thread
         std::string description_;     ///< description of this interval timer
 
         bool pre_shutdown_;           ///< execute termination during pre-shutdown
-        bool is_started_;             ///< timer has been started
+        bool is_started_;             ///< timer has been started (is running)
         bool first_start_;            ///< flag to distinguish first invocation of start()
+        bool is_terminated_;          ///< The timer has been terminated
     };
 }}
 

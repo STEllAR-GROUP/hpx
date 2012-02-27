@@ -519,6 +519,13 @@ namespace hpx
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::
+        add_pre_startup_function(HPX_STD_FUNCTION<void()> const& f)
+    {
+        runtime_support_.add_pre_startup_function(f);
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    void runtime_impl<SchedulingPolicy, NotificationPolicy>::
         add_startup_function(HPX_STD_FUNCTION<void()> const& f)
     {
         runtime_support_.add_startup_function(f);

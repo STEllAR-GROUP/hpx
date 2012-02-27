@@ -83,12 +83,12 @@ inline void register_counter_types()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-inline void garbage_collect_non_blocking()
+void garbage_collect_non_blocking()
 {
     agas::garbage_collect_non_blocking();
 }
 
-inline void garbage_collect()
+void garbage_collect()
 {
     agas::garbage_collect();
 }
@@ -97,6 +97,8 @@ inline void garbage_collect()
 // Implements second and third stage bootstrapping.
 bool pre_main(runtime_mode mode)
 {
+    using components::stubs::runtime_support;
+
     naming::resolver_client& agas_client = naming::get_agas_client();
     util::runtime_configuration const& cfg = get_runtime().get_config();
 
@@ -114,13 +116,16 @@ bool pre_main(runtime_mode mode)
         LBT_(info) << "(2nd stage) pre_main: addressing services enabled";
 
         // Load components, so that we can use the barrier LCO.
-        exit_requested = !components::stubs::runtime_support::load_components(find_here());
+        exit_requested = !runtime_support::load_components(find_here());
         LBT_(info) << "(2nd stage) pre_main: loaded components"
             << (exit_requested ? ", application exit has been requested" : "");
 
         register_counter_types();
 
-        components::stubs::runtime_support::call_startup_functions(find_here());
+        runtime_support::call_startup_functions(find_here(), true);
+        LBT_(info) << "(3rd stage) pre_main: ran pre-startup functions";
+
+        runtime_support::call_startup_functions(find_here(), false);
         LBT_(info) << "(3rd stage) pre_main: ran startup functions";
     }
 
@@ -142,7 +147,7 @@ bool pre_main(runtime_mode mode)
         // }}}
 
         // Load components, so that we can use the barrier LCO.
-        exit_requested = !components::stubs::runtime_support::load_components(find_here());
+        exit_requested = !runtime_support::load_components(find_here());
         LBT_(info) << "(2nd stage) pre_main: loaded components"
             << (exit_requested ? ", application exit has been requested" : "");
 
@@ -184,12 +189,15 @@ bool pre_main(runtime_mode mode)
         LBT_(info) << "(2nd stage) pre_main: passed 2nd stage boot barrier";
 
         // Tear down the second stage barrier.
-        if (agas_client.is_bootstrap()) 
+        if (agas_client.is_bootstrap())
             agas::unregister_name(second_barrier);
 
         register_counter_types();
 
-        components::stubs::runtime_support::call_startup_functions(find_here());
+        runtime_support::call_startup_functions(find_here(), true);
+        LBT_(info) << "(3rd stage) pre_main: ran pre-startup functions";
+
+        runtime_support::call_startup_functions(find_here(), false);
         LBT_(info) << "(3rd stage) pre_main: ran startup functions";
 
         // Third stage bootstrap synchronizes startup functions across all
@@ -200,7 +208,7 @@ bool pre_main(runtime_mode mode)
         LBT_(info) << "(3rd stage) pre_main: passed 3rd stage boot barrier";
 
         // Tear down the second stage barrier.
-        if (agas_client.is_bootstrap()) 
+        if (agas_client.is_bootstrap())
             agas::unregister_name(third_barrier);
     }
 
@@ -220,7 +228,7 @@ bool pre_main(runtime_mode mode)
     {
         // If load_components returns false, shutdown the system. This
         // essentially only happens if the command line contained --exit.
-        components::stubs::runtime_support::shutdown_all(
+        runtime_support::shutdown_all(
             naming::get_id_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX), -1.0);
         return false;
     }

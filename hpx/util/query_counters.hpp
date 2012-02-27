@@ -14,6 +14,8 @@
 #include <string>
 #include <vector>
 
+#include <boost/cstdint.hpp>
+
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -29,6 +31,10 @@ namespace hpx { namespace util
     protected:
         void find_counters();
 
+        template <typename Stream>
+        void print_value(Stream& out, std::string const& name,
+            performance_counters::counter_value& value);
+
     private:
         typedef lcos::local_mutex mutex_type;
 
@@ -39,6 +45,7 @@ namespace hpx { namespace util
         std::string destination_;
 
         interval_timer timer_;
+        boost::uint64_t started_at_;
     };
 }}
 

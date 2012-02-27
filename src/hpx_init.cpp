@@ -323,8 +323,9 @@ namespace hpx
                 rt.add_pre_shutdown_function(
                     boost::bind(&util::query_counters::evaluate, qc));
 
-                if (0 != interval)
-                    rt.add_startup_function(boost::bind(&print_counters, qc));
+                // schedule to start all counters
+                rt.add_startup_function(
+                    boost::bind(&print_counters, qc));
             }
             else if (vm.count("hpx:print-counter-interval")) {
                 throw std::logic_error("Invalid command line option "

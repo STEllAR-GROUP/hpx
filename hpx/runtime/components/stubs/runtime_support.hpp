@@ -280,15 +280,15 @@ namespace hpx { namespace components { namespace stubs
         }
 
         static lcos::promise<void>
-        call_startup_functions_async(naming::id_type const& gid)
+        call_startup_functions_async(naming::id_type const& gid, bool pre_startup)
         {
             typedef server::runtime_support::call_startup_functions_action action_type;
-            return lcos::eager_future<action_type, void>(gid.get_gid());
+            return lcos::eager_future<action_type, void>(gid.get_gid(), pre_startup);
         }
 
-        static void call_startup_functions(naming::id_type const& gid)
+        static void call_startup_functions(naming::id_type const& gid, bool pre_startup)
         {
-            call_startup_functions_async(gid).get();
+            call_startup_functions_async(gid, pre_startup).get();
         }
 
         static lcos::promise<void>
@@ -453,7 +453,7 @@ namespace hpx { namespace components { namespace stubs
             return lcos::eager_future<action_type, naming::gid_type>(targetgid, info);
         }
 
-        static naming::gid_type 
+        static naming::gid_type
         create_performance_counter(naming::id_type targetgid,
             performance_counters::counter_info const& info)
         {

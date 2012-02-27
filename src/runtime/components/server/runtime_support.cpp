@@ -640,11 +640,19 @@ namespace hpx { namespace components { namespace server
             get_runtime().get_agas_client());
     }
 
-    void runtime_support::call_startup_functions()
+    void runtime_support::call_startup_functions(bool pre_startup)
     {
-        BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, startup_functions_)
-        {
-            f();
+        if (pre_startup) {
+            BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, pre_startup_functions_)
+            {
+                f();
+            }
+        }
+        else {
+            BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, startup_functions_)
+            {
+                f();
+            }
         }
     }
 
@@ -841,7 +849,7 @@ namespace hpx { namespace components { namespace server
 
             startup_function_type startup;
             if (startup_shutdown->get_startup_function(startup))
-                startup_functions_.push_back(startup);
+                pre_startup_functions_.push_back(startup);
 
             shutdown_function_type shutdown;
             if (startup_shutdown->get_shutdown_function(shutdown))

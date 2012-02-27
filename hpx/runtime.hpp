@@ -167,6 +167,8 @@ namespace hpx
 
         virtual util::unique_ids& get_id_pool() = 0;
 
+        virtual void add_pre_startup_function(HPX_STD_FUNCTION<void()> const& f) = 0;
+
         virtual void add_startup_function(HPX_STD_FUNCTION<void()> const& f) = 0;
 
         virtual void add_pre_shutdown_function(HPX_STD_FUNCTION<void()> const& f) = 0;
@@ -473,6 +475,20 @@ namespace hpx
         {
             return id_pool;
         }
+
+        /// Add a function to be executed inside a HPX thread before hpx_main
+        /// but guaranteed to be executed before any startup function registered
+        /// with \a add_startup_function.
+        ///
+        /// \param  f   The function 'f' will be called from inside a HPX
+        ///             thread before hpx_main is executed. This is very useful
+        ///             to setup the runtime environment of the application
+        ///             (install performance counters, etc.)
+        ///
+        /// \note       The difference to a startup function is that all
+        ///             pre-startup functions will be (system-wide) executed
+        ///             before any startup function.
+        void add_pre_startup_function(HPX_STD_FUNCTION<void()> const& f);
 
         /// Add a function to be executed inside a HPX thread before hpx_main
         ///

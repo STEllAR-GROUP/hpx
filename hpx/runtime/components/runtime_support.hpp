@@ -128,14 +128,14 @@ namespace hpx { namespace components
             return this->base_type::load_components(gid_);
         }
 
-        lcos::promise<void> call_startup_functions_async()
+        lcos::promise<void> call_startup_functions_async(bool pre_startup)
         {
-            return this->base_type::call_startup_functions_async(gid_);
+            return this->base_type::call_startup_functions_async(gid_, pre_startup);
         }
 
-        void call_startup_functions()
+        void call_startup_functions(bool pre_startup)
         {
-            this->base_type::call_startup_functions(gid_);
+            this->base_type::call_startup_functions(gid_, pre_startup);
         }
 
         lcos::promise<void> call_shutdown_functions_async(bool pre_shutdown)

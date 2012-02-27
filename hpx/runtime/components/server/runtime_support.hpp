@@ -252,7 +252,7 @@ namespace hpx { namespace components { namespace server
         /// \brief Load all components on this locality.
         bool load_components();
 
-        void call_startup_functions();
+        void call_startup_functions(bool pre_startup);
         void call_shutdown_functions(bool pre_shutdown);
 
         /// \brief Force a garbage collection operation in the AGAS layer.
@@ -296,8 +296,8 @@ namespace hpx { namespace components { namespace server
             &runtime_support::load_components
         > load_components_action;
 
-        typedef hpx::actions::action0<
-            runtime_support, runtime_support_call_startup_functions,
+        typedef hpx::actions::action1<
+            runtime_support, runtime_support_call_startup_functions, bool,
             &runtime_support::call_startup_functions
         > call_startup_functions_action;
 
@@ -383,6 +383,12 @@ namespace hpx { namespace components { namespace server
 
         bool was_stopped() const { return stopped_; }
 
+        void add_pre_startup_function(HPX_STD_FUNCTION<void()> const& f)
+        {
+            util::spinlock::scoped_lock l(globals_mtx_);
+            pre_startup_functions_.push_back(f);
+        }
+
         void add_startup_function(HPX_STD_FUNCTION<void()> const& f)
         {
             util::spinlock::scoped_lock l(globals_mtx_);
@@ -426,6 +432,7 @@ namespace hpx { namespace components { namespace server
         util::section& ini_;
 
         util::spinlock globals_mtx_;
+        std::list<HPX_STD_FUNCTION<void()> > pre_startup_functions_;
         std::list<HPX_STD_FUNCTION<void()> > startup_functions_;
         std::list<HPX_STD_FUNCTION<void()> > pre_shutdown_functions_;
         std::list<HPX_STD_FUNCTION<void()> > shutdown_functions_;
