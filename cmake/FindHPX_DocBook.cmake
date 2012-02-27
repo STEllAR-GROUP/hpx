@@ -24,9 +24,10 @@ endif()
 
 hpx_find_path(DOCBOOK_DTD
   FILES docbookx.dtd
-  FILE_PATHS share/xml/docbook/schema/dtd/4.2 docbook-dtd)
+  FILE_PATHS share/xml/docbook/schema/dtd/4.2 docbook-dtd share/sgml/docbook/xml-dtd-4.2)
 
 hpx_find_path(DOCBOOK_XSL
   FILES html/html.xsl # Do not move the html/ part into FILE_PATHS
-  FILE_PATHS share/xml/docbook/stylesheet/docbook-xsl docbook-xsl)
+        xhtml-1_1/html.xsl
+  FILE_PATHS share/xml/docbook/stylesheet/docbook-xsl docbook-xsl share/sgml/docbook/xsl-stylesheets)
 
