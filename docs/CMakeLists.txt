@@ -5,10 +5,12 @@
 
 hpx_write_boostbook_catalog(${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml)
 
+set(DOCUMENTATION_FILES
+    hpx.qbk preface.qbk whats_new.qbk introduction.qbk gettingstarted.qbk)
+
 hpx_quickbook_to_html(hpx
     SOURCE hpx.qbk
-    DEPENDENCIES hpx.qbk preface.qbk whats_new.qbk introduction.qbk
-                 gettingstarted.qbk
+    DEPENDENCIES ${DOCUMENTATION_FILES}
     CATALOG ${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml
     XSLTPROC_ARGS --stringparam chunk.section.depth 4
                   --stringparam chunk.first.sections 1
@@ -16,5 +18,12 @@ hpx_quickbook_to_html(hpx
                   --stringparam toc.max.depth 3
                   --stringparam generate.section.toc.level 4)
 
-add_custom_target(docs DEPENDS hpx_HTML.manifest)
+add_custom_target(docs
+    DEPENDS hpx_HTML.manifest
+    SOURCES ${DOCUMENTATION_FILES})
 
+source_group(Documentation
+    FILES ${DOCUMENTATION_FILES})
+
+set_source_files_properties(${DOCUMENTATION_FILES}
+    PROPERTIES HEADER_FILE_ONLY TRUE)
