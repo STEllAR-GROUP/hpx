@@ -206,8 +206,8 @@ namespace hpx { namespace performance_counters
                 boost::int32_t parentindex = -1, boost::int32_t instanceindex = -1,
                 bool parentinstance_is_basename = false)
           : counter_type_path_elements(objectname, countername, parameters),
-            parentinstancename_(parentname), parentinstanceindex_(parentindex),
-            instancename_(instancename), instanceindex_(instanceindex),
+            parentinstancename_(parentname), instancename_(instancename),
+            parentinstanceindex_(parentindex), instanceindex_(instanceindex),
             parentinstance_is_basename_(parentinstance_is_basename)
         {}
 
