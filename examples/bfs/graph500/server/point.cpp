@@ -41,6 +41,7 @@ namespace graph500 { namespace server
     void point::init(std::size_t objectid,std::size_t log_numverts,std::size_t number_partitions,
                      double overlap)
     {
+      hpx::lcos::local_mutex::scoped_lock l(mtx_);
       idx_ = objectid;
       // Spread the two 64-bit numbers into five nonzero values in the correct
       //  range.
@@ -138,6 +139,7 @@ namespace graph500 { namespace server
 
     void point::root(std::vector<int64_t> const& bfs_roots)
     {
+      hpx::lcos::local_mutex::scoped_lock l(mtx_);
       bfs_roots_ = bfs_roots;
 
       parent_.resize(N_,bfs_roots.size(),1);
@@ -175,6 +177,7 @@ namespace graph500 { namespace server
 
     void point::bfs()
     {
+      hpx::lcos::local_mutex::scoped_lock l(mtx_);
       for (std::size_t step=0;step<bfs_roots_.size();step++) {
         int64_t root_node = bfs_roots_[step];
 
@@ -206,6 +209,7 @@ namespace graph500 { namespace server
 
     bool point::resolve_conflict_callback(std::size_t j,resolvedata r)
     {
+      hpx::lcos::local_mutex::scoped_lock l(mtx_);
       // if there is a dispute about a parent, pick the edge with the lowest level
       for (std::size_t i=0;i<bfs_roots_.size();i++) {
         if ( r.level[i] != 0 && 
@@ -221,19 +225,19 @@ namespace graph500 { namespace server
 
     void point::resolve_conflict()
     {
+      typedef std::vector<hpx::lcos::promise< resolvedata > > lazy_results_type;
+      lazy_results_type lazy_results;
       {
         hpx::lcos::local_mutex::scoped_lock l(mtx_);
         // go through each particle on this component; if there are duplicates (i.e. the
         // same particle is on a different component as well), communicate with those components
         // to resolve the controversy over who is the real parent
-        typedef std::vector<hpx::lcos::promise< resolvedata > > lazy_results_type;
-        lazy_results_type lazy_results;
         hpx::naming::id_type this_gid = get_gid(); 
         for (int64_t i=0;i< (int64_t) duplicates_.size();i++) {
           if ( duplicates_[i].size() > 1 && duplicates_[i][0] == this_gid ) {  
             for (std::size_t j=1;j<duplicates_[i].size();j++) {
               hpx::naming::id_type id = duplicates_[i][j];
-              util::unlock_the_lock<hpx::lcos::local_mutex> ul(l);
+              hpx::util::unlock_the_lock<hpx::lcos::local_mutex::scoped_lock> ul(l);
               lazy_results.push_back( stubs::point::get_parent_async(id,i+minnode_) ); 
             }
           }
@@ -246,6 +250,7 @@ namespace graph500 { namespace server
 
     std::vector<int> point::distributed_validate(std::size_t scale)
     {
+      hpx::lcos::local_mutex::scoped_lock l(mtx_);
       // the parent of the root is always itself
       std::vector<int> rc;
       rc.resize(bfs_roots_.size());
@@ -342,6 +347,7 @@ namespace graph500 { namespace server
 
     bool point::get_numedges_callback(std::size_t j,resolvedata r)
     {
+      hpx::lcos::local_mutex::scoped_lock l(mtx_);
       // if there is a dispute about a parent, pick the edge with the lowest level
       for (std::size_t i=0;i<bfs_roots_.size();i++) {
         parent_(r.edge-minnode_,i,0).level = r.level[i];
@@ -352,38 +358,43 @@ namespace graph500 { namespace server
 
     std::vector<int64_t> point::get_numedges()
     {
-      // Get the number of edges for performance counting
-      std::vector<int64_t> num_edges;
-      num_edges.resize(bfs_roots_.size());
-      std::fill(num_edges.begin(),num_edges.end(),0);
-
-      for (std::size_t i=0;i<local_edges_.size();i++) {
-        std::size_t node = local_edges_[i].v0;
-        std::size_t neighbor = local_edges_[i].v1;
-        if ( node != neighbor ) {
-          nedge_bins_[node-minnode_] += 1;
-          nedge_bins_[neighbor-minnode_] += 1;
-        }
-      }
-
-      for (std::size_t step=0;step<bfs_roots_.size();step++) {
-        for (std::size_t i=0;i<nedge_bins_.size();i++) {
-          if ( parent_(i,step,0).parent > 0 ) {
-            num_edges[step] += nedge_bins_[i];
-          }
-        }
-        // Volume/2
-        num_edges[step] = num_edges[step]/2;
-      }
-
-      // This method also ensures the duplicate parent information is found
-      // on the first number_partitions components
       typedef std::vector<hpx::lcos::promise< resolvedata > > lazy_results_type;
       lazy_results_type lazy_results;
-      hpx::naming::id_type this_gid = get_gid();
-      for (int64_t i=0;i< (int64_t) duplicates_.size();i++) {
-        if ( duplicates_[i].size() > 1 && duplicates_[i][0] != this_gid ) {
-          lazy_results.push_back( stubs::point::get_parent_async(duplicates_[i][0],i+minnode_) );
+      std::vector<int64_t> num_edges;
+      {
+        hpx::lcos::local_mutex::scoped_lock l(mtx_);
+        // Get the number of edges for performance counting
+        num_edges.resize(bfs_roots_.size());
+        std::fill(num_edges.begin(),num_edges.end(),0);
+
+        for (std::size_t i=0;i<local_edges_.size();i++) {
+          std::size_t node = local_edges_[i].v0;
+          std::size_t neighbor = local_edges_[i].v1;
+          if ( node != neighbor ) {
+            nedge_bins_[node-minnode_] += 1;
+            nedge_bins_[neighbor-minnode_] += 1;
+          }
+        }
+
+        for (std::size_t step=0;step<bfs_roots_.size();step++) {
+          for (std::size_t i=0;i<nedge_bins_.size();i++) {
+            if ( parent_(i,step,0).parent > 0 ) {
+              num_edges[step] += nedge_bins_[i];
+            }
+          }
+          // Volume/2
+          num_edges[step] = num_edges[step]/2;
+        }
+
+        // This method also ensures the duplicate parent information is found
+        // on the first number_partitions components
+        hpx::naming::id_type this_gid = get_gid();
+        for (int64_t i=0;i< (int64_t) duplicates_.size();i++) {
+          if ( duplicates_[i].size() > 1 && duplicates_[i][0] != this_gid ) {
+            hpx::naming::id_type id = duplicates_[i][0];
+            hpx::util::unlock_the_lock<hpx::lcos::local_mutex::scoped_lock> ul(l);
+            lazy_results.push_back( stubs::point::get_parent_async(id,i+minnode_) );
+          }
         }
       }
       hpx::lcos::wait(lazy_results,
