@@ -55,10 +55,21 @@ namespace hpx { namespace lcos { namespace server { namespace detail
     template <
         typename Action
       , BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT(HPX_ACTION_ARGUMENT_LIMIT, typename A, void)
-      , typename Result = void
+      , typename Result = typename traits::promise_local_result<
+                typename Action::result_type>::type
       , typename Enable = void
     >
     struct dataflow_impl;
+
+#define HPX_RV_REF_ARGS(z, n, _)                                              \
+        BOOST_PP_COMMA_IF(n)                                                  \
+            BOOST_RV_REF(BOOST_PP_CAT(A, n)) BOOST_PP_CAT(a, n)              \
+    /**/
+
+#define HPX_FORWARD_ARGS(z, n, _)                                             \
+        BOOST_PP_COMMA_IF(n)                                                  \
+            boost::forward<BOOST_PP_CAT(A, n)>(BOOST_PP_CAT(a, n))            \
+    /**/
 
 #define BOOST_PP_ITERATION_PARAMS_1                                             \
     (                                                                           \
@@ -71,6 +82,9 @@ namespace hpx { namespace lcos { namespace server { namespace detail
     )                                                                           \
 /**/
 #include BOOST_PP_ITERATE()
+
+#undef HPX_FWD_ARGS
+#undef HPX_FORWARD_ARGS
 
 }}}}
 
@@ -207,6 +221,40 @@ namespace hpx { namespace traits
         {
         }
 
+#if N > 0
+        void init(BOOST_PP_REPEAT(N, HPX_RV_REF_ARGS, _))
+        {
+            LLCO_(info)
+                << "dataflow_impl<"
+                << hpx::actions::detail::get_action_name<Action>()
+                << ">::init(): "
+                << get_gid()
+                ;
+#define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
+            typedef                                                             \
+                component_wrapper<                                              \
+                    dataflow_slot<                                              \
+                        BOOST_PP_CAT(A, N)                                      \
+                      , N, wrapped_type                                         \
+                    >                                                           \
+                >                                                               \
+                BOOST_PP_CAT(component_type, N);                                \
+                                                                                \
+            BOOST_PP_CAT(component_type, N) * BOOST_PP_CAT(w, N)                \
+                = new BOOST_PP_CAT(component_type, N)(                          \
+                    this                                                        \
+                  , boost::move(BOOST_PP_CAT(a, N))                             \
+                );                                                              \
+                                                                                \
+            arg_ids[N] = BOOST_PP_CAT(w, N);                                    \
+            (*BOOST_PP_CAT(w, N))->connect();                                   \
+    /**/
+
+            BOOST_PP_REPEAT(N, HPX_LCOS_DATAFLOW_M0, _)
+#undef HPX_LCOS_DATAFLOW_M0
+        }
+#endif
+        
         void init(BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
         {
             LLCO_(info)
@@ -355,18 +403,12 @@ namespace hpx { namespace traits
         }
 
 #if N > 0
-        template <int Slot>
+        template <int Slot, typename T>
         typename boost::enable_if<
-            boost::mpl::has_key<slot_to_args_map, boost::mpl::int_<Slot> >
+            typename boost::mpl::has_key<slot_to_args_map, boost::mpl::int_<Slot> >::type
         >::type
         set_arg(
-            typename boost::fusion::result_of::at<
-                args_type
-              , typename boost::mpl::at<
-                    slot_to_args_map
-                  , boost::mpl::int_<Slot>
-                >::type
-            >::type value
+            BOOST_FWD_REF(T) value
         )
         {
             boost::fusion::at<
@@ -374,12 +416,15 @@ namespace hpx { namespace traits
                     slot_to_args_map
                   , boost::mpl::int_<Slot>
                 >::type
-            >(args) = value;
+            >(args) = boost::forward<T>(value);
             maybe_apply<Slot>();
         }
 
         template <int Slot>
-        void set_arg(hpx::util::unused_type)
+        typename boost::disable_if<
+            typename boost::mpl::has_key<slot_to_args_map, boost::mpl::int_<Slot> >::type
+        >::type
+        set_arg(hpx::util::unused_type)
         {
             maybe_apply<Slot>();
         }

@@ -39,7 +39,7 @@ namespace hpx { namespace lcos
             : impl(new detail::dataflow_base_impl(promise))
         {}
         
-        promise<Result, remote_result_type> get_sync() const
+        promise<Result, remote_result_type> get_async() const
         {
             promise<Result, remote_result_type> p;
             connect(p.get_gid());

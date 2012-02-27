@@ -88,7 +88,6 @@ hpx::lcos::dataflow_base<boost::uint64_t> fib(boost::uint64_t n)
     bool BOOST_PP_CAT(called_f, N) = false;                                   \
     void BOOST_PP_CAT(f, N)()                                                 \
     {                                                                         \
-        /*hpx::cout << BOOST_PP_STRINGIZE(BOOST_PP_CAT(f, N)) << "\n" << hpx::flush;*/\
         BOOST_PP_CAT(called_f, N) = true;                                     \
     }                                                                         \
     typedef hpx::actions::plain_action0<&BOOST_PP_CAT(f, N)>                  \
@@ -114,17 +113,18 @@ int hpx_main(variables_map & vm)
         // this as the target of the dataflow)
         HPX_TEST_EQ(18003, c.get());
 
-        //hpx::util::high_resolution_timer t;
-        boost::uint64_t r = fib(n).get();
-        //double time = t.elapsed();
-        //hpx::cout << "fib(" << n << ") = " << r << " calculated in "
-        //          << time << " seconds\n" << hpx::flush;
+        HPX_TEST_EQ(55u, fib(n).get());
 
-        HPX_TEST_EQ(55U, r);
+        HPX_TEST_EQ(n, hpx::lcos::dataflow<id_action>(here, n).get());
+        hpx::lcos::dataflow_base<boost::uint64_t> d = hpx::lcos::dataflow<id_action>(here, n);
+        HPX_TEST_EQ(n, d.get());
+
         HPX_TEST_EQ(9005, hpx::lcos::dataflow<h_action>(here, a, 4).get());
         HPX_TEST_EQ(9007, hpx::lcos::dataflow<h_action>(here, 5, b).get());
         HPX_TEST_EQ(9003, hpx::lcos::dataflow<g_action>(here,
             hpx::lcos::dataflow<trigger_action>(here)).get());
+        HPX_TEST(called_trigger);
+        called_trigger = false;
 
         std::vector<hpx::lcos::dataflow_base<void> > trigger;
         trigger.push_back(hpx::lcos::dataflow<f1action>(here));
@@ -138,7 +138,6 @@ int hpx_main(variables_map & vm)
 
         hpx::lcos::dataflow<f9action>(
             here, hpx::lcos::dataflow_trigger(here, trigger)).get();
-        HPX_TEST(called_trigger);
         HPX_TEST(called_f1);
         HPX_TEST(called_f2);
         HPX_TEST(called_f3);

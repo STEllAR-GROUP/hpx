@@ -21,11 +21,19 @@ namespace hpx { namespace lcos { namespace server { namespace detail
         typedef T result_type;
         typedef T remote_result;
 
+        /*
+        dataflow_slot(SinkAction * back, BOOST_RV_REF(T) t)
+            : back_ptr_(0)
+            , back(back)
+            , t(boost::move(t))
+        {}
+        */
+
         dataflow_slot(SinkAction * back, T const & t)
             : back_ptr_(0)
-        {
-            back->template set_arg<Slot>(t);
-        }
+            , back(back)
+            , t(t)
+        {}
 
         void set_result(remote_result const & r)
         {
@@ -34,6 +42,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
 
         void connect()
         {
+            back->template set_arg<Slot>(boost::move(t));
         }
 
         void set_event()
@@ -73,6 +82,8 @@ namespace hpx { namespace lcos { namespace server { namespace detail
         }
 
         components::managed_component<dataflow_slot>* back_ptr_;
+        SinkAction *back;
+        T t;
     };
 
     template <typename T, int Slot, typename SinkAction>

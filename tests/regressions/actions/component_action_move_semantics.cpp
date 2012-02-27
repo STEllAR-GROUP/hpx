@@ -44,14 +44,14 @@ int hpx_main(boost::program_options::variables_map& vm)
             pass_object<
                 action_move_semantics::test_movable_action, movable_object
             >(id)
-        ), is_local ? 1 : 2);
+        ), is_local ? 1u : 2u);
 
         // test for movable object (direct actions)
         HPX_TEST_EQ((
             pass_object<
                 action_move_semantics::test_movable_direct_action, movable_object
             >(id)
-        ), is_local ? 0 : 2);
+        ), is_local ? 0u : 2u);
 
         // FIXME: Can we get down to one copy for non-movable objects as well?
 
@@ -60,14 +60,14 @@ int hpx_main(boost::program_options::variables_map& vm)
             pass_object<
                 action_move_semantics::test_non_movable_action, non_movable_object
             >(id)
-        ), is_local ? 2 : 3);
+        ), is_local ? 2u : 3u);
 
         // test for a non-movable object (direct actions)
         HPX_TEST_EQ((
             pass_object<
                 action_move_semantics::test_non_movable_direct_action, non_movable_object
             >(id)
-        ), is_local ? 0 : 3);
+        ), is_local ? 0u : 3u);
     }
 
     hpx::finalize();
