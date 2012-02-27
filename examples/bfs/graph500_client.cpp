@@ -297,7 +297,7 @@ int hpx_main(boost::program_options::variables_map &vm)
               }
             }
             for (std::size_t i=0;i<bfsvalidate.size();i++) {
-              if ( bfsvalidate[i] < 0 ) std::cerr << " Validate for " << i << " failed: " << bfsvalidate[i] << std::endl;
+              if ( bfsvalidate[i] < 0 ) std::cout << " Validate for " << i << " failed: " << bfsvalidate[i] << std::endl;
             }
 
           }
