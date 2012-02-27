@@ -16,7 +16,11 @@ hpx_quickbook_to_html(hpx
                   --stringparam chunk.first.sections 1
                   --stringparam toc.section.depth 3
                   --stringparam toc.max.depth 3
-                  --stringparam generate.section.toc.level 4)
+                  --stringparam generate.section.toc.level 4
+                  --stringparam boost.image.src images/hpx_0_8.png
+                  --stringparam boost.image.w 323
+                  --stringparam boost.image.h 68
+                  --stringparam boost.image.alt "HPX - High Performance ParalleX")
 
 add_custom_target(docs
     DEPENDS hpx_HTML.manifest

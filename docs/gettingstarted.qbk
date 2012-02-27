@@ -91,9 +91,9 @@ which should print `Hello HPX World!` end exit.
 [section:commandline Command Line Handling]
 
 The predefined command line options of any application using `hpx::init` are
-described below.
+described in the [link hpx.getting_started.commandline.commandline table below].
 
-[table:commandline
+[table:commandline Default HPX Command Line Options
     [[Option]                   [Description]]
     [[[*HPX options (allowed on command line only)]]]
     [[`--hpx:help`]             [print out program usage]]
