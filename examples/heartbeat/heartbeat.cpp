@@ -123,7 +123,8 @@ int monitor(std::string const& name, boost::uint64_t pause)
         hpx::threads::suspend(milliseconds(pause));
     }
 
-    hpx::agas::unregister_name(stop_flag_name, stop_flag.get_gid());
+    hpx::naming::id_type stop_id = stop_flag.get_gid();
+    hpx::agas::unregister_name(stop_flag_name, stop_id);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
