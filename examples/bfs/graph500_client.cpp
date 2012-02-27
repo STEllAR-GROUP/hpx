@@ -288,11 +288,18 @@ int hpx_main(boost::program_options::variables_map &vm)
             }
             hpx::lcos::wait(distributed_validate_phase,rc);
             // Check that everyone validated
+            std::vector<int> bfsvalidate;
+            bfsvalidate.resize(bfs_roots.size());
+            std::fill(bfsvalidate.begin(),bfsvalidate.end(),0);
             for (std::size_t i=0;i<rc.size();i++) {
               for (std::size_t j=0;j<rc[i].size();j++) {
-                if ( rc[i][j] < 0 ) std::cout << " Validation failed for " << j << " component " << i << " rc " << rc[i][j] << std::endl;     
+                if ( rc[i][j] < 0 ) bfsvalidate[j] = rc[i][j];
               }
             }
+            for (std::size_t i=0;i<bfsvalidate.size();i++) {
+              if ( bfsvalidate[i] < 0 ) std::cerr << " Validate for " << i << " failed: " << bfsvalidate[i] << std::endl;
+            }
+
           }
         }
 
