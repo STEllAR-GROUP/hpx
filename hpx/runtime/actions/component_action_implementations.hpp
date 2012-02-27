@@ -40,11 +40,11 @@
     /**/
 #define HPX_PARAM_TYPES(z, n, data)                                           \
         BOOST_PP_COMMA_IF(n)                                                  \
-        BOOST_PP_CAT(data, n) const&                                          \
+        BOOST_RV_REF(BOOST_PP_CAT(data, n))                                   \
         BOOST_PP_CAT(BOOST_PP_CAT(data, n), _)                                \
     /**/
 #define HPX_PARAM_ARGUMENT(z, n, data)                                        \
-        BOOST_PP_COMMA_IF(n) BOOST_PP_CAT(BOOST_PP_CAT(data, n), _)           \
+        BOOST_PP_COMMA_IF(n) boost::move(BOOST_PP_CAT(BOOST_PP_CAT(data, n), _))\
     /**/
 
 #define HPX_FWD_ARGS(z, n, _)                                                 \

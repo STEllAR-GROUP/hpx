@@ -41,7 +41,7 @@ namespace hpx { namespace lcos { namespace detail
     protected:
         typedef Result result_type;
         typedef boost::exception_ptr error_type;
-        typedef boost::variant<result_type, error_type> data_type;
+        //typedef boost::variant<result_type, error_type> data_type;
 
     public:
         // This is the component id. Every component needs to have an embedded
@@ -106,19 +106,21 @@ namespace hpx { namespace lcos { namespace detail
                 return Result();
             }
 
+
             // yields control if needed
-            data_type d;
+            result_type d;
             data_[slot].read(d, ec);
             if (ec) return Result();
 
             // the thread has been re-activated by one of the actions
             // supported by this promise (see \a promise::set_event
             // and promise::set_error).
-            if (1 == d.which())
+            if (!error_[slot].is_empty())
             {
                 // an error has been reported in the meantime, throw or set
                 // the error code
-                error_type e = boost::get<error_type>(d);
+                error_type e;
+                error_[slot].read(e, ec);
                 if (&ec == &throws) {
                     // REVIEW: should HPX_RETHROW_EXCEPTION be used instead?
                     boost::rethrow_exception(e);
@@ -140,7 +142,7 @@ namespace hpx { namespace lcos { namespace detail
                 ec = make_success_code();
 
             // no error has been reported, return the result
-            return boost::get<result_type>(d);
+            return d;//boost::get<result_type>(d);
         }
 
         // helper functions for setting data (if successful) or the error (if
@@ -157,11 +159,12 @@ namespace hpx { namespace lcos { namespace detail
 
             try {
                 // store the value
-                data_[slot].set(data_type(
-                    traits::get_remote_result<Result, RemoteResult>::call(result)));
+                data_[slot].set(
+                    traits::get_remote_result<Result, RemoteResult>::call(result));
             }
             catch (hpx::exception const&) {
-                data_[slot].set(data_type(boost::current_exception()));
+                error_[slot].set(boost::current_exception());
+                data_[slot].set(result_type());
             }
         }
 
@@ -177,10 +180,11 @@ namespace hpx { namespace lcos { namespace detail
 
             try {
                 // store the value
-                data_[slot].set(data_type(result));
+                data_[slot].set(result);
             }
             catch (hpx::exception const&) {
-                data_[slot].set(data_type(boost::current_exception()));
+                error_[slot].set(boost::current_exception());
+                data_[slot].set(result_type());
             }
         }
 
@@ -195,7 +199,9 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             // store the error code
-            data_[slot].set(data_type(e));
+            error_[slot].set(e);
+            // store empty result
+            data_[slot].set(result_type());
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -241,7 +247,9 @@ namespace hpx { namespace lcos { namespace detail
             back_ptr_ = bp;
         }
 
-        util::full_empty<data_type> data_[N];
+        //util::full_empty<data_type> data_[N];
+        util::full_empty<result_type> data_[N];
+        util::full_empty<error_type> error_[N];
         components::managed_component<promise>* back_ptr_;
     };
 

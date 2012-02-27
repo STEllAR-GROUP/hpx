@@ -17,6 +17,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
 #include <boost/aligned_storage.hpp>
+#include <boost/move/move.hpp>
 #include <boost/type_traits/alignment_of.hpp>
 #include <boost/type_traits/add_pointer.hpp>
 #include <boost/intrusive/slist.hpp>
@@ -127,10 +128,10 @@ namespace hpx { namespace util { namespace detail
         }
 
         template <typename T0>
-        explicit full_empty_entry(T0 const& t0)
+        explicit full_empty_entry(BOOST_FWD_REF(T0) t0)
           : state_(empty)
         {
-            ::new (get_address()) Data(t0);    // properly initialize memory
+            ::new (get_address()) Data(boost::forward<T0>(t0));    // properly initialize memory
 
             lcos::local_spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
             ++full_empty_counter_data_.constructed_;
@@ -423,7 +424,7 @@ namespace hpx { namespace util { namespace detail
         ///////////////////////////////////////////////////////////////////////
         // enqueue if entry is full, otherwise fill it
         template <typename T>
-        void enqueue_if_full(T const& src, error_code& ec = throws)
+        void enqueue_if_full(BOOST_FWD_REF(T) src, error_code& ec = throws)
         {
             threads::thread_self* self = threads::get_self_ptr_checked(ec);
             if (ec) return;
@@ -472,7 +473,7 @@ namespace hpx { namespace util { namespace detail
 
             // set the data
             if (get_address() != &src)
-                *get_address() = src;
+                *get_address() = boost::forward<T>(src);
 
             // make sure the entry is full
             set_full_locked();    // state_ = full
@@ -538,13 +539,13 @@ namespace hpx { namespace util { namespace detail
         ///////////////////////////////////////////////////////////////////////
         // unconditionally set the data and set the entry to full
         template <typename T>
-        void set_and_fill(T const& src)
+        void set_and_fill(BOOST_FWD_REF(T) src)
         {
             mutex_type::scoped_lock l(mtx_);
 
             // set the data
             if (get_address() != &src)
-                *get_address() = src;
+                *get_address() = boost::forward<T>(src);
 
             // make sure the entry is full
             set_full_locked();    // state_ = full
