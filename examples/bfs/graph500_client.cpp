@@ -386,7 +386,7 @@ int main(int argc, char* argv[])
             "the scale of the graph problem size assuming edge factor 16")
         ("validator", value<bool>()->default_value(false),
             "whether to run the validation (slow)")
-        ("overlap", value<double>()->default_value(1.3),
+        ("overlap", value<double>()->default_value(1.4),
             "overlap factor for additive Schwarz")
         ("schwarzdomains", value<std::size_t>()->default_value(30),
             "number of additive Schwarz domains");

@@ -204,11 +204,14 @@ namespace graph500 { namespace server
       }
     }
 
-    bool point::resolve_conflict_callback(std::size_t i,resolvedata r)
+    bool point::resolve_conflict_callback(std::size_t j,resolvedata r)
     {
       // if there is a dispute about a parent, pick the edge with the lowest level
       for (std::size_t i=0;i<bfs_roots_.size();i++) {
-        if ( r.level[i] != 0 && r.level[i] < parent_(r.edge-minnode_,i,0).level ) {
+        if ( r.level[i] != 0 && 
+             ( r.level[i] < parent_(r.edge-minnode_,i,0).level ||
+               parent_(r.edge-minnode_,i,0).level == 0 )
+           ) {
           parent_(r.edge-minnode_,i,0).level = r.level[i];
           parent_(r.edge-minnode_,i,0).parent = r.parent[i];
         }
@@ -271,8 +274,8 @@ namespace graph500 { namespace server
           // We have level 0 as the root_node also.  So change the level of any root
           // node to be 1
 
-          if ( node == root_node ) li[i] += 1;
-          if ( neighbor == root_node ) lj[i] += 1;
+          if ( node == root_node ) li[i] = 1;
+          if ( neighbor == root_node ) lj[i] = 1;
 
         }
  
@@ -294,6 +297,10 @@ namespace graph500 { namespace server
         for (std::size_t i=0;i<local_edges_.size();i++) {
           if ( !(neither_in[i] || both_in[i] ) ) {
             //std::cerr << " Validation step " << step << " failed " << -4 << std::endl;
+            //std::cerr << " li " << li[i] << " lj " << lj[i] << std::endl;
+            //std::cerr << " v0 " << local_edges_[i].v0 << " v1 " << local_edges_[i].v1 << " root " << root_node << std::endl;
+            //std::cerr << " duplicates v0 " << duplicates_[local_edges_[i].v0-minnode_].size() << std::endl;
+            //std::cerr << " duplicates v1 " << duplicates_[local_edges_[i].v1-minnode_].size() << std::endl;
             if ( rc[step] == 1 ) rc[step] = -4;
           }
         }
@@ -307,7 +314,7 @@ namespace graph500 { namespace server
           if ( abs( (int) (li[i] - lj[i]) ) <= 1 ) respects_tree_level[i] = true;
           else respects_tree_level[i] = false;
         }
- 
+
         // octave:
         // if any (not (neither_in | respects_tree_level)),
         //  out = -5;
@@ -315,6 +322,10 @@ namespace graph500 { namespace server
         for (std::size_t i=0;i<local_edges_.size();i++) {
           if ( !(neither_in[i] || respects_tree_level[i] ) ) {
             //std::cerr << " Validation step " << step << " failed " << -5 << std::endl;
+            //std::cerr << " li " << li[i] << " lj " << lj[i] << std::endl;
+            //std::cerr << " v0 " << local_edges_[i].v0 << " v1 " << local_edges_[i].v1 << " root " << root_node << std::endl;
+            //std::cerr << " duplicates v0 " << duplicates_[local_edges_[i].v0-minnode_].size() << std::endl;
+            //std::cerr << " duplicates v1 " << duplicates_[local_edges_[i].v1-minnode_].size() << std::endl;
             if ( rc[step] == 1 ) rc[step] = -5;
           }
         }
@@ -324,7 +335,7 @@ namespace graph500 { namespace server
       return rc;
     }
 
-    bool point::get_numedges_callback(std::size_t i,resolvedata r)
+    bool point::get_numedges_callback(std::size_t j,resolvedata r)
     {
       // if there is a dispute about a parent, pick the edge with the lowest level
       for (std::size_t i=0;i<bfs_roots_.size();i++) {
