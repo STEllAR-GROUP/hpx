@@ -61,8 +61,7 @@ portable_binary_iarchive::load_impl(boost::intmax_t & l, char maxsize)
         size = -size;
 
     if(size > maxsize) {
-        boost::serialization::throw_exception(
-            portable_binary_iarchive_exception());
+        BOOST_THROW_EXCEPTION(portable_binary_iarchive_exception());
     }
 
     char* cptr = reinterpret_cast<char *>(& l);
@@ -90,7 +89,7 @@ portable_binary_iarchive::load_override(boost::archive::class_name_type& t, int)
     cn.reserve(BOOST_SERIALIZATION_MAX_KEY_SIZE);
     load_override(cn, 0);
     if(cn.size() > (BOOST_SERIALIZATION_MAX_KEY_SIZE - 1)) {
-        boost::serialization::throw_exception(
+        BOOST_THROW_EXCEPTION(
             boost::archive::archive_exception(
                 boost::archive::archive_exception::invalid_class_name));
     }
@@ -108,7 +107,7 @@ void HPX_ALWAYS_EXPORT portable_binary_iarchive::init(unsigned int flags)
         std::string file_signature;
         *this >> file_signature;
         if (file_signature != boost::archive::BOOST_ARCHIVE_SIGNATURE()) {
-            boost::serialization::throw_exception(
+            BOOST_THROW_EXCEPTION(
                 boost::archive::archive_exception(
                     boost::archive::archive_exception::invalid_signature));
         }
@@ -120,7 +119,7 @@ void HPX_ALWAYS_EXPORT portable_binary_iarchive::init(unsigned int flags)
 
         // extra little .t is to get around borland quirk
         if (boost::archive::BOOST_ARCHIVE_VERSION() < input_library_version) {
-            boost::serialization::throw_exception(
+            BOOST_THROW_EXCEPTION(
                 boost::archive::archive_exception(
                     boost::archive::archive_exception::unsupported_version));
         }

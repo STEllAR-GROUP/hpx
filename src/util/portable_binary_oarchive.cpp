@@ -83,7 +83,7 @@ portable_binary_oarchive::save_impl(const boost::intmax_t l, const char maxsize)
 void HPX_ALWAYS_EXPORT portable_binary_oarchive::init(unsigned int flags)
 {
     if (m_flags == (endian_big | endian_little)) {
-        boost::serialization::throw_exception(
+        BOOST_THROW_EXCEPTION(
             portable_binary_oarchive_exception());
     }
 
