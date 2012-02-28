@@ -50,7 +50,7 @@ namespace hpx { namespace performance_counters
             error_code ec;
             get_counter_type_path_elements(type_name, p, ec);
             if (!ec)
-                it = countertypes_.find(p.objectname_);
+                it = countertypes_.find("/"+p.objectname_);
         }
         return it;
     }
