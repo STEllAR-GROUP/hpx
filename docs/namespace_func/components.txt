@@ -1,4 +1,4 @@
-Namespace: hpx::components
+Namespace: hpx::performance_counters
 
 API Component:                                  File:                                                           Comments:
 
@@ -25,7 +25,7 @@ stubs::distributing_factory                     hpx/components/stub/distributing
 stubs::remote_object                            hpx/components/remote_object/stubs/remote_object.hpp
 
 remote_object::ctor_fun<>                       hpx/components/remote_object/ctor_fun.hpp
-remote_object::dtor_fun<>                       
+remote_object::dtor_fun<>                       hpx/components/remote_object/new.hpp
 remote_object::invoke_apply_fun<>               hpx/components/remote_object/object.hpp
 remote_object::object<>                         hpx/components/remote_object/object.hpp
 
