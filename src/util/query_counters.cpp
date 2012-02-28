@@ -70,8 +70,8 @@ namespace hpx { namespace util
         }
 
         // this will invoke the evaluate function for the first time
-        timer_.start();
         started_at_ = hpx::performance_counters::high_resolution_clock::now();
+        timer_.start();
     }
 
     template <typename Stream>
