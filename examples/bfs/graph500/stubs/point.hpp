@@ -49,17 +49,19 @@ namespace graph500 { namespace stubs
         static hpx::lcos::promise<void>
         receive_duplicates_async(hpx::naming::id_type const& gid,
                                  int64_t j,
-                                 std::vector<hpx::naming::id_type> const& duplicate_components)
+                                 std::vector<hpx::naming::id_type> const& duplicate_components,
+                                 std::vector<std::size_t> const& duplicateid)
         {
             typedef server::point::receive_duplicates_action action_type;
-            return hpx::lcos::eager_future<action_type>(gid,j,duplicate_components);
+            return hpx::lcos::eager_future<action_type>(gid,j,duplicate_components,duplicateid);
         }
 
         static void receive_duplicates(hpx::naming::id_type const& gid,
                                        int64_t j,
-                                       std::vector<hpx::naming::id_type> const& duplicate_components)
+                                       std::vector<hpx::naming::id_type> const& duplicate_components,
+                                       std::vector<std::size_t> const& duplicateid)
         {
-            receive_duplicates_async(gid,j,duplicate_components).get();
+            receive_duplicates_async(gid,j,duplicate_components,duplicateid).get();
         }
 
         static hpx::lcos::promise<void>

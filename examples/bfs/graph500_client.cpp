@@ -48,15 +48,19 @@ bool whohasthisedge_callback(int64_t j,std::vector<bool> const& has_edge,
 {
   // let the components which have duplicates know about each other
   std::vector<hpx::naming::id_type> duplicate;
+  std::vector<std::size_t> duplicateid;
   for ( std::size_t i=0;i<has_edge.size();i++) {
-    if ( has_edge[i] == true ) duplicate.push_back(point_components[i]);
+    if ( has_edge[i] == true ) { 
+      duplicate.push_back(point_components[i]);
+      duplicateid.push_back(i);
+    }
   }
 
   std::vector<hpx::lcos::promise<void> > send_duplicates_phase;
   for (std::size_t i=0;i<duplicate.size();i++) {
     // j+1 since edge number 0 is a special number
     send_duplicates_phase.push_back(
-             graph500::stubs::point::receive_duplicates_async(duplicate[i],j+1,duplicate));
+             graph500::stubs::point::receive_duplicates_async(duplicate[i],j+1,duplicate,duplicateid));
   }
   hpx::lcos::wait(send_duplicates_phase);
 

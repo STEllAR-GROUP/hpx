@@ -144,6 +144,7 @@ namespace graph500 { namespace server
 
       parent_.resize(N_,bfs_roots.size(),1);
       duplicates_.resize(N_);
+      duplicatesid_.resize(N_);
       // initialize to 0 -- no edge is identified as 0
       for (std::size_t j=0;j<parent_.jsize();j++) {
         for (std::size_t i=0;i<parent_.isize();i++) {
@@ -154,10 +155,12 @@ namespace graph500 { namespace server
     }
 
     void point::receive_duplicates(int64_t j,
-                std::vector<hpx::naming::id_type> const& duplicate_components)
+                std::vector<hpx::naming::id_type> const& duplicate_components,
+                std::vector<std::size_t> const& duplicateid)
     {
       hpx::lcos::local_mutex::scoped_lock l(mtx_);
       duplicates_[j-minnode_] = duplicate_components;
+      duplicatesid_[j-minnode_] = duplicateid;
       return;
     }
 
@@ -210,6 +213,7 @@ namespace graph500 { namespace server
     bool point::resolve_conflict_callback(std::size_t j,resolvedata r)
     {
       hpx::lcos::local_mutex::scoped_lock l(mtx_);
+
       // if there is a dispute about a parent, pick the edge with the lowest level
       for (std::size_t i=0;i<bfs_roots_.size();i++) {
         if ( r.level[i] != 0 && 
@@ -232,9 +236,8 @@ namespace graph500 { namespace server
         // go through each particle on this component; if there are duplicates (i.e. the
         // same particle is on a different component as well), communicate with those components
         // to resolve the controversy over who is the real parent
-        hpx::naming::id_type this_gid = get_gid(); 
         for (int64_t i=0;i< (int64_t) duplicates_.size();i++) {
-          if ( duplicates_[i].size() > 1 && duplicates_[i][0] == this_gid ) {  
+          if ( duplicates_[i].size() > 1 && duplicatesid_[i][0] == idx_ ) {  
             for (std::size_t j=1;j<duplicates_[i].size();j++) {
               hpx::naming::id_type id = duplicates_[i][j];
               hpx::util::unlock_the_lock<hpx::lcos::local_mutex::scoped_lock> ul(l);
@@ -306,11 +309,11 @@ namespace graph500 { namespace server
         //end
         for (std::size_t i=0;i<local_edges_.size();i++) {
           if ( !(neither_in[i] || both_in[i] ) ) {
-            //std::cerr << " Validation step " << step << " failed " << -4 << std::endl;
-            //std::cerr << " li " << li[i] << " lj " << lj[i] << std::endl;
-            //std::cerr << " v0 " << local_edges_[i].v0 << " v1 " << local_edges_[i].v1 << " root " << root_node << std::endl;
-            //std::cerr << " duplicates v0 " << duplicates_[local_edges_[i].v0-minnode_].size() << std::endl;
-            //std::cerr << " duplicates v1 " << duplicates_[local_edges_[i].v1-minnode_].size() << std::endl;
+            std::cerr << " Validation step " << step << " failed " << -4 << std::endl;
+            std::cerr << " li " << li[i] << " lj " << lj[i] << std::endl;
+            std::cerr << " v0 " << local_edges_[i].v0 << " v1 " << local_edges_[i].v1 << " root " << root_node << std::endl;
+            std::cerr << " duplicates v0 " << duplicates_[local_edges_[i].v0-minnode_].size() << std::endl;
+            std::cerr << " duplicates v1 " << duplicates_[local_edges_[i].v1-minnode_].size() << std::endl;
             if ( rc[step] == 1 ) rc[step] = -4;
           }
         }
@@ -388,9 +391,8 @@ namespace graph500 { namespace server
 
         // This method also ensures the duplicate parent information is found
         // on the first number_partitions components
-        hpx::naming::id_type this_gid = get_gid();
         for (int64_t i=0;i< (int64_t) duplicates_.size();i++) {
-          if ( duplicates_[i].size() > 1 && duplicates_[i][0] != this_gid ) {
+          if ( duplicates_[i].size() > 1 && duplicatesid_[i][0] != idx_ ) {
             hpx::naming::id_type id = duplicates_[i][0];
             hpx::util::unlock_the_lock<hpx::lcos::local_mutex::scoped_lock> ul(l);
             lazy_results.push_back( stubs::point::get_parent_async(id,i+minnode_) );

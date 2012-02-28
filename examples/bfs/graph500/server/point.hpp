@@ -90,7 +90,8 @@ namespace graph500 { namespace server
         bool resolve_conflict_callback(std::size_t i,resolvedata r);
 
         void receive_duplicates(int64_t j,                
-                  std::vector<hpx::naming::id_type> const& duplicate_components);
+                  std::vector<hpx::naming::id_type> const& duplicate_components,
+                  std::vector<std::size_t> const& duplicateid);
 
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
@@ -135,7 +136,7 @@ namespace graph500 { namespace server
             &point::root
         > root_action;
 
-        typedef hpx::actions::action2<
+        typedef hpx::actions::action3<
             // Component server type.
             point,
             // Action code.
@@ -143,6 +144,7 @@ namespace graph500 { namespace server
             // Arguments of this action.
             int64_t,
             std::vector<hpx::naming::id_type> const&,
+            std::vector<std::size_t> const&,
             // Method bound to this action.
             &point::receive_duplicates
         > receive_duplicates_action;
@@ -225,6 +227,7 @@ namespace graph500 { namespace server
         std::vector< std::vector<int64_t> > neighbors_;
         bfsg::array<leveldata> parent_;
         std::vector< std::vector<hpx::naming::id_type> > duplicates_;
+        std::vector< std::vector<std::size_t> > duplicatesid_;
         int64_t minnode_;
         std::vector<packed_edge> local_edges_;
         std::vector<int64_t> nedge_bins_;
