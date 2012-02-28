@@ -156,7 +156,7 @@ else()
                 "--stringparam" "admon.graphics.path" "images/"
                 "--stringparam" "boost.root" "${BOOST_ROOT_FOR_DOCS}"
                 "--stringparam" "html.stylesheet" "boostbook.css"
-                "--stringparam" "manifest" "${DOCS_OUTPUT_DIR}/${name}_HTML.manifest"
+                "--stringparam" "manifest" "${CMAKE_CURRENT_BINARY_DIR}/${name}_HTML.manifest"
                 "--xinclude"
                 "-o" "${DOCS_OUTPUT_DIR}"
                 "--path" ${CMAKE_CURRENT_BINARY_DIR}
@@ -172,7 +172,7 @@ else()
                 "--stringparam" "admon.graphics.path" "images/"
                 "--stringparam" "boost.root" "${BOOST_ROOT_FOR_DOCS}"
                 "--stringparam" "html.stylesheet" "boostbook.css"
-                "--stringparam" "manifest" "${DOCS_OUTPUT_DIR}/${name}_HTML.manifest"
+                "--stringparam" "manifest" "${CMAKE_CURRENT_BINARY_DIR}/${name}_HTML.manifest"
                 "--xinclude"
                 "-o" "${DOCS_OUTPUT_DIR}"
                 "--path" ${CMAKE_CURRENT_BINARY_DIR}
