@@ -98,7 +98,7 @@ namespace hpx { namespace parcelset
         }
     }
 
-    threads::thread_state parcelhandler::decode_parcel(
+    threads::thread_state_enum parcelhandler::decode_parcel(
         boost::shared_ptr<std::vector<char> > const& parcel_data)
     {
         // protect from unhandled exceptions bubbling up into thread manager
@@ -107,10 +107,10 @@ namespace hpx { namespace parcelset
                 // create a special io stream on top of in_buffer_
                 typedef util::container_device<std::vector<char> > io_device_type;
                 boost::iostreams::stream<io_device_type> io(*parcel_data.get());
-    
+
                 // De-serialize the parcel data
                 hpx::util::portable_binary_iarchive archive(io);
-    
+
                 std::size_t parcel_count = 0;
                 archive >> parcel_count;
                 while(parcel_count-- != 0)
@@ -121,48 +121,52 @@ namespace hpx { namespace parcelset
                     parcels_->add_parcel(p);
                 }
             }
-            catch (hpx::exception const& e)
-            {
+            catch (hpx::exception const& e) {
                 LPT_(error)
                     << "decode_parcel: caught hpx::exception: "
                     << e.what();
                 hpx::report_error(boost::current_exception());
             }
-            catch (boost::system::system_error const& e)
-            {
+            catch (boost::archive::archive_exception const& e) {
+                // We have to repackage all exceptions thrown by the
+                // serialization library as otherwise we will loose the
+                // e.what() description of the problem.
+                boost::throw_exception(boost::enable_error_info(
+                    hpx::exception(serialization_error, e.what())));
+            }
+            catch (boost::system::system_error const& e) {
                 LPT_(error)
                     << "decode_parcel: caught boost::system::error: "
                     << e.what();
                 hpx::report_error(boost::current_exception());
             }
-            catch (boost::exception const& e)
-            {
+            catch (boost::exception const&) {
                 LPT_(error)
                     << "decode_parcel: caught boost::exception.";
                 hpx::report_error(boost::current_exception());
             }
-            catch (std::exception const& e)
-            {
+            catch (std::exception const& e) {
+                // We have to repackage all exceptions thrown by the
+                // serialization library as otherwise we will loose the
+                // e.what() description of the problem.
                 boost::throw_exception(boost::enable_error_info(
-                    hpx::exception(std_exception, e.what())));
+                    hpx::exception(serialization_error, e.what())));
             }
         }
-        catch (hpx::exception const& e)
-        {
+        catch (hpx::exception const& e) {
             LPT_(error)
                 << "decode_parcel: caught hpx::exception: "
                 << e.what();
             hpx::report_error(boost::current_exception());
         }
-        catch (...)
-        {
+        catch (...) {
             // Prevent exceptions from boiling up into the thread-manager.
             LPT_(error)
                 << "decode_parcel: caught unknown exception.";
             hpx::report_error(boost::current_exception());
         }
 
-        return threads::thread_state(threads::terminated);
+        return threads::terminated;
     }
 
     parcelhandler::parcelhandler(naming::resolver_client& resolver,

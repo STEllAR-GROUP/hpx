@@ -13,6 +13,7 @@
 
 #include <boost/iostreams/stream.hpp>
 #include <boost/archive/basic_binary_oarchive.hpp>
+#include <boost/format.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
@@ -43,13 +44,32 @@ namespace hpx { namespace parcelset
                 archive << p;
             }
         }
-        catch (std::exception const& e) {
-            hpx::util::osstream strm;
-            // TODO: add proper error report
-            strm << "parcelport: parcel serialization failed: " << e.what();
-            HPX_THROW_EXCEPTION(no_success,
+        catch (boost::archive::archive_exception const& e) {
+            // We have to repackage all exceptions thrown by the
+            // serialization library as otherwise we will loose the
+            // e.what() description of the problem.
+            HPX_RETHROW_EXCEPTION(serialization_error,
                 "parcelport_connection::set_parcel",
-                hpx::util::osstream_get_string(strm));
+                boost::str(boost::format(
+                    "parcelport: parcel serialization failed, caught "
+                    "boost::archive::archive_exception: %s") % e.what()));
+            return;
+        }
+        catch (boost::system::system_error const& e) {
+            HPX_RETHROW_EXCEPTION(serialization_error,
+                "parcelport_connection::set_parcel",
+                boost::str(boost::format(
+                    "parcelport: parcel serialization failed, caught "
+                    "boost::system::system_error: %d (%s)") %
+                        e.code().value() % e.code().message()));
+            return;
+        }
+        catch (std::exception const& e) {
+            HPX_RETHROW_EXCEPTION(serialization_error,
+                "parcelport_connection::set_parcel",
+                boost::str(boost::format(
+                    "parcelport: parcel serialization failed, caught "
+                    "std::exception: %s") % e.what()));
             return;
         }
 

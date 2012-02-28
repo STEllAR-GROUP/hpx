@@ -38,7 +38,7 @@ namespace hpx { namespace parcelset
             boost::shared_ptr<std::vector<char> > const& parcel_data,
             threads::thread_priority priority);
 
-        threads::thread_state decode_parcel(
+        threads::thread_state_enum decode_parcel(
             boost::shared_ptr<std::vector<char> > const& parcel_data);
 
         // make sure the parcel has been properly initialized
