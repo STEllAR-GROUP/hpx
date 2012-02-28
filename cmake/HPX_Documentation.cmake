@@ -112,9 +112,10 @@ else()
       add_custom_command(OUTPUT ${name}.dbk
         COMMAND set XML_CATALOG_FILES=${${name}_CATALOG}
         COMMAND ${XSLTPROC_PROGRAM} ${${name}_XSLTPROC_ARGS}
+                "--stringparam" "boost.graphics.root" "images/"
                 "--stringparam" "admon.graphics.path" "images/"
                 "--stringparam" "boost.root" "${BOOST_ROOT_FOR_DOCS}"
-                "--stringparam" "html.stylesheet" "../src/boostbook.css"
+                "--stringparam" "html.stylesheet" "src/boostbook.css"
                 "--xinclude" "-o" ${name}.dbk
                 "--path" ${CMAKE_CURRENT_BINARY_DIR}
                 ${BOOSTBOOK_XSL_PATH}/docbook.xsl ${${name}_SOURCE}
@@ -124,9 +125,10 @@ else()
       add_custom_command(OUTPUT ${name}.dbk
         COMMAND "XML_CATALOG_FILES=${${name}_CATALOG}" ${XSLTPROC_PROGRAM}
                 ${${name}_XSLTPROC_ARGS}
+                "--stringparam" "boost.graphics.root" "images/"
                 "--stringparam" "admon.graphics.path" "images/"
                 "--stringparam" "boost.root" "${BOOST_ROOT_FOR_DOCS}"
-                "--stringparam" "html.stylesheet" "../src/boostbook.css"
+                "--stringparam" "html.stylesheet" "src/boostbook.css"
                 "--xinclude" "-o" ${name}.dbk
                 "--path" ${CMAKE_CURRENT_BINARY_DIR}
                 ${BOOSTBOOK_XSL_PATH}/docbook.xsl ${${name}_SOURCE}
@@ -145,15 +147,19 @@ else()
       set(BOOST_ROOT_FOR_DOCS ${BOOST_ROOT})
     endif()
 
+    set(DOCS_OUTPUT_DIR "file:///${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/share/docs/html/${name}/")
+
     if(WIN32)
       add_custom_command(OUTPUT ${name}_HTML.manifest
         COMMAND set XML_CATALOG_FILES=${${name}_CATALOG}
         COMMAND ${XSLTPROC_PROGRAM} ${${name}_XSLTPROC_ARGS}
+                "--stringparam" "boost.graphics.root" "images/"
                 "--stringparam" "admon.graphics.path" "images/"
                 "--stringparam" "boost.root" "${BOOST_ROOT_FOR_DOCS}"
-                "--stringparam" "html.stylesheet" "../src/boostbook.css"
-                "--stringparam" "manifest" "${name}_HTML.manifest"
-                "--xinclude" "-o" "file:///${hpx_SOURCE_DIR}/docs/html/${name}/"
+                "--stringparam" "html.stylesheet" "src/boostbook.css"
+                "--stringparam" "manifest" "${CMAKE_CURRENT_BINARY_DIR}/${name}_HTML.manifest"
+                "--xinclude"
+                "-o" "${DOCS_OUTPUT_DIR}"
                 "--path" ${CMAKE_CURRENT_BINARY_DIR}
                 ${BOOSTBOOK_XSL_PATH}/html.xsl ${${name}_SOURCE}
         COMMENT "Generating HTML from ${${name}_SOURCE}."
@@ -162,11 +168,13 @@ else()
       add_custom_command(OUTPUT ${name}_HTML.manifest
         COMMAND "XML_CATALOG_FILES=${${name}_CATALOG}" ${XSLTPROC_PROGRAM}
                 ${${name}_XSLTPROC_ARGS}
+                "--stringparam" "boost.graphics.root" "images/"
                 "--stringparam" "admon.graphics.path" "images/"
                 "--stringparam" "boost.root" "${BOOST_ROOT_FOR_DOCS}"
-                "--stringparam" "html.stylesheet" "../src/boostbook.css"
-                "--stringparam" "manifest" "${name}_HTML.manifest"
-                "--xinclude" "-o" "file:///${hpx_SOURCE_DIR}/docs/html/${name}/"
+                "--stringparam" "html.stylesheet" "src/boostbook.css"
+                "--stringparam" "manifest" "${CMAKE_CURRENT_BINARY_DIR}/${name}_HTML.manifest"
+                "--xinclude"
+                "-o" "${DOCS_OUTPUT_DIR}"
                 "--path" ${CMAKE_CURRENT_BINARY_DIR}
                 ${BOOSTBOOK_XSL_PATH}/html.xsl ${${name}_SOURCE}
         COMMENT "Generating HTML from ${${name}_SOURCE}."

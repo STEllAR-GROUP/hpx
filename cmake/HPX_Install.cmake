@@ -22,17 +22,17 @@ macro(hpx_symlink source destination)
 endmacro()
 
 macro(hpx_executable_install name)
-    if(NOT HPX_NO_INSTALL)
+  if(NOT HPX_NO_INSTALL)
     hpx_parse_arguments(${name} "" "ESSENTIAL" ${ARGN})
-  
+
     set(optional "OPTIONAL")
-  
+
     if(${name}_ESSENTIAL)
       set(optional "")
     endif()
-  
+
     get_target_property(location ${name} LOCATION)
-  
+
     set(install_code
         "file(INSTALL FILES ${location}
               DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
@@ -52,10 +52,16 @@ macro(hpx_library_install lib)
     else()
       set(targets ${lib})
     endif()
-  
+
+    if(MSVC)
+      set(BINARY_DIR ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
+    else()
+      set(BINARY_DIR ${CMAKE_BINARY_DIR})
+    endif()
+
     foreach(target ${targets})
       set(install_code
-        "file(INSTALL FILES ${CMAKE_BINARY_DIR}/lib/hpx/${target}
+        "file(INSTALL FILES ${BINARY_DIR}/lib/hpx/${target}
               DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/hpx
               TYPE SHARED_LIBRARY
               OPTIONAL
@@ -69,8 +75,14 @@ endmacro()
 
 macro(hpx_archive_install lib)
   if(NOT HPX_NO_INSTALL)
+    if(MSVC)
+      set(BINARY_DIR ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
+    else()
+      set(BINARY_DIR ${CMAKE_BINARY_DIR})
+    endif()
+
     set(install_code
-      "file(INSTALL FILES ${CMAKE_BINARY_DIR}/lib/hpx/${lib}
+      "file(INSTALL FILES ${BINARY_DIR}/lib/hpx/${lib}
             DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/hpx
             OPTIONAL
             PERMISSIONS OWNER_READ OWNER_READ OWNER_READ

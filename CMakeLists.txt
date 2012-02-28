@@ -380,7 +380,7 @@ find_package(OpenMP)
 find_package(HPX_MPI)
 
 ################################################################################
-# Documentation toolchain (DocBook, BoostBook, QuickBook, xsltproc) 
+# Documentation toolchain (DocBook, BoostBook, QuickBook, xsltproc)
 ################################################################################
 hpx_include(Documentation)
 
@@ -1024,6 +1024,7 @@ if(HPX_BUILD_TOOLS)
 endif()
 
 if(HPX_DOCUMENTATION_GENERATION)
+  add_hpx_pseudo_target(docs)
   add_subdirectory(docs)
 endif()
 
@@ -1112,6 +1113,39 @@ if(NOT HPX_NO_INSTALL)
       DESTINATION include
       COMPONENT core
       FILES_MATCHING PATTERN "*.hpp"
+      PATTERN ".svn" EXCLUDE
+      PATTERN ".git" EXCLUDE)
+  endif()
+
+  if(HPX_DOCUMENTATION_GENERATION)
+    # install hpx documentation files
+    if(MSVC)
+      set(BINARY_DIR ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
+    else()
+      set(BINARY_DIR ${CMAKE_BINARY_DIR})
+    endif()
+
+    install(
+      DIRECTORY ${BINARY_DIR}/share/docs
+      DESTINATION ${CMAKE_INSTALL_PREFIX}/share/docs
+      COMPONENT docs
+      FILES_MATCHING PATTERN "*.html"
+      PATTERN ".svn" EXCLUDE
+      PATTERN ".git" EXCLUDE)
+
+    install(
+      DIRECTORY ${hpx_SOURCE_DIR}/docs/html/hpx/src
+      DESTINATION ${CMAKE_INSTALL_PREFIX}/share/docs/html/hpx/src
+      COMPONENT docs
+      FILES_MATCHING PATTERN "*.css"
+      PATTERN ".svn" EXCLUDE
+      PATTERN ".git" EXCLUDE)
+
+    install(
+      DIRECTORY ${hpx_SOURCE_DIR}/docs/html/hpx/images
+      DESTINATION ${CMAKE_INSTALL_PREFIX}/share/docs/html/hpx/images
+      COMPONENT docs
+      FILES_MATCHING PATTERN "*.png"
       PATTERN ".svn" EXCLUDE
       PATTERN ".git" EXCLUDE)
   endif()
