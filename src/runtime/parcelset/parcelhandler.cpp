@@ -103,41 +103,54 @@ namespace hpx { namespace parcelset
     {
         // protect from unhandled exceptions bubbling up into thread manager
         try {
-            // create a special io stream on top of in_buffer_
-            typedef util::container_device<std::vector<char> > io_device_type;
-            boost::iostreams::stream<io_device_type> io(*parcel_data.get());
-
-            // De-serialize the parcel data
-            hpx::util::portable_binary_iarchive archive(io);
-
-            std::size_t parcel_count = 0;
-            archive >> parcel_count;
-            while(parcel_count-- != 0)
+            try {
+                // create a special io stream on top of in_buffer_
+                typedef util::container_device<std::vector<char> > io_device_type;
+                boost::iostreams::stream<io_device_type> io(*parcel_data.get());
+    
+                // De-serialize the parcel data
+                hpx::util::portable_binary_iarchive archive(io);
+    
+                std::size_t parcel_count = 0;
+                archive >> parcel_count;
+                while(parcel_count-- != 0)
+                {
+                    // de-serialize parcel and add it to incoming parcel queue
+                    parcel p;
+                    archive >> p;
+                    parcels_->add_parcel(p);
+                }
+            }
+            catch (hpx::exception const& e)
             {
-                // de-serialize parcel and add it to incoming parcel queue
-                parcel p;
-                archive >> p;
-                parcels_->add_parcel(p);
+                LPT_(error)
+                    << "decode_parcel: caught hpx::exception: "
+                    << e.what();
+                hpx::report_error(boost::current_exception());
+            }
+            catch (boost::system::system_error const& e)
+            {
+                LPT_(error)
+                    << "decode_parcel: caught boost::system::error: "
+                    << e.what();
+                hpx::report_error(boost::current_exception());
+            }
+            catch (boost::exception const& e)
+            {
+                LPT_(error)
+                    << "decode_parcel: caught boost::exception.";
+                hpx::report_error(boost::current_exception());
+            }
+            catch (std::exception const& e)
+            {
+                boost::throw_exception(boost::enable_error_info(
+                    hpx::exception(std_exception, e.what())));
             }
         }
         catch (hpx::exception const& e)
         {
             LPT_(error)
                 << "decode_parcel: caught hpx::exception: "
-                << e.what();
-            hpx::report_error(boost::current_exception());
-        }
-        catch (boost::system::system_error const& e)
-        {
-            LPT_(error)
-                << "decode_parcel: caught boost::system::error: "
-                << e.what();
-            hpx::report_error(boost::current_exception());
-        }
-        catch (std::exception const& e)
-        {
-            LPT_(error)
-                << "decode_parcel: caught std::exception: "
                 << e.what();
             hpx::report_error(boost::current_exception());
         }

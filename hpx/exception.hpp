@@ -62,6 +62,7 @@ namespace hpx
         yield_aborted = 28,
         component_load_failure = 29,
         commandline_option_error = 30,
+        std_exception = 31,
         last_error
     };
 
@@ -98,6 +99,7 @@ namespace hpx
         "yield_aborted",
         "component_load_failure",
         "commandline_option_error",
+        "std_exception",
         ""
     };
 
@@ -229,7 +231,7 @@ namespace hpx
             BOOST_ASSERT(e >= success && e < last_error);
             LERR_(error) << "created exception: " << this->what();
         }
-        explicit exception(boost::system::system_error e)
+        explicit exception(boost::system::system_error const& e)
           : boost::system::system_error(e)
         {
             LERR_(error) << "created exception: " << this->what();
@@ -246,6 +248,7 @@ namespace hpx
             BOOST_ASSERT(e >= success && e < last_error);
             LERR_(error) << "created exception: " << this->what();
         }
+
         ~exception() throw()
         {
         }
@@ -265,102 +268,102 @@ namespace hpx
         }
     };
 
-    struct HPX_EXCEPTION_EXPORT std_exception : std::exception 
-    {
-      private:
-        std::string what_;
-
-      public:
-        explicit std_exception(std::string const& what)
-          : what_(what)
-        {}   
-
-        ~std_exception() throw() {}
-
-        const char* what() const throw()
-        {
-            return what_.c_str();
-        }
-    };
-
-    struct HPX_EXCEPTION_EXPORT bad_alloc : std::bad_alloc 
-    {
-      private:
-        std::string what_;
-
-      public:
-        explicit bad_alloc(std::string const& what)
-          : what_(what)
-        {}   
-
-        ~bad_alloc() throw() {}
-
-        const char* what() const throw()
-        {
-            return what_.c_str();
-        }
-    };
-
-    struct HPX_EXCEPTION_EXPORT bad_exception : std::bad_exception 
-    {
-      private:
-        std::string what_;
-
-      public:
-        explicit bad_exception(std::string const& what)
-          : what_(what)
-        {}   
-
-        ~bad_exception() throw() {}
-
-        const char* what() const throw()
-        {
-            return what_.c_str();
-        }
-    };
-
-#ifndef BOOST_NO_TYPEID
-    struct HPX_EXCEPTION_EXPORT bad_cast : std::bad_cast 
-    {
-      private:
-        std::string what_;
-
-      public:
-        explicit bad_cast(std::string const& what)
-          : what_(what)
-        {}   
-
-        ~bad_cast() throw() {}
-
-        const char* what() const throw()
-        {
-            return what_.c_str();
-        }
-    };
-
-    struct HPX_EXCEPTION_EXPORT bad_typeid : std::bad_typeid 
-    {
-      private:
-        std::string what_;
-
-      public:
-        explicit bad_typeid(std::string const& what)
-          : what_(what)
-        {}   
-
-        ~bad_typeid() throw() {}
-
-        const char* what() const throw()
-        {
-            return what_.c_str();
-        }
-    };
-#endif
-
-    ///////////////////////////////////////////////////////////////////////////
-    // types needed to add additional information to the thrown exceptions
     namespace detail
     {
+        struct HPX_EXCEPTION_EXPORT std_exception : std::exception 
+        {
+          private:
+            std::string what_;
+    
+          public:
+            explicit std_exception(std::string const& what)
+              : what_(what)
+            {}   
+    
+            ~std_exception() throw() {}
+    
+            const char* what() const throw()
+            {
+                return what_.c_str();
+            }
+        };
+    
+        struct HPX_EXCEPTION_EXPORT bad_alloc : std::bad_alloc 
+        {
+          private:
+            std::string what_;
+    
+          public:
+            explicit bad_alloc(std::string const& what)
+              : what_(what)
+            {}   
+    
+            ~bad_alloc() throw() {}
+    
+            const char* what() const throw()
+            {
+                return what_.c_str();
+            }
+        };
+    
+        struct HPX_EXCEPTION_EXPORT bad_exception : std::bad_exception 
+        {
+          private:
+            std::string what_;
+    
+          public:
+            explicit bad_exception(std::string const& what)
+              : what_(what)
+            {}   
+    
+            ~bad_exception() throw() {}
+    
+            const char* what() const throw()
+            {
+                return what_.c_str();
+            }
+        };
+    
+#ifndef BOOST_NO_TYPEID
+        struct HPX_EXCEPTION_EXPORT bad_cast : std::bad_cast 
+        {
+          private:
+            std::string what_;
+    
+          public:
+            explicit bad_cast(std::string const& what)
+              : what_(what)
+            {}   
+    
+            ~bad_cast() throw() {}
+    
+            const char* what() const throw()
+            {
+                return what_.c_str();
+            }
+        };
+    
+        struct HPX_EXCEPTION_EXPORT bad_typeid : std::bad_typeid 
+        {
+          private:
+            std::string what_;
+    
+          public:
+            explicit bad_typeid(std::string const& what)
+              : what_(what)
+            {}   
+    
+            ~bad_typeid() throw() {}
+    
+            const char* what() const throw()
+            {
+                return what_.c_str();
+            }
+        };
+#endif
+
+        ///////////////////////////////////////////////////////////////////////
+        // types needed to add additional information to the thrown exceptions
         struct tag_throw_locality {};
         struct tag_throw_hostname {};
         struct tag_throw_pid {};
