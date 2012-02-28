@@ -1142,8 +1142,8 @@ if(NOT HPX_NO_INSTALL)
       PATTERN ".git" EXCLUDE)
 
     install(
-      DIRECTORY ${hpx_SOURCE_DIR}/docs/html/images
-      DESTINATION ${CMAKE_INSTALL_PREFIX}/share/hpx/docs/html
+      DIRECTORY ${hpx_SOURCE_DIR}/docs/html/images/
+      DESTINATION ${CMAKE_INSTALL_PREFIX}/share/hpx/docs/html/images
       COMPONENT docs
       FILES_MATCHING PATTERN "*.png"
       PATTERN ".svn" EXCLUDE
