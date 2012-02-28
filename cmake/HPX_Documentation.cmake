@@ -92,8 +92,16 @@ else()
       set(input_path ${${name}_SOURCE})
     endif()
 
+    set(svn_revision_option "")
+    if(SVN_REVISION AND NOT ${SVN_REVISION} STREQUAL "")
+      set(svn_revision_option "-D__svn_revision__=${SVN_REVISION}")
+    endif()
+
     add_custom_command(OUTPUT ${name}.xml
-      COMMAND ${QUICKBOOK_PROGRAM} "--output-file=${name}.xml" ${input_path}
+      COMMAND ${QUICKBOOK_PROGRAM}
+          "--output-file=${name}.xml"
+          "${svn_revision_option}"
+          ${input_path}
       COMMENT "Generating BoostBook XML file ${name}.xml from ${${name}_SOURCE}."
       DEPENDS ${${name}_SOURCE} ${${name}_DEPENDENCIES})
   endmacro()

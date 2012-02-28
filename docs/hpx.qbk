@@ -39,6 +39,10 @@
 
 [/ CONTENT]
 
+This documentation is automatically generated for HPX __version__ (from SVN
+revision __svn_revision__) by the Boost QuickBook documentation tool. QuickBook
+can be found in the collection of __boost_tools__.
+
 [include preface.qbk]
 [include whats_new.qbk]
 [include gettingstarted.qbk]
