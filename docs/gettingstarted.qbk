@@ -39,9 +39,11 @@ described in detail in Boost's own __boost_getting_started__ document. It is
 often possible to download the Boost libraries using the package manager of
 your distribution, please refer to the corresponding documentation.
 
+[fixme Import the prereq tables from the old docs]
+
 [heading The HPX Distribution]
 
-[fixme Describe the directory layout of the HPX distibution here]
+[fixme Describe the directory layout of the HPX distribution here]
 
 [heading Installation]
 
@@ -82,7 +84,7 @@ To test the result, type:
 
     ./example
 
-which should print `Hello HPX World!` end exit.
+which should print `Hello HPX World!` and exit.
 
 [endsect] [/ How to Install HPX on Unix Variants]
 
@@ -96,10 +98,10 @@ described in the [link hpx.getting_started.commandline.commandline table below].
 [table:commandline Default HPX Command Line Options
     [[Option]                   [Description]]
     [[[*HPX options (allowed on command line only)]]]
-    [[`--hpx:help`]             [print out program usage]]
-    [[`--hpx:version`]          [print out HPX version and copyright information]]
-    [[`--hpx:options-file arg`] [specify a file containing command line options
-                                 (alternatively: @filepath)]]
+    [[`--hpx:help`, `--help` or `-h`]       [print out program usage]]
+    [[`--hpx:version`, `--version` or `-v`] [print out HPX version and copyright information]]
+    [[`--hpx:options-file arg`]             [specify a file containing command line options
+                                             (alternatively: @filepath)]]
 
     [[[*HPX options (additionally allowed in an options file)]]]
     [[`--hpx:worker`]           [run this instance in worker mode]]
