@@ -1134,9 +1134,12 @@ if(NOT HPX_NO_INSTALL)
       PATTERN ".git" EXCLUDE)
 
     install(
-      FILES ${hpx_SOURCE_DIR}/docs/html/boostbook.css
-      DESTINATION ${CMAKE_INSTALL_PREFIX}/share/hpx/docs/html
-      COMPONENT docs)
+      DIRECTORY ${hpx_SOURCE_DIR}/docs/html/src/
+      DESTINATION ${CMAKE_INSTALL_PREFIX}/share/hpx/docs/html/src
+      COMPONENT docs
+      FILES_MATCHING PATTERN "*.css"
+      PATTERN ".svn" EXCLUDE
+      PATTERN ".git" EXCLUDE)
 
     install(
       DIRECTORY ${hpx_SOURCE_DIR}/docs/html/images
