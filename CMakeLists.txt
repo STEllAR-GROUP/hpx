@@ -1119,14 +1119,14 @@ if(NOT HPX_NO_INSTALL)
   if(HPX_DOCUMENTATION_GENERATION)
     # install hpx documentation files
     if(MSVC)
-      set(BINARY_DIR ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
+      set(doc_dir ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
     else()
-      set(BINARY_DIR ${CMAKE_BINARY_DIR})
+      set(doc_dir ${CMAKE_BINARY_DIR})
     endif()
 
     install(
-      DIRECTORY ${BINARY_DIR}/share/docs
-      DESTINATION ${CMAKE_INSTALL_PREFIX}/share/docs
+      DIRECTORY ${doc_dir}/share/hpx/docs/html/
+      DESTINATION ${CMAKE_INSTALL_PREFIX}/share/hpx/docs/html
       COMPONENT docs
       OPTIONAL
       FILES_MATCHING PATTERN "*.html"
@@ -1134,16 +1134,13 @@ if(NOT HPX_NO_INSTALL)
       PATTERN ".git" EXCLUDE)
 
     install(
-      DIRECTORY ${hpx_SOURCE_DIR}/docs/html/hpx/src
-      DESTINATION ${CMAKE_INSTALL_PREFIX}/share/docs/html/hpx/src
-      COMPONENT docs
-      FILES_MATCHING PATTERN "*.css"
-      PATTERN ".svn" EXCLUDE
-      PATTERN ".git" EXCLUDE)
+      FILES ${hpx_SOURCE_DIR}/docs/html/boostbook.css
+      DESTINATION ${CMAKE_INSTALL_PREFIX}/share/hpx/docs/html
+      COMPONENT docs)
 
     install(
-      DIRECTORY ${hpx_SOURCE_DIR}/docs/html/hpx/images
-      DESTINATION ${CMAKE_INSTALL_PREFIX}/share/docs/html/hpx/images
+      DIRECTORY ${hpx_SOURCE_DIR}/docs/html/images
+      DESTINATION ${CMAKE_INSTALL_PREFIX}/share/hpx/docs/html
       COMPONENT docs
       FILES_MATCHING PATTERN "*.png"
       PATTERN ".svn" EXCLUDE
