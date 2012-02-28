@@ -27,6 +27,34 @@ namespace hpx { namespace performance_counters
       : agas_client_(agas_client)
     {}
 
+    registry::counter_type_map_type::iterator
+        registry::locate_counter_type(std::string const& type_name)
+    {
+        counter_type_map_type::iterator it = countertypes_.find(type_name);
+        if (it == countertypes_.end()) {
+            counter_path_elements p;
+            error_code ec;
+            get_counter_type_path_elements(type_name, p, ec);
+            if (!ec)
+                it = countertypes_.find(p.objectname_);
+        }
+        return it;
+    }
+
+    registry::counter_type_map_type::const_iterator
+        registry::locate_counter_type(std::string const& type_name) const
+    {
+        counter_type_map_type::const_iterator it = countertypes_.find(type_name);
+        if (it == countertypes_.end()) {
+            counter_path_elements p;
+            error_code ec;
+            get_counter_type_path_elements(type_name, p, ec);
+            if (!ec)
+                it = countertypes_.find(p.objectname_);
+        }
+        return it;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     counter_status registry::add_counter_type(counter_info const& info,
         HPX_STD_FUNCTION<create_counter_func> const& create_counter,
@@ -38,7 +66,7 @@ namespace hpx { namespace performance_counters
         counter_status status = get_counter_type_name(info.fullname_, type_name, ec);
         if (!status_is_valid(status)) return status;
 
-        counter_type_map_type::iterator it = countertypes_.find(type_name);
+        counter_type_map_type::iterator it = locate_counter_type(type_name);
         if (it != countertypes_.end()) {
             HPX_THROWS_IF(ec, bad_parameter, "registry::add_counter_type",
                 "counter type already defined");
@@ -92,7 +120,7 @@ namespace hpx { namespace performance_counters
         counter_status status = get_counter_type_name(info.fullname_, type_name, ec);
         if (!status_is_valid(status)) return status;
 
-        counter_type_map_type::const_iterator it = countertypes_.find(type_name);
+        counter_type_map_type::const_iterator it = locate_counter_type(type_name);
         if (it == countertypes_.end()) {
             HPX_THROWS_IF(ec, bad_parameter, "registry::get_counter_create_function",
                 "counter type is not defined");
@@ -122,7 +150,7 @@ namespace hpx { namespace performance_counters
         counter_status status = get_counter_type_name(info.fullname_, type_name, ec);
         if (!status_is_valid(status)) return status;
 
-        counter_type_map_type::const_iterator it = countertypes_.find(type_name);
+        counter_type_map_type::const_iterator it = locate_counter_type(type_name);
         if (it == countertypes_.end()) {
             HPX_THROWS_IF(ec, bad_parameter, "registry::get_counter_discovery_function",
                 "counter type is not defined");
@@ -151,7 +179,7 @@ namespace hpx { namespace performance_counters
         counter_status status = get_counter_type_name(info.fullname_, type_name, ec);
         if (!status_is_valid(status)) return status;
 
-        counter_type_map_type::iterator it = countertypes_.find(type_name);
+        counter_type_map_type::iterator it = locate_counter_type(type_name);
         if (it == countertypes_.end()) {
             HPX_THROWS_IF(ec, bad_parameter, "registry::remove_counter_type",
                 "counter type is not defined");
@@ -190,7 +218,7 @@ namespace hpx { namespace performance_counters
         counter_status status = get_counter_type_name(info.fullname_, type_name, ec);
         if (!status_is_valid(status)) return status;
 
-        counter_type_map_type::iterator it = countertypes_.find(type_name);
+        counter_type_map_type::iterator it = locate_counter_type(type_name);
         if (it == countertypes_.end()) {
             HPX_THROWS_IF(ec, bad_parameter, "registry::create_raw_counter",
                 boost::str(boost::format("unknown counter type %s") % type_name));
@@ -246,7 +274,7 @@ namespace hpx { namespace performance_counters
         counter_status status = get_counter_type_name(info.fullname_, type_name, ec);
         if (!status_is_valid(status)) return status;
 
-        counter_type_map_type::iterator it = countertypes_.find(type_name);
+        counter_type_map_type::iterator it = locate_counter_type(type_name);
         if (it == countertypes_.end()) {
             HPX_THROWS_IF(ec, bad_parameter, "registry::create_counter",
                 boost::str(boost::format("unknown counter type %s") % type_name));
@@ -309,7 +337,7 @@ namespace hpx { namespace performance_counters
         counter_status status = get_counter_type_name(info.fullname_, type_name, ec);
         if (!status_is_valid(status)) return status;
 
-        counter_type_map_type::iterator it = countertypes_.find(type_name);
+        counter_type_map_type::iterator it = locate_counter_type(type_name);
         if (it == countertypes_.end()) {
             HPX_THROWS_IF(ec, bad_parameter, "registry::create_aggregating_counter",
                 boost::str(boost::format("unknown counter type %s") % type_name));
@@ -405,7 +433,7 @@ namespace hpx { namespace performance_counters
         if (!status_is_valid(status)) return status;
 
         // make sure the type of the new counter is known to the registry
-        counter_type_map_type::iterator it = countertypes_.find(type_name);
+        counter_type_map_type::iterator it = locate_counter_type(type_name);
         if (it == countertypes_.end()) {
             HPX_THROWS_IF(ec, bad_parameter, "registry::add_counter",
                 boost::str(boost::format("unknown counter type %s") % type_name));
@@ -479,7 +507,7 @@ namespace hpx { namespace performance_counters
         if (!status_is_valid(status)) return status;
 
         // make sure the type of the counter is known to the registry
-        counter_type_map_type::iterator it = countertypes_.find(type_name);
+        counter_type_map_type::iterator it = locate_counter_type(type_name);
         if (it == countertypes_.end()) {
             HPX_THROWS_IF(ec, bad_parameter, "registry::get_counter_type",
                 boost::str(boost::format("unknown counter type %s") % type_name));

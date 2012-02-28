@@ -103,6 +103,12 @@ namespace hpx { namespace performance_counters
         counter_status get_counter_type(std::string const& name,
             counter_info& info, error_code& ec = throws);
 
+    protected:
+        counter_type_map_type::iterator
+            locate_counter_type(std::string const& type_name);
+        counter_type_map_type::const_iterator
+            locate_counter_type(std::string const& type_name) const;
+
     private:
         naming::resolver_client& agas_client_;
         counter_type_map_type countertypes_;
