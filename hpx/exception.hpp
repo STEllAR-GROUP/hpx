@@ -64,7 +64,7 @@ namespace hpx
         commandline_option_error = 30,
         serialization_error = 31,
         unhandled_exception = 32,
-        last_error
+        last_error,
 
         // force this enum type to be at least 16 bits.
         error_upper_bound = 0x7fffL
