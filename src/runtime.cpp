@@ -416,13 +416,12 @@ namespace hpx
         components::server::console_error_sink(e);
 
         // Report this error to the console.
-        naming::gid_type console_prefix;
-        if (agas_client_.get_console_locality(console_prefix))
+        naming::gid_type console_id;
+        if (agas_client_.get_console_locality(console_id))
         {
-            if (parcel_handler_.get_locality() != console_prefix) {
+            if (parcel_handler_.get_locality() != console_id) {
                 components::console_error_sink(
-                    naming::id_type(console_prefix, naming::id_type::unmanaged),
-                    e);
+                    naming::id_type(console_id, naming::id_type::unmanaged), e);
             }
         }
 
