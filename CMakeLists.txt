@@ -1024,7 +1024,6 @@ if(HPX_BUILD_TOOLS)
 endif()
 
 if(HPX_DOCUMENTATION_GENERATION)
-  add_hpx_pseudo_target(docs)
   add_subdirectory(docs)
 endif()
 
@@ -1129,6 +1128,7 @@ if(NOT HPX_NO_INSTALL)
       DIRECTORY ${BINARY_DIR}/share/docs
       DESTINATION ${CMAKE_INSTALL_PREFIX}/share/docs
       COMPONENT docs
+      OPTIONAL
       FILES_MATCHING PATTERN "*.html"
       PATTERN ".svn" EXCLUDE
       PATTERN ".git" EXCLUDE)
