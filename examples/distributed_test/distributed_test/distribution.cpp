@@ -80,22 +80,26 @@ namespace distributed
         client_data_type dd_vector;
         
         split_client_data(num_instances, data_received, dd_vector);
-        loc_itr = comp_instances_.begin();
-        result_future.resize(0);
+        //loc_itr = comp_instances_.begin();
+        //result_future.resize(0);
+        std::vector<hpx::lcos::promise<void> > result_future2;
         client_data_type::iterator dd_itr;
         dd_itr = dd_vector.begin();
         loc_itr = comp_instances_.begin();
         cardinality = 0;
         while(loc_itr != comp_instances_.end())
         {
-            result_future.push_back(stubs::datastructure::data_write_async(
+            BOOST_ASSERT(dd_itr <= dd_vector.end());
+            result_future2.push_back(stubs::datastructure::data_write_async(
                 *loc_itr, symbolic_name_base, num_comps, cardinality
                 , *dd_itr));
             ++cardinality;
-            ++dd_itr;
-            ++loc_itr;
+            if(dd_itr < dd_vector.end())
+                ++dd_itr;
+            if(loc_itr < comp_instances_.end())
+                ++loc_itr;
         }
-        hpx::lcos::wait(result_future);
+        hpx::lcos::wait(result_future2);
         //Create component object locally. 
         comp_created_ = true;
     }

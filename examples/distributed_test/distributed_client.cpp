@@ -30,7 +30,7 @@ int hpx_main(variables_map& vm)
         else
             temp_data.push_back(0);
     }
-    std::vector<hpx::naming::id_type> prefixes = hpx::find_all_localities();
+    //std::vector<hpx::naming::id_type> prefixes = hpx::find_all_localities();
     distrib.create(distrib_symbolic_name, num_instances, temp_data);
     //------------------------
     hpx::finalize();

@@ -87,7 +87,7 @@ namespace distributed { namespace server
 
         typedef hpx::actions::result_action0<
         datastructure const
-        , config_comp
+        , distributed::config_comp
         , datastructure_config_get
         , &datastructure::get_config_info
         > get_config_action;

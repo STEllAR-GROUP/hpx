@@ -74,6 +74,9 @@ namespace distributed { namespace server
         if(data_.size() != client_data.size())
             data_.resize(client_data.size());
         data_ = client_data;
+        for (data_type::iterator itr = data_.begin(); itr != data_.end(); ++itr)
+            std::cout << "Data:" << *itr << std::endl;
+        std::cout<< "Write Data Part for component:" << my_cardinality << std::endl;
     }
 
     distributed::config_comp datastructure::get_config_info() const
@@ -139,13 +142,13 @@ HPX_REGISTER_ACTION_EX(distributed::server::datastructure::get_data_action,
     distributed_datastructure_get_data_action);
 HPX_REGISTER_ACTION_EX(distributed::server::datastructure::get_data_at_action,
     distributed_datastructure_get_data_at_action);
-
+    
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<datastructure_type>,
     distributed_datastructure_type);
 HPX_DEFINE_GET_COMPONENT_TYPE(datastructure_type);
 
-//what doesthis do?
+
 /*HPX_REGISTER_ACTION_EX(
     hpx::lcos::base_lco_with_value<distributed::config_comp>::set_result_action, 
     set_result_action_distributed_config_comp);
