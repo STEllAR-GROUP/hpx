@@ -356,7 +356,7 @@ namespace hpx { namespace threads
 
         // nothing to do here if the state doesn't change
         if (new_state == previous_state_val) {
-            LTM_(fatal) << "set_state: old thread state is the same as new "
+            LTM_(warning) << "set_state: old thread state is the same as new "
                            "thread state, aborting state change, thread("
                         << id << "), description("
                         << thrd->get_description() << "), new state("
@@ -373,7 +373,7 @@ namespace hpx { namespace threads
         if (active == previous_state_val)
         {
             // schedule a new thread to set the state
-            LTM_(fatal) << "set_state: thread is currently active, scheduling "
+            LTM_(warning) << "set_state: thread is currently active, scheduling "
                            "new thread, thread(" << id << "), description("
                         << thrd->get_description() << "), new state("
                         << get_thread_state_name(new_state) << ")";
@@ -390,7 +390,7 @@ namespace hpx { namespace threads
             return previous_state;     // done
         }
         else if (terminated == previous_state_val) {
-            LTM_(fatal) << "set_state: thread is terminated, aborting state "
+            LTM_(warning) << "set_state: thread is terminated, aborting state "
                            "change, thread(" << id << "), description("
                         << thrd->get_description() << "), new state("
                         << get_thread_state_name(new_state) << ")";
@@ -804,7 +804,15 @@ namespace hpx { namespace threads
         {
             LTM_(info) << "tfunc(" << num_thread << "): start";
             try {
-                tfunc_impl(num_thread);
+                try {
+                    tfunc_impl(num_thread);
+                }
+                catch (std::exception const& e)
+                {
+                    // Repackage exceptions to avoid slicing.
+                    boost::throw_exception(boost::enable_error_info(
+                        hpx::exception(unhandled_exception, e.what())));
+                }
             }
             catch (hpx::exception const& e) {
                 LFATAL_ << "tfunc(" << num_thread
@@ -820,13 +828,6 @@ namespace hpx { namespace threads
                 report_error(num_thread, boost::current_exception());
                 return;
             }
-            catch (std::exception const& e) {
-                LFATAL_ << "tfunc(" << num_thread
-                        << "): caught std::exception: "
-                        << e.what() << ", aborted thread execution";
-                report_error(num_thread, boost::current_exception());
-                return;
-            }
             catch (...) {
                 LFATAL_ << "tfunc(" << num_thread << "): caught unexpected "
                     "exception, aborted thread execution";
@@ -834,7 +835,7 @@ namespace hpx { namespace threads
                 return;
             }
 
-            LTM_(fatal) << "tfunc(" << num_thread << "): end, executed "
+            LTM_(info) << "tfunc(" << num_thread << "): end, executed "
                        << executed_threads_[num_thread] << " HPX threads";
         }
 
@@ -865,7 +866,7 @@ namespace hpx { namespace threads
         thread_state_enum state, char const* info)
     {
         // log this in any case
-        LTM_(fatal) << "tfunc(" << num_thread << "): "
+        LTM_(warning) << "tfunc(" << num_thread << "): "
             << "thread(" << thrd->get_thread_id() << "), "
             << "description(" << thrd->get_description() << "), "
             << "new state(" << get_thread_state_name(state) << "), "
@@ -1345,7 +1346,7 @@ namespace hpx { namespace threads
                     }
                 }
                 else if (active == state_val) {
-                    LTM_(fatal) << "tfunc(" << num_thread << "): "
+                    LTM_(warning) << "tfunc(" << num_thread << "): "
                         "thread(" << thrd->get_thread_id() << "), "
                         "description(" << thrd->get_description() << "), "
                         "rescheduling";
