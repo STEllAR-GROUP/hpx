@@ -282,14 +282,6 @@ namespace hpx { namespace parcelset
 
     void parcelport::send_pending_parcels_trampoline(boost::uint32_t locality_id)
     {
-        // create a new thread which sends parcels that might still be pending
-        hpx::applier::register_thread_nullary(
-            HPX_STD_BIND(&parcelport::send_pending_parcels, this, locality_id),
-            "send_pending_parcels");
-    }
-
-    void parcelport::send_pending_parcels(boost::uint32_t locality_id)
-    {
         parcelport_connection_ptr client_connection =
             connection_cache_.get(locality_id);
 
@@ -311,19 +303,32 @@ namespace hpx { namespace parcelset
                 std::swap(handlers, it->second.second);
             }
         }
-
         if (!parcels.empty() && !handlers.empty())
         {
-            client_connection->set_parcel(parcels);
-            client_connection->async_write(
-                    detail::call_for_each(handlers),
-                    boost::bind(&parcelport::send_pending_parcels_trampoline, this, ::_1
+            // create a new thread which sends parcels that might still be pending
+            hpx::applier::register_thread_nullary(
+                HPX_STD_BIND(
+                    &parcelport::send_pending_parcels
+                  , this
+                  , client_connection
+                  , boost::move(parcels)
+                  , boost::move(handlers)
                 )
-            );
+              , "send_pending_parcels");
         }
         else
         {
             connection_cache_.add(locality_id, client_connection);
         }
+    }
+
+    void parcelport::send_pending_parcels(parcelport_connection_ptr client_connection, std::vector<parcel> const & parcels, std::vector<write_handler_type> const & handlers)
+    {
+        client_connection->set_parcel(parcels);
+        client_connection->async_write(
+                detail::call_for_each(handlers),
+                boost::bind(&parcelport::send_pending_parcels_trampoline, this, ::_1
+            )
+        );
     }
 }}

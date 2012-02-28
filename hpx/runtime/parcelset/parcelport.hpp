@@ -197,7 +197,7 @@ namespace parcelset
 
         /// helper function to send remaining pending parcels
         void send_pending_parcels_trampoline(boost::uint32_t prefix);
-        void send_pending_parcels(boost::uint32_t prefix);
+        void send_pending_parcels(parcelport_connection_ptr client_connection, std::vector<parcel> const & parcels, std::vector<write_handler_type> const &);
 
     private:
         /// The site current range of ids to be used for id_type instances
