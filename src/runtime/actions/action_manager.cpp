@@ -24,7 +24,7 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     // Call-back function for parcelHandler to call when new parcels are received
     void action_manager::fetch_parcel(
-        parcelset::parcelhandler& parcel_handler, naming::address const&)
+        parcelset::parcelhandler& parcel_handler, naming::address const& dest)
     {
         parcelset::parcel p;
         if (parcel_handler.get_parcel(p))  // if new parcel is found
@@ -43,25 +43,24 @@ namespace hpx { namespace actions
                 return;
             }
 
-        // write this parcel to the log
+            // write this parcel to the log
             LPT_(debug) << "action_manager: fetch_parcel: " << p;
 
-        // decode the local virtual address of the parcel
+            // decode the local virtual address of the parcel
             naming::address addr = p.get_destination_addr();
             naming::address::address_type lva = addr.address_;
 
-        // by convention, a zero address references the local runtime support
-        // component
+            // by convention, a zero address references the local runtime support
+            // component
             if (0 == lva)
                 lva = appl_.get_runtime_support_raw_gid().get_lsb();
 
-        // decode the action-type in the parcel
+            // decode the action-type in the parcel
             action_type act = p.get_action();
             continuation_type cont = p.get_continuation();
 
-        // make sure the component_type of the action matches the component
-        // type in the destination address
-/*
+            // make sure the component_type of the action matches the component
+            // type in the destination address
             if (HPX_UNLIKELY(!components::types_are_compatible(
                 dest.type_, act->get_component_type())))
             {
@@ -74,12 +73,11 @@ namespace hpx { namespace actions
                     "action_manager::fetch_parcel",
                     hpx::util::osstream_get_string(strm));
             }
-*/
 
-        // either directly execute the action or create a new thread
+            // either directly execute the action or create a new thread
             if (actions::base_action::direct_action == act->get_action_type())
             {
-            // direct execution of the action
+                // direct execution of the action
                 if (!cont) {
                 // no continuation is to be executed
                     act->get_thread_function(lva)(threads::wait_signaled);
@@ -91,8 +89,8 @@ namespace hpx { namespace actions
                 }
             }
             else {
-            // dispatch action, register work item either with or without
-            // continuation support
+                // dispatch action, register work item either with or without
+                // continuation support
                 if (!cont) {
                 // no continuation is to be executed, register the plain action
                 // and the local-virtual address with the TM only
