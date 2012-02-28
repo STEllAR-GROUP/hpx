@@ -63,7 +63,11 @@ namespace hpx
         component_load_failure = 29,
         commandline_option_error = 30,
         serialization_error = 31,
+        unhandled_exception = 32,
         last_error
+
+        // force this enum type to be at least 16 bits.
+        error_upper_bound = 0x7fffL
     };
 
     char const* const error_names[] =
@@ -100,6 +104,7 @@ namespace hpx
         "component_load_failure",
         "commandline_option_error",
         "serialization_error",
+        "unhandled_exception",
         ""
     };
 
