@@ -299,11 +299,11 @@ namespace graph500 { namespace server
         //end
         for (std::size_t i=0;i<local_edges_.size();i++) {
           if ( !(neither_in[i] || both_in[i] ) ) {
-            std::cerr << " Validation step " << step << " failed " << -4 << std::endl;
-            std::cerr << " li " << li[i] << " lj " << lj[i] << std::endl;
-            std::cerr << " v0 " << local_edges_[i].v0 << " v1 " << local_edges_[i].v1 << " root " << root_node << std::endl;
-            std::cerr << " duplicates v0 " << duplicates_[local_edges_[i].v0-minnode_].size() << std::endl;
-            std::cerr << " duplicates v1 " << duplicates_[local_edges_[i].v1-minnode_].size() << std::endl;
+           // std::cerr << " Validation step " << step << " failed " << -4 << std::endl;
+           // std::cerr << " li " << li[i] << " lj " << lj[i] << std::endl;
+           // std::cerr << " v0 " << local_edges_[i].v0 << " v1 " << local_edges_[i].v1 << " root " << root_node << std::endl;
+           // std::cerr << " duplicates v0 " << duplicates_[local_edges_[i].v0-minnode_].size() << std::endl;
+           // std::cerr << " duplicates v1 " << duplicates_[local_edges_[i].v1-minnode_].size() << std::endl;
             if ( rc[step] == 1 ) rc[step] = -4;
           }
         }
