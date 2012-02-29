@@ -23,7 +23,7 @@ namespace ep { namespace server
     void point::bfs(std::size_t scale)
     {
       for (std::size_t i=0;i<scale;i++) {
-        sum_ += rand();
+        sum_ += i+(i-1)*(i+1)/(i+2);
       }
     }
 }}
