@@ -232,12 +232,19 @@ namespace hpx { namespace lcos
         /// The \a set_result_action may be used to trigger any LCO instances
         /// while carrying an additional parameter of any type.
         ///
+        /// RemoteResult is taken by value. This allows for perfect forwarding.
+        /// When the action thread function is created, the values are moved into
+        /// the calling function. By taking it by value instead of const lvalue
+        /// ref, the move constructor is called, and one copy is elided. By taking
+        /// it by const lvalue reference, we disable the possibility to further
+        /// move the result to the designated destination
+        ///
         /// \param RemoteResult [in] The type of the result to be transferred back to
         ///               this LCO instance.
         /// TODO: having RemoteResult as the action parameter enables perfect forwarding
         /// for movable objects. However, it leads to one more copy for non movable types
         /// This could be improved by using std::is_move_constructible, which isn't
-        /// available for most compilers
+        /// available for most compilers.
         typedef hpx::actions::direct_action1<
             base_lco_with_value, lco_set_result, RemoteResult,
             &base_lco_with_value::set_result_nonvirt

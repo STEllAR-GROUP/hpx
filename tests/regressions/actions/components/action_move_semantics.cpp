@@ -47,5 +47,18 @@ HPX_REGISTER_ACTION_EX(
     hpx::test::server::action_move_semantics::test_non_movable_direct_action,
     action_move_semantics_test_non_movable_direct_action);
 
+HPX_REGISTER_ACTION_EX(
+    hpx::test::server::action_move_semantics::return_test_movable_action,
+    action_move_semantics_return_test_movable_action);
+HPX_REGISTER_ACTION_EX(
+    hpx::test::server::action_move_semantics::return_test_non_movable_action,
+    action_move_semantics_return_test_non_movable_action);
+HPX_REGISTER_ACTION_EX(
+    hpx::test::server::action_move_semantics::return_test_movable_direct_action,
+    action_move_semantics_return_test_movable_direct_action);
+HPX_REGISTER_ACTION_EX(
+    hpx::test::server::action_move_semantics::return_test_non_movable_direct_action,
+    action_move_semantics_return_test_non_movable_direct_action);
+
 HPX_DEFINE_GET_COMPONENT_TYPE(action_move_semantics);
 

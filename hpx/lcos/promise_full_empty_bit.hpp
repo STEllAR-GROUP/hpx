@@ -172,6 +172,50 @@ namespace hpx { namespace lcos { namespace detail
             // no error has been reported, return the result
             return boost::move(d.get_value());
         }
+        
+        BOOST_RV_REF(result_type) move_data(int slot, error_code& ec = throws)
+        {
+            if (slot < 0 || slot >= N) {
+                HPX_THROWS_IF(ec, bad_parameter,
+                    "promise<Result, N>::get_data", "slot index out of range");
+                return boost::move(Result());
+            }
+
+            // yields control if needed
+            data_type d;
+            data_[slot].read_and_empty(d, ec);
+            if (ec) return boost::move(result_type());
+
+            // the thread has been re-activated by one of the actions
+            // supported by this promise (see \a promise::set_event
+            // and promise::set_error).
+            if (!d.stores_value())
+            {
+                // an error has been reported in the meantime, throw or set
+                // the error code
+                if (&ec == &throws) {
+                    // REVIEW: should HPX_RETHROW_EXCEPTION be used instead?
+                    boost::rethrow_exception(d.get_error());
+                    // never reached
+                }
+                else {
+                    try {
+                        boost::rethrow_exception(d.get_error());
+                    }
+                    catch (hpx::exception const& he) {
+                        ec = make_error_code(he.get_error(), he.what(),
+                            hpx::rethrow);
+                    }
+                }
+                return boost::move(result_type());
+            }
+
+            if (&ec != &throws)
+                ec = make_success_code();
+
+            // no error has been reported, return the result
+            return boost::move(d.get_value());
+        }
 
         // helper functions for setting data (if successful) or the error (if
         // non-successful)
@@ -297,6 +341,11 @@ namespace hpx { namespace lcos { namespace detail
         Result get_value()
         {
             return boost::move(get_data(0));
+        }
+        
+        Result move_value()
+        {
+            return boost::move(move_data(0));
         }
 
         naming::id_type get_gid() const
@@ -479,6 +528,18 @@ namespace hpx { namespace lcos
         {
             detail::log_on_exit<wrapping_type> on_exit(impl_, ec);
             return boost::move((*impl_)->get_data(0, ec));
+        }
+        
+        BOOST_RV_REF(Result) move_out(int slot, error_code& ec = throws) const
+        {
+            detail::log_on_exit<wrapping_type> on_exit(impl_, ec);
+            return boost::move((*impl_)->move_data(slot, ec));
+        }
+
+        BOOST_RV_REF(Result) move_out(error_code& ec = throws) const
+        {
+            detail::log_on_exit<wrapping_type> on_exit(impl_, ec);
+            return boost::move((*impl_)->move_data(0, ec));
         }
 
         void set(int slot, RemoteResult const& result)

@@ -21,7 +21,11 @@ namespace hpx { namespace test { namespace server
             action_test_movable,
             action_test_direct_movable,
             action_test_non_movable,
-            action_test_direct_non_movable
+            action_test_direct_non_movable,
+            return_action_test_movable,
+            return_action_test_direct_movable,
+            return_action_test_non_movable,
+            return_action_test_direct_non_movable
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -33,6 +37,17 @@ namespace hpx { namespace test { namespace server
         std::size_t test_non_movable(non_movable_object const& obj)
         {
             return obj.get_count();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        movable_object return_test_movable()
+        {
+            return movable_object();
+        }
+
+        non_movable_object return_test_non_movable()
+        {
+            return non_movable_object();
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -55,6 +70,26 @@ namespace hpx { namespace test { namespace server
             action_move_semantics, std::size_t, action_test_direct_non_movable,
             non_movable_object const&, &action_move_semantics::test_non_movable
         > test_non_movable_direct_action;
+        
+        typedef hpx::actions::result_action0<
+            action_move_semantics, movable_object, return_action_test_movable,
+            &action_move_semantics::return_test_movable
+        > return_test_movable_action;
+
+        typedef hpx::actions::result_action0<
+            action_move_semantics, non_movable_object, return_action_test_non_movable,
+            &action_move_semantics::return_test_non_movable
+        > return_test_non_movable_action;
+
+        typedef hpx::actions::direct_result_action0<
+            action_move_semantics, movable_object, return_action_test_direct_movable,
+            &action_move_semantics::return_test_movable
+        > return_test_movable_direct_action;
+
+        typedef hpx::actions::direct_result_action0<
+            action_move_semantics, non_movable_object, return_action_test_direct_non_movable,
+            &action_move_semantics::return_test_non_movable
+        > return_test_non_movable_direct_action;
     };
 }}}
 
@@ -70,6 +105,19 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::test::server::action_move_semantics::test_non_movable_direct_action,
     action_move_semantics_test_non_movable_direct_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::test::server::action_move_semantics::return_test_movable_action,
+    action_move_semantics_return_test_movable_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::test::server::action_move_semantics::return_test_non_movable_action,
+    action_move_semantics_return_test_non_movable_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::test::server::action_move_semantics::return_test_movable_direct_action,
+    action_move_semantics_return_test_movable_direct_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::test::server::action_move_semantics::return_test_non_movable_direct_action,
+    action_move_semantics_return_test_non_movable_direct_action);
 
 #endif
 

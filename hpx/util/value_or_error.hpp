@@ -211,7 +211,7 @@ namespace hpx { namespace util
             return get_value();
         }
 #else
-        value_type&& move_value()
+        BOOST_RV_REF(value_type) move_value()
         {
             if (!stores_value()) {
                 HPX_THROW_EXCEPTION(invalid_status,

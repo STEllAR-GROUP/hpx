@@ -345,12 +345,12 @@ namespace hpx { namespace util { namespace detail
                     return;
                 }
 
-                // copy the data to the destination
-                dest = data_;
+                // move the data to the destination
+                dest = boost::move(data_);
             }
             else {
-                // copy the data to the destination
-                dest = data_;
+                // move the data to the destination
+                dest = boost::move(data_);
                 set_empty_locked(ec);   // state_ = empty;
                 if (ec) return;
             }

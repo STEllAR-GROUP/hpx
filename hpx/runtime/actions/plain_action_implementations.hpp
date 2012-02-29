@@ -40,14 +40,6 @@
         BOOST_PP_COMMA_IF(n)                                                  \
         typename detail::remove_qualifiers<BOOST_PP_CAT(T, n)>::type          \
     /**/
-#define HPX_PARAM_TYPES(z, n, data)                                           \
-        BOOST_PP_COMMA_IF(n)                                                  \
-        BOOST_RV_REF(BOOST_PP_CAT(data, n))                                   \
-        BOOST_PP_CAT(BOOST_PP_CAT(data, n), _)                                \
-    /**/
-#define HPX_PARAM_ARGUMENT(z, n, data)                                        \
-        BOOST_PP_COMMA_IF(n) boost::move(BOOST_PP_CAT(BOOST_PP_CAT(data, n), _))\
-    /**/
 
 #define HPX_FWD_ARGS(z, n, _)                                                 \
         BOOST_PP_COMMA_IF(n)                                                  \
@@ -251,16 +243,17 @@ namespace hpx { namespace actions
           : base_type(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static Result
         execute_function(naming::address::address_type lva,
-            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
             LTM_(debug)
                 << "plain_result_action" << N
                 << "::execute_function name("
                 << detail::get_action_name<derived_type>() << ")";
 
-            return F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
+            return F(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
         }
 
         /// serialization support
@@ -360,16 +353,17 @@ namespace hpx { namespace actions
     public:
         typedef boost::mpl::true_ direct_execution;
 
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static Result
         execute_function(naming::address::address_type lva,
-            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
             LTM_(debug)
                 << "plain_direct_result_action" << N
                 << "::execute_function name("
                 << detail::get_action_name<derived_type>() << ")";
 
-            return F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
+            return F(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
         }
 
         /// serialization support
@@ -617,16 +611,17 @@ namespace hpx { namespace actions
           : base_type(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static util::unused_type
         execute_function(naming::address::address_type lva,
-            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
             LTM_(debug)
                 << "plain_action" << N
                 << "::execute_function name("
                 << detail::get_action_name<derived_type>() << ")";
 
-            F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
+            F(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
             return util::unused;
         }
 
@@ -726,16 +721,17 @@ namespace hpx { namespace actions
     public:
         typedef boost::mpl::true_ direct_execution;
 
+        template<BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static util::unused_type
         execute_function(naming::address::address_type lva,
-            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T))
+            BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
             LTM_(debug)
                 << "plain_base_action" << N
                 << "::execute_function name("
                 << detail::get_action_name<derived_type>() << ")";
 
-            F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
+            F(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
             return util::unused;
         }
 
@@ -932,8 +928,6 @@ namespace hpx { namespace actions { namespace detail
 ///////////////////////////////////////////////////////////////////////////////
 #undef HPX_FORWARD_ARGS
 #undef HPX_FWD_ARGS
-#undef HPX_PARAM_ARGUMENT
-#undef HPX_PARAM_TYPES
 #undef HPX_REMOVE_QUALIFIERS
 #undef HPX_ACTION_DIRECT_ARGUMENT
 #undef HPX_ACTION_ARGUMENT

@@ -69,7 +69,7 @@
                             << ") with continuation("
                             << cont->get_raw_gid()
                             << ")";
-                func(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));//BOOST_PP_ENUM_PARAMS(N, arg));
+                func(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
                 cont->trigger();
             }
             catch (hpx::exception const&) {
