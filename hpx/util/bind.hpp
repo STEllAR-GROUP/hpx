@@ -550,7 +550,7 @@ namespace hpx { namespace util {
                 BOOST_PP_ENUM(N, HPX_UTIL_BIND_REFERENCE, A)                    \
             >                                                                   \
             env_type;                                                           \
-        env_type env = {BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_PARAMS, A)};         \
+        env_type env(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_PARAMS, A));            \
         return                                                                  \
             (get_pointer(detail::eval(env, arg0))->*f)                          \
                 (BOOST_PP_ENUM_SHIFTED(NN, HPX_UTIL_BIND_EVAL, _));             \
@@ -651,7 +651,7 @@ namespace hpx { namespace util {
                 BOOST_PP_ENUM(N, HPX_UTIL_BIND_REFERENCE, A)                    \
             >                                                                   \
             env_type;                                                           \
-        env_type env = {BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_PARAMS, A)};         \
+        env_type env(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_PARAMS, A));            \
         return                                                                  \
             (get_pointer(detail::eval(env, a0))->*f)                            \
                 (BOOST_PP_ENUM_SHIFTED(NN, HPX_UTIL_BIND_EVAL, _));             \
