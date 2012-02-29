@@ -342,7 +342,7 @@ namespace hpx { namespace traits
 
         typedef typename Action::result_type remote_result;
 
-        void set_result(remote_result const & r)
+        void set_result(BOOST_RV_REF(remote_result) r)
         {
             BOOST_ASSERT(!result_set);
             LLCO_(info)
@@ -376,7 +376,7 @@ namespace hpx { namespace traits
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_result_action action_type;
-                applier::apply<action_type>(t[i], result);
+                applier::apply<action_type>(t[i], boost::forward<remote_result>(result));
             }
         }
 
@@ -394,7 +394,7 @@ namespace hpx { namespace traits
             {
                 typedef typename lco_type::set_result_action action_type;
                 l.unlock();
-                applier::apply<action_type>(target, result);
+                applier::apply<action_type>(target, boost::forward<remote_result>(result));
             }
             else
             {

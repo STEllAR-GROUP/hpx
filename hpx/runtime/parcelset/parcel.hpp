@@ -76,7 +76,7 @@ namespace hpx { namespace parcelset
         // default copy constructor is ok
         // default assignment operator is ok
 
-        actions::action_type get_action() const
+        actions::action_type get_action()
         {
             return action_;
         }

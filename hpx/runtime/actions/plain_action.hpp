@@ -161,7 +161,7 @@ namespace hpx { namespace actions
         /// This \a get_thread_function will be invoked to retrieve the thread
         /// function for an action which has to be invoked without continuations.
         HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(naming::address::address_type lva) const
+        get_thread_function(naming::address::address_type lva)
         {
             return construct_thread_function(lva);
         }
@@ -170,7 +170,7 @@ namespace hpx { namespace actions
         /// function for an action which has to be invoked with continuations.
         HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
-            naming::address::address_type lva) const
+            naming::address::address_type lva)
         {
             return construct_thread_function(cont, lva);
         }
@@ -437,14 +437,14 @@ namespace hpx { namespace actions
 
     private:
         HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(naming::address::address_type lva) const
+        get_thread_function(naming::address::address_type lva)
         {
             return construct_thread_function(lva);
         }
 
         HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
-            naming::address::address_type lva) const
+            naming::address::address_type lva)
         {
             return construct_thread_function(cont, lva);
         }

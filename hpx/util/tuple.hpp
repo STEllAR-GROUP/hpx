@@ -62,15 +62,69 @@ namespace hpx { namespace util
 
 #define N BOOST_PP_ITERATION()
 
+#define HPX_UTIL_TUPLE_NAME BOOST_PP_CAT(tuple, N)
+
+#define HPX_UTIL_TUPLE_FWD_REF_TYPES(Z, N, D)                                   \
+    typename BOOST_FWD_REF(BOOST_PP_CAT(Arg, N))                                \
+
+#define HPX_UTIL_TUPLE_FWD_REF_PARAMS(Z, N, D)                                  \
+    BOOST_FWD_REF(BOOST_PP_CAT(Arg, N)) BOOST_PP_CAT(arg, N)                    \
+
+#define HPX_UTIL_TUPLE_INIT_MEMBER(Z, N, D)                                     \
+    BOOST_PP_CAT(a, N)(boost::forward<BOOST_PP_CAT(Arg, N)>(BOOST_PP_CAT(arg, N))) \
+
+#define HPX_UTIL_TUPLE_INIT_COPY_MEMBER(Z, N, D)                                \
+    BOOST_PP_CAT(a, N)(BOOST_PP_CAT(other.a, N))                                \
+
+#define HPX_UTIL_TUPLE_INIT_MOVE_MEMBER(Z, N, D)                                \
+    BOOST_PP_CAT(a, N)(boost::move(BOOST_PP_CAT(other.a, N)))                   \
+
+#define HPX_UTIL_TUPLE_ASSIGN_COPY_MEMBER(Z, N, D)                              \
+    BOOST_PP_CAT(a, N) = BOOST_PP_CAT(other.a, N);                              \
+
+#define HPX_UTIL_TUPLE_ASSIGN_MOVE_MEMBER(Z, N, D)                              \
+    BOOST_PP_CAT(a, N) = boost::move(BOOST_PP_CAT(other.a, N));                 \
+
 namespace hpx { namespace util
 {
     template <BOOST_PP_ENUM_PARAMS(N, typename A)>
-    struct BOOST_PP_CAT(tuple, N)
+    struct HPX_UTIL_TUPLE_NAME
     {
         BOOST_PP_REPEAT(N, M0, _)
 
+        HPX_UTIL_TUPLE_NAME() {}
+
+        HPX_UTIL_TUPLE_NAME(HPX_UTIL_TUPLE_NAME const & other)
+          : BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_INIT_COPY_MEMBER, _)
+        {}
+
+        HPX_UTIL_TUPLE_NAME(BOOST_RV_REF(HPX_UTIL_TUPLE_NAME) other)
+          : BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_INIT_MOVE_MEMBER, _)
+        {}
+
+        HPX_UTIL_TUPLE_NAME & operator=(BOOST_COPY_ASSIGN_REF(HPX_UTIL_TUPLE_NAME) other)
+        {
+            BOOST_PP_REPEAT(N, HPX_UTIL_TUPLE_ASSIGN_COPY_MEMBER, _)
+            return *this;
+        }
+
+        HPX_UTIL_TUPLE_NAME & operator=(BOOST_RV_REF(HPX_UTIL_TUPLE_NAME) other)
+        {
+            BOOST_PP_REPEAT(N, HPX_UTIL_TUPLE_ASSIGN_MOVE_MEMBER, _)
+            return *this;
+        }
+
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+        HPX_UTIL_TUPLE_NAME(BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_FWD_REF_PARAMS, _))
+          : BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_INIT_MEMBER, _)
+        {}
+
         typedef boost::mpl::int_<N> size_type;
         static const int size_value = N;
+
+    private:
+        BOOST_COPYABLE_AND_MOVABLE(HPX_UTIL_TUPLE_NAME);
+
     };
 }}
 

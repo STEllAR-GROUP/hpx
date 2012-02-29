@@ -166,6 +166,18 @@ namespace hpx { namespace util {
         env_type env = {BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_PARAMS, A)};         \
         return eval(env, f) D;                                                  \
     }                                                                           \
+                                                                                \
+    template <BOOST_PP_ENUM_PARAMS(N, typename A)>                              \
+    result_type operator()(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_REF_PARAMS, _))   \
+    {                                                                           \
+        typedef                                                                 \
+            BOOST_PP_CAT(hpx::util::tuple, N)<                                  \
+                BOOST_PP_ENUM(N, HPX_UTIL_BIND_REFERENCE, A)                    \
+            >                                                                   \
+            env_type;                                                           \
+        env_type env = {BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_PARAMS, A)};         \
+        return eval(env, f) D;                                                  \
+    }                                                                           \
 /**/
 
     ///////////////////////////////////////////////////////////////////////////
@@ -249,6 +261,11 @@ namespace hpx { namespace util {
             {}
 
             result_type operator()() const
+            {
+                return f();
+            }
+
+            result_type operator()()
             {
                 return f();
             }
@@ -373,6 +390,13 @@ namespace hpx { namespace util {
             {}
 
             R operator()() const
+            {
+                typedef hpx::util::tuple0<> env_type;
+                env_type env;
+                return f(BOOST_PP_ENUM(N, HPX_UTIL_BIND_EVAL, _));
+            }
+
+            R operator()()
             {
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;

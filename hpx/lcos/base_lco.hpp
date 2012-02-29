@@ -12,6 +12,7 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/util/ini.hpp>
+#include <type_traits>
 //#include <hpx/util/detail/serialization_registration.hpp>
 
 namespace hpx { namespace lcos
@@ -171,7 +172,7 @@ namespace hpx { namespace lcos
             set_result(RemoteResult());
         }
 
-        virtual void set_result (RemoteResult const& result) = 0;
+        virtual void set_result (BOOST_RV_REF(RemoteResult) result) = 0;
 
         virtual Result get_event()
         {
@@ -206,11 +207,18 @@ namespace hpx { namespace lcos
         ///
         /// \returns      The thread state the calling thread needs to be set
         ///               to after returning from this function.
+        /*
         void set_result_nonvirt (RemoteResult const& result)
         {
             set_result(result);
         }
-
+        */
+        
+        void set_result_nonvirt (RemoteResult result)
+        {
+            set_result(boost::move(result));
+        }
+        
         Result get_value_nonvirt()
         {
             return get_value();
@@ -226,8 +234,12 @@ namespace hpx { namespace lcos
         ///
         /// \param RemoteResult [in] The type of the result to be transferred back to
         ///               this LCO instance.
+        /// TODO: having RemoteResult as the action parameter enables perfect forwarding
+        /// for movable objects. However, it leads to one more copy for non movable types
+        /// This could be improved by using std::is_move_constructible, which isn't
+        /// available for most compilers
         typedef hpx::actions::direct_action1<
-            base_lco_with_value, lco_set_result, RemoteResult const&,
+            base_lco_with_value, lco_set_result, RemoteResult,
             &base_lco_with_value::set_result_nonvirt
         > set_result_action;
 

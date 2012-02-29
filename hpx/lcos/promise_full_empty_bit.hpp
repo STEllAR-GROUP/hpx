@@ -173,7 +173,7 @@ namespace hpx { namespace lcos { namespace detail
                 ec = make_success_code();
 
             // no error has been reported, return the result
-            return d.get_value();
+            return boost::move(d.get_value());
         }
 
         // helper functions for setting data (if successful) or the error (if
@@ -299,7 +299,7 @@ namespace hpx { namespace lcos { namespace detail
 
         Result get_value()
         {
-            return get_data(0);
+            return boost::move(get_data(0));
         }
 
         naming::id_type get_gid() const
@@ -475,13 +475,13 @@ namespace hpx { namespace lcos
         Result get(int slot, error_code& ec = throws) const
         {
             detail::log_on_exit<wrapping_type> on_exit(impl_, ec);
-            return (*impl_)->get_data(slot, ec);
+            return boost::move((*impl_)->get_data(slot, ec));
         }
 
         Result get(error_code& ec = throws) const
         {
             detail::log_on_exit<wrapping_type> on_exit(impl_, ec);
-            return (*impl_)->get_data(0, ec);
+            return boost::move((*impl_)->get_data(0, ec));
         }
 
         void set(int slot, RemoteResult const& result)

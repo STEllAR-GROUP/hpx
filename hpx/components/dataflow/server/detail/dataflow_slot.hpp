@@ -35,7 +35,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
             , t(t)
         {}
 
-        void set_result(remote_result const & r)
+        void set_result(BOOST_RV_REF(remote_result) r)
         {
             BOOST_ASSERT(false);
         }
@@ -135,7 +135,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
                 << get_gid();
         }
 
-        void set_result(remote_result const & r)
+        void set_result(BOOST_RV_REF(remote_result) r)
         {
             LLCO_(info)
                 << "dataflow_slot<"
@@ -262,7 +262,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
                 << get_gid();
         }
 
-        void set_result(remote_result const & r)
+        void set_result(BOOST_RV_REF(remote_result) r)
         {
             LLCO_(info)
                 << "dataflow_slot<"

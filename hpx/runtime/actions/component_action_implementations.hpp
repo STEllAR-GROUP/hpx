@@ -30,9 +30,11 @@
 #else // defined(BOOST_PP_IS_ITERATING)
 
 #define N BOOST_PP_ITERATION()
-#define HPX_ACTION_ARGUMENT(z, n, data) BOOST_PP_COMMA_IF(n) data.get<n>()
+#define HPX_ACTION_ARGUMENT(z, n, data)                                       \
+        BOOST_PP_COMMA_IF(n) boost::move(data.get<n>())                       \
+    /**/
 #define HPX_ACTION_DIRECT_ARGUMENT(z, n, data)                                \
-        BOOST_PP_COMMA_IF(n) boost::fusion::at_c<n>(data)                     \
+        BOOST_PP_COMMA_IF(n) boost::move(boost::fusion::at_c<n>(data))        \
     /**/
 #define HPX_REMOVE_QUALIFIERS(z, n, data)                                     \
         BOOST_PP_COMMA_IF(n)                                                  \
@@ -50,6 +52,11 @@
 #define HPX_FWD_ARGS(z, n, _)                                                 \
         BOOST_PP_COMMA_IF(n)                                                  \
             BOOST_FWD_REF(BOOST_PP_CAT(Arg, n)) BOOST_PP_CAT(arg, n)          \
+    /**/
+
+#define HPX_MOVE_ARGS(z, n, _)                                                \
+        BOOST_PP_COMMA_IF(n)                                                  \
+            boost::move(BOOST_PP_CAT(arg, n))                                 \
     /**/
 
 #define HPX_FORWARD_ARGS(z, n, _)                                             \
@@ -103,33 +110,36 @@ namespace hpx { namespace actions
         /// The \a thread_function will be registered as the thread
         /// function of a thread. It encapsulates the execution of the
         /// original function (given by \a func).
-        // TODO: implement proper rvalue ref handling
-        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        static threads::thread_state_enum thread_function(
-            naming::address::address_type lva,
-            //BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        struct thread_function
         {
-            try {
-                LTM_(debug) << "Executing component action("
-                            << detail::get_action_name<Derived>()
-                            << ") lva(" << reinterpret_cast<void const*>
-                                (get_lva<Component>::call(lva)) << ")";
-                //(get_lva<Component>::call(lva)->*F)(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
-                (get_lva<Component>::call(lva)->*F)(BOOST_PP_ENUM_PARAMS(N, arg));
-            }
-            catch (hpx::exception const& e) {
-                LTM_(error)
-                    << "Unhandled exception while executing component action("
-                    << detail::get_action_name<Derived>()
-                    << ") lva(" << reinterpret_cast<void const*>
-                        (get_lva<Component>::call(lva)) << "): " << e.what();
+            typedef threads::thread_state_enum result_type;
 
-                // report this error to the console in any case
-                hpx::report_error(boost::current_exception());
+            template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+            result_type operator()(
+                naming::address::address_type lva,
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)) const
+            {
+                try {
+                    LTM_(debug) << "Executing component action("
+                                << detail::get_action_name<Derived>()
+                                << ") lva(" << reinterpret_cast<void const*>
+                                    (get_lva<Component>::call(lva)) << ")";
+                    (get_lva<Component>::call(lva)->*F)(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+                }
+                catch (hpx::exception const& e) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << "): " << e.what();
+
+                    // report this error to the console in any case
+                    hpx::report_error(boost::current_exception());
+                }
+                return threads::terminated;
             }
-            return threads::terminated;
-        }
+
+        };
 
     public:
         typedef boost::mpl::false_ direct_execution;
@@ -138,19 +148,13 @@ namespace hpx { namespace actions
         // a proper thread function for a thread without having to
         // instantiate the base_result_actionN type. This is used by the
         // applier in case no continuation has been supplied.
-        // TODO: implement proper rvalue ref handling
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(naming::address::address_type lva,
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+            BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
-            // we need to assign the address of the thread function to a
-            // variable to  help the compiler to deduce the function type
-            threads::thread_state_enum (*f)(naming::address::address_type,
-                    BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) =
-                &Derived::template thread_function<BOOST_PP_ENUM_PARAMS(N, Arg)>;
-
-            return HPX_STD_BIND(f, lva, BOOST_PP_ENUM_PARAMS(N, arg));
+            return HPX_STD_BIND(typename Derived::thread_function()
+                    , lva, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
         }
 
         // This static construct_thread_function allows to construct
@@ -180,7 +184,7 @@ namespace hpx { namespace actions
         // This get_thread_function will be invoked to retrieve the thread
         // function for an action which has to be invoked without continuations.
         HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(naming::address::address_type lva) const
+        get_thread_function(naming::address::address_type lva)
         {
             return construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
@@ -190,7 +194,7 @@ namespace hpx { namespace actions
         // function for an action which has to be invoked with continuations.
         HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
-            naming::address::address_type lva) const
+            naming::address::address_type lva)
         {
             return construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
@@ -455,12 +459,12 @@ namespace hpx { namespace actions
     class BOOST_PP_CAT(base_action, N)
       : public action<
             Component, Action, util::unused_type,
-            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
+            BOOST_PP_CAT(hpx::util::tuple, N)<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
             Derived, Priority>
     {
     public:
         typedef util::unused_type result_type;
-        typedef boost::fusion::vector<
+        typedef BOOST_PP_CAT(hpx::util::tuple, N)<
             BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
         typedef action<Component, Action, result_type, arguments_type,
                        Derived, Priority> base_type;
@@ -488,20 +492,21 @@ namespace hpx { namespace actions
         /// The \a thread_function will be registered as the thread
         /// function of a thread. It encapsulates the execution of the
         /// original function (given by \a func).
-        //TODO: implement proper rvalue ref handling
-        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        static threads::thread_state_enum thread_function(
-            naming::address::address_type lva,
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-            //BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+        struct thread_function
         {
+            typedef threads::thread_state_enum result_type;
+
+            template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+            result_type operator()(
+                naming::address::address_type lva,
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)) const
+            {
             try {
                 LTM_(debug) << "Executing component action("
                             << detail::get_action_name<Derived>()
                             << ") lva(" << reinterpret_cast<void const*>
                                 (get_lva<Component>::call(lva)) << ")";
-                //(get_lva<Component>::call(lva)->*F)(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
-                (get_lva<Component>::call(lva)->*F)(BOOST_PP_ENUM_PARAMS(N, arg));
+                (get_lva<Component>::call(lva)->*F)(BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
             }
             catch (hpx::exception const& e) {
                 LTM_(error)
@@ -514,7 +519,8 @@ namespace hpx { namespace actions
                 hpx::report_error(boost::current_exception());
             }
             return threads::terminated;
-        }
+            }
+        };
 
     public:
         typedef boost::mpl::false_ direct_execution;
@@ -523,19 +529,15 @@ namespace hpx { namespace actions
         // a proper thread function for a thread without having to
         // instantiate the base_actionN type. This is used by the applier in
         // case no continuation has been supplied.
-        // TODO: implement proper rvalue ref handling
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(naming::address::address_type lva,
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+            BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
             // we need to assign the address of the thread function to a
             // variable to  help the compiler to deduce the function type
-            threads::thread_state_enum (*f)(naming::address::address_type,
-                    BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) =
-                &Derived::template thread_function<BOOST_PP_ENUM_PARAMS(N, Arg)>;
 
-            return HPX_STD_BIND(f, lva, BOOST_PP_ENUM_PARAMS(N, arg));
+            return boost::move(HPX_STD_BIND(typename Derived::thread_function(), lva, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)));
         }
 
         // This static construct_thread_function allows to construct
@@ -548,8 +550,8 @@ namespace hpx { namespace actions
             naming::address::address_type lva,
             BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
-            return base_type::construct_continuation_thread_object_function_void(
-                cont, F, get_lva<Component>::call(lva), BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+            return boost::move(base_type::construct_continuation_thread_object_function_void(
+                cont, F, get_lva<Component>::call(lva), BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)));
         }
 
         /// serialization support
@@ -563,18 +565,18 @@ namespace hpx { namespace actions
     private:
         ///
         HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(naming::address::address_type lva) const
+        get_thread_function(naming::address::address_type lva)
         {
-            return construct_thread_function(lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
+            return boost::move(construct_thread_function(lva,
+                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this))));
         }
 
         HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
-            naming::address::address_type lva) const
+            naming::address::address_type lva)
         {
-            return construct_thread_function(cont, lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
+            return boost::move(construct_thread_function(cont, lva,
+                BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this))));
         }
 
     private:

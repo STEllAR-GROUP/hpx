@@ -56,7 +56,7 @@ namespace hpx { namespace actions
         template <typename T>
         struct remove_qualifiers
         {
-            typedef typename boost::remove_reference<T>::type no_ref_type;
+            typedef typename hpx::util::detail::remove_reference<T>::type no_ref_type;
             typedef typename boost::remove_const<no_ref_type>::type type;
         };
 
@@ -147,7 +147,7 @@ namespace hpx { namespace actions
         ///       thread function for an action which has to be invoked without
         ///       continuations.
         virtual HPX_STD_FUNCTION<threads::thread_function_type>
-            get_thread_function(naming::address::address_type lva) const = 0;
+            get_thread_function(naming::address::address_type lva) = 0;
 
         /// The \a get_thread_function constructs a proper thread function for
         /// a \a thread, encapsulating the functionality, the arguments, and
@@ -166,7 +166,7 @@ namespace hpx { namespace actions
         ///       continuations.
         virtual HPX_STD_FUNCTION<threads::thread_function_type>
             get_thread_function(continuation_type& cont,
-                naming::address::address_type lva) const = 0;
+                naming::address::address_type lva) = 0;
 
         /// return the id of the locality of the parent thread
         virtual boost::uint32_t get_parent_locality_prefix() const = 0;
@@ -292,12 +292,6 @@ namespace hpx { namespace actions
         {
             return boost::fusion::at_c<N>(arguments_);
         }
-        template <int N>
-        typename boost::fusion::result_of::at_c<arguments_type const, N>::type
-        get() const
-        {
-            return boost::fusion::at_c<N>(arguments_);
-        }
 
     protected:
         // bring in all overloads for
@@ -398,9 +392,9 @@ namespace hpx { namespace actions
       typename Arguments, typename Derived, threads::thread_priority Priority>
     inline typename boost::fusion::result_of::at_c<
         typename action<Component, Action, Result, Arguments, Derived,
-            Priority>::arguments_type const, N
+            Priority>::arguments_type, N
     >::type
-    get(action<Component, Action, Result, Arguments, Derived, Priority> const& args)
+    get(action<Component, Action, Result, Arguments, Derived, Priority> & args)
     {
         return args.get<N>();
     }
