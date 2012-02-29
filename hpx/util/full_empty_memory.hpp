@@ -9,6 +9,7 @@
 
 #include <boost/noncopyable.hpp>
 #include <boost/call_traits.hpp>
+#include <boost/move/move.hpp>
 
 #include <hpx/util/full_empty_entry.hpp>
 
@@ -65,8 +66,8 @@ namespace hpx { namespace util
         {}
 
         template <typename T0>
-        full_empty(T0 const& t0)
-          : data_(t0)
+        full_empty(BOOST_FWD_REF(T0) t0)
+          : data_(boost::forward<T0>(t0))
         {}
 
         /// \brief Destruct the full/empty data item
@@ -148,9 +149,9 @@ namespace hpx { namespace util
         ///         location to full using \a set might re-activate threads
         ///         waiting on this in a \a read or \a read_and_empty function.
         template <typename Target>
-        void set(Target const& data)
+        void set(BOOST_FWD_REF(Target) data)
         {
-            data_.set_and_fill(data);
+            data_.set_and_fill(boost::forward<Target>(data));
         }
 
         /// \brief  Waits for memory to become empty, and then fills it. If the
@@ -166,9 +167,9 @@ namespace hpx { namespace util
         /// \note   When memory becomes empty only one thread blocked like this
         ///         will be queued to run.
         template <typename Target>
-        void write(Target const& data, error_code& ec = throws)
+        void write(BOOST_FWD_REF(Target) data, error_code& ec = throws)
         {
-            data_.enqueue_if_full(data, ec);
+            data_.enqueue_if_full(boost::forward<Target>(data), ec);
         }
 
     private:

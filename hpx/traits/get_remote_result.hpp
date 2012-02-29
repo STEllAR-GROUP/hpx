@@ -9,6 +9,9 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/traits.hpp>
 
+#include <boost/config.hpp>
+#include <boost/move/move.hpp>
+
 namespace hpx { namespace traits
 {
     template <typename Result, typename RemoteResult, typename Enable>
@@ -17,6 +20,11 @@ namespace hpx { namespace traits
         static Result call(RemoteResult const& rhs)
         {
             return Result(rhs);
+        }
+
+        static Result call(BOOST_RV_REF(RemoteResult) rhs)
+        {
+          return Result(boost::forward<RemoteResult>(rhs));
         }
     };
 
@@ -27,6 +35,12 @@ namespace hpx { namespace traits
         {
             return rhs;
         }
+#if !defined(BOOST_NO_RVALUE_REFERENCES)
+        static Result&& call(BOOST_RV_REF(Result) rhs)
+        {
+            return boost::move(rhs);
+        }
+#endif
     };
 
     template <>

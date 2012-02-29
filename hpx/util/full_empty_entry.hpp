@@ -119,20 +119,16 @@ namespace hpx { namespace util { namespace detail
 
     public:
         full_empty_entry()
-          : state_(empty)
+          : data_(), state_(empty)
         {
-            ::new (get_address()) Data();      // properly initialize memory
-
             lcos::local_spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
             ++full_empty_counter_data_.constructed_;
         }
 
         template <typename T0>
         explicit full_empty_entry(BOOST_FWD_REF(T0) t0)
-          : state_(empty)
+          : data_(boost::forward<T0>(t0)), state_(empty)
         {
-            ::new (get_address()) Data(boost::forward<T0>(t0));    // properly initialize memory
-
             lcos::local_spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
             ++full_empty_counter_data_.constructed_;
         }
@@ -145,7 +141,6 @@ namespace hpx { namespace util { namespace detail
                 log_non_empty_queue("read_and_empty_queue", read_and_empty_queue_);
                 log_non_empty_queue("read_queue", read_queue_);
             }
-            get_address()->Data::~Data();      // properly destruct value in memory
 
             lcos::local_spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
             ++full_empty_counter_data_.destructed_;
@@ -233,8 +228,7 @@ namespace hpx { namespace util { namespace detail
             }
 
             // copy the data to the destination
-            if (get_address() != &dest)
-                dest = *get_address();
+            dest = data_;
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -352,13 +346,11 @@ namespace hpx { namespace util { namespace detail
                 }
 
                 // copy the data to the destination
-                if (get_address() != &dest)
-                    dest = *get_address();
+                dest = data_;
             }
             else {
                 // copy the data to the destination
-                if (get_address() != &dest)
-                    dest = *get_address();
+                dest = data_;
                 set_empty_locked();   // state_ = empty;
             }
 
@@ -472,8 +464,7 @@ namespace hpx { namespace util { namespace detail
             }
 
             // set the data
-            if (get_address() != &src)
-                *get_address() = boost::forward<T>(src);
+            data_ = boost::forward<Data>(src);
 
             // make sure the entry is full
             set_full_locked();    // state_ = full
@@ -544,8 +535,7 @@ namespace hpx { namespace util { namespace detail
             mutex_type::scoped_lock l(mtx_);
 
             // set the data
-            if (get_address() != &src)
-                *get_address() = boost::forward<T>(src);
+            data_ = boost::forward<T>(src);
 
             // make sure the entry is full
             set_full_locked();    // state_ = full
@@ -623,27 +613,12 @@ namespace hpx { namespace util { namespace detail
 
     private:
         typedef Data value_type;
-        typedef boost::aligned_storage<sizeof(value_type),
-            boost::alignment_of<value_type>::value> storage_type;
-
-        // type safe accessors to the stored data
-        typedef typename boost::add_pointer<value_type>::type pointer;
-        typedef typename boost::add_pointer<value_type const>::type const_pointer;
-
-        pointer get_address()
-        {
-            return static_cast<pointer>(data_.address());
-        }
-        const_pointer get_address() const
-        {
-            return static_cast<const_pointer>(data_.address());
-        }
 
         mutable mutex_type mtx_;
         queue_type write_queue_;              // threads waiting in write
         queue_type read_and_empty_queue_;     // threads waiting in read_and_empty
         queue_type read_queue_;               // threads waiting in read
-        storage_type data_;                   // protected data
+        value_type data_;                     // protected data
         full_empty state_;                    // current full/empty state
     };
 }}}
