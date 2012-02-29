@@ -154,17 +154,17 @@ namespace hpx { namespace util { namespace detail
         }
 
         // sets this entry to empty
-        bool set_empty()
+        bool set_empty(error_code& ec = throws)
         {
             mutex_type::scoped_lock l(mtx_);
-            return set_empty_locked();
+            return set_empty_locked(ec);
         }
 
         // sets this entry to full
-        bool set_full()
+        bool set_full(error_code& ec = throws)
         {
             mutex_type::scoped_lock l(mtx_);
-            return set_full_locked();
+            return set_full_locked(ec);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -351,7 +351,8 @@ namespace hpx { namespace util { namespace detail
             else {
                 // copy the data to the destination
                 dest = data_;
-                set_empty_locked();   // state_ = empty;
+                set_empty_locked(ec);   // state_ = empty;
+                if (ec) return;
             }
 
             if (&ec != &throws)
@@ -406,7 +407,8 @@ namespace hpx { namespace util { namespace detail
                 }
             }
             else {
-                set_empty_locked();   // state_ = empty
+                set_empty_locked(ec);   // state_ = empty
+                if (ec) return;
             }
 
             if (&ec != &throws)
@@ -467,7 +469,8 @@ namespace hpx { namespace util { namespace detail
             data_ = boost::forward<Data>(src);
 
             // make sure the entry is full
-            set_full_locked();    // state_ = full
+            set_full_locked(ec);    // state_ = full
+            if (ec) return;
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -521,7 +524,8 @@ namespace hpx { namespace util { namespace detail
             }
 
             // make sure the entry is full
-            set_full_locked();    // state_ = full
+            set_full_locked(ec);    // state_ = full
+            if (ec) return;
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -530,7 +534,7 @@ namespace hpx { namespace util { namespace detail
         ///////////////////////////////////////////////////////////////////////
         // unconditionally set the data and set the entry to full
         template <typename T>
-        void set_and_fill(BOOST_FWD_REF(T) src)
+        void set_and_fill(BOOST_FWD_REF(T) src, error_code& ec = throws)
         {
             mutex_type::scoped_lock l(mtx_);
 
@@ -538,16 +542,16 @@ namespace hpx { namespace util { namespace detail
             data_ = boost::forward<T>(src);
 
             // make sure the entry is full
-            set_full_locked();    // state_ = full
+            set_full_locked(ec);    // state_ = full
         }
 
         // same as above, but for entries without associated data
-        void set_and_fill()
+        void set_and_fill(error_code& ec = throws)
         {
             mutex_type::scoped_lock l(mtx_);
 
             // make sure the entry is full
-            set_full_locked();    // state_ = full
+            set_full_locked(ec);    // state_ = full
         }
 
         // returns whether this entry is still in use
@@ -558,7 +562,7 @@ namespace hpx { namespace util { namespace detail
         }
 
     protected:
-        bool set_empty_locked()
+        bool set_empty_locked(error_code& ec)
         {
             state_ = empty;
 
@@ -566,16 +570,22 @@ namespace hpx { namespace util { namespace detail
                 threads::thread_id_type id = write_queue_.front().id_;
                 write_queue_.front().id_ = 0;
                 write_queue_.pop_front();
-                threads::set_thread_lco_description(id);
-                threads::set_thread_state(id, threads::pending);
-                set_full_locked();    // state_ = full
+
+                threads::set_thread_lco_description(id, 0, ec);
+                if (ec) return false;
+
+                threads::set_thread_state(id, threads::pending,
+                    threads::wait_timeout, threads::thread_priority_normal, ec);
+
+                set_full_locked(ec);    // state_ = full
+                if (ec) return false;
             }
 
             // return whether this block needs to be removed
             return state_ == full && !is_used_locked();
         }
 
-        bool set_full_locked()
+        bool set_full_locked(error_code& ec)
         {
             state_ = full;
 
@@ -584,8 +594,13 @@ namespace hpx { namespace util { namespace detail
                 threads::thread_id_type id = read_queue_.front().id_;
                 read_queue_.front().id_ = 0;
                 read_queue_.pop_front();
-                threads::set_thread_lco_description(id);
-                threads::set_thread_state(id, threads::pending);
+
+                threads::set_thread_lco_description(id, 0, ec);
+                if (ec) return false;
+
+                threads::set_thread_state(id, threads::pending,
+                    threads::wait_timeout, threads::thread_priority_normal, ec);
+                if (ec) return false;
 
                 lcos::local_spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
                 ++full_empty_counter_data_.set_full_;
@@ -597,9 +612,16 @@ namespace hpx { namespace util { namespace detail
                 threads::thread_id_type id = read_and_empty_queue_.front().id_;
                 read_and_empty_queue_.front().id_ = 0;
                 read_and_empty_queue_.pop_front();
-                threads::set_thread_lco_description(id);
-                threads::set_thread_state(id, threads::pending);
-                set_empty_locked();   // state_ = empty
+
+                threads::set_thread_lco_description(id, 0, ec);
+                if (ec) return false;
+
+                threads::set_thread_state(id, threads::pending,
+                    threads::wait_timeout, threads::thread_priority_normal, ec);
+                if (ec) return false;
+
+                set_empty_locked(ec);   // state_ = empty
+                if (ec) return false;
             }
 
             // return whether this block needs to be removed

@@ -80,9 +80,9 @@ namespace hpx { namespace util
         ///
         /// \note    This function will create a new full/empty entry in the
         ///          store if it doesn't exist yet.
-        void set_empty()
+        void set_empty(error_code& ec = throws)
         {
-            data_.set_empty();
+            data_.set_empty(ec);
         }
 
         /// \brief Atomically set the state to full without releasing any
@@ -91,9 +91,9 @@ namespace hpx { namespace util
         ///
         /// \note    This function will not create a new full/empty entry in
         ///          the store if it doesn't exist yet.
-        void set_full()
+        void set_full(error_code& ec = throws)
         {
-            data_.set_full();
+            data_.set_full(ec);
         }
 
         /// \brief Query the current state of the memory

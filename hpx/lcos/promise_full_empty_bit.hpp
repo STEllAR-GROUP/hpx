@@ -97,7 +97,7 @@ namespace hpx { namespace lcos { namespace detail
                 return;
             }
 
-            data_[slot].set_empty();
+            data_[slot].set_empty(ec);
         }
 
         /// Return whether or not the data is available for this
@@ -168,9 +168,6 @@ namespace hpx { namespace lcos { namespace detail
                 }
                 return result_type();
             }
-
-            if (&ec != &throws)
-                ec = make_success_code();
 
             // no error has been reported, return the result
             return boost::move(d.get_value());

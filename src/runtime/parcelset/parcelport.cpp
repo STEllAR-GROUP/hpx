@@ -268,9 +268,7 @@ namespace hpx { namespace parcelset
             // ... start an asynchronous write operation now.
             client_connection->async_write(
                 detail::call_for_each(handlers),
-                boost::bind(
-                    &parcelport::send_pending_parcels_trampoline, this, ::_1
-                )
+                boost::bind(&parcelport::send_pending_parcels_trampoline, this, ::_1)
             );
         }
         else
@@ -307,14 +305,9 @@ namespace hpx { namespace parcelset
         {
             // create a new thread which sends parcels that might still be pending
             hpx::applier::register_thread_nullary(
-                HPX_STD_BIND(
-                    &parcelport::send_pending_parcels
-                  , this
-                  , client_connection
-                  , boost::move(parcels)
-                  , boost::move(handlers)
-                )
-              , "send_pending_parcels");
+                HPX_STD_BIND(&parcelport::send_pending_parcels, this,
+                    client_connection, boost::move(parcels),
+                    boost::move(handlers)), "send_pending_parcels");
         }
         else
         {
@@ -322,13 +315,15 @@ namespace hpx { namespace parcelset
         }
     }
 
-    void parcelport::send_pending_parcels(parcelport_connection_ptr client_connection, std::vector<parcel> const & parcels, std::vector<write_handler_type> const & handlers)
+    void parcelport::send_pending_parcels(
+        parcelport_connection_ptr client_connection,
+        std::vector<parcel> const & parcels,
+        std::vector<write_handler_type> const & handlers)
     {
         client_connection->set_parcel(parcels);
         client_connection->async_write(
-                detail::call_for_each(handlers),
-                boost::bind(&parcelport::send_pending_parcels_trampoline, this, ::_1
-            )
+            detail::call_for_each(handlers),
+            boost::bind(&parcelport::send_pending_parcels_trampoline, this, ::_1)
         );
     }
 }}

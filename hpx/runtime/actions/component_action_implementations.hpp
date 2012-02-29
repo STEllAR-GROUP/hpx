@@ -124,7 +124,8 @@ namespace hpx { namespace actions
                                 << detail::get_action_name<Derived>()
                                 << ") lva(" << reinterpret_cast<void const*>
                                     (get_lva<Component>::call(lva)) << ")";
-                    (get_lva<Component>::call(lva)->*F)(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+                    (get_lva<Component>::call(lva)->*F)(
+                        BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
                 }
                 catch (hpx::exception const& e) {
                     LTM_(error)
@@ -138,7 +139,6 @@ namespace hpx { namespace actions
                 }
                 return threads::terminated;
             }
-
         };
 
     public:
@@ -501,24 +501,25 @@ namespace hpx { namespace actions
                 naming::address::address_type lva,
                 BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)) const
             {
-            try {
-                LTM_(debug) << "Executing component action("
-                            << detail::get_action_name<Derived>()
-                            << ") lva(" << reinterpret_cast<void const*>
-                                (get_lva<Component>::call(lva)) << ")";
-                (get_lva<Component>::call(lva)->*F)(BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
-            }
-            catch (hpx::exception const& e) {
-                LTM_(error)
-                    << "Unhandled exception while executing component action("
-                    << detail::get_action_name<Derived>()
-                    << ") lva(" << reinterpret_cast<void const*>
-                        (get_lva<Component>::call(lva)) << "): " << e.what();
+                try {
+                    LTM_(debug) << "Executing component action("
+                                << detail::get_action_name<Derived>()
+                                << ") lva(" << reinterpret_cast<void const*>
+                                    (get_lva<Component>::call(lva)) << ")";
+                    (get_lva<Component>::call(lva)->*F)(
+                        BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
+                }
+                catch (hpx::exception const& e) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << "): " << e.what();
 
-                // report this error to the console in any case
-                hpx::report_error(boost::current_exception());
-            }
-            return threads::terminated;
+                    // report this error to the console in any case
+                    hpx::report_error(boost::current_exception());
+                }
+                return threads::terminated;
             }
         };
 
@@ -536,8 +537,9 @@ namespace hpx { namespace actions
         {
             // we need to assign the address of the thread function to a
             // variable to  help the compiler to deduce the function type
-
-            return boost::move(HPX_STD_BIND(typename Derived::thread_function(), lva, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)));
+            return boost::move(HPX_STD_BIND(
+                typename Derived::thread_function(), lva,
+                BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)));
         }
 
         // This static construct_thread_function allows to construct
@@ -550,8 +552,10 @@ namespace hpx { namespace actions
             naming::address::address_type lva,
             BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
-            return boost::move(base_type::construct_continuation_thread_object_function_void(
-                cont, F, get_lva<Component>::call(lva), BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)));
+            return boost::move(
+                base_type::construct_continuation_thread_object_function_void(
+                    cont, F, get_lva<Component>::call(lva),
+                    BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)));
         }
 
         /// serialization support
@@ -829,15 +833,8 @@ namespace hpx { namespace actions
         void (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T)),
         threads::thread_priority Priority,
         typename Derived>
-    class BOOST_PP_CAT(result_action, N) <
-        Component
-      , void
-      , Action
-      , BOOST_PP_ENUM_PARAMS(N, T)
-      , F
-      , Priority
-      , Derived
-    >
+    class BOOST_PP_CAT(result_action, N)<Component, void, Action,
+            BOOST_PP_ENUM_PARAMS(N, T), F, Priority, Derived>
       : public BOOST_PP_CAT(action, N)<Component, Action,
             BOOST_PP_ENUM_PARAMS(N, T), F, Priority, Derived>
     {

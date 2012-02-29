@@ -126,7 +126,7 @@ namespace hpx { namespace parcelset
                 // serialization library as otherwise we will loose the
                 // e.what() description of the problem, due to slicing.
                 boost::throw_exception(boost::enable_error_info(
-                    hpx::exception(unhandled_exception, e.what())));
+                    hpx::exception(serialization_error, e.what())));
             }
         }
         catch (hpx::exception const& e) {

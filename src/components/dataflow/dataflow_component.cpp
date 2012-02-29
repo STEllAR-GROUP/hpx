@@ -16,7 +16,6 @@
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/lcos/base_lco.hpp>
-#include <hpx/traits/get_remote_result.hpp>
 #include <hpx/components/dataflow/server/dataflow.hpp>
 #include <hpx/components/dataflow/server/dataflow_trigger.hpp>
 #include <hpx/include/iostreams.hpp>

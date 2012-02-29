@@ -807,8 +807,7 @@ namespace hpx { namespace threads
                 try {
                     tfunc_impl(num_thread);
                 }
-                catch (std::exception const& e)
-                {
+                catch (std::exception const& e) {
                     // Repackage exceptions to avoid slicing.
                     boost::throw_exception(boost::enable_error_info(
                         hpx::exception(unhandled_exception, e.what())));
