@@ -150,7 +150,7 @@ namespace hpx { namespace lcos { namespace server
         // standard LCO action implementations
 
         /// Add a value to the queue.
-        void set_result (RemoteType const& result)
+        void set_result (BOOST_RV_REF(RemoteType) result)
         {
             // push back the new value onto the queue
             HPX_STD_UNIQUE_PTR<queue_value_entry> node(
