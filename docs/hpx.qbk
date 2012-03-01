@@ -47,5 +47,6 @@ can be found in the collection of __boost_tools__.
 [include whats_new.qbk]
 [include gettingstarted.qbk]
 [include introduction.qbk]
+[include examples.qbk]
 
 

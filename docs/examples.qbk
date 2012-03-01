@@ -1,0 +1,24 @@
+[/=============================================================================
+Copyright (C) 2007-2012 Hartmut Kaiser
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying 
+file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+=============================================================================/]
+
+[section:examples Examples]
+
+Here are some more examples for our reader to get more familiar with HPX style 
+programming.
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:hello_world Hello World v2]
+
+You have already looked at a simple ["Hello World] example.  In this version 
+each locality will print out a statement that says which OS thread executed it
+and which locality it came from.  The output will look something like this:
+
+
+[endsect] [/Hello World]
+[/////////////////////////////////////////////////////////////////////////////]
+
+[endsect] [/Examples]
