@@ -55,7 +55,7 @@ using hpx::flush;
 boost::uint64_t nt = 0;
 boost::uint64_t nx = 0;
 boost::uint64_t n_predict = 0;
-double gamma = 0.0;
+double fluid_gamma = 0.0;
 double x_min = 0.0;
 double x_max = 0.0;
 double dx = 0.0;
@@ -195,7 +195,7 @@ double timestep_size(uint64_t timestep)
       // dt_cfl = cfl_factor*dx/(soundspeed+absolute_velocity)
       double abs_velocity = this_cell.mom/this_cell.rho;
       double pressure = get_pressure(this_cell);
-      double soundspeed = sqrt(gamma*pressure/this_cell.rho);
+      double soundspeed = sqrt(fluid_gamma*pressure/this_cell.rho);
       double dt_cfl_here = cfl_factor*dx/(soundspeed+abs_velocity);
       if (dt_cfl_here < 0.0) 
         {
@@ -320,21 +320,21 @@ cell compute(boost::uint64_t timestep, boost::uint64_t location);
   now.eint -= middle_pressure*(left.mom/left.rho - right.mom/right.rho)*dt/dx;
 
   //dual energy formalism
-  double e_kinetic = 0.5d0*middle.mom*middle.mom/middle.rho;
+  double e_kinetic = 0.5*middle.mom*middle.mom/middle.rho;
   double e_internal = middle.etot - e_kinetic;
   if ( abs(e_internal) > 0.1*middle.etot) 
-    new.tau = pow(e_internal,1.0/gamma)
+    new.tau = pow(e_internal,1.0/fluid_gamma)
 
 }  
 
 double get_pressure(cell input)
 {
-  double e_kinetic = 0.5d0*input.mom*input.mom/input.rho;
+  double e_kinetic = 0.5*input.mom*input.mom/input.rho;
   double e_internal = input.etot - e_kinetic;
   if ( (input.etot - e_kinetic) > 0.001*input.etot )
-    pressure = (gamma-1.0)*(input.etot - e_kinetic)
+    pressure = (fluid_gamma-1.0)*(input.etot - e_kinetic)
   else
-    pressure = (gamma-1.0)*pow(input.tau,gamma);
+    pressure = (fluid_gamma-1.0)*pow(input.tau,fluid_gamma);
 
   return pressure;
 }
@@ -342,7 +342,7 @@ double get_pressure(cell input)
 cell initial_sod(boost::uint64_t location)
 {
   // calculate what the x coordinate is here
-  x_here = (location-0.5)*dx+x_min;
+  double x_here = (location-0.5)*dx+x_min;
   
   cell cell_here;
   double e_internal = 0.0;
@@ -362,7 +362,7 @@ cell initial_sod(boost::uint64_t location)
     }
 
   cell_here.mom = 0.0;
-  cell_here.tau = pow(e_internal,(1.0/gamma));
+  cell_here.tau = pow(e_internal,(1.0/fluid_gamma));
   cell_here.etot = e_internal;  // ONLY true when mom=0, not in general!
   
 
@@ -378,7 +378,7 @@ int hpx_main(
   // some physics parameters
   nt = 100;
   nx = 100;
-  gamma = 1.4;
+  fluid_gamma = 1.4;
   
   x_min = -0.5;
   x_max = 0.5;
@@ -399,7 +399,27 @@ int hpx_main(
 
   {
     //HPX stuff goes here
-    //start the initial futures
+
+    // Keep track of the time required to execute.
+    high_resolution_timer t;
+
+    std::vector<promise<cell> > futures;
+    for (boost::uint64_t i=0;i<nx;i++)
+      futures.push_back(async<compute_action>(here,nt-1,i));
+    
+    // open file for output
+    std::ofstream outfile;
+    outfile.open ("output.dat");
+
+    wait(futures, [&](std::size_t i, cell n)
+         { double x_here = (location-0.5)*dx+x_min;
+           outfile << (boost::format("%1% %2%\n") % x_here % n.rho) << flush; });
+
+    outfile.close();
+
+    char const* fmt = "elapsed time: %1% [s]\n";
+    std::cout << (boost::format(fmt) % t.elapsed());
+    
   }
 
     finalize();
