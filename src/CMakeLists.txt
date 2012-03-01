@@ -133,20 +133,23 @@ add_hpx_library_headers(hpx
   GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/runtime/*.hpp"
   APPEND)
 add_hpx_library_headers(hpx
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/config/*.hpp"
+  APPEND)
+add_hpx_library_headers(hpx
   GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/include/*.hpp"
   APPEND)
 add_hpx_library_headers(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/config/*.hpp"
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/lcos/*.hpp"
   APPEND)
 add_hpx_library_headers(hpx
   GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/performance_counters/*.hpp"
   APPEND)
 add_hpx_library_headers(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/util/*.h*"
-  EXCLUDE ".*portable_binary_.*archive[.]hpp"
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/traits/*.hpp"
   APPEND)
 add_hpx_library_headers(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/lcos/*.hpp"
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/util/*.h*"
+  EXCLUDE ".*portable_binary_.*archive[.]hpp"
   APPEND)
 
 # libhpx_init headers
@@ -197,7 +200,7 @@ add_hpx_source_group(
 
 ################################################################################
 # libhpx_serialization
-add_library(hpx_serialization SHARED EXCLUDE_FROM_ALL
+add_library(hpx_serialization SHARED
   ${hpx_serialization_SOURCES} ${hpx_serialization_HEADERS})
 
 set_target_properties(hpx_serialization PROPERTIES
@@ -238,7 +241,7 @@ endif()
 
 ################################################################################
 # libhpx
-add_library(hpx SHARED EXCLUDE_FROM_ALL
+add_library(hpx SHARED
   ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
 
 set_target_properties(hpx PROPERTIES
@@ -278,7 +281,7 @@ endif()
 
 ################################################################################
 # libhpx_init
-add_library(hpx_init STATIC EXCLUDE_FROM_ALL
+add_library(hpx_init STATIC
   ${hpx_init_SOURCES} ${hpx_init_HEADERS})
 
 set_property(TARGET hpx_init APPEND
