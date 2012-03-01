@@ -8,10 +8,16 @@ hpx_write_boostbook_catalog(${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml)
 file(GLOB HPX_QBK_FILES "*.qbk")
 set(DOCUMENTATION_FILES
     ${HPX_QBK_FILES})
+set(DOCUMENTATION_DEPENENCIES
+    ${DOCUMENTATION_FILES}
+    ../examples/quickstart/hello_world.cpp
+    ../examples/quickstart/simplest_hello_world.cpp
+    )
+
 
 hpx_quickbook_to_html(hpx
     SOURCE hpx.qbk
-    DEPENDENCIES ${DOCUMENTATION_FILES}
+    DEPENDENCIES ${DOCUMENTATION_DEPENDENCIES}
     CATALOG ${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml
     XSLTPROC_ARGS --stringparam chunk.section.depth 4
                   --stringparam chunk.first.sections 1

@@ -33,7 +33,9 @@ To run the program type:
 
 [pre[^./bin/hello_world]]
 
-This should print: [^hello world from OS-thread 0 on locality 0]
+This should print: 
+
+[pre[^hello world from OS-thread 0 on locality 0]]
 
 To include more threads use the command line option ['-t] and type the number of threads that you wish to use.  For example, typing:
 
