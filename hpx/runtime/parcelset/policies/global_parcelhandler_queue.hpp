@@ -40,9 +40,11 @@ namespace hpx { namespace parcelset { namespace policies
             parcels_.enqueue(tmp);
             ++queue_length;
 
+            naming::address addr(tmp->get_destination_addr());
+
             // do some work (notify event handlers)
             BOOST_ASSERT(ph_ != 0);
-            notify_(*ph_, tmp->get_destination_addr());
+            notify_(*ph_, addr);
         }
 
         bool get_parcel(parcel& p)
