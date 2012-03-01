@@ -138,7 +138,7 @@ int hpx_main(variables_map&)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-//[main
+//[hello_world_main
 int main(int argc, char* argv[])
 {
     // Configure application-specific options.

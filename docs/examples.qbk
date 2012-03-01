@@ -17,36 +17,32 @@ You have already looked at a simple ["Hello World] example.  In this version
 each locality will print out a statement that says which OS thread executed it
 and which locality it came from.  The output will look something like this:
 
-[pre
-[^hello world from OS-thread 2 on locality 0]
-[^hello world from OS-thread 5 on locality 2]
-[^hello world from OS-thread 0 on locality 0]
-]
+    hello world from OS-thread 2 on locality 0
+    hello world from OS-thread 5 on locality 2
+    hello world from OS-thread 0 on locality 0
 
 The source file is already created for you and could be found in the svn
 repository in: [^parallex/hpx/examples/quickstart/hello_world.cpp] or a
 here [fixme add a link here].  To compile this file type:
 
-[pre[^make examples.quickstart.hello_world]]
+    make examples.quickstart.hello_world
 
 To run the program type:
 
-[pre[^./bin/hello_world]]
+    ./bin/hello_world
 
 This should print:
 
-[pre[^hello world from OS-thread 0 on locality 0]]
+    hello world from OS-thread 0 on locality 0
 
 To include more threads use the command line option ['-t] and type the number of threads that you wish to use.  For example, typing:
 
-[pre[^./bin/hello_world -t2]]
+    ./bin/hello_world -t2
 
-will yeild:
+will yield:
 
-[pre
-[^hello world from OS-thread 0 on locality 0]
-[^hello world from OS-thread 0 on locality 0]
-]
+    hello world from OS-thread 0 on locality 0
+    hello world from OS-thread 0 on locality 0
 
 [fixme explain how to run hello world on multiple localites]
 
@@ -54,11 +50,13 @@ Now that you can complile and run the code lets look at how the code works
 begining with main:
 
 [import ../examples/quickstart/hello_world.cpp]
-[main]
+[hello_world_main]
 
 [endsect] [/Hello World]
+
 [/////////////////////////////////////////////////////////////////////////////]
 [section:accumulator Accumulator]
+
 Accumulator is a simple example that exposes the notion of components in HPX.
 Components allow us to run applicationin in distributed environment in HPX.
 This example exposes four differenct functions: init, add, query and print.
@@ -69,11 +67,13 @@ component at the remote locality. Query command at the client would print the
 contents of the remote locality component at client locality.
 
 [heading Building the example]
+
 From your build directory, type the following:
 
     make examples.accumulator.accumulator
 
 [heading Run the example]
+
 From your bin directory inside install path, type the following:
 
 [teletype][/ switch to plain text source mode]
