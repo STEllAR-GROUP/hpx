@@ -8,7 +8,7 @@ set(example_programs
     1d_hydro_upwind
    )
 
-set(1d_hydro_FLAGS DEPENDENCIES iostreams_component)
+set(1d_hydro_upwind_FLAGS DEPENDENCIES iostreams_component)
 
 foreach(example_program ${example_programs})
   set(sources
