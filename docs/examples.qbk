@@ -45,9 +45,11 @@ To include more threads use the command line option ['-t] and type the number of
 
 will yield:
 
-    hello world from OS-thread 0 on locality 0
+    hello world from OS-thread 1 on locality 0
     hello world from OS-thread 0 on locality 0
 
+Notice how the ordering of the two print statements will change with
+subsequent runs.
 [fixme explain how to run hello world on multiple localites]
 
 [heading Walk-through]
