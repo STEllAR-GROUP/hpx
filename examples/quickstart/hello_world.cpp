@@ -138,6 +138,7 @@ int hpx_main(variables_map&)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+//[main
 int main(int argc, char* argv[])
 {
     // Configure application-specific options.
@@ -147,4 +148,4 @@ int main(int argc, char* argv[])
     // Initialize and run HPX.
     return init(desc_commandline, argc, argv);
 }
-
+//]

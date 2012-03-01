@@ -17,6 +17,42 @@ You have already looked at a simple ["Hello World] example.  In this version
 each locality will print out a statement that says which OS thread executed it
 and which locality it came from.  The output will look something like this:
 
+[pre
+[^hello world from OS-thread 2 on locality 0]
+[^hello world from OS-thread 5 on locality 2]
+[^hello world from OS-thread 0 on locality 0]
+]
+
+The source file is already created for you and could be found in the svn 
+repository in: [^parallex/hpx/examples/quickstart/hello_world.cpp] or a 
+here [fixme add a link here].  To compile this file type:
+
+[pre[^make examples.quickstart.hello_world]]
+
+To run the program type:
+
+[pre[^./bin/hello_world]]
+
+This should print: [^hello world from OS-thread 0 on locality 0]
+
+To include more threads use the command line option ['-t] and type the number of threads that you wish to use.  For example, typing:
+
+[pre[^./bin/hello_world -t2]]
+
+will yeild:
+
+[pre
+[^hello world from OS-thread 0 on locality 0]
+[^hello world from OS-thread 0 on locality 0]
+]
+
+[fixme explain how to run hello world on multiple localites]
+
+Now that you can complile and run the code lets look at how the code works
+begining with main:
+
+[import ../examples/quickstart/hello_world.cpp]
+[main]
 
 [endsect] [/Hello World]
 [/////////////////////////////////////////////////////////////////////////////]
