@@ -200,7 +200,13 @@ else()
 
   # Quickbook -> BoostBook XML -> DocBook -> HTML
   macro(hpx_quickbook_to_html name)
-    hpx_parse_arguments(${name} "SOURCE;DEPENDENCIES;CATALOG;XSLTPROC_ARGS;TARGET" "" ${ARGN})
+    hpx_parse_arguments(${name}
+        "SOURCE;DEPENDENCIES;CATALOG;XSLTPROC_ARGS;TARGET"
+        "" ${ARGN})
+
+    hpx_print_list("DEBUG"
+        "hpx_quickbook_to_html.${name}" "Documentation dependencies"
+        ${name}_DEPENDENCIES)
 
     hpx_quickbook_to_boostbook(${name}
       SOURCE ${${name}_SOURCE}

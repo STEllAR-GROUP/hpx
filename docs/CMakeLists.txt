@@ -8,12 +8,11 @@ hpx_write_boostbook_catalog(${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml)
 file(GLOB HPX_QBK_FILES "*.qbk")
 set(DOCUMENTATION_FILES
     ${HPX_QBK_FILES})
-set(DOCUMENTATION_DEPENENCIES
-    ${DOCUMENTATION_FILES}
-    ../examples/quickstart/hello_world.cpp
-    ../examples/quickstart/simplest_hello_world.cpp
-    )
 
+set(DOCUMENTATION_DEPENDENCIES
+    ${DOCUMENTATION_FILES}
+    ${hpx_SOURCE_DIR}/examples/quickstart/hello_world.cpp
+    ${hpx_SOURCE_DIR}/examples/quickstart/simplest_hello_world.cpp)
 
 hpx_quickbook_to_html(hpx
     SOURCE hpx.qbk
