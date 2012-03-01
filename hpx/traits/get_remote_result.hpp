@@ -36,7 +36,7 @@ namespace hpx { namespace traits
             return rhs;
         }
 #if !defined(BOOST_NO_RVALUE_REFERENCES)
-        static BOOST_RV_REF(Result) call(BOOST_RV_REF(Result) rhs)
+        static Result call(BOOST_RV_REF(Result) rhs)
         {
             return boost::move(rhs);
         }

@@ -254,7 +254,7 @@ namespace hpx { namespace traits
 #undef HPX_LCOS_DATAFLOW_M0
         }
 #endif
-        
+
         void init(BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
         {
             LLCO_(info)

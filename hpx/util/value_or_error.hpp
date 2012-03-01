@@ -205,13 +205,7 @@ namespace hpx { namespace util
         }
 
         // access stored data
-#if defined(BOOST_NO_RVALUE_REFERENCES)
-        value_type const& move_value()
-        {
-            return get_value();
-        }
-#else
-        BOOST_RV_REF(value_type) move_value()
+        value_type move_value()
         {
             if (!stores_value()) {
                 HPX_THROW_EXCEPTION(invalid_status,
@@ -220,7 +214,6 @@ namespace hpx { namespace util
             }
             return boost::move(*get_value_address());
         }
-#endif
 
         value_type& get_value()
         {

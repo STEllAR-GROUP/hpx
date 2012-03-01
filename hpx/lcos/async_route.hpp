@@ -46,7 +46,6 @@ namespace hpx { namespace lcos
         typedef typename traits::promise_local_result<
             typename Action::result_type
         >::type result_type;
-        //typedef eager_future<Action, result_type, signalling_tag> future_type;
         typedef eager_future_route<Action, result_type, signalling_tag> future_type;
 
         return future_type(gid, data_sink);
@@ -70,7 +69,6 @@ namespace hpx { namespace lcos
         typedef typename traits::promise_local_result<
             typename Action::result_type
         >::type result_type;
-        //typedef eager_future<Action, result_type, signalling_tag> future_type;
         typedef eager_future_route<Action, result_type, signalling_tag> future_type;
 
         return future_type(gid, data_sink, error_sink);
@@ -85,7 +83,7 @@ namespace hpx { namespace lcos
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (1, HPX_ACTION_ARGUMENT_LIMIT,                                        \
-    "hpx/lcos/async_route.hpp"))                                                    \
+    "hpx/lcos/async_route.hpp"))                                              \
     /**/
 
 #include BOOST_PP_ITERATE()

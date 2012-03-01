@@ -7,8 +7,8 @@
 #if !defined(HPX_LCOS_EAGER_FUTURE_JUN_27_2008_0420PM)
 #define HPX_LCOS_EAGER_FUTURE_JUN_27_2008_0420PM
 
-#include <hpx/exception.hpp>
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/exception.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/promise.hpp>
 #include <hpx/lcos/signalling_promise.hpp>
@@ -21,7 +21,6 @@
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/full_empty_memory.hpp>
 
-#include <boost/variant.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/identity.hpp>
 

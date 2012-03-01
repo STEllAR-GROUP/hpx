@@ -11,6 +11,7 @@
 #include <hpx/lcos/local_mutex.hpp>
 
 #include <boost/exception_ptr.hpp>
+#include <boost/move/move.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail
@@ -19,10 +20,10 @@ namespace hpx { namespace lcos { namespace detail
     /// action and wait for the result.
     template <typename Result, typename RemoteResult>
     class signalling_promise
-      : public detail::promise<Result, RemoteResult, 1>
+      : public detail::promise<Result, Result, 1>
     {
     private:
-        typedef detail::promise<Result, RemoteResult, 1> base_type;
+        typedef detail::promise<Result, Result, 1> base_type;
 
     public:
         typedef HPX_STD_FUNCTION<void(Result const&)> completed_callback_type;
@@ -41,21 +42,32 @@ namespace hpx { namespace lcos { namespace detail
           : on_completed_(data_sink), on_error_(error_sink)
         {}
 
-        void set_result (RemoteResult const& result)
+        void set_result (BOOST_RV_REF(RemoteResult) result)
         {
-            // We set the value of the future first as it might get converted
-            // when stored. The callback is to receive the converted value.
-            this->base_type::set_result(result);
-            if (on_completed_) {
-                error_code ec;                // this is not supposed to fail
-                on_completed_(this->get_data(0, ec));
+            try {
+                // We (possibly) convert the remote result type, call our
+                // on_completed handler, and only afterwards signal the result to
+                // the (suspended) promise. This allows to do both, get a callback
+                // and securely wait on the future.
+                typedef traits::get_remote_result<Result, RemoteResult>
+                    get_remote_result_type;
+
+                Result res = get_remote_result_type::call(result);
+                if (on_completed_)
+                    on_completed_(res);
+                this->base_type::set_result(boost::move(res));
+            }
+            catch (hpx::exception const&) {
+                // store error instead
+                set_error(boost::current_exception());
             }
         }
 
         void set_error (boost::exception_ptr const& e)
         {
+            if (on_error_)
+                on_error_(e);
             this->base_type::set_error(e);
-            if (on_error_) on_error_(e);
         }
 
     private:
@@ -126,7 +138,7 @@ namespace hpx { namespace lcos
 
 namespace hpx { namespace components
 {
-    // This specialization enables to mirrow teh detail::promise object
+    // This specialization enables to mirrow the detail::promise object
     // hierarchy for the managed_component<> as well.
     template <typename Derived, typename Result, typename RemoteResult>
     class managed_component<

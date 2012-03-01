@@ -77,6 +77,59 @@ namespace hpx { namespace lcos { namespace detail
         typedef boost::exception_ptr error_type;
         typedef util::value_or_error<result_type> data_type;
 
+        result_type handle_error(data_type const& d, error_code &ec)
+        {
+            // an error has been reported in the meantime, throw or set
+            // the error code
+            if (&ec == &throws) {
+                // REVIEW: should HPX_RETHROW_EXCEPTION be used instead?
+                boost::rethrow_exception(d.get_error());
+                // never reached
+            }
+            else {
+                try {
+                    boost::rethrow_exception(d.get_error());
+                }
+                catch (hpx::exception const& he) {
+                    ec = make_error_code(he.get_error(), he.what(),
+                        hpx::rethrow);
+                }
+            }
+            return result_type();
+        }
+
+        static bool
+        verify_slot(int slot, char const* function_name, error_code& ec = throws)
+        {
+            if (slot < 0 || slot >= N) {
+                HPX_THROWS_IF(ec, bad_parameter,
+                    function_name, "slot index out of range");
+                return false;
+            }
+            return true;
+        }
+
+        template <typename T>
+        void set_data_impl(int slot, BOOST_FWD_REF(T) result)
+        {
+            if (!verify_slot(slot, "promise<>::set_data_impl"))
+                return;
+
+            // set the received result, reset error status
+            try {
+                // store the value
+                typedef traits::get_remote_result<Result, RemoteResult>
+                    get_remote_result_type;
+
+                data_[slot].set(get_remote_result_type::call(
+                    boost::forward<RemoteResult>(result)));
+            }
+            catch (hpx::exception const&) {
+                // store the error instead
+                data_[slot].set(boost::current_exception());
+            }
+        }
+
     public:
         // This is the component id. Every component needs to have an embedded
         // enumerator 'value' which is used by the generic action implementation
@@ -91,11 +144,8 @@ namespace hpx { namespace lcos { namespace detail
         /// operation. Allows any subsequent set_data operation to succeed.
         void reset(int slot, error_code& ec = throws)
         {
-            if (slot < 0 || slot >= N) {
-                HPX_THROWS_IF(ec, bad_parameter,
-                    "promise<Result, N>::reset", "slot index out of range");
+            if (!verify_slot(slot, "promise<>::reset", ec))
                 return;
-            }
 
             data_[slot].set_empty(ec);
         }
@@ -104,11 +154,8 @@ namespace hpx { namespace lcos { namespace detail
         /// \a promise.
         bool ready(int slot, error_code& ec = throws) const
         {
-            if (slot < 0 || slot >= N) {
-                HPX_THROWS_IF(ec, bad_parameter,
-                    "promise<Result, N>::ready", "slot index out of range");
+            if (!verify_slot(slot, "promise<>::ready", ec))
                 return false;
-            }
 
             return !(data_[slot].is_empty());
         }
@@ -134,84 +181,39 @@ namespace hpx { namespace lcos { namespace detail
         ///               error description if <code>&ec == &throws</code>.
         result_type get_data(int slot, error_code& ec = throws)
         {
-            if (slot < 0 || slot >= N) {
-                HPX_THROWS_IF(ec, bad_parameter,
-                    "promise<Result, N>::get_data", "slot index out of range");
-                return Result();
-            }
+            if (!verify_slot(slot, "promise<>::get_data", ec))
+                return result_type();
 
             // yields control if needed
             data_type d;
-            data_[slot].read(d, ec);
+            data_[slot].read(d, ec);      // copies the data out of the store
             if (ec) return result_type();
 
             // the thread has been re-activated by one of the actions
             // supported by this promise (see \a promise::set_event
             // and promise::set_error).
             if (!d.stores_value())
-            {
-                // an error has been reported in the meantime, throw or set
-                // the error code
-                if (&ec == &throws) {
-                    // REVIEW: should HPX_RETHROW_EXCEPTION be used instead?
-                    boost::rethrow_exception(d.get_error());
-                    // never reached
-                }
-                else {
-                    try {
-                        boost::rethrow_exception(d.get_error());
-                    }
-                    catch (hpx::exception const& he) {
-                        ec = make_error_code(he.get_error(), he.what(),
-                            hpx::rethrow);
-                    }
-                }
-                return result_type();
-            }
+                return handle_error(d, ec);
 
             // no error has been reported, return the result
             return boost::move(d.get_value());
         }
-        
-        BOOST_RV_REF(result_type) move_data(int slot, error_code& ec = throws)
+
+        result_type move_data(int slot, error_code& ec = throws)
         {
-            if (slot < 0 || slot >= N) {
-                HPX_THROWS_IF(ec, bad_parameter,
-                    "promise<Result, N>::get_data", "slot index out of range");
-                return boost::move(Result());
-            }
+            if (!verify_slot(slot, "promise<>::move_data", ec))
+                return result_type();
 
             // yields control if needed
             data_type d;
-            data_[slot].read_and_empty(d, ec);
-            if (ec) return boost::move(result_type());
+            data_[slot].read_and_empty(d, ec); // moves the data from the store
+            if (ec) return result_type();
 
             // the thread has been re-activated by one of the actions
             // supported by this promise (see \a promise::set_event
             // and promise::set_error).
             if (!d.stores_value())
-            {
-                // an error has been reported in the meantime, throw or set
-                // the error code
-                if (&ec == &throws) {
-                    // REVIEW: should HPX_RETHROW_EXCEPTION be used instead?
-                    boost::rethrow_exception(d.get_error());
-                    // never reached
-                }
-                else {
-                    try {
-                        boost::rethrow_exception(d.get_error());
-                    }
-                    catch (hpx::exception const& he) {
-                        ec = make_error_code(he.get_error(), he.what(),
-                            hpx::rethrow);
-                    }
-                }
-                return boost::move(result_type());
-            }
-
-            if (&ec != &throws)
-                ec = make_success_code();
+                return handle_error(d, ec);
 
             // no error has been reported, return the result
             return boost::move(d.get_value());
@@ -219,100 +221,26 @@ namespace hpx { namespace lcos { namespace detail
 
         // helper functions for setting data (if successful) or the error (if
         // non-successful)
-        void set_data(int slot, RemoteResult const& result)
-        {
-            // set the received result, reset error status
-            if (slot < 0 || slot >= N) {
-                HPX_THROW_EXCEPTION(bad_parameter,
-                    "promise<Result, N>::set_data",
-                    "slot index out of range");
-                return;
-            }
-
-            try {
-                // store the value
-                typedef traits::get_remote_result<Result, RemoteResult>
-                    get_remote_result_type;
-
-                data_[slot].set(get_remote_result_type::call(result));
-            }
-            catch (hpx::exception const&) {
-                // store the error instead
-                data_[slot].set(boost::current_exception());
-            }
-        }
+//         void set_data(int slot, RemoteResult const& result)
+//         {
+//             return set_data_impl(slot, result);
+//         }
 
         void set_data(int slot, BOOST_RV_REF(RemoteResult) result)
         {
-            // set the received result, reset error status
-            if (slot < 0 || slot >= N) {
-                HPX_THROW_EXCEPTION(bad_parameter,
-                    "promise<Result, N>::set_data",
-                    "slot index out of range");
-                return;
-            }
-
-            try {
-                // store the value
-                typedef traits::get_remote_result<Result, RemoteResult>
-                    get_remote_result_type;
-
-                data_[slot].set(get_remote_result_type::call(
-                    boost::forward<RemoteResult>(result)));
-            }
-            catch (hpx::exception const&) {
-                // store the error instead
-                data_[slot].set(boost::current_exception());
-            }
+            return set_data_impl(slot, boost::forward<RemoteResult>(result));
         }
 
         void set_local_data(int slot, result_type const& result)
         {
-            // set the received result, reset error status
-            if (slot < 0 || slot >= N) {
-                HPX_THROW_EXCEPTION(bad_parameter,
-                    "promise<Result, N>::set_data",
-                    "slot index out of range");
-                return;
-            }
-
-            try {
-                // store the value
-                data_[slot].set(result);
-            }
-            catch (hpx::exception const&) {
-                data_[slot].set(data_type(boost::current_exception()));
-            }
-        }
-
-        void set_local_data(int slot, BOOST_RV_REF(result_type) result)
-        {
-            // set the received result, reset error status
-            if (slot < 0 || slot >= N) {
-                HPX_THROW_EXCEPTION(bad_parameter,
-                    "promise<Result, N>::set_data",
-                    "slot index out of range");
-                return;
-            }
-
-            try {
-                // store the value
-                data_[slot].set(boost::forward<result_type>(result));
-            }
-            catch (hpx::exception const&) {
-                data_[slot].set(data_type(boost::current_exception()));
-            }
+            return set_data_impl(slot, result);
         }
 
         // trigger the future with the given error condition
         void set_error(int slot, boost::exception_ptr const& e)
         {
-            if (slot < 0 || slot >= N) {
-                HPX_THROW_EXCEPTION(bad_parameter,
-                    "promise<Result, N>::set_error",
-                    "slot index out of range");
+            if (!verify_slot(slot, "promise<>::set_error"))
                 return;
-            }
 
             // store the error code
             data_[slot].set(data_type(e));
@@ -322,11 +250,6 @@ namespace hpx { namespace lcos { namespace detail
         // exposed functionality of this component
 
         // trigger the future, set the result
-        void set_result (RemoteResult const& result)
-        {
-            set_data(0, result);    // set the received result, reset error status
-        }
-
         void set_result (BOOST_RV_REF(RemoteResult) result)
         {
             // set the received result, reset error status
@@ -342,7 +265,7 @@ namespace hpx { namespace lcos { namespace detail
         {
             return boost::move(get_data(0));
         }
-        
+
         Result move_value()
         {
             return boost::move(move_data(0));
@@ -529,14 +452,14 @@ namespace hpx { namespace lcos
             detail::log_on_exit<wrapping_type> on_exit(impl_, ec);
             return boost::move((*impl_)->get_data(0, ec));
         }
-        
-        BOOST_RV_REF(Result) move_out(int slot, error_code& ec = throws) const
+
+        Result move_out(int slot, error_code& ec = throws) const
         {
             detail::log_on_exit<wrapping_type> on_exit(impl_, ec);
             return boost::move((*impl_)->move_data(slot, ec));
         }
 
-        BOOST_RV_REF(Result) move_out(error_code& ec = throws) const
+        Result move_out(error_code& ec = throws) const
         {
             detail::log_on_exit<wrapping_type> on_exit(impl_, ec);
             return boost::move((*impl_)->move_data(0, ec));
