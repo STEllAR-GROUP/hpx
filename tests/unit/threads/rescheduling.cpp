@@ -64,7 +64,7 @@ boost::uint64_t wait(
         {
             // loop over all lazy_values, executing the next as soon as its
             // value gets available
-            if (!handled[i] && lazy_values[i].ready())
+            if (!handled[i] && lazy_values[i].is_ready())
             {
                 handled[i] = true;
                 ++handled_count;

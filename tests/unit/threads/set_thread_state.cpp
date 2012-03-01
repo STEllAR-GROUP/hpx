@@ -63,7 +63,7 @@ boost::uint64_t wait(
         {
             // loop over all lazy_values, executing the next as soon as its
             // value gets available
-            if (!handled[i] && lazy_values[i].ready())
+            if (!handled[i] && lazy_values[i].is_ready())
             {
                 handled[i] = true;
                 ++handled_count;
@@ -88,11 +88,11 @@ void change_thread_state(
     boost::uint64_t thread
     )
 {
-//    std::cout << "waking up thread (wait_signaled)\n"; 
-    set_thread_state(reinterpret_cast<void*>(thread), pending, wait_signaled); 
+//    std::cout << "waking up thread (wait_signaled)\n";
+    set_thread_state(reinterpret_cast<void*>(thread), pending, wait_signaled);
 
-//    std::cout << "suspending thread (wait_timeout)\n"; 
-    set_thread_state(reinterpret_cast<void*>(thread), suspended, wait_timeout); 
+//    std::cout << "suspending thread (wait_timeout)\n";
+    set_thread_state(reinterpret_cast<void*>(thread), suspended, wait_timeout);
 }
 
 typedef plain_action1<
@@ -107,7 +107,7 @@ HPX_REGISTER_PLAIN_ACTION(change_thread_state_action);
 ///////////////////////////////////////////////////////////////////////////////
 void tree_boot(
     boost::uint64_t count
-  , boost::uint64_t grain_size 
+  , boost::uint64_t grain_size
   , id_type const& prefix
   , boost::uint64_t thread
     );
@@ -127,7 +127,7 @@ HPX_REGISTER_PLAIN_ACTION(tree_boot_action);
 ///////////////////////////////////////////////////////////////////////////////
 void tree_boot(
     boost::uint64_t count
-  , boost::uint64_t grain_size 
+  , boost::uint64_t grain_size
   , id_type const& prefix
   , boost::uint64_t thread
     )
@@ -161,7 +161,7 @@ void tree_boot(
     for (boost::uint64_t i = 0; i < children; ++i)
     {
         promises.push_back(async<tree_boot_action>
-            (prefix, child_count, grain_size, prefix, thread)); 
+            (prefix, child_count, grain_size, prefix, thread));
     }
 
     for (boost::uint64_t i = 0; i < actors; ++i)

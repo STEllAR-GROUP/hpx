@@ -152,9 +152,9 @@ namespace hpx { namespace lcos { namespace detail
 
         /// Return whether or not the data is available for this
         /// \a promise.
-        bool ready(int slot, error_code& ec = throws) const
+        bool is_ready(int slot, error_code& ec = throws) const
         {
-            if (!verify_slot(slot, "promise<>::ready", ec))
+            if (!verify_slot(slot, "promise<>::is_ready", ec))
                 return false;
 
             return !(data_[slot].is_empty());
@@ -413,9 +413,15 @@ namespace hpx { namespace lcos
 
         /// Return whether or not the data is available for this
         /// \a promise.
-        bool ready() const
+        bool is_ready() const
         {
-            return (*impl_)->ready(0);
+            return (*impl_)->is_ready(0);
+        }
+
+        /// Return whether this instance has been properly initialized
+        bool valid() const
+        {
+            return impl_;
         }
 
         typedef Result result_type;
@@ -559,9 +565,9 @@ namespace hpx { namespace lcos
 
         /// Return whether or not the data is available for this
         /// \a promise.
-        bool ready() const
+        bool is_ready() const
         {
-            return (*impl_)->ready(0);
+            return (*impl_)->is_ready(0);
         }
 
         typedef util::unused_type result_type;

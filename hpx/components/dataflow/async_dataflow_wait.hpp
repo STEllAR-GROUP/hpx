@@ -43,7 +43,7 @@ namespace hpx { namespace lcos
 
                 // loop over all lazy_values, executing the next as soon as its
                 // value becomes available
-                if (!handled[i] && lazy_values[i].ready()) {
+                if (!handled[i] && lazy_values[i].is_ready()) {
                     // get the value from the future, invoke the function
                     f(i, lazy_values[i].get());
 
@@ -87,7 +87,7 @@ namespace hpx { namespace lcos
 
                 // loop over all lazy_values, executing the next as soon as its
                 // value becomes available
-                if (!handled[i] && lazy_values[i].ready()) {
+                if (!handled[i] && lazy_values[i].is_ready()) {
                     // get the value from the future, invoke the function
                     lazy_values[i].get();
                     f(i);

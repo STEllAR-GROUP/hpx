@@ -79,7 +79,7 @@ struct managed_refcnt_monitor
         // Flush pending reference counting operations on the target locality. 
         agas::garbage_collect(locality_);
 
-        return flag_.ready();
+        return flag_.is_ready();
     }
 
     template <
@@ -98,7 +98,7 @@ struct managed_refcnt_monitor
         // Suspend this pxthread.
         threads::get_self().yield(threads::suspended);
 
-        return flag_.ready();
+        return flag_.is_ready();
     }
 };
 
