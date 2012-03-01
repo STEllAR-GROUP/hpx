@@ -58,5 +58,51 @@ begining with main:
 
 [endsect] [/Hello World]
 [/////////////////////////////////////////////////////////////////////////////]
+[section:accumulator Accumulator]
+Accumulator is a simple example that exposes the notion of components in HPX. 
+Components allow us to run applicationin in distributed environment in HPX. 
+This example exposes four differenct functions: init, add, query and print.
+What this example does is it takes an input from a client locality component, 
+puts value in a data type (unsigned long) at the remote locality component.
+Print command at the client would print the contents of the remote locality 
+component at the remote locality. Query command at the client would print the 
+contents of the remote locality component at client locality. 
+
+[Building the example]
+From your build directory, type the following:
+[pre[^make examples.accumulator.accumulator]]
+
+[Run the example]
+From your bin directory inside install path, type the following:
+a) On single machine, first console:
+[pre[^./accumulator_client -0 -l2]]
+Same machine, second console, on identical path as above:
+[pre[^./accumulator_client -1 -l2]]
+Result:
+    Console 1:
+[pre
+[^accumulator client, you may enter some commands (try 'help' if in doubt...)]
+[^add 5]
+[^print]
+[^query]
+[^{0000000200ff0001, 000000000002ffff}> 5]
+[^print]
+[^add 5]
+[^print]
+[^query]
+[^{0000000200ff0001, 000000000002ffff}> 10]
+[^quit]
+]
+
+
+    Console 2:
+[pre
+[^{0000000200000000, 00007fff21db4860}> 5]
+[^{0000000200000000, 00007fff21db4860}> 5]
+[^{0000000200000000, 00007fff21db4860}> 10]
+]
+
+[endsect] [/Accumulator]
+[/////////////////////////////////////////////////////////////////////////////]
 
 [endsect] [/Examples]

@@ -68,6 +68,10 @@ void printfinalcoord (config_f& param, uint64_t k) { ///Not done with this funct
  string j=param.output+"_finalcoord.h5";
  const H5std_string FILE_NAME(j);
  const H5std_string DATASET_NAME("Coordinates");
+
+ const H5std_string FILE_NAME("test_output.h5");
+ const H5std_string DATASET_NAME("test again");
+
  H5File file(FILE_NAME, H5F_ACC_TRUNC); //Create new file
  
  //Define a memory space
