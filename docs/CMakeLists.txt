@@ -5,9 +5,9 @@
 
 hpx_write_boostbook_catalog(${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml)
 
+file(GLOB HPX_QBK_FILES "*.qbk")
 set(DOCUMENTATION_FILES
-    hpx.qbk preface.qbk whats_new.qbk introduction.qbk gettingstarted.qbk 
-    examples.qbk)
+    ${HPX_QBK_FILES})
 
 hpx_quickbook_to_html(hpx
     SOURCE hpx.qbk

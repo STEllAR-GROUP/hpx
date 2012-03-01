@@ -1125,8 +1125,8 @@ if(NOT HPX_NO_INSTALL)
     endif()
 
     install(
-      DIRECTORY ${doc_dir}/share/hpx/docs/html/
-      DESTINATION ${CMAKE_INSTALL_PREFIX}/share/hpx/docs/html
+      DIRECTORY ${doc_dir}/share/hpx/docs/
+      DESTINATION ${CMAKE_INSTALL_PREFIX}/share/hpx-${HPX_VERSION}/doc
       COMPONENT docs
       OPTIONAL
       FILES_MATCHING PATTERN "*.html"
@@ -1135,7 +1135,7 @@ if(NOT HPX_NO_INSTALL)
 
     install(
       DIRECTORY ${hpx_SOURCE_DIR}/docs/html/src/
-      DESTINATION ${CMAKE_INSTALL_PREFIX}/share/hpx/docs/html/src
+      DESTINATION ${CMAKE_INSTALL_PREFIX}/share/hpx/doc-${HPX_VERSION}/html/src
       COMPONENT docs
       FILES_MATCHING PATTERN "*.css"
       PATTERN ".svn" EXCLUDE
@@ -1143,7 +1143,7 @@ if(NOT HPX_NO_INSTALL)
 
     install(
       DIRECTORY ${hpx_SOURCE_DIR}/docs/html/images/
-      DESTINATION ${CMAKE_INSTALL_PREFIX}/share/hpx/docs/html/images
+      DESTINATION ${CMAKE_INSTALL_PREFIX}/share/hpx/doc-${HPX_VERSION}/html/images
       COMPONENT docs
       FILES_MATCHING PATTERN "*.png"
       PATTERN ".svn" EXCLUDE

@@ -97,7 +97,7 @@ macro(hpx_ini_install name ini)
     set(install_code
         "if(EXISTS \"${name}\")
             file(INSTALL FILES ${CMAKE_CURRENT_SOURCE_DIR}/${ini}
-                 DESTINATION ${CMAKE_INSTALL_PREFIX}/share/hpx/ini
+                 DESTINATION ${CMAKE_INSTALL_PREFIX}/share/hpx-${HPX_VERSION}/ini
                  OPTIONAL
                  PERMISSIONS OWNER_READ OWNER_WRITE
                              GROUP_READ
