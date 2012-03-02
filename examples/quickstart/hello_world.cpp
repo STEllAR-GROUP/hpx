@@ -111,14 +111,14 @@ void hello_world_foreman()
 
 // Define the boilerplate code necessary for the function 'hello_world_foreman'
 // to be invoked as an HPX action
-//[action_wrapper
+//[hello_world_action_wrapper
 typedef plain_action0<hello_world_foreman> hello_world_foreman_action;
 
 HPX_REGISTER_PLAIN_ACTION(hello_world_foreman_action);
 //]
 
 ///////////////////////////////////////////////////////////////////////////////
-//[hpx_main
+//[hello_world_hpx_main
 //`Here is hpx_main:
 int hpx_main(variables_map&)
 {
@@ -136,7 +136,7 @@ int hpx_main(variables_map&)
         }
 
         wait(futures);    /* Wait for all IO to finish */ /*<
-        Wait() will cause the OS thread to wait for all the promises stored 
+        Wait() will cause the OS thread to wait for all the promises stored
            in futures to be executed before continuing the program>*/
     }
 
@@ -159,7 +159,7 @@ int main(int argc, char* argv[])
     return init(desc_commandline, argc, argv);
 }
 /*`
-  In HPX main is used to initialize the runtime system and pass the command line 
+  In HPX main is used to initialize the runtime system and pass the command line
   arguments to the program.  If you wish to add command line options to your
   program you would add them here using desc_commandline.add_options() [fixme link
   to API] (see the API for more details).  Init() calls hpx_main after setting up
