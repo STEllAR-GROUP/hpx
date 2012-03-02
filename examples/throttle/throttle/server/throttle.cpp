@@ -39,7 +39,7 @@ namespace throttle { namespace server
     {
         // If the current thread is not the requested one, re-schedule a new
         // PX thread in order to retry.
-        std::size_t thread_num = hpx::get_thread_num();
+        std::size_t thread_num = hpx::get_worker_thread_num();
         if (thread_num != shepherd) {
             register_suspend_thread(shepherd);
             return;

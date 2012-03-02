@@ -133,7 +133,7 @@ namespace hpx { namespace util
             std::stringstream out;
             out << std::hex << std::setw(sizeof(std::size_t)*2)
                 << std::setfill('0')
-                << hpx::get_thread_num();
+                << hpx::get_worker_thread_num();
             str.prepend_string(out.str());
         }
     };

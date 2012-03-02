@@ -563,7 +563,7 @@ namespace hpx
     ///         returned by \a get_os_thread_count().
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         fail otherwise (it will return -1).
-    HPX_API_EXPORT std::size_t get_thread_num();
+    HPX_API_EXPORT std::size_t get_worker_thread_num();
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of the locality this function is being called

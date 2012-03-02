@@ -15,7 +15,7 @@ HPX_REGISTER_PLAIN_ACTION(touch_mem_action);
 
 std::size_t touch_mem(std::size_t desired, std::size_t ps, std::size_t start, std::size_t end)
 {
-    std::size_t current = hpx::get_thread_num();
+    std::size_t current = hpx::get_worker_thread_num();
 
     if (current == desired)
     {

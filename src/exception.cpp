@@ -161,7 +161,7 @@ namespace hpx { namespace detail
             if (threads::threadmanager_is(running))
             {
                 node = get_locality_id();
-                shepherd = threads::threadmanager_base::get_thread_num();
+                shepherd = threads::threadmanager_base::get_worker_thread_num();
             }
 
             thread_id = reinterpret_cast<std::size_t>(self->get_thread_id());

@@ -57,7 +57,7 @@ using hpx::flush;
 ///////////////////////////////////////////////////////////////////////////////
 std::size_t hello_world_worker(std::size_t desired)
 {
-    std::size_t current = hpx::get_thread_num();
+    std::size_t current = hpx::get_worker_thread_num();
 
     if (current == desired)
     {

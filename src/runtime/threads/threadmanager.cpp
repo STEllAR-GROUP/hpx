@@ -202,7 +202,7 @@ namespace hpx { namespace threads
         // producer environment, this can lead to unexpected imbalances and
         // work only gets distributed by work stealing.
         //if (std::size_t(-1)  == data.num_os_thread)
-        //    data.num_os_thread = get_thread_num();
+        //    data.num_os_thread = get_worker_thread_num();
 
         // create the new thread
         thread_id_type newid = scheduler_.create_thread(
@@ -283,7 +283,7 @@ namespace hpx { namespace threads
         // producer environment, this can lead to unexpected imbalances and
         // work only gets distributed by work stealing.
         //if (std::size_t(-1) == data.num_os_thread)
-        //    data.num_os_thread = get_thread_num();
+        //    data.num_os_thread = get_worker_thread_num();
 
         if (thread_priority_critical == data.priority) {
             // For critical priority threads, create the thread immediately.
@@ -435,7 +435,7 @@ namespace hpx { namespace threads
         thrd->set_state(new_state);
 
         if (new_state == pending) {
-            scheduler_.schedule_thread(thrd, get_thread_num(), priority);
+            scheduler_.schedule_thread(thrd, get_worker_thread_num(), priority);
             do_some_work();
         }
 
@@ -1588,7 +1588,7 @@ namespace hpx { namespace threads
         threadmanager_base::thread_num_.reset();
     }
 
-    std::size_t threadmanager_base::get_thread_num(bool* numa_sensitive)
+    std::size_t threadmanager_base::get_worker_thread_num(bool* numa_sensitive)
     {
         if (NULL != threadmanager_base::thread_num_.get())
         {
@@ -1612,7 +1612,7 @@ namespace hpx { namespace threads
     std::size_t get_numa_node_number()
     {
         bool numa_sensitive = false;
-        std::size_t thread_num = threadmanager_base::get_thread_num(&numa_sensitive);
+        std::size_t thread_num = threadmanager_base::get_worker_thread_num(&numa_sensitive);
         return get_numa_node(get_thread_manager().get_pu_num(thread_num), numa_sensitive);
     }
 

@@ -294,7 +294,7 @@ namespace hpx { namespace threads
         /// Return number of the processing unit the given thread is running on
         virtual std::size_t get_pu_num(std::size_t num_thread) = 0;
 
-        static std::size_t get_thread_num(bool* numa_sensitive = 0);
+        static std::size_t get_worker_thread_num(bool* numa_sensitive = 0);
 
         void init_tss(std::size_t thread_num, bool numa_sensitive);
         void deinit_tss();

@@ -433,7 +433,7 @@ namespace hpx
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::report_error(
         boost::exception_ptr const& e)
     {
-        std::size_t num_thread = hpx::threads::threadmanager_base::get_thread_num();
+        std::size_t num_thread = hpx::threads::threadmanager_base::get_worker_thread_num();
         return report_error(num_thread, e);
     }
 
@@ -652,7 +652,7 @@ namespace hpx
             return;
         }
 
-        std::size_t num_thread = hpx::threads::threadmanager_base::get_thread_num();
+        std::size_t num_thread = hpx::threads::threadmanager_base::get_worker_thread_num();
         hpx::applier::get_applier().get_thread_manager().report_error(num_thread, e);
     }
 
@@ -765,9 +765,9 @@ namespace hpx
         return get_runtime().get_config().get_os_thread_count();
     }
 
-    std::size_t get_thread_num()
+    std::size_t get_worker_thread_num()
     {
-        return get_runtime().get_thread_manager().get_thread_num();
+        return get_runtime().get_thread_manager().get_worker_thread_num();
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -1,10 +1,10 @@
 Namespce HPX
 
-API Component:		Comments:
-example_function	this does bla...
-example_class		this class belongs in **** namespace...
-			I love this class...
-example_module		bla bla bla....
+API Component:        Comments:
+example_function    this does bla...
+example_class        this class belongs in **** namespace...
+            I love this class...
+example_module        bla bla bla....
 
 
 class error_code : public boost::system::error_code
@@ -22,9 +22,9 @@ class HPX_EXPORT runtime_impl : public runtime
 
 struct HPX_EXCEPTION_EXPORT bad_alloc : std::bad_alloc
 
-struct HPX_EXCEPTION_EXPORT bad_cast : std::bad_cast 
+struct HPX_EXCEPTION_EXPORT bad_cast : std::bad_cast
 
-struct HPX_EXCEPTION_EXPORT bad_exception : std::bad_exception 
+struct HPX_EXCEPTION_EXPORT bad_exception : std::bad_exception
 
 struct HPX_EXCEPTION_EXPORT bad_typeid : std::bad_typeid
 
@@ -103,7 +103,7 @@ inline error_code make_success_code(throwmode mode = plain);
     ///         returned by \a get_os_thread_count().
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         fail otherwise (it will return -1).
-    HPX_API_EXPORT std::size_t get_thread_num();
+    HPX_API_EXPORT std::size_t get_worker_thread_num();
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of the locality this function is being called
