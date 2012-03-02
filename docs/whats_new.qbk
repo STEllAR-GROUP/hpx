@@ -10,6 +10,154 @@
 [/////////////////////////////////////////////////////////////////////////////]
 [section:hpx_0_8_0 HPX V0.8.0]
 
+[heading General Changes]
+
+* Improving the general performance of local and remote action invocations.
+  This (under certain circumstances) drastically reduces the number of copies
+  created for each of the parameters and return values.
+* Reworked the performance counter framework. Performance counters are now
+  created only when needed, which reduces the overall resource requirements.
+  The new framework allows for a much more flexible creation and management
+  of performance counters. The new Sine example application demonstrates some
+  of the capabilities.
+* Added a buildbot based continuous build system giving instant automated
+  feedback on each commit to SVN.
+* Added more automated tests to verify proper functioning of HPX.
+* Started to create documentation for HPX and its API.
+* Added documentation toolchain to the build system.
+* Added dataflow LCO.
+* Changed default HPX command line options to have `'hpx:'` prefix, for
+  instance the former option `--threads` is now `--hpx:threads`. This has been
+  done to make ambiguities with possible application specific command line
+  options as unlikely as possible. See the section __commandline__ for a full
+  list of available options.
+* Added the possibility to define command line aliases. The former short
+  (one-letter) command line options have been defined as predefined aliases for
+  backwards compatibility. See the section [fixme insert link] for a detailed
+  description of command line option aliasing.
+* Network connections are now cached based on the connected host. The number of
+  simultaneous connections to a particular host is now limited. Parcels are
+  buffered and bundled if all connections are in use.
+* Added a suite of benchmarks allowing to compare performance of the HPX
+  threading subsystem to other threading libraries (Intel TBB, ETI SWARM,
+  Sandia QThreads).
+* Added more refined thread affinity control. This is based on the external
+  library __hwloc__
+* Fully support (64Bit) Windows builds in build system.
+* Allow for components to register their own command line options.
+* Added the possibility to register custom startup/shutdown functions for
+  any component. These functions are guaranteed to be executed by an HPX
+  thread.
+* Added two new experimental thread schedulers: hierarchy_scheduler and
+  periodic_priority_scheduler. These can be activated by using the command line
+  options `--hpx::queueing=hierarchy` or `--hpx::queueing=periodic`.
+
+[heading Example Applications]
+
+* Graph500 performace benchmark (thanks to Matthew Anderson for contributing
+  this application).
+* Sine performance counter demo.
+
+[heading API Changes]
+
+* Moved all local LCOs into a separate namespace `hpx::lcos::local` (for
+  instance, `hpx::lcos::local_mutex` is now hpx::lcos::local::mutex`).
+
+* Replaced `hpx::actions::function` with `hpx::util::function`. Cleaned up
+  related code.
+* Removed `hpx::traits::handle_gid` and moved handlingn of global reference
+  counts into the corresponding serialization code.
+* Changed terminology: `prefix` is now called `locality_id`, renamed the
+  corresponding API functions (such as `hpx::get_prefix`, which is nowcalled
+  `hpx::get_locality_id`).
+* Adding `hpx::find_remote_localities`, `hpx::get_num_localities`,
+* Changed performance counter naming scheme to make it more bash friendly
+  (the new performance counter naming scheme is now
+
+    /object{parentname#parentindex/instance#index}/counter#parameters
+
+* Added `hpx::get_worker_thread_num` replacing `hpx::threadmanager_base::get_thread_num`.
+* Renamed `hpx::get_num_os_threads` to `hpx::get_os_threads_count`.
+* Added `hpx::threads::get_thread_count`.
+
+[heading Bug fixes]
+
+*  #31: Specialize handle_gid<> for examples and tests
+*  #72: Fix AGAS reference counting
+* #103: Better diagnostics for multiple component/action registerations under the same name
+* #104: VERIFY: heartbeat throws an exception when decrefing the performance counter its watching
+* #111: VERIFY: throttle causes an exception on the target application
+* #142: One failed component loading causes an unrelated component to fail
+* #165: Remote exception propagation bug in AGAS reference counting test
+* #171: Add an INI option to turn off deadlock detection independently of logging
+* #175: Asynchronous AGAS API
+* #186: Test credit exhaustion/splitting (e.g. prepare_gid, symbol NS)
+* #188: Implement remaining AGAS reference counting test cases
+* #209: Support multiple configurations in generated build files
+* #215: Add /proc/pid/stat and /proc/pid/statm performance counters
+* #224: VERIFY: Changing pxthread state metadata is not thread safe
+* #237: Symbolic naming interface should deal exclusively in id_types
+* #251: VERIFY: Sine PCS example causes time scaling exception in other applications
+* #258: No type checking of GIDs in stubs classes
+* #266: Investigate static_ visibility
+* #271: Seg fault/shared pointer assertion in distributed code
+* #281: cmake options need explanative text
+* #282: Add check to ensure cmake is executed for the correct CMakeLists.txt
+* #283: AGAS caching broken (gva_cache needs to be rewritten with ICL)
+* #284: examples broken in r6614
+* #285: HPX_INSTALL root directory not the same as CMAKE_INSTALL_PREFIX
+* #286: new segfault in dataflow applications
+* #287: FindHPX_GSL.cmake
+* #288: CMake install error on Windows
+* #289: Exceptions should only be logged if unhandled
+* #290: c++11 tests failure
+* #291: Let at least one buildbot slave do full builds (instead of incremental builds)
+* #292: Bogus 'fixes' to AGAS caching
+* #293: Build target for component libraries
+* #294: Linker error
+* #295: Don't require install path to be known at compile time
+* #296: Compilation error with Boost V1.49rc1
+* #297: linking fails w/o hwloc but with numactl present
+* #298: Illegal instructions on termination
+* #299: gravity aborts with multiple threads
+* #300: C compiler support needed for bfs
+* #301: Build error with Boost trunk
+* #302: Build failure of HPX 0.7.0 with visual studio 2010
+* #303: Logging assertion failure in distributed runs
+* #304: Exception 'what' strings are lost when exceptions from decode_parcel are reported
+* #305: top of trunk broken
+* #306: Peformance counter user interface issues
+* #307: Logging exception in distributed runs
+* #308: Logging deadlocks in distributed
+* #309: Reference counting test failures and exceptions
+* #310: Duplicate logging entries
+* #311: Merge AGAS remote_interface with the runtime_support object
+* #314: Object tracking for id_types
+* #315: Remove handle_gid and handle credit splitting in id_type serialization
+* #317: Implement network performance counters
+* #318: Network benchmarks
+* #319: Dataflow destruction
+* #320: applier::get_locality_id() should return an error value (or throw an exception)
+* #321: Optimization for id_types which are never split should be restored
+* #322: Command line processing ignored with Boost 1.47.0
+* #323: Credit exhaustion causes object to stay alive
+* #324: Duplicate exception messages
+* #325: Sheneos is 200-400 times slower than the fortran equivalent
+* #326: Intergrate Quickbook with CMake
+* #328: FindHPX_HDF5.cmake is broken
+* #329: --help and --version should still work
+* #330: Create pkg-config files
+* #336: Integrate testing with cmake
+* #337: Improve usability of performance counter timestamps
+* #338: Non-std exceptions deriving from std::exceptions in tfunc may be sliced
+* #339: Decrease the number of send_pending_parcels threads
+* #340: Performance counters for parcels
+* #343: VERIFY: Dynamically setting the stack size doesn't work
+* #344: Mark CMake variables as advanced
+* #345: Add more versatile environmental/cmake variable support to hpx_find_* CMake macros
+* #347: Embarrassingly parallel applications do not scale
+
+
 [endsect]
 
 [/////////////////////////////////////////////////////////////////////////////]

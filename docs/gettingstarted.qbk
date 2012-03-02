@@ -41,7 +41,6 @@ often possible to download the Boost libraries using the package manager of
 your distribution, please refer to the corresponding documentation.
 
 [table Prerequisites for using HPX on Linux systems
-
     [[Name                       ][Recommended Version][Min/Max Version ]]
 
     [[[*Compilers]]]
@@ -49,12 +48,12 @@ your distribution, please refer to the corresponding documentation.
 
     [[[*Build System]]]
 
-    [[cmake                      ][2.8.4              ][2.8.*           ]]
+    [[__cmake__                  ][2.8.4              ][2.8.*           ]]
     [[gmake                      ][3.81               ][3.80 - 3.82     ]]
 
     [[[*Required Libraries]]]
 
-    [[boost                      ][1.48               ][1.47.0 - SVN    ]]
+    [[__boost__                  ][1.48               ][1.47.0 - SVN    ]]
     [[eglibc (Debian, Ubuntu)    ][2.11.*             ][2.7.* - 2.13.*  ]]
     [[glibc (Redhat)             ][2.11.*             ][2.7.* - 2.13.*  ]]
     [[libstdc++                  ][4.4.5-6            ][4.4.*           ]]
@@ -158,6 +157,11 @@ To test the result, type:
 
 which should print `Hello HPX World!` and exit.
 
+
+[heading Using HPX Applications with PBS]
+
+[fixme TBD]
+
 [endsect] [/ How to Install HPX on Unix Variants]
 
 
@@ -175,10 +179,10 @@ which should print `Hello HPX World!` and exit.
 
     [[[*Build System]]]
 
-    [[cmake                      ][2.8.4              ][2.8.*           ]]
+    [[__cmake__                  ][2.8.4              ][2.8.*           ]]
 
     [[[*Required Libraries]]]
-    [[boost                      ][1.48               ][1.43.0 - SVN    ]]
+    [[__boost__                  ][1.48               ][1.43.0 - SVN    ]]
 ]
 
 [fixme TBD]
@@ -264,7 +268,7 @@ described in the [link hpx.getting_started.commandline.commandline table below].
                                  instance of HPX (default: 1)]]
     [[`--hpx:threads arg`]      [the number of operating system threads to spawn
                                  for this HPX locality (default: 1)]]
-    [[`--hpx:queueing arg`]     [the queue scheduling policy to use, options are
+    [[`--hpx:queuing arg`]      [the queue scheduling policy to use, options are
                                  'local/l', 'priority_local/pr', 'abp/a', 'priority_abp',
                                  'hierarchy/h', and 'periodic/pe' (default: priority_local/p)]]
     [[`--hpx:hierarchy-arity`]  [the arity of the of the thread queue tree, valid for

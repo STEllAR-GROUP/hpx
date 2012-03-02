@@ -7,7 +7,7 @@
 ===============================================================================/]
 
 [article HPX
-    [quickbook 1.6]
+    [quickbook 1.5]
     [id hpx]
     [authors [STE||AR Group, The]]
     [version 0.8.0]
@@ -27,9 +27,14 @@
 [def __stellar_list__           [@email:gopx@cct.lsu.edu HPX General List]]
 [def __stellar_irc__            [@irc://irc.freenode.net:6667/#ste||ar #stellar at Freenet]]
 
+[def __cmake__                  [@http://www.cmake.org/ CMake]]
+
 [def __boost__                  [@http://www.boost.org/ Boost]]
 [def __boost_tools__            [@http://www.boost.org/tools/index.html Boost Tools]]
 [def __boost_getting_started__  [@http://www.boost.org/doc/libs/release/more/getting_started/index.html Getting Started]]
+
+[/ optional external dependencies]
+[def __hwloc__                  [@http://www.open-mpi.org/projects/hwloc/ Portable Hardware Locality (hwloc)]]
 
 [/ Some images ]
 [def __note__                   [$./images/note.png]]
@@ -37,6 +42,9 @@
 [def __important__              [$./images/important.png]]
 [def __caution__                [$./images/caution.png]]
 [def __danger__                 [$./images/alert.png]]
+
+[/ Section link shortcuts]
+[def __commandline__            [link hpx.getting_started.commandline HPX Command Line Options]]
 
 [/ CONTENT]
 
