@@ -1116,6 +1116,12 @@ if(NOT HPX_NO_INSTALL)
       PATTERN ".git" EXCLUDE)
   endif()
 
+  install(
+    DIRECTORY ${hpx_SOURCE_DIR}/
+    DESTINATION share/hpx-${HPX_VERSION}
+    COMPONENT license
+    FILES_MATCHING PATTERN "LICENSE_1_0.txt")
+
   if(HPX_DOCUMENTATION_GENERATION)
     # install hpx documentation files
     if(MSVC)
@@ -1126,7 +1132,7 @@ if(NOT HPX_NO_INSTALL)
 
     install(
       DIRECTORY ${doc_dir}/share/hpx/docs/
-      DESTINATION ${CMAKE_INSTALL_PREFIX}/share/hpx-${HPX_VERSION}/doc
+      DESTINATION share/hpx-${HPX_VERSION}/doc
       COMPONENT docs
       OPTIONAL
       FILES_MATCHING PATTERN "*.html"
@@ -1135,7 +1141,7 @@ if(NOT HPX_NO_INSTALL)
 
     install(
       DIRECTORY ${hpx_SOURCE_DIR}/docs/html/src/
-      DESTINATION ${CMAKE_INSTALL_PREFIX}/share/hpx-${HPX_VERSION}/doc/html/src
+      DESTINATION share/hpx-${HPX_VERSION}/doc/html/src
       COMPONENT docs
       FILES_MATCHING PATTERN "*.css"
       PATTERN ".svn" EXCLUDE
@@ -1143,7 +1149,7 @@ if(NOT HPX_NO_INSTALL)
 
     install(
       DIRECTORY ${hpx_SOURCE_DIR}/docs/html/images/
-      DESTINATION ${CMAKE_INSTALL_PREFIX}/share/hpx-${HPX_VERSION}/doc/html/images
+      DESTINATION share/hpx-${HPX_VERSION}/doc/html/images
       COMPONENT docs
       FILES_MATCHING PATTERN "*.png"
       PATTERN ".svn" EXCLUDE
