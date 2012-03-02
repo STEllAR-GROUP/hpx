@@ -14,6 +14,7 @@ set(subdirs
     bright_future
     dataflow
     distributed_test
+    embarrassingly_parallel
     gtc
     heartbeat
     hplpx
