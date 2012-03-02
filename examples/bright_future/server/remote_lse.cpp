@@ -155,7 +155,7 @@ namespace bright_future { namespace server {
         /*
         double time = t.elapsed();
         {
-            hpx::lcos::local_spinlock::scoped_lock l(mtx);
+            hpx::lcos::local::spinlock::scoped_lock l(mtx);
             timestamps.push_back(time);
         }
         */

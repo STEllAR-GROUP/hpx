@@ -13,7 +13,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/lcos/local_spinlock.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/stringstream.hpp>
@@ -68,7 +68,7 @@
 //        else return the new semaphore
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos
+namespace hpx { namespace lcos { namespace local
 {
     template <typename T>
     inline bool interlocked_bit_test_and_set(boost::atomic<T>& x, long bit)
@@ -86,10 +86,10 @@ namespace hpx { namespace lcos
 
     /// An exclusive-ownership mutex which implements Boost.Thread's
     /// TimedLockable concept.
-    class HPX_EXPORT local_mutex : public boost::noncopyable
+    class HPX_EXPORT mutex : public boost::noncopyable
     {
     private:
-        typedef lcos::local_spinlock mutex_type;
+        typedef lcos::local::spinlock mutex_type;
 
         BOOST_STATIC_CONSTANT(boost::uint32_t, lock_flag_bit = 31);
         BOOST_STATIC_CONSTANT(boost::uint32_t, lock_flag_value = 1u << lock_flag_bit);
@@ -160,16 +160,16 @@ namespace hpx { namespace lcos
         void set_event();
 
     public:
-        local_mutex(char const* const description = "")
+        mutex(char const* const description = "")
           : active_count_(0), pending_events_(0), description_(description)
         {
-            HPX_ITT_SYNC_CREATE(this, "lcos::local_mutex", description);
-            HPX_ITT_SYNC_RENAME(this, "lcos::local_mutex");
+            HPX_ITT_SYNC_CREATE(this, "lcos::mutex", description);
+            HPX_ITT_SYNC_RENAME(this, "lcos::mutex");
         }
 
-        ~local_mutex();
+        ~mutex();
 
-        /// Attempts to acquire ownership of the \a local_mutex. Never blocks.
+        /// Attempts to acquire ownership of the \a mutex. Never blocks.
         ///
         /// \returns \a true if ownership was acquired; otherwise, \a false.
         ///
@@ -187,7 +187,7 @@ namespace hpx { namespace lcos
             return got_lock;
         }
 
-        /// Acquires ownership of the \a local_mutex. Suspends the current
+        /// Acquires ownership of the \a mutex. Suspends the current
         /// HPX-thread if ownership cannot be obtained immediately.
         ///
         /// \throws Throws \a hpx#bad_parameter if an error occurs while
@@ -219,7 +219,7 @@ namespace hpx { namespace lcos
             HPX_ITT_SYNC_ACQUIRED(this);
         }
 
-        /// Attempts to acquire ownership of the \a local_mutex. Suspends the
+        /// Attempts to acquire ownership of the \a mutex. Suspends the
         /// current HPX-thread until \a wait_until if ownership cannot be obtained
         /// immediately.
         ///
@@ -231,7 +231,7 @@ namespace hpx { namespace lcos
         ///         called outside of a HPX-thread.
         bool timed_lock(::boost::system_time const& wait_until);
 
-        /// Attempts to acquire ownership of the \a local_mutex. Suspends the
+        /// Attempts to acquire ownership of the \a mutex. Suspends the
         /// current HPX-thread until \a timeout if ownership cannot be obtained
         /// immediately.
         ///
@@ -252,7 +252,7 @@ namespace hpx { namespace lcos
             return timed_lock(boost::posix_time::ptime(timeout));
         }
 
-        /// Release ownership of the \a local_mutex.
+        /// Release ownership of the \a mutex.
         ///
         /// \throws Throws \a hpx#bad_parameter if an error occurs while
         ///         releasing the mutex. Throws \a hpx#null_thread_id if called
@@ -270,8 +270,8 @@ namespace hpx { namespace lcos
             HPX_ITT_SYNC_RELEASED(this);
         }
 
-        typedef boost::unique_lock<local_mutex> scoped_lock;
-        typedef boost::detail::try_lock_wrapper<local_mutex> scoped_try_lock;
+        typedef boost::unique_lock<mutex> scoped_lock;
+        typedef boost::detail::try_lock_wrapper<mutex> scoped_try_lock;
 
     private:
         mutable mutex_type mtx_;
@@ -280,9 +280,11 @@ namespace hpx { namespace lcos
         boost::uint32_t pending_events_;
         char const* const description_;
     };
-}}
+}}}
+
 #if defined(BOOST_MSVC)
 #pragma warning(pop)
 #endif
+
 #endif
 

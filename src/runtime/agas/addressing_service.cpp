@@ -526,7 +526,7 @@ bool addressing_service::route_parcel(
 ///////////////////////////////////////////////////////////////////////////////
 struct lock_semaphore
 {
-    lock_semaphore(lcos::local_counting_semaphore& sem)
+    lock_semaphore(lcos::local::counting_semaphore& sem)
       : sem_(sem)
     {
         // this needs to be invoked from a px-thread
@@ -539,7 +539,7 @@ struct lock_semaphore
         sem_.signal(1);
     }
 
-    lcos::local_counting_semaphore& sem_;
+    lcos::local::counting_semaphore& sem_;
 };
 
 template <typename Pool, typename Future, typename Promise>

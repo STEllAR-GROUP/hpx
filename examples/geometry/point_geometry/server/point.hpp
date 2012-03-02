@@ -18,7 +18,7 @@
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <boost/geometry/geometries/adapted/boost_tuple.hpp>
-#include <hpx/lcos/local_mutex.hpp>
+#include <hpx/lcos/local/mutex.hpp>
 
 #include "../serialize_geometry.hpp"
 
@@ -255,7 +255,7 @@ namespace hpx { namespace geometry { namespace server
         > recompute_action;
 
     private:
-        //hpx::lcos::local_mutex mtx_;    // lock for this data block
+        //hpx::lcos::local::mutex mtx_;    // lock for this data block
         plain_point_type pt_;
         double xmin_,xmax_,ymin_,ymax_;
         std::size_t numpoints_;

@@ -29,7 +29,7 @@
 #include <hpx/components/dataflow/server/detail/component_wrapper.hpp>
 
 #include <hpx/util/demangle_helper.hpp>
-#include <hpx/lcos/local_spinlock.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 
 namespace hpx { namespace lcos { namespace server { namespace detail
 {
@@ -44,7 +44,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
         boost::int64_t constructed_;
         boost::int64_t initialized_;
         boost::int64_t fired_;
-        lcos::local_spinlock mtx_;
+        lcos::local::spinlock mtx_;
     };
     extern HPX_COMPONENT_EXPORT dataflow_counter_data dataflow_counter_data_;
 
@@ -207,7 +207,7 @@ namespace hpx { namespace traits
 
         dataflow_impl(
             naming::id_type const & id
-          , lcos::local_spinlock & mtx
+          , lcos::local::spinlock & mtx
           , std::vector<naming::id_type> & t
         )
             : back_ptr_(0)
@@ -321,7 +321,7 @@ namespace hpx { namespace traits
 #if N > 0
             bool wait = false;
             {
-                lcos::local_spinlock::scoped_lock l(mtx);
+                lcos::local::spinlock::scoped_lock l(mtx);
                 wait = (args_set == args_completed);
             }
             if(wait)
@@ -330,7 +330,7 @@ namespace hpx { namespace traits
                 while(true)
                 {
                     {
-                        lcos::local_spinlock::scoped_lock l(mtx);
+                        lcos::local::spinlock::scoped_lock l(mtx);
                         if(result_set)
                             break;
                     }
@@ -352,7 +352,7 @@ namespace hpx { namespace traits
                 << targets.size()
                 ;
             {
-                lcos::local_spinlock::scoped_lock l(mtx);
+                lcos::local::spinlock::scoped_lock l(mtx);
 
                 result = r;
                 result_set = true;
@@ -365,7 +365,7 @@ namespace hpx { namespace traits
         {
             std::vector<naming::id_type> t;
             {
-                lcos::local_spinlock::scoped_lock l(mtx);
+                lcos::local::spinlock::scoped_lock l(mtx);
                 if(result_set == false) return;
                 std::swap(targets, t);
             }
@@ -388,7 +388,7 @@ namespace hpx { namespace traits
                 << ">::set_target() of "
                 << get_gid()
                 << " ";
-            lcos::local_spinlock::scoped_lock l(mtx);
+            lcos::local::spinlock::scoped_lock l(mtx);
 
             if(result_set)
             {
@@ -434,7 +434,7 @@ namespace hpx { namespace traits
         {
             bool apply_it = false;
             {
-                lcos::local_spinlock::scoped_lock l(mtx);
+                lcos::local::spinlock::scoped_lock l(mtx);
                 if(args_set != args_completed)
                 {
                     args_set |= (1<<Slot);
@@ -452,7 +452,7 @@ namespace hpx { namespace traits
                   , args
                 );
 
-                lcos::local_spinlock::scoped_lock l(mtx);
+                lcos::local::spinlock::scoped_lock l(mtx);
                 ++dataflow_counter_data_.fired_;
             }
             LLCO_(info)
@@ -522,7 +522,7 @@ namespace hpx { namespace traits
 #if N > 0
         boost::array<component_wrapper_base *, N> arg_ids;
 #endif
-        lcos::local_spinlock & mtx;
+        lcos::local::spinlock & mtx;
     };
 
 #undef REMAINDER

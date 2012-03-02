@@ -12,11 +12,11 @@
 #include <hpx/lcos/lazy_future.hpp>
 #include <hpx/lcos/async.hpp>
 
-#include <hpx/lcos/local_barrier.hpp>
-#include <hpx/lcos/local_counting_semaphore.hpp>
-#include <hpx/lcos/local_mutex.hpp>
-#include <hpx/lcos/local_shared_mutex.hpp>
-#include <hpx/lcos/local_recursive_mutex.hpp>
+#include <hpx/lcos/local/barrier.hpp>
+#include <hpx/lcos/local/counting_semaphore.hpp>
+#include <hpx/lcos/local/mutex.hpp>
+#include <hpx/lcos/local/shared_mutex.hpp>
+#include <hpx/lcos/local/recursive_mutex.hpp>
 
 #include <hpx/lcos/queue.hpp>
 #include <hpx/lcos/barrier.hpp>

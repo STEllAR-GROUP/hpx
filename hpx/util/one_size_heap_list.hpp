@@ -19,7 +19,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/lcos/local_shared_mutex.hpp>
+#include <hpx/lcos/local/shared_mutex.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -44,7 +44,7 @@ class one_size_heap_list
         heap_size = heap_type::heap_size    // size of the object
     };
 
-    typedef lcos::local_shared_mutex mutex_type;
+    typedef lcos::local::shared_mutex mutex_type;
     typedef boost::shared_lock<mutex_type> shared_lock_type;
     typedef boost::upgrade_lock<mutex_type> upgrade_lock_type;
     typedef boost::upgrade_to_unique_lock<mutex_type> upgraded_lock_type;

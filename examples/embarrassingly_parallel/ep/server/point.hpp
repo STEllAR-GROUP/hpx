@@ -52,7 +52,7 @@ namespace ep { namespace server
         > bfs_action;
 
     private:
-        hpx::lcos::local_mutex mtx_;
+        hpx::lcos::local::mutex mtx_;
         double sum_;
     };
 }}

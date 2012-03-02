@@ -87,7 +87,7 @@ struct time{
     , computed(other.computed)
   {}
 
-  hpx::lcos::local_mutex mtx;
+  hpx::lcos::local::mutex mtx;
   double dt;
   double elapsed_time;
   bool computed;
@@ -122,7 +122,7 @@ struct cell{
     , computed(other.computed)
   {}
 
-  hpx::lcos::local_mutex mtx;
+  hpx::lcos::local::mutex mtx;
   double rho;
   double mom;
   double etot;
@@ -163,7 +163,7 @@ typedef eager_future<compute_action> compute_future;
 double timestep_size(uint64_t timestep)
 {
   // locking
-  hpx::lcos::local_mutex::scoped_lock l(time_array[timestep].mtx);
+  hpx::lcos::local::mutex::scoped_lock l(time_array[timestep].mtx);
 
   // if it has already been calculated, then just return the value
   if (time_array[timestep].computed)
@@ -224,7 +224,7 @@ double timestep_size(uint64_t timestep)
 
 cell compute(boost::uint64_t timestep, boost::uint64_t location)
 {
-  hpx::lcos::local_mutex::scoped_lock l(grid[timestep][location].mtx);
+  hpx::lcos::local::mutex::scoped_lock l(grid[timestep][location].mtx);
   
   // if it is already computed then just return the value
   if (grid[timestep][location].computed == true)

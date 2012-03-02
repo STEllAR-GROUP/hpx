@@ -10,7 +10,7 @@
 #include <memory>
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/local_spinlock.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/runtime/threads/thread.hpp>
@@ -46,7 +46,7 @@ namespace hpx { namespace util { namespace detail
         boost::int64_t read_enqueued_;
         boost::int64_t read_dequeued_;
         boost::int64_t set_full_;
-        lcos::local_spinlock mtx_;
+        lcos::local::spinlock mtx_;
     };
     extern HPX_EXPORT full_empty_counter_data full_empty_counter_data_;
 
@@ -58,7 +58,7 @@ namespace hpx { namespace util { namespace detail
     class full_empty_entry
     {
     public:
-        typedef lcos::local_spinlock mutex_type;
+        typedef lcos::local::spinlock mutex_type;
 
     private:
         typedef threads::thread_id_type thread_id_type;
@@ -121,7 +121,7 @@ namespace hpx { namespace util { namespace detail
         full_empty_entry()
           : data_(), state_(empty)
         {
-            lcos::local_spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
+            lcos::local::spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
             ++full_empty_counter_data_.constructed_;
         }
 
@@ -129,7 +129,7 @@ namespace hpx { namespace util { namespace detail
         explicit full_empty_entry(BOOST_FWD_REF(T0) t0)
           : data_(boost::forward<T0>(t0)), state_(empty)
         {
-            lcos::local_spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
+            lcos::local::spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
             ++full_empty_counter_data_.constructed_;
         }
 
@@ -142,7 +142,7 @@ namespace hpx { namespace util { namespace detail
                 log_non_empty_queue("read_queue", read_queue_);
             }
 
-            lcos::local_spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
+            lcos::local::spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
             ++full_empty_counter_data_.destructed_;
         }
 
@@ -192,7 +192,7 @@ namespace hpx { namespace util { namespace detail
                 threads::thread_state_ex_enum statex;
 
                 {
-                    lcos::local_spinlock::scoped_lock ll(full_empty_counter_data_.mtx_);
+                    lcos::local::spinlock::scoped_lock ll(full_empty_counter_data_.mtx_);
                     ++full_empty_counter_data_.read_enqueued_;
                 }
 
@@ -203,7 +203,7 @@ namespace hpx { namespace util { namespace detail
                 }
 
                 {
-                    lcos::local_spinlock::scoped_lock ll(full_empty_counter_data_.mtx_);
+                    lcos::local::spinlock::scoped_lock ll(full_empty_counter_data_.mtx_);
                     ++full_empty_counter_data_.read_dequeued_;
                 }
 
@@ -257,7 +257,7 @@ namespace hpx { namespace util { namespace detail
                 threads::thread_state_ex_enum statex;
 
                 {
-                    lcos::local_spinlock::scoped_lock ll(full_empty_counter_data_.mtx_);
+                    lcos::local::spinlock::scoped_lock ll(full_empty_counter_data_.mtx_);
                     ++full_empty_counter_data_.read_enqueued_;
                 }
 
@@ -268,7 +268,7 @@ namespace hpx { namespace util { namespace detail
                 }
 
                 {
-                    lcos::local_spinlock::scoped_lock ll(full_empty_counter_data_.mtx_);
+                    lcos::local::spinlock::scoped_lock ll(full_empty_counter_data_.mtx_);
                     ++full_empty_counter_data_.read_dequeued_;
                 }
 
@@ -602,7 +602,7 @@ namespace hpx { namespace util { namespace detail
                     threads::wait_timeout, threads::thread_priority_normal, ec);
                 if (ec) return false;
 
-                lcos::local_spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
+                lcos::local::spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
                 ++full_empty_counter_data_.set_full_;
             }
 

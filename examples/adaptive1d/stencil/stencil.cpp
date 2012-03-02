@@ -231,7 +231,7 @@ namespace hpx { namespace components { namespace adaptive1d
               val.push_back(f.get());
 
             // lock all user defined data elements, will be unlocked at function exit
-            scoped_values_lock<lcos::local_mutex> l(val);
+            scoped_values_lock<lcos::local::mutex> l(val);
 
             val[1]->max_index_ = val[0]->max_index_;
             val[1]->index_ = val[0]->index_;
@@ -277,7 +277,7 @@ namespace hpx { namespace components { namespace adaptive1d
               val.push_back(f.get());
 
             // lock all user defined data elements, will be unlocked at function exit
-            scoped_values_lock<lcos::local_mutex> l(val);
+            scoped_values_lock<lcos::local::mutex> l(val);
 
             val[2]->max_index_ = val[0]->max_index_;
             val[2]->index_ = val[0]->index_;
@@ -328,7 +328,7 @@ namespace hpx { namespace components { namespace adaptive1d
               val.push_back(f.get());
 
             // lock all user defined data elements, will be unlocked at function exit
-            scoped_values_lock<lcos::local_mutex> l(val);
+            scoped_values_lock<lcos::local::mutex> l(val);
 
             val[3]->max_index_ = val[1]->max_index_;
             val[3]->index_ = val[1]->index_;
@@ -380,7 +380,7 @@ namespace hpx { namespace components { namespace adaptive1d
               val.push_back(f.get());
 
             // lock all user defined data elements, will be unlocked at function exit
-            scoped_values_lock<lcos::local_mutex> l(val);
+            scoped_values_lock<lcos::local::mutex> l(val);
 
             val[1].get() = val[0].get();
 
@@ -410,7 +410,7 @@ namespace hpx { namespace components { namespace adaptive1d
               val.push_back(f.get());
 
             // lock all user defined data elements, will be unlocked at function exit
-            scoped_values_lock<lcos::local_mutex> l(val);
+            scoped_values_lock<lcos::local::mutex> l(val);
 
             val[2].get() = val[0].get();
 
@@ -467,7 +467,7 @@ namespace hpx { namespace components { namespace adaptive1d
                 val.push_back(f.get());
 
             // lock all user defined data elements, will be unlocked at function exit
-            scoped_values_lock<lcos::local_mutex> l(val);
+            scoped_values_lock<lcos::local::mutex> l(val);
 
             val[3].get() = val[0].get();
 

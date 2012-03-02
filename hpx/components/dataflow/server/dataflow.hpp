@@ -71,12 +71,12 @@ namespace hpx { namespace lcos { namespace server
 
             component_type * w = new component_type(target, mtx, targets);
             {
-                lcos::local_spinlock::scoped_lock l(mtx);
+                lcos::local::spinlock::scoped_lock l(mtx);
                 component_ptr = w;
             }
             (*w)->init();
 
-            lcos::local_spinlock::scoped_lock l(detail::dataflow_counter_data_.mtx_);
+            lcos::local::spinlock::scoped_lock l(detail::dataflow_counter_data_.mtx_);
             ++detail::dataflow_counter_data_.initialized_;
         }
 
@@ -120,7 +120,7 @@ namespace hpx { namespace lcos { namespace server
                 "server::dataflow::connect(" << target << ") {" << get_gid() << "}"
                 ;
             {
-                lcos::local_spinlock::scoped_lock l(mtx);
+                lcos::local::spinlock::scoped_lock l(mtx);
 
                 // wait until component_ptr is initialized.
                 if(component_ptr == 0)
@@ -143,7 +143,7 @@ namespace hpx { namespace lcos { namespace server
 
     private:
         detail::component_wrapper_base * component_ptr;
-        lcos::local_spinlock mtx;
+        lcos::local::spinlock mtx;
         std::vector<naming::id_type> targets;
     };
 }}}
@@ -188,12 +188,12 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
                 component_type;
             component_type * w = new component_type(target, mtx, targets);
             {
-                lcos::local_spinlock::scoped_lock l(mtx);
+                lcos::local::spinlock::scoped_lock l(mtx);
                 component_ptr = w;
             }
             (*w)->init(BOOST_PP_ENUM(N, M1, _));
 
-            lcos::local_spinlock::scoped_lock
+            lcos::local::spinlock::scoped_lock
                 l(detail::dataflow_counter_data_.mtx_);
             ++detail::dataflow_counter_data_.initialized_;
         }

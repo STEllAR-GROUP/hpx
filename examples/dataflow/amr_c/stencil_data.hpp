@@ -12,7 +12,7 @@
 #include <boost/serialization/split_member.hpp>
 #include <vector>
 
-#include <hpx/lcos/local_mutex.hpp>
+#include <hpx/lcos/local/mutex.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/valarray.hpp>
 
@@ -92,7 +92,7 @@ namespace hpx { namespace components { namespace amr
             return *this;
         }
 
-        hpx::lcos::local_mutex mtx_;    // lock for this data block
+        hpx::lcos::local::mutex mtx_;    // lock for this data block
 
         std::size_t max_index_;   // overall number of data points
         std::size_t index_;       // sequential number of this data point (0 <= index_ < max_values_)

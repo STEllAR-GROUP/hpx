@@ -11,7 +11,7 @@
 #include <boost/version.hpp>
 #include <boost/intrusive/slist.hpp>
 
-#include <hpx/lcos/local_mutex.hpp>
+#include <hpx/lcos/local/mutex.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/runtime/threads/thread.hpp>
@@ -35,7 +35,7 @@ namespace hpx { namespace lcos { namespace server
     private:
         typedef components::managed_component_base<barrier> base_type;
 
-        typedef hpx::lcos::local_mutex mutex_type;
+        typedef hpx::lcos::local::mutex mutex_type;
         mutex_type mtx_;
 
         // define data structures needed for intrusive slist container used for

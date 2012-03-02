@@ -3,39 +3,39 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_LOCAL_BARRIER_JUN_23_2008_0530PM)
-#define HPX_LCOS_LOCAL_BARRIER_JUN_23_2008_0530PM
+#if !defined(HPX_LCOS_barrier_JUN_23_2008_0530PM)
+#define HPX_LCOS_barrier_JUN_23_2008_0530PM
 
 #include <boost/intrusive/slist.hpp>
-#include <hpx/lcos/local_spinlock.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/stringstream.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos
+namespace hpx { namespace lcos { namespace local
 {
-    /// A local_barrier can be used to synchronize a specific number of threads,
+    /// A barrier can be used to synchronize a specific number of threads,
     /// blocking all of the entering threads until all of the threads have
-    /// entered the local_barrier.
+    /// entered the barrier.
     ///
-    /// \note   A \a local_barrier is not a LCO in the sense that it has no global id
+    /// \note   A \a barrier is not a LCO in the sense that it has no global id
     ///         and it can't be triggered using the action (parcel) mechanism.
     ///         It is just a low level synchronization primitive allowing to
     ///         synchronize a given number of \a threads.
-    class local_barrier
+    class barrier
     {
     private:
-        typedef lcos::local_spinlock mutex_type;
+        typedef lcos::local::spinlock mutex_type;
 
         // define data structures needed for intrusive slist container used for
         // the queues
-        struct local_barrier_queue_entry
+        struct barrier_queue_entry
         {
             typedef boost::intrusive::slist_member_hook<
                 boost::intrusive::link_mode<boost::intrusive::normal_link>
             > hook_type;
 
-            local_barrier_queue_entry(threads::thread_id_type id)
+            barrier_queue_entry(threads::thread_id_type id)
               : id_(id)
             {}
 
@@ -44,25 +44,25 @@ namespace hpx { namespace lcos
         };
 
         typedef boost::intrusive::member_hook<
-            local_barrier_queue_entry, local_barrier_queue_entry::hook_type,
-            &local_barrier_queue_entry::slist_hook_
+            barrier_queue_entry, barrier_queue_entry::hook_type,
+            &barrier_queue_entry::slist_hook_
         > slist_option_type;
 
         typedef boost::intrusive::slist<
-            local_barrier_queue_entry, slist_option_type,
+            barrier_queue_entry, slist_option_type,
             boost::intrusive::cache_last<true>,
             boost::intrusive::constant_time_size<false>
         > queue_type;
 
     public:
-        local_barrier(std::size_t number_of_threads)
+        barrier(std::size_t number_of_threads)
           : number_of_threads_(number_of_threads)
         {}
 
-        ~local_barrier()
+        ~barrier()
         {
             if (!queue_.empty()) {
-                LERR_(fatal) << "~local_barrier: thread_queue is not empty, aborting threads";
+                LERR_(fatal) << "~barrier: thread_queue is not empty, aborting threads";
 
                 mutex_type::scoped_lock l(mtx_);
                 while (!queue_.empty()) {
@@ -72,7 +72,7 @@ namespace hpx { namespace lcos
 
                     // we know that the id is actually the pointer to the thread
                     threads::thread* thrd = static_cast<threads::thread*>(id);
-                    LERR_(fatal) << "~local_barrier: pending thread: "
+                    LERR_(fatal) << "~barrier: pending thread: "
                             << get_thread_state_name(thrd->get_state())
                             << "(" << id << "): " << thrd->get_description();
 
@@ -81,7 +81,7 @@ namespace hpx { namespace lcos
                     threads::set_thread_state(id, threads::pending,
                         threads::wait_abort, threads::thread_priority_normal, ec);
                     if (ec) {
-                        LERR_(fatal) << "~local_barrier: could not abort thread"
+                        LERR_(fatal) << "~barrier: could not abort thread"
                             << get_thread_state_name(thrd->get_state())
                             << "(" << id << "): " << thrd->get_description();
                     }
@@ -101,9 +101,9 @@ namespace hpx { namespace lcos
             if (queue_.size() < number_of_threads_-1) {
                 threads::thread_id_type id = self.get_thread_id();
 
-                threads::set_thread_lco_description(id, "lcos::local_barrier");
+                threads::set_thread_lco_description(id, "lcos::barrier");
 
-                local_barrier_queue_entry e(id);
+                barrier_queue_entry e(id);
                 queue_.push_back(e);
                 queue_type::const_iterator last = queue_.last();
                 threads::thread_state_ex_enum statex;
@@ -120,7 +120,7 @@ namespace hpx { namespace lcos
                     hpx::util::osstream strm;
                     strm << "thread(" << id << ", " << threads::get_thread_description(id)
                           << ") aborted (yield returned wait_abort)";
-                    HPX_THROW_EXCEPTION(yield_aborted, "local_barrier::wait",
+                    HPX_THROW_EXCEPTION(yield_aborted, "barrier::wait",
                         hpx::util::osstream_get_string(strm));
                     return;
                 }
@@ -159,8 +159,7 @@ namespace hpx { namespace lcos
         mutable mutex_type mtx_;
         queue_type queue_;
     };
-
-}}
+}}}
 
 #endif
 

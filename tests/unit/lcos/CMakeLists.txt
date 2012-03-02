@@ -4,18 +4,20 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+set(subdirs
+    local)
+
+foreach(subdir ${subdirs})
+  add_hpx_pseudo_target(tests.unit.lcos.local)
+  add_subdirectory(local)
+  add_hpx_pseudo_dependencies(tests.unit.lcos tests.unit.lcos.local)
+endforeach()
+
 set(tests
     barrier
     dataflow
     eager_future
     lazy_future
-    local_barrier
-    local_mutex_lock
-    local_mutex_lock_raii
-    local_mutex_lock_sanity
-    local_mutex_try_lock
-    local_mutex_try_lock_raii
-    local_mutex_try_lock_sanity
     signalling_promise
    )
 

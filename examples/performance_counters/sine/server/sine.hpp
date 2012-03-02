@@ -8,7 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/interval_timer.hpp>
-#include <hpx/lcos/local_spinlock.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
 
 namespace performance_counters { namespace sine { namespace server
@@ -51,7 +51,7 @@ namespace performance_counters { namespace sine { namespace server
         void evaluate();
 
     private:
-        typedef hpx::lcos::local_spinlock mutex_type;
+        typedef hpx::lcos::local::spinlock mutex_type;
 
         mutable mutex_type mtx_;
         double current_value_;

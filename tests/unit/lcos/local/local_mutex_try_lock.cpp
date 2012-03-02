@@ -8,8 +8,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/lightweight_test.hpp>
-#include <hpx/lcos/local_mutex.hpp>
-#include <hpx/lcos/local_barrier.hpp>
+#include <hpx/lcos/local/mutex.hpp>
+#include <hpx/lcos/local/barrier.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -17,8 +17,8 @@ using boost::program_options::value;
 
 using hpx::applier::register_work_nullary;
 
-using hpx::lcos::local_barrier;
-using hpx::lcos::local_mutex;
+using hpx::lcos::local::barrier;
+using hpx::lcos::local::mutex;
 
 using hpx::init;
 using hpx::finalize;
@@ -33,10 +33,10 @@ struct test_mutexed_data
     typedef typename M::scoped_try_lock try_lock_type;
 
     mutex_type* mtx;
-    local_barrier* barr;
+    barrier* barr;
     std::size_t* data;
 
-    test_mutexed_data(mutex_type& m, local_barrier& b, std::size_t& d)
+    test_mutexed_data(mutex_type& m, barrier& b, std::size_t& d)
         : mtx(&m), barr(&b), data(&d) {}
 
     void operator()()
@@ -72,17 +72,17 @@ int hpx_main(variables_map& vm)
         pxthreads = vm["pxthreads"].as<std::size_t>();
     
     {
-        local_mutex mtx;
-        local_barrier barr(pxthreads + 1);
+        mutex mtx;
+        barrier barr(pxthreads + 1);
         std::size_t data = 0;
 
-        test_mutexed_data<local_mutex> t(mtx, barr, data);
+        test_mutexed_data<mutex> t(mtx, barr, data);
         for (std::size_t i = 0; i < pxthreads; ++i)
             register_work_nullary(t, "test_local_mutex_try_lock");
 
         barr.wait();
 
-        local_mutex::scoped_lock lock(mtx);
+        mutex::scoped_lock lock(mtx);
         HPX_TEST(lock ? true : false);
 
         HPX_TEST_EQ(data, pxthreads);

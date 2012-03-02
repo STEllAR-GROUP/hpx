@@ -23,7 +23,7 @@ namespace bfs { namespace server
         std::vector<std::size_t> const& neighborlist,
         boost::numeric::ublas::mapped_vector<std::size_t> const& index,std::size_t max_levels)
     {
-        hpx::lcos::local_mutex::scoped_lock l(mtx_);
+        hpx::lcos::local::mutex::scoped_lock l(mtx_);
         idx_ = objectid;
         grainsize_ = grainsize; 
         max_levels_ = max_levels;
@@ -84,14 +84,14 @@ namespace bfs { namespace server
     }
 
     void point::reset_visited(std::size_t id) {
-      hpx::lcos::local_mutex::scoped_lock l(mtx_);
+      hpx::lcos::local::mutex::scoped_lock l(mtx_);
       std::fill( visited_.begin(),visited_.end(),false);
     }
 
     // tradional traverse
     std::vector<std::size_t> point::traverse(std::size_t level,std::size_t parent,std::size_t edge)
     {
-        hpx::lcos::local_mutex::scoped_lock l(mtx_);
+        hpx::lcos::local::mutex::scoped_lock l(mtx_);
         if ( visited_[mapping_(edge)] == false ) {
           visited_[mapping_(edge)] = true;
           parent_[mapping_(edge)] = parent;
@@ -140,7 +140,7 @@ namespace bfs { namespace server
     // depth traverse
     std::vector<nodedata> point::depth_traverse(std::size_t level,std::size_t parent,std::size_t edge)
     {
-        hpx::lcos::local_mutex::scoped_lock l(mtx_);
+        hpx::lcos::local::mutex::scoped_lock l(mtx_);
         std::vector<nodedata> result,lresult;
         //result.reserve(10000);
         //lresult.reserve(10000);
@@ -156,7 +156,7 @@ namespace bfs { namespace server
             if ( level < max_levels_ ) {
               for (std::size_t i=0;i<neighbors_[mapping].size();i++) {
                 std::size_t neighbor = neighbors_[mapping][i];
-                //hpx::util::unlock_the_lock<hpx::lcos::local_mutex::scoped_lock> ul(l); 
+                //hpx::util::unlock_the_lock<hpx::lcos::local::mutex::scoped_lock> ul(l); 
                 //lresult = depth_traverse(level+1,edge,neighbor);
                 lresult = unlocked_depth_traverse(level+1,edge,neighbor);
                 result.insert(result.end(),lresult.begin(),lresult.end());
@@ -176,7 +176,7 @@ namespace bfs { namespace server
  
     std::size_t point::get_parent(std::size_t edge)
     {
-      hpx::lcos::local_mutex::scoped_lock l(mtx_);
+      hpx::lcos::local::mutex::scoped_lock l(mtx_);
       if ( visited_[mapping_(edge)] == false ) {
         return 0;
       } else {
@@ -186,7 +186,7 @@ namespace bfs { namespace server
 
     std::size_t point::get_level(std::size_t edge)
     {
-      hpx::lcos::local_mutex::scoped_lock l(mtx_);
+      hpx::lcos::local::mutex::scoped_lock l(mtx_);
       if ( visited_[mapping_(edge)] == false ) {
         return 0;
       } else {

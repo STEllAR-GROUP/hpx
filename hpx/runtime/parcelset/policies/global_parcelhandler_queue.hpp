@@ -94,7 +94,7 @@ namespace hpx { namespace parcelset { namespace policies
 
         boost::signals2::signal_type<
             void(parcelhandler&, naming::address const&)
-          , boost::signals2::keywords::mutex_type<lcos::local_mutex>
+          , boost::signals2::keywords::mutex_type<lcos::local::mutex>
         >::type notify_;
     };
 }}}

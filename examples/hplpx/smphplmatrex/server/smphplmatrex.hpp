@@ -18,7 +18,7 @@ a destructor, and access operators.
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/local_mutex.hpp>
+#include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
@@ -92,7 +92,7 @@ namespace hpx { namespace components { namespace server
     int* pivotarr;        //array for storing pivot elements
                           //(maps original rows to pivoted/reordered rows)
     int* tempivotarr;     //temporary copy of pivotarr
-    lcos::local_mutex mtex;     //mutex
+    lcos::local::mutex mtex;     //mutex
 
     public:
     //here we define the actions that will be used

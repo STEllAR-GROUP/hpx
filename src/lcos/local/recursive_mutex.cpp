@@ -7,12 +7,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/lcos/local_recursive_mutex.hpp>
+#include <hpx/lcos/local/recursive_mutex.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
-namespace hpx { namespace lcos
+namespace hpx { namespace lcos { namespace local
 {
-    bool local_recursive_mutex::try_lock()
+    bool recursive_mutex::try_lock()
     {
         threads::thread_id_type const current_thread_id = threads::get_self_id();
 
@@ -20,7 +20,7 @@ namespace hpx { namespace lcos
             try_basic_lock(current_thread_id);
     }
 
-    void local_recursive_mutex::lock()
+    void recursive_mutex::lock()
     {
         threads::thread_id_type const current_thread_id = threads::get_self_id();
 
@@ -32,12 +32,12 @@ namespace hpx { namespace lcos
         }
     }
 
-    bool local_recursive_mutex::timed_lock(::boost::system_time const& wait_until)
+    bool recursive_mutex::timed_lock(::boost::system_time const& wait_until)
     {
         threads::thread_id_type const current_thread_id = threads::get_self_id();
 
         return try_recursive_lock(current_thread_id) ||
             try_timed_lock(current_thread_id, wait_until);
     }
-}}
+}}}
 

@@ -156,7 +156,7 @@ namespace graph500 { namespace server
                 std::vector<hpx::naming::id_type> const& duplicate_components,
                 std::vector<std::size_t> const& duplicateid)
     {
-      hpx::lcos::local_mutex::scoped_lock l(mtx_);
+      hpx::lcos::local::mutex::scoped_lock l(mtx_);
       duplicates_[j-minnode_] = duplicate_components;
       duplicatesid_[j-minnode_] = duplicateid;
       return;
@@ -164,7 +164,7 @@ namespace graph500 { namespace server
 
     bool point::has_edge(int64_t edge)
     {
-      hpx::lcos::local_mutex::scoped_lock l(mtx_);
+      hpx::lcos::local::mutex::scoped_lock l(mtx_);
       bool found = false;
       for (std::size_t i=0;i<local_edges_.size();i++) {
         if ( edge == local_edges_[i].v0 || 
@@ -392,7 +392,7 @@ namespace graph500 { namespace server
 
     resolvedata point::get_parent(int64_t edge)
     {
-      hpx::lcos::local_mutex::scoped_lock l(mtx_);
+      hpx::lcos::local::mutex::scoped_lock l(mtx_);
       resolvedata result;
       result.level.resize(bfs_roots_.size());
       result.parent.resize(bfs_roots_.size());

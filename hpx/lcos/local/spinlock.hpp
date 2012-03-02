@@ -26,10 +26,11 @@
 #  endif
 #endif
 
-namespace hpx { namespace lcos
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace lcos { namespace local
 {
     /// boost::mutex-compatible spinlock class
-    struct local_spinlock : boost::noncopyable
+    struct spinlock : boost::noncopyable
     {
     private:
         boost::uint64_t v_;
@@ -90,12 +91,12 @@ namespace hpx { namespace lcos
         }
 
     public:
-        local_spinlock() : v_(0)
+        spinlock() : v_(0)
         {
-            HPX_ITT_SYNC_CREATE(this, "test::local_spinlock", "");
+            HPX_ITT_SYNC_CREATE(this, "test::spinlock", "");
         }
 
-        ~local_spinlock()
+        ~spinlock()
         {
             HPX_ITT_SYNC_DESTROY(this);
         }
@@ -106,7 +107,7 @@ namespace hpx { namespace lcos
 
             for (std::size_t k = 0; !try_lock(); ++k)
             {
-                local_spinlock::yield(k);
+                spinlock::yield(k);
             }
 
             HPX_ITT_SYNC_ACQUIRED(this);
@@ -146,10 +147,10 @@ namespace hpx { namespace lcos
             HPX_ITT_SYNC_RELEASED(this);
         }
 
-        typedef boost::unique_lock<local_spinlock> scoped_lock;
-        typedef boost::detail::try_lock_wrapper<local_spinlock> scoped_try_lock;
+        typedef boost::unique_lock<spinlock> scoped_lock;
+        typedef boost::detail::try_lock_wrapper<spinlock> scoped_try_lock;
     };
-}}
+}}}
 
 #endif // HPX_B3A83B49_92E0_4150_A551_488F9F5E1113
 

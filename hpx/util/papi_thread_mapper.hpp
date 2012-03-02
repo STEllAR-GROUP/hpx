@@ -11,7 +11,7 @@
 #if defined(HPX_HAVE_PAPI)
 
 #include <hpx/exception.hpp>
-#include <hpx/lcos/local_spinlock.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 
 #include <map>
 #include <vector>
@@ -27,7 +27,7 @@ namespace hpx { namespace util
     // PAPI support and early initialization
     class HPX_EXPORT papi_thread_mapper : boost::noncopyable
     {
-        typedef hpx::lcos::local_spinlock mutex_type;
+        typedef hpx::lcos::local::spinlock mutex_type;
         typedef std::map<boost::thread::id, std::size_t> thread_map_type;
         typedef std::map<char const *, std::size_t> label_map_type;
 

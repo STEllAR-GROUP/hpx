@@ -8,17 +8,17 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/lcos/local_mutex.hpp>
+#include <hpx/lcos/local/mutex.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos
+namespace hpx { namespace lcos { namespace local
 {
-    local_mutex::~local_mutex()
+    mutex::~mutex()
     {
         HPX_ITT_SYNC_DESTROY(this);
         if (!queue_.empty()) {
-            LERR_(fatal) << "lcos::~local_mutex: " << description_
+            LERR_(fatal) << "lcos::local::mutex::~mutex: " << description_
                          << ": queue is not empty";
 
             mutex_type::scoped_lock l(mtx_);
@@ -28,17 +28,17 @@ namespace hpx { namespace lcos
                 queue_.pop_front();
 
                 // we know that the id is actually the pointer to the thread
-                LERR_(fatal) << "lcos::~local_mutex: " << description_
-                        << ": pending thread: "
-                        << threads::get_thread_state_name(threads::get_thread_state(id))
-                        << "(" << id << "): " << threads::get_thread_description(id);
+                LERR_(fatal) << "lcos::local::mutex::~mutex: " << description_
+                    << ": pending thread: "
+                    << threads::get_thread_state_name(threads::get_thread_state(id))
+                    << "(" << id << "): " << threads::get_thread_description(id);
 
                 // forcefully abort thread, do not throw
                 error_code ec;
                 threads::set_thread_state(id, threads::pending,
                     threads::wait_abort, threads::thread_priority_normal, ec);
                 if (ec) {
-                    LERR_(fatal) << "lcos::~local_mutex: could not abort thread"
+                    LERR_(fatal) << "lcos::local::mutex::~mutex: could not abort thread"
                         << get_thread_state_name(threads::get_thread_state(id))
                         << "(" << id << "): " << threads::get_thread_state(id);
                 }
@@ -46,7 +46,7 @@ namespace hpx { namespace lcos
         }
     }
 
-    bool local_mutex::wait_for_single_object(::boost::system_time const& wait_until)
+    bool mutex::wait_for_single_object(::boost::system_time const& wait_until)
     {
         threads::thread_self& self = threads::get_self();
         threads::thread_id_type id = self.get_thread_id();
@@ -84,16 +84,18 @@ namespace hpx { namespace lcos
         result = threads::wait_timeout == statex;
         if (statex == threads::wait_abort) {
             hpx::util::osstream strm;
-            strm << "thread(" << id << ", " << threads::get_thread_description(id)
-                  << ") aborted (yield returned wait_abort)";
-            HPX_THROW_EXCEPTION(yield_aborted, "lcos::local_mutex::wait_for_single_object",
+            strm << "thread(" << id << ", "
+                << threads::get_thread_description(id)
+                << ") aborted (yield returned wait_abort)";
+            HPX_THROW_EXCEPTION(yield_aborted,
+                "lcos::local::mutex::wait_for_single_object",
                 hpx::util::osstream_get_string(strm));
             return result;
         }
         return result;
     }
 
-    void local_mutex::set_event()
+    void mutex::set_event()
     {
         if (!queue_.empty()) {
             threads::thread_id_type id = queue_.front().id_;
@@ -108,7 +110,7 @@ namespace hpx { namespace lcos
         }
     }
 
-    bool local_mutex::timed_lock(::boost::system_time const& wait_until)
+    bool mutex::timed_lock(::boost::system_time const& wait_until)
     {
         HPX_ITT_SYNC_PREPARE(this);
         if (try_lock_internal()) {
@@ -139,5 +141,5 @@ namespace hpx { namespace lcos
         HPX_ITT_SYNC_ACQUIRED(this);
         return true;
     }
-}}
+}}}
 

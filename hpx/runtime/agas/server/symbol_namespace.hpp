@@ -20,7 +20,7 @@
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/lcos/local_mutex.hpp>
+#include <hpx/lcos/local/mutex.hpp>
 
 namespace hpx { namespace agas
 {
@@ -38,7 +38,7 @@ struct HPX_EXPORT symbol_namespace :
     >
 {
     // {{{ nested types
-    typedef lcos::local_mutex mutex_type;
+    typedef lcos::local::mutex mutex_type;
 
     // FIXME: This signature should use id_type, not gid_type
     typedef hpx::util::function<

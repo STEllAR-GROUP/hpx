@@ -11,7 +11,7 @@
 #define HPX_LCOS_RECURSIVE_MUTEX_AUG_03_2009_0459PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/local_mutex.hpp>
+#include <hpx/lcos/local/mutex.hpp>
 
 // Disable warning C4275: non dll-interface class used as base for dll-interface
 // class
@@ -22,23 +22,23 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos
+namespace hpx { namespace lcos { namespace local
 {
     /// An exclusive-ownership recursive mutex which implements Boost.Thread's
     /// TimedLockable concept.
-    struct HPX_EXPORT local_recursive_mutex : boost::noncopyable
+    struct HPX_EXPORT recursive_mutex : boost::noncopyable
     {
       private:
         boost::uint64_t recursion_count;
         boost::atomic<threads::thread_id_type> locking_thread_id;
-        local_mutex mutex;
+        mutex mutex;
 
       public:
-        local_recursive_mutex(char const* const description = "")
+        recursive_mutex(char const* const description = "")
           : recursion_count(0), locking_thread_id(0), mutex(description)
         {}
 
-        /// Attempts to acquire ownership of the \a local_recursive_mutex.
+        /// Attempts to acquire ownership of the \a recursive_mutex.
         /// Never blocks.
         ///
         /// \returns \a true if ownership was acquired; otherwise, \a false.
@@ -46,7 +46,7 @@ namespace hpx { namespace lcos
         /// \throws Never throws.
         bool try_lock();
 
-        /// Acquires ownership of the \a local_recursive_mutex. Suspends the
+        /// Acquires ownership of the \a recursive_mutex. Suspends the
         /// current pxthread if ownership cannot be obtained immediately.
         ///
         /// \throws Throws \a hpx#bad_parameter if an error occurs while
@@ -55,7 +55,7 @@ namespace hpx { namespace lcos
         ///         called outside of a pxthread.
         void lock();
 
-        /// Attempts to acquire ownership of the \a local_recursive_mutex.
+        /// Attempts to acquire ownership of the \a recursive_mutex.
         /// Suspends the current pxthread until \a wait_until if ownership
         /// cannot be obtained immediately.
         ///
@@ -67,7 +67,7 @@ namespace hpx { namespace lcos
         ///         called outside of a pxthread.
         bool timed_lock(::boost::system_time const& wait_until);
 
-        /// Attempts to acquire ownership of the \a local_recursive_mutex.
+        /// Attempts to acquire ownership of the \a recursive_mutex.
         /// Suspends the current pxthread until \a timeout if ownership cannot
         /// be obtained immediately.
         ///
@@ -88,7 +88,7 @@ namespace hpx { namespace lcos
             return timed_lock(boost::posix_time::ptime(timeout));
         }
 
-        /// Release ownership of the \a local_recursive_mutex.
+        /// Release ownership of the \a recursive_mutex.
         ///
         /// \throws Throws \a hpx#bad_parameter if an error occurs while
         ///         releasing the mutex. Throws \a hpx#null_thread_id if called
@@ -137,7 +137,7 @@ namespace hpx { namespace lcos
             return false;
         }
     };
-}}
+}}}
 
 #if defined(BOOST_MSVC)
 #pragma warning(pop)

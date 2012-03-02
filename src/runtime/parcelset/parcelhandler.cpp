@@ -16,7 +16,7 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/lcos/local_counting_semaphore.hpp>
+#include <hpx/lcos/local/counting_semaphore.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 
@@ -46,7 +46,7 @@ namespace hpx { namespace parcelset
 
     struct wait_for_put_parcel
     {
-        wait_for_put_parcel() : sema_(new lcos::local_counting_semaphore) {}
+        wait_for_put_parcel() : sema_(new lcos::local::counting_semaphore) {}
 
         wait_for_put_parcel(wait_for_put_parcel const& other)
             : sema_(other.sema_) {}
@@ -61,7 +61,7 @@ namespace hpx { namespace parcelset
             sema_->wait();
         }
 
-        boost::shared_ptr<lcos::local_counting_semaphore> sema_;
+        boost::shared_ptr<lcos::local::counting_semaphore> sema_;
     };
 
     void parcelhandler::sync_put_parcel(parcel& p)

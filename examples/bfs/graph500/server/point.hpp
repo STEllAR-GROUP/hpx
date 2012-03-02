@@ -221,7 +221,7 @@ namespace graph500 { namespace server
         > has_edge_action;
 
     private:
-        hpx::lcos::local_mutex mtx_;
+        hpx::lcos::local::mutex mtx_;
         std::size_t idx_;
         int64_t N_;
         std::vector< std::vector<int64_t> > neighbors_;

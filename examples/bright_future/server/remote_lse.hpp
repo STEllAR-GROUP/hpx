@@ -14,7 +14,7 @@
 #include <hpx/util/function.hpp>
 #include "../grid.hpp"
 
-#include <hpx/lcos/local_spinlock.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 
 namespace boost { namespace serialization {
     template <typename Archive>
@@ -73,7 +73,7 @@ namespace bright_future {
             // stuff for the stencil
 
         public:
-            hpx::lcos::local_spinlock mtx;
+            hpx::lcos::local::spinlock mtx;
             std::vector<double> timestamps;
 
             void clear_timestamps()

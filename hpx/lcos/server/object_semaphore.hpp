@@ -11,7 +11,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/lcos/local_spinlock.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -38,7 +38,7 @@ struct object_semaphore
 
     typedef components::managed_component_base<object_semaphore> base_type;
 
-    typedef hpx::lcos::local_spinlock mutex_type;
+    typedef hpx::lcos::local::spinlock mutex_type;
 
     // define data structures needed for intrusive slist container used for
     // the queues

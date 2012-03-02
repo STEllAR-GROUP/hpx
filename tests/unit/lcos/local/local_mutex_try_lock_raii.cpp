@@ -2,14 +2,14 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 //
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/lightweight_test.hpp>
-#include <hpx/lcos/local_mutex.hpp>
-#include <hpx/lcos/local_barrier.hpp>
+#include <hpx/lcos/local/mutex.hpp>
+#include <hpx/lcos/local/barrier.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -17,8 +17,8 @@ using boost::program_options::value;
 
 using hpx::applier::register_work_nullary;
 
-using hpx::lcos::local_barrier;
-using hpx::lcos::local_mutex;
+using hpx::lcos::local::barrier;
+using hpx::lcos::local::mutex;
 
 using hpx::init;
 using hpx::finalize;
@@ -33,10 +33,10 @@ struct test_mutexed_data
     typedef typename M::scoped_try_lock try_lock_type;
 
     mutex_type* mtx;
-    local_barrier* barr;
+    barrier* barr;
     std::size_t* data;
 
-    test_mutexed_data(mutex_type& m, local_barrier& b, std::size_t& d)
+    test_mutexed_data(mutex_type& m, barrier& b, std::size_t& d)
         : mtx(&m), barr(&b), data(&d) {}
 
     void operator()()
@@ -51,7 +51,7 @@ struct test_mutexed_data
 
             ++(*data);
         }
- 
+
         barr->wait();
     }
 };
@@ -68,23 +68,23 @@ int hpx_main(variables_map& vm)
 
     if (vm.count("pxthreads"))
         pxthreads = vm["pxthreads"].as<std::size_t>();
-    
+
     {
-        local_mutex mtx;
-        local_barrier barr(pxthreads + 1);
+        mutex mtx;
+        barrier barr(pxthreads + 1);
         std::size_t data = 0;
 
-        test_mutexed_data<local_mutex> t(mtx, barr, data);
+        test_mutexed_data<mutex> t(mtx, barr, data);
         for (std::size_t i = 0; i < pxthreads; ++i)
             register_work_nullary(t, "test_local_mutex_try_lock_raii");
 
         barr.wait();
 
-        local_mutex::scoped_lock lock(mtx);
+        mutex::scoped_lock lock(mtx);
         HPX_TEST(lock ? true : false);
 
         HPX_TEST_EQ(data, pxthreads);
-    } 
+    }
 
     // Initiate shutdown of the runtime system.
     finalize();
@@ -97,9 +97,9 @@ int main(int argc, char* argv[])
     // Configure application-specific options.
     options_description
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
-    
+
     desc_commandline.add_options()
-        ("pxthreads,T", value<std::size_t>(), 
+        ("pxthreads,T", value<std::size_t>(),
             "the number of PX threads to invoke (default: OS threads * 8)")
         ;
 

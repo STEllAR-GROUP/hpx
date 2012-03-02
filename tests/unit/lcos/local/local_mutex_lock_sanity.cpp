@@ -8,8 +8,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/lightweight_test.hpp>
-#include <hpx/lcos/local_mutex.hpp>
-#include <hpx/lcos/local_barrier.hpp>
+#include <hpx/lcos/local/mutex.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -17,8 +16,7 @@ using boost::program_options::value;
 
 using hpx::applier::register_work_nullary;
 
-using hpx::lcos::local_barrier;
-using hpx::lcos::local_mutex;
+using hpx::lcos::local::mutex;
 
 using hpx::init;
 using hpx::finalize;
@@ -27,29 +25,29 @@ using hpx::util::report_errors;
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename M>
-struct test_mutexed_data
+struct test_lock
 {
     typedef M mutex_type;
     typedef typename M::scoped_lock lock_type;
 
-    mutex_type* mtx;
-    local_barrier* barr;
-    std::size_t* data;
-
-    test_mutexed_data(mutex_type& m, local_barrier& b, std::size_t& d)
-        : mtx(&m), barr(&b), data(&d) {}
-
     void operator()()
     {
-        lock_type lock(*mtx);
+        mutex_type mtx;
+
+        // Test the lock's constructors.
+        {
+            lock_type lock(mtx, boost::defer_lock);
+            HPX_TEST(!lock);
+        }
+
+        lock_type lock(mtx);
         HPX_TEST(lock ? true : false);
 
-        ++(*data);
- 
+        // Test the lock and unlock methods.
         lock.unlock();
         HPX_TEST(!lock);
-
-        barr->wait();
+        lock.lock();
+        HPX_TEST(lock ? true : false);
     }
 };
 
@@ -65,23 +63,13 @@ int hpx_main(variables_map& vm)
 
     if (vm.count("pxthreads"))
         pxthreads = vm["pxthreads"].as<std::size_t>();
-    
+
     {
-        local_mutex mtx;
-        local_barrier barr(pxthreads + 1);
-        std::size_t data = 0;
+        test_lock<mutex> t;
 
-        test_mutexed_data<local_mutex> t(mtx, barr, data);
         for (std::size_t i = 0; i < pxthreads; ++i)
-            register_work_nullary(t, "test_local_mutex_lock");
-
-        barr.wait();
-
-        local_mutex::scoped_lock lock(mtx);
-        HPX_TEST(lock ? true : false);
-
-        HPX_TEST_EQ(data, pxthreads);
-    } 
+            register_work_nullary(t, "test_local_mutex_lock_sanity");
+    }
 
     // Initiate shutdown of the runtime system.
     finalize();

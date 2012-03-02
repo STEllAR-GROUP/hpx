@@ -19,31 +19,31 @@ namespace hpx { namespace util { namespace detail
 
     boost::int64_t get_constructed_count()
     {
-        lcos::local_spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
+        lcos::local::spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
         return full_empty_counter_data_.constructed_;
     }
 
     boost::int64_t get_destructed_count()
     {
-        lcos::local_spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
+        lcos::local::spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
         return full_empty_counter_data_.destructed_;
     }
 
     boost::int64_t get_read_enqueued_count()
     {
-        lcos::local_spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
+        lcos::local::spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
         return full_empty_counter_data_.read_enqueued_;
     }
 
     boost::int64_t get_read_dequeued_count()
     {
-        lcos::local_spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
+        lcos::local::spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
         return full_empty_counter_data_.read_dequeued_;
     }
 
     boost::int64_t get_set_full_count()
     {
-        lcos::local_spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
+        lcos::local::spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
         return full_empty_counter_data_.set_full_;
     }
 

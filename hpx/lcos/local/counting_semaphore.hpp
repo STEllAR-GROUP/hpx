@@ -12,7 +12,7 @@
 #include <boost/intrusive/slist.hpp>
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/local_spinlock.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 
 #if defined(BOOST_MSVC)
 #pragma warning(push)
@@ -20,7 +20,7 @@
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos
+namespace hpx { namespace lcos { namespace local
 {
     /// A semaphore is a protected variable (an entity storing a value) or
     /// abstract data type (an entity grouping several variables that may or
@@ -38,10 +38,10 @@ namespace hpx { namespace lcos
     /// well: one thread waiting for several other threads to touch (signal)
     /// the semaphore, or several threads waiting for one other thread to touch
     /// this semaphore.
-    class HPX_EXPORT local_counting_semaphore
+    class HPX_EXPORT counting_semaphore
     {
     private:
-        typedef lcos::local_spinlock mutex_type;
+        typedef lcos::local::spinlock mutex_type;
 
         // define data structures needed for intrusive slist container used for
         // the queues
@@ -79,10 +79,10 @@ namespace hpx { namespace lcos
         ///                 are equivalent to the same number of signals pre-
         ///                 set, and negative values are equivalent to the
         ///                 same number of waits pre-set.
-        local_counting_semaphore(boost::int64_t value = 0)
+        counting_semaphore(boost::int64_t value = 0)
           : value_(value) {}
 
-        ~local_counting_semaphore();
+        ~counting_semaphore();
 
         /// \brief Wait for the semaphore to be signaled
         ///
@@ -144,8 +144,7 @@ namespace hpx { namespace lcos
         boost::int64_t value_;
         queue_type queue_;
     };
-
-}}
+}}}
 
 #if defined(BOOST_MSVC)
 #pragma warning(pop)

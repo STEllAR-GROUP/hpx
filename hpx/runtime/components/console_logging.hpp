@@ -12,7 +12,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
-#include <hpx/lcos/local_mutex.hpp>
+#include <hpx/lcos/local/mutex.hpp>
 #include <hpx/util/spinlock.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/applier/apply.hpp>
@@ -27,7 +27,7 @@ namespace hpx { namespace components
 {
     struct HPX_EXPORT pending_logs
     {
-        typedef lcos::local_mutex prefix_mutex_type;
+        typedef lcos::local::mutex prefix_mutex_type;
         typedef util::spinlock queue_mutex_type;
 
         enum { max_pending = 128 };

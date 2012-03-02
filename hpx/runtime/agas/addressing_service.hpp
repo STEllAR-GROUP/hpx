@@ -25,8 +25,8 @@
 #include <hpx/exception.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
-#include <hpx/lcos/local_mutex.hpp>
-#include <hpx/lcos/local_counting_semaphore.hpp>
+#include <hpx/lcos/local/mutex.hpp>
+#include <hpx/lcos/local/counting_semaphore.hpp>
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/agas/component_namespace.hpp>
@@ -57,7 +57,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     typedef component_namespace::iterate_types_function_type
         iterate_types_function_type;
 
-    typedef hpx::lcos::local_mutex mutex_type;
+    typedef hpx::lcos::local::mutex mutex_type;
     // }}}
 
     // {{{ gva cache
@@ -174,7 +174,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         component_namespace component_ns_;
         symbol_namespace symbol_ns_;
 
-        hpx::lcos::local_counting_semaphore promise_pool_semaphore_;
+        hpx::lcos::local::counting_semaphore promise_pool_semaphore_;
         promise_pool_type promise_pool_;
     }; // }}}
 
@@ -192,7 +192,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     std::size_t refcnt_requests_count_;
     boost::shared_ptr<refcnt_requests_type> refcnt_requests_;
 
-    hpx::lcos::local_counting_semaphore resolve_throttle_;
+    hpx::lcos::local::counting_semaphore resolve_throttle_;
 
     service_mode const service_type;
     runtime_mode const runtime_type;

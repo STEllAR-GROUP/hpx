@@ -25,7 +25,7 @@
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/merging_map.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/lcos/local_mutex.hpp>
+#include <hpx/lcos/local/mutex.hpp>
 
 namespace hpx { namespace agas
 {
@@ -93,7 +93,7 @@ struct HPX_EXPORT primary_namespace :
     >
 {
     // {{{ nested types
-    typedef lcos::local_mutex mutex_type;
+    typedef lcos::local::mutex mutex_type;
 
     typedef boost::int32_t component_type;
 

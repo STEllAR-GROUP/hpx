@@ -13,8 +13,8 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/lcos/local_counting_semaphore.hpp>
-#include <hpx/lcos/local_mutex.hpp>
+#include <hpx/lcos/local/counting_semaphore.hpp>
+#include <hpx/lcos/local/mutex.hpp>
 
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
@@ -141,9 +141,9 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         bool is_called_;                              // is one of the 'main' stencils
         threads::thread_id_type driver_thread_;
 
-        std::vector<boost::shared_ptr<lcos::local_counting_semaphore> > sem_in_;
-        std::vector<boost::shared_ptr<lcos::local_counting_semaphore> > sem_out_;
-        lcos::local_counting_semaphore sem_result_;
+        std::vector<boost::shared_ptr<lcos::local::counting_semaphore> > sem_in_;
+        std::vector<boost::shared_ptr<lcos::local::counting_semaphore> > sem_out_;
+        lcos::local::counting_semaphore sem_result_;
 
         std::vector<boost::shared_ptr<in_adaptor_type> > in_;   // adaptors used to gather input
         std::vector<naming::id_type> out_;                      // adaptors used to provide result
@@ -158,7 +158,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         parameter par_;
         double cycle_time_;
 
-        typedef lcos::local_mutex mutex_type;
+        typedef lcos::local::mutex mutex_type;
         mutex_type mtx_;
     };
 

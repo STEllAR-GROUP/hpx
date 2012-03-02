@@ -6,7 +6,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/lcos/local_spinlock.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/runtime/threads/thread.hpp>
@@ -64,19 +64,19 @@ namespace hpx { namespace lcos { namespace server { namespace detail
 
     boost::int64_t get_constructed_count()
     {
-        lcos::local_spinlock::scoped_lock l(dataflow_counter_data_.mtx_);
+        lcos::local::spinlock::scoped_lock l(dataflow_counter_data_.mtx_);
         return dataflow_counter_data_.constructed_;
     }
 
     boost::int64_t get_initialized_count()
     {
-        lcos::local_spinlock::scoped_lock l(dataflow_counter_data_.mtx_);
+        lcos::local::spinlock::scoped_lock l(dataflow_counter_data_.mtx_);
         return dataflow_counter_data_.initialized_;
     }
 
     boost::int64_t get_fired_count()
     {
-        lcos::local_spinlock::scoped_lock l(dataflow_counter_data_.mtx_);
+        lcos::local::spinlock::scoped_lock l(dataflow_counter_data_.mtx_);
         return dataflow_counter_data_.fired_;
     }
 

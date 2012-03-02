@@ -7,7 +7,7 @@
 #define HPX_UTIL_INTERVAL_TIMER_SEP_27_2011_0434PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/local_spinlock.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
@@ -49,7 +49,7 @@ namespace hpx { namespace util
         bool stop_locked();
 
     private:
-        typedef lcos::local_spinlock mutex_type;
+        typedef lcos::local::spinlock mutex_type;
 
         mutable mutex_type mtx_;
         HPX_STD_FUNCTION<void()> f_;  ///< function to call

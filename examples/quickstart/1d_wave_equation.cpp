@@ -89,7 +89,7 @@ struct data{
     , computed(other.computed)
   {}
  
-  hpx::lcos::local_mutex mtx;
+  hpx::lcos::local::mutex mtx;
   double u_value;
   bool computed;
 };
@@ -141,7 +141,7 @@ double calculate_u_tplus_x_1st(double u_t_xplus, double u_t_x,
 
 double wave(boost::uint64_t t, boost::uint64_t x)
 {
-  hpx::lcos::local_mutex::scoped_lock l(u[t][x].mtx);
+  hpx::lcos::local::mutex::scoped_lock l(u[t][x].mtx);
   //  cout << (boost::format("calling wave... t=%1% x=%2%\n") % t % x) << flush;
   if (u[t][x].computed)
     {

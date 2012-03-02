@@ -7,7 +7,7 @@
 #if !defined(HPX_COMPONENTS_STENCIL_LOGGING_AUG_02_2011_0719PM)
 #define HPX_COMPONENTS_STENCIL_LOGGING_AUG_02_2011_0719PM
 
-#include <hpx/lcos/local_mutex.hpp>
+#include <hpx/lcos/local/mutex.hpp>
 #include "stencil_data.hpp"
 #include "../parameter.hpp"
 #include <hpx/lcos/barrier.hpp>
@@ -51,7 +51,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         > logentry_action;
 
     private:
-        typedef lcos::local_mutex mutex_type;
+        typedef lcos::local::mutex mutex_type;
         static mutex_type mtx_;
         std::size_t count;
     };

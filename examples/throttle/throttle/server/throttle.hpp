@@ -8,7 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/promise.hpp>
-#include <hpx/lcos/local_mutex.hpp>
+#include <hpx/lcos/local/mutex.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 
@@ -22,7 +22,7 @@ namespace throttle { namespace server
     {
     private:
         typedef hpx::components::simple_component_base<throttle> base_type;
-        typedef hpx::lcos::local_mutex mutex_type;
+        typedef hpx::lcos::local::mutex mutex_type;
 
     public:
         throttle();
