@@ -1043,7 +1043,7 @@ if(NOT HPX_NO_INSTALL)
 
   install( # install all hpx cmake utility files
     DIRECTORY cmake/
-    DESTINATION share/hpx/cmake
+    DESTINATION share/hpx-${HPX_VERSION}/cmake
     COMPONENT core
     PATTERN ".svn" EXCLUDE
     PATTERN ".git" EXCLUDE)
@@ -1075,7 +1075,7 @@ if(NOT HPX_NO_INSTALL)
 
   install( # install hpx python module (TODO: this is a temporary hack)
     DIRECTORY python/hpx
-    DESTINATION share/hpx/python
+    DESTINATION share/hpx-${HPX_VERSION}/python
     COMPONENT core
     FILES_MATCHING PATTERN "*.py"
     PATTERN ".svn" EXCLUDE
@@ -1117,10 +1117,9 @@ if(NOT HPX_NO_INSTALL)
   endif()
 
   install(
-    DIRECTORY ${hpx_SOURCE_DIR}/
+    FILES ${hpx_SOURCE_DIR}/LICENSE_1_0.txt
     DESTINATION share/hpx-${HPX_VERSION}
-    COMPONENT license
-    FILES_MATCHING PATTERN "LICENSE_1_0.txt")
+    COMPONENT license)
 
   if(HPX_DOCUMENTATION_GENERATION)
     # install hpx documentation files
@@ -1138,6 +1137,11 @@ if(NOT HPX_NO_INSTALL)
       FILES_MATCHING PATTERN "*.html"
       PATTERN ".svn" EXCLUDE
       PATTERN ".git" EXCLUDE)
+
+    install(
+      FILES ${hpx_SOURCE_DIR}/docs/index.html
+      DESTINATION share/hpx-${HPX_VERSION}/
+      COMPONENT docs)
 
     install(
       DIRECTORY ${hpx_SOURCE_DIR}/docs/html/src/
