@@ -52,6 +52,7 @@ using hpx::flush;
 // globals
 
 // initialized in hpx_main
+id_type here = invalid_id; 
 boost::uint64_t nt = 0;
 boost::uint64_t nx = 0;
 boost::uint64_t n_predict = 0;
@@ -90,9 +91,9 @@ struct time{
   double dt;
   double elapsed_time;
   bool computed;
-}
+};
 // declaring time_array
-  std::vector<time> time_array;
+std::vector<typename ::time> time_array;
 
 
 // this is the fundimental element of the hydrodynamics code, the 
@@ -165,7 +166,7 @@ double timestep_size(uint64_t timestep)
   hpx::lcos::local_mutex::scoped_lock l(time_array[timestep].mtx);
 
   // if it has already been calculated, then just return the value
-  if (time_array[timestep].calculated)
+  if (time_array[timestep].computed)
     return time_array[timestep].dt;
 
   // if the current timestep is less than n_predict, then we manually
@@ -189,7 +190,7 @@ double timestep_size(uint64_t timestep)
   double dt_cfl = 1000.0;
 
   // wait for an array of futures
-  wait(futures, [&](std::size_t i, cell this_cell))
+  wait(futures, [&](std::size_t i, cell this_cell)
     {         
       // look at all of the cells at a timestep, then pick the smallest
       // dt_cfl = cfl_factor*dx/(soundspeed+absolute_velocity)
@@ -213,27 +214,27 @@ double timestep_size(uint64_t timestep)
       // we don't want to let the timestep increase too quickly, so
       // we only let it increase by 50% each timestep
       time_array[timestep].computed = true;
-      time_array[timestep].dt = min(
+      time_array[timestep].dt = std::min(
                                     cfl_predict_factor*dt_cfl 
                                     , 
                                     1.5*time_array[timestep-1].dt);
       return time_array[timestep].dt;
-    }   
+    });
 }
 
-cell compute(boost::uint64_t timestep, boost::uint64_t location);
+cell compute(boost::uint64_t timestep, boost::uint64_t location)
 {
   hpx::lcos::local_mutex::scoped_lock l(grid[timestep][location].mtx);
   
   // if it is already computed then just return the value
-  if (grid[timestep][location].computed = true)
+  if (grid[timestep][location].computed == true)
     return grid[timestep][location];
 
   // we are going to compute it now!
   grid[timestep][location].computed = true;
 
   //initial values
-  if (t == 0)
+  if (timestep == 0)
     {
       grid[timestep][location] = initial_sod(location);
       return grid[timestep][location];
@@ -317,7 +318,7 @@ cell compute(boost::uint64_t timestep, boost::uint64_t location);
   double left_pressure = get_pressure(left);
   double middle_pressure = get_pressure(middle);
   now.mom += dt*(left_pressure - right_pressure)/(middle.rho*dx);
-  now.eint -= middle_pressure*(left.mom/left.rho - right.mom/right.rho)*dt/dx;
+  now.etot -= middle_pressure*(left.mom/left.rho - right.mom/right.rho)*dt/dx;
 
   //dual energy formalism
   double e_kinetic = 0.5*middle.mom*middle.mom/middle.rho;
@@ -329,10 +330,11 @@ cell compute(boost::uint64_t timestep, boost::uint64_t location);
 
 double get_pressure(cell input)
 {
+  double pressure = 0.0;
   double e_kinetic = 0.5*input.mom*input.mom/input.rho;
   double e_internal = input.etot - e_kinetic;
   if ( (input.etot - e_kinetic) > 0.001*input.etot )
-    pressure = (fluid_gamma-1.0)*(input.etot - e_kinetic)
+    pressure = (fluid_gamma-1.0)*(input.etot - e_kinetic);
   else
     pressure = (fluid_gamma-1.0)*pow(input.tau,fluid_gamma);
 
@@ -392,7 +394,7 @@ int hpx_main(
   cout << (boost::format("nx = %1%\n") % nx) << flush;
 
   // allocating the time array
-  time_array = std::vector<time>(nt);
+  time_array = std::vector<typedef time>(nt);
   
   // allocating the grid 2d array of all of the cells for all timesteps
   grid = std::vector<std::vector<cell> >(nt, std::vector<cell>(nx));
@@ -412,7 +414,7 @@ int hpx_main(
     outfile.open ("output.dat");
 
     wait(futures, [&](std::size_t i, cell n)
-         { double x_here = (location-0.5)*dx+x_min;
+         { double x_here = (i-0.5)*dx+x_min; // this is wrong
            outfile << (boost::format("%1% %2%\n") % x_here % n.rho) << flush; });
 
     outfile.close();
