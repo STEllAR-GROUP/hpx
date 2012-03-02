@@ -7,9 +7,9 @@
 ===============================================================================/]
 
 [article HPX
-    [quickbook 1.5]
+    [quickbook 1.6]
     [id hpx]
-    [authors [Kaiser, Hartmut], [Adelstein-Lelbach, Bryce], [Serio, Adrian]]
+    [authors [STE||AR Group, The]]
     [version 0.8.0]
     [copyright 2011 2012 The STE||AR Group]
     [license
