@@ -31,11 +31,11 @@ namespace hpx { namespace lcos { namespace local
       private:
         boost::uint64_t recursion_count;
         boost::atomic<threads::thread_id_type> locking_thread_id;
-        mutex mutex;
+        local::mutex mtx;
 
       public:
         recursive_mutex(char const* const description = "")
-          : recursion_count(0), locking_thread_id(0), mutex(description)
+          : recursion_count(0), locking_thread_id(0), mtx(description)
         {}
 
         /// Attempts to acquire ownership of the \a recursive_mutex.
@@ -98,7 +98,7 @@ namespace hpx { namespace lcos { namespace local
             if (!--recursion_count)
             {
                 locking_thread_id.exchange((threads::thread_id_type)0);
-                mutex.unlock();
+                mtx.unlock();
             }
         }
 
@@ -116,7 +116,7 @@ namespace hpx { namespace lcos { namespace local
 
         bool try_basic_lock(threads::thread_id_type current_thread_id)
         {
-            if (mutex.try_lock())
+            if (mtx.try_lock())
             {
                 locking_thread_id.exchange(current_thread_id);
                 recursion_count = 1;
@@ -128,7 +128,7 @@ namespace hpx { namespace lcos { namespace local
         bool try_timed_lock(threads::thread_id_type current_thread_id,
             ::boost::system_time const& target)
         {
-            if (mutex.timed_lock(target))
+            if (mtx.timed_lock(target))
             {
                 locking_thread_id.exchange(current_thread_id);
                 recursion_count = 1;

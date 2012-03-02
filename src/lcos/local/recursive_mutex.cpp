@@ -26,7 +26,7 @@ namespace hpx { namespace lcos { namespace local
 
         if (!try_recursive_lock(current_thread_id))
         {
-            mutex.lock();
+            mtx.lock();
             locking_thread_id.exchange(current_thread_id);
             recursion_count = 1;
         }
