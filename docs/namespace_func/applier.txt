@@ -1,9 +1,58 @@
 Namespce Applier
 
-API Component:		Comments:
-example_function	this does bla...
-example_class		this class belongs in **** namespace...
-			I love this class...
-example_module		bla bla bla....
+API Component:				File:			
 
+*functions
+action_priority				hpx/runtime/applier/apply.hpp
+apply_r_p				hpx/runtime/applier/apply.hpp
+apply_r_p_route				hpx/runtime/applier/apply.hpp
+apply_r					hpx/runtime/applier/apply.hpp
+apply_r_route				hpx/runtime/applier/apply.hpp
+apply_l_p				hpx/runtime/applier/apply.hpp
+apply_l					hpx/runtime/applier/apply.hpp
+apply_p					hpx/runtime/applier/apply.hpp
+apply_p_route				hpx/runtime/applier/apply.hpp
+apply					hpx/runtime/applier/apply.hpp
+apply_route				hpx/runtime/applier/apply.hpp
+apply_r_p				hpx/runtime/applier/apply.hpp
+apply_r					hpx/runtime/applier/apply.hpp
+apply_r_route				hpx/runtime/applier/apply.hpp
+apply_r_sync_p				hpx/runtime/applier/apply.hpp
+apply_r_sync				hpx/runtime/applier/apply.hpp
+apply_c_p				hpx/runtime/applier/apply.hpp
+apply_c_p_route				hpx/runtime/applier/apply.hpp
+apply_c					hpx/runtime/applier/apply.hpp
+apply_c_route				hpx/runtime/applier/apply.hpp
+applier::applier			hpx/runtime/applier/applier.hpp
+applier::get_agas_client		hpx/runtime/applier/applier.hpp
+applier::get_parcel_handler		hpx/runtime/applier/applier.hpp
+applier::get_thread_manager		hpx/runtime/applier/applier.hpp
+applier::here				hpx/runtime/applier/applier.hpp
+applier::get_raw_locality		hpx/runtime/applier/applier.hpp
+applier::get_locality_id		hpx/runtime/applier/applier.hpp
+applier::get_raw_remote_localities	hpx/runtime/applier/applier.hpp
+applier::get_remote_localities		hpx/runtime/applier/applier.hpp
+applier::get_raw_localities		hpx/runtime/applier/applier.hpp
+applier::get_localities			hpx/runtime/applier/applier.hpp
+applier::get_runtime_support_raw_gid	hpx/runtime/applier/applier.hpp
+applier::get_runtime_support_gid	hpx/runtime/applier/applier.hpp
 
+* these only have some comments about functionality if at all, not sure what they do
+applier::get_memory_raw_gid		hpx/runtime/applier/applier.hpp
+applier::get_memory_gid			hpx/runtime/applier/applier.hpp
+applier::route				hpx/runtime/applier/applier.hpp
+applier::init_tss			hpx/runtime/applier/applier.hpp
+applier::deinit_tss			hpx/runtime/applier/applier.hpp
+apply_helper0::call			hpx/runtime/applier/apply_helper.hpp
+apply_helper1::call			hpx/runtime/applier/apply_helper.hpp
+trigger					hpx/runtime/applier/trigger.hpp
+trigger_error				hpx/runtime/applier/trigger.hpp
+bind_gid	                        hpx/runtime/applier/bind_naming_wrappers.hpp
+unbind_gid                              hpx/runtime/applier/bind_naming_wrappers.hpp
+bind_range                              hpx/runtime/applier/bind_naming_wrappers.hpp
+unbind_range                            hpx/runtime/applier/bind_naming_wrappers.hpp
+
+*classes
+applier					hpx/runtime/applier/applier.hpp
+apply_helper0				hpx/runtime/applier/apply_helper.hpp
+apply_helper1				hpx/runtime/applier/apply_helper.hpp
