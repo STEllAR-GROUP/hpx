@@ -32,6 +32,10 @@ int hpx_main(variables_map& vm)
     }
     //std::vector<hpx::naming::id_type> prefixes = hpx::find_all_localities();
     distrib.create(distrib_symbolic_name, num_instances, temp_data);
+    //Get data of nth element of the distributed data.
+    std::size_t temp_c; //fourth element
+    temp_c = distrib.get_data_at(3);
+    temp_c = distrib.get_data_at(7); // 8th element
     //------------------------
     hpx::finalize();
     return 0;

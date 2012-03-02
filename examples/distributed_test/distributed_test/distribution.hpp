@@ -29,6 +29,7 @@ namespace distributed
         void split_client_data(std::size_t num_instances
             , std::vector<std::size_t> &data_received
             , std::vector<std::vector<std::size_t>> &dd_vector);
+        std::size_t get_data_at(std::size_t n);
 
     private:
         //find GID of object containing specified cardinality/data
@@ -40,6 +41,7 @@ namespace distributed
         std::vector<hpx::naming::id_type> comp_instances_;
         bool comp_created_;
         datastructure data_struct_;
+        std::size_t max_comp_size_;
     };
 }
 

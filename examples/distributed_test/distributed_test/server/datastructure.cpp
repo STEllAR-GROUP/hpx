@@ -47,6 +47,9 @@ namespace distributed { namespace server
         {
             data_.push_back(init_value+my_cardinality);
         }
+        config_data_.symbolic_name_ = symbolic_name;
+        config_data_.num_instances_ = num_instances;
+        config_data_.my_cardinality_ = my_cardinality;
         
         std::cout << "My Cardinality:" << my_cardinality << std::endl;
         std::cout << "Num Instances:" << num_instances << std::endl;

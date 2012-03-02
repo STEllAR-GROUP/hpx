@@ -100,7 +100,15 @@ namespace distributed
                 ++loc_itr;
         }
         hpx::lcos::wait(result_future2);
-        //Create component object locally. 
+        //Create component object locally.
+        loc_itr = comp_instances_.begin();
+        hpx::lcos::promise<distributed::config_comp> config_result = 
+            stubs::datastructure::get_config_info_async(*loc_itr);
+        distributed::config_comp config_data = config_result.get();
+        hpx::lcos::promise<std::vector<std::size_t>> data_fraction;
+        data_fraction = stubs::datastructure::get_data_async(*(++loc_itr));
+        std::vector<std::size_t> temp_vector = data_fraction.get();
+                //hpx::lcos::wait(data_fraction);
         comp_created_ = true;
     }
 
@@ -118,6 +126,7 @@ namespace distributed
         std::vector<std::size_t> temp;
         if(rem == 0)
         {
+            max_comp_size_ = quotient;  //total component size
             for(std::size_t i = 0; i<num_instances; ++i)
             {
                 temp.resize(0);
@@ -131,20 +140,77 @@ namespace distributed
         }
         else
         {
+            max_comp_size_ = quotient + 1;  //total component size
             for(std::size_t i = 0; i<num_instances - 1; ++ i)
             {
                 temp.resize(0);
                 if(itr <= (data_received.end() - quotient))
                 {
-                    temp.assign(itr, itr+(quotient+1));
+                    temp.assign(itr, itr+(max_comp_size_));
                     dd_vector.push_back(temp);
-                    itr+=quotient+1;
+                    itr+=max_comp_size_;
                 }
             }
 
             temp.resize(0);
             temp.assign(itr, data_received.end());
             dd_vector.push_back(temp);
+        }
+    }
+
+    std::size_t distribution::get_data_at(std::size_t n)
+    {
+        // n_pos is ordinal position
+        std::size_t find_component_no, temp = 0, n_pos = n+1, quo, rem;
+        std::size_t max_elements = comp_instances_.size() * max_comp_size_;
+
+        std::vector<hpx::naming::id_type>::iterator itr;
+        if(n_pos <= max_elements)
+        {
+            if(n_pos <= max_comp_size_)
+            {
+                itr = comp_instances_.begin();
+            }
+            else
+            {   
+                itr = comp_instances_.begin();
+                temp+= max_comp_size_;
+                while( temp <= n_pos )
+                {
+                    ++itr;
+                    temp+= max_comp_size_;
+                }
+            }
+
+            rem = n_pos%max_comp_size_;
+            quo = n_pos/max_comp_size_;
+
+            if(rem == 0)
+            {
+                //use max_comp_size_ (element_ordinal_position)
+
+                //return hpx::applier::apply<distributed::server::datastructure::get_data_at_action>
+                //return hpx::lcos::apply<distributed::server::datastructure::get_data_at_action>
+                //    (*itr, max_comp_size_ - 1);
+                hpx::lcos::promise<std::size_t> value_at = 
+                    stubs::datastructure::get_data_at_async(*itr, max_comp_size_ - 1 );
+                return value_at.get();
+            }
+            else
+            {
+                //use rem (element_ordinal_position)
+
+                //return hpx::applier::apply<distributed::server::datastructure::get_data_at_action>
+                //return hpx::lcos::apply<distributed::server::datastructure::get_data_at_action>
+                //    (*itr, rem - 1);
+                hpx::lcos::promise<std::size_t> value_at = 
+                    stubs::datastructure::get_data_at_async(*itr, rem - 1);
+                return value_at.get();
+            }
+        }
+        else
+        {
+            return 0;
         }
     }
 }
