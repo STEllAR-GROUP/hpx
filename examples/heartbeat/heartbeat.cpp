@@ -10,7 +10,7 @@
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/threads/re.hpp>
 #include <hpx/lcos/promise.hpp>
 #include <hpx/state.hpp>
 
@@ -98,7 +98,7 @@ int monitor(std::string const& name, boost::uint64_t pause)
 
     while (true)
     {
-        if (!threadmanager_is(running) || stop_flag.ready())
+        if (!threadmanager_is(running) || stop_flag.is_ready())
             return 0;
 
         // Query the performance counter.
