@@ -118,11 +118,8 @@ namespace hpx { namespace lcos { namespace detail
             // set the received result, reset error status
             try {
                 // store the value
-                typedef traits::get_remote_result<Result, RemoteResult>
-                    get_remote_result_type;
-
-                data_[slot].set(get_remote_result_type::call(
-                    boost::forward<RemoteResult>(result)));
+                data_[slot].set(traits::get_remote_result<Result, T>::call(
+                    boost::forward<T>(result)));
             }
             catch (hpx::exception const&) {
                 // store the error instead
@@ -221,19 +218,16 @@ namespace hpx { namespace lcos { namespace detail
 
         // helper functions for setting data (if successful) or the error (if
         // non-successful)
-//         void set_data(int slot, RemoteResult const& result)
-//         {
-//             return set_data_impl(slot, result);
-//         }
-
-        void set_data(int slot, BOOST_RV_REF(RemoteResult) result)
+        template <typename T>
+        void set_data(int slot, BOOST_FWD_REF(T) result)
         {
             return set_data_impl(slot, boost::forward<RemoteResult>(result));
         }
 
-        void set_local_data(int slot, result_type const& result)
+        template <typename T>
+        void set_local_data(int slot, BOOST_FWD_REF(T) result)
         {
-            return set_data_impl(slot, result);
+            return set_data_impl(slot, boost::forward<result_type>(result));
         }
 
         // trigger the future with the given error condition
@@ -452,40 +446,38 @@ namespace hpx { namespace lcos
             detail::log_on_exit<wrapping_type> on_exit(impl_, ec);
             return boost::move((*impl_)->get_data(slot, ec));
         }
-
         Result get(error_code& ec = throws) const
         {
             detail::log_on_exit<wrapping_type> on_exit(impl_, ec);
             return boost::move((*impl_)->get_data(0, ec));
         }
 
+        ///
         Result move_out(int slot, error_code& ec = throws) const
         {
             detail::log_on_exit<wrapping_type> on_exit(impl_, ec);
             return boost::move((*impl_)->move_data(slot, ec));
         }
-
         Result move_out(error_code& ec = throws) const
         {
             detail::log_on_exit<wrapping_type> on_exit(impl_, ec);
             return boost::move((*impl_)->move_data(0, ec));
         }
 
+        ///
         void set(int slot, RemoteResult const& result)
         {
             return (*impl_)->set_data(slot, result);
+        }
+        void set(RemoteResult const& result)
+        {
+            return (*impl_)->set_data(0, result);
         }
 
         void set(int slot, BOOST_RV_REF(RemoteResult) result)
         {
           return (*impl_)->set_data(slot, boost::forward<RemoteResult>(result));
         }
-
-        void set(RemoteResult const& result)
-        {
-            return (*impl_)->set_data(0, result);
-        }
-
         void set(BOOST_RV_REF(RemoteResult) result)
         {
             return (*impl_)->set_data(0, boost::forward<RemoteResult>(result));
@@ -501,9 +493,10 @@ namespace hpx { namespace lcos
             (*impl_)->set_error(0, e);      // set the received error
         }
 
-        void set_local_data(int slot, Result const& result)
+        template <typename T>
+        void set_local_data(int slot, BOOST_FWD_REF(T) result)
         {
-            (*impl_)->set_local_data(0, result);
+            (*impl_)->set_local_data(0, boost::forward<Result>(result));
         }
 
     protected:

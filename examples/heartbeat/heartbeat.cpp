@@ -10,7 +10,7 @@
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
-#include <hpx/runtime/threads/re.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/lcos/promise.hpp>
 #include <hpx/state.hpp>
 
