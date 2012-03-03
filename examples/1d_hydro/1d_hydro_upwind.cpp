@@ -68,9 +68,9 @@ double cfl_predict_factor = 0.0;
 // containing information about timestep size. the index will be 
 // the integer timestep number, so time_array[timestep].dt will be 
 // the timestep size at that timestep
-struct time{
+struct time_element{
   // default constructor
-  time()
+  time_element()
     : mtx()
     , dt(0.0)
     , elapsed_time(0.0)
@@ -78,8 +78,8 @@ struct time{
   {}
   
   // copy constructor
-  time(
-       time const& other
+  time_element(
+       time_element const& other
        )
     : mtx()
     , dt(other.dt)                     // timestep size
@@ -93,7 +93,7 @@ struct time{
   bool computed;
 };
 // declaring time_array
-std::vector<typename ::time> time_array;
+std::vector<time_element> time_array;
 
 
 // this is the fundimental element of the hydrodynamics code, the 
@@ -122,7 +122,33 @@ struct cell{
     , computed(other.computed)
   {}
 
-  hpx::lcos::local::mutex mtx;
+  // assignment operator:
+  //
+  //   cell c1, c2;
+  //   c1 = c2; // invoked by this syntax
+  cell& operator=(
+       cell const& other
+       )
+  {
+    // first, we lock both the mutex of this cell, and the mutex of the other
+    // cell
+    hpx::lcos::local::mutex::scoped_lock this_lock(mtx), other_lock(other.mtx);
+
+    rho = other.rho;
+    mom = other.mom;
+    etot = other.etot;
+    tau = other.tau;
+    computed = other.computed;
+
+    // return a reference to ourselves
+    return *this;
+  }
+
+  // dummy serialization functionality
+  template <typename Archive>
+  void serialize(Archive &, unsigned) {}
+
+  mutable hpx::lcos::local::mutex mtx;
   double rho;
   double mom;
   double etot;
@@ -135,7 +161,7 @@ std::vector<std::vector<cell> > grid;
 
 // forward declaration of the compute function
 cell compute(boost::uint64_t timestep, boost::uint64_t location);
-double timestep_size(uint64_t timestep);
+double timestep_size(boost::uint64_t timestep);
 cell initial_sod(boost::uint64_t location);
 double get_pressure(cell input);  
 
@@ -160,7 +186,7 @@ typedef eager_future<compute_action> compute_future;
 // this will return the timestep size.  The timestep index will refer to the 
 // timestep where it will be USED rather than the timestep where it was 
 // calculated.
-double timestep_size(uint64_t timestep)
+double timestep_size(boost::uint64_t timestep)
 {
   // locking
   hpx::lcos::local::mutex::scoped_lock l(time_array[timestep].mtx);
@@ -190,7 +216,7 @@ double timestep_size(uint64_t timestep)
   double dt_cfl = 1000.0;
 
   // wait for an array of futures
-  wait(futures, [&](std::size_t i, cell this_cell)
+  wait(futures, [&](std::size_t i, cell const& this_cell)
     {         
       // look at all of the cells at a timestep, then pick the smallest
       // dt_cfl = cfl_factor*dx/(soundspeed+absolute_velocity)
@@ -220,6 +246,9 @@ double timestep_size(uint64_t timestep)
                                     1.5*time_array[timestep-1].dt);
       return time_array[timestep].dt;
     });
+
+  // REVIEW: Zach, is this the right value to return?
+  return time_array[timestep].dt;
 }
 
 cell compute(boost::uint64_t timestep, boost::uint64_t location)
@@ -324,14 +353,19 @@ cell compute(boost::uint64_t timestep, boost::uint64_t location)
   double e_kinetic = 0.5*middle.mom*middle.mom/middle.rho;
   double e_internal = middle.etot - e_kinetic;
   if ( abs(e_internal) > 0.1*middle.etot) 
-    new.tau = pow(e_internal,1.0/fluid_gamma)
+    now.tau = pow(e_internal,1.0/fluid_gamma);
 
+  // REVIEW: Zach, is this the right value to return?
+  return now;
 }  
 
 double get_pressure(cell input)
 {
   double pressure = 0.0;
   double e_kinetic = 0.5*input.mom*input.mom/input.rho;
+
+  // REVIEW: Zach. what's the purpose of e_internal? it's not used anywhere
+  // else in this function.
   double e_internal = input.etot - e_kinetic;
   if ( (input.etot - e_kinetic) > 0.001*input.etot )
     pressure = (fluid_gamma-1.0)*(input.etot - e_kinetic);
@@ -367,7 +401,8 @@ cell initial_sod(boost::uint64_t location)
   cell_here.tau = pow(e_internal,(1.0/fluid_gamma));
   cell_here.etot = e_internal;  // ONLY true when mom=0, not in general!
   
-
+  // REVIEW: Zach, is the right value to return?
+  return cell_here;
 }
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(
@@ -394,7 +429,7 @@ int hpx_main(
   cout << (boost::format("nx = %1%\n") % nx) << flush;
 
   // allocating the time array
-  time_array = std::vector<typedef time>(nt);
+  time_array = std::vector<time_element>(nt);
   
   // allocating the grid 2d array of all of the cells for all timesteps
   grid = std::vector<std::vector<cell> >(nt, std::vector<cell>(nx));
@@ -424,8 +459,8 @@ int hpx_main(
     
   }
 
-    finalize();
-    return 0;
+  finalize();
+  return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -434,10 +469,10 @@ int main(
   , char* argv[]
     )
 {
-    // Configure application-specific options.
-    options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
+  // Configure application-specific options.
+  options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
 
-    // Initialize and run HPX.
-    return init(cmdline, argc, argv);
+  // Initialize and run HPX.
+  return init(cmdline, argc, argv);
 }
 
