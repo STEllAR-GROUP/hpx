@@ -19,7 +19,7 @@ a destructor, and access operators.
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/lcos/local-mutex.hpp>
+#include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
