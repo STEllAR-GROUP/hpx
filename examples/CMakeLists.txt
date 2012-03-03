@@ -6,55 +6,19 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(subdirs
-    1d_hydro
     accumulator
-    adaptive1d
     balancing
     bfs
-    bright_future
-    dataflow
-    distributed_test
-    embarrassingly_parallel
     gtc
-    heartbeat
-    hplpx
-    nqueen
-    object_semaphore
     performance_counters
-    queue
     quickstart
     random_mem_access
-    startup_shutdown
-    throttle
    )
 
-if(${BOOST_MINOR_VERSION} GREATER 46)
+if(HDF5_CPP_FOUND AND HPX_CXX11_LAMBDAS AND HPX_CXX11_AUTO AND HDF5_THREAD_SAFE)
   set(subdirs ${subdirs}
-      geometry
+      sheneos
      )
-endif()
-
-if(HDF5_CPP_FOUND)
-  if(HDF5_FOUND)
-    set(subdirs ${subdirs}
-        interpolate1d
-        interpolate3d
-        gravity
-       )
-  endif()
-  
-
-  if(HPX_CXX11_LAMBDAS AND HPX_CXX11_AUTO AND HDF5_THREAD_SAFE)
-    set(subdirs ${subdirs}
-        sheneos
-       )
-
-    if(CMAKE_Fortran_COMPILER AND HDF5_FORTRAN_FOUND)
-      set(subdirs ${subdirs}
-          neutron_star
-         )
-    endif()
-  endif()
 endif()
 
 foreach(subdir ${subdirs})
