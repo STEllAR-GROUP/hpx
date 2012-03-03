@@ -18,10 +18,13 @@
     ]
 ]
 
+[/ Definitions which are controlled by commandline macros]
+
+[? __enable_fixme__   [template fixme[s] [*FIXME: [s]]] ]
+[? __disable_fixme__  [template fixme[s] ] ]
+
 [/ DEFINITIONS]
 [def __version__                V0.8.0]
-
-[template fixme[s]              [*FIXME: [s]]]
 
 [def __stellar__                [@http://stellar.cct.lsu.edu STE||AR]]
 [def __stellar_list__           [@email:gopx@cct.lsu.edu HPX General List]]

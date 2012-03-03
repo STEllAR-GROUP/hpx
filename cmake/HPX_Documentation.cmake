@@ -89,7 +89,11 @@ else()
 
   # Quickbook -> BoostBook XML
   macro(hpx_quickbook_to_boostbook name)
-    hpx_parse_arguments(${name} "SOURCE;DEPENDENCIES" "" ${ARGN})
+    hpx_parse_arguments(${name} "SOURCE;DEPENDENCIES;QUICKBOOK_ARGS" "" ${ARGN})
+
+    hpx_print_list("DEBUG"
+        "hpx_quickbook_to_boostbook.${name}" "Quickbook arguments"
+        ${name}_QUICKBOOK_ARGS)
 
     # If input is not a full path, it's in the current source directory.
     get_filename_component(input_path ${${name}_SOURCE} PATH)
@@ -109,6 +113,7 @@ else()
       COMMAND ${QUICKBOOK_PROGRAM}
           "--output-file=${name}.xml"
           "${svn_revision_option}"
+          ${${name}_QUICKBOOK_ARGS}
           ${input_path}
       COMMENT "Generating BoostBook XML file ${name}.xml from ${${name}_SOURCE}."
       DEPENDS ${${name}_SOURCE} ${${name}_DEPENDENCIES})
@@ -201,7 +206,7 @@ else()
   # Quickbook -> BoostBook XML -> DocBook -> HTML
   macro(hpx_quickbook_to_html name)
     hpx_parse_arguments(${name}
-        "SOURCE;DEPENDENCIES;CATALOG;XSLTPROC_ARGS;TARGET"
+        "SOURCE;DEPENDENCIES;CATALOG;XSLTPROC_ARGS;TARGET;QUICKBOOK_ARGS"
         "" ${ARGN})
 
     hpx_print_list("DEBUG"
@@ -210,7 +215,8 @@ else()
 
     hpx_quickbook_to_boostbook(${name}
       SOURCE ${${name}_SOURCE}
-      DEPENDENCIES ${${name}_DEPENDENCIES})
+      DEPENDENCIES ${${name}_DEPENDENCIES}
+      QUICKBOOK_ARGS ${${name}_QUICKBOOK_ARGS})
 
     hpx_boostbook_to_docbook(${name}
       SOURCE ${name}.xml

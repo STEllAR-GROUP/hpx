@@ -14,6 +14,11 @@ set(DOCUMENTATION_DEPENDENCIES
     ${hpx_SOURCE_DIR}/examples/quickstart/hello_world.cpp
     ${hpx_SOURCE_DIR}/examples/quickstart/simplest_hello_world.cpp)
 
+set(quickbook_fixme_mode "-D__disable_fixme__")
+if(HPX_DOCUMENTATION_DEVELOPMENT)
+  set(quickbook_fixme_mode "-D__enable_fixme__")
+endif()
+
 hpx_quickbook_to_html(hpx
     SOURCE hpx.qbk
     DEPENDENCIES ${DOCUMENTATION_DEPENDENCIES}
@@ -26,7 +31,8 @@ hpx_quickbook_to_html(hpx
                   --stringparam boost.image.src images/hpx_0_8.png
                   --stringparam boost.image.w 323
                   --stringparam boost.image.h 68
-                  --stringparam boost.image.alt "HPX - High Performance ParalleX")
+                  --stringparam boost.image.alt "HPX - High Performance ParalleX"
+    QUICKBOOK_ARGS ${quickbook_fixme_mode})
 
 add_custom_target(docs
     DEPENDS hpx_HTML.manifest
