@@ -34,7 +34,7 @@ namespace hpx { namespace threads { namespace detail
     {
         BOOST_ASSERT(sizeof(detail::thread) == size);
 
-        void *ret = pool.detail_pool_.malloc();
+        void *ret = pool.detail_pool_.allocate();
         if (0 == ret)
             boost::throw_exception(std::bad_alloc());
         return ret;
@@ -48,7 +48,7 @@ namespace hpx { namespace threads { namespace detail
     void thread::operator delete(void *p, thread_pool& pool)
     {
         if (0 != p)
-            pool.detail_pool_.free(reinterpret_cast<detail::thread*>(p));
+            pool.detail_pool_.deallocate(reinterpret_cast<detail::thread*>(p));
     }
 
     void thread::operator delete(void *p, std::size_t size)
@@ -56,7 +56,7 @@ namespace hpx { namespace threads { namespace detail
         BOOST_ASSERT(sizeof(detail::thread) == size);
         if (0 != p) {
             detail::thread* pt = reinterpret_cast<detail::thread*>(p);
-            pt->pool_->detail_pool_.free(pt);
+            pt->pool_->detail_pool_.deallocate(pt);
         }
     }
 }}}
@@ -64,6 +64,10 @@ namespace hpx { namespace threads { namespace detail
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
 {
+    ///////////////////////////////////////////////////////////////////////////
+    // global variable defining the stack size to use for all HPX-threads
+    std::size_t default_stacksize = HPX_DEFAULT_STACK_SIZE;
+
     ///////////////////////////////////////////////////////////////////////////
     // This overload will be called by the ptr_map<> used in the thread_queue
     // whenever an instance of a threads::thread needs to be deleted. We

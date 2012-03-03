@@ -88,20 +88,20 @@ int hpx_main(po::variables_map &vm)
     int result = 0;
     double elapsed = 0.0;
 
-    std::vector<naming::id_type> prefixes;
-    applier::applier& appl = applier::get_applier();
-
-    naming::id_type this_prefix = appl.get_runtime_support_gid();
-
     components::component_type type =
        components::get_component_type<components::server::plain_function<set_initialdata_action> >();
+    std::vector<naming::id_type> localities =
+        hpx::find_remote_localities(type);
+
+    naming::id_type this_prefix = hpx::find_here();
+
 
     // Declaration used to store the first gid (if any) of the remote prefixes
     naming::id_type that_prefix;
 
-    if (appl.get_remote_prefixes(prefixes, type)) {
+    if (!localities.empty()) {
       // If there is at least one such remote locality, store the first gid in the list
-      that_prefix = prefixes[0];
+      that_prefix = localities[0];
     } else {
       that_prefix = this_prefix;
     }
@@ -161,14 +161,14 @@ HPX_REGISTER_MANAGE_OBJECT_ACTION(
 naming::id_type set_initialdata (int i)
 {
 
-    naming::id_type here = applier::get_applier().get_runtime_support_gid();
+  naming::id_type here = hpx::find_here();
     naming::id_type result = components::stubs::memory_block::create(
             here, sizeof(data), manage_data);
 
     components::access_memory_block<data> val(
                 components::stubs::memory_block::checkout(result));
 
-    int locality = get_prefix_from_id( here );
+    int locality = get_locality_id_from_id( here );
 
     val->val_ = i;
     std::cout << " locality : " << locality << " index : " << i << std::endl;
@@ -184,7 +184,7 @@ void update (naming::id_type in)
                 components::stubs::memory_block::checkout(in));
 
     naming::id_type here = applier::get_applier().get_runtime_support_gid();
-    int locality = get_prefix_from_id( here );
+    int locality = get_locality_id_from_id( here );
     std::cout << " locality update " << locality << std::endl;
 
     result->val_ += 1;

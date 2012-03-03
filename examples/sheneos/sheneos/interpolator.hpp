@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -35,7 +35,7 @@ namespace sheneos
         ~interpolator();
 
         /// Create a new interpolator instance and initialize it synchronously.
-        /// 
+        ///
         /// \param symbolic_name_base [in] The name for the new interpolator
         ///                           object.
         /// \param num_instances      [in] The number of
@@ -59,7 +59,7 @@ namespace sheneos
         /// the proper partition for the actual interpolation.
         hpx::lcos::promise<std::vector<double> >
         interpolate_async(double ye, double temp, double rho,
-            boost::uint32_t eosvalues = server::partition3d::small_api_values)
+            boost::uint32_t eosvalues = server::partition3d::small_api_values)  const
         {
             return stubs::partition3d::interpolate_async(
                 get_gid(ye, temp, rho), ye, temp, rho, eosvalues);
@@ -68,20 +68,59 @@ namespace sheneos
         /// Synchronously interpolate the function values for the given ye,
         /// temp and rho from the ShenEOS tables. This function dispatches to
         /// the proper partition for the actual interpolation.
-        std::vector<double>
-        interpolate(double ye, double temp, double rho,
-            boost::uint32_t eosvalues = server::partition3d::small_api_values)
+        std::vector<double> interpolate(double ye, double temp, double rho,
+            boost::uint32_t eosvalues = server::partition3d::small_api_values)  const
         {
             return stubs::partition3d::interpolate(
                 get_gid(ye, temp, rho), ye, temp, rho, eosvalues);
         }
 
+        /// Asynchronously interpolate the function values for the given ye,
+        /// temp and rho from the ShenEOS tables. This function dispatches to
+        /// the proper partition for the actual interpolation.
+        hpx::lcos::promise<double>
+        interpolate_one_async(double ye, double temp, double rho,
+            boost::uint32_t eosvalue)  const
+        {
+            return stubs::partition3d::interpolate_one_async(
+                get_gid(ye, temp, rho), ye, temp, rho, eosvalue);
+        }
+
+        /// Synchronously interpolate the function values for the given ye,
+        /// temp and rho from the ShenEOS tables. This function dispatches to
+        /// the proper partition for the actual interpolation.
+        double interpolate_one(double ye, double temp, double rho,
+            boost::uint32_t eosvalue)  const
+        {
+            return stubs::partition3d::interpolate_one(
+                get_gid(ye, temp, rho), ye, temp, rho, eosvalue);
+        }
+
+        /// Asynchronously interpolate the function values for the given ye,
+        /// temp and rho from the ShenEOS tables. This function dispatches to
+        /// the proper partition for the actual interpolation.
+        hpx::lcos::promise<std::vector<double> >
+        interpolate_one_bulk_async(std::vector<double> const& ye,
+            std::vector<double> const& temp, std::vector<double> const& rho,
+            boost::uint32_t eosvalue) const;
+
+        /// Synchronously interpolate the function values for the given ye,
+        /// temp and rho from the ShenEOS tables. This function dispatches to
+        /// the proper partition for the actual interpolation.
+        std::vector<double> interpolate_one_bulk(std::vector<double> const& ye,
+            std::vector<double> const temp, std::vector<double> const& rho,
+            boost::uint32_t eosvalue) const
+        {
+            return interpolate_one_bulk_async(ye, temp, rho, eosvalue).get();
+        }
+
         /// Find the minimum and maximum values of the given dimension.
-        void get_dimension(dimension::type what, double& min, double& max);
+        void get_dimension(dimension::type what, double& min, double& max)  const;
 
     private:
         /// Find the GID of the partition that contains the specified value.
-        hpx::naming::id_type const& get_gid(double ye, double temp, double rho);
+        hpx::naming::id_type const&
+            get_gid(double ye, double temp, double rho) const;
 
         typedef hpx::components::distributing_factory distributing_factory;
         typedef distributing_factory::async_create_result_type
@@ -91,7 +130,7 @@ namespace sheneos
         void fill_partitions(std::string const& datafilename,
             std::string symbolic_name_base, async_create_result_type future);
 
-        std::size_t get_partition_index(std::size_t d, double value);
+        std::size_t get_partition_index(std::size_t d, double value) const;
 
     private:
         std::vector<hpx::naming::id_type> partitions_;

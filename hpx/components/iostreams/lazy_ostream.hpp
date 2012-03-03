@@ -32,7 +32,7 @@ struct lazy_ostream
     typedef components::client_base<lazy_ostream, stubs::output_stream>
         base_type;
 
-    typedef lcos::local_mutex mutex_type;
+    typedef lcos::local::mutex mutex_type;
     typedef std::back_insert_iterator<std::deque<char> > iterator_type;
     typedef util::iterator_sink<iterator_type> device_type;
     typedef boost::iostreams::stream<device_type> stream_type;

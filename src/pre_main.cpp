@@ -1,5 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,10 +8,10 @@
 
 #include <hpx/version.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/lcos/barrier.hpp>
+#include <hpx/lcos/future_wait.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 
 namespace hpx
@@ -22,11 +23,11 @@ inline lcos::barrier
 create_barrier(naming::resolver_client& agas_client,
     std::size_t num_localities, char const* symname)
 {
-    lcos::barrier barrier;
-    barrier.create_one(agas_client.local_prefix(), num_localities);
+    lcos::barrier b;
+    b.create_one(agas_client.local_locality(), num_localities);
 
-    agas::register_name(symname, barrier.get_gid());
-    return barrier;
+    agas::register_name(symname, b.get_gid());
+    return b;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -58,36 +59,50 @@ const char* third_barrier = "/barrier(agas#0)/third_stage";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Install performance counter startup functions for core subsystems.
-void install_counters()
+inline void register_counter_types()
 {
-     naming::get_agas_client().install_counters();
-     LBT_(info) << "(3rd stage) pre_main: installed AGAS client-side "
-                   "performance counters";
+     naming::get_agas_client().register_counter_types();
+     LBT_(info) << "(3rd stage) pre_main: registered AGAS client-side "
+                   "performance counter types";
 
-     get_runtime().install_counters();
-     LBT_(info) << "(3rd stage) pre_main: installed runtime performance "
-                   "counters";
+     get_runtime().register_counter_types();
+     LBT_(info) << "(3rd stage) pre_main: registered runtime performance "
+                   "counter types";
 
-     threads::get_thread_manager().install_counters();
-     LBT_(info) << "(3rd stage) pre_main: installed thread-manager performance "
-                   "counters";
+     threads::get_thread_manager().register_counter_types();
+     LBT_(info) << "(3rd stage) pre_main: registered thread-manager performance "
+                   "counter types";
 
-     applier::get_applier().get_parcel_handler().install_counters();
-     LBT_(info) << "(3rd stage) pre_main: installed parcelset performance "
-                   "counters";
+     applier::get_applier().get_parcel_handler().register_counter_types();
+     LBT_(info) << "(3rd stage) pre_main: registered parcelset performance "
+                   "counter types";
 
-     util::detail::install_counters();
-     LBT_(info) << "(3rd stage) pre_main: installed full_empty_entry "
-                   "performance counters";
+     util::detail::register_counter_types();
+     LBT_(info) << "(3rd stage) pre_main: registered full_empty_entry "
+                   "performance counter types";
+}
+
+///////////////////////////////////////////////////////////////////////////////
+void garbage_collect_non_blocking()
+{
+    agas::garbage_collect_non_blocking();
+}
+
+void garbage_collect()
+{
+    agas::garbage_collect();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Implements second and third stage bootstrapping.
-void pre_main(runtime_mode mode)
+bool pre_main(runtime_mode mode)
 {
+    using components::stubs::runtime_support;
+
     naming::resolver_client& agas_client = naming::get_agas_client();
     util::runtime_configuration const& cfg = get_runtime().get_config();
 
+    bool exit_requested = false;
     if (runtime_mode_connect == mode)
     {
         LBT_(info) << "(2nd stage) pre_main: locality is in connect mode, "
@@ -101,13 +116,16 @@ void pre_main(runtime_mode mode)
         LBT_(info) << "(2nd stage) pre_main: addressing services enabled";
 
         // Load components, so that we can use the barrier LCO.
-        components::stubs::runtime_support::load_components
-            (find_here());
-        LBT_(info) << "(2nd stage) pre_main: loaded components";
+        exit_requested = !runtime_support::load_components(find_here());
+        LBT_(info) << "(2nd stage) pre_main: loaded components"
+            << (exit_requested ? ", application exit has been requested" : "");
 
-        install_counters();
+        register_counter_types();
 
-        components::stubs::runtime_support::call_startup_functions(find_here());
+        runtime_support::call_startup_functions(find_here(), true);
+        LBT_(info) << "(3rd stage) pre_main: ran pre-startup functions";
+
+        runtime_support::call_startup_functions(find_here(), false);
         LBT_(info) << "(3rd stage) pre_main: ran startup functions";
     }
 
@@ -129,9 +147,9 @@ void pre_main(runtime_mode mode)
         // }}}
 
         // Load components, so that we can use the barrier LCO.
-        components::stubs::runtime_support::load_components
-            (find_here());
-        LBT_(info) << "(2nd stage) pre_main: loaded components";
+        exit_requested = !runtime_support::load_components(find_here());
+        LBT_(info) << "(2nd stage) pre_main: loaded components"
+            << (exit_requested ? ", application exit has been requested" : "");
 
         lcos::barrier second_stage, third_stage;
 
@@ -140,7 +158,7 @@ void pre_main(runtime_mode mode)
         {
             naming::gid_type console_;
 
-            if (HPX_UNLIKELY(!agas_client.get_console_prefix(console_)))
+            if (HPX_UNLIKELY(!agas_client.get_console_locality(console_)))
             {
                 HPX_THROW_EXCEPTION(network_error
                     , "pre_main"
@@ -170,9 +188,16 @@ void pre_main(runtime_mode mode)
         second_stage.wait();
         LBT_(info) << "(2nd stage) pre_main: passed 2nd stage boot barrier";
 
-        install_counters();
+        // Tear down the second stage barrier.
+        if (agas_client.is_bootstrap())
+            agas::unregister_name(second_barrier);
 
-        components::stubs::runtime_support::call_startup_functions(find_here());
+        register_counter_types();
+
+        runtime_support::call_startup_functions(find_here(), true);
+        LBT_(info) << "(3rd stage) pre_main: ran pre-startup functions";
+
+        runtime_support::call_startup_functions(find_here(), false);
         LBT_(info) << "(3rd stage) pre_main: ran startup functions";
 
         // Third stage bootstrap synchronizes startup functions across all
@@ -181,11 +206,34 @@ void pre_main(runtime_mode mode)
         // component tables are populated.
         third_stage.wait();
         LBT_(info) << "(3rd stage) pre_main: passed 3rd stage boot barrier";
+
+        // Tear down the second stage barrier.
+        if (agas_client.is_bootstrap())
+            agas::unregister_name(third_barrier);
     }
 
-    // Enable logging.
+    // Enable logging. Even if we terminate at this point we will see all
+    // pending log messages so far.
     components::activate_logging();
     LBT_(info) << "(3rd stage) pre_main: activated logging";
+
+    // Register pre-shutdown and shutdown functions to flush pending
+    // reference counting operations.
+    register_pre_shutdown_function(&garbage_collect_non_blocking);
+    register_shutdown_function(&garbage_collect);
+
+    // Any error in post-command line handling or any explicit --exit command
+    // line option will cause the application to terminate at this point.
+    if (exit_requested)
+    {
+        // If load_components returns false, shutdown the system. This
+        // essentially only happens if the command line contained --exit.
+        runtime_support::shutdown_all(
+            naming::get_id_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX), -1.0);
+        return false;
+    }
+
+    return true;
 }
 
 }

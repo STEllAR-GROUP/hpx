@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,8 +23,6 @@
 namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class component_factory_one component_factory_one.hpp hpx/runtime/components/component_factory_one.hpp
-    ///
     /// The \a component_factory_one provides a minimal implementation of a
     /// component's factory. If no additional functionality is required this
     /// type can be used to implement the full set of minimally required
@@ -167,6 +165,24 @@ namespace hpx { namespace components
                 "component_factory_one::create_one",
                 "this factory instance is disabled for this locality (" +
                 get_component_name() + ")");
+            return naming::invalid_gid;
+        }
+
+        /// \brief Create one new component instance and initialize it using
+        ///        the using the given constructor function.
+        ///
+        /// \param f  [in] The constructor function to call in order to
+        ///         initialize the newly allocated object.
+        ///
+        /// \return Returns the GID of the first newly created component
+        ///         instance. If more than one component instance has been
+        ///         created (\a count > 1) the GID's of all new instances are
+        ///         sequential in a row.
+        naming::gid_type create_one_functor(HPX_STD_FUNCTION<void(void*)> const&)
+        {
+            HPX_THROW_EXCEPTION(bad_request,
+                "component_factory_one::create_one",
+                "create_one is not supported by this factory instance");
             return naming::invalid_gid;
         }
 

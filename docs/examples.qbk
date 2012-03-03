@@ -1,0 +1,143 @@
+[/=============================================================================
+Copyright (C) 2012 Adrian Serio
+Copyright (C) 2012 Vinay C Amatya
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+=============================================================================/]
+
+[section:examples Examples]
+
+Here are some more examples for our reader to get more familiar with HPX style
+programming.
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:hello_world Hello World v2]
+
+You have already looked at a simple ["Hello World] example.  In this version
+each locality will print out a statement that says which OS thread executed it
+and which locality it came from.  The output will look something like this:
+
+    hello world from OS-thread 2 on locality 0
+    hello world from OS-thread 5 on locality 2
+    hello world from OS-thread 0 on locality 0
+
+[heading Setup]
+
+The source file is already created for you and could be found in the svn
+repository: [^parallex/hpx/examples/quickstart/hello_world.cpp] or a
+here [fixme add a link here].
+
+To compile this file type:
+
+    make examples.quickstart.hello_world
+
+To run the program type:
+
+    ./bin/hello_world
+
+This should print:
+
+    hello world from OS-thread 0 on locality 0
+
+To include more threads use the command line option ['-t] and type the number of threads that you wish to use.  For example, typing:
+
+    ./bin/hello_world -t2
+
+will yield:
+
+    hello world from OS-thread 1 on locality 0
+    hello world from OS-thread 0 on locality 0
+
+Notice how the ordering of the two print statements will change with
+subsequent runs.
+[fixme explain how to run hello world on multiple localites]
+
+[heading Walk-through]
+
+Now that you can complile and run the code lets look at how the code works
+begining with main:
+
+[import ../examples/quickstart/hello_world.cpp]
+[hello_world_main]
+[hello_world_hpx_main]
+
+In this excerpt of the code there are alot of new concepts such as
+["promise] which require explanation.  HPX is an ["action oriented] runtime
+system, which means that the information shared between compute nodes is in
+the form of ["work] or processes to be done.  This work is passed to other
+nodes in containers such as a ["promise].  For these work-containers to
+function properly, however, they must be wrapped in another device called
+an ["action].  We do this by declaring this:
+
+[hello_world_action_wrapper]
+
+Another way of thinking about this technique is as follows: functions are
+wrapped in promises which are wrapped in actions which are distributed to
+compute nodes.
+
+The rest of this program uses other mostly self explainitory functions.
+For more information on those functions veiw our API [fixme link to API].
+For more information on HPX theory please read [fixme link to HPX Theory].
+
+[endsect] [/Hello World]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:accumulator Accumulator]
+
+Accumulator is a simple example that exposes the notion of components in HPX.
+Components allow us to run applicationin in distributed environment in HPX.
+This example exposes four differenct functions: init, add, query and print.
+What this example does is it takes an input from a client locality component,
+puts value in a data type (unsigned long) at the remote locality component.
+Print command at the client would print the contents of the remote locality
+component at the remote locality. Query command at the client would print the
+contents of the remote locality component at client locality.
+
+[heading Building the example]
+
+From your build directory, type the following:
+
+    make examples.accumulator.accumulator
+
+[heading Run the example]
+
+From your bin directory inside install path, type the following:
+
+[teletype][/ switch to plain text source mode]
+On single machine, first console:
+
+    ./accumulator_client -0 -l2
+
+Same machine, second console, on identical path as above: [teletype]
+
+    ./accumulator_client -1 -l2
+
+[heading Results]
+
+Console 1:
+
+    accumulator client, you may enter some commands (try 'help' if in doubt...)
+    add 5
+    print
+    query
+    {0000000200ff0001, 000000000002ffff}> 5
+    print
+    add 5
+    print
+    query
+    {0000000200ff0001, 000000000002ffff}> 10
+    quit
+
+Console 2:
+
+    {0000000200000000, 00007fff21db4860}> 5
+    {0000000200000000, 00007fff21db4860}> 5
+    {0000000200000000, 00007fff21db4860}> 10
+
+[c++][/ switch back to C++ source mode]
+
+[endsect] [/Accumulator]
+[/////////////////////////////////////////////////////////////////////////////]
+
+[endsect] [/Examples]

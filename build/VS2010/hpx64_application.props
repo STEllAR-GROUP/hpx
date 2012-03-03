@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets">
+    <Import Project="hpx64.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros">
+    <BOOST_ROOT>$(HPX_BOOST_ROOT)</BOOST_ROOT>
+    <TBB_ROOT>$(HPX_TBB_ROOT)</TBB_ROOT>
+  </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.21006.1</_ProjectFileVersion>
+    <TargetExt>.exe</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>HPX_APPLICATION_EXPORTS=1;HPX_APPLICATION_NAME=$(ProjectName);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4267;4503;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <CustomBuildStep>
+      <Command>if not exist "$(HPX_ROOT)\bin64" mkdir "$(HPX_ROOT)\bin64"
+if not exist "$(HPX_ROOT)\bin64\$(Configuration)" mkdir "$(HPX_ROOT)\bin64\$(Configuration)"
+if not exist "$(HPX_ROOT)\bin64\$(Configuration)\bin" mkdir "$(HPX_ROOT)\bin64\$(Configuration)\bin"
+xcopy /Y/F "$(TargetPath)" "$(HPX_ROOT)\bin64\$(Configuration)\bin"
+xcopy /Y/F "$(TargetDir)\$(TargetName).pdb" "$(HPX_ROOT)\bin64\$(Configuration)\bin"
+</Command>
+      <Outputs>$(HPX_ROOT)\bin64\$(Configuration)\bin\$(TargetFileName);$(HPX_ROOT)\bin64\$(Configuration)\bin\$(TargetName).pdb;%(Outputs)</Outputs>
+    </CustomBuildStep>
+    <Link />
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="BOOST_ROOT">
+      <Value>$(BOOST_ROOT)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="HPX_ROOT">
+      <Value>$(HPX_ROOT)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="TBB_ROOT">
+      <Value>$(TBB_ROOT)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

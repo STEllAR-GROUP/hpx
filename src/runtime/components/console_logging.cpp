@@ -1,167 +1,234 @@
-////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2011 Hartmut Kaiser, Bryce Lelbach
+//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/util/serialize_sequence.hpp>
 #include <hpx/runtime/components/console_logging.hpp>
+#include <hpx/runtime/components/server/console_logging.hpp>
+#include <hpx/runtime/components/plain_component_factory.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 
 #include <boost/fusion/include/at_c.hpp>
+#include <boost/assert.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
-
-void console_logging_locked(naming::id_type const& prefix,
-    messages_type const& msgs)
-{
-    // If we're not in an HPX thread, we cannot call apply as it may access
-    // the AGAS components. We just throw an exception here - there's no
-    // thread-manager, so the exception will probably be unhandled. This is
-    // desirable in this situation, as we can't trust the logging system to
-    // report this error.
-    if (HPX_UNLIKELY(!threads::get_self_ptr()))
-        HPX_THROW_EXCEPTION(null_thread_id
-          , "components::console_logging_locked"
-          , "console_logging_locked was not called from a pxthread");
-
-    try {
-        applier::apply<server::console_logging_action<> >(prefix, msgs);
-    }
-    catch (hpx::exception const& e) {
+    void fallback_console_logging_locked(messages_type const& msgs,
+        std::string fail_msg = "")
+    {
         using boost::fusion::at_c;
 
-        // if this is not the console locality (or any other error occurs)
-        // we might be too late for any logging, write to local file
+        if (!fail_msg.empty())
+            fail_msg = "Logging failed due to: " + fail_msg + "\n";
+
         BOOST_FOREACH(message_type const& msg, msgs)
         {
-            std::string fail_msg = e.what();
-
-            if (fail_msg.empty())
-                fail_msg = "Failed logging to console";
-            else
-                fail_msg = "Failed logging to console due to: "
-                         + fail_msg;
-
             switch (at_c<0>(msg)) {
             default:
             case destination_hpx:
-                LHPX_CONSOLE_(at_c<1>(msg)) << fail_msg << "\n"
-                                            << at_c<2>(msg);
+                LHPX_CONSOLE_(at_c<1>(msg)) << fail_msg << at_c<2>(msg);
                 break;
 
             case destination_timing:
-                LTIM_CONSOLE_(at_c<1>(msg)) << fail_msg << "\n"
-                                            << at_c<2>(msg);
+                LTIM_CONSOLE_(at_c<1>(msg)) << fail_msg << at_c<2>(msg);
                 break;
 
             case destination_agas:
-                LAGAS_CONSOLE_(at_c<1>(msg)) << fail_msg << "\n"
-                                             << at_c<2>(msg);
+                LAGAS_CONSOLE_(at_c<1>(msg)) << fail_msg << at_c<2>(msg);
                 break;
 
             case destination_app:
-                LAPP_CONSOLE_(at_c<1>(msg)) << fail_msg << "\n"
-                                            << at_c<2>(msg);
+                LAPP_CONSOLE_(at_c<1>(msg)) << fail_msg << at_c<2>(msg);
                 break;
             }
         }
     }
-}
 
-void pending_logs::add(message_type const& msg)
-{
+    void console_logging_locked(naming::id_type const& prefix,
+        messages_type const& msgs)
     {
-        queue_mutex_type::scoped_lock l(queue_mtx_);
-        queue_.push_back(msg);
-        ++queue_size_;
-    }
-
-    // we can only invoke send from within a pxthread
-    if (threads::threadmanager_is(running) && threads::get_self_ptr() &&
-        activated_.load())
-    {
-        // invoke actual logging immediately if we're on the console
-        if (naming::get_agas_client().is_console())
-            send();
-        else if (max_pending < queue_size_.load())
-            send();
-    }
-}
-
-void pending_logs::cleanup()
-{
-    if (threads::threadmanager_is(running) && threads::get_self_ptr() &&
-        activated_.load() && (0 < queue_size_.load()))
-    {
-        send();
-    }
-}
-
-bool pending_logs::ensure_prefix()
-{
-    // Resolve the console prefix if it's still invalid.
-    if (HPX_UNLIKELY(naming::invalid_id == prefix_))
-    {
-        prefix_mutex_type::scoped_try_lock l(prefix_mtx_);
-
-        if (l.owns_lock() && (naming::invalid_id == prefix_))
+        // If we're not in an HPX thread, we cannot call apply as it may access
+        // the AGAS components. We just throw an exception here - there's no
+        // thread-manager, so the exception will probably be unhandled. This is
+        // desirable in this situation, as we can't trust the logging system to
+        // report this error.
+        if (HPX_UNLIKELY(!threads::get_self_ptr()))
         {
-            naming::gid_type raw_prefix;
-            naming::get_agas_client().get_console_prefix(raw_prefix);
-            BOOST_ASSERT(naming::invalid_gid != raw_prefix);
-            prefix_ = naming::id_type(raw_prefix, naming::id_type::unmanaged);
+            // write the message to a local file in any case
+            fallback_console_logging_locked(msgs);
+
+            // raise error as this should get called from outside a HPX-thread
+            HPX_THROW_EXCEPTION(null_thread_id,
+                "components::console_logging_locked",
+                "console_logging_locked was not called from a HPX-thread");
         }
 
-        // Someone else started getting the console prefix.
-        else {
-            return false;
+        try {
+            applier::apply<server::console_logging_action<> >(prefix, msgs);
+        }
+        catch (hpx::exception const& e) {
+            // if this is not the console locality (or any other error occurs)
+            // we might be too late for any logging, write to local file
+            fallback_console_logging_locked(msgs, e.what());
         }
     }
-    return true;
-}
 
-void pending_logs::send()
-{
-    if (!ensure_prefix())
-        return;
-
-    messages_type msgs;
+    bool pending_logs::is_active()
     {
-        queue_mutex_type::scoped_lock l(queue_mtx_);
-        queue_.swap(msgs);
-        queue_size_.store(0);
+        return threads::threadmanager_is(running) && threads::get_self_ptr() &&
+            activated_.load();
     }
 
-    if (!msgs.empty())
+    void pending_logs::add(message_type const& msg)
+    {
+        if (0 == hpx::get_runtime_ptr()) {
+            // This branch will be taken if it's too early or too late in the
+            // game. We do local logging only. Any queued messages which may be
+            // still left in the queue are logged locally as well.
+
+            // queue up the new message and log it with the rest of it
+            messages_type msgs;
+            {
+                queue_mutex_type::scoped_lock l(queue_mtx_);
+                queue_.push_back(msg);
+                queue_.swap(msgs);
+            }
+
+            fallback_console_logging_locked(msgs);
+        }
+        else if (is_active()) {
+            // This branch will be taken under normal circumstances. We queue
+            // up the message and either log it immediately (if we are on the
+            // console locality) or defer logging until 'max_pending' messages
+            // have been queued. Note: we can invoke send only from within a
+            // HPX-thread.
+            std::size_t size = 0;
+
+            {
+                queue_mutex_type::scoped_lock l(queue_mtx_);
+                queue_.push_back(msg);
+                size = queue_.size();
+            }
+
+            // Invoke actual logging immediately if we're on the console or
+            // if the number of waiting log messages is too large.
+            if (naming::get_agas_client().is_console() || size > max_pending)
+                send();
+        }
+        else {
+            // This branch will be taken if the runtime is up and running, but
+            // either the thread manager is not active or this is not invoked
+            // on a HPX-thread.
+
+            // Note: is_console can be called outside of a HPX-thread
+            if (!naming::get_agas_client().is_console())
+            {
+                // queue it for delivery to the console
+                queue_mutex_type::scoped_lock l(queue_mtx_);
+                queue_.push_back(msg);
+            }
+
+            // and log it locally
+            messages_type msgs;
+            msgs.push_back(msg);
+            fallback_console_logging_locked(msgs);
+        }
+    }
+
+    void pending_logs::cleanup()
+    {
+        if (threads::threadmanager_is(running) && threads::get_self_ptr())
+        {
+            send();
+        }
+        else
+        {
+            messages_type msgs;
+            {
+                queue_mutex_type::scoped_lock l(queue_mtx_);
+                if (queue_.empty())
+                    return;         // some other thread did the deed
+                queue_.swap(msgs);
+            }
+
+            fallback_console_logging_locked(msgs);
+        }
+    }
+
+    bool pending_logs::ensure_prefix()
+    {
+        // Resolve the console prefix if it's still invalid.
+        if (HPX_UNLIKELY(naming::invalid_id == prefix_))
+        {
+            prefix_mutex_type::scoped_try_lock l(prefix_mtx_);
+
+            if (l.owns_lock() && (naming::invalid_id == prefix_))
+            {
+                naming::gid_type raw_prefix;
+                naming::get_agas_client().get_console_locality(raw_prefix);
+                BOOST_ASSERT(naming::invalid_gid != raw_prefix);
+                prefix_ = naming::id_type(raw_prefix, naming::id_type::unmanaged);
+            }
+
+            // Someone else started getting the console prefix.
+            else {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    void pending_logs::send()
+    {
+        // WARNING: Never, ever call this outside of a HPX-thread.
+        BOOST_ASSERT(threads::get_self_ptr());
+
+        if (!ensure_prefix())
+            return;             // some other thread tries to do logging
+
+        messages_type msgs;
+        {
+            queue_mutex_type::scoped_lock l(queue_mtx_);
+            if (queue_.empty())
+                return;         // some other thread did the deed
+            queue_.swap(msgs);
+        }
+
         console_logging_locked(prefix_, msgs);
-}
+    }
 
-void console_logging(logging_destination dest, std::size_t level,
-    std::string const& s)
-{
-    util::static_<pending_logs, pending_logs_tag> logs;
-    message_type msg(dest, level, s);
-    logs.get().add(msg);
-}
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        pending_logs& logger()
+        {
+            util::static_<pending_logs, pending_logs_tag> logs;
+            return logs.get();
+        }
+    }
 
-void cleanup_logging()
-{
-    util::static_<pending_logs, pending_logs_tag> logs;
-    logs.get().cleanup();
-}
+    void console_logging(logging_destination dest, std::size_t level,
+        std::string const& s)
+    {
+        message_type msg(dest, level, s);
+        detail::logger().add(msg);
+    }
 
-void activate_logging()
-{
-    util::static_<pending_logs, pending_logs_tag> logs;
-    logs.get().activate();
-}
+    void cleanup_logging()
+    {
+        detail::logger().cleanup();
+    }
 
+    void activate_logging()
+    {
+        detail::logger().activate();
+    }
 }}
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -19,12 +19,12 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     struct lazy_result
     {
-        lazy_result(naming::gid_type const& prefix)
-          : prefix_(prefix)
+        lazy_result(naming::gid_type const& locality_id)
+          : locality_(locality_id)
         {}
 
-        naming::gid_type prefix_;
-        std::vector<lcos::promise<naming::gid_type> > gids_;
+        naming::gid_type locality_;
+        std::vector<lcos::promise<naming::gid_type, naming::gid_type> > gids_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -33,16 +33,16 @@ namespace hpx { namespace components { namespace server
     distributing_factory::create_components(
         components::component_type type, std::size_t count) const
     {
-        // make sure we get prefixes for derived component type, if any
+        // make sure we get localities for derived component type, if any
         components::component_type prefix_type = type;
         if (type != components::get_base_type(type))
             prefix_type = components::get_derived_type(type);
 
         // get list of locality prefixes
-        std::vector<naming::gid_type> prefixes;
-        hpx::naming::get_agas_client().get_prefixes(prefixes, prefix_type);
+        std::vector<naming::id_type> localities =
+            hpx::find_all_localities(prefix_type);
 
-        if (prefixes.empty())
+        if (localities.empty())
         {
             HPX_THROW_EXCEPTION(bad_component_type,
                 "distributing_factory::create_components",
@@ -51,11 +51,11 @@ namespace hpx { namespace components { namespace server
         }
 
         if (count == std::size_t(-1))
-            count = prefixes.size();
+            count = localities.size();
 
         std::size_t created_count = 0;
-        std::size_t count_on_locality = count / prefixes.size();
-        std::size_t excess = count - count_on_locality*prefixes.size();
+        std::size_t count_on_locality = count / localities.size();
+        std::size_t excess = count - count_on_locality*localities.size();
 
         // distribute the number of components to create evenly over all
         // available localities
@@ -65,7 +65,7 @@ namespace hpx { namespace components { namespace server
         // start an asynchronous operation for each of the localities
         future_values_type v;
 
-        BOOST_FOREACH(naming::gid_type const& gid, prefixes)
+        BOOST_FOREACH(naming::id_type const& fact, localities)
         {
             std::size_t numcreate = count_on_locality;
             if (excess != 0) {
@@ -80,9 +80,7 @@ namespace hpx { namespace components { namespace server
                 break;
 
             // create one component at a time
-            naming::id_type fact(gid, naming::id_type::unmanaged);
-
-            v.push_back(future_values_type::value_type(gid));
+            v.push_back(future_values_type::value_type(fact.get_gid()));
             for (std::size_t i = 0; i < numcreate; ++i) {
                 lcos::eager_future<action_type, naming::gid_type> f(fact, type, 1);
                 v.back().gids_.push_back(f);
@@ -98,7 +96,7 @@ namespace hpx { namespace components { namespace server
 
         BOOST_FOREACH(lazy_result const& lr, v)
         {
-            results.push_back(remote_result_type::value_type(lr.prefix_, type));
+            results.push_back(remote_result_type::value_type(lr.locality_, type));
             lcos::wait(lr.gids_, results.back().gids_);
         }
 
@@ -116,10 +114,10 @@ namespace hpx { namespace components { namespace server
             prefix_type = components::get_derived_type(type);
 
         // get list of locality prefixes
-        std::vector<naming::gid_type> prefixes;
-        hpx::naming::get_agas_client().get_prefixes(prefixes, prefix_type);
+        std::vector<naming::id_type> localities =
+            hpx::find_all_localities(prefix_type);
 
-        if (prefixes.empty())
+        if (localities.empty())
         {
             // no locality supports creating the requested component type
             HPX_THROW_EXCEPTION(bad_component_type,
@@ -129,7 +127,7 @@ namespace hpx { namespace components { namespace server
         }
 
         std::size_t part_size = info.size();
-        if (part_size < prefixes.size())
+        if (part_size < localities.size())
         {
             // we have less localities than required by one partition
             HPX_THROW_EXCEPTION(bad_parameter,
@@ -139,8 +137,8 @@ namespace hpx { namespace components { namespace server
 
         // a new partition starts every parts_delta localities
         std::size_t parts_delta = 0;
-        if (prefixes.size() > part_size)
-            parts_delta = prefixes.size() / part_size;
+        if (localities.size() > part_size)
+            parts_delta = localities.size() / part_size;
 
         // distribute the number of components to create evenly over all
         // available localities
@@ -151,14 +149,14 @@ namespace hpx { namespace components { namespace server
         future_values_type v;
 
         for (std::size_t i = 0, j = 0;
-             i < prefixes.size() && j < parts;
+             i < localities.size() && j < parts;
              i += parts_delta, ++j)
         {
             // create one component at a time, overall, 'count' components
             // for each partition
-            naming::id_type fact(prefixes[i], naming::id_type::unmanaged);
+            naming::id_type fact(localities[i]);
 
-            v.push_back(future_values_type::value_type(prefixes[i]));
+            v.push_back(future_values_type::value_type(fact.get_gid()));
             for (std::size_t k = 0; k < count; ++k)
             {
                 lcos::eager_future<action_type, naming::gid_type> f(fact, type, 1);
@@ -171,7 +169,7 @@ namespace hpx { namespace components { namespace server
 
         BOOST_FOREACH(lazy_result const& lr, v)
         {
-            results.push_back(remote_result_type::value_type(lr.prefix_, type));
+            results.push_back(remote_result_type::value_type(lr.locality_, type));
             lcos::wait(lr.gids_, results.back().gids_);
         }
 
@@ -247,20 +245,11 @@ namespace boost { namespace serialization
 
     ///////////////////////////////////////////////////////////////////////////
     // explicit instantiation for the correct archive types
-#if HPX_USE_PORTABLE_ARCHIVES != 0
     template HPX_COMPONENT_EXPORT void
     serialize(hpx::util::portable_binary_iarchive&,
         hpx::components::server::partition_info&, unsigned int const);
     template HPX_COMPONENT_EXPORT void
     serialize(hpx::util::portable_binary_oarchive&,
         hpx::components::server::partition_info&, unsigned int const);
-#else
-    template HPX_COMPONENT_EXPORT void
-    serialize(boost::archive::binary_iarchive&,
-        hpx::components::server::partition_info&, unsigned int const);
-    template HPX_COMPONENT_EXPORT void
-    serialize(boost::archive::binary_oarchive&,
-        hpx::components::server::partition_info&, unsigned int const);
-#endif
 }}
 

@@ -17,31 +17,32 @@
 
 #include <boost/cstdint.hpp>
 
-namespace boost
-{
-namespace lockfree
-{
+namespace boost {
+namespace lockfree {
+namespace detail {
 
-#if defined (__x86_64__) || defined (_M_X64) || defined(__alpha__)
+#if defined (__x86_64__) || defined (_M_X64)
 
 template <class T>
-struct tagged_ptr
+class tagged_ptr
 {
+public:
     typedef boost::uint64_t compressed_ptr_t;
     typedef boost::uint16_t tag_t;
 
+private:
     union cast_unit
     {
         compressed_ptr_t value;
         tag_t tag[4];
     };
 
-    BOOST_STATIC_CONSTANT(std::size_t, tag_index = 3);
-    BOOST_STATIC_CONSTANT(compressed_ptr_t, ptr_mask = 0xffffffffffff);
+    static const int tag_index = 3;
+    static const compressed_ptr_t ptr_mask = 0xffffffffffff; //(1L<<48L)-1;
 
     static T* extract_ptr(volatile compressed_ptr_t const & i)
     {
-        return reinterpret_cast<T*>(i & ptr_mask);
+        return (T*)(i & ptr_mask);
     }
 
     static tag_t extract_tag(volatile compressed_ptr_t const & i)
@@ -51,18 +52,17 @@ struct tagged_ptr
         return cu.tag[tag_index];
     }
 
-    static compressed_ptr_t pack_ptr(T * ptr, tag_t tag)
+    static compressed_ptr_t pack_ptr(T * ptr, int tag)
     {
         cast_unit ret;
-        ret.value = reinterpret_cast<compressed_ptr_t>(ptr);
+        ret.value = compressed_ptr_t(ptr);
         ret.tag[tag_index] = tag;
         return ret.value;
     }
 
 public:
     /** uninitialized constructor */
-    tagged_ptr(void):
-        ptr(0)
+    tagged_ptr(void)//: ptr(0), tag(0)
     {}
 
     /** copy constructor */
@@ -70,30 +70,20 @@ public:
         ptr(p.ptr)
     {}
 
-    explicit tagged_ptr(T * p):
-        ptr(pack_ptr(p, 0))
-    {}
-
-    tagged_ptr(T * p, tag_t t):
+    explicit tagged_ptr(T * p, tag_t t = 0):
         ptr(pack_ptr(p, t))
     {}
 
     /** unsafe set operation */
     /* @{ */
-    tagged_ptr& operator= (tagged_ptr const & p)
+    void operator= (tagged_ptr const & p)
     {
         ptr = p.ptr;
-        return *this;
     }
 
     void set(T * p, tag_t t)
     {
         ptr = pack_ptr(p, t);
-    }
-
-    void reset(T * p, tag_t t)
-    {
-        set(p, t);
     }
     /* @} */
 
@@ -160,9 +150,10 @@ protected:
     compressed_ptr_t ptr;
 };
 #else
-    #error unsupported platform
+#error unsupported platform
 #endif
 
+} /* namespace detail */
 } /* namespace lockfree */
 } /* namespace boost */
 

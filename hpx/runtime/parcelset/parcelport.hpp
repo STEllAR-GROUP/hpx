@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2007      Richard D Guidry Jr
 //  Copyright (c) 2011      Bryce Lelbach & Katelyn Kufahl
 //
@@ -76,7 +76,9 @@ namespace parcelset
         ///                 incoming requests
         /// \param here     [in] The locality this instance should listen at.
         parcelport(util::io_service_pool& io_service_pool
-          , naming::locality here);
+          , naming::locality here
+          , std::size_t max_connection_cache_size
+          , std::size_t max_connections_per_locality);
 
         ~parcelport();
 
@@ -101,7 +103,6 @@ namespace parcelset
         /// operation or on any error.
         ///
         /// \param p        [in, out] A reference to the parcel to send. The
-        ///                 parcel \a p will be modified in place, as it will
         ///                 parcel \a p will be modified in place, as it will
         ///                 get set the resolved destination address and parcel
         ///                 id (if not already set).
@@ -194,6 +195,10 @@ namespace parcelset
         void send_parcel(parcel const& p, naming::address const& addr,
             write_handler_type f);
 
+        /// helper function to send remaining pending parcels
+        void send_pending_parcels_trampoline(boost::uint32_t prefix);
+        void send_pending_parcels(parcelport_connection_ptr client_connection, std::vector<parcel> const & parcels, std::vector<write_handler_type> const &);
+
     private:
         /// The site current range of ids to be used for id_type instances
         util::unique_ids id_range_;
@@ -209,6 +214,19 @@ namespace parcelset
 
         /// The connection cache for sending connections
         util::connection_cache<parcelport_connection> connection_cache_;
+
+        /// Mutex for pending parcels
+        util::spinlock mtx_;
+        /// The cache for pending parcels
+        typedef
+            std::map<
+                boost::uint32_t
+              , std::pair<
+                    std::vector<parcel>
+                  , std::vector<write_handler_type>
+                >
+            > pending_parcels_map;
+        pending_parcels_map pending_parcels_;
 
         /// The local locality
         naming::locality here_;

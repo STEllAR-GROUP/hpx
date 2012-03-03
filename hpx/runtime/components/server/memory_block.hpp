@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -22,6 +22,8 @@
 #include <boost/serialization/array.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/detail/atomic_count.hpp>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
@@ -687,20 +689,42 @@ namespace hpx { namespace components { namespace server
         boost::intrusive_ptr<detail::memory_block_header> component_;
     };
 
-namespace detail
-{
+    namespace detail
+    {
+        inline naming::id_type memory_block_header::get_gid() const
+        {
+            return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
+        }
 
-inline naming::id_type memory_block_header::get_gid() const
-{
-    return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
-}
+        inline naming::gid_type memory_block_header::get_base_gid() const
+        {
+            BOOST_ASSERT(wrapper_);
+            return wrapper_->get_base_gid();
+        }
+    }
+}}}
 
-inline naming::gid_type memory_block_header::get_base_gid() const
-{
-    BOOST_ASSERT(wrapper_);
-    return wrapper_->get_base_gid();
-}
+///////////////////////////////////////////////////////////////////////////////
+// Declaration of serialization support for the memory_block actions
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::detail::memory_block::get_action,
+    memory_block_get_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::detail::memory_block::get_config_action,
+    memory_block_get_config_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::detail::memory_block::checkout_action,
+    memory_block_checkout_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::detail::memory_block::checkin_action,
+    memory_block_checkin_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::detail::memory_block::clone_action,
+    memory_block_clone_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<hpx::components::memory_block_data>::set_result_action,
+    set_result_action_memory_data_type);
 
-}}}}
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

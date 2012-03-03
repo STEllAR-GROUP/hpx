@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -57,9 +57,6 @@ namespace hpx
         /// specific) applier instance.
         HPX_API_EXPORT applier& get_applier();
         HPX_API_EXPORT applier* get_applier_ptr();
-
-        /// The function \a get_prefix_id returns the id of this locality
-        HPX_API_EXPORT boost::uint32_t get_prefix_id();
     }
 
     /// \namespace actions
@@ -133,14 +130,32 @@ namespace hpx
     {
         namespace policies
         {
+#if defined(HPX_GLOBAL_SCHEDULER)
             class HPX_API_EXPORT global_queue_scheduler;
+#endif
+#if defined(HPX_LOCAL_SCHEDULER)
             class HPX_API_EXPORT local_queue_scheduler;
-            class HPX_API_EXPORT local_priority_queue_scheduler;
+#endif
+#if defined(HPX_ABP_SCHEDULER)
             struct HPX_API_EXPORT abp_queue_scheduler;
+#endif
+#if defined(HPX_ABP_PRIORITY_SCHEDULER)
+            class HPX_API_EXPORT abp_priority_queue_scheduler;
+#endif
+
+            class HPX_API_EXPORT local_priority_queue_scheduler;
+
+#if defined(HPX_HIERARCHY_SCHEDULER)
+            class HPX_API_EXPORT hierarchy_scheduler;
+#endif
+#if defined(HPX_PERIODIC_PRIORITY_SCHEDULER)
+            class HPX_API_EXPORT periodic_priority_scheduler;
+#endif
+
             class HPX_API_EXPORT callback_notifier;
 
             // define the default scheduler to use
-            typedef local_queue_scheduler queue_scheduler;
+            typedef local_priority_queue_scheduler queue_scheduler;
         }
 
         struct HPX_API_EXPORT threadmanager_base;
@@ -252,6 +267,11 @@ namespace hpx
         /// The function \a get_thread_manager returns a reference to the
         /// current thread manager.
         HPX_API_EXPORT threadmanager_base& get_thread_manager();
+
+        /// The function \a get_thread_count returns the number of currently
+        /// known threads.
+        HPX_API_EXPORT boost::int64_t get_thread_count(
+            thread_state_enum state = unknown);
     }
 
     class HPX_API_EXPORT runtime;
@@ -273,6 +293,7 @@ namespace hpx
     /// Get the readable string representing the name of the given runtime_mode
     /// constant.
     HPX_API_EXPORT char const* get_runtime_mode_name(runtime_mode state);
+    HPX_API_EXPORT runtime_mode get_runtime_mode_from_name(std::string const& mode);
 
     namespace agas
     {
@@ -347,6 +368,9 @@ namespace hpx
             struct fixed_component_tag {};
             struct simple_component_tag {};
             struct managed_component_tag {};
+
+            struct construct_with_back_ptr {};
+            struct construct_without_back_ptr {};
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -395,7 +419,8 @@ namespace hpx
         template <typename Component>
         class simple_component;
 
-        template <typename Component, typename Wrapper = detail::this_type>
+        template <typename Component, typename Wrapper = detail::this_type,
+            typename CtorPolicy = detail::construct_without_back_ptr>
         class managed_component_base;
 
         template <typename Component, typename Derived = detail::this_type>
@@ -445,10 +470,18 @@ namespace hpx
                 typename traits::promise_remote_result<Result>::type,
             int N = 1>
         class promise;
+        struct non_signalling_tag {};
+
+        template <typename Result,
+            typename RemoteResult =
+                typename traits::promise_remote_result<Result>::type>
+        class signalling_promise;
+        struct signalling_tag {};
 
         template <typename Action,
             typename Result = typename traits::promise_local_result<
                 typename Action::result_type>::type,
+            typename Signalling = non_signalling_tag,
             typename DirectExecute = typename Action::direct_execution>
         class eager_future;
 
@@ -494,7 +527,7 @@ namespace hpx
     /// \brief Return the global id representing this locality
     HPX_API_EXPORT naming::id_type find_here();
 
-    /// \brief Return the list of prefixes of the localities supporting the
+    /// \brief Return the list of locality ids of the localities supporting the
     ///        given component type. By default this function will return the
     ///        list of all localities.
     HPX_API_EXPORT std::vector<naming::id_type> find_all_localities();
@@ -502,12 +535,40 @@ namespace hpx
         components::component_type);
     HPX_API_EXPORT naming::id_type find_locality(components::component_type);
 
+    /// \brief Return the list of locality ids of remote localities supporting
+    ///        the given component type. By default this function will return
+    ///        the list of all remote localities (all but the current locality).
+    HPX_API_EXPORT std::vector<naming::id_type> find_remote_localities();
+    HPX_API_EXPORT std::vector<naming::id_type> find_remote_localities(
+        components::component_type);
+
+    /// \brief Return the number of localities which are currently registered
+    ///        for the running application.
+    HPX_API_EXPORT boost::uint32_t get_num_localities();
+    HPX_API_EXPORT boost::uint32_t get_num_localities(components::component_type);
+
     HPX_API_EXPORT naming::gid_type get_next_id();
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of OS-threads running in the runtime instance
-    ///        the current thread is associated with
-    HPX_API_EXPORT std::size_t get_num_os_threads();
+    ///        the current HPX-thread is associated with.
+    HPX_API_EXPORT std::size_t get_os_thread_count();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the number of the current OS-thread running in the
+    ///        runtime instance the current HPX-thread is associated with.
+    ///
+    /// \note   The returned value is zero based and it's maximum value is
+    ///         smaller than the overall number of OS-threads executed (as
+    ///         returned by \a get_os_thread_count().
+    /// \note   This function needs to be executed on a HPX-thread. It will
+    ///         fail otherwise (it will return -1).
+    HPX_API_EXPORT std::size_t get_worker_thread_num();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the number of the locality this function is being called
+    ///        from.
+    HPX_API_EXPORT boost::uint32_t get_locality_id();
 }
 
 #endif

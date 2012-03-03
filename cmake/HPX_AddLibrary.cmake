@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2011 Hartmut Kaiser
+# Copyright (c) 2007-2012 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,7 +16,7 @@ hpx_include(Message
 macro(add_hpx_library name)
   # retrieve arguments
   hpx_parse_arguments(${name}
-    "SOURCES;HEADERS;DEPENDENCIES;INI" "ESSENTIAL;NOLIBS" ${ARGN})
+    "SOURCES;HEADERS;DEPENDENCIES;INI;FOLDER" "ESSENTIAL;NOLIBS" ${ARGN})
 
   hpx_print_list("DEBUG" "add_library.${name}" "Sources for ${name}" ${name}_SOURCES)
   hpx_print_list("DEBUG" "add_library.${name}" "Headers for ${name}" ${name}_HEADERS)
@@ -24,7 +24,7 @@ macro(add_hpx_library name)
   hpx_print_list("DEBUG" "add_library.${name}" "Configuration files for ${name}" ${name}_INI)
 
   if(NOT MSVC)
-    if(${name}_ESSENTIAL)
+    if(${${name}_ESSENTIAL})
       add_library(${name}_lib SHARED
         ${${name}_SOURCES} ${${name}_HEADERS})
     else()
@@ -32,7 +32,7 @@ macro(add_hpx_library name)
         ${${name}_SOURCES} ${${name}_HEADERS})
     endif()
   else()
-    if(${name}_ESSENTIAL)
+    if(${${name}_ESSENTIAL})
       add_library(${name}_lib SHARED ${${name}_SOURCES})
     else()
       add_library(${name}_lib SHARED EXCLUDE_FROM_ALL ${${name}_SOURCES})
@@ -42,7 +42,7 @@ macro(add_hpx_library name)
   set(prefix "")
 
   if(NOT MSVC)
-    if(NOT ${name}_NOLIBS)
+    if(NOT ${${name}_NOLIBS})
       target_link_libraries(${name}_lib
         ${${name}_DEPENDENCIES} ${hpx_LIBRARIES} ${BOOST_FOUND_LIBRARIES})
       set_property(TARGET ${name}_lib APPEND
@@ -53,7 +53,7 @@ macro(add_hpx_library name)
     endif()
     set(prefix "hpx_")
   else()
-    if(NOT ${name}_NOLIBS)
+    if(NOT ${${name}_NOLIBS})
       target_link_libraries(${name}_lib
         ${${name}_DEPENDENCIES} ${hpx_LIBRARIES} ${BOOST_FOUND_LIBRARIES})
     else()
@@ -68,17 +68,27 @@ macro(add_hpx_library name)
     SOVERSION ${HPX_SOVERSION}
     # allow creating static and shared libs without conflicts
     CLEAN_DIRECT_OUTPUT 1
-    OUTPUT_NAME ${prefix}${name})
+    OUTPUT_NAME ${prefix}${name}
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE}
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG}
+    RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL}
+    RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO})
+
+  if(${name}_FOLDER)
+    set_target_properties(${name}_lib PROPERTIES FOLDER ${${name}_FOLDER})
+  endif()
 
   set_property(TARGET ${name}_lib APPEND
-               PROPERTY COMPILE_DEFINITIONS "HPX_EXPORTS")
+               PROPERTY COMPILE_DEFINITIONS "HPX_LIBRARY_EXPORTS")
 
-  hpx_mangle_name(install_target ${name}_lib)
+  if(NOT HPX_NO_INSTALL)
+    hpx_mangle_name(install_target ${name}_lib)
 
-  hpx_library_install(${install_target})
+    hpx_library_install(${install_target})
 
-  foreach(target ${${name}_INI})
-    hpx_ini_install(${install_target} ${target})
-  endforeach()
+    foreach(target ${${name}_INI})
+      hpx_ini_install(${install_target} ${target})
+    endforeach()
+  endif()
 endmacro()
 

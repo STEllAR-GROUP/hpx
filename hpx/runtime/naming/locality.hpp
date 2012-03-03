@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D. Guidry Jr.
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -27,7 +27,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-///  version of locality class
+/// Version of locality class.
 #define HPX_LOCALITY_VERSION   0x10
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -58,8 +58,6 @@ namespace hpx { namespace naming
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \class locality locality.hpp hpx/runtime/naming/locality.hpp
-    ///
     /// The class \a locality is a helper class storing the address and the
     /// port number of a HPX locality.
     class HPX_EXPORT locality

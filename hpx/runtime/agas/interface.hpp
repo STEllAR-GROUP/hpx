@@ -16,6 +16,7 @@
 
 namespace hpx { namespace agas
 {
+
 ///////////////////////////////////////////////////////////////////////////////
 HPX_EXPORT bool register_name(
     std::string const& name
@@ -67,6 +68,105 @@ HPX_EXPORT bool resolve_name(
   , error_code& ec = throws
     );
 
+///////////////////////////////////////////////////////////////////////////////
+HPX_EXPORT bool is_local_address(
+    naming::gid_type const& gid
+  , error_code& ec = throws
+    );
+
+HPX_EXPORT bool is_local_address(
+    naming::gid_type const& gid
+  , naming::address& addr
+  , error_code& ec = throws
+    );
+
+inline bool is_local_address(
+    naming::id_type const& gid
+  , error_code& ec = throws
+    )
+{
+    return is_local_address(gid.get_gid(), ec);
+}
+
+inline bool is_local_address(
+    naming::id_type const& gid
+  , naming::address& addr
+  , error_code& ec = throws
+    )
+{
+    return is_local_address(gid.get_gid(), addr, ec);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+HPX_EXPORT bool is_local_address_cached(
+    naming::gid_type const& gid
+  , error_code& ec = throws
+    );
+
+HPX_EXPORT bool is_local_address_cached(
+    naming::gid_type const& gid
+  , naming::address& addr
+  , error_code& ec = throws
+    );
+
+inline bool is_local_address_cached(
+    naming::id_type const& gid
+  , error_code& ec = throws
+    )
+{
+    return is_local_address_cached(gid.get_gid(), ec);
+}
+
+inline bool is_local_address_cached(
+    naming::id_type const& gid
+  , naming::address& addr
+  , error_code& ec = throws
+    )
+{
+    return is_local_address_cached(gid.get_gid(), addr, ec);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+HPX_EXPORT bool is_local_lva_encoded_address(
+    naming::gid_type const& gid
+    );
+
+inline bool is_local_lva_encoded_address(
+    naming::id_type const& gid
+    )
+{
+    return is_local_lva_encoded_address(gid.get_gid());
+}
+
+///////////////////////////////////////////////////////////////////////////////
+HPX_EXPORT void garbage_collect_non_blocking(
+    error_code& ec = throws
+    );
+
+HPX_EXPORT void garbage_collect(
+    error_code& ec = throws
+    );
+
+///////////////////////////////////////////////////////////////////////////////
+/// \brief Invoke an asynchronous garbage collection step on the given target
+///        locality.
+HPX_EXPORT void garbage_collect_non_blocking(
+    naming::id_type const& id
+  , error_code& ec = throws
+    );
+
+/// \brief Invoke a synchronous garbage collection step on the given target
+///        locality.
+HPX_EXPORT void garbage_collect(
+    naming::id_type const& id
+  , error_code& ec = throws
+    );
+
+///////////////////////////////////////////////////////////////////////////////
+/// \brief Return an id_type referring to the console locality.
+HPX_EXPORT naming::id_type get_console_locality(
+    error_code& ec = throws
+    );
 }}
 
 #endif // HPX_A55506A4_4AC7_4FD0_AB0D_ED0D1368FCC5

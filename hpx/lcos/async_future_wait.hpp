@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,7 +7,6 @@
 #define HPX_LCOS_ASYNC_FUTURE_WAIT_AUG_02_2011_1146AM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/eager_future.hpp>
 
 #include <vector>
 
@@ -52,7 +51,7 @@ namespace hpx { namespace lcos
 
                 // loop over all lazy_values, executing the next as soon as its
                 // value becomes available
-                if (!handled[i] && lazy_values[i].ready()) {
+                if (!handled[i] && lazy_values[i].is_ready()) {
                     // get the value from the future, invoke the function
                     f(i, lazy_values[i].get());
 
@@ -88,7 +87,7 @@ namespace hpx { namespace lcos
 
                 // loop over all lazy_values, executing the next as soon as its
                 // value becomes available
-                if (!handled[i] && lazy_values[i].ready()) {
+                if (!handled[i] && lazy_values[i].is_ready()) {
                     // get the value from the future, invoke the function
                     lazy_values[i].get();
                     f(i);

@@ -9,6 +9,7 @@
 #include <boost/serialization/export.hpp>
 
 #include <hpx/hpx.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/primary_namespace.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
@@ -29,3 +30,10 @@ HPX_REGISTER_ACTION_EX(
     primary_namespace::service_action,
     primary_namespace_service_action);
 
+HPX_REGISTER_ACTION_EX(
+    primary_namespace::bulk_service_action,
+    primary_namespace_bulk_service_action);
+
+HPX_REGISTER_ACTION_EX(
+    primary_namespace::route_action,
+    primary_namespace_route_action);

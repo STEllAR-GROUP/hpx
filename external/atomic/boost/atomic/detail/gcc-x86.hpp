@@ -11,6 +11,10 @@
 #include <boost/atomic/detail/base.hpp>
 #include <boost/atomic/detail/builder.hpp>
 
+#include <boost/cstdint.hpp>
+
+#define __BOOST_AMD_64 defined(__amd64__) || defined(__x86_64__)
+
 namespace boost {
 namespace detail {
 namespace atomic {
@@ -40,7 +44,7 @@ static inline void fence_after(memory_order order)
 
 static inline void full_fence(void)
 {
-#if (defined(__amd64__) || defined(__x86_64__))
+#if __BOOST_AMD_64
             __asm__ __volatile__("mfence" ::: "memory");
 #else
             /* could use mfence iff i686, but it does not appear to matter much */
@@ -282,7 +286,7 @@ public:
     platform_atomic_integral(void) {}
 };
 
-#if (defined(__amd64__) || defined(__x86_64__))
+#if __BOOST_AMD_64
 template<typename T>
 class atomic_x86_64 {
 public:
@@ -360,6 +364,14 @@ public:
         memory_order success_order,
         memory_order failure_order) volatile
     {
+#ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_8
+		T prev = __sync_val_compare_and_swap_8(&i, expected, desired);
+		bool success=(prev==expected);
+		if (success) fence_after(success_order);
+		else fence_after(failure_order);
+		expected=prev;
+		return success;
+#else
         long scratch;
         fence_before(success_order);
         T prev=expected;
@@ -383,13 +395,14 @@ public:
             "lock; cmpxchg8b 0(%4)\n"
             "movl %1, %%ebx\n"
             : "=A" (prev), "=m" (scratch)
-            : "D" ((long)desired), "c" ((long)(desired>>32)), "S" (&i), "0" (prev)
+			: "D" ((long)desired), "c" ((long)((boost::uint64_t)desired>>32)), "S" (&i), "0" (prev)
             : "memory");
         bool success=(prev==expected);
         if (success) fence_after(success_order);
         else fence_after(failure_order);
         expected=prev;
         return success;
+#endif
     }
     bool compare_exchange_weak(
         T &expected,
@@ -438,7 +451,7 @@ private:
 
 #endif
 
-#if (defined(__amd64__) || defined(__x86_64__)) || defined(__i686__)
+#if __BOOST_AMD_64 || defined(__i686__)
 template<typename T>
 class platform_atomic_integral<T, 8> : public build_atomic_from_add<atomic_x86_64<T> >{
 public:
@@ -448,9 +461,7 @@ public:
 };
 #endif
 
-// TODO: only use the sync intrinsics as a fallback, prefer inline asm as it
-// allows us to do relaxed memory ordering.
-#if (defined(__amd64__) || defined(__x86_64__)) && \
+#if __BOOST_AMD_64 && \
     defined(BOOST_ATOMIC_HAVE_SSE2) && \
     defined(BOOST_ATOMIC_HAVE_GNU_SYNC_16) && \
     defined(BOOST_ATOMIC_HAVE_GNU_ALIGNED_16)
@@ -461,28 +472,18 @@ public:
     atomic_x86_128() {}
     T load(memory_order order=memory_order_seq_cst) const volatile
     {
-        T v;
-        __asm__ __volatile__ (
-            "movdqa %1, %%xmm0 ;\n"
-            "movdqa %%xmm0, %0 ;\n"
-          : "=m" (v)
-          : "m" (i)
-          : "xmm0", "memory"
-          );
+        T v=*reinterpret_cast<volatile const T *>(&i);
         fence_after_load(order);
         return v;
     }
     void store(T v, memory_order order=memory_order_seq_cst) volatile
     {
+        if (order!=memory_order_seq_cst) {
         fence_before(order);
-        // Atomically stores 128bit value by SSE instruction movdqa
-        __asm__ __volatile__ (
-            "movdqa %1, %%xmm0 ;\n"
-            "movdqa %%xmm0, %0 ;\n"
-          : "=m" (i)
-          : "m" (v)
-          : "xmm0", "memory"
-          );
+            *reinterpret_cast<volatile T *>(&i)=v;
+        } else {
+            exchange(v);
+        }
     }
     bool compare_exchange_strong(
         T &expected,
@@ -490,8 +491,7 @@ public:
         memory_order success_order,
         memory_order failure_order) volatile
     {
-        T prev = __sync_val_compare_and_swap_16
-                      (reinterpret_cast<volatile T*>(&i), expected, desired);
+        T prev = __sync_val_compare_and_swap_16(&i, expected, desired);
         bool success=(prev==expected);
         if (success) fence_after(success_order);
         else fence_after(failure_order);
@@ -508,19 +508,15 @@ public:
     }
     T exchange(T r, memory_order order=memory_order_seq_cst) volatile
     {
-        while (!__sync_bool_compare_and_swap_16
-                  (reinterpret_cast<volatile T*>(&i), i, r))
+        while (!__sync_bool_compare_and_swap_16(&i, i, r))
         {};
 
         return r;
     }
     T fetch_add(T c, memory_order order=memory_order_seq_cst) volatile
     {
-        T expected=i, desired;
-        do {
-            desired=expected+c;
-        } while(!compare_exchange_strong(expected, desired, order, memory_order_relaxed));
-        return expected;
+        __sync_fetch_and_add(&i, c);
+        return c;
     }
 
     bool is_lock_free(void) const volatile {return true;}
@@ -543,5 +539,7 @@ public:
 }
 }
 }
+
+#undef __BOOST_AMD_64
 
 #endif

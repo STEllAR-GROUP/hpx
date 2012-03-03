@@ -10,6 +10,6 @@ endif()
 hpx_find_package(JEMALLOC
   LIBRARIES jemalloc libjemalloc
   LIBRARY_PATHS lib64 lib
-  HEADERS jemalloc.h
-  HEADER_PATHS include/jemalloc)
+  HEADERS jemalloc/jemalloc.h
+  HEADER_PATHS include)
 

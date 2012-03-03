@@ -1,5 +1,6 @@
+//  Copyright (c) 2006, Giovanni P. Deretta
 //  Copyright (c) 2007 Robert Perricone
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0.
@@ -16,7 +17,7 @@
 #endif
 
 #ifdef BOOST_COROUTINE_USE_ATOMIC_COUNT
-#  include <boost/detail/atomic_count.hpp>
+#  include <boost/atomic.hpp>
 #endif
 
 #include <sys/param.h>
@@ -27,6 +28,7 @@
 #include <boost/coroutine/detail/posix_utility.hpp>
 #include <boost/coroutine/detail/swap_context.hpp>
 #include <boost/coroutine/detail/static.hpp>
+#include <boost/assert.hpp>
 
 /*
  * Defining BOOST_COROUTINE_NO_SEPARATE_CALL_SITES will disable separate
@@ -36,9 +38,15 @@
  * default.
  */
 
+#if defined(__x86_64__)
 extern "C" void swapcontext_stack (void***, void**) throw();
 extern "C" void swapcontext_stack2 (void***, void**) throw();
 extern "C" void swapcontext_stack3 (void***, void**) throw();
+#else
+extern "C" void swapcontext_stack (void***, void**) throw() __attribute((regparm(2)));
+extern "C" void swapcontext_stack2 (void***, void**) throw()__attribute((regparm(2)));
+extern "C" void swapcontext_stack3 (void***, void**) throw()__attribute((regparm(2)));
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace boost { namespace coroutines {
@@ -72,6 +80,12 @@ namespace boost { namespace coroutines {
 
       void prefetch() const
       {
+#if defined(__x86_64__)
+        BOOST_ASSERT(sizeof(void*) == 8);
+#else
+        BOOST_ASSERT(sizeof(void*) == 4);
+#endif
+
         __builtin_prefetch (m_sp, 1, 3);
         __builtin_prefetch (m_sp, 0, 3);
         __builtin_prefetch ((void**)m_sp+64/sizeof(void*), 1, 3);
@@ -92,13 +106,11 @@ namespace boost { namespace coroutines {
       friend void swap_context(x86_linux_context_impl_base& from,
           x86_linux_context_impl const& to, default_hint);
 
-#ifndef BOOST_COROUTINE_NO_SEPARATE_CALL_SITES
       friend void swap_context(x86_linux_context_impl& from,
           x86_linux_context_impl_base const& to, yield_hint);
 
       friend void swap_context(x86_linux_context_impl& from,
           x86_linux_context_impl_base const& to, yield_to_hint);
-#endif
 
     protected:
       void ** m_sp;
@@ -123,7 +135,8 @@ namespace boost { namespace coroutines {
       x86_linux_context_impl(Functor& cb, std::ptrdiff_t stack_size = -1)
         : m_stack_size(stack_size == -1
                       ? static_cast<std::ptrdiff_t>(default_stack_size)
-                      : stack_size)
+                      : stack_size),
+          m_stack(0)
       {
         BOOST_ASSERT(0 == (m_stack_size % EXEC_PAGESIZE));
         m_stack = posix::alloc_stack(m_stack_size);
@@ -135,6 +148,7 @@ namespace boost { namespace coroutines {
         typedef void fun(Functor*);
         fun * funp = trampoline;
 
+#if defined(__x86_64__)
         // we have to make sure that the stack pointer is aligned on a 16 Byte
         // boundary when the code is entering the trampoline (the stack itself
         // is already properly aligned)
@@ -151,6 +165,15 @@ namespace boost { namespace coroutines {
         *--m_sp = 0;       // r13
         *--m_sp = 0;       // r14
         *--m_sp = 0;       // r15
+#else
+        *--m_sp = &cb;     // parm 0 of trampoline;
+        *--m_sp = 0;       // dummy return address for trampoline
+        *--m_sp = (void*) funp ;// return addr (here: start addr)
+        *--m_sp = 0;       // ebp
+        *--m_sp = 0;       // ebx
+        *--m_sp = 0;       // esi
+        *--m_sp = 0;       // edi
+#endif
       }
 
       ~x86_linux_context_impl()
@@ -171,27 +194,27 @@ namespace boost { namespace coroutines {
 #ifndef BOOST_COROUTINE_USE_ATOMIC_COUNT
       typedef std::size_t counter_type;
 #else
-      typedef boost::detail::atomic_count counter_type;
+      typedef boost::atomic_uint64_t counter_type;
 #endif
 
       static counter_type& get_stack_unbind_counter()
       {
-        static counter_type counter(0);
-        return counter;
+          static counter_type counter(0);
+          return counter;
       }
       static boost::uint64_t get_stack_unbind_count()
       {
-        return get_stack_unbind_counter();
+          return get_stack_unbind_counter();
       }
       static boost::uint64_t increment_stack_unbind_count()
       {
-        return ++get_stack_unbind_counter();
+          return ++get_stack_unbind_counter();
       }
 
       static counter_type& get_stack_recycle_counter()
       {
-        static counter_type counter(0);
-        return counter;
+          static counter_type counter(0);
+          return counter;
       }
       static boost::uint64_t get_stack_recycle_count()
       {
@@ -199,19 +222,17 @@ namespace boost { namespace coroutines {
       }
       static boost::uint64_t increment_stack_recycle_count()
       {
-        return ++get_stack_recycle_counter();
+          return ++get_stack_recycle_counter();
       }
 
       friend void swap_context(x86_linux_context_impl_base& from,
           x86_linux_context_impl const& to, default_hint);
 
-#ifndef BOOST_COROUTINE_NO_SEPARATE_CALL_SITES
       friend void swap_context(x86_linux_context_impl& from,
           x86_linux_context_impl_base const& to, yield_hint);
 
       friend void swap_context(x86_linux_context_impl& from,
           x86_linux_context_impl_base const& to, yield_to_hint);
-#endif
 
     private:
       std::ptrdiff_t m_stack_size;
@@ -233,13 +254,16 @@ namespace boost { namespace coroutines {
         swapcontext_stack(&from.m_sp, to.m_sp);
     }
 
-#ifndef BOOST_COROUTINE_NO_SEPARATE_CALL_SITES
     inline void swap_context(x86_linux_context_impl& from,
         x86_linux_context_impl_base const& to, yield_hint)
     {
 //        BOOST_ASSERT(*(void**)from.m_stack == (void*)~0);
         to.prefetch();
+#ifndef BOOST_COROUTINE_NO_SEPARATE_CALL_SITES
         swapcontext_stack2(&from.m_sp, to.m_sp);
+#else
+        swapcontext_stack(&from.m_sp, to.m_sp);
+#endif
     }
 
     inline void swap_context(x86_linux_context_impl& from,
@@ -247,9 +271,12 @@ namespace boost { namespace coroutines {
     {
 //        BOOST_ASSERT(*(void**)from.m_stack == (void*)~0);
         to.prefetch();
+#ifndef BOOST_COROUTINE_NO_SEPARATE_CALL_SITES
         swapcontext_stack3(&from.m_sp, to.m_sp);
-    }
+#else
+        swapcontext_stack(&from.m_sp, to.m_sp);
 #endif
+    }
 
   }
 }}}

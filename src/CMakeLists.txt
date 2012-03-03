@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2011 Hartmut Kaiser
+# Copyright (c) 2007-2012 Hartmut Kaiser
 # Copyright (c)      2011 Bryce Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -66,33 +66,57 @@ add_hpx_library_sources(hpx
   GLOB GLOBS "${hpx_SOURCE_DIR}/src/*.cpp"
   EXCLUDE ".*hpx_init.cpp")
 add_hpx_library_sources(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/runtime/*.cpp")
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/runtime/*.cpp"
+  APPEND)
 add_hpx_library_sources(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/performance_counters/*.cpp")
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/performance_counters/*.cpp"
+  APPEND)
 add_hpx_library_sources(hpx
   GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/util/*.cpp"
-  EXCLUDE ".*portable_binary_.*archive[.]cpp")
+  EXCLUDE ".*portable_binary_.*archive[.]cpp"
+  APPEND)
 add_hpx_library_sources(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/lcos/*.cpp")
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/lcos/*.cpp"
+  APPEND)
 
 # libhpx_init sources
 add_hpx_library_sources(hpx_init
   GLOB GLOBS "${hpx_SOURCE_DIR}/src/*hpx_init.cpp")
 
+set(hpx_external_SOURCES "" CACHE INTERNAL "Sources for libhpx_external." FORCE)
+
 # Boost Chrono sources (as long as this library is not in Boost)
-if(HPX_INTERNAL_CHRONO AND ${BOOST_MINOR_VERSION} LESS 47)
-  add_hpx_library_sources(hpx
-    GLOB GLOBS "${hpx_SOURCE_DIR}/external/chrono/libs/chrono/src/chrono.cpp")
+if(HPX_INTERNAL_CHRONO)
+  add_hpx_library_sources(hpx_external
+    GLOB GLOBS "${hpx_SOURCE_DIR}/external/chrono/libs/chrono/src/chrono.cpp"
+    APPEND)
 endif()
 
 # Add Boost.Backtrace sources if stack traces are enabled
 if(HPX_STACKTRACES)
-  add_hpx_library_sources(hpx
-    GLOB GLOBS "${hpx_SOURCE_DIR}/external/backtrace/libs/backtrace/src/backtrace.cpp")
+  add_hpx_library_sources(hpx_external
+    GLOB GLOBS "${hpx_SOURCE_DIR}/external/backtrace/libs/backtrace/src/backtrace.cpp"
+    APPEND)
 endif()
 
-add_hpx_library_sources(hpx
-  GLOB GLOBS "${hpx_SOURCE_DIR}/external/coroutine/libs/coroutine/src/swapcontext.cpp")
+if(NOT MSVC)
+  add_hpx_library_sources(hpx_external
+    GLOB GLOBS "${hpx_SOURCE_DIR}/external/coroutine/libs/coroutine/src/swapcontext.cpp"
+    APPEND)
+else()
+  if(HPX_EMULATE_SWAP_CONTEXT)
+    set(switch_to_fiber_source "${hpx_SOURCE_DIR}/external/coroutine/libs/coroutine/src/switch_to_fiber.asm")
+    add_hpx_library_sources(hpx_external_objects
+      GLOB GLOBS "${switch_to_fiber_source}")
+    add_custom_command(
+      OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/switch_to_fiber.obj
+      COMMAND ${CMAKE_ASM_MASM_COMPILER} /Fo ${CMAKE_CURRENT_BINARY_DIR}/switch_to_fiber.obj /nologo /c ${switch_to_fiber_source}
+      DEPENDS ${switch_to_fiber_source})
+    set(hpx_external_OBJECTS ${CMAKE_CURRENT_BINARY_DIR}/switch_to_fiber.obj
+      CACHE INTERNAL "Object files for libhpx_external." FORCE)
+    add_definitions(-DHPX_EMULATE_SWAP_CONTEXT)
+  endif()
+endif()
 
 ################################################################################
 # gather headers
@@ -106,30 +130,73 @@ add_hpx_library_headers(hpx
   GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/*.hpp"
   EXCLUDE ".*hpx_init.hpp")
 add_hpx_library_headers(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/runtime/*.hpp")
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/runtime/*.hpp"
+  APPEND)
 add_hpx_library_headers(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/include/*.hpp")
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/config/*.hpp"
+  APPEND)
 add_hpx_library_headers(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/config/*.hpp")
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/include/*.hpp"
+  APPEND)
 add_hpx_library_headers(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/performance_counters/*.hpp")
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/lcos/*.hpp"
+  APPEND)
+add_hpx_library_headers(hpx
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/performance_counters/*.hpp"
+  APPEND)
+add_hpx_library_headers(hpx
+  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/traits/*.hpp"
+  APPEND)
 add_hpx_library_headers(hpx
   GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/util/*.h*"
-  EXCLUDE ".*portable_binary_.*archive[.]hpp")
-add_hpx_library_headers(hpx
-  GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/hpx/lcos/*.hpp")
+  EXCLUDE ".*portable_binary_.*archive[.]hpp"
+  APPEND)
 
-# libhpx_init sources
-add_hpx_library_sources(hpx_init
-  GLOB GLOBS "${hpx_SOURCE_DIR}/src/*hpx_init.cpp")
+# libhpx_init headers
+add_hpx_library_headers(hpx_init
+  GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/hpx_init.hpp")
 
 ################################################################################
 # make source groups
-add_hpx_source_group(CLASS "Source Files" ROOT ${hpx_SOURCE_DIR}/src
-  TARGETS ${hpx_serialization_SOURCES} ${hpx_SOURCES} ${hpx_init_SOURCES})
+add_hpx_source_group(
+  NAME hpx_serialization
+  CLASS "Source Files"
+  ROOT ${hpx_SOURCE_DIR}/src/util
+  TARGETS ${hpx_serialization_SOURCES})
 
-add_hpx_source_group(CLASS "Header Files" ROOT ${hpx_SOURCE_DIR}/hpx
-  TARGETS ${hpx_serialization_HEADERS} ${hpx_HEADERS} ${hpx_init_HEADERS})
+add_hpx_source_group(
+  NAME hpx_serialization
+  CLASS "Header Files"
+  ROOT ${hpx_SOURCE_DIR}/hpx/util
+  TARGETS ${hpx_serialization_HEADERS})
+
+add_hpx_source_group(
+  NAME hpx CLASS "Source Files"
+  ROOT ${hpx_SOURCE_DIR}/src
+  TARGETS ${hpx_SOURCES})
+
+add_hpx_source_group(
+  NAME hpx CLASS "External Source Files"
+  ROOT ${hpx_SOURCE_DIR}/external
+  TARGETS ${hpx_external_SOURCES})
+
+add_hpx_source_group(
+  NAME hpx
+  CLASS "Header Files"
+  ROOT ${hpx_SOURCE_DIR}/hpx
+  TARGETS ${hpx_HEADERS})
+
+add_hpx_source_group(
+  NAME hpx_init
+  CLASS "Source Files"
+  ROOT ${hpx_SOURCE_DIR}/src
+  TARGETS ${hpx_init_SOURCES})
+
+add_hpx_source_group(
+  NAME hpx_init
+  CLASS "Header Files"
+  ROOT ${hpx_SOURCE_DIR}/hpx
+  TARGETS ${hpx_init_HEADERS})
 
 ################################################################################
 # libhpx_serialization
@@ -140,32 +207,57 @@ set_target_properties(hpx_serialization PROPERTIES
   VERSION ${HPX_VERSION}
   SOVERSION ${HPX_SOVERSION}
   CLEAN_DIRECT_OUTPUT 1
-  OUTPUT_NAME hpx_serialization)
+  OUTPUT_NAME hpx_serialization
+  FOLDER "Core"
+  RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE}
+  RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG}
+  RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL}
+  RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO})
+
+set(hpx_serialization_lib_dependencies
+  ${hpx_MALLOC_LIBRARY}
+  ${BOOST_serialization_LIBRARY})
+
+if(NOT MSVC)
+  set(hpx_serialization_lib_dependencies
+      ${hpx_serialization_lib_dependencies}
+      ${BOOST_system_LIBRARY})
+endif()
 
 target_link_libraries(hpx_serialization
-  ${hpx_MALLOC_LIBRARY}
-  ${BOOST_serialization_LIBRARY}
-  ${BOOST_system_LIBRARY})
+  ${hpx_serialization_lib_dependencies})
 
 hpx_mangle_name(name hpx_serialization)
 
 set_property(TARGET hpx_serialization APPEND
   PROPERTY COMPILE_DEFINITIONS
   "HPX_LIBRARY=\"${name}\""
-  "HPX_COMPONENT_NAME=hpx"
   "HPX_EXPORTS"
   "BOOST_COROUTINE_EXPORTS")
 
-hpx_library_install(${name})
+if(NOT HPX_NO_INSTALL)
+  hpx_library_install(${name})
+endif()
 
 ################################################################################
 # libhpx
-add_library(hpx SHARED ${hpx_SOURCES} ${hpx_HEADERS})
+add_library(hpx SHARED
+  ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
+
 set_target_properties(hpx PROPERTIES
   VERSION ${HPX_VERSION}
   SOVERSION ${HPX_SOVERSION}
   CLEAN_DIRECT_OUTPUT 1
-  OUTPUT_NAME hpx)
+  OUTPUT_NAME hpx
+  FOLDER "Core"
+  RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE}
+  RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG}
+  RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL}
+  RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO})
+
+if(MSVC AND HPX_EMULATE_SWAP_CONTEXT)
+  set_target_properties(hpx PROPERTIES LINK_FLAGS "/EXPORT:switch_to_fiber")
+endif()
 
 target_link_libraries(hpx
   hpx_serialization
@@ -178,23 +270,27 @@ hpx_mangle_name(name hpx)
 set_property(TARGET hpx APPEND
   PROPERTY COMPILE_DEFINITIONS
   "HPX_LIBRARY=\"${name}\""
-  "HPX_COMPONENT_NAME=hpx"
   "HPX_EXPORTS"
-  "HPX_ACTION_ARGUMENT_LIMIT=2"
+  "HPX_ACTION_ARGUMENT_LIMIT=3"
   "BOOST_ENABLE_ASSERT_HANDLER"
   "BOOST_COROUTINE_EXPORTS") # Do we still need this?
 
-hpx_library_install(${name})
+if(NOT HPX_NO_INSTALL)
+  hpx_library_install(${name})
+endif()
 
 ################################################################################
 # libhpx_init
-add_library(hpx_init STATIC ${hpx_init_SOURCES} ${hpx_init_HEADERS})
+add_library(hpx_init STATIC
+  ${hpx_init_SOURCES} ${hpx_init_HEADERS})
 
 set_property(TARGET hpx_init APPEND
   PROPERTY COMPILE_DEFINITIONS
   "HPX_APPLICATION_EXPORTS"
-  "HPX_ACTION_ARGUMENT_LIMIT=2"
+  "HPX_ACTION_ARGUMENT_LIMIT=3"
   "BOOST_ENABLE_ASSERT_HANDLER")
+
+set_property(TARGET hpx_init PROPERTY FOLDER "Core")
 
 hpx_mangle_name(name hpx_init)
 

@@ -1,0 +1,492 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{E6C6C6C4-6959-4B47-B92A-6323A906CC40}</ProjectGuid>
+    <RootNamespace>hpx</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+    <Import Project="..\hpx64.props" />
+    <Import Project="..\hpx64_release.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+    <Import Project="..\hpx64.props" />
+    <Import Project="..\hpx64_debug.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.21006.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</IntDir>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectName)d</TargetName>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkIncremental>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(VSInstallDir)SDK\v2.0\lib\amd64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;HPX_EXPORTS;HPX_COMPONENT_NAME=$(ProjectName);BOOST_COROUTINE_EXPORTS;BOOST_COROUTINE_ARG_MAX=2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificDiagnostics>2586</DisableSpecificDiagnostics>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ModuleDefinitionFile>hpx.def</ModuleDefinitionFile>
+      <AdditionalDependencies>psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CustomBuildStep>
+      <Outputs>$(HPX_ROOT)\bin64\$(Configuration)\lib\hpx\$(TargetFileName);$(HPX_ROOT)\bin64\$(Configuration)\lib\hpx\$(TargetName).pdb;%(Outputs)</Outputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;HPX_EXPORTS;HPX_COMPONENT_NAME=$(ProjectName);BOOST_COROUTINE_EXPORTS;BOOST_COROUTINE_ARG_MAX=2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <Optimization>Full</Optimization>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ModuleDefinitionFile>hpx.def</ModuleDefinitionFile>
+      <AdditionalDependencies>psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\external\backtrace\libs\backtrace\src\backtrace.cpp" />
+    <ClCompile Include="..\..\..\src\exception.cpp" />
+    <ClCompile Include="..\..\..\src\exception_list.cpp" />
+    <ClCompile Include="..\..\..\src\lcos\barrier\barrier.cpp" />
+    <ClCompile Include="..\..\..\src\lcos\local_counting_semaphore.cpp" />
+    <ClCompile Include="..\..\..\src\lcos\local_mutex.cpp" />
+    <ClCompile Include="..\..\..\src\lcos\local_recursive_mutex.cpp" />
+    <ClCompile Include="..\..\..\src\performance_counters\manage_counter.cpp" />
+    <ClCompile Include="..\..\..\src\performance_counters\manage_counter_type.cpp" />
+    <ClCompile Include="..\..\..\src\performance_counters\server\average_count_counter.cpp" />
+    <ClCompile Include="..\..\..\src\performance_counters\server\elapsed_time_counter.cpp" />
+    <ClCompile Include="..\..\..\src\pre_main.cpp" />
+    <ClCompile Include="..\..\..\src\runtime.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\agas\addressing_service.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\big_boot_barrier.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\component_namespace.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\interface.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\agas\primary_namespace.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\response.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\agas\server\component_namespace.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)\component_namespace1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)\component_namespace1.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\server\primary_namespace.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)\primary_namespace1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)\primary_namespace1.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\server\route.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\agas\server\symbol_namespace.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)\symbol_namespace1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)\symbol_namespace1.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\stubs\component_namespace.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)\component_namespace2.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)\component_namespace2.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\stubs\primary_namespace.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)\primary_namespace2.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)\primary_namespace2.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\stubs\symbol_namespace.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)\symbol_namespace2.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)\symbol_namespace2.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\agas\symbol_namespace.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\applier\bind_naming_wrappers.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\components\console_error_sink.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)\console_error_sink1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)\console_error_sink1.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\components\console_logging.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)\console_logging1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)\console_logging1.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\runtime\parcelset\parcelhandler.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\threads\thread_helpers.cpp" />
+    <ClCompile Include="..\..\..\src\state.cpp" />
+    <ClCompile Include="..\..\..\src\util\asio_util.cpp" />
+    <ClCompile Include="..\..\..\src\util\full_empty_entry.cpp" />
+    <ClCompile Include="..\..\..\src\util\generate_unique_ids.cpp" />
+    <ClCompile Include="..\..\..\src\util\ini.cpp" />
+    <ClCompile Include="..\..\..\src\util\init_ini_data.cpp" />
+    <ClCompile Include="..\..\..\src\util\interval_timer.cpp" />
+    <ClCompile Include="..\..\..\src\util\io_service_pool.cpp" />
+    <ClCompile Include="..\..\..\src\util\itt_notify.cpp" />
+    <ClCompile Include="..\..\..\src\util\logging.cpp" />
+    <ClCompile Include="..\..\..\src\util\map_hostnames.cpp" />
+    <ClCompile Include="..\..\..\src\util\parse_command_line.cpp" />
+    <ClCompile Include="..\..\..\src\util\pbs_environment.cpp" />
+    <ClCompile Include="..\..\..\src\util\query_counters.cpp" />
+    <ClCompile Include="..\..\..\src\util\runtime_configuration.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\actions\action_manager.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\actions\continuation.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\naming\address.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\naming\locality.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\naming\name.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\parcelset\parcel.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\parcelset\parcelport.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\parcelset\parcelport_connection.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\threads\thread.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\threads\threadmanager.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\applier\applier.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\components\component_type.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\components\server\console_error_sink.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\components\server\console_error_sink_singleton.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\components\server\console_logging.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\components\server\memory.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\components\server\memory_block.cpp" />
+    <ClCompile Include="..\..\..\src\runtime\components\server\runtime_support.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\lcos\base_lco.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\performance_counters\counters.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\performance_counters\registry.cpp" />
+    <ClCompile Include="..\..\..\src\performance_counters\stubs\performance_counter.cpp" />
+    <ClCompile Include="..\..\..\src\performance_counters\server\raw_counter.cpp" />
+    <ClCompile Include="..\..\..\external\chrono\libs\chrono\src\chrono.cpp" />
+    <ClCompile Include="..\..\..\external\chrono\libs\chrono\src\process_clock.cpp" />
+    <ClCompile Include="..\..\..\external\chrono\libs\chrono\src\run_timer.cpp" />
+    <ClCompile Include="..\..\..\external\chrono\libs\chrono\src\run_timer_static.cpp" />
+    <ClCompile Include="..\..\..\src\util\sed_transform.cpp" />
+    <ClCompile Include="..\..\..\src\util\serialize_exception.cpp" />
+    <ClCompile Include="..\..\..\src\version.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\hpx\config.hpp" />
+    <ClInclude Include="..\..\..\hpx\config\bind.hpp" />
+    <ClInclude Include="..\..\..\hpx\config\branch_hints.hpp" />
+    <ClInclude Include="..\..\..\hpx\config\function.hpp" />
+    <ClInclude Include="..\..\..\hpx\config\manual_profiling.hpp" />
+    <ClInclude Include="..\..\..\hpx\config\tuple.hpp" />
+    <ClInclude Include="..\..\..\hpx\exception.hpp" />
+    <ClInclude Include="..\..\..\hpx\exception_list.hpp" />
+    <ClInclude Include="..\..\..\hpx\hpx.hpp" />
+    <ClInclude Include="..\..\..\hpx\hpx_fwd.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\async.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\async_future_wait.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\barrier.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\eager_future_signalling_constructors.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\eager_future_signalling_constructors_direct.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\get_result.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\local_barrier.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\local_counting_semaphore.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\local_mutex.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\local_spinlock.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\object_semaphore.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\promise.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\promise_full_empty_bit.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\queue.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\server\barrier.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\server\object_semaphore.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\server\queue.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\signalling_promise.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\stubs\barrier.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\stubs\object_semaphore.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\stubs\queue.hpp" />
+    <ClInclude Include="..\..\..\hpx\performance_counters\manage_counter.hpp" />
+    <ClInclude Include="..\..\..\hpx\performance_counters\manage_counter_type.hpp" />
+    <ClInclude Include="..\..\..\hpx\performance_counters\parcels\count_and_time_data_point.hpp" />
+    <ClInclude Include="..\..\..\hpx\performance_counters\parcels\count_time_stats.hpp" />
+    <ClInclude Include="..\..\..\hpx\performance_counters\parcels\data_point.hpp" />
+    <ClInclude Include="..\..\..\hpx\performance_counters\parcels\gatherer.hpp" />
+    <ClInclude Include="..\..\..\hpx\performance_counters\server\average_count_counter.hpp" />
+    <ClInclude Include="..\..\..\hpx\performance_counters\server\elapsed_time_counter.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\actions\action_registry.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\actions\component_action_registration.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\actions\function.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\actions\function_implementations.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\actions\manage_object_action.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\actions\plain_action_registration.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\actions\signature_implementations.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\addressing_service.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\big_boot_barrier.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\component_namespace.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\gva.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\interface.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\namespace_action_code.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\primary_namespace.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\request.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\response.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\server\component_namespace.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\server\primary_namespace.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\server\symbol_namespace.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\stubs\component_namespace.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\stubs\primary_namespace.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\stubs\symbol_namespace.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\agas\symbol_namespace.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\applier\bind_naming_wrappers.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\applier\trigger.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\component_factory_one.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\component_registry.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\component_registry_base.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\component_startup_shutdown.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\component_startup_shutdown_base.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\constructor_argument.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\derived_component_factory_one.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\generic_component_factory.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\plain_component_factory.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\unique_component_name.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\naming\resolver_client.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\parcelset\parcelhandler_queue_base.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\parcelset\policies\global_parcelhandler_queue.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\threads\detail\tagged_thread_state.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\threads\policies\abp_priority_queue_scheduler.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\threads\policies\abp_queue_scheduler.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\threads\policies\accel_defs.h" />
+    <ClInclude Include="..\..\..\hpx\runtime\threads\policies\accel_fifo.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\threads\policies\hierarchy_scheduler.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\threads\policies\local_priority_queue_scheduler.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\threads\policies\periodic_priority_scheduler.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\threads\policies\queue_helpers.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\threads\policies\schedulers.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\threads\policies\thread_deque.hpp" />
+    <ClInclude Include="..\..\..\hpx\traits.hpp" />
+    <ClInclude Include="..\..\..\hpx\traits\component_type_database.hpp" />
+    <ClInclude Include="..\..\..\hpx\traits\get_action_name.hpp" />
+    <ClInclude Include="..\..\..\hpx\traits\get_remote_result.hpp" />
+    <ClInclude Include="..\..\..\hpx\traits\handle_gid.hpp" />
+    <ClInclude Include="..\..\..\hpx\traits\promise_local_result.hpp" />
+    <ClInclude Include="..\..\..\hpx\traits\promise_remote_result.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\demangle_helper.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\detail\function_template.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\detail\get_table.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\detail\pp_strip_parens.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\detail\serialization_registration.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\detail\vtable.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\detail\vtable_ptr.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\detail\vtable_ptr_base.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\detail\vtable_ptr_base_fwd.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\detail\vtable_ptr_fwd.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\filesystem_compatibility.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\full_empty_entry.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\function.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\hardware\bit_manipulation.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\hardware\cpuid.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\hardware\cpuid\linux_x86.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\hardware\cpuid\msvc.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\hardware\timestamp.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\hardware\timestamp\linux_x86_32.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\hardware\timestamp\linux_x86_64.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\hardware\timestamp\msvc.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\interval_timer.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\itt_notify.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\locking_helpers.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\map_hostnames.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\parse_command_line.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\pbs_environment.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\protect.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\query_counters.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\random.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\sed_transform.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\spinlock.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\spinlock_pool.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\stringstream.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\unmangle_name.hpp" />
+    <ClInclude Include="..\..\..\hpx\version.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\asio_util.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\block_profiler.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\connection_cache.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\container_device.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\full_empty_memory.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\future.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\generate_unique_ids.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\high_resolution_timer.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\ini.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\init_ini_data.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\io_service_pool.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\logging.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\one_size_heap_list.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\performance_counters.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\runtime_configuration.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\safe_bool.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\serialize_exception.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\serialize_sequence.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\static.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\time_logger.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\unlock_lock.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\util.hpp" />
+    <ClInclude Include="..\..\..\hpx\util\value_logger.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\get_lva.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\actions\action_constructors.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\actions\action_manager.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\actions\action_support.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\actions\component_action.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\actions\component_action_implementations.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\actions\continuation.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\actions\continuation_impl.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\actions\plain_action.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\actions\plain_action_implementations.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\naming\address.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\naming\locality.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\naming\name.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\applier\applier.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\applier\apply.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\applier\apply_helper.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\applier\apply_helper_implementations.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\applier\apply_implementations.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\parcelset\parcel.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\parcelset\parcelhandler.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\parcelset\parcelport.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\parcelset\parcelport_connection.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\parcelset\server\parcelport_queue.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\parcelset\server\parcelport_server_connection.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\threads\thread.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\threads\thread_affinity.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\threads\thread_helpers.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\threads\thread_init_data.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\threads\threadmanager.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\threads\policies\callback_notifier.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\threads\policies\global_queue_scheduler.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\threads\policies\local_queue_scheduler.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\threads\policies\thread_queue.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\client_base.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\component_factory.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\component_factory_base.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\component_type.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\console_error_sink.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\console_logging.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\derived_component_factory.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\memory_block.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\runtime_support.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\server\console_error_sink.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\server\console_error_sink_singleton.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\server\console_logging.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\server\manage_component.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\server\managed_component_base.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\server\memory.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\server\memory_block.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\server\plain_function.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\server\runtime_support.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\server\simple_component_base.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\server\wrapper_heap.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\server\wrapper_heap_list.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\stubs\memory_block.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\stubs\runtime_support.hpp" />
+    <ClInclude Include="..\..\..\hpx\runtime\components\stubs\stub_base.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\base_lco.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\condition.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\eager_future.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\eager_future_constructors.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\eager_future_constructors_direct.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\future_callback.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\future_wait.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\lazy_future.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\lazy_future_get_results.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\lazy_future_get_results_direct.hpp" />
+    <ClInclude Include="..\..\..\hpx\lcos\recursive_mutex.hpp" />
+    <ClInclude Include="..\..\..\hpx\config\defaults.hpp" />
+    <ClInclude Include="..\..\..\hpx\config\export_definitions.hpp" />
+    <ClInclude Include="..\..\..\hpx\config\warnings_prefix.hpp" />
+    <ClInclude Include="..\..\..\hpx\config\warnings_suffix.hpp" />
+    <ClInclude Include="..\..\..\hpx\include\actions.hpp" />
+    <ClInclude Include="..\..\..\hpx\include\applier.hpp" />
+    <ClInclude Include="..\..\..\hpx\include\components.hpp" />
+    <ClInclude Include="..\..\..\hpx\include\lcos.hpp" />
+    <ClInclude Include="..\..\..\hpx\include\parcelset.hpp" />
+    <ClInclude Include="..\..\..\hpx\include\performance_counters.hpp" />
+    <ClInclude Include="..\..\..\hpx\include\runtime.hpp" />
+    <ClInclude Include="..\..\..\hpx\include\threadmanager.hpp" />
+    <ClInclude Include="..\..\..\hpx\include\util.hpp" />
+    <ClInclude Include="..\..\..\hpx\performance_counters\counters.hpp" />
+    <ClInclude Include="..\..\..\hpx\performance_counters\registry.hpp" />
+    <ClInclude Include="..\..\..\hpx\performance_counters\server\base_performance_counter.hpp" />
+    <ClInclude Include="..\..\..\hpx\performance_counters\server\raw_counter.hpp" />
+    <ClInclude Include="..\..\..\hpx\performance_counters\stubs\performance_counter.hpp" />
+    <ClInclude Include="..\..\..\hpx\c\types.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\CMakeLists.txt" />
+    <None Include="..\..\..\docs\hpx.doxy" />
+    <None Include="..\..\..\src\CMakeLists.txt" />
+    <None Include="..\..\..\src\performance_counters\CMakeLists.txt" />
+    <None Include="hpx.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="..\..\..\external\coroutine\libs\coroutine\src\switch_to_fiber.asm" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\hpx_serialization\hpx_serialization.vcxproj">
+      <Project>{163e7f8f-1a47-488f-ab83-21183a70b0bd}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties BuildVersion_UseGlobalSettings="True" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

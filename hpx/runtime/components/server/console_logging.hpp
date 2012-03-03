@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,9 +11,10 @@
 #include <vector>
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/logging.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/util/logging.hpp>
+#include <hpx/util/void_cast.hpp>
 
 #include <boost/fusion/include/vector.hpp>
 
@@ -25,6 +26,14 @@ namespace hpx { namespace components
     > message_type;
 
     typedef std::vector<message_type> messages_type;
+}}
+
+///////////////////////////////////////////////////////////////////////////////
+// non-intrusive serialization
+namespace boost { namespace serialization
+{
+    template <typename Archive>
+    void serialize(Archive&, hpx::components::message_type&, unsigned int const);
 }}
 
 //////////////////////////////////////////////////////////////////////////////
@@ -63,28 +72,13 @@ namespace hpx { namespace components { namespace server
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<console_logging_action, base_type>();
+            util::void_cast_register_nonvirt<console_logging_action, base_type>();
             base_type::register_base();
         }
 
     public:
-        util::unused_type
-        execute_function(naming::address::address_type lva,
-            messages_type const& msgs)
-        {
-            try {
-                // call the function, ignoring the return value
-                console_logging(msgs);
-            }
-            catch (hpx::exception const& /*e*/) {
-                /**/;      // no logging!
-            }
-            return util::unused;
-        }
-
         static util::unused_type
-        execute_function_nonvirt(naming::address::address_type lva,
+        execute_function(naming::address::address_type lva,
             messages_type const& msgs)
         {
             try {
@@ -107,6 +101,19 @@ namespace hpx { namespace components { namespace server
             ar & boost::serialization::base_object<base_type>(*this);
         }
     };
+}}}
+
+HPX_REGISTER_PLAIN_ACTION_DECLARATION(
+    hpx::components::server::console_logging_action<>
+)
+
+namespace hpx { namespace actions { namespace detail {
+    template <typename Dummy>
+    struct needs_guid_initialization<
+        hpx::components::server::console_logging_action<Dummy>
+    >
+        : boost::mpl::false_
+    {};
 }}}
 
 #endif

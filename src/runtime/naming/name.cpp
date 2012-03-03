@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,48 +9,56 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
+#include <hpx/util/base_object.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
-#include <boost/serialization/shared_ptr.hpp>
 
 namespace hpx { namespace naming
 {
     namespace detail
     {
-        // thread function called while serializing a gid
-        void increment_refcnt(id_type id)
-        {
-            applier::get_applier().get_agas_client().incref(id.get_gid());
-        }
-
         void decrement_refcnt(detail::id_type_impl* p)
         {
-            // guard for wait_abort and other shutdown issues
-            try {
-                // decrement global reference count for the given gid, delete it
-                // if this was the last reference
-                boost::uint32_t credits = get_credit_from_gid(*p);
-                BOOST_ASSERT(0 != credits);
+            // Talk to AGAS only if this gid was split at some time in the past,
+            // i.e. if a reference actually left the original locality.
+            // Alternatively we need to go this way if the id has never been
+            // resolved, which means we don't know anything about the component
+            // type.
+            //if (gid_was_split(*p) || !p->is_resolved())
+            {
+                // guard for wait_abort and other shutdown issues
+                try {
+                    // decrement global reference count for the given gid,
+                    boost::uint32_t credits = get_credit_from_gid(*p);
+                    BOOST_ASSERT(0 != credits);
 
-                applier::applier* app = applier::get_applier_ptr();
-
-                error_code ec;
-
-                components::component_type t = components::component_invalid;
-                if (app && 0 == app->get_agas_client().decref(*p, t, credits, ec))
-                {
-                    components::stubs::runtime_support::free_component_sync(
-                        (components::component_type)t, *p);
+                    if (get_runtime_ptr())
+                    {
+                        error_code ec;
+                        // Fire-and-forget semantics.
+                        naming::get_agas_client().decref(*p, credits, ec);
+                    }
+                }
+                catch (hpx::exception const& e) {
+                    LTM_(error)
+                        << "Unhandled exception while executing decrement_refcnt:"
+                        << e.what();
                 }
             }
-            catch (hpx::exception const& e) {
-                LTM_(error)
-                    << "Unhandled exception while executing decrement_refcnt:"
-                    << e.what();
-            }
+//             else {
+//                 // If the gid was not split at any point in time we can assume
+//                 // that the referenced object is fully local.
+//                 components::component_type t =
+//                     static_cast<components::component_type>(p->address_.type_);
+//
+//                 BOOST_ASSERT(t != components::component_invalid);
+//                 // Third parameter is the count of how many components to destroy.
+//                 components::stubs::runtime_support::free_component_sync(t, *p, 1);
+//             }
             delete p;   // delete local gid representation in any case
         }
 
@@ -68,20 +76,20 @@ namespace hpx { namespace naming
                 // as the shared_ptr is assuming it has been properly deleted
                 // already. The actual deletion happens in the decrement_refcnt
                 // once it is executed.
-                error_code ec;
-                applier::register_work(boost::bind(decrement_refcnt, p),
-                    "decrement global gid reference count",
-                    threads::thread_state(threads::pending),
-                    threads::thread_priority_normal, std::size_t(-1), ec);
-                if (ec)
-                {
+                //error_code ec;
+                //applier::register_work(boost::bind(decrement_refcnt, p),
+                //    "decrement global gid reference count",
+                //    threads::thread_state(threads::pending),
+                //    threads::thread_priority_normal, std::size_t(-1), ec);
+                //if (ec)
+                //{
                     // if we are not able to spawn a new thread, we need to execute
                     // the deleter directly
                     decrement_refcnt(p);
-                }
+                //}
             }
             else {
-                delete p;
+                delete p;   // delete local gid representation if needed
             }
         }
 
@@ -92,169 +100,146 @@ namespace hpx { namespace naming
             delete p;   // delete local gid representation only
         }
 
-        void gid_transmission_deleter (id_type_impl* p)
+        ///////////////////////////////////////////////////////////////////////
+        id_type_impl::deleter_type id_type_impl::get_deleter(id_type_management t)
         {
-            delete p;   // delete local gid representation only
+            switch (t) {
+            case unmanaged:
+                return &detail::gid_unmanaged_deleter;
+            case managed:
+                return &detail::gid_managed_deleter;
+            default:
+                BOOST_ASSERT(false);          // invalid management type
+                return &detail::gid_unmanaged_deleter;
+            }
+            return 0;
         }
 
-        bool id_type_impl::is_local_cached()
+        ///////////////////////////////////////////////////////////////////////
+        // prepare the given id, note: this function modifies the passed id
+        naming::gid_type id_type_impl::prepare_gid() const
         {
-            applier::applier& appl = applier::get_applier();
             gid_type::mutex_type::scoped_lock l(this);
-            return address_ ? address_.locality_ == appl.here() : false;
-        }
 
-        bool id_type_impl::is_cached() const
-        {
-            gid_type::mutex_type::scoped_lock l(this);
-            return address_ ? true : false;
-        }
-
-        bool id_type_impl::is_local()
-        {
-//             if (applier::get_applier().get_agas_client().is_smp_mode())
-//                 return true;
-
-            bool valid = false;
+            // If the initial credit is zero the gid is 'unmanaged' and no
+            // additional action needs to be performed.
+            boost::uint16_t oldcredits = get_credit_from_gid(*this);
+            if (0 != oldcredits)
             {
-                gid_type::mutex_type::scoped_lock l(this);
-                valid = address_ ? true : false;
+                // Request new credits from AGAS if needed (i.e. the initial
+                // gid's credit is equal to one and the new gid has no credits
+                // after splitting).
+                naming::gid_type newid =
+                    split_credits_for_gid(const_cast<id_type_impl&>(*this));
+                if (0 == get_credit_from_gid(newid))
+                {
+                    // We add the new credits to the gids first to avoid
+                    // duplicate splitting during concurrent serialization
+                    // operations.
+                    BOOST_ASSERT(1 == get_credit_from_gid(*this));
+                    add_credit_to_gid(const_cast<id_type_impl&>(*this),
+                        HPX_INITIAL_GLOBALCREDIT);
+                    add_credit_to_gid(newid, HPX_INITIAL_GLOBALCREDIT);
+
+                    // We unlock the lock as all operations on the local credit
+                    // have been performed and we don't want the lock to be
+                    // pending during the (possibly remote) AGAS operation.
+                    l.unlock();
+
+                    // If something goes wrong during the reference count
+                    // increment below we will have already added credits to
+                    // the split gid. In the worst case this will cause a
+                    // memory leak. I'm not sure if it is possible to reliably
+                    // handle this problem.
+                    naming::resolver_client& resolver =
+                        naming::get_agas_client();
+                    resolver.incref(*this, HPX_INITIAL_GLOBALCREDIT * 2);
+                }
+                return newid;
             }
 
-            if (!valid && !resolve())
-                return false;
-
-            applier::applier& appl = applier::get_applier();
-            gid_type::mutex_type::scoped_lock l(this);
-            return address_.locality_ == appl.here();
+            BOOST_ASSERT(unmanaged == type_);
+            return *this;
         }
 
-        bool id_type_impl::resolve(naming::address& addr)
+        // serialization
+        template <typename Archive>
+        void id_type_impl::save(Archive& ar, const unsigned int version) const
         {
-            bool valid = false;
-            {
-                gid_type::mutex_type::scoped_lock l(this);
-                valid = address_ ? true : false;
+            naming::gid_type split_id(prepare_gid());
+            ar << split_id << type_;
+        }
+
+        template <typename Archive>
+        void id_type_impl::load(Archive& ar, const unsigned int version)
+        {
+            // serialize base class
+            ar >> static_cast<gid_type&>(*this);
+
+            // serialize management type
+            id_type_management m;
+            ar >> m;
+
+            if (detail::unmanaged != m && detail::managed != m) {
+                HPX_THROW_EXCEPTION(version_too_new, "id_type::load",
+                    "trying to load id_type with unknown deleter");
             }
 
-            // if it already has been resolved, just return the address
-            if (!valid && !resolve())
-                return false;
-
-            addr = address_;
-            return true;
+            type_ = m;
         }
 
-        bool id_type_impl::resolve()
-        {
-            // call only if not already resolved
-            applier::applier& appl = applier::get_applier();
+        // explicit instantiation for the correct archive types
+        template HPX_EXPORT void id_type_impl::save(
+            util::portable_binary_oarchive&, const unsigned int version) const;
 
-            error_code ec;
-            address addr;
-            if (appl.get_agas_client().resolve(*this, addr, true, ec) && !ec)
-            {
-                gid_type::mutex_type::scoped_lock l(this);
-                address_ = addr;
-                return true;
-            }
-            return false;
-        }
+        template HPX_EXPORT void id_type_impl::load(
+            util::portable_binary_iarchive&, const unsigned int version);
     }   // detail
 
-    id_type::management_type id_type::get_management_type() const
-    {
-        if (!gid_)
-            return unknown_deleter;
-
-        deleter_type* d = boost::get_deleter<deleter_type>(gid_);
-
-        if (!d)
-            return unknown_deleter;
-
-        if (*d == &detail::gid_managed_deleter)
-            return managed;
-        else if (*d == &detail::gid_unmanaged_deleter)
-            return unmanaged;
-        else if (*d == &detail::gid_transmission_deleter)
-            return transmission;
-        return unknown_deleter;
-    }
-
+    ///////////////////////////////////////////////////////////////////////////
     template <class Archive>
     void id_type::save(Archive& ar, const unsigned int version) const
     {
         bool isvalid = gid_ ? true : false;
         ar << isvalid;
-        if (isvalid) {
-            management_type m = get_management_type();
-            gid_type const& g = *gid_;
-            ar << m;
-            ar << g;
-        }
+        if (isvalid)
+            ar << gid_;
     }
 
     template <class Archive>
     void id_type::load(Archive& ar, const unsigned int version)
     {
-        if (version > HPX_IDTYPE_VERSION)
-        {
+        if (version > HPX_IDTYPE_VERSION) {
             HPX_THROW_EXCEPTION(version_too_new, "id_type::load",
-                "trying to load id_type with unknown version");
+                "trying to load id_type of unknown version");
         }
 
         bool isvalid;
         ar >> isvalid;
-        if (isvalid) {
-            management_type m;
-            gid_type g;
-            ar >> m;
-
-            if (unknown_deleter == m)
-            {
-                HPX_THROW_EXCEPTION(version_too_new, "id_type::load",
-                    "trying to load id_type with unknown deleter");
-            }
-
-            if (transmission == m)
-                m = managed;
-
-            ar >> g;
-            gid_.reset(new detail::id_type_impl(g), get_deleter(m));
-        }
+        if (isvalid)
+            ar >> gid_;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
     // explicit instantiation for the correct archive types
-#if HPX_USE_PORTABLE_ARCHIVES != 0
-    template HPX_EXPORT void
-    id_type::save(util::portable_binary_oarchive&, const unsigned int version) const;
+    template HPX_EXPORT void id_type::save(
+        util::portable_binary_oarchive&, const unsigned int version) const;
 
-    template HPX_EXPORT void
-    id_type::load(util::portable_binary_iarchive&, const unsigned int version);
-#else
-    template HPX_EXPORT void
-    id_type::save(boost::archive::binary_oarchive&, const unsigned int version) const;
-
-    template HPX_EXPORT void
-    id_type::load(boost::archive::binary_iarchive&, const unsigned int version);
-#endif
+    template HPX_EXPORT void id_type::load(
+        util::portable_binary_iarchive&, const unsigned int version);
 
     ///////////////////////////////////////////////////////////////////////////
     char const* const management_type_names[] =
     {
         "unknown_deleter",    // -1
         "unmanaged",          // 0
-        "managed",            // 1
-        "transmission"        // 2
+        "managed"             // 1
     };
 
     char const* get_management_type_name(id_type::management_type m)
     {
-        if (m < id_type::unknown_deleter || m > id_type::transmission)
+        if (m < id_type::unknown_deleter || m > id_type::managed)
             return "invalid";
         return management_type_names[m + 1];
     }
-
 }}
 

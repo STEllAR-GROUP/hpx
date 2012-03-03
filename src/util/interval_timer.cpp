@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -23,33 +23,71 @@ namespace hpx { namespace util
             std::size_t microsecs, std::string const& description,
             bool pre_shutdown)
       : f_(f), microsecs_(microsecs), id_(0), description_(description),
-        pre_shutdown_(pre_shutdown)
+        pre_shutdown_(pre_shutdown), is_started_(false), first_start_(true),
+        is_terminated_(false)
     {}
 
-    void interval_timer::start()
-    {
-        if (pre_shutdown_)
-            register_pre_shutdown_function(boost::bind(&interval_timer::stop, this));
-        else
-            register_shutdown_function(boost::bind(&interval_timer::stop, this));
-
-        evaluate(threads::wait_signaled);
-    }
-
-    void interval_timer::stop()
+    bool interval_timer::start()
     {
         mutex_type::scoped_lock l(mtx_);
-        if (id_) {
-            error_code ec;       // avoid throwing on error
-            threads::set_thread_state(id_, threads::pending,
-                threads::wait_abort, threads::thread_priority_critical, ec);
-            id_ = 0;
+        if (!is_started_) {
+            is_started_ = true;
+            l.unlock();
+
+            if (first_start_) {
+                first_start_ = false;
+                if (pre_shutdown_)
+                    register_pre_shutdown_function(boost::bind(&interval_timer::terminate, this));
+                else
+                    register_shutdown_function(boost::bind(&interval_timer::terminate, this));
+            }
+
+            evaluate(threads::wait_signaled);
+            return true;
+        }
+        return false;
+    }
+
+    bool interval_timer::stop()
+    {
+        mutex_type::scoped_lock l(mtx_);
+        return stop_locked();
+    }
+
+    bool interval_timer::stop_locked()
+    {
+        if (is_started_) {
+            is_started_ = false;
+
+            if (id_) {
+                error_code ec;       // avoid throwing on error
+                threads::set_thread_state(id_, threads::pending,
+                    threads::wait_abort, threads::thread_priority_critical, ec);
+                id_ = 0;
+            }
+            return true;
+        }
+        BOOST_ASSERT(id_ == 0);
+        return false;
+    }
+
+    void interval_timer::terminate()
+    {
+        mutex_type::scoped_lock l(mtx_);
+        if (!is_terminated_) {
+            is_terminated_ = true;
+            stop_locked();
         }
     }
 
     interval_timer::~interval_timer()
     {
-        stop();
+        try {
+            terminate();
+        }
+        catch(...) {
+            ;   // there is nothing we can do here
+        }
     }
 
     threads::thread_state_enum interval_timer::evaluate(

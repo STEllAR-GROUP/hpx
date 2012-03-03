@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,6 +16,7 @@
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/util/void_cast.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
@@ -27,13 +28,10 @@ namespace hpx { namespace actions
         typedef void (*clone_function)(void*, void const*, std::size_t);
         typedef void (*assign_function)(void*, void const*, std::size_t);
         typedef void (*destruct_function)(void*);
-#if HPX_USE_PORTABLE_ARCHIVES != 0
+
         typedef util::portable_binary_oarchive oarchive_type;
         typedef util::portable_binary_iarchive iarchive_type;
-#else
-        typedef boost::archive::binary_oarchive oarchive_type;
-        typedef boost::archive::binary_iarchive iarchive_type;
-#endif
+
         typedef void (*serialize_save_function)(
             boost::uint8_t const*, std::size_t, oarchive_type&,
             const unsigned int, boost::uint8_t const*);
@@ -198,8 +196,7 @@ namespace hpx { namespace actions
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<manage_object_action, manage_object_action_base>();
+            util::void_cast_register_nonvirt<manage_object_action, manage_object_action_base>();
         }
 
     private:
@@ -223,8 +220,7 @@ namespace hpx { namespace actions
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<manage_object_action, manage_object_action_base>();
+            util::void_cast_register_nonvirt<manage_object_action, manage_object_action_base>();
         }
 
     private:
@@ -300,8 +296,8 @@ namespace hpx { namespace actions
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<manage_object_action, manage_object_action<T> >();
+            util::void_cast_register_nonvirt<manage_object_action, manage_object_action<T> >();
+            manage_object_action<T>::register_base();
         }
 
     private:

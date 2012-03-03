@@ -7,7 +7,7 @@ set(HPX_ADDPSEUDOTARGET_LOADED TRUE)
 
 macro(add_hpx_pseudo_target)
   # Windows is evil
-  if(NOT MSVC)
+  if(NOT WIN32)
     add_custom_target(${ARGV})
   endif()
 endmacro()

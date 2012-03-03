@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,7 +12,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
-#include <hpx/lcos/local_mutex.hpp>
+#include <hpx/lcos/local/mutex.hpp>
 #include <hpx/util/spinlock.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/applier/apply.hpp>
@@ -20,18 +20,20 @@
 #include <hpx/runtime/components/server/console_logging.hpp>
 #include <hpx/util/static.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
     struct HPX_EXPORT pending_logs
     {
-        typedef lcos::local_mutex prefix_mutex_type;
+        typedef lcos::local::mutex prefix_mutex_type;
         typedef util::spinlock queue_mutex_type;
 
         enum { max_pending = 128 };
 
         pending_logs()
-          : prefix_(naming::invalid_id), activated_(false), queue_size_(0)
+          : prefix_(naming::invalid_id), activated_(false)
         {}
 
         void add(message_type const& msg);
@@ -43,9 +45,10 @@ namespace hpx { namespace components
             activated_.store(true);
         }
 
-      private:
+    private:
         bool ensure_prefix();
         void send();
+        bool is_active();
 
         prefix_mutex_type prefix_mtx_;
         naming::id_type prefix_;
@@ -54,8 +57,6 @@ namespace hpx { namespace components
         messages_type queue_;
 
         boost::atomic<bool> activated_;
-
-        boost::atomic<std::size_t> queue_size_;
     };
 
     struct pending_logs_tag {};
@@ -67,7 +68,8 @@ namespace hpx { namespace components
         void init_timing_console_log(util::section const& ini);
         void init_hpx_console_log(util::section const& ini);
     }
-
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

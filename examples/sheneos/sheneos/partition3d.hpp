@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -35,8 +35,8 @@ namespace sheneos
 
         /// Create a new partition instance on a specific locality and
         /// initialize it synchronously.
-        /// 
-        /// \param gid [in] The locality where the partition should be created. 
+        ///
+        /// \param gid [in] The locality where the partition should be created.
         partition3d(hpx::naming::id_type const& gid, std::string const& datafilename,
                 dimension const& dimx, dimension const& dimy, dimension const& dimz)
           : base_type(sheneos::stubs::partition3d::create_sync(gid))
@@ -44,7 +44,7 @@ namespace sheneos
             init(datafilename, dimx, dimy, dimz);
         }
 
-        /// Connect to an existing partition instance. 
+        /// Connect to an existing partition instance.
         partition3d(hpx::naming::id_type const& gid)
           : base_type(gid)
         {}
@@ -66,12 +66,12 @@ namespace sheneos
         }
 
         /// Asynchronously perform an interpolation on this partition.
-        /// 
+        ///
         /// \param ye        [in] Electron fraction.
         /// \param temp      [in] Temperature.
         /// \param rho       [in] Rest mass density of the plasma.
         /// \param eosvalues [in] The EOS values to interpolate. Must be
-        ///                  in the range of this partition. 
+        ///                  in the range of this partition.
         hpx::lcos::promise<std::vector<double> >
         interpolate_async(double ye, double temp, double rho,
             boost::uint32_t eosvalues)
@@ -81,17 +81,81 @@ namespace sheneos
         }
 
         /// Synchronously perform an interpolation on this partition.
-        /// 
+        ///
         /// \param ye        [in] Electron fraction.
         /// \param temp      [in] Temperature.
         /// \param rho       [in] Rest mass density of the plasma.
         /// \param eosvalues [in] The EOS values to interpolate. Must be
-        ///                  in the range of this partition. 
+        ///                  in the range of this partition.
         std::vector<double> interpolate(double ye, double temp, double rho,
             boost::uint32_t eosvalues)
         {
             return stubs::partition3d::interpolate(this->gid_,
                 ye, temp, rho, eosvalues);
+        }
+
+        /// Asynchronously perform an interpolation of one given field on this
+        /// partition.
+        ///
+        /// \param ye        [in] Electron fraction.
+        /// \param temp      [in] Temperature.
+        /// \param rho       [in] Rest mass density of the plasma.
+        /// \param eosvalue  [in] The EOS value to interpolate. Must be
+        ///                  in the range of the given partition.
+        hpx::lcos::promise<double>
+        interpolate_one_async(double ye, double temp, double rho,
+            boost::uint32_t eosvalue)
+        {
+            return stubs::partition3d::interpolate_one_async(this->gid_,
+                ye, temp, rho, eosvalue);
+        }
+
+        /// Synchronously perform an interpolation of one given field on this
+        /// partition.
+        ///
+        /// \param ye        [in] Electron fraction.
+        /// \param temp      [in] Temperature.
+        /// \param rho       [in] Rest mass density of the plasma.
+        /// \param eosvalue  [in] The EOS value to interpolate. Must be
+        ///                  in the range of the given partition.
+        double interpolate_one(double ye, double temp, double rho,
+            boost::uint32_t eosvalue)
+        {
+            return stubs::partition3d::interpolate_one(this->gid_,
+                ye, temp, rho, eosvalue);
+        }
+
+        /// Asynchronously perform an interpolation of one given field on this
+        /// partition.
+        ///
+        /// \param ye        [in] Electron fraction.
+        /// \param temp      [in] Temperature.
+        /// \param rho       [in] Rest mass density of the plasma.
+        /// \param eosvalue  [in] The EOS value to interpolate. Must be
+        ///                  in the range of the given partition.
+        hpx::lcos::promise<std::vector<double>>
+        interpolate_one_bulk_async(std::vector<double> const& ye,
+            std::vector<double> const& temp, std::vector<double> const& rho,
+            boost::uint32_t eosvalue)
+        {
+            return stubs::partition3d::interpolate_one_bulk_async(this->gid_,
+                ye, temp, rho, eosvalue);
+        }
+
+        /// Synchronously perform an interpolation of one given field on this
+        /// partition.
+        ///
+        /// \param ye        [in] Electron fraction.
+        /// \param temp      [in] Temperature.
+        /// \param rho       [in] Rest mass density of the plasma.
+        /// \param eosvalue  [in] The EOS value to interpolate. Must be
+        ///                  in the range of the given partition.
+        std::vector<double> interpolate_one_bulk(std::vector<double> const& ye,
+            std::vector<double> const& temp, std::vector<double> const& rho,
+            boost::uint32_t eosvalue)
+        {
+            return stubs::partition3d::interpolate_one_bulk(this->gid_,
+                ye, temp, rho, eosvalue);
         }
     };
 }

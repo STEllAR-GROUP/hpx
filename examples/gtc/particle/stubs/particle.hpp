@@ -22,21 +22,38 @@ namespace gtc { namespace stubs
         /// given particle file.  
         static hpx::lcos::promise<void>
         init_async(hpx::naming::id_type const& gid,std::size_t objectid,
-            std::string const& particlefile)
+            hpx::components::gtc::parameter const& par)
         {
             typedef server::particle::init_action action_type;
             return hpx::lcos::eager_future<action_type>(gid,objectid,
-                particlefile);
+                par);
         }
 
         /// Initialize the \a gtc::server::particle instance with the
         /// given particle file.  
         static void init(hpx::naming::id_type const& gid,std::size_t objectid,
-            std::string const& particlefile)
+            hpx::components::gtc::parameter const& par)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the promise.
-            init_async(gid,objectid,particlefile).get();
+            init_async(gid,objectid,par).get();
+        }
+
+        static hpx::lcos::promise<void>
+        chargei_async(hpx::naming::id_type const& gid,std::size_t objectid,std::size_t istep,std::vector<hpx::naming::id_type> const& particle_components,
+            hpx::components::gtc::parameter const& par)
+        {
+            typedef server::particle::chargei_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid,objectid,istep,
+                particle_components,par);
+        }
+
+        static void chargei(hpx::naming::id_type const& gid,std::size_t objectid,std::size_t istep,std::vector<hpx::naming::id_type> const& particle_components,
+            hpx::components::gtc::parameter const& par)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise.
+            chargei_async(gid,objectid,istep,particle_components,par).get();
         }
 
         /// Compute the distance from the particle to the specified coordinates. 
@@ -71,6 +88,20 @@ namespace gtc { namespace stubs
             // The following get yields control while the action above
             // is executed and the result is returned to the promise
             return get_index_async(gid).get();
+        }
+
+        static hpx::lcos::promise< array<double> >
+        get_densityi_async(hpx::naming::id_type const& gid)
+        {
+            typedef server::particle::get_densityi_action action_type;
+            return hpx::lcos::eager_future<action_type>(gid);
+        }
+
+        static array<double> get_densityi(hpx::naming::id_type const& gid)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise
+            return get_densityi_async(gid).get();
         }
     };
 }}

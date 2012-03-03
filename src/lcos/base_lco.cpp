@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,6 +8,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/components/derived_component_factory_one.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/serialize_exception.hpp>
@@ -84,37 +85,4 @@ HPX_REGISTER_ACTION_EX(
 ///////////////////////////////////////////////////////////////////////////////
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco, hpx::components::component_base_lco);
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<hpx::naming::gid_type>,
-    hpx::components::component_base_lco_with_value);
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<std::vector<hpx::naming::gid_type> >,
-    hpx::components::component_base_lco_with_value);
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<hpx::naming::id_type>,
-    hpx::components::component_base_lco_with_value);
-typedef
-    hpx::lcos::base_lco_with_value<hpx::naming::id_type, hpx::naming::gid_type>
-remote_id_type_retval;
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    remote_id_type_retval,
-    hpx::components::component_base_lco_with_value);
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<std::vector<hpx::naming::id_type> >,
-    hpx::components::component_base_lco_with_value);
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<double>,
-    hpx::components::component_base_lco_with_value);
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<int>,
-    hpx::components::component_base_lco_with_value);
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<bool>,
-    hpx::components::component_base_lco_with_value);
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<hpx::util::section>,
-    hpx::components::component_base_lco_with_value);
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<hpx::util::unused_type>,
-    hpx::components::component_base_lco_with_value);
 

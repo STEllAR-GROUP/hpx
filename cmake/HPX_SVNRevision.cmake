@@ -9,11 +9,21 @@ include(HPX_Include)
 
 hpx_include(Message)
 
-execute_process(
-  COMMAND "${hpx_SOURCE_DIR}/cmake/scripts/svnversion.py" "${hpx_SOURCE_DIR}"
-  OUTPUT_VARIABLE SVN_REVISION ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+if(MSVC)
+  execute_process(
+    COMMAND "cmd" "/c" "${hpx_SOURCE_DIR}/python/scripts/hpx_svnversion.py" "${hpx_SOURCE_DIR}"
+    OUTPUT_VARIABLE SVN_REVISION ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+else()
+  execute_process(
+    COMMAND "${hpx_SOURCE_DIR}/python/scripts/hpx_svnversion.py" "${hpx_SOURCE_DIR}"
+    OUTPUT_VARIABLE SVN_REVISION ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+endif()
 
-if("${SVN_REVISION}" STREQUAL "" OR "${SVN_REVISION}" STREQUAL "None")
+if("${SVN_REVISION}" STREQUAL "None")
+  set(SVN_REVISION "")
+endif()
+ 
+if("${SVN_REVISION}" STREQUAL "")
   hpx_warn("svn.revision" "SVN revision not found.")
 else()
   hpx_info("svn.revision" "SVN revision is ${SVN_REVISION}.")

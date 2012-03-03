@@ -1,4 +1,5 @@
-//  Copyright (c) 2008-2009 Chirag Dekate, Hartmut Kaiser, Anshul Tandon
+//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,7 +15,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/coroutine/coroutine.hpp>
-#include <boost/pool/object_pool.hpp>
+#include <boost/lockfree/detail/freelist.hpp>
 #include <boost/lockfree/detail/branch_hints.hpp>
 
 #include <hpx/hpx_fwd.hpp>
@@ -37,6 +38,10 @@ namespace hpx { namespace threads
 {
     struct thread_pool;    // forward declaration only
     class thread;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // global variable defining the stack size to use for all HPX-threads
+    extern std::size_t default_stacksize;
 
     ///////////////////////////////////////////////////////////////////////////
     // This overload will be called by the ptr_map<> used in the thread_queue
@@ -72,13 +77,34 @@ namespace hpx { namespace threads { namespace detail
     template <typename CoroutineImpl>
     struct coroutine_allocator
     {
+        typedef util::spinlock mutex_type;
+
         coroutine_allocator()
         {}
 
         CoroutineImpl* get()
         {
-            thread_mutex_type::scoped_lock l(this);
+            mutex_type::scoped_lock l(mtx_);
+            return get_locked();
+        }
 
+        CoroutineImpl* try_get()
+        {
+            mutex_type::scoped_lock l(mtx_, boost::try_to_lock);
+            if (!l)
+                return NULL;
+            return get_locked();
+        }
+
+        void deallocate(CoroutineImpl* c)
+        {
+            mutex_type::scoped_lock l(mtx_);
+            heap_.push(c);
+        }
+
+    private:
+        CoroutineImpl* get_locked()
+        {
             if (heap_.empty())
                 return NULL;
 
@@ -87,12 +113,7 @@ namespace hpx { namespace threads { namespace detail
             return next;
         }
 
-        void deallocate(CoroutineImpl* c)
-        {
-            thread_mutex_type::scoped_lock l(this);
-            heap_.push(c);
-        }
-
+        mutex_type mtx_;
         std::stack<CoroutineImpl*> heap_;
     };
 
@@ -103,39 +124,7 @@ namespace hpx { namespace threads { namespace detail
         typedef HPX_STD_FUNCTION<thread_function_type> function_type;
 
     public:
-        thread(thread_init_data const& init_data, thread_id_type id,
-               thread_state_enum newstate, thread_pool& pool)
-          : coroutine_(init_data.func, id, HPX_DEFAULT_STACK_SIZE), //coroutine_type::impl_type::create(init_data.func, id)),
-            current_state_(thread_state(newstate)),
-            current_state_ex_(thread_state_ex(wait_signaled)),
-            description_(init_data.description ? init_data.description : ""),
-            lco_description_(""),
-            parent_locality_prefix_(init_data.parent_prefix),
-            parent_thread_id_(init_data.parent_id),
-            parent_thread_phase_(init_data.parent_phase),
-            component_id_(init_data.lva),
-            marked_state_(unknown),
-            back_ptr_(0),
-            pool_(&pool)
-        {
-            LTM_(debug) << "thread::thread(" << this << "), description("
-                        << init_data.description << ")";
-
-            // store the thread id of the parent thread, mainly for debugging
-            // purposes
-            if (0 == parent_thread_id_) {
-                thread_self* self = get_self_ptr();
-                if (self)
-                {
-                    parent_thread_id_ = self->get_thread_id();
-                    parent_thread_phase_ = self->get_thread_phase();
-                }
-            }
-            if (0 == parent_locality_prefix_)
-                parent_locality_prefix_ = applier::get_prefix_id();
-        }
-
-        thread(BOOST_RV_REF(thread_init_data) init_data, thread_id_type id,
+        thread(thread_init_data& init_data, thread_id_type id,
                thread_state_enum newstate, thread_pool& pool)
           : coroutine_(boost::move(init_data.func), id, HPX_DEFAULT_STACK_SIZE), //coroutine_type::impl_type::create(init_data.func, id)),
             current_state_(thread_state(newstate)),
@@ -164,7 +153,7 @@ namespace hpx { namespace threads { namespace detail
                 }
             }
             if (0 == parent_locality_prefix_)
-                parent_locality_prefix_ = applier::get_prefix_id();
+                parent_locality_prefix_ = get_locality_id();
         }
 
         /// This constructor is provided just for compatibility with the scheme
@@ -361,6 +350,11 @@ namespace hpx { namespace threads { namespace detail
             return back_ptr_->get_base_gid();
         }
 
+        void reset()
+        {
+            coroutine_.reset();
+        }
+
     private:
         friend class threads::thread;
         friend void threads::delete_clone(threads::thread const*);
@@ -382,6 +376,9 @@ namespace hpx { namespace threads { namespace detail
         naming::address::address_type const component_id_;
         mutable thread_state marked_state_;
 
+        template <typename, typename, typename>
+        friend struct components::detail_adl_barrier::init;
+
         void set_back_ptr(
             components::managed_component<thread, threads::thread>* bp)
         {
@@ -402,8 +399,6 @@ namespace hpx { namespace threads
     struct thread_pool;
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \class thread thread.hpp hpx/runtime/threads/thread.hpp
-    ///
     /// A \a thread is the representation of a ParalleX thread. It's a first
     /// class object in ParalleX. In our implementation this is a user level
     /// thread running on top of one of the OS threads spawned by the \a
@@ -444,10 +439,7 @@ namespace hpx { namespace threads
         ///                 \a thread will be associated with.
         /// \param newstate [in] The initial thread state this instance will
         ///                 be initialized with.
-        inline thread(thread_init_data const& init_data, thread_pool& pool,
-            thread_state_enum new_state);
-
-        inline thread(BOOST_RV_REF(thread_init_data) init_data,
+        inline thread(thread_init_data& init_data,
             thread_pool& pool, thread_state_enum new_state);
 
         ~thread() {}
@@ -640,7 +632,7 @@ namespace hpx { namespace threads
         thread_state_enum operator()()
         {
             detail::thread* t = get();
-            return t ? t->execute() : thread_state(terminated);
+            return t ? t->execute() : terminated;
         }
 
         /// \brief Get the (optional) description of this thread
@@ -687,6 +679,14 @@ namespace hpx { namespace threads
             detail::thread const* t = get();
             return t ? t->is_created_from(pool) : false;
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        // This function will be called when the thread is about to be deleted
+        void reset()
+        {
+            detail::thread* t = get();
+            if (t) t->reset();
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -700,7 +700,8 @@ namespace hpx { namespace threads
         typedef components::detail::wrapper_heap_list<
             components::detail::fixed_wrapper_heap<threads::thread> >
         heap_type;
-        typedef boost::object_pool<threads::detail::thread> detail_heap_type;
+        typedef boost::lockfree::caching_freelist<threads::detail::thread>
+            detail_heap_type;
 
         thread_pool()
           : pool_(components::get_component_type<threads::detail::thread>())
@@ -711,21 +712,15 @@ namespace hpx { namespace threads
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    inline thread::thread(thread_init_data const& init_data,
+    inline thread::thread(thread_init_data& init_data,
             thread_pool& pool, thread_state_enum new_state)
-      : thread::base_type(new (pool) detail::thread(
-            init_data, This(), new_state, pool))
-    {}
-
-    inline thread::thread(BOOST_RV_REF(thread_init_data) init_data,
-            thread_pool& pool, thread_state_enum new_state)
-      : thread::base_type(new (pool) detail::thread(
-            boost::move(init_data), This(), new_state, pool))
+      : thread::base_type(
+            new (pool) detail::thread(init_data, This(), new_state, pool))
     {}
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components
+namespace hpx { namespace components { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     // specialization of heap factory for threads::thread, this is a dummy
@@ -748,7 +743,7 @@ namespace hpx { namespace components
             return naming::invalid_gid;
         }
     };
-}}
+}}}
 
 #include <hpx/config/warnings_suffix.hpp>
 

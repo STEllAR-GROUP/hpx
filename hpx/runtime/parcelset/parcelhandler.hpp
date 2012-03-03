@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,8 +25,6 @@
 
 namespace hpx { namespace parcelset
 {
-    /// \class parcelhandler parcelhandler.hpp hpx/runtime/parcelset/parcelhandler.hpp
-    ///
     /// The \a parcelhandler is the representation of the parcelset inside a
     /// locality. It is built on top of a single parcelport. Several
     /// parcelhandler's may be connected to a single parcelport.
@@ -40,7 +38,7 @@ namespace hpx { namespace parcelset
             boost::shared_ptr<std::vector<char> > const& parcel_data,
             threads::thread_priority priority);
 
-        threads::thread_state decode_parcel(
+        threads::thread_state_enum decode_parcel(
             boost::shared_ptr<std::vector<char> > const& parcel_data);
 
         // make sure the parcel has been properly initialized
@@ -48,7 +46,7 @@ namespace hpx { namespace parcelset
         {
             // ensure the source locality id is set (if no component id is given)
             if (!p.get_source())
-                p.set_source(naming::id_type(prefix_, naming::id_type::unmanaged));
+                p.set_source(naming::id_type(locality_, naming::id_type::unmanaged));
 
             // set the current local time for this locality
             p.set_start_time(get_current_time());
@@ -95,22 +93,22 @@ namespace hpx { namespace parcelset
             return pp_;
         }
 
-        /// Return the prefix of this locality
+        /// Return the locality_id of this locality
         ///
-        /// This accessor allows to retrieve the prefix value being assigned to
+        /// This accessor allows to retrieve the locality_id value being assigned to
         /// the locality this parcelhandler is associated with. This returns the
         /// same value as would be returned by:
         ///
         /// \code
-        ///     naming::id_type prefix;
-        ///     get_resolver().get_prefix(here, prefix);
+        ///     naming::id_type locality_id;
+        ///     get_resolver().get_locality_id(here, locality_id);
         /// \endcode
         ///
         /// but doesn't require the full AGAS round trip as the prefix value
         /// is cached inside the parcelhandler.
-        naming::gid_type const& get_prefix() const
+        naming::gid_type const& get_locality() const
         {
-            return prefix_;
+            return locality_;
         }
 
         /// Return the list of all remote localities supporting the given
@@ -124,7 +122,7 @@ namespace hpx { namespace parcelset
         /// \returns The function returns \a true if there is at least one
         ///          remote locality known by AGAS
         ///          (!prefixes.empty()).
-        bool get_raw_remote_prefixes(std::vector<naming::gid_type>& prefixes,
+        bool get_raw_remote_localities(std::vector<naming::gid_type>& locality_ids,
             components::component_type type = components::component_invalid) const;
 
         /// Return the list of all localities supporting the given
@@ -138,7 +136,7 @@ namespace hpx { namespace parcelset
         /// \returns The function returns \a true if there is at least one
         ///          locality known by AGAS
         ///          (!prefixes.empty()).
-        bool get_raw_prefixes(std::vector<naming::gid_type>& prefixes,
+        bool get_raw_localities(std::vector<naming::gid_type>& locality_ids,
             components::component_type type = components::component_invalid) const;
 
         /// A parcel is submitted for transport at the source locality site to
@@ -285,9 +283,10 @@ namespace hpx { namespace parcelset
             return pp_.here();
         }
 
-        /// install_counters is called during startup to allow registration of
-        /// performance counters
-        void install_counters();
+        /// The function register_counter_types() is called during startup to
+        /// allow the registration of all performance counter types for this
+        /// parcel-handler instance.
+        void register_counter_types();
 
     protected:
         boost::int64_t get_queue_length() const
@@ -300,7 +299,7 @@ namespace hpx { namespace parcelset
         naming::resolver_client& resolver_;
 
         /// The site prefix of the locality
-        naming::gid_type prefix_;
+        naming::gid_type locality_;
 
         /// the parcelport this handler is associated with
         parcelport& pp_;

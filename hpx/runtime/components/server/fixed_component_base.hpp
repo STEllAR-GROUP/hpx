@@ -1,5 +1,5 @@
 //  Copyright (c) 2011      Bryce Lelbach
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -25,7 +25,6 @@ template <boost::uint64_t MSB, boost::uint64_t LSB>
 struct gid_tag;
 
 ///////////////////////////////////////////////////////////////////////////
-/// \class fixed_component_base fixed_component_base.hpp hpx/runtime/components/server/fixed_component_base.hpp
 template <boost::uint64_t MSB, boost::uint64_t LSB, typename Component>
 struct fixed_component_base : detail::fixed_component_tag
 {
@@ -130,7 +129,6 @@ struct fixed_component_base : detail::fixed_component_tag
 
 
 ///////////////////////////////////////////////////////////////////////////
-/// \class fixed_component fixed_component.hpp hpx/runtime/components/server/fixed_component_base.hpp
 template <typename Component>
 struct fixed_component : Component
 {
@@ -156,7 +154,7 @@ struct fixed_component : Component
         }                                                                     \
     /**/
 
-        BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARG_MAX,
+        BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARGUMENT_LIMIT,
             HPX_FIXED_COMPONENT_CREATE_ONE, _)
 
 #undef HPX_FIXED_COMPONENT_CREATE_ONE

@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2011 Hartmut Kaiser
+# Copyright (c) 2007-2012 Hartmut Kaiser
 # Copyright (c) 2010-2011 Matt Anderson
 # Copyright (c) 2011      Bryce Lelbach
 #
@@ -9,9 +9,17 @@ if(NOT HPX_FINDPACKAGE_LOADED)
   include(HPX_FindPackage)
 endif()
 
-hpx_find_package(TCMALLOC
-  LIBRARIES tcmalloc_minimal libtcmalloc_minimal
-  LIBRARY_PATHS lib64 lib
-  HEADERS tcmalloc.h
-  HEADER_PATHS include/google)
+if(GOOGLE_PERFTOOLS_FOUND)
+  hpx_find_package(TCMALLOC
+    LIBRARIES tcmalloc libtcmalloc
+    LIBRARY_PATHS lib64 lib
+    HEADERS google/tcmalloc.h
+    HEADER_PATHS include)
+else()
+  hpx_find_package(TCMALLOC
+    LIBRARIES tcmalloc_minimal libtcmalloc_minimal
+    LIBRARY_PATHS lib64 lib
+    HEADERS google/tcmalloc.h
+    HEADER_PATHS include)
+endif()
 

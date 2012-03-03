@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -43,21 +43,12 @@ namespace boost { namespace serialization
 
     ///////////////////////////////////////////////////////////////////////////
     // Explicit instantiation for the correct archive types.
-#if HPX_USE_PORTABLE_ARCHIVES != 0
     template HPX_COMPONENT_EXPORT void
     serialize(hpx::util::portable_binary_iarchive&, sheneos::config_data&,
         unsigned int const);
     template HPX_COMPONENT_EXPORT void
     serialize(hpx::util::portable_binary_oarchive&, sheneos::config_data&,
         unsigned int const);
-#else
-    template HPX_COMPONENT_EXPORT void
-    serialize(boost::archive::binary_iarchive&, sheneos::config_data&,
-        unsigned int const);
-    template HPX_COMPONENT_EXPORT void
-    serialize(boost::archive::binary_oarchive&, sheneos::config_data&,
-        unsigned int const);
-#endif
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

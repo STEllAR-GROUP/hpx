@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -68,7 +68,9 @@ namespace sheneos { namespace server
         enum actions
         {
             partition3d_init = 0,
-            partition3d_interpolate = 1
+            partition3d_interpolate = 1,
+            partition3d_interpolate_one = 2,
+            partition3d_interpolate_one_bulk = 3
         };
 
         partition3d();
@@ -86,43 +88,77 @@ namespace sheneos { namespace server
         /// \param temp      [in] Temperature.
         /// \param rho       [in] Rest mass density of the plasma.
         /// \param eosvalues [in] The EOS values to interpolate. Must be
-        ///                  in the range of this partition. 
+        ///                  in the range of this partition.
         std::vector<double> interpolate(double ye, double temp, double rho,
             boost::uint32_t eosvalues);
+
+        /// Perform an interpolation of one given field on this partition.
+        ///
+        /// \param ye        [in] Electron fraction.
+        /// \param temp      [in] Temperature.
+        /// \param rho       [in] Rest mass density of the plasma.
+        /// \param eosvalues [in] The EOS value to interpolate. Must be
+        ///                  in the range of this partition.
+        double interpolate_one(double ye, double temp, double rho,
+            boost::uint32_t eosvalue);
+
+        /// Perform several interpolations of one given field on this partition.
+        ///
+        /// \param ye        [in] Electron fractions.
+        /// \param temp      [in] Temperatures.
+        /// \param rho       [in] Rest mass densities of the plasma.
+        /// \param eosvalues [in] The EOS value to interpolate. Must be
+        ///                  in the range of this partition.
+        std::vector<double> interpolate_one_bulk(std::vector<double> const& ye,
+            std::vector<double> const& temp, std::vector<double> const& rho,
+            boost::uint32_t eosvalue);
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
         typedef hpx::actions::action4<
-            // Component server type.
-            partition3d,
-            // Action code.
-            partition3d_init,
-            // Arguments of this action.
-            std::string const&,
+            partition3d,                        // Component server type.
+            partition3d_init,                   // Action code.
+            std::string const&,                 // Arguments of this action.
             dimension const&,
             dimension const&,
             dimension const&,
-            // Method bound to this action.
-            &partition3d::init
+            &partition3d::init                  // Method bound to this action.
         > init_action;
 
         typedef hpx::actions::result_action4<
-            // Component server type.
-            partition3d,
-            // Return type.
-            std::vector<double>,
-            // Action code.
-            partition3d_interpolate,
-            // Arguments of this action.
-            double,
+            partition3d,                        // Component server type.
+            std::vector<double>,                // Return type.
+            partition3d_interpolate,            // Action code.
+            double,                             // Arguments of this action.
             double,
             double,
             boost::uint32_t,
-            // Method bound to this action.
-            &partition3d::interpolate
+            &partition3d::interpolate           // Method bound to this action.
         > interpolate_action;
+
+        typedef hpx::actions::result_action4<
+            partition3d,                        // Component server type.
+            double,                             // Return type.
+            partition3d_interpolate_one,        // Action code.
+            double,                             // Arguments of this action.
+            double,
+            double,
+            boost::uint32_t,
+            &partition3d::interpolate_one       // Method bound to this action.
+        > interpolate_one_action;
+
+        typedef hpx::actions::result_action4<
+            partition3d,                        // Component server type.
+            std::vector<double>,                // Return type.
+            partition3d_interpolate_one_bulk,   // Action code.
+            std::vector<double> const&,         // Arguments of this action.
+            std::vector<double> const&,
+            std::vector<double> const&,
+            boost::uint32_t,
+            &partition3d::interpolate_one_bulk  // Method bound to this action.
+        > interpolate_one_bulk_action;
 
     private:
         dimension dim_[dimension::dim];
@@ -162,6 +198,22 @@ namespace sheneos { namespace server
 #endif
     };
 }}
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    sheneos::server::partition3d::init_action,
+    sheneos_partition3d_init_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    sheneos::server::partition3d::interpolate_action,
+    sheneos_partition3d_interpolate_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    sheneos::server::partition3d::interpolate_one_action,
+    sheneos_partition3d_interpolate_one_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    sheneos::server::partition3d::interpolate_one_bulk_action,
+    sheneos_partition3d_interpolate_one_bulk_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<std::vector<double> >::set_result_action,
+    set_result_action_vector_double);
 
 #endif
 

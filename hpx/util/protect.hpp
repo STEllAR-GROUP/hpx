@@ -1,6 +1,6 @@
 //  Copyright (c) 2002 Peter Dimov and Multi Media Ltd.
 //  Copyright (c) 2009 Steven Watanabe
-//  Copyright (c) 2011 Hartmut Kaiser
+//  Copyright (c) 2011-2012 Hartmut Kaiser
 //
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
@@ -11,7 +11,6 @@
 
 #include <boost/config.hpp>
 #include <boost/move/move.hpp>
-#include <boost/detail/workaround.hpp>
 
 namespace hpx { namespace util { namespace detail
 {
@@ -21,12 +20,20 @@ namespace hpx { namespace util { namespace detail
     public:
         typedef typename F::result_type result_type;
 
-        explicit protected_bind(F const& f)
-          : f_(f)
-        {}
+        // copy constructor
+        protected_bind(protected_bind const& other)
+          : f_(other.f_)
+        {
+        }
 
-        explicit protected_bind(BOOST_RV_REF(F) f)
-          : f_(boost::move(f))
+        // move constructor
+        protected_bind(BOOST_RV_REF(protected_bind) other)
+          : f_(boost::move(other.f_))
+        {
+        }
+
+        explicit protected_bind(BOOST_FWD_REF(F) f)
+          : f_(boost::forward<F>(f))
         {}
 
         protected_bind& operator=(BOOST_COPY_ASSIGN_REF(protected_bind) rhs)
@@ -129,6 +136,7 @@ namespace hpx { namespace util { namespace detail
 
     private:
         F f_;
+        BOOST_COPYABLE_AND_MOVABLE(protected_bind);
     };
 }}} // namespace hpx::util::detail
 

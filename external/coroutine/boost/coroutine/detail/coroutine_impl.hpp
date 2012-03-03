@@ -28,6 +28,7 @@
 
 #ifndef BOOST_COROUTINE_COROUTINE_IMPL_HPP_20060601
 #define BOOST_COROUTINE_COROUTINE_IMPL_HPP_20060601
+
 #if defined(_MSC_VER)
 #pragma warning (push)
 #pragma warning (disable: 4355) //this used in base member initializer
@@ -74,8 +75,8 @@ namespace boost { namespace coroutines { namespace detail
 
     typedef boost::intrusive_ptr<type> pointer;
 
-    template<typename DerivedType>
-        coroutine_impl(DerivedType * this_, thread_id_type id,
+    template <typename DerivedType>
+    coroutine_impl(DerivedType *this_, thread_id_type id,
             std::ptrdiff_t stack_size)
       : context_base_(*this_, stack_size),
         m_arg(0),
@@ -95,15 +96,8 @@ namespace boost { namespace coroutines { namespace detail
     }
 
     template <typename Functor>
-    static inline pointer create(Functor const&, thread_id_type = 0,
+    static inline pointer create(BOOST_FWD_REF(Functor), thread_id_type = 0,
         std::ptrdiff_t = default_stack_size);
-
-    template <typename Functor>
-    static inline pointer create(BOOST_RV_REF(Functor), thread_id_type = 0,
-        std::ptrdiff_t = default_stack_size);
-
-//     template<typename Functor>
-//     static inline void rebind(pointer, Functor, thread_id_type);
 
     void bind_args(arg_slot_type* arg) {
       m_arg = arg;
@@ -158,6 +152,8 @@ namespace boost { namespace coroutines { namespace detail
   public:
     BOOST_COROUTINE_EXPORT static void set_self(self_type* self);
     BOOST_COROUTINE_EXPORT static self_type* get_self();
+    BOOST_COROUTINE_EXPORT static void init_self();
+    BOOST_COROUTINE_EXPORT static void reset_self();
 
   protected:
     void rebind(thread_id_type id)
@@ -175,7 +171,7 @@ namespace boost { namespace coroutines { namespace detail
     thread_id_type m_thread_id;
   };
 
-  // the TSS holds a pointer to the self instance as stored on the stack
+  // the TLS holds a pointer to the self instance as stored on the stack
   template<typename CoroutineType, typename ContextImpl,
       template <typename> class Heap>
   hpx::util::thread_specific_ptr<
@@ -201,9 +197,14 @@ namespace boost { namespace coroutines { namespace detail
           return heap_.get();
       }
 
+      Coroutine* try_allocate()
+      {
+          return heap_.try_get();
+      }
+
       void deallocate(Coroutine* p)
       {
-          p->reset();          // reset bound function
+//          p->reset();          // reset bound function
           heap_.deallocate(p);
       }
 
@@ -228,18 +229,15 @@ namespace boost { namespace coroutines { namespace detail
     typedef coroutine_impl<CoroutineType, ContextImpl, Heap> super_type;
     typedef typename super_type::thread_id_type thread_id_type;
 
-    typedef FunctorType functor_type;
+    typedef typename remove_reference<
+        typename remove_const<FunctorType>::type
+    >::type functor_type;
 
-    coroutine_impl_wrapper(functor_type const& f, thread_id_type id,
+    template <typename Functor>
+    coroutine_impl_wrapper(BOOST_FWD_REF(Functor) f, thread_id_type id,
                 std::ptrdiff_t stack_size)
       : super_type(this, id, stack_size),
-        m_fun(f)
-    {}
-
-    coroutine_impl_wrapper(BOOST_RV_REF(functor_type) f, thread_id_type id,
-                std::ptrdiff_t stack_size)
-      : super_type(this, id, stack_size),
-        m_fun(boost::move(f))
+        m_fun(boost::forward<Functor>(f))
     {}
 
     void operator()() {
@@ -347,6 +345,7 @@ private:
     }
 
     static inline void destroy(type* p);
+    static inline void reset(type* p);
 
     void reset()
     {
@@ -354,15 +353,10 @@ private:
         m_fun = FunctorType();    // just reset the bound function
     }
 
-    void rebind(FunctorType const& f, thread_id_type id)
+    template <typename Functor>
+    void rebind(BOOST_FWD_REF(Functor) f, thread_id_type id)
     {
-        m_fun = f;
-        this->super_type::rebind(id);
-    }
-
-    void rebind(BOOST_RV_REF(FunctorType) f, thread_id_type id)
-    {
-        m_fun = boost::move(f);
+        m_fun = boost::forward<Functor>(f);
         this->super_type::rebind(id);
     }
 
@@ -384,51 +378,48 @@ private:
     {
         return get_heap(i).allocate();
     }
+    static coroutine_impl_wrapper* try_allocate(std::size_t i)
+    {
+        return get_heap(i).try_allocate();
+    }
     static void deallocate(coroutine_impl_wrapper* wrapper, std::size_t i)
     {
         get_heap(i).deallocate(wrapper);
     }
 
-    FunctorType m_fun;
+    functor_type m_fun;
   };
 
   template<typename CoroutineType, typename ContextImpl, template <typename> class Heap>
   template<typename Functor>
   inline typename coroutine_impl<CoroutineType, ContextImpl, Heap>::pointer
   coroutine_impl<CoroutineType, ContextImpl, Heap>::
-      create(Functor const& f, thread_id_type id, std::ptrdiff_t stack_size)
+      create(BOOST_FWD_REF(Functor) f, thread_id_type id, std::ptrdiff_t stack_size)
   {
-      typedef coroutine_impl_wrapper<
-          Functor, CoroutineType, ContextImpl, Heap> wrapper_type;
+      typedef typename remove_reference<
+          typename remove_const<Functor>::type
+      >::type functor_type;
 
-      wrapper_type* wrapper = wrapper_type::allocate(
-          (std::size_t(id)/8) % BOOST_COROUTINE_NUM_HEAPS);
-      if (NULL == wrapper) {
-          context_base<ContextImpl>::increment_allocation_count();
-          return new wrapper_type(f, id, stack_size);
+      typedef coroutine_impl_wrapper<
+          functor_type, CoroutineType, ContextImpl, Heap> wrapper_type;
+
+      // start looking at the matching heap
+      std::size_t const heap_num = (std::size_t(id)/8) % BOOST_COROUTINE_NUM_HEAPS;
+
+      // look through all heaps to find an available coroutine object
+      wrapper_type* wrapper = wrapper_type::allocate(heap_num);
+      for (std::size_t i = 1; i < BOOST_COROUTINE_NUM_HEAPS && !wrapper; ++i) {
+          wrapper = wrapper_type::try_allocate((heap_num + i) % BOOST_COROUTINE_NUM_HEAPS);
       }
 
-      wrapper->rebind(f, id);
-      return wrapper;
-  }
-
-  template<typename CoroutineType, typename ContextImpl, template <typename> class Heap>
-  template<typename Functor>
-  inline typename coroutine_impl<CoroutineType, ContextImpl, Heap>::pointer
-  coroutine_impl<CoroutineType, ContextImpl, Heap>::
-      create(BOOST_RV_REF(Functor) f, thread_id_type id, std::ptrdiff_t stack_size)
-  {
-      typedef coroutine_impl_wrapper<
-          Functor, CoroutineType, ContextImpl, Heap> wrapper_type;
-
-      wrapper_type* wrapper = wrapper_type::allocate(
-          (std::size_t(id)/8) % BOOST_COROUTINE_NUM_HEAPS);
+      // allocate a new coroutine object, if non is available (or all heaps are locked)
       if (NULL == wrapper) {
-          context_base<ContextImpl>::increment_allocation_count();
-          return new wrapper_type(boost::move(f), id, stack_size);
+          context_base<ContextImpl>::increment_allocation_count(heap_num);
+          return new wrapper_type(boost::forward<Functor>(f), id, stack_size);
       }
 
-      wrapper->rebind(boost::move(f), id);
+      // if we reuse an existing  object, we need to rebind its function
+      wrapper->rebind(boost::forward<Functor>(f), id);
       return wrapper;
   }
 
@@ -437,12 +428,23 @@ private:
   inline void
   coroutine_impl_wrapper<Functor, CoroutineType, ContextImpl, Heap>::destroy(type* p)
   {
+      // always hand the stack back to the matching heap
       deallocate(p, (std::size_t(p->get_thread_id())/8) % BOOST_COROUTINE_NUM_HEAPS);
   }
 
-} } }
+
+  template<typename Functor, typename CoroutineType, typename ContextImpl,
+      template <typename> class Heap>
+  inline void
+  coroutine_impl_wrapper<Functor, CoroutineType, ContextImpl, Heap>::reset(type* p)
+  {
+      p->reset();
+  }
+}}}
 
 #if defined(_MSC_VER)
 #pragma warning(pop)
 #endif
+
 #endif
+

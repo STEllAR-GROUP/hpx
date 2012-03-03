@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,10 +14,6 @@
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/runtime/threads/policies/global_queue_scheduler.hpp>
-#include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
-#include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
-#include <hpx/runtime/threads/policies/abp_queue_scheduler.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -29,6 +25,7 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
+#include <hpx/util/papi_thread_mapper.hpp>
 #include <boost/foreach.hpp>
 #include <boost/detail/atomic_count.hpp>
 
@@ -40,7 +37,6 @@ namespace hpx
     template <typename SchedulingPolicy, typename NotificationPolicy>
     class HPX_EXPORT runtime_impl;
 
-    /// \class runtime runtime.hpp hpx/runtime.hpp
     class HPX_EXPORT runtime
     {
     public:
@@ -54,11 +50,8 @@ namespace hpx
 
         /// construct a new instance of a runtime
         runtime(naming::resolver_client& agas_client,
-                std::string const& hpx_ini_file = "",
-                std::vector<std::string> const& cmdline_ini_defs
-                    = std::vector<std::string>())
-          : ini_(util::detail::get_logging_data(), hpx_ini_file,
-                 cmdline_ini_defs),
+                util::runtime_configuration& rtcfg)
+          : ini_(rtcfg),
             instance_number_(++instance_number_counter_),
             stopped_(true)
         {
@@ -138,15 +131,24 @@ namespace hpx
             return *counters_;
         }
 
+        /// \brief Return a reference to the internal PAPI thread manager
+        util::papi_thread_mapper& get_papi_thread_mapper()
+        {
+            return papi_support_;
+        }
+
         /// \brief Install all performance counters related to this runtime
         ///        instance
-        void install_counters();
+        void register_counter_types();
 
+        ///////////////////////////////////////////////////////////////////////
         virtual util::io_service_pool& get_io_pool() = 0;
 
         virtual parcelset::parcelport& get_parcel_port() = 0;
 
         virtual parcelset::parcelhandler& get_parcel_handler() = 0;
+
+        virtual threads::threadmanager_base& get_thread_manager() = 0;
 
         virtual naming::resolver_client& get_agas_client() = 0;
 
@@ -165,6 +167,8 @@ namespace hpx
 
         virtual util::unique_ids& get_id_pool() = 0;
 
+        virtual void add_pre_startup_function(HPX_STD_FUNCTION<void()> const& f) = 0;
+
         virtual void add_startup_function(HPX_STD_FUNCTION<void()> const& f) = 0;
 
         virtual void add_pre_shutdown_function(HPX_STD_FUNCTION<void()> const& f) = 0;
@@ -181,18 +185,18 @@ namespace hpx
         on_exit_type on_exit_functions_;
         boost::mutex on_exit_functions_mtx_;
 
-        util::runtime_configuration ini_;
-
+        util::runtime_configuration& ini_;
         boost::shared_ptr<performance_counters::registry> counters_;
 
         long instance_number_;
         static boost::atomic<int> instance_number_counter_;
 
+        // PAPI support requires to register all threads with the library
+        util::papi_thread_mapper papi_support_;
+
         bool stopped_;
     };
 
-    /// \class runtime_impl runtime.hpp hpx/runtime.hpp
-    ///
     /// The \a runtime class encapsulates the HPX runtime system in a simple to
     /// use way. It makes sure all required parts of the HPX runtime system are
     /// properly initialized.
@@ -224,11 +228,9 @@ namespace hpx
         ///
         /// \param locality_mode  [in] This is the mode the given runtime
         ///                       instance should be executed in.
-        explicit runtime_impl(runtime_mode locality_mode = runtime_mode_console,
-            init_scheduler_type const& init = init_scheduler_type(),
-            std::string const& hpx_ini_file = "",
-            std::vector<std::string> const& cmdline_ini_defs =
-                std::vector<std::string>());
+        explicit runtime_impl(util::runtime_configuration& rtcfg,
+            runtime_mode locality_mode = runtime_mode_console,
+            init_scheduler_type const& init = init_scheduler_type());
 
         /// \brief The destructor makes sure all HPX runtime services are
         ///        properly shut down before exiting.
@@ -339,8 +341,14 @@ namespace hpx
         ///                   function, in which case all threads have to be
         ///                   scheduled explicitly.
         /// \param num_threads [in] The initial number of threads to be started
-        ///                   by the threadmanager. This parameter is optional
+        ///                   by the thread-manager. This parameter is optional
         ///                   and defaults to 1.
+        /// \num_localities   [in] The overall number of localities which are
+        ///                   initially used for the full application. The
+        ///                   runtime system will block during startup until
+        ///                   this many localities have been brought on line.
+        ///                   If this is not specified the number of localities
+        ///                   is assumed to be one.
         ///
         /// \note             The parameter \a func is optional. If no function
         ///                   is supplied, the runtime system will simply wait
@@ -355,11 +363,17 @@ namespace hpx
                 std::size_t num_threads = 1, std::size_t num_localities = 1);
 
         /// \brief Run the HPX runtime system, initially use the given number
-        ///        of (OS) threads in the threadmanager and block waiting for
+        ///        of (OS) threads in the thread-manager and block waiting for
         ///        all threads to finish.
         ///
         /// \param num_threads [in] The initial number of threads to be started
-        ///                   by the threadmanager.
+        ///                   by the thread-manager.
+        /// \num_localities   [in] The overall number of localities which are
+        ///                   initially used for the full application. The
+        ///                   runtime system will block during startup until
+        ///                   this many localities have been brought on line.
+        ///                   If this is not specified the number of localities
+        ///                   is assumed to be one.
         ///
         /// \returns          This function will always return 0 (zero).
         int run(std::size_t num_threads, std::size_t num_localities = 1);
@@ -435,7 +449,7 @@ namespace hpx
         ///            thread the number of executed PX threads should be
         ///            returned for. If this is std::size_t(-1) the function
         ///            will return the overall number of executed PX threads.
-        std::size_t get_executed_threads(std::size_t num = std::size_t(-1)) const
+        boost::int64_t get_executed_threads(std::size_t num = std::size_t(-1)) const
         {
             return thread_manager_.get_executed_threads(num);
         }
@@ -461,6 +475,20 @@ namespace hpx
         {
             return id_pool;
         }
+
+        /// Add a function to be executed inside a HPX thread before hpx_main
+        /// but guaranteed to be executed before any startup function registered
+        /// with \a add_startup_function.
+        ///
+        /// \param  f   The function 'f' will be called from inside a HPX
+        ///             thread before hpx_main is executed. This is very useful
+        ///             to setup the runtime environment of the application
+        ///             (install performance counters, etc.)
+        ///
+        /// \note       The difference to a startup function is that all
+        ///             pre-startup functions will be (system-wide) executed
+        ///             before any startup function.
+        void add_pre_startup_function(HPX_STD_FUNCTION<void()> const& f);
 
         /// Add a function to be executed inside a HPX thread before hpx_main
         ///
@@ -493,7 +521,7 @@ namespace hpx
         void add_shutdown_function(HPX_STD_FUNCTION<void()> const& f);
 
     private:
-        void init_tss();
+        void init_tss(char const* context);
         void deinit_tss();
 
     private:

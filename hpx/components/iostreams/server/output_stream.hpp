@@ -8,15 +8,17 @@
 #if !defined(HPX_4AFE0EEA_49F8_4F4C_8945_7B55BF395DA0)
 #define HPX_4AFE0EEA_49F8_4F4C_8945_7B55BF395DA0
 
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/split_member.hpp>
-
 #include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/spinlock.hpp>
 #include <hpx/components/iostreams/write_functions.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
+
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/deque.hpp>
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/split_member.hpp>
 
 // TODO: Error handling?
 
@@ -148,6 +150,16 @@ struct HPX_COMPONENT_EXPORT output_stream
 };
 
 }}}
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::iostreams::server::output_stream::write_async_action
+  , output_stream_write_async_action
+)
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::iostreams::server::output_stream::write_sync_action
+  , output_stream_write_sync_action
+)
 
 #endif // HPX_4AFE0EEA_49F8_4F4C_8945_7B55BF395DA0
 

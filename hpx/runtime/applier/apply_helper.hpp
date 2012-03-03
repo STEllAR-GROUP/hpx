@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -71,7 +71,7 @@ namespace hpx { namespace applier { namespace detail
         call (naming::address::address_type lva,
             threads::thread_priority /*priority*/)
         {
-            Action::execute_function_nonvirt(lva);
+            Action::execute_function(lva);
         }
 
         static void
@@ -79,7 +79,7 @@ namespace hpx { namespace applier { namespace detail
             threads::thread_priority /*priority*/)
         {
             try {
-                c->trigger(Action::execute_function_nonvirt(lva));
+                c->trigger(boost::move(Action::execute_function(lva)));
             }
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client
@@ -102,7 +102,8 @@ namespace hpx { namespace applier { namespace detail
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
         {
             hpx::applier::register_work_plain(
-                Action::construct_thread_function(lva, boost::forward<Arg0>(arg0)),
+                boost::move(Action::construct_thread_function(lva, 
+                    boost::forward<Arg0>(arg0))),
                 actions::detail::get_action_name<Action>(), lva,
                 threads::pending, priority);
         }
@@ -113,7 +114,8 @@ namespace hpx { namespace applier { namespace detail
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
         {
             hpx::applier::register_work_plain(
-                Action::construct_thread_function(c, lva, boost::forward<Arg0>(arg0)),
+                boost::move(Action::construct_thread_function(c, lva, 
+                    boost::forward<Arg0>(arg0))),
                 actions::detail::get_action_name<Action>(), lva,
                 threads::pending, priority);
         }
@@ -128,7 +130,7 @@ namespace hpx { namespace applier { namespace detail
         call (naming::address::address_type lva,
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
         {
-            Action::execute_function_nonvirt(lva, boost::forward<Arg0>(arg0));
+            Action::execute_function(lva, boost::forward<Arg0>(arg0));
         }
 
         template <typename Arg0>
@@ -137,10 +139,10 @@ namespace hpx { namespace applier { namespace detail
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
         {
             try {
-                c->trigger(Action::execute_function_nonvirt(lva,
-                    boost::forward<Arg0>(arg0)));
+                c->trigger(boost::move(Action::execute_function(lva,
+                    boost::forward<Arg0>(arg0))));
             }
-            catch (hpx::exception const& e) {
+            catch (hpx::exception const& /*e*/) {
                 // make sure hpx::exceptions are propagated back to the client
                 c->trigger_error(boost::current_exception());
             }

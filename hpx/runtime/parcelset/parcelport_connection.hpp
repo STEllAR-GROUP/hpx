@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach & Katelyn Kufahl
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,6 +11,7 @@
 #include <vector>
 
 #include <hpx/runtime/parcelset/server/parcelport_queue.hpp>
+#include <hpx/runtime/applier/applier.hpp>
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
@@ -24,6 +25,7 @@
 #include <boost/asio/write.hpp>
 #include <boost/atomic.hpp>
 #include <boost/bind.hpp>
+#include <boost/bind/protect.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/integer/endian.hpp>
@@ -51,14 +53,19 @@ namespace hpx { namespace parcelset
         {
         }
 
-        void set_parcel (parcel const& p);
+        void set_parcel (parcel const& p)
+        {
+            set_parcel(std::vector<parcel>(1, p));
+        }
+        
+        void set_parcel (std::vector<parcel> const& p);
 
         /// Get the socket associated with the parcelport_connection.
         boost::asio::ip::tcp::socket& socket() { return socket_; }
 
         /// Asynchronously write a data structure to the socket.
-        template <typename Handler>
-        void async_write(Handler handler)
+        template <typename Handler, typename ParcelPostprocess>
+        void async_write(Handler handler, ParcelPostprocess parcel_postprocess)
         {
             /// Increment sends and begin timer.
             send_data_.timer_ = timer_.elapsed_microseconds();
@@ -77,20 +84,25 @@ namespace hpx { namespace parcelset
             // needed to keep  this parcelport_connection object alive for the whole
             // write operation
             void (parcelport_connection::*f)(boost::system::error_code const&, std::size_t,
-                    boost::tuple<Handler>)
+                    boost::tuple<Handler, ParcelPostprocess>)
                 = &parcelport_connection::handle_write<Handler>;
 
             boost::asio::async_write(socket_, buffers,
                 boost::bind(f, shared_from_this(),
                     boost::asio::placeholders::error, _2,
-                    boost::make_tuple(handler)));
+                    boost::make_tuple(handler, parcel_postprocess)));
+        }
+
+        boost::uint32_t destination() const
+        {
+            return there_;
         }
 
     protected:
         /// handle completed write operation
-        template <typename Handler>
+        template <typename Handler, typename ParcelPostprocess>
         void handle_write(boost::system::error_code const& e, std::size_t bytes,
-            boost::tuple<Handler> handler)
+            boost::tuple<Handler, ParcelPostprocess> handler)
         {
             // if there is an error sending a parcel it's likely logging will not
             // work anyways, so don't log the error
@@ -107,7 +119,7 @@ namespace hpx { namespace parcelset
 
             // complete data point and push back onto gatherer
             send_data_.timer_ = timer_.elapsed_microseconds() - send_data_.timer_;
-            parcels_sent_.push_back(send_data_);
+            parcels_sent_.add_data(send_data_);
 
             // now we can give this connection back to the cache
             out_buffer_.clear();
@@ -115,7 +127,10 @@ namespace hpx { namespace parcelset
             out_size_ = 0;
             send_data_.timer_ = 0;
 
+            // Check if connection still fits in cache
             connection_cache_.add(there_, shared_from_this());
+            // Call postprocessing handler, which will send remaining pending parcels
+            boost::get<1>(handler)(there_);
         }
 
     private:

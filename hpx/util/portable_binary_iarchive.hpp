@@ -4,8 +4,14 @@
 #include <boost/version.hpp>
 #include <hpx/config.hpp>
 
-#if HPX_USE_PORTABLE_ARCHIVES == 0
+#if !defined(HPX_USE_PORTABLE_ARCHIVES) || HPX_USE_PORTABLE_ARCHIVES == 0
 #include <boost/archive/binary_iarchive.hpp>
+
+namespace hox { namespace util
+{
+    typedef boost::archive::binary_iarchive portable_binary_iarchive;
+}}
+
 #else
 
 // MS compatible compilers support #pragma once
@@ -68,7 +74,7 @@ public:
     portable_binary_iarchive_exception(exception_code c = incompatible_integer_size )
       : boost::archive::archive_exception((boost::archive::archive_exception::exception_code)c)
     {}
-    virtual const char *what( ) const throw( )
+    virtual const char *what() const throw()
     {
         const char *msg = "programmer error";
         switch(code){
@@ -121,66 +127,66 @@ protected:
 
     // default fall through for any types not specified here
     template<class T>
-    void load(T & t){
+    void load(T & t) {
         boost::intmax_t l = 0;
         load_impl(l, sizeof(T));
         // use cast to avoid compile time warning
         t = static_cast<T>(l);
     }
-    void load(std::string & t){
+    void load(std::string & t) {
         this->primitive_base_t::load(t);
     }
 #if BOOST_VERSION >= 104400
-    void load(boost::archive::class_id_type & t){
+    void load(boost::archive::class_id_type & t) {
         boost::intmax_t l = 0;
         load_impl(l, sizeof(boost::int16_t));
         t = boost::archive::class_id_type(std::size_t(l));
     }
-    void load(boost::archive::object_id_type & t){
+    void load(boost::archive::object_id_type & t) {
         boost::intmax_t l = 0;
         load_impl(l, sizeof(boost::uint32_t));
         t = boost::archive::object_id_type((unsigned int)(l));
     }
-    void load(boost::archive::tracking_type & t){
+    void load(boost::archive::tracking_type & t) {
         bool l = false;
         this->primitive_base_t::load(l);
         t = boost::archive::tracking_type(l);
     }
-    void load(boost::archive::version_type & t){
+    void load(boost::archive::version_type & t) {
         boost::intmax_t l = 0;
         load_impl(l, sizeof(boost::uint32_t));
         t = boost::archive::version_type((unsigned int)(l));
     }
-    void load(boost::archive::library_version_type & t){
+    void load(boost::archive::library_version_type & t) {
         boost::intmax_t l = 0;
         load_impl(l, sizeof(boost::uint16_t));
         t = boost::archive::library_version_type((unsigned int)(l));
     }
-    void load(boost::serialization::item_version_type & t){
+    void load(boost::serialization::item_version_type & t) {
         boost::intmax_t l = 0;
         load_impl(l, sizeof(boost::intmax_t));
         t = boost::serialization::item_version_type((unsigned int)(l));
     }
 #endif
 #ifndef BOOST_NO_STD_WSTRING
-    void load(std::wstring & t){
+    void load(std::wstring & t) {
         this->primitive_base_t::load(t);
     }
 #endif
-    void load(float & t){
+    void load(float & t) {
         this->primitive_base_t::load(t);
         // floats not supported
         //BOOST_STATIC_ASSERT(false);
     }
-    void load(double & t){
+    void load(double & t) {
         this->primitive_base_t::load(t);
         // doubles not supported
         //BOOST_STATIC_ASSERT(false);
     }
-    void load(char & t){
+    void load(char & t) {
         this->primitive_base_t::load(t);
     }
-    void load(unsigned char & t){
+    void load(unsigned char & t) {
         this->primitive_base_t::load(t);
     }
 
@@ -189,25 +195,25 @@ protected:
     // template ordering
     typedef boost::archive::detail::common_iarchive<portable_binary_iarchive>
         detail_common_iarchive;
-    template<class T>
-    void load_override(T & t, BOOST_PFTO int){
+
+    template <class T>
+    void load_override(T & t, BOOST_PFTO int) {
         this->detail_common_iarchive::load_override(t, 0);
     }
+
     HPX_ALWAYS_EXPORT void
     load_override(boost::archive::class_name_type & t, int);
+
     // binary files don't include the optional information
-    void load_override(
-        boost::archive::class_id_optional_type & /* t */,
-        int
-    ){}
+    void load_override(boost::archive::class_id_optional_type&, int) {}
 
     HPX_ALWAYS_EXPORT void
     init(unsigned int flags);
 
 public:
-    portable_binary_iarchive(std::istream & is, unsigned flags = 0) :
-        primitive_base_t(
-            * is.rdbuf(),
+    portable_binary_iarchive(std::istream & is, unsigned flags = 0)
+      : primitive_base_t(
+            *is.rdbuf(),
             0 != (flags & boost::archive::no_codecvt)
         ),
         archive_base_t(flags),
@@ -217,13 +223,12 @@ public:
     }
 
     portable_binary_iarchive(
-        std::basic_streambuf<
-            std::istream::char_type,
-            std::istream::traits_type
-        > & bsb,
-        unsigned int flags
-    ) :
-        primitive_base_t(
+            std::basic_streambuf<
+                std::istream::char_type,
+                std::istream::traits_type
+            > & bsb,
+            unsigned int flags)
+      : primitive_base_t(
             bsb,
             0 != (flags & boost::archive::no_codecvt)
         ),

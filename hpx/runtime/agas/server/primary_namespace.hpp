@@ -12,7 +12,6 @@
 #include <boost/preprocessor/stringize.hpp>
 
 #include <boost/fusion/include/vector.hpp>
-#include <boost/fusion/include/at_c.hpp>
 #include <boost/utility/binary.hpp>
 
 #include <hpx/hpx_fwd.hpp>
@@ -24,8 +23,9 @@
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/util/insert_checked.hpp>
+#include <hpx/util/merging_map.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/lcos/local_mutex.hpp>
+#include <hpx/lcos/local/mutex.hpp>
 
 namespace hpx { namespace agas
 {
@@ -93,7 +93,7 @@ struct HPX_EXPORT primary_namespace :
     >
 {
     // {{{ nested types
-    typedef lcos::local_mutex mutex_type;
+    typedef lcos::local::mutex mutex_type;
 
     typedef boost::int32_t component_type;
 
@@ -106,11 +106,13 @@ struct HPX_EXPORT primary_namespace :
     typedef std::map<naming::locality, partition_type>
         partition_table_type;
 
-    typedef std::map<naming::gid_type, boost::uint64_t>
+    typedef util::merging_map<naming::gid_type, boost::int64_t>
         refcnt_table_type;
     // }}}
 
   private:
+    // REVIEW: Separate mutexes might reduce contention here. This has to be
+    // investigated carefully.
     mutex_type mutex_;
     gva_table_type gvas_;
     partition_table_type partitions_;
@@ -123,8 +125,20 @@ struct HPX_EXPORT primary_namespace :
       , gvas_()
       , partitions_()
       , refcnts_()
-      , prefix_counter_(0)
+      , prefix_counter_(HPX_AGAS_BOOTSTRAP_PREFIX)
     {}
+
+    bool route(
+        parcelset::parcel const& p
+        )
+    {
+        return route(p, throws);
+    }
+
+    bool route(
+        parcelset::parcel const& p
+      , error_code& ec
+        );
 
     response service(
         request const& req
@@ -135,6 +149,20 @@ struct HPX_EXPORT primary_namespace :
 
     response service(
         request const& req
+      , error_code& ec
+        );
+
+    /// Maps \a service over \p reqs in parallel.
+    std::vector<response> bulk_service(
+        std::vector<request> const& reqs
+        )
+    {
+        return bulk_service(reqs, throws);
+    }
+
+    /// Maps \a service over \p reqs in parallel.
+    std::vector<response> bulk_service(
+        std::vector<request> const& reqs
       , error_code& ec
         );
 
@@ -168,12 +196,12 @@ struct HPX_EXPORT primary_namespace :
       , error_code& ec = throws
         );
 
-    response increment(
+    response change_credit_non_blocking(
         request const& req
       , error_code& ec = throws
         );
 
-    response decrement(
+    response change_credit_sync(
         request const& req
       , error_code& ec = throws
         );
@@ -183,21 +211,79 @@ struct HPX_EXPORT primary_namespace :
       , error_code& ec = throws
         );
 
+  private:
+    boost::fusion::vector2<naming::gid_type, gva> resolve_gid_locked(
+        naming::gid_type const& gid
+      , error_code& ec
+        );
+
+    void increment(
+        naming::gid_type const& lower
+      , naming::gid_type const& upper
+      , boost::int64_t credits
+      , error_code& ec
+        );
+
+    /// TODO/REVIEW: Do we ensure that a GID doesn't get reinserted into the
+    /// table after it's been decremented to 0 and destroyed? How do we do this
+    /// efficiently?
+    /// 
+    /// The new decrement algorithm (decrement_sweep handles 0-2,
+    /// kill_non_blocking or kill_sync handles 3):
+    ///
+    ///    0.) Apply the decrement across the entire keyspace.
+    ///    1.) Search for dead objects (e.g. objects with a reference count of
+    ///        0) by iterating over the keyspace.
+    ///    2.) Resolve the dead objects (retrieve the GVA, adjust for partial
+    ///        matches) and remove them from the reference counting table.
+    ///    3.) Kill the dead objects (fire-and-forget semantics).
+
+    typedef boost::fusion::vector3<
+        gva                 // gva
+      , naming::gid_type    // gid
+      , naming::gid_type    // count
+    > free_entry;
+
+    void decrement_sweep(
+        std::list<free_entry>& free_list
+      , naming::gid_type const& lower
+      , naming::gid_type const& upper
+      , boost::int64_t credits
+      , error_code& ec
+        );
+
+    void kill_non_blocking(
+        std::list<free_entry>& free_list
+      , naming::gid_type const& lower
+      , naming::gid_type const& upper
+      , error_code& ec
+        );
+
+    void kill_sync(
+        std::list<free_entry>& free_list
+      , naming::gid_type const& lower
+      , naming::gid_type const& upper
+      , error_code& ec
+        );
+
+  public:
     enum actions
     { // {{{ action enum
         // Actual actions
-        namespace_service          = BOOST_BINARY_U(1000000)
+        namespace_service                       = BOOST_BINARY_U(1000000)
+      , namespace_bulk_service                  = BOOST_BINARY_U(1000001)
+      , namespace_route                         = BOOST_BINARY_U(1000010)
 
         // Pseudo-actions
-      , namespace_allocate         = BOOST_BINARY_U(1000001)
-      , namespace_bind_gid         = BOOST_BINARY_U(1000010)
-      , namespace_resolve_gid      = BOOST_BINARY_U(1000011)
-      , namespace_resolve_locality = BOOST_BINARY_U(1000100)
-      , namespace_free             = BOOST_BINARY_U(1000101)
-      , namespace_unbind_gid       = BOOST_BINARY_U(1000110)
-      , namespace_increment        = BOOST_BINARY_U(1000111)
-      , namespace_decrement        = BOOST_BINARY_U(1001000)
-      , namespace_localities       = BOOST_BINARY_U(1001001)
+      , namespace_allocate                      = BOOST_BINARY_U(1000011)
+      , namespace_bind_gid                      = BOOST_BINARY_U(1000100)
+      , namespace_resolve_gid                   = BOOST_BINARY_U(1000101)
+      , namespace_resolve_locality              = BOOST_BINARY_U(1000110)
+      , namespace_free                          = BOOST_BINARY_U(1000111)
+      , namespace_unbind_gid                    = BOOST_BINARY_U(1001000)
+      , namespace_change_credit_non_blocking    = BOOST_BINARY_U(1001001)
+      , namespace_change_credit_sync            = BOOST_BINARY_U(1001010)
+      , namespace_localities                    = BOOST_BINARY_U(1001011)
     }; // }}}
 
     typedef hpx::actions::result_action1<
@@ -208,9 +294,39 @@ struct HPX_EXPORT primary_namespace :
       , &primary_namespace::service
       , threads::thread_priority_critical
     > service_action;
+
+    typedef hpx::actions::result_action1<
+        primary_namespace
+      , /* return type */ std::vector<response>
+      , /* enum value */  namespace_bulk_service
+      , /* arguments */   std::vector<request> const&
+      , &primary_namespace::bulk_service
+      , threads::thread_priority_critical
+    > bulk_service_action;
+
+    typedef hpx::actions::result_action1<
+        primary_namespace
+      , /* return type */ bool
+      , /* enum value */  namespace_route
+      , /* arguments */   parcelset::parcel const&
+      , &primary_namespace::route
+      , threads::thread_priority_critical
+    > route_action;
 };
 
 }}}
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::agas::server::primary_namespace::service_action,
+    primary_namespace_service_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::agas::server::primary_namespace::bulk_service_action,
+    primary_namespace_bulk_service_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::agas::server::primary_namespace::route_action,
+    primary_namespace_route_action);
 
 #endif // HPX_BDD56092_8F07_4D37_9987_37D20A1FEA21
 

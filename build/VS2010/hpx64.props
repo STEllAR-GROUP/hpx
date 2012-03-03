@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="UserMacros">
+    <BOOST_ROOT>$(HPX_BOOST_ROOT)</BOOST_ROOT>
+    <TBB_ROOT>$(HPX_TBB_ROOT)</TBB_ROOT>
+    <BUILD_OPTIONS>$(HPX_BUILD_OPTIONS)</BUILD_OPTIONS>
+    <AMPLIFIER_2011_DIR>$(VTUNE_AMPLIFIER_XE_2011_DIR)</AMPLIFIER_2011_DIR>
+  </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.21006.1</_ProjectFileVersion>
+    <OutDir>$(Platform)\$(Configuration)\</OutDir>
+    <CustomBuildAfterTargets>PostBuildEvent</CustomBuildAfterTargets>
+    <TargetExt>.dll</TargetExt>
+    <LibraryPath>$(VSInstallDir)SDK\v2.0\lib\amd64;$(LibraryPath)</LibraryPath>
+    <ExecutablePath>$(VCInstallDir)bin\x86_amd64;$(VCInstallDir)bin;$(ExecutablePath)</ExecutablePath>
+    <IncludePath>$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(TBB_ROOT)\include;$(HPX_ROOT)\external\serialization;$(BOOST_ROOT);$(HPX_ROOT);$(HPX_ROOT)\external\atomic;$(HPX_ROOT)\external\backtrace;$(HPX_ROOT)\external\cache;$(HPX_ROOT)\external\chrono;$(HPX_ROOT)\external\coroutine;$(HPX_ROOT)\external\endian;$(HPX_ROOT)\external\lockfree;$(HPX_ROOT)\external\logging;$(HPX_ROOT)\external\plugin;$(HPX_ROOT)\external\move;$(INSPECTOR_2011_DIR)include;$(AMPLIFIER_2011_DIR)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x0600;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;HPX_PREFIX="$(HPX_ROOT)/bin64/$(Configuration)";HPX_USE_TBB=0;HPX_USE_LOCKFREE=1;BOOST_COROUTINE_USE_FIBERS=1;BOOST_SERIALIZATION_DYN_LINK;BOOST_COROUTINE_USE_ATOMIC_COUNT;BOOST_USE_WINDOWS_H;HPX_DEBUG_WRAPPER_HEAP=0;BOOST_PARAMETER_MAX_ARITY=7;BOOST_ATOMIC_HAVE_SSE2=1;HPX_HAVE_CXX11_UNIQUE_PTR=1;HPX_HAVE_CXX11_STD_FUNCTION1=1;HPX_HAVE_CXX11_STD_TUPLE=1;HPX_HAVE_NATIVE_TLS=1;HPX_HAVE_CXX11_LAMBDAS=1;HPX_UTIL_BIND=1;HPX_UTIL_FUNCTION=1;HPX_LOCAL_SCHEDULER=1;HPX_ABP_SCHEDULER=1;HPX_ABP_PRIORITY_SCHEDULER=1;HPX_PERIODIC_PRIORITY_SCHEDULER=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4267;4503;4251;4275;4094;4180;4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <AdditionalOptions>$(BUILD_OPTIONS) /bigobj %(AdditionalOptions)</AdditionalOptions>
+      <MinimalRebuild>
+      </MinimalRebuild>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(BOOST_ROOT)\stage64\lib;$(INSPECTOR_2011_DIR)\lib64;$(AMPLIFIER_2011_DIR)\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CustomBuildStep>
+      <Command>if not exist "$(HPX_ROOT)\bin64" mkdir "$(HPX_ROOT)\bin64"
+if not exist "$(HPX_ROOT)\bin64\$(Configuration)" mkdir "$(HPX_ROOT)\bin64\$(Configuration)"
+if not exist "$(HPX_ROOT)\bin64\$(Configuration)\lib" mkdir "$(HPX_ROOT)\bin64\$(Configuration)\lib"
+if not exist "$(HPX_ROOT)\bin64\$(Configuration)\lib\hpx" mkdir "$(HPX_ROOT)\bin64\$(Configuration)\lib\hpx"
+if not exist "$(HPX_ROOT)\bin64\$(Configuration)\libs" mkdir "$(HPX_ROOT)\bin64\$(Configuration)\libs"
+xcopy /Y/F "$(TargetPath)" "$(HPX_ROOT)\bin64\$(Configuration)\lib\hpx"
+xcopy /Y/F "$(TargetDir)\$(TargetName).pdb" "$(HPX_ROOT)\bin64\$(Configuration)\lib\hpx"
+xcopy /Y/F "$(TargetDir)\$(TargetName).lib" "$(HPX_ROOT)\bin64\$(Configuration)\libs"
+</Command>
+      <Inputs>$(TargetPath)</Inputs>
+      <Outputs>$(HPX_ROOT)\bin64\$(Configuration)\lib\hpx\$(TargetFileName);$(HPX_ROOT)\bin64\$(Configuration)\lib\hpx\$(TargetName).pdb;%(Outputs)</Outputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="BOOST_ROOT">
+      <Value>$(BOOST_ROOT)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="HPX_ROOT">
+      <Value>$(HPX_ROOT)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="TBB_ROOT">
+      <Value>$(TBB_ROOT)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="BUILD_OPTIONS">
+      <Value>$(BUILD_OPTIONS)</Value>
+    </BuildMacro>
+    <BuildMacro Include="AMPLIFIER_2011_DIR">
+      <Value>$(AMPLIFIER_2011_DIR)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

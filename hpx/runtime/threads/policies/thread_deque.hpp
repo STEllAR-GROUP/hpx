@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,13 +14,12 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
 
-#include <boost/thread/condition.hpp>
-#include <boost/bind.hpp>
+#include <boost/thread/mutex.hpp>
 #include <boost/atomic.hpp>
-#include <boost/tuple/tuple.hpp>
 #include <boost/lockfree/deque.hpp>
 #include <boost/lockfree/fifo.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
+#include <boost/move/move.hpp>
 
 // TODO: add branch prediction and function heat
 
@@ -35,11 +34,15 @@ inline void enqueue(Queue& workqueue, Value val)
 { workqueue.push_left(val); }
 
 template <typename Queue, typename Value>
-inline bool dequeue(Queue& workqueue, Value val)
+inline void enqueue_last(Queue& workqueue, Value val)
+{ workqueue.push_right(val); }
+
+template <typename Queue, typename Value>
+inline bool dequeue(Queue& workqueue, Value& val)
 { return workqueue.pop_left(val); }
 
 template <typename Queue, typename Value>
-inline bool steal(Queue& workqueue, Value val)
+inline bool steal(Queue& workqueue, Value& val)
 { return workqueue.pop_right(val); }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -67,9 +70,9 @@ struct thread_deque
 
     // this is the type of the queue of new tasks not yet converted to
     // threads
-    typedef boost::tuple<thread_init_data, thread_state_enum> task_description;
+    typedef HPX_STD_TUPLE<thread_init_data, thread_state_enum> task_description;
 
-    typedef boost::lockfree::deque<task_description const*> task_items_type;
+    typedef boost::lockfree::deque<task_description*> task_items_type;
 
     typedef boost::lockfree::fifo<thread_id_type> thread_id_queue_type;
 
@@ -81,9 +84,9 @@ struct thread_deque
             return 0;
 
         std::size_t added = 0;
-        task_description const* task = 0;
+        task_description* task = 0;
 
-        while (add_count-- && dequeue(new_tasks_, &task))
+        while (add_count-- && dequeue(new_tasks_, task))
         {
             --new_tasks_count_;
 
@@ -91,10 +94,10 @@ struct thread_deque
             util::block_profiler_wrapper<add_new_tag> bp(add_new_logger_);
 
             // create the new thread
-            thread_state_enum state = boost::get<1>(*task);
+            thread_state_enum state = HPX_STD_GET(1, *task);
             HPX_STD_UNIQUE_PTR<threads::thread> thrd(
                 new (memory_pool_) threads::thread(
-                    boost::get<0>(*task), memory_pool_, state));
+                    HPX_STD_GET(0, *task), memory_pool_, state));
 
             delete task;
 
@@ -137,9 +140,9 @@ struct thread_deque
             return 0;
 
         std::size_t added = 0;
-        task_description const* task = 0;
+        task_description* task = 0;
 
-        while (add_count-- && steal(addfrom->new_tasks_, &task))
+        while (add_count-- && steal(addfrom->new_tasks_, task))
         {
             --addfrom->new_tasks_count_;
 
@@ -147,10 +150,10 @@ struct thread_deque
             util::block_profiler_wrapper<add_new_tag> bp(add_new_logger_);
 
             // create the new thread
-            thread_state_enum state = boost::get<1>(*task);
+            thread_state_enum state = HPX_STD_GET(1, *task);
             HPX_STD_UNIQUE_PTR<threads::thread> thrd(
                 new (memory_pool_) threads::thread(
-                    boost::get<0>(*task), memory_pool_, state));
+                    HPX_STD_GET(0, *task), memory_pool_, state));
 
             delete task;
 
@@ -188,7 +191,6 @@ struct thread_deque
 
     boost::int64_t compute_count()
     {
-
         // create new threads from pending tasks (if appropriate)
         boost::int64_t add_count = -1; // default is no constraint
 
@@ -224,7 +226,7 @@ struct thread_deque
             // delete only this many threads
             boost::int64_t delete_count = max_delete_count;
             thread_id_type todelete;
-            while (delete_count && terminated_items_.dequeue(&todelete))
+            while (delete_count && terminated_items_.dequeue(todelete))
             {
                 if (thread_map_.erase(todelete))
                     --delete_count;
@@ -266,7 +268,19 @@ struct thread_deque
 
     // This returns the current length of the queues (work items and new items)
     boost::int64_t get_queue_length() const
-    { return work_items_count_ + new_tasks_count_; }
+    {
+        return work_items_count_ + new_tasks_count_;
+    }
+    // This returns the current length of the work queue
+    boost::int64_t get_work_length() const
+    {
+        return work_items_count_;
+    }
+    // This returns the current length of the work queue
+    boost::int64_t get_task_length() const
+    {
+        return new_tasks_count_;
+    }
 
     // create a new thread and schedule it if the initial state is equal to
     // pending
@@ -307,8 +321,9 @@ struct thread_deque
 
         // do not execute the work, but register a task description for
         // later thread creation
+        enqueue(new_tasks_,
+            new task_description(boost::move(data), initial_state));
         ++new_tasks_count_;
-        enqueue(new_tasks_, new task_description(data, initial_state));
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -316,7 +331,7 @@ struct thread_deque
         return invalid_thread_id; // thread has not been created yet
     }
 
-    bool get_next_thread(threads::thread** thrd)
+    bool get_next_thread(threads::thread*& thrd)
     {
         if (dequeue(work_items_, thrd)) {
             --work_items_count_;
@@ -325,7 +340,7 @@ struct thread_deque
         return false;
     }
 
-    bool steal_next_thread(threads::thread** thrd)
+    bool steal_next_thread(threads::thread*& thrd)
     {
         if (steal(work_items_, thrd)) {
             --work_items_count_;
@@ -341,11 +356,18 @@ struct thread_deque
         ++work_items_count_;
     }
 
+    void schedule_thread_last(threads::thread* thrd)
+    {
+        enqueue_last(work_items_, thrd);
+        ++work_items_count_;
+    }
+
     // Destroy the passed thread as it has been terminated
     bool destroy_thread(threads::thread* thrd)
     {
         if (thrd->is_created_from(&memory_pool_)) {
             thread_id_type id = thrd->get_thread_id();
+            reinterpret_cast<thread*>(id)->reset();     // reset bound function object
             terminated_items_.enqueue(id);
             return true;
         }
@@ -390,7 +412,7 @@ struct thread_deque
     bool add_new_or_terminate(std::size_t num_thread, bool running,
                               std::size_t& added)
     {
-        if (0 == work_items_count_) {
+        if (0 == work_items_count_.load(boost::memory_order_relaxed)) {
             util::try_lock_wrapper<mutex_type> lk(mtx_);
             if (!lk)
                 return false;
@@ -426,7 +448,7 @@ struct thread_deque
     bool steal_new_or_terminate(std::size_t num_thread, bool running,
                                 std::size_t& added, thread_deque* addfrom)
     {
-        if (0 == work_items_count_) {
+        if (0 == work_items_count_.load(boost::memory_order_relaxed)) {
             util::try_lock_wrapper<mutex_type> lk(mtx_);
             if (!lk)
                 return false;
@@ -486,7 +508,6 @@ struct thread_deque
 
 private:
     mutable mutex_type mtx_;            ///< mutex protecting the members
-    boost::condition cond_;             ///< used to trigger some action
 
     thread_map_type thread_map_;        ///< mapping of thread id's to PX-threads
     work_items_type work_items_;        ///< list of active work items

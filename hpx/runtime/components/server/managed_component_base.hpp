@@ -1,4 +1,5 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c)      2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -22,21 +23,95 @@
 #include <hpx/util/static.hpp>
 #include <hpx/util/stringstream.hpp>
 
+#include <iostream>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
     template <typename Component, typename Derived>
     class managed_component;
 
+    template <typename T, typename Enable = void>
+    struct component_ctor_policy
+    {
+        typedef detail::construct_without_back_ptr type;
+    };
+
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Wrapper>
+    namespace detail_adl_barrier
+    {
+        template <typename Component, typename Managed, typename BackPtrTag>
+        struct init;
+
+        template <typename Component, typename Managed>
+        struct init<Component, Managed, detail::construct_with_back_ptr>
+        {
+            static void call(Component*& component, Managed* this_)
+            {
+                typedef typename Managed::wrapped_type wrapped_type;
+                component = new wrapped_type(this_);
+            }
+
+#define MANAGED_COMPONENT_CONSTRUCT_INIT1(Z, N, _)                            \
+            template <BOOST_PP_ENUM_PARAMS(N, typename T)>                    \
+            static void call(Component*& component, Managed* this_,           \
+                BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t))                  \
+            {                                                                 \
+                typedef typename Managed::wrapped_type wrapped_type;          \
+                component = new wrapped_type(this_, BOOST_PP_ENUM_PARAMS(N, t));\
+            }                                                                 \
+    /**/
+            BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARGUMENT_LIMIT,
+                MANAGED_COMPONENT_CONSTRUCT_INIT1, _)
+
+#undef MANAGED_COMPONENT_CONSTRUCT_INIT1
+        };
+
+        template <typename Component, typename Managed>
+        struct init<Component, Managed, detail::construct_without_back_ptr>
+        {
+            static void call(Component*& component, Managed* this_)
+            {
+                typedef typename Managed::wrapped_type wrapped_type;
+                component = new wrapped_type();
+                component->set_back_ptr(this_);
+            }
+
+#define MANAGED_COMPONENT_CONSTRUCT_INIT2(Z, N, _)                            \
+            template <BOOST_PP_ENUM_PARAMS(N, typename T)>                    \
+            static void call(Component*& component, Managed* this_,           \
+                BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t))                  \
+            {                                                                 \
+                typedef typename Managed::wrapped_type wrapped_type;          \
+                component = new wrapped_type(BOOST_PP_ENUM_PARAMS(N, t));     \
+                component->set_back_ptr(this_);                               \
+            }                                                                 \
+    /**/
+            BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARGUMENT_LIMIT,
+                MANAGED_COMPONENT_CONSTRUCT_INIT2, _)
+
+#undef MANAGED_COMPONENT_CONSTRUCT_INIT2
+        };
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Component, typename Wrapper, typename CtorPolicy>
     class managed_component_base
       : public detail::managed_component_tag, boost::noncopyable
     {
     public:
+        typedef void has_managed_component_base;
+        typedef CtorPolicy ctor_policy;
+
         managed_component_base()
           : back_ptr_(0)
         {}
+
+        managed_component_base(managed_component<Component, Wrapper>* back_ptr)
+          : back_ptr_(back_ptr)
+        {
+            BOOST_ASSERT(back_ptr);
+        }
 
         // components must contain a typedef for wrapping_type defining the
         // managed_component type used to encapsulate instances of this
@@ -65,6 +140,8 @@ namespace hpx { namespace components
     private:
         template <typename, typename>
         friend class managed_component;
+        template <typename, typename, typename>
+        friend struct detail_adl_barrier::init;
 
         void set_back_ptr(components::managed_component<Component, Wrapper>* bp)
         {
@@ -76,60 +153,65 @@ namespace hpx { namespace components
         managed_component<Component, Wrapper>* back_ptr_;
     };
 
+    template <typename Component>
+    struct component_ctor_policy<
+        Component, typename Component::has_managed_component_base>
+    {
+        typedef typename Component::ctor_policy type;
+    };
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
         // for backwards compatibility only
         using components::managed_component_base;
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Component, typename Derived>
+        struct heap_factory
+        {
+            // the memory for the wrappers is managed by a one_size_heap_list
+            typedef detail::wrapper_heap_list<
+                detail::fixed_wrapper_heap<Derived> > heap_type;
+
+            typedef detail::fixed_wrapper_heap<Derived> block_type;
+
+            struct wrapper_heap_tag {};
+
+            static heap_type& get_heap()
+            {
+                // ensure thread-safe initialization
+                util::static_<heap_type, wrapper_heap_tag, HPX_RUNTIME_INSTANCE_LIMIT>
+                    heap(components::get_component_type<Component>());
+                return heap.get(get_runtime_instance_number());
+            }
+
+            static block_type* alloc_heap()
+            {
+                return get_heap().alloc_heap();
+            }
+
+            static void add_heap(block_type* p)
+            {
+                return get_heap().add_heap(p);
+            }
+
+            static Derived* alloc(std::size_t count = 1)
+            {
+                return get_heap().alloc(count);
+            }
+            static void free(void* p, std::size_t count = 1)
+            {
+                get_heap().free(p, count);
+            }
+            static naming::gid_type get_gid(void* p)
+            {
+                return get_heap().get_gid(p);
+            }
+        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Derived>
-    struct heap_factory
-    {
-        // the memory for the wrappers is managed by a one_size_heap_list
-        typedef detail::wrapper_heap_list<
-            detail::fixed_wrapper_heap<Derived> > heap_type;
-
-        typedef detail::fixed_wrapper_heap<Derived> block_type;
-
-        struct wrapper_heap_tag {};
-
-        static heap_type& get_heap()
-        {
-            // ensure thread-safe initialization
-            util::static_<heap_type, wrapper_heap_tag, HPX_RUNTIME_INSTANCE_LIMIT>
-                heap(components::get_component_type<Component>());
-            return heap.get(get_runtime_instance_number());
-        }
-
-        static block_type* alloc_heap()
-        {
-            return get_heap().alloc_heap();
-        }
-
-        static void add_heap(block_type* p)
-        {
-            return get_heap().add_heap(p);
-        }
-
-        static Derived* alloc(std::size_t count = 1)
-        {
-            return get_heap().alloc(count);
-        }
-        static void free(void* p, std::size_t count = 1)
-        {
-            get_heap().free(p, count);
-        }
-        static naming::gid_type get_gid(void* p)
-        {
-            return get_heap().get_gid(p);
-        }
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// \class managed_component managed_component.hpp hpx/runtime/components/server/managed_component.hpp
-    ///
     /// The managed_component template is used as a indirection layer
     /// for components allowing to gracefully handle the access to non-existing
     /// components.
@@ -172,24 +254,29 @@ namespace hpx { namespace components
             component_->set_back_ptr(this);
         }
 
+    public:
         /// \brief Construct a managed_component instance holding a new wrapped
         ///        instance
         managed_component()
-          : component_(new wrapped_type())
+          : component_(0)
         {
-            component_->set_back_ptr(this);
+            detail_adl_barrier::init<Component, managed_component,
+                typename component_ctor_policy<Component>::type
+            >::call(component_, this);
         }
 
 #define MANAGED_COMPONENT_CONSTRUCT(Z, N, _)                                  \
         template <BOOST_PP_ENUM_PARAMS(N, typename T)>                        \
         managed_component(BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t))        \
-          : component_(new wrapped_type(BOOST_PP_ENUM_PARAMS(N, t)))          \
+          : component_(0)                                                     \
         {                                                                     \
-            component_->set_back_ptr(this);                                   \
-        }
+            detail_adl_barrier::init<Component, managed_component,            \
+                typename component_ctor_policy<Component>::type               \
+            >::call(component_, this, BOOST_PP_ENUM_PARAMS(N, t));            \
+        }                                                                     \
     /**/
 
-        BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARG_MAX,
+        BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARGUMENT_LIMIT,
             MANAGED_COMPONENT_CONSTRUCT, _)
 
 #undef MANAGED_COMPONENT_CONSTRUCT
@@ -256,10 +343,9 @@ namespace hpx { namespace components
             return component_;
         }
 
-    protected:
-        typedef heap_factory<Component, derived_type> heap_type;
-
     public:
+        typedef detail::heap_factory<Component, derived_type> heap_type;
+
         /// \brief  The memory for managed_component objects is managed by
         ///         a class specific allocator. This allocator uses a one size
         ///         heap implementation, ensuring fast memory allocation.
@@ -334,6 +420,7 @@ namespace hpx { namespace components
                 {
                     curr->finalize();
                     curr->~derived_type();
+                    ++curr;
                 }
                 heap_type::free(p, count);     // free memory
                 throw;      // rethrow
@@ -357,7 +444,7 @@ namespace hpx { namespace components
         }                                                                     \
     /**/
 
-        BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARG_MAX,
+        BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARGUMENT_LIMIT,
             HPX_MANAGED_COMPONENT_CREATE_ONE, _)
 
 #undef HPX_MANAGED_COMPONENT_CREATE_ONE
@@ -369,18 +456,13 @@ namespace hpx { namespace components
             if (NULL == p || 0 == count)
                 return;     // do nothing if given a NULL pointer
 
-            if (1 == count) {
-                p->finalize();
-                p->~derived_type();
-            }
-            else {
-                // call destructors for all managed_component instances
-                derived_type* curr = p;
-                for (std::size_t i = 0; i < count; ++i)
-                {
-                    curr->finalize();
-                    curr->~derived_type();
-                }
+            // call destructors for all managed_component instances
+            derived_type* curr = p;
+            for (std::size_t i = 0; i < count; ++i)
+            {
+                curr->finalize();
+                curr->~derived_type();
+                ++curr;
             }
 
             // free memory itself
@@ -399,12 +481,6 @@ namespace hpx { namespace components
         }
 
     public:
-        ///
-        /// \brief Return the global id of this \a future instance
-        naming::id_type get_gid() const
-        {
-            return get_checked()->get_gid();
-        }
 
         ///////////////////////////////////////////////////////////////////////
         // The managed_component behaves just like the wrapped object
@@ -430,6 +506,11 @@ namespace hpx { namespace components
         }
 
         ///////////////////////////////////////////////////////////////////////
+        /// \brief Return the global id of this \a future instance
+        naming::id_type get_gid() const
+        {
+            return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
+        }
         naming::gid_type get_base_gid() const
         {
             return heap_type::get_gid(const_cast<managed_component*>(this));
@@ -439,16 +520,17 @@ namespace hpx { namespace components
         Component* component_;
     };
 
-    template <typename Component, typename Wrapper>
+    template <typename Component, typename Wrapper, typename CtorPolicy>
     inline naming::id_type
-    managed_component_base<Component, Wrapper>::get_gid() const
+    managed_component_base<Component, Wrapper, CtorPolicy>::get_gid() const
     {
-        return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
+        BOOST_ASSERT(back_ptr_);
+        return back_ptr_->get_gid();
     }
 
-    template <typename Component, typename Wrapper>
+    template <typename Component, typename Wrapper, typename CtorPolicy>
     inline naming::gid_type
-    managed_component_base<Component, Wrapper>::get_base_gid() const
+    managed_component_base<Component, Wrapper, CtorPolicy>::get_base_gid() const
     {
         BOOST_ASSERT(back_ptr_);
         return back_ptr_->get_base_gid();

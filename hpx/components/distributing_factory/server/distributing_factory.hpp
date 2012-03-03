@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -110,8 +110,8 @@ namespace hpx { namespace components { namespace server
         // return the overall size of a partition described by this info
         std::size_t size() const
         {
-            return std::accumulate(dim_sizes_.begin(), dim_sizes_.end(), 1U,
-                std::multiplies<std::size_t>());
+            return std::accumulate(dim_sizes_.begin(), dim_sizes_.end(), 
+                std::size_t(1), std::multiplies<std::size_t>());
         }
 
         std::size_t dims_;                    ///< dimensionality of the partitions
@@ -253,11 +253,7 @@ namespace hpx { namespace components { namespace server
     HPX_COMPONENT_EXPORT
     std::pair<locality_result_iterator, locality_result_iterator>
         locality_results(distributing_factory::result_type const& v);
-}
-
-using server::locality_results;
-
-}}
+}}}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace traits
@@ -293,5 +289,24 @@ namespace boost { namespace serialization
     void serialize(Archive&, hpx::components::server::partition_info&,
         unsigned int const);
 }}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Declaration of serialization support for the distributing_factory actions
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::distributing_factory::create_components_action
+  , distributing_factory_create_components_action
+)
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::distributing_factory::create_partitioned_action
+  , distributing_factory_create_partitioned_action
+)
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<
+        hpx::components::server::distributing_factory::remote_result_type
+    >::set_result_action
+  , set_result_action_distributing_factory_result);
 
 #endif

@@ -37,11 +37,11 @@
         util::block_profiler_wrapper<lazy_future_direct_tag> bp(apply_logger_);
 
         naming::address addr;
-        if (hpx::applier::get_applier().address_is_local(gid, addr)) {
+        if (agas::is_local_address(gid, addr)) {
             // local, direct execution
             BOOST_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
-            (*this->impl_)->set_data(0, Action::execute_function_nonvirt(
+            (*this->impl_)->set_data(0, Action::execute_function(
                 addr.address_, BOOST_PP_ENUM_PARAMS(N, arg)));
         }
         else {
@@ -58,7 +58,7 @@ private:
         naming::id_type const& gid,
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
-        if (!((*th->impl_)->ready()))
+        if (!((*th->impl_)->is_ready()))
             th->apply(gid, BOOST_PP_ENUM_PARAMS(N, arg));
     }
 

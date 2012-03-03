@@ -6,6 +6,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
 
 namespace hpx { namespace agas
@@ -41,7 +42,7 @@ response symbol_namespace::service(
             return resolve(req, ec);
         case symbol_ns_unbind:
             return unbind(req, ec);
-        case symbol_ns_iterate:
+        case symbol_ns_iterate_names:
             return iterate(req, ec);
 
         case primary_ns_allocate:
@@ -49,8 +50,8 @@ response symbol_namespace::service(
         case primary_ns_resolve_gid:
         case primary_ns_free:
         case primary_ns_unbind_gid:
-        case primary_ns_increment:
-        case primary_ns_decrement:
+        case primary_ns_change_credit_non_blocking:
+        case primary_ns_change_credit_sync:
         case primary_ns_localities:
         {
             LAGAS_(warning) <<
@@ -87,6 +88,24 @@ response symbol_namespace::service(
         }
     };
 } // }}}
+
+// TODO: do/undo semantics (e.g. transactions)
+std::vector<response> symbol_namespace::bulk_service(
+    std::vector<request> const& reqs
+  , error_code& ec
+    )
+{
+    std::vector<response> r;
+    r.reserve(reqs.size());
+
+    BOOST_FOREACH(request const& req, reqs)
+    {
+        error_code ign;
+        r.push_back(service(req, ign));
+    }
+
+    return r;
+}
 
 response symbol_namespace::bind(
     request const& req
@@ -287,7 +306,7 @@ response symbol_namespace::iterate(
     if (&ec != &throws)
         ec = make_success_code();
 
-    return response(symbol_ns_iterate);
+    return response(symbol_ns_iterate_names);
 } // }}}
 
 }}}

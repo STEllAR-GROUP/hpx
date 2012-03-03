@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -22,7 +22,7 @@ namespace hpx { namespace util
         naming::resolver_client& resolver, std::size_t count)
     {
         // create a new id
-        mutex_type::scoped_lock l(this);
+        mutex_type::scoped_lock l(mtx_);
 
         // ensure next_id doesn't overflow
         if ((lower_ + count) > upper_)

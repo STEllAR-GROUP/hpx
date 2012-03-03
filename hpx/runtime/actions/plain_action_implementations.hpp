@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -30,23 +30,29 @@
 #else // defined(BOOST_PP_IS_ITERATING)
 
 #define N BOOST_PP_ITERATION()
-#define HPX_ACTION_ARGUMENT(z, n, data) BOOST_PP_COMMA_IF(n) data.get<n>()
+#define HPX_ACTION_ARGUMENT(z, n, data)                                       \
+        BOOST_PP_COMMA_IF(n) boost::move(data.get<n>())                       \
+    /**/
 #define HPX_ACTION_DIRECT_ARGUMENT(z, n, data)                                \
-        BOOST_PP_COMMA_IF(n) boost::fusion::at_c<n>(data)                     \
+        BOOST_PP_COMMA_IF(n) boost::move(boost::fusion::at_c<n>(data))        \
     /**/
 #define HPX_REMOVE_QUALIFIERS(z, n, data)                                     \
         BOOST_PP_COMMA_IF(n)                                                  \
         typename detail::remove_qualifiers<BOOST_PP_CAT(T, n)>::type          \
     /**/
-#define HPX_PARAM_TYPES(z, n, data)                                           \
+
+#define HPX_FWD_ARGS(z, n, _)                                                 \
         BOOST_PP_COMMA_IF(n)                                                  \
-        BOOST_PP_CAT(data, n) const&                                          \
-        BOOST_PP_CAT(BOOST_PP_CAT(data, n), _)                                \
-    /**/
-#define HPX_PARAM_ARGUMENT(z, n, data)                                       \
-        BOOST_PP_COMMA_IF(n) BOOST_PP_CAT(BOOST_PP_CAT(data, n), _)          \
+            BOOST_FWD_REF(BOOST_PP_CAT(Arg, n)) BOOST_PP_CAT(arg, n)          \
     /**/
 
+#define HPX_FORWARD_ARGS(z, n, _)                                             \
+        BOOST_PP_COMMA_IF(n)                                                  \
+            boost::forward<BOOST_PP_CAT(Arg, n)>(BOOST_PP_CAT(arg, n))        \
+    /**/
+
+namespace hpx { namespace actions
+{
     ///////////////////////////////////////////////////////////////////////////
     //  N parameter version, with result
     template <
@@ -65,7 +71,8 @@
     {
     public:
         typedef Result result_type;
-        typedef boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
+        typedef boost::fusion::vector<
+            BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
         typedef action<
             components::server::plain_function<Derived>,
             BOOST_PP_CAT(function_result_action_arg, N), result_type,
@@ -79,42 +86,48 @@
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_base_result_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_base_result_action, N)(
                 threads::thread_priority priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
     protected:
         /// The \a thread_function will be registered as the thread
         /// function of a thread. It encapsulates the execution of the
         /// original function (given by \a func).
-        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        static threads::thread_state_enum thread_function(
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        struct thread_function
         {
-            try {
-                LTM_(debug) << "Executing plain action("
-                            << detail::get_action_name<Derived>()
-                            << ").";
-                F(BOOST_PP_ENUM_PARAMS(N, arg));      // call the function, ignoring the return value
-            }
-            catch (hpx::exception const& e) {
-                LTM_(error)
-                    << "Unhandled exception while executing plain action("
-                    << detail::get_action_name<Derived>()
-                    << "): " << e.what();
+            typedef threads::thread_state_enum result_type;
+            
+            template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+            result_type operator()(
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)) const
+            {
+                try {
+                    LTM_(debug) << "Executing plain action("
+                                << detail::get_action_name<Derived>()
+                                << ").";
+                    // call the function, ignoring the return value
+                    F(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+                }
+                catch (hpx::exception const& e) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>()
+                        << "): " << e.what();
 
-                // report this error to the console in any case
-                hpx::report_error(boost::current_exception());
+                    // report this error to the console in any case
+                    hpx::report_error(boost::current_exception());
+                }
+                return threads::terminated;
             }
-            return threads::terminated;
-        }
+        };
 
     public:
         typedef boost::mpl::false_ direct_execution;
@@ -126,14 +139,10 @@
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(naming::address::address_type lva,
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+            BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
-            // we need to assign the address of the thread function to a
-            // variable to  help the compiler to deduce the function type
-            threads::thread_state_enum (*f)(BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) =
-                &Derived::template thread_function<BOOST_PP_ENUM_PARAMS(N, Arg)>;
-
-            return HPX_STD_BIND(f, BOOST_PP_ENUM_PARAMS(N, arg));
+            return HPX_STD_BIND(typename Derived::thread_function()
+                    , BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
         }
 
         // This static construct_thread_function allows to construct
@@ -144,17 +153,17 @@
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva,
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+            BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
             return base_type::construct_continuation_thread_function(
-                HPX_STD_BIND(F, BOOST_PP_ENUM_PARAMS(N, arg)), cont);
+                cont, F, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
         }
 
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<BOOST_PP_CAT(plain_base_result_action, N), base_type>();
+            util::void_cast_register_nonvirt<
+                BOOST_PP_CAT(plain_base_result_action, N), base_type>();
             base_type::register_base();
         }
 
@@ -162,7 +171,7 @@
         // This get_thread_function will be invoked to retrieve the thread
         // function for an action which has to be invoked without continuations.
         HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(naming::address::address_type lva) const
+        get_thread_function(naming::address::address_type lva)
         {
             return construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
@@ -172,27 +181,10 @@
         // function for an action which has to be invoked with continuations.
         HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
-            naming::address::address_type lva) const
+            naming::address::address_type lva)
         {
             return construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
-        }
-
-        //
-        HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(naming::address::address_type lva,
-            arguments_type const& arg) const
-        {
-            return construct_thread_function(lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
-        }
-
-        HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(continuation_type& cont,
-            naming::address::address_type lva, arguments_type const& arg) const
-        {
-            return construct_thread_function(cont, lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
         }
 
     private:
@@ -202,7 +194,7 @@
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            ar & boost::serialization::base_object<base_type>(*this);
+            ar & util::base_object_nonvirt<base_type>(*this);
         }
     };
 
@@ -240,44 +232,35 @@
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_result_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_result_action, N)(
                 threads::thread_priority priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
-        Result execute_function(
-            naming::address::address_type lva,
-            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)) const
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+        static Result
+        execute_function(naming::address::address_type lva,
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
             LTM_(debug)
                 << "plain_result_action" << N
                 << "::execute_function name("
                 << detail::get_action_name<derived_type>() << ")";
-            return F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
-        }
 
-        static Result execute_function_nonvirt(
-            naming::address::address_type lva,
-            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T))
-        {
-            LTM_(debug)
-                << "plain_result_action" << N
-                << "::execute_function_nonvirt name("
-                << detail::get_action_name<derived_type>() << ")";
-            return F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
+            return F(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
         }
 
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<BOOST_PP_CAT(plain_result_action, N), base_type>();
+            util::void_cast_register_nonvirt<
+                BOOST_PP_CAT(plain_result_action, N), base_type>();
             base_type::register_base();
         }
 
@@ -288,7 +271,7 @@
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            ar & boost::serialization::base_object<base_type>(*this);
+            ar & util::base_object_nonvirt<base_type>(*this);
         }
 
     private:
@@ -300,7 +283,8 @@
             data.func = this->construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
@@ -316,40 +300,8 @@
             data.func = this->construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
-            data.parent_phase = this->parent_phase_;
-            data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_;
-            return data;
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const& arg)
-        {
-            data.lva = lva;
-            data.func = this->construct_thread_function(lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
-            data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
-            data.parent_phase = this->parent_phase_;
-            data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_;
-            return data;
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const& arg)
-        {
-            data.lva = lva;
-            data.func = this->construct_thread_function(cont, lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
-            data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
@@ -387,47 +339,38 @@
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_direct_result_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_direct_result_action, N)(
                 threads::thread_priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
     public:
         typedef boost::mpl::true_ direct_execution;
 
-        Result execute_function(
-            naming::address::address_type lva,
-            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)) const
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+        static Result
+        execute_function(naming::address::address_type lva,
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
             LTM_(debug)
                 << "plain_direct_result_action" << N
                 << "::execute_function name("
                 << detail::get_action_name<derived_type>() << ")";
-            return F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
-        }
 
-        static Result execute_function_nonvirt(
-            naming::address::address_type lva,
-            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T))
-        {
-            LTM_(debug)
-                << "plain_direct_result_action" << N
-                << "::execute_function_nonvirt name("
-                << detail::get_action_name<derived_type>() << ")";
-            return F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
+            return F(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
         }
 
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<BOOST_PP_CAT(plain_direct_result_action, N), base_type>();
+            util::void_cast_register_nonvirt<
+                BOOST_PP_CAT(plain_direct_result_action, N), base_type>();
             base_type::register_base();
         }
 
@@ -438,7 +381,7 @@
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            ar & boost::serialization::base_object<base_type>(*this);
+            ar & util::base_object_nonvirt<base_type>(*this);
         }
 
     private:
@@ -458,7 +401,8 @@
             data.func = this->construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
@@ -474,40 +418,8 @@
             data.func = this->construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
-            data.parent_phase = this->parent_phase_;
-            data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_;
-            return data;
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const& arg)
-        {
-            data.lva = lva;
-            data.func = this->construct_thread_function(lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
-            data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
-            data.parent_phase = this->parent_phase_;
-            data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_;
-            return data;
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const& arg)
-        {
-            data.lva = lva;
-            data.func = this->construct_thread_function(cont, lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
-            data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
@@ -546,42 +458,49 @@
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_base_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_base_action, N)(
                 threads::thread_priority priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
     protected:
         /// The \a thread_function will be registered as the thread
         /// function of a thread. It encapsulates the execution of the
         /// original function (given by \a func).
-        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        static threads::thread_state_enum thread_function(
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+        struct thread_function
         {
-            try {
-                LTM_(debug) << "Executing plain action("
-                            << detail::get_action_name<Derived>()
-                            << ").";
-                F(BOOST_PP_ENUM_PARAMS(N, arg));      // call the function, ignoring the return value
-            }
-            catch (hpx::exception const& e) {
-                LTM_(error)
-                    << "Unhandled exception while executing plain action("
-                    << detail::get_action_name<Derived>()
-                    << "): " << e.what();
+            typedef threads::thread_state_enum result_type;
 
-                // report this error to the console in any case
-                hpx::report_error(boost::current_exception());
+            template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+            result_type operator()(
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)) const
+            {
+                try {
+                    LTM_(debug) << "Executing plain action("
+                                << detail::get_action_name<Derived>()
+                                << ").";
+                    // call the function, ignoring the return value
+                    F(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+                }
+                catch (hpx::exception const& e) {
+                    LTM_(error)
+                        << "Unhandled exception while executing plain action("
+                        << detail::get_action_name<Derived>()
+                        << "): " << e.what();
+
+                    // report this error to the console in any case
+                    hpx::report_error(boost::current_exception());
+                }
+                return threads::terminated;
             }
-            return threads::terminated;
-        }
+            
+        };
 
     public:
         typedef boost::mpl::false_ direct_execution;
@@ -593,14 +512,11 @@
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(naming::address::address_type lva,
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+            BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
-            // we need to assign the address of the thread function to a
-            // variable to  help the compiler to deduce the function type
-            threads::thread_state_enum (*f)(BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg)) =
-                &Derived::template thread_function<BOOST_PP_ENUM_PARAMS(N, Arg)>;
-
-            return HPX_STD_BIND(f, BOOST_PP_ENUM_PARAMS(N, arg));
+            return
+                HPX_STD_BIND(typename Derived::thread_function(),
+                    BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
         }
 
         // This static construct_thread_function allows to construct
@@ -611,23 +527,23 @@
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva,
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+            BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
             return base_type::construct_continuation_thread_function_void(
-                HPX_STD_BIND(F, BOOST_PP_ENUM_PARAMS(N, arg)), cont);
+                cont, F, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
         }
 
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<BOOST_PP_CAT(plain_base_action, N), base_type>();
+            util::void_cast_register_nonvirt<
+                BOOST_PP_CAT(plain_base_action, N), base_type>();
             base_type::register_base();
         }
 
     private:
         HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(naming::address::address_type lva) const
+        get_thread_function(naming::address::address_type lva)
         {
             return construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
@@ -635,27 +551,10 @@
 
         HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
-            naming::address::address_type lva) const
+            naming::address::address_type lva)
         {
             return construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
-        }
-
-        ///
-        HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(naming::address::address_type lva,
-            arguments_type const& arg) const
-        {
-            return construct_thread_function(lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
-        }
-
-        HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(continuation_type& cont,
-            naming::address::address_type lva, arguments_type const& arg) const
-        {
-            return construct_thread_function(cont, lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
         }
 
     private:
@@ -665,7 +564,7 @@
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            ar & boost::serialization::base_object<base_type>(*this);
+            ar & util::base_object_nonvirt<base_type>(*this);
         }
     };
 
@@ -701,46 +600,36 @@
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_action, N)(
                 threads::thread_priority priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
-        util::unused_type execute_function(
-            naming::address::address_type lva,
-            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)) const
+        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+        static util::unused_type
+        execute_function(naming::address::address_type lva,
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
             LTM_(debug)
                 << "plain_action" << N
                 << "::execute_function name("
                 << detail::get_action_name<derived_type>() << ")";
-            F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
-            return util::unused;
-        }
 
-        static util::unused_type execute_function_nonvirt(
-            naming::address::address_type lva,
-            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T))
-        {
-            LTM_(debug)
-                << "plain_action" << N
-                << "::execute_function_nonvirt name("
-                << detail::get_action_name<derived_type>() << ")";
-            F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
+            F(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
             return util::unused;
         }
 
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<BOOST_PP_CAT(plain_action, N), base_type>();
+            util::void_cast_register_nonvirt<
+                BOOST_PP_CAT(plain_action, N), base_type>();
             base_type::register_base();
         }
 
@@ -751,7 +640,7 @@
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            ar & boost::serialization::base_object<base_type>(*this);
+            ar & util::base_object_nonvirt<base_type>(*this);
         }
 
     private:
@@ -763,7 +652,8 @@
             data.func = this->construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
@@ -779,40 +669,8 @@
             data.func = this->construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
-            data.parent_phase = this->parent_phase_;
-            data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_;
-            return data;
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const& arg)
-        {
-            data.lva = lva;
-            data.func = this->construct_thread_function(lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
-            data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
-            data.parent_phase = this->parent_phase_;
-            data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_;
-            return data;
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const& arg)
-        {
-            data.lva = lva;
-            data.func = this->construct_thread_function(cont, lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
-            data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
@@ -849,49 +707,39 @@
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_direct_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_direct_action, N)(
                 threads::thread_priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
     public:
         typedef boost::mpl::true_ direct_execution;
 
-        util::unused_type execute_function(
-            naming::address::address_type lva,
-            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)
-        ) const {
+        template<BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+        static util::unused_type
+        execute_function(naming::address::address_type lva,
+            BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+        {
             LTM_(debug)
                 << "plain_base_action" << N
                 << "::execute_function name("
                 << detail::get_action_name<derived_type>() << ")";
-            F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
-            return util::unused;
-        }
 
-        static util::unused_type execute_function_nonvirt(
-            naming::address::address_type lva,
-            BOOST_PP_REPEAT(N, HPX_PARAM_TYPES, T)
-        ) {
-            LTM_(debug)
-                << "plain_base_action" << N
-                << "::execute_function_nonvirt name("
-                << detail::get_action_name<derived_type>() << ")";
-            F(BOOST_PP_REPEAT(N, HPX_PARAM_ARGUMENT, T));
+            F(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
             return util::unused;
         }
 
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<BOOST_PP_CAT(plain_direct_action, N), base_type>();
+            util::void_cast_register_nonvirt<
+                BOOST_PP_CAT(plain_direct_action, N), base_type>();
             base_type::register_base();
         }
 
@@ -902,7 +750,7 @@
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            ar & boost::serialization::base_object<base_type>(*this);
+            ar & util::base_object_nonvirt<base_type>(*this);
         }
 
     private:
@@ -921,7 +769,8 @@
             data.func = this->construct_thread_function(lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
@@ -937,65 +786,23 @@
             data.func = this->construct_thread_function(cont, lva,
                 BOOST_PP_REPEAT(N, HPX_ACTION_ARGUMENT, (*this)));
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
-            data.parent_phase = this->parent_phase_;
-            data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_;
-            return data;
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const& arg)
-        {
-            data.lva = lva;
-            data.func = this->construct_thread_function(lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
-            data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
-            data.parent_phase = this->parent_phase_;
-            data.parent_prefix = this->parent_locality_;
-            data.priority = this->priority_;
-            return data;
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const& arg)
-        {
-            data.lva = lva;
-            data.func = this->construct_thread_function(cont, lva,
-                BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, arg));
-            data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
             return data;
         }
     };
-    
+
     template <
         BOOST_PP_ENUM_PARAMS(N, typename T),
         void (*F)(BOOST_PP_ENUM_PARAMS(N, T)),
-        threads::thread_priority Priority,
-        typename Derived>
+        threads::thread_priority Priority, typename Derived>
     class BOOST_PP_CAT(plain_result_action, N)<
-        void
-      , BOOST_PP_ENUM_PARAMS(N, T)
-      , F
-      , Priority
-      , Derived
-    >
+                void, BOOST_PP_ENUM_PARAMS(N, T), F, Priority, Derived>
       : public BOOST_PP_CAT(plain_action, N)<
-            BOOST_PP_ENUM_PARAMS(N, T)
-          , F
-          , Priority
-          , Derived
-        >
+            BOOST_PP_ENUM_PARAMS(N, T), F, Priority, Derived>
     {
     private:
         typedef BOOST_PP_CAT(plain_action, N)<
@@ -1011,22 +818,22 @@
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_result_action, N)(
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(plain_result_action, N)(
                 threads::thread_priority priority,
-                BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-          : base_type(priority, BOOST_PP_ENUM_PARAMS(N, arg))
+                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+          : base_type(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<BOOST_PP_CAT(plain_result_action, N), base_type>();
+            util::void_cast_register_nonvirt<
+                BOOST_PP_CAT(plain_result_action, N), base_type>();
             base_type::register_base();
         }
 
@@ -1037,12 +844,90 @@
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            ar & boost::serialization::base_object<base_type>(*this);
+            ar & util::base_object_nonvirt<base_type>(*this);
         }
     };
+}}
 
-#undef HPX_PARAM_ARGUMENT
-#undef HPX_PARAM_TYPES
+// Disabling the guid initialization stuff for plain actions
+namespace hpx { namespace actions { namespace detail
+{
+    template <
+        BOOST_PP_ENUM_PARAMS(N, typename Arg)
+      , void (*F)(BOOST_PP_ENUM_PARAMS(N, Arg))
+      , hpx::threads::thread_priority Priority
+      , typename Enable
+    >
+    struct needs_guid_initialization<
+        BOOST_PP_CAT(hpx::actions::plain_action, N)<
+            BOOST_PP_ENUM_PARAMS(N, Arg)
+          , F
+          , Priority
+        >
+      , Enable
+    >
+        : boost::mpl::false_
+    {};
+
+    template <
+        BOOST_PP_ENUM_PARAMS(N, typename Arg)
+      , void (*F)(BOOST_PP_ENUM_PARAMS(N, Arg))
+      , typename Derived
+      , typename Enable
+    >
+    struct needs_guid_initialization<
+        BOOST_PP_CAT(hpx::actions::plain_direct_action, N)<
+            BOOST_PP_ENUM_PARAMS(N, Arg)
+          , F
+          , Derived
+        >
+      , Enable
+    >
+        : boost::mpl::false_
+    {};
+
+    template <
+        typename R
+      , BOOST_PP_ENUM_PARAMS(N, typename Arg)
+      , R(*F)(BOOST_PP_ENUM_PARAMS(N, Arg))
+      , hpx::threads::thread_priority Priority
+      , typename Enable
+    >
+    struct needs_guid_initialization<
+        BOOST_PP_CAT(hpx::actions::plain_result_action, N)<
+            R
+          , BOOST_PP_ENUM_PARAMS(N, Arg)
+          , F
+          , Priority
+        >
+      , Enable
+    >
+        : boost::mpl::false_
+    {};
+
+    template <
+        typename R
+      , BOOST_PP_ENUM_PARAMS(N, typename Arg)
+      , R(*F)(BOOST_PP_ENUM_PARAMS(N, Arg))
+      , typename Derived
+      , typename Enable
+    >
+    struct needs_guid_initialization<
+        BOOST_PP_CAT(hpx::actions::plain_direct_result_action, N)<
+            R
+          , BOOST_PP_ENUM_PARAMS(N, Arg)
+          , F
+          , Derived
+        >
+      , Enable
+    >
+        : boost::mpl::false_
+    {};
+}}}
+
+///////////////////////////////////////////////////////////////////////////////
+#undef HPX_FORWARD_ARGS
+#undef HPX_FWD_ARGS
 #undef HPX_REMOVE_QUALIFIERS
 #undef HPX_ACTION_DIRECT_ARGUMENT
 #undef HPX_ACTION_ARGUMENT

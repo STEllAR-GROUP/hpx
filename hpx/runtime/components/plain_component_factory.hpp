@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,8 +25,6 @@
 namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class plain_component_factory component_factory.hpp hpx/runtime/components/plain_component_factory.hpp
-    ///
     /// The \a plain_component_factory provides a minimal implementation of a
     /// component's factory usable for plain_actions.
     ///
@@ -125,7 +123,7 @@ namespace hpx { namespace components
         naming::gid_type create (std::size_t count)
         {
             HPX_THROW_EXCEPTION(bad_request,
-                "derived_component_factory_one::create",
+                "plain_component_factory::create",
                 "create is not supported by this factory instance (" +
                 get_component_name() + ")");
             return naming::invalid_gid;
@@ -143,7 +141,14 @@ namespace hpx { namespace components
         naming::gid_type create_one (components::constructor_argument const&)
         {
             HPX_THROW_EXCEPTION(bad_request,
-                "derived_component_factory::create_one",
+                "plain_component_factory::create_one",
+                "create_one is not supported by this factory instance");
+            return naming::invalid_gid;
+        }
+        naming::gid_type create_one_functor(HPX_STD_FUNCTION<void(void*)> const&)
+        {
+            HPX_THROW_EXCEPTION(bad_request,
+                "plain_component_factory::create_one",
                 "create_one is not supported by this factory instance");
             return naming::invalid_gid;
         }
@@ -177,6 +182,7 @@ namespace hpx { namespace components
 /// register a minimal factory for plain actions with Boost.Plugin.
 #define HPX_REGISTER_PLAIN_ACTION_EX2(plain_action, plain_action_name,        \
         enable_always)                                                        \
+    BOOST_CLASS_EXPORT_KEY2(plain_action, BOOST_PP_STRINGIZE(plain_action_name))\
     HPX_REGISTER_ACTION_EX(plain_action, plain_action_name);                  \
     HPX_REGISTER_COMPONENT_FACTORY(                                           \
         hpx::components::plain_component_factory<plain_action>,               \

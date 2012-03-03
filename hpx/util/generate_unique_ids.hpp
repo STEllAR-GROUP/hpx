@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,9 +13,13 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
-#include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/spinlock.hpp>
 #include <hpx/exception.hpp>
+
+#if defined(BOOST_MSVC)
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
 
 namespace hpx { namespace util
 {
@@ -23,8 +27,9 @@ namespace hpx { namespace util
     /// unique ids for components, parcels, threads etc.
     class HPX_EXPORT unique_id_ranges
     {
-        struct tag {};
-        typedef hpx::util::spinlock_pool<tag> mutex_type;
+        typedef hpx::util::spinlock mutex_type;
+
+        mutex_type mtx_;
 
         /// size of the id range returned by command_getidrange
         /// FIXME: is this a policy?
@@ -108,6 +113,10 @@ namespace hpx { namespace util
         }
     };
 }}
+
+#if defined(BOOST_MSVC)
+#pragma warning(pop)
+#endif
 
 #endif
 

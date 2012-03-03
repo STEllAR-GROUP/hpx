@@ -3,20 +3,20 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/hpx_init.hpp>
+#include <hpx/lcos/async_future_wait.hpp>
+#include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/components/plain_component_factory.hpp>
+#include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/lcos/eager_future.hpp>
+#include <hpx/include/iostreams.hpp>
+
 #include <stdexcept>
 
 #include <boost/format.hpp>
 #include <boost/bind.hpp>
 #include <boost/cstdint.hpp>
-
-#include <hpx/runtime.hpp>
-#include <hpx/hpx_init.hpp>
-#include <hpx/lcos/async_future_wait.hpp>
-#include <hpx/runtime/actions/plain_action.hpp>
-#include <hpx/runtime/components/plain_component_factory.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/lcos/eager_future.hpp>
-#include <hpx/include/iostreams.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;

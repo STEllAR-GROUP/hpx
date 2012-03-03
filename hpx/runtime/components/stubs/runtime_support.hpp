@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,6 +11,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/apply.hpp>
+#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/util/ini.hpp>
@@ -266,28 +267,28 @@ namespace hpx { namespace components { namespace stubs
             return create_memory_block_async(id.get_gid(), count, act).get();
         }
 
-        static lcos::promise<void>
+        static lcos::promise<bool>
         load_components_async(naming::id_type const& gid)
         {
             typedef server::runtime_support::load_components_action action_type;
-            return lcos::eager_future<action_type, void>(gid.get_gid());
+            return lcos::eager_future<action_type>(gid.get_gid());
         }
 
-        static void load_components(naming::id_type const& gid)
+        static bool load_components(naming::id_type const& gid)
         {
-            load_components_async(gid).get();
+            return load_components_async(gid).get();
         }
 
         static lcos::promise<void>
-        call_startup_functions_async(naming::id_type const& gid)
+        call_startup_functions_async(naming::id_type const& gid, bool pre_startup)
         {
             typedef server::runtime_support::call_startup_functions_action action_type;
-            return lcos::eager_future<action_type, void>(gid.get_gid());
+            return lcos::eager_future<action_type, void>(gid.get_gid(), pre_startup);
         }
 
-        static void call_startup_functions(naming::id_type const& gid)
+        static void call_startup_functions(naming::id_type const& gid, bool pre_startup)
         {
-            call_startup_functions_async(gid).get();
+            call_startup_functions_async(gid, pre_startup).get();
         }
 
         static lcos::promise<void>
@@ -303,27 +304,32 @@ namespace hpx { namespace components { namespace stubs
         }
 
         static void free_component_sync(components::component_type type,
-            naming::gid_type const& gid)
+            naming::gid_type const& gid, boost::uint64_t count)
+        {
+            free_component_sync(type, gid, naming::gid_type(0, count));
+        }
+
+        static void free_component_sync(components::component_type type,
+            naming::gid_type const& gid, naming::gid_type const& count)
         {
             typedef server::runtime_support::free_component_action action_type;
 
             // Determine whether the gid of the component to delete is local or
             // remote
-            naming::address addr;
-            applier::applier& appl = hpx::applier::get_applier();
             //naming::resolver_client& agas = appl.get_agas_client();
-            if (/*agas.is_bootstrap() || */appl.address_is_local(gid, addr)) {
+            if (/*agas.is_bootstrap() || */agas::is_local_address(gid)) {
                 // apply locally
-                applier::detail::apply_helper2<
-                    action_type
-                >::call(appl.get_runtime_support_raw_gid().get_lsb(),
-                        threads::thread_priority_default, type, gid);
+                applier::detail::apply_helper3<action_type>::call(
+                    applier::get_applier().get_runtime_support_raw_gid().get_lsb(),
+                    threads::thread_priority_default, type, gid, count);
             }
             else {
                 // apply remotely
-                naming::gid_type prefix = naming::get_gid_from_prefix(
-                    naming::get_prefix_from_gid(gid));
-                lcos::eager_future<action_type, void>(prefix, type, gid).get();
+                // FIXME: Resolve the locality instead of deducing it from
+                // the target GID, otherwise this will break once we start
+                // moving objects.
+                naming::gid_type prefix = naming::get_locality_from_gid(gid);
+                lcos::eager_future<action_type, void>(prefix, type, gid, count).get();
             }
         }
 
@@ -410,6 +416,50 @@ namespace hpx { namespace components { namespace stubs
             typedef server::runtime_support::update_agas_cache_action
                 action_type;
             hpx::applier::apply<action_type>(targetgid, gid, g);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        static void
+        garbage_collect_non_blocking(naming::id_type const& targetgid)
+        {
+            typedef server::runtime_support::garbage_collect_action
+                action_type;
+            hpx::applier::apply<action_type>(targetgid);
+        }
+
+        static lcos::promise<void>
+        garbage_collect_async(naming::id_type const& targetgid)
+        {
+            typedef server::runtime_support::garbage_collect_action
+                action_type;
+            return lcos::eager_future<action_type, void>(targetgid);
+        }
+
+        static void
+        garbage_collect(naming::id_type const& targetgid)
+        {
+            typedef server::runtime_support::garbage_collect_action
+                action_type;
+            lcos::eager_future<action_type, void>(targetgid).get();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        static lcos::promise<naming::gid_type>
+        create_performance_counter_async(naming::id_type targetgid,
+            performance_counters::counter_info const& info)
+        {
+            typedef server::runtime_support::create_performance_counter_action
+                action_type;
+            return lcos::eager_future<action_type, naming::gid_type>(targetgid, info);
+        }
+
+        static naming::gid_type
+        create_performance_counter(naming::id_type targetgid,
+            performance_counters::counter_info const& info)
+        {
+            typedef server::runtime_support::create_performance_counter_action
+                action_type;
+            return lcos::eager_future<action_type, naming::gid_type>(targetgid, info).get();
         }
 
         ///////////////////////////////////////////////////////////////////////

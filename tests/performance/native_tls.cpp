@@ -10,6 +10,7 @@
 #include <boost/format.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/tss.hpp>
+#include <boost/thread/barrier.hpp>
 #include <boost/program_options.hpp>
 
 #include <hpx/util/high_resolution_timer.hpp>
@@ -37,15 +38,20 @@ static HPX_NATIVE_TLS double* global_scratch;
 
 ///////////////////////////////////////////////////////////////////////////////
 inline void worker(
-    boost::uint64_t updates
+    boost::barrier& b
+  , boost::uint64_t updates
     )
 {
-    global_scratch = new double;
+    b.wait();
 
     for (boost::uint64_t i = 0; i < updates; ++i)
-        *global_scratch += 1 / (2. * i + 1);
+    {
+        global_scratch = new double;
 
-    delete global_scratch;
+        *global_scratch += 1 / (2. * i * (*global_scratch) + 1);
+
+        delete global_scratch;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -60,18 +66,18 @@ int main(
 
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
-    boost::uint64_t threads, updates;
+    boost::uint32_t threads, updates;
 
     cmdline.add_options()
         ( "help,h"
         , "print out program usage (this message)")
 
         ( "threads,t"
-        , value<boost::uint64_t>(&threads)->default_value(1),
+        , value<boost::uint32_t>(&threads)->default_value(1),
          "number of OS-threads")
 
         ( "updates,u"
-        , value<boost::uint64_t>(&updates)->default_value(1 << 22)
+        , value<boost::uint32_t>(&updates)->default_value(1 << 22)
         , "updates made to the TLS variable per OS-thread")
 
         ( "csv"
@@ -95,10 +101,12 @@ int main(
     // run the test
     boost::thread_group workers;
 
+    boost::barrier b(threads);
+
     high_resolution_timer t;
 
-    for (boost::uint64_t i = 0; i != threads; ++i)
-        workers.add_thread(new boost::thread(worker, updates));
+    for (boost::uint32_t i = 0; i != threads; ++i)
+        workers.add_thread(new boost::thread(worker, boost::ref(b), updates));
 
     workers.join_all();
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -52,6 +52,44 @@ namespace sheneos { namespace stubs
             double ye, double temp, double rho, boost::uint32_t eosvalues)
         {
             return interpolate_async(gid, ye, temp, rho, eosvalues).get();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        static hpx::lcos::promise<double>
+        interpolate_one_async(hpx::naming::id_type const& gid,
+            double ye, double temp, double rho, boost::uint32_t eosvalues)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise.
+            typedef sheneos::server::partition3d::interpolate_one_action action_type;
+            return hpx::lcos::async<action_type>(gid, ye, temp, rho, eosvalues);
+        }
+
+        static double interpolate_one(hpx::naming::id_type const& gid,
+            double ye, double temp, double rho, boost::uint32_t eosvalues)
+        {
+            return interpolate_one_async(gid, ye, temp, rho, eosvalues).get();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        static hpx::lcos::promise<std::vector<double> >
+        interpolate_one_bulk_async(hpx::naming::id_type const& gid,
+            std::vector<double> const& ye, std::vector<double> const& temp,
+            std::vector<double> const& rho, boost::uint32_t eosvalues)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the promise.
+            typedef sheneos::server::partition3d::interpolate_one_bulk_action
+                action_type;
+            return hpx::lcos::async<action_type>(gid, ye, temp, rho, eosvalues);
+        }
+
+        static std::vector<double> interpolate_one_bulk(
+            hpx::naming::id_type const& gid, std::vector<double> const& ye,
+            std::vector<double> const& temp, std::vector<double> const& rho,
+            boost::uint32_t eosvalues)
+        {
+            return interpolate_one_bulk_async(gid, ye, temp, rho, eosvalues).get();
         }
     };
 }}

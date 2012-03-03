@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,13 +10,14 @@
 #include <memory>
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/spinlock.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
 #include <boost/aligned_storage.hpp>
+#include <boost/move/move.hpp>
 #include <boost/type_traits/alignment_of.hpp>
 #include <boost/type_traits/add_pointer.hpp>
 #include <boost/intrusive/slist.hpp>
@@ -33,9 +34,9 @@ namespace hpx { namespace util { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     // data structure holding all counters for full_empty entries
-    struct counter_data
+    struct full_empty_counter_data
     {
-        counter_data()
+        full_empty_counter_data()
           : constructed_(0), destructed_(0),
             read_enqueued_(0), read_dequeued_(0), set_full_(0)
         {}
@@ -45,18 +46,19 @@ namespace hpx { namespace util { namespace detail
         boost::int64_t read_enqueued_;
         boost::int64_t read_dequeued_;
         boost::int64_t set_full_;
+        lcos::local::spinlock mtx_;
     };
-    extern HPX_EXPORT counter_data counter_data_;
+    extern HPX_EXPORT full_empty_counter_data full_empty_counter_data_;
 
-    // call this to install all counters for full_empty entries
-    void install_counters();
+    // call this to register all counter types for full_empty entries
+    void register_counter_types();
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Data>
     class full_empty_entry
     {
     public:
-        typedef util::spinlock mutex_type;
+        typedef lcos::local::spinlock mutex_type;
 
     private:
         typedef threads::thread_id_type thread_id_type;
@@ -117,18 +119,18 @@ namespace hpx { namespace util { namespace detail
 
     public:
         full_empty_entry()
-          : state_(empty)
+          : data_(), state_(empty)
         {
-            ::new (get_address()) Data();      // properly initialize memory
-            ++counter_data_.constructed_;
+            lcos::local::spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
+            ++full_empty_counter_data_.constructed_;
         }
 
         template <typename T0>
-        explicit full_empty_entry(T0 const& t0)
-          : state_(empty)
+        explicit full_empty_entry(BOOST_FWD_REF(T0) t0)
+          : data_(boost::forward<T0>(t0)), state_(empty)
         {
-            ::new (get_address()) Data(t0);    // properly initialize memory
-            ++counter_data_.constructed_;
+            lcos::local::spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
+            ++full_empty_counter_data_.constructed_;
         }
 
         ~full_empty_entry()
@@ -139,8 +141,9 @@ namespace hpx { namespace util { namespace detail
                 log_non_empty_queue("read_and_empty_queue", read_and_empty_queue_);
                 log_non_empty_queue("read_queue", read_queue_);
             }
-            get_address()->Data::~Data();      // properly destruct value in memory
-            ++counter_data_.destructed_;
+
+            lcos::local::spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
+            ++full_empty_counter_data_.destructed_;
         }
 
         // returns whether this entry is currently empty
@@ -151,17 +154,17 @@ namespace hpx { namespace util { namespace detail
         }
 
         // sets this entry to empty
-        bool set_empty()
+        bool set_empty(error_code& ec = throws)
         {
             mutex_type::scoped_lock l(mtx_);
-            return set_empty_locked();
+            return set_empty_locked(ec);
         }
 
         // sets this entry to full
-        bool set_full()
+        bool set_full(error_code& ec = throws)
         {
             mutex_type::scoped_lock l(mtx_);
-            return set_full_locked();
+            return set_full_locked(ec);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -188,7 +191,10 @@ namespace hpx { namespace util { namespace detail
                 typename queue_type::const_iterator last = read_queue_.last();
                 threads::thread_state_ex_enum statex;
 
-                ++counter_data_.read_enqueued_;
+                {
+                    lcos::local::spinlock::scoped_lock ll(full_empty_counter_data_.mtx_);
+                    ++full_empty_counter_data_.read_enqueued_;
+                }
 
                 {
                     // yield this thread
@@ -196,7 +202,10 @@ namespace hpx { namespace util { namespace detail
                     statex = self->yield(threads::suspended);
                 }
 
-                ++counter_data_.read_dequeued_;
+                {
+                    lcos::local::spinlock::scoped_lock ll(full_empty_counter_data_.mtx_);
+                    ++full_empty_counter_data_.read_dequeued_;
+                }
 
                 if (f.id_)
                     read_queue_.erase(last);     // remove entry from queue
@@ -219,8 +228,7 @@ namespace hpx { namespace util { namespace detail
             }
 
             // copy the data to the destination
-            if (get_address() != &dest)
-                dest = *get_address();
+            dest = data_;
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -248,7 +256,10 @@ namespace hpx { namespace util { namespace detail
                 typename queue_type::const_iterator last = read_queue_.last();
                 threads::thread_state_ex_enum statex;
 
-                ++counter_data_.read_enqueued_;
+                {
+                    lcos::local::spinlock::scoped_lock ll(full_empty_counter_data_.mtx_);
+                    ++full_empty_counter_data_.read_enqueued_;
+                }
 
                 {
                     // yield this thread
@@ -256,7 +267,10 @@ namespace hpx { namespace util { namespace detail
                     statex = self->yield(threads::suspended);
                 }
 
-                ++counter_data_.read_dequeued_;
+                {
+                    lcos::local::spinlock::scoped_lock ll(full_empty_counter_data_.mtx_);
+                    ++full_empty_counter_data_.read_dequeued_;
+                }
 
                 if (f.id_)
                     read_queue_.erase(last);     // remove entry from queue
@@ -331,15 +345,14 @@ namespace hpx { namespace util { namespace detail
                     return;
                 }
 
-                // copy the data to the destination
-                if (get_address() != &dest)
-                    dest = *get_address();
+                // move the data to the destination
+                dest = boost::move(data_);
             }
             else {
-                // copy the data to the destination
-                if (get_address() != &dest)
-                    dest = *get_address();
-                set_empty_locked();   // state_ = empty;
+                // move the data to the destination
+                dest = boost::move(data_);
+                set_empty_locked(ec);   // state_ = empty;
+                if (ec) return;
             }
 
             if (&ec != &throws)
@@ -394,7 +407,8 @@ namespace hpx { namespace util { namespace detail
                 }
             }
             else {
-                set_empty_locked();   // state_ = empty
+                set_empty_locked(ec);   // state_ = empty
+                if (ec) return;
             }
 
             if (&ec != &throws)
@@ -404,7 +418,7 @@ namespace hpx { namespace util { namespace detail
         ///////////////////////////////////////////////////////////////////////
         // enqueue if entry is full, otherwise fill it
         template <typename T>
-        void enqueue_if_full(T const& src, error_code& ec = throws)
+        void enqueue_if_full(BOOST_FWD_REF(T) src, error_code& ec = throws)
         {
             threads::thread_self* self = threads::get_self_ptr_checked(ec);
             if (ec) return;
@@ -452,11 +466,11 @@ namespace hpx { namespace util { namespace detail
             }
 
             // set the data
-            if (get_address() != &src)
-                *get_address() = src;
+            data_ = boost::forward<Data>(src);
 
             // make sure the entry is full
-            set_full_locked();    // state_ = full
+            set_full_locked(ec);    // state_ = full
+            if (ec) return;
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -510,7 +524,8 @@ namespace hpx { namespace util { namespace detail
             }
 
             // make sure the entry is full
-            set_full_locked();    // state_ = full
+            set_full_locked(ec);    // state_ = full
+            if (ec) return;
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -519,25 +534,24 @@ namespace hpx { namespace util { namespace detail
         ///////////////////////////////////////////////////////////////////////
         // unconditionally set the data and set the entry to full
         template <typename T>
-        void set_and_fill(T const& src)
+        void set_and_fill(BOOST_FWD_REF(T) src, error_code& ec = throws)
         {
             mutex_type::scoped_lock l(mtx_);
 
             // set the data
-            if (get_address() != &src)
-                *get_address() = src;
+            data_ = boost::forward<T>(src);
 
             // make sure the entry is full
-            set_full_locked();    // state_ = full
+            set_full_locked(ec);    // state_ = full
         }
 
         // same as above, but for entries without associated data
-        void set_and_fill()
+        void set_and_fill(error_code& ec = throws)
         {
             mutex_type::scoped_lock l(mtx_);
 
             // make sure the entry is full
-            set_full_locked();    // state_ = full
+            set_full_locked(ec);    // state_ = full
         }
 
         // returns whether this entry is still in use
@@ -548,7 +562,7 @@ namespace hpx { namespace util { namespace detail
         }
 
     protected:
-        bool set_empty_locked()
+        bool set_empty_locked(error_code& ec)
         {
             state_ = empty;
 
@@ -556,16 +570,22 @@ namespace hpx { namespace util { namespace detail
                 threads::thread_id_type id = write_queue_.front().id_;
                 write_queue_.front().id_ = 0;
                 write_queue_.pop_front();
-                threads::set_thread_lco_description(id);
-                threads::set_thread_state(id, threads::pending);
-                set_full_locked();    // state_ = full
+
+                threads::set_thread_lco_description(id, 0, ec);
+                if (ec) return false;
+
+                threads::set_thread_state(id, threads::pending,
+                    threads::wait_timeout, threads::thread_priority_normal, ec);
+
+                set_full_locked(ec);    // state_ = full
+                if (ec) return false;
             }
 
             // return whether this block needs to be removed
             return state_ == full && !is_used_locked();
         }
 
-        bool set_full_locked()
+        bool set_full_locked(error_code& ec)
         {
             state_ = full;
 
@@ -574,9 +594,16 @@ namespace hpx { namespace util { namespace detail
                 threads::thread_id_type id = read_queue_.front().id_;
                 read_queue_.front().id_ = 0;
                 read_queue_.pop_front();
-                threads::set_thread_lco_description(id);
-                threads::set_thread_state(id, threads::pending);
-                ++counter_data_.set_full_;
+
+                threads::set_thread_lco_description(id, 0, ec);
+                if (ec) return false;
+
+                threads::set_thread_state(id, threads::pending,
+                    threads::wait_timeout, threads::thread_priority_normal, ec);
+                if (ec) return false;
+
+                lcos::local::spinlock::scoped_lock l(full_empty_counter_data_.mtx_);
+                ++full_empty_counter_data_.set_full_;
             }
 
             // since we got full now we need to re-activate one thread waiting
@@ -585,9 +612,16 @@ namespace hpx { namespace util { namespace detail
                 threads::thread_id_type id = read_and_empty_queue_.front().id_;
                 read_and_empty_queue_.front().id_ = 0;
                 read_and_empty_queue_.pop_front();
-                threads::set_thread_lco_description(id);
-                threads::set_thread_state(id, threads::pending);
-                set_empty_locked();   // state_ = empty
+
+                threads::set_thread_lco_description(id, 0, ec);
+                if (ec) return false;
+
+                threads::set_thread_state(id, threads::pending,
+                    threads::wait_timeout, threads::thread_priority_normal, ec);
+                if (ec) return false;
+
+                set_empty_locked(ec);   // state_ = empty
+                if (ec) return false;
             }
 
             // return whether this block needs to be removed
@@ -601,27 +635,12 @@ namespace hpx { namespace util { namespace detail
 
     private:
         typedef Data value_type;
-        typedef boost::aligned_storage<sizeof(value_type),
-            boost::alignment_of<value_type>::value> storage_type;
-
-        // type safe accessors to the stored data
-        typedef typename boost::add_pointer<value_type>::type pointer;
-        typedef typename boost::add_pointer<value_type const>::type const_pointer;
-
-        pointer get_address()
-        {
-            return static_cast<pointer>(data_.address());
-        }
-        const_pointer get_address() const
-        {
-            return static_cast<const_pointer>(data_.address());
-        }
 
         mutable mutex_type mtx_;
         queue_type write_queue_;              // threads waiting in write
         queue_type read_and_empty_queue_;     // threads waiting in read_and_empty
         queue_type read_queue_;               // threads waiting in read
-        storage_type data_;                   // protected data
+        value_type data_;                     // protected data
         full_empty state_;                    // current full/empty state
     };
 }}}

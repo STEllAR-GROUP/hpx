@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach & Katelyn Kufahl
-//  Copyright (c) 2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -44,7 +44,7 @@ typedef lcos::eager_future<
     response
 > bind_response_future_type;
 
-typedef components::heap_factory<
+typedef components::detail::heap_factory<
     lcos::detail::promise<
         response
       , response
@@ -71,36 +71,37 @@ void early_parcel_sink(
     boost::iostreams::stream<io_device_type> io (*parcel_data.get());
 
     // De-serialize the parcel data
-    #if HPX_USE_PORTABLE_ARCHIVES != 0
-        util::portable_binary_iarchive archive(io);
-    #else
-        boost::archive::binary_iarchive archive(io);
-    #endif
+    util::portable_binary_iarchive archive(io);
 
-    archive >> p;
+    std::size_t count = 0;
+    archive >> count;
+    while(count-- != 0)
+    {
+        archive >> p;
 
-    // decode the action-type in the parcel
-    actions::action_type act = p.get_action();
+        // decode the action-type in the parcel
+        actions::action_type act = p.get_action();
 
-    // early parcels should only be plain actions
-    BOOST_ASSERT(actions::base_action::plain_action == act->get_action_type());
+        // early parcels should only be plain actions
+        BOOST_ASSERT(actions::base_action::plain_action == act->get_action_type());
 
-    // early parcels can't have continuations
-    BOOST_ASSERT(!p.get_continuation());
+        // early parcels can't have continuations
+        BOOST_ASSERT(!p.get_continuation());
 
-    // We should not allow any exceptions to escape the execution of the
-    // action as this would bring down the ASIO thread we execute in.
-    try {
-        act->get_thread_function(0)
-            (threads::thread_state_ex(threads::wait_signaled));
-    }
-    catch (...) {
+        // We should not allow any exceptions to escape the execution of the
+        // action as this would bring down the ASIO thread we execute in.
         try {
-            boost::rethrow_exception(boost::current_exception());
+            act->get_thread_function(0)
+                (threads::thread_state_ex(threads::wait_signaled));
         }
-        catch (boost::exception const& be) {
-            std::cerr << hpx::diagnostic_information(be) << std::endl;
-            std::abort();
+        catch (...) {
+            try {
+                boost::rethrow_exception(boost::current_exception());
+            }
+            catch (boost::exception const& be) {
+                std::cerr << hpx::diagnostic_information(be) << std::endl;
+                std::abort();
+            }
         }
     }
 } // }}}
@@ -109,6 +110,11 @@ void early_write_handler(
     boost::system::error_code const& e
   , std::size_t size
     )
+{
+    // no-op
+}
+
+void early_pending_parcel_handler(boost::uint32_t)
 {
     // no-op
 }
@@ -330,7 +336,7 @@ void register_console(registration_header const& header)
     HPX_STD_FUNCTION<void()>* thunk = new HPX_STD_FUNCTION<void()>
         (boost::bind(&big_boot_barrier::apply
                    , boost::ref(get_big_boot_barrier())
-                   , naming::get_prefix_from_gid(prefix)
+                   , naming::get_locality_id_from_gid(prefix)
                    , naming::address(header.locality)
                    , p));
 
@@ -361,15 +367,15 @@ void notify_console(notification_header const& header)
     }
 
     // set our prefix
-    agas_client.local_prefix(header.prefix);
+    agas_client.local_locality(header.prefix);
     get_runtime().get_config().parse("assigned locality",
         boost::str(boost::format("hpx.locality=%1%")
-                  % naming::get_prefix_from_gid(header.prefix)));
+                  % naming::get_locality_id_from_gid(header.prefix)));
 
     // store the full addresses of the agas servers in our local router
-    agas_client.hosted->primary_ns_addr_ = header.primary_ns_address;
-    agas_client.hosted->component_ns_addr_ = header.component_ns_address;
-    agas_client.hosted->symbol_ns_addr_ = header.symbol_ns_address;
+    agas_client.primary_ns_addr_ = header.primary_ns_address;
+    agas_client.component_ns_addr_ = header.component_ns_address;
+    agas_client.symbol_ns_addr_ = header.symbol_ns_address;
 
     // Assign the initial parcel gid range to the parcelport. Note that we can't
     // get the parcelport through the parcelhandler because it isn't up yet.
@@ -478,7 +484,7 @@ void register_worker(registration_header const& header)
     {
         // We can just send the parcel now, the connecting locality isn't a part
         // of startup synchronization.
-        get_big_boot_barrier().apply(naming::get_prefix_from_gid(prefix)
+        get_big_boot_barrier().apply(naming::get_locality_id_from_gid(prefix)
                                    , naming::address(header.locality), p);
     }
 
@@ -487,7 +493,7 @@ void register_worker(registration_header const& header)
         HPX_STD_FUNCTION<void()>* thunk = new HPX_STD_FUNCTION<void()>
             (boost::bind(&big_boot_barrier::apply
                        , boost::ref(get_big_boot_barrier())
-                       , naming::get_prefix_from_gid(prefix)
+                       , naming::get_locality_id_from_gid(prefix)
                        , naming::address(header.locality)
                        , p));
 
@@ -507,15 +513,15 @@ void notify_worker(notification_header const& header)
     naming::resolver_client& agas_client = get_runtime().get_agas_client();
 
     // set our prefix
-    agas_client.local_prefix(header.prefix);
+    agas_client.local_locality(header.prefix);
     get_runtime().get_config().parse("assigned locality",
         boost::str(boost::format("hpx.locality=%1%")
-                  % naming::get_prefix_from_gid(header.prefix)));
+                  % naming::get_locality_id_from_gid(header.prefix)));
 
     // store the full addresses of the agas servers in our local service
-    agas_client.hosted->primary_ns_addr_ = header.primary_ns_address;
-    agas_client.hosted->component_ns_addr_ = header.component_ns_address;
-    agas_client.hosted->symbol_ns_addr_ = header.symbol_ns_address;
+    agas_client.primary_ns_addr_ = header.primary_ns_address;
+    agas_client.component_ns_addr_ = header.component_ns_address;
+    agas_client.symbol_ns_addr_ = header.symbol_ns_address;
 
     // Assign the initial parcel gid range to the parcelport. Note that we can't
     // get the parcelport through the parcelhandler because it isn't up yet.
@@ -667,7 +673,7 @@ void big_boot_barrier::apply(
     else
         client_connection->set_parcel(p);
 
-    client_connection->async_write(early_write_handler);
+    client_connection->async_write(early_write_handler, early_pending_parcel_handler);
 } // }}}
 
 void big_boot_barrier::wait()
@@ -738,7 +744,7 @@ void big_boot_barrier::trigger()
     {
         HPX_STD_FUNCTION<void()>* p;
 
-        while (thunks.dequeue(&p))
+        while (thunks.dequeue(p))
             (*p)();
     }
 }

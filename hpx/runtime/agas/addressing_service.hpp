@@ -25,8 +25,8 @@
 #include <hpx/exception.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
-#include <hpx/lcos/local_mutex.hpp>
-#include <hpx/lcos/local_counting_semaphore.hpp>
+#include <hpx/lcos/local/mutex.hpp>
+#include <hpx/lcos/local/counting_semaphore.hpp>
 #include <hpx/lcos/eager_future.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/agas/component_namespace.hpp>
@@ -57,40 +57,43 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     typedef component_namespace::iterate_types_function_type
         iterate_types_function_type;
 
-    typedef hpx::lcos::local_mutex mutex_type;
+    typedef hpx::lcos::local::mutex mutex_type;
     // }}}
 
     // {{{ gva cache
     struct gva_cache_key
     { // {{{ gva_cache_key implementation
       private:
-        naming::gid_type id;
-        boost::uint64_t count;
+        typedef boost::icl::closed_interval<naming::gid_type, std::less>
+            key_type;
+
+        key_type key_;
 
       public:
         gva_cache_key()
-          : id()
-          , count(0)
+          : key_()
         {}
 
         explicit gva_cache_key(
             naming::gid_type const& id_
           , boost::uint64_t count_ = 1
             )
-          : id(id_)
-          , count(count_)
+          : key_(naming::strip_credit_from_cgid(id_)
+               , naming::strip_credit_from_cgid(id_) + (count_ - 1))
         {
-            naming::strip_credit_from_gid(id);
+            BOOST_ASSERT(count_);
         }
 
-        naming::gid_type const& get_gid() const
+        naming::gid_type get_gid() const
         {
-            return id;
+            return boost::icl::lower(key_);
         }
 
         boost::uint64_t get_count() const
         {
-            return count;
+            naming::gid_type const size = boost::icl::length(key_);
+            BOOST_ASSERT(size.get_msb() == 0);
+            return size.get_lsb();
         }
 
         friend bool operator<(
@@ -98,7 +101,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
           , gva_cache_key const& rhs
             )
         {
-            return (lhs.id + (lhs.count - 1)) < rhs.id;
+            return boost::icl::exclusive_less(lhs.key_, rhs.key_);
         }
 
         friend bool operator==(
@@ -107,18 +110,15 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
             )
         {
             // Is lhs in rhs?
-            if (1 == lhs.count && 1 != rhs.count)
-                return (lhs.id >= rhs.id)
-                    && (lhs.id <= (rhs.id + (lhs.count - 1)));
+            if (1 == lhs.get_count() && 1 != rhs.get_count())
+                return boost::icl::contains(rhs.key_, lhs.key_);
 
             // Is rhs in lhs?
-            else if (1 != lhs.count && 1 == rhs.count)
-                return (rhs.id >= lhs.id)
-                    && (rhs.id <= (lhs.id + (lhs.count - 1)));
+            else if (1 != lhs.get_count() && 1 == rhs.get_count())
+                return boost::icl::contains(lhs.key_, lhs.key_);
 
             // Direct hit
-            else
-                return (lhs.id == rhs.id) && (lhs.count == rhs.count);
+            return lhs.key_ == rhs.key_;
         }
     }; // }}}
 
@@ -158,6 +158,9 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     typedef boost::lockfree::fifo<lcos::promise<response>*> promise_pool_type;
 
+    typedef util::merging_map<naming::gid_type, boost::int64_t>
+        refcnt_requests_type;
+
     struct bootstrap_data_type
     { // {{{
         server::primary_namespace primary_ns_server;
@@ -171,25 +174,32 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         component_namespace component_ns_;
         symbol_namespace symbol_ns_;
 
-        hpx::lcos::local_counting_semaphore promise_pool_semaphore_;
+        hpx::lcos::local::counting_semaphore promise_pool_semaphore_;
         promise_pool_type promise_pool_;
-
-        naming::address primary_ns_addr_;
-        naming::address component_ns_addr_;
-        naming::address symbol_ns_addr_;
     }; // }}}
 
+    // REVIEW: Does this have to be mutable?
     mutable mutex_type gva_cache_mtx_;
     gva_cache_type gva_cache_;
 
+    // REVIEW: Does this have to be mutable?
     mutable mutex_type console_cache_mtx_;
     boost::uint32_t console_cache_;
 
-    const service_mode service_type;
-    const runtime_mode runtime_type;
+    std::size_t const max_refcnt_requests_;
 
-    const bool caching_;
-    const bool range_caching_;
+    mutex_type refcnt_requests_mtx_;
+    std::size_t refcnt_requests_count_;
+    boost::shared_ptr<refcnt_requests_type> refcnt_requests_;
+
+    hpx::lcos::local::counting_semaphore resolve_throttle_;
+
+    service_mode const service_type;
+    runtime_mode const runtime_type;
+
+    bool const caching_;
+    bool const range_caching_;
+    threads::thread_priority const action_priority_;
 
     naming::locality here_;
     boost::uint64_t rts_lva_;
@@ -198,7 +208,11 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     boost::shared_ptr<hosted_data_type> hosted;
 
     atomic_state state_;
-    naming::gid_type prefix_;
+    naming::gid_type locality_;
+
+    naming::address primary_ns_addr_;
+    naming::address component_ns_addr_;
+    naming::address symbol_ns_addr_;
 
     addressing_service(
         parcelset::parcelport& pp
@@ -235,15 +249,15 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         state_.store(new_state);
     }
 
-    naming::gid_type const& local_prefix() const
+    naming::gid_type const& local_locality() const
     {
-        BOOST_ASSERT(prefix_ != naming::invalid_gid);
-        return prefix_;
+        BOOST_ASSERT(locality_ != naming::invalid_gid);
+        return locality_;
     }
 
-    void local_prefix(naming::gid_type const& g)
+    void local_locality(naming::gid_type const& g)
     {
-        prefix_ = g;
+        locality_ = g;
     }
 
     bool is_bootstrap() const
@@ -258,11 +272,39 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         return runtime_type == runtime_mode_console;
     }
 
-    /// \brief Install performance counters exposing properties from the
+    /// \brief Register performance counter types exposing properties from the
     ///        local cache.
-    void install_counters();
+    void register_counter_types();
+
+    // FIXME: document (add comments)
+    void garbage_collect_non_blocking(
+        error_code& ec = throws
+        );
+
+    // FIXME: document (add comments)
+    void garbage_collect(
+        error_code& ec = throws
+        );
 
 private:
+    /// Assumes that \a refcnt_requests_mtx_ is locked.
+    void increment_refcnt_requests(
+        mutex_type::scoped_lock& l
+      , error_code& ec
+        );
+
+    /// Assumes that \a refcnt_requests_mtx_ is locked.
+    void send_refcnt_requests_non_blocking(
+        mutex_type::scoped_lock& l
+      , error_code& ec
+        );
+
+    /// Assumes that \a refcnt_requests_mtx_ is locked.
+    void send_refcnt_requests_sync(
+        mutex_type::scoped_lock& l
+      , error_code& ec
+        );
+
     // Helper functions to access the current cache statistics
     std::size_t get_cache_hits() const;
     std::size_t get_cache_misses() const;
@@ -272,6 +314,11 @@ private:
 public:
     response service(
         request const& req
+      , error_code& ec = throws
+        );
+
+    std::vector<response> bulk_service(
+        std::vector<request> const& reqs
       , error_code& ec = throws
         );
 
@@ -296,20 +343,20 @@ public:
       , error_code& ec = throws
         );
 
-    /// \brief Get locality prefix of the console locality.
+    /// \brief Get locality locality_id of the console locality.
     ///
-    /// \param prefix     [out] The prefix value uniquely identifying the
+    /// \param locality_id     [out] The locality_id value uniquely identifying the
     ///                   console locality. This is valid only, if the
     ///                   return value of this function is true.
     /// \param try_cache  [in] If this is set to true the console is first
     ///                   tried to be found in the local cache. Otherwise
     ///                   this function will always query AGAS, even if the
-    ///                   console prefix is already known locally.
+    ///                   console locality_id is already known locally.
     /// \param ec         [in,out] this represents the error status on exit,
     ///                   if this is pre-initialized to \a hpx#throws
     ///                   the function will throw on error instead.
     ///
-    /// \returns          This function returns \a true if a console prefix
+    /// \returns          This function returns \a true if a console locality_id
     ///                   exists and returns \a false otherwise.
     ///
     /// \note             As long as \a ec is not pre-initialized to
@@ -317,18 +364,18 @@ public:
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    bool get_console_prefix(
-        naming::gid_type& prefix
+    bool get_console_locality(
+        naming::gid_type& locality_id
       , error_code& ec = throws
         );
 
-    /// \brief Query for the prefixes of all known localities.
+    /// \brief Query for the locality_ids of all known localities.
     ///
-    /// This function returns the prefixes of all localities known to the
+    /// This function returns the locality_ids of all localities known to the
     /// AGAS server or all localities having a registered factory for a
     /// given component type.
     ///
-    /// \param prefixes   [out] The vector will contain the prefixes of all
+    /// \param locality_ids [out] The vector will contain the prefixes of all
     ///                   localities registered with the AGAS server. The
     ///                   returned vector holds the prefixes representing
     ///                   the runtime_support components of these
@@ -347,18 +394,18 @@ public:
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    bool get_prefixes(
-        std::vector<naming::gid_type>& prefixes
+    bool get_localities(
+        std::vector<naming::gid_type>& locality_ids
       , components::component_type type
       , error_code& ec = throws
         );
 
-    bool get_prefixes(
-        std::vector<naming::gid_type>& prefixes
+    bool get_localities(
+        std::vector<naming::gid_type>& locality_ids
       , error_code& ec = throws
         )
     {
-        return get_prefixes(prefixes, components::component_invalid, ec);
+        return get_localities(locality_ids, components::component_invalid, ec);
     }
 
     /// \brief Return a unique id usable as a component type.
@@ -397,7 +444,7 @@ public:
     /// This function allows to register a component factory for a given
     /// locality and component type.
     ///
-    /// \param prefix     [in] The prefix value uniquely identifying the
+    /// \param locality_id  [in] The locality value uniquely identifying the
     ///                   given locality the factory needs to be registered
     ///                   for.
     /// \param name       [in] The component name (string) to register a
@@ -419,16 +466,16 @@ public:
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     components::component_type register_factory(
-        naming::gid_type const& prefix
+        naming::gid_type const& locality_id
       , std::string const& name
       , error_code& ec = throws
         )
     {
-        return register_factory(naming::get_prefix_from_gid(prefix), name, ec);
+        return register_factory(naming::get_locality_id_from_gid(locality_id), name, ec);
     }
 
     components::component_type register_factory(
-        boost::uint32_t prefix
+        boost::uint32_t locality_id
       , std::string const& name
       , error_code& ec = throws
         );
@@ -442,7 +489,7 @@ public:
     ///
     /// \param l          [in] The locality the locality id needs to be
     ///                   generated for. Repeating calls using the same
-    ///                   locality results in identical prefix values.
+    ///                   locality results in identical locality_id values.
     /// \param count      [in] The number of global ids to be generated.
     /// \param lower_bound
     ///                   [out] The lower bound of the assigned id range.
@@ -739,6 +786,50 @@ public:
       , error_code& ec = throws
         );
 
+    /// \brief Test whether the given address refers to a local object.
+    ///
+    /// This function will test whether the given address refers to an object
+    /// living on the locality of the caller.
+    ///
+    /// \param addr       [in] The address to test.
+    /// \param ec         [in,out] this represents the error status on exit,
+    ///                   if this is pre-initialized to \a hpx#throws
+    ///                   the function will throw on error instead.
+    /// \returns          This function returns \a true if the passed address
+    ///                   refers to an object which lives on the locality of
+    ///                   the caller.
+    ///
+    /// \note             As long as \a ec is not pre-initialized to
+    ///                   \a hpx#throws this function doesn't
+    ///                   throw but returns the result code using the
+    ///                   parameter \a ec. Otherwise it throws an instance
+    ///                   of hpx#exception.
+    bool is_local_address(
+        naming::gid_type const& id
+      , error_code& ec = throws
+        );
+
+    bool is_local_address(
+        naming::gid_type const& id
+      , naming::address& addr
+      , error_code& ec = throws
+        );
+
+    bool is_local_address_cached(
+        naming::gid_type const& id
+      , error_code& ec = throws
+        );
+
+    bool is_local_address_cached(
+        naming::gid_type const& id
+      , naming::address& addr
+      , error_code& ec = throws
+        );
+
+    bool is_local_lva_encoded_address(
+        naming::gid_type const& id
+        );
+
     /// \brief Resolve a given global address (\a id) to its associated local
     ///        address.
     ///
@@ -771,18 +862,44 @@ public:
     bool resolve(
         naming::gid_type const& id
       , naming::address& addr
-      , bool try_cache = true
       , error_code& ec = throws
-        );
+        )
+    {
+        // Try the cache
+        if (caching_)
+        {
+            if (resolve_cached(id, addr, ec))
+                return true;
+
+            if (ec)
+                return false;
+        }
+
+        return resolve_full(id, addr, ec);
+    }
 
     bool resolve(
         naming::id_type const& id
       , naming::address& addr
-      , bool try_cache = true
       , error_code& ec = throws
         )
     {
-        return resolve(id.get_gid(), addr, try_cache, ec);
+        return resolve(id.get_gid(), addr, ec);
+    }
+
+    bool resolve_full(
+        naming::gid_type const& id
+      , naming::address& addr
+      , error_code& ec = throws
+        );
+
+    bool resolve_full(
+        naming::id_type const& id
+      , naming::address& addr
+      , error_code& ec = throws
+        )
+    {
+        return resolve_full(id.get_gid(), addr, ec);
     }
 
     bool resolve_cached(
@@ -808,11 +925,21 @@ public:
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    boost::uint64_t incref(
-        naming::gid_type const& id
-      , boost::uint64_t credits = 1
+    void incref(
+        naming::gid_type const& lower
+      , naming::gid_type const& upper
+      , boost::int64_t credits = 1
       , error_code& ec = throws
         );
+
+    void incref(
+        naming::gid_type const& id
+      , boost::int64_t credits = 1
+      , error_code& ec = throws
+        )
+    {
+        return incref(id, id, credits, ec);
+    }
 
     /// \brief Decrement the global reference count for the given id
     ///
@@ -836,12 +963,21 @@ public:
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    boost::uint64_t decref(
-        naming::gid_type const& id
-      , components::component_type& t
-      , boost::uint64_t credits = 1
+    void decref(
+        naming::gid_type const& lower
+      , naming::gid_type const& upper
+      , boost::int64_t credits = 1
       , error_code& ec = throws
         );
+
+    void decref(
+        naming::gid_type const& id
+      , boost::int64_t credits = 1
+      , error_code& ec = throws
+        )
+    {
+        return decref(id, id, credits, ec);
+    }
 
 #if !defined(HPX_NO_DEPRECATED)
     /// \brief Register a global name with a global address (id)
@@ -981,7 +1117,7 @@ public:
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    bool iterateids(
+    bool iterate_ids(
         iterate_names_function_type const& f
       , error_code& ec = throws
         );
@@ -1002,7 +1138,7 @@ public:
     ///
     /// \returns          The function returns \a true if the global name
     ///                   was registered. It returns false if the global name is
-    ///                   not registered. 
+    ///                   not registered.
     ///
     /// \note             As long as \a ec is not pre-initialized to
     ///                   \a hpx#throws this function doesn't
@@ -1014,11 +1150,6 @@ public:
       , naming::gid_type const& id
       , error_code& ec = throws
         );
-
-    static lcos::promise<bool, response> register_name_async(
-        std::string const& name
-      , naming::gid_type const& id
-        ); 
 
     /// \brief Unregister a global name (release any existing association)
     ///
@@ -1055,10 +1186,6 @@ public:
         std::string const& name
       , naming::gid_type& id
       , error_code& ec = throws
-        );
-
-    static lcos::promise<naming::id_type, response> unregister_name_async(
-        std::string const& name
         );
 
     /// \brief Query for the global address associated with a given global name.
@@ -1099,6 +1226,11 @@ public:
     void update_cache(
         naming::gid_type const& gid
       , gva const& gva
+      , error_code& ec = throws
+        );
+
+    bool route_parcel(
+        parcelset::parcel const& arg0
       , error_code& ec = throws
         );
 };

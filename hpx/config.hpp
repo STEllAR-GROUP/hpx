@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -65,20 +65,46 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// This defines the maximum number of arguments a component constructor can
 /// take
-#if !defined(HPX_COMPONENT_CREATE_ARG_MAX)
-#  define HPX_COMPONENT_CREATE_ARG_MAX 4
+#if !defined(HPX_COMPONENT_CREATE_ARGUMENT_LIMIT)
+#  define HPX_COMPONENT_CREATE_ARGUMENT_LIMIT 4
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This defines the maximum number of arguments a util::function can take
-#ifndef HPX_FUNCTION_LIMIT
+/// This defines the maximum number of arguments a util::function can take.
+/// Note that this needs to be larger than HPX_ACTION_ARGUMENT_LIMIT by at
+/// least 3.
+#if !defined(HPX_FUNCTION_LIMIT)
 #  define HPX_FUNCTION_LIMIT 10
 #endif
 
+#if (HPX_FUNCTION_LIMIT+3) < HPX_ACTION_ARGUMENT_LIMIT
+#  error "The specified HPX_FUNCTION_LIMIT (default is 10) has to be larger than HPX_ACTION_ARGUMENT_LIMIT by at least 3."
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
-/// This defines the number of outgoing (parcel-) connections kept alive
+/// This defines the number of outgoing (parcel-) connections kept alive (to
+/// all other localities). This value can be changed at runtime by setting
+/// the configuration parameter:
+///
+///   hpx.max_connections_cache_size = ...
+///
+/// (or by setting the corresponding environment variable
+/// HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE).
 #if !defined(HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE)
-#  define HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE 64
+#  define HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE 256
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+/// This defines the number of outgoing (parcel-) connections kept alive (to
+/// each of the other localities). This value can be changed at runtime by
+/// setting the configuration parameter:
+///
+///   hpx.max_connections_per_locality = ...
+///
+/// (or by setting the corresponding environment variable
+/// HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY).
+#if !defined(HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY)
+#  define HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY 2
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -86,8 +112,18 @@
 /// cache. This is just the initial size which may be adjusted depending on the
 /// load of the system, etc. It must be a minimum of 3 for AGAS v3
 /// bootstrapping.
-#if !defined(HPX_INITIAL_AGAS_GVA_CACHE_SIZE)
-#  define HPX_INITIAL_AGAS_GVA_CACHE_SIZE 256
+#if !defined(HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE)
+#  define HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE 256
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+#if !defined(HPX_INITIAL_AGAS_MAX_RESOLVE_REQUESTS)
+#  define HPX_INITIAL_AGAS_MAX_RESOLVE_REQUESTS 16
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+#if !defined(HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS)
+#  define HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS 4096
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -261,28 +297,38 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Use std::function if it's available and movable
+#if defined(HPX_UTIL_FUNCTION)
+#  define HPX_STD_FUNCTION ::hpx::util::function_nonser
+#else
 #if !defined(HPX_HAVE_CXX11_STD_FUNCTION)
 #  define HPX_STD_FUNCTION ::boost::function
 #else
 #  define HPX_STD_FUNCTION ::std::function
 #endif
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // Use std::bind if it's available and movable
-#if !defined(HPX_HAVE_CXX11_STD_BIND)
-#  if defined(HPX_USE_PHOENIX_BIND)
-#    define HPX_STD_PLACEHOLDERS    ::boost::phoenix::placeholders
-#    define HPX_STD_BIND            ::boost::phoenix::bind
-#    define HPX_STD_PROTECT(f)      ::boost::phoenix::lambda[f]
-#  else
-#    define HPX_STD_PLACEHOLDERS
-#    define HPX_STD_BIND            ::boost::bind
-#    define HPX_STD_PROTECT(f)      ::hpx::util::protect(f)
-#  endif
+#if defined(HPX_UTIL_BIND)
+#  define HPX_STD_PLACEHOLDERS        ::hpx::util::placeholders
+#  define HPX_STD_BIND                ::hpx::util::bind
+#  define HPX_STD_PROTECT(f)          ::hpx::util::protect(f)
 #else
-#  define HPX_STD_PLACEHOLDERS      ::std::placeholders
-#  define HPX_STD_BIND              ::std::bind
-#  define HPX_STD_PROTECT(f)        ::hpx::util::protect(f)
+#  if !defined(HPX_HAVE_CXX11_STD_BIND)
+#    if defined(HPX_PHOENIX_BIND)
+#      define HPX_STD_PLACEHOLDERS    ::boost::phoenix::placeholders
+#      define HPX_STD_BIND            ::boost::phoenix::bind
+#      define HPX_STD_PROTECT(f)      ::boost::phoenix::lambda[f]
+#    else
+#      define HPX_STD_PLACEHOLDERS
+#      define HPX_STD_BIND            ::boost::bind
+#      define HPX_STD_PROTECT(f)      ::hpx::util::protect(f)
+#    endif
+#  else
+#    define HPX_STD_PLACEHOLDERS      ::std::placeholders
+#    define HPX_STD_BIND              ::std::bind
+#    define HPX_STD_PROTECT(f)        ::hpx::util::protect(f)
+#  endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -304,7 +350,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_AGAS_BOOTSTRAP_PREFIX   1U
+#define HPX_AGAS_BOOTSTRAP_PREFIX   0U
 #define HPX_AGAS_PRIMARY_NS_MSB     0x0000000100000001ULL
 #define HPX_AGAS_PRIMARY_NS_LSB     0x0000000000000001ULL
 #define HPX_AGAS_COMPONENT_NS_MSB   0x0000000100000001ULL

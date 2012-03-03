@@ -46,7 +46,7 @@ private:
         naming::id_type const& gid,
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
-        if (!((*th->impl_)->ready()))
+        if (!((*th->impl_)->is_ready()))
             th->apply(gid, BOOST_PP_ENUM_PARAMS(N, arg));
     }
 

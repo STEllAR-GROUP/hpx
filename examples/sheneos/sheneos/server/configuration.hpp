@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -89,6 +89,15 @@ namespace boost { namespace serialization
 {
     template <typename Archive>
     void serialize(Archive&, sheneos::config_data&, unsigned int const);
-}} 
+}}
+
+HPX_REGISTER_ACTION_DECLARATION_EX(sheneos::server::configuration::init_action,
+    sheneos_configuration_init_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(sheneos::server::configuration::get_action,
+    sheneos_configuration_get_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<sheneos::config_data>::set_result_action,
+    set_result_action_sheneos_config_data);
+
 #endif
 

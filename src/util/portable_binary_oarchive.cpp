@@ -41,67 +41,62 @@ namespace hpx { namespace util
 {
 
 void HPX_ALWAYS_EXPORT
-portable_binary_oarchive::save_impl(
-    const boost::intmax_t l,
-    const char maxsize
-){
+portable_binary_oarchive::save_impl(const boost::intmax_t l, const char maxsize)
+{
     char size = 0;
-
-    if(l == 0){
+    if (l == 0) {
         this->primitive_base_t::save(size);
         return;
     }
 
     boost::intmax_t ll;
     bool negative = (l < 0);
-    if(negative)
+    if (negative)
         ll = -l;
     else
         ll = l;
 
-    do{
+    do {
         ll >>= CHAR_BIT;
         ++size;
-    }while(ll != 0);
+    } while(ll != 0);
 
-    this->primitive_base_t::save(
-        static_cast<char>(negative ? -size : size)
-    );
+    this->primitive_base_t::save(static_cast<char>(negative ? -size : size));
 
     if(negative)
         ll = -l;
     else
         ll = l;
-    char * cptr = reinterpret_cast<char *>(& ll);
-    #ifdef BOOST_BIG_ENDIAN
-        cptr += (sizeof(boost::intmax_t) - size);
-        if(m_flags & endian_little)
-            reverse_bytes(size, cptr);
-    #else
-        if(m_flags & endian_big)
-            reverse_bytes(size, cptr);
-    #endif
+
+    char* cptr = reinterpret_cast<char *>(& ll);
+#ifdef BOOST_BIG_ENDIAN
+    cptr += (sizeof(boost::intmax_t) - size);
+    if(m_flags & endian_little)
+        reverse_bytes(size, cptr);
+#else
+    if(m_flags & endian_big)
+        reverse_bytes(size, cptr);
+#endif
     this->primitive_base_t::save_binary(cptr, size);
 }
 
-void HPX_ALWAYS_EXPORT
-portable_binary_oarchive::init(unsigned int flags) {
-    if(m_flags == (endian_big | endian_little)){
-        boost::serialization::throw_exception(
-            portable_binary_oarchive_exception()
-        );
+void HPX_ALWAYS_EXPORT portable_binary_oarchive::init(unsigned int flags)
+{
+    if (m_flags == (endian_big | endian_little)) {
+        BOOST_THROW_EXCEPTION(
+            portable_binary_oarchive_exception());
     }
-    if(0 == (flags & boost::archive::no_header)){
+
+    if (0 == (flags & boost::archive::no_header)) {
         // write signature in an archive version independent manner
         const std::string file_signature(
-            boost::archive::BOOST_ARCHIVE_SIGNATURE()
-        );
-        * this << file_signature;
+            boost::archive::BOOST_ARCHIVE_SIGNATURE());
+        *this << file_signature;
+
         // write library version
         const boost::archive::version_type v(
-            boost::archive::BOOST_ARCHIVE_VERSION()
-        );
-        * this << v;
+            boost::archive::BOOST_ARCHIVE_VERSION());
+        *this << v;
     }
     save(static_cast<unsigned char>(m_flags >> CHAR_BIT));
 }
@@ -115,7 +110,8 @@ portable_binary_oarchive::init(unsigned int flags) {
 namespace boost {
 namespace archive {
 
-template class HPX_ALWAYS_EXPORT detail::archive_pointer_oserializer<hpx::util::portable_binary_oarchive> ;
+template class HPX_ALWAYS_EXPORT
+    detail::archive_pointer_oserializer<hpx::util::portable_binary_oarchive>;
 
 } // namespace archive
 } // namespace boost
@@ -126,7 +122,8 @@ template class HPX_ALWAYS_EXPORT detail::archive_pointer_oserializer<hpx::util::
 namespace boost {
 namespace archive {
 
-template class HPX_ALWAYS_EXPORT detail::archive_serializer_map<hpx::util::portable_binary_oarchive>;
+template class HPX_ALWAYS_EXPORT
+    detail::archive_serializer_map<hpx::util::portable_binary_oarchive>;
 
 } // namespace archive
 } // namespace boost
@@ -142,7 +139,7 @@ template class basic_binary_oprimitive<
     hpx::util::portable_binary_oarchive,
     std::ostream::char_type,
     std::ostream::traits_type
-> ;
+>;
 
 } // namespace archive
 } // namespace boost

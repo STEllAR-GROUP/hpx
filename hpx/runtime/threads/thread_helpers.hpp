@@ -36,7 +36,7 @@ namespace hpx { namespace threads
     ///                   thread referenced by the \a id parameter. It will
     ///                   return one of the values as defined by the
     ///                   \a thread_state enumeration. If the
-    ///                   thread is not known to the threadmanager the
+    ///                   thread is not known to the thread-manager the
     ///                   return value will be \a thread_state#unknown.
     ///
     /// \note             If the thread referenced by the parameter \a id
@@ -107,7 +107,7 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     /// The function get_thread_description is part of the thread related API
     /// allows to query the description of one of the threads known to the
-    /// threadmanager.
+    /// thread-manager.
     ///
     /// \param id         [in] The thread id of the thread being queried.
     /// \param ec         [in,out] this represents the error status on exit,
@@ -116,7 +116,7 @@ namespace hpx { namespace threads
     ///
     /// \returns          This function returns the description of the
     ///                   thread referenced by the \a id parameter. If the
-    ///                   thread is not known to the threadmanager the return
+    ///                   thread is not known to the thread-manager the return
     ///                   value will be the string "<unknown>".
     HPX_API_EXPORT std::string get_thread_description(thread_id_type id,
         error_code& ec = throws);
@@ -131,7 +131,7 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     /// The function get_thread_gid is part of the thread related API
     /// allows to query the GID of one of the threads known to the
-    /// threadmanager.
+    /// thread-manager.
     ///
     /// \param id         [in] The thread id of the thread being queried.
     /// \param ec         [in,out] this represents the error status on exit,
@@ -140,14 +140,14 @@ namespace hpx { namespace threads
     ///
     /// \returns          This function returns the GID of the
     ///                   thread referenced by the \a id parameter. If the
-    ///                   thread is not known to the threadmanager the return
+    ///                   thread is not known to the thread-manager the return
     ///                   value will be \a naming::invalid_id.
     HPX_API_EXPORT naming::id_type get_thread_gid(thread_id_type id,
         error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// The function get_thread_state is part of the thread related API. It
-    /// queries the state of one of the threads known to the threadmanager.
+    /// queries the state of one of the threads known to the thread-manager.
     ///
     /// \param id         [in] The thread id of the thread the state should
     ///                   be modified for.
@@ -157,14 +157,14 @@ namespace hpx { namespace threads
     ///
     /// \returns          This function returns the thread state of the
     ///                   thread referenced by the \a id parameter. If the
-    ///                   thread is not known to the threadmanager the return
+    ///                   thread is not known to the thread-manager the return
     ///                   value will be \a terminated.
     HPX_API_EXPORT thread_state get_thread_state(thread_id_type id,
         error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// The function get_thread_phase is part of the thread related API.
-    /// It queries the phase of one of the threads known to the threadmanager.
+    /// It queries the phase of one of the threads known to the thread-manager.
     ///
     /// \param id         [in] The thread id of the thread the phase should
     ///                   be modified for.
@@ -174,7 +174,7 @@ namespace hpx { namespace threads
     ///
     /// \returns          This function returns the thread phase of the
     ///                   thread referenced by the \a id parameter. If the
-    ///                   thread is not known to the threadmanager the return
+    ///                   thread is not known to the thread-manager the return
     ///                   value will be ~0.
     HPX_API_EXPORT std::size_t get_thread_phase(thread_id_type id,
         error_code& ec = throws);
@@ -184,26 +184,28 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     // Return the number of the NUMA node the current thread is running on
-    HPX_API_EXPORT int get_numa_node_number();
+    HPX_API_EXPORT std::size_t get_numa_node_number();
 
     ///////////////////////////////////////////////////////////////////////////
     /// The function \a suspend will return control to the thread manager
     /// (suspends the current thread). It sets the new state of this thread
     /// to the thread state passed as the parameter.
     ///
-    /// \note Must be called from within a pxthread.
+    /// \note Must be called from within a HPX-thread.
     ///
-    /// \throws If <code>&ec == &throws</code>, never throws, but will set \a ec
+    /// \throws If <code>&ec != &throws</code>, never throws, but will set \a ec
     ///         to an appropriate value when an error occurs. Otherwise, this
     ///         function will throw an \a hpx#exception with an error code of
     ///         \a hpx#yield_aborted if it is signaled with \a wait_aborted.
-    ///         If called outside of a pxthread, this function will throw
+    ///         If called outside of a HPX-thread, this function will throw
     ///         an \a hpx#exception with an error code of \a hpx::null_thread_id.
-    ///         If this function is called while the threadmanager is not
+    ///         If this function is called while the thread-manager is not
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#invalid_status.
     ///
-    HPX_API_EXPORT thread_state_ex_enum suspend(thread_state_enum state = pending,
+    HPX_API_EXPORT thread_state_ex_enum suspend(
+        thread_state_enum state = pending,
+        char const* description = "threads::suspend",
         error_code& ec = throws);
 
     /// The function \a suspend will return control to the thread manager
@@ -211,19 +213,21 @@ namespace hpx { namespace threads
     /// to \a suspended and schedules a wakeup for this threads at the given
     /// time.
     ///
-    /// \note Must be called from within a pxthread.
+    /// \note Must be called from within a HPX-thread.
     ///
-    /// \throws If <code>&ec == &throws</code>, never throws, but will set \a ec
+    /// \throws If <code>&ec != &throws</code>, never throws, but will set \a ec
     ///         to an appropriate value when an error occurs. Otherwise, this
     ///         function will throw an \a hpx#exception with an error code of
     ///         \a hpx#yield_aborted if it is signaled with \a wait_aborted.
-    ///         If called outside of a pxthread, this function will throw
+    ///         If called outside of a HPX-thread, this function will throw
     ///         an \a hpx#exception with an error code of \a hpx::null_thread_id.
-    ///         If this function is called while the threadmanager is not
+    ///         If this function is called while the thread-manager is not
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#invalid_status.
     ///
-    HPX_API_EXPORT thread_state_ex_enum suspend(boost::posix_time::ptime const&,
+    HPX_API_EXPORT thread_state_ex_enum suspend(
+        boost::posix_time::ptime const&,
+        char const* description = "threads::suspend",
         error_code& ec = throws);
 
     /// The function \a suspend will return control to the thread manager
@@ -231,19 +235,21 @@ namespace hpx { namespace threads
     /// to \a suspended and schedules a wakeup for this threads after the given
     /// duration.
     ///
-    /// \note Must be called from within a pxthread.
+    /// \note Must be called from within a HPX-thread.
     ///
-    /// \throws If <code>&ec == &throws</code>, never throws, but will set \a ec
+    /// \throws If <code>&ec != &throws</code>, never throws, but will set \a ec
     ///         to an appropriate value when an error occurs. Otherwise, this
     ///         function will throw an \a hpx#exception with an error code of
     ///         \a hpx#yield_aborted if it is signaled with \a wait_aborted.
-    ///         If called outside of a pxthread, this function will throw
+    ///         If called outside of a HPX-thread, this function will throw
     ///         an \a hpx#exception with an error code of \a hpx::null_thread_id.
-    ///         If this function is called while the threadmanager is not
+    ///         If this function is called while the thread-manager is not
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#invalid_status.
     ///
-    HPX_API_EXPORT thread_state_ex_enum suspend(boost::posix_time::time_duration const&,
+    HPX_API_EXPORT thread_state_ex_enum suspend(
+        boost::posix_time::time_duration const&,
+        char const* description = "threads::suspend",
         error_code& ec = throws);
 }}
 

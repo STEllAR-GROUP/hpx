@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -112,7 +112,8 @@ namespace sheneos { namespace server
             return 0;
         }
 
-        std::size_t index = (value - min_value_[d]) / delta_[d];
+        std::size_t index = static_cast<std::size_t>(
+            (value - min_value_[d]) / delta_[d]);
 
         // Either the index has to be inside bounds or the requested value
         // corresponds to the right end edge of the managed data range.
@@ -136,8 +137,7 @@ namespace sheneos { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline double
-    partition3d::interpolate(double* values,
+    inline double partition3d::interpolate(double* values,
         std::size_t idx_x, std::size_t idx_y, std::size_t idx_z,
         double delta_ye, double delta_logtemp, double delta_logrho)
     {
@@ -165,8 +165,7 @@ namespace sheneos { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::vector<double>
-    partition3d::interpolate(double ye, double temp,
+    std::vector<double> partition3d::interpolate(double ye, double temp,
         double rho, boost::uint32_t eosvalues)
     {
         double logrho = std::log10(rho);
@@ -229,6 +228,131 @@ namespace sheneos { namespace server
 
         return results;
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        inline int numberof_setbits(boost::uint32_t i)
+        {
+            i = i - ((i >> 1) & 0x55555555);
+            i = (i & 0x33333333) + ((i >> 2) & 0x33333333);
+            return (((i + (i >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24;
+        }
+
+        inline bool more_than_one_value_requested(boost::uint32_t i)
+        {
+            return numberof_setbits(i) > 1;
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    double partition3d::interpolate_one(double ye, double temp,
+        double rho, boost::uint32_t eosvalue)
+    {
+        double logrho = std::log10(rho);
+        double logtemp = std::log10(temp);
+
+        std::size_t idx_ye = get_index(dimension::ye, ye);
+        std::size_t idx_logtemp = get_index(dimension::temp, logtemp);
+        std::size_t idx_logrho = get_index(dimension::rho, logrho);
+
+        double delta_ye = (ye - ye_values_[idx_ye]) / delta_[dimension::ye];
+        double delta_logtemp = (logtemp - logtemp_values_[idx_logtemp]) / delta_[dimension::temp];
+        double delta_logrho = (logrho - logrho_values_[idx_logrho]) / delta_[dimension::rho];
+
+        if (detail::more_than_one_value_requested(eosvalue)) {
+            HPX_THROW_EXCEPTION(hpx::bad_parameter,
+                "partition3d::interpolate_one",
+                "requested to interpolate more than one physical value: " +
+                boost::lexical_cast<std::string>(eosvalue));
+        }
+
+        // Calculate all required values.
+        switch (eosvalue) {
+        case logpress:
+            {
+                double value = interpolate(logpress_values_.get(),
+                    idx_ye, idx_logtemp, idx_logrho,
+                    delta_ye, delta_logtemp, delta_logrho);
+                return std::pow(10., value);
+            }
+        case logenergy:
+            {
+                double value = interpolate(logenergy_values_.get(),
+                    idx_ye, idx_logtemp, idx_logrho,
+                    delta_ye, delta_logtemp, delta_logrho);
+                return std::pow(10., value) - energy_shift_;
+            }
+        case entropy:
+            return interpolate(entropy_values_.get(),
+                idx_ye, idx_logtemp, idx_logrho,
+                delta_ye, delta_logtemp, delta_logrho);
+
+        case munu:
+            return interpolate(munu_values_.get(),
+                idx_ye, idx_logtemp, idx_logrho,
+                delta_ye, delta_logtemp, delta_logrho);
+
+        case cs2:
+            return interpolate(cs2_values_.get(),
+                idx_ye, idx_logtemp, idx_logrho,
+                delta_ye, delta_logtemp, delta_logrho);
+
+        case dedt:
+            return interpolate(dedt_values_.get(),
+                idx_ye, idx_logtemp, idx_logrho,
+                delta_ye, delta_logtemp, delta_logrho);
+
+        case dpdrhoe:
+            return interpolate(dpdrhoe_values_.get(),
+                idx_ye, idx_logtemp, idx_logrho,
+                delta_ye, delta_logtemp, delta_logrho);
+
+        case dpderho:
+            return interpolate(dpderho_values_.get(),
+                idx_ye, idx_logtemp, idx_logrho,
+                delta_ye, delta_logtemp, delta_logrho);
+
+        default:
+            break;
+        }
+
+        HPX_THROW_EXCEPTION(hpx::bad_parameter, "partition3d::interpolate_one",
+            "requested to interpolate unknown physical value: " +
+            boost::lexical_cast<std::string>(eosvalue));
+
+        return 0;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    std::vector<double>
+    partition3d::interpolate_one_bulk(std::vector<double> const& ye,
+        std::vector<double> const& temp, std::vector<double> const& rho,
+        boost::uint32_t eosvalue)
+    {
+        std::vector<double> result;
+
+        if (ye.size() != temp.size() || ye.size() != rho.size()) {
+            HPX_THROW_EXCEPTION(hpx::bad_parameter,
+                "partition3d::interpolate_one_bulk",
+                "inconsistent sizes of input fields");
+            return result;
+        }
+
+        result.reserve(ye.size());
+
+        // interpolate as requested
+        std::vector<double>::const_iterator it_temp = temp.begin();
+        std::vector<double>::const_iterator it_rho = rho.begin();
+        std::vector<double>::const_iterator it_ye_end = ye.end();
+        for (std::vector<double>::const_iterator it_ye = ye.begin();
+            it_ye != it_ye_end; ++it_ye)
+        {
+            result.push_back(interpolate_one(*it_ye, *it_temp, *it_rho, eosvalue));
+        }
+
+        return result;
+    }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -240,6 +364,10 @@ HPX_REGISTER_ACTION_EX(partition3d_type::init_action,
     sheneos_partition3d_init_action);
 HPX_REGISTER_ACTION_EX(partition3d_type::interpolate_action,
     sheneos_partition3d_interpolate_action);
+HPX_REGISTER_ACTION_EX(partition3d_type::interpolate_one_action,
+    sheneos_partition3d_interpolate_one_action);
+HPX_REGISTER_ACTION_EX(partition3d_type::interpolate_one_bulk_action,
+    sheneos_partition3d_interpolate_one_bulk_action);
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<partition3d_type>,

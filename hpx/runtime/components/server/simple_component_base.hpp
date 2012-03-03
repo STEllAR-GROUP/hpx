@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,8 +20,6 @@
 namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class simple_component_base simple_component_base.hpp hpx/runtime/components/server/simple_component_base.hpp
-    ///
     template <typename Component>
     class simple_component_base : public detail::simple_component_tag
     {
@@ -114,15 +112,30 @@ namespace hpx { namespace components
         mutable naming::gid_type gid_;
     };
 
+    namespace detail
+    {
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Component>
+        struct simple_heap_factory
+        {
+            static Component* alloc(std::size_t count)
+            {
+                return Component::create(count);
+            }
+            static void free(void* p, std::size_t count)
+            {
+                Component::destroy(p, count);
+            }
+        };
+    }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \class simple_component simple_component.hpp hpx/runtime/components/server/simple_component_base.hpp
-    ///
     template <typename Component>
     class simple_component : public Component
     {
     public:
         typedef Component type_holder;
+        typedef detail::simple_heap_factory<Component> heap_type;
 
         /// \brief  The function \a create is used for allocation and
         ///         initialization of instances of the derived components.
@@ -144,7 +157,7 @@ namespace hpx { namespace components
         }                                                                     \
     /**/
 
-        BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARG_MAX,
+        BOOST_PP_REPEAT_FROM_TO(1, HPX_COMPONENT_CREATE_ARGUMENT_LIMIT,
             HPX_SIMPLE_COMPONENT_CREATE_ONE, _)
 
 #undef HPX_SIMPLE_COMPONENT_CREATE_ONE

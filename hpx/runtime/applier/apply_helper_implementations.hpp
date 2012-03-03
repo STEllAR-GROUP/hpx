@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -56,8 +56,8 @@ namespace hpx { namespace applier { namespace detail
             BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
             hpx::applier::register_work_plain(
-                Action::construct_thread_function(lva,
-                    BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)),
+                boost::move(Action::construct_thread_function(lva,
+                    BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))),
                 actions::detail::get_action_name<Action>(), lva,
                 threads::pending, priority);
         }
@@ -69,8 +69,8 @@ namespace hpx { namespace applier { namespace detail
             BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
             hpx::applier::register_work_plain(
-                Action::construct_thread_function(
-                    c, lva, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)),
+                boost::move(Action::construct_thread_function(
+                    c, lva, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))),
                 actions::detail::get_action_name<Action>(), lva,
                 threads::pending, priority);
         }
@@ -86,7 +86,7 @@ namespace hpx { namespace applier { namespace detail
             threads::thread_priority priority,
             BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
-            Action::execute_function_nonvirt(lva,
+            Action::execute_function(lva,
                 BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
         }
 
@@ -97,8 +97,8 @@ namespace hpx { namespace applier { namespace detail
             BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
             try {
-                c->trigger(Action::execute_function_nonvirt(
-                    lva, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)));
+                c->trigger(boost::move(Action::execute_function(
+                    lva, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))));
             }
             catch (hpx::exception const& e) {
                 // make sure hpx::exceptions are propagated back to the client

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -11,7 +11,7 @@
 #include <boost/version.hpp>
 #include <boost/intrusive/slist.hpp>
 
-#include <hpx/lcos/local_mutex.hpp>
+#include <hpx/lcos/local/mutex.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/runtime/threads/thread.hpp>
@@ -22,8 +22,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace server
 {
-    /// \class barrier barrier.hpp hpx/lcos/server/barrier.hpp
-    ///
     /// A barrier can be used to synchronize a specific number of threads,
     /// blocking all of the entering threads until all of the threads have
     /// entered the barrier.
@@ -37,7 +35,7 @@ namespace hpx { namespace lcos { namespace server
     private:
         typedef components::managed_component_base<barrier> base_type;
 
-        typedef hpx::lcos::local_mutex mutex_type;
+        typedef hpx::lcos::local::mutex mutex_type;
         mutex_type mtx_;
 
         // define data structures needed for intrusive slist container used for

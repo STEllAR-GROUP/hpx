@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,6 +12,7 @@
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
@@ -48,7 +49,7 @@ namespace hpx { namespace components
 
         // retrieve console locality
         naming::gid_type console_gid;
-        naming::get_agas_client().get_console_prefix(console_gid);
+        naming::get_agas_client().get_console_locality(console_gid);
         naming::id_type dst(console_gid, naming::id_type::unmanaged);
 
         // Report the error only if the thread-manager is up.

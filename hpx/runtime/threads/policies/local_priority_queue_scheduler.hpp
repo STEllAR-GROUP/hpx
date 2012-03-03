@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,31 +7,67 @@
 #if !defined(HPX_THREADMANAGER_SCHEDULING_LOCAL_PRIOTITY_QUEUE_MAR_15_2011_0926AM)
 #define HPX_THREADMANAGER_SCHEDULING_LOCAL_PRIOTITY_QUEUE_MAR_15_2011_0926AM
 
-#include <map>
+#include <vector>
 #include <memory>
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/util/block_profiler.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/thread_affinity.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
 
-#include <boost/thread.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/bind.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/lockfree/fifo.hpp>
-#include <boost/ptr_container/ptr_map.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/atomic.hpp>
+#include <boost/mpl/bool.hpp>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 // TODO: add branch prediction and function heat
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
 {
+    ///////////////////////////////////////////////////////////////////////////
+    // Structure holding the information related to thread affinity selection
+    // for the shepherd threads of this instance
+    struct affinity_data
+    {
+        affinity_data() : pu_offset_(0), pu_step_(1) {}
+        affinity_data(std::size_t pu_offset, std::size_t pu_step)
+          : pu_offset_(pu_offset), pu_step_(pu_step) {}
+
+        std::size_t get_pu_num(std::size_t num_thread) const
+        {
+            // The offset shouldn't be larger than the number of available
+            // processing units.
+            BOOST_ASSERT(pu_offset_ < hardware_concurrency());
+
+            // The distance between assigned processing units shouldn't be zero
+            BOOST_ASSERT(pu_step_ > 0 && pu_step_ < hardware_concurrency());
+
+            // We 'scale' the thread number to compute the corresponding
+            // processing unit number.
+            //
+            // The base line processing unit number is computed from the given
+            // pu-offset and pu-step.
+            std::size_t num_pu = pu_offset_ + pu_step_ * num_thread;
+
+            // We add an additional offset, which allows to 'roll over' if the
+            // pu number would get larger than the number of available
+            // processing units. Note that it does not make sense to 'roll over'
+            // farther than the given pu-step.
+            std::size_t offset = (num_pu / hardware_concurrency()) % pu_step_;
+
+            // The resulting pu number has to be smaller than the available
+            // number of processing units.
+            return (num_pu + offset) % hardware_concurrency();
+        }
+
+        std::size_t pu_offset_; ///< offset of the first processing unit to use
+        std::size_t pu_step_;   ///< step between used processing units
+    };
+
     ///////////////////////////////////////////////////////////////////////////
     /// The local_priority_queue_scheduler maintains exactly one queue of work
     /// items (threads) per OS thread, where this OS thread pulls its next work
@@ -51,6 +87,8 @@ namespace hpx { namespace threads { namespace policies
         enum { max_thread_count = 1000 };
 
     public:
+        typedef boost::mpl::false_ has_periodic_maintenance;
+
         // the scheduler type takes two initialization parameters:
         //    the number of queues
         //    the number of high priority queues
@@ -60,30 +98,29 @@ namespace hpx { namespace threads { namespace policies
             init_parameter()
               : num_queues_(1),
                 max_queue_thread_count_(max_thread_count),
+                pu_offset_(0),
+                pu_step_(1),
                 numa_sensitive_(false)
             {}
 
             init_parameter(std::size_t num_queues,
                     std::size_t num_high_priority_queues,
                     std::size_t max_queue_thread_count = max_thread_count,
-                    bool numa_sensitive = false)
+                    bool numa_sensitive = false,
+                    std::size_t pu_offset = 0,
+                    std::size_t pu_step = 1)
               : num_queues_(num_queues),
                 num_high_priority_queues_(num_high_priority_queues),
                 max_queue_thread_count_(max_queue_thread_count),
-                numa_sensitive_(numa_sensitive)
-            {}
-
-            init_parameter(std::pair<std::size_t, std::size_t> const& init,
-                    bool numa_sensitive = false)
-              : num_queues_(init.first),
-                num_high_priority_queues_(init.first),
-                max_queue_thread_count_(init.second),
+                pu_offset_(pu_offset), pu_step_(pu_step),
                 numa_sensitive_(numa_sensitive)
             {}
 
             std::size_t num_queues_;
             std::size_t num_high_priority_queues_;
             std::size_t max_queue_thread_count_;
+            std::size_t pu_offset_;
+            std::size_t pu_step_;
             bool numa_sensitive_;
         };
         typedef init_parameter init_parameter_type;
@@ -93,6 +130,7 @@ namespace hpx { namespace threads { namespace policies
             high_priority_queues_(init.num_high_priority_queues_),
             low_priority_queue_(init.max_queue_thread_count_),
             curr_queue_(0),
+            affinity_data_(init.pu_offset_, init.pu_step_),
             numa_sensitive_(init.numa_sensitive_)
         {
             BOOST_ASSERT(init.num_queues_ != 0);
@@ -116,6 +154,11 @@ namespace hpx { namespace threads { namespace policies
         }
 
         bool numa_sensitive() const { return numa_sensitive_; }
+
+        std::size_t get_pu_num(std::size_t num_thread) const
+        {
+            return affinity_data_.get_pu_num(num_thread);
+        }
 
         ///////////////////////////////////////////////////////////////////////
         void abort_all_suspended_threads()
@@ -155,8 +198,8 @@ namespace hpx { namespace threads { namespace policies
         {
             // try to figure out the NUMA node where the data lives
             if (numa_sensitive_ && std::size_t(-1) == num_thread) {
-                std::size_t mask = get_thread_affinity_mask_from_lva(data.lva);
-                if (mask != std::size_t(-1)) {
+                boost::uint64_t mask = get_thread_affinity_mask_from_lva(data.lva);
+                if (mask) {
                     std::size_t m = 0x01LL;
                     for (std::size_t i = 0; i < queues_.size(); m <<= 1, ++i)
                     {
@@ -172,10 +215,10 @@ namespace hpx { namespace threads { namespace policies
 
             // now create the thread
             if (data.priority == thread_priority_critical) {
-                BOOST_ASSERT(run_now == true);
+                BOOST_ASSERT(run_now);
                 std::size_t num = num_thread % high_priority_queues_.size();
                 return high_priority_queues_[num]->create_thread(data,
-                    initial_state, run_now, queues_.size(), ec);
+                    initial_state, run_now, queues_.size() + num, ec);
             }
             else if (data.priority == thread_priority_low) {
                 return low_priority_queue_.create_thread(data, initial_state,
@@ -190,42 +233,45 @@ namespace hpx { namespace threads { namespace policies
         /// Return the next thread to be executed, return false if non is
         /// available
         bool get_next_thread(std::size_t num_thread, bool running,
-            std::size_t& idle_loop_count, threads::thread** thrd)
+            std::size_t& idle_loop_count, threads::thread*& thrd)
         {
             // master thread only: first try to get a priority thread
-            if (num_thread < high_priority_queues_.size())
+            std::size_t high_priority_queue_size = high_priority_queues_.size();
+            std::size_t queue_size = queues_.size();
+            if (num_thread < high_priority_queue_size)
             {
                 bool result = high_priority_queues_[num_thread]->
-                    get_next_thread(thrd, queues_.size()+num_thread);
+                    get_next_thread(thrd, queue_size + num_thread);
                 if (result) return true;
             }
 
             // try to get the next thread from our own queue
-            BOOST_ASSERT(num_thread < queues_.size());
+            BOOST_ASSERT(num_thread < queue_size);
             if (queues_[num_thread]->get_next_thread(thrd, num_thread))
                 return true;
 
             // try to execute low priority work if no other work is available
-            if (queues_.size()-1 == num_thread &&
-                low_priority_queue_.get_next_thread(
-                    thrd, queues_.size()+high_priority_queues_.size()))
+            if (queue_size-1 == num_thread)
             {
-                return true;
+                bool result = low_priority_queue_.get_next_thread(
+                    thrd, queue_size + high_priority_queue_size);
+                if (result) return true;
             }
 
             // steal thread from other queue, first try high priority queues,
             // then normal ones
-            for (std::size_t i = 1; i < high_priority_queues_.size(); ++i) {
-                std::size_t idx = (i + num_thread) % high_priority_queues_.size();
+            for (std::size_t i = 1; i < high_priority_queue_size; ++i) {
+                std::size_t idx = (i + num_thread) % high_priority_queue_size;
                 if (high_priority_queues_[idx]->
-                        get_next_thread(thrd, queues_.size()+num_thread))
+                        get_next_thread(thrd, queue_size + idx))
                 {
                     return true;
                 }
             }
 
-            for (std::size_t i = 1; i < queues_.size(); ++i) {
-                std::size_t idx = (i + num_thread) % queues_.size();
+            // steal thread from other queue
+            for (std::size_t i = 1; i < queue_size; ++i) {
+                std::size_t idx = (i + num_thread) % queue_size;
                 if (queues_[idx]->get_next_thread(thrd, num_thread))
                     return true;
             }
@@ -254,6 +300,12 @@ namespace hpx { namespace threads { namespace policies
             }
         }
 
+        void schedule_thread_last(threads::thread* thrd, std::size_t num_thread,
+            thread_priority priority = thread_priority_normal)
+        {
+            schedule_thread(thrd, num_thread, priority);
+        }
+
         /// Destroy the passed thread as it has been terminated
         bool destroy_thread(threads::thread* thrd)
         {
@@ -279,33 +331,29 @@ namespace hpx { namespace threads { namespace policies
         boost::int64_t get_queue_length(std::size_t num_thread = std::size_t(-1)) const
         {
             // Return queue length of one specific queue.
+            boost::int64_t count = 0;
             if (std::size_t(-1) != num_thread) {
                 BOOST_ASSERT(num_thread < queues_.size());
 
-                boost::int64_t count = 0;
-
                 if (num_thread < high_priority_queues_.size())
-                {
-                    count =  high_priority_queues_[num_thread]->get_thread_count();
-                }
+                    count = high_priority_queues_[num_thread]->get_thread_count();
+
                 if (num_thread == queues_.size()-1)
-                {
                     count += low_priority_queue_.get_thread_count();
-                }
+\
                 return count + queues_[num_thread]->get_queue_length();
             }
 
             // Cumulative queue lengths of all queues.
-            boost::int64_t result = 0;
             for (std::size_t i = 0; i < high_priority_queues_.size(); ++i)
-                result += high_priority_queues_[i]->get_queue_length();
+                count += high_priority_queues_[i]->get_queue_length();
 
-            result += low_priority_queue_.get_queue_length();
+            count += low_priority_queue_.get_queue_length();
 
             for (std::size_t i = 0; i < queues_.size(); ++i)
-                result += queues_[i]->get_queue_length();
+                count += queues_[i]->get_queue_length();
 
-            return result;
+            return count;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -314,33 +362,30 @@ namespace hpx { namespace threads { namespace policies
             std::size_t num_thread = std::size_t(-1)) const
         {
             // Return thread count of one specific queue.
+            boost::int64_t count = 0;
             if (std::size_t(-1) != num_thread)
             {
                 BOOST_ASSERT(num_thread < queues_.size());
 
-                boost::int64_t result = 0;
                 if (num_thread < high_priority_queues_.size())
-                {
-                    result = high_priority_queues_[num_thread]->get_thread_count(state);
-                }
+                    count = high_priority_queues_[num_thread]->get_thread_count(state);
+
                 if (queues_.size()-1 == num_thread)
-                {
-                    result += low_priority_queue_.get_thread_count(state);
-                }
-                return result + queues_[num_thread]->get_thread_count(state);
+                    count += low_priority_queue_.get_thread_count(state);
+
+                return count + queues_[num_thread]->get_thread_count(state);
             }
 
             // Return the cumulative count for all queues.
-            boost::int64_t result = 0;
             for (std::size_t i = 0; i < high_priority_queues_.size(); ++i)
-                result += high_priority_queues_[i]->get_thread_count(state);
+                count += high_priority_queues_[i]->get_thread_count(state);
 
-            result += low_priority_queue_.get_thread_count(state);
+            count += low_priority_queue_.get_thread_count(state);
 
             for (std::size_t i = 0; i < queues_.size(); ++i)
-                result += queues_[i]->get_thread_count(state);
+                count += queues_[i]->get_thread_count(state);
 
-            return result;
+            return count;
         }
 
         /// This is a function which gets called periodically by the thread
@@ -355,92 +400,71 @@ namespace hpx { namespace threads { namespace policies
             std::size_t added = 0;
             bool result = queues_[num_thread]->wait_or_add_new(
                 num_thread, running, idle_loop_count, added);
+            if (0 != added) return result;
 
-            if ((queues_.size()-1 == num_thread) && (0 == added)) {
+            std::size_t queues_size = queues_.size();
+            if (queues_size-1 == num_thread) {
                 // Convert low priority tasks to threads before attempting to
                 // steal from other OS thread.
                 result = low_priority_queue_.wait_or_add_new(
                     num_thread, running, idle_loop_count, added) && result;
+                if (0 != added) return result;
             }
 
-            if (0 == added) {
-                // steal work items: first try to steal from other cores in
-                // the same NUMA node
-                std::size_t core_mask = get_thread_affinity_mask(num_thread, numa_sensitive_);
-                std::size_t node_mask = get_numa_node_affinity_mask(num_thread, numa_sensitive_);
+            // steal work items: first try to steal from other cores in
+            // the same NUMA node
+            std::size_t num_pu = get_pu_num(num_thread);
+            boost::uint64_t core_mask = get_thread_affinity_mask(num_pu, numa_sensitive_);
+            boost::uint64_t node_mask = get_numa_node_affinity_mask(num_pu, numa_sensitive_);
 
-                if (core_mask != std::size_t(-1) && node_mask != std::size_t(-1)) {
-                    std::size_t m = 0x01LL;
-                    for (std::size_t i = 0; (0 == added) && i < queues_.size();
-                         m <<= 1, ++i)
-                    {
-                        if (m == core_mask || !(m & node_mask))
-                            continue;         // don't steal from ourselves
+            if (core_mask && node_mask) {
+                boost::uint64_t m = 0x01LL;
+                for (std::size_t i = 0; i < queues_size; m <<= 1, ++i)
+                {
+                    if (i == num_thread || !(m & node_mask))
+                        continue;         // don't steal from ourselves
 
-                        std::size_t idx = least_significant_bit_set(m);
-                        BOOST_ASSERT(idx < queues_.size());
+                    result = queues_[num_thread]->wait_or_add_new(i,
+                        running, idle_loop_count, added, queues_[i]) && result;
+                    if (0 != added) return result;
+                }
+            }
 
-                        result = queues_[num_thread]->wait_or_add_new(idx,
-                            running, idle_loop_count, added, queues_[idx]) && result;
-                    }
+            // if nothing found ask everybody else
+            for (std::size_t i = 1; i < queues_size; ++i) {
+                std::size_t idx = (i + num_thread) % queues_size;
+                result = queues_[num_thread]->wait_or_add_new(idx, running,
+                    idle_loop_count, added, queues_[idx]) && result;
+                if (0 != added) return result;
+            }
+
+            // no new work is available, are we deadlocked?
+            if (HPX_UNLIKELY(/*0 == num_thread &&*/ LHPX_ENABLED(error))) {
+                bool suspended_only = true;
+
+                for (std::size_t i = 0; suspended_only && i < queues_.size(); ++i) {
+                    suspended_only = queues_[i]->dump_suspended_threads(
+                        i, idle_loop_count, running);
                 }
 
-                // if nothing found ask everybody else
-                for (std::size_t i = 1; 0 == added && i < queues_.size(); ++i) {
-                    std::size_t idx = (i + num_thread) % queues_.size();
-                    result = queues_[num_thread]->wait_or_add_new(idx, running,
-                        idle_loop_count, added, queues_[idx]) && result;
-                }
-
-                // no new work is available, are we deadlocked?
-                if (HPX_UNLIKELY(0 == added /*&& 0 == num_thread*/ && LHPX_ENABLED(error))) {
-                    bool suspended_only = true;
-
-                    for (std::size_t i = 0; suspended_only && i < queues_.size(); ++i) {
-                        suspended_only = queues_[i]->dump_suspended_threads(
-                            i, idle_loop_count, running);
+                if (HPX_UNLIKELY(suspended_only)) {
+                    if (running) {
+                        LTM_(error)
+                            << "queue(" << num_thread << "): "
+                            << "no new work available, are we deadlocked?";
                     }
-
-                    if (HPX_UNLIKELY(suspended_only)) {
-                        if (running) {
-                            LTM_(error)
-                                << "queue(" << num_thread << "): "
-                                << "no new work available, are we deadlocked?";
-                        }
-                        else {
-                            LHPX_CONSOLE_(boost::logging::level::error) << "  [TM] "
-                                  << "queue(" << num_thread << "): "
-                                  << "no new work available, are we deadlocked?\n";
-                        }
+                    else {
+                        LHPX_CONSOLE_(boost::logging::level::error) << "  [TM] "
+                              << "queue(" << num_thread << "): "
+                              << "no new work available, are we deadlocked?\n";
                     }
                 }
             }
-            return result && 0 == added;
+            return result;
         }
 
-        /// This function gets called by the thread-manager whenever new work
-        /// has been added, allowing the scheduler to reactivate one or more of
-        /// possibly idling OS threads
-        void do_some_work(std::size_t num_thread)
-        {
-            if (std::size_t(-1) != num_thread) {
-                BOOST_ASSERT(num_thread < queues_.size());
-
-                if (num_thread < high_priority_queues_.size())
-                    high_priority_queues_[num_thread]->do_some_work();
-                if (num_thread == queues_.size()-1)
-                    low_priority_queue_.do_some_work();
-
-                queues_[num_thread]->do_some_work();
-            }
-            else {
-                for (std::size_t i = 0; i < high_priority_queues_.size(); ++i)
-                    high_priority_queues_[i]->do_some_work();
-                for (std::size_t i = 0; i < queues_.size(); ++i)
-                    queues_[i]->do_some_work();
-                low_priority_queue_.do_some_work();
-            }
-        }
+        // no-op for local scheduling
+        void do_some_work(std::size_t num_thread) {}
 
         ///////////////////////////////////////////////////////////////////////
         void on_start_thread(std::size_t num_thread)
@@ -476,8 +500,12 @@ namespace hpx { namespace threads { namespace policies
         std::vector<thread_queue<false>*> high_priority_queues_;
         thread_queue<false> low_priority_queue_;
         boost::atomic<std::size_t> curr_queue_;
+        affinity_data affinity_data_;
         bool numa_sensitive_;
     };
 }}}
 
+#include <hpx/config/warnings_suffix.hpp>
+
 #endif
+

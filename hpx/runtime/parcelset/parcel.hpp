@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2007 Alexandre (aka Alex) TABBAL
 //  Copyright (c) 2011 Bryce Lelbach
@@ -29,9 +29,6 @@
 namespace hpx { namespace parcelset
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class parcel parcel.hpp hpx/runtime/parcelset/parcel.hpp
-    ///
-    ///
     class HPX_EXPORT parcel
     {
     public:
@@ -68,7 +65,7 @@ namespace hpx { namespace parcelset
 
         parcel(boost::uint32_t prefix, naming::address addr,
             actions::base_action* act)
-          : destination_id_(naming::get_gid_from_prefix(prefix)),
+          : destination_id_(naming::get_gid_from_locality_id(prefix)),
             destination_addr_(addr), source_id_(), action_(act),
             continuation_(), start_time_(0), creation_time_(0)
         {}
@@ -79,7 +76,7 @@ namespace hpx { namespace parcelset
         // default copy constructor is ok
         // default assignment operator is ok
 
-        actions::action_type get_action() const
+        actions::action_type get_action()
         {
             return action_;
         }

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,6 +25,7 @@
 #include <hpx/runtime/parcelset/policies/global_parcelhandler_queue.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/include/performance_counters.hpp>
+#include <boost/coroutine/detail/coroutine_impl_impl.hpp>
 
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 
@@ -83,7 +84,7 @@ namespace hpx
 
 #else
 
-#include <pthread.h>
+//#include <pthread.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
@@ -132,29 +133,38 @@ namespace hpx
         return strings::runtime_mode_names[state+1];
     }
 
+    runtime_mode get_runtime_mode_from_name(std::string const& mode)
+    {
+        for (std::size_t i = 0; i < runtime_mode_last; ++i) {
+            if (mode == strings::runtime_mode_names[i])
+                return static_cast<runtime_mode>(i-1);
+        }
+        return runtime_mode_invalid;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     boost::atomic<int> runtime::instance_number_counter_(-1);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
-            runtime_mode locality_mode, init_scheduler_type const& init,
-            std::string const& hpx_ini_file,
-            std::vector<std::string> const& cmdline_ini_defs)
-      : runtime(agas_client_, hpx_ini_file, cmdline_ini_defs),
+            util::runtime_configuration& rtcfg,
+            runtime_mode locality_mode, init_scheduler_type const& init)
+      : runtime(agas_client_, rtcfg),
         mode_(locality_mode), result_(0),
-        io_pool_(boost::bind(&runtime_impl::init_tss, This()),
+        io_pool_(boost::bind(&runtime_impl::init_tss, This(), "io-thread"),
             boost::bind(&runtime_impl::deinit_tss, This()), "io_pool"),
-        parcel_pool_(boost::bind(&runtime_impl::init_tss, This()),
+        parcel_pool_(boost::bind(&runtime_impl::init_tss, This(), "parcel-thread"),
             boost::bind(&runtime_impl::deinit_tss, This()), "parcel_pool"),
-        timer_pool_(boost::bind(&runtime_impl::init_tss, This()),
+        timer_pool_(boost::bind(&runtime_impl::init_tss, This(), "timer-thread"),
             boost::bind(&runtime_impl::deinit_tss, This()), "timer_pool"),
-        parcel_port_(parcel_pool_, ini_.get_parcelport_address()),
+        parcel_port_(parcel_pool_, ini_.get_parcelport_address(),
+            ini_.get_connection_cache_size(), ini_.get_max_connections_per_loc()),
         agas_client_(parcel_port_, ini_, mode_),
         parcel_handler_(agas_client_, parcel_port_, &thread_manager_,
             new parcelset::policies::global_parcelhandler_queue),
         scheduler_(init),
-        notifier_(boost::bind(&runtime_impl::init_tss, This()),
+        notifier_(boost::bind(&runtime_impl::init_tss, This(), "worker-thread"),
             boost::bind(&runtime_impl::deinit_tss, This()),
             boost::bind(&runtime_impl::report_error, This(), _1, _2)),
         thread_manager_(timer_pool_, scheduler_, notifier_),
@@ -162,7 +172,7 @@ namespace hpx
         applier_(parcel_handler_, thread_manager_,
             boost::uint64_t(&runtime_support_), boost::uint64_t(&memory_)),
         action_manager_(applier_),
-        runtime_support_(ini_, parcel_handler_.get_prefix(), agas_client_, applier_)
+        runtime_support_(ini_, parcel_handler_.get_locality(), agas_client_, applier_)
     {
         components::server::get_error_dispatcher().register_error_sink(
             &runtime_impl::default_errorsink, default_error_sink_);
@@ -186,7 +196,7 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void pre_main(hpx::runtime_mode);
+    bool pre_main(hpx::runtime_mode);
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     threads::thread_state
@@ -199,7 +209,11 @@ namespace hpx
         threads::set_thread_description(threads::get_self_id(), "pre_main");
 
         // Finish the bootstrap
-        hpx::pre_main(mode_);
+        if (!hpx::pre_main(mode_)) {
+            LBT_(info) << "(3rd stage) runtime_impl::run_helper: bootstrap "
+                          "aborted, bailing out";
+            return threads::thread_state(threads::terminated);
+        }
 
         LBT_(info) << "(3rd stage) runtime_impl::run_helper: bootstrap complete";
 
@@ -355,8 +369,9 @@ namespace hpx
 
         t.join();
 
-//        // stop the rest of the system
-//        parcel_port_.stop(blocking);        // stops parcel_pool_ as well
+        // stop the rest of the system
+        parcel_port_.stop(blocking);        // stops parcel_pool_ as well
+        io_pool_.stop();                    // stops parcel_pool_ as well
 
         deinit_tss();
     }
@@ -386,40 +401,39 @@ namespace hpx
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::report_error(
         std::size_t num_thread, boost::exception_ptr const& e)
     {
-        // Early and late exceptions, errors outside of pxthreads
+        // Early and late exceptions, errors outside of px-threads
         if (!threads::get_self_ptr() || !threads::threadmanager_is(running))
         {
-            detail::report_exception_and_abort(e);
+            detail::report_exception_and_terminate(e);
             return;
         }
 
-        // The console error sink is only applied at the console, so default
-        // error sink never gets called on the locality, meaning that the user
-        // never sees errors that kill the system before the error parcel gets
-        // sent out. So, before we try to send the error parcel (which might
-        // cause a double fault), print local diagnostics.
+        // The components::console_error_sink is only applied at the console,
+        // so the default error sink never gets called on the locality, meaning
+        // that the user never sees errors that kill the system before the
+        // error parcel gets sent out. So, before we try to send the error
+        // parcel (which might cause a double fault), print local diagnostics.
         components::server::console_error_sink(e);
 
         // Report this error to the console.
-        naming::gid_type console_prefix;
-        if (agas_client_.get_console_prefix(console_prefix))
+        naming::gid_type console_id;
+        if (agas_client_.get_console_locality(console_id))
         {
-            if (parcel_handler_.get_prefix() != console_prefix) {
+            if (parcel_handler_.get_locality() != console_id) {
                 components::console_error_sink(
-                    naming::id_type(console_prefix, naming::id_type::unmanaged),
-                    e);
+                    naming::id_type(console_id, naming::id_type::unmanaged), e);
             }
         }
 
         components::stubs::runtime_support::terminate_all(
-            naming::get_id_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX));
+            naming::get_id_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX));
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::report_error(
         boost::exception_ptr const& e)
     {
-        std::size_t num_thread = hpx::threads::threadmanager_base::get_thread_num();
+        std::size_t num_thread = hpx::threads::threadmanager_base::get_worker_thread_num();
         return report_error(num_thread, e);
     }
 
@@ -461,13 +475,20 @@ namespace hpx
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::default_errorsink(
         std::string const& msg)
     {
+        // log the exception information in any case
+        LERR_(always) << "default_errorsink: unhandled exception: " << msg;
+
         std::cerr << msg << std::endl;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    void runtime_impl<SchedulingPolicy, NotificationPolicy>::init_tss()
+    void runtime_impl<SchedulingPolicy, NotificationPolicy>::init_tss(
+        char const* context)
     {
+        // initialize PAPI
+        papi_support_.register_thread(context);
+
         // initialize our TSS
         this->runtime::init_tss();
 
@@ -483,6 +504,9 @@ namespace hpx
 
         // reset our TSS
         this->runtime::deinit_tss();
+
+        // reset PAPI support
+        papi_support_.unregister_thread();
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -490,6 +514,13 @@ namespace hpx
     runtime_impl<SchedulingPolicy, NotificationPolicy>::get_next_id()
     {
         return id_pool.get_id(parcel_port_.here(), agas_client_);
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    void runtime_impl<SchedulingPolicy, NotificationPolicy>::
+        add_pre_startup_function(HPX_STD_FUNCTION<void()> const& f)
+    {
+        runtime_support_.add_pre_startup_function(f);
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -520,32 +551,66 @@ namespace hpx
     {
         // initialize our TSS
         BOOST_ASSERT(NULL == runtime::runtime_.get());    // shouldn't be initialized yet
+        BOOST_ASSERT(NULL == threads::coroutine_type::impl_type::get_self());
+
         runtime::runtime_.reset(new runtime* (this));
+        threads::coroutine_type::impl_type::init_self();
     }
 
     void runtime::deinit_tss()
     {
         // reset our TSS
+        threads::coroutine_type::impl_type::reset_self();
         runtime::runtime_.reset();
     }
 
-    /// \brief Install all performance counters related to this runtime
+    /// \brief Register all performance counter types related to this runtime
     ///        instance
-    void runtime::install_counters()
+    void runtime::register_counter_types()
     {
-        performance_counters::raw_counter_type_data counter_types[] =
+        performance_counters::generic_counter_type_data statistic_counter_types[] =
         {
+            // averaging counter
+            { "/statistics/average", performance_counters::counter_aggregating,
+              "returns the averaged value of its base counter over "
+              "an arbitrary time line; pass required base counter as the instance "
+              "name: /statistics{<base_counter_name>}/average",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::aggregating_counter_creator,
+              &performance_counters::default_counter_discoverer
+            },
+
+            // max counter
+            { "/statistics/max", performance_counters::counter_aggregating,
+              "returns the averaged value of its base counter over "
+              "an arbitrary time line; pass required base counter as the instance "
+              "name: /statistics{<base_counter_name>}/max",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::aggregating_counter_creator,
+              &performance_counters::default_counter_discoverer
+            },
+
+            // min counter
+            { "/statistics/min", performance_counters::counter_aggregating,
+              "returns the averaged value of its base counter over "
+              "an arbitrary time line; pass required base counter as the instance "
+              "name: /statistics{<base_counter_name>}/min",
+              HPX_PERFORMANCE_COUNTER_V1,
+               &performance_counters::detail::aggregating_counter_creator,
+               &performance_counters::default_counter_discoverer
+            },
+
+            // uptime counters
             { "/runtime/uptime", performance_counters::counter_elapsed_time,
               "returns the up time of the runtime instance for the referenced locality",
-              HPX_PERFORMANCE_COUNTER_V1 }
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::uptime_counter_creator,
+              &performance_counters::default_counter_discoverer
+            }
         };
         performance_counters::install_counter_types(
-            counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
-
-        boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
-        boost::format runtime_uptime("/runtime(locality#%d/total)/uptime");
-        performance_counters::install_counter(
-            boost::str(runtime_uptime % prefix));
+            statistic_counter_types,
+            sizeof(statistic_counter_types)/sizeof(statistic_counter_types[0]));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -571,7 +636,7 @@ namespace hpx
         // Early and late exceptions
         if (!threads::threadmanager_is(running))
         {
-            detail::report_exception_and_abort(e);
+            detail::report_exception_and_terminate(e);
             return;
         }
 
@@ -583,11 +648,11 @@ namespace hpx
         // Early and late exceptions
         if (!threads::threadmanager_is(running))
         {
-            detail::report_exception_and_abort(e);
+            detail::report_exception_and_terminate(e);
             return;
         }
 
-        std::size_t num_thread = hpx::threads::threadmanager_base::get_thread_num();
+        std::size_t num_thread = hpx::threads::threadmanager_base::get_worker_thread_num();
         hpx::applier::get_applier().get_thread_manager().report_error(num_thread, e);
     }
 
@@ -621,39 +686,72 @@ namespace hpx
     // Helpers
     naming::id_type find_here()
     {
-        return naming::id_type(hpx::applier::get_applier().get_prefix(),
+        return naming::id_type(hpx::applier::get_applier().get_raw_locality(),
             naming::id_type::unmanaged);
     }
 
     std::vector<naming::id_type>
     find_all_localities(components::component_type type)
     {
-        std::vector<naming::id_type> prefixes;
-        hpx::applier::get_applier().get_prefixes(prefixes, type);
-        return prefixes;
+        std::vector<naming::id_type> locality_ids;
+        hpx::applier::get_applier().get_localities(locality_ids, type);
+        return locality_ids;
     }
 
     std::vector<naming::id_type> find_all_localities()
     {
-        std::vector<naming::id_type> prefixes;
-        hpx::applier::get_applier().get_prefixes(prefixes);
-        return prefixes;
+        std::vector<naming::id_type> locality_ids;
+        hpx::applier::get_applier().get_localities(locality_ids);
+        return locality_ids;
+    }
+
+    std::vector<naming::id_type>
+    find_remote_localities(components::component_type type)
+    {
+        std::vector<naming::id_type> locality_ids;
+        hpx::applier::get_applier().get_remote_localities(locality_ids, type);
+        return locality_ids;
+    }
+
+    std::vector<naming::id_type> find_remote_localities()
+    {
+        std::vector<naming::id_type> locality_ids;
+        hpx::applier::get_applier().get_remote_localities(locality_ids);
+        return locality_ids;
     }
 
     // find a locality supporting the given component
     naming::id_type find_locality(components::component_type type)
     {
-        std::vector<naming::id_type> prefixes;
-        hpx::applier::get_applier().get_prefixes(prefixes, type);
+        std::vector<naming::id_type> locality_ids;
+        hpx::applier::get_applier().get_localities(locality_ids, type);
 
-        if (prefixes.empty()) {
+        if (locality_ids.empty()) {
             HPX_THROW_EXCEPTION(hpx::bad_component_type, "find_locality",
                 "no locality supporting sheneos configuration component found");
             return naming::invalid_id;
         }
 
         // chose first locality to host the object
-        return prefixes.front();
+        return locality_ids.front();
+    }
+
+    /// \brief Return the number of localities which are currently registered
+    ///        for the running application.
+    boost::uint32_t get_num_localities()
+    {
+        // FIXME: this is overkill
+        std::vector<naming::id_type> locality_ids;
+        hpx::applier::get_applier().get_localities(locality_ids);
+        return static_cast<boost::uint32_t>(locality_ids.size());
+    }
+
+    boost::uint32_t get_num_localities(components::component_type type)
+    {
+        // FIXME: this is overkill
+        std::vector<naming::id_type> locality_ids;
+        hpx::applier::get_applier().get_localities(locality_ids, type);
+        return static_cast<boost::uint32_t>(locality_ids.size());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -662,9 +760,14 @@ namespace hpx
         return get_runtime().get_next_id();
     }
 
-    std::size_t get_num_os_threads()
+    std::size_t get_os_thread_count()
     {
-        return get_runtime().get_config().get_num_os_threads();
+        return get_runtime().get_config().get_os_thread_count();
+    }
+
+    std::size_t get_worker_thread_num()
+    {
+        return get_runtime().get_thread_manager().get_worker_thread_num();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -682,7 +785,7 @@ namespace hpx
     {
         get_runtime().add_shutdown_function(f);
     }
- 
+
     HPX_EXPORT components::server::runtime_support* get_runtime_support_ptr()
     {
         return reinterpret_cast<components::server::runtime_support*>(
@@ -726,19 +829,50 @@ namespace hpx { namespace threads
 
 ///////////////////////////////////////////////////////////////////////////////
 /// explicit template instantiation for the thread manager of our choice
+#if defined(HPX_GLOBAL_SCHEDULER)
+#include <hpx/runtime/threads/policies/global_queue_scheduler.hpp>
 template HPX_EXPORT class hpx::runtime_impl<
     hpx::threads::policies::global_queue_scheduler,
     hpx::threads::policies::callback_notifier>;
+#endif
 
+#if defined(HPX_LOCAL_SCHEDULER)
+#include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 template HPX_EXPORT class hpx::runtime_impl<
     hpx::threads::policies::local_queue_scheduler,
     hpx::threads::policies::callback_notifier>;
+#endif
 
+#include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
 template HPX_EXPORT class hpx::runtime_impl<
     hpx::threads::policies::local_priority_queue_scheduler,
     hpx::threads::policies::callback_notifier>;
 
+#if defined(HPX_ABP_SCHEDULER)
+#include <hpx/runtime/threads/policies/abp_queue_scheduler.hpp>
 template HPX_EXPORT class hpx::runtime_impl<
     hpx::threads::policies::abp_queue_scheduler,
     hpx::threads::policies::callback_notifier>;
+#endif
+
+#if defined(HPX_ABP_PRIORITY_SCHEDULER)
+#include <hpx/runtime/threads/policies/abp_priority_queue_scheduler.hpp>
+template HPX_EXPORT class hpx::runtime_impl<
+    hpx::threads::policies::abp_priority_queue_scheduler,
+    hpx::threads::policies::callback_notifier>;
+#endif
+
+#if defined(HPX_HIERARCHY_SCHEDULER)
+#include <hpx/runtime/threads/policies/hierarchy_scheduler.hpp>
+template HPX_EXPORT class hpx::runtime_impl<
+    hpx::threads::policies::hierarchy_scheduler,
+    hpx::threads::policies::callback_notifier>;
+#endif
+
+#if defined(HPX_PERIODIC_PRIORITY_SCHEDULER)
+#include <hpx/runtime/threads/policies/periodic_priority_scheduler.hpp>
+template HPX_EXPORT class hpx::runtime_impl<
+    hpx::threads::policies::local_periodic_priority_scheduler,
+    hpx::threads::policies::callback_notifier>;
+#endif
 

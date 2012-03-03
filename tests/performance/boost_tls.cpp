@@ -10,6 +10,7 @@
 #include <boost/format.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/tss.hpp>
+#include <boost/thread/barrier.hpp>
 #include <boost/program_options.hpp>
 
 #include <hpx/util/high_resolution_timer.hpp>
@@ -29,15 +30,20 @@ static boost::thread_specific_ptr<double> global_scratch;
 
 ///////////////////////////////////////////////////////////////////////////////
 inline void worker(
-    boost::uint64_t updates
+    boost::barrier& b
+  , boost::uint64_t updates
     )
 {
-    global_scratch.reset(new double);
+    b.wait(); 
 
     for (boost::uint64_t i = 0; i < updates; ++i)
-        *global_scratch += 1 / (2. * i + 1);
+    {
+        global_scratch.reset(new double);
 
-    global_scratch.reset();
+        *global_scratch += 1 / (2. * i * (*global_scratch) + 1);
+
+        global_scratch.reset();
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -87,10 +93,12 @@ int main(
     // run the test
     boost::thread_group workers;
 
+    boost::barrier b(threads);
+
     high_resolution_timer t;
 
     for (boost::uint64_t i = 0; i != threads; ++i)
-        workers.add_thread(new boost::thread(worker, updates));
+        workers.add_thread(new boost::thread(worker, boost::ref(b), updates));
 
     workers.join_all();
 

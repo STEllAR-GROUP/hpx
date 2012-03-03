@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -45,7 +45,7 @@ namespace sheneos
         if (was_created_) {
             // Unregister the config data.
             config_data data = cfg_.get();
-            hpx::agas::unregister_name(data.symbolic_name_);   
+            hpx::agas::unregister_name(data.symbolic_name_);
 
             // Unregister all symbolic names.
             for (std::size_t i = 0; i < partitions_.size(); ++i)
@@ -101,19 +101,24 @@ namespace sheneos
         {
             using boost::lexical_cast;
             partitions_.push_back(hpx::naming::id_type());
-            hpx::agas::resolve_name(data.symbolic_name_ + lexical_cast<std::string>(i),
-                             partitions_.back());
+            hpx::agas::resolve_name(
+                data.symbolic_name_ + lexical_cast<std::string>(i),
+                partitions_.back());
         }
 
         // Read required data from given file.
         num_values_[dimension::ye] = extract_data_range(data.datafile_name_,
-            "ye", minval_[dimension::ye], maxval_[dimension::ye], delta_[dimension::ye]);
+            "ye", minval_[dimension::ye], maxval_[dimension::ye],
+            delta_[dimension::ye]);
         num_values_[dimension::temp] = extract_data_range(data.datafile_name_,
-            "logtemp", minval_[dimension::temp], maxval_[dimension::temp], delta_[dimension::temp]);
+            "logtemp", minval_[dimension::temp], maxval_[dimension::temp],
+            delta_[dimension::temp]);
         num_values_[dimension::rho] = extract_data_range(data.datafile_name_,
-            "logrho", minval_[dimension::rho], maxval_[dimension::rho], delta_[dimension::rho]);
+            "logrho", minval_[dimension::rho], maxval_[dimension::rho],
+            delta_[dimension::rho]);
 
-        num_partitions_per_dim_ = std::exp(std::log(double(data.num_instances_)) / 3);
+        num_partitions_per_dim_ = static_cast<std::size_t>(
+            std::exp(std::log(double(data.num_instances_)) / 3));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -122,11 +127,14 @@ namespace sheneos
     {
         // Read required data from file.
         num_values_[dimension::ye] = extract_data_range(datafilename,
-            "ye", minval_[dimension::ye], maxval_[dimension::ye], delta_[dimension::ye]);
+            "ye", minval_[dimension::ye], maxval_[dimension::ye],
+            delta_[dimension::ye]);
         num_values_[dimension::temp] = extract_data_range(datafilename,
-            "logtemp", minval_[dimension::temp], maxval_[dimension::temp], delta_[dimension::temp]);
+            "logtemp", minval_[dimension::temp], maxval_[dimension::temp],
+            delta_[dimension::temp]);
         num_values_[dimension::rho] = extract_data_range(datafilename,
-            "logrho", minval_[dimension::rho], maxval_[dimension::rho], delta_[dimension::rho]);
+            "logrho", minval_[dimension::rho], maxval_[dimension::rho],
+            delta_[dimension::rho]);
 
         // Wait for the partitions to be created.
         distributing_factory::result_type results = future.get();
@@ -140,22 +148,23 @@ namespace sheneos
         std::size_t num_localities = partitions_.size();
         BOOST_ASSERT(0 != num_localities);
 
-        num_partitions_per_dim_ = std::exp(std::log(double(num_localities)) / 3);
+        num_partitions_per_dim_ = static_cast<std::size_t>(
+            std::exp(std::log(double(num_localities)) / 3));
 
         std::size_t partition_size_x =
             num_values_[dimension::ye] / num_partitions_per_dim_;
-        std::size_t last_partition_size_x =
-            num_values_[dimension::ye] - partition_size_x * (num_partitions_per_dim_-1);
+        std::size_t last_partition_size_x = num_values_[dimension::ye] -
+            partition_size_x * (num_partitions_per_dim_-1);
 
         std::size_t partition_size_y =
             num_values_[dimension::temp] / num_partitions_per_dim_;
-        std::size_t last_partition_size_y =
-            num_values_[dimension::temp] - partition_size_y * (num_partitions_per_dim_-1);
+        std::size_t last_partition_size_y = num_values_[dimension::temp] -
+            partition_size_y * (num_partitions_per_dim_-1);
 
         std::size_t partition_size_z =
             num_values_[dimension::rho] / num_partitions_per_dim_;
-        std::size_t last_partition_size_z =
-            num_values_[dimension::rho] - partition_size_z * (num_partitions_per_dim_-1);
+        std::size_t last_partition_size_z = num_values_[dimension::rho] -
+            partition_size_z * (num_partitions_per_dim_-1);
 
         dimension dim_x(num_values_[dimension::ye]);
         dimension dim_y(num_values_[dimension::temp]);
@@ -222,7 +231,7 @@ namespace sheneos
 
     ///////////////////////////////////////////////////////////////////////////
     hpx::naming::id_type const&
-    interpolator::get_gid(double ye, double temp, double rho)
+    interpolator::get_gid(double ye, double temp, double rho)  const
     {
         std::size_t x = get_partition_index(dimension::ye, ye);
         std::size_t y = get_partition_index(dimension::temp, std::log10(temp));
@@ -235,17 +244,20 @@ namespace sheneos
         return partitions_[index];
     }
 
-    std::size_t interpolator::get_partition_index(std::size_t d, double value)
+    std::size_t
+    interpolator::get_partition_index(std::size_t d, double value) const
     {
         std::size_t partition_size = num_values_[d] / num_partitions_per_dim_;
-        std::size_t partition_index = (value - minval_[d]) / (delta_[d] * partition_size);
+        std::size_t partition_index = static_cast<std::size_t>(
+            (value - minval_[d]) / (delta_[d] * partition_size));
         if (partition_index == num_partitions_per_dim_)
             --partition_index;
         BOOST_ASSERT(partition_index < num_partitions_per_dim_);
         return partition_index;
     }
 
-    void interpolator::get_dimension(dimension::type what, double& min, double& max)
+    void interpolator::get_dimension(
+        dimension::type what, double& min, double& max)  const
     {
         switch (what) {
         case dimension::ye:
@@ -263,8 +275,109 @@ namespace sheneos
             HPX_THROW_EXCEPTION(hpx::bad_parameter,
                 "sheneos::interpolator::get_dimension",
                 "value of parameter 'what' is not valid");
-            
+            break;
         }
+    }
+
+    // context data and callback function for asynchronous bulk operations
+    struct context_data
+    {
+        std::vector<std::size_t> indicies_;
+        std::vector<double> ye_;
+        std::vector<double> temp_;
+        std::vector<double> rho_;
+    };
+
+    // callback function object which will be called whenever an asynchronous
+    // bulk operation has been completed
+    struct on_completed_bulk
+    {
+        on_completed_bulk(context_data const& data,
+                std::vector<double>& overall_result)
+          : data_(data), overall_result_(overall_result)
+        {}
+
+        void operator()(std::vector<double> const& result)
+        {
+            std::vector<std::size_t> const& indicies = data_.get().indicies_;
+
+            if (result.size() != indicies.size()) {
+                HPX_THROW_EXCEPTION(hpx::bad_parameter,
+                    "interpolator::on_completed_bulk",
+                    "inconsistent sizes of result and index arrays");
+            }
+
+            for (std::size_t i = 0; i < indicies.size(); ++i)
+                (overall_result_.get())[indicies[i]] = result[i];
+        }
+
+        boost::reference_wrapper<context_data const> data_;
+        boost::reference_wrapper<std::vector<double> > overall_result_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    hpx::lcos::promise<std::vector<double> >
+    interpolator::interpolate_one_bulk_async(std::vector<double> const& ye,
+        std::vector<double> const& temp, std::vector<double> const& rho,
+        boost::uint32_t eosvalue) const
+    {
+        namespace naming = hpx::naming;
+        namespace lcos = hpx::lcos;
+
+        lcos::promise<std::vector<double> > bulk_op;
+
+        // go through the triplets of data points and determine their target
+        // partition, construct the partition-specific query-data
+        if (ye.size() != temp.size() || ye.size() != rho.size()) {
+            HPX_THROW_EXCEPTION(hpx::bad_parameter,
+                "interpolator::interpolate_one_bulk_async",
+                "inconsistent sizes of input fields");
+            return bulk_op;
+        }
+
+        typedef std::map<naming::id_type, context_data> partitions_type;
+        partitions_type partitions;
+
+        std::size_t index = 0;
+        std::vector<double>::const_iterator it_temp = temp.begin();
+        std::vector<double>::const_iterator it_rho = rho.begin();
+        std::vector<double>::const_iterator it_ye_end = ye.end();
+        for (std::vector<double>::const_iterator it_ye = ye.begin();
+            it_ye != it_ye_end; ++it_ye, ++index)
+        {
+            context_data& d = partitions[get_gid(*it_ye, *it_temp, *it_rho)];
+
+            d.indicies_.push_back(index);
+            d.ye_.push_back(*it_ye);
+            d.temp_.push_back(*it_temp);
+            d.rho_.push_back(*it_rho);
+        }
+
+        // create the overall result vector
+        std::vector<double> overall_result;
+        overall_result.resize(ye.size());
+
+        // asynchronously invoke the interpolation on the different partitions
+        std::vector<lcos::promise<std::vector<double> > > lazy_results;
+        lazy_results.reserve(partitions.size());
+
+        typedef partitions_type::value_type value_type;
+        BOOST_FOREACH(value_type& p, partitions)
+        {
+            typedef sheneos::server::partition3d::interpolate_one_bulk_action
+                action_type;
+
+            context_data& d = p.second;
+            lazy_results.push_back(lcos::async_callback<action_type>(
+                on_completed_bulk(d, overall_result),
+                p.first, boost::move(d.ye_), boost::move(d.temp_),
+                boost::move(d.rho_), eosvalue));
+        }
+
+        // wait for all asynchronous operations to complete
+        lcos::wait(lazy_results);
+
+        return bulk_op;
     }
 }
 

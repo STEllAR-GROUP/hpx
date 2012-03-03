@@ -18,3 +18,13 @@ macro(hpx_get_include_directory variable)
   set(${variable} "${dir}")
 endmacro()
 
+###############################################################################
+# prevent undefined variables from messing up the compilation flags
+macro(hpx_get_boost_include_directory variable)
+  if(NOT BOOST_INCLUDE_DIR)
+    set(${variable} "")
+  else()
+    set(${variable} "-I${BOOST_INCLUDE_DIR}")
+  endif()
+endmacro()
+

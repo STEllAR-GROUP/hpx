@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,6 +14,7 @@
 #include <hpx/util/spinlock.hpp>
 #include <hpx/util/serialize_sequence.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/server/console_logging.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
@@ -36,10 +37,18 @@ namespace boost { namespace serialization
 {
     template <typename Archive>
     void serialize(Archive& ar, hpx::components::message_type& r,
-        const unsigned int version)
+        unsigned int version)
     {
         hpx::util::serialize_sequence(ar, r);
     }
+
+    template HPX_EXPORT void
+    serialize(hpx::util::portable_binary_oarchive&,
+        hpx::components::message_type&, unsigned int version);
+
+    template HPX_EXPORT void
+    serialize(hpx::util::portable_binary_iarchive&,
+        hpx::components::message_type&, unsigned int version);
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

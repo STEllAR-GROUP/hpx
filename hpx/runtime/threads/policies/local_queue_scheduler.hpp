@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,7 +6,7 @@
 #if !defined(HPX_THREADMANAGER_SCHEDULING_LOCAL_QUEUE_AUG_25_2009_0137PM)
 #define HPX_THREADMANAGER_SCHEDULING_LOCAL_QUEUE_AUG_25_2009_0137PM
 
-#include <map>
+#include <vector>
 #include <memory>
 
 #include <hpx/config.hpp>
@@ -17,14 +17,11 @@
 #include <hpx/runtime/threads/thread_affinity.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
 
-#include <boost/thread.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/bind.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/lockfree/fifo.hpp>
-#include <boost/ptr_container/ptr_map.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/atomic.hpp>
+#include <boost/mpl/bool.hpp>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
@@ -43,6 +40,7 @@ namespace hpx { namespace threads { namespace policies
         enum { max_thread_count = 1000 };
 
     public:
+        typedef boost::mpl::false_ has_periodic_maintenance;
         // the scheduler type takes two initialization parameters:
         //    the number of queues
         //    the maxcount per queue
@@ -92,6 +90,11 @@ namespace hpx { namespace threads { namespace policies
         }
 
         bool numa_sensitive() const { return numa_sensitive_; }
+
+        std::size_t get_pu_num(std::size_t num_thread) const
+        {
+            return num_thread;
+        }
 
         ///////////////////////////////////////////////////////////////////////
         // Queries the current length of the queues (work items and new items).
@@ -164,7 +167,7 @@ namespace hpx { namespace threads { namespace policies
         /// Return the next thread to be executed, return false if non is
         /// available
         bool get_next_thread(std::size_t num_thread, bool running,
-            std::size_t& idle_loop_count, threads::thread** thrd)
+            std::size_t& idle_loop_count, threads::thread*& thrd)
         {
             // first try to get the next thread from our own queue
             BOOST_ASSERT(num_thread < queues_.size());
@@ -205,6 +208,12 @@ namespace hpx { namespace threads { namespace policies
             }
         }
 
+        void schedule_thread_last(threads::thread* thrd, std::size_t num_thread,
+            thread_priority priority = thread_priority_normal)
+        {
+            schedule_thread(thrd, num_thread, priority);
+        }
+
         /// Destroy the passed thread as it has been terminated
         bool destroy_thread(threads::thread* thrd)
         {
@@ -231,11 +240,11 @@ namespace hpx { namespace threads { namespace policies
             if (0 == added) {
                 // steal work items: first try to steal from other cores in the
                 // same numa node
-                std::size_t core_mask = get_thread_affinity_mask(num_thread, numa_sensitive_);
-                std::size_t node_mask = get_numa_node_affinity_mask(num_thread, numa_sensitive_);
+                boost::uint64_t core_mask = get_thread_affinity_mask(num_thread, numa_sensitive_);
+                boost::uint64_t node_mask = get_numa_node_affinity_mask(num_thread, numa_sensitive_);
 
-                if (core_mask != std::size_t(-1) && node_mask != std::size_t(-1)) {
-                    std::size_t m = 0x01LL;
+                if (core_mask && node_mask) {
+                    boost::uint64_t m = 0x01LL;
                     for (std::size_t i = 0; (0 == added) && i < queues_.size();
                          m <<= 1, ++i)
                     {
@@ -317,7 +326,8 @@ namespace hpx { namespace threads { namespace policies
         boost::atomic<std::size_t> curr_queue_;
         bool numa_sensitive_;
     };
-
 }}}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

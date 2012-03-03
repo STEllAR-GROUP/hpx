@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -231,7 +231,7 @@ namespace boost { namespace serialization
             switch (type) {
             case hpx::util::std_exception:
             case hpx::util::unknown_exception:
-                hpx::detail::rethrow_exception(std::exception(),
+                hpx::detail::rethrow_exception(hpx::detail::std_exception(what),
                     throw_function_, throw_file_, throw_line_, back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_);
@@ -267,7 +267,7 @@ namespace boost { namespace serialization
                 break;
 
             case hpx::util::std_bad_alloc:
-                hpx::detail::rethrow_exception(std::bad_alloc(),
+                hpx::detail::rethrow_exception(hpx::detail::bad_alloc(what),
                     throw_function_, throw_file_, throw_line_, back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_);
@@ -275,21 +275,21 @@ namespace boost { namespace serialization
 
 #ifndef BOOST_NO_TYPEID
             case hpx::util::std_bad_cast:
-                hpx::detail::rethrow_exception(std::bad_cast(),
+                hpx::detail::rethrow_exception(hpx::detail::bad_cast(what),
                     throw_function_, throw_file_, throw_line_, back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_);
                 break;
 
             case hpx::util::std_bad_typeid:
-                hpx::detail::rethrow_exception(std::bad_typeid(),
+                hpx::detail::rethrow_exception(hpx::detail::bad_typeid(what),
                     throw_function_, throw_file_, throw_line_, back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_);
                 break;
 #endif
             case hpx::util::std_bad_exception:
-                hpx::detail::rethrow_exception(std::bad_exception(),
+                hpx::detail::rethrow_exception(hpx::detail::bad_exception(what),
                     throw_function_, throw_file_, throw_line_, back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_);
@@ -327,7 +327,6 @@ namespace boost { namespace serialization
 
     ///////////////////////////////////////////////////////////////////////////
     // explicit instantiation for the correct archive types
-#if HPX_USE_PORTABLE_ARCHIVES != 0
     template HPX_EXPORT void
     save(hpx::util::portable_binary_oarchive&, boost::exception_ptr const&,
         unsigned int);
@@ -335,14 +334,5 @@ namespace boost { namespace serialization
     template HPX_EXPORT void
     load(hpx::util::portable_binary_iarchive&, boost::exception_ptr&,
         unsigned int);
-#else
-    template HPX_EXPORT void
-    save(boost::archive::binary_oarchive&, boost::exception_ptr const&,
-        unsigned int);
-
-    template HPX_EXPORT void
-    load(boost::archive::binary_iarchive&, boost::exception_ptr&,
-        unsigned int);
-#endif
 }}
 

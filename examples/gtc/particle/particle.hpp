@@ -39,18 +39,31 @@ namespace gtc
         /// Initialize the \a gtc::server::particle instance with the
         /// given particle file. 
         hpx::lcos::promise<void> init_async(std::size_t objectid,
-            std::string const& particlefile)
+            parameter const& par)
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::init_async(gid_,objectid,particlefile);
+            return this->base_type::init_async(gid_,objectid,par);
         }
 
         /// Initialize the \a gtc::server::particle instance with the
         /// given particle file.  
-        void init(std::size_t objectid,std::string const& particlefile)
+        void init(std::size_t objectid,parameter const& par)
         {
             BOOST_ASSERT(gid_);
-            this->base_type::init(gid_,objectid,particlefile);
+            this->base_type::init(gid_,objectid,par);
+        }
+
+        hpx::lcos::promise<void> chargei_async(std::size_t objectid,std::size_t istep, std::vector<hpx::naming::id_type> const& particle_components,
+            parameter const& par)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::chargei_async(gid_,objectid,istep,particle_components,par);
+        }
+
+        void chargei(std::size_t objectid,std::size_t istep,std::vector<hpx::naming::id_type> const& particle_components,parameter const& par)
+        {
+            BOOST_ASSERT(gid_);
+            this->base_type::chargei(gid_,objectid,istep,particle_components,par);
         }
 
         /// Compute the distance from the particle to the specified coordinates. 
@@ -80,6 +93,20 @@ namespace gtc
         {
             BOOST_ASSERT(gid_);
             return this->base_type::get_index(gid_);
+        }
+
+        /// Get the index of the particle.
+        hpx::lcos::promise< array<double> > get_densityi_async()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_densityi_async(gid_);
+        }
+
+        /// Get the index of the particle.
+        array<double> get_densityi()
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::get_densityi(gid_);
         }
     };
 }

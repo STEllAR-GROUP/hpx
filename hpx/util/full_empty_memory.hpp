@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,14 +9,13 @@
 
 #include <boost/noncopyable.hpp>
 #include <boost/call_traits.hpp>
+#include <boost/move/move.hpp>
 
 #include <hpx/util/full_empty_entry.hpp>
 
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class full_empty full_empty_memory.hpp hpx/lcos/full_empty_memory.hpp
-    ///
     /// The \a full_empty data type is a implementation of memory areas guarded
     /// by full/empty bits, a very low level synchronization primitive. The
     /// class has been modeled after the FEB implementation in the QThread
@@ -67,8 +66,8 @@ namespace hpx { namespace util
         {}
 
         template <typename T0>
-        full_empty(T0 const& t0)
-          : data_(t0)
+        full_empty(BOOST_FWD_REF(T0) t0)
+          : data_(boost::forward<T0>(t0))
         {}
 
         /// \brief Destruct the full/empty data item
@@ -81,9 +80,9 @@ namespace hpx { namespace util
         ///
         /// \note    This function will create a new full/empty entry in the
         ///          store if it doesn't exist yet.
-        void set_empty()
+        void set_empty(error_code& ec = throws)
         {
-            data_.set_empty();
+            data_.set_empty(ec);
         }
 
         /// \brief Atomically set the state to full without releasing any
@@ -92,9 +91,9 @@ namespace hpx { namespace util
         ///
         /// \note    This function will not create a new full/empty entry in
         ///          the store if it doesn't exist yet.
-        void set_full()
+        void set_full(error_code& ec = throws)
         {
-            data_.set_full();
+            data_.set_full(ec);
         }
 
         /// \brief Query the current state of the memory
@@ -150,9 +149,9 @@ namespace hpx { namespace util
         ///         location to full using \a set might re-activate threads
         ///         waiting on this in a \a read or \a read_and_empty function.
         template <typename Target>
-        void set(Target const& data)
+        void set(BOOST_FWD_REF(Target) data)
         {
-            data_.set_and_fill(data);
+            data_.set_and_fill(boost::forward<Target>(data));
         }
 
         /// \brief  Waits for memory to become empty, and then fills it. If the
@@ -168,9 +167,9 @@ namespace hpx { namespace util
         /// \note   When memory becomes empty only one thread blocked like this
         ///         will be queued to run.
         template <typename Target>
-        void write(Target const& data, error_code& ec = throws)
+        void write(BOOST_FWD_REF(Target) data, error_code& ec = throws)
         {
-            data_.enqueue_if_full(data, ec);
+            data_.enqueue_if_full(boost::forward<Target>(data), ec);
         }
 
     private:

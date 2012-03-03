@@ -1,5 +1,5 @@
 //  Copyright (c) 2007-2008 Anshul Tandon
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,8 +24,6 @@
 
 namespace hpx { namespace applier
 {
-    /// \class applier applier.hpp hpx/runtime/applier/applier.hpp
-    ///
     /// The \a applier class is used to decide whether a particular action
     /// has to be issued on a local or a remote resource. If the target
     /// component is local a new \a thread will be created, if the target is
@@ -55,7 +53,7 @@ namespace hpx { namespace applier
         /// applier instance has been created with.
         parcelset::parcelhandler& get_parcel_handler();
 
-        /// \brief Access the \a threadmanager instance associated with this
+        /// \brief Access the \a thread-manager instance associated with this
         ///        \a applier
         ///
         /// This function returns a reference to the thread manager this
@@ -69,21 +67,21 @@ namespace hpx { namespace applier
         /// instance is associated with.
         naming::locality const& here() const;
 
-        /// \brief Allow access to the prefix of the locality this applier
+        /// \brief Allow access to the locality of the locality this applier
         ///        instance is associated with.
         ///
         /// This function returns a reference to the locality this applier
         /// instance is associated with.
-        naming::gid_type const& get_prefix() const;
+        naming::gid_type const& get_raw_locality() const;
 
         /// \brief Allow access to the id of the locality this applier
         ///        instance is associated with.
         ///
         /// This function returns a reference to the id of the locality this
         /// applier instance is associated with.
-        boost::uint32_t get_prefix_id() const;
+        boost::uint32_t get_locality_id() const;
 
-        /// \brief Return list of prefixes of all remote localities
+        /// \brief Return list of localities of all remote localities
         ///        registered with the AGAS service for a specific component
         ///        type.
         ///
@@ -91,7 +89,7 @@ namespace hpx { namespace applier
         /// localities known to AGAS except the local one) supporting the given
         /// component type.
         ///
-        /// \param prefixes [out] The reference to a vector of id_types filled
+        /// \param locality_ids [out] The reference to a vector of id_types filled
         ///                 by the function.
         /// \param type     [in] The type of the component which needs to exist
         ///                 on the returned localities.
@@ -99,13 +97,13 @@ namespace hpx { namespace applier
         /// \returns The function returns \a true if there is at least one
         ///          remote locality known to the AGASservice
         ///          (!prefixes.empty()).
-        bool get_raw_remote_prefixes(std::vector<naming::gid_type>& prefixes,
+        bool get_raw_remote_localities(std::vector<naming::gid_type>& locality_ids,
             components::component_type type = components::component_invalid) const;
 
-        bool get_remote_prefixes(std::vector<naming::id_type>& prefixes,
+        bool get_remote_localities(std::vector<naming::id_type>& locality_ids,
             components::component_type type = components::component_invalid) const;
 
-        /// \brief Return list of prefixes of all localities
+        /// \brief Return list of locality_ids of all localities
         ///        registered with the AGAS service for a specific component
         ///        type.
         ///
@@ -113,7 +111,7 @@ namespace hpx { namespace applier
         /// localities known to AGAS except the local one) supporting the given
         /// component type.
         ///
-        /// \param prefixes [out] The reference to a vector of id_types filled
+        /// \param locality_ids [out] The reference to a vector of id_types filled
         ///                 by the function.
         /// \param type     [in] The type of the component which needs to exist
         ///                 on the returned localities.
@@ -121,10 +119,10 @@ namespace hpx { namespace applier
         /// \returns The function returns \a true if there is at least one
         ///          remote locality known to the AGASservice
         ///          (!prefixes.empty()).
-        bool get_raw_prefixes(std::vector<naming::gid_type>& prefixes,
+        bool get_raw_localities(std::vector<naming::gid_type>& locality_ids,
             components::component_type type = components::component_invalid) const;
 
-        bool get_prefixes(std::vector<naming::id_type>& prefixes,
+        bool get_localities(std::vector<naming::id_type>& locality_ids,
             components::component_type type = components::component_invalid) const;
 
         /// By convention the runtime_support has a gid identical to the prefix
@@ -155,12 +153,8 @@ namespace hpx { namespace applier
             return memory_id_;
         }
 
-        /// Test whether the given address (gid) is local or remote
-        bool address_is_local(naming::id_type const& id,
-            naming::address& addr) const;
-
-        bool address_is_local(naming::gid_type const& gid,
-            naming::address& addr) const;
+        // parcel forwarding
+        bool route(parcelset::parcel const& arg0);
 
     public:
         // the TSS holds a pointer to the applier associated with a given
@@ -184,8 +178,8 @@ namespace hpx { namespace applier
     /// \param func       [in] The function to be executed as the thread-function.
     ///                   This function has to expose the minimal low level
     ///                   PX-thread interface, i.e. it takes one argument (a
-    ///                   \a threads#thread_state_ex) and returns a
-    ///                   \a threads#thread_state.
+    ///                   \a threads#thread_state_ex_enum) and returns a
+    ///                   \a threads#thread_state_enum.
     /// \param description [in] A optional string describing the newly created
     ///                   thread. This is useful for debugging and logging
     ///                   purposes as this string will be inserted in the logs.
@@ -232,7 +226,7 @@ namespace hpx { namespace applier
     /// \throws invalid_status if the runtime system has not been started yet.
     ///
     HPX_API_EXPORT threads::thread_id_type register_thread_plain(
-        HPX_STD_FUNCTION<threads::thread_function_type> const& func,
+        BOOST_RV_REF(HPX_STD_FUNCTION<threads::thread_function_type>) func,
         char const* description = 0,
         threads::thread_state_enum initial_state = threads::pending,
         bool run_now = true,
@@ -246,14 +240,14 @@ namespace hpx { namespace applier
     /// \param func       [in] The function to be executed as the thread-function.
     ///                   This function has to expose the minimal low level
     ///                   PX-thread interface, i.e. it takes one argument (a
-    ///                   \a threads#thread_state_ex). The thread will be
+    ///                   \a threads#thread_state_ex_enum). The thread will be
     ///                   terminated after the function returns.
     ///
     /// \note All other arguments are equivalent to those of the function
     ///       \a applier#register_thread_plain
     ///
     HPX_API_EXPORT threads::thread_id_type register_thread(
-        HPX_STD_FUNCTION<void(threads::thread_state_ex)> const& func,
+        BOOST_RV_REF(HPX_STD_FUNCTION<void(threads::thread_state_ex_enum)>) func,
         char const* description = 0,
         threads::thread_state_enum initial_state = threads::pending,
         bool run_now = true,
@@ -273,7 +267,7 @@ namespace hpx { namespace applier
     ///       \a applier#register_thread_plain
     ///
     HPX_API_EXPORT threads::thread_id_type register_thread_nullary(
-        HPX_STD_FUNCTION<void()> const& func, char const* description = 0,
+        BOOST_RV_REF(HPX_STD_FUNCTION<void()>) func, char const* description = 0,
         threads::thread_state_enum initial_state = threads::pending,
         bool run_now = true,
         threads::thread_priority priority = threads::thread_priority_normal,
@@ -303,8 +297,8 @@ namespace hpx { namespace applier
     /// \param func       [in] The function to be executed as the thread-function.
     ///                   This function has to expose the minimal low level
     ///                   PX-thread interface, i.e. it takes one argument (a
-    ///                   \a threads#thread_state_ex) and returns a
-    ///                   \a threads#thread_state.
+    ///                   \a threads#thread_state_ex_enum) and returns a
+    ///                   \a threads#thread_state_enum.
     /// \param description [in] A optional string describing the newly created
     ///                   thread. This is useful for debugging and logging
     ///                   purposes as this string will be inserted in the logs.
@@ -341,7 +335,7 @@ namespace hpx { namespace applier
     /// \throws invalid_status if the runtime system has not been started yet.
     ///
     HPX_API_EXPORT void register_work_plain(
-        HPX_STD_FUNCTION<threads::thread_function_type> const& func,
+        BOOST_RV_REF(HPX_STD_FUNCTION<threads::thread_function_type>) func,
         char const* description = 0, naming::address::address_type lva = 0,
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
@@ -354,14 +348,14 @@ namespace hpx { namespace applier
     /// \param func       [in] The function to be executed as the thread-function.
     ///                   This function has to expose the minimal low level
     ///                   PX-thread interface, i.e. it takes one argument (a
-    ///                   \a threads#thread_state_ex). The thread will be
+    ///                   \a threads#thread_state_ex_enum). The thread will be
     ///                   terminated after the function returns.
     ///
     /// \note All other arguments are equivalent to those of the function
     ///       \a applier#register_work_plain
     ///
     HPX_API_EXPORT void register_work(
-        HPX_STD_FUNCTION<void(threads::thread_state_ex)> const& func,
+        BOOST_RV_REF(HPX_STD_FUNCTION<void(threads::thread_state_ex_enum)>) func,
         char const* description = 0,
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
@@ -380,7 +374,7 @@ namespace hpx { namespace applier
     ///       \a applier#register_work_plain
     ///
     HPX_API_EXPORT void register_work_nullary(
-        HPX_STD_FUNCTION<void()> const& func, char const* description = 0,
+        BOOST_RV_REF(HPX_STD_FUNCTION<void()>) func, char const* description = 0,
         threads::thread_state_enum initial_state = threads::pending,
         threads::thread_priority priority = threads::thread_priority_normal,
         std::size_t os_thread = std::size_t(-1), error_code& ec = throws);

@@ -1,4 +1,5 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c)      2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -22,7 +23,7 @@
 #include <hpx/util/stringstream.hpp>
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (1, HPX_COMPONENT_CREATE_ARG_MAX,                                     \
+    (3, (1, HPX_COMPONENT_CREATE_ARGUMENT_LIMIT,                              \
     "hpx/runtime/components/server/manage_component.hpp"))                    \
     /**/
 
@@ -57,6 +58,32 @@ namespace hpx { namespace components { namespace server
                 "component instance";
         HPX_THROWS_IF(ec, hpx::duplicate_component_address,
             "create<Component>",
+            hpx::util::osstream_get_string(strm));
+
+        return naming::invalid_gid;
+    }
+
+    template <typename Component>
+    naming::gid_type create_one (HPX_STD_FUNCTION<void(void*)> const& ctor,
+        error_code& ec = throws)
+    {
+        Component* c = Component::heap_type::alloc(1);
+
+        ctor(c);
+        naming::gid_type gid = c->get_base_gid();
+        if (gid) {
+            if (&ec != &throws)
+                ec = make_success_code();
+            return gid;
+        }
+
+        Component::heap_type::free(c, 1);
+
+        hpx::util::osstream strm;
+        strm << "global id " << gid << " is already bound to a different "
+                "component instance";
+        HPX_THROWS_IF(ec, hpx::duplicate_component_address,
+            "create_one<Component>(ctor)",
             hpx::util::osstream_get_string(strm));
 
         return naming::invalid_gid;

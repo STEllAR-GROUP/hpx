@@ -8,12 +8,14 @@ if(NOT HPX_FINDPACKAGE_LOADED)
   include(HPX_FindPackage)
 endif()
 
+# This if statement is specific to Lorene, and should not be copied into other
+# Find cmake scripts.
 if(NOT LORENE_ROOT AND NOT $ENV{HOME_LORENE} STREQUAL "")
   set(LORENE_ROOT $ENV{HOME_LORENE})
 endif()
 
 if(LORENE_USE_SYSTEM)
-  set(LORENE_F77_CPP_USE_SYSTEM ON)
+  set(LORENE_F77_USE_SYSTEM ON)
 endif()
 
 if(LORENE_ROOT)
@@ -21,7 +23,7 @@ if(LORENE_ROOT)
 endif()
 
 if(LORENE_USE_SYSTEM)
-  set(LORENE_EXPORT_CPP_USE_SYSTEM ON)
+  set(LORENE_EXPORT_USE_SYSTEM ON)
 endif()
 
 if(LORENE_ROOT)

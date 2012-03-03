@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -206,19 +206,23 @@ namespace hpx { namespace threads
     ///
     /// If the suspension was aborted, this function will throw a
     /// \a yield_aborted exception.
-    thread_state_ex_enum suspend(thread_state_enum state, error_code& ec)
+    thread_state_ex_enum suspend(thread_state_enum state,
+        char const* description, error_code& ec)
     {
         // let the thread manager do other things while waiting
         threads::thread_self& self = threads::get_self();
+        threads::thread_id_type id = self.get_thread_id();
+        threads::set_thread_lco_description(id, description, ec);
+
         threads::thread_state_ex_enum statex = self.yield(state);
 
+        threads::set_thread_lco_description(id, 0, ec);
         if (statex == threads::wait_abort) {
-            threads::thread_id_type id = self.get_thread_id();
             hpx::util::osstream strm;
             strm << "thread(" << id << ", "
                   << threads::get_thread_description(id)
                   << ") aborted (yield returned wait_abort)";
-            HPX_THROWS_IF(ec, yield_aborted, "threads::suspend",
+            HPX_THROWS_IF(ec, yield_aborted, description,
                 hpx::util::osstream_get_string(strm));
         }
 
@@ -228,27 +232,29 @@ namespace hpx { namespace threads
         return statex;
     }
 
-    thread_state_ex_enum suspend(boost::posix_time::ptime const& at_time, error_code& ec)
+    thread_state_ex_enum suspend(boost::posix_time::ptime const& at_time,
+        char const* description, error_code& ec)
     {
         // schedule a thread waking us up at_time
         threads::thread_self& self = threads::get_self();
-        threads::set_thread_state(self.get_thread_id(),
+        threads::thread_id_type id = self.get_thread_id();
+        threads::set_thread_lco_description(id, description, ec);
+
+        threads::set_thread_state(id,
             at_time, threads::pending, threads::wait_signaled,
             threads::thread_priority_critical, ec);
-
-        if (ec)
-            return wait_unknown;
+        if (ec) return wait_unknown;
 
         // let the thread manager do other things while waiting
         threads::thread_state_ex_enum statex = self.yield(threads::suspended);
 
+        threads::set_thread_lco_description(id, 0, ec);
         if (statex == threads::wait_abort) {
-            threads::thread_id_type id = self.get_thread_id();
             hpx::util::osstream strm;
             strm << "thread(" << id << ", "
                   << threads::get_thread_description(id)
                   << ") aborted (yield returned wait_abort)";
-            HPX_THROWS_IF(ec, yield_aborted, "threads::suspend",
+            HPX_THROWS_IF(ec, yield_aborted, description,
                 hpx::util::osstream_get_string(strm));
         }
 
@@ -258,28 +264,30 @@ namespace hpx { namespace threads
         return statex;
     }
 
-    thread_state_ex_enum suspend(boost::posix_time::time_duration const& after_duration,
-        error_code& ec)
+    thread_state_ex_enum suspend(
+        boost::posix_time::time_duration const& after_duration,
+        char const* description, error_code& ec)
     {
         // schedule a thread waking us up after_duration
         threads::thread_self& self = threads::get_self();
-        threads::set_thread_state(self.get_thread_id(),
+        threads::thread_id_type id = self.get_thread_id();
+        threads::set_thread_lco_description(id, description, ec);
+
+        threads::set_thread_state(id,
             after_duration, threads::pending, threads::wait_signaled,
             threads::thread_priority_critical, ec);
-
-        if (ec)
-            return wait_unknown;
+        if (ec) return wait_unknown;
 
         // let the thread manager do other things while waiting
         threads::thread_state_ex_enum statex = self.yield(threads::suspended);
 
+        threads::set_thread_lco_description(id, 0, ec);
         if (statex == threads::wait_abort) {
-            threads::thread_id_type id = self.get_thread_id();
             hpx::util::osstream strm;
             strm << "thread(" << id << ", "
                   << threads::get_thread_description(id)
                   << ") aborted (yield returned wait_abort)";
-            HPX_THROWS_IF(ec, yield_aborted, "threads::suspend",
+            HPX_THROWS_IF(ec, yield_aborted, description,
                 hpx::util::osstream_get_string(strm));
         }
 

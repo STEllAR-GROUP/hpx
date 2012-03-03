@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser, Dylan Stark
+//  Copyright (c) 2007-2012 Hartmut Kaiser, Dylan Stark
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,6 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/lcos/base_lco.hpp>
@@ -24,8 +25,6 @@
 namespace hpx { namespace lcos
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class lazy_future lazy_future.hpp hpx/lcos/lazy_future.hpp
-    ///
     /// A lazy_future can be used by a single \a thread to invoke a
     /// (remote) action and wait for the result. The result is expected to be
     /// sent back to the lazy_future using the LCO's set_event action
@@ -137,7 +136,7 @@ namespace hpx { namespace lcos
             // as the underlying FEB prevents the action from being called
             // more than once; but it would be more efficient to reduce the
             // number of calls to apply().
-            if (!((*th->impl_)->ready()))
+            if (!((*th->impl_)->is_ready(0)))
                 th->apply(gid);
         }
 
@@ -210,7 +209,7 @@ namespace hpx { namespace lcos
         template <typename Arg0>
         void invoke1(naming::id_type const& gid, Arg0 const& arg0)
         {
-            if (!((*this->impl_)->ready()))
+            if (!((*this->impl_)->is_ready(0)))
                 this->apply(gid, arg0);
         }
 
@@ -327,12 +326,12 @@ namespace hpx { namespace lcos
 
             // Determine whether the gid is local or remote
             naming::address addr;
-            if (hpx::applier::get_applier().address_is_local(gid, addr)) {
+            if (agas::is_local_address(gid, addr)) {
                 // local, direct execution
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<typename Action::component_type>()));
                 (*this->impl_)->set_data(0,
-                    Action::execute_function_nonvirt(addr.address_));
+                    Action::execute_function(addr.address_));
             }
             else {
                 // remote execution
@@ -350,7 +349,7 @@ namespace hpx { namespace lcos
         static void invoke(hpx::lcos::lazy_future<Action,Result,boost::mpl::true_> *th,
                            naming::id_type const& gid)
         {
-            if (!((*th->impl_)->ready()))
+            if (!((*th->impl_)->is_ready(0)))
               th->apply(gid);
         }
 
@@ -407,12 +406,12 @@ namespace hpx { namespace lcos
 
             // Determine whether the gid is local or remote
             naming::address addr;
-            if (hpx::applier::get_applier().address_is_local(gid, addr)) {
+            if (agas::is_local_address(gid, addr)) {
                 // local, direct execution
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<typename Action::component_type>()));
                 (*this->impl_)->set_data(
-                    0, Action::execute_function_nonvirt(addr.address_, arg0));
+                    0, Action::execute_function(addr.address_, arg0));
             }
             else {
                 // remote execution
@@ -434,7 +433,7 @@ namespace hpx { namespace lcos
         static void invoke1(hpx::lcos::lazy_future<Action,Result,boost::mpl::true_> *th,
                             naming::id_type const& gid, Arg0 const& arg0)
         {
-            if (!((*th->impl_)->ready()))
+            if (!((*th->impl_)->is_ready(0)))
                 th->apply(gid, arg0);
         }
 

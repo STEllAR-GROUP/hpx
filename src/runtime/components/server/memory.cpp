@@ -1,12 +1,13 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/runtime/applier/apply.hpp>
-#include <hpx/runtime/components/server/memory.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
@@ -47,17 +48,4 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     hpx::lcos::base_lco_with_value<boost::uint64_t>::set_result_action,
     set_result_action_uint64_t);
-
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<boost::uint8_t>,
-    hpx::components::component_base_lco_with_value);
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<boost::uint16_t>,
-    hpx::components::component_base_lco_with_value);
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<boost::uint32_t>,
-    hpx::components::component_base_lco_with_value);
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<boost::uint64_t>,
-    hpx::components::component_base_lco_with_value);
 

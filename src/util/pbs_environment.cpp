@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -41,21 +41,21 @@ namespace hpx { namespace util
                         if (debug_)
                             std::cerr << "read: '" << line << "'" << std::endl;
 
-                        if (!found_agas_host &&
-                            ((agas_host.empty() && nodes_.empty()) ||
-                             line == agas_host))
-                        {
-                            agas_node_ = line;
-                            found_agas_host = true;
-                            agas_node_num_ = agas_node;
-                        }
+                        if (!found_agas_host) {
+                            if ((agas_host.empty() && nodes_.empty()) ||
+                                line == agas_host)
+                            {
+                                agas_node_ = line;
+                                found_agas_host = true;
+                                agas_node_num_ = agas_node;
+                            }
 
-                        if (0 == nodes_.count(line))
-                        {
-                            if (debug_)
-                                std::cerr << "incrementing agas_node"
-                                          << std::endl;
-                            ++agas_node;
+                            if (0 == nodes_.count(line)) {
+                                if (debug_)
+                                    std::cerr << "incrementing agas_node"
+                                              << std::endl;
+                                ++agas_node;
+                            }
                         }
 
                         ++nodes_[line];
@@ -128,11 +128,11 @@ namespace hpx { namespace util
                 ") not found in node list");
         }
 
-        if (debug_ && !agas_node_.empty())
+        if (debug_ && !agas_node_.empty()) {
             std::cerr << "using AGAS host: '" << agas_node_
                       << "' (node number " << agas_node_num_ << ")"
                       << std::endl;
-
+        }
         return nodes_list;
     }
 
@@ -209,7 +209,7 @@ namespace hpx { namespace util
 
     std::string pbs_environment::host_name() const
     {
-        if (!!transform_)
+        if (!!transform_) // If the transform is not empty
             return transform_(boost::asio::ip::host_name());
         return boost::asio::ip::host_name();
     }
@@ -219,6 +219,8 @@ namespace hpx { namespace util
         std::string host = nodes_.empty() ? def_hpx_name : host_name();
         if (debug_)
             std::cerr << "host_name: " << host << std::endl;
+        if (!!transform_) // If the transform is not empty
+            return transform_(host);
         return host;
     }
 
@@ -229,6 +231,8 @@ namespace hpx { namespace util
         std::string host = agas_node_.empty() ? def_agas : agas_node_;
         if (debug_)
             std::cerr << "agas host_name: " << host << std::endl;
+        if (!!transform_) // If the transform is not empty
+            return transform_(host);
         return host;
     }
 

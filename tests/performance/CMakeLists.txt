@@ -8,8 +8,65 @@ set(benchmarks
     native_tls
     hpx_tls
     delay_baseline
-    pxthread
+    hpx_homogeneous_task_spawn
+    hpx_heterogeneous_task_spawn
+    print_heterogeneous_payloads
+    sizeof
    )
+
+if(OPENMP_FOUND)
+  set(benchmarks
+      ${benchmarks}
+      openmp_homogeneous_task_spawn
+     )
+
+  set(openmp_homogeneous_task_spawn_FLAGS NOLIBS
+      DEPENDENCIES ${BOOST_program_options_LIBRARY})
+endif()
+
+if(QTHREADS_FOUND)
+  include_directories(${QTHREADS_INCLUDE_DIR})
+
+  set(benchmarks
+      ${benchmarks}
+      qthreads_homogeneous_task_spawn
+      qthreads_heterogeneous_task_spawn
+     )
+
+  set(qthreads_homogeneous_task_spawn_FLAGS NOLIBS
+      DEPENDENCIES ${BOOST_program_options_LIBRARY}
+                   ${QTHREADS_LIBRARY})
+
+  set(qthreads_heterogeneous_task_spawn_FLAGS NOLIBS
+      DEPENDENCIES ${BOOST_program_options_LIBRARY}
+                   ${QTHREADS_LIBRARY})
+endif()
+
+if(TBB_FOUND)
+  include_directories(${TBB_INCLUDE_DIR})
+
+  set(benchmarks
+      ${benchmarks}
+      tbb_homogeneous_task_spawn
+     )
+
+  set(tbb_homogeneous_task_spawn_FLAGS NOLIBS
+      DEPENDENCIES ${BOOST_program_options_LIBRARY}
+                   ${TBB_LIBRARY})
+endif()
+
+if(SWARM_FOUND)
+  include_directories(${SWARM_INCLUDE_DIR})
+
+  set(benchmarks
+      ${benchmarks}
+      swarm_homogeneous_task_spawn
+     )
+
+  set(swarm_homogeneous_task_spawn_FLAGS NOLIBS
+      DEPENDENCIES ${BOOST_program_options_LIBRARY}
+                   ${SWARM_LIBRARY})
+endif()
 
 set(boost_tls_FLAGS NOLIBS DEPENDENCIES ${BOOST_program_options_LIBRARY}
                                         ${BOOST_thread_LIBRARY})
@@ -20,17 +77,31 @@ set(native_tls_FLAGS NOLIBS DEPENDENCIES ${BOOST_program_options_LIBRARY}
 set(hpx_tls_FLAGS NOLIBS DEPENDENCIES ${BOOST_program_options_LIBRARY}
                                       ${BOOST_thread_LIBRARY})
 
-set(delay_baseline_FLAGS DEPENDENCIES iostreams_component)
+set(delay_baseline_FLAGS NOLIBS
+    DEPENDENCIES ${BOOST_program_options_LIBRARY})
 
-set(pxthread_FLAGS DEPENDENCIES iostreams_component)
+set(hpx_homogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component)
+
+set(hpx_heterogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component)
+
+set(print_heterogeneous_payloads_FLAGS NOLIBS
+    DEPENDENCIES ${BOOST_program_options_LIBRARY})
+
+set(spinlock_FLAGS DEPENDENCIES iostreams_component)
+
+set(spinlock_alt_FLAGS DEPENDENCIES iostreams_component)
 
 if(HPX_CXX11_LAMBDAS)
   set(benchmarks ${benchmarks}
       eager_future
+      spinlock
+      spinlock_alt
      )
 
   set(eager_future_FLAGS DEPENDENCIES iostreams_component)
 endif()
+
+set(sizeof_FLAGS DEPENDENCIES iostreams_component)
 
 foreach(benchmark ${benchmarks})
   set(sources
@@ -41,7 +112,8 @@ foreach(benchmark ${benchmarks})
   # add example executable
   add_hpx_executable(${benchmark}
                      SOURCES ${sources}
-                     ${${benchmark}_FLAGS})
+                     ${${benchmark}_FLAGS}
+                     FOLDER "Benchmarks/${benchmark}")
 
   # add a custom target for this example
   add_hpx_pseudo_target(tests.performance.${benchmark})
@@ -54,4 +126,22 @@ foreach(benchmark ${benchmarks})
   add_hpx_pseudo_dependencies(tests.performance.${benchmark}
                               ${benchmark}_exe)
 endforeach()
+
+if(OPENMP_FOUND)
+  set_target_properties(openmp_homogeneous_task_spawn_exe PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
+  set_target_properties(openmp_homogeneous_task_spawn_exe PROPERTIES LINK_FLAGS ${OpenMP_CXX_FLAGS})
+endif()
+
+add_hpx_executable(util_function
+                   SOURCES util/function.cpp
+                   ${util_function_FLAGS}
+                   FOLDER "Benchmarks/util_function")
+
+add_hpx_pseudo_target(tests.performance.util.function)
+
+add_hpx_pseudo_dependencies(tests.performance
+                            tests.performance.util.function)
+
+add_hpx_pseudo_dependencies(tests.performance.util.function
+                            util.function_exe)
 

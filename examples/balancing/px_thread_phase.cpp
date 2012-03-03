@@ -11,8 +11,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/lcos/local_barrier.hpp>
-#include <hpx/lcos/local_mutex.hpp>
+#include <hpx/lcos/local/barrier.hpp>
+#include <hpx/lcos/local/mutex.hpp>
 
 using boost::lockfree::fifo;
 
@@ -22,8 +22,8 @@ using boost::program_options::value;
 
 using boost::posix_time::milliseconds;
 
-using hpx::lcos::local_barrier;
-using hpx::lcos::local_mutex;
+using hpx::lcos::local::barrier;
+using hpx::lcos::local::mutex;
 
 using hpx::applier::register_thread;
 
@@ -42,9 +42,9 @@ typedef fifo<std::pair<thread_id_type, std::size_t>*> fifo_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 void lock_and_wait(
-    local_mutex& m
-  , local_barrier& b0
-  , local_barrier& b1
+    mutex& m
+  , barrier& b0
+  , barrier& b1
   , fifo_type& pxthreads
   , std::size_t wait
 ) {
@@ -56,7 +56,7 @@ void lock_and_wait(
     while (true)
     {
         // Try to acquire the mutex.
-        local_mutex::scoped_try_lock l(m);
+        mutex::scoped_try_lock l(m);
 
         if (l.owns_lock())
         {
@@ -106,12 +106,12 @@ int hpx_main(variables_map& vm)
         // Have the fifo preallocate storage.
         fifo_type pxthreads(pxthread_count);
 
-        std::vector<local_mutex*> m(mutex_count, 0);
-        local_barrier b0(pxthread_count + 1), b1(pxthread_count + 1);
+        std::vector<mutex*> m(mutex_count, 0);
+        barrier b0(pxthread_count + 1), b1(pxthread_count + 1);
 
         // Allocate the mutexes.
         for (std::size_t j = 0; j < mutex_count; ++j)
-            m[j] = new local_mutex;
+            m[j] = new mutex;
 
         for (std::size_t j = 0; j < pxthread_count; ++j)
         {
@@ -136,7 +136,7 @@ int hpx_main(variables_map& vm)
         // {{{ Print results for this iteration.
         std::pair<thread_id_type, std::size_t>* entry = 0;
 
-        while (pxthreads.dequeue(&entry))
+        while (pxthreads.dequeue(entry))
         {
             BOOST_ASSERT(entry);
             std::cout << "  " << entry->first << "," << entry->second << "\n";

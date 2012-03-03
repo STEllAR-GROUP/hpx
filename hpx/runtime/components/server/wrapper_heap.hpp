@@ -1,4 +1,4 @@
-//  Copyright (c) 1998-2011 Hartmut Kaiser
+//  Copyright (c) 1998-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,7 +17,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/local_mutex.hpp>
+#include <hpx/lcos/local/mutex.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -71,7 +71,7 @@ namespace hpx { namespace components { namespace detail
         };
 #endif
 
-        typedef hpx::lcos::local_mutex mutex_type;
+        typedef hpx::lcos::local::mutex mutex_type;
 
         typedef typename mutex_type::scoped_lock scoped_lock;
 

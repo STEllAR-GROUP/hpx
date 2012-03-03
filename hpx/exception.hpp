@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -60,7 +60,14 @@ namespace hpx
         null_thread_id = 26,
         invalid_data = 27,
         yield_aborted = 28,
-        last_error
+        component_load_failure = 29,
+        commandline_option_error = 30,
+        serialization_error = 31,
+        unhandled_exception = 32,
+        last_error,
+
+        // force this enum type to be at least 16 bits.
+        error_upper_bound = 0x7fffL
     };
 
     char const* const error_names[] =
@@ -94,6 +101,10 @@ namespace hpx
         "null_thread_id",
         "invalid_data",
         "yield_aborted",
+        "component_load_failure",
+        "commandline_option_error",
+        "serialization_error",
+        "unhandled_exception",
         ""
     };
 
@@ -225,7 +236,7 @@ namespace hpx
             BOOST_ASSERT(e >= success && e < last_error);
             LERR_(error) << "created exception: " << this->what();
         }
-        explicit exception(boost::system::system_error e)
+        explicit exception(boost::system::system_error const& e)
           : boost::system::system_error(e)
         {
             LERR_(error) << "created exception: " << this->what();
@@ -242,7 +253,8 @@ namespace hpx
             BOOST_ASSERT(e >= success && e < last_error);
             LERR_(error) << "created exception: " << this->what();
         }
-        ~exception (void) throw()
+
+        ~exception() throw()
         {
         }
 
@@ -261,10 +273,102 @@ namespace hpx
         }
     };
 
-    ///////////////////////////////////////////////////////////////////////////
-    // types needed to add additional information to the thrown exceptions
     namespace detail
     {
+        struct HPX_EXCEPTION_EXPORT std_exception : std::exception
+        {
+          private:
+            std::string what_;
+
+          public:
+            explicit std_exception(std::string const& what)
+              : what_(what)
+            {}
+
+            ~std_exception() throw() {}
+
+            const char* what() const throw()
+            {
+                return what_.c_str();
+            }
+        };
+
+        struct HPX_EXCEPTION_EXPORT bad_alloc : std::bad_alloc
+        {
+          private:
+            std::string what_;
+
+          public:
+            explicit bad_alloc(std::string const& what)
+              : what_(what)
+            {}
+
+            ~bad_alloc() throw() {}
+
+            const char* what() const throw()
+            {
+                return what_.c_str();
+            }
+        };
+
+        struct HPX_EXCEPTION_EXPORT bad_exception : std::bad_exception
+        {
+          private:
+            std::string what_;
+
+          public:
+            explicit bad_exception(std::string const& what)
+              : what_(what)
+            {}
+
+            ~bad_exception() throw() {}
+
+            const char* what() const throw()
+            {
+                return what_.c_str();
+            }
+        };
+
+#ifndef BOOST_NO_TYPEID
+        struct HPX_EXCEPTION_EXPORT bad_cast : std::bad_cast
+        {
+          private:
+            std::string what_;
+
+          public:
+            explicit bad_cast(std::string const& what)
+              : what_(what)
+            {}
+
+            ~bad_cast() throw() {}
+
+            const char* what() const throw()
+            {
+                return what_.c_str();
+            }
+        };
+
+        struct HPX_EXCEPTION_EXPORT bad_typeid : std::bad_typeid
+        {
+          private:
+            std::string what_;
+
+          public:
+            explicit bad_typeid(std::string const& what)
+              : what_(what)
+            {}
+
+            ~bad_typeid() throw() {}
+
+            const char* what() const throw()
+            {
+                return what_.c_str();
+            }
+        };
+#endif
+
+        ///////////////////////////////////////////////////////////////////////
+        // types needed to add additional information to the thrown exceptions
         struct tag_throw_locality {};
         struct tag_throw_hostname {};
         struct tag_throw_pid {};
@@ -374,7 +478,7 @@ namespace hpx
 
         // Report an early or late exception and locally abort execution. There
         // isn't anything more we could do.
-        HPX_EXPORT void report_exception_and_abort(boost::exception_ptr const&);
+        HPX_EXPORT void report_exception_and_terminate(boost::exception_ptr const&);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -423,16 +527,16 @@ namespace boost
 // exception
 #define HPX_THROW_EXCEPTION_EX(except, errcode, func, msg, mode)              \
     {                                                                         \
-        boost::filesystem::path p(hpx::util::create_path(__FILE__));          \
+        boost::filesystem::path p__(hpx::util::create_path(__FILE__));        \
         hpx::detail::throw_exception(except((hpx::error)errcode, msg, mode),  \
-            func, p.string(), __LINE__);                                      \
+            func, p__.string(), __LINE__);                                    \
     }                                                                         \
     /**/
 
 #define HPX_THROW_STD_EXCEPTION(except, func)                                 \
     {                                                                         \
-        boost::filesystem::path p(hpx::util::create_path(__FILE__));          \
-        hpx::detail::throw_exception(except, func, p.string(), __LINE__);     \
+        boost::filesystem::path p__(hpx::util::create_path(__FILE__));        \
+        hpx::detail::throw_exception(except, func, p__.string(), __LINE__);   \
     }                                                                         \
     /**/
 

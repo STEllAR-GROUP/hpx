@@ -5,8 +5,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
+
+#include <boost/foreach.hpp>
 
 namespace hpx { namespace agas
 {
@@ -26,7 +29,7 @@ naming::id_type bootstrap_component_namespace_id()
 namespace server
 {
 
-// TODO: This isn't scalable, we have to update it every time we add a new 
+// TODO: This isn't scalable, we have to update it every time we add a new
 // AGAS request/response type.
 response component_namespace::service(
     request const& req
@@ -51,8 +54,8 @@ response component_namespace::service(
         case primary_ns_resolve_gid:
         case primary_ns_free:
         case primary_ns_unbind_gid:
-        case primary_ns_increment:
-        case primary_ns_decrement:
+        case primary_ns_change_credit_non_blocking:
+        case primary_ns_change_credit_sync:
         case primary_ns_localities:
         {
             LAGAS_(warning) <<
@@ -64,7 +67,7 @@ response component_namespace::service(
         case symbol_ns_bind:
         case symbol_ns_resolve:
         case symbol_ns_unbind:
-        case symbol_ns_iterate:
+        case symbol_ns_iterate_names:
         {
             LAGAS_(warning) <<
                 "component_namespace::service, redirecting request to "
@@ -89,6 +92,24 @@ response component_namespace::service(
     };
 } // }}}
 
+// TODO: do/undo semantics (e.g. transactions)
+std::vector<response> component_namespace::bulk_service(
+    std::vector<request> const& reqs
+  , error_code& ec
+    )
+{
+    std::vector<response> r;
+    r.reserve(reqs.size());
+
+    BOOST_FOREACH(request const& req, reqs)
+    {
+        error_code ign;
+        r.push_back(service(req, ign));
+    }
+
+    return r;
+}
+
 response component_namespace::bind_prefix(
     request const& req
   , error_code& ec
@@ -96,7 +117,7 @@ response component_namespace::bind_prefix(
 { // {{{ bind_prefix implementation
     // parameters
     std::string key = req.get_name();
-    boost::uint32_t prefix = req.get_prefix();
+    boost::uint32_t prefix = req.get_locality_id();
 
     mutex_type::scoped_lock l(mutex_);
 
@@ -204,6 +225,11 @@ response component_namespace::resolve_id(
 { // {{{ resolve_id implementation
     // parameters
     component_id_type key = req.get_component_type();
+
+    // If the requested component type is a derived type, use only its derived
+    // part for the lookup.
+    if (key != components::get_base_type(key))
+        key = components::get_derived_type(key);
 
     mutex_type::scoped_lock l(mutex_);
 

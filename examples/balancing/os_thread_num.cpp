@@ -6,7 +6,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/lcos/local_barrier.hpp>
+#include <hpx/lcos/local/barrier.hpp>
 
 #include <map>
 
@@ -19,7 +19,7 @@ using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
 
-using hpx::lcos::local_barrier;
+using hpx::lcos::local::barrier;
 
 using hpx::threads::threadmanager_base;
 using hpx::threads::pending;
@@ -48,10 +48,10 @@ double delay()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void get_os_thread_num(local_barrier& barr, fifo<std::size_t>& os_threads)
+void get_os_thread_num(barrier& barr, fifo<std::size_t>& os_threads)
 {
     global_scratch = delay();
-    os_threads.enqueue(threadmanager_base::get_thread_num());
+    os_threads.enqueue(hpx::get_worker_thread_num());
     barr.wait();
 }
 
@@ -79,7 +79,7 @@ int hpx_main(variables_map& vm)
             // Have the fifo preallocate the nodes.
             fifo<std::size_t> os_threads(pxthreads);
 
-            local_barrier barr(pxthreads + 1);
+            barrier barr(pxthreads + 1);
 
             for (std::size_t j = 0; j < pxthreads; ++j)
             {
@@ -96,7 +96,7 @@ int hpx_main(variables_map& vm)
 
             std::size_t shepherd = 0;
 
-            while (os_threads.dequeue(&shepherd))
+            while (os_threads.dequeue(shepherd))
                 ++results[shepherd];
         }
 

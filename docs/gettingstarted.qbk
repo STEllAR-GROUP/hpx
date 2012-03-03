@@ -1,0 +1,316 @@
+[/==============================================================================
+    Copyright (C) 2007-2012 Hartmut Kaiser
+    Copyright (C) 2011 Bryce Lelbach
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+===============================================================================/]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:getting_started Getting Started]
+
+[heading Welcome]
+
+Welcome to the HPX runtime system libraries! By the time you've completed this
+tutorial, you'll be at least somewhat comfortable with the contents of a HPX
+distribution and how to go about using it.
+
+[heading What's Here]
+
+This document is designed to be an extremely gentle introduction, so we
+included a fair amount of material that may already be very familiar to you.
+To keep things simple, we also left out some information intermediate and
+advanced users will probably want. At the end of this document, we'll refer
+you on to resources that can help you pursue these topics further.
+
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:unix_installation How to Install HPX on Unix Variants]
+
+[heading Prerequisites]
+
+Depending on the options you chose while building and installing HPX you will
+find it to depend on several prerequisites. However, in the simplest case HPX
+will depend on one prerequisite library only: __boost__. So, before you read
+further, please make sure you have a recent version version of __boost__
+installed on your target machine. HPX currently requires at least Boost V1.47
+to work properly. It may build and run with older versions, but we do not
+test HPX with those. Please be warned. Installing the Boost libraries is
+described in detail in Boost's own __boost_getting_started__ document. It is
+often possible to download the Boost libraries using the package manager of
+your distribution, please refer to the corresponding documentation.
+
+[table Prerequisites for using HPX on Linux systems
+    [[Name                       ][Recommended Version][Min/Max Version ]]
+
+    [[[*Compilers]]]
+    [[gcc                        ][4.4.5-6            ][4.4.*           ]]
+
+    [[[*Build System]]]
+
+    [[__cmake__                  ][2.8.4              ][2.8.*           ]]
+    [[gmake                      ][3.81               ][3.80 - 3.82     ]]
+
+    [[[*Required Libraries]]]
+
+    [[__boost__                  ][1.48               ][1.47.0 - SVN    ]]
+    [[eglibc (Debian, Ubuntu)    ][2.11.*             ][2.7.* - 2.13.*  ]]
+    [[glibc (Redhat)             ][2.11.*             ][2.7.* - 2.13.*  ]]
+    [[libstdc++                  ][4.4.5-6            ][4.4.*           ]]
+
+    [[[*Optional Libraries]]]
+
+    [[rnpl (AMR examples only)   ][N/A                ][N/A             ]]
+    [[jemalloc (malloc)          ][2.1.2              ][2.1.0 - GIT     ]]
+    [[google-perftools           ][1.7.1              ][1.7.1 - SVN     ]]
+    [[libunwind                  ][0.99               ][0.97 - GIT      ]]
+]
+
+[heading The HPX Distribution]
+
+[fixme Describe the directory layout of the HPX distribution here]
+
+[heading Installation]
+
+* Download the latest Subversion revision of HPX (or a stable tag):
+
+[pre
+    $ svn co https://svn.cct.lsu.edu/repos/projects/parallex/trunk/hpx hpx
+]
+
+* Create a build directory. HPX requires an out-of-tree build. This means you
+  will be unable to run CMake in the HPX source tree.
+
+[pre
+    $ cd hpx
+$ mkdir my_hpx_build
+$ cd my_hpx_build
+]
+
+* Invoke CMake from your build directory, pointing the CMake driver to the root
+  of your HPX source tree.
+
+[pre
+    $ cmake \[CMake variable definitions\] /path/to/source/tree
+]
+
+for instance:
+
+[pre
+    $ cmake -DBOOST_ROOT=~/packages/boost -DCMAKE_INSTALL_PREFIX=~/packages/hpx /path/to/source/tree
+]
+
+* Invoke GNU make. If you are on a box with multiple cores (very likely),
+  add the -jN flag to your make invocation, where N is the number of nodes
+  on your machine plus one.
+
+[pre
+    $ gmake -j49
+]
+
+* To complete the build and install HPX:
+
+[pre
+    $ gmake install
+]
+
+[heading Build a Simple Program Using HPX]
+
+After you are done with the installation you should be able to build the
+following program. It prints 'Hello HPX World!' on the locality you run it on.
+
+[import ../examples/quickstart/simplest_hello_world.cpp]
+
+[/ this is how it should look like in the future, for now we import some code
+   from the simples_hello_world example:
+
+    #include <hpx/hpx_init.hpp>
+
+    int hpx_main()
+    {
+        // Say Hello to the World!
+        hpx::cout << "Hello HPX World!" << hpx::endl;
+
+        // Initiate shutdown of the runtime system
+        return hpx::finalize();
+    }
+
+    int main(int argc, char* argv[])
+    {
+        // Initialize and run HPX.
+        return hpx::init("Hello HPX World Example", argc, argv);
+    }
+]
+[simplest_hello_world_getting_started]
+
+Copy the text of this program into a file called example.cpp.
+
+Now, in the directory where you saved example.cpp, issue the following command:
+
+[pre
+    c++ \`pkg-config --cflags --libs hpx\` -o example
+]
+
+To test the result, type:
+
+    ./example
+
+which should print `Hello HPX World!` and exit.
+
+
+[heading Using HPX Applications with PBS]
+
+[fixme TBD]
+
+[endsect] [/ How to Install HPX on Unix Variants]
+
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:windows_installation How to Install HPX on Windows]
+
+[heading Prerequisites]
+
+[table Prerequisites for using HPX on Windows systems
+    [[Name                       ][Recommended Version][Min/Max Version ]]
+
+    [[[*Compilers]]]
+
+    [[Visual C++                 ][2010               ][2010            ]]
+
+    [[[*Build System]]]
+
+    [[__cmake__                  ][2.8.4              ][2.8.*           ]]
+
+    [[[*Required Libraries]]]
+    [[__boost__                  ][1.48               ][1.43.0 - SVN    ]]
+]
+
+[fixme TBD]
+
+[heading The HPX Distribution]
+
+[fixme Describe the directory layout of the HPX distribution here]
+
+[heading Installation]
+
+* Download the latest version of one of the archives available on the __stellar__
+  website ([@http://stellar.cct.lsu.edu/downloads/ here]). Unpack the archive
+  into a forlder you choose.
+* Create a build folder. HPX requires an out-of-tree-build. This means that you
+  will be unable to run CMake in the HPX source folder.
+* Open up the CMake GUI. In the input box labelled "Where is the source code:",
+  enter the full path to the source folder. In the input box labelled
+  "Where to build the binaries:", enter the full path to the build folder you
+  created before.
+* Add CMake variable definitions (if any) by clicking the "Add Entry" button.
+  The only required variable you need to define is `BOOST_ROOT`. This variable
+  needs to be set to point to point to the root folder of your Boost
+  installation. It is recommended to set the variable `CMAKE_INSTALL_PREFIX` as
+  well. This allows to control where the built HPX libraries will be installed.
+* Press the "Configure" button. A window will pop up asking you which compilers
+  to use. Select the Visual Studio 10 (64Bit) compilers (they are usually
+  the default if available).
+* Press "Configure" again. Repeat this step until the "Generate" button becomes
+  clickable (and until no variable definitions are marked red anymore).
+* Press "Generate".
+* Open up the build folder, and double-click hpx.sln.
+* Build the INSTALL target.
+
+[endsect] [/ How to Install HPX on Windows]
+
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:commandline HPX Command Line Options]
+
+The predefined command line options of any application using `hpx::init` are
+described in the [link hpx.getting_started.commandline.commandline table below].
+
+[table:commandline Default HPX Command Line Options
+    [[Option]                   [Description]]
+    [[[*HPX options (allowed on command line only)]]]
+    [[`--hpx:help`, `--help` or `-h`]       [print out program usage]]
+    [[`--hpx:version`, `--version` or `-v`] [print out HPX version and copyright information]]
+    [[`--hpx:options-file arg`]             [specify a file containing command line options
+                                             (alternatively: @filepath)]]
+
+    [[[*HPX options (additionally allowed in an options file)]]]
+    [[`--hpx:worker`]           [run this instance in worker mode]]
+    [[`--hpx:console`]          [run this instance in console mode]]
+    [[`--hpx:connect`]          [run this instance in worker mode, but connecting
+                                 late]]
+    [[`--hpx:run-agas-server`]  [run AGAS server as part of this runtime instance]]
+    [[`--hpx:run-hpx-main`]     [run the hpx_main function, regardless of locality
+                                 mode]]
+    [[`--hpx:hpx arg`]          [the IP address the HPX parcelport is listening
+                                 on, expected format: 'address:port' (default:
+                                 127.0.0.1:7910)]]
+    [[`--hpx:agas arg`]         [the IP address the AGAS server is running on,
+                                 expected format: 'address:port' (default:
+                                 127.0.0.1:7910)]]
+    [[`--hpx:run-agas-server-only`][run only the AGAS server]]
+    [[`--hpx:nodefile arg`]     [the file name of a node file to use (list of nodes, one
+                                 node name per line and core)]]
+    [[`--hpx:nodes arg`]        [the (space separated) list of the nodes to use (usually
+                                 this is extracted from a node file)]]
+    [[`--hpx:ifsuffix arg`]     [suffix to append to host names in order to resolve them
+                                 to the proper network interconnect]]
+    [[`--hpx:ifprefix arg`]     [prefix to prepend to host names in order to resolve them
+                                 to the proper network interconnect]]
+    [[`--hpx:iftransform arg`]  [sed-style search and replace (s/search/replace/) used to
+                                 transform host names to the proper network interconnect]]
+    [[`--hpx:localities arg`]   [the number of localities to wait for at
+                                 application startup (default: 1)]]
+    [[`--hpx:node arg`]         [number of the node this locality is run on
+                                 (must be unique)]]
+    [[`--hpx:pu-offset`]        [the first processing unit this instance of HPX should be
+                                 run on (default: 0)]]
+    [[`--hpx:pu-step`]          [the step between used processing unit numbers for this
+                                 instance of HPX (default: 1)]]
+    [[`--hpx:threads arg`]      [the number of operating system threads to spawn
+                                 for this HPX locality (default: 1)]]
+    [[`--hpx:queuing arg`]      [the queue scheduling policy to use, options are
+                                 'local/l', 'priority_local/pr', 'abp/a', 'priority_abp',
+                                 'hierarchy/h', and 'periodic/pe' (default: priority_local/p)]]
+    [[`--hpx:hierarchy-arity`]  [the arity of the of the thread queue tree, valid for
+                                 --queuing=hierarchy only (default: 2)]]
+    [[`--hpx:high-priority-threads arg`] [the number of operating system threads
+                                 maintaining a high priority queue (default:
+                                 number of OS threads), valid for
+                                 --queueing=priority_local only]]
+    [[`--hpx:numa-sensitive`]   [makes the priority_local scheduler NUMA sensitive, valid for
+                                 --queuing=priority_local only]]
+
+    [[[*HPX configuration options]]]
+    [[`--hpx:app-config arg`]   [load the specified application configuration
+                                 (ini) file]]
+    [[`--hpx:config arg`]       [load the specified hpx configuration (ini) file]]
+    [[`--hpx:ini arg`]          [add a configuration definition to the default
+                                 runtime configuration]]
+    [[`--hpx:exit`]             [exit after configuring the runtime]]
+
+    [[[*HPX debugging options]]]
+    [[`--hpx:list-symbolic-names`][list all registered symbolic names after startup]]
+    [[`--hpx:list-component-types`][list all dynamic component types after startup]]
+    [[`--hpx:dump-config-initial`][print the initial runtime configuration]]
+    [[`--hpx:dump-config`]      [print the final runtime configuration]]
+    [[`--hpx:debug-hpx-log`]    [enable all messages on the HPX log channel and send all
+                                 HPX logs to the target destination]]
+    [[`--hpx:debug-agas-log`]   [enable all messages on the AGAS log channel and send all
+                                 AGAS logs to the target destination]]
+    [[`--hpx:debug-clp`]        [debug command line processing]]
+
+    [[[*HPX options related to performance counters]]]
+    [[`--hpx:print-counter`]    [print the specified performance counter either repeatedly or
+                                 before shutting down the system (see option --print-counter-interval)]]
+    [[`--hpx:print-counter-interval`][print the performance counter(s) specified with --print-counter
+                                 repeatedly after the time interval (specified in milliseconds)
+                                 (default: 0, which means print once at shutdown)]]
+    [[`--hpx:print-counter-destination`][print the performance counter(s) specified with --print-counter
+                                 to the given file (default: console)]]
+    [[`--hpx:list-counters`]    [list the names of all registered performance counters]]
+    [[`--hpx:list-counter-infos`][list the description of all registered performance counters]]
+]
+
+[endsect] [/ Command Line Handling]
+
+[endsect] [/ Getting Started]

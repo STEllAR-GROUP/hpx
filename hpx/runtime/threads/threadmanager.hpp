@@ -7,7 +7,6 @@
 #if !defined(HPX_THREADMANAGER_MAY_20_2008_845AM)
 #define HPX_THREADMANAGER_MAY_20_2008_845AM
 
-#include <map>
 #include <vector>
 #include <memory>
 #include <numeric>
@@ -27,6 +26,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/performance_counters/counters.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
@@ -45,7 +45,6 @@ namespace hpx { namespace threads
     struct set_state_tag {};
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \class threadmanager_base threadmanager.hpp hpx/runtime/threads/threadmanager.hpp
     struct threadmanager_base : private boost::noncopyable
     {
     protected:
@@ -287,11 +286,15 @@ namespace hpx { namespace threads
         /// object, which in turn will report it to the console, etc.).
         virtual void report_error(std::size_t, boost::exception_ptr const&) = 0;
 
-        /// install_counters is called during startup to allow registration of
-        /// performance counters
-        virtual void install_counters() = 0;
+        /// The function register_counter_types() is called during startup to
+        /// allow the registration of all performance counter types for this
+        /// thread-manager instance.
+        virtual void register_counter_types() = 0;
 
-        static std::size_t get_thread_num(bool* numa_sensitive = 0);
+        /// Return number of the processing unit the given thread is running on
+        virtual std::size_t get_pu_num(std::size_t num_thread) = 0;
+
+        static std::size_t get_worker_thread_num(bool* numa_sensitive = 0);
 
         void init_tss(std::size_t thread_num, bool numa_sensitive);
         void deinit_tss();
@@ -303,10 +306,8 @@ namespace hpx { namespace threads
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \class threadmanager threadmanager.hpp hpx/runtime/threads/threadmanager.hpp
-    ///
     /// The \a threadmanager class is the central instance of management for
-    /// all (non-depleted) \a thread's
+    /// all (non-depleted) threads
     template <typename SchedulingPolicy, typename NotificationPolicy>
     class threadmanager_impl : public threadmanager_base
     {
@@ -436,11 +437,11 @@ namespace hpx { namespace threads
         //        here.
         bool cleanup_terminated();
 
-        /// \brief Return the number of OS threads running in this threadmanager
+        /// \brief Return the number of OS threads running in this thread-manager
         ///
-        /// This function will return correct results only if the threadmanager
+        /// This function will return correct results only if the thread-manager
         /// is running.
-        std::size_t get_num_os_threads() const
+        std::size_t get_os_thread_count() const
         {
             mutex_type::scoped_lock lk(mtx_);
             return threads_.size();
@@ -627,10 +628,39 @@ namespace hpx { namespace threads
             thread_state_enum newstate, thread_state_ex_enum newstate_ex,
             thread_priority priority);
 
+        ///
+        template <typename C>
+        void start_periodic_maintenance(boost::mpl::true_);
+
+        template <typename C>
+        void start_periodic_maintenance(boost::mpl::false_) {}
+
+        template <typename C>
+        void periodic_maintenance_handler(boost::mpl::true_);
+
+        template <typename C>
+        void periodic_maintenance_handler(boost::mpl::false_) {}
+
     public:
-        /// install_counters is called during startup to allow registration of
-        /// performance counters
-        void install_counters();
+        /// The function register_counter_types() is called during startup to
+        /// allow the registration of all performance counter types for this
+        /// thread-manager instance.
+        void register_counter_types();
+
+        /// Return number of the processing unit the given thread is running on
+        std::size_t get_pu_num(std::size_t num_thread)
+        {
+            return scheduler_.get_pu_num(num_thread);
+        }
+
+    private:
+        // counter creator functions
+        naming::gid_type queue_length_counter_creator(
+            performance_counters::counter_info const& info, error_code& ec);
+        naming::gid_type thread_counts_counter_creator(
+            performance_counters::counter_info const& info, error_code& ec);
+        naming::gid_type idle_rate_counter_creator(
+            performance_counters::counter_info const& info, error_code& ec);
 
     private:
         /// this thread manager has exactly as much threads as requested

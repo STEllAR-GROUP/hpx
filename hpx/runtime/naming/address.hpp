@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -24,12 +24,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming
 {
-    /// \class address address.hpp hpx/runtime/naming/address.hpp
-    ///
-    ///
     struct HPX_EXPORT address
     {
-        typedef boost::int64_t component_type;
+        typedef boost::int32_t component_type;
         typedef boost::uint64_t address_type;
 
         ///////////////////////////////////////////////////////////////////////

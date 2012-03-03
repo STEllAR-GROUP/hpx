@@ -1,4 +1,4 @@
-//  Copyright (c) 2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -20,8 +20,6 @@ namespace hpx { namespace components
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \class component_startup_shutdown component_startup_shutdown.hpp hpx/runtime/components/component_startup_shutdown.hpp
-    ///
     /// The \a component_startup_shutdown provides a minimal implementation of
     /// a component's startup/shutdown function provider.
     ///
@@ -61,30 +59,37 @@ namespace hpx { namespace components
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_DEF_COMPONENT_STARTUP_SHUTDOWN(startup_, shutdown_)               \
+#define HPX_DEFINE_COMPONENT_STARTUP_SHUTDOWN(startup_, shutdown_)            \
     namespace hpx { namespace components { namespace startup_shutdown_provider\
     {                                                                         \
         bool startup(HPX_STD_FUNCTION<void()>& startup_func)                  \
         {                                                                     \
-            HPX_STD_FUNCTION<void()> tmp = startup_;                          \
-            if (!!tmp) { startup_func = startup_; return true; }              \
+            HPX_STD_FUNCTION<bool(HPX_STD_FUNCTION<void()>&)> tmp = startup_; \
+            if (!!tmp) { return tmp(startup_func); }                          \
             return false;                                                     \
         }                                                                     \
         bool shutdown(HPX_STD_FUNCTION<void()>& shutdown_func)                \
         {                                                                     \
-            HPX_STD_FUNCTION<void()> tmp = shutdown_;                         \
-            if (!!tmp) { shutdown_func = shutdown_; return true; }            \
+            HPX_STD_FUNCTION<bool(HPX_STD_FUNCTION<void()>&)> tmp = shutdown_;\
+            if (!!tmp) { return tmp(shutdown_func); }                         \
             return false;                                                     \
         }                                                                     \
     }}}                                                                       \
     /***/
+
+#define HPX_NULL_STARTUP_SHUTDOWN_PTR ((bool(*)(HPX_STD_FUNCTION<void()>&))0)
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_STARTUP_SHUTDOWN_MODULE(startup, shutdown)               \
         HPX_REGISTER_STARTUP_SHUTDOWN_FUNCTIONS()                             \
         HPX_REGISTER_STARTUP_SHUTDOWN_REGISTRY(                               \
             hpx::components::component_startup_shutdown, startup_shutdown)    \
-        HPX_DEF_COMPONENT_STARTUP_SHUTDOWN(startup, shutdown)                 \
+        HPX_DEFINE_COMPONENT_STARTUP_SHUTDOWN(startup, shutdown)              \
+    /**/
+
+#define HPX_REGISTER_STARTUP_MODULE(startup)                                  \
+        HPX_REGISTER_STARTUP_SHUTDOWN_MODULE(                                 \
+            startup, HPX_NULL_STARTUP_SHUTDOWN_PTR)                           \
     /**/
 
 #endif // HPX_A7F46A4F_9AF9_4909_B0D8_5304FEFC5649

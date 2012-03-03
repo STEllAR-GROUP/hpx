@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{a3b832bb-3764-48bc-9756-345d0aebec62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{fb74c2e2-51bd-4de5-9c66-6ead697973fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Server">
+      <UniqueIdentifier>{2d31a540-8d77-4f2e-86ba-35b37e915bef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Stubs">
+      <UniqueIdentifier>{8bada9ed-586f-4225-a47e-7f9252a51e7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Server">
+      <UniqueIdentifier>{352c9c52-3090-4774-8464-19c90401072d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\examples\geometry\point_geometry\server\point.hpp">
+      <Filter>Header Files\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\examples\geometry\point_geometry\stubs\point.hpp">
+      <Filter>Header Files\Stubs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\examples\geometry\point_geometry\point.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\examples\geometry\point_geometry\serialize_geometry.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\examples\geometry\point_geometry\point.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\examples\geometry\point_geometry\serialize_geometry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\examples\geometry\point_geometry\server\point.cpp">
+      <Filter>Source Files\Server</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\examples\geometry\point_geometry\CMakeLists.txt" />
+  </ItemGroup>
+</Project>

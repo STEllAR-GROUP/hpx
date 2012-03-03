@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{3E98252E-1326-4EDD-AB07-239052A6146A}</ProjectGuid>
+    <RootNamespace>coroutines</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+    <Import Project="..\hpx64_debug.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.21006.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\external\coroutine\libs\coroutine\src\coroutine.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\external\coroutine\libs\coroutine\src\swapcontext.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\external\coroutine\libs\coroutine\src\swapcontext32.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\external\coroutine\libs\coroutine\src\swapcontext64.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\external\coroutine\libs\coroutine\src\swapcontext.s">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\external\coroutine\libs\coroutine\src\swapcontext64.s">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\external\coroutine\libs\coroutine\src\swapcontext_windows.asm">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\coroutine.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\context_generic_context.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\context_stackless.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\exception.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\future.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\generator.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\move.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\shared_coroutine.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\tuple_traits.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\arg_max.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\argument_packer.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\argument_unpacker.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\call_impl.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\context_base.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\context_linux.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\context_linux64.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\context_posix.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\context_windows.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\context_windows64.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\coroutine_accessor.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\coroutine_impl.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\coroutine_impl_impl.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\coroutine_traits.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\default_context_impl.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\fix_result.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\future_impl.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\has_swap.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\index.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\is_callable.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\make_tuple_traits.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\noreturn.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\posix_utility.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\self.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\signal.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\signature.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\swap_context.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\wait_impl.hpp" />
+    <ClInclude Include="..\..\..\external\coroutine\boost\coroutine\detail\yield_result_type.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\external\coroutine\libs\coroutine\src\switch_to_fiber.asm">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties BuildVersion_UseGlobalSettings="True" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

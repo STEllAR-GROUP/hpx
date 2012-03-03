@@ -1,5 +1,6 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
+//  Copyright (c)      2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -14,6 +15,7 @@
 #include <boost/thread/condition.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/plugin.hpp>
+#include <boost/program_options/options_description.hpp>
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/agas/gva.hpp>
@@ -22,12 +24,60 @@
 #include <hpx/runtime/components/constructor_argument.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
+#include <hpx/performance_counters/counters.hpp>
 #include <hpx/util/spinlock.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace components { namespace server
 {
+#define HPX_RUNTIME_SUPPORT_CREATE_ONE_M0(Z, N, D)                            \
+        BOOST_PP_CAT(a, N)(boost::cref(BOOST_PP_CAT(_a, N)))                  \
+    /**/
+#define HPX_RUNTIME_SUPPORT_CREATE_ONE_M1(Z, N, D)                            \
+        boost::reference_wrapper<BOOST_PP_CAT(A, N) const> BOOST_PP_CAT(a, N);\
+    /**/
+#define HPX_RUNTIME_SUPPORT_CREATE_ONE_M2(Z, N, D)                            \
+        BOOST_PP_CAT(a, N).get()                                              \
+    /**/
+#define HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT(Z, N, D)                     \
+        template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>    \
+        struct BOOST_PP_CAT(create_one_component_functor, N)                  \
+        {                                                                     \
+            typedef void result_type;                                         \
+            BOOST_PP_CAT(create_one_component_functor, N)(                    \
+                      BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & _a))          \
+              : BOOST_PP_ENUM(N, HPX_RUNTIME_SUPPORT_CREATE_ONE_M0, _)        \
+            {}                                                                \
+            result_type operator()(void* p) const                             \
+            {                                                                 \
+                new (p) Component(BOOST_PP_ENUM(N, HPX_RUNTIME_SUPPORT_CREATE_ONE_M2, _));\
+            }                                                                 \
+            BOOST_PP_REPEAT(N, HPX_RUNTIME_SUPPORT_CREATE_ONE_M1, _)          \
+        };                                                                    \
+        template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>    \
+        naming::gid_type create_one_functor(                                  \
+            component_factory_base* factory,                                  \
+            BOOST_PP_ENUM_BINARY_PARAMS(N, A, const& a))                      \
+        {                                                                     \
+            return factory->create_one_functor(                               \
+                BOOST_PP_CAT(create_one_component_functor, N)<                \
+                    Component, BOOST_PP_ENUM_PARAMS(N, A)>(                   \
+                        BOOST_PP_ENUM_PARAMS(N, a))                           \
+            );                                                                \
+        }                                                                     \
+    /**/
+    BOOST_PP_REPEAT_FROM_TO(
+        1
+      , HPX_ACTION_ARGUMENT_LIMIT
+      , HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT
+      , _
+    )
+#undef HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT
+#undef HPX_RUNTIME_SUPPORT_CREATE_ONE_M0
+#undef HPX_RUNTIME_SUPPORT_CREATE_ONE_M1
+#undef HPX_RUNTIME_SUPPORT_CREATE_ONE_M2
+
     ///////////////////////////////////////////////////////////////////////////
     class runtime_support
     {
@@ -74,6 +124,8 @@ namespace hpx { namespace components { namespace server
             runtime_support_call_startup_functions = 11,
             runtime_support_call_shutdown_functions = 12,
             runtime_support_update_agas_cache = 13,
+            runtime_support_garbage_collect = 14,
+            runtime_support_create_performance_counter = 15
         };
 
         static component_type get_component_type()
@@ -120,13 +172,62 @@ namespace hpx { namespace components { namespace server
         naming::gid_type create_one_component(components::component_type type,
             constructor_argument const& arg0);
 
+#define HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT_(Z, N, D)                      \
+        template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>      \
+        naming::gid_type create_one_component_(components::component_type type, \
+            BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))                       \
+        {                                                                       \
+            component_map_type::const_iterator it = components_.find(type);     \
+            if (it == components_.end()) {                                      \
+                hpx::util::osstream strm;                                       \
+                strm << "attempt to create component instance of "              \
+                     << "invalid/unknown type: "                                \
+                     << components::get_component_type_name(type)               \
+                     << " (component not found in map)";                        \
+                HPX_THROW_EXCEPTION(hpx::bad_component_type,                    \
+                    "runtime_support::create_component",                        \
+                    hpx::util::osstream_get_string(strm));                      \
+                return naming::invalid_gid;                                     \
+            }                                                                   \
+            if (!(*it).second.first) {                                          \
+                hpx::util::osstream strm;                                       \
+                strm << "attempt to create component instance of "              \
+                     << "invalid/unknown type: "                                \
+                     << components::get_component_type_name(type)               \
+                     << " (map entry is NULL)";                                 \
+                HPX_THROW_EXCEPTION(hpx::bad_component_type,                    \
+                    "runtime_support::create_component",                        \
+                    hpx::util::osstream_get_string(strm));                      \
+                return naming::invalid_gid;                                     \
+            }                                                                   \
+                                                                                \
+            naming::gid_type id = server::create_one_functor<Component>(        \
+                (*it).second.first.get(), BOOST_PP_ENUM_PARAMS(N, a));          \
+            LRT_(info) << "successfully created component " << id               \
+                       << " of type: "                                          \
+                       << components::get_component_type_name(type);            \
+                                                                                \
+            return id;                                                          \
+        }                                                                       \
+    /**/
+        BOOST_PP_REPEAT_FROM_TO(
+            1
+          , HPX_ACTION_ARGUMENT_LIMIT
+          , HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT_
+          , _
+        )
+#undef HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT_
+
         /// \brief Action to create new memory block
         naming::gid_type create_memory_block(std::size_t count,
             hpx::actions::manage_object_action_base const& act);
 
         /// \brief Action to delete existing components
+        ///
+        /// \param count [in] This GID is a count of the number of components
+        ///                   to destroy. It does not represent a global address.
         void free_component(components::component_type type,
-            naming::gid_type const& gid);
+            naming::gid_type const& gid, naming::gid_type const& count);
 
         /// \brief Gracefully shutdown this runtime system instance
         void shutdown(double timeout,
@@ -144,12 +245,22 @@ namespace hpx { namespace components { namespace server
         /// \brief Retrieve configuration information
         util::section get_config();
 
+        /// \brief Insert the given name mapping into the AGAS cache of this
+        ///        locality.
         void update_agas_cache(naming::gid_type const&, agas::gva const&);
 
-        void load_components();
+        /// \brief Load all components on this locality.
+        bool load_components();
 
-        void call_startup_functions();
+        void call_startup_functions(bool pre_startup);
         void call_shutdown_functions(bool pre_shutdown);
+
+        /// \brief Force a garbage collection operation in the AGAS layer.
+        void garbage_collect();
+
+        /// \brief Create the given performance counter instance.
+        naming::gid_type create_performance_counter(
+            performance_counters::counter_info const& info);
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into a action
@@ -180,13 +291,13 @@ namespace hpx { namespace components { namespace server
             &runtime_support::create_memory_block
         > create_memory_block_action;
 
-        typedef hpx::actions::direct_action0<
-            runtime_support, runtime_support_load_components,
+        typedef hpx::actions::direct_result_action0<
+            runtime_support, bool, runtime_support_load_components,
             &runtime_support::load_components
         > load_components_action;
 
-        typedef hpx::actions::action0<
-            runtime_support, runtime_support_call_startup_functions,
+        typedef hpx::actions::action1<
+            runtime_support, runtime_support_call_startup_functions, bool,
             &runtime_support::call_startup_functions
         > call_startup_functions_action;
 
@@ -195,9 +306,9 @@ namespace hpx { namespace components { namespace server
             &runtime_support::call_shutdown_functions
         > call_shutdown_functions_action;
 
-        typedef hpx::actions::direct_action2<
+        typedef hpx::actions::action3<
             runtime_support, runtime_support_free_component,
-            components::component_type, naming::gid_type const&,
+            components::component_type, naming::gid_type const&, naming::gid_type const&,
             &runtime_support::free_component
         > free_component_action;
 
@@ -236,6 +347,19 @@ namespace hpx { namespace components { namespace server
             &runtime_support::update_agas_cache
         > update_agas_cache_action;
 
+        typedef hpx::actions::action0<
+            runtime_support, runtime_support_garbage_collect,
+            &runtime_support::garbage_collect
+        > garbage_collect_action;
+
+        typedef hpx::actions::result_action1<
+            runtime_support, naming::gid_type,
+            runtime_support_create_performance_counter,
+            performance_counters::counter_info const&,
+            &runtime_support::create_performance_counter
+        > create_performance_counter_action;
+
+        ///////////////////////////////////////////////////////////////////////
         /// \brief Start the runtime_support component
         void run();
 
@@ -259,6 +383,12 @@ namespace hpx { namespace components { namespace server
 
         bool was_stopped() const { return stopped_; }
 
+        void add_pre_startup_function(HPX_STD_FUNCTION<void()> const& f)
+        {
+            util::spinlock::scoped_lock l(globals_mtx_);
+            pre_startup_functions_.push_back(f);
+        }
+
         void add_startup_function(HPX_STD_FUNCTION<void()> const& f)
         {
             util::spinlock::scoped_lock l(globals_mtx_);
@@ -279,14 +409,17 @@ namespace hpx { namespace components { namespace server
 
     protected:
         // Load all components from the ini files found in the configuration
-        void load_components(util::section& ini, naming::gid_type const& prefix,
+        bool load_components(util::section& ini, naming::gid_type const& prefix,
             naming::resolver_client& agas_client);
         bool load_component(util::section& ini, std::string const& instance,
             std::string const& component, boost::filesystem::path lib,
             naming::gid_type const& prefix, naming::resolver_client& agas_client,
-            bool isdefault, bool isenabled);
+            bool isdefault, bool isenabled,
+            boost::program_options::options_description& options);
 
         bool load_startup_shutdown_functions(boost::plugin::dll& d);
+        bool load_commandline_options(boost::plugin::dll& d,
+            boost::program_options::options_description& options);
 
     private:
         mutex_type mtx_;
@@ -299,12 +432,109 @@ namespace hpx { namespace components { namespace server
         util::section& ini_;
 
         util::spinlock globals_mtx_;
+        std::list<HPX_STD_FUNCTION<void()> > pre_startup_functions_;
         std::list<HPX_STD_FUNCTION<void()> > startup_functions_;
         std::list<HPX_STD_FUNCTION<void()> > pre_shutdown_functions_;
         std::list<HPX_STD_FUNCTION<void()> > shutdown_functions_;
     };
 
+#define HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT_ACTION(Z, N, D)              \
+    template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>        \
+    struct BOOST_PP_CAT(create_one_component_action, N)                       \
+    {                                                                         \
+        typedef                                                               \
+            BOOST_PP_CAT( ::hpx::actions::result_action, BOOST_PP_INC(N))<    \
+                runtime_support                                               \
+              , naming::gid_type                                              \
+              , runtime_support::runtime_support_create_one_component         \
+              , components::component_type                                    \
+              , BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & BOOST_PP_INTERCEPT) \
+              , &runtime_support::create_one_component_<                      \
+                    Component                                                 \
+                  , BOOST_PP_ENUM_PARAMS(N, A)                                \
+                >                                                             \
+            >                                                                 \
+            type;                                                             \
+    };                                                                        \
+                                                                              \
+    template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>        \
+    struct BOOST_PP_CAT(create_one_component_direct_action, N)                \
+    {                                                                         \
+        typedef                                                               \
+            BOOST_PP_CAT( ::hpx::actions::direct_result_action, BOOST_PP_INC(N))<\
+                runtime_support                                               \
+              , naming::gid_type                                              \
+              , runtime_support::runtime_support_create_one_component         \
+              , components::component_type                                    \
+              , BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & BOOST_PP_INTERCEPT) \
+              , &runtime_support::create_one_component_<                      \
+                    Component                                                 \
+                  , BOOST_PP_ENUM_PARAMS(N, A)                                \
+                >                                                             \
+            >                                                                 \
+            type;                                                             \
+    };                                                                        \
+    /**/
+    BOOST_PP_REPEAT_FROM_TO(
+        1
+      , BOOST_PP_DEC(HPX_ACTION_ARGUMENT_LIMIT)
+      , HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT_ACTION
+      , _
+    )
+#undef HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT_ACTION
+
 }}}
+
+///////////////////////////////////////////////////////////////////////////////
+// Declaration of serialization support for the runtime_support actions
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::factory_properties_action,
+    factory_properties_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::create_component_action,
+    create_component_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::create_one_component_action,
+    create_one_component_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::create_memory_block_action,
+    create_memory_block_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::load_components_action,
+    load_components_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::call_startup_functions_action,
+    call_startup_functions_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::call_shutdown_functions_action,
+    call_shutdown_functions_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::free_component_action,
+    free_component_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::shutdown_action,
+    shutdown_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::shutdown_all_action,
+    shutdown_all_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::terminate_action,
+    terminate_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::terminate_all_action,
+    terminate_all_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::get_config_action,
+    get_config_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::update_agas_cache_action,
+    update_agas_cache_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::garbage_collect_action,
+    garbage_collect_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::create_performance_counter_action,
+    create_performance_counter_action);
 
 #include <hpx/config/warnings_suffix.hpp>
 

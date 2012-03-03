@@ -47,94 +47,90 @@ namespace hpx { namespace util
 {
 
 void HPX_ALWAYS_EXPORT
-portable_binary_iarchive::load_impl(boost::intmax_t & l, char maxsize){
+portable_binary_iarchive::load_impl(boost::intmax_t & l, char maxsize)
+{
     char size;
     l = 0;
     this->primitive_base_t::load(size);
 
-    if(0 == size){
+    if (0 == size)
         return;
-    }
 
-    bool negative = (size < 0);
+    bool negative = (size < 0) ? true : false;
     if(negative)
         size = -size;
 
-    if(size > maxsize)
-        boost::serialization::throw_exception(
-            portable_binary_iarchive_exception()
-        );
+    if(size > maxsize) {
+        BOOST_THROW_EXCEPTION(portable_binary_iarchive_exception());
+    }
 
-    char * cptr = reinterpret_cast<char *>(& l);
-    #ifdef BOOST_BIG_ENDIAN
-        cptr += (sizeof(boost::intmax_t) - size);
-    #endif
+    char* cptr = reinterpret_cast<char *>(& l);
+#ifdef BOOST_BIG_ENDIAN
+    cptr += (sizeof(boost::intmax_t) - size);
+#endif
     this->primitive_base_t::load_binary(cptr, size);
 
-    #ifdef BOOST_BIG_ENDIAN
-        if(m_flags & endian_little)
-    #else
-        if(m_flags & endian_big)
-    #endif
-            reverse_bytes(size, cptr);
+#ifdef BOOST_BIG_ENDIAN
+    if(m_flags & endian_little)
+          reverse_bytes(size, cptr);
+#else
+    if(m_flags & endian_big)
+          reverse_bytes(size, cptr);
+#endif
 
     if(negative)
         l = -l;
 }
 
 void HPX_ALWAYS_EXPORT
-portable_binary_iarchive::load_override(
-    boost::archive::class_name_type & t, int
-){
+portable_binary_iarchive::load_override(boost::archive::class_name_type& t, int)
+{
     std::string cn;
     cn.reserve(BOOST_SERIALIZATION_MAX_KEY_SIZE);
     load_override(cn, 0);
-    if(cn.size() > (BOOST_SERIALIZATION_MAX_KEY_SIZE - 1))
-        boost::serialization::throw_exception(
+    if(cn.size() > (BOOST_SERIALIZATION_MAX_KEY_SIZE - 1)) {
+        BOOST_THROW_EXCEPTION(
             boost::archive::archive_exception(
-                boost::archive::archive_exception::invalid_class_name)
-            );
+                boost::archive::archive_exception::invalid_class_name));
+    }
+
     std::memcpy(t, cn.data(), cn.size());
     // borland tweak
     t.t[cn.size()] = '\0';
 }
 
-void HPX_ALWAYS_EXPORT
-portable_binary_iarchive::init(unsigned int flags){
-    if(0 == (flags & boost::archive::no_header)){
+void HPX_ALWAYS_EXPORT portable_binary_iarchive::init(unsigned int flags)
+{
+    if (0 == (flags & boost::archive::no_header))
+    {
         // read signature in an archive version independent manner
         std::string file_signature;
-        * this >> file_signature;
-        if(file_signature != boost::archive::BOOST_ARCHIVE_SIGNATURE())
-            boost::serialization::throw_exception(
+        *this >> file_signature;
+        if (file_signature != boost::archive::BOOST_ARCHIVE_SIGNATURE()) {
+            BOOST_THROW_EXCEPTION(
                 boost::archive::archive_exception(
-                    boost::archive::archive_exception::invalid_signature
-                )
-            );
+                    boost::archive::archive_exception::invalid_signature));
+        }
+
         // make sure the version of the reading archive library can
         // support the format of the archive being read
         boost::archive::version_type input_library_version(0);
-        * this >> input_library_version;
+        *this >> input_library_version;
 
         // extra little .t is to get around borland quirk
-        if(boost::archive::BOOST_ARCHIVE_VERSION() < input_library_version)
-            boost::serialization::throw_exception(
+        if (boost::archive::BOOST_ARCHIVE_VERSION() < input_library_version) {
+            BOOST_THROW_EXCEPTION(
                 boost::archive::archive_exception(
-                    boost::archive::archive_exception::unsupported_version
-                )
-            );
+                    boost::archive::archive_exception::unsupported_version));
+        }
 
-        #if BOOST_WORKAROUND(__MWERKS__, BOOST_TESTED_AT(0x3205))
+#if BOOST_WORKAROUND(__MWERKS__, BOOST_TESTED_AT(0x3205))
         this->set_library_version(input_library_version);
-        //#else
-        //#if ! BOOST_WORKAROUND(BOOST_MSVC, <= 1200)
-        //detail::
-        //#endif
         boost::archive::detail::basic_iarchive::set_library_version(
-            input_library_version
-        );
-        #endif
+            input_library_version);
+#endif
     }
+
     unsigned char x;
     load(x);
     m_flags = x << CHAR_BIT;
@@ -149,7 +145,8 @@ portable_binary_iarchive::init(unsigned int flags){
 namespace boost {
 namespace archive {
 
-template class HPX_ALWAYS_EXPORT detail::archive_pointer_iserializer<hpx::util::portable_binary_iarchive> ;
+template class HPX_ALWAYS_EXPORT
+    detail::archive_pointer_iserializer<hpx::util::portable_binary_iarchive>;
 
 } // namespace archive
 } // namespace boost
@@ -160,7 +157,8 @@ template class HPX_ALWAYS_EXPORT detail::archive_pointer_iserializer<hpx::util::
 namespace boost {
 namespace archive {
 
-template class HPX_ALWAYS_EXPORT detail::archive_serializer_map<hpx::util::portable_binary_iarchive>;
+template class HPX_ALWAYS_EXPORT
+    detail::archive_serializer_map<hpx::util::portable_binary_iarchive>;
 
 } // namespace archive
 } // namespace boost
@@ -176,7 +174,7 @@ template class basic_binary_iprimitive<
     hpx::util::portable_binary_iarchive,
     std::istream::char_type,
     std::istream::traits_type
-> ;
+>;
 
 } // namespace archive
 } // namespace boost

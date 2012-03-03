@@ -4,8 +4,14 @@
 #include <boost/version.hpp>
 #include <hpx/config.hpp>
 
-#if HPX_USE_PORTABLE_ARCHIVES == 0
+#if !defined(HPX_USE_PORTABLE_ARCHIVES) || HPX_USE_PORTABLE_ARCHIVES == 0
 #include <boost/archive/binary_oarchive.hpp>
+
+namespace hox { namespace util
+{
+    typedef boost::archive::binary_oarchive portable_binary_oarchive;
+}}
+
 #else
 
 // MS compatible compilers support #pragma once
@@ -64,10 +70,10 @@ public:
     enum exception_code {
         invalid_flags
     };
-    portable_binary_oarchive_exception(exception_code c = invalid_flags )
+    portable_binary_oarchive_exception(exception_code c = invalid_flags)
       : boost::archive::archive_exception((boost::archive::archive_exception::exception_code)c)
     {}
-    virtual const char *what( ) const throw( )
+    virtual const char *what() const throw()
     {
         const char *msg = "programmer error";
         switch(code){
@@ -124,57 +130,58 @@ protected:
 
     // default fall through for any types not specified here
     template<class T>
-    void save(const T & t){
+    void save(const T & val) {
+        boost::intmax_t t = val;
         save_impl(t, sizeof(T));
     }
-    void save(const std::string & t){
+    void save(const std::string & t) {
         this->primitive_base_t::save(t);
     }
 #if BOOST_VERSION >= 104400
-    void save(const boost::archive::class_id_type & t){
-        boost::int16_t l = t;
+    void save(const boost::archive::class_id_type & t) {
+        /*boost::int16_t*/boost::intmax_t l = t;
         save_impl(l, sizeof(boost::int16_t));
     }
-    void save(const boost::archive::object_id_type & t){
-        boost::uint32_t l = t;
+    void save(const boost::archive::object_id_type & t) {
+        /*boost::uint32_t*/boost::intmax_t l = t;
         save_impl(l, sizeof(boost::uint32_t));
     }
-    void save(const boost::archive::tracking_type & t){
+    void save(const boost::archive::tracking_type & t) {
         bool l = t;
         this->primitive_base_t::save(l);
     }
-    void save(const boost::archive::version_type & t){
-        boost::uint32_t l = t;
+    void save(const boost::archive::version_type & t) {
+        /*boost::uint32_t*/boost::intmax_t l = t;
         save_impl(l, sizeof(boost::uint32_t));
     }
-    void save(const boost::archive::library_version_type & t){
-        boost::uint16_t l = t;
+    void save(const boost::archive::library_version_type & t) {
+        /*boost::uint16_t*/boost::intmax_t l = t;
         save_impl(l, sizeof(boost::uint16_t));
     }
-    void save(const boost::serialization::item_version_type & t){
+    void save(const boost::serialization::item_version_type & t) {
         boost::intmax_t l = t;
         save_impl(l, sizeof(boost::intmax_t));
     }
 #endif
 #ifndef BOOST_NO_STD_WSTRING
-    void save(const std::wstring & t){
+    void save(const std::wstring & t) {
         this->primitive_base_t::save(t);
     }
 #endif
-    void save(const float & t){
+    void save(const float & t) {
         this->primitive_base_t::save(t);
         // floats not supported
         //BOOST_STATIC_ASSERT(false);
     }
-    void save(const double & t){
+    void save(const double & t) {
         this->primitive_base_t::save(t);
         // doubles not supported
         //BOOST_STATIC_ASSERT(false);
     }
-    void save(const char & t){
+    void save(const char & t) {
         this->primitive_base_t::save(t);
     }
-    void save(const unsigned char & t){
+    void save(const unsigned char & t) {
         this->primitive_base_t::save(t);
     }
 
@@ -182,27 +189,26 @@ protected:
     // extra stuff to get it passed borland compilers
     typedef boost::archive::detail::common_oarchive<portable_binary_oarchive>
         detail_common_oarchive;
+
     template<class T>
-    void save_override(T & t, BOOST_PFTO int){
+    void save_override(T & t, BOOST_PFTO int) {
         this->detail_common_oarchive::save_override(t, 0);
     }
     // explicitly convert to char * to avoid compile ambiguities
-    void save_override(const boost::archive::class_name_type & t, int){
+    void save_override(const boost::archive::class_name_type & t, int) {
         const std::string s(t);
-        * this << s;
+        *this << s;
     }
+
     // binary files don't include the optional information
-    void save_override(
-        const boost::archive::class_id_optional_type & /* t */,
-        int
-    ){}
+    void save_override(const boost::archive::class_id_optional_type&, int) {}
 
     HPX_ALWAYS_EXPORT void
     init(unsigned int flags);
 
 public:
-    portable_binary_oarchive(std::ostream & os, unsigned flags = 0) :
-        primitive_base_t(
+    portable_binary_oarchive(std::ostream & os, unsigned flags = 0)
+      : primitive_base_t(
             * os.rdbuf(),
             0 != (flags & boost::archive::no_codecvt)
         ),
@@ -213,13 +219,12 @@ public:
     }
 
     portable_binary_oarchive(
-        std::basic_streambuf<
-            std::ostream::char_type,
-            std::ostream::traits_type
-        > & bsb,
-        unsigned int flags
-    ) :
-        primitive_base_t(
+            std::basic_streambuf<
+                std::ostream::char_type,
+                std::ostream::traits_type
+            > & bsb,
+            unsigned int flags)
+      : primitive_base_t(
             bsb,
             0 != (flags & boost::archive::no_codecvt)
         ),

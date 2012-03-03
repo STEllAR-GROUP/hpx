@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,8 +21,6 @@
 namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class component_registry component_registry.hpp hpx/runtime/components/component_registry.hpp
-    ///
     /// The \a component_registry provides a minimal implementation of a
     /// component's registry. If no additional functionality is required this
     /// type can be used to implement the full set of minimally required

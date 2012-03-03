@@ -7,17 +7,18 @@
 
 // Naive SMP version implemented with eager_futures.
 
-#include <iostream>
-
-#include <boost/cstdint.hpp>
-#include <boost/format.hpp>
-
 #include <hpx/hpx.hpp>
+#include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/lcos/eager_future.hpp>
+
+#include <iostream>
+
+#include <boost/cstdint.hpp>
+#include <boost/format.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;

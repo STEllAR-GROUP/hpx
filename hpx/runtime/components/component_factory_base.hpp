@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -21,8 +21,6 @@
 namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class component_factory_base component_factory_base.hpp hpx/runtime/components/component_factory_base.hpp
-    ///
     /// The \a component_factory_base has to be used as a base class for all
     /// component factories.
     struct HPX_EXPORT component_factory_base
@@ -81,6 +79,19 @@ namespace hpx { namespace components
         ///         sequential in a row.
         virtual naming::gid_type create_one (
             components::constructor_argument const&) = 0;
+
+        /// \brief Create one new component instance and initialize it using
+        ///        the using the given constructor function.
+        ///
+        /// \param f  [in] The constructor function to call in order to
+        ///         initialize the newly allocated object.
+        ///
+        /// \return Returns the GID of the first newly created component
+        ///         instance. If more than one component instance has been
+        ///         created (\a count > 1) the GID's of all new instances are
+        ///         sequential in a row.
+        virtual naming::gid_type create_one_functor(
+            HPX_STD_FUNCTION<void(void*)> const&) = 0;
 
         /// \brief Destroy one or more component instances
         ///

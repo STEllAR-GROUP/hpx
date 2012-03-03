@@ -15,6 +15,11 @@
 
 #include <boost/shared_ptr.hpp>
 
+#if defined(BOOST_MSVC)
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#endif
+
 namespace hpx { namespace util
 {
 
@@ -72,6 +77,10 @@ struct HPX_EXPORT sed_transform
 };
 
 }}
+
+#if defined(BOOST_MSVC)
+#pragma warning(pop)
+#endif
 
 #endif // HPX_EC1602ED_CCC2_471C_BC28_1DBB98902F40
 

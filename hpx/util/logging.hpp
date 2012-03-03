@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -147,25 +147,29 @@ namespace hpx { namespace util
 #define LAGAS_CONSOLE_(lvl)                                                   \
     BOOST_LOG_USE_LOG(hpx::util::agas_console_logger(),                       \
         read_msg().gather().out(),                                            \
-        hpx::util::agas_console_level()->is_enabled(lvl))                     \
+        hpx::util::agas_console_level()->is_enabled(                          \
+            static_cast<boost::logging::level::type>(lvl)))                   \
 /**/
 
 #define LTIM_CONSOLE_(lvl)                                                    \
     BOOST_LOG_USE_LOG(hpx::util::timing_console_logger(),                     \
         read_msg().gather().out(),                                            \
-        hpx::util::timing_console_level()->is_enabled(lvl))                   \
+        hpx::util::timing_console_level()->is_enabled(                        \
+            static_cast<boost::logging::level::type>(lvl)))                   \
 /**/
 
 #define LHPX_CONSOLE_(lvl)                                                    \
     BOOST_LOG_USE_LOG(hpx::util::hpx_console_logger(),                        \
         read_msg().gather().out(),                                            \
-        hpx::util::hpx_console_level()->is_enabled(lvl))                      \
+        hpx::util::hpx_console_level()->is_enabled(                           \
+            static_cast<boost::logging::level::type>(lvl)))                   \
 /**/
 
 #define LAPP_CONSOLE_(lvl)                                                    \
     BOOST_LOG_USE_LOG(hpx::util::app_console_logger(),                        \
         read_msg().gather().out(),                                            \
-        hpx::util::app_console_level()->is_enabled(lvl))                      \
+        hpx::util::app_console_level()->is_enabled(                           \
+            static_cast<boost::logging::level::type>(lvl)))                   \
 /**/
 
 #endif

@@ -7,6 +7,8 @@
 
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/components/stubs/runtime_support.hpp>
 
 namespace hpx { namespace agas
 {
@@ -82,7 +84,11 @@ lcos::promise<bool, response> register_name_async(
     else
         new_gid = mutable_gid;
 
-    return naming::resolver_client::register_name_async(name, new_gid);
+    request req(symbol_ns_bind, name, new_gid);
+
+    naming::id_type const target = bootstrap_symbol_namespace_id();
+
+    return stubs::symbol_namespace::service_async<bool>(target, req);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -136,7 +142,11 @@ lcos::promise<naming::id_type, response> unregister_name_async(
     std::string const& name
     )
 {
-    return naming::resolver_client::unregister_name_async(name);
+    request req(symbol_ns_unbind, name);
+
+    naming::id_type const target = bootstrap_symbol_namespace_id();
+
+    return stubs::symbol_namespace::service_async<naming::id_type>(target, req);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -177,5 +187,116 @@ bool resolve_name(
     return false;
 }
 
+lcos::promise<naming::id_type, response> resolve_name_async(
+    std::string const& name
+    )
+{
+    request req(symbol_ns_resolve, name);
+
+    naming::id_type const gid = bootstrap_symbol_namespace_id();
+
+    return stubs::symbol_namespace::service_async<naming::id_type>(gid, req);
+}
+
+bool is_local_address(
+    naming::gid_type const& gid
+  , error_code& ec
+    )
+{
+    return naming::get_agas_client().is_local_address(gid, ec);
+}
+
+bool is_local_address(
+    naming::gid_type const& gid
+  , naming::address& addr
+  , error_code& ec
+    )
+{
+    return naming::get_agas_client().is_local_address(gid, addr, ec);
+}
+
+bool is_local_address_cached(
+    naming::gid_type const& gid
+  , error_code& ec
+    )
+{
+    return naming::get_agas_client().is_local_address_cached(gid, ec);
+}
+
+bool is_local_address_cached(
+    naming::gid_type const& gid
+  , naming::address& addr
+  , error_code& ec
+    )
+{
+    return naming::get_agas_client().is_local_address_cached(gid, addr, ec);
+}
+
+bool is_local_lva_encoded_address(
+    naming::gid_type const& gid
+    )
+{
+    return naming::get_agas_client().is_local_lva_encoded_address(gid);
+}
+
+void garbage_collect_non_blocking(
+    error_code& ec
+    )
+{
+    naming::get_agas_client().garbage_collect_non_blocking(ec);
+}
+
+void garbage_collect(
+    error_code& ec
+    )
+{
+    naming::get_agas_client().garbage_collect(ec);
+}
+
+/// \brief Invoke an asynchronous garbage collection step on the given target
+///        locality.
+void garbage_collect_non_blocking(
+    naming::id_type const& id
+  , error_code& ec
+    )
+{
+    try {
+        components::stubs::runtime_support::garbage_collect_non_blocking(id);
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws)
+            throw;
+        ec = make_error_code(e.get_error(), e.what());
+    }
+}
+
+/// \brief Invoke a synchronous garbage collection step on the given target
+///        locality.
+void garbage_collect(
+    naming::id_type const& id
+  , error_code& ec
+    )
+{
+    try {
+        components::stubs::runtime_support::garbage_collect(id);
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws)
+            throw;
+        ec = make_error_code(e.get_error(), e.what());
+    }
+}
+
+/// \brief Return an id_type referring to the console locality.
+naming::id_type get_console_locality(
+    error_code& ec
+    )
+{
+    naming::gid_type console;
+    naming::get_agas_client().get_console_locality(console, ec);
+    if (ec) return naming::invalid_id;
+
+    return naming::id_type(console, naming::id_type::unmanaged);
+}
 }}
 

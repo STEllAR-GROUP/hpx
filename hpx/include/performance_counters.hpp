@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,10 +7,12 @@
 #if !defined(HPX_PERFORMANCE_COUNTERS_MAR_01_2009_0212PM)
 #define HPX_PERFORMANCE_COUNTERS_MAR_01_2009_0212PM
 
-#include <hpx/config.hpp>
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/manage_counter.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
+#include <hpx/performance_counters/high_resolution_clock.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
 
 #endif

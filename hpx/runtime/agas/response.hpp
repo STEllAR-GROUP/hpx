@@ -8,6 +8,16 @@
 #if !defined(HPX_FB40C7A4_33B0_4C64_A16B_2A3FEEB237ED)
 #define HPX_FB40C7A4_33B0_4C64_A16B_2A3FEEB237ED
 
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/exception.hpp>
+#include <hpx/util/serialize_sequence.hpp>
+#include <hpx/traits/get_remote_result.hpp>
+#include <hpx/runtime/agas/namespace_action_code.hpp>
+#include <hpx/runtime/agas/gva.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/lcos/base_lco.hpp>
+
 #include <boost/variant.hpp>
 #include <boost/mpl/at.hpp>
 #include <boost/fusion/include/at_c.hpp>
@@ -19,16 +29,8 @@
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/tracking.hpp>
 
-#include <hpx/exception.hpp>
-#include <hpx/util/serialize_sequence.hpp>
-#include <hpx/traits/get_remote_result.hpp>
-#include <hpx/runtime/agas/namespace_action_code.hpp>
-#include <hpx/runtime/agas/gva.hpp>
-#include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/components/component_type.hpp>
-
 // The number of types that response's variant can represent.
-#define HPX_AGAS_RESPONSE_SUBTYPES 10
+#define HPX_AGAS_RESPONSE_SUBTYPES 8
 
 namespace hpx { namespace agas
 {
@@ -79,44 +81,6 @@ struct response
       : mc(type_)
       , status(status_)
       , data(boost::fusion::make_vector(gva_))
-    {
-        // TODO: verification of namespace_action_code
-    }
-
-    response(
-        namespace_action_code type_
-      , boost::uint64_t count_
-      , boost::int32_t ctype_
-      , error status_ = success
-        )
-      : mc(type_)
-      , status(status_)
-      , data(boost::fusion::make_vector(count_, ctype_))
-    {
-        // TODO: verification of namespace_action_code
-    }
-
-    response(
-        namespace_action_code type_
-      , boost::uint64_t count_
-      , components::component_type ctype_
-      , error status_ = success
-        )
-      : mc(type_)
-      , status(status_)
-      , data(boost::fusion::make_vector(count_, boost::int32_t(ctype_)))
-    {
-        // TODO: verification of namespace_action_code
-    }
-
-    response(
-        namespace_action_code type_
-      , boost::uint64_t count_
-      , error status_ = success
-        )
-      : mc(type_)
-      , status(status_)
-      , data(boost::fusion::make_vector(count_))
     {
         // TODO: verification of namespace_action_code
     }
@@ -235,25 +199,6 @@ struct response
         return g;
     }
 
-    boost::uint64_t get_count(
-        error_code& ec = throws
-        ) const
-    { // {{{
-        boost::uint64_t count = 0;
-
-        // Don't let the first attempt throw.
-        error_code first_try;
-        count = get_data<subtype_count, 0>(first_try);
-
-        // If the first try failed, check again.
-        if (first_try)
-            count = get_data<subtype_count_ctype, 0>(ec);
-        else if (&ec != &throws)
-            ec = make_success_code();
-
-        return count;
-    } // }}}
-
     std::vector<boost::uint32_t> get_localities(
         error_code& ec = throws
         ) const
@@ -264,23 +209,11 @@ struct response
     boost::int32_t get_component_type(
         error_code& ec = throws
         ) const
-    { // {{{
-        boost::int32_t ctype = 0;
+    {
+        return get_data<subtype_ctype, 0>(ec);
+    }
 
-        // Don't let the first attempt throw.
-        error_code first_try;
-        ctype = get_data<subtype_ctype, 0>(first_try);
-
-        // If the first try failed, check again.
-        if (first_try)
-            ctype = get_data<subtype_count_ctype, 1>(ec);
-        else if (&ec != &throws)
-            ec = make_success_code();
-
-        return ctype;
-    } // }}}
-
-    boost::uint32_t get_prefix(
+    boost::uint32_t get_locality_id(
         error_code& ec = throws
         ) const
     {
@@ -345,13 +278,11 @@ struct response
         subtype_gid_gid_prefix  = 0x0
       , subtype_gid_gva         = 0x1
       , subtype_gva             = 0x2
-      , subtype_count_ctype     = 0x3
-      , subtype_count           = 0x4
-      , subtype_ctype           = 0x5
-      , subtype_prefixes        = 0x6
-      , subtype_gid             = 0x7
-      , subtype_prefix          = 0x8
-      , subtype_void            = 0x9
+      , subtype_ctype           = 0x3
+      , subtype_prefixes        = 0x4
+      , subtype_gid             = 0x5
+      , subtype_prefix          = 0x6
+      , subtype_void            = 0x7
     };
 
     // The order of the variant types is significant, and should not be changed
@@ -375,46 +306,36 @@ struct response
             gva // gva
         >
         // 0x3
-        // primary_ns_decrement
-      , boost::fusion::vector2<
-            boost::uint64_t // count
-          , boost::int32_t  // ctype
-        >
-        // 0x4
-        // primary_ns_increment
-      , boost::fusion::vector1<
-            boost::uint64_t // count
-        >
-        // 0x5
         // component_ns_bind_prefix
         // component_ns_bind_name
       , boost::fusion::vector1<
             boost::int32_t // ctype
         >
-        // 0x6
+        // 0x4
         // primary_ns_localities
         // component_ns_resolve_id
       , boost::fusion::vector1<
             std::vector<boost::uint32_t> // prefixes
         >
-        // 0x7
+        // 0x5
         // symbol_ns_unbind
         // symbol_ns_resolve
       , boost::fusion::vector1<
             naming::gid_type // gid
         >
-        // 0x8
+        // 0x6
         // primary_ns_resolve_locality
       , boost::fusion::vector1<
             boost::uint32_t // prefix
         >
-        // 0x9
+        // 0x7
         // primary_ns_free
         // primary_ns_bind_gid
         // component_ns_unbind
         // component_ns_iterate_types
         // symbol_ns_bind
-        // symbol_ns_iterate
+        // symbol_ns_iterate_names
+        // primary_ns_change_credit
       , boost::fusion::vector0<
         >
     > data_type;
@@ -603,6 +524,33 @@ struct get_remote_result<bool, agas::response>
 
 BOOST_CLASS_VERSION(hpx::agas::response, HPX_AGAS_VERSION)
 BOOST_CLASS_TRACKING(hpx::agas::response, boost::serialization::track_never)
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco_with_value<hpx::agas::response>::set_result_action,
+    set_result_action_agas_response_type);
+
+namespace hpx { namespace agas { namespace create_result_ns {
+    typedef
+        hpx::lcos::base_lco_with_value<bool, hpx::agas::response>
+        base_lco_bool_response_type;
+    typedef
+        hpx::lcos::base_lco_with_value<hpx::naming::id_type, hpx::agas::response>
+        base_lco_id_type_response_type;
+    typedef
+        hpx::lcos::base_lco_with_value<std::vector<hpx::agas::response> >
+        base_lco_vector_response_type;
+}}}
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::agas::create_result_ns::base_lco_bool_response_type::set_result_action,
+    set_result_action_agas_bool_response_type);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::agas::create_result_ns::base_lco_id_type_response_type::set_result_action,
+    set_result_action_agas_id_type_response_type);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::agas::create_result_ns::base_lco_vector_response_type::set_result_action,
+    set_result_action_agas_vector_response_type);
 
 #endif // HPX_FB40C7A4_33B0_4C64_A16B_2A3FEEB237ED
 

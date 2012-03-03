@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -118,24 +118,24 @@ namespace hpx { namespace components
             return this->base_type::create_memory_block_async(gid_, count, act);
         }
 
-        lcos::promise<void> load_components_async()
+        lcos::promise<bool> load_components_async()
         {
             return this->base_type::load_components_async(gid_);
         }
 
-        void load_components()
+        bool load_components()
         {
-            this->base_type::load_components(gid_);
+            return this->base_type::load_components(gid_);
         }
 
-        lcos::promise<void> call_startup_functions_async()
+        lcos::promise<void> call_startup_functions_async(bool pre_startup)
         {
-            return this->base_type::call_startup_functions_async(gid_);
+            return this->base_type::call_startup_functions_async(gid_, pre_startup);
         }
 
-        void call_startup_functions()
+        void call_startup_functions(bool pre_startup)
         {
-            this->base_type::call_startup_functions(gid_);
+            this->base_type::call_startup_functions(gid_, pre_startup);
         }
 
         lcos::promise<void> call_shutdown_functions_async(bool pre_shutdown)

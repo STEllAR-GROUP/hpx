@@ -2,6 +2,8 @@
 #define BOOST_DETAIL_ATOMIC_INTERLOCKED_HPP
 
 //  Copyright (c) 2009 Helge Bahmann
+//  Copyright (c) 2011-2012 Hartmut Kaiser
+//  Copyright (c) 2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0.
 //  See accompanying file LICENSE_1_0.txt or copy at
@@ -12,9 +14,7 @@
 #include <boost/atomic/detail/base.hpp>
 #include <boost/atomic/detail/builder.hpp>
 
-namespace boost {
-namespace detail {
-namespace atomic {
+namespace boost { namespace detail { namespace atomic {
 
 static inline void full_fence(void)
 {
@@ -98,6 +98,8 @@ private:
     T i;
 };
 
+}}}
+
 # if defined(_M_IA64) || defined(_M_AMD64)
 
 #if defined( BOOST_USE_WINDOWS_H )
@@ -123,6 +125,8 @@ extern "C" boost::int64_t __cdecl _InterlockedCompareExchange64(boost::int64_t v
 # define BOOST_INTERLOCKED_COMPARE_EXCHANGE64 _InterlockedCompareExchange64
 
 #endif
+
+namespace boost { namespace detail { namespace atomic {
 
 template<typename T>
 class __declspec(align(8)) atomic_interlocked_64 {
@@ -178,27 +182,17 @@ private:
     T i;
 };
 
+}}}
+
 // _InterlockedCompareExchange128 is available only starting with VS2008
 #if BOOST_MSVC >= 1500 && defined(BOOST_ATOMIC_HAVE_SSE2)
-
-#if defined( BOOST_USE_WINDOWS_H )
-
-# include <windows.h>
-# include <emmintrin.h>
-
-# define BOOST_INTERLOCKED_COMPARE_EXCHANGE128 InterlockedCompareExchange128
-
-# pragma intrinsic( _mm_load_si128 )
-# pragma intrinsic( _mm_store_si128 )
-
-#else
 
 # include <emmintrin.h>
 
 extern "C" unsigned char __cdecl _InterlockedCompareExchange128(
     boost::int64_t volatile *Destination,
     boost::int64_t ExchangeHigh, boost::int64_t ExchangeLow,
-    boost::int64_t *Comparand)
+    boost::int64_t *Comparand);
 extern "C" __m128i _mm_load_si128(__m128i const*_P);
 extern "C" void _mm_store_si128(__m128i *_P, __m128i _B);
 
@@ -208,7 +202,7 @@ extern "C" void _mm_store_si128(__m128i *_P, __m128i _B);
 
 # define BOOST_INTERLOCKED_COMPARE_EXCHANGE128 _InterlockedCompareExchange128
 
-#endif
+namespace boost { namespace detail { namespace atomic {
 
 template<typename T>
 class __declspec(align(16)) atomic_interlocked_128 {
@@ -219,10 +213,10 @@ public:
     {
         T v;
         if (order!=memory_order_seq_cst) {
-            v = _mm_load_si128(*(__m128i*)(&i));
+            v = *(T const*)(&i);
         }
         else {
-            v = *reinterpret_cast<volatile const T *>(&i);
+            v = _mm_load_si128((__m128i const*)(&i));
         }
         fence_after_load(order);
         return v;
@@ -230,7 +224,7 @@ public:
     void store(T v, memory_order order=memory_order_seq_cst) volatile
     {
         if (order!=memory_order_seq_cst) {
-            *reinterpret_cast<volatile T *>(&i)=v;
+            *(T*)(&i)=v;
         }
         else {
             _mm_store_si128(*(__m128i*)(&i), v);
@@ -242,11 +236,11 @@ public:
         memory_order success_order,
         memory_order failure_order) volatile
     {
-        boost::int64_t* desired_raw = &desired;
-        T prev = i;
+        boost::int64_t* desired_raw = (boost::int64_t*)&desired;
+        T prev = *(__m128i*)(&i);
         bool success = BOOST_INTERLOCKED_COMPARE_EXCHANGE128(
             (boost::int64_t volatile *)(&i),
-            desired_raw[1], desired_raw[0], (boost::int64_t*)&expected);
+            desired_raw[1], desired_raw[0], (boost::int64_t*)&expected) ? true : false;
         if (!success)
             expected = prev;
         return success;
@@ -261,7 +255,7 @@ public:
     }
     T exchange(T r, memory_order order=memory_order_seq_cst) volatile
     {
-        boost::int64_t* desired_raw = &r;
+        boost::int64_t* desired_raw = (boost::int64_t*)&r;
         T prev = i;
 
         while (!BOOST_INTERLOCKED_COMPARE_EXCHANGE128(
@@ -289,9 +283,14 @@ public:
 private:
     T i;
 };
+
+}}}
+
 #endif
 
 #endif
+
+namespace boost { namespace detail { namespace atomic {
 
 template<typename T>
 class platform_atomic_integral<T, 4> : public build_atomic_from_add<atomic_interlocked_32<T> > {
@@ -358,8 +357,6 @@ public:
 
 #endif
 
-}
-}
-}
+}}}
 
 #endif

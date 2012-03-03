@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,7 +10,7 @@
 #include <boost/intrusive/slist.hpp>
 
 #include <hpx/exception.hpp>
-#include <hpx/util/spinlock.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/runtime/threads/thread.hpp>
@@ -24,8 +24,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace server
 {
-    /// \class queue queue.hpp hpx/lcos/server/queue.hpp
-    ///
     /// A queue can be used to 'collect' (queue) a number of incoming values
     /// for consumption of an internal thread, which will invoke a given action
     /// for each of the values.
@@ -42,7 +40,7 @@ namespace hpx { namespace lcos { namespace server
         typedef lcos::base_lco_with_value<ValueType, RemoteType> base_type_holder;
 
     private:
-        typedef util::spinlock mutex_type;
+        typedef lcos::local::spinlock mutex_type;
         typedef components::managed_component_base<queue> base_type;
 
         // define data structures needed for intrusive slist container used for
@@ -151,11 +149,8 @@ namespace hpx { namespace lcos { namespace server
 
         // standard LCO action implementations
 
-        /// The function \a set_event will block the number of entering
-        /// \a threads (as given by the constructor parameter \a number_of_threads),
-        /// releasing all waiting threads as soon as the last \a thread
-        /// entered this function.
-        void set_result (RemoteType const& result)
+        /// Add a value to the queue.
+        void set_result (BOOST_RV_REF(RemoteType) result)
         {
             // push back the new value onto the queue
             HPX_STD_UNIQUE_PTR<queue_value_entry> node(
@@ -178,9 +173,7 @@ namespace hpx { namespace lcos { namespace server
         }
 
         /// The \a function set_error is called whenever a
-        /// \a set_error_action is applied on an instance of a LCO. This
-        /// function just forwards to the virtual function \a set_error, which
-        /// is overloaded by the derived concrete LCO.
+        /// \a set_error_action is applied on an instance of a LCO.
         ///
         /// \param e      [in] The exception encapsulating the error to report
         ///               to this LCO instance.

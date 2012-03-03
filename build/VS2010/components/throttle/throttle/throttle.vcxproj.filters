@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Server">
+      <UniqueIdentifier>{f41e2852-18a6-4cbf-a5fe-af9937ce60c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Stubs">
+      <UniqueIdentifier>{7040cf9f-02eb-4b65-99cd-0532b03666b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Server">
+      <UniqueIdentifier>{131aa8c5-944c-4c73-8b0f-f6f4ee512773}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\..\examples\throttle\throttle\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\examples\throttle\throttle\throttle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\examples\throttle\throttle\server\throttle.cpp">
+      <Filter>Source Files\Server</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\examples\throttle\throttle\server\throttle.hpp">
+      <Filter>Header Files\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\examples\throttle\throttle\stubs\throttle.hpp">
+      <Filter>Header Files\Stubs</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

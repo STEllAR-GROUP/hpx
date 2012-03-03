@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -79,6 +79,13 @@ namespace hpx { namespace performance_counters
         /// Type:     Average
         counter_average_count,
 
+        /// \a counter_aggregating applies a function to an embedded counter
+        /// instance. The embedded counter is usually evaluated repeatedly
+        /// after a fixed (but configurable) time interval.
+        ///
+        /// Formula:  F(Nx)
+        counter_aggregating,
+
         /// \a counter_average_timer measures the average time it takes to
         /// complete a process or operation. Counters of this type display a
         /// ratio of the total elapsed time of the sample interval to the
@@ -131,6 +138,11 @@ namespace hpx { namespace performance_counters
         status_generic_error,   ///< A unknown error occurred
     };
 
+    inline bool status_is_valid(counter_status s)
+    {
+        return s == status_valid_data || s == status_new_data;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     /// A counter_type_path_elements holds the elements of a full name for a
     /// counter type. Generally, a full name of a counter type has the
@@ -146,13 +158,17 @@ namespace hpx { namespace performance_counters
         counter_type_path_elements()
         {}
 
-        template <typename S1, typename S2>
-        counter_type_path_elements(S1 const& obj, S2 const& counter)
-          : objectname_(obj), countername_(counter)
+        counter_type_path_elements(std::string const& objectname,
+                std::string const& countername, std::string const& parameters)
+          : objectname_(objectname),
+            countername_(countername),
+            parameters_(parameters)
         {}
 
         std::string objectname_;          ///< the name of the performance object
         std::string countername_;         ///< contains the counter name
+        std::string parameters_;          ///< optional parameters for the
+                                          ///< counter instance
 
     protected:
         // serialization support
@@ -161,7 +177,7 @@ namespace hpx { namespace performance_counters
         template<class Archive>
         void serialize(Archive& ar, const unsigned int)
         {
-            ar & objectname_ & countername_;
+            ar & objectname_ & countername_ & parameters_;
         }
     };
 
@@ -170,32 +186,36 @@ namespace hpx { namespace performance_counters
     /// instance. Generally, a full name of a counter instance has the
     /// structure:
     ///
-    ///    /objectname(parentinstancename#parentindex/instancename#instanceindex)/countername
+    ///    /objectname{parentinstancename#parentindex/instancename#instanceindex}/countername#parameters
     ///
     /// i.e.
-    ///    /queue(localityprefix/thread#2)/length
+    ///    /queue{localityprefix/thread#2}/length
     ///
     struct counter_path_elements : counter_type_path_elements
     {
         typedef counter_type_path_elements base_type;
 
         counter_path_elements()
-          : parentinstanceindex_(-1), instanceindex_(-1)
+          : parentinstanceindex_(-1), instanceindex_(-1),
+            parentinstance_is_basename_(false)
         {}
 
-        template <typename S1, typename S2, typename S3, typename S4>
-        counter_path_elements(S1 const& obj, S2 const& counter,
-                S3 const& parent, S4 const& instance,
-                boost::int32_t parentindex = -1, boost::int32_t index = -1)
-          : base_type(obj, counter),
-            parentinstancename_(parent), instancename_(instance),
-            parentinstanceindex_(parentindex), instanceindex_(index)
+        counter_path_elements(std::string const& objectname,
+                std::string const& countername, std::string const& parameters,
+                std::string const& parentname, std::string const& instancename,
+                boost::int32_t parentindex = -1, boost::int32_t instanceindex = -1,
+                bool parentinstance_is_basename = false)
+          : counter_type_path_elements(objectname, countername, parameters),
+            parentinstancename_(parentname), instancename_(instancename),
+            parentinstanceindex_(parentindex), instanceindex_(instanceindex),
+            parentinstance_is_basename_(parentinstance_is_basename)
         {}
 
         std::string parentinstancename_;  ///< the name of the parent instance
         std::string instancename_;        ///< the name of the object instance
         boost::int32_t parentinstanceindex_;    ///< the parent instance index
         boost::int32_t instanceindex_;    ///< the instance index
+        bool parentinstance_is_basename_; ///< the parentinstancename_ member holds a base counter name
 
     private:
         // serialization support
@@ -206,14 +226,24 @@ namespace hpx { namespace performance_counters
         {
             typedef counter_type_path_elements base_type;
             ar & boost::serialization::base_object<base_type>(*this);
-            ar & parentinstancename_ & instancename_ & parentinstanceindex_ & instanceindex_;
+            ar & parentinstancename_ & instancename_ &
+                 parentinstanceindex_ & instanceindex_ &
+                 parentinstance_is_basename_;
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a full name of a counter type from the contents of the
-    ///        given \a counter_type_path_elements instance.
-    HPX_API_EXPORT counter_status get_counter_name(
+    ///        given \a counter_type_path_elements instance.The generated
+    ///        counter type name will not contain any parameters.
+    HPX_API_EXPORT counter_status get_counter_type_name(
+        counter_type_path_elements const& path, std::string& result,
+        error_code& ec = throws);
+
+    /// \brief Create a full name of a counter type from the contents of the
+    ///        given \a counter_type_path_elements instance. The generated
+    ///        counter type name will contain all parameters.
+    HPX_API_EXPORT counter_status get_full_counter_type_name(
         counter_type_path_elements const& path, std::string& result,
         error_code& ec = throws);
 
@@ -225,7 +255,7 @@ namespace hpx { namespace performance_counters
 
     /// \brief Fill the given \a counter_type_path_elements instance from the
     ///        given full name of a counter type
-    HPX_API_EXPORT counter_status get_counter_path_elements(
+    HPX_API_EXPORT counter_status get_counter_type_path_elements(
         std::string const& name, counter_type_path_elements& path,
         error_code& ec = throws);
 
@@ -255,13 +285,18 @@ namespace hpx { namespace performance_counters
     {
         counter_info(counter_type type = counter_raw)
           : type_(type), version_(HPX_PERFORMANCE_COUNTER_V1),
-            status_(status_valid_data)
+            status_(status_invalid_data)
+        {}
+
+        counter_info(std::string const& name)
+          : type_(counter_raw), version_(HPX_PERFORMANCE_COUNTER_V1),
+            status_(status_invalid_data), fullname_(name)
         {}
 
         counter_info(counter_type type, std::string const& name,
                 std::string const& helptext = "",
                 boost::uint32_t version = HPX_PERFORMANCE_COUNTER_V1)
-          : type_(type), version_(version), status_(status_valid_data),
+          : type_(type), version_(version), status_(status_invalid_data),
             fullname_(name), helptext_(helptext)
         {}
 
@@ -284,6 +319,25 @@ namespace hpx { namespace performance_counters
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \brief This declares the type of a function, which will be
+    ///        called by HPX whenever a new performance counter instance of a
+    ///        particular type needs to be created.
+    typedef naming::gid_type create_counter_func(counter_info const&,
+        error_code&);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief This declares a type of a function, which will be passed to
+    ///        a \a discover_counters_func in order to be called for each
+    ///        discovered performance counter instance.
+    typedef bool discover_counter_func(counter_info const&, error_code&);
+
+    /// \brief This declares the type of a function, which will be called by
+    ///        HPX whenever it needs to discover all performance counter
+    ///        instances of a particular type.
+    typedef bool discover_counters_func(counter_info const&,
+        HPX_STD_FUNCTION<discover_counter_func> const&, error_code&);
+
+    ///////////////////////////////////////////////////////////////////////////
     /// \brief Complement the counter info if parent instance name is missing
     HPX_API_EXPORT counter_status complement_counter_info(counter_info& info,
         counter_info const& type_info, error_code& ec = throws);
@@ -301,7 +355,7 @@ namespace hpx { namespace performance_counters
         {}
 
         counter_status status_;     ///< The status of the counter value
-        boost::int64_t time_;       ///< The local time when data was collected
+        boost::uint64_t time_;      ///< The local time when data was collected
         boost::int64_t value_;      ///< The current counter value
         boost::int64_t scaling_;    ///< The scaling of the current counter value
         bool scale_inverse_;        ///< If true, value_ needs to be deleted by
@@ -313,7 +367,7 @@ namespace hpx { namespace performance_counters
         template <typename T>
         T get_value(error_code& ec = throws)
         {
-            if (status_valid_data != status_) {
+            if (!status_is_valid(status_)) {
                 HPX_THROWS_IF(ec, invalid_status,
                     "counter_value::get_value<T>",
                     "counter value is in invalid status");
@@ -334,7 +388,7 @@ namespace hpx { namespace performance_counters
 
                 return T(value_) * scaling_;
             }
-            return value_;
+            return T(value_);
         }
 
     private:
@@ -350,8 +404,23 @@ namespace hpx { namespace performance_counters
 
     ///////////////////////////////////////////////////////////////////////
     /// \brief Add a new performance counter type to the (local) registry
-    HPX_API_EXPORT counter_status add_counter_type(
-        counter_info const& info, error_code& ec = throws);
+    HPX_API_EXPORT counter_status add_counter_type(counter_info const& info,
+        HPX_STD_FUNCTION<create_counter_func> const& create_counter,
+        HPX_STD_FUNCTION<discover_counters_func> const& discover_counters,
+        error_code& ec = throws);
+
+    inline counter_status add_counter_type(counter_info const& info,
+        error_code& ec = throws)
+    {
+        return add_counter_type(info, HPX_STD_FUNCTION<create_counter_func>(),
+            HPX_STD_FUNCTION<discover_counters_func>(), ec);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Call the supplied function for each registered counter type
+    HPX_API_EXPORT counter_status discover_counter_types(
+        HPX_STD_FUNCTION<discover_counter_func> const& discover_counter,
+        error_code& ec = throws);
 
     /// \brief Remove an existing counter type from the (local) registry
     ///
@@ -360,44 +429,82 @@ namespace hpx { namespace performance_counters
     HPX_API_EXPORT counter_status remove_counter_type(
         counter_info const& info, error_code& ec = throws);
 
-    /// \brief Create a new performance counter instance based on given
-    ///        counter value
-    HPX_API_EXPORT naming::id_type create_raw_counter(
-        counter_info const& info, boost::int64_t* countervalue,
-        error_code& ec = throws);
+    /// \brief Retrieve the counter type for the given counter name from the
+    ///        (local) registry
+    HPX_API_EXPORT counter_status get_counter_type(std::string const& name,
+        counter_info& info, error_code& ec = throws);
 
-    /// \brief Create a new performance counter instance based on given
-    ///        function returning the counter value
-    HPX_API_EXPORT naming::id_type create_raw_counter(
-        counter_info const& info, HPX_STD_FUNCTION<boost::int64_t()> f,
-        error_code& ec = throws);
-
-    /// \brief Create a new performance counter instance based on given
-    ///        counter info
-    HPX_API_EXPORT naming::id_type create_counter(
-        counter_info const& info, error_code& ec = throws);
-
-    /// \brief Create a new performance counter instance of type
-    ///        counter_average_count based on given base counter name and
-    ///        given base time interval (milliseconds)
-    HPX_API_EXPORT naming::id_type create_average_count_counter(
-        performance_counters::counter_info const& info,
-        std::string const& base_counter_name, std::size_t base_time_interval,
-        error_code& ec = throws);
-
-    /// \brief Add an existing performance counter instance to the registry
-    HPX_API_EXPORT counter_status add_counter(naming::id_type const& id,
-        counter_info const& info, error_code& ec = throws);
-
-    /// \brief Remove an existing performance counter instance with the
-    ///        given id (as returned from \a create_counter)
-    HPX_API_EXPORT counter_status remove_counter(
-        counter_info const& info, naming::id_type const& id,
-        error_code& ec = throws);
-
-    /// \brief Get the global id of an existing performance counter
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Get the global id of an existing performance counter, if the
+    ///        counter does not exist yet, the function attempts to create the
+    ///        counter based on the given counter name.
     HPX_API_EXPORT naming::id_type get_counter(std::string name,
         error_code& ec = throws);
+
+    /// \brief Get the global id of an existing performance counter, if the
+    ///        counter does not exist yet, the function attempts to create the
+    ///        counter based on the given counter info.
+    HPX_API_EXPORT naming::id_type get_counter(
+        counter_info const& info, error_code& ec = throws);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieve the meta data specific for the given counter instance
+    HPX_API_EXPORT void get_counter_infos(counter_info const& info,
+        counter_type& type, std::string& helptext, boost::uint32_t& version,
+        error_code& ec = throws);
+
+    /// \brief Retrieve the meta data specific for the given counter instance
+    HPX_API_EXPORT void get_counter_infos(std::string name, counter_type& type,
+        std::string& helptext, boost::uint32_t& version, error_code& ec = throws);
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        /// \brief Add an existing performance counter instance to the registry
+        HPX_API_EXPORT counter_status add_counter(naming::id_type const& id,
+            counter_info const& info, error_code& ec = throws);
+
+        /// \brief Remove an existing performance counter instance with the
+        ///        given id (as returned from \a create_counter)
+        HPX_API_EXPORT counter_status remove_counter(
+            counter_info const& info, naming::id_type const& id,
+            error_code& ec = throws);
+
+        ///////////////////////////////////////////////////////////////////////
+        // Helper function for creating counters encapsulating a function
+        // returning the counter value.
+        naming::gid_type create_raw_counter(counter_info const&,
+            HPX_STD_FUNCTION<boost::int64_t()> const&, error_code&);
+
+        // Helper function for creating a new performance counter instance
+        // based on a given counter value.
+        naming::gid_type create_raw_counter_value(counter_info const&,
+            boost::int64_t*, error_code&);
+
+        // Creation function for aggregating performance counters; to be
+        // registered with the counter types.
+        naming::gid_type aggregating_counter_creator(counter_info const&,
+            error_code&);
+
+        // Creation function for uptime counters.
+        naming::gid_type uptime_counter_creator(counter_info const&,
+            error_code&);
+
+        // \brief Create a new aggregating performance counter instance based on
+        //        given base counter name and given base time interval
+        //        (milliseconds).
+        naming::gid_type create_aggregating_counter(
+            counter_info const& info, std::string const& base_counter_name,
+            std::size_t base_time_interval, error_code& ec = throws);
+
+        // \brief Create a new performance counter instance based on given
+        //        counter info
+        naming::gid_type create_counter(counter_info const& info,
+            error_code& ec = throws);
+
+        // \brief Create an arbitrary counter on this locality
+        naming::gid_type create_counter_local(counter_info const& info);
+    }
 }}
 
 #endif

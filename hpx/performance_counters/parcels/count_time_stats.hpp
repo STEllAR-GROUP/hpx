@@ -24,12 +24,13 @@
 namespace hpx { namespace performance_counters { namespace parcels
 {
 
-class count_time_stats {
-  typedef hpx::util::spinlock mutex_type;
-  typedef mutex_type::scoped_lock lock;
-  typedef boost::accumulators::accumulator_set acc_set;
+class count_time_stats 
+{
+    typedef hpx::util::spinlock mutex_type;
+    typedef mutex_type::scoped_lock lock;
+    typedef boost::accumulators::accumulator_set acc_set;
 
-   public:
+public:
 
     count_time_stats():
       count_time_stats_size(0)
@@ -67,8 +68,7 @@ class count_time_stats {
 
 inline void count_time_stats::push_back(count_and_time_data_point const& x)
 {
-    lock
-        mtx(acc_mtx)
+    lock mtx(acc_mtx)
 
     ++count_time_stats_size;
 

@@ -6,18 +6,13 @@
 ################################################################################
 # C++-style include guard to prevent multiple searches in the same build
 if(NOT BOOST_VERSION_SEARCHED)
-set(BOOST_VERSION_SEARCHED ON CACHE INTERNAL "Found Boost version")
 
 include(HPX_Utils)
-
-if(NOT CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCT)
-  set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
-endif()
 
 ################################################################################
 macro(get_boost_version)
   if(NOT BOOST_VERSION_FOUND)
-  set(BOOST_VERSION_FOUND ON CACHE INTERNAL "Boost version was found.")
+  set(BOOST_VERSION_FOUND OFF CACHE INTERNAL "Boost version was found.")
 
   # Non-system Boost tree (tarball, SCM checkout, etc)
   if(NOT BOOST_USE_SYSTEM)
@@ -50,12 +45,20 @@ macro(get_boost_version)
     find_path(BOOST_VERSION_HPP boost/version.hpp PATHS ${BOOST_INCLUDE_DIR} NO_DEFAULT_PATH)
 
     if(${BOOST_VERSION_HPP} STREQUAL BOOST_VERSION_HPP-NOTFOUND)
-      hpx_warn("boost.version" "Could not locate Boost include directory in ${BOOST_INCLUDE_DIR}. Now searching the system.")
+      if(NOT BOOST_INCLUDE_DIR)
+        hpx_warn("boost.version" "Could not locate Boost include directory. Now searching the system.")
+      else()
+        hpx_warn("boost.version" "Could not locate Boost include directory in ${BOOST_INCLUDE_DIR}. Now searching the system.")
+      endif()
 
       find_path(BOOST_VERSION_HPP boost/version.hpp)
 
       if(${BOOST_VERSION_HPP} STREQUAL BOOST_VERSION_HPP-NOTFOUND)
-        hpx_error("boost.version" "Failed to locate Boost include directory in ${BOOST_INCLUDE_DIR} or in the default path.")
+        if(NOT BOOST_INCLUDE_DIR)
+          hpx_error("boost.version" "Failed to locate Boost include directory in the default path. Try setting BOOST_ROOT to your Boost installation directory.")
+        else()
+          hpx_error("boost.version" "Failed to locate Boost include directory in ${BOOST_INCLUDE_DIR} or in the default path. Try setting BOOST_ROOT to your Boost installation directory.")
+        endif()
       endif()
     endif()
 
@@ -65,7 +68,7 @@ macro(get_boost_version)
     find_path(BOOST_VERSION_HPP boost/version.hpp)
 
     if(${BOOST_VERSION_HPP} STREQUAL BOOST_VERSION_HPP-NOTFOUND)
-      hpx_error("boost.version" "Failed to locate Boost include directory in the default path.")
+      hpx_error("boost.version" "Failed to locate Boost include directory in the default path. Try setting BOOST_ROOT to your Boost installation directory.")
     endif()
 
   endif()
@@ -93,7 +96,7 @@ macro(get_boost_version)
     math(EXPR BOOST_MINOR_VERSION "${BOOST_VERSION_NUM} / 100 % 1000")
     math(EXPR BOOST_PATCH_VERSION "${BOOST_VERSION_NUM} % 100")
   else()
-    hpx_error("boost.version" "Invalid Boost version ${BOOST_VERSION_NUM}.")
+    hpx_error("boost.version" "Invalid Boost version ${BOOST_VERSION_NUM}, expected format MMRRPP (i.e. 104800)")
   endif()
 
   set(BOOST_VERSION_HPP "${BOOST_VERSION_HPP}"
@@ -113,6 +116,9 @@ macro(get_boost_version)
     CACHE STRING "Boost version (M.mm.p string version)." FORCE)
 
   hpx_info("boost.version" "Boost version is ${BOOST_VERSION_STR}.")
+
+  set(BOOST_VERSION_SEARCHED ON CACHE INTERNAL "Found Boost version")
+  set(BOOST_VERSION_FOUND ON CACHE INTERNAL "Boost version was found.")
 
   set(BOOST_USE_SYSTEM "${BOOST_USE_SYSTEM}" CACHE BOOL
     "Set to true to search for a system install of Boost (default ON)." FORCE)

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -30,12 +30,6 @@ namespace hpx { namespace actions
         LLCO_(info) << "continuation::trigger_error(" << gid_ << ")";
         hpx::applier::apply<lcos::base_lco::set_error_action>(
             gid_, boost::move(e));
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    void continuation::enumerate_argument_gids(enum_gid_handler_type f)
-    {
-        f (boost::ref(gid_));
     }
 }}
 

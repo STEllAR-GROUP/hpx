@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -15,31 +15,33 @@
 #include <boost/fusion/include/vector.hpp>
 #include <boost/fusion/include/at.hpp>
 #include <boost/fusion/include/size.hpp>
-#include <boost/fusion/include/any.hpp>
+#include <boost/fusion/include/for_each.hpp>
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/ref.hpp>
 #include <boost/foreach.hpp>
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/export.hpp>
+#include <boost/serialization/extended_type_info.hpp>
+#include <boost/serialization/extended_type_info_typeid.hpp>
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 #include <boost/type_traits/is_same.hpp>
+#include <boost/type_traits/is_convertible.hpp>
 #include <boost/mpl/if.hpp>
-#include <boost/serialization/base_object.hpp>
-#include <boost/serialization/void_cast.hpp>
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/export.hpp>
 #include <boost/move/move.hpp>
 
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/util/serialize_sequence.hpp>
+#include <hpx/util/serialize_exception.hpp>
+#include <hpx/util/demangle_helper.hpp>
+#include <hpx/util/base_object.hpp>
+#include <hpx/util/void_cast.hpp>
 
 #include <hpx/config/bind.hpp>
 #include <hpx/config/tuple.hpp>
 #include <hpx/config/function.hpp>
-#include <hpx/traits/handle_gid.hpp>
-#include <hpx/traits/get_action_name.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -54,14 +56,47 @@ namespace hpx { namespace actions
         template <typename T>
         struct remove_qualifiers
         {
-            typedef typename boost::remove_reference<T>::type no_ref_type;
+            typedef typename hpx::util::detail::remove_reference<T>::type no_ref_type;
             typedef typename boost::remove_const<no_ref_type>::type type;
         };
+
+        template <typename Action, typename Enable = void>
+        struct needs_guid_initialization
+            : boost::mpl::true_
+        {};
+
+        template <typename Action>
+        void guid_initialization(boost::mpl::false_) {}
+
+        template <typename Action>
+        void guid_initialization(boost::mpl::true_)
+        {
+            // force serialization self registration to happen
+            using namespace boost::archive::detail::extra_detail;
+            init_guid<Action>::g.initialize();
+        }
+
+        template <typename Action>
+        void guid_initialization()
+        {
+            guid_initialization<Action>(
+                typename needs_guid_initialization<Action>::type()
+            );
+        }
 
         template <typename Action>
         char const* get_action_name()
         {
-            return traits::get_action_name<Action>::call();
+            /// If you encounter this assert while compiling code, that means that
+            /// you have a HPX_REGISTER_ACTION macro somewhere in a source file,
+            /// but the header in which the action is defined misses a
+            /// HPX_REGISTER_ACTION_DECLARATION
+            BOOST_MPL_ASSERT_MSG(
+                needs_guid_initialization<Action>::value
+              , HPX_REGISTER_ACTION_DECLARATION_MISSING
+              , (Action)
+            );
+            return util::type_id<Action>::typeid_.type_id();
         }
     }
 
@@ -112,7 +147,7 @@ namespace hpx { namespace actions
         ///       thread function for an action which has to be invoked without
         ///       continuations.
         virtual HPX_STD_FUNCTION<threads::thread_function_type>
-            get_thread_function(naming::address::address_type lva) const = 0;
+            get_thread_function(naming::address::address_type lva) = 0;
 
         /// The \a get_thread_function constructs a proper thread function for
         /// a \a thread, encapsulating the functionality, the arguments, and
@@ -131,7 +166,7 @@ namespace hpx { namespace actions
         ///       continuations.
         virtual HPX_STD_FUNCTION<threads::thread_function_type>
             get_thread_function(continuation_type& cont,
-                naming::address::address_type lva) const = 0;
+                naming::address::address_type lva) = 0;
 
         /// return the id of the locality of the parent thread
         virtual boost::uint32_t get_parent_locality_prefix() const = 0;
@@ -154,74 +189,7 @@ namespace hpx { namespace actions
         get_thread_init_data(continuation_type& cont,
             naming::address::address_type lva,
             threads::thread_init_data& data) = 0;
-
-        /// Enumerate all GIDs which stored as arguments
-        typedef HPX_STD_FUNCTION<void(naming::id_type const&)> enum_gid_handler_type;
-        virtual void enumerate_argument_gids(enum_gid_handler_type) = 0;
     };
-
-    ///////////////////////////////////////////////////////////////////////////
-    struct enum_gid_handler
-    {
-        /// Enumerate all GIDs which stored as arguments
-        typedef base_action::enum_gid_handler_type enum_gid_handler_type;
-
-        enum_gid_handler(enum_gid_handler_type f)
-          : f_(f)
-        {}
-
-        template <typename T>
-        bool operator()(T const& t) const
-        {
-            return traits::handle_gid<T, enum_gid_handler_type>::call(t, f_);
-        }
-
-        enum_gid_handler_type f_;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Result, typename Arguments>
-    struct signature;
-
-    template <typename Result>
-    struct signature<Result, boost::fusion::vector<> > : base_action
-    {
-        typedef boost::fusion::vector<> arguments_type;
-        typedef Result result_type;
-
-        virtual result_type execute_function(
-            naming::address::address_type lva) const = 0;
-
-        virtual HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(naming::address::address_type lva,
-            arguments_type const& args) const = 0;
-
-        virtual HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(continuation_type& cont,
-            naming::address::address_type lva,
-            arguments_type const& args) const = 0;
-
-        virtual threads::thread_init_data&
-        get_thread_init_data(naming::address::address_type lva,
-            threads::thread_init_data& data,
-            arguments_type const& args) = 0;
-
-        virtual threads::thread_init_data&
-        get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva,
-            threads::thread_init_data& data,
-            arguments_type const& args) = 0;
-
-    public:
-        /// serialization support
-        static void register_base()
-        {
-            using namespace boost::serialization;
-            void_cast_register<signature, base_action>();
-        }
-    };
-
-    #include <hpx/runtime/actions/signature_implementations.hpp>
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
@@ -256,23 +224,23 @@ namespace hpx { namespace actions
         };
     }
 
-    template <typename Component                // Component type
-            , int Action                        // Action code
-            , typename Result                   // Return type
-            , typename Arguments                // Arguments (fusion vector)
-            , typename Derived                  // Derived action class
-            , threads::thread_priority Priority /* Default priority */>
-    class action : public signature<Result, Arguments>
+    ///////////////////////////////////////////////////////////////////////////
+    /// \tparam Component         component type
+    /// \tparam Action            action code
+    /// \tparam Result            return type
+    /// \tparam Arguments         arguments (fusion vector)
+    /// \tparam Derived           derived action class
+    /// \tparam threads::thread_priority Priority default priority
+    template <typename Component, int Action, typename Result,
+        typename Arguments, typename Derived,
+        threads::thread_priority Priority>
+    class action : public base_action
     {
     public:
         typedef Component component_type;
         typedef Derived derived_type;
         typedef Result result_type;
         typedef Arguments arguments_type;
-
-        /// Enumerate all GIDs which stored as arguments
-        typedef HPX_STD_FUNCTION<void(naming::id_type const&)>
-            enum_gid_handler_type;
 
         // This is the action code (id) of this action. It is exposed to allow
         // generic handling of actions.
@@ -290,18 +258,18 @@ namespace hpx { namespace actions
         {}
 
         template <typename Arg0>
-        action(Arg0 const& arg0)
-          : arguments_(arg0),
-            parent_locality_(applier::get_prefix_id()),
+        action(BOOST_FWD_REF(Arg0) arg0)
+          : arguments_(boost::forward<Arg0>(arg0)),
+            parent_locality_(get_locality_id()),
             parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
             parent_phase_(threads::get_parent_phase()),
             priority_(detail::thread_priority<Priority>::call(Priority))
         {}
 
         template <typename Arg0>
-        action(threads::thread_priority priority, Arg0 const& arg0)
-          : arguments_(arg0),
-            parent_locality_(applier::get_prefix_id()),
+        action(threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
+          : arguments_(boost::forward<Arg0>(arg0)),
+            parent_locality_(get_locality_id()),
             parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
             parent_phase_(threads::get_parent_phase()),
             priority_(detail::thread_priority<Priority>::call(priority))
@@ -312,7 +280,9 @@ namespace hpx { namespace actions
 
         /// destructor
         ~action()
-        {}
+        {
+            detail::guid_initialization<derived_type>();
+        }
 
     public:
         /// retrieve the N's argument
@@ -322,104 +292,14 @@ namespace hpx { namespace actions
         {
             return boost::fusion::at_c<N>(arguments_);
         }
-        template <int N>
-        typename boost::fusion::result_of::at_c<arguments_type const, N>::type
-        get() const
-        {
-            return boost::fusion::at_c<N>(arguments_);
-        }
 
     protected:
-        /// The \a continuation_thread_function will be registered as the thread
-        /// function of a thread. It encapsulates the execution of the
-        /// original function (given by \a func), and afterwards triggers all
-        /// continuations using the result value obtained from the execution
-        /// of the original thread function.
-        struct continuation_thread_function_void
-        {
-            typedef threads::thread_state_enum result_type;
-
-            template <typename Func>
-            result_type operator()(continuation_type cont,
-                Func const & func) const
-            {
-                try {
-                    LTM_(debug) << "Executing action("
-                                << detail::get_action_name<derived_type>()
-                                << ") with continuation("
-                                << cont->get_raw_gid()
-                                << ")";
-                    func();
-                    cont->trigger();
-                }
-                catch (hpx::exception const&) {
-                    // make sure hpx::exceptions are propagated back to the client
-                    cont->trigger_error(boost::current_exception());
-                }
-                return threads::terminated;
-             }
-        };
-
-        /// The \a construct_continuation_thread_function is a helper function
-        /// for constructing the wrapped thread function needed for
-        /// continuation support
-        template <typename Func>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
-        construct_continuation_thread_function_void(BOOST_FWD_REF(Func) func,
-            continuation_type cont)
-        {
-            // The following bind constructs the wrapped thread function
-            //    f:  is the wrapping thread function
-            // cont: continuation
-            // func: wrapped function object
-            return HPX_STD_BIND(continuation_thread_function_void(), cont,
-                HPX_STD_PROTECT(boost::forward<Func>(func)));
-        }
-
-        /// The \a continuation_thread_function will be registered as the thread
-        /// function of a thread. It encapsulates the execution of the
-        /// original function (given by \a func), and afterwards triggers all
-        /// continuations using the result value obtained from the execution
-        /// of the original thread function.
-        struct continuation_thread_function
-        {
-            typedef threads::thread_state_enum result_type;
-
-            template <typename Func>
-            result_type operator()(continuation_type cont,
-                Func const & func) const
-            {
-                try {
-                    LTM_(debug) << "Executing action("
-                                << detail::get_action_name<derived_type>()
-                                << ") with continuation("
-                                << cont->get_raw_gid()
-                                << ")";
-                    cont->trigger(func());
-                }
-                catch (hpx::exception const&) {
-                    // make sure hpx::exceptions are propagated back to the client
-                    cont->trigger_error(boost::current_exception());
-                }
-                return threads::terminated;
-            }
-        };
-
-        /// The \a construct_continuation_thread_function is a helper function
-        /// for constructing the wrapped thread function needed for
-        /// continuation support
-        template <typename Func>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
-        construct_continuation_thread_function(BOOST_FWD_REF(Func) func,
-            continuation_type cont)
-        {
-            // The following bind constructs the wrapped thread function
-            //    f:  is the wrapping thread function
-            // cont: continuation
-            // func: wrapped function object
-            return HPX_STD_BIND(continuation_thread_function(), cont,
-                HPX_STD_PROTECT(boost::forward<Func>(func)));
-        }
+        // bring in all overloads for
+        //    construct_continuation_thread_function_void()
+        //    construct_continuation_thread_object_function_void()
+        //    construct_continuation_thread_function()
+        //    construct_continuation_thread_object_function()
+        #include <hpx/runtime/actions/construct_continuation_functions.hpp>
 
     public:
         /// retrieve component type
@@ -431,9 +311,7 @@ namespace hpx { namespace actions
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<action, signature<Result, Arguments> >();
-            signature<Result, Arguments>::register_base();
+            util::void_cast_register_nonvirt<action, base_action>();
         }
 
     private:
@@ -487,11 +365,6 @@ namespace hpx { namespace actions
             return priority_;
         }
 
-        void enumerate_argument_gids(enum_gid_handler_type f)
-        {
-            boost::fusion::any(arguments_, enum_gid_handler(f));
-        }
-
     private:
         // serialization support
         friend class boost::serialization::access;
@@ -518,9 +391,10 @@ namespace hpx { namespace actions
     template <int N, typename Component, int Action, typename Result,
       typename Arguments, typename Derived, threads::thread_priority Priority>
     inline typename boost::fusion::result_of::at_c<
-        typename action<Component, Action, Result, Arguments, Derived, Priority>::arguments_type const, N
+        typename action<Component, Action, Result, Arguments, Derived,
+            Priority>::arguments_type, N
     >::type
-    get(action<Component, Action, Result, Arguments, Derived, Priority> const& args)
+    get(action<Component, Action, Result, Arguments, Derived, Priority> & args)
     {
         return args.get<N>();
     }
@@ -556,14 +430,24 @@ namespace hpx { namespace actions
 // Helper macro for action serialization, each of the defined actions needs to
 // be registered with the serialization library
 #define HPX_DEFINE_GET_ACTION_NAME(action)                                    \
-        namespace hpx { namespace traits {                                    \
-            template<> HPX_ALWAYS_EXPORT                                      \
-            char const* get_action_name<action>::call()                       \
-            {                                                                 \
-                return BOOST_PP_STRINGIZE(action);                            \
-            }                                                                 \
-        }}                                                                    \
-    /**/
+    HPX_DEFINE_GET_ACTION_NAME(action, action)                                \
+/**/
+
+#define HPX_DEFINE_GET_ACTION_NAME_EX(action, actionname)                     \
+    namespace hpx { namespace actions { namespace detail {                    \
+        template<> HPX_ALWAYS_EXPORT                                          \
+        char const* get_action_name<action>()                                 \
+        {                                                                     \
+            return BOOST_PP_STRINGIZE(actionname);                            \
+        }                                                                     \
+    }}}                                                                       \
+/**/
+
+#define HPX_REGISTER_ACTION_EX(action, actionname)                            \
+    BOOST_CLASS_EXPORT_IMPLEMENT(action)                                      \
+    HPX_REGISTER_BASE_HELPER(action, actionname)                              \
+    HPX_DEFINE_GET_ACTION_NAME_EX(action, actionname)                         \
+/**/
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_BASE_HELPER(action, actionname)                          \
@@ -573,13 +457,34 @@ namespace hpx { namespace actions
                 _##actionname);                                               \
     /**/
 
-#define HPX_REGISTER_ACTION_EX(action, actionname)                            \
-        BOOST_CLASS_EXPORT(action)                                            \
-        HPX_REGISTER_BASE_HELPER(action, actionname)                          \
-        HPX_DEFINE_GET_ACTION_NAME(action)                                    \
-    /**/
-
 #define HPX_REGISTER_ACTION(action) HPX_REGISTER_ACTION_EX(action, action)
+
+#define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID(action)               \
+    namespace hpx { namespace actions { namespace detail {                    \
+        template <> HPX_ALWAYS_EXPORT                                         \
+        char const* get_action_name<action>();                                \
+        template <typename Enable>                                            \
+        struct needs_guid_initialization<action, Enable>                      \
+            : boost::mpl::false_                                              \
+        {};                                                                   \
+    }}}                                                                       \
+/**/
+#define HPX_REGISTER_ACTION_DECLARATION_GUID(action)                          \
+    namespace boost { namespace archive { namespace detail {                  \
+        namespace extra_detail {                                              \
+            template <>                                                       \
+            struct init_guid<action>;                                         \
+        }                                                                     \
+    }}}                                                                       \
+/**/
+#define HPX_REGISTER_ACTION_DECLARATION_EX(action, actionname)                \
+    HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID(action)                   \
+    BOOST_CLASS_EXPORT_KEY2(action, BOOST_PP_STRINGIZE(actionname))           \
+    HPX_REGISTER_ACTION_DECLARATION_GUID(action)                              \
+/**/
+#define HPX_REGISTER_ACTION_DECLARATION(action)                               \
+    HPX_REGISTER_ACTION_DECLARATION_EX(action, action)                        \
+/**/
 
 #endif
 

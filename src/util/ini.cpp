@@ -1,5 +1,5 @@
 //  Copyright (c) 2005-2007 Andre Merzky
-//  Copyright (c) 2005-2011 Hartmut Kaiser
+//  Copyright (c) 2005-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -699,6 +699,7 @@ void section::save(Archive& ar, const unsigned int version) const
     ar << make_nvp("section_env", section_env_);
     ar << make_nvp("sections", sections_);
 }
+
 template <typename Archive>
 void section::load(Archive& ar, const unsigned int version)
 {
@@ -712,21 +713,13 @@ void section::load(Archive& ar, const unsigned int version)
     set_root(this, true);     // make this the current root
 }
 
-///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // explicit instantiation for the correct archive types
-#if HPX_USE_PORTABLE_ARCHIVES != 0
 template HPX_EXPORT void
 section::save(util::portable_binary_oarchive&, const unsigned int version) const;
 
 template HPX_EXPORT void
 section::load(util::portable_binary_iarchive&, const unsigned int version);
-#else
-template HPX_EXPORT void
-section::save(boost::archive::binary_oarchive&, const unsigned int version) const;
-
-template HPX_EXPORT void
-section::load(boost::archive::binary_iarchive&, const unsigned int version);
-#endif
 
 }}  // namespace hpx::util
 

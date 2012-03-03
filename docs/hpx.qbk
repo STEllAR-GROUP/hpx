@@ -1,0 +1,64 @@
+[/==============================================================================
+    Copyright (C) 2007-2012 Hartmut Kaiser
+    Copyright (C) 2012 Bryce Adelstein-Lelbach and Adrian Serio
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+===============================================================================/]
+
+[article HPX
+    [quickbook 1.5]
+    [id hpx]
+    [authors [STE||AR Group, The]]
+    [version 0.8.0]
+    [copyright 2011 2012 Louisiana State University]
+    [license
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file [@../../LICENSE_1_0.txt LICENSE_1_0.txt] or copy at [@http://www.boost.org/LICENSE_1_0.txt])
+    ]
+]
+
+[/ Definitions which are controlled by commandline macros]
+
+[? __enable_fixme__   [template fixme[s] [*FIXME: [s]]] ]
+[? __disable_fixme__  [template fixme[s] ] ]
+
+[/ DEFINITIONS]
+[def __version__                V0.8.0]
+
+[def __stellar__                [@http://stellar.cct.lsu.edu STE||AR]]
+[def __stellar_list__           [@email:gopx@cct.lsu.edu HPX General List]]
+[def __stellar_irc__            [@irc://irc.freenode.net:6667/#ste||ar #stellar at Freenet]]
+
+[def __cmake__                  [@http://www.cmake.org/ CMake]]
+
+[def __boost__                  [@http://www.boost.org/ Boost]]
+[def __boost_tools__            [@http://www.boost.org/tools/index.html Boost Tools]]
+[def __boost_getting_started__  [@http://www.boost.org/doc/libs/release/more/getting_started/index.html Getting Started]]
+
+[/ optional external dependencies]
+[def __hwloc__                  [@http://www.open-mpi.org/projects/hwloc/ Portable Hardware Locality (hwloc)]]
+
+[/ Some images ]
+[def __note__                   [$./images/note.png]]
+[def __tip__                    [$./images/tip.png]]
+[def __important__              [$./images/important.png]]
+[def __caution__                [$./images/caution.png]]
+[def __danger__                 [$./images/alert.png]]
+
+[/ Section link shortcuts]
+[def __commandline__            [link hpx.getting_started.commandline HPX Command Line Options]]
+
+[/ CONTENT]
+
+This documentation is automatically generated for HPX __version__ (from SVN
+revision __svn_revision__) by the Boost QuickBook documentation tool. QuickBook
+can be found in the collection of __boost_tools__.
+
+[include preface.qbk]
+[include whats_new.qbk]
+[include gettingstarted.qbk]
+[include introduction.qbk]
+[include examples.qbk]
+
+

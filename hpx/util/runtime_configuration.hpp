@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -29,10 +29,14 @@ namespace hpx { namespace util
     public:
         // initialize and load configuration information
         runtime_configuration();
-        runtime_configuration(std::vector<std::string> const& prefill,
-                              std::string const& hpx_ini_file_ = "",
-                              std::vector<std::string> const& cmdline_ini_defs_
-                                  = std::vector<std::string>());
+
+        // re-initialize all entries based on the additional information from
+        // the given configuration file
+        void reconfigure(std::string const& ini_file);
+
+        // re-initialize all entries based on the additional information from
+        // any explicit command line options
+        void reconfigure(std::vector<std::string> const& ini_defs);
 
         void load_components();
 
@@ -52,12 +56,25 @@ namespace hpx { namespace util
         // Get the HPX network address to use
         naming::locality get_parcelport_address() const;
 
-        // Get AGAS client-side GVA cache size
-        std::size_t get_agas_gva_cache_size() const;
+        // Get the number of maximum concurrent connections per locality
+        std::size_t get_max_connections_per_loc() const;
+        std::size_t get_connection_cache_size() const;
+
+        // Get AGAS client-side local cache size
+        std::size_t get_agas_local_cache_size() const;
 
         bool get_agas_caching_mode() const;
 
         bool get_agas_range_caching_mode() const;
+
+        std::size_t get_agas_max_resolve_requests() const;
+
+        std::size_t get_agas_max_pending_refcnt_requests() const;
+
+        // Get whether the AGAS server is running as a dedicated runtime.
+        // This decides whether the AGAS actions are executed with normal
+        // priority (if dedicated) or with high priority (non-dedicated)
+        bool get_agas_dedicated_server() const;
 
         // Load application specific configuration and merge it with the
         // default configuration loaded from hpx.ini
@@ -68,10 +85,13 @@ namespace hpx { namespace util
         bool get_itt_notify_mode() const;
 
         // Returns the number of OS threads this locality is running.
-        std::size_t get_num_os_threads() const;
+        std::size_t get_os_thread_count() const;
 
         // Returns the command line that this locality was invoked with.
         std::string get_cmd_line() const;
+
+        // Will return the stack size to use for all HPX-threads.
+        std::size_t get_default_stack_size() const;
     };
 }}
 

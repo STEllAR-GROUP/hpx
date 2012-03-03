@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -20,7 +20,7 @@ namespace hpx { namespace lcos { namespace stubs
         wait_async(naming::id_type const& gid)
         {
             typedef lcos::base_lco::set_event_action action_type;
-            return lcos::eager_future<action_type, void>(gid);
+            return lcos::eager_future<action_type>(gid);
         }
 
         static lcos::promise<void, util::unused_type>
@@ -28,7 +28,7 @@ namespace hpx { namespace lcos { namespace stubs
             boost::exception_ptr const& e)
         {
             typedef lcos::base_lco::set_error_action action_type;
-            return lcos::eager_future<action_type, void>(gid, e);
+            return lcos::eager_future<action_type>(gid, e);
         }
 
         static void wait(naming::id_type const& gid)

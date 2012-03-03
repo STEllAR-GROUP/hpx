@@ -4,7 +4,7 @@
 //
 //  implementation for c++
 //
-//  Copyright (C) 2008 Tim Blechmann
+//  Copyright (C) 2008, 2009, 2010, 2011 Tim Blechmann
 //
 //  Distributed under the Boost Software License, Version 1.0. (See
 //  accompanying file LICENSE_1_0.txt or copy at
@@ -15,25 +15,21 @@
 #ifndef BOOST_LOCKFREE_FIFO_HPP_INCLUDED
 #define BOOST_LOCKFREE_FIFO_HPP_INCLUDED
 
-#include <boost/atomic.hpp>
+#include <memory>               /* std::auto_ptr */
+
+#include <boost/noncopyable.hpp>
+#include <boost/scoped_ptr.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/static_assert.hpp>
+#include <boost/type_traits/has_trivial_assign.hpp>
+
+#include <boost/lockfree/detail/atomic.hpp>
 #include <boost/lockfree/detail/tagged_ptr.hpp>
 #include <boost/lockfree/detail/freelist.hpp>
 
-#include <boost/static_assert.hpp>
-#include <boost/type_traits/is_pod.hpp>
-
-#include <memory>               /* std::auto_ptr / std::unique_ptr */
-#include <boost/scoped_ptr.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/noncopyable.hpp>
-
-namespace boost
-{
-namespace lockfree
-{
-
-namespace detail
-{
+namespace boost {
+namespace lockfree {
+namespace detail {
 
 template <typename T, typename freelist_t, typename Alloc>
 class fifo:
@@ -45,39 +41,38 @@ private:
 
     struct BOOST_LOCKFREE_CACHELINE_ALIGNMENT node
     {
-        typedef tagged_ptr<node> tagged_ptr_t;
+        typedef tagged_ptr<node> tagged_node_ptr;
 
         node(T const & v):
             data(v)
         {
             /* increment tag to avoid ABA problem */
-            tagged_ptr_t old_next = next.load(memory_order_relaxed);
-            tagged_ptr_t new_next (NULL, old_next.get_tag()+1);
+            tagged_node_ptr old_next = next.load(memory_order_relaxed);
+            tagged_node_ptr new_next (NULL, old_next.get_tag()+1);
             next.store(new_next, memory_order_release);
         }
 
         node (void):
-            next(tagged_ptr_t(NULL, 0))
+            next(tagged_node_ptr(NULL, 0))
         {}
 
-        atomic<tagged_ptr_t> next;
+        atomic<tagged_node_ptr> next;
         T data;
     };
 
-    typedef tagged_ptr<node> tagged_ptr_t;
+    typedef tagged_ptr<node> tagged_node_ptr;
 
     typedef typename Alloc::template rebind<node>::other node_allocator;
-/*     typedef typename select_freelist<node, node_allocator, freelist_t>::type pool_t; */
 
     typedef typename boost::mpl::if_<boost::is_same<freelist_t, caching_freelist_t>,
-                                     caching_freelist<node, node_allocator>,
-                                     static_freelist<node, node_allocator>
+                                     detail::freelist_stack<node, true, node_allocator>,
+                                     detail::freelist_stack<node, false, node_allocator>
                                      >::type pool_t;
 
     void initialize(void)
     {
-        node * n = alloc_node();
-        tagged_ptr_t dummy_node(n, 0);
+        node * n = pool.construct();
+        tagged_node_ptr dummy_node(n, 0);
         head_.store(dummy_node, memory_order_relaxed);
         tail_.store(dummy_node, memory_order_release);
     }
@@ -87,48 +82,55 @@ public:
     /**
      * \return true, if implementation is lock-free.
      *
-     * \warning \b Warning: It only checks, if the fifo head node is lockfree. on most platforms, this should be sufficient, though
+     * \warning \b Warning: It only checks, if the fifo head node is lockfree. On most platforms, the whole implementation is
+     *                      lockfree, if this is true. Using c++0x-style atomics, there is no possibility to provide a completely
+     *                      accurate implementation, because one would need to test every internal node, which is impossible
+     *                      if further nodes will be allocated from the operating system.
      * */
     bool is_lock_free (void) const
     {
-        return head_.is_lock_free();
+        return head_.is_lock_free() && pool.is_lock_free();
     }
 
-    //! Construct fifo, initially allocates 128 nodes
-    fifo(void):
-        pool(128)
+    //! Construct fifo.
+    fifo(void)
     {
+        pool.reserve_unsafe(1);
         initialize();
     }
 
-    //! Construct fifo with a number of initially allocated fifo nodes.
-    explicit fifo(std::size_t initial_nodes):
-        pool(initial_nodes)
+    //! Construct fifo, allocate n nodes for the freelist.
+    explicit fifo(std::size_t n)
     {
+        pool.reserve_unsafe(n+1);
         initialize();
+    }
+
+    //! \copydoc boost::lockfree::stack::reserve
+    void reserve(std::size_t n)
+    {
+        pool.reserve(n);
+    }
+
+    //! \copydoc boost::lockfree::stack::reserve_unsafe
+    void reserve_unsafe(std::size_t n)
+    {
+        pool.reserve_unsafe(n);
     }
 
     /** Destroys fifo, free all nodes from freelist.
-     *
-     *  \warning not threadsafe
-     *
      * */
     ~fifo(void)
     {
-        if (!empty())
-        {
+        if (!empty()) {
             T dummy;
-            for(;;)
-            {
-                if (!dequeue(&dummy))
-                    break;
-            }
+            while(dequeue_unsafe(dummy))
+                ;
         }
-        dealloc_node(head_.load(memory_order_relaxed).get_ptr());
+        pool.destruct(head_.load(memory_order_relaxed).get_ptr());
     }
 
-    /**
-     * \return true, if fifo is empty.
+    /** Check if the ringbuffer is empty
      *
      * \warning Not thread-safe, use for debugging purposes only
      * */
@@ -146,31 +148,57 @@ public:
      * */
     bool enqueue(T const & t)
     {
-        node * n = alloc_node(t);
+        node * n = pool.construct(t);
+
+        if (n == NULL)
+            return false;
+
+        for (;;) {
+            tagged_node_ptr tail = tail_.load(memory_order_acquire);
+            tagged_node_ptr next = tail->next.load(memory_order_acquire);
+            node * next_ptr = next.get_ptr();
+
+            tagged_node_ptr tail2 = tail_.load(memory_order_acquire);
+            if (likely(tail == tail2)) {
+                if (next_ptr == 0) {
+                    if ( tail->next.compare_exchange_weak(next, tagged_node_ptr(n, next.get_tag() + 1)) ) {
+                        tail_.compare_exchange_strong(tail, tagged_node_ptr(n, tail.get_tag() + 1));
+                        return true;
+                    }
+                }
+                else
+                    tail_.compare_exchange_strong(tail, tagged_node_ptr(next_ptr, tail.get_tag() + 1));
+            }
+        }
+    }
+
+    /** Enqueues object t to the fifo. Enqueueing may fail, if the freelist is not able to allocate a new fifo node.
+     *
+     * \returns true, if the enqueue operation is successful.
+     *
+     * \note Not thread-safe
+     * \warning \b Warning: May block if node needs to be allocated from the operating system
+     * */
+    bool enqueue_unsafe(T const & t)
+    {
+        node * n = pool.construct_unsafe(t);
 
         if (n == NULL)
             return false;
 
         for (;;)
         {
-            tagged_ptr_t tail = tail_.load(memory_order_acquire);
-            tagged_ptr_t next = tail->next.load(memory_order_acquire);
+            tagged_node_ptr tail = tail_.load(memory_order_relaxed);
+            tagged_node_ptr next = tail->next.load(memory_order_relaxed);
             node * next_ptr = next.get_ptr();
 
-            tagged_ptr_t tail_tmp = tail_.load(memory_order_acquire);
-            if (likely(tail == tail_tmp))
-            {
-                if (next_ptr == 0)
-                {
-                    if ( tail->next.compare_exchange_strong(next, tagged_ptr_t(n, next.get_tag() + 1)) )
-                    {
-                        tail_.compare_exchange_strong(tail, tagged_ptr_t(n, tail.get_tag() + 1));
-                        return true;
-                    }
-                }
-                else
-                    tail_.compare_exchange_strong(tail, tagged_ptr_t(next_ptr, tail.get_tag() + 1));
+            if (next_ptr == 0) {
+                tail->next.store(tagged_node_ptr(n, next.get_tag() + 1), memory_order_relaxed);
+                tail_.store(tagged_node_ptr(n, tail.get_tag() + 1), memory_order_relaxed);
+                return true;
             }
+            else
+                tail_.store(tagged_node_ptr(next_ptr, tail.get_tag() + 1), memory_order_relaxed);
         }
     }
 
@@ -183,32 +211,32 @@ public:
      * \note Thread-safe and non-blocking
      *
      * */
-    bool dequeue (T * ret)
+    bool dequeue (T & ret)
     {
-        for (;;)
-        {
-            tagged_ptr_t head = head_.load(memory_order_acquire);
-            tagged_ptr_t tail = tail_.load(memory_order_acquire);
-            tagged_ptr_t next = head->next.load(memory_order_acquire);
+        for (;;) {
+            tagged_node_ptr head = head_.load(memory_order_acquire);
+            tagged_node_ptr tail = tail_.load(memory_order_acquire);
+            tagged_node_ptr next = head->next.load(memory_order_acquire);
             node * next_ptr = next.get_ptr();
 
-            tagged_ptr_t head_tmp = head_.load(memory_order_acquire);
-            if (likely(head == head_tmp))
+//             tagged_node_ptr head2 = head_.load(memory_order_acquire);
+//             if (likely(head == head2)) 
             {
-                if (head.get_ptr() == tail.get_ptr())
-                {
+                if (head.get_ptr() == tail.get_ptr()) {
                     if (next_ptr == 0)
                         return false;
-                    tail_.compare_exchange_strong(tail, tagged_ptr_t(next_ptr, tail.get_tag() + 1));
-                }
-                else
-                {
-                    if (next_ptr == 0) /* this check shouldn't be needed, but it crashes without :/ */
+                    tail_.compare_exchange_strong(tail, tagged_node_ptr(next_ptr, tail.get_tag() + 1));
+                } else {
+                    if (next_ptr == 0)
+                        /* this check is not part of the original algorithm as published by michael and scott
+                         *
+                         * however we reuse the tagged_ptr part for the and clear the next part during node
+                         * allocation. we can observe a null-pointer here.
+                         * */
                         continue;
-                    *ret = next_ptr->data;
-                    if (head_.compare_exchange_strong(head, tagged_ptr_t(next_ptr, head.get_tag() + 1)))
-                    {
-                        dealloc_node(head.get_ptr());
+                    ret = next_ptr->data;
+                    if (head_.compare_exchange_weak(head, tagged_node_ptr(next_ptr, head.get_tag() + 1))) {
+                        pool.destruct(head.get_ptr());
                         return true;
                     }
                 }
@@ -216,32 +244,51 @@ public:
         }
     }
 
+    /** Dequeue object from fifo.
+     *
+     * if dequeue operation is successful, object is written to memory location denoted by ret.
+     *
+     * \returns true, if the dequeue operation is successful, false if fifo was empty.
+     *
+     * \note Not thread-safe
+     *
+     * */
+    bool dequeue_unsafe (T & ret)
+    {
+        for (;;) {
+            tagged_node_ptr head = head_.load(memory_order_relaxed);
+            tagged_node_ptr tail = tail_.load(memory_order_relaxed);
+            tagged_node_ptr next = head->next.load(memory_order_relaxed);
+            node * next_ptr = next.get_ptr();
+
+//             tagged_node_ptr head2 = head_.load(memory_order_relaxed);
+            if (head.get_ptr() == tail.get_ptr()) {
+                if (next_ptr == 0)
+                    return false;
+                tail_.store(tagged_node_ptr(next_ptr, tail.get_tag() + 1), memory_order_relaxed);
+            } else {
+                if (next_ptr == 0)
+                    /* this check is not part of the original algorithm as published by michael and scott
+                     *
+                     * however we reuse the tagged_ptr part for the and clear the next part during node
+                     * allocation. we can observe a null-pointer here.
+                     * */
+                    continue;
+                ret = next_ptr->data;
+                head_.store(tagged_node_ptr(next_ptr, head.get_tag() + 1), memory_order_relaxed);
+                pool.destruct_unsafe(head.get_ptr());
+                return true;
+            }
+        }
+    }
+
+
 private:
 #ifndef BOOST_DOXYGEN_INVOKED
-    node * alloc_node(void)
-    {
-        node * chunk = pool.allocate();
-        new(chunk) node();
-        return chunk;
-    }
-
-    node * alloc_node(T const & t)
-    {
-        node * chunk = pool.allocate();
-        new(chunk) node(t);
-        return chunk;
-    }
-
-    void dealloc_node(node * n)
-    {
-        n->~node();
-        pool.deallocate(n);
-    }
-
-    atomic<tagged_ptr_t> head_;
-    static const int padding_size = BOOST_LOCKFREE_CACHELINE_BYTES - sizeof(tagged_ptr_t);
+    atomic<tagged_node_ptr> head_;
+    static const int padding_size = BOOST_LOCKFREE_CACHELINE_BYTES - sizeof(tagged_node_ptr);
     char padding1[padding_size];
-    atomic<tagged_ptr_t> tail_;
+    atomic<tagged_node_ptr> tail_;
     char padding2[padding_size];
 
     pool_t pool;
@@ -252,40 +299,45 @@ private:
 
 /** The fifo class provides a multi-writer/multi-reader fifo, enqueueing and dequeueing is lockfree,
  *  construction/destruction has to be synchronized. It uses a freelist for memory management,
- *  freed nodes are pushed to the freelist, but not returned to the os. This may result in leaking memory.
+ *  freed nodes are pushed to the freelist and not returned to the os before the fifo is destroyed.
  *
  *  The memory management of the fifo can be controlled via its freelist_t template argument. Two different
  *  freelists can be used. struct caching_freelist_t selects a caching freelist, which can allocate more nodes
  *  from the operating system, and struct static_freelist_t uses a fixed-sized freelist. With a fixed-sized
  *  freelist, the enqueue operation may fail, while with a caching freelist, the enqueue operation may block.
  *
- *  \b Limitation: The fifo class is limited to PODs
+ *  \b Limitation: The class T is required to have a trivial assignment operator.
  *
  * */
 template <typename T,
           typename freelist_t = caching_freelist_t,
           typename Alloc = std::allocator<T>
-          >
+         >
 class fifo:
     public detail::fifo<T, freelist_t, Alloc>
 {
+    BOOST_STATIC_ASSERT(boost::has_trivial_assign<T>::value);
+
 public:
-    //! Construct fifo, initially allocates 128 nodes
+    //! Construct fifo.
     fifo(void)
     {}
 
-    //! Construct fifo with a number of initially allocated fifo nodes.
-    explicit fifo(std::size_t initial_nodes):
-        detail::fifo<T, freelist_t, Alloc>(initial_nodes)
+    //! Construct fifo, allocate n nodes for the freelist.
+    explicit fifo(std::size_t n):
+        detail::fifo<T, freelist_t, Alloc>(n)
     {}
 };
 
 
-/** template specialization of the boost::lockfree::fifo class for pointer arguments.
+/** Template specialization of the fifo class for pointer arguments, that supports dequeue operations to
+ *  stl/boost-style smart pointers
  *
- *  it supports dequeue operations to stl/boost-style smart pointers
  * */
-template <typename T, typename freelist_t, typename Alloc>
+template <typename T,
+          typename freelist_t,
+          typename Alloc
+         >
 class fifo<T*, freelist_t, Alloc>:
     public detail::fifo<T*, freelist_t, Alloc>
 {
@@ -296,7 +348,7 @@ class fifo<T*, freelist_t, Alloc>:
     bool dequeue_smart_ptr(smart_ptr & ptr)
     {
         T * result = 0;
-        bool success = fifo_t::dequeue(&result);
+        bool success = fifo_t::dequeue(result);
 
         if (success)
             ptr.reset(result);
@@ -305,22 +357,22 @@ class fifo<T*, freelist_t, Alloc>:
 #endif
 
 public:
-    //! Construct fifo, initially allocates 128 nodes
+    //! Construct fifo.
     fifo(void)
     {}
 
-    //! Construct fifo with a number of initially allocated fifo nodes.
-    explicit fifo(std::size_t initial_nodes):
-        fifo_t(initial_nodes)
+    //! Construct fifo, allocate n nodes for the freelist.
+    explicit fifo(std::size_t n):
+        fifo_t(n)
     {}
 
     //! \copydoc detail::fifo::dequeue
-    bool dequeue (T ** ret)
+    bool dequeue (T * & ret)
     {
         return fifo_t::dequeue(ret);
     }
 
-    /** Dequeue object from fifo to std::auto_ptr / unique_ptr
+    /** Dequeue object from fifo to std::auto_ptr
      *
      * if dequeue operation is successful, object is written to memory location denoted by ret.
      *
@@ -329,11 +381,7 @@ public:
      * \note Thread-safe and non-blocking
      *
      * */
-#if defined(BOOST_LOCKFREE_HAVE_CXX11_UNIQUE_PTR)
-    bool dequeue (std::unique_ptr<T> & ret)
-#else
     bool dequeue (std::auto_ptr<T> & ret)
-#endif
     {
         return dequeue_smart_ptr(ret);
     }
@@ -350,7 +398,7 @@ public:
     bool dequeue (boost::scoped_ptr<T> & ret)
     {
         BOOST_STATIC_ASSERT(sizeof(boost::scoped_ptr<T>) == sizeof(T*));
-        return dequeue(reinterpret_cast<T**>((void*)&ret));
+        return dequeue(reinterpret_cast<T*&>(ret));
     }
 
     /** Dequeue object from fifo to boost::shared_ptr
@@ -370,6 +418,5 @@ public:
 
 } /* namespace lockfree */
 } /* namespace boost */
-
 
 #endif /* BOOST_LOCKFREE_FIFO_HPP_INCLUDED */

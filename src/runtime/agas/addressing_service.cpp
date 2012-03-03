@@ -12,6 +12,7 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/include/performance_counters.hpp>
+#include <hpx/performance_counters/counter_creators.hpp>
 
 #include <boost/format.hpp>
 
@@ -24,14 +25,20 @@ addressing_service::addressing_service(
   , runtime_mode runtime_type_
     )
   : console_cache_(0)
+  , max_refcnt_requests_(ini_.get_agas_max_pending_refcnt_requests())
+  , refcnt_requests_count_(0)
+  , refcnt_requests_(new refcnt_requests_type)
+  , resolve_throttle_(ini_.get_agas_max_resolve_requests())
   , service_type(ini_.get_agas_service_mode())
   , runtime_type(runtime_type_)
   , caching_(ini_.get_agas_caching_mode())
   , range_caching_(caching_ ? ini_.get_agas_range_caching_mode() : false)
+  , action_priority_(ini_.get_agas_dedicated_server() ?
+        threads::thread_priority_normal : threads::thread_priority_critical)
   , here_(get_runtime().here())
   , rts_lva_(get_runtime().get_runtime_support_lva())
   , state_(starting)
-  , prefix_()
+  , locality_()
 { // {{{
     // boot the parcel port
     pp.run(false);
@@ -39,7 +46,7 @@ addressing_service::addressing_service(
     create_big_boot_barrier(pp, ini_, runtime_type_);
 
     if (caching_)
-        gva_cache_.reserve(ini_.get_agas_gva_cache_size());
+        gva_cache_.reserve(ini_.get_agas_local_cache_size());
 
     if (service_type == service_mode_bootstrap)
         launch_bootstrap(pp, ini_);
@@ -56,7 +63,7 @@ void addressing_service::launch_bootstrap(
 
     const naming::locality ep = ini_.get_agas_locality();
     const naming::gid_type here
-        = naming::get_gid_from_prefix(HPX_AGAS_BOOTSTRAP_PREFIX);
+        = naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX);
 
     const naming::gid_type primary_gid = bootstrap_primary_namespace_gid();
     const naming::gid_type component_gid = bootstrap_component_namespace_gid();
@@ -72,10 +79,20 @@ void addressing_service::launch_bootstrap(
         server::symbol_namespace::get_component_type(), 1U,
             static_cast<void*>(&bootstrap->symbol_ns_server));
 
-    local_prefix(here);
+    primary_ns_addr_ = naming::address(ep,
+        server::primary_namespace::get_component_type(),
+            static_cast<void*>(&bootstrap->primary_ns_server));
+    component_ns_addr_ = naming::address(ep,
+        server::component_namespace::get_component_type(),
+            static_cast<void*>(&bootstrap->component_ns_server));
+    symbol_ns_addr_ = naming::address(ep,
+        server::symbol_namespace::get_component_type(),
+            static_cast<void*>(&bootstrap->symbol_ns_server));
+
+    local_locality(here);
     get_runtime().get_config().parse("assigned locality",
         boost::str(boost::format("hpx.locality=%1%")
-                  % naming::get_prefix_from_gid(here)));
+                  % naming::get_locality_id_from_gid(here)));
 
     request reqs[] =
     {
@@ -126,7 +143,7 @@ response addressing_service::service(
         if (is_bootstrap())
             return bootstrap->primary_ns_server.service(req, ec);
         else
-            return hosted->primary_ns_.service(req, ec);
+            return hosted->primary_ns_.service(req, action_priority_, ec);
     }
 
     else if (req.get_action_code() & component_ns_service)
@@ -134,7 +151,7 @@ response addressing_service::service(
         if (is_bootstrap())
             return bootstrap->component_ns_server.service(req, ec);
         else
-            return hosted->component_ns_.service(req, ec);
+            return hosted->component_ns_.service(req, action_priority_, ec);
     }
 
     else if (req.get_action_code() & symbol_ns_service)
@@ -142,13 +159,28 @@ response addressing_service::service(
         if (is_bootstrap())
             return bootstrap->symbol_ns_server.service(req, ec);
         else
-            return hosted->symbol_ns_.service(req, ec);
+            return hosted->symbol_ns_.service(req, action_priority_, ec);
     }
 
     HPX_THROWS_IF(ec, bad_action_code
         , "addressing_service::service"
         , "invalid action code encountered in request")
     return response();
+} // }}}
+
+std::vector<response> addressing_service::bulk_service(
+    std::vector<request> const& req
+  , error_code& ec
+    )
+{ // {{{
+    // FIXME: For now, we just send it to the primary namespace, assuming that
+    // most requests will end up there anyways. The primary namespace will
+    // route the requests to other namespaces (and the other namespaces would
+    // also route requests intended for the primary namespace).
+    if (is_bootstrap())
+        return bootstrap->primary_ns_server.bulk_service(req, ec);
+    else
+        return hosted->primary_ns_.bulk_service(req, action_priority_, ec);
 } // }}}
 
 bool addressing_service::register_locality(
@@ -164,12 +196,12 @@ bool addressing_service::register_locality(
         if (is_bootstrap())
             rep = bootstrap->primary_ns_server.service(req, ec);
         else
-            rep = hosted->primary_ns_.service(req, ec);
+            rep = hosted->primary_ns_.service(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return false;
 
-        prefix = naming::get_gid_from_prefix(rep.get_prefix());
+        prefix = naming::get_gid_from_locality_id(rep.get_locality_id());
 
         return true;
     }
@@ -198,12 +230,12 @@ boost::uint32_t addressing_service::resolve_locality(
         if (is_bootstrap())
             rep = bootstrap->primary_ns_server.service(req, ec);
         else
-            rep = hosted->primary_ns_.service(req, ec);
+            rep = hosted->primary_ns_.service(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return 0;
 
-        return rep.get_prefix();
+        return rep.get_locality_id();
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
@@ -232,7 +264,7 @@ bool addressing_service::unregister_locality(
         if (is_bootstrap())
             rep = bootstrap->primary_ns_server.service(req, ec);
         else
-            rep = hosted->primary_ns_.service(req, ec);
+            rep = hosted->primary_ns_.service(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return false;
@@ -252,7 +284,7 @@ bool addressing_service::unregister_locality(
     }
 } // }}}
 
-bool addressing_service::get_console_prefix(
+bool addressing_service::get_console_locality(
     naming::gid_type& prefix
   , error_code& ec
     )
@@ -267,7 +299,7 @@ bool addressing_service::get_console_prefix(
 
         if (is_console())
         {
-            prefix = local_prefix();
+            prefix = local_locality();
             if (&ec != &throws)
                 ec = make_success_code();
             return true;
@@ -277,26 +309,26 @@ bool addressing_service::get_console_prefix(
 
         if (console_cache_)
         {
-            prefix = naming::get_gid_from_prefix(console_cache_);
+            prefix = naming::get_gid_from_locality_id(console_cache_);
             if (&ec != &throws)
                 ec = make_success_code();
             return true;
         }
 
-        request req(symbol_ns_resolve, "/locality(console)");
+        request req(symbol_ns_resolve, std::string("/locality(console)"));
         response rep;
 
         if (is_bootstrap())
             rep = bootstrap->symbol_ns_server.service(req, ec);
         else
-            rep = hosted->symbol_ns_.service(req, ec);
+            rep = hosted->symbol_ns_.service(req, action_priority_, ec);
 
         if (!ec && (rep.get_gid() != naming::invalid_gid) &&
             (rep.get_status() == success))
         {
             prefix = rep.get_gid();
 
-            console_cache_ = naming::get_prefix_from_gid(prefix);
+            console_cache_ = naming::get_locality_id_from_gid(prefix);
 
             LAS_(debug) <<
                 ( boost::format("caching console locality, prefix(%1%)")
@@ -310,7 +342,7 @@ bool addressing_service::get_console_prefix(
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
             HPX_RETHROW_EXCEPTION(e.get_error(),
-                "addressing_service::get_console_prefix", e.what());
+                "addressing_service::get_console_locality", e.what());
         }
         else {
             ec = e.get_error_code(hpx::rethrow);
@@ -320,12 +352,12 @@ bool addressing_service::get_console_prefix(
     }
 } // }}}
 
-bool addressing_service::get_prefixes(
-    std::vector<naming::gid_type>& prefixes
+bool addressing_service::get_localities(
+    std::vector<naming::gid_type>& locality_ids
   , components::component_type type
   , error_code& ec
     )
-{ // {{{ get_prefixes implementation
+{ // {{{ get_locality_ids implementation
     try {
         if (type != components::component_invalid)
         {
@@ -335,7 +367,7 @@ bool addressing_service::get_prefixes(
             if (is_bootstrap())
                 rep = bootstrap->component_ns_server.service(req, ec);
             else
-                rep = hosted->component_ns_.service(req, ec);
+                rep = hosted->component_ns_.service(req, action_priority_, ec);
 
             if (ec || (success != rep.get_status()))
                 return false;
@@ -345,9 +377,9 @@ bool addressing_service::get_prefixes(
             if (!p.size())
                 return false;
 
-            prefixes.clear();
+            locality_ids.clear();
             for (boost::uint64_t i = 0; i < p.size(); ++i)
-                prefixes.push_back(naming::get_gid_from_prefix(p[i]));
+                locality_ids.push_back(naming::get_gid_from_locality_id(p[i]));
 
             return true;
         }
@@ -360,7 +392,7 @@ bool addressing_service::get_prefixes(
             if (is_bootstrap())
                 rep = bootstrap->primary_ns_server.service(req, ec);
             else
-                rep = hosted->primary_ns_.service(req, ec);
+                rep = hosted->primary_ns_.service(req, action_priority_, ec);
 
             if (ec || (success != rep.get_status()))
                 return false;
@@ -370,9 +402,9 @@ bool addressing_service::get_prefixes(
             if (!p.size())
                 return false;
 
-            prefixes.clear();
+            locality_ids.clear();
             for (boost::uint64_t i = 0; i < p.size(); ++i)
-                prefixes.push_back(naming::get_gid_from_prefix(p[i]));
+                locality_ids.push_back(naming::get_gid_from_locality_id(p[i]));
 
             return true;
         }
@@ -380,7 +412,7 @@ bool addressing_service::get_prefixes(
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
             HPX_RETHROW_EXCEPTION(e.get_error(),
-                "addressing_service::get_prefixes", e.what());
+                "addressing_service::get_locality_ids", e.what());
         }
         else {
             ec = e.get_error_code(hpx::rethrow);
@@ -402,7 +434,7 @@ components::component_type addressing_service::get_component_id(
         if (is_bootstrap())
             rep = bootstrap->component_ns_server.service(req, ec);
         else
-            rep = hosted->component_ns_.service(req, ec);
+            rep = hosted->component_ns_.service(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return components::component_invalid;
@@ -433,7 +465,7 @@ void addressing_service::iterate_types(
         if (is_bootstrap())
             bootstrap->symbol_ns_server.service(req, ec);
         else
-            hosted->symbol_ns_.service(req, ec);
+            hosted->symbol_ns_.service(req, action_priority_, ec);
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
@@ -460,7 +492,7 @@ components::component_type addressing_service::register_factory(
         if (is_bootstrap())
             rep = bootstrap->component_ns_server.service(req, ec);
         else
-            rep = hosted->component_ns_.service(req, ec);
+            rep = hosted->component_ns_.service(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return components::component_invalid;
@@ -480,10 +512,21 @@ components::component_type addressing_service::register_factory(
     }
 } // }}}
 
+bool addressing_service::route_parcel(
+    parcelset::parcel const& p
+  , error_code& ec
+    )
+{
+    if (is_bootstrap())
+        return bootstrap->primary_ns_server.route(p, ec);
+    else
+        return hosted->primary_ns_.route(p, action_priority_, ec);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 struct lock_semaphore
 {
-    lock_semaphore(lcos::local_counting_semaphore& sem)
+    lock_semaphore(lcos::local::counting_semaphore& sem)
       : sem_(sem)
     {
         // this needs to be invoked from a px-thread
@@ -496,7 +539,7 @@ struct lock_semaphore
         sem_.signal(1);
     }
 
-    lcos::local_counting_semaphore& sem_;
+    lcos::local::counting_semaphore& sem_;
 };
 
 template <typename Pool, typename Future, typename Promise>
@@ -505,7 +548,7 @@ struct checkout_promise
     checkout_promise(Pool& pool, Promise*& promise)
       : result_ok_(false), pool_(pool), promise_(promise)
     {
-        pool_.dequeue(&promise_);
+        pool_.dequeue(promise_);
         BOOST_ASSERT(promise_);
 
         promise_->reset(); // reset the promise
@@ -718,7 +761,7 @@ bool addressing_service::unbind_range(
         if (is_bootstrap())
             rep = bootstrap->primary_ns_server.service(req, ec);
         else
-            rep = hosted->primary_ns_.service(req, ec);
+            rep = hosted->primary_ns_.service(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
             return false;
@@ -748,10 +791,83 @@ bool addressing_service::unbind_range(
     }
 } // }}}
 
-bool addressing_service::resolve(
+/// This function will test whether the given address refers to an object
+/// living on the locality of the caller.
+bool addressing_service::is_local_address(
+    naming::gid_type const& id
+  , error_code& ec
+    )
+{
+    if (&ec != &throws)
+        ec = make_success_code();
+
+    // For now we fall back to the primitive implementation which just compares
+    // the prefixes. That will have to be changed, though.
+    return naming::get_locality_id_from_gid(local_locality())
+        == naming::get_locality_id_from_gid(id);
+}
+
+bool addressing_service::is_local_address(
     naming::gid_type const& id
   , naming::address& addr
-  , bool try_cache
+  , error_code& ec
+    )
+{
+    // Resolve the address of the GID.
+    if (!resolve(id, addr, ec))
+    {
+        HPX_THROWS_IF(ec, unknown_component_address
+          , "addressing_service::is_local_address"
+          , boost::str(boost::format("cannot resolve gid(%1%)") % id));
+        return false;
+    }
+
+    if (ec)
+        return false;
+
+    return addr.locality_ == here_;
+}
+
+bool addressing_service::is_local_address_cached(
+    naming::gid_type const& id
+  , error_code& ec
+    )
+{
+    if (&ec != &throws)
+        ec = make_success_code();
+
+    // For now we fall back to the primitive implementation which just compares
+    // the prefixes. That will have to be changed, though.
+    return naming::get_locality_id_from_gid(local_locality())
+        == naming::get_locality_id_from_gid(id);
+}
+
+bool addressing_service::is_local_address_cached(
+    naming::gid_type const& id
+  , naming::address& addr
+  , error_code& ec
+    )
+{
+    // Try to resolve the address of the GID.
+    // NOTE: We do not throw here for a reason; it is perfectly valid for the
+    // GID to not be found in the cache.
+    if (!resolve_cached(id, addr, ec) || ec)
+        return false;
+
+    return addr.locality_ == here_;
+}
+
+bool addressing_service::is_local_lva_encoded_address(
+    naming::gid_type const& id
+    )
+{
+    return naming::strip_credit_from_gid(id.get_msb())
+        == local_locality().get_msb();
+}
+
+bool addressing_service::resolve_full(
+    naming::gid_type const& id
+  , naming::address& addr
   , error_code& ec
     )
 { // {{{ resolve implementation
@@ -759,8 +875,7 @@ bool addressing_service::resolve(
         // {{{ special cases
 
         // LVA-encoded GIDs (located on this machine)
-        if (naming::strip_credit_from_gid(id.get_msb())
-            == local_prefix().get_msb())
+        if (is_local_lva_encoded_address(id))
         {
             addr.locality_ = here_;
 
@@ -786,7 +901,7 @@ bool addressing_service::resolve(
         // authoritative AGAS component address resolution
         else if (id == bootstrap_primary_namespace_gid())
         {
-            addr = hosted->primary_ns_addr_;
+            addr = primary_ns_addr_;
             if (&ec != &throws)
                 ec = make_success_code();
             return true;
@@ -794,7 +909,7 @@ bool addressing_service::resolve(
 
         else if (id == bootstrap_component_namespace_gid())
         {
-            addr = hosted->component_ns_addr_;
+            addr = component_ns_addr_;
             if (&ec != &throws)
                 ec = make_success_code();
             return true;
@@ -802,37 +917,31 @@ bool addressing_service::resolve(
 
         else if (id == bootstrap_symbol_namespace_gid())
         {
-            addr = hosted->symbol_ns_addr_;
+            addr = symbol_ns_addr_;
             if (&ec != &throws)
                 ec = make_success_code();
             return true;
         }
         // }}}
 
-        // Try the cache if applicable.
-        if (try_cache && caching_)
-        {
-            if (resolve_cached(id, addr, ec))
-                return true;
-
-            if (ec)
-                return false;
-        }
-
         request req(primary_ns_resolve_gid, id);
         response rep;
 
-        if (is_bootstrap())
-            rep = bootstrap->primary_ns_server.service(req, ec);
-        else
-            rep = hosted->primary_ns_.service(req, ec);
+        {
+            lock_semaphore lock(resolve_throttle_);
+
+            if (is_bootstrap())
+                rep = bootstrap->primary_ns_server.service(req, ec);
+            else
+                rep = hosted->primary_ns_.service(req, action_priority_, ec);
+        }
 
         if (ec || (success != rep.get_status()))
             return false;
 
         // Resolve the gva to the real resolved address (which is just a gva
         // with as fully resolved LVA and an offset of zero).
-        const gva g = rep.get_gva().resolve(id, rep.get_base_gid());
+        gva const g = rep.get_gva().resolve(id, rep.get_base_gid());
 
         addr.locality_ = g.endpoint;
         addr.type_ = g.type;
@@ -858,8 +967,9 @@ bool addressing_service::resolve(
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
-            HPX_RETHROW_EXCEPTION(e.get_error(), "addressing_service::resolve",
-                e.what());
+            HPX_RETHROW_EXCEPTION(e.get_error()
+                , "addressing_service::resolve_full"
+                , e.what());
         }
         else {
             ec = e.get_error_code(hpx::rethrow);
@@ -878,7 +988,7 @@ bool addressing_service::resolve_cached(
     // {{{ special cases
 
     // LVA-encoded GIDs (located on this machine)
-    if (naming::strip_credit_from_gid(id.get_msb()) == local_prefix().get_msb())
+    if (is_local_lva_encoded_address(id))
     {
         addr.locality_ = here_;
 
@@ -904,7 +1014,7 @@ bool addressing_service::resolve_cached(
     // authoritative AGAS component address resolution
     else if (id == bootstrap_primary_namespace_gid())
     {
-        addr = hosted->primary_ns_addr_;
+        addr = primary_ns_addr_;
         if (&ec != &throws)
             ec = make_success_code();
         return true;
@@ -912,7 +1022,7 @@ bool addressing_service::resolve_cached(
 
     else if (id == bootstrap_component_namespace_gid())
     {
-        addr = hosted->component_ns_addr_;
+        addr = component_ns_addr_;
         if (&ec != &throws)
             ec = make_success_code();
         return true;
@@ -920,7 +1030,7 @@ bool addressing_service::resolve_cached(
 
     else if (id == bootstrap_symbol_namespace_gid())
     {
-        addr = hosted->symbol_ns_addr_;
+        addr = symbol_ns_addr_;
         if (&ec != &throws)
             ec = make_success_code();
         return true;
@@ -983,25 +1093,37 @@ bool addressing_service::resolve_cached(
     return false;
 } // }}}
 
-boost::uint64_t addressing_service::incref(
-    naming::gid_type const& id
-  , boost::uint64_t credits
+void addressing_service::incref(
+    naming::gid_type const& lower
+  , naming::gid_type const& upper
+  , boost::int64_t credit
   , error_code& ec
     )
 { // {{{ incref implementation
+    if (HPX_UNLIKELY(0 >= credit))
+    {
+        HPX_THROWS_IF(ec, bad_parameter
+          , "addressing_service::incref"
+          , boost::str(boost::format("invalid credit count of %1%") % credit));
+        return;
+    }
+
     try {
-        request req(primary_ns_increment, id, credits);
+        request req(primary_ns_change_credit_non_blocking
+                  , lower, upper, credit);
         response rep;
 
+        // REVIEW: Should we do fire-and-forget here as well?
         if (is_bootstrap())
             rep = bootstrap->primary_ns_server.service(req, ec);
         else
-            rep = hosted->primary_ns_.service(req, ec);
+            rep = hosted->primary_ns_.service(req, action_priority_, ec);
 
         if (ec || (success != rep.get_status()))
-            return 0;
+            return;
 
-        return rep.get_count();
+        if (&ec != &throws)
+            ec = make_success_code();
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
@@ -1012,46 +1134,32 @@ boost::uint64_t addressing_service::incref(
             ec = e.get_error_code(hpx::rethrow);
         }
 
-        return 0;
+        return;
     }
 } // }}}
 
-boost::uint64_t addressing_service::decref(
-    naming::gid_type const& id
-  , components::component_type& t
-  , boost::uint64_t credits
+void addressing_service::decref(
+    naming::gid_type const& lower
+  , naming::gid_type const& upper
+  , boost::int64_t credit
   , error_code& ec
     )
 { // {{{ decref implementation
+    if (HPX_UNLIKELY(0 >= credit))
+    {
+        HPX_THROWS_IF(ec, bad_parameter
+          , "addressing_service::decref"
+          , boost::str(boost::format("invalid credit count of %1%") % credit));
+        return;
+    }
+
     try {
-        request req(primary_ns_decrement, id, credits);
-        response rep;
+        mutex_type::scoped_lock l(refcnt_requests_mtx_);
 
-        if (is_bootstrap())
-            rep = bootstrap->primary_ns_server.service(req, ec);
-        else
-            rep = hosted->primary_ns_.service(req, ec);
+        refcnt_requests_->apply(lower, upper
+                              , util::incrementer<boost::int64_t>(-credit));
 
-        if (ec || (success != rep.get_status()))
-            return 0;
-
-        if (0 == rep.get_count())
-        {
-            t = (components::component_type) rep.get_component_type();
-
-            if (HPX_UNLIKELY(components::component_invalid != t))
-            {
-                HPX_THROWS_IF(ec, bad_component_type
-                  , "addressing_service::decref"
-                  , boost::str(boost::format(
-                    "received invalid component type when decrementing last "
-                    "GID to 0, gid(%1%)")
-                    % id));
-                return 0;
-            }
-        }
-
-        return rep.get_count();
+        increment_refcnt_requests(l, ec);
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
@@ -1062,7 +1170,7 @@ boost::uint64_t addressing_service::decref(
             ec = e.get_error_code(hpx::rethrow);
         }
 
-        return false;
+        return;
     }
 } // }}}
 
@@ -1079,7 +1187,7 @@ bool addressing_service::register_name(
         if (is_bootstrap())
             rep = bootstrap->symbol_ns_server.service(req, ec);
         else
-            rep = hosted->symbol_ns_.service(req, ec);
+            rep = hosted->symbol_ns_.service(req, action_priority_, ec);
 
         return !ec && (success == rep.get_status());
     }
@@ -1097,18 +1205,6 @@ bool addressing_service::register_name(
     }
 } // }}}
 
-lcos::promise<bool, response> addressing_service::register_name_async(
-    std::string const& name
-  , naming::gid_type const& id
-    )
-{
-    request req(symbol_ns_bind, name, id);
-
-    naming::id_type const gid = bootstrap_symbol_namespace_id();
-
-    return stubs::symbol_namespace::service_async<bool>(gid, req);
-}
-
 bool addressing_service::unregister_name(
     std::string const& name
   , naming::gid_type& id
@@ -1122,7 +1218,7 @@ bool addressing_service::unregister_name(
         if (is_bootstrap())
             rep = bootstrap->symbol_ns_server.service(req, ec);
         else
-            rep = hosted->symbol_ns_.service(req, ec);
+            rep = hosted->symbol_ns_.service(req, action_priority_, ec);
 
         if (!ec && (success == rep.get_status()))
         {
@@ -1146,18 +1242,6 @@ bool addressing_service::unregister_name(
     }
 } // }}}
 
-lcos::promise<naming::id_type, response>
-addressing_service::unregister_name_async(
-    std::string const& name
-    )
-{
-    request req(symbol_ns_unbind, name);
-
-    naming::id_type const gid = bootstrap_symbol_namespace_id();
-
-    return stubs::symbol_namespace::service_async<naming::id_type>(gid, req);
-}
-
 bool addressing_service::resolve_name(
     std::string const& name
   , naming::gid_type& id
@@ -1171,7 +1255,7 @@ bool addressing_service::resolve_name(
         if (is_bootstrap())
             rep = bootstrap->symbol_ns_server.service(req, ec);
         else
-            rep = hosted->symbol_ns_.service(req, ec);
+            rep = hosted->symbol_ns_.service(req, action_priority_, ec);
 
         if (!ec && (success == rep.get_status()))
         {
@@ -1196,38 +1280,27 @@ bool addressing_service::resolve_name(
     }
 } // }}}
 
-lcos::promise<naming::id_type, response> resolve_name_async(
-    std::string const& name
-    )
-{
-    request req(symbol_ns_resolve, name);
-
-    naming::id_type const gid = bootstrap_symbol_namespace_id();
-
-    return stubs::symbol_namespace::service_async<naming::id_type>(gid, req);
-}
-
 /// Invoke the supplied hpx::function for every registered global name
-bool addressing_service::iterateids(
+bool addressing_service::iterate_ids(
     iterate_names_function_type const& f
   , error_code& ec
     )
 { // {{{
     try {
-        request req(symbol_ns_iterate, f);
+        request req(symbol_ns_iterate_names, f);
         response rep;
 
         if (is_bootstrap())
             rep = bootstrap->symbol_ns_server.service(req, ec);
         else
-            rep = hosted->symbol_ns_.service(req, ec);
+            rep = hosted->symbol_ns_.service(req, action_priority_, ec);
 
         return !ec && (success == rep.get_status());
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
             HPX_RETHROW_EXCEPTION(e.get_error()
-              , "addressing_service::iterateids"
+              , "addressing_service::iterate_ids"
               , e.what());
         }
         else {
@@ -1253,9 +1326,17 @@ void addressing_service::update_cache(
     }
 
     try {
+        // The entry in AGAS for a locality's RTS component has a count of 0,
+        // so we convert it to 1 here so that the cache doesn't break.
+        const boost::uint64_t count = (g.count ? g.count : 1);
+
+        LAS_(debug) <<
+            ( boost::format("updating cache, gid(%1%), count(%2%)")
+            % gid % count);
+
         mutex_type::scoped_lock lock(gva_cache_mtx_);
 
-        gva_cache_key key(gid, g.count ? g.count : 1);
+        gva_cache_key key(gid, count);
         gva_cache_.insert(key, g);
 
         if (&ec != &throws)
@@ -1299,46 +1380,191 @@ std::size_t addressing_service::get_cache_insertions() const
     return gva_cache_.get_statistics().insertions();
 }
 
-/// Install performance counters exposing properties from the local cache.
-void addressing_service::install_counters()
+/// Install performance counter types exposing properties from the local cache.
+void addressing_service::register_counter_types()
 { // {{{
     // install
-    performance_counters::raw_counter_type_data const counter_types[] =
+    HPX_STD_FUNCTION<boost::int64_t()> cache_hits(
+        boost::bind(&addressing_service::get_cache_hits, this));
+    HPX_STD_FUNCTION<boost::int64_t()> cache_misses(
+        boost::bind(&addressing_service::get_cache_misses, this));
+    HPX_STD_FUNCTION<boost::int64_t()> cache_evictions(
+        boost::bind(&addressing_service::get_cache_evictions, this));
+    HPX_STD_FUNCTION<boost::int64_t()> cache_insertions(
+        boost::bind(&addressing_service::get_cache_insertions, this));
+
+    performance_counters::generic_counter_type_data const counter_types[] =
     {
         { "/agas/cache/hits", performance_counters::counter_raw,
           "returns the number of cache hits while accessing the AGAS cache",
-          HPX_PERFORMANCE_COUNTER_V1 },
+          HPX_PERFORMANCE_COUNTER_V1,
+          boost::bind(&performance_counters::locality_raw_counter_creator,
+              _1, cache_hits, _2),
+          &performance_counters::locality_counter_discoverer
+        },
         { "/agas/cache/misses", performance_counters::counter_raw,
           "returns the number of cache misses while accessing the AGAS cache",
-          HPX_PERFORMANCE_COUNTER_V1 },
+          HPX_PERFORMANCE_COUNTER_V1,
+          boost::bind(&performance_counters::locality_raw_counter_creator,
+              _1, cache_misses, _2),
+          &performance_counters::locality_counter_discoverer
+        },
         { "/agas/cache/evictions", performance_counters::counter_raw,
           "returns the number of cache evictions from the AGAS cache",
-          HPX_PERFORMANCE_COUNTER_V1 },
+          HPX_PERFORMANCE_COUNTER_V1,
+          boost::bind(&performance_counters::locality_raw_counter_creator,
+              _1, cache_evictions, _2),
+          &performance_counters::locality_counter_discoverer
+        },
         { "/agas/cache/insertions", performance_counters::counter_raw,
           "returns the number of cache insertions into the AGAS cache",
-          HPX_PERFORMANCE_COUNTER_V1 }
+          HPX_PERFORMANCE_COUNTER_V1,
+          boost::bind(&performance_counters::locality_raw_counter_creator,
+              _1, cache_insertions, _2),
+          &performance_counters::locality_counter_discoverer
+        }
     };
     performance_counters::install_counter_types(
         counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
-
-    boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
-    boost::format cache_statistics("/agas(locality#%d/total)/cache/%s");
-
-    performance_counters::raw_counter_data const counters[] =
-    {
-        { boost::str(cache_statistics % prefix % "hits"),
-          boost::bind(&addressing_service::get_cache_hits, this) },
-        { boost::str(cache_statistics % prefix % "misses"),
-          boost::bind(&addressing_service::get_cache_misses, this) },
-        { boost::str(cache_statistics % prefix % "evictions"),
-          boost::bind(&addressing_service::get_cache_evictions, this) },
-        { boost::str(cache_statistics % prefix % "insertions"),
-          boost::bind(&addressing_service::get_cache_insertions, this) }
-    };
-
-    performance_counters::install_counters(
-        counters, sizeof(counters)/sizeof(counters[0]));
 } // }}}
+
+void addressing_service::garbage_collect_non_blocking(
+    error_code& ec
+    )
+{
+    mutex_type::scoped_lock l(refcnt_requests_mtx_);
+    send_refcnt_requests_non_blocking(l, ec);
+}
+
+void addressing_service::garbage_collect(
+    error_code& ec
+    )
+{
+    mutex_type::scoped_lock l(refcnt_requests_mtx_);
+    send_refcnt_requests_sync(l, ec);
+}
+
+void addressing_service::increment_refcnt_requests(
+    addressing_service::mutex_type::scoped_lock& l
+  , error_code& ec
+    )
+{
+    if (!l.owns_lock())
+    {
+        HPX_THROWS_IF(ec, lock_error
+          , "addressing_service::increment_refcnt_requests"
+          , "mutex is not locked");
+        return;
+    }
+
+    if (max_refcnt_requests_ == ++refcnt_requests_count_)
+        send_refcnt_requests_non_blocking(l, ec);
+
+    else if (&ec != &throws)
+        ec = make_success_code();
+}
+
+void addressing_service::send_refcnt_requests_non_blocking(
+    addressing_service::mutex_type::scoped_lock& l
+  , error_code& ec
+    )
+{
+    try {
+        boost::shared_ptr<refcnt_requests_type> p(new refcnt_requests_type);
+
+        p.swap(refcnt_requests_);
+
+        refcnt_requests_count_ = 0;
+
+        l.unlock();
+
+        std::vector<request> requests;
+
+        BOOST_FOREACH(refcnt_requests_type::const_reference e, *p)
+        {
+            request const req(primary_ns_change_credit_non_blocking
+                            , boost::icl::lower(e.key())
+                            , boost::icl::upper(e.key())
+                            , e.data());
+            requests.push_back(req);
+        }
+
+        if (is_bootstrap())
+        {
+            typedef server::primary_namespace::bulk_service_action
+                action_type;
+            applier::apply_l_p<action_type>
+                (primary_ns_addr_, action_priority_, requests);
+        }
+
+        else
+            hosted->primary_ns_.bulk_service_non_blocking
+                (requests, action_priority_);
+
+        if (&ec != &throws)
+            ec = make_success_code();
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error()
+              , "addressing_service::increment_refcnt_requests"
+              , e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow);
+        }
+
+        return;
+    }
+}
+
+void addressing_service::send_refcnt_requests_sync(
+    addressing_service::mutex_type::scoped_lock& l
+  , error_code& ec
+    )
+{
+    try {
+        boost::shared_ptr<refcnt_requests_type> p(new refcnt_requests_type);
+
+        p.swap(refcnt_requests_);
+
+        refcnt_requests_count_ = 0;
+
+        l.unlock();
+
+        std::vector<request> requests;
+
+        BOOST_FOREACH(refcnt_requests_type::const_reference e, *p)
+        {
+            request const req(primary_ns_change_credit_sync
+                            , boost::icl::lower(e.key())
+                            , boost::icl::upper(e.key())
+                            , e.data());
+            requests.push_back(req);
+        }
+
+        // same for local and remote requests
+        bulk_service(requests, ec);
+
+        if (ec)
+            return;
+
+        if (&ec != &throws)
+            ec = make_success_code();
+    }
+    catch (hpx::exception const& e) {
+        if (&ec == &throws) {
+            HPX_RETHROW_EXCEPTION(e.get_error()
+              , "addressing_service::increment_refcnt_requests"
+              , e.what());
+        }
+        else {
+            ec = e.get_error_code(hpx::rethrow);
+        }
+
+        return;
+    }
+}
 
 }}
 

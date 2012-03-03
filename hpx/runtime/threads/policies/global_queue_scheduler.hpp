@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,7 +6,7 @@
 #if !defined(HPX_THREADMANAGER_SCHEDULING_GLOBAL_QUEUE_JUN_18_2009_1116AM)
 #define HPX_THREADMANAGER_SCHEDULING_GLOBAL_QUEUE_JUN_18_2009_1116AM
 
-#include <map>
+#include <vector>
 #include <memory>
 
 #include <hpx/config.hpp>
@@ -15,12 +15,9 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
 
-#include <boost/thread.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/bind.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/lockfree/fifo.hpp>
-#include <boost/ptr_container/ptr_map.hpp>
+#include <boost/mpl/bool.hpp>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 // TODO: add branch prediction and function heat
 
@@ -41,6 +38,7 @@ namespace hpx { namespace threads { namespace policies
         enum { max_thread_count = 1000 };
 
     public:
+        typedef boost::mpl::false_ has_periodic_maintenance;
         // the scheduler type takes one initialization parameter: the maxcount
         typedef std::size_t init_parameter_type;
 
@@ -51,6 +49,11 @@ namespace hpx { namespace threads { namespace policies
         {}
 
         bool numa_sensitive() const { return false; }
+
+        std::size_t get_pu_num(std::size_t num_thread) const
+        {
+            return num_thread;
+        }
 
         ///////////////////////////////////////////////////////////////////////
         // This returns the current length of the queues (work items and new items)
@@ -91,7 +94,7 @@ namespace hpx { namespace threads { namespace policies
         /// Return the next thread to be executed, return false if non is
         /// available
         bool get_next_thread(std::size_t num_thread, bool running,
-            std::size_t& idle_loop_count, threads::thread** thrd)
+            std::size_t& idle_loop_count, threads::thread*& thrd)
         {
             return queue_.get_next_thread(thrd, num_thread);
         }
@@ -101,6 +104,12 @@ namespace hpx { namespace threads { namespace policies
             thread_priority /*priority*/ = thread_priority_normal)
         {
             queue_.schedule_thread(thrd, num_thread);
+        }
+
+        void schedule_thread_last(threads::thread* thrd, std::size_t num_thread,
+            thread_priority priority = thread_priority_normal)
+        {
+            schedule_thread(thrd, num_thread, priority);
         }
 
         /// Destroy the passed thread as it has been terminated
@@ -145,7 +154,8 @@ namespace hpx { namespace threads { namespace policies
     private:
         thread_queue<true> queue_;                ///< this manages all the threads
     };
-
 }}}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

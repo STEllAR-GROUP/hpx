@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,6 +12,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
 
+#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
@@ -21,10 +22,13 @@
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/component_registry_base.hpp>
 #include <hpx/runtime/components/component_startup_shutdown_base.hpp>
+#include <hpx/runtime/components/component_commandline_base.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/lcos/future_wait.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
+#include <hpx/util/parse_command_line.hpp>
 
 #include <algorithm>
 
@@ -81,6 +85,12 @@ HPX_REGISTER_ACTION_EX(
     get_config_action);
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::update_agas_cache_action,
+    update_agas_cache_action);
+HPX_REGISTER_ACTION_EX(
+    hpx::components::server::runtime_support::garbage_collect_action,
+    update_agas_cache_action);
+HPX_REGISTER_ACTION_EX(
+    hpx::components::server::runtime_support::create_performance_counter_action,
     update_agas_cache_action);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -231,45 +241,58 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     // delete an existing instance of a component
     void runtime_support::free_component(
-        components::component_type type, naming::gid_type const& gid)
+        components::component_type type, naming::gid_type const& gid,
+        naming::gid_type const& count)
     {
-    // locate the factory for the requested component type
+        // Special case: component_memory_block.
         if (type == components::component_memory_block) {
-            // retrieve the local address bound to the given global id
             applier::applier& appl = hpx::applier::get_applier();
-            naming::address addr;
-            if (!appl.get_agas_client().resolve(gid, addr))
+
+            for (naming::gid_type i(0, 0); i < count; ++i)
             {
-                hpx::util::osstream strm;
-                strm << "global id " << gid << " is not bound to any "
-                        "component instance";
-                HPX_THROW_EXCEPTION(hpx::unknown_component_address,
-                    "runtime_support::free_component",
-                    hpx::util::osstream_get_string(strm));
-                return;
+                naming::gid_type target = gid + i;
+
+                // retrieve the local address bound to the given global id
+                naming::address addr;
+                if (!appl.get_agas_client().resolve(target, addr))
+                {
+                    hpx::util::osstream strm;
+                    strm << "global id " << target << " is not bound to any "
+                            "component instance";
+                    // FIXME: If this throws then we leak the rest of count.
+                    // What should we do instead?
+                    HPX_THROW_EXCEPTION(hpx::unknown_component_address,
+                        "runtime_support::free_component",
+                        hpx::util::osstream_get_string(strm));
+                    return;
+                }
+
+                // make sure this component is located here
+                if (appl.here() != addr.locality_)
+                {
+                    // FIXME: should the component be re-bound ?
+                    hpx::util::osstream strm;
+                    strm << "global id " << target << " is not bound to any "
+                            "local component instance";
+                    // FIXME: If this throws then we leak the rest of count.
+                    // What should we do instead?
+                    HPX_THROW_EXCEPTION(hpx::unknown_component_address,
+                        "runtime_support::free_component",
+                        hpx::util::osstream_get_string(strm));
+                    return;
+                }
+
+                // free the memory block
+                components::server::memory_block::destroy(
+                    reinterpret_cast<components::server::memory_block*>(addr.address_));
+
+                LRT_(info) << "successfully destroyed memory block " << target;
             }
 
-            // make sure this component is located here
-            if (appl.here() != addr.locality_)
-            {
-                // FIXME: should the component be re-bound ?
-                hpx::util::osstream strm;
-                strm << "global id " << gid << " is not bound to any local "
-                        "component instance";
-                HPX_THROW_EXCEPTION(hpx::unknown_component_address,
-                    "runtime_support::free_component",
-                    hpx::util::osstream_get_string(strm));
-                return;
-            }
-
-            // free the memory block
-            components::server::memory_block::destroy(
-                reinterpret_cast<components::server::memory_block*>(addr.address_));
-
-            LRT_(info) << "successfully destroyed memory block " << gid;
             return;
         }
 
+        // locate the factory for the requested component type
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end()) {
             // we don't know anything about this component
@@ -282,9 +305,9 @@ namespace hpx { namespace components { namespace server
 
             strm << "list of registered components: \n";
             component_map_type::iterator end = components_.end();
-            for (component_map_type::iterator it = components_.begin(); it!= end; ++it)
+            for (component_map_type::iterator cit = components_.begin(); cit!= end; ++cit)
             {
-                strm << "  " << components::get_component_type_name((*it).first)
+                strm << "  " << components::get_component_type_name((*cit).first)
                      << std::endl;
             }
 
@@ -294,11 +317,19 @@ namespace hpx { namespace components { namespace server
             return;
         }
 
-    // destroy the component instance
-        (*it).second.first->destroy(gid);
 
-        LRT_(info) << "successfully destroyed component " << gid
-            << " of type: " << components::get_component_type_name(type);
+        for (naming::gid_type i(0, 0); i < count; ++i)
+        {
+            naming::gid_type target = gid + i;
+
+            // FIXME: If this throws then we leak the rest of count.
+            // What should we do instead?
+            // destroy the component instance
+            (*it).second.first->destroy(target);
+
+            LRT_(info) << "successfully destroyed component " << target
+                << " of type: " << components::get_component_type_name(type);
+        }
     }
 
     // function to be called during shutdown
@@ -321,8 +352,7 @@ namespace hpx { namespace components { namespace server
             typedef void_lco_type::set_event_action action_type;
 
             naming::address addr;
-            applier::applier& appl = hpx::applier::get_applier();
-            if (appl.address_is_local(respond_to.get_gid(), addr)) {
+            if (agas::is_local_address(respond_to, addr)) {
                 // execute locally, action is executed immediately as it is
                 // a direct_action
                 hpx::applier::apply_l<action_type>(addr);
@@ -357,23 +387,23 @@ namespace hpx { namespace components { namespace server
 
     void runtime_support::shutdown_all(double timeout)
     {
-        std::vector<naming::gid_type> prefixes;
+        std::vector<naming::gid_type> locality_ids;
         applier::applier& appl = hpx::applier::get_applier();
-        appl.get_agas_client().get_prefixes(prefixes);
-        std::reverse(prefixes.begin(), prefixes.end());
+        appl.get_agas_client().get_localities(locality_ids);
+        std::reverse(locality_ids.begin(), locality_ids.end());
 
         // execute registered shutdown functions on all localities
-        invoke_shutdown_functions(prefixes, true);
-        invoke_shutdown_functions(prefixes, false);
+        invoke_shutdown_functions(locality_ids, true);
+        invoke_shutdown_functions(locality_ids, false);
 
         // shut down all localities except the the local one
         {
-            boost::uint32_t prefix = applier::get_prefix_id();
+            boost::uint32_t locality_id = get_locality_id();
             std::vector<lcos::promise<void> > lazy_actions;
 
-            BOOST_FOREACH(naming::gid_type gid, prefixes)
+            BOOST_FOREACH(naming::gid_type gid, locality_ids)
             {
-                if (prefix != naming::get_prefix_from_gid(gid))
+                if (locality_id != naming::get_locality_id_from_gid(gid))
                 {
                     using components::stubs::runtime_support;
                     naming::id_type id(gid, naming::id_type::unmanaged);
@@ -393,19 +423,19 @@ namespace hpx { namespace components { namespace server
     // initiate system shutdown for all localities
     void runtime_support::terminate_all()
     {
-        std::vector<naming::gid_type> prefixes;
+        std::vector<naming::gid_type> locality_ids;
         applier::applier& appl = hpx::applier::get_applier();
-        appl.get_agas_client().get_prefixes(prefixes);
-        std::reverse(prefixes.begin(), prefixes.end());
+        appl.get_agas_client().get_localities(locality_ids);
+        std::reverse(locality_ids.begin(), locality_ids.end());
 
         // terminate all localities except the the local one
         {
-            boost::uint32_t prefix = applier::get_prefix_id();
+            boost::uint32_t locality_id = get_locality_id();
             std::vector<lcos::promise<void> > lazy_actions;
 
-            BOOST_FOREACH(naming::gid_type gid, prefixes)
+            BOOST_FOREACH(naming::gid_type gid, locality_ids)
             {
-                if (prefix != naming::get_prefix_from_gid(gid))
+                if (locality_id != naming::get_locality_id_from_gid(gid))
                 {
                     using components::stubs::runtime_support;
                     naming::id_type id(gid, naming::id_type::unmanaged);
@@ -428,12 +458,30 @@ namespace hpx { namespace components { namespace server
         return *(get_runtime().get_config().get_section("application"));
     }
 
+    /// \brief Insert the given name mapping into the AGAS cache of this
+    ///        locality.
     void runtime_support::update_agas_cache(naming::gid_type const& gid,
         agas::gva const& g)
     {
         naming::get_agas_client().update_cache(gid, g);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Force a garbage collection operation in the AGAS layer.
+    void runtime_support::garbage_collect()
+    {
+        naming::get_agas_client().garbage_collect_non_blocking();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Create the given performance counter instance.
+    naming::gid_type runtime_support::create_performance_counter(
+        performance_counters::counter_info const& info)
+    {
+        return performance_counters::detail::create_counter_local(info);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     void runtime_support::tidy()
     {
         mutex_type::scoped_lock l(mtx_);
@@ -557,7 +605,7 @@ namespace hpx { namespace components { namespace server
                 typedef void_lco_type::set_event_action action_type;
 
                 naming::address addr;
-                if (appl.address_is_local(respond_to.get_gid(), addr)) {
+                if (agas::is_local_address(respond_to, addr)) {
                     // execute locally, action is executed immediately as it is
                     // a direct_action
                     hpx::applier::apply_l<action_type>(addr);
@@ -583,20 +631,28 @@ namespace hpx { namespace components { namespace server
         }
     }
 
-    void runtime_support::load_components()
+    bool runtime_support::load_components()
     {
         // load components now that AGAS is up
         get_runtime().get_config().load_components();
-        load_components(get_runtime().get_config()
-                      , get_runtime().get_agas_client().local_prefix()
-                      , get_runtime().get_agas_client());
+        return load_components(get_runtime().get_config(),
+            get_runtime().get_agas_client().local_locality(),
+            get_runtime().get_agas_client());
     }
 
-    void runtime_support::call_startup_functions()
+    void runtime_support::call_startup_functions(bool pre_startup)
     {
-        BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, startup_functions_)
-        {
-            f();
+        if (pre_startup) {
+            BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, pre_startup_functions_)
+            {
+                f();
+            }
+        }
+        else {
+            BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, startup_functions_)
+            {
+                f();
+            }
         }
     }
 
@@ -616,16 +672,32 @@ namespace hpx { namespace components { namespace server
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////
+    inline void decode (std::string &str, char const *s, char const *r)
+    {
+        std::string::size_type pos = 0;
+        while ((pos = str.find(s, pos)) != std::string::npos)
+        {
+            str.replace(pos, 2, r);
+        }
+    }
+
+    inline std::string decode_string(std::string str)
+    {
+        decode(str, "\\n", "\n");
+        return str;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // Load all components from the ini files found in the configuration
-    void runtime_support::load_components(util::section& ini,
+    bool runtime_support::load_components(util::section& ini,
         naming::gid_type const& prefix, naming::resolver_client& agas_client)
     {
         // load all components as described in the configuration information
         if (!ini.has_section("hpx.components")) {
             LRT_(info) << "No components found/loaded, HPX will be mostly "
                           "non-functional (no section [hpx.components] found).";
-            return;     // no components to load
+            return true;     // no components to load
         }
 
         // each shared library containing components may have an ini section
@@ -644,11 +716,13 @@ namespace hpx { namespace components { namespace server
         if (NULL == sec)
         {
             LRT_(error) << "NULL section found";
-            return;     // something bad happened
+            return false;     // something bad happened
         }
 
-        util::section::section_map const& s = (*sec).get_sections();
+        // collect additional command-line options
+        boost::program_options::options_description options;
 
+        util::section::section_map const& s = (*sec).get_sections();
         typedef util::section::section_map::const_iterator iterator;
         iterator end = s.end();
         for (iterator i = s.begin (); i != end; ++i)
@@ -691,13 +765,13 @@ namespace hpx { namespace components { namespace server
                     lib = hpx::util::create_path(HPX_DEFAULT_COMPONENT_PATH);
 
                 if (!load_component(ini, instance, component, lib, prefix,
-                        agas_client, isdefault, isenabled))
+                        agas_client, isdefault, isenabled, options))
                 {
                     // build path to component to load
                     std::string libname(component + HPX_SHARED_LIB_EXTENSION);
                     lib /= hpx::util::create_path(libname);
                     if (!load_component(ini, instance, component, lib, prefix,
-                            agas_client, isdefault, isenabled))
+                            agas_client, isdefault, isenabled, options))
                     {
                         continue;   // next please :-P
                     }
@@ -707,8 +781,58 @@ namespace hpx { namespace components { namespace server
                 LRT_(warning) << "caught exception while loading " << instance
                               << ", " << get_hpx_category().message(e.get_error())
                               << ": " << e.what();
+                if (e.get_error_code().value() == hpx::commandline_option_error)
+                {
+                    std::cerr << "runtime_support::load_components: "
+                              << "invalid command line option(s) to "
+                              << instance << " component: " << e.what() << std::endl;
+                }
             }
         } // for
+
+        // do secondary command line processing, check validity of options only
+        try {
+            std::string unknown_cmd_line(ini.get_entry("hpx.unknown_cmd_line", ""));
+            if (!unknown_cmd_line.empty()) {
+                std::string runtime_mode(ini.get_entry("hpx.runtime_mode", ""));
+                boost::program_options::variables_map vm;
+
+                util::parse_commandline(ini, options, unknown_cmd_line, vm,
+                    util::rethrow_on_error, get_runtime_mode_from_name(runtime_mode));
+            }
+
+            std::string fullhelp(ini.get_entry("hpx.cmd_line_help", ""));
+            if (!fullhelp.empty()) {
+                std::string help_option(ini.get_entry("hpx.cmd_line_help_option", ""));
+                if (0 == std::string("full").find(help_option)) {
+                    std::cout << decode_string(fullhelp);
+                    std::cout << options << std::endl;
+                }
+                else {
+                    throw std::logic_error("unknown help option: " + help_option);
+                }
+                return false;
+            }
+
+            // secondary command line handling, looking for --exit option
+            std::string cmd_line(ini.get_entry("hpx.cmd_line", ""));
+            if (!cmd_line.empty()) {
+                std::string runtime_mode(ini.get_entry("hpx.runtime_mode", ""));
+                boost::program_options::variables_map vm;
+
+                util::parse_commandline(ini, options, cmd_line, vm,
+                    util::allow_unregistered, get_runtime_mode_from_name(runtime_mode));
+
+                if (vm.count("hpx:exit"))
+                    return false;
+            }
+        }
+        catch (std::exception const& e) {
+            std::cerr << "runtime_support::load_components: "
+                      << "command line processing: " << e.what() << std::endl;
+            return false;
+        }
+        return true;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -725,11 +849,14 @@ namespace hpx { namespace components { namespace server
 
             startup_function_type startup;
             if (startup_shutdown->get_startup_function(startup))
-                startup_functions_.push_back(startup);
+                pre_startup_functions_.push_back(startup);
 
             shutdown_function_type shutdown;
             if (startup_shutdown->get_shutdown_function(shutdown))
                 shutdown_functions_.push_back(shutdown);
+        }
+        catch (hpx::exception const&) {
+            throw;
         }
         catch (std::logic_error const& e) {
             LRT_(debug) << "loading of startup/shutdown functions failed: "
@@ -745,10 +872,42 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    bool runtime_support::load_commandline_options(boost::plugin::dll& d,
+        boost::program_options::options_description& options)
+    {
+        try {
+            // get the factory, may fail
+            boost::plugin::plugin_factory<component_commandline_base> pf (d,
+                BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME(commandline_options)));
+
+            // create the startup_shutdown object
+            boost::shared_ptr<component_commandline_base>
+                commandline_options(pf.create("commandline_options"));
+
+            options.add(commandline_options->add_commandline_options());
+        }
+        catch (hpx::exception const&) {
+            throw;
+        }
+        catch (std::logic_error const& e) {
+            LRT_(debug) << "loading of command-line options failed: "
+                        << d.get_name() << ": " << e.what();
+            return false;
+        }
+        catch (std::exception const& e) {
+            LRT_(debug) << "loading of command-line options failed: "
+                        << d.get_name() << ": " << e.what();
+            return false;
+        }
+        return true;    // startup/shutdown functions got registered
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     bool runtime_support::load_component(util::section& ini,
         std::string const& instance, std::string const& component,
         boost::filesystem::path lib, naming::gid_type const& prefix,
-        naming::resolver_client& agas_client, bool isdefault, bool isenabled)
+        naming::resolver_client& agas_client, bool isdefault, bool isenabled,
+        boost::program_options::options_description& options)
     {
         namespace fs = boost::filesystem;
         if (fs::extension(lib) != HPX_SHARED_LIB_EXTENSION)
@@ -811,11 +970,15 @@ namespace hpx { namespace components { namespace server
                 return false;   // duplicate component id?
             }
 
+            load_commandline_options(d, options);
             load_startup_shutdown_functions(d);
 
             LRT_(info) << "dynamic loading succeeded: " << lib.string()
                        << ": " << instance << ": "
                        << components::get_component_type_name(t);
+        }
+        catch (hpx::exception const&) {
+            throw;
         }
         catch (std::logic_error const& e) {
             LRT_(warning) << "dynamic loading failed: " << lib.string()

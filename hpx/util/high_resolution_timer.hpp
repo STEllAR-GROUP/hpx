@@ -1,4 +1,4 @@
-//  Copyright (c) 2005-2011 Hartmut Kaiser
+//  Copyright (c) 2005-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,6 +10,8 @@
 #include <boost/throw_exception.hpp>
 #include <boost/cstdint.hpp>
 
+#include <stdexcept>
+
 #if defined(BOOST_HAS_UNISTD_H)
 #include <unistd.h>
 #endif
@@ -17,7 +19,6 @@
 
 #if defined(BOOST_WINDOWS)
 
-#include <stdexcept>
 #include <limits>
 #include <windows.h>
 

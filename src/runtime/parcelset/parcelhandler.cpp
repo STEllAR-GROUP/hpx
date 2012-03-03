@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2007      Richard D Guidry Jr
 //  Copyright (c) 2011      Bryce Lelbach & Katelyn Kufahl
 //
@@ -6,6 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/state.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
@@ -13,9 +14,11 @@
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/lcos/local_counting_semaphore.hpp>
+#include <hpx/lcos/local/counting_semaphore.hpp>
 #include <hpx/include/performance_counters.hpp>
+#include <hpx/performance_counters/counter_creators.hpp>
 
 #include <string>
 #include <algorithm>
@@ -43,7 +46,7 @@ namespace hpx { namespace parcelset
 
     struct wait_for_put_parcel
     {
-        wait_for_put_parcel() : sema_(new lcos::local_counting_semaphore) {}
+        wait_for_put_parcel() : sema_(new lcos::local::counting_semaphore) {}
 
         wait_for_put_parcel(wait_for_put_parcel const& other)
             : sema_(other.sema_) {}
@@ -58,7 +61,7 @@ namespace hpx { namespace parcelset
             sema_->wait();
         }
 
-        boost::shared_ptr<lcos::local_counting_semaphore> sema_;
+        boost::shared_ptr<lcos::local::counting_semaphore> sema_;
     };
 
     void parcelhandler::sync_put_parcel(parcel& p)
@@ -72,13 +75,19 @@ namespace hpx { namespace parcelset
         boost::shared_ptr<std::vector<char> > const& parcel_data,
         threads::thread_priority priority)
     {
-        if (NULL == tm_ || !(tm_->status() == running))
+        // wait for thread-manager to become active
+        while (tm_->status() & starting)
         {
-            // this is supported for debugging purposes mainly, it results in
-            // the direct execution of the parcel decoding
-            decode_parcel(parcel_data);
+            boost::this_thread::sleep(boost::get_system_time() +
+                boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
         }
 
+        // Give up if we're shutting down.
+        if (tm_->status() & stopping)
+        {
+            LPT_(debug) << "parcel_sink: dropping late parcel";
+            return;
+        }
         else
         {
             // create a new thread which decodes and handles the parcel
@@ -89,64 +98,62 @@ namespace hpx { namespace parcelset
         }
     }
 
-    threads::thread_state parcelhandler::decode_parcel(
+    threads::thread_state_enum parcelhandler::decode_parcel(
         boost::shared_ptr<std::vector<char> > const& parcel_data)
     {
         // protect from unhandled exceptions bubbling up into thread manager
-        try
-        {
-            parcel p;
-            {
+        try {
+            try {
                 // create a special io stream on top of in_buffer_
                 typedef util::container_device<std::vector<char> > io_device_type;
                 boost::iostreams::stream<io_device_type> io(*parcel_data.get());
 
                 // De-serialize the parcel data
-#if HPX_USE_PORTABLE_ARCHIVES != 0
                 hpx::util::portable_binary_iarchive archive(io);
-#else
-                boost::archive::binary_iarchive archive(io);
-#endif
-                archive >> p;
+
+                std::size_t parcel_count = 0;
+                archive >> parcel_count;
+                while(parcel_count-- != 0)
+                {
+                    // de-serialize parcel and add it to incoming parcel queue
+                    parcel p;
+                    archive >> p;
+                    parcels_->add_parcel(p);
+                }
             }
-
-            // add parcel to incoming parcel queue
-            parcels_->add_parcel(p);
+            catch (std::exception const& e) {
+                // We have to repackage all exceptions thrown by the
+                // serialization library as otherwise we will loose the
+                // e.what() description of the problem, due to slicing.
+                boost::throw_exception(boost::enable_error_info(
+                    hpx::exception(serialization_error, e.what())));
+            }
         }
-
-        catch (hpx::exception const& e)
-        {
+        catch (hpx::exception const& e) {
             LPT_(error)
                 << "decode_parcel: caught hpx::exception: "
                 << e.what();
             hpx::report_error(boost::current_exception());
         }
-
-        catch (boost::system::system_error const& e)
-        {
+        catch (boost::system::system_error const& e) {
             LPT_(error)
                 << "decode_parcel: caught boost::system::error: "
                 << e.what();
             hpx::report_error(boost::current_exception());
         }
-
-        catch (std::exception const& e)
-        {
+        catch (boost::exception const&) {
             LPT_(error)
-                << "decode_parcel: caught std::exception: "
-                << e.what();
+                << "decode_parcel: caught boost::exception.";
             hpx::report_error(boost::current_exception());
         }
-
-        // Prevent exceptions from boiling up into the thread-manager.
-        catch (...)
-        {
+        catch (...) {
+            // Prevent exceptions from boiling up into the thread-manager.
             LPT_(error)
                 << "decode_parcel: caught unknown exception.";
             hpx::report_error(boost::current_exception());
         }
 
-        return threads::thread_state(threads::terminated);
+        return threads::terminated;
     }
 
     parcelhandler::parcelhandler(naming::resolver_client& resolver,
@@ -161,7 +168,7 @@ namespace hpx { namespace parcelset
 
         // AGAS v2 registers itself in the client before the parcelhandler
         // is booted.
-        prefix_ = resolver_.local_prefix();
+        locality_ = resolver_.local_locality();
 
         parcels_->set_parcelhandler(this);
 
@@ -175,84 +182,30 @@ namespace hpx { namespace parcelset
         return resolver_;
     }
 
-    bool parcelhandler::get_raw_remote_prefixes(
-        std::vector<naming::gid_type>& prefixes,
+    bool parcelhandler::get_raw_remote_localities(
+        std::vector<naming::gid_type>& locality_ids,
         components::component_type type) const
     {
         std::vector<naming::gid_type> allprefixes;
         error_code ec;
-        bool result = resolver_.get_prefixes(allprefixes, type, ec);
+        bool result = resolver_.get_localities(allprefixes, type, ec);
         if (ec || !result) return false;
 
         using boost::lambda::_1;
         std::remove_copy_if(allprefixes.begin(), allprefixes.end(),
-            std::back_inserter(prefixes), _1 == prefix_);
-        return !prefixes.empty();
+            std::back_inserter(locality_ids), _1 == locality_);
+        return !locality_ids.empty();
     }
 
-    bool parcelhandler::get_raw_prefixes(
-        std::vector<naming::gid_type>& prefixes,
+    bool parcelhandler::get_raw_localities(
+        std::vector<naming::gid_type>& locality_ids,
         components::component_type type) const
     {
         error_code ec;
-        bool result = resolver_.get_prefixes(prefixes, type, ec);
+        bool result = resolver_.get_localities(locality_ids, type, ec);
         if (ec || !result) return false;
 
-        return !prefixes.empty();
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // prepare the given gid, note: this function modifies the passed id
-    void prepare_gid(
-        naming::resolver_client& resolver_,
-        naming::id_type const& id)
-    {
-        // request new credits from AGAS if needed (i.e. gid is credit managed
-        // and the new gid has no credits after splitting)
-        boost::uint16_t oldcredits = id.get_credit();
-        if (0 != oldcredits)
-        {
-            naming::id_type newid(id.split_credits());
-            if (0 == newid.get_credit())
-            {
-                BOOST_ASSERT(1 == id.get_credit());
-                resolver_.incref(id.get_gid(), HPX_INITIAL_GLOBALCREDIT * 2);
-
-                const_cast<naming::id_type&>(id).add_credit(HPX_INITIAL_GLOBALCREDIT);
-                newid.add_credit(HPX_INITIAL_GLOBALCREDIT);
-            }
-            const_cast<naming::id_type&>(id) = newid;
-        }
-    }
-
-    // prepare all GIDs stored in an action
-    void prepare_action(
-        naming::resolver_client& resolver_,
-        actions::action_type action)
-    {
-        action->enumerate_argument_gids(boost::bind(prepare_gid, boost::ref(resolver_), _1));
-    }
-
-    // prepare all GIDs stored in a continuation
-    void prepare_continuation(
-        naming::resolver_client& resolver_,
-        actions::continuation_type cont)
-    {
-        if (cont)
-            cont->enumerate_argument_gids(boost::bind(prepare_gid, boost::ref(resolver_), _1));
-    }
-
-    // walk through all data in this parcel and register all required AGAS
-    // operations with the given resolver_helper
-    void prepare_parcel(
-        naming::resolver_client& resolver_,
-        parcel& p, error_code& ec)
-    {
-        prepare_gid(resolver_, p.get_source());                // we need to register the source gid
-        prepare_action(resolver_, p.get_action());             // all gids stored in the action
-        prepare_continuation(resolver_, p.get_continuation()); // all gids in the continuation
-        if (&ec != &throws)
-            ec = make_success_code();
+        return !locality_ids.empty();
     }
 
     void parcelhandler::put_parcel(parcel& p, write_handler_type f)
@@ -275,56 +228,45 @@ namespace hpx { namespace parcelset
                 p.set_destination_addr(addr);
         }
 
-        // prepare all additional AGAS related operations for this parcel
-        error_code ec;
-        prepare_parcel(resolver_, p, ec);
-
-        if (ec)
-        {
-            // parcel preparation failed
-            HPX_THROW_EXCEPTION(no_success,
-                "parcelhandler::put_parcel", ec.get_message());
-        }
-
         pp_.put_parcel(p, f);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void parcelhandler::install_counters()
+    void parcelhandler::register_counter_types()
     {
-        performance_counters::raw_counter_type_data const counter_types[] =
+        HPX_STD_FUNCTION<boost::int64_t()> num_sends(
+            boost::bind(&parcelport::total_sends_completed, &pp_));
+        HPX_STD_FUNCTION<boost::int64_t()> num_receives(
+            boost::bind(&parcelport::total_receives_completed, &pp_));
+        HPX_STD_FUNCTION<boost::int64_t()> queue_length(
+            boost::bind(&parcelhandler::get_queue_length, this));
+
+        performance_counters::generic_counter_type_data const counter_types[] =
         {
             { "/parcels/count/sent", performance_counters::counter_raw,
               "returns the number of sent parcels for the referenced locality",
-              HPX_PERFORMANCE_COUNTER_V1 },
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, num_sends, _2),
+              &performance_counters::locality_counter_discoverer
+            },
             { "/parcels/count/received", performance_counters::counter_raw,
               "returns the number of received parcels for the referenced locality",
-              HPX_PERFORMANCE_COUNTER_V1 },
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, num_receives, _2),
+              &performance_counters::locality_counter_discoverer
+            },
             { "/parcelqueue/length/instantaneous", performance_counters::counter_raw,
-              "returns the number current length of the queue of incomming threads",
-              HPX_PERFORMANCE_COUNTER_V1 }
+              "returns the number current length of the queue of incoming threads",
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, queue_length, _2),
+              &performance_counters::locality_counter_discoverer
+            }
         };
         performance_counters::install_counter_types(
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
-
-        boost::uint32_t const prefix = applier::get_applier().get_prefix_id();
-        boost::format parcel_count("/parcels(locality#%d/total)/count/%s");
-        boost::format queue_length("/parcelqueue(locality#%d/total)/length/instantaneous");
-
-        performance_counters::raw_counter_data const counters[] =
-        {
-            // Total parcels sent (completed)
-            { boost::str(parcel_count % prefix % "sent"),
-              boost::bind(&parcelport::total_sends_completed, &pp_) },
-            // Total parcels received (completed)
-            { boost::str(parcel_count % prefix % "received"),
-              boost::bind(&parcelport::total_receives_completed, &pp_) },
-            // Current length of incoming parcel queue
-            { boost::str(queue_length % prefix),
-              boost::bind(&parcelhandler::get_queue_length, this) }
-        };
-        performance_counters::install_counters(
-            counters, sizeof(counters)/sizeof(counters[0]));
     }
 }}
 

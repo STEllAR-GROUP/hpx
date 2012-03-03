@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Hartmut Kaiser
+# Copyright (c) 2007-2012 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Adelstein-Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,12 +16,13 @@ set(example_programs
 if(HPX_CXX11_LAMBDAS)
   set(example_programs ${example_programs}
       hello_world
+      1d_wave_equation
      )
 endif()
 
 set(hello_world_FLAGS DEPENDENCIES iostreams_component)
+set(1d_wave_equation_FLAGS DEPENDENCIES iostreams_component)
 set(simplest_hello_world_FLAGS DEPENDENCIES iostreams_component)
-set(quicksort_FLAGS DEPENDENCIES iostreams_component)
 
 foreach(example_program ${example_programs})
   set(sources
@@ -32,7 +33,8 @@ foreach(example_program ${example_programs})
   # add example executable
   add_hpx_executable(${example_program}
                      SOURCES ${sources}
-                     ${${example_program}_FLAGS})
+                     ${${example_program}_FLAGS}
+                     FOLDER "Examples/Quickstart/${example_program}")
 
   # add a custom target for this example
   add_hpx_pseudo_target(examples.quickstart.${example_program})

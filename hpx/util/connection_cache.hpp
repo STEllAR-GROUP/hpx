@@ -1,7 +1,12 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c)      2012 Thomas Heller
 //
 //  Parts of this code were taken from the Boost.Regex library
 //  Copyright (c) 2004 John Maddock
+//
+//  Parts of this code were taking from this article:
+//  http://timday.bitbucket.org/lru.html
+//  Copyright (c) 2010-2011 Tim Day
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -27,138 +32,195 @@
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
+    // This class implements an LRU cache to hold connections.
+    // TODO: investigate usage of boost.cache.
     template <typename Connection, typename Key>
     class connection_cache
     {
     public:
         typedef boost::recursive_mutex mutex_type;
+
         typedef boost::shared_ptr<Connection> connection_type;
+        typedef std::deque<connection_type> value_type;
         typedef Key key_type;
+        typedef std::list<key_type> key_tracker_type;
+        typedef
+            std::map<
+                key_type
+              , boost::tuple<
+                    value_type
+                  , std::size_t
+                  , typename key_tracker_type::iterator
+                >
+            >
+            cache_type;
+        typedef typename cache_type::size_type size_type;
 
-        typedef std::pair<connection_type, std::pair<key_type const*, int> > value_type;
-        typedef std::list<value_type> list_type;
-        typedef typename list_type::iterator list_iterator;
-        typedef typename list_type::size_type size_type;
-
-        typedef std::multimap<key_type, std::pair<list_iterator, int> > map_type;
-        typedef typename map_type::iterator map_iterator;
-        typedef typename map_type::size_type map_size_type;
-
-        connection_cache(size_type max_cache_size, char const* const logdest)
-          : max_cache_size_(max_cache_size < 2 ? 2 : max_cache_size),
-            logdest_(logdest), count_(0)
-        {}
+        connection_cache(
+            size_type max_cache_size
+          , size_type max_connections_per_locality
+        )
+          : max_cache_size_(max_cache_size < 2 ? 2 : max_cache_size)
+          , max_connections_per_locality_(max_connections_per_locality)
+          , cache_size_(0)
+        {
+            if(max_connections_per_locality_ > max_cache_size)
+            {
+                HPX_THROW_EXCEPTION(bad_parameter, "connection_cache ctor",
+                    "max_connections_per_locality_ > max_cache_size");
+            }
+        }
 
         connection_type get(key_type const& l)
         {
             mutex_type::scoped_lock lock(mtx_);
 
-//            LHPX_(debug, logdest_) << "connection_cache: requesting: " << l;
+            // Check if entry already exists ...
+            const typename cache_type::iterator it = cache_.find(l);
 
-            // see if the object is already in the cache:
-            std::pair<map_iterator, map_iterator> mpos = index_.equal_range(l);
-            if (mpos.first != mpos.second) {
-            // We have a cached item, return it
-//                LHPX_(debug, logdest_)
-//                    << "connection_cache: reusing existing connection for: "
-//                    << l;
+            // If it does ...
+            if(it != cache_.end())
+            {
+                // .. update LRU meta data
+                key_tracker_.splice(
+                    key_tracker_.end()
+                  , key_tracker_
+                  , boost::get<2>(it->second)
+                );
 
-                connection_type result(mpos.first->second.first->first);
-                cont_.erase(mpos.first->second.first);
-                index_.erase(mpos.first);
-                return result;
+                // remove the oldest from that prefix and return it.
+                if(!boost::get<0>(it->second).empty())
+                {
+                    connection_type result = boost::get<0>(it->second).front();
+                    boost::get<0>(it->second).pop_front();
+                    --boost::get<1>(it->second);
+                    --cache_size_;
+
+                    return result;
+                }
             }
 
-//            LHPX_(debug, logdest_)
-//                << "connection_cache: no existing connection for: " << l;
-
-            // if we get here then the item is not in the cache
+            // If we get here then the item is not in the cache.
             return connection_type();
         }
 
-        void add(key_type const& l, connection_type conn)
+        // returns true if insertion was successful, which means maximum cache
+        // size has not been exceeded
+        void add(key_type const& l, connection_type const& conn)
         {
             mutex_type::scoped_lock lock(mtx_);
 
-//            LHPX_(debug, logdest_)
-//                << "connection_cache: returning connection to cache: " << l;
+            const typename cache_type::iterator jt = cache_.find(l);
 
-            // Add it to the list, and index it
-            cont_.push_back(value_type(conn,
-                std::make_pair((key_type const*)NULL, ++count_)));
-            map_iterator it = index_.insert(
-                std::make_pair(l, std::make_pair(--(cont_.end()), count_)));
-            if (it == index_.end())
+            if(jt != cache_.end() && boost::get<1>(jt->second) >= max_connections_per_locality_)
             {
-                HPX_THROW_EXCEPTION(out_of_memory, "connection_cache::add",
-                    "couldn't insert new item into connection cache");
+                key_tracker_.splice(
+                    key_tracker_.end()
+                  , key_tracker_
+                  , boost::get<2>(jt->second)
+                );
+                return;
             }
-            cont_.back().second.first = &(it->first);
 
-            map_size_type s = index_.size();
-            if (s > max_cache_size_) {
-            // We have too many items in the list, so we need to start popping them
-            // off the back of the list
-//                LHPX_(debug, logdest_)
-//                    << "connection_cache: cache full, removing least recently "
-//                       "used entries";
+            if(key_tracker_.empty())
+            {
+                BOOST_ASSERT(cache_.size() == 0);
+            }
+            // eviction strategy implemented here ...
+            else
+            {
+                // If we reached maximum capacity, evict one entry ...
+                // Find the least recently used key entry
+                typename key_tracker_type::iterator it = key_tracker_.begin();
 
-                list_iterator pos = cont_.begin();
-                list_iterator last = cont_.end();
-                while (pos != last && s > max_cache_size_) {
-                    // now remove the items from our containers
-                    list_iterator condemmed(pos);
-                    ++pos;
+                while(cache_size_ >= max_cache_size_)
+                {
+                    // find it ...
+                    const typename cache_type::iterator kt = cache_.find(*it);
+                    BOOST_ASSERT(kt != cache_.end());
 
-//                    LHPX_(debug, logdest_)
-//                        << "connection_cache: removing entry for: "
-//                        << *(condemmed->second.first);
-
-                    int generational_count = condemmed->second.second;
-                    std::pair<map_iterator, map_iterator> mpos =
-                        index_.equal_range(*(condemmed->second.first));
-                    BOOST_ASSERT(mpos.first != mpos.second);
-
-#if defined(HPX_DEBUG)
-                    bool found = false;
-#endif
-                    for(/**/; mpos.first != mpos.second; ++mpos.first)
+                    // remove it if it is empty, doesn't affect cache size
+                    if(boost::get<0>(kt->second).empty())
                     {
-                        if (mpos.first->second.second == generational_count)
-                        {
-                            index_.erase(mpos.first);
-#if defined(HPX_DEBUG)
-                            found = true;
-#endif
-                            break;
-                        }
+                        cache_.erase(kt);
+                        key_tracker_.erase(it);
+                        it = key_tracker_.begin();
+                        BOOST_ASSERT(it != key_tracker_.end());
+                        continue;
                     }
-#if defined(HPX_DEBUG)
-                    BOOST_ASSERT(found);
-#endif
 
-                    cont_.erase(condemmed);
-                    --s;
+                    // just remove the oldest connection.
+                    boost::get<0>(kt->second).pop_front();
+                    --boost::get<1>(kt->second);
+                    --cache_size_;
+                    break;
                 }
             }
+
+
+            // If we reach here, we can safely add a new entry ...
+            if(jt == cache_.end())
+            {
+                // cache doesn't hold the key yet ... insert
+                typename key_tracker_type::iterator it =
+                    key_tracker_.insert(key_tracker_.end(), l);
+                cache_.insert(
+                    std::make_pair(
+                        l
+                      , boost::make_tuple(value_type(1, conn), 1, it)
+                    )
+                );
+            }
+            else
+            {
+                BOOST_ASSERT(!key_tracker_.empty());
+
+                // add it to our vector of connections for this prefix
+                boost::get<0>(jt->second).push_back(conn);
+                ++boost::get<1>(jt->second);
+                // updating LRU info ... this key has just been used.
+                key_tracker_.splice(
+                    key_tracker_.end()
+                  , key_tracker_
+                  , boost::get<2>(jt->second)
+                );
+            }
+            ++cache_size_;
+        }
+
+        bool full()
+        {
+            mutex_type::scoped_lock lock(mtx_);
+            return (cache_size_ >= max_cache_size_);
+        }
+
+        bool full(key_type const & l)
+        {
+            mutex_type::scoped_lock lock(mtx_);
+            return cache_.count(l) && boost::get<1>(cache_[l]) >= max_connections_per_locality_;
+        }
+
+        bool contains(key_type const & l)
+        {
+            mutex_type::scoped_lock lock(mtx_);
+            return cache_.count(l) && boost::get<0>(cache_[l]).size();
         }
 
         void clear()
         {
             mutex_type::scoped_lock lock(mtx_);
-            index_.clear();
-            cont_.clear();
+            cache_.clear();
+            cache_size_ = 0;
         }
 
     private:
         mutex_type mtx_;
-        size_type max_cache_size_;
-        char const* const logdest_;
-        list_type cont_;
-        map_type index_;
-        int count_;
+        size_type const max_cache_size_;
+        size_type const max_connections_per_locality_;
+        key_tracker_type key_tracker_;
+        cache_type cache_;
+        size_type cache_size_;
     };
-
 }}
 
 #endif

@@ -1,4 +1,4 @@
-//  Copyright (c) 2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2011 Matt Anderson
 //  Copyright (c) 2011 Bryce Lelbach
 //
@@ -7,113 +7,96 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-
-#include <hpx/include/iostreams.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
 #include <boost/foreach.hpp>
+#include <time.h>
 
-#include <cstdlib>
-#include <ctime>
+#include "random_mem_access/random_mem_access.hpp"
 
-#include "element/element.hpp"
-
-/// This function initializes a vector of \a random_mem_access::element clients, 
-/// connecting them to components created with
-/// \a hpx#components#distributing_factory.
 inline void
-initialize_clients(
-    hpx::components::server::distributing_factory::iterator_range_type r,
-    std::vector<random_mem_access::element>& array)
+init(hpx::components::server::distributing_factory::iterator_range_type r,
+    std::vector<hpx::components::random_mem_access>& accu)
 {
     BOOST_FOREACH(hpx::naming::id_type const& id, r)
     {
-        array.push_back(random_mem_access::element(id));
+        accu.push_back(hpx::components::random_mem_access(id));
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
+    std::size_t array_size = 0;
+    std::size_t iterations = 0;
+
+    if (vm.count("array-size"))
+        array_size = vm["array-size"].as<std::size_t>();
+
+    if (vm.count("iterations"))
+        iterations = vm["iterations"].as<std::size_t>();
+
     {
-        // Retrieve the command line options. 
-        std::size_t const array_size = vm["array-size"].as<std::size_t>();
-        std::size_t const iterations = vm["iterations"].as<std::size_t>();
-        std::size_t seed = vm["seed"].as<std::size_t>();
+        // get list of all known localities
+        //std::vector<hpx::naming::id_type> prefixes;
+        //hpx::applier::applier& appl = hpx::applier::get_applier();
+        //hpx::naming::id_type prefix;
 
-        // If the specified seed is 0, then we pick a random seed.
-        if (!seed)
-            seed = std::size_t(std::time(0));
-
-        // Seed the C standard libraries random number facilities.
-        std::srand(seed);
-
-        hpx::cout << "Seed: " << seed << hpx::endl; 
-
-        ///////////////////////////////////////////////////////////////////////
-        // Start a high resolution timer to record the execution time of this
-        // example.
-        hpx::util::high_resolution_timer t;
-
-        ///////////////////////////////////////////////////////////////////////
-        // Array creation.
-
-        // Create a distributing factory. This object can be used to create
-        // a distributed array of components. 
+        // create a distributing factory locally
         hpx::components::distributing_factory factory;
-        factory.create(hpx::find_here());
+        factory.create(hpx::applier::get_applier().get_runtime_support_gid());
 
-        // Get the global component type of our element component. 
-        hpx::components::component_type type =
+        hpx::components::component_type mem_block_type =
             hpx::components::get_component_type<
-                random_mem_access::server::element>();
+                hpx::components::random_mem_access::server_component_type>();
 
-        // Create a global array of element components via distributing factory.
-        // The elements will be divided up equally among the localities that
-        // supports our element component will 
-        std::vector<random_mem_access::element> array;
-        initialize_clients(hpx::components::locality_results
-            (factory.create_components(type, array_size)), array);
+        hpx::components::distributing_factory::result_type mem_blocks =
+            factory.create_components(mem_block_type, array_size);
 
-        // Initialize the value of each element with its index in the array. 
-        for (std::size_t i = 0; i < array_size; ++i) {
-            array[i].init(i);
+        //if (appl.get_remote_prefixes(prefixes))
+        //    // create random_mem_access on any of the remote localities
+        //    prefix = prefixes[0];
+        //else
+        //    // create an accumulator locally
+        //    prefix = appl.get_runtime_support_gid();
+
+        std::vector<hpx::components::random_mem_access> accu;
+
+        //int array_size = 6;
+        //accu.resize(array_size);
+
+        //for (int i=0;i<array_size;i++) {
+        //  accu[i].create(prefix);
+        //}
+
+        ::init(locality_results(mem_blocks), accu);
+
+        // initialize the array
+        for (std::size_t i=0;i<array_size;i++) {
+          accu[i].init(i);
         }
 
-        ///////////////////////////////////////////////////////////////////////
-        // Access phase - increment elements in the array at random.
-        std::vector<hpx::lcos::promise<void> > access_phase;
+        srand( time(NULL) );
 
-        // Spawn a future for each remote 
-        for (std::size_t i = 0; i < iterations; ++i) {
-            // Compute the element to access.            
-            std::size_t const rn = std::rand() % array_size;
-            access_phase.push_back(array[rn].add_async());
+        std::vector<hpx::lcos::promise<void> > barrier;
+        for (std::size_t i=0;i<iterations;i++) {
+          std::size_t rn = rand() % array_size;
+          //std::cout << " Random element access: " << rn << std::endl;
+          barrier.push_back(accu[rn].add_async());
         }
 
-        // Wait for the access operations to complete.
-        hpx::lcos::wait(access_phase);
+        hpx::lcos::wait(barrier);
 
-        ///////////////////////////////////////////////////////////////////////
-        // Print phase - print each element in the array. 
-        std::vector<hpx::lcos::promise<void> > print_phase;
-
-        for (std::size_t i = 0; i < array_size; ++i) {
-            // Start an asynchronous print action, which will be executed on
-            // the locality where each element lives. The I/O, however, will
-            // all go to standard output on the console locality.
-            print_phase.push_back(array[i].print_async());
+        std::vector<hpx::lcos::promise<void> > barrier2;
+        for (std::size_t i=0;i<array_size;i++) {
+          barrier2.push_back(accu[i].print_async());
         }
 
-        // Wait for all print operations to finish.
-        hpx::lcos::wait(print_phase);
-
-        // Print the total walltime that the computation took.
-        hpx::cout << "Elapsed time: " << t.elapsed() << " [s]" << hpx::endl;
-
-    } // Ensure things go out of scope before hpx::finalize is called.
+        hpx::lcos::wait(barrier2);
+    }
 
     hpx::finalize();
+
     return 0;
 }
 
@@ -122,7 +105,7 @@ int main(int argc, char* argv[])
 {
     using boost::program_options::value;
 
-    // Configure application-specific options.
+    // Configure application-specific options
     boost::program_options::options_description
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
@@ -131,12 +114,8 @@ int main(int argc, char* argv[])
             "the size of the array")
         ("iterations", value<std::size_t>()->default_value(16),
             "the number of lookups to perform")
-        ("seed", value<std::size_t>()->default_value(0),
-            "the seed for the pseudo random number generator (if 0, a seed "
-            "is choosen based on the current system time)")
         ;
-
-    // Initialize and run HPX.
+    // Initialize and run HPX
     return hpx::init(desc_commandline, argc, argv);
 }
 

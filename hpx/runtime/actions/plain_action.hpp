@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,6 +20,7 @@
 #include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/runtime/components/server/plain_function.hpp>
 #include <hpx/util/unused.hpp>
+#include <hpx/util/void_cast.hpp>
 
 #include <boost/version.hpp>
 #include <boost/shared_ptr.hpp>
@@ -136,15 +137,13 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva)
         {
-            return base_type::construct_continuation_thread_function(
-                HPX_STD_BIND(F), cont);
+            return base_type::construct_continuation_thread_function(cont, F);
         }
 
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<plain_base_result_action0, base_type>();
+            util::void_cast_register_nonvirt<plain_base_result_action0, base_type>();
             base_type::register_base();
         }
 
@@ -155,14 +154,14 @@ namespace hpx { namespace actions
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            ar & boost::serialization::base_object<base_type>(*this);
+            ar & util::base_object_nonvirt<base_type>(*this);
         }
 
     private:
         /// This \a get_thread_function will be invoked to retrieve the thread
         /// function for an action which has to be invoked without continuations.
         HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(naming::address::address_type lva) const
+        get_thread_function(naming::address::address_type lva)
         {
             return construct_thread_function(lva);
         }
@@ -171,25 +170,7 @@ namespace hpx { namespace actions
         /// function for an action which has to be invoked with continuations.
         HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
-            naming::address::address_type lva) const
-        {
-            return construct_thread_function(cont, lva);
-        }
-
-        /// This \a get_thread_function will be invoked to retrieve the thread
-        /// function for an action which has to be invoked without continuations.
-        HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(naming::address::address_type lva,
-            arguments_type const& arg) const
-        {
-            return construct_thread_function(lva);
-        }
-
-        /// This \a get_thread_function will be invoked to retrieve the thread
-        /// function for an action which has to be invoked with continuations.
-        HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(continuation_type& cont,
-            naming::address::address_type lva, arguments_type const& arg) const
+            naming::address::address_type lva)
         {
             return construct_thread_function(cont, lva);
         }
@@ -218,18 +199,11 @@ namespace hpx { namespace actions
           : base_type(priority)
         {}
 
-        Result execute_function(naming::address::address_type lva) const {
-            LTM_(debug)
-                << "plain_result_action0::execute_function: name("
-                << detail::get_action_name<derived_type>()
-                << ")";
-            return F();
-        }
-
-        static Result execute_function_nonvirt(naming::address::address_type lva)
+        static Result 
+        execute_function(naming::address::address_type lva)
         {
             LTM_(debug)
-                << "plain_result_action0::execute_function_nonvirt: name("
+                << "plain_result_action0::execute_function: name("
                 << detail::get_action_name<derived_type>()
                 << ")";
             return F();
@@ -238,8 +212,7 @@ namespace hpx { namespace actions
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<plain_result_action0, base_type>();
+            util::void_cast_register_nonvirt<plain_result_action0, base_type>();
             base_type::register_base();
         }
 
@@ -250,7 +223,7 @@ namespace hpx { namespace actions
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            ar & boost::serialization::base_object<base_type>(*this);
+            ar & util::base_object_nonvirt<base_type>(*this);
         }
 
     private:
@@ -281,23 +254,6 @@ namespace hpx { namespace actions
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
             return data;
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const&)
-        {
-            return this->get_thread_init_data(lva, data);
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const&)
-        {
-            return this->get_thread_init_data(cont, lva, data);
         }
     };
 
@@ -327,7 +283,8 @@ namespace hpx { namespace actions
     public:
         typedef boost::mpl::true_ direct_execution;
 
-        Result execute_function(naming::address::address_type lva) const
+        static Result 
+        execute_function(naming::address::address_type lva)
         {
             LTM_(debug)
                 << "plain_direct_result_action0::execute_function: name("
@@ -336,20 +293,10 @@ namespace hpx { namespace actions
             return F();
         }
 
-        static Result execute_function_nonvirt(naming::address::address_type lva)
-        {
-            LTM_(debug)
-                << "plain_direct_result_action0::execute_function_nonvirt: name("
-                << detail::get_action_name<derived_type>()
-                << ")";
-            return F();
-        }
-
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<plain_direct_result_action0, base_type>();
+            util::void_cast_register_nonvirt<plain_direct_result_action0, base_type>();
             base_type::register_base();
         }
 
@@ -360,7 +307,7 @@ namespace hpx { namespace actions
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            ar & boost::serialization::base_object<base_type>(*this);
+            ar & util::base_object_nonvirt<base_type>(*this);
         }
 
     private:
@@ -378,7 +325,8 @@ namespace hpx { namespace actions
             data.lva = lva;
             data.func = this->construct_thread_function(lva);
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
@@ -393,28 +341,12 @@ namespace hpx { namespace actions
             data.lva = lva;
             data.func = this->construct_thread_function(cont, lva);
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
             return data;
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const&)
-        {
-            return this->get_thread_init_data(lva, data);
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const&)
-        {
-            return this->get_thread_init_data(cont, lva, data);
         }
     };
 
@@ -493,41 +425,26 @@ namespace hpx { namespace actions
             naming::address::address_type lva)
         {
             return base_type::construct_continuation_thread_function_void(
-                HPX_STD_BIND(F), cont);
+                cont, F);
         }
 
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<plain_base_action0, base_type>();
+            util::void_cast_register_nonvirt<plain_base_action0, base_type>();
             base_type::register_base();
         }
 
     private:
         HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(naming::address::address_type lva) const
+        get_thread_function(naming::address::address_type lva)
         {
             return construct_thread_function(lva);
         }
 
         HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(continuation_type& cont,
-            naming::address::address_type lva) const
-        {
-            return construct_thread_function(cont, lva);
-        }
-
-        HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(naming::address::address_type lva,
-            arguments_type const& arg) const
-        {
-            return construct_thread_function(lva);
-        }
-
-        HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(continuation_type& cont,
-            naming::address::address_type lva, arguments_type const& arg) const
+            naming::address::address_type lva)
         {
             return construct_thread_function(cont, lva);
         }
@@ -539,7 +456,7 @@ namespace hpx { namespace actions
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            ar & boost::serialization::base_object<base_type>(*this);
+            ar & util::base_object_nonvirt<base_type>(*this);
         }
     };
 
@@ -565,8 +482,8 @@ namespace hpx { namespace actions
           : base_type(priority)
         {}
 
-        util::unused_type
-        execute_function(naming::address::address_type lva) const
+        static util::unused_type
+        execute_function(naming::address::address_type lva)
         {
             LTM_(debug)
                 << "plain_action0::execute_function: name("
@@ -576,22 +493,10 @@ namespace hpx { namespace actions
             return util::unused;
         }
 
-        static util::unused_type
-        execute_function_nonvirt(naming::address::address_type lva)
-        {
-            LTM_(debug)
-                << "plain_action0::execute_function_nonvirt: name("
-                << detail::get_action_name<derived_type>()
-                << ")";
-            F();
-            return util::unused;
-        }
-
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<plain_action0, base_type>();
+            util::void_cast_register_nonvirt<plain_action0, base_type>();
             base_type::register_base();
         }
 
@@ -602,7 +507,7 @@ namespace hpx { namespace actions
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            ar & boost::serialization::base_object<base_type>(*this);
+            ar & util::base_object_nonvirt<base_type>(*this);
         }
 
     private:
@@ -613,7 +518,8 @@ namespace hpx { namespace actions
             data.lva = lva;
             data.func = this->construct_thread_function(lva);
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
@@ -628,28 +534,12 @@ namespace hpx { namespace actions
             data.lva = lva;
             data.func = this->construct_thread_function(cont, lva);
             data.description = detail::get_action_name<derived_type>();
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
+            data.parent_id =
+                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
             data.parent_prefix = this->parent_locality_;
             data.priority = this->priority_;
             return data;
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const&)
-        {
-            return this->get_thread_init_data(lva, data);
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const&)
-        {
-            return this->get_thread_init_data(cont, lva, data);
         }
     };
 
@@ -678,8 +568,8 @@ namespace hpx { namespace actions
     public:
         typedef boost::mpl::true_ direct_execution;
 
-        util::unused_type
-        execute_function(naming::address::address_type lva) const
+        static util::unused_type
+        execute_function(naming::address::address_type lva)
         {
             LTM_(debug)
                 << "plain_base_action0::execute_function: name("
@@ -689,22 +579,10 @@ namespace hpx { namespace actions
             return util::unused;
         }
 
-        static util::unused_type
-        execute_function_nonvirt(naming::address::address_type lva)
-        {
-            LTM_(debug)
-                << "plain_base_action0::execute_function_nonvirt: name("
-                << detail::get_action_name<derived_type>()
-                << ")";
-            F();
-            return util::unused;
-        }
-
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<plain_direct_action0, base_type>();
+            util::void_cast_register_nonvirt<plain_direct_action0, base_type>();
             base_type::register_base();
         }
 
@@ -715,7 +593,7 @@ namespace hpx { namespace actions
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            ar & boost::serialization::base_object<base_type>(*this);
+            ar & util::base_object_nonvirt<base_type>(*this);
         }
 
     private:
@@ -754,25 +632,8 @@ namespace hpx { namespace actions
             data.priority = this->priority_;
             return data;
         }
-
-        threads::thread_init_data&
-        get_thread_init_data(naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const&)
-        {
-            return this->get_thread_init_data(lva, data);
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva,
-            threads::thread_init_data& data,
-            typename base_type::arguments_type const&)
-        {
-            return this->get_thread_init_data(cont, lva, data);
-        }
     };
-    
+
     template <void (*F)(),
         threads::thread_priority Priority,
         typename Derived>
@@ -789,8 +650,7 @@ namespace hpx { namespace actions
         /// serialization support
         static void register_base()
         {
-            using namespace boost::serialization;
-            void_cast_register<plain_result_action0, base_type>();
+            util::void_cast_register_nonvirt<plain_result_action0, base_type>();
             base_type::register_base();
         }
 
@@ -801,16 +661,80 @@ namespace hpx { namespace actions
         template<class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            ar & boost::serialization::base_object<base_type>(*this);
+            ar & util::base_object_nonvirt<base_type>(*this);
         }
     };
+}}
 
-    ///////////////////////////////////////////////////////////////////////////
-    // bring in the rest of the implementations
-    #include <hpx/runtime/actions/plain_action_implementations.hpp>
+// Disabling the guid initialization stuff for plain actions
+namespace hpx { namespace actions { namespace detail {
+        template <
+            void (*F)()
+          , hpx::threads::thread_priority Priority
+          , typename Enable
+        >
+        struct needs_guid_initialization<
+            hpx::actions::plain_action0<F, Priority>
+          , Enable
+        >
+            : boost::mpl::false_
+        {};
+
+        template <
+            void (*F)()
+          , typename Derived
+          , typename Enable
+        >
+        struct needs_guid_initialization<
+            hpx::actions::plain_direct_action0<F, Derived>
+          , Enable
+        >
+            : boost::mpl::false_
+        {};
+
+        template <
+            typename R
+          , R(*F)()
+          , hpx::threads::thread_priority Priority
+          , typename Enable
+        >
+        struct needs_guid_initialization<
+            hpx::actions::plain_result_action0<R, F, Priority>
+          , Enable
+        >
+            : boost::mpl::false_
+        {};
+
+        template <
+            typename R
+          , R(*F)()
+          , typename Derived
+          , typename Enable
+        >
+        struct needs_guid_initialization<
+            hpx::actions::plain_direct_result_action0<R, F, Derived>
+          , Enable
+        >
+            : boost::mpl::false_
+        {};
+}}}
+
+///////////////////////////////////////////////////////////////////////////
+// bring in the rest of the implementations
+#include <hpx/runtime/actions/plain_action_implementations.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-}}
+/// The macro \a HPX_REGISTER_PLAIN_ACTION_DECLARATION is used create the
+/// forward declarations for plain actions. This is only needed if the plain
+/// action was declared in a header, and is defined in a source file. Use this
+/// macro in the header, and \a HPX_REGISTER_PLAIN_ACTION in the source file
+#define HPX_REGISTER_PLAIN_ACTION_DECLARATION(plain_action)                   \
+    namespace hpx { namespace actions { namespace detail {                    \
+        template <>                                                           \
+        HPX_ALWAYS_EXPORT const char *                                        \
+        get_action_name<plain_action>();                                      \
+    }}}                                                                       \
+/**/
 
 #include <hpx/config/warnings_suffix.hpp>
 

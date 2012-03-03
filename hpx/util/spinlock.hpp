@@ -12,10 +12,12 @@
 #include <boost/thread/locks.hpp>
 #include <boost/smart_ptr/detail/spinlock.hpp>
 
+#include <hpx/util/itt_notify.hpp>
+
 namespace hpx { namespace util
 {
 
-// boost::mutex-compatible spinlock class
+/// boost::mutex-compatible spinlock class
 struct spinlock : boost::noncopyable
 {
   private:
@@ -24,23 +26,40 @@ struct spinlock : boost::noncopyable
   public:
     spinlock()
     {
+        HPX_ITT_SYNC_CREATE(this, "util::spinlock", "");
+
         boost::detail::spinlock l = BOOST_DETAIL_SPINLOCK_INIT;
         m = l;
     }
 
+    ~spinlock()
+    {
+        HPX_ITT_SYNC_DESTROY(this);
+    }
+
     void lock()
     {
+        HPX_ITT_SYNC_PREPARE(this);
         m.lock();
+        HPX_ITT_SYNC_ACQUIRED(this);
     }
 
     bool try_lock()
     {
-        return m.try_lock();
+        HPX_ITT_SYNC_PREPARE(this);
+        if (m.try_lock()) {
+            HPX_ITT_SYNC_ACQUIRED(this);
+            return true;
+        }
+        HPX_ITT_SYNC_CANCEL(this);
+        return false;
     }
 
     void unlock()
     {
+        HPX_ITT_SYNC_RELEASING(this);
         m.unlock();
+        HPX_ITT_SYNC_RELEASED(this);
     }
 
     typedef boost::detail::spinlock* native_handle_type;

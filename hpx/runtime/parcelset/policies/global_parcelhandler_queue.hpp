@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2011 Katelyn Kufahl & Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -40,9 +40,11 @@ namespace hpx { namespace parcelset { namespace policies
             parcels_.enqueue(tmp);
             ++queue_length;
 
+            naming::address addr(tmp->get_destination_addr());
+
             // do some work (notify event handlers)
             BOOST_ASSERT(ph_ != 0);
-            notify_(*ph_, tmp->get_destination_addr());
+            notify_(*ph_, addr);
         }
 
         bool get_parcel(parcel& p)
@@ -50,7 +52,7 @@ namespace hpx { namespace parcelset { namespace policies
             parcel* tmp;
 
             // Remove parcel from queue and decrement queue length.
-            if (parcels_.dequeue(&tmp))
+            if (parcels_.dequeue(tmp))
             {
                 std::swap(p, *tmp);
                 delete tmp;
@@ -92,7 +94,7 @@ namespace hpx { namespace parcelset { namespace policies
 
         boost::signals2::signal_type<
             void(parcelhandler&, naming::address const&)
-          , boost::signals2::keywords::mutex_type<lcos::local_mutex>
+          , boost::signals2::keywords::mutex_type<lcos::local::mutex>
         >::type notify_;
     };
 }}}

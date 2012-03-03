@@ -1,5 +1,5 @@
 //  Copyright (c)      2011 Bryce Lelbach
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -11,13 +11,11 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/util/spinlock.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
-#include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/applier/trigger.hpp>
 #include <hpx/lcos/base_lco.hpp>
 
@@ -40,7 +38,7 @@ struct object_semaphore
 
     typedef components::managed_component_base<object_semaphore> base_type;
 
-    typedef hpx::util::spinlock mutex_type;
+    typedef hpx::lcos::local::spinlock mutex_type;
 
     // define data structures needed for intrusive slist container used for
     // the queues

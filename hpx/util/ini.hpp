@@ -1,5 +1,5 @@
 //  Copyright (c) 2005-2007 Andre Merzky
-//  Copyright (c) 2005-2011 Hartmut Kaiser
+//  Copyright (c) 2005-2012 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying

@@ -1,4 +1,5 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c)      2011 Bryce Adelstein-Lelbach
 //
 //  Parts of this code were taken from the Boost.Asio library
 //  Copyright (c) 2003-2007 Christopher M. Kohlhoff (chris at kohlhoff dot com)
@@ -21,14 +22,21 @@
 namespace hpx { namespace util
 {
     io_service_pool::io_service_pool(std::size_t pool_size,
-            char const* pool_name, HPX_STD_FUNCTION<void()> on_start_thread,
-            HPX_STD_FUNCTION<void()> on_stop_thread)
+            HPX_STD_FUNCTION<void()> on_start_thread,
+            HPX_STD_FUNCTION<void()> on_stop_thread,
+            char const* pool_name)
       : next_io_service_(0), stopped_(false), pool_size_(pool_size),
-        on_start_thread_(on_start_thread), on_stop_thread_(on_stop_thread),
-        pool_name_(pool_name)
+        on_start_thread_(on_start_thread), on_stop_thread_(on_stop_thread)
+#if defined(DEBUG)
+      , pool_name_(pool_name)
+#endif
     {
         if (pool_size == 0)
-            throw std::runtime_error("io_service_pool size is 0");
+        {
+            HPX_THROW_EXCEPTION(bad_parameter,
+                "io_service_pool::io_service_pool",
+                "io_service_pool size is 0");
+        }
 
         // Give all the io_services work to do so that their run() functions
         // will not exit until they are explicitly stopped.
@@ -44,8 +52,10 @@ namespace hpx { namespace util
     io_service_pool::io_service_pool(HPX_STD_FUNCTION<void()> on_start_thread,
             HPX_STD_FUNCTION<void()> on_stop_thread, char const* pool_name)
       : next_io_service_(0), stopped_(false), pool_size_(2),
-        on_start_thread_(on_start_thread), on_stop_thread_(on_stop_thread),
-        pool_name_(pool_name)
+        on_start_thread_(on_start_thread), on_stop_thread_(on_stop_thread)
+#if defined(DEBUG)
+      , pool_name_(pool_name)
+#endif
     {
         for (std::size_t i = 0; i < pool_size_; ++i)
         {
@@ -56,21 +66,18 @@ namespace hpx { namespace util
         }
     }
 
-    void io_service_pool::thread_run(int index)
+    io_service_pool::~io_service_pool()
+    {
+        boost::mutex::scoped_lock l(mtx_);
+        stop_locked();
+        join_locked();
+        clear_locked();
+    }
+
+    void io_service_pool::thread_run(std::size_t index)
     {
         if (on_start_thread_)
             on_start_thread_();
-
-//         boost::system::error_code ec;
-//         do {
-//             // use this thread for the given io service
-//             io_services_[index]->run(ec);   // run io service
-//             if (!ec)
-//                 break;
-//
-//             // reset io service on error and restart the thread loop
-//             io_services_[index]->reset();
-//         } while (true);
 
         // use this thread for the given io service
         io_services_[index]->run();   // run io service
@@ -81,6 +88,8 @@ namespace hpx { namespace util
 
     bool io_service_pool::run(bool join_threads)
     {
+        boost::mutex::scoped_lock l(mtx_);
+
         // Create a pool of threads to run all of the io_services.
         if (!threads_.empty())   // should be called only once
         {
@@ -89,14 +98,15 @@ namespace hpx { namespace util
             BOOST_ASSERT(work_.size() == io_services_.size());
 
             if (join_threads)
-                join();
+                join_locked();
+
             return false;
         }
 
         // Give all the io_services work to do so that their run() functions
         // will not exit until they are explicitly stopped.
         if (!io_services_.empty())
-            clear();
+            clear_locked();
 
         if (io_services_.empty())
         {
@@ -124,20 +134,32 @@ namespace hpx { namespace util
         BOOST_ASSERT(work_.size() == io_services_.size());
 
         if (join_threads)
-            join();
+            join_locked();
 
         return true;
     }
 
     void io_service_pool::join()
     {
+        boost::mutex::scoped_lock l(mtx_);
+        join_locked();
+    }
+
+    void io_service_pool::join_locked()
+    {
         // Wait for all threads in the pool to exit.
-        for (std::size_t i = 0; /*!stopped_ && */i < threads_.size(); ++i)
+        for (std::size_t i = 0; i < threads_.size(); ++i)
             threads_[i]->join();
         threads_.clear();
     }
 
     void io_service_pool::stop()
+    {
+        boost::mutex::scoped_lock l(mtx_);
+        stop_locked();
+    }
+
+    void io_service_pool::stop_locked()
     {
         if (!stopped_) {
             // Explicitly inform all work to exit.
@@ -155,6 +177,12 @@ namespace hpx { namespace util
 
     void io_service_pool::clear()
     {
+        boost::mutex::scoped_lock l(mtx_);
+        clear_locked();
+    }
+
+    void io_service_pool::clear_locked()
+    {
         if (stopped_) {
             next_io_service_ = 0;
             threads_.clear();
@@ -165,6 +193,8 @@ namespace hpx { namespace util
 
     boost::asio::io_service& io_service_pool::get_io_service()
     {
+        boost::mutex::scoped_lock l(mtx_);
+
         // Use a round-robin scheme to choose the next io_service to use.
         boost::asio::io_service& io_service = *io_services_[next_io_service_];
         ++next_io_service_;

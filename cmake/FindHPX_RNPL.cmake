@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2011 Hartmut Kaiser
+# Copyright (c) 2007-2012 Hartmut Kaiser
 # Copyright (c) 2010-2011 Matt Anderson
 # Copyright (c) 2011      Bryce Lelbach
 #
@@ -24,7 +24,6 @@ hpx_find_package(RNPL
   HEADER_PATHS include)
 
 if(RNPL_FOUND AND NOT HPX_SET_RNPL_MACRO)
-  set(HPX_SET_RNPL_MACRO ON CACHE BOOL "Added the RNPL detection macro" FORCE)
   add_definitions(-DSDF_FOUND)
   add_definitions(-DRNPL_FOUND)
 endif()

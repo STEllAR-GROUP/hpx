@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -17,8 +17,6 @@
 namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// \class component_startup_shutdown_base component_registry_base.hpp hpx/runtime/components/component_startup_shutdown_base.hpp
-    ///
     /// The \a component_startup_shutdown_base has to be used as a base class
     /// for all component startup/shutdown registries.
     struct HPX_EXPORT component_startup_shutdown_base
