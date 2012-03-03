@@ -344,17 +344,6 @@ if(PAPI_FOUND)
 endif()
 
 ################################################################################
-# hwloc
-################################################################################
-find_package(HPX_Hwloc)
-if(HWLOC_FOUND)
-  include_directories(${HWLOC_INCLUDE_DIR})
-  link_directories(${HWLOC_LIBRARY_DIR})
-  add_definitions(-DHPX_HAVE_HWLOC)
-  set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${HWLOC_LIBRARY})
-endif()
-
-################################################################################
 # Qthreads (for benchmark comparisons)
 ################################################################################
 find_package(HPX_Qthreads)
@@ -1014,13 +1003,6 @@ hpx_option(HPX_BUILD_RUNTIME BOOL "Build HPX runtime (default: ON)" ON ADVANCED)
 if(HPX_BUILD_RUNTIME)
   add_hpx_pseudo_target(runtime)
   add_subdirectory(runtime)
-endif()
-
-hpx_option(HPX_BUILD_TOOLS BOOL "Build HPX tools (default: OFF)" OFF ADVANCED)
-
-if(HPX_BUILD_TOOLS)
-  add_hpx_pseudo_target(tools)
-  add_subdirectory(tools)
 endif()
 
 if(HPX_DOCUMENTATION_GENERATION)
