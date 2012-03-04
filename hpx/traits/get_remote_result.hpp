@@ -24,7 +24,7 @@ namespace hpx { namespace traits
 
         static Result call(BOOST_RV_REF(RemoteResult) rhs)
         {
-          return Result(boost::forward<RemoteResult>(rhs));
+          return Result(boost::move(rhs));
         }
     };
 
@@ -36,9 +36,14 @@ namespace hpx { namespace traits
             return rhs;
         }
 #if !defined(BOOST_NO_RVALUE_REFERENCES)
-        static Result call(BOOST_RV_REF(Result) rhs)
+        static Result&& call(Result&& rhs)
         {
-            return boost::move(rhs);
+          return boost::move(rhs);
+        }
+#else
+        static ::boost::rv<Result>& call(BOOST_RV_REF(Result) rhs)
+        {
+          return boost::move(rhs);
         }
 #endif
     };

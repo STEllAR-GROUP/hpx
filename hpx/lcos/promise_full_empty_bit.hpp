@@ -118,8 +118,13 @@ namespace hpx { namespace lcos { namespace detail
             // set the received result, reset error status
             try {
                 // store the value
-                data_[slot].set(traits::get_remote_result<Result, T>::call(
-                    boost::forward<T>(result)));
+                typedef typename boost::remove_const<
+                    typename hpx::util::detail::remove_reference<T>::type
+                >::type naked_type;
+
+                data_[slot].set(
+                    traits::get_remote_result<Result, naked_type>::call(
+                        boost::forward<T>(result)));
             }
             catch (hpx::exception const&) {
                 // store the error instead
@@ -247,7 +252,7 @@ namespace hpx { namespace lcos { namespace detail
         void set_result (BOOST_RV_REF(RemoteResult) result)
         {
             // set the received result, reset error status
-            set_data(0, boost::forward<RemoteResult>(result));
+            set_data(0, boost::move(result));
         }
 
         void set_error (boost::exception_ptr const& e)
@@ -476,11 +481,11 @@ namespace hpx { namespace lcos
 
         void set(int slot, BOOST_RV_REF(RemoteResult) result)
         {
-          return (*impl_)->set_data(slot, boost::forward<RemoteResult>(result));
+          return (*impl_)->set_data(slot, boost::move(result));
         }
         void set(BOOST_RV_REF(RemoteResult) result)
         {
-            return (*impl_)->set_data(0, boost::forward<RemoteResult>(result));
+            return (*impl_)->set_data(0, boost::move(result));
         }
 
         void invalidate(int slot, boost::exception_ptr const& e)

@@ -93,7 +93,7 @@ namespace hpx { namespace util
         explicit value_or_error(BOOST_RV_REF(value_type) t)
           : has_value_(has_value)
         {
-            construct_value(boost::forward<value_type>(t));
+            construct_value(boost::move(t));
         }
 
         explicit value_or_error(error_type const& e)
@@ -175,11 +175,11 @@ namespace hpx { namespace util
         {
             if (!stores_value()) {
                 destruct_error();
-                construct_value(boost::forward<value_type>(t));
+                construct_value(boost::move(t));
                 has_value_ = has_value;
             }
             else {
-                assign_value(boost::forward<value_type>(t));
+                assign_value(boost::move(t));
             }
             return *this;
         }
@@ -264,7 +264,7 @@ namespace hpx { namespace util
 
         void construct_value(BOOST_RV_REF(value_type) v)
         {
-            ::new (get_error_address()) value_type(boost::forward<value_type>(v));
+            ::new (get_error_address()) value_type(boost::move(v));
         }
 
         void construct_error(error_type const& e)
@@ -280,7 +280,7 @@ namespace hpx { namespace util
 
         void assign_value(BOOST_RV_REF(value_type) v)
         {
-            *get_value_address() = boost::forward<value_type>(v);
+            *get_value_address() = boost::move(v);
         }
 
         void assign_error(error_type const& e)
