@@ -205,7 +205,8 @@ namespace hpx { namespace util
         }
 
         // access stored data
-        value_type move_value()
+#if !defined(BOOST_NO_RVALUE_REFERENCES)
+        value_type&& move_value()
         {
             if (!stores_value()) {
                 HPX_THROW_EXCEPTION(invalid_status,
@@ -214,6 +215,17 @@ namespace hpx { namespace util
             }
             return boost::move(*get_value_address());
         }
+#else
+        ::boost::rv<value_type>& move_value()
+        {
+            if (!stores_value()) {
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "value_or_error::get_value",
+                    "unexpected retrieval of value")
+            }
+            return boost::move(*get_value_address());
+        }
+#endif
 
         value_type& get_value()
         {
