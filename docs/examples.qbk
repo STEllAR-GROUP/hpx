@@ -40,7 +40,8 @@ This should print:
 
     hello world from OS-thread 0 on locality 0
 
-To include more threads use the command line option ['-t] and type the number of threads that you wish to use.  For example, typing:
+To include more threads use the command line option ['-t] and type the number 
+of threads that you wish to use.  For example, typing:
 
     ./bin/hello_world -t2
 

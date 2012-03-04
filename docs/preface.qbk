@@ -11,9 +11,8 @@
 
 The development of High Performance ParalleX - HPX started back in 2007. At
 that point Hartmut Kaiser became interested in the work done by the ParalleX
-group at the [@http://www.cct.lsu.edu Center for Computation and Technology]
-(a multi-disciplinary research institute at the [@http://www.lsu.edu Louisiana
-State University]). The first implementations were crude at best and the team
+group at the __cct__ (a multi-disciplinary research institute at the __lsu__). 
+The first implementations were crude at best and the team
 had to dimiss those designs entirely. However, over time we learned quite a
 bit about how to design a parallel runtime system which implements the ideas
 of ParalleX, a new (and still experimental) execution model for future high

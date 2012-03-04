@@ -191,7 +191,7 @@ elseif(MSVC)
   if(NOT (MSVC10 OR MSVC11))
     hpx_error("msvc_config" "MSVC x64 2010 or higher is required.")
   elseif(NOT CMAKE_CL_64)
-    hpx_warn("msvc_config" "MSVC 2010 (32Bit) will compile but will fail running larger applications because of limitations in the Windows OS.")
+    hpx_warn("msvc_config" "MSVC (32Bit) will compile but will fail running larger applications because of limitations in the Windows OS.")
   endif()
 endif()
 

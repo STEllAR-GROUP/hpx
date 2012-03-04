@@ -11,10 +11,11 @@
     [id hpx]
     [authors [STE||AR Group, The]]
     [version 0.8.0]
-    [copyright 2011 2012 Louisiana State University]
+    [copyright 2011 2012 The STE||AR Group]
     [license
-        Distributed under the Boost Software License, Version 1.0. (See accompanying
-        file [@../../LICENSE_1_0.txt LICENSE_1_0.txt] or copy at [@http://www.boost.org/LICENSE_1_0.txt])
+        Distributed under the Boost Software License, Version 1.0. (See
+        accompanying file [@../../LICENSE_1_0.txt LICENSE_1_0.txt] or copy at
+        [@http://www.boost.org/LICENSE_1_0.txt])
     ]
 ]
 
@@ -29,6 +30,8 @@
 [def __stellar__                [@http://stellar.cct.lsu.edu STE||AR]]
 [def __stellar_list__           [@email:gopx@cct.lsu.edu HPX General List]]
 [def __stellar_irc__            [@irc://irc.freenode.net:6667/#ste||ar #stellar at Freenet]]
+[def __lsu__                    [@http://www.lsu.edu Louisiana State University (LSU)]]
+[def __cct__                    [@http://www.cct.lsu.edu Center for Computation and Technology (CCT)]]
 
 [def __cmake__                  [@http://www.cmake.org/ CMake]]
 
@@ -48,8 +51,14 @@
 
 [/ Section link shortcuts]
 [def __commandline__            [link hpx.getting_started.commandline HPX Command Line Options]]
+[def __people__                 [link hpx.people People]]
 
 [/ CONTENT]
+
+The STE||AR Group (System Technologies, Emergent Parallelism, and Algorithms
+Research) is a research group at the Center for Computation and Technology
+(Louisiana State University). For a list of people working in that group and
+participating in writing this documentation see __people__.
 
 This documentation is automatically generated for HPX __version__ (from SVN
 revision __svn_revision__) by the Boost QuickBook documentation tool. QuickBook
@@ -60,5 +69,6 @@ can be found in the collection of __boost_tools__.
 [include gettingstarted.qbk]
 [include introduction.qbk]
 [include examples.qbk]
+[include people.qbk]
 
 
