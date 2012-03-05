@@ -255,6 +255,8 @@ cell compute(boost::uint64_t timestep, boost::uint64_t location)
 {
   hpx::lcos::local::mutex::scoped_lock l(grid[timestep][location].mtx);
   
+  cout << (boost::format("calling compute, loc = %1%,ts=%2% \n") % location % timestep) << flush;  
+
   // if it is already computed then just return the value
   if (grid[timestep][location].computed == true)
     return grid[timestep][location];
@@ -265,7 +267,9 @@ cell compute(boost::uint64_t timestep, boost::uint64_t location)
   //initial values
   if (timestep == 0)
     {
+  cout << (boost::format("calling initial_sod, loc = %1%,ts=%2% \n") % location % timestep) << flush;        
       grid[timestep][location] = initial_sod(location);
+  cout << (boost::format("returning value, loc = %1%,ts=%2% \n") % location % timestep) << flush;  
       return grid[timestep][location];
     }  
 
@@ -364,9 +368,6 @@ double get_pressure(cell input)
   double pressure = 0.0;
   double e_kinetic = 0.5*input.mom*input.mom/input.rho;
 
-  // REVIEW: Zach. what's the purpose of e_internal? it's not used anywhere
-  // else in this function.
-  double e_internal = input.etot - e_kinetic;
   if ( (input.etot - e_kinetic) > 0.001*input.etot )
     pressure = (fluid_gamma-1.0)*(input.etot - e_kinetic);
   else
@@ -377,6 +378,9 @@ double get_pressure(cell input)
 
 cell initial_sod(boost::uint64_t location)
 {
+
+  cout << (boost::format("initial_sod, loc = %1%\n") % location) << flush;
+
   // calculate what the x coordinate is here
   double x_here = (location-0.5)*dx+x_min;
   
@@ -402,6 +406,8 @@ cell initial_sod(boost::uint64_t location)
   cell_here.etot = e_internal;  // ONLY true when mom=0, not in general!
   
   // REVIEW: Zach, is the right value to return?
+
+  cout << (boost::format("returning from initial_sod, loc = %1%\n") % location) << flush;
   return cell_here;
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -413,8 +419,8 @@ int hpx_main(
   here = find_here();
   
   // some physics parameters
-  nt = 100;
-  nx = 100;
+  nt = 1;
+  nx = 10;
   fluid_gamma = 1.4;
   
   x_min = -0.5;
