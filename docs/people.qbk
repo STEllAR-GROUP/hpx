@@ -1,0 +1,56 @@
+[/==============================================================================
+    Copyright (C) 2007-2012 Hartmut Kaiser
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+===============================================================================/]
+
+[section People]
+
+The STE||AR Group (pronounced as stellar) stands for "System Technologies,
+Emergent Parallelism, and Algorithms Research". We decided to use this name
+for our group because the focus of our work has shifted over the last months.
+We are a group of faculty, researchers and students working at the __cct__ at
+__lsu__. Everything we do is centered around the ParalleX execution model and
+its implementation in our experimental runtime system HPX (High Performance
+ParalleX). We use HPX for a broad range of scientific applications, helping
+scientists and developers to write code which scales better and shows better
+performance if compared to more conventional programming models such as MPI.
+
+/ParalleX/ is a new (and still experimental) parallel execution model aiming to
+overcome the limitations imposed by the current hardware and the way we write
+applications today. Our group focuses on two types of applications - those
+requiring excellent strong scaling, allowing for a dramatic reduction of
+execution time for fixed workloads and those needing highest level of sustained
+performance through massive parallelism. These applications are either
+presently unable (through conventional practices) to effectively exploit a
+relatively small number of cores in a multi-core system. At the same time
+more often than not these application will not be able to exploit high-end
+computing systems likely to employ hundreds of millions of such cores by the
+end of this decade.
+
+Critical bottlenecks to the effective use of new generation high performance
+computing (HPC) systems include:
+
+* /Starvation/: due to lack of usable application parallelism and means of
+  managing it,
+* /Overhead/: reduction to permit strong scalability, improve efficiency, and
+  enable dynamic resource management,
+* /Latency/: from remote access across system or to local memories,
+* /Contention/: due to multicore chip I/O pins, memory banks, and system
+  interconnects.
+
+The ParalleX model has been devised to address these challenges by enabling a
+new computing dynamic through the application of message-driven computation in
+a global address space context with lightweight synchronization. The work of
+our group is centered around implementing the concepts as defined by ParalleX.
+We develop High Performence ParalleX (HPX) - a parallel runtime system
+currently targetted at conventional machines, such as classical Linux based
+Beowulf clusters and SMP nodes.
+
+We fully understand that the success of HPX (and ParalleX) is very much the
+result of the work of many people.
+
+
+
+[endsect] [/ People]

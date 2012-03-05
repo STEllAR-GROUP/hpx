@@ -175,7 +175,7 @@ which should print `Hello HPX World!` and exit.
 
     [[[*Compilers]]]
 
-    [[Visual C++                 ][2010               ][2010            ]]
+    [[Visual C++                 ][2010               ][2010, VS11 (beta)]]
 
     [[[*Build System]]]
 
