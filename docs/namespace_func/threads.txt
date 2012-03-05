@@ -6,4 +6,78 @@ example_class		this class belongs in **** namespace...
 			I love this class...
 example_module		bla bla bla....
 
+// Public functions / classes
 
+namespace hpx::threads
+
+    std::size_t default_stacksize
+
+    void delete_clone(threads::thread const*)
+
+    struct heap_clone_allocator
+        static threads::thread* allocate_clone(threads::thread const&)
+        static void deallocate_clone(threads::thread const *)
+
+    class thread : public components::managed_component<detail::thread,thread>
+        thread()
+        thread(thread_init_data const&,thread_pool&,thread_state_enum)
+        thread(BOOST_RV_REF(thread_init_data),thread_pool&,thread_state_enum)
+        ~thread()
+
+        // use the thread pool
+        static void *operator new(std::size_t,thread_pool&)
+        static void *operator delete(void *p,thread_pool&)
+
+        // needs to be defined but never called?
+        static void *operator new(std::size_t)
+        static void operator delete(void *,std::size_t)
+
+        // Placement new & delete
+        static void *operator new(std::size_t,void*)
+        static void operator delete(void*,void*)
+
+        thread_id_type get_thread_id() const
+
+        std::size_t get_thread_phase() const
+
+        // I thought prefixes were gone?
+        boost::uint32_t get_parent_locality_prefix() const
+
+        thread_id_type get_parent_thread_id() const
+
+        std::size_t get_parent_thread_phase() const
+
+        naming::address::address_type get_component_id() const
+
+        thread_state get_state() const
+
+        // advanced?
+        thread_state set_state(thread_state_enum)
+
+        bool set_state_tagged(thread_state_enum,thread_state& prevstate,thread_state& newstate)
+        bool restore_state(thread_state_enum newval,thread_state oldval)
+
+        thread_state_ex get_state_ex() const
+
+        thread_state_ex set_state_ex(thread_state_ex)
+
+        // execute
+        thread_state_enum operator()()
+
+        std::string get_description() const
+
+        void set_description(char const *=0)
+
+        std::string get_lco_description() const
+
+        void set_lco_description(char const *=0)
+
+        thread_state get_marked_state() const
+
+        bool is_created_from(void *)
+
+        void reset()
+
+    thread_pool
+        thread_pool()
+        heap_type pool_
