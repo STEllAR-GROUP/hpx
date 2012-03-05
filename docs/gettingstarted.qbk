@@ -148,7 +148,7 @@ Copy the text of this program into a file called example.cpp.
 Now, in the directory where you saved example.cpp, issue the following command:
 
 [pre
-    c++ \`pkg-config --cflags --libs hpx\` -o example
+    c++ \`pkg-config --cflags --libs hpx\` -o example example.cpp
 ]
 
 To test the result, type:
