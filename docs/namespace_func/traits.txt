@@ -1,9 +1,7 @@
-Namespce Traits
+Seems there was only one file with not much in it.
 
-API Component:		Comments:
-example_function	this does bla...
-example_class		this class belongs in **** namespace...
-			I love this class...
-example_module		bla bla bla....
-
-
+file: hpx/hpx/traits.hpp
+    promise_remote_result
+    promise_local_result
+    get_remote_result
+    component_type_database
