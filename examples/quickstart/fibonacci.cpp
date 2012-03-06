@@ -34,6 +34,7 @@ using hpx::finalize;
 using hpx::find_here;
 
 ///////////////////////////////////////////////////////////////////////////////
+//[fib_action
 // forward declaration of the Fibonacci function
 boost::uint64_t fibonacci(boost::uint64_t m);
 
@@ -48,13 +49,17 @@ typedef plain_result_action1<
 // this is to generate the required boilerplate we need for the remote
 // invocation to work
 HPX_REGISTER_PLAIN_ACTION(fibonacci_action);
+//]
 
 ///////////////////////////////////////////////////////////////////////////////
+//[fib_typedef
 // An eager_future is a HPX construct exposing the semantics of a Future
 // object. It starts executing the bound action immediately (eagerly).
 typedef eager_future<fibonacci_action> fibonacci_future;
+//]
 
 ///////////////////////////////////////////////////////////////////////////////
+//[fib_func
 boost::uint64_t fibonacci(boost::uint64_t n)
 {
     if (n < 2)
@@ -71,8 +76,10 @@ boost::uint64_t fibonacci(boost::uint64_t n)
 
     return n1.get() + n2.get();   // wait for the Futures to return their values
 }
+//]
 
 ///////////////////////////////////////////////////////////////////////////////
+//[fib_hpx_main
 int hpx_main(variables_map& vm)
 {
     // extract command line argument, i.e. fib(N)
@@ -84,17 +91,19 @@ int hpx_main(variables_map& vm)
 
         // Create a Future for the whole calculation and wait for it.
         fibonacci_future f(find_here(), n);    // execute locally
-        boost::uint64_t r = f.get();
+        boost::uint64_t r = f.get(); //wait for future f to return value
 
         char const* fmt = "fibonacci(%1%) == %2%\nelapsed time: %3% [s]\n";
         std::cout << (boost::format(fmt) % n % r % t.elapsed());
     }
 
-    finalize();
+    finalize(); //Handles HPX shutdown
     return 0;
 }
+//]
 
 ///////////////////////////////////////////////////////////////////////////////
+//[fib_main
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
@@ -109,4 +118,4 @@ int main(int argc, char* argv[])
     // Initialize and run HPX
     return init(desc_commandline, argc, argv);
 }
-
+//]
