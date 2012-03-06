@@ -16,8 +16,14 @@ programming.
 
 The Fibonacci sequence is a sequence of numbers starting with 0 and 1 where
 every subsequent number is the sum of the previous two numbers. In this example
-we will use HPX to calculating the value of the n-th postition of the Fibonacci
-sequece. The source code for this exaple in in the SVN repository:
+we will use HPX to calculate the value of the n-th postition of the Fibonacci
+sequece. In order to compute this problem in parallel, we will use a tool known
+as a future. Futures are packets of work that are sent to woker nodes that at a later time can be called to return their values. This allows HPX to schedule work early in a program so that later when the funtion value is needed it will be 
+avalable.
+
+[heading Setup]
+
+The source code for this exaple in in the SVN repository:
 [^parallex/hpx/examples/quickstart/fibonacci.cpp]
 [fixme Add link to source here].
 
@@ -63,12 +69,59 @@ Since this code is written in C++ we will begin with main. Here you can
 see that in HPX main is only used to initialize the runtime system. It is 
 important to note that command line options are defined here. You can see
 below that our programs '--n-value' is set by the Boost library function
-desc_commandline.add_options(). In the desctription, the defalut value of
+[^desc_commandline.add_options()]. In the desctription, the defalut value of
 the variable is set to 10. This is why when we ran the program for the first
 time without using the '--n-value' option the program returned the 10th
 value of the Fibonacci sequence. The last part of the description is the
 text that appears when a user uses the '--help' option to see what command
 line options are avalable.
+
+[import ../examples/quickstart/fibonacci.cpp]
+[fib_main]
+
+The [^init()] function in main calls hxp_main which is where the ["meat] of the
+program is. Below we can see that the basic program is simple. The command
+line option 'n-value' is read in, a timer is set, two functions are called,
+and the data is printed out. 
+
+[fib_hpx_main]
+
+Upon a closer look we see that the first of 
+the two functions is of type [^fibonacci_future]. This was defined earlier
+in the code:
+
+[fib_typedef]
+
+But wait, [^eager_future] is a type but what is [^fibonacci_action]? Again
+we turn to the code and find this section right before [^fibonacci_future]
+was typedefined:
+
+[fib_action]
+
+Finally we are getting somewhere! In this block of code the function 
+[^fibonacci] is declared. After the declaration, the function was wrapped in
+an action called [^plain_result_action1] (we use [^plain_result_action1]
+because the function takes one argument). This action was then ["registered]
+as an HPX action.
+
+This picture should now start making sense. The function [^fibonacci] is
+wrapped in an action [^plain_result_action1], which in turn was wrapped
+in a future [^eager_future]. Now that we understand where all these variables
+are comming from lets look at the function [^fibanacci]:
+
+[fib_func]
+
+On first inspection this block of code is straight forward. First if n < 2,
+meaning if n = 0 or 1, then return 0 or 1 (as we recall the first position 
+of the Fibanacci sequence is 0 and the second is one). Next call
+[^fibonacci_future] twice and subtract n before it is passed to the function. 
+Finaly get the values of the futures and return their sum. But hold-the-phone
+by calling [^fibonacci_future] we are calling the function recursively! This 
+is where the power of futures is displayed. [^fibonacci_future] will continue
+to be called until the value of n = 0 or 1 (it increments down each time
+the function is called) at which point the values of the futures will be
+returned by [^get()] and the value of the n-th position of the Fibonacci
+sequence will be calculated.
 
 [endsect] [/Fibonacci]
 
