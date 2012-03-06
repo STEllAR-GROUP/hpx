@@ -4,17 +4,16 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx.hpp>
-//#include <hpx/util/parse_command_line.hpp>
+#include <cctype>
 
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
-#include <boost/chrono/chrono.hpp>
 #include <boost/program_options.hpp>
-#include <boost/algorithm/string.hpp>
+#include <boost/generator_iterator.hpp>
 
+#include <hpx/hpx.hpp>
+#include <hpx/util/thread_mapper.hpp>
 #include <hpx/components/papi/server/papi.hpp>
-#include <hpx/components/papi/stubs/papi.hpp>
 #include <hpx/components/papi/util/papi.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -31,120 +30,179 @@ namespace hpx { namespace performance_counters { namespace papi
 {
     using boost::program_options::options_description;
     using boost::program_options::variables_map;
-    using boost::algorithm::to_lower;
+    using hpx::performance_counters::counter_info;
+    using hpx::util::thread_mapper;
+    using util::papi_call;
 
-    // startup function for PAPI counter component 
-    void startup()
+#define NS_STR "hpx::performance_counters::papi::"
+
+    // create PAPI counter
+    hpx::naming::gid_type create_papi_counter(counter_info const& info,
+                                              hpx::error_code& ec)
     {
-        using hpx::performance_counters::papi::util::papi_call;
+        // verify the validity of the counter instance name
+        hpx::performance_counters::counter_path_elements paths;
+        get_counter_path_elements(info.fullname_, paths, ec);
+        if (ec) return hpx::naming::invalid_gid;
 
-        char const *const srcloc = "hpx::performance_counters::papi::startup()";
-        
-        // get processed command line options
-        variables_map vm = util::get_options();
-        bool multiplexed = false;
-
-        // make sure PAPI environment is initialized
-        util::papi_init();
-        // enable library level multiplexing if requested
-        if (vm.count("papi-multiplex"))
+        if (paths.parentinstance_is_basename_)
         {
-            papi_call(PAPI_multiplex_init(),
-                "cannot enable counter multiplexing", srcloc);
-            multiplexed = true;
-            // FIXME: setting of multiplexing period if other than default
+            HPX_THROWS_IF(ec, hpx::bad_parameter,
+                NS_STR "create_papi_counter()",
+                "unsupported counter instance parent name: "+
+                    paths.parentinstancename_);
+            return hpx::naming::invalid_gid;
         }
-        if (vm.count("papi-domain"))
+
+        // validate thread label taken from counter name
+        thread_mapper& tm = hpx::get_runtime().get_thread_mapper();
+        boost::uint32_t tix =
+            tm.get_thread_index(paths.instancename_.c_str(), paths.instanceindex_);
+        if (tix == thread_mapper::invalid_index)
+            HPX_THROW_EXCEPTION(hpx::bad_parameter,
+                NS_STR "create_papi_counter()",
+                "cannot find thread specified in "+info.fullname_);
+        // create a local PAPI counter component
+        hpx::naming::gid_type id;
+        try
         {
-            std::string ds = vm["papi-domain"].as<std::string>();
-            int dom = util::map_domain(ds);
-            boost::format fmt("cannot switch to \"%s\" domain monitoring");
-            papi_call(PAPI_set_domain(dom), boost::str(fmt % ds).c_str(), srcloc);
+            id = hpx::components::server::create_one<papi_counter_type>(info);
         }
-        
-        // obtain local prefix
-        boost::uint32_t const prefix = hpx::get_locality_id();
-
-        // create counter component for every monitored event
-        if (vm.count("papi-events"))
+        catch (hpx::exception const& e)
         {
-            std::vector<std::string> events;
-            util::get_local_events(events,
-                vm["papi-events"].as<std::vector<std::string> >());
+            if (&ec == &hpx::throws)
+                throw;
+            ec = make_error_code(e.get_error(), e.what());
+            return hpx::naming::invalid_gid;
+        }
 
-            for (size_t i = 0; i < events.size(); ++i)
+        if (&ec != &hpx::throws)
+            ec = hpx::make_success_code();
+        return id;
+    }
+
+    // discover available PAPI counters
+    bool discover_papi_counters(
+        hpx::performance_counters::counter_info const& info,
+        HPX_STD_FUNCTION<hpx::performance_counters::discover_counter_func> const& f,
+        hpx::error_code& ec)
+    {
+        typedef util::event_info_generator<true> all_info_gen;
+
+        hpx::performance_counters::counter_info specinfo = info;
+        using hpx::performance_counters::counter_path_elements;
+
+        // decompose the counter name
+        counter_path_elements p;
+        hpx::performance_counters::counter_status status =
+            get_counter_path_elements(info.fullname_, p, ec);
+        if (!status_is_valid(status)) return false;
+
+        // obtain known OS thread categories
+        std::vector<char const *> labels;
+        hpx::util::thread_mapper& tm =
+            get_runtime().get_thread_mapper();
+        tm.get_registered_labels(labels);
+
+        // fill in common path segments for all counters
+        counter_path_elements cpe;
+        cpe.objectname_ = p.objectname_;
+        cpe.parentinstancename_ = "locality#<*>";
+        cpe.parentinstanceindex_ = -1;
+        cpe.instanceindex_ = -1;
+
+        // enumerate PAPI events
+        all_info_gen gen;
+        boost::generator_iterator_generator<all_info_gen >::type gi =
+            boost::make_generator_iterator(gen);
+        for ( ; *gi != 0; ++gi)
+        {
+            // iterate over possible thread names
+            std::vector<char const *>::const_iterator it;
+            for (it = labels.begin(); it != labels.end(); ++it)
             {
-                // convert event name to internal PAPI code
-                int ecode;
-                boost::format err("PAPI event %s not supported");
-                papi_call(PAPI_event_name_to_code((char *)events[i].c_str(), &ecode),
-                    boost::str(err % events[i]).c_str(), srcloc);
-                // get short counter description
-                PAPI_event_info_t einfo;
-                std::string edesc = "no description";
-                if (PAPI_get_event_info(ecode, &einfo) == PAPI_OK)
-                { // convert the first char to lowercase
-                    edesc = einfo.short_descr[0];
-                    to_lower(edesc);
-                    edesc += einfo.short_descr+1;
-                }
+                cpe.instancename_ = *it;
+                cpe.instancename_ += "#<*>";
+                cpe.countername_ = (*gi)->symbol;
 
-                // name of the counter instance
-                boost::format instance_name("/papi(locality#%d)/%s");
-                // define the counter type
-                raw_counter_type_data papi_counter_data;
-                boost::format counter_type_name("/papi/%s"),
-                    counter_type_desc("returns the current count of \"%s\"");
-                papi_counter_data.name_ = boost::str(counter_type_name % events[i]);
-                papi_counter_data.type_ = counter_raw;
-                papi_counter_data.version_ = HPX_PERFORMANCE_COUNTER_V1;
-                papi_counter_data.helptext_ = boost::str(counter_type_desc % edesc);
-                // install PAPI counter type
-                install_counter_types(&papi_counter_data, 1);
-
-                // full info of the counter to create, help text and version will be
-                // complemented from counter type info as specified above
-                counter_info info(counter_raw,
-                    boost::str(instance_name % prefix % events[i]));
-
-                // create the PAPI performance counter component locally
-                hpx::naming::id_type id(
-                    hpx::components::server::create_one<papi_counter_type>(info),
-                    hpx::naming::id_type::managed);
-
-                // install the created counter, un-installation is automatic
-                install_counter(id, info);
-
-                // enforce multiplexing on event set (has to be done once and
-                // before starting the count)
-                if (i == 0 && vm.count("papi-multiplex"))
-                    stubs::papi_counter::enable_multiplexing(id,
-                        vm["papi-multiplex"].as<long>());
-
-                // configure counter to monitor the specified event
-                if (!stubs::papi_counter::set_event(id, ecode, true))
-                {
-                    boost::format err("failed to activate event %s");
-                    HPX_THROW_EXCEPTION(hpx::no_success, srcloc,
-                        boost::str(err % events[i]));
-                }
+                status = get_counter_name(cpe, specinfo.fullname_, ec);
+                if (!status_is_valid(status)) return false;
+                std::string evstr((*gi)->short_descr);
+                specinfo.helptext_ = "returns the count of occurrences of \""+
+                    evstr+"\" in "+(*it)+" instance";
+                if (!f(specinfo, ec) || ec) return false;
             }
         }
+        if (&ec != &hpx::throws)
+            ec = hpx::make_success_code();
+        return true;
+    }
+
+    // enable multiplexing with specified period for thread tix
+    bool enable_multiplexing(int evset, int interval)
+    {
+        switch (PAPI_get_multiplex(evset))
+        {
+        case PAPI_OK:              // not yet multiplexed
+            if (PAPI_assign_eventset_component(evset, 0) != PAPI_OK)
+                return false;
+            if (!interval)
+            { // enable multiplexing with default interval
+                return PAPI_set_multiplex(evset) != PAPI_OK;
+            }
+            break;
+        case PAPI_EINVAL:          // already multiplexed
+            if (!interval) return true;
+            break; // still need to change interval
+        default:                   // error
+            return false;
+        }
+        // force the requested interval
+        PAPI_option_t popt;
+        popt.multiplex.eventset = evset;
+        popt.multiplex.ns = interval;
+        popt.multiplex.flags = PAPI_MULTIPLEX_DEFAULT;
+        return PAPI_set_opt(PAPI_MULTIPLEX, &popt) == PAPI_OK;
+    }
+
+    // startup function for PAPI counter component
+    void startup()
+    {
+        using namespace hpx::performance_counters;
+
+        // define & install generic PAPI counter type
+        generic_counter_type_data const papi_cnt_type =
+        {
+            "/papi",
+            counter_raw,
+            "the current count of occurrences of a specific PAPI event",
+            HPX_PERFORMANCE_COUNTER_V1,
+            &create_papi_counter,
+            &discover_papi_counters
+        };
+        install_counter_types(&papi_cnt_type, 1);
     }
 
     bool check_startup(HPX_STD_FUNCTION<void()>& startup_func)
     {
+        // PAPI initialization
+        if (PAPI_is_initialized() == PAPI_NOT_INITED)
+        {
+            if (PAPI_library_init(PAPI_VER_CURRENT) != PAPI_VER_CURRENT)
+            {
+                HPX_THROW_EXCEPTION(hpx::no_success,
+                    "hpx::performance_counters::papi::check_startup()",
+                    "PAPI library initialization failed (version mismatch)");
+            }
+        }
         // retrieve command line
         variables_map vm = util::get_options();
 
         if (util::check_options(vm))
-        { // perform full module startup (counters must be created)
+        { // perform full module startup (counters will be used)
             startup_func = startup;
             return true;
         }
-        // list known events?
-        if (vm.count("papi-list-events"))
-            util::list_events(vm["papi-list-events"].as<std::string>());
 
         return false;
     }
