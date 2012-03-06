@@ -25,8 +25,8 @@ and which locality it came from.  The output will look something like this:
 [heading Setup]
 
 The source file is already created for you and could be found in the svn
-repository: [^parallex/hpx/examples/quickstart/hello_world.cpp] or a
-here [fixme add a link here].
+repository: [^parallex/hpx/examples/quickstart/hello_world.cpp]
+[fixme add a link here].
 
 To compile this file type:
 
@@ -79,7 +79,8 @@ compute nodes.
 
 The rest of this program uses other mostly self explainitory functions.
 For more information on those functions veiw our API [fixme link to API].
-For more information on HPX theory please read [fixme link to HPX Theory].
+For more information on HPX theory please read our HPX theory section
+[fixme link to HPX Theory].
 
 [endsect] [/Hello World]
 

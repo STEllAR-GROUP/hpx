@@ -8,10 +8,9 @@
 [section People]
 
 The STE||AR Group (pronounced as stellar) stands for "System Technologies,
-Emergent Parallelism, and Algorithms Research". We decided to use this name
-for our group because the focus of our work has shifted over the last months.
-We are a group of faculty, researchers and students working at the __cct__ at
-__lsu__. Everything we do is centered around the ParalleX execution model and
+Emergent Parallelism, and Algorithms Research". We are a group of faculty, 
+researchers, and students working at the __cct__ at __lsu__. Everything we 
+do is centered around the ParalleX execution model and
 its implementation in our experimental runtime system HPX (High Performance
 ParalleX). We use HPX for a broad range of scientific applications, helping
 scientists and developers to write code which scales better and shows better
@@ -49,8 +48,22 @@ currently targetted at conventional machines, such as classical Linux based
 Beowulf clusters and SMP nodes.
 
 We fully understand that the success of HPX (and ParalleX) is very much the
-result of the work of many people.
+result of the work of many people. To see a list of who is contributing see
+our talbes below.
 
+[heading The STE||AR Group]
 
+[table:id Contributors
+  [[Name]           [Institution]]
+  [[Hartmut Kaiser] [_cct_, _lsu_]]
+  [[Adrian Serio]   [_cct_, _lsu_]]
+]
+
+[heading Contributors to this Document]
+
+[table:id Authors
+  [[Name] [Institution]]
+  [[Adrian Serio] [_cct_, _lsu_]]
+]
 
 [endsect] [/ People]
