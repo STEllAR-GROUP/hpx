@@ -55,15 +55,15 @@ our talbes below.
 
 [table:id Contributors
   [[Name]           [Institution]]
-  [[Hartmut Kaiser] [_cct_, _lsu_]]
-  [[Adrian Serio]   [_cct_, _lsu_]]
+  [[Hartmut Kaiser] [__cct__, __lsu__]]
+  [[Adrian Serio]   [__cct__, __lsu__]]
 ]
 
 [heading Contributors to this Document]
 
 [table:id Authors
   [[Name] [Institution]]
-  [[Adrian Serio] [_cct_, _lsu_]]
+  [[Adrian Serio] [__cct__, __lsu__]]
 ]
 
 [endsect] [/ People]
