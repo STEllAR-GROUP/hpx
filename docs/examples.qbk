@@ -12,6 +12,67 @@ Here are some more examples for our reader to get more familiar with HPX style
 programming.
 
 [/////////////////////////////////////////////////////////////////////////////]
+[section:fibonacci Fibonacci]
+
+The Fibonacci sequence is a sequence of numbers starting with 0 and 1 where
+every subsequent number is the sum of the previous two numbers. In this example
+we will use HPX to calculating the value of the n-th postition of the Fibonacci
+sequece. The source code for this exaple in in the SVN repository:
+[^parallex/hpx/examples/quickstart/fibonacci.cpp]
+[fixme Add link to source here].
+
+To compile this file type:
+  
+  make examples.quickstart.fibonacci
+
+If you know how many cores your machine has use make's '-j' option to increase
+the number of parallel pocesses that are runing. You should start your number
+of cores plus an additional process for maximum speed. For instance, if your
+machine has 4 cores you would type:
+
+  make examples.quickstart.fibonacci -j5
+
+for the fastset build.
+
+To run the program type:
+
+  ./bin/fibonacci
+
+This should print (time should be approxamate):
+
+  fibonacci(10) == 55
+  elapsed time: 0.00186288 [s]
+
+This run used the default setting of calculating the tenth place of the
+Fibonacci sequence. To declare which position you want to calculate, use
+the '--n-value' option. Addtitionally you can use the '--hpx:threads' option
+to declare how many threads you wish to use when running the program. For 
+instance,running:
+
+  ./bin/fibonacci --n-value 20 --hpx:threads 5
+
+Will yeild:
+
+  fibonacci(20) == 6765
+  elapsed time: 0.233827 [s]
+
+[heading Walk-through]
+
+Now that you can compile and run the code lets look at how the code works. 
+Since this code is written in C++ we will begin with main. Here you can
+see that in HPX main is only used to initialize the runtime system. It is 
+important to note that command line options are defined here. You can see
+below that our programs '--n-value' is set by the Boost library function
+desc_commandline.add_options(). In the desctription, the defalut value of
+the variable is set to 10. This is why when we ran the program for the first
+time without using the '--n-value' option the program returned the 10th
+value of the Fibonacci sequence. The last part of the description is the
+text that appears when a user uses the '--help' option to see what command
+line options are avalable.
+
+[endsect] [/Fibonacci]
+
+[/////////////////////////////////////////////////////////////////////////////]
 [section:hello_world Hello World v2]
 
 You have already looked at a simple ["Hello World] example.  In this version
@@ -40,10 +101,10 @@ This should print:
 
     hello world from OS-thread 0 on locality 0
 
-To include more threads use the command line option ['-t] and type the number 
-of threads that you wish to use.  For example, typing:
+To include more threads use the command line option ['--hpx:threads] and 
+type the number of threads that you wish to use.  For example, typing:
 
-    ./bin/hello_world -t2
+    ./bin/hello_world --hpx:threads 2
 
 will yield:
 
