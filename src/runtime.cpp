@@ -487,7 +487,7 @@ namespace hpx
         char const* context)
     {
         // initialize PAPI
-        papi_support_.register_thread(context);
+        thread_support_.register_thread(context);
 
         // initialize our TSS
         this->runtime::init_tss();
@@ -506,7 +506,7 @@ namespace hpx
         this->runtime::deinit_tss();
 
         // reset PAPI support
-        papi_support_.unregister_thread();
+        thread_support_.unregister_thread();
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
