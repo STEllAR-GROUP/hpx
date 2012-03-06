@@ -337,11 +337,6 @@ hpx_check_for_thread_safe_hdf5(HDF5_THREAD_SAFE)
 # PAPI event counters
 ################################################################################
 find_package(HPX_PAPI)
-if(PAPI_FOUND)
-  include_directories(${PAPI_INCLUDE_DIR})
-  link_directories(${PAPI_LIBRARY_DIR})
-  set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${PAPI_LIBRARY})
-endif()
 
 ################################################################################
 # hwloc
