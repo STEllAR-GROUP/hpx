@@ -38,6 +38,7 @@
 [def __boost__                  [@http://www.boost.org/ Boost]]
 [def __boost_tools__            [@http://www.boost.org/tools/index.html Boost Tools]]
 [def __boost_getting_started__  [@http://www.boost.org/doc/libs/release/more/getting_started/index.html Getting Started]]
+[def __boost_doc__              [@http://www.boost.org/doc/ Boost Documentation]]
 
 [/ optional external dependencies]
 [def __hwloc__                  [@http://www.open-mpi.org/projects/hwloc/ Portable Hardware Locality (hwloc)]]

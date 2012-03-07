@@ -18,8 +18,10 @@ The Fibonacci sequence is a sequence of numbers starting with 0 and 1 where
 every subsequent number is the sum of the previous two numbers. In this example
 we will use HPX to calculate the value of the n-th postition of the Fibonacci
 sequece. In order to compute this problem in parallel, we will use a tool known
-as a future. Futures are packets of work that are sent to woker nodes that at a later time can be called to return their values. This allows HPX to schedule work early in a program so that later when the funtion value is needed it will be 
-avalable.
+as a future. Futures are packets of work that are sent to woker nodes that 
+at a later time can be called by the internal function '.get()' to return 
+their values. This allows HPX to schedule work early in a program so that 
+later when the funtion value is needed it will be avalable.
 
 [heading Setup]
 
@@ -68,8 +70,10 @@ Now that you can compile and run the code lets look at how the code works.
 Since this code is written in C++ we will begin with main. Here you can
 see that in HPX main is only used to initialize the runtime system. It is 
 important to note that command line options are defined here. You can see
-below that our programs '--n-value' is set by the Boost library function
-[^desc_commandline.add_options()]. In the desctription, the defalut value of
+below that our programs '--n-value' is set by the instance of the Boost 
+library class [^options_description] using the public member function 
+[^.add_options()] (to learn more about this class see the __boost_doc__).
+In the desctription, the defalut value of
 the variable is set to 10. This is why when we ran the program for the first
 time without using the '--n-value' option the program returned the 10th
 value of the Fibonacci sequence. The last part of the description is the
@@ -154,7 +158,7 @@ This should print:
 
     hello world from OS-thread 0 on locality 0
 
-To include more threads use the command line option ['--hpx:threads] and 
+To include more threads use the command line option '--hpx:threads' and 
 type the number of threads that you wish to use.  For example, typing:
 
     ./bin/hello_world --hpx:threads 2
@@ -187,14 +191,32 @@ an ["action].  We do this by declaring this:
 
 [hello_world_action_wrapper]
 
-Another way of thinking about this technique is as follows: functions are
-wrapped in promises which are wrapped in actions which are distributed to
-compute nodes.
+Another way of thinking about this technique is as follows: functions 
+(the work to be done) are wrapped in promises which are wrapped in 
+actions which are distributed to compute nodes.
 
-The rest of this program uses other mostly self explainitory functions.
-For more information on those functions veiw our API [fixme link to API].
-For more information on HPX theory please read our HPX theory section
-[fixme link to HPX Theory].
+Now it is time to look at the [^hellow_world_foreman] which was wrapped in
+the action above:
+
+[hello_world_foreman]
+
+Here the set 'attendance' is keeping track of which localities have printed
+out the hello world statement. When the locality prints out the statement
+the future returns to wait which invokes the lambda funtion '&'.  This 
+funtion '&' erases the thread from the set 'attendance' thus letting 
+[^hello_world_forman] know how many localites still needed to print out
+["hello world]. However, if the future returns a value of -1 the thread is
+skipped and that thread remains in 'attendance' for another cycle of the 
+while loop.
+
+Finally, let us look at [^hello_world_worker].  Here [^hello_world_woker]
+checks to see if it is on the target locality. If it is the correct locality,
+it prints out the hello world statement and returns the OS thread number
+to [^wait()] in [^hello_world_forman].  If it is not the correct locality,
+it returns a value of -1 which when returned to [^hello_world_forman]
+leaves that locality's thread number in the set 'attendance'.
+
+[hello_world_worker]
 
 [endsect] [/Hello World]
 
