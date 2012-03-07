@@ -55,9 +55,11 @@ using hpx::flush;
 // end up being 'stolen' by another OS-thread.
 
 ///////////////////////////////////////////////////////////////////////////////
+//[hello_world_worker
 std::size_t hello_world_worker(std::size_t desired)
 {
-    std::size_t current = hpx::get_worker_thread_num();
+    std::size_t current = hpx::get_worker_thread_num(); //Returns OS thread 
+                                                        // number on worker
 
     if (current == desired)
     {
@@ -79,16 +81,21 @@ typedef plain_result_action1<std::size_t, std::size_t, hello_world_worker>
     hello_world_worker_action;
 
 HPX_REGISTER_PLAIN_ACTION(hello_world_worker_action);
+//]
 
 ///////////////////////////////////////////////////////////////////////////////
+//[hello_world_foreman
 void hello_world_foreman()
 {
-    std::size_t const os_threads = get_os_thread_count();
-    id_type const prefix = find_here();
+    std::size_t const os_threads = get_os_thread_count(); //Get the number of OS
+                                                          // threads
+    id_type const prefix = find_here(); //Determine on which locality function
+                                        // is being executed
 
     std::set<std::size_t> attendance;
     for (std::size_t os_thread = 0; os_thread < os_threads; ++os_thread)
-        attendance.insert(os_thread);
+        attendance.insert(os_thread); //Keeping track of the number of threads
+                                      // who have reported back
 
     // Retry until all PX-threads got executed by their designated OS-thread.
     while (!attendance.empty())
@@ -106,8 +113,11 @@ void hello_world_foreman()
         // future until the action gets executed on the right OS-thread
         wait(futures, [&](std::size_t, std::size_t t)
             { if (std::size_t(-1) != t) attendance.erase(t); });
+        // it is important to note that wait returns two values which can be
+        // passed to a function that takes two variables
     }
 }
+//]
 
 // Define the boilerplate code necessary for the function 'hello_world_foreman'
 // to be invoked as an HPX action
@@ -132,11 +142,11 @@ int hpx_main(variables_map&)
         BOOST_FOREACH(id_type const& node, prefixes)
         {
             futures.push_back(async<hello_world_foreman_action>(node)); /*<
-            asyncronoulsy call hello_world_foreman_action>*/
+            asyncronous call [^hello_world_foreman_action]>*/
         }
 
         wait(futures);    /* Wait for all IO to finish */ /*<
-        Wait() will cause the OS thread to wait for all the promises stored
+        [^wait()] will cause the OS thread to wait for all the promises stored
            in futures to be executed before continuing the program>*/
     }
 
@@ -159,10 +169,13 @@ int main(int argc, char* argv[])
     return init(desc_commandline, argc, argv);
 }
 /*`
-  In HPX main is used to initialize the runtime system and pass the command line
-  arguments to the program.  If you wish to add command line options to your
-  program you would add them here using desc_commandline.add_options() [fixme link
-  to API] (see the API for more details).  Init() calls hpx_main after setting up
-  HPX, which is where the mechanics of our program is written.
+  In HPX main is used to initialize the runtime system and pass the command 
+  line arguments to the program.  If you wish to add command line options to 
+  your program you would add them here using the instance of the Boost 
+  class [^options_description], and invocting the public member function
+  [^.add_options()] (see __boost_doc__ or the [link hpx.examples.fibonacci
+  Fibonacci Example] for more details).  [^init()] calls 
+  hpx_main after setting up HPX, which is where the mechanics of our program 
+  is written.
  */
 //]
