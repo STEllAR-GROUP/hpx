@@ -107,9 +107,9 @@ namespace hpx { namespace util
 
     public:
         // erroneous thread index
-        static boost::uint32_t const invalid_index = (boost::uint32_t)-1;
+        static boost::uint32_t invalid_index;
         // erroneous low-level thread ID
-        static unsigned long const invalid_tid = (unsigned long)-1;
+        static unsigned long invalid_tid;
 
         thread_mapper() { }
         ~thread_mapper();

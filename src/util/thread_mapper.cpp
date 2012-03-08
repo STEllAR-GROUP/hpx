@@ -15,6 +15,11 @@
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
+    // static members
+    boost::uint32_t thread_mapper::invalid_index = (boost::uint32_t)-1;
+    unsigned long thread_mapper::invalid_tid = (unsigned long)-1;
+
+    ///////////////////////////////////////////////////////////////////////////
     // methods
     bool thread_mapper::null_cb(boost::uint32_t) {return true;}
 
