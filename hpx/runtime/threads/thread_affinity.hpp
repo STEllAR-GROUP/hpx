@@ -158,7 +158,7 @@ namespace hpx { namespace threads
                 if (hwloc_compare_types(HWLOC_OBJ_PU, obj->type) == 0)
                 {
                     do {
-                        mask |= (1ULL << obj->logical_index);
+                        mask |= (static_cast<boost::uint64_t>(1) << obj->os_index);
                         obj = hwloc_get_next_child(topology, parent, obj);
                     } while (obj != NULL && hwloc_compare_types(HWLOC_OBJ_PU, obj->type) == 0);
                     return;
@@ -253,23 +253,34 @@ namespace hpx { namespace threads
                 if (numa_nodes == -1)
                     return error;
 
+                std::size_t num_of_cores_per_numa_node = num_of_cores / numa_nodes;
                 boost::uint64_t node_affinity_mask = 0;
-                boost::uint64_t mask = 0x01LL;
+                boost::uint64_t mask = 0;
 
                 node_affinity_mask = get_numa_node_affinity_mask(num_thread, numa_sensitive);
-                if (node_affinity_mask == 0)
-                    return error;
 
-                mask = least_significant_bit(node_affinity_mask) <<
-                    (affinity / numa_nodes);
+                std::size_t node_index = affinity % num_of_cores_per_numa_node;
 
-                while (!(mask & node_affinity_mask)) {
-                    mask <<= 1LL;
-                    if (0 == mask)
-                        mask = 0x01LL;
+                // We need to detect the node_index-th bit which is set in
+                // node_affinity_mask, this bit must be set in the result mask
+                boost::uint64_t count = 0;
+                for(boost::uint64_t i = 0; i < 64; ++i)
+                {
+                    // is i-th bit set?
+                    if(node_affinity_mask & (static_cast<boost::uint64_t>(1)<<i))
+                    {
+                        if(count == node_index)
+                        {
+                            mask = (static_cast<boost::uint64_t>(1)<<i);
+                            break;
+                        }
+                        ++count;
+                    }
                 }
+
                 return mask;
             }
+
 
             hwloc_topology_destroy(topology);
             return error;
@@ -315,9 +326,13 @@ namespace hpx { namespace threads
 
             hwloc_bitmap_set_ith_ulong(cpuset, 0, mask & 0xFFFFFFFF);
             hwloc_bitmap_set_ith_ulong(cpuset, 1, (mask >> 32) & 0xFFFFFFFF);
-            hwloc_bitmap_singlify(cpuset);
+            //hwloc_bitmap_singlify(cpuset);
 
             result = true;
+            char buf[1024];
+            hwloc_bitmap_snprintf(buf, 1024, cpuset);
+
+
             if (hwloc_set_cpubind(topology, cpuset,
                   HWLOC_CPUBIND_STRICT | HWLOC_CPUBIND_THREAD))
             {
