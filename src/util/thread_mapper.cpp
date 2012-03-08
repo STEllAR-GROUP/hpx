@@ -57,7 +57,8 @@ namespace hpx { namespace util
             unmap_thread(it);
         }
         // increment category count and create mappings
-        boost::uint32_t tix = thread_map_[id] = thread_info_.size();
+        boost::uint32_t tix = thread_map_[id] =
+            static_cast<boost::uint32_t>(thread_info_.size());
         thread_info_.push_back(
             thread_data(l, label_count_[l], get_papi_thread_id()));
         label_map_[thread_id(l, label_count_[l]++)] = tix;
@@ -113,7 +114,7 @@ namespace hpx { namespace util
         return (tix < thread_info_.size())? thread_info_[tix].instance_: invalid_index;
     }
 
-    std::uint32_t thread_mapper::get_thread_index(char const *label,
+    boost::uint32_t thread_mapper::get_thread_index(char const *label,
                                                        boost::uint32_t inst) const
     {
         mutex_type::scoped_lock m(mtx_);
@@ -127,7 +128,7 @@ namespace hpx { namespace util
     {
         mutex_type::scoped_lock m(mtx_);
 
-        return thread_info_.size();
+        return static_cast<boost::uint32_t>(thread_info_.size());
     }
 
     void thread_mapper::get_registered_labels(std::vector<char const *>& labels) const

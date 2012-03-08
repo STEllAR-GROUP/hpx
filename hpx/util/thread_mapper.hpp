@@ -20,6 +20,8 @@
 #include <boost/cstdint.hpp>
 #include <boost/function.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -135,7 +137,7 @@ namespace hpx { namespace util
         boost::uint32_t get_thread_instance(boost::uint32_t tix) const;
 
         // returns unique index based on group label and instance number
-        std::uint32_t get_thread_index(char const *grp,
+        boost::uint32_t get_thread_index(char const *grp,
                                        boost::uint32_t inst) const;
 
         // returns the number of threads registered so far
@@ -145,5 +147,7 @@ namespace hpx { namespace util
         void get_registered_labels(std::vector<char const *>&) const;
     };
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif
