@@ -69,12 +69,12 @@ namespace hpx { namespace actions
     class plain_base_result_action0
       : public action<
             components::server::plain_function<Derived>,
-            function_result_action_arg0, Result, boost::fusion::vector<>,
+            function_result_action_arg0, Result, hpx::util::tuple0<>,
             Derived, Priority>
     {
     public:
         typedef Result result_type;
-        typedef boost::fusion::vector<> arguments_type;
+        typedef hpx::util::tuple0<> arguments_type;
         typedef action<
             components::server::plain_function<Derived>,
             function_result_action_arg0, result_type, arguments_type,
@@ -357,12 +357,12 @@ namespace hpx { namespace actions
     class plain_base_action0
       : public action<
             components::server::plain_function<Derived>,
-            function_action_arg0, util::unused_type, boost::fusion::vector<>,
+            function_action_arg0, util::unused_type, hpx::util::tuple0<>,
             Derived, Priority>
     {
     public:
         typedef util::unused_type result_type;
-        typedef boost::fusion::vector<> arguments_type;
+        typedef hpx::util::tuple0<> arguments_type;
         typedef action<
             components::server::plain_function<Derived>,
             function_action_arg0, result_type, arguments_type,

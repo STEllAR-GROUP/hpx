@@ -68,12 +68,12 @@ namespace hpx { namespace actions
     class BOOST_PP_CAT(base_result_action, N)
       : public action<
             Component, Action, Result,
-            boost::fusion::vector<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
+            BOOST_PP_CAT(hpx::util::tuple, N)<BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)>,
             Derived, Priority>
     {
     public:
         typedef Result result_type;
-        typedef boost::fusion::vector<
+        typedef BOOST_PP_CAT(hpx::util::tuple, N)<
             BOOST_PP_REPEAT(N, HPX_REMOVE_QUALIFIERS, _)> arguments_type;
         typedef action<Component, Action, result_type, arguments_type,
                        Derived, Priority>

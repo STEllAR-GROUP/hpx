@@ -372,7 +372,8 @@ namespace hpx { namespace actions
         template <class Archive>
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
-            util::serialize_sequence(ar, arguments_);
+            //util::serialize_sequence(ar, arguments_);
+            ar & arguments_;
             ar & parent_locality_;
             ar & parent_id_;
             ar & parent_phase_;
