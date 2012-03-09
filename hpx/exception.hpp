@@ -64,6 +64,7 @@ namespace hpx
         commandline_option_error = 30,
         serialization_error = 31,
         unhandled_exception = 32,
+        kernel_error = 33,
         last_error,
 
         // force this enum type to be at least 16 bits.
@@ -105,6 +106,7 @@ namespace hpx
         "commandline_option_error",
         "serialization_error",
         "unhandled_exception",
+        "kernel_error",
         ""
     };
 
