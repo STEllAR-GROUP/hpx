@@ -110,7 +110,7 @@ namespace hpx { namespace lcos { namespace local
 
         // Assignment
         packaged_task(BOOST_RV_REF(packaged_task) rhs)
-          : future_data_(rhs.future_data_),
+          : task_(rhs.future_data_),
             future_obtained_(rhs.future_obtained_)
         {
             rhs.task_.reset();
