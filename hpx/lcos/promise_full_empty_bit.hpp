@@ -333,6 +333,7 @@ namespace hpx { namespace lcos
         void reset()
         {
             (*impl_)->reset();
+            future_obtained_ = false;
         }
 
         /// \brief Return the global id of this \a future instance
