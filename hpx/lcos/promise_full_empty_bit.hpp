@@ -58,9 +58,10 @@ namespace hpx { namespace lcos { namespace detail
         public util::future_data<Result, RemoteResult>
     {
     protected:
+        typedef util::future_data<Result, RemoteResult> future_data_type;
+        typedef typename future_data_type::result_type result_type;
         typedef boost::exception_ptr error_type;
         typedef util::value_or_error<result_type> data_type;
-        typedef util::future_data<Result, RemoteResult> future_data_type;
 
     public:
         // This is the component id. Every component needs to have an embedded
