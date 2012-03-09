@@ -16,6 +16,7 @@
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/action_manager.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
@@ -137,6 +138,11 @@ namespace hpx
             return thread_support_;
         }
 
+        threads::topology const& get_topology() const
+        {
+            return topology_;
+        }
+
         /// \brief Install all performance counters related to this runtime
         ///        instance
         void register_counter_types();
@@ -194,6 +200,8 @@ namespace hpx
         // certain components (such as PAPI) require all threads to be
         // registered with the library
         util::thread_mapper thread_support_;
+
+        threads::topology topology_;
 
         bool stopped_;
     };
