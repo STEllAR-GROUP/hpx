@@ -1,4 +1,3 @@
-//  Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 //  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,7 +13,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/runtime/threads/thread.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/threads/thread_affinity.hpp>
 #include <hpx/runtime/threads/policies/thread_deque.hpp>
 
 #include <boost/noncopyable.hpp>
@@ -70,8 +69,7 @@ struct abp_queue_scheduler : boost::noncopyable
     abp_queue_scheduler(init_parameter_type const& init)
       : queues_(init.num_queues_),
         curr_queue_(0),
-        numa_sensitive_(init.numa_sensitive_),
-        topology_(get_topology())
+        numa_sensitive_(init.numa_sensitive_)
     {
         BOOST_ASSERT(init.num_queues_ != 0);
         for (std::size_t i = 0; i < init.num_queues_; ++i)
@@ -234,10 +232,8 @@ struct abp_queue_scheduler : boost::noncopyable
 
         // steal work items: first try to steal from other cores in the
         // same NUMA node
-        boost::uint64_t core_mask
-            = topology_.get_thread_affinity_mask(num_thread, numa_sensitive_);
-        boost::uint64_t node_mask
-            = topology_.get_numa_node_affinity_mask(num_thread, numa_sensitive_);
+        boost::uint64_t core_mask = get_thread_affinity_mask(num_thread, numa_sensitive_);
+        boost::uint64_t node_mask = get_numa_node_affinity_mask(num_thread, numa_sensitive_);
 
         std::size_t queue_size = queues_.size();
         if (core_mask && node_mask) {
@@ -307,7 +303,6 @@ private:
     std::vector<thread_deque*> queues_; ///< this manages all the PX threads
     boost::atomic<std::size_t> curr_queue_;
     bool numa_sensitive_;
-    topology const& topology_;
 };
 
 }}}

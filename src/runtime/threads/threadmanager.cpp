@@ -8,7 +8,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/threads/thread_affinity.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
@@ -1245,6 +1245,12 @@ namespace hpx { namespace threads
 
         manage_active_thread_count count(thread_count_);
 
+        // set affinity on Linux systems or when using hwloc
+        std::size_t pu_num = scheduler_.get_pu_num(num_thread);
+        LTM_(info) << "tfunc(" << num_thread
+                   << "): will run on processing unit: " << pu_num;
+        set_affinity(pu_num, scheduler_.numa_sensitive());
+
         std::size_t idle_loop_count = 0;
 
         // run the work queue
@@ -1409,30 +1415,17 @@ namespace hpx { namespace threads
 
             state_.store(running);
 
-            topology const& topology_ = get_topology();
-
             std::size_t thread_num = num_threads;
             while (thread_num-- != 0) {
-                std::size_t pu_num = scheduler_.get_pu_num(thread_num);
-
-                LTM_(info) << "run: create OS thread " << thread_num
-                           << " running on processing unit " << pu_num;
+                LTM_(info) << "run: create OS thread: " << thread_num;
 
                 // create a new thread
                 threads_.push_back(new boost::thread(boost::bind(
                     &threadmanager_impl::tfunc, this, thread_num)));
 
-                error_code ec;
-                // set the new threads affinity (on all platforms) 
-                topology_.set_thread_affinity
-                    (threads_.back(), pu_num, scheduler_.numa_sensitive(), ec);
-
-                if (ec)
-                {
-                    LTM_(warning) << "run: setting thread affinity on OS "
-                                     "thread " << thread_num << " failed with: "
-                                  << ec.get_message();
-                }
+                // set the new threads affinity (on Windows systems)
+                std::size_t pu_num = scheduler_.get_pu_num(thread_num);
+                set_affinity(threads_.back(), pu_num, scheduler_.numa_sensitive());
             }
 
             // start timer pool as well
@@ -1443,7 +1436,7 @@ namespace hpx { namespace threads
             startup_->wait();
         }
         catch (std::exception const& e) {
-            LTM_(fatal) << "run: failed with: " << e.what();
+            LTM_(fatal) << "run: failed with:" << e.what();
 
             // trigger the barrier
             while (num_threads-- != 0 && !startup_->wait())
@@ -1619,10 +1612,8 @@ namespace hpx { namespace threads
     std::size_t get_numa_node_number()
     {
         bool numa_sensitive = false;
-        std::size_t thread_num
-            = threadmanager_base::get_worker_thread_num(&numa_sensitive);
-        return get_topology().get_numa_node_number(
-            get_thread_manager().get_pu_num(thread_num));
+        std::size_t thread_num = threadmanager_base::get_worker_thread_num(&numa_sensitive);
+        return get_numa_node(get_thread_manager().get_pu_num(thread_num), numa_sensitive);
     }
 
     ///////////////////////////////////////////////////////////////////////////

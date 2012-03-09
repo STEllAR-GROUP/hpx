@@ -14,7 +14,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/runtime/threads/thread.hpp>
-#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/threads/thread_affinity.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
 
 #include <boost/noncopyable.hpp>
@@ -76,8 +76,7 @@ namespace hpx { namespace threads { namespace policies
         local_queue_scheduler(init_parameter_type const& init)
           : queues_(init.num_queues_),
             curr_queue_(0),
-            numa_sensitive_(init.numa_sensitive_),
-            topology_(get_topology())
+            numa_sensitive_(init.numa_sensitive_)
         {
             BOOST_ASSERT(init.num_queues_ != 0);
             for (std::size_t i = 0; i < init.num_queues_; ++i)
@@ -241,10 +240,8 @@ namespace hpx { namespace threads { namespace policies
             if (0 == added) {
                 // steal work items: first try to steal from other cores in the
                 // same numa node
-                boost::uint64_t core_mask
-                    = topology_.get_thread_affinity_mask(num_thread, numa_sensitive_);
-                boost::uint64_t node_mask
-                    = topology_.get_numa_node_affinity_mask(num_thread, numa_sensitive_);
+                boost::uint64_t core_mask = get_thread_affinity_mask(num_thread, numa_sensitive_);
+                boost::uint64_t node_mask = get_numa_node_affinity_mask(num_thread, numa_sensitive_);
 
                 if (core_mask && node_mask) {
                     boost::uint64_t m = 0x01LL;
@@ -328,7 +325,6 @@ namespace hpx { namespace threads { namespace policies
         std::vector<thread_queue<false>*> queues_;   ///< this manages all the PX threads
         boost::atomic<std::size_t> curr_queue_;
         bool numa_sensitive_;
-        topology const& topology_;
     };
 }}}
 
