@@ -90,7 +90,7 @@ namespace hpx { namespace util
     BOOST_PP_CAT(a, N) = boost::move(BOOST_PP_CAT(other.a, N));                 \
 
 #define HPX_UTIL_TUPLE_SERIALIZE(Z, N, D)                                       \
-    this->serialize(ar, BOOST_PP_CAT(a, N));                                    \
+    this->do_serialize(ar, BOOST_PP_CAT(a, N));                                    \
 
 
 namespace hpx { namespace util
@@ -123,12 +123,12 @@ namespace hpx { namespace util
         }
 
         template <typename Archive, typename T>
-        void serialize(Archive & ar, T & t)
+        void do_serialize(Archive & ar, T & t)
         {
             ar & t;
         }
         template <typename Archive>
-        void serialize(Archive & ar, boost::fusion::unused_type)
+        void do_serialize(Archive & ar, boost::fusion::unused_type)
         {
         }
 
