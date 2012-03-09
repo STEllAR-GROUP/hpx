@@ -227,12 +227,12 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         // Search for duplicates among the partitions
         // this determines the communication pattern for finalization
-        //std::vector<hpx::lcos::future< std::vector<bool> > > whohasthisedge_phase;
-        //for (int64_t j=1;j<= nglobalverts;j++) {
-        //  whohasthisedge_phase.push_back(async<whohasthisedge_action>(hpx::find_here(),j,point_components));
-        //}
+        std::vector<hpx::lcos::future< std::vector<bool> > > whohasthisedge_phase;
+        for (int64_t j=1;j<= nglobalverts;j++) {
+          whohasthisedge_phase.push_back(hpx::lcos::async<whohasthisedge_action>(hpx::find_here(),j,point_components));
+        }
         // put a callback here instead of search_vector
-        //hpx::lcos::wait(whohasthisedge_phase,boost::bind(&whohasthisedge_callback,_1,_2,boost::ref(point_components)));
+        hpx::lcos::wait(whohasthisedge_phase,boost::bind(&whohasthisedge_callback,_1,_2,boost::ref(point_components)));
 
         double kernel1_time = kernel1time.elapsed();
         std::cout << "Elapsed time during kernel 1: " << kernel1_time << " [s]" << std::endl;
@@ -250,13 +250,13 @@ int hpx_main(boost::program_options::variables_map &vm)
           }
           hpx::lcos::wait(bfs_phase);
         }
-        //{
-        //  std::vector<hpx::lcos::future<void> > resolve_conflict_phase;
-        //  for (std::size_t i=0;i<num_pe;i++) {
-        //    resolve_conflict_phase.push_back(points[i].resolve_conflict_async());
-        //  }
-        //  hpx::lcos::wait(resolve_conflict_phase);
-        //}
+        {
+          std::vector<hpx::lcos::future<void> > resolve_conflict_phase;
+          for (std::size_t i=0;i<num_pe;i++) {
+            resolve_conflict_phase.push_back(points[i].resolve_conflict_async());
+          }
+          hpx::lcos::wait(resolve_conflict_phase);
+        }
 
         double k2time = kernel2time.elapsed();
 
