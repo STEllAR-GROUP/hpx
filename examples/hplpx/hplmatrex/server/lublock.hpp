@@ -89,15 +89,15 @@ namespace hpx { namespace components { namespace server
             &lublock::get_needed_future> getFuture_action;
 
         //futures
-        typedef hpx::lcos::eager_future<server::lublock::getData_action> dataFuture;
-        typedef hpx::lcos::eager_future<server::lublock::getRows_action> rowFuture;
-        typedef
-            hpx::lcos::eager_future<server::lublock::getColumns_action> columnFuture;
-        typedef hpx::lcos::eager_future<server::lublock::getFuture_action> getFuture;
-        typedef hpx::lcos::eager_future<server::lublock::gcorner_action> gcFuture;
-        typedef hpx::lcos::eager_future<server::lublock::gleft_action> glFuture;
-        typedef hpx::lcos::eager_future<server::lublock::gtop_action> gtoFuture;
-        typedef hpx::lcos::eager_future<server::lublock::gtrail_action> gtrFuture;
+//         typedef hpx::lcos::eager_future<server::lublock::getData_action> dataFuture;
+//         typedef hpx::lcos::eager_future<server::lublock::getRows_action> rowFuture;
+//         typedef
+//             hpx::lcos::eager_future<server::lublock::getColumns_action> columnFuture;
+//         typedef hpx::lcos::eager_future<server::lublock::getFuture_action> getFuture;
+//         typedef hpx::lcos::eager_future<server::lublock::gcorner_action> gcFuture;
+//         typedef hpx::lcos::eager_future<server::lublock::gleft_action> glFuture;
+//         typedef hpx::lcos::eager_future<server::lublock::gtop_action> gtoFuture;
+//         typedef hpx::lcos::eager_future<server::lublock::gtrail_action> gtrFuture;
 
         //the following variables require the above typedefs
         glFuture*  nextLeft;

@@ -8,7 +8,7 @@
 
 #include <boost/move/move.hpp>
 #include <hpx/components/remote_object/stubs/remote_object.hpp>
-#include <hpx/lcos/promise.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/runtime/naming/address.hpp>
 
@@ -73,7 +73,7 @@ namespace hpx { namespace components
         naming::id_type gid_;
 
         template <typename F>
-        lcos::promise<
+        lcos::future<
             typename boost::result_of<F(T &)>::type
         >
         operator<=(F const & f) const

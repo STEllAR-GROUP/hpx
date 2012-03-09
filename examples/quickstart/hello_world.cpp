@@ -36,7 +36,7 @@ using hpx::naming::id_type;
 using hpx::actions::plain_action0;
 using hpx::actions::plain_result_action1;
 
-using hpx::lcos::promise;
+using hpx::lcos::future;
 using hpx::lcos::async;
 using hpx::lcos::wait;
 
@@ -100,7 +100,7 @@ void hello_world_foreman()
     // Retry until all PX-threads got executed by their designated OS-thread.
     while (!attendance.empty())
     {
-        std::vector<promise<std::size_t> > futures;
+        std::vector<future<std::size_t> > futures;
         futures.reserve(attendance.size());
         BOOST_FOREACH(std::size_t os_thread, attendance)
         {
@@ -136,7 +136,7 @@ int hpx_main(variables_map&)
         std::vector<id_type> prefixes = find_all_localities();/*<Returns the number
                                                                  of localities>*/
 
-        std::vector<promise<void> > futures;/*<A promise is a chunk of work which
+        std::vector<future<void> > futures;/*<A future is a chunk of work which
                                                is executed after being assigned>*/
         futures.reserve(prefixes.size());
         BOOST_FOREACH(id_type const& node, prefixes)

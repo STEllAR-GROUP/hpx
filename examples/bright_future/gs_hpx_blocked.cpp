@@ -14,7 +14,7 @@
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/include/iostreams.hpp>
 
 #include "server/remote_lse.hpp"
@@ -152,7 +152,7 @@ void gs(
         // this is not something to worry about right now.
         // it creates the remote_lse_type and registers it with the hpx agas
         // server. a remote_id is created, this is a "pointer" to our (possibly)
-        // remotely created LSE. 
+        // remotely created LSE.
         hpx::components::component_type type
             = hpx::components::get_component_type<remote_lse_type>();
 
@@ -176,22 +176,20 @@ void gs(
 
         // initalization of hpx component ends here.
 
-        typedef hpx::lcos::promise<void> promise_type;
+        typedef hpx::lcos::future<void> promise_type;
 
         // The init future:
         // a hpx future takes an action. this action is a remotely callable
         // member function on an instance of remote_lse_type
         // the init function has the signature
         // void(unsigned n_x, unsigned n_y, double hx, double hy)
-        typedef
-            hpx::lcos::eager_future<remote_lse_type::init_action>
-            init_future;
 
         // we create a temporary init_future object. the first parameter is the
         // id on which object we want to call the action. the remaining
         // parameters are the parameters to be passed to the action, see comment
         // above
-        init_future(remote_id, n_x, n_y, n_x, n_y, hx, hy).get();
+        hpx::lcos::async<remote_lse_type::init_action>(
+            remote_id, n_x, n_y, n_x, n_y, hx, hy).get();
 
         // this type represents our grid, instead of doubles, we just use
         // promises as value types.
@@ -215,10 +213,6 @@ void gs(
         // set our initial values, setting the top boundary to be a dirichlet
         // boundary condition
         {
-            typedef
-                hpx::lcos::eager_future<remote_lse_type::init_rhs_blocked_action>
-                init_rhs_future;
-            
             // we opened another scope to just have this vector temporarily, we
             // won't need it after the initializiation
             for(size_type y = 0, y_block = 0; y < n_y; y += block_size, ++y_block)
@@ -226,7 +220,7 @@ void gs(
                 for(size_type x = 0, x_block = 0; x < n_x; x += block_size, ++x_block)
                 {
                     init_rhs_promises(x_block, y_block) =
-                        init_rhs_future(
+                        hpx::lcos::async<remote_lse_type::init_rhs_blocked_action>(
                             remote_id
                           , init_rhs_fun()
                           , range_type(x, (std::min)(n_x, x + block_size))
@@ -234,10 +228,6 @@ void gs(
                         );
                 }
             }
-
-            typedef
-                hpx::lcos::eager_future<remote_lse_type::init_u_blocked_action>
-                init_u_future;
 
             // initialize our grid. This will serve as the dependency of the
             // first loop below.
@@ -247,7 +237,7 @@ void gs(
                 {
                     // set the promise of the initialization.
                     iteration_dependencies[0](x_block, y_block) =
-                        init_u_future(   // invoke the init future.
+                        hpx::lcos::async<remote_lse_type::init_u_blocked_action>(   // invoke the init future.
                             remote_id
                           , init_u_fun() // pass the initialization function
                           , range_type(x, (std::min)(n_x, x + block_size))
@@ -262,14 +252,6 @@ void gs(
             //    promise.get();
             //}
         }
-
-        typedef
-            hpx::lcos::eager_future<remote_lse_type::apply_action>
-            apply_future;
-
-        typedef
-            hpx::lcos::eager_future<remote_lse_type::apply_region_action>
-            apply_region_future;
 
         high_resolution_timer t;
 
@@ -303,7 +285,7 @@ void gs(
                             deps.push_back(&init_rhs_promises(x,y));
                         // these are our dependencies to update this specific
                         // block
-                        
+
                         // we need to be sure to wait for the previous iteration.
                         deps.push_back(&prev(x,y));
 
@@ -338,7 +320,7 @@ void gs(
                             //         u(x, y) = update_fun()(x, y, u, rhs, ...)
                             // the loop will be executed after all the dependencies
                             // are finished.
-                            apply_region_future(
+                            hpx::lcos::async<remote_lse_type::apply_region_action>(
                                 remote_id
                               , update_fun()
                               , x_range
@@ -368,7 +350,8 @@ void gs(
             {
                 for(size_type y = 0; y < n_y; ++y)
                 {
-                    apply_future(remote_id, out, x, y, std::vector<promise_type>()).get();
+                    hpx::lcos::async<remote_lse_type::apply_action>(
+                        remote_id, out, x, y, std::vector<promise_type>()).get();
                 }
                 (*f.file) << "\n";
             }

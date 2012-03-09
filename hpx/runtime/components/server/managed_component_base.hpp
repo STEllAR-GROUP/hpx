@@ -7,6 +7,13 @@
 #if !defined(HPX_COMPONENTS_MANAGED_COMPONENT_BASE_JUN_04_2008_0902PM)
 #define HPX_COMPONENTS_MANAGED_COMPONENT_BASE_JUN_04_2008_0902PM
 
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/exception.hpp>
+#include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/components/server/wrapper_heap.hpp>
+#include <hpx/runtime/components/server/wrapper_heap_list.hpp>
+#include <hpx/util/static.hpp>
+
 #include <boost/throw_exception.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/mpl/if.hpp>
@@ -14,16 +21,28 @@
 #include <boost/detail/atomic_count.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/preprocessor/repeat.hpp>
+#include <boost/intrusive_ptr.hpp>
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/exception.hpp>
-#include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/components/server/wrapper_heap.hpp>
-#include <hpx/runtime/components/server/wrapper_heap_list.hpp>
-#include <hpx/util/static.hpp>
-#include <hpx/util/stringstream.hpp>
+#include <stdexcept>
 
-#include <iostream>
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace traits
+{
+    template <typename Component>
+    struct managed_component_ctor_policy<
+        Component, typename Component::has_managed_component_base>
+    {
+        typedef typename Component::ctor_policy type;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Component>
+    struct managed_component_dtor_policy<
+        Component, typename Component::has_managed_component_base>
+    {
+        typedef typename Component::dtor_policy type;
+    };
+}}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
@@ -31,21 +50,16 @@ namespace hpx { namespace components
     template <typename Component, typename Derived>
     class managed_component;
 
-    template <typename T, typename Enable = void>
-    struct component_ctor_policy
-    {
-        typedef detail::construct_without_back_ptr type;
-    };
-
     ///////////////////////////////////////////////////////////////////////////
     namespace detail_adl_barrier
     {
-        template <typename Component, typename Managed, typename BackPtrTag>
+        template <typename BackPtrTag>
         struct init;
 
-        template <typename Component, typename Managed>
-        struct init<Component, Managed, detail::construct_with_back_ptr>
+        template <>
+        struct init<traits::construct_with_back_ptr>
         {
+            template <typename Component, typename Managed>
             static void call(Component*& component, Managed* this_)
             {
                 typedef typename Managed::wrapped_type wrapped_type;
@@ -53,7 +67,8 @@ namespace hpx { namespace components
             }
 
 #define MANAGED_COMPONENT_CONSTRUCT_INIT1(Z, N, _)                            \
-            template <BOOST_PP_ENUM_PARAMS(N, typename T)>                    \
+            template <typename Component, typename Managed,                   \
+                BOOST_PP_ENUM_PARAMS(N, typename T)>                          \
             static void call(Component*& component, Managed* this_,           \
                 BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t))                  \
             {                                                                 \
@@ -67,9 +82,10 @@ namespace hpx { namespace components
 #undef MANAGED_COMPONENT_CONSTRUCT_INIT1
         };
 
-        template <typename Component, typename Managed>
-        struct init<Component, Managed, detail::construct_without_back_ptr>
+        template <>
+        struct init<traits::construct_without_back_ptr>
         {
+            template <typename Component, typename Managed>
             static void call(Component*& component, Managed* this_)
             {
                 typedef typename Managed::wrapped_type wrapped_type;
@@ -78,7 +94,8 @@ namespace hpx { namespace components
             }
 
 #define MANAGED_COMPONENT_CONSTRUCT_INIT2(Z, N, _)                            \
-            template <BOOST_PP_ENUM_PARAMS(N, typename T)>                    \
+            template <typename Component, typename Managed,                   \
+                BOOST_PP_ENUM_PARAMS(N, typename T)>                          \
             static void call(Component*& component, Managed* this_,           \
                 BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t))                  \
             {                                                                 \
@@ -92,16 +109,105 @@ namespace hpx { namespace components
 
 #undef MANAGED_COMPONENT_CONSTRUCT_INIT2
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        // This is used by the component implementation to decide whether to
+        // delete the managed_component instance it depends on.
+        template <typename DtorTag>
+        struct destroy_backptr;
+
+        template <>
+        struct destroy_backptr<traits::managed_object_is_lifetime_controlled>
+        {
+            template <typename BackPtr>
+            static void call(BackPtr* back_ptr)
+            {
+                // The managed_component's controls the lifetime of the
+                // component implementation.
+                delete back_ptr;
+            }
+        };
+
+        template <>
+        struct destroy_backptr<traits::managed_object_controls_lifetime>
+        {
+            template <typename BackPtr>
+            static void call(BackPtr*)
+            {
+                // The managed_component's lifetime is controlled by the
+                // component implementation. Do nothing.
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        // This is used by the managed_component to decide whether to
+        // delete the component implementation depending on it.
+        template <typename DtorTag>
+        struct destroy;
+
+        template <>
+        struct destroy<traits::managed_object_is_lifetime_controlled>
+        {
+            template <typename Component>
+            static void call(Component* component)
+            {
+                // The managed_component's lifetime is controlled by the
+                // component implementation. Do nothing.
+            }
+
+            template <typename Component>
+            static void addref(Component* component)
+            {
+                intrusive_ptr_add_ref(component);
+            }
+
+            template <typename Component>
+            static void release(Component* component)
+            {
+                intrusive_ptr_release(component);
+            }
+        };
+
+        template <>
+        struct destroy<traits::managed_object_controls_lifetime>
+        {
+            template <typename Component>
+            static void call(Component* component)
+            {
+                // The managed_component's controls the lifetime of the
+                // component implementation.
+                component->finalize();
+                delete component;
+            }
+
+            template <typename Component>
+            static void addref(Component*)
+            {
+            }
+
+            template <typename Component>
+            static void release(Component*)
+            {
+            }
+        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Wrapper, typename CtorPolicy>
+    template <typename Component, typename Wrapper,
+        typename CtorPolicy, typename DtorPolicy>
     class managed_component_base
       : public detail::managed_component_tag, boost::noncopyable
     {
     public:
         typedef void has_managed_component_base;
         typedef CtorPolicy ctor_policy;
+        typedef DtorPolicy dtor_policy;
+
+        // make sure that we have a back_ptr whenever we need to control the
+        // lifetime of the managed_component
+        BOOST_STATIC_ASSERT((
+            boost::is_same<ctor_policy, traits::construct_without_back_ptr>::value ||
+            boost::is_same<dtor_policy, traits::managed_object_controls_lifetime>::value));
 
         managed_component_base()
           : back_ptr_(0)
@@ -111,6 +217,13 @@ namespace hpx { namespace components
           : back_ptr_(back_ptr)
         {
             BOOST_ASSERT(back_ptr);
+        }
+
+        // The implementation of the component is responsible for deleting the
+        // actual managed component object
+        ~managed_component_base()
+        {
+            detail_adl_barrier::destroy_backptr<dtor_policy>::call(back_ptr_);
         }
 
         // components must contain a typedef for wrapping_type defining the
@@ -140,7 +253,8 @@ namespace hpx { namespace components
     private:
         template <typename, typename>
         friend class managed_component;
-        template <typename, typename, typename>
+
+        template <typename>
         friend struct detail_adl_barrier::init;
 
         void set_back_ptr(components::managed_component<Component, Wrapper>* bp)
@@ -151,13 +265,6 @@ namespace hpx { namespace components
         }
 
         managed_component<Component, Wrapper>* back_ptr_;
-    };
-
-    template <typename Component>
-    struct component_ctor_policy<
-        Component, typename Component::has_managed_component_base>
-    {
-        typedef typename Component::ctor_policy type;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -260,8 +367,8 @@ namespace hpx { namespace components
         managed_component()
           : component_(0)
         {
-            detail_adl_barrier::init<Component, managed_component,
-                typename component_ctor_policy<Component>::type
+            detail_adl_barrier::init<
+                typename traits::managed_component_ctor_policy<Component>::type
             >::call(component_, this);
         }
 
@@ -270,8 +377,8 @@ namespace hpx { namespace components
         managed_component(BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t))        \
           : component_(0)                                                     \
         {                                                                     \
-            detail_adl_barrier::init<Component, managed_component,            \
-                typename component_ctor_policy<Component>::type               \
+            detail_adl_barrier::init<                                         \
+                typename traits::managed_component_ctor_policy<Component>::type \
             >::call(component_, this, BOOST_PP_ENUM_PARAMS(N, t));            \
         }                                                                     \
     /**/
@@ -281,12 +388,13 @@ namespace hpx { namespace components
 
 #undef MANAGED_COMPONENT_CONSTRUCT
 
+    public:
         /// \brief The destructor releases any wrapped instances
         ~managed_component()
         {
-            component_->finalize();
-            delete component_;
-            component_ = 0;
+            detail_adl_barrier::destroy<
+                typename traits::managed_component_dtor_policy<Component>::type
+            >::call(component_);
         }
 
         /// \brief finalize() will be called just before the instance gets
@@ -315,7 +423,7 @@ namespace hpx { namespace components
 
         Component* get_checked()
         {
-            if (0 == component_) {
+            if (!component_) {
                 hpx::util::osstream strm;
                 strm << "component is NULL ("
                      << components::get_component_type_name(
@@ -325,12 +433,12 @@ namespace hpx { namespace components
                     "managed_component<Component, Derived>::get_checked",
                     hpx::util::osstream_get_string(strm));
             }
-            return component_;
+            return get();
         }
 
         Component const* get_checked() const
         {
-            if (0 == component_) {
+            if (!component_) {
                 hpx::util::osstream strm;
                 strm << "component is NULL ("
                      << components::get_component_type_name(
@@ -340,7 +448,7 @@ namespace hpx { namespace components
                     "managed_component<Component, Derived>::get_checked",
                     hpx::util::osstream_get_string(strm));
             }
-            return component_;
+            return get();
         }
 
     public:
@@ -517,20 +625,37 @@ namespace hpx { namespace components
         }
 
     protected:
+        // reference counting
+        friend void intrusive_ptr_add_ref(managed_component* p)
+        {
+            detail_adl_barrier::destroy<
+                typename traits::managed_component_dtor_policy<Component>::type
+            >::addref(p->component_);
+        }
+        friend void intrusive_ptr_release(managed_component* p)
+        {
+            detail_adl_barrier::destroy<
+                typename traits::managed_component_dtor_policy<Component>::type
+            >::release(p->component_);
+        }
+
         Component* component_;
     };
 
-    template <typename Component, typename Wrapper, typename CtorPolicy>
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Component, typename Wrapper,
+        typename CtorPolicy, typename DtorPolicy>
     inline naming::id_type
-    managed_component_base<Component, Wrapper, CtorPolicy>::get_gid() const
+    managed_component_base<Component, Wrapper, CtorPolicy, DtorPolicy>::get_gid() const
     {
         BOOST_ASSERT(back_ptr_);
         return back_ptr_->get_gid();
     }
 
-    template <typename Component, typename Wrapper, typename CtorPolicy>
+    template <typename Component, typename Wrapper,
+        typename CtorPolicy, typename DtorPolicy>
     inline naming::gid_type
-    managed_component_base<Component, Wrapper, CtorPolicy>::get_base_gid() const
+    managed_component_base<Component, Wrapper, CtorPolicy, DtorPolicy>::get_base_gid() const
     {
         BOOST_ASSERT(back_ptr_);
         return back_ptr_->get_base_gid();

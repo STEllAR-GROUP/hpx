@@ -10,7 +10,7 @@
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/lcos/future_wait.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 
 #include <algorithm>
 #include <boost/atomic.hpp>
@@ -30,7 +30,7 @@ using hpx::actions::plain_action4;
 using hpx::applier::applier;
 using hpx::applier::get_applier;
 
-using hpx::lcos::eager_future;
+using hpx::lcos::async;
 
 using hpx::util::high_resolution_timer;
 
@@ -116,7 +116,7 @@ void quicksort_parallel<T>::call(id_type prefix, id_type d, std::size_t begin,
         // always spawn the larger part in a new thread
         if (2 * middle_idx < end - begin)
         {
-            eager_future<action_type> n(prefix, prefix, d,
+            future<id_type> n = async<action_type>(prefix, prefix, d,
                 (std::max)(begin + 1, middle_idx), end);
 
             call(prefix, d, begin, middle_idx);
@@ -125,7 +125,7 @@ void quicksort_parallel<T>::call(id_type prefix, id_type d, std::size_t begin,
 
         else
         {
-            eager_future<action_type> n(prefix, prefix, d,
+            future<id_type> n = async<action_type>(prefix, prefix, d,
                 begin, middle_idx);
 
             call(prefix, d, (std::max)(begin + 1, middle_idx), end);
@@ -186,7 +186,7 @@ int hpx_main(variables_map& vm)
         std::cout << "parallel quicksort" << std::endl;
 
         t.restart();
-        eager_future<quicksort_parallel<int>::action_type> n(
+        future<int> n = async<quicksort_parallel<int>::action_type>(
             prefix, prefix, mb.get_gid(), 0, elements);
         ::hpx::lcos::wait(n);
         elapsed = t.elapsed();

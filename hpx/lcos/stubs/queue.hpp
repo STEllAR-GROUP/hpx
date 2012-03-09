@@ -8,7 +8,9 @@
 
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/lcos/base_lco.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/lcos/server/queue.hpp>
+#include <hpx/traits/promise_remote_result.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace stubs
@@ -20,30 +22,30 @@ namespace hpx { namespace lcos { namespace stubs
             lcos::server::queue<ValueType, RemoteType> >
     {
         ///////////////////////////////////////////////////////////////////////
-        static lcos::promise<ValueType, RemoteType>
+        static lcos::future<ValueType, RemoteType>
         get_value_async(naming::id_type const& gid)
         {
             typedef typename
                 lcos::base_lco_with_value<ValueType, RemoteType>::get_value_action
             action_type;
-            return lcos::eager_future<action_type>(gid);
+            return lcos::async<action_type>(gid);
         }
 
-        static lcos::promise<void>
+        static lcos::future<void>
         set_value_async(naming::id_type const& gid, RemoteType const& val)
         {
             typedef typename
                 lcos::base_lco_with_value<ValueType, RemoteType>::set_result_action
             action_type;
-            return lcos::eager_future<action_type>(gid, val);
+            return lcos::async<action_type>(gid, val);
         }
 
-        static lcos::promise<void, util::unused_type>
+        static lcos::future<void>
         abort_pending_async(naming::id_type const& gid,
             boost::exception_ptr const& e)
         {
             typedef lcos::base_lco::set_error_action action_type;
-            return lcos::eager_future<action_type>(gid, e);
+            return lcos::async<action_type>(gid, e);
         }
 
         ///////////////////////////////////////////////////////////////////////

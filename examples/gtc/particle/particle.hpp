@@ -38,7 +38,7 @@ namespace gtc
 
         /// Initialize the \a gtc::server::particle instance with the
         /// given particle file. 
-        hpx::lcos::promise<void> init_async(std::size_t objectid,
+        hpx::lcos::future<void> init_async(std::size_t objectid,
             parameter const& par)
         {
             BOOST_ASSERT(gid_);
@@ -53,7 +53,7 @@ namespace gtc
             this->base_type::init(gid_,objectid,par);
         }
 
-        hpx::lcos::promise<void> chargei_async(std::size_t objectid,std::size_t istep, std::vector<hpx::naming::id_type> const& particle_components,
+        hpx::lcos::future<void> chargei_async(std::size_t objectid,std::size_t istep, std::vector<hpx::naming::id_type> const& particle_components,
             parameter const& par)
         {
             BOOST_ASSERT(gid_);
@@ -67,7 +67,7 @@ namespace gtc
         }
 
         /// Compute the distance from the particle to the specified coordinates. 
-        hpx::lcos::promise<double> distance_async(double posx, double posy,
+        hpx::lcos::future<double> distance_async(double posx, double posy,
             double posz)
         {
             BOOST_ASSERT(gid_);
@@ -82,7 +82,7 @@ namespace gtc
         }
 
         /// Get the index of the particle.
-        hpx::lcos::promise<std::size_t> get_index_async()
+        hpx::lcos::future<std::size_t> get_index_async()
         {
             BOOST_ASSERT(gid_);
             return this->base_type::get_index_async(gid_);
@@ -96,7 +96,7 @@ namespace gtc
         }
 
         /// Get the index of the particle.
-        hpx::lcos::promise< array<double> > get_densityi_async()
+        hpx::lcos::future< array<double> > get_densityi_async()
         {
             BOOST_ASSERT(gid_);
             return this->base_type::get_densityi_async(gid_);

@@ -15,7 +15,7 @@
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <algorithm>
 
@@ -52,7 +52,7 @@ using hpx::lcos::dataflow_base;
 using hpx::find_here;
 using hpx::find_all_localities;
 using hpx::find_here;
-using hpx::lcos::promise;
+using hpx::lcos::future;
 using hpx::lcos::wait;
 using hpx::naming::id_type;
 using hpx::naming::get_locality_from_id;
@@ -341,15 +341,11 @@ void gs(
         // member function on an instance of remote_lse_type
         // the init function has the signature
         // void(unsigned n_x, unsigned n_y, double hx, double hy)
-        typedef
-            hpx::lcos::eager_future<remote_lse_type::init_action>
-            init_dataflow;
-
         for(size_type y_block = 0; y_block < n_y_block; ++y_block)
         {
             for(size_type x_block = 0; x_block < n_x_block; ++x_block)
             {
-                init_dataflow(
+                hpx::lcos::async<remote_lse_type::init_action>(
                     grid_ids(x_block, y_block)
                   , n_x_local + 2
                   , n_y_local + 2

@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-// Naive SMP version implemented with eager_futures.
+// Naive SMP version implemented with futures.
 
 #include <hpx/hpx.hpp>
 #include <hpx/config.hpp>
@@ -13,7 +13,7 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 
 #include <iostream>
 
@@ -27,7 +27,7 @@ using boost::program_options::value;
 
 using hpx::naming::id_type;
 using hpx::actions::plain_result_action1;
-using hpx::lcos::eager_future;
+using hpx::lcos::asznc;
 using hpx::util::high_resolution_timer;
 using hpx::init;
 using hpx::finalize;
@@ -52,13 +52,7 @@ HPX_REGISTER_PLAIN_ACTION(fibonacci_action);
 //]
 
 ///////////////////////////////////////////////////////////////////////////////
-//[fib_typedef
-// An eager_future is a HPX construct exposing the semantics of a Future
-// object. It starts executing the bound action immediately (eagerly).
-typedef eager_future<fibonacci_action> fibonacci_future;
-//]
 
-///////////////////////////////////////////////////////////////////////////////
 //[fib_func
 boost::uint64_t fibonacci(boost::uint64_t n)
 {
@@ -71,8 +65,8 @@ boost::uint64_t fibonacci(boost::uint64_t n)
     // Invoking the Fibonacci algorithm twice is inefficient.
     // However, we intentionally demonstrate it this way to create some
     // heavy workload.
-    fibonacci_future n1(prefix, n - 1);
-    fibonacci_future n2(prefix, n - 2);
+    future<boost::uint64_t> n1 = async<fibonacci_action>(prefix, n - 1);
+    future<boost::uint64_t> n2 = async<fibonacci_action>(prefix, n - 2);
 
     return n1.get() + n2.get();   // wait for the Futures to return their values
 }
@@ -90,7 +84,8 @@ int hpx_main(variables_map& vm)
         high_resolution_timer t;
 
         // Create a Future for the whole calculation and wait for it.
-        fibonacci_future f(find_here(), n);    // execute locally
+        future<boost::uint64_t> f = 
+            async<fibonacci_action>(find_here(), n); // execute locally
         boost::uint64_t r = f.get(); //wait for future f to return value
 
         char const* fmt = "fibonacci(%1%) == %2%\nelapsed time: %3% [s]\n";

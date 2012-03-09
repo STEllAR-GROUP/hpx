@@ -18,6 +18,7 @@
 #include <hpx/lcos/local/shared_mutex.hpp>
 #include <hpx/lcos/local/recursive_mutex.hpp>
 
+#include <hpx/lcos/future.hpp>
 #include <hpx/lcos/queue.hpp>
 #include <hpx/lcos/barrier.hpp>
 

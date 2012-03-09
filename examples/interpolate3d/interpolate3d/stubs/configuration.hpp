@@ -7,7 +7,7 @@
 #define HPX_INTERPOLATE3D_CONFIGURATION_AUG_07_2011_0648PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/promise.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 
 #include "../server/configuration.hpp"
@@ -19,15 +19,15 @@ namespace interpolate3d { namespace stubs
       : hpx::components::stubs::stub_base<interpolate3d::server::configuration>
     {
         ///////////////////////////////////////////////////////////////////////
-        static hpx::lcos::promise<void>
+        static hpx::lcos::future<void>
         init_async(hpx::naming::id_type const& gid, std::string const& datafile,
             std::string const& symbolic_name, std::size_t num_instances)
         {
-            // Create an eager_future, execute the required action,
-            // we simply return the initialized promise, the caller needs
+            // Create a future, execute the required action,
+            // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef interpolate3d::server::configuration::init_action action_type;
-            return hpx::lcos::eager_future<action_type>(
+            return hpx::lcos::async<action_type>(
                 gid, datafile, symbolic_name, num_instances);
         }
 
@@ -39,14 +39,14 @@ namespace interpolate3d { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static hpx::lcos::promise<config_data>
+        static hpx::lcos::future<config_data>
         get_async(hpx::naming::id_type const& gid)
         {
-            // Create an eager_future, execute the required action,
-            // we simply return the initialized promise, the caller needs
+            // Create a future, execute the required action,
+            // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef interpolate3d::server::configuration::get_action action_type;
-            return hpx::lcos::eager_future<action_type>(gid);
+            return hpx::lcos::async<action_type>(gid);
         }
 
         static config_data get(hpx::naming::id_type const& gid)

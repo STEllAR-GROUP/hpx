@@ -7,7 +7,7 @@
 #define HPX_AJGKWzDvv6WY3TBEXyrCoEBHXyNsAGMOd7kMxopv
 
 #include <hpx/hpx_fwd.hpp>                                                       
-#include <hpx/lcos/promise.hpp>                                                  
+#include <hpx/lcos/future.hpp>                                                  
 #include <hpx/components/distributing_factory/distributing_factory.hpp>          
                                                                                  
 #include <vector>                                                                

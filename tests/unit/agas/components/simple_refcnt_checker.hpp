@@ -9,7 +9,7 @@
 #define HPX_8E877149_A22D_4120_8C0A_BC206BBFA3B4
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/promise.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
@@ -30,7 +30,7 @@ struct simple_refcnt_monitor
     > base_type;
 
   private:
-    lcos::promise<void> flag_;
+    lcos::future<void> flag_;
     naming::id_type const locality_;
 
     using base_type::create;
@@ -58,7 +58,7 @@ struct simple_refcnt_monitor
         this->base_type::create_one(locality, flag_.get_gid());
     }
 
-    lcos::promise<void> take_reference_async(
+    lcos::future<void> take_reference_async(
         naming::id_type const& gid
         )
     {

@@ -15,7 +15,7 @@
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/include/iostreams.hpp>
 
 #include <hpx/components/dataflow/dataflow.hpp>
@@ -183,7 +183,7 @@ void gs(
 
         hpx::cout << typeid(hpx::traits::is_dataflow<dataflow_trigger>::type).name() << "\n" << hpx::endl;
 
-        // initalization of hpx component ends here.
+        // initialization of hpx component ends here.
 
         typedef hpx::lcos::dataflow_base<void> dataflow_type;
 
@@ -192,15 +192,14 @@ void gs(
         // member function on an instance of remote_lse_type
         // the init function has the signature
         // void(unsigned n_x, unsigned n_y, double hx, double hy)
-        typedef
-            hpx::lcos::eager_future<remote_lse_type::init_action>
-            init_dataflow;
 
         // we create a temporary init_future object. the first parameter is the
         // id on which object we want to call the action. the remaining
         // parameters are the parameters to be passed to the action, see comment
         // above
-        init_dataflow(remote_id, n_x, n_y, n_x, n_y, hx, hy).get();
+        hpx::lcos::async<remote_lse_type::init_action>(
+            remote_id, n_x, n_y, n_x, n_y, hx, hy).get();
+
         // this type represents our grid, instead of doubles, we just use
         // promises as value types.
         typedef bright_future::grid<dataflow_type> promise_grid_type;
@@ -282,7 +281,7 @@ void gs(
 
         cout << "finished initializing ...\n" << flush;
 
-        hpx::lcos::eager_future<remote_lse_type::clear_timestamps_action>(remote_id).get();
+        hpx::lcos::async<remote_lse_type::clear_timestamps_action>(remote_id).get();
 
         high_resolution_timer t;
 
@@ -386,7 +385,7 @@ void gs(
         }
         std::cout << "\n" << flush;
 
-        hpx::lcos::eager_future<remote_lse_type::print_timestamps_action>(remote_id).get();
+        hpx::lcos::async<remote_lse_type::print_timestamps_action>(remote_id).get();
 
         double time_elapsed = t.elapsed();
         cout << time_elapsed << "\n" << flush;
@@ -400,7 +399,7 @@ void gs(
             {
                 for(size_type y = 0; y < n_y; ++y)
                 {
-                    apply_future(remote_id, out, x, y, std::vector<hpx::lcos::promise<void> >()).get();
+                    apply_future(remote_id, out, x, y, std::vector<hpx::lcos::future<void> >()).get();
                 }
                 (*f.file) << "\n";
             }

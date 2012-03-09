@@ -10,7 +10,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/components/remote_object/new.hpp>
-#include <hpx/lcos/promise.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
@@ -18,7 +18,7 @@ using hpx::cout;
 using hpx::flush;
 using hpx::find_all_localities;
 using hpx::find_here;
-using hpx::lcos::promise;
+using hpx::lcos::future;
 using hpx::lcos::wait;
 using hpx::naming::id_type;
 
@@ -36,7 +36,7 @@ template <typename T>
 struct lse_config
 {
     typedef typename bright_future::grid<T>::size_type size_type;
-    
+
     lse_config()
         : n_x(0.0)
         , n_y(0.0)
@@ -60,7 +60,7 @@ struct lse_config
         , div(2.0/(hx_*hx_) + 2.0/(hy_*hy_) + k*k)
         , relaxation(relaxation)
     {}
-    
+
     size_type n_x;
     size_type n_y;
     T hx;
@@ -141,7 +141,7 @@ struct init_rhs
 
     result_type operator()(grid_type & rhs) const
     {
-        rhs(x, y) = 
+        rhs(x, y) =
             39.478 * sin((x_global * c.hx) * 6.283) * sinh((y_global * c.hy) * 6.283);
     }
 
@@ -154,7 +154,7 @@ struct init_rhs
 struct get
 {
     typedef double result_type;
-    
+
     get() {}
     get(size_type x, size_type y) : x(x), y(y) {}
 
@@ -180,15 +180,15 @@ struct update
     size_type x;
     size_type y;
     object<grid_type> rhs;
-    std::vector<promise<void> > deps;
-    
+    std::vector<future<void> > deps;
+
     update() {}
     update(
         lse_config<double> const & c
       , size_type x
       , size_type y
       , object<grid_type> const & rhs
-      , std::vector<promise<void> > const & deps
+      , std::vector<future<void> > const & deps
     )
         : c(c)
         , x(x)
@@ -199,7 +199,7 @@ struct update
 
     void operator()(grid_type & u) const
     {
-        promise<double> rhs_promise = rhs <= get(x, y);
+        future<double> rhs_promise = rhs <= get(x, y);
         wait(deps);
         double rhs_value = rhs_promise.get();
         u(x, y) =
@@ -315,7 +315,7 @@ struct get_column
 struct update_top_boundary
 {
     typedef void result_type;
-    
+
     object<grid_type> other;
 
     update_top_boundary() {}
@@ -337,7 +337,7 @@ struct update_top_boundary
 struct update_bottom_boundary
 {
     typedef void result_type;
-    
+
     object<grid_type> other;
 
     update_bottom_boundary() {}
@@ -359,7 +359,7 @@ struct update_bottom_boundary
 struct update_left_boundary
 {
     typedef void result_type;
-    
+
     object<grid_type> other;
 
     update_left_boundary() {}
@@ -384,7 +384,7 @@ struct update_left_boundary
 struct update_right_boundary
 {
     typedef void result_type;
-    
+
     object<grid_type> other;
 
     update_right_boundary() {}
@@ -422,8 +422,8 @@ void gs(
 )
 {
     typedef object<grid_type>    object_type;
-    typedef promise<object_type> object_promise;
-    typedef promise<void>        void_promise;
+    typedef future<object_type> object_promise;
+    typedef future<void>        void_promise;
 
     typedef bright_future::grid<void_promise> promise_grid_type;
     typedef std::vector<promise_grid_type> iteration_dependencies_type;
@@ -440,7 +440,7 @@ void gs(
 
     size_type n_x_block = n_x/block_size+1;
     size_type n_y_block = n_y/block_size+1;
-    
+
     grid<object_type> u(n_x_block, n_y_block);
     grid<object_type> rhs(n_x_block, n_y_block);
     grid<object_promise> u_promise(n_x_block, n_y_block);
@@ -501,7 +501,7 @@ void gs(
             2
           , promise_grid_type(n_x/*_block*/, n_y/*_block*/)
         );
-     
+
     {
         promise_grid_type rhs_promises(n_x, n_y);
         // initalize our right hand side and the initial grid
@@ -548,19 +548,19 @@ void gs(
                                   , x_global
                                   , y_global
                                 );
-                            
+
                             (u(x_block, y_block)
                                 <= update_top_boundary(u(x_block, y_block-1))
                             ).get();
-                            
+
                             (u(x_block, y_block)
                                 <= update_left_boundary(u(x_block-1, y_block))
                             ).get();
-                            
+
                             (u(x_block, y_block)
                                 <= update_bottom_boundary(u(x_block, y_block+1))
                             ).get();
-                            
+
                             (u(x_block, y_block)
                                 <= update_right_boundary(u(x_block+1, y_block))
                             ).get();
@@ -568,14 +568,14 @@ void gs(
                 }
             }
         }
-        
+
         // wait for the rhs initialization to finish.
         BOOST_FOREACH(void_promise const & promise, rhs_promises)
         {
             promise.get();
         }
     }
-    
+
     high_resolution_timer t;
     for(unsigned iter = 0; iter < max_iterations; ++iter)//iter += iteration_block)
     {
@@ -601,7 +601,7 @@ void gs(
             }
         }
     }
-    
+
     /*
     for(unsigned iter = 0; iter < max_iterations; ++iter)//iter += iteration_block)
     {
@@ -633,7 +633,7 @@ void gs(
         }
     }
     */
-        
+
     // add barrier to have some kind of time comparision to conventional systems
     BOOST_FOREACH(void_promise const & promise, iteration_dependencies[(max_iterations%2)])
     {
@@ -642,7 +642,7 @@ void gs(
 
     double time_elapsed = t.elapsed();
     cout << (n_x*n_y) << " " << time_elapsed << "\n" << flush;
-    
+
     if(!output.empty())
     {
         boost::shared_ptr<std::ofstream> file(new std::ofstream(output.c_str()));

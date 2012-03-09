@@ -11,7 +11,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 
 #include <examples/nqueen/server/nqueen.hpp>
 
@@ -27,11 +27,11 @@ namespace nqueen { namespace stubs
         }
         //--------------------------------------------------------------
 
-        static hpx::lcos::promise<list_type>
+        static hpx::lcos::future<list_type>
         access_board_async(hpx::naming::id_type const& gid)
         {
             typedef server::board::access_action action_type;
-            return hpx::lcos::eager_future<action_type>(gid);
+            return hpx::lcos::async<action_type>(gid);
         }
 
         static list_type access_board(hpx::naming::id_type const& gid)
@@ -49,12 +49,12 @@ namespace nqueen { namespace stubs
 
         //------------------------------------------------------------
 
-        static hpx::lcos::promise<bool>
+        static hpx::lcos::future<bool>
         check_board_async(hpx::naming::id_type const& gid, list_type const& list,
             std::size_t level)
         {
             typedef server::board::check_action action_type;
-            return hpx::lcos::eager_future<action_type>(gid, list, level);
+            return hpx::lcos::async<action_type>(gid, list, level);
         }
 
         static bool check_board(hpx::naming::id_type const& gid,
@@ -71,12 +71,12 @@ namespace nqueen { namespace stubs
             return solve_board_async(gid, list, size, level, col).get();
         }
 
-        static hpx::lcos::promise<std::size_t> solve_board_async(
+        static hpx::lcos::future<std::size_t> solve_board_async(
             hpx::naming::id_type const& gid, list_type const& list,
             std::size_t size, std::size_t level, std::size_t col)
         {
             typedef server::board::solve_action action_type;
-            return hpx::lcos::eager_future<action_type>
+            return hpx::lcos::async<action_type>
                 (gid, list, size, level, col);
         }
         //----------------------------------------------------------

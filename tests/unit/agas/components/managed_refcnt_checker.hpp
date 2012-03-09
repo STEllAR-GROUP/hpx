@@ -9,7 +9,7 @@
 #define HPX_901997BE_9730_41F7_9DBC_AD1DC70D7819
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/promise.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
@@ -30,7 +30,7 @@ struct managed_refcnt_monitor
     > base_type;
 
   private:
-    lcos::promise<void> flag_;
+    lcos::future<void> flag_;
     naming::id_type const locality_;
 
     using base_type::create;
@@ -58,7 +58,7 @@ struct managed_refcnt_monitor
         this->base_type::create_one(locality, flag_.get_gid());
     }
 
-    lcos::promise<void> take_reference_async(
+    lcos::future<void> take_reference_async(
         naming::id_type const& gid
         )
     {
@@ -76,7 +76,7 @@ struct managed_refcnt_monitor
 
     bool ready()
     {
-        // Flush pending reference counting operations on the target locality. 
+        // Flush pending reference counting operations on the target locality.
         agas::garbage_collect(locality_);
 
         return flag_.is_ready();
@@ -89,7 +89,7 @@ struct managed_refcnt_monitor
         Duration const& d
         )
     {
-        // Flush pending reference counting operations on the target locality. 
+        // Flush pending reference counting operations on the target locality.
         agas::garbage_collect(locality_);
 
         // Schedule a wakeup.

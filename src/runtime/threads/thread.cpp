@@ -184,5 +184,5 @@ namespace hpx { namespace threads
 ///////////////////////////////////////////////////////////////////////////////
 // explicit instantiation of the function thread_self::set_self
 template void
-hpx::threads::thread_self::impl_type/*::super_type*/::set_self(hpx::threads::thread_self*);
+hpx::threads::thread_self::impl_type::set_self(hpx::threads::thread_self*);
 

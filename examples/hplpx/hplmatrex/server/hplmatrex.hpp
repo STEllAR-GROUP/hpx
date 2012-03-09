@@ -20,7 +20,7 @@ a destructor, and access operators.
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/lcos/local/mutex.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -115,19 +115,18 @@ namespace hpx { namespace components { namespace server
 
     //here begins the definitions of most of the future types that will be used
     //the first of which is for assign action
-    typedef hpx::lcos::eager_future<server::hplmatrex::assign_action> assign_future;
+    typedef hpx::lcos::future<int> assign_future;
     //the search pivots future
-    typedef hpx::lcos::eager_future<server::hplmatrex::search_action> search_future;
+    typedef hpx::lcos::future<int> search_future;
     //Here is the swap future
-    typedef hpx::lcos::eager_future<server::hplmatrex::swap_action> swap_future;
+    typedef hpx::lcos::future<int> swap_future;
     //the backsubst future is used to make sure all computations are complete
     //before returning from lusolve, to avoid killing processes and erasing the
     //leftdata while it is still being worked on
-    typedef
-        hpx::lcos::eager_future<server::hplmatrex::partbsub_action> partbsub_future;
+    typedef hpx::lcos::future<int> partbsub_future;
     //the final future type for the class is used for checking the accuracy of
     //the results of the lu decomposition
-    typedef hpx::lcos::eager_future<server::hplmatrex::check_action> check_future;
+    typedef hpx::lcos::future<double> check_future;
     };
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -164,7 +163,8 @@ namespace hpx { namespace components { namespace server
         offset *= 2;
     }
     //here we initialize the the matrix
-    assign_future future(gid,(int)0,offset,false,gen());
+    assign_future future =
+        hpx::lcos::async<server::hplmatrex::assign_action>(gid,(int)0,offset,false,gen());
 
     //initialize the pivot array
     for(i=0;i<rows;i++){pivotarr[i]=tempivotarr[i]=i;}
@@ -297,8 +297,7 @@ namespace hpx { namespace components { namespace server
     int h = (int)std::ceil(((float)rows)*.5);
     int offset = 1;
     while(offset < h){offset *= 2;}
-    check_future chk(_gid,0,offset,false);
-    return chk.get();
+    return async<server::hplmatrex::check_action>(_gid,0,offset,false).get();
     }
 
     //pivot() finds the pivot element of each column and stores it. All
@@ -323,7 +322,9 @@ namespace hpx { namespace components { namespace server
     for(outer=0;outer<=brows;outer++){
 //******involved in predictions**********************************************//
         if(outer < (brows/2)){
-            searches.push_back(search_future(_gid,(outer+1)*blocksize));
+            searches.push_back(
+                hpx::lcos::async<server::hplmatrex::search_action>(
+                    _gid,(outer+1)*blocksize));
         }
         if(outer > 0 && outer <= brows/2){
             searches[outer-1].get();
@@ -372,10 +373,10 @@ namespace hpx { namespace components { namespace server
         //to represent the entire dataset, the second to last iteration
         //does not create a new swap future.
         if(outer<brows-1){
-            futures.push_back(swap_future(_gid,outer,0));
+            futures.push_back(async<server::hplmatrex::swap_action>(_gid,outer,0));
         }
         else if(outer==brows){
-            futures.push_back(swap_future(_gid,outer-1,0));
+            futures.push_back(async<server::hplmatrex::swap_action>(_gid,outer-1,0));
         }
     }
     //transData is no longer needed so free the memory and allocate
@@ -475,7 +476,7 @@ namespace hpx { namespace components { namespace server
                 tempData[l][k]*solution[temp][brows];
     }   }
     neededFuture[0] = futures.size();
-    for(k=brows-2;k>=0;k--){futures.push_back(partbsub_future(_gid,k,i));}
+    for(k=brows-2;k>=0;k--){futures.push_back(async<server::hplmatrex::partbsub_action>(_gid,k,i));}
 
     //the remaining iterations are performed in this block of code
     for(i=brows-2;i>=0;i--){
@@ -497,7 +498,7 @@ namespace hpx { namespace components { namespace server
                 solution[row+l][brows] -= tempData[l][k]*solution[temp][brows];
         }   }
         neededFuture[brows-i-1] = futures.size();
-        for(k=i-1;k>=0;k--){futures.push_back(partbsub_future(_gid,k,i));}
+        for(k=i-1;k>=0;k--){futures.push_back(async<server::hplmatrex::partbsub_action>(_gid,k,i));}
     }
     return 1;
     }
@@ -534,14 +535,14 @@ namespace hpx { namespace components { namespace server
         while(!complete){
             if(offset <= allocblock){
                 if(row + offset < rows){
-                    futures.push_back(check_future(_gid,
+                    futures.push_back(async<server::hplmatrex::check_action>(_gid,
                         row+offset,offset,true));
                 }
                 complete = true;
             }
             else{
                 if(row + offset < rows){
-                    futures.push_back(check_future(_gid,row+offset,
+                    futures.push_back(async<server::hplmatrex::check_action>(_gid,row+offset,
                         (int)(offset*.5),false));
                 }
                 offset = (int)(offset*.5);

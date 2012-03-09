@@ -11,7 +11,7 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/lcos/promise.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/state.hpp>
 
 #include <boost/bind.hpp>
@@ -44,8 +44,9 @@ using hpx::performance_counters::status_is_valid;
 
 using hpx::naming::get_locality_id_from_gid;
 
+using hpx::lcos::future;
 using hpx::lcos::promise;
-using hpx::lcos::eager_future;
+using hpx::lcos::async;
 using hpx::lcos::base_lco;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -60,7 +61,7 @@ void stop_monitor(std::string const& name)
     }
     BOOST_ASSERT(id);
 
-    eager_future<base_lco::set_event_action>(id).get();
+    async<base_lco::set_event_action>(id).get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -90,15 +91,18 @@ int monitor(std::string const& name, boost::uint64_t pause)
         str(format("/stop_flag(locality#%d)/heartbeat)") % locality_id);
 
     // Associate the stop flag with a symbolic name.
-    hpx::agas::register_name(stop_flag_name, stop_flag.get_gid());
+    hpx::naming::id_type stop_id = stop_flag.get_gid();
+    hpx::agas::register_name(stop_flag_name, stop_id);
 
     register_shutdown_function(boost::bind(&stop_monitor, stop_flag_name));
 
     boost::int64_t zero_time = 0;
 
+    future<void> f = stop_flag.get_future();
+
     while (true)
     {
-        if (!threadmanager_is(running) || stop_flag.is_ready())
+        if (!threadmanager_is(running) || f.is_ready())
             return 0;
 
         // Query the performance counter.
@@ -123,7 +127,6 @@ int monitor(std::string const& name, boost::uint64_t pause)
         hpx::threads::suspend(milliseconds(pause));
     }
 
-    hpx::naming::id_type stop_id = stop_flag.get_gid();
     hpx::agas::unregister_name(stop_flag_name, stop_id);
 }
 

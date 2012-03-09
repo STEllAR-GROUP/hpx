@@ -7,7 +7,7 @@
 #define HPX_QS8bOEkaaAXoeu7EuXAR5ECiGiXXqYTEOsv7oa1h
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/promise.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 
 #include "../server/datastructure.hpp"
@@ -19,15 +19,15 @@ namespace distributed { namespace stubs
     {
         typedef std::vector<std::size_t> client_data_type;
         /////////////////////////////////////////////////////////////////////
-        static hpx::lcos::promise<void>
+        static hpx::lcos::future<void>
         data_init_async(hpx::naming::id_type const& gid
             ,std::string const& symbolic_name, std::size_t num_instances
             ,std::size_t my_cardinality, std::size_t init_length,
             std::size_t init_value)
         {
-            // init_async --> promise
+            // init_async --> future
             typedef distributed::server::datastructure::init_action action_type;
-            return hpx::lcos::eager_future<action_type>(
+            return hpx::lcos::async<action_type>(
                 gid, symbolic_name, num_instances, my_cardinality, init_length
                 , init_value);
         }
@@ -41,13 +41,13 @@ namespace distributed { namespace stubs
             , init_length, init_value).get();
         }
         ////////////////////////////////////////////////////////////////////
-        static hpx::lcos::promise<void>
+        static hpx::lcos::future<void>
         data_write_async(hpx::naming::id_type const& gid
             , std::string const& symbolic_name, std::size_t num_instances
             , std::size_t my_cardinality, client_data_type client_data)
         {
             typedef distributed::server::datastructure::write_action action_type;
-            return hpx::lcos::eager_future<action_type>(
+            return hpx::lcos::async<action_type>(
                 gid, symbolic_name, num_instances, my_cardinality, client_data);
         }
 
@@ -59,12 +59,12 @@ namespace distributed { namespace stubs
                 , client_data);
         }
         ////////////////////////////////////////////////////////////////////
-        static hpx::lcos::promise<distributed::config_comp>
+        static hpx::lcos::future<distributed::config_comp>
         get_config_info_async (hpx::naming::id_type const& gid)
         {
             typedef distributed::server::datastructure::get_config_action 
                 action_type;
-            return hpx::lcos::eager_future<action_type>(gid);
+            return hpx::lcos::async<action_type>(gid);
         }
 
         static distributed::config_comp get_config_info(
@@ -73,11 +73,11 @@ namespace distributed { namespace stubs
             return get_config_info_async(gid).get();
         }
         ////////////////////////////////////////////////////////////////////
-        static hpx::lcos::promise<std::vector<std::size_t>>
+        static hpx::lcos::future<std::vector<std::size_t>>
         get_data_async (hpx::naming::id_type const& gid)
         {
             typedef distributed::server::datastructure::get_data_action action_type;
-            return hpx::lcos::eager_future<action_type>(gid);
+            return hpx::lcos::async<action_type>(gid);
         }
 
         static std::vector<std::size_t> get_data( hpx::naming::id_type const& gid)
@@ -85,12 +85,12 @@ namespace distributed { namespace stubs
             return get_data_async(gid).get();
         }
         ////////////////////////////////////////////////////////////////////
-        static hpx::lcos::promise<std::size_t>
+        static hpx::lcos::future<std::size_t>
         get_data_at_async(hpx::naming::id_type const& gid, std::size_t pos)
         {
             typedef distributed::server::datastructure::get_data_at_action
                 action_type;
-            return hpx::lcos::eager_future<action_type>(gid, pos);
+            return hpx::lcos::async<action_type>(gid, pos);
         }
 
         static std::size_t get_data_at(hpx::naming::id_type const& gid

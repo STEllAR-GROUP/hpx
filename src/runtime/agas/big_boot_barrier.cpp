@@ -48,13 +48,11 @@ typedef components::detail::heap_factory<
     lcos::detail::promise<
         response
       , response
-      , 1
     >
   , components::managed_component<
         lcos::detail::promise<
             response
           , response
-          , 1
         >
     >
 > response_heap_type;

@@ -53,7 +53,7 @@
             // local, direct execution
             BOOST_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
-            (*this->impl_)->set_data(0, Action::execute_function(
+            (*this->impl_)->set_data(Action::execute_function(
                 addr.address_, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)));
         }
         else {

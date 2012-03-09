@@ -101,7 +101,7 @@ template <typename Action, typename Object>
 std::size_t pass_object_void()
 {
     Object obj;
-    dataflow<Action>(find_here(), obj).get();
+    dataflow<Action>(find_here(), obj).get_future().get();
 
     return obj.get_count();
 }
@@ -110,7 +110,7 @@ template <typename Action, typename Object>
 std::size_t pass_object(id_type id)
 {
     Object obj;
-    return dataflow<Action>(id, obj).get();
+    return dataflow<Action>(id, obj).get_future().get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -118,7 +118,7 @@ template <typename Action, typename Object>
 std::size_t move_object_void()
 {
     Object obj;
-    dataflow<Action>(find_here(), boost::move(obj)).get();
+    dataflow<Action>(find_here(), boost::move(obj)).get_future().get();
 
     return obj.get_count();
 }
@@ -127,7 +127,7 @@ template <typename Action, typename Object>
 std::size_t move_object(id_type id)
 {
     Object obj;
-    return dataflow<Action>(id, boost::move(obj)).get();
+    return dataflow<Action>(id, boost::move(obj)).get_future().get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

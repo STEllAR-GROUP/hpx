@@ -28,16 +28,16 @@ namespace hpx { namespace components { namespace amr { namespace stubs
 
         // The eval and is_last_timestep functions have to be overloaded by any
         // functional component derived from this class
-        static lcos::promise<int> eval_async(naming::id_type const& gid,
+        static lcos::future<int> eval_async(naming::id_type const& gid,
             naming::id_type const& result,
             std::vector<naming::id_type> const& gids, std::size_t row, std::size_t column,
             double cycle_time,parameter const& par)
         {
-            // Create an eager_future, execute the required action,
-            // we simply return the initialized promise, the caller needs
+            // Create a future, execute the required action,
+            // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef amr::server::functional_component::eval_action action_type;
-            return lcos::eager_future<action_type>(gid, result, gids, row, column,cycle_time,par);
+            return lcos::async<action_type>(gid, result, gids, row, column,cycle_time,par);
         }
 
         static int eval(naming::id_type const& gid,
@@ -45,21 +45,21 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             int row, int column,double cycle_time, parameter const& par)
         {
             // The following get yields control while the action above
-            // is executed and the result is returned to the eager_future
+            // is executed and the result is returned to the future
             return eval_async(gid, result, gids, row, column,cycle_time,par).get();
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static lcos::promise<naming::id_type> alloc_data_async(
+        static lcos::future<naming::id_type> alloc_data_async(
             naming::id_type const& gid, int item, int maxitems,
             int row,std::vector<naming::id_type> const& interp_src_data,
             double time, parameter const& par)
         {
-            // Create an eager_future, execute the required action,
-            // we simply return the initialized promise, the caller needs
+            // Create a future, execute the required action,
+            // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef amr::server::functional_component::alloc_data_action action_type;
-            return lcos::eager_future<action_type>(gid, item, maxitems,
+            return lcos::async<action_type>(gid, item, maxitems,
                                                    row, interp_src_data,time,par);
         }
 
@@ -73,12 +73,12 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static lcos::promise<void>
+        static lcos::future<void>
         init_async(naming::id_type const& gid, std::size_t numsteps,
             naming::id_type const& val)
         {
             typedef amr::server::functional_component::init_action action_type;
-            return lcos::eager_future<action_type>(gid, numsteps, val);
+            return lcos::async<action_type>(gid, numsteps, val);
         }
 
         static void init(naming::id_type const& gid,

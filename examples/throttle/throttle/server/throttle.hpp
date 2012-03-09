@@ -7,7 +7,7 @@
 #define HPX_THROTTLE_SERVER_AUG_09_2011_0702PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/promise.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>

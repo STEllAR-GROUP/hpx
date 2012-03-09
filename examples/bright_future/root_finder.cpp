@@ -11,7 +11,7 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -19,7 +19,7 @@ using boost::program_options::value;
 
 using hpx::naming::id_type;
 using hpx::actions::plain_result_action2;
-using hpx::lcos::eager_future;
+using hpx::lcos::async;
 using hpx::util::high_resolution_timer;
 using hpx::init;
 using hpx::finalize;
@@ -37,8 +37,6 @@ typedef
     update_action;
 
 HPX_REGISTER_PLAIN_ACTION(update_action);
-
-typedef eager_future<update_action> update_future;
 
 double update(double x, double x_n)
 {
@@ -77,8 +75,7 @@ int hpx_main(variables_map & vm)
 
     for(unsigned i = 0; i < max_iterations; ++i)
     {
-        update_future f(find_here(), x, x_n);
-        double x_new = f.get();
+        double x_new = async<update_action>(find_here(), x, x_n).get();
         if(std::abs(x_n - x_new) < 1e-10) break;
         x_n = x_new;
     }

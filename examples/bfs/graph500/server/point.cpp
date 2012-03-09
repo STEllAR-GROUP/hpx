@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/lcos/async_future_wait.hpp>
 
 #include "../make_graph.hpp"
@@ -224,7 +224,7 @@ namespace graph500 { namespace server
 
     void point::resolve_conflict()
     {
-      typedef std::vector<hpx::lcos::promise< resolvedata > > lazy_results_type;
+      typedef std::vector<hpx::lcos::future< resolvedata > > lazy_results_type;
       lazy_results_type lazy_results;
       // go through each particle on this component; if there are duplicates (i.e. the
       // same particle is on a different component as well), communicate with those components
@@ -350,7 +350,7 @@ namespace graph500 { namespace server
 
     std::vector<int64_t> point::get_numedges()
     {
-      typedef std::vector<hpx::lcos::promise< resolvedata > > lazy_results_type;
+      typedef std::vector<hpx::lcos::future< resolvedata > > lazy_results_type;
       lazy_results_type lazy_results;
       std::vector<int64_t> num_edges;
       // Get the number of edges for performance counting

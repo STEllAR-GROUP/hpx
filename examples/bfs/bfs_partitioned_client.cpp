@@ -184,7 +184,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         ///////////////////////////////////////////////////////////////////////
         // Put the graph in the data structure
-        std::vector<hpx::lcos::promise<void> > init_phase;
+        std::vector<hpx::lcos::future<void> > init_phase;
 
         for (std::size_t i=0;i<ne;i++) {
           init_phase.push_back(points[i].init_async(i,grainsize,max_num_neighbors,
@@ -211,7 +211,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         for (std::size_t step=0;step<searchroot.size();step++) {
           hpx::util::high_resolution_timer kernel2time;
 
-          std::vector<hpx::lcos::promise<std::vector<std::size_t> > > traverse_phase;
+          std::vector<hpx::lcos::future<std::vector<std::size_t> > > traverse_phase;
 
           // Traverse the graph.
           std::size_t level = 0;
@@ -223,7 +223,7 @@ int hpx_main(boost::program_options::variables_map &vm)
           }
 
           // TEST
-          std::vector<hpx::lcos::promise<std::vector<nodedata> > > depth_traverse_phase;
+          std::vector<hpx::lcos::future<std::vector<nodedata> > > depth_traverse_phase;
           std::vector<std::vector<nodedata> > result;
           depth_traverse_phase.push_back( points[ index(searchroot[step]) ].depth_traverse_async(level,searchroot[step],searchroot[step]) );
           hpx::lcos::wait(depth_traverse_phase,result);
@@ -316,7 +316,7 @@ int hpx_main(boost::program_options::variables_map &vm)
           }
 
           // Reset for the next root
-          std::vector<hpx::lcos::promise<void> > reset_phase;
+          std::vector<hpx::lcos::future<void> > reset_phase;
           for (std::size_t i=0;i<ne;i++) {
             reset_phase.push_back(points[i].reset_visited_async(i));
           }

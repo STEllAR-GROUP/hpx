@@ -53,7 +53,7 @@ namespace hpx { namespace geometry
         // exposed functionality of this component
 
         /// Initialize the server#point instance with the given \a gid
-        lcos::promise<void> init_async(double xmin, double xmax,
+        lcos::future<void> init_async(double xmin, double xmax,
                                             double ymin, double ymax,
                                             double velx, double vely,
                                             std::size_t numpoints,
@@ -73,13 +73,13 @@ namespace hpx { namespace geometry
         }
 
         /// Initialize the server#point instance with the given \a gid
-        lcos::promise<int> search_async(std::vector<hpx::naming::id_type> const& search_objects)
+        lcos::future<int> search_async(std::vector<hpx::naming::id_type> const& search_objects)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::search_async(gid_, search_objects);
         }
 
-        lcos::promise<void> recompute_async(std::vector<hpx::naming::id_type> const& search_objects)
+        lcos::future<void> recompute_async(std::vector<hpx::naming::id_type> const& search_objects)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::recompute_async(gid_, search_objects);
@@ -97,7 +97,7 @@ namespace hpx { namespace geometry
             this->base_type::recompute(gid_, search_objects);
         }
 
-        lcos::promise<polygon_type> get_poly_async() const
+        lcos::future<polygon_type> get_poly_async() const
         {
             BOOST_ASSERT(gid_);
             return this->base_type::get_poly_async(gid_);
@@ -109,19 +109,19 @@ namespace hpx { namespace geometry
             return this->base_type::get_poly(gid_);
         }
 
-        lcos::promise<void> move_async(double dt,double time)
+        lcos::future<void> move_async(double dt,double time)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::move_async(gid_,dt,time);
         }
 
-        lcos::promise<void> adjust_async(double dt)
+        lcos::future<void> adjust_async(double dt)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::adjust_async(gid_,dt);
         }
 
-        lcos::promise<void> enforce_async(std::vector<hpx::naming::id_type> const& master_gids,double dt,
+        lcos::future<void> enforce_async(std::vector<hpx::naming::id_type> const& master_gids,double dt,
                                                std::size_t n,std::size_t N)
         {
             BOOST_ASSERT(gid_);
@@ -149,12 +149,12 @@ namespace hpx { namespace geometry
 
         /// Query the current coordinate values of the server#point
         /// instance with the given \a gid.
-        lcos::promise<double> get_X_async() const
+        lcos::future<double> get_X_async() const
         {
             BOOST_ASSERT(gid_);
             return this->base_type::get_X_async(gid_);
         }
-        lcos::promise<double> get_Y_async()  const
+        lcos::future<double> get_Y_async()  const
         {
             BOOST_ASSERT(gid_);
             return this->base_type::get_Y_async(gid_);
@@ -173,12 +173,12 @@ namespace hpx { namespace geometry
 
         /// Modify the current coordinate values of the server#point
         /// instance with the given \a gid.
-        lcos::promise<void> set_X_async(double x)
+        lcos::future<void> set_X_async(double x)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::set_X_async(gid_, x);
         }
-        lcos::promise<void> set_Y_async(double y)
+        lcos::future<void> set_Y_async(double y)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::set_Y_async(gid_, y);

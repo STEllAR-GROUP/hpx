@@ -40,7 +40,7 @@ namespace hpx { namespace components { namespace amr
         /// data referred to by the parameter \a initial. After finishing
         /// execution it returns a reference to the result as its return value
         /// (parameter \a result)
-        lcos::promise<naming::id_type> call_async(
+        lcos::future<naming::id_type> call_async(
             naming::id_type const& initial)
         {
             return this->base_type::call_async(this->gid_, initial);
@@ -54,7 +54,7 @@ namespace hpx { namespace components { namespace amr
         ///////////////////////////////////////////////////////////////////////
         /// Return the gid's of the output ports associated with this
         /// \a dynamic_stencil_value instance.
-        lcos::promise<std::vector<naming::id_type> >
+        lcos::future<std::vector<naming::id_type> >
         get_output_ports_async()
         {
             return this->base_type::get_output_ports_async(this->gid_);

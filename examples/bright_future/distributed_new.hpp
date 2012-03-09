@@ -31,11 +31,11 @@
 namespace hpx { namespace components {
 #if N == 0
     template <typename T>
-    std::vector<lcos::promise<object<T> > >
+    std::vector<lcos::future<object<T> > >
     distributed_new(std::size_t count)
 #else
     template <typename T, BOOST_PP_ENUM_PARAMS(N, typename A)>
-    std::vector<lcos::promise<object<T> > >
+    std::vector<lcos::future<object<T> > >
     distributed_new(std::size_t count, BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
 #endif
     {
@@ -43,31 +43,31 @@ namespace hpx { namespace components {
             = hpx::components::get_component_type<hpx::components::server::remote_object>();
 
         std::vector<naming::id_type> prefixes = find_all_localities(type);
-        
+
         std::vector<naming::id_type>::size_type objs_per_loc = count / prefixes.size();
-        
+
         std::size_t created_count = 0;
         std::size_t excess = count - objs_per_loc*prefixes.size();
 
         std::vector<lcos::promise<object<T> > > res;
-        
+
         res.reserve(count);
-        
+
         BOOST_FOREACH(naming::id_type const & prefix, prefixes)
         {
             std::size_t numcreate = objs_per_loc;
-            
+
             if (excess != 0) {
                 --excess;
                 ++numcreate;
             }
-            
+
             if (created_count + numcreate > count)
                 numcreate = count - created_count;
-            
+
             if (numcreate == 0)
                 break;
-            
+
             for (std::size_t i = 0; i < numcreate; ++i) {
 #if N == 0
                 res.push_back(
@@ -79,7 +79,7 @@ namespace hpx { namespace components {
                 );
 #endif
             }
-            
+
             created_count += numcreate;
             if (created_count >= count)
                 break;

@@ -11,7 +11,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/plain_actions.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/lcos/async.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
@@ -32,7 +32,6 @@ using hpx::actions::plain_direct_action1;
 using hpx::actions::plain_direct_result_action1;
 using hpx::actions::plain_direct_result_action0;
 
-using hpx::lcos::eager_future;
 using hpx::lcos::async;
 
 using hpx::init;
@@ -202,7 +201,7 @@ template <typename Action, typename Object>
 std::size_t pass_object_void()
 {
     Object obj;
-    eager_future<Action>(find_here(), obj).get();
+    async<Action>(find_here(), obj).get();
 
     return obj.get_count();
 }
@@ -211,7 +210,7 @@ template <typename Action, typename Object>
 std::size_t pass_object(id_type id)
 {
     Object obj;
-    return eager_future<Action>(id, obj).get();
+    return async<Action>(id, obj).get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -219,7 +218,7 @@ template <typename Action, typename Object>
 std::size_t move_object_void()
 {
     Object obj;
-    eager_future<Action>(find_here(), boost::move(obj)).get();
+    async<Action>(find_here(), boost::move(obj)).get();
 
     return obj.get_count();
 }
@@ -228,7 +227,7 @@ template <typename Action, typename Object>
 std::size_t move_object(id_type id)
 {
     Object obj;
-    return eager_future<Action>(id, boost::move(obj)).get();
+    return async<Action>(id, boost::move(obj)).get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -269,7 +268,7 @@ std::size_t async_move_object(id_type id)
 template <typename Action, typename Object>
 std::size_t return_object(id_type id)
 {
-    Object obj(eager_future<Action>(id).get());
+    Object obj(async<Action>(id).get());
     return obj.get_count();
 }
 
@@ -285,7 +284,7 @@ std::size_t async_return_object(id_type id)
 template <typename Action, typename Object>
 std::size_t return_move_object(id_type id)
 {
-    Object obj(boost::move(eager_future<Action>(id).move_out()));
+    Object obj(boost::move(async<Action>(id).move()));
     return obj.get_count();
 }
 
@@ -293,7 +292,7 @@ std::size_t return_move_object(id_type id)
 template <typename Action, typename Object>
 std::size_t async_return_move_object(id_type id)
 {
-    Object obj(boost::move(async<Action>(id).move_out()));
+    Object obj(boost::move(async<Action>(id).move()));
     return obj.get_count();
 }
 

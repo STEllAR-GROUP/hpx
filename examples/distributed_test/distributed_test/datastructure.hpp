@@ -7,7 +7,7 @@
 #define HPX_xFq1eUILdlLmLfIiA5xbaFTHnuEhtkSQTOvbZtzx
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/promise.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 
 #include "stubs/datastructure.hpp"
@@ -48,7 +48,7 @@ namespace distributed
         datastructure()
         {}
         //////////////////////////////////////////////////////////////////////
-        hpx::lcos::promise<void>
+        hpx::lcos::future<void>
         data_init_async(std::string const& symbolic_name, std::size_t num_instances
             , std::size_t my_cardinality, std::size_t initial_length
             , std::size_t initial_value)
@@ -66,7 +66,7 @@ namespace distributed
                 num_instances, my_cardinality, initial_length, initial_value);
         }
         //////////////////////////////////////////////////////////////////////
-        hpx::lcos::promise<void>
+        hpx::lcos::future<void>
         data_write_async(std::string const& symbolic_name, std::size_t num_instances
             , std::size_t my_cardinality, std::vector<std::size_t> client_data)
         {
@@ -81,7 +81,7 @@ namespace distributed
                 num_instances, my_cardinality, client_data);
         }
         //////////////////////////////////////////////////////////////////////
-        hpx::lcos::promise<distributed::config_comp>
+        hpx::lcos::future<distributed::config_comp>
         get_config_info_async()
         {
             return stubs::datastructure::get_config_info_async(this->gid_);
@@ -92,7 +92,7 @@ namespace distributed
             return stubs::datastructure::get_config_info(this->gid_);
         }
         //////////////////////////////////////////////////////////////////////
-        hpx::lcos::promise<std::vector<std::size_t>>
+        hpx::lcos::future<std::vector<std::size_t>>
         get_data_async()
         {
             return stubs::datastructure::get_data_async(this->gid_);
@@ -103,7 +103,7 @@ namespace distributed
             return stubs::datastructure::get_data(this->gid_);
         }
         //////////////////////////////////////////////////////////////////////
-        hpx::lcos::promise<std::size_t>
+        hpx::lcos::future<std::size_t>
         get_data_at_async(std::size_t pos)
         {
             return stubs::datastructure::get_data_at_async(this->gid_, pos);

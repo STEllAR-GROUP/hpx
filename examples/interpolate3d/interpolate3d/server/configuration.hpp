@@ -7,7 +7,7 @@
 #define HPX_INTERPOLATE3D_CONFIGURATION_AUG_07_2011_0641PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/promise.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 

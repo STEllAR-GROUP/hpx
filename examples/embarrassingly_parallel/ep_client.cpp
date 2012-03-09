@@ -81,7 +81,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         // Begin Kernel 2
         hpx::util::high_resolution_timer kernel2time;
         {
-          std::vector<hpx::lcos::promise<void> > bfs_phase;
+          std::vector<hpx::lcos::future<void> > bfs_phase;
           for (std::size_t i=0;i<num_pe;i++) {
             bfs_phase.push_back(points[i].bfs_async(scale));
           }

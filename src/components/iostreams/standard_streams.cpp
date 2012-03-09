@@ -7,7 +7,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
@@ -60,7 +60,7 @@ namespace hpx { namespace iostreams
         stream_raii(char const* cout_name)
         {
             LRT_(info) << "stream_raii::stream_raii: creating '"
-                       << cout_name << "' stream object"; 
+                       << cout_name << "' stream object";
 
             naming::resolver_client& agas_client = get_runtime().get_agas_client();
             if (agas_client.is_console())
@@ -80,16 +80,15 @@ namespace hpx { namespace iostreams
                 // FIXME: Use an error code here?
                 if (!agas::resolve_name(cout_name, gid))
                 {
-                    naming::gid_type console;
                     error_code ec;
-                    agas_client.get_console_locality(console, ec);
+                    naming::id_type console = agas::get_console_locality(ec);
                     if (HPX_UNLIKELY(ec || !console))
                     {
                         HPX_THROW_EXCEPTION(no_registered_console,
                             "stream_raii::stream_raii", "couldn't contact console");
                     }
 
-                    lcos::eager_future<create_cout_action>(console).get();
+                    lcos::async<create_cout_action>(console).get();
 
                     // Try again
                     bool r = agas::resolve_name(cout_name, gid, ec);

@@ -12,6 +12,8 @@
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/traits/get_remote_result.hpp>
+#include <hpx/traits/promise_remote_result.hpp>
+#include <hpx/traits/promise_local_result.hpp>
 
 #include <boost/make_shared.hpp>
 #include <boost/iterator_adaptors.hpp>
@@ -110,7 +112,7 @@ namespace hpx { namespace components { namespace server
         // return the overall size of a partition described by this info
         std::size_t size() const
         {
-            return std::accumulate(dim_sizes_.begin(), dim_sizes_.end(), 
+            return std::accumulate(dim_sizes_.begin(), dim_sizes_.end(),
                 std::size_t(1), std::multiplies<std::size_t>());
         }
 
@@ -279,6 +281,17 @@ namespace hpx { namespace traits
             return result;
         }
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <>
+    struct promise_remote_result<std::vector<components::server::locality_result> >
+      : boost::mpl::identity<std::vector<components::server::remote_locality_result> >
+    {};
+
+    template <>
+    struct promise_local_result<std::vector<components::server::remote_locality_result> >
+      : boost::mpl::identity<std::vector<components::server::locality_result> >
+    {};
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

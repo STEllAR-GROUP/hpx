@@ -14,7 +14,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 
 #include "../server/lublock.hpp"
 
@@ -27,7 +27,7 @@ namespace hpx { namespace components { namespace stubs
         const int posx, const int posy, const int size,
         const vector<vector<id_type> > gidList,
         const vector<vector<double> > theData){
-        return lcos::eager_future<server::lublock::constructBlock_action>(
+        return lcos::async<server::lublock::constructBlock_action>(
             gid,h,w,posx,posy,size,gidList,theData).get();
     }
 

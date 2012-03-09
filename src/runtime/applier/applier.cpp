@@ -13,23 +13,23 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace applier
 {
     //
-    lcos::promise<naming::id_type, naming::gid_type>
+    lcos::future<naming::id_type>
     create_async(naming::id_type const& targetgid,
         components::component_type type, std::size_t count)
     {
-        // Create a promise, execute the required action,
-        // we simply return the initialized promise, the caller needs
+        // Create a future, execute the required action,
+        // we simply return the initialized future, the caller needs
         // to call get() on the return value to obtain the result
         typedef
             components::server::runtime_support::create_component_action
         action_type;
-        return lcos::eager_future<action_type, naming::id_type>(targetgid, type, count);
+        return lcos::async<action_type>(targetgid, type, count);
     }
 
     //

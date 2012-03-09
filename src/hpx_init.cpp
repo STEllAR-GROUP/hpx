@@ -14,7 +14,7 @@
 #include <hpx/util/sed_transform.hpp>
 #include <hpx/util/parse_command_line.hpp>
 
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
@@ -120,12 +120,10 @@ namespace hpx { namespace detail
 
     inline void print(std::string const& name, error_code& ec = throws)
     {
-        naming::gid_type console;
-        naming::get_agas_client().get_console_locality(console, ec);
+        naming::id_type console(agas::get_console_locality(ec));
         if (ec) return;
 
-        typedef lcos::eager_future<console_print_action> future_type;
-        future_type(console, name).get(ec);
+        lcos::async<console_print_action>(console, name).get(ec);
         if (ec) return;
 
         if (&ec != &throws)

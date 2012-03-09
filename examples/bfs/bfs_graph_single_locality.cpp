@@ -67,7 +67,7 @@ namespace bfs_graph { namespace single_locality
         }
 
         // Put the graph in the data structure
-        std::vector<hpx::lcos::promise<void> > init_phase;
+        std::vector<hpx::lcos::future<void> > init_phase;
         for (std::size_t i = 0; i < num_graphs; ++i)
             init_phase.push_back(graphs[i].init_async(i, num_elements, edgelist));
         hpx::lcos::wait(init_phase);
@@ -124,7 +124,7 @@ namespace bfs_graph { namespace single_locality
             }
 
             // Reset for the next root
-            std::vector<hpx::lcos::promise<void> > reset_phase;
+            std::vector<hpx::lcos::future<void> > reset_phase;
             for (std::size_t i = 0; i < graphs.size(); ++i)
                 reset_phase.push_back(graphs[i].reset_async());
             hpx::lcos::wait(reset_phase);

@@ -19,12 +19,12 @@ namespace sheneos { namespace stubs
       : hpx::components::stubs::stub_base<sheneos::server::partition3d>
     {
         ///////////////////////////////////////////////////////////////////////
-        static hpx::lcos::promise<void>
+        static hpx::lcos::future<void>
         init_async(hpx::naming::id_type const& gid, std::string const& datafilename,
             dimension const& dimx, dimension const& dimy, dimension const& dimz)
         {
             // The following get yields control while the action above
-            // is executed and the result is returned to the promise.
+            // is executed and the result is returned to the future.
             typedef sheneos::server::partition3d::init_action action_type;
             return hpx::lcos::async<action_type>(
                 gid, datafilename, dimx, dimy, dimz);
@@ -38,12 +38,12 @@ namespace sheneos { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static hpx::lcos::promise<std::vector<double> >
+        static hpx::lcos::future<std::vector<double> >
         interpolate_async(hpx::naming::id_type const& gid,
             double ye, double temp, double rho, boost::uint32_t eosvalues)
         {
             // The following get yields control while the action above
-            // is executed and the result is returned to the promise.
+            // is executed and the result is returned to the future.
             typedef sheneos::server::partition3d::interpolate_action action_type;
             return hpx::lcos::async<action_type>(gid, ye, temp, rho, eosvalues);
         }
@@ -55,12 +55,12 @@ namespace sheneos { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static hpx::lcos::promise<double>
+        static hpx::lcos::future<double>
         interpolate_one_async(hpx::naming::id_type const& gid,
             double ye, double temp, double rho, boost::uint32_t eosvalues)
         {
             // The following get yields control while the action above
-            // is executed and the result is returned to the promise.
+            // is executed and the result is returned to the future.
             typedef sheneos::server::partition3d::interpolate_one_action action_type;
             return hpx::lcos::async<action_type>(gid, ye, temp, rho, eosvalues);
         }
@@ -72,13 +72,13 @@ namespace sheneos { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static hpx::lcos::promise<std::vector<double> >
+        static hpx::lcos::future<std::vector<double> >
         interpolate_one_bulk_async(hpx::naming::id_type const& gid,
             std::vector<double> const& ye, std::vector<double> const& temp,
             std::vector<double> const& rho, boost::uint32_t eosvalues)
         {
             // The following get yields control while the action above
-            // is executed and the result is returned to the promise.
+            // is executed and the result is returned to the future.
             typedef sheneos::server::partition3d::interpolate_one_bulk_action
                 action_type;
             return hpx::lcos::async<action_type>(gid, ye, temp, rho, eosvalues);

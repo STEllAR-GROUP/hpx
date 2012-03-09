@@ -15,17 +15,17 @@ namespace ep { namespace stubs
     ///////////////////////////////////////////////////////////////////////////
     struct point : hpx::components::stub_base<server::point>
     {
-        static hpx::lcos::promise<void>
+        static hpx::lcos::future<void>
         bfs_async(hpx::naming::id_type const& gid,std::size_t scale)
         {
             typedef server::point::bfs_action action_type;
-            return hpx::lcos::eager_future<action_type>(gid,scale);
+            return hpx::lcos::async<action_type>(gid,scale);
         }
 
         static void bfs(hpx::naming::id_type const& gid,std::size_t scale)
         {
             // The following get yields control while the action above
-            // is executed and the result is returned to the promise.
+            // is executed and the result is returned to the future.
             bfs_async(gid,scale).get();
         }
     };

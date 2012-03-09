@@ -18,7 +18,7 @@
 
 namespace boost { namespace serialization {
     template <typename Archive>
-    void serialize(Archive & ar, hpx::lcos::promise<void> &, unsigned)
+    void serialize(Archive & ar, hpx::lcos::future<void> &, unsigned)
     {
     }
 }}
@@ -247,7 +247,7 @@ namespace bright_future {
                 apply_func_type f
               , typename remote_lse<T>::size_type x
               , typename remote_lse<T>::size_type y
-              , std::vector<hpx::lcos::promise<void> > dependencies
+              , std::vector<hpx::lcos::future<void> > dependencies
             );
 
             typedef
@@ -257,7 +257,7 @@ namespace bright_future {
                   , apply_func_type
                   , size_type
                   , size_type
-                  , std::vector<hpx::lcos::promise<void> >
+                  , std::vector<hpx::lcos::future<void> >
                   , &remote_lse<T>::apply
                 >
                 apply_action;
@@ -266,7 +266,7 @@ namespace bright_future {
                 apply_func_type f
               , range_type x_range
               , range_type y_range
-              , std::vector<hpx::lcos::promise<void> *> dependencies
+              , std::vector<hpx::lcos::future<void> *> dependencies
             );
 
             typedef
@@ -276,7 +276,7 @@ namespace bright_future {
                   , apply_func_type
                   , range_type
                   , range_type
-                  , std::vector<hpx::lcos::promise<void> *>
+                  , std::vector<hpx::lcos::future<void> *>
                   , &remote_lse<T>::apply_region
                 >
                 apply_region_action;

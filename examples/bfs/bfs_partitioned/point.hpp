@@ -35,7 +35,7 @@ namespace bfs
         // Exposed functionality of this component.
 
         // kernel 1
-        hpx::lcos::promise<void> init_async(std::size_t objectid,
+        hpx::lcos::future<void> init_async(std::size_t objectid,
             std::size_t grainsize,std::size_t max_num_neighbors,
             std::vector<std::size_t> const& nodefile,
             std::vector<std::size_t> const& neighborfile,
@@ -61,7 +61,7 @@ namespace bfs
         }
 
         /// Traverse the graph. 
-        hpx::lcos::promise<std::vector<std::size_t> >
+        hpx::lcos::future<std::vector<std::size_t> >
         traverse_async(std::size_t level, std::size_t parent,std::size_t edge)
         {
             BOOST_ASSERT(gid_);
@@ -76,7 +76,7 @@ namespace bfs
         }
 
         /// Traverse the graph. 
-        hpx::lcos::promise<std::vector<nodedata> >
+        hpx::lcos::future<std::vector<nodedata> >
         depth_traverse_async(std::size_t level, std::size_t parent,std::size_t edge)
         {
             BOOST_ASSERT(gid_);
@@ -91,7 +91,7 @@ namespace bfs
         }
 
         /// get parent
-        hpx::lcos::promise<std::size_t>
+        hpx::lcos::future<std::size_t>
         get_parent_async(std::size_t edge)
         {
             BOOST_ASSERT(gid_);
@@ -106,7 +106,7 @@ namespace bfs
         }
 
         /// get level
-        hpx::lcos::promise<std::size_t>
+        hpx::lcos::future<std::size_t>
         get_level_async(std::size_t edge)
         {
             BOOST_ASSERT(gid_);
@@ -121,7 +121,7 @@ namespace bfs
         }
 
         // reset_visited
-        hpx::lcos::promise<void> reset_visited_async(std::size_t objectid)
+        hpx::lcos::future<void> reset_visited_async(std::size_t objectid)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::reset_visited_async(gid_,objectid);

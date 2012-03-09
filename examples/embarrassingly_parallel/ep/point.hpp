@@ -34,7 +34,7 @@ namespace ep
         ///////////////////////////////////////////////////////////////////////
         // Exposed functionality of this component.
 
-        hpx::lcos::promise<void> bfs_async(std::size_t scale)
+        hpx::lcos::future<void> bfs_async(std::size_t scale)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::bfs_async(gid_,scale);

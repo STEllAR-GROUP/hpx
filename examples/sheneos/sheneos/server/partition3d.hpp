@@ -7,7 +7,7 @@
 #define HPX_SHENEOS_PARTITION3D_AUG_08_2011_1220PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/promise.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/server/simple_component_base.hpp>
 

@@ -10,7 +10,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/lcos/async_future_wait.hpp>
 
 #include <boost/geometry.hpp>
@@ -36,7 +36,7 @@ namespace hpx { namespace geometry { namespace server
         {
           return 0;
 #if 0
-            typedef std::vector<lcos::promise<polygon_type> > lazy_results_type;
+            typedef std::vector<lcos::future<polygon_type> > lazy_results_type;
 
             lazy_results_type lazy_results;
             BOOST_FOREACH(naming::id_type gid, search_objects)
@@ -267,7 +267,7 @@ namespace hpx { namespace geometry { namespace server
 
         void point::enforce(std::vector<hpx::naming::id_type> const& master_gids,double dt,std::size_t n,std::size_t N)
         {
-          typedef std::vector<lcos::promise<polygon_type> > lazy_results_type;
+          typedef std::vector<lcos::future<polygon_type> > lazy_results_type;
 
           lazy_results_type lazy_results;
 
@@ -373,7 +373,7 @@ namespace hpx { namespace geometry { namespace server
         /// Recompute Rsum
         void point::recompute(std::vector<hpx::naming::id_type> const& search_objects)
         {
-          typedef std::vector<lcos::promise<polygon_type> > lazy_results_type;
+          typedef std::vector<lcos::future<polygon_type> > lazy_results_type;
 
           lazy_results_type lazy_results;
 

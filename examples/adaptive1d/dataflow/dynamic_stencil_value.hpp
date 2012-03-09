@@ -9,6 +9,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/client_base.hpp>
+#include <hpx/lcos/async.hpp>
 
 #include "stubs/dynamic_stencil_value.hpp"
 
@@ -40,7 +41,7 @@ namespace hpx { namespace components { namespace adaptive1d
         /// data referred to by the parameter \a initial. After finishing
         /// execution it returns a reference to the result as its return value
         /// (parameter \a result)
-        lcos::promise<naming::id_type> call_async(
+        lcos::future<naming::id_type> call_async(
             naming::id_type const& initial)
         {
             return this->base_type::call_async(this->gid_, initial);
@@ -54,7 +55,7 @@ namespace hpx { namespace components { namespace adaptive1d
         ///////////////////////////////////////////////////////////////////////
         /// Return the gid's of the output ports associated with this
         /// \a dynamic_stencil_value instance.
-        lcos::promise<std::vector<naming::id_type> >
+        lcos::future<std::vector<naming::id_type> >
         get_output_ports_async()
         {
             return this->base_type::get_output_ports_async(this->gid_);

@@ -13,7 +13,8 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/util/ini.hpp>
 #include <type_traits>
-//#include <hpx/util/detail/serialization_registration.hpp>
+
+#include <boost/mpl/bool.hpp>
 
 namespace hpx { namespace lcos
 {
@@ -213,12 +214,12 @@ namespace hpx { namespace lcos
             set_result(result);
         }
         */
-        
+
         void set_result_nonvirt (RemoteResult result)
         {
             set_result(boost::move(result));
         }
-        
+
         Result get_value_nonvirt()
         {
             return get_value();

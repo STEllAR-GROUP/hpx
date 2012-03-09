@@ -28,8 +28,8 @@ using hpx::actions::plain_action1;
 using hpx::actions::plain_action2;
 using hpx::naming::id_type;
 using hpx::lcos::async;
-using hpx::lcos::promise;
-using hpx::lcos::eager_future;
+using hpx::lcos::future;
+
 using hpx::find_all_localities;
 using hpx::util::function;
 using hpx::util::high_resolution_timer;

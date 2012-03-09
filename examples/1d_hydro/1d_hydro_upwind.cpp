@@ -27,10 +27,9 @@ using hpx::naming::invalid_id;
 
 using hpx::actions::plain_result_action2;
 
-using hpx::lcos::promise;
+using hpx::lcos::future;
 using hpx::lcos::async;
 using hpx::lcos::wait;
-using hpx::lcos::eager_future;
 
 using hpx::util::high_resolution_timer;
 
@@ -182,7 +181,7 @@ typedef plain_result_action2<
 // This generates the required boilerplate we need for remote invocation.
 HPX_REGISTER_PLAIN_ACTION(compute_action);
 
-typedef eager_future<compute_action> compute_future;
+typedef future<cell> compute_future;
 
 // this will return the timestep size.  The timestep index will refer to the 
 // timestep where it will be USED rather than the timestep where it was 
@@ -213,7 +212,7 @@ double timestep_size(boost::uint64_t timestep)
   // n_predict timesteps previous to the one we want to decide
   // the timestep for
   cout << (boost::format("pushing back futures for ts calc, ts=%1% \n") % timestep) << flush;  
-  std::vector<promise<cell> > futures;
+  std::vector<future<cell> > futures;
   for (boost::uint64_t i=0;i<nx;i++)
     futures.push_back(async<compute_action>(here,timestep-n_predict,i));
 
@@ -296,16 +295,16 @@ cell compute(boost::uint64_t timestep, boost::uint64_t location)
   //now we have to actually compute some values. 
 
   //these are the dependencies, or "stencil" 
-  compute_future nleft(here,timestep-1,location-1);
-  compute_future nmiddle(here,timestep-1,location);
-  compute_future nright(here,timestep-1,location+1);
+  compute_future nleft = async<compute_action>(here,timestep-1,location-1);
+  compute_future nmiddle = async<compute_action>(here,timestep-1,location);
+  compute_future nright = async<compute_action>(here,timestep-1,location+1);
 
   // OR is this the correct way to do it?
-  //promise<cell> left;
+  //future<cell> left;
   //left = async<compute_action>(here,timestep-1,location-1);
-  //promise<cell> middle;
+  //future<cell> middle;
   //middle = async<compute_action>(here,timestep-1,location);
-  //promise<cell> right;
+  //future<cell> right;
   //right = async<compute_action>(here,timestep-1,location+1);
 
   // calling this function may or may not make futures
@@ -550,7 +549,7 @@ int hpx_main(
     // Keep track of the time required to execute.
     high_resolution_timer t;
 
-    std::vector<promise<cell> > futures;
+    std::vector<future<cell> > futures;
     for (boost::uint64_t i=0;i<nx;i++)
       futures.push_back(async<compute_action>(here,nt-1,i));
     

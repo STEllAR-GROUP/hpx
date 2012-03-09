@@ -141,7 +141,7 @@ namespace bright_future
 
             while(!attendance.empty())
             {
-                std::vector<hpx::lcos::promise<std::size_t> > futures;
+                std::vector<hpx::lcos::future<std::size_t> > futures;
                 futures.reserve(attendance.size());
                 std::size_t start = 0;
                 BOOST_FOREACH(std::size_t os_thread, attendance)
@@ -175,7 +175,7 @@ namespace bright_future
 
             while(!attendance.empty())
             {
-                std::vector<hpx::lcos::promise<std::size_t> > futures;
+                std::vector<hpx::lcos::future<std::size_t> > futures;
                 futures.reserve(attendance.size());
                 BOOST_FOREACH(std::size_t os_thread, attendance)
                 {

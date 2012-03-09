@@ -11,7 +11,7 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/include/iostreams.hpp>
 
 using boost::program_options::variables_map;
@@ -21,8 +21,8 @@ using boost::program_options::value;
 using hpx::naming::id_type;
 using hpx::actions::plain_result_action2;
 using hpx::actions::plain_result_action3;
-using hpx::lcos::eager_future;
-using hpx::lcos::promise;
+using hpx::lcos::async;
+using hpx::lcos::future;
 using hpx::util::high_resolution_timer;
 using hpx::init;
 using hpx::finalize;
@@ -58,8 +58,6 @@ typedef
     start_iteration_action;
 
 HPX_REGISTER_PLAIN_ACTION(start_iteration_action);
-
-typedef eager_future<start_iteration_action> start_iteration_future;
 
 int hpx_main(variables_map & vm)
 {
@@ -101,11 +99,12 @@ int hpx_main(variables_map & vm)
 
     t.restart();
 
-    std::vector<promise<double> > promises;
+    std::vector<future<double> > promises;
     promises.reserve(xs.size());
     for(std::vector<double>::iterator it = xs.begin(); it != xs.end(); ++it)
     {
-        promises.push_back(start_iteration_future(find_here(), *it, *it, max_iterations));
+        promises.push_back(async<start_iteration_action>(
+            find_here(), *it, *it, max_iterations));
     }
     for(unsigned i = 0; i < vector_size; ++i)
     {

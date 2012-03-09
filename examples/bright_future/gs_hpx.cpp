@@ -13,7 +13,7 @@
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/include/iostreams.hpp>
 
 #include "server/remote_lse.hpp"
@@ -179,17 +179,9 @@ void gs(
 
         hpx::naming::id_type remote_id = *parts.first;
 
-        typedef hpx::lcos::promise<void> promise_type;
+        typedef hpx::lcos::future<void> promise_type;
 
-        typedef
-            hpx::lcos::eager_future<remote_lse_type::init_action>
-            init_future;
-
-        init_future(remote_id, n_x, n_y, hx, hy).get();
-
-        typedef
-            hpx::lcos::eager_future<remote_lse_type::init_rhs_action>
-            init_rhs_future;
+        async<remote_lse_type::init_action>(remote_id, n_x, n_y, hx, hy).get();
 
         typedef bright_future::grid<promise_type> promise_grid_type;
 
@@ -201,7 +193,9 @@ void gs(
             {
                 for(size_type x = 0; x < n_x; ++x)
                 {
-                    init_rhs_promises(x, y) = init_rhs_future(remote_id, init_rhs_fun(), x, y);
+                    init_rhs_promises(x, y) =
+                        hpx::lcos::async<remote_lse_type::init_rhs_action>(
+                            remote_id, init_rhs_fun(), x, y);
                 }
             }
             BOOST_FOREACH(promise_type & promise, init_rhs_promises)
@@ -214,26 +208,16 @@ void gs(
 
         iteration_dependencies_type iteration_dependencies(max_iterations+1, promise_grid_type(n_x, n_y));
 
-        typedef
-            hpx::lcos::eager_future<remote_lse_type::init_u_action>
-            init_u_future;
-
         for(size_type y = 0; y < n_y; ++y)
         {
             for(size_type x = 0; x < n_x; ++x)
             {
-                iteration_dependencies[0](x, y) = init_u_future(remote_id, init_u_fun(), x, y);
+                iteration_dependencies[0](x, y) =
+                    hpx::lcos::async<remote_lse_type::init_u_action>(
+                        remote_id, init_u_fun(), x, y);
                 iteration_dependencies[0](x, y).get();
             }
         }
-
-        typedef
-            hpx::lcos::eager_future<remote_lse_type::apply_action>
-            apply_future;
-
-        typedef
-            hpx::lcos::eager_future<remote_lse_type::apply_region_action>
-            apply_region_future;
 
         high_resolution_timer t;
         for(unsigned iter = 0; iter < max_iterations; iter++)// += iteration_block)
@@ -253,12 +237,16 @@ void gs(
                     {
                         std::vector<promise_type> dependencies;
                         dependencies.push_back(prev(0,y));
-                        current(0, y) = apply_future(remote_id, identity_fun(), 0, y, dependencies);
+                        current(0, y) =
+                            hpx::lcos::async<remote_lse_type::apply_action>(
+                                remote_id, identity_fun(), 0, y, dependencies);
                     }
                     {
                         std::vector<promise_type> dependencies;
                         dependencies.push_back(prev(n_x-1,y));
-                        current(n_x-1, y) = apply_future(remote_id, identity_fun(), n_x-1, y, dependencies);
+                        current(n_x-1, y) =
+                            hpx::lcos::async<remote_lse_type::apply_action>(
+                                remote_id, identity_fun(), n_x-1, y, dependencies);
                     }
                 }
                 for(x = 1; x < n_x-1; ++x)
@@ -266,12 +254,16 @@ void gs(
                     {
                         std::vector<promise_type> dependencies;
                         dependencies.push_back(prev(x,0));
-                        current(x, 0) = apply_future(remote_id, identity_fun(), x, 0, dependencies);
+                        current(x, 0) =
+                            hpx::lcos::async<remote_lse_type::apply_action>(
+                                remote_id, identity_fun(), x, 0, dependencies);
                     }
                     {
                         std::vector<promise_type> dependencies;
                         dependencies.push_back(prev(x,n_y-1));
-                        current(x, n_y-1) = apply_future(remote_id, identity_fun(), x, n_y-1, dependencies);
+                        current(x, n_y-1) =
+                            hpx::lcos::async<remote_lse_type::apply_action>(
+                                remote_id, identity_fun(), x, n_y-1, dependencies);
                     }
                 }
 
@@ -289,7 +281,9 @@ void gs(
                         dependencies.push_back(current(x-1,y));
                         dependencies.push_back(current(x,y-1));
 
-                        current(x, y) = apply_future(remote_id, update_fun(), x, y, dependencies);
+                        current(x, y) =
+                            hpx::lcos::async<remote_lse_type::apply_action>(
+                                remote_id, update_fun(), x, y, dependencies);
 
                         //u(x, y) = update(u, rhs, x, y, hx_sq, hy_sq, div, relaxation);
                     }
@@ -348,7 +342,8 @@ void gs(
             {
                 for(size_type y = 0; y < n_y; ++y)
                 {
-                    apply_future(remote_id, out, x, y, std::vector<promise_type>()).get();
+                    hpx::lcos::async<remote_lse_type::apply_action>(
+                        remote_id, out, x, y, std::vector<promise_type>()).get();
                 }
                 (*f.file) << "\n";
             }

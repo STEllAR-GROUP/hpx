@@ -78,7 +78,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         srand( time(NULL) );
 
-        std::vector<hpx::lcos::promise<void> > barrier;
+        std::vector<hpx::lcos::future<void> > barrier;
         for (std::size_t i=0;i<iterations;i++) {
           std::size_t rn = rand() % array_size;
           //std::cout << " Random element access: " << rn << std::endl;
@@ -87,7 +87,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         hpx::lcos::wait(barrier);
 
-        std::vector<hpx::lcos::promise<void> > barrier2;
+        std::vector<hpx::lcos::future<void> > barrier2;
         for (std::size_t i=0;i<array_size;i++) {
           barrier2.push_back(accu[i].print_async());
         }

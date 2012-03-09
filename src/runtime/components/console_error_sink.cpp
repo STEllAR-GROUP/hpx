@@ -6,7 +6,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/components/console_error_sink.hpp>
@@ -26,8 +26,7 @@ namespace hpx { namespace components
         {
             if (threads::get_self_ptr())
             {
-                lcos::eager_future<server::console_error_sink_action> f(dst, e);
-                f.get();
+                lcos::async<server::console_error_sink_action>(dst, e).get();
             }
             else
             {
@@ -55,8 +54,7 @@ namespace hpx { namespace components
         // Report the error only if the thread-manager is up.
         if (threads::threadmanager_is(running))
         {
-            lcos::eager_future<server::console_error_sink_action> f(dst, e);
-            f.get();
+            lcos::async<server::console_error_sink_action>(dst, e).get();
         }
     }
 }}

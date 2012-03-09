@@ -40,7 +40,7 @@ namespace hpx { namespace components
         ///////////////////////////////////////////////////////////////////////
         /// Create a new instance of an object on the locality as
         /// given by the parameter \a targetgid
-        Derived& create(naming::gid_type const& targetgid, component_type type,
+        Derived& create(naming::id_type const& targetgid, component_type type,
             std::size_t count = 1)
         {
             free();
@@ -48,27 +48,16 @@ namespace hpx { namespace components
             return static_cast<Derived&>(*this);
         }
 
-        Derived& create(naming::gid_type const& targetgid, std::size_t count = 1)
+        Derived& create(naming::id_type const& targetgid, std::size_t count = 1)
         {
             free();
             gid_ = stub_type::create_sync(targetgid, count);
             return static_cast<Derived&>(*this);
         }
 
-        Derived& create(naming::id_type const& gid, component_type type,
-            std::size_t count = 1)
-        {
-            return create(gid.get_gid(), type, count);
-        }
-
-        Derived& create(naming::id_type const& gid, std::size_t count = 1)
-        {
-            return create(gid.get_gid(), count);
-        }
-
         ///////////////////////////////////////////////////////////////////////
         template <typename Arg0>
-        Derived& create_one(naming::gid_type const& gid, component_type type,
+        Derived& create_one(naming::id_type const& gid, component_type type,
             Arg0 const& arg0)
         {
             free();
@@ -77,24 +66,11 @@ namespace hpx { namespace components
         }
 
         template <typename Arg0>
-        Derived& create_one(naming::gid_type const& gid, Arg0 const& arg0)
+        Derived& create_one(naming::id_type const& gid, Arg0 const& arg0)
         {
             free();
             gid_ = stub_type::create_one_sync(gid, arg0);
             return static_cast<Derived&>(*this);
-        }
-
-        template <typename Arg0>
-        Derived& create_one(naming::id_type const& gid, component_type type,
-            Arg0 const& arg0)
-        {
-            return create_one(gid.get_gid(), type, arg0);
-        }
-
-        template <typename Arg0>
-        Derived& create_one(naming::id_type const& gid, Arg0 const& arg0)
-        {
-            return create_one(gid.get_gid(), arg0);
         }
 
         ///////////////////////////////////////////////////////////////////////

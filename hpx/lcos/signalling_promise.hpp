@@ -20,10 +20,10 @@ namespace hpx { namespace lcos { namespace detail
     /// action and wait for the result.
     template <typename Result, typename RemoteResult>
     class signalling_promise
-      : public detail::promise<Result, Result, 1>
+      : public detail::promise<Result, Result>
     {
     private:
-        typedef detail::promise<Result, Result, 1> base_type;
+        typedef detail::promise<Result, Result> base_type;
 
     public:
         typedef HPX_STD_FUNCTION<void(Result const&)> completed_callback_type;
@@ -144,10 +144,10 @@ namespace hpx { namespace components
     class managed_component<
               lcos::detail::signalling_promise<Result,  RemoteResult>, Derived>
       : public managed_component<
-            lcos::detail::promise<Result,  RemoteResult, 1> >
+            lcos::detail::promise<Result,  RemoteResult> >
     {
     private:
-        typedef lcos::detail::promise<Result,  RemoteResult, 1> detail_base_type;
+        typedef lcos::detail::promise<Result,  RemoteResult> detail_base_type;
         typedef managed_component<detail_base_type> base_type;
 
     public:

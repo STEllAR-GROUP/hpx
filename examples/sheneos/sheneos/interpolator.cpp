@@ -8,6 +8,10 @@
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
+#include <hpx/lcos/async.hpp>
+#include <hpx/lcos/async_future_wait.hpp>
+#include <hpx/lcos/local/eager_future.hpp>
+
 #include <boost/foreach.hpp>
 #include <boost/assert.hpp>
 
@@ -170,7 +174,7 @@ namespace sheneos
         dimension dim_y(num_values_[dimension::temp]);
         dimension dim_z(num_values_[dimension::rho]);
 
-        std::vector<hpx::lcos::promise<void> > lazy_sync;
+        std::vector<hpx::lcos::future<void> > lazy_sync;
         for (std::size_t x = 0; x != num_partitions_per_dim_; ++x)
         {
             dim_x.offset_ = partition_size_x * x;
@@ -316,7 +320,7 @@ namespace sheneos
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::lcos::promise<std::vector<double> >
+    hpx::lcos::future<std::vector<double> >
     interpolator::interpolate_one_bulk_async(std::vector<double> const& ye,
         std::vector<double> const& temp, std::vector<double> const& rho,
         boost::uint32_t eosvalue) const
@@ -324,15 +328,13 @@ namespace sheneos
         namespace naming = hpx::naming;
         namespace lcos = hpx::lcos;
 
-        lcos::promise<std::vector<double> > bulk_op;
-
         // go through the triplets of data points and determine their target
         // partition, construct the partition-specific query-data
         if (ye.size() != temp.size() || ye.size() != rho.size()) {
             HPX_THROW_EXCEPTION(hpx::bad_parameter,
                 "interpolator::interpolate_one_bulk_async",
                 "inconsistent sizes of input fields");
-            return bulk_op;
+            return hpx::lcos::future<std::vector<double> >();
         }
 
         typedef std::map<naming::id_type, context_data> partitions_type;
@@ -353,31 +355,39 @@ namespace sheneos
             d.rho_.push_back(*it_rho);
         }
 
-        // create the overall result vector
-        std::vector<double> overall_result;
-        overall_result.resize(ye.size());
+        hpx::lcos::local::eager_future<std::vector<double> > bulk_op (
+            [&]() -> std::vector<double> {
+                namespace naming = hpx::naming;
+                namespace lcos = hpx::lcos;
 
-        // asynchronously invoke the interpolation on the different partitions
-        std::vector<lcos::promise<std::vector<double> > > lazy_results;
-        lazy_results.reserve(partitions.size());
+                // create the overall result vector
+                std::vector<double> overall_result;
+                overall_result.resize(ye.size());
 
-        typedef partitions_type::value_type value_type;
-        BOOST_FOREACH(value_type& p, partitions)
-        {
-            typedef sheneos::server::partition3d::interpolate_one_bulk_action
-                action_type;
+                // asynchronously invoke the interpolation on the different partitions
+                std::vector<lcos::future<std::vector<double> > > lazy_results;
+                lazy_results.reserve(partitions.size());
 
-            context_data& d = p.second;
-            lazy_results.push_back(lcos::async_callback<action_type>(
-                on_completed_bulk(d, overall_result),
-                p.first, boost::move(d.ye_), boost::move(d.temp_),
-                boost::move(d.rho_), eosvalue));
-        }
+                typedef std::map<naming::id_type, context_data>::value_type value_type;
+                BOOST_FOREACH(value_type& p, partitions)
+                {
+                    typedef sheneos::server::partition3d::interpolate_one_bulk_action
+                        action_type;
 
-        // wait for all asynchronous operations to complete
-        lcos::wait(lazy_results);
+                    context_data& d = p.second;
+                    lazy_results.push_back(lcos::async_callback<action_type>(
+                        on_completed_bulk(d, overall_result),
+                        p.first, boost::move(d.ye_), boost::move(d.temp_),
+                        boost::move(d.rho_), eosvalue));
+                }
 
-        return bulk_op;
+                // wait for all asynchronous operations to complete
+                lcos::wait(lazy_results);
+
+                return overall_result;
+            });
+
+        return bulk_op.get_future();
     }
 }
 

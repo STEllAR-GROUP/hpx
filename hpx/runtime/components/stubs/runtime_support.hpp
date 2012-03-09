@@ -12,8 +12,9 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/util/ini.hpp>
 
 namespace hpx { namespace components { namespace stubs
@@ -31,110 +32,73 @@ namespace hpx { namespace components { namespace stubs
         ///         be created in blocks (i.e. more than one instance at once).
         ///         This function is used by the \a distributing_factory to
         ///         determine a correct allocation strategy
-        static lcos::promise<int> get_factory_properties_async(
+        static lcos::future<int> get_factory_properties_async(
             naming::id_type const& targetgid, components::component_type type)
         {
-            // Create an eager_future, execute the required action,
-            // we simply return the initialized promise, the caller needs
+            // Create a future, execute the required action,
+            // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef
                 server::runtime_support::factory_properties_action
             action_type;
-            return lcos::eager_future<action_type>(targetgid, type);
+            return lcos::async<action_type>(targetgid, type);
         }
 
         static int get_factory_properties(naming::id_type const& targetgid,
             components::component_type type)
         {
             // The following get yields control while the action above
-            // is executed and the result is returned to the eager_future
+            // is executed and the result is returned to the future
             return get_factory_properties_async(targetgid, type).get();
         }
 
         ///////////////////////////////////////////////////////////////////////
         /// Create a new component \a type using the runtime_support with the
         /// given \a targetgid. This is a non-blocking call. The caller needs
-        /// to call \a promise#get on the result of this function
+        /// to call \a future#get on the result of this function
         /// to obtain the global id of the newly created object.
-        static lcos::promise<naming::id_type, naming::gid_type>
-        create_component_async(
-            naming::gid_type const& gid, components::component_type type,
-            std::size_t count = 1)
-        {
-            // Create an eager_future, execute the required action,
-            // we simply return the initialized promise, the caller needs
-            // to call get() on the return value to obtain the result
-            typedef server::runtime_support::create_component_action action_type;
-            return lcos::eager_future<action_type, naming::id_type>(gid, type, count);
-        }
-
-        static lcos::promise<naming::id_type, naming::gid_type>
+        static lcos::future<naming::id_type>
         create_component_async(
             naming::id_type const& gid, components::component_type type,
             std::size_t count = 1)
         {
-            // Create an eager_future, execute the required action,
-            // we simply return the initialized promise, the caller needs
+            // Create a future, execute the required action,
+            // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::runtime_support::create_component_action action_type;
-            return lcos::eager_future<action_type, naming::id_type>(
-                gid.get_gid(), type, count);
+            return lcos::async<action_type>(gid, type, count);
         }
 
         /// Create a new component \a type using the runtime_support with the
         /// given \a targetgid. Block for the creation to finish.
         static naming::id_type create_component(
-            naming::gid_type const& gid, components::component_type type,
-            std::size_t count = 1)
-        {
-            // The following get yields control while the action above
-            // is executed and the result is returned to the eager_future
-            return create_component_async(gid, type, count).get();
-        }
-
-        static naming::id_type create_component(
             naming::id_type const& gid, components::component_type type,
             std::size_t count = 1)
         {
             // The following get yields control while the action above
-            // is executed and the result is returned to the eager_future
-            return create_component_async(gid.get_gid(), type, count).get();
+            // is executed and the result is returned to the future
+            return create_component_async(gid, type, count).get();
         }
 
         ///////////////////////////////////////////////////////////////////////
         /// Create a new component \a type using the runtime_support with the
         /// given \a targetgid. This is a non-blocking call. The caller needs
-        /// to call \a promise#get on the result of this function
+        /// to call \a future#get on the result of this function
         /// to obtain the global id of the newly created object. Pass one
         /// generic argument to the constructor.
         template <typename Arg0>
-        static lcos::promise<naming::id_type, naming::gid_type>
-        create_one_component_async(
-            naming::gid_type const& gid, components::component_type type,
-            Arg0 const& arg0)
-        {
-            // Create an eager_future, execute the required action,
-            // we simply return the initialized promise, the caller needs
-            // to call get() on the return value to obtain the result
-            typedef server::runtime_support::create_one_component_action
-                action_type;
-            return lcos::eager_future<action_type, naming::id_type>(
-                gid, type, components::constructor_argument(arg0));
-        }
-
-        template <typename Arg0>
-        static lcos::promise<naming::id_type, naming::gid_type>
+        static lcos::future<naming::id_type>
         create_one_component_async(
             naming::id_type const& gid, components::component_type type,
             Arg0 const& arg0)
         {
-            // Create an eager_future, execute the required action,
-            // we simply return the initialized promise, the caller needs
+            // Create a future, execute the required action,
+            // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::runtime_support::create_one_component_action
                 action_type;
-            return lcos::eager_future<action_type, naming::id_type>(
-                gid.get_gid(), type, components::constructor_argument(arg0));
+            return lcos::async<action_type>(gid, type,
+                components::constructor_argument(arg0));
         }
 
         /// Create a new component \a type using the runtime_support with the
@@ -146,132 +110,46 @@ namespace hpx { namespace components { namespace stubs
             Arg0 const& arg0)
         {
             // The following get yields control while the action above
-            // is executed and the result is returned to the eager_future
+            // is executed and the result is returned to the future
             return create_one_component_async(targetgid, type, arg0).get();
-        }
-
-        template <typename Arg0>
-        static naming::id_type create_one_component(
-            naming::gid_type const& gid, components::component_type type,
-            Arg0 const& arg0)
-        {
-            // The following get yields control while the action above
-            // is executed and the result is returned to the eager_future
-            return create_one_component_async(gid, type, arg0).get();
         }
 
         ///////////////////////////////////////////////////////////////////////
         /// Create a new memory block using the runtime_support with the
         /// given \a targetgid. This is a non-blocking call. The caller needs
-        /// to call \a promise#get on the result of this function
+        /// to call \a future#get on the result of this function
         /// to obtain the global id of the newly created object.
-//         template <typename T>
-//         static lcos::promise<naming::id_type, naming::gid_type>
-//         create_memory_block_async(
-//             naming::gid_type const& gid, std::size_t count,
-//             hpx::actions::manage_object_action<T> const& act)
-//         {
-//             // Create an eager_future, execute the required action,
-//             // we simply return the initialized promise, the caller needs
-//             // to call get() on the return value to obtain the result
-//             typedef server::runtime_support::create_memory_block_action action_type;
-//             return lcos::eager_future<action_type, naming::id_type>(gid, count, act);
-//         }
-//
-//         template <typename T>
-//         static lcos::promise<naming::id_type, naming::gid_type>
-//         create_memory_block_async(
-//             naming::id_type const& id, std::size_t count,
-//             hpx::actions::manage_object_action<T> const& act)
-//         {
-//             // Create an eager_future, execute the required action,
-//             // we simply return the initialized promise, the caller needs
-//             // to call get() on the return value to obtain the result
-//             typedef server::runtime_support::create_memory_block_action action_type;
-//             return lcos::eager_future<action_type, naming::id_type>(
-//                 id.get_gid(), count, act);
-//         }
-//
-//         /// Create a new memory block using the runtime_support with the
-//         /// given \a targetgid. Block for the creation to finish.
-//         template <typename T>
-//         static naming::id_type create_memory_block(
-//             naming::gid_type const& gid, std::size_t count,
-//             hpx::actions::manage_object_action<T> const& act)
-//         {
-//             // The following get yields control while the action above
-//             // is executed and the result is returned to the eager_future
-//             return create_memory_block_async(gid, count, act).get();
-//         }
-//
-//         template <typename T>
-//         static naming::id_type create_memory_block(
-//             naming::id_type const& id, std::size_t count,
-//             hpx::actions::manage_object_action<T> const& act)
-//         {
-//             // The following get yields control while the action above
-//             // is executed and the result is returned to the eager_future
-//             return create_memory_block_async(id.get_gid(), count, act).get();
-//         }
-
-        ///////////////////////////////////////////////////////////////////////
         template <typename T, typename Config>
-        static lcos::promise<naming::id_type, naming::gid_type>
-        create_memory_block_async(
-            naming::gid_type const& gid, std::size_t count,
-            hpx::actions::manage_object_action<T, Config> const& act)
-        {
-            // Create an eager_future, execute the required action,
-            // we simply return the initialized promise, the caller needs
-            // to call get() on the return value to obtain the result
-            typedef server::runtime_support::create_memory_block_action
-                action_type;
-            return lcos::eager_future<action_type, naming::id_type>(
-                gid, count, act);
-        }
-
-        template <typename T, typename Config>
-        static lcos::promise<naming::id_type, naming::gid_type>
+        static lcos::future<naming::id_type, naming::gid_type>
         create_memory_block_async(
             naming::id_type const& id, std::size_t count,
             hpx::actions::manage_object_action<T, Config> const& act)
         {
-            // Create an eager_future, execute the required action,
-            // we simply return the initialized promise, the caller needs
+            // Create a future, execute the required action,
+            // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::runtime_support::create_memory_block_action
                 action_type;
-            return lcos::eager_future<action_type, naming::id_type>(
-                id.get_gid(), count, act);
+            return lcos::async<action_type>(id, count, act);
         }
 
         /// Create a new memory block using the runtime_support with the
         /// given \a targetgid. Block for the creation to finish.
         template <typename T, typename Config>
         static naming::id_type create_memory_block(
-            naming::gid_type const& gid, std::size_t count,
-            hpx::actions::manage_object_action<T, Config> const& act)
-        {
-            // The following get yields control while the action above
-            // is executed and the result is returned to the eager_future
-            return create_memory_block_async(gid, count, act).get();
-        }
-
-        template <typename T, typename Config>
-        static naming::id_type create_memory_block(
             naming::id_type const& id, std::size_t count,
             hpx::actions::manage_object_action<T, Config> const& act)
         {
             // The following get yields control while the action above
-            // is executed and the result is returned to the eager_future
-            return create_memory_block_async(id.get_gid(), count, act).get();
+            // is executed and the result is returned to the future
+            return create_memory_block_async(id, count, act).get();
         }
 
-        static lcos::promise<bool>
+        static lcos::future<bool>
         load_components_async(naming::id_type const& gid)
         {
             typedef server::runtime_support::load_components_action action_type;
-            return lcos::eager_future<action_type>(gid.get_gid());
+            return lcos::async<action_type>(gid);
         }
 
         static bool load_components(naming::id_type const& gid)
@@ -279,11 +157,11 @@ namespace hpx { namespace components { namespace stubs
             return load_components_async(gid).get();
         }
 
-        static lcos::promise<void>
+        static lcos::future<void>
         call_startup_functions_async(naming::id_type const& gid, bool pre_startup)
         {
             typedef server::runtime_support::call_startup_functions_action action_type;
-            return lcos::eager_future<action_type, void>(gid.get_gid(), pre_startup);
+            return lcos::async<action_type>(gid, pre_startup);
         }
 
         static void call_startup_functions(naming::id_type const& gid, bool pre_startup)
@@ -291,11 +169,11 @@ namespace hpx { namespace components { namespace stubs
             call_startup_functions_async(gid, pre_startup).get();
         }
 
-        static lcos::promise<void>
+        static lcos::future<void>
         call_shutdown_functions_async(naming::id_type const& gid, bool pre_shutdown)
         {
             typedef server::runtime_support::call_shutdown_functions_action action_type;
-            return lcos::eager_future<action_type, void>(gid.get_gid(), pre_shutdown);
+            return lcos::async<action_type>(gid, pre_shutdown);
         }
 
         static void call_shutdown_functions(naming::id_type const& gid, bool pre_shutdown)
@@ -329,12 +207,13 @@ namespace hpx { namespace components { namespace stubs
                 // the target GID, otherwise this will break once we start
                 // moving objects.
                 naming::gid_type prefix = naming::get_locality_from_gid(gid);
-                lcos::eager_future<action_type, void>(prefix, type, gid, count).get();
+                lcos::eager_future<action_type, void>(prefix, type, gid, count)
+                    .get_future().get();
             }
         }
 
         /// \brief Shutdown the given runtime system
-        static lcos::promise<void>
+        static lcos::future<void>
         shutdown_async(naming::id_type const& targetgid, double timeout = -1)
         {
             // Create a promise directly and execute the required action.
@@ -344,13 +223,13 @@ namespace hpx { namespace components { namespace stubs
 
             lcos::promise<void> value;
             hpx::applier::apply<action_type>(targetgid, timeout, value.get_gid());
-            return value;
+            return value.get_future();
         }
 
         static void shutdown(naming::id_type const& targetgid, double timeout = - 1)
         {
             // The following get yields control while the action above
-            // is executed and the result is returned to the eager_future
+            // is executed and the result is returned to the future
             shutdown_async(targetgid, timeout).get();
         }
 
@@ -373,23 +252,23 @@ namespace hpx { namespace components { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         /// \brief Retrieve configuration information
         /// \brief Terminate the given runtime system
-        static lcos::promise<void>
+        static lcos::future<void>
         terminate_async(naming::id_type const& targetgid)
         {
-            // Create a promise directly and execute the required action.
+            // Create a future directly and execute the required action.
             // This action has implemented special response handling as the
             // back-parcel is sent explicitly (and synchronously).
             typedef server::runtime_support::terminate_action action_type;
 
             lcos::promise<void> value;
             hpx::applier::apply<action_type>(targetgid, value.get_gid());
-            return value;
+            return value.get_future();
         }
 
         static void terminate(naming::id_type const& targetgid)
         {
             // The following get yields control while the action above
-            // is executed and the result is returned to the eager_future
+            // is executed and the result is returned to the future
             terminate_async(targetgid).get();
         }
 
@@ -427,12 +306,12 @@ namespace hpx { namespace components { namespace stubs
             hpx::applier::apply<action_type>(targetgid);
         }
 
-        static lcos::promise<void>
+        static lcos::future<void>
         garbage_collect_async(naming::id_type const& targetgid)
         {
             typedef server::runtime_support::garbage_collect_action
                 action_type;
-            return lcos::eager_future<action_type, void>(targetgid);
+            return lcos::async<action_type>(targetgid);
         }
 
         static void
@@ -440,48 +319,46 @@ namespace hpx { namespace components { namespace stubs
         {
             typedef server::runtime_support::garbage_collect_action
                 action_type;
-            lcos::eager_future<action_type, void>(targetgid).get();
+            lcos::async<action_type>(targetgid).get();
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static lcos::promise<naming::gid_type>
+        static lcos::future<naming::gid_type>
         create_performance_counter_async(naming::id_type targetgid,
             performance_counters::counter_info const& info)
         {
             typedef server::runtime_support::create_performance_counter_action
                 action_type;
-            return lcos::eager_future<action_type, naming::gid_type>(targetgid, info);
+            return lcos::eager_future<action_type, naming::gid_type>(
+                targetgid, info).get_future();
         }
 
         static naming::gid_type
         create_performance_counter(naming::id_type targetgid,
             performance_counters::counter_info const& info)
         {
-            typedef server::runtime_support::create_performance_counter_action
-                action_type;
-            return lcos::eager_future<action_type, naming::gid_type>(targetgid, info).get();
+            return create_performance_counter_async(targetgid, info).get();
         }
 
         ///////////////////////////////////////////////////////////////////////
         /// \brief Retrieve configuration information
-        static lcos::promise<util::section> get_config_async(
+        static lcos::future<util::section> get_config_async(
             naming::id_type const& targetgid)
         {
-            // Create an eager_future, execute the required action,
-            // we simply return the initialized promise, the caller needs
+            // Create a future, execute the required action,
+            // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::runtime_support::get_config_action action_type;
-            return lcos::eager_future<action_type>(targetgid);
+            return lcos::async<action_type>(targetgid);
         }
 
         static void get_config(naming::id_type const& targetgid, util::section& ini)
         {
             // The following get yields control while the action above
-            // is executed and the result is returned to the eager_future
+            // is executed and the result is returned to the future
             ini = get_config_async(targetgid).get();
         }
     };
-
 }}}
 
 #endif

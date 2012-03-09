@@ -371,7 +371,7 @@ namespace hpx { namespace components { namespace server
     void invoke_shutdown_functions(
         std::vector<naming::gid_type> const& prefixes, bool pre_shutdown)
     {
-        std::vector<lcos::promise<void> > lazy_actions;
+        std::vector<lcos::future<void> > lazy_actions;
         BOOST_FOREACH(naming::gid_type const& gid, prefixes)
         {
             using components::stubs::runtime_support;
@@ -399,7 +399,7 @@ namespace hpx { namespace components { namespace server
         // shut down all localities except the the local one
         {
             boost::uint32_t locality_id = get_locality_id();
-            std::vector<lcos::promise<void> > lazy_actions;
+            std::vector<lcos::future<void> > lazy_actions;
 
             BOOST_FOREACH(naming::gid_type gid, locality_ids)
             {
@@ -431,7 +431,7 @@ namespace hpx { namespace components { namespace server
         // terminate all localities except the the local one
         {
             boost::uint32_t locality_id = get_locality_id();
-            std::vector<lcos::promise<void> > lazy_actions;
+            std::vector<lcos::future<void> > lazy_actions;
 
             BOOST_FOREACH(naming::gid_type gid, locality_ids)
             {

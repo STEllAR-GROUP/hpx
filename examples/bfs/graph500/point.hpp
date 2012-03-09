@@ -35,7 +35,7 @@ namespace graph500
         // Exposed functionality of this component.
 
         // kernel 1
-        hpx::lcos::promise<void> init_async(std::size_t objectid,
+        hpx::lcos::future<void> init_async(std::size_t objectid,
             std::size_t scale,std::size_t number_partitions,double overlap)
         {
             BOOST_ASSERT(gid_);
@@ -49,7 +49,7 @@ namespace graph500
             this->base_type::init_async(gid_,objectid, scale,number_partitions,overlap);
         }
 
-        hpx::lcos::promise<void> root_async(std::vector<int64_t> const& bfs_roots)
+        hpx::lcos::future<void> root_async(std::vector<int64_t> const& bfs_roots)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::root_async(gid_,bfs_roots);
@@ -61,7 +61,7 @@ namespace graph500
             this->base_type::root(gid_,bfs_roots);
         }
 
-        hpx::lcos::promise<void> receive_duplicates_async(int64_t j,
+        hpx::lcos::future<void> receive_duplicates_async(int64_t j,
                           std::vector<hpx::naming::id_type> const& duplicate_components,
                           std::vector<std::size_t> const& duplicateid)
         {
@@ -77,7 +77,7 @@ namespace graph500
             this->base_type::receive_duplicates(gid_,j,duplicate_components,duplicateid);
         }
 
-        hpx::lcos::promise<void> bfs_async()
+        hpx::lcos::future<void> bfs_async()
         {
             BOOST_ASSERT(gid_);
             return this->base_type::bfs_async(gid_);
@@ -89,7 +89,7 @@ namespace graph500
             this->base_type::bfs(gid_);
         }
 
-        hpx::lcos::promise<void> resolve_conflict_async()
+        hpx::lcos::future<void> resolve_conflict_async()
         {
             BOOST_ASSERT(gid_);
             return this->base_type::resolve_conflict_async(gid_);
@@ -101,7 +101,7 @@ namespace graph500
             this->base_type::resolve_conflict(gid_);
         }
 
-        hpx::lcos::promise< std::vector<int> > distributed_validate_async(std::size_t scale)
+        hpx::lcos::future< std::vector<int> > distributed_validate_async(std::size_t scale)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::distributed_validate_async(gid_,scale);
@@ -113,7 +113,7 @@ namespace graph500
             return this->base_type::distributed_validate(gid_,scale);
         }
 
-        hpx::lcos::promise< std::vector<int64_t> > get_numedges_async()
+        hpx::lcos::future< std::vector<int64_t> > get_numedges_async()
         {
             BOOST_ASSERT(gid_);
             return this->base_type::get_numedges_async(gid_);
@@ -125,7 +125,7 @@ namespace graph500
             return this->base_type::get_numedges(gid_);
         }
 
-        hpx::lcos::promise< bool > has_edge_async(int64_t edge)
+        hpx::lcos::future< bool > has_edge_async(int64_t edge)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::has_edge_async(gid_,edge);
@@ -137,7 +137,7 @@ namespace graph500
             return this->base_type::has_edge(gid_,edge);
         }
 
-        hpx::lcos::promise< resolvedata > get_parent_async(int64_t edge)
+        hpx::lcos::future< resolvedata > get_parent_async(int64_t edge)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::get_parent_async(gid_,edge);

@@ -11,12 +11,12 @@
 //
 // D^2 U / Dt^2 = c^2  D^2 U / Dx^2
 //
-// The parameter alpha = c*dt/dx must be less than 1 to ensure the stability of the algorithm. 
+// The parameter alpha = c*dt/dx must be less than 1 to ensure the stability of the algorithm.
 // Discritizing the equation and solving for U(t+dt,x) yeilds
 // alpha^2 * (U(t,x+dx)+U(t,x-dx))+2(1-alpha^2)*U(t,x) - U(t-dt,x)
 //
 // For the first timestep, we approximate U(t-dt,x) by u(t+dt,x)-2*dt*du/dt(t,x)
-// 
+//
 
 
 // Include statements.
@@ -40,10 +40,9 @@ using hpx::naming::invalid_id;
 
 using hpx::actions::plain_result_action2;
 
-using hpx::lcos::promise;
+using hpx::lcos::future;
 using hpx::lcos::async;
 using hpx::lcos::wait;
-using hpx::lcos::eager_future;
 
 using hpx::util::high_resolution_timer;
 
@@ -61,10 +60,10 @@ using hpx::flush;
 double alpha_squared = 0;
 
 // Initialized in hpx_main.
-id_type here = invalid_id; 
-double pi = 0.; 
+id_type here = invalid_id;
+double pi = 0.;
 double c = 0.;
-double dt = 0.; 
+double dt = 0.;
 double dx = 0.;
 
 // Command line argument.
@@ -88,15 +87,15 @@ struct data{
     , u_value(other.u_value)
     , computed(other.computed)
   {}
- 
+
   hpx::lcos::local::mutex mtx;
   double u_value;
   bool computed;
 };
 
-std::vector<std::vector<data> > u; 
+std::vector<std::vector<data> > u;
 
- 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Forward declaration of the wave function.
 double wave(boost::uint64_t t, boost::uint64_t x);
@@ -105,10 +104,10 @@ double wave(boost::uint64_t t, boost::uint64_t x);
 // invoked as a HPX-thread.
 typedef plain_result_action2<
   // result type
-  double,             
-    
+  double,
+
   // arguments
-  boost::uint64_t,    
+  boost::uint64_t,
   boost::uint64_t,
 
   // function
@@ -117,11 +116,6 @@ typedef plain_result_action2<
 
 // This generates the required boilerplate we need for remote invocation.
 HPX_REGISTER_PLAIN_ACTION(wave_action);
-
-///////////////////////////////////////////////////////////////////////////////
-// An eager_future is a HPX construct exposing the semantics of a Future
-// object. It starts executing the bound action immediately (eagerly).
-typedef eager_future<wave_action> wave_future;
 
 double calculate_u_tplus_x(double u_t_xplus, double u_t_x, double u_t_xminus,
                            double u_tminus_x)
@@ -149,18 +143,18 @@ double wave(boost::uint64_t t, boost::uint64_t x)
       return u[t][x].u_value;
     }
   u[t][x].computed = true;
-    
+
   if (t == 0) //first timestep are initial values
     {
       //        cout << (boost::format("first timestep\n")) << flush;
       u[t][x].u_value = std::sin(2.*pi*x*dx); // initial u(x) value
       return u[t][x].u_value;
     }
-  promise<double> n1;
-    
-    
-    
-    
+  future<double> n1;
+
+
+
+
   // NOT using ghost zones here... just letting the stencil cross the periodic
   // boundary.
   if (x == 0)
@@ -168,9 +162,9 @@ double wave(boost::uint64_t t, boost::uint64_t x)
   else
     n1 = async<wave_action>(here,t-1,x-1);
 
-  wave_future n2(here,t-1,x);
+  future<double> n2 = async<wave_action>(here,t-1,x);
 
-  promise<double> n3;
+  future<double> n3;
 
   if (x == (nx-1))
     n3 = async<wave_action>(here,t-1,0);
@@ -187,12 +181,11 @@ double wave(boost::uint64_t t, boost::uint64_t x)
       u[t][x].u_value = calculate_u_tplus_x_1st(u_t_xplus,u_t_x,u_t_xminus,u_dot);
       return u[t][x].u_value;
     } else {
-    wave_future n4(here,t-2,x);
-    double u_tminus_x = n4.get();
+    double u_tminus_x = async<wave_action>(here,t-2,x).get();
     u[t][x].u_value =  calculate_u_tplus_x(u_t_xplus,u_t_x,u_t_xminus,u_tminus_x);
     return u[t][x].u_value;
   }
-  
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -212,11 +205,11 @@ int hpx_main(variables_map& vm)
   dt = 1.0/(nt-1);
   dx = 1.0/(nx-1);
   alpha_squared = (c*dt/dx)*(c*dt/dx);
-  
+
   // check that alpha_squared satisfies the stability condition
-  if (0.25 < alpha_squared) 
+  if (0.25 < alpha_squared)
     {
-      cout << (("alpha^2 = (c*dt/dx)^2 should be less than 0.25 for stability!\n"))<< flush;      
+      cout << (("alpha^2 = (c*dt/dx)^2 should be less than 0.25 for stability!\n"))<< flush;
     }
 
   u = std::vector<std::vector<data> >(nt, std::vector<data>(nx));
@@ -229,10 +222,10 @@ int hpx_main(variables_map& vm)
     // Keep track of the time required to execute.
     high_resolution_timer t;
 
-    std::vector<promise<double> > futures;
+    std::vector<future<double> > futures;
     for (boost::uint64_t i=0;i<nx;i++)
       futures.push_back(async<wave_action>(here,nt-1,i));
-    
+
     // open file for output
     std::ofstream outfile;
     outfile.open ("output.dat");

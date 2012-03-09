@@ -7,7 +7,7 @@
 #define HPX_INTERPOLATE3D_AUG_04_2011_0340PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/promise.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
 #include <vector>
@@ -48,7 +48,7 @@ namespace interpolate3d
         // Return the interpolated  function value for the given argument. This
         // function dispatches to the proper partition for the actual
         // interpolation.
-        hpx::lcos::promise<double>
+        hpx::lcos::future<double>
         interpolate_async(double value_x, double value_y, double value_z)
         {
             return stubs::partition3d::interpolate_async(

@@ -8,7 +8,7 @@
 #define HPX_COMPONENTS_AMR_STUBS_STENCIL_VALUE_NOV_02_2008_0447PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 
 #include "../server/dynamic_stencil_value.hpp"
@@ -28,44 +28,44 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         /// data referred to by the parameter \a initial. After finishing
         /// execution it returns a reference to the result as its return value
         /// (parameter \a result)
-        static lcos::promise<naming::id_type> call_async(
+        static lcos::future<naming::id_type> call_async(
             naming::id_type const& targetgid, naming::id_type const& initial)
         {
-            // Create an eager_future, execute the required action,
-            // we simply return the initialized promise, the caller needs
+            // Create a future, execute the required action,
+            // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef amr::server::dynamic_stencil_value::call_action action_type;
-            return lcos::eager_future<action_type>(targetgid,initial);
+            return lcos::async<action_type>(targetgid,initial);
         }
 
         static naming::id_type call(naming::id_type const& targetgid,
             naming::id_type const& initial)
         {
             // The following get yields control while the action above
-            // is executed and the result is returned to the eager_future
+            // is executed and the result is returned to the future
             return call_async(targetgid, initial).get();
         }
 
         ///////////////////////////////////////////////////////////////////////
         /// Return the gid's of the output ports associated with this
         /// \a dynamic_stencil_value instance.
-        static lcos::promise<std::vector<naming::id_type> >
+        static lcos::future<std::vector<naming::id_type> >
         get_output_ports_async(naming::id_type const& gid)
         {
-            // Create an eager_future, execute the required action,
-            // we simply return the initialized promise, the caller needs
+            // Create a future, execute the required action,
+            // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef amr::server::dynamic_stencil_value::get_output_ports_action
-            action_type;
+                action_type;
             typedef std::vector<naming::id_type> return_type;
-            return lcos::eager_future<action_type, return_type>(gid);
+            return lcos::async<action_type, return_type>(gid);
         }
 
         static std::vector<naming::id_type>
         get_output_ports(naming::id_type const& gid)
         {
             // The following get yields control while the action above
-            // is executed and the result is returned to the eager_future
+            // is executed and the result is returned to the future
             return get_output_ports_async(gid).get();
         }
 
@@ -73,14 +73,14 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         /// Connect the destinations given by the provided gid's with the
         /// corresponding input ports associated with this \a dynamic_stencil_value
         /// instance.
-        static lcos::promise<void>
+        static lcos::future<void>
         connect_input_ports_async(naming::id_type const& gid,
             std::vector<naming::id_type> const& gids)
         {
             typedef
                 amr::server::dynamic_stencil_value::connect_input_ports_action
             action_type;
-            return lcos::eager_future<action_type>(gid, gids);
+            return lcos::async<action_type>(gid, gids);
         }
 
         static void connect_input_ports(naming::id_type const& gid,
@@ -92,7 +92,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         /// Set the gid of the component implementing the actual time evolution
         /// functionality
-        static lcos::promise<void>
+        static lcos::future<void>
         set_functional_component_async(naming::id_type const& gid,
             naming::id_type const& functiongid, int row, int column,
             int instencilsize, int outstencilsize, double cycle_time,parameter const& par)
@@ -100,7 +100,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             typedef
                 amr::server::dynamic_stencil_value::set_functional_component_action
             action_type;
-            return lcos::eager_future<action_type>(gid, functiongid, row,
+            return lcos::async<action_type>(gid, functiongid, row,
                 column, instencilsize, outstencilsize,cycle_time, par);
         }
 
@@ -114,12 +114,12 @@ namespace hpx { namespace components { namespace amr { namespace stubs
 
         ///////////////////////////////////////////////////////////////////////
         /// Subset of set_functional_component functionality
-        static lcos::promise<void>
+        static lcos::future<void>
         start_async(naming::id_type const& gid)
         {
             typedef amr::server::dynamic_stencil_value::start_action
                 action_type;
-            return lcos::eager_future<action_type>(gid);
+            return lcos::async<action_type>(gid);
         }
 
         static void start(naming::id_type const& gid)

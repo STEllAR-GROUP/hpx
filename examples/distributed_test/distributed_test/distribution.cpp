@@ -30,16 +30,16 @@ namespace distributed
         , std::size_t num_instances, std::vector<std::size_t> data_received)
     {
         std::size_t init_length = 1, init_value = 0;
-        hpx::components::component_type type = 
+        hpx::components::component_type type =
             hpx::components::get_component_type<server::datastructure>();
-        
+
         typedef hpx::components::distributing_factory distributing_factory;
-    
+
         distributing_factory factory(
             distributing_factory::create_sync(hpx::find_here()));
         //asyncronously create comonents, which will be distributed across
         //all available localities
-        distributing_factory::async_create_result_type result = 
+        distributing_factory::async_create_result_type result =
             factory.create_components_async(type, num_instances);
 
         //initialize locality mappings: Total Component instances
@@ -47,7 +47,7 @@ namespace distributed
 
         //wait for the components to be created
         distributing_factory::result_type results = result.get();
-        distributing_factory::iterator_range_type parts = 
+        distributing_factory::iterator_range_type parts =
             hpx::components::server::locality_results(results);
 
         std::size_t cardinality = 0;
@@ -61,8 +61,8 @@ namespace distributed
         BOOST_ASSERT( 0 != num_comps);
         BOOST_ASSERT( 0 != num_instances);
         std::vector<hpx::naming::id_type> prefixes = hpx::find_all_localities();
-       
-        std::vector<hpx::lcos::promise<void> > result_future;
+
+        std::vector<hpx::lcos::future<void> > result_future;
 
         std::vector<hpx::naming::id_type>::iterator loc_itr = comp_instances_.begin();
         while(loc_itr != comp_instances_.end())
@@ -76,13 +76,13 @@ namespace distributed
         hpx::lcos::wait(result_future);
 
         typedef std::vector<std::vector<std::size_t> > client_data_type;
-        
+
         client_data_type dd_vector;
-        
+
         split_client_data(num_instances, data_received, dd_vector);
         //loc_itr = comp_instances_.begin();
         //result_future.resize(0);
-        std::vector<hpx::lcos::promise<void> > result_future2;
+        std::vector<hpx::lcos::future<void> > result_future2;
         client_data_type::iterator dd_itr;
         dd_itr = dd_vector.begin();
         loc_itr = comp_instances_.begin();
@@ -102,10 +102,10 @@ namespace distributed
         hpx::lcos::wait(result_future2);
         //Create component object locally.
         loc_itr = comp_instances_.begin();
-        hpx::lcos::promise<distributed::config_comp> config_result = 
+        hpx::lcos::future<distributed::config_comp> config_result =
             stubs::datastructure::get_config_info_async(*loc_itr);
         distributed::config_comp config_data = config_result.get();
-        hpx::lcos::promise<std::vector<std::size_t>> data_fraction;
+        hpx::lcos::future<std::vector<std::size_t>> data_fraction;
         data_fraction = stubs::datastructure::get_data_async(*(++loc_itr));
         std::vector<std::size_t> temp_vector = data_fraction.get();
                 //hpx::lcos::wait(data_fraction);
@@ -172,7 +172,7 @@ namespace distributed
                 itr = comp_instances_.begin();
             }
             else
-            {   
+            {
                 itr = comp_instances_.begin();
                 temp+= max_comp_size_;
                 while( temp <= n_pos )
@@ -192,7 +192,7 @@ namespace distributed
                 //return hpx::applier::apply<distributed::server::datastructure::get_data_at_action>
                 //return hpx::lcos::apply<distributed::server::datastructure::get_data_at_action>
                 //    (*itr, max_comp_size_ - 1);
-                hpx::lcos::promise<std::size_t> value_at = 
+                hpx::lcos::future<std::size_t> value_at =
                     stubs::datastructure::get_data_at_async(*itr, max_comp_size_ - 1 );
                 return value_at.get();
             }
@@ -203,7 +203,7 @@ namespace distributed
                 //return hpx::applier::apply<distributed::server::datastructure::get_data_at_action>
                 //return hpx::lcos::apply<distributed::server::datastructure::get_data_at_action>
                 //    (*itr, rem - 1);
-                hpx::lcos::promise<std::size_t> value_at = 
+                hpx::lcos::future<std::size_t> value_at =
                     stubs::datastructure::get_data_at_async(*itr, rem - 1);
                 return value_at.get();
             }

@@ -9,7 +9,7 @@
 #include <boost/type_traits/is_void.hpp>
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/components/remote_object/server/remote_object.hpp>
 
@@ -22,7 +22,7 @@ namespace hpx { namespace components { namespace stubs
     {
     private:
         template <typename F>
-        static lcos::promise<typename F::result_type>
+        static lcos::future<typename F::result_type>
         apply_async_invoke(
             naming::id_type const & target_id
           , F const & f
@@ -37,11 +37,11 @@ namespace hpx { namespace components { namespace stubs
                 action_type;
             using namespace boost::archive::detail::extra_detail;
             init_guid<action_type>::g.initialize();
-            return lcos::eager_future<action_type>(target_id, f, 0);
+            return lcos::async<action_type>(target_id, f, 0);
         }
 
         template <typename F>
-        static lcos::promise<void>
+        static lcos::future<void>
         apply_async_invoke(
             naming::id_type const & target_id
           , F const & f
@@ -51,12 +51,12 @@ namespace hpx { namespace components { namespace stubs
             typedef typename
                 server::remote_object_apply_action<void>
                 action_type;
-            return lcos::eager_future<action_type>(target_id, f, 0);
+            return lcos::async<action_type>(target_id, f, 0);
         }
 
     public:
         template <typename F>
-        static lcos::promise<typename F::result_type>
+        static lcos::future<typename F::result_type>
         apply_async(naming::id_type const & target_id, F const & f)
         {
             return
@@ -75,11 +75,11 @@ namespace hpx { namespace components { namespace stubs
         }
 
         template <typename F>
-        static lcos::promise<void>
+        static lcos::future<void>
         set_dtor_async(naming::id_type const & target_id, F const & f)
         {
             typedef server::remote_object::set_dtor_action action_type;
-            return lcos::eager_future<action_type>(target_id, f, 0);
+            return lcos::async<action_type>(target_id, f, 0);
         }
 
         template <typename F>

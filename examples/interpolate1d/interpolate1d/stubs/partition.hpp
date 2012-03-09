@@ -7,7 +7,7 @@
 #define HPX_PARTITION_AUG_04_2011_0255PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/promise.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 
 #include "../server/partition.hpp"
@@ -19,15 +19,15 @@ namespace interpolate1d { namespace stubs
       : hpx::components::stubs::stub_base<interpolate1d::server::partition>
     {
         ///////////////////////////////////////////////////////////////////////
-        static hpx::lcos::promise<void>
+        static hpx::lcos::future<void>
         init_async(hpx::naming::id_type const& gid, std::string datafilename,
             dimension const& dim, std::size_t num_nodes)
         {
-            // Create an eager_future, execute the required action,
-            // we simply return the initialized promise, the caller needs
+            // Create a future, execute the required action,
+            // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef interpolate1d::server::partition::init_action action_type;
-            return hpx::lcos::eager_future<action_type>(
+            return hpx::lcos::async<action_type>(
                 gid, datafilename, dim, num_nodes);
         }
 
@@ -39,14 +39,14 @@ namespace interpolate1d { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static hpx::lcos::promise<double>
+        static hpx::lcos::future<double>
         interpolate_async(hpx::naming::id_type const& gid, double value)
         {
-            // Create an eager_future, execute the required action,
-            // we simply return the initialized promise, the caller needs
+            // Create a future, execute the required action,
+            // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef interpolate1d::server::partition::interpolate_action action_type;
-            return hpx::lcos::eager_future<action_type>(gid, value);
+            return hpx::lcos::async<action_type>(gid, value);
         }
 
         static double interpolate(hpx::naming::id_type const& gid, double value)

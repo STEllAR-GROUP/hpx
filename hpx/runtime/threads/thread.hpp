@@ -376,7 +376,7 @@ namespace hpx { namespace threads { namespace detail
         naming::address::address_type const component_id_;
         mutable thread_state marked_state_;
 
-        template <typename, typename, typename>
+        template <typename>
         friend struct components::detail_adl_barrier::init;
 
         void set_back_ptr(
@@ -390,6 +390,10 @@ namespace hpx { namespace threads { namespace detail
         components::managed_component<thread, threads::thread>* back_ptr_;
         thread_pool* pool_;
     };
+
+    // dummy functions, not needed anywhere
+    inline void intrusive_ptr_add_ref(thread*) {}
+    inline void intrusive_ptr_release(thread*) {}
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -305,14 +305,9 @@ namespace hpx { namespace lcos
             return (*this->impl_)->get_data(0, ec);
         }
 
-        void invalidate(int slot, boost::exception_ptr const& e)
-        {
-            (*this->impl_)->set_error(slot, e); // set the received error
-        }
-
         void invalidate(boost::exception_ptr const& e)
         {
-            (*this->impl_)->set_error(0, e); // set the received error
+            (*this->impl_)->set_error(e); // set the received error
         }
 
         /// The apply function starts the asynchronous operations encapsulated
@@ -330,7 +325,7 @@ namespace hpx { namespace lcos
                 // local, direct execution
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<typename Action::component_type>()));
-                (*this->impl_)->set_data(0,
+                (*this->impl_)->set_data(
                     Action::execute_function(addr.address_));
             }
             else {
@@ -349,7 +344,7 @@ namespace hpx { namespace lcos
         static void invoke(hpx::lcos::lazy_future<Action,Result,boost::mpl::true_> *th,
                            naming::id_type const& gid)
         {
-            if (!((*th->impl_)->is_ready(0)))
+            if (!((*th->impl_)->is_ready()))
               th->apply(gid);
         }
 
@@ -411,7 +406,7 @@ namespace hpx { namespace lcos
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<typename Action::component_type>()));
                 (*this->impl_)->set_data(
-                    0, Action::execute_function(addr.address_, arg0));
+                    Action::execute_function(addr.address_, arg0));
             }
             else {
                 // remote execution
@@ -433,7 +428,7 @@ namespace hpx { namespace lcos
         static void invoke1(hpx::lcos::lazy_future<Action,Result,boost::mpl::true_> *th,
                             naming::id_type const& gid, Arg0 const& arg0)
         {
-            if (!((*th->impl_)->is_ready(0)))
+            if (!((*th->impl_)->is_ready()))
                 th->apply(gid, arg0);
         }
 

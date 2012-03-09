@@ -111,22 +111,22 @@ int hpx_main(po::variables_map &vm)
         // Create a timer so see how its done
         util::high_resolution_timer t;
 
-        std::vector<lcos::promise< naming::id_type > > n;
+        std::vector<lcos::future< naming::id_type > > n;
 
         int array_length = 6;
         for (int i=0;i<array_length;i++) {
-          n.push_back(lcos::eager_future<set_initialdata_action>(this_prefix,i));
+          n.push_back(lcos::async<set_initialdata_action>(this_prefix,i));
         }
 
         srand( time(NULL) );
 
-        std::vector<lcos::promise< void > > future_update;
+        std::vector<lcos::future< void > > future_update;
         int N = 10; // number of random accesses to the array
         for (int i=0;i<N;i++) {
           int rn = rand() % array_length;
           std::cout << " Random number element accessed: " << rn << std::endl;
           naming::id_type tmp = n[rn].get();
-          future_update.push_back(lcos::eager_future<update_action>(that_prefix,tmp));
+          future_update.push_back(lcos::async<update_action>(that_prefix,tmp));
         }
 
         //for (int i=0;i<N;i++) {

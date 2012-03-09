@@ -109,7 +109,7 @@ int hpx_main(variables_map & vm)
         hpx::lcos::dataflow<g_action> b(here);
         hpx::lcos::dataflow<f_action> c(here, a, b);
 
-        // blocks until the result is delivered! (constructs a promise and sets
+        // blocks until the result is delivered! (constructs a future and sets
         // this as the target of the dataflow)
         HPX_TEST_EQ(18003, c.get());
 

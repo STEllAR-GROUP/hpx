@@ -114,7 +114,7 @@ namespace hpx { namespace components { namespace amr
         stencil_config_data cfg_left(par->grain_size-3, 2);
 
         // get all input memory_block_data instances
-        typedef std::vector<lcos::promise<memory_block_data> >
+        typedef std::vector<lcos::future<memory_block_data> >
             lazy_results_type;
 
         // first invoke all remote operations
@@ -132,7 +132,7 @@ namespace hpx { namespace components { namespace amr
 
         // then wait for all results to get back to us
         std::vector<access_memory_block<stencil_data> > val;
-        BOOST_FOREACH(lcos::promise<memory_block_data> const& f, lazy_results)
+        BOOST_FOREACH(lcos::future<memory_block_data> const& f, lazy_results)
             val.push_back(f.get());
 
         // lock all user defined data elements, will be unlocked at function exit

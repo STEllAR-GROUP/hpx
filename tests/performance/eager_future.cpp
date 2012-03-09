@@ -9,7 +9,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/include/iostreams.hpp>
 
 #include <stdexcept>
@@ -31,8 +31,8 @@ using hpx::naming::id_type;
 
 using hpx::actions::plain_result_action0;
 
-using hpx::lcos::promise;
-using hpx::lcos::eager_future;
+using hpx::lcos::future;
+using hpx::lcos::async;
 using hpx::lcos::wait;
 
 using hpx::util::high_resolution_timer;
@@ -64,8 +64,6 @@ typedef plain_result_action0<
 
 HPX_REGISTER_PLAIN_ACTION(null_action);
 
-typedef eager_future<null_action> null_future;
-
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(
     variables_map& vm
@@ -81,7 +79,7 @@ int hpx_main(
         if (HPX_UNLIKELY(0 == count))
             throw std::logic_error("error: count of 0 futures specified\n");
 
-        std::vector<promise<double> > futures;
+        std::vector<future<double> > futures;
 
         futures.reserve(count);
 
@@ -89,7 +87,7 @@ int hpx_main(
         high_resolution_timer walltime;
 
         for (boost::uint64_t i = 0; i < count; ++i)
-            futures.push_back(null_future(here));
+            futures.push_back(async<null_action>(here));
 
         wait(futures, [&] (std::size_t, double r) { global_scratch += r; });
 

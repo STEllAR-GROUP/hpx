@@ -26,7 +26,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         // exposed functionality of this component
 
         ///////////////////////////////////////////////////////////////////////
-        static lcos::promise<boost::shared_ptr<std::vector<naming::id_type> > >
+        static lcos::future<boost::shared_ptr<std::vector<naming::id_type> > >
         init_execute_async(naming::id_type const& gid,
             std::vector<naming::id_type> const& interp_src_data,
             double time,
@@ -34,11 +34,11 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             std::size_t numsteps, components::component_type logging_type,
             parameter const& par)
         {
-            // Create an eager_future, execute the required action,
-            // we simply return the initialized promise, the caller needs
+            // Create a future, execute the required action,
+            // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef amr::server::unigrid_mesh::init_execute_action action_type;
-            return lcos::eager_future<action_type>(gid, interp_src_data,time,function_type,
+            return lcos::async<action_type>(gid, interp_src_data,time,function_type,
                 numvalues, numsteps, logging_type,par);
         }
 
@@ -56,18 +56,18 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static lcos::promise<std::vector<naming::id_type> >
+        static lcos::future<std::vector<naming::id_type> >
         execute_async(naming::id_type const& gid,
             std::vector<naming::id_type> const& initial_data,
             components::component_type function_type, std::size_t numvalues,
             std::size_t numsteps, components::component_type logging_type,
             parameter const& par)
         {
-            // Create an eager_future, execute the required action,
-            // we simply return the initialized promise, the caller needs
+            // Create a future, execute the required action,
+            // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef amr::server::unigrid_mesh::execute_action action_type;
-            return lcos::eager_future<action_type>(gid, initial_data,
+            return lcos::async<action_type>(gid, initial_data,
                 function_type, numvalues, numsteps, logging_type, par);
         }
 

@@ -16,7 +16,7 @@
 #include "dataflow_object.hpp"
 #include "distributed_new.hpp"
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <algorithm>
 
@@ -522,7 +522,7 @@ void gs(
         size_type n_x_local_block = n_x_local/block_size+1;
         size_type n_y_local_block = n_y_local/block_size+1;
 
-        std::vector<hpx::lcos::promise<object<data> > >
+        std::vector<hpx::lcos::future<object<data> > >
             objects =
                 distributed_new<data>(
                     num_blocks
@@ -545,7 +545,7 @@ void gs(
             size_type x = 0;
             size_type y = 0;
 
-            BOOST_FOREACH(hpx::lcos::promise<object<data> > const & o, objects)
+            BOOST_FOREACH(hpx::lcos::future<object<data> > const & o, objects)
             {
                 using hpx::naming::strip_credit_from_gid;
  

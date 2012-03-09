@@ -31,31 +31,31 @@ struct object_semaphore
     object_semaphore(naming::id_type gid) : base_type(gid) {}
 
     ///////////////////////////////////////////////////////////////////////////
-    lcos::promise<void> signal_async(
+    lcos::future<void> signal_async(
         ValueType const& val
-      , boost::uint64_t count = 1
-    ) {
+      , boost::uint64_t count = 1)
+    {
         BOOST_ASSERT(this->gid_);
         return this->base_type::signal_async(this->gid_, val, count);
     }
 
     void signal_sync(
         ValueType const& val
-      , boost::uint64_t count = 1
-    ) {
+      , boost::uint64_t count = 1)
+    {
         BOOST_ASSERT(this->gid_);
         return this->base_type::signal_sync(this->gid_, val, count);
     }
 
     void signal(
         ValueType const& val
-      , boost::uint64_t count = 1
-    ) {
+      , boost::uint64_t count = 1)
+    {
         signal_sync(val, count);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    lcos::promise<ValueType> get_async()
+    lcos::future<ValueType> get_async()
     {
         BOOST_ASSERT(this->gid_);
         return this->base_type::get_async(this->gid_);

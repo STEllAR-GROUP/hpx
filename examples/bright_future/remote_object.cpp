@@ -26,7 +26,7 @@ using hpx::init;
 using hpx::finalize;
 using hpx::find_here;
 using hpx::naming::id_type;
-using hpx::lcos::promise;
+using hpx::lcos::future;
 using hpx::lcos::wait;
 using hpx::find_all_localities;
 using hpx::components::new_;
@@ -87,7 +87,7 @@ int hpx_main(variables_map &)
 {
     {
         typedef hpx::components::object<foo> object_type;
-        typedef promise<object_type> object_promise_type;
+        typedef future<object_type> object_promise_type;
         typedef std::vector<object_promise_type> object_promises_type;
         typedef std::vector<object_type> objects_type;
 

@@ -143,7 +143,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
 
         // Initial Data -----------------------------------------
-        std::vector<hpx::lcos::promise<void> > initial_phase;
+        std::vector<hpx::lcos::future<void> > initial_phase;
 
         for (i=0;i<num_bodies;i++) {
           // compute the initial velocity so that everything heads to the origin
@@ -168,7 +168,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         while (time < stop_time) {
             //{
               // Move bodies--------------------------------------------
-            //  std::vector<hpx::lcos::promise<void> > move_phase;
+            //  std::vector<hpx::lcos::future<void> > move_phase;
             //  for (i=0;i<num_bodies;i++) {
             //    move_phase.push_back(accu[i].move_async(dt,time));
             //  }
@@ -182,7 +182,7 @@ int hpx_main(boost::program_options::variables_map &vm)
             {
               // Search for Contact------------------------------------
               // vector of futures
-              std::vector<hpx::lcos::promise<int> > search_phase;
+              std::vector<hpx::lcos::future<int> > search_phase;
 
               for (i=0;i<num_bodies;i++) {
                 search_phase.push_back(accu[i].search_async(master_objects));
@@ -199,7 +199,7 @@ int hpx_main(boost::program_options::variables_map &vm)
             std::size_t N = 10; // number of iterations; soon to be a parameter
 
             for (std::size_t n=0;n<N;n++) {
-              std::vector<hpx::lcos::promise<void> > enforcement_phase;
+              std::vector<hpx::lcos::future<void> > enforcement_phase;
               for (i=0;i<num_bodies;i++) {
                 if ( search_vector[i] == 1 ) {
                   // contact was discovered  -- enforce the contact
@@ -208,7 +208,7 @@ int hpx_main(boost::program_options::variables_map &vm)
               }
               hpx::lcos::wait(enforcement_phase);
 
-              std::vector<hpx::lcos::promise<void> > adjustment_phase;
+              std::vector<hpx::lcos::future<void> > adjustment_phase;
               for (i=0;i<num_bodies;i++) {
                 if ( search_vector[i] == 1 ) {
                   // adjust the nodes based on the iteration results
@@ -218,7 +218,7 @@ int hpx_main(boost::program_options::variables_map &vm)
               hpx::lcos::wait(enforcement_phase);
 
               // Recompute the Rsum quantity------------------------------------
-              std::vector<hpx::lcos::promise<void> > recompute_phase;
+              std::vector<hpx::lcos::future<void> > recompute_phase;
 
               for (i=0;i<num_bodies;i++) {
                 if ( search_vector[i] == 1 ) {

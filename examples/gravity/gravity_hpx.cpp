@@ -37,7 +37,7 @@
 #include<hpx/runtime/actions/plain_action.hpp>
 #include<hpx/runtime/components/plain_component_factory.hpp>
 #include<hpx/util/high_resolution_timer.hpp>
-#include<hpx/lcos/eager_future.hpp>
+#include<hpx/lcos/async.hpp>
 
 #include "gravity.hpp"
 
@@ -52,8 +52,8 @@ using hpx::actions::plain_result_action1;
 using hpx::actions::plain_result_action5;
 using hpx::actions::plain_action3;
 using hpx::actions::plain_action4;
-using hpx::lcos::eager_future;
-using hpx::lcos::promise;
+using hpx::lcos::async;
+using hpx::lcos::future;
 using hpx::lcos::wait;
 using hpx::util::high_resolution_timer;
 using hpx::init;
@@ -61,24 +61,24 @@ using hpx::finalize;
 using hpx::find_here;
 using hpx::get_os_thread_count;
 
-// dummy serialize function in order to be able to pass a promise, or
-// vector of promises to a future
+// dummy serialize function in order to be able to pass a future, or
+// vector of futures
 // WARNING: this will not work in distributed!
 namespace boost
 {
     template <typename Archive>
-    void serialize(Archive & ar, hpx::lcos::promise<void> &, unsigned)
+    void serialize(Archive & ar, hpx::lcos::future<void> &, unsigned)
     {
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 //Forward Declarations
-vector<promise<void> > calc(uint64_t k,uint64_t t);
+vector<future<void> > calc(uint64_t k,uint64_t t);
 vector<components> dist(uint64_t t,uint64_t i,uint64_t l);
-void move(vector<promise<void> > const& cfp,config_f const& param,uint64_t k,
+void move(vector<future<void> > const& cfp,config_f const& param,uint64_t k,
           uint64_t t);
-void printval(promise<void> const & mp,config_f& param,uint64_t k,uint64_t t,
+void printval(future<void> const & mp,config_f& param,uint64_t k,uint64_t t,
                ofstream &coorfile, ofstream &trbst);///!!!!//
 void printfinalcoord(config_f& param,uint64_t k);
 void closefile(ofstream &notes,config_f& param,float ct);
@@ -99,18 +99,13 @@ typedef plain_action3<
 HPX_REGISTER_PLAIN_ACTION(calc_force_action);
 
 typedef plain_action4< 
-     vector<promise<void> > const &,
+     vector<future<void> > const &,
      config_f const &,
      uint64_t,
      uint64_t,
      move
  > move_action;
 HPX_REGISTER_PLAIN_ACTION(move_action);
-
-///////////////////////////////////////////////////////////////////////////////
-//Future Declarations
-typedef eager_future<calc_force_action> calc_force_future;
-typedef eager_future<move_action> move_future;
 
 ///////////////////////////////////////////////////////////////////////////////
 //Global Variables
@@ -127,8 +122,8 @@ int hpx_main(variables_map& vm)
      string j; // Buffer
      uint64_t k=0; //Number of points in simulation
      float ct=0; //Computation time
-     vector<promise<void> > cfp; // calc_force promises
-     promise<void> mp; //move promise
+     vector<future<void> > cfp; // calc_force promises
+     future<void> mp; //move promise
 
      debug=vm.count("debug");
      cout <<"Config File Location: "<< vm["config-file"].as<std::string>() 
@@ -168,7 +163,7 @@ int hpx_main(variables_map& vm)
      for (uint64_t t=0;t<param.steps;t++) {
       if (debug) cout<<"\nFor step "<<t<<":\n";
       cfp=calc(k,t);  //This is the calculation of force
-      mp=move_future(find_here(),cfp,param,k,t);
+      mp=async<move_action>(find_here(),cfp,param,k,t);
       printval(mp,param,k,t,coorfile,trbst); //Writes output
      }
      printfinalcoord(param,k); 
@@ -194,11 +189,11 @@ int main(int argc, char*argv[])
  return init(desc_commandline, argc, argv);
 }
 
-vector<promise<void> > calc(uint64_t k,uint64_t t) {
+vector<future<void> > calc(uint64_t k,uint64_t t) {
   
- vector<promise<void> > cfp;
+ vector<future<void> > cfp;
  for (uint64_t i=0;i<k;++i) { //moves through the points ie 1, 2, etc.
-  cfp.push_back(calc_force_future(find_here(),k,t,i));
+  cfp.push_back(async<calc_force_action>(find_here(),k,t,i));
  }
  return cfp;
 }
@@ -226,7 +221,7 @@ vector<components> dist(uint64_t t,uint64_t i,uint64_t l) {
  return comp;
 }
 
-void move(vector<promise<void> >const& cfp,config_f const & param,uint64_t k,uint64_t t) {
+void move(vector<future<void> >const& cfp,config_f const & param,uint64_t k,uint64_t t) {
  uint64_t tn=t+1;
  double timestep=param.timestep; //the timestep
  

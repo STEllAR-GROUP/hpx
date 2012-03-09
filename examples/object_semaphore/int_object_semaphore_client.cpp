@@ -12,7 +12,7 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/lcos/future_wait.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/lcos/object_semaphore.hpp>
 
 typedef hpx::lcos::object_semaphore<int> object_semaphore_type;
@@ -39,8 +39,6 @@ typedef hpx::actions::plain_action1<hpx::naming::id_type const&, worker>
 
 HPX_REGISTER_PLAIN_ACTION(worker_action);
 
-typedef hpx::lcos::eager_future<worker_action> worker_future;
-
 ///////////////////////////////////////////////////////////////////////////////
 void breaker(hpx::naming::id_type const& gid)
 {
@@ -64,11 +62,11 @@ int hpx_main(boost::program_options::variables_map &vm)
         for (std::size_t i = 0; i < 5; ++i)
             os.signal_sync(i);
 
-        std::vector<hpx::lcos::promise<void> > barrier;
+        std::vector<hpx::lcos::future<void> > barrier;
 
         // create some threads waiting to pull elements from the queue
         for (std::size_t i = 0; i < 5; ++i)
-            barrier.push_back(worker_future(hpx::find_here(), os.get_gid()));
+            barrier.push_back(async<worker_action>(hpx::find_here(), os.get_gid()));
 
         // abort all pending workers
         hpx::applier::register_work(boost::bind(&breaker, os.get_gid()));

@@ -22,6 +22,28 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Enable = void>
     struct component_type_database;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // control the way managed_components are constructed
+    struct construct_with_back_ptr {};
+    struct construct_without_back_ptr {};
+
+    template <typename T, typename Enable = void>
+    struct managed_component_ctor_policy
+    {
+        typedef construct_without_back_ptr type;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    // control the way managed_components are destructed
+    struct managed_object_is_lifetime_controlled {};
+    struct managed_object_controls_lifetime {};
+
+    template <typename T, typename Enable = void>
+    struct managed_component_dtor_policy
+    {
+        typedef managed_object_controls_lifetime type;
+    };
 }}
 
 #endif

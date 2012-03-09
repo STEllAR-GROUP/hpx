@@ -25,14 +25,14 @@ namespace hpx { namespace lcos { namespace server
         : components::managed_component_base<
             dataflow
           , hpx::components::detail::this_type
-          , hpx::components::detail::construct_with_back_ptr
+          , hpx::traits::construct_with_back_ptr
         >
     {
         typedef
             components::managed_component_base<
                 dataflow
               , hpx::components::detail::this_type
-              , hpx::components::detail::construct_with_back_ptr
+              , hpx::traits::construct_with_back_ptr
             >
             base_type;
         typedef hpx::components::managed_component<dataflow> component_type;

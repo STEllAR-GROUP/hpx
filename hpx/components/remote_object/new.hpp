@@ -9,8 +9,8 @@
 #define HPX_COMPONENTS_REMOTE_OBJECT_NEW_HPP
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/eager_future.hpp>
-#include <hpx/lcos/promise.hpp>
+#include <hpx/lcos/async.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/components/remote_object/stubs/remote_object.hpp>
 #include <hpx/components/remote_object/ctor_fun.hpp>
@@ -38,7 +38,7 @@ namespace hpx { namespace components
     }
     // asynchronously creates an instance of type T on locality target_id
     template <typename T>
-    lcos::promise<object<T> >
+    lcos::future<object<T> >
     new_(naming::id_type const & target_id)
     {
         return
@@ -50,7 +50,7 @@ namespace hpx { namespace components
               , target_id
               , remote_object::ctor_fun<T>()
               , remote_object::dtor_fun<T>()
-            );
+            ).get_future();
     }
 
     // vertical repetition code to enable constructor parameters up to
@@ -76,7 +76,7 @@ namespace hpx { namespace components
 #define N BOOST_PP_ITERATION()
 
     template <typename T, BOOST_PP_ENUM_PARAMS(N, typename A)>
-    lcos::promise<object<T> >
+    lcos::future<object<T> >
     new_(naming::id_type const & target_id, BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
     {
         return
@@ -93,7 +93,7 @@ namespace hpx { namespace components
                     BOOST_PP_ENUM_PARAMS(N, a)
                 )
               , remote_object::dtor_fun<T>()
-            );
+            ).get_future();
     }
 
 #undef N

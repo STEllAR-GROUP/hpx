@@ -811,7 +811,7 @@ void primary_namespace::decrement_sweep(
             // Sanity check.
             if (matches.first->data_ < 0)
             {
-                HPX_THROWS_IF(ec, invalid_data 
+                HPX_THROWS_IF(ec, invalid_data
                   , "primary_namespace::decrement_sweep"
                   , boost::str(boost::format(
                         "negative entry in reference count table, lower(%1%) "
@@ -1092,9 +1092,9 @@ void primary_namespace::kill_sync(
             (futures.back().get_gid(), prefix_, type_, at_c<1>(e), at_c<2>(e));
     }
 
-    BOOST_FOREACH(lcos::promise<void> const& f, futures)
+    BOOST_FOREACH(lcos::promise<void>& f, futures)
     {
-        f.get();
+        f.get_future().get();
     }
 
     if (&ec != &throws)

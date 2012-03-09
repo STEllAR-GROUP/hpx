@@ -7,7 +7,7 @@
 #define HPX_SHENEOS_PARTITION3D_AUG_08_2011_1223PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/promise.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 
 #include "stubs/partition3d.hpp"
@@ -50,7 +50,7 @@ namespace sheneos
         {}
 
         /// Initialize this partition asynchronously.
-        hpx::lcos::promise<void>
+        hpx::lcos::future<void>
         init_async(std::string const& datafilename,
             dimension const& dimx, dimension const& dimy, dimension const& dimz)
         {
@@ -72,7 +72,7 @@ namespace sheneos
         /// \param rho       [in] Rest mass density of the plasma.
         /// \param eosvalues [in] The EOS values to interpolate. Must be
         ///                  in the range of this partition.
-        hpx::lcos::promise<std::vector<double> >
+        hpx::lcos::future<std::vector<double> >
         interpolate_async(double ye, double temp, double rho,
             boost::uint32_t eosvalues)
         {
@@ -102,7 +102,7 @@ namespace sheneos
         /// \param rho       [in] Rest mass density of the plasma.
         /// \param eosvalue  [in] The EOS value to interpolate. Must be
         ///                  in the range of the given partition.
-        hpx::lcos::promise<double>
+        hpx::lcos::future<double>
         interpolate_one_async(double ye, double temp, double rho,
             boost::uint32_t eosvalue)
         {
@@ -133,7 +133,7 @@ namespace sheneos
         /// \param rho       [in] Rest mass density of the plasma.
         /// \param eosvalue  [in] The EOS value to interpolate. Must be
         ///                  in the range of the given partition.
-        hpx::lcos::promise<std::vector<double>>
+        hpx::lcos::future<std::vector<double>>
         interpolate_one_bulk_async(std::vector<double> const& ye,
             std::vector<double> const& temp, std::vector<double> const& rho,
             boost::uint32_t eosvalue)

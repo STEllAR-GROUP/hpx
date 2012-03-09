@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-// Naive SMP version implemented with eager_futures.
+// Naive SMP version implemented with futures.
 
 #include <hpx/hpx.hpp>
 #include <hpx/config.hpp>
@@ -13,7 +13,7 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 
 #include <iostream>
 
@@ -30,7 +30,7 @@ using hpx::applier::get_applier;
 
 using hpx::actions::plain_result_action2;
 
-using hpx::lcos::eager_future;
+using hpx::lcos::async;
 
 using hpx::util::high_resolution_timer;
 
@@ -55,8 +55,6 @@ typedef plain_result_action2<
 
 HPX_REGISTER_PLAIN_ACTION(factorial_action);
 
-typedef eager_future<factorial_action> factorial_future;
-
 ///////////////////////////////////////////////////////////////////////////////
 boost::uint64_t factorial(
     id_type const& prefix
@@ -67,7 +65,8 @@ boost::uint64_t factorial(
 
     else
     {
-        factorial_future n1(prefix, prefix, n - 1);
+        future<boost::uint64_t> n1 =
+            async<factorial_action>(prefix, prefix, n - 1);
         return n * n1.get();
     }
 }
@@ -82,9 +81,7 @@ int hpx_main(variables_map& vm)
 
         high_resolution_timer t;
 
-        factorial_future f(prefix, prefix, n);
-
-        boost::uint64_t r = f.get();
+        boost::uint64_t r = async<factorial_action>(prefix, prefix, n).get();
 
         double elapsed = t.elapsed();
 

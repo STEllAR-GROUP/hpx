@@ -9,7 +9,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/lcos/async_future_wait.hpp>
 #include <hpx/include/iostreams.hpp>
 
@@ -519,7 +519,7 @@ namespace gtc { namespace server
 
       // send densityi to the left; receive from the right
       {
-        typedef std::vector<hpx::lcos::promise< std::valarray<double> > > lazy_results_type;
+        typedef std::vector<hpx::lcos::future< std::valarray<double> > > lazy_results_type;
         lazy_results_type lazy_results;
         lazy_results.push_back( stubs::point::get_densityi_async( point_components[right_pe_] ) );
         hpx::lcos::wait(lazy_results,
@@ -579,7 +579,7 @@ namespace gtc { namespace server
       {
         adum_.resize(zonali_.size());
         std::fill( adum_.begin(),adum_.end(),0.0);
-        typedef std::vector<hpx::lcos::promise< std::vector<double> > > lazy_results_type;
+        typedef std::vector<hpx::lcos::future< std::vector<double> > > lazy_results_type;
         lazy_results_type lazy_results;
         BOOST_FOREACH(hpx::naming::id_type const& gid, point_components)
         {
@@ -736,7 +736,7 @@ namespace gtc { namespace server
         // parallel smoothing
         // get phi from the left
         {
-          typedef std::vector<hpx::lcos::promise< std::valarray<double> > > lazy_results_type;
+          typedef std::vector<hpx::lcos::future< std::valarray<double> > > lazy_results_type;
           lazy_results_type lazy_results;
           lazy_results.push_back( stubs::point::get_phi_async( point_components[left_pe_],mzeta_ ) );
           hpx::lcos::wait(lazy_results,
@@ -745,7 +745,7 @@ namespace gtc { namespace server
 
         // get phi from the right
         {
-          typedef std::vector<hpx::lcos::promise< std::valarray<double> > > lazy_results_type;
+          typedef std::vector<hpx::lcos::future< std::valarray<double> > > lazy_results_type;
           lazy_results_type lazy_results;
           std::size_t one = 1; 
           lazy_results.push_back( stubs::point::get_phi_async( point_components[right_pe_],one ) );
@@ -806,7 +806,7 @@ namespace gtc { namespace server
 
       // toroidal BC: send phi to right and receive from left
       {
-        typedef std::vector<hpx::lcos::promise< std::valarray<double> > > lazy_results_type;
+        typedef std::vector<hpx::lcos::future< std::valarray<double> > > lazy_results_type;
         lazy_results_type lazy_results;
         lazy_results.push_back( stubs::point::get_phi_async( point_components[left_pe_],mzeta_ ) );
         hpx::lcos::wait(lazy_results,
@@ -1001,7 +1001,7 @@ namespace gtc { namespace server
 
             // Gather
             {
-              typedef std::vector<hpx::lcos::promise< std::vector<double> > > lazy_results_type;
+              typedef std::vector<hpx::lcos::future< std::vector<double> > > lazy_results_type;
               lazy_results_type lazy_results;
               BOOST_FOREACH(hpx::naming::id_type const& gid, point_components)
               {
@@ -1156,7 +1156,7 @@ namespace gtc { namespace server
 
       // get phi from the left
       {
-        typedef std::vector<hpx::lcos::promise< std::valarray<double> > > lazy_results_type;
+        typedef std::vector<hpx::lcos::future< std::valarray<double> > > lazy_results_type;
         lazy_results_type lazy_results;
         lazy_results.push_back( stubs::point::get_phi_async( point_components[left_pe_],mzeta_ ) );
         hpx::lcos::wait(lazy_results,
@@ -1165,7 +1165,7 @@ namespace gtc { namespace server
 
       // get phi from the right
       {
-        typedef std::vector<hpx::lcos::promise< std::valarray<double> > > lazy_results_type;
+        typedef std::vector<hpx::lcos::future< std::valarray<double> > > lazy_results_type;
         lazy_results_type lazy_results;
         std::size_t one = 1; 
         lazy_results.push_back( stubs::point::get_phi_async( point_components[right_pe_],one ) );
@@ -1254,7 +1254,7 @@ namespace gtc { namespace server
 
       // get evector from the left
       {
-        typedef std::vector<hpx::lcos::promise< std::valarray<double> > > lazy_results_type;
+        typedef std::vector<hpx::lcos::future< std::valarray<double> > > lazy_results_type;
         lazy_results_type lazy_results;
         lazy_results.push_back( stubs::point::get_evector_async( point_components[left_pe_],1,mzeta_ ) );
         lazy_results.push_back( stubs::point::get_evector_async( point_components[left_pe_],2,mzeta_ ) );
@@ -1550,7 +1550,7 @@ namespace gtc { namespace server
             {
               dtemtmp_.resize(dtem_.size());
               std::fill( dtemtmp_.begin(),dtemtmp_.end(),0.0);
-              typedef std::vector<hpx::lcos::promise< std::vector<double> > > lazy_results_type;
+              typedef std::vector<hpx::lcos::future< std::vector<double> > > lazy_results_type;
               lazy_results_type lazy_results;
               BOOST_FOREACH(hpx::naming::id_type const& gid, point_components)
               {
@@ -1564,7 +1564,7 @@ namespace gtc { namespace server
             {
               ddentmp_.resize(dden_.size());
               std::fill( ddentmp_.begin(),ddentmp_.end(),0.0);
-              typedef std::vector<hpx::lcos::promise< std::vector<double> > > lazy_results_type;
+              typedef std::vector<hpx::lcos::future< std::vector<double> > > lazy_results_type;
               lazy_results_type lazy_results;
               BOOST_FOREACH(hpx::naming::id_type const& gid, point_components)
               {
@@ -1686,7 +1686,7 @@ namespace gtc { namespace server
            // global sum of msend broadcast to every toroidal PE
            {
              mrecv_ = 0;
-             typedef std::vector<hpx::lcos::promise< std::size_t > > lazy_results_type;
+             typedef std::vector<hpx::lcos::future< std::size_t > > lazy_results_type;
              lazy_results_type lazy_results;
              BOOST_FOREACH(hpx::naming::id_type const& gid, point_components)
              {
@@ -1743,7 +1743,7 @@ namespace gtc { namespace server
 
          // send # of particle to move right to neighboring PEs of same particle
          {
-           typedef std::vector<hpx::lcos::promise< std::vector<std::size_t> > > lazy_results_type;
+           typedef std::vector<hpx::lcos::future< std::vector<std::size_t> > > lazy_results_type;
            lazy_results_type lazy_results;
            lazy_results.push_back( stubs::point::get_msendright_async( point_components[left_pe_] ) );
            hpx::lcos::wait(lazy_results,
@@ -1753,7 +1753,7 @@ namespace gtc { namespace server
          // send particle to right and receive from left
          {
            recvleft_.resize(nzion+1,(std::max)(mrecvleft_[1],one)+1,1);
-           typedef std::vector<hpx::lcos::promise< array<double> > > lazy_results_type;
+           typedef std::vector<hpx::lcos::future< array<double> > > lazy_results_type;
            lazy_results_type lazy_results;
            lazy_results.push_back( stubs::point::get_sendright_async( point_components[left_pe_] ) );
            hpx::lcos::wait(lazy_results,
@@ -1762,7 +1762,7 @@ namespace gtc { namespace server
 
          // send # of particle to move left
          {
-           typedef std::vector<hpx::lcos::promise< std::vector<std::size_t> > > lazy_results_type;
+           typedef std::vector<hpx::lcos::future< std::vector<std::size_t> > > lazy_results_type;
            lazy_results_type lazy_results;
            lazy_results.push_back( stubs::point::get_msendleft_async( point_components[right_pe_] ) );
            hpx::lcos::wait(lazy_results,
@@ -1772,7 +1772,7 @@ namespace gtc { namespace server
          // send particle to left and receive from right
          {
            recvright_.resize(nzion+1,(std::max)(mrecvright_[1],one)+1,1);
-           typedef std::vector<hpx::lcos::promise< array<double> > > lazy_results_type;
+           typedef std::vector<hpx::lcos::future< array<double> > > lazy_results_type;
            lazy_results_type lazy_results;
            lazy_results.push_back( stubs::point::get_sendleft_async( point_components[right_pe_] ) );
            hpx::lcos::wait(lazy_results,

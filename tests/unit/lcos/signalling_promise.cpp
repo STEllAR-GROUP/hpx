@@ -69,13 +69,13 @@ void error_callback(
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
 {
-    using hpx::lcos::promise;
+    using hpx::lcos::future;
     using hpx::lcos::async_callback;
 
     {
         bool data_cb_called = false;
 
-        promise<int> p = async_callback<test_action>(
+        future<int> p = async_callback<test_action>(
             boost::bind(data_callback, boost::ref(data_cb_called), _1),
             hpx::find_here()
         );
@@ -89,7 +89,7 @@ int hpx_main(variables_map& vm)
         bool data_cb_called = false;
         bool error_cb_called = false;
 
-        promise<int> p = async_callback<test_error_action>(
+        future<int> p = async_callback<test_error_action>(
             boost::bind(data_callback, boost::ref(data_cb_called), _1),
             boost::bind(error_callback, boost::ref(error_cb_called), _1),
             hpx::find_here()

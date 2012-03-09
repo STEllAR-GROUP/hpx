@@ -7,7 +7,7 @@
 #define HPX_SHENEOS_CONFIGURATION_AUG_08_2011_1221PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/promise.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 
 #include "stubs/configuration.hpp"
@@ -44,7 +44,7 @@ namespace sheneos
         {}
 
         ///////////////////////////////////////////////////////////////////////
-        hpx::lcos::promise<void>
+        hpx::lcos::future<void>
         init_async(std::string const& datafile,
             std::string const& symbolic_name, std::size_t num_instances)
         {
@@ -60,7 +60,7 @@ namespace sheneos
         }
 
         ///////////////////////////////////////////////////////////////////////
-        hpx::lcos::promise<config_data> get_async() const
+        hpx::lcos::future<config_data> get_async() const
         {
             return stubs::configuration::get_async(this->gid_);
         }

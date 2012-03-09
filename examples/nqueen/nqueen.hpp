@@ -37,7 +37,7 @@ namespace nqueen
             return this->base_type::access_board(gid_);
         }
 
-        hpx::lcos::promise<list_type> access_board_async(){
+        hpx::lcos::future<list_type> access_board_async(){
             return this->base_type::access_board_async(gid_);
         }
         //------------------------------------------------------
@@ -53,7 +53,7 @@ namespace nqueen
             return this->base_type::check_board(gid_, list, level);
         }
 
-        hpx::lcos::promise<bool> check_board_async(list_type const& list,
+        hpx::lcos::future<bool> check_board_async(list_type const& list,
             std::size_t level)
         {
             return this->base_type::check_board_async(gid_, list, level);
@@ -67,7 +67,7 @@ namespace nqueen
             return this->base_type::solve_board(gid_, list, size, level, col);
         }
 
-        hpx::lcos::promise<std::size_t>
+        hpx::lcos::future<std::size_t>
         solve_board_async(list_type const& list, std::size_t size,
             std::size_t level, std::size_t col)
         {

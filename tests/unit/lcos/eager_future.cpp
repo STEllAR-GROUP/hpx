@@ -28,8 +28,6 @@ typedef hpx::actions::plain_result_action0<bool, null_thread> null_action;
 
 HPX_REGISTER_PLAIN_ACTION(null_action);
 
-typedef hpx::lcos::eager_future<null_action> null_future;
-
 ///////////////////////////////////////////////////////////////////////////////
 int int_thread()
 {
@@ -42,17 +40,13 @@ typedef hpx::actions::plain_result_action0<int, int_thread> int_action;
 
 HPX_REGISTER_PLAIN_ACTION(int_action);
 
-typedef hpx::lcos::eager_future<int_action> int_future;
-
-
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map&)
 {
     // create an explicit future
     null_thread_executed = false;
     {
-        null_future f(hpx::find_here());
-        HPX_TEST(f.get());
+        HPX_TEST(async<null_action>(hpx::find_here().get());
     }
     HPX_TEST(null_thread_executed);
 
@@ -64,7 +58,7 @@ int hpx_main(variables_map&)
     HPX_TEST(null_thread_executed);
 
     //test two successive 'get' from a promise
-    hpx::lcos::promise<int> int_promise(int_future(hpx::find_here()));
+    hpx::lcos::future<int> int_promise(async<int_action>(hpx::find_here()));
     HPX_TEST(int_promise.get() == int_promise.get());
 
     hpx::finalize();       // Initiate shutdown of the runtime system.

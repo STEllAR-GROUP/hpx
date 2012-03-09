@@ -24,7 +24,7 @@ foreach(subdir ${subdirs})
   add_hpx_executable(${subdir}_client
     SOURCES ${sources}
     DEPENDENCIES ${subdir}_component ${dependencies}
-    FOLDER "Examples/Bfs/${subdir}")
+    FOLDER "Examples/Embarrassingly_parallel/${subdir}")
 
   # add a custom target for this example
   add_hpx_pseudo_target(examples.embarrassingly_parallel.${subdir})

@@ -28,10 +28,10 @@
 using namespace std;
 using namespace H5;
 
-using hpx::lcos::promise;
+using hpx::lcos::future;
 using hpx::lcos::wait;
 
-void printval (promise<void> const & mp,config_f& param,uint64_t k,uint64_t t,
+void printval (future<void> const & mp,config_f& param,uint64_t k,uint64_t t,
                 ofstream &coorfile, ofstream &trbst) {
  wait(mp);
  if (t%param.print==0) {

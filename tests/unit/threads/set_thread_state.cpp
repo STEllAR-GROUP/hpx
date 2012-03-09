@@ -48,7 +48,7 @@ using hpx::find_here;
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T1, typename TR1>
 boost::uint64_t wait(
-    std::vector<promise<T1, TR1> > const& lazy_values
+    std::vector<future<T1, TR1> > const& lazy_values
   , boost::uint64_t suspend_for = 10
     )
 {
@@ -135,7 +135,7 @@ void tree_boot(
     BOOST_ASSERT(grain_size);
     BOOST_ASSERT(count);
 
-    std::vector<promise<void> > promises;
+    std::vector<future<void> > promises;
 
     boost::uint64_t const actors = (count > grain_size) ? grain_size : count;
 

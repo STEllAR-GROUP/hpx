@@ -4,24 +4,25 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace stubs
 {
-    lcos::promise<counter_info> performance_counter::get_info_async(
+    lcos::future<counter_info> performance_counter::get_info_async(
         naming::id_type const& targetid)
     {
         typedef server::base_performance_counter::get_counter_info_action action_type;
-        return lcos::eager_future<action_type>(targetid);
+        return lcos::async<action_type>(targetid);
     }
 
-    lcos::promise<counter_value> performance_counter::get_value_async(
+    lcos::future<counter_value> performance_counter::get_value_async(
         naming::id_type const& targetid)
     {
         typedef server::base_performance_counter::get_counter_value_action action_type;
-        return lcos::eager_future<action_type>(targetid);
+        return lcos::async<action_type>(targetid);
     }
 
     counter_info performance_counter::get_info(naming::id_type const& targetid,
@@ -36,18 +37,18 @@ namespace hpx { namespace performance_counters { namespace stubs
         return get_value_async(targetid).get(ec);
     }
 
-    lcos::promise<bool> performance_counter::start_async(
+    lcos::future<bool> performance_counter::start_async(
         naming::id_type const& targetid)
     {
         typedef server::base_performance_counter::start_action action_type;
-        return lcos::eager_future<action_type>(targetid);
+        return lcos::async<action_type>(targetid);
     }
 
-    lcos::promise<bool> performance_counter::stop_async(
+    lcos::future<bool> performance_counter::stop_async(
         naming::id_type const& targetid)
     {
         typedef server::base_performance_counter::stop_action action_type;
-        return lcos::eager_future<action_type>(targetid);
+        return lcos::async<action_type>(targetid);
     }
 
     bool performance_counter::start(naming::id_type const& targetid,

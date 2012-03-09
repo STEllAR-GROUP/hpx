@@ -17,7 +17,7 @@
 #include "dataflow_object.hpp"
 #include "distributed_new.hpp"
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/components/dataflow/dataflow.hpp>
 #include <hpx/components/dataflow/dataflow_trigger.hpp>
@@ -334,7 +334,7 @@ void gs(
 
     grid<object_type> object_grid(dims[0], dims[1]);
     {
-        std::vector<hpx::lcos::promise<object<data_type> > >
+        std::vector<hpx::lcos::future<object<data_type> > >
             objects =
                 distributed_new<data_type>(
                     dims[0] * dims[1]
@@ -349,7 +349,7 @@ void gs(
         size_type x = 0;
         size_type y = 0;
 
-        BOOST_FOREACH(hpx::lcos::promise<object<data_type> > const & o, objects)
+        BOOST_FOREACH(hpx::lcos::future<object<data_type> > const & o, objects)
         {
             using hpx::naming::id_type;
             using hpx::naming::strip_credit_from_gid;

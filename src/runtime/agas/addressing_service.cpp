@@ -609,7 +609,7 @@ bool addressing_service::get_id_range(
 
             // execute the action (synchronously)
             cf->apply(bootstrap_primary_namespace_id(), req);
-            rep = cf->get(ec);
+            rep = cf->get_future().get(ec);
 
             cf.set_ok();
         }
@@ -696,7 +696,7 @@ bool addressing_service::bind_range(
 
             // execute the action (synchronously)
             cf->apply(bootstrap_primary_namespace_id(), req);
-            rep = cf->get(ec);
+            rep = cf->get_future().get(ec);
 
             cf.set_ok();
         }

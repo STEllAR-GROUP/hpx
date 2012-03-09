@@ -35,21 +35,21 @@ namespace hpx { namespace lcos
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
-        lcos::promise<ValueType, RemoteType>
+        lcos::future<ValueType, RemoteType>
         get_value_async()
         {
             BOOST_ASSERT(this->gid_);
             return this->base_type::get_value_async(this->gid_);
         }
 
-        lcos::promise<void>
+        lcos::future<void>
         set_value_async(RemoteType const& val)
         {
             BOOST_ASSERT(this->gid_);
             return this->base_type::set_value_async(this->gid_, val);
         }
 
-        lcos::promise<void, util::unused_type>
+        lcos::future<void>
         abort_pending_async(boost::exception_ptr const& e)
         {
             BOOST_ASSERT(this->gid_);
