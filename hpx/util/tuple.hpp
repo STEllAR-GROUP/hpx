@@ -35,6 +35,10 @@ namespace hpx { namespace util
     {
         typedef boost::mpl::int_<0> size_type;
         static const int size_value = 0;
+
+        template <typename Archive>
+        void serialize(Archive & ar, unsigned)
+        {}
     };
 }}
 
@@ -85,6 +89,10 @@ namespace hpx { namespace util
 #define HPX_UTIL_TUPLE_ASSIGN_MOVE_MEMBER(Z, N, D)                              \
     BOOST_PP_CAT(a, N) = boost::move(BOOST_PP_CAT(other.a, N));                 \
 
+#define HPX_UTIL_TUPLE_SERIALIZE(Z, N, D)                                       \
+    this->serialize(ar, BOOST_PP_CAT(a, N));                                    \
+
+
 namespace hpx { namespace util
 {
     template <BOOST_PP_ENUM_PARAMS(N, typename A)>
@@ -114,6 +122,22 @@ namespace hpx { namespace util
             return *this;
         }
 
+        template <typename Archive, typename T>
+        void serialize(Archive & ar, T & t)
+        {
+            ar & t;
+        }
+        template <typename Archive>
+        void serialize(Archive & ar, boost::fusion::unused_type)
+        {
+        }
+
+        template <typename Archive>
+        void serialize(Archive & ar, unsigned)
+        {
+            BOOST_PP_REPEAT(N, HPX_UTIL_TUPLE_SERIALIZE, _);
+        }
+
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         HPX_UTIL_TUPLE_NAME(BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_FWD_REF_PARAMS, _))
           : BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_INIT_MEMBER, _)
@@ -135,5 +159,14 @@ BOOST_FUSION_ADAPT_TPL_STRUCT(
 )
 
 #undef N
+#undef HPX_UTIL_TUPLE_NAME
+#undef HPX_UTIL_TUPLE_FWD_REF_TYPES
+#undef HPX_UTIL_TUPLE_FWD_REF_PARAMS
+#undef HPX_UTIL_TUPLE_INIT_MEMBER
+#undef HPX_UTIL_TUPLE_INIT_COPY_MEMBER
+#undef HPX_UTIL_TUPLE_INIT_MOVE_MEMBER
+#undef HPX_UTIL_TUPLE_ASSIGN_COPY_MEMBER
+#undef HPX_UTIL_TUPLE_ASSIGN_MOVE_MEMBER
+#undef HPX_UTIL_TUPLE_SERIALIZE
 
 #endif
