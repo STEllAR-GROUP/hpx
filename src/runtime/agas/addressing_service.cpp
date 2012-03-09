@@ -28,7 +28,6 @@ addressing_service::addressing_service(
   , max_refcnt_requests_(ini_.get_agas_max_pending_refcnt_requests())
   , refcnt_requests_count_(0)
   , refcnt_requests_(new refcnt_requests_type)
-  , resolve_throttle_(ini_.get_agas_max_resolve_requests())
   , service_type(ini_.get_agas_service_mode())
   , runtime_type(runtime_type_)
   , caching_(ini_.get_agas_caching_mode())
@@ -928,8 +927,6 @@ bool addressing_service::resolve_full(
         response rep;
 
         {
-            lock_semaphore lock(resolve_throttle_);
-
             if (is_bootstrap())
                 rep = bootstrap->primary_ns_server.service(req, ec);
             else

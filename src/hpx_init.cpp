@@ -1071,14 +1071,6 @@ namespace hpx
             ini_config += "hpx.localities=" +
                 boost::lexical_cast<std::string>(num_localities);
 
-//             // If we are running on one locality we should not throttle the
-//             // number of concurrent AGAS resolve requests.
-//             if (1 == num_localities) {
-//                 ini_config += "hpx.agas.max_resolve_requests=" +
-//                     boost::lexical_cast<std::string>(
-//                         (std::numeric_limits<int>::max)());
-//             }
-
             // FIXME: AGAS V2: if a locality is supposed to run the AGAS
             //        service only and requests to use 'priority_local' as the
             //        scheduler, switch to the 'local' scheduler instead.

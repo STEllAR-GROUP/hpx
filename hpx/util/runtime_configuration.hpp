@@ -67,8 +67,6 @@ namespace hpx { namespace util
 
         bool get_agas_range_caching_mode() const;
 
-        std::size_t get_agas_max_resolve_requests() const;
-
         std::size_t get_agas_max_pending_refcnt_requests() const;
 
         // Get whether the AGAS server is running as a dedicated runtime.

@@ -192,8 +192,6 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     std::size_t refcnt_requests_count_;
     boost::shared_ptr<refcnt_requests_type> refcnt_requests_;
 
-    hpx::lcos::local::counting_semaphore resolve_throttle_;
-
     service_mode const service_type;
     runtime_mode const runtime_type;
 
