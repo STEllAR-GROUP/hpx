@@ -172,16 +172,42 @@ namespace parcelset
             id_range_.set_range(lower, upper);
         }
 
-        /// return sends completed
-        boost::int64_t total_sends_completed() const
+        /// number of messages sent
+        boost::int64_t get_send_count() const
         {
             return parcels_sent_.size();
         }
 
-        /// return receives completed
-        boost::int64_t total_receives_completed() const
+        /// number of messages received 
+        boost::int64_t get_receive_count() const
         {
             return parcels_received_.size();
+        }
+
+        /// the total time it took for all sends, from async_write to the
+        /// completion handler (microseconds)
+        boost::int64_t get_sending_time() const
+        {
+            return parcels_sent_.total_time();
+        }
+
+        /// the total time it took for all receives, from async_read to the
+        /// completion handler (microseconds)
+        boost::int64_t get_receiving_time() const
+        {
+            return parcels_received_.total_time();
+        }
+
+        /// total data received (bytes)
+        boost::int64_t get_data_sent() const
+        {
+            return parcels_sent_.total_bytes();
+        }
+
+        /// total data received (bytes)
+        boost::int64_t get_data_received() const
+        {
+            return parcels_received_.total_bytes();
         }
 
     protected:

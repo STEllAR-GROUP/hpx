@@ -235,9 +235,17 @@ namespace hpx { namespace parcelset
     void parcelhandler::register_counter_types()
     {
         HPX_STD_FUNCTION<boost::int64_t()> num_sends(
-            boost::bind(&parcelport::total_sends_completed, &pp_));
+            boost::bind(&parcelport::get_send_count, &pp_));
         HPX_STD_FUNCTION<boost::int64_t()> num_receives(
-            boost::bind(&parcelport::total_receives_completed, &pp_));
+            boost::bind(&parcelport::get_receive_count, &pp_));
+        HPX_STD_FUNCTION<boost::int64_t()> sending_time(
+            boost::bind(&parcelport::get_sending_time, &pp_));
+        HPX_STD_FUNCTION<boost::int64_t()> receiving_time(
+            boost::bind(&parcelport::get_receiving_time, &pp_));
+        HPX_STD_FUNCTION<boost::int64_t()> data_sent(
+            boost::bind(&parcelport::get_data_sent, &pp_));
+        HPX_STD_FUNCTION<boost::int64_t()> data_received(
+            boost::bind(&parcelport::get_data_received, &pp_));
         HPX_STD_FUNCTION<boost::int64_t()> queue_length(
             boost::bind(&parcelhandler::get_queue_length, this));
 
@@ -255,6 +263,40 @@ namespace hpx { namespace parcelset
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, num_receives, _2),
+              &performance_counters::locality_counter_discoverer
+            },
+            { "/parcels/time/sending", performance_counters::counter_raw,
+              "returns the total time between the start of each asynchronous "
+              "write and the invocation of the write callback for the referenced "
+              "locality [microseconds]",
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, sending_time, _2),
+              &performance_counters::locality_counter_discoverer
+            },
+            { "/parcels/time/receiving", performance_counters::counter_raw,
+              "returns the total time between the start of each asynchronous "
+              "read and the invocation of the read callback for the referenced "
+              "locality [microseconds]",
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, receiving_time, _2),
+              &performance_counters::locality_counter_discoverer
+            },
+            { "/parcels/data/sent", performance_counters::counter_raw,
+              "returns the amount of parcel data (including headers) sent "
+              "by the referenced locality [bytes]",
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, data_sent, _2),
+              &performance_counters::locality_counter_discoverer
+            },
+            { "/parcels/data/received", performance_counters::counter_raw,
+              "returns the amount of parcel data (including headers) received "
+              "by the referenced locality [bytes]",
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, data_received, _2),
               &performance_counters::locality_counter_discoverer
             },
             { "/parcelqueue/length/instantaneous", performance_counters::counter_raw,
