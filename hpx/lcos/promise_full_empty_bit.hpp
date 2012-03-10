@@ -86,7 +86,7 @@ namespace hpx { namespace lcos { namespace detail
         template <typename T>
         void set_local_data(BOOST_FWD_REF(T) result)
         {
-            return set_data_impl(boost::forward<result_type>(result));
+            return set_data(boost::forward<result_type>(result));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -177,7 +177,7 @@ namespace hpx { namespace lcos { namespace detail
         template <typename T>
         void set_local_data(BOOST_FWD_REF(T) result)
         {
-            return set_data_impl(boost::forward<result_type>(result));
+            return set_data(boost::forward<result_type>(result));
         }
 
         ///////////////////////////////////////////////////////////////////////
