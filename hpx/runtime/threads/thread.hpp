@@ -41,7 +41,7 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     // global variable defining the stack size to use for all HPX-threads
-    extern std::size_t default_stacksize;
+    HPX_EXPORT extern std::size_t default_stacksize;
 
     ///////////////////////////////////////////////////////////////////////////
     // This overload will be called by the ptr_map<> used in the thread_queue
@@ -126,7 +126,7 @@ namespace hpx { namespace threads { namespace detail
     public:
         thread(thread_init_data& init_data, thread_id_type id,
                thread_state_enum newstate, thread_pool& pool)
-          : coroutine_(boost::move(init_data.func), id, HPX_DEFAULT_STACK_SIZE), //coroutine_type::impl_type::create(init_data.func, id)),
+          : coroutine_(boost::move(init_data.func), id, default_stacksize), //coroutine_type::impl_type::create(init_data.func, id)),
             current_state_(thread_state(newstate)),
             current_state_ex_(thread_state_ex(wait_signaled)),
             description_(init_data.description ? init_data.description : ""),

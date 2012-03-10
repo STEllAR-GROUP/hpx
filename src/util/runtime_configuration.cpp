@@ -478,7 +478,7 @@ namespace hpx { namespace util
                 return val;
             }
         }
-        return 1;
+        return HPX_DEFAULT_STACK_SIZE;
     }
 
     ///////////////////////////////////////////////////////////////////////////
