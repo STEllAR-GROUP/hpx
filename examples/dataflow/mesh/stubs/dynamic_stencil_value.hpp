@@ -28,7 +28,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
         /// data referred to by the parameter \a initial. After finishing
         /// execution it returns a reference to the result as its return value
         /// (parameter \a result)
-        static lcos::future<naming::id_type> call_async(
+        static lcos::future<naming::id_type, naming::id_type> call_async(
             naming::id_type const& targetgid, naming::id_type const& initial)
         {
             // Create a future, execute the required action,
@@ -57,8 +57,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             // to call get() on the return value to obtain the result
             typedef amr::server::dynamic_stencil_value::get_output_ports_action
                 action_type;
-            typedef std::vector<naming::id_type> return_type;
-            return lcos::async<action_type, return_type>(gid);
+            return lcos::async<action_type>(gid);
         }
 
         static std::vector<naming::id_type>

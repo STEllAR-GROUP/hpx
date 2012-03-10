@@ -237,7 +237,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         std::size_t numvalues,
         parameter const& par)
     {
-        typedef std::vector<lcos::future<naming::id_type> > lazyvals_type;
+        typedef std::vector<lcos::future<naming::id_type, naming::id_type> > lazyvals_type;
 
         // create a data item value type for each of the functions
         lazyvals_type lazyvals;
@@ -260,7 +260,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         std::vector<naming::id_type>& result_data)
     {
         // start the execution of all stencil stencils (data items)
-        typedef std::vector<lcos::future<naming::id_type> > lazyvals_type;
+        typedef std::vector<lcos::future<naming::id_type, naming::id_type> > lazyvals_type;
 
         lazyvals_type lazyvals;
         components::distributing_factory::iterator_type stencil = stencils.first;
