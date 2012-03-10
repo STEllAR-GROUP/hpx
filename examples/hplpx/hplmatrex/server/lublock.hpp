@@ -89,15 +89,15 @@ namespace hpx { namespace components { namespace server
             &lublock::get_needed_future> getFuture_action;
 
         //futures
-//         typedef hpx::lcos::eager_future<server::lublock::getData_action> dataFuture;
-//         typedef hpx::lcos::eager_future<server::lublock::getRows_action> rowFuture;
-//         typedef
-//             hpx::lcos::eager_future<server::lublock::getColumns_action> columnFuture;
-//         typedef hpx::lcos::eager_future<server::lublock::getFuture_action> getFuture;
-//         typedef hpx::lcos::eager_future<server::lublock::gcorner_action> gcFuture;
-//         typedef hpx::lcos::eager_future<server::lublock::gleft_action> glFuture;
-//         typedef hpx::lcos::eager_future<server::lublock::gtop_action> gtoFuture;
-//         typedef hpx::lcos::eager_future<server::lublock::gtrail_action> gtrFuture;
+        typedef hpx::lcos::eager_future<server::lublock::getData_action> dataFuture;
+        typedef hpx::lcos::eager_future<server::lublock::getRows_action> rowFuture;
+        typedef
+            hpx::lcos::eager_future<server::lublock::getColumns_action> columnFuture;
+        typedef hpx::lcos::eager_future<server::lublock::getFuture_action> getFuture;
+        typedef hpx::lcos::eager_future<server::lublock::gcorner_action> gcFuture;
+        typedef hpx::lcos::eager_future<server::lublock::gleft_action> glFuture;
+        typedef hpx::lcos::eager_future<server::lublock::gtop_action> gtoFuture;
+        typedef hpx::lcos::eager_future<server::lublock::gtrail_action> gtrFuture;
 
         //the following variables require the above typedefs
         glFuture*  nextLeft;
@@ -159,11 +159,11 @@ namespace hpx { namespace components { namespace server
     //a different component to retreive the value from this component's futures.
     int lublock::get_needed_future(const int type, const int iter){
         switch(type){
-            case 1: return nextLeft->get();
-            case 2: return nextTop->get();
-            case 3: return nextBelow[iter]->get();
-            case 4: return nextRight[iter]->get();
-            case 5: return nextDagnl[iter]->get();
+            case 1: return nextLeft->get_future().get();
+            case 2: return nextTop->get_future().get();
+            case 3: return nextBelow[iter]->get_future().get();
+            case 4: return nextRight[iter]->get_future().get();
+            case 5: return nextDagnl[iter]->get_future().get();
         }
         return 1;
     }
@@ -178,7 +178,7 @@ namespace hpx { namespace components { namespace server
     double fFactor, factor;
 
     if(iter > 0){
-        neededPrev->get();
+        neededPrev->get_future().get();
         delete neededPrev;
     }
     for(i=0;i<rows;i++){
@@ -208,10 +208,10 @@ namespace hpx { namespace components { namespace server
     }
     int i,j,k;
     double fFactor, factor;
-    vector<vector<double> > cornerData = dataFuture(gidList[iter][iter]).get();
+    vector<vector<double> > cornerData = dataFuture(gidList[iter][iter]).get_future().get();
 
     if(iter > 0){
-        neededPrev->get();
+        neededPrev->get_future().get();
         delete neededPrev;
     }
     if(posX < gridSize - 1){
@@ -239,10 +239,10 @@ namespace hpx { namespace components { namespace server
     int i,j,k;
     double factor;
     double* fFactor = new double[columns];
-    vector<vector<double> > cornerData = dataFuture(gidList[iter][iter]).get();
+    vector<vector<double> > cornerData = dataFuture(gidList[iter][iter]).get_future().get();
 
     if(iter > 0){
-        neededPrev->get();
+        neededPrev->get_future().get();
         delete neededPrev;
     }
     if(posY < gridSize - 1){
@@ -283,11 +283,11 @@ namespace hpx { namespace components { namespace server
             neededPrev = new getFuture(gidList[posY][posX-1],4,iter-1);
         }
         else{neededPrev = new getFuture(gidList[posY-1][posX-1],5,iter-1);}
-        neededPrev->get();
+        neededPrev->get_future().get();
         delete neededPrev;
     }
-    neededLeft.get();
-    neededTop.get();
+    neededLeft.get_future().get();
+    neededTop.get_future().get();
 
     if(posX <= posY && posY < gridSize - 1){
         nextBelow[iter] = new gtrFuture(gidList[posY+1][posX], iter);
@@ -301,9 +301,9 @@ namespace hpx { namespace components { namespace server
 
     int i,j,k;
     double fFactor, factor;
-    vector<vector<double> > cornerData = dataFuture(gidList[iter][iter]).get();
-    vector<vector<double> > leftData = dataFuture(gidList[posY][iter]).get();
-    vector<vector<double> > topData = dataFuture(gidList[iter][posX]).get();
+    vector<vector<double> > cornerData = dataFuture(gidList[iter][iter]).get_future().get();
+    vector<vector<double> > leftData = dataFuture(gidList[posY][iter]).get_future().get();
+    vector<vector<double> > topData = dataFuture(gidList[iter][posX]).get_future().get();
     const int size = cornerData.size();
 
     for(i=0;i<size;i++){

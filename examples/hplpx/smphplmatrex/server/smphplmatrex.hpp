@@ -19,7 +19,7 @@ a destructor, and access operators.
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/local/mutex.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/lcos/eager_future.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -125,23 +125,23 @@ namespace hpx { namespace components { namespace server
     typedef hpx::actions::result_action3<smphplmatrex, double, hpl_check, int,
         int, bool, &smphplmatrex::checksolve> check_action;
 
-//     //here begins the definitions of most of the future types that will be used
-//     //the first of which is for assign action
-//     typedef hpx::lcos::eager_future<server::smphplmatrex::assign_action> assign_future;
-//     //the search pivots future
-//     typedef hpx::lcos::eager_future<server::smphplmatrex::search_action> search_future;
-//     //Here is the swap future, which works the same way as the assign future
-//     typedef hpx::lcos::eager_future<server::smphplmatrex::swap_action> swap_future;
-//     //This future corresponds to the Gaussian elimination functions
-//     typedef hpx::lcos::eager_future<server::smphplmatrex::gmain_action> gmain_future;
-//     //the backsubst future is used to make sure all computations are complete
-//     //before returning from LUsolve, to avoid killing processes and erasing the
-//     //leftdata while it is still being worked on
-//     typedef
-//         hpx::lcos::eager_future<server::smphplmatrex::partbsub_action> partbsub_future;
-//     //the final future type for the class is used for checking the accuracy of
-//     //the results of the LU decomposition
-//     typedef hpx::lcos::eager_future<server::smphplmatrex::check_action> check_future;
+    //here begins the definitions of most of the future types that will be used
+    //the first of which is for assign action
+    typedef hpx::lcos::eager_future<server::smphplmatrex::assign_action> assign_future;
+    //the search pivots future
+    typedef hpx::lcos::eager_future<server::smphplmatrex::search_action> search_future;
+    //Here is the swap future, which works the same way as the assign future
+    typedef hpx::lcos::eager_future<server::smphplmatrex::swap_action> swap_future;
+    //This future corresponds to the Gaussian elimination functions
+    typedef hpx::lcos::eager_future<server::smphplmatrex::gmain_action> gmain_future;
+    //the backsubst future is used to make sure all computations are complete
+    //before returning from LUsolve, to avoid killing processes and erasing the
+    //leftdata while it is still being worked on
+    typedef
+        hpx::lcos::eager_future<server::smphplmatrex::partbsub_action> partbsub_future;
+    //the final future type for the class is used for checking the accuracy of
+    //the results of the LU decomposition
+    typedef hpx::lcos::eager_future<server::smphplmatrex::check_action> check_future;
 
     //right here are special arrays of futures
     gmain_future*** leftFutures, topFutures;
@@ -187,7 +187,7 @@ namespace hpx { namespace components { namespace server
 
     //initialize the pivot array
     for(i=0;i<rows;i++){pivotarr[i]=tempivotarr[i]=i;}
-    future.get();
+    future.get_future().get();
     return 1;
     }
 
@@ -257,7 +257,7 @@ namespace hpx { namespace components { namespace server
     }
     //once all spun off futures are complete we are done
     BOOST_FOREACH(assign_future af, futures){
-        af.get();
+        af.get_future().get();
     }
     return 1;
     }
@@ -312,7 +312,7 @@ namespace hpx { namespace components { namespace server
     int offset = 1;
     while(offset < h){offset *= 2;}
     check_future chk(_gid,0,offset,false);
-    return chk.get();
+    return chk.get_future().get();
     }
 
     //pivot() finds the pivot element of each column and stores it. All
@@ -340,7 +340,7 @@ namespace hpx { namespace components { namespace server
             searches.push_back(search_future(_gid,(outer+1)*blocksize));
         }
         if(outer > 0 && outer <= brows/2){
-            searches[outer-1].get();
+            searches[outer-1].get_future().get();
             temp = (outer-1)*blocksize;
             for(j=(int)temp;j<rows;j++){
                 guessedPivots[j] = tempivotarr[j];
@@ -399,7 +399,7 @@ namespace hpx { namespace components { namespace server
 
     //ensure that all pivoting is complete
     BOOST_FOREACH(swap_future sf, futures){
-        sf.get();
+        sf.get_future().get();
     }
     free(tempivotarr);
     }
@@ -475,10 +475,10 @@ namespace hpx { namespace components { namespace server
     }
     beginElement = futures.size();
     for(i = 0; i <= endElement; i++){
-        futures[i].get();
+        futures[i].get_future().get();
     }
     for(i = 1; i < brows; i++){
-        futures[endElement+i].get();
+        futures[endElement+i].get_future().get();
         for(j = 1; j < brows; j++){
             futures.push_back(gmain_future(_gid,j,i,0,1));
     }   }
@@ -486,25 +486,25 @@ namespace hpx { namespace components { namespace server
     //complete before launching new futures
     for(iter = 1; iter < brows; iter++){
         startElement = futures.size();
-        futures[beginElement].get();
+        futures[beginElement].get_future().get();
         LU_gauss_corner(iter);
         for(i = iter+1; i < brows; i++){
-            futures[beginElement+i-iter].get();
+            futures[beginElement+i-iter].get_future().get();
             futures.push_back(gmain_future(_gid,i,iter,iter,3));
         }
         endElement = futures.size()-1;
         for(i = iter+1; i < brows; i++){
-            futures[beginElement+(brows-iter)*(i-iter)].get();
+            futures[beginElement+(brows-iter)*(i-iter)].get_future().get();
             futures.push_back(gmain_future(_gid,iter,i,iter,2));
         }
         nextElement = futures.size();
         for(i = startElement; i <= endElement; i++){
-            futures[i].get();
+            futures[i].get_future().get();
         }
         for(i = iter+1; i < brows; i++){
-            futures[endElement+i-iter].get();
+            futures[endElement+i-iter].get_future().get();
             for(j = iter+1; j < brows; j++){
-                futures[beginElement+(brows-iter)*(i-iter)+j-iter].get();
+                futures[beginElement+(brows-iter)*(i-iter)+j-iter].get_future().get();
                 futures.push_back(gmain_future(_gid,j,i,iter,1));
         }   }
         beginElement = nextElement;
@@ -660,7 +660,7 @@ namespace hpx { namespace components { namespace server
     for(i=brows-2;i>=0;i--){
         row = i*blocksize;
         for(k=0;k<brows-i-1;k++){
-            futures[neededFuture[k]].get();
+            futures[neededFuture[k]].get_future().get();
             neededFuture[k]+=1;
         }
         for(k=row;k<row+blocksize;k++){
@@ -739,7 +739,7 @@ namespace hpx { namespace components { namespace server
 
         //collect the results and add them up
         BOOST_FOREACH(check_future cf, futures){
-            toterror += cf.get();
+            toterror += cf.get_future().get();
         }
         return toterror;
     }

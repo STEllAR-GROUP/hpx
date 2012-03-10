@@ -51,13 +51,13 @@ namespace hpx { namespace components { namespace stubs
 
     //get functions
     static int get_rows(const id_type gid){
-        return server::lublock::rowFuture(gid).get();
+        return server::lublock::rowFuture(gid).get_future().get();
     }
     static int get_columns(const id_type gid){
-        return server::lublock::columnFuture(gid).get();
+        return server::lublock::columnFuture(gid).get_future().get();
     }
     static vector<vector<double> > get_data(const id_type gid){
-        return server::lublock::dataFuture(gid).get();
+        return server::lublock::dataFuture(gid).get_future().get();
     }
     };
 }}}
