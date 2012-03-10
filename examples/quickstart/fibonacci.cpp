@@ -27,7 +27,8 @@ using boost::program_options::value;
 
 using hpx::naming::id_type;
 using hpx::actions::plain_result_action1;
-using hpx::lcos::asznc;
+using hpx::lcos::async;
+using hpx::lcos::future;
 using hpx::util::high_resolution_timer;
 using hpx::init;
 using hpx::finalize;
@@ -84,7 +85,7 @@ int hpx_main(variables_map& vm)
         high_resolution_timer t;
 
         // Create a Future for the whole calculation and wait for it.
-        future<boost::uint64_t> f = 
+        future<boost::uint64_t> f =
             async<fibonacci_action>(find_here(), n); // execute locally
         boost::uint64_t r = f.get(); //wait for future f to return value
 
