@@ -51,6 +51,11 @@
             boost::forward<BOOST_PP_CAT(Arg, n)>(BOOST_PP_CAT(arg, n))        \
     /**/
 
+#define HPX_MOVE_ARGS(z, n, _)                                                \
+        BOOST_PP_COMMA_IF(n)                                                  \
+            boost::move(BOOST_PP_CAT(arg, n))                                 \
+    /**/
+
 namespace hpx { namespace actions
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -114,7 +119,7 @@ namespace hpx { namespace actions
                                 << detail::get_action_name<Derived>()
                                 << ").";
                     // call the function, ignoring the return value
-                    F(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+                    F(BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
                 }
                 catch (hpx::exception const& e) {
                     LTM_(error)
@@ -486,7 +491,7 @@ namespace hpx { namespace actions
                                 << detail::get_action_name<Derived>()
                                 << ").";
                     // call the function, ignoring the return value
-                    F(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+                    F(BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
                 }
                 catch (hpx::exception const& e) {
                     LTM_(error)
@@ -926,6 +931,7 @@ namespace hpx { namespace actions { namespace detail
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
+#undef HPX_MOVE_ARGS
 #undef HPX_FORWARD_ARGS
 #undef HPX_FWD_ARGS
 #undef HPX_REMOVE_QUALIFIERS

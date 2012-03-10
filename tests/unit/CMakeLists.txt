@@ -6,6 +6,7 @@
 
 set(subdirs
     agas
+    actions
     components
     diagnostics
     lcos

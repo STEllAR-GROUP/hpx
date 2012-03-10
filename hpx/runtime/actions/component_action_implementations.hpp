@@ -30,6 +30,7 @@
 #else // defined(BOOST_PP_IS_ITERATING)
 
 #define N BOOST_PP_ITERATION()
+
 #define HPX_ACTION_ARGUMENT(z, n, data)                                       \
         BOOST_PP_COMMA_IF(n) boost::move(data.get<n>())                       \
     /**/
@@ -46,14 +47,14 @@
             BOOST_FWD_REF(BOOST_PP_CAT(Arg, n)) BOOST_PP_CAT(arg, n)          \
     /**/
 
-#define HPX_MOVE_ARGS(z, n, _)                                                \
-        BOOST_PP_COMMA_IF(n)                                                  \
-            boost::move(BOOST_PP_CAT(arg, n))                                 \
-    /**/
-
 #define HPX_FORWARD_ARGS(z, n, _)                                             \
         BOOST_PP_COMMA_IF(n)                                                  \
             boost::forward<BOOST_PP_CAT(Arg, n)>(BOOST_PP_CAT(arg, n))        \
+    /**/
+
+#define HPX_MOVE_ARGS(z, n, _)                                                \
+        BOOST_PP_COMMA_IF(n)                                                  \
+            boost::move(BOOST_PP_CAT(arg, n))                                 \
     /**/
 
 namespace hpx { namespace actions
@@ -117,7 +118,7 @@ namespace hpx { namespace actions
                                 << ") lva(" << reinterpret_cast<void const*>
                                     (get_lva<Component>::call(lva)) << ")";
                     (get_lva<Component>::call(lva)->*F)(
-                        BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+                        BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
                 }
                 catch (hpx::exception const& e) {
                     LTM_(error)
@@ -878,6 +879,7 @@ namespace hpx { namespace actions
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
+#undef HPX_MOVE_ARGS
 #undef HPX_FORWARD_ARGS
 #undef HPX_FWD_ARGS
 #undef HPX_REMOVE_QUALIFIERS
