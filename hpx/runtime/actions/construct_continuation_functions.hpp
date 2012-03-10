@@ -75,7 +75,7 @@
                             << ") with continuation("
                             << cont->get_raw_gid()
                             << ")";
-                // The arguments are move here. This function is called from a
+                // The arguments are moved here. This function is called from a
                 // bound functor. In order to do true perfect forwarding in an
                 // asynchronous operation. These bound variables must be moved
                 // out of the bound object.
@@ -124,7 +124,7 @@
                             << ") with continuation("
                             << cont->get_raw_gid()
                             << ")";
-                // The arguments are move here. This function is called from a
+                // The arguments are moved here. This function is called from a
                 // bound functor. In order to do true perfect forwarding in an
                 // asynchronous operation. These bound variables must be moved
                 // out of the bound object.
@@ -171,7 +171,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_raw_gid() << ")";
-                // The arguments are move here. This function is called from a
+                // The arguments are moved here. This function is called from a
                 // bound functor. In order to do true perfect forwarding in an
                 // asynchronous operation. These bound variables must be moved
                 // out of the bound object.
@@ -199,7 +199,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_raw_gid() << ")";
-                // The arguments are move here. This function is called from a
+                // The arguments are moved here. This function is called from a
                 // bound functor. In order to do true perfect forwarding in an
                 // asynchronous operation. These bound variables must be moved
                 // out of the bound object.
@@ -263,7 +263,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_raw_gid() << ")";
-                // The arguments are move here. This function is called from a
+                // The arguments are moved here. This function is called from a
                 // bound functor. In order to do true perfect forwarding in an
                 // asynchronous operation. These bound variables must be moved
                 // out of the bound object.
@@ -291,7 +291,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_raw_gid() << ")";
-                // The arguments are move here. This function is called from a
+                // The arguments are moved here. This function is called from a
                 // bound functor. In order to do true perfect forwarding in an
                 // asynchronous operation. These bound variables must be moved
                 // out of the bound object.

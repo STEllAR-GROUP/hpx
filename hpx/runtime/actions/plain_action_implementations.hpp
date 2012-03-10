@@ -118,6 +118,12 @@ namespace hpx { namespace actions
                     LTM_(debug) << "Executing plain action("
                                 << detail::get_action_name<Derived>()
                                 << ").";
+
+                    // The arguments are moved here. This function is called from a
+                    // bound functor. In order to do true perfect forwarding in an
+                    // asynchronous operation. These bound variables must be moved
+                    // out of the bound object.
+
                     // call the function, ignoring the return value
                     F(BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
                 }
@@ -490,6 +496,12 @@ namespace hpx { namespace actions
                     LTM_(debug) << "Executing plain action("
                                 << detail::get_action_name<Derived>()
                                 << ").";
+
+                    // The arguments are moved here. This function is called from a
+                    // bound functor. In order to do true perfect forwarding in an
+                    // asynchronous operation. These bound variables must be moved
+                    // out of the bound object.
+
                     // call the function, ignoring the return value
                     F(BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
                 }

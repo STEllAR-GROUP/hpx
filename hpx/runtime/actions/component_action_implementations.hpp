@@ -117,6 +117,10 @@ namespace hpx { namespace actions
                                 << detail::get_action_name<Derived>()
                                 << ") lva(" << reinterpret_cast<void const*>
                                     (get_lva<Component>::call(lva)) << ")";
+                    // The arguments are moved here. This function is called from a
+                    // bound functor. In order to do true perfect forwarding in an
+                    // asynchronous operation. These bound variables must be moved
+                    // out of the bound object.
                     (get_lva<Component>::call(lva)->*F)(
                         BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
                 }
@@ -501,6 +505,10 @@ namespace hpx { namespace actions
                                 << detail::get_action_name<Derived>()
                                 << ") lva(" << reinterpret_cast<void const*>
                                     (get_lva<Component>::call(lva)) << ")";
+                    // The arguments are moved here. This function is called from a
+                    // bound functor. In order to do true perfect forwarding in an
+                    // asynchronous operation. These bound variables must be moved
+                    // out of the bound object.
                     (get_lva<Component>::call(lva)->*F)(
                         BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
                 }
