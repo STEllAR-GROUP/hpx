@@ -1176,7 +1176,7 @@ namespace hpx { namespace threads
             },
             // idle rate
             { "/time/idle-rate", performance_counters::counter_raw,
-              "returns the idle rate for the referenced object  (in 0.1%)",
+              "returns the idle rate for the referenced object [0.1%]",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&ti::idle_rate_counter_creator, this, _1, _2),
               &performance_counters::locality_thread_counter_discoverer
