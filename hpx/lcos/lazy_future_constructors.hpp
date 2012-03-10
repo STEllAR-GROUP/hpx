@@ -1,4 +1,5 @@
-//  Copyright (c) 2007-2010 Hartmut Kaiser, Dylan Stark
+//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2010 Dylan Stark
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,7 +17,7 @@
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (2, HPX_ACTION_ARGUMENT_LIMIT,                                        \
-    "hpx/lcos/lazy_future_constructors.hpp"))                                       \
+    "hpx/lcos/lazy_future_constructors.hpp"))                                 \
     /**/
 
 #include BOOST_PP_ITERATE()

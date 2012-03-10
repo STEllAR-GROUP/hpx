@@ -1,4 +1,5 @@
-//  Copyright (c) 2007-2010 Hartmut Kaiser, Dylan Stark
+//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2010 Dylan Stark
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,7 +17,7 @@
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (2, HPX_ACTION_ARGUMENT_LIMIT,                                        \
-    "hpx/lcos/lazy_future_constructors_direct.hpp"))                         \
+    "hpx/lcos/lazy_future_constructors_direct.hpp"))                          \
     /**/
 
 #include BOOST_PP_ITERATE()
@@ -41,7 +42,7 @@
             // local, direct execution
             BOOST_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
-            (*this->impl_)->set_data(0, Action::execute_function(
+            (*this->impl_)->set_data(Action::execute_function(
                 addr.address_, BOOST_PP_ENUM_PARAMS(N, arg)));
         }
         else {

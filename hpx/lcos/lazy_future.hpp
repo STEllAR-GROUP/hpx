@@ -1,4 +1,5 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser, Dylan Stark
+//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2010 Dylan Stark
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -96,17 +97,12 @@ namespace hpx { namespace lcos
             closure_();
 
             // wait for the result (yield control)
-            return (*this->impl_)->get_data(0, ec);
-        }
-
-        void invalidate(int slot, boost::exception_ptr const& e)
-        {
-            (*this->impl_)->set_error(slot, e); // set the received error
+            return (*this->impl_)->get_data(ec);
         }
 
         void invalidate(boost::exception_ptr const& e)
         {
-            (*this->impl_)->set_error(0, e); // set the received error
+            (*this->impl_)->set_error(e); // set the received error
         }
 
         /// The apply function starts the asynchronous operations encapsulated
@@ -136,7 +132,7 @@ namespace hpx { namespace lcos
             // as the underlying FEB prevents the action from being called
             // more than once; but it would be more efficient to reduce the
             // number of calls to apply().
-            if (!((*th->impl_)->is_ready(0)))
+            if (!((*th->impl_)->is_ready()))
                 th->apply(gid);
         }
 
@@ -209,7 +205,7 @@ namespace hpx { namespace lcos
         template <typename Arg0>
         void invoke1(naming::id_type const& gid, Arg0 const& arg0)
         {
-            if (!((*this->impl_)->is_ready(0)))
+            if (!((*this->impl_)->is_ready()))
                 this->apply(gid, arg0);
         }
 
@@ -302,7 +298,7 @@ namespace hpx { namespace lcos
             closure_();
 
             // wait for the result (yield control)
-            return (*this->impl_)->get_data(0, ec);
+            return (*this->impl_)->get_data(ec);
         }
 
         void invalidate(boost::exception_ptr const& e)
