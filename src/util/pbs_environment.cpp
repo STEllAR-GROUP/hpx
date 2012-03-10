@@ -94,7 +94,7 @@ namespace hpx { namespace util
         bool found_agas_host = false;
         std::size_t agas_node = 0;
         std::string nodes_list;
-        BOOST_FOREACH(std::string const& s, nodes)
+        BOOST_FOREACH(std::string s, nodes)
         {
             if (!s.empty()) {
                 if (debug_)
@@ -108,11 +108,17 @@ namespace hpx { namespace util
                     agas_node_num_ = agas_node;
                 }
 
-                if (0 == nodes_.count(s))
-                {
-                    if (debug_)
-                        std::cerr << "incrementing agas_node"
+                if (!!transform_) {    // If the transform is not empty
+                    s = transform_(s);
+                    if (debug_) {
+                        std::cerr << "extracted(transformed): '" << s << "'"
                                   << std::endl;
+                    }
+                }
+
+                if (0 == nodes_.count(s)) {
+                    if (debug_)
+                        std::cerr << "incrementing agas_node" << std::endl;
                     ++agas_node;
                 }
 
@@ -164,10 +170,8 @@ namespace hpx { namespace util
         // in the node-file
         node_map_type::const_iterator it = nodes_.find(host_name());
         std::size_t result = it != nodes_.end() ? (*it).second : 1;
-        if (debug_) {
-            std::cerr << "retrieve_number_of_threads: " << result
-                      << std::endl;
-        }
+        if (debug_)
+            std::cerr << "retrieve_number_of_threads: " << result << std::endl;
         return result;
     }
 
@@ -209,9 +213,17 @@ namespace hpx { namespace util
 
     std::string pbs_environment::host_name() const
     {
-        if (!!transform_) // If the transform is not empty
-            return transform_(boost::asio::ip::host_name());
-        return boost::asio::ip::host_name();
+        std::string hostname = boost::asio::ip::host_name();
+        if (debug_)
+            std::cerr << "asio host_name: " << hostname << std::endl;
+        if (!!transform_) {   // If the transform is not empty
+            hostname = transform_(hostname);
+            if (debug_) {
+                std::cerr << "asio host_name(transformed): " << hostname
+                          << std::endl;
+            }
+        }
+        return hostname;
     }
 
     std::string pbs_environment::host_name(std::string const& def_hpx_name) const
@@ -219,8 +231,11 @@ namespace hpx { namespace util
         std::string host = nodes_.empty() ? def_hpx_name : host_name();
         if (debug_)
             std::cerr << "host_name: " << host << std::endl;
-        if (!!transform_) // If the transform is not empty
-            return transform_(host);
+        if (!!transform_) {   // If the transform is not empty
+            host = transform_(host);
+            if (debug_)
+                std::cerr << "host_name(transformed): " << host << std::endl;
+        }
         return host;
     }
 
@@ -231,8 +246,13 @@ namespace hpx { namespace util
         std::string host = agas_node_.empty() ? def_agas : agas_node_;
         if (debug_)
             std::cerr << "agas host_name: " << host << std::endl;
-        if (!!transform_) // If the transform is not empty
-            return transform_(host);
+        if (!!transform_) {   // If the transform is not empty
+            host = transform_(host);
+            if (debug_) {
+                std::cerr << "agas host_name(transformed): " << host
+                          << std::endl;
+            }
+        }
         return host;
     }
 
