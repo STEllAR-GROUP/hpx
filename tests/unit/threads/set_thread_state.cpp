@@ -26,15 +26,13 @@ using hpx::actions::plain_action4;
 
 using hpx::applier::register_thread_nullary;
 
-using hpx::lcos::promise;
+using hpx::lcos::future;
 using hpx::lcos::async;
 
 using hpx::threads::thread_id_type;
 using hpx::threads::suspend;
 using hpx::threads::set_thread_state;
-using hpx::threads::thread_state_enum;
 using hpx::threads::thread_state_ex_enum;
-using hpx::threads::unknown;
 using hpx::threads::pending;
 using hpx::threads::suspended;
 using hpx::threads::wait_signaled;

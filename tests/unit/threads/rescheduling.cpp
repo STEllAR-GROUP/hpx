@@ -32,13 +32,10 @@ using hpx::lcos::async;
 using hpx::threads::thread_id_type;
 using hpx::threads::suspend;
 using hpx::threads::set_thread_state;
-using hpx::threads::thread_state_enum;
 using hpx::threads::thread_state_ex_enum;
-using hpx::threads::unknown;
 using hpx::threads::pending;
 using hpx::threads::suspended;
 using hpx::threads::wait_signaled;
-using hpx::threads::wait_timeout;
 using hpx::threads::wait_terminate;
 
 using hpx::init;
@@ -131,7 +128,7 @@ void tree_boot(
     BOOST_ASSERT(grain_size);
     BOOST_ASSERT(count);
 
-    std::vector<promise<void> > promises;
+    std::vector<future<void> > promises;
 
     boost::uint64_t const actors = (count > grain_size) ? grain_size : count;
 
@@ -206,14 +203,14 @@ int hpx_main(variables_map& vm)
 
         // Flood the queues with suspension operations before the rescheduling
         // attempt.
-        future<void> before = 
+        future<void> before =
             async<tree_boot_action>(prefix, futures, grain_size, prefix, thread);
 
         set_thread_state(thread_id, pending, wait_signaled);
 
         // Flood the queues with suspension operations after the rescheduling
         // attempt.
-        future<void> after = 
+        future<void> after =
             async<tree_boot_action>(prefix, futures, grain_size, prefix, thread);
 
         before.get();
