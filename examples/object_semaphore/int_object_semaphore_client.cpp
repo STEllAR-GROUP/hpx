@@ -65,8 +65,10 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::vector<hpx::lcos::future<void> > barrier;
 
         // create some threads waiting to pull elements from the queue
-        for (std::size_t i = 0; i < 5; ++i)
+        for (std::size_t i = 0; i < 5; ++i) {
+            using hpx::lcos::async;
             barrier.push_back(async<worker_action>(hpx::find_here(), os.get_gid()));
+        }
 
         // abort all pending workers
         hpx::applier::register_work(boost::bind(&breaker, os.get_gid()));
