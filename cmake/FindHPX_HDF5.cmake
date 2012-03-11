@@ -61,5 +61,5 @@ hpx_find_package(HDF5_FORTRAN
   LIBRARIES hdf5_fortran libhdf5_fortran ${hdf5_fortran_lib}
   LIBRARY_PATHS lib64 lib
   HEADERS hdf5.mod
-  HEADER_PATHS include)
+  HEADER_PATHS include include/fortran)
 
