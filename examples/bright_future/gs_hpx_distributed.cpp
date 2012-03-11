@@ -646,7 +646,7 @@ void gs(
             BOOST_FOREACH(dataflow_base<void> & promise, block)
             {
                 cout << "." << flush;
-                promise.get();
+                promise.get_future().get();
             }
         }
         if(debug) cout << "\n";
@@ -693,7 +693,7 @@ void gs(
                         )
                       , x_range
                       , y_range
-                    ).get();
+                    ).get_future().get();
                 }
             }
             cout << "\n" << flush;

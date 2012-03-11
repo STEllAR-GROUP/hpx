@@ -380,7 +380,7 @@ void gs(
         // wait for the last iteration to finish.
         BOOST_FOREACH(dataflow_type & promise, iteration_dependencies[max_iterations%2])
         {
-            promise.get();
+            promise.get_future().get();
             std::cout << "." << flush;
         }
         std::cout << "\n" << flush;
@@ -399,7 +399,10 @@ void gs(
             {
                 for(size_type y = 0; y < n_y; ++y)
                 {
-                    apply_future(remote_id, out, x, y, std::vector<hpx::lcos::future<void> >()).get();
+                    apply_future(
+                        remote_id, out, x, y
+                      , std::vector<hpx::lcos::future<void> >()
+                    ).get_future().get();
                 }
                 (*f.file) << "\n";
             }

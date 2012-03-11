@@ -88,7 +88,7 @@ struct data
     double inv_hy_sq;
     std::vector<grid_type> u;
     grid_type rhs;
-    
+
 };
 
 using hpx::components::dataflow_object;
@@ -125,7 +125,7 @@ struct init_fun
             }
         }
     }
-    
+
     template <typename Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
@@ -147,7 +147,7 @@ struct get_col_fun
     get_col_fun() {}
     get_col_fun(range_type const & r, size_type ro, size_type cur)
         : range(r), col(ro), cur(cur) {}
-    
+
     template <typename Archive>
     void serialize(Archive & ar, unsigned)
     {
@@ -191,7 +191,7 @@ struct get_row_fun
     result_type operator()(data & d) const
     {
         std::vector<double> result;
-        
+
         result.reserve((range.second-range.first));
 
         for(size_type x = range.first; x < range.second; ++x)
@@ -228,8 +228,9 @@ struct update_top_boundary_fun
 
     result_type operator()(data & d) const
     {
-    
-        std::vector<double> b = neighbor.apply(get_row_fun(range, d.u[cur].y()-2, cur)).get();
+
+        std::vector<double> b = neighbor.apply(
+            get_row_fun(range, d.u[cur].y()-2, cur)).get_future().get();
         for(size_type x = range.first, i = 0; x < range.second; ++x, ++i)
         {
             d.u[cur](x, 0) = b.at(i);
@@ -262,7 +263,8 @@ struct update_bottom_boundary_fun
 
     result_type operator()(data & d) const
     {
-        std::vector<double> b = neighbor.apply(get_row_fun(range, 1, cur)).get();
+        std::vector<double> b = neighbor.apply(
+            get_row_fun(range, 1, cur)).get_future().get();
         for(size_type x = range.first, i = 0; x < range.second; ++x, ++i)
         {
             d.u[cur](x, d.u[cur].y()-1) = b.at(i);
@@ -295,7 +297,8 @@ struct update_right_boundary_fun
 
     result_type operator()(data & d) const
     {
-        std::vector<double> b = neighbor.apply(get_col_fun(range, 1, cur)).get();
+        std::vector<double> b = neighbor.apply(
+            get_col_fun(range, 1, cur)).get_future().get();
         for(size_type y = range.first, i = 0; y < range.second; ++y, ++i)
         {
             d.u[cur](d.u[cur].x()-1, y) = b.at(i);
@@ -328,7 +331,8 @@ struct update_left_boundary_fun
 
     result_type operator()(data & d) const
     {
-        std::vector<double> b = neighbor.apply(get_col_fun(range, d.u[cur].x()-2, cur)).get();
+        std::vector<double> b = neighbor.apply(
+            get_col_fun(range, d.u[cur].x()-2, cur)).get_future().get();
         for(size_type y = range.first, i = 0; y < range.second; ++y, ++i)
         {
             d.u[cur](0, y) = b.at(i);
@@ -339,7 +343,7 @@ struct update_left_boundary_fun
 struct update_fun
 {
     typedef void result_type;
-    
+
     range_type x_range;
     range_type y_range;
     size_type old;
@@ -383,7 +387,7 @@ struct update_fun
             }
         }
     }
-    
+
     template <typename Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
@@ -428,7 +432,7 @@ struct output_fun
             file << "\n";
         }
     }
-    
+
     template <typename Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
@@ -489,17 +493,17 @@ void gs(
         hy_sq = hy * hy;
         double inv_hx_sq = 1.0 / hx_sq;
         double inv_hy_sq = 1.0 / hy_sq;
-        
+
         /*
         size_type n_x_block = n_x / block_size + 1;
         size_type n_y_block = n_y / block_size + 1;
         */
-        
+
         hpx::components::component_type type
             = hpx::components::get_component_type<hpx::components::server::remote_object>();
 
         std::vector<id_type> prefixes = find_all_localities(type);
-        
+
         double num_blocks_sqrt = std::floor(std::sqrt(static_cast<double>(prefixes.size())));
 
         double num_blocks = 0;
@@ -548,7 +552,7 @@ void gs(
             BOOST_FOREACH(hpx::lcos::future<object<data> > const & o, objects)
             {
                 using hpx::naming::strip_credit_from_gid;
- 
+
                 object_grid(x, y) = o.get();
 
                 if(++x > n_x_block - 1)
@@ -588,7 +592,7 @@ void gs(
                                 x
                               , (std::min)(n_x_local + 2, x + block_size)
                             );
-                        
+
                         range_type
                             y_range(
                                 y
@@ -604,7 +608,7 @@ void gs(
                                   , y_block * n_y_local
                                 )
                             );
-                        deps(x_block, y_block)(xx,yy).get();
+                        deps(x_block, y_block)(xx,yy).get_future().get();
                     }
                 }
             }
@@ -635,7 +639,7 @@ void gs(
                                             : (std::min)(n_x_local + 1, x + block_size)
                                         : (std::min)(n_x_local + 1, x + block_size)
                                 );
-                            
+
                             range_type
                                 y_range(
                                     yy == 0 && y_block == 0 ? 2 : y
@@ -659,7 +663,7 @@ void gs(
                                 trigger.push_back(cur_deps(xx+1, yy));
                             if(yy + 1 < n_y_local_block)
                                 trigger.push_back(cur_deps(xx, yy+1));
-                            
+
                             if(xx == 0 && x_block > 0)
                             {
                                 trigger.push_back(
@@ -733,7 +737,7 @@ void gs(
         {
             BOOST_FOREACH(promise & p, block)
             {
-                p.get();
+                p.get_future().get();
             }
             //wait(block.data_handle(), [&](size_t){if(debug) cout << "." << flush; });
         }
@@ -759,7 +763,7 @@ void gs(
                           ? n_x - x_block * n_x_local + 1
                           : n_x_local+1
                         );
-                    
+
                     range_type
                         y_range(
                             1
@@ -777,7 +781,7 @@ void gs(
                           , y_block * n_y_local
                           , new_
                         )
-                    ).get();
+                    ).get_future().get();
                 }
             }
         }

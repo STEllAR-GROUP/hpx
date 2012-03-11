@@ -63,7 +63,7 @@ struct get_col_fun
     get_col_fun() {}
     get_col_fun(range_type const & r, size_type ro, size_type cur)
         : range(r), col(ro), cur(cur) {}
-    
+
     template <typename Archive>
     void serialize(Archive & ar, unsigned)
     {
@@ -107,7 +107,7 @@ struct get_row_fun
     result_type operator()(std::vector<grid_type> & u) const
     {
         std::vector<double> result;
-        
+
         result.reserve((range.second-range.first));
 
         for(size_type x = range.first; x < range.second; ++x)
@@ -144,8 +144,9 @@ struct update_top_boundary_fun
 
     result_type operator()(std::vector<grid_type> & u) const
     {
-    
-        std::vector<double> b = neighbor.apply(get_row_fun(range, u[cur].y()-2, cur)).get();
+
+        std::vector<double> b = neighbor.apply(
+            get_row_fun(range, u[cur].y()-2, cur)).get_future().get();
         for(size_type x = range.first, i = 0; x < range.second; ++x, ++i)
         {
             u[cur](x, 0) = b.at(i);
@@ -178,7 +179,8 @@ struct update_bottom_boundary_fun
 
     result_type operator()(std::vector<grid_type> & u) const
     {
-        std::vector<double> b = neighbor.apply(get_row_fun(range, 1, cur)).get();
+        std::vector<double> b = neighbor.apply(
+            get_row_fun(range, 1, cur)).get_future().get();
         for(size_type x = range.first, i = 0; x < range.second; ++x, ++i)
         {
             u[cur](x, u[cur].y()-1) = b.at(i);
@@ -211,7 +213,8 @@ struct update_right_boundary_fun
 
     result_type operator()(std::vector<grid_type> & u) const
     {
-        std::vector<double> b = neighbor.apply(get_col_fun(range, 1, cur)).get();
+        std::vector<double> b = neighbor.apply(
+            get_col_fun(range, 1, cur)).get_future().get();
         for(size_type y = range.first, i = 0; y < range.second; ++y, ++i)
         {
             u[cur](u[cur].x()-1, y) = b.at(i);
@@ -244,7 +247,8 @@ struct update_left_boundary_fun
 
     result_type operator()(std::vector<grid_type> & u) const
     {
-        std::vector<double> b = neighbor.apply(get_col_fun(range, u[cur].x()-2, cur)).get();
+        std::vector<double> b = neighbor.apply(
+            get_col_fun(range, u[cur].x()-2, cur)).get_future().get();
         for(size_type y = range.first, i = 0; y < range.second; ++y, ++i)
         {
             u[cur](0, y) = b.at(i);
@@ -255,7 +259,7 @@ struct update_left_boundary_fun
 struct update_fun
 {
     typedef void result_type;
-    
+
     range_type x_range;
     range_type y_range;
     size_type src;
@@ -282,7 +286,7 @@ struct update_fun
           , cache_block
         );
     }
-    
+
     template <typename Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
@@ -314,7 +318,7 @@ void gs(
     std::vector<id_type> prefixes = find_all_localities(type);
 
     std::vector<std::size_t> dims = create_dim(prefixes.size(), 2);
-    
+
     n_x = n_x -1;
     n_y = n_y -1;
 
@@ -369,7 +373,7 @@ void gs(
             }
         }
     }
-    
+
     size_type n_x_local_block = (n_x_local - 2)/block_size + 1;
     size_type n_y_local_block = (n_y_local - 2)/block_size + 1;
 
@@ -420,7 +424,7 @@ void gs(
                                 trigger.push_back(cur_deps(xx, yy+1));
                             if(yy > 0)
                                 trigger.push_back(cur_deps(xx, yy-1));
-                            
+
                             if(xx == 0 && x_block > 0)
                             {
                                 trigger.push_back(
@@ -512,7 +516,7 @@ void gs(
             {
                 for(size_type x = 1, xx = 0; x < n_x_local; x += block_size, ++xx)
                 {
-                    deps[src](x_block, y_block)(xx, yy).get();
+                    deps[src](x_block, y_block)(xx, yy).get_future().get();
                 }
             }
         }

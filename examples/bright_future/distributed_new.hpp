@@ -49,7 +49,7 @@ namespace hpx { namespace components {
         std::size_t created_count = 0;
         std::size_t excess = count - objs_per_loc*prefixes.size();
 
-        std::vector<lcos::promise<object<T> > > res;
+        std::vector<lcos::future<object<T> > > res;
 
         res.reserve(count);
 

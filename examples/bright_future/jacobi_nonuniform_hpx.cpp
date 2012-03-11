@@ -63,7 +63,7 @@ struct lse_data
 struct update_fun
 {
     typedef void result_type;
-    
+
     range_type range;
     std::size_t old;
     std::size_t n;
@@ -86,7 +86,7 @@ struct update_fun
           , old, n
         );
     }
-    
+
     template <typename Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
@@ -109,7 +109,7 @@ struct return_
     {
         return lse.x[which];
     }
-    
+
     template <typename Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
@@ -158,7 +158,7 @@ void solve(
             }
         }
     }
-    
+
     typedef dataflow_object<lse_data> object_type;
 
     object_type lse(new_<lse_data>(find_here(), A, x, b_).get());
@@ -169,7 +169,7 @@ void solve(
     typedef dataflow_base<void> promise;
     typedef std::vector<promise> promise_grid_type;
     std::vector<promise_grid_type> deps(2, promise_grid_type(dependencies.size()));
-    
+
     cout << "running " << max_iterations << " iterations\n" << flush;
     t.restart();
     for(std::size_t iter = 0; iter < max_iterations; ++iter)
@@ -201,12 +201,12 @@ void solve(
     }
     for(std::size_t i = 0; i < deps[0].size(); ++i)
     {
-        deps[old][i].get();
+        deps[old][i].get_future().get();
     }
 
     double time_elapsed = t.elapsed();
     cout << x.size() << " "
          << (((x.size() * max_iterations)/1e6)/time_elapsed) << " MLUPS/s\n" << flush;
 
-    x = lse.apply(return_(old)).get();
+    x = lse.apply(return_(old)).get_future().get();
 }

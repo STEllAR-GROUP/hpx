@@ -52,7 +52,7 @@ using hpx::components::dataflow_object;
 struct update_fun
 {
     typedef void result_type;
-    
+
     range_type x_range;
     range_type y_range;
     size_type old;
@@ -79,7 +79,7 @@ struct update_fun
           , cache_block
         );
     }
-    
+
     template <typename Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
@@ -121,7 +121,7 @@ struct output_fun
             file << "\n";
         }
     }
-    
+
     template <typename Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
@@ -217,7 +217,7 @@ void gs(
     {
         for(size_type x = 1, xx = 0; x < n_x - 1; x += block_size, ++xx)
         {
-            deps[old](xx, yy).get();
+            deps[old](xx, yy).get_future().get();
         }
     }
 
@@ -231,6 +231,8 @@ void gs(
         {
             std::ofstream(output.c_str());
         }
-        u.apply(output_fun(output, range_type(0, n_x), range_type(0, n_y), old)).get();
+        u.apply(
+            output_fun(output, range_type(0, n_x), range_type(0, n_y), old)
+        ).get_future().get();
     }
 }

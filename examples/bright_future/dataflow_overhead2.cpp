@@ -74,11 +74,11 @@ int hpx_main(variables_map & vm)
         num_iterations = vm["delay-iterations"].as<boost::uint64_t>();
 
         const boost::uint64_t count = vm["dataflows"].as<boost::uint64_t>();
-        
+
         std::vector<id_type> prefixes = find_all_localities();
 
         double function_time = 0.0;
-        {    
+        {
             high_resolution_timer walltime;
             for(std::size_t i = 0; i < 10000; ++i)
             {
@@ -101,9 +101,9 @@ int hpx_main(variables_map & vm)
                 d = null_dataflow(prefix, d);
             }
 
-            global_scratch += d.get();
+            global_scratch += d.get_future().get();
             const double duration = walltime.elapsed();
-            
+
             if (vm.count("csv"))
                 cout << ( boost::format("%1%,%2%,%3%,%4%\n")
                         % get_locality_id_from_id(prefix)

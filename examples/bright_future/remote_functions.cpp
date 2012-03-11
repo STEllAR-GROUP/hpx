@@ -3,17 +3,18 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <iostream>
-
-#include <boost/fusion/container/vector.hpp>
-#include <boost/type_traits/is_convertible.hpp>
-#include <hpx/util/function.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/util/function.hpp>
 
 #include <hpx/util/high_resolution_timer.hpp>
+
+#include <iostream>
+
+#include <boost/fusion/container/vector.hpp>
+#include <boost/type_traits/is_convertible.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -65,7 +66,7 @@ int hpx_main(variables_map &)
     {
         function<void()> f = g();
         std::vector<id_type> prefixes = find_all_localities();
-    
+
         BOOST_FOREACH(id_type const & prefix, prefixes)
         {
             async<f_action>(prefix, f, 0).get();
