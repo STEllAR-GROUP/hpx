@@ -10,7 +10,7 @@
 
 #include <hpx/lcos/async.hpp>
 #include <hpx/lcos/async_future_wait.hpp>
-#include <hpx/lcos/local/eager_future.hpp>
+#include <hpx/lcos/local/async.hpp>
 
 #include <boost/foreach.hpp>
 #include <boost/assert.hpp>
@@ -355,7 +355,7 @@ namespace sheneos
             d.rho_.push_back(*it_rho);
         }
 
-        hpx::lcos::local::eager_future<std::vector<double> > bulk_op (
+        return hpx::lcos::local::async<std::vector<double> >(
             [&]() -> std::vector<double> {
                 namespace naming = hpx::naming;
                 namespace lcos = hpx::lcos;
@@ -386,8 +386,6 @@ namespace sheneos
 
                 return overall_result;
             });
-
-        return bulk_op.get_future();
     }
 }
 

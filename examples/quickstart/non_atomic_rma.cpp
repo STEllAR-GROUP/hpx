@@ -111,7 +111,7 @@ int hpx_main(po::variables_map &vm)
         // Create a timer so see how its done
         util::high_resolution_timer t;
 
-        std::vector<lcos::future< naming::id_type > > n;
+        std::vector<lcos::future< naming::id_type, naming::id_type> > n;
 
         int array_length = 6;
         for (int i=0;i<array_length;i++) {
