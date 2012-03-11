@@ -13,7 +13,6 @@
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/components/remote_object/new.hpp>
-#include "dataflow_object.hpp"
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/lcos/async.hpp>
 #include <hpx/include/iostreams.hpp>
@@ -22,6 +21,7 @@
 #include <hpx/components/dataflow/dataflow.hpp>
 #include <hpx/components/dataflow/dataflow_trigger.hpp>
 #include <hpx/components/dataflow/async_dataflow_wait.hpp>
+#include <hpx/components/dataflow/dataflow_object.hpp>
 
 #undef min
 
@@ -61,7 +61,23 @@ struct update_fun
 
     update_fun() {}
 
-    update_fun(range_type x, range_type y, size_type old, size_type n, size_type c)
+    update_fun(update_fun const & other)
+      : x_range(other.x_range)
+      , x_range(other.y_range)
+      , old(other.old)
+      , n(other.n)
+      , cache_block(other.cache_block)
+    {}
+
+    update_fun(BOOST_RV_REF(update_fun) other)
+      : x_range(boost::move(other.x_range))
+      , x_range(boost::move(other.y_range))
+      , old(boost::move(other.old))
+      , n(boost::move(other.n))
+      , cache_block(boost::move(other.cache_block))
+    {}
+
+    update_fun(range_type const & x, range_type const & y, size_type old, size_type n, size_type c)
         : x_range(x)
         , y_range(y)
         , old(old)
@@ -89,6 +105,9 @@ struct update_fun
         ar & n;
         ar & cache_block;
     }
+
+    private:
+        BOOST_COPYABLE_AND_MOVABLE(update_fun)
 };
 
 struct output_fun
@@ -186,27 +205,27 @@ void gs(
 
                     deps[n](xx, yy)
                         = u.apply(
-                            update_fun(
+                            boost::move(update_fun(
                                 range_type(x, x_end)
                               , range_type(y, y_end)
                               , old
                               , n
                               , cache_block
-                            )
-                          , dataflow_trigger(u.gid_, trigger)
+                            ))
+                          , dataflow_trigger(u.gid_, boost::move(trigger))
                         );
                 }
                 else
                 {
                     deps[n](xx, yy)
                         = u.apply(
-                            update_fun(
-                                range_type(x, x_end)
-                              , range_type(y, y_end)
+                            boost::move(update_fun(
+                                boost::move(range_type(x, x_end))
+                              , boost::move(range_type(y, y_end))
                               , old
                               , n
                               , cache_block
-                            )
+                            ))
                         );
                 }
             }
@@ -222,8 +241,8 @@ void gs(
     }
 
     double time_elapsed = t.elapsed();
-    cout << n_x-1 << "x" << n_y-1 << " "
-         << ((((n_x-2)*(n_y-2) * max_iterations)/1e6)/time_elapsed) << " MLUP/S\n" << flush;
+    cout << n_x << "x" << n_y << " "
+         << ((((n_x-2)*(n_y-2) * max_iterations)/1e6)/time_elapsed) << " MLUPS/s\n" << flush;
 
     if(!output.empty())
     {

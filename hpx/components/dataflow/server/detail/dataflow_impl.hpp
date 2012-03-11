@@ -221,41 +221,7 @@ namespace hpx { namespace traits
         {
         }
 
-#if N > 0
         void init(BOOST_PP_REPEAT(N, HPX_RV_REF_ARGS, _))
-        {
-            LLCO_(info)
-                << "dataflow_impl<"
-                << hpx::actions::detail::get_action_name<Action>()
-                << ">::init(): "
-                << get_gid()
-                ;
-#define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
-            typedef                                                             \
-                component_wrapper<                                              \
-                    dataflow_slot<                                              \
-                        BOOST_PP_CAT(A, N)                                      \
-                      , N, wrapped_type                                         \
-                    >                                                           \
-                >                                                               \
-                BOOST_PP_CAT(component_type, N);                                \
-                                                                                \
-            BOOST_PP_CAT(component_type, N) * BOOST_PP_CAT(w, N)                \
-                = new BOOST_PP_CAT(component_type, N)(                          \
-                    this                                                        \
-                  , boost::move(BOOST_PP_CAT(a, N))                             \
-                );                                                              \
-                                                                                \
-            arg_ids[N] = BOOST_PP_CAT(w, N);                                    \
-            (*BOOST_PP_CAT(w, N))->connect();                                   \
-    /**/
-
-            BOOST_PP_REPEAT(N, HPX_LCOS_DATAFLOW_M0, _)
-#undef HPX_LCOS_DATAFLOW_M0
-        }
-#endif
-
-        void init(BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
         {
             LLCO_(info)
                 << "dataflow_impl<"
@@ -280,7 +246,7 @@ namespace hpx { namespace traits
             BOOST_PP_CAT(component_type, N) * BOOST_PP_CAT(w, N)                \
                 = new BOOST_PP_CAT(component_type, N)(                          \
                     this                                                        \
-                  , BOOST_PP_CAT(a, N)                                          \
+                  , boost::move(BOOST_PP_CAT(a, N))                             \
                 );                                                              \
                                                                                 \
             arg_ids[N] = BOOST_PP_CAT(w, N);                                    \

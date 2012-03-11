@@ -9,6 +9,14 @@
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 
+#define HPX_FORWARD_ARGS(z, n, _)                                               \
+    boost::forward<BOOST_PP_CAT(A, n)>(BOOST_PP_CAT(a, n))                      \
+    /**/
+
+#define HPX_FWD_REF_ARGS(z, n, _)                                               \
+    BOOST_FWD_REF(BOOST_PP_CAT(A, n)) BOOST_PP_CAT(a, n)                        \
+    /**/
+
 namespace hpx { namespace lcos { namespace server { namespace detail 
 {
     struct component_wrapper_base
@@ -36,20 +44,9 @@ namespace hpx { namespace lcos { namespace server { namespace detail
 
 #define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
         template <BOOST_PP_ENUM_PARAMS(N, typename A)>                          \
-        component_wrapper(BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))         \
+        component_wrapper(BOOST_PP_ENUM(N, HPX_FWD_REF_ARGS, _))                \
         {                                                                       \
-            T * t = new T(BOOST_PP_ENUM_PARAMS(N, a));                          \
-            component_ptr = new component_type(t);                              \
-        }                                                                       \
-    /**/
-        BOOST_PP_REPEAT_FROM_TO(1, 10, HPX_LCOS_DATAFLOW_M0, _)
-#undef HPX_LCOS_DATAFLOW_M0
-
-#define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
-        template <BOOST_PP_ENUM_PARAMS(N, typename A)>                          \
-        component_wrapper(BOOST_PP_ENUM_BINARY_PARAMS(N, A, & a))               \
-        {                                                                       \
-            T * t = new T(BOOST_PP_ENUM_PARAMS(N, a));                          \
+            T * t = new T(BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _));               \
             component_ptr = new component_type(t);                              \
         }                                                                       \
     /**/
@@ -82,5 +79,8 @@ namespace hpx { namespace lcos { namespace server { namespace detail
         }
     };
 }}}}
+
+#undef HPX_FORWARD_ARGS
+#undef HPX_FWD_REF_ARGS
 
 #endif

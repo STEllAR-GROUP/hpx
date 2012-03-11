@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/util/detail/remove_reference.hpp>
 
 #include <boost/get_pointer.hpp>
 
@@ -24,25 +25,11 @@
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 
-#include <boost/type_traits/remove_reference.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util {
     namespace detail
     {
 #if defined(BOOST_NO_RVALUE_REFERENCES)
-        template <typename T>
-        struct remove_reference
-        {
-            typedef typename boost::remove_reference<T>::type type;
-        };
-
-        template <typename T>
-        struct remove_reference<boost::rv<T> >
-        {
-            typedef T type;
-        };
-
         template <typename T>
         struct env_value_type;
 
@@ -59,8 +46,6 @@ namespace hpx { namespace util {
         };
 
 #else
-        using std::remove_reference;
-
         template <typename T, bool IsRvalue = std::is_rvalue_reference<T>::value>
         struct env_value_type
         {

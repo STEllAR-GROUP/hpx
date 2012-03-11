@@ -43,7 +43,7 @@ namespace hpx { namespace components
         lcos::dataflow_base<
             typename boost::result_of<F(T &)>::type
         >
-        apply(F const & f) const
+        apply(BOOST_FWD_REF(F) f) const
         {
             typedef
                 typename boost::result_of<F(T &)>::type
@@ -54,7 +54,7 @@ namespace hpx { namespace components
                 apply_action;
 
             return lcos::dataflow<apply_action>(gid_
-                  , remote_object::invoke_apply_fun<T, F>(f)
+                  , remote_object::invoke_apply_fun<T, F>(boost::forward<F>(f))
                   , 0
                 );
         }
@@ -63,7 +63,7 @@ namespace hpx { namespace components
         lcos::dataflow_base<
             typename boost::result_of<F(T &)>::type
         >
-        apply(F const & f, D const & d) const
+        apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(D) d) const
         {
             typedef
                 typename boost::result_of<F(T &)>::type
@@ -74,7 +74,7 @@ namespace hpx { namespace components
                 apply_action;
 
             return lcos::dataflow<apply_action>(gid_
-                  , remote_object::invoke_apply_fun<T, F>(f)
+                  , remote_object::invoke_apply_fun<T, F>(boost::forward<F>(f))
                   , 0
                   , d
                 );

@@ -26,6 +26,7 @@ namespace hpx { namespace components
 
             invoke_apply_fun() {}
             invoke_apply_fun(F const & f) : f(f) {}
+            invoke_apply_fun(BOOST_RV_REF(F) f) : f(boost::move(f)) {}
 
             invoke_apply_fun(invoke_apply_fun const & other)
                 : f(other.f)
@@ -76,12 +77,12 @@ namespace hpx { namespace components
         lcos::future<
             typename boost::result_of<F(T &)>::type
         >
-        operator<=(F const & f) const
+        operator<=(BOOST_FWD_REF(F) f) const
         {
             return
                 stubs::remote_object::apply_async(
                     gid_
-                  , remote_object::invoke_apply_fun<T, F>(f)
+                  , boost::move(remote_object::invoke_apply_fun<T, F>(boost::forward<F>(f)))
                 );
         }
 

@@ -8,6 +8,8 @@
 #ifndef HPX_LCOS_DATAFLOW_HPP
 #define HPX_LCOS_DATAFLOW_HPP
 
+#include <hpx/config.hpp>
+#include <hpx/include/plain_actions.hpp>
 #include <hpx/components/dataflow/dataflow_base.hpp>
 #include <hpx/components/dataflow/dataflow_fwd.hpp>
 #include <hpx/lcos/async.hpp>
@@ -83,7 +85,7 @@ namespace hpx { namespace lcos
 
 #define HPX_A(z, n, _)                                                 \
         BOOST_PP_COMMA_IF(n)                                                  \
-            typename boost::remove_const<typename hpx::util::detail::remove_reference<BOOST_FWD_REF(BOOST_PP_CAT(A, n))>::type>::type              \
+            typename boost::remove_const<typename hpx::util::detail::remove_reference<BOOST_PP_CAT(A, n)>::type>::type && \
     /**/
 
 #define HPX_FORWARD_ARGS(z, n, _)                                             \
@@ -138,8 +140,8 @@ namespace hpx { namespace lcos
                   , BOOST_PP_ADD(N, 2)
                 )<
                     components::managed_component<server::dataflow>
-                  , detail::action_wrapper<Action>
-                  , naming::id_type
+                  , detail::action_wrapper<Action> const &
+                  , naming::id_type const &
                   , BOOST_PP_REPEAT(N, HPX_A, _)
                 >::type
                 create_component_action;
@@ -166,8 +168,8 @@ namespace hpx { namespace lcos
                   , BOOST_PP_ADD(N, 2)
                 )<
                     components::managed_component<server::dataflow>
-                  , detail::action_wrapper<Action>
-                  , naming::id_type
+                  , detail::action_wrapper<Action> const &
+                  , naming::id_type const &
                   , BOOST_PP_REPEAT(N, HPX_A, _)
                 >::type
                 create_component_action;
