@@ -5,10 +5,14 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(example_programs
-    1d_hydro_upwind
    )
 
-set(1d_hydro_upwind_FLAGS DEPENDENCIES iostreams_component)
+if(HPX_CXX11_LAMBDAS)
+  set(example_programs
+      ${example_programs}
+      1d_hydro_upwind)
+  set(1d_hydro_upwind_FLAGS DEPENDENCIES iostreams_component)
+endif()
 
 foreach(example_program ${example_programs})
   set(sources

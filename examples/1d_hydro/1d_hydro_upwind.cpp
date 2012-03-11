@@ -245,7 +245,7 @@ double timestep_size(boost::uint64_t timestep)
       // we don't want to let the timestep increase too quickly, so
       // we only let it increase by 50% each timestep
       time_array[timestep].computed = true;
-      time_array[timestep].dt = std::min(
+      time_array[timestep].dt = (std::min)(
                                     cfl_predict_factor*dt_cfl 
                                     , 
                                     1.5*time_array[timestep-1].dt);
@@ -285,7 +285,7 @@ cell compute(boost::uint64_t timestep, boost::uint64_t location)
     }  
 
   //boundary conditions (using sod shock tube boundaries)
-  if ( (location == 0) or (location == nx-1) )
+  if ( (location == 0) || (location == nx-1) )
     {
       grid[timestep][location] = initial_sod(location);
       grid[timestep][location].computed = true;
@@ -373,8 +373,8 @@ cell compute(boost::uint64_t timestep, boost::uint64_t location)
 
 
   // check for CFL (courant friedrichs levy) violation (makes code unstable)
-  double soundspeed = sqrt(fluid_gamma*middle_pressure/middle.rho);
-  double abs_velocity = std::max(velocity_right,velocity_right);
+  double soundspeed = std::sqrt(fluid_gamma*middle_pressure/middle.rho);
+  double abs_velocity = (std::max)(velocity_right,velocity_right);
   double dt_cfl_here = cfl_factor*dx/(soundspeed+abs_velocity);
   if (dt_cfl_here > timestep) 
     { 
