@@ -67,8 +67,7 @@ namespace detail
                 }
 
                 if (running) {
-                    LTM_(error)
-                                << "queue(" << num_thread << "): "
+                    LTM_(error) << "queue(" << num_thread << "): "
                                 << get_thread_state_name(state)
                                 << "(" << std::hex << std::setw(8)
                                     << std::setfill('0') << (*it).first
@@ -94,7 +93,7 @@ namespace detail
                                 << ") P" << std::hex << std::setw(8)
                                     << std::setfill('0') << thrd->get_parent_thread_id()
                                 << ": " << thrd->get_description()
-                                << ": " << thrd->get_lco_description() << std::endl;
+                                << ": " << thrd->get_lco_description() << "\n";
                 }
                 thrd->set_marked_state(state);
 

@@ -236,6 +236,14 @@ if(NOT HPX_NO_INSTALL)
 endif()
 
 ################################################################################
+# Logging configuration
+################################################################################
+hpx_option(HPX_NO_LOGGING BOOL "Build hpx with logging completely disabled (default: OFF)." OFF ADVANCED)
+if(HPX_NO_LOGGING)
+  add_definitions("-DHPX_NO_LOGGING=1")
+endif()
+
+################################################################################
 # HPX_PREFIX
 ################################################################################
 # If you want to run hpx applications without installing them, set this to
