@@ -12,7 +12,7 @@
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/components/remote_object/new.hpp>
-#include "dataflow_object.hpp"
+#include <hpx/components/dataflow/dataflow_object.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/lcos/async.hpp>
 #include <hpx/include/iostreams.hpp>
