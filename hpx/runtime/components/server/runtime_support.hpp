@@ -67,7 +67,7 @@ namespace hpx { namespace components { namespace server
                 return boost::move(t);
             };
         };
-        
+
         template <typename T>
         struct to_move_or_not<T &, false>
         {
@@ -77,7 +77,7 @@ namespace hpx { namespace components { namespace server
                 return t;
             };
         };
-        
+
         template <typename T>
         struct to_move_or_not<T const &, false>
         {
@@ -87,7 +87,7 @@ namespace hpx { namespace components { namespace server
                 return t;
             };
         };
-        
+
         template <typename T>
         struct to_move_or_not<T, true>
         {
@@ -563,5 +563,6 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 #undef HPX_FORWARD_ARGS
 #undef HPX_FWD_REF_ARGS
 #undef HPX_FWD_REF_ARGS2
+#undef HPX_TO_MOVE_OR_NOT_ARGS
 
 #endif
