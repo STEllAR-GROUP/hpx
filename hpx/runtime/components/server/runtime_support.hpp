@@ -144,44 +144,41 @@ namespace hpx { namespace components { namespace server
 
 #define HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT_(Z, N, D)                      \
         template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>      \
-        struct BOOST_PP_CAT(create_one_component_, BOOST_PP_INC(N))             \
+        naming::gid_type create_one_component_(components::component_type type, \
+            BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))                               \
         {                                                                       \
-            static naming::gid_type call(components::component_type type,       \
-                BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))                           \
-            {                                                                   \
-                component_map_type::const_iterator it = components_.find(type); \
-                if (it == components_.end()) {                                  \
-                    hpx::util::osstream strm;                                   \
-                    strm << "attempt to create component instance of "          \
-                         << "invalid/unknown type: "                            \
-                         << components::get_component_type_name(type)           \
-                         << " (component not found in map)";                    \
-                    HPX_THROW_EXCEPTION(hpx::bad_component_type,                \
-                        "runtime_support::create_component",                    \
-                        hpx::util::osstream_get_string(strm));                  \
-                    return naming::invalid_gid;                                 \
-                }                                                               \
-                if (!(*it).second.first) {                                      \
-                    hpx::util::osstream strm;                                   \
-                    strm << "attempt to create component instance of "          \
-                         << "invalid/unknown type: "                            \
-                         << components::get_component_type_name(type)           \
-                         << " (map entry is NULL)";                             \
-                    HPX_THROW_EXCEPTION(hpx::bad_component_type,                \
-                        "runtime_support::create_component",                    \
-                        hpx::util::osstream_get_string(strm));                  \
-                    return naming::invalid_gid;                                 \
-                }                                                               \
-                                                                                \
-                naming::gid_type id = server::create_one_functor<Component>(    \
-                    (*it).second.first.get(), BOOST_PP_ENUM_PARAMS(N, a));      \
-                LRT_(info) << "successfully created component " << id           \
-                           << " of type: "                                      \
-                           << components::get_component_type_name(type);        \
-                                                                                \
-                return id;                                                      \
+            component_map_type::const_iterator it = components_.find(type);     \
+            if (it == components_.end()) {                                      \
+                hpx::util::osstream strm;                                       \
+                strm << "attempt to create component instance of "              \
+                     << "invalid/unknown type: "                                \
+                     << components::get_component_type_name(type)               \
+                     << " (component not found in map)";                        \
+                HPX_THROW_EXCEPTION(hpx::bad_component_type,                    \
+                    "runtime_support::create_component",                        \
+                    hpx::util::osstream_get_string(strm));                      \
+                return naming::invalid_gid;                                     \
             }                                                                   \
-        };                                                                      \
+            if (!(*it).second.first) {                                          \
+                hpx::util::osstream strm;                                       \
+                strm << "attempt to create component instance of "              \
+                     << "invalid/unknown type: "                                \
+                     << components::get_component_type_name(type)               \
+                     << " (map entry is NULL)";                                 \
+                HPX_THROW_EXCEPTION(hpx::bad_component_type,                    \
+                    "runtime_support::create_component",                        \
+                    hpx::util::osstream_get_string(strm));                      \
+                return naming::invalid_gid;                                     \
+            }                                                                   \
+                                                                                \
+            naming::gid_type id = server::create_one_functor<Component>(        \
+                (*it).second.first.get(), BOOST_PP_ENUM_PARAMS(N, a));          \
+            LRT_(info) << "successfully created component " << id               \
+                       << " of type: "                                          \
+                       << components::get_component_type_name(type);            \
+                                                                                \
+            return id;                                                          \
+        }                                                                       \
     /**/
         BOOST_PP_REPEAT_FROM_TO(
             1
@@ -422,11 +419,10 @@ namespace hpx { namespace components { namespace server
               , runtime_support::runtime_support_create_one_component         \
               , components::component_type                                    \
               , BOOST_PP_ENUM_PARAMS(N, A)                                    \
-              , BOOST_PP_CAT(                                                 \
-                  &runtime_support::create_one_component_, BOOST_PP_INC(N))<  \
+              , &runtime_support::create_one_component_<                      \
                     Component                                                 \
                   , BOOST_PP_ENUM_PARAMS(N, A)                                \
-                >::call                                                       \
+                >                                                             \
             >                                                                 \
             type;                                                             \
     };                                                                        \
@@ -441,11 +437,10 @@ namespace hpx { namespace components { namespace server
               , runtime_support::runtime_support_create_one_component         \
               , components::component_type                                    \
               , BOOST_PP_ENUM_PARAMS(N, A)                                    \
-              , BOOST_PP_CAT(                                                 \
-                  &runtime_support::create_one_component_, BOOST_PP_INC(N))<  \
+              , &runtime_support::create_one_component_<                      \
                     Component                                                 \
                   , BOOST_PP_ENUM_PARAMS(N, A)                                \
-                >::call                                                       \
+                >                                                             \
             >                                                                 \
             type;                                                             \
     };                                                                        \
