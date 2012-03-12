@@ -605,7 +605,8 @@ namespace hpx
               "returns the up time of the runtime instance for the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1,
               &performance_counters::detail::uptime_counter_creator,
-              &performance_counters::default_counter_discoverer
+              &performance_counters::locality_counter_discoverer,
+              "s"    // unit of measure is seconds
             }
         };
         performance_counters::install_counter_types(

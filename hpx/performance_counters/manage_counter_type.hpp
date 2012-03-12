@@ -171,7 +171,7 @@ namespace hpx { namespace performance_counters
         HPX_STD_FUNCTION<create_counter_func> const& create_counter,
         HPX_STD_FUNCTION<discover_counters_func> const& discover_counters,
         boost::uint32_t version = HPX_PERFORMANCE_COUNTER_V1,
-        error_code& ec = throws);
+        std::string const& uom = "", error_code& ec = throws);
 
     /// A small data structure holding all data needed to install a counter type
     struct generic_counter_type_data
@@ -188,6 +188,9 @@ namespace hpx { namespace performance_counters
         HPX_STD_FUNCTION<discover_counters_func> discover_counters_;
             ///< Function used to discover all supported counter instances of
             ///< this type.
+        std::string unit_of_measure_;
+            ///< The textual representation of the unit of measure for counter
+            ///< instances of this type. Use ISO unit names.
     };
 
     /// Install several new performance counter types in a way, which will

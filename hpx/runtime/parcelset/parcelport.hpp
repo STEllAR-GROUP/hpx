@@ -185,17 +185,17 @@ namespace parcelset
         }
 
         /// the total time it took for all sends, from async_write to the
-        /// completion handler (microseconds)
+        /// completion handler (nanoseconds)
         boost::int64_t get_sending_time() const
         {
-            return parcels_sent_.total_time();
+            return parcels_sent_.total_time() * 1000;
         }
 
         /// the total time it took for all receives, from async_read to the
-        /// completion handler (microseconds)
+        /// completion handler (nanoseconds)
         boost::int64_t get_receiving_time() const
         {
-            return parcels_received_.total_time();
+            return parcels_received_.total_time() * 1000;
         }
 
         /// total data received (bytes)

@@ -1179,7 +1179,8 @@ namespace hpx { namespace threads
               "returns the idle rate for the referenced object [0.1%]",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&ti::idle_rate_counter_creator, this, _1, _2),
-              &performance_counters::locality_thread_counter_discoverer
+              &performance_counters::locality_thread_counter_discoverer,
+              "0.1%"
             },
             // thread counts
             { "/threads/count/cumulative/all", performance_counters::counter_raw,
@@ -1423,7 +1424,7 @@ namespace hpx { namespace threads
                     &threadmanager_impl::tfunc, this, thread_num)));
 
                 error_code ec;
-                // set the new threads affinity (on all platforms) 
+                // set the new threads affinity (on all platforms)
                 topology_.set_thread_affinity
                     (threads_.back(), pu_num, scheduler_.numa_sensitive(), ec);
 

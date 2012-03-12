@@ -268,36 +268,40 @@ namespace hpx { namespace parcelset
             { "/parcels/time/sending", performance_counters::counter_raw,
               "returns the total time between the start of each asynchronous "
               "write and the invocation of the write callback for the referenced "
-              "locality [microseconds]",
+              "locality",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, sending_time, _2),
-              &performance_counters::locality_counter_discoverer
+              &performance_counters::locality_counter_discoverer,
+              "ns"
             },
             { "/parcels/time/receiving", performance_counters::counter_raw,
               "returns the total time between the start of each asynchronous "
               "read and the invocation of the read callback for the referenced "
-              "locality [microseconds]",
+              "locality",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, receiving_time, _2),
-              &performance_counters::locality_counter_discoverer
+              &performance_counters::locality_counter_discoverer,
+              "ns"
             },
             { "/parcels/data/sent", performance_counters::counter_raw,
               "returns the amount of parcel data (including headers) sent "
-              "by the referenced locality [bytes]",
+              "by the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, data_sent, _2),
-              &performance_counters::locality_counter_discoverer
+              &performance_counters::locality_counter_discoverer,
+              "bytes"
             },
             { "/parcels/data/received", performance_counters::counter_raw,
               "returns the amount of parcel data (including headers) received "
-              "by the referenced locality [bytes]",
+              "by the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, data_received, _2),
-              &performance_counters::locality_counter_discoverer
+              &performance_counters::locality_counter_discoverer,
+              "bytes"
             },
             { "/parcelqueue/length/instantaneous", performance_counters::counter_raw,
               "returns the number current length of the queue of incoming threads",
