@@ -26,7 +26,8 @@ namespace hpx { namespace lcos
         lco_set_result = 1,
         lco_set_error = 2,
         lco_get_value = 3,
-        lco_set_target = 4
+        lco_connect = 4,
+        lco_disconnect = 5
     };
 
     /// The \a base_lco class is the common base class for all LCO's
@@ -143,12 +144,12 @@ namespace hpx { namespace lcos
         > set_error_action;
 
         typedef hpx::actions::direct_action1<
-            base_lco, lco_set_target, naming::id_type const&,
+            base_lco, lco_connect, naming::id_type const&,
             &base_lco::connect_nonvirt
         > connect_action;
 
         typedef hpx::actions::direct_action1<
-            base_lco, lco_set_target, naming::id_type const&,
+            base_lco, lco_disconnect, naming::id_type const&,
             &base_lco::disconnect_nonvirt
         > disconnect_action;
     };
@@ -175,11 +176,6 @@ namespace hpx { namespace lcos
 
         virtual void set_result (BOOST_RV_REF(RemoteResult) result) = 0;
 
-        virtual Result get_event()
-        {
-            return get_value();
-        }
-
         virtual Result get_value() = 0;
 
     public:
@@ -199,54 +195,45 @@ namespace hpx { namespace lcos
         }
 
         /// The \a function set_result_nonvirt is called whenever a
-        /// \a set_result_action is applied on a instance of a LCO. This
+        /// \a set_result_action is applied on this LCO instance. This
         /// function just forwards to the virtual function \a set_result, which
         /// is overloaded by the derived concrete LCO.
         ///
         /// \param result [in] The result value to be transferred from the
         ///               remote operation back to this LCO instance.
-        ///
-        /// \returns      The thread state the calling thread needs to be set
-        ///               to after returning from this function.
-        /*
-        void set_result_nonvirt (RemoteResult const& result)
-        {
-            set_result(result);
-        }
-        */
-
         void set_result_nonvirt (BOOST_RV_REF(RemoteResult) result)
         {
             set_result(boost::move(result));
         }
-
+        
+        /// The \a function get_result_nonvirt is called whenever a 
+        /// \a get_result_action is applied on this LCO instance. This
+        /// function just forwards to the virtual function \a get_result, which
+        /// is overloaded by the derived concrete LCO.
         Result get_value_nonvirt()
         {
             return get_value();
         }
 
     public:
-        /// Each of the exposed functions needs to be encapsulated into an action
-        /// type, allowing to generate all required boilerplate code for threads,
-        /// serialization, etc.
-        ///
         /// The \a set_result_action may be used to trigger any LCO instances
         /// while carrying an additional parameter of any type.
         ///
         /// RemoteResult is taken by rvalue ref. This allows for perfect forwarding.
         /// When the action thread function is created, the values are moved into
-        /// the calling function. By taking it by value instead of const lvalue
-        /// ref, the move constructor is called, and one copy is elided. By taking
-        /// it by const lvalue reference, we disable the possibility to further
-        /// move the result to the designated destination
+        /// the calling function. If we took it by const lvalue reference, we 
+        /// would disable the possibility to further move the result to the 
+        /// designated destination.
         ///
-        /// \param RemoteResult [in] The type of the result to be transferred back to
-        ///               this LCO instance.
+        /// \param RemoteResult [in] The type of the result to be transferred 
+        ///               back to this LCO instance.
         typedef hpx::actions::direct_action1<
             base_lco_with_value, lco_set_result, BOOST_RV_REF(RemoteResult),
             &base_lco_with_value::set_result_nonvirt
         > set_result_action;
 
+        /// The \a get_value_action may be used to query the value this LCO 
+        /// instance exposes as its 'result' value.
         typedef hpx::actions::direct_result_action0<
             base_lco_with_value, Result, lco_get_value,
             &base_lco_with_value::get_value_nonvirt
@@ -298,12 +285,9 @@ namespace hpx { namespace traits
 ///////////////////////////////////////////////////////////////////////////////
 // Declaration of serialization support for the base LCO actions
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    hpx::lcos::base_lco::set_event_action, base_set_event_action
-);
+    hpx::lcos::base_lco::set_event_action, base_set_event_action);
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    hpx::lcos::base_lco::set_error_action
-  , base_set_error_action
-);
+    hpx::lcos::base_lco::set_error_action, base_set_error_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION_DECLARATION_EX(

@@ -17,10 +17,7 @@
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
-#include <hpx/util/full_empty_memory.hpp>
-#include <hpx/util/unused.hpp>
-#include <hpx/util/value_or_error.hpp>
-#include <hpx/util/future_data.hpp>
+#include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
 
 #include <boost/intrusive_ptr.hpp>
@@ -55,13 +52,11 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Result, typename RemoteResult>
     class promise
       : public lcos::base_lco_with_value<Result, RemoteResult>,
-        public util::future_data<Result, RemoteResult>
+        public lcos::detail::future_data<Result, RemoteResult>
     {
     protected:
-        typedef util::future_data<Result, RemoteResult> future_data_type;
+        typedef lcos::detail::future_data<Result, RemoteResult> future_data_type;
         typedef typename future_data_type::result_type result_type;
-        typedef boost::exception_ptr error_type;
-        typedef util::value_or_error<result_type> data_type;
 
     public:
         // This is the component id. Every component needs to have an embedded
@@ -139,7 +134,6 @@ namespace hpx { namespace lcos { namespace detail
             back_ptr_ = bp;
         }
 
-        util::full_empty<data_type> data_;
         components::managed_component<promise>* back_ptr_;
     };
 
@@ -147,12 +141,11 @@ namespace hpx { namespace lcos { namespace detail
     template <>
     class promise<void, util::unused_type>
       : public lcos::base_lco_with_value<void, util::unused_type>,
-        public util::future_data<void, util::unused_type>
+        public lcos::detail::future_data<void, util::unused_type>
     {
     protected:
-        typedef boost::exception_ptr error_type;
-        typedef util::value_or_error<result_type> data_type;
-        typedef util::future_data<void, util::unused_type> future_data_type;
+        typedef lcos::detail::future_data<void, util::unused_type> future_data_type;
+        typedef future_data_type::result_type result_type;
 
     public:
         // This is the component id. Every component needs to have an embedded
@@ -230,30 +223,8 @@ namespace hpx { namespace lcos { namespace detail
             back_ptr_ = bp;
         }
 
-        util::full_empty<data_type> data_;
         components::managed_component<promise>* back_ptr_;
     };
-
-//     ///////////////////////////////////////////////////////////////////////////
-//     template <typename T>
-//     struct log_on_exit
-//     {
-//         log_on_exit(boost::shared_ptr<T> const& impl, error_code const& ec)
-//           : impl_(impl), ec_(ec)
-//         {
-//             LLCO_(info) << "promise::get(" << impl_->get_gid()
-//                         << "), throws(" << ((&ec_ == &throws) ? "true" : "false")
-//                         << ")";
-//         }
-//         ~log_on_exit()
-//         {
-//             LLCO_(info) << "promise::got(" << impl_->get_gid()
-//                         << "), throws(" << ((&ec_ == &throws) ? "true" : "false")
-//                         << ")";
-//         }
-//         boost::shared_ptr<T> const& impl_;
-//         error_code const& ec_;
-//     };
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -366,47 +337,6 @@ namespace hpx { namespace lcos
         ~promise()
         {}
 
-        /// Get the result of the requested action. This call blocks (yields
-        /// control) if the result is not ready. As soon as the result has been
-        /// returned and the waiting thread has been re-scheduled by the thread
-        /// manager the function \a eager_future#get will return.
-        ///
-        /// \param self   [in] The \a thread which will be unconditionally
-        ///               blocked (yielded) while waiting for the result.
-        /// \param ec     [in,out] this represents the error status on exit,
-        ///               if this is pre-initialized to \a hpx#throws
-        ///               the function will throw on error instead. If the
-        ///               operation blocks and is aborted because the object
-        ///               went out of scope, the code \a hpx#yield_aborted is
-        ///               set or thrown.
-        ///
-        /// \note         If there has been an error reported (using the action
-        ///               \a base_lco#set_error), this function will throw an
-        ///               exception encapsulating the reported error code and
-        ///               error description if <code>&ec == &throws</code>.
-//         Result get(int slot, error_code& ec = throws) const
-//         {
-//             detail::log_on_exit<wrapping_type> on_exit(impl_, ec);
-//             return boost::move((*impl_)->get_data(slot, ec));
-//         }
-//         Result get(error_code& ec = throws) const
-//         {
-//             detail::log_on_exit<wrapping_type> on_exit(impl_, ec);
-//             return boost::move((*impl_)->get_data(0, ec));
-//         }
-//
-//         ///
-//         Result move_out(int slot, error_code& ec = throws) const
-//         {
-//             detail::log_on_exit<wrapping_type> on_exit(impl_, ec);
-//             return boost::move((*impl_)->move_data(slot, ec));
-//         }
-//         Result move_out(error_code& ec = throws) const
-//         {
-//             detail::log_on_exit<wrapping_type> on_exit(impl_, ec);
-//             return boost::move((*impl_)->move_data(0, ec));
-//         }
-
         lcos::future<Result, RemoteResult> get_future(error_code& ec = throws)
         {
             if (future_obtained_) {
@@ -512,33 +442,6 @@ namespace hpx { namespace lcos
 
         ~promise()
         {}
-
-        /// Get the result of the requested action. This call blocks (yields
-        /// control) if the result is not ready. As soon as the result has been
-        /// returned and the waiting thread has been re-scheduled by the thread
-        /// manager the function \a eager_future#get will return.
-        ///
-        /// \param self   [in] The \a thread which will be unconditionally
-        ///               blocked (yielded) while waiting for the result.
-        /// \param ec     [in,out] this represents the error status on exit,
-        ///               if this is pre-initialized to \a hpx#throws
-        ///               the function will throw on error instead.
-        ///
-        /// \note         If there has been an error reported (using the action
-        ///               \a base_lco#set_error), this function will throw an
-        ///               exception encapsulating the reported error code and
-        ///               error description if <code>&ec == &throws</code>.
-//         util::unused_type get(int slot, error_code& ec = throws) const
-//         {
-//             detail::log_on_exit<wrapping_type> on_exit(impl_, ec);
-//             return (*impl_)->get_data(slot, ec);
-//         }
-//
-//         util::unused_type get(error_code& ec = throws) const
-//         {
-//             detail::log_on_exit<wrapping_type> on_exit(impl_, ec);
-//             return (*impl_)->get_data(0, ec);
-//         }
 
         lcos::future<void> get_future(error_code& ec = throws)
         {

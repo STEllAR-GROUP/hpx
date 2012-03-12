@@ -3,11 +3,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_UTIL_FUTURE_DATA_MAR_06_2012_1055AM)
-#define HPX_UTIL_FUTURE_DATA_MAR_06_2012_1055AM
+#if !defined(HPX_LCOS_DETAIL_FUTURE_DATA_MAR_06_2012_1055AM)
+#define HPX_LCOS_DETAIL_FUTURE_DATA_MAR_06_2012_1055AM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/full_empty_memory.hpp>
+#include <hpx/util/unused.hpp>
 #include <hpx/util/value_or_error.hpp>
 
 #include <boost/move/move.hpp>
@@ -16,55 +17,68 @@
 #include <boost/detail/atomic_count.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util
+namespace hpx { namespace lcos { namespace detail
 {
-    namespace detail
+    ///////////////////////////////////////////////////////////////////////
+    struct future_data_refcnt_base;
+
+    void intrusive_ptr_add_ref(future_data_refcnt_base* p);
+    void intrusive_ptr_release(future_data_refcnt_base* p);
+
+    ///////////////////////////////////////////////////////////////////////
+    struct future_data_refcnt_base
     {
-        ///////////////////////////////////////////////////////////////////////
-        struct future_data_refcnt_base;
+    public:
+        typedef void has_future_data_refcnt_base;
 
-        void intrusive_ptr_add_ref(future_data_refcnt_base* p);
-        void intrusive_ptr_release(future_data_refcnt_base* p);
+        virtual ~future_data_refcnt_base() {}
 
-        ///////////////////////////////////////////////////////////////////////
-        struct future_data_refcnt_base
-        {
-        public:
-            typedef void has_future_data_refcnt_base;
+    protected:
+        future_data_refcnt_base() : count_(0) {}
 
-            virtual ~future_data_refcnt_base() {}
+    private:
+        // reference counting
+        friend void intrusive_ptr_add_ref(future_data_refcnt_base* p);
+        friend void intrusive_ptr_release(future_data_refcnt_base* p);
 
-        protected:
-            future_data_refcnt_base() : count_(0) {}
+        boost::detail::atomic_count count_;
+    };
 
-        private:
-            // reference counting
-            friend void intrusive_ptr_add_ref(future_data_refcnt_base* p);
-            friend void intrusive_ptr_release(future_data_refcnt_base* p);
-
-            boost::detail::atomic_count count_;
-        };
-
-        /// support functions for boost::intrusive_ptr
-        inline void intrusive_ptr_add_ref(future_data_refcnt_base* p)
-        {
-            ++p->count_;
-        }
-        inline void intrusive_ptr_release(future_data_refcnt_base* p)
-        {
-            if (0 == --p->count_)
-                delete p;
-        }
+    /// support functions for boost::intrusive_ptr
+    inline void intrusive_ptr_add_ref(future_data_refcnt_base* p)
+    {
+        ++p->count_;
+    }
+    inline void intrusive_ptr_release(future_data_refcnt_base* p)
+    {
+        if (0 == --p->count_)
+            delete p;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result, typename RemoteResult>
-    struct future_data : detail::future_data_refcnt_base
+    struct future_data_base : future_data_refcnt_base
     {
-    public:
         typedef typename boost::mpl::if_<
             boost::is_same<void, Result>, util::unused_type, Result
         >::type result_type;
+
+        virtual result_type get_data(error_code& ec = throws) = 0;
+        virtual result_type move_data(error_code& ec = throws) = 0;
+        virtual bool is_ready() const = 0;
+
+    protected:
+        future_data_base() {}
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Result, typename RemoteResult =
+        typename traits::promise_remote_result<Result>::type>
+    struct future_data : future_data_base<Result, RemoteResult>
+    {
+    public:
+        typedef future_data_base<Result, RemoteResult> base_type;
+        typedef typename base_type::result_type result_type;
         typedef boost::exception_ptr error_type;
         typedef util::value_or_error<result_type> data_type;
 
@@ -270,6 +284,6 @@ namespace hpx { namespace util
     private:
         bool started_;
     };
-}}
+}}}
 
 #endif

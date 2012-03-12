@@ -7,7 +7,7 @@
 #define HPX_LCOS_FUTURE_MAR_06_2012_1059AM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/future_data.hpp>
+#include <hpx/lcos/detail/future_data.hpp>
 
 #include <boost/move/move.hpp>
 #include <boost/intrusive_ptr.hpp>
@@ -28,11 +28,14 @@ namespace hpx { namespace lcos
     private:
         BOOST_COPYABLE_AND_MOVABLE(future)
 
-        future(util::future_data<Result, RemoteResult>* p)
+        typedef lcos::detail::future_data_base<Result, RemoteResult> 
+            future_data_type;
+
+        future(future_data_type* p)
           : future_data_(p)
         {}
 
-        future(boost::intrusive_ptr<util::future_data<Result, RemoteResult> > p)
+        future(boost::intrusive_ptr<future_data_type> p)
           : future_data_(p)
         {}
 
@@ -92,7 +95,7 @@ namespace hpx { namespace lcos
         }
 
     private:
-        boost::intrusive_ptr<util::future_data<Result, RemoteResult> > future_data_;
+        boost::intrusive_ptr<future_data_type> future_data_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -102,11 +105,14 @@ namespace hpx { namespace lcos
     private:
         BOOST_COPYABLE_AND_MOVABLE(future)
 
-        future(util::future_data<void, util::unused_type>* p)
+        typedef lcos::detail::future_data_base<void, util::unused_type> 
+            future_data_type;
+
+        future(future_data_type* p)
           : future_data_(p)
         {}
 
-        future(boost::intrusive_ptr<util::future_data<void, util::unused_type> > p)
+        future(boost::intrusive_ptr<future_data_type> p)
           : future_data_(p)
         {}
 
@@ -166,7 +172,7 @@ namespace hpx { namespace lcos
         }
 
     private:
-        boost::intrusive_ptr<util::future_data<void, util::unused_type> > future_data_;
+        boost::intrusive_ptr<future_data_type> future_data_;
     };
 }}
 

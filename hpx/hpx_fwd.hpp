@@ -520,10 +520,6 @@ namespace hpx
 
         template <typename Connection, typename Key = boost::uint32_t>
         class connection_cache;
-
-        template <typename Result, typename RemoteResult =
-            typename traits::promise_remote_result<Result>::type>
-        struct future_data;
     }
 
     ///////////////////////////////////////////////////////////////////////////

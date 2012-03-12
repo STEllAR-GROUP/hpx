@@ -8,10 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/util/full_empty_memory.hpp>
-#include <hpx/util/unused.hpp>
-#include <hpx/util/value_or_error.hpp>
-#include <hpx/util/future_data.hpp>
+#include <hpx/lcos/detail/future_data.hpp>
 
 #include <boost/move/move.hpp>
 #include <boost/intrusive_ptr.hpp>
@@ -21,7 +18,7 @@ namespace hpx { namespace lcos { namespace local
     namespace detail
     {
         template<typename Result, typename F>
-        struct task_object : util::task_base<Result>
+        struct task_object : lcos::detail::task_base<Result>
         {
             typedef Result result_type;
 
@@ -47,7 +44,7 @@ namespace hpx { namespace lcos { namespace local
         };
 
         template<typename F>
-        struct task_object<void, F> : util::task_base<util::unused_type>
+        struct task_object<void, F> : lcos::detail::task_base<util::unused_type>
         {
             typedef util::unused_type result_type;
 
@@ -79,7 +76,7 @@ namespace hpx { namespace lcos { namespace local
     class packaged_task
     {
     private:
-        typedef util::task_base<Result> task_impl_type;
+        typedef lcos::detail::task_base<Result> task_impl_type;
 
         BOOST_MOVABLE_BUT_NOT_COPYABLE(packaged_task)
 
