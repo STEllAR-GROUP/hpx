@@ -1026,7 +1026,7 @@ if(HPX_BUILD_TOOLS)
   add_subdirectory(tools)
 endif()
 
-if(HPX_DOCUMENTATION_GENERATION)
+if(HPX_BUILD_DOCUMENTATION)
   add_subdirectory(docs)
 endif()
 
@@ -1124,7 +1124,7 @@ if(NOT HPX_NO_INSTALL)
     DESTINATION share/hpx-${HPX_VERSION}
     COMPONENT license)
 
-  if(HPX_DOCUMENTATION_GENERATION)
+  if(HPX_BUILD_DOCUMENTATION)
     # install hpx documentation files
     if(MSVC)
       set(doc_dir ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
