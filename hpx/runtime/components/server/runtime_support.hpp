@@ -195,8 +195,8 @@ namespace hpx { namespace components { namespace server
 
 #define HPX_RUNTIME_SUPPORT_CREATE_ONE_COMPONENT_(Z, N, D)                      \
         template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>      \
-        naming::gid_type create_one_component_(components::component_type type, \
-            BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))                               \
+        naming::gid_type BOOST_PP_CAT(create_one_component_, N)(                \
+            components::component_type type, BOOST_PP_ENUM_BINARY_PARAMS(N, A, a)) \
         {                                                                       \
             component_map_type::const_iterator it = components_.find(type);     \
             if (it == components_.end()) {                                      \
@@ -470,7 +470,7 @@ namespace hpx { namespace components { namespace server
               , runtime_support::runtime_support_create_one_component         \
               , components::component_type                                    \
               , BOOST_PP_ENUM_PARAMS(N, A)                                    \
-              , &runtime_support::create_one_component_<                      \
+              , &runtime_support::BOOST_PP_CAT(create_one_component_, N)<     \
                     Component                                                 \
                   , BOOST_PP_ENUM_PARAMS(N, A)                                \
                 >                                                             \
@@ -488,7 +488,7 @@ namespace hpx { namespace components { namespace server
               , runtime_support::runtime_support_create_one_component         \
               , components::component_type                                    \
               , BOOST_PP_ENUM_PARAMS(N, A)                                    \
-              , &runtime_support::create_one_component_<                      \
+              , &runtime_support::BOOST_PP_CAT(create_one_component_, N)<     \
                     Component                                                 \
                   , BOOST_PP_ENUM_PARAMS(N, A)                                \
                 >                                                             \
@@ -560,8 +560,8 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 #include <hpx/config/warnings_suffix.hpp>
 
 #undef HPX_MOVE_ARGS
-
 #undef HPX_FORWARD_ARGS
 #undef HPX_FWD_REF_ARGS
+#undef HPX_FWD_REF_ARGS2
 
 #endif
