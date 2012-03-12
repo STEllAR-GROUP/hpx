@@ -6,11 +6,14 @@
 #ifndef HPX_COMPONENTS_REMOTE_OBJECT_OBJECT_HPP
 #define HPX_COMPONENTS_REMOTE_OBJECT_OBJECT_HPP
 
-#include <boost/move/move.hpp>
 #include <hpx/components/remote_object/stubs/remote_object.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/runtime/naming/address.hpp>
+
+#include <boost/config.hpp>
+#include <boost/move/move.hpp>
+#include <boost/detail/workaround.hpp>
 
 namespace hpx { namespace components
 {
@@ -27,7 +30,9 @@ namespace hpx { namespace components
                 result_type;
 
             invoke_apply_fun() {}
+#if !BOOST_WORKAROUND(BOOST_MSVC, < 1800)     // this breaks with MSVC10
             invoke_apply_fun(F const & f) : f(f) {}
+#endif
             invoke_apply_fun(BOOST_RV_REF(F) f) : f(boost::move(f)) {}
 
             invoke_apply_fun(invoke_apply_fun const & other)
