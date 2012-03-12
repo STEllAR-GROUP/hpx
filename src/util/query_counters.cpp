@@ -15,6 +15,9 @@
 #include <boost/foreach.hpp>
 #include <boost/format.hpp>
 
+#include <iostream>
+#include <fstream>
+
 namespace hpx { namespace util
 {
     query_counters::query_counters(std::vector<std::string> const& names,
