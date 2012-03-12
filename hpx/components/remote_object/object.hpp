@@ -22,7 +22,9 @@ namespace hpx { namespace components
         struct invoke_apply_fun
         {
 
-            typedef typename boost::result_of<F(T &)>::type result_type;
+            typedef
+                typename boost::result_of<typename hpx::util::detail::remove_reference<F>::type(T &)>::type
+                result_type;
 
             invoke_apply_fun() {}
             invoke_apply_fun(F const & f) : f(f) {}
@@ -75,7 +77,7 @@ namespace hpx { namespace components
 
         template <typename F>
         lcos::future<
-            typename boost::result_of<F(T &)>::type
+            typename boost::result_of<typename hpx::util::detail::remove_reference<F>::type(T &)>::type
         >
         operator<=(BOOST_FWD_REF(F) f) const
         {

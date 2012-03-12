@@ -41,7 +41,7 @@ namespace hpx { namespace components
 
         template <typename F>
         lcos::dataflow_base<
-            typename boost::result_of<F(T &)>::type
+            typename boost::result_of<typename hpx::util::detail::remove_reference<F>::type(T &)>::type
         >
         apply(BOOST_FWD_REF(F) f) const
         {
@@ -61,12 +61,12 @@ namespace hpx { namespace components
 
         template <typename F, typename D>
         lcos::dataflow_base<
-            typename boost::result_of<F(T &)>::type
+            typename boost::result_of<typename hpx::util::detail::remove_reference<F>::type(T &)>::type
         >
         apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(D) d) const
         {
             typedef
-                typename boost::result_of<F(T &)>::type
+                typename boost::result_of<typename hpx::util::detail::remove_reference<F>::type(T &)>::type
                 result_type;
 
             typedef
