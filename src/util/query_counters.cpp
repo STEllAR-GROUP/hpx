@@ -20,7 +20,7 @@ namespace hpx { namespace util
     query_counters::query_counters(std::vector<std::string> const& names,
             std::size_t interval, std::string const& dest)
       : names_(names), destination_(dest),
-        timer_(boost::bind(&query_counters::evaluate, this),
+        timer_(boost::bind(&query_counters::evaluate, this_()),
             interval*1000, "query_counters", true),
         started_at_(0)
     {

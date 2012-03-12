@@ -21,6 +21,9 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     class HPX_EXPORT query_counters
     {
+        // avoid warning about using this in member initializer list
+        query_counters* this_() { return this; }
+
     public:
         query_counters(std::vector<std::string> const& names,
           std::size_t interval, std::string const& dest);
