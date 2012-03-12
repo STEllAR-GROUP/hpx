@@ -116,15 +116,12 @@ struct topology
                                   : thread_affinity_masks_[thread_num];
         }
 
-        else
-        {
-            HPX_THROWS_IF(ec, bad_parameter
-              , "hpx::threads::topology::get_thread_affinity_mask"
-              , boost::str(boost::format(
-                    "thread number %1% is out of range")
-                    % thread_num));
-            return 0;
-        }
+        HPX_THROWS_IF(ec, bad_parameter
+          , "hpx::threads::topology::get_thread_affinity_mask"
+          , boost::str(boost::format(
+                "thread number %1% is out of range")
+                % thread_num));
+        return 0;
     } // }}}
 
     void set_thread_affinity(
@@ -135,8 +132,9 @@ struct topology
         ) const
     { // {{{
         std::size_t mask = get_thread_affinity_mask(num_thread, numa_sensitive);
-        
-        if (!SetThreadAffinityMask(thrd.native_handle(), DWORD_PTR(mask))){
+
+        if (!SetThreadAffinityMask(thrd.native_handle(), DWORD_PTR(mask)))
+        {
             HPX_THROWS_IF(ec, kernel_error
               , "hpx::threads::topology::set_thread_affinity_mask"
               , "failed to set thread affinity mask");
@@ -154,19 +152,21 @@ struct topology
         info.VirtualAddress = reinterpret_cast<void*>(lva);
 
         if (!QueryWorkingSetEx(GetCurrentProcess(), &info, sizeof(info)))
+        {
             HPX_THROWS_IF(ec, kernel_error
               , "hpx::threads::topology::get_thread_affinity_mask_from_lva"
               , "failed to get thread affinity mask");
-
+        }
         if (ec)
             return 0;
 
         std::size_t mask = 0;
         if (!GetNumaNodeProcessorMask(info.VirtualAttributes.Node, &mask))
+        {
             HPX_THROWS_IF(ec, kernel_error
               , "hpx::threads::topology::get_thread_affinity_mask_from_lva"
               , "failed to get thread affinity mask");
-
+        }
         if (ec)
             return 0;
         else if (&ec != &throws)
@@ -187,9 +187,12 @@ struct topology
         if (GetNumaProcessorNode(UCHAR(thread_num), &node_number))
             return node_number;
 
-        std::size_t num_of_numa_cores = hardware_concurrency();
+        std::size_t num_of_cores = hardware_concurrency();
+        if (0 == num_of_cores)
+            num_of_cores = 1;     // assume one core
+
+        std::size_t num_of_numa_cores = num_of_cores;
         ULONG numa_nodes = 0;
-        std::size_t const num_of_cores = hardware_concurrency();
         if (GetNumaHighestNodeNumber(&numa_nodes) && 0 != numa_nodes)
             num_of_numa_cores = num_of_cores / (numa_nodes + 1);
 
@@ -212,18 +215,21 @@ struct topology
         if (numa_sensitive) {
             UCHAR numa_node = affinity % numa_nodes;
             if (!GetNumaNodeProcessorMask(numa_node, &mask))
+            {
                 HPX_THROW_EXCEPTION(kernel_error
                   , "hpx::threads::topology::init_numa_node_affinity_mask"
                   , "failed to initialize NUMA node affinity mask");
-
+            }
             return mask;
         }
 
         UCHAR numa_node = UCHAR(get_numa_node_number(num_thread));
         if (!GetNumaNodeProcessorMask(numa_node, &mask))
+        {
             HPX_THROW_EXCEPTION(kernel_error
               , "hpx::threads::topology::init_numa_node_affinity_mask"
               , "failed to initialize NUMA node affinity mask");
+        }
 
         return mask;
     } // }}}
@@ -248,10 +254,11 @@ struct topology
             UCHAR numa_node = UCHAR(affinity % numa_nodes);
 
             if (!GetNumaNodeProcessorMask(numa_node, &node_affinity_mask))
+            {
                 HPX_THROW_EXCEPTION(kernel_error
                   , "hpx::threads::topology::init_thread_affinity_mask"
                   , "failed to initialize thread affinity mask");
-
+            }
             mask = least_significant_bit(node_affinity_mask) <<
                 (affinity / numa_nodes);
         }
@@ -259,10 +266,11 @@ struct topology
             UCHAR numa_node = UCHAR(get_numa_node_number(num_thread));
 
             if (!GetNumaNodeProcessorMask(numa_node, &node_affinity_mask))
+            {
                 HPX_THROW_EXCEPTION(kernel_error
                   , "hpx::threads::topology::init_thread_affinity_mask"
                   , "failed to initialize thread affinity mask");
-
+            }
             mask = least_significant_bit(node_affinity_mask) <<
                 (affinity % num_of_cores_per_numa_node);
         }
