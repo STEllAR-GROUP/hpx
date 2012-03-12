@@ -28,6 +28,9 @@ namespace hpx { namespace performance_counters { namespace server
         typedef components::managed_component_base<
             aggregating_counter<Statistic> > base_type;
 
+        // avoid warnings about using this in member initializer list
+        aggregating_counter* this_() { return this; }
+
     public:
         typedef aggregating_counter type_holder;
         typedef base_performance_counter base_type_holder;
