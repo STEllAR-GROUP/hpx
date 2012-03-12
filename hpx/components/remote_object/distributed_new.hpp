@@ -16,7 +16,7 @@
       , (                                                                       \
             0                                                                   \
           , HPX_FUNCTION_LIMIT                                                  \
-          , <examples/bright_future/distributed_new.hpp>                        \
+          , <hpx/components/remote_object/distributed_new.hpp>                  \
         )                                                                       \
     )                                                                           \
 /**/
