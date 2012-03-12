@@ -136,10 +136,11 @@ struct topology
     { // {{{
         std::size_t mask = get_thread_affinity_mask(num_thread, numa_sensitive);
         
-        if (!SetThreadAffinityMask(thrd.native_handle(), DWORD_PTR(mask)))
+        if (!SetThreadAffinityMask(thrd.native_handle(), DWORD_PTR(mask))){
             HPX_THROWS_IF(ec, kernel_error
               , "hpx::threads::topology::set_thread_affinity_mask"
               , "failed to set thread affinity mask");
+        }
         else if (&ec != &throws)
             ec = make_success_code();
     } // }}}
@@ -188,6 +189,7 @@ struct topology
 
         std::size_t num_of_numa_cores = hardware_concurrency();
         ULONG numa_nodes = 0;
+        std::size_t const num_of_cores = hardware_concurrency();
         if (GetNumaHighestNodeNumber(&numa_nodes) && 0 != numa_nodes)
             num_of_numa_cores = num_of_cores / (numa_nodes + 1);
 
