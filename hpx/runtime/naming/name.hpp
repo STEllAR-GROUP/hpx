@@ -549,6 +549,7 @@ namespace hpx { namespace naming
         void load(Archive & ar, const unsigned int version);
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()
+        BOOST_COPYABLE_AND_MOVABLE(id_type);
 
         boost::intrusive_ptr<detail::id_type_impl> gid_;
     };

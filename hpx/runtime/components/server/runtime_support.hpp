@@ -34,20 +34,71 @@
     boost::move(BOOST_PP_CAT(a, n))                                           \
     /**/
 
+#define HPX_TO_MOVE_OR_NOT_ARGS(z, n, _)                                      \
+    detail::to_move_or_not<BOOST_PP_CAT(A, n)>::call(BOOST_PP_CAT(a, n))      \
+    /**/
+
 #define HPX_FORWARD_ARGS(z, n, _)                                             \
     boost::forward<BOOST_PP_CAT(A, n)>(BOOST_PP_CAT(a, n))                    \
     /**/
 
 #define HPX_FWD_REF_ARGS(z, n, _)                                             \
-    BOOST_FWD_REF(BOOST_PP_CAT(A, n)) BOOST_PP_CAT(a, n)                       \
+    BOOST_FWD_REF(BOOST_PP_CAT(A, n)) BOOST_PP_CAT(a, n)                      \
     /**/
 
-#define HPX_FWD_REF_ARGS2(z, n, _)                                             \
-    BOOST_FWD_REF(BOOST_PP_CAT(T, n)) BOOST_PP_CAT(t, n)                       \
+#define HPX_FWD_REF_ARGS2(z, n, _)                                            \
+    BOOST_FWD_REF(BOOST_PP_CAT(T, n)) BOOST_PP_CAT(t, n)                      \
     /**/
 
 namespace hpx { namespace components { namespace server
 {
+    namespace detail
+    {
+#if !BOOST_NO_RVALUE_REFERENCES
+        template <typename T, bool IsRvalueRef = std::is_rvalue_reference<T>::type::value>
+#else
+        template <typename T, bool IsRvalueRef = false>
+#endif
+        struct to_move_or_not
+        {
+            template <typename A>
+            static T call(BOOST_FWD_REF(A) t)
+            {
+                return boost::move(t);
+            };
+        };
+        
+        template <typename T>
+        struct to_move_or_not<T &, false>
+        {
+            template <typename A>
+            static T & call(BOOST_FWD_REF(A) t)
+            {
+                return t;
+            };
+        };
+        
+        template <typename T>
+        struct to_move_or_not<T const &, false>
+        {
+            template <typename A>
+            static T const & call(BOOST_FWD_REF(A) t)
+            {
+                return t;
+            };
+        };
+        
+        template <typename T>
+        struct to_move_or_not<T, true>
+        {
+            template <typename A>
+            static BOOST_RV_REF(typename hpx::util::detail::remove_reference<T>::type) call(BOOST_FWD_REF(A) t)
+            {
+                return boost::move(t);
+            };
+        };
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     class runtime_support
     {
@@ -172,7 +223,7 @@ namespace hpx { namespace components { namespace server
             }                                                                   \
                                                                                 \
             naming::gid_type id = server::create_one_functor<Component>(        \
-                (*it).second.first.get(), BOOST_PP_ENUM_PARAMS(N, a));          \
+                (*it).second.first.get(), BOOST_PP_ENUM(N, HPX_TO_MOVE_OR_NOT_ARGS, _));  \
             LRT_(info) << "successfully created component " << id               \
                        << " of type: "                                          \
                        << components::get_component_type_name(type);            \

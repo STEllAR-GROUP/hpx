@@ -63,7 +63,7 @@ struct update_fun
 
     update_fun(update_fun const & other)
       : x_range(other.x_range)
-      , x_range(other.y_range)
+      , y_range(other.y_range)
       , old(other.old)
       , n(other.n)
       , cache_block(other.cache_block)
@@ -71,7 +71,7 @@ struct update_fun
 
     update_fun(BOOST_RV_REF(update_fun) other)
       : x_range(boost::move(other.x_range))
-      , x_range(boost::move(other.y_range))
+      , y_range(boost::move(other.y_range))
       , old(boost::move(other.old))
       , n(boost::move(other.n))
       , cache_block(boost::move(other.cache_block))

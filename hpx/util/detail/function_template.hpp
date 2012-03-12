@@ -21,6 +21,7 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
+#include <hpx/util/detail/remove_reference.hpp>
 #include <hpx/util/detail/vtable_ptr_base_fwd.hpp>
 #include <hpx/util/detail/vtable_ptr_fwd.hpp>
 #include <hpx/util/detail/serialization_registration.hpp>
@@ -100,8 +101,20 @@ namespace hpx { namespace util
         function() : base_type() {}
 
         template <typename Functor>
-        function(Functor f)
-            : base_type(boost::move(f))
+        function(
+            BOOST_FWD_REF(Functor) f
+          , typename ::boost::disable_if<
+                typename boost::is_same<
+                    function
+                  , typename boost::remove_const<
+                        typename hpx::util::detail::remove_reference<
+                            Functor
+                        >::type
+                    >::type
+                >::type
+            >::type * dummy = 0
+        )
+            : base_type(boost::forward<Functor>(f))
         {}
 
         function(function const & other)
@@ -160,8 +173,20 @@ namespace hpx { namespace util
         function() : base_type() {}
 
         template <typename Functor>
-        function(Functor f)
-            : base_type(boost::move(f))
+        function(
+            BOOST_FWD_REF(Functor) f
+          , typename ::boost::disable_if<
+                typename boost::is_same<
+                    function
+                  , typename boost::remove_const<
+                        typename hpx::util::detail::remove_reference<
+                            Functor
+                        >::type
+                    >::type
+                >::type
+            >::type * dummy = 0
+        )
+            : base_type(boost::forward<Functor>(f))
         {}
 
         function(function const & other)
@@ -198,8 +223,20 @@ namespace hpx { namespace util
         function_nonser() : base_type() {}
 
         template <typename Functor>
-        function_nonser(Functor f)
-            : base_type(boost::move(f))
+        function_nonser(
+            BOOST_FWD_REF(Functor) f
+          , typename ::boost::disable_if<
+                typename boost::is_same<
+                    function_nonser
+                  , typename boost::remove_const<
+                        typename hpx::util::detail::remove_reference<
+                            Functor
+                        >::type
+                    >::type
+                >::type
+            >::type * dummy = 0
+        )
+            : base_type(boost::forward<Functor>(f))
         {}
 
         function_nonser(function_nonser const & other)
@@ -282,25 +319,40 @@ namespace hpx { namespace util {
             > vtable_ptr_type;
 
         template <typename Functor>
-        explicit function_base(BOOST_FWD_REF(Functor) f)
+        explicit function_base(
+            BOOST_FWD_REF(Functor) f
+          , typename ::boost::disable_if<
+                typename boost::is_same<
+                    function_base
+                  , typename boost::remove_const<
+                        typename hpx::util::detail::remove_reference<
+                            Functor
+                        >::type
+                    >::type
+                >::type
+            >::type * dummy = 0
+        )
             : vptr(0)
             , object(0)
         {
             if (!detail::is_empty_function(f))
             {
+                typedef
+                    typename boost::remove_const<
+                        typename boost::decay<
+                            typename hpx::util::detail::remove_reference<Functor>::type
+                        >::type
+                    >::type
+                    functor_type;
+
                 vptr = detail::get_table<
-                            typename boost::decay<Functor>::type
+                            functor_type
                           , R(BOOST_PP_ENUM_PARAMS(N, A))
                         >::template get<
                             IArchive
                           , OArchive
                         >();
 
-                typedef
-                    typename boost::remove_const<
-                        typename boost::decay<Functor>::type
-                    >::type
-                    functor_type;
                 static const bool is_small = sizeof(functor_type) <= sizeof(void *);
                 if(is_small)
                 {
@@ -354,7 +406,9 @@ namespace hpx { namespace util {
         {
             typedef
                 typename boost::remove_const<
-                    typename boost::decay<Functor>::type
+                    typename boost::decay<
+                        typename hpx::util::detail::remove_reference<Functor>::type
+                    >::type
                 >::type
                 functor_type;
             static const bool is_small = sizeof(functor_type) <= sizeof(void *);

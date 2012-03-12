@@ -54,7 +54,7 @@ namespace hpx { namespace components
                 apply_action;
 
             return lcos::dataflow<apply_action>(gid_
-                  , remote_object::invoke_apply_fun<T, F>(boost::forward<F>(f))
+                  , boost::move(remote_object::invoke_apply_fun<T, F>(boost::forward<F>(f)))
                   , 0
                 );
         }
@@ -74,7 +74,7 @@ namespace hpx { namespace components
                 apply_action;
 
             return lcos::dataflow<apply_action>(gid_
-                  , remote_object::invoke_apply_fun<T, F>(boost::forward<F>(f))
+                  , boost::move(remote_object::invoke_apply_fun<T, F>(boost::forward<F>(f)))
                   , 0
                   , d
                 );

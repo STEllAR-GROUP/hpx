@@ -138,11 +138,11 @@ int hpx_main(variables_map& vm)
         {
             dataflow_object<foo> f(new_<foo>(id).get());
 
-            HPX_TEST_EQ(f.apply(movable_functor<movable_object>()).get_future().get(), 1u);
-            HPX_TEST_EQ(f.apply(movable_functor<non_movable_object>()).get_future().get(), 1u);
+            HPX_TEST_EQ(f.apply(movable_functor<movable_object>()).get_future().get(), 0u);
+            HPX_TEST_EQ(f.apply(movable_functor<non_movable_object>()).get_future().get(), 2u);
 
-            HPX_TEST_EQ(f.apply(non_movable_functor<movable_object>()).get_future().get(), 1u);
-            HPX_TEST_EQ(f.apply(non_movable_functor<non_movable_object>()).get_future().get(), 1u);
+            HPX_TEST_EQ(f.apply(non_movable_functor<movable_object>()).get_future().get(), 2u);
+            HPX_TEST_EQ(f.apply(non_movable_functor<non_movable_object>()).get_future().get(), 2u);
         }
     }
 
