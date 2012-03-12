@@ -77,6 +77,20 @@ namespace graph500
             this->base_type::receive_duplicates(gid_,j,duplicate_components,duplicateid);
         }
 
+        hpx::lcos::future<void> ppedge_async(int64_t start,int64_t stop,
+                          std::vector<hpx::naming::id_type> const& point_components)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::ppedge_async(gid_,start,stop,point_components);
+        }
+
+        void ppedge(int64_t start,int64_t stop, 
+                    std::vector<hpx::naming::id_type> const& point_components)
+        {
+            BOOST_ASSERT(gid_);
+            this->base_type::ppedge(gid_,start,stop,point_components);
+        }
+
         hpx::lcos::future<void> bfs_async()
         {
             BOOST_ASSERT(gid_);

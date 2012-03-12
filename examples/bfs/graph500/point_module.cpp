@@ -37,6 +37,10 @@ HPX_REGISTER_ACTION_EX(
     graph500_point_root_action);
 
 HPX_REGISTER_ACTION_EX(
+    graph500_point_type::wrapped_type::ppedge_action,
+    graph500_point_ppedge_action);
+
+HPX_REGISTER_ACTION_EX(
     graph500_point_type::wrapped_type::receive_duplicates_action,
     graph500_point_receive_duplicates_action);
 

@@ -65,6 +65,22 @@ namespace graph500 { namespace stubs
         }
 
         static hpx::lcos::future<void>
+        ppedge_async(hpx::naming::id_type const& gid,
+                                 int64_t start,int64_t stop,
+                                 std::vector<hpx::naming::id_type> const& point_components)
+        {
+            typedef server::point::ppedge_action action_type;
+            return hpx::lcos::async<action_type>(gid,start,stop,point_components);
+        }
+
+        static void ppedge(hpx::naming::id_type const& gid,
+                           int64_t start,int64_t stop,
+                           std::vector<hpx::naming::id_type> const& point_components)
+        {
+            ppedge_async(gid,start,stop,point_components).get();
+        }
+
+        static hpx::lcos::future<void>
         bfs_async(hpx::naming::id_type const& gid)
         {
             typedef server::point::bfs_action action_type;

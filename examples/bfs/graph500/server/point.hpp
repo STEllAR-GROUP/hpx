@@ -82,6 +82,8 @@ namespace graph500 { namespace server
         bool get_numedges_callback(std::size_t i,resolvedata r);
 
         std::vector<int64_t> get_numedges();
+  
+        void ppedge(int64_t start, int64_t stop, std::vector<hpx::naming::id_type> const& point_components);
 
         resolvedata get_parent(int64_t edge);
 
@@ -108,7 +110,8 @@ namespace graph500 { namespace server
             point_resolve_conflict = 5,
             point_get_parent = 6,
             point_distributed_validate = 7,
-            point_get_numedges = 8
+            point_get_numedges = 8,
+            point_ppedge = 9
         };
 
         typedef hpx::actions::action4<
@@ -148,6 +151,19 @@ namespace graph500 { namespace server
             // Method bound to this action.
             &point::receive_duplicates
         > receive_duplicates_action;
+
+        typedef hpx::actions::action3<
+            // Component server type.
+            point,
+            // Action code.
+            point_ppedge,
+            // Arguments of this action.
+            int64_t,
+            int64_t,
+            std::vector<hpx::naming::id_type> const&,
+            // Method bound to this action.
+            &point::ppedge
+        > ppedge_action;
 
         typedef hpx::actions::action0<
             // Component server type.
@@ -243,6 +259,10 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     graph500::server::point::root_action,
     graph500_point_root_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    graph500::server::point::ppedge_action,
+    graph500_point_ppedge_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     graph500::server::point::receive_duplicates_action,

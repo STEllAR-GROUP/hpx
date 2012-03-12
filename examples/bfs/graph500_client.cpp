@@ -106,6 +106,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         bool const validator = vm["validator"].as<bool>();
         double overlap = vm["overlap"].as<double>();
         std::size_t schwarzdomains = vm["schwarzdomains"].as<std::size_t>();
+        bool const hasedgeroot = vm["hasedgeroot"].as<bool>();
 
         // number_partitions defines the size of the partition
         // for Additive Schwarz to work, we will need more partitions 
@@ -133,6 +134,12 @@ int hpx_main(boost::program_options::variables_map &vm)
         // Get the component type for our point component.
         hpx::components::component_type block_type =
             hpx::components::get_component_type<graph500::server::point>();
+
+        // Find how many localities we have
+        //hpx::components::component_type function_type = 
+        //            hpx::components::get_component_type<graph500::server::point>();
+        //std::vector<hpx::naming::id_type> localities = hpx::find_all_localities(function_type);
+        //std::cout << " Number of localities " << localities.size() << std::endl;
 
         // ---------------------------------------------------------------
         // Create ne point components with distributing factory.
@@ -227,12 +234,27 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         // Search for duplicates among the partitions
         // this determines the communication pattern for finalization
-        std::vector<hpx::lcos::future< std::vector<bool> > > whohasthisedge_phase;
-        for (int64_t j=1;j<= nglobalverts;j++) {
-          whohasthisedge_phase.push_back(hpx::lcos::async<whohasthisedge_action>(hpx::find_here(),j,point_components));
+        // the hasedgeroot option does not scale particularly well but is easy to understand
+        if ( hasedgeroot ) {
+          std::vector<hpx::lcos::future< std::vector<bool> > > whohasthisedge_phase;
+          for (int64_t j=1;j<= nglobalverts;j++) {
+            whohasthisedge_phase.push_back(hpx::lcos::async<whohasthisedge_action>(hpx::find_here(),j,point_components));
+          }
+          // put a callback here instead of search_vector
+          hpx::lcos::wait(whohasthisedge_phase,boost::bind(&whohasthisedge_callback,_1,_2,boost::ref(point_components)));
+        } else {
+          std::vector<hpx::lcos::future< void > > ppedge_phase;
+          //for (int64_t j=1;j<= nglobalverts;j++) 
+          int64_t delta = nglobalverts/num_pe;
+          int64_t extra = nglobalverts%num_pe;
+          for (std::size_t i=0;i<num_pe;i++) {
+            int64_t start = i*delta + 1;
+            int64_t stop = (i+1)*delta;
+            std::cout << " TEST start " << start << " stop " << stop << std::endl;
+            ppedge_phase.push_back(points[i].ppedge_async(start,stop,point_components));
+          }
+          hpx::lcos::wait(ppedge_phase);
         }
-        // put a callback here instead of search_vector
-        hpx::lcos::wait(whohasthisedge_phase,boost::bind(&whohasthisedge_callback,_1,_2,boost::ref(point_components)));
 
         double kernel1_time = kernel1time.elapsed();
         std::cout << "Elapsed time during kernel 1: " << kernel1_time << " [s]" << std::endl;
@@ -243,6 +265,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         kernel2_time.resize(bfs_roots.size());
 
         hpx::util::high_resolution_timer kernel2time;
+#if 0
         {
           std::vector<hpx::lcos::future<void> > bfs_phase;
           for (std::size_t i=0;i<num_pe;i++) {
@@ -257,6 +280,7 @@ int hpx_main(boost::program_options::variables_map &vm)
           }
           hpx::lcos::wait(resolve_conflict_phase);
         }
+#endif
 
         double k2time = kernel2time.elapsed();
 
@@ -395,7 +419,9 @@ int main(int argc, char* argv[])
         ("overlap", value<double>()->default_value(1.4),
             "overlap factor for additive Schwarz")
         ("schwarzdomains", value<std::size_t>()->default_value(30),
-            "number of additive Schwarz domains");
+            "number of additive Schwarz domains")
+        ("hasedgeroot", value<bool>()->default_value(false),
+            "determine the resolve conflict communication from the root node");
 
     return hpx::init(desc_commandline, argc, argv); // Initialize and run HPX.
 }

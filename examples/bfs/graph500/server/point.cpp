@@ -136,6 +136,14 @@ namespace graph500 { namespace server
       }
     }
 
+    void point::ppedge(int64_t start, int64_t stop,
+                  std::vector<hpx::naming::id_type> const& point_components)
+    {
+      //for (int64_t edge=start;edge<=stop;edge++) {
+      //  edge_phase.push_back(graph500::stubs::point::edge_async(point_components,edge));
+      //}
+    }
+
     void point::root(std::vector<int64_t> const& bfs_roots)
     {
       bfs_roots_ = bfs_roots;
