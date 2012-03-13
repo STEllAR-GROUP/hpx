@@ -233,6 +233,8 @@ leaves that locality's thread number in the set 'attendance'.
 
 [endsect] [/Hello World]
 
+[/Proofread by:]
+
 [/////////////////////////////////////////////////////////////////////////////]
 [section:accumulator Accumulator]
 
@@ -289,6 +291,9 @@ Console 2:
 [c++][/ switch back to C++ source mode]
 
 [endsect] [/Accumulator]
+
+[/Proofread by:]
+
 [/////////////////////////////////////////////////////////////////////////////]
 
 [endsect] [/Examples]
