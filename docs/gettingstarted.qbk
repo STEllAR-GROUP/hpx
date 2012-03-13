@@ -23,20 +23,23 @@ To keep things simple, we also left out some information intermediate and
 advanced users will probably want. At the end of this document, we'll refer
 you on to resources that can help you pursue these topics further.
 
+[/Proofread by:]
+[Adrian Serio 3-13-12]
 
 [/////////////////////////////////////////////////////////////////////////////]
 [section:unix_installation How to Install HPX on Unix Variants]
 
 [heading Prerequisites]
 
-Depending on the options you chose while building and installing HPX you will
-find it to depend on several prerequisites. However, in the simplest case HPX
-will depend on one prerequisite library only: __boost__. So, before you read
-further, please make sure you have a recent version version of __boost__
-installed on your target machine. HPX currently requires at least Boost V1.47
-to work properly. It may build and run with older versions, but we do not
-test HPX with those. Please be warned. Installing the Boost libraries is
-described in detail in Boost's own __boost_getting_started__ document. It is
+In the simplest case, HPX will depend on one prerequisite library: __boost__. 
+However, depending on the options you chose while building and installing HPX
+you will find that HPX may depend on several other prerequisites such as those
+listed below. So, before you read further, please make sure you have a recent 
+version version of __boost__ installed on your target machine. HPX currently 
+requires at least Boost V1.47 to work properly. It may build and run with 
+older versions, but we do not test HPX with those versions so please be 
+warned. Installing the Boost libraries is described in detail in Boost's 
+own __boost_getting_started__ document. It is
 often possible to download the Boost libraries using the package manager of
 your distribution, please refer to the corresponding documentation.
 
@@ -164,6 +167,8 @@ which should print `Hello HPX World!` and exit.
 
 [endsect] [/ How to Install HPX on Unix Variants]
 
+[/Proofread by:]
+[/Adrian Serio 3-13-12]
 
 [/////////////////////////////////////////////////////////////////////////////]
 [section:windows_installation How to Install HPX on Windows]
@@ -218,6 +223,8 @@ which should print `Hello HPX World!` and exit.
 
 [endsect] [/ How to Install HPX on Windows]
 
+[/Proofread by:]
+[/Adrian Serio 3-13-12]
 
 [/////////////////////////////////////////////////////////////////////////////]
 [section:commandline HPX Command Line Options]
@@ -314,3 +321,6 @@ described in the [link hpx.getting_started.commandline.commandline table below].
 [endsect] [/ Command Line Handling]
 
 [endsect] [/ Getting Started]
+
+[/Proofread by:]
+[/Adrian Serio 3-13-12]

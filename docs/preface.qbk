@@ -21,7 +21,7 @@ performance computer architectures.
 The main emphasis of the development of HPX is to create a high quality, freely
 available, open source implementation of the ideas of ParalleX for conventional
 systems, such as classical Linux based Beowulf clusters or single highly
-parallel SMP nodes. At the same time we wanted to have a very modular and well
+parallel SMP nodes. At the same time, we wanted to have a very modular and well
 designed runtime system architecture which would allow us over time to port our
 implementation onto new computer system architectures. We want to use real
 world applications to drive the development of the runtime system, coining out
@@ -30,7 +30,7 @@ a smooth migration path for developers.
 
 From the very beginning this endeavour has been a group effort. In addition to a
 handful of interested researchers, there always have been students
-participating in the discussions, the design, and the implementation of HPX.
+participating in the discussions, design, and implementation of HPX.
 In 2011 we decide to formalize our collective research efforts by creating the
 __stellar__ group. Today, __stellar__ stands for 'Systems Technologies,
 Emergent Parallelism, and Algorithms Research', which describes the three
@@ -87,3 +87,6 @@ Please feel free to direct questions to HPX's mailing list: __stellar_list__
 or log onto our IRC channel which can be found at __stellar_irc__
 
 [endsect] [/ Preface]
+
+[/Proofread by:]
+[/Adrian Serio 3-13-12]
