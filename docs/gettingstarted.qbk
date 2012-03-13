@@ -163,7 +163,86 @@ which should print `Hello HPX World!` and exit.
 
 [heading Using HPX Applications with PBS]
 
-[fixme TBD]
+Most HPX applications are executed on parallel computers.  These platforms
+typically provide integrated job management services that facilitate the
+allocation of computing resources for each parallel program. HPX includes out of
+the box support for one of the most common job management systems, PBS
+([@http://www.pbsworks.com Portable Batch System]).
+
+All PBS jobs require a script to specify the resource requirements and other
+parameters associated with a parallel job. The PBS script is basically a shell
+script with PBS directives placed within comment section at the beginning of the
+file. The remaining (not commented-out) portion of the file executes just like
+any other regular shell script. While the description of all available PBS
+options is ouside the scope of this tutorial (interested reader may refer to
+in-depth [@http://www.pbsworks.com/SupportDocuments.aspx documentation] for more
+information), below is a minimal example to illustrate the approach. As a test
+application we will use the multithreaded `hello_world` program, explained [link
+hpx.examples.hello_world here].
+
+[teletype]
+``
+    #!/bin/bash
+    #
+    #PBS -l nodes=2:ppn=4
+
+    APP_PATH=~/packages/hpx/bin/hello_world
+    APP_OPTIONS=--hpx:threads=4
+
+    pbsdsh -u $APP_PATH --hpx:nodes=`cat $PBS_NODEFILE` $APP_OPTIONS
+``
+
+The `#PBS -l` directive will cause two nodes to be allocated for the
+application, as specified in option `nodes`. Each of the nodes will dedicate
+four cores to the program (option `ppn`, short for "processors per node"; for
+the purpose of execution resource allocation PBS does not distinguish between
+processors and cores). Note that requesting more cores per node than physically
+available is pointless and may prevent PBS from accepting the script.
+
+`APP_PATH` and `APP_OPTIONS` are shell variables that respectively specify the
+correct path to the executable (`hello_world` in this case) and command line
+options.  The `--hpx:threads=4` in the example indicates that the application
+will spawn four worker threads on each node, hence optimally matching the
+requested resources (one thread per core).  If no command line options need to
+be specified, the variable `APP_OPTIONS` may be left empty, with no text
+following the `=` sign.
+
+Finally, `pbsdsh` is a PBS command that starts a distributed job using allocated
+execution resources. It is recommended to leave this line as shown and modify
+only the PBS options and shell variables as needed for a specific application.
+
+All that remains now is submitting the job to the queuing system. Assuming that
+the contents of the PBS script were saved in file `pbs_hello_world.sh` in the
+current directory, this is accomplished by typing:
+
+    qsub ./pbs_hello_world_pbs.sh
+
+If the job is accepted, qsub will print out the assigned job ID, which may look like:
+
+    42.supercomputer.some.university.edu
+
+To check the status of your job, issue:
+
+   qstat 42.supercomputer.some.university.edu
+
+and look for a single-letter job status symbol. The common cases include:
+
+* Q signifies that the job is queued and awaiting its turn to be executed,
+* R indicates that the jub is currently running, and
+* C means that the job has completed after having run.
+
+After the job completes, PBS will place two files, `pbs_hello_world.sh.o42` and
+`pbs_hello_world.sh.e42` in the directory from where the job was submitted. The
+first contains the standard output and the second error output collected from
+all the nodes on which the application executed. In our example, the error
+output file should be empty and standard output file contains something similar
+to:
+
+[fixme verify this stuff when my arete account gets fixed (again!)]
+
+    *provide sample output here*
+
+Congratulations! You have just run your first distributed HPX application!
 
 [endsect] [/ How to Install HPX on Unix Variants]
 
