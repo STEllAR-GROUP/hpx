@@ -151,12 +151,12 @@ Copy the text of this program into a file called example.cpp.
 Now, in the directory where you saved example.cpp, issue the following command:
 
 [pre
-    c++ \`pkg-config --cflags --libs hpx\` -o example example.cpp
+    $ c++ \`pkg-config --cflags --libs hpx\` -o example example.cpp
 ]
 
 To test the result, type:
 
-    ./example
+    $ ./example
 
 which should print `Hello HPX World!` and exit.
 
@@ -215,15 +215,15 @@ All that remains now is submitting the job to the queuing system. Assuming that
 the contents of the PBS script were saved in file `pbs_hello_world.sh` in the
 current directory, this is accomplished by typing:
 
-    qsub ./pbs_hello_world_pbs.sh
+    $ qsub ./pbs_hello_world_pbs.sh
 
 If the job is accepted, qsub will print out the assigned job ID, which may look like:
 
-    42.supercomputer.some.university.edu
+    $ 42.supercomputer.some.university.edu
 
 To check the status of your job, issue:
 
-   qstat 42.supercomputer.some.university.edu
+   $ qstat 42.supercomputer.some.university.edu
 
 and look for a single-letter job status symbol. The common cases include:
 
@@ -238,7 +238,7 @@ all the nodes on which the application executed. In our example, the error
 output file should be empty and standard output file contains something similar
 to:
 
-[fixme verify this stuff when my arete account gets fixed (again!)]
+[fixme verify this stuff when my arete account gets fixed (again!) MB 3-13-12]
 
     *provide sample output here*
 

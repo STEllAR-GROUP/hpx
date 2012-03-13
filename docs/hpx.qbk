@@ -28,7 +28,7 @@
 [def __version__                V0.8.0]
 
 [def __stellar__                [@http://stellar.cct.lsu.edu STE||AR]]
-[def __stellar_list__           [@email:gopx@cct.lsu.edu HPX General List]]
+[def __stellar_list__           [@email:gopx@cct.lsu.edu gopx@cct.lsu.edu]]
 [def __stellar_irc__            [@irc://irc.freenode.net:6667/#ste||ar #stellar at Freenet]]
 [def __lsu__                    [@http://www.lsu.edu Louisiana State University (LSU)]]
 [def __cct__                    [@http://www.cct.lsu.edu Center for Computation and Technology (CCT)]]

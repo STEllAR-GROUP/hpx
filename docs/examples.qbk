@@ -38,20 +38,20 @@ The source code for this exaple in in the SVN repository:
 
 To compile this file type:
   
-  make examples.quickstart.fibonacci
+  $ make examples.quickstart.fibonacci
 
 If you know how many cores your machine has use make's '-j' option to increase
 the number of parallel pocesses that are runing. You should start your number
 of cores plus an additional process for maximum speed. For instance, if your
 machine has 4 cores you would type:
 
-  make examples.quickstart.fibonacci -j5
+  $ make examples.quickstart.fibonacci -j5
 
 for the fastset build.
 
 To run the program type:
 
-  ./bin/fibonacci
+  $ ./bin/fibonacci
 
 This should print (time should be approxamate):
 
@@ -64,12 +64,16 @@ the '--n-value' option. Addtitionally you can use the '--hpx:threads' option
 to declare how many threads you wish to use when running the program. For 
 instance,running:
 
-  ./bin/fibonacci --n-value 20 --hpx:threads 5
+  $ ./bin/fibonacci --n-value 20 --hpx:threads 5
 
 Will yeild:
 
   fibonacci(20) == 6765
   elapsed time: 0.233827 [s]
+
+To run this program on multiple localities please see the [link 
+hpx.getting_started.unix_installation.using_hpx_applications_with_pbs PBS] 
+documentation.[fixme link to running in distrubuted in manuel AS 3-13-12] 
 
 [heading Walk-through]
 
@@ -161,11 +165,11 @@ repository: [^parallex/hpx/examples/quickstart/hello_world.cpp]
 
 To compile this file type:
 
-    make examples.quickstart.hello_world
+    $ make examples.quickstart.hello_world
 
 To run the program type:
 
-    ./bin/hello_world
+    $ ./bin/hello_world
 
 This should print:
 
@@ -174,7 +178,7 @@ This should print:
 To include more threads use the command line option '--hpx:threads' and 
 type the number of threads that you wish to use.  For example, typing:
 
-    ./bin/hello_world --hpx:threads 2
+    $ ./bin/hello_world --hpx:threads 2
 
 will yield:
 
@@ -182,8 +186,9 @@ will yield:
     hello world from OS-thread 0 on locality 0
 
 Notice how the ordering of the two print statements will change with
-subsequent runs.
-[fixme explain how to run hello world on multiple localites]
+subsequent runs. To run this program on multiple localities please see the [link 
+hpx.getting_started.unix_installation.using_hpx_applications_with_pbs PBS] 
+documentation.[fixme link to running in distrubuted in manuel AS 3-13-12] 
 
 [heading Walk-through]
 
@@ -234,7 +239,7 @@ leaves that locality's thread number in the set 'attendance'.
 [endsect] [/Hello World]
 
 [/Proofread by:]
-[Adrian Serio 3-13-12]
+[/Adrian Serio 3-13-12]
 
 [/////////////////////////////////////////////////////////////////////////////]
 [section:accumulator Accumulator]
