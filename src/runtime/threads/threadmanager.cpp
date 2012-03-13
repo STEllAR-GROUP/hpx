@@ -1172,7 +1172,8 @@ namespace hpx { namespace threads
               "returns the current queue length for the referenced queue",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&ti::queue_length_counter_creator, this, _1, _2),
-              &performance_counters::locality_thread_counter_discoverer
+              &performance_counters::locality_thread_counter_discoverer,
+              ""
             },
             // idle rate
             { "/time/idle-rate", performance_counters::counter_raw,
@@ -1186,50 +1187,59 @@ namespace hpx { namespace threads
             { "/threads/count/cumulative/all", performance_counters::counter_raw,
               "returns the overall number of executed (retired) HPX-thread for "
               "the referenced locality", HPX_PERFORMANCE_COUNTER_V1, counts_creator,
-              &performance_counters::locality_thread_counter_discoverer
+              &performance_counters::locality_thread_counter_discoverer,
+              ""
             },
             { "/threads/count/instantaneous/all", performance_counters::counter_raw,
               "returns the overall current number of HPX-thread instantiated at the "
               "referenced locality", HPX_PERFORMANCE_COUNTER_V1, counts_creator,
-              &performance_counters::locality_thread_counter_discoverer
+              &performance_counters::locality_thread_counter_discoverer,
+              ""
             },
             { "/threads/count/instantaneous/active", performance_counters::counter_raw,
               "returns the current number of active HPX-thread at the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1, counts_creator,
-              &performance_counters::locality_thread_counter_discoverer
+              &performance_counters::locality_thread_counter_discoverer,
+              ""
             },
             { "/threads/count/instantaneous/pending", performance_counters::counter_raw,
               "returns the current number of pending HPX-thread at the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1, counts_creator,
-              &performance_counters::locality_thread_counter_discoverer
+              &performance_counters::locality_thread_counter_discoverer,
+              ""
             },
             { "/threads/count/instantaneous/suspended", performance_counters::counter_raw,
               "returns the current number of suspended HPX-thread at the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1, counts_creator,
-              &performance_counters::locality_thread_counter_discoverer
+              &performance_counters::locality_thread_counter_discoverer,
+              ""
             },
             { "/threads/count/instantaneous/terminated", performance_counters::counter_raw,
               "returns the current number of terminated HPX-thread at the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1, counts_creator,
-              &performance_counters::locality_thread_counter_discoverer
+              &performance_counters::locality_thread_counter_discoverer,
+              ""
             },
             { "/threads/count/stack-recycles", performance_counters::counter_raw,
               "returns the total number of HPX-thread recycling operations performed "
               "for the referenced locality", HPX_PERFORMANCE_COUNTER_V1,
-              counts_creator, &performance_counters::locality_counter_discoverer
+              counts_creator, &performance_counters::locality_counter_discoverer,
+              ""
             },
 #if !defined(BOOST_WINDOWS)
             { "/threads/stack-unbinds", performance_counters::counter_raw,
               "returns the total number of HPX-thread unbind (madvise) operations "
               "performed for the referenced locality", HPX_PERFORMANCE_COUNTER_V1,
-              counts_creator, &performance_counters::locality_counter_discoverer
+              counts_creator, &performance_counters::locality_counter_discoverer,
+              ""
             },
 #endif
             { "/threads/count/objects", performance_counters::counter_raw,
               "returns the overall number of created HPX-thread objects for "
               "the referenced locality", HPX_PERFORMANCE_COUNTER_V1,
               counts_creator,
-              &locality_allocator_counter_discoverer
+              &locality_allocator_counter_discoverer,
+              ""
             },
         };
         performance_counters::install_counter_types(

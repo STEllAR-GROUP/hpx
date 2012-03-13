@@ -256,14 +256,16 @@ namespace hpx { namespace parcelset
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, num_sends, _2),
-              &performance_counters::locality_counter_discoverer
+              &performance_counters::locality_counter_discoverer,
+              ""
             },
             { "/parcels/count/received", performance_counters::counter_raw,
               "returns the number of received parcels for the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, num_receives, _2),
-              &performance_counters::locality_counter_discoverer
+              &performance_counters::locality_counter_discoverer,
+              ""
             },
             { "/parcels/time/sending", performance_counters::counter_raw,
               "returns the total time between the start of each asynchronous "
@@ -308,7 +310,8 @@ namespace hpx { namespace parcelset
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, queue_length, _2),
-              &performance_counters::locality_counter_discoverer
+              &performance_counters::locality_counter_discoverer,
+              ""
             }
         };
         performance_counters::install_counter_types(

@@ -57,35 +57,40 @@ namespace hpx { namespace util { namespace detail
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, get_constructed_count, _2),
-              &performance_counters::locality_counter_discoverer
+              &performance_counters::locality_counter_discoverer,
+              ""
             },
             { "/lcos/full_empty/destructed", performance_counters::counter_raw,
               "returns the number of destructed full_empty entries",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, get_destructed_count, _2),
-              &performance_counters::locality_counter_discoverer
+              &performance_counters::locality_counter_discoverer,
+              ""
             },
             { "/lcos/full_empty/read_enqueued", performance_counters::counter_raw,
               "returns the number of full_empty 'read' enqueue operations",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, get_read_enqueued_count, _2),
-              &performance_counters::locality_counter_discoverer
+              &performance_counters::locality_counter_discoverer,
+              ""
             },
             { "/lcos/full_empty/read_dequeued", performance_counters::counter_raw,
               "returns the number of full_empty 'read' dequeue operations",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, get_read_dequeued_count, _2),
-              &performance_counters::locality_counter_discoverer
+              &performance_counters::locality_counter_discoverer,
+              ""
             },
             { "/lcos/full_empty/set_full", performance_counters::counter_raw,
               "returns the number of full_empty 'set' operations",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, get_set_full_count, _2),
-              &performance_counters::locality_counter_discoverer
+              &performance_counters::locality_counter_discoverer,
+              ""
             }
         };
         performance_counters::install_counter_types(

@@ -577,7 +577,8 @@ namespace hpx
               "name: /statistics{<base_counter_name>}/average",
               HPX_PERFORMANCE_COUNTER_V1,
               &performance_counters::detail::aggregating_counter_creator,
-              &performance_counters::default_counter_discoverer
+              &performance_counters::default_counter_discoverer,
+              ""
             },
 
             // max counter
@@ -587,7 +588,8 @@ namespace hpx
               "name: /statistics{<base_counter_name>}/max",
               HPX_PERFORMANCE_COUNTER_V1,
               &performance_counters::detail::aggregating_counter_creator,
-              &performance_counters::default_counter_discoverer
+              &performance_counters::default_counter_discoverer,
+              ""
             },
 
             // min counter
@@ -597,7 +599,8 @@ namespace hpx
               "name: /statistics{<base_counter_name>}/min",
               HPX_PERFORMANCE_COUNTER_V1,
                &performance_counters::detail::aggregating_counter_creator,
-               &performance_counters::default_counter_discoverer
+               &performance_counters::default_counter_discoverer,
+              ""
             },
 
             // uptime counters

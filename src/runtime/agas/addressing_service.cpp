@@ -1397,28 +1397,32 @@ void addressing_service::register_counter_types()
           HPX_PERFORMANCE_COUNTER_V1,
           boost::bind(&performance_counters::locality_raw_counter_creator,
               _1, cache_hits, _2),
-          &performance_counters::locality_counter_discoverer
+          &performance_counters::locality_counter_discoverer,
+          ""
         },
         { "/agas/cache/misses", performance_counters::counter_raw,
           "returns the number of cache misses while accessing the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           boost::bind(&performance_counters::locality_raw_counter_creator,
               _1, cache_misses, _2),
-          &performance_counters::locality_counter_discoverer
+          &performance_counters::locality_counter_discoverer,
+          ""
         },
         { "/agas/cache/evictions", performance_counters::counter_raw,
           "returns the number of cache evictions from the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           boost::bind(&performance_counters::locality_raw_counter_creator,
               _1, cache_evictions, _2),
-          &performance_counters::locality_counter_discoverer
+          &performance_counters::locality_counter_discoverer,
+          ""
         },
         { "/agas/cache/insertions", performance_counters::counter_raw,
           "returns the number of cache insertions into the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           boost::bind(&performance_counters::locality_raw_counter_creator,
               _1, cache_insertions, _2),
-          &performance_counters::locality_counter_discoverer
+          &performance_counters::locality_counter_discoverer,
+          ""
         }
     };
     performance_counters::install_counter_types(
