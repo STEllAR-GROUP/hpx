@@ -15,6 +15,7 @@ more complex yet powerful HPX concepts.
 
 [/Proofread by:]
 [/Adrian Serio 3-13-12]
+[/Phillip LeBlanc 3-13-12]
 
 [/////////////////////////////////////////////////////////////////////////////]
 [section:fibonacci Fibonacci]
@@ -22,13 +23,13 @@ more complex yet powerful HPX concepts.
 The Fibonacci sequence is a sequence of numbers starting with 0 and 1 where
 every subsequent number is the sum of the previous two numbers. In this 
 example, we will use HPX to calculate the value of the n-th postition of the 
-Fibonacci sequece. In order to compute this problem in parallel, we will use
+Fibonacci sequence. In order to compute this problem in parallel, we will use
 a tool known as a future. Futures are the return values of packets of work 
-that are sent to woker nodes. These objects are declared but do not recieve
+that are sent to worker nodes. These objects are declared but do not recieve
 their value until the internal function [^.get()] is called, which fetches 
-their values from the functions that they are wrapped around. This tool allows
-HPX to schedule work early in a program so that when the funtion value is 
-needed it will be already calculated and avalable.
+the values from the functions that they are wrapped around. This tool allows
+HPX to schedule work early in a program so that when the function value is 
+needed it will already be calculated and available.
 
 [heading Setup]
 
@@ -41,19 +42,19 @@ To compile this file type:
   $ make examples.quickstart.fibonacci
 
 If you know how many cores your machine has use make's '-j' option to increase
-the number of parallel pocesses that are runing. You should start your number
+the number of parallel pocesses that are running. You should start your number
 of cores plus an additional process for maximum speed. For instance, if your
 machine has 4 cores you would type:
 
   $ make examples.quickstart.fibonacci -j5
 
-for the fastset build.
+for the fastest build.
 
 To run the program type:
 
   $ ./bin/fibonacci
 
-This should print (time should be approxamate):
+This should print (time should be approximate):
 
   fibonacci(10) == 55
   elapsed time: 0.00186288 [s]
@@ -73,9 +74,9 @@ Will yeild:
 
 To run this program on multiple localities please see the [link 
 hpx.getting_started.unix_installation.using_hpx_applications_with_pbs PBS] 
-documentation.[fixme link to running in distrubuted in manuel AS 3-13-12] 
+documentation. 
 
-[heading Walk-through]
+[heading Walkthrough]
 
 Now that you can compile and run the code lets look at how the code works. 
 Since this code is written in C++, we will begin with main below. Here you can
@@ -84,7 +85,7 @@ important to note that command line options are defined here. You can see
 that our programs '--n-value' is set by the instance of the Boost 
 library class [^options_description] using the public member function 
 [^.add_options()] (to learn more about this class see the __boost_doc__).
-In the desctription, the defalut value of
+In the description, the default value of
 the variable is set to 10. This is why when we ran the program for the first
 time without using the '--n-value' option the program returned the 10th
 value of the Fibonacci sequence. The last part of the description is the
@@ -94,7 +95,7 @@ line options are avalable.
 [import ../examples/quickstart/fibonacci.cpp]
 [fib_main]
 
-The [^init()] function in main calls hxp_main which is where the ["meat] of the
+The [^init()] function in main calls [^hpx_main()] which is where the ["meat] of the
 program is. Below we can see that the basic program is simple. The command
 line option 'n-value' is read in, a timer is set, a future is created,
 a [^.get()] function is called, and the data is printed out. 
@@ -109,7 +110,7 @@ wrapper for a function.  By wrapping functions, HPX can place packets of work
 into different types of processing vehicles. These vehicles allow users to 
 caluclate work now, later, or on certain nodes. These other methods of 
 processing work will be brought up later, for now we will stick to simple 
-futures which once created immediatly start to do work as soon as resources
+futures which once created immediately start to do work as soon as resources
 are avalable. To futher understand this we turn to the 
 code to find where [^fibonacci_action] was typedefined:
 
@@ -124,11 +125,11 @@ as an HPX action.
 This picture should now start making sense. The function [^fibonacci] is
 wrapped in an action [^plain_result_action1], which in turn was wrapped
 in [^async<>], which returns a future. Now that we understand where all these 
-variables are comming from lets look at the function [^fibanacci]:
+variables are coming from lets look at the function [^fibonacci]:
 
 [fib_func]
 
-On first inspection this block of code is straight forward. First if n < 2,
+On first inspection this block of code is straightforward. First if n < 2,
 meaning if n = 0 or 1, then return 0 or 1 (as we recall the first position 
 of the Fibanacci sequence is 0 and the second is one). Next two futures n1 
 and n2 are created and their values are added together after being called 
@@ -145,6 +146,7 @@ position of the Fibonacci sequence can be calculated.
 
 [/Proofread by:]
 [/Adrian Serio 3-13-12]
+[/Phillip LeBlanc 3-13-12]
 
 [/////////////////////////////////////////////////////////////////////////////]
 [section:hello_world Hello World v2]
@@ -188,12 +190,12 @@ will yield:
 Notice how the ordering of the two print statements will change with
 subsequent runs. To run this program on multiple localities please see the [link 
 hpx.getting_started.unix_installation.using_hpx_applications_with_pbs PBS] 
-documentation.[fixme link to running in distrubuted in manuel AS 3-13-12] 
+documentation. 
 
-[heading Walk-through]
+[heading Walkthrough]
 
-Now that you can complile and run the code lets look at how the code works
-begining with main:
+Now that you can compile and run the code lets look at how the code works
+beginning with main:
 
 [import ../examples/quickstart/hello_world.cpp]
 [hello_world_main]
@@ -213,7 +215,7 @@ Another way of thinking about this wrapping technique is as follows: functions
 (the work to be done) are wrapped in actions which are wrapped into compute
 vehicles [fixme wording AS 3-13-12]which are distributed to compute nodes.
 
-Now it is time to look at the [^hellow_world_foreman] which was wrapped in
+Now it is time to look at the [^hello_world_foreman] which was wrapped in
 the action above:
 
 [hello_world_foreman]
@@ -222,16 +224,16 @@ Here the set 'attendance' is keeping track of which localities have printed
 out the hello world statement. When the locality prints out the statement
 the future returns to wait which invokes the lambda funtion '&'.  This 
 funtion '&' erases the thread from the set 'attendance' thus letting 
-[^hello_world_forman] know how many localites still needed to print out
+[^hello_world_foreman] know how many localites still need to print out
 ["hello world]. However, if the future returns a value of -1 the thread is
 skipped and that thread remains in 'attendance' for another cycle of the 
 while loop.
 
-Finally, let us look at [^hello_world_worker].  Here [^hello_world_woker]
+Finally, let us look at [^hello_world_worker].  Here [^hello_world_worker]
 checks to see if it is on the target locality. If it is the correct locality,
 it prints out the hello world statement and returns the OS thread number
-to [^wait()] in [^hello_world_forman].  If it is not the correct locality,
-it returns a value of -1 which when returned to [^hello_world_forman]
+to [^wait()] in [^hello_world_foreman].  If it is not the correct locality,
+it returns a value of -1 which when returned to [^hello_world_foreman]
 leaves that locality's thread number in the set 'attendance'.
 
 [hello_world_worker]
@@ -240,31 +242,32 @@ leaves that locality's thread number in the set 'attendance'.
 
 [/Proofread by:]
 [/Adrian Serio 3-13-12]
+[/Phillip LeBlanc 3-13-12]
 
 [/////////////////////////////////////////////////////////////////////////////]
 [section:accumulator Accumulator]
 
 Accumulator is a simple example that exposes the notion of components in HPX.
-Components allow us to run applicationin in distributed environment in HPX.
+Components allow us to run applications in an distributed environment in HPX.
 This example exposes four differenct functions: init, add, query and print.
 What this example does is it takes an input from a client locality component,
 puts value in a data type (unsigned long) at the remote locality component.
-Print command at the client would print the contents of the remote locality
-component at the remote locality. Query command at the client would print the
-contents of the remote locality component at client locality.
+The print command from the client will print the contents of the remote locality
+component at the remote locality. The query command from the client will print 
+the contents of the remote locality component at client locality.
 
 [heading Building the example]
 
 From your build directory, type the following:
 
-    make examples.accumulator.accumulator
+    $ make examples.accumulator.accumulator
 
 [heading Run the example]
 
 From your bin directory inside install path, type the following:
 
 [teletype][/ switch to plain text source mode]
-On single machine, first console:
+On a single machine, first console:
 
     ./accumulator_client -0 -l2
 
@@ -299,6 +302,7 @@ Console 2:
 [endsect] [/Accumulator]
 
 [/Proofread by:]
+[/Phillip LeBlanc 3-13-12]
 
 [/////////////////////////////////////////////////////////////////////////////]
 
