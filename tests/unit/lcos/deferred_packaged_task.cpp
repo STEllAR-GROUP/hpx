@@ -28,7 +28,7 @@ typedef hpx::actions::plain_result_action0<bool, null_thread> null_action;
 
 HPX_REGISTER_PLAIN_ACTION(null_action);
 
-typedef hpx::lcos::lazy_future<null_action> null_future;
+typedef hpx::lcos::deferred_packaged_task<null_action> null_future;
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map&)

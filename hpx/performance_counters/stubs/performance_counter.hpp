@@ -8,7 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/packaged_task.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

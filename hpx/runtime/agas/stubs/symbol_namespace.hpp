@@ -33,7 +33,7 @@ struct HPX_EXPORT symbol_namespace
         )
     {
         typedef server_type::service_action action_type;
-        return lcos::eager_future<action_type, Result>(
+        return lcos::packaged_task<action_type, Result>(
             gid, priority, req).get_future();
     }
 

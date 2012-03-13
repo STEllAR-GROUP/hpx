@@ -10,7 +10,7 @@
 #define HPX_LCOS_ASYNC_SEP_28_2011_0840AM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/eager_future_route.hpp>
+#include <hpx/lcos/packaged_task_route.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
@@ -25,8 +25,8 @@ namespace hpx { namespace lcos
     >
     async (naming::id_type const& gid)
     {
-        //return eager_future<Action>(gid);
-        return eager_future_route<Action>(gid).get_future();
+        //return packaged_task<Action>(gid);
+        return packaged_task_route<Action>(gid).get_future();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -45,7 +45,7 @@ namespace hpx { namespace lcos
         typedef typename traits::promise_local_result<
             typename Action::result_type
         >::type result_type;
-        typedef eager_future_route<Action, result_type, signalling_tag> future_type;
+        typedef packaged_task_route<Action, result_type, signalling_tag> future_type;
 
         return future_type(gid, data_sink).get_future();
     }
@@ -68,7 +68,7 @@ namespace hpx { namespace lcos
         typedef typename traits::promise_local_result<
             typename Action::result_type
         >::type result_type;
-        typedef eager_future_route<Action, result_type, signalling_tag> future_type;
+        typedef packaged_task_route<Action, result_type, signalling_tag> future_type;
 
         return future_type(gid, data_sink, error_sink).get_future();
     }
@@ -108,7 +108,7 @@ namespace hpx { namespace lcos
     async (naming::id_type const& gid,
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
-        return eager_future_route<Action>(gid, 
+        return packaged_task_route<Action>(gid, 
             BOOST_PP_ENUM_PARAMS(N, arg)).get_future();
     }
 
@@ -128,7 +128,7 @@ namespace hpx { namespace lcos
         typedef typename traits::promise_local_result<
             typename Action::result_type
         >::type result_type;
-        typedef eager_future_route<Action, result_type, signalling_tag> future_type;
+        typedef packaged_task_route<Action, result_type, signalling_tag> future_type;
 
         return future_type(gid, data_sink, 
             BOOST_PP_ENUM_PARAMS(N, arg)).get_future();
@@ -152,7 +152,7 @@ namespace hpx { namespace lcos
         typedef typename traits::promise_local_result<
             typename Action::result_type
         >::type result_type;
-        typedef eager_future_route<Action, result_type, signalling_tag> future_type;
+        typedef packaged_task_route<Action, result_type, signalling_tag> future_type;
 
         return future_type(gid, data_sink, error_sink, 
             BOOST_PP_ENUM_PARAMS(N, arg)).get_future();

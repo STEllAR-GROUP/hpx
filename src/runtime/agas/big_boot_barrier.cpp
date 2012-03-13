@@ -34,12 +34,12 @@
 namespace hpx { namespace agas
 {
 
-typedef lcos::eager_future<
+typedef lcos::packaged_task<
     server::primary_namespace::service_action,
     response
 > allocate_response_future_type;
 
-typedef lcos::eager_future<
+typedef lcos::packaged_task<
     server::primary_namespace::service_action,
     response
 > bind_response_future_type;

@@ -477,13 +477,13 @@ namespace hpx
                 typename Action::result_type>::type,
             typename Signalling = non_signalling_tag,
             typename DirectExecute = typename Action::direct_execution>
-        class eager_future;
+        class packaged_task;
 
         template <typename Action,
             typename Result = typename traits::promise_local_result<
                 typename Action::result_type>::type,
             typename DirectExecute = typename Action::direct_execution>
-        class lazy_future;
+        class deferred_packaged_task;
 
         template <typename Result,
             typename RemoteResult =

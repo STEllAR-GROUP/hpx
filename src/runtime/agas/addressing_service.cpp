@@ -577,7 +577,7 @@ bool addressing_service::get_id_range(
   , error_code& ec
     )
 { // {{{ get_id_range implementation
-    typedef lcos::eager_future<server::primary_namespace::service_action>
+    typedef lcos::packaged_task<server::primary_namespace::service_action>
         future_type;
 
     lcos::promise<response>* f = 0;
@@ -658,7 +658,7 @@ bool addressing_service::bind_range(
   , error_code& ec
     )
 { // {{{ bind_range implementation
-    typedef lcos::eager_future<server::primary_namespace::service_action>
+    typedef lcos::packaged_task<server::primary_namespace::service_action>
         future_type;
 
     lcos::promise<response>* f = 0;

@@ -18,7 +18,7 @@ namespace hpx { namespace lcos
     namespace local
     {
         template <typename Result>
-        class packaged_task;
+        class promise;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -28,7 +28,7 @@ namespace hpx { namespace lcos
     private:
         BOOST_COPYABLE_AND_MOVABLE(future)
 
-        typedef lcos::detail::future_data_base<Result, RemoteResult> 
+        typedef lcos::detail::future_data_base<Result, RemoteResult>
             future_data_type;
 
         future(future_data_type* p)
@@ -39,7 +39,7 @@ namespace hpx { namespace lcos
           : future_data_(p)
         {}
 
-        friend class local::packaged_task<Result>;
+        friend class local::promise<Result>;
         friend class promise<Result, RemoteResult>;
 
     public:
@@ -105,7 +105,7 @@ namespace hpx { namespace lcos
     private:
         BOOST_COPYABLE_AND_MOVABLE(future)
 
-        typedef lcos::detail::future_data_base<void, util::unused_type> 
+        typedef lcos::detail::future_data_base<void, util::unused_type>
             future_data_type;
 
         future(future_data_type* p)
@@ -116,7 +116,7 @@ namespace hpx { namespace lcos
           : future_data_(p)
         {}
 
-        friend class local::packaged_task<void>;
+        friend class local::promise<void>;
         friend class promise<void, util::unused_type>;
 
     public:

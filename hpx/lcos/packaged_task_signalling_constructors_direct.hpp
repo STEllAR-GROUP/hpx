@@ -5,8 +5,8 @@
 
 #ifndef BOOST_PP_IS_ITERATING
 
-#if !defined(HPX_LCOS_EAGER_FUTURE_CONSTRUCTORS_DIRECT_JUL_01_2008_0116PM)
-#define HPX_LCOS_EAGER_FUTURE_CONSTRUCTORS_DIRECT_JUL_01_2008_0116PM
+#if !defined(HPX_LCOS_PACKAGED_TASK_CONSTRUCTORS_SIGNALLING_DIRECT_NOV_07_2011_0130PM)
+#define HPX_LCOS_PACKAGED_TASK_CONSTRUCTORS_SIGNALLING_DIRECT_NOV_07_2011_0130PM
 
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repeat.hpp>
@@ -25,7 +25,7 @@
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (2, HPX_ACTION_ARGUMENT_LIMIT,                                        \
-    "hpx/lcos/eager_future_constructors_direct.hpp"))                         \
+    "hpx/lcos/packaged_task_signalling_constructors_direct.hpp"))              \
     /**/
 
 #include BOOST_PP_ITERATE()
@@ -64,11 +64,13 @@
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    eager_future(naming::gid_type const& gid,
+    packaged_task(naming::gid_type const& gid,
+            completed_callback_type const& data_sink,
             BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
-      : apply_logger_("eager_future_direct::apply")
+      : base_type(data_sink),
+        apply_logger_("packaged_task_direct::apply")
     {
-        LLCO_(info) << "eager_future::eager_future("
+        LLCO_(info) << "packaged_task::packaged_task("
                     << hpx::actions::detail::get_action_name<Action>()
                     << ", "
                     << gid
@@ -77,11 +79,45 @@
             BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    eager_future(naming::id_type const& gid,
+    packaged_task(naming::id_type const& gid,
+            completed_callback_type const& data_sink,
             BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
-      : apply_logger_("eager_future_direct::apply")
+      : base_type(data_sink),
+        apply_logger_("packaged_task_direct::apply")
     {
-        LLCO_(info) << "eager_future::eager_future("
+        LLCO_(info) << "packaged_task::packaged_task("
+                    << hpx::actions::detail::get_action_name<Action>()
+                    << ", "
+                    << gid
+                    << ") args(" << (N + 1) << ")";
+        apply(gid, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+    }
+
+    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    packaged_task(naming::gid_type const& gid,
+            completed_callback_type const& data_sink,
+            error_callback_type const& error_sink,
+            BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+      : base_type(data_sink, error_sink),
+        apply_logger_("packaged_task_direct::apply")
+    {
+        LLCO_(info) << "packaged_task::packaged_task("
+                    << hpx::actions::detail::get_action_name<Action>()
+                    << ", "
+                    << gid
+                    << ") args(" << (N + 1) << ")";
+        apply(naming::id_type(gid, naming::id_type::unmanaged),
+            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+    }
+    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    packaged_task(naming::id_type const& gid,
+            completed_callback_type const& data_sink,
+            error_callback_type const& error_sink,
+            BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+      : base_type(data_sink, error_sink),
+        apply_logger_("packaged_task_direct::apply")
+    {
+        LLCO_(info) << "packaged_task::packaged_task("
                     << hpx::actions::detail::get_action_name<Action>()
                     << ", "
                     << gid

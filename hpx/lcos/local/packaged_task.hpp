@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_LOCAL_EAGER_FUTURE_MAR_01_2012_0121PM)
-#define HPX_LCOS_LOCAL_EAGER_FUTURE_MAR_01_2012_0121PM
+#if !defined(HPX_LCOS_LOCAL_promise_MAR_01_2012_0121PM)
+#define HPX_LCOS_LOCAL_promise_MAR_01_2012_0121PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -73,40 +73,40 @@ namespace hpx { namespace lcos { namespace local
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result>
-    class packaged_task
+    class promise
     {
     private:
         typedef lcos::detail::task_base<Result> task_impl_type;
 
-        BOOST_MOVABLE_BUT_NOT_COPYABLE(packaged_task)
+        BOOST_MOVABLE_BUT_NOT_COPYABLE(promise)
 
     public:
         // construction and destruction
         template <typename F>
-        explicit packaged_task(F const& f)
+        explicit promise(F const& f)
           : task_(new detail::task_object<Result, F>(f)),
             future_obtained_(false)
         {}
 
         template <typename F>
-        explicit packaged_task(BOOST_FWD_REF(F) f)
+        explicit promise(BOOST_FWD_REF(F) f)
           : task_(new detail::task_object<Result, F>(boost::forward<F>(f))),
             future_obtained_(false)
         {}
 
-        explicit packaged_task(Result(*f)())
+        explicit promise(Result(*f)())
           : task_(new detail::task_object<Result , Result (*)()>(f)),
             future_obtained_(false)
         {}
 
-        ~packaged_task()
+        ~promise()
         {
             if (task_)
                 task_->deleting_owner();
         }
 
         // Assignment
-        packaged_task(BOOST_RV_REF(packaged_task) rhs)
+        promise(BOOST_RV_REF(promise) rhs)
           : task_(rhs.future_data_),
             future_obtained_(rhs.future_obtained_)
         {
@@ -114,7 +114,7 @@ namespace hpx { namespace lcos { namespace local
             rhs.future_obtained_ = false;
         }
 
-        packaged_task& operator=(BOOST_RV_REF(packaged_task) rhs)
+        promise& operator=(BOOST_RV_REF(promise) rhs)
         {
             task_ = rhs.task_;
             future_obtained_ = rhs.future_obtained_;
@@ -123,7 +123,7 @@ namespace hpx { namespace lcos { namespace local
             return *this;
         }
 
-        void swap(packaged_task& other)
+        void swap(promise& other)
         {
             task_.swap(other.task_);
             std::swap(future_obtained_, other.future_obtained_);
@@ -134,14 +134,14 @@ namespace hpx { namespace lcos { namespace local
         {
             if (!task_) {
                 HPX_THROWS_IF(ec, task_moved,
-                    "packaged_task<Result>::get_future",
+                    "promise<Result>::get_future",
                     "task invalid (has it been moved?)");
                 return lcos::future<Result>();
             }
             if (future_obtained_) {
                 HPX_THROWS_IF(ec, future_already_retrieved,
-                    "packaged_task<Result>::get_future",
-                    "future already has been retrieved from this packaged_task");
+                    "promise<Result>::get_future",
+                    "future already has been retrieved from this promise");
                 return lcos::future<Result>();
             }
 
@@ -154,7 +154,7 @@ namespace hpx { namespace lcos { namespace local
         {
             if (!task_) {
                 HPX_THROWS_IF(ec, task_moved,
-                    "packaged_task::operator()",
+                    "promise::operator()",
                     "task invalid (has it been moved?)");
                 return;
             }
@@ -174,25 +174,25 @@ namespace hpx { namespace lcos { namespace local
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result>
-    struct eager_future : packaged_task<Result>
+    struct packaged_task : promise<Result>
     {
         // construction and destruction
         template <typename F>
-        explicit eager_future(F const& f)
-          : packaged_task<Result>(f)
+        explicit packaged_task(F const& f)
+          : promise<Result>(f)
         {
             (*this)();    // execute the function immediately
         }
 
         template <typename F>
-        explicit eager_future(BOOST_FWD_REF(F) f)
-          : packaged_task<Result>(boost::forward<F>(f))
+        explicit packaged_task(BOOST_FWD_REF(F) f)
+          : promise<Result>(boost::forward<F>(f))
         {
             (*this)();    // execute the function immediately
         }
 
-        explicit eager_future(Result(*f)())
-          : packaged_task<Result>(f)
+        explicit packaged_task(Result(*f)())
+          : promise<Result>(f)
         {
             (*this)();    // execute the function immediately
         }

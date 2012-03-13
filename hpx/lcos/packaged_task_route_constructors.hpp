@@ -5,8 +5,8 @@
 
 #ifndef BOOST_PP_IS_ITERATING
 
-#if !defined(HPX_LCOS_EAGER_FUTURE_ROUTE_CONSTRUCTORS_SIGNALLING_DIRECT_NOV_07_2011_0130PM)
-#define HPX_LCOS_EAGER_FUTURE_ROUTE_CONSTRUCTORS_SIGNALLING_DIRECT_NOV_07_2011_0130PM
+#if !defined(HPX_LCOS_PACKAGED_TASK_ROUTE_CONSTRUCTORS_JUN_27_2008_0440PM)
+#define HPX_LCOS_PACKAGED_TASK_ROUTE_CONSTRUCTORS_JUN_27_2008_0440PM
 
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repeat.hpp>
@@ -16,7 +16,7 @@
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (2, HPX_ACTION_ARGUMENT_LIMIT,                                        \
-    "hpx/lcos/eager_future_route_signalling_constructors_direct.hpp"))        \
+    "hpx/lcos/packaged_task_route_constructors.hpp"))                         \
     /**/
 
 #include BOOST_PP_ITERATE()
@@ -35,30 +35,26 @@
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-
-        naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
-            // local, direct execution
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<typename Action::component_type>()));
-            (*this->impl_)->set_data(Action::execute_function(
-                addr.address_, BOOST_PP_ENUM_PARAMS(N, arg)));
-        }
-        else {
-            // remote execution
-            hpx::applier::apply_c_route<Action>(addr, this->get_gid(), gid,
-                BOOST_PP_ENUM_PARAMS(N, arg));
-        }
+        hpx::applier::apply_c_route<Action>(
+            this->get_gid(), gid, BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    eager_future_route(naming::gid_type const& gid,
-            completed_callback_type const& data_sink,
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-      : base_type(data_sink),
-        apply_logger_("eager_future_direct::apply")
+    void apply_p(naming::id_type const& gid,
+        threads::thread_priority priority,
+        BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
-        LLCO_(info) << "eager_future::eager_future("
+        util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
+        hpx::applier::apply_c_p_route<Action>(
+            this->get_gid(), gid, priority, BOOST_PP_ENUM_PARAMS(N, arg));
+    }
+
+    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    packaged_task_route(naming::gid_type const& gid,
+            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
+      : apply_logger_("packaged_task::apply")
+    {
+        LLCO_(info) << "packaged_task::packaged_task("
                     << hpx::actions::detail::get_action_name<Action>()
                     << ", "
                     << gid
@@ -67,13 +63,11 @@
             BOOST_PP_ENUM_PARAMS(N, arg));
     }
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    eager_future_route(naming::id_type const& gid,
-            completed_callback_type const& data_sink,
+    packaged_task_route(naming::id_type const& gid,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-      : base_type(data_sink),
-        apply_logger_("eager_future_direct::apply")
+      : apply_logger_("packaged_task::apply")
     {
-        LLCO_(info) << "eager_future::eager_future("
+        LLCO_(info) << "packaged_task::packaged_task("
                     << hpx::actions::detail::get_action_name<Action>()
                     << ", "
                     << gid
@@ -82,35 +76,31 @@
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    eager_future_route(naming::gid_type const& gid,
-            completed_callback_type const& data_sink,
-            error_callback_type const& error_sink,
+    packaged_task_route(naming::gid_type const& gid,
+            threads::thread_priority priority,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-      : base_type(data_sink, error_sink),
-        apply_logger_("eager_future_direct::apply")
+      : apply_logger_("packaged_task::apply")
     {
-        LLCO_(info) << "eager_future::eager_future("
+        LLCO_(info) << "packaged_task::packaged_task("
                     << hpx::actions::detail::get_action_name<Action>()
                     << ", "
                     << gid
                     << ") args(" << (N + 1) << ")";
-        apply(naming::id_type(gid, naming::id_type::unmanaged),
-            BOOST_PP_ENUM_PARAMS(N, arg));
+        apply_p(naming::id_type(gid, naming::id_type::unmanaged),
+            priority, BOOST_PP_ENUM_PARAMS(N, arg));
     }
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    eager_future_route(naming::id_type const& gid,
-            completed_callback_type const& data_sink,
-            error_callback_type const& error_sink,
+    packaged_task_route(naming::id_type const& gid,
+            threads::thread_priority priority,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-      : base_type(data_sink, error_sink),
-        apply_logger_("eager_future_direct::apply")
+      : apply_logger_("packaged_task::apply")
     {
-        LLCO_(info) << "eager_future::eager_future("
+        LLCO_(info) << "packaged_task::packaged_task("
                     << hpx::actions::detail::get_action_name<Action>()
                     << ", "
                     << gid
                     << ") args(" << (N + 1) << ")";
-        apply(gid, BOOST_PP_ENUM_PARAMS(N, arg));
+        apply_p(gid, priority, BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
 #undef N

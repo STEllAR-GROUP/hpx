@@ -83,7 +83,7 @@ namespace hpx { namespace components { namespace server
             v.push_back(future_values_type::value_type(fact.get_gid()));
             for (std::size_t i = 0; i < numcreate; ++i) {
                 v.back().gids_.push_back(
-                    lcos::eager_future<action_type, naming::gid_type>(
+                    lcos::packaged_task<action_type, naming::gid_type>(
                         fact, type, 1).get_future());
             }
 
@@ -161,7 +161,7 @@ namespace hpx { namespace components { namespace server
             for (std::size_t k = 0; k < count; ++k)
             {
                 v.back().gids_.push_back(
-                    lcos::eager_future<action_type, naming::gid_type>(
+                    lcos::packaged_task<action_type, naming::gid_type>(
                         fact, type, 1).get_future());
             }
         }

@@ -19,7 +19,7 @@ a destructor, and access operators.
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/local/mutex.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/packaged_task.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -127,21 +127,21 @@ namespace hpx { namespace components { namespace server
 
     //here begins the definitions of most of the future types that will be used
     //the first of which is for assign action
-    typedef hpx::lcos::eager_future<server::smphplmatrex::assign_action> assign_future;
+    typedef hpx::lcos::packaged_task<server::smphplmatrex::assign_action> assign_future;
     //the search pivots future
-    typedef hpx::lcos::eager_future<server::smphplmatrex::search_action> search_future;
+    typedef hpx::lcos::packaged_task<server::smphplmatrex::search_action> search_future;
     //Here is the swap future, which works the same way as the assign future
-    typedef hpx::lcos::eager_future<server::smphplmatrex::swap_action> swap_future;
+    typedef hpx::lcos::packaged_task<server::smphplmatrex::swap_action> swap_future;
     //This future corresponds to the Gaussian elimination functions
-    typedef hpx::lcos::eager_future<server::smphplmatrex::gmain_action> gmain_future;
+    typedef hpx::lcos::packaged_task<server::smphplmatrex::gmain_action> gmain_future;
     //the backsubst future is used to make sure all computations are complete
     //before returning from LUsolve, to avoid killing processes and erasing the
     //leftdata while it is still being worked on
     typedef
-        hpx::lcos::eager_future<server::smphplmatrex::partbsub_action> partbsub_future;
+        hpx::lcos::packaged_task<server::smphplmatrex::partbsub_action> partbsub_future;
     //the final future type for the class is used for checking the accuracy of
     //the results of the LU decomposition
-    typedef hpx::lcos::eager_future<server::smphplmatrex::check_action> check_future;
+    typedef hpx::lcos::packaged_task<server::smphplmatrex::check_action> check_future;
 
     //right here are special arrays of futures
     gmain_future*** leftFutures, topFutures;

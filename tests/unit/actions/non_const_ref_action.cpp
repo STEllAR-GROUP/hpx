@@ -7,7 +7,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/plain_actions.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/packaged_task.hpp>
 #include <hpx/lcos/async.hpp>
 #include <hpx/util/lightweight_test.hpp>
 #include <tests/unit/actions/components/non_const_ref_action_component.hpp>
@@ -23,7 +23,7 @@ using hpx::actions::plain_result_action1;
 using hpx::actions::plain_direct_action1;
 using hpx::actions::plain_direct_result_action1;
 
-using hpx::lcos::eager_future;
+using hpx::lcos::packaged_task;
 using hpx::lcos::async;
 
 using hpx::init;

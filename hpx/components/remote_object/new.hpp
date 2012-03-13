@@ -42,7 +42,7 @@ namespace hpx { namespace components
     new_(naming::id_type const & target_id)
     {
         return
-            lcos::eager_future<
+            lcos::packaged_task<
                 remote_object::new_impl_action
               , object<T>
             >(
@@ -80,7 +80,7 @@ namespace hpx { namespace components
     new_(naming::id_type const & target_id, BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
     {
         return
-            lcos::eager_future<
+            lcos::packaged_task<
                 remote_object::new_impl_action
               , object<T>
             >(

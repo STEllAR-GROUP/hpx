@@ -5,8 +5,8 @@
 
 #ifndef BOOST_PP_IS_ITERATING
 
-#if !defined(HPX_LCOS_EAGER_FUTURE_CONSTRUCTORS_JUN_27_2008_0440PM)
-#define HPX_LCOS_EAGER_FUTURE_CONSTRUCTORS_JUN_27_2008_0440PM
+#if !defined(HPX_LCOS_PACKAGED_TASK_CONSTRUCTORS_DIRECT_JUL_01_2008_0116PM)
+#define HPX_LCOS_PACKAGED_TASK_CONSTRUCTORS_DIRECT_JUL_01_2008_0116PM
 
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repeat.hpp>
@@ -25,7 +25,7 @@
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (2, HPX_ACTION_ARGUMENT_LIMIT,                                        \
-    "hpx/lcos/eager_future_constructors.hpp"))                                \
+    "hpx/lcos/packaged_task_constructors_direct.hpp"))                        \
     /**/
 
 #include BOOST_PP_ITERATE()
@@ -47,26 +47,28 @@
         BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::applier::apply_c<Action>(
-            this->get_gid(), gid, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+
+        naming::address addr;
+        if (agas::is_local_address(gid, addr)) {
+            // local, direct execution
+            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                components::get_component_type<typename Action::component_type>()));
+            (*this->impl_)->set_data(Action::execute_function(
+                addr.address_, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)));
+        }
+        else {
+            // remote execution
+            hpx::applier::apply_c<Action>(addr, this->get_gid(), gid,
+                BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+        }
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    void apply_p(naming::id_type const& gid,
-        threads::thread_priority priority,
-        BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
-    {
-        util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::applier::apply_c_p<Action>(this->get_gid(), gid, priority, 
-            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
-    }
-
-    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    eager_future(naming::gid_type const& gid,
+    packaged_task(naming::gid_type const& gid,
             BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
-      : apply_logger_("eager_future::apply")
+      : apply_logger_("packaged_task_direct::apply")
     {
-        LLCO_(info) << "eager_future::eager_future("
+        LLCO_(info) << "packaged_task::packaged_task("
                     << hpx::actions::detail::get_action_name<Action>()
                     << ", "
                     << gid
@@ -75,44 +77,16 @@
             BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    eager_future(naming::id_type const& gid,
+    packaged_task(naming::id_type const& gid,
             BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
-      : apply_logger_("eager_future::apply")
+      : apply_logger_("packaged_task_direct::apply")
     {
-        LLCO_(info) << "eager_future::eager_future("
+        LLCO_(info) << "packaged_task::packaged_task("
                     << hpx::actions::detail::get_action_name<Action>()
                     << ", "
                     << gid
                     << ") args(" << (N + 1) << ")";
         apply(gid, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
-    }
-
-    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    eager_future(naming::gid_type const& gid,
-            threads::thread_priority priority,
-            BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
-      : apply_logger_("eager_future::apply")
-    {
-        LLCO_(info) << "eager_future::eager_future("
-                    << hpx::actions::detail::get_action_name<Action>()
-                    << ", "
-                    << gid
-                    << ") args(" << (N + 1) << ")";
-        apply_p(naming::id_type(gid, naming::id_type::unmanaged),
-            priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
-    }
-    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    eager_future(naming::id_type const& gid,
-            threads::thread_priority priority,
-            BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
-      : apply_logger_("eager_future::apply")
-    {
-        LLCO_(info) << "eager_future::eager_future("
-                    << hpx::actions::detail::get_action_name<Action>()
-                    << ", "
-                    << gid
-                    << ") args(" << (N + 1) << ")";
-        apply_p(gid, priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
 #undef N

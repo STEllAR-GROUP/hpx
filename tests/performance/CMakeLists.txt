@@ -93,12 +93,12 @@ set(spinlock_alt_FLAGS DEPENDENCIES iostreams_component)
 
 if(HPX_CXX11_LAMBDAS)
   set(benchmarks ${benchmarks}
-      eager_future
+      packaged_task
       spinlock
       spinlock_alt
      )
 
-  set(eager_future_FLAGS DEPENDENCIES iostreams_component)
+  set(packaged_task_FLAGS DEPENDENCIES iostreams_component)
 endif()
 
 set(sizeof_FLAGS DEPENDENCIES iostreams_component)

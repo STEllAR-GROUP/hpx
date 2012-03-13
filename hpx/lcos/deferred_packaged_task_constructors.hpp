@@ -6,8 +6,8 @@
 
 #ifndef BOOST_PP_IS_ITERATING
 
-#if !defined(HPX_LCOS_LAZY_FUTURE_CONSTRUCTORS_DIRECT_JUL_01_2008_0116PM)
-#define HPX_LCOS_LAZY_FUTURE_CONSTRUCTORS_DIRECT_JUL_01_2008_0116PM
+#if !defined(HPX_LCOS_DEFERRED_PACKAGED_TASK_CONSTRUCTORS_JUN_27_2008_0440PM)
+#define HPX_LCOS_DEFERRED_PACKAGED_TASK_CONSTRUCTORS_JUN_27_2008_0440PM
 
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repeat.hpp>
@@ -17,7 +17,7 @@
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (2, HPX_ACTION_ARGUMENT_LIMIT,                                        \
-    "hpx/lcos/lazy_future_constructors_direct.hpp"))                          \
+    "hpx/lcos/deferred_packaged_task_constructors.hpp"))                      \
     /**/
 
 #include BOOST_PP_ITERATE()
@@ -35,27 +35,15 @@
     void apply(naming::id_type const& gid,
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
-        util::block_profiler_wrapper<lazy_future_direct_tag> bp(apply_logger_);
-
-        naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
-            // local, direct execution
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<typename Action::component_type>()));
-            (*this->impl_)->set_data(Action::execute_function(
-                addr.address_, BOOST_PP_ENUM_PARAMS(N, arg)));
-        }
-        else {
-            // remote execution
-            hpx::applier::apply_c<Action>(addr, this->get_gid(), gid,
-                BOOST_PP_ENUM_PARAMS(N, arg));
-        }
+        util::block_profiler_wrapper<deferred_packaged_task_tag> bp(apply_logger_);
+        hpx::applier::apply_c<Action>(
+            this->get_gid(), gid, BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
 private:
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     static void BOOST_PP_CAT(invoke,N)(
-        hpx::lcos::lazy_future<Action,Result,boost::mpl::true_> *th,
+        hpx::lcos::deferred_packaged_task<Action,Result> *th,
         naming::id_type const& gid,
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
@@ -65,15 +53,15 @@ private:
 
 public:
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    lazy_future(naming::gid_type const& gid,
+    deferred_packaged_task(naming::gid_type const& gid,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-      : apply_logger_("lazy_future_direct::apply"),
+      : apply_logger_("deferred_packaged_task::apply"),
         closure_(boost::bind(
-            &lazy_future::template BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N, Arg)>,
-            this, naming::id_type(gid, naming::id_type::unmanaged),
+          &deferred_packaged_task::template BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N,Arg)>,
+            this_(), naming::id_type(gid, naming::id_type::unmanaged),
             BOOST_PP_ENUM_PARAMS(N, arg)))
     {
-        LLCO_(info) << "lazy_future::lazy_future("
+        LLCO_(info) << "deferred_packaged_task::deferred_packaged_task("
                     << hpx::actions::detail::get_action_name<Action>()
                     << ", "
                     << gid
@@ -81,15 +69,15 @@ public:
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    lazy_future(naming::id_type const& gid,
+    deferred_packaged_task(naming::id_type const& gid,
             BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-      : apply_logger_("lazy_future_direct::apply"),
+      : apply_logger_("deferred_packaged_task::apply"),
         closure_(boost::bind(
-            &lazy_future::template BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N, Arg)>,
-            this, gid,
+          &deferred_packaged_task::template BOOST_PP_CAT(invoke,N)<BOOST_PP_ENUM_PARAMS(N,Arg)>,
+            this_(), gid,
             BOOST_PP_ENUM_PARAMS(N, arg)))
     {
-        LLCO_(info) << "lazy_future::lazy_future("
+        LLCO_(info) << "deferred_packaged_task::deferred_packaged_task("
                     << hpx::actions::detail::get_action_name<Action>()
                     << ", "
                     << gid

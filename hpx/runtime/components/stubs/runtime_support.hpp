@@ -207,7 +207,7 @@ namespace hpx { namespace components { namespace stubs
                 // the target GID, otherwise this will break once we start
                 // moving objects.
                 naming::gid_type prefix = naming::get_locality_from_gid(gid);
-                lcos::eager_future<action_type, void>(prefix, type, gid, count)
+                lcos::packaged_task<action_type, void>(prefix, type, gid, count)
                     .get_future().get();
             }
         }
@@ -329,7 +329,7 @@ namespace hpx { namespace components { namespace stubs
         {
             typedef server::runtime_support::create_performance_counter_action
                 action_type;
-            return lcos::eager_future<action_type, naming::gid_type>(
+            return lcos::packaged_task<action_type, naming::gid_type>(
                 targetgid, info).get_future();
         }
 
