@@ -8,20 +8,27 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 [section:examples Examples]
 
-Here are some more examples for our reader to get more familiar with HPX style
-programming.
+The following sections of our tuturial are some examples for our reader to 
+get familiar with HPX style programming. We start off with simple examples
+that utilize basic HPX elements and then begin to expose the reader to the 
+more complex yet powerful HPX concepts.
+
+[/Proofread by:]
+[/Adrian Serio 3-13-12]
 
 [/////////////////////////////////////////////////////////////////////////////]
 [section:fibonacci Fibonacci]
 
 The Fibonacci sequence is a sequence of numbers starting with 0 and 1 where
-every subsequent number is the sum of the previous two numbers. In this example
-we will use HPX to calculate the value of the n-th postition of the Fibonacci
-sequece. In order to compute this problem in parallel, we will use a tool known
-as a future. Futures are packets of work that are sent to woker nodes that 
-at a later time can be called by the internal function '.get()' to return 
-their values. This allows HPX to schedule work early in a program so that 
-later when the funtion value is needed it will be avalable.
+every subsequent number is the sum of the previous two numbers. In this 
+example, we will use HPX to calculate the value of the n-th postition of the 
+Fibonacci sequece. In order to compute this problem in parallel, we will use
+a tool known as a future. Futures are the return values of packets of work 
+that are sent to woker nodes. These objects are declared but do not recieve
+their value until the internal function [^.get()] is called, which fetches 
+their values from the functions that they are wrapped around. This tool allows
+HPX to schedule work early in a program so that when the funtion value is 
+needed it will be already calculated and avalable.
 
 [heading Setup]
 
@@ -67,10 +74,10 @@ Will yeild:
 [heading Walk-through]
 
 Now that you can compile and run the code lets look at how the code works. 
-Since this code is written in C++ we will begin with main. Here you can
+Since this code is written in C++, we will begin with main below. Here you can
 see that in HPX main is only used to initialize the runtime system. It is 
 important to note that command line options are defined here. You can see
-below that our programs '--n-value' is set by the instance of the Boost 
+that our programs '--n-value' is set by the instance of the Boost 
 library class [^options_description] using the public member function 
 [^.add_options()] (to learn more about this class see the __boost_doc__).
 In the desctription, the defalut value of
@@ -85,20 +92,22 @@ line options are avalable.
 
 The [^init()] function in main calls hxp_main which is where the ["meat] of the
 program is. Below we can see that the basic program is simple. The command
-line option 'n-value' is read in, a timer is set, two functions are called,
-and the data is printed out. 
+line option 'n-value' is read in, a timer is set, a future is created,
+a [^.get()] function is called, and the data is printed out. 
 
 [fib_hpx_main]
 
-Upon a closer look we see that the first of 
-the two functions is of type [^fibonacci_future]. This was defined earlier
-in the code:
-
-[fib_typedef]
-
-But wait, [^eager_future] is a type but what is [^fibonacci_action]? Again
-we turn to the code and find this section right before [^fibonacci_future]
-was typedefined:
+Upon a closer look we see that the future we created is assigned the return
+of [^async<fibonacci_action>(find_here(), n)]. [^async<>] takes an action,
+in this case [^fibonacci_action], and returns a future. But wait, what is an 
+action? And what is this [^fibonacci_action]? For starters, an action is a 
+wrapper for a function.  By wrapping functions, HPX can place packets of work
+into different types of processing vehicles. These vehicles allow users to 
+caluclate work now, later, or on certain nodes. These other methods of 
+processing work will be brought up later, for now we will stick to simple 
+futures which once created immediatly start to do work as soon as resources
+are avalable. To futher understand this we turn to the 
+code to find where [^fibonacci_action] was typedefined:
 
 [fib_action]
 
@@ -110,24 +119,28 @@ as an HPX action.
 
 This picture should now start making sense. The function [^fibonacci] is
 wrapped in an action [^plain_result_action1], which in turn was wrapped
-in a future [^eager_future]. Now that we understand where all these variables
-are comming from lets look at the function [^fibanacci]:
+in [^async<>], which returns a future. Now that we understand where all these 
+variables are comming from lets look at the function [^fibanacci]:
 
 [fib_func]
 
 On first inspection this block of code is straight forward. First if n < 2,
 meaning if n = 0 or 1, then return 0 or 1 (as we recall the first position 
-of the Fibanacci sequence is 0 and the second is one). Next call
-[^fibonacci_future] twice and subtract n before it is passed to the function. 
-Finaly get the values of the futures and return their sum. But hold-the-phone
-by calling [^fibonacci_future] we are calling the function recursively! This 
-is where the power of futures is displayed. [^fibonacci_future] will continue
-to be called until the value of n = 0 or 1 (it increments down each time
-the function is called) at which point the values of the futures will be
-returned by [^get()] and the value of the n-th position of the Fibonacci
-sequence will be calculated.
+of the Fibanacci sequence is 0 and the second is one). Next two futures n1 
+and n2 are created and their values are added together after being called 
+by [^.get()]. But, hold-the-phone, by calling [^fibonacci_action] inside
+the function [^fibonacci] we are calling this function recursively! 
+This is where the power of futures is displayed.
+The function [^fibonacci] will continue to be called until the value of n
+is equal to 0 or 1 (it increments down each time the function is called) 
+at which point the values of the future will be returned as 0 or 1. When 
+this happens the futures can then be added up and the value of the n-th 
+position of the Fibonacci sequence can be calculated.
 
 [endsect] [/Fibonacci]
+
+[/Proofread by:]
+[/Adrian Serio 3-13-12]
 
 [/////////////////////////////////////////////////////////////////////////////]
 [section:hello_world Hello World v2]
