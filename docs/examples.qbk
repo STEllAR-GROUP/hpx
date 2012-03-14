@@ -8,9 +8,9 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 [section:examples Examples]
 
-The following sections of our tuturial are some examples for our reader to 
+The following sections of our tuturial are some examples for our reader to
 get familiar with HPX style programming. We start off with simple examples
-that utilize basic HPX elements and then begin to expose the reader to the 
+that utilize basic HPX elements and then begin to expose the reader to the
 more complex yet powerful HPX concepts.
 
 [/Proofread by:]
@@ -21,14 +21,14 @@ more complex yet powerful HPX concepts.
 [section:fibonacci Fibonacci]
 
 The Fibonacci sequence is a sequence of numbers starting with 0 and 1 where
-every subsequent number is the sum of the previous two numbers. In this 
-example, we will use HPX to calculate the value of the n-th postition of the 
+every subsequent number is the sum of the previous two numbers. In this
+example, we will use HPX to calculate the value of the n-th postition of the
 Fibonacci sequence. In order to compute this problem in parallel, we will use
-a tool known as a future. Futures are the return values of packets of work 
+a tool known as a future. Futures are the return values of packets of work
 that are sent to worker nodes. These objects are declared but do not recieve
-their value until the internal function [^.get()] is called, which fetches 
+their value until the internal function [^.get()] is called, which fetches
 the values from the functions that they are wrapped around. This tool allows
-HPX to schedule work early in a program so that when the function value is 
+HPX to schedule work early in a program so that when the function value is
 needed it will already be calculated and available.
 
 [heading Setup]
@@ -38,7 +38,7 @@ The source code for this exaple in in the SVN repository:
 [fixme Add link to source here].
 
 To compile this file type:
-  
+
   $ make examples.quickstart.fibonacci
 
 If you know how many cores your machine has use make's '-j' option to increase
@@ -62,7 +62,7 @@ This should print (time should be approximate):
 This run used the default setting of calculating the tenth place of the
 Fibonacci sequence. To declare which position you want to calculate, use
 the '--n-value' option. Addtitionally you can use the '--hpx:threads' option
-to declare how many threads you wish to use when running the program. For 
+to declare how many threads you wish to use when running the program. For
 instance,running:
 
   $ ./bin/fibonacci --n-value 20 --hpx:threads 5
@@ -72,18 +72,18 @@ Will yeild:
   fibonacci(20) == 6765
   elapsed time: 0.233827 [s]
 
-To run this program on multiple localities please see the [link 
-hpx.getting_started.unix_installation.using_hpx_applications_with_pbs PBS] 
-documentation. 
+To run this program on multiple localities please see the [link
+hpx.tutorial.getting_started.unix_installation.using_hpx_applications_with_pbs PBS]
+documentation.
 
 [heading Walkthrough]
 
-Now that you can compile and run the code lets look at how the code works. 
+Now that you can compile and run the code lets look at how the code works.
 Since this code is written in C++, we will begin with main below. Here you can
-see that in HPX main is only used to initialize the runtime system. It is 
+see that in HPX main is only used to initialize the runtime system. It is
 important to note that command line options are defined here. You can see
-that our programs '--n-value' is set by the instance of the Boost 
-library class [^options_description] using the public member function 
+that our programs '--n-value' is set by the instance of the Boost
+library class [^options_description] using the public member function
 [^.add_options()] (to learn more about this class see the __boost_doc__).
 In the description, the default value of
 the variable is set to 10. This is why when we ran the program for the first
@@ -98,25 +98,25 @@ line options are avalable.
 The [^init()] function in main calls [^hpx_main()] which is where the ["meat] of the
 program is. Below we can see that the basic program is simple. The command
 line option 'n-value' is read in, a timer is set, a future is created,
-a [^.get()] function is called, and the data is printed out. 
+a [^.get()] function is called, and the data is printed out.
 
 [fib_hpx_main]
 
 Upon a closer look we see that the future we created is assigned the return
 of [^async<fibonacci_action>(find_here(), n)]. [^async<>] takes an action,
-in this case [^fibonacci_action], and returns a future. But wait, what is an 
-action? And what is this [^fibonacci_action]? For starters, an action is a 
+in this case [^fibonacci_action], and returns a future. But wait, what is an
+action? And what is this [^fibonacci_action]? For starters, an action is a
 wrapper for a function.  By wrapping functions, HPX can place packets of work
-into different types of processing vehicles. These vehicles allow users to 
-caluclate work now, later, or on certain nodes. These other methods of 
-processing work will be brought up later, for now we will stick to simple 
+into different types of processing vehicles. These vehicles allow users to
+caluclate work now, later, or on certain nodes. These other methods of
+processing work will be brought up later, for now we will stick to simple
 futures which once created immediately start to do work as soon as resources
-are avalable. To futher understand this we turn to the 
+are avalable. To futher understand this we turn to the
 code to find where [^fibonacci_action] was typedefined:
 
 [fib_action]
 
-Finally we are getting somewhere! In this block of code the function 
+Finally we are getting somewhere! In this block of code the function
 [^fibonacci] is declared. After the declaration, the function was wrapped in
 an action called [^plain_result_action1] (we use [^plain_result_action1]
 because the function takes one argument). This action was then ["registered]
@@ -124,22 +124,22 @@ as an HPX action.
 
 This picture should now start making sense. The function [^fibonacci] is
 wrapped in an action [^plain_result_action1], which in turn was wrapped
-in [^async<>], which returns a future. Now that we understand where all these 
+in [^async<>], which returns a future. Now that we understand where all these
 variables are coming from lets look at the function [^fibonacci]:
 
 [fib_func]
 
 On first inspection this block of code is straightforward. First if n < 2,
-meaning if n = 0 or 1, then return 0 or 1 (as we recall the first position 
-of the Fibanacci sequence is 0 and the second is one). Next two futures n1 
-and n2 are created and their values are added together after being called 
+meaning if n = 0 or 1, then return 0 or 1 (as we recall the first position
+of the Fibanacci sequence is 0 and the second is one). Next two futures n1
+and n2 are created and their values are added together after being called
 by [^.get()]. But, hold-the-phone, by calling [^fibonacci_action] inside
-the function [^fibonacci] we are calling this function recursively! 
+the function [^fibonacci] we are calling this function recursively!
 This is where the power of futures is displayed.
 The function [^fibonacci] will continue to be called until the value of n
-is equal to 0 or 1 (it increments down each time the function is called) 
-at which point the values of the future will be returned as 0 or 1. When 
-this happens the futures can then be added up and the value of the n-th 
+is equal to 0 or 1 (it increments down each time the function is called)
+at which point the values of the future will be returned as 0 or 1. When
+this happens the futures can then be added up and the value of the n-th
 position of the Fibonacci sequence can be calculated.
 
 [endsect] [/Fibonacci]
@@ -177,7 +177,7 @@ This should print:
 
     hello world from OS-thread 0 on locality 0
 
-To include more threads use the command line option '--hpx:threads' and 
+To include more threads use the command line option '--hpx:threads' and
 type the number of threads that you wish to use.  For example, typing:
 
     $ ./bin/hello_world --hpx:threads 2
@@ -188,9 +188,9 @@ will yield:
     hello world from OS-thread 0 on locality 0
 
 Notice how the ordering of the two print statements will change with
-subsequent runs. To run this program on multiple localities please see the [link 
-hpx.getting_started.unix_installation.using_hpx_applications_with_pbs PBS] 
-documentation. 
+subsequent runs. To run this program on multiple localities please see the [link
+hpx.tutorial.getting_started.unix_installation.using_hpx_applications_with_pbs PBS]
+documentation.
 
 [heading Walkthrough]
 
@@ -205,13 +205,13 @@ In this excerpt of the code we again see the use of futures. This time
 these futures are stored in a vector so that they can easily be accessed.
 New to us is the [^wait()] function. Wait provides a way to make sure
 that all of the futures have finished being calculated without having to call
-[^.get()] for each one. As in the [link hpx.examples.fibonacci 
+[^.get()] for each one. As in the [link hpx.tutorial.examples.fibonacci
 Fibonacci Example] our futures are set equal to an [^async<>] wrapped
 action. This action is declared here:
 
 [hello_world_action_wrapper]
 
-Another way of thinking about this wrapping technique is as follows: functions 
+Another way of thinking about this wrapping technique is as follows: functions
 (the work to be done) are wrapped in actions which are wrapped into compute
 vehicles [fixme wording AS 3-13-12]which are distributed to compute nodes.
 
@@ -222,11 +222,11 @@ the action above:
 
 Here the set 'attendance' is keeping track of which localities have printed
 out the hello world statement. When the locality prints out the statement
-the future returns to wait which invokes the lambda funtion '&'.  This 
-funtion '&' erases the thread from the set 'attendance' thus letting 
+the future returns to wait which invokes the lambda funtion '&'.  This
+funtion '&' erases the thread from the set 'attendance' thus letting
 [^hello_world_foreman] know how many localites still need to print out
 ["hello world]. However, if the future returns a value of -1 the thread is
-skipped and that thread remains in 'attendance' for another cycle of the 
+skipped and that thread remains in 'attendance' for another cycle of the
 while loop.
 
 Finally, let us look at [^hello_world_worker].  Here [^hello_world_worker]
@@ -253,7 +253,7 @@ This example exposes four differenct functions: init, add, query and print.
 What this example does is it takes an input from a client locality component,
 puts value in a data type (unsigned long) at the remote locality component.
 The print command from the client will print the contents of the remote locality
-component at the remote locality. The query command from the client will print 
+component at the remote locality. The query command from the client will print
 the contents of the remote locality component at client locality.
 
 [heading Building the example]

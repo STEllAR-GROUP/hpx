@@ -54,21 +54,22 @@ our talbes below.
 [heading The STE||AR Group]
 
 [table:contributors Contributors
-  [[Name]           [Institution]]
-  [[Hartmut Kaiser] [__cct__, __lsu__]]
-  [[Bryce Adelstein-Lelbach] [__cct__]]
-  [[Adrian Serio]   [__cct__, __lsu__]]
-  [[Alex Nagelberg] [__cct__, __lsu__]]
-  [[Matthew Anderson] [__crest__, __iu__]]
-  [[Thomas Heller] [__inf3__, __fau__]]
+  [[Name]               [Institution]]
+  [[Hartmut Kaiser]     [__cct__, __lsu__]]
+  [[Bryce Adelstein-Lelbach] [__cct__, __lsu__]]
+  [[Adrian Serio]       [__cct__, __lsu__]]
+  [[Alex Nagelberg]     [__cct__, __lsu__]]
+  [[Matthew Anderson]   [__crest__, __iu__]]
+  [[Thomas Heller]      [__inf3__, __fau__]]
+  [[Maciej Brodovicz]   [__cct__, __lsu__]]
 ]
 
 [heading Contributors to this Document]
 
-[table:authors Authors
+[table:authors Documentation Authors
   [[Name]           [Institution]]
   [[Hartmut Kaiser] [__cct__, __lsu__]]
-  [[Bryce Adelstein-Lelbach] [__cct__]]
+  [[Bryce Adelstein-Lelbach] [__cct__, __lsu__]]
   [[Adrian Serio]   [__cct__, __lsu__]]
 ]
 

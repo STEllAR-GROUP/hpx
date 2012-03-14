@@ -14,7 +14,7 @@
     [copyright 2011 2012 The STE||AR Group]
     [license
         Distributed under the Boost Software License, Version 1.0. (See
-        accompanying file [@../../LICENSE_1_0.txt LICENSE_1_0.txt] or copy at
+        accompanying file [@http://www.boost.org/LICENSE_1_0.txt LICENSE_1_0.txt] or copy at
         [@http://www.boost.org/LICENSE_1_0.txt])
     ]
 ]
@@ -55,7 +55,7 @@
 [def __danger__                 [$./images/alert.png]]
 
 [/ Section link shortcuts]
-[def __commandline__            [link hpx.getting_started.commandline HPX Command Line Options]]
+[def __commandline__            [link hpx.tutorial.getting_started.commandline HPX Command Line Options]]
 [def __people__                 [link hpx.people People]]
 
 [/ CONTENT]
@@ -71,9 +71,16 @@ can be found in the collection of __boost_tools__.
 
 [include preface.qbk]
 [include whats_new.qbk]
+
+[section:tutorial Tutorial]
+
 [include gettingstarted.qbk]
 [include introduction.qbk]
 [include examples.qbk]
+
+[endsect]
+[section:manual Manual]
+
+[endsect]
+
 [include people.qbk]
-
-
