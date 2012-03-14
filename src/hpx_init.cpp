@@ -1200,7 +1200,7 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void finalize(double shutdown_timeout, double localwait)
+    int finalize(double shutdown_timeout, double localwait)
     {
         if (localwait == -1.0)
             localwait = detail::get_option("hpx.finalize_wait_time", -1.0);
@@ -1220,6 +1220,8 @@ namespace hpx
         components::stubs::runtime_support::shutdown_all(
             naming::get_id_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX),
             shutdown_timeout);
+
+        return 0;
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -72,9 +72,7 @@ Will yeild:
   fibonacci(20) == 6765
   elapsed time: 0.233827 [s]
 
-To run this program on multiple localities please see the [link
-hpx.tutorial.getting_started.unix_installation.using_hpx_applications_with_pbs PBS]
-documentation.
+To run this program on multiple localities please see the __pbs__ documentation.
 
 [heading Walkthrough]
 
@@ -188,9 +186,8 @@ will yield:
     hello world from OS-thread 0 on locality 0
 
 Notice how the ordering of the two print statements will change with
-subsequent runs. To run this program on multiple localities please see the [link
-hpx.tutorial.getting_started.unix_installation.using_hpx_applications_with_pbs PBS]
-documentation.
+subsequent runs. To run this program on multiple localities please see the
+__pbs__ documentation.
 
 [heading Walkthrough]
 
@@ -205,8 +202,8 @@ In this excerpt of the code we again see the use of futures. This time
 these futures are stored in a vector so that they can easily be accessed.
 New to us is the [^wait()] function. Wait provides a way to make sure
 that all of the futures have finished being calculated without having to call
-[^.get()] for each one. As in the [link hpx.tutorial.examples.fibonacci 
-Fibonacci Example] our futures are set equal to an [^async<>] wrapped
+[^.get()] for each one. As in the __fibonacci_example__ our futures are set 
+equal to an [^async<>] wrapped
 action. This action is declared here:
 
 [hello_world_action_wrapper]

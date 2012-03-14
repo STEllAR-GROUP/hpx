@@ -38,11 +38,9 @@ std::size_t hello_world_worker(std::size_t desired)
     // Returns the OS-thread number of the worker that is running this
     // PX-thread.
     std::size_t current = hpx::get_worker_thread_num();
-
     if (current == desired)
     {
         // The PX-thread has been run on the desired OS-thread.
-
         char const* msg = "hello world from OS-thread %1% on locality %2%\n";
 
         hpx::cout << (boost::format(msg) % desired % hpx::get_locality_id())
@@ -59,12 +57,9 @@ std::size_t hello_world_worker(std::size_t desired)
 // Define the boilerplate code necessary for the function 'hello_world_worker'
 // to be invoked as an HPX action (by a HPX future).
 typedef hpx::actions::plain_result_action1<
-    // Return type.
-    std::size_t
-    // Arguments. 
-  , std::size_t
-    // Wrapped function. 
-  , hello_world_worker
+    std::size_t,          // return type
+    std::size_t,          // argument
+    hello_world_worker    // wrapped function
 > hello_world_worker_action;
 
 HPX_REGISTER_PLAIN_ACTION(hello_world_worker_action);
@@ -78,7 +73,7 @@ void hello_world_foreman()
     std::size_t const os_threads = hpx::get_os_thread_count();
 
     // Find the global name of the current locality.
-    hpx::naming::id_type const here = hpx::find_here(); 
+    hpx::naming::id_type const here = hpx::find_here();
 
     // Populate a set with the OS-thread numbers of all OS-threads on this
     // locality. When the hello world message has been printed on a particular
@@ -114,8 +109,11 @@ void hello_world_foreman()
         // is the index of the future in the vector, and the second is the
         // return value of the future. hpx::lcos::wait doesn't return until
         // all the futures in the vector have returned.
-        hpx::lcos::wait(futures, [&](std::size_t, std::size_t t)
-            { if (std::size_t(-1) != t) attendance.erase(t); });
+        hpx::lcos::wait(futures,
+            [&](std::size_t, std::size_t t) {
+                if (std::size_t(-1) != t)
+                    attendance.erase(t);
+            });
     }
 }
 //]
@@ -124,7 +122,7 @@ void hello_world_foreman()
 // to be invoked as an HPX action.
 //[hello_world_action_wrapper
 typedef hpx::actions::plain_action0<
-    // Wrapped function. 
+    // Wrapped function.
     hello_world_foreman
 > hello_world_foreman_action;
 
@@ -138,10 +136,10 @@ int hpx_main(boost::program_options::variables_map& vm)
 {
     {
         // Get a list of all available localities.
-        std::vector<hpx::naming::id_type> localities
-            = hpx::find_all_localities();
+        std::vector<hpx::naming::id_type> localities =
+            hpx::find_all_localities();
 
-        // Reserve storage space for futures, one for each locality. 
+        // Reserve storage space for futures, one for each locality.
         std::vector<hpx::lcos::future<void> > futures;
         futures.reserve(localities.size());
 
@@ -156,14 +154,12 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         // The non-callback version of hpx::lcos::wait takes a single parameter,
         // a future of vectors to wait on. hpx::lcos::wait only returns when
-        // all of the futures have finished. 
+        // all of the futures have finished.
         hpx::lcos::wait(futures);
     }
 
     // Initiate shutdown of the runtime system.
-    hpx::finalize();
-
-    return 0;
+    return hpx::finalize();
 }
 //]
 
@@ -178,16 +174,12 @@ int main(int argc, char* argv[])
     // Initialize and run HPX.
     return hpx::init(desc_commandline, argc, argv);
 }
-/*`
-  In HPX main is used to initialize the runtime system and pass the command 
-  line arguments to the program. If you wish to add command line options to 
-  your program you would add them here using the instance of the Boost 
-  class [^options_description], and invoking the public member function
-  [^.add_options()] (see __boost_doc__ or the 
-  [link hpx.tutorial.examples.fibonacci Fibonacci Example] 
-  for more details). [^hpx::init()] calls 
-  [^hpx_main] after setting up HPX, which is where the mechanics of our 
-  program is written.
- */
+//` In HPX `main` is used to initialize the runtime system and pass the command
+//` line arguments to the program. If you wish to add command line options to
+//` your program you would add them here using the instance of the Boost
+//` class `options_description`, and invoking the public member function
+//` `.add_options()` (see __boost_doc__ or the __fibonacci_example__
+//` for more details). `hpx::init()` calls `hpx_main` after setting up
+//` HPX, which is where the logic of our program is encoded.
 //]
 

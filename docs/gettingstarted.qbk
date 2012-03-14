@@ -181,7 +181,7 @@ options is outside the scope of this tutorial (the interested reader may refer
 to in-depth [@http://www.pbsworks.com/SupportDocuments.aspx documentation] for
 more information), below is a minimal example to illustrate the approach. As a
 test application we will use the multithreaded `hello_world` program, explained
-[link hpx.tutorial.examples.hello_world here].
+in the section __hello_world_example__.
 
 [teletype]
 ``

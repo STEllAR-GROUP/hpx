@@ -55,7 +55,12 @@
 [def __danger__                 [$./images/alert.png]]
 
 [/ Section link shortcuts]
+[def __pbs__                    [link hpx.tutorial.getting_started.unix_installation.using_hpx_applications_with_pbs PBS]]
 [def __commandline__            [link hpx.tutorial.getting_started.commandline HPX Command Line Options]]
+
+[def __fibonacci_example__      [link hpx.tutorial.examples.fibonacci Fibonacci Example]]
+[def __hello_world_example__    [link hpx.tutorial.examples.hello_world Hello World Example]]
+
 [def __people__                 [link hpx.people People]]
 
 [/ CONTENT]
@@ -72,15 +77,18 @@ can be found in the collection of __boost_tools__.
 [include preface.qbk]
 [include whats_new.qbk]
 
+[/////////////////////////////////////////////////////////////////////////////]
 [section:tutorial Tutorial]
 
 [include gettingstarted.qbk]
 [include introduction.qbk]
 [include examples.qbk]
 
-[endsect]
-[section:manual Manual]
+[endsect] [/ Tutorial]
 
-[endsect]
+[/////////////////////////////////////////////////////////////////////////////]
+[section:manual Refernce Manual]
+
+[endsect] [/ Manual]
 
 [include people.qbk]
