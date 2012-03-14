@@ -11,6 +11,7 @@
 #include <hpx/performance_counters/high_resolution_clock.hpp>
 #include <hpx/components/papi/server/papi.hpp>
 #include <hpx/components/papi/util/papi.hpp>
+#include <hpx/exception.hpp>
 
 #include <functional>
 
@@ -53,6 +54,12 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
             "could not create PAPI event set", locstr);
         papi_call(PAPI_assign_eventset_component(evset_, 0),
             "cannot assign component index to event set", locstr);
+        unsigned long tid = tm.get_thread_id(tix);
+        if (tid == tm.invalid_tid)
+            HPX_THROW_EXCEPTION(hpx::bad_parameter,
+                NS_STR "thread_counters::thread_counters()",
+                "unable to retrieve correct OS thread ID for profiling "
+                "(perhaps thread was not registered)");
         papi_call(PAPI_attach(evset_, tm.get_thread_id(tix)),
             "failed to attach thread to PAPI event set", locstr);
         tm.register_callback(tix,
@@ -65,7 +72,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
             mutex_type::scoped_lock m(mtx_);
             finalize();
         }
-        // callback cancellation is moved outside the mutex to avoid potential deadlock
+        // callback cancellation moved outside the mutex to avoid potential deadlock
         hpx::get_runtime().get_thread_mapper().revoke_callback(thread_index_);
     }
 
@@ -193,30 +200,28 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         counter_path_elements cpe;
         get_counter_path_elements(info.fullname_, cpe);
         // convert event name to code and check availability
-        boost::format fmt("%s does not seem to be a valid event name");
         papi_call(PAPI_event_name_to_code(const_cast<char *>(cpe.countername_.c_str()),
                                           const_cast<int *>(&event_)),
-                  str(fmt % cpe.countername_), locstr);
-        fmt = boost::format("event %s is not available on this platform");
+            cpe.countername_+" does not seem to be a valid event name", locstr);
         papi_call(PAPI_query_event(event_),
-                  str(fmt % cpe.countername_), locstr);
+            "event "+cpe.countername_+" is not available on this platform", locstr);
         // find OS thread associated with the counter
         hpx::util::thread_mapper& tm = get_runtime().get_thread_mapper();
         boost::uint32_t tix = tm.get_thread_index(cpe.instancename_.c_str(),
                                                   cpe.instanceindex_);
         if (tix == hpx::util::thread_mapper::invalid_index)
         {
-            fmt = boost::format("could not find %s#%d");
+            boost::format fmt("could not find %s#%d");
             HPX_THROW_EXCEPTION(hpx::no_success, locstr,
-                                str(fmt % cpe.instancename_ % cpe.instanceindex_));
+                boost::str(fmt % cpe.instancename_ % cpe.instanceindex_));
         }
         // associate low level counters object
         counters_ = get_thread_counters(tix);
         if (!counters_)
         {
-            fmt = boost::format("failed to find low level counters for %s#%d");
+            boost::format fmt("failed to find low level counters for %s#%d");
             HPX_THROW_EXCEPTION(hpx::no_success, locstr,
-                                str(fmt % cpe.instancename_ % cpe.instanceindex_));
+                boost::str(fmt % cpe.instancename_ % cpe.instanceindex_));
         }
         // counting is not enabled here; it has to be started explicitly
     }

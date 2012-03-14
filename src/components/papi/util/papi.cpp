@@ -38,11 +38,9 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
     {
         std::map<std::string, int>::const_iterator it = papi_domain_map.find(s);
         if (it == papi_domain_map.end())
-        {
-            boost::format fmt("invalid argument %s for --papi-domain");
             HPX_THROW_EXCEPTION(hpx::commandline_option_error,
-                                NS_STR "check_options()", str(fmt % s));
-        }
+                NS_STR "check_options()",
+                "invalid argument "+s+" to --papi-domain");
         return it->second;
     }
 
@@ -119,12 +117,6 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
                 HPX_THROW_EXCEPTION(hpx::commandline_option_error,
                     NS_STR "check_options()",
                     "unsupported mode "+v+" in --papi-event-info");
-            // FIXME: implement this
-            if (v == "native")
-                HPX_THROW_EXCEPTION(hpx::not_implemented,
-                    NS_STR "check_options()",
-                    "native events are currently not supported");
-            list_events();
         }
         if (vm.count("papi-domain"))
         {
@@ -135,7 +127,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
                 NS_STR "check_options()");
             needed = true;
         }
-        // FIXME: implement multiplexing and uncomment below when done
+        // FIXME: implement multiplexing properly and uncomment below when done
         if (vm.count("papi-multiplex"))
             HPX_THROW_EXCEPTION(hpx::not_implemented,
                 NS_STR "check_options()",
@@ -186,20 +178,98 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
         return s;
     }
 
-    // list available events with descriptions
-    void list_events()
+    void list_presets()
     {
-        using boost::asio::ip::host_name;
-
-        std::string host(host_name());
         boost::format fmt = boost::format(
             std::string("Event        : %s\n"
                         "Type         : %s\n"
+                        "Code         : 0x%x\n"
                         "Derived from : %s\n"
                         "Description  : %s\n"
                         "%s")+                 // optional note
                             std::string(79, '-')+'\n');
 
+
+        // collect available events and print their descriptions
+        avail_preset_info_gen gen;
+        boost::generator_iterator_generator<avail_preset_info_gen>::type it;
+        for (it = boost::make_generator_iterator(gen); *it != 0; ++it)
+        {
+            std::string note;
+            if ((*it)->note && strlen((*it)->note) > 0)
+            { // is this actually provided anywhere??
+                note = "Note:\n";
+                note += (*it)->note;
+                note += "\n";
+            }
+            std::cout << fmt % (*it)->symbol
+                             % decode_preset_type((*it)->event_type)
+                             % (*it)->event_code
+                             % dependencies(**it)
+                             % (*it)->long_descr
+                             % note;
+        }
+    }
+
+    std::string registers(PAPI_event_info_t const& info)
+    {
+        if (!info.count) return "-";
+        std::string regs;
+        for (unsigned i = 0; i < info.count; ++i)
+        {
+            if (info.name[i][0])
+            {
+                if (!regs.empty()) regs += std::string(15, ' ');
+                boost::format fmt("reg[%d] name: %-20s value: 0x%16x\n");
+                regs += boost::str(fmt % i % info.name[i] % info.code[i]);
+            }
+        }
+        return regs;
+    }
+
+    void print_native_info(PAPI_event_info_t const& info)
+    {
+        boost::format fmt = boost::format(
+            std::string("Event        : %s\n"
+                        "Type         : native\n"
+                        "Code         : 0x%x\n"
+                        "Registers    : %s\n"
+                        "Description  : %s\n"
+                        "%s")+                 // optional note
+                            std::string(79, '-')+'\n');
+        std::string note;
+        if (info.note && strlen(info.note) > 0)
+        {
+            note = "Note:\n";
+            note += info.note;
+            note += "\n";
+        }
+        std::cout << fmt % info.symbol
+                         % info.event_code
+                         % registers(info)
+                         % info.long_descr
+                         % note;
+    }
+
+    void list_native()
+    {
+        // list available events for each PAPI component
+        for (int ci = 0; ci < PAPI_num_components(); ++ci)
+        {
+            native_info_gen gen(ci);
+            boost::generator_iterator_generator<native_info_gen>::type it =
+                boost::make_generator_iterator(gen);
+            for ( ; *it != 0; ++it)
+                print_native_info(**it);
+        }
+    }
+
+    // list available events with descriptions
+    void list_events(std::string const& scope)
+    {
+        using boost::asio::ip::host_name;
+
+        std::string host(host_name());
         // print header
         std::string hdr("PAPI events available on ");
         if (!host.empty())
@@ -214,25 +284,8 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
         }
         std::cout << hdr << std::endl
                   << std::string(hdr.length(), '=') << std::endl;
-
-        // collect available events and print their descriptions
-        event_info_generator<false> gen;
-        boost::generator_iterator_generator<event_info_generator<false> >::type it;
-        for (it = boost::make_generator_iterator(gen); *it != 0; ++it)
-        {
-            std::string note;
-            if ((*it)->note && strlen((*it)->note) > 0)
-            {
-                note = "Note:\n";
-                note += (*it)->note;
-                note += "\n";
-            }
-            std::cout << fmt % (*it)->symbol
-                             % decode_preset_type((*it)->event_type)
-                             % dependencies(**it)
-                             % (*it)->long_descr
-                             % note;
-        }
+        if (scope == "preset" || scope == "all") list_presets();
+        if (scope == "native" || scope == "all") list_native();
     }
 
 }}}}

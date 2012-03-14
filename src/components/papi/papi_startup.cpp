@@ -9,12 +9,12 @@
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
 #include <boost/program_options.hpp>
-#include <boost/generator_iterator.hpp>
 
 #include <hpx/hpx.hpp>
 #include <hpx/util/thread_mapper.hpp>
 #include <hpx/components/papi/server/papi.hpp>
 #include <hpx/components/papi/util/papi.hpp>
+#include <hpx/exception.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality
@@ -31,6 +31,7 @@ namespace hpx { namespace performance_counters { namespace papi
     using boost::program_options::options_description;
     using boost::program_options::variables_map;
     using hpx::performance_counters::counter_info;
+    using hpx::performance_counters::counter_path_elements;
     using hpx::util::thread_mapper;
     using util::papi_call;
 
@@ -76,9 +77,40 @@ namespace hpx { namespace performance_counters { namespace papi
             return hpx::naming::invalid_gid;
         }
 
-        if (&ec != &hpx::throws)
-            ec = hpx::make_success_code();
+        if (&ec != &hpx::throws) ec = hpx::make_success_code();
         return id;
+    }
+
+    template<class T>
+    bool discover_events(counter_path_elements& cpe,
+        std::vector<char const *> const& labels,
+        hpx::performance_counters::counter_info& info,
+        T& gen,
+        HPX_STD_FUNCTION<hpx::performance_counters::discover_counter_func> const& f,
+        hpx::error_code& ec)
+    {
+        typename boost::generator_iterator_generator<T>::type gi =
+            boost::make_generator_iterator(gen);
+        for ( ; *gi != 0; ++gi)
+        {
+            std::vector<char const *>::const_iterator it;
+            // iterate over known thread names
+            for (it = labels.begin(); it != labels.end(); ++it)
+            {
+                cpe.instancename_ = *it;
+                cpe.instancename_ += "#<*>";
+                cpe.countername_ = (*gi)->symbol;
+
+                hpx::performance_counters::counter_status status =
+                    get_counter_name(cpe, info.fullname_, ec);
+                if (!status_is_valid(status)) return false;
+                std::string evstr((*gi)->long_descr);
+                info.helptext_ = "returns the count of occurrences of \""+
+                    evstr+"\" in "+(*it)+" instance";
+                if (!f(info, ec) || ec) return false;
+            }
+        }
+        return true;
     }
 
     // discover available PAPI counters
@@ -87,10 +119,7 @@ namespace hpx { namespace performance_counters { namespace papi
         HPX_STD_FUNCTION<hpx::performance_counters::discover_counter_func> const& f,
         hpx::error_code& ec)
     {
-        typedef util::event_info_generator<true> all_info_gen;
-
-        hpx::performance_counters::counter_info specinfo = info;
-        using hpx::performance_counters::counter_path_elements;
+        hpx::performance_counters::counter_info cnt_info = info;
 
         // decompose the counter name
         counter_path_elements p;
@@ -100,8 +129,7 @@ namespace hpx { namespace performance_counters { namespace papi
 
         // obtain known OS thread categories
         std::vector<char const *> labels;
-        hpx::util::thread_mapper& tm =
-            get_runtime().get_thread_mapper();
+        hpx::util::thread_mapper& tm = get_runtime().get_thread_mapper();
         tm.get_registered_labels(labels);
 
         // fill in common path segments for all counters
@@ -111,28 +139,20 @@ namespace hpx { namespace performance_counters { namespace papi
         cpe.parentinstanceindex_ = -1;
         cpe.instanceindex_ = -1;
 
-        // enumerate PAPI events
-        all_info_gen gen;
-        boost::generator_iterator_generator<all_info_gen >::type gi =
-            boost::make_generator_iterator(gen);
-        for ( ; *gi != 0; ++gi)
+        // enumerate PAPI presets
         {
-            // iterate over possible thread names
-            std::vector<char const *>::const_iterator it;
-            for (it = labels.begin(); it != labels.end(); ++it)
-            {
-                cpe.instancename_ = *it;
-                cpe.instancename_ += "#<*>";
-                cpe.countername_ = (*gi)->symbol;
-
-                status = get_counter_name(cpe, specinfo.fullname_, ec);
-                if (!status_is_valid(status)) return false;
-                std::string evstr((*gi)->short_descr);
-                specinfo.helptext_ = "returns the count of occurrences of \""+
-                    evstr+"\" in "+(*it)+" instance";
-                if (!f(specinfo, ec) || ec) return false;
-            }
+            util::all_preset_info_gen gen;
+            if (!discover_events(cpe, labels, cnt_info, gen, f, ec))
+                return false;
         }
+        // enumerate PAPI native events
+        for (int ci = 0; ci < PAPI_num_components(); ++ci)
+        {
+            util::native_info_gen gen(ci);
+            if (!discover_events(cpe, labels, cnt_info, gen, f, ec))
+                return false;
+        }
+
         if (&ec != &hpx::throws)
             ec = hpx::make_success_code();
         return true;
@@ -181,6 +201,14 @@ namespace hpx { namespace performance_counters { namespace papi
             &discover_papi_counters
         };
         install_counter_types(&papi_cnt_type, 1);
+
+        // deferred options
+        variables_map vm = util::get_options();
+        if (vm.count("papi-event-info"))
+        {
+            std::string v = vm["papi-event-info"].as<std::string>();
+            util::list_events(v);
+        }
     }
 
     bool check_startup(HPX_STD_FUNCTION<void()>& startup_func)
