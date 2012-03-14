@@ -205,7 +205,7 @@ In this excerpt of the code we again see the use of futures. This time
 these futures are stored in a vector so that they can easily be accessed.
 New to us is the [^wait()] function. Wait provides a way to make sure
 that all of the futures have finished being calculated without having to call
-[^.get()] for each one. As in the [link hpx.tutorial.examples.fibonacci
+[^.get()] for each one. As in the [link hpx.tutorial.examples.fibonacci 
 Fibonacci Example] our futures are set equal to an [^async<>] wrapped
 action. This action is declared here:
 

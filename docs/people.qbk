@@ -54,8 +54,8 @@ our talbes below.
 [heading The STE||AR Group]
 
 [table:contributors Contributors
-  [[Name]               [Institution]]
-  [[Hartmut Kaiser]     [__cct__, __lsu__]]
+  [[Name]                    [Institution]]
+  [[Hartmut Kaiser]          [__cct__, __lsu__]]
   [[Bryce Adelstein-Lelbach] [__cct__, __lsu__]]
   [[Adrian Serio]       [__cct__, __lsu__]]
   [[Alex Nagelberg]     [__cct__, __lsu__]]
@@ -68,13 +68,20 @@ our talbes below.
 [heading Contributors to this Document]
 
 [table:authors Documentation Authors
-  [[Name]           [Institution]]
-  [[Hartmut Kaiser] [__cct__, __lsu__]]
+  [[Name]                    [Institution]]
+  [[Hartmut Kaiser]          [__cct__, __lsu__]]
   [[Bryce Adelstein-Lelbach] [__cct__, __lsu__]]
-  [[Adrian Serio]   [__cct__, __lsu__]]
-  [[Steven Brandt] [__cct__, __lsu__]]
+  [[Steven Brandt]           [__cct__, __lsu__]]
+  [[Adrian Serio]            [__cct__, __lsu__]]
   [[Maciej Brodowicz] [__cct__, __lsu__]]
 ]
+
+[heading Acknowledgements]
+
+In addtion to the people who worked directly with HPX development we would
+like to acknowledge Thomas Sterling, who was instrumental in the creation
+of HPX as well as the NSF, DARPA, and __cct__ who fund and support our
+work.
 
 [endsect] [/ People]
 
