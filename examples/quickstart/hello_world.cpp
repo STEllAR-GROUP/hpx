@@ -183,9 +183,11 @@ int main(int argc, char* argv[])
   line arguments to the program. If you wish to add command line options to 
   your program you would add them here using the instance of the Boost 
   class [^options_description], and invoking the public member function
-  [^.add_options()] (see __boost_doc__ or the [link hpx.examples.fibonacci
-  Fibonacci Example] for more details). [^hpx::init()] calls [^hpx_main] after
-  setting up HPX, which is where the mechanics of our program is written.
+  [^.add_options()] (see __boost_doc__ or the 
+  [link hpx.tutorial.examples.fibonacci Fibonacci Example] 
+  for more details). [^hpx::init()] calls 
+  [^hpx_main] after setting up HPX, which is where the mechanics of our 
+  program is written.
  */
 //]
 
