@@ -244,13 +244,14 @@ int hpx_main(boost::program_options::variables_map &vm)
           hpx::lcos::wait(whohasthisedge_phase,boost::bind(&whohasthisedge_callback,_1,_2,boost::ref(point_components)));
         } else {
           std::vector<hpx::lcos::future< void > > ppedge_phase;
-          //for (int64_t j=1;j<= nglobalverts;j++) 
           int64_t delta = nglobalverts/num_pe;
           int64_t extra = nglobalverts%num_pe;
           for (std::size_t i=0;i<num_pe;i++) {
             int64_t start = i*delta + 1;
             int64_t stop = (i+1)*delta;
-            std::cout << " TEST start " << start << " stop " << stop << std::endl;
+            if ( i == num_pe - 1 ) {
+              stop += extra;
+            }
             ppedge_phase.push_back(points[i].ppedge_async(start,stop,point_components));
           }
           hpx::lcos::wait(ppedge_phase);

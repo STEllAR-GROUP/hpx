@@ -127,6 +127,20 @@ namespace graph500
             return this->base_type::distributed_validate(gid_,scale);
         }
 
+        hpx::lcos::future< std::vector<bool> > findwhohasthisedge_async(int64_t edge,
+                            std::vector<hpx::naming::id_type> const& point_components)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::findwhohasthisedge_async(gid_,edge,point_components);
+        }
+
+        std::vector<bool> findwhohasthisedge(int64_t edge,
+                            std::vector<hpx::naming::id_type> const& point_components)
+        {
+            BOOST_ASSERT(gid_);
+            return this->base_type::findwhohasthisedge(gid_,edge,point_components);
+        }
+
         hpx::lcos::future< std::vector<int64_t> > get_numedges_async()
         {
             BOOST_ASSERT(gid_);

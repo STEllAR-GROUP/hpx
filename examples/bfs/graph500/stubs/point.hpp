@@ -122,6 +122,23 @@ namespace graph500 { namespace stubs
             return distributed_validate_async(gid,scale).get();
         }
 
+        static hpx::lcos::future< std::vector<bool> >
+        findwhohasthisedge_async(hpx::naming::id_type const& gid,int64_t edge,
+           std::vector<hpx::naming::id_type> const& point_components)
+        {
+            typedef server::point::findwhohasthisedge_action action_type;
+            return hpx::lcos::async<action_type>(gid,edge,point_components);
+        }
+
+        static std::vector<bool> findwhohasthisedge(hpx::naming::id_type const& gid,
+                                                    int64_t edge,
+                            std::vector<hpx::naming::id_type> const& point_components)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the future.
+            return findwhohasthisedge_async(gid,edge,point_components).get();
+        }
+
         static hpx::lcos::future< std::vector<int64_t> >
         get_numedges_async(hpx::naming::id_type const& gid)
         {

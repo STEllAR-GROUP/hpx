@@ -82,6 +82,13 @@ namespace graph500 { namespace server
         bool get_numedges_callback(std::size_t i,resolvedata r);
 
         std::vector<int64_t> get_numedges();
+
+        std::vector<bool> findwhohasthisedge(int64_t edge,
+           std::vector<hpx::naming::id_type> const& point_components);
+
+        bool findwhohasthisedge_callback(int64_t j,std::vector<bool> const& has_edge,
+                     std::vector<hpx::naming::id_type> const& point_components,
+                     int64_t start);
   
         void ppedge(int64_t start, int64_t stop, std::vector<hpx::naming::id_type> const& point_components);
 
@@ -111,7 +118,8 @@ namespace graph500 { namespace server
             point_get_parent = 6,
             point_distributed_validate = 7,
             point_get_numedges = 8,
-            point_ppedge = 9
+            point_ppedge = 9,
+            point_findwhohasthisedge = 10
         };
 
         typedef hpx::actions::action4<
@@ -198,6 +206,20 @@ namespace graph500 { namespace server
             &point::distributed_validate
         > distributed_validate_action;
 
+        typedef hpx::actions::result_action2<
+            // Component server type.
+            point,
+            // Return type.
+            std::vector<bool>,
+            // Action code.
+            point_findwhohasthisedge,
+            // Arguments of this action.
+            int64_t,
+            std::vector<hpx::naming::id_type> const&,
+            // Method bound to this action.
+            &point::findwhohasthisedge
+        > findwhohasthisedge_action;
+
         typedef hpx::actions::result_action0<
             // Component server type.
             point,
@@ -263,6 +285,10 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     graph500::server::point::ppedge_action,
     graph500_point_ppedge_action);
+
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    graph500::server::point::findwhohasthisedge_action,
+    graph500_point_findwhohasthisedge_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     graph500::server::point::receive_duplicates_action,
