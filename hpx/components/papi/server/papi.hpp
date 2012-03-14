@@ -14,8 +14,6 @@
 #include <hpx/util/interval_timer.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
 
-#include <boost/chrono/chrono.hpp>
-
 #include <papi.h>
 
 namespace hpx { namespace performance_counters { namespace papi { namespace server
