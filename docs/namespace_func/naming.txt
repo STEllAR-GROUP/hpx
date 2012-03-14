@@ -7,3 +7,101 @@ example_class		this class belongs in **** namespace...
 example_module		bla bla bla....
 
 
+hpx/runtime/naming/address.hpp
+
+hpx::naming::address
+    address()
+    address(locality const&,component_type t=components::component_invalid)
+    address(locality const&,component_type,void *lva)
+    address(locality const&,component_type,address_type)
+    address(void *lva)
+    operator util::safe_bool<address>::result_type() const
+    locality locality_;
+    component_type type_;
+    address_type address_;
+std::ostream& operator<< (std::ostream&, address const&)
+
+hpx/runtime/naming/locality.hpp
+
+hpx::naming::locality
+    locality()
+    locality(std::string const& addr,boost::uint16_t port)
+    locality(boost::asio::ip::address addr, boost::uint16_t port)
+    explicit locality(boost::asio::ip::tcp::endpoint ep)
+    locality& operator= (boost::asio::ip::tcp::endpoint ep)
+    /// \brief Returns an iterator which when dereferenced will give an
+    ///        endpoint suitable for a call to accept() related to this
+    ///        locality
+    iterator_type accept_begin(boost::asio::io_service& io_service) const;
+    iterator_type accept_end() const
+
+    /// \brief Returns an iterator which when dereferenced will give an
+    ///        endpoint suitable for a call to connect() related to this
+    ///        locality
+    iterator_type connect_begin(boost::asio::io_service& io_service) const;
+    iterator_type connect_end() const
+    operators: ==, !=, <, >
+    operator util::safe_bool<locality>::result_type() const
+    std::string const& get_address() const
+    boost::uint16_t get_port() const 
+std::ostream& operator<< (std::ostream&, locality const&)
+
+hpx/runtime/naming/name.hpp
+
+hpx::naming::gid_type
+    static boost::uint64_t const credit_base_mask
+    static boost::uint64_t const credit_mask
+    static boost::uint64_t const was_split_mask
+
+    explicit gid_type (boost::uint64_t lsb_id = 0)
+    explicit gid_type (boost::uint64_t msb_id, boost::uint64_t lsb_id)
+    gid_type& operator=(boost::uint64_t lsb_id)
+    operator util::safe_bool<gid_type>::result_type() const
+    operators: ++,++(int),--,--(int),+,+=,-,-=,&,==,!=,<,<=,>,>=
+    boost::uint64_t get_msb() const
+    void set_msb(boost::uint64_t msb)
+    boost::uint64_t get_lsb() const
+    void set_lsb(boost::uint64_t lsb)
+    void set_lsb(void* lsb)
+
+functions in hpx::naming
+
+std::ostream& operator<< (std::ostream&, gid_type const&)
+gid_type get_gid_from_locality_id(boost::uint32_t prefix)
+boost::uint32_t get_locality_id_from_gid(gid_type const& id)
+gid_type get_locality_from_gid(gid_type const& id)
+boost::uint32_t const invalid_locality_id
+boost::uint16_t get_credit_from_gid(gid_type const& id)
+boost::uint16_t add_credit_to_gid(gid_type& id, boost::uint16_t credit)
+boost::uint64_t strip_credit_from_gid(boost::uint64_t msb)
+void strip_credit_from_gid(gid_type& id)
+gid_type strip_credit_from_gid(gid_type const& id)
+gid_type strip_credit_from_cgid(gid_type const& id)
+void set_credit_for_gid(gid_type& id, boost::uint16_t credit)
+gid_type split_credits_for_gid(gid_type& id, int fraction = 2)
+bool gid_was_split(gid_type const& id)
+gid_type const invalid_gid
+
+hpx::naming::id_type
+    id_type()
+    explicit id_type(boost::uint64_t lsb_id, management_type t)
+    explicit id_type(gid_type const& gid, management_type t)
+    explicit id_type(boost::uint64_t,boost::uint64_t,management_type)
+    gid_type& get_gid()
+    // This function is used in AGAS unit tests, do not remove.
+    // Do we want it exposed?
+    management_type get_management_type() const
+    operators: ++,++(int),==,!=,<,<=,>,>=
+    operator util::safe_bool<id_type>::result_type() const
+    boost::uint64_t get_msb() const
+    boost::uint64_t get_lsb() const
+    void set_lsb(boost::uint64_t lsb)
+    void set_lsb(void* lsb)
+std::ostream& operator<< (std::ostream& os, id_type const& id)
+
+functions in hpx::naming
+    id_type get_id_from_locality_id(boost::uint32_t prefix)
+    boost::uint32_t get_locality_id_from_id(id_type const& id)
+    id_type get_locality_from_id(id_type const& id)
+    id_type const invalid_id
+    
