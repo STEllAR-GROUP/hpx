@@ -69,10 +69,21 @@ namespace hpx { namespace util
                         agas_host + ") not found in node list");
                 }
 
-                if (debug_ && !agas_node_.empty())
-                    std::cerr << "using AGAS host: '" << agas_node_
-                              << "' (node number " << agas_node_num_ << ")"
-                              << std::endl;
+                if (debug_) {
+                    if (!agas_node_.empty()) {
+                        std::cerr << "using AGAS host: '" << agas_node_
+                                  << "' (node number " << agas_node_num_ << ")"
+                                  << std::endl;
+                    }
+                    std::cerr << "Nodes from file:" << std::endl;
+                    std::map<std::string, std::size_t>::const_iterator end = nodes_.end();
+                    for (std::map<std::string, std::size_t>::const_iterator it = nodes_.begin();
+                         it != end; ++it)
+                    {
+                        std::cerr << (*it).first << ":" << (*it).second
+                            << std::endl;
+                    }
+                }
             }
             else if (debug_) {
                 std::cerr << "failed opening: " << nodefile << std::endl;
@@ -134,10 +145,20 @@ namespace hpx { namespace util
                 ") not found in node list");
         }
 
-        if (debug_ && !agas_node_.empty()) {
-            std::cerr << "using AGAS host: '" << agas_node_
-                      << "' (node number " << agas_node_num_ << ")"
-                      << std::endl;
+        if (debug_) {
+            if (!agas_node_.empty()) {
+                std::cerr << "using AGAS host: '" << agas_node_
+                    << "' (node number " << agas_node_num_ << ")" << std::endl;
+            }
+
+            std::cerr << "Nodes from nodelist:" << std::endl;
+            std::map<std::string, std::size_t>::const_iterator end = nodes_.end();
+            for (std::map<std::string, std::size_t>::const_iterator it = nodes_.begin();
+                  it != end; ++it)
+            {
+                std::cerr << (*it).first << ":" << (*it).second
+                    << std::endl;
+            }
         }
         return nodes_list;
     }
