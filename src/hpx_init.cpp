@@ -920,7 +920,7 @@ namespace hpx
             if (vm.count("hpx:threads")) {
                 if (env.run_with_pbs()) {
                     std::cerr  << "hpx::init: command line warning: --hpx:threads "
-                        "used used when running with PBS, the application might"
+                        "used when running with PBS, the application might "
                         "not run properly." << std::endl;
                 }
                 num_threads = vm["hpx:threads"].as<std::size_t>();
