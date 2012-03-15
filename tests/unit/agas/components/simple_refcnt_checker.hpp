@@ -9,7 +9,7 @@
 #define HPX_8E877149_A22D_4120_8C0A_BC206BBFA3B4
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/future.hpp>
+#include <hpx/lcos/promise.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
@@ -30,7 +30,7 @@ struct simple_refcnt_monitor
     > base_type;
 
   private:
-    lcos::future<void> flag_;
+    lcos::promise<void> flag_;
     naming::id_type const locality_;
 
     using base_type::create;
@@ -46,7 +46,7 @@ struct simple_refcnt_monitor
       : locality_(naming::get_locality_from_gid(locality)
                 , naming::id_type::unmanaged)
     {
-        this->base_type::create_one(locality, flag_.get_gid());
+        this->base_type::create_one(locality_, flag_.get_gid());
     }
 
     /// Create a new component on the target locality.
@@ -55,7 +55,7 @@ struct simple_refcnt_monitor
         )
       : locality_(naming::get_locality_from_id(locality))
     {
-        this->base_type::create_one(locality, flag_.get_gid());
+        this->base_type::create_one(locality_, flag_.get_gid());
     }
 
     lcos::future<void> take_reference_async(
@@ -125,7 +125,9 @@ struct simple_object
         naming::gid_type const& locality
         )
     {
-        this->base_type::create_one(locality, naming::invalid_id);
+        this->base_type::create_one(
+            naming::id_type(locality, naming::id_type::unmanaged),
+            naming::invalid_id);
     }
 
     /// Create a new component on the target locality.
