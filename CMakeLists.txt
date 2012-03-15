@@ -139,7 +139,7 @@ endif()
 if(${HPX_INTERNAL_CHRONO})
   add_definitions(-DHPX_INTERNAL_CHRONO)
   add_definitions(-DBOOST_CHRONO_NO_LIB)
-  # Don't use hpx_link_directories/hpx_include_directories to avoid passing 
+  # Don't use hpx_link_directories/hpx_include_directories to avoid passing
   # paths from the source tree to FindHPX.cmake
   include_directories(${hpx_SOURCE_DIR}/external/chrono)
 else()
@@ -154,7 +154,7 @@ endif()
 
 if(${HPX_INTERNAL_MOVE})
   add_definitions(-DHPX_INTERNAL_MOVE)
-  # Don't use hpx_link_directories/hpx_include_directories to avoid passing 
+  # Don't use hpx_link_directories/hpx_include_directories to avoid passing
   # paths from the source tree to FindHPX.cmake.
   include_directories(${hpx_SOURCE_DIR}/external/move)
 endif()
@@ -1177,16 +1177,18 @@ endif()
 ################################################################################
 # external build system support (FindHPX.cmake, pkgconfig)
 ################################################################################
-hpx_include_directories(/usr/local/include /usr/include)
+if(NOT WIN32)
+  hpx_include_directories(/usr/local/include /usr/include)
+endif()
 
 list(REMOVE_DUPLICATES HPX_LINK_DIRECTORIES)
 list(REMOVE_DUPLICATES HPX_INCLUDE_DIRECTORIES)
 
-set(external_rpath ${HPX_RPATH}) 
+set(external_rpath ${HPX_RPATH})
 
 foreach(directory ${HPX_LINK_DIRECTORIES})
   set(external_link_directories "${external_link_directories} ${directory}")
-  set(external_rpath "${external_rpath}:${directory}")  
+  set(external_rpath "${external_rpath}:${directory}")
 endforeach()
 
 foreach(directory ${HPX_INCLUDE_DIRECTORIES})
