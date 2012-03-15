@@ -302,7 +302,7 @@ endif()
 # RPATH configuration
 ################################################################################
 set(HPX_RPATH "${CMAKE_INSTALL_PREFIX}/lib/hpx:${CMAKE_BINARY_DIR}/lib/hpx"
-    CACHE STRING "Base RPATH for linking")
+    CACHE STRING "Base RPATH for linking" FORCE)
 
 ################################################################################
 # C++11 configuration
