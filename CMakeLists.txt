@@ -1177,10 +1177,6 @@ endif()
 ################################################################################
 # external build system support (FindHPX.cmake, pkgconfig)
 ################################################################################
-if(NOT WIN32)
-  hpx_include_directories(/usr/local/include /usr/include)
-endif()
-
 list(REMOVE_DUPLICATES HPX_LINK_DIRECTORIES)
 list(REMOVE_DUPLICATES HPX_INCLUDE_DIRECTORIES)
 
