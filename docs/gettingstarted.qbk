@@ -206,9 +206,10 @@ available is pointless and may prevent PBS from accepting the script.
 correct path to the executable (`hello_world` in this case) and command line
 options.  Since the `hello_world` application doesn't need any command line
 options, `APP_OPTIONS` has been left empty. Unlike in other execution
-environments, there is no need to use the `--hpx:threads` option to indicate the
-required number of OS threads per node; HPX library will derive this parameter
-automatically from PBS.
+environments, there is no need to use the 
+[link hpx.tutorial.getting_started.commandline --hpx:threads] option to 
+indicate the required number of OS threads per node; HPX library will 
+derive this parameter automatically from PBS.
 
 Finally, `pbsdsh` is a PBS command that starts a distributed job using allocated
 execution resources. It is recommended to leave this line as shown and modify
