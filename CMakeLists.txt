@@ -84,6 +84,8 @@ include(HPX_FortranCompiler)
 ################################################################################
 # search path configuration
 ################################################################################
+# Don't use hpx_link_directories/hpx_include_directories to avoid passing paths
+# from the source tree to FindHPX.cmake
 include_directories(${hpx_SOURCE_DIR})
 include_directories(${hpx_SOURCE_DIR}/external/atomic)
 include_directories(${hpx_SOURCE_DIR}/external/cache)
@@ -106,8 +108,8 @@ hpx_option(HPX_INTERNAL_CHRONO BOOL "Use HPX's internal version of Boost.Chrono 
 # Boost.Move is in newer versions of Boost
 hpx_option(HPX_INTERNAL_MOVE BOOL "Use HPX's internal version of Boost.Move (default: OFF)" OFF ADVANCED)
 
-# this cmake module will snag the Boost version we'll be using (which we need
-# to know to specify the Boost libraries that we want to look for).
+# This cmake module will snag the Boost version we'll be using (which we need
+# to know to specify the Boost libraries that we want to look for)
 find_package(HPX_BoostVersion)
 
 if(NOT BOOST_VERSION_FOUND)
@@ -137,6 +139,8 @@ endif()
 if(${HPX_INTERNAL_CHRONO})
   add_definitions(-DHPX_INTERNAL_CHRONO)
   add_definitions(-DBOOST_CHRONO_NO_LIB)
+  # Don't use hpx_link_directories/hpx_include_directories to avoid passing 
+  # paths from the source tree to FindHPX.cmake
   include_directories(${hpx_SOURCE_DIR}/external/chrono)
 else()
   set(BOOST_LIBRARIES ${BOOST_LIBRARIES} chrono)
@@ -150,14 +154,16 @@ endif()
 
 if(${HPX_INTERNAL_MOVE})
   add_definitions(-DHPX_INTERNAL_MOVE)
+  # Don't use hpx_link_directories/hpx_include_directories to avoid passing 
+  # paths from the source tree to FindHPX.cmake.
   include_directories(${hpx_SOURCE_DIR}/external/move)
 endif()
 
 # We have a patched version of FindBoost loosely based on the one that Kitware ships
 find_package(HPX_Boost)
 
-include_directories(${BOOST_INCLUDE_DIR})
-link_directories(${BOOST_LIBRARY_DIR})
+hpx_include_directories(${BOOST_INCLUDE_DIR})
+hpx_link_directories(${BOOST_LIBRARY_DIR})
 
 # Boost preprocessor definitions
 add_definitions(-DBOOST_PARAMETER_MAX_ARITY=7)
@@ -213,6 +219,8 @@ include(HPX_SVNRevision)
 ################################################################################
 # Installation configuration
 ################################################################################
+# FIXME: Three separate doc strings are used for the *_PREFIX macros.
+
 hpx_option(HPX_NO_INSTALL BOOL "Build hpx applications so that they can be run without installation (default: OFF)." OFF ADVANCED)
 
 if(NOT HPX_NO_INSTALL)
@@ -293,12 +301,8 @@ endif()
 ################################################################################
 # RPATH configuration
 ################################################################################
-set(CMAKE_SKIP_BUILD_RPATH TRUE)
-if(NOT HPX_NO_INSTALL)
-  set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
-  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib/hpx:${CMAKE_BINARY_DIR}/bin")
-  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-endif()
+set(HPX_RPATH "${CMAKE_INSTALL_PREFIX}/lib/hpx:${CMAKE_BINARY_DIR}/lib/hpx"
+    CACHE STRING "Base RPATH for linking")
 
 ################################################################################
 # C++11 configuration
@@ -351,8 +355,8 @@ find_package(HPX_PAPI)
 ################################################################################
 find_package(HPX_Hwloc)
 if(HWLOC_FOUND)
-  include_directories(${HWLOC_INCLUDE_DIR})
-  link_directories(${HWLOC_LIBRARY_DIR})
+  hpx_include_directories(${HWLOC_INCLUDE_DIR})
+  hpx_link_directories(${HWLOC_LIBRARY_DIR})
   add_definitions(-DHPX_HAVE_HWLOC)
   set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${HWLOC_LIBRARY})
 endif()
@@ -375,7 +379,7 @@ find_package(HPX_SWARM)
 ################################################################################
 # OpenMP (for benchmark comparisons)
 ################################################################################
-find_package(OpenMP)
+find_package(HPX_OpenMP)
 
 ################################################################################
 # MPI (for benchmark comparisons)
@@ -915,7 +919,8 @@ else()
     find_package(HPX_GooglePerftools)
     if(GOOGLE_PERFTOOLS_FOUND AND HPX_GOOGLE_PERFTOOLS)
       set(hpx_LIBRARIES ${hpx_LIBRARIES} ${GOOGLE_PERFTOOLS_LIBRARY})
-      include_directories(${GOOGLE_PERFTOOLS_INCLUDE_DIR})
+      hpx_include_directories(${GOOGLE_PERFTOOLS_INCLUDE_DIR})
+      hpx_link_directories(${GOOGLE_PERFTOOLS_LIBRARY_DIR})
       add_definitions(-DHPX_GOOGLE_PERFTOOLS)
     else()
       set(GOOGLE_PERFTOOLS_LIBRARY "")
@@ -947,11 +952,15 @@ else()
         hpx_info("malloc" "Using tcmalloc allocator.")
         set(hpx_MALLOC_LIBRARY ${TCMALLOC_LIBRARY})
         set(hpx_LIBRARIES ${hpx_LIBRARIES} ${TCMALLOC_LIBRARY})
+        hpx_include_directories(${TCMALLOC_INCLUDE_DIR})
+        hpx_link_directories(${TCMALLOC_LIBRARY_DIR})
         add_definitions(-DHPX_TCMALLOC)
       else()
         hpx_info("malloc" "Using jemalloc allocator.")
         set(hpx_MALLOC_LIBRARY ${JEMALLOC_LIBRARY})
         set(hpx_LIBRARIES ${hpx_LIBRARIES} ${JEMALLOC_LIBRARY})
+        hpx_include_directories(${JEMALLOC_INCLUDE_DIR})
+        hpx_link_directories(${JEMALLOC_LIBRARY_DIR})
         add_definitions(-DHPX_JEMALLOC)
       endif()
 
@@ -1048,6 +1057,7 @@ if(NOT HPX_NO_INSTALL)
     DIRECTORY cmake/
     DESTINATION share/hpx-${HPX_VERSION}/cmake
     COMPONENT core
+    PATTERN ".cmake.in" EXCLUDE
     PATTERN ".svn" EXCLUDE
     PATTERN ".git" EXCLUDE)
 
@@ -1163,4 +1173,31 @@ if(NOT HPX_NO_INSTALL)
       PATTERN ".git" EXCLUDE)
   endif()
 endif()
+
+################################################################################
+# external build system support (FindHPX.cmake, pkgconfig)
+################################################################################
+hpx_include_directories(/usr/local/include /usr/include)
+
+list(REMOVE_DUPLICATES HPX_LINK_DIRECTORIES)
+list(REMOVE_DUPLICATES HPX_INCLUDE_DIRECTORIES)
+
+set(external_rpath ${HPX_RPATH}) 
+
+foreach(directory ${HPX_LINK_DIRECTORIES})
+  set(external_link_directories "${external_link_directories} ${directory}")
+  set(external_rpath "${external_rpath}:${directory}")  
+endforeach()
+
+foreach(directory ${HPX_INCLUDE_DIRECTORIES})
+  set(external_include_directories "${external_include_directories} ${directory}")
+endforeach()
+
+get_directory_property(external_definitions DEFINITIONS)
+
+configure_file(${hpx_SOURCE_DIR}/cmake/FindHPX.cmake.in
+               ${CMAKE_BINARY_DIR}/FindHPX.cmake ESCAPE_QUOTES @ONLY)
+
+install(FILES ${CMAKE_BINARY_DIR}/FindHPX.cmake
+        DESTINATION share/cmake-2.8/Modules)
 

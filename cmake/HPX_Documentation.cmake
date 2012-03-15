@@ -92,7 +92,7 @@ else()
     hpx_parse_arguments(${name} "SOURCE;DEPENDENCIES;QUICKBOOK_ARGS" "" ${ARGN})
 
     hpx_print_list("DEBUG"
-        "hpx_quickbook_to_boostbook.${name}" "Quickbook arguments"
+        "quickbook_to_boostbook.${name}" "Quickbook arguments"
         ${name}_QUICKBOOK_ARGS)
 
     # If input is not a full path, it's in the current source directory.
@@ -210,7 +210,7 @@ else()
         "" ${ARGN})
 
     hpx_print_list("DEBUG"
-        "hpx_quickbook_to_html.${name}" "Documentation dependencies"
+        "quickbook_to_html.${name}" "Documentation dependencies"
         ${name}_DEPENDENCIES)
 
     hpx_quickbook_to_boostbook(${name}
