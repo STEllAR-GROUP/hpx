@@ -7,6 +7,7 @@
 #define HPX_UTIL_PBS_ENVIRONMENT_AUG_26_2011_0901AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/asio_util.hpp>
 
 #include <map>
 #include <cstdlib>
@@ -24,10 +25,6 @@ namespace hpx { namespace util
     // Try to retrieve PBS related settings from the environment
     struct HPX_EXPORT pbs_environment
     {
-        typedef HPX_STD_FUNCTION<std::string(std::string const&)>
-            transform_function_type;
-        typedef std::map<std::string, std::size_t> node_map_type;
-
         // the constructor tries to read from a PBS node-file, filling our
         // map of nodes and thread counts
         pbs_environment(bool debug = false)
@@ -43,11 +40,6 @@ namespace hpx { namespace util
         // separated) list of nodes
         std::string init_from_nodelist(std::vector<std::string> const& nodes,
             std::string const& agas_host);
-
-        void use_transform(transform_function_type f)
-        {
-            transform_ = f;
-        }
 
         // The number of threads is either one (if no PBS information was
         // found), or it is the same as the number of times this node has
@@ -78,11 +70,14 @@ namespace hpx { namespace util
         // PBS, false otherwise
         bool run_with_pbs() const;
 
+        typedef std::map<
+            boost::asio::ip::tcp::endpoint, std::pair<std::string, std::size_t>
+        > node_map_type;
+
         std::string agas_node_;
         std::size_t agas_node_num_;
-        std::map<std::string, std::size_t> nodes_;
+        node_map_type nodes_;
         bool debug_;
-        transform_function_type transform_;
     };
 }}
 

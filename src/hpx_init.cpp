@@ -839,9 +839,9 @@ namespace hpx
                         vm["hpx:iftransform"].as<std::string>()));
                 }
 
-                typedef util::pbs_environment::transform_function_type
+                typedef util::map_hostnames::transform_function_type
                     transform_function_type;
-                env.use_transform(transform_function_type(iftransform));
+                mapnames.use_transform(transform_function_type(iftransform));
             }
 
             if (vm.count("hpx:nodefile")) {
@@ -895,7 +895,8 @@ namespace hpx
                     mode = hpx::runtime_mode_console;
                 }
                 else {
-                    hpx_port += static_cast<boost::uint16_t>(node);         // each node gets an unique port
+                    // each node gets an unique port
+                    hpx_port += static_cast<boost::uint16_t>(node);
                     mode = hpx::runtime_mode_worker;
 
                     // do not execute any explicit hpx_main except if asked
@@ -918,12 +919,14 @@ namespace hpx
                 util::split_ip_address(vm["hpx:hpx"].as<std::string>(), hpx_host, hpx_port);
 
             if (vm.count("hpx:threads")) {
-                if (env.run_with_pbs()) {
+                std::size_t threads = vm["hpx:threads"].as<std::size_t>();
+                if (env.run_with_pbs() && threads > num_threads) {
                     std::cerr  << "hpx::init: command line warning: --hpx:threads "
-                        "used when running with PBS, the application might "
-                        "not run properly." << std::endl;
+                        "used when running with PBS, requesting a larger "
+                        "number of threads than cores have been assigned by PBS, "
+                        "the application might not run properly." << std::endl;
                 }
-                num_threads = vm["hpx:threads"].as<std::size_t>();
+                num_threads = threads;
             }
 
             std::string queueing("priority_local");
