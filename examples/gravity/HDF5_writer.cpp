@@ -64,7 +64,8 @@ void printval (future<void> const & mp,config_f& param,uint64_t k,uint64_t t,
  }
 }
 
-void printfinalcoord (config_f& param, uint64_t k) { ///Not done with this function
+void printfinalcoord (config_f& param, uint64_t k) { //Not done with this
+                                                     // function
  string j=param.output+"_finalcoord.h5";
  const H5std_string FILE_NAME(j);
  const H5std_string DATASET_NAME("Coordinates");
