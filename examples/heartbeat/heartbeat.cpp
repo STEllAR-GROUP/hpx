@@ -128,6 +128,8 @@ int monitor(std::string const& name, boost::uint64_t pause)
     }
 
     hpx::agas::unregister_name(stop_flag_name, stop_id);
+
+    return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
