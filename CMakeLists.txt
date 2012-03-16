@@ -24,6 +24,18 @@ set(CMAKE_USER_MAKE_RULES_OVERRIDE_Fortran
     "${CMAKE_SOURCE_DIR}/cmake/HPX_FortranOverrides.cmake")
 
 ################################################################################
+# Build type (needs to be handled before project command below)
+################################################################################
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Configuration type (one of Debug, RelWithDebInfo, Release, MinSizeRel)" FORCE)
+endif()
+
+# Always force CMAKE_CONFIGURATION_TYPES to be the same as CMAKE_BUILD_TYPE
+# (at least for now, until we figure out how to use multiple build types in
+# the same project).
+set(CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}" CACHE INTERNAL "Configuration types" FORCE)
+
+################################################################################
 # project metadata
 ################################################################################
 project(hpx CXX)
@@ -54,26 +66,12 @@ if(NOT HPX_CMAKE_LOGLEVEL)
   set(HPX_CMAKE_LOGLEVEL "WARN")
 endif()
 
-################################################################################
-# Build type
-################################################################################
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Configuration type (one of Debug, RelWithDebInfo, Release, MinSizeRel)" FORCE)
-endif()
-
+###############################################################################
 # reconfigure Boost library information if configuration type has been
 # changed since last configure
 if(CMAKE_BUILD_TYPE AND NOT (CMAKE_BUILD_TYPE STREQUAL CMAKE_CONFIGURATION_TYPES))
   set(BOOST_VERSION_SEARCHED OFF CACHE INTERNAL "Found Boost version" FORCE)
   set(BOOST_SEARCHED OFF CACHE INTERNAL "Found Boost libraries" FORCE)
-endif()
-
-# Set CMAKE_CONFIGURATION_TYPES if not already set
-# On MSVC force CMAKE_CONFIGURATION_TYPES to be the same as CMAKE_BUILD_TYPE
-# (at least for now, until we figure out how to use multiple build types in
-# the same project).
-if((NOT MSVC AND NOT CMAKE_CONFIGURATION_TYPES) OR MSVC)
-  set(CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}" CACHE INTERNAL "Configuration types" FORCE)
 endif()
 
 ################################################################################
