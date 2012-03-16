@@ -8,7 +8,7 @@
 set(subdirs
     1d_hydro
     accumulator
-    #adaptive1d
+    adaptive1d
     balancing
     bfs
     bright_future
