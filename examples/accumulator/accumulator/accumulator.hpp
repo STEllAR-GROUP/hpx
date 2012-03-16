@@ -6,7 +6,7 @@
 #if !defined(HPX_COMPONENTS_ACCUMULATOR_MAY_18_2008_0822AM)
 #define HPX_COMPONENTS_ACCUMULATOR_MAY_18_2008_0822AM
 
-//[acc_cli
+//[accumulator_client
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 
@@ -19,8 +19,7 @@ namespace hpx { namespace components
     /// specific \a server#accumulator component
     class accumulator
       : public client_base<accumulator, stubs::accumulator>
-        //[acc_cli_base
-        
+        //[accumulator_client_base
     {
         typedef client_base<accumulator, stubs::accumulator> base_type;
 
@@ -40,7 +39,7 @@ namespace hpx { namespace components
 
         /// Initialize the accumulator value
         
-        //[acc_cli_init
+        //[accumulator_client_init
         void init()
         {
             BOOST_ASSERT(gid_);

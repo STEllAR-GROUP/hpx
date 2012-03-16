@@ -37,7 +37,7 @@ namespace hpx { namespace components { namespace server
     public:
         // parcel action code: the action to be performed on the destination
         // object (the accumulator)
-        
+
         //[accumulator_enum_action
         enum actions
         {
@@ -47,6 +47,7 @@ namespace hpx { namespace components { namespace server
             accumulator_print = 3
         };
         //]
+
         // constructor: initialize accumulator value
         accumulator()
           : arg_(0)
@@ -55,14 +56,14 @@ namespace hpx { namespace components { namespace server
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
-        //[accumulator__init
+        //[accumulator_init
         /// Initialize the accumulator
         void init()
         {
             arg_ = 0;
         }
         //]
-        
+
         /// Add the given number to the accumulator
         void add (unsigned long arg)
         {
@@ -92,13 +93,13 @@ namespace hpx { namespace components { namespace server
             accumulator, accumulator_init, &accumulator::init
         > init_action;
         //]
-        
+
         //[accumulator_action_add
         typedef hpx::actions::action1<
             accumulator, accumulator_add, unsigned long, &accumulator::add
         > add_action;
         //]
-        
+
         typedef hpx::actions::result_action0<
             accumulator, unsigned long, accumulator_query_value, &accumulator::query
         > query_action;

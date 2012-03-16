@@ -307,7 +307,7 @@ examples/accumulator/accumulator/server/accumulator.hpp
 [import ../examples/accumulator/accumulator/server/accumulator.hpp]
 [accumulator_namespace]
 The component object class inherits properties from
-components::detail::managed_component_base<>,
+`components::detail::managed_component_base<>`,
 making it a managed component.
 
 [accumulator_enum_action]
@@ -320,7 +320,7 @@ the component, where the component is instantiated. In this case, this action
 simply initializes component member variable arg_ to 0.
 
 [accumulator_action_init]
-The above code snippet encapsulates the exposed function (accumulator::init),
+The above code snippet encapsulates the exposed function (`accumulator::init`),
 along with its component type, return type and argument types into hpx action
 type, which enables boilerplate code for threads, serialization, etc. to be
 generated. Here the action takes no argument and returns no value.
@@ -341,33 +341,34 @@ example/accumulator/accumulator/stubs/accumulator.hpp
 
 [import ../examples/accumulator/accumulator/stubs/accumulator.hpp]
 
-[acc_stub]
+[accumulator_stub]
 
 The access methods provided at the client side allows access to component
 actions available in any of the localities where the component is instantiated
 as each method takes gid as first argument.
 
-[acc_stub_init]
+[accumulator_stub_init]
 The above code snippet allows the client side to invoke init action (server::
 accumulator::init_action) directly at the component location. This action does
 not take any value as the definition of the action at the serverside implicitly
 initialized the data member of accumulator component to 0.
 
-[acc_stub_add]
+[accumulator_stub_add]
 In the above add action, we can see, the action takes an additional parameter
 that is passed to the component where the component identified by gid is
 instantiated. Gid is however not an argument to the action of the component.
 
-[acc_stub_query]
+[accumulator_stub_query]
 The above code snippet gives us an action that returns a value. The return type
 is unsigned long. The caller of this function needs to call future.get() on the
 return value of the function to obtain the result returned by the function.
 
 For example:
 
-lcos::future<unsigned long> ret_value = query_async(gid);
+    lcos::future<unsigned long> ret_value = query_async(gid);
+    ret_value.get()
 
-ret_value.get() would get the value result returned by query_async(gid).
+would get the value result returned by `query_async(gid)`.
 
 
 Now the following example gives another method of client side access to the
@@ -377,17 +378,17 @@ examples/accumulator/accumulator/accumulator.hpp
 
 [import ../examples/accumulator/accumulator/accumulator.hpp]
 
-[acc_cli]
+[accumulator_client]
 The methods defined in the above file gives us access to actions of component in
 the locality where the client object is instantiated. Here explicit gid of the
 component is not passed into the function. The function takes the gid of the
 locality where the client object is instantiated (gid_).
 
-[acc_cli_base]
+[accumulator_client_base]
 The above code snippet make the client object instantiated effectively also inherit
 properties from the stubs::accumulator class.
 
-[acc_cli_init]
+[accumulator_client_init]
 The above code would call the component init action using gid_ of the client
 locality where the component is also instantiated.
 
@@ -396,10 +397,10 @@ Registering Actions with HPX:
 /examples/accumulator/accumulator/accumulator.cpp
 
 [import ../examples/accumulator/accumulator/accumulator.cpp]
-[acc_cpp]
+[accumulator_cpp]
 
 In the above file, we register component and actions with HPX. What is listed in
-the server/accumulator.hpp file is the declaration version of the above hpx
+the `server/accumulator.hpp` file is the declaration version of the above hpx
 action registration macro.
 
 
@@ -409,36 +410,36 @@ client side objects, the following file is used:
 /examples/accumulator/accumulator_client.cpp
 
 [import ../examples/accumulator/accumulator_client.cpp]
-[acc_acc_client]
+[accumulator_accumulator_client]
 
-[hpx_init]
+[accumulator_hpx_init]
 The above code bootstraps the hpx runtime system.
 
-[hpx_main]
+[accumulator_hpx_main]
 The above method would be entry point for accumulator application.
 
-[acc_comp]
+[accumulator_comp]
 The above code returns the component type of accumulator (to distinguish accumulator
 component from other component types).
 
-[hpx_loc]
+[accumulator_hpx_loc]
 In the above code all the available localities the hpx runtime system can access
 and which support the accumulator component type are listed.
 
-[hpx_loc_1]
+[accumulator_hpx_loc_1]
 In the above code if there are more than one localities available to the runtime
 system, then the first one is selected of the listed localities else the locality
 where the hpx_main() is instantiated is selected where the accumulator component
 will be instantiated.
 
-[acc_create]
+[accumulator_create]
 With the above code, the accumulator component is created locally.
 
-[acc_execute]
+[accumulator_execute]
 In above code snippet, commands to execute respective actions on the accumulator
 is passed.
 
-[hpx_finalize]
+[accumulator_hpx_finalize]
 Finally the above method will initiate shutdown procedure on the hpx runtime
 system.
 
