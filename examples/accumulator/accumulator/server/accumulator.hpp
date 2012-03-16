@@ -17,7 +17,7 @@
 #include <hpx/runtime/components/server/memory.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-//[acc_namespace
+//[accumulator_namespace
 namespace hpx { namespace components { namespace server
 {
     //
@@ -38,7 +38,7 @@ namespace hpx { namespace components { namespace server
         // parcel action code: the action to be performed on the destination
         // object (the accumulator)
         
-        //[e_action
+        //[accumulator_enum_action
         enum actions
         {
             accumulator_init = 0,
@@ -55,7 +55,7 @@ namespace hpx { namespace components { namespace server
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
-        //[acc_init
+        //[accumulator__init
         /// Initialize the accumulator
         void init()
         {
@@ -87,13 +87,13 @@ namespace hpx { namespace components { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        //[a_init1
+        //[accumulator_action_init
         typedef hpx::actions::action0<
             accumulator, accumulator_init, &accumulator::init
         > init_action;
         //]
         
-        //[a_add1
+        //[accumulator_action_add
         typedef hpx::actions::action1<
             accumulator, accumulator_add, unsigned long, &accumulator::add
         > add_action;
@@ -115,7 +115,7 @@ namespace hpx { namespace components { namespace server
 //]
 
 
-//[action_declare
+//[accumulator_action_declare
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::components::server::accumulator::init_action,

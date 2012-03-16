@@ -12,7 +12,8 @@ set(DOCUMENTATION_FILES
 set(DOCUMENTATION_DEPENDENCIES
     ${DOCUMENTATION_FILES}
     ${hpx_SOURCE_DIR}/examples/quickstart/hello_world.cpp
-    ${hpx_SOURCE_DIR}/examples/quickstart/simplest_hello_world.cpp)
+    ${hpx_SOURCE_DIR}/examples/quickstart/simplest_hello_world.cpp
+    ${hpx_SOURCE_DIR}/examples/accumulator/accumulator/server/accumulator.hpp)
 
 set(quickbook_fixme_mode "-D__disable_fixme__")
 if(HPX_DOCUMENTATION_DEVELOPMENT)
