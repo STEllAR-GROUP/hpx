@@ -1454,7 +1454,7 @@ namespace hpx { namespace threads
             startup_->wait();
         }
         catch (std::exception const& e) {
-            LTM_(fatal) << "run: failed with: " << e.what();
+            LTM_(always) << "run: failed with: " << e.what();
 
             // trigger the barrier
             while (num_threads-- != 0 && !startup_->wait())
