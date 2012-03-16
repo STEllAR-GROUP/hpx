@@ -54,16 +54,16 @@ struct topology
     } // }}}
 
     std::size_t get_numa_node_number(
-        std::size_t thread_num
+        std::size_t num_thread
       , error_code& ec = throws
         ) const
     { // {{{
-        if (thread_num < numa_node_numbers_.size())
+        if (num_thread < numa_node_numbers_.size())
         {
             if (&ec != &throws)
                 ec = make_success_code();
 
-            return numa_node_numbers_[thread_num];
+            return numa_node_numbers_[num_thread];
         }
 
         else
@@ -72,24 +72,24 @@ struct topology
               , "hpx::threads::topology::get_numa_node_number"
               , boost::str(boost::format(
                     "thread number %1% is out of range")
-                    % thread_num));
+                    % num_thread));
             return std::size_t(-1);
         }
     } // }}}
 
     std::size_t get_numa_node_affinity_mask(
-        std::size_t thread_num
+        std::size_t num_thread
       , bool numa_sensitive
       , error_code& ec = throws
         ) const
     { // {{{
-        if (thread_num < numa_node_affinity_masks_.size())
+        if (num_thread < numa_node_affinity_masks_.size())
         {
             if (&ec != &throws)
                 ec = make_success_code();
 
-            return numa_sensitive ? ns_numa_node_affinity_masks_[thread_num]
-                                  : numa_node_affinity_masks_[thread_num];
+            return numa_sensitive ? ns_numa_node_affinity_masks_[num_thread]
+                                  : numa_node_affinity_masks_[num_thread];
         }
 
         else
@@ -98,24 +98,24 @@ struct topology
               , "hpx::threads::topology::get_numa_node_affinity_mask"
               , boost::str(boost::format(
                     "thread number %1% is out of range")
-                    % thread_num));
+                    % num_thread));
             return 0;
         }
     } // }}}
 
     std::size_t get_thread_affinity_mask(
-        std::size_t thread_num
+        std::size_t num_thread
       , bool numa_sensitive
       , error_code& ec = throws
         ) const
     { // {{{
-        if (thread_num < thread_affinity_masks_.size())
+        if (num_thread < thread_affinity_masks_.size())
         {
             if (&ec != &throws)
                 ec = make_success_code();
 
-            return numa_sensitive ? ns_thread_affinity_masks_[thread_num]
-                                  : thread_affinity_masks_[thread_num];
+            return numa_sensitive ? ns_thread_affinity_masks_[num_thread]
+                                  : thread_affinity_masks_[num_thread];
         }
 
         else
@@ -124,7 +124,7 @@ struct topology
               , "hpx::threads::topology::get_thread_affinity_mask"
               , boost::str(boost::format(
                     "thread number %1% is out of range")
-                    % thread_num));
+                    % num_thread));
             return 0;
         }
     } // }}}
@@ -164,7 +164,9 @@ struct topology
 
                     HPX_THROWS_IF(ec, kernel_error
                       , "hpx::threads::topology::set_thread_affinity_mask"
-                      , "failed to set thread affinity mask");
+                      , boost::str(boost::format(
+                            "failed to set thread %1% affinity mask")
+                            % num_thread));
 
                     if (ec)
                         return;
@@ -193,10 +195,10 @@ struct topology
 
   private:
     std::size_t init_numa_node_number(
-        std::size_t thread_num
+        std::size_t num_thread
         )
     { // {{{
-        if (std::size_t(-1) == thread_num)
+        if (std::size_t(-1) == num_thread)
              return std::size_t(-1);
 
         hwloc_topology_t topology;
@@ -205,7 +207,7 @@ struct topology
             0 == hwloc_topology_load(topology))
         {
             hwloc_obj_t obj = hwloc_get_obj_by_type(topology, HWLOC_OBJ_PU,
-                static_cast<unsigned>(thread_num));
+                static_cast<unsigned>(num_thread));
             while (obj)
             {
                 if (hwloc_compare_types(obj->type, HWLOC_OBJ_NODE) == 0)
@@ -219,9 +221,6 @@ struct topology
         }
 
         hwloc_topology_destroy(topology);
-        HPX_THROW_EXCEPTION(kernel_error
-          , "hpx::threads::topology::init_numa_node_number"
-          , "failed to initialize NUMA node number");
         return std::size_t(-1);
     } // }}}
 
@@ -256,6 +255,9 @@ struct topology
         std::size_t node_affinity_mask = 0;
         std::size_t numa_node = get_numa_node_number(num_thread);
 
+        if (std::size_t(-1) == numa_node)
+            return 0;
+
         hwloc_topology_t topology;
 
         if (0 == hwloc_topology_init(&topology) &&
@@ -274,7 +276,9 @@ struct topology
         hwloc_topology_destroy(topology);
         HPX_THROW_EXCEPTION(kernel_error
           , "hpx::threads::topology::init_numa_node_affinity_mask"
-          , "failed to initialize NUMA node affinity mask");
+          , boost::str(boost::format(
+                "failed to initialize NUMA node affinity mask for thread %1%")
+                % num_thread));
         return 0; 
     } // }}}
 
@@ -294,10 +298,8 @@ struct topology
             int numa_nodes = hwloc_get_nbobjs_by_type(topology, HWLOC_OBJ_NODE);
             hwloc_topology_destroy(topology);
 
-            if (numa_nodes == -1)
-                HPX_THROW_EXCEPTION(kernel_error
-                  , "hpx::threads::topology::init_thread_affinity_mask"
-                  , "failed to initialize thread affinity mask");
+            if (numa_nodes == -1 || numa_nodes == 0)
+                return 0;
 
             std::size_t num_of_cores_per_numa_node = num_of_cores / numa_nodes;
             std::size_t node_affinity_mask = 0;
@@ -329,9 +331,6 @@ struct topology
         }
 
         hwloc_topology_destroy(topology);
-        HPX_THROW_EXCEPTION(kernel_error
-          , "hpx::threads::topology::init_thread_affinity_mask"
-          , "failed to initialize thread affinity mask");
         return 0; 
     } // }}}
 

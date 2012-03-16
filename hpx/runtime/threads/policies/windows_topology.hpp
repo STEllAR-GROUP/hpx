@@ -52,16 +52,16 @@ struct topology
     } // }}}
 
     std::size_t get_numa_node_number(
-        std::size_t thread_num
+        std::size_t num_thread
       , error_code& ec = throws
         ) const
     { // {{{
-        if (thread_num < numa_node_numbers_.size())
+        if (num_thread < numa_node_numbers_.size())
         {
             if (&ec != &throws)
                 ec = make_success_code();
 
-            return numa_node_numbers_[thread_num];
+            return numa_node_numbers_[num_thread];
         }
 
         else
@@ -70,24 +70,24 @@ struct topology
               , "hpx::threads::topology::get_numa_node_number"
               , boost::str(boost::format(
                     "thread number %1% is out of range")
-                    % thread_num));
+                    % num_thread));
             return std::size_t(-1);
         }
     } // }}}
 
     std::size_t get_numa_node_affinity_mask(
-        std::size_t thread_num
+        std::size_t num_thread
       , bool numa_sensitive
       , error_code& ec = throws
         ) const
     { // {{{
-        if (thread_num < numa_node_affinity_masks_.size())
+        if (num_thread < numa_node_affinity_masks_.size())
         {
             if (&ec != &throws)
                 ec = make_success_code();
 
-            return numa_sensitive ? ns_numa_node_affinity_masks_[thread_num]
-                                  : numa_node_affinity_masks_[thread_num];
+            return numa_sensitive ? ns_numa_node_affinity_masks_[num_thread]
+                                  : numa_node_affinity_masks_[num_thread];
         }
 
         else
@@ -96,31 +96,31 @@ struct topology
               , "hpx::threads::topology::get_numa_node_affinity_mask"
               , boost::str(boost::format(
                     "thread number %1% is out of range")
-                    % thread_num));
+                    % num_thread));
             return 0;
         }
     } // }}}
 
     std::size_t get_thread_affinity_mask(
-        std::size_t thread_num
+        std::size_t num_thread
       , bool numa_sensitive
       , error_code& ec = throws
         ) const
     { // {{{
-        if (thread_num < thread_affinity_masks_.size())
+        if (num_thread < thread_affinity_masks_.size())
         {
             if (&ec != &throws)
                 ec = make_success_code();
 
-            return numa_sensitive ? ns_thread_affinity_masks_[thread_num]
-                                  : thread_affinity_masks_[thread_num];
+            return numa_sensitive ? ns_thread_affinity_masks_[num_thread]
+                                  : thread_affinity_masks_[num_thread];
         }
 
         HPX_THROWS_IF(ec, bad_parameter
           , "hpx::threads::topology::get_thread_affinity_mask"
           , boost::str(boost::format(
                 "thread number %1% is out of range")
-                % thread_num));
+                % num_thread));
         return 0;
     } // }}}
 
@@ -137,7 +137,9 @@ struct topology
         {
             HPX_THROWS_IF(ec, kernel_error
               , "hpx::threads::topology::set_thread_affinity_mask"
-              , "failed to set thread affinity mask");
+              , boost::str(boost::format(
+                    "failed to set thread %1% affinity mask")
+                    % num_thread));
         }
         else if (&ec != &throws)
             ec = make_success_code();
@@ -177,14 +179,14 @@ struct topology
 
   private:
     std::size_t init_numa_node_number(
-        std::size_t thread_num
+        std::size_t num_thread
         )
     { // {{{
-        if (std::size_t(-1) == thread_num)
+        if (std::size_t(-1) == num_thread)
              return std::size_t(-1);
 
         UCHAR node_number = 0;
-        if (GetNumaProcessorNode(UCHAR(thread_num), &node_number))
+        if (GetNumaProcessorNode(UCHAR(num_thread), &node_number))
             return node_number;
 
         std::size_t num_of_cores = hardware_concurrency();
@@ -196,7 +198,7 @@ struct topology
         if (GetNumaHighestNodeNumber(&numa_nodes) && 0 != numa_nodes)
             num_of_numa_cores = num_of_cores / (numa_nodes + 1);
 
-        return thread_num / num_of_numa_cores;
+        return num_thread / num_of_numa_cores;
     } // }}}
 
     std::size_t init_numa_node_affinity_mask(
@@ -218,7 +220,10 @@ struct topology
             {
                 HPX_THROW_EXCEPTION(kernel_error
                   , "hpx::threads::topology::init_numa_node_affinity_mask"
-                  , "failed to initialize NUMA node affinity mask");
+                  , boost::str(boost::format(
+                        "failed to initialize NUMA node affinity mask for "
+                        "thread %1%")
+                        % num_thread));
             }
             return mask;
         }
@@ -228,7 +233,10 @@ struct topology
         {
             HPX_THROW_EXCEPTION(kernel_error
               , "hpx::threads::topology::init_numa_node_affinity_mask"
-              , "failed to initialize NUMA node affinity mask");
+              , boost::str(boost::format(
+                    "failed to initialize NUMA node affinity mask for "
+                    "thread %1%")
+                    % num_thread));
         }
 
         return mask;
@@ -257,7 +265,9 @@ struct topology
             {
                 HPX_THROW_EXCEPTION(kernel_error
                   , "hpx::threads::topology::init_thread_affinity_mask"
-                  , "failed to initialize thread affinity mask");
+                  , boost::str(boost::format(
+                        "failed to initialize thread %1% affinity mask")
+                        % num_thread));
             }
             mask = least_significant_bit(node_affinity_mask) <<
                 (affinity / numa_nodes);
@@ -269,7 +279,9 @@ struct topology
             {
                 HPX_THROW_EXCEPTION(kernel_error
                   , "hpx::threads::topology::init_thread_affinity_mask"
-                  , "failed to initialize thread affinity mask");
+                  , boost::str(boost::format(
+                        "failed to initialize thread %1% affinity mask")
+                        % num_thread));
             }
             mask = least_significant_bit(node_affinity_mask) <<
                 (affinity % num_of_cores_per_numa_node);
