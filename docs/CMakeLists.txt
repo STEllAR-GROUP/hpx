@@ -34,7 +34,7 @@ hpx_quickbook_to_html(hpx
                   --stringparam boost.image.alt "HPX - High Performance ParalleX"
     QUICKBOOK_ARGS ${quickbook_fixme_mode})
 
-add_custom_target(docs
+add_custom_target(docs ALL
     DEPENDS hpx_HTML.manifest
     SOURCES ${DOCUMENTATION_FILES})
 
