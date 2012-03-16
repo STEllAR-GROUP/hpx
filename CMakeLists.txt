@@ -1193,9 +1193,13 @@ endforeach()
 
 get_directory_property(external_definitions DEFINITIONS)
 
+set(cmake_dir cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
+
 configure_file(${hpx_SOURCE_DIR}/cmake/FindHPX.cmake.in
-               ${CMAKE_BINARY_DIR}/FindHPX.cmake ESCAPE_QUOTES @ONLY)
+               ${CMAKE_BINARY_DIR}/share/${cmake_dir}/Modules/FindHPX.cmake
+               ESCAPE_QUOTES @ONLY)
 
-install(FILES ${CMAKE_BINARY_DIR}/FindHPX.cmake
-        DESTINATION share/cmake-2.8/Modules)
-
+if(NOT HPX_NO_INSTALL)
+  install(FILES ${CMAKE_BINARY_DIR}/share/${cmake_dir}/Modules/FindHPX.cmake
+          DESTINATION share/${cmake_dir}/Modules)
+endif()
