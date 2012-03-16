@@ -1194,7 +1194,13 @@ endforeach()
 get_directory_property(external_definitions DEFINITIONS)
 
 set(cmake_dir cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
-  
+
+if(MSVC)
+  set(output_dir ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
+else()
+  set(output_dir ${CMAKE_BINARY_DIR})
+endif()
+
 if(HPX_NO_INSTALL)
   set(external_cmake_path ${hpx_SOURCE_DIR}/cmake)
 else()
@@ -1202,11 +1208,11 @@ else()
 endif()
 
 configure_file(${hpx_SOURCE_DIR}/cmake/FindHPX.cmake.in
-               ${CMAKE_BINARY_DIR}/share/${cmake_dir}/Modules/FindHPX.cmake
+               ${output_dir}/share/${cmake_dir}/Modules/FindHPX.cmake
                ESCAPE_QUOTES @ONLY)
 
 if(NOT HPX_NO_INSTALL)
-  install(FILES ${CMAKE_BINARY_DIR}/share/${cmake_dir}/Modules/FindHPX.cmake
+  install(FILES ${output_dir}/share/${cmake_dir}/Modules/FindHPX.cmake
           DESTINATION share/${cmake_dir}/Modules)
 endif()
 
