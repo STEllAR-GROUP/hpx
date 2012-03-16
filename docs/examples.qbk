@@ -297,7 +297,7 @@ Console 2:
 [heading Disecting Accumulator Example]
 
 The following text/code snippets gives us a basic infracture know how for 
-creating our own components, using the accumulator components as example. 
+creating our own components, using the accumulator components as an example. 
 
 The file where the accumulator component object with its data and 
 function members are defined: 
@@ -312,7 +312,7 @@ making it a managed component.
 
 [e_action]
 The above enumeration is for all the actions exposed by the component. Its use 
-comes later when we define the action as hpx action.  
+comes later when we define the action as hpx action type.  
 
 [acc_init] 
 The above code snippet is a normal definition of an action that is performed by 
@@ -323,18 +323,18 @@ simply initializes component member variable arg_ to 0.
 The above code snippet encapsulates the exposed function (accumulator::init), 
 along with its component type, return type and argument types into hpx action 
 type, which enables boilerplate code for threads, serialization, etc. to be 
-generated. Here the action does takes no argument and returns no value. 
+generated. Here the action takes no argument and returns no value. 
 
 [a_add1]
 In the above hpx action type definition, the designated action takes one argument, 
-and return no value.  
+and returns no value.  
 
 [action_declare]
-Here we declare all the action types that the component exposes to the hpx, so 
+Here we declare all the action types that the component exposes to the hpx so 
 that hpx runtime system reconizes that action as a valid hpx component action.
 
 Now we create client side methods to access the actions the component provides 
-for us. The convention in hpx followed by the accumulator example is to create 
+. The convention followed by the accumulator example, in hpx, is to create 
 the following file: 
 
 example/accumulator/accumulator/stubs/accumulator.hpp
@@ -403,8 +403,8 @@ the server/accumulator.hpp file is the declaration version of the above hpx
 action registration macro. 
 
 
-Now for instantiating the accumulator component objects (client, server), the 
-following file is used: 
+Now for instantiating the accumulator example with its component objects and 
+client side objects, the following file is used: 
 
 /examples/accumulator/accumulator_client.cpp
 
@@ -435,7 +435,7 @@ will be instantiated.
 With the above code, the accumulator component is created locally. 
 
 [acc_execute]
-In above code snippet commands to execute respective actions on the accumulator 
+In above code snippet, commands to execute respective actions on the accumulator 
 is passed. 
 
 [hpx_finalize]
