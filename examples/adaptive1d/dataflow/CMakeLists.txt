@@ -6,7 +6,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 add_hpx_component(adaptive1d_dataflow
-  DEPENDENCIES adaptive1d_stencil_component distributing_factory_component
+  DEPENDENCIES distributing_factory_component
   FOLDER "Examples/Applications/Adaptive1d"
   AUTOGLOB)
 

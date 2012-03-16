@@ -7,6 +7,7 @@
 
 add_hpx_component(adaptive1d_stencil
   DEPENDENCIES adaptive1d_application_lib
+    distributing_factory_component adaptive1d_dataflow_component
   FOLDER "Examples/Applications/Adaptive1d"
   AUTOGLOB)
 

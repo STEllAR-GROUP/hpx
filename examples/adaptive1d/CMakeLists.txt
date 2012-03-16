@@ -37,7 +37,9 @@ set(sources
 
 # define basic dependencies
 set(dependencies
-    adaptive1d_dataflow_component)
+    adaptive1d_stencil_component
+    adaptive1d_dataflow_component
+    adaptive1d_application_lib)
 
 source_group("Source Files" FILES ${sources})
 

@@ -17,21 +17,21 @@ namespace hpx { namespace components { namespace adaptive1d
 ///////////////////////////////////////////////////////////////////////////////
 /// The function \a generate_initial_data will be called to initialize the
 /// given instance of 'stencil_data'
-HPX_COMPONENT_EXPORT int generate_initial_data(
+HPX_LIBRARY_EXPORT int generate_initial_data(
     stencil_data* data, int item, int maxitems, int row, detail::parameter const& par);
 
 /// The function \a evaluate_timestep will be called to compute the result data
 /// for the given timestep
-HPX_COMPONENT_EXPORT int rkupdate3(std::vector<access_memory_block<stencil_data> > &val,
+HPX_LIBRARY_EXPORT int rkupdate3(std::vector<access_memory_block<stencil_data> > &val,
              double t, detail::parameter const& par);
 
-HPX_COMPONENT_EXPORT int rkupdate1(std::vector<access_memory_block<stencil_data> > &val,
+HPX_LIBRARY_EXPORT int rkupdate1(std::vector<access_memory_block<stencil_data> > &val,
              double t, detail::parameter const& par);
 
-HPX_COMPONENT_EXPORT int rkupdate2a(std::vector<access_memory_block<stencil_data> > &val,
+HPX_LIBRARY_EXPORT int rkupdate2a(std::vector<access_memory_block<stencil_data> > &val,
              double t, detail::parameter const& par);
 
-HPX_COMPONENT_EXPORT int rkupdate2b(std::vector<access_memory_block<stencil_data> > &val,
+HPX_LIBRARY_EXPORT int rkupdate2b(std::vector<access_memory_block<stencil_data> > &val,
              double t, detail::parameter const& par);
 
 

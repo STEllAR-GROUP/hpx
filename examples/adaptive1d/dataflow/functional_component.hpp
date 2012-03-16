@@ -55,7 +55,7 @@ namespace hpx { namespace components { namespace adaptive1d
         }
 
         ///////////////////////////////////////////////////////////////////////
-        lcos::future<naming::id_type> alloc_data_async(int item,
+        lcos::future<naming::id_type, naming::id_type> alloc_data_async(int item,
             int maxitems, int row,
             std::vector<naming::id_type> const& interp_src_data,
             double time,

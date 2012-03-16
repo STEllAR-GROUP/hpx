@@ -50,7 +50,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static lcos::future<naming::id_type> alloc_data_async(
+        static lcos::future<naming::id_type, naming::id_type> alloc_data_async(
             naming::id_type const& gid, int item, int maxitems,
             int row,std::vector<naming::id_type> const& interp_src_data,
             double time, parameter const& par)
@@ -59,8 +59,8 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef adaptive1d::server::functional_component::alloc_data_action action_type;
-            return lcos::async<action_type>(gid, item, maxitems,
-                                                   row, interp_src_data,time,par);
+            return lcos::packaged_task<action_type, naming::id_type>(
+                gid, item, maxitems, row, interp_src_data,time,par).get_future();
         }
 
         static naming::id_type alloc_data(naming::id_type const& gid,

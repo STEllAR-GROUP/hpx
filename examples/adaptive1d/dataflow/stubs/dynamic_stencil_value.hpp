@@ -28,14 +28,15 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
         /// data referred to by the parameter \a initial. After finishing
         /// execution it returns a reference to the result as its return value
         /// (parameter \a result)
-        static lcos::future<naming::id_type> call_async(
+        static lcos::future<naming::id_type, naming::id_type> call_async(
             naming::id_type const& targetgid, naming::id_type const& initial)
         {
             // Create a future, execute the required action,
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef adaptive1d::server::dynamic_stencil_value::call_action action_type;
-            return lcos::async<action_type>(targetgid,initial);
+            return lcos::packaged_task<action_type, naming::id_type>(
+                targetgid, initial).get_future();
         }
 
         static naming::id_type call(naming::id_type const& targetgid,
@@ -58,7 +59,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
             typedef adaptive1d::server::dynamic_stencil_value::get_output_ports_action
                 action_type;
             typedef std::vector<naming::id_type> return_type;
-            return lcos::async<action_type, return_type>(gid);
+            return lcos::async<action_type>(gid);
         }
 
         static std::vector<naming::id_type>

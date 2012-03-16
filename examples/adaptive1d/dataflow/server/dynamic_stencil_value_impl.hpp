@@ -30,7 +30,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         {
             std::vector<naming::id_type> input_gids(in.size());
             for (std::size_t i = 0; i < in.size(); ++i)
-                input_gids[i] = in[i]->get();
+                input_gids[i] = in[i]->get_future().get();
 
             return components::adaptive1d::stubs::functional_component::eval(
                 gid, value_gid, input_gids, row, column,cycle_time, par);
