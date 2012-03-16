@@ -14,6 +14,7 @@
 
 #include <boost/foreach.hpp>
 #include <boost/assert.hpp>
+#include <boost/make_shared.hpp>
 
 #include "read_values.hpp"
 #include "partition3d.hpp"
@@ -311,8 +312,9 @@ namespace sheneos
                     "inconsistent sizes of result and index arrays");
             }
 
+            std::vector<double>& overall_result = overall_result_.get();
             for (std::size_t i = 0; i < indicies.size(); ++i)
-                (overall_result_.get())[indicies[i]] = result[i];
+                overall_result[indicies[i]] = result[i];
         }
 
         boost::reference_wrapper<context_data const> data_;
@@ -338,16 +340,19 @@ namespace sheneos
         }
 
         typedef std::map<naming::id_type, context_data> partitions_type;
-        partitions_type partitions;
+        boost::shared_ptr<partitions_type> partitions(
+            boost::make_shared<partitions_type>());
+
+        partitions_type& parts = *partitions;
 
         std::size_t index = 0;
         std::vector<double>::const_iterator it_temp = temp.begin();
         std::vector<double>::const_iterator it_rho = rho.begin();
         std::vector<double>::const_iterator it_ye_end = ye.end();
         for (std::vector<double>::const_iterator it_ye = ye.begin();
-            it_ye != it_ye_end; ++it_ye, ++index)
+            it_ye != it_ye_end; ++it_ye, ++it_rho, ++it_temp, ++index)
         {
-            context_data& d = partitions[get_gid(*it_ye, *it_temp, *it_rho)];
+            context_data& d = parts[get_gid(*it_ye, *it_temp, *it_rho)];
 
             d.indicies_.push_back(index);
             d.ye_.push_back(*it_ye);
@@ -355,21 +360,22 @@ namespace sheneos
             d.rho_.push_back(*it_rho);
         }
 
+        std::size_t size = ye.size();
         return hpx::lcos::local::async<std::vector<double> >(
-            [&]() -> std::vector<double> {
+            [partitions, size, eosvalue]() -> std::vector<double> {
                 namespace naming = hpx::naming;
                 namespace lcos = hpx::lcos;
 
                 // create the overall result vector
                 std::vector<double> overall_result;
-                overall_result.resize(ye.size());
+                overall_result.resize(size);
 
                 // asynchronously invoke the interpolation on the different partitions
                 std::vector<lcos::future<std::vector<double> > > lazy_results;
-                lazy_results.reserve(partitions.size());
+                lazy_results.reserve(partitions->size());
 
                 typedef std::map<naming::id_type, context_data>::value_type value_type;
-                BOOST_FOREACH(value_type& p, partitions)
+                BOOST_FOREACH(value_type& p, *partitions)
                 {
                     typedef sheneos::server::partition3d::interpolate_one_bulk_action
                         action_type;
