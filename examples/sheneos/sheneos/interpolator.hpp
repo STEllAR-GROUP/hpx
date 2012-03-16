@@ -96,22 +96,46 @@ namespace sheneos
                 get_gid(ye, temp, rho), ye, temp, rho, eosvalue);
         }
 
-        /// Asynchronously interpolate the function values for the given ye,
+        /// Asynchronously interpolate one function value for all the given ye,
         /// temp and rho from the ShenEOS tables. This function dispatches to
-        /// the proper partition for the actual interpolation.
+        /// the proper partitions for the actual interpolation using bulk
+        /// operations.
         hpx::lcos::future<std::vector<double> >
         interpolate_one_bulk_async(std::vector<double> const& ye,
             std::vector<double> const& temp, std::vector<double> const& rho,
             boost::uint32_t eosvalue) const;
 
-        /// Synchronously interpolate the function values for the given ye,
+        /// Synchronously interpolate the function value for all the given ye,
         /// temp and rho from the ShenEOS tables. This function dispatches to
-        /// the proper partition for the actual interpolation.
-        std::vector<double> interpolate_one_bulk(std::vector<double> const& ye,
+        /// the proper partition for the actual interpolation using bulk
+        /// operations.
+        std::vector<double>
+        interpolate_one_bulk(std::vector<double> const& ye,
             std::vector<double> const temp, std::vector<double> const& rho,
             boost::uint32_t eosvalue) const
         {
             return interpolate_one_bulk_async(ye, temp, rho, eosvalue).get();
+        }
+
+        /// Asynchronously interpolate the function values for all the given ye,
+        /// temp and rho from the ShenEOS tables. This function dispatches to
+        /// the proper partition for the actual interpolation using bulk
+        /// operations.
+        hpx::lcos::future<std::vector<std::vector<double> > >
+        interpolate_bulk_async(std::vector<double> const& ye,
+            std::vector<double> const& temp, std::vector<double> const& rho,
+            boost::uint32_t eosvalues = server::partition3d::small_api_values) const;
+
+        /// Synchronously interpolate the function values for all the given ye,
+        /// temp and rho from the ShenEOS tables. This function dispatches to
+        /// the proper partition for the actual interpolation using bulk
+        /// operations.
+        std::vector<std::vector<double> >
+        interpolate_bulk(std::vector<double> const& ye,
+            std::vector<double> const temp, std::vector<double> const& rho,
+            boost::uint32_t eosvalues = server::partition3d::small_api_values) const
+        {
+            return interpolate_bulk_async(ye, temp, rho, eosvalues).get();
         }
 
         /// Find the minimum and maximum values of the given dimension.

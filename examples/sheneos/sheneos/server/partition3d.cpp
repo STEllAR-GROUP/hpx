@@ -14,6 +14,7 @@
 #include <memory>
 
 #include <boost/assert.hpp>
+#include <boost/move/move.hpp>
 
 #include "partition3d.hpp"
 #include "../read_values.hpp"
@@ -353,6 +354,38 @@ namespace sheneos { namespace server
 
         return result;
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    std::vector<std::vector<double> >
+    partition3d::interpolate_bulk(std::vector<double> const& ye,
+        std::vector<double> const& temp, std::vector<double> const& rho,
+        boost::uint32_t eosvalues)
+    {
+        std::vector<std::vector<double> > result;
+
+        if (ye.size() != temp.size() || ye.size() != rho.size()) {
+            HPX_THROW_EXCEPTION(hpx::bad_parameter,
+                "partition3d::interpolate_one_bulk",
+                "inconsistent sizes of input fields");
+            return result;
+        }
+
+        result.resize(ye.size());
+
+        // interpolate as requested
+        std::size_t index = 0;
+        std::vector<double>::const_iterator it_temp = temp.begin();
+        std::vector<double>::const_iterator it_rho = rho.begin();
+        std::vector<double>::const_iterator it_ye_end = ye.end();
+        for (std::vector<double>::const_iterator it_ye = ye.begin();
+            it_ye != it_ye_end; ++it_ye, ++index)
+        {
+            result[index] =
+                boost::move(interpolate(*it_ye, *it_temp, *it_rho, eosvalues));
+        }
+
+        return result;
+    }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -366,6 +399,8 @@ HPX_REGISTER_ACTION_EX(partition3d_type::interpolate_action,
     sheneos_partition3d_interpolate_action);
 HPX_REGISTER_ACTION_EX(partition3d_type::interpolate_one_action,
     sheneos_partition3d_interpolate_one_action);
+HPX_REGISTER_ACTION_EX(partition3d_type::interpolate_bulk_action,
+    sheneos_partition3d_interpolate_bulk_action);
 HPX_REGISTER_ACTION_EX(partition3d_type::interpolate_one_bulk_action,
     sheneos_partition3d_interpolate_one_bulk_action);
 
@@ -375,9 +410,15 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
 HPX_DEFINE_GET_COMPONENT_TYPE(partition3d_type);
 
 HPX_REGISTER_ACTION_EX(
+    hpx::lcos::base_lco_with_value<std::vector<std::vector<double> > >::set_result_action,
+    set_result_action_vector_vector_double);
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
+    hpx::lcos::base_lco_with_value<std::vector<std::vector<double> > >,
+    hpx::components::component_base_lco_with_value);
+
+HPX_REGISTER_ACTION_EX(
     hpx::lcos::base_lco_with_value<std::vector<double> >::set_result_action,
     set_result_action_vector_double);
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco_with_value<std::vector<double> >,
     hpx::components::component_base_lco_with_value);
-

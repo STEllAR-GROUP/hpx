@@ -176,11 +176,11 @@ void test_sheneos_one_bulk(std::size_t num_ye_points,
     std::random_shuffle(sequence_rho.begin(), sequence_rho.end());
 
     // Execute bulk operation
-    hpx::lcos::future<std::vector<double> > bulk_tests =
+    hpx::lcos::future<std::vector<double> > bulk_one_tests =
         shen.interpolate_one_bulk_async(values_ye, values_temp, values_rho,
             sheneos::server::partition3d::logpress);
 
-    hpx::lcos::wait(bulk_tests);
+    std::vector<double> results = hpx::lcos::wait(bulk_one_tests);
 }
 
 typedef hpx::actions::plain_action4<
@@ -192,6 +192,87 @@ typedef hpx::actions::plain_action4<
 > test_one_bulk_action;
 
 HPX_REGISTER_PLAIN_ACTION(test_one_bulk_action);
+
+///////////////////////////////////////////////////////////////////////////////
+/// This is the test function for interpolate_bulk. It will be invoked on all
+/// localities that the benchmark is being run on.
+void test_sheneos_bulk(std::size_t num_ye_points,
+    std::size_t num_temp_points, std::size_t num_rho_points, std::size_t seed)
+{
+    // Create a client instance connected to the already existing interpolation
+    // object.
+    sheneos::interpolator shen;
+    shen.connect(shen_symbolic_name);
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Compute the minimum, maximum and delta values for each dimension.
+    double min_ye = 0, max_ye = 0;
+    shen.get_dimension(sheneos::dimension::ye, min_ye, max_ye);
+    double const delta_ye = (max_ye - min_ye) / num_ye_points;
+
+    double min_temp = 0, max_temp = 0;
+    shen.get_dimension(sheneos::dimension::temp, min_temp, max_temp);
+    double const delta_temp = (max_temp - min_temp) / num_temp_points;
+
+    double min_rho = 0, max_rho = 0;
+    shen.get_dimension(sheneos::dimension::rho, min_rho, max_rho);
+    double const delta_rho = (max_rho - min_rho) / num_rho_points;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Generate the data points, spacing them out equally.
+    std::vector<double> values_ye(num_ye_points);
+    std::vector<std::size_t> sequence_ye(num_ye_points);
+    double ye = min_ye;
+    for (std::size_t i = 0; i < num_ye_points; ++i) {
+        values_ye[i] = ye;
+        sequence_ye[i] = i;
+        ye += delta_ye;
+    }
+
+    std::vector<double> values_temp(num_temp_points);
+    std::vector<std::size_t> sequence_temp(num_temp_points);
+    double temp = min_temp;
+    for (std::size_t i = 0; i < num_temp_points; ++i) {
+        values_temp[i] = temp;
+        sequence_temp[i] = i;
+        temp += delta_temp;
+    }
+
+    std::vector<double> values_rho(num_rho_points);
+    std::vector<std::size_t> sequence_rho(num_rho_points);
+    double rho = min_rho;
+    for (std::size_t i = 0; i < num_rho_points; ++i) {
+        values_rho[i] = rho;
+        sequence_rho[i] = i;
+        rho += delta_rho;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // We want to avoid invoking the same evaluation sequence on all localities
+    // performing the test, so we randomly shuffle the sequences. We combine
+    // the shared seed with the locality id to ensure that each locality has
+    // a unique, reproducible seed.
+    std::srand(static_cast<unsigned int>(seed + hpx::get_locality_id()));
+    std::random_shuffle(sequence_ye.begin(), sequence_ye.end());
+    std::random_shuffle(sequence_temp.begin(), sequence_temp.end());
+    std::random_shuffle(sequence_rho.begin(), sequence_rho.end());
+
+    // Execute bulk operation
+    hpx::lcos::future<std::vector<std::vector<double> > > bulk_tests =
+        shen.interpolate_bulk_async(values_ye, values_temp, values_rho);
+
+    std::vector<std::vector<double> > results = hpx::lcos::wait(bulk_tests);
+}
+
+typedef hpx::actions::plain_action4<
+    std::size_t,
+    std::size_t,
+    std::size_t,
+    std::size_t,
+    test_sheneos_bulk
+> test_bulk_action;
+
+HPX_REGISTER_PLAIN_ACTION(test_bulk_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
@@ -231,7 +312,7 @@ int hpx_main(boost::program_options::variables_map& vm)
             plain_function<test_action>::get_component_type();
 
         // Get a list of all localities that support the test action.
-        std::vector<hpx::naming::id_type> prefixes =
+        std::vector<hpx::naming::id_type> locality_ids =
             hpx::find_all_localities(type);
 
         t.restart();
@@ -239,7 +320,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Kick off the computation asynchronously. On each locality,
         // num_workers test_actions are created.
         std::vector<hpx::lcos::future<void> > tests;
-        BOOST_FOREACH(hpx::naming::id_type const& id, prefixes)
+        BOOST_FOREACH(hpx::naming::id_type const& id, locality_ids)
         {
             using hpx::lcos::async;
             for (std::size_t i = 0; i < num_workers; ++i)
@@ -247,10 +328,12 @@ int hpx_main(boost::program_options::variables_map& vm)
                     num_temp_points, num_rho_points, seed));
         }
 
-        hpx::lcos::wait(tests, [&](std::size_t i) {
-            std::cout << "Finished task " << i << ": " << t.elapsed() << " [s]"
-                      << std::endl;
-        });
+        hpx::lcos::wait(tests,
+            [&](std::size_t i)
+            {
+                std::cout << "Finished task " << i << ": " << t.elapsed() << " [s]"
+                          << std::endl;
+            });
 
         std::cout << "Completed tests: " << t.elapsed() << " [s]" << std::endl;
 
@@ -258,19 +341,44 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         // Kick off the computation asynchronously. On each locality,
         // num_workers test_actions are created.
-        std::vector<hpx::lcos::future<void> > bulk_tests;
-        BOOST_FOREACH(hpx::naming::id_type const& id, prefixes)
+        std::vector<hpx::lcos::future<void> > bulk_one_tests;
+        BOOST_FOREACH(hpx::naming::id_type const& id, locality_ids)
         {
             using hpx::lcos::async;
             for (std::size_t i = 0; i < num_workers; ++i)
-                bulk_tests.push_back(async<test_one_bulk_action>(id,
+                bulk_one_tests.push_back(async<test_one_bulk_action>(id,
                     num_ye_points, num_temp_points, num_rho_points, seed));
         }
 
-        hpx::lcos::wait(bulk_tests, [&](std::size_t i) {
-            std::cout << "Finished bulk task " << i << ": " << t.elapsed()
-                << " [s]" << std::endl;
-        });
+        hpx::lcos::wait(bulk_one_tests,
+            [&](std::size_t i)
+            {
+                std::cout << "Finished bulk-one task " << i << ": " << t.elapsed()
+                    << " [s]" << std::endl;
+            });
+
+        std::cout << "Completed bulk-one tests: " << t.elapsed() << " [s]"
+            << std::endl;
+
+        t.restart();
+
+        // Kick off the computation asynchronously. On each locality,
+        // num_workers test_actions are created.
+        std::vector<hpx::lcos::future<void> > bulk_tests;
+        BOOST_FOREACH(hpx::naming::id_type const& id, locality_ids)
+        {
+            using hpx::lcos::async;
+            for (std::size_t i = 0; i < num_workers; ++i)
+                bulk_tests.push_back(async<test_bulk_action>(id,
+                    num_ye_points, num_temp_points, num_rho_points, seed));
+        }
+
+        hpx::lcos::wait(bulk_tests,
+            [&](std::size_t i)
+            {
+                std::cout << "Finished bulk task " << i << ": " << t.elapsed()
+                    << " [s]" << std::endl;
+            });
 
         std::cout << "Completed bulk tests: " << t.elapsed() << " [s]"
             << std::endl;
