@@ -13,7 +13,7 @@ set(HPX_FLAGS "@CMAKE_CXX_FLAGS@ @external_definitions@")
 
 set(HPX_PREFIX @CMAKE_INSTALL_PREFIX@ CACHE PATH "HPX installation root")
 
-if(NOT WIN32)
+if(NOT MSVC)
   set(HPX_RPATH @external_rpath@ CACHE STRING "Base RPATH for linking")
 endif()
 
