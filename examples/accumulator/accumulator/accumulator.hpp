@@ -6,6 +6,7 @@
 #if !defined(HPX_COMPONENTS_ACCUMULATOR_MAY_18_2008_0822AM)
 #define HPX_COMPONENTS_ACCUMULATOR_MAY_18_2008_0822AM
 
+//[acc_cli
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/components/client_base.hpp>
 
@@ -18,28 +19,34 @@ namespace hpx { namespace components
     /// specific \a server#accumulator component
     class accumulator
       : public client_base<accumulator, stubs::accumulator>
+        //[acc_cli_base
+        
     {
         typedef client_base<accumulator, stubs::accumulator> base_type;
 
     public:
         accumulator()
         {}
-
+        
         /// Create a client side representation for the existing
         /// \a server#accumulator instance with the given global id \a gid.
         accumulator(naming::id_type gid)
           : base_type(gid)
         {}
-
+        //]
+        
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
         /// Initialize the accumulator value
+        
+        //[acc_cli_init
         void init()
         {
             BOOST_ASSERT(gid_);
             this->base_type::init(gid_);
         }
+        //]
 
         /// Add the given number to the accumulator
         void add (unsigned long arg)
@@ -70,5 +77,7 @@ namespace hpx { namespace components
     };
 
 }}
+
+//]
 
 #endif

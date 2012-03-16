@@ -6,6 +6,7 @@
 #if !defined(HPX_COMPONENTS_STUBS_ACCUMULATOR_JUN_09_2008_0458PM)
 #define HPX_COMPONENTS_STUBS_ACCUMULATOR_JUN_09_2008_0458PM
 
+//[acc_stub
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
@@ -28,6 +29,7 @@ namespace hpx { namespace components { namespace stubs
         /// with the given \a gid. This is a non-blocking call. The caller
         /// needs to call \a future#get on the return value of
         /// this function to obtain the result as returned by the accumulator.
+        //[acc_stub_query
         static lcos::future<unsigned long> query_async(naming::id_type const& gid)
         {
             // Create a future, execute the required action,
@@ -46,20 +48,25 @@ namespace hpx { namespace components { namespace stubs
             // is executed and the result is returned to the future
             return query_async(gid).get();
         }
+        //]        
 
         /// Initialize the accumulator value of the server#accumulator instance
         /// with the given \a gid
+        //[acc_stub_init
         static void init(naming::id_type gid)
         {
             applier::apply<server::accumulator::init_action>(gid);
         }
+        //]
 
         /// Add the given number to the server#accumulator instance
         /// with the given \a gid
+        //[acc_stub_add
         static void add (naming::id_type gid, unsigned long arg)
         {
             applier::apply<server::accumulator::add_action>(gid, arg);
         }
+        //]
 
         /// Print the current value of the server#accumulator instance
         /// with the given \a gid
@@ -70,5 +77,6 @@ namespace hpx { namespace components { namespace stubs
     };
 
 }}}
+//]
 
 #endif

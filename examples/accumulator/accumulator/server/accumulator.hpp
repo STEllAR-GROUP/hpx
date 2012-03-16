@@ -17,8 +17,10 @@
 #include <hpx/runtime/components/server/memory.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
+//[acc_namespace
 namespace hpx { namespace components { namespace server
 {
+    //
     ///////////////////////////////////////////////////////////////////////////
     /// The accumulator is a very simple example of a HPX component.
     ///
@@ -29,13 +31,14 @@ namespace hpx { namespace components { namespace server
     ///
     /// Note that the implementation of the accumulator does not require any
     /// special data members or virtual functions.
-    ///
     class accumulator
       : public components::detail::managed_component_base<accumulator>
     {
     public:
         // parcel action code: the action to be performed on the destination
         // object (the accumulator)
+        
+        //[e_action
         enum actions
         {
             accumulator_init = 0,
@@ -43,7 +46,7 @@ namespace hpx { namespace components { namespace server
             accumulator_query_value = 2,
             accumulator_print = 3
         };
-
+        //]
         // constructor: initialize accumulator value
         accumulator()
           : arg_(0)
@@ -52,12 +55,14 @@ namespace hpx { namespace components { namespace server
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
+        //[acc_init
         /// Initialize the accumulator
         void init()
         {
             arg_ = 0;
         }
-
+        //]
+        
         /// Add the given number to the accumulator
         void add (unsigned long arg)
         {
@@ -82,14 +87,18 @@ namespace hpx { namespace components { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
+        //[a_init1
         typedef hpx::actions::action0<
             accumulator, accumulator_init, &accumulator::init
         > init_action;
-
+        //]
+        
+        //[a_add1
         typedef hpx::actions::action1<
             accumulator, accumulator_add, unsigned long, &accumulator::add
         > add_action;
-
+        //]
+        
         typedef hpx::actions::result_action0<
             accumulator, unsigned long, accumulator_query_value, &accumulator::query
         > query_action;
@@ -103,6 +112,10 @@ namespace hpx { namespace components { namespace server
     };
 
 }}}
+//]
+
+
+//[action_declare
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::components::server::accumulator::init_action,
@@ -116,5 +129,6 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::components::server::accumulator::print_action,
     accumulator_print_action);
+//]
 
 #endif

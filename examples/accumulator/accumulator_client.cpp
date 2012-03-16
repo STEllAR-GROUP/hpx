@@ -3,35 +3,48 @@
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-
+//[acc_acc_client
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
 #include "accumulator/accumulator.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+//[hpx_main
 int hpx_main(boost::program_options::variables_map&)
+//]
+
 {
     // get list of all known remote localities supporting our accumulator type
+   
+     //[acc_comp
     hpx::components::component_type t =
         hpx::components::accumulator::get_component_type();
+    //]
+    
+    //[hpx_loc
     std::vector<hpx::naming::id_type> localities =
         hpx::find_remote_localities(t);
-
+    //]
+    
     hpx::naming::id_type prefix;
-
+    
+    //[hpx_loc_1
     if (!localities.empty())
         // create accumulator on any of the remote localities
         prefix = localities[0];
     else
         // create an accumulator locally
         prefix = hpx::find_here();
-
-    {
+    //]
+    
+    {   
+        //[acc_create
         // create an accumulator locally
         hpx::components::accumulator accu;
         accu.create(prefix);
-
+        //]
+        
         // print some message
         std::cout << "accumulator client, you may enter some commands "
                      "(try 'help' if in doubt...)" << std::endl;
@@ -39,6 +52,7 @@ int hpx_main(boost::program_options::variables_map&)
         // execute a couple of commands on this component
         std::string cmd;
         std::cin >> cmd;
+        //[acc_execute
         while (std::cin.good())
         {
             if (cmd == "init")
@@ -63,6 +77,7 @@ int hpx_main(boost::program_options::variables_map&)
 
             else if (cmd == "quit")
                 break;
+        //]
 
             else
                 std::cout << "Invalid command.\n"
@@ -74,12 +89,14 @@ int hpx_main(boost::program_options::variables_map&)
     }
 
     // initiate shutdown of the runtime systems on all localities
-    hpx::finalize();
 
+    //[hpx_finalize
+    hpx::finalize();
+    //]
     return 0;
 }
-
 ///////////////////////////////////////////////////////////////////////////////
+//[hpx_init
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
@@ -89,4 +106,6 @@ int main(int argc, char* argv[])
     // Initialize and run HPX
     return hpx::init(desc_commandline, argc, argv);
 }
+//]
 
+//]
