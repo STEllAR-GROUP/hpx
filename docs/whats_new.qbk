@@ -14,6 +14,9 @@
 [/////////////////////////////////////////////////////////////////////////////]
 [section:hpx_0_8_0 HPX V0.8.0]
 
+We have had roughly 1500 commits since the last release, closed approximately
+100 tickets (bugs, feature requests, etc.).
+
 [heading General Changes]
 
 * Improved PBS support, allowing for arbitrary naming schemes of node-hostnames.
@@ -52,9 +55,9 @@
   threading subsystem to other threading libraries (Intel TBB, ETI SWARM,
   Sandia QThreads).
 * Added more refined thread affinity control. This is based on the external
-  library __hwloc__. Note: the use of __hwloc__ is still off by default because
+  library __hwloc__. Note: the use of HWLOC is still off by default because
   of the experimental character of our NUMA support.
-* Fully support (64Bit) Windows builds in build system.
+* Added full support of (64Bit) Windows builds using cmake build system.
 * Allow for components to register their own command line options.
 * Added the possibility to register custom startup/shutdown functions for
   any component. These functions are guaranteed to be executed by an HPX
@@ -67,7 +70,16 @@
 
 * Graph500 performace benchmark (thanks to Matthew Anderson for contributing
   this application).
+* GTC (Gyrokinetic Toroidal Code): A skeletton for particle in cell type codes.
+* Random Memory Access: an example demonstrating random memory accesses in a
+  large array
+* ShenEOS example demonstrating partitioning of large read-only data structures
+  and exposes an interpolation API on top of those.
 * Sine performance counter demo.
+* Accumulator examples demonstrating how to write and use HPX components.
+* Quickstart examples (like hello_world, fibonacci, quicksort, factorial, etc.)
+  demonstrating simple HPX concepts which introduce some of the concepts in
+  HPX.
 
 [heading API Changes]
 
@@ -90,8 +102,10 @@
 * Added `hpx::get_worker_thread_num` replacing `hpx::threadmanager_base::get_thread_num`.
 * Renamed `hpx::get_num_os_threads` to `hpx::get_os_threads_count`.
 * Added `hpx::threads::get_thread_count`.
+* Restructured the Futures sub-system, renaming types in accordance with the
+  terminology used by the C++11 ISO standard.
 
-[heading Bug fixes]
+[heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the tickets we closed for this release:
 

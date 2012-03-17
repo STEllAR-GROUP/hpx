@@ -45,7 +45,7 @@
 [def __boost_doc__              [@http://www.boost.org/doc/ Boost Documentation]]
 
 [/ optional external dependencies]
-[def __hwloc__                  [@http://www.open-mpi.org/projects/hwloc/ Portable Hardware Locality (hwloc)]]
+[def __hwloc__                  [@http://www.open-mpi.org/projects/hwloc/ Portable Hardware Locality (HWLOC)]]
 
 [/ Some images ]
 [def __note__                   [$./images/note.png]]
