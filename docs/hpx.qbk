@@ -46,6 +46,9 @@
 
 [/ optional external dependencies]
 [def __hwloc__                  [@http://www.open-mpi.org/projects/hwloc/ Portable Hardware Locality (HWLOC)]]
+[def __tbb__                    [@http://threadingbuildingblocks.org/ Intel Threading Building Blocks (TBB)]]
+[def __swarm__                  [@http://www.etinternational.com/index.php/products/swarmbeta/ ETI SWift Adaptive Runtime Machine (SWARM)]]
+[def __qthreads__               [@http://www.cs.sandia.gov/qthreads/ Sandia National Labs Qthreads]]
 
 [/ Some images ]
 [def __note__                   [$./images/note.png]]
@@ -87,7 +90,9 @@ can be found in the collection of __boost_tools__.
 [endsect] [/ Tutorial]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[section:manual Refernce Manual]
+[section:manual Reference Manual]
+
+[fixme TBD]
 
 [endsect] [/ Manual]
 

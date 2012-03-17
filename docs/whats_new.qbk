@@ -52,8 +52,8 @@ We have had roughly 1500 commits since the last release, closed approximately
   simultaneous connections to a particular host is now limited. Parcels are
   buffered and bundled if all connections are in use.
 * Added a suite of benchmarks allowing to compare performance of the HPX
-  threading subsystem to other threading libraries (Intel TBB, ETI SWARM,
-  Sandia QThreads).
+  threading subsystem to other threading libraries (__tbb__, __swarm__,
+  __qthreads__).
 * Added more refined thread affinity control. This is based on the external
   library __hwloc__. Note: the use of HWLOC is still off by default because
   of the experimental character of our NUMA support.
