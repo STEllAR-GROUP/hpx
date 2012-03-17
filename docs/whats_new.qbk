@@ -16,6 +16,12 @@
 
 [heading General Changes]
 
+* Improved PBS support, allowing for arbitrary naming schemes of node-hostnames.
+* Implemented better connection control for network connections between two
+  compute-nodes. Added parcel buffering.
+* Restructured LCO framework. Renamed `eager_future` and `lazy_future` into
+  packaged_task and deferred packaged_task. Split promises into packaged_tasks
+  and futures. Added 'local' futures (in namespace `hpx::lcos::local`).
 * Improving the general performance of local and remote action invocations.
   This (under certain circumstances) drastically reduces the number of copies
   created for each of the parameters and return values.
@@ -46,7 +52,8 @@
   threading subsystem to other threading libraries (Intel TBB, ETI SWARM,
   Sandia QThreads).
 * Added more refined thread affinity control. This is based on the external
-  library __hwloc__
+  library __hwloc__. Note: the use of __hwloc__ is still off by default because
+  of the experimental character of our NUMA support.
 * Fully support (64Bit) Windows builds in build system.
 * Allow for components to register their own command line options.
 * Added the possibility to register custom startup/shutdown functions for
@@ -85,6 +92,8 @@
 * Added `hpx::threads::get_thread_count`.
 
 [heading Bug fixes]
+
+Here is a list of the tickets we closed for this release:
 
 *  #31: Specialize handle_gid<> for examples and tests
 *  #72: Fix AGAS reference counting
@@ -151,7 +160,6 @@
 * #328: FindHPX_HDF5.cmake is broken
 * #329: --help and --version should still work
 * #330: Create pkg-config files
-* #336: Integrate testing with cmake
 * #337: Improve usability of performance counter timestamps
 * #338: Non-std exceptions deriving from std::exceptions in tfunc may be sliced
 * #339: Decrease the number of send_pending_parcels threads
@@ -160,6 +168,16 @@
 * #344: Mark CMake variables as advanced
 * #345: Add more versatile environmental/cmake variable support to hpx_find_* CMake macros
 * #347: Embarrassingly parallel applications do not scale
+* #351: 'make install' does not update documents
+* #353: Disable FIXMEs in the docs by default; add a doc developer CMake option to enable FIXMEs
+* #355: "make" doesn't do anything after correct configuration
+* #356: Don't use hpx::util::static_ in topology code
+* #357: sheneos_test fails to link
+* #358: r7357 broken for neutron_star
+* #359: Infinite recursion in hpx::tuple serialization
+* #360: IB over IP -- help
+* #361: Add compile time option to disable logging completely
+* #364: Installation seriously broken in r7443
 
 
 [endsect]
