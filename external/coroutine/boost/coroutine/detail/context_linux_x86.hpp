@@ -58,7 +58,7 @@ namespace boost { namespace coroutines {
       ~prepare_main_thread() {}
   };
 
-  namespace detail { namespace linux
+  namespace detail { namespace lx
   {
     template<typename T>
     void trampoline(T* fun);

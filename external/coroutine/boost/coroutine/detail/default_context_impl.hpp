@@ -106,7 +106,7 @@ namespace boost { namespace coroutines { namespace detail {
 
 #include <boost/coroutine/detail/context_linux_x86.hpp>
 namespace boost { namespace coroutines { namespace detail {
-  typedef linux::context_impl default_context_impl;
+  typedef lx::context_impl default_context_impl;
 } } }
 
 #elif defined(_POSIX_VERSION)
