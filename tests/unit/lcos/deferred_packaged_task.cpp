@@ -33,13 +33,15 @@ typedef hpx::lcos::deferred_packaged_task<null_action> null_future;
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map&)
 {
-    // create an explicit future
-    null_thread_executed = false;
     {
-        null_future f(hpx::find_here());
-        HPX_TEST(f.get());
+        // create an explicit future
+        null_thread_executed = false;
+        {
+            null_future f(hpx::find_here());
+            HPX_TEST(f.get());
+        }
+        HPX_TEST(null_thread_executed);
     }
-    HPX_TEST(null_thread_executed);
 
     hpx::finalize();       // Initiate shutdown of the runtime system.
     return hpx::util::report_errors();
