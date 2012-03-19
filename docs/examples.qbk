@@ -33,9 +33,9 @@ needed it will already be calculated and available.
 
 [heading Setup]
 
-The source code for this exaple in in the SVN repository:
-[^parallex/hpx/examples/quickstart/fibonacci.cpp]
-[fixme Add link to source here].
+The source code for this example in in the svn repository:
+[^.../hpx/examples/quickstart/fibonacci.cpp]
+[fixme Add link to source here and remove reference to svn].
 
 To compile this file type:
 
@@ -160,8 +160,8 @@ and which locality it came from.  The output will look something like this:
 [heading Setup]
 
 The source file is already created for you and could be found in the svn
-repository: [^parallex/hpx/examples/quickstart/hello_world.cpp]
-[fixme add a link here].
+repository: [^.../hpx/examples/quickstart/hello_world.cpp]
+[fixme add a link here and remove reference to svn].
 
 To compile this file type:
 
@@ -333,8 +333,8 @@ and returns no value.
 Here we declare all the action types that the component exposes to the hpx so
 that hpx runtime system reconizes that action as a valid hpx component action.
 
-Now we create client side methods to access the actions the component provides
-. The convention followed by the accumulator example, in hpx, is to create
+Now we create client side methods to access the actions the component provides.
+The convention followed by the accumulator example, in hpx, is to create
 the following file:
 
 example/accumulator/accumulator/stubs/accumulator.hpp
@@ -348,8 +348,8 @@ actions available in any of the localities where the component is instantiated
 as each method takes gid as first argument.
 
 [accumulator_stub_init]
-The above code snippet allows the client side to invoke init action (server::
-accumulator::init_action) directly at the component location. This action does
+The above code snippet allows the client side to invoke init action
+(`server::accumulator::init_action`) directly at the component location. This action does
 not take any value as the definition of the action at the serverside implicitly
 initialized the data member of accumulator component to 0.
 
@@ -360,7 +360,7 @@ instantiated. Gid is however not an argument to the action of the component.
 
 [accumulator_stub_query]
 The above code snippet gives us an action that returns a value. The return type
-is unsigned long. The caller of this function needs to call future.get() on the
+is unsigned long. The caller of this function needs to call `future.get()` on the
 return value of the function to obtain the result returned by the function.
 
 For example:
@@ -382,14 +382,14 @@ examples/accumulator/accumulator/accumulator.hpp
 The methods defined in the above file gives us access to actions of component in
 the locality where the client object is instantiated. Here explicit gid of the
 component is not passed into the function. The function takes the gid of the
-locality where the client object is instantiated (gid_).
+locality where the client object is instantiated (`gid_`).
 
 [accumulator_client_base]
 The above code snippet make the client object instantiated effectively also inherit
-properties from the stubs::accumulator class.
+properties from the `stubs::accumulator` class.
 
 [accumulator_client_init]
-The above code would call the component init action using gid_ of the client
+The above code would call the component init action using `gid_` of the client
 locality where the component is also instantiated.
 
 Registering Actions with HPX:
@@ -429,7 +429,7 @@ and which support the accumulator component type are listed.
 [accumulator_hpx_loc_1]
 In the above code if there are more than one localities available to the runtime
 system, then the first one is selected of the listed localities else the locality
-where the hpx_main() is instantiated is selected where the accumulator component
+where the `hpx_main()` is instantiated is selected where the accumulator component
 will be instantiated.
 
 [accumulator_create]

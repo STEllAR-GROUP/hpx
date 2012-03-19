@@ -68,10 +68,10 @@
 
 [/ CONTENT]
 
-The STE||AR Group (System Technologies, Emergent Parallelism, and Algorithms
-Research) is a research group at the Center for Computation and Technology
-(Louisiana State University). For a list of people working in that group and
-participating in writing this documentation see __people__.
+The __stellar__ Group ([*S]ystems [*T]echnologies, [*E]mergent Para[*ll]elism,
+and [*A]lgorithms [*R]esearch) is a research group at the __cct__ (__lsu__). For
+a list of people working in that group and participating in writing this
+documentation see __people__.
 
 This documentation is automatically generated for HPX __version__ (from SVN
 revision __svn_revision__) by the Boost QuickBook documentation tool. QuickBook
