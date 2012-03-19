@@ -66,6 +66,27 @@
 
 [def __people__                 [link hpx.people People]]
 
+[/  fig[ref title label]
+    Image element with a title.
+
+    ref   := Reference to the image file.
+    title := The title to associate with this figure.
+    label := the id to use to be able to reference this picture
+]
+[template fig[ref title label]'''
+    <figure id="'''[label]'''">
+        <title>'''[title]'''</title>
+        <inlinemediaobject>
+            <imageobject>
+                <imagedata fileref="./images/'''[ref]'''"></imagedata>
+            </imageobject>
+            <textobject>
+                <phrase role="alt">'''[title]'''</phrase>
+            </textobject>
+        </inlinemediaobject>
+    </figure>
+''']
+
 [/ CONTENT]
 
 The __stellar__ Group ([*S]ystems [*T]echnologies, [*E]mergent Para[*ll]elism,

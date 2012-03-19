@@ -24,12 +24,33 @@ The Fibonacci sequence is a sequence of numbers starting with 0 and 1 where
 every subsequent number is the sum of the previous two numbers. In this
 example, we will use HPX to calculate the value of the n-th postition of the
 Fibonacci sequence. In order to compute this problem in parallel, we will use
-a tool known as a future. Futures are the return values of packets of work
-that are sent to worker nodes. These objects are declared but do not recieve
-their value until the internal function [^.get()] is called, which fetches
-the values from the functions that they are wrapped around. This tool allows
+a facility known as a Future.
+[/Futures are the return values of packets of work
+that are sent to worker nodes. These objects are declared but do not receive
+their value until the internal function `.get()` is called, which fetches
+the values from the functions that they are wrapped around.]
+
+As shown in the [link examples.future_schematics figure] below, a Future
+encapsulates a delayed computation. It acts as
+a proxy for a result initially not known, most of the time because the
+computation of the result has not completed yet. The Future synchronizes the
+access of this value by optionally suspending the HPX-thread requesting the
+result until the value is available. When a Future is created, it spawns a
+new HPX-thread (either remotely with a parcel or locally by placing it into
+the thread queue) which, when run, will execute the action associated with
+the Future. The arguments of the action are bound when the Future is created.
+
+[fig future_schematics.png..Schematic of a Future execution..examples.future_schematics]
+
+Once the action has finished executing, a write operation is performed on the
+Future. The write operation marks the Future as completed, and optionally
+stores data returned by the action. When the result of the delayed computation
+is needed, a read operation is performed on the Future. If the Future's action
+hasn't completed when a read operation is performed on it, the reader
+HPX-thread is suspended until the Future is ready. The Future facility allows
 HPX to schedule work early in a program so that when the function value is
-needed it will already be calculated and available.
+needed it will already be calculated and available. We use this property in our
+Fibonacci example below to enable its parallel execution.
 
 [heading Setup]
 
@@ -39,25 +60,25 @@ The source code for this example in in the svn repository:
 
 To compile this file type:
 
-  $ make examples.quickstart.fibonacci
+    $ make examples.quickstart.fibonacci
 
-If you know how many cores your machine has use make's '-j' option to increase
-the number of parallel pocesses that are running. You should start your number
+If you know how many cores your machine has, use make's '-j' option to increase
+the number of parallel processes that are running. You should start your number
 of cores plus an additional process for maximum speed. For instance, if your
 machine has 4 cores you would type:
 
-  $ make examples.quickstart.fibonacci -j5
+    $ make examples.quickstart.fibonacci -j5
 
 for the fastest build.
 
 To run the program type:
 
-  $ ./bin/fibonacci
+    $ ./bin/fibonacci
 
 This should print (time should be approximate):
 
-  fibonacci(10) == 55
-  elapsed time: 0.00186288 [s]
+    fibonacci(10) == 55
+    elapsed time: 0.00186288 [s]
 
 This run used the default setting of calculating the tenth place of the
 Fibonacci sequence. To declare which position you want to calculate, use
@@ -65,12 +86,12 @@ the '--n-value' option. Addtitionally you can use the '--hpx:threads' option
 to declare how many threads you wish to use when running the program. For
 instance,running:
 
-  $ ./bin/fibonacci --n-value 20 --hpx:threads 5
+    $ ./bin/fibonacci --n-value 20 --hpx:threads 5
 
 Will yeild:
 
-  fibonacci(20) == 6765
-  elapsed time: 0.233827 [s]
+    fibonacci(20) == 6765
+    elapsed time: 0.233827 [s]
 
 To run this program on multiple localities please see the __pbs__ documentation.
 
@@ -294,7 +315,7 @@ Console 2:
     {0000000200000000, 00007fff21db4860}> 5
     {0000000200000000, 00007fff21db4860}> 10
 
-[heading Disecting Accumulator Example]
+[heading Disecting the Accumulator Example]
 
 The following text/code snippets gives us a basic infracture know how for
 creating our own components, using the accumulator components as an example.
