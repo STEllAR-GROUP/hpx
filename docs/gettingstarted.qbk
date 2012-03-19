@@ -87,8 +87,8 @@ your distribution, please refer to the corresponding documentation.
 
 [pre
     $ cd hpx
-    $ mkdir my_hpx_build
-    $ cd my_hpx_build
+$ mkdir my_hpx_build
+$ cd my_hpx_build
 ]
 
 * Invoke CMake from your build directory, pointing the CMake driver to the root
@@ -134,12 +134,12 @@ Now, in the directory where you put hello_world.cpp, issue the following command
 HPX):
 
 [pre
-    $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
-    $ c++ -o hello_world hello_world.cpp \`pkg-config --cflags --libs hpx_application\` -lhpx_component_iostreams -DHPX_APPLICATION_NAME=hello_world
+    $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/
+$ c++ -o hello_world hello_world.cpp \`pkg-config --cflags --libs hpx_application\` -lhpx_component_iostreams -DHPX_APPLICATION_NAME=hello_world
 ]
 
 [important When using pkg-config with HPX, the pkg-config flags must go after
-           the `-o` flag.] 
+           the `-o` flag.]
 
 To test the program, type:
 
@@ -155,15 +155,15 @@ Let's try a more complex example involving an HPX component. An HPX component is
 a class which exposes HPX actions. HPX components are compiled into dynamically
 loaded modules called component libraries. Here's the source code:
 
-[*hello_world.hpp]
-
-[import ../examples/hello_world_component/hello_world.hpp]
+[import ../examples/hello_world_component/hello_world_component.hpp]
 
 [*hello_world.cpp]
 
-[import ../examples/hello_world_component/hello_world.cpp]
+[import ../examples/hello_world_component/hello_world_component.cpp]
 
 [hello_world_cpp_getting_started]
+
+[*hello_world.hpp]
 
 [hello_world_hpp_getting_started]
 
@@ -173,7 +173,7 @@ loaded modules called component libraries. Here's the source code:
 
 [hello_world_client_getting_started]
 
-Copy the three source files above into three files (called hello_world.cpp, 
+Copy the three source files above into three files (called hello_world.cpp,
 hello_world.hpp and hello_world_client.cpp respectively).
 
 Now, in the directory where you put the files, run the following command to
@@ -182,8 +182,8 @@ CMAKE_INSTALL_PREFIX you used while building HPX):
 
 [pre
     $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
-    $ c++ -o libhpx_component_hello_world.so hello_world.cpp `pkg-config --cflags --libs hpx_component` -DHPX_COMPONENT_NAME=hello_world
-    $ mv libhpx_component_hello_world.so $HPX_LOCATION/lib/hpx/libhpx_component_hello_world.so
+$ c++ -o libhpx_component_hello_world.so hello_world.cpp \`pkg-config --cflags --libs hpx_component\` -DHPX_COMPONENT_NAME=hello_world
+$ mv libhpx_component_hello_world.so $HPX_LOCATION/lib/hpx/libhpx_component_hello_world.so
 ]
 
 Now, to build the application that uses this component (hello_world_client.cpp),
@@ -191,11 +191,11 @@ we do:
 
 [pre
     $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
-    $ c++ -o hello_world_client hello_world_client.cpp `pkg-config --cflags --libs hpx_application` -lhpx_component_iostreams -lhpx_component_hello_world
+$ c++ -o hello_world_client hello_world_client.cpp \`pkg-config --cflags --libs hpx_application\` -lhpx_component_iostreams -lhpx_component_hello_world
 ]
 
 [important When using pkg-config with HPX, the pkg-config flags must go after
-           the `-o` flag.] 
+           the `-o` flag.]
 
 To test the program, type:
 
@@ -247,9 +247,9 @@ available is pointless and may prevent PBS from accepting the script.
 correct path to the executable (`hello_world` in this case) and command line
 options.  Since the `hello_world` application doesn't need any command line
 options, `APP_OPTIONS` has been left empty. Unlike in other execution
-environments, there is no need to use the 
-[link hpx.tutorial.getting_started.commandline --hpx:threads] option to 
-indicate the required number of OS threads per node; HPX library will 
+environments, there is no need to use the
+[link hpx.tutorial.getting_started.commandline --hpx:threads] option to
+indicate the required number of OS threads per node; HPX library will
 derive this parameter automatically from PBS.
 
 Finally, `pbsdsh` is a PBS command that starts a distributed job using allocated
@@ -281,7 +281,7 @@ become available is shown below:
 
     Job id                    Name             User            Time Use S Queue
     ------------------------- ---------------- --------------- -------- - -----
-    42.supercomputer          ...ello_world.sh joe_user               0 Q batch    
+    42.supercomputer          ...ello_world.sh joe_user               0 Q batch
 
 After the job completes, PBS will place two files, `pbs_hello_world.sh.o42` and
 `pbs_hello_world.sh.e42` in the directory from where the job was submitted. The
@@ -346,7 +346,7 @@ Congratulations! You have just run your first distributed HPX application!
   created before.
 * Add CMake variable definitions (if any) by clicking the "Add Entry" button.
   The only required variable you need to define is `BOOST_ROOT`. This variable
-  needs to be set to point to point to the root folder of your Boost
+  needs to be set to point to the root folder of your Boost
   installation. It is recommended to set the variable `CMAKE_INSTALL_PREFIX` as
   well. This allows to control where the built HPX libraries will be installed.
 * Press the "Configure" button. A window will pop up asking you which compilers

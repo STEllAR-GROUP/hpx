@@ -17,7 +17,9 @@ set(DOCUMENTATION_DEPENDENCIES
     ${hpx_SOURCE_DIR}/examples/accumulator/accumulator/stubs/accumulator.hpp
     ${hpx_SOURCE_DIR}/examples/accumulator/accumulator/accumulator.hpp
     ${hpx_SOURCE_DIR}/examples/accumulator/accumulator/accumulator.cpp
-    ${hpx_SOURCE_DIR}/examples/accumulator/accumulator_client.cpp)
+    ${hpx_SOURCE_DIR}/examples/accumulator/accumulator_client.cpp
+    ${hpx_SOURCE_DIR}/examples/hello_world_component/hello_world_component.hpp
+    ${hpx_SOURCE_DIR}/examples/hello_world_component/hello_world_component.cpp)
 
 set(quickbook_fixme_mode "-D__disable_fixme__")
 if(HPX_DOCUMENTATION_DEVELOPMENT)
