@@ -1,5 +1,10 @@
+//  Copyright (c) 2012 Bryce Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
 //[hello_world_cpp_getting_started
-#include "hello_world.hpp"
+#include "hello_world_component.hpp"
 #include <hpx/include/iostreams.hpp>
 
 namespace examples { namespace server

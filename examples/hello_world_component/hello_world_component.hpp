@@ -1,7 +1,13 @@
-//[hello_world_hpp_getting_started
-#if !defined(HELLO_WORLD_HPP)
-#define HELLO_WORLD_HPP 
+//  Copyright (c) 2012 Bryce Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+//[hello_world_hpp_getting_started
+#if !defined(HELLO_WORLD_COMPONENT_HPP)
+#define HELLO_WORLD_COMPONENT_HPP
+
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/components.hpp>
@@ -52,6 +58,6 @@ struct hello_world
 HPX_REGISTER_ACTION_DECLARATION_EX(
     examples::server::hello_world::invoke_action, hello_world_invoke_action);
 
-#endif // HELLO_WORLD_HPP 
+#endif // HELLO_WORLD_COMPONENT_HPP 
 //]
 
