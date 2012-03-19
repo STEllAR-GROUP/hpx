@@ -61,11 +61,12 @@ namespace hpx { namespace actions
 
             // make sure the component_type of the action matches the component
             // type in the destination address
+/*
             if (HPX_UNLIKELY(!components::types_are_compatible(
                 dest.type_, act->get_component_type())))
             {
                 hpx::util::osstream strm;
-                strm << " types are not compatible: destination_type("
+                strm << "types are not compatible: destination_type("
                      << dest.type_ << ") action_type("
                      << act->get_component_type()
                      << ") parcel ("  << p << ")";
@@ -73,6 +74,7 @@ namespace hpx { namespace actions
                     "action_manager::fetch_parcel",
                     hpx::util::osstream_get_string(strm));
             }
+*/
 
             // either directly execute the action or create a new thread
             if (actions::base_action::direct_action == act->get_action_type())
