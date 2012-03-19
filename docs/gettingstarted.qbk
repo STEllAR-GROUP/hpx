@@ -118,53 +118,92 @@ for instance:
     $ gmake install
 ]
 
-[heading Build a Simple Program Using HPX]
+[heading Building HPX Applications with pkg-config]
 
 After you are done with the installation you should be able to build the
 following program. It prints 'Hello HPX World!' on the locality you run it on.
 
 [import ../examples/quickstart/simplest_hello_world.cpp]
 
-[/ this is how it should look like in the future, for now we import some code
-   from the simplest_hello_world example:
-
-    #include <hpx/hpx_init.hpp>
-
-    int hpx_main()
-    {
-        // Say Hello to the World!
-        hpx::cout << "Hello HPX World!" << hpx::endl;
-
-        // Initiate shutdown of the runtime system
-        return hpx::finalize();
-    }
-
-    int main(int argc, char* argv[])
-    {
-        // Initialize and run HPX.
-        return hpx::init("Hello HPX World Example", argc, argv);
-    }
-]
 [simplest_hello_world_getting_started]
 
-Copy the text of this program into a file called example.cpp.
+Copy the text of this program into a file called hello_world.cpp.
 
-Now, in the directory where you saved example.cpp, issue the following command
+Now, in the directory where you put hello_world.cpp, issue the following command
 (where $HPX_LOCATION is with the CMAKE_INSTALL_PREFIX you used while building
 HPX):
 
 [pre
     $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
-    $ c++ \`pkg-config --cflags --libs hpx_application\` -o example example.cpp
+    $ c++ -o hello_world hello_world.cpp \`pkg-config --cflags --libs hpx_application\` -lhpx_component_iostreams -DHPX_APPLICATION_NAME=hello_world
 ]
 
-To test the result, type:
+[important When using pkg-config with HPX, the pkg-config flags must go after
+           the `-o` flag.] 
+
+To test the program, type:
 
 [pre
-    $ ./example
+    $ ./hello_world
 ]
 
-which should print `Hello HPX World!` and exit.
+which should print `Hello World!` and exit.
+
+[heading Building HPX Components with pkg-config]
+
+Let's try a more complex example involving an HPX component. An HPX component is
+a class which exposes HPX actions. HPX components are compiled into dynamically
+loaded modules called component libraries. Here's the source code:
+
+[*hello_world.hpp]
+
+[import ../examples/hello_world_component/hello_world.hpp]
+
+[*hello_world.cpp]
+
+[import ../examples/hello_world_component/hello_world.cpp]
+
+[hello_world_cpp_getting_started]
+
+[hello_world_hpp_getting_started]
+
+[*hello_world_client.cpp]
+
+[import ../examples/hello_world_component/hello_world_client.cpp]
+
+[hello_world_client_getting_started]
+
+Copy the three source files above into three files (called hello_world.cpp, 
+hello_world.hpp and hello_world_client.cpp respectively).
+
+Now, in the directory where you put the files, run the following command to
+build the component library. (where $HPX_LOCATION is with the
+CMAKE_INSTALL_PREFIX you used while building HPX):
+
+[pre
+    $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
+    $ c++ -o libhpx_component_hello_world.so hello_world.cpp `pkg-config --cflags --libs hpx_component` -DHPX_COMPONENT_NAME=hello_world
+    $ mv libhpx_component_hello_world.so $HPX_LOCATION/lib/hpx/libhpx_component_hello_world.so
+]
+
+Now, to build the application that uses this component (hello_world_client.cpp),
+we do:
+
+[pre
+    $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
+    $ c++ -o hello_world_client hello_world_client.cpp `pkg-config --cflags --libs hpx_application` -lhpx_component_iostreams -lhpx_component_hello_world
+]
+
+[important When using pkg-config with HPX, the pkg-config flags must go after
+           the `-o` flag.] 
+
+To test the program, type:
+
+[pre
+    $ ./hello_world_client
+]
+
+which should print `Hello World!` and exit.
 
 [heading Using HPX Applications with PBS]
 

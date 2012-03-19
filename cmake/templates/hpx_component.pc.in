@@ -1,0 +1,16 @@
+# Copyright (c) 2012 Bryce Adelstein-Lelbach
+#
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+prefix=@HPX_PREFIX@
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib/hpx
+includedir=${exec_prefix}/include
+ 
+Name: hpx_component
+Description: High Performance ParalleX (application configuration) 
+Version: @HPX_VERSION@
+Libs: -Wl,-rpath,@external_rpath@ @CMAKE_CXX_FLAGS@ -fPIC -shared @external_link_flags@ -lhpx
+Cflags: @CMAKE_CXX_FLAGS@ @external_definitions@ @external_include_flags@ -DHPX_COMPONENT_EXPORTS -DBOOST_ENABLE_ASSERT_HANDLER
+

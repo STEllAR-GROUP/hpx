@@ -13,7 +13,7 @@
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/lcos/async.hpp>
 
-#include <examples/accumulator/accumulator/server/accumulator.hpp>
+#include "../server/accumulator.hpp"
 
 namespace hpx { namespace components { namespace stubs
 {

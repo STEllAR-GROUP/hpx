@@ -548,44 +548,17 @@ endif()
 ################################################################################
 if(MSVC)
   if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-    # No optimizations
-    hpx_append_flag(-Od LANGUAGES CXX Fortran)
-
-    # Generate debugging information
-    hpx_append_flag(-Zi LANGUAGES CXX Fortran)
-
-    # Keep the frame pointer
-    hpx_append_flag(-Oy- LANGUAGES CXX Fortran)
-
-    # Use multi-threaded debug runtime
-    hpx_append_flag(-MDd LANGUAGES CXX Fortran)
-
-    # basic runtime checks
-    hpx_append_flag(-RTC1 LANGUAGES CXX)
+    set(CMAKE_CXX_FLAGS_DEBUG
+        "${CMAKE_CXX_FLAGS_DEBUG} -Od -Zi -Oy- -MDd -RTC1")
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
-    # Optimize for speed with debug info
-    hpx_append_flag(-O2 LANGUAGES CXX Fortran)
-
-    # Generate debugging information
-    hpx_append_flag(-Zi LANGUAGES CXX Fortran)
-
-    # Use multi-threaded debug runtime
-    hpx_append_flag(-MD LANGUAGES CXX Fortran)
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO
+        "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -O2 -Zi -MD")
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
-    # Optimize for size
-    hpx_append_flag(-O1 LANGUAGES CXX Fortran)
-
-    # Use multi-threaded runtime
-    hpx_append_flag(-MD LANGUAGES CXX Fortran)
+    set(CMAKE_CXX_FLAGS_MINSIZEREL
+        "${CMAKE_CXX_FLAGS_MINSIZEREL} -O1 -MD")
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
-    # Optimize for speed
-    hpx_append_flag(-Ox LANGUAGES CXX Fortran)
-
-    # Use multi-threaded runtime
-    hpx_append_flag(-MD LANGUAGES CXX Fortran)
-
-    # Use full programm optimization (FPO)
-    hpx_append_flag(-GL LANGUAGES CXX Fortran)
+    set(CMAKE_CXX_FLAGS_RELEASE
+        "${CMAKE_CXX_FLAGS_RELEASE} -Ox -MD -GL")
   endif()
 
   # Exceptions
@@ -1173,20 +1146,31 @@ if(NOT HPX_NO_INSTALL)
 endif()
 
 ################################################################################
-# external build system support (FindHPX.cmake, pkgconfig)
+# External build system support (FindHPX.cmake and pkg-config).
 ################################################################################
+set(HPX_LINK_DIRECTORIES
+    ${HPX_LINK_DIRECTORIES} ${CMAKE_INSTALL_PREFIX}/lib/hpx)
+set(HPX_INCLUDE_DIRECTORIES
+    ${HPX_INCLUDE_DIRECTORIES} ${CMAKE_INSTALL_PREFIX}/include)
+
 list(REMOVE_DUPLICATES HPX_LINK_DIRECTORIES)
 list(REMOVE_DUPLICATES HPX_INCLUDE_DIRECTORIES)
 
-set(external_rpath ${HPX_RPATH})
+set(external_rpath "")
+set(external_link_directories "")
+set(external_link_flags "")
+set(external_include_directories "")
+set(external_include_flags "")
 
 foreach(directory ${HPX_LINK_DIRECTORIES})
   set(external_link_directories "${external_link_directories} ${directory}")
+  set(external_link_flags "${external_link_flags} -L${directory}")
   set(external_rpath "${external_rpath}:${directory}")
 endforeach()
 
 foreach(directory ${HPX_INCLUDE_DIRECTORIES})
   set(external_include_directories "${external_include_directories} ${directory}")
+  set(external_include_flags "${external_include_flags} -I${directory}")
 endforeach()
 
 get_directory_property(external_definitions DEFINITIONS)
@@ -1205,12 +1189,27 @@ else()
   set(external_cmake_path ${HPX_PREFIX}/share/hpx-${HPX_VERSION}/cmake)
 endif()
 
-configure_file(${hpx_SOURCE_DIR}/cmake/FindHPX.cmake.in
+configure_file(${hpx_SOURCE_DIR}/cmake/templates/FindHPX.cmake.in
                ${output_dir}/share/${cmake_dir}/Modules/FindHPX.cmake
                ESCAPE_QUOTES @ONLY)
 
 if(NOT HPX_NO_INSTALL)
   install(FILES ${output_dir}/share/${cmake_dir}/Modules/FindHPX.cmake
           DESTINATION share/${cmake_dir}/Modules)
+endif()
+
+configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_application.pc.in
+               ${output_dir}/lib/pkgconfig/hpx_application.pc
+               @ONLY)
+
+configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_component.pc.in
+               ${output_dir}/lib/pkgconfig/hpx_component.pc
+               @ONLY)
+
+if(NOT HPX_NO_INSTALL)
+  install(FILES ${output_dir}/lib/pkgconfig/hpx_application.pc
+          DESTINATION lib/pkgconfig)
+  install(FILES ${output_dir}/lib/pkgconfig/hpx_component.pc
+          DESTINATION lib/pkgconfig)
 endif()
 

@@ -26,12 +26,12 @@ macro(add_hpx_component name)
     if(NOT ${name}_SOURCE_ROOT)
       set(${name}_SOURCE_ROOT ".")
     endif()
-    hpx_debug("add_component.${name}_component" "${name}_SOURCE_ROOT: ${${name}_SOURCE_ROOT}")
+    hpx_debug("add_component.${name}" "${name}_SOURCE_ROOT: ${${name}_SOURCE_ROOT}")
 
     if(NOT ${name}_SOURCE_GLOB)
       set(${name}_SOURCE_GLOB "${${name}_SOURCE_ROOT}/*.cpp")
     endif()
-    hpx_debug("add_component.${name}_component" "${name}_SOURCE_GLOB: ${${name}_SOURCE_GLOB}")
+    hpx_debug("add_component.${name}" "${name}_SOURCE_GLOB: ${${name}_SOURCE_GLOB}")
 
     add_hpx_library_sources(${name}_component
       GLOB_RECURSE GLOBS "${${name}_SOURCE_GLOB}")
@@ -47,12 +47,12 @@ macro(add_hpx_component name)
     if(NOT ${name}_HEADER_ROOT)
       set(${name}_HEADER_ROOT ".")
     endif()
-    hpx_debug("add_component.${name}_component" "${name}_HEADER_ROOT: ${${name}_HEADER_ROOT}")
+    hpx_debug("add_component.${name}" "${name}_HEADER_ROOT: ${${name}_HEADER_ROOT}")
 
     if(NOT ${name}_HEADER_GLOB)
       set(${name}_HEADER_GLOB "${${name}_HEADER_ROOT}/*.hpp")
     endif()
-    hpx_debug("add_component.${name}_component" "${name}_HEADER_GLOB: ${${name}_HEADER_GLOB}")
+    hpx_debug("add_component.${name}" "${name}_HEADER_GLOB: ${${name}_HEADER_GLOB}")
 
     add_hpx_library_headers(${name}_component
       GLOB_RECURSE GLOBS "${${name}_HEADER_GLOB}")
