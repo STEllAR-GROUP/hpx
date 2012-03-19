@@ -157,13 +157,13 @@ loaded modules called component libraries. Here's the source code:
 
 [import ../examples/hello_world_component/hello_world_component.hpp]
 
-[*hello_world.cpp]
+[*hello_world_component.cpp]
 
 [import ../examples/hello_world_component/hello_world_component.cpp]
 
 [hello_world_cpp_getting_started]
 
-[*hello_world.hpp]
+[*hello_world_component.hpp]
 
 [hello_world_hpp_getting_started]
 
