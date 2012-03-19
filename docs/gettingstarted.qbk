@@ -182,7 +182,7 @@ CMAKE_INSTALL_PREFIX you used while building HPX):
 
 [pre
     $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
-$ c++ -o libhpx_component_hello_world.so hello_world.cpp \`pkg-config --cflags --libs hpx_component\` -DHPX_COMPONENT_NAME=hello_world
+$ c++ -o libhpx_component_hello_world.so hello_world_component.cpp \`pkg-config --cflags --libs hpx_component\` -DHPX_COMPONENT_NAME=hello_world
 $ mv libhpx_component_hello_world.so $HPX_LOCATION/lib/hpx/libhpx_component_hello_world.so
 ]
 
