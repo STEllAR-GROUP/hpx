@@ -11,6 +11,7 @@
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
+using boost::program_options::value;
 
 ///////////////////////////////////////////////////////////////////////////////
 inline bool
@@ -38,8 +39,8 @@ eval(char const* expr, sheneos::interpolator& shen, double ye,
 
 int hpx_main(variables_map& vm)
 {
-    std::string datafilename("myshen_test_220r_180t_50y_extT_analmu_20100322_SVNr28.h5");
-    int num_localities = 27;
+    std::string const datafilename = vm["file"].as<std::string>();
+    int num_partitions = 27;
 
     {
         char const* shen_symbolic_name = "/sheneos_client/test";
@@ -57,7 +58,7 @@ int hpx_main(variables_map& vm)
 
         // create the distributed interpolation object on num_localities
         sheneos::interpolator shen;
-        shen.create(datafilename, shen_symbolic_name, num_localities);
+        shen.create(datafilename, shen_symbolic_name, num_partitions);
 
         eval("shen(0.2660725, 63.0, std::pow(10., 14.74994))", shen,
             0.2660725, 63.0, std::pow(10., 14.74994), expected);
@@ -85,6 +86,12 @@ int main(int argc, char* argv[])
     // Configure application-specific options
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
+
+    desc_commandline.add_options()
+        ("file", value<std::string>()->default_value(
+                "sheneos_220r_180t_50y_extT_analmu_20100322_SVNr28.h5"),
+            "name of HDF5 data file containing the Shen EOS tables")
+        ;
 
     // Initialize and run HPX
     return hpx::init(desc_commandline, argc, argv);
