@@ -1,7 +1,0 @@
-Seems there was only one file with not much in it.
-
-file: hpx/hpx/traits.hpp
-    promise_remote_result
-    promise_local_result
-    get_remote_result
-    component_type_database
