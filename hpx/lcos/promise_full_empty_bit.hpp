@@ -104,7 +104,7 @@ namespace hpx { namespace lcos { namespace detail
             return this->move_data();
         }
 
-        void set_error(boost::exception_ptr e)
+        void set_error(boost::exception_ptr const& e)
         {
             return this->future_data_type::set_error(e);
         }
@@ -193,7 +193,7 @@ namespace hpx { namespace lcos { namespace detail
             this->move_data();
         }
 
-        void set_error(boost::exception_ptr e)
+        void set_error(boost::exception_ptr const& e)
         {
             return this->future_data_type::set_error(e);
         }
