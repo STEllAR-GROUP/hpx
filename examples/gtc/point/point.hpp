@@ -37,22 +37,22 @@ namespace gtc
         // Exposed functionality of this component.
 
         /// Initialize the \a gtc::server::point instance with the
-        /// given point file. 
-        hpx::lcos::promise<void> init_async(std::size_t objectid,parameter const& par)
+        /// given point file.
+        hpx::lcos::future<void> init_async(std::size_t objectid,parameter const& par)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::init_async(gid_,objectid,par);
         }
 
         /// Initialize the \a gtc::server::point instance with the
-        /// given point file.  
+        /// given point file.
         void init(std::size_t objectid,parameter const& par)
         {
             BOOST_ASSERT(gid_);
             this->base_type::init_async(gid_,objectid,par);
         }
 
-        hpx::lcos::promise<void> load_async(std::size_t objectid,parameter const& par)
+        hpx::lcos::future<void> load_async(std::size_t objectid,parameter const& par)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::load_async(gid_,objectid,par);
@@ -64,7 +64,7 @@ namespace gtc
             this->base_type::load_async(gid_,objectid,par);
         }
 
-        hpx::lcos::promise<void> chargei_async(std::size_t istep, 
+        hpx::lcos::future<void> chargei_async(std::size_t istep,
             std::vector<hpx::naming::id_type> const& point_components,
             parameter const& par)
         {
@@ -80,7 +80,7 @@ namespace gtc
             this->base_type::chargei(gid_,istep,point_components,par);
         }
 
-        hpx::lcos::promise< std::valarray<double> > get_densityi_async()
+        hpx::lcos::future< std::valarray<double> > get_densityi_async()
         {
             BOOST_ASSERT(gid_);
             return this->base_type::get_densityi_async(gid_);
@@ -92,7 +92,7 @@ namespace gtc
             return this->base_type::get_densityi(gid_);
         }
 
-        hpx::lcos::promise< std::vector<double> > get_zonali_async()
+        hpx::lcos::future< std::vector<double> > get_zonali_async()
         {
             BOOST_ASSERT(gid_);
             return this->base_type::get_zonali_async(gid_);
@@ -104,7 +104,7 @@ namespace gtc
             return this->base_type::get_zonali(gid_);
         }
 
-        hpx::lcos::promise<void> smooth_async(std::size_t iflag, 
+        hpx::lcos::future<void> smooth_async(std::size_t iflag,
             std::vector<hpx::naming::id_type> const& point_components,
             std::size_t idiag,
             parameter const& par)
@@ -122,7 +122,7 @@ namespace gtc
             this->base_type::smooth(gid_,iflag,point_components,idiag,par);
         }
 
-        hpx::lcos::promise< std::valarray<double> > get_phi_async(std::size_t depth)
+        hpx::lcos::future< std::valarray<double> > get_phi_async(std::size_t depth)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::get_phi_async(gid_,depth);
@@ -134,7 +134,7 @@ namespace gtc
             return this->base_type::get_phi(gid_,depth);
         }
 
-        hpx::lcos::promise< std::vector<double> > get_eachzeta_async()
+        hpx::lcos::future< std::vector<double> > get_eachzeta_async()
         {
             BOOST_ASSERT(gid_);
             return this->base_type::get_eachzeta_async(gid_);
@@ -146,7 +146,7 @@ namespace gtc
             return this->base_type::get_eachzeta(gid_);
         }
 
-        hpx::lcos::promise<void> field_async(
+        hpx::lcos::future<void> field_async(
             std::vector<hpx::naming::id_type> const& point_components,
             parameter const& par)
         {
@@ -161,7 +161,7 @@ namespace gtc
             this->base_type::field(gid_,point_components,par);
         }
 
-        hpx::lcos::promise< std::valarray<double> > get_evector_async(std::size_t depth,std::size_t extent)
+        hpx::lcos::future< std::valarray<double> > get_evector_async(std::size_t depth,std::size_t extent)
         {
             BOOST_ASSERT(gid_);
             return this->base_type::get_evector_async(gid_,depth,extent);
@@ -173,7 +173,7 @@ namespace gtc
             return this->base_type::get_evector(gid_,depth,extent);
         }
 
-        hpx::lcos::promise<void> pushi_async(
+        hpx::lcos::future<void> pushi_async(
             std::size_t irk,
             std::size_t istep,
             std::size_t idiag,
@@ -194,7 +194,7 @@ namespace gtc
             this->base_type::pushi(gid_,irk,istep,idiag,point_components,par);
         }
 
-        hpx::lcos::promise< std::vector<double> > get_dden_async()
+        hpx::lcos::future< std::vector<double> > get_dden_async()
         {
             BOOST_ASSERT(gid_);
             return this->base_type::get_dden_async(gid_);
@@ -206,7 +206,7 @@ namespace gtc
             return this->base_type::get_dden(gid_);
         }
 
-        hpx::lcos::promise< std::vector<double> > get_dtem_async()
+        hpx::lcos::future< std::vector<double> > get_dtem_async()
         {
             BOOST_ASSERT(gid_);
             return this->base_type::get_dtem_async(gid_);
@@ -218,7 +218,7 @@ namespace gtc
             return this->base_type::get_dtem(gid_);
         }
 
-        hpx::lcos::promise<void> shifti_async(
+        hpx::lcos::future<void> shifti_async(
             std::vector<hpx::naming::id_type> const& point_components,
             parameter const& par)
         {
@@ -233,7 +233,7 @@ namespace gtc
             this->base_type::shifti(gid_,point_components,par);
         }
 
-        hpx::lcos::promise< std::size_t > get_msend_async()
+        hpx::lcos::future< std::size_t > get_msend_async()
         {
             BOOST_ASSERT(gid_);
             return this->base_type::get_msend_async(gid_);
@@ -245,7 +245,7 @@ namespace gtc
             return this->base_type::get_msend(gid_);
         }
 
-        hpx::lcos::promise< std::vector<std::size_t> > get_msendright_async()
+        hpx::lcos::future< std::vector<std::size_t> > get_msendright_async()
         {
             BOOST_ASSERT(gid_);
             return this->base_type::get_msendright_async(gid_);
@@ -257,7 +257,7 @@ namespace gtc
             return this->base_type::get_msendright(gid_);
         }
 
-        hpx::lcos::promise< array<double> > get_sendright_async()
+        hpx::lcos::future< array<double> > get_sendright_async()
         {
             BOOST_ASSERT(gid_);
             return this->base_type::get_sendright_async(gid_);
@@ -269,7 +269,7 @@ namespace gtc
             return this->base_type::get_sendright(gid_);
         }
 
-        hpx::lcos::promise< std::vector<std::size_t> > get_msendleft_async()
+        hpx::lcos::future< std::vector<std::size_t> > get_msendleft_async()
         {
             BOOST_ASSERT(gid_);
             return this->base_type::get_msendleft_async(gid_);
@@ -281,7 +281,7 @@ namespace gtc
             return this->base_type::get_msendleft(gid_);
         }
 
-        hpx::lcos::promise< array<double> > get_sendleft_async()
+        hpx::lcos::future< array<double> > get_sendleft_async()
         {
             BOOST_ASSERT(gid_);
             return this->base_type::get_sendleft_async(gid_);
@@ -293,7 +293,7 @@ namespace gtc
             return this->base_type::get_sendleft(gid_);
         }
 
-        hpx::lcos::promise<void> poisson_async(
+        hpx::lcos::future<void> poisson_async(
             std::size_t iflag,
             std::size_t istep,
             std::size_t irk,

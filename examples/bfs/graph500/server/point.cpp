@@ -5,7 +5,8 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/include/iostreams.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/future_wait.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/lcos/async_future_wait.hpp>
 
 #include "../make_graph.hpp"
@@ -136,6 +137,59 @@ namespace graph500 { namespace server
       }
     }
 
+    bool point::findwhohasthisedge_callback(int64_t j,std::vector<bool> const& has_edge,
+                     std::vector<hpx::naming::id_type> const& point_components,
+                     int64_t start)
+    {
+      // let the components which have duplicates know about each other
+      std::vector<hpx::naming::id_type> duplicate;
+      std::vector<std::size_t> duplicateid;
+      for ( std::size_t i=0;i<has_edge.size();i++) {
+        if ( has_edge[i] == true ) {
+          duplicate.push_back(point_components[i]);
+          duplicateid.push_back(i);
+        }
+      }
+      
+      std::vector<hpx::lcos::future<void> > send_duplicates_phase;
+      for (std::size_t i=0;i<duplicate.size();i++) {
+        // the edge number in question is j + start
+        send_duplicates_phase.push_back(
+               stubs::point::receive_duplicates_async(duplicate[i],j+start,
+                                                     duplicate,duplicateid));
+      }
+      hpx::lcos::wait(send_duplicates_phase);
+
+      return true;
+    }
+
+    std::vector<bool> point::findwhohasthisedge(int64_t edge,
+           std::vector<hpx::naming::id_type> const& point_components)
+    {
+      std::vector<bool> search_vector;
+      std::vector<hpx::lcos::future<bool> > has_edge_phase;
+      for (std::size_t i=0;i<point_components.size();i++) {
+        has_edge_phase.push_back(stubs::point::has_edge_async(point_components[i],edge));
+      }
+      hpx::lcos::wait(has_edge_phase,search_vector);
+
+      return search_vector;
+    }
+
+    void point::ppedge(int64_t start, int64_t stop,
+                  std::vector<hpx::naming::id_type> const& point_components)
+    {
+      typedef std::vector<hpx::lcos::future< std::vector<bool> > > lazy_results_type;
+      lazy_results_type lazy_results;
+
+      for (int64_t edge=start;edge<=stop;edge++) {
+        lazy_results.push_back(stubs::point::findwhohasthisedge_async(point_components[idx_],edge,point_components));
+      }
+      // put a callback here instead of search_vector
+      hpx::lcos::wait(lazy_results,boost::bind(&point::findwhohasthisedge_callback,
+                              this,_1,_2,boost::ref(point_components),boost::ref(start)));
+    }
+
     void point::root(std::vector<int64_t> const& bfs_roots)
     {
       bfs_roots_ = bfs_roots;
@@ -224,7 +278,7 @@ namespace graph500 { namespace server
 
     void point::resolve_conflict()
     {
-      typedef std::vector<hpx::lcos::promise< resolvedata > > lazy_results_type;
+      typedef std::vector<hpx::lcos::future< resolvedata > > lazy_results_type;
       lazy_results_type lazy_results;
       // go through each particle on this component; if there are duplicates (i.e. the
       // same particle is on a different component as well), communicate with those components
@@ -350,7 +404,7 @@ namespace graph500 { namespace server
 
     std::vector<int64_t> point::get_numedges()
     {
-      typedef std::vector<hpx::lcos::promise< resolvedata > > lazy_results_type;
+      typedef std::vector<hpx::lcos::future< resolvedata > > lazy_results_type;
       lazy_results_type lazy_results;
       std::vector<int64_t> num_edges;
       // Get the number of edges for performance counting

@@ -10,18 +10,17 @@ include(HPX_Include)
 
 hpx_include(Message
             ParseArguments
-            MangleName
             Install)
 
 macro(add_hpx_library name)
   # retrieve arguments
   hpx_parse_arguments(${name}
-    "SOURCES;HEADERS;DEPENDENCIES;INI;FOLDER" "ESSENTIAL;NOLIBS" ${ARGN})
+    "SOURCES;HEADERS;DEPENDENCIES;COMPONENT_DEPENDENCIES;FOLDER" "ESSENTIAL;NOLIBS" ${ARGN})
 
   hpx_print_list("DEBUG" "add_library.${name}" "Sources for ${name}" ${name}_SOURCES)
   hpx_print_list("DEBUG" "add_library.${name}" "Headers for ${name}" ${name}_HEADERS)
   hpx_print_list("DEBUG" "add_library.${name}" "Dependencies for ${name}" ${name}_DEPENDENCIES)
-  hpx_print_list("DEBUG" "add_library.${name}" "Configuration files for ${name}" ${name}_INI)
+  hpx_print_list("DEBUG" "add_library.${name}" "Component dependencies for ${name}" ${name}_COMPONENT_DEPENDENCIES)
 
   if(NOT MSVC)
     if(${${name}_ESSENTIAL})
@@ -39,25 +38,29 @@ macro(add_hpx_library name)
     endif()
   endif()
 
+  hpx_handle_component_dependencies(${name}_COMPONENT_DEPENDENCIES)
+
   set(prefix "")
 
   if(NOT MSVC)
     if(NOT ${${name}_NOLIBS})
       target_link_libraries(${name}_lib
-        ${${name}_DEPENDENCIES} ${hpx_LIBRARIES} ${BOOST_FOUND_LIBRARIES})
+        ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} hpx)
       set_property(TARGET ${name}_lib APPEND
                    PROPERTY COMPILE_DEFINITIONS
                    "BOOST_ENABLE_ASSERT_HANDLER")
     else()
-      target_link_libraries(${name}_lib ${${name}_DEPENDENCIES})
+      target_link_libraries(${name}_lib
+        ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES})
     endif()
     set(prefix "hpx_")
   else()
     if(NOT ${${name}_NOLIBS})
       target_link_libraries(${name}_lib
-        ${${name}_DEPENDENCIES} ${hpx_LIBRARIES} ${BOOST_FOUND_LIBRARIES})
+        ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} hpx)
     else()
-      target_link_libraries(${name}_lib ${${name}_DEPENDENCIES})
+      target_link_libraries(${name}_lib
+        ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES})
     endif()
   endif()
 
@@ -74,6 +77,17 @@ macro(add_hpx_library name)
     RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL}
     RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO})
 
+  if(HPX_FLAGS)
+    set_property(TARGET ${name}_lib APPEND PROPERTY COMPILE_FLAGS ${HPX_FLAGS})
+    set_property(TARGET ${name}_lib APPEND PROPERTY LINK_FLAGS ${HPX_FLAGS})
+  endif()
+
+  set_target_properties(${name}_lib 
+                        PROPERTIES SKIP_BUILD_RPATH TRUE
+                                   BUILD_WITH_INSTALL_RPATH TRUE
+                                   INSTALL_RPATH_USE_LINK_PATH TRUE 
+                                   INSTALL_RPATH ${HPX_RPATH})
+
   if(${name}_FOLDER)
     set_target_properties(${name}_lib PROPERTIES FOLDER ${${name}_FOLDER})
   endif()
@@ -82,13 +96,7 @@ macro(add_hpx_library name)
                PROPERTY COMPILE_DEFINITIONS "HPX_LIBRARY_EXPORTS")
 
   if(NOT HPX_NO_INSTALL)
-    hpx_mangle_name(install_target ${name}_lib)
-
-    hpx_library_install(${install_target})
-
-    foreach(target ${${name}_INI})
-      hpx_ini_install(${install_target} ${target})
-    endforeach()
+    hpx_library_install(${name}_lib)
   endif()
 endmacro()
 

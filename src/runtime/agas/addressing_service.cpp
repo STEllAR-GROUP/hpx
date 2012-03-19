@@ -28,7 +28,6 @@ addressing_service::addressing_service(
   , max_refcnt_requests_(ini_.get_agas_max_pending_refcnt_requests())
   , refcnt_requests_count_(0)
   , refcnt_requests_(new refcnt_requests_type)
-  , resolve_throttle_(ini_.get_agas_max_resolve_requests())
   , service_type(ini_.get_agas_service_mode())
   , runtime_type(runtime_type_)
   , caching_(ini_.get_agas_caching_mode())
@@ -578,7 +577,7 @@ bool addressing_service::get_id_range(
   , error_code& ec
     )
 { // {{{ get_id_range implementation
-    typedef lcos::eager_future<server::primary_namespace::service_action>
+    typedef lcos::packaged_task<server::primary_namespace::service_action>
         future_type;
 
     lcos::promise<response>* f = 0;
@@ -609,7 +608,7 @@ bool addressing_service::get_id_range(
 
             // execute the action (synchronously)
             cf->apply(bootstrap_primary_namespace_id(), req);
-            rep = cf->get(ec);
+            rep = cf->get_future().get(ec);
 
             cf.set_ok();
         }
@@ -659,7 +658,7 @@ bool addressing_service::bind_range(
   , error_code& ec
     )
 { // {{{ bind_range implementation
-    typedef lcos::eager_future<server::primary_namespace::service_action>
+    typedef lcos::packaged_task<server::primary_namespace::service_action>
         future_type;
 
     lcos::promise<response>* f = 0;
@@ -696,7 +695,7 @@ bool addressing_service::bind_range(
 
             // execute the action (synchronously)
             cf->apply(bootstrap_primary_namespace_id(), req);
-            rep = cf->get(ec);
+            rep = cf->get_future().get(ec);
 
             cf.set_ok();
         }
@@ -928,8 +927,6 @@ bool addressing_service::resolve_full(
         response rep;
 
         {
-            lock_semaphore lock(resolve_throttle_);
-
             if (is_bootstrap())
                 rep = bootstrap->primary_ns_server.service(req, ec);
             else
@@ -1400,28 +1397,32 @@ void addressing_service::register_counter_types()
           HPX_PERFORMANCE_COUNTER_V1,
           boost::bind(&performance_counters::locality_raw_counter_creator,
               _1, cache_hits, _2),
-          &performance_counters::locality_counter_discoverer
+          &performance_counters::locality_counter_discoverer,
+          ""
         },
         { "/agas/cache/misses", performance_counters::counter_raw,
           "returns the number of cache misses while accessing the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           boost::bind(&performance_counters::locality_raw_counter_creator,
               _1, cache_misses, _2),
-          &performance_counters::locality_counter_discoverer
+          &performance_counters::locality_counter_discoverer,
+          ""
         },
         { "/agas/cache/evictions", performance_counters::counter_raw,
           "returns the number of cache evictions from the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           boost::bind(&performance_counters::locality_raw_counter_creator,
               _1, cache_evictions, _2),
-          &performance_counters::locality_counter_discoverer
+          &performance_counters::locality_counter_discoverer,
+          ""
         },
         { "/agas/cache/insertions", performance_counters::counter_raw,
           "returns the number of cache insertions into the AGAS cache",
           HPX_PERFORMANCE_COUNTER_V1,
           boost::bind(&performance_counters::locality_raw_counter_creator,
               _1, cache_insertions, _2),
-          &performance_counters::locality_counter_discoverer
+          &performance_counters::locality_counter_discoverer,
+          ""
         }
     };
     performance_counters::install_counter_types(

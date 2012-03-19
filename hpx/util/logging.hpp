@@ -9,6 +9,8 @@
 #include <string>
 #include <hpx/hpx_fwd.hpp>
 
+#if !defined(HPX_NO_LOGGING)
+
 #include <boost/logging/format/named_write.hpp>
 #include <boost/logging/format_fwd.hpp>
 
@@ -80,18 +82,6 @@ namespace hpx { namespace util
     #define LAPP_ENABLED(lvl)                                                 \
         hpx::util::app_level()->is_enabled(::boost::logging::level::lvl)      \
     /**/
-
-    ///////////////////////////////////////////////////////////////////////////
-    // specific logging
-    #define LTM_(lvl)   LHPX_(lvl, "  [TM] ")   /* thread manager */
-    #define LRT_(lvl)   LHPX_(lvl, "  [RT] ")   /* runtime support */
-    #define LOSH_(lvl)  LHPX_(lvl, " [OSH] ")   /* one size heap */
-    #define LERR_(lvl)  LHPX_(lvl, " [ERR] ")   /* exceptions */
-    #define LPT_(lvl)   LHPX_(lvl, "  [PT] ")   /* parcel transport */
-    #define LLCO_(lvl)  LHPX_(lvl, " [LCO] ")   /* lcos */
-    #define LPCS_(lvl)  LHPX_(lvl, " [PCS] ")   /* performance counters */
-    #define LAS_(lvl)   LHPX_(lvl, "  [AS] ")   /* addressing service */
-    #define LBT_(lvl)   LHPX_(lvl, "  [BT] ")   /* bootstrap */
 
     ///////////////////////////////////////////////////////////////////////////
     // errors are logged in a special manner (always to cerr and additionally,
@@ -171,6 +161,62 @@ namespace hpx { namespace util
         hpx::util::app_console_level()->is_enabled(                           \
             static_cast<boost::logging::level::type>(lvl)))                   \
 /**/
+
+#else
+// logging is disabled all together
+
+namespace hpx { namespace util { namespace detail
+{
+    ///////////////////////////////////////////////////////////////////////////
+    // get the data to use to pre-fill the runtime_configuration instance
+    // with logging specific data
+    std::vector<std::string> HPX_EXPORT get_logging_data();
+
+    // the init_logging type will be used for initialization purposes only as
+    // well
+    struct init_logging
+    {
+        init_logging(runtime_configuration&, bool, naming::resolver_client&)
+        {
+        }
+    };
+
+    struct dummy_log_impl {};
+    extern HPX_EXPORT dummy_log_impl dummy_log;
+
+    template <typename T>
+    inline dummy_log_impl& operator<<(dummy_log_impl& l, T) { return l; }
+
+    #define LAGAS_(lvl)           if(true) {} else hpx::util::detail::dummy_log
+    #define LTIM_(lvl)            if(true) {} else hpx::util::detail::dummy_log
+    #define LHPX_(lvl, cat)       if(true) {} else hpx::util::detail::dummy_log
+    #define LAPP_(lvl)            if(true) {} else hpx::util::detail::dummy_log
+    #define LFATAL_               if(true) {} else hpx::util::detail::dummy_log
+
+    #define LAGAS_CONSOLE_(lvl)   if(true) {} else hpx::util::detail::dummy_log
+    #define LTIM_CONSOLE_(lvl)    if(true) {} else hpx::util::detail::dummy_log
+    #define LHPX_CONSOLE_(lvl)    if(true) {} else hpx::util::detail::dummy_log
+    #define LAPP_CONSOLE_(lvl)    if(true) {} else hpx::util::detail::dummy_log
+
+    #define LAGAS_ENABLED(lvl)    (false)
+    #define LTIM_ENABLED(lvl)     (false)
+    #define LHPX_ENABLED(lvl)     (false)
+    #define LAPP_ENABLED(lvl)     (false)
+}}}
+
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// specific logging
+#define LTM_(lvl)   LHPX_(lvl, "  [TM] ")   /* thread manager */
+#define LRT_(lvl)   LHPX_(lvl, "  [RT] ")   /* runtime support */
+#define LOSH_(lvl)  LHPX_(lvl, " [OSH] ")   /* one size heap */
+#define LERR_(lvl)  LHPX_(lvl, " [ERR] ")   /* exceptions */
+#define LPT_(lvl)   LHPX_(lvl, "  [PT] ")   /* parcel transport */
+#define LLCO_(lvl)  LHPX_(lvl, " [LCO] ")   /* lcos */
+#define LPCS_(lvl)  LHPX_(lvl, " [PCS] ")   /* performance counters */
+#define LAS_(lvl)   LHPX_(lvl, "  [AS] ")   /* addressing service */
+#define LBT_(lvl)   LHPX_(lvl, "  [BT] ")   /* bootstrap */
 
 #endif
 

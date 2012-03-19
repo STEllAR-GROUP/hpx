@@ -10,14 +10,15 @@
 #define HPX_LCOS_ASYNC_SEP_28_2011_0840AM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/packaged_task.hpp>
+#include <hpx/lcos/future.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action>
-    promise<
+    future<
         typename traits::promise_local_result<
             typename Action::result_type
         >::type,
@@ -25,12 +26,12 @@ namespace hpx { namespace lcos
     >
     async (naming::id_type const& gid)
     {
-        return eager_future<Action>(gid);
+        return packaged_task<Action>(gid).get_future();
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action>
-    promise<
+    future<
         typename traits::promise_local_result<
             typename Action::result_type
         >::type,
@@ -44,14 +45,14 @@ namespace hpx { namespace lcos
         typedef typename traits::promise_local_result<
             typename Action::result_type
         >::type result_type;
-        typedef eager_future<Action, result_type, signalling_tag> future_type;
+        typedef packaged_task<Action, result_type, signalling_tag> future_type;
 
-        return future_type(gid, data_sink);
+        return future_type(gid, data_sink).get_future();
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action>
-    promise<
+    future<
         typename traits::promise_local_result<
             typename Action::result_type
         >::type,
@@ -67,9 +68,9 @@ namespace hpx { namespace lcos
         typedef typename traits::promise_local_result<
             typename Action::result_type
         >::type result_type;
-        typedef eager_future<Action, result_type, signalling_tag> future_type;
+        typedef packaged_task<Action, result_type, signalling_tag> future_type;
 
-        return future_type(gid, data_sink, error_sink);
+        return future_type(gid, data_sink, error_sink).get_future();
     }
 }}
 
@@ -111,7 +112,7 @@ namespace hpx { namespace lcos
 namespace hpx { namespace lcos
 {
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    promise<
+    future<
         typename traits::promise_local_result<
             typename Action::result_type
         >::type,
@@ -120,11 +121,12 @@ namespace hpx { namespace lcos
     async (naming::id_type const& gid,
         BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
-        return eager_future<Action>(gid, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+        return packaged_task<Action>(
+            gid, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)).get_future();
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    promise<
+    future<
         typename traits::promise_local_result<
             typename Action::result_type
         >::type,
@@ -139,13 +141,14 @@ namespace hpx { namespace lcos
         typedef typename traits::promise_local_result<
             typename Action::result_type
         >::type result_type;
-        typedef eager_future<Action, result_type, signalling_tag> future_type;
+        typedef packaged_task<Action, result_type, signalling_tag> future_type;
 
-        return future_type(gid, data_sink, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+        return future_type(gid, data_sink,
+            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)).get_future();
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    promise<
+    future<
         typename traits::promise_local_result<
             typename Action::result_type
         >::type,
@@ -162,9 +165,10 @@ namespace hpx { namespace lcos
         typedef typename traits::promise_local_result<
             typename Action::result_type
         >::type result_type;
-        typedef eager_future<Action, result_type, signalling_tag> future_type;
+        typedef packaged_task<Action, result_type, signalling_tag> future_type;
 
-        return future_type(gid, data_sink, error_sink, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+        return future_type(gid, data_sink, error_sink,
+            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)).get_future();
     }
 }}
 

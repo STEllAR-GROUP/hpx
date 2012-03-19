@@ -24,21 +24,42 @@ if(HDF5_ROOT)
   set(HDF5_FORTRAN_ROOT ${HDF5_ROOT})
 endif()
 
+# find main HDF5 library
+if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+  set(hdf5_lib hdf5ddll hdf5dll)
+else()
+  set(hdf5_lib hdf5dll)
+endif()
+
 hpx_find_package(HDF5
-  LIBRARIES hdf5 libhdf5 hdf5dll
+  LIBRARIES hdf5 libhdf5 ${hdf5_lib}
   LIBRARY_PATHS lib64 lib
   HEADERS H5pubconf.h
   HEADER_PATHS include)
 
+# find HDF5 C++ library
+if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+  set(hdf5_cpp_lib hdf5_cppddll hdf5_cppdll)
+else()
+  set(hdf5_cpp_lib hdf5_cppdll)
+endif()
+
 hpx_find_package(HDF5_CPP
-  LIBRARIES hdf5_cpp libhdf5_cpp hdf5_cppdll
+  LIBRARIES hdf5_cpp libhdf5_cpp ${hdf5_cpp_lib}
   LIBRARY_PATHS lib64 lib
   HEADERS H5Cpp.h
   HEADER_PATHS include include/cpp)
 
+# find HDF5 Fortran library
+if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+  set(hdf5_fortran_lib hdf5_fortranddll hdf5_fortrandll)
+else()
+  set(hdf5_fortran_lib hdf5_fortrandll)
+endif()
+
 hpx_find_package(HDF5_FORTRAN
-  LIBRARIES hdf5_fortran libhdf5_fortran hdf5_fortrandll
+  LIBRARIES hdf5_fortran libhdf5_fortran ${hdf5_fortran_lib}
   LIBRARY_PATHS lib64 lib
   HEADERS hdf5.mod
-  HEADER_PATHS include)
+  HEADER_PATHS include include/fortran)
 

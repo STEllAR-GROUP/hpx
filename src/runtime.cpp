@@ -487,7 +487,7 @@ namespace hpx
         char const* context)
     {
         // initialize PAPI
-        papi_support_.register_thread(context);
+        thread_support_.register_thread(context);
 
         // initialize our TSS
         this->runtime::init_tss();
@@ -506,7 +506,7 @@ namespace hpx
         this->runtime::deinit_tss();
 
         // reset PAPI support
-        papi_support_.unregister_thread();
+        thread_support_.unregister_thread();
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -577,7 +577,8 @@ namespace hpx
               "name: /statistics{<base_counter_name>}/average",
               HPX_PERFORMANCE_COUNTER_V1,
               &performance_counters::detail::aggregating_counter_creator,
-              &performance_counters::default_counter_discoverer
+              &performance_counters::default_counter_discoverer,
+              ""
             },
 
             // max counter
@@ -587,7 +588,8 @@ namespace hpx
               "name: /statistics{<base_counter_name>}/max",
               HPX_PERFORMANCE_COUNTER_V1,
               &performance_counters::detail::aggregating_counter_creator,
-              &performance_counters::default_counter_discoverer
+              &performance_counters::default_counter_discoverer,
+              ""
             },
 
             // min counter
@@ -597,7 +599,8 @@ namespace hpx
               "name: /statistics{<base_counter_name>}/min",
               HPX_PERFORMANCE_COUNTER_V1,
                &performance_counters::detail::aggregating_counter_creator,
-               &performance_counters::default_counter_discoverer
+               &performance_counters::default_counter_discoverer,
+              ""
             },
 
             // uptime counters
@@ -605,7 +608,8 @@ namespace hpx
               "returns the up time of the runtime instance for the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1,
               &performance_counters::detail::uptime_counter_creator,
-              &performance_counters::default_counter_discoverer
+              &performance_counters::locality_counter_discoverer,
+              "s"    // unit of measure is seconds
             }
         };
         performance_counters::install_counter_types(

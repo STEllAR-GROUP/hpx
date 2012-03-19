@@ -58,7 +58,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
         void operator()(
             naming::id_type const & cont
           , naming::id_type const & id
-          , Vector const & args
+          , Vector & args
         ) const
         {
             LLCO_(info)

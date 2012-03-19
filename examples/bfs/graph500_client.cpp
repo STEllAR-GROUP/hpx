@@ -56,7 +56,7 @@ bool whohasthisedge_callback(int64_t j,std::vector<bool> const& has_edge,
     }
   }
 
-  std::vector<hpx::lcos::promise<void> > send_duplicates_phase;
+  std::vector<hpx::lcos::future<void> > send_duplicates_phase;
   for (std::size_t i=0;i<duplicate.size();i++) {
     // j+1 since edge number 0 is a special number
     send_duplicates_phase.push_back(
@@ -70,7 +70,7 @@ bool whohasthisedge_callback(int64_t j,std::vector<bool> const& has_edge,
 std::vector<bool> whohasthisedge(int64_t edge,std::vector<hpx::naming::id_type> const& point_components)
 {
   std::vector<bool> search_vector;
-  std::vector<hpx::lcos::promise<bool> > has_edge_phase;
+  std::vector<hpx::lcos::future<bool> > has_edge_phase;
   for (std::size_t i=0;i<point_components.size();i++) {
     has_edge_phase.push_back(graph500::stubs::point::has_edge_async(point_components[i],edge));
   }
@@ -92,11 +92,6 @@ typedef hpx::actions::plain_result_action2<
 HPX_REGISTER_PLAIN_ACTION(whohasthisedge_action);
 
 ///////////////////////////////////////////////////////////////////////////////
-// An eager_future is a HPX construct exposing the semantics of a Future
-// object. It starts executing the bound action immediately (eagerly).
-typedef hpx::lcos::eager_future<whohasthisedge_action> whohasthisedge_future;
-
-///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map &vm)
 {
     {
@@ -111,6 +106,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         bool const validator = vm["validator"].as<bool>();
         double overlap = vm["overlap"].as<double>();
         std::size_t schwarzdomains = vm["schwarzdomains"].as<std::size_t>();
+        bool const hasedgeroot = vm["hasedgeroot"].as<bool>();
 
         // number_partitions defines the size of the partition
         // for Additive Schwarz to work, we will need more partitions 
@@ -139,6 +135,12 @@ int hpx_main(boost::program_options::variables_map &vm)
         hpx::components::component_type block_type =
             hpx::components::get_component_type<graph500::server::point>();
 
+        // Find how many localities we have
+        //hpx::components::component_type function_type = 
+        //            hpx::components::get_component_type<graph500::server::point>();
+        //std::vector<hpx::naming::id_type> localities = hpx::find_all_localities(function_type);
+        //std::cout << " Number of localities " << localities.size() << std::endl;
+
         // ---------------------------------------------------------------
         // Create ne point components with distributing factory.
         // These components will be evenly distributed among all available
@@ -162,7 +164,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         ///////////////////////////////////////////////////////////////////////
         // Put the graph in the data structure
-        std::vector<hpx::lcos::promise<void> > init_phase;
+        std::vector<hpx::lcos::future<void> > init_phase;
 
         for (std::size_t i=0;i<num_pe;i++) {
           init_phase.push_back(points[i].init_async(i,scale,number_partitions,overlap));
@@ -205,7 +207,7 @@ int hpx_main(boost::program_options::variables_map &vm)
               // check if the root is in the graph; if so, set root_ok to be true
               {
                 std::vector<bool> search_vector;
-                std::vector<hpx::lcos::promise<bool> > has_edge_phase;
+                std::vector<hpx::lcos::future<bool> > has_edge_phase;
                 for (std::size_t i=0;i<number_partitions;i++) {
                   has_edge_phase.push_back(points[i].has_edge_async(root));
                 }
@@ -224,7 +226,7 @@ int hpx_main(boost::program_options::variables_map &vm)
           }
         }
 
-        std::vector<hpx::lcos::promise<void> > root_phase;
+        std::vector<hpx::lcos::future<void> > root_phase;
         for (std::size_t i=0;i<num_pe;i++) {
           root_phase.push_back(points[i].root_async(bfs_roots));
         }
@@ -232,12 +234,28 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         // Search for duplicates among the partitions
         // this determines the communication pattern for finalization
-        //std::vector<hpx::lcos::promise< std::vector<bool> > > whohasthisedge_phase;
-        //for (int64_t j=1;j<= nglobalverts;j++) {
-        //  whohasthisedge_phase.push_back(whohasthisedge_future(hpx::find_here(),j,point_components));
-        //}
-        // put a callback here instead of search_vector
-        //hpx::lcos::wait(whohasthisedge_phase,boost::bind(&whohasthisedge_callback,_1,_2,boost::ref(point_components)));
+        // the hasedgeroot option does not scale particularly well but is easy to understand
+        if ( hasedgeroot ) {
+          std::vector<hpx::lcos::future< std::vector<bool> > > whohasthisedge_phase;
+          for (int64_t j=1;j<= nglobalverts;j++) {
+            whohasthisedge_phase.push_back(hpx::lcos::async<whohasthisedge_action>(hpx::find_here(),j,point_components));
+          }
+          // put a callback here instead of search_vector
+          hpx::lcos::wait(whohasthisedge_phase,boost::bind(&whohasthisedge_callback,_1,_2,boost::ref(point_components)));
+        } else {
+          std::vector<hpx::lcos::future< void > > ppedge_phase;
+          int64_t delta = nglobalverts/num_pe;
+          int64_t extra = nglobalverts%num_pe;
+          for (std::size_t i=0;i<num_pe;i++) {
+            int64_t start = i*delta + 1;
+            int64_t stop = (i+1)*delta;
+            if ( i == num_pe - 1 ) {
+              stop += extra;
+            }
+            ppedge_phase.push_back(points[i].ppedge_async(start,stop,point_components));
+          }
+          hpx::lcos::wait(ppedge_phase);
+        }
 
         double kernel1_time = kernel1time.elapsed();
         std::cout << "Elapsed time during kernel 1: " << kernel1_time << " [s]" << std::endl;
@@ -248,20 +266,22 @@ int hpx_main(boost::program_options::variables_map &vm)
         kernel2_time.resize(bfs_roots.size());
 
         hpx::util::high_resolution_timer kernel2time;
+#if 0
         {
-          std::vector<hpx::lcos::promise<void> > bfs_phase;
+          std::vector<hpx::lcos::future<void> > bfs_phase;
           for (std::size_t i=0;i<num_pe;i++) {
             bfs_phase.push_back(points[i].bfs_async());
           }
           hpx::lcos::wait(bfs_phase);
         }
-        //{
-        //  std::vector<hpx::lcos::promise<void> > resolve_conflict_phase;
-        //  for (std::size_t i=0;i<num_pe;i++) {
-        //    resolve_conflict_phase.push_back(points[i].resolve_conflict_async());
-        //  }
-        //  hpx::lcos::wait(resolve_conflict_phase);
-        //}
+        {
+          std::vector<hpx::lcos::future<void> > resolve_conflict_phase;
+          for (std::size_t i=0;i<num_pe;i++) {
+            resolve_conflict_phase.push_back(points[i].resolve_conflict_async());
+          }
+          hpx::lcos::wait(resolve_conflict_phase);
+        }
+#endif
 
         double k2time = kernel2time.elapsed();
 
@@ -271,7 +291,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         if ( validator ) {
           {
-            std::vector<hpx::lcos::promise< std::vector<int64_t> > > get_numedges_phase;
+            std::vector<hpx::lcos::future< std::vector<int64_t> > > get_numedges_phase;
             std::vector< std::vector<int64_t> > numedges;
             for (std::size_t i=0;i<number_partitions;i++) {
               get_numedges_phase.push_back(points[i].get_numedges_async());
@@ -285,7 +305,7 @@ int hpx_main(boost::program_options::variables_map &vm)
             }
           }
           {
-            std::vector<hpx::lcos::promise< std::vector<int> > > distributed_validate_phase;
+            std::vector<hpx::lcos::future< std::vector<int> > > distributed_validate_phase;
             std::vector< std::vector<int> > rc;
             for (std::size_t i=0;i<number_partitions;i++) {
               distributed_validate_phase.push_back(points[i].distributed_validate_async(scale));
@@ -400,7 +420,9 @@ int main(int argc, char* argv[])
         ("overlap", value<double>()->default_value(1.4),
             "overlap factor for additive Schwarz")
         ("schwarzdomains", value<std::size_t>()->default_value(30),
-            "number of additive Schwarz domains");
+            "number of additive Schwarz domains")
+        ("hasedgeroot", value<bool>()->default_value(false),
+            "determine the resolve conflict communication from the root node");
 
     return hpx::init(desc_commandline, argc, argv); // Initialize and run HPX.
 }

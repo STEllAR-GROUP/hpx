@@ -5,15 +5,18 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+# TODO: Rename to hpx_find_library
+
 set(HPX_FINDPACKAGE_LOADED TRUE)
 
 if(NOT HPX_UTILS_LOADED)
   include(HPX_Utils)
 endif()
 
+# TODO: Name is misleading.
 macro(hpx_get_version name)
   if(${name}_DISABLE)
-    hpx_info("hpx_get_version.${name}" "Library search disabled by user.")
+    hpx_info("get_version.${name}" "Library search disabled by user.")
     unset(${name}_VERSION_SEARCHED CACHE)
     unset(${name}_ROOT)
     set(${name}_FOUND OFF CACHE BOOL "Found ${name}.")
@@ -24,9 +27,9 @@ macro(hpx_get_version name)
       hpx_parse_arguments(${name}
         "HEADERS;HEADER_PATHS;LIBRARIES;LIBRARY_PATHS" "ESSENTIAL" ${ARGN})
 
-      #############################################################################
+      ##########################################################################
       # Check if ${name}_ROOT is defined and use that path first if
-      # ${name}_USE_SYSTEM is defined.
+      # ${name}_USE_SYSTEM is not defined.
       if(NOT ${name}_USE_SYSTEM)
         if(NOT ${name}_ROOT AND NOT $ENV{${name}_ROOT} STREQUAL "")
           set(${name}_ROOT $ENV{${name}_ROOT})
@@ -82,6 +85,7 @@ macro(hpx_find_package name)
     unset(${name}_ROOT)
     set(${name}_FOUND OFF CACHE BOOL "Found ${name}.")
     set(${name}_LIBRARY ${name}_LIBRARY-NOTFOUND CACHE FILEPATH "${name} shared library.")
+    set(${name}_LIBRARY_DIR ${name}_LIBRARY_DIR-NOTFOUND CACHE PATH "${name} library directory.")
     set(${name}_INCLUDE_DIR ${name}_INCLUDE_DIR-NOTFOUND CACHE PATH "${name} include directory.")
   else()
     if(NOT ${name}_SEARCHED)
@@ -141,10 +145,17 @@ macro(hpx_find_package name)
 
       if(${name}_FOUND)
         get_filename_component(${name}_ROOT ${${name}_INCLUDE_DIR} PATH)
+        get_filename_component(${name}_LIBRARY_DIR ${${name}_LIBRARY} PATH)
         set(${name}_FOUND ${${name}_FOUND} CACHE BOOL "Found ${name}.")
         set(${name}_ROOT ${${name}_ROOT} CACHE PATH "${name} root directory.")
         set(${name}_LIBRARY ${${name}_LIBRARY} CACHE FILEPATH "${name} shared library.")
+        set(${name}_LIBRARY_DIR ${${name}_LIBRARY_DIR} CACHE PATH "${name} library directory.")
         set(${name}_INCLUDE_DIR ${${name}_INCLUDE_DIR} CACHE PATH "${name} include directory.")
+      else()
+        set(${name}_FOUND OFF CACHE BOOL "Found ${name}.")
+        set(${name}_LIBRARY ${name}_LIBRARY-NOTFOUND CACHE FILEPATH "${name} shared library.")
+        set(${name}_LIBRARY_DIR ${name}_LIBRARY_DIR-NOTFOUND CACHE PATH "${name} library directory.")
+        set(${name}_INCLUDE_DIR ${name}_INCLUDE_DIR-NOTFOUND CACHE PATH "${name} include directory.")
       endif()
 
     endif()

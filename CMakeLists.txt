@@ -24,6 +24,18 @@ set(CMAKE_USER_MAKE_RULES_OVERRIDE_Fortran
     "${CMAKE_SOURCE_DIR}/cmake/HPX_FortranOverrides.cmake")
 
 ################################################################################
+# Build type (needs to be handled before project command below)
+################################################################################
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Configuration type (one of Debug, RelWithDebInfo, Release, MinSizeRel)" FORCE)
+endif()
+
+# Always force CMAKE_CONFIGURATION_TYPES to be the same as CMAKE_BUILD_TYPE
+# (at least for now, until we figure out how to use multiple build types in
+# the same project).
+set(CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}" CACHE INTERNAL "Configuration types" FORCE)
+
+################################################################################
 # project metadata
 ################################################################################
 project(hpx CXX)
@@ -54,26 +66,12 @@ if(NOT HPX_CMAKE_LOGLEVEL)
   set(HPX_CMAKE_LOGLEVEL "WARN")
 endif()
 
-################################################################################
-# Build type
-################################################################################
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Configuration type (one of Debug, RelWithDebInfo, Release, MinSizeRel)" FORCE)
-endif()
-
+###############################################################################
 # reconfigure Boost library information if configuration type has been
 # changed since last configure
 if(CMAKE_BUILD_TYPE AND NOT (CMAKE_BUILD_TYPE STREQUAL CMAKE_CONFIGURATION_TYPES))
   set(BOOST_VERSION_SEARCHED OFF CACHE INTERNAL "Found Boost version" FORCE)
   set(BOOST_SEARCHED OFF CACHE INTERNAL "Found Boost libraries" FORCE)
-endif()
-
-# Set CMAKE_CONFIGURATION_TYPES if not already set
-# On MSVC force CMAKE_CONFIGURATION_TYPES to be the same as CMAKE_BUILD_TYPE
-# (at least for now, until we figure out how to use multiple build types in
-# the same project).
-if((NOT MSVC AND NOT CMAKE_CONFIGURATION_TYPES) OR MSVC)
-  set(CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}" CACHE INTERNAL "Configuration types" FORCE)
 endif()
 
 ################################################################################
@@ -84,6 +82,8 @@ include(HPX_FortranCompiler)
 ################################################################################
 # search path configuration
 ################################################################################
+# Don't use hpx_link_directories/hpx_include_directories to avoid passing paths
+# from the source tree to FindHPX.cmake
 include_directories(${hpx_SOURCE_DIR})
 include_directories(${hpx_SOURCE_DIR}/external/atomic)
 include_directories(${hpx_SOURCE_DIR}/external/cache)
@@ -106,8 +106,8 @@ hpx_option(HPX_INTERNAL_CHRONO BOOL "Use HPX's internal version of Boost.Chrono 
 # Boost.Move is in newer versions of Boost
 hpx_option(HPX_INTERNAL_MOVE BOOL "Use HPX's internal version of Boost.Move (default: OFF)" OFF ADVANCED)
 
-# this cmake module will snag the Boost version we'll be using (which we need
-# to know to specify the Boost libraries that we want to look for).
+# This cmake module will snag the Boost version we'll be using (which we need
+# to know to specify the Boost libraries that we want to look for)
 find_package(HPX_BoostVersion)
 
 if(NOT BOOST_VERSION_FOUND)
@@ -137,6 +137,8 @@ endif()
 if(${HPX_INTERNAL_CHRONO})
   add_definitions(-DHPX_INTERNAL_CHRONO)
   add_definitions(-DBOOST_CHRONO_NO_LIB)
+  # Don't use hpx_link_directories/hpx_include_directories to avoid passing
+  # paths from the source tree to FindHPX.cmake
   include_directories(${hpx_SOURCE_DIR}/external/chrono)
 else()
   set(BOOST_LIBRARIES ${BOOST_LIBRARIES} chrono)
@@ -150,14 +152,16 @@ endif()
 
 if(${HPX_INTERNAL_MOVE})
   add_definitions(-DHPX_INTERNAL_MOVE)
+  # Don't use hpx_link_directories/hpx_include_directories to avoid passing
+  # paths from the source tree to FindHPX.cmake.
   include_directories(${hpx_SOURCE_DIR}/external/move)
 endif()
 
 # We have a patched version of FindBoost loosely based on the one that Kitware ships
 find_package(HPX_Boost)
 
-include_directories(${BOOST_INCLUDE_DIR})
-link_directories(${BOOST_LIBRARY_DIR})
+hpx_include_directories(${BOOST_INCLUDE_DIR})
+hpx_link_directories(${BOOST_LIBRARY_DIR})
 
 # Boost preprocessor definitions
 add_definitions(-DBOOST_PARAMETER_MAX_ARITY=7)
@@ -213,6 +217,8 @@ include(HPX_SVNRevision)
 ################################################################################
 # Installation configuration
 ################################################################################
+# FIXME: Three separate doc strings are used for the *_PREFIX macros.
+
 hpx_option(HPX_NO_INSTALL BOOL "Build hpx applications so that they can be run without installation (default: OFF)." OFF ADVANCED)
 
 if(NOT HPX_NO_INSTALL)
@@ -233,6 +239,14 @@ if(NOT HPX_NO_INSTALL)
     CACHE PATH "Where to install ${PROJECT_NAME} (default: /opt/hpx for POSIX, C:/Program Files/hpx for Windows)." FORCE)
 
   hpx_info("install" "Install root is ${CMAKE_INSTALL_PREFIX}.")
+endif()
+
+################################################################################
+# Logging configuration
+################################################################################
+hpx_option(HPX_NO_LOGGING BOOL "Build hpx with logging completely disabled (default: OFF)." OFF ADVANCED)
+if(HPX_NO_LOGGING)
+  add_definitions("-DHPX_NO_LOGGING=1")
 endif()
 
 ################################################################################
@@ -285,12 +299,8 @@ endif()
 ################################################################################
 # RPATH configuration
 ################################################################################
-set(CMAKE_SKIP_BUILD_RPATH TRUE)
-if(NOT HPX_NO_INSTALL)
-  set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
-  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib/hpx:${CMAKE_BINARY_DIR}/bin")
-  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-endif()
+set(HPX_RPATH "${CMAKE_INSTALL_PREFIX}/lib/hpx:${CMAKE_BINARY_DIR}/lib/hpx"
+    CACHE STRING "Base RPATH for linking" FORCE)
 
 ################################################################################
 # C++11 configuration
@@ -337,10 +347,16 @@ hpx_check_for_thread_safe_hdf5(HDF5_THREAD_SAFE)
 # PAPI event counters
 ################################################################################
 find_package(HPX_PAPI)
-if(PAPI_FOUND)
-  include_directories(${PAPI_INCLUDE_DIR})
-  link_directories(${PAPI_LIBRARY_DIR})
-  set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${PAPI_LIBRARY})
+
+################################################################################
+# hwloc
+################################################################################
+find_package(HPX_Hwloc)
+if(HWLOC_FOUND)
+  hpx_include_directories(${HWLOC_INCLUDE_DIR})
+  hpx_link_directories(${HWLOC_LIBRARY_DIR})
+  add_definitions(-DHPX_HAVE_HWLOC)
+  set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${HWLOC_LIBRARY})
 endif()
 
 ################################################################################
@@ -361,7 +377,7 @@ find_package(HPX_SWARM)
 ################################################################################
 # OpenMP (for benchmark comparisons)
 ################################################################################
-find_package(OpenMP)
+find_package(HPX_OpenMP)
 
 ################################################################################
 # MPI (for benchmark comparisons)
@@ -532,44 +548,17 @@ endif()
 ################################################################################
 if(MSVC)
   if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-    # No optimizations
-    hpx_append_flag(-Od LANGUAGES CXX Fortran)
-
-    # Generate debugging information
-    hpx_append_flag(-Zi LANGUAGES CXX Fortran)
-
-    # Keep the frame pointer
-    hpx_append_flag(-Oy- LANGUAGES CXX Fortran)
-
-    # Use multi-threaded debug runtime
-    hpx_append_flag(-MDd LANGUAGES CXX Fortran)
-
-    # basic runtime checks
-    hpx_append_flag(-RTC1 LANGUAGES CXX)
+    set(CMAKE_CXX_FLAGS_DEBUG
+        "${CMAKE_CXX_FLAGS_DEBUG} -Od -Zi -Oy- -MDd -RTC1")
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
-    # Optimize for speed with debug info
-    hpx_append_flag(-O2 LANGUAGES CXX Fortran)
-
-    # Generate debugging information
-    hpx_append_flag(-Zi LANGUAGES CXX Fortran)
-
-    # Use multi-threaded debug runtime
-    hpx_append_flag(-MD LANGUAGES CXX Fortran)
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO
+        "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -O2 -Zi -MD")
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
-    # Optimize for size
-    hpx_append_flag(-O1 LANGUAGES CXX Fortran)
-
-    # Use multi-threaded runtime
-    hpx_append_flag(-MD LANGUAGES CXX Fortran)
+    set(CMAKE_CXX_FLAGS_MINSIZEREL
+        "${CMAKE_CXX_FLAGS_MINSIZEREL} -O1 -MD")
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
-    # Optimize for speed
-    hpx_append_flag(-Ox LANGUAGES CXX Fortran)
-
-    # Use multi-threaded runtime
-    hpx_append_flag(-MD LANGUAGES CXX Fortran)
-
-    # Use full programm optimization (FPO)
-    hpx_append_flag(-GL LANGUAGES CXX Fortran)
+    set(CMAKE_CXX_FLAGS_RELEASE
+        "${CMAKE_CXX_FLAGS_RELEASE} -Ox -MD -GL")
   endif()
 
   # Exceptions
@@ -901,7 +890,8 @@ else()
     find_package(HPX_GooglePerftools)
     if(GOOGLE_PERFTOOLS_FOUND AND HPX_GOOGLE_PERFTOOLS)
       set(hpx_LIBRARIES ${hpx_LIBRARIES} ${GOOGLE_PERFTOOLS_LIBRARY})
-      include_directories(${GOOGLE_PERFTOOLS_INCLUDE_DIR})
+      hpx_include_directories(${GOOGLE_PERFTOOLS_INCLUDE_DIR})
+      hpx_link_directories(${GOOGLE_PERFTOOLS_LIBRARY_DIR})
       add_definitions(-DHPX_GOOGLE_PERFTOOLS)
     else()
       set(GOOGLE_PERFTOOLS_LIBRARY "")
@@ -933,11 +923,15 @@ else()
         hpx_info("malloc" "Using tcmalloc allocator.")
         set(hpx_MALLOC_LIBRARY ${TCMALLOC_LIBRARY})
         set(hpx_LIBRARIES ${hpx_LIBRARIES} ${TCMALLOC_LIBRARY})
+        hpx_include_directories(${TCMALLOC_INCLUDE_DIR})
+        hpx_link_directories(${TCMALLOC_LIBRARY_DIR})
         add_definitions(-DHPX_TCMALLOC)
       else()
         hpx_info("malloc" "Using jemalloc allocator.")
         set(hpx_MALLOC_LIBRARY ${JEMALLOC_LIBRARY})
         set(hpx_LIBRARIES ${hpx_LIBRARIES} ${JEMALLOC_LIBRARY})
+        hpx_include_directories(${JEMALLOC_INCLUDE_DIR})
+        hpx_link_directories(${JEMALLOC_LIBRARY_DIR})
         add_definitions(-DHPX_JEMALLOC)
       endif()
 
@@ -1005,7 +999,14 @@ if(HPX_BUILD_RUNTIME)
   add_subdirectory(runtime)
 endif()
 
-if(HPX_DOCUMENTATION_GENERATION)
+hpx_option(HPX_BUILD_TOOLS BOOL "Build HPX tools (default: OFF)" OFF ADVANCED)
+
+if(HPX_BUILD_TOOLS)
+  add_hpx_pseudo_target(tools)
+  add_subdirectory(tools)
+endif()
+
+if(HPX_BUILD_DOCUMENTATION)
   add_subdirectory(docs)
 endif()
 
@@ -1027,6 +1028,7 @@ if(NOT HPX_NO_INSTALL)
     DIRECTORY cmake/
     DESTINATION share/hpx-${HPX_VERSION}/cmake
     COMPONENT core
+    PATTERN ".cmake.in" EXCLUDE
     PATTERN ".svn" EXCLUDE
     PATTERN ".git" EXCLUDE)
 
@@ -1103,7 +1105,7 @@ if(NOT HPX_NO_INSTALL)
     DESTINATION share/hpx-${HPX_VERSION}
     COMPONENT license)
 
-  if(HPX_DOCUMENTATION_GENERATION)
+  if(HPX_BUILD_DOCUMENTATION)
     # install hpx documentation files
     if(MSVC)
       set(doc_dir ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
@@ -1141,5 +1143,73 @@ if(NOT HPX_NO_INSTALL)
       PATTERN ".svn" EXCLUDE
       PATTERN ".git" EXCLUDE)
   endif()
+endif()
+
+################################################################################
+# External build system support (FindHPX.cmake and pkg-config).
+################################################################################
+set(HPX_LINK_DIRECTORIES
+    ${HPX_LINK_DIRECTORIES} ${CMAKE_INSTALL_PREFIX}/lib/hpx)
+set(HPX_INCLUDE_DIRECTORIES
+    ${HPX_INCLUDE_DIRECTORIES} ${CMAKE_INSTALL_PREFIX}/include)
+
+list(REMOVE_DUPLICATES HPX_LINK_DIRECTORIES)
+list(REMOVE_DUPLICATES HPX_INCLUDE_DIRECTORIES)
+
+set(external_rpath "")
+set(external_link_directories "")
+set(external_link_flags "")
+set(external_include_directories "")
+set(external_include_flags "")
+
+foreach(directory ${HPX_LINK_DIRECTORIES})
+  set(external_link_directories "${external_link_directories} ${directory}")
+  set(external_link_flags "${external_link_flags} -L${directory}")
+  set(external_rpath "${external_rpath}:${directory}")
+endforeach()
+
+foreach(directory ${HPX_INCLUDE_DIRECTORIES})
+  set(external_include_directories "${external_include_directories} ${directory}")
+  set(external_include_flags "${external_include_flags} -I${directory}")
+endforeach()
+
+get_directory_property(external_definitions DEFINITIONS)
+
+set(cmake_dir cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
+
+if(MSVC)
+  set(output_dir ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
+else()
+  set(output_dir ${CMAKE_BINARY_DIR})
+endif()
+
+if(HPX_NO_INSTALL)
+  set(external_cmake_path ${hpx_SOURCE_DIR}/cmake)
+else()
+  set(external_cmake_path ${HPX_PREFIX}/share/hpx-${HPX_VERSION}/cmake)
+endif()
+
+configure_file(${hpx_SOURCE_DIR}/cmake/templates/FindHPX.cmake.in
+               ${output_dir}/share/${cmake_dir}/Modules/FindHPX.cmake
+               ESCAPE_QUOTES @ONLY)
+
+if(NOT HPX_NO_INSTALL)
+  install(FILES ${output_dir}/share/${cmake_dir}/Modules/FindHPX.cmake
+          DESTINATION share/${cmake_dir}/Modules)
+endif()
+
+configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_application.pc.in
+               ${output_dir}/lib/pkgconfig/hpx_application.pc
+               @ONLY)
+
+configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_component.pc.in
+               ${output_dir}/lib/pkgconfig/hpx_component.pc
+               @ONLY)
+
+if(NOT HPX_NO_INSTALL)
+  install(FILES ${output_dir}/lib/pkgconfig/hpx_application.pc
+          DESTINATION lib/pkgconfig)
+  install(FILES ${output_dir}/lib/pkgconfig/hpx_component.pc
+          DESTINATION lib/pkgconfig)
 endif()
 

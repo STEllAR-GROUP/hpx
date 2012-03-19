@@ -21,6 +21,9 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     class HPX_EXPORT query_counters
     {
+        // avoid warning about using this in member initializer list
+        query_counters* this_() { return this; }
+
     public:
         query_counters(std::vector<std::string> const& names,
           std::size_t interval, std::string const& dest);
@@ -33,15 +36,18 @@ namespace hpx { namespace util
 
         template <typename Stream>
         void print_value(Stream& out, std::string const& name,
-            performance_counters::counter_value& value);
+            performance_counters::counter_value& value,
+            std::string const& uom);
 
     private:
         typedef lcos::local::mutex mutex_type;
 
         mutex_type mtx_;
 
-        std::vector<std::string> names_;
-        std::vector<naming::id_type> ids_;
+        std::vector<std::string> names_;      // counter instance names
+        std::vector<naming::id_type> ids_;    // gids of counter instances
+        std::vector<std::string> uoms_;       // units of measure
+
         std::string destination_;
 
         interval_timer timer_;

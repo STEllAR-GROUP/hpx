@@ -6,11 +6,14 @@
 #ifndef HPX_COMPONENTS_REMOTE_OBJECT_OBJECT_HPP
 #define HPX_COMPONENTS_REMOTE_OBJECT_OBJECT_HPP
 
-#include <boost/move/move.hpp>
 #include <hpx/components/remote_object/stubs/remote_object.hpp>
-#include <hpx/lcos/promise.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/runtime/naming/address.hpp>
+
+#include <boost/config.hpp>
+#include <boost/move/move.hpp>
+#include <boost/detail/workaround.hpp>
 
 namespace hpx { namespace components
 {
@@ -22,10 +25,13 @@ namespace hpx { namespace components
         struct invoke_apply_fun
         {
 
-            typedef typename boost::result_of<F(T &)>::type result_type;
+            typedef
+                typename boost::result_of<typename hpx::util::detail::remove_reference<F>::type(T &)>::type
+                result_type;
 
             invoke_apply_fun() {}
-            invoke_apply_fun(F const & f) : f(f) {}
+
+            invoke_apply_fun(BOOST_RV_REF(F) f) : f(boost::move(f)) {}
 
             invoke_apply_fun(invoke_apply_fun const & other)
                 : f(other.f)
@@ -73,15 +79,15 @@ namespace hpx { namespace components
         naming::id_type gid_;
 
         template <typename F>
-        lcos::promise<
-            typename boost::result_of<F(T &)>::type
+        lcos::future<
+            typename boost::result_of<typename hpx::util::detail::remove_reference<F>::type(T &)>::type
         >
-        operator<=(F const & f) const
+        operator<=(BOOST_FWD_REF(F) f) const
         {
             return
                 stubs::remote_object::apply_async(
                     gid_
-                  , remote_object::invoke_apply_fun<T, F>(f)
+                  , boost::move(remote_object::invoke_apply_fun<T, F>(boost::forward<F>(f)))
                 );
         }
 

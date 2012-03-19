@@ -370,7 +370,7 @@ namespace hpx
     ///
     /// Using this function is an alternative to \a hpx#disconnect, these
     /// functions do not need to be called both.
-    void finalize(double shutdown_timeout = -1.0,
+    int finalize(double shutdown_timeout = -1.0,
         double localwait = -1.0);
 
     ///////////////////////////////////////////////////////////////////////////

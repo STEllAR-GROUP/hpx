@@ -3,6 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+//[accumulator_cpp
 #include <hpx/hpx.hpp>
 #include <hpx/include/serialization.hpp>
 #include <hpx/include/actions.hpp>
@@ -40,3 +41,4 @@ HPX_DEFINE_GET_COMPONENT_TYPE(accumulator_type::wrapped_type);
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco_with_value<unsigned long>,
     hpx::components::component_base_lco_with_value);
+//]

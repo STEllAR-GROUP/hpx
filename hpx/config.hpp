@@ -117,11 +117,6 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_INITIAL_AGAS_MAX_RESOLVE_REQUESTS)
-#  define HPX_INITIAL_AGAS_MAX_RESOLVE_REQUESTS 16
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS)
 #  define HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS 4096
 #endif

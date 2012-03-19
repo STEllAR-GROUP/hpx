@@ -24,7 +24,7 @@ namespace hpx { namespace components { namespace server
         {}
 
         naming::gid_type locality_;
-        std::vector<lcos::promise<naming::gid_type, naming::gid_type> > gids_;
+        std::vector<lcos::future<naming::gid_type> > gids_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -82,8 +82,9 @@ namespace hpx { namespace components { namespace server
             // create one component at a time
             v.push_back(future_values_type::value_type(fact.get_gid()));
             for (std::size_t i = 0; i < numcreate; ++i) {
-                lcos::eager_future<action_type, naming::gid_type> f(fact, type, 1);
-                v.back().gids_.push_back(f);
+                v.back().gids_.push_back(
+                    lcos::packaged_task<action_type, naming::gid_type>(
+                        fact, type, 1).get_future());
             }
 
             created_count += numcreate;
@@ -159,8 +160,9 @@ namespace hpx { namespace components { namespace server
             v.push_back(future_values_type::value_type(fact.get_gid()));
             for (std::size_t k = 0; k < count; ++k)
             {
-                lcos::eager_future<action_type, naming::gid_type> f(fact, type, 1);
-                v.back().gids_.push_back(f);
+                v.back().gids_.push_back(
+                    lcos::packaged_task<action_type, naming::gid_type>(
+                        fact, type, 1).get_future());
             }
         }
 

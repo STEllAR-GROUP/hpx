@@ -28,7 +28,10 @@ namespace hpx { namespace naming
             // Alternatively we need to go this way if the id has never been
             // resolved, which means we don't know anything about the component
             // type.
-            //if (gid_was_split(*p) || !p->is_resolved())
+            naming::address addr;
+
+            if (gid_was_split(*p) ||
+                !naming::get_agas_client().resolve_cached(*p, addr))
             {
                 // guard for wait_abort and other shutdown issues
                 try {
@@ -49,16 +52,20 @@ namespace hpx { namespace naming
                         << e.what();
                 }
             }
-//             else {
-//                 // If the gid was not split at any point in time we can assume
-//                 // that the referenced object is fully local.
-//                 components::component_type t =
-//                     static_cast<components::component_type>(p->address_.type_);
-//
-//                 BOOST_ASSERT(t != components::component_invalid);
-//                 // Third parameter is the count of how many components to destroy.
-//                 components::stubs::runtime_support::free_component_sync(t, *p, 1);
-//             }
+            else {
+                // If the gid was not split at any point in time we can assume
+                // that the referenced object is fully local.
+                components::component_type t =
+                    static_cast<components::component_type>(addr.type_);
+
+                BOOST_ASSERT(t != components::component_invalid);
+
+                // Third parameter is the count of how many components to destroy.
+                // FIXME: The address should still be in the cache, but it could
+                // be evicted. It would be nice to have a way to pass the address
+                // directly to free_component_sync.
+                components::stubs::runtime_support::free_component_sync(t, *p, 1);
+            }
             delete p;   // delete local gid representation in any case
         }
 

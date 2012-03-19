@@ -10,16 +10,18 @@ include(HPX_Include)
 
 hpx_include(Message
             ParseArguments
+            HandleComponentDependencies
             Install)
 
 macro(add_hpx_executable name)
   # retrieve arguments
   hpx_parse_arguments(${name}
-    "SOURCES;HEADERS;DEPENDENCIES;FOLDER;HEADER_ROOT;SOURCE_ROOT" "ESSENTIAL;NOLIBS" ${ARGN})
+    "SOURCES;HEADERS;DEPENDENCIES;COMPONENT_DEPENDENCIES;FOLDER;HEADER_ROOT;SOURCE_ROOT" "ESSENTIAL;NOLIBS" ${ARGN})
 
   hpx_print_list("DEBUG" "add_executable.${name}" "Sources for ${name}" ${name}_SOURCES)
   hpx_print_list("DEBUG" "add_executable.${name}" "Headers for ${name}" ${name}_HEADERS)
   hpx_print_list("DEBUG" "add_executable.${name}" "Dependencies for ${name}" ${name}_DEPENDENCIES)
+  hpx_print_list("DEBUG" "add_executable.${name}" "Component dependencies for ${name}" ${name}_COMPONENT_DEPENDENCIES)
 
   # add the executable build target
   if(NOT MSVC)
@@ -52,33 +54,39 @@ macro(add_hpx_executable name)
                "HPX_APPLICATION_STRING=\"${name}\""
                "HPX_APPLICATION_EXPORTS")
 
-  set(libs "")
-
-  if(NOT MSVC)
-    set(libs ${BOOST_FOUND_LIBRARIES})
+  if(HPX_FLAGS)
+    set_property(TARGET ${name}_exe APPEND PROPERTY COMPILE_FLAGS ${HPX_FLAGS})
+    set_property(TARGET ${name}_exe APPEND PROPERTY LINK_FLAGS ${HPX_FLAGS})
   endif()
+
+  set_target_properties(${name}_exe 
+                        PROPERTIES SKIP_BUILD_RPATH TRUE
+                                   BUILD_WITH_INSTALL_RPATH TRUE
+                                   INSTALL_RPATH_USE_LINK_PATH TRUE 
+                                   INSTALL_RPATH ${HPX_RPATH})
+
+#  set(libs "")
+
+#  if(NOT MSVC)
+#    set(libs ${BOOST_FOUND_LIBRARIES})
+#  endif()
 
   # linker instructions
   if(NOT ${${name}_NOLIBS})
+    hpx_handle_component_dependencies(${name}_COMPONENT_DEPENDENCIES)
     target_link_libraries(${name}_exe
       ${${name}_DEPENDENCIES}
-      ${hpx_LIBRARIES}
-      hpx_init
-      ${libs})
+      ${${name}_COMPONENT_DEPENDENCIES}
+      hpx hpx_init)
     set_property(TARGET ${name}_exe APPEND
                  PROPERTY COMPILE_DEFINITIONS
                  "BOOST_ENABLE_ASSERT_HANDLER")
   else()
-    target_link_libraries(${name}_exe
-      ${${name}_DEPENDENCIES})
+    target_link_libraries(${name}_exe ${${name}_DEPENDENCIES})
   endif()
 
   if(NOT HPX_NO_INSTALL)
-    if(${name}_ESSENTIAL)
-      hpx_executable_install(${name}_exe ESSENTIAL)
-    else()
-      hpx_executable_install(${name}_exe)
-    endif()
+    hpx_executable_install(${name}_exe)
   endif()
 endmacro()
 

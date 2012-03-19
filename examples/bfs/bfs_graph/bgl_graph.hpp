@@ -37,7 +37,7 @@ namespace bfs
         // Exposed functionality of this component.
 
         // initialize the graph
-        hpx::lcos::promise<void> init_async(
+        hpx::lcos::future<void> init_async(
             std::size_t idx, std::size_t grainsize,
             std::vector<std::pair<std::size_t, std::size_t> > const& edgelist)
         {
@@ -52,7 +52,7 @@ namespace bfs
         }
 
         /// Perform a BFS on the graph.
-        hpx::lcos::promise<double>
+        hpx::lcos::future<double>
         bfs_async(std::size_t root)
         {
             BOOST_ASSERT(gid_);
@@ -65,7 +65,7 @@ namespace bfs
         }
 
         /// validate the BFS on the graph.
-        hpx::lcos::promise<std::vector<std::size_t> >
+        hpx::lcos::future<std::vector<std::size_t> >
         get_parents_async()
         {
             BOOST_ASSERT(gid_);
@@ -78,7 +78,7 @@ namespace bfs
         }
 
         /// Reset for the next BFS
-        hpx::lcos::promise<void>
+        hpx::lcos::future<void>
         reset_async()
         {
             BOOST_ASSERT(gid_);

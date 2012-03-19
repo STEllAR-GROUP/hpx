@@ -16,19 +16,19 @@ namespace hpx { namespace lcos { namespace stubs
     struct barrier
       : public components::stubs::stub_base<lcos::server::barrier>
     {
-        static lcos::promise<void>
+        static lcos::future<void>
         wait_async(naming::id_type const& gid)
         {
             typedef lcos::base_lco::set_event_action action_type;
-            return lcos::eager_future<action_type>(gid);
+            return lcos::async<action_type>(gid);
         }
 
-        static lcos::promise<void, util::unused_type>
+        static lcos::future<void, util::unused_type>
         set_error_async(naming::id_type const& gid,
             boost::exception_ptr const& e)
         {
             typedef lcos::base_lco::set_error_action action_type;
-            return lcos::eager_future<action_type>(gid, e);
+            return lcos::async<action_type>(gid, e);
         }
 
         static void wait(naming::id_type const& gid)

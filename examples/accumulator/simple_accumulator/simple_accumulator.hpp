@@ -68,7 +68,7 @@ namespace hpx { namespace components
         }
 
         /// Asynchronously query the current value of the simple_accumulator
-        lcos::promise<double> query_async()
+        lcos::future<double> query_async()
         {
             return this->base_type::query_async(gid_);
         }

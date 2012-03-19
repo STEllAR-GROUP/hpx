@@ -8,7 +8,7 @@
 
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/components/dataflow/server/dataflow.hpp>
 
 namespace hpx { namespace lcos {
@@ -23,7 +23,7 @@ namespace hpx { namespace lcos {
 
 #if 0
             template <typename Action>
-            static promise<void>
+            static future<void>
             init_async(
                 naming::id_type const & gid
               , naming::id_type const & target
@@ -33,7 +33,7 @@ namespace hpx { namespace lcos {
                     typename server::init_action<Action>
                     action_type;
 
-                return eager_future<action_type>(gid, target);
+                return async<action_type>(gid, target);
             }
 
             template <typename Action>
@@ -47,7 +47,7 @@ namespace hpx { namespace lcos {
 
 #define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
             template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename A)>     \
-            static promise<void>                                                \
+            static future<void>                                                 \
             init_async(                                                         \
                 naming::id_type const & gid                                     \
               , naming::id_type const & target                                  \
@@ -61,8 +61,7 @@ namespace hpx { namespace lcos {
                     >                                                           \
                     action_type;                                                \
                                                                                 \
-                return                                                          \
-                    eager_future<action_type>(                                  \
+                return async<action_type>(                                      \
                         gid                                                     \
                       , target                                                  \
                       , BOOST_PP_ENUM_PARAMS(N, a)                              \
@@ -92,14 +91,14 @@ namespace hpx { namespace lcos {
 #undef HPX_LCOS_DATAFLOW_M0
 #endif
 
-            static promise<void>
+            static future<void>
             connect_async(
                 naming::id_type const & gid
               , naming::id_type const & target
             )
             {
                 typedef server_type::connect_action action_type;
-                return eager_future<action_type>(gid, target);
+                return async<action_type>(gid, target);
             }
 
             static void connect(

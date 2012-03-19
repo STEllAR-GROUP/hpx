@@ -360,7 +360,7 @@ namespace gtc { namespace server
 
         if ( par->npartdom > 1 ) {
           // All reduce on densityi
-          typedef std::vector<hpx::lcos::promise< array<double> > > lazy_results_type;
+          typedef std::vector<hpx::lcos::future< array<double> > > lazy_results_type;
 
           lazy_results_type lazy_results;
           BOOST_FOREACH(hpx::naming::id_type const& gid, particle_components)

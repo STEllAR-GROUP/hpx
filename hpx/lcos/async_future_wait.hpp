@@ -19,7 +19,7 @@ namespace hpx { namespace lcos
     /// expected value directly (without wrapping it into a tuple).
     template <typename T1, typename TR1, typename F>
     inline std::size_t
-    wait (lcos::promise<T1, TR1> const& f1, F const& f)
+    wait (lcos::future<T1, TR1> const& f1, F const& f)
     {
         f(0, f1.get());
         return 1;
@@ -27,7 +27,7 @@ namespace hpx { namespace lcos
 
     template <typename F>
     inline std::size_t
-    wait (lcos::promise<void> const& f1, F const& f)
+    wait (lcos::future<void> const& f1, F const& f)
     {
         f1.get();
         f(0);
@@ -39,7 +39,7 @@ namespace hpx { namespace lcos
     // results to be there.
     template <typename T1, typename TR1, typename F>
     inline std::size_t
-    wait (std::vector<lcos::promise<T1, TR1> > const& lazy_values, F const& f,
+    wait (std::vector<lcos::future<T1, TR1> > const& lazy_values, F const& f,
         std::size_t suspend_for = 10)
     {
         boost::dynamic_bitset<> handled(lazy_values.size());
@@ -75,7 +75,7 @@ namespace hpx { namespace lcos
 
     template <typename F>
     inline std::size_t
-    wait (std::vector<lcos::promise<void> > const& lazy_values, F const& f,
+    wait (std::vector<lcos::future<void> > const& lazy_values, F const& f,
         std::size_t suspend_for = 10)
     {
         boost::dynamic_bitset<> handled(lazy_values.size());

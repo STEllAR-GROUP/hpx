@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/plain_actions.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/foreach.hpp>
@@ -27,7 +27,7 @@ std::size_t pass_object(hpx::naming::id_type id)
     Object obj;
     obj.reset_count();
 
-    return hpx::lcos::eager_future<Action>(test.get_gid(), obj).get();
+    return hpx::lcos::async<Action>(test.get_gid(), obj).get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -40,7 +40,7 @@ std::size_t move_object(hpx::naming::id_type id)
     Object obj;
     obj.reset_count();
 
-    return hpx::lcos::eager_future<Action>(test.get_gid(), boost::move(obj)).get();
+    return hpx::lcos::async<Action>(test.get_gid(), boost::move(obj)).get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -51,7 +51,7 @@ std::size_t return_object(hpx::naming::id_type id)
 
     action_move_semantics test(action_move_semantics::create_sync(id));
 
-    Object obj(hpx::lcos::eager_future<Action>(test.get_gid()).get());
+    Object obj(hpx::lcos::async<Action>(test.get_gid()).get());
     return obj.get_count();
 }
 
@@ -63,7 +63,7 @@ std::size_t return_move_object(hpx::naming::id_type id)
 
     action_move_semantics test(action_move_semantics::create_sync(id));
 
-    Object obj(boost::move(hpx::lcos::eager_future<Action>(test.get_gid()).move_out()));
+    Object obj(boost::move(hpx::lcos::async<Action>(test.get_gid()).move_out()));
     return obj.get_count();
 }
 
@@ -112,14 +112,14 @@ int hpx_main(boost::program_options::variables_map& vm)
             move_object<
                 action_move_semantics::test_movable_action, movable_object
             >(id)
-        ), is_local ? 0u : 1u);
+        ), is_local ? 0u : 0u);
 
         // test for movable object (direct actions)
         HPX_TEST_EQ((
             move_object<
                 action_move_semantics::test_movable_direct_action, movable_object
             >(id)
-        ), is_local ? 0u : 1u);
+        ), is_local ? 0u : 0u);
 
         // FIXME: Can we get down to one copy for non-movable objects as well?
 
@@ -153,13 +153,13 @@ int hpx_main(boost::program_options::variables_map& vm)
             return_object<
                 action_move_semantics::return_test_non_movable_action, non_movable_object
             >(id)
-        ), is_local ? 5u : 9u);
+        ), is_local ? 3u : 7u);
 
         HPX_TEST_EQ((
             return_object<
                 action_move_semantics::return_test_non_movable_direct_action, non_movable_object
             >(id)
-        ), is_local ? 3u : 9u);
+        ), is_local ? 2u : 7u);
     }
 
     hpx::finalize();

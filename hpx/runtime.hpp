@@ -16,6 +16,7 @@
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/action_manager.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
@@ -25,7 +26,7 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
-#include <hpx/util/papi_thread_mapper.hpp>
+#include <hpx/util/thread_mapper.hpp>
 #include <boost/foreach.hpp>
 #include <boost/detail/atomic_count.hpp>
 
@@ -132,9 +133,14 @@ namespace hpx
         }
 
         /// \brief Return a reference to the internal PAPI thread manager
-        util::papi_thread_mapper& get_papi_thread_mapper()
+        util::thread_mapper& get_thread_mapper()
         {
-            return papi_support_;
+            return thread_support_;
+        }
+
+        threads::topology const& get_topology() const
+        {
+            return topology_;
         }
 
         /// \brief Install all performance counters related to this runtime
@@ -191,8 +197,11 @@ namespace hpx
         long instance_number_;
         static boost::atomic<int> instance_number_counter_;
 
-        // PAPI support requires to register all threads with the library
-        util::papi_thread_mapper papi_support_;
+        // certain components (such as PAPI) require all threads to be
+        // registered with the library
+        util::thread_mapper thread_support_;
+
+        threads::topology topology_;
 
         bool stopped_;
     };

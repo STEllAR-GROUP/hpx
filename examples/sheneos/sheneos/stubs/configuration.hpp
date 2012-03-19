@@ -7,7 +7,8 @@
 #define HPX_SHENEOS_CONFIGURATION_AUG_08_2011_1217PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/promise.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 
 #include "../server/configuration.hpp"
@@ -19,14 +20,14 @@ namespace sheneos { namespace stubs
       : hpx::components::stubs::stub_base<sheneos::server::configuration>
     {
         ///////////////////////////////////////////////////////////////////////
-        static hpx::lcos::promise<void>
+        static hpx::lcos::future<void>
         init_async(hpx::naming::id_type const& gid, std::string const& datafile,
             std::string const& symbolic_name, std::size_t num_instances)
         {
             // The following get yields control while the action above
-            // is executed and the result is returned to the promise.
+            // is executed and the result is returned to the future.
             typedef sheneos::server::configuration::init_action action_type;
-            return hpx::lcos::eager_future<action_type>(
+            return hpx::lcos::async<action_type>(
                 gid, datafile, symbolic_name, num_instances);
         }
 
@@ -38,13 +39,13 @@ namespace sheneos { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static hpx::lcos::promise<config_data>
+        static hpx::lcos::future<config_data>
         get_async(hpx::naming::id_type const& gid)
         {
             // The following get yields control while the action above
-            // is executed and the result is returned to the promise.
+            // is executed and the result is returned to the future.
             typedef sheneos::server::configuration::get_action action_type;
-            return hpx::lcos::eager_future<action_type>(gid);
+            return hpx::lcos::async<action_type>(gid);
         }
 
         static config_data get(hpx::naming::id_type const& gid)

@@ -26,20 +26,16 @@ using hpx::actions::plain_action4;
 
 using hpx::applier::register_thread_nullary;
 
-using hpx::lcos::promise;
+using hpx::lcos::future;
 using hpx::lcos::async;
-using hpx::lcos::eager_future;
 
 using hpx::threads::thread_id_type;
 using hpx::threads::suspend;
 using hpx::threads::set_thread_state;
-using hpx::threads::thread_state_enum;
 using hpx::threads::thread_state_ex_enum;
-using hpx::threads::unknown;
 using hpx::threads::pending;
 using hpx::threads::suspended;
 using hpx::threads::wait_signaled;
-using hpx::threads::wait_timeout;
 using hpx::threads::wait_terminate;
 
 using hpx::init;
@@ -49,7 +45,7 @@ using hpx::find_here;
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T1, typename TR1>
 boost::uint64_t wait(
-    std::vector<promise<T1, TR1> > const& lazy_values
+    std::vector<future<T1, TR1> > const& lazy_values
   , boost::uint64_t suspend_for = 10
     )
 {
@@ -89,7 +85,7 @@ void change_thread_state(
     boost::uint64_t thread
     )
 {
-    set_thread_state(reinterpret_cast<void*>(thread), suspended); 
+    set_thread_state(reinterpret_cast<void*>(thread), suspended);
 }
 
 typedef plain_action1<
@@ -104,7 +100,7 @@ HPX_REGISTER_PLAIN_ACTION(change_thread_state_action);
 ///////////////////////////////////////////////////////////////////////////////
 void tree_boot(
     boost::uint64_t count
-  , boost::uint64_t grain_size 
+  , boost::uint64_t grain_size
   , id_type const& prefix
   , boost::uint64_t thread
     );
@@ -121,12 +117,10 @@ typedef plain_action4<
 
 HPX_REGISTER_PLAIN_ACTION(tree_boot_action);
 
-typedef eager_future<tree_boot_action> tree_boot_future;
-
 ///////////////////////////////////////////////////////////////////////////////
 void tree_boot(
     boost::uint64_t count
-  , boost::uint64_t grain_size 
+  , boost::uint64_t grain_size
   , id_type const& prefix
   , boost::uint64_t thread
     )
@@ -134,7 +128,7 @@ void tree_boot(
     BOOST_ASSERT(grain_size);
     BOOST_ASSERT(count);
 
-    std::vector<promise<void> > promises;
+    std::vector<future<void> > promises;
 
     boost::uint64_t const actors = (count > grain_size) ? grain_size : count;
 
@@ -160,7 +154,7 @@ void tree_boot(
     for (boost::uint64_t i = 0; i < children; ++i)
     {
         promises.push_back(async<tree_boot_action>
-            (prefix, child_count, grain_size, prefix, thread)); 
+            (prefix, child_count, grain_size, prefix, thread));
     }
 
     for (boost::uint64_t i = 0; i < actors; ++i)
@@ -209,13 +203,15 @@ int hpx_main(variables_map& vm)
 
         // Flood the queues with suspension operations before the rescheduling
         // attempt.
-        tree_boot_future before(prefix, futures, grain_size, prefix, thread);
+        future<void> before =
+            async<tree_boot_action>(prefix, futures, grain_size, prefix, thread);
 
         set_thread_state(thread_id, pending, wait_signaled);
 
         // Flood the queues with suspension operations after the rescheduling
         // attempt.
-        tree_boot_future after(prefix, futures, grain_size, prefix, thread);
+        future<void> after =
+            async<tree_boot_action>(prefix, futures, grain_size, prefix, thread);
 
         before.get();
         after.get();

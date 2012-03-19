@@ -27,7 +27,7 @@
 #include <hpx/state.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/agas/component_namespace.hpp>
 #include <hpx/runtime/agas/primary_namespace.hpp>
@@ -191,8 +191,6 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     mutex_type refcnt_requests_mtx_;
     std::size_t refcnt_requests_count_;
     boost::shared_ptr<refcnt_requests_type> refcnt_requests_;
-
-    hpx::lcos::local::counting_semaphore resolve_throttle_;
 
     service_mode const service_type;
     runtime_mode const runtime_type;
@@ -1219,7 +1217,7 @@ public:
       , error_code& ec = throws
         );
 
-    lcos::promise<naming::id_type, response> resolve_name_async(
+    lcos::future<naming::id_type, response> resolve_name_async(
         std::string const& name
         );
 

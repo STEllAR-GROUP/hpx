@@ -64,6 +64,12 @@ namespace hpx
         commandline_option_error = 30,
         serialization_error = 31,
         unhandled_exception = 32,
+        kernel_error = 33,
+        broken_task = 34,
+        task_moved = 35,
+        future_already_retrieved = 36,
+        future_already_satisfied = 37,
+        task_already_started = 38,
         last_error,
 
         // force this enum type to be at least 16 bits.
@@ -105,6 +111,12 @@ namespace hpx
         "commandline_option_error",
         "serialization_error",
         "unhandled_exception",
+        "kernel_error",
+        "broken_task",
+        "task_moved",
+        "future_already_retrieved",
+        "future_already_satisfied",
+        "task_already_started",
         ""
     };
 

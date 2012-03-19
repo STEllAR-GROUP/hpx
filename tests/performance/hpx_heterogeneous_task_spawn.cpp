@@ -41,8 +41,8 @@ boost::uint64_t min_delay = 0;
 boost::uint64_t max_delay = 0;
 boost::uint64_t total_delay = 0;
 boost::uint64_t current_trial = 0;
-boost::uint64_t total_trials = 1; 
-boost::uint64_t seed = 0; 
+boost::uint64_t total_trials = 1;
+boost::uint64_t seed = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
 void print_results(
@@ -91,12 +91,12 @@ boost::uint64_t shuffler(
     boost::random::uniform_int_distribution<boost::uint64_t>
         dist(0, high - 1);
 
-    return dist(prng); 
+    return dist(prng);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void worker(
-    boost::uint64_t delay_ 
+    boost::uint64_t delay_
     )
 {
     double volatile d = 0.;
@@ -111,7 +111,7 @@ int hpx_main(
 {
     {
         ///////////////////////////////////////////////////////////////////////
-        // Initialize the PRNG seed. 
+        // Initialize the PRNG seed.
         if (!seed)
             seed = boost::uint64_t(std::time(0));
 
@@ -143,7 +143,7 @@ int hpx_main(
                                         "tasks\n");
 
         ///////////////////////////////////////////////////////////////////////
-        // Randomly generate a description of the heterogeneous workload. 
+        // Randomly generate a description of the heterogeneous workload.
         std::vector<boost::uint64_t> payloads;
         payloads.reserve(tasks);
 
@@ -180,10 +180,10 @@ int hpx_main(
             boost::uint64_t const payload = dist(prng);
 
             if (payload < min_delay)
-                throw std::logic_error("task delay is below minimum"); 
+                throw std::logic_error("task delay is below minimum");
 
             if (payload > max_delay)
-                throw std::logic_error("task delay is above maximum"); 
+                throw std::logic_error("task delay is above maximum");
 
             current_sum += payload;
             payloads.push_back(payload);
@@ -201,16 +201,16 @@ int hpx_main(
             throw std::logic_error("incorrect number of tasks generated");
 
         boost::uint64_t const payloads_sum =
-            std::accumulate(payloads.begin(), payloads.end(), 0LLU);
+            std::accumulate(payloads.begin(), payloads.end(), 0ULL);
         if (payloads_sum != total_delay)
             throw std::logic_error("incorrect total delay generated");
- 
+
         ///////////////////////////////////////////////////////////////////////
         // Start the clock.
         high_resolution_timer t;
 
         ///////////////////////////////////////////////////////////////////////
-        // Queue the tasks in a serial loop. 
+        // Queue the tasks in a serial loop.
         for (boost::uint64_t i = 0; i < tasks; ++i)
             register_work(HPX_STD_BIND(&worker, payloads[i]));
 
@@ -257,7 +257,7 @@ int main(
         ( "total-delay"
         , value<boost::uint64_t>(&total_delay)->default_value(0)
         , "total number of delay iterations to be executed")
-        
+
         ( "current-trial"
         , value<boost::uint64_t>(&current_trial)->default_value(0)
         , "current trial")

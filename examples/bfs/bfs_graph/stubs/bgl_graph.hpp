@@ -16,13 +16,13 @@ namespace bfs { namespace stubs
     struct bgl_graph : hpx::components::stub_base<server::bgl_graph>
     {
         // initialize the graph
-        static hpx::lcos::promise<void>
+        static hpx::lcos::future<void>
         init_async(hpx::naming::id_type const& gid,
             std::size_t idx, std::size_t grainsize,
             std::vector<std::pair<std::size_t, std::size_t> > const& edgelist)
         {
             typedef server::bgl_graph::init_action action_type;
-            return hpx::lcos::eager_future<action_type>(gid, idx, grainsize,
+            return hpx::lcos::async<action_type>(gid, idx, grainsize,
                 edgelist);
         }
 
@@ -34,11 +34,11 @@ namespace bfs { namespace stubs
         }
 
         /// Perform a BFS on the graph.
-        static hpx::lcos::promise<double>
+        static hpx::lcos::future<double>
         bfs_async(hpx::naming::id_type const& gid, std::size_t root)
         {
             typedef server::bgl_graph::bfs_action action_type;
-            return hpx::lcos::eager_future<action_type>(gid, root);
+            return hpx::lcos::async<action_type>(gid, root);
         }
 
         static double
@@ -48,11 +48,11 @@ namespace bfs { namespace stubs
         }
 
         /// validate the BFS on the graph.
-        static hpx::lcos::promise<std::vector<std::size_t> >
+        static hpx::lcos::future<std::vector<std::size_t> >
         get_parents_async(hpx::naming::id_type const& gid)
         {
             typedef server::bgl_graph::get_parents_action action_type;
-            return hpx::lcos::eager_future<action_type>(gid);
+            return hpx::lcos::async<action_type>(gid);
         }
 
         static std::vector<std::size_t>
@@ -62,11 +62,11 @@ namespace bfs { namespace stubs
         }
 
         /// Reset for the next BFS
-        static hpx::lcos::promise<void>
+        static hpx::lcos::future<void>
         reset_async(hpx::naming::id_type const& gid)
         {
             typedef server::bgl_graph::reset_action action_type;
-            return hpx::lcos::eager_future<action_type>(gid);
+            return hpx::lcos::async<action_type>(gid);
         }
 
         static void

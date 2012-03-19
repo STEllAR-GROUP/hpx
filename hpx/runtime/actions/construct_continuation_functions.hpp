@@ -27,6 +27,11 @@
             boost::forward<BOOST_PP_CAT(Arg, n)>(BOOST_PP_CAT(arg, n))        \
     /**/
 
+#define HPX_MOVE_ARGS(z, n, _)                                                \
+        BOOST_PP_COMMA_IF(n)                                                  \
+            boost::move(BOOST_PP_CAT(arg, n))                                 \
+    /**/
+
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (0, HPX_ACTION_ARGUMENT_LIMIT,                                        \
     "hpx/runtime/actions/construct_continuation_functions.hpp"))              \
@@ -36,6 +41,7 @@
 
 #undef HPX_FWD_ARGS
 #undef HPX_FORWARD_ARGS
+#undef HPX_MOVE_ARGS
 
 #endif
 
@@ -69,7 +75,11 @@
                             << ") with continuation("
                             << cont->get_raw_gid()
                             << ")";
-                func(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+                // The arguments are moved here. This function is called from a
+                // bound functor. In order to do true perfect forwarding in an
+                // asynchronous operation. These bound variables must be moved
+                // out of the bound object.
+                func(BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
                 cont->trigger();
             }
             catch (hpx::exception const&) {
@@ -114,7 +124,11 @@
                             << ") with continuation("
                             << cont->get_raw_gid()
                             << ")";
-                cont->trigger(boost::move(func(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))));
+                // The arguments are moved here. This function is called from a
+                // bound functor. In order to do true perfect forwarding in an
+                // asynchronous operation. These bound variables must be moved
+                // out of the bound object.
+                cont->trigger(boost::move(func(BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _))));
             }
             catch (hpx::exception const&) {
                 // make sure hpx::exceptions are propagated back to the client
@@ -157,7 +171,11 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_raw_gid() << ")";
-                (obj->*func)(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+                // The arguments are moved here. This function is called from a
+                // bound functor. In order to do true perfect forwarding in an
+                // asynchronous operation. These bound variables must be moved
+                // out of the bound object.
+                (obj->*func)(BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
                 cont->trigger();
             }
             catch (hpx::exception const&) {
@@ -181,7 +199,11 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_raw_gid() << ")";
-                (obj->*func)(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+                // The arguments are moved here. This function is called from a
+                // bound functor. In order to do true perfect forwarding in an
+                // asynchronous operation. These bound variables must be moved
+                // out of the bound object.
+                (obj->*func)(BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
                 cont->trigger();
             }
             catch (hpx::exception const&) {
@@ -241,8 +263,12 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_raw_gid() << ")";
+                // The arguments are moved here. This function is called from a
+                // bound functor. In order to do true perfect forwarding in an
+                // asynchronous operation. These bound variables must be moved
+                // out of the bound object.
                 cont->trigger(
-                    boost::move((obj->*func)(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))));
+                    boost::move((obj->*func)(BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _))));
             }
             catch (hpx::exception const&) {
                 // make sure hpx::exceptions are propagated back to the client
@@ -265,8 +291,12 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_raw_gid() << ")";
+                // The arguments are moved here. This function is called from a
+                // bound functor. In order to do true perfect forwarding in an
+                // asynchronous operation. These bound variables must be moved
+                // out of the bound object.
                 cont->trigger(
-                    boost::move((obj->*func)(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))));
+                    boost::move((obj->*func)(BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _))));
             }
             catch (hpx::exception const&) {
                 // make sure hpx::exceptions are propagated back to the client

@@ -3,20 +3,20 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+///////////////////////////////////////////////////////////////////////////////
+// The purpose of this example is to execute a HPX-thread printing
+// "Hello World!" once. That's all.
+
+//[simplest_hello_world_getting_started
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
 
-///////////////////////////////////////////////////////////////////////////////
-// The purpose of this example is to execute a HPX-thread printing
-// "Hello world" once. That's all.
-//[simplest_hello_world_getting_started
 int hpx_main(boost::program_options::variables_map&)
 {
-    // Say Hello to the World!
+    // Say hello to the world!
     hpx::cout << "Hello World!\n" << hpx::flush;
 
-    hpx::finalize();                // Initiate shutdown of the runtime system
-    return 0;
+    return hpx::finalize(); // Initiate shutdown of the runtime system.
 }
 
 int main(int argc, char* argv[])

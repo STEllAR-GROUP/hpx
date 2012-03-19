@@ -10,17 +10,21 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/high_resolution_clock.hpp>
+#include <hpx/performance_counters/stubs/performance_counter.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/foreach.hpp>
 #include <boost/format.hpp>
+
+#include <iostream>
+#include <fstream>
 
 namespace hpx { namespace util
 {
     query_counters::query_counters(std::vector<std::string> const& names,
             std::size_t interval, std::string const& dest)
       : names_(names), destination_(dest),
-        timer_(boost::bind(&query_counters::evaluate, this),
+        timer_(boost::bind(&query_counters::evaluate, this_()),
             interval*1000, "query_counters", true),
         started_at_(0)
     {
@@ -53,6 +57,11 @@ namespace hpx { namespace util
                 }
 
                 ids_.push_back(id);
+
+                using performance_counters::stubs::performance_counter;
+                performance_counters::counter_info info =
+                    performance_counter::get_info(id);
+                uoms_.push_back(info.unit_of_measure_);
             }
         }
         BOOST_ASSERT(ids_.size() == names_.size());
@@ -76,7 +85,7 @@ namespace hpx { namespace util
 
     template <typename Stream>
     void query_counters::print_value(Stream& out, std::string const& name,
-        performance_counters::counter_value& value)
+      performance_counters::counter_value& value, std::string const& uom)
     {
         error_code ec;        // do not throw
         double val = value.get_value<double>(ec);
@@ -85,7 +94,10 @@ namespace hpx { namespace util
         if (!ec) {
             double elapsed = (value.time_ - started_at_) * 1e-9;
             out << boost::str(boost::format("%.6f") % elapsed)
-                << "[s]," << val << "\n";
+                << "[s]," << val;
+            if (!uom.empty())
+                out << "[" << uom << "]";
+            out << "\n";
         }
         else {
             out << "invalid\n";
@@ -129,11 +141,11 @@ namespace hpx { namespace util
 
             // Output the performance counter value.
             if (destination_is_cout) {
-                print_value(std::cout, names_[i], value);
+                print_value(std::cout, names_[i], value, uoms_[i]);
             }
             else {
                 std::ofstream out(destination_, std::ios_base::ate);
-                print_value(out, names_[i], value);
+                print_value(out, names_[i], value, uoms_[i]);
             }
         }
     }

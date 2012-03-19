@@ -10,13 +10,14 @@ include(HPX_Include)
 
 hpx_include(Message
             ParseArguments
+            HandleComponentDependencies
             Install
             AddSourceGroup)
 
 macro(add_hpx_component name)
   # retrieve arguments
   hpx_parse_arguments(${name}
-    "SOURCES;HEADERS;DEPENDENCIES;INI;FOLDER;HEADER_ROOT;SOURCE_ROOT;HEADER_GLOB;SOURCE_GLOB"
+    "SOURCES;HEADERS;DEPENDENCIES;COMPONENT_DEPENDENCIES;INI;FOLDER;HEADER_ROOT;SOURCE_ROOT;HEADER_GLOB;SOURCE_GLOB"
     "ESSENTIAL;NOLIBS;AUTOGLOB" ${ARGN})
 
   # Collect sources and headers from the given (current) directory
@@ -25,12 +26,12 @@ macro(add_hpx_component name)
     if(NOT ${name}_SOURCE_ROOT)
       set(${name}_SOURCE_ROOT ".")
     endif()
-    hpx_debug("add_hpx_component.${name}_component" "${name}_SOURCE_ROOT: ${${name}_SOURCE_ROOT}")
+    hpx_debug("add_component.${name}" "${name}_SOURCE_ROOT: ${${name}_SOURCE_ROOT}")
 
     if(NOT ${name}_SOURCE_GLOB)
       set(${name}_SOURCE_GLOB "${${name}_SOURCE_ROOT}/*.cpp")
     endif()
-    hpx_debug("add_hpx_component.${name}_component" "${name}_SOURCE_GLOB: ${${name}_SOURCE_GLOB}")
+    hpx_debug("add_component.${name}" "${name}_SOURCE_GLOB: ${${name}_SOURCE_GLOB}")
 
     add_hpx_library_sources(${name}_component
       GLOB_RECURSE GLOBS "${${name}_SOURCE_GLOB}")
@@ -46,12 +47,12 @@ macro(add_hpx_component name)
     if(NOT ${name}_HEADER_ROOT)
       set(${name}_HEADER_ROOT ".")
     endif()
-    hpx_debug("add_hpx_component.${name}_component" "${name}_HEADER_ROOT: ${${name}_HEADER_ROOT}")
+    hpx_debug("add_component.${name}" "${name}_HEADER_ROOT: ${${name}_HEADER_ROOT}")
 
     if(NOT ${name}_HEADER_GLOB)
       set(${name}_HEADER_GLOB "${${name}_HEADER_ROOT}/*.hpp")
     endif()
-    hpx_debug("add_hpx_component.${name}_component" "${name}_HEADER_GLOB: ${${name}_HEADER_GLOB}")
+    hpx_debug("add_component.${name}" "${name}_HEADER_GLOB: ${${name}_HEADER_GLOB}")
 
     add_hpx_library_headers(${name}_component
       GLOB_RECURSE GLOBS "${${name}_HEADER_GLOB}")
@@ -68,6 +69,7 @@ macro(add_hpx_component name)
   hpx_print_list("DEBUG" "add_component.${name}" "Sources for ${name}" ${name}_SOURCES)
   hpx_print_list("DEBUG" "add_component.${name}" "Headers for ${name}" ${name}_HEADERS)
   hpx_print_list("DEBUG" "add_component.${name}" "Dependencies for ${name}" ${name}_DEPENDENCIES)
+  hpx_print_list("DEBUG" "add_component.${name}" "Component dependencies for ${name}" ${name}_COMPONENT_DEPENDENCIES)
   hpx_print_list("DEBUG" "add_component.${name}" "Configuration files for ${name}" ${name}_INI)
 
   if(${${name}_ESSENTIAL})
@@ -88,13 +90,15 @@ macro(add_hpx_component name)
                  "BOOST_ENABLE_ASSERT_HANDLER")
   endif()
 
+  hpx_handle_component_dependencies(${name}_COMPONENT_DEPENDENCIES)
+
   if(NOT MSVC)
     target_link_libraries(${name}_component
-      ${${name}_DEPENDENCIES} ${libs} ${BOOST_FOUND_LIBRARIES})
+      ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} hpx)
     set(prefix "hpx_component_")
   else()
     target_link_libraries(${name}_component
-      ${${name}_DEPENDENCIES} ${libs})
+      ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} hpx)
   endif()
 
   # set properties of generated shared library
@@ -110,6 +114,17 @@ macro(add_hpx_component name)
     RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL}
     RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO})
 
+  if(HPX_FLAGS)
+    set_property(TARGET ${name}_component APPEND PROPERTY COMPILE_FLAGS ${HPX_FLAGS})
+    set_property(TARGET ${name}_component APPEND PROPERTY LINK_FLAGS ${HPX_FLAGS})
+  endif()
+
+  set_target_properties(${name}_component 
+                        PROPERTIES SKIP_BUILD_RPATH TRUE
+                                   BUILD_WITH_INSTALL_RPATH TRUE
+                                   INSTALL_RPATH_USE_LINK_PATH TRUE 
+                                   INSTALL_RPATH ${HPX_RPATH})
+
   if(${name}_FOLDER)
     set_target_properties(${name}_component PROPERTIES FOLDER ${${name}_FOLDER})
   endif()
@@ -121,9 +136,7 @@ macro(add_hpx_component name)
                "HPX_COMPONENT_EXPORTS")
 
   if(NOT HPX_NO_INSTALL)
-    hpx_mangle_name(install_target ${name}_component)
-
-    hpx_library_install(${install_target})
+    hpx_library_install(${name}_component)
 
     foreach(target ${${name}_INI})
       hpx_ini_install(${install_target} ${target})

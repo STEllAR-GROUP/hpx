@@ -109,20 +109,20 @@ int hpx_main(variables_map & vm)
         hpx::lcos::dataflow<g_action> b(here);
         hpx::lcos::dataflow<f_action> c(here, a, b);
 
-        // blocks until the result is delivered! (constructs a promise and sets
+        // blocks until the result is delivered! (constructs a future and sets
         // this as the target of the dataflow)
-        HPX_TEST_EQ(18003, c.get());
+        HPX_TEST_EQ(18003, c.get_future().get());
 
-        HPX_TEST_EQ(55u, fib(n).get());
+        HPX_TEST_EQ(55u, fib(n).get_future().get());
 
-        HPX_TEST_EQ(n, hpx::lcos::dataflow<id_action>(here, n).get());
+        HPX_TEST_EQ(n, hpx::lcos::dataflow<id_action>(here, n).get_future().get());
         hpx::lcos::dataflow_base<boost::uint64_t> d = hpx::lcos::dataflow<id_action>(here, n);
-        HPX_TEST_EQ(n, d.get());
+        HPX_TEST_EQ(n, d.get_future().get());
 
-        HPX_TEST_EQ(9005, hpx::lcos::dataflow<h_action>(here, a, 4).get());
-        HPX_TEST_EQ(9007, hpx::lcos::dataflow<h_action>(here, 5, b).get());
+        HPX_TEST_EQ(9005, hpx::lcos::dataflow<h_action>(here, a, 4).get_future().get());
+        HPX_TEST_EQ(9007, hpx::lcos::dataflow<h_action>(here, 5, b).get_future().get());
         HPX_TEST_EQ(9003, hpx::lcos::dataflow<g_action>(here,
-            hpx::lcos::dataflow<trigger_action>(here)).get());
+            hpx::lcos::dataflow<trigger_action>(here)).get_future().get());
         HPX_TEST(called_trigger);
         called_trigger = false;
 
@@ -137,7 +137,7 @@ int hpx_main(variables_map & vm)
         trigger.push_back(hpx::lcos::dataflow<f8action>(here));
 
         hpx::lcos::dataflow<f9action>(
-            here, hpx::lcos::dataflow_trigger(here, trigger)).get();
+            here, hpx::lcos::dataflow_trigger(here, trigger)).get_future().get();
         HPX_TEST(called_f1);
         HPX_TEST(called_f2);
         HPX_TEST(called_f3);
@@ -154,7 +154,7 @@ int hpx_main(variables_map & vm)
                 here
               , hpx::lcos::dataflow<g_action>(here)
               , hpx::lcos::dataflow<g_action>(here)
-            ).get();
+            ).get_future().get();
 
             hpx::lcos::dataflow<f1action>(
                 here
@@ -167,7 +167,7 @@ int hpx_main(variables_map & vm)
                         )
                     )
                 )
-            ).get();
+            ).get_future().get();
         }
         //hpx::cout << "leaving destruction test scope\n" << hpx::flush;
     }

@@ -8,7 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/packaged_task.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -19,9 +19,9 @@ namespace hpx { namespace performance_counters { namespace stubs
       : components::stubs::stub_base<server::base_performance_counter>
     {
         ///////////////////////////////////////////////////////////////////////
-        static lcos::promise<counter_info> get_info_async(
+        static lcos::future<counter_info> get_info_async(
             naming::id_type const& targetid);
-        static lcos::promise<counter_value> get_value_async(
+        static lcos::future<counter_value> get_value_async(
             naming::id_type const& targetid);
 
         static counter_info get_info(naming::id_type const& targetid,
@@ -30,8 +30,8 @@ namespace hpx { namespace performance_counters { namespace stubs
             error_code& ec = throws);
 
         ///////////////////////////////////////////////////////////////////////
-        static lcos::promise<bool> start_async(naming::id_type const& targetid);
-        static lcos::promise<bool> stop_async(naming::id_type const& targetid);
+        static lcos::future<bool> start_async(naming::id_type const& targetid);
+        static lcos::future<bool> stop_async(naming::id_type const& targetid);
 
         static bool start(naming::id_type const& targetid,
             error_code& ec = throws);

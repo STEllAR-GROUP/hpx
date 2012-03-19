@@ -14,7 +14,7 @@
     [copyright 2011 2012 The STE||AR Group]
     [license
         Distributed under the Boost Software License, Version 1.0. (See
-        accompanying file [@../../LICENSE_1_0.txt LICENSE_1_0.txt] or copy at
+        accompanying file [@http://www.boost.org/LICENSE_1_0.txt LICENSE_1_0.txt] or copy at
         [@http://www.boost.org/LICENSE_1_0.txt])
     ]
 ]
@@ -28,19 +28,27 @@
 [def __version__                V0.8.0]
 
 [def __stellar__                [@http://stellar.cct.lsu.edu STE||AR]]
-[def __stellar_list__           [@email:gopx@cct.lsu.edu HPX General List]]
+[def __stellar_list__           [@email:gopx@cct.lsu.edu gopx@cct.lsu.edu]]
 [def __stellar_irc__            [@irc://irc.freenode.net:6667/#ste||ar #stellar at Freenet]]
 [def __lsu__                    [@http://www.lsu.edu Louisiana State University (LSU)]]
 [def __cct__                    [@http://www.cct.lsu.edu Center for Computation and Technology (CCT)]]
+[def __iu__                     [@http://www.iu.edu Indiana University (IU)]]
+[def __crest__                  [@http://pti.iu.edu Center for Research in Extreme Scale Technologies (CREST)]]
+[def __fau__                    [@http://www.fau.de Friedrich-Alexander University Erlangen-Nuremberg (FAU)]]
+[def __inf3__                   [@http://www3.cs.fau.de Chair of Computer Science 3 - Computer Architecture]]
 
 [def __cmake__                  [@http://www.cmake.org/ CMake]]
 
 [def __boost__                  [@http://www.boost.org/ Boost]]
 [def __boost_tools__            [@http://www.boost.org/tools/index.html Boost Tools]]
 [def __boost_getting_started__  [@http://www.boost.org/doc/libs/release/more/getting_started/index.html Getting Started]]
+[def __boost_doc__              [@http://www.boost.org/doc/ Boost Documentation]]
 
 [/ optional external dependencies]
-[def __hwloc__                  [@http://www.open-mpi.org/projects/hwloc/ Portable Hardware Locality (hwloc)]]
+[def __hwloc__                  [@http://www.open-mpi.org/projects/hwloc/ Portable Hardware Locality (HWLOC)]]
+[def __tbb__                    [@http://threadingbuildingblocks.org/ Intel Threading Building Blocks (TBB)]]
+[def __swarm__                  [@http://www.etinternational.com/index.php/products/swarmbeta/ ETI SWift Adaptive Runtime Machine (SWARM)]]
+[def __qthreads__               [@http://www.cs.sandia.gov/qthreads/ Sandia National Labs Qthreads]]
 
 [/ Some images ]
 [def __note__                   [$./images/note.png]]
@@ -50,15 +58,41 @@
 [def __danger__                 [$./images/alert.png]]
 
 [/ Section link shortcuts]
-[def __commandline__            [link hpx.getting_started.commandline HPX Command Line Options]]
+[def __pbs__                    [link hpx.tutorial.getting_started.unix_installation.using_hpx_applications_with_pbs PBS]]
+[def __commandline__            [link hpx.tutorial.getting_started.commandline HPX Command Line Options]]
+
+[def __fibonacci_example__      [link hpx.tutorial.examples.fibonacci Fibonacci Example]]
+[def __hello_world_example__    [link hpx.tutorial.examples.hello_world Hello World Example]]
+
 [def __people__                 [link hpx.people People]]
+
+[/  fig[ref title label]
+    Image element with a title.
+
+    ref   := Reference to the image file.
+    title := The title to associate with this figure.
+    label := the id to use to be able to reference this picture
+]
+[template fig[ref title label]'''
+    <figure id="'''[label]'''">
+        <title>'''[title]'''</title>
+        <inlinemediaobject>
+            <imageobject>
+                <imagedata fileref="./images/'''[ref]'''"></imagedata>
+            </imageobject>
+            <textobject>
+                <phrase role="alt">'''[title]'''</phrase>
+            </textobject>
+        </inlinemediaobject>
+    </figure>
+''']
 
 [/ CONTENT]
 
-The STE||AR Group (System Technologies, Emergent Parallelism, and Algorithms
-Research) is a research group at the Center for Computation and Technology
-(Louisiana State University). For a list of people working in that group and
-participating in writing this documentation see __people__.
+The __stellar__ Group ([*S]ystems [*T]echnologies, [*E]mergent Para[*ll]elism,
+and [*A]lgorithms [*R]esearch) is a research group at the __cct__ (__lsu__). For
+a list of people working in that group and participating in writing this
+documentation see __people__.
 
 This documentation is automatically generated for HPX __version__ (from SVN
 revision __svn_revision__) by the Boost QuickBook documentation tool. QuickBook
@@ -66,9 +100,21 @@ can be found in the collection of __boost_tools__.
 
 [include preface.qbk]
 [include whats_new.qbk]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:tutorial Tutorial]
+
 [include gettingstarted.qbk]
 [include introduction.qbk]
 [include examples.qbk]
+
+[endsect] [/ Tutorial]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:manual Reference Manual]
+
+[fixme TBD]
+
+[endsect] [/ Manual]
+
 [include people.qbk]
-
-

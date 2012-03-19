@@ -7,6 +7,9 @@
 #define HPX_TRAITS_PROMISE_REMOTE_RESULT_OCT_27_2011_0416PM
 
 #include <hpx/traits.hpp>
+#include <hpx/util/unused.hpp>
+
+#include <boost/mpl/identity.hpp>
 
 namespace hpx { namespace traits
 {

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="hpx64_component"
+	InheritedPropertySheets=".\hpx64.vsprops"
+	>
+	<Tool
+		Name="VCCLCompilerTool"
+		AdditionalIncludeDirectories=""
+		PreprocessorDefinitions="HPX_COMPONENT_NAME=$(ProjectName);HPX_COMPONENT_EXPORTS"
+		DisableSpecificWarnings="4267;4503"
+	/>
+	<Tool
+		Name="VCCustomBuildTool"
+		CommandLine="if not exist &quot;$(HPX_ROOT)\bin&quot; mkdir &quot;$(HPX_ROOT)\bin&quot;&#x0D;&#x0A;if not exist &quot;$(HPX_ROOT)\bin\lib&quot; mkdir &quot;$(HPX_ROOT)\bin\lib&quot;&#x0D;&#x0A;if not exist &quot;$(HPX_ROOT)\bin\libs&quot; mkdir &quot;$(HPX_ROOT)\bin\libs&quot;&#x0D;&#x0A;xcopy /Y/F &quot;$(TargetPath)&quot; &quot;$(HPX_ROOT)\bin\lib&quot;&#x0D;&#x0A;xcopy /Y/F &quot;$(TargetDir)\$(TargetName).pdb&quot; &quot;$(HPX_ROOT)\bin\lib&quot;&#x0D;&#x0A;xcopy /Y/F &quot;$(TargetDir)\$(TargetName).lib&quot; &quot;$(HPX_ROOT)\bin\libs&quot;&#x0D;&#x0A;"
+		Outputs="&quot;$(HPX_ROOT)\bin\lib\$(TargetFileName)&quot;"
+	/>
+	<Tool
+		Name="VCLinkerTool"
+		AdditionalLibraryDirectories="&quot;$(BOOST_ROOT)\stage\lib&quot;;&quot;$(TBB_ROOT)\ia32\vc8\lib&quot;"
+	/>
+	<UserMacro
+		Name="BOOST_ROOT"
+		Value="$(HPX_BOOST_ROOT)"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
+		Name="HPX_ROOT"
+		Value="$(HPX_ROOT)"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
+		Name="TBB_ROOT"
+		Value="$(HPX_TBB_ROOT)"
+		PerformEnvironmentSet="true"
+	/>
+</VisualStudioPropertySheet>

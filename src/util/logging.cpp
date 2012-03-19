@@ -4,10 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <cstddef>
-#include <cstdlib>
-
 #include <hpx/hpx_fwd.hpp>
+
+#if !defined(HPX_NO_LOGGING)
+
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
@@ -24,6 +24,9 @@
 #include <boost/assign/std/vector.hpp>
 #include <boost/logging/format/named_write.hpp>
 #include <boost/logging/format/destination/defaults.hpp>
+
+#include <cstddef>
+#include <cstdlib>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -726,12 +729,8 @@ namespace hpx { namespace util { namespace detail
         std::vector<std::string> prefill_;
     };
 
-// the Boost.Log generates bogus milliseconds on Linux systems
-#if defined(BOOST_WINDOWS)
+// define the format for the generated time stamps
 #define HPX_TIMEFORMAT "$hh:$mm.$ss.$mili"
-#else
-#define HPX_TIMEFORMAT "$hh:$mm.$ss.$mili"
-#endif
 
     logging_configuration::logging_configuration()
     {
@@ -833,7 +832,21 @@ namespace hpx { namespace util { namespace detail
         init_hpx_console_log(ini);
         init_app_console_log(ini);
     }
-
-///////////////////////////////////////////////////////////////////////////////
 }}}
 
+#else  // HPX_NO_LOGGING
+
+#include <hpx/util/logging.hpp>
+
+namespace hpx { namespace util { namespace detail
+{
+    dummy_log_impl dummy_log = dummy_log_impl();
+
+    std::vector<std::string> get_logging_data()
+    {
+        static std::vector<std::string> dummy_data;
+        return dummy_data;
+    }
+}}}
+
+#endif // HPX_NO_LOGGING

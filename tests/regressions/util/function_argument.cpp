@@ -9,8 +9,8 @@
 
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/function.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
-#include <boost/detail/lightweight_test.hpp>
 #include <boost/foreach.hpp>
 
 using boost::program_options::variables_map;
@@ -26,14 +26,14 @@ bool invoked_g = false;
 
 bool f(hpx::util::function<bool()> func)
 {
-    BOOST_TEST(!invoked_f);
+    HPX_TEST(!invoked_f);
     invoked_f = true;
 
     invoked_g = false;
     bool result = func();
-    BOOST_TEST(invoked_g);
+    HPX_TEST(invoked_g);
 
-    BOOST_TEST(result);
+    HPX_TEST(result);
     return result;
 }
 
@@ -46,7 +46,7 @@ struct g
 {
     bool operator()()
     {
-        BOOST_TEST(!invoked_g);
+        HPX_TEST(!invoked_g);
         invoked_g = true;
 
         hpx::cout << "Hello World\n" << hpx::flush;
@@ -68,13 +68,13 @@ int hpx_main(variables_map &)
         BOOST_FOREACH(id_type const & prefix, prefixes)
         {
             invoked_f = false;
-            BOOST_TEST(async<f_action>(prefix, f).get());
-            BOOST_TEST(invoked_f);
+            HPX_TEST(async<f_action>(prefix, f).get());
+            HPX_TEST(invoked_f);
         }
     }
 
     hpx::finalize();
-    return boost::report_errors();
+    return hpx::util::report_errors();
 }
 
 int main(int argc, char **argv)

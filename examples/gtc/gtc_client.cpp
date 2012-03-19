@@ -373,7 +373,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         ///////////////////////////////////////////////////////////////////////
         { // SETUP
-          std::vector<hpx::lcos::promise<void> > initial_phase;
+          std::vector<hpx::lcos::future<void> > initial_phase;
           for (std::size_t i=0;i<par->ntoroidal;i++) {
             initial_phase.push_back(points[i].init_async(i,par));
           }
@@ -388,7 +388,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         }
 
         { // LOAD
-          std::vector<hpx::lcos::promise<void> > load_phase;
+          std::vector<hpx::lcos::future<void> > load_phase;
           for (std::size_t i=0;i<par->ntoroidal;i++) {
             load_phase.push_back(points[i].load_async(i,par));
           }
@@ -402,7 +402,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         std::size_t istep = 0;
         { // CHARGEI
-          std::vector<hpx::lcos::promise<void> > chargei_phase;
+          std::vector<hpx::lcos::future<void> > chargei_phase;
           for (std::size_t i=0;i<par->ntoroidal;i++) {
             chargei_phase.push_back(points[i].chargei_async(istep,
                                 point_components,par));
@@ -418,7 +418,7 @@ int hpx_main(boost::program_options::variables_map &vm)
             std::size_t idiag = ((irk+1)%2) + (istep%par->ndiag);
 
             {  // SMOOTH(3)
-              std::vector<hpx::lcos::promise<void> > smooth_phase;
+              std::vector<hpx::lcos::future<void> > smooth_phase;
               std::size_t iflag = 3;
               for (std::size_t i=0;i<par->ntoroidal;i++) {
                 smooth_phase.push_back(points[i].smooth_async(iflag,
@@ -428,7 +428,7 @@ int hpx_main(boost::program_options::variables_map &vm)
             }
 
             {  // FIELD
-              std::vector<hpx::lcos::promise<void> > field_phase;
+              std::vector<hpx::lcos::future<void> > field_phase;
               for (std::size_t i=0;i<par->ntoroidal;i++) {
                 field_phase.push_back(points[i].field_async(
                                       point_components,par));
@@ -438,7 +438,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
             // push ion
             {  // PUSHI
-              std::vector<hpx::lcos::promise<void> > pushi_phase;
+              std::vector<hpx::lcos::future<void> > pushi_phase;
               for (std::size_t i=0;i<par->ntoroidal;i++) {
                 pushi_phase.push_back(points[i].pushi_async(irk,istep,idiag,
                                       point_components,par));
@@ -448,7 +448,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
             // redistribute ion across PEs
             {  // SHIFTI
-              std::vector<hpx::lcos::promise<void> > shifti_phase;
+              std::vector<hpx::lcos::future<void> > shifti_phase;
               for (std::size_t i=0;i<par->ntoroidal;i++) {
                 shifti_phase.push_back(points[i].shifti_async(
                                       point_components,par));
@@ -462,7 +462,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
             // ion perturbed density
             { // CHARGEI
-              std::vector<hpx::lcos::promise<void> > chargei_phase;
+              std::vector<hpx::lcos::future<void> > chargei_phase;
               for (std::size_t i=0;i<par->ntoroidal;i++) {
                 chargei_phase.push_back(points[i].chargei_async(istep,
                                     point_components,par));
@@ -472,7 +472,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
             // smooth ion density
             {  // SMOOTH(0)
-              std::vector<hpx::lcos::promise<void> > smooth_phase;
+              std::vector<hpx::lcos::future<void> > smooth_phase;
               std::size_t iflag = 0;
               for (std::size_t i=0;i<par->ntoroidal;i++) {
                 smooth_phase.push_back(points[i].smooth_async(iflag,
@@ -483,7 +483,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
             // solve GK Poisson equation using adiabatic electron
             {  // POISSON(0)
-              std::vector<hpx::lcos::promise<void> > poisson_phase;
+              std::vector<hpx::lcos::future<void> > poisson_phase;
               std::size_t iflag = 0;
               for (std::size_t i=0;i<par->ntoroidal;i++) {
                 poisson_phase.push_back(points[i].poisson_async(

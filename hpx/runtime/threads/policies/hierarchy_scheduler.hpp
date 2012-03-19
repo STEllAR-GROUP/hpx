@@ -15,7 +15,6 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/runtime/threads/thread.hpp>
-#include <hpx/runtime/threads/thread_affinity.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
 
 #include <boost/noncopyable.hpp>

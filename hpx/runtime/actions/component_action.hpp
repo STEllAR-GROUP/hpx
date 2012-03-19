@@ -42,12 +42,12 @@ namespace hpx { namespace actions
         Result (Component::*F)(), typename Derived,
         threads::thread_priority Priority = threads::thread_priority_default>
     class base_result_action0
-      : public action<Component, Action, Result, boost::fusion::vector<>,
+      : public action<Component, Action, Result, hpx::util::tuple0<>,
                       Derived, Priority>
     {
     public:
         typedef Result result_type;
-        typedef boost::fusion::vector<> arguments_type;
+        typedef hpx::util::tuple0<> arguments_type;
         typedef action<Component, Action, result_type, arguments_type,
                        Derived, Priority>
             base_type;
@@ -338,11 +338,11 @@ namespace hpx { namespace actions
       threads::thread_priority Priority = threads::thread_priority_default>
     class base_action0
       : public action<Component, Action, util::unused_type,
-                      boost::fusion::vector<>, Derived, Priority>
+                      hpx::util::tuple0<>, Derived, Priority>
     {
     public:
         typedef util::unused_type result_type;
-        typedef boost::fusion::vector<> arguments_type;
+        typedef hpx::util::tuple0<> arguments_type;
         typedef action<Component, Action, result_type, arguments_type,
                        Derived, Priority>
             base_type;

@@ -8,7 +8,7 @@
 #if !defined(HPX_FF038007_9487_465F_B750_9452CF6D6693)
 #define HPX_FF038007_9487_465F_B750_9452CF6D6693
 
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/components/iostreams/server/output_stream.hpp>
 
@@ -23,7 +23,7 @@ struct output_stream : components::stub_base<server::output_stream>
       , buffer const& in
     ) {
         typedef server::output_stream::write_sync_action action_type;
-        lcos::eager_future<action_type>(gid, in).get();
+        lcos::async<action_type>(gid, in).get();
     }
 
     static void write_async(
@@ -31,7 +31,7 @@ struct output_stream : components::stub_base<server::output_stream>
       , buffer const& in
     ) {
         typedef server::output_stream::write_async_action action_type;
-        lcos::eager_future<action_type>(gid, in).get();
+        lcos::async<action_type>(gid, in).get();
     }
 };
 

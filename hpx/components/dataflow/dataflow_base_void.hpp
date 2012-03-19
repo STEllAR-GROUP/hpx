@@ -32,23 +32,21 @@ namespace hpx { namespace lcos
         virtual ~dataflow_base()
         {}
 
-        dataflow_base(promise<naming::id_type, naming::gid_type> const & promise)
+        dataflow_base(future<naming::id_type> const & promise)
             : impl(new detail::dataflow_base_impl(promise))
         {}
 
-        promise<void> get_async() const
+        future<void> get_future() const
         {
             promise<void> p;
             connect(p.get_gid());
-            return p;
+            return p.get_future();
         }
 
-        void get() const
-        {
-            promise<void> p;
-            connect(p.get_gid());
-            p.get();
-        }
+//         void get() const
+//         {
+//             get_future().get();
+//         }
 
         void invalidate()
         {

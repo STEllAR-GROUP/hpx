@@ -44,10 +44,10 @@ namespace hpx { namespace performance_counters
         counter_type type, std::string const& helptext,
         HPX_STD_FUNCTION<create_counter_func> const& create_counter,
         HPX_STD_FUNCTION<discover_counters_func> const& discover_counters,
-        boost::uint32_t version, error_code& ec)
+        boost::uint32_t version, std::string const& uom, error_code& ec)
     {
         counter_info info(type, name, helptext,
-            version ? version : HPX_PERFORMANCE_COUNTER_V1);
+            version ? version : HPX_PERFORMANCE_COUNTER_V1, uom);
         boost::shared_ptr<manage_counter_type> p =
             boost::make_shared<manage_counter_type>(info);
 
@@ -68,7 +68,8 @@ namespace hpx { namespace performance_counters
         {
             install_counter_type(data[i].name_, data[i].type_,
                 data[i].helptext_, data[i].create_counter_,
-                data[i].discover_counters_, data[i].version_, ec);
+                data[i].discover_counters_, data[i].version_,
+                data[i].unit_of_measure_, ec);
             if (ec) break;
         }
     }

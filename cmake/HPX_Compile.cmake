@@ -58,7 +58,7 @@ macro(hpx_compile name)
   endif()
 
   if(${name}_QUIET)
-    hpx_debug("hpx_compile.quiet" "${CMAKE_${${name}_LANGUAGE}_COMPILER}"
+    hpx_debug("compile" "${CMAKE_${${name}_LANGUAGE}_COMPILER}"
         "${${name}_FLAGS} ${${name}_SOURCE}"
         ${outflag} "${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}")
     execute_process(
@@ -67,7 +67,7 @@ macro(hpx_compile name)
               ${outflag} ${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}
       RESULT_VARIABLE ${name}_RESULT OUTPUT_QUIET ERROR_QUIET)
   else()
-    hpx_debug("hpx_compile" "${CMAKE_${${name}_LANGUAGE}_COMPILER}"
+    hpx_debug("compile" "${CMAKE_${${name}_LANGUAGE}_COMPILER}"
         "${${name}_FLAGS} ${${name}_SOURCE}"
         ${outflag} "${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}")
     execute_process(

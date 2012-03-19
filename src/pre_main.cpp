@@ -20,11 +20,10 @@ namespace hpx
 ///////////////////////////////////////////////////////////////////////////////
 // Create a new barrier and register its gid with the given symbolic name.
 inline lcos::barrier
-create_barrier(naming::resolver_client& agas_client,
-    std::size_t num_localities, char const* symname)
+create_barrier(std::size_t num_localities, char const* symname)
 {
     lcos::barrier b;
-    b.create_one(agas_client.local_locality(), num_localities);
+    b.create_one(find_here(), num_localities);
 
     agas::register_name(symname, b.get_gid());
     return b;
@@ -166,8 +165,8 @@ bool pre_main(runtime_mode mode)
             }
 
             std::size_t const num_localities = cfg.get_num_localities();
-            second_stage = create_barrier(agas_client, num_localities, second_barrier);
-            third_stage = create_barrier(agas_client, num_localities, third_barrier);
+            second_stage = create_barrier(num_localities, second_barrier);
+            third_stage = create_barrier(num_localities, third_barrier);
 
             LBT_(info) << "(2nd stage) pre_main: created 2nd and 3rd stage boot barriers";
         }

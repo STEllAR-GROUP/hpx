@@ -90,21 +90,24 @@ namespace hpx { namespace lcos { namespace server { namespace detail
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, get_constructed_count, _2),
-              &performance_counters::locality_counter_discoverer
+              &performance_counters::locality_counter_discoverer,
+              ""
             },
             { "/lcos/dataflow/initialized", performance_counters::counter_raw,
               "returns the number of initialized dataflow objects",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, get_initialized_count, _2),
-              &performance_counters::locality_counter_discoverer
+              &performance_counters::locality_counter_discoverer,
+              ""
             },
             { "/lcos/dataflow/fired", performance_counters::counter_raw,
               "returns the number of fired dataflow objects",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
                   _1, get_fired_count, _2),
-              &performance_counters::locality_counter_discoverer
+              &performance_counters::locality_counter_discoverer,
+              ""
             }
         };
         performance_counters::install_counter_types(

@@ -24,6 +24,9 @@ namespace hpx { namespace util
     // file
     struct HPX_EXPORT map_hostnames
     {
+        typedef HPX_STD_FUNCTION<std::string(std::string const&)>
+            transform_function_type;
+
         map_hostnames(bool debug = false)
           : debug_(debug)
         {}
@@ -38,9 +41,15 @@ namespace hpx { namespace util
             prefix_ = prefix;
         }
 
-        std::string map(std::string const& host_name, boost::uint16_t port) const;
+        void use_transform(transform_function_type f)
+        {
+            transform_ = f;
+        }
+
+        std::string map(std::string host_name, boost::uint16_t port) const;
 
       private:
+        transform_function_type transform_;
         std::string suffix_;
         std::string prefix_;
         bool debug_;

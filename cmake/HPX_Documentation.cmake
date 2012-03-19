@@ -17,21 +17,21 @@ find_package(HPX_Xsltproc)
 # issue a meaninful warning if part of the documentation toolchain is not available
 if((NOT DOCBOOK_DTD_PATH_FOUND) OR (NOT DOCBOOK_XSL_PATH_FOUND))
   hpx_warn("documentation" "DocBook DTD or XSL is unavailable, documentation generation disabled. Set DOCBOOK_ROOT pointing to your DocBook installation directory.")
-  set(HPX_DOCUMENTATION_GENERATION OFF CACHE BOOL "True if the HPX documentation toolchain is available." FORCE)
+  set(HPX_BUILD_DOCUMENTATION OFF CACHE BOOL "True if the HPX documentation toolchain is available." FORCE)
 elseif((NOT BOOSTBOOK_DTD_PATH_FOUND) OR (NOT BOOSTBOOK_XSL_PATH_FOUND))
   hpx_warn("documentation" "BoostBook DTD or XSL is unavailable, documentation generation disabled. Set BOOSTBOOK_ROOT pointing to your BoostBook installation directory.")
-  set(HPX_DOCUMENTATION_GENERATION OFF CACHE BOOL "True if the HPX documentation toolchain is available." FORCE)
+  set(HPX_BUILD_DOCUMENTATION OFF CACHE BOOL "True if the HPX documentation toolchain is available." FORCE)
 elseif(NOT QUICKBOOK_FOUND)
   hpx_warn("documentation" "QuickBook tool is unavailable, documentation generation disabled. Set QUICKBOOK_ROOT pointing to your quickbook installation directory.")
-  set(HPX_DOCUMENTATION_GENERATION OFF CACHE BOOL "True if the HPX documentation toolchain is available." FORCE)
+  set(HPX_BUILD_DOCUMENTATION OFF CACHE BOOL "True if the HPX documentation toolchain is available." FORCE)
 elseif(NOT XSLTPROC_FOUND)
   hpx_warn("documentation" "xsltproc tool is unavailable, documentation generation disabled. Set XSLTPROC_ROOT pointing to your xsltproc installation directory.")
-  set(HPX_DOCUMENTATION_GENERATION OFF CACHE BOOL "True if the HPX documentation toolchain is available." FORCE)
+  set(HPX_BUILD_DOCUMENTATION OFF CACHE BOOL "True if the HPX documentation toolchain is available." FORCE)
 else()
-  set(HPX_DOCUMENTATION_GENERATION ON CACHE BOOL "True if the HPX documentation toolchain is available.")
+  set(HPX_BUILD_DOCUMENTATION ON CACHE BOOL "True if the HPX documentation toolchain is available.")
 endif()
 
-if(NOT HPX_DOCUMENTATION_GENERATION)
+if(NOT HPX_BUILD_DOCUMENTATION)
   # implement fallback macros for documantation toolchain
 
   macro(hpx_write_boostbook_catalog file)
@@ -92,7 +92,7 @@ else()
     hpx_parse_arguments(${name} "SOURCE;DEPENDENCIES;QUICKBOOK_ARGS" "" ${ARGN})
 
     hpx_print_list("DEBUG"
-        "hpx_quickbook_to_boostbook.${name}" "Quickbook arguments"
+        "quickbook_to_boostbook.${name}" "Quickbook arguments"
         ${name}_QUICKBOOK_ARGS)
 
     # If input is not a full path, it's in the current source directory.
@@ -210,7 +210,7 @@ else()
         "" ${ARGN})
 
     hpx_print_list("DEBUG"
-        "hpx_quickbook_to_html.${name}" "Documentation dependencies"
+        "quickbook_to_html.${name}" "Documentation dependencies"
         ${name}_DEPENDENCIES)
 
     hpx_quickbook_to_boostbook(${name}

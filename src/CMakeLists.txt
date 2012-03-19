@@ -200,8 +200,14 @@ add_hpx_source_group(
 
 ################################################################################
 # libhpx_serialization
-add_library(hpx_serialization SHARED EXCLUDE_FROM_ALL
+add_library(hpx_serialization SHARED 
   ${hpx_serialization_SOURCES} ${hpx_serialization_HEADERS})
+
+set_target_properties(hpx_serialization
+                      PROPERTIES SKIP_BUILD_RPATH TRUE
+                                 BUILD_WITH_INSTALL_RPATH TRUE
+                                 INSTALL_RPATH_USE_LINK_PATH TRUE 
+                                 INSTALL_RPATH ${HPX_RPATH})
 
 set_target_properties(hpx_serialization PROPERTIES
   VERSION ${HPX_VERSION}
@@ -227,7 +233,7 @@ endif()
 target_link_libraries(hpx_serialization
   ${hpx_serialization_lib_dependencies})
 
-hpx_mangle_name(name hpx_serialization)
+hpx_get_target_file(name hpx_serialization)
 
 set_property(TARGET hpx_serialization APPEND
   PROPERTY COMPILE_DEFINITIONS
@@ -236,12 +242,12 @@ set_property(TARGET hpx_serialization APPEND
   "BOOST_COROUTINE_EXPORTS")
 
 if(NOT HPX_NO_INSTALL)
-  hpx_library_install(${name})
+  hpx_library_install(hpx_serialization)
 endif()
 
 ################################################################################
 # libhpx
-add_library(hpx SHARED EXCLUDE_FROM_ALL
+add_library(hpx SHARED 
   ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
 
 set_target_properties(hpx PROPERTIES
@@ -255,6 +261,12 @@ set_target_properties(hpx PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL}
   RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO})
 
+set_target_properties(hpx
+                      PROPERTIES SKIP_BUILD_RPATH TRUE
+                                 BUILD_WITH_INSTALL_RPATH TRUE
+                                 INSTALL_RPATH_USE_LINK_PATH TRUE 
+                                 INSTALL_RPATH ${HPX_RPATH})
+
 if(MSVC AND HPX_EMULATE_SWAP_CONTEXT)
   set_target_properties(hpx PROPERTIES LINK_FLAGS "/EXPORT:switch_to_fiber")
 endif()
@@ -265,7 +277,7 @@ target_link_libraries(hpx
   ${hpx_RUNTIME_LIBRARIES}
   ${BOOST_FOUND_LIBRARIES})
 
-hpx_mangle_name(name hpx)
+hpx_get_target_file(name hpx)
 
 set_property(TARGET hpx APPEND
   PROPERTY COMPILE_DEFINITIONS
@@ -276,12 +288,12 @@ set_property(TARGET hpx APPEND
   "BOOST_COROUTINE_EXPORTS") # Do we still need this?
 
 if(NOT HPX_NO_INSTALL)
-  hpx_library_install(${name})
+  hpx_library_install(hpx)
 endif()
 
 ################################################################################
 # libhpx_init
-add_library(hpx_init STATIC EXCLUDE_FROM_ALL
+add_library(hpx_init STATIC 
   ${hpx_init_SOURCES} ${hpx_init_HEADERS})
 
 set_property(TARGET hpx_init APPEND
@@ -292,7 +304,7 @@ set_property(TARGET hpx_init APPEND
 
 set_property(TARGET hpx_init PROPERTY FOLDER "Core")
 
-hpx_mangle_name(name hpx_init)
-
-hpx_archive_install(${name})
+if(NOT HPX_NO_INSTALL)
+  hpx_archive_install(hpx_init)
+endif()
 

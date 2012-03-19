@@ -16,8 +16,8 @@ endforeach()
 set(tests
     barrier
     dataflow
-    eager_future
-    lazy_future
+    packaged_task
+    deferred_packaged_task
     signalling_promise
    )
 

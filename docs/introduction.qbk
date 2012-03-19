@@ -76,10 +76,17 @@ problems. HPX is the first practical, reliable, and performance-oriented
 runtime system incorporating the principal concepts of ParalleX model publicly
 provided in open source release form.
 
-HPX is designed by the CCT __stellar__ Group (STE||AR: Systems Technology, Emergent
-Parallelism, and Algorithm Research) to enable developers to exploit the full
-processing power of many-core systems with an unprecedented degree of parallelism.
-__stellar__ is a research group focusing on system software solutions and scientific
-application development for hybrid and many-core hardware architectures.
+HPX is designed by the __stellar__ Group (STE||AR: [*S]ystems
+[*T]echnologies, [*E]mergent Para[*ll]elism, and [*A]lgorithms
+[*R]esearch) at the __cct__ (__lsu__) to enable developers to exploit
+the full processing power of many-core systems with an unprecedented degree
+of parallelism. __stellar__ is a research group focusing on system software
+solutions and scientific application development for hybrid and many-core
+hardware architectures.
 
 [endsect] [/ Introduction]
+
+[/Proofread by:]
+[/Adrian Serio 3-13-12]
+[/Phillip LeBlanc 3-13-12]
+

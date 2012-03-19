@@ -25,6 +25,8 @@
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/serialize_intrusive_ptr.hpp>
 #include <hpx/runtime/naming/address.hpp>
+#include <hpx/traits/promise_remote_result.hpp>
+#include <hpx/traits/promise_local_result.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -547,6 +549,7 @@ namespace hpx { namespace naming
         void load(Archive & ar, const unsigned int version);
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()
+        BOOST_COPYABLE_AND_MOVABLE(id_type);
 
         boost::intrusive_ptr<detail::id_type_impl> gid_;
     };
@@ -579,11 +582,25 @@ namespace hpx { namespace naming
         return get_id_from_locality_id(get_locality_id_from_id(id));
     }
 
-    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     id_type const invalid_id = id_type();
 
-    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT char const* get_management_type_name(id_type::management_type m);
+}}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace traits
+{
+    template <>
+    struct promise_remote_result<naming::id_type>
+      : boost::mpl::identity<naming::gid_type>
+    {};
+
+    template <>
+    struct promise_local_result<naming::gid_type>
+      : boost::mpl::identity<naming::id_type>
+    {};
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

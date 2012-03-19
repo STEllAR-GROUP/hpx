@@ -4,33 +4,47 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+//[accumulator_accumulator_client
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
 #include "accumulator/accumulator.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+//[accumulator_hpx_main
 int hpx_main(boost::program_options::variables_map&)
+//]
+
 {
     // get list of all known remote localities supporting our accumulator type
+
+     //[accumulator_acc_comp
     hpx::components::component_type t =
         hpx::components::accumulator::get_component_type();
+    //]
+
+    //[accumulator_hpx_loc
     std::vector<hpx::naming::id_type> localities =
         hpx::find_remote_localities(t);
+    //]
 
     hpx::naming::id_type prefix;
 
+    //[accumulator_hpx_loc_1
     if (!localities.empty())
         // create accumulator on any of the remote localities
         prefix = localities[0];
     else
         // create an accumulator locally
         prefix = hpx::find_here();
+    //]
 
     {
+        //[accumulator_create
         // create an accumulator locally
         hpx::components::accumulator accu;
         accu.create(prefix);
+        //]
 
         // print some message
         std::cout << "accumulator client, you may enter some commands "
@@ -39,6 +53,7 @@ int hpx_main(boost::program_options::variables_map&)
         // execute a couple of commands on this component
         std::string cmd;
         std::cin >> cmd;
+        //[accumulator_execute
         while (std::cin.good())
         {
             if (cmd == "init")
@@ -63,6 +78,7 @@ int hpx_main(boost::program_options::variables_map&)
 
             else if (cmd == "quit")
                 break;
+        //]
 
             else
                 std::cout << "Invalid command.\n"
@@ -74,12 +90,14 @@ int hpx_main(boost::program_options::variables_map&)
     }
 
     // initiate shutdown of the runtime systems on all localities
-    hpx::finalize();
 
+    //[accumulator_hpx_finalize
+    hpx::finalize();
+    //]
     return 0;
 }
-
 ///////////////////////////////////////////////////////////////////////////////
+//[accumulator_hpx_init
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
@@ -89,4 +107,6 @@ int main(int argc, char* argv[])
     // Initialize and run HPX
     return hpx::init(desc_commandline, argc, argv);
 }
+//]
 
+//]

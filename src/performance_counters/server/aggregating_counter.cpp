@@ -79,7 +79,7 @@ namespace hpx { namespace performance_counters { namespace server
             counter_info const& info, std::string const& base_counter_name,
             std::size_t base_time_interval)
       : base_type_holder(info),
-        timer_(boost::bind(&aggregating_counter::evaluate, this),
+        timer_(boost::bind(&aggregating_counter::evaluate, this_()),
             1000 * base_time_interval, info.fullname_, true),
         base_counter_name_(ensure_counter_prefix(base_counter_name))
     {

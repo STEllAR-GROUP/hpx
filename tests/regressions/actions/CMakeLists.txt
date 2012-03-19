@@ -8,7 +8,8 @@ add_subdirectory(components)
 set(tests
     plain_action_move_semantics
     plain_action_dataflow_move_semantics
-    component_action_move_semantics)
+    component_action_move_semantics
+    remote_object_move_semantics)
 
 set(plain_action_move_semantics_FLAGS
     DEPENDENCIES action_move_semantics_component)
@@ -18,6 +19,9 @@ set(plain_action_dataflow_move_semantics_FLAGS
 
 set(component_action_move_semantics_FLAGS
     DEPENDENCIES action_move_semantics_component)
+
+set(remote_object_move_semantics_FLAGS
+    DEPENDENCIES dataflow_component action_move_semantics_component remote_object_component)
 
 foreach(test ${tests})
   set(sources

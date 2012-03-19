@@ -46,7 +46,7 @@ struct managed_refcnt_monitor
       : locality_(naming::get_locality_from_gid(locality)
                 , naming::id_type::unmanaged)
     {
-        this->base_type::create_one(locality, flag_.get_gid());
+        this->base_type::create_one(locality_, flag_.get_gid());
     }
 
     /// Create a new component on the target locality.
@@ -55,10 +55,10 @@ struct managed_refcnt_monitor
         )
       : locality_(naming::get_locality_from_id(locality))
     {
-        this->base_type::create_one(locality, flag_.get_gid());
+        this->base_type::create_one(locality_, flag_.get_gid());
     }
 
-    lcos::promise<void> take_reference_async(
+    lcos::future<void> take_reference_async(
         naming::id_type const& gid
         )
     {
@@ -76,7 +76,7 @@ struct managed_refcnt_monitor
 
     bool ready()
     {
-        // Flush pending reference counting operations on the target locality. 
+        // Flush pending reference counting operations on the target locality.
         agas::garbage_collect(locality_);
 
         return flag_.is_ready();
@@ -89,7 +89,7 @@ struct managed_refcnt_monitor
         Duration const& d
         )
     {
-        // Flush pending reference counting operations on the target locality. 
+        // Flush pending reference counting operations on the target locality.
         agas::garbage_collect(locality_);
 
         // Schedule a wakeup.
@@ -125,7 +125,9 @@ struct managed_object
         naming::gid_type const& locality
         )
     {
-        this->base_type::create_one(locality, naming::invalid_id);
+        this->base_type::create_one(
+            naming::id_type(locality, naming::id_type::unmanaged),
+            naming::invalid_id);
     }
 
     /// Create a new component on the target locality.

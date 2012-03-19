@@ -8,7 +8,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/threads/thread_affinity.hpp>
+#include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
@@ -1172,63 +1172,74 @@ namespace hpx { namespace threads
               "returns the current queue length for the referenced queue",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&ti::queue_length_counter_creator, this, _1, _2),
-              &performance_counters::locality_thread_counter_discoverer
+              &performance_counters::locality_thread_counter_discoverer,
+              ""
             },
             // idle rate
             { "/time/idle-rate", performance_counters::counter_raw,
-              "returns the idle rate for the referenced object  (in 0.1%)",
+              "returns the idle rate for the referenced object [0.1%]",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&ti::idle_rate_counter_creator, this, _1, _2),
-              &performance_counters::locality_thread_counter_discoverer
+              &performance_counters::locality_thread_counter_discoverer,
+              "0.1%"
             },
             // thread counts
             { "/threads/count/cumulative/all", performance_counters::counter_raw,
               "returns the overall number of executed (retired) HPX-thread for "
               "the referenced locality", HPX_PERFORMANCE_COUNTER_V1, counts_creator,
-              &performance_counters::locality_thread_counter_discoverer
+              &performance_counters::locality_thread_counter_discoverer,
+              ""
             },
             { "/threads/count/instantaneous/all", performance_counters::counter_raw,
               "returns the overall current number of HPX-thread instantiated at the "
               "referenced locality", HPX_PERFORMANCE_COUNTER_V1, counts_creator,
-              &performance_counters::locality_thread_counter_discoverer
+              &performance_counters::locality_thread_counter_discoverer,
+              ""
             },
             { "/threads/count/instantaneous/active", performance_counters::counter_raw,
               "returns the current number of active HPX-thread at the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1, counts_creator,
-              &performance_counters::locality_thread_counter_discoverer
+              &performance_counters::locality_thread_counter_discoverer,
+              ""
             },
             { "/threads/count/instantaneous/pending", performance_counters::counter_raw,
               "returns the current number of pending HPX-thread at the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1, counts_creator,
-              &performance_counters::locality_thread_counter_discoverer
+              &performance_counters::locality_thread_counter_discoverer,
+              ""
             },
             { "/threads/count/instantaneous/suspended", performance_counters::counter_raw,
               "returns the current number of suspended HPX-thread at the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1, counts_creator,
-              &performance_counters::locality_thread_counter_discoverer
+              &performance_counters::locality_thread_counter_discoverer,
+              ""
             },
             { "/threads/count/instantaneous/terminated", performance_counters::counter_raw,
               "returns the current number of terminated HPX-thread at the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1, counts_creator,
-              &performance_counters::locality_thread_counter_discoverer
+              &performance_counters::locality_thread_counter_discoverer,
+              ""
             },
             { "/threads/count/stack-recycles", performance_counters::counter_raw,
               "returns the total number of HPX-thread recycling operations performed "
               "for the referenced locality", HPX_PERFORMANCE_COUNTER_V1,
-              counts_creator, &performance_counters::locality_counter_discoverer
+              counts_creator, &performance_counters::locality_counter_discoverer,
+              ""
             },
 #if !defined(BOOST_WINDOWS)
             { "/threads/stack-unbinds", performance_counters::counter_raw,
               "returns the total number of HPX-thread unbind (madvise) operations "
               "performed for the referenced locality", HPX_PERFORMANCE_COUNTER_V1,
-              counts_creator, &performance_counters::locality_counter_discoverer
+              counts_creator, &performance_counters::locality_counter_discoverer,
+              ""
             },
 #endif
             { "/threads/count/objects", performance_counters::counter_raw,
               "returns the overall number of created HPX-thread objects for "
               "the referenced locality", HPX_PERFORMANCE_COUNTER_V1,
               counts_creator,
-              &locality_allocator_counter_discoverer
+              &locality_allocator_counter_discoverer,
+              ""
             },
         };
         performance_counters::install_counter_types(
@@ -1244,12 +1255,6 @@ namespace hpx { namespace threads
         util::itt::mark_context mark("threadmanager");
 
         manage_active_thread_count count(thread_count_);
-
-        // set affinity on Linux systems or when using hwloc
-        std::size_t pu_num = scheduler_.get_pu_num(num_thread);
-        LTM_(info) << "tfunc(" << num_thread
-                   << "): will run on processing unit: " << pu_num;
-        set_affinity(pu_num, scheduler_.numa_sensitive());
 
         std::size_t idle_loop_count = 0;
 
@@ -1415,17 +1420,30 @@ namespace hpx { namespace threads
 
             state_.store(running);
 
+            topology const& topology_ = get_topology();
+
             std::size_t thread_num = num_threads;
             while (thread_num-- != 0) {
-                LTM_(info) << "run: create OS thread: " << thread_num;
+                std::size_t pu_num = scheduler_.get_pu_num(thread_num);
+
+                LTM_(info) << "run: create OS thread " << thread_num
+                           << " running on processing unit " << pu_num;
 
                 // create a new thread
                 threads_.push_back(new boost::thread(boost::bind(
                     &threadmanager_impl::tfunc, this, thread_num)));
 
-                // set the new threads affinity (on Windows systems)
-                std::size_t pu_num = scheduler_.get_pu_num(thread_num);
-                set_affinity(threads_.back(), pu_num, scheduler_.numa_sensitive());
+                error_code ec;
+                // set the new threads affinity (on all platforms)
+                topology_.set_thread_affinity
+                    (threads_.back(), pu_num, scheduler_.numa_sensitive(), ec);
+
+                if (ec)
+                {
+                    LTM_(warning) << "run: setting thread affinity on OS "
+                                     "thread " << thread_num << " failed with: "
+                                  << ec.get_message();
+                }
             }
 
             // start timer pool as well
@@ -1436,7 +1454,7 @@ namespace hpx { namespace threads
             startup_->wait();
         }
         catch (std::exception const& e) {
-            LTM_(fatal) << "run: failed with:" << e.what();
+            LTM_(always) << "run: failed with: " << e.what();
 
             // trigger the barrier
             while (num_threads-- != 0 && !startup_->wait())
@@ -1612,8 +1630,10 @@ namespace hpx { namespace threads
     std::size_t get_numa_node_number()
     {
         bool numa_sensitive = false;
-        std::size_t thread_num = threadmanager_base::get_worker_thread_num(&numa_sensitive);
-        return get_numa_node(get_thread_manager().get_pu_num(thread_num), numa_sensitive);
+        std::size_t thread_num
+            = threadmanager_base::get_worker_thread_num(&numa_sensitive);
+        return get_topology().get_numa_node_number(
+            get_thread_manager().get_pu_num(thread_num));
     }
 
     ///////////////////////////////////////////////////////////////////////////

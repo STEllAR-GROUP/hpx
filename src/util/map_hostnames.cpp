@@ -13,7 +13,7 @@
 
 namespace hpx { namespace util
 {
-    std::string map_hostnames::map(std::string const& host_name,
+    std::string map_hostnames::map(std::string host_name,
         boost::uint16_t port) const
     {
         if (host_name == "localhost") {
@@ -25,6 +25,14 @@ namespace hpx { namespace util
                           << std::endl;
             }
             return "127.0.0.1";
+        }
+
+        if (!!transform_) {   // If the transform is not empty
+            host_name = transform_(host_name);
+            if (debug_) {
+                std::cerr << "host_name(transformed): " << host_name
+                    << std::endl;
+            }
         }
 
         // do full host name resolution

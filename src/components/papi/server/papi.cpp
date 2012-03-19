@@ -8,14 +8,17 @@
 #include <hpx/runtime/components/derived_component_factory.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/performance_counters/counters.hpp>
-
-#include <boost/version.hpp>
-
+#include <hpx/performance_counters/high_resolution_clock.hpp>
 #include <hpx/components/papi/server/papi.hpp>
 #include <hpx/components/papi/util/papi.hpp>
+#include <hpx/exception.hpp>
+
+#include <functional>
+
+#include <boost/version.hpp>
+#include <boost/format.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-
 namespace papi_ns = hpx::performance_counters::papi;
 
 typedef hpx::components::managed_component<
@@ -24,276 +27,253 @@ typedef hpx::components::managed_component<
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
     papi_counter_type, papi_counter, "base_performance_counter");
-HPX_DEFINE_GET_COMPONENT_TYPE(
-    papi_ns::server::papi_counter);
-
-HPX_REGISTER_ACTION_EX(
-    papi_ns::server::papi_counter::set_event_action,
-    papi_counter_set_event_action);
-
-HPX_REGISTER_ACTION_EX(
-    papi_ns::server::papi_counter::start_action,
-    papi_counter_start_action);
-
-HPX_REGISTER_ACTION_EX(
-    papi_ns::server::papi_counter::stop_action,
-    papi_counter_stop_action);
-
-HPX_REGISTER_ACTION_EX(
-    papi_ns::server::papi_counter::enable_multiplexing_action,
-    papi_counter_enable_multiplexing_action);
-
-
-#define NS_STR "hpx::performance_counters::papi::server::"
+HPX_DEFINE_GET_COMPONENT_TYPE(papi_ns::server::papi_counter);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace papi { namespace server
 {
+#define NS_STR "hpx::performance_counters::papi::server::"
+
     ///////////////////////////////////////////////////////////////////////////
     // static members
     papi_counter_base::mutex_type papi_counter_base::base_mtx_;
-    int papi_counter_base::evset_ = PAPI_NULL;
-    papi_counter_base::cnttab_type papi_counter_base::cnttab_;
-    std::vector<long long> papi_counter_base::counts_;
-
+    papi_counter_base::ttable_type papi_counter_base::thread_state_;
 
     using hpx::performance_counters::papi::util::papi_call;
 
     ///////////////////////////////////////////////////////////////////////////
     // methods
-    papi_counter_base::papi_counter_base(): index_((unsigned)-1)
+    thread_counters::thread_counters(boost::uint32_t tix):
+        thread_index_(tix), evset_(PAPI_NULL)
     {
-        mutex_type::scoped_lock m(base_mtx_); // is locking required here?
-
-        if (evset_ != PAPI_NULL) return;
+        char const *locstr =
+            "hpx::performance_counters::papi::server::thread_counters()";
+        hpx::util::thread_mapper& tm =
+            hpx::get_runtime().get_thread_mapper();
         papi_call(PAPI_create_eventset(&evset_),
-                  "unable to create new PAPI event set",
-                  NS_STR "papi_counter_base()");
+            "could not create PAPI event set", locstr);
+        papi_call(PAPI_assign_eventset_component(evset_, 0),
+            "cannot assign component index to event set", locstr);
+        unsigned long tid = tm.get_thread_id(tix);
+        if (tid == tm.invalid_tid)
+            HPX_THROW_EXCEPTION(hpx::bad_parameter,
+                NS_STR "thread_counters::thread_counters()",
+                "unable to retrieve correct OS thread ID for profiling "
+                "(perhaps thread was not registered)");
+        papi_call(PAPI_attach(evset_, tm.get_thread_id(tix)),
+            "failed to attach thread to PAPI event set", locstr);
+        tm.register_callback(tix,
+            std::bind1st(std::mem_fun(&thread_counters::terminate), this));
     }
 
-    papi_counter_base::~papi_counter_base()
+    thread_counters::~thread_counters()
     {
-        mutex_type::scoped_lock m(base_mtx_);
-
-        if (evset_ != PAPI_NULL && counts_.size() == 0)
-            papi_call(PAPI_destroy_eventset(&evset_),
-                      "failed to destroy PAPI event set",
-                      NS_STR "~papi_counter_base()");
-    }
-
-    bool papi_counter_base::add_counter(papi_counter *c)
-    {
-        mutex_type::scoped_lock m(base_mtx_);
-
-        stop_all();
-        bool rc = add_event(c);
-        start_all();
-        return rc;
-    }
-
-    bool papi_counter_base::remove_counter(long long& last_val)
-    {
-        mutex_type::scoped_lock m(base_mtx_);
-
-        stop_all();
-        last_val = counts_[index_];
-        bool rc = remove_event();
-        // resume counting if any events left
-        if (cnttab_.size() > 0) start_all();
-        return rc;
-    }
-
-    bool papi_counter_base::read_value(long long& val)
-    {
-        mutex_type::scoped_lock m(base_mtx_);
-
-        papi_call(PAPI_accum(evset_, &counts_[0]), "PAPI_accum failed",
-                             NS_STR "papi_counter_base::read_value()");
-        val = counts_[index_];
-        return true;
-    }
-
-    bool papi_counter_base::enable_multiplexing(long ival)
-    {
-        // multiplexing interval is ignored for now
-        mutex_type::scoped_lock m(base_mtx_);
-
-        switch (PAPI_get_multiplex(evset_))
         {
-        case PAPI_OK:     // not yet multiplexed
-            papi_call(PAPI_assign_eventset_component(evset_, 0),
-                      "failed to assign component index to current event set",
-                      NS_STR "papi_counter_base::enable_multiplexing()");
-            papi_call(PAPI_set_multiplex(evset_),
-                      "failed to enable multiplexing for event set",
-                      NS_STR "papi_counter_base::enable_multiplexing()");
-            return true;
-        case PAPI_EINVAL: // already multiplexed
-            return true;
-        default:          // error
-            return false;
+            mutex_type::scoped_lock m(mtx_);
+            finalize();
         }
+        // callback cancellation moved outside the mutex to avoid potential deadlock
+        hpx::get_runtime().get_thread_mapper().revoke_callback(thread_index_);
     }
 
-    bool papi_counter_base::add_event(papi_counter *c)
+    bool thread_counters::add_event(papi_counter *cnt)
     {
-        papi_call(PAPI_add_event(evset_, c->get_event()),
-                  "could not add event",
-                  NS_STR "papi_counter_base::add_event()");
-        counts_.push_back(c->get_value());
-        cnttab_.push_back(c);
-        index_ = counts_.size()-1;
-        return true;
+        stop_all();
+        if (PAPI_add_event(evset_, cnt->get_event()) != PAPI_OK)
+            return false;
+        counts_.push_back(cnt->get_value());
+        cnttab_.push_back(cnt);
+        cnt->update_index(counts_.size()-1);
+        return start_all();
     }
 
-    bool papi_counter_base::remove_event()
+    bool thread_counters::remove_event(papi_counter *cnt)
     {
-        papi_call(PAPI_cleanup_eventset(evset_),
-                  "could not clean up event set",
-                  NS_STR "papi_counter_base::remove_event()");
+        if (!stop_all() || PAPI_cleanup_eventset(evset_) != PAPI_OK)
+            return false;
 
-        // For the lack of better strategy the events are added in the same
-        // order as before. This avoids reordering of remaining counter values
-        // and at least some surprises on architectures with asymmetric
+        // store the most recent value
+        int rmix = cnt->get_counter_index();
+        cnt->update_state(timestamp_, counts_[rmix], PAPI_COUNTER_STOPPED);
+        // erase entries corresponding to removed event
+        counts_.erase(counts_.begin()+rmix);
+        cnttab_.erase(cnttab_.begin()+rmix);
+        // For the lack of better strategy the remaining events are added in the
+        // same order as before. This avoids reordering of remaining counter
+        // values and at least some surprises on architectures with asymmetric
         // functionality of counting registers.
-        for (unsigned i = 0; i < counts_.size(); ++i)
+        unsigned i = 0;
+        while (i < counts_.size())
         {
             papi_counter *c = cnttab_[i];
-            if (i != index_)
-            {
-                papi_call(PAPI_add_event(evset_, c->get_event()),
-                          "cannot add event to event set",
-                          NS_STR "papi_counter_base::remove_event()");
-                // adjust indices of remaining counters
-                if (i > index_) c->index_--;
+            if (PAPI_add_event(evset_, c->get_event()) != PAPI_OK)
+            { // failed to add event
+                c->update_state(timestamp_, counts_[c->get_counter_index()],
+                                PAPI_COUNTER_SUSPENDED);
+                counts_.erase(counts_.begin()+i);
+                cnttab_.erase(cnttab_.begin()+i);
+                continue;
             }
+            // update indices of remaining counters
+            c->update_index(i++);
         }
-        // erase entries corresponding to removed event
-        counts_.erase(counts_.begin()+index_);
-        cnttab_.erase(cnttab_.begin()+index_);
+        return start_all();
+    }
+
+    bool thread_counters::read_value(papi_counter *cnt)
+    {
+        if (PAPI_accum(evset_, &counts_[0]) != PAPI_OK) return false;
+        timestamp_ = hpx::performance_counters::high_resolution_clock::now();
+        cnt->update_state(timestamp_, counts_[cnt->get_counter_index()]);
         return true;
     }
 
-    void papi_counter_base::start_all()
+    bool thread_counters::terminate(boost::uint32_t tix)
     {
-        papi_call(PAPI_start(evset_), "cannot start PAPI counters",
-                  NS_STR "papi_counter_base::start_all()");
+        mutex_type::scoped_lock m(mtx_);
+        return finalize();
     }
 
-    void papi_counter_base::stop_all()
+    bool thread_counters::start_all()
+    {
+        if (counts_.empty()) return true; // nothing to count
+        return PAPI_start(evset_) == PAPI_OK;
+    }
+
+    bool thread_counters::stop_all()
     {
         int stat;
-        papi_call(PAPI_state(evset_, &stat), "PAPI_state failed",
-                  NS_STR "papi_counter_base::stop_all()");
+        if (PAPI_state(evset_, &stat) != PAPI_OK) return false;
 
         if ((stat & PAPI_RUNNING) != 0)
         {
             std::vector<long long> tmp(counts_.size());
-            papi_call(PAPI_stop(evset_, &tmp[0]), "PAPI_stop failed",
-                      NS_STR "papi_counter_base::stop_all()");
+            if (PAPI_stop(evset_, &tmp[0]) != PAPI_OK) return false;
             // accumulate existing counts before modifying event set
-            papi_call(PAPI_accum(evset_, &counts_[0]), "PAPI_stop failed",
-                      NS_STR "papi_counter_base::stop_all()");
+            if (PAPI_accum(evset_, &counts_[0]) != PAPI_OK) return false;
+            timestamp_ = hpx::performance_counters::high_resolution_clock::now();
         }
+        return true;
     }
 
+    bool thread_counters::finalize()
+    {
+        if (evset_ != PAPI_NULL)
+        {
+            if (stop_all())
+            {
+                for (boost::uint32_t i = 0; i < cnttab_.size(); ++i)
+                { // retrieve the most recent values for the still active counters
+                    papi_counter *c = cnttab_[i];
+                    if (c->get_status() == PAPI_COUNTER_ACTIVE)
+                        c->update_state(timestamp_, counts_[i], PAPI_COUNTER_TERMINATED);
+                    else c->update_status(PAPI_COUNTER_TERMINATED);
+                }
+            }
+            // release event set resources
+            return PAPI_destroy_eventset(&evset_) == PAPI_OK;
+        }
+        return true;
+    }
 
     ///////////////////////////////////////////////////////////////////////////
+    thread_counters *papi_counter_base::get_thread_counters(boost::uint32_t tix)
+    {
+        mutex_type::scoped_lock m(base_mtx_);
+
+        // create entry for the thread associated with the counter if it doesn't exist
+        ttable_type::iterator it = thread_state_.find(tix);
+        if (it == thread_state_.end())
+            return thread_state_[tix] = new thread_counters(tix);
+        else
+            return it->second;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    papi_counter::papi_counter(hpx::performance_counters::counter_info const& info):
+        base_type_holder(info), event_(PAPI_NULL), index_(-1),
+        value_(0), timestamp_(-1), status_(PAPI_COUNTER_STOPPED)
+    {
+        char const *locstr = NS_STR "papi_counter()";
+
+        // extract path elements from counter name
+        counter_path_elements cpe;
+        get_counter_path_elements(info.fullname_, cpe);
+        // convert event name to code and check availability
+        papi_call(PAPI_event_name_to_code(const_cast<char *>(cpe.countername_.c_str()),
+                                          const_cast<int *>(&event_)),
+            cpe.countername_+" does not seem to be a valid event name", locstr);
+        papi_call(PAPI_query_event(event_),
+            "event "+cpe.countername_+" is not available on this platform", locstr);
+        // find OS thread associated with the counter
+        hpx::util::thread_mapper& tm = get_runtime().get_thread_mapper();
+        boost::uint32_t tix = tm.get_thread_index(cpe.instancename_.c_str(),
+                                                  cpe.instanceindex_);
+        if (tix == hpx::util::thread_mapper::invalid_index)
+        {
+            boost::format fmt("could not find %s#%d");
+            HPX_THROW_EXCEPTION(hpx::no_success, locstr,
+                boost::str(fmt % cpe.instancename_ % cpe.instanceindex_));
+        }
+        // associate low level counters object
+        counters_ = get_thread_counters(tix);
+        if (!counters_)
+        {
+            boost::format fmt("failed to find low level counters for %s#%d");
+            HPX_THROW_EXCEPTION(hpx::no_success, locstr,
+                boost::str(fmt % cpe.instancename_ % cpe.instanceindex_));
+        }
+        // counting is not enabled here; it has to be started explicitly
+    }
+
     void papi_counter::get_counter_value(hpx::performance_counters::counter_value& value)
     {
-        mutex_type::scoped_lock m(mtx_);
+        thread_counters::mutex_type::scoped_lock m(counters_->get_lock());
 
         if (status_ == PAPI_COUNTER_ACTIVE)
-        {
-            long long cnt;
-            if (read_value(cnt)) update_state(cnt);
-        }
+            counters_->read_value(this);
 
-        if (timestamp_ != -1) update_value(value);
+        if (timestamp_ != -1) copy_value(value);
         else value.status_ = hpx::performance_counters::status_invalid_data;
-    }
-
-    bool papi_counter::enable_multiplexing(long ival)
-    {
-        return papi_counter_base::enable_multiplexing(ival);
-    }
-
-    bool papi_counter::set_event(int event, bool activate)
-    {
-        mutex_type::scoped_lock m(mtx_);
-
-        // check if anything needs to be done at all
-        if (event == event_ && activate == (status_ == PAPI_COUNTER_ACTIVE))
-            return true;
-
-        // remove currently counted event from active set
-        if (!stop_counter()) return false;
-        // invalidate cached values on event change
-        if (event != event_)
-        {
-            value_ = 0;
-            timestamp_ = -1;
-            event_ = event;
-        }
-        // insert new event to the active set
-        if (activate) return start_counter();
-        else status_ = PAPI_COUNTER_STOPPED;
-
-        return true;
     }
 
     bool papi_counter::start()
     {
-        mutex_type::scoped_lock m(mtx_);
+        thread_counters::mutex_type::scoped_lock m(counters_->get_lock());
 
-        return start_counter();
-    }
-
-    bool papi_counter::stop()
-    {
-        mutex_type::scoped_lock m(mtx_);
-
-        return stop_counter();
-    }
-
-    void papi_counter::finalize()
-    {
-        mutex_type::scoped_lock m(mtx_); // probably not needed
-
-        stop_counter();
-        base_type_holder::finalize();
-        base_type::finalize();
-    }
-
-    bool papi_counter::start_counter()
-    {
         if (status_ == PAPI_COUNTER_ACTIVE) return true;
-        if (add_counter(this))
+        if (counters_->add_event(this))
         {
             status_ = PAPI_COUNTER_ACTIVE;
             return true;
         }
-        else
-        {
-            status_ = PAPI_COUNTER_SUSPENDED;
-            return false;
-        }
+        status_ = PAPI_COUNTER_SUSPENDED;
+        return false;
+    }
+
+    bool papi_counter::stop()
+    {
+        thread_counters::mutex_type::scoped_lock m(counters_->get_lock());
+
+        return stop_counter();
     }
 
     bool papi_counter::stop_counter()
     {
         if (status_ == PAPI_COUNTER_ACTIVE)
         {
-            long long cnt;
-            if (!remove_counter(cnt))
-            {   // FIXME: revisit when more permissive handling is implemented
-                return false;
-            }
-
-            update_state(cnt);
-            status_ = PAPI_COUNTER_STOPPED;
+            if (!counters_->remove_event(this)) return false;
         }
         return true;
+    }
+
+    void papi_counter::finalize()
+    {
+        thread_counters::mutex_type::scoped_lock m(counters_->get_lock());
+
+        stop_counter();
+        base_type_holder::finalize();
+        base_type::finalize();
     }
 
 }}}}

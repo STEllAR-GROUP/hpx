@@ -1,0 +1,31 @@
+# Copyright (c) 2012 Bryce Adelstein-Lelbach
+#
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+set(HPX_MAJOR_VERSION @HPX_MAJOR_VERSION@)
+set(HPX_MINOR_VERSION @HPX_MINOR_VERSION@)
+set(HPX_PATCH_LEVEL   @HPX_PATCH_LEVEL@)
+set(HPX_VERSION       @HPX_VERSION@) 
+set(HPX_SOVERSION     @HPX_SOVERSION@)
+
+set(HPX_FLAGS "@CMAKE_CXX_FLAGS@ @external_definitions@")
+
+set(HPX_PREFIX @CMAKE_INSTALL_PREFIX@ CACHE PATH "HPX installation root")
+
+if(NOT MSVC)
+  set(HPX_RPATH @external_rpath@ CACHE STRING "Base RPATH for linking")
+endif()
+
+link_directories(@external_link_directories@)
+
+include_directories(@external_include_directories@)
+
+if(NOT HPX_CMAKE_LOGLEVEL)
+  set(HPX_CMAKE_LOGLEVEL "WARN")
+endif()
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} @external_cmake_path@)
+
+include(HPX_Utils)
+

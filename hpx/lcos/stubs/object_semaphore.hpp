@@ -9,7 +9,7 @@
 
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/lcos/base_lco.hpp>
-#include <hpx/lcos/eager_future.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/lcos/server/object_semaphore.hpp>
 
 namespace hpx { namespace lcos { namespace stubs
@@ -17,44 +17,44 @@ namespace hpx { namespace lcos { namespace stubs
 
 template <typename ValueType>
 struct object_semaphore : components::stubs::stub_base<
-  lcos::server::object_semaphore<ValueType>
-> {
+    lcos::server::object_semaphore<ValueType> >
+{
     typedef lcos::server::object_semaphore<ValueType> server_type;
 
     ///////////////////////////////////////////////////////////////////////////
-    static lcos::promise<void> signal_async(
+    static lcos::future<void> signal_async(
         naming::id_type const& gid
       , ValueType const& val
-      , boost::uint64_t count
-    ) {
+      , boost::uint64_t count)
+    {
         typedef typename server_type::signal_action action_type;
-        return lcos::eager_future<action_type>(gid, val, count);
+        return lcos::async<action_type>(gid, val, count);
     }
 
     static void signal_sync(
         naming::id_type const& gid
       , ValueType const& val
-      , boost::uint64_t count
-    ) {
+      , boost::uint64_t count)
+    {
         signal_async(gid, val, count).get();
     }
 
     static void signal(
         naming::id_type const& gid
       , ValueType const& val
-      , boost::uint64_t count
-    ) {
+      , boost::uint64_t count)
+    {
         signal_async(gid, val, count).get();
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    static lcos::promise<ValueType>
+    static lcos::future<ValueType>
     get_async(naming::id_type const& gid)
     {
         typedef typename server_type::get_action action_type;
         lcos::promise<ValueType> lco;
         applier::apply<action_type>(gid, lco.get_gid());
-        return lco;
+        return lco.get_future();
     }
 
     static ValueType get_sync(naming::id_type const& gid)
@@ -68,45 +68,43 @@ struct object_semaphore : components::stubs::stub_base<
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    static lcos::promise<void> abort_pending_async(
+    static lcos::future<void> abort_pending_async(
         naming::id_type const& gid
-      , error ec
-    ) {
+      , error ec)
+    {
         typedef typename server_type::abort_pending_action action_type;
-        return lcos::eager_future<action_type>(gid, ec);
+        return lcos::async<action_type>(gid, ec);
     }
 
     static void abort_pending_sync(
         naming::id_type const& gid
-      , error ec
-    ) {
+      , error ec)
+    {
         abort_pending_async(gid, ec).get();
     }
 
     static void abort_pending(
         naming::id_type const& gid
-      , error ec
-    ) {
+      , error ec)
+    {
         abort_pending_async(gid, ec).get();
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    static lcos::promise<void> wait_async(
-        naming::id_type const& gid
-    ) {
+    static lcos::future<void> wait_async(
+        naming::id_type const& gid)
+    {
         typedef typename server_type::wait_action action_type;
-        return lcos::eager_future<action_type>(gid);
+        return lcos::async<action_type>(gid);
     }
 
-    static void wait_sync(
-        naming::id_type const& gid
-    ) {
+    static void wait_sync(naming::id_type const& gid)
+    {
         wait_async(gid).get();
     }
 
-    static void wait(
-        naming::id_type const& gid
-    ) {
+    static void wait(naming::id_type const& gid)
+    {
         wait(gid).get();
     }
 };

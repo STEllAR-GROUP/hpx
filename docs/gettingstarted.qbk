@@ -23,20 +23,24 @@ To keep things simple, we also left out some information intermediate and
 advanced users will probably want. At the end of this document, we'll refer
 you on to resources that can help you pursue these topics further.
 
+[/Proofread by:]
+[/Adrian Serio 3-13-12]
+[/Phillip LeBlanc 3-13-12]
 
 [/////////////////////////////////////////////////////////////////////////////]
 [section:unix_installation How to Install HPX on Unix Variants]
 
 [heading Prerequisites]
 
-Depending on the options you chose while building and installing HPX you will
-find it to depend on several prerequisites. However, in the simplest case HPX
-will depend on one prerequisite library only: __boost__. So, before you read
-further, please make sure you have a recent version version of __boost__
-installed on your target machine. HPX currently requires at least Boost V1.47
-to work properly. It may build and run with older versions, but we do not
-test HPX with those. Please be warned. Installing the Boost libraries is
-described in detail in Boost's own __boost_getting_started__ document. It is
+In the simplest case, HPX will depend on one prerequisite library: __boost__.
+However, depending on the options you chose while building and installing HPX
+you will find that HPX may depend on several other prerequisites such as those
+listed below. So, before you read further, please make sure you have a recent
+version version of __boost__ installed on your target machine. HPX currently
+requires at least Boost V1.47 to work properly. It may build and run with
+older versions, but we do not test HPX with those versions so please be
+warned. Installing the Boost libraries is described in detail in Boost's
+own __boost_getting_started__ document. It is
 often possible to download the Boost libraries using the package manager of
 your distribution, please refer to the corresponding documentation.
 
@@ -78,6 +82,8 @@ your distribution, please refer to the corresponding documentation.
     $ svn co https://svn.cct.lsu.edu/repos/projects/parallex/trunk/hpx hpx
 ]
 
+[fixme Remove reference to SVN and replace it with the download link for HPX]
+
 * Create a build directory. HPX requires an out-of-tree build. This means you
   will be unable to run CMake in the HPX source tree.
 
@@ -114,56 +120,193 @@ for instance:
     $ gmake install
 ]
 
-[heading Build a Simple Program Using HPX]
+[heading Building HPX Applications with pkg-config]
 
 After you are done with the installation you should be able to build the
 following program. It prints 'Hello HPX World!' on the locality you run it on.
 
 [import ../examples/quickstart/simplest_hello_world.cpp]
 
-[/ this is how it should look like in the future, for now we import some code
-   from the simples_hello_world example:
-
-    #include <hpx/hpx_init.hpp>
-
-    int hpx_main()
-    {
-        // Say Hello to the World!
-        hpx::cout << "Hello HPX World!" << hpx::endl;
-
-        // Initiate shutdown of the runtime system
-        return hpx::finalize();
-    }
-
-    int main(int argc, char* argv[])
-    {
-        // Initialize and run HPX.
-        return hpx::init("Hello HPX World Example", argc, argv);
-    }
-]
 [simplest_hello_world_getting_started]
 
-Copy the text of this program into a file called example.cpp.
+Copy the text of this program into a file called hello_world.cpp.
 
-Now, in the directory where you saved example.cpp, issue the following command:
+Now, in the directory where you put hello_world.cpp, issue the following command
+(where $`HPX_LOCATION` is the `CMAKE_INSTALL_PREFIX` you used while building HPX):
 
 [pre
-    c++ \`pkg-config --cflags --libs hpx\` -o example
+    $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/
+$ c++ -o hello_world hello_world.cpp \`pkg-config --cflags --libs hpx_application\` -lhpx_component_iostreams -DHPX_APPLICATION_NAME=hello_world
 ]
 
-To test the result, type:
+[important When using pkg-config with HPX, the pkg-config flags must go after
+           the `-o` flag.]
 
-    ./example
+To test the program, type:
 
-which should print `Hello HPX World!` and exit.
+[pre
+    $ ./hello_world
+]
 
+which should print `Hello World!` and exit.
+
+[heading Building HPX Components with pkg-config]
+
+Let's try a more complex example involving an HPX component. An HPX component is
+a class which exposes HPX actions. HPX components are compiled into dynamically
+loaded modules called component libraries. Here's the source code:
+
+[import ../examples/hello_world_component/hello_world_component.hpp]
+
+[*hello_world_component.cpp]
+
+[import ../examples/hello_world_component/hello_world_component.cpp]
+
+[hello_world_cpp_getting_started]
+
+[*hello_world_component.hpp]
+
+[hello_world_hpp_getting_started]
+
+[*hello_world_client.cpp]
+
+[import ../examples/hello_world_component/hello_world_client.cpp]
+
+[hello_world_client_getting_started]
+
+Copy the three source files above into three files (called hello_world.cpp,
+hello_world.hpp and hello_world_client.cpp respectively).
+
+Now, in the directory where you put the files, run the following command to
+build the component library. (where $`HPX_LOCATION` is the
+`CMAKE_INSTALL_PREFIX` you used while building HPX):
+
+[pre
+    $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
+$ c++ -o libhpx_component_hello_world.so hello_world_component.cpp \`pkg-config --cflags --libs hpx_component\` -DHPX_COMPONENT_NAME=hello_world
+$ mv libhpx_component_hello_world.so $HPX_LOCATION/lib/hpx/libhpx_component_hello_world.so
+]
+
+Now, to build the application that uses this component (hello_world_client.cpp),
+we do:
+
+[pre
+    $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
+$ c++ -o hello_world_client hello_world_client.cpp \`pkg-config --cflags --libs hpx_application\` -lhpx_component_iostreams -lhpx_component_hello_world
+]
+
+[important When using pkg-config with HPX, the pkg-config flags must go after
+           the `-o` flag.]
+
+To test the program, type:
+
+[pre
+    $ ./hello_world_client
+]
+
+which should print `Hello World!` and exit.
 
 [heading Using HPX Applications with PBS]
 
-[fixme TBD]
+Most HPX applications are executed on parallel computers.  These platforms
+typically provide integrated job management services that facilitate the
+allocation of computing resources for each parallel program. HPX includes out of
+the box support for one of the most common job management systems, PBS
+([@http://www.pbsworks.com Portable Batch System]).
+
+All PBS jobs require a script to specify the resource requirements and other
+parameters associated with a parallel job. The PBS script is basically a shell
+script with PBS directives placed within comment section at the beginning of the
+file. The remaining (not commented-out) portion of the file executes just like
+any other regular shell script. While the description of all available PBS
+options is outside the scope of this tutorial (the interested reader may refer
+to in-depth [@http://www.pbsworks.com/SupportDocuments.aspx documentation] for
+more information), below is a minimal example to illustrate the approach. As a
+test application we will use the multithreaded `hello_world` program, explained
+in the section __hello_world_example__.
+
+[teletype]
+``
+    #!/bin/bash
+    #
+    #PBS -l nodes=2:ppn=4
+
+    APP_PATH=~/packages/hpx/bin/hello_world
+    APP_OPTIONS=
+
+    pbsdsh -u $APP_PATH --hpx:nodes=`cat $PBS_NODEFILE` $APP_OPTIONS
+``
+
+The `#PBS -l` directive will cause two compute nodes to be allocated for the
+application, as specified in option `nodes`. Each of the nodes will dedicate
+four cores to the program (option `ppn`, short for "processors per node"; for
+the purpose of execution resource allocation PBS does not distinguish between
+processors and cores). Note that requesting more cores per node than physically
+available is pointless and may prevent PBS from accepting the script.
+
+`APP_PATH` and `APP_OPTIONS` are shell variables that respectively specify the
+correct path to the executable (`hello_world` in this case) and command line
+options.  Since the `hello_world` application doesn't need any command line
+options, `APP_OPTIONS` has been left empty. Unlike in other execution
+environments, there is no need to use the
+[link hpx.tutorial.getting_started.commandline --hpx:threads] option to
+indicate the required number of OS threads per node; HPX library will
+derive this parameter automatically from PBS.
+
+Finally, `pbsdsh` is a PBS command that starts a distributed job using allocated
+execution resources. It is recommended to leave this line as shown and modify
+only the PBS options and shell variables as needed for a specific application.
+
+All that remains now is submitting the job to the queuing system. Assuming that
+the contents of the PBS script were saved in file `pbs_hello_world.sh` in the
+current directory, this is accomplished by typing:
+
+    $ qsub ./pbs_hello_world_pbs.sh
+
+If the job is accepted, qsub will print out the assigned job ID, which may look like:
+
+    $ 42.supercomputer.some.university.edu
+
+To check the status of your job, issue:
+
+   $ qstat 42.supercomputer.some.university.edu
+
+and look for a single-letter job status symbol. The common cases include:
+
+* *Q* signifies that the job is queued and awaiting its turn to be executed,
+* *R* indicates that the job is currently running, and
+* *C* means that the job has completed after having run.
+
+The example `qstat` output showing job waiting for the execution resources to
+become available is shown below:
+
+    Job id                    Name             User            Time Use S Queue
+    ------------------------- ---------------- --------------- -------- - -----
+    42.supercomputer          ...ello_world.sh joe_user               0 Q batch
+
+After the job completes, PBS will place two files, `pbs_hello_world.sh.o42` and
+`pbs_hello_world.sh.e42` in the directory from where the job was submitted. The
+first contains the standard output and the second error output collected from
+all the nodes on which the application executed. In our example, the error
+output file should be empty and standard output file contains something similar
+to:
+
+    hello world from OS-thread 3 on locality 0
+    hello world from OS-thread 2 on locality 0
+    hello world from OS-thread 1 on locality 1
+    hello world from OS-thread 0 on locality 0
+    hello world from OS-thread 3 on locality 1
+    hello world from OS-thread 2 on locality 1
+    hello world from OS-thread 1 on locality 0
+    hello world from OS-thread 0 on locality 1
+
+Congratulations! You have just run your first distributed HPX application!
 
 [endsect] [/ How to Install HPX on Unix Variants]
 
+[/Proofread by:]
+[/Adrian Serio 3-13-12]
+[/Phillip LeBlanc 3-13-12]
 
 [/////////////////////////////////////////////////////////////////////////////]
 [section:windows_installation How to Install HPX on Windows]
@@ -204,7 +347,7 @@ which should print `Hello HPX World!` and exit.
   created before.
 * Add CMake variable definitions (if any) by clicking the "Add Entry" button.
   The only required variable you need to define is `BOOST_ROOT`. This variable
-  needs to be set to point to point to the root folder of your Boost
+  needs to be set to point to the root folder of your Boost
   installation. It is recommended to set the variable `CMAKE_INSTALL_PREFIX` as
   well. This allows to control where the built HPX libraries will be installed.
 * Press the "Configure" button. A window will pop up asking you which compilers
@@ -218,12 +361,15 @@ which should print `Hello HPX World!` and exit.
 
 [endsect] [/ How to Install HPX on Windows]
 
+[/Proofread by:]
+[/Adrian Serio 3-13-12]
+[/Phillip LeBlanc 3-13-12]
 
 [/////////////////////////////////////////////////////////////////////////////]
 [section:commandline HPX Command Line Options]
 
 The predefined command line options of any application using `hpx::init` are
-described in the [link hpx.getting_started.commandline.commandline table below].
+described in the [link hpx.tutorial.getting_started.commandline.commandline table below].
 
 [table:commandline Default HPX Command Line Options
     [[Option]                   [Description]]
@@ -314,3 +460,6 @@ described in the [link hpx.getting_started.commandline.commandline table below].
 [endsect] [/ Command Line Handling]
 
 [endsect] [/ Getting Started]
+
+[/Proofread by:]
+[/Adrian Serio 3-13-12]

@@ -28,12 +28,12 @@ namespace hpx { namespace lcos
         boost::dynamic_bitset<> handled(dataflows.size());
         std::size_t handled_count = 0;
 
-        std::vector<lcos::promise<T1, TR1> > lazy_values;
+        std::vector<lcos::future<T1, TR1> > lazy_values;
         lazy_values.reserve(dataflows.size());
         typedef dataflow_base<T1, TR1> dataflow_type;
         BOOST_FOREACH(dataflow_type const & d, dataflows)
         {
-            lazy_values.push_back(d.get_async());
+            lazy_values.push_back(d.get_future());
         }
 
         while (handled_count < lazy_values.size()) {
@@ -73,11 +73,11 @@ namespace hpx { namespace lcos
         boost::dynamic_bitset<> handled(dataflows.size());
         std::size_t handled_count = 0;
 
-        std::vector<lcos::promise<void> > lazy_values;
+        std::vector<lcos::future<void> > lazy_values;
         lazy_values.reserve(dataflows.size());
         BOOST_FOREACH(dataflow_base<void> const & d, dataflows)
         {
-            lazy_values.push_back(d.get_async());
+            lazy_values.push_back(d.get_future());
         }
 
         while (handled_count < lazy_values.size()) {

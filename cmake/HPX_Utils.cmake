@@ -14,11 +14,10 @@ hpx_include(Message
             Install
             GetIncludeDirectory
             Compile
-            MangleName
+            TargetPaths
             AddComponent
             AddLibrary
             AddExecutable
-            AddTest
             AddConfigTest
             AddPythonConfigTest
             AddPseudoDependencies
@@ -26,5 +25,7 @@ hpx_include(Message
             AddLibrarySources
             AddLibraryHeaders
             AddSourceGroup
+            LinkDirectories
+            IncludeDirectories
             ForceOutOfTreeBuild)
 

@@ -21,18 +21,10 @@ namespace hpx { namespace lcos { namespace server { namespace detail
         typedef T result_type;
         typedef T remote_result;
 
-        /*
         dataflow_slot(SinkAction * back, BOOST_RV_REF(T) t)
             : back_ptr_(0)
             , back(back)
             , t(boost::move(t))
-        {}
-        */
-
-        dataflow_slot(SinkAction * back, T const & t)
-            : back_ptr_(0)
-            , back(back)
-            , t(t)
         {}
 
         void set_result(BOOST_RV_REF(remote_result) r)

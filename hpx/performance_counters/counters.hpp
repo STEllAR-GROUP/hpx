@@ -295,9 +295,10 @@ namespace hpx { namespace performance_counters
 
         counter_info(counter_type type, std::string const& name,
                 std::string const& helptext = "",
-                boost::uint32_t version = HPX_PERFORMANCE_COUNTER_V1)
+                boost::uint32_t version = HPX_PERFORMANCE_COUNTER_V1,
+                std::string const& uom = "")
           : type_(type), version_(version), status_(status_invalid_data),
-            fullname_(name), helptext_(helptext)
+            fullname_(name), helptext_(helptext), unit_of_measure_(uom)
         {}
 
         counter_type type_;         ///< The type of the described counter
@@ -306,6 +307,7 @@ namespace hpx { namespace performance_counters
         counter_status status_;     ///< The status of the counter object
         std::string fullname_;      ///< The full name of this counter
         std::string helptext_;      ///< The full descriptive text for this counter
+        std::string unit_of_measure_; ///< The unit of measure for this counter
 
     private:
         // serialization support
@@ -314,7 +316,9 @@ namespace hpx { namespace performance_counters
         template<class Archive>
         void serialize(Archive& ar, const unsigned int)
         {
-            ar & type_ & version_ & status_ & fullname_ & helptext_;
+            ar & type_ & version_ & status_
+               & fullname_ & helptext_
+               & unit_of_measure_;
         }
     };
 

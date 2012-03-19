@@ -185,7 +185,7 @@ struct object_semaphore
                     "aborting pending thread");
             }
 
-            catch (hpx::exception& e)
+            catch (hpx::exception const& /*e*/)
             {
                 applier::trigger_error(id, boost::current_exception());
             }

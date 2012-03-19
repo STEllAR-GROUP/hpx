@@ -78,6 +78,13 @@ namespace hpx
     namespace agas
     {
         struct HPX_API_EXPORT addressing_service;
+
+        enum service_mode
+        {
+            service_mode_invalid = -1,
+            service_mode_bootstrap = 0,
+            service_mode_hosted = 1,
+        };
     }
 
     /// \namespace naming
@@ -295,16 +302,6 @@ namespace hpx
     HPX_API_EXPORT char const* get_runtime_mode_name(runtime_mode state);
     HPX_API_EXPORT runtime_mode get_runtime_mode_from_name(std::string const& mode);
 
-    namespace agas
-    {
-        enum service_mode
-        {
-            service_mode_invalid = -1,
-            service_mode_bootstrap = 0,
-            service_mode_hosted = 1,
-        };
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     /// Retrieve the string value of a configuration entry as given by \p key.
     HPX_API_EXPORT std::string get_config_entry(std::string const& key,
@@ -368,9 +365,6 @@ namespace hpx
             struct fixed_component_tag {};
             struct simple_component_tag {};
             struct managed_component_tag {};
-
-            struct construct_with_back_ptr {};
-            struct construct_without_back_ptr {};
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -420,7 +414,8 @@ namespace hpx
         class simple_component;
 
         template <typename Component, typename Wrapper = detail::this_type,
-            typename CtorPolicy = detail::construct_without_back_ptr>
+            typename CtorPolicy = traits::construct_without_back_ptr,
+            typename DtorPolicy = traits::managed_object_controls_lifetime>
         class managed_component_base;
 
         template <typename Component, typename Derived = detail::this_type>
@@ -467,8 +462,7 @@ namespace hpx
 
         template <typename Result,
             typename RemoteResult =
-                typename traits::promise_remote_result<Result>::type,
-            int N = 1>
+                typename traits::promise_remote_result<Result>::type>
         class promise;
         struct non_signalling_tag {};
 
@@ -483,15 +477,20 @@ namespace hpx
                 typename Action::result_type>::type,
             typename Signalling = non_signalling_tag,
             typename DirectExecute = typename Action::direct_execution>
-        class eager_future;
+        class packaged_task;
 
         template <typename Action,
             typename Result = typename traits::promise_local_result<
                 typename Action::result_type>::type,
             typename DirectExecute = typename Action::direct_execution>
-        class lazy_future;
+        class deferred_packaged_task;
 
-        template <typename ValueType>
+        template <typename Result,
+            typename RemoteResult =
+                typename traits::promise_remote_result<Result>::type>
+        class future;
+
+       template <typename ValueType>
         struct object_semaphore;
 
         namespace stubs

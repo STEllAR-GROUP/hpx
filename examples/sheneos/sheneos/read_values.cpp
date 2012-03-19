@@ -55,7 +55,7 @@ namespace sheneos { namespace detail
             H5File file(datafilename, H5F_ACC_RDONLY);
 
             // Try to open the specified dataset.
-            DataSet dataset = file.openDataSet(name); 
+            DataSet dataset = file.openDataSet(name);
             DataSpace dataspace = dataset.getSpace();
 
             // Verify number of dimensions.
@@ -85,7 +85,7 @@ namespace sheneos { namespace detail
             H5File file(datafilename, H5F_ACC_RDONLY);
 
             // Try to open the specified dataset.
-            DataSet dataset = file.openDataSet(name); 
+            DataSet dataset = file.openDataSet(name);
             DataSpace dataspace = dataset.getSpace();
 
             // Verify number of dimensions
@@ -101,19 +101,20 @@ namespace sheneos { namespace detail
             detail::read_values(dataset, dataspace, start, 1, &minval);
             detail::read_values(dataset, dataspace, end - 1, 1, &maxval);
 
-            // Read the delta value. 
+            // Read the delta value.
             detail::read_values(dataset, dataspace, start + 1, 1, &delta);
             delta -= minval;
 
             // Return size of dataset.
-            return dims[0];     
+            return dims[0];
         }
-        catch (H5::Exception const& e) {
-            HPX_THROW_EXCEPTION(hpx::no_success, "sheneos::extract_data_range",
-                e.getDetailMsg());
+        catch (H5::Exception e) {
+            std::string msg = e.getDetailMsg().c_str();
+            HPX_THROW_EXCEPTION(hpx::no_success,
+                "sheneos::extract_data_range", msg);
         }
 
-        // This return statement keeps the compiler from whining. 
+        // This return statement keeps the compiler from whining.
         return 0;
     }
 

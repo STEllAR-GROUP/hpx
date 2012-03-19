@@ -12,7 +12,14 @@ set(DOCUMENTATION_FILES
 set(DOCUMENTATION_DEPENDENCIES
     ${DOCUMENTATION_FILES}
     ${hpx_SOURCE_DIR}/examples/quickstart/hello_world.cpp
-    ${hpx_SOURCE_DIR}/examples/quickstart/simplest_hello_world.cpp)
+    ${hpx_SOURCE_DIR}/examples/quickstart/simplest_hello_world.cpp
+    ${hpx_SOURCE_DIR}/examples/accumulator/accumulator/server/accumulator.hpp
+    ${hpx_SOURCE_DIR}/examples/accumulator/accumulator/stubs/accumulator.hpp
+    ${hpx_SOURCE_DIR}/examples/accumulator/accumulator/accumulator.hpp
+    ${hpx_SOURCE_DIR}/examples/accumulator/accumulator/accumulator.cpp
+    ${hpx_SOURCE_DIR}/examples/accumulator/accumulator_client.cpp
+    ${hpx_SOURCE_DIR}/examples/hello_world_component/hello_world_component.hpp
+    ${hpx_SOURCE_DIR}/examples/hello_world_component/hello_world_component.cpp)
 
 set(quickbook_fixme_mode "-D__disable_fixme__")
 if(HPX_DOCUMENTATION_DEVELOPMENT)
@@ -34,7 +41,7 @@ hpx_quickbook_to_html(hpx
                   --stringparam boost.image.alt "HPX - High Performance ParalleX"
     QUICKBOOK_ARGS ${quickbook_fixme_mode})
 
-add_custom_target(docs
+add_custom_target(docs ALL
     DEPENDS hpx_HTML.manifest
     SOURCES ${DOCUMENTATION_FILES})
 

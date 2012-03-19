@@ -27,21 +27,20 @@ namespace hpx { namespace lcos
     /// expected value directly (without wrapping it into a tuple).
     template <typename T1, typename TR1>
     inline T1
-    wait (lcos::promise<T1, TR1> const& f1)
+    wait (lcos::future<T1, TR1> const& f1)
     {
         return f1.get();
     }
 
     inline void
-    wait (lcos::promise<void> const& f1)
+    wait (lcos::future<void> const& f1)
     {
         f1.get();
     }
 
     template <typename T1, typename T2, typename TR1, typename TR2>
     inline boost::tuple<T1, T2>
-    wait (lcos::promise<T1, TR1> const& f1,
-        lcos::promise<T2, TR2> const& f2)
+    wait (lcos::future<T1, TR1> const& f1, lcos::future<T2, TR2> const& f2)
     {
         return boost::make_tuple(f1.get(), f2.get());
     }
@@ -56,28 +55,28 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename TR>
     inline void
-    wait (std::vector<lcos::promise<T, TR> > const& v, std::vector<TR>& r)
+    wait (std::vector<lcos::future<T, TR> > const& v, std::vector<TR>& r)
     {
         r.reserve(v.size());
 
-        typedef lcos::promise<T, TR> value_type;
+        typedef lcos::future<T, TR> value_type;
         BOOST_FOREACH(value_type const& f, v)
             r.push_back(f.get());
     }
 
     template <typename T, typename TR>
     inline void
-    wait (std::vector<lcos::promise<T, TR> > const& v)
+    wait (std::vector<lcos::future<T, TR> > const& v)
     {
-        typedef lcos::promise<T, TR> value_type;
+        typedef lcos::future<T, TR> value_type;
         BOOST_FOREACH(value_type const& f, v)
             f.get();
     }
 
     inline void
-    wait (std::vector<lcos::promise<void> > const& v)
+    wait (std::vector<lcos::future<void> > const& v)
     {
-        typedef lcos::promise<void> value_type;
+        typedef lcos::future<void> value_type;
         BOOST_FOREACH(value_type const& f, v)
             f.get();
     }
@@ -93,7 +92,7 @@ namespace hpx { namespace lcos
 #define N BOOST_PP_ITERATION()
 
 #define HPX_FUTURE_WAIT_ARGUMENT(z, n, data) BOOST_PP_COMMA_IF(n)             \
-        lcos::promise<BOOST_PP_CAT(T, n), BOOST_PP_CAT(TR, n)> const&    \
+        lcos::future<BOOST_PP_CAT(T, n), BOOST_PP_CAT(TR, n)> const&          \
             BOOST_PP_CAT(f, n)                                                \
     /**/
 #define HPX_FUTURE_TUPLE_ARGUMENT(z, n, data) BOOST_PP_COMMA_IF(n)            \

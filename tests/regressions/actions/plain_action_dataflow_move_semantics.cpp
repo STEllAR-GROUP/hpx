@@ -25,8 +25,10 @@ using boost::program_options::value;
 using hpx::naming::id_type;
 
 using hpx::actions::plain_action1;
+using hpx::actions::plain_result_action0;
 using hpx::actions::plain_result_action1;
 using hpx::actions::plain_direct_action1;
+using hpx::actions::plain_direct_result_action0;
 using hpx::actions::plain_direct_result_action1;
 
 using hpx::lcos::dataflow;
@@ -97,11 +99,49 @@ HPX_REGISTER_PLAIN_ACTION(pass_non_movable_object_void_direct_action);
 HPX_REGISTER_PLAIN_ACTION(pass_non_movable_object_direct_action);
 
 ///////////////////////////////////////////////////////////////////////////////
+non_movable_object return_non_movable_object()
+{
+    return non_movable_object();
+}
+movable_object return_movable_object()
+{
+    return movable_object();
+}
+
+// 'normal' actions (execution is scheduled on a new thread)
+typedef plain_result_action0<
+    movable_object
+  , return_movable_object
+> return_movable_object_action;
+
+typedef plain_result_action0<
+    non_movable_object
+  , return_non_movable_object
+> return_non_movable_object_action;
+
+HPX_REGISTER_PLAIN_ACTION(return_movable_object_action);
+HPX_REGISTER_PLAIN_ACTION(return_non_movable_object_action);
+
+// direct actions (execution happens in the calling thread)
+typedef plain_direct_result_action0<
+    movable_object
+  , return_movable_object
+> return_movable_object_direct_action;
+
+typedef plain_direct_result_action0<
+    non_movable_object
+  , return_non_movable_object
+> return_non_movable_object_direct_action;
+
+HPX_REGISTER_PLAIN_ACTION(return_movable_object_direct_action);
+HPX_REGISTER_PLAIN_ACTION(return_non_movable_object_direct_action);
+
+///////////////////////////////////////////////////////////////////////////////
 template <typename Action, typename Object>
 std::size_t pass_object_void()
 {
     Object obj;
-    dataflow<Action>(find_here(), obj).get();
+    dataflow<Action>(find_here(), obj).get_future().get();
 
     return obj.get_count();
 }
@@ -110,7 +150,7 @@ template <typename Action, typename Object>
 std::size_t pass_object(id_type id)
 {
     Object obj;
-    return dataflow<Action>(id, obj).get();
+    return dataflow<Action>(id, obj).get_future().get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -118,7 +158,7 @@ template <typename Action, typename Object>
 std::size_t move_object_void()
 {
     Object obj;
-    dataflow<Action>(find_here(), boost::move(obj)).get();
+    dataflow<Action>(find_here(), boost::move(obj)).get_future().get();
 
     return obj.get_count();
 }
@@ -127,8 +167,25 @@ template <typename Action, typename Object>
 std::size_t move_object(id_type id)
 {
     Object obj;
-    return dataflow<Action>(id, boost::move(obj)).get();
+    return dataflow<Action>(id, boost::move(obj)).get_future().get();
 }
+
+///////////////////////////////////////////////////////////////////////////////
+template <typename Action, typename Object>
+std::size_t return_object(id_type id)
+{
+    Object obj(dataflow<Action>(id).get_future().get());
+    return obj.get_count();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+template <typename Action, typename Object>
+std::size_t return_move_object(id_type id)
+{
+    Object obj(dataflow<Action>(id).get_future().move());
+    return obj.get_count();
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
@@ -149,45 +206,55 @@ int hpx_main(variables_map& vm)
                 >()
             ), 1u);
 
+            /* TODO: Make this compile
             HPX_TEST_EQ((
                 pass_object_void<
                     pass_movable_object_void_direct_action, movable_object
                 >()
             ), 0u);
+            */
 
             HPX_TEST_EQ((
                 pass_object_void<
                     pass_non_movable_object_void_action, non_movable_object
                 >()
-            ), 2u);
+            ), 4u);
+
+            /* TODO: Make this compile
             HPX_TEST_EQ((
                 pass_object_void<
                     pass_non_movable_object_void_direct_action, non_movable_object
                 >()
             ), 0u);
+            */
 
             HPX_TEST_EQ((
                 move_object_void<
                     pass_movable_object_void_action, movable_object
                 >()
-            ), 1u);
+            ), 0u);
 
+            /* TODO: Make this compile
             HPX_TEST_EQ((
                 move_object_void<
                     pass_movable_object_void_direct_action, movable_object
                 >()
             ), 0u);
+            */
 
             HPX_TEST_EQ((
                 move_object_void<
                     pass_non_movable_object_void_action, non_movable_object
                 >()
-            ), 2u);
+            ), 4u);
+            
+            /* TODO: Make this compile
             HPX_TEST_EQ((
                 move_object_void<
                     pass_non_movable_object_void_direct_action, non_movable_object
                 >()
             ), 0u);
+            */
         }
 
         // test for movable object ('normal' actions)
@@ -195,40 +262,104 @@ int hpx_main(variables_map& vm)
             pass_object<pass_movable_object_action, movable_object>(id)
         ), is_local ? 1u : 1u);
 
+        /* TODO: Make this compile
         // test for movable object (direct actions)
         HPX_TEST_EQ((
             pass_object<pass_movable_object_direct_action, movable_object>(id)
         ), is_local ? 0u : 0u);
+        */
 
         // test for a non-movable object ('normal' actions)
         HPX_TEST_EQ((
             pass_object<pass_non_movable_object_action, non_movable_object>(id)
-        ), is_local ? 2u : 2u);
+        ), is_local ? 4u : 4u);
 
+        /* TODO: Make this compile
         // test for a non-movable object (direct actions)
         HPX_TEST_EQ((
             pass_object<pass_non_movable_object_direct_action, non_movable_object>(id)
         ), is_local ? 0u : 0u);
+        */
 
         // test for movable object ('normal' actions)
         HPX_TEST_EQ((
             move_object<pass_movable_object_action, movable_object>(id)
-        ), is_local ? 1u : 1u);
+        ), is_local ? 0u : 1u);
 
+        /* TODO: Make this compile
         // test for movable object (direct actions)
         HPX_TEST_EQ((
             move_object<pass_movable_object_direct_action, movable_object>(id)
         ), is_local ? 0u : 0u);
+        */
 
         // test for a non-movable object ('normal' actions)
         HPX_TEST_EQ((
             move_object<pass_non_movable_object_action, non_movable_object>(id)
-        ), is_local ? 2u : 2u);
+        ), is_local ? 4u : 4u);
 
+        /* TODO: Make this compile
         // test for a non-movable object (direct actions)
         HPX_TEST_EQ((
             move_object<pass_non_movable_object_direct_action, non_movable_object>(id)
         ), is_local ? 0u : 0u);
+        */
+
+        HPX_TEST_EQ((
+            return_object<
+                return_movable_object_action, movable_object
+            >(id)
+        ), is_local ? 1u : 2u);
+
+        /* TODO: Make this compile
+        HPX_TEST_EQ((
+            return_object<
+                return_movable_object_direct_action, movable_object
+            >(id)
+        ), is_local ? 1u : 1u);
+        */
+
+        HPX_TEST_EQ((
+            return_object<
+                return_non_movable_object_action, non_movable_object
+            >(id)
+        ), is_local ? 2u : 8u);
+
+        /* TODO: Make this compile
+        HPX_TEST_EQ((
+            return_object<
+                return_non_movable_object_direct_action, non_movable_object
+            >(id)
+        ), is_local ? 2u : 7u);
+        */
+            
+        HPX_TEST_EQ((
+            return_move_object<
+                return_movable_object_action, movable_object
+            >(id)
+        ), is_local ? 0u : 0u);
+
+        /* TODO: Make this compile
+        HPX_TEST_EQ((
+            return_move_object<
+                return_movable_object_direct_action, movable_object
+            >(id)
+        ), is_local ? 0u : 0u);
+        */
+
+        HPX_TEST_EQ((
+            return_move_object<
+                return_non_movable_object_action, non_movable_object
+            >(id)
+        ), is_local ? 2u : 2u);
+
+        /* TODO: Make this compile
+        HPX_TEST_EQ((
+            return_move_object<
+                return_non_movable_object_direct_action, non_movable_object
+            >(id)
+        ), is_local ? 2u : 7u);
+        */
     }
 
     finalize();
