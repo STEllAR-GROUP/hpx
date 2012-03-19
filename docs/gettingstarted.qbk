@@ -82,6 +82,8 @@ your distribution, please refer to the corresponding documentation.
     $ svn co https://svn.cct.lsu.edu/repos/projects/parallex/trunk/hpx hpx
 ]
 
+[fixme Remove reference to SVN and replace it with the download link for HPX]
+
 * Create a build directory. HPX requires an out-of-tree build. This means you
   will be unable to run CMake in the HPX source tree.
 
@@ -130,8 +132,7 @@ following program. It prints 'Hello HPX World!' on the locality you run it on.
 Copy the text of this program into a file called hello_world.cpp.
 
 Now, in the directory where you put hello_world.cpp, issue the following command
-(where $HPX_LOCATION is with the CMAKE_INSTALL_PREFIX you used while building
-HPX):
+(where $`HPX_LOCATION` is the `CMAKE_INSTALL_PREFIX` you used while building HPX):
 
 [pre
     $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/
@@ -177,8 +178,8 @@ Copy the three source files above into three files (called hello_world.cpp,
 hello_world.hpp and hello_world_client.cpp respectively).
 
 Now, in the directory where you put the files, run the following command to
-build the component library. (where $HPX_LOCATION is with the
-CMAKE_INSTALL_PREFIX you used while building HPX):
+build the component library. (where $`HPX_LOCATION` is the
+`CMAKE_INSTALL_PREFIX` you used while building HPX):
 
 [pre
     $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
