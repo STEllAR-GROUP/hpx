@@ -49,7 +49,6 @@ struct g
         HPX_TEST(!invoked_g);
         invoked_g = true;
 
-        hpx::cout << "Hello World\n" << hpx::flush;
         return true;
     }
 
