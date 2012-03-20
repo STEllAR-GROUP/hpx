@@ -15,7 +15,6 @@ set(subdirs
     quickstart
     random_mem_access
     startup_shutdown
-    throttle
    )
 
 if(HDF5_CPP_FOUND AND HPX_CXX11_LAMBDAS AND HPX_CXX11_AUTO AND HDF5_THREAD_SAFE)
