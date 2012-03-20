@@ -15,7 +15,10 @@
 
 #if defined(__linux) || defined(__APPLE__) || defined(__sun)
 #define BOOST_HAVE_EXECINFO
-#define BOOST_HAVE_DLADDR
+#define BOOST_HAVE_DLFCN
+#if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4)) && !defined(__clang__)
+#  define BOOST_HAVE_UNWIND
+#endif
 #endif
 
 #if defined(__GNUC__)
@@ -30,8 +33,11 @@
 #include <cxxabi.h>
 #endif
 
-#ifdef BOOST_HAVE_DLADDR
+#ifdef BOOST_HAVE_DLFCN
 #include <dlfcn.h>
+#endif
+#ifdef BOOST_HAVE_UNWIND
+#include <unwind.h>
 #endif
 #include <string.h>
 #include <stdlib.h>
@@ -50,16 +56,76 @@
 namespace boost {
 
     namespace stack_trace {
-        #if defined(BOOST_HAVE_EXECINFO)
+        #if defined(BOOST_HAVE_EXECINFO) && defined(BOOST_HAVE_UNWIND) && defined(BOOST_HAVE_EXECINFO)
 
-        int trace(void **array,std::size_t n)
+        struct trace_data
+        {
+            trace_data(void **array,std::size_t size)
+              : array_(array), size_(size), cfa_(0), count_(-1)
+            {}
+
+            void **array_;      // storage for the stack trace
+            std::size_t size_;  // number of frames
+            _Unwind_Word cfa_;  // canonical frame address
+            std::size_t count_;
+        };
+
+        _Unwind_Reason_Code trace_callback(_Unwind_Context* ctx,void* ptr)
+        {
+            if (!ptr)
+                return _URC_NO_REASON;
+                
+            trace_data& d = *((trace_data*) ptr);
+ 
+            // First call. 
+            if (1 != d.count_)
+            {
+                // Get the instruction pointer for this frame.
+                d.array_[d.count_] = (void *) _Unwind_GetIP(ctx);
+
+                // Get the CFA.
+                _Unwind_Word cfa = _Unwind_GetCFA(ctx);
+
+                // Check if we're at the end of the stack.
+                if ((0 < d.count_) &&
+                    (d.array_[d.count_ - 1] == d.array_[d.count_]) &&
+                    (cfa == d.cfa_))
+                {
+                    return _URC_END_OF_STACK;
+                }
+
+                d.cfa_ = cfa;
+            }
+
+            if (++d.count_ == d.size_)
+                return _URC_END_OF_STACK;
+
+            return _URC_NO_REASON;
+        }
+
+        std::size_t trace(void **array,std::size_t n)
+        {
+            trace_data d(array,n);
+
+            if (1 <= n)
+                _Unwind_Backtrace(trace_callback, (void*) &d);
+
+            if ((1 < d.count_) && d.array_[d.count_ - 1])
+                --d.count_;
+
+            return (std::size_t(-1) != d.count_) ? d.count_ : 0;
+        }
+        
+        #elif defined(BOOST_HAVE_EXECINFO)
+
+        std::size_t trace(void **array,std::size_t n)
         {
             return :: backtrace(array,n);
         }
 
         #elif defined(BOOST_MSVC)
 
-        int trace(void **array,std::size_t n)
+        std::size_t trace(void **array,std::size_t n)
         {
             if(n>=63)
                 n=62;
@@ -68,14 +134,14 @@ namespace boost {
 
         #else
 
-        int trace(void ** /*array*/,std::size_t /*n*/)
+        std::size_t trace(void ** /*array*/,std::size_t /*n*/)
         {
             return 0;
         }
 
         #endif
 
-        #if defined(BOOST_HAVE_DLADDR) && defined(BOOST_HAVE_ABI_CXA_DEMANGLE)
+        #if defined(BOOST_HAVE_DLFCN) && defined(BOOST_HAVE_ABI_CXA_DEMANGLE)
 
         std::string get_symbol(void *ptr)
         {
