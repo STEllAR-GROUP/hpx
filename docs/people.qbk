@@ -49,7 +49,7 @@ Beowulf clusters and SMP nodes.
 
 We fully understand that the success of HPX (and ParalleX) is very much the
 result of the work of many people. To see a list of who is contributing see
-our talbes below.
+our tables below.
 
 [heading The STE||AR Group]
 
@@ -80,7 +80,7 @@ our talbes below.
 
 [heading Acknowledgements]
 
-In addtion to the people who worked directly with HPX development we would
+In addition to the people who worked directly with HPX development we would
 like to acknowledge Thomas Sterling, who was instrumental in the creation
 of HPX as well as the NSF, DARPA, and __cct__ who fund and support our
 work.

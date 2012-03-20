@@ -111,7 +111,7 @@ Here is a list of the tickets we closed for this release:
 
 *  #31: Specialize handle_gid<> for examples and tests
 *  #72: Fix AGAS reference counting
-* #103: Better diagnostics for multiple component/action registerations under the same name
+* #103: Better diagnostics for multiple component/action registrations under the same name
 * #104: VERIFY: heartbeat throws an exception when decrefing the performance counter its watching
 * #111: VERIFY: throttle causes an exception on the target application
 * #142: One failed component loading causes an unrelated component to fail

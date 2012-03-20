@@ -8,7 +8,7 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 [section:examples Examples]
 
-The following sections of our tuturial are some examples for our reader to
+The following sections of our tutorial are some examples for our reader to
 get familiar with HPX style programming. We start off with simple examples
 that utilize basic HPX elements and then begin to expose the reader to the
 more complex yet powerful HPX concepts.
@@ -22,19 +22,15 @@ more complex yet powerful HPX concepts.
 
 The Fibonacci sequence is a sequence of numbers starting with 0 and 1 where
 every subsequent number is the sum of the previous two numbers. In this
-example, we will use HPX to calculate the value of the n-th postition of the
+example, we will use HPX to calculate the value of the n-th position of the
 Fibonacci sequence. In order to compute this problem in parallel, we will use
 a facility known as a Future.
-[/Futures are the return values of packets of work
-that are sent to worker nodes. These objects are declared but do not receive
-their value until the internal function `.get()` is called, which fetches
-the values from the functions that they are wrapped around.]
 
 As shown in the [link examples.future_schematics figure] below, a Future
 encapsulates a delayed computation. It acts as
 a proxy for a result initially not known, most of the time because the
 computation of the result has not completed yet. The Future synchronizes the
-access of this value by optionally suspending the HPX-thread requesting the
+access of this value by optionally suspending any HPX-threads requesting the
 result until the value is available. When a Future is created, it spawns a
 new HPX-thread (either remotely with a parcel or locally by placing it into
 the thread queue) which, when run, will execute the action associated with
@@ -54,7 +50,7 @@ Fibonacci example below to enable its parallel execution.
 
 [heading Setup]
 
-The source code for this example in in the svn repository:
+The source code for this example is in the svn repository:
 [^.../hpx/examples/quickstart/fibonacci.cpp]
 [fixme Add link to source here and remove reference to svn].
 
@@ -82,18 +78,18 @@ This should print (time should be approximate):
 
 This run used the default setting of calculating the tenth place of the
 Fibonacci sequence. To declare which position you want to calculate, use
-the '--n-value' option. Addtitionally you can use the '--hpx:threads' option
+the '--n-value' option. Additionally you can use the '--hpx:threads' option
 to declare how many threads you wish to use when running the program. For
 instance,running:
 
     $ ./bin/fibonacci --n-value 20 --hpx:threads 5
 
-Will yeild:
+Will yield:
 
     fibonacci(20) == 6765
     elapsed time: 0.233827 [s]
 
-To run this program on multiple localities please see the __pbs__ documentation.
+[/To run this program on multiple localities please see the __pbs__ documentation.]
 
 [heading Walkthrough]
 
@@ -109,7 +105,7 @@ the variable is set to 10. This is why when we ran the program for the first
 time without using the '--n-value' option the program returned the 10th
 value of the Fibonacci sequence. The last part of the description is the
 text that appears when a user uses the '--help' option to see what command
-line options are avalable.
+line options are available.
 
 [import ../examples/quickstart/fibonacci.cpp]
 [fib_main]
@@ -127,11 +123,11 @@ in this case [^fibonacci_action], and returns a future. But wait, what is an
 action? And what is this [^fibonacci_action]? For starters, an action is a
 wrapper for a function.  By wrapping functions, HPX can place packets of work
 into different types of processing vehicles. These vehicles allow users to
-caluclate work now, later, or on certain nodes. These other methods of
+calculate work now, later, or on certain nodes. These other methods of
 processing work will be brought up later, for now we will stick to simple
 futures which once created immediately start to do work as soon as resources
-are avalable. To futher understand this we turn to the
-code to find where [^fibonacci_action] was typedefined:
+are available. To futher understand this we turn to the
+code to find where [^fibonacci_action] was [^typedef]'d:
 
 [fib_action]
 
@@ -150,7 +146,7 @@ variables are coming from lets look at the function [^fibonacci]:
 
 On first inspection this block of code is straightforward. First if n < 2,
 meaning if n = 0 or 1, then return 0 or 1 (as we recall the first position
-of the Fibanacci sequence is 0 and the second is one). Next two futures n1
+of the Fibonacci sequence is 0 and the second is one). Next two futures n1
 and n2 are created and their values are added together after being called
 by [^.get()]. But, hold-the-phone, by calling [^fibonacci_action] inside
 the function [^fibonacci] we are calling this function recursively!
@@ -168,7 +164,7 @@ position of the Fibonacci sequence can be calculated.
 [/Phillip LeBlanc 3-13-12]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[section:hello_world Hello World v2]
+[section:hello_world Hello World]
 
 You have already looked at a simple ["Hello World] example.  In this version
 each locality will print out a statement that says which OS thread executed it
@@ -230,8 +226,8 @@ action. This action is declared here:
 [hello_world_action_wrapper]
 
 Another way of thinking about this wrapping technique is as follows: functions
-(the work to be done) are wrapped in actions which are wrapped into compute
-vehicles [fixme wording AS 3-13-12]which are distributed to compute nodes.
+(the work to be done) are wrapped in actions, and actions can be executed
+locally or remotely (e.g. on another machine participating in the computation).
 
 Now it is time to look at the [^hello_world_foreman] which was wrapped in
 the action above:
@@ -240,9 +236,9 @@ the action above:
 
 Here the set 'attendance' is keeping track of which localities have printed
 out the hello world statement. When the locality prints out the statement
-the future returns to wait which invokes the lambda funtion '&'.  This
-funtion '&' erases the thread from the set 'attendance' thus letting
-[^hello_world_foreman] know how many localites still need to print out
+the future returns to wait which invokes the lambda function '&'.  This
+function '&' erases the thread from the set 'attendance' thus letting
+[^hello_world_foreman] know how many localities still need to print out
 ["hello world]. However, if the future returns a value of -1 the thread is
 skipped and that thread remains in 'attendance' for another cycle of the
 while loop.
@@ -267,7 +263,7 @@ leaves that locality's thread number in the set 'attendance'.
 
 Accumulator is a simple example that exposes the notion of components in HPX.
 Components allow us to run applications in an distributed environment in HPX.
-This example exposes four differenct functions: init, add, query and print.
+This example exposes four different functions: init, add, query and print.
 What this example does is it takes an input from a client locality component,
 puts value in a data type (unsigned long) at the remote locality component.
 The print command from the client will print the contents of the remote locality
@@ -315,9 +311,9 @@ Console 2:
     {0000000200000000, 00007fff21db4860}> 5
     {0000000200000000, 00007fff21db4860}> 10
 
-[heading Disecting the Accumulator Example]
+[heading Dissecting the Accumulator Example]
 
-The following text/code snippets gives us a basic infracture know how for
+The following text/code snippets gives us a basic infrastructure know how for
 creating our own components, using the accumulator components as an example.
 
 The file where the accumulator component object with its data and
@@ -352,7 +348,7 @@ and returns no value.
 
 [accumulator_action_declare]
 Here we declare all the action types that the component exposes to the hpx so
-that hpx runtime system reconizes that action as a valid hpx component action.
+that hpx runtime system recognizes that action as a valid hpx component action.
 
 Now we create client side methods to access the actions the component provides.
 The convention followed by the accumulator example, in hpx, is to create
@@ -371,7 +367,7 @@ as each method takes gid as first argument.
 [accumulator_stub_init]
 The above code snippet allows the client side to invoke init action
 (`server::accumulator::init_action`) directly at the component location. This action does
-not take any value as the definition of the action at the serverside implicitly
+not take any value as the definition of the action at the server-side implicitly
 initialized the data member of accumulator component to 0.
 
 [accumulator_stub_add]

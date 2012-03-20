@@ -338,7 +338,7 @@ Congratulations! You have just run your first distributed HPX application!
 
 * Download the latest version of one of the archives available on the __stellar__
   website ([@http://stellar.cct.lsu.edu/downloads/ here]). Unpack the archive
-  into a forlder you choose.
+  into a folder you choose.
 * Create a build folder. HPX requires an out-of-tree-build. This means that you
   will be unable to run CMake in the HPX source folder.
 * Open up the CMake GUI. In the input box labelled "Where is the source code:",
