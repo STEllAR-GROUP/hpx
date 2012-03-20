@@ -113,9 +113,9 @@ int monitor(std::string const& name, boost::uint64_t pause)
             if (!zero_time)
                 zero_time = value.time_;
 
-            std::cout << ( format("  %s,%d,%d\n")
+            std::cout << ( format("  %s,%d[s],%d\n")
                          % name
-                         % (value.time_ - zero_time)
+                         % double((value.time_ - zero_time) * 1e-9)
                          % value.value_);
 
 #if defined(BOOST_WINDOWS)
