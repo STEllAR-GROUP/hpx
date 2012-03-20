@@ -234,21 +234,21 @@ the action above:
 
 [hello_world_foreman]
 
-Here the set 'attendance' is keeping track of which localities have printed
-out the hello world statement. When the locality prints out the statement
-the future returns to wait which invokes the lambda function '&'.  This
-function '&' erases the thread from the set 'attendance' thus letting
-[^hello_world_foreman] know how many localities still need to print out
+Here the set 'attendance' is keeping track of which threads have printed
+out the hello world statement. When the thread prints out the statement
+the future returns to wait which invokes a lambda function.  This
+lambda erases the thread from the set 'attendance' thus letting
+[^hello_world_foreman] know how many threads still need to print out
 ["hello world]. However, if the future returns a value of -1 the thread is
 skipped and that thread remains in 'attendance' for another cycle of the
 while loop.
 
 Finally, let us look at [^hello_world_worker].  Here [^hello_world_worker]
-checks to see if it is on the target locality. If it is the correct locality,
+checks to see if it is on the target thread. If it is the correct thread,
 it prints out the hello world statement and returns the OS thread number
-to [^wait()] in [^hello_world_foreman].  If it is not the correct locality,
+to [^wait()] in [^hello_world_foreman].  If it is not the correct thread,
 it returns a value of -1 which when returned to [^hello_world_foreman]
-leaves that locality's thread number in the set 'attendance'.
+leaves that thread number in the set 'attendance'.
 
 [hello_world_worker]
 
@@ -265,7 +265,7 @@ Accumulator is a simple example that exposes the notion of components in HPX.
 Components allow us to run applications in an distributed environment in HPX.
 This example exposes four different functions: init, add, query and print.
 What this example does is it takes an input from a client locality component,
-puts value in a data type (unsigned long) at the remote locality component.
+puts the value in a data type (unsigned long) at the remote locality component.
 The print command from the client will print the contents of the remote locality
 component at the remote locality. The query command from the client will print
 the contents of the remote locality component at client locality.
