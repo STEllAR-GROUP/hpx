@@ -43,8 +43,8 @@ The ParalleX model has been devised to address these challenges by enabling a
 new computing dynamic through the application of message-driven computation in
 a global address space context with lightweight synchronization. The work of
 our group is centered around implementing the concepts as defined by ParalleX.
-We develop High Performence ParalleX (HPX) - a parallel runtime system
-currently targetted at conventional machines, such as classical Linux based
+We develop High Performance ParalleX (HPX) - a parallel runtime system
+currently targeted at conventional machines, such as classical Linux based
 Beowulf clusters and SMP nodes.
 
 We fully understand that the success of HPX (and ParalleX) is very much the

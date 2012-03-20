@@ -126,7 +126,7 @@ into different types of processing vehicles. These vehicles allow users to
 calculate work now, later, or on certain nodes. These other methods of
 processing work will be brought up later, for now we will stick to simple
 futures which once created immediately start to do work as soon as resources
-are available. To futher understand this we turn to the
+are available. To further understand this we turn to the
 code to find where [^fibonacci_action] was [^typedef]'d:
 
 [fib_action]

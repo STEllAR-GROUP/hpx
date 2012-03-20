@@ -68,9 +68,9 @@ We have had roughly 1500 commits since the last release, closed approximately
 
 [heading Example Applications]
 
-* Graph500 performace benchmark (thanks to Matthew Anderson for contributing
+* Graph500 performance benchmark (thanks to Matthew Anderson for contributing
   this application).
-* GTC (Gyrokinetic Toroidal Code): A skeletton for particle in cell type codes.
+* GTC (Gyrokinetic Toroidal Code): A skeleton for particle in cell type codes.
 * Random Memory Access: an example demonstrating random memory accesses in a
   large array
 * ShenEOS example demonstrating partitioning of large read-only data structures
@@ -88,10 +88,10 @@ We have had roughly 1500 commits since the last release, closed approximately
 
 * Replaced `hpx::actions::function` with `hpx::util::function`. Cleaned up
   related code.
-* Removed `hpx::traits::handle_gid` and moved handlingn of global reference
+* Removed `hpx::traits::handle_gid` and moved handling of global reference
   counts into the corresponding serialization code.
 * Changed terminology: `prefix` is now called `locality_id`, renamed the
-  corresponding API functions (such as `hpx::get_prefix`, which is nowcalled
+  corresponding API functions (such as `hpx::get_prefix`, which is now called
   `hpx::get_locality_id`).
 * Adding `hpx::find_remote_localities`, `hpx::get_num_localities`,
 * Changed performance counter naming scheme to make it more bash friendly
@@ -128,7 +128,7 @@ Here is a list of the tickets we closed for this release:
 * #258: No type checking of GIDs in stubs classes
 * #266: Investigate static_ visibility
 * #271: Seg fault/shared pointer assertion in distributed code
-* #281: cmake options need explanative text
+* #281: cmake options need explicative text
 * #282: Add check to ensure cmake is executed for the correct CMakeLists.txt
 * #283: AGAS caching broken (gva_cache needs to be rewritten with ICL)
 * #284: examples broken in r6614
@@ -153,7 +153,7 @@ Here is a list of the tickets we closed for this release:
 * #303: Logging assertion failure in distributed runs
 * #304: Exception 'what' strings are lost when exceptions from decode_parcel are reported
 * #305: top of trunk broken
-* #306: Peformance counter user interface issues
+* #306: Performance counter user interface issues
 * #307: Logging exception in distributed runs
 * #308: Logging deadlocks in distributed
 * #309: Reference counting test failures and exceptions
@@ -170,7 +170,7 @@ Here is a list of the tickets we closed for this release:
 * #323: Credit exhaustion causes object to stay alive
 * #324: Duplicate exception messages
 * #325: Sheneos is 200-400 times slower than the fortran equivalent
-* #326: Intergrate Quickbook with CMake
+* #326: Integrate Quickbook with CMake
 * #328: FindHPX_HDF5.cmake is broken
 * #329: --help and --version should still work
 * #330: Create pkg-config files
