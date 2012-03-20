@@ -807,25 +807,25 @@ namespace hpx { namespace threads
                 try {
                     tfunc_impl(num_thread);
                 }
+                catch (hpx::exception const& e) {
+                    LFATAL_ << "tfunc(" << num_thread
+                            << "): caught hpx::exception: "
+                            << e.what() << ", aborted thread execution";
+                    report_error(num_thread, boost::current_exception());
+                    return;
+                }
+                catch (boost::system::system_error const& e) {
+                    LFATAL_ << "tfunc(" << num_thread
+                            << "): caught boost::system::system_error: "
+                            << e.what() << ", aborted thread execution";
+                    report_error(num_thread, boost::current_exception());
+                    return;
+                }
                 catch (std::exception const& e) {
                     // Repackage exceptions to avoid slicing.
                     boost::throw_exception(boost::enable_error_info(
                         hpx::exception(unhandled_exception, e.what())));
                 }
-            }
-            catch (hpx::exception const& e) {
-                LFATAL_ << "tfunc(" << num_thread
-                        << "): caught hpx::exception: "
-                        << e.what() << ", aborted thread execution";
-                report_error(num_thread, boost::current_exception());
-                return;
-            }
-            catch (boost::system::system_error const& e) {
-                LFATAL_ << "tfunc(" << num_thread
-                        << "): caught boost::system::system_error: "
-                        << e.what() << ", aborted thread execution";
-                report_error(num_thread, boost::current_exception());
-                return;
             }
             catch (...) {
                 LFATAL_ << "tfunc(" << num_thread << "): caught unexpected "
