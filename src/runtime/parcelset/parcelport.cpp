@@ -159,12 +159,13 @@ namespace hpx { namespace parcelset
             // socket
             c->async_read(
                 boost::bind(&parcelport::handle_read_completion, this,
-                    boost::asio::placeholders::error));
+                    boost::asio::placeholders::error, c));
         }
     }
 
     /// Handle completion of a read operation.
-    void parcelport::handle_read_completion(boost::system::error_code const& e)
+    void parcelport::handle_read_completion(boost::system::error_code const& e,
+        server::parcelport_connection_ptr)
     {
         if (e && e != boost::asio::error::operation_aborted
               && e != boost::asio::error::eof)

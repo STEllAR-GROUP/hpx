@@ -220,7 +220,8 @@ namespace parcelset
         // helper functions for receiving parcels
         void handle_accept(boost::system::error_code const& e,
             server::parcelport_connection_ptr);
-        void handle_read_completion(boost::system::error_code const& e);
+        void handle_read_completion(boost::system::error_code const& e,
+            server::parcelport_connection_ptr);
 
         /// send the parcel to the specified address
         void send_parcel(parcel const& p, naming::address const& addr,
