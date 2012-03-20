@@ -294,7 +294,7 @@ namespace hpx
                                     ///< connecting late
         runtime_mode_default = 3,   ///< The runtime mode will be determined
                                     ///< based on the command line arguments
-        runtime_mode_last = 3
+        runtime_mode_last
     };
 
     /// Get the readable string representing the name of the given runtime_mode
