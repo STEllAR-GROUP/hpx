@@ -25,7 +25,7 @@
 [? __disable_fixme__  [template fixme[s] ] ]
 
 [/ DEFINITIONS]
-[def __version__                V0.8.0]
+[def __version__                V1.0.0]
 
 [def __stellar__                [@http://stellar.cct.lsu.edu STE||AR]]
 [def __stellar_list__           [@email:gopx@cct.lsu.edu gopx@cct.lsu.edu]]
