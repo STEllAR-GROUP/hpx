@@ -292,7 +292,7 @@ namespace hpx
         runtime_mode_worker = 1,    ///< The runtime is a worker locality
         runtime_mode_connect = 2,   ///< The runtime is a worker locality
                                     ///< connecting late
-        runtime_mode_default = 3,   ///< The runtime mode will be determinded
+        runtime_mode_default = 3,   ///< The runtime mode will be determined
                                     ///< based on the command line arguments
         runtime_mode_last = 3
     };
