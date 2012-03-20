@@ -233,8 +233,6 @@ namespace hpx { namespace threads
         ///               enumeration (thread_state#pending, or \a
         ///               thread_state#suspended, any other value will throw a
         ///               hpx#bad_parameter exception).
-        /// \param parent_prefix
-        /// \param parent thread id
         virtual void
         register_work(thread_init_data& data,
             thread_state_enum initial_state = pending,

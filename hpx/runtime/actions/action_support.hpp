@@ -169,7 +169,7 @@ namespace hpx { namespace actions
                 naming::address::address_type lva) = 0;
 
         /// return the id of the locality of the parent thread
-        virtual boost::uint32_t get_parent_locality_prefix() const = 0;
+        virtual boost::uint32_t get_parent_locality_id() const = 0;
 
         /// Return the thread id of the parent thread
         virtual threads::thread_id_type get_parent_thread_id() const = 0;
@@ -260,7 +260,7 @@ namespace hpx { namespace actions
         template <typename Arg0>
         action(BOOST_FWD_REF(Arg0) arg0)
           : arguments_(boost::forward<Arg0>(arg0)),
-            parent_locality_(get_locality_id()),
+            parent_locality_(action::get_locality_id()),
             parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
             parent_phase_(threads::get_parent_phase()),
             priority_(detail::thread_priority<Priority>::call(Priority))
@@ -269,7 +269,7 @@ namespace hpx { namespace actions
         template <typename Arg0>
         action(threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
           : arguments_(boost::forward<Arg0>(arg0)),
-            parent_locality_(get_locality_id()),
+            parent_locality_(action::get_locality_id()),
             parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
             parent_phase_(threads::get_parent_phase()),
             priority_(detail::thread_priority<Priority>::call(priority))
@@ -342,7 +342,7 @@ namespace hpx { namespace actions
         }
 
         /// Return the locality of the parent thread
-        boost::uint32_t get_parent_locality_prefix() const
+        boost::uint32_t get_parent_locality_id() const
         {
             return parent_locality_;
         }
@@ -363,6 +363,12 @@ namespace hpx { namespace actions
         threads::thread_priority get_thread_priority() const
         {
             return priority_;
+        }
+
+        static boost::uint32_t get_locality_id()
+        {
+            error_code ec;      // ignore any errors
+            return hpx::get_locality_id(ec);
         }
 
     private:

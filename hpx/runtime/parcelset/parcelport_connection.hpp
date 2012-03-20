@@ -57,7 +57,7 @@ namespace hpx { namespace parcelset
         {
             set_parcel(std::vector<parcel>(1, p));
         }
-        
+
         void set_parcel (std::vector<parcel> const& p);
 
         /// Get the socket associated with the parcelport_connection.
@@ -77,15 +77,12 @@ namespace hpx { namespace parcelset
             buffers.push_back(boost::asio::buffer(&out_size_, sizeof(out_size_)));
             buffers.push_back(boost::asio::buffer(out_buffer_));
 
-            // record size of parcel
-            send_data_.bytes_ = out_size_;
-
             // this additional wrapping of the handler into a bind object is
             // needed to keep  this parcelport_connection object alive for the whole
             // write operation
             void (parcelport_connection::*f)(boost::system::error_code const&, std::size_t,
                     boost::tuple<Handler, ParcelPostprocess>)
-                = &parcelport_connection::handle_write<Handler>;
+                = &parcelport_connection::handle_write<Handler, ParcelPostprocess>;
 
             boost::asio::async_write(socket_, buffers,
                 boost::bind(f, shared_from_this(),
@@ -125,17 +122,24 @@ namespace hpx { namespace parcelset
             out_buffer_.clear();
             out_priority_ = 0;
             out_size_ = 0;
+
+            send_data_.bytes_ = 0;
             send_data_.timer_ = 0;
+            send_data_.num_parcels_ = 0;
 
             // Check if connection still fits in cache
             connection_cache_.add(there_, shared_from_this());
-            // Call postprocessing handler, which will send remaining pending parcels
+
+            // Call post-processing handler, which will send remaining pending parcels
             boost::get<1>(handler)(there_);
         }
 
     private:
         /// Socket for the parcelport_connection.
         boost::asio::ip::tcp::socket socket_;
+
+        /// holding on to number of parcels in the current message
+        std::size_t out_parcel_count_;
 
         /// buffer for outgoing data
         boost::integer::ulittle8_t out_priority_;

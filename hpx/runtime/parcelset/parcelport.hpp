@@ -178,7 +178,7 @@ namespace parcelset
             return parcels_sent_.size();
         }
 
-        /// number of messages received 
+        /// number of messages received
         boost::int64_t get_receive_count() const
         {
             return parcels_received_.size();
@@ -210,12 +210,17 @@ namespace parcelset
             return parcels_received_.total_bytes();
         }
 
+        void add_received_data(
+            performance_counters::parcels::data_point const& data)
+        {
+            parcels_received_.add_data(data);
+        }
+
     protected:
         // helper functions for receiving parcels
         void handle_accept(boost::system::error_code const& e,
             server::parcelport_connection_ptr);
-        void handle_read_completion(boost::system::error_code const& e,
-            server::parcelport_connection_ptr);
+        void handle_read_completion(boost::system::error_code const& e);
 
         /// send the parcel to the specified address
         void send_parcel(parcel const& p, naming::address const& addr,

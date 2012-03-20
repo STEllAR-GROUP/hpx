@@ -236,7 +236,7 @@ namespace hpx { namespace actions
             data.description = detail::get_action_name<derived_type>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
-            data.parent_prefix = this->parent_locality_;
+            data.parent_locality_id = this->parent_locality_;
             data.priority = this->priority_;
             return data;
         }
@@ -251,7 +251,7 @@ namespace hpx { namespace actions
             data.description = detail::get_action_name<derived_type>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
-            data.parent_prefix = this->parent_locality_;
+            data.parent_locality_id = this->parent_locality_;
             data.priority = this->priority_;
             return data;
         }
@@ -328,7 +328,7 @@ namespace hpx { namespace actions
             data.parent_id =
                 reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
-            data.parent_prefix = this->parent_locality_;
+            data.parent_locality_id = this->parent_locality_;
             data.priority = this->priority_;
             return data;
         }
@@ -344,7 +344,7 @@ namespace hpx { namespace actions
             data.parent_id =
                 reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
-            data.parent_prefix = this->parent_locality_;
+            data.parent_locality_id = this->parent_locality_;
             data.priority = this->priority_;
             return data;
         }
@@ -521,7 +521,7 @@ namespace hpx { namespace actions
             data.parent_id =
                 reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
-            data.parent_prefix = this->parent_locality_;
+            data.parent_locality_id = this->parent_locality_;
             data.priority = this->priority_;
             return data;
         }
@@ -537,7 +537,7 @@ namespace hpx { namespace actions
             data.parent_id =
                 reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
-            data.parent_prefix = this->parent_locality_;
+            data.parent_locality_id = this->parent_locality_;
             data.priority = this->priority_;
             return data;
         }
@@ -613,7 +613,7 @@ namespace hpx { namespace actions
             data.description = detail::get_action_name<derived_type>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
-            data.parent_prefix = this->parent_locality_;
+            data.parent_locality_id = this->parent_locality_;
             data.priority = this->priority_;
             return data;
         }
@@ -628,7 +628,7 @@ namespace hpx { namespace actions
             data.description = detail::get_action_name<derived_type>();
             data.parent_id = reinterpret_cast<threads::thread_id_type>(this->parent_id_);
             data.parent_phase = this->parent_phase_;
-            data.parent_prefix = this->parent_locality_;
+            data.parent_locality_id = this->parent_locality_;
             data.priority = this->priority_;
             return data;
         }

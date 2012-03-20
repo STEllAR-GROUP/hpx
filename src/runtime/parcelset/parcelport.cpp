@@ -159,25 +159,19 @@ namespace hpx { namespace parcelset
             // socket
             c->async_read(
                 boost::bind(&parcelport::handle_read_completion, this,
-                boost::asio::placeholders::error, c));
+                    boost::asio::placeholders::error));
         }
     }
 
     /// Handle completion of a read operation.
-    void parcelport::handle_read_completion(boost::system::error_code const& e,
-        server::parcelport_connection_ptr c)
+    void parcelport::handle_read_completion(boost::system::error_code const& e)
     {
         if (e && e != boost::asio::error::operation_aborted
               && e != boost::asio::error::eof)
         {
-            LPT_(error) << "handle read operation completion: error: "
-                        << e.message();
-        }
-        else {
-            // complete data point and push back
-            performance_counters::parcels::data_point& data = c->get_receive_data();
-            data.timer_ = timer_.elapsed_microseconds() - data.timer_;
-            parcels_received_.add_data(data);
+            LPT_(error)
+                << "handle read operation completion: error: "
+                << e.message();
         }
     }
 

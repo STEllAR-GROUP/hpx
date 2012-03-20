@@ -262,10 +262,10 @@ namespace hpx
         /// PX thread).
         HPX_API_EXPORT std::size_t get_parent_phase();
 
-        /// The function \a get_parent_prefix returns the id of the locality of
+        /// The function \a get_parent_locality_id returns the id of the locality of
         /// the currents thread parent (or zero if the current thread is not a
         /// PX thread).
-        HPX_API_EXPORT boost::uint32_t get_parent_prefix();
+        HPX_API_EXPORT boost::uint32_t get_parent_locality_id();
 
         /// The function \a get_self_component_id returns the lva of the
         /// component the current thread is acting on
@@ -312,11 +312,15 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     /// Add a function to be executed inside a HPX thread before hpx_main
+    /// but guaranteed before any startup function is executed (system-wide)
     typedef HPX_STD_FUNCTION<void()> startup_function_type;
+    HPX_API_EXPORT void register_pre_startup_function(startup_function_type const&);
+
+    /// Add a function to be executed inside a HPX thread before hpx_main
     HPX_API_EXPORT void register_startup_function(startup_function_type const&);
 
     /// Add a function to be executed inside a HPX thread during hpx::finalize
-    /// but guaranteed before any shutdown function (system-wide)
+    /// but guaranteed before any shutdown function is executed (system-wide)
     typedef HPX_STD_FUNCTION<void()> shutdown_function_type;
     HPX_API_EXPORT void register_pre_shutdown_function(shutdown_function_type const&);
 
@@ -567,7 +571,7 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of the locality this function is being called
     ///        from.
-    HPX_API_EXPORT boost::uint32_t get_locality_id();
+    HPX_API_EXPORT boost::uint32_t get_locality_id(error_code& ec = throws);
 }
 
 #endif

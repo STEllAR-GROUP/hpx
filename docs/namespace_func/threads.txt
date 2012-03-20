@@ -40,8 +40,7 @@ namespace hpx::threads
 
         std::size_t get_thread_phase() const
 
-        // I thought prefixes were gone?
-        boost::uint32_t get_parent_locality_prefix() const
+        boost::uint32_t get_parent_locality_id() const
 
         thread_id_type get_parent_thread_id() const
 

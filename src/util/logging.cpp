@@ -224,12 +224,12 @@ namespace hpx { namespace util
     {
         void operator()(param str) const
         {
-            boost::uint32_t parent_prefix = threads::get_parent_prefix();
-            if (0 != parent_prefix) {
+            boost::uint32_t parent_locality_id = threads::get_parent_locality_id();
+            if (0 != parent_locality_id) {
                 // called from inside a PX thread
                 std::stringstream out;
                 out << std::hex << std::setw(sizeof(boost::uint32_t)*2) << std::setfill('0')
-                    << parent_prefix;
+                    << parent_locality_id;
                 str.prepend_string(out.str());
             }
             else {

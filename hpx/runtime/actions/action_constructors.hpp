@@ -40,7 +40,7 @@
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     action(BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         : arguments_(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)),
-          parent_locality_(get_locality_id()),
+          parent_locality_(action::get_locality_id()),
           parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
           parent_phase_(threads::get_parent_phase()),
           priority_(detail::thread_priority<Priority>::call(Priority))
@@ -50,7 +50,7 @@
     action(threads::thread_priority priority,
               BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         : arguments_(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)),
-          parent_locality_(get_locality_id()),
+          parent_locality_(action::get_locality_id()),
           parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
           parent_phase_(threads::get_parent_phase()),
           priority_(detail::thread_priority<Priority>::call(priority))

@@ -13,50 +13,76 @@
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/parcelhandler_queue_base.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 
 #include <boost/assert.hpp>
-#include <boost/lockfree/fifo.hpp>
 
 namespace hpx { namespace parcelset { namespace policies
 {
     ///////////////////////////////////////////////////////////////////////////
     struct global_parcelhandler_queue : parcelhandler_queue_base
     {
-        global_parcelhandler_queue() :
-            ph_(0), queue_length(0)
+    private:
+        typedef lcos::local::spinlock mutex_type;
+        typedef std::map<naming::gid_type, parcel> parcel_map_type;
+
+    public:
+        global_parcelhandler_queue()
+          : ph_(0)
         {}
 
-        ~global_parcelhandler_queue()
+        ~global_parcelhandler_queue() {}
+
+        bool add_parcel(parcel const& p)
         {
-            parcel p;
-            while (get_parcel(p)) {}
-        }
+            naming::gid_type id(p.get_parcel_id());
+            naming::address addr(p.get_destination_addr());
 
-        void add_parcel(parcel const& p)
-        {
-            parcel* tmp = new parcel(p);
+            // Add parcel to queue.
+            {
+                mutex_type::scoped_lock l(mtx_);
+                std::pair<parcel_map_type::iterator, bool> ret =
+                    parcels_.insert(parcel_map_type::value_type(id, p));
 
-            // Add parcel to queue and increment queue length.
-            parcels_.enqueue(tmp);
-            ++queue_length;
-
-            naming::address addr(tmp->get_destination_addr());
+                if (!ret.second) {
+                    HPX_THROW_EXCEPTION(bad_parameter,
+                        "global_parcelhandler_queue::add_parcel",
+                        "Could not add received parcel to the parcelhandler "
+                        "queue");
+                    return false;
+                }
+            }
 
             // do some work (notify event handlers)
             BOOST_ASSERT(ph_ != 0);
-            notify_(*ph_, addr);
+            notify_(*ph_, id, addr);
+            return true;
         }
 
         bool get_parcel(parcel& p)
         {
-            parcel* tmp;
+            // Remove the first parcel from queue.
+            mutex_type::scoped_lock l(mtx_);
 
-            // Remove parcel from queue and decrement queue length.
-            if (parcels_.dequeue(tmp))
-            {
-                std::swap(p, *tmp);
-                delete tmp;
-                --queue_length;
+            if (!parcels_.empty()) {
+                parcel_map_type::iterator front = parcels_.begin();
+                p = (*front).second;
+                parcels_.erase(front);
+                return true;
+            }
+
+            return false;
+        }
+
+        bool get_parcel(parcel& p, naming::gid_type const& parcel_id)
+        {
+            // Remove the requested parcel from queue.
+            mutex_type::scoped_lock l(mtx_);
+
+            parcel_map_type::iterator it = parcels_.find(parcel_id);
+            if (it != parcels_.end()) {
+                p = (*it).second;
+                parcels_.erase(it);
                 return true;
             }
 
@@ -82,18 +108,18 @@ namespace hpx { namespace parcelset { namespace policies
 
         boost::int64_t get_queue_length() const
         {
-            return queue_length.load();
+            mutex_type::scoped_lock l(mtx_);
+            return parcels_.size();
         }
 
-      private:
-        boost::lockfree::fifo<parcel*> parcels_;
+    private:
+        mutable mutex_type mtx_;
+        parcel_map_type parcels_;
 
         parcelhandler* ph_;
 
-        boost::atomic<boost::int64_t> queue_length;
-
         boost::signals2::signal_type<
-            void(parcelhandler&, naming::address const&)
+            void(parcelhandler&, naming::gid_type, naming::address const&)
           , boost::signals2::keywords::mutex_type<lcos::local::mutex>
         >::type notify_;
     };

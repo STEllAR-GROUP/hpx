@@ -328,12 +328,3 @@ namespace hpx { namespace applier
     }
 }}
 
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx
-{
-    HPX_API_EXPORT boost::uint32_t get_locality_id()
-    {
-        return hpx::applier::get_locality_id();
-    }
-}
-

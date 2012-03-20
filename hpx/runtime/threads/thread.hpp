@@ -131,7 +131,7 @@ namespace hpx { namespace threads { namespace detail
             current_state_ex_(thread_state_ex(wait_signaled)),
             description_(init_data.description ? init_data.description : ""),
             lco_description_(""),
-            parent_locality_prefix_(init_data.parent_prefix),
+            parent_locality_id_(init_data.parent_locality_id),
             parent_thread_id_(init_data.parent_id),
             parent_thread_phase_(init_data.parent_phase),
             component_id_(init_data.lva),
@@ -152,8 +152,8 @@ namespace hpx { namespace threads { namespace detail
                     parent_thread_phase_ = self->get_thread_phase();
                 }
             }
-            if (0 == parent_locality_prefix_)
-                parent_locality_prefix_ = get_locality_id();
+            if (0 == parent_locality_id_)
+                parent_locality_id_ = get_locality_id();
         }
 
         /// This constructor is provided just for compatibility with the scheme
@@ -163,7 +163,7 @@ namespace hpx { namespace threads { namespace detail
         thread()
           : coroutine_(function_type(), 0), //coroutine_type::impl_type::create(function_type())),
             description_(""), lco_description_(""),
-            parent_locality_prefix_(0), parent_thread_id_(0),
+            parent_locality_id_(0), parent_thread_id_(0),
             parent_thread_phase_(0), component_id_(0), back_ptr_(0), pool_(0)
         {
             BOOST_ASSERT(false);    // shouldn't ever be called
@@ -289,9 +289,9 @@ namespace hpx { namespace threads { namespace detail
                 lco_description_.clear();
         }
 
-        boost::uint32_t get_parent_locality_prefix() const
+        boost::uint32_t get_parent_locality_id() const
         {
-            return parent_locality_prefix_;
+            return parent_locality_id_;
         }
         thread_id_type get_parent_thread_id() const
         {
@@ -370,7 +370,7 @@ namespace hpx { namespace threads { namespace detail
         std::string description_;
         std::string lco_description_;
 
-        boost::uint32_t parent_locality_prefix_;
+        boost::uint32_t parent_locality_id_;
         thread_id_type parent_thread_id_;
         std::size_t parent_thread_phase_;
         naming::address::address_type const component_id_;
@@ -492,10 +492,10 @@ namespace hpx { namespace threads
         }
 
         /// Return the locality of the parent thread
-        boost::uint32_t get_parent_locality_prefix() const
+        boost::uint32_t get_parent_locality_id() const
         {
             detail::thread const* t = get();
-            return t ? t->get_parent_locality_prefix() : 0;
+            return t ? t->get_parent_locality_id() : 0;
         }
 
         /// Return the thread id of the parent thread

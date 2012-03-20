@@ -27,7 +27,7 @@ namespace hpx { namespace parcelset
 {
     /// The \a parcelhandler is the representation of the parcelset inside a
     /// locality. It is built on top of a single parcelport. Several
-    /// parcelhandler's may be connected to a single parcelport.
+    /// parcel-handlers may be connected to a single parcelport.
     class HPX_EXPORT parcelhandler : boost::noncopyable
     {
     private:
@@ -36,10 +36,12 @@ namespace hpx { namespace parcelset
 
         void parcel_sink(parcelport& pp,
             boost::shared_ptr<std::vector<char> > const& parcel_data,
-            threads::thread_priority priority);
+            threads::thread_priority priority,
+            performance_counters::parcels::data_point& receive_data);
 
         threads::thread_state_enum decode_parcel(
-            boost::shared_ptr<std::vector<char> > const& parcel_data);
+            boost::shared_ptr<std::vector<char> > const& parcel_data,
+            performance_counters::parcels::data_point& receive_data);
 
         // make sure the parcel has been properly initialized
         void init_parcel(parcel& p)
@@ -208,6 +210,28 @@ namespace hpx { namespace parcelset
         bool get_parcel(parcel& p)
         {
             return parcels_->get_parcel(p);
+        }
+
+        /// The function \a get_parcel returns the next available parcel
+        ///
+        /// \param p        [out] The parcel instance to be filled with the
+        ///                 received parcel. If the functioned returns \a true
+        ///                 this will be the next received parcel.
+        /// \param parcel_id  [in] The id of the parcel to fetch
+        ///
+        /// \returns        Returns \a true if the parcel with the given id
+        ///                 has been retrieved successfully. The reference
+        ///                 given by parameter \a p will be initialized with
+        ///                 the received parcel data.
+        ///                 Return \a false if no parcel is available in the
+        ///                 parcelhandler, the reference \a p is not touched.
+        ///
+        /// The returned parcel will be no longer available from the
+        /// parcelhandler as it is removed from the internal queue of received
+        /// parcels.
+        bool get_parcel(parcel& p, naming::gid_type const& parcel_id)
+        {
+            return parcels_->get_parcel(p, parcel_id);
         }
 
         /// Register an event handler to be called whenever a parcel has been

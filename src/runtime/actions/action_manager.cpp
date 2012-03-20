@@ -24,10 +24,11 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     // Call-back function for parcelHandler to call when new parcels are received
     void action_manager::fetch_parcel(
-        parcelset::parcelhandler& parcel_handler, naming::address const& dest)
+        parcelset::parcelhandler& parcel_handler,
+        naming::gid_type const& parcel_id, naming::address const& dest)
     {
         parcelset::parcel p;
-        if (parcel_handler.get_parcel(p))  // if new parcel is found
+        if (parcel_handler.get_parcel(p, parcel_id))
         {
             while (threads::threadmanager_is(starting))
             {
@@ -114,10 +115,9 @@ namespace hpx { namespace actions
     // Invoked by the Thread Manager when it is running out of work-items
     // and needs something to execute on a specific starving resources
     // specified as the argument
-    void action_manager::fetch_parcel (naming::id_type const& resourceID)
-    {
-
-    }
+//     void action_manager::fetch_parcel (naming::id_type const& resourceID)
+//     {
+//     }
 
 ///////////////////////////////////////////////////////////////////////////////
 }}

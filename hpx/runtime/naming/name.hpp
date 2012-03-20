@@ -237,11 +237,11 @@ namespace hpx { namespace naming
 
     ///////////////////////////////////////////////////////////////////////////
     //  Handle conversion to/from locality_id
-    inline gid_type get_gid_from_locality_id(boost::uint32_t prefix) HPX_SUPER_PURE;
+    inline gid_type get_gid_from_locality_id(boost::uint32_t locality_id) HPX_SUPER_PURE;
 
-    inline gid_type get_gid_from_locality_id(boost::uint32_t prefix)
+    inline gid_type get_gid_from_locality_id(boost::uint32_t locality_id)
     {
-        return gid_type(boost::uint64_t(prefix+1) << 32, 0);
+        return gid_type(boost::uint64_t(locality_id+1) << 32, 0);
     }
 
     inline boost::uint32_t get_locality_id_from_gid(gid_type const& id) HPX_PURE;
@@ -562,12 +562,12 @@ namespace hpx { namespace naming
     }
 
     ///////////////////////////////////////////////////////////////////////
-    //  Handle conversion to/from prefix
-    inline id_type get_id_from_locality_id(boost::uint32_t prefix) HPX_SUPER_PURE;
+    //  Handle conversion to/from locality_id
+    inline id_type get_id_from_locality_id(boost::uint32_t locality_id) HPX_SUPER_PURE;
 
-    inline id_type get_id_from_locality_id(boost::uint32_t prefix)
+    inline id_type get_id_from_locality_id(boost::uint32_t locality_id)
     {
-        return id_type(boost::uint64_t(prefix+1) << 32, 0, id_type::unmanaged);
+        return id_type(boost::uint64_t(locality_id+1) << 32, 0, id_type::unmanaged);
     }
 
     inline boost::uint32_t get_locality_id_from_id(id_type const& id) HPX_PURE;

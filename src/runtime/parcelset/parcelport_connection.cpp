@@ -75,6 +75,9 @@ namespace hpx { namespace parcelset
 
         out_priority_ = boost::integer::ulittle8_t(priority);
         out_size_ = out_buffer_.size();
+
+        send_data_.num_parcels_ = pv.size();
+        send_data_.bytes_ = out_buffer_.size();
     }
 }}
 

@@ -190,8 +190,8 @@ namespace hpx { namespace threads
                 data.parent_phase = self->get_thread_phase();
             }
         }
-        if (0 == data.parent_prefix)
-            data.parent_prefix = get_locality_id();
+        if (0 == data.parent_locality_id)
+            data.parent_locality_id = get_locality_id();
 
         // NOTE: This code overrides a request to schedule a thread on a scheduler
         // selected queue. The schedulers are written to select a queue to put
@@ -271,8 +271,8 @@ namespace hpx { namespace threads
                 data.parent_phase = self->get_thread_phase();
             }
         }
-        if (0 == data.parent_prefix)
-            data.parent_prefix = get_locality_id();
+        if (0 == data.parent_locality_id)
+            data.parent_locality_id = get_locality_id();
 
         // NOTE: This code overrides a request to schedule a thread on a scheduler
         // selected queue. The schedulers are written to select a queue to put

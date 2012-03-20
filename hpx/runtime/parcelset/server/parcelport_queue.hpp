@@ -9,6 +9,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
+#include <hpx/performance_counters/parcels/data_point.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset { namespace server
@@ -22,9 +23,11 @@ namespace hpx { namespace parcelset { namespace server
 
         /// add a new parcel to the end of the parcel queue
         void add_parcel(boost::shared_ptr<std::vector<char> > const& data,
-                        threads::thread_priority priority)
+            threads::thread_priority priority,
+            performance_counters::parcels::data_point& receive_data)
         {
-            notify_(parcel_port_, data, priority);      // do some work (notify event handlers)
+            // do some work (notify event handlers)
+            notify_(parcel_port_, data, priority, receive_data);
         }
 
         /// register event handler to be notified whenever a parcel arrives
@@ -38,7 +41,8 @@ namespace hpx { namespace parcelset { namespace server
         hpx::parcelset::parcelport& parcel_port_;
         typedef void callback_type(parcelport&,
             boost::shared_ptr<std::vector<char> > const&,
-            threads::thread_priority);
+            threads::thread_priority,
+            performance_counters::parcels::data_point& receive_data);
         HPX_STD_FUNCTION<callback_type> notify_;
     };
 

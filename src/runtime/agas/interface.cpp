@@ -298,5 +298,12 @@ naming::id_type get_console_locality(
 
     return naming::id_type(console, naming::id_type::unmanaged);
 }
+
+boost::uint32_t get_locality_id(error_code& ec)
+{
+    naming::gid_type l = naming::get_agas_client().local_locality(ec);
+    return naming::get_locality_id_from_gid(l);
+}
+
 }}
 

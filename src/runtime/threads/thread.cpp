@@ -152,11 +152,11 @@ namespace hpx { namespace threads
             reinterpret_cast<thread*>(self->get_thread_id())->get_parent_thread_phase() : 0;
     }
 
-    boost::uint32_t get_parent_prefix()
+    boost::uint32_t get_parent_locality_id()
     {
         thread_self* self = get_self_ptr();
         return (0 != self) ?
-            reinterpret_cast<thread*>(self->get_thread_id())->get_parent_locality_prefix() : 0;
+            reinterpret_cast<thread*>(self->get_thread_id())->get_parent_locality_id() : 0;
     }
 
     naming::address::address_type get_self_component_id()

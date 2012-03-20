@@ -126,10 +126,15 @@ namespace hpx { namespace parcelset { namespace server
                 boost::get<0>(handler)(e);
             }
             else {
+                // complete data point and pass it along
+                receive_data_.timer_ = 
+                    timer_.elapsed_microseconds() - receive_data_.timer_;
+
                 // add parcel data to incoming parcel queue
                 boost::integer::ulittle8_t::value_type priority = in_priority_;
                 parcels_.add_parcel(in_buffer_,
-                    static_cast<threads::thread_priority>(priority));
+                    static_cast<threads::thread_priority>(priority),
+                    receive_data_);
 
                 // Inform caller that data has been received ok.
                 boost::get<0>(handler)(e);

@@ -98,6 +98,9 @@ inline bool is_local_address(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+HPX_API_EXPORT boost::uint32_t get_locality_id(error_code& ec = throws);
+
+///////////////////////////////////////////////////////////////////////////////
 HPX_EXPORT bool is_local_address_cached(
     naming::gid_type const& gid
   , error_code& ec = throws

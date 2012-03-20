@@ -50,7 +50,7 @@ namespace hpx { namespace performance_counters { namespace parcels
 
         overall_bytes_ += x.bytes_;
         overall_time_ += x.timer_;
-        ++gatherer_size_;
+        gatherer_size_ += x.num_parcels_;
     }
 
     inline boost::int64_t gatherer::size() const

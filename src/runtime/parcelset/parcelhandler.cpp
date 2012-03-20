@@ -73,7 +73,8 @@ namespace hpx { namespace parcelset
 
     void parcelhandler::parcel_sink(parcelport& pp,
         boost::shared_ptr<std::vector<char> > const& parcel_data,
-        threads::thread_priority priority)
+        threads::thread_priority priority,
+        performance_counters::parcels::data_point& receive_data)
     {
         // wait for thread-manager to become active
         while (tm_->status() & starting)
@@ -92,14 +93,16 @@ namespace hpx { namespace parcelset
         {
             // create a new thread which decodes and handles the parcel
             threads::thread_init_data data(
-                boost::bind(&parcelhandler::decode_parcel, this, parcel_data),
+                boost::bind(&parcelhandler::decode_parcel, this,
+                    parcel_data, boost::ref(receive_data)),
                 "decode_parcel", 0, priority);
             tm_->register_thread(data);
         }
     }
 
     threads::thread_state_enum parcelhandler::decode_parcel(
-        boost::shared_ptr<std::vector<char> > const& parcel_data)
+        boost::shared_ptr<std::vector<char> > const& parcel_data,
+        performance_counters::parcels::data_point& receive_data)
     {
         // protect from unhandled exceptions bubbling up into thread manager
         try {
@@ -120,6 +123,10 @@ namespace hpx { namespace parcelset
                     archive >> p;
                     parcels_->add_parcel(p);
                 }
+
+                // complete received data with parcel count
+                receive_data.num_parcels_ = parcel_count;
+                pp_.add_received_data(receive_data);
             }
             catch (std::exception const& e) {
                 // We have to repackage all exceptions thrown by the
@@ -174,7 +181,7 @@ namespace hpx { namespace parcelset
 
         // register our callback function with the parcelport
         pp_.register_event_handler(
-            boost::bind(&parcelhandler::parcel_sink, this, _1, _2, _3));
+            boost::bind(&parcelhandler::parcel_sink, this, _1, _2, _3, _4));
     }
 
     naming::resolver_client& parcelhandler::get_resolver()
@@ -227,6 +234,9 @@ namespace hpx { namespace parcelset
             else
                 p.set_destination_addr(addr);
         }
+
+        if (!p.get_parcel_id())
+            p.set_parcel_id(parcel::generate_unique_id());
 
         pp_.put_parcel(p, f);
     }

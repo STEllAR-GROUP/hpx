@@ -775,21 +775,27 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void register_startup_function(HPX_STD_FUNCTION<void()> const& f)
+    void register_startup_function(startup_function_type const& f)
     {
         get_runtime().add_startup_function(f);
     }
 
-    void register_pre_shutdown_function(HPX_STD_FUNCTION<void()> const& f)
+    void register_pre_startup_function(startup_function_type const& f)
+    {
+        get_runtime().add_pre_startup_function(f);
+    }
+
+    void register_pre_shutdown_function(shutdown_function_type const& f)
     {
         get_runtime().add_pre_shutdown_function(f);
     }
 
-    void register_shutdown_function(HPX_STD_FUNCTION<void()> const& f)
+    void register_shutdown_function(shutdown_function_type const& f)
     {
         get_runtime().add_shutdown_function(f);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT components::server::runtime_support* get_runtime_support_ptr()
     {
         return reinterpret_cast<components::server::runtime_support*>(
@@ -830,6 +836,15 @@ namespace hpx { namespace threads
         return hpx::applier::get_applier().get_thread_manager();
     }
 }}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx
+{
+    boost::uint32_t get_locality_id(error_code& ec)
+    {
+        return agas::get_locality_id(ec);
+    }
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 /// explicit template instantiation for the thread manager of our choice

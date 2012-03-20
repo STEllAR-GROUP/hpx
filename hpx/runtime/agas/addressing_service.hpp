@@ -247,9 +247,13 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         state_.store(new_state);
     }
 
-    naming::gid_type const& local_locality() const
+    naming::gid_type const& local_locality(error_code& ec = throws) const
     {
-        BOOST_ASSERT(locality_ != naming::invalid_gid);
+        if (locality_ == naming::invalid_gid) {
+            HPX_THROWS_IF(ec, invalid_status,
+                "addressing_service::local_locality",
+                "local locality has not been initialized (yet)");
+        }
         return locality_;
     }
 

@@ -17,7 +17,7 @@ namespace hpx { namespace threads
     struct thread_init_data
     {
         thread_init_data()
-          : description(0), lva(0), parent_prefix(0), parent_id(0),
+          : description(0), lva(0), parent_locality_id(0), parent_id(0),
             parent_phase(0), priority(thread_priority_normal),
             num_os_thread(std::size_t(-1))
         {}
@@ -25,7 +25,7 @@ namespace hpx { namespace threads
         thread_init_data(BOOST_RV_REF(thread_init_data) rhs)
           : func(boost::move(rhs.func)),
             description(rhs.description), lva(rhs.lva),
-            parent_prefix(rhs.parent_prefix), parent_id(rhs.parent_id),
+            parent_locality_id(rhs.parent_locality_id), parent_id(rhs.parent_id),
             parent_phase(rhs.parent_phase), priority(rhs.priority),
             num_os_thread(rhs.num_os_thread)
         {}
@@ -36,14 +36,14 @@ namespace hpx { namespace threads
                 thread_priority priority = thread_priority_normal,
                 std::size_t os_thread = std::size_t(-1))
           : func(boost::forward<F>(f)), description(desc),
-            lva(lva), parent_prefix(0), parent_id(0), parent_phase(0),
+            lva(lva), parent_locality_id(0), parent_id(0), parent_phase(0),
             priority(priority), num_os_thread(os_thread)
         {}
 
         HPX_STD_FUNCTION<threads::thread_function_type> func;
         char const* description;
         naming::address::address_type lva;
-        boost::uint32_t parent_prefix;
+        boost::uint32_t parent_locality_id;
         threads::thread_id_type parent_id;
         std::size_t parent_phase;
         thread_priority priority;
