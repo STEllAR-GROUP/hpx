@@ -275,7 +275,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         }
         {
           std::vector<hpx::lcos::future<void> > resolve_conflict_phase;
-          for (std::size_t i=0;i<num_pe;i++) {
+          for (std::size_t i=0;i<number_partitions;i++) {
             resolve_conflict_phase.push_back(points[i].resolve_conflict_async());
           }
           hpx::lcos::wait(resolve_conflict_phase);
