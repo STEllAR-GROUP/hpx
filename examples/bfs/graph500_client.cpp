@@ -266,7 +266,6 @@ int hpx_main(boost::program_options::variables_map &vm)
         kernel2_time.resize(bfs_roots.size());
 
         hpx::util::high_resolution_timer kernel2time;
-#if 0
         {
           std::vector<hpx::lcos::future<void> > bfs_phase;
           for (std::size_t i=0;i<num_pe;i++) {
@@ -281,7 +280,6 @@ int hpx_main(boost::program_options::variables_map &vm)
           }
           hpx::lcos::wait(resolve_conflict_phase);
         }
-#endif
 
         double k2time = kernel2time.elapsed();
 
@@ -421,7 +419,7 @@ int main(int argc, char* argv[])
             "overlap factor for additive Schwarz")
         ("schwarzdomains", value<std::size_t>()->default_value(30),
             "number of additive Schwarz domains")
-        ("hasedgeroot", value<bool>()->default_value(false),
+        ("hasedgeroot", value<bool>()->default_value(true),
             "determine the resolve conflict communication from the root node");
 
     return hpx::init(desc_commandline, argc, argv); // Initialize and run HPX.
