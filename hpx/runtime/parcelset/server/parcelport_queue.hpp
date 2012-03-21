@@ -22,9 +22,9 @@ namespace hpx { namespace parcelset { namespace server
         {}
 
         /// add a new parcel to the end of the parcel queue
-        void add_parcel(boost::shared_ptr<std::vector<char> > const& data,
+        void add_parcel(boost::shared_ptr<std::vector<char> > data,
             threads::thread_priority priority,
-            performance_counters::parcels::data_point& receive_data)
+            performance_counters::parcels::data_point const& receive_data)
         {
             // do some work (notify event handlers)
             notify_(parcel_port_, data, priority, receive_data);
@@ -40,9 +40,8 @@ namespace hpx { namespace parcelset { namespace server
     private:
         hpx::parcelset::parcelport& parcel_port_;
         typedef void callback_type(parcelport&,
-            boost::shared_ptr<std::vector<char> > const&,
-            threads::thread_priority,
-            performance_counters::parcels::data_point& receive_data);
+            boost::shared_ptr<std::vector<char> >, threads::thread_priority,
+            performance_counters::parcels::data_point const&);
         HPX_STD_FUNCTION<callback_type> notify_;
     };
 

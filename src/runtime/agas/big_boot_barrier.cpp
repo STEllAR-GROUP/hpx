@@ -59,14 +59,11 @@ typedef components::detail::heap_factory<
 
 // TODO: Make assertions exceptions
 void early_parcel_sink(
-    parcelset::parcelport&
-  , boost::shared_ptr<std::vector<char> > const& parcel_data
+    boost::shared_ptr<std::vector<char> > parcel_data
     )
 { // {{{
-    parcelset::parcel p;
-
     typedef util::container_device<std::vector<char> > io_device_type;
-    boost::iostreams::stream<io_device_type> io (*parcel_data.get());
+    boost::iostreams::stream<io_device_type> io (*parcel_data);
 
     // De-serialize the parcel data
     util::portable_binary_iarchive archive(io);
@@ -75,6 +72,7 @@ void early_parcel_sink(
     archive >> count;
     while(count-- != 0)
     {
+        parcelset::parcel p;
         archive >> p;
 
         // decode the action-type in the parcel
@@ -596,7 +594,7 @@ big_boot_barrier::big_boot_barrier(
                : 0)
              : 1)
 {
-    pp_.register_event_handler(boost::bind(&early_parcel_sink, _1, _2));
+    pp_.register_event_handler(boost::bind(&early_parcel_sink, _2));
 }
 
 void big_boot_barrier::apply(

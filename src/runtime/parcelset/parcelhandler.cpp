@@ -109,7 +109,7 @@ namespace hpx { namespace parcelset
             try {
                 // create a special io stream on top of in_buffer_
                 typedef util::container_device<std::vector<char> > io_device_type;
-                boost::iostreams::stream<io_device_type> io(*parcel_data.get());
+                boost::iostreams::stream<io_device_type> io(*parcel_data);
 
                 // De-serialize the parcel data
                 hpx::util::portable_binary_iarchive archive(io);
