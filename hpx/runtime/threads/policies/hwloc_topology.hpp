@@ -150,8 +150,10 @@ struct topology
             hwloc_bitmap_set_ith_ulong(cpuset, 0, mask & 0xFFFFFFFF);
             hwloc_bitmap_set_ith_ulong(cpuset, 1, (mask >> 32) & 0xFFFFFFFF);
 
+#if defined(DEBUG)
             char buf[1024];
             hwloc_bitmap_snprintf(buf, 1024, cpuset);
+#endif
 
             if (hwloc_set_cpubind(topology, cpuset,
                   HWLOC_CPUBIND_STRICT | HWLOC_CPUBIND_THREAD))

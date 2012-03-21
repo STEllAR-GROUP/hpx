@@ -35,13 +35,13 @@ namespace hpx { namespace parcelset
             std::size_t size) {}
 
         void parcel_sink(parcelport& pp,
-            boost::shared_ptr<std::vector<char> > const& parcel_data,
+            boost::shared_ptr<std::vector<char> > parcel_data,
             threads::thread_priority priority,
-            performance_counters::parcels::data_point& receive_data);
+            performance_counters::parcels::data_point const& receive_data);
 
         threads::thread_state_enum decode_parcel(
-            boost::shared_ptr<std::vector<char> > const& parcel_data,
-            performance_counters::parcels::data_point& receive_data);
+            boost::shared_ptr<std::vector<char> > parcel_data,
+            performance_counters::parcels::data_point receive_data);
 
         // make sure the parcel has been properly initialized
         void init_parcel(parcel& p)

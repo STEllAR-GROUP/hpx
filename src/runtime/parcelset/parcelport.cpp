@@ -91,9 +91,7 @@ namespace hpx { namespace parcelset
             try {
                 server::parcelport_connection_ptr conn(
                     new server::parcelport_connection(
-                        io_service_pool_.get_io_service(), parcels_,
-                        timer_, parcels_received_)
-                );
+                        io_service_pool_.get_io_service(), parcels_, timer_));
 
                 tcp::endpoint ep = *it;
                 acceptor_->open(ep.protocol());
@@ -149,8 +147,8 @@ namespace hpx { namespace parcelset
 
             // create new connection waiting for next incoming parcel
             conn.reset(new server::parcelport_connection(
-                io_service_pool_.get_io_service(), parcels_,
-                timer_, parcels_received_));
+                io_service_pool_.get_io_service(), parcels_, timer_));
+
             acceptor_->async_accept(conn->socket(),
                 boost::bind(&parcelport::handle_accept, this,
                     boost::asio::placeholders::error, conn));
@@ -184,7 +182,8 @@ namespace hpx { namespace parcelset
         const boost::uint32_t locality_id =
             naming::get_locality_id_from_gid(p.get_destination());
 
-        parcelport_connection_ptr client_connection(connection_cache_.get(locality_id));
+        parcelport_connection_ptr client_connection(
+            connection_cache_.get(locality_id));
 
         // enqueue the incoming parcel ...
         {
@@ -275,8 +274,8 @@ namespace hpx { namespace parcelset
 
     void parcelport::send_pending_parcels_trampoline(boost::uint32_t locality_id)
     {
-        parcelport_connection_ptr client_connection =
-            connection_cache_.get(locality_id);
+        parcelport_connection_ptr client_connection(
+            connection_cache_.get(locality_id));
 
         // If another thread was faster ... try again
         if (!client_connection)

@@ -72,9 +72,9 @@ namespace hpx { namespace parcelset
     }
 
     void parcelhandler::parcel_sink(parcelport& pp,
-        boost::shared_ptr<std::vector<char> > const& parcel_data,
+        boost::shared_ptr<std::vector<char> > parcel_data,
         threads::thread_priority priority,
-        performance_counters::parcels::data_point& receive_data)
+        performance_counters::parcels::data_point const& receive_data)
     {
         // wait for thread-manager to become active
         while (tm_->status() & starting)
@@ -94,15 +94,15 @@ namespace hpx { namespace parcelset
             // create a new thread which decodes and handles the parcel
             threads::thread_init_data data(
                 boost::bind(&parcelhandler::decode_parcel, this,
-                    parcel_data, boost::ref(receive_data)),
+                    parcel_data, receive_data),
                 "decode_parcel", 0, priority);
             tm_->register_thread(data);
         }
     }
 
     threads::thread_state_enum parcelhandler::decode_parcel(
-        boost::shared_ptr<std::vector<char> > const& parcel_data,
-        performance_counters::parcels::data_point& receive_data)
+        boost::shared_ptr<std::vector<char> > parcel_data,
+        performance_counters::parcels::data_point receive_data)
     {
         // protect from unhandled exceptions bubbling up into thread manager
         try {
@@ -116,7 +116,9 @@ namespace hpx { namespace parcelset
 
                 std::size_t parcel_count = 0;
                 archive >> parcel_count;
-                while(parcel_count-- != 0)
+
+                std::size_t count = parcel_count;
+                while(count-- != 0)
                 {
                     // de-serialize parcel and add it to incoming parcel queue
                     parcel p;

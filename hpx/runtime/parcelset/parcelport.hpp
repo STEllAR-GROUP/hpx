@@ -65,7 +65,7 @@ namespace parcelset
         > write_handler_type;
 
         typedef HPX_STD_FUNCTION<
-            void(parcelport& pp, boost::shared_ptr<std::vector<char> > const&,
+            void(parcelport& pp, boost::shared_ptr<std::vector<char> >,
                  threads::thread_priority)
         > read_handler_type;
 
@@ -229,7 +229,8 @@ namespace parcelset
 
         /// helper function to send remaining pending parcels
         void send_pending_parcels_trampoline(boost::uint32_t prefix);
-        void send_pending_parcels(parcelport_connection_ptr client_connection, std::vector<parcel> const & parcels, std::vector<write_handler_type> const &);
+        void send_pending_parcels(parcelport_connection_ptr client_connection,
+            std::vector<parcel> const&, std::vector<write_handler_type> const&);
 
     private:
         /// The site current range of ids to be used for id_type instances

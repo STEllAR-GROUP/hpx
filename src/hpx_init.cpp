@@ -492,7 +492,7 @@ namespace hpx
 
             std::size_t pu_offset = 0;
             std::size_t pu_step = 1;
-#if defined(HPX_HAVE_HWLOC)
+#if defined(HPX_HAVE_HWLOC) || defined(BOOST_WINDOWS)
             if (vm.count("hpx:pu-offset")) {
                 pu_offset = vm["hpx:pu-offset"].as<std::size_t>();
                 if (pu_offset >= hpx::threads::hardware_concurrency()) {
