@@ -232,7 +232,7 @@ int hpx_main(variables_map& vm)
                 move_object_void<
                     pass_movable_object_void_action, movable_object
                 >()
-            ), 0u);
+            ), 1u);
 
             /* TODO: Make this compile
             HPX_TEST_EQ((
@@ -284,7 +284,7 @@ int hpx_main(variables_map& vm)
         // test for movable object ('normal' actions)
         HPX_TEST_EQ((
             move_object<pass_movable_object_action, movable_object>(id)
-        ), is_local ? 0u : 1u);
+        ), is_local ? 1u : 1u);
 
         /* TODO: Make this compile
         // test for movable object (direct actions)
@@ -323,7 +323,7 @@ int hpx_main(variables_map& vm)
             return_object<
                 return_non_movable_object_action, non_movable_object
             >(id)
-        ), is_local ? 2u : 8u);
+        ), is_local ? 2u : 7u);
 
         /* TODO: Make this compile
         HPX_TEST_EQ((

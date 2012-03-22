@@ -448,13 +448,13 @@ int hpx_main(variables_map& vm)
             return_object<
                 return_non_movable_object_action, non_movable_object
             >(id)
-        ), is_local ? 3u : 7u);
+        ), is_local ? 3u : 6u);
 
         HPX_TEST_EQ((
             return_object<
                 return_non_movable_object_direct_action, non_movable_object
             >(id)
-        ), is_local ? 2u : 7u);
+        ), is_local ? 2u : 6u);
             
         HPX_TEST_EQ((
             return_move_object<
@@ -472,13 +472,13 @@ int hpx_main(variables_map& vm)
             return_move_object<
                 return_non_movable_object_action, non_movable_object
             >(id)
-        ), is_local ? 3u : 7u);
+        ), is_local ? 3u : 6u);
 
         HPX_TEST_EQ((
             return_move_object<
                 return_non_movable_object_direct_action, non_movable_object
             >(id)
-        ), is_local ? 2u : 7u);
+        ), is_local ? 2u : 6u);
     }
 
     finalize();

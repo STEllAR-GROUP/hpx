@@ -153,13 +153,13 @@ int hpx_main(boost::program_options::variables_map& vm)
             return_object<
                 action_move_semantics::return_test_non_movable_action, non_movable_object
             >(id)
-        ), is_local ? 3u : 7u);
+        ), is_local ? 3u : 6u);
 
         HPX_TEST_EQ((
             return_object<
                 action_move_semantics::return_test_non_movable_direct_action, non_movable_object
             >(id)
-        ), is_local ? 2u : 7u);
+        ), is_local ? 2u : 6u);
     }
 
     hpx::finalize();

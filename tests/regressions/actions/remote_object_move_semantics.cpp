@@ -71,7 +71,7 @@ struct movable_functor
         return *this;
     }
 
-    result_type operator()(foo&)
+    result_type operator()(foo&) const
     {
         return obj.get_count();
     }
@@ -107,7 +107,7 @@ struct non_movable_functor
         return *this;
     }
 
-    result_type operator()(foo&)
+    result_type operator()(foo&) const
     {
         return obj.get_count();
     }
@@ -126,23 +126,24 @@ int hpx_main(variables_map& vm)
 
     BOOST_FOREACH(id_type id, localities)
     {
+        bool is_local = (id == hpx::find_here()) ? true : false;
         {
             object<foo> f = new_<foo>(id).get();
 
             HPX_TEST_EQ((f <= movable_functor<movable_object>()).get(), 0u);
-            HPX_TEST_EQ((f <= movable_functor<non_movable_object>()).get(), 2u);
+            HPX_TEST_EQ((f <= movable_functor<non_movable_object>()).get(), is_local ? 4u: 5u);
 
-            HPX_TEST_EQ((f <= non_movable_functor<movable_object>()).get(), 2u);
-            HPX_TEST_EQ((f <= non_movable_functor<non_movable_object>()).get(), 2u);
+            HPX_TEST_EQ((f <= non_movable_functor<movable_object>()).get(), is_local ? 4u: 5u);
+            HPX_TEST_EQ((f <= non_movable_functor<non_movable_object>()).get(), is_local ? 4u: 5u);
         }
         {
             dataflow_object<foo> f(new_<foo>(id).get());
 
-            HPX_TEST_EQ(f.apply(movable_functor<movable_object>()).get_future().get(), 0u);
-            HPX_TEST_EQ(f.apply(movable_functor<non_movable_object>()).get_future().get(), 2u);
+            HPX_TEST_EQ(f.apply(movable_functor<movable_object>()).get_future().get(), 1u);
+            HPX_TEST_EQ(f.apply(movable_functor<non_movable_object>()).get_future().get(), 4u);
 
-            HPX_TEST_EQ(f.apply(non_movable_functor<movable_object>()).get_future().get(), 2u);
-            HPX_TEST_EQ(f.apply(non_movable_functor<non_movable_object>()).get_future().get(), 2u);
+            HPX_TEST_EQ(f.apply(non_movable_functor<movable_object>()).get_future().get(), 4u);
+            HPX_TEST_EQ(f.apply(non_movable_functor<non_movable_object>()).get_future().get(), 4u);
         }
     }
 
