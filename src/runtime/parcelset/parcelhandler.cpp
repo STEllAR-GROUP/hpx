@@ -116,9 +116,7 @@ namespace hpx { namespace parcelset
 
                 std::size_t parcel_count = 0;
                 archive >> parcel_count;
-
-                std::size_t count = parcel_count;
-                while(count-- != 0)
+                for(std::size_t i = 0; i < parcel_count; ++i)
                 {
                     // de-serialize parcel and add it to incoming parcel queue
                     parcel p;

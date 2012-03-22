@@ -68,9 +68,9 @@ void early_parcel_sink(
     // De-serialize the parcel data
     util::portable_binary_iarchive archive(io);
 
-    std::size_t count = 0;
-    archive >> count;
-    while(count-- != 0)
+    std::size_t parcel_count = 0;
+    archive >> parcel_count;
+    for(std::size_t i = 0; i < parcel_count; ++i)
     {
         parcelset::parcel p;
         archive >> p;
