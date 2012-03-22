@@ -58,13 +58,19 @@ namespace hpx { namespace components
                 return f(*reinterpret_cast<T *>(*p));
             }
 
+            template <typename A>
+            result_type operator()(void ** p, BOOST_FWD_REF(A) a) const
+            {
+                return f(*reinterpret_cast<T *>(*p), boost::forward<A>(a));
+            }
+
             template <typename Archive>
             void serialize(Archive & ar, unsigned)
             {
                 ar & f;
             }
 
-            hpx::util::function<result_type(T &)> f;
+            F f;
 
             private:
                 BOOST_COPYABLE_AND_MOVABLE(invoke_apply_fun);

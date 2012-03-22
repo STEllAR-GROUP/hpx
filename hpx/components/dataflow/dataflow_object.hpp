@@ -11,6 +11,21 @@
 
 namespace hpx { namespace components
 {
+    namespace detail
+    {
+        template <typename T, typename Enable = typename hpx::traits::is_dataflow<T>::type>
+        struct dataflow_result
+        {
+            typedef T type;
+        };
+
+        template <typename T>
+        struct dataflow_result<T, boost::mpl::true_>
+        {
+            typedef typename T::result_type type;
+        };
+    }
+
     template <typename T>
     struct dataflow_object
     {
@@ -41,42 +56,90 @@ namespace hpx { namespace components
 
         template <typename F>
         lcos::dataflow_base<
-            typename boost::result_of<typename hpx::util::detail::remove_reference<F>::type(T &)>::type
+            typename boost::result_of<typename boost::remove_const<typename hpx::util::detail::remove_reference<F>::type>::type(T &)>::type
         >
         apply(BOOST_FWD_REF(F) f) const
         {
             typedef
-                typename boost::result_of<F(T &)>::type
-                result_type;
-
-            typedef
-                server::remote_object_apply_action<result_type>
+                server::remote_object_apply_action1<
+                    remote_object::invoke_apply_fun<
+                        T
+                      , typename boost::remove_const<typename hpx::util::detail::remove_reference<F>::type>::type
+                    >
+                >
                 apply_action;
 
             return lcos::dataflow<apply_action>(gid_
                   , boost::move(remote_object::invoke_apply_fun<T, F>(boost::forward<F>(f)))
-                  , 0
                 );
         }
 
         template <typename F, typename D>
         lcos::dataflow_base<
-            typename boost::result_of<typename hpx::util::detail::remove_reference<F>::type(T &)>::type
+            typename boost::result_of<typename boost::remove_const<typename hpx::util::detail::remove_reference<F>::type>::type(T &)>::type
         >
         apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(D) d) const
         {
             typedef
-                typename boost::result_of<typename hpx::util::detail::remove_reference<F>::type(T &)>::type
-                result_type;
-
-            typedef
-                server::remote_object_apply_action<result_type>
+                server::remote_object_apply_action1<
+                    remote_object::invoke_apply_fun<
+                        T
+                      , typename boost::remove_const<typename hpx::util::detail::remove_reference<F>::type>::type
+                    >
+                >
                 apply_action;
+
 
             return lcos::dataflow<apply_action>(gid_
                   , boost::move(remote_object::invoke_apply_fun<T, F>(boost::forward<F>(f)))
-                  , 0
-                  , d
+                  , boost::forward<D>(d)
+                );
+        }
+
+        template <typename F, typename A>
+        lcos::dataflow_base<
+            typename boost::result_of<typename boost::remove_const<typename hpx::util::detail::remove_reference<F>::type>::type(T &, A)>::type
+        >
+        apply2(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A) a) const
+        {
+            typedef
+                server::remote_object_apply_action2<
+                    remote_object::invoke_apply_fun<
+                        T
+                      , typename boost::remove_const<typename hpx::util::detail::remove_reference<F>::type>::type
+                    >
+                  , typename detail::dataflow_result<A>::type
+                >
+                apply_action;
+
+
+            return lcos::dataflow<apply_action>(gid_
+                  , boost::move(remote_object::invoke_apply_fun<T, F>(boost::forward<F>(f)))
+                  , boost::forward<A>(a)
+                );
+        }
+
+        template <typename F, typename A0, typename A1>
+        lcos::dataflow_base<
+            typename boost::result_of<typename boost::remove_const<typename hpx::util::detail::remove_reference<F>::type>::type(T &)>::type
+        >
+        apply3(BOOST_FWD_REF(F) f, A0 const & a0, A1 const & a1) const
+        {
+            typedef
+                server::remote_object_apply_action2<
+                    remote_object::invoke_apply_fun<
+                        T
+                      , typename boost::remove_const<typename hpx::util::detail::remove_reference<F>::type>::type
+                    >
+                  , typename detail::dataflow_result<A0>::type
+                >
+                apply_action;
+
+
+            return lcos::dataflow<apply_action>(gid_
+                  , boost::move(remote_object::invoke_apply_fun<T, F>(boost::forward<F>(f)))
+                  , a0
+                  , a1
                 );
         }
 

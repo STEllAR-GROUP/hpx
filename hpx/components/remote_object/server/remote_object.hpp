@@ -40,17 +40,18 @@ namespace hpx { namespace components { namespace server
           , remote_object_set_dtor = 2
         };
 
-        template <typename R>
-        R apply(hpx::util::function<R(void**)> const & f, std::size_t count);
+        template <typename F>
+        typename F::result_type apply1(F const & f);
+        template <typename F, typename A>
+        typename F::result_type apply2(F const & f, A const & a);
 
-        void set_dtor(hpx::util::function<void(void**)> const & dtor, std::size_t count);
+        void set_dtor(hpx::util::function<void(void**)> const & dtor);
 
         typedef
-            hpx::actions::action2<
+            hpx::actions::action1<
                 remote_object
               , remote_object_set_dtor
               , hpx::util::function<void(void**)> const &
-              , std::size_t
               , &remote_object::set_dtor
             >
             set_dtor_action;
@@ -59,57 +60,61 @@ namespace hpx { namespace components { namespace server
         hpx::util::function<void(void**)> dtor;
     };
 
-    template <typename R>
-    R remote_object::apply(hpx::util::function<R(void**)> const & f, std::size_t)
+    template <typename F>
+    typename F::result_type remote_object::apply1(F const & f)
     {
         return f(&object);
     }
+    
+    template <typename F, typename A>
+    typename F::result_type remote_object::apply2(F const & f, A const & a)
+    {
+        return f(&object, a);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename R>
-    struct remote_object_apply_action
-      : hpx::actions::result_action2<
+    template <typename F>
+    struct remote_object_apply_action1
+      : hpx::actions::result_action1<
             remote_object
-          , R
+          , typename F::result_type
           , remote_object::remote_object_apply
-          , hpx::util::function<R(void**)> const &
-          , std::size_t
-          , &remote_object::apply<R>
+          , F const &
+          , &remote_object::apply1<F>
           , hpx::threads::thread_priority_default
-          , remote_object_apply_action<R>
+          , remote_object_apply_action1<F>
         >
     {
     private:
-        typedef hpx::actions::result_action2<
+        typedef hpx::actions::result_action1<
                 remote_object
-              , R
+              , typename F::result_type
               , remote_object::remote_object_apply
-              , hpx::util::function<R(void**)> const &
-              , std::size_t
-              , &remote_object::apply<R>
+              , F const &
+              , &remote_object::apply1<F>
               , hpx::threads::thread_priority_default
-              , remote_object_apply_action<R>
+              , remote_object_apply_action1<F>
             >
             base_type;
 
     public:
-        remote_object_apply_action() {}
+        remote_object_apply_action1() {}
 
         // construct an action from its arguments
-        remote_object_apply_action(hpx::util::function<R(void**)> const& f,
-                std::size_t size)
-          : base_type(f, size)
+        template <typename FF>
+        remote_object_apply_action1(BOOST_FWD_REF(FF) f)
+          : base_type(boost::forward<FF>(f))
         {}
 
-        remote_object_apply_action(threads::thread_priority p,
-                hpx::util::function<R(void**)> const & f, std::size_t size)
-          : base_type(p, f, size)
+        template <typename FF>
+        remote_object_apply_action1(threads::thread_priority p, BOOST_FWD_REF(FF) f)
+          : base_type(p, boost::forward<FF>(f))
         {}
 
         /// serialization support
         static void register_base()
         {
-            util::void_cast_register_nonvirt<remote_object_apply_action, base_type>();
+            util::void_cast_register_nonvirt<remote_object_apply_action1, base_type>();
             base_type::register_base();
         }
 
@@ -124,48 +129,51 @@ namespace hpx { namespace components { namespace server
         }
     };
 
-    template <>
-    struct remote_object_apply_action<void>
-      : hpx::actions::action2<
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename F, typename A>
+    struct remote_object_apply_action2
+      : hpx::actions::result_action2<
             remote_object
+          , typename F::result_type
           , remote_object::remote_object_apply
-          , hpx::util::function<void(void**)> const &
-          , std::size_t
-          , &remote_object::apply<void>
+          , F const &
+          , A const &
+          , &remote_object::apply2<F, A>
           , hpx::threads::thread_priority_default
-          , remote_object_apply_action<void>
+          , remote_object_apply_action2<F, A>
         >
     {
     private:
-        typedef hpx::actions::action2<
+        typedef hpx::actions::result_action2<
                 remote_object
+              , typename F::result_type
               , remote_object::remote_object_apply
-              , hpx::util::function<void(void**)> const &
-              , std::size_t
-              , &remote_object::apply<void>
+              , F const &
+              , A const &
+              , &remote_object::apply2<F, A>
               , hpx::threads::thread_priority_default
-              , remote_object_apply_action<void>
+              , remote_object_apply_action2<F, A>
             >
             base_type;
 
     public:
-        remote_object_apply_action() {}
+        remote_object_apply_action2() {}
 
         // construct an action from its arguments
-        remote_object_apply_action(hpx::util::function<void(void**)> const & f,
-                std::size_t size)
-          : base_type(f, size)
+        template <typename FF, typename AA>
+        remote_object_apply_action2(BOOST_FWD_REF(FF) f, BOOST_FWD_REF(AA) a)
+          : base_type(boost::forward<FF>(f), boost::forward<AA>(a))
         {}
 
-        remote_object_apply_action(threads::thread_priority p,
-                hpx::util::function<void(void**)> const & f, std::size_t size)
-          : base_type(p, f, size)
+        template <typename FF, typename AA>
+        remote_object_apply_action2(threads::thread_priority p, BOOST_FWD_REF(FF) f, BOOST_FWD_REF(AA) a)
+          : base_type(p, boost::forward<FF>(f), boost::forward<AA>(a))
         {}
 
         /// serialization support
         static void register_base()
         {
-            util::void_cast_register_nonvirt<remote_object_apply_action, base_type>();
+            util::void_cast_register_nonvirt<remote_object_apply_action2, base_type>();
             base_type::register_base();
         }
 
@@ -186,14 +194,21 @@ namespace hpx { namespace components { namespace server
 #endif
 
 HPX_SERIALIZATION_REGISTER_TEMPLATE(
-    (template <typename R>)
-  , (hpx::components::server::remote_object_apply_action<R>)
+    (template <typename F>)
+  , (hpx::components::server::remote_object_apply_action1<F>)
 )
 
+HPX_SERIALIZATION_REGISTER_TEMPLATE(
+    (template <typename F, typename A>)
+  , (hpx::components::server::remote_object_apply_action2<F, A>)
+)
+
+/*
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::components::server::remote_object_apply_action<void>
   , remote_object_apply_action_void
 )
+*/
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::components::server::remote_object::set_dtor_action
