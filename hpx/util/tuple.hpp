@@ -42,6 +42,79 @@ namespace hpx { namespace util
     };
 }}
 
+namespace boost {
+    namespace fusion {
+        namespace traits
+        {
+            template<>
+            struct tag_of<hpx::util::tuple0<> >
+            {
+                typedef struct_tag type;
+            };
+            template<>
+            struct tag_of<hpx::util::tuple0<> const>
+            {
+                typedef struct_tag type;
+            };
+        }
+
+        namespace extension
+        {
+            template<int I>
+            struct access::struct_member<hpx::util::tuple0<>, I>
+            {
+                //BOOST_MPL_ASSERT_MSG(false, INVALID_MEMBER, I);
+                template<typename Seq> struct apply;
+                /*
+                {
+                    typedef
+                        typename add_reference<
+                            typename mpl::eval_if<
+                                is_const<Seq>
+                              , add_const<attribute_type> 
+                              , mpl::identity<attribute_type>
+                            >::type
+                        >::type
+                        type;
+                    
+                    static type call(Seq& seq) { return seq. i; }
+                };
+                */
+            };
+
+            template<int I>
+            struct struct_member_name<hpx::util::tuple0<>, I>
+            {
+                //BOOST_MPL_ASSERT_MSG(false, INVALID_MEMBER, I);
+                /*
+                typedef char const* type;
+                static type call()
+                { return i; }
+                */
+            };
+            
+            template<>
+            struct struct_size<hpx::util::tuple0<> > : mpl::int_<0> {};
+            template<>
+            struct struct_is_view<hpx::util::tuple0<> > : mpl::false_ {};
+        }
+    }
+    namespace mpl
+    {
+        template<typename>
+        struct sequence_tag;
+        template<>
+        struct sequence_tag<hpx::util::tuple0<> >
+        {
+            typedef fusion::fusion_sequence_tag type;
+        };
+        template<>
+        struct sequence_tag<hpx::util::tuple0<> const >
+        {
+            typedef fusion::fusion_sequence_tag type;
+        };
+    }
+}
 
 #define BOOST_PP_ITERATION_PARAMS_1                                             \
     (                                                                           \
@@ -67,9 +140,6 @@ namespace hpx { namespace util
 #define N BOOST_PP_ITERATION()
 
 #define HPX_UTIL_TUPLE_NAME BOOST_PP_CAT(tuple, N)
-
-#define HPX_UTIL_TUPLE_FWD_REF_TYPES(Z, N, D)                                   \
-    typename BOOST_FWD_REF(BOOST_PP_CAT(Arg, N))                                \
 
 #define HPX_UTIL_TUPLE_FWD_REF_PARAMS(Z, N, D)                                  \
     BOOST_FWD_REF(BOOST_PP_CAT(Arg, N)) BOOST_PP_CAT(arg, N)                    \
@@ -122,6 +192,7 @@ namespace hpx { namespace util
             return *this;
         }
 
+        /*
         template <typename Archive, typename T>
         void do_serialize(Archive & ar, T & t)
         {
@@ -137,6 +208,7 @@ namespace hpx { namespace util
         {
             BOOST_PP_REPEAT(N, HPX_UTIL_TUPLE_SERIALIZE, _);
         }
+        */
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         HPX_UTIL_TUPLE_NAME(BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_FWD_REF_PARAMS, _))
@@ -160,7 +232,6 @@ BOOST_FUSION_ADAPT_TPL_STRUCT(
 
 #undef N
 #undef HPX_UTIL_TUPLE_NAME
-#undef HPX_UTIL_TUPLE_FWD_REF_TYPES
 #undef HPX_UTIL_TUPLE_FWD_REF_PARAMS
 #undef HPX_UTIL_TUPLE_INIT_MEMBER
 #undef HPX_UTIL_TUPLE_INIT_COPY_MEMBER
