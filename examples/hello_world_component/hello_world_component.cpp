@@ -12,7 +12,7 @@ namespace examples { namespace server
 
 void hello_world::invoke()
 {
-    hpx::cout << "Hello World!\n" << hpx::flush;
+    hpx::cout << "Hello HPX World!\n" << hpx::flush;
 }
 
 }}
