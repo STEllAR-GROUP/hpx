@@ -58,7 +58,7 @@
 [def __danger__                 [$./images/alert.png]]
 
 [/ Section link shortcuts]
-[def __pbs__                    [link hpx.tutorial.getting_started.unix_installation.using_hpx_applications_with_pbs PBS]]
+[def __pbs__                    [link hpx.tutorial.getting_started.pbs PBS]]
 [def __commandline__            [link hpx.tutorial.getting_started.commandline HPX Command Line Options]]
 
 [def __fibonacci_example__      [link hpx.tutorial.examples.fibonacci Fibonacci Example]]

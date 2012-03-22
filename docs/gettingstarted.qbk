@@ -120,7 +120,10 @@ for instance:
     $ gmake install
 ]
 
-[heading Building HPX Applications with pkg-config]
+[endsect] [/ How to Install HPX on Unix Variants]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:building_hpx Building HPX Applications with pkg-config]
 
 After you are done with the installation you should be able to build the
 following program. It prints 'Hello HPX World!' on the locality you run it on.
@@ -206,7 +209,10 @@ To test the program, type:
 
 which should print `Hello World!` and exit.
 
-[heading Using HPX Applications with PBS]
+[endsect] [/ Building HPX Applications with pkg-config]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:pbs Using HPX Applications with PBS]
 
 Most HPX applications are executed on parallel computers.  These platforms
 typically provide integrated job management services that facilitate the
@@ -302,7 +308,7 @@ to:
 
 Congratulations! You have just run your first distributed HPX application!
 
-[endsect] [/ How to Install HPX on Unix Variants]
+[endsect] [/ Using HPX Applications with PBS]
 
 [/Proofread by:]
 [/Adrian Serio 3-13-12]
