@@ -22,6 +22,21 @@ namespace hpx { namespace lcos
 
         typedef stubs::dataflow_trigger stub_type;
 
+        /*
+        dataflow_trigger(dataflow_trigger &&) = delete;
+        dataflow_trigger& operator=(dataflow_trigger &&) = delete;
+        
+        dataflow_trigger(dataflow_trigger const &o)
+            : base_type(o)
+        {}
+
+        dataflow_trigger& operator=(dataflow_trigger const& o)
+        {
+            base_type::impl.reset(new detail::dataflow_base_impl(*o.base_type::impl));
+            return *this;
+        }
+        */
+
         dataflow_trigger() {}
 
         // MSVC chokes on having the lambda in the member initializer list below
@@ -45,6 +60,7 @@ namespace hpx { namespace lcos
                 );
         }
         
+        /*
         static inline lcos::future<naming::id_type>
         create_component(
             naming::id_type const & id
@@ -54,7 +70,7 @@ namespace hpx { namespace lcos
             typedef
                 hpx::components::server::create_one_component_action1<
                     components::managed_component<server::dataflow_trigger>
-                  , std::vector<dataflow_base<void> > &&
+                  , std::vector<dataflow_base<void> >
                 >::type
                 create_component_action;
             return
@@ -64,6 +80,7 @@ namespace hpx { namespace lcos
                   , boost::move(trigger)
                 );
         }
+        */
 
         dataflow_trigger(
             naming::id_type const & id
@@ -72,12 +89,14 @@ namespace hpx { namespace lcos
             : base_type(create_component(id, trigger))
         {}
 
+        /*
         dataflow_trigger(
             naming::id_type const & id
           , BOOST_RV_REF(std::vector<dataflow_base<void> >) trigger
         )
             : base_type(create_component(id, boost::move(trigger)))
         {}
+        */
 
         ~dataflow_trigger()
         {

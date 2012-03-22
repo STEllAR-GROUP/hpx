@@ -45,6 +45,21 @@ namespace hpx { namespace lcos
 
         typedef stubs::dataflow stub_type;
 
+        /*
+        dataflow(dataflow &&) = delete;
+        dataflow& operator=(dataflow &&) = delete;
+        
+        dataflow(dataflow const &o)
+            : base_type(o)
+        {}
+
+        dataflow& operator=(dataflow const& o)
+        {
+            base_type::impl.reset(new detail::dataflow_base_impl(*o.base_type::impl));
+            return *this;
+        }
+        */
+
         dataflow() {}
 
         ~dataflow()
@@ -85,7 +100,7 @@ namespace hpx { namespace lcos
 
 #define HPX_A(z, n, _)                                                 \
         BOOST_PP_COMMA_IF(n)                                                  \
-            typename boost::remove_const<typename hpx::util::detail::remove_reference<BOOST_PP_CAT(A, n)>::type>::type && \
+            typename boost::remove_const<typename hpx::util::detail::remove_reference<BOOST_PP_CAT(A, n)>::type>::type \
     /**/
 
 #define HPX_FORWARD_ARGS(z, n, _)                                             \
@@ -186,11 +201,11 @@ namespace hpx { namespace lcos
         template <BOOST_PP_ENUM_PARAMS(N, typename A)>
         dataflow(
             naming::id_type const & target
-          , BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)
+          , BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)//BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)
         )
             : base_type(
                 create_component(target
-                  , BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)
+                  , BOOST_PP_ENUM_PARAMS(N, a)//BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)
                   , typename Action::direct_execution()
                 )
             )

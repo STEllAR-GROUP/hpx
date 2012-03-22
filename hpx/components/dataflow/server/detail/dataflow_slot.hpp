@@ -21,10 +21,11 @@ namespace hpx { namespace lcos { namespace server { namespace detail
         typedef T result_type;
         typedef T remote_result;
 
-        dataflow_slot(SinkAction * back, BOOST_RV_REF(T) t)
+        template <typename TT>
+        dataflow_slot(SinkAction * back, BOOST_FWD_REF(TT) t)
             : back_ptr_(0)
             , back(back)
-            , t(boost::move(t))
+            , t(boost::forward<TT>(t))
         {}
 
         void set_result(BOOST_RV_REF(remote_result) r)
@@ -114,6 +115,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
             , dataflow_sink(back)
             , dataflow_source(flow)
         {
+            BOOST_ASSERT(dataflow_source.get_gid());
         }
 
         ~dataflow_slot()
@@ -157,6 +159,8 @@ namespace hpx { namespace lcos { namespace server { namespace detail
             typedef
                 typename dataflow_type::stub_type::server_type::connect_action
                 action_type;
+            
+            BOOST_ASSERT(dataflow_source.get_gid());
 
             applier::apply<action_type>(dataflow_source.get_gid(), get_gid());
         }
@@ -241,6 +245,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
             , dataflow_source(flow)
             , slot(slot)
         {
+            BOOST_ASSERT(dataflow_source.get_gid());
         }
 
         ~dataflow_slot()
@@ -280,6 +285,8 @@ namespace hpx { namespace lcos { namespace server { namespace detail
             typedef
                 typename dataflow_type::stub_type::server_type::connect_action
                 action_type;
+
+            BOOST_ASSERT(dataflow_source.get_gid());
 
             applier::apply<action_type>(dataflow_source.get_gid(), get_gid());
         }

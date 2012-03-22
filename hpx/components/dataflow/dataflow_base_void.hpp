@@ -26,6 +26,22 @@ namespace hpx { namespace lcos
 
         typedef stubs::dataflow stub_type;
 
+        /*
+        dataflow_base(dataflow_base &&) = delete;
+        dataflow_base& operator=(dataflow_base &&) = delete;
+        */
+        
+        dataflow_base(dataflow_base const &o)
+            : impl(o.impl)
+        {}
+
+        dataflow_base& operator=(dataflow_base const& o)
+        {
+            impl = o.impl;
+            return *this;
+        }
+
+
         dataflow_base()
         {}
 
@@ -33,7 +49,8 @@ namespace hpx { namespace lcos
         {}
 
         dataflow_base(future<naming::id_type> const & promise)
-            : impl(new detail::dataflow_base_impl(promise))
+            //: impl(new detail::dataflow_base_impl(promise))
+            : impl(promise)
         {}
 
         future<void> get_future() const
@@ -50,20 +67,21 @@ namespace hpx { namespace lcos
 
         void invalidate()
         {
-            impl->invalidate();
+            impl.invalidate();
         }
 
         naming::id_type get_gid() const
         {
-            return impl->get_gid();
+            return impl.get_gid();
         }
 
         void connect(naming::id_type const & target) const
         {
-            stub_type::connect(impl->get_gid(), target);
+            BOOST_ASSERT(impl.get_gid());
+            stub_type::connect(impl.get_gid(), target);
         }
 
-        boost::shared_ptr<detail::dataflow_base_impl> impl;
+        detail::dataflow_base_impl impl;
 
     private:
         friend class boost::serialization::access;
