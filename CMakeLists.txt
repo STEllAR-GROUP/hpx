@@ -93,9 +93,6 @@ include_directories(${hpx_SOURCE_DIR}/external/logging)
 include_directories(${hpx_SOURCE_DIR}/external/lockfree)
 include_directories(${hpx_SOURCE_DIR}/external/plugin)
 include_directories(${hpx_SOURCE_DIR}/external/backtrace)
-if(${BOOST_MINOR_VERSION} LESS 49)
-  include_directories(${hpx_SOURCE_DIR}/external/serialization)
-endif()
 link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
 
 ################################################################################
@@ -129,6 +126,10 @@ set(BOOST_LIBRARIES date_time
                     serialization
                     system
                     thread)
+
+if(${BOOST_MINOR_VERSION} LESS 49)
+  include_directories(${hpx_SOURCE_DIR}/external/serialization)
+endif()
 
 # Decide whether to use internal version of Boost.Chrono
 if(${BOOST_MINOR_VERSION} LESS 47)
