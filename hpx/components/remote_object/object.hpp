@@ -31,7 +31,22 @@ namespace hpx { namespace components
 
             invoke_apply_fun() {}
 
-            invoke_apply_fun(BOOST_RV_REF(F) f) : f(boost::move(f)) {}
+            template <typename Functor>
+            invoke_apply_fun(
+                BOOST_FWD_REF(Functor) f
+              , typename ::boost::disable_if<
+                    typename boost::is_same<
+                        invoke_apply_fun
+                      , typename boost::remove_const<
+                            typename hpx::util::detail::remove_reference<
+                                Functor
+                            >::type
+                        >::type
+                    >::type
+                >::type * dummy = 0
+            )
+                : f(boost::forward<Functor>(f))
+            {}
 
             invoke_apply_fun(invoke_apply_fun const & other)
                 : f(other.f)
