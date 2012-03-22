@@ -45,7 +45,7 @@ void gs(
     t.restart();
     for(std::size_t iter = 0; iter < max_iterations; ++iter)
     {
-#pragma omp parallel for shared(u) schedule(static)
+#pragma omp parallel for shared(u) schedule(dynamic)
         for(size_type y_block = 1; y_block < n_y-1; y_block += block_size)
         {
             size_type y_end = (std::min)(y_block + block_size, n_y-1);

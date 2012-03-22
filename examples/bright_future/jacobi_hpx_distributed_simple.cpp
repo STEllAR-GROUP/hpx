@@ -122,15 +122,13 @@ struct get_row_fun
 struct update_top_boundary_fun
 {
     range_type range;
-    dataflow_object<std::vector<grid_type> > neighbor;
     size_type cur;
 
     typedef void result_type;
 
     update_top_boundary_fun() {}
-    update_top_boundary_fun(range_type const & r, dataflow_object<std::vector<grid_type> > n, size_type cur)
+    update_top_boundary_fun(range_type const & r, size_type cur)
         : range(r)
-        , neighbor(n)
         , cur(cur)
     {}
 
@@ -138,15 +136,11 @@ struct update_top_boundary_fun
     void serialize(Archive & ar, unsigned version)
     {
         ar & range;
-        ar & neighbor;
         ar & cur;
     }
 
-    result_type operator()(std::vector<grid_type> & u) const
+    result_type operator()(std::vector<grid_type> & u, std::vector<double> const & b) const
     {
-
-        std::vector<double> b = neighbor.apply(
-            get_row_fun(range, u[cur].y()-2, cur)).get_future().get();
         for(size_type x = range.first, i = 0; x < range.second; ++x, ++i)
         {
             u[cur](x, 0) = b.at(i);
@@ -157,15 +151,13 @@ struct update_top_boundary_fun
 struct update_bottom_boundary_fun
 {
     range_type range;
-    dataflow_object<std::vector<grid_type> > neighbor;
     size_type cur;
 
     typedef void result_type;
 
     update_bottom_boundary_fun() {}
-    update_bottom_boundary_fun(range_type const & r, dataflow_object<std::vector<grid_type> > n, size_type cur)
+    update_bottom_boundary_fun(range_type const & r, size_type cur)
         : range(r)
-        , neighbor(n)
         , cur(cur)
     {}
 
@@ -173,14 +165,11 @@ struct update_bottom_boundary_fun
     void serialize(Archive & ar, unsigned version)
     {
         ar & range;
-        ar & neighbor;
         ar & cur;
     }
 
-    result_type operator()(std::vector<grid_type> & u) const
+    result_type operator()(std::vector<grid_type> & u, std::vector<double> const & b) const
     {
-        std::vector<double> b = neighbor.apply(
-            get_row_fun(range, 1, cur)).get_future().get();
         for(size_type x = range.first, i = 0; x < range.second; ++x, ++i)
         {
             u[cur](x, u[cur].y()-1) = b.at(i);
@@ -191,15 +180,13 @@ struct update_bottom_boundary_fun
 struct update_right_boundary_fun
 {
     range_type range;
-    dataflow_object<std::vector<grid_type>> neighbor;
     size_type cur;
 
     typedef void result_type;
 
     update_right_boundary_fun() {}
-    update_right_boundary_fun(range_type const & r, dataflow_object<std::vector<grid_type>> n, size_type cur)
+    update_right_boundary_fun(range_type const & r, size_type cur)
         : range(r)
-        , neighbor(n)
         , cur(cur)
     {}
 
@@ -207,14 +194,11 @@ struct update_right_boundary_fun
     void serialize(Archive & ar, unsigned version)
     {
         ar & range;
-        ar & neighbor;
         ar & cur;
     }
 
-    result_type operator()(std::vector<grid_type> & u) const
+    result_type operator()(std::vector<grid_type> & u, std::vector<double> const & b) const
     {
-        std::vector<double> b = neighbor.apply(
-            get_col_fun(range, 1, cur)).get_future().get();
         for(size_type y = range.first, i = 0; y < range.second; ++y, ++i)
         {
             u[cur](u[cur].x()-1, y) = b.at(i);
@@ -225,15 +209,13 @@ struct update_right_boundary_fun
 struct update_left_boundary_fun
 {
     range_type range;
-    dataflow_object<std::vector<grid_type>> neighbor;
     size_type cur;
 
     typedef void result_type;
 
     update_left_boundary_fun() {}
-    update_left_boundary_fun(range_type const & r, dataflow_object<std::vector<grid_type>> n, size_type cur)
+    update_left_boundary_fun(range_type const & r, size_type cur)
         : range(r)
-        , neighbor(n)
         , cur(cur)
     {}
 
@@ -241,14 +223,11 @@ struct update_left_boundary_fun
     void serialize(Archive & ar, unsigned version)
     {
         ar & range;
-        ar & neighbor;
         ar & cur;
     }
 
-    result_type operator()(std::vector<grid_type> & u) const
+    result_type operator()(std::vector<grid_type> & u, std::vector<double> const & b) const
     {
-        std::vector<double> b = neighbor.apply(
-            get_col_fun(range, u[cur].x()-2, cur)).get_future().get();
         for(size_type y = range.first, i = 0; y < range.second; ++y, ++i)
         {
             u[cur](0, y) = b.at(i);
@@ -296,6 +275,9 @@ struct update_fun
         ar & dst;
         ar & cache_block;
     }
+
+    private:
+        BOOST_COPYABLE_AND_MOVABLE(update_fun)
 };
 
 void gs(
@@ -379,7 +361,7 @@ void gs(
 
     std::vector<grid<grid<promise> > >
         deps(
-            2
+            max_iterations
           , grid<grid<promise> >(
                 dims[0]
               , dims[1]
@@ -402,7 +384,7 @@ void gs(
         {
             for(size_type x_block = 0; x_block < dims[0]; ++x_block)
             {
-                promise_grid_type & cur_deps = deps[src](x_block, y_block);
+                promise_grid_type & cur_deps = deps.at(iter)(x_block, y_block);
                 for(size_type y = 1, yy = 0; y < n_y_local; y += block_size, ++yy)
                 {
                     size_type y_end = (std::min)(y + block_size, n_y_local);
@@ -415,25 +397,29 @@ void gs(
                             range_type y_range(y, y_end);
                             std::vector<promise > trigger;
                             trigger.reserve(9);
-                            trigger.push_back(cur_deps(xx,yy));
+                            promise_grid_type & old_deps = deps.at(iter-1)(x_block, y_block);
+                            trigger.push_back(old_deps(xx,yy));
                             if(xx + 1 < n_x_local_block)
-                                trigger.push_back(cur_deps(xx+1, yy));
+                                trigger.push_back(old_deps(xx+1, yy));
                             if(xx > 0)
-                                trigger.push_back(cur_deps(xx-1, yy));
+                                trigger.push_back(old_deps(xx-1, yy));
                             if(yy + 1 < n_y_local_block)
-                                trigger.push_back(cur_deps(xx, yy+1));
+                                trigger.push_back(old_deps(xx, yy+1));
                             if(yy > 0)
-                                trigger.push_back(cur_deps(xx, yy-1));
+                                trigger.push_back(old_deps(xx, yy-1));
 
                             if(xx == 0 && x_block > 0)
                             {
                                 trigger.push_back(
-                                    object_grid(x_block, y_block).apply(
+                                    object_grid(x_block, y_block).apply3(
                                         update_left_boundary_fun(
                                             y_range
-                                          , object_grid(x_block - 1, y_block)
                                           , src
                                         )
+                                      , object_grid(x_block - 1, y_block).apply(
+                                          get_col_fun(y_range, n_x_local-1, src)
+                                        )
+                                      , deps[iter-1](x_block-1, y_block)(n_x_local_block-1, yy)
                                     )
                                 );
                             }
@@ -441,12 +427,15 @@ void gs(
                             if(xx + 1 == n_x_local && x_block + 1 < dims[0])
                             {
                                 trigger.push_back(
-                                    object_grid(x_block, y_block).apply(
+                                    object_grid(x_block, y_block).apply3(
                                         update_right_boundary_fun(
                                             y_range
-                                          , object_grid(x_block + 1, y_block)
                                           , src
                                         )
+                                      , object_grid(x_block + 1, y_block).apply(
+                                            get_col_fun(y_range, 1, src)
+                                        )
+                                      , deps[iter-1](x_block+1, y_block)(1, yy)
                                     )
                                 );
                             }
@@ -454,12 +443,15 @@ void gs(
                             if(yy == 0 && y_block > 0)
                             {
                                 trigger.push_back(
-                                    object_grid(x_block, y_block).apply(
+                                    object_grid(x_block, y_block).apply3(
                                         update_top_boundary_fun(
                                             x_range
-                                          , object_grid(x_block, y_block - 1)
                                           , src
                                         )
+                                      , object_grid(x_block, y_block - 1).apply(
+                                          get_row_fun(x_range, n_y_local-1, src)
+                                        )
+                                      , deps[iter-1](x_block, y_block-1)(xx, n_y_local_block-1)
                                     )
                                 );
                             }
@@ -467,17 +459,20 @@ void gs(
                             if(yy + 1 == n_y_local && y_block + 1 < dims[1])
                             {
                                 trigger.push_back(
-                                    object_grid(x_block, y_block).apply(
+                                    object_grid(x_block, y_block).apply3(
                                         update_bottom_boundary_fun(
                                             x_range
-                                          , object_grid(x_block, y_block + 1)
                                           , src
                                         )
+                                      , object_grid(x_block, y_block + 1).apply(
+                                          get_row_fun(x_range, 1, src)
+                                        )
+                                      , deps[iter-1](x_block, y_block+1)(xx, 1)
                                     )
                                 );
                             }
 
-                            deps[dst](x_block, y_block)(xx, yy)
+                            cur_deps(xx, yy)
                                 = object_grid(x_block, y_block).apply(
                                     update_fun(
                                         range_type(x, x_end)
@@ -491,7 +486,7 @@ void gs(
                         }
                         else
                         {
-                            deps[dst](x_block, y_block)(xx, yy)
+                            cur_deps(xx, yy)
                                 = object_grid(x_block, y_block).apply(
                                     update_fun(
                                         range_type(x, x_end)
@@ -516,7 +511,7 @@ void gs(
             {
                 for(size_type x = 1, xx = 0; x < n_x_local; x += block_size, ++xx)
                 {
-                    deps[src](x_block, y_block)(xx, yy).get_future().get();
+                    deps[max_iterations-1](x_block, y_block)(xx, yy).get_future().get();
                 }
             }
         }

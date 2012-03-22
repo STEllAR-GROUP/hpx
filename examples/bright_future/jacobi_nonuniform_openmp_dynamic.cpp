@@ -31,7 +31,7 @@ void solve(
     t.restart();
     for(std::size_t iter = 0; iter < max_iterations; ++iter)
     {
-#pragma omp parallel for shared(u) schedule(static)
+#pragma omp parallel for shared(u) schedule(dynamic)
         for(int i = 0; i < (int)x.size(); i += (int)block_size)
         {
             bright_future::jacobi_kernel_nonuniform(

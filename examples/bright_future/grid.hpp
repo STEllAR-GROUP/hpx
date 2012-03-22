@@ -269,7 +269,7 @@ namespace bright_future
     template <typename T>
     struct grid
     {
-        typedef std::vector<T, numa_allocator<T> > vector_type;
+        typedef std::vector<T/*, numa_allocator<T>*/ > vector_type;
         typedef typename vector_type::size_type size_type;
         typedef typename vector_type::value_type value_type;
         typedef typename vector_type::reference reference_type;
@@ -290,7 +290,7 @@ namespace bright_future
         grid(size_type x_size, size_type y_size, size_type block_size, T const & init)
             : n_x(x_size)
             , n_y(y_size)
-            , data(x_size * y_size, init, numa_allocator<T>(block_size))
+            , data(x_size * y_size, init/*, numa_allocator<T>(block_size)*/)
         {}
 
         grid(grid const & g)

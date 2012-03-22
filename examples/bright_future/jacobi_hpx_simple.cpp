@@ -18,6 +18,8 @@
 #include <hpx/include/iostreams.hpp>
 #include <algorithm>
 
+#include <fstream>
+
 #include <hpx/components/dataflow/dataflow.hpp>
 #include <hpx/components/dataflow/dataflow_trigger.hpp>
 #include <hpx/components/dataflow/async_dataflow_wait.hpp>
@@ -242,7 +244,8 @@ void gs(
 
     double time_elapsed = t.elapsed();
     cout << n_x << "x" << n_y << " "
-         << ((((n_x-2)*(n_y-2) * max_iterations)/1e6)/time_elapsed) << " MLUPS/s\n" << flush;
+         //<< ((((n_x-2)*(n_y-2) * max_iterations)/1e6)/time_elapsed) << " MLUPS/s\n" << flush;
+         << ((((n_x-1)*(n_y-1) * max_iterations)/1e6)/time_elapsed) << " MLUPS/s\n" << flush;
 
     if(!output.empty())
     {

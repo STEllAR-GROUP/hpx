@@ -32,7 +32,9 @@ if(HPX_CXX11_LAMBDAS)
     set(bright_future_programs ${bright_future_programs}
       jacobi_openmp
       jacobi_openmp_simple
+      jacobi_openmp_dynamic_simple
       jacobi_nonuniform_openmp
+      jacobi_nonuniform_openmp_dynamic
     )
   endif()
 
@@ -64,7 +66,9 @@ set(gs_hpx_distributed_sources gs.cpp grid.cpp)
 if(OPENMP_FOUND)
   set(jacobi_openmp_sources gs.cpp)
   set(jacobi_openmp_simple_sources gs.cpp grid.cpp)
+  set(jacobi_openmp_dynamic_simple_sources gs.cpp grid.cpp)
   set(jacobi_nonuniform_openmp_sources jacobi_nonuniform.cpp grid.cpp)
+  set(jacobi_nonuniform_openmp_dynamic_sources jacobi_nonuniform.cpp grid.cpp)
 endif()
 
 if(MPI_FOUND AND OPENMP_FOUND)
@@ -126,9 +130,17 @@ if(HPX_CXX11_LAMBDAS)
     set_target_properties(jacobi_openmp_simple_exe PROPERTIES COMPILE_FLAGS "${OpenMP_CXX_FLAGS} -DOPENMP_GRID")
     set_target_properties(jacobi_openmp_simple_exe PROPERTIES LINK_FLAGS "${OpenMP_CXX_FLAGS}")
 
+    set_target_properties(jacobi_openmp_dynamic_simple_exe PROPERTIES COMPILE_DEFINITIONS BRIGHT_FUTURE_NO_HPX)
+    set_target_properties(jacobi_openmp_dynamic_simple_exe PROPERTIES COMPILE_FLAGS "${OpenMP_CXX_FLAGS} -DOPENMP_GRID")
+    set_target_properties(jacobi_openmp_dynamic_simple_exe PROPERTIES LINK_FLAGS "${OpenMP_CXX_FLAGS}")
+
     set_target_properties(jacobi_nonuniform_openmp_exe PROPERTIES COMPILE_DEFINITIONS BRIGHT_FUTURE_NO_HPX)
     set_target_properties(jacobi_nonuniform_openmp_exe PROPERTIES COMPILE_FLAGS "${OpenMP_CXX_FLAGS} -DOPENMP_GRID")
     set_target_properties(jacobi_nonuniform_openmp_exe PROPERTIES LINK_FLAGS "${OpenMP_CXX_FLAGS}")
+    
+    set_target_properties(jacobi_nonuniform_openmp_dynamic_exe PROPERTIES COMPILE_DEFINITIONS BRIGHT_FUTURE_NO_HPX)
+    set_target_properties(jacobi_nonuniform_openmp_dynamic_exe PROPERTIES COMPILE_FLAGS "${OpenMP_CXX_FLAGS} -DOPENMP_GRID")
+    set_target_properties(jacobi_nonuniform_openmp_dynamic_exe PROPERTIES LINK_FLAGS "${OpenMP_CXX_FLAGS}")
   endif()
 
   if(MPI_FOUND AND OPENMP_FOUND)

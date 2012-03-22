@@ -22,6 +22,8 @@
 #include <hpx/components/dataflow/dataflow_trigger.hpp>
 #include <hpx/components/dataflow/async_dataflow_wait.hpp>
 
+#include <fstream>
+
 #undef min
 
 using hpx::util::high_resolution_timer;
@@ -70,7 +72,19 @@ struct update_fun
 
     update_fun() {}
 
-    update_fun(range_type r, std::size_t old, std::size_t n)
+    update_fun(update_fun const & other)
+      : range(other.range)
+      , old(other.old)
+      , n(other.n)
+    {}
+
+    update_fun(BOOST_RV_REF(update_fun) other)
+      : range(boost::move(other.range))
+      , old(boost::move(other.old))
+      , n(boost::move(other.n))
+    {}
+
+    update_fun(range_type const & r, std::size_t old, std::size_t n)
         : range(r)
         , old(old)
         , n(n)
@@ -94,6 +108,9 @@ struct update_fun
         ar & old;
         ar & n;
     }
+
+    private:
+        BOOST_COPYABLE_AND_MOVABLE(update_fun)
 };
 
 struct return_
@@ -105,7 +122,7 @@ struct return_
     return_() {}
     return_(std::size_t which) : which(which) {}
 
-    result_type operator()(lse_data & lse)
+    result_type operator()(lse_data & lse) const
     {
         return lse.x[which];
     }
@@ -185,15 +202,15 @@ void solve(
                 }
                 deps[n][b]
                     = lse.apply(
-                        update_fun(block_ranges[b], old, n)
-                      , dataflow_trigger(lse.gid_, trigger)
+                        boost::move(update_fun(block_ranges[b], old, n))
+                      , boost::move(dataflow_trigger(lse.gid_, boost::move(trigger)))
                     );
             }
             else
             {
                 deps[n][b]
                     = lse.apply(
-                        update_fun(block_ranges[b], old, n)
+                        boost::move(update_fun(block_ranges[b], old, n))
                     );
             }
         }
