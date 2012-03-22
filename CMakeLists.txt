@@ -1149,9 +1149,9 @@ endif()
 # External build system support (FindHPX.cmake and pkg-config).
 ################################################################################
 set(HPX_LINK_DIRECTORIES
-    ${HPX_LINK_DIRECTORIES} ${CMAKE_INSTALL_PREFIX}/lib/hpx)
+    ${CMAKE_INSTALL_PREFIX}/lib/hpx ${HPX_LINK_DIRECTORIES})
 set(HPX_INCLUDE_DIRECTORIES
-    ${HPX_INCLUDE_DIRECTORIES} ${CMAKE_INSTALL_PREFIX}/include)
+    ${CMAKE_INSTALL_PREFIX}/include ${HPX_INCLUDE_DIRECTORIES})
 
 list(REMOVE_DUPLICATES HPX_LINK_DIRECTORIES)
 list(REMOVE_DUPLICATES HPX_INCLUDE_DIRECTORIES)
