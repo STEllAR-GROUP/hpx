@@ -8,10 +8,10 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 [section:examples Examples]
 
-The following sections of our tutorial are some examples for our reader to
-get familiar with HPX style programming. We start off with simple examples
-that utilize basic HPX elements and then begin to expose the reader to the
-more complex yet powerful HPX concepts.
+The following sections of our tutorial analyzes some examples to help you get
+familiar with the HPX style of programming. We start off with simple examples
+that utilize basic HPX elements and then begin to expose the reader to the more
+complex, yet powerful, HPX concepts.
 
 [/Proofread by:]
 [/Adrian Serio 3-13-12]
@@ -22,7 +22,7 @@ more complex yet powerful HPX concepts.
 
 The Fibonacci sequence is a sequence of numbers starting with 0 and 1 where
 every subsequent number is the sum of the previous two numbers. In this
-example, we will use HPX to calculate the value of the n-th position of the
+example, we will use HPX to calculate the value of the n-th element of the
 Fibonacci sequence. In order to compute this problem in parallel, we will use
 a facility known as a Future.
 
@@ -50,112 +50,132 @@ Fibonacci example below to enable its parallel execution.
 
 [heading Setup]
 
-The source code for this example is in the svn repository:
-[^.../hpx/examples/quickstart/fibonacci.cpp]
-[fixme Add link to source here and remove reference to svn].
+[teletype]
 
-To compile this file type:
+The source code for this example can be found [hpx_link examples/quickstart/fibonacci.cpp..here]. 
 
+To compile this program, go to your HPX build directory (see [link hpx.tutorial.getting_started Getting
+Started] for information on configuring and building HPX) and enter:
+
+``
     $ make examples.quickstart.fibonacci
+``
 
-If you know how many cores your machine has, use make's '-j' option to increase
-the number of parallel processes that are running. You should start your number
-of cores plus an additional process for maximum speed. For instance, if your
-machine has 4 cores you would type:
-
-    $ make examples.quickstart.fibonacci -j5
-
-for the fastest build.
+[/ If you are using Visual Studio, simply build the target called "fibonacci". It
+will be under "Quickstart" in "Examples". ]
 
 To run the program type:
 
+``
     $ ./bin/fibonacci
+``
+
+[/or in Visual Studio, right click on the target and select "Debug -> Start new instance". ]
 
 This should print (time should be approximate):
 
+``
     fibonacci(10) == 55
     elapsed time: 0.00186288 [s]
+``
 
-This run used the default setting of calculating the tenth place of the
-Fibonacci sequence. To declare which position you want to calculate, use
-the '--n-value' option. Additionally you can use the '--hpx:threads' option
-to declare how many threads you wish to use when running the program. For
-instance,running:
+This run used the default settings, which calculate the tenth element of the
+Fibonacci sequence. To declare which Fibonacci value you want to calculate, use
+the [^--n-value] option. Additionally you can use the
+[hpx_cmdline [^--hpx:threads]] option to declare how many OS-threads you
+wish to use when running the program. For instance, running:
 
+``
     $ ./bin/fibonacci --n-value 20 --hpx:threads 5
+``
 
 Will yield:
 
+``
     fibonacci(20) == 6765
     elapsed time: 0.233827 [s]
+``
 
-[/To run this program on multiple localities please see the __pbs__ documentation.]
+[c++]
+
+[fixme How do we set command line options on Windows?]
 
 [heading Walkthrough]
 
-Now that you can compile and run the code lets look at how the code works.
-Since this code is written in C++, we will begin with main below. Here you can
-see that in HPX main is only used to initialize the runtime system. It is
-important to note that command line options are defined here. You can see
-that our programs '--n-value' is set by the instance of the Boost
-library class [^options_description] using the public member function
-[^.add_options()] (to learn more about this class see the __boost_doc__).
-In the description, the default value of
-the variable is set to 10. This is why when we ran the program for the first
-time without using the '--n-value' option the program returned the 10th
-value of the Fibonacci sequence. The last part of the description is the
-text that appears when a user uses the '--help' option to see what command
-line options are available.
+[c++]
+
+Now that you have compiled and run the code, lets look at how the code works.
+Since this code is written in C++, we will begin with the `main` function.
+Here you can see that in HPX, `main` is only used to initialize the runtime
+system. It is important to note that application-specific command line options
+are defined here. HPX uses
+[@http://www.boost.org/doc/libs/1_49_0/doc/html/program_options.html Boost.Program Options]
+for command line processing. You can see that our programs [^--n-value] option
+is set by calling the `add_options()` method on an instance of
+`boost::program_options::options_description`.  The default value of the
+variable is set to 10. This is why when we ran the program for the first time
+without using the [^--n-value] option the program returned the 10th value of
+the Fibonacci sequence. The constructor argument of the description is the text
+that appears when a user uses the [^--help] option to see what command line
+options are available. `HPX_APPLICATION_STRING` is a macro that expands to a
+string constant containing the name of the HPX application currently being
+compiled.
 
 [import ../examples/quickstart/fibonacci.cpp]
 [fib_main]
 
-The [^init()] function in main calls [^hpx_main()] which is where the ["meat] of the
-program is. Below we can see that the basic program is simple. The command
-line option 'n-value' is read in, a timer is set, a future is created,
-a [^.get()] function is called, and the data is printed out.
+The `hpx::init()` function in `main` starts the runtime system, and invokes
+`hpx_main()` as the first HPX-thread. Below we can see that the basic program
+is simple. The command line option `--n-value` is read in, a timer
+(`hpx::util::high_resolution_timer`) is set up to record the time it takes to
+do the computation, an `hpx::lcos::future<>` is created, the `get()` function 
+on the `hpx::lcos::future<>` is called to retrieve or wait for the result, and
+the answer is printed out.
 
 [fib_hpx_main]
 
-Upon a closer look we see that the future we created is assigned the return
-of [^async<fibonacci_action>(find_here(), n)]. [^async<>] takes an action,
-in this case [^fibonacci_action], and returns a future. But wait, what is an
-action? And what is this [^fibonacci_action]? For starters, an action is a
-wrapper for a function.  By wrapping functions, HPX can place packets of work
-into different types of processing vehicles. These vehicles allow users to
-calculate work now, later, or on certain nodes. These other methods of
-processing work will be brought up later, for now we will stick to simple
-futures which once created immediately start to do work as soon as resources
-are available. To futher understand this we turn to the
-code to find where [^fibonacci_action] was [^typedef]'d:
+Upon a closer look we see that the `hpx::lcos::future<>` we created is assigned
+the return of `hpx::lcos::async<fibonacci_action>(hpx::find_here(), n)`.
+`hpx::lcos::async<>()` takes an action, in this case `fibonacci_action`, and
+asynchronously kicks of the computation of the action, returning a future which
+represents the result of the computation. But wait, what is an action? And what
+is this `fibonacci_action`? For starters, an action is a wrapper for a
+function. By wrapping functions, HPX can send packets of work to different
+processing units. These vehicles allow users to calculate work now, later, or
+on certain nodes. The first argument to `hpx::lcos::async<>()` is the location
+where the action should be run. In this case, we just want to run the action on
+the machine that we are currently on, so we use `hpx::find_here()`. To further
+understand this we turn to the code to find where `fibonacci_action` was
+defined:
 
 [fib_action]
 
-Finally we are getting somewhere! In this block of code the function
-[^fibonacci] is declared. After the declaration, the function was wrapped in
-an action called [^plain_result_action1] (we use [^plain_result_action1]
-because the function takes one argument). This action was then ["registered]
-as an HPX action.
+In this block of code the function `fibonacci()` is declared. After the
+declaration, the function is wrapped in a `hpx::actions::plain_result_action1<>`.
+A plain action is the most basic form of action. Plain actions wrap simple global
+functions which are not associated with any particular object (we will discuss
+other types of actions in the __accumulator_example__). The name of the action
+is tells us about the arity and nature of the functions return type. `1` signifies that the
+action takes 1 argument, and `result` indicates that the action returns a non-`void`
+value. 
 
-This picture should now start making sense. The function [^fibonacci] is
-wrapped in an action [^plain_result_action1], which in turn was wrapped
-in [^async<>], which returns a future. Now that we understand where all these
-variables are coming from lets look at the function [^fibonacci]:
+This picture should now start making sense. The function `fibonacci()` is
+wrapped in an action `hpx::actions::plain_result_action1<>`, which was spawned
+by `hpx::lcos::async<>()`, which returns a future. Now, lets look at the
+function `fibonacci()`:
 
 [fib_func]
 
-On first inspection this block of code is straightforward. First if n < 2,
-meaning if n = 0 or 1, then return 0 or 1 (as we recall the first position
-of the Fibonacci sequence is 0 and the second is one). Next two futures n1
-and n2 are created and their values are added together after being called
-by [^.get()]. But, hold-the-phone, by calling [^fibonacci_action] inside
-the function [^fibonacci] we are calling this function recursively!
-This is where the power of futures is displayed.
-The function [^fibonacci] will continue to be called until the value of n
-is equal to 0 or 1 (it increments down each time the function is called)
-at which point the values of the future will be returned as 0 or 1. When
-this happens the futures can then be added up and the value of the n-th
-position of the Fibonacci sequence can be calculated.
+On first inspection this block of code is straightforward. First, `if (n < 2)`,
+meaning n is 0 or 1, then we return 0 or 1 (recall the first element
+of the Fibonacci sequence is 0 and the second is 1). If n is larger than 1, then
+we spawn two futures, `n1` and `n2`. Each of these futures represents an asynchronous,
+recursive call to `fibonacci()`. After we've created both futures, we wait for both
+of them to finish computing, and then we add them together, and return that value
+as our result. The recursive call tree will continue until n is equal to 0 or 1,
+at which point the value can be returned because it is implicitly known. 
+When this termination condition is reached, the futures can then be added up,
+producing the n-th value of the Fibonacci sequence.
 
 [endsect] [/Fibonacci]
 
@@ -166,41 +186,61 @@ position of the Fibonacci sequence can be calculated.
 [/////////////////////////////////////////////////////////////////////////////]
 [section:hello_world Hello World]
 
-You have already looked at a simple ["Hello World] example.  In this version
-each locality will print out a statement that says which OS thread executed it
-and which locality it came from.  The output will look something like this:
+[teletype]
 
-    hello world from OS-thread 2 on locality 0
-    hello world from OS-thread 5 on locality 2
+This program will print out a hello world message on every OS-thread on every
+locality. The output will look something like this:
+
+``
+    hello world from OS-thread 1 on locality 0
+    hello world from OS-thread 1 on locality 1
     hello world from OS-thread 0 on locality 0
+    hello world from OS-thread 0 on locality 1
+``
 
 [heading Setup]
 
-The source file is already created for you and could be found in the svn
-repository: [^.../hpx/examples/quickstart/hello_world.cpp]
-[fixme add a link here and remove reference to svn].
+The source code for this example can be found [hpx_link examples/quickstart/hello_world.cpp..here]. 
 
-To compile this file type:
+To compile this program, go to your HPX build directory (see [link hpx.tutorial.getting_started Getting
+Started] for information on configuring and building HPX) and enter:
 
+``
     $ make examples.quickstart.hello_world
+``
+
+[/ If you are using Visual Studio, simply build the target called "hello_world". It
+will be under "Quickstart" in "Examples". ]
 
 To run the program type:
 
+``
     $ ./bin/hello_world
+``
+
+[/ or in Visual Studio, right click on the target and select "Debug -> Start new instance". ] 
 
 This should print:
 
+``
     hello world from OS-thread 0 on locality 0
+``
 
-To include more threads use the command line option '--hpx:threads' and
-type the number of threads that you wish to use.  For example, typing:
+To use more OS-threads use the command line option [hpx_cmdline [^--hpx:threads]]
+and type the number of threads that you wish to use. For example, typing:
 
+``
     $ ./bin/hello_world --hpx:threads 2
+``
 
 will yield:
 
+``
     hello world from OS-thread 1 on locality 0
     hello world from OS-thread 0 on locality 0
+``
+
+[fixme How do we set command line options on Windows?]
 
 Notice how the ordering of the two print statements will change with
 subsequent runs. To run this program on multiple localities please see the
@@ -208,20 +248,30 @@ __pbs__ documentation.
 
 [heading Walkthrough]
 
-Now that you can compile and run the code lets look at how the code works
-beginning with main:
+[c++]
+
+Now that you have compiled and run the code, lets look at how the code works,
+beginning with `main()` and `hpx_main()`:
 
 [import ../examples/quickstart/hello_world.cpp]
 [hello_world_main]
 [hello_world_hpx_main]
 
 In this excerpt of the code we again see the use of futures. This time
-these futures are stored in a vector so that they can easily be accessed.
-New to us is the [^wait()] function. Wait provides a way to make sure
-that all of the futures have finished being calculated without having to call
-[^.get()] for each one. As in the __fibonacci_example__ our futures are set
-equal to an [^async<>] wrapped
-action. This action is declared here:
+the futures are stored in a vector so that they can easily be accessed.
+`hpx::lcos::wait()` is a family of functions that wait on for an `std::vector<>`
+of futures to become ready. In this piece of code, we are using the synchronous
+version of `hpx::lcos::wait()`, which takes one argument (the `std::vector<>` of
+futures to wait on). This function will not return until all the futures in the
+vector have been executed.
+
+In the __fibonacci_example__, we used `hpx::find_here()` to specified the target'
+of our actions. Here, we instead use `hpx::find_all_localities()`, which returns
+an `std::vector<>` containing the identifiers of all the machines in the system,
+including the one that we are on. 
+
+As in the __fibonacci_example__ our futures are set using `hpx::lcos::async<>()`.
+The `hello_world_foreman_action` is declared here:
 
 [hello_world_action_wrapper]
 
@@ -229,28 +279,44 @@ Another way of thinking about this wrapping technique is as follows: functions
 (the work to be done) are wrapped in actions, and actions can be executed
 locally or remotely (e.g. on another machine participating in the computation).
 
-Now it is time to look at the [^hello_world_foreman] which was wrapped in
-the action above:
+Now it is time to look at the `hello_world_foreman()` function which was wrapped in
+the action above: 
 
 [hello_world_foreman]
 
-Here the set 'attendance' is keeping track of which threads have printed
-out the hello world statement. When the thread prints out the statement
-the future returns to wait which invokes a lambda function.  This
-lambda erases the thread from the set 'attendance' thus letting
-[^hello_world_foreman] know how many threads still need to print out
-["hello world]. However, if the future returns a value of -1 the thread is
-skipped and that thread remains in 'attendance' for another cycle of the
-while loop.
+Now, before we discuss `hello_world_foreman()`, let's talk about the
+`hpx::lcos::wait()` function. `hpx::lcos::wait()` provides a way to make sure
+that all of the futures have finished being calculated without having to call
+`get()` for each one. The version of `hpx::lcos::wait()` used here performs an
+non-blocking wait, which acts on an `std::vector<>`. It queries the state of
+the futures, waiting for them to finish. Whenever a future becomes marked as
+ready, `hpx::lcos::wait()` invokes a callback function provided by the user,
+supplying the callback function with the index of the future in the
+`std::vector<>` and the result of the future.
 
-Finally, let us look at [^hello_world_worker].  Here [^hello_world_worker]
-checks to see if it is on the target thread. If it is the correct thread,
-it prints out the hello world statement and returns the OS thread number
-to [^wait()] in [^hello_world_foreman].  If it is not the correct thread,
-it returns a value of -1 which when returned to [^hello_world_foreman]
-leaves that thread number in the set 'attendance'.
+In `hello_world_foreman()`, an `std::set<>` called `attendance` keeps track of
+which OS-threads have printed out the hello world message. When the OS-thread
+prints out the statement, the future is marked as ready, and
+`hpx::lcos::wait()` invokes the callback function, in this case a C+11 lambda.
+This lambda erases the OS-threads id from the set `attendance`, thus letting
+`hello_world_foreman()` know which OS-threads still need to print out hello
+world. However, if the future returns a value of -1, the future executed on an
+OS-thread which has already printed out hello world. In this case, we have to
+try again by rescheduling the future in the next round. We do this by leaving
+the OS-thread id in `attendance`.
+
+Finally, let us look at `hello_world_worker()`. Here, `hello_world_worker()`
+checks to see if it is on the target OS-thread. If it is executing on the
+correct OS-thread, it prints out the hello world message and returns the
+OS-thread id to `hpx::lcos::wait()` in `hello_world_foreman()`. If it is
+not executing on the correct OS-thread, it returns a value of -1, which causes
+`hello_world_foreman()` to leave the OS-thread id in `attendance`.
 
 [hello_world_worker]
+
+Because HPX features work stealing task schedulers, there is no way to guarantee
+that an action will be scheduled on a particular OS-thread. This is why we must
+use a guess-and-check approach. 
 
 [endsect] [/Hello World]
 
@@ -261,38 +327,58 @@ leaves that thread number in the set 'attendance'.
 [/////////////////////////////////////////////////////////////////////////////]
 [section:accumulator Accumulator]
 
-Accumulator is a simple example that exposes the notion of components in HPX.
-Components allow us to run applications in an distributed environment in HPX.
-This example exposes four different functions: init, add, query and print.
-What this example does is it takes an input from a client locality component,
-puts the value in a data type (unsigned long) at the remote locality component.
-The print command from the client will print the contents of the remote locality
-component at the remote locality. The query command from the client will print
-the contents of the remote locality component at client locality.
+[teletype]
 
-[heading Building the example]
+Accumulator is a simple example that demonstrates a more complex HPX
+programming construct: components. Components are C++ classes that expose
+methods as a type of HPX actions called component actions. Components are
+globally named, meaning that a component action can be called remotely (e.g.
+from another machine).
+
+In the __fibonacci_example__ and the
+__hello_world_example__, we introduced plain actions, which wrapped global
+functions.  The target of a plain action is an identifier which refers to a
+particular machine involved in the computation. For plain actions, the target
+is the machine where the action will be executed. 
+
+Component actions, however, do not target machines. Instead, they target
+component instances. The instance may live on the machine that we've invoked
+the component action from, or it may live on another machine. 
+
+The component in this example exposes four different functions:
+`init()`, `add()`, `query()` and `print()`. This example creates an instance
+of the accumulator, and then allows the user to enter commands at a prompt,
+which subsequently invoke actions on the accumulator instance.
+
+[heading Setup]
 
 From your build directory, type the following:
 
+``
     $ make examples.accumulator.accumulator
+``
 
 [heading Run the example]
 
 From your bin directory inside install path, type the following:
 
-[teletype][/ switch to plain text source mode]
 On a single machine, first console:
 
+``
     ./accumulator_client -0 -l2
+``
 
-Same machine, second console, on identical path as above: [teletype]
+Same machine, second console, on identical path as above:
 
+``
     ./accumulator_client -1 -l2
+``
 
 [heading Results]
 
 Console 1:
 
+``
     accumulator client, you may enter some commands (try 'help' if in doubt...)
     add 5
     print
@@ -304,14 +390,19 @@ Console 1:
     query
     {0000000200ff0001, 000000000002ffff}> 10
     quit
+``
 
 Console 2:
 
+``
     {0000000200000000, 00007fff21db4860}> 5
     {0000000200000000, 00007fff21db4860}> 5
     {0000000200000000, 00007fff21db4860}> 10
+``
 
 [heading Dissecting the Accumulator Example]
+
+[c++]
 
 The following text/code snippets gives us a basic infrastructure know how for
 creating our own components, using the accumulator components as an example.
@@ -382,11 +473,12 @@ return value of the function to obtain the result returned by the function.
 
 For example:
 
+``
     lcos::future<unsigned long> ret_value = query_async(gid);
     ret_value.get()
+``
 
 would get the value result returned by `query_async(gid)`.
-
 
 Now the following example gives another method of client side access to the
 component actions. File:
@@ -460,8 +552,6 @@ is passed.
 Finally the above method will initiate shutdown procedure on the hpx runtime
 system.
 
-[c++][/ switch back to C++ source mode]
-
 [endsect] [/Accumulator]
 
 [/Proofread by:]
@@ -470,3 +560,4 @@ system.
 [/////////////////////////////////////////////////////////////////////////////]
 
 [endsect] [/Examples]
+

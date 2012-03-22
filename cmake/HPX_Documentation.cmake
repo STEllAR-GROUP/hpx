@@ -113,6 +113,7 @@ else()
       COMMAND ${QUICKBOOK_PROGRAM}
           "--output-file=${name}.xml"
           "${svn_revision_option}"
+          "-D__hpx_source_dir__=${hpx_SOURCE_DIR}"
           ${${name}_QUICKBOOK_ARGS}
           ${input_path}
       COMMENT "Generating BoostBook XML file ${name}.xml from ${${name}_SOURCE}."

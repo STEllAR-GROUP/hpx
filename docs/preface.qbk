@@ -9,53 +9,36 @@
 
 [heading History]
 
-The development of High Performance ParalleX - HPX started back in 2007. At
-that point Hartmut Kaiser became interested in the work done by the ParalleX
-group at the __cct__, a multi-disciplinary research institute at the __lsu__. 
-The first implementations were crude at best and the team
-had to dismiss those designs entirely. However, over time we learned quite a
-bit about how to design a parallel runtime system which implements the ideas
-of ParalleX, a new (and still experimental) execution model for future high
-performance computer architectures.
+The development of High Performance ParalleX (HPX) started back in 2007. At
+that point, Hartmut Kaiser became interested in the work done by the ParalleX
+group at the __cct__, a multi-disciplinary research institute at __lsu__. The
+ParalleX group was developing a new and experimental execution model for future
+high performance computing architectures called ParalleX.  The first
+implementations were crude at best, and we had to dismiss those designs
+entirely. However, over time we learned quite a bit about how to design a
+parallel runtime system which implements the ideas of ParalleX.
 
-The main emphasis of the development of HPX is to create a high quality, freely
-available, open source implementation of the ideas of ParalleX for conventional
-systems, such as classical Linux based Beowulf clusters or single highly
-parallel SMP nodes. At the same time, we wanted to have a very modular and well
-designed runtime system architecture which would allow us over time to port our
+Our goal is to create a high quality, freely available, open source
+implementation of the ParalleX model for conventional systems, such as
+classic Linux based Beowulf clusters or multi-socket highly parallel SMP
+nodes. At the same time, we want to have a very modular and well designed
+runtime system architecture which would allow us to port our
 implementation onto new computer system architectures. We want to use real
 world applications to drive the development of the runtime system, coining out
-required functionalities and converging onto an stable API which will provide
-a smooth migration path for developers.
+required functionalities and converging onto an stable API which will provide a
+smooth migration path for developers.
 
-From the very beginning this endeavour has been a group effort. In addition to a
-handful of interested researchers, there always have been students
-participating in the discussions, design, and implementation of HPX.
-In 2011 we decide to formalize our collective research efforts by creating the
-__stellar__ group. Today, __stellar__ stands for 'Systems Technologies,
-Emergent Parallelism, and Algorithms Research', which describes the three
-main focal points we center our work around.
+From the very beginning, this endeavour has been a group effort. In addition to
+a handful of interested researchers, there have always been undergraduate and
+graduate students participating in the discussions, design, and implementation
+of HPX. In 2011 we decide to formalize our collective research efforts by
+creating the __stellar__ group. __stellar__ stands for [*S]ystems
+[*T]echnologies, [*E]mergent Para[*ll]elism, and [*A]lgorithms [*R]esearch,
+which describes the three main focal points we center our work around.
 
+To learn more about __stellar__ and ParalleX, see __people__ and __intro__.
 
 [heading How to use this manual]
-
-Each major section is roughly divided into 3 parts:
-
-# Tutorials: A step by step guide with heavily annotated code. These
-  are meant to get the user acquainted with the library as quickly as
-  possible. The objective is to build the user's confidence
-  using the library through abundant examples and detailed
-  instructions. Examples speak volumes and we have volumes of
-  examples!
-
-# Abstracts: A high level summary of key topics. The objective is to
-  give the user a high level view of the library, the key concepts,
-  background and theories.
-
-# Reference: Detailed formal technical reference. We start with a quick
-  reference -- an easy to use table that maps into the reference proper.
-  The reference proper starts with C++ concepts followed by
-  models of the concepts.
 
 Some icons are used to mark certain topics indicative of their relevance.
 These icons precede some text to indicate:
@@ -84,10 +67,11 @@ These icons precede some text to indicate:
 [heading Support]
 
 Please feel free to direct questions to HPX's mailing list: __stellar_list__
-or log onto our IRC channel which can be found at __stellar_irc__
+or log onto our IRC channel which can be found at __stellar_irc__.
 
 [endsect] [/ Preface]
 
 [/Proofread by:]
 [/Adrian Serio 3-13-12]
 [/Phillip LeBlanc 3-13-12]
+

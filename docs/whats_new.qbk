@@ -14,78 +14,81 @@
 [/////////////////////////////////////////////////////////////////////////////]
 [section:hpx_0_8_0 HPX V0.8.0]
 
-We have had roughly 1500 commits since the last release, closed approximately
-100 tickets (bugs, feature requests, etc.).
+We have had roughly 1000 commits since the last release and we have closed
+approximately 70 tickets (bugs, feature requests, etc.).
 
 [heading General Changes]
 
 * Improved PBS support, allowing for arbitrary naming schemes of node-hostnames.
-* Implemented better connection control for network connections between two
-  compute-nodes. Added parcel buffering.
-* Restructured LCO framework. Renamed `eager_future` and `lazy_future` into
-  packaged_task and deferred packaged_task. Split promises into packaged_tasks
-  and futures. Added 'local' futures (in namespace `hpx::lcos::local`).
-* Improving the general performance of local and remote action invocations.
+* Finished verification of the reference counting framework.
+* Implemented decrement merging logic to optimize the distributed reference
+  counting system.
+* Restructured the LCO framework. Renamed [^hpx::lcos::eager_future<>] and
+  [^hpx::lcos::lazy_future<>] into [^hpx::lcos::packaged_task<>] and
+  [^hpx::lcos::deferred_packaged_task<>]. Split [^hpx::lcos::promise<>] into
+  packaged_tasks and [^hpx::lcos::futures<>]. Added 'local' futures
+  (in namespace [^hpx::lcos::local]).
+* Improved the general performance of local and remote action invocations.
   This (under certain circumstances) drastically reduces the number of copies
   created for each of the parameters and return values.
 * Reworked the performance counter framework. Performance counters are now
   created only when needed, which reduces the overall resource requirements.
-  The new framework allows for a much more flexible creation and management
-  of performance counters. The new Sine example application demonstrates some
-  of the capabilities.
-* Added a buildbot based continuous build system giving instant automated
+  The new framework allows for much more flexible creation and management
+  of performance counters. The new sine example application demonstrates some
+  of the capabilities of the new infrastructure.
+* Added a buildbot-based continuous build system which gives instant, automated
   feedback on each commit to SVN.
 * Added more automated tests to verify proper functioning of HPX.
 * Started to create documentation for HPX and its API.
 * Added documentation toolchain to the build system.
 * Added dataflow LCO.
-* Changed default HPX command line options to have `'hpx:'` prefix, for
-  instance the former option `--threads` is now `--hpx:threads`. This has been
-  done to make ambiguities with possible application specific command line
-  options as unlikely as possible. See the section __commandline__ for a full
-  list of available options.
+* Changed default HPX command line options to have [^hpx:] prefix. For
+  instance, the former option [^--threads] is now [hpx_cmdline [^--hpx:threads]].
+  This has been done to make ambiguities with possible application specific
+  command line options as unlikely as possible. See the section __commandline__
+  for a full list of available options.
 * Added the possibility to define command line aliases. The former short
-  (one-letter) command line options have been defined as predefined aliases for
-  backwards compatibility. See the section [fixme insert link] for a detailed
+  (one-letter) command line options have been predefined as aliases for
+  backwards compatibility. See the section __commandline__ for a detailed
   description of command line option aliasing.
 * Network connections are now cached based on the connected host. The number of
   simultaneous connections to a particular host is now limited. Parcels are
   buffered and bundled if all connections are in use.
-* Added a suite of benchmarks allowing to compare performance of the HPX
-  threading subsystem to other threading libraries (__tbb__, __swarm__,
-  __qthreads__).
 * Added more refined thread affinity control. This is based on the external
-  library __hwloc__. Note: the use of HWLOC is still off by default because
-  of the experimental character of our NUMA support.
-* Added full support of (64Bit) Windows builds using cmake build system.
-* Allow for components to register their own command line options.
+  library __hwloc__. 
+* Improved support for Windows builds with CMake.
+* Added support for components to register their own command line options.
 * Added the possibility to register custom startup/shutdown functions for
   any component. These functions are guaranteed to be executed by an HPX
   thread.
 * Added two new experimental thread schedulers: hierarchy_scheduler and
   periodic_priority_scheduler. These can be activated by using the command line
-  options `--hpx::queueing=hierarchy` or `--hpx::queueing=periodic`.
+  options [hpx_cmdline [^--hpx:queueing=hierarchy]] or
+  [hpx_cmdline [^--hpx:queueing=periodic]].
 
 [heading Example Applications]
 
-* Graph500 performace benchmark (thanks to Matthew Anderson for contributing
+* [@http://www.graph500.org/ Graph500 performace benchmark] (thanks to Matthew
+  Anderson for contributing
   this application).
-* GTC (Gyrokinetic Toroidal Code): A skeletton for particle in cell type codes.
+* [@http://www.nersc.gov/research-and-development/benchmarking-and-workload-characterization/nersc-6-benchmarks/gtc/ GTC (Gyrokinetic Toroidal Code)]:
+  a skeleton for particle in cell type codes.
 * Random Memory Access: an example demonstrating random memory accesses in a
   large array
-* ShenEOS example demonstrating partitioning of large read-only data structures
-  and exposes an interpolation API on top of those.
+* [@http://stellarcollapse.org/equationofstate ShenEOS example], demonstrating
+  partitioning of large read-only data structures and exposing an interpolation
+  API.
 * Sine performance counter demo.
 * Accumulator examples demonstrating how to write and use HPX components.
 * Quickstart examples (like hello_world, fibonacci, quicksort, factorial, etc.)
   demonstrating simple HPX concepts which introduce some of the concepts in
   HPX.
+* Load balancing and work stealing demos.
 
 [heading API Changes]
 
 * Moved all local LCOs into a separate namespace `hpx::lcos::local` (for
-  instance, `hpx::lcos::local_mutex` is now hpx::lcos::local::mutex`).
-
+  instance, `hpx::lcos::local_mutex` is now `hpx::lcos::local::mutex`).
 * Replaced `hpx::actions::function` with `hpx::util::function`. Cleaned up
   related code.
 * Removed `hpx::traits::handle_gid` and moved handlingn of global reference
@@ -94,10 +97,14 @@ We have had roughly 1500 commits since the last release, closed approximately
   corresponding API functions (such as `hpx::get_prefix`, which is nowcalled
   `hpx::get_locality_id`).
 * Adding `hpx::find_remote_localities`, `hpx::get_num_localities`,
-* Changed performance counter naming scheme to make it more bash friendly
-  (the new performance counter naming scheme is now
+* Changed performance counter naming scheme to make it more bash friendly.
+  The new performance counter naming scheme is now
 
+[teletype]
+``
     /object{parentname#parentindex/instance#index}/counter#parameters
+``
+[c++]
 
 * Added `hpx::get_worker_thread_num` replacing `hpx::threadmanager_base::get_thread_num`.
 * Renamed `hpx::get_num_os_threads` to `hpx::get_os_threads_count`.
@@ -107,92 +114,57 @@ We have had roughly 1500 commits since the last release, closed approximately
 
 [heading Bug Fixes (Closed Tickets)]
 
-Here is a list of the tickets we closed for this release:
+Here is a list of the important tickets we closed for this release:
 
-*  #31: Specialize handle_gid<> for examples and tests
-*  #72: Fix AGAS reference counting
-* #103: Better diagnostics for multiple component/action registrations under the same name
-* #104: VERIFY: heartbeat throws an exception when decrefing the performance counter its watching
-* #111: VERIFY: throttle causes an exception on the target application
-* #142: One failed component loading causes an unrelated component to fail
-* #165: Remote exception propagation bug in AGAS reference counting test
-* #171: Add an INI option to turn off deadlock detection independently of logging
-* #175: Asynchronous AGAS API
-* #186: Test credit exhaustion/splitting (e.g. prepare_gid, symbol NS)
-* #188: Implement remaining AGAS reference counting test cases
-* #209: Support multiple configurations in generated build files
-* #215: Add /proc/pid/stat and /proc/pid/statm performance counters
-* #224: VERIFY: Changing pxthread state metadata is not thread safe
-* #237: Symbolic naming interface should deal exclusively in id_types
-* #251: VERIFY: Sine PCS example causes time scaling exception in other applications
-* #258: No type checking of GIDs in stubs classes
-* #266: Investigate static_ visibility
-* #271: Seg fault/shared pointer assertion in distributed code
-* #281: cmake options need explanative text
-* #282: Add check to ensure cmake is executed for the correct CMakeLists.txt
-* #283: AGAS caching broken (gva_cache needs to be rewritten with ICL)
-* #284: examples broken in r6614
-* #285: HPX_INSTALL root directory not the same as CMAKE_INSTALL_PREFIX
-* #286: new segfault in dataflow applications
-* #287: FindHPX_GSL.cmake
-* #288: CMake install error on Windows
-* #289: Exceptions should only be logged if unhandled
-* #290: c++11 tests failure
-* #291: Let at least one buildbot slave do full builds (instead of incremental builds)
-* #292: Bogus 'fixes' to AGAS caching
-* #293: Build target for component libraries
-* #294: Linker error
-* #295: Don't require install path to be known at compile time
-* #296: Compilation error with Boost V1.49rc1
-* #297: linking fails w/o hwloc but with numactl present
-* #298: Illegal instructions on termination
-* #299: gravity aborts with multiple threads
-* #300: C compiler support needed for bfs
-* #301: Build error with Boost trunk
-* #302: Build failure of HPX 0.7.0 with visual studio 2010
-* #303: Logging assertion failure in distributed runs
-* #304: Exception 'what' strings are lost when exceptions from decode_parcel are reported
-* #305: top of trunk broken
-* #306: Peformance counter user interface issues
-* #307: Logging exception in distributed runs
-* #308: Logging deadlocks in distributed
-* #309: Reference counting test failures and exceptions
-* #310: Duplicate logging entries
-* #311: Merge AGAS remote_interface with the runtime_support object
-* #314: Object tracking for id_types
-* #315: Remove handle_gid and handle credit splitting in id_type serialization
-* #317: Implement network performance counters
-* #318: Network benchmarks
-* #319: Dataflow destruction
-* #320: applier::get_locality_id() should return an error value (or throw an exception)
-* #321: Optimization for id_types which are never split should be restored
-* #322: Command line processing ignored with Boost 1.47.0
-* #323: Credit exhaustion causes object to stay alive
-* #324: Duplicate exception messages
-* #325: Sheneos is 200-400 times slower than the fortran equivalent
-* #326: Intergrate Quickbook with CMake
-* #328: FindHPX_HDF5.cmake is broken
-* #329: --help and --version should still work
-* #330: Create pkg-config files
-* #337: Improve usability of performance counter timestamps
-* #338: Non-std exceptions deriving from std::exceptions in tfunc may be sliced
-* #339: Decrease the number of send_pending_parcels threads
-* #340: Performance counters for parcels
-* #343: VERIFY: Dynamically setting the stack size doesn't work
-* #344: Mark CMake variables as advanced
-* #345: Add more versatile environmental/cmake variable support to hpx_find_* CMake macros
-* #347: Embarrassingly parallel applications do not scale
-* #351: 'make install' does not update documents
-* #353: Disable FIXMEs in the docs by default; add a doc developer CMake option to enable FIXMEs
-* #355: "make" doesn't do anything after correct configuration
-* #356: Don't use hpx::util::static_ in topology code
-* #357: sheneos_test fails to link
-* #358: r7357 broken for neutron_star
-* #359: Infinite recursion in hpx::tuple serialization
-* #360: IB over IP -- help
-* #361: Add compile time option to disable logging completely
-* #364: Installation seriously broken in r7443
-
+*  #31 - Specialize handle_gid<> for examples and tests
+*  #72 - Fix AGAS reference counting
+* #104 - heartbeat throws an exception when decrefing the performance counter it's watching
+* #111 - throttle causes an exception on the target application
+* #142 - One failed component loading causes an unrelated component to fail
+* #165 - Remote exception propagation bug in AGAS reference counting test
+* #186 - Test credit exhaustion/splitting (e.g. prepare_gid and symbol NS)
+* #188 - Implement remaining AGAS reference counting test cases
+* #258 - No type checking of GIDs in stubs classes
+* #271 - Seg fault/shared pointer assertion in distributed code
+* #281 - CMake options need explanative text
+* #283 - AGAS caching broken (gva_cache needs to be rewritten with ICL)
+* #285 - HPX_INSTALL root directory not the same as CMAKE_INSTALL_PREFIX
+* #286 - New segfault in dataflow applications
+* #289 - Exceptions should only be logged if unhandled
+* #290 - c++11 tests failure
+* #293 - Build target for component libraries
+* #296 - Compilation error with Boost V1.49rc1
+* #298 - Illegal instructions on termination
+* #299 - gravity aborts with multiple threads
+* #301 - Build error with Boost trunk
+* #303 - Logging assertion failure in distributed runs
+* #304 - Exception 'what' strings are lost when exceptions from decode_parcel are reported
+* #306 - Peformance counter user interface issues
+* #307 - Logging exception in distributed runs
+* #308 - Logging deadlocks in distributed
+* #309 - Reference counting test failures and exceptions
+* #311 - Merge AGAS remote_interface with the runtime_support object
+* #314 - Object tracking for id_types
+* #315 - Remove handle_gid and handle credit splitting in id_type serialization
+* #320 - applier::get_locality_id() should return an error value (or throw an exception)
+* #321 - Optimization for id_types which are never split should be restored
+* #322 - Command line processing ignored with Boost 1.47.0
+* #323 - Credit exhaustion causes object to stay alive
+* #324 - Duplicate exception messages
+* #326 - Intergrate Quickbook with CMake
+* #329 - --help and --version should still work
+* #330 - Create pkg-config files
+* #337 - Improve usability of performance counter timestamps
+* #338 - Non-std exceptions deriving from std::exceptions in tfunc may be sliced
+* #339 - Decrease the number of send_pending_parcels threads
+* #343 - Dynamically setting the stack size doesn't work
+* #351 - 'make install' does not update documents
+* #353 - Disable FIXMEs in the docs by default; add a doc developer CMake option to enable FIXMEs
+* #355 - 'make' doesn't do anything after correct configuration
+* #356 - Don't use hpx::util::static_ in topology code
+* #359 - Infinite recursion in hpx::tuple serialization
+* #361 - Add compile time option to disable logging completely
+* #364 - Installation seriously broken in r7443
 
 [endsect]
 
@@ -202,60 +174,141 @@ Here is a list of the tickets we closed for this release:
 [/////////////////////////////////////////////////////////////////////////////]
 [section:hpx_0_7_0 HPX V0.7.0]
 
-We have had roughly 1000 commits since the last release, closed approximately
-120 tickets (bugs, feature requests, etc.).
+We have had roughly 1000 commits since the last release and we have closed
+approximately 120 tickets (bugs, feature requests, etc.).
 
 [heading General Changes]
 
 * Completely removed code related to deprecated AGAS V1, started to work on
-  AGAS V2.1
+  AGAS V2.1.
 * Started to clean up and streamline the exposed APIs (see 'API changes' below
-  for more details)
+  for more details).
 * Revamped and unified performance counter framework, added a lot of new
   performance counter instances for monitoring of a diverse set of internal
-  HPX parameters (queue lengths, access statistics, etc.)
-* Improved general error handling and logging support
+  HPX parameters (queue lengths, access statistics, etc.).
+* Improved general error handling and logging support.
 * Fixed several race conditions, improved overall stability, decreased memory
   footprint, improved overall performance (major optimizations include native
-  TLS support and ranged-based AGAS caching)
-* Added support for running HPX applications with PBS
+  TLS support and ranged-based AGAS caching).
+* Added support for running HPX applications with PBS.
 * Many updates to the build system, added support for gcc 4.5.x and 4.6.x,
-  added C++11 support
-* Many updates to default command line options
-* Added many tests, set up buildbot for continuous integration testing
-* Better shutdown handling of distributed applications
+  added C++11 support.
+* Many updates to default command line options.
+* Added many tests, set up buildbot for continuous integration testing.
+* Better shutdown handling of distributed applications.
 
 [heading Example Applications]
 
 * quickstart/factorial and quickstart/fibonacci, future-recursive parallel
-  algorithms
-* quickstart/hello_world, distributed hello world example
+  algorithms.
+* quickstart/hello_world, distributed hello world example.
 * quickstart/rma, simple remote memory access example
-* quickstart/quicksort, parallel quicksort implementation
-* gtc, gyrokinetic torodial code
-* bfs, breadth-first-search, example code for a graph application
-* sheneos, partitioning of large data sets
-* accumulator, simple component example
+* quickstart/quicksort, parallel quicksort implementation.
+* gtc, gyrokinetic torodial code.
+* bfs, breadth-first-search, example code for a graph application.
+* sheneos, partitioning of large data sets.
+* accumulator, simple component example.
 * balancing/os_thread_num, balancing/px_thread_phase, examples demonstrating
-  load balancing and work stealing
+  load balancing and work stealing.
 
 [heading API Changes]
 
-* Added `hpx::find_all_localities`
-* Added `hpx::terminate` for non-graceful termination of applications
-* Added `hpx::lcos::async` functions for simpler asynchronous programming
-* Added new AGAS interface for handling of symbolic namespace (`hpx::agas::*`)
-* Renamed `hpx::components::wait` to `hpx::lcos::wait`
-* Renamed `hpx::lcos::future_value` to `hpx::lcos::promise`
+* Added `hpx::find_all_localities`.
+* Added `hpx::terminate` for non-graceful termination of applications.
+* Added `hpx::lcos::async` functions for simpler asynchronous programming.
+* Added new AGAS interface for handling of symbolic namespace (`hpx::agas::*`).
+* Renamed `hpx::components::wait` to `hpx::lcos::wait`.
+* Renamed `hpx::lcos::future_value` to `hpx::lcos::promise`.
 * Renamed `hpx::lcos::recursive_mutex` to `hpx::lcos::local_recursive_mutex`,
   `hpx::lcos::mutex` to `hpx::lcos::local_mutex`
 * Removed support for Boost versions older than V1.38, recommended Boost version
-  is now V1.47 and newer
-* Removed `hpx::process` (this will be repalced by a real process implementation
-  in the future
+  is now V1.47 and newer.
+* Removed `hpx::process` (this will be replaced by a real process implementation
+  in the future).
 * Removed non-functional LCO code (`hpx::lcos::dataflow`, `hpx::lcos::thunk`,
-  `hpx::lcos::dataflow_variable`)
-* Removed deprecated `hpx::naming::full_address`
+  `hpx::lcos::dataflow_variable`).
+* Removed deprecated `hpx::naming::full_address`.
+
+[heading Bug Fixes (Closed Tickets)]
+
+Here is a list of the important tickets we closed for this release:
+
+*  #28 - Integrate Windows/Linux CMake code for HPX core
+*  #32 - hpx::cout() should be hpx::cout
+*  #33 - AGAS V2 legacy client does not properly handle error_code
+*  #60 - AGAS: allow for registerid to optionally take ownership of the gid
+*  #62 - adaptive1d compilation failure in Fusion
+*  #64 - Parcel subsystem doesn't resolve domain names
+*  #83 - No error handling if no console is available
+*  #84 - No error handling if a hosted locality is treated as the bootstrap server
+*  #90 - Add general commandline option -N
+*  #91 - Add possibility to read command line arguments from file
+*  #92 - Always log exceptions/errors to the log file
+*  #93 - Log the command line/program name
+*  #95 - Support for distributed launches
+*  #97 - Attempt to create a bad component type in AMR examples
+* #100 - factorial and factorial_get examples trigger AGAS component type assertions
+* #101 - Segfault when hpx::process::here() is called in fibonacci2
+* #102 - unknown_component_address in int_object_semaphore_client
+* #114 - marduk raises assertion with default parameters
+* #115 - Logging messages for SMP runs (on the console) shouldn't be buffered
+* #119 - marduk linking strategy breaks other applications
+* #121 - pbsdsh problem
+* #123 - marduk, dataflow and adaptive1d fail to build
+* #124 - Lower default preprocessing arity
+* #125 - Move hpx::detail::diagnostic_information out of the detail namespace
+* #126 - Test definitions for AGAS reference counting
+* #128 - Add averaging performance counter
+* #129 - Error with endian.hpp while building adaptive1d
+* #130 - Bad initialization of performance counters
+* #131 - Add global startup/shutdown funtions to component modules
+* #132 - Avoid using auto_ptr
+* #133 - On Windows hpx.dll doesn't get installed
+* #134 - HPX_LIBRARY does not reflect real library name (on Windows)
+* #135 - Add detection of unique_ptr to build system
+* #137 - Add command line option allowing to repeatedly evaluate performance counters
+* #139 - Logging is broken
+* #140 - CMake problem on windows
+* #141 - Move all non-component libraries into $PREFIX/lib/hpx
+* #143 - adaptive1d throws an exception with the default command line options
+* #146 - Early exception handling is broken
+* #147 - Sheneos doesn't link on Linux
+* #149 - sheneos_test hangs
+* #154 - Compilation fails for r5661
+* #155 - Sine performance counters example chokes on chrono headers
+* #156 - Add build type to --version
+* #157 - Extend AGAS caching to store gid ranges
+* #158 - r5691 doesn't compile
+* #160 - Re-add AGAS function for resolving a locality to its prefix
+* #168 - Managed components should be able to access their own GID
+* #169 - Rewrite AGAS future pool
+* #179 - Complete switch to request class for AGAS server interface
+* #182 - Sine performance counter is loaded by other examples
+* #185 - Write tests for symbol namespace reference counting
+* #191 - Assignment of read-only variable in point_geometry
+* #200 - Seg faults when querying performance counters
+* #204 - --ifnames and suffix stripping needs to be more generic
+* #205 - --list-* and --print-counter-* options do not work together and produce no warning
+* #207 - Implement decrement entry merging
+* #208 - Replace the spinlocks in AGAS with hpx::lcos::local_mutexes
+* #210 - Add an --ifprefix option
+* #214 - Performance test for PX-thread creation
+* #216 - VS2010 compilation
+* #222 - r6045 context_linux_x86.hpp
+* #223 - fibonacci hangs when changing the state of an active thread
+* #225 - Active threads end up in the FEB wait queue
+* #226 - VS Build Error for Accumulator Client
+* #228 - Move all traits into namespace hpx::traits
+* #229 - Invalid initialization of reference in thread_init_data
+* #235 - Invalid GID in iostreams
+* #238 - Demangle type names for the default implementation of get_action_name
+* #241 - C++11 support breaks GCC 4.5
+* #247 - Reference to temporary with GCC 4.4
+* #248 - Seg fault at shutdown with GCC 4.4
+* #253 - Default component action registration kills compiler
+* #272 - G++ unrecognized command line option
+* #273 - quicksort example doesn't compile
+* #277 - Invalid CMake logic for Windows
 
 [endsect]
 
