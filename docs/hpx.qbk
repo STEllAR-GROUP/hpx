@@ -10,7 +10,7 @@
     [quickbook 1.5]
     [id hpx]
     [authors [STE||AR Group, The]]
-    [version 0.8.0]
+    [version 1.0.0]
     [copyright 2011 2012 The STE||AR Group]
     [license
         Distributed under the Boost Software License, Version 1.0. (See
@@ -25,7 +25,7 @@
 [? __disable_fixme__  [template fixme[s] ] ]
 
 [/ DEFINITIONS]
-[def __version__                V0.8.0]
+[def __version__                V1.0.0]
 
 [def __stellar__                [@http://stellar.cct.lsu.edu STE||AR]]
 [def __stellar_list__           [@email:gopx@cct.lsu.edu gopx@cct.lsu.edu]]
