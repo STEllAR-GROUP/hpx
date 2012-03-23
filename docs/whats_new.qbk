@@ -126,7 +126,7 @@ Here is a list of the important tickets we closed for this release:
 * #188 - Implement remaining AGAS reference counting test cases
 * #258 - No type checking of GIDs in stubs classes
 * #271 - Seg fault/shared pointer assertion in distributed code
-* #281 - CMake options need explanative text
+* #281 - CMake options need descriptive text
 * #283 - AGAS caching broken (gva_cache needs to be rewritten with ICL)
 * #285 - HPX_INSTALL root directory not the same as CMAKE_INSTALL_PREFIX
 * #286 - New segfault in dataflow applications
@@ -261,7 +261,7 @@ Here is a list of the important tickets we closed for this release:
 * #128 - Add averaging performance counter
 * #129 - Error with endian.hpp while building adaptive1d
 * #130 - Bad initialization of performance counters
-* #131 - Add global startup/shutdown funtions to component modules
+* #131 - Add global startup/shutdown functions to component modules
 * #132 - Avoid using auto_ptr
 * #133 - On Windows hpx.dll doesn't get installed
 * #134 - HPX_LIBRARY does not reflect real library name (on Windows)
