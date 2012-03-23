@@ -90,7 +90,7 @@ approximately 70 tickets (bugs, feature requests, etc.).
   instance, `hpx::lcos::local_mutex` is now `hpx::lcos::local::mutex`).
 * Replaced `hpx::actions::function` with `hpx::util::function`. Cleaned up
   related code.
-* Removed `hpx::traits::handle_gid` and moved handlingn of global reference
+* Removed `hpx::traits::handle_gid` and moved handling of global reference
   counts into the corresponding serialization code.
 * Changed terminology: `prefix` is now called `locality_id`, renamed the
   corresponding API functions (such as `hpx::get_prefix`, which is now called
