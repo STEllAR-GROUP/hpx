@@ -2,6 +2,8 @@
  HPX Build Instructions 
 ************************
 
+For SVN access, email gopx@cct.lsu.edu.
+
 Linux
 -----
 
@@ -21,11 +23,11 @@ Linux
 
     $ cmake [CMake variable definitions] /path/to/source/tree 
 
-4) Invoke GNU make. If you are on a box with multiple cores (very likely),
+4) Invoke GNU make. If you are on a machine with multiple cores (very likely),
    add the -jN flag to your make invocation, where N is the number of nodes
    on your machine plus one.::
 
-    $ gmake -j49
+    $ gmake -j17
  
 5) To complete the build and install HPX:::
 

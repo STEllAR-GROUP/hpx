@@ -29,13 +29,13 @@
 #define HPX_VERSION_MINOR        8
 #define HPX_VERSION_SUBMINOR     0
 
-#define HPX_VERSION_DATE         20110818
+#define HPX_VERSION_DATE         20120316
 
 #if !defined(HPX_AGAS_VERSION)
     #define HPX_AGAS_VERSION 0x21
 #endif
 
-#define HPX_VERSION_TAG          "-release"
+#define HPX_VERSION_TAG          ""
 
 #if !defined(HPX_SVN_REVISION)
     #define HPX_SVN_REVISION     "$Revision$"
