@@ -74,7 +74,7 @@ functions and classes throughout the manual:
     [[`foo()`]          [The function foo]]
 
     [[`foo<>()`]        [The template function foo (used only for template
-                        functions that require explicit parameters)]
+                        functions that require explicit parameters)]]
 
     [[`foo`]            [The class foo]]
 
