@@ -43,7 +43,7 @@
 [def __boost_getting_started__  [@http://www.boost.org/doc/libs/release/more/getting_started/index.html Getting Started]]
 [def __boost_doc__              [@http://www.boost.org/doc/ Boost Documentation]]
 
-[def __boost_program_options__  [@www.boost.org/doc/html/program_options.html Boost.Program Options]]
+[def __boost_program_options__  [@http://www.boost.org/doc/html/program_options.html Boost.Program Options]]
 [def __boost_atomic__           [@http://www.chaoticmind.net/~hcb/projects/boost.atomic/doc/index.html Boost.Atomic]]
 
 [/ external dependencies]
