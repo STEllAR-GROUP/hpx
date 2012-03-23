@@ -211,7 +211,7 @@ Now, in the directory where you put hello_world.cpp, issue the following command
 [teletype]
 
 ``
-    $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/
+    $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
     $ c++ -o hello_world hello_world.cpp `pkg-config --cflags --libs hpx_application` -lhpx_component_iostreams -DHPX_APPLICATION_NAME=hello_world
 ``
 
