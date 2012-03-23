@@ -64,6 +64,23 @@ These icons precede some text to indicate:
                                         trouble if ignored]]
 ]
 
+The following table describes the syntax that will be used to refer to
+functions and classes throughout the manual:
+
+[table Syntax for Code References
+
+    [[Syntax]           [Meaning]]
+
+    [[`foo()`]          [The function foo]]
+
+    [[`foo<>()`]        [The template function foo (used only for template
+                        functions that require explicit parameters)]
+
+    [[`foo`]            [The class foo]]
+
+    [[`foo<>`]          [The template class foo]]
+]
+
 [heading Support]
 
 Please feel free to direct questions to HPX's mailing list: __stellar_list__

@@ -43,6 +43,9 @@
 [def __boost_getting_started__  [@http://www.boost.org/doc/libs/release/more/getting_started/index.html Getting Started]]
 [def __boost_doc__              [@http://www.boost.org/doc/ Boost Documentation]]
 
+[def __boost_program_options__  [@www.boost.org/doc/html/program_options.html Boost.Program Options]]
+[def __boost_atomic__           [@http://www.chaoticmind.net/~hcb/projects/boost.atomic/doc/index.html Boost.Atomic]]
+
 [/ external dependencies]
 [def __cmake__                  [@http://www.cmake.org CMake]]
 [def __gcc__                    [@http://gcc.gnu.org GNU Compiler Collection (g++)]]
@@ -71,12 +74,16 @@
 [def __swarm__                  [@http://www.etinternational.com/index.php/products/swarmbeta/ ETI SWift Adaptive Runtime Machine (SWARM)]]
 [def __qthreads__               [@http://www.cs.sandia.gov/qthreads/ Sandia National Labs Qthreads]]
 
-[/ Some images ]
+[/ Some images]
 [def __note__                   [$./images/note.png]]
 [def __tip__                    [$./images/tip.png]]
 [def __important__              [$./images/important.png]]
 [def __caution__                [$./images/caution.png]]
 [def __danger__                 [$./images/alert.png]]
+
+[/ C++ references]
+
+[template cxx_crtp              [@http://en.wikipedia.org/wiki/Curiously_recurring_template_pattern [str]]]
 
 [/ Section link shortcuts]
 [def __pbs__                    [link hpx.tutorial.getting_started.unix_pbs PBS]]
@@ -87,11 +94,12 @@
 [def __accumulator_example__    [link hpx.tutorial.examples.accumulator Accumulator Example]]
 
 [def __people__                 [link hpx.people People]]
+[def __getting_started__        [link hpx.tutorial.getting_started Getting Started]]
 [def __intro__                  [link hpx.tutorial.intro Introduction]]
 
 [template hpx_cmdline[str]      [link hpx.tutorial.getting_started.commandline [str]]]
 
-[template hpx_link[url txt] '''<ulink url="'''__hpx_source_dir__/[url]'''">'''[txt]'''</ulink>''']
+[template hpx_link[url txt]     '''<ulink url="file://'''__hpx_source_dir__/[url]'''">'''[txt]'''</ulink>''']
 
 [/  fig[ref title label]
     Image element with a title.

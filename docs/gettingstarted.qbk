@@ -413,7 +413,7 @@ Congratulations! You have just run your first distributed HPX application!
 The predefined command line options for any application using `hpx::init` are
 described in the table below:
 
-[/ TODO: proofread gettingstarted]
+[/ TODO: proofread the options]
 [table:commandline Default HPX Command Line Options
     [[Option]                   [Description]]
     [[[*HPX options (allowed on command line only)]]]

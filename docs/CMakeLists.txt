@@ -13,11 +13,11 @@ set(DOCUMENTATION_DEPENDENCIES
     ${DOCUMENTATION_FILES}
     ${hpx_SOURCE_DIR}/examples/quickstart/hello_world.cpp
     ${hpx_SOURCE_DIR}/examples/quickstart/simplest_hello_world.cpp
-    ${hpx_SOURCE_DIR}/examples/accumulator/accumulator/server/accumulator.hpp
-    ${hpx_SOURCE_DIR}/examples/accumulator/accumulator/stubs/accumulator.hpp
-    ${hpx_SOURCE_DIR}/examples/accumulator/accumulator/accumulator.hpp
-    ${hpx_SOURCE_DIR}/examples/accumulator/accumulator/accumulator.cpp
-    ${hpx_SOURCE_DIR}/examples/accumulator/accumulator_client.cpp
+    ${hpx_SOURCE_DIR}/examples/accumulator/accumulators/server/managed_accumulator.hpp
+    ${hpx_SOURCE_DIR}/examples/accumulator/accumulators/stubs/managed_accumulator.hpp
+    ${hpx_SOURCE_DIR}/examples/accumulator/accumulators/managed_accumulator.hpp
+    ${hpx_SOURCE_DIR}/examples/accumulator/accumulators/managed_accumulator.cpp
+    ${hpx_SOURCE_DIR}/examples/accumulator/managed_accumulator_client.cpp
     ${hpx_SOURCE_DIR}/examples/hello_world_component/hello_world_component.hpp
     ${hpx_SOURCE_DIR}/examples/hello_world_component/hello_world_component.cpp)
 
