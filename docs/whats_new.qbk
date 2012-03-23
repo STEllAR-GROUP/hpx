@@ -93,7 +93,7 @@ approximately 70 tickets (bugs, feature requests, etc.).
 * Removed `hpx::traits::handle_gid` and moved handlingn of global reference
   counts into the corresponding serialization code.
 * Changed terminology: `prefix` is now called `locality_id`, renamed the
-  corresponding API functions (such as `hpx::get_prefix`, which is nowc alled
+  corresponding API functions (such as `hpx::get_prefix`, which is now called
   `hpx::get_locality_id`).
 * Adding `hpx::find_remote_localities`, `hpx::get_num_localities`,
 * Changed performance counter naming scheme to make it more bash friendly.
