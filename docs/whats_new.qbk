@@ -94,7 +94,7 @@ approximately 70 tickets (bugs, feature requests, etc.).
 * Removed `hpx::traits::handle_gid` and moved handlingn of global reference
   counts into the corresponding serialization code.
 * Changed terminology: `prefix` is now called `locality_id`, renamed the
-  corresponding API functions (such as `hpx::get_prefix`, which is nowcalled
+  corresponding API functions (such as `hpx::get_prefix`, which is nowc alled
   `hpx::get_locality_id`).
 * Adding `hpx::find_remote_localities`, `hpx::get_num_localities`,
 * Changed performance counter naming scheme to make it more bash friendly.
@@ -130,7 +130,7 @@ Here is a list of the important tickets we closed for this release:
 * #283 - AGAS caching broken (gva_cache needs to be rewritten with ICL)
 * #285 - HPX_INSTALL root directory not the same as CMAKE_INSTALL_PREFIX
 * #286 - New segfault in dataflow applications
-* #289 - Exceptions should only be logged if unhandled
+* #289 - Exceptions should only be logged if not handled
 * #290 - c++11 tests failure
 * #293 - Build target for component libraries
 * #296 - Compilation error with Boost V1.49rc1
@@ -139,7 +139,7 @@ Here is a list of the important tickets we closed for this release:
 * #301 - Build error with Boost trunk
 * #303 - Logging assertion failure in distributed runs
 * #304 - Exception 'what' strings are lost when exceptions from decode_parcel are reported
-* #306 - Peformance counter user interface issues
+* #306 - Performance counter user interface issues
 * #307 - Logging exception in distributed runs
 * #308 - Logging deadlocks in distributed
 * #309 - Reference counting test failures and exceptions
@@ -151,7 +151,7 @@ Here is a list of the important tickets we closed for this release:
 * #322 - Command line processing ignored with Boost 1.47.0
 * #323 - Credit exhaustion causes object to stay alive
 * #324 - Duplicate exception messages
-* #326 - Intergrate Quickbook with CMake
+* #326 - Integrate Quickbook with CMake
 * #329 - --help and --version should still work
 * #330 - Create pkg-config files
 * #337 - Improve usability of performance counter timestamps
