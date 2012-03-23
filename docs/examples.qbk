@@ -8,10 +8,13 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 [section:examples Examples]
 
-The following sections of our tutorial are some examples for our reader to
-get familiar with HPX style programming. We start off with simple examples
-that utilize basic HPX elements and then begin to expose the reader to the
-more complex yet powerful HPX concepts.
+The following sections of our tutorial analyzes some examples to help you get
+familiar with the HPX style of programming. We start off with simple examples
+that utilize basic HPX elements and then begin to expose the reader to the more
+complex, yet powerful, HPX concepts.
+
+[note The instructions for building and running the examples currently 
+      only cover Unix variants.]
 
 [/Proofread by:]
 [/Adrian Serio 3-13-12]
@@ -22,7 +25,7 @@ more complex yet powerful HPX concepts.
 
 The Fibonacci sequence is a sequence of numbers starting with 0 and 1 where
 every subsequent number is the sum of the previous two numbers. In this
-example, we will use HPX to calculate the value of the n-th position of the
+example, we will use HPX to calculate the value of the n-th element of the
 Fibonacci sequence. In order to compute this problem in parallel, we will use
 a facility known as a Future.
 
@@ -50,112 +53,124 @@ Fibonacci example below to enable its parallel execution.
 
 [heading Setup]
 
-The source code for this example is in the svn repository:
-[^.../hpx/examples/quickstart/fibonacci.cpp]
-[fixme Add link to source here and remove reference to svn].
+[teletype]
 
-To compile this file type:
+The source code for this example can be found [hpx_link examples/quickstart/fibonacci.cpp..here]. 
 
+To compile this program, go to your HPX build directory (see __getting_started__
+for information on configuring and building HPX) and enter:
+
+``
     $ make examples.quickstart.fibonacci
-
-If you know how many cores your machine has, use make's '-j' option to increase
-the number of parallel processes that are running. You should start your number
-of cores plus an additional process for maximum speed. For instance, if your
-machine has 4 cores you would type:
-
-    $ make examples.quickstart.fibonacci -j5
-
-for the fastest build.
+``
 
 To run the program type:
 
+``
     $ ./bin/fibonacci
+``
 
 This should print (time should be approximate):
 
+``
     fibonacci(10) == 55
     elapsed time: 0.00186288 [s]
+``
 
-This run used the default setting of calculating the tenth place of the
-Fibonacci sequence. To declare which position you want to calculate, use
-the '--n-value' option. Additionally you can use the '--hpx:threads' option
-to declare how many threads you wish to use when running the program. For
-instance,running:
+This run used the default settings, which calculate the tenth element of the
+Fibonacci sequence. To declare which Fibonacci value you want to calculate, use
+the [^--n-value] option. Additionally you can use the
+[hpx_cmdline [^--hpx:threads]] option to declare how many OS-threads you
+wish to use when running the program. For instance, running:
 
-    $ ./bin/fibonacci --n-value 20 --hpx:threads 5
+```
+    $ ./bin/fibonacci --n-value 20 ``[link hpx.tutorial.getting_started.commandline --hpx:threads]`` 4
+```
 
 Will yield:
 
+``
     fibonacci(20) == 6765
     elapsed time: 0.233827 [s]
+``
 
-[/To run this program on multiple localities please see the __pbs__ documentation.]
+[c++]
 
 [heading Walkthrough]
 
-Now that you can compile and run the code lets look at how the code works.
-Since this code is written in C++, we will begin with main below. Here you can
-see that in HPX main is only used to initialize the runtime system. It is
-important to note that command line options are defined here. You can see
-that our programs '--n-value' is set by the instance of the Boost
-library class [^options_description] using the public member function
-[^.add_options()] (to learn more about this class see the __boost_doc__).
-In the description, the default value of
-the variable is set to 10. This is why when we ran the program for the first
-time without using the '--n-value' option the program returned the 10th
-value of the Fibonacci sequence. The last part of the description is the
-text that appears when a user uses the '--help' option to see what command
-line options are available.
+[c++]
+
+Now that you have compiled and run the code, let's look at how the code works.
+Since this code is written in C++, we will begin with the `main()` function.
+Here you can see that in HPX, `main()` is only used to initialize the runtime
+system. It is important to note that application-specific command line options
+are defined here. HPX uses __boost_program_options__ for command line
+processing. You can see that our programs [^--n-value] option is set by calling
+the `add_options()` method on an instance of
+`boost::program_options::options_description`.  The default value of the
+variable is set to 10. This is why when we ran the program for the first time
+without using the [^--n-value] option the program returned the 10th value of
+the Fibonacci sequence. The constructor argument of the description is the text
+that appears when a user uses the [hpx_cmdline [^--help]] option to see what
+command line options are available. `HPX_APPLICATION_STRING` is a macro that
+expands to a string constant containing the name of the HPX application
+currently being compiled.
 
 [import ../examples/quickstart/fibonacci.cpp]
 [fib_main]
 
-The [^init()] function in main calls [^hpx_main()] which is where the ["meat] of the
-program is. Below we can see that the basic program is simple. The command
-line option 'n-value' is read in, a timer is set, a future is created,
-a [^.get()] function is called, and the data is printed out.
+The `hpx::init()` function in `main()` starts the runtime system, and invokes
+`hpx_main()` as the first HPX-thread. Below we can see that the basic program
+is simple. The command line option [^--n-value] is read in, a timer
+(`hpx::util::high_resolution_timer`) is set up to record the time it takes to
+do the computation, an `hpx::lcos::future<>` is created, the `get()` function 
+on the `hpx::lcos::future<>` is called to retrieve or wait for the result, and
+the answer is printed out.
 
 [fib_hpx_main]
 
-Upon a closer look we see that the future we created is assigned the return
-of [^async<fibonacci_action>(find_here(), n)]. [^async<>] takes an action,
-in this case [^fibonacci_action], and returns a future. But wait, what is an
-action? And what is this [^fibonacci_action]? For starters, an action is a
-wrapper for a function.  By wrapping functions, HPX can place packets of work
-into different types of processing vehicles. These vehicles allow users to
-calculate work now, later, or on certain nodes. These other methods of
-processing work will be brought up later, for now we will stick to simple
-futures which once created immediately start to do work as soon as resources
-are available. To further understand this we turn to the
-code to find where [^fibonacci_action] was [^typedef]'d:
+Upon a closer look we see that the `hpx::lcos::future<>` we created is assigned
+the return of `hpx::lcos::async<fibonacci_action>(hpx::find_here(), n)`.
+`hpx::lcos::async<>()` takes an action, in this case `fibonacci_action`, and
+asynchronously kicks of the computation of the action, returning a future which
+represents the result of the computation. But wait, what is an action? And what
+is this `fibonacci_action`? For starters, an action is a wrapper for a
+function. By wrapping functions, HPX can send packets of work to different
+processing units. These vehicles allow users to calculate work now, later, or
+on certain nodes. The first argument to `hpx::lcos::async<>()` is the location
+where the action should be run. In this case, we just want to run the action on
+the machine that we are currently on, so we use `hpx::find_here()`. To further
+understand this we turn to the code to find where `fibonacci_action` was
+defined:
 
 [fib_action]
 
-Finally we are getting somewhere! In this block of code the function
-[^fibonacci] is declared. After the declaration, the function was wrapped in
-an action called [^plain_result_action1] (we use [^plain_result_action1]
-because the function takes one argument). This action was then ["registered]
-as an HPX action.
+In this block of code the function `fibonacci()` is declared. After the
+declaration, the function is wrapped in a `hpx::actions::plain_result_action1<>`.
+A plain action is the most basic form of action. Plain actions wrap simple global
+functions which are not associated with any particular object (we will discuss
+other types of actions in the __accumulator_example__). The name of the action
+is tells us about the arity and nature of the functions return type. `1` signifies that the
+action takes 1 argument, and `result` indicates that the action returns a non-`void`
+value. 
 
-This picture should now start making sense. The function [^fibonacci] is
-wrapped in an action [^plain_result_action1], which in turn was wrapped
-in [^async<>], which returns a future. Now that we understand where all these
-variables are coming from lets look at the function [^fibonacci]:
+This picture should now start making sense. The function `fibonacci()` is
+wrapped in an action `hpx::actions::plain_result_action1<>`, which was spawned
+by `hpx::lcos::async<>()`, which returns a future. Now, lets look at the
+function `fibonacci()`:
 
 [fib_func]
 
-On first inspection this block of code is straightforward. First if n < 2,
-meaning if n = 0 or 1, then return 0 or 1 (as we recall the first position
-of the Fibonacci sequence is 0 and the second is one). Next two futures n1
-and n2 are created and their values are added together after being called
-by [^.get()]. But, hold-the-phone, by calling [^fibonacci_action] inside
-the function [^fibonacci] we are calling this function recursively!
-This is where the power of futures is displayed.
-The function [^fibonacci] will continue to be called until the value of n
-is equal to 0 or 1 (it increments down each time the function is called)
-at which point the values of the future will be returned as 0 or 1. When
-this happens the futures can then be added up and the value of the n-th
-position of the Fibonacci sequence can be calculated.
+On first inspection this block of code is straightforward. First, `if (n < 2)`,
+meaning n is 0 or 1, then we return 0 or 1 (recall the first element
+of the Fibonacci sequence is 0 and the second is 1). If n is larger than 1, then
+we spawn two futures, `n1` and `n2`. Each of these futures represents an asynchronous,
+recursive call to `fibonacci()`. After we've created both futures, we wait for both
+of them to finish computing, and then we add them together, and return that value
+as our result. The recursive call tree will continue until n is equal to 0 or 1,
+at which point the value can be returned because it is implicitly known. 
+When this termination condition is reached, the futures can then be added up,
+producing the n-th value of the Fibonacci sequence.
 
 [endsect] [/Fibonacci]
 
@@ -166,41 +181,54 @@ position of the Fibonacci sequence can be calculated.
 [/////////////////////////////////////////////////////////////////////////////]
 [section:hello_world Hello World]
 
-You have already looked at a simple ["Hello World] example.  In this version
-each locality will print out a statement that says which OS thread executed it
-and which locality it came from.  The output will look something like this:
+[teletype]
 
-    hello world from OS-thread 2 on locality 0
-    hello world from OS-thread 5 on locality 2
+This program will print out a hello world message on every OS-thread on every
+locality. The output will look something like this:
+
+``
+    hello world from OS-thread 1 on locality 0
+    hello world from OS-thread 1 on locality 1
     hello world from OS-thread 0 on locality 0
+    hello world from OS-thread 0 on locality 1
+``
 
 [heading Setup]
 
-The source file is already created for you and could be found in the svn
-repository: [^.../hpx/examples/quickstart/hello_world.cpp]
-[fixme add a link here and remove reference to svn].
+The source code for this example can be found [hpx_link examples/quickstart/hello_world.cpp..here]. 
 
-To compile this file type:
+To compile this program, go to your HPX build directory (see __getting_started__
+for information on configuring and building HPX) and enter:
 
+``
     $ make examples.quickstart.hello_world
+``
 
 To run the program type:
 
+``
     $ ./bin/hello_world
+``
 
 This should print:
 
+``
     hello world from OS-thread 0 on locality 0
+``
 
-To include more threads use the command line option '--hpx:threads' and
-type the number of threads that you wish to use.  For example, typing:
+To use more OS-threads use the command line option [hpx_cmdline [^--hpx:threads]]
+and type the number of threads that you wish to use. For example, typing:
 
-    $ ./bin/hello_world --hpx:threads 2
+```
+    $ ./bin/hello_world ``[link hpx.tutorial.getting_started.commandline --hpx:threads]`` 2
+```
 
 will yield:
 
+``
     hello world from OS-thread 1 on locality 0
     hello world from OS-thread 0 on locality 0
+``
 
 Notice how the ordering of the two print statements will change with
 subsequent runs. To run this program on multiple localities please see the
@@ -208,20 +236,30 @@ __pbs__ documentation.
 
 [heading Walkthrough]
 
-Now that you can compile and run the code lets look at how the code works
-beginning with main:
+[c++]
+
+Now that you have compiled and run the code, lets look at how the code works,
+beginning with `main()` and `hpx_main()`:
 
 [import ../examples/quickstart/hello_world.cpp]
 [hello_world_main]
 [hello_world_hpx_main]
 
 In this excerpt of the code we again see the use of futures. This time
-these futures are stored in a vector so that they can easily be accessed.
-New to us is the [^wait()] function. Wait provides a way to make sure
-that all of the futures have finished being calculated without having to call
-[^.get()] for each one. As in the __fibonacci_example__ our futures are set
-equal to an [^async<>] wrapped
-action. This action is declared here:
+the futures are stored in a vector so that they can easily be accessed.
+`hpx::lcos::wait()` is a family of functions that wait on for an `std::vector<>`
+of futures to become ready. In this piece of code, we are using the synchronous
+version of `hpx::lcos::wait()`, which takes one argument (the `std::vector<>` of
+futures to wait on). This function will not return until all the futures in the
+vector have been executed.
+
+In the __fibonacci_example__, we used `hpx::find_here()` to specified the target'
+of our actions. Here, we instead use `hpx::find_all_localities()`, which returns
+an `std::vector<>` containing the identifiers of all the machines in the system,
+including the one that we are on. 
+
+As in the __fibonacci_example__ our futures are set using `hpx::lcos::async<>()`.
+The `hello_world_foreman_action` is declared here:
 
 [hello_world_action_wrapper]
 
@@ -229,28 +267,44 @@ Another way of thinking about this wrapping technique is as follows: functions
 (the work to be done) are wrapped in actions, and actions can be executed
 locally or remotely (e.g. on another machine participating in the computation).
 
-Now it is time to look at the [^hello_world_foreman] which was wrapped in
-the action above:
+Now it is time to look at the `hello_world_foreman()` function which was wrapped in
+the action above: 
 
 [hello_world_foreman]
 
-Here the set 'attendance' is keeping track of which threads have printed
-out the hello world statement. When the thread prints out the statement
-the future returns to wait which invokes a lambda function.  This
-lambda erases the thread from the set 'attendance' thus letting
-[^hello_world_foreman] know how many threads still need to print out
-["hello world]. However, if the future returns a value of -1 the thread is
-skipped and that thread remains in 'attendance' for another cycle of the
-while loop.
+Now, before we discuss `hello_world_foreman()`, let's talk about the
+`hpx::lcos::wait()` function. `hpx::lcos::wait()` provides a way to make sure
+that all of the futures have finished being calculated without having to call
+`get()` for each one. The version of `hpx::lcos::wait()` used here performs an
+non-blocking wait, which acts on an `std::vector<>`. It queries the state of
+the futures, waiting for them to finish. Whenever a future becomes marked as
+ready, `hpx::lcos::wait()` invokes a callback function provided by the user,
+supplying the callback function with the index of the future in the
+`std::vector<>` and the result of the future.
 
-Finally, let us look at [^hello_world_worker].  Here [^hello_world_worker]
-checks to see if it is on the target thread. If it is the correct thread,
-it prints out the hello world statement and returns the OS thread number
-to [^wait()] in [^hello_world_foreman].  If it is not the correct thread,
-it returns a value of -1 which when returned to [^hello_world_foreman]
-leaves that thread number in the set 'attendance'.
+In `hello_world_foreman()`, an `std::set<>` called `attendance` keeps track of
+which OS-threads have printed out the hello world message. When the OS-thread
+prints out the statement, the future is marked as ready, and
+`hpx::lcos::wait()` invokes the callback function, in this case a C+11 lambda.
+This lambda erases the OS-threads id from the set `attendance`, thus letting
+`hello_world_foreman()` know which OS-threads still need to print out hello
+world. However, if the future returns a value of -1, the future executed on an
+OS-thread which has already printed out hello world. In this case, we have to
+try again by rescheduling the future in the next round. We do this by leaving
+the OS-thread id in `attendance`.
+
+Finally, let us look at `hello_world_worker()`. Here, `hello_world_worker()`
+checks to see if it is on the target OS-thread. If it is executing on the
+correct OS-thread, it prints out the hello world message and returns the
+OS-thread id to `hpx::lcos::wait()` in `hello_world_foreman()`. If it is
+not executing on the correct OS-thread, it returns a value of -1, which causes
+`hello_world_foreman()` to leave the OS-thread id in `attendance`.
 
 [hello_world_worker]
+
+Because HPX features work stealing task schedulers, there is no way to guarantee
+that an action will be scheduled on a particular OS-thread. This is why we must
+use a guess-and-check approach. 
 
 [endsect] [/Hello World]
 
@@ -261,206 +315,250 @@ leaves that thread number in the set 'attendance'.
 [/////////////////////////////////////////////////////////////////////////////]
 [section:accumulator Accumulator]
 
-Accumulator is a simple example that exposes the notion of components in HPX.
-Components allow us to run applications in an distributed environment in HPX.
-This example exposes four different functions: init, add, query and print.
-What this example does is it takes an input from a client locality component,
-puts the value in a data type (unsigned long) at the remote locality component.
-The print command from the client will print the contents of the remote locality
-component at the remote locality. The query command from the client will print
-the contents of the remote locality component at client locality.
+The accumulator example demonstrates the use of components. Components are C++
+classes that expose methods as a type of HPX action. These actions are called
+component actions.
 
-[heading Building the example]
+Components are globally named, meaning that a component action can be called
+remotely (e.g.  from another machine). There are two accumulator examples in
+HPX; managed_accumulator and simple_accumulator (we will talk more about the
+differences between the two later). This tutorial will examine the
+managed_accumulator variant.
 
-From your build directory, type the following:
+In the __fibonacci_example__ and the
+__hello_world_example__, we introduced plain actions, which wrapped global
+functions.  The target of a plain action is an identifier which refers to a
+particular machine involved in the computation. For plain actions, the target
+is the machine where the action will be executed. 
 
-    $ make examples.accumulator.accumulator
+Component actions, however, do not target machines. Instead, they target
+component instances. The instance may live on the machine that we've invoked
+the component action from, or it may live on another machine. 
 
-[heading Run the example]
+The component in this example exposes three different functions:
 
-From your bin directory inside install path, type the following:
+* `reset()` - Resets the accumulator value to 0.
+* `add(arg)` - Adds `arg` to the accumulators value.
+* `query()` - Queries the value of the accumulator.
 
-[teletype][/ switch to plain text source mode]
-On a single machine, first console:
+This example creates an instance of the accumulator, and then allows the user
+to enter commands at a prompt, which subsequently invoke actions on the
+accumulator instance.
 
-    ./accumulator_client -0 -l2
+[heading Setup]
 
-Same machine, second console, on identical path as above: [teletype]
+[teletype]
 
-    ./accumulator_client -1 -l2
+The source code for this example can be found
+[hpx_link examples/accumulator/accumulators..here]. 
 
-[heading Results]
+To compile this program, go to your HPX build directory (see __getting_started__
+for information on configuring and building HPX) and enter:
 
-Console 1:
+``
+    $ make examples.accumulator.managed_accumulator
+``
 
-    accumulator client, you may enter some commands (try 'help' if in doubt...)
-    add 5
-    print
-    query
-    {0000000200ff0001, 000000000002ffff}> 5
-    print
-    add 5
-    print
-    query
-    {0000000200ff0001, 000000000002ffff}> 10
-    quit
-
-Console 2:
-
-    {0000000200000000, 00007fff21db4860}> 5
-    {0000000200000000, 00007fff21db4860}> 5
-    {0000000200000000, 00007fff21db4860}> 10
-
-[heading Dissecting the Accumulator Example]
-
-The following text/code snippets gives us a basic infrastructure know how for
-creating our own components, using the accumulator components as an example.
-
-The file where the accumulator component object with its data and
-function members are defined:
-
-examples/accumulator/accumulator/server/accumulator.hpp
-
-[import ../examples/accumulator/accumulator/server/accumulator.hpp]
-[accumulator_namespace]
-The component object class inherits properties from
-`components::detail::managed_component_base<>`,
-making it a managed component.
-
-[accumulator_enum_action]
-The above enumeration is for all the actions exposed by the component. Its use
-comes later when we define the action as hpx action type.
-
-[accumulator_init]
-The above code snippet is a normal definition of an action that is performed by
-the component, where the component is instantiated. In this case, this action
-simply initializes component member variable arg_ to 0.
-
-[accumulator_action_init]
-The above code snippet encapsulates the exposed function (`accumulator::init`),
-along with its component type, return type and argument types into hpx action
-type, which enables boilerplate code for threads, serialization, etc. to be
-generated. Here the action takes no argument and returns no value.
-
-[accumulator_action_add]
-In the above hpx action type definition, the designated action takes one argument,
-and returns no value.
-
-[accumulator_action_declare]
-Here we declare all the action types that the component exposes to the hpx so
-that hpx runtime system recognizes that action as a valid hpx component action.
-
-Now we create client side methods to access the actions the component provides.
-The convention followed by the accumulator example, in hpx, is to create
-the following file:
-
-example/accumulator/accumulator/stubs/accumulator.hpp
-
-[import ../examples/accumulator/accumulator/stubs/accumulator.hpp]
-
-[accumulator_stub]
-
-The access methods provided at the client side allows access to component
-actions available in any of the localities where the component is instantiated
-as each method takes gid as first argument.
-
-[accumulator_stub_init]
-The above code snippet allows the client side to invoke init action
-(`server::accumulator::init_action`) directly at the component location. This action does
-not take any value as the definition of the action at the server-side implicitly
-initialized the data member of accumulator component to 0.
-
-[accumulator_stub_add]
-In the above add action, we can see, the action takes an additional parameter
-that is passed to the component where the component identified by gid is
-instantiated. Gid is however not an argument to the action of the component.
-
-[accumulator_stub_query]
-The above code snippet gives us an action that returns a value. The return type
-is unsigned long. The caller of this function needs to call `future.get()` on the
-return value of the function to obtain the result returned by the function.
-
-For example:
-
-    lcos::future<unsigned long> ret_value = query_async(gid);
-    ret_value.get()
-
-would get the value result returned by `query_async(gid)`.
+To run the program type:
 
 
-Now the following example gives another method of client side access to the
-component actions. File:
+``
+    ./bin/managed_accumulator_client
+``
 
-examples/accumulator/accumulator/accumulator.hpp
+Once the program starts running, it will print the following prompt and then
+wait for input. An example session is given below:
 
-[import ../examples/accumulator/accumulator/accumulator.hpp]
+``
+    commands: reset, add [amount], query, help, quit
+    > add 5
+    > add 10
+    > query
+    15
+    > add 2
+    > query
+    17
+    > reset
+    > add 1
+    > query
+    1
+    > quit
+``
 
-[accumulator_client]
-The methods defined in the above file gives us access to actions of component in
-the locality where the client object is instantiated. Here explicit gid of the
-component is not passed into the function. The function takes the gid of the
-locality where the client object is instantiated (`gid_`).
+[heading Walkthrough]
 
-[accumulator_client_base]
-The above code snippet make the client object instantiated effectively also inherit
-properties from the `stubs::accumulator` class.
+[c++]
 
-[accumulator_client_init]
-The above code would call the component init action using `gid_` of the client
-locality where the component is also instantiated.
+Now, let's take a look at the source code of the managed_accumulator example. This
+example consists of two parts: an HPX component library (a library that exposes
+an HPX component) and a client application which uses the library. This
+walkthrough will cover the HPX component library. The code for the client
+application can be found [hpx_link examples/accumulator/managed_accumulator_client.cpp..here]. 
 
-Registering Actions with HPX:
+An HPX component is represented by three C++ classes:
 
-/examples/accumulator/accumulator/accumulator.cpp
+* [*A server class] - The implementation of the components functionality.
+* [*A stubs class] - A lower-level interface to instances of the component.
+* [*A client class] - A high-level interface that acts as a proxy for an
+  instance of the component. 
 
-[import ../examples/accumulator/accumulator/accumulator.cpp]
-[accumulator_cpp]
+Typically, these three classes all have the same name, but stubs and server
+classes usually live in different sub-namespaces (`server` and `stubs`
+respectively).  For example, the full names of the three classes in
+managed_accumulator are:
 
-In the above file, we register component and actions with HPX. What is listed in
-the `server/accumulator.hpp` file is the declaration version of the above hpx
-action registration macro.
+* `examples::server::managed_accumulator` (server class)
+* `examples::stubs::managed_accumulator` (stubs class)
+* `examples::managed_accumulator` (client class)
 
+[heading The Server Class]
 
-Now for instantiating the accumulator example with its component objects and
-client side objects, the following file is used:
+The following code is from
+[hpx_link examples/accumulator/accumulators/server/managed_accumulator.hpp..server/managed_accumulator.hpp].
 
-/examples/accumulator/accumulator_client.cpp
+All HPX component server classes must inherit publicly from an HPX component
+base class. There are currently two component base classes:
 
-[import ../examples/accumulator/accumulator_client.cpp]
-[accumulator_accumulator_client]
+* `hpx::components::managed_component_base<>` - Managed components are components
+  which are allocated in bulk by HPX. Managed components are more efficient if
+  you are creating a large number (e.g. hundreds or more per machine) of
+  component instances.
+* `hpx::components::simple_component_base<>` - Simple components are components
+  which are allocated individually by HPX. Simple components are more efficient
+  if you are creating a small number (e.g. only a handful per machine) of
+  component instances.
 
-[accumulator_hpx_init]
-The above code bootstraps the hpx runtime system.
+The managed_accumulator component is a managed component, because it inherits
+from `hpx::components::managed_component_base`, as we can see in the following
+snippet:
 
-[accumulator_hpx_main]
-The above method would be entry point for accumulator application.
+[import ../examples/accumulator/accumulators/server/managed_accumulator.hpp]
+[managed_accumulator_server_inherit]
 
-[accumulator_comp]
-The above code returns the component type of accumulator (to distinguish accumulator
-component from other component types).
+Our accumulator class will need a data member to store its value in, so let's
+declare a data member:
 
-[accumulator_hpx_loc]
-In the above code all the available localities the hpx runtime system can access
-and which support the accumulator component type are listed.
+[managed_accumulator_server_data_member]
 
-[accumulator_hpx_loc_1]
-In the above code if there are more than one localities available to the runtime
-system, then the first one is selected of the listed localities else the locality
-where the `hpx_main()` is instantiated is selected where the accumulator component
-will be instantiated.
+The `boost::atomic<>` template class is from the __boost_atomic__ library. We use
+this class to ensure thread-safety in our example. Think of this data member as
+a thread-safe, 64-bit unsigned integer.
 
-[accumulator_create]
-With the above code, the accumulator component is created locally.
+The constructor for this class simply initializes `value_` to 0:
 
-[accumulator_execute]
-In above code snippet, commands to execute respective actions on the accumulator
-is passed.
+[managed_accumulator_server_ctor]
 
-[accumulator_hpx_finalize]
-Finally the above method will initiate shutdown procedure on the hpx runtime
-system.
+Next, let's look at the three methods of this component that we will be exposing
+as component actions:
 
-[c++][/ switch back to C++ source mode]
+[managed_accumulator_methods]
+
+Before we can define the action types for these methods, we first need to
+associate an action code (an arbitrary, unique integral value) with each method
+that we are going to expose as an action:
+
+[managed_accumulator_action_codes]
+
+Here are the action types. These types wrap the methods we're exposing. The
+wrapping technique is very similar to the one used in the __fibonacci_example__
+and the __hello_world_example__:
+
+[managed_accumulator_action_types]
+
+The last piece of code in the server class header is the declaration of the
+action type registration code:
+
+[managed_accumulator_registration_declarations]
+
+[note The code above must be placed in the global namespace.]
+
+The rest of the registration code is in 
+[hpx_link examples/accumulator/accumulators/managed_accumulator.cpp..managed_accumulator.cpp].
+
+[import ../examples/accumulator/accumulators/managed_accumulator.cpp]
+[managed_accumulator_registration_definitions]
+
+[note The code above must be placed in the global namespace.]
+
+[heading The Stubs Class]
+
+The following code is from
+[hpx_link examples/accumulator/accumulators/stubs/managed_accumulator.hpp..stubs/managed_accumulator.hpp].
+
+All stubs classes must inherit from the stubs base class, `hpx::components::stub_base<>`:
+
+[import ../examples/accumulator/accumulators/stubs/managed_accumulator.hpp]
+[managed_accumulator_stubs_inherit]
+
+The stubs class contains helper functions which invoke actions on component
+instances. There are a few different ways of invoking actions:
+
+* [*Non-blocking]: For actions which don't have return types, or when we do not
+  care about the result of an action, we can invoke the action using
+  fire-and-forget semantics. This means that once we have asked HPX to compute
+  the action, we forget about it completely and continue with our computation.
+  We use `hpx::applier::apply<>()` instead of `hpx::lcos::async<>()` to invoke
+  an action in a non-blocking fashion. Here's an example from the
+  managed_accumulator stubs class:
+
+[managed_accumulator_stubs_reset_non_blocking]
+
+* [*Asynchronous]: Futures, as demonstrated in __fibonacci_example__ and the
+  __hello_world_example__, enable asynchronous action invocation. Here's an
+  example from the managed_accumulator stubs class:
+
+[managed_accumulator_stubs_query_async]
+
+* [*Synchronous]: To invoke an action in a fully synchronous manner, we can
+  simply call `hpx::lcos::async<>().get()` (e.g., create a future and immediately
+  wait on it to be ready). Here's an example from the managed_accumulator stubs
+  class:
+
+[managed_accumulator_stubs_add_sync]
+
+`hpx::naming::id_type` is a type which represents a global identifier in HPX.
+This is the type that is returned by `hpx::find_here()`. This type specifies
+the target of an action.
+
+[heading The Client Class]
+
+The following code is from
+[hpx_link examples/accumulator/accumulators/managed_accumulator.hpp..managed_accumulator.hpp].
+
+The client class is the primary interface to a component instance. Client classes
+are used to create components:
+
+``
+    examples::managed_accumulator c;
+    c.create(hpx::find_here()); // Create a component on this machine.
+``
+
+and to invoke component actions:
+
+``
+    c.add_sync(4);
+``
+
+Clients, like stubs and servers, need to inherit from a base class, this time,
+`hpx::components::client_base<>`:
+
+[import ../examples/accumulator/accumulators/managed_accumulator.hpp]
+[managed_accumulator_client_inherit]
+
+For readability, we typedef the base class like so:
+
+[managed_accumulator_base_type]
+
+Here are examples of how to expose actions through a client class:
+
+[managed_accumulator_client_reset_non_blocking]
+
+[managed_accumulator_client_query_async]
+
+[managed_accumulator_client_add_sync]
+
+Note that `this->gid_` references a data member of the
+`hpx::components::client_base<>` base class.
 
 [endsect] [/Accumulator]
 
@@ -470,3 +568,4 @@ system.
 [/////////////////////////////////////////////////////////////////////////////]
 
 [endsect] [/Examples]
+

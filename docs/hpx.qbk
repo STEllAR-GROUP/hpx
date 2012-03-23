@@ -10,7 +10,7 @@
     [quickbook 1.5]
     [id hpx]
     [authors [STE||AR Group, The]]
-    [version 1.0.0]
+    [version 0.8.0]
     [copyright 2011 2012 The STE||AR Group]
     [license
         Distributed under the Boost Software License, Version 1.0. (See
@@ -25,7 +25,7 @@
 [? __disable_fixme__  [template fixme[s] ] ]
 
 [/ DEFINITIONS]
-[def __version__                V1.0.0]
+[def __version__                V0.8.0]
 
 [def __stellar__                [@http://stellar.cct.lsu.edu STE||AR]]
 [def __stellar_list__           [@email:gopx@cct.lsu.edu gopx@cct.lsu.edu]]
@@ -37,12 +37,36 @@
 [def __fau__                    [@http://www.fau.de Friedrich-Alexander University Erlangen-Nuremberg (FAU)]]
 [def __inf3__                   [@http://www3.cs.fau.de Chair of Computer Science 3 - Computer Architecture]]
 
-[def __cmake__                  [@http://www.cmake.org/ CMake]]
-
 [def __boost__                  [@http://www.boost.org/ Boost]]
+[def __boost_libraries__        [@http://www.boost.org/ Boost C++ Libraries]]
 [def __boost_tools__            [@http://www.boost.org/tools/index.html Boost Tools]]
 [def __boost_getting_started__  [@http://www.boost.org/doc/libs/release/more/getting_started/index.html Getting Started]]
 [def __boost_doc__              [@http://www.boost.org/doc/ Boost Documentation]]
+
+[def __boost_program_options__  [@www.boost.org/doc/html/program_options.html Boost.Program Options]]
+[def __boost_atomic__           [@http://www.chaoticmind.net/~hcb/projects/boost.atomic/doc/index.html Boost.Atomic]]
+
+[/ external dependencies]
+[def __cmake__                  [@http://www.cmake.org CMake]]
+[def __gcc__                    [@http://gcc.gnu.org GNU Compiler Collection (g++)]]
+[def __gmake__                  [@http://www.gnu.org/software/make GNU Make (gmake)]]
+[def __eglibc__                 [@http://eglibc.org/home Embedded GLIBC (EGLIBC)]]
+[def __glibc__                  [@http://gnu.org/s/libc GNU C Library (GLIBC)]]
+[def __libstdcxx__              [@http://gcc.gnu.org/libstdc++ GNU Standard C++ Library]]
+[def __rnpl__                   [@http://relativity.phys.lsu.edu/postdocs/matt/software.html RNPL]]
+[def __google_perftools__       [@http://code.google.com/p/gperftools google-perftools]]
+[def __visual_cxx__             [@http://msdn.microsoft.com/en-us/visualc/default.aspx Visual C++]]
+[def __jemalloc__               [@http://www.canonware.com/jemalloc jemalloc]]
+[def __libunwind__              [@http://www.nongnu.org/libunwind libunwind]]
+[def __hdf5__                   [@http://www.hdfgroup.org/HDF5 Hierarchical Data Format V5 (HDF5) Libraries]]
+[def __lorene__                 [@http://www.lorene.obspm.fr LORENE]]
+[def __papi__                   [@http://icl.cs.utk.edu/papi/ Performance Application Programming Interface]]
+[def __lapack__                 [@http://math-atlas.sourceforge.net/ Linear Algebra PACKage (LAPACK)]]
+[def __blas__                   [@http://math-atlas.sourceforge.net/ Basic Linear Algebra Subroutines 3 (BLAS)]]
+[def __gsl__                    [@http://www.gnu.org/software/gsl/ GNU Scientific Library (GSL)]]
+[def __qsub__                   [@http://www.clusterresources.com/torquedocs21/commands/qsub.shtml qsub]]
+[def __qstat__                  [@http://www.clusterresources.com/torquedocs21/commands/qstat.shtml qstat]]
+[def __pbsdsh__                 [@http://www.clusterresources.com/torquedocs21/commands/pbsdsh.shtml pbsdsh]]
 
 [/ optional external dependencies]
 [def __hwloc__                  [@http://www.open-mpi.org/projects/hwloc/ Portable Hardware Locality (HWLOC)]]
@@ -50,21 +74,32 @@
 [def __swarm__                  [@http://www.etinternational.com/index.php/products/swarmbeta/ ETI SWift Adaptive Runtime Machine (SWARM)]]
 [def __qthreads__               [@http://www.cs.sandia.gov/qthreads/ Sandia National Labs Qthreads]]
 
-[/ Some images ]
+[/ Some images]
 [def __note__                   [$./images/note.png]]
 [def __tip__                    [$./images/tip.png]]
 [def __important__              [$./images/important.png]]
 [def __caution__                [$./images/caution.png]]
 [def __danger__                 [$./images/alert.png]]
 
+[/ C++ references]
+
+[template cxx_crtp              [@http://en.wikipedia.org/wiki/Curiously_recurring_template_pattern [str]]]
+
 [/ Section link shortcuts]
-[def __pbs__                    [link hpx.tutorial.getting_started.pbs PBS]]
+[def __pbs__                    [link hpx.tutorial.getting_started.unix_pbs PBS]]
 [def __commandline__            [link hpx.tutorial.getting_started.commandline HPX Command Line Options]]
 
 [def __fibonacci_example__      [link hpx.tutorial.examples.fibonacci Fibonacci Example]]
 [def __hello_world_example__    [link hpx.tutorial.examples.hello_world Hello World Example]]
+[def __accumulator_example__    [link hpx.tutorial.examples.accumulator Accumulator Example]]
 
 [def __people__                 [link hpx.people People]]
+[def __getting_started__        [link hpx.tutorial.getting_started Getting Started]]
+[def __intro__                  [link hpx.tutorial.intro Introduction]]
+
+[template hpx_cmdline[str]      [link hpx.tutorial.getting_started.commandline [str]]]
+
+[template hpx_link[url txt]     '''<ulink url="file://'''__hpx_source_dir__/[url]'''">'''[txt]'''</ulink>''']
 
 [/  fig[ref title label]
     Image element with a title.
@@ -91,7 +126,7 @@
 
 The __stellar__ Group ([*S]ystems [*T]echnologies, [*E]mergent Para[*ll]elism,
 and [*A]lgorithms [*R]esearch) is a research group at __lsu__'s __cct__. For
-a list of people working in that group and participating in writing this
+a list of people working in this group and participating in writing this
 documentation see __people__.
 
 This documentation is automatically generated for HPX __version__ (from SVN
