@@ -7,7 +7,7 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
+//#include <hpx/util/high_resolution_timer.hpp>
 //#include <hpx/components/dataflow/dataflow.hpp>
 
 #include <algorithm>
@@ -420,6 +420,8 @@ inline void print(
   , std::string const& name
     )
 {
+    BOOST_ASSERT(2 == A.order());
+
     for (std::size_t i = 0; i < A.extent(0); ++i)
     {
         if (i == 0)
@@ -554,7 +556,7 @@ HPX_REGISTER_PLAIN_ACTION(multiply_and_add_action);
 template <
     typename T
 >
-inline orthotope<T> block_matrix_multiply(
+inline orthotope<T> blocked_matrix_multiply(
     orthotope<T> const& A
   , orthotope<T> const& B
   , std::size_t block_size
@@ -588,7 +590,8 @@ inline orthotope<T> block_matrix_multiply(
 
                 stop_list.push_back(
                     hpx::lcos::async<multiply_and_add_action>(
-                        hpx::find_here(), C_sub, A_sub, B_sub, mtx));
+                            hpx::find_here(), C_sub, A_sub, B_sub, mtx
+                        ).get_future());
             } 
         }
     }
@@ -596,6 +599,259 @@ inline orthotope<T> block_matrix_multiply(
     hpx::lcos::wait(stop_list);
 
     return C;
+}
+
+template <
+    typename T
+>
+inline T euclidean_norm(
+    orthotope<T> const& w
+    )
+{
+    BOOST_ASSERT(1 == w.order());
+
+    T sum = T();
+
+    for (std::size_t i = 0; i < w.extent(0); ++i)
+        sum += (w(i) * w(i));
+
+    return std::sqrt(sum);
+}
+
+template <
+    typename T
+>
+inline T compute_sigma(
+    orthotope<T> const& R
+  , std::size_t n
+  , std::size_t l
+    )
+{
+    BOOST_ASSERT(2 == R.order());
+
+    T sum = T();
+
+    for (std::size_t i = l; i < n; ++i)
+        sum += (R(i, l) * R(i, l));
+
+    return std::sqrt(sum);
+}
+
+template <
+    typename T
+>
+inline boost::int16_t compute_sign(
+    T const& x
+    )
+{
+    T const epsilon = std::numeric_limits<T>::epsilon();
+ 
+    if (std::abs(x) < epsilon)
+        return 1;
+    else if (x < epsilon)
+        return -1;
+    else
+        return 1;
+}
+
+template <
+    typename T
+>
+inline orthotope<T> compute_H(
+    orthotope<T> const& w
+    )
+{
+    BOOST_ASSERT(1 == w.order());
+
+    std::size_t const n = w.extent(0);
+
+    orthotope<T> H({n, n});
+
+    for (std::size_t i = 0; i < n; ++i)
+    {
+        for (std::size_t j = 0; j < n; ++j)
+        {
+            if (i == j)
+                H(i, j) = 1 - 2 * (w(i) * w(j));
+            else
+                H(i, j) = 0 - 2 * (w(i) * w(j)); 
+        }
+    }
+
+    return H;
+}
+
+template <
+    typename T
+>
+void check_QR(
+    orthotope<T> const& A
+  , orthotope<T> const& Q
+  , orthotope<T> const& R
+    )
+{ // {{{
+    BOOST_ASSERT(2 == A.order());
+    BOOST_ASSERT(2 == Q.order());
+    BOOST_ASSERT(2 == R.order());
+    BOOST_ASSERT(A.hypercube());
+    BOOST_ASSERT(Q.hypercube());
+    BOOST_ASSERT(R.hypercube());
+
+    std::size_t const n = A.extent(0);
+
+    BOOST_ASSERT(n == Q.extent(0));
+    BOOST_ASSERT(n == R.extent(0));
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Make sure Q * R equals A.
+    orthotope<T> QR = matrix_multiply(Q, R);
+
+    for (std::size_t l = 0; l < n; ++l)
+    {
+        for (std::size_t i = 0; i < n; ++i)
+        {
+            if (!compare_floating(A(l, i), QR(l, i), 1e-6)) 
+                std::cout << "WARNING: QR[" << l << "][" << i << "] (value "
+                          << QR(l, i) << ") is not equal to A[" << l << "]["
+                          << i << "] (value " << A(l, i) << ")\n";
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Make sure R is an upper triangular matrix. 
+    for (std::size_t l = 0; l < (n - 1); ++l)
+    {
+        for (std::size_t i = l + 1; i < n; ++i)
+        {
+            if (!compare_floating(0.0, R(i, l), 1e-6))
+                std::cout << "WARNING: R[" << i << "][" << l << "] is not 0 "
+                             "(value is " << R(i, l) << "), R is not an upper "
+                             "triangular matrix\n";
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Make sure Q is orthogonal. A matrix is orthogonal if its transpose is
+    /// equal to its inverse:
+    ///
+    ///     Q^T = Q^-1
+    ///
+    /// This implies that:
+    ///
+    ///     Q^T * Q = Q * Q^T = I
+    /// 
+    /// We use the above formula to verify Q's orthogonality. 
+    orthotope<T> QT = Q.copy();
+
+    // Transpose QT.
+    for (std::size_t l = 0; l < (n - 1); ++l)
+        for (std::size_t i = l + 1; i < n; ++i)
+            std::swap(QT(l, i), QT(i, l));
+
+    // Compute Q^T * Q and store the result in QT.
+    QT = matrix_multiply(Q, QT);
+
+    for (std::size_t l = 0; l < n; ++l)
+    {
+        for (std::size_t i = 0; i < n; ++i)
+        {
+            // Diagonals should be 1. 
+            if (l == i)
+            {
+                if (!compare_floating(1.0, QT(l, i), 1e-6)) 
+                    std::cout << "WARNING: (Q^T * Q)[" << l << "][" << i << "] "
+                                 "is not 1 (value is " << QT(l, i) << "), Q is "
+                                 "not an orthogonal matrix\n";
+            }
+
+            // All other entries should be 0.
+            else
+            {
+                if (!compare_floating(0.0, QT(l, i), 1e-6)) 
+                    std::cout << "WARNING: (Q^T * Q)[" << l << "][" << i << "] "
+                                 "is not 0 (value is " << QT(l, i) << "), Q is "
+                                 "not an orthogonal matrix\n";
+            }
+        }
+    }
+} // }}}
+
+template <
+    typename T
+>
+void householders(
+    orthotope<T> const& A
+    )
+{
+    BOOST_ASSERT(2 == A.order());
+    BOOST_ASSERT(A.hypercube());
+
+    std::size_t const n = A.extent(0);
+
+    orthotope<T> R = A.copy();
+    orthotope<T> Q({n, n});
+
+    for (std::size_t l = 0; l < n; ++l)
+        Q(l, l) = 1.0;
+
+    for (std::size_t l = 0; l < (n - 1); ++l)
+    {
+        T const sigma = compute_sigma(R, n, l);
+        boost::int16_t const sign = compute_sign(R(l, l));
+
+        #if defined(HPXLA_DEBUG_HOUSEHOLDERS)
+            std::cout << (std::string(80, '#') + "\n")
+                      << "ROUND " << l << "\n\n";
+
+            print(sigma, "sigma");
+            print(sign, "sign");
+        #endif
+
+        orthotope<T> w({n});
+
+        w(l) = R(l, l) + sign * sigma;
+ 
+        for (std::size_t i = (l + 1); i < w.extent(0); ++i)
+            w(i) = R(i, l);
+
+        #if defined(HPXLA_DEBUG_HOUSEHOLDERS)
+            print(w, "u");
+        #endif
+
+        T const w_norm = euclidean_norm(w);
+
+        for (std::size_t i = l; i < n; ++i)
+            w(i) /= w_norm;
+
+        #if defined(HPXLA_DEBUG_HOUSEHOLDERS)
+            print(w, "v");
+        #endif
+
+        orthotope<T> H = compute_H(w);
+
+        #if defined(HPXLA_DEBUG_HOUSEHOLDERS)
+            print(H, "H");
+        #endif
+
+        R = matrix_multiply(H, R);
+
+        Q = matrix_multiply(Q, H);
+
+        for (std::size_t i = l + 1; i < n; ++i)
+            R(i, l) = 0;
+    }
+
+    #if defined(HPXLA_DEBUG_HOUSEHOLDERS)
+        std::cout << std::string(80, '#') << "\n";
+    #endif
+
+    print(A, "A");
+    print(Q, "Q");
+    print(R, "R");
+
+    #if defined(HPXLA_DEBUG_HOUSEHOLDERS)
+        check_QR(A, Q, R);
+    #endif
 }
 
 template <
@@ -622,23 +878,52 @@ inline void random_matrix(
 int hpx_main(boost::program_options::variables_map& vm)
 {
     {
-        orthotope<double> A({100, 100}), B({100, 100});
+        orthotope<double>
+            A0({3, 3})
+          , A1({3, 3})
+          , A2({3, 3})  
+          , A3({3, 3})
+          , A4({3, 3})
+          , A5({4, 4})
+            ;
+    
+        // QR {{1, 3, 6}, {3, 5, 7}, {6, 7, 4}}
+        A0.row(0,  1,    3,    6   );
+        A0.row(1,  3,    5,    7   );
+        A0.row(2,  6,    7,    4   );
+    
+        // QR {{12, -51, 4}, {6, 167, -68}, {-4, 24, -41}}
+        A1.row(0,  12,  -51,   4   );
+        A1.row(1,  6,    167, -68  );
+        A1.row(2, -4,    24,  -41  );
+ 
+        // QR {{2, -2, 18}, {2, 1, 0}, {1, 2, 0}}
+        A2.row(0,  2,   -2,    18  );
+        A2.row(1,  2,    1,    0   );
+        A2.row(2,  1,    2,    0   );
+   
+        // QR {{0, 1, 1}, {1, 1, 2}, {0, 0, 3}}
+        A3.row(0,  0,    1,    1   );
+        A3.row(1,  1,    1,    2   );
+        A3.row(2,  0,    0,    3   );
 
-        boost::uint64_t const seed = std::time(0);
-
-        std::cout << "seed: " << seed << "\n\n";
-
-        random_matrix(A, seed);
-        random_matrix(B, seed);
-
-        hpx::util::high_resolution_timer t;
-
-        orthotope<double> C = block_matrix_multiply(A, B, 20);
-
-        std::cout << "elapsed time: " << t.elapsed() << "\n";
-
-        if (!matrix_equal(matrix_multiply(A, B), C))
-            std::cout << "matrices are not equal!\n";
+        // QR {{1, 1, -1}, {1, 2, 1}, {1, 2, -1}}
+        A4.row(0,  1,    1,   -1   );
+        A4.row(1,  1,    2,    1   );
+        A4.row(2,  1,    2,   -1   );
+    
+        // QR {{4, -2, 2, 8}, {-2, 6, 2, 4}, {2, 2, 10, -6}, {8, 4, -6, 12}}
+        A5.row(0,  4,   -2,    2,    8   );
+        A5.row(1, -2,    6,    2,    4   );
+        A5.row(2,  2,    2,    10,  -6   );
+        A5.row(3,  8,    4,   -6,    12  );
+    
+        householders(A0);
+        householders(A1);
+        householders(A2);
+        householders(A3);
+        householders(A4);
+        householders(A5);
     }
 
     return hpx::finalize(); 

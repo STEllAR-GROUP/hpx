@@ -6,6 +6,7 @@
 
 set(example_programs
     blocked_matrix_multiply
+    householder_qr_factorization
    )
 
 #set(blocked_matrix_multiply_FLAGS DEPENDENCIES dataflow_component)
@@ -33,9 +34,9 @@ foreach(example_program ${example_programs})
                               ${example_program}_exe)
 endforeach()
 
-set_property(TARGET blocked_matrix_multiply_exe APPEND
-  PROPERTY COMPILE_DEFINITIONS
-  "HPX_ACTION_ARGUMENT_LIMIT=10"
-  "HPX_COMPONENT_CREATE_ARGUMENT_LIMIT=10"
-  "HPX_FUNCTION_LIMIT=13")
+#set_property(TARGET blocked_matrix_multiply_exe APPEND
+#  PROPERTY COMPILE_DEFINITIONS
+#  "HPX_ACTION_ARGUMENT_LIMIT=10"
+#  "HPX_COMPONENT_CREATE_ARGUMENT_LIMIT=10"
+#  "HPX_FUNCTION_LIMIT=13")
 
