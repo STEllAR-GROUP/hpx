@@ -7,6 +7,7 @@
 set(example_programs
     blocked_matrix_multiply
     householder_qr_factorization
+    explicit_qr_algorithm
    )
 
 #set(blocked_matrix_multiply_FLAGS DEPENDENCIES dataflow_component)
