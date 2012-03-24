@@ -10,6 +10,7 @@
 //#include <hpx/util/high_resolution_timer.hpp>
 //#include <hpx/components/dataflow/dataflow.hpp>
 
+#include <complex>
 #include <algorithm>
 #include <cmath>
 #include <ctime>
@@ -779,6 +780,42 @@ void check_QR(
 template <
     typename T
 >
+void write_octave_file(
+    orthotope<T> const& A
+  , std::string const& name
+    )
+{
+    BOOST_ASSERT(2 == A.order());
+
+    std::size_t const rows = A.extent(0);
+    std::size_t const cols = A.extent(1);
+
+    std::ofstream file(name + ".mat");
+
+    BOOST_ASSERT(file.is_open());
+
+    file << "# name: " << name << "\n"
+         << "# type: matrix\n"
+         << "# rows: " << rows << "\n"
+         << "# columns: " << cols << "\n";
+
+    for (std::size_t i = 0; i < rows; ++i)
+    {
+        for (std::size_t j = 0; j < cols; ++j)
+        {
+            T const v = (compare_floating(0.0, A(i, j), 1e-6) ? 0.0 : A(i, j));
+            file << " " << v; 
+        }
+
+        file << "\n";
+    }
+
+    file.close();
+}
+
+template <
+    typename T
+>
 void householders(
     orthotope<T> const& A
   , orthotope<T>& Q
@@ -876,21 +913,94 @@ void qr_eigenvalue(
 
         Ak = matrix_multiply(R, Q); 
 
-        bool upper_triangular = true;
+        bool pseudo_upper_triangular = true;
 
         for (std::size_t k = 0; k < (n - 1); ++k)
-            for (std::size_t i = k + 1; i < n; ++i)
+            for (std::size_t i = k + 2; i < n; ++i)
                 if (!compare_floating(0.0, Ak(i, k), 1e-6))
-                    upper_triangular = false;
+                    pseudo_upper_triangular = false;
 
-        if (upper_triangular)
+        if (pseudo_upper_triangular)
             break;
+
+        if (iterations > 10000)
+        {
+            std::cout << "didn't converge\n";
+            write_octave_file(Ak, "Ak");
+            return;
+        }
     }
 
     std::cout << "converged in " << iterations << " iterations\n";
 
-    for (std::size_t i = n; i < n; ++i)
+    write_octave_file(Ak, "Ak");
+
+    for (std::size_t i = 0; i < n; ++i)
     {
+        if (i != n)
+        {
+            // Check for complex eigenvalues.
+            if (!compare_floating(0.0, Ak(i + 1, i), 1e-6))
+            {
+                /// For a 2x2 matrix:
+                ///
+                ///     A = [a b]
+                ///         [c d]
+                ///
+                /// The eigenvalues are:
+                ///
+                ///     e0 = (a + d) / 2 + sqrt(4 * b * c + (a - d) ^ 2) / 2
+                ///     e1 = (a + d) / 2 - sqrt(4 * b * c + (a - d) ^ 2) / 2
+                std::complex<T> e0, e1
+                              , a(Ak(i,     i))
+                              , b(Ak(i,     i + 1))
+                              , c(Ak(i + 1, i))
+                              , d(Ak(i + 1, i + 1));
+
+                std::complex<T> const c2(2.0);
+                std::complex<T> const c4(4.0);
+
+                using std::sqrt;
+
+                e0 = (a + d) / c2 + sqrt(c4 * b * c + (a - d) * (a - d)) / c2;
+                e1 = (a + d) / c2 - sqrt(c4 * b * c + (a - d) * (a - d)) / c2;
+
+                // Print e0
+                std::cout << "ev[" << i << "] = " << e0.real();
+
+                if (!compare_floating(0.0, e0.imag(), 1e-6))
+                {
+                    if (1 == compute_sign(e0.imag()))
+                        std::cout << " + " << e0.imag() << "i\n"; 
+                    else
+                        std::cout << " - " << std::abs(e0.imag()) << "i\n"; 
+                }
+
+                else
+                    std::cout << "\n";
+
+                // Print e1
+                std::cout << "ev[" << (i + 1) << "] = " << e1.real();
+
+                if (!compare_floating(0.0, e1.imag(), 1e-6))
+                {
+                    if (1 == compute_sign(e1.imag()))
+                        std::cout << " + " << e1.imag() << "i\n"; 
+                    else
+                        std::cout << " - " << std::abs(e1.imag()) << "i\n"; 
+                }
+
+                else
+                    std::cout << "\n";
+ 
+                // A(i + 1, i + 1) is also a complex eigenvalue, so we skip it
+                // next iteration.
+                ++i;
+
+                continue;
+            }
+        }
+
         std::cout << "ev[" << i << "] = " << Ak(i, i) << "\n";
     }
 }
@@ -908,7 +1018,7 @@ inline void random_matrix(
     std::size_t const n = A.extent(0);
     std::size_t const m = A.extent(1);
 
-    boost::random::mt19937_64 rng(std::time(0));
+    boost::random::mt19937_64 rng(seed);
     boost::random::uniform_int_distribution<> dist(-100, 100);
 
     for (std::size_t i = 0; i < n; ++i)
@@ -929,7 +1039,7 @@ inline void random_symmetric_matrix(
 
     std::size_t const n = A.extent(0);
 
-    boost::random::mt19937_64 rng(std::time(0));
+    boost::random::mt19937_64 rng(seed);
     boost::random::uniform_int_distribution<> dist(-100, 100);
 
     for (std::size_t l = 0; l < n; ++l)
@@ -948,7 +1058,7 @@ inline void random_symmetric_matrix(
 int hpx_main(boost::program_options::variables_map& vm)
 {
     {
-        orthotope<double> A({6, 6});
+        orthotope<double> A({4, 4});
 
 /*
         A.row(0,  4,   -2,    2,    8   );
@@ -957,13 +1067,18 @@ int hpx_main(boost::program_options::variables_map& vm)
         A.row(3,  8,    4,   -6,    12  );
 */
 
-        boost::uint64_t const seed = std::time(0);
+        A.row(0, -93,  -34,   18,  -85  );
+        A.row(1, -19,   6,    86,  -35  );
+        A.row(2,  13,   11,  -27,   90  );
+        A.row(3,  68,   6,   -12,  -75  );
+
+        boost::uint64_t const seed = 1332629047;//std::time(0);
 
         std::cout << "seed: " << seed << "\n\n";
 
-        random_symmetric_matrix(A, seed);
+//        random_matrix(A, seed);
 
-        print(A, "A");
+        write_octave_file(A, "A");
 
         hpx::util::high_resolution_timer t;
 
