@@ -780,7 +780,7 @@ void check_QR(
 template <
     typename T
 >
-void write_octave_file(
+void write_matrix_to_octave_file(
     orthotope<T> const& A
   , std::string const& name
     )
@@ -812,6 +812,39 @@ void write_octave_file(
 
     file.close();
 }
+
+template <
+    typename T
+>
+void write_evs_to_octave_file(
+    std::vector<std::complex<T> > const& v
+  , std::string const& name
+    )
+{
+    std::size_t const rows = v.size(); 
+
+    std::ofstream file(name + ".mat");
+
+    BOOST_ASSERT(file.is_open());
+
+    file << "# name: " << name << "\n"
+         << "# type: complex matrix\n"
+         << "# rows: " << rows << "\n"
+         << "# columns: 1\n";
+
+    for (std::size_t i = 0; i < rows; ++i)
+    {
+        T const real = (compare_floating(0.0, v[i].real(), 1e-6)
+                       ? 0.0 : v[i].real());
+        T const imag = (compare_floating(0.0, v[i].imag(), 1e-6)
+                       ? 0.0 : v[i].imag());
+
+        file << " (" << real << "," << imag << ")\n"; 
+    }
+
+    file.close();
+}
+
 
 template <
     typename T
@@ -892,15 +925,19 @@ void householders(
 template <
     typename T
 >
-void qr_eigenvalue(
+std::vector<std::complex<T> > qr_eigenvalue(
     orthotope<T> const& A
+  , std::size_t max_iterations
     )
 {
     BOOST_ASSERT(2 == A.order());
     BOOST_ASSERT(A.hypercube());
 
     std::size_t const n = A.extent(0); 
-    
+
+    std::vector<std::complex<T> > evs;
+    evs.reserve(n);
+
     orthotope<T> Ak = A.copy(), R, Q;
 
     std::size_t iterations = 0;
@@ -923,17 +960,17 @@ void qr_eigenvalue(
         if (pseudo_upper_triangular)
             break;
 
-        if (iterations > 10000)
+        if (iterations > max_iterations)
         {
-            std::cout << "didn't converge\n";
-            write_octave_file(Ak, "Ak");
-            return;
+            std::cout << "Didn't converge\n";
+            write_matrix_to_octave_file(Ak, "Ak");
+            return std::vector<std::complex<T> >();
         }
     }
 
-    std::cout << "converged in " << iterations << " iterations\n";
+    std::cout << "Converged in " << iterations << " iterations\n";
 
-    write_octave_file(Ak, "Ak");
+    write_matrix_to_octave_file(Ak, "Ak");
 
     for (std::size_t i = 0; i < n; ++i)
     {
@@ -951,6 +988,7 @@ void qr_eigenvalue(
                 ///
                 ///     e0 = (a + d) / 2 + sqrt(4 * b * c + (a - d) ^ 2) / 2
                 ///     e1 = (a + d) / 2 - sqrt(4 * b * c + (a - d) ^ 2) / 2
+                ///
                 std::complex<T> e0, e1
                               , a(Ak(i,     i))
                               , b(Ak(i,     i + 1))
@@ -965,34 +1003,9 @@ void qr_eigenvalue(
                 e0 = (a + d) / c2 + sqrt(c4 * b * c + (a - d) * (a - d)) / c2;
                 e1 = (a + d) / c2 - sqrt(c4 * b * c + (a - d) * (a - d)) / c2;
 
-                // Print e0
-                std::cout << "ev[" << i << "] = " << e0.real();
+                evs.push_back(e0);
+                evs.push_back(e1);
 
-                if (!compare_floating(0.0, e0.imag(), 1e-6))
-                {
-                    if (1 == compute_sign(e0.imag()))
-                        std::cout << " + " << e0.imag() << "i\n"; 
-                    else
-                        std::cout << " - " << std::abs(e0.imag()) << "i\n"; 
-                }
-
-                else
-                    std::cout << "\n";
-
-                // Print e1
-                std::cout << "ev[" << (i + 1) << "] = " << e1.real();
-
-                if (!compare_floating(0.0, e1.imag(), 1e-6))
-                {
-                    if (1 == compute_sign(e1.imag()))
-                        std::cout << " + " << e1.imag() << "i\n"; 
-                    else
-                        std::cout << " - " << std::abs(e1.imag()) << "i\n"; 
-                }
-
-                else
-                    std::cout << "\n";
- 
                 // A(i + 1, i + 1) is also a complex eigenvalue, so we skip it
                 // next iteration.
                 ++i;
@@ -1001,8 +1014,10 @@ void qr_eigenvalue(
             }
         }
 
-        std::cout << "ev[" << i << "] = " << Ak(i, i) << "\n";
+        evs.push_back(std::complex<T>(Ak(i, i)));
     }
+
+    return evs;
 }
 
 template <
@@ -1057,34 +1072,32 @@ inline void random_symmetric_matrix(
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
+    std::size_t const dimensions = vm["dimensions"].as<std::size_t>();
+
+    std::size_t const max_iterations = vm["max-iterations"].as<std::size_t>();
+
+    std::size_t seed = vm["seed"].as<std::size_t>();
+
+    if (!seed)
+        seed = std::size_t(std::time(0));
+
+    std::cout << "Seed: " << seed << "\n";
+
     {
-        orthotope<double> A({4, 4});
+        orthotope<double> A0({dimensions, dimensions});
 
-/*
-        A.row(0,  4,   -2,    2,    8   );
-        A.row(1, -2,    6,    2,    4   );
-        A.row(2,  2,    2,    10,  -6   );
-        A.row(3,  8,    4,   -6,    12  );
-*/
+        random_matrix(A0, seed);
 
-        A.row(0, -93,  -34,   18,  -85  );
-        A.row(1, -19,   6,    86,  -35  );
-        A.row(2,  13,   11,  -27,   90  );
-        A.row(3,  68,   6,   -12,  -75  );
-
-        boost::uint64_t const seed = 1332629047;//std::time(0);
-
-        std::cout << "seed: " << seed << "\n\n";
-
-//        random_matrix(A, seed);
-
-        write_octave_file(A, "A");
+        write_matrix_to_octave_file(A0, "A0");
 
         hpx::util::high_resolution_timer t;
 
-        qr_eigenvalue(A);
+        std::vector<std::complex<double> > evs
+            = qr_eigenvalue(A0, max_iterations);
 
-        std::cout << "elapsed time: " << t.elapsed() << "\n";
+        std::cout << "Elapsed Time: " << t.elapsed() << " [s]\n";
+
+        write_evs_to_octave_file(evs, "evs");
     }
 
     return hpx::finalize(); 
@@ -1095,6 +1108,18 @@ int main(int argc, char* argv[])
     // Configure application-specific options.
     boost::program_options::options_description
         cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
+
+    using boost::program_options::value;
+
+    cmdline.add_options()
+        ("dimensions", value<std::size_t>()->default_value(14),
+            "dimensions of randomly generated square input matrix")
+        ("max-iterations", value<std::size_t>()->default_value(10000),
+            "maximum number of iterations before admitting failure to converge")
+        ("seed", value<std::size_t>()->default_value(0),
+            "the seed for the pseudo random number generator (if 0, a seed "
+            "is chosen based on the current system time)")
+    ;
 
     // Initialize and run HPX.
     return hpx::init(cmdline, argc, argv);
