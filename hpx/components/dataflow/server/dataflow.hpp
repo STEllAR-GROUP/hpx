@@ -51,22 +51,15 @@ namespace hpx { namespace lcos { namespace server
         {
             components::set_component_type<dataflow>(type);
         }
-
-        dataflow(component_type * back_ptr)
-            : base_type(back_ptr)
-            , component_ptr(0)
-        {
-            BOOST_ASSERT(false);
-        }
-
+        
         void finalize()
         {
-            BOOST_ASSERT(component_ptr);
-            component_ptr->finalize();
         }
 
         ~dataflow()
         {
+            BOOST_ASSERT(component_ptr);
+            component_ptr->finalize();
             LLCO_(info)
                 << "~server::dataflow::dataflow()";
             BOOST_ASSERT(component_ptr);
@@ -99,6 +92,17 @@ namespace hpx { namespace lcos { namespace server
 
             lcos::local::spinlock::scoped_lock l(detail::dataflow_counter_data_.mtx_);
             ++detail::dataflow_counter_data_.initialized_;
+        }
+        
+        dataflow()
+        {
+            BOOST_ASSERT(false);
+        }
+
+        dataflow(component_type * back_ptr)
+            : base_type(back_ptr)
+        {
+            BOOST_ASSERT(false);
         }
 
         template <typename Action>

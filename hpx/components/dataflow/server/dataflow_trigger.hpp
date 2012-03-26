@@ -57,34 +57,21 @@ namespace hpx { namespace lcos { namespace server
             // which means connecting to the triggers
             std::vector<lcos::future<void> > trigger_future;
             trigger_future.reserve(trigger.size());
-            
-            LLCO_(info)
-                << "hpx::lcos::server::dataflow_trigger: converting dataflow to futures start\n";
 
-            //BOOST_FOREACH(hpx::lcos::dataflow_base<void> const & t, trigger)
-            for(std::size_t i; i < trigger.size(); ++i)
+            BOOST_FOREACH(hpx::lcos::dataflow_base<void> const & t, trigger)
             {
-                trigger_future.push_back(trigger[i].get_future());
-                new hpx::lcos::dataflow_base<void>(trigger[i]);
+
+                trigger_future.push_back(t.get_future());
             }
             
-            LLCO_(info)
-                << "hpx::lcos::server::dataflow_trigger: converting dataflow to futures finished\n";
-
             // After connecting, we can wait for the trigger
             // This can be in serial, because we have to wait for all trigger
             // to fire anyway, by getting the futures first, we already
             // connected to the dataflows asynchronously.
-            //BOOST_FOREACH(lcos::future<void> const & f, trigger_future)
-            for(std::size_t i; i < trigger_future.size(); ++i)
+            BOOST_FOREACH(lcos::future<void> const & f, trigger_future)
             {
-            
-                LLCO_(info)
-                    << "hpx::lcos::server::dataflow_trigger: waiting for trigger " << i << "\n";
                 // TODO: error handling
-                trigger_future[i].get();
-                LLCO_(info)
-                    << "hpx::lcos::server::dataflow_trigger: got trigger " << i << "\n";
+                f.get();
             }
 
             // after all triggers completed the operation, we fire all already
@@ -106,6 +93,11 @@ namespace hpx { namespace lcos { namespace server
                 applier::apply<action_type>(target);
             }
         }
+        
+        dataflow_trigger()
+        {
+            BOOST_ASSERT(false);
+        }
 
         dataflow_trigger(component_type * back_ptr)
             : base_type(back_ptr)
@@ -122,6 +114,9 @@ namespace hpx { namespace lcos { namespace server
         }
 
         void finalize()
+        {}
+
+        ~dataflow_trigger()
         {
             LLCO_(info)
                 << "hpx::lcos::server::dataflow_trigger: finalize\n";
@@ -139,10 +134,6 @@ namespace hpx { namespace lcos { namespace server
                 BOOST_ASSERT(target);
                 applier::apply<action_type>(target);
             }
-        }
-
-        ~dataflow_trigger()
-        {
             BOOST_ASSERT(targets.empty());
         }
 

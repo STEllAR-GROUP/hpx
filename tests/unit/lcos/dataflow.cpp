@@ -113,6 +113,7 @@ int hpx_main(variables_map & vm)
         // this as the target of the dataflow)
         HPX_TEST_EQ(18003, c.get_future().get());
 
+
         HPX_TEST_EQ(55u, fib(n).get_future().get());
 
         HPX_TEST_EQ(n, hpx::lcos::dataflow<id_action>(here, n).get_future().get());
@@ -136,6 +137,49 @@ int hpx_main(variables_map & vm)
         trigger.push_back(hpx::lcos::dataflow<f7action>(here));
         trigger.push_back(hpx::lcos::dataflow<f8action>(here));
 
+        hpx::lcos::dataflow_trigger(here, trigger).get_future().get();
+        HPX_TEST(called_f1);
+        HPX_TEST(called_f2);
+        HPX_TEST(called_f3);
+        HPX_TEST(called_f4);
+        HPX_TEST(called_f5);
+        HPX_TEST(called_f6);
+        HPX_TEST(called_f7);
+        HPX_TEST(called_f8);
+        called_f1 = false;
+        called_f2 = false;
+        called_f3 = false;
+        called_f4 = false;
+        called_f5 = false;
+        called_f6 = false;
+        called_f7 = false;
+        called_f8 = false;
+        hpx::lcos::future<void> f1 = hpx::lcos::dataflow<f1action>(here).get_future();
+        hpx::lcos::future<void> f2 = hpx::lcos::dataflow<f2action>(here).get_future();
+        hpx::lcos::future<void> f3 = hpx::lcos::dataflow<f3action>(here).get_future();
+        hpx::lcos::future<void> f4 = hpx::lcos::dataflow<f4action>(here).get_future();
+        hpx::lcos::future<void> f5 = hpx::lcos::dataflow<f5action>(here).get_future();
+        hpx::lcos::future<void> f6 = hpx::lcos::dataflow<f6action>(here).get_future();
+        hpx::lcos::future<void> f7 = hpx::lcos::dataflow<f7action>(here).get_future();
+        hpx::lcos::future<void> f8 = hpx::lcos::dataflow<f8action>(here).get_future();
+        f1.get();
+        f2.get();
+        f3.get();
+        f4.get();
+        f5.get();
+        f6.get();
+        f7.get();
+        f8.get();
+        HPX_TEST(called_f1);
+        HPX_TEST(called_f2);
+        HPX_TEST(called_f3);
+        HPX_TEST(called_f4);
+        HPX_TEST(called_f5);
+        HPX_TEST(called_f6);
+        HPX_TEST(called_f7);
+        HPX_TEST(called_f8);
+
+        /*
         hpx::lcos::dataflow<f9action>(
             here, hpx::lcos::dataflow_trigger(here, trigger)).get_future().get();
         HPX_TEST(called_f1);
@@ -147,6 +191,7 @@ int hpx_main(variables_map & vm)
         HPX_TEST(called_f7);
         HPX_TEST(called_f8);
         HPX_TEST(called_f9);
+        */
 
         //hpx::cout << "entering destruction test scope\n" << hpx::flush;
         {

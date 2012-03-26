@@ -25,7 +25,7 @@ namespace hpx { namespace lcos { namespace detail
             : gid_promise(promise)
         {}
 
-        void add_target(naming::id_type const & id) const
+        void connect(naming::id_type const & id) const
         {
             typedef
                 typename hpx::lcos::base_lco::connect_action
@@ -33,8 +33,7 @@ namespace hpx { namespace lcos { namespace detail
 
             BOOST_ASSERT(gid_promise.is_set());
 
-            //hpx::applier::apply<action_type>(gid_promise.get(), id);
-            hpx::lcos::async<action_type>(gid_promise.get(), id).get();
+            hpx::applier::apply<action_type>(gid_promise.get(), id);
         }
 
         naming::id_type get_gid() const

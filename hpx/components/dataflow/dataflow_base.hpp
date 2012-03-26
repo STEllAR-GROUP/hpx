@@ -27,11 +27,16 @@ namespace hpx { namespace lcos
         dataflow_base(future<naming::id_type> const & promise)
             : impl(new detail::dataflow_base_impl(promise))
         {}
+
+        void connect(naming::id_type const & id) const
+        {
+            impl->connect(id);
+        }
         
         future<Result, remote_result_type> get_future() const
         {
             promise<Result, remote_result_type> p;
-            impl->add_target(p.get_gid());
+            impl->connect(p.get_gid());
             return p.get_future();
         }
 
