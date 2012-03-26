@@ -272,8 +272,7 @@ endif()
 add_definitions("-DHPX_PREFIX=\"${HPX_PREFIX}\"")
 
 # Make sure the specified build type is valid
-if(NOT MSVC AND
-   NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug" OR
+if(NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug" OR
         "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo" OR
         "${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel" OR
         "${CMAKE_BUILD_TYPE}" STREQUAL "Release"))
