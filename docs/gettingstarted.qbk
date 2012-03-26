@@ -37,8 +37,8 @@ work, but we do not test HPX with other platforms, so please be warned.
 
 [table Supported Platforms for HPX
     [[Name   ][Recommended Version][Minimum Version][Architectures ]]
-    [[Windows][7, Server 2008 R2  ][Any NT system  ][x86-64]        ]
     [[Linux  ][3.2                ][2.6            ][x86-32, x86-64]]
+    [[Windows][7, Server 2008 R2  ][Any NT system  ][x86-64]        ]
 ]
 
 [heading Software and Libraries]
@@ -91,32 +91,53 @@ Depending on the options you chose while building and installing HPX,
 you will find that HPX may depend on several other libraries such as those
 listed below.
 
-[note Optional prerequisites in bold are highly suggested.]
+[table Highly Recommended Optional Software Prerequisites for HPX on Linux systems
+    [[Name                       ][Recommended Version][Minimum Version ][Notes]]
+
+    [[__hwloc__                  ][1.4                ][1.2             ]
+        [Used for OS-thread pinning and NUMA awareness.]]
+    [[__hdf5__                   ][1.8.7              ][1.6.7           ]
+        [Used for data I/O in the gravity, sheneos, neutron_star, interpolate1d
+         and interpolate3d applications. See important note below.]]
+    [[__google_perftools__       ][1.7.1              ][1.7.1           ]
+        [Used as a replacement for the system allocator, and for allocation
+         diagnostics.]]
+    [[__libunwind__              ][0.99               ][0.97            ]
+        [Dependency of google-perftools on x86-64, used for stack unwinding.]]
+]
 
 [table Optional Software Prerequisites for HPX on Linux systems
     [[Name                       ][Recommended Version][Minimum Version ][Notes]]
 
-    [[[*__hwloc__]               ][1.4                ][1.2             ][Used for OS-thread pinning and NUMA awareness.]]
-    [[__papi__                   ][                   ][                ][Used for accessing hardware performance data.]]
-    [[__lapack__                 ][                   ][                ][Used in the neutron_star application.]]
-    [[__blas__                   ][                   ][                ][Used in the neutron_star application.]]
-    [[__gsl__                    ][                   ][                ][Used in the neutron_star application.]]
-    [[__lorene__                 ][                   ][                ][Used in the neutron_star application.]]
-    [[__rnpl__                   ][1.11               ][1.11            ][Used for data I/O in the adaptive1d and neutron_star applications.]]
-    [[__jemalloc__               ][2.1.2              ][2.1.0           ][Used as a replacement for the system allocator.]]
-    [[[*__hdf5__]                ][1.8.7              ][1.6.7           ][Used for data I/O in the gravity, sheneos, neutron_star, interpolate1d and interpolate3d applications.
-                                                                          [*Must be compiled with threadsafety support.]]]
-    [[[*__google_perftools__]    ][1.7.1              ][1.7.1           ][Used as a replacement for the system allocator, and for allocation diagnostics.]]
-    [[[*__libunwind__]           ][0.99               ][0.97            ][Dependency of google-perftools on x86-64, used for stack unwinding.]]
+    [[__papi__                   ][                   ][                ]
+        [Used for accessing hardware performance data.]]
+    [[__lapack__                 ][                   ][                ]
+        [Used in the neutron_star application.]]
+    [[__blas__                   ][                   ][                ]
+        [Used in the neutron_star application.]]
+    [[__gsl__                    ][                   ][                ]
+        [Used in the neutron_star application.]]
+    [[__lorene__                 ][                   ][                ]
+        [Used in the neutron_star application.]]
+    [[__rnpl__                   ][1.11               ][1.11            ]
+        [Used for data I/O in the adaptive1d and neutron_star applications.]]
+    [[__jemalloc__               ][2.1.2              ][2.1.0           ]
+        [Used as a replacement for the system allocator.]]
 ]
 
-[table Optional Software Prerequisites for HPX on Windows systems
+[table Highly Recommended Optional Software Prerequisites for HPX on Windows systems
     [[Name                       ][Recommended Version][Minimum Version ][Notes]]
 
-    [[[*__hwloc__]               ][1.4                ][1.2             ][Used for OS-thread pinning and NUMA awareness.]]
-    [[[*__hdf5__]                ][1.8.7              ][1.6.7           ][Used for data I/O in the gravity, sheneos, neutron_star, interpolate1d and interpolate3d applications.
-                                                                          [*Must be compiled with threadsafety support.]]]
+    [[__hwloc__                  ][1.4.2              ][1.4.2           ]
+        [Used for OS-thread pinning and NUMA awareness.]]
+    [[__hdf5__                   ][1.8.7              ][1.6.7           ]
+        [Used for data I/O in the gravity, sheneos, neutron_star, interpolate1d
+         and interpolate3d applications. See important note below.]]
 ]
+
+[important The C++ HDF5 libraries must be compiled with enabled threadsafety
+           support. This has to be explicitly specified while configuring
+           the HDF5 libraries as it is not the default.]
 
 [endsect] [/ Prerequisites]
 
