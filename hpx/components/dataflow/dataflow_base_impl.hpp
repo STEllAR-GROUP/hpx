@@ -1,4 +1,4 @@
-//  Copyright (c) 2011 Thomas Heller
+//  Copyright (c) 2011-2012 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,6 +7,8 @@
 #define HPX_LCOS_DATAFLOW_BASE_IMPL_HPP
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/lcos/base_lco.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/components/dataflow/is_dataflow.hpp>
 
 namespace hpx { namespace lcos { namespace detail
@@ -16,18 +18,23 @@ namespace hpx { namespace lcos { namespace detail
         dataflow_base_impl()
         {}
 
-        ~dataflow_base_impl()
+        virtual ~dataflow_base_impl()
         {}
 
         dataflow_base_impl(lcos::future<naming::id_type> const & promise)
             : gid_promise(promise)
         {}
 
-        void invalidate()
+        void add_target(naming::id_type const & id) const
         {
-            /*
-            gid_promise.reset();
-            */
+            typedef
+                typename hpx::lcos::base_lco::connect_action
+                action_type;
+
+            BOOST_ASSERT(gid_promise.is_set());
+
+            //hpx::applier::apply<action_type>(gid_promise.get(), id);
+            hpx::lcos::async<action_type>(gid_promise.get(), id).get();
         }
 
         naming::id_type get_gid() const

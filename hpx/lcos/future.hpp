@@ -43,6 +43,9 @@ namespace hpx { namespace lcos
         friend class promise<Result, RemoteResult>;
 
     public:
+
+        typedef Result result_type;
+
         future()
         {}
 
@@ -94,6 +97,11 @@ namespace hpx { namespace lcos
             return future_data_->is_ready();
         }
 
+        bool is_set() const
+        {
+            return future_data_;
+        }
+
     private:
         boost::intrusive_ptr<future_data_type> future_data_;
     };
@@ -120,6 +128,8 @@ namespace hpx { namespace lcos
         friend class promise<void, util::unused_type>;
 
     public:
+        typedef void result_type;
+
         future()
         {}
 
@@ -169,6 +179,11 @@ namespace hpx { namespace lcos
         bool is_ready() const
         {
             return future_data_->is_ready();
+        }
+
+        bool is_set() const
+        {
+            return future_data_;
         }
 
     private:

@@ -163,6 +163,9 @@ namespace hpx { namespace traits
         typedef
             typename traits::promise_remote_result<Result>::type
             result_type;
+
+        typedef util::value_or_error<result_type> data_type;
+
         typedef
             hpx::lcos::base_lco_with_value<
                 result_type
@@ -201,7 +204,7 @@ namespace hpx { namespace traits
             (1<<N) |                                                            \
     /**/
         static const boost::uint32_t
-            args_completed = (BOOST_PP_REPEAT(N, HPX_LCOS_DATAFLOW_M0, _) 0);
+            slots_completed = (BOOST_PP_REPEAT(N, HPX_LCOS_DATAFLOW_M0, _) 0);
 #undef HPX_LCOS_DATAFLOW_M0
 #endif
 
@@ -212,19 +215,19 @@ namespace hpx { namespace traits
         )
             : back_ptr_(0)
 #if N > 0
-            , args_set(0)
+            , slots_set(0)
 #endif
-            , result_set(false)
             , targets(t)
             , action_id(id)
             , mtx(mtx)
         {
         }
 
+
         void init(BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))//BOOST_PP_REPEAT(N, HPX_RV_REF_ARGS, _))
         {
             LLCO_(info)
-                << "dataflow_impl<"
+                << "hpx::lcos::server::detail::dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
                 << ">::init(): "
                 << get_gid()
@@ -234,23 +237,9 @@ namespace hpx { namespace traits
 #endif
 #if N > 0
 #define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
-            typedef                                                             \
-                component_wrapper<                                              \
-                    dataflow_slot<                                              \
-                        BOOST_PP_CAT(A, N)                                      \
-                      , N, wrapped_type                                         \
-                    >                                                           \
-                >                                                               \
-                BOOST_PP_CAT(component_type, N);                                \
-                                                                                \
-            BOOST_PP_CAT(component_type, N) * BOOST_PP_CAT(w, N)                \
-                = new BOOST_PP_CAT(component_type, N)(                          \
-                    this                                                        \
-                  , BOOST_PP_CAT(a, N)                             \
-                );                                                              \
-                                                                                \
-            arg_ids[N] = BOOST_PP_CAT(w, N);                                    \
-            (*BOOST_PP_CAT(w, N))->connect();                                   \
+            set_slot<N>(                                                        \
+                BOOST_PP_CAT(a, N)                                              \
+              , typename hpx::traits::is_dataflow<BOOST_PP_CAT(A, N)>::type()); \
     /**/
 
             BOOST_PP_REPEAT(N, HPX_LCOS_DATAFLOW_M0, _)
@@ -258,20 +247,38 @@ namespace hpx { namespace traits
 #endif
         }
 
+        void finalize()
+        {
+            data_type d;
+            result.read(d);
+            std::vector<naming::id_type> t;
+            {
+                lcos::local::spinlock::scoped_lock l(mtx);
+                std::swap(targets, t);
+            }
+            for (std::size_t i = 0; i < t.size(); ++i)
+            {
+                if(!d.stores_value())
+                {
+                    typedef typename lco_type::set_error_action action_type;
+                    applier::apply<action_type>(t[i], d.get_error());
+                }
+                else
+                {
+                    typedef typename lco_type::set_result_action action_type;
+                    result_type r =  d.get_value();
+                    applier::apply<action_type>(t[i], boost::move(r));
+                }
+            }
+        }
+
         ~dataflow_impl()
         {
-            forward_results();
-            BOOST_ASSERT(result_set);
-            BOOST_ASSERT(targets.size() == 0);
+            BOOST_ASSERT(!result.is_empty());
+            BOOST_ASSERT(targets.empty());
 #if N > 0
-            BOOST_ASSERT(args_set == args_completed);
+            BOOST_ASSERT(slots_set == slots_completed);
 #endif
-#define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
-            delete arg_ids[N];                                                  \
-    /**/
-            //BOOST_PP_REPEAT(N, HPX_LCOS_DATAFLOW_M0, _)
-#undef HPX_LCOS_DATAFLOW_M0
-
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -280,69 +287,42 @@ namespace hpx { namespace traits
                 ;
         }
 
-        /*
-        void finalize()
-        {
-            int time = 0;
-#if N > 0
-            bool wait = false;
-            {
-                lcos::local::spinlock::scoped_lock l(mtx);
-                wait = (args_set == args_completed);
-            }
-            if(wait)
-#endif
-            {
-                while(true)
-                {
-                    {
-                        lcos::local::spinlock::scoped_lock l(mtx);
-                        if(result_set)
-                            break;
-                    }
-                    threads::suspend(boost::posix_time::microseconds(++time * 10));
-                }
-            }
-        }
-        */
-
         typedef typename Action::result_type remote_result;
 
         void set_result(BOOST_RV_REF(remote_result) r)
         {
-            BOOST_ASSERT(!result_set);
-            LLCO_(info)
-                << "dataflow_impl<"
-                << hpx::actions::detail::get_action_name<Action>()
-                << ">::set_result(): set_result: "
-                << targets.size()
-                ;
-            {
-                lcos::local::spinlock::scoped_lock l(mtx);
-
-                result = r;
-                result_set = true;
-            }
+            result.set(boost::move(r));
 
             forward_results();
         }
 
         void forward_results()
         {
+            BOOST_ASSERT(!result.is_empty());
             std::vector<naming::id_type> t;
             {
                 lcos::local::spinlock::scoped_lock l(mtx);
-                if(result_set == false) return;
                 std::swap(targets, t);
             }
 
             // Note: lco::set_result is a direct action, for this reason,
             //       the following loop will not be parallelized if the
             //       targets are local (which is ok)
+            data_type d;
+            result.read(d);
             for (std::size_t i = 0; i < t.size(); ++i)
             {
-                typedef typename lco_type::set_result_action action_type;
-                applier::apply<action_type>(t[i], boost::forward<remote_result>(result));
+                if(!d.stores_value())
+                {
+                    typedef typename lco_type::set_error_action action_type;
+                    applier::apply<action_type>(t[i], d.get_error());
+                }
+                else
+                {
+                    typedef typename lco_type::set_result_action action_type;
+                    result_type r =  d.get_value();
+                    applier::apply<action_type>(t[i], boost::move(r));
+                }
             }
         }
 
@@ -354,46 +334,112 @@ namespace hpx { namespace traits
                 << ">::set_target() of "
                 << get_gid()
                 << " ";
-            lcos::local::spinlock::scoped_lock l(mtx);
 
-            if(result_set)
+            if(!result.is_empty())
             {
-                typedef typename lco_type::set_result_action action_type;
-                l.unlock();
-                applier::apply<action_type>(target, boost::forward<remote_result>(result));
+                data_type d;
+                result.read(d);
+                
+                if(!d.stores_value())
+                {
+                    typedef typename lco_type::set_error_action action_type;
+                    applier::apply<action_type>(target, d.get_error());
+                }
+                else
+                {
+                    typedef typename lco_type::set_result_action action_type;
+                    result_type r =  d.get_value();
+                    applier::apply<action_type>(target, boost::move(r));
+                }
             }
             else
             {
+                lcos::local::spinlock::scoped_lock l(mtx);
                 targets.push_back(target);
             }
         }
 
 #if N > 0
-        template <int Slot, typename T>
+        template <int Slot, typename Future, typename Dataflow>
+        typename boost::enable_if<typename boost::is_same<typename Future::result_type, void>::type>::type
+        set_future_slot(Future const & f, Dataflow d)
+        {
+            // TODO: error handling
+            f.get();
+            set_slot<Slot>(hpx::util::unused_type(), boost::mpl::false_());
+        }
+        
+        template <int Slot, typename Future, typename Dataflow>
+        typename boost::disable_if<typename boost::is_same<typename Future::result_type, void>::type>::type
+        set_future_slot(Future const & f, Dataflow d)
+        {
+            // TODO: error handling
+            set_slot<Slot>(f.get(), boost::mpl::false_());
+        }
+
+        // Setting the slot for future values
+        template <int Slot, typename A>
+        void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
+        {
+            typedef
+                typename boost::remove_const<
+                    typename util::detail::remove_reference<
+                        A
+                    >::type
+                >::type
+                dataflow_type;
+            typedef typename dataflow_type::result_type dataflow_result_type;
+
+            future<dataflow_result_type> f = a.get_future();
+
+            // If the future has been already computed, set slot directly
+            if(f.is_ready())
+            {
+                set_future_slot<Slot>(f, hpx::util::unused_type());
+            }
+            // otherwise spawn thread which will block until result is ready.
+            else
+            {
+                void (dataflow_impl::*fun)(future<dataflow_result_type> const&, dataflow_type)
+                    = &dataflow_impl::set_future_slot<Slot, future<dataflow_result_type>, dataflow_type>;
+
+                // bind the dataflow in order to keep it alive
+                applier::register_thread_nullary(
+                    HPX_STD_BIND(fun, this, f, boost::forward<A>(a)),
+                    "hpx::lcos::server::detail::dataflow_impl::wait_for_slot");
+            }
+        };
+
+        // Setting the slot for immediate values
+        template <
+            int Slot
+          , typename A
+        >
         typename boost::enable_if<
             typename boost::mpl::has_key<slot_to_args_map, boost::mpl::int_<Slot> >::type
         >::type
-        set_arg(
-            BOOST_FWD_REF(T) value
-        )
+        set_slot(BOOST_FWD_REF(A) a, boost::mpl::false_)
         {
             boost::fusion::at<
                 typename boost::mpl::at<
                     slot_to_args_map
                   , boost::mpl::int_<Slot>
                 >::type
-            >(args) = boost::forward<T>(value);
+            >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
-        }
-
-        template <int Slot>
+        };
+        // Setting the slot for immediate values
+        template <
+            int Slot
+          , typename A
+        >
         typename boost::disable_if<
             typename boost::mpl::has_key<slot_to_args_map, boost::mpl::int_<Slot> >::type
         >::type
-        set_arg(hpx::util::unused_type)
+        set_slot(BOOST_FWD_REF(A), boost::mpl::false_)
         {
             maybe_apply<Slot>();
-        }
+        };
 
         template <int Slot>
         void maybe_apply()
@@ -401,10 +447,10 @@ namespace hpx { namespace traits
             bool apply_it = false;
             {
                 lcos::local::spinlock::scoped_lock l(mtx);
-                if(args_set != args_completed)
+                if(slots_set != slots_completed)
                 {
-                    args_set |= (1<<Slot);
-                    apply_it = (args_set == args_completed);
+                    slots_set |= (1<<Slot);
+                    apply_it = (slots_set == slots_completed);
                 }
             }
             if(apply_it)
@@ -415,7 +461,7 @@ namespace hpx { namespace traits
                 >()(
                     get_gid()
                   , action_id
-                  , args
+                  , slots
                 );
 
                 lcos::local::spinlock::scoped_lock l(mtx);
@@ -427,9 +473,9 @@ namespace hpx { namespace traits
                 << ">::maybe_apply(): "
                 << get_gid()
                 << " args set: "
-                << args_set
+                << slots_set
                 << "("
-                << args_completed
+                << slots_completed
                 << ")"
                 << "\n"
                 ;
@@ -476,18 +522,14 @@ namespace hpx { namespace traits
         components::managed_component<dataflow_impl>* back_ptr_;
 
 #if N > 0
-        args_type args;
-        boost::uint32_t args_set;
+        args_type slots;
+        boost::uint32_t slots_set;
 #endif
 
-        remote_result result;
-        bool result_set;
+        util::full_empty<data_type> result;
         std::vector<naming::id_type> & targets;
         naming::id_type action_id;
 
-#if N > 0
-        boost::array<component_wrapper_base *, N> arg_ids;
-#endif
         lcos::local::spinlock & mtx;
     };
 

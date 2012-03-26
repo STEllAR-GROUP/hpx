@@ -18,6 +18,7 @@
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/components/dataflow/server/dataflow.hpp>
 #include <hpx/components/dataflow/server/dataflow_trigger.hpp>
+#include <hpx/components/dataflow/dataflow_base.hpp>
 #include <hpx/include/iostreams.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
@@ -29,27 +30,18 @@ HPX_REGISTER_COMPONENT_MODULE();
 
 typedef hpx::components::managed_component<hpx::lcos::server::dataflow> dataflow_type;
 
-HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY_EX(
-    dataflow_type, bright_future_dataflow, true);
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(dataflow_type, bright_future_dataflow,
+    "hpx::lcos::server::dataflow");
 
 HPX_DEFINE_GET_COMPONENT_TYPE(dataflow_type::wrapped_type);
-
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::server::dataflow::connect_action
-  , dataflow_type_connect_action)
 
 typedef hpx::components::managed_component<hpx::lcos::server::dataflow_trigger>
     dataflow_trigger_type;
 
-HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY_EX(
-    dataflow_trigger_type,
-    bright_future_dataflow_trigger, true);
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(dataflow_trigger_type, bright_future_dataflow_trigger,
+    "hpx::lcos::server::dataflow");
 
 HPX_DEFINE_GET_COMPONENT_TYPE(dataflow_trigger_type::wrapped_type);
-
-HPX_REGISTER_ACTION_EX(
-    hpx::lcos::server::dataflow_trigger::connect_action
-  , dataflow_trigger_type_connect_action)
 
 // HPX_REGISTER_ACTION_EX(
 //     hpx::lcos::server::dataflow_trigger::init_action

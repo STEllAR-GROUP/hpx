@@ -1,4 +1,4 @@
-//  Copyright (c) 2011 Thomas Heller
+//  Copyright (c) 2011-2012 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -21,21 +21,6 @@ namespace hpx { namespace lcos
         typedef dataflow_base<void> base_type;
 
         typedef stubs::dataflow_trigger stub_type;
-
-        /*
-        dataflow_trigger(dataflow_trigger &&) = delete;
-        dataflow_trigger& operator=(dataflow_trigger &&) = delete;
-        
-        dataflow_trigger(dataflow_trigger const &o)
-            : base_type(o)
-        {}
-
-        dataflow_trigger& operator=(dataflow_trigger const& o)
-        {
-            base_type::impl.reset(new detail::dataflow_base_impl(*o.base_type::impl));
-            return *this;
-        }
-        */
 
         dataflow_trigger() {}
 

@@ -143,11 +143,12 @@ namespace hpx { namespace lcos { namespace server { namespace detail
                     traits::get_remote_result<result_type, remote_result>
                         ::call(r)
                 );
-            dataflow_source.invalidate();
+            //dataflow_source.invalidate();
         }
 
         void connect()
         {
+            /*
             LLCO_(info)
                 << "dataflow_slot<"
                 << util::type_id<T>::typeid_.type_id()
@@ -163,6 +164,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
             BOOST_ASSERT(dataflow_source.get_gid());
 
             applier::apply<action_type>(dataflow_source.get_gid(), get_gid());
+            */
         }
 
         void set_event()
@@ -269,7 +271,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
                 << ">::set_result() dynamic: "
                 << get_gid();
             dataflow_sink->set_slot(slot);
-            dataflow_source.invalidate();
+            //dataflow_source.invalidate();
         }
 
         void connect()
@@ -281,7 +283,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
                 << hpx::actions::detail::get_action_name<SinkAction>()
                 << ">::connect() dynamic: "
                 << get_gid();
-
+            /*
             typedef
                 typename dataflow_type::stub_type::server_type::connect_action
                 action_type;
@@ -289,6 +291,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
             BOOST_ASSERT(dataflow_source.get_gid());
 
             applier::apply<action_type>(dataflow_source.get_gid(), get_gid());
+            */
         }
 
         void set_event()

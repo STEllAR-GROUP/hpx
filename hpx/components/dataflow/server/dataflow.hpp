@@ -22,7 +22,8 @@ namespace hpx { namespace lcos { namespace server
 {
     /// The dataflow server side representation
     struct HPX_COMPONENT_EXPORT dataflow
-        : components::managed_component_base<
+        : base_lco
+        , components::managed_component_base<
             dataflow
           , hpx::components::detail::this_type
           , hpx::traits::construct_with_back_ptr
@@ -37,11 +38,31 @@ namespace hpx { namespace lcos { namespace server
             base_type;
         typedef hpx::components::managed_component<dataflow> component_type;
 
+        // disambiguate base classes
+        typedef base_lco base_type_holder;
+        using base_type::finalize;
+        typedef typename base_type::wrapping_type wrapping_type;
+
+        static components::component_type get_component_type()
+        {
+            return components::get_component_type<dataflow>();
+        }
+        static void set_component_type(components::component_type type)
+        {
+            components::set_component_type<dataflow>(type);
+        }
+
         dataflow(component_type * back_ptr)
             : base_type(back_ptr)
             , component_ptr(0)
         {
             BOOST_ASSERT(false);
+        }
+
+        void finalize()
+        {
+            BOOST_ASSERT(component_ptr);
+            component_ptr->finalize();
         }
 
         ~dataflow()
@@ -89,13 +110,16 @@ namespace hpx { namespace lcos { namespace server
             : base_type(back_ptr)
             , component_ptr(0)
         {
+            /*
             applier::register_thread(
                 HPX_STD_BIND(&dataflow::init<typename Action::type>
                   , this
                   , target
                 )
-              , "dataflow::init<>"
+              , "hpx::lcos::server::dataflow::init<>"
             );
+            */
+            init<typename Action::type>(target);
         }
 
         // Vertical preprocessor repetition to define the remaining
@@ -117,7 +141,7 @@ namespace hpx { namespace lcos { namespace server
         void connect(naming::id_type const & target)
         {
             LLCO_(info) <<
-                "server::dataflow::connect(" << target << ") {" << get_gid() << "}"
+                "hpx::lcos::server::dataflow::connect(" << target << ") {" << get_gid() << "}"
                 ;
             {
                 lcos::local::spinlock::scoped_lock l(mtx);
@@ -131,15 +155,8 @@ namespace hpx { namespace lcos { namespace server
             }
             (*component_ptr)->connect_nonvirt(target);
         }
-
-        typedef
-            ::hpx::actions::action1<
-                dataflow
-              , 0
-              , naming::id_type const &
-              , &dataflow::connect
-            >
-            connect_action;
+        
+        void set_event() {}
 
     private:
         detail::component_wrapper_base * component_ptr;
@@ -147,10 +164,6 @@ namespace hpx { namespace lcos { namespace server
         std::vector<naming::id_type> targets;
     };
 }}}
-
-HPX_REGISTER_ACTION_DECLARATION_EX(
-    hpx::lcos::server::dataflow::connect_action
-  , dataflow_type_connect_action)
 
 #endif
 
@@ -215,9 +228,9 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
                     >
                   , this
                   , target
-                  , BOOST_PP_ENUM_PARAMS(N, a)
+                  , BOOST_PP_ENUM(N, A)
                 )
-              , "dataflow::init<>"
+              , "hpx::lcos::server::dataflow::init<>"
             );
             */
             init<typename Action::type>(target, BOOST_PP_ENUM(N, M1, _));

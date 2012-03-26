@@ -1,4 +1,4 @@
-//  Copyright (c) 2011 Thomas Heller
+//  Copyright (c) 2011-2012 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -45,21 +45,6 @@ namespace hpx { namespace lcos
 
         typedef stubs::dataflow stub_type;
 
-        /*
-        dataflow(dataflow &&) = delete;
-        dataflow& operator=(dataflow &&) = delete;
-        
-        dataflow(dataflow const &o)
-            : base_type(o)
-        {}
-
-        dataflow& operator=(dataflow const& o)
-        {
-            base_type::impl.reset(new detail::dataflow_base_impl(*o.base_type::impl));
-            return *this;
-        }
-        */
-
         dataflow() {}
 
         ~dataflow()
@@ -100,7 +85,7 @@ namespace hpx { namespace lcos
 
 #define HPX_A(z, n, _)                                                 \
         BOOST_PP_COMMA_IF(n)                                                  \
-            typename boost::remove_const<typename hpx::util::detail::remove_reference<BOOST_PP_CAT(A, n)>::type>::type \
+            typename boost::remove_const<typename hpx::util::detail::remove_reference<BOOST_PP_CAT(A, n)>::type>::type const &\
     /**/
 
 #define HPX_FORWARD_ARGS(z, n, _)                                             \

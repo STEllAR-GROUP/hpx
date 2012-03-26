@@ -63,7 +63,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
     {};
 
     template <typename RemoteResult>
-    struct dataflow_is_void<dataflow_base<void, RemoteResult> >
+    struct dataflow_is_void<hpx::lcos::dataflow_base<void, RemoteResult> >
         : boost::mpl::true_
     {};
 
