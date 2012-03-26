@@ -15,7 +15,7 @@ add_subdirectory(sheneos)
 add_hpx_pseudo_dependencies(examples.sheneos examples.sheneos.sheneos)
 
 ###############################################################################
-source_group("Source Files" FILES sheneos_client.cpp sheneos_test.cpp)
+source_group("Source Files" FILES sheneos_client.cpp sheneos_test.cpp sheneos_compare.cpp read_nuc_table.F90 eosmodule.F90 readtable.F90 nuc_eos.F90 findrho.F90 findtemp.F90 linterp.f linterp_many.F90 bisection.F90)
 
 # add example executable
 add_hpx_executable(sheneos_client
@@ -33,4 +33,12 @@ add_hpx_executable(sheneos_test
 
 # add dependencies to pseudo-target
 add_hpx_pseudo_dependencies(examples.sheneos sheneos_test_exe)
+
+add_hpx_executable(sheneos_compare
+  SOURCES sheneos_compare.cpp read_nuc_table.F90 eosmodule.F90 readtable.F90 nuc_eos.F90 findrho.F90 findtemp.F90 linterp.f linterp_many.F90 bisection.F90
+  DEPENDENCIES sheneos_component ${HDF5_FORTRAN_LIBRARY} ${HDF5_LIBRARY}
+  FOLDER "Examples/ShenEOS")
+
+# add dependencies to pseudo-target
+add_hpx_pseudo_dependencies(examples.sheneos sheneos_compare_exe)
 
