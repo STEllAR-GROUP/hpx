@@ -9,6 +9,7 @@
 #include <hpx/include/lcos.hpp>
 
 #include <boost/dynamic_bitset.hpp>
+#include <boost/bind.hpp>
 
 #include <cstdlib>
 #include <ctime>
@@ -275,6 +276,25 @@ typedef hpx::actions::plain_action4<
 HPX_REGISTER_PLAIN_ACTION(test_bulk_action);
 
 ///////////////////////////////////////////////////////////////////////////////
+void wait_for_task(std::size_t i, hpx::util::high_resolution_timer& t)
+{
+    std::cout << "Finished task " << i << ": " << t.elapsed() << " [s]"
+              << std::endl;
+}
+
+void wait_for_bulk_one_task(std::size_t i, hpx::util::high_resolution_timer& t)
+{
+    std::cout << "Finished bulk-one task " << i << ": " << t.elapsed()
+        << " [s]" << std::endl;
+}
+
+void wait_for_bulk_task(std::size_t i, hpx::util::high_resolution_timer& t)
+{
+    std::cout << "Finished bulk task " << i << ": " << t.elapsed()
+        << " [s]" << std::endl;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
     std::string const datafilename = vm["file"].as<std::string>();
@@ -328,12 +348,8 @@ int hpx_main(boost::program_options::variables_map& vm)
                     num_temp_points, num_rho_points, seed));
         }
 
-        hpx::lcos::wait(tests,
-            [&](std::size_t i)
-            {
-                std::cout << "Finished task " << i << ": " << t.elapsed() << " [s]"
-                          << std::endl;
-            });
+        hpx::lcos::wait(tests, 
+            boost::bind(wait_for_task, ::_1, boost::ref(t)));
 
         std::cout << "Completed tests: " << t.elapsed() << " [s]" << std::endl;
 
@@ -351,11 +367,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         }
 
         hpx::lcos::wait(bulk_one_tests,
-            [&](std::size_t i)
-            {
-                std::cout << "Finished bulk-one task " << i << ": " << t.elapsed()
-                    << " [s]" << std::endl;
-            });
+            boost::bind(wait_for_bulk_one_task, ::_1, boost::ref(t)));
 
         std::cout << "Completed bulk-one tests: " << t.elapsed() << " [s]"
             << std::endl;
@@ -374,11 +386,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         }
 
         hpx::lcos::wait(bulk_tests,
-            [&](std::size_t i)
-            {
-                std::cout << "Finished bulk task " << i << ": " << t.elapsed()
-                    << " [s]" << std::endl;
-            });
+            boost::bind(wait_for_bulk_task, ::_1, boost::ref(t)));
 
         std::cout << "Completed bulk tests: " << t.elapsed() << " [s]"
             << std::endl;
