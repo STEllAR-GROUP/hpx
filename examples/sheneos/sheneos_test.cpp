@@ -10,6 +10,7 @@
 
 #include <boost/dynamic_bitset.hpp>
 #include <boost/bind.hpp>
+#include <boost/random/linear_congruential.hpp>
 
 #include <cstdlib>
 #include <ctime>
@@ -77,12 +78,14 @@ void test_sheneos(std::size_t num_ye_points, std::size_t num_temp_points,
     // performing the test, so we randomly shuffle the sequences. We combine
     // the shared seed with the locality id to ensure that each locality has
     // a unique, reproducible seed.
-    std::srand(static_cast<unsigned int>(seed + hpx::get_locality_id()));
-    std::random_shuffle(sequence_ye.begin(), sequence_ye.end());
-    std::random_shuffle(sequence_temp.begin(), sequence_temp.end());
-    std::random_shuffle(sequence_rho.begin(), sequence_rho.end());
+    //  This rand stuff probably doesn't scale -- avoid it
+    //std::srand(static_cast<unsigned int>(seed + hpx::get_locality_id()));
+    //std::random_shuffle(sequence_ye.begin(), sequence_ye.end());
+    //std::random_shuffle(sequence_temp.begin(), sequence_temp.end());
+    //std::random_shuffle(sequence_rho.begin(), sequence_rho.end());
 
     // Create the three-dimensional future grid.
+    hpx::util::high_resolution_timer t;
     std::vector<hpx::lcos::future<std::vector<double> > > tests;
     for (std::size_t i = 0; i < sequence_ye.size(); ++i)
     {
@@ -100,6 +103,7 @@ void test_sheneos(std::size_t num_ye_points, std::size_t num_temp_points,
     }
 
     hpx::lcos::wait(tests);
+    std::cout << " elapsed " << t.elapsed() << std::endl;
 }
 
 typedef hpx::actions::plain_action4<
@@ -348,11 +352,12 @@ int hpx_main(boost::program_options::variables_map& vm)
                     num_temp_points, num_rho_points, seed));
         }
 
-        hpx::lcos::wait(tests, 
-            boost::bind(wait_for_task, ::_1, boost::ref(t)));
+        //hpx::lcos::wait(tests, 
+        //    boost::bind(wait_for_task, ::_1, boost::ref(t)));
+        hpx::lcos::wait(tests); 
 
         std::cout << "Completed tests: " << t.elapsed() << " [s]" << std::endl;
-
+#if 0
         t.restart();
 
         // Kick off the computation asynchronously. On each locality,
@@ -390,7 +395,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         std::cout << "Completed bulk tests: " << t.elapsed() << " [s]"
             << std::endl;
-
+#endif
     } // Ensure that everything is out of scope before shutdown.
 
     // Shutdown the runtime system.
