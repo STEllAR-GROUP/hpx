@@ -288,6 +288,10 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::lcos::base_lco::set_event_action, base_set_event_action);
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::lcos::base_lco::set_error_action, base_set_error_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco::connect_action, base_connect_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::lcos::base_lco::disconnect_action, base_disconnect_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION_DECLARATION_EX(
