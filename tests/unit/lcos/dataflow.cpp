@@ -29,7 +29,6 @@ using boost::program_options::value;
 ///////////////////////////////////////////////////////////////////////////////
 int f(int i, int j)
 {
-//     hpx::cout << "f\n" << hpx::flush;
     return i + j;
 }
 typedef hpx::actions::plain_result_action2<int, int, int, &f> f_action;
@@ -37,7 +36,6 @@ HPX_REGISTER_PLAIN_ACTION(f_action);
 
 int h(int i, int j)
 {
-//     hpx::cout << "h\n" << hpx::flush;
     return i + j;
 }
 typedef hpx::actions::plain_result_action2<int, int, int, &h> h_action;
@@ -45,8 +43,7 @@ HPX_REGISTER_PLAIN_ACTION(h_action);
 
 int g()
 {
-    static int i = 9000;
-//     hpx::cout << "g\n" << hpx::flush;
+    int i = 9000;
     return ++i;
 }
 typedef hpx::actions::plain_result_action0<int, &g> g_action;
@@ -56,7 +53,6 @@ bool called_trigger = false;
 void trigger()
 {
     called_trigger = true;
-//     hpx::cout << "trigger!\n" << hpx::flush;
 }
 typedef hpx::actions::plain_action0<&trigger> trigger_action;
 HPX_REGISTER_PLAIN_ACTION(trigger_action);
@@ -111,7 +107,7 @@ int hpx_main(variables_map & vm)
 
         // blocks until the result is delivered! (constructs a future and sets
         // this as the target of the dataflow)
-        HPX_TEST_EQ(18003, c.get_future().get());
+        HPX_TEST_EQ(18002, c.get_future().get());
 
 
         HPX_TEST_EQ(55u, fib(n).get_future().get());
@@ -121,8 +117,8 @@ int hpx_main(variables_map & vm)
         HPX_TEST_EQ(n, d.get_future().get());
 
         HPX_TEST_EQ(9005, hpx::lcos::dataflow<h_action>(here, a, 4).get_future().get());
-        HPX_TEST_EQ(9007, hpx::lcos::dataflow<h_action>(here, 5, b).get_future().get());
-        HPX_TEST_EQ(9003, hpx::lcos::dataflow<g_action>(here,
+        HPX_TEST_EQ(9006, hpx::lcos::dataflow<h_action>(here, 5, b).get_future().get());
+        HPX_TEST_EQ(9001, hpx::lcos::dataflow<g_action>(here,
             hpx::lcos::dataflow<trigger_action>(here)).get_future().get());
         HPX_TEST(called_trigger);
         called_trigger = false;

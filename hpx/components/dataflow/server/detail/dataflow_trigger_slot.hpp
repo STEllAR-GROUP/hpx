@@ -3,16 +3,16 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_LCOS_DATAFLOW_SERVER_DETAIL_DATAFLOW_SLOT_HPP
-#define HPX_LCOS_DATAFLOW_SERVER_DETAIL_DATAFLOW_SLOT_HPP
+#ifndef HPX_LCOS_DATAFLOW_SERVER_DETAIL_DATAFLOW_TRIGGER_SLOT_HPP
+#define HPX_LCOS_DATAFLOW_SERVER_DETAIL_DATAFLOW_TRIGGER_SLOT_HPP
 
 #include <hpx/components/dataflow/dataflow_base_fwd.hpp>
 #include <hpx/components/dataflow/dataflow_fwd.hpp>
 
 namespace hpx { namespace lcos { namespace server { namespace detail
 {
-    template <typename T, int Slot, typename SinkAction>
-    struct dataflow_slot
+    template <typename T, typename SinkAction>
+    struct dataflow_trigger_slot
         : hpx::lcos::base_lco_with_value<
             typename boost::mpl::if_<
                 boost::is_void<typename T::result_type>
@@ -32,9 +32,8 @@ namespace hpx { namespace lcos { namespace server { namespace detail
 
         typedef T dataflow_type;
         typedef
-            hpx::lcos::server::detail::dataflow_slot<
+            hpx::lcos::server::detail::dataflow_trigger_slot<
                 dataflow_type
-              , Slot
               , SinkAction
             >
             wrapped_type;
@@ -42,51 +41,25 @@ namespace hpx { namespace lcos { namespace server { namespace detail
 
         typedef typename T::remote_result_type remote_result;
 
-        dataflow_slot(SinkAction * back, dataflow_type const & flow)
+        dataflow_trigger_slot(SinkAction * back, dataflow_type const & flow, std::size_t slot)
             : back_ptr_(0)
             , dataflow_sink(back)
             , dataflow_source(flow)
+            , slot(slot)
         {
         }
-
-        ~dataflow_slot()
-        {
-            LLCO_(info)
-                << "~dataflow_slot<"
-                << util::type_id<T>::typeid_.type_id()
-                << ", " << Slot
-                << hpx::actions::detail::get_action_name<SinkAction>()
-                << ">::dataflow_slot(): "
-                << get_gid();
-        }
-
+        
         void set_result(BOOST_RV_REF(remote_result) r)
         {
-            LLCO_(info)
-                << "dataflow_slot<"
-                << util::type_id<T>::typeid_.type_id()
-                << ", " << Slot
-                << hpx::actions::detail::get_action_name<SinkAction>()
-                << ">::set_result(): "
-                << get_gid();
-            dataflow_sink
-                ->template set_slot<Slot>(
+            dataflow_sink->set_slot(
                     traits::get_remote_result<result_type, remote_result>
                         ::call(r)
-                  , boost::mpl::false_()
+                  , slot
                 );
         }
-
+        
         void connect()
         {
-            LLCO_(info)
-                << "dataflow_slot<"
-                << util::type_id<T>::typeid_.type_id()
-                << ", " << Slot
-                << hpx::actions::detail::get_action_name<SinkAction>()
-                << ">::connect() from "
-                << get_gid();
-            
             BOOST_ASSERT(get_gid());
 
             dataflow_source.connect(get_gid());
@@ -122,31 +95,30 @@ namespace hpx { namespace lcos { namespace server { namespace detail
         template <typename, typename>
         friend class components::managed_component;
 
-        void set_back_ptr(components::managed_component<dataflow_slot>* bp)
+        void set_back_ptr(components::managed_component<dataflow_trigger_slot>* bp)
         {
             BOOST_ASSERT(0 == back_ptr_);
             BOOST_ASSERT(bp);
             back_ptr_ = bp;
         }
 
-        components::managed_component<dataflow_slot>* back_ptr_;
+        components::managed_component<dataflow_trigger_slot>* back_ptr_;
 
         SinkAction * dataflow_sink;
         dataflow_type dataflow_source;
+        std::size_t slot;
     };
-
 }}}}
 
 namespace hpx { namespace traits
 {
     template <
         typename T
-      , int Slot
       , typename SinkAction
     >
-    struct component_type_database<lcos::server::detail::dataflow_slot<T, Slot, SinkAction> >
+    struct component_type_database<lcos::server::detail::dataflow_trigger_slot<T, SinkAction> >
     {
-        typedef lcos::server::detail::dataflow_slot<T, Slot, SinkAction> dataflow_slot;
+        typedef lcos::server::detail::dataflow_trigger_slot<T, SinkAction> dataflow_slot;
         typedef typename dataflow_slot::result_type result_type;
         typedef typename dataflow_slot::remote_result remote_result_type;
 
@@ -166,4 +138,5 @@ namespace hpx { namespace traits
         }
     };
 }}
+
 #endif

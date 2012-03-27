@@ -1,4 +1,4 @@
-//  Copyright (c) 2011 Thomas Heller
+//  Copyright (c) 2011-2012 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -293,10 +293,12 @@ namespace hpx { namespace traits
         void set_result(BOOST_RV_REF(remote_result) r)
         {
 #if N > 0
+            /*
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
             {
                 delete p;
             }
+            */
 #endif
             remote_result tmp(r);
             forward_results(tmp);
