@@ -7,6 +7,7 @@
 set(example_programs
     factorial
     fibonacci
+    interest_calculator
     non_atomic_rma
     quicksort
     timed_wake
@@ -23,6 +24,7 @@ endif()
 set(hello_world_FLAGS DEPENDENCIES iostreams_component)
 set(1d_wave_equation_FLAGS DEPENDENCIES iostreams_component)
 set(simplest_hello_world_FLAGS DEPENDENCIES iostreams_component)
+set(interest_calculator_FLAGS DEPENDENCIES dataflow_component)
 
 foreach(example_program ${example_programs})
   set(sources
