@@ -96,11 +96,11 @@ subroutine findtemp(lr,lt0,y,epsin,keyerrt,rfeps)
           goto 12
        else
           ! total failure
-          write(*,*) "EOS: Did not converge in findtemp!"
-          write(*,*) "rl,logrho,logtemp0,ye,lt,eps,eps0,abs(eps-eps0)/eps0"
-          write(*,"(i4,i4,1P10E19.10)") i,rl,lr,lt0,y,lt,eps,eps0,abs(eps-eps0)/eps0
-          write(*,*) "Tried calling bisection... didn't help... :-/"
-          write(*,*) "Bisection error: ",keyerrt
+          !write(*,*) "EOS: Did not converge in findtemp!"
+          !write(*,*) "rl,logrho,logtemp0,ye,lt,eps,eps0,abs(eps-eps0)/eps0"
+          !write(*,"(i4,i4,1P10E19.10)") i,rl,lr,lt0,y,lt,eps,eps0,abs(eps-eps0)/eps0
+          !write(*,*) "Tried calling bisection... didn't help... :-/"
+          !write(*,*) "Bisection error: ",keyerrt
        endif
     endif
     
