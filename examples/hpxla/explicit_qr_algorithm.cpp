@@ -655,6 +655,7 @@ inline boost::int16_t compute_sign(
         return 1;
 }
 
+/// H = I - 2 * w * w^T
 template <
     typename T
 >
@@ -849,7 +850,7 @@ void write_evs_to_octave_file(
 template <
     typename T
 >
-void householders(
+void householders_qr_factor(
     orthotope<T> const& A
   , orthotope<T>& Q
   , orthotope<T>& R
@@ -925,6 +926,51 @@ void householders(
 template <
     typename T
 >
+void householders_tri_factor(
+    orthotope<T>& A
+  , T eps = 1e-8
+    )
+{
+    BOOST_ASSERT(2 == A.order());
+    BOOST_ASSERT(A.hypercube());
+
+    std::size_t const n = A.extent(0);
+
+    for (std::size_t l = 0; l < (n - 1); ++l)
+    {
+        T sign = -compute_sign(A(l + 1, l));
+
+        T alpha = 0.0;
+
+        for (std::size_t j = (l + 1); j < n; ++j)
+            alpha += (A(j, l) * A(j, l));
+
+        if (alpha < eps)
+            continue;
+
+        alpha = sign * std::sqrt(alpha);
+
+        T const r = std::sqrt(0.5 * ((alpha * alpha) - (alpha * A(l + 1, l))));
+
+        orthotope<T> w({n});
+
+        w(l + 1) = (A(l + 1, l) - alpha) / (2.0 * r); 
+
+        for (std::size_t j = (l + 2); j < n; ++j)
+            w(j) = A(j, l) / (2.0 * r);
+
+        orthotope<T> H = compute_H(w);
+
+        /// A_l = H * A_l_minus_1 * H
+        orthotope<T> H_A_l_minus_1 = matrix_multiply(H, A);
+
+        A = matrix_multiply(H_A_l_minus_1, H);
+    }
+}
+
+template <
+    typename T
+>
 std::vector<std::complex<T> > qr_eigenvalue(
     orthotope<T> const& A
   , std::size_t max_iterations
@@ -940,31 +986,52 @@ std::vector<std::complex<T> > qr_eigenvalue(
 
     orthotope<T> Ak = A.copy(), R, Q;
 
+    householders_tri_factor(Ak);
+
+    write_matrix_to_octave_file(Ak, "hess_A0");
+
     std::size_t iterations = 0;
 
     while (true)
     {
-        ++iterations;
+        T const mu = Ak(n, n);
 
-        householders(Ak, Q, R);
+//        if (0 != iterations)
+//        {
+            for (std::size_t i = 0; i < (n - 1); ++i)
+                Ak(i, i) -= mu;
+
+            Ak(n, n) = 0.0;
+//        }
+
+        householders_qr_factor(Ak, Q, R);
 
         Ak = matrix_multiply(R, Q); 
 
+//        if (0 != iterations)
+            for (std::size_t i = 0; i < n; ++i)
+                Ak(i, i) += mu;
+
         bool pseudo_upper_triangular = true;
 
-        for (std::size_t k = 0; k < (n - 1); ++k)
-            for (std::size_t i = k + 2; i < n; ++i)
-                if (!compare_floating(0.0, Ak(i, k), 1e-6))
+        for (std::size_t j = 0; j < (n - 1); ++j)
+            for (std::size_t i = j + 2; i < n; ++i)
+                if (!compare_floating(0.0, Ak(i, j), 1e-6))
                     pseudo_upper_triangular = false;
 
-        if (pseudo_upper_triangular)
-            break;
+//        if (pseudo_upper_triangular)
+//            break;
 
-        if (iterations > max_iterations)
+        ++iterations;
+
+        if (iterations >= (n * n))
         {
+            break;
+/*
             std::cout << "Didn't converge\n";
             write_matrix_to_octave_file(Ak, "Ak");
             return std::vector<std::complex<T> >();
+*/
         }
     }
 
