@@ -10,7 +10,6 @@
 
 #include <boost/dynamic_bitset.hpp>
 #include <boost/bind.hpp>
-#include <boost/random/linear_congruential.hpp>
 
 #include <cstdlib>
 #include <ctime>
@@ -78,14 +77,12 @@ void test_sheneos(std::size_t num_ye_points, std::size_t num_temp_points,
     // performing the test, so we randomly shuffle the sequences. We combine
     // the shared seed with the locality id to ensure that each locality has
     // a unique, reproducible seed.
-    //  This rand stuff probably doesn't scale -- avoid it
-    //std::srand(static_cast<unsigned int>(seed + hpx::get_locality_id()));
-    //std::random_shuffle(sequence_ye.begin(), sequence_ye.end());
-    //std::random_shuffle(sequence_temp.begin(), sequence_temp.end());
-    //std::random_shuffle(sequence_rho.begin(), sequence_rho.end());
+    std::srand(static_cast<unsigned int>(seed + hpx::get_locality_id()));
+    std::random_shuffle(sequence_ye.begin(), sequence_ye.end());
+    std::random_shuffle(sequence_temp.begin(), sequence_temp.end());
+    std::random_shuffle(sequence_rho.begin(), sequence_rho.end());
 
     // Create the three-dimensional future grid.
-    hpx::util::high_resolution_timer t;
     std::vector<hpx::lcos::future<std::vector<double> > > tests;
     for (std::size_t i = 0; i < sequence_ye.size(); ++i)
     {
@@ -103,7 +100,6 @@ void test_sheneos(std::size_t num_ye_points, std::size_t num_temp_points,
     }
 
     hpx::lcos::wait(tests);
-    std::cout << " elapsed " << t.elapsed() << std::endl;
 }
 
 typedef hpx::actions::plain_action4<
@@ -180,10 +176,29 @@ void test_sheneos_one_bulk(std::size_t num_ye_points,
     std::random_shuffle(sequence_temp.begin(), sequence_temp.end());
     std::random_shuffle(sequence_rho.begin(), sequence_rho.end());
 
+    // build the array of coordinates we want to get the interpolated values for
+    std::vector<sheneos::sheneos_coord> values;
+    values.reserve(num_ye_points * num_temp_points * num_rho_points);
+
+    std::vector<hpx::lcos::future<std::vector<double> > > tests;
+    for (std::size_t i = 0; i < sequence_ye.size(); ++i)
+    {
+        std::size_t const& ii = sequence_ye[i];
+        for (std::size_t j = 0; j < sequence_temp.size(); ++j)
+        {
+            std::size_t const& jj = sequence_temp[j];
+            for (std::size_t k = 0; k < sequence_rho.size(); ++k)
+            {
+                std::size_t const& kk = sequence_rho[k];
+                values.push_back(sheneos::sheneos_coord(
+                    values_ye[ii], values_temp[jj], values_rho[kk]));
+            }
+        }
+    }
+
     // Execute bulk operation
     hpx::lcos::future<std::vector<double> > bulk_one_tests =
-        shen.interpolate_one_bulk_async(values_ye, values_temp, values_rho,
-            sheneos::server::partition3d::logpress);
+        shen.interpolate_one_bulk_async(values, sheneos::server::partition3d::logpress);
 
     std::vector<double> results = hpx::lcos::wait(bulk_one_tests);
 }
@@ -262,9 +277,29 @@ void test_sheneos_bulk(std::size_t num_ye_points,
     std::random_shuffle(sequence_temp.begin(), sequence_temp.end());
     std::random_shuffle(sequence_rho.begin(), sequence_rho.end());
 
+    // build the array of coordinates we want to get the interpolated values for
+    std::vector<sheneos::sheneos_coord> values;
+    values.reserve(num_ye_points * num_temp_points * num_rho_points);
+
+    std::vector<hpx::lcos::future<std::vector<double> > > tests;
+    for (std::size_t i = 0; i < sequence_ye.size(); ++i)
+    {
+        std::size_t const& ii = sequence_ye[i];
+        for (std::size_t j = 0; j < sequence_temp.size(); ++j)
+        {
+            std::size_t const& jj = sequence_temp[j];
+            for (std::size_t k = 0; k < sequence_rho.size(); ++k)
+            {
+                std::size_t const& kk = sequence_rho[k];
+                values.push_back(sheneos::sheneos_coord(
+                    values_ye[ii], values_temp[jj], values_rho[kk]));
+            }
+        }
+    }
+
     // Execute bulk operation
     hpx::lcos::future<std::vector<std::vector<double> > > bulk_tests =
-        shen.interpolate_bulk_async(values_ye, values_temp, values_rho);
+        shen.interpolate_bulk_async(values);
 
     std::vector<std::vector<double> > results = hpx::lcos::wait(bulk_tests);
 }
@@ -304,8 +339,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::string const datafilename = vm["file"].as<std::string>();
 
     std::size_t const num_ye_points = vm["num-ye-points"].as<std::size_t>();
-    std::size_t const num_temp_points = vm["num-temp-points"].as<std::size_t>();
-    std::size_t const num_rho_points = vm["num-rho-points"].as<std::size_t>();
+    std::size_t const num_temp_points = vm["num-ye-points"].as<std::size_t>();
+    std::size_t const num_rho_points = vm["num-ye-points"].as<std::size_t>();
 
     std::size_t const num_partitions = vm["num-partitions"].as<std::size_t>();
 
@@ -341,43 +376,42 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         t.restart();
 
-        // Kick off the computation asynchronously. On each locality,
-        // num_workers test_actions are created.
-        std::vector<hpx::lcos::future<void> > tests;
-        BOOST_FOREACH(hpx::naming::id_type const& id, locality_ids)
-        {
-            using hpx::lcos::async;
-            for (std::size_t i = 0; i < num_workers; ++i)
-                tests.push_back(async<test_action>(id, num_ye_points,
-                    num_temp_points, num_rho_points, seed));
-        }
-
-        //hpx::lcos::wait(tests, 
-        //    boost::bind(wait_for_task, ::_1, boost::ref(t)));
-        hpx::lcos::wait(tests); 
-
-        std::cout << "Completed tests: " << t.elapsed() << " [s]" << std::endl;
-#if 0
-        t.restart();
-
-        // Kick off the computation asynchronously. On each locality,
-        // num_workers test_actions are created.
-        std::vector<hpx::lcos::future<void> > bulk_one_tests;
-        BOOST_FOREACH(hpx::naming::id_type const& id, locality_ids)
-        {
-            using hpx::lcos::async;
-            for (std::size_t i = 0; i < num_workers; ++i)
-                bulk_one_tests.push_back(async<test_one_bulk_action>(id,
-                    num_ye_points, num_temp_points, num_rho_points, seed));
-        }
-
-        hpx::lcos::wait(bulk_one_tests,
-            boost::bind(wait_for_bulk_one_task, ::_1, boost::ref(t)));
-
-        std::cout << "Completed bulk-one tests: " << t.elapsed() << " [s]"
-            << std::endl;
-
-        t.restart();
+//         // Kick off the computation asynchronously. On each locality,
+//         // num_workers test_actions are created.
+//         std::vector<hpx::lcos::future<void> > tests;
+//         BOOST_FOREACH(hpx::naming::id_type const& id, locality_ids)
+//         {
+//             using hpx::lcos::async;
+//             for (std::size_t i = 0; i < num_workers; ++i)
+//                 tests.push_back(async<test_action>(id, num_ye_points,
+//                     num_temp_points, num_rho_points, seed));
+//         }
+//
+//         hpx::lcos::wait(tests,
+//             boost::bind(wait_for_task, ::_1, boost::ref(t)));
+//
+//         std::cout << "Completed tests: " << t.elapsed() << " [s]" << std::endl;
+//
+//         t.restart();
+//
+//         // Kick off the computation asynchronously. On each locality,
+//         // num_workers test_actions are created.
+//         std::vector<hpx::lcos::future<void> > bulk_one_tests;
+//         BOOST_FOREACH(hpx::naming::id_type const& id, locality_ids)
+//         {
+//             using hpx::lcos::async;
+//             for (std::size_t i = 0; i < num_workers; ++i)
+//                 bulk_one_tests.push_back(async<test_one_bulk_action>(id,
+//                     num_ye_points, num_temp_points, num_rho_points, seed));
+//         }
+//
+//         hpx::lcos::wait(bulk_one_tests,
+//             boost::bind(wait_for_bulk_one_task, ::_1, boost::ref(t)));
+//
+//         std::cout << "Completed bulk-one tests: " << t.elapsed() << " [s]"
+//             << std::endl;
+//
+//         t.restart();
 
         // Kick off the computation asynchronously. On each locality,
         // num_workers test_actions are created.
@@ -395,7 +429,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         std::cout << "Completed bulk tests: " << t.elapsed() << " [s]"
             << std::endl;
-#endif
+
     } // Ensure that everything is out of scope before shutdown.
 
     // Shutdown the runtime system.
@@ -416,11 +450,11 @@ int main(int argc, char* argv[])
         ("file", value<std::string>()->default_value(
                 "sheneos_220r_180t_50y_extT_analmu_20100322_SVNr28.h5"),
             "name of HDF5 data file containing the Shen EOS tables")
-        ("num-ye-points,Y", value<std::size_t>()->default_value(20),
+        ("num-ye-points,Y", value<std::size_t>()->default_value(40),
             "number of points to interpolate on the ye axis")
-        ("num-temp-points,T", value<std::size_t>()->default_value(20),
+        ("num-temp-points,T", value<std::size_t>()->default_value(40),
             "number of points to interpolate on the temp axis")
-        ("num-rho-points,R", value<std::size_t>()->default_value(20),
+        ("num-rho-points,R", value<std::size_t>()->default_value(40),
             "number of points to interpolate on the rho axis")
         ("num-partitions", value<std::size_t>()->default_value(32),
             "number of partitions to create")

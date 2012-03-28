@@ -13,6 +13,21 @@
 
 #include "../dimension.hpp"
 
+namespace sheneos
+{
+    ///////////////////////////////////////////////////////////////////////////
+    struct sheneos_coord
+    {
+        sheneos_coord(double ye = 0.0, double temp = 0.0, double rho = 0.0)
+          : ye_(ye), temp_(temp), rho_(rho)
+        {}
+
+        double ye_;
+        double temp_;
+        double rho_;
+    };
+}
+
 namespace sheneos { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -105,26 +120,22 @@ namespace sheneos { namespace server
 
         /// Perform several interpolations of all given fields on this partition.
         ///
-        /// \param ye        [in] Electron fractions.
-        /// \param temp      [in] Temperatures.
-        /// \param rho       [in] Rest mass densities of the plasma.
+        /// \param cords     [in] triples of electron fractions, temperatures,
+        ///                  and rest mass densities of the plasma.
         /// \param eosvalues [in] The EOS values to interpolate. Must be
         ///                  in the range of this partition.
         std::vector<std::vector<double> >
-        interpolate_bulk(std::vector<double> const& ye,
-            std::vector<double> const& temp, std::vector<double> const& rho,
+        interpolate_bulk(std::vector<sheneos_coord> const& coords,
             boost::uint32_t eosvalues);
 
         /// Perform several interpolations of one given field on this partition.
         ///
-        /// \param ye        [in] Electron fractions.
-        /// \param temp      [in] Temperatures.
-        /// \param rho       [in] Rest mass densities of the plasma.
+        /// \param cords     [in] triples of electron fractions, temperatures,
+        ///                  and rest mass densities of the plasma.
         /// \param eosvalue  [in] The EOS value to interpolate. Must be
         ///                  in the range of this partition.
         std::vector<double>
-        interpolate_one_bulk(std::vector<double> const& ye,
-            std::vector<double> const& temp, std::vector<double> const& rho,
+        interpolate_one_bulk(std::vector<sheneos_coord> const& coords,
             boost::uint32_t eosvalue);
 
         ///////////////////////////////////////////////////////////////////////
@@ -163,27 +174,29 @@ namespace sheneos { namespace server
             &partition3d::interpolate_one       // Method bound to this action.
         > interpolate_one_action;
 
-        typedef hpx::actions::result_action4<
+        typedef hpx::actions::result_action2<
             partition3d,                        // Component server type.
             std::vector<std::vector<double> >,  // Return type.
             partition3d_interpolate_bulk,       // Action code.
-            std::vector<double> const&,         // Arguments of this action.
-            std::vector<double> const&,
-            std::vector<double> const&,
+            std::vector<sheneos_coord> const&,  // Arguments of this action.
             boost::uint32_t,
             &partition3d::interpolate_bulk      // Method bound to this action.
         > interpolate_bulk_action;
 
-        typedef hpx::actions::result_action4<
+        typedef hpx::actions::result_action2<
             partition3d,                        // Component server type.
             std::vector<double>,                // Return type.
             partition3d_interpolate_one_bulk,   // Action code.
-            std::vector<double> const&,         // Arguments of this action.
-            std::vector<double> const&,
-            std::vector<double> const&,
+            std::vector<sheneos_coord> const&,  // Arguments of this action.
             boost::uint32_t,
             &partition3d::interpolate_one_bulk  // Method bound to this action.
         > interpolate_one_bulk_action;
+
+    protected:
+        double interpolate_one(sheneos_coord const& c,
+            boost::uint32_t eosvalue);
+        std::vector<double> interpolate(sheneos_coord const& c,
+            boost::uint32_t eosvalues);
 
     private:
         dimension dim_[dimension::dim];
@@ -224,6 +237,15 @@ namespace sheneos { namespace server
     };
 }}
 
+///////////////////////////////////////////////////////////////////////////////
+// Non-intrusive serialization.
+namespace boost { namespace serialization
+{
+    template <typename Archive>
+    void serialize(Archive&, sheneos::sheneos_coord&, unsigned int const);
+}}
+
+///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION_DECLARATION_EX(
     sheneos::server::partition3d::init_action,
     sheneos_partition3d_init_action);

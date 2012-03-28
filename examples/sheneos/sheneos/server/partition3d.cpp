@@ -326,30 +326,32 @@ namespace sheneos { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    inline double partition3d::interpolate_one(sheneos_coord const& c,
+        boost::uint32_t eosvalue)
+    {
+        return interpolate_one(c.ye_, c.temp_, c.rho_, eosvalue);
+    }
+
+    inline std::vector<double> partition3d::interpolate(
+        sheneos_coord const& c, boost::uint32_t eosvalues)
+    {
+        return interpolate(c.ye_, c.temp_, c.rho_, eosvalues);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     std::vector<double>
-    partition3d::interpolate_one_bulk(std::vector<double> const& ye,
-        std::vector<double> const& temp, std::vector<double> const& rho,
+    partition3d::interpolate_one_bulk(std::vector<sheneos_coord> const& coords,
         boost::uint32_t eosvalue)
     {
         std::vector<double> result;
-
-        if (ye.size() != temp.size() || ye.size() != rho.size()) {
-            HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                "partition3d::interpolate_one_bulk",
-                "inconsistent sizes of input fields");
-            return result;
-        }
-
-        result.reserve(ye.size());
+        result.reserve(coords.size());
 
         // interpolate as requested
-        std::vector<double>::const_iterator it_temp = temp.begin();
-        std::vector<double>::const_iterator it_rho = rho.begin();
-        std::vector<double>::const_iterator it_ye_end = ye.end();
-        for (std::vector<double>::const_iterator it_ye = ye.begin();
-            it_ye != it_ye_end; ++it_ye)
+        std::vector<sheneos_coord>::const_iterator end = coords.end();
+        for (std::vector<sheneos_coord>::const_iterator it = coords.begin();
+            it != end; ++it)
         {
-            result.push_back(interpolate_one(*it_ye, *it_temp, *it_rho, eosvalue));
+            result.push_back(interpolate_one(*it, eosvalue));
         }
 
         return result;
@@ -357,35 +359,43 @@ namespace sheneos { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     std::vector<std::vector<double> >
-    partition3d::interpolate_bulk(std::vector<double> const& ye,
-        std::vector<double> const& temp, std::vector<double> const& rho,
+    partition3d::interpolate_bulk(std::vector<sheneos_coord> const& coords,
         boost::uint32_t eosvalues)
     {
         std::vector<std::vector<double> > result;
-
-        if (ye.size() != temp.size() || ye.size() != rho.size()) {
-            HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                "partition3d::interpolate_one_bulk",
-                "inconsistent sizes of input fields");
-            return result;
-        }
-
-        result.resize(ye.size());
+        result.reserve(coords.size());
 
         // interpolate as requested
-        std::size_t index = 0;
-        std::vector<double>::const_iterator it_temp = temp.begin();
-        std::vector<double>::const_iterator it_rho = rho.begin();
-        std::vector<double>::const_iterator it_ye_end = ye.end();
-        for (std::vector<double>::const_iterator it_ye = ye.begin();
-            it_ye != it_ye_end; ++it_ye, ++index)
+        std::vector<sheneos_coord>::const_iterator end = coords.end();
+        for (std::vector<sheneos_coord>::const_iterator it = coords.begin();
+            it != end; ++it)
         {
-            result[index] =
-                boost::move(interpolate(*it_ye, *it_temp, *it_rho, eosvalues));
+            result.push_back(boost::move(interpolate(*it, eosvalues)));
         }
 
         return result;
     }
+}}
+
+///////////////////////////////////////////////////////////////////////////////
+namespace boost { namespace serialization
+{
+    ///////////////////////////////////////////////////////////////////////////
+    // Implement the serialization functions.
+    template <typename Archive>
+    void serialize(Archive& ar, sheneos::sheneos_coord& coord, unsigned int const)
+    {
+        ar & coord.ye_ & coord.temp_ & coord.rho_;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Explicit instantiation for the correct archive types.
+    template HPX_COMPONENT_EXPORT void
+    serialize(hpx::util::portable_binary_iarchive&, sheneos::sheneos_coord&,
+        unsigned int const);
+    template HPX_COMPONENT_EXPORT void
+    serialize(hpx::util::portable_binary_oarchive&, sheneos::sheneos_coord&,
+        unsigned int const);
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

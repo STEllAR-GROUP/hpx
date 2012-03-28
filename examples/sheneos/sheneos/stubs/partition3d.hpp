@@ -74,22 +74,39 @@ namespace sheneos { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         static hpx::lcos::future<std::vector<double> >
         interpolate_one_bulk_async(hpx::naming::id_type const& gid,
-            std::vector<double> const& ye, std::vector<double> const& temp,
-            std::vector<double> const& rho, boost::uint32_t eosvalues)
+            std::vector<sheneos_coord> const& coords, boost::uint32_t eosvalue)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the future.
             typedef sheneos::server::partition3d::interpolate_one_bulk_action
                 action_type;
-            return hpx::lcos::async<action_type>(gid, ye, temp, rho, eosvalues);
+            return hpx::lcos::async<action_type>(gid, coords, eosvalue);
         }
 
-        static std::vector<double> interpolate_one_bulk(
-            hpx::naming::id_type const& gid, std::vector<double> const& ye,
-            std::vector<double> const& temp, std::vector<double> const& rho,
-            boost::uint32_t eosvalues)
+        static std::vector<double>
+        interpolate_one_bulk(hpx::naming::id_type const& gid,
+            std::vector<sheneos_coord> const& coords, boost::uint32_t eosvalues)
         {
-            return interpolate_one_bulk_async(gid, ye, temp, rho, eosvalues).get();
+            return interpolate_one_bulk_async(gid, coords, eosvalues).get();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        static hpx::lcos::future<std::vector<std::vector<double> > >
+        interpolate_bulk_async(hpx::naming::id_type const& gid,
+            std::vector<sheneos_coord> const& coords, boost::uint32_t eosvalues)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the future.
+            typedef sheneos::server::partition3d::interpolate_bulk_action
+                action_type;
+            return hpx::lcos::async<action_type>(gid, coords, eosvalues);
+        }
+
+        static std::vector<std::vector<double> >
+        interpolate_bulk(hpx::naming::id_type const& gid,
+            std::vector<sheneos_coord> const& coords, boost::uint32_t eosvalues)
+        {
+            return interpolate_bulk_async(gid, coords, eosvalues).get();
         }
     };
 }}
