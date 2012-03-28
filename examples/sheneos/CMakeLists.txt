@@ -37,7 +37,7 @@ add_hpx_pseudo_dependencies(examples.sheneos sheneos_test_exe)
 if(CMAKE_Fortran_COMPILER AND HDF5_FORTRAN_FOUND)
   add_hpx_executable(sheneos_compare
     SOURCES 
-        eos_driver/sheneos_compare.cpp 
+        sheneos_compare.cpp 
         eos_driver/read_nuc_table.F90 
         eos_driver/eosmodule.F90 
         eos_driver/readtable.F90 
