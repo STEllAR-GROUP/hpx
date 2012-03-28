@@ -1,10 +1,18 @@
-/////////////////////////// Intrest Calculor //////////////////////////////////
+/////////////////////////// Interest Calculator //////////////////////////////////
 //  Copyright (c) 2012 Adrian Serio
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
-// Calculate interest while using dataflow objects
+// Purpose: Calculates compound interest while using dataflow objects.
+//
+// In this example, you supply the program with the principal [$], the interest 
+// rate [%], the length of the compound period [months], and the length of time
+// the money is invested [months]. The program will calculate the new total
+// amount of money you have and the amount of interest made. For example if 
+// you have $100, an interest rate of 5%, a compound period of 6 months and 
+// you leave your money in that account for 36 months you will end up with 
+// $134.01 and will have made $34.01 in interest.
 ///////////////////////////////////////////////////////////////////////////////
 
 // When using the dataflow component we have to define the following constants
@@ -18,8 +26,6 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/components/dataflow/dataflow.hpp>
-
-#include <hpx/runtime/components/plain_component_factory.hpp>
 
 using hpx::actions::plain_result_action1;
 using hpx::actions::plain_result_action2;
@@ -82,13 +88,25 @@ int hpx_main(variables_map & vm)
 {
     using hpx::lcos::dataflow;
     using hpx::lcos::dataflow_base;
-    hpx::naming::id_type here = hpx::find_here;
+    hpx::naming::id_type here = hpx::find_here();
+
+    double p=vm["principal"].as<double>(); //Initial principal
+    double i_rate=vm["rate"].as<double>(); //Interest rate
+    int cp=vm["cp"].as<int>(); //Length of a compound period
+    int t=vm["time"].as<int>(); //Length of time money is invested
+      
+    i_rate/=100; //Rate is a % and must be converted
+    if (t%cp !=0) { 
+     t/=cp; //Determine how many times to iterate interest calculation
+     t++;
+    }
+    else { t/=cp;}
 
     // In non-dataflow terms the implemented algorithm would look like:
     //
     // int t = 5;    // number of time periods to use
-    // double principal = 1e6;
-    // double rate = 0.20;
+    // double principal = p;
+    // double rate = i_rate;
     //
     // for (int i = 0; i < t; ++i)
     // {
@@ -98,9 +116,8 @@ int hpx_main(variables_map & vm)
     //
     // Please note the similarity with the code below!
 
-    int t = 5;    // number of time periods to use
-    dataflow_base<double> principal = dataflow<identity_action>(here, 1e6);
-    dataflow_base<double> rate = dataflow<identity_action>(here, 0.20);
+    dataflow_base<double> principal = dataflow<identity_action>(here, p);
+    dataflow_base<double> rate = dataflow<identity_action>(here, i_rate);
 
     for (int i = 0; i < t; ++i)
     {
@@ -114,7 +131,7 @@ int hpx_main(variables_map & vm)
 
 
     std::cout << "Final amount: " << result << std::endl;
-    std::cout << "Amount made: " << result-1e6 << std::endl;
+    std::cout << "Amount made: " << result-p << std::endl;
     return hpx::finalize();
 }
 
@@ -125,7 +142,7 @@ int main(int argc, char ** argv)
 
     cmdline.add_options()
         ("principal", value<double>(), "The principal [$]")
-        ("rate", value<double>(), "The intrest rate [%]")
+        ("rate", value<double>(), "The interest rate [%]")
         ("cp", value<int>(), "The compound period [months]")
         ("time", value<int>(), "The time money is invested [months]")
     ;
