@@ -28,7 +28,7 @@ namespace hpx { namespace lcos { namespace detail
         void connect(naming::id_type const & id) const
         {
             typedef
-                typename hpx::lcos::base_lco::connect_action
+                hpx::lcos::base_lco::connect_action
                 action_type;
 
             BOOST_ASSERT(gid_promise.is_set());
