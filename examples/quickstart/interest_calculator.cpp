@@ -34,6 +34,7 @@ using boost::program_options::options_description;
 using boost::program_options::value;
 
 ///////////////////////////////////////////////////////////////////////////////
+//[interest_calc_add_action
 // Calculate interest for one period
 double calc(double principal, double rate)
 {
@@ -66,8 +67,10 @@ typedef plain_result_action2<
 > add_action;
 
 HPX_REGISTER_PLAIN_ACTION(add_action);
+//]
 
 ///////////////////////////////////////////////////////////////////////////////
+//[interest_id_action
 // This is a helper function allowing to encapsulate the initial values into a
 // dataflow object
 double identity(double initial_value)
@@ -82,8 +85,10 @@ typedef plain_result_action1<
 > identity_action;
 
 HPX_REGISTER_PLAIN_ACTION(identity_action);
+//]
 
 ///////////////////////////////////////////////////////////////////////////////
+//[interest_hpx_main
 int hpx_main(variables_map & vm)
 {
     using hpx::lcos::dataflow;
@@ -134,8 +139,10 @@ int hpx_main(variables_map & vm)
     std::cout << "Amount made: " << result-p << std::endl;
     return hpx::finalize();
 }
+//]
 
 ///////////////////////////////////////////////////////////////////////////////
+//[interest_main
 int main(int argc, char ** argv)
 {
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
@@ -149,4 +156,4 @@ int main(int argc, char ** argv)
 
     return hpx::init(cmdline, argc, argv);
 }
-
+//]
