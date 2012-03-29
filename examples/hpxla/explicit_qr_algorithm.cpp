@@ -393,6 +393,23 @@ inline bool compare_floating(
 template <
     typename T
 >
+inline bool compare_are(
+    T const& x_old
+  , T const& x_new
+  , T const& tolerance
+    )
+{
+    BOOST_ASSERT(!compare_floating(0.0, x_new, 1e-6));
+
+    // Absolute relative error = | (x_new - x_old) / x_new | * 100
+    T const are = std::abs((x_new - x_old) / x_new) * 100.0;
+
+    return tolerance >= are; 
+}
+
+template <
+    typename T
+>
 inline void output_float(
     T const& A
     )
@@ -936,9 +953,9 @@ void householders_tri_factor(
 
     std::size_t const n = A.extent(0);
 
-    for (std::size_t l = 0; l < (n - 1); ++l)
+    for (std::size_t l = 0; l < (n - 2); ++l)
     {
-        T sign = -compute_sign(A(l + 1, l));
+        boost::int16_t sign = -compute_sign(A(l + 1, l));
 
         T alpha = 0.0;
 
@@ -974,6 +991,7 @@ template <
 std::vector<std::complex<T> > qr_eigenvalue(
     orthotope<T> const& A
   , std::size_t max_iterations
+  , T const& tolerance = 1.0
     )
 {
     BOOST_ASSERT(2 == A.order());
@@ -981,8 +999,15 @@ std::vector<std::complex<T> > qr_eigenvalue(
 
     std::size_t const n = A.extent(0); 
 
+/*
     std::vector<std::complex<T> > evs;
     evs.reserve(n);
+*/
+
+    std::complex<T> const nan_(std::numeric_limits<T>::quiet_NaN()
+                             , std::numeric_limits<T>::quiet_NaN());
+
+    std::vector<std::complex<T> > evs(n, nan_), old(n, nan_);
 
     orthotope<T> Ak = A.copy(), R, Q;
 
@@ -994,44 +1019,174 @@ std::vector<std::complex<T> > qr_eigenvalue(
 
     while (true)
     {
+/*
         T const mu = Ak(n, n);
 
-//        if (0 != iterations)
-//        {
+        if (0 != iterations)
+        {
             for (std::size_t i = 0; i < (n - 1); ++i)
                 Ak(i, i) -= mu;
 
             Ak(n, n) = 0.0;
-//        }
+        }
+*/
 
         householders_qr_factor(Ak, Q, R);
 
         Ak = matrix_multiply(R, Q); 
 
-//        if (0 != iterations)
+/*
+        if (0 != iterations)
             for (std::size_t i = 0; i < n; ++i)
                 Ak(i, i) += mu;
+*/
 
+/*
         bool pseudo_upper_triangular = true;
 
         for (std::size_t j = 0; j < (n - 1); ++j)
+        {
+            // Make sure we're in Hessenberg form.
             for (std::size_t i = j + 2; i < n; ++i)
+            {
                 if (!compare_floating(0.0, Ak(i, j), 1e-6))
                     pseudo_upper_triangular = false;
+            }
 
-//        if (pseudo_upper_triangular)
-//            break;
+            /// Check for convergence. Either we converge to 2x2 complex
+            /// conjugates eigenvalues, which take the form:
+            ///
+            ///     [ a  b ]
+            ///     [ c  a ]
+            ///
+            /// Where b * c < 0. Or, we converge to real eigenvalues which take
+            /// the form:
+            ///
+            ///     [ a ]
+            ///     [ 0 ]
+            ///
+
+            // Determine if we've failed to converge to a real eigenvalue. 
+            if (!compare_floating(0.0, Ak(j, j + 1), 1e-6))
+            {
+                // Determine if we've failed to converge to a pair of complex
+                // eigenvalues.
+                if (!compare_floating(Ak(j, j), Ak(j + 1, j + 1), 1e-6))
+                    pseudo_upper_triangular = false;
+            }
+        }
+*/
+
+        bool converged = true;
+
+        for (std::size_t j = 0; j < n; ++j)
+        {
+            if (j != n)
+            {
+                // Check for complex eigenvalues.
+                if (!compare_floating(0.0, Ak(j + 1, j), 1e-6))
+                {
+                    T const test0 = 4.0 * Ak(j, j + 1) * Ak(j + 1, j)
+                                  + ( (Ak(j, j) - Ak(j + 1, j + 1))
+                                    * (Ak(j, j) - Ak(j + 1, j + 1)));
+
+                    // Check if solving the eigenvalues of the 2x2 matrix
+                    // will give us a complex answer. This avoids unnecessary
+                    // square roots.  
+                    if (-1 == compute_sign(test0)) 
+                    {
+                        std::complex<T> const a(Ak(j,     j)    );
+                        std::complex<T> const d(Ak(j + 1, j + 1));
+
+                        std::complex<T> const i2(2.0);
+
+                        std::complex<T> const comp_part
+                            = std::sqrt(std::complex<T>(test0));
+
+                        evs[j    ] = (a + d) / i2 + comp_part / i2; 
+                        evs[j + 1] = (a + d) / i2 - comp_part / i2; 
+
+/*
+                        std::cout << "evs[" << j << "] = " << evs[j] << "\n"
+                                  << "old[" << j << "] = " << old[j] << "\n"
+                                  << "evs[" << (j + 1) << "] = " << evs[j + 1] << "\n"
+                                  << "old[" << (j + 1) << "] = " << old[j + 1] << "\n";
+*/
+
+                        if ((old[j] == nan_) || (old[j + 1] == nan_))
+                            converged = false;
+
+                        else 
+                        {
+                            T const evs0_real = evs[j    ].real();
+                            T const evs0_imag = evs[j    ].imag();
+                            T const evs1_real = evs[j + 1].real();
+                            T const evs1_imag = evs[j + 1].imag();
+
+                            T const old0_real = old[j    ].real();
+                            T const old0_imag = old[j    ].imag();
+                            T const old1_real = old[j + 1].real();
+                            T const old1_imag = old[j + 1].imag();
+
+                            bool const test1
+                                = compare_are(old0_real, evs0_real, 0.1)
+                               && compare_are(old0_imag, evs0_imag, 0.1)
+                               && compare_are(old1_real, evs1_real, 0.1)
+                               && compare_are(old1_imag, evs1_imag, 0.1);
+
+                            converged = test1;
+                        }
+
+                        // We handled Ak(j + 1, j + 1), so skip the next
+                        // iteration.
+                        ++j;
+
+                        continue;
+                    }
+                }
+            }
+
+            evs[j] = Ak(j, j);
+
+/*
+            std::cout << "evs[" << j << "] = " << evs[j] << "\n"
+                      << "old[" << j << "] = " << old[j] << "\n";
+*/
+
+            if (old[j] == nan_)
+                converged = false;
+
+            else
+            {
+                T const evs_real = evs[j].real();
+                T const evs_imag = evs[j].imag();
+
+                T const old_real = old[j].real();
+                T const old_imag = old[j].imag();
+
+                converged = compare_are(old_real, evs_real, 0.1)
+                         && compare_are(old_imag, evs_imag, 0.1);
+            }
+        }
+
+        old = evs;
 
         ++iterations;
 
-        if (iterations >= (n * n))
-        {
+        if (converged)
             break;
+
 /*
-            std::cout << "Didn't converge\n";
-            write_matrix_to_octave_file(Ak, "Ak");
-            return std::vector<std::complex<T> >();
+        if (pseudo_upper_triangular)
+            break;
 */
+
+        if (iterations >= max_iterations)
+        {
+            std::cout << "Didn't converge in " << max_iterations
+                      << " iterations\n";
+            write_matrix_to_octave_file(Ak, "best_Ak");
+            return std::vector<std::complex<T> >();
         }
     }
 
@@ -1039,6 +1194,7 @@ std::vector<std::complex<T> > qr_eigenvalue(
 
     write_matrix_to_octave_file(Ak, "Ak");
 
+/*
     for (std::size_t i = 0; i < n; ++i)
     {
         if (i != n)
@@ -1056,24 +1212,25 @@ std::vector<std::complex<T> > qr_eigenvalue(
                 ///     e0 = (a + d) / 2 + sqrt(4 * b * c + (a - d) ^ 2) / 2
                 ///     e1 = (a + d) / 2 - sqrt(4 * b * c + (a - d) ^ 2) / 2
                 ///
-                std::complex<T> e0, e1
-                              , a(Ak(i,     i))
-                              , b(Ak(i,     i + 1))
-                              , c(Ak(i + 1, i))
-                              , d(Ak(i + 1, i + 1));
+                std::complex<T> e0, e1;
 
-                std::complex<T> const c2(2.0);
-                std::complex<T> const c4(4.0);
+                std::complex<T> const a(Ak(i,     i)    );
+                std::complex<T> const b(Ak(i,     i + 1));
+                std::complex<T> const c(Ak(i + 1, i)    );
+                std::complex<T> const d(Ak(i + 1, i + 1));
+
+                std::complex<T> const i2(2.0);
+                std::complex<T> const i4(4.0);
 
                 using std::sqrt;
 
-                e0 = (a + d) / c2 + sqrt(c4 * b * c + (a - d) * (a - d)) / c2;
-                e1 = (a + d) / c2 - sqrt(c4 * b * c + (a - d) * (a - d)) / c2;
+                e0 = (a + d) / i2 + sqrt(i4 * b * c + (a - d) * (a - d)) / i2;
+                e1 = (a + d) / i2 - sqrt(i4 * b * c + (a - d) * (a - d)) / i2;
 
                 evs.push_back(e0);
                 evs.push_back(e1);
 
-                // A(i + 1, i + 1) is also a complex eigenvalue, so we skip it
+                // Ak(i + 1, i + 1) is also a complex eigenvalue, so we skip it
                 // next iteration.
                 ++i;
 
@@ -1083,6 +1240,7 @@ std::vector<std::complex<T> > qr_eigenvalue(
 
         evs.push_back(std::complex<T>(Ak(i, i)));
     }
+*/
 
     return evs;
 }
