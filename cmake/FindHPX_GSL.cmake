@@ -31,6 +31,6 @@ hpx_find_package(GSL
 hpx_find_package(GSLCBLAS
   LIBRARIES gslcblas libgslcblas
   LIBRARY_PATHS lib64 lib
-  HEADERS gsl/gsl_test.h
+  HEADERS gsl/gsl_blas.h
   HEADER_PATHS include)
 
