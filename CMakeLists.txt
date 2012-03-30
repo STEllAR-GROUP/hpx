@@ -271,7 +271,7 @@ endif()
 
 add_definitions("-DHPX_PREFIX=\"${HPX_PREFIX}\"")
 
-# Make sure the specified build type is valid
+# Make sure the specified build type is valid.
 if(NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug" OR
         "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo" OR
         "${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel" OR
@@ -279,6 +279,7 @@ if(NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug" OR
   hpx_error("build_type" "\"${CMAKE_BUILD_TYPE}\" is not a valid build type, must be Debug, Release, RelWithDebInfo, or MinSizeRel.")
 endif()
 
+# TODO: Move this into a CMake macro.
 if(MSVC)
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release/bin)
   set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release/lib/hpx)
