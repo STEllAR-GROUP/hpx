@@ -399,7 +399,8 @@ inline bool compare_are(
   , T const& tolerance
     )
 {
-    BOOST_ASSERT(!compare_floating(0.0, x_new, 1e-6));
+    if (compare_floating(0.0, x_new, 1e-6))
+        return tolerance >= (std::abs(x_new - x_old) * 100.0);
 
     // Absolute relative error = | (x_new - x_old) / x_new | * 100
     T const are = std::abs((x_new - x_old) / x_new) * 100.0;
@@ -1079,6 +1080,8 @@ std::vector<std::complex<T> > qr_eigenvalue(
 
         bool converged = true;
 
+        std::cout << "ITERATION " << iterations << "\n";
+
         for (std::size_t j = 0; j < n; ++j)
         {
             if (j != n)
@@ -1106,12 +1109,10 @@ std::vector<std::complex<T> > qr_eigenvalue(
                         evs[j    ] = (a + d) / i2 + comp_part / i2; 
                         evs[j + 1] = (a + d) / i2 - comp_part / i2; 
 
-/*
                         std::cout << "evs[" << j << "] = " << evs[j] << "\n"
                                   << "old[" << j << "] = " << old[j] << "\n"
                                   << "evs[" << (j + 1) << "] = " << evs[j + 1] << "\n"
                                   << "old[" << (j + 1) << "] = " << old[j + 1] << "\n";
-*/
 
                         if ((old[j] == nan_) || (old[j + 1] == nan_))
                             converged = false;
@@ -1134,8 +1135,16 @@ std::vector<std::complex<T> > qr_eigenvalue(
                                && compare_are(old1_real, evs1_real, 0.1)
                                && compare_are(old1_imag, evs1_imag, 0.1);
 
-                            converged = test1;
+                            std::cout << "test = " << test1 << "\n";
+                            std::cout << "converged = " << converged << "\n";
+
+                            converged = converged && test1;
                         }
+
+/*
+                        std::cout << "converged[" << j << "] = " << converged << "\n";
+                        std::cout << "converged[" << (j + 1) << "] = " << converged << "\n";
+*/
 
                         // We handled Ak(j + 1, j + 1), so skip the next
                         // iteration.
@@ -1148,10 +1157,8 @@ std::vector<std::complex<T> > qr_eigenvalue(
 
             evs[j] = Ak(j, j);
 
-/*
             std::cout << "evs[" << j << "] = " << evs[j] << "\n"
                       << "old[" << j << "] = " << old[j] << "\n";
-*/
 
             if (old[j] == nan_)
                 converged = false;
@@ -1164,9 +1171,18 @@ std::vector<std::complex<T> > qr_eigenvalue(
                 T const old_real = old[j].real();
                 T const old_imag = old[j].imag();
 
-                converged = compare_are(old_real, evs_real, 0.1)
-                         && compare_are(old_imag, evs_imag, 0.1);
+                bool const test = compare_are(old_real, evs_real, 0.1)
+                                && compare_are(old_imag, evs_imag, 0.1);
+
+                std::cout << "test = " << test << "\n";
+                std::cout << "converged = " << converged << "\n";
+
+                converged = converged && test;
             }
+
+/*
+            std::cout << "converged[" << j << "] = " << converged << "\n";
+*/
         }
 
         old = evs;
