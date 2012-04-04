@@ -124,7 +124,7 @@ namespace hpx { namespace components
             }
             static void free(void* p, std::size_t count)
             {
-                Component::destroy(p, count);
+                Component::destroy(reinterpret_cast<Component *>(p), count);
             }
         };
     }
@@ -135,25 +135,26 @@ namespace hpx { namespace components
     {
     public:
         typedef Component type_holder;
-        typedef detail::simple_heap_factory<Component> heap_type;
+        typedef simple_component<Component> component_type;
+        typedef detail::simple_heap_factory<component_type> heap_type;
 
         /// \brief  The function \a create is used for allocation and
         ///         initialization of instances of the derived components.
-        static Component* create(std::size_t count)
+        static component_type* create(std::size_t count)
         {
             // simple components can be created individually only
             BOOST_ASSERT(1 == count);
-            return new Component();
+            return static_cast<component_type* >(new Component());
         }
 
         /// \brief  The function \a create is used for allocation and
         //          initialization of a single instance.
 #define HPX_SIMPLE_COMPONENT_CREATE_ONE(Z, N, _)                              \
         template <BOOST_PP_ENUM_PARAMS(N, typename T)>                        \
-        static Component*                                                     \
+        static component_type*                                                \
         create_one(BOOST_PP_ENUM_BINARY_PARAMS(N, T, const& t))               \
         {                                                                     \
-            return new Component(BOOST_PP_ENUM_PARAMS(N, t));                 \
+            return static_cast<component_type* >(new Component(BOOST_PP_ENUM_PARAMS(N, t)));                 \
         }                                                                     \
     /**/
 
