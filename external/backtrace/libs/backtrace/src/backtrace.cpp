@@ -78,7 +78,7 @@ namespace boost {
             trace_data& d = *((trace_data*) ptr);
  
             // First call. 
-            if (1 != d.count_)
+            if (std::size_t(-1) != d.count_)
             {
                 // Get the instruction pointer for this frame.
                 d.array_[d.count_] = (void *) _Unwind_GetIP(ctx);

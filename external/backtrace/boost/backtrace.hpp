@@ -56,7 +56,8 @@ namespace boost {
                 return;
             frames_.resize(frames_no,0);
             std::size_t size = stack_trace::trace(&frames_.front(),frames_no);
-            frames_.resize(size);
+            if(size != 0)
+                frames_.resize(size);
         }
 
         virtual ~backtrace() throw()
