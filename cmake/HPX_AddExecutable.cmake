@@ -73,11 +73,17 @@ macro(add_hpx_executable name)
 
   # linker instructions
   if(NOT ${${name}_NOLIBS})
+    if(HPX_FOUND AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+      set(hpx_libs hpx${CMAKE_DEBUG_POSTFIX} hpx_init${CMAKE_DEBUG_POSTFIX})
+    else()
+      set(hpx_libs hpx hpx_init)
+    endif()
+
     hpx_handle_component_dependencies(${name}_COMPONENT_DEPENDENCIES)
     target_link_libraries(${name}_exe
       ${${name}_DEPENDENCIES}
       ${${name}_COMPONENT_DEPENDENCIES}
-      hpx hpx_init)
+      ${hpx_libs})
     set_property(TARGET ${name}_exe APPEND
                  PROPERTY COMPILE_DEFINITIONS
                  "BOOST_ENABLE_ASSERT_HANDLER")

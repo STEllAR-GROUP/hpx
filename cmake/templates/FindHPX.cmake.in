@@ -27,7 +27,13 @@ if(NOT HPX_CMAKE_LOGLEVEL)
   set(HPX_CMAKE_LOGLEVEL "WARN")
 endif()
 
+set(CMAKE_BUILD_TYPE @CMAKE_BUILD_TYPE@ CACHE STRING
+    "Configuration type (one of Debug, RelWithDebInfo, Release, MinSizeRel)"
+    FORCE)
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} @external_cmake_path@)
+
+set(CMAKE_DEBUG_POSTFIX "d")
 
 include(HPX_Utils)
 

@@ -40,12 +40,18 @@ macro(add_hpx_library name)
 
   hpx_handle_component_dependencies(${name}_COMPONENT_DEPENDENCIES)
 
+  if(HPX_FOUND AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    set(hpx_lib hpx${CMAKE_DEBUG_POSTFIX})
+  else()
+    set(hpx_lib hpx)
+  endif()
+
   set(prefix "")
 
   if(NOT MSVC)
     if(NOT ${${name}_NOLIBS})
       target_link_libraries(${name}_lib
-        ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} hpx)
+        ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} ${hpx_lib})
       set_property(TARGET ${name}_lib APPEND
                    PROPERTY COMPILE_DEFINITIONS
                    "BOOST_ENABLE_ASSERT_HANDLER")
@@ -57,7 +63,7 @@ macro(add_hpx_library name)
   else()
     if(NOT ${${name}_NOLIBS})
       target_link_libraries(${name}_lib
-        ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} hpx)
+        ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} ${hpx_lib})
     else()
       target_link_libraries(${name}_lib
         ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES})
