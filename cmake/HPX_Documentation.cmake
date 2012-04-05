@@ -10,7 +10,7 @@ include(HPX_Include)
 hpx_include(Message)
 
 find_package(HPX_DocBook)
-find_package(HPX_BoostBook)
+#find_package(HPX_BoostBook)
 find_package(HPX_QuickBook)
 find_package(HPX_Doxygen)
 find_package(HPX_Xsltproc)
@@ -19,9 +19,9 @@ find_package(HPX_Xsltproc)
 if((NOT DOCBOOK_DTD_PATH_FOUND) OR (NOT DOCBOOK_XSL_PATH_FOUND))
   hpx_warn("documentation" "DocBook DTD or XSL is unavailable, documentation generation disabled. Set DOCBOOK_ROOT pointing to your DocBook installation directory.")
   set(HPX_BUILD_DOCUMENTATION OFF CACHE BOOL "True if the HPX documentation toolchain is available." FORCE)
-elseif((NOT BOOSTBOOK_DTD_PATH_FOUND) OR (NOT BOOSTBOOK_XSL_PATH_FOUND))
-  hpx_warn("documentation" "BoostBook DTD or XSL is unavailable, documentation generation disabled. Set BOOSTBOOK_ROOT pointing to your BoostBook installation directory.")
-  set(HPX_BUILD_DOCUMENTATION OFF CACHE BOOL "True if the HPX documentation toolchain is available." FORCE)
+#elseif((NOT BOOSTBOOK_DTD_PATH_FOUND) OR (NOT BOOSTBOOK_XSL_PATH_FOUND))
+#  hpx_warn("documentation" "BoostBook DTD or XSL is unavailable, documentation generation disabled. Set BOOSTBOOK_ROOT pointing to your BoostBook installation directory.")
+#  set(HPX_BUILD_DOCUMENTATION OFF CACHE BOOL "True if the HPX documentation toolchain is available." FORCE)
 elseif(NOT QUICKBOOK_FOUND)
   hpx_warn("documentation" "QuickBook tool is unavailable, documentation generation disabled. Set QUICKBOOK_ROOT pointing to your QuickBook installation directory.")
   set(HPX_BUILD_DOCUMENTATION OFF CACHE BOOL "True if the HPX documentation toolchain is available." FORCE)
@@ -73,6 +73,9 @@ if(NOT HPX_BUILD_DOCUMENTATION)
     hpx_error("source_to_boostbook" "Documentation toolchain is unavailable.")
   endmacro()
 else()
+  set(BOOSTBOOK_DTD_PATH ${hpx_SOURCE_DIR}/external/boostbook/dtd/)
+  set(BOOSTBOOK_XSL_PATH ${hpx_SOURCE_DIR}/external/boostbook/xsl/)
+
   macro(hpx_write_boostbook_catalog file)
     file(WRITE ${file}
       "<?xml version=\"1.0\"?>\n"
@@ -94,13 +97,21 @@ else()
       "    uriStartString=\"http://docbook.sourceforge.net/release/xsl/current/\"\n"
       "    rewritePrefix=\"file:///${DOCBOOK_XSL_PATH}/\"\n"
       "  />\n"
+      #"   <rewriteURI\n"
+      #"    uriStartString=\"http://www.boost.org/tools/boostbook/dtd/\"\n"
+      #"    rewritePrefix=\"file:///${BOOSTBOOK_DTD_PATH}/\"\n"
+      #"  />\n"
+      #"  <rewriteURI\n"
+      #"    uriStartString=\"http://www.boost.org/tools/boostbook/xsl/\"\n"
+      #"    rewritePrefix=\"file:///${BOOSTBOOK_XSL_PATH}/\"\n"
+      #"  />\n"
       "   <rewriteURI\n"
       "    uriStartString=\"http://www.boost.org/tools/boostbook/dtd/\"\n"
-      "    rewritePrefix=\"file:///${BOOSTBOOK_DTD_PATH}/\"\n"
+      "    rewritePrefix=\"file:///${hpx_SOURCE_DIR}/external/boostbook/dtd/\"\n"
       "  />\n"
       "  <rewriteURI\n"
       "    uriStartString=\"http://www.boost.org/tools/boostbook/xsl/\"\n"
-      "    rewritePrefix=\"file:///${BOOSTBOOK_XSL_PATH}/\"\n"
+      "    rewritePrefix=\"file:///${hpx_SOURCE_DIR}/external/boostbook/xsl/\"\n"
       "  />\n"
       "</catalog>\n"
     )
@@ -302,6 +313,7 @@ else()
       add_custom_command(OUTPUT ${name}.xml
         COMMAND set XML_CATALOG_FILES=${${name}_CATALOG}
         COMMAND ${XSLTPROC_PROGRAM} ${${name}_XSLTPROC_ARGS}
+                "--stringparam" "boost.doxygen.header.prefix" ${hpx_SOURCE_DIR}
                 "--xinclude" "-o" ${name}.xml
                 "--path" ${CMAKE_CURRENT_BINARY_DIR}
                 ${BOOSTBOOK_XSL_PATH}/doxygen/doxygen2boostbook.xsl
@@ -312,6 +324,7 @@ else()
       add_custom_command(OUTPUT ${name}.xml
         COMMAND "XML_CATALOG_FILES=${${name}_CATALOG}" ${XSLTPROC_PROGRAM}
                 ${${name}_XSLTPROC_ARGS}
+                "--stringparam" "boost.doxygen.header.prefix" ${hpx_SOURCE_DIR}
                 "--xinclude" "-o" ${name}.xml
                 "--path" ${CMAKE_CURRENT_BINARY_DIR}
                 ${BOOSTBOOK_XSL_PATH}/doxygen/doxygen2boostbook.xsl

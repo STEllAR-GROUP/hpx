@@ -200,7 +200,7 @@ add_hpx_source_group(
 
 ################################################################################
 # libhpx_serialization
-add_library(hpx_serialization SHARED 
+add_library(hpx_serialization SHARED EXCLUDE_FROM_ALL 
   ${hpx_serialization_SOURCES} ${hpx_serialization_HEADERS})
 
 set_target_properties(hpx_serialization
@@ -247,7 +247,7 @@ endif()
 
 ################################################################################
 # libhpx
-add_library(hpx SHARED 
+add_library(hpx SHARED EXCLUDE_FROM_ALL 
   ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
 
 set_target_properties(hpx PROPERTIES
@@ -293,7 +293,7 @@ endif()
 
 ################################################################################
 # libhpx_init
-add_library(hpx_init STATIC 
+add_library(hpx_init STATIC EXCLUDE_FROM_ALL
   ${hpx_init_SOURCES} ${hpx_init_HEADERS})
 
 set_property(TARGET hpx_init APPEND

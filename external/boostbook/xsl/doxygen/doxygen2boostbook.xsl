@@ -400,17 +400,7 @@
     <xsl:choose>
       <xsl:when test="contains($header, $prefix)">
         <xsl:variable name="rest" select="substring-after($header, $prefix)"/>
-        <xsl:choose>
-          <xsl:when test="contains($rest, $prefix)">
-            <xsl:call-template name="shorten.header.name">
-              <xsl:with-param name="header" select="$rest"/>
-            </xsl:call-template>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="$prefix"/>
-            <xsl:value-of select="$rest"/>
-          </xsl:otherwise>
-        </xsl:choose>
+        <xsl:value-of select="$rest"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="$header"/>
