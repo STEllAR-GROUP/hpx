@@ -21,32 +21,41 @@ set(DOCUMENTATION_DEPENDENCIES
     ${hpx_SOURCE_DIR}/examples/hello_world_component/hello_world_component.hpp
     ${hpx_SOURCE_DIR}/examples/hello_world_component/hello_world_component.cpp)
 
+if(DOXYGEN_FOUND)
+  set(DOCUMENTATION_DEPENDENCIES ${DOCUMENTATION_DEPENDENCIES}
+      ${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc.xml)
+
+  # Generate Doxygen from the source code.
+  hpx_source_to_boostbook(hpx_autodoc
+    CATALOG ${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml)
+endif()
+
 set(quickbook_fixme_mode "-D__disable_fixme__")
 if(HPX_DOCUMENTATION_DEVELOPMENT)
   set(quickbook_fixme_mode "-D__enable_fixme__")
 endif()
 
 hpx_quickbook_to_html(hpx
-    SOURCE hpx.qbk
-    DEPENDENCIES ${DOCUMENTATION_DEPENDENCIES}
-    CATALOG ${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml
-    XSLTPROC_ARGS --stringparam chunk.section.depth 4
-                  --stringparam chunk.first.sections 1
-                  --stringparam toc.section.depth 3
-                  --stringparam toc.max.depth 3
-                  --stringparam generate.section.toc.level 4
-                  --stringparam boost.image.src images/hpx_1_0.png
-                  --stringparam boost.image.w 322
-                  --stringparam boost.image.h 101
-                  --stringparam boost.image.alt "HPX - High Performance ParalleX"
-    QUICKBOOK_ARGS ${quickbook_fixme_mode})
+  SOURCE hpx.qbk
+  DEPENDENCIES ${DOCUMENTATION_DEPENDENCIES}
+  CATALOG ${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml
+  XSLTPROC_ARGS --stringparam chunk.section.depth 4
+                --stringparam chunk.first.sections 1
+                --stringparam toc.section.depth 3
+                --stringparam toc.max.depth 3
+                --stringparam generate.section.toc.level 4
+                --stringparam boost.image.src images/hpx_1_0.png
+                --stringparam boost.image.w 322
+                --stringparam boost.image.h 101
+                --stringparam boost.image.alt "HPX - High Performance ParalleX"
+  QUICKBOOK_ARGS ${quickbook_fixme_mode})
 
 add_custom_target(docs ALL
-    DEPENDS hpx_HTML.manifest
-    SOURCES ${DOCUMENTATION_FILES})
+  DEPENDS hpx_HTML.manifest
+  SOURCES ${DOCUMENTATION_FILES})
 
-source_group(Documentation
-    FILES ${DOCUMENTATION_FILES})
+source_group(Documentation FILES ${DOCUMENTATION_FILES})
 
 set_source_files_properties(${DOCUMENTATION_FILES}
-    PROPERTIES HEADER_FILE_ONLY TRUE)
+  PROPERTIES HEADER_FILE_ONLY TRUE)
+

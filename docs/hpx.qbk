@@ -147,11 +147,13 @@ can be found in the collection of __boost_tools__.
 [endsect] [/ Tutorial]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[section:manual Reference Manual]
+[section:manual Manual]
 
 [include man_components.qbk]
 
 [endsect] [/ Manual]
+
+[xinclude __hpx_docs_dir__/hpx_autodoc.xml]
 
 [/////////////////////////////////////////////////////////////////////////////]
 [include people.qbk]

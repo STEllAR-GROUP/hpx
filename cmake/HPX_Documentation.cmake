@@ -12,9 +12,10 @@ hpx_include(Message)
 find_package(HPX_DocBook)
 find_package(HPX_BoostBook)
 find_package(HPX_QuickBook)
+find_package(HPX_Doxygen)
 find_package(HPX_Xsltproc)
 
-# issue a meaninful warning if part of the documentation toolchain is not available
+# issue a meaningful warning if part of the documentation toolchain is not available
 if((NOT DOCBOOK_DTD_PATH_FOUND) OR (NOT DOCBOOK_XSL_PATH_FOUND))
   hpx_warn("documentation" "DocBook DTD or XSL is unavailable, documentation generation disabled. Set DOCBOOK_ROOT pointing to your DocBook installation directory.")
   set(HPX_BUILD_DOCUMENTATION OFF CACHE BOOL "True if the HPX documentation toolchain is available." FORCE)
@@ -22,17 +23,19 @@ elseif((NOT BOOSTBOOK_DTD_PATH_FOUND) OR (NOT BOOSTBOOK_XSL_PATH_FOUND))
   hpx_warn("documentation" "BoostBook DTD or XSL is unavailable, documentation generation disabled. Set BOOSTBOOK_ROOT pointing to your BoostBook installation directory.")
   set(HPX_BUILD_DOCUMENTATION OFF CACHE BOOL "True if the HPX documentation toolchain is available." FORCE)
 elseif(NOT QUICKBOOK_FOUND)
-  hpx_warn("documentation" "QuickBook tool is unavailable, documentation generation disabled. Set QUICKBOOK_ROOT pointing to your quickbook installation directory.")
+  hpx_warn("documentation" "QuickBook tool is unavailable, documentation generation disabled. Set QUICKBOOK_ROOT pointing to your QuickBook installation directory.")
   set(HPX_BUILD_DOCUMENTATION OFF CACHE BOOL "True if the HPX documentation toolchain is available." FORCE)
 elseif(NOT XSLTPROC_FOUND)
   hpx_warn("documentation" "xsltproc tool is unavailable, documentation generation disabled. Set XSLTPROC_ROOT pointing to your xsltproc installation directory.")
   set(HPX_BUILD_DOCUMENTATION OFF CACHE BOOL "True if the HPX documentation toolchain is available." FORCE)
+elseif(NOT DOXYGEN_FOUND)
+  hpx_warn("documentation" "Doxygen tool is unavailable, API reference will be unavailable. Set DOXYGEN_ROOT pointing to your Doxygen installation directory.")
 else()
   set(HPX_BUILD_DOCUMENTATION ON CACHE BOOL "True if the HPX documentation toolchain is available.")
 endif()
 
 if(NOT HPX_BUILD_DOCUMENTATION)
-  # implement fallback macros for documantation toolchain
+  # implement fallback macros for documentation toolchain
 
   macro(hpx_write_boostbook_catalog file)
     hpx_error("write_boostbook_catalog" "Documentation toolchain is unavailable.")
@@ -52,6 +55,22 @@ if(NOT HPX_BUILD_DOCUMENTATION)
 
   macro(hpx_docbook_to_html name)
     hpx_error("docbook_to_html" "Documentation toolchain is unavailable.")
+  endmacro()
+
+  macro(hpx_source_to_doxygen name)
+    hpx_error("source_to_doxygen" "Documentation toolchain is unavailable.")
+  endmacro()
+
+  macro(hpx_collect_doxygen name)
+    hpx_error("collect_doxygen" "Documentation toolchain is unavailable.")
+  endmacro()
+
+  macro(hpx_doxygen_to_boostbook name)
+    hpx_error("doxygen_to_boostbook" "Documentation toolchain is unavailable.")
+  endmacro()
+
+  macro(hpx_source_to_boostbook name)
+    hpx_error("source_to_boostbook" "Documentation toolchain is unavailable.")
   endmacro()
 else()
   macro(hpx_write_boostbook_catalog file)
@@ -114,6 +133,8 @@ else()
           "--output-file=${name}.xml"
           "${svn_revision_option}"
           "-D__hpx_source_dir__=${hpx_SOURCE_DIR}"
+          "-D__hpx_binary_dir__=${CMAKE_BINARY_DIR}"
+          "-D__hpx_docs_dir__=${CMAKE_CURRENT_BINARY_DIR}"
           ${${name}_QUICKBOOK_ARGS}
           ${input_path}
       COMMENT "Generating BoostBook XML file ${name}.xml from ${${name}_SOURCE}."
@@ -230,7 +251,99 @@ else()
       XSLTPROC_ARGS ${${name}_XSLTPROC_ARGS})
 
     if(${name}_TARGET)
-      add_custom_target(${${name}_TARGET} DEPENDS ${name}_HTML.manifest)
+      add_custom_target(${${name}_TARGET} DEPENDS ${name}_HTML.manifest
+        DEPENDENCIES ${${name}_DEPENDENCIES})
+    endif()
+  endmacro()
+
+  # C++ Source -> Doxygen XML
+  macro(hpx_source_to_doxygen name)
+    hpx_parse_arguments(${name} "DEPENDENCIES;DOXYGEN_ARGS" "" ${ARGN})
+
+    add_custom_command(OUTPUT ${name}/index.xml
+      COMMAND ${DOXYGEN_PROGRAM} ${${name}_DOXYGEN_ARGS}
+              ${CMAKE_CURRENT_BINARY_DIR}/${name}.doxy
+      COMMENT "Generating Doxygen."
+      DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${name}.doxy ${${name}_DEPENDENCIES})
+  endmacro()
+
+  # Collect chunked Doxygen XML
+  macro(hpx_collect_doxygen name)
+    hpx_parse_arguments(${name} "SOURCE;DEPENDENCIES;CATALOG;XSLTPROC_ARGS" "" ${ARGN})
+
+    if(WIN32)
+      add_custom_command(OUTPUT ${name}.doxygen.xml
+        COMMAND set XML_CATALOG_FILES=${${name}_CATALOG}
+        COMMAND ${XSLTPROC_PROGRAM} ${${name}_XSLTPROC_ARGS}
+                "--stringparam" "doxygen.xml.path" ${CMAKE_CURRENT_BINARY_DIR}/${name} 
+                "--xinclude" "-o" ${name}.doxygen.xml
+                "--path" ${CMAKE_CURRENT_BINARY_DIR}
+                ${BOOSTBOOK_XSL_PATH}/doxygen/collect.xsl ${${name}_SOURCE}
+        COMMENT "Collecting Doxygen XML files."
+        DEPENDS ${${name}_SOURCE} ${${name}_DEPENDENCIES})
+    else()
+      add_custom_command(OUTPUT ${name}.doxygen.xml
+        COMMAND "XML_CATALOG_FILES=${${name}_CATALOG}" ${XSLTPROC_PROGRAM}
+                ${${name}_XSLTPROC_ARGS}
+                "--stringparam" "doxygen.xml.path" ${CMAKE_CURRENT_BINARY_DIR}/${name} 
+                "--xinclude" "-o" ${name}.doxygen.xml
+                "--path" ${CMAKE_CURRENT_BINARY_DIR}
+                ${BOOSTBOOK_XSL_PATH}/doxygen/collect.xsl ${${name}_SOURCE}
+        COMMENT "Collecting Doxygen XML files."
+        DEPENDS ${${name}_SOURCE} ${${name}_DEPENDENCIES})
+    endif()
+  endmacro()
+
+  # Doxygen XML -> BoostBook XML
+  macro(hpx_doxygen_to_boostbook name)
+    hpx_parse_arguments(${name} "SOURCE;DEPENDENCIES;CATALOG;XSLTPROC_ARGS" "" ${ARGN})
+
+    if(WIN32)
+      add_custom_command(OUTPUT ${name}.xml
+        COMMAND set XML_CATALOG_FILES=${${name}_CATALOG}
+        COMMAND ${XSLTPROC_PROGRAM} ${${name}_XSLTPROC_ARGS}
+                "--xinclude" "-o" ${name}.xml
+                "--path" ${CMAKE_CURRENT_BINARY_DIR}
+                ${BOOSTBOOK_XSL_PATH}/doxygen/doxygen2boostbook.xsl
+                ${${name}_SOURCE}
+        COMMENT "Generating BoostBook XML file ${name}.xml from ${${name}_SOURCE}."
+        DEPENDS ${${name}_SOURCE} ${${name}_DEPENDENCIES})
+    else()
+      add_custom_command(OUTPUT ${name}.xml
+        COMMAND "XML_CATALOG_FILES=${${name}_CATALOG}" ${XSLTPROC_PROGRAM}
+                ${${name}_XSLTPROC_ARGS}
+                "--xinclude" "-o" ${name}.xml
+                "--path" ${CMAKE_CURRENT_BINARY_DIR}
+                ${BOOSTBOOK_XSL_PATH}/doxygen/doxygen2boostbook.xsl
+                ${${name}_SOURCE}
+        COMMENT "Generating BoostBook XML file ${name}.xml from ${${name}_SOURCE}."
+        DEPENDS ${${name}_SOURCE} ${${name}_DEPENDENCIES})
+    endif()
+  endmacro()
+
+  # C++ Source -> Doxygen XML -> BoostBook XML
+  macro(hpx_source_to_boostbook name)
+    hpx_parse_arguments(${name}
+        "DEPENDENCIES;CATALOG;XSLTPROC_ARGS;TARGET;DOXYGEN_ARGS"
+        "" ${ARGN})
+
+    hpx_source_to_doxygen(${name}
+      DEPENDENCIES ${${name}_DEPENDENCIES}
+      DOXYGEN_ARGS ${${name}_DOXYGEN_ARGS})
+
+    hpx_collect_doxygen(${name}
+      SOURCE ${name}/index.xml
+      CATALOG ${${name}_CATALOG}
+      XSLTPROC_ARGS ${${name}_XSLTPROC_ARGS})
+      
+    hpx_doxygen_to_boostbook(${name}
+      SOURCE ${name}.doxygen.xml
+      CATALOG ${${name}_CATALOG}
+      XSLTPROC_ARGS ${${name}_XSLTPROC_ARGS})
+
+    if(${name}_TARGET)
+      add_custom_target(${${name}_TARGET} DEPENDS ${name}.xml
+        DEPENDENCIES ${${name}_DEPENDENCIES})
     endif()
   endmacro()
 endif()
