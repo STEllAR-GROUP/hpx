@@ -16,8 +16,11 @@
        be output. -->
   <xsl:param name="boost.doxygen.headers" select="''"/>
 
-  <!-- The common prefix to all headers -->
-  <xsl:param name="boost.doxygen.header.prefix" select="'boost'"/>
+  <!-- Prefix removed from all headers -->
+  <xsl:param name="boost.doxygen.header.stripped_prefix" select="''"/>
+
+  <!-- Prefix added to all headers -->
+  <xsl:param name="boost.doxygen.header.added_prefix" select="''"/>
 
   <!-- The text that Doxygen places in overloaded functions. Damn them
        for forcing us to compare TEXT just to figure out what's overloaded
@@ -368,7 +371,14 @@
       </xsl:call-template>
     </xsl:variable>
     <xsl:if test="$include-header='yes'">
-      <header role="NotInToc">
+      <header role="not_in_main_toc">
+        <xsl:attribute name="url">
+          <xsl:value-of select="$boost.doxygen.header.added_prefix" />  
+          <xsl:call-template name="shorten.header.name">
+            <xsl:with-param name="header" select="location/attribute::file"/>
+          </xsl:call-template>
+        </xsl:attribute>
+
         <xsl:attribute name="name">
           <xsl:call-template name="shorten.header.name">
             <xsl:with-param name="header" select="location/attribute::file"/>
@@ -394,7 +404,7 @@
     <xsl:param name="header"/>
 
     <xsl:variable name="prefix">
-      <xsl:value-of select="concat($boost.doxygen.header.prefix, '/')"/>
+      <xsl:value-of select="concat($boost.doxygen.header.stripped_prefix, '/')"/>
     </xsl:variable>
 
     <xsl:choose>

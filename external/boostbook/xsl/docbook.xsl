@@ -132,9 +132,7 @@
           <xsl:text>Header &lt;</xsl:text>
           <ulink>
             <xsl:attribute name="url">
-              <xsl:value-of select="$boost.header.root"/>
-              <xsl:text>/</xsl:text>
-              <xsl:value-of select="@name"/>
+              <xsl:value-of select="@url"/>
             </xsl:attribute>
             <xsl:value-of select="@name"/>
           </ulink>

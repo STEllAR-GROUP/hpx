@@ -200,18 +200,11 @@
      </xsl:call-template>
   </xsl:template>
 
-  <xsl:template match="section[@role = 'NotInToc']" mode="toc">
+  <xsl:template match="section[@role = 'not_in_main_toc']" mode="toc">
     <xsl:param name="toc-context" select="."/>
 
     <xsl:choose>
       <xsl:when test="local-name($toc-context) = 'article'" />
-<!--
-        <xsl:call-template name="subtoc">
-          <xsl:with-param name="toc-context" select="$toc-context"/>
-          <xsl:with-param name="nodes" select="foo"/>
-        </xsl:call-template>
-      </xsl:when>
--->
       <xsl:otherwise>
         <xsl:call-template name="subtoc">
           <xsl:with-param name="toc-context" select="$toc-context"/>

@@ -286,7 +286,7 @@ else()
       add_custom_command(OUTPUT ${name}.doxygen.xml
         COMMAND set XML_CATALOG_FILES=${${name}_CATALOG}
         COMMAND ${XSLTPROC_PROGRAM} ${${name}_XSLTPROC_ARGS}
-                "--stringparam" "doxygen.xml.path" ${CMAKE_CURRENT_BINARY_DIR}/${name} 
+#                "--stringparam" "doxygen.xml.path" ${CMAKE_CURRENT_BINARY_DIR}/${name} 
                 "--xinclude" "-o" ${name}.doxygen.xml
                 "--path" ${CMAKE_CURRENT_BINARY_DIR}
                 ${BOOSTBOOK_XSL_PATH}/doxygen/collect.xsl ${${name}_SOURCE}
@@ -296,7 +296,7 @@ else()
       add_custom_command(OUTPUT ${name}.doxygen.xml
         COMMAND "XML_CATALOG_FILES=${${name}_CATALOG}" ${XSLTPROC_PROGRAM}
                 ${${name}_XSLTPROC_ARGS}
-                "--stringparam" "doxygen.xml.path" ${CMAKE_CURRENT_BINARY_DIR}/${name} 
+#                "--stringparam" "doxygen.xml.path" ${CMAKE_CURRENT_BINARY_DIR}/${name} 
                 "--xinclude" "-o" ${name}.doxygen.xml
                 "--path" ${CMAKE_CURRENT_BINARY_DIR}
                 ${BOOSTBOOK_XSL_PATH}/doxygen/collect.xsl ${${name}_SOURCE}
@@ -313,7 +313,8 @@ else()
       add_custom_command(OUTPUT ${name}.xml
         COMMAND set XML_CATALOG_FILES=${${name}_CATALOG}
         COMMAND ${XSLTPROC_PROGRAM} ${${name}_XSLTPROC_ARGS}
-                "--stringparam" "boost.doxygen.header.prefix" ${hpx_SOURCE_DIR}
+                "--stringparam" "boost.doxygen.header.stripped_prefix" ${hpx_SOURCE_DIR}
+                "--stringparam" "boost.doxygen.header.added_prefix" "file://${CMAKE_INSTALL_PREFIX}/include/"
                 "--xinclude" "-o" ${name}.xml
                 "--path" ${CMAKE_CURRENT_BINARY_DIR}
                 ${BOOSTBOOK_XSL_PATH}/doxygen/doxygen2boostbook.xsl
@@ -324,7 +325,8 @@ else()
       add_custom_command(OUTPUT ${name}.xml
         COMMAND "XML_CATALOG_FILES=${${name}_CATALOG}" ${XSLTPROC_PROGRAM}
                 ${${name}_XSLTPROC_ARGS}
-                "--stringparam" "boost.doxygen.header.prefix" ${hpx_SOURCE_DIR}
+                "--stringparam" "boost.doxygen.header.stripped_prefix" ${hpx_SOURCE_DIR}
+                "--stringparam" "boost.doxygen.header.added_prefix" "file://${CMAKE_INSTALL_PREFIX}/include/"
                 "--xinclude" "-o" ${name}.xml
                 "--path" ${CMAKE_CURRENT_BINARY_DIR}
                 ${BOOSTBOOK_XSL_PATH}/doxygen/doxygen2boostbook.xsl
