@@ -136,13 +136,19 @@ else()
 
     set(svn_revision_option "")
     if(SVN_REVISION AND NOT ${SVN_REVISION} STREQUAL "")
-      set(svn_revision_option "-D__svn_revision__=${SVN_REVISION}")
+      set(svn_revision_option "-D__hpx_svn_revision__=${SVN_REVISION}")
+    endif()
+
+    set(doxygen_option "")
+    if(DOXYGEN_FOUND)
+      set(doxygen_option "-D__hpx_doxygen__")
     endif()
 
     add_custom_command(OUTPUT ${name}.xml
       COMMAND ${QUICKBOOK_PROGRAM}
           "--output-file=${name}.xml"
           "${svn_revision_option}"
+          "${doxygen_option}"
           "-D__hpx_source_dir__=${hpx_SOURCE_DIR}"
           "-D__hpx_binary_dir__=${CMAKE_BINARY_DIR}"
           "-D__hpx_docs_dir__=${CMAKE_CURRENT_BINARY_DIR}"

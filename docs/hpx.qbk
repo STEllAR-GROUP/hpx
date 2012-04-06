@@ -25,7 +25,7 @@
 [? __disable_fixme__  [template fixme[s] ] ]
 
 [/ DEFINITIONS]
-[def __version__                V1.0.0]
+[def __hpx_version__                V1.0.0]
 
 [def __stellar__                [@http://stellar.cct.lsu.edu STE||AR]]
 [def __stellar_list__           [@email:gopx@cct.lsu.edu gopx@cct.lsu.edu]]
@@ -130,9 +130,9 @@ and [*A]lgorithms [*R]esearch) is a research group at __lsu__'s __cct__. For
 a list of people working in this group and participating in writing this
 documentation see __people__.
 
-This documentation is automatically generated for HPX __version__ (from SVN
-revision __svn_revision__) by the Boost QuickBook documentation tool. QuickBook
-can be found in the collection of __boost_tools__.
+This documentation is automatically generated for HPX __hpx_version__ (from SVN
+revision __hpx_svn_revision__) by the Boost QuickBook documentation tool.
+QuickBook can be found in the collection of __boost_tools__.
 
 [include preface.qbk]
 [include whats_new.qbk]
@@ -153,7 +153,7 @@ can be found in the collection of __boost_tools__.
 
 [endsect] [/ Manual]
 
-[xinclude __hpx_docs_dir__/hpx_autodoc.xml]
+[? __hpx_doxygen__ [xinclude __hpx_docs_dir__/hpx_autodoc.xml]]
 
 [/////////////////////////////////////////////////////////////////////////////]
 [include people.qbk]
