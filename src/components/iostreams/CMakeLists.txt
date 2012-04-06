@@ -11,7 +11,7 @@ add_definitions(-DHPX_IOSTREAMS_MODULE_EXPORTS)
 add_hpx_component(iostreams
   FOLDER "Core/Components"
   HEADER_ROOT ${root}
-  AUTOGLOB)
+  AUTOGLOB ESSENTIAL)
 
 add_hpx_pseudo_dependencies(components.iostreams
                             iostreams_component)
