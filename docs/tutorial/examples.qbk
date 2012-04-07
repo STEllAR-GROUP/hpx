@@ -116,30 +116,30 @@ command line options are available. `HPX_APPLICATION_STRING` is a macro that
 expands to a string constant containing the name of the HPX application
 currently being compiled.
 
-[import ../examples/quickstart/fibonacci.cpp]
+[import ../../examples/quickstart/fibonacci.cpp]
 [fib_main]
 
-The `hpx::init()` function in `main()` starts the runtime system, and invokes
-`hpx_main()` as the first HPX-thread. Below we can see that the basic program
+The [funcref hpx::init]`()` function in `main()` starts the runtime system, and invokes
+[funcref hpx_main]`()` as the first HPX-thread. Below we can see that the basic program
 is simple. The command line option [^--n-value] is read in, a timer
-(`hpx::util::high_resolution_timer`) is set up to record the time it takes to
-do the computation, an `hpx::lcos::future<>` is created, the `get()` function 
-on the `hpx::lcos::future<>` is called to retrieve or wait for the result, and
-the answer is printed out.
+([classref hpx::util::high_resolution_timer]) is set up to record the time it takes to
+do the computation, an [classref hpx::lcos::future]`<>` is created, the
+[memberref hpx::lcos::future::get]`()` function on the [classref hpx::lcos::future]`<>`
+is called to retrieve or wait for the result, and the answer is printed out.
 
 [fib_hpx_main]
 
-Upon a closer look we see that the `hpx::lcos::future<>` we created is assigned
-the return of `hpx::lcos::async<fibonacci_action>(hpx::find_here(), n)`.
-`hpx::lcos::async<>()` takes an action, in this case `fibonacci_action`, and
+Upon a closer look we see that the [classref hpx::lcos::future]`<>` we created is assigned
+the return of [funcref hpx::lcos::async]`<fibonacci_action>(`[funcref hpx::find_here]`(), n)`.
+[funcref hpx::lcos::async]`<>()` takes an action, in this case `fibonacci_action`, and
 asynchronously kicks of the computation of the action, returning a future which
 represents the result of the computation. But wait, what is an action? And what
 is this `fibonacci_action`? For starters, an action is a wrapper for a
 function. By wrapping functions, HPX can send packets of work to different
 processing units. These vehicles allow users to calculate work now, later, or
-on certain nodes. The first argument to `hpx::lcos::async<>()` is the location
+on certain nodes. The first argument to [funcref hpx::lcos::async]`<>()` is the location
 where the action should be run. In this case, we just want to run the action on
-the machine that we are currently on, so we use `hpx::find_here()`. To further
+the machine that we are currently on, so we use [funcref hpx::find_here]`()`. To further
 understand this we turn to the code to find where `fibonacci_action` was
 defined:
 
@@ -156,7 +156,7 @@ value.
 
 This picture should now start making sense. The function `fibonacci()` is
 wrapped in an action `hpx::actions::plain_result_action1<>`, which was spawned
-by `hpx::lcos::async<>()`, which returns a future. Now, lets look at the
+by [funcref hpx::lcos::async]`<>()`, which returns a future. Now, lets look at the
 function `fibonacci()`:
 
 [fib_func]
@@ -239,26 +239,26 @@ __pbs__ documentation.
 [c++]
 
 Now that you have compiled and run the code, lets look at how the code works,
-beginning with `main()` and `hpx_main()`:
+beginning with `main()` and [funcref hpx_main]`()`:
 
-[import ../examples/quickstart/hello_world.cpp]
+[import ../../examples/quickstart/hello_world.cpp]
 [hello_world_main]
 [hello_world_hpx_main]
 
 In this excerpt of the code we again see the use of futures. This time
 the futures are stored in a vector so that they can easily be accessed.
-`hpx::lcos::wait()` is a family of functions that wait on for an `std::vector<>`
+[funcref hpx::lcos::wait]`()` is a family of functions that wait on for an `std::vector<>`
 of futures to become ready. In this piece of code, we are using the synchronous
-version of `hpx::lcos::wait()`, which takes one argument (the `std::vector<>` of
+version of [funcref hpx::lcos::wait]`()`, which takes one argument (the `std::vector<>` of
 futures to wait on). This function will not return until all the futures in the
 vector have been executed.
 
-In the __fibonacci_example__, we used `hpx::find_here()` to specified the target'
-of our actions. Here, we instead use `hpx::find_all_localities()`, which returns
+In the __fibonacci_example__, we used [funcref hpx::find_here]`()` to specified the target'
+of our actions. Here, we instead use [funcref hpx::find_all_localities]`()`, which returns
 an `std::vector<>` containing the identifiers of all the machines in the system,
 including the one that we are on. 
 
-As in the __fibonacci_example__ our futures are set using `hpx::lcos::async<>()`.
+As in the __fibonacci_example__ our futures are set using [funcref hpx::lcos::async]`<>()`.
 The `hello_world_foreman_action` is declared here:
 
 [hello_world_action_wrapper]
@@ -273,19 +273,19 @@ the action above:
 [hello_world_foreman]
 
 Now, before we discuss `hello_world_foreman()`, let's talk about the
-`hpx::lcos::wait()` function. `hpx::lcos::wait()` provides a way to make sure
+[funcref hpx::lcos::wait]`()` function. [funcref hpx::lcos::wait]`()` provides a way to make sure
 that all of the futures have finished being calculated without having to call
-`get()` for each one. The version of `hpx::lcos::wait()` used here performs an
+[memberref hpx::lcos::future::get]`()` for each one. The version of [funcref hpx::lcos::wait]`()` used here performs an
 non-blocking wait, which acts on an `std::vector<>`. It queries the state of
 the futures, waiting for them to finish. Whenever a future becomes marked as
-ready, `hpx::lcos::wait()` invokes a callback function provided by the user,
+ready, [funcref hpx::lcos::wait]`()` invokes a callback function provided by the user,
 supplying the callback function with the index of the future in the
 `std::vector<>` and the result of the future.
 
 In `hello_world_foreman()`, an `std::set<>` called `attendance` keeps track of
 which OS-threads have printed out the hello world message. When the OS-thread
 prints out the statement, the future is marked as ready, and
-`hpx::lcos::wait()` invokes the callback function, in this case a C+11 lambda.
+[funcref hpx::lcos::wait]`()` invokes the callback function, in this case a C+11 lambda.
 This lambda erases the OS-threads id from the set `attendance`, thus letting
 `hello_world_foreman()` know which OS-threads still need to print out hello
 world. However, if the future returns a value of -1, the future executed on an
@@ -296,7 +296,7 @@ the OS-thread id in `attendance`.
 Finally, let us look at `hello_world_worker()`. Here, `hello_world_worker()`
 checks to see if it is on the target OS-thread. If it is executing on the
 correct OS-thread, it prints out the hello world message and returns the
-OS-thread id to `hpx::lcos::wait()` in `hello_world_foreman()`. If it is
+OS-thread id to [funcref hpx::lcos::wait]`()` in `hello_world_foreman()`. If it is
 not executing on the correct OS-thread, it returns a value of -1, which causes
 `hello_world_foreman()` to leave the OS-thread id in `attendance`.
 
@@ -419,20 +419,20 @@ The following code is from
 All HPX component server classes must inherit publicly from an HPX component
 base class. There are currently two component base classes:
 
-* `hpx::components::managed_component_base<>` - Managed components are components
+* [classref hpx::components::managed_component_base]`<>` - Managed components are components
   which are allocated in bulk by HPX. Managed components are more efficient if
   you are creating a large number (e.g. hundreds or more per machine) of
   component instances.
-* `hpx::components::simple_component_base<>` - Simple components are components
+* [classref hpx::components::simple_component_base]`<>` - Simple components are components
   which are allocated individually by HPX. Simple components are more efficient
   if you are creating a small number (e.g. only a handful per machine) of
   component instances.
 
 The managed_accumulator component is a managed component, because it inherits
-from `hpx::components::managed_component_base`, as we can see in the following
+from [classref hpx::components::managed_component_base]`<>`, as we can see in the following
 snippet:
 
-[import ../examples/accumulator/accumulators/server/managed_accumulator.hpp]
+[import ../../examples/accumulator/accumulators/server/managed_accumulator.hpp]
 [managed_accumulator_server_inherit]
 
 Our accumulator class will need a data member to store its value in, so let's
@@ -475,7 +475,7 @@ action type registration code:
 The rest of the registration code is in 
 [hpx_link examples/accumulator/accumulators/managed_accumulator.cpp..managed_accumulator.cpp].
 
-[import ../examples/accumulator/accumulators/managed_accumulator.cpp]
+[import ../../examples/accumulator/accumulators/managed_accumulator.cpp]
 [managed_accumulator_registration_definitions]
 
 [note The code above must be placed in the global namespace.]
@@ -485,9 +485,9 @@ The rest of the registration code is in
 The following code is from
 [hpx_link examples/accumulator/accumulators/stubs/managed_accumulator.hpp..stubs/managed_accumulator.hpp].
 
-All stubs classes must inherit from the stubs base class, `hpx::components::stub_base<>`:
+All stubs classes must inherit from the stubs base class, [classref hpx::components::stub_base]`<>`:
 
-[import ../examples/accumulator/accumulators/stubs/managed_accumulator.hpp]
+[import ../../examples/accumulator/accumulators/stubs/managed_accumulator.hpp]
 [managed_accumulator_stubs_inherit]
 
 The stubs class contains helper functions which invoke actions on component
@@ -497,9 +497,9 @@ instances. There are a few different ways of invoking actions:
   care about the result of an action, we can invoke the action using
   fire-and-forget semantics. This means that once we have asked HPX to compute
   the action, we forget about it completely and continue with our computation.
-  We use `hpx::applier::apply<>()` instead of `hpx::lcos::async<>()` to invoke
-  an action in a non-blocking fashion. Here's an example from the
-  managed_accumulator stubs class:
+  We use [funcref hpx::applier::apply]`<>()` instead of
+  [funcref hpx::lcos::async]`<>()` to invoke an action in a non-blocking fashion.
+  Here's an example from the managed_accumulator stubs class:
 
 [managed_accumulator_stubs_reset_non_blocking]
 
@@ -510,15 +510,15 @@ instances. There are a few different ways of invoking actions:
 [managed_accumulator_stubs_query_async]
 
 * [*Synchronous]: To invoke an action in a fully synchronous manner, we can
-  simply call `hpx::lcos::async<>().get()` (e.g., create a future and immediately
-  wait on it to be ready). Here's an example from the managed_accumulator stubs
-  class:
+  simply call [classref hpx::lcos::async]`<>().get()` (e.g., create a future and
+  immediately wait on it to be ready). Here's an example from the
+  managed_accumulator stubs class:
 
 [managed_accumulator_stubs_add_sync]
 
-`hpx::naming::id_type` is a type which represents a global identifier in HPX.
-This is the type that is returned by `hpx::find_here()`. This type specifies
-the target of an action.
+[classref hpx::naming::id_type] is a type which represents a global identifier
+in HPX. This is the type that is returned by [funcref hpx::find_here]`()`. This
+type specifies the target of an action.
 
 [heading The Client Class]
 
@@ -540,9 +540,9 @@ and to invoke component actions:
 ``
 
 Clients, like stubs and servers, need to inherit from a base class, this time,
-`hpx::components::client_base<>`:
+[classref hpx::components::client_base]`<>`:
 
-[import ../examples/accumulator/accumulators/managed_accumulator.hpp]
+[import ../../examples/accumulator/accumulators/managed_accumulator.hpp]
 [managed_accumulator_client_inherit]
 
 For readability, we typedef the base class like so:
@@ -558,7 +558,7 @@ Here are examples of how to expose actions through a client class:
 [managed_accumulator_client_add_sync]
 
 Note that `this->gid_` references a data member of the
-`hpx::components::client_base<>` base class.
+[classref hpx::components::client_base]`<>` base class.
 
 [endsect] [/Accumulator]
 
@@ -639,9 +639,9 @@ Let us begin with main, here we can see that we again are using
 __boost_program_options__ to set our command line variables (see
 __fibonacci_example__ for more details). These options set the principal,
 rate, compound period, and time. It is important to note that the units of time
-for =cp= and =time= must be the same.
+for `cp` and `time` must be the same.
 
-[import ../examples/quickstart/interest_calculator.cpp]
+[import ../../examples/quickstart/interest_calculator.cpp]
 [interest_main]
 
 Next we look at hpx_main.
@@ -652,29 +652,32 @@ Here we find our command line variables read in,
 the rate is converted from a percent to a decimal, the number of calculation
 iterations is determined, and then our dataflows are set up. Notice that we
 first place our principal and rate into a dataflow by passing the variables
-=p= and =i_rate= to an action called =identity_action=:
+`p` and `i_rate` to an action called `identity_action`:
 
 [interest_id_action]
 
-In this way =dataflow_base<double> principal= and =rate= will be initialized
-to =p= and =i_rate= when =dataflow<identity_action>= returns a value. These
-dataflows enter for loop and are passed to =interest=. Next =principal=
-and =interest= are passed to the reassignment of =principal=. This loop 
+In this way [classref hpx::lcos::dataflow_base]`<double> principal` and `rate`
+will be initialized to `p` and `i_rate` when
+[classref hpx::lcos::dataflow]`<identity_action>` returns a value. These
+dataflows enter for loop and are passed to `interest`. Next `principal`
+and `interest` are passed to the reassignment of `principal`. This loop 
 continues for each compound period that must be calculated. To see how
-=interest= and =principal= are calculated in the loop let us look at
-=calc_action= and =add_action=:
+`interest` and `principal` are calculated in the loop let us look at
+`calc_action` and `add_action`:
 
 [interest_calc_add_action]
 
 After the dataflow dependencies have been defined in hpx_main, we see the
 following statement:
 
+``
     double result = principal.get_future().get();
+``
 
-This statement calls =.get()= on the last dataflow created by our for
-loop. The program will wait here until the entire dataflow tree has been
-calculated and the value assigned to result. The program then prints out
-the final value of the investment and the amount of interest made by subtracting
+This statement calls [memberref hpx::lcos::future::get]`()` on the last dataflow
+created by our for loop. The program will wait here until the entire dataflow
+tree has been calculated and the value assigned to result. The program then prints
+out the final value of the investment and the amount of interest made by subtracting
 the final value of the investment from the initial value of the investment.
 
 [endsect] [/Interest Calculator]

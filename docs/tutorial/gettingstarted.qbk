@@ -220,7 +220,7 @@ program. It prints [^Hello HPX World!] on the locality you run it on.
 
 [c++]
 
-[import ../examples/quickstart/simplest_hello_world.cpp]
+[import ../../examples/quickstart/simplest_hello_world.cpp]
 
 [simplest_hello_world_getting_started]
 
@@ -258,11 +258,11 @@ loaded modules called component libraries. Here's the source code:
 
 [c++]
 
-[import ../examples/hello_world_component/hello_world_component.hpp]
+[import ../../examples/hello_world_component/hello_world_component.hpp]
 
 [*hello_world_component.cpp]
 
-[import ../examples/hello_world_component/hello_world_component.cpp]
+[import ../../examples/hello_world_component/hello_world_component.cpp]
 
 [hello_world_cpp_getting_started]
 
@@ -272,7 +272,7 @@ loaded modules called component libraries. Here's the source code:
 
 [*hello_world_client.cpp]
 
-[import ../examples/hello_world_component/hello_world_client.cpp]
+[import ../../examples/hello_world_component/hello_world_client.cpp]
 
 [hello_world_client_getting_started]
 
@@ -482,13 +482,13 @@ described in the table below:
                                  'local/l', 'priority_local/pr', 'abp/a', 'priority_abp',
                                  'hierarchy/h', and 'periodic/pe' (default: priority_local/p)]]
     [[`--hpx:hierarchy-arity`]  [the arity of the of the thread queue tree, valid for
-                                 --queuing=hierarchy only (default: 2)]]
+                                 --hpx:queuing=hierarchy only (default: 2)]]
     [[`--hpx:high-priority-threads arg`] [the number of operating system threads
                                  maintaining a high priority queue (default:
                                  number of OS threads), valid for
-                                 --queueing=priority_local only]]
+                                 --hpx:queuing=priority_local only]]
     [[`--hpx:numa-sensitive`]   [makes the priority_local scheduler NUMA sensitive, valid for
-                                 --queuing=priority_local only]]
+                                 --hpx:queuing=priority_local only]]
 
     [[[*HPX configuration options]]]
     [[`--hpx:app-config arg`]   [load the specified application configuration
@@ -511,11 +511,11 @@ described in the table below:
 
     [[[*HPX options related to performance counters]]]
     [[`--hpx:print-counter`]    [print the specified performance counter either repeatedly or
-                                 before shutting down the system (see option --print-counter-interval)]]
-    [[`--hpx:print-counter-interval`][print the performance counter(s) specified with --print-counter
+                                 before shutting down the system (see option --hpx:print-counter-interval)]]
+    [[`--hpx:print-counter-interval`][print the performance counter(s) specified with --hpx:print-counter
                                  repeatedly after the time interval (specified in milliseconds)
                                  (default: 0, which means print once at shutdown)]]
-    [[`--hpx:print-counter-destination`][print the performance counter(s) specified with --print-counter
+    [[`--hpx:print-counter-destination`][print the performance counter(s) specified with --hpx:print-counter
                                  to the given file (default: console)]]
     [[`--hpx:list-counters`]    [list the names of all registered performance counters]]
     [[`--hpx:list-counter-infos`][list the description of all registered performance counters]]

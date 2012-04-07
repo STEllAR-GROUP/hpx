@@ -24,9 +24,10 @@ approximately 70 tickets (bugs, feature requests, etc.).
 * Implemented decrement merging logic to optimize the distributed reference
   counting system.
 * Restructured the LCO framework. Renamed [^hpx::lcos::eager_future<>] and
-  [^hpx::lcos::lazy_future<>] into [^hpx::lcos::packaged_task<>] and
-  [^hpx::lcos::deferred_packaged_task<>]. Split [^hpx::lcos::promise<>] into
-  packaged_tasks and [^hpx::lcos::futures<>]. Added 'local' futures
+  [^hpx::lcos::lazy_future<>] into [classref hpx::lcos::packaged_task]`<>` and
+  [classref hpx::lcos::deferred_packaged_task]`<>`. Split
+  [classref hpx::lcos::promise]`<>` into [classref hpx::lcos::packaged_task]`<>`
+  and [classref hpx::lcos::futures]`<>`. Added 'local' futures
   (in namespace [^hpx::lcos::local]).
 * Improved the general performance of local and remote action invocations.
   This (under certain circumstances) drastically reduces the number of copies
@@ -87,15 +88,16 @@ approximately 70 tickets (bugs, feature requests, etc.).
 [heading API Changes]
 
 * Moved all local LCOs into a separate namespace `hpx::lcos::local` (for
-  instance, `hpx::lcos::local_mutex` is now `hpx::lcos::local::mutex`).
-* Replaced `hpx::actions::function` with `hpx::util::function`. Cleaned up
-  related code.
+  instance, `hpx::lcos::local_mutex` is now [classref hpx::lcos::local::mutex]).
+* Replaced `hpx::actions::function` with [classref hpx::util::function]. Cleaned
+  up related code.
 * Removed `hpx::traits::handle_gid` and moved handling of global reference
   counts into the corresponding serialization code.
 * Changed terminology: `prefix` is now called `locality_id`, renamed the
   corresponding API functions (such as `hpx::get_prefix`, which is now called
   `hpx::get_locality_id`).
-* Adding `hpx::find_remote_localities`, `hpx::get_num_localities`,
+* Adding [funcref hpx::find_remote_localities]`()`,
+  and [funcref hpx::get_num_localities]`()`.
 * Changed performance counter naming scheme to make it more bash friendly.
   The new performance counter naming scheme is now
 

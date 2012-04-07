@@ -5,12 +5,10 @@
 
 hpx_write_boostbook_catalog(${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml)
 
-file(GLOB HPX_QBK_FILES "*.qbk")
-set(DOCUMENTATION_FILES
-    ${HPX_QBK_FILES})
+file(GLOB_RECURSE documentation_files ${hpx_SOURCE_DIR}/docs/*.qbk)
 
-set(DOCUMENTATION_DEPENDENCIES
-    ${DOCUMENTATION_FILES}
+set(documentation_dependencies
+    ${documentation_files}
     ${hpx_SOURCE_DIR}/examples/quickstart/hello_world.cpp
     ${hpx_SOURCE_DIR}/examples/quickstart/simplest_hello_world.cpp
     ${hpx_SOURCE_DIR}/examples/accumulator/accumulators/server/managed_accumulator.hpp
@@ -22,22 +20,25 @@ set(DOCUMENTATION_DEPENDENCIES
     ${hpx_SOURCE_DIR}/examples/hello_world_component/hello_world_component.cpp)
 
 if(DOXYGEN_FOUND)
-  set(DOCUMENTATION_DEPENDENCIES ${DOCUMENTATION_DEPENDENCIES}
+  set(documentation_dependencies ${documentation_dependencies}
       ${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc.xml)
+
+  file(GLOB_RECURSE doxygen_dependencies ${hpx_SOURCE_DIR}/hpx/*.hpp) 
 
   # Generate Doxygen from the source code.
   hpx_source_to_boostbook(hpx_autodoc
-    CATALOG ${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml)
+    CATALOG ${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml
+    DEPENDENCIES ${doxygen_dependencies})
 endif()
 
-set(quickbook_fixme_mode "-D__disable_fixme__")
+set(quickbook_fixme_mode "-D__hpx_disable_fixme__")
 if(HPX_DOCUMENTATION_DEVELOPMENT)
-  set(quickbook_fixme_mode "-D__enable_fixme__")
+  set(quickbook_fixme_mode "-D__hpx_enable_fixme__")
 endif()
 
 hpx_quickbook_to_html(hpx
   SOURCE hpx.qbk
-  DEPENDENCIES ${DOCUMENTATION_DEPENDENCIES}
+  DEPENDENCIES ${documentation_dependencies}
   CATALOG ${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml
   XSLTPROC_ARGS --stringparam chunk.section.depth 4
                 --stringparam chunk.first.sections 1
@@ -52,10 +53,10 @@ hpx_quickbook_to_html(hpx
 
 add_custom_target(docs ALL
   DEPENDS hpx_HTML.manifest
-  SOURCES ${DOCUMENTATION_FILES})
+  SOURCES ${documentation_files})
 
-source_group(Documentation FILES ${DOCUMENTATION_FILES})
+source_group(Documentation FILES ${documentation_files})
 
-set_source_files_properties(${DOCUMENTATION_FILES}
+set_source_files_properties(${documentation_files}
   PROPERTIES HEADER_FILE_ONLY TRUE)
 
