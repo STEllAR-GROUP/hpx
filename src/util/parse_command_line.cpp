@@ -344,14 +344,14 @@ namespace hpx { namespace util
                   "'hierarchy/h', and 'periodic/pe' (default: priority_local/p)")
                 ("hpx:hierarchy-arity", value<std::size_t>(),
                   "the arity of the of the thread queue tree, valid for "
-                   "--queuing=hierarchy only (default: 2)")
+                   "--hpx:queuing=hierarchy only (default: 2)")
                 ("hpx:high-priority-threads", value<std::size_t>(),
                   "the number of operating system threads maintaining a high "
                   "priority queue (default: number of OS threads), valid for "
-                  "--queuing=priority_local only")
+                  "--hpx:queuing=priority_local only")
                 ("hpx:numa-sensitive",
                   "makes the priority_local scheduler NUMA sensitive, valid for "
-                  "--queuing=priority_local only")
+                  "--hpx:queuing=priority_local only")
             ;
 
             options_description config_options("HPX configuration options");
@@ -389,13 +389,13 @@ namespace hpx { namespace util
             counter_options.add_options()
                 ("hpx:print-counter", value<std::vector<std::string> >()->composing(),
                   "print the specified performance counter either repeatedly or "
-                  "before shutting down the system (see option --print-counter-interval)")
+                  "before shutting down the system (see option --hpx:print-counter-interval)")
                 ("hpx:print-counter-interval", value<std::size_t>(),
-                  "print the performance counter(s) specified with --print-counter "
+                  "print the performance counter(s) specified with --hpx:print-counter "
                   "repeatedly after the time interval (specified in milliseconds) "
                   "(default: 0, which means print once at shutdown)")
                 ("hpx:print-counter-destination", value<std::string>(),
-                  "print the performance counter(s) specified with --print-counter "
+                  "print the performance counter(s) specified with --hpx:print-counter "
                   "to the given file (default: console)")
                 ("hpx:list-counters", "list the names of all registered performance "
                   "counters")
