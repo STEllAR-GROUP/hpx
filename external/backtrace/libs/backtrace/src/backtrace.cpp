@@ -38,6 +38,7 @@
 #endif
 #ifdef BOOST_HAVE_UNWIND
 #include <unwind.h>
+#include <boost/cstdint.hpp>
 #endif
 #include <string.h>
 #include <stdlib.h>
@@ -66,7 +67,7 @@ namespace boost {
 
             void **array_;      // storage for the stack trace
             std::size_t size_;  // number of frames
-            _Unwind_Word cfa_;  // canonical frame address
+            boost::uint32_t cfa_;  // canonical frame address
             std::size_t count_;
         };
 
@@ -84,7 +85,7 @@ namespace boost {
                 d.array_[d.count_] = (void *) _Unwind_GetIP(ctx);
 
                 // Get the CFA.
-                _Unwind_Word cfa = _Unwind_GetCFA(ctx);
+                boost::uint32_t cfa = _Unwind_GetCFA(ctx);
 
                 // Check if we're at the end of the stack.
                 if ((0 < d.count_) &&
