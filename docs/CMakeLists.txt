@@ -5,7 +5,12 @@
 
 hpx_write_boostbook_catalog(${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml)
 
-file(GLOB_RECURSE documentation_files ${hpx_SOURCE_DIR}/docs/*.qbk)
+file(GLOB base_files ${hpx_SOURCE_DIR}/docs/*.qbk)
+file(GLOB_RECURSE manual_files ${hpx_SOURCE_DIR}/docs/manual/*.qbk)
+file(GLOB_RECURSE tutorial_files ${hpx_SOURCE_DIR}/docs/tutorial/*.qbk)
+
+set(documentation_files
+    ${manual_files} ${tutorial_files} ${base_files})
 
 set(documentation_dependencies
     ${documentation_files}
@@ -23,7 +28,7 @@ if(DOXYGEN_FOUND)
   set(documentation_dependencies ${documentation_dependencies}
       ${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc.xml)
 
-  file(GLOB_RECURSE doxygen_dependencies ${hpx_SOURCE_DIR}/hpx/*.hpp) 
+  file(GLOB_RECURSE doxygen_dependencies ${hpx_SOURCE_DIR}/hpx/*.hpp)
 
   # Generate Doxygen from the source code.
   hpx_source_to_boostbook(hpx_autodoc
@@ -55,7 +60,9 @@ add_custom_target(docs ALL
   DEPENDS hpx_HTML.manifest
   SOURCES ${documentation_files})
 
-source_group(Documentation FILES ${documentation_files})
+source_group(Documentation FILES ${base_files})
+source_group("Documentation\\Manual" FILES ${manual_files})
+source_group("Documentation\\Tutorial" FILES ${tutorial_files})
 
 set_source_files_properties(${documentation_files}
   PROPERTIES HEADER_FILE_ONLY TRUE)
