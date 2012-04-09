@@ -27,7 +27,7 @@ approximately 70 tickets (bugs, feature requests, etc.).
   [^hpx::lcos::lazy_future<>] into [classref hpx::lcos::packaged_task]`<>` and
   [classref hpx::lcos::deferred_packaged_task]`<>`. Split
   [classref hpx::lcos::promise]`<>` into [classref hpx::lcos::packaged_task]`<>`
-  and [classref hpx::lcos::futures]`<>`. Added 'local' futures
+  and [classref hpx::lcos::future]`<>`. Added 'local' futures
   (in namespace [^hpx::lcos::local]).
 * Improved the general performance of local and remote action invocations.
   This (under certain circumstances) drastically reduces the number of copies
