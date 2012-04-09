@@ -85,7 +85,11 @@ namespace hpx { namespace components
                 ar & f;
             }
 
-            F f;
+            typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<
+                    F
+                >::type
+            >::type f;
 
             private:
                 BOOST_COPYABLE_AND_MOVABLE(invoke_apply_fun);
