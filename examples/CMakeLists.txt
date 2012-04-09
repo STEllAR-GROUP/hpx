@@ -28,6 +28,14 @@ set(subdirs
     throttle
    )
 
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  if(${GCC_VERSION} GREATER 040500)
+    set(subdirs ${subdirs}
+        hpxla
+       )
+  endif()
+endif()
+
 if(${BOOST_MINOR_VERSION} GREATER 46)
   set(subdirs ${subdirs}
       geometry

@@ -6,7 +6,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/lcos/async.hpp>
-#include <hpx/lcos/async_future_wait.hpp>
+#include <hpx/lcos/future_wait.hpp>
 
 #include "../stubs/point.hpp"
 #include "point.hpp"

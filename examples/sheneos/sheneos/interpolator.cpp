@@ -9,7 +9,7 @@
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
 #include <hpx/lcos/async.hpp>
-#include <hpx/lcos/async_future_wait.hpp>
+#include <hpx/lcos/future_wait.hpp>
 #include <hpx/lcos/local/async.hpp>
 
 #include <boost/foreach.hpp>

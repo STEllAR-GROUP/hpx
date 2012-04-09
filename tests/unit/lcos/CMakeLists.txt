@@ -5,7 +5,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(subdirs
-    local)
+    local
+   )
 
 foreach(subdir ${subdirs})
   add_hpx_pseudo_target(tests.unit.lcos.local)
@@ -19,6 +20,7 @@ set(tests
     packaged_task
     deferred_packaged_task
     signalling_promise
+    future_wait
    )
 
 set(dataflow_FLAGS DEPENDENCIES dataflow_component)
