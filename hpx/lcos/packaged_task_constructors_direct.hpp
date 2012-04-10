@@ -52,13 +52,14 @@
         if (agas::is_local_address(gid, addr)) {
             // local, direct execution
             BOOST_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<typename Action::component_type>()));
-            (*this->impl_)->set_data(Action::execute_function(
+                components::get_component_type<
+                    typename action_type::component_type>()));
+            (*this->impl_)->set_data(action_type::execute_function(
                 addr.address_, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)));
         }
         else {
             // remote execution
-            hpx::applier::apply_c<Action>(addr, this->get_gid(), gid,
+            hpx::applier::apply_c<action_type>(addr, this->get_gid(), gid,
                 BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
         }
     }
@@ -69,7 +70,7 @@
       : apply_logger_("packaged_task_direct::apply")
     {
         LLCO_(info) << "packaged_task::packaged_task("
-                    << hpx::actions::detail::get_action_name<Action>()
+                    << hpx::actions::detail::get_action_name<action_type>()
                     << ", "
                     << gid
                     << ") args(" << (N + 1) << ")";
@@ -82,7 +83,7 @@
       : apply_logger_("packaged_task_direct::apply")
     {
         LLCO_(info) << "packaged_task::packaged_task("
-                    << hpx::actions::detail::get_action_name<Action>()
+                    << hpx::actions::detail::get_action_name<action_type>()
                     << ", "
                     << gid
                     << ") args(" << (N + 1) << ")";

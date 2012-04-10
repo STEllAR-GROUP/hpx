@@ -109,7 +109,7 @@ namespace hpx { namespace actions
         struct thread_function
         {
             typedef threads::thread_state_enum result_type;
-            
+
             template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
             result_type operator()(
                 BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)) const
@@ -224,12 +224,13 @@ namespace hpx { namespace actions
                   Result, BOOST_PP_ENUM_PARAMS(N, T), F, Priority>, Derived
           >::type, Priority>
     {
-    private:
+    public:
         typedef typename detail::action_type<
             BOOST_PP_CAT(plain_result_action, N)<
                 Result, BOOST_PP_ENUM_PARAMS(N, T), F, Priority>, Derived
         >::type derived_type;
 
+    private:
         typedef BOOST_PP_CAT(plain_base_result_action, N)<
             Result, BOOST_PP_ENUM_PARAMS(N, T), F, derived_type, Priority>
         base_type;
@@ -320,6 +321,13 @@ namespace hpx { namespace actions
         }
     };
 
+    template <typename Result, BOOST_PP_ENUM_PARAMS(N, typename T),
+        Result (*F)(BOOST_PP_ENUM_PARAMS(N, T))>
+    struct make_action<Result (*)(BOOST_PP_ENUM_PARAMS(N, T)), F, boost::mpl::false_>
+      : boost::mpl::identity<BOOST_PP_CAT(plain_result_action, N)<Result,
+            BOOST_PP_ENUM_PARAMS(N, T), F> >
+    {};
+
     ///////////////////////////////////////////////////////////////////////////
     //  N parameter version, direct execution with result
     template <
@@ -334,12 +342,13 @@ namespace hpx { namespace actions
                   Result, BOOST_PP_ENUM_PARAMS(N, T), F>, Derived
           >::type>
     {
-    private:
+    public:
         typedef typename detail::action_type<
             BOOST_PP_CAT(plain_direct_result_action, N)<
                 Result, BOOST_PP_ENUM_PARAMS(N, T), F>, Derived
         >::type derived_type;
 
+    private:
         typedef BOOST_PP_CAT(plain_base_result_action, N)<
             Result, BOOST_PP_ENUM_PARAMS(N, T), F, derived_type> base_type;
 
@@ -438,6 +447,13 @@ namespace hpx { namespace actions
         }
     };
 
+    template <typename Result, BOOST_PP_ENUM_PARAMS(N, typename T),
+        Result (*F)(BOOST_PP_ENUM_PARAMS(N, T))>
+    struct make_action<Result (*)(BOOST_PP_ENUM_PARAMS(N, T)), F, boost::mpl::true_>
+      : boost::mpl::identity<BOOST_PP_CAT(plain_direct_result_action, N)<
+            Result, BOOST_PP_ENUM_PARAMS(N, T), F> >
+    {};
+
     ///////////////////////////////////////////////////////////////////////////
     //  N parameter version, no result type
     template <
@@ -516,7 +532,7 @@ namespace hpx { namespace actions
                 }
                 return threads::terminated;
             }
-            
+
         };
 
     public:
@@ -599,12 +615,13 @@ namespace hpx { namespace actions
                     BOOST_PP_ENUM_PARAMS(N, T), F, Priority>, Derived
             >::type, Priority>
     {
-    private:
+    public:
         typedef typename detail::action_type<
             BOOST_PP_CAT(plain_action, N)<
                 BOOST_PP_ENUM_PARAMS(N, T), F, Priority>, Derived
         >::type derived_type;
 
+    private:
         typedef BOOST_PP_CAT(plain_base_action, N)<
             BOOST_PP_ENUM_PARAMS(N, T), F, derived_type, Priority>
         base_type;
@@ -695,6 +712,13 @@ namespace hpx { namespace actions
         }
     };
 
+    template <BOOST_PP_ENUM_PARAMS(N, typename T),
+        void (*F)(BOOST_PP_ENUM_PARAMS(N, T))>
+    struct make_action<void (*)(BOOST_PP_ENUM_PARAMS(N, T)), F, boost::mpl::false_>
+      : boost::mpl::identity<BOOST_PP_CAT(plain_action, N)<
+            BOOST_PP_ENUM_PARAMS(N, T), F> >
+    {};
+
     ///////////////////////////////////////////////////////////////////////////
     template <
         BOOST_PP_ENUM_PARAMS(N, typename T),
@@ -708,12 +732,13 @@ namespace hpx { namespace actions
                     BOOST_PP_ENUM_PARAMS(N, T), F>, Derived
             >::type>
     {
-    private:
+    public:
         typedef typename detail::action_type<
             BOOST_PP_CAT(plain_direct_action, N)<
                 BOOST_PP_ENUM_PARAMS(N, T), F>, Derived
         >::type derived_type;
 
+    private:
         typedef BOOST_PP_CAT(plain_base_action, N)<
             BOOST_PP_ENUM_PARAMS(N, T), F, derived_type> base_type;
 
@@ -811,6 +836,13 @@ namespace hpx { namespace actions
             return data;
         }
     };
+
+    template <BOOST_PP_ENUM_PARAMS(N, typename T),
+        void (*F)(BOOST_PP_ENUM_PARAMS(N, T))>
+    struct make_action<void (*)(BOOST_PP_ENUM_PARAMS(N, T)), F, boost::mpl::true_>
+      : boost::mpl::identity<BOOST_PP_CAT(plain_direct_action, N)<
+            BOOST_PP_ENUM_PARAMS(N, T), F> >
+    {};
 
     template <
         BOOST_PP_ENUM_PARAMS(N, typename T),

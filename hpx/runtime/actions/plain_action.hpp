@@ -22,10 +22,9 @@
 #include <hpx/util/unused.hpp>
 #include <hpx/util/void_cast.hpp>
 
-#include <boost/version.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repeat.hpp>
+#include <boost/mpl/identity.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -45,12 +44,12 @@ namespace hpx { namespace actions
     enum function_action
     {
         /// plain (free) remotely callable function identifiers
-        function_action_base = 100,
+        function_action_base = 3000,
         function_action_arg0 = function_action_base + 0,
         BOOST_PP_REPEAT(HPX_ACTION_ARGUMENT_LIMIT, HPX_FUNCTION_ARG_ENUM, _)
 
         /// plain (free) remotely callable function identifiers with result
-        function_result_action_base = 200,
+        function_result_action_base = 4000,
         function_result_action_arg0 = function_result_action_base + 0,
         BOOST_PP_REPEAT(HPX_ACTION_ARGUMENT_LIMIT, HPX_FUNCTION_RETARG_ENUM, _)
     };
@@ -186,11 +185,12 @@ namespace hpx { namespace actions
                 plain_result_action0<Result, F, Priority>, Derived
             >::type, Priority>
     {
-    private:
+    public:
         typedef typename detail::action_type<
             plain_result_action0<Result, F, Priority>, Derived
         >::type derived_type;
 
+    private:
         typedef plain_base_result_action0<Result, F, derived_type, Priority>
             base_type;
 
@@ -199,7 +199,7 @@ namespace hpx { namespace actions
           : base_type(priority)
         {}
 
-        static Result 
+        static Result
         execute_function(naming::address::address_type lva)
         {
             LTM_(debug)
@@ -257,6 +257,11 @@ namespace hpx { namespace actions
         }
     };
 
+    template <typename Result, Result (*F)()>
+    struct make_action<Result (*)(), F, boost::mpl::false_>
+      : boost::mpl::identity<plain_result_action0<Result, F> >
+    {};
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result, Result (*F)(),
         typename Derived = detail::this_type>
@@ -266,11 +271,12 @@ namespace hpx { namespace actions
                 plain_direct_result_action0<Result, F>, Derived
             >::type>
     {
-    private:
+    public:
         typedef typename detail::action_type<
             plain_direct_result_action0<Result, F>, Derived
         >::type derived_type;
 
+    private:
         typedef plain_base_result_action0<Result, F, derived_type> base_type;
 
     public:
@@ -283,7 +289,7 @@ namespace hpx { namespace actions
     public:
         typedef boost::mpl::true_ direct_execution;
 
-        static Result 
+        static Result
         execute_function(naming::address::address_type lva)
         {
             LTM_(debug)
@@ -349,6 +355,11 @@ namespace hpx { namespace actions
             return data;
         }
     };
+
+    template <typename Result, Result (*F)()>
+    struct make_action<Result (*)(), F, boost::mpl::true_>
+      : boost::mpl::identity<plain_direct_result_action0<Result, F> >
+    {};
 
     ///////////////////////////////////////////////////////////////////////////
     //  zero parameter version, no result value
@@ -470,11 +481,12 @@ namespace hpx { namespace actions
                 plain_action0<F, Priority>, Derived
             >::type, Priority>
     {
-    private:
+    public:
         typedef typename detail::action_type<
             plain_action0<F, Priority>, Derived
         >::type derived_type;
 
+    private:
         typedef plain_base_action0<F, derived_type, Priority> base_type;
 
     public:
@@ -543,6 +555,11 @@ namespace hpx { namespace actions
         }
     };
 
+    template <void (*F)()>
+    struct make_action<void (*)(), F, boost::mpl::false_>
+      : boost::mpl::identity<plain_action0<F> >
+    {};
+
     ///////////////////////////////////////////////////////////////////////////
     template <void (*F)(), typename Derived = detail::this_type>
     class plain_direct_action0
@@ -551,11 +568,12 @@ namespace hpx { namespace actions
                 plain_direct_action0<F>, Derived
             >::type>
     {
-    private:
+    public:
         typedef typename detail::action_type<
             plain_direct_action0<F>, Derived
         >::type derived_type;
 
+    private:
         typedef plain_base_action0<F, derived_type> base_type;
 
     public:
@@ -633,6 +651,11 @@ namespace hpx { namespace actions
             return data;
         }
     };
+
+    template <void (*F)()>
+    struct make_action<void(*)(), F, boost::mpl::true_>
+      : boost::mpl::identity<plain_direct_action0<F> >
+    {};
 
     template <void (*F)(),
         threads::thread_priority Priority,

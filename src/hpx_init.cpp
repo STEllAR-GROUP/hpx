@@ -49,27 +49,14 @@ namespace hpx
 namespace hpx { namespace detail
 {
     // forward declarations only
-    void console_print(std::string const& name);
-    void list_symbolic_name(std::string const& name, naming::gid_type const& gid);
-    void list_component_type(std::string const& name, components::component_type);
+    void console_print(std::string const&);
+    void list_symbolic_name(std::string const&, naming::gid_type const&);
+    void list_component_type(std::string const&, components::component_type);
 }}
 
-typedef hpx::actions::plain_action1<
-    std::string const&, hpx::detail::console_print
-> console_print_action;
-HPX_REGISTER_PLAIN_ACTION_EX2(console_print_action, console_print_action, true);
-
-typedef hpx::actions::plain_action2<
-    std::string const&, hpx::naming::gid_type const&,
-    hpx::detail::list_symbolic_name
-> list_symbolic_name_action;
-HPX_REGISTER_PLAIN_ACTION_EX2(list_symbolic_name_action, list_symbolic_name_action, true);
-
-typedef hpx::actions::plain_action2<
-    std::string const&, hpx::components::component_type,
-    hpx::detail::list_component_type
-> list_component_type_action;
-HPX_REGISTER_PLAIN_ACTION_EX2(list_component_type_action, list_component_type_action, true);
+HPX_PLAIN_ACTION_EX(hpx::detail::console_print, console_print_action, true);
+HPX_PLAIN_ACTION_EX(hpx::detail::list_symbolic_name, list_symbolic_name_action, true);
+HPX_PLAIN_ACTION_EX(hpx::detail::list_component_type, list_component_type_action, true);
 
 namespace hpx { namespace detail
 {

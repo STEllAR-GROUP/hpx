@@ -13,7 +13,8 @@ namespace hpx { namespace components
 {
     namespace detail
     {
-        template <typename T, typename Enable = typename hpx::traits::is_dataflow<T>::type>
+        template <typename T,
+            typename Enable = typename hpx::traits::is_dataflow<T>::type>
         struct dataflow_result
         {
             typedef T type;
@@ -56,7 +57,9 @@ namespace hpx { namespace components
 
         template <typename F>
         lcos::dataflow_base<
-            typename boost::result_of<typename boost::remove_const<typename hpx::util::detail::remove_reference<F>::type>::type(T &)>::type
+            typename boost::result_of<typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<F>::type
+            >::type(T &)>::type
         >
         apply(BOOST_FWD_REF(F) f) const
         {
@@ -64,7 +67,9 @@ namespace hpx { namespace components
                 server::remote_object_apply_action1<
                     remote_object::invoke_apply_fun<
                         T
-                      , typename boost::remove_const<typename hpx::util::detail::remove_reference<F>::type>::type
+                      , typename boost::remove_const<
+                            typename hpx::util::detail::remove_reference<F>::type
+                        >::type
                     >
                 >
                 apply_action;
@@ -76,7 +81,9 @@ namespace hpx { namespace components
 
         template <typename F, typename D>
         lcos::dataflow_base<
-            typename boost::result_of<typename boost::remove_const<typename hpx::util::detail::remove_reference<F>::type>::type(T &)>::type
+            typename boost::result_of<typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<F>::type
+            >::type(T &)>::type
         >
         apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(D) d) const
         {
@@ -84,7 +91,9 @@ namespace hpx { namespace components
                 server::remote_object_apply_action1<
                     remote_object::invoke_apply_fun<
                         T
-                      , typename boost::remove_const<typename hpx::util::detail::remove_reference<F>::type>::type
+                      , typename boost::remove_const<
+                            typename hpx::util::detail::remove_reference<F>::type
+                        >::type
                     >
                 >
                 apply_action;
@@ -98,7 +107,9 @@ namespace hpx { namespace components
 
         template <typename F, typename A>
         lcos::dataflow_base<
-            typename boost::result_of<typename boost::remove_const<typename hpx::util::detail::remove_reference<F>::type>::type(T &, A)>::type
+            typename boost::result_of<typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<F>::type
+            >::type(T &, A)>::type
         >
         apply2(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A) a) const
         {
@@ -106,7 +117,9 @@ namespace hpx { namespace components
                 server::remote_object_apply_action2<
                     remote_object::invoke_apply_fun<
                         T
-                      , typename boost::remove_const<typename hpx::util::detail::remove_reference<F>::type>::type
+                      , typename boost::remove_const<
+                            typename hpx::util::detail::remove_reference<F>::type
+                        >::type
                     >
                   , typename detail::dataflow_result<A>::type
                 >
@@ -121,7 +134,9 @@ namespace hpx { namespace components
 
         template <typename F, typename A0, typename A1>
         lcos::dataflow_base<
-            typename boost::result_of<typename boost::remove_const<typename hpx::util::detail::remove_reference<F>::type>::type(T &)>::type
+            typename boost::result_of<typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<F>::type
+            >::type(T &)>::type
         >
         apply3(BOOST_FWD_REF(F) f, A0 const & a0, A1 const & a1) const
         {
@@ -129,7 +144,9 @@ namespace hpx { namespace components
                 server::remote_object_apply_action2<
                     remote_object::invoke_apply_fun<
                         T
-                      , typename boost::remove_const<typename hpx::util::detail::remove_reference<F>::type>::type
+                      , typename boost::remove_const<
+                            typename hpx::util::detail::remove_reference<F>::type
+                        >::type
                     >
                   , typename detail::dataflow_result<A0>::type
                 >

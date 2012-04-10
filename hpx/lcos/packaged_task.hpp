@@ -41,7 +41,7 @@ namespace hpx { namespace lcos
     ///                  arguments \a arg0,... \a argN are used as parameters
     ///                  for this action.
     /// \tparam Result   The template parameter \a Result defines the type this
-    ///                  packaged_task is expected to return from its associated 
+    ///                  packaged_task is expected to return from its associated
     ///                  future \a packaged_task#get_future.
     /// \tparam DirectExecute The template parameter \a DirectExecute is an
     ///                  optimization aid allowing to execute the action
@@ -61,10 +61,12 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Result>
     class packaged_task<Action, Result, non_signalling_tag, boost::mpl::false_>
-      : public promise<Result, typename Action::result_type>
+      : public promise<Result,
+            typename hpx::actions::extract_action<Action>::result_type>
     {
     private:
-        typedef promise<Result, typename Action::result_type> base_type;
+        typedef typename hpx::actions::extract_action<Action>::type action_type;
+        typedef promise<Result, typename action_type::result_type> base_type;
         struct profiler_tag {};
 
     public:
@@ -75,7 +77,7 @@ namespace hpx { namespace lcos
           : apply_logger_("packaged_task::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ") args(0)";
         }
 
@@ -87,13 +89,13 @@ namespace hpx { namespace lcos
         void apply(naming::id_type const& gid)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-            hpx::applier::apply_c<Action>(this->get_gid(), gid);
+            hpx::applier::apply_c<action_type>(this->get_gid(), gid);
         }
 
         void apply_p(naming::id_type const& gid, threads::thread_priority priority)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-            hpx::applier::apply_c_p<Action>(this->get_gid(), gid, priority);
+            hpx::applier::apply_c_p<action_type>(this->get_gid(), gid, priority);
         }
 
         /// Construct a new \a packaged_task instance. The \a thread
@@ -115,7 +117,7 @@ namespace hpx { namespace lcos
           : apply_logger_("packaged_task::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(0)";
@@ -125,7 +127,7 @@ namespace hpx { namespace lcos
           : apply_logger_("packaged_task::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(0)";
@@ -136,7 +138,7 @@ namespace hpx { namespace lcos
           : apply_logger_("packaged_task::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(0)";
@@ -146,7 +148,7 @@ namespace hpx { namespace lcos
           : apply_logger_("packaged_task::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(0)";
@@ -164,7 +166,7 @@ namespace hpx { namespace lcos
         void apply(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-            hpx::applier::apply_c<Action>(this->get_gid(), gid,
+            hpx::applier::apply_c<action_type>(this->get_gid(), gid,
                 boost::forward<Arg0>(arg0));
         }
 
@@ -173,7 +175,7 @@ namespace hpx { namespace lcos
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-            hpx::applier::apply_c_p<Action>(
+            hpx::applier::apply_c_p<action_type>(
                 this->get_gid(), gid, priority, boost::forward<Arg0>(arg0));
         }
 
@@ -199,7 +201,7 @@ namespace hpx { namespace lcos
           : apply_logger_("packaged_task::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(1)";
@@ -211,7 +213,7 @@ namespace hpx { namespace lcos
           : apply_logger_("packaged_task::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(1)";
@@ -224,7 +226,7 @@ namespace hpx { namespace lcos
           : apply_logger_("packaged_task::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(1)";
@@ -237,7 +239,7 @@ namespace hpx { namespace lcos
           : apply_logger_("packaged_task::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(1)";
@@ -253,10 +255,11 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Result>
     class packaged_task<Action, Result, non_signalling_tag, boost::mpl::true_>
-      : public promise<Result, typename Action::result_type>
+      : public promise<Result, typename hpx::actions::extract_action<Action>::result_type>
     {
     private:
-        typedef promise<Result, typename Action::result_type> base_type;
+        typedef typename hpx::actions::extract_action<Action>::type action_type;
+        typedef promise<Result, typename action_type::result_type> base_type;
         struct profiler_tag {};
 
     public:
@@ -267,7 +270,7 @@ namespace hpx { namespace lcos
           : apply_logger_("packaged_task_direct::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ") args(0)";
         }
 
@@ -285,12 +288,12 @@ namespace hpx { namespace lcos
             if (agas::is_local_address(gid, addr)) {
                 // local, direct execution
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
-                    components::get_component_type<typename Action::component_type>()));
-                (*this->impl_)->set_data(Action::execute_function(addr.address_));
+                    components::get_component_type<typename action_type::component_type>()));
+                (*this->impl_)->set_data(action_type::execute_function(addr.address_));
             }
             else {
                 // remote execution
-                hpx::applier::apply_c<Action>(addr, this->get_gid(), gid);
+                hpx::applier::apply_c<action_type>(addr, this->get_gid(), gid);
             }
         }
 
@@ -313,7 +316,7 @@ namespace hpx { namespace lcos
           : apply_logger_("packaged_task_direct::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(0)";
@@ -323,7 +326,7 @@ namespace hpx { namespace lcos
           : apply_logger_("packaged_task_direct::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(0)";
@@ -347,13 +350,13 @@ namespace hpx { namespace lcos
             if (agas::is_local_address(gid, addr)) {
                 // local, direct execution
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
-                    components::get_component_type<typename Action::component_type>()));
+                    components::get_component_type<typename action_type::component_type>()));
                 (*this->impl_)->set_data(
-                    Action::execute_function(addr.address_, boost::forward<Arg0>(arg0)));
+                    action_type::execute_function(addr.address_, boost::forward<Arg0>(arg0)));
             }
             else {
                 // remote execution
-                hpx::applier::apply_c<Action>(addr, this->get_gid(), gid,
+                hpx::applier::apply_c<action_type>(addr, this->get_gid(), gid,
                     boost::forward<Arg0>(arg0));
             }
         }
@@ -380,7 +383,7 @@ namespace hpx { namespace lcos
           : apply_logger_("packaged_task_direct::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(1)";
@@ -392,7 +395,7 @@ namespace hpx { namespace lcos
           : apply_logger_("packaged_task_direct::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(1)";
@@ -408,11 +411,15 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Result>
     class packaged_task<Action, Result, signalling_tag, boost::mpl::false_>
-      : public signalling_promise<Result, typename Action::result_type>
+      : public signalling_promise<Result,
+            typename hpx::actions::extract_action<Action>::result_type>
     {
     private:
-        typedef signalling_promise<Result, typename Action::result_type> base_type;
-        typedef typename base_type::completed_callback_type completed_callback_type;
+        typedef typename hpx::actions::extract_action<Action>::type action_type;
+        typedef signalling_promise<Result,
+            typename action_type::result_type> base_type;
+        typedef typename base_type::completed_callback_type
+            completed_callback_type;
         typedef typename base_type::error_callback_type error_callback_type;
 
         struct profiler_tag {};
@@ -427,7 +434,7 @@ namespace hpx { namespace lcos
             apply_logger_("packaged_task::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ") args(0)";
         }
 
@@ -439,13 +446,13 @@ namespace hpx { namespace lcos
         void apply(naming::id_type const& gid)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-            hpx::applier::apply_c<Action>(this->get_gid(), gid);
+            hpx::applier::apply_c<action_type>(this->get_gid(), gid);
         }
 
         void apply_p(naming::id_type const& gid, threads::thread_priority priority)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-            hpx::applier::apply_c_p<Action>(this->get_gid(), gid, priority);
+            hpx::applier::apply_c_p<action_type>(this->get_gid(), gid, priority);
         }
 
         /// Construct a new \a packaged_task instance. The \a thread
@@ -470,7 +477,7 @@ namespace hpx { namespace lcos
             apply_logger_("packaged_task::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(0)";
@@ -483,7 +490,7 @@ namespace hpx { namespace lcos
             apply_logger_("packaged_task::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(0)";
@@ -497,7 +504,7 @@ namespace hpx { namespace lcos
           : apply_logger_("packaged_task::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(0)";
@@ -510,7 +517,7 @@ namespace hpx { namespace lcos
           : apply_logger_("packaged_task::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(0)";
@@ -528,7 +535,8 @@ namespace hpx { namespace lcos
         void apply(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-            hpx::applier::apply_c<Action>(this->get_gid(), gid, boost::forward<Arg0>(arg0));
+            hpx::applier::apply_c<action_type>(this->get_gid(), gid,
+                boost::forward<Arg0>(arg0));
         }
 
         template <typename Arg0>
@@ -536,7 +544,7 @@ namespace hpx { namespace lcos
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-            hpx::applier::apply_c_p<Action>(
+            hpx::applier::apply_c_p<action_type>(
                 this->get_gid(), gid, priority, boost::forward<Arg0>(arg0));
         }
 
@@ -565,7 +573,7 @@ namespace hpx { namespace lcos
             apply_logger_("packaged_task::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(1)";
@@ -580,7 +588,7 @@ namespace hpx { namespace lcos
             apply_logger_("packaged_task::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(1)";
@@ -596,7 +604,7 @@ namespace hpx { namespace lcos
             apply_logger_("packaged_task::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(1)";
@@ -612,7 +620,7 @@ namespace hpx { namespace lcos
             apply_logger_("packaged_task::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(1)";
@@ -627,7 +635,7 @@ namespace hpx { namespace lcos
             apply_logger_("packaged_task::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(1)";
@@ -642,7 +650,7 @@ namespace hpx { namespace lcos
             apply_logger_("packaged_task::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(1)";
@@ -658,7 +666,7 @@ namespace hpx { namespace lcos
             apply_logger_("packaged_task::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(1)";
@@ -674,7 +682,7 @@ namespace hpx { namespace lcos
             apply_logger_("packaged_task::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(1)";
@@ -690,11 +698,15 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Result>
     class packaged_task<Action, Result, signalling_tag, boost::mpl::true_>
-      : public signalling_promise<Result, typename Action::result_type>
+      : public signalling_promise<Result,
+          typename hpx::actions::extract_action<Action>::result_type>
     {
     private:
-        typedef signalling_promise<Result, typename Action::result_type> base_type;
-        typedef typename base_type::completed_callback_type completed_callback_type;
+        typedef typename hpx::actions::extract_action<Action>::type action_type;
+        typedef signalling_promise<Result,
+            typename action_type::result_type> base_type;
+        typedef typename base_type::completed_callback_type
+            completed_callback_type;
         typedef typename base_type::error_callback_type error_callback_type;
 
         struct profiler_tag {};
@@ -709,7 +721,7 @@ namespace hpx { namespace lcos
             apply_logger_("packaged_task_direct::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ") args(0)";
         }
 
@@ -727,13 +739,14 @@ namespace hpx { namespace lcos
             if (agas::is_local_address(gid, addr)) {
                 // local, direct execution
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
-                    components::get_component_type<typename Action::component_type>()));
+                    components::get_component_type<
+                        typename action_type::component_type>()));
                 (*this->impl_)->set_data(
-                    Action::execute_function(addr.address_));
+                    action_type::execute_function(addr.address_));
             }
             else {
                 // remote execution
-                hpx::applier::apply_c<Action>(addr, this->get_gid(), gid);
+                hpx::applier::apply_c<action_type>(addr, this->get_gid(), gid);
             }
         }
 
@@ -759,7 +772,7 @@ namespace hpx { namespace lcos
             apply_logger_("packaged_task_direct::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(0)";
@@ -772,7 +785,7 @@ namespace hpx { namespace lcos
             apply_logger_("packaged_task_direct::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(0)";
@@ -796,13 +809,15 @@ namespace hpx { namespace lcos
             if (agas::is_local_address(gid, addr)) {
                 // local, direct execution
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
-                    components::get_component_type<typename Action::component_type>()));
+                    components::get_component_type<
+                        typename action_type::component_type>()));
                 (*this->impl_)->set_data(
-                    0, Action::execute_function(addr.address_, boost::forward<Arg0>(arg0)));
+                    action_type::execute_function(addr.address_,
+                        boost::forward<Arg0>(arg0)));
             }
             else {
                 // remote execution
-                hpx::applier::apply_c<Action>(addr, this->get_gid(), gid,
+                hpx::applier::apply_c<action_type>(addr, this->get_gid(), gid,
                     boost::forward<Arg0>(arg0));
             }
         }
@@ -832,7 +847,7 @@ namespace hpx { namespace lcos
             apply_logger_("packaged_task_direct::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(1)";
@@ -847,7 +862,7 @@ namespace hpx { namespace lcos
             apply_logger_("packaged_task_direct::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(1)";
@@ -863,7 +878,7 @@ namespace hpx { namespace lcos
             apply_logger_("packaged_task_direct::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(1)";
@@ -879,7 +894,7 @@ namespace hpx { namespace lcos
             apply_logger_("packaged_task_direct::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<Action>()
+                        << hpx::actions::detail::get_action_name<action_type>()
                         << ", "
                         << gid
                         << ") args(1)";

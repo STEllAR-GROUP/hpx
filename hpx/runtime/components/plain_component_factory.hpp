@@ -198,12 +198,23 @@ namespace hpx { namespace components
         hpx::components::server::plain_function<plain_action>)                \
     /**/
 
+#define HPX_REGISTER_PLAIN_ACTION_EX(plain_action, plain_action_name)         \
+    HPX_REGISTER_PLAIN_ACTION_EX2(plain_action, plain_action_name, false)     \
+    /**/
+
 #define HPX_REGISTER_PLAIN_ACTION(plain_action)                               \
     HPX_REGISTER_PLAIN_ACTION_EX2(plain_action, plain_action, false)          \
     /**/
 
-#define HPX_REGISTER_PLAIN_ACTION_EX(plain_action, plain_action_name)         \
-    HPX_REGISTER_PLAIN_ACTION_EX2(plain_action, plain_action_name, false)     \
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_PLAIN_ACTION(func, name)                                          \
+  typedef HPX_MAKE_ACTION(func)::type name;                                   \
+    HPX_REGISTER_PLAIN_ACTION(name)                                           \
+    /**/
+
+#define HPX_PLAIN_ACTION_EX(func, name, enable_always)                        \
+    typedef HPX_MAKE_ACTION(func)::type name;                                 \
+    HPX_REGISTER_PLAIN_ACTION_EX2(name, name, enable_always)                  \
     /**/
 
 #endif

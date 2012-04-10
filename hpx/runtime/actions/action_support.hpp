@@ -28,7 +28,9 @@
 #include <boost/type_traits/is_same.hpp>
 #include <boost/type_traits/is_convertible.hpp>
 #include <boost/mpl/if.hpp>
+#include <boost/mpl/bool.hpp>
 #include <boost/move/move.hpp>
+#include <boost/typeof/typeof.hpp>
 
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
@@ -405,6 +407,74 @@ namespace hpx { namespace actions
     {
         return args.get<N>();
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Base template allowing to generate concrete action type from function
+    // pointer. It is instantiated only if the supplied pointer is not a
+    // supported function pointer
+    template <typename F, F funcptr, typename Direct = boost::mpl::false_>
+    struct make_action;
+
+    template <typename F, F funcptr>
+    struct make_direct_action
+      : make_action<F, funcptr, boost::mpl::true_>
+    {};
+
+    // Macros usable to refer to an action given the function to expose
+    #define HPX_MAKE_ACTION(f)                                                \
+        hpx::actions::make_action<BOOST_TYPEOF(&f), &f>        /**/           \
+    /**/
+    #define HPX_MAKE_DIRECT_ACTION(f)                                         \
+        hpx::actions::make_direct_action<BOOST_TYPEOF(&f), &f> /**/           \
+    /**/
+
+#if BOOST_WORKAROUND(BOOST_MSVC, == 1600)
+    // workarounds for VC2010
+    #define HPX_MAKE_COMPONENT_ACTION(component, f)                           \
+        hpx::actions::make_action<                                            \
+            BOOST_TYPEOF(component::f) component::*, &component::f>  /**/     \
+    /**/
+    namespace detail
+    {
+        template <typename Obj, typename F>
+        struct synthesize_const_mf;
+
+        template <typename F> F replicate_type(F);
+    }
+    #define HPX_MAKE_CONST_COMPONENT_ACTION(component, f)                     \
+        hpx::actions::make_action<hpx::actions::detail::synthesize_const_mf<  \
+            component, BOOST_TYPEOF(                                          \
+                hpx::actions::detail::replicate_type(&component::f)           \
+            )                                                                 \
+        >::type, &component::f>  /**/                                         \
+    /**/
+#else
+    // the implementation on conforming compilers is almost trivial
+    #define HPX_MAKE_COMPONENT_ACTION(component, f)                           \
+        HPX_MAKE_ACTION(component::f)::type                                   \
+    /**/
+    #define HPX_MAKE_CONST_COMPONENT_ACTION(component, f)                     \
+        HPX_MAKE_ACTION(component::f)::type                                   \
+    /**/
+#endif
+
+    ///////////////////////////////////////////////////////////////////////////
+    // This template meta function can be used to extract the action type, no
+    // matter whether it got specified directly or by passing the
+    // corresponding make_action<> specialization.
+    template <typename Action, typename Enable = void>
+    struct extract_action
+    {
+        typedef typename Action::derived_type type;
+        typedef typename type::result_type result_type;
+    };
+
+    template <typename Action>
+    struct extract_action<Action, typename Action::type>
+    {
+        typedef typename Action::type type;
+        typedef typename type::result_type result_type;
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     // Helper to invoke the registration code for serialization at startup

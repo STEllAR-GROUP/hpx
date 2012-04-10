@@ -21,16 +21,43 @@
 #include <hpx/util/unused.hpp>
 #include <hpx/util/void_cast.hpp>
 
-#include <boost/version.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/ref.hpp>
-#include <boost/preprocessor/stringize.hpp>
+#include <boost/preprocessor/cat.hpp>
+#include <boost/preprocessor/repeat.hpp>
+#if BOOST_WORKAROUND(BOOST_MSVC, == 1600)
+#include <boost/mpl/identity.hpp>
+#endif
 
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
+    ///////////////////////////////////////////////////////////////////////////
+#define HPX_FUNCTION_ARG_ENUM(z, n, data)                                     \
+        BOOST_PP_CAT(component_action_arg, BOOST_PP_INC(n)) =                 \
+            component_action_base + BOOST_PP_INC(n),                          \
+    /**/
+#define HPX_FUNCTION_RETARG_ENUM(z, n, data)                                  \
+        BOOST_PP_CAT(component_result_action_arg, BOOST_PP_INC(n)) =          \
+            component_result_action_base + BOOST_PP_INC(n),                   \
+    /**/
+
+    enum component_action
+    {
+        /// remotely callable member function identifiers
+        component_action_base = 1000,
+        component_action_arg0 = component_action_base + 0,
+        BOOST_PP_REPEAT(HPX_ACTION_ARGUMENT_LIMIT, HPX_FUNCTION_ARG_ENUM, _)
+
+        /// remotely callable member function identifiers with result
+        component_result_action_base = 2000,
+        component_result_action_arg0 = component_result_action_base + 0,
+        BOOST_PP_REPEAT(HPX_ACTION_ARGUMENT_LIMIT, HPX_FUNCTION_RETARG_ENUM, _)
+    };
+
+#undef HPX_FUNCTION_RETARG_ENUM
+#undef HPX_FUNCTION_ARG_ENUM
+
     ///////////////////////////////////////////////////////////////////////////
     //  Specialized generic component action types allowing to hold a different
     //  number of arguments
@@ -162,11 +189,12 @@ namespace hpx { namespace actions
                 Derived
             >::type, Priority>
     {
-    private:
+    public:
         typedef typename detail::action_type<
             result_action0<Component, Result, Action, F, Priority>, Derived
         >::type derived_type;
 
+    private:
         typedef base_result_action0<
             Component, Result, Action, F, derived_type, Priority>
         base_type;
@@ -236,6 +264,57 @@ namespace hpx { namespace actions
         }
     };
 
+#if BOOST_WORKAROUND(BOOST_MSVC, <= 1700)
+#if BOOST_WORKAROUND(BOOST_MSVC, == 1600)
+    namespace detail
+    {
+        template <typename Obj, typename Result>
+        struct synthesize_const_mf<Obj, Result (*)()>
+        {
+            typedef Result (Obj::*type)() const;
+        };
+
+        template <typename Obj, typename Result>
+        struct synthesize_const_mf<Obj, Result (Obj::*)() const>
+        {
+            typedef Result (Obj::*type)() const;
+        };
+
+        template <typename Result>
+        typename boost::mpl::identity<Result (*)()>::type
+        replicate_type(Result (*p)());
+    }
+#endif
+
+    template <typename Component, typename Result,
+        Result (Component::*F)()>
+    struct make_action<Result (Component::*)(), F, boost::mpl::false_>
+      : result_action0<Component, Result, component_result_action_arg0, F>
+    {};
+
+    template <typename Component, typename Result,
+        Result (Component::*F)() const>
+    struct make_action<Result (Component::*)() const, F, boost::mpl::false_>
+      : result_action0<Component const, Result, component_result_action_arg0, F>
+    {};
+
+#else
+
+    template <typename Component, typename Result,
+        Result (Component::*F)()>
+    struct make_action<Result (Component::*)(), F, boost::mpl::false_>
+      : boost::mpl::identity<result_action0<
+            Component, Result, component_result_action_arg0, F> >
+    {};
+
+    template <typename Component, typename Result,
+        Result (Component::*F)() const>
+    struct make_action<Result (Component::*)() const, F, boost::mpl::false_>
+      : boost::mpl::identity<result_action0<
+            Component const, Result, component_result_action_arg0, F> >
+    {};
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Component, typename Result, int Action,
@@ -246,11 +325,12 @@ namespace hpx { namespace actions
                 direct_result_action0<Component, Result, Action, F>, Derived
             >::type>
     {
-    private:
+    public:
         typedef typename detail::action_type<
             direct_result_action0<Component, Result, Action, F>, Derived
         >::type derived_type;
 
+    private:
         typedef base_result_action0<
             Component, Result, Action, F, derived_type>
         base_type;
@@ -331,6 +411,36 @@ namespace hpx { namespace actions
             return data;
         }
     };
+
+#if BOOST_WORKAROUND(BOOST_MSVC, <= 1700)
+    template <typename Component, typename Result,
+        Result (Component::*F)()>
+    struct make_action<Result (Component::*)(), F, boost::mpl::true_>
+      : direct_result_action0<Component, Result,
+            component_result_action_arg0, F>
+    {};
+
+    template <typename Component, typename Result,
+        Result (Component::*F)() const>
+    struct make_action<Result (Component::*)() const, F, boost::mpl::true_>
+      : direct_result_action0<Component const, Result,
+            component_result_action_arg0, F>
+    {};
+#else
+    template <typename Component, typename Result,
+        Result (Component::*F)()>
+    struct make_action<Result (Component::*)(), F, boost::mpl::true_>
+      : boost::mpl::identity<direct_result_action0<Component, Result,
+            component_result_action_arg0, F> >
+    {};
+
+    template <typename Component, typename Result,
+        Result (Component::*F)() const>
+    struct make_action<Result (Component::*)() const, F, boost::mpl::true_>
+      : direct_result_action0<Component const, Result,
+            component_result_action_arg0, F>
+    {};
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     //  zero parameter version, no result value
@@ -450,11 +560,12 @@ namespace hpx { namespace actions
                 action0<Component, Action, F, Priority>, Derived
             >::type, Priority>
     {
-    private:
+    public:
         typedef typename detail::action_type<
             action0<Component, Action, F, Priority>, Derived
         >::type derived_type;
 
+    private:
         typedef base_action0<Component, Action, F, derived_type, Priority>
             base_type;
 
@@ -524,6 +635,30 @@ namespace hpx { namespace actions
         }
     };
 
+#if BOOST_WORKAROUND(BOOST_MSVC, <= 1700)
+    template <typename Component, void (Component::*F)()>
+    struct make_action<void (Component::*)(), F, boost::mpl::false_>
+      : action0<Component, component_result_action_arg0, F>
+    {};
+
+    template <typename Component, void (Component::*F)() const>
+    struct make_action<void (Component::*)() const, F, boost::mpl::false_>
+      : action0<Component const, component_result_action_arg0, F>
+    {};
+#else
+    template <typename Component, void (Component::*F)()>
+    struct make_action<void (Component::*)(), F, boost::mpl::false_>
+      : boost:mpl::identity<action0<
+            Component, component_result_action_arg0, F> >
+    {};
+
+    template <typename Component, void (Component::*F)() const>
+    struct make_action<void (Component::*)() const, F, boost::mpl::false_>
+      : boost:mpl::identity<action0<
+            Component const, component_result_action_arg0, F> >
+    {};
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, int Action, void (Component::*F)(),
         typename Derived = detail::this_type>
@@ -533,11 +668,12 @@ namespace hpx { namespace actions
                 direct_action0<Component, Action, F>, Derived
             >::type>
     {
-    private:
+    public:
         typedef typename detail::action_type<
             direct_action0<Component, Action, F>, Derived
         >::type derived_type;
 
+    private:
         typedef base_action0<Component, Action, F, derived_type> base_type;
 
     public:
@@ -617,6 +753,30 @@ namespace hpx { namespace actions
         }
     };
 
+#if BOOST_WORKAROUND(BOOST_MSVC, <= 1700)
+    template <typename Component, void (Component::*F)()>
+    struct make_action<void (Component::*)(), F, boost::mpl::true_>
+      : direct_action0<Component, component_result_action_arg0, F>
+    {};
+
+    template <typename Component, void (Component::*F)() const>
+    struct make_action<void (Component::*)() const, F, boost::mpl::true_>
+      : direct_action0<Component const, component_result_action_arg0, F>
+    {};
+#else
+    template <typename Component, void (Component::*F)()>
+    struct make_action<void (Component::*)(), F, boost::mpl::true_>
+      : boost::mpl::identity<direct_action0<
+            Component, component_result_action_arg0, F> >
+    {};
+
+    template <typename Component, void (Component::*F)() const>
+    struct make_action<void (Component::*)() const, F, boost::mpl::true_>
+      : boost::mpl::identity<direct_action0<
+            Component const, component_result_action_arg0, F> >
+    {};
+#endif
+
     template <
         typename Component, int Action,
         void (Component::*F)(),
@@ -651,7 +811,16 @@ namespace hpx { namespace actions
     };
 }}
 
-/////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_COMPONENT_ACTION(component, func, name)                           \
+    typedef HPX_MAKE_COMPONENT_ACTION(component, func) name                   \
+    /**/
+#define HPX_COMPONENT_CONST_ACTION(component, func, name)                     \
+    typedef HPX_MAKE_CONST_COMPONENT_ACTION(component, func) name             \
+    /**/
+
+
+///////////////////////////////////////////////////////////////////////////////
 // bring in the rest of the implementations
 #include <hpx/runtime/actions/component_action_implementations.hpp>
 #include <hpx/runtime/actions/component_action_registration.hpp>

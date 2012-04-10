@@ -55,14 +55,9 @@ std::size_t hello_world_worker(std::size_t desired)
 }
 
 // Define the boilerplate code necessary for the function 'hello_world_worker'
-// to be invoked as an HPX action (by a HPX future).
-typedef hpx::actions::plain_result_action1<
-    std::size_t,          // return type
-    std::size_t,          // argument
-    hello_world_worker    // wrapped function
-> hello_world_worker_action;
-
-HPX_REGISTER_PLAIN_ACTION(hello_world_worker_action);
+// to be invoked as an HPX action (by a HPX future). This macro defines the
+// type 'hello_world_worker_action'.
+HPX_PLAIN_ACTION(hello_world_worker, hello_world_worker_action);
 //]
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -118,15 +113,10 @@ void hello_world_foreman()
 }
 //]
 
+//[hello_world_action_wrapper
 // Define the boilerplate code necessary for the function 'hello_world_foreman'
 // to be invoked as an HPX action.
-//[hello_world_action_wrapper
-typedef hpx::actions::plain_action0<
-    // Wrapped function.
-    hello_world_foreman
-> hello_world_foreman_action;
-
-HPX_REGISTER_PLAIN_ACTION(hello_world_foreman_action);
+HPX_PLAIN_ACTION(hello_world_foreman, hello_world_foreman_action);
 //]
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -47,7 +47,7 @@
         BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::applier::apply_c<Action>(
+        hpx::applier::apply_c<action_type>(
             this->get_gid(), gid, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
@@ -57,7 +57,7 @@
         BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::applier::apply_c_p<Action>(this->get_gid(), gid, priority, 
+        hpx::applier::apply_c_p<action_type>(this->get_gid(), gid, priority,
             BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
@@ -67,7 +67,7 @@
       : apply_logger_("packaged_task::apply")
     {
         LLCO_(info) << "packaged_task::packaged_task("
-                    << hpx::actions::detail::get_action_name<Action>()
+                    << hpx::actions::detail::get_action_name<action_type>()
                     << ", "
                     << gid
                     << ") args(" << (N + 1) << ")";
@@ -80,7 +80,7 @@
       : apply_logger_("packaged_task::apply")
     {
         LLCO_(info) << "packaged_task::packaged_task("
-                    << hpx::actions::detail::get_action_name<Action>()
+                    << hpx::actions::detail::get_action_name<action_type>()
                     << ", "
                     << gid
                     << ") args(" << (N + 1) << ")";
@@ -94,7 +94,7 @@
       : apply_logger_("packaged_task::apply")
     {
         LLCO_(info) << "packaged_task::packaged_task("
-                    << hpx::actions::detail::get_action_name<Action>()
+                    << hpx::actions::detail::get_action_name<action_type>()
                     << ", "
                     << gid
                     << ") args(" << (N + 1) << ")";
@@ -108,7 +108,7 @@
       : apply_logger_("packaged_task::apply")
     {
         LLCO_(info) << "packaged_task::packaged_task("
-                    << hpx::actions::detail::get_action_name<Action>()
+                    << hpx::actions::detail::get_action_name<action_type>()
                     << ", "
                     << gid
                     << ") args(" << (N + 1) << ")";

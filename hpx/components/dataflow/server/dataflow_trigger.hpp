@@ -68,7 +68,7 @@ namespace hpx { namespace lcos { namespace server
         static boost::uint64_t calc_complete_mask(std::size_t N)
         {
             boost::uint64_t r = 0;
-            for(std::size_t i= 0; i < N; ++i)
+            for(std::size_t i = 0; i < N; ++i)
             {
                 r |= (std::size_t(1)<<i);
             }

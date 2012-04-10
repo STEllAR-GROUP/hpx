@@ -14,6 +14,8 @@
 #include <hpx/components/dataflow/dataflow_fwd.hpp>
 #include <hpx/lcos/async.hpp>
 
+#include <boost/move/move.hpp>
+
 namespace hpx { namespace lcos
 {
     namespace detail
@@ -83,9 +85,11 @@ namespace hpx { namespace lcos
             BOOST_FWD_REF(BOOST_PP_CAT(A, n)) BOOST_PP_CAT(a, n)              \
     /**/
 
-#define HPX_A(z, n, _)                                                 \
+#define HPX_A(z, n, _)                                                        \
         BOOST_PP_COMMA_IF(n)                                                  \
-            typename boost::remove_const<typename hpx::util::detail::remove_reference<BOOST_PP_CAT(A, n)>::type>::type const &\
+            typename boost::remove_const<                                     \
+                typename hpx::util::detail::remove_reference<                 \
+                    BOOST_PP_CAT(A, n)>::type>::type const &                  \
     /**/
 
 #define HPX_FORWARD_ARGS(z, n, _)                                             \

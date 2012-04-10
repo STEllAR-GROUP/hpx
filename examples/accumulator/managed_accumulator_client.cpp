@@ -13,8 +13,7 @@
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
-char const* const help
-    = "commands: reset, add [amount], query, help, quit";
+char const* const help = "commands: reset, add [amount], query, help, quit";
 
 void ignore_whitespace(std::istream& is)
 {
@@ -53,10 +52,13 @@ int hpx_main(boost::program_options::variables_map&)
                 if (cmd[0] == "reset")
                     accu.reset_sync();
 
+                if (cmd[0] == "reset")
+                    accu.reset_sync();
+
                 else if (cmd[0] == "add")
                 {
                     if (cmd.size() != 2)
-                        std::cout << "error: invalid command '" 
+                        std::cout << "error: invalid command '"
                                   << line << "'" << std::endl
                                   << help << std::endl;
                     else
@@ -73,8 +75,8 @@ int hpx_main(boost::program_options::variables_map&)
                 else if (cmd[0] == "quit")
                     break;
 
-                else 
-                    std::cout << "error: invalid command '" 
+                else
+                    std::cout << "error: invalid command '"
                               << line << "'" << std::endl
                               << help << std::endl;
             }

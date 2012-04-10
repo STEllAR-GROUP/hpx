@@ -47,12 +47,15 @@ namespace hpx { namespace applier
     apply_r_p(naming::address& addr, naming::id_type const& gid,
         threads::thread_priority priority, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
+        typedef typename hpx::actions::extract_action<Action>::type action_type;
+
         // If remote, create a new parcel to be sent to the destination
         // Create a new parcel with the gid, action, and arguments
         parcelset::parcel p (gid.get_gid(),
-            new Action(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)));
+            new action_type(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)));
         if (components::component_invalid == addr.type_)
-            addr.type_ = components::get_component_type<typename Action::component_type>();
+            addr.type_ = components::get_component_type<
+                typename action_type::component_type>();
         p.set_destination_addr(addr);   // avoid to resolve address again
 
         // Send the parcel through the parcel handler
@@ -62,14 +65,17 @@ namespace hpx { namespace applier
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
-    apply_r_p_route(naming::address& addr, naming::id_type const& gid, 
+    apply_r_p_route(naming::address& addr, naming::id_type const& gid,
         threads::thread_priority priority, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
-        //creat parcel 
+        typedef typename hpx::actions::extract_action<Action>::type action_type;
+
+        // create parcel
         parcelset::parcel p(gid.get_gid(),
-            new Action(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)));
+            new action_type(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)));
         if (components::component_invalid == addr.type_)
-            addr.type_ = components::get_component_type<typename Action::component_type>();
+            addr.type_ = components::get_component_type<
+                typename action_type::component_type>();
         p.set_destination_addr(addr); // redundant
 
         // send parcel to agas
@@ -93,15 +99,18 @@ namespace hpx { namespace applier
         return apply_r_p_route<Action>(addr, gid, action_priority<Action>(),
             BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
-    
+
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply_l_p(naming::address const& addr, threads::thread_priority priority,
         BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
+        typedef typename hpx::actions::extract_action<Action>::type action_type;
+
         BOOST_ASSERT(components::types_are_compatible(addr.type_,
-            components::get_component_type<typename Action::component_type>()));
-        detail::BOOST_PP_CAT(apply_helper, N)<Action>::call(addr.address_,
+            components::get_component_type<
+                typename action_type::component_type>()));
+        detail::BOOST_PP_CAT(apply_helper, N)<action_type>::call(addr.address_,
             priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
         return true;     // no parcel has been sent (dest is local)
     }
@@ -157,11 +166,10 @@ namespace hpx { namespace applier
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    inline bool 
+    inline bool
     apply_route (naming::id_type const& gid, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
-//    apply_route (naming::id_type const& gid, 
     {
-        return apply_p_route<Action>(gid, action_priority<Action>(), 
+        return apply_p_route<Action>(gid, action_priority<Action>(),
             BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
@@ -172,14 +180,17 @@ namespace hpx { namespace applier
         naming::id_type const& gid, threads::thread_priority priority,
         BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
+        typedef typename hpx::actions::extract_action<Action>::type action_type;
+
         actions::continuation_type cont(c);
 
         // If remote, create a new parcel to be sent to the destination
         // Create a new parcel with the gid, action, and arguments
         parcelset::parcel p (gid.get_gid(),
-            new Action(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)), cont);
+            new action_type(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)), cont);
         if (components::component_invalid == addr.type_)
-            addr.type_ = components::get_component_type<typename Action::component_type>();
+            addr.type_ = components::get_component_type<
+                typename action_type::component_type>();
         p.set_destination_addr(addr);   // avoid to resolve address again
 
         // Send the parcel through the parcel handler
@@ -189,22 +200,24 @@ namespace hpx { namespace applier
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
-    apply_r_p_route(naming::address& addr, actions::continuation* c, 
+    apply_r_p_route(naming::address& addr, actions::continuation* c,
         naming::id_type const& gid, threads::thread_priority priority,
         BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
+        typedef typename hpx::actions::extract_action<Action>::type action_type;
+
         actions::continuation_type cont(c);
 
         // Create a new parcel with the gid, action, and arguments
-        parcelset::parcel p (gid.get_gid(), 
-            new Action(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)), cont);
+        parcelset::parcel p (gid.get_gid(),
+            new action_type(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)), cont);
         if (components::component_invalid == addr.type_)
-            addr.type_ = components::get_component_type<typename Action::    component_type>();
+            addr.type_ = components::get_component_type<
+                typename action_type::component_type>();
         p.set_destination_addr(addr);   // redundant
 
         // Send the parcel to agas
         return hpx::applier::get_applier().route(p);
-        //return false;     // destination is remote
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
@@ -230,10 +243,13 @@ namespace hpx { namespace applier
     apply_l_p(actions::continuation* c, naming::address const& addr,
         threads::thread_priority priority, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
+        typedef typename hpx::actions::extract_action<Action>::type action_type;
+
         BOOST_ASSERT(components::types_are_compatible(addr.type_,
-            components::get_component_type<typename Action::component_type>()));
+            components::get_component_type<
+                typename action_type::component_type>()));
         actions::continuation_type cont(c);
-        detail::BOOST_PP_CAT(apply_helper, N)<Action>::call(cont,
+        detail::BOOST_PP_CAT(apply_helper, N)<action_type>::call(cont,
             addr.address_, priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
         return true;     // no parcel has been sent (dest is local)
     }
@@ -309,7 +325,6 @@ namespace hpx { namespace applier
             gid, priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
-
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply_c_p_route(naming::address& addr, naming::id_type const& contgid,
@@ -364,7 +379,7 @@ namespace hpx { namespace applier
         return apply_p<Action>(new actions::continuation(contgid),
             gid, action_priority<Action>(), BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
-    
+
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply_c_route (naming::id_type const& contgid, naming::id_type const& gid,

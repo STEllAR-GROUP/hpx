@@ -10,6 +10,7 @@
 #define HPX_LCOS_ASYNC_SEP_28_2011_0840AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/lcos/packaged_task.hpp>
 #include <hpx/lcos/future.hpp>
 
@@ -20,32 +21,35 @@ namespace hpx { namespace lcos
     template <typename Action>
     future<
         typename traits::promise_local_result<
-            typename Action::result_type
+            typename hpx::actions::extract_action<Action>::result_type
         >::type,
-        typename Action::result_type
+        typename hpx::actions::extract_action<Action>::result_type
     >
     async (naming::id_type const& gid)
     {
-        return packaged_task<Action>(gid).get_future();
+        typedef hpx::actions::extract_action<Action>::type action_type;
+        return packaged_task<action_type>(gid).get_future();
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action>
     future<
         typename traits::promise_local_result<
-            typename Action::result_type
+            typename hpx::actions::extract_action<Action>::result_type
         >::type,
-        typename Action::result_type
+        typename hpx::actions::extract_action<Action>::result_type
     >
     async_callback (
         HPX_STD_FUNCTION<void(typename traits::promise_local_result<
-            typename Action::result_type
+            typename hpx::actions::extract_action<Action>::result_type
         >::type const&)> const& data_sink, naming::id_type const& gid)
     {
+        typedef hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
-            typename Action::result_type
+            typename action_type::result_type
         >::type result_type;
-        typedef packaged_task<Action, result_type, signalling_tag> future_type;
+        typedef packaged_task<action_type, result_type, signalling_tag>
+            future_type;
 
         return future_type(gid, data_sink).get_future();
     }
@@ -54,21 +58,23 @@ namespace hpx { namespace lcos
     template <typename Action>
     future<
         typename traits::promise_local_result<
-            typename Action::result_type
+            typename hpx::actions::extract_action<Action>::result_type
         >::type,
-        typename Action::result_type
+        typename hpx::actions::extract_action<Action>::result_type
     >
     async_callback (
         HPX_STD_FUNCTION<void(typename traits::promise_local_result<
-            typename Action::result_type
+            typename hpx::actions::extract_action<Action>::result_type
         >::type const&)> const& data_sink,
         HPX_STD_FUNCTION<void(boost::exception_ptr const&)> const& error_sink,
         naming::id_type const& gid)
     {
+        typedef hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
-            typename Action::result_type
+            typename action_type::result_type
         >::type result_type;
-        typedef packaged_task<Action, result_type, signalling_tag> future_type;
+        typedef packaged_task<action_type, result_type, signalling_tag>
+            future_type;
 
         return future_type(gid, data_sink, error_sink).get_future();
     }
@@ -114,34 +120,36 @@ namespace hpx { namespace lcos
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     future<
         typename traits::promise_local_result<
-            typename Action::result_type
+            typename hpx::actions::extract_action<Action>::result_type
         >::type,
-        typename Action::result_type
+        typename hpx::actions::extract_action<Action>::result_type
     >
     async (naming::id_type const& gid,
         BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
-        return packaged_task<Action>(
+        return packaged_task<hpx::actions::extract_action<Action>::type>(
             gid, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)).get_future();
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     future<
         typename traits::promise_local_result<
-            typename Action::result_type
+            typename hpx::actions::extract_action<Action>::result_type
         >::type,
-        typename Action::result_type
+        typename hpx::actions::extract_action<Action>::result_type
     >
     async_callback (
         HPX_STD_FUNCTION<void(typename traits::promise_local_result<
-            typename Action::result_type
+            typename hpx::actions::extract_action<Action>::result_type
         >::type const&)> const& data_sink, naming::id_type const& gid,
         BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
+        typedef hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
-            typename Action::result_type
+            typename action_type::result_type
         >::type result_type;
-        typedef packaged_task<Action, result_type, signalling_tag> future_type;
+        typedef packaged_task<action_type, result_type, signalling_tag>
+            future_type;
 
         return future_type(gid, data_sink,
             BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)).get_future();
@@ -150,22 +158,24 @@ namespace hpx { namespace lcos
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     future<
         typename traits::promise_local_result<
-            typename Action::result_type
+            typename hpx::actions::extract_action<Action>::result_type
         >::type,
-        typename Action::result_type
+        typename hpx::actions::extract_action<Action>::result_type
     >
     async_callback (
         HPX_STD_FUNCTION<void(typename traits::promise_local_result<
-            typename Action::result_type
+            typename hpx::actions::extract_action<Action>::result_type
         >::type const&)> const& data_sink,
         HPX_STD_FUNCTION<void(boost::exception_ptr const&)> const& error_sink,
         naming::id_type const& gid,
         BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
+        typedef hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
-            typename Action::result_type
+            typename action_type::result_type
         >::type result_type;
-        typedef packaged_task<Action, result_type, signalling_tag> future_type;
+        typedef packaged_task<action_type, result_type, signalling_tag>
+            future_type;
 
         return future_type(gid, data_sink, error_sink,
             BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)).get_future();

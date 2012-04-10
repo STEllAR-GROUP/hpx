@@ -227,7 +227,7 @@ namespace hpx { namespace actions
                 Derived
             >::type, Priority>
     {
-    private:
+    public:
         typedef typename detail::action_type<
             BOOST_PP_CAT(result_action, N)<
                 Component, Result, Action, BOOST_PP_ENUM_PARAMS(N, T), F,
@@ -235,12 +235,13 @@ namespace hpx { namespace actions
             Derived
         >::type derived_type;
 
+    private:
         typedef BOOST_PP_CAT(base_result_action, N)<
             Component, Result, Action, BOOST_PP_ENUM_PARAMS(N, T), F,
             derived_type, Priority> base_type;
 
     public:
-        BOOST_PP_CAT(result_action, N)(
+        explicit BOOST_PP_CAT(result_action, N)(
                 threads::thread_priority priority = Priority)
           : base_type(priority)
         {}
@@ -326,6 +327,77 @@ namespace hpx { namespace actions
         }
     };
 
+#if BOOST_WORKAROUND(BOOST_MSVC, <= 1700)
+#if BOOST_WORKAROUND(BOOST_MSVC, == 1600)
+    namespace detail
+    {
+        template <typename Obj, typename Result,
+            BOOST_PP_ENUM_PARAMS(N, typename T)>
+        struct synthesize_const_mf<Obj,
+            Result (*)(BOOST_PP_ENUM_PARAMS(N, T))>
+        {
+            typedef Result (Obj::*type)(BOOST_PP_ENUM_PARAMS(N, T)) const;
+        };
+
+        template <typename Obj, typename Result,
+            BOOST_PP_ENUM_PARAMS(N, typename T)>
+        struct synthesize_const_mf<Obj,
+            Result (Obj::*)(BOOST_PP_ENUM_PARAMS(N, T)) const>
+        {
+            typedef Result (Obj::*type)(BOOST_PP_ENUM_PARAMS(N, T)) const;
+        };
+
+        template <typename Result, BOOST_PP_ENUM_PARAMS(N, typename T)>
+        typename boost::mpl::identity<Result (*)(BOOST_PP_ENUM_PARAMS(N, T))>::type
+        replicate_type(Result (*p)(BOOST_PP_ENUM_PARAMS(N, T)));
+    }
+#endif
+
+    template <typename Component, typename Result,
+        BOOST_PP_ENUM_PARAMS(N, typename T),
+        Result (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T))>
+    struct make_action<Result (Component::*)(BOOST_PP_ENUM_PARAMS(N, T)),
+            F, boost::mpl::false_>
+      : BOOST_PP_CAT(result_action, N)<
+            Component, Result, BOOST_PP_CAT(component_result_action_arg, N),
+            BOOST_PP_ENUM_PARAMS(N, T), F>
+    {};
+
+    template <typename Component, typename Result,
+        BOOST_PP_ENUM_PARAMS(N, typename T),
+        Result (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T)) const>
+    struct make_action<Result (Component::*)(BOOST_PP_ENUM_PARAMS(N, T)) const,
+            F, boost::mpl::false_>
+      : BOOST_PP_CAT(result_action, N)<
+            Component const, Result,
+            BOOST_PP_CAT(component_result_action_arg, N),
+            BOOST_PP_ENUM_PARAMS(N, T), F>
+    {};
+
+#else
+
+    template <typename Component, typename Result,
+        BOOST_PP_ENUM_PARAMS(N, typename T),
+        Result (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T))>
+    struct make_action<Result (Component::*)(BOOST_PP_ENUM_PARAMS(N, T)),
+            F, boost::mpl::false_>
+        : boost::mpl::identity<BOOST_PP_CAT(result_action, N)<
+            Component, Result, BOOST_PP_CAT(component_result_action_arg, N),
+            BOOST_PP_ENUM_PARAMS(N, T), F> >
+    {};
+
+    template <typename Component, typename Result,
+        BOOST_PP_ENUM_PARAMS(N, typename T),
+        Result (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T)) const>
+    struct make_action<Result (Component::*)(BOOST_PP_ENUM_PARAMS(N, T)) const,
+            F, boost::mpl::false_>
+      : boost::mpl::identity<BOOST_PP_CAT(result_action, N)<
+            Component const, Result,
+            BOOST_PP_CAT(component_result_action_arg, N),
+            BOOST_PP_ENUM_PARAMS(N, T), F> >
+    {};
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
     //  N parameter version, direct execution with result
     template <
@@ -343,13 +415,14 @@ namespace hpx { namespace actions
                     Derived
             >::type>
     {
-    private:
+    public:
         typedef typename detail::action_type<
             BOOST_PP_CAT(direct_result_action, N)<
                 Component, Result, Action, BOOST_PP_ENUM_PARAMS(N, T), F>,
                 Derived
         >::type derived_type;
 
+    private:
         typedef BOOST_PP_CAT(base_result_action, N)<
             Component, Result, Action, BOOST_PP_ENUM_PARAMS(N, T), F,
             derived_type> base_type;
@@ -448,6 +521,50 @@ namespace hpx { namespace actions
             return base_action::direct_action;
         }
     };
+
+#if BOOST_WORKAROUND(BOOST_MSVC, <= 1700)
+    template <typename Component, typename Result,
+        BOOST_PP_ENUM_PARAMS(N, typename T),
+        Result (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T))>
+    struct make_action<Result (Component::*)(BOOST_PP_ENUM_PARAMS(N, T)),
+            F, boost::mpl::true_>
+      : BOOST_PP_CAT(direct_result_action, N)<
+            Component, Result, BOOST_PP_CAT(component_result_action_arg, N),
+            BOOST_PP_ENUM_PARAMS(N, T), F>
+    {};
+
+    template <typename Component, typename Result,
+        BOOST_PP_ENUM_PARAMS(N, typename T),
+        Result (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T)) const>
+    struct make_action<Result (Component::*)(BOOST_PP_ENUM_PARAMS(N, T)) const,
+            F, boost::mpl::true_>
+      : BOOST_PP_CAT(direct_result_action, N)<
+            Component const, Result,
+            BOOST_PP_CAT(component_result_action_arg, N),
+            BOOST_PP_ENUM_PARAMS(N, T), F>
+    {};
+#else
+    template <typename Component, typename Result,
+        BOOST_PP_ENUM_PARAMS(N, typename T),
+        Result (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T))>
+    struct make_action<Result (Component::*)(BOOST_PP_ENUM_PARAMS(N, T)),
+            F, boost::mpl::true_>
+      : boost::mpl::identity<BOOST_PP_CAT(direct_result_action, N)<
+            Component, Result, BOOST_PP_CAT(component_result_action_arg, N),
+            BOOST_PP_ENUM_PARAMS(N, T), F> >
+    {};
+
+    template <typename Component, typename Result,
+        BOOST_PP_ENUM_PARAMS(N, typename T),
+        Result (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T)) const>
+    struct make_action<Result (Component::*)(BOOST_PP_ENUM_PARAMS(N, T)) const,
+            F, boost::mpl::true_>
+      : boost::mpl::identity<BOOST_PP_CAT(direct_result_action, N)<
+            Component const, Result,
+            BOOST_PP_CAT(component_result_action_arg, N),
+            BOOST_PP_ENUM_PARAMS(N, T), F> >
+    {};
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     //  N parameter version, no result type
@@ -612,19 +729,20 @@ namespace hpx { namespace actions
                 Derived
             >::type, Priority>
     {
-    private:
+    public:
         typedef typename detail::action_type<
             BOOST_PP_CAT(action, N)<
                 Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F, Priority>,
             Derived
         >::type derived_type;
 
+    private:
         typedef BOOST_PP_CAT(base_action, N)<
             Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F,
             derived_type, Priority> base_type;
 
     public:
-        BOOST_PP_CAT(action, N)(
+        explicit BOOST_PP_CAT(action, N)(
                 threads::thread_priority priority = Priority)
           : base_type(priority)
         {}
@@ -711,6 +829,44 @@ namespace hpx { namespace actions
         }
     };
 
+#if BOOST_WORKAROUND(BOOST_MSVC, <= 1700)
+    template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename T),
+        void (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T))>
+    struct make_action<void (Component::*)(BOOST_PP_ENUM_PARAMS(N, T)),
+            F, boost::mpl::false_>
+      : BOOST_PP_CAT(action, N)<
+            Component, BOOST_PP_CAT(component_action_arg, N),
+            BOOST_PP_ENUM_PARAMS(N, T), F>
+    {};
+
+    template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename T),
+        void (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T)) const>
+    struct make_action<void (Component::*)(BOOST_PP_ENUM_PARAMS(N, T)) const,
+            F, boost::mpl::false_>
+      : BOOST_PP_CAT(action, N)<
+            Component const, BOOST_PP_CAT(component_action_arg, N),
+            BOOST_PP_ENUM_PARAMS(N, T), F>
+    {};
+#else
+    template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename T),
+        void (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T))>
+    struct make_action<void (Component::*)(BOOST_PP_ENUM_PARAMS(N, T)),
+            F, boost::mpl::false_>
+      : boost::mpl::identity<BOOST_PP_CAT(action, N)<
+            Component, BOOST_PP_CAT(component_action_arg, N),
+            BOOST_PP_ENUM_PARAMS(N, T), F> >
+    {};
+
+    template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename T),
+        void (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T)) const>
+    struct make_action<void (Component::*)(BOOST_PP_ENUM_PARAMS(N, T)) const,
+            F, boost::mpl::false_>
+      : boost::mpl::identity<BOOST_PP_CAT(action, N)<
+            Component const, BOOST_PP_CAT(component_action_arg, N),
+            BOOST_PP_ENUM_PARAMS(N, T), F> >
+    {};
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Component, int Action, BOOST_PP_ENUM_PARAMS(N, typename T),
@@ -725,13 +881,14 @@ namespace hpx { namespace actions
                     Derived
             >::type>
     {
-    private:
+    public:
         typedef typename detail::action_type<
             BOOST_PP_CAT(direct_action, N)<
                 Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F>,
                 Derived
         >::type derived_type;
 
+    private:
         typedef BOOST_PP_CAT(base_action, N)<
             Component, Action, BOOST_PP_ENUM_PARAMS(N, T), F,
             derived_type> base_type;
@@ -832,6 +989,44 @@ namespace hpx { namespace actions
         }
     };
 
+#if BOOST_WORKAROUND(BOOST_MSVC, <= 1700)
+    template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename T),
+        void (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T))>
+    struct make_action<void (Component::*)(BOOST_PP_ENUM_PARAMS(N, T)),
+            F, boost::mpl::true_>
+      : BOOST_PP_CAT(action, N)<
+            Component, BOOST_PP_CAT(component_action_arg, N),
+            BOOST_PP_ENUM_PARAMS(N, T), F>
+    {};
+
+    template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename T),
+        void (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T)) const>
+    struct make_action<void (Component::*)(BOOST_PP_ENUM_PARAMS(N, T)) const,
+            F, boost::mpl::true_>
+      : BOOST_PP_CAT(action, N)<
+            Component const, BOOST_PP_CAT(component_action_arg, N),
+            BOOST_PP_ENUM_PARAMS(N, T), F>
+    {};
+#else
+    template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename T),
+        void (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T))>
+    struct make_action<void (Component::*)(BOOST_PP_ENUM_PARAMS(N, T)),
+            F, boost::mpl::true_>
+      : boost::mpl::identity<BOOST_PP_CAT(action, N)<
+            Component, BOOST_PP_CAT(component_action_arg, N),
+            BOOST_PP_ENUM_PARAMS(N, T), F> >
+    {};
+
+    template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename T),
+        void (Component::*F)(BOOST_PP_ENUM_PARAMS(N, T)) const>
+    struct make_action<void (Component::*)(BOOST_PP_ENUM_PARAMS(N, T)) const,
+            F, boost::mpl::true_>
+      : boost::mpl::identity<BOOST_PP_CAT(action, N)<
+            Component const, BOOST_PP_CAT(component_action_arg, N),
+            BOOST_PP_ENUM_PARAMS(N, T), F> >
+    {};
+#endif
+
     template <
         typename Component, int Action,
         BOOST_PP_ENUM_PARAMS(N, typename T),
@@ -847,7 +1042,7 @@ namespace hpx { namespace actions
             BOOST_PP_ENUM_PARAMS(N, T), F, Priority, Derived> base_type;
 
     public:
-        BOOST_PP_CAT(result_action, N)(
+        explicit BOOST_PP_CAT(result_action, N)(
                 threads::thread_priority priority = Priority)
           : base_type(priority)
         {}
