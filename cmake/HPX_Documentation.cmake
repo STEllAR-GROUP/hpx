@@ -279,9 +279,9 @@ else()
 
     add_custom_command(OUTPUT ${name}/index.xml
       COMMAND ${DOXYGEN_PROGRAM} ${${name}_DOXYGEN_ARGS}
-              ${name}.doxy
+              ${CMAKE_CURRENT_BINARY_DIR}/${name}.doxy
       COMMENT "Generating Doxygen."
-      DEPENDS ${name}.doxy ${${name}_DEPENDENCIES})
+      DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${name}.doxy ${${name}_DEPENDENCIES})
   endmacro()
 
   # Collect chunked Doxygen XML
