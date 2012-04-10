@@ -27,7 +27,7 @@ namespace hpx { namespace lcos
     >
     async (naming::id_type const& gid)
     {
-        typedef hpx::actions::extract_action<Action>::type action_type;
+        typedef typename hpx::actions::extract_action<Action>::type action_type;
         return packaged_task<action_type>(gid).get_future();
     }
 
@@ -44,7 +44,7 @@ namespace hpx { namespace lcos
             typename hpx::actions::extract_action<Action>::result_type
         >::type const&)> const& data_sink, naming::id_type const& gid)
     {
-        typedef hpx::actions::extract_action<Action>::type action_type;
+        typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
             typename action_type::result_type
         >::type result_type;
@@ -69,7 +69,7 @@ namespace hpx { namespace lcos
         HPX_STD_FUNCTION<void(boost::exception_ptr const&)> const& error_sink,
         naming::id_type const& gid)
     {
-        typedef hpx::actions::extract_action<Action>::type action_type;
+        typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
             typename action_type::result_type
         >::type result_type;
@@ -127,7 +127,7 @@ namespace hpx { namespace lcos
     async (naming::id_type const& gid,
         BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
-        return packaged_task<hpx::actions::extract_action<Action>::type>(
+        return packaged_task<typename hpx::actions::extract_action<Action>::type>(
             gid, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)).get_future();
     }
 
@@ -144,7 +144,7 @@ namespace hpx { namespace lcos
         >::type const&)> const& data_sink, naming::id_type const& gid,
         BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
-        typedef hpx::actions::extract_action<Action>::type action_type;
+        typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
             typename action_type::result_type
         >::type result_type;
@@ -170,7 +170,7 @@ namespace hpx { namespace lcos
         naming::id_type const& gid,
         BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
-        typedef hpx::actions::extract_action<Action>::type action_type;
+        typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
             typename action_type::result_type
         >::type result_type;
