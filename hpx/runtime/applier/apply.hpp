@@ -405,7 +405,7 @@ namespace hpx { namespace applier
             boost::forward<Arg0>(arg0)));
         if (components::component_invalid == addr.type_)
             addr.type_ = components::get_component_type<
-                typename action-type::component_type>();
+                typename action_type::component_type>();
         p.set_destination_addr(addr);   // probably redundant
 
         //send parcel to agas

@@ -410,11 +410,18 @@ namespace hpx { namespace actions
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // Base template allowing to generate concrete action type from function
+    // Base template allowing to generate a concrete action type from a function
     // pointer. It is instantiated only if the supplied pointer is not a
-    // supported function pointer
+    // supported function pointer.
     template <typename F, F funcptr, typename Direct = boost::mpl::false_>
-    struct make_action;
+    struct make_action
+    {
+        // If you see this assertion during compilation, then you are most
+        // probably using one of the HPX_..._ACTION macros with a non-function
+        // type.
+        BOOST_STATIC_ASSERT_MSG(false,
+            "Attempt to instantiate make_action<> with a not supported type");
+    };
 
     template <typename F, F funcptr>
     struct make_direct_action
