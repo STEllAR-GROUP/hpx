@@ -59,7 +59,7 @@ HPX_REGISTER_PLAIN_ACTION(trigger_action);
 
 boost::uint64_t id(boost::uint64_t i)
 {
-    std::cout << i << "\n";
+    //std::cout << i << "\n";
     return i;
 }
 typedef hpx::actions::plain_result_action1<boost::uint64_t, boost::uint64_t, &id> id_action;
@@ -67,7 +67,7 @@ HPX_REGISTER_PLAIN_ACTION(id_action);
 
 boost::uint64_t add(boost::uint64_t n1, boost::uint64_t n2)
 {
-    std::cout << n1 << " + " << n2 << "\n";
+    //std::cout << n1 << " + " << n2 << "\n";
     return n1 + n2;
 }
 typedef hpx::actions::plain_result_action2<
