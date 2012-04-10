@@ -1216,8 +1216,8 @@ if(NOT HPX_NO_INSTALL)
           DESTINATION lib/pkgconfig)
 endif()
 
-if(NOT HPX_NO_INSTALL AND DOXYGEN_FOUND)
-  file(GLOB_RECURSE doxygen_inputs_list ${hpx_SOURCE_DIR}/hpx/*.hpp) 
+if(${DOXYGEN_FOUND})
+  file(GLOB_RECURSE doxygen_inputs_list ${hpx_SOURCE_DIR}/hpx/*.hpp)
 
   set(doxygen_inputs "")
 
@@ -1228,8 +1228,9 @@ if(NOT HPX_NO_INSTALL AND DOXYGEN_FOUND)
   set(doxygen_output_file "${output_dir}/docs/hpx_autodoc")
   set(doxygen_output_dir "${output_dir}/docs")
 
+  hpx_info("doxygen" "Creating ${CMAKE_CURRENT_BINARY_DIR}/docs/hpx_autodoc.doxy")
   configure_file(${hpx_SOURCE_DIR}/cmake/templates/autodoc.doxy.in
-                 ${output_dir}/docs/hpx_autodoc.doxy
+                 ${CMAKE_CURRENT_BINARY_DIR}/docs/hpx_autodoc.doxy
                  @ONLY)
 endif()
 
