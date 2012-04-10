@@ -1225,8 +1225,8 @@ if(${DOXYGEN_FOUND})
     set(doxygen_inputs "${doxygen_inputs} ${doxygen_input}")
   endforeach()
 
-  set(doxygen_output_file "${output_dir}/docs/hpx_autodoc")
-  set(doxygen_output_dir "${output_dir}/docs")
+  set(doxygen_output_file "${CMAKE_CURRENT_BINARY_DIR}/docs/hpx_autodoc")
+  set(doxygen_output_dir "${CMAKE_CURRENT_BINARY_DIR}/docs")
 
   hpx_info("doxygen" "Creating ${CMAKE_CURRENT_BINARY_DIR}/docs/hpx_autodoc.doxy")
   configure_file(${hpx_SOURCE_DIR}/cmake/templates/autodoc.doxy.in
