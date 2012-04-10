@@ -648,13 +648,13 @@ namespace hpx { namespace actions
 #else
     template <typename Component, void (Component::*F)()>
     struct make_action<void (Component::*)(), F, boost::mpl::false_>
-      : boost:mpl::identity<action0<
+      : boost::mpl::identity<action0<
             Component, component_result_action_arg0, F> >
     {};
 
     template <typename Component, void (Component::*F)() const>
     struct make_action<void (Component::*)() const, F, boost::mpl::false_>
-      : boost:mpl::identity<action0<
+      : boost::mpl::identity<action0<
             Component const, component_result_action_arg0, F> >
     {};
 #endif
