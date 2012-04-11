@@ -339,6 +339,12 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+// Older Boost versions do not have BOOST_NOEXCEPT defined
+#if !defined(BOOST_NOEXCEPT)
+#define BOOST_NOEXCEPT
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 // make sure Chrono is handled properly
 #if defined(HPX_INTERNAL_CHRONO) && BOOST_VERSION < 104700 && !defined(BOOST_CHRONO_NO_LIB)
 #  define BOOST_CHRONO_NO_LIB
