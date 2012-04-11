@@ -34,10 +34,10 @@ namespace hpx { namespace threads
         thread() BOOST_NOEXCEPT;
 
         template <typename F>
-        explicit thread(F f)
+        explicit thread(BOOST_FWD_REF(F) f)
           : id_(invalid_thread_id)
         {
-            start_thread(HPX_STD_BIND(boost::move(f)));
+            start_thread(HPX_STD_BIND(boost::forward<F>(f)));
         }
 
 // #if !defined(BOOST_NO_VARIADIC_TEMPLATES)
@@ -213,10 +213,11 @@ namespace hpx { namespace threads
     /**/
 
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    thread(F f, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+    thread(BOOST_FWD_REF(F) f, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
       : id_(invalid_thread_id)
     {
-        start_thread(HPX_STD_BIND(boost::move(f), BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)));
+        start_thread(HPX_STD_BIND(boost::forward<F>(f),
+            BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)));
     }
 
 #undef HPX_FORWARD_ARGS
