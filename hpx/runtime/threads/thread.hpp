@@ -37,7 +37,7 @@ namespace hpx { namespace threads
         explicit thread(BOOST_FWD_REF(F) f)
           : id_(invalid_thread_id)
         {
-            start_thread(HPX_STD_BIND(boost::forward<F>(f)));
+            start_thread(boost::forward<F>(f));
         }
 
 // #if !defined(BOOST_NO_VARIADIC_TEMPLATES)
