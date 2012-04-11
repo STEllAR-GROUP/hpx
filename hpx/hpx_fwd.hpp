@@ -166,6 +166,7 @@ namespace hpx
         }
 
         struct HPX_API_EXPORT threadmanager_base;
+        class HPX_API_EXPORT thread_data;
         class HPX_API_EXPORT thread;
 
         template <

@@ -12,7 +12,7 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/util/full_empty_memory.hpp>
 #include <hpx/runtime/actions/component_action.hpp>

@@ -13,7 +13,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/stringstream.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/lcos/base_lco.hpp>
@@ -115,7 +115,7 @@ namespace hpx { namespace lcos { namespace server
                     thread_queue_.pop_front();
 
                     // we know that the id is actually the pointer to the thread
-                    threads::thread* thrd = static_cast<threads::thread*>(id);
+                    threads::thread_data* thrd = static_cast<threads::thread_data*>(id);
                     LERR_(fatal) << "~queue: pending thread: "
                             << get_thread_state_name(thrd->get_state())
                             << "(" << id << "): " << thrd->get_description();

@@ -71,7 +71,7 @@ namespace hpx { namespace lcos { namespace local
                     queue_.pop_front();
 
                     // we know that the id is actually the pointer to the thread
-                    threads::thread* thrd = static_cast<threads::thread*>(id);
+                    threads::thread_data* thrd = static_cast<threads::thread_data*>(id);
                     LERR_(fatal) << "~barrier: pending thread: "
                             << get_thread_state_name(thrd->get_state())
                             << "(" << id << "): " << thrd->get_description();

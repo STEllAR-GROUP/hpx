@@ -6,6 +6,8 @@
 set(tests
     set_thread_state
     rescheduling
+    test_thread
+    test_thread_id
    )
 
 foreach(test ${tests})

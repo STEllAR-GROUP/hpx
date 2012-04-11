@@ -9,7 +9,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>

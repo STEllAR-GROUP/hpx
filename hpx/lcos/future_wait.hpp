@@ -72,7 +72,7 @@ namespace hpx { namespace lcos
 
                     // give thread-manager a chance to look for more work while
                     // waiting
-                    threads::suspend();
+                    threads::this_thread::suspend();
                     suspended = true;
                 }
             }
@@ -80,7 +80,7 @@ namespace hpx { namespace lcos
             // suspend after one full loop over all values, 10ms should be fine
             // (default parameter)
             if (!suspended)
-                threads::suspend(boost::posix_time::milliseconds(suspend_for));
+                threads::this_thread::suspend(boost::posix_time::milliseconds(suspend_for));
         }
         return handled.count();
     }
@@ -109,7 +109,7 @@ namespace hpx { namespace lcos
 
                     // give thread-manager a chance to look for more work while
                     // waiting
-                    threads::suspend();
+                    threads::this_thread::suspend();
                     suspended = true;
                 }
             }
@@ -117,7 +117,7 @@ namespace hpx { namespace lcos
             // suspend after one full loop over all values, 10ms should be fine
             // (default parameter)
             if (!suspended)
-                threads::suspend(boost::posix_time::milliseconds(suspend_for));
+                threads::this_thread::suspend(boost::posix_time::milliseconds(suspend_for));
         }
         return handled.count();
     }

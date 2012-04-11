@@ -10,7 +10,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
@@ -310,9 +310,8 @@ namespace hpx { namespace threads
         }
 
         // just retry, set_state will create new thread if target is still active
-        // REVIEW: report errors, at least?
-        //error_code ec;      // do not throw
-        set_state(id, newstate, newstate_ex, priority/*, ec*/);
+        error_code ec;      // do not throw
+        set_state(id, newstate, newstate_ex, priority, ec);
         return thread_state(terminated);
     }
 
@@ -343,7 +342,7 @@ namespace hpx { namespace threads
         }
 
         // we know that the id is actually the pointer to the thread
-        thread* thrd = reinterpret_cast<thread*>(id);
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
         if (NULL == thrd->get()) {
             if (&ec != &throws)
                 ec = make_success_code();
@@ -452,7 +451,7 @@ namespace hpx { namespace threads
         get_state(thread_id_type id)
     {
         // we know that the id is actually the pointer to the thread
-        thread* thrd = reinterpret_cast<thread*>(id);
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
         return thrd->get() ? thrd->get_state() : thread_state(terminated);
     }
 
@@ -463,7 +462,7 @@ namespace hpx { namespace threads
         get_phase(thread_id_type id)
     {
         // we know that the id is actually the pointer to the thread
-        thread* thrd = reinterpret_cast<thread*>(id);
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
         return thrd->get() ? thrd->get_thread_phase() : std::size_t(~0);
     }
 
@@ -475,7 +474,7 @@ namespace hpx { namespace threads
         get_description(thread_id_type id) const
     {
         // we know that the id is actually the pointer to the thread
-        thread* thrd = reinterpret_cast<thread*>(id);
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
         return thrd->get() ? thrd->get_description() : "<unknown>";
     }
 
@@ -490,7 +489,7 @@ namespace hpx { namespace threads
         }
 
         // we know that the id is actually the pointer to the thread
-        thread* thrd = reinterpret_cast<thread*>(id);
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
         if (thrd->get())
             thrd->set_description(desc);
     }
@@ -506,7 +505,7 @@ namespace hpx { namespace threads
         }
 
         // we know that the id is actually the pointer to the thread
-        thread* thrd = reinterpret_cast<thread*>(id);
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
         return thrd->get() ? thrd->get_lco_description() : "<unknown>";
     }
 
@@ -521,7 +520,7 @@ namespace hpx { namespace threads
         }
 
         // we know that the id is actually the pointer to the thread
-        thread* thrd = reinterpret_cast<thread*>(id);
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
         if (thrd->get())
             thrd->set_lco_description(desc);
     }
@@ -682,7 +681,7 @@ namespace hpx { namespace threads
         }
 
         // we know that the id is actually the pointer to the thread
-        thread* thrd = reinterpret_cast<thread*>(id);
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
         return thrd->get() ? thrd->get_gid() : naming::invalid_id;
     }
 
@@ -690,7 +689,7 @@ namespace hpx { namespace threads
     class switch_status
     {
     public:
-        switch_status (thread* t, thread_state prev_state)
+        switch_status (thread_data* t, thread_state prev_state)
           : thread_(t), prev_state_(prev_state),
             need_restore_state_(t->set_state_tagged(active, prev_state_, orig_state_))
         {}
@@ -736,7 +735,7 @@ namespace hpx { namespace threads
         void disable_restore() { need_restore_state_ = false; }
 
     private:
-        thread* thread_;
+        thread_data* thread_;
         thread_state prev_state_;
         thread_state orig_state_;
         bool need_restore_state_;
@@ -843,7 +842,7 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline void write_old_state_log(std::size_t num_thread, thread* thrd,
+    inline void write_old_state_log(std::size_t num_thread, thread_data* thrd,
         thread_state_enum state)
     {
         LTM_(debug) << "tfunc(" << num_thread << "): "
@@ -852,7 +851,7 @@ namespace hpx { namespace threads
                    << "old state(" << get_thread_state_name(state) << ")";
     }
 
-    inline void write_new_state_log_debug(std::size_t num_thread, thread* thrd,
+    inline void write_new_state_log_debug(std::size_t num_thread, thread_data* thrd,
         thread_state_enum state, char const* info)
     {
         LTM_(debug) << "tfunc(" << num_thread << "): "
@@ -861,7 +860,7 @@ namespace hpx { namespace threads
             << "new state(" << get_thread_state_name(state) << "), "
             << info;
     }
-    inline void write_new_state_log_warning(std::size_t num_thread, thread* thrd,
+    inline void write_new_state_log_warning(std::size_t num_thread, thread_data* thrd,
         thread_state_enum state, char const* info)
     {
         // log this in any case
@@ -1270,7 +1269,7 @@ namespace hpx { namespace threads
 
         while (true) {
             // Get the next PX thread from the queue
-            thread* thrd = NULL;
+            thread_data* thrd = NULL;
             if (scheduler_.get_next_thread(num_thread,
                     state_.load() == running, idle_loop_count, thrd))
             {

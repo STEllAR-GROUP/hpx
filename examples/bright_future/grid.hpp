@@ -47,10 +47,6 @@ typedef
 HPX_REGISTER_PLAIN_ACTION_DECLARATION(touch_mem_action);
 #endif
 
-#if defined(BOOST_NO_NOEXCEPT)
-#define noexcept throw()
-#endif
-
 namespace bright_future
 {
     template <typename T>
@@ -81,20 +77,20 @@ namespace bright_future
 
         template <typename U> struct rebind { typedef numa_allocator<U> other; };
 
-        numa_allocator() noexcept {}
-        explicit numa_allocator(std::size_t block_size) noexcept  : block_size(block_size){}
-        numa_allocator(numa_allocator const & n) noexcept  : block_size(n.block_size) {}
+        numa_allocator() BOOST_NOEXCEPT {}
+        explicit numa_allocator(std::size_t block_size) BOOST_NOEXCEPT : block_size(block_size){}
+        numa_allocator(numa_allocator const & n) BOOST_NOEXCEPT : block_size(n.block_size) {}
         template <typename U>
-        numa_allocator(numa_allocator<U> const & n) noexcept : block_size(n.block_size)  {}
+        numa_allocator(numa_allocator<U> const & n) BOOST_NOEXCEPT : block_size(n.block_size)  {}
         ~numa_allocator() {}
 
-        numa_allocator & operator=(numa_allocator const & n) noexcept
+        numa_allocator & operator=(numa_allocator const & n) BOOST_NOEXCEPT
         {
             block_size = n.block_size;
         }
 
         template <typename U>
-        numa_allocator & operator=(numa_allocator<U> const & n) noexcept
+        numa_allocator & operator=(numa_allocator<U> const & n) BOOST_NOEXCEPT
         {
             block_size = n.block_size;
         }
@@ -206,7 +202,7 @@ namespace bright_future
             std::free(p);
         }
 
-        size_type max_size() const noexcept
+        size_type max_size() const BOOST_NOEXCEPT
         {
             return std::allocator<T>().max_size();
         }
@@ -255,13 +251,13 @@ namespace bright_future
     };
 
     template <typename T1, typename T2>
-    bool operator==(const numa_allocator<T1>&, const numa_allocator<T2>&) noexcept
+    bool operator==(const numa_allocator<T1>&, const numa_allocator<T2>&) BOOST_NOEXCEPT
     {
         return true;
     }
 
     template <typename T1, typename T2>
-    bool operator!=(const numa_allocator<T1>&, const numa_allocator<T2>&) noexcept
+    bool operator!=(const numa_allocator<T1>&, const numa_allocator<T2>&) BOOST_NOEXCEPT
     {
         return false;
     }

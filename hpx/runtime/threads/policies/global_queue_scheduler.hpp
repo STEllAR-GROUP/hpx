@@ -12,7 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/block_profiler.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
 
 #include <boost/mpl/bool.hpp>
@@ -94,26 +94,26 @@ namespace hpx { namespace threads { namespace policies
         /// Return the next thread to be executed, return false if non is
         /// available
         bool get_next_thread(std::size_t num_thread, bool running,
-            std::size_t& idle_loop_count, threads::thread*& thrd)
+            std::size_t& idle_loop_count, threads::thread_data*& thrd)
         {
             return queue_.get_next_thread(thrd, num_thread);
         }
 
         /// Schedule the passed thread
-        void schedule_thread(threads::thread* thrd, std::size_t num_thread,
+        void schedule_thread(threads::thread_data* thrd, std::size_t num_thread,
             thread_priority /*priority*/ = thread_priority_normal)
         {
             queue_.schedule_thread(thrd, num_thread);
         }
 
-        void schedule_thread_last(threads::thread* thrd, std::size_t num_thread,
+        void schedule_thread_last(threads::thread_data* thrd, std::size_t num_thread,
             thread_priority priority = thread_priority_normal)
         {
             schedule_thread(thrd, num_thread, priority);
         }
 
         /// Destroy the passed thread as it has been terminated
-        bool destroy_thread(threads::thread* thrd)
+        bool destroy_thread(threads::thread_data* thrd)
         {
             return queue_.destroy_thread(thrd);
         }

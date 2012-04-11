@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/full_empty_entry.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/runtime/actions/continuation.hpp>

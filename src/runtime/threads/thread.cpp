@@ -1,188 +1,145 @@
-//  Copyright (c) 2008-2009 Chirag Dekate, Hartmut Kaiser, Anshul Tandon
-//  Copyright (c) 2011      Bryce Lelbach
+//  Copyright (c) 2007-2012 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/exception.hpp>
-#include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/threads/threadmanager.hpp>
+
+#include <hpx/runtime.hpp>
 #include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/components/runtime_support.hpp>
 
-#include <boost/coroutine/detail/coroutine_impl_impl.hpp>
-#include <boost/assert.hpp>
-
-///////////////////////////////////////////////////////////////////////////////
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::threads::detail::thread, hpx::components::component_thread);
-
-namespace hpx { namespace threads { namespace detail
-{
-    components::component_type thread::get_component_type()
-    {
-        return components::get_component_type<thread>();
-    }
-
-    void thread::set_component_type(components::component_type type)
-    {
-        components::set_component_type<thread>(type);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    void *thread::operator new(std::size_t size, thread_pool& pool)
-    {
-        BOOST_ASSERT(sizeof(detail::thread) == size);
-
-        void *ret = pool.detail_pool_.allocate();
-        if (0 == ret)
-            boost::throw_exception(std::bad_alloc());
-        return ret;
-    }
-
-    void *thread::operator new(std::size_t size) throw()
-    {
-        return NULL;    // won't be ever used
-    }
-
-    void thread::operator delete(void *p, thread_pool& pool)
-    {
-        if (0 != p)
-            pool.detail_pool_.deallocate(reinterpret_cast<detail::thread*>(p));
-    }
-
-    void thread::operator delete(void *p, std::size_t size)
-    {
-        BOOST_ASSERT(sizeof(detail::thread) == size);
-        if (0 != p) {
-            detail::thread* pt = reinterpret_cast<detail::thread*>(p);
-            pt->pool_->detail_pool_.deallocate(pt);
-        }
-    }
-}}}
-
-///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
 {
-    ///////////////////////////////////////////////////////////////////////////
-    // global variable defining the stack size to use for all HPX-threads
-    std::size_t default_stacksize = HPX_DEFAULT_STACK_SIZE;
+    thread::thread() BOOST_NOEXCEPT
+      : id_(invalid_thread_id)
+    {}
 
-    ///////////////////////////////////////////////////////////////////////////
-    // This overload will be called by the ptr_map<> used in the thread_queue
-    // whenever an instance of a threads::thread needs to be deleted. We
-    // provide this overload as we need to extract the thread_pool from the
-    // thread instance the moment before it gets deleted
-    void delete_clone(threads::thread const* t)
+    thread::thread(BOOST_RV_REF(thread) rhs) BOOST_NOEXCEPT
+      : id_(rhs.id_)
     {
-        if (0 != t) {
-            threads::thread_pool* pool = t->get()->pool_;
-            boost::checked_delete(t); // delete the normal way, memory does not get freed
-            pool->pool_.free(const_cast<threads::thread*>(t));
-        }
+        rhs.id_ = invalid_thread_id;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    void* thread::operator new(std::size_t size, thread_pool& pool)
+    thread& thread::operator=(BOOST_RV_REF(thread) rhs) BOOST_NOEXCEPT
     {
-        BOOST_ASSERT(sizeof(thread) == size);
-
-        void *ret = pool.pool_.alloc();
-        if (0 == ret)
-            boost::throw_exception(std::bad_alloc());
-        return ret;
+        thread tmp(boost::move(rhs));
+        swap(tmp);
+        return *this;
     }
 
-    void thread::operator delete(void *p, thread_pool& pool)
+    thread::~thread()
     {
-        if (0 != p)
-            pool.pool_.free(reinterpret_cast<thread*>(p));
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    thread_self& get_self()
-    {
-        thread_self* p = get_self_ptr();
-        if (HPX_UNLIKELY(!p)) {
-            HPX_THROW_EXCEPTION(null_thread_id, "threads::get_self",
-                "NULL thread id encountered (is this executed on a HPX-thread?)");
-        }
-        return *p;
-    }
-
-    thread_self* get_self_ptr()
-    {
-        return thread_self::impl_type/*::super_type*/::get_self();
-    }
-
-    thread_self* get_self_ptr_checked(error_code& ec)
-    {
-        thread_self* p = thread_self::impl_type::get_self();
-
-        if (HPX_UNLIKELY(!p))
-        {
-            HPX_THROWS_IF(ec, null_thread_id, "threads::get_self_ptr_checked",
-                "NULL thread id encountered (is this executed on a HPX-thread?)");
-            return 0;
-        }
-
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        return p;
-    }
-
-    thread_id_type get_self_id()
-    {
-        thread_self* self = get_self_ptr();
-        return (0 != self) ? self->get_thread_id() : 0;
-    }
-
-    thread_id_type get_parent_id()
-    {
-        thread_self* self = get_self_ptr();
-        return (0 != self) ?
-            reinterpret_cast<thread*>(self->get_thread_id())->get_parent_thread_id() : 0;
-    }
-
-    std::size_t get_parent_phase()
-    {
-        thread_self* self = get_self_ptr();
-        return (0 != self) ?
-            reinterpret_cast<thread*>(self->get_thread_id())->get_parent_thread_phase() : 0;
-    }
-
-    boost::uint32_t get_parent_locality_id()
-    {
-        thread_self* self = get_self_ptr();
-        return (0 != self) ?
-            reinterpret_cast<thread*>(self->get_thread_id())->get_parent_locality_id() : 0;
-    }
-
-    naming::address::address_type get_self_component_id()
-    {
-        thread_self* self = get_self_ptr();
-        return (0 != self) ?
-            reinterpret_cast<thread*>(self->get_thread_id())->get_component_id() : 0;
-    }
-
-    namespace detail
-    {
-        void thread::set_event()
-        {
-            // we need to reactivate the thread itself
-            if (suspended == current_state_.load(boost::memory_order_acquire))
-            {
-                hpx::applier::get_applier().get_thread_manager().
-                    set_state(get_thread_id(), pending);
+        // If the thread is still running, we terminate the whole application
+        // as we have no chance of reporting this error (we can't throw)
+        if (joinable()) {
+            try {
+                components::stubs::runtime_support::terminate_all(
+                    naming::get_id_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX));
             }
-            // FIXME: implement functionality required for depleted state
+            catch(...) {
+                /* nothing we can do */;
+            }
+        }
+    }
+
+    void thread::swap(thread& rhs) BOOST_NOEXCEPT
+    {
+        mutex_type::scoped_lock l(mtx_);
+        std::swap(id_, rhs.id_);
+    }
+
+    static thread_state_enum
+    thread_function_nullary(HPX_STD_FUNCTION<void()> const& func, thread* t)
+    {
+        try {
+            func();
+        }
+        catch (hpx::exception const& e) {
+            if (e.get_error() != hpx::thread_interrupted)
+                throw;    // rethrow any exception except 'thread_interrupted'
+        }
+
+//        run_thread_exit_callbacks();
+
+        // make sure our thread object knows that we're gone
+        t->detach();
+        return terminated;
+    }
+
+    thread::id thread::get_id() const BOOST_NOEXCEPT
+    {
+        return id(native_handle());
+    }
+
+    void thread::start_thread(BOOST_RV_REF(HPX_STD_FUNCTION<void()>) func)
+    {
+        threads::thread_init_data data(
+            HPX_STD_BIND(&thread_function_nullary, boost::move(func), this),
+            "<unknown>");
+
+        error_code ec;
+        thread_id_type id = hpx::get_runtime().get_thread_manager().
+            register_thread(data, suspended, true, ec);
+        if (ec) {
+            HPX_THROWS_IF(ec, thread_resource_error, "thread::start_thread",
+                "Could not create thread");
+            return;
+        }
+
+        set_thread_state(id, pending, wait_signaled, thread_priority_normal, ec);
+        if (ec) {
+            HPX_THROWS_IF(ec, thread_resource_error, "thread::start_thread",
+                "Could not start newly created thread");
+            return;
+        }
+
+        mutex_type::scoped_lock l(mtx_);
+        id_ = id;
+    }
+
+    void thread::join()
+    {
+        if (this_thread::get_id() == get_id())
+        {
+            HPX_THROW_EXCEPTION(thread_resource_error, "thread::join",
+                "hpx::threads::thread: trying joining itself");
+            return;
+        }
+
+        // wait for thread to be terminated, suspend for 10ms
+        do {
+            native_handle_type id = native_handle();
+            if (id == invalid_thread_id || get_thread_state(id) == terminated)
+                break;
+            this_thread::suspend(boost::posix_time::milliseconds(10));
+        } while (true);
+    }
+
+    void thread::yield() BOOST_NOEXCEPT
+    {
+        this_thread::yield();
+    }
+
+    void thread::sleep(boost::posix_time::ptime const& xt)
+    {
+        this_thread::suspend(xt);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace this_thread
+    {
+        void yield() BOOST_NOEXCEPT
+        {
+            threads::this_thread::suspend();
+        }
+
+        thread::id get_id() BOOST_NOEXCEPT
+        {
+            threads::thread_self& self = threads::get_self();
+            return thread::id(self.get_thread_id());
         }
     }
 }}
-
-///////////////////////////////////////////////////////////////////////////////
-// explicit instantiation of the function thread_self::set_self
-template void
-hpx::threads::thread_self::impl_type::set_self(hpx::threads::thread_self*);
 

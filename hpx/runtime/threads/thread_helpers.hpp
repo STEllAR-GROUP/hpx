@@ -180,12 +180,12 @@ namespace hpx { namespace threads
         error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
-//     HPX_API_EXPORT void report_error(boost::exception_ptr const& e);
-
-    ///////////////////////////////////////////////////////////////////////////
     // Return the number of the NUMA node the current thread is running on
     HPX_API_EXPORT std::size_t get_numa_node_number();
+}}
 
+namespace hpx { namespace threads { namespace this_thread
+{
     ///////////////////////////////////////////////////////////////////////////
     /// The function \a suspend will return control to the thread manager
     /// (suspends the current thread). It sets the new state of this thread
@@ -205,7 +205,7 @@ namespace hpx { namespace threads
     ///
     HPX_API_EXPORT thread_state_ex_enum suspend(
         thread_state_enum state = pending,
-        char const* description = "threads::suspend",
+        char const* description = "threads::this_thread::suspend",
         error_code& ec = throws);
 
     /// The function \a suspend will return control to the thread manager
@@ -227,7 +227,7 @@ namespace hpx { namespace threads
     ///
     HPX_API_EXPORT thread_state_ex_enum suspend(
         boost::posix_time::ptime const&,
-        char const* description = "threads::suspend",
+        char const* description = "threads::this_thread::suspend",
         error_code& ec = throws);
 
     /// The function \a suspend will return control to the thread manager
@@ -249,8 +249,8 @@ namespace hpx { namespace threads
     ///
     HPX_API_EXPORT thread_state_ex_enum suspend(
         boost::posix_time::time_duration const&,
-        char const* description = "threads::suspend",
+        char const* description = "threads::this_thread::suspend",
         error_code& ec = throws);
-}}
+}}}
 
 #endif

@@ -17,7 +17,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/full_empty_memory.hpp>
 

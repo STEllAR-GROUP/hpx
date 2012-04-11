@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/stringstream.hpp>
@@ -30,7 +30,7 @@ namespace hpx { namespace lcos { namespace local
                 queue_.pop_front();
 
                 // we know that the id is actually the pointer to the thread
-                threads::thread* thrd = static_cast<threads::thread*>(id);
+                threads::thread_data* thrd = static_cast<threads::thread_data*>(id);
                 LERR_(fatal)
                         << "lcos::counting_semaphore::~counting_semaphore:"
                         << " pending thread: "

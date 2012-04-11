@@ -13,7 +13,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/stringstream.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
 #include <boost/aligned_storage.hpp>
@@ -99,7 +99,7 @@ namespace hpx { namespace util { namespace detail
                 queue.pop_front();
 
                 // we know that the id is actually the pointer to the thread
-                threads::thread* thrd = reinterpret_cast<threads::thread*>(id);
+                threads::thread_data* thrd = reinterpret_cast<threads::thread_data*>(id);
                 LERR_(info) << "~full_empty_entry: aborting pending thread in "
                         << desc << ": "
                         << get_thread_state_name(thrd->get_state())

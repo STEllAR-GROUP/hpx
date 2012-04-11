@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -199,7 +199,10 @@ namespace hpx { namespace threads
 
         return app->get_thread_manager().get_thread_gid(id);
     }
+}}
 
+namespace hpx { namespace threads { namespace this_thread
+{
     /// The function \a suspend will return control to the thread manager
     /// (suspends the current thread). It sets the new state of this thread
     /// to the thread state passed as the parameter.
@@ -296,5 +299,5 @@ namespace hpx { namespace threads
 
         return statex;
     }
-}}
+}}}
 

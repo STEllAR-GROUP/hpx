@@ -51,7 +51,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 if(hpx::threads::get_self_ptr())
                 {
-                    hpx::threads::suspend();
+                    hpx::threads::this_thread::suspend();
                 }
                 else
                 {
@@ -67,7 +67,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 if (hpx::threads::get_self_ptr())
                 {
-                    hpx::threads::suspend(boost::posix_time::microseconds(1));
+                    hpx::threads::this_thread::suspend(boost::posix_time::microseconds(1));
                 }
                 else
                 {

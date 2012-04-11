@@ -124,7 +124,7 @@ int monitor(std::string const& name, boost::uint64_t pause)
         }
 
         // Schedule a wakeup.
-        hpx::threads::suspend(milliseconds(pause));
+        hpx::threads::this_thread::suspend(milliseconds(pause));
     }
 
     hpx::agas::unregister_name(stop_flag_name, stop_id);

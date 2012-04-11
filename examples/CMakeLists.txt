@@ -50,9 +50,9 @@ if(HDF5_CPP_FOUND)
         gravity
        )
   endif()
-  
 
-  if(HPX_CXX11_LAMBDAS AND HPX_CXX11_AUTO AND HDF5_THREAD_SAFE)
+
+  if(HDF5_THREAD_SAFE)
     set(subdirs ${subdirs}
         sheneos
        )

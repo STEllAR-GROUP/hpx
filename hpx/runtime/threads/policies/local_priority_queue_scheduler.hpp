@@ -13,7 +13,7 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
 
@@ -235,7 +235,7 @@ namespace hpx { namespace threads { namespace policies
         /// Return the next thread to be executed, return false if non is
         /// available
         bool get_next_thread(std::size_t num_thread, bool running,
-            std::size_t& idle_loop_count, threads::thread*& thrd)
+            std::size_t& idle_loop_count, threads::thread_data*& thrd)
         {
             // master thread only: first try to get a priority thread
             std::size_t high_priority_queue_size = high_priority_queues_.size();
@@ -281,7 +281,7 @@ namespace hpx { namespace threads { namespace policies
         }
 
         /// Schedule the passed thread
-        void schedule_thread(threads::thread* thrd, std::size_t num_thread,
+        void schedule_thread(threads::thread_data* thrd, std::size_t num_thread,
             thread_priority priority = thread_priority_normal)
         {
             if (std::size_t(-1) == num_thread)
@@ -302,14 +302,14 @@ namespace hpx { namespace threads { namespace policies
             }
         }
 
-        void schedule_thread_last(threads::thread* thrd, std::size_t num_thread,
+        void schedule_thread_last(threads::thread_data* thrd, std::size_t num_thread,
             thread_priority priority = thread_priority_normal)
         {
             schedule_thread(thrd, num_thread, priority);
         }
 
         /// Destroy the passed thread as it has been terminated
-        bool destroy_thread(threads::thread* thrd)
+        bool destroy_thread(threads::thread_data* thrd)
         {
             for (std::size_t i = 0; i < high_priority_queues_.size(); ++i)
             {
@@ -342,7 +342,7 @@ namespace hpx { namespace threads { namespace policies
 
                 if (num_thread == queues_.size()-1)
                     count += low_priority_queue_.get_thread_count();
-\
+
                 return count + queues_[num_thread]->get_queue_length();
             }
 

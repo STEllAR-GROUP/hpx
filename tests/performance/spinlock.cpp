@@ -74,7 +74,7 @@ namespace test
             }
             else if (hpx::threads::get_self_ptr())
             {
-                hpx::threads::suspend();
+                hpx::threads::this_thread::suspend();
             }
             else
             {
