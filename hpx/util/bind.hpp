@@ -77,7 +77,33 @@ namespace hpx { namespace util {
             return t;
         }
 
-        /*
+        template <typename Env, typename T>
+        T & eval(Env const &, boost::reference_wrapper<T> const & r)
+        {
+            return r.get();
+        }
+
+        template <typename Env, typename T>
+        T const & eval(Env const &, boost::reference_wrapper<T const> const & r)
+        {
+            return r.get();
+        }
+        
+        template <typename Env, typename T>
+        T & eval(Env const &, boost::reference_wrapper<T> & r)
+        {
+            return r.get();
+        }
+
+        template <typename Env, typename T>
+        T const & eval(Env const &, boost::reference_wrapper<T const> & r)
+        {
+            return r.get();
+        }
+
+
+        using boost::get_pointer;
+
         template <typename T>
         T * get_pointer(T &t)
         {
@@ -89,7 +115,6 @@ namespace hpx { namespace util {
         {
             return &t;
         }
-        */
     }
 
     namespace placeholders
@@ -507,7 +532,7 @@ namespace hpx { namespace util {
 
             R operator()() const
             {
-                using boost::get_pointer;
+                using detail::get_pointer;
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
                 return
@@ -517,7 +542,7 @@ namespace hpx { namespace util {
 
             R operator()()
             {
-                using boost::get_pointer;
+                using detail::get_pointer;
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
                 return
@@ -529,7 +554,7 @@ namespace hpx { namespace util {
     template <BOOST_PP_ENUM_PARAMS(N, typename A)>                              \
     result_type operator()(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_REF_PARAMS, _))   \
     {                                                                           \
-        using boost::get_pointer;                                               \
+        using detail::get_pointer;                                              \
         typedef                                                                 \
             BOOST_PP_CAT(hpx::util::tuple, N)<                                  \
                 BOOST_PP_ENUM(N, HPX_UTIL_BIND_REFERENCE, A)                    \
@@ -608,7 +633,7 @@ namespace hpx { namespace util {
 
             R operator()() const
             {
-                using boost::get_pointer;
+                using detail::get_pointer;
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
                 return
@@ -618,7 +643,7 @@ namespace hpx { namespace util {
 
             R operator()()
             {
-                using boost::get_pointer;
+                using detail::get_pointer;
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
                 return
@@ -630,7 +655,7 @@ namespace hpx { namespace util {
     template <BOOST_PP_ENUM_PARAMS(N, typename A)>                              \
     result_type operator()(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_REF_PARAMS, _)) const \
     {                                                                           \
-        using boost::get_pointer;                                               \
+        using detail::get_pointer;                                              \
         typedef                                                                 \
             BOOST_PP_CAT(hpx::util::tuple, N)<                                  \
                 BOOST_PP_ENUM(N, HPX_UTIL_BIND_REFERENCE, A)                    \

@@ -17,7 +17,7 @@ using boost::program_options::options_description;
 ///////////////////////////////////////////////////////////////////////////////
 struct X
 {
-    mutable unsigned int hash;
+    mutable int hash;
 
     X() : hash(0) {}
 
@@ -50,7 +50,7 @@ struct X
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(variables_map& vm)
+int hpx_main(variables_map& /*vm*/)
 {
     {
         X x;
@@ -60,7 +60,7 @@ int hpx_main(variables_map& vm)
         hpx::threads::thread(&X::f0, boost::ref(x)).join();
 
         hpx::threads::thread(&X::g0, &x).join();
-//         hpx::threads::thread(&X::g0, x).join();
+        hpx::threads::thread(&X::g0, x).join();
         hpx::threads::thread(&X::g0, boost::ref(x)).join();
 
         // 1
@@ -68,7 +68,7 @@ int hpx_main(variables_map& vm)
         hpx::threads::thread(&X::f1, boost::ref(x), 1).join();
 
         hpx::threads::thread(&X::g1, &x, 1).join();
-//         hpx::threads::thread(&X::g1, x, 1).join();
+        hpx::threads::thread(&X::g1, x, 1).join();
         hpx::threads::thread(&X::g1, boost::ref(x), 1).join();
 
         // 2
@@ -76,7 +76,7 @@ int hpx_main(variables_map& vm)
         hpx::threads::thread(&X::f2, boost::ref(x), 1, 2).join();
 
         hpx::threads::thread(&X::g2, &x, 1, 2).join();
-//         hpx::threads::thread(&X::g2, x, 1, 2).join();
+        hpx::threads::thread(&X::g2, x, 1, 2).join();
         hpx::threads::thread(&X::g2, boost::ref(x), 1, 2).join();
 
         // 3
@@ -84,7 +84,7 @@ int hpx_main(variables_map& vm)
         hpx::threads::thread(&X::f3, boost::ref(x), 1, 2, 3).join();
 
         hpx::threads::thread(&X::g3, &x, 1, 2, 3).join();
-//         hpx::threads::thread(&X::g3, x, 1, 2, 3).join();
+        hpx::threads::thread(&X::g3, x, 1, 2, 3).join();
         hpx::threads::thread(&X::g3, boost::ref(x), 1, 2, 3).join();
 
         // 4
@@ -92,7 +92,7 @@ int hpx_main(variables_map& vm)
         hpx::threads::thread(&X::f4, boost::ref(x), 1, 2, 3, 4).join();
 
         hpx::threads::thread(&X::g4, &x, 1, 2, 3, 4).join();
-//         hpx::threads::thread(&X::g4, x, 1, 2, 3, 4).join();
+        hpx::threads::thread(&X::g4, x, 1, 2, 3, 4).join();
         hpx::threads::thread(&X::g4, boost::ref(x), 1, 2, 3, 4).join();
 
         // 5
@@ -100,7 +100,7 @@ int hpx_main(variables_map& vm)
         hpx::threads::thread(&X::f5, boost::ref(x), 1, 2, 3, 4, 5).join();
 
         hpx::threads::thread(&X::g5, &x, 1, 2, 3, 4, 5).join();
-//         hpx::threads::thread(&X::g5, x, 1, 2, 3, 4, 5).join();
+        hpx::threads::thread(&X::g5, x, 1, 2, 3, 4, 5).join();
         hpx::threads::thread(&X::g5, boost::ref(x), 1, 2, 3, 4, 5).join();
 
         // 6
@@ -108,7 +108,7 @@ int hpx_main(variables_map& vm)
         hpx::threads::thread(&X::f6, boost::ref(x), 1, 2, 3, 4, 5, 6).join();
 
         hpx::threads::thread(&X::g6, &x, 1, 2, 3, 4, 5, 6).join();
-//         hpx::threads::thread(&X::g6, x, 1, 2, 3, 4, 5, 6).join();
+        hpx::threads::thread(&X::g6, x, 1, 2, 3, 4, 5, 6).join();
         hpx::threads::thread(&X::g6, boost::ref(x), 1, 2, 3, 4, 5, 6).join();
 
         // 7
@@ -116,7 +116,7 @@ int hpx_main(variables_map& vm)
         hpx::threads::thread(&X::f7, boost::ref(x), 1, 2, 3, 4, 5, 6, 7).join();
 
         hpx::threads::thread(&X::g7, &x, 1, 2, 3, 4, 5, 6, 7).join();
-//         hpx::threads::thread(&X::g7, x, 1, 2, 3, 4, 5, 6, 7).join();
+        hpx::threads::thread(&X::g7, x, 1, 2, 3, 4, 5, 6, 7).join();
         hpx::threads::thread(&X::g7, boost::ref(x), 1, 2, 3, 4, 5, 6, 7).join();
 
         // 8
@@ -124,7 +124,7 @@ int hpx_main(variables_map& vm)
         hpx::threads::thread(&X::f8, boost::ref(x), 1, 2, 3, 4, 5, 6, 7, 8).join();
 
         hpx::threads::thread(&X::g8, &x, 1, 2, 3, 4, 5, 6, 7, 8).join();
-//         hpx::threads::thread(&X::g8, x, 1, 2, 3, 4, 5, 6, 7, 8).join();
+        hpx::threads::thread(&X::g8, x, 1, 2, 3, 4, 5, 6, 7, 8).join();
         hpx::threads::thread(&X::g8, boost::ref(x), 1, 2, 3, 4, 5, 6, 7, 8).join();
 
         HPX_TEST_EQ(x.hash, 23558);
