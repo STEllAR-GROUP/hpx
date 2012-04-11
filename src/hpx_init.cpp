@@ -13,6 +13,7 @@
 #include <hpx/util/map_hostnames.hpp>
 #include <hpx/util/sed_transform.hpp>
 #include <hpx/util/parse_command_line.hpp>
+#include <hpx/util/manage_config.hpp>
 
 #include <hpx/lcos/async.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
@@ -720,6 +721,7 @@ namespace hpx
             // load basic ini configuration information to allow for command-
             // line option aliases
             util::runtime_configuration rtcfg;
+            util::manage_config cfgmap(ini_config);
 
             // Initial analysis of the command line options. This is
             // preliminary as it will not take into account any aliases as
@@ -746,8 +748,10 @@ namespace hpx
                 // Make sure any aliases defined on the command line get used
                 // for the option analysis below.
                 std::vector<std::string> cfg;
-                if (prevm.count("hpx:ini"))
+                if (prevm.count("hpx:ini")) {
                     cfg = prevm["hpx:ini"].as<std::vector<std::string> >();
+                    cfgmap.add(cfg);
+                }
                 std::copy(ini_config.begin(), ini_config.end(), std::back_inserter(cfg));
 
                 rtcfg.reconfigure(cfg);
@@ -851,7 +855,19 @@ namespace hpx
 
             std::string hpx_host(env.host_name(HPX_INITIAL_IP_ADDRESS));
             boost::uint16_t hpx_port = HPX_INITIAL_IP_PORT;
-            std::size_t num_threads = env.retrieve_number_of_threads();
+
+            std::size_t pbs_threads = env.retrieve_number_of_threads();
+            std::size_t num_threads = cfgmap.get_value<std::size_t>(
+                "hpx.os_threads", pbs_threads);
+
+            if (env.run_with_pbs() && num_threads > pbs_threads) {
+                std::cerr  << "hpx::init: command line warning: "
+                    "--hpx:ini=hpx.os_threads used when running with PBS, "
+                    "requesting a larger number of threads than cores have "
+                    "been assigned by PBS, the application might not run "
+                    "properly." << std::endl;
+            }
+
             bool run_agas_server = vm.count("hpx:run-agas-server") ? true : false;
 
             std::size_t num_localities = env.retrieve_number_of_localities();

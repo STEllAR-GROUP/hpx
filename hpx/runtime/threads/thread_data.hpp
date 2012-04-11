@@ -118,6 +118,23 @@ namespace hpx { namespace threads { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    struct thread_exit_callback_node
+    {
+        HPX_STD_FUNCTION<void()> f_;
+        thread_exit_callback_node* next_;
+
+        thread_exit_callback_node(HPX_STD_FUNCTION<void()> const& f,
+                thread_exit_callback_node* next)
+          : f_(f), next_(next)
+        {}
+
+        void operator()()
+        {
+            f_();
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     // This is the representation of a ParalleX thread
     class thread_data : public lcos::base_lco, private boost::noncopyable
     {
@@ -137,7 +154,10 @@ namespace hpx { namespace threads { namespace detail
             component_id_(init_data.lva),
             marked_state_(unknown),
             back_ptr_(0),
-            pool_(&pool)
+            pool_(&pool),
+            requested_interrupt_(false),
+            enabled_interrupt_(true),
+            exit_funcs_(0)
         {
             LTM_(debug) << "thread::thread(" << this << "), description("
                         << init_data.description << ")";
@@ -164,13 +184,16 @@ namespace hpx { namespace threads { namespace detail
           : coroutine_(function_type(), 0), //coroutine_type::impl_type::create(function_type())),
             description_(""), lco_description_(""),
             parent_locality_id_(0), parent_thread_id_(0),
-            parent_thread_phase_(0), component_id_(0), back_ptr_(0), pool_(0)
+            parent_thread_phase_(0), component_id_(0), back_ptr_(0), pool_(0),
+            requested_interrupt_(false), enabled_interrupt_(false),
+            exit_funcs_(0)
         {
             BOOST_ASSERT(false);    // shouldn't ever be called
         }
 
         ~thread_data()
         {
+            free_thread_exit_callbacks();
             LTM_(debug) << "~thread(" << this << "), description("
                         << get_description() << "), phase("
                         << get_thread_phase() << ")";
@@ -355,6 +378,37 @@ namespace hpx { namespace threads { namespace detail
             coroutine_.reset();
         }
 
+        // handle thread interruption
+        bool interruption_requested() const
+        {
+            return requested_interrupt_;
+        }
+
+        bool interruption_enabled() const
+        {
+            return enabled_interrupt_;
+        }
+
+        void set_interruption_enabled(bool enable)
+        {
+            enabled_interrupt_ = enable;
+        }
+
+        void interrupt()
+        {
+            if (!enabled_interrupt_) {
+                HPX_THROW_EXCEPTION(thread_not_interruptable,
+                    "detail::thread_data::interrupt",
+                    "Interrupts are disabled for this thread.");
+                return;
+            }
+            requested_interrupt_ = true;
+        }
+
+        bool add_thread_exit_callback(HPX_STD_FUNCTION<void()> const& f);
+        void run_thread_exit_callbacks();
+        void free_thread_exit_callbacks();
+
     private:
         friend class threads::thread_data;
         friend void threads::delete_clone(threads::thread_data const*);
@@ -389,6 +443,10 @@ namespace hpx { namespace threads { namespace detail
 
         components::managed_component<thread_data, threads::thread_data>* back_ptr_;
         thread_pool* pool_;
+
+        bool requested_interrupt_;
+        bool enabled_interrupt_;
+        thread_exit_callback_node* exit_funcs_;
     };
 
     // dummy functions, not needed anywhere
@@ -662,6 +720,45 @@ namespace hpx { namespace threads
             detail::thread_data* t = get();
             if (t)
                 t->set_lco_description(lco_description);
+        }
+
+        bool interruption_requested() const
+        {
+            detail::thread_data const* t = get();
+            return t ? t->interruption_requested() : false;
+        }
+
+        bool interruption_enabled() const
+        {
+            detail::thread_data const* t = get();
+            return t ? t->interruption_enabled() : false;
+        }
+
+        void set_interruption_enabled(bool enable)
+        {
+            detail::thread_data* t = get();
+            if (t)
+                t->set_interruption_enabled(enable);
+        }
+
+        void interrupt()
+        {
+            detail::thread_data* t = get();
+            if (t)
+                t->interrupt();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        bool add_thread_exit_callback(HPX_STD_FUNCTION<void()> const& f)
+        {
+            detail::thread_data* t = get();
+            return t ? t->add_thread_exit_callback(f) : false;
+        }
+
+        void run_thread_exit_callbacks()
+        {
+            detail::thread_data* t = get();
+            if (t) t->run_thread_exit_callbacks();
         }
 
         ///////////////////////////////////////////////////////////////////////

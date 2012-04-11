@@ -13,6 +13,7 @@
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/exception_ptr.hpp>
+#include <boost/move/move.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
@@ -182,6 +183,26 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     // Return the number of the NUMA node the current thread is running on
     HPX_API_EXPORT std::size_t get_numa_node_number();
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_API_EXPORT bool get_thread_interruption_enabled(thread_id_type id,
+        error_code& ec = throws);
+
+    HPX_API_EXPORT void set_thread_interruption_enabled(thread_id_type id,
+        bool enable, error_code& ec = throws);
+
+    HPX_API_EXPORT bool get_thread_interruption_requested(thread_id_type id,
+        error_code& ec = throws);
+
+    HPX_API_EXPORT void interrupt_thread(thread_id_type id,
+        error_code& ec = throws);
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_API_EXPORT void run_thread_exit_callbacks(thread_id_type id,
+        error_code& ec = throws);
+
+    HPX_API_EXPORT bool add_thread_exit_callback(thread_id_type id,
+        HPX_STD_FUNCTION<void()> const& f, error_code& ec = throws);
 }}
 
 namespace hpx { namespace threads { namespace this_thread

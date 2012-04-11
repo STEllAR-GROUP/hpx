@@ -47,9 +47,11 @@ namespace hpx { namespace naming
                     }
                 }
                 catch (hpx::exception const& e) {
-                    LTM_(error)
-                        << "Unhandled exception while executing decrement_refcnt:"
-                        << e.what();
+                    if (e.get_error() != thread_interrupted) {
+                        LTM_(error)
+                            << "Unhandled exception while executing decrement_refcnt:"
+                            << e.what();
+                    }
                 }
             }
             else {

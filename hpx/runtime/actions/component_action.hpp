@@ -100,14 +100,16 @@ namespace hpx { namespace actions
                 (get_lva<Component>::call(lva)->*F)();      // just call the function
             }
             catch (hpx::exception const& e) {
-                LTM_(error)
-                    << "Unhandled exception while executing component action("
-                    << detail::get_action_name<Derived>()
-                    << ") lva(" << reinterpret_cast<void const*>
-                        (get_lva<Component>::call(lva)) << "): " << e.what();
+                if (e.get_error() != hpx::thread_interrupted) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << "): " << e.what();
 
-                // report this error to the console in any case
-                hpx::report_error(boost::current_exception());
+                    // report this error to the console in any case
+                    hpx::report_error(boost::current_exception());
+                }
             }
             return threads::terminated;
         }
@@ -478,14 +480,16 @@ namespace hpx { namespace actions
                 (get_lva<Component>::call(lva)->*F)();      // just call the function
             }
             catch (hpx::exception const& e) {
-                LTM_(error)
-                    << "Unhandled exception while executing component action("
-                    << detail::get_action_name<Derived>()
-                    << ") lva(" << reinterpret_cast<void const*>
-                        (get_lva<Component>::call(lva)) << "): " << e.what();
+                if (e.get_error() != hpx::thread_interrupted) {
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << "): " << e.what();
 
-                // report this error to the console in any case
-                hpx::report_error(boost::current_exception());
+                    // report this error to the console in any case
+                    hpx::report_error(boost::current_exception());
+                }
             }
             return threads::terminated;
         }

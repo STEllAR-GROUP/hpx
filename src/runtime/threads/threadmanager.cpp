@@ -525,6 +525,128 @@ namespace hpx { namespace threads
             thrd->set_lco_description(desc);
     }
 
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    bool threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        get_interruption_enabled(thread_id_type id, error_code& ec)
+    {
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROW_EXCEPTION(null_thread_id,
+                "threadmanager_impl::get_interruption_enabled",
+                "NULL thread id encountered");
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        // we know that the id is actually the pointer to the thread
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        return thrd->get() ? thrd->interruption_enabled() : false;
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        set_interruption_enabled(thread_id_type id, bool enable, error_code& ec)
+    {
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROW_EXCEPTION(null_thread_id,
+                "threadmanager_impl::set_interruption_enabled",
+                "NULL thread id encountered");
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        // we know that the id is actually the pointer to the thread
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        if (thrd->get())
+            thrd->set_interruption_enabled(enable);
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    bool threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        get_interruption_requested(thread_id_type id, error_code& ec)
+    {
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
+                "threadmanager_impl::get_interruption_requested",
+                "NULL thread id encountered");
+            return false;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        // we know that the id is actually the pointer to the thread
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        return thrd->get() ? thrd->interruption_requested() : false;
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        interrupt(thread_id_type id, error_code& ec)
+    {
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
+                "threadmanager_impl::interrupt",
+                "NULL thread id encountered");
+            return;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        // we know that the id is actually the pointer to the thread
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        if (thrd->get()) {
+            thrd->interrupt();      // notify thread
+
+            // set thread state to pending, if the thread is currently active,
+            // this will be rescheduled until it calls an interruption point
+            set_thread_state(id, pending, wait_abort,
+                thread_priority_normal, ec);
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+    run_thread_exit_callbacks(thread_id_type id, error_code& ec)
+    {
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
+                "threadmanager_impl::interrupt",
+                "NULL thread id encountered");
+            return;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        if (thrd)
+            thrd->run_thread_exit_callbacks();
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    bool threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+    add_thread_exit_callback(thread_id_type id, HPX_STD_FUNCTION<void()> const& f,
+        error_code& ec)
+    {
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
+                "threadmanager_impl::interrupt",
+                "NULL thread id encountered");
+            return false;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        return (0 != thrd) ? thrd->add_thread_exit_callback(f) : false;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     /// This thread function is used by the at_timer thread below to trigger
     /// the required action.
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -538,11 +660,13 @@ namespace hpx { namespace threads
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::wake_timer_thread",
                 "NULL thread id encountered (id)");
+            return terminated;
         }
         if (HPX_UNLIKELY(!timer_id)) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::wake_timer_thread",
                 "NULL thread id encountered (timer_id)");
+            return terminated;
         }
 
         bool oldvalue = false;
@@ -571,6 +695,7 @@ namespace hpx { namespace threads
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::at_timer",
                 "NULL thread id encountered");
+            return terminated;
         }
 
         // create a new thread in suspended state, which will execute the
@@ -678,6 +803,7 @@ namespace hpx { namespace threads
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::get_thread_gid",
                 "NULL thread id encountered");
+            return naming::invalid_id;
         }
 
         // we know that the id is actually the pointer to the thread

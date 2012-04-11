@@ -72,6 +72,7 @@ namespace hpx
         task_already_started = 38,
         thread_resource_error = 39,
         thread_interrupted = 40,
+        thread_not_interruptable = 41,
         last_error,
 
         // force this enum type to be at least 16 bits.
@@ -121,6 +122,7 @@ namespace hpx
         "task_already_started",
         "thread_resource_error",
         "thread_interrupted",
+        "thread_not_interruptable",
         ""
     };
 

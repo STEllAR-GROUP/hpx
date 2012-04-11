@@ -14,6 +14,7 @@
 #include <hpx/util/unlock_lock.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/lcos/base_lco.hpp>
@@ -69,6 +70,23 @@ namespace hpx { namespace lcos { namespace server
             boost::intrusive::cache_last<true>,
             boost::intrusive::constant_time_size<false>
         > thread_queue_type;
+
+        struct reset_queue_entry
+        {
+            reset_queue_entry(queue_thread_entry& e, thread_queue_type& q)
+              : e_(e), q_(q), last_(q.last())
+            {}
+
+            ~reset_queue_entry()
+            {
+                if (e_.id_)
+                    q_.erase(last_);     // remove entry from queue
+            }
+
+            queue_thread_entry& e_;
+            thread_queue_type& q_;
+            typename thread_queue_type::const_iterator last_;
+        };
 
         // queue holding the values to process
         struct queue_value_entry
@@ -202,27 +220,15 @@ namespace hpx { namespace lcos { namespace server
             if (value_queue_.empty()) {
                 // suspend this thread until a new value is placed into the
                 // value queue
-                threads::thread_id_type id = self.get_thread_id();
-
-                queue_thread_entry e (id);
+                queue_thread_entry e(self.get_thread_id());
                 thread_queue_.push_back(e);
-                typename thread_queue_type::const_iterator last = thread_queue_.last();
 
+                reset_queue_entry r(e, thread_queue_);
                 {
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                    threads::thread_state_ex_enum statex = self.yield(threads::suspended);
-                    if (statex == threads::wait_abort) {
-                        hpx::util::osstream strm;
-                        strm << "thread(" << id << ", " << threads::get_thread_description(id)
-                             << ") aborted (yield returned wait_abort)";
-                        HPX_THROW_EXCEPTION(yield_aborted, "queue::get_value",
-                            hpx::util::osstream_get_string(strm));
-                        return ValueType();
-                    }
+                    threads::this_thread::suspend(threads::suspended,
+                        "queue::get_value");
                 }
-
-                if (e.id_)
-                    thread_queue_.erase(last);     // remove entry from queue
             }
 
             // get the first value from the value queue and return it to the

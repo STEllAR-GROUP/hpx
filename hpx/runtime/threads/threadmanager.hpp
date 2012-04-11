@@ -274,6 +274,67 @@ namespace hpx { namespace threads
             thread_state_enum initial_state = pending,
             bool run_now = true, error_code& ec = throws) = 0;
 
+        /// The get_interruption_enabled function is part of the thread related
+        /// API. It queries whether of one of the threads known can be
+        /// interrupted.
+        ///
+        /// \param id       [in] The thread id of the thread to query.
+        ///
+        /// \returns        This function returns whether the thread referenced
+        ///                 by the \a id parameter can be interrupted. If the
+        ///                 thread is not known to the thread-manager the return
+        ///                 value will be false.
+        virtual bool get_interruption_enabled(thread_id_type id,
+            error_code& ec = throws) = 0;
+
+        /// The set_interruption_enabled function is part of the thread related
+        /// API. It sets whether of one of the threads known can be
+        /// interrupted.
+        ///
+        /// \param id       [in] The thread id of the thread to query.
+        virtual void set_interruption_enabled(thread_id_type id, bool enable,
+            error_code& ec = throws) = 0;
+
+        /// The get_interruption_requested function is part of the thread related
+        /// API. It queries whether of one of the threads known has been
+        /// interrupted.
+        ///
+        /// \param id       [in] The thread id of the thread to query.
+        ///
+        /// \returns        This function returns whether the thread referenced
+        ///                 by the \a id parameter has been interrupted. If the
+        ///                 thread is not known to the thread-manager the return
+        ///                 value will be false.
+        virtual bool get_interruption_requested(thread_id_type id,
+            error_code& ec = throws) = 0;
+
+        /// The interrupt function is part of the thread related API. It
+        /// queries notifies one of the threads to abort at the next
+        /// interruption point.
+        ///
+        /// \param id       [in] The thread id of the thread to interrupt.
+        virtual void interrupt(thread_id_type id, error_code& ec = throws) = 0;
+
+        /// The run_thread_exit_callbacks function is part of the thread related
+        /// API. It runs all exit functions for one of the threads.
+        ///
+        /// \param id       [in] The thread id of the thread to interrupt.
+        virtual void run_thread_exit_callbacks(thread_id_type id,
+            error_code& ec = throws) = 0;
+
+        /// The add_thread_exit_callback function is part of the thread related
+        /// API. It adds a callback function to be executed at thread exit.
+        ///
+        /// \param id       [in] The thread id of the thread to interrupt.
+        ///
+        /// \returns        This function returns whether the function has been
+        ///                 added to the referenced thread
+        ///                 by the \a id parameter has been interrupted. If the
+        ///                 thread is not known to the thread-manager the return
+        ///                 value will be false.
+        virtual bool add_thread_exit_callback(thread_id_type id,
+            HPX_STD_FUNCTION<void()> const& f, error_code& ec = throws) = 0;
+
         /// this notifies the thread manager that there is some more work
         /// available
         virtual void do_some_work(std::size_t num_thread = std::size_t(-1)) = 0;
@@ -407,7 +468,73 @@ namespace hpx { namespace threads
         ///               \a false.
         bool run(std::size_t num_threads = 1);
 
-        /// \brief Forcefully stop the threadmanager
+        /// The get_interruption_enabled function is part of the thread related
+        /// API. It queries whether of one of the threads known can be
+        /// interrupted.
+        ///
+        /// \param id       [in] The thread id of the thread to query.
+        ///
+        /// \returns        This function returns whether the thread referenced
+        ///                 by the \a id parameter can be interrupted. If the
+        ///                 thread is not known to the thread-manager the return
+        ///                 value will be false.
+        bool get_interruption_enabled(thread_id_type id,
+            error_code& ec = throws);
+
+        /// The set_interruption_enabled function is part of the thread related
+        /// API. It sets whether of one of the threads known can be
+        /// interrupted.
+        ///
+        /// \param id       [in] The thread id of the thread to query.
+        void set_interruption_enabled(thread_id_type id, bool enable,
+            error_code& ec = throws);
+
+        /// The get_interruption_requested function is part of the thread related
+        /// API. It queries whether of one of the threads known has been
+        /// interrupted.
+        ///
+        /// \param id       [in] The thread id of the thread to query.
+        ///
+        /// \returns        This function returns whether the thread referenced
+        ///                 by the \a id parameter has been interrupted. If the
+        ///                 thread is not known to the thread-manager the return
+        ///                 value will be false.
+        bool get_interruption_requested(thread_id_type id,
+            error_code& ec = throws);
+
+        /// The interrupt function is part of the thread related API. It
+        /// queries notifies one of the threads to abort at the next
+        /// interruption point.
+        ///
+        /// \param id       [in] The thread id of the thread to interrupt.
+        ///
+        /// \returns        This function returns whether the thread referenced
+        ///                 by the \a id parameter has been interrupted. If the
+        ///                 thread is not known to the thread-manager the return
+        ///                 value will be false.
+        void interrupt(thread_id_type id, error_code& ec = throws);
+
+        /// The run_thread_exit_callbacks function is part of the thread related
+        /// API. It runs all exit functions for one of the threads.
+        ///
+        /// \param id       [in] The thread id of the thread to interrupt.
+        void run_thread_exit_callbacks(thread_id_type id,
+            error_code& ec = throws);
+
+        /// The add_thread_exit_callback function is part of the thread related
+        /// API. It adds a callback function to be executed at thread exit.
+        ///
+        /// \param id       [in] The thread id of the thread to interrupt.
+        ///
+        /// \returns        This function returns whether the function has been
+        ///                 added to the referenced thread
+        ///                 by the \a id parameter has been interrupted. If the
+        ///                 thread is not known to the thread-manager the return
+        ///                 value will be false.
+        bool add_thread_exit_callback(thread_id_type id,
+            HPX_STD_FUNCTION<void()> const& f, error_code& ec = throws);
+
+        /// \brief Forcefully stop the thread-manager
         ///
         /// \param blocking
         ///

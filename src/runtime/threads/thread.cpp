@@ -50,8 +50,20 @@ namespace hpx { namespace threads
         std::swap(id_, rhs.id_);
     }
 
-    static thread_state_enum
-    thread_function_nullary(HPX_STD_FUNCTION<void()> const& func, thread* t)
+    static void run_thread_exit_callbacks()
+    {
+        threads::thread_self& self = threads::get_self();
+        thread_id_type id = self.get_thread_id();
+        if (id == invalid_thread_id) {
+            HPX_THROW_EXCEPTION(null_thread_id,
+                "run_thread_exit_callbacks",
+                "NULL thread id encountered");
+        }
+        threads::run_thread_exit_callbacks(id);
+    }
+
+    thread_state_enum thread::thread_function_nullary(
+        HPX_STD_FUNCTION<void()> const& func)
     {
         try {
             func();
@@ -61,10 +73,8 @@ namespace hpx { namespace threads
                 throw;    // rethrow any exception except 'thread_interrupted'
         }
 
-//        run_thread_exit_callbacks();
-
-        // make sure our thread object knows that we're gone
-        t->detach();
+        // run all callbacks attached to the exit event for this thread
+        run_thread_exit_callbacks();
         return terminated;
     }
 
@@ -76,8 +86,8 @@ namespace hpx { namespace threads
     void thread::start_thread(BOOST_RV_REF(HPX_STD_FUNCTION<void()>) func)
     {
         threads::thread_init_data data(
-            HPX_STD_BIND(&thread_function_nullary, boost::move(func), this),
-            "<unknown>");
+            HPX_STD_BIND(&thread::thread_function_nullary, boost::move(func)),
+            "thread::thread_function_nullary");
 
         error_code ec;
         thread_id_type id = hpx::get_runtime().get_thread_manager().
@@ -99,6 +109,11 @@ namespace hpx { namespace threads
         id_ = id;
     }
 
+    static void resume_thread(thread_id_type id)
+    {
+        threads::set_thread_state(id, pending);
+    }
+
     void thread::join()
     {
         if (this_thread::get_id() == get_id())
@@ -108,23 +123,30 @@ namespace hpx { namespace threads
             return;
         }
 
-        // wait for thread to be terminated, suspend for 10ms
-        do {
-            native_handle_type id = native_handle();
-            if (id == invalid_thread_id || get_thread_state(id) == terminated)
-                break;
-            this_thread::suspend(boost::posix_time::milliseconds(10));
-        } while (true);
+        threads::this_thread::interruption_point();
+
+        native_handle_type id = native_handle();
+        if (id != invalid_thread_id)
+        {
+            // register callback function to be called when thread exits
+            if (threads::add_thread_exit_callback(id, HPX_STD_BIND(&resume_thread, id)))
+            {
+                // wait for thread to be terminated
+                this_thread::suspend();
+            }
+        }
+
+        detach();   // invalidate this object
     }
 
-    void thread::yield() BOOST_NOEXCEPT
+    void thread::interrupt()
     {
-        this_thread::yield();
+        threads::interrupt_thread(native_handle());
     }
 
-    void thread::sleep(boost::posix_time::ptime const& xt)
+    bool thread::interruption_requested() const
     {
-        this_thread::suspend(xt);
+        return threads::get_thread_interruption_requested(native_handle());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -139,6 +161,78 @@ namespace hpx { namespace threads
         {
             threads::thread_self& self = threads::get_self();
             return thread::id(self.get_thread_id());
+        }
+
+        // extensions
+        void interruption_point()
+        {
+            if (interruption_enabled() && interruption_requested())
+            {
+                throw hpx::exception(thread_interrupted,
+                    "hpx::threads::this_thread::interruption_point: "
+                    "thread aborts itself due to requested thread interruption");
+            }
+        }
+
+        bool interruption_enabled()
+        {
+            threads::thread_self& self = threads::get_self();
+            return threads::get_thread_interruption_enabled(self.get_thread_id());
+        }
+
+        bool interruption_requested()
+        {
+            threads::thread_self& self = threads::get_self();
+            return threads::get_thread_interruption_requested(self.get_thread_id());
+        }
+
+        void sleep_until(boost::posix_time::ptime const& at)
+        {
+            threads::this_thread::suspend(at);
+        }
+
+        void sleep_for(boost::posix_time::time_duration const& p)
+        {
+            threads::this_thread::suspend(p);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        disable_interruption::disable_interruption()
+          : interruption_was_enabled_(interruption_enabled())
+        {
+            if (interruption_was_enabled_) {
+                threads::thread_self& self = threads::get_self();
+                threads::set_thread_interruption_enabled(self.get_thread_id(), false);
+            }
+        }
+
+        disable_interruption::~disable_interruption()
+        {
+            threads::thread_self* p = threads::get_self_ptr();
+            if (p) {
+                threads::set_thread_interruption_enabled(p->get_thread_id(),
+                    interruption_was_enabled_);
+            }
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        restore_interruption::restore_interruption(disable_interruption& d)
+        {
+            if (d.interruption_was_enabled_)
+            {
+                threads::thread_self& self = threads::get_self();
+                threads::set_thread_interruption_enabled(
+                    self.get_thread_id(), true);
+            }
+        }
+
+        restore_interruption::~restore_interruption()
+        {
+            threads::thread_self* p = threads::get_self_ptr();
+            if (p) {
+                threads::set_thread_interruption_enabled(
+                    p->get_thread_id(), false);
+            }
         }
     }
 }}

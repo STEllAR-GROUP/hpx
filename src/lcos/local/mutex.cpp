@@ -48,9 +48,6 @@ namespace hpx { namespace lcos { namespace local
 
     bool mutex::wait_for_single_object(::boost::system_time const& wait_until)
     {
-        threads::thread_self& self = threads::get_self();
-        threads::thread_id_type id = self.get_thread_id();
-
         // enqueue this thread
         mutex_type::scoped_lock l(mtx_);
         if (pending_events_) {
@@ -58,41 +55,28 @@ namespace hpx { namespace lcos { namespace local
             return false;
         }
 
-        threads::set_thread_lco_description(id, description_);
-
-        queue_entry e(id);
+        threads::thread_self& self = threads::get_self();
+        queue_entry e(self.get_thread_id());
         queue_.push_back(e);
 
-        queue_type::const_iterator last = queue_.last();
         bool result = false;
         threads::thread_state_ex_enum statex;
+
+        reset_queue_entry r(e, queue_);
 
         {
             util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
 
             // timeout at the given time, if appropriate
             if (!wait_until.is_not_a_date_time())
-                threads::set_thread_state(id, wait_until);
+                threads::set_thread_state(self.get_thread_id(), wait_until);
 
             // if this timed out, return true
-            statex = self.yield(threads::suspended);
+            statex = threads::this_thread::suspend(threads::suspended,
+                description_);
         }
 
-        if (e.id_)
-            queue_.erase(last);     // remove entry from queue
-
-        result = threads::wait_timeout == statex;
-        if (statex == threads::wait_abort) {
-            hpx::util::osstream strm;
-            strm << "thread(" << id << ", "
-                << threads::get_thread_description(id)
-                << ") aborted (yield returned wait_abort)";
-            HPX_THROW_EXCEPTION(yield_aborted,
-                "lcos::local::mutex::wait_for_single_object",
-                hpx::util::osstream_get_string(strm));
-            return result;
-        }
-        return result;
+        return (threads::wait_timeout == statex) ? true : false;
     }
 
     void mutex::set_event()

@@ -37,7 +37,7 @@ namespace hpx { namespace threads
         explicit thread(BOOST_FWD_REF(F) f)
           : id_(invalid_thread_id)
         {
-            start_thread(boost::forward<F>(f));
+            start_thread(HPX_STD_FUNCTION<void()>(boost::forward<F>(f)));
         }
 
 // #if !defined(BOOST_NO_VARIADIC_TEMPLATES)
@@ -97,12 +97,14 @@ namespace hpx { namespace threads
             return boost::thread::hardware_concurrency();
         }
 
-        // compatibility with older boost thread interface
-        static void yield() BOOST_NOEXCEPT;
-        static void sleep(boost::posix_time::ptime const& xt);
+        // extensions
+        void interrupt();
+        bool interruption_requested() const;
 
     private:
         void start_thread(BOOST_RV_REF(HPX_STD_FUNCTION<void()>) func);
+        static thread_state_enum thread_function_nullary(
+            HPX_STD_FUNCTION<void()> const& func);
 
         mutable mutex_type mtx_;
         native_handle_type id_;
@@ -179,9 +181,9 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     namespace this_thread
     {
-        HPX_EXPORT thread::id get_id() BOOST_NOEXCEPT;
+        HPX_API_EXPORT thread::id get_id() BOOST_NOEXCEPT;
 
-        HPX_EXPORT void yield() BOOST_NOEXCEPT;
+        HPX_API_EXPORT void yield() BOOST_NOEXCEPT;
 
         template <typename Clock, typename Duration>
         void sleep_until(boost::chrono::time_point<Clock, Duration> const& at)
@@ -194,6 +196,39 @@ namespace hpx { namespace threads
         {
             threads::this_thread::suspend(util::to_time_duration(p));
         }
+
+        // extensions
+        void HPX_API_EXPORT interruption_point();
+        bool HPX_API_EXPORT interruption_enabled();
+        bool HPX_API_EXPORT interruption_requested();
+
+        void HPX_API_EXPORT sleep_until(boost::posix_time::ptime const& at);
+        void HPX_API_EXPORT sleep_for(boost::posix_time::time_duration const& p);
+
+        class HPX_EXPORT disable_interruption
+        {
+        private:
+            disable_interruption(disable_interruption const&);
+            disable_interruption& operator=(disable_interruption const&);
+
+            bool interruption_was_enabled_;
+            friend class restore_interruption;
+
+        public:
+            disable_interruption();
+            ~disable_interruption();
+        };
+
+        class HPX_EXPORT restore_interruption
+        {
+        private:
+            restore_interruption(restore_interruption const&);
+            restore_interruption& operator=(restore_interruption const&);
+
+        public:
+            explicit restore_interruption(disable_interruption& d);
+            ~restore_interruption();
+        };
     }
 }}
 

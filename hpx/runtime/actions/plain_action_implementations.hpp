@@ -128,13 +128,15 @@ namespace hpx { namespace actions
                     F(BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
                 }
                 catch (hpx::exception const& e) {
-                    LTM_(error)
-                        << "Unhandled exception while executing plain action("
-                        << detail::get_action_name<Derived>()
-                        << "): " << e.what();
+                    if (e.get_error() != hpx::thread_interrupted) {
+                        LTM_(error)
+                            << "Unhandled exception while executing plain action("
+                            << detail::get_action_name<Derived>()
+                            << "): " << e.what();
 
-                    // report this error to the console in any case
-                    hpx::report_error(boost::current_exception());
+                        // report this error to the console in any case
+                        hpx::report_error(boost::current_exception());
+                    }
                 }
                 return threads::terminated;
             }
@@ -522,13 +524,15 @@ namespace hpx { namespace actions
                     F(BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _));
                 }
                 catch (hpx::exception const& e) {
-                    LTM_(error)
-                        << "Unhandled exception while executing plain action("
-                        << detail::get_action_name<Derived>()
-                        << "): " << e.what();
+                    if (e.get_error() != hpx::thread_interrupted) {
+                        LTM_(error)
+                            << "Unhandled exception while executing plain action("
+                            << detail::get_action_name<Derived>()
+                            << "): " << e.what();
 
-                    // report this error to the console in any case
-                    hpx::report_error(boost::current_exception());
+                        // report this error to the console in any case
+                        hpx::report_error(boost::current_exception());
+                    }
                 }
                 return threads::terminated;
             }

@@ -61,32 +61,16 @@ namespace hpx { namespace lcos { namespace local
             // we need to get the self anew for each round as it might
             // get executed in a different thread from the previous one
             threads::thread_self& self = threads::get_self();
-            threads::thread_id_type id = self.get_thread_id();
 
-            threads::set_thread_lco_description(id, "lcos::counting_semaphore");
-
-            queue_entry e(id);
+            queue_entry e(self.get_thread_id());
             queue_.push_back(e);
-            queue_type::const_iterator last = queue_.last();
-            threads::thread_state_ex_enum statex;
+
+            reset_queue_entry r(e, queue_);
 
             {
                 util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                statex = self.yield(threads::suspended);
-            }
-
-            if (e.id_)
-                queue_.erase(last);     // remove entry from queue
-
-            if (statex == threads::wait_abort) {
-                hpx::util::osstream strm;
-                strm << "thread(" << id << ", "
-                     << threads::get_thread_description(id)
-                     << ") aborted (yield returned wait_abort)";
-                HPX_THROW_EXCEPTION(yield_aborted,
-                    "lcos::counting_semaphore::wait",
-                    hpx::util::osstream_get_string(strm));
-                return;
+                threads::this_thread::suspend(threads::suspended,
+                    "lcos::counting_semaphore::wait");
             }
         }
 

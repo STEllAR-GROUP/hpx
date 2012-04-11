@@ -11,6 +11,8 @@
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/assign/std/vector.hpp>
+
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 
@@ -140,7 +142,12 @@ int main(int argc, char* argv[])
     // Configure application-specific options
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
+    // we force this test to use several (4) threads
+    using namespace boost::assign;
+    std::vector<std::string> cfg;
+    cfg += "hpx.os_threads=4";
+
     // Initialize and run HPX
-    return hpx::init(cmdline, argc, argv);
+    return hpx::init(cmdline, argc, argv, cfg);
 }
 

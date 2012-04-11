@@ -60,6 +60,44 @@ namespace hpx { namespace threads { namespace detail
             pt->pool_->detail_pool_.deallocate(pt);
         }
     }
+
+    void thread_data::run_thread_exit_callbacks()
+    {
+        thread_mutex_type::scoped_lock l(this);
+        while (exit_funcs_)
+        {
+            thread_exit_callback_node* const current_node = exit_funcs_;
+            exit_funcs_ = current_node->next_;
+            if (!current_node->f_.empty())
+            {
+                (current_node->f_)();
+            }
+            delete current_node;
+        }
+    }
+
+    bool thread_data::add_thread_exit_callback(HPX_STD_FUNCTION<void()> const& f)
+    {
+        thread_mutex_type::scoped_lock l(this);
+        if (get_state() == terminated)
+            return false;
+
+        thread_exit_callback_node* new_node =
+            new thread_exit_callback_node(f, exit_funcs_);
+        exit_funcs_ = new_node;
+        return true;
+    }
+
+    void thread_data::free_thread_exit_callbacks()
+    {
+        thread_mutex_type::scoped_lock l(this);
+        while (exit_funcs_)
+        {
+            thread_exit_callback_node* const current_node = exit_funcs_;
+            exit_funcs_ = current_node->next_;
+            delete current_node;
+        }
+    }
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////

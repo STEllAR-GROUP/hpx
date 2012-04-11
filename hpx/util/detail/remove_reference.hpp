@@ -26,7 +26,6 @@ namespace hpx { namespace util {
         };
 #else
         using std::remove_reference;
-
 #endif
     }
 }}

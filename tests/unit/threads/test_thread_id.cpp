@@ -8,6 +8,8 @@
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/assign/std/vector.hpp>
+
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 
@@ -141,7 +143,7 @@ void get_thread_id(hpx::threads::thread::id* id)
 void test_thread_id_of_running_thread_returned_by_this_thread_get_id()
 {
     hpx::threads::thread::id id;
-    hpx::threads::thread t(HPX_STD_BIND(get_thread_id, &id));
+    hpx::threads::thread t(HPX_STD_BIND(&get_thread_id, &id));
     hpx::threads::thread::id t_id = t.get_id();
     t.join();
     HPX_TEST_EQ(id, t_id);
@@ -168,7 +170,12 @@ int main(int argc, char* argv[])
     // Configure application-specific options
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
+    // we force this test to use several (4) threads
+    using namespace boost::assign;
+    std::vector<std::string> cfg;
+    cfg += "hpx.os_threads=4";
+
     // Initialize and run HPX
-    return hpx::init(cmdline, argc, argv);
+    return hpx::init(cmdline, argc, argv, cfg);
 }
 
