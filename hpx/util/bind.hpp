@@ -451,32 +451,6 @@ namespace hpx { namespace util {
             (f, BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_PARAMS, A));
     }
 
-#ifdef BOOST_MSVC
-    template <
-        typename R
-      , BOOST_PP_ENUM_PARAMS(N, typename T)
-      , BOOST_PP_ENUM_PARAMS(N, typename A)
-    >
-    BOOST_PP_CAT(detail::bound_function, N)<
-        R
-      , BOOST_PP_ENUM_PARAMS(N, T)
-      , BOOST_PP_ENUM(N, HPX_UTIL_BIND_REMOVE_REFERENCE, A)
-    >
-    bind(
-        R(__cdecl *f)(BOOST_PP_ENUM_PARAMS(N, T))
-      , BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_REF_PARAMS, _)
-    )
-    {
-        return
-            BOOST_PP_CAT(detail::bound_function, N)<
-                R
-              , BOOST_PP_ENUM_PARAMS(N, T)
-              , BOOST_PP_ENUM(N, HPX_UTIL_BIND_REMOVE_REFERENCE, A)
-            >
-            (f, BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_PARAMS, A));
-    }
-#endif
-
     ///////////////////////////////////////////////////////////////////////////
     // member function pointers
     namespace detail
