@@ -132,7 +132,7 @@ namespace hpx { namespace threads
 
     public:
         id() BOOST_NOEXCEPT : id_(invalid_thread_id) {}
-        explicit id(thread_id_type id) BOOST_NOEXCEPT : id_(id) {}
+        explicit id(thread_id_type i) BOOST_NOEXCEPT : id_(i) {}
     };
 
     inline bool operator== (thread::id x, thread::id y) BOOST_NOEXCEPT
@@ -203,21 +203,19 @@ namespace hpx { namespace threads
 #define N BOOST_PP_ITERATION()
 
 #define HPX_FWD_ARGS(z, n, _)                                                 \
-        BOOST_PP_COMMA_IF(n)                                                  \
             BOOST_FWD_REF(BOOST_PP_CAT(Arg, n)) BOOST_PP_CAT(arg, n)          \
     /**/
 
 #define HPX_FORWARD_ARGS(z, n, _)                                             \
-        BOOST_PP_COMMA_IF(n)                                                  \
             boost::forward<BOOST_PP_CAT(Arg, n)>(BOOST_PP_CAT(arg, n))        \
     /**/
 
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    thread(BOOST_FWD_REF(F) f, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+    thread(BOOST_FWD_REF(F) f, BOOST_PP_ENUM(N, HPX_FWD_ARGS, _))
       : id_(invalid_thread_id)
     {
         start_thread(HPX_STD_BIND(boost::forward<F>(f),
-            BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)));
+            BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _)));
     }
 
 #undef HPX_FORWARD_ARGS
