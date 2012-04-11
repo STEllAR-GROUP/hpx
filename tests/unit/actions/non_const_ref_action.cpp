@@ -90,7 +90,7 @@ int hpx_main(variables_map& vm)
         //async<non_const_ref_void_direct_action>(id, boost::move(i)).get();
         // Not possible (passing a rvalue directly to a non const lvalue ref)
         //async<non_const_ref_void_direct_action>(id, 9).get();
-        
+
         HPX_TEST_EQ(async<non_const_ref_result_action>(id, i).get(), i);
         HPX_TEST_EQ(async<non_const_ref_result_action>(id, boost::move(i)).get(), i);
         HPX_TEST_EQ(async<non_const_ref_result_action>(id, 9).get(), 9);
@@ -100,7 +100,7 @@ int hpx_main(variables_map& vm)
         // Not possible (passing a rvalue directly to a non const lvalue ref)
         //HPX_TEST_EQ(async<non_const_ref_void_direct_action>(id, 9).get(), 9);
         */
-        
+
         // testing component actions
         /*
         using hpx::test::server::non_const_ref_component;
@@ -112,7 +112,7 @@ int hpx_main(variables_map& vm)
         //async<non_const_ref_component::non_const_ref_void_direct_action>(id, boost::move(i)).get();
         // Not possible (passing a rvalue directly to a non const lvalue ref)
         //async<non_const_ref_component::non_const_ref_void_direct_action>(id, 9).get();
-        
+
         HPX_TEST_EQ(async<non_const_ref_component::non_const_ref_result_action>(id, i).get(), i);
         HPX_TEST_EQ(async<non_const_ref_component::non_const_ref_result_action>(id, boost::move(i)).get(), i);
         HPX_TEST_EQ(async<non_const_ref_component::non_const_ref_result_action>(id, 9).get(), 9);
@@ -135,13 +135,13 @@ int main(int argc, char* argv[])
     // Configure application-specific options.
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
-    
+
     // we need to explicitly enable the test components used by this test
     using namespace boost::assign;
     std::vector<std::string> cfg;
     cfg += "hpx.components.test_non_const_ref_component.enabled = 1";
 
     // Initialize and run HPX.
-    return init(desc_commandline, argc, argv);
+    return init(desc_commandline, argc, argv, cfg);
 }
 
