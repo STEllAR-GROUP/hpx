@@ -9,6 +9,7 @@ set(tests
     test_thread
     test_thread_id
     test_thread_launching
+    test_thread_mf
    )
 
 foreach(test ${tests})
