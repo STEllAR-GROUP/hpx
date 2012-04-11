@@ -109,7 +109,7 @@ namespace hpx { namespace performance_counters
         }
 
         if (!path.parameters_.empty()) {
-            result += "#";
+            result += "@";
             result += path.parameters_;
         }
 
@@ -233,8 +233,8 @@ namespace hpx { namespace performance_counters
           : path_parser::base_type(start)
         {
           start = -qi::lit(counter_prefix)
-                >> '/' >> +~qi::char_("/{#") >> -instance
-                >> -('/' >>  +~qi::char_("#}")) >> -('#' >> +qi::char_);
+                >> '/' >> +~qi::char_("/{#@") >> -instance
+                >> -('/' >>  +~qi::char_("#}@")) >> -('@' >> +qi::char_);
             instance = '{' >> parent >> -('/' >> child) >> '}';
             parent =
                     &qi::lit('/') >> qi::raw[start] >> qi::attr(-1) >> qi::attr(true)  // base counter
