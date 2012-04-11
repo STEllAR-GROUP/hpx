@@ -13,7 +13,7 @@
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
-#include <boost/chrono.hpp>
+#include <boost/chrono/chrono.hpp>
 #include <boost/move/move.hpp>
 #include <boost/thread/thread.hpp>
 
