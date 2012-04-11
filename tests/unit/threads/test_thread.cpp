@@ -31,7 +31,7 @@ inline bool in_range(boost::posix_time::ptime const& xt, int secs = 1)
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename F>
-void timed_test(F func, int secs)
+void timed_test(F func, int /*secs*/)
 {
     hpx::threads::thread thrd(func);
     thrd.join();
@@ -162,13 +162,11 @@ struct non_copyable_functor:
 
 void do_test_creation_through_reference_wrapper()
 {
-#if 0
     non_copyable_functor f;
 
     hpx::threads::thread thrd(boost::ref(f));
     thrd.join();
     HPX_TEST_EQ(f.value, 999u);
-#endif
 }
 
 void test_creation_through_reference_wrapper()
@@ -245,7 +243,7 @@ void test_swap()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(variables_map& vm)
+int hpx_main(variables_map&)
 {
     {
         test_sleep();

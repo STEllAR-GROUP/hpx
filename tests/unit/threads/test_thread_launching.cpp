@@ -158,14 +158,16 @@ int callable_multiple_arg::called_three_arg3;
 void test_thread_callable_object_multiple_arguments()
 {
     std::vector<int> x;
-    for(unsigned i = 0; i < 7; ++i)
+    for(int i = 0; i < 7; ++i)
     {
         x.push_back(i*i);
     }
 
     callable_multiple_arg func;
 
-    hpx::threads::thread callable3(func, "hello", x, 1.2);
+    // FIXME? char array not automatically decayed to pointer inside bind ...
+    //hpx::threads::thread callable3(func, "hello", x, 1.2);
+    hpx::threads::thread callable3(func, std::string("hello"), x, 1.2);
     callable3.join();
     HPX_TEST(callable_multiple_arg::called_three);
     HPX_TEST_EQ(callable_multiple_arg::called_three_arg1, "hello");
@@ -182,8 +184,8 @@ void test_thread_callable_object_multiple_arguments()
     hpx::threads::thread callable2(func, 19, dbl);
     callable2.join();
     HPX_TEST(callable_multiple_arg::called_two);
-    HPX_TEST_EQ(callable_multiple_arg::called_two_arg1, 19);
-    HPX_TEST_EQ(callable_multiple_arg::called_two_arg2, dbl);
+    HPX_TEST_LT(std::abs(callable_multiple_arg::called_two_arg1 - 19.), 1e-16);
+    HPX_TEST_LT(std::abs(callable_multiple_arg::called_two_arg2 - dbl), 1e-16);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -227,7 +229,7 @@ void test_thread_member_function_one_argument()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(variables_map& vm)
+int hpx_main(variables_map&)
 {
     {
         test_thread_function_no_arguments();

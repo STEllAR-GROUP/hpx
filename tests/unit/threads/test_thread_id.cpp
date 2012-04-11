@@ -148,7 +148,7 @@ void test_thread_id_of_running_thread_returned_by_this_thread_get_id()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(variables_map& vm)
+int hpx_main(variables_map&)
 {
     {
         test_thread_id_for_default_constructed_thread_is_default_constructed_id();

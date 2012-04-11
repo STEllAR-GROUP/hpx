@@ -758,12 +758,12 @@ namespace hpx { namespace util {
 
             typedef typename F::result_type result_type;
 
-            template <BOOST_PP_ENUM_PARAMS(N, typename A)>
+            template <typename FF, BOOST_PP_ENUM_PARAMS(N, typename A)>
             BOOST_PP_CAT(bound_functor, N)(
-                BOOST_FWD_REF(F) f
+                BOOST_FWD_REF(FF) f_
               , BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_REF_PARAMS, _)
             )
-                : f(boost::forward<F>(f))
+                : f(boost::forward<FF>(f_))
                 , BOOST_PP_ENUM(N, HPX_UTIL_BIND_INIT_MEMBER, _)
             {}
 
@@ -839,7 +839,7 @@ namespace hpx { namespace util {
       , BOOST_PP_ENUM_PARAMS(N, typename A)
     >
     BOOST_PP_CAT(detail::bound_functor, N)<
-        F
+        typename detail::remove_reference<F>::type
       , BOOST_PP_ENUM(N, HPX_UTIL_BIND_REMOVE_REFERENCE, A)
     >
     bind(
@@ -849,7 +849,7 @@ namespace hpx { namespace util {
     {
         return
             BOOST_PP_CAT(detail::bound_functor, N)<
-                F
+                typename detail::remove_reference<F>::type
               , BOOST_PP_ENUM(N, HPX_UTIL_BIND_REMOVE_REFERENCE, A)
             >(
                 boost::forward<F>(f)
