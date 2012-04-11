@@ -175,8 +175,8 @@ namespace hpx { namespace util {
             typedef R result_type;
             R(*f)();
 
-            bound_function0(R(*f)())
-                : f(f)
+            bound_function0(R(*f_)())
+                : f(f_)
             {}
 
             R operator()() const
@@ -241,8 +241,8 @@ namespace hpx { namespace util {
                 return *this;
             }
 
-            bound_functor0(BOOST_FWD_REF(F) f)
-                : f(f)
+            bound_functor0(BOOST_FWD_REF(F) f_)
+                : f(f_)
             {}
 
             result_type operator()() const
@@ -259,7 +259,7 @@ namespace hpx { namespace util {
                 HPX_UTIL_BIND_FUNCTOR_OPERATOR, ())
 
         private:
-            BOOST_COPYABLE_AND_MOVABLE(bound_functor0);
+            BOOST_COPYABLE_AND_MOVABLE(bound_functor0)
         };
 
         template <typename Env, typename F>
