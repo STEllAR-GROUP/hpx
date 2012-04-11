@@ -1216,7 +1216,7 @@ if(NOT HPX_NO_INSTALL)
           DESTINATION lib/pkgconfig)
 endif()
 
-if(${DOXYGEN_FOUND})
+if(DOXYGEN_FOUND)
   file(GLOB_RECURSE doxygen_inputs_list ${hpx_SOURCE_DIR}/hpx/*.hpp)
 
   set(doxygen_inputs "")
