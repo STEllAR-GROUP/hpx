@@ -106,10 +106,7 @@ void tree_boot(
   , boost::uint64_t thread
     );
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wredundant-decls"
 HPX_PLAIN_ACTION(tree_boot, tree_boot_action)
-#pragma GCC diagnostic push
 
 ///////////////////////////////////////////////////////////////////////////////
 void tree_boot(
