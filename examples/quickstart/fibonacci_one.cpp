@@ -5,7 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-// Naive SMP version implemented with futures.
+// Naive SMP version implemented with futures (but still a bit more
+// sophisticated than fibonacci.cpp).
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
@@ -36,15 +37,13 @@ boost::uint64_t fibonacci(boost::uint64_t n)
     // We restrict ourselves to execute the Fibonacci function locally.
     hpx::naming::id_type const locality_id = hpx::find_here();
 
-    // Invoking the Fibonacci algorithm twice is inefficient.
-    // However, we intentionally demonstrate it this way to create some
-    // heavy workload.
-    using hpx::lcos::future;
-    using hpx::lcos::async;
-    future<boost::uint64_t> n1 = async<fibonacci_action>(locality_id, n - 1);
-    future<boost::uint64_t> n2 = async<fibonacci_action>(locality_id, n - 2);
+    // Run one branch of the Fibonacci calculation on this thread, while the
+    // other branch is scheduled in a separate thread.
+    hpx::lcos::future<boost::uint64_t> n1 =
+        hpx::lcos::async<fibonacci_action>(locality_id, n - 1);
+    boost::uint64_t n2 = fibonacci(n-2);
 
-    return n1.get() + n2.get();   // wait for the Futures to return their values
+    return n1.get() + n2;   // wait for the Futures to return their values
 }
 //]
 

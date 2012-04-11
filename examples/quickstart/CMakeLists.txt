@@ -7,6 +7,7 @@
 set(example_programs
     factorial
     fibonacci
+    fibonacci_one
     interest_calculator
     non_atomic_rma
     quicksort
