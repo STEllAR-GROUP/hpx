@@ -47,6 +47,10 @@ typedef
 HPX_REGISTER_PLAIN_ACTION_DECLARATION(touch_mem_action);
 #endif
 
+#if !defined(BOOST_NOEXCEPT)
+#define BOOST_NOEXCEPT
+#endif
+
 namespace bright_future
 {
     template <typename T>
