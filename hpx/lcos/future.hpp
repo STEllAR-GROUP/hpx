@@ -21,6 +21,12 @@ namespace hpx { namespace lcos
         class promise;
     }
 
+    namespace detail
+    {
+        template <typename Result, typename RemoteResult>
+        class signalling_promise;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result, typename RemoteResult>
     class future
@@ -42,6 +48,9 @@ namespace hpx { namespace lcos
         friend class local::promise<Result>;
         friend class promise<Result, RemoteResult>;
         friend class threads::thread;
+
+        template <typename Result, typename RemoteResult>
+        friend class detail::signalling_promise;
 
     public:
 
@@ -141,6 +150,9 @@ namespace hpx { namespace lcos
         friend class local::promise<void>;
         friend class promise<void, util::unused_type>;
         friend class threads::thread;
+
+        template <typename Result, typename RemoteResult>
+        friend class detail::signalling_promise;
 
     public:
         typedef void result_type;

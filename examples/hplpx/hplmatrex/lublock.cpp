@@ -29,8 +29,8 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
 HPX_REGISTER_ACTION_EX(
     hpx::lcos::base_lco_with_value<
         std::vector<std::vector<double> >
-    >::set_result_action,
-    base_lco_with_value_set_result_vector_vector_double);
+    >::set_value_action,
+    base_lco_with_value_set_value_vector_vector_double);
 
 //Register the actions
 HPX_REGISTER_ACTION_EX(

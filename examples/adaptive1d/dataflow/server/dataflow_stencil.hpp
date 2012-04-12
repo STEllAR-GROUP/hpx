@@ -144,8 +144,8 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
     adaptive1d_dataflow_dataflow_stencil_execute_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    hpx::lcos::base_lco_with_value<boost::shared_ptr<std::vector<hpx::naming::id_type> > >::set_result_action,
-    adaptive1d_dataflow_set_result_action_gid_vector_ptr);
+    hpx::lcos::base_lco_with_value<boost::shared_ptr<std::vector<hpx::naming::id_type> > >::set_value_action,
+    adaptive1d_dataflow_set_value_action_gid_vector_ptr);
 
 
 #endif

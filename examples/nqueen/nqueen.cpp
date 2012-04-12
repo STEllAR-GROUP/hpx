@@ -54,8 +54,8 @@ HPX_REGISTER_ACTION_EX(
 HPX_DEFINE_GET_COMPONENT_TYPE(board_type::wrapped_type);
 
 HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<nqueen::list_type>::set_result_action,
-    set_result_action_vector_std_size_t);
+    hpx::lcos::base_lco_with_value<nqueen::list_type>::set_value_action,
+    set_value_action_vector_std_size_t);
 
 HPX_REGISTER_ACTION_EX(
     hpx::lcos::base_lco_with_value<nqueen::list_type>::get_value_action,

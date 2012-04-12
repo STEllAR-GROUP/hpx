@@ -199,11 +199,11 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
     performance_counter_stop_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    hpx::lcos::base_lco_with_value<hpx::performance_counters::counter_info>::set_result_action,
-    set_result_action_counter_info);
+    hpx::lcos::base_lco_with_value<hpx::performance_counters::counter_info>::set_value_action,
+    set_value_action_counter_info);
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    hpx::lcos::base_lco_with_value<hpx::performance_counters::counter_value>::set_result_action,
-    set_result_action_counter_value);
+    hpx::lcos::base_lco_with_value<hpx::performance_counters::counter_value>::set_value_action,
+    set_value_action_counter_value);
 
 #endif
 

@@ -100,9 +100,9 @@ namespace hpx { namespace lcos
             return (*this->impl_)->get_data(ec);
         }
 
-        void invalidate(boost::exception_ptr const& e)
+        void set_exception(boost::exception_ptr const& e)
         {
-            (*this->impl_)->set_error(e); // set the received error
+            (*this->impl_)->set_exception(e); // set the received error
         }
 
         /// The apply function starts the asynchronous operations encapsulated
@@ -150,8 +150,8 @@ namespace hpx { namespace lcos
         ///
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
-        ///               \a base_lco#set_result action. Any error has to be
-        ///               reported using a \a base_lco::set_error action. The
+        ///               \a base_lco#set_value action. Any error has to be
+        ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
         ///               deferred_packaged_task instance (as it has to be sent along
         ///               with the action as the continuation parameter).
@@ -222,8 +222,8 @@ namespace hpx { namespace lcos
         ///
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
-        ///               \a base_lco#set_result action. Any error has to be
-        ///               reported using a \a base_lco::set_error action. The
+        ///               \a base_lco#set_value action. Any error has to be
+        ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
         ///               deferred_packaged_task instance (as it has to be sent along
         ///               with the action as the continuation parameter).
@@ -301,9 +301,9 @@ namespace hpx { namespace lcos
             return (*this->impl_)->get_data(ec);
         }
 
-        void invalidate(boost::exception_ptr const& e)
+        void set_exception(boost::exception_ptr const& e)
         {
-            (*this->impl_)->set_error(e); // set the received error
+            (*this->impl_)->set_exception(e); // set the received error
         }
 
         /// The apply function starts the asynchronous operations encapsulated
@@ -355,8 +355,8 @@ namespace hpx { namespace lcos
         ///
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
-        ///               \a base_lco#set_result action. Any error has to be
-        ///               reported using a \a base_lco::set_error action. The
+        ///               \a base_lco#set_value action. Any error has to be
+        ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
         ///               deferred_packaged_task instance (as it has to be sent along
         ///               with the action as the continuation parameter).
@@ -441,8 +441,8 @@ namespace hpx { namespace lcos
         ///
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
-        ///               \a base_lco#set_result action. Any error has to be
-        ///               reported using a \a base_lco::set_error action. The
+        ///               \a base_lco#set_value action. Any error has to be
+        ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
         ///               deferred_packaged_task instance (as it has to be sent along
         ///               with the action as the continuation parameter).

@@ -43,16 +43,16 @@ namespace hpx { namespace lcos
             this->base_type::wait(gid_);
         }
 
-        lcos::future<void> set_error_async(boost::exception_ptr const& e)
+        lcos::future<void> set_exception_async(boost::exception_ptr const& e)
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::set_error_async(gid_, e);
+            return this->base_type::set_exception_async(gid_, e);
         }
 
-        void set_error(boost::exception_ptr const& e)
+        void set_exception(boost::exception_ptr const& e)
         {
             BOOST_ASSERT(gid_);
-            this->base_type::set_error(gid_, e);
+            this->base_type::set_exception(gid_, e);
         }
     };
 }}

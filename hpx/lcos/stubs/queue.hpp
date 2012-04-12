@@ -35,7 +35,7 @@ namespace hpx { namespace lcos { namespace stubs
         set_value_async(naming::id_type const& gid, BOOST_RV_REF(RemoteType) val)
         {
             typedef typename
-                lcos::base_lco_with_value<ValueType, RemoteType>::set_result_action
+                lcos::base_lco_with_value<ValueType, RemoteType>::set_value_action
             action_type;
             return lcos::async<action_type>(gid, boost::move(val));
         }
@@ -44,7 +44,7 @@ namespace hpx { namespace lcos { namespace stubs
         abort_pending_async(naming::id_type const& gid,
             boost::exception_ptr const& e)
         {
-            typedef lcos::base_lco::set_error_action action_type;
+            typedef lcos::base_lco::set_exception_action action_type;
             return lcos::async<action_type>(gid, e);
         }
 
@@ -69,7 +69,7 @@ namespace hpx { namespace lcos { namespace stubs
         static void set_value(naming::id_type const& gid, BOOST_RV_REF(RemoteType) val)
         {
             typedef typename
-                lcos::base_lco_with_value<ValueType, RemoteType>::set_result_action
+                lcos::base_lco_with_value<ValueType, RemoteType>::set_value_action
             action_type;
             hpx::applier::apply<action_type>(gid, val);
         }
@@ -77,7 +77,7 @@ namespace hpx { namespace lcos { namespace stubs
         static void abort_pending(naming::id_type const& gid,
             boost::exception_ptr const& e)
         {
-            typedef lcos::base_lco::set_error_action action_type;
+            typedef lcos::base_lco::set_exception_action action_type;
             hpx::applier::apply<action_type>(gid, e);
         }
     };

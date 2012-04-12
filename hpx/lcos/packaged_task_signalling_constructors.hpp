@@ -57,7 +57,7 @@
         BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::applier::apply_c_p<Action>(this->get_gid(), gid, priority, 
+        hpx::applier::apply_c_p<Action>(this->get_gid(), gid, priority,
             BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
@@ -94,74 +94,9 @@
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     packaged_task(naming::gid_type const& gid,
             completed_callback_type const& data_sink,
-            error_callback_type const& error_sink,
-            BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
-      : base_type(data_sink, error_sink),
-        apply_logger_("packaged_task::apply")
-    {
-        LLCO_(info) << "packaged_task::packaged_task("
-                    << hpx::actions::detail::get_action_name<Action>()
-                    << ", "
-                    << gid
-                    << ") args(" << (N + 1) << ")";
-        apply(naming::id_type(gid, naming::id_type::unmanaged),
-            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
-    }
-    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    packaged_task(naming::id_type const& gid,
-            completed_callback_type const& data_sink,
-            error_callback_type const& error_sink,
-            BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
-      : base_type(data_sink, error_sink),
-        apply_logger_("packaged_task::apply")
-    {
-        LLCO_(info) << "packaged_task::packaged_task("
-                    << hpx::actions::detail::get_action_name<Action>()
-                    << ", "
-                    << gid
-                    << ") args(" << (N + 1) << ")";
-        apply(gid, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
-    }
-
-    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    packaged_task(naming::gid_type const& gid,
-            completed_callback_type const& data_sink,
             threads::thread_priority priority,
             BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
       : base_type(data_sink),
-        apply_logger_("packaged_task::apply")
-    {
-        LLCO_(info) << "packaged_task::packaged_task("
-                    << hpx::actions::detail::get_action_name<Action>()
-                    << ", "
-                    << gid
-                    << ") args(" << (N + 1) << ")";
-        apply_p(naming::id_type(gid, naming::id_type::unmanaged),
-            priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
-    }
-    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    packaged_task(naming::id_type const& gid,
-            completed_callback_type const& data_sink,
-            threads::thread_priority priority,
-            BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
-      : base_type(data_sink),
-        apply_logger_("packaged_task::apply")
-    {
-        LLCO_(info) << "packaged_task::packaged_task("
-                    << hpx::actions::detail::get_action_name<Action>()
-                    << ", "
-                    << gid
-                    << ") args(" << (N + 1) << ")";
-        apply_p(gid, priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
-    }
-
-    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    packaged_task(naming::gid_type const& gid,
-            completed_callback_type const& data_sink,
-            error_callback_type const& error_sink,
-            threads::thread_priority priority,
-            BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
-      : base_type(data_sink, error_sink),
         apply_logger_("packaged_task::apply")
     {
         LLCO_(info) << "packaged_task::packaged_task("
@@ -175,10 +110,9 @@
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     packaged_task(naming::id_type const& gid,
             completed_callback_type const& data_sink,
-            error_callback_type const& error_sink,
             threads::thread_priority priority,
             BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
-      : base_type(data_sink, error_sink),
+      : base_type(data_sink),
         apply_logger_("packaged_task::apply")
     {
         LLCO_(info) << "packaged_task::packaged_task("

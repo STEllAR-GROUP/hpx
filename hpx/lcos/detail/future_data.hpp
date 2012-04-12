@@ -132,7 +132,7 @@ namespace hpx { namespace lcos { namespace detail
         ///               set or thrown.
         ///
         /// \note         If there has been an error reported (using the action
-        ///               \a base_lco#set_error), this function will throw an
+        ///               \a base_lco#set_exception), this function will throw an
         ///               exception encapsulating the reported error code and
         ///               error description if <code>&ec == &throws</code>.
         result_type get_data(error_code& ec = throws)
@@ -144,7 +144,7 @@ namespace hpx { namespace lcos { namespace detail
 
             // the thread has been re-activated by one of the actions
             // supported by this promise (see \a promise::set_event
-            // and promise::set_error).
+            // and promise::set_exception).
             if (!d.stores_value())
                 return handle_error(d, ec);
 
@@ -161,7 +161,7 @@ namespace hpx { namespace lcos { namespace detail
 
             // the thread has been re-activated by one of the actions
             // supported by this promise (see \a promise::set_event
-            // and promise::set_error).
+            // and promise::set_exception).
             if (!d.stores_value())
                 return handle_error(d, ec);
 
@@ -198,7 +198,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         // trigger the future with the given error condition
-        void set_error(boost::exception_ptr const& e)
+        void set_exception(boost::exception_ptr const& e)
         {
             // store the error code
             data_.set(e);

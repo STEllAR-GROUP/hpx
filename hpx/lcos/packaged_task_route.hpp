@@ -110,8 +110,8 @@ namespace hpx { namespace lcos
         ///
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
-        ///               \a base_lco#set_result action. Any error has to be
-        ///               reported using a \a base_lco::set_error action. The
+        ///               \a base_lco#set_value action. Any error has to be
+        ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
         ///               packaged_task instance (as it has to be sent along
         ///               with the action as the continuation parameter).
@@ -194,8 +194,8 @@ namespace hpx { namespace lcos
         ///
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
-        ///               \a base_lco#set_result action. Any error has to be
-        ///               reported using a \a base_lco::set_error action. The
+        ///               \a base_lco#set_value action. Any error has to be
+        ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
         ///               packaged_task instance (as it has to be sent along
         ///               with the action as the continuation parameter).
@@ -309,8 +309,8 @@ namespace hpx { namespace lcos
         ///
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
-        ///               \a base_lco#set_result action. Any error has to be
-        ///               reported using a \a base_lco::set_error action. The
+        ///               \a base_lco#set_value action. Any error has to be
+        ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
         ///               packaged_task instance (as it has to be sent along
         ///               with the action as the continuation parameter).
@@ -374,8 +374,8 @@ namespace hpx { namespace lcos
         ///
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
-        ///               \a base_lco#set_result action. Any error has to be
-        ///               reported using a \a base_lco::set_error action. The
+        ///               \a base_lco#set_value action. Any error has to be
+        ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
         ///               packaged_task instance (as it has to be sent along
         ///               with the action as the continuation parameter).
@@ -461,8 +461,8 @@ namespace hpx { namespace lcos
         ///
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
-        ///               \a base_lco#set_result action. Any error has to be
-        ///               reported using a \a base_lco::set_error action. The
+        ///               \a base_lco#set_value action. Any error has to be
+        ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
         ///               packaged_task instance (as it has to be sent along
         ///               with the action as the continuation parameter).
@@ -555,8 +555,8 @@ namespace hpx { namespace lcos
         ///
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
-        ///               \a base_lco#set_result action. Any error has to be
-        ///               reported using a \a base_lco::set_error action. The
+        ///               \a base_lco#set_value action. Any error has to be
+        ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
         ///               packaged_task instance (as it has to be sent along
         ///               with the action as the continuation parameter).
@@ -748,8 +748,8 @@ namespace hpx { namespace lcos
         ///
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
-        ///               \a base_lco#set_result action. Any error has to be
-        ///               reported using a \a base_lco::set_error action. The
+        ///               \a base_lco#set_value action. Any error has to be
+        ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
         ///               packaged_task instance (as it has to be sent along
         ///               with the action as the continuation parameter).
@@ -819,8 +819,8 @@ namespace hpx { namespace lcos
         ///
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
-        ///               \a base_lco#set_result action. Any error has to be
-        ///               reported using a \a base_lco::set_error action. The
+        ///               \a base_lco#set_value action. Any error has to be
+        ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
         ///               packaged_task instance (as it has to be sent along
         ///               with the action as the continuation parameter).

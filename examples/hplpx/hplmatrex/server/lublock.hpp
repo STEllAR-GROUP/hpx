@@ -321,8 +321,8 @@ namespace hpx { namespace components { namespace server
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::lcos::base_lco_with_value<
         std::vector<std::vector<double> >
-    >::set_result_action,
-    base_lco_with_value_set_result_vector_vector_double);
+    >::set_value_action,
+    base_lco_with_value_set_value_vector_vector_double);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::components::server::lublock::constructBlock_action,HPLconstructBlock_action);

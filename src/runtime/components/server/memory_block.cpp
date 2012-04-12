@@ -52,8 +52,8 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
 
 typedef hpx::components::memory_block_data memory_data_type;
 HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<memory_data_type>::set_result_action,
-    set_result_action_memory_data_type);
+    hpx::lcos::base_lco_with_value<memory_data_type>::set_value_action,
+    set_value_action_memory_data_type);
 
 HPX_REGISTER_MANAGE_OBJECT_ACTION(
     hpx::actions::manage_object_action<boost::uint8_t>,

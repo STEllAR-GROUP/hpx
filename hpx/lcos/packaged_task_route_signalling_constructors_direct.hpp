@@ -81,38 +81,6 @@
         apply(gid, BOOST_PP_ENUM_PARAMS(N, arg));
     }
 
-    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    packaged_task_route(naming::gid_type const& gid,
-            completed_callback_type const& data_sink,
-            error_callback_type const& error_sink,
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-      : base_type(data_sink, error_sink),
-        apply_logger_("packaged_task_direct::apply")
-    {
-        LLCO_(info) << "packaged_task::packaged_task("
-                    << hpx::actions::detail::get_action_name<Action>()
-                    << ", "
-                    << gid
-                    << ") args(" << (N + 1) << ")";
-        apply(naming::id_type(gid, naming::id_type::unmanaged),
-            BOOST_PP_ENUM_PARAMS(N, arg));
-    }
-    template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    packaged_task_route(naming::id_type const& gid,
-            completed_callback_type const& data_sink,
-            error_callback_type const& error_sink,
-            BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
-      : base_type(data_sink, error_sink),
-        apply_logger_("packaged_task_direct::apply")
-    {
-        LLCO_(info) << "packaged_task::packaged_task("
-                    << hpx::actions::detail::get_action_name<Action>()
-                    << ", "
-                    << gid
-                    << ") args(" << (N + 1) << ")";
-        apply(gid, BOOST_PP_ENUM_PARAMS(N, arg));
-    }
-
 #undef N
 
 #endif

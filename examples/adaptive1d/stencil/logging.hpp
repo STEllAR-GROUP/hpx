@@ -40,7 +40,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         /// type, allowing to generate all required boilerplate code for threads,
         /// serialization, etc.
         ///
-        /// The \a set_result_action may be used to trigger any LCO instances
+        /// The \a set_value_action may be used to trigger any LCO instances
         /// while carrying an additional parameter of any type.
         ///
         /// \param Result [in] The type of the result to be transferred back to

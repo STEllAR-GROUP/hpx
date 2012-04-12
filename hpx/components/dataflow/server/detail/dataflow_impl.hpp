@@ -261,12 +261,12 @@ namespace hpx { namespace traits
             {
                 if(!d.stores_value())
                 {
-                    typedef typename lco_type::set_error_action action_type;
+                    typedef typename lco_type::set_exception_action action_type;
                     applier::apply<action_type>(t[i], d.get_error());
                 }
                 else
                 {
-                    typedef typename lco_type::set_result_action action_type;
+                    typedef typename lco_type::set_value_action action_type;
                     result_type r =  d.get_value();
                     applier::apply<action_type>(t[i], boost::move(r));
                 }
@@ -290,7 +290,7 @@ namespace hpx { namespace traits
 
         typedef typename Action::result_type remote_result;
 
-        void set_result(BOOST_RV_REF(remote_result) r)
+        void set_value(BOOST_RV_REF(remote_result) r)
         {
 #if N > 0
             /*
@@ -313,12 +313,12 @@ namespace hpx { namespace traits
                 std::swap(targets, t);
             }
 
-            // Note: lco::set_result is a direct action, for this reason,
+            // Note: lco::set_value is a direct action, for this reason,
             //       the following loop will not be parallelized if the
             //       targets are local (which is ok)
             for (std::size_t i = 0; i < t.size(); ++i)
             {
-                typedef typename lco_type::set_result_action action_type;
+                typedef typename lco_type::set_value_action action_type;
                 result_type tmp =  r;
                 applier::apply<action_type>(t[i], boost::move(tmp));
             }
@@ -340,12 +340,12 @@ namespace hpx { namespace traits
                 
                 if(!d.stores_value())
                 {
-                    typedef typename lco_type::set_error_action action_type;
+                    typedef typename lco_type::set_exception_action action_type;
                     applier::apply<action_type>(target, d.get_error());
                 }
                 else
                 {
-                    typedef typename lco_type::set_result_action action_type;
+                    typedef typename lco_type::set_value_action action_type;
                     result_type r =  d.get_value();
                     applier::apply<action_type>(target, boost::move(r));
                 }
@@ -457,7 +457,7 @@ namespace hpx { namespace traits
 
         void set_event()
         {
-            this->set_result_nonvirt(remote_result());
+            this->set_value_nonvirt(remote_result());
         }
 
         result_type get_value()

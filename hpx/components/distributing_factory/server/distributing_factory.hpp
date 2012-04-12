@@ -319,7 +319,7 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::lcos::base_lco_with_value<
         hpx::components::server::distributing_factory::remote_result_type
-    >::set_result_action
-  , set_result_action_distributing_factory_result);
+    >::set_value_action
+  , set_value_action_distributing_factory_result);
 
 #endif

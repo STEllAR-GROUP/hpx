@@ -60,14 +60,14 @@ namespace hpx { namespace lcos { namespace server { namespace detail
                 << get_gid();
         }
 
-        void set_result(BOOST_RV_REF(remote_result) r)
+        void set_value(BOOST_RV_REF(remote_result) r)
         {
             LLCO_(info)
                 << "dataflow_slot<"
                 << util::type_id<T>::typeid_.type_id()
                 << ", " << Slot
                 << hpx::actions::detail::get_action_name<SinkAction>()
-                << ">::set_result(): "
+                << ">::set_value(): "
                 << get_gid();
             dataflow_sink
                 ->template set_slot<Slot>(
@@ -94,7 +94,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
 
         void set_event()
         {
-            this->set_result_nonvirt(remote_result());
+            this->set_value_nonvirt(remote_result());
         }
 
         result_type get_value()

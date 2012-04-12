@@ -67,8 +67,8 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
 HPX_DEFINE_GET_COMPONENT_TYPE(configuration_type);
 
 HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<sheneos::config_data>::set_result_action,
-    set_result_action_sheneos_config_data);
+    hpx::lcos::base_lco_with_value<sheneos::config_data>::set_value_action,
+    set_value_action_sheneos_config_data);
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco_with_value<sheneos::config_data>,
     hpx::components::component_base_lco_with_value);

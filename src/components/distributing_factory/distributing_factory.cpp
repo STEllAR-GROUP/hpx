@@ -39,5 +39,5 @@ typedef hpx::lcos::base_lco_with_value<
     > create_result_type;
 
 HPX_REGISTER_ACTION_EX(
-    create_result_type::set_result_action,
-    set_result_action_distributing_factory_result);
+    create_result_type::set_value_action,
+    set_value_action_distributing_factory_result);

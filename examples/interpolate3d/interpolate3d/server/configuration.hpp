@@ -80,8 +80,8 @@ HPX_REGISTER_ACTION_DECLARATION_EX(interpolate3d::server::configuration::get_act
     interpolate3d_configuration_get_action);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    hpx::lcos::base_lco_with_value<interpolate3d::config_data>::set_result_action,
-    set_result_action_interpolate3d_config_data);
+    hpx::lcos::base_lco_with_value<interpolate3d::config_data>::set_value_action,
+    set_value_action_interpolate3d_config_data);
 
 ///////////////////////////////////////////////////////////////////////////////
 // non-intrusive serialization

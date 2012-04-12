@@ -40,7 +40,7 @@ namespace hpx { namespace lcos { namespace local
                   this->set_data(f_());
                 }
                 catch(...) {
-                    this->set_error(boost::current_exception());
+                    this->set_exception(boost::current_exception());
                 }
             }
         };
@@ -69,7 +69,7 @@ namespace hpx { namespace lcos { namespace local
                     this->set_data(result_type());
                 }
                 catch(...) {
-                    this->set_error(boost::current_exception());
+                    this->set_exception(boost::current_exception());
                 }
             }
         };
@@ -181,7 +181,7 @@ namespace hpx { namespace lcos { namespace local
 
         void set_exception(boost::exception_ptr const& e)
         {
-            task_->set_error(e);
+            task_->set_exception(e);
         }
 
     private:
@@ -322,7 +322,7 @@ namespace hpx { namespace lcos { namespace local
 
         void set_exception(boost::exception_ptr const& e)
         {
-            task_->set_error(e);
+            task_->set_exception(e);
         }
 
     private:

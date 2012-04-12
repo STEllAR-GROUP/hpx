@@ -58,7 +58,7 @@ namespace hpx
             void trigger(BOOST_FWD_REF(Arg0) arg0)
             {
                 typedef typename
-                    lcos::template base_lco_with_value<Arg0>::set_result_action
+                    lcos::template base_lco_with_value<Arg0>::set_value_action
                 action_type;
 
                 LLCO_(info) << "continuation::trigger(" << gid_ << ")";

@@ -260,15 +260,15 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
     sheneos::server::partition3d::interpolate_bulk_action,
     sheneos_partition3d_interpolate_bulk_action);
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    hpx::lcos::base_lco_with_value<std::vector<std::vector<double> > >::set_result_action,
-    set_result_action_vector_vector_double);
+    hpx::lcos::base_lco_with_value<std::vector<std::vector<double> > >::set_value_action,
+    set_value_action_vector_vector_double);
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     sheneos::server::partition3d::interpolate_one_bulk_action,
     sheneos_partition3d_interpolate_one_bulk_action);
 HPX_REGISTER_ACTION_DECLARATION_EX(
-    hpx::lcos::base_lco_with_value<std::vector<double> >::set_result_action,
-    set_result_action_vector_double);
+    hpx::lcos::base_lco_with_value<std::vector<double> >::set_value_action,
+    set_value_action_vector_double);
 
 #endif
 

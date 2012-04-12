@@ -108,8 +108,8 @@ namespace hpx { namespace lcos
         ///
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
-        ///               \a base_lco#set_result action. Any error has to be
-        ///               reported using a \a base_lco::set_error action. The
+        ///               \a base_lco#set_value action. Any error has to be
+        ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
         ///               packaged_task instance (as it has to be sent along
         ///               with the action as the continuation parameter).
@@ -191,8 +191,8 @@ namespace hpx { namespace lcos
         ///
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
-        ///               \a base_lco#set_result action. Any error has to be
-        ///               reported using a \a base_lco::set_error action. The
+        ///               \a base_lco#set_value action. Any error has to be
+        ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
         ///               packaged_task instance (as it has to be sent along
         ///               with the action as the continuation parameter).
@@ -307,8 +307,8 @@ namespace hpx { namespace lcos
         ///
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
-        ///               \a base_lco#set_result action. Any error has to be
-        ///               reported using a \a base_lco::set_error action. The
+        ///               \a base_lco#set_value action. Any error has to be
+        ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
         ///               packaged_task instance (as it has to be sent along
         ///               with the action as the continuation parameter).
@@ -373,8 +373,8 @@ namespace hpx { namespace lcos
         ///
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
-        ///               \a base_lco#set_result action. Any error has to be
-        ///               reported using a \a base_lco::set_error action. The
+        ///               \a base_lco#set_value action. Any error has to be
+        ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
         ///               packaged_task instance (as it has to be sent along
         ///               with the action as the continuation parameter).
@@ -420,7 +420,6 @@ namespace hpx { namespace lcos
             typename action_type::result_type> base_type;
         typedef typename base_type::completed_callback_type
             completed_callback_type;
-        typedef typename base_type::error_callback_type error_callback_type;
 
         struct profiler_tag {};
 
@@ -428,9 +427,8 @@ namespace hpx { namespace lcos
         /// Construct a (non-functional) instance of an \a packaged_task. To use
         /// this instance its member function \a apply needs to be directly
         /// called.
-        packaged_task(completed_callback_type const& data_sink,
-                error_callback_type const& error_sink = error_callback_type())
-          : base_type(data_sink, error_sink),
+        packaged_task(completed_callback_type const& data_sink)
+          : base_type(data_sink),
             apply_logger_("packaged_task::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
@@ -465,15 +463,14 @@ namespace hpx { namespace lcos
         ///
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
-        ///               \a base_lco#set_result action. Any error has to be
-        ///               reported using a \a base_lco::set_error action. The
+        ///               \a base_lco#set_value action. Any error has to be
+        ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
         ///               packaged_task instance (as it has to be sent along
         ///               with the action as the continuation parameter).
         packaged_task(naming::gid_type const& gid,
-                completed_callback_type const& data_sink,
-                error_callback_type const& error_sink = error_callback_type())
-          : base_type(data_sink, error_sink),
+                completed_callback_type const& data_sink)
+          : base_type(data_sink),
             apply_logger_("packaged_task::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
@@ -484,9 +481,8 @@ namespace hpx { namespace lcos
             apply(naming::id_type(gid, naming::id_type::unmanaged));
         }
         packaged_task(naming::id_type const& gid,
-                completed_callback_type const& data_sink,
-                error_callback_type const& error_sink = error_callback_type())
-          : base_type(data_sink, error_sink),
+                completed_callback_type const& data_sink)
+          : base_type(data_sink),
             apply_logger_("packaged_task::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
@@ -499,7 +495,6 @@ namespace hpx { namespace lcos
 
         packaged_task(naming::gid_type const& gid,
                 completed_callback_type const& data_sink,
-                error_callback_type const& error_sink,
                 threads::thread_priority priority)
           : apply_logger_("packaged_task::apply")
         {
@@ -512,7 +507,6 @@ namespace hpx { namespace lcos
         }
         packaged_task(naming::id_type const& gid,
                 completed_callback_type const& data_sink,
-                error_callback_type const& error_sink,
                 threads::thread_priority priority)
           : apply_logger_("packaged_task::apply")
         {
@@ -560,8 +554,8 @@ namespace hpx { namespace lcos
         ///
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
-        ///               \a base_lco#set_result action. Any error has to be
-        ///               reported using a \a base_lco::set_error action. The
+        ///               \a base_lco#set_value action. Any error has to be
+        ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
         ///               packaged_task instance (as it has to be sent along
         ///               with the action as the continuation parameter).
@@ -598,38 +592,6 @@ namespace hpx { namespace lcos
         template <typename Arg0>
         packaged_task(naming::gid_type const& gid,
                 completed_callback_type const& data_sink,
-                error_callback_type const& error_sink,
-                BOOST_FWD_REF(Arg0) arg0)
-          : base_type(data_sink, error_sink),
-            apply_logger_("packaged_task::apply")
-        {
-            LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<action_type>()
-                        << ", "
-                        << gid
-                        << ") args(1)";
-            apply(naming::id_type(gid, naming::id_type::unmanaged),
-                boost::forward<Arg0>(arg0));
-        }
-        template <typename Arg0>
-        packaged_task(naming::id_type const& gid,
-                completed_callback_type const& data_sink,
-                error_callback_type const& error_sink,
-                BOOST_FWD_REF(Arg0) arg0)
-          : base_type(data_sink, error_sink),
-            apply_logger_("packaged_task::apply")
-        {
-            LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<action_type>()
-                        << ", "
-                        << gid
-                        << ") args(1)";
-            apply(gid, boost::forward<Arg0>(arg0));
-        }
-
-        template <typename Arg0>
-        packaged_task(naming::gid_type const& gid,
-                completed_callback_type const& data_sink,
                 threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
           : base_type(data_sink),
             apply_logger_("packaged_task::apply")
@@ -647,38 +609,6 @@ namespace hpx { namespace lcos
                 completed_callback_type const& data_sink,
                 threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
           : base_type(data_sink),
-            apply_logger_("packaged_task::apply")
-        {
-            LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<action_type>()
-                        << ", "
-                        << gid
-                        << ") args(1)";
-            apply_p(gid, priority, boost::forward<Arg0>(arg0));
-        }
-
-        template <typename Arg0>
-        packaged_task(naming::gid_type const& gid,
-                completed_callback_type const& data_sink,
-                error_callback_type const& error_sink,
-                threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
-          : base_type(data_sink, error_sink),
-            apply_logger_("packaged_task::apply")
-        {
-            LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<action_type>()
-                        << ", "
-                        << gid
-                        << ") args(1)";
-            apply_p(naming::id_type(gid, naming::id_type::unmanaged),
-                priority, boost::forward<Arg0>(arg0));
-        }
-        template <typename Arg0>
-        packaged_task(naming::id_type const& gid,
-                completed_callback_type const& data_sink,
-                error_callback_type const& error_sink,
-                threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
-          : base_type(data_sink, error_sink),
             apply_logger_("packaged_task::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
@@ -707,7 +637,6 @@ namespace hpx { namespace lcos
             typename action_type::result_type> base_type;
         typedef typename base_type::completed_callback_type
             completed_callback_type;
-        typedef typename base_type::error_callback_type error_callback_type;
 
         struct profiler_tag {};
 
@@ -715,9 +644,8 @@ namespace hpx { namespace lcos
         /// Construct a (non-functional) instance of an \a packaged_task. To use
         /// this instance its member function \a apply needs to be directly
         /// called.
-        packaged_task(completed_callback_type const& data_sink,
-                error_callback_type const& error_sink = error_callback_type())
-          : base_type(data_sink, error_sink),
+        packaged_task(completed_callback_type const& data_sink)
+          : base_type(data_sink),
             apply_logger_("packaged_task_direct::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
@@ -760,15 +688,14 @@ namespace hpx { namespace lcos
         ///
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
-        ///               \a base_lco#set_result action. Any error has to be
-        ///               reported using a \a base_lco::set_error action. The
+        ///               \a base_lco#set_value action. Any error has to be
+        ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
         ///               packaged_task instance (as it has to be sent along
         ///               with the action as the continuation parameter).
         packaged_task(naming::gid_type const& gid,
-                completed_callback_type const& data_sink,
-                error_callback_type const& error_sink = error_callback_type())
-          : base_type(data_sink, error_sink),
+                completed_callback_type const& data_sink)
+          : base_type(data_sink),
             apply_logger_("packaged_task_direct::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
@@ -779,9 +706,8 @@ namespace hpx { namespace lcos
             apply(naming::id_type(gid, naming::id_type::unmanaged));
         }
         packaged_task(naming::id_type const& gid,
-                completed_callback_type const& data_sink,
-                error_callback_type const& error_sink = error_callback_type())
-          : base_type(data_sink, error_sink),
+                completed_callback_type const& data_sink)
+          : base_type(data_sink),
             apply_logger_("packaged_task_direct::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("
@@ -834,8 +760,8 @@ namespace hpx { namespace lcos
         ///
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
-        ///               \a base_lco#set_result action. Any error has to be
-        ///               reported using a \a base_lco::set_error action. The
+        ///               \a base_lco#set_value action. Any error has to be
+        ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
         ///               packaged_task instance (as it has to be sent along
         ///               with the action as the continuation parameter).
@@ -859,38 +785,6 @@ namespace hpx { namespace lcos
                 completed_callback_type const& data_sink,
                 BOOST_FWD_REF(Arg0) arg0)
           : base_type(data_sink),
-            apply_logger_("packaged_task_direct::apply")
-        {
-            LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<action_type>()
-                        << ", "
-                        << gid
-                        << ") args(1)";
-            apply(gid, boost::forward<Arg0>(arg0));
-        }
-
-        template <typename Arg0>
-        packaged_task(naming::gid_type const& gid,
-                completed_callback_type const& data_sink,
-                error_callback_type const& error_sink,
-                BOOST_FWD_REF(Arg0) arg0)
-          : base_type(data_sink, error_sink),
-            apply_logger_("packaged_task_direct::apply")
-        {
-            LLCO_(info) << "packaged_task::packaged_task("
-                        << hpx::actions::detail::get_action_name<action_type>()
-                        << ", "
-                        << gid
-                        << ") args(1)";
-            apply(naming::id_type(gid, naming::id_type::unmanaged),
-                boost::forward<Arg0>(arg0));
-        }
-        template <typename Arg0>
-        packaged_task(naming::id_type const& gid,
-                completed_callback_type const& data_sink,
-                error_callback_type const& error_sink,
-                BOOST_FWD_REF(Arg0) arg0)
-          : base_type(data_sink, error_sink),
             apply_logger_("packaged_task_direct::apply")
         {
             LLCO_(info) << "packaged_task::packaged_task("

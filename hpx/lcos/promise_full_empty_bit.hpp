@@ -88,7 +88,7 @@ namespace hpx { namespace lcos { namespace detail
         // exposed functionality of this component
 
         // trigger the future, set the result
-        void set_result (BOOST_RV_REF(RemoteResult) result)
+        void set_value (BOOST_RV_REF(RemoteResult) result)
         {
             // set the received result, reset error status
             set_data(boost::move(result));
@@ -104,9 +104,9 @@ namespace hpx { namespace lcos { namespace detail
             return this->move_data();
         }
 
-        void set_error(boost::exception_ptr const& e)
+        void set_exception(boost::exception_ptr const& e)
         {
-            return this->future_data_type::set_error(e);
+            return this->future_data_type::set_exception(e);
         }
 
         // retrieve the gid of this promise
@@ -177,7 +177,7 @@ namespace hpx { namespace lcos { namespace detail
         // exposed functionality of this component
 
         // trigger the future, set the result
-        void set_result (BOOST_RV_REF(util::unused_type) result)
+        void set_value (BOOST_RV_REF(util::unused_type) result)
         {
             // set the received result, reset error status
             set_data(boost::move(result));
@@ -193,9 +193,9 @@ namespace hpx { namespace lcos { namespace detail
             this->move_data();
         }
 
-        void set_error(boost::exception_ptr const& e)
+        void set_exception(boost::exception_ptr const& e)
         {
-            return this->future_data_type::set_error(e);
+            return this->future_data_type::set_exception(e);
         }
 
         // retrieve the gid of this promise
@@ -280,8 +280,8 @@ namespace hpx { namespace lcos
         ///
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
-        ///               \a base_lco#set_result action. Any error has to be
-        ///               reported using a \a base_lco::set_error action. The
+        ///               \a base_lco#set_value action. Any error has to be
+        ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
         ///               future instance (as it has to be sent along
         ///               with the action as the continuation parameter).
@@ -359,7 +359,7 @@ namespace hpx { namespace lcos
 
         void set_exception(boost::exception_ptr const& e)
         {
-            (*impl_)->set_error(e);      // set the received error
+            (*impl_)->set_exception(e);      // set the received error
         }
 
         template <typename T>
@@ -388,8 +388,8 @@ namespace hpx { namespace lcos
         ///
         /// \note         The result of the requested operation is expected to
         ///               be returned as the first parameter using a
-        ///               \a base_lco#set_result action. Any error has to be
-        ///               reported using a \a base_lco::set_error action. The
+        ///               \a base_lco#set_value action. Any error has to be
+        ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
         ///               future instance (as it has to be sent along
         ///               with the action as the continuation parameter).
@@ -459,12 +459,7 @@ namespace hpx { namespace lcos
 
         void set_exception(boost::exception_ptr const& e)
         {
-            (*impl_)->set_error(e);
-        }
-
-        void invalidate(boost::exception_ptr const& e)
-        {
-            (*impl_)->set_error(e); // set the received error
+            (*impl_)->set_exception(e);
         }
 
     protected:

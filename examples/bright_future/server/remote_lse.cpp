@@ -272,8 +272,8 @@ HPX_REGISTER_ACTION_EX(
 );
 */
 HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<std::vector<double> >::set_result_action
-  , remote_lse_base_lco_set_result_action
+    hpx::lcos::base_lco_with_value<std::vector<double> >::set_value_action
+  , remote_lse_base_lco_set_value_action
 );
 /*
 HPX_REGISTER_ACTION_EX(

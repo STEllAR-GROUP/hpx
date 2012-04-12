@@ -188,14 +188,14 @@ namespace hpx { namespace lcos { namespace server
             }
         }
 
-        /// The \a function set_error is called whenever a
-        /// \a set_error_action is applied on an instance of a LCO. This
-        /// function just forwards to the virtual function \a set_error, which
+        /// The \a function set_exception is called whenever a
+        /// \a set_exception_action is applied on an instance of a LCO. This
+        /// function just forwards to the virtual function \a set_exception, which
         /// is overloaded by the derived concrete LCO.
         ///
         /// \param e      [in] The exception encapsulating the error to report
         ///               to this LCO instance.
-        void set_error(boost::exception_ptr const& e)
+        void set_exception(boost::exception_ptr const& e)
         {
             try {
                 mutex_type::scoped_lock l(mtx_);
@@ -213,7 +213,7 @@ namespace hpx { namespace lcos { namespace server
             }
             catch (boost::exception const& be) {
                 // rethrow again, but this time using the native hpx mechanics
-                HPX_RETHROW_EXCEPTION(hpx::no_success, "barrier::set_error",
+                HPX_RETHROW_EXCEPTION(hpx::no_success, "barrier::set_exception",
                     boost::diagnostic_information(be));
             }
         }

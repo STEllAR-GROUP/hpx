@@ -20,9 +20,7 @@ int test()
 {
     return 42;
 }
-typedef hpx::actions::plain_result_action0<int, test> test_action;
-
-HPX_REGISTER_PLAIN_ACTION(test_action);
+HPX_PLAIN_ACTION(test, test_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 int test_error()
@@ -31,39 +29,37 @@ int test_error()
         "throwing test exception");
     return 42;
 }
-typedef hpx::actions::plain_result_action0<int, test_error> test_error_action;
-
-HPX_REGISTER_PLAIN_ACTION(test_error_action);
+HPX_PLAIN_ACTION(test_error, test_error_action);
 
 ///////////////////////////////////////////////////////////////////////////////
-void data_callback(
-    bool& cb_called
-  , int const& i
+void future_callback(
+    bool& data_cb_called
+  , bool& error_cb_called
+  , hpx::lcos::future<int> f
     )
 {
-    cb_called = true;
-    HPX_TEST_EQ(i, 42);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-void error_callback(
-    bool& cb_called
-  , boost::exception_ptr const& be
-    )
-{
-    cb_called = true;
-
-    std::string error_msg = "throwing test exception: HPX(not_implemented)";
-    std::string what_msg;
-
-    try {
-        boost::rethrow_exception(be);
+    if (f.has_value()) {
+        data_cb_called = true;
+        HPX_TEST_EQ(f.get(), 42);
     }
-    catch (std::exception const& e) {
-        what_msg = e.what();
-    }
+    else {
+        error_cb_called = true;
+        HPX_TEST(f.has_exception());
 
-    HPX_TEST_EQ(what_msg, error_msg);
+        std::string error_msg("throwing test exception: HPX(not_implemented)");
+        std::string what_msg;
+
+        try {
+            f.get();          // should rethrow
+            HPX_TEST(false);
+        }
+        catch (std::exception const& e) {
+            what_msg = e.what();
+            HPX_TEST(true);
+        }
+
+        HPX_TEST_EQ(what_msg, error_msg);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -74,24 +70,26 @@ int hpx_main(variables_map& vm)
 
     {
         bool data_cb_called = false;
+        bool error_cb_called = false;
 
         future<int> p = async_callback<test_action>(
-            boost::bind(data_callback, boost::ref(data_cb_called), _1),
+            boost::bind(future_callback, boost::ref(data_cb_called)
+              , boost::ref(error_cb_called), _1),
             hpx::find_here()
         );
 
         HPX_TEST_EQ(p.get(), 42);
         HPX_TEST(data_cb_called);
+        HPX_TEST(!error_cb_called);
     }
-
 
     {
         bool data_cb_called = false;
         bool error_cb_called = false;
 
         future<int> p = async_callback<test_error_action>(
-            boost::bind(data_callback, boost::ref(data_cb_called), _1),
-            boost::bind(error_callback, boost::ref(error_cb_called), _1),
+            boost::bind(future_callback, boost::ref(data_cb_called)
+              , boost::ref(error_cb_called), _1),
             hpx::find_here()
         );
 

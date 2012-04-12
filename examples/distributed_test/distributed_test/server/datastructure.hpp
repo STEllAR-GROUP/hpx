@@ -149,7 +149,7 @@ HPX_REGISTER_ACTION_DECLARATION_EX(distributed::server::datastructure::get_data_
 //HPX_REGISTER_ACTION_DECLARATION_EX(distributed::server::datastructure::
     //get_config_action, distributed_datastructure_get_config_action);
 //HPX_REGISTER_ACTION_DECLARATION_EX(
-//    hpx::lcos::base_lco_with_value<distributed::config_comp>::set_result_action,
-//    set_result_action_distributed_config_comp);
-//
+//    hpx::lcos::base_lco_with_value<distributed::config_comp>::set_value_action,
+//    set_value_action_distributed_config_comp);
+
 #endif //HPX_amcKqeEjd01sNoYXrWLZkVt5Il2vwxFzhT9f78uUnAgBPCpJbDRQ

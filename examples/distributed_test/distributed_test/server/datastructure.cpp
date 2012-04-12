@@ -153,8 +153,8 @@ HPX_DEFINE_GET_COMPONENT_TYPE(datastructure_type);
 
 
 /*HPX_REGISTER_ACTION_EX(
-    hpx::lcos::base_lco_with_value<distributed::config_comp>::set_result_action, 
-    set_result_action_distributed_config_comp);
+    hpx::lcos::base_lco_with_value<distributed::config_comp>::set_value_action, 
+    set_value_action_distributed_config_comp);
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco_with_value<distributed::config_comp>,
     hpx::components::component_base_lco_with_value);

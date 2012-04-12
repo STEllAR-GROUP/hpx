@@ -20,15 +20,16 @@ namespace hpx { namespace lcos { namespace detail
     /// action and wait for the result.
     template <typename Result, typename RemoteResult>
     class signalling_promise
-      : public detail::promise<Result, Result>
+      : public detail::promise<Result, RemoteResult>
     {
     private:
-        typedef detail::promise<Result, Result> base_type;
+        typedef detail::promise<Result, RemoteResult> base_type;
+        typedef lcos::detail::future_data_base<Result, RemoteResult>
+            future_data_type;
 
     public:
-        typedef HPX_STD_FUNCTION<void(Result const&)> completed_callback_type;
-        typedef HPX_STD_FUNCTION<void(boost::exception_ptr const&)>
-            error_callback_type;
+        typedef HPX_STD_FUNCTION<void(future<Result, RemoteResult>)>
+            completed_callback_type;
 
         signalling_promise()
         {}
@@ -37,42 +38,48 @@ namespace hpx { namespace lcos { namespace detail
           : on_completed_(data_sink)
         {}
 
-        signalling_promise(completed_callback_type const& data_sink,
-                error_callback_type const& error_sink)
-          : on_completed_(data_sink), on_error_(error_sink)
-        {}
-
-        void set_result (BOOST_RV_REF(RemoteResult) result)
+        void set_value (BOOST_RV_REF(RemoteResult) result)
         {
             try {
-                // We (possibly) convert the remote result type, call our
-                // on_completed handler, and only afterwards signal the result to
-                // the (suspended) promise. This allows to do both, get a callback
-                // and securely wait on the future.
+                // We (possibly) convert the remote result type
                 typedef traits::get_remote_result<Result, RemoteResult>
                     get_remote_result_type;
 
-                Result res = get_remote_result_type::call(result);
-                if (on_completed_)
-                    on_completed_(res);
-                this->base_type::set_result(boost::move(res));
+                if (on_completed_) {
+                    // this future instance keeps the promise alive
+                    future<Result, RemoteResult> f(
+                        boost::intrusive_ptr<future_data_type>(this));
+                    this->base_type::set_value(
+                        boost::move(get_remote_result_type::call(result)));
+                    on_completed_(f);
+                }
+                else {
+                    this->base_type::set_value(
+                        boost::move(get_remote_result_type::call(result)));
+                }
             }
             catch (hpx::exception const&) {
                 // store error instead
-                set_error(boost::current_exception());
+                set_exception(boost::current_exception());
             }
         }
 
-        void set_error (boost::exception_ptr const& e)
+        void set_exception (boost::exception_ptr const& e)
         {
-            if (on_error_)
-                on_error_(e);
-            this->base_type::set_error(e);
+            if (on_completed_) {
+                // this future instance keeps the promise alive
+                future<Result, RemoteResult> f(
+                    boost::intrusive_ptr<future_data_type>(this));
+                this->base_type::set_exception(e);
+                on_completed_(f);
+            }
+            else {
+                this->base_type::set_exception(e);
+            }
         }
 
     private:
         completed_callback_type on_completed_;
-        error_callback_type on_error_;
     };
 }}}
 
@@ -112,7 +119,6 @@ namespace hpx { namespace lcos
         typedef components::managed_component<wrapped_type> wrapping_type;
 
         typedef typename wrapped_type::completed_callback_type completed_callback_type;
-        typedef typename wrapped_type::error_callback_type error_callback_type;
 
         /// Construct a new \a signalling_promise instance from the given
         /// promise instance.
@@ -122,11 +128,6 @@ namespace hpx { namespace lcos
 
         signalling_promise(completed_callback_type const& data_sink)
           : base_type(new wrapping_type(new wrapped_type(data_sink)))
-        {}
-
-        signalling_promise(completed_callback_type const& data_sink,
-                error_callback_type const& error_sink)
-          : base_type(new wrapping_type(new wrapped_type(data_sink, error_sink)))
         {}
 
         typedef Result result_type;

@@ -168,7 +168,7 @@ namespace hpx { namespace lcos { namespace server
         // standard LCO action implementations
 
         /// Add a value to the queue.
-        void set_result (BOOST_RV_REF(RemoteType) result)
+        void set_value (BOOST_RV_REF(RemoteType) result)
         {
             // push back the new value onto the queue
             HPX_STD_UNIQUE_PTR<queue_value_entry> node(
@@ -190,12 +190,12 @@ namespace hpx { namespace lcos { namespace server
             }
         }
 
-        /// The \a function set_error is called whenever a
-        /// \a set_error_action is applied on an instance of a LCO.
+        /// The \a function set_exception is called whenever a
+        /// \a set_exception_action is applied on an instance of a LCO.
         ///
         /// \param e      [in] The exception encapsulating the error to report
         ///               to this LCO instance.
-        void set_error(boost::exception_ptr const& e)
+        void set_exception(boost::exception_ptr const& e)
         {
             mutex_type::scoped_lock l(mtx_);
 

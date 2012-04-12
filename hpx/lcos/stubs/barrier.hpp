@@ -24,10 +24,10 @@ namespace hpx { namespace lcos { namespace stubs
         }
 
         static lcos::future<void, util::unused_type>
-        set_error_async(naming::id_type const& gid,
+        set_exception_async(naming::id_type const& gid,
             boost::exception_ptr const& e)
         {
-            typedef lcos::base_lco::set_error_action action_type;
+            typedef lcos::base_lco::set_exception_action action_type;
             return lcos::async<action_type>(gid, e);
         }
 
@@ -36,10 +36,10 @@ namespace hpx { namespace lcos { namespace stubs
             wait_async(gid).get();
         }
 
-        static void set_error(naming::id_type const& gid,
+        static void set_exception(naming::id_type const& gid,
             boost::exception_ptr const& e)
         {
-            set_error_async(gid, e).get();
+            set_exception_async(gid, e).get();
         }
     };
 }}}
