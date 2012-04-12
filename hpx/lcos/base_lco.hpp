@@ -24,7 +24,7 @@ namespace hpx { namespace lcos
     {
         lco_set_event = 0,
         lco_set_value = 1,
-        lco_set_error = 2,
+        lco_set_exception = 2,
         lco_get_value = 3,
         lco_connect = 4,
         lco_disconnect = 5
@@ -143,9 +143,9 @@ namespace hpx { namespace lcos
 //         HPX_COMPONENT_DIRECT_ACTION(base_lco, set_exception_nonvirt,
 //             set_exception_action);
         typedef hpx::actions::direct_action1<
-            base_lco, lco_set_error, boost::exception_ptr const&,
-            &base_lco::set_error_nonvirt
-        > set_error_action;
+            base_lco, lco_set_exception, boost::exception_ptr const&,
+            &base_lco::set_exception_nonvirt
+        > set_exception_action;
 
         /// The \a connect_action may be used to
 //         HPX_COMPONENT_DIRECT_ACTION(base_lco, connect_nonvirt, connect_action);
