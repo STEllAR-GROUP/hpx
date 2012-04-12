@@ -429,12 +429,33 @@ namespace hpx { namespace actions
         hpx::actions::make_direct_action<BOOST_TYPEOF(&f), &f> /**/           \
     /**/
 
+    #define HPX_MAKE_ACTION_TPL(f)                                            \
+        hpx::actions::make_action<BOOST_TYPEOF_TPL(&f), &f>        /**/       \
+    /**/
+    #define HPX_MAKE_DIRECT_ACTION_TPL(f)                                     \
+        hpx::actions::make_direct_action<BOOST_TYPEOF_TPL(&f), &f> /**/       \
+    /**/
+
 #if BOOST_WORKAROUND(BOOST_MSVC, == 1600)
     // workarounds for VC2010
     #define HPX_MAKE_COMPONENT_ACTION(component, f)                           \
         hpx::actions::make_action<                                            \
             BOOST_TYPEOF(component::f) component::*, &component::f>  /**/     \
     /**/
+    #define HPX_MAKE_DIRECT_COMPONENT_ACTION(component, f)                    \
+        hpx::actions::make_direct_action<                                     \
+            BOOST_TYPEOF(component::f) component::*, &component::f>  /**/     \
+    /**/
+
+    #define HPX_MAKE_COMPONENT_ACTION_TPL(component, f)                       \
+        hpx::actions::make_action<                                            \
+            BOOST_TYPEOF_TPL(component::f) component::*, &component::f>  /**/ \
+    /**/
+    #define HPX_MAKE_DIRECT_COMPONENT_ACTION_TPL(component, f)                \
+        hpx::actions::make_direct_action<                                     \
+            BOOST_TYPEOF_TPL(component::f) component::*, &component::f>  /**/ \
+    /**/
+
     namespace detail
     {
         template <typename Obj, typename F>
@@ -442,20 +463,66 @@ namespace hpx { namespace actions
 
         template <typename F> F replicate_type(F);
     }
+
     #define HPX_MAKE_CONST_COMPONENT_ACTION(component, f)                     \
-        hpx::actions::make_action<hpx::actions::detail::synthesize_const_mf<  \
-            component, BOOST_TYPEOF(                                          \
-                hpx::actions::detail::replicate_type(&component::f)           \
-            )                                                                 \
-        >::type, &component::f>  /**/                                         \
+        hpx::actions::make_action<                                            \
+            hpx::actions::detail::synthesize_const_mf<                        \
+                component, BOOST_TYPEOF(                                      \
+                    hpx::actions::detail::replicate_type(&component::f)       \
+                )                                                             \
+            >::type, &component::f>  /**/                                     \
+    /**/
+    #define HPX_MAKE_CONST_DIRECT_COMPONENT_ACTION(component, f)              \
+        hpx::actions::make_direct_action<                                     \
+            hpx::actions::detail::synthesize_const_mf<                        \
+                component, BOOST_TYPEOF(                                      \
+                    hpx::actions::detail::replicate_type(&component::f)       \
+                )                                                             \
+            >::type, &component::f>  /**/                                     \
+    /**/
+
+    #define HPX_MAKE_CONST_COMPONENT_ACTION_TPL(component, f)                 \
+        hpx::actions::make_action<                                            \
+            typename hpx::actions::detail::synthesize_const_mf<               \
+                component, BOOST_TYPEOF_TPL(                                  \
+                    hpx::actions::detail::replicate_type(&component::f)       \
+                )                                                             \
+            >::type, &component::f>  /**/                                     \
+    /**/
+    #define HPX_MAKE_CONST_DIRECT_COMPONENT_ACTION_TPL(component, f)          \
+        hpx::actions::make_direct_action<                                     \
+            typename hpx::actions::detail::synthesize_const_mf<               \
+                component, BOOST_TYPEOF_TPL(                                  \
+                    hpx::actions::detail::replicate_type(&component::f)       \
+                )                                                             \
+            >::type, &component::f>  /**/                                     \
     /**/
 #else
     // the implementation on conforming compilers is almost trivial
     #define HPX_MAKE_COMPONENT_ACTION(component, f)                           \
         HPX_MAKE_ACTION(component::f)::type                                   \
     /**/
+    #define HPX_MAKE_DIRECT_COMPONENT_ACTION(component, f)                    \
+        HPX_MAKE_DIRECT_ACTION(component::f)::type                            \
+    /**/
     #define HPX_MAKE_CONST_COMPONENT_ACTION(component, f)                     \
         HPX_MAKE_ACTION(component::f)::type                                   \
+    /**/
+    #define HPX_MAKE_CONST_DIRECT_COMPONENT_ACTION(component, f)              \
+        HPX_MAKE_DIRECT_ACTION(component::f)::type                            \
+    /**/
+
+    #define HPX_MAKE_COMPONENT_ACTION_TPL(component, f)                       \
+        typename HPX_MAKE_ACTION_TPL(component::f)::type                      \
+    /**/
+    #define HPX_MAKE_DIRECT_COMPONENT_ACTION_TPL(component, f)                \
+        typename HPX_MAKE_DIRECT_ACTION_TPL(component::f)::type               \
+    /**/
+    #define HPX_MAKE_CONST_COMPONENT_ACTION_TPL(component, f)                 \
+        typename HPX_MAKE_ACTION_TPL(component::f)::type                      \
+    /**/
+    #define HPX_MAKE_CONST_DIRECT_COMPONENT_ACTION_TPL(component, f)          \
+        typename HPX_MAKE_DIRECT_ACTION_TPL(component::f)::type               \
     /**/
 #endif
 

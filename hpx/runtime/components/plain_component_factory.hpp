@@ -208,10 +208,9 @@ namespace hpx { namespace components
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_PLAIN_ACTION(func, name)                                          \
-  typedef HPX_MAKE_ACTION(func)::type name;                                   \
+    typedef HPX_MAKE_ACTION(func)::type name;                                 \
     HPX_REGISTER_PLAIN_ACTION(name)                                           \
     /**/
-
 #define HPX_PLAIN_ACTION_EX(func, name, enable_always)                        \
     typedef HPX_MAKE_ACTION(func)::type name;                                 \
     HPX_REGISTER_PLAIN_ACTION_EX2(name, name, enable_always)                  \
