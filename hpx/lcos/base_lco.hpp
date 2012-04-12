@@ -209,13 +209,21 @@ namespace hpx { namespace lcos
         ///
         /// \param RemoteResult [in] The type of the result to be transferred
         ///               back to this LCO instance.
-        HPX_COMPONENT_DIRECT_ACTION_TPL(base_lco_with_value, set_value_nonvirt,
-            set_value_action);
+//         HPX_COMPONENT_DIRECT_ACTION_TPL(base_lco_with_value, set_value_nonvirt,
+//             set_value_action);
+        typedef hpx::actions::direct_action1<
+            base_lco_with_value, lco_set_value, BOOST_RV_REF(RemoteResult),
+            &base_lco_with_value::set_value_nonvirt
+        > set_value_action;
 
         /// The \a get_value_action may be used to query the value this LCO
         /// instance exposes as its 'result' value.
-        HPX_COMPONENT_DIRECT_ACTION_TPL(base_lco_with_value, get_value_nonvirt,
-            get_value_action);
+//         HPX_COMPONENT_DIRECT_ACTION_TPL(base_lco_with_value, get_value_nonvirt,
+//             get_value_action);
+        typedef hpx::actions::direct_result_action0<
+            base_lco_with_value, Result, lco_get_value,
+            &base_lco_with_value::get_value_nonvirt
+        > get_value_action;
     };
 
     /// The base_lco<void> specialization is used whenever the set_event action
