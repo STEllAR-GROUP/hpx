@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/asio_util.hpp>
-#include <hpx/util/pbs_environment.hpp>
+#include <hpx/util/batch_environment.hpp>
 #include <hpx/util/map_hostnames.hpp>
 #include <hpx/util/sed_transform.hpp>
 #include <hpx/util/parse_command_line.hpp>
@@ -818,7 +818,7 @@ namespace hpx
             }
 
             // Check command line arguments.
-            util::pbs_environment env(debug_clp);
+            util::batch_environment env(debug_clp);
 
             if (vm.count("hpx:iftransform")) {
                 util::sed_transform iftransform(vm["hpx:iftransform"].as<std::string>());
@@ -848,6 +848,9 @@ namespace hpx
                 ini_config += "hpx.nodes=" + env.init_from_nodelist(
                     vm["hpx:nodes"].as<std::vector<std::string> >(), agas_host);
             }
+            else if (env.found_batch_environment()) {
+                ini_config += "hpx.nodes=" + env.init_from_environment(agas_host);
+            }
 
             // let the PBS environment decide about the AGAS host
             agas_host = env.agas_host_name(
@@ -857,49 +860,68 @@ namespace hpx
             boost::uint16_t hpx_port = HPX_INITIAL_IP_PORT;
 
             // handling number of threads
-            std::size_t pbs_threads = env.retrieve_number_of_threads();
+            std::size_t batch_threads = env.retrieve_number_of_threads();
             std::size_t num_threads = cfgmap.get_value<std::size_t>(
-                "hpx.os_threads", pbs_threads);
+                "hpx.os_threads", batch_threads);
 
-            if (env.run_with_pbs() && num_threads > pbs_threads) {
+            if ((env.run_with_pbs() || env.run_with_slurm()) &&
+                  num_threads > batch_threads)
+            {
                 std::cerr  << "hpx::init: command line warning: "
-                    "--hpx:ini=hpx.os_threads used when running with PBS, "
-                    "requesting a larger number of threads than cores have "
-                    "been assigned by PBS, the application might not run "
-                    "properly." << std::endl;
+                        "--hpx:ini=hpx.os_threads used when running with "
+                    <<  env.get_batch_name()
+                    <<  ", requesting a larger number of threads than cores have "
+                        "been assigned by "
+                    <<  env.get_batch_name()
+                    <<  ", the application might not run properly."
+                    << std::endl;
             }
 
             if (vm.count("hpx:threads")) {
                 std::size_t threads = vm["hpx:threads"].as<std::size_t>();
-                if (env.run_with_pbs() && threads > num_threads) {
+                if ((env.run_with_pbs() || env.run_with_slurm()) &&
+                      threads > num_threads)
+                {
                     std::cerr  << "hpx::init: command line warning: --hpx:threads "
-                        "used when running with PBS, requesting a larger "
-                        "number of threads than cores have been assigned by PBS, "
-                        "the application might not run properly." << std::endl;
+                            "used when running with "
+                        <<  env.get_batch_name() << " , requesting a larger "
+                            "number of threads than cores have been assigned by "
+                        <<  env.get_batch_name()
+                        <<  ", the application might not run properly."
+                        <<  std::endl;
                 }
                 num_threads = threads;
             }
 
             // handling number of localities
-            std::size_t pbs_localities = env.retrieve_number_of_localities();
+            std::size_t batch_localities = env.retrieve_number_of_localities();
             std::size_t num_localities = cfgmap.get_value<std::size_t>(
-                "hpx.localities", pbs_localities);
+                "hpx.localities", batch_localities);
 
-            if (env.run_with_pbs() && pbs_localities != num_localities) {
+            if ((env.run_with_pbs() || env.run_with_slurm()) &&
+                    batch_localities != num_localities)
+            {
                 std::cerr  << "hpx::init: command line warning: "
-                    "--hpx:ini=hpx.localities used when running with PBS, "
-                    "requesting a different number of localities than have "
-                    "been assigned by PBS, the application might not run "
-                    "properly." << std::endl;
+                        "--hpx:ini=hpx.localities used when running with "
+                    <<  env.get_batch_name()
+                    <<  ", requesting a different number of localities than have "
+                        "been assigned by " << env.get_batch_name()
+                    <<  ", the application might not run properly."
+                    << std::endl;
             }
 
             if (vm.count("hpx:localities")) {
                 std::size_t localities = vm["hpx:localities"].as<std::size_t>();
-                if (env.run_with_pbs() && localities != num_localities) {
+                if ((env.run_with_pbs() || env.run_with_slurm()) &&
+                        localities != num_localities)
+                {
                     std::cerr  << "hpx::init: command line warning: --hpx:localities "
-                        "used when running with PBS, requesting a different "
-                        "number of localities than have been assigned by PBS, "
-                        "the application might not run properly." << std::endl;
+                            "used when running with " << env.get_batch_name()
+                        <<  ", requesting a different "
+                            "number of localities than have been assigned by "
+                        <<  env.get_batch_name()
+                        <<  ", the application might not run properly."
+                        <<  std::endl;
                 }
                 num_localities = localities;
             }
@@ -1016,7 +1038,7 @@ namespace hpx
                 agas_host = hpx_host;
                 agas_port = hpx_port;
             }
-            else if (env.run_with_pbs()) {
+            else if (env.run_with_pbs() || env.run_with_slurm()) {
                 // in PBS mode, if the network addresses are different and we
                 // should not run the AGAS server we assume to be in worker mode
                 mode = hpx::runtime_mode_worker;
@@ -1038,7 +1060,9 @@ namespace hpx
                 if (vm.count("hpx:run-agas-server-only"))
                     ini_config += "hpx.components.load_external=0";
             }
-            else if (vm.count("hpx:run-agas-server-only") && !env.run_with_pbs()) {
+            else if (vm.count("hpx:run-agas-server-only") &&
+                  !(env.run_with_pbs() || env.run_with_slurm()))
+            {
                 throw std::logic_error("Command line option --hpx:run-agas-server-only "
                     "can be specified only for the node running the AGAS server.");
             }

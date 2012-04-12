@@ -23,11 +23,11 @@ namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////
     // Try to retrieve PBS related settings from the environment
-    struct HPX_EXPORT pbs_environment
+    struct HPX_EXPORT batch_environment
     {
         // the constructor tries to read from a PBS node-file, filling our
         // map of nodes and thread counts
-        pbs_environment(bool debug = false)
+        batch_environment(bool debug = false)
           : agas_node_num_(0), debug_(debug)
         {}
 
@@ -40,6 +40,9 @@ namespace hpx { namespace util
         // separated) list of nodes
         std::string init_from_nodelist(std::vector<std::string> const& nodes,
             std::string const& agas_host);
+
+        // this function initializes the map of nodes from the environment
+        std::string init_from_environment(std::string const& agas_host);
 
         // The number of threads is either one (if no PBS information was
         // found), or it is the same as the number of times this node has
@@ -69,6 +72,18 @@ namespace hpx { namespace util
         // The function run_with_pbs returns true if the job was started using
         // PBS, false otherwise
         bool run_with_pbs() const;
+
+        // The function run_with_pbs returns true if the job was started using
+        // SLURM, false otherwise
+        bool run_with_slurm() const;
+
+        // The function will analyze the current environment and return true
+        // if it finds sufficient information to deduce its running as a batch
+        // job.
+        bool found_batch_environment() const;
+
+        // Return a string containing the name of the batch system
+        std::string get_batch_name() const;
 
         typedef std::map<
             boost::asio::ip::tcp::endpoint, std::pair<std::string, std::size_t>

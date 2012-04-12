@@ -4,7 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/pbs_environment.hpp>
+#include <hpx/util/batch_environment.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -12,21 +12,27 @@
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/asio/ip/host_name.hpp>
+#include <boost/tokenizer.hpp>
 
 namespace hpx { namespace util
 {
+    // The function will analyze the current environment and return true
+    // if it finds sufficient information to deduce its running as a batch job.
+    bool batch_environment::found_batch_environment() const
+    {
+        // All we have to do for now is to identify SLURM as PBS does not
+        // provide sufficient environment variable to deduce all required
+        // information.
+        // (https://computing.llnl.gov/linux/slurm/srun.html)
+        return std::getenv("SLURM_NODELIST") &&
+               std::getenv("SLURM_PROCID");
+    }
+
     // this function tries to read from a PBS node-file, filling our
     // map of nodes and thread counts
-    std::string pbs_environment::init_from_file(std::string nodefile,
+    std::string batch_environment::init_from_file(std::string nodefile,
         std::string const& agas_host)
     {
-        // read node file
-        if (nodefile.empty()) {
-            char* pbs_nodefile_env = std::getenv("PBS_NODEFILE");
-            if (pbs_nodefile_env)
-                nodefile = pbs_nodefile_env;
-        }
-
         if (!nodefile.empty()) {
             boost::asio::io_service io_service;
             std::ifstream ifs(nodefile.c_str());
@@ -104,7 +110,7 @@ namespace hpx { namespace util
 
     // this function initializes the map of nodes from the given (space
     // separated) list of nodes
-    std::string pbs_environment::init_from_nodelist(
+    std::string batch_environment::init_from_nodelist(
         std::vector<std::string> const& nodes,
         std::string const& agas_host)
     {
@@ -174,12 +180,53 @@ namespace hpx { namespace util
         return nodes_list;
     }
 
+    // this function initializes the map of nodes from the environment
+    std::string batch_environment::init_from_environment(
+        std::string const& agas_host)
+    {
+        char* slurm_nodelist_env = std::getenv("SLURM_NODELIST");
+        if (slurm_nodelist_env) {
+            if (debug_) {
+                std::cerr << "SLURM nodelist found: " << slurm_nodelist_env
+                          << std::endl;
+            }
+
+            typedef boost::tokenizer<boost::char_separator<char> > tokenizer_type;
+
+            std::vector<std::string> nodes;
+            boost::char_separator<char> sep (" \t:");
+            tokenizer_type tok(std::string(slurm_nodelist_env), sep);
+            tokenizer_type::iterator end = tok.end();
+            for (tokenizer_type::iterator it = tok.begin (); it != end; ++it)
+                nodes.push_back (*it);
+
+            return init_from_nodelist(nodes, agas_host);
+        }
+        return std::string();
+    }
+
     // The number of threads is either one (if no PBS information was
     // found), or it is the same as the number of times this node has
     // been listed in the node file.
-    std::size_t pbs_environment::retrieve_number_of_threads() const
+    std::size_t batch_environment::retrieve_number_of_threads() const
     {
         std::size_t result = 1;
+        char* slurm_cpus_on_node = std::getenv("SLURM_CPUS_ON_NODE");
+        if (slurm_cpus_on_node) {
+            try {
+                std::string value(slurm_cpus_on_node);
+                result = boost::lexical_cast<std::size_t>(value);
+                if (debug_) {
+                    std::cerr << "retrieve_number_of_threads (SLURM_CPUS_ON_NODE): "
+                              << result << std::endl;
+                }
+                return result;
+            }
+            catch (boost::bad_lexical_cast const&) {
+                ; // just ignore the error
+            }
+        }
+
         if (!nodes_.empty()) {
             // fall back to counting the number of occurrences of this node
             // in the node-file
@@ -202,7 +249,7 @@ namespace hpx { namespace util
     // The number of localities is either one (if no PBS information
     // was found), or it is the same as the number of distinct node
     // names listed in the node file.
-    std::size_t pbs_environment::retrieve_number_of_localities() const
+    std::size_t batch_environment::retrieve_number_of_localities() const
     {
         std::size_t result = nodes_.empty() ? 1 : nodes_.size();
         if (debug_) {
@@ -213,16 +260,19 @@ namespace hpx { namespace util
     }
 
     // Try to retrieve the node number from the PBS environment
-    std::size_t pbs_environment::retrieve_node_number() const
+    std::size_t batch_environment::retrieve_node_number() const
     {
-        char* pbs_nodenum = std::getenv("PBS_NODENUM");
-        if (pbs_nodenum) {
+        char* nodenum_env = std::getenv("PBS_NODENUM");
+        if (!nodenum_env)
+            nodenum_env = std::getenv("SLURM_PROCID");
+
+        if (nodenum_env) {
             try {
-                std::string value(pbs_nodenum);
+                std::string value(nodenum_env);
                 std::size_t result = boost::lexical_cast<std::size_t>(value);
                 if (debug_) {
-                    std::cerr << "retrieve_node_number (PBS_NODENUM): " << result
-                              << std::endl;
+                    std::cerr << "retrieve_node_number (PBS_NODENUM/SLURM_PROCID): "
+                              << result << std::endl;
                 }
                 return result;
             }
@@ -232,10 +282,11 @@ namespace hpx { namespace util
         }
         if (debug_)
             std::cerr << "retrieve_node_number: -1" << std::endl;
+
         return std::size_t(-1);
     }
 
-    std::string pbs_environment::host_name() const
+    std::string batch_environment::host_name() const
     {
         std::string hostname = boost::asio::ip::host_name();
         if (debug_)
@@ -243,7 +294,7 @@ namespace hpx { namespace util
         return hostname;
     }
 
-    std::string pbs_environment::host_name(std::string const& def_hpx_name) const
+    std::string batch_environment::host_name(std::string const& def_hpx_name) const
     {
         std::string host = nodes_.empty() ? def_hpx_name : host_name();
         if (debug_)
@@ -253,7 +304,7 @@ namespace hpx { namespace util
 
     // We either select the first host listed in the node file or a given
     // host name to host the AGAS server.
-    std::string pbs_environment::agas_host_name(std::string const& def_agas) const
+    std::string batch_environment::agas_host_name(std::string const& def_agas) const
     {
         std::string host = agas_node_.empty() ? def_agas : agas_node_;
         if (debug_)
@@ -261,9 +312,24 @@ namespace hpx { namespace util
         return host;
     }
 
-    bool pbs_environment::run_with_pbs() const
+    bool batch_environment::run_with_pbs() const
     {
         return std::getenv("PBS_NODENUM") != 0 ? true : false;
+    }
+
+    bool batch_environment::run_with_slurm() const
+    {
+        return std::getenv("SLURM_PROCID") != 0 ? true : false;
+    }
+
+    // Return a string containing the name of the batch system
+    std::string batch_environment::get_batch_name() const
+    {
+        if (run_with_pbs())
+            return "PBS";
+        if (run_with_slurm())
+            return "SLURM";
+        return "";
     }
 }}
 
