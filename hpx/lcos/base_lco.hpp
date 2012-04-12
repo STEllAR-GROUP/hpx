@@ -23,7 +23,7 @@ namespace hpx { namespace lcos
     enum actions
     {
         lco_set_event = 0,
-        lco_set_result = 1,
+        lco_set_value = 1,
         lco_set_error = 2,
         lco_get_value = 3,
         lco_connect = 4,
@@ -221,6 +221,8 @@ namespace hpx { namespace lcos
         ///
         /// \param RemoteResult [in] The type of the result to be transferred
         ///               back to this LCO instance.
+
+        // FIXME: gcc complains when the macro is used
 //         HPX_COMPONENT_DIRECT_ACTION_TPL(base_lco_with_value, set_value_nonvirt,
 //             set_value_action);
         typedef hpx::actions::direct_action1<
@@ -230,6 +232,8 @@ namespace hpx { namespace lcos
 
         /// The \a get_value_action may be used to query the value this LCO
         /// instance exposes as its 'result' value.
+
+        // FIXME: gcc complains when the macro is used
 //         HPX_COMPONENT_DIRECT_ACTION_TPL(base_lco_with_value, get_value_nonvirt,
 //             get_value_action);
         typedef hpx::actions::direct_result_action0<
