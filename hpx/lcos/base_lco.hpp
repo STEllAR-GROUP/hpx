@@ -18,6 +18,18 @@
 
 namespace hpx { namespace lcos
 {
+    // parcel action code: the action to be performed on the destination
+    // object
+    enum actions
+    {
+        lco_set_event = 0,
+        lco_set_result = 1,
+        lco_set_error = 2,
+        lco_get_value = 3,
+        lco_connect = 4,
+        lco_disconnect = 5
+    };
+
     /// The \a base_lco class is the common base class for all LCO's
     /// implementing a simple set_event action
     class base_lco
