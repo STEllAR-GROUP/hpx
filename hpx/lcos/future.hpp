@@ -148,7 +148,7 @@ namespace hpx { namespace lcos
         friend class local::promise<void>;
         friend class promise<void, util::unused_type>;
         friend class threads::thread;
-        friend class detail::signalling_promise<Result, RemoteResult>;
+        friend class detail::signalling_promise<void, util::unused_type>;
 
     public:
         typedef void result_type;
