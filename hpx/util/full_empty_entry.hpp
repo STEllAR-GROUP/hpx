@@ -184,6 +184,15 @@ namespace hpx { namespace util { namespace detail
             return set_full_locked(ec);
         }
 
+        template <typename F>
+        bool peek(F f) const
+        {
+            mutex_type::scoped_lock l(mtx_);
+            if (state_ == empty)
+                return false;
+            return f(data_);      // pass the data to the provided function
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // enqueue a get operation if full/full queue if entry is empty
         template <typename T>
@@ -382,7 +391,7 @@ namespace hpx { namespace util { namespace detail
                 {
                     // yield this thread
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                    threads::this_thread::suspend(threads::suspended, 
+                    threads::this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_if_full");
                 }
             }
@@ -422,7 +431,7 @@ namespace hpx { namespace util { namespace detail
                 {
                     // yield this thread
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                    threads::this_thread::suspend(threads::suspended, 
+                    threads::this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_if_full");
                 }
             }

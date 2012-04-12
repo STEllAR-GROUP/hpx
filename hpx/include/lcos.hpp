@@ -17,6 +17,7 @@
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/shared_mutex.hpp>
 #include <hpx/lcos/local/recursive_mutex.hpp>
+#include <hpx/lcos/local/packaged_task.hpp>
 
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/queue.hpp>

@@ -172,6 +172,19 @@ namespace hpx { namespace util
             data_.enqueue_if_full(boost::forward<Target>(data), ec);
         }
 
+        /// \brief  Calls the supplied function passing along the stored data
+        ///         (if full)
+        ///
+        /// \param f [in] The function to be called
+        ///
+        /// \returns This function returns \a false if the FE memory is empty
+        ///          otherwise it returns the return value of \p f.
+        template <typename F>
+        bool peek(F f) const
+        {
+            return data_.peek(f);
+        }
+
     private:
         detail::full_empty_entry<T> data_;
     };

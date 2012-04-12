@@ -18,9 +18,11 @@ namespace hpx { namespace lcos { namespace local
     namespace detail
     {
         template<typename Result, typename F>
-        struct task_object : lcos::detail::task_base<Result>
+        struct task_object
+          : lcos::detail::task_base<Result>
         {
-            typedef Result result_type;
+            typedef typename lcos::detail::task_base<Result>::result_type
+                result_type;
 
             F f_;
 
@@ -44,9 +46,11 @@ namespace hpx { namespace lcos { namespace local
         };
 
         template<typename F>
-        struct task_object<void, F> : lcos::detail::task_base<util::unused_type>
+        struct task_object<void, F>
+          : lcos::detail::task_base<void>
         {
-            typedef util::unused_type result_type;
+            typedef typename lcos::detail::task_base<void>::result_type
+                result_type;
 
             F f_;
 
@@ -82,6 +86,8 @@ namespace hpx { namespace lcos { namespace local
 
     public:
         // construction and destruction
+        promise() : future_obtained_(false) {}
+
         template <typename F>
         explicit promise(F const& f)
           : task_(new detail::task_object<Result, F>(f)),
@@ -94,7 +100,7 @@ namespace hpx { namespace lcos { namespace local
             future_obtained_(false)
         {}
 
-        explicit promise(Result(*f)())
+        explicit promise(Result (*f)())
           : task_(new detail::task_object<Result , Result (*)()>(f)),
             future_obtained_(false)
         {}
@@ -107,7 +113,7 @@ namespace hpx { namespace lcos { namespace local
 
         // Assignment
         promise(BOOST_RV_REF(promise) rhs)
-          : task_(rhs.future_data_),
+          : task_(rhs.task_),
             future_obtained_(rhs.future_obtained_)
         {
             rhs.task_.reset();
@@ -167,6 +173,17 @@ namespace hpx { namespace lcos { namespace local
 //             task_->set_wait_callback(f, this);
 //         }
 
+        template <typename T>
+        void set_value(BOOST_FWD_REF(T) result)
+        {
+            task_->set_data(boost::forward<T>(result));
+        }
+
+        void set_exception(boost::exception_ptr const& e)
+        {
+            task_->set_error(e);
+        }
+
     private:
         boost::intrusive_ptr<task_impl_type> task_;
         bool future_obtained_;
@@ -177,6 +194,8 @@ namespace hpx { namespace lcos { namespace local
     struct packaged_task : promise<Result>
     {
         // construction and destruction
+        packaged_task() {}
+
         template <typename F>
         explicit packaged_task(F const& f)
           : promise<Result>(f)
@@ -196,6 +215,119 @@ namespace hpx { namespace lcos { namespace local
         {
             (*this)();    // execute the function immediately
         }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <>
+    class promise<void>
+    {
+    private:
+        typedef lcos::detail::task_base<void> task_impl_type;
+
+        BOOST_MOVABLE_BUT_NOT_COPYABLE(promise)
+
+    public:
+        // construction and destruction
+        promise() : future_obtained_(false) {}
+
+        template <typename F>
+        explicit promise(F const& f)
+          : task_(new detail::task_object<void, F>(f)),
+            future_obtained_(false)
+        {}
+
+        template <typename F>
+        explicit promise(BOOST_FWD_REF(F) f)
+          : task_(new detail::task_object<void, F>(boost::forward<F>(f))),
+            future_obtained_(false)
+        {}
+
+        explicit promise(void (*f)())
+          : task_(new detail::task_object<void , void (*)()>(f)),
+            future_obtained_(false)
+        {}
+
+        ~promise()
+        {
+            if (task_)
+                task_->deleting_owner();
+        }
+
+        // Assignment
+        promise(BOOST_RV_REF(promise) rhs)
+          : task_(rhs.task_),
+            future_obtained_(rhs.future_obtained_)
+        {
+            rhs.task_.reset();
+            rhs.future_obtained_ = false;
+        }
+
+        promise& operator=(BOOST_RV_REF(promise) rhs)
+        {
+            task_ = rhs.task_;
+            future_obtained_ = rhs.future_obtained_;
+            rhs.task_.reset();
+            rhs.future_obtained_ = false;
+            return *this;
+        }
+
+        void swap(promise& other)
+        {
+            task_.swap(other.task_);
+            std::swap(future_obtained_, other.future_obtained_);
+        }
+
+        // Result retrieval
+        lcos::future<void> get_future(error_code& ec = throws)
+        {
+            if (!task_) {
+                HPX_THROWS_IF(ec, task_moved,
+                    "promise<Result>::get_future",
+                    "task invalid (has it been moved?)");
+                return lcos::future<void>();
+            }
+            if (future_obtained_) {
+                HPX_THROWS_IF(ec, future_already_retrieved,
+                    "promise<Result>::get_future",
+                    "future already has been retrieved from this promise");
+                return lcos::future<void>();
+            }
+
+            future_obtained_ = true;
+            return lcos::future<void>(task_);
+        }
+
+        // execution
+        void operator()(error_code& ec = throws)
+        {
+            if (!task_) {
+                HPX_THROWS_IF(ec, task_moved,
+                    "promise::operator()",
+                    "task invalid (has it been moved?)");
+                return;
+            }
+            task_->run(ec);
+        }
+
+//         template <typename F>
+//         void set_wait_callback(F f)
+//         {
+//             task_->set_wait_callback(f, this);
+//         }
+
+        void set_value()
+        {
+            task_->set_data(util::unused);
+        }
+
+        void set_exception(boost::exception_ptr const& e)
+        {
+            task_->set_error(e);
+        }
+
+    private:
+        boost::intrusive_ptr<task_impl_type> task_;
+        bool future_obtained_;
     };
 }}}
 

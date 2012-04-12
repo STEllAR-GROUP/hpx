@@ -634,7 +634,7 @@ bool addressing_service::get_id_range(
         if (!is_bootstrap() && f)
         {
             hosted->promise_pool_.enqueue(new lcos::promise<response>);
-            f->invalidate(boost::current_exception());
+            f->set_exception(boost::current_exception());
         }
 
         if (&ec == &throws) {
@@ -730,7 +730,7 @@ bool addressing_service::bind_range(
         if (!is_bootstrap() && f)
         {
             hosted->promise_pool_.enqueue(new lcos::promise<response>);
-            f->invalidate(boost::current_exception());
+            f->set_exception(boost::current_exception());
         }
 
         if (&ec == &throws) {

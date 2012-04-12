@@ -184,7 +184,6 @@ namespace hpx { namespace util
             return *this;
         }
 
-
         value_or_error& operator=(error_type const& e)
         {
             if (stores_value()) {

@@ -39,7 +39,7 @@ namespace boost { namespace serialization
         const unsigned int)
     {
         // The most common cause of trapping here would be serializing
-        // something like shared_ptr<int>.  This occurs because int
+        // something like intrusive_ptr<int>.  This occurs because int
         // is never tracked by default.  Wrap int in a trackable type
         BOOST_STATIC_ASSERT((tracking_level<T>::value != track_never));
         T* ptr;
@@ -51,7 +51,7 @@ namespace boost { namespace serialization
     inline void serialize(Archive& ar, boost::intrusive_ptr<T>& t,
         unsigned int const version)
     {
-        // correct shared_ptr serialization depends upon object tracking
+        // correct intrusive_ptr serialization depends upon object tracking
         // being used.
         BOOST_STATIC_ASSERT(tracking_level<T>::value != track_never);
         boost::serialization::split_free(ar, t, version);

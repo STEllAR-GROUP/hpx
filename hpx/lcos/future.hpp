@@ -41,6 +41,7 @@ namespace hpx { namespace lcos
 
         friend class local::promise<Result>;
         friend class promise<Result, RemoteResult>;
+        friend class threads::thread;
 
     public:
 
@@ -97,9 +98,22 @@ namespace hpx { namespace lcos
             return future_data_->is_ready();
         }
 
-        bool is_set() const
+        bool has_value() const
         {
-            return future_data_;
+            return future_data_->has_value();
+        }
+
+        bool has_exception() const
+        {
+            return future_data_->has_exception();
+        }
+
+        future_state::state get_state() const
+        {
+            if (!future_data_)
+                return future_state::uninitialized;
+
+            return future_data_->get_state();
         }
 
     private:
@@ -182,9 +196,22 @@ namespace hpx { namespace lcos
             return future_data_->is_ready();
         }
 
-        bool is_set() const
+        bool has_value() const
         {
-            return future_data_;
+            return future_data_->has_value();
+        }
+
+        bool has_exception() const
+        {
+            return future_data_->has_exception();
+        }
+
+        future_state::state get_state() const
+        {
+            if (!future_data_)
+                return future_state::uninitialized;
+
+            return future_data_->get_state();
         }
 
     private:

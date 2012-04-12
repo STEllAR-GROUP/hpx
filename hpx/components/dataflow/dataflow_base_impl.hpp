@@ -31,7 +31,7 @@ namespace hpx { namespace lcos { namespace detail
                 hpx::lcos::base_lco::connect_action
                 action_type;
 
-            BOOST_ASSERT(gid_promise.is_set());
+            BOOST_ASSERT(gid_promise.get_state() != hpx::lcos::future_state::uninitialized);
 
             hpx::applier::apply<action_type>(gid_promise.get(), id);
         }

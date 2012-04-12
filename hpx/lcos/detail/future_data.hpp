@@ -17,6 +17,15 @@
 #include <boost/detail/atomic_count.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace lcos
+{
+    namespace future_state
+    {
+        enum state { uninitialized, deferred, ready, timeout };
+    }
+}}
+
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////
@@ -67,6 +76,9 @@ namespace hpx { namespace lcos { namespace detail
         virtual result_type get_data(error_code& ec = throws) = 0;
         virtual result_type move_data(error_code& ec = throws) = 0;
         virtual bool is_ready() const = 0;
+        virtual bool has_value() const = 0;
+        virtual bool has_exception() const = 0;
+        virtual future_state::state get_state() const = 0;
 
     protected:
         future_data_base() {}
@@ -210,6 +222,28 @@ namespace hpx { namespace lcos { namespace detail
             return !data_.is_empty();
         }
 
+    private:
+        static bool has_data_helper(data_type const& d)
+        {
+            return d.stores_value();
+        }
+
+    public:
+        bool has_value() const
+        {
+            return is_ready() && data_.peek(&has_data_helper);
+        }
+
+        bool has_exception() const
+        {
+            return is_ready() && !data_.peek(&has_data_helper);
+        }
+
+        future_state::state get_state() const
+        {
+            return is_ready() ? future_state::ready : future_state::deferred;
+        }
+
         /// Reset the promise to allow to restart an asynchronous
         /// operation. Allows any subsequent set_data operation to succeed.
         void reset(error_code& ec = throws)
@@ -222,16 +256,18 @@ namespace hpx { namespace lcos { namespace detail
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template<typename Result>
+    template <typename Result>
     struct task_base : future_data<Result>
     {
+        typedef typename future_data<Result>::result_type result_type;
+
     public:
         task_base()
           : started_(false)
         {}
 
         // retrieving the value
-        Result get(error_code& ec = throws)
+        result_type get(error_code& ec = throws)
         {
             if (!started_)
                 run(ec);
@@ -240,7 +276,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         // moving out the value
-        Result move(error_code& ec = throws)
+        result_type move(error_code& ec = throws)
         {
             if (!started_)
                 run(ec);

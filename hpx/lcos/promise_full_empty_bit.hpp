@@ -351,17 +351,13 @@ namespace hpx { namespace lcos
         }
 
         ///
-        void set(RemoteResult const& result)
+        template <typename T>
+        void set_value(BOOST_FWD_REF(T) result)
         {
-            return (*impl_)->set_data(result);
+            (*impl_)->set_data(boost::forward<T>(result));
         }
 
-        void set(BOOST_RV_REF(RemoteResult) result)
-        {
-            return (*impl_)->set_data(boost::move(result));
-        }
-
-        void invalidate(boost::exception_ptr const& e)
+        void set_exception(boost::exception_ptr const& e)
         {
             (*impl_)->set_error(e);      // set the received error
         }
@@ -456,9 +452,14 @@ namespace hpx { namespace lcos
             return lcos::future<void>(impl_->get());
         }
 
-        void set()
+        void set_value()
         {
-            return (*impl_)->set_data(util::unused);
+            (*impl_)->set_data(util::unused);
+        }
+
+        void set_exception(boost::exception_ptr const& e)
+        {
+            (*impl_)->set_error(e);
         }
 
         void invalidate(boost::exception_ptr const& e)
