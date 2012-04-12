@@ -101,6 +101,8 @@ namespace hpx { namespace threads
         void interrupt();
         bool interruption_requested() const;
 
+        lcos::future<void> get_future(error_code& ec = throws);
+
     private:
         void start_thread(BOOST_RV_REF(HPX_STD_FUNCTION<void()>) func);
         static thread_state_enum thread_function_nullary(

@@ -56,7 +56,8 @@ namespace hpx { namespace lcos { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Result, typename RemoteResult>
+    template <typename Result, typename RemoteResult =
+        typename traits::promise_remote_result<Result>::type>
     struct future_data_base : future_data_refcnt_base
     {
         typedef typename boost::mpl::if_<

@@ -9,6 +9,7 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
+#include <hpx/lcos/future.hpp>
 
 namespace hpx { namespace threads
 {
@@ -139,6 +140,7 @@ namespace hpx { namespace threads
         detach();   // invalidate this object
     }
 
+    // extensions
     void thread::interrupt()
     {
         threads::interrupt_thread(native_handle());
@@ -147,6 +149,74 @@ namespace hpx { namespace threads
     bool thread::interruption_requested() const
     {
         return threads::get_thread_interruption_requested(native_handle());
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        struct thread_task_base
+          : lcos::detail::future_data<void>
+        {
+            typedef boost::intrusive_ptr<lcos::detail::future_data<void> >
+                future_base_type;
+
+        public:
+            thread_task_base(threads::thread_id_type id)
+              : valid_(false)
+            {
+                if (threads::add_thread_exit_callback(id,
+                        HPX_STD_BIND(&thread_task_base::thread_exit_function,
+                        this, future_base_type(this))))
+                {
+                    valid_ = true;
+                }
+            }
+
+            // retrieving the value
+            void get(error_code& ec = throws)
+            {
+                this->get_data(ec);
+            }
+
+            // moving out the value
+            void move(error_code& ec = throws)
+            {
+                this->move_data(ec);
+            }
+
+            bool is_valid() const
+            {
+                return valid_;
+            }
+
+        protected:
+            void thread_exit_function(future_base_type base)
+            {
+                base->set_data(result_type());
+            }
+
+        private:
+            bool valid_;
+        };
+    }
+
+    lcos::future<void> thread::get_future(error_code& ec)
+    {
+        if (id_ == invalid_thread_id) {
+            HPX_THROWS_IF(ec, null_thread_id, "thread::get_future",
+                "NULL thread id encountered");
+            return lcos::future<void>();
+        }
+
+        detail::thread_task_base* p = new detail::thread_task_base(id_);
+        boost::intrusive_ptr<lcos::detail::future_data_base<void> > base(p);
+        if (!p->is_valid()) {
+            HPX_THROWS_IF(ec, thread_resource_error, "thread::get_future",
+                "Could not create future as thread has been terminated.");
+            return lcos::future<void>();
+        }
+
+        return lcos::future<void>(base);
     }
 
     ///////////////////////////////////////////////////////////////////////////
