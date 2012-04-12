@@ -856,6 +856,7 @@ namespace hpx
             std::string hpx_host(env.host_name(HPX_INITIAL_IP_ADDRESS));
             boost::uint16_t hpx_port = HPX_INITIAL_IP_PORT;
 
+            // handling number of threads
             std::size_t pbs_threads = env.retrieve_number_of_threads();
             std::size_t num_threads = cfgmap.get_value<std::size_t>(
                 "hpx.os_threads", pbs_threads);
@@ -868,12 +869,42 @@ namespace hpx
                     "properly." << std::endl;
             }
 
+            if (vm.count("hpx:threads")) {
+                std::size_t threads = vm["hpx:threads"].as<std::size_t>();
+                if (env.run_with_pbs() && threads > num_threads) {
+                    std::cerr  << "hpx::init: command line warning: --hpx:threads "
+                        "used when running with PBS, requesting a larger "
+                        "number of threads than cores have been assigned by PBS, "
+                        "the application might not run properly." << std::endl;
+                }
+                num_threads = threads;
+            }
+
+            // handling number of localities
+            std::size_t pbs_localities = env.retrieve_number_of_localities();
+            std::size_t num_localities = cfgmap.get_value<std::size_t>(
+                "hpx.localities", pbs_localities);
+
+            if (env.run_with_pbs() && pbs_localities != num_localities) {
+                std::cerr  << "hpx::init: command line warning: "
+                    "--hpx:ini=hpx.localities used when running with PBS, "
+                    "requesting a different number of localities than have "
+                    "been assigned by PBS, the application might not run "
+                    "properly." << std::endl;
+            }
+
+            if (vm.count("hpx:localities")) {
+                std::size_t localities = vm["hpx:localities"].as<std::size_t>();
+                if (env.run_with_pbs() && localities != num_localities) {
+                    std::cerr  << "hpx::init: command line warning: --hpx:localities "
+                        "used when running with PBS, requesting a different "
+                        "number of localities than have been assigned by PBS, "
+                        "the application might not run properly." << std::endl;
+                }
+                num_localities = localities;
+            }
+
             bool run_agas_server = vm.count("hpx:run-agas-server") ? true : false;
-
-            std::size_t num_localities = env.retrieve_number_of_localities();
-            if (vm.count("hpx:localities"))
-                num_localities = vm["hpx:localities"].as<std::size_t>();
-
             std::size_t node = env.retrieve_node_number();
 
             // we initialize certain settings if --node is specified (or data
@@ -920,17 +951,6 @@ namespace hpx
 
             if (vm.count("hpx:hpx"))
                 util::split_ip_address(vm["hpx:hpx"].as<std::string>(), hpx_host, hpx_port);
-
-            if (vm.count("hpx:threads")) {
-                std::size_t threads = vm["hpx:threads"].as<std::size_t>();
-                if (env.run_with_pbs() && threads > num_threads) {
-                    std::cerr  << "hpx::init: command line warning: --hpx:threads "
-                        "used when running with PBS, requesting a larger "
-                        "number of threads than cores have been assigned by PBS, "
-                        "the application might not run properly." << std::endl;
-                }
-                num_threads = threads;
-            }
 
             std::string queuing("priority_local");
             if (vm.count("hpx:queuing"))
