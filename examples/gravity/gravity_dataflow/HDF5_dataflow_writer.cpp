@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//////////////////////////    HDF5 Writer    //////////////////////////////////
+/////////////////////    HDF5 Dataflow Writer    //////////////////////////////
 //
 //This program is designed to write the output file of Gravity.  It writes
 //the file in a HDF5 format.
@@ -23,7 +23,7 @@
 #include <hpx/lcos/future_wait.hpp>
 
 #include <H5Cpp.h>
-#include "gravity.hpp"
+#include "gravity_dataflow.hpp"
 
 using namespace std;
 using namespace H5;
@@ -31,9 +31,8 @@ using namespace H5;
 using hpx::lcos::future;
 using hpx::lcos::wait;
 
-void printval (future<void> const & mp,config_f& param,uint64_t k,uint64_t t,
-                ofstream &coorfile, ofstream &trbst) {
- wait(mp);
+void printval (Vector_container pts,config_f const & param,uint64_t k,
+                uint64_t t) {
  if (t%param.print==0) {
   uint64_t width=log10(param.steps)+1;
   string a=boost::lexical_cast<string>(t);
@@ -46,26 +45,27 @@ void printval (future<void> const & mp,config_f& param,uint64_t k,uint64_t t,
   DataSpace fspace(2,fdim);
   DataSet dataset=file.createDataSet(DATASET_NAME, PredType::NATIVE_DOUBLE,
                                      fspace);
-  dataset.write(&pts_timestep[t][0],PredType::NATIVE_DOUBLE);
+  dataset.write(&pts[0],PredType::NATIVE_DOUBLE);
   dataset.close();
   file.close();
  }
+}
+
+void printdebug(Vector_container pts,uint64_t k,ofstream &coorfile, 
+                 ofstream &trbst) {
  if (debug) {
-  uint64_t tn=t+1;
   for (uint64_t i=0;i<k;i++) {
-   coorfile<<pts_timestep[tn][i].x<<","<<pts_timestep[tn][i].y<<","
-           <<pts_timestep[tn][i].z<<",";
-   trbst<<"v:,"<<pts_timestep[tn][i].vx<<","<<pts_timestep[tn][i].vy<<","
-        <<pts_timestep[tn][i].vz<<",";
-   trbst<<"f:,"<<pts_timestep[t][i].ft<<",";
+   coorfile<<pts[i].x<<","<<pts[i].y<<","<<pts[i].z<<",";
+   trbst<<"v:,"<<pts[i].vx<<","<<pts[i].vy<<","<<pts[i].vz<<",";
+   trbst<<"f:,"<<pts[i].ft<<",";
  }
  coorfile<<'\n';
  trbst<<'\n';
  }
 }
 
-void printfinalcoord (config_f& param, uint64_t k) { //Not done with this
-                                                     // function
+void printfinalcoord (Vector_container const &pts,config_f& param, uint64_t k) { 
+                          //Not done with this function
  string j=param.output+"_finalcoord.h5";
  const H5std_string FILE_NAME(j);
  const H5std_string DATASET_NAME("Coordinates");
@@ -93,7 +93,7 @@ void printfinalcoord (config_f& param, uint64_t k) { //Not done with this
  DataSpace fspace(2,fdim); //new file dataspace
  DataSet dataset=file.createDataSet(DATASET_NAME, PredType::NATIVE_DOUBLE,
                                     fspace); //new file dataset
- dataset.write(&pts_timestep[param.steps][0],PredType::NATIVE_DOUBLE,mspace,
+ dataset.write(&pts[0],PredType::NATIVE_DOUBLE,mspace,
                fspace); //write memory-hyperslab to file
  dataset.close();
  file.close();

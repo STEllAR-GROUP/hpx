@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-///////////////////////////      HDF5 Reader    ////////////////////////////////
+//////////////////////      HDF5 Dataflow Reader    ////////////////////////////
 //
 //This program is designed to read in an HDF5 file produced by Coordinate
 //Builder. It is used to setup the points in Gravity.
@@ -18,7 +18,7 @@
 #include <cstdlib>
 
 #include <H5Cpp.h>
-#include "gravity.hpp"
+#include "gravity_dataflow.hpp"
 
 using namespace std;
 using namespace H5;
