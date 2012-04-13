@@ -145,23 +145,23 @@ defined:
 
 [fib_action]
 
-In this block of code the function `fibonacci()` is declared. After the
-declaration, the function is wrapped in a `hpx::actions::plain_result_action1<>`.
 A plain action is the most basic form of action. Plain actions wrap simple global
 functions which are not associated with any particular object (we will discuss
-other types of actions in the __accumulator_example__). The name of the action
-is tells us about the arity and nature of the functions return type. `1` signifies that the
-action takes 1 argument, and `result` indicates that the action returns a non-`void`
-value. 
+other types of actions in the __accumulator_example__).
+In this block of code the function `fibonacci()` is declared. After the
+declaration, the function is wrapped in an action in the declaration 
+ `HPX_PLAIN_ACTION()`. This function takes two aruments: the name of the
+function that is to be wrapped and the name of the action that you are
+creating.
 
 This picture should now start making sense. The function `fibonacci()` is
-wrapped in an action `hpx::actions::plain_result_action1<>`, which was spawned
+wrapped in an action `fibonacci_action`, which was spawned
 by [funcref hpx::lcos::async]`<>()`, which returns a future. Now, lets look at the
 function `fibonacci()`:
 
 [fib_func]
 
-On first inspection this block of code is straightforward. First, `if (n < 2)`,
+This block of code is much more straightforward. First, `if (n < 2)`,
 meaning n is 0 or 1, then we return 0 or 1 (recall the first element
 of the Fibonacci sequence is 0 and the second is 1). If n is larger than 1, then
 we spawn two futures, `n1` and `n2`. Each of these futures represents an asynchronous,
@@ -173,6 +173,8 @@ When this termination condition is reached, the futures can then be added up,
 producing the n-th value of the Fibonacci sequence.
 
 [endsect] [/Fibonacci]
+
+[/Last Edit: 4-13-12]
 
 [/Proofread by:]
 [/Adrian Serio 3-13-12]
