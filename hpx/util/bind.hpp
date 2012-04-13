@@ -88,7 +88,7 @@ namespace hpx { namespace util {
         {
             return r.get();
         }
-        
+
         template <typename Env, typename T>
         T & eval(Env const &, boost::reference_wrapper<T> & r)
         {
@@ -137,7 +137,7 @@ namespace hpx { namespace util {
     {
         template <typename Env, int N>
         typename boost::fusion::result_of::at_c<Env, N>::type
-        eval(Env const & env, placeholders::arg<N> const&)
+        eval(Env const & env, util::placeholders::arg<N> const&)
         {
             return boost::fusion::at_c<N>(env);
         }
@@ -315,6 +315,12 @@ namespace hpx { namespace util {
 #include BOOST_PP_ITERATE()
 
 #undef HPX_UTIL_BIND_FWD_REF_PARAMS
+#undef HPX_UTIL_BIND_FWD_PARAMS
+#undef HPX_UTIL_BIND_EVAL
+#undef HPX_UTIL_BIND_REMOVE_REFERENCE
+#undef HPX_UTIL_BIND_REFERENCE
+#undef HPX_UTIL_BIND_FUNCTOR_OPERATOR
+
 }}
 
 #endif
@@ -565,6 +571,20 @@ namespace hpx { namespace util {
             (get_pointer(detail::eval(env, arg0))->*f)                          \
                 (BOOST_PP_ENUM_SHIFTED(NN, HPX_UTIL_BIND_EVAL, _));             \
     }                                                                           \
+    template <BOOST_PP_ENUM_PARAMS(N, typename A)>                              \
+    result_type operator()(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_REF_PARAMS, _)) const \
+    {                                                                           \
+        using detail::get_pointer;                                              \
+        typedef                                                                 \
+            BOOST_PP_CAT(hpx::util::tuple, N)<                                  \
+                BOOST_PP_ENUM(N, HPX_UTIL_BIND_REFERENCE, A)                    \
+            >                                                                   \
+            env_type;                                                           \
+        env_type env(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_PARAMS, A));            \
+        return                                                                  \
+            (get_pointer(detail::eval(env, arg0))->*f)                          \
+                (BOOST_PP_ENUM_SHIFTED(NN, HPX_UTIL_BIND_EVAL, _));             \
+    }                                                                           \
 /**/
 
             BOOST_PP_REPEAT_FROM_TO(
@@ -652,6 +672,20 @@ namespace hpx { namespace util {
             }
 
 #define HPX_UTIL_BIND_MEMBER_FUNCTOR_OPERATOR(Z, N, D)                          \
+    template <BOOST_PP_ENUM_PARAMS(N, typename A)>                              \
+    result_type operator()(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_REF_PARAMS, _))   \
+    {                                                                           \
+        using detail::get_pointer;                                              \
+        typedef                                                                 \
+            BOOST_PP_CAT(hpx::util::tuple, N)<                                  \
+                BOOST_PP_ENUM(N, HPX_UTIL_BIND_REFERENCE, A)                    \
+            >                                                                   \
+            env_type;                                                           \
+        env_type env(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_PARAMS, A));            \
+        return                                                                  \
+            (get_pointer(detail::eval(env, a0))->*f)                            \
+                (BOOST_PP_ENUM_SHIFTED(NN, HPX_UTIL_BIND_EVAL, _));             \
+    }                                                                           \
     template <BOOST_PP_ENUM_PARAMS(N, typename A)>                              \
     result_type operator()(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_REF_PARAMS, _)) const \
     {                                                                           \
@@ -881,6 +915,13 @@ namespace hpx { namespace util {
               , BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_PARAMS, A)
             );
     }
+
+#undef HPX_UTIL_BIND_MOVE_MEMBER
+#undef HPX_UTIL_BIND_ASSIGN_MEMBER
+#undef HPX_UTIL_BIND_INIT_MOVE_MEMBER
+#undef HPX_UTIL_BIND_INIT_COPY_MEMBER
+#undef HPX_UTIL_BIND_MEMBER
+#undef HPX_UTIL_BIND_INIT_MEMBER
 
 #undef NN
 #undef N
