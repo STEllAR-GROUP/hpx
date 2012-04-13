@@ -31,6 +31,8 @@ int test_error()
 }
 HPX_PLAIN_ACTION(test_error, test_error_action);
 
+char const* const error_msg = "throwing test exception: HPX(not_implemented)";
+
 ///////////////////////////////////////////////////////////////////////////////
 void future_callback(
     bool& data_cb_called
@@ -46,7 +48,6 @@ void future_callback(
         error_cb_called = true;
         HPX_TEST(f.has_exception());
 
-        std::string error_msg("throwing test exception: HPX(not_implemented)");
         std::string what_msg;
 
         try {
@@ -66,7 +67,13 @@ void future_callback(
 int hpx_main(variables_map& vm)
 {
     using hpx::lcos::future;
+    using hpx::lcos::async;
     using hpx::lcos::async_callback;
+
+    {
+        future<int> p = async<test_action>(hpx::find_here());
+        HPX_TEST_EQ(p.get(), 42);
+    }
 
     {
         bool data_cb_called = false;
@@ -84,6 +91,23 @@ int hpx_main(variables_map& vm)
     }
 
     {
+        future<int> p = async<test_error_action>(hpx::find_here());
+
+        std::string what_msg;
+
+        try {
+            p.get();      // throws
+            HPX_TEST(false);
+        }
+        catch (std::exception const& e) {
+            HPX_TEST(true);
+            what_msg = e.what();
+        }
+
+        HPX_TEST_EQ(what_msg, error_msg);
+    }
+
+    {
         bool data_cb_called = false;
         bool error_cb_called = false;
 
@@ -93,20 +117,18 @@ int hpx_main(variables_map& vm)
             hpx::find_here()
         );
 
-        std::string error_msg = "throwing test exception: HPX(not_implemented)";
         std::string what_msg;
-        bool exception_caught = false;
 
         try {
             p.get();      // throws
+            HPX_TEST(false);
         }
         catch (std::exception const& e) {
-            exception_caught = true;
+            HPX_TEST(true);
             what_msg = e.what();
         }
 
         HPX_TEST_EQ(what_msg, error_msg);
-        HPX_TEST(exception_caught);
         HPX_TEST(!data_cb_called);
         HPX_TEST(error_cb_called);
     }

@@ -48,8 +48,7 @@ namespace hpx { namespace lcos
         typedef typename traits::promise_local_result<
             typename action_type::result_type
         >::type result_type;
-        typedef packaged_task<action_type, result_type, signalling_tag>
-            future_type;
+        typedef packaged_task<action_type, result_type> future_type;
 
         return future_type(gid, data_sink).get_future();
     }
@@ -102,7 +101,13 @@ namespace hpx { namespace lcos
     async (naming::id_type const& gid,
         BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
-        return packaged_task<typename hpx::actions::extract_action<Action>::type>(
+        typedef typename hpx::actions::extract_action<Action>::type action_type;
+        typedef typename traits::promise_local_result<
+            typename action_type::result_type
+        >::type result_type;
+        typedef packaged_task<action_type, result_type> packaged_task_type;
+
+        return packaged_task_type(
             gid, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)).get_future();
     }
 
@@ -123,10 +128,9 @@ namespace hpx { namespace lcos
         typedef typename traits::promise_local_result<
             typename action_type::result_type
         >::type result_type;
-        typedef packaged_task<action_type, result_type, signalling_tag>
-            future_type;
+        typedef packaged_task<action_type, result_type> packaged_task_type;
 
-        return future_type(gid, data_sink,
+        return packaged_task_type(gid, data_sink,
             BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)).get_future();
     }
 }}

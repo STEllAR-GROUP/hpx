@@ -303,8 +303,9 @@ namespace sheneos
           : data_(data), overall_result_(overall_result)
         {}
 
-        void operator()(std::vector<double> const& result)
+        void operator()(hpx::lcos::future<std::vector<double> > f)
         {
+            std::vector<double> result = f.get();
             std::vector<std::size_t> const& indicies = data_.get().indicies_;
 
             if (result.size() != indicies.size()) {
@@ -407,8 +408,9 @@ namespace sheneos
           : data_(data), overall_results_(overall_results)
         {}
 
-        void operator()(std::vector<std::vector<double> > const& result)
+        void operator()(hpx::lcos::future<std::vector<std::vector<double> > > f)
         {
+            std::vector<std::vector<double> > result = f.get();
             std::vector<std::size_t> const& indicies = data_.get().indicies_;
 
             if (result.size() != indicies.size()) {

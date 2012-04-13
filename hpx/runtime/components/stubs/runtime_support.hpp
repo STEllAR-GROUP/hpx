@@ -206,8 +206,9 @@ namespace hpx { namespace components { namespace stubs
                 // FIXME: Resolve the locality instead of deducing it from
                 // the target GID, otherwise this will break once we start
                 // moving objects.
-                naming::gid_type prefix = naming::get_locality_from_gid(gid);
-                lcos::packaged_task<action_type, void>(prefix, type, gid, count)
+                boost::uint32_t locality_id = naming::get_locality_id_from_gid(gid);
+                naming::id_type id = naming::get_id_from_locality_id(locality_id);
+                lcos::packaged_task<action_type, void>(id, type, gid, count)
                     .get_future().get();
             }
         }

@@ -19,7 +19,7 @@ set(tests
     dataflow
     packaged_task
     deferred_packaged_task
-    signalling_promise
+    promise
     future_wait
    )
 

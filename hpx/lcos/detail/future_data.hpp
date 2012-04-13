@@ -95,8 +95,15 @@ namespace hpx { namespace lcos { namespace detail
         typedef boost::exception_ptr error_type;
         typedef util::value_or_error<result_type> data_type;
 
+        typedef HPX_STD_FUNCTION<void(future<Result, RemoteResult>)>
+            completed_callback_type;
+
     protected:
         future_data() {}
+
+        future_data(completed_callback_type const& data_sink)
+          : on_completed_(data_sink)
+        {}
 
     public:
         result_type handle_error(data_type const& d, error_code &ec)
@@ -187,13 +194,27 @@ namespace hpx { namespace lcos { namespace detail
                     typename hpx::util::detail::remove_reference<T>::type
                 >::type naked_type;
 
+                typedef traits::get_remote_result<
+                    result_type, naked_type
+                > get_remote_result_type;
+
                 // store the value
-                data_.set(traits::get_remote_result<result_type, naked_type>::call(
-                    boost::forward<T>(result)));
+                if (!on_completed_.empty()) {
+                    // this future coincidentally instance keeps us alive
+                    future<Result, RemoteResult> f(this);
+
+                    data_.set(boost::move(get_remote_result_type::call(
+                        boost::forward<T>(result))));
+                    on_completed_(f);
+                }
+                else {
+                  data_.set(boost::move(get_remote_result_type::call(
+                        boost::forward<T>(result))));
+                }
             }
             catch (hpx::exception const&) {
                 // store the error instead
-                data_.set(boost::current_exception());
+                set_exception(boost::current_exception());
             }
         }
 
@@ -201,7 +222,15 @@ namespace hpx { namespace lcos { namespace detail
         void set_exception(boost::exception_ptr const& e)
         {
             // store the error code
-            data_.set(e);
+            if (!on_completed_.empty()) {
+                // this future coincidentally instance keeps us alive
+                future<Result, RemoteResult> f(this);
+                data_.set(e);
+                on_completed_(f);
+            }
+            else {
+                data_.set(e);
+            }
         }
 
         void set_error(error e, char const* f, char const* msg)
@@ -211,7 +240,7 @@ namespace hpx { namespace lcos { namespace detail
             }
             catch (hpx::exception const&) {
                 // store the error code
-                data_.set(boost::current_exception());
+                set_exception(boost::current_exception());
             }
         }
 
@@ -253,6 +282,7 @@ namespace hpx { namespace lcos { namespace detail
 
     private:
         util::full_empty<data_type> data_;
+        completed_callback_type on_completed_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
