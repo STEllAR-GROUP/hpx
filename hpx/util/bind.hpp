@@ -136,8 +136,8 @@ namespace hpx { namespace util {
     namespace detail
     {
         template <typename Env, int N>
-        typename boost::fusion::result_of::at_c<Env, N>::type
-        eval(Env const & env, util::placeholders::arg<N> const&)
+        typename boost::fusion::result_of::at_c<Env const, N>::type
+        eval(Env const & env, util::placeholders::arg<N>)
         {
             return boost::fusion::at_c<N>(env);
         }

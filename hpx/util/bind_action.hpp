@@ -176,7 +176,7 @@ namespace hpx { namespace util
                 return *this;
             }
 
-            result_type operator()() const
+            result_type operator()()
             {
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
@@ -186,7 +186,7 @@ namespace hpx { namespace util
                         BOOST_PP_ENUM_SHIFTED(N, HPX_UTIL_BIND_EVAL, _)).get();
             }
 
-            result_type operator()()
+            result_type operator()() const
             {
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
@@ -279,7 +279,7 @@ namespace hpx { namespace util
                 return *this;
             }
 
-            void operator()() const
+            void operator()()
             {
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
@@ -289,7 +289,7 @@ namespace hpx { namespace util
                         BOOST_PP_ENUM_SHIFTED(N, HPX_UTIL_BIND_EVAL, _));
             }
 
-            void operator()()
+            void operator()() const
             {
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
