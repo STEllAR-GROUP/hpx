@@ -27,8 +27,6 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/components/dataflow/dataflow.hpp>
 
-using hpx::actions::plain_result_action1;
-using hpx::actions::plain_result_action2;
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
@@ -50,23 +48,8 @@ double add(double principal, double interest)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Action Declarations
-typedef plain_result_action2<
-    double,    // return type
-    double,    // arguments
-    double,
-    &calc      // wrapped function
-> calc_action;
-
-HPX_REGISTER_PLAIN_ACTION(calc_action);
-
-typedef plain_result_action2<
-    double,    // return type
-    double,    // arguments
-    double,
-    &add       // wrapped function
-> add_action;
-
-HPX_REGISTER_PLAIN_ACTION(add_action);
+HPX_PLAIN_ACTION(calc, calc_action);
+HPX_PLAIN_ACTION(add, add_action);
 //]
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -78,13 +61,7 @@ double identity(double initial_value)
     return initial_value;
 }
 
-typedef plain_result_action1<
-    double,
-    double,
-    &identity
-> identity_action;
-
-HPX_REGISTER_PLAIN_ACTION(identity_action);
+HPX_PLAIN_ACTION(identity, identity_action);
 //]
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -101,11 +78,8 @@ int hpx_main(variables_map & vm)
     int t=vm["time"].as<int>(); //Length of time money is invested
       
     i_rate/=100; //Rate is a % and must be converted
-    if (t%cp !=0) { 
-     t/=cp; //Determine how many times to iterate interest calculation
-     t++;
-    }
-    else { t/=cp;}
+    t/=cp; //Determine how many times to iterate interest calculation:
+           //How many full compund periods can fit in the time invested
 
     // In non-dataflow terms the implemented algorithm would look like:
     //
