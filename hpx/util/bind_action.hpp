@@ -320,7 +320,7 @@ namespace hpx { namespace util
         hpx::applier::apply<Action>(                                            \
             hpx::util::detail::eval(env, arg0)                                  \
           BOOST_PP_COMMA_IF(BOOST_PP_DEC(NN))                                   \
-                BOOST_PP_ENUM_SHIFTED(NN, HPX_UTIL_BIND_EVAL, _)).get();        \
+                BOOST_PP_ENUM_SHIFTED(NN, HPX_UTIL_BIND_EVAL, _));              \
     }                                                                           \
     template <BOOST_PP_ENUM_PARAMS(N, typename A)>                              \
     void operator()(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_REF_PARAMS, _)) const    \
@@ -334,7 +334,7 @@ namespace hpx { namespace util
         hpx::applier::apply<Action>(                                            \
             hpx::util::detail::eval(env, arg0)                                  \
           BOOST_PP_COMMA_IF(BOOST_PP_DEC(NN))                                   \
-                BOOST_PP_ENUM_SHIFTED(NN, HPX_UTIL_BIND_EVAL, _)).get();        \
+                BOOST_PP_ENUM_SHIFTED(NN, HPX_UTIL_BIND_EVAL, _));              \
     }                                                                           \
 /**/
             BOOST_PP_REPEAT_FROM_TO(

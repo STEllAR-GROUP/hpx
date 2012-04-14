@@ -14,6 +14,7 @@
 #include <hpx/util/sed_transform.hpp>
 #include <hpx/util/parse_command_line.hpp>
 #include <hpx/util/manage_config.hpp>
+#include <hpx/util/bind_action.hpp>
 
 #include <hpx/lcos/async.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
@@ -61,44 +62,6 @@ HPX_PLAIN_ACTION_EX(hpx::detail::list_component_type, list_component_type_action
 
 namespace hpx { namespace detail
 {
-    ///////////////////////////////////////////////////////////////////////////
-    // Functional wrapper for any action2
-    template <typename Action>
-    struct action_wrapper2
-    {
-        typedef typename boost::add_const<
-            typename Action::arguments_type
-        >::type arguments_type;
-
-        typedef typename
-            boost::fusion::result_of::at_c<arguments_type, 0>::type
-        arg1_type;
-        typedef typename
-            boost::fusion::result_of::at_c<arguments_type, 1>::type
-        arg2_type;
-
-        // default constructor is required for serialization
-        action_wrapper2()
-        {}
-
-        action_wrapper2(naming::id_type const& target)
-          : target_(target)
-        {}
-
-        void operator() (arg1_type s, arg2_type t) const
-        {
-            applier::apply<Action>(target_, s, t);
-        }
-
-        template <typename Archive>
-        void serialize(Archive& ar, unsigned /*version*/)
-        {
-            ar & target_;
-        }
-
-        naming::id_type target_;
-    };
-
     ///////////////////////////////////////////////////////////////////////////
     // print string on the console
     void console_print(std::string const& name)
@@ -195,9 +158,12 @@ namespace hpx { namespace detail
         print(std::string("List of all registered symbolic names:"));
         print(std::string(78, '-'));
 
+        using hpx::util::placeholders::_1;
+        using hpx::util::placeholders::_2;
+
         naming::id_type console(agas::get_console_locality());
         naming::get_agas_client().iterate_ids(
-            action_wrapper2<list_symbolic_name_action>(console));
+            hpx::util::bind<list_symbolic_name_action>(console, _1, _2));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -213,9 +179,12 @@ namespace hpx { namespace detail
         print(std::string("List of all registered component types:"));
         print(std::string(78, '-'));
 
+        using hpx::util::placeholders::_1;
+        using hpx::util::placeholders::_2;
+
         naming::id_type console(agas::get_console_locality());
         naming::get_agas_client().iterate_types(
-            action_wrapper2<list_component_type_action>(console));
+            hpx::util::bind<list_component_type_action>(console, _1, _2));
     }
 
     ///////////////////////////////////////////////////////////////////////////
