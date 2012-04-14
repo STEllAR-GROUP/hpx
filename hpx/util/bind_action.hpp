@@ -145,6 +145,10 @@ namespace hpx { namespace util
         {
             typedef Result result_type;
 
+            // default constructor is needed for serialization
+            BOOST_PP_CAT(bound_action, N)()
+            {}
+
             template <BOOST_PP_ENUM_PARAMS(N, typename A)>
             BOOST_PP_CAT(bound_action, N)(
                 BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_REF_PARAMS, _)
@@ -208,8 +212,8 @@ namespace hpx { namespace util
         env_type env(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_PARAMS, A));            \
         return hpx::lcos::async<Action>(                                        \
             hpx::util::detail::eval(env, arg0)                                  \
-          BOOST_PP_COMMA_IF(BOOST_PP_DEC(N))                                    \
-                BOOST_PP_ENUM_SHIFTED(N, HPX_UTIL_BIND_EVAL, _)).get();         \
+          BOOST_PP_COMMA_IF(BOOST_PP_DEC(NN))                                   \
+                BOOST_PP_ENUM_SHIFTED(NN, HPX_UTIL_BIND_EVAL, _)).get();        \
     }                                                                           \
     template <BOOST_PP_ENUM_PARAMS(N, typename A)>                              \
     result_type operator()(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_REF_PARAMS, _)) const \
@@ -222,8 +226,8 @@ namespace hpx { namespace util
         env_type env(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_PARAMS, A));            \
         return hpx::lcos::async<Action>(                                        \
             hpx::util::detail::eval(env, arg0)                                  \
-          BOOST_PP_COMMA_IF(BOOST_PP_DEC(N))                                    \
-                BOOST_PP_ENUM_SHIFTED(N, HPX_UTIL_BIND_EVAL, _)).get();         \
+          BOOST_PP_COMMA_IF(BOOST_PP_DEC(NN))                                   \
+                BOOST_PP_ENUM_SHIFTED(NN, HPX_UTIL_BIND_EVAL, _)).get();        \
     }                                                                           \
 /**/
             BOOST_PP_REPEAT_FROM_TO(
@@ -247,6 +251,10 @@ namespace hpx { namespace util
             >
         {
             typedef void result_type;
+
+            // default constructor is needed for serialization
+            BOOST_PP_CAT(bound_action, N)()
+            {}
 
             template <BOOST_PP_ENUM_PARAMS(N, typename A)>
             BOOST_PP_CAT(bound_action, N)(
@@ -311,8 +319,8 @@ namespace hpx { namespace util
         env_type env(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_PARAMS, A));            \
         hpx::applier::apply<Action>(                                            \
             hpx::util::detail::eval(env, arg0)                                  \
-          BOOST_PP_COMMA_IF(BOOST_PP_DEC(N))                                    \
-                BOOST_PP_ENUM_SHIFTED(N, HPX_UTIL_BIND_EVAL, _)).get();         \
+          BOOST_PP_COMMA_IF(BOOST_PP_DEC(NN))                                   \
+                BOOST_PP_ENUM_SHIFTED(NN, HPX_UTIL_BIND_EVAL, _)).get();        \
     }                                                                           \
     template <BOOST_PP_ENUM_PARAMS(N, typename A)>                              \
     void operator()(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_REF_PARAMS, _)) const    \
@@ -325,8 +333,8 @@ namespace hpx { namespace util
         env_type env(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_PARAMS, A));            \
         hpx::applier::apply<Action>(                                            \
             hpx::util::detail::eval(env, arg0)                                  \
-          BOOST_PP_COMMA_IF(BOOST_PP_DEC(N))                                    \
-                BOOST_PP_ENUM_SHIFTED(N, HPX_UTIL_BIND_EVAL, _)).get();         \
+          BOOST_PP_COMMA_IF(BOOST_PP_DEC(NN))                                   \
+                BOOST_PP_ENUM_SHIFTED(NN, HPX_UTIL_BIND_EVAL, _)).get();        \
     }                                                                           \
 /**/
             BOOST_PP_REPEAT_FROM_TO(
@@ -392,7 +400,7 @@ namespace hpx { namespace util
 namespace boost { namespace serialization
 {
     // serialization of the bound object, just serialize members
-#define HPX_UTIL_BIND_SERIALIZE_MEMBER(Z, N, _) ar & BOOST_PP_CAT(arg, N);
+#define HPX_UTIL_BIND_SERIALIZE_MEMBER(Z, N, _) ar & BOOST_PP_CAT(bound.arg, N);
 
     template <
         typename Action
