@@ -693,58 +693,60 @@ namespace hpx { namespace actions
     };
 }}
 
+///////////////////////////////////////////////////////////////////////////////
 // Disabling the guid initialization stuff for plain actions
-namespace hpx { namespace actions { namespace detail {
-        template <
-            void (*F)()
-          , hpx::threads::thread_priority Priority
-          , typename Enable
-        >
-        struct needs_guid_initialization<
-            hpx::actions::plain_action0<F, Priority>
-          , Enable
-        >
-            : boost::mpl::false_
-        {};
+namespace hpx { namespace traits
+{
+    template <
+        void (*F)()
+      , hpx::threads::thread_priority Priority
+      , typename Enable
+    >
+    struct needs_guid_initialization<
+        hpx::actions::plain_action0<F, Priority>
+      , Enable
+    >
+        : boost::mpl::false_
+    {};
 
-        template <
-            void (*F)()
-          , typename Derived
-          , typename Enable
-        >
-        struct needs_guid_initialization<
-            hpx::actions::plain_direct_action0<F, Derived>
-          , Enable
-        >
-            : boost::mpl::false_
-        {};
+    template <
+        void (*F)()
+      , typename Derived
+      , typename Enable
+    >
+    struct needs_guid_initialization<
+        hpx::actions::plain_direct_action0<F, Derived>
+      , Enable
+    >
+        : boost::mpl::false_
+    {};
 
-        template <
-            typename R
-          , R(*F)()
-          , hpx::threads::thread_priority Priority
-          , typename Enable
-        >
-        struct needs_guid_initialization<
-            hpx::actions::plain_result_action0<R, F, Priority>
-          , Enable
-        >
-            : boost::mpl::false_
-        {};
+    template <
+        typename R
+      , R(*F)()
+      , hpx::threads::thread_priority Priority
+      , typename Enable
+    >
+    struct needs_guid_initialization<
+        hpx::actions::plain_result_action0<R, F, Priority>
+      , Enable
+    >
+        : boost::mpl::false_
+    {};
 
-        template <
-            typename R
-          , R(*F)()
-          , typename Derived
-          , typename Enable
-        >
-        struct needs_guid_initialization<
-            hpx::actions::plain_direct_result_action0<R, F, Derived>
-          , Enable
-        >
-            : boost::mpl::false_
-        {};
-}}}
+    template <
+        typename R
+      , R(*F)()
+      , typename Derived
+      , typename Enable
+    >
+    struct needs_guid_initialization<
+        hpx::actions::plain_direct_result_action0<R, F, Derived>
+      , Enable
+    >
+        : boost::mpl::false_
+    {};
+}}
 
 ///////////////////////////////////////////////////////////////////////////
 // bring in the rest of the implementations

@@ -44,6 +44,10 @@ namespace hpx { namespace traits
     {
         typedef managed_object_controls_lifetime type;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Action, typename Enable = void>
+    struct needs_guid_initialization;
 }}
 
 #endif

@@ -32,6 +32,7 @@
 #include <boost/move/move.hpp>
 #include <boost/typeof/typeof.hpp>
 
+#include <hpx/traits/needs_guid_initialization.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
@@ -63,30 +64,6 @@ namespace hpx { namespace actions
             typedef typename boost::remove_const<no_ref_type>::type type;
         };
 
-        template <typename Action, typename Enable = void>
-        struct needs_guid_initialization
-            : boost::mpl::true_
-        {};
-
-        template <typename Action>
-        void guid_initialization(boost::mpl::false_) {}
-
-        template <typename Action>
-        void guid_initialization(boost::mpl::true_)
-        {
-            // force serialization self registration to happen
-            using namespace boost::archive::detail::extra_detail;
-            init_guid<Action>::g.initialize();
-        }
-
-        template <typename Action>
-        void guid_initialization()
-        {
-            guid_initialization<Action>(
-                typename needs_guid_initialization<Action>::type()
-            );
-        }
-
         template <typename Action>
         char const* get_action_name()
         {
@@ -95,7 +72,7 @@ namespace hpx { namespace actions
             /// but the header in which the action is defined misses a
             /// HPX_REGISTER_ACTION_DECLARATION
             BOOST_MPL_ASSERT_MSG(
-                needs_guid_initialization<Action>::value
+                traits::needs_guid_initialization<Action>::value
               , HPX_REGISTER_ACTION_DECLARATION_MISSING
               , (Action)
             );
@@ -545,17 +522,6 @@ namespace hpx { namespace actions
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    // Helper to invoke the registration code for serialization at startup
-    template <typename Action>
-    struct register_base_helper
-    {
-        register_base_helper()
-        {
-            Action::register_base();
-        }
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
         // simple type allowing to distinguish whether an action is the most
@@ -596,7 +562,7 @@ namespace hpx { namespace actions
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_BASE_HELPER(action, actionname)                          \
-        hpx::actions::register_base_helper<action>                            \
+        hpx::actions::detail::register_base_helper<action>                    \
             BOOST_PP_CAT(                                                     \
                 BOOST_PP_CAT(__hpx_action_register_base_helper_, __LINE__),   \
                 _##actionname);                                               \
@@ -608,11 +574,13 @@ namespace hpx { namespace actions
     namespace hpx { namespace actions { namespace detail {                    \
         template <> HPX_ALWAYS_EXPORT                                         \
         char const* get_action_name<action>();                                \
+    }}}                                                                       \
+    namespace hpx { namespace traits {                                        \
         template <typename Enable>                                            \
         struct needs_guid_initialization<action, Enable>                      \
-            : boost::mpl::false_                                              \
+          : boost::mpl::false_                                                \
         {};                                                                   \
-    }}}                                                                       \
+    }}                                                                        \
 /**/
 #define HPX_REGISTER_ACTION_DECLARATION_GUID(action)                          \
     namespace boost { namespace archive { namespace detail {                  \

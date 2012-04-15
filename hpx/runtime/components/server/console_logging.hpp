@@ -107,14 +107,15 @@ HPX_REGISTER_PLAIN_ACTION_DECLARATION(
     hpx::components::server::console_logging_action<>
 )
 
-namespace hpx { namespace actions { namespace detail {
+namespace hpx { namespace traits
+{
     template <typename Dummy>
     struct needs_guid_initialization<
         hpx::components::server::console_logging_action<Dummy>
     >
         : boost::mpl::false_
     {};
-}}}
+}}
 
 #endif
 

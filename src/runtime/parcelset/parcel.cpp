@@ -55,7 +55,7 @@ namespace hpx { namespace parcelset
         bool has_continuations = continuation_;
         ar << has_continuations;
         if (has_continuations)
-            ar << *(continuation_.get());
+            ar << continuation_;
 
         ar << start_time_;
         ar << creation_time_;
@@ -87,11 +87,8 @@ namespace hpx { namespace parcelset
 
         // Check for a continuation.
         ar >> has_continuation;
-        if (has_continuation) {
-            actions::continuation* c = new actions::continuation;
-            ar >> *c;
-            continuation_.reset(c);
-        }
+        if (has_continuation)
+            ar >> continuation_;
 
         ar >> start_time_;
         ar >> creation_time_;

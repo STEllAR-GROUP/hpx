@@ -89,12 +89,6 @@ namespace hpx { namespace lcos { namespace local
         promise() : future_obtained_(false) {}
 
         template <typename F>
-        explicit promise(F const& f)
-          : task_(new detail::task_object<Result, F>(f)),
-            future_obtained_(false)
-        {}
-
-        template <typename F>
         explicit promise(BOOST_FWD_REF(F) f)
           : task_(new detail::task_object<Result, F>(boost::forward<F>(f))),
             future_obtained_(false)
@@ -197,13 +191,6 @@ namespace hpx { namespace lcos { namespace local
         packaged_task() {}
 
         template <typename F>
-        explicit packaged_task(F const& f)
-          : promise<Result>(f)
-        {
-            (*this)();    // execute the function immediately
-        }
-
-        template <typename F>
         explicit packaged_task(BOOST_FWD_REF(F) f)
           : promise<Result>(boost::forward<F>(f))
         {
@@ -229,12 +216,6 @@ namespace hpx { namespace lcos { namespace local
     public:
         // construction and destruction
         promise() : future_obtained_(false) {}
-
-        template <typename F>
-        explicit promise(F const& f)
-          : task_(new detail::task_object<void, F>(f)),
-            future_obtained_(false)
-        {}
 
         template <typename F>
         explicit promise(BOOST_FWD_REF(F) f)

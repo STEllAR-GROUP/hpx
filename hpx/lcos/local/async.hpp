@@ -26,24 +26,14 @@ namespace hpx { namespace lcos { namespace local
         return local::packaged_task<Result>(boost::forward<F>(f)).get_future();
     }
 
-//     ///////////////////////////////////////////////////////////////////////////
-//     template <typename Result, typename F>
-//     future<Result> async_callback (
-//         HPX_STD_FUNCTION<void(Result const&)> const& data_sink, F f)
-//     {
-//         return local::packaged_task<Result>(data_sink, f).get_future();
-//     }
-//
-//     ///////////////////////////////////////////////////////////////////////////
-//     template <typename Result, typename F>
-//     future<Result>
-//     async_callback (
-//         HPX_STD_FUNCTION<void(Result const&)> const& data_sink,
-//         HPX_STD_FUNCTION<void(boost::exception_ptr const&)> const& error_sink,
-//         F f)
-//     {
-//         return local::packaged_task<Result>(data_sink, error_sink, f).get_future();
-//     }
+//    ///////////////////////////////////////////////////////////////////////////
+//    template <typename Result, typename F>
+//    future<Result> async_callback (
+//        HPX_STD_FUNCTION<void(future<Result>)> const& data_sink, BOOST_FWD_REF(F) f)
+//    {
+//        return local::packaged_task<Result>(
+//            data_sink, boost::forward<F>(f)).get_future();
+//    }
 }}}
 
 #endif

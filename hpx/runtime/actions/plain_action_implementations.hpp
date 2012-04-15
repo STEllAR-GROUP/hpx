@@ -903,7 +903,7 @@ namespace hpx { namespace actions
 }}
 
 // Disabling the guid initialization stuff for plain actions
-namespace hpx { namespace actions { namespace detail
+namespace hpx { namespace traits
 {
     template <
         BOOST_PP_ENUM_PARAMS(N, typename Arg)
@@ -976,7 +976,7 @@ namespace hpx { namespace actions { namespace detail
     >
         : boost::mpl::false_
     {};
-}}}
+}}
 
 ///////////////////////////////////////////////////////////////////////////////
 #undef HPX_MOVE_ARGS

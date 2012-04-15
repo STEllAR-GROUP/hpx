@@ -8,24 +8,26 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/lcos/base_lco.hpp>
 
+BOOST_CLASS_EXPORT(hpx::actions::continuation);
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
     ///////////////////////////////////////////////////////////////////////////
-    void continuation::trigger()
+    void continuation::trigger() const
     {
         LLCO_(info) << "continuation::trigger(" << gid_ << ")";
         hpx::applier::apply<lcos::base_lco::set_event_action>(gid_);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void continuation::trigger_error(boost::exception_ptr const& e)
+    void continuation::trigger_error(boost::exception_ptr const& e) const
     {
         LLCO_(info) << "continuation::trigger_error(" << gid_ << ")";
         hpx::applier::apply<lcos::base_lco::set_exception_action>(gid_, e);
     }
 
-    void continuation::trigger_error(BOOST_RV_REF(boost::exception_ptr) e)
+    void continuation::trigger_error(BOOST_RV_REF(boost::exception_ptr) e) const
     {
         LLCO_(info) << "continuation::trigger_error(" << gid_ << ")";
         hpx::applier::apply<lcos::base_lco::set_exception_action>(

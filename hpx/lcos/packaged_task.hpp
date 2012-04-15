@@ -331,7 +331,8 @@ namespace hpx { namespace lcos
             }
             else {
                 // remote execution
-                hpx::applier::apply_c<action_type>(addr, this->get_gid(), gid);
+                hpx::applier::detail::apply_c<action_type>(addr,
+                    this->get_gid(), gid);
             }
         }
 
@@ -398,8 +399,8 @@ namespace hpx { namespace lcos
             }
             else {
                 // remote execution
-                hpx::applier::apply_c<action_type>(addr, this->get_gid(), gid,
-                    boost::forward<Arg0>(arg0));
+                hpx::applier::detail::apply_c<action_type>(addr, 
+                    this->get_gid(), gid, boost::forward<Arg0>(arg0));
             }
         }
 

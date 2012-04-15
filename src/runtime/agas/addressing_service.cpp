@@ -1494,7 +1494,7 @@ void addressing_service::send_refcnt_requests_non_blocking(
         {
             typedef server::primary_namespace::bulk_service_action
                 action_type;
-            applier::apply_l_p<action_type>
+            hpx::applier::detail::apply_l_p<action_type>
                 (primary_ns_addr_, action_priority_, requests);
         }
 

@@ -59,8 +59,8 @@
         }
         else {
             // remote execution
-            hpx::applier::apply_c<action_type>(addr, this->get_gid(), gid,
-                BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+            hpx::applier::detail::apply_c<action_type>(addr,
+                this->get_gid(), gid, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
         }
     }
 

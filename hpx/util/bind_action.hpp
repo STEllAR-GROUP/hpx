@@ -41,7 +41,7 @@
 
 #define HPX_UTIL_BIND_FUNCTOR_OPERATOR(Z, N, D)                                 \
     template <BOOST_PP_ENUM_PARAMS(N, typename A)>                              \
-    result_type operator()(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_REF_PARAMS, _)) const  \
+    result_type operator()(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_REF_PARAMS, _))   \
     {                                                                           \
         typedef                                                                 \
             BOOST_PP_CAT(hpx::util::tuple, N)<                                  \
@@ -53,7 +53,7 @@
     }                                                                           \
                                                                                 \
     template <BOOST_PP_ENUM_PARAMS(N, typename A)>                              \
-    result_type operator()(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_REF_PARAMS, _))   \
+    result_type operator()(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_REF_PARAMS, _)) const \
     {                                                                           \
         typedef                                                                 \
             BOOST_PP_CAT(hpx::util::tuple, N)<                                  \
@@ -306,6 +306,25 @@ namespace hpx { namespace util
                   BOOST_PP_COMMA_IF(BOOST_PP_DEC(N))
                         BOOST_PP_ENUM_SHIFTED(N, HPX_UTIL_BIND_EVAL, _));
             }
+
+//             template <typename A1>
+//             void operator()(BOOST_FWD_REF(A1) a1)
+//             {
+//                 typedef
+//                     hpx::util::tuple1<
+//                         typename detail::env_value_type<BOOST_FWD_REF(A1)>::type
+//                     >
+//                     env_type;
+//                 typedef
+//                     typename boost::mpl::apply<
+//                         typename boost::mpl::lambda<Action>::type, A1
+//                     >::type action_type;
+//                 env_type env(boost::forward<A1>(a1));
+//                 hpx::applier::apply<action_type>(
+//                     hpx::util::detail::eval(env, arg0)
+//                   BOOST_PP_COMMA_IF(BOOST_PP_DEC(N))
+//                         BOOST_PP_ENUM_SHIFTED(N, HPX_UTIL_BIND_EVAL, _));
+//             }
 
 #define HPX_UTIL_BIND_ACTION_OPERATOR(Z, N, D)                                  \
     template <BOOST_PP_ENUM_PARAMS(N, typename A)>                              \
