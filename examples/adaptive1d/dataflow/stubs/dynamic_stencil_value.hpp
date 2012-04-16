@@ -8,7 +8,7 @@
 #define HPX_COMPONENTS_AMR_STUBS_STENCIL_VALUE_NOV_02_2008_0447PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 
 #include "../server/dynamic_stencil_value.hpp"
@@ -59,7 +59,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
             typedef adaptive1d::server::dynamic_stencil_value::get_output_ports_action
                 action_type;
             typedef std::vector<naming::id_type> return_type;
-            return lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         static std::vector<naming::id_type>
@@ -81,7 +81,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
             typedef
                 adaptive1d::server::dynamic_stencil_value::connect_input_ports_action
             action_type;
-            return lcos::async<action_type>(gid, gids);
+            return hpx::async<action_type>(gid, gids);
         }
 
         static void connect_input_ports(naming::id_type const& gid,
@@ -101,7 +101,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
             typedef
                 adaptive1d::server::dynamic_stencil_value::set_functional_component_action
             action_type;
-            return lcos::async<action_type>(gid, functiongid, row,
+            return hpx::async<action_type>(gid, functiongid, row,
                 column, instencilsize, outstencilsize,cycle_time, par);
         }
 
@@ -120,7 +120,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
         {
             typedef adaptive1d::server::dynamic_stencil_value::start_action
                 action_type;
-            return lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         static void start(naming::id_type const& gid)

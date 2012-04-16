@@ -10,7 +10,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 
 #include <examples/random_mem_access/random_mem_access/server/random_mem_access.hpp>
 
@@ -31,7 +31,7 @@ namespace hpx { namespace components { namespace stubs
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::random_mem_access::query_action action_type;
-            return lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         static lcos::future<void> add_async(naming::id_type gid)
@@ -40,7 +40,7 @@ namespace hpx { namespace components { namespace stubs
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::random_mem_access::add_action action_type;
-            return lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         static lcos::future<void> print_async(naming::id_type gid)
@@ -49,7 +49,7 @@ namespace hpx { namespace components { namespace stubs
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::random_mem_access::print_action action_type;
-            return lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         /// Query the current value of the server#simple_accumulator instance
@@ -69,7 +69,7 @@ namespace hpx { namespace components { namespace stubs
         /// with the given \a gid
         static void init(naming::id_type gid,int i)
         {
-            applier::apply<server::random_mem_access::init_action>(gid,i);
+            hpx::apply<server::random_mem_access::init_action>(gid,i);
         }
 
         static void add(naming::id_type gid)
@@ -84,7 +84,7 @@ namespace hpx { namespace components { namespace stubs
         static void print(naming::id_type gid)
         {
             print_async(gid).get();
-          //  applier::apply<server::random_mem_access::print_action>(gid);
+          //  hpx::apply<server::random_mem_access::print_action>(gid);
         }
     };
 

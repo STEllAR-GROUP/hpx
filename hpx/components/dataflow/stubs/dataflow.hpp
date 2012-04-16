@@ -8,7 +8,7 @@
 
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/components/dataflow/server/dataflow.hpp>
 
 namespace hpx { namespace lcos {

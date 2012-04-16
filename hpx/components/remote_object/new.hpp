@@ -9,7 +9,7 @@
 #define HPX_COMPONENTS_REMOTE_OBJECT_NEW_HPP
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/components/remote_object/stubs/remote_object.hpp>

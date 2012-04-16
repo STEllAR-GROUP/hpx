@@ -18,6 +18,22 @@ int test0()
 }
 HPX_PLAIN_ACTION(test0, test0_action);
 
+// void async_test0(hpx::naming::id_type id)
+// {
+//     using hpx::util::placeholders::_1;
+//     using hpx::util::placeholders::_2;
+//
+//     HPX_TEST_EQ(hpx::util::bind<test0_action>(id).async(), 42);
+//     HPX_TEST_EQ(hpx::util::bind<test0_action>(_1).async(id), 42);
+//     HPX_TEST_EQ(hpx::util::bind<test0_action>(_1).async(id, 41, 3.0), 42);
+//     HPX_TEST_EQ(hpx::util::bind<test0_action>(_2).async(41, id), 42);
+//
+//     HPX_TEST_EQ(hpx::async(hpx::util::bind<test0_action>(id)), 42);
+//     HPX_TEST_EQ(hpx::async(hpx::util::bind<test0_action>(_1), id), 42);
+//     HPX_TEST_EQ(hpx::async(hpx::util::bind<test0_action>(_1), id, 41, 3.0), 42);
+//     HPX_TEST_EQ(hpx::async(hpx::util::bind<test0_action>(_2), 41, id), 42);
+// }
+
 void bind_test0(hpx::naming::id_type id)
 {
     using hpx::util::placeholders::_1;

@@ -101,13 +101,13 @@ namespace hpx { namespace lcos
         void apply(naming::id_type const& gid)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-            hpx::applier::apply_c<action_type>(this->get_gid(), gid);
+            hpx::apply_c<action_type>(this->get_gid(), gid);
         }
 
         void apply_p(naming::id_type const& gid, threads::thread_priority priority)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-            hpx::applier::apply_c_p<action_type>(this->get_gid(), gid, priority);
+            hpx::apply_c_p<action_type>(this->get_gid(), gid, priority);
         }
 
         /// Construct a new \a packaged_task instance. The \a thread
@@ -186,7 +186,7 @@ namespace hpx { namespace lcos
         void apply(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-            hpx::applier::apply_c<action_type>(this->get_gid(), gid,
+            hpx::apply_c<action_type>(this->get_gid(), gid,
                 boost::forward<Arg0>(arg0));
         }
 
@@ -195,7 +195,7 @@ namespace hpx { namespace lcos
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-            hpx::applier::apply_c_p<action_type>(
+            hpx::apply_c_p<action_type>(
                 this->get_gid(), gid, priority, boost::forward<Arg0>(arg0));
         }
 
@@ -399,7 +399,7 @@ namespace hpx { namespace lcos
             }
             else {
                 // remote execution
-                hpx::applier::detail::apply_c<action_type>(addr, 
+                hpx::applier::detail::apply_c<action_type>(addr,
                     this->get_gid(), gid, boost::forward<Arg0>(arg0));
             }
         }

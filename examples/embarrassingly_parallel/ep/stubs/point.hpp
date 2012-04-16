@@ -19,7 +19,7 @@ namespace ep { namespace stubs
         bfs_async(hpx::naming::id_type const& gid,std::size_t scale)
         {
             typedef server::point::bfs_action action_type;
-            return hpx::lcos::async<action_type>(gid,scale);
+            return hpx::async<action_type>(gid,scale);
         }
 
         static void bfs(hpx::naming::id_type const& gid,std::size_t scale)

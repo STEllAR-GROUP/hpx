@@ -1088,7 +1088,7 @@ void primary_namespace::kill_sync(
         futures.push_back(lcos::promise<void>());
 
         // FIXME: Priority?
-        applier::apply_c<action_type>
+        hpx::apply_c<action_type>
             (futures.back().get_gid(), prefix_, type_, at_c<1>(e), at_c<2>(e));
     }
 

@@ -47,7 +47,7 @@
         }
         else {
             // remote execution
-            hpx::applier::apply_c<Action>(addr, this->get_gid(), gid,
+            hpx::applier::detail::apply_c<Action>(addr, this->get_gid(), gid,
                 BOOST_PP_ENUM_PARAMS(N, arg));
         }
     }

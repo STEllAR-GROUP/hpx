@@ -189,8 +189,8 @@ namespace distributed
             {
                 //use max_comp_size_ (element_ordinal_position)
 
-                //return hpx::applier::apply<distributed::server::datastructure::get_data_at_action>
-                //return hpx::lcos::apply<distributed::server::datastructure::get_data_at_action>
+                //return hpx::apply<distributed::server::datastructure::get_data_at_action>
+                //return hpx::apply<distributed::server::datastructure::get_data_at_action>
                 //    (*itr, max_comp_size_ - 1);
                 hpx::lcos::future<std::size_t> value_at =
                     stubs::datastructure::get_data_at_async(*itr, max_comp_size_ - 1 );

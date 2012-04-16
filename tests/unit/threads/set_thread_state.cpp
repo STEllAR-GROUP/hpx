@@ -7,7 +7,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/plain_actions.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
@@ -27,7 +27,7 @@ using hpx::actions::plain_action4;
 using hpx::applier::register_thread_nullary;
 
 using hpx::lcos::future;
-using hpx::lcos::async;
+using hpx::async;
 
 using hpx::threads::thread_id_type;
 using hpx::threads::this_thread::suspend;

@@ -27,7 +27,7 @@ namespace hpx { namespace geometry { namespace stubs
         init_async(naming::id_type gid, double xmin, double xmax,double ymin,double ymax,double velx,double vely,std::size_t numpoints,std::size_t objectid)
         {
             typedef server::point::init_action action_type;
-            return lcos::async<action_type>(gid,xmin,xmax,ymin,ymax,velx,vely,numpoints,objectid);
+            return hpx::async<action_type>(gid,xmin,xmax,ymin,ymax,velx,vely,numpoints,objectid);
         }
 
         static void init(naming::id_type const& gid,double xmin, double xmax,double ymin,double ymax,double velx, double vely,std::size_t numpoints,std::size_t objectid)
@@ -41,14 +41,14 @@ namespace hpx { namespace geometry { namespace stubs
         search_async(naming::id_type gid, std::vector<hpx::naming::id_type> const& search_objects)
         {
             typedef server::point::search_action action_type;
-            return lcos::async<action_type>(gid, search_objects);
+            return hpx::async<action_type>(gid, search_objects);
         }
 
         static lcos::future<void>
         recompute_async(naming::id_type gid, std::vector<hpx::naming::id_type> const& search_objects)
         {
             typedef server::point::recompute_action action_type;
-            return lcos::async<action_type>(gid, search_objects);
+            return hpx::async<action_type>(gid, search_objects);
         }
 
         static int search(naming::id_type const& gid, std::vector<hpx::naming::id_type> const& search_objects)
@@ -69,7 +69,7 @@ namespace hpx { namespace geometry { namespace stubs
         get_poly_async(naming::id_type gid)
         {
             typedef server::point::get_poly_action action_type;
-            return lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         static polygon_type get_poly(naming::id_type const& gid)
@@ -83,14 +83,14 @@ namespace hpx { namespace geometry { namespace stubs
         move_async(naming::id_type gid,double dt,double time)
         {
             typedef server::point::move_action action_type;
-            return lcos::async<action_type>(gid,dt,time);
+            return hpx::async<action_type>(gid,dt,time);
         }
 
         static lcos::future<void>
         adjust_async(naming::id_type gid,double dt)
         {
             typedef server::point::adjust_action action_type;
-            return lcos::async<action_type>(gid,dt);
+            return hpx::async<action_type>(gid,dt);
         }
 
         static lcos::future<void>
@@ -98,7 +98,7 @@ namespace hpx { namespace geometry { namespace stubs
                       std::size_t n,std::size_t N)
         {
             typedef server::point::enforce_action action_type;
-            return lcos::async<action_type>(gid,master_gids,dt,n,N);
+            return hpx::async<action_type>(gid,master_gids,dt,n,N);
         }
 
         static void move(naming::id_type const& gid,double dt,double time)
@@ -132,7 +132,7 @@ namespace hpx { namespace geometry { namespace stubs
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::point::get_X_action action_type;
-            return lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
         static lcos::future<double>
         get_Y_async(naming::id_type const& gid)
@@ -141,7 +141,7 @@ namespace hpx { namespace geometry { namespace stubs
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::point::get_Y_action action_type;
-            return lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         static double get_X(naming::id_type const& gid)
@@ -166,7 +166,7 @@ namespace hpx { namespace geometry { namespace stubs
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::point::set_X_action action_type;
-            return lcos::async<action_type>(gid, x);
+            return hpx::async<action_type>(gid, x);
         }
         static lcos::future<void>
         set_Y_async(naming::id_type const& gid, double y)
@@ -175,7 +175,7 @@ namespace hpx { namespace geometry { namespace stubs
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::point::set_Y_action action_type;
-            return lcos::async<action_type>(gid, y);
+            return hpx::async<action_type>(gid, y);
         }
 
         static void set_X(naming::id_type const& gid, double x)

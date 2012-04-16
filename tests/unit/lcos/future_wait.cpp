@@ -7,7 +7,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/lcos/future_wait.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
@@ -26,7 +26,7 @@ using hpx::actions::plain_action0;
 using hpx::actions::plain_result_action0;
 
 using hpx::lcos::wait;
-using hpx::lcos::async;
+using hpx::async;
 using hpx::lcos::future;
 
 using hpx::find_here;

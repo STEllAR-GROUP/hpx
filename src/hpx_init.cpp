@@ -16,7 +16,7 @@
 #include <hpx/util/manage_config.hpp>
 #include <hpx/util/bind_action.hpp>
 
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
@@ -74,7 +74,7 @@ namespace hpx { namespace detail
         naming::id_type console(agas::get_console_locality(ec));
         if (ec) return;
 
-        lcos::async<console_print_action>(console, name).get(ec);
+        hpx::async<console_print_action>(console, name).get(ec);
         if (ec) return;
 
         if (&ec != &throws)

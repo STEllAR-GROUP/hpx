@@ -14,7 +14,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 
 #include <examples/hplpx/smphplmatrex/server/smphplmatrex.hpp>
 
@@ -25,17 +25,17 @@ namespace hpx { namespace components { namespace stubs
     //constructor and destructor
     static int construct(naming::id_type gid, unsigned int h,
         unsigned int ab, unsigned int bs){
-        return lcos::async<server::smphplmatrex::construct_action>(
+        return hpx::async<server::smphplmatrex::construct_action>(
             gid,gid,h,ab,bs).get();
     }
     static void destruct(naming::id_type gid)
     {
-        applier::apply<server::smphplmatrex::destruct_action>(gid);
+        hpx::apply<server::smphplmatrex::destruct_action>(gid);
     }
 
     //functions for manipulating the matrix
     static double LUsolve(naming::id_type gid){
-        return lcos::async<server::smphplmatrex::solve_action>(gid).get();
+        return hpx::async<server::smphplmatrex::solve_action>(gid).get();
     }
     };
 }}}

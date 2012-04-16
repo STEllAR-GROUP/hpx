@@ -8,7 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/base_lco.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/components/dataflow/is_dataflow.hpp>
 
 namespace hpx { namespace lcos { namespace detail
@@ -33,7 +33,7 @@ namespace hpx { namespace lcos { namespace detail
 
             BOOST_ASSERT(gid_promise.get_state() != hpx::lcos::future_state::uninitialized);
 
-            hpx::applier::apply<action_type>(gid_promise.get(), id);
+            hpx::apply<action_type>(gid_promise.get(), id);
         }
 
         naming::id_type get_gid() const

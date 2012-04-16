@@ -12,10 +12,15 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/traits/supports_result_of.hpp>
 
 #include <boost/chrono/chrono.hpp>
 #include <boost/move/move.hpp>
 #include <boost/thread/thread.hpp>
+#include <boost/utility/enable_if.hpp>
+#include <boost/preprocessor/enum.hpp>
+#include <boost/preprocessor/enum_params.hpp>
+#include <boost/preprocessor/iterate.hpp>
 
 #include <iosfwd>
 
@@ -49,8 +54,8 @@ namespace hpx { namespace threads
 // #else
         // Vertical preprocessor repetition to define the remaining constructors
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (1, HPX_ACTION_ARGUMENT_LIMIT                                         \
-          , <hpx/runtime/threads/thread.hpp>))                                \
+    (4, (1, HPX_ACTION_ARGUMENT_LIMIT                                         \
+          , <hpx/runtime/threads/thread.hpp>, 1))                             \
     /**/
 
 #include BOOST_PP_ITERATE()
@@ -234,19 +239,41 @@ namespace hpx { namespace threads
     }
 }}
 
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx
+{
+    // simply launch the given function or function object asynchronously
+    template <typename F>
+    bool apply(BOOST_FWD_REF(F) f)
+    {
+        threads::thread t(boost::forward<F>(f));
+        t.detach();     // detach the thread
+        return false;   // executed locally
+    }
+}
+
+#define BOOST_PP_ITERATION_PARAMS_1                                           \
+    (4, (1, HPX_ACTION_ARGUMENT_LIMIT                                         \
+          , <hpx/runtime/threads/thread.hpp>, 2))                             \
+    /**/
+
+#include BOOST_PP_ITERATE()
+
 #endif
 
+///////////////////////////////////////////////////////////////////////////////
 #else // BOOST_PP_IS_ITERATING
+
 #define N BOOST_PP_ITERATION()
 
 #define HPX_FWD_ARGS(z, n, _)                                                 \
             BOOST_FWD_REF(BOOST_PP_CAT(Arg, n)) BOOST_PP_CAT(arg, n)          \
     /**/
-
 #define HPX_FORWARD_ARGS(z, n, _)                                             \
             boost::forward<BOOST_PP_CAT(Arg, n)>(BOOST_PP_CAT(arg, n))        \
     /**/
 
+#if  BOOST_PP_ITERATION_FLAGS() == 1
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     thread(BOOST_FWD_REF(F) f, BOOST_PP_ENUM(N, HPX_FWD_ARGS, _))
       : id_(invalid_thread_id)
@@ -254,8 +281,30 @@ namespace hpx { namespace threads
         start_thread(HPX_STD_BIND(boost::forward<F>(f),
             BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _)));
     }
+#endif
+
+#if  BOOST_PP_ITERATION_FLAGS() == 2
+namespace hpx
+{
+    // simply launch the given function or function object asynchronously
+    template <typename F, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    typename boost::enable_if<
+        traits::supports_result_of<F>
+      , bool
+    >::type
+    apply(BOOST_FWD_REF(F) f, BOOST_PP_ENUM(N, HPX_FWD_ARGS, _))
+    {
+        threads::thread t(boost::forward<F>(f),
+            BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _));
+        t.detach();     // detach the thread
+        return false;   // executed locally
+    }
+}
+#endif
 
 #undef HPX_FORWARD_ARGS
 #undef HPX_FWD_ARGS
 #undef N
+
 #endif
+

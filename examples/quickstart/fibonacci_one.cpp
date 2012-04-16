@@ -40,7 +40,7 @@ boost::uint64_t fibonacci(boost::uint64_t n)
     // Run one branch of the Fibonacci calculation on this thread, while the
     // other branch is scheduled in a separate thread.
     hpx::lcos::future<boost::uint64_t> n1 =
-        hpx::lcos::async<fibonacci_action>(locality_id, n - 1);
+        hpx::async<fibonacci_action>(locality_id, n - 1);
     boost::uint64_t n2 = fibonacci(n-2);
 
     return n1.get() + n2;   // wait for the Futures to return their values
@@ -61,7 +61,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Create a Future for the whole calculation, execute it locally, and
         // wait for it.
         hpx::lcos::future<boost::uint64_t> f =
-            hpx::lcos::async<fibonacci_action>(hpx::find_here(), n);
+            hpx::async<fibonacci_action>(hpx::find_here(), n);
 
         // wait for future f to return value
         boost::uint64_t r = f.get();

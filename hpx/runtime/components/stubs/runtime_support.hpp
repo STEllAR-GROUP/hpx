@@ -14,7 +14,7 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/util/ini.hpp>
 
 namespace hpx { namespace components { namespace stubs
@@ -41,7 +41,7 @@ namespace hpx { namespace components { namespace stubs
             typedef
                 server::runtime_support::factory_properties_action
             action_type;
-            return lcos::async<action_type>(targetgid, type);
+            return hpx::async<action_type>(targetgid, type);
         }
 
         static int get_factory_properties(naming::id_type const& targetgid,
@@ -66,7 +66,7 @@ namespace hpx { namespace components { namespace stubs
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::runtime_support::create_component_action action_type;
-            return lcos::async<action_type>(gid, type, count);
+            return hpx::async<action_type>(gid, type, count);
         }
 
         /// Create a new component \a type using the runtime_support with the
@@ -97,7 +97,7 @@ namespace hpx { namespace components { namespace stubs
             // to call get() on the return value to obtain the result
             typedef server::runtime_support::create_one_component_action
                 action_type;
-            return lcos::async<action_type>(gid, type,
+            return hpx::async<action_type>(gid, type,
                 components::constructor_argument(arg0));
         }
 
@@ -130,7 +130,7 @@ namespace hpx { namespace components { namespace stubs
             // to call get() on the return value to obtain the result
             typedef server::runtime_support::create_memory_block_action
                 action_type;
-            return lcos::async<action_type>(id, count, act);
+            return hpx::async<action_type>(id, count, act);
         }
 
         /// Create a new memory block using the runtime_support with the
@@ -149,7 +149,7 @@ namespace hpx { namespace components { namespace stubs
         load_components_async(naming::id_type const& gid)
         {
             typedef server::runtime_support::load_components_action action_type;
-            return lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         static bool load_components(naming::id_type const& gid)
@@ -161,7 +161,7 @@ namespace hpx { namespace components { namespace stubs
         call_startup_functions_async(naming::id_type const& gid, bool pre_startup)
         {
             typedef server::runtime_support::call_startup_functions_action action_type;
-            return lcos::async<action_type>(gid, pre_startup);
+            return hpx::async<action_type>(gid, pre_startup);
         }
 
         static void call_startup_functions(naming::id_type const& gid, bool pre_startup)
@@ -173,7 +173,7 @@ namespace hpx { namespace components { namespace stubs
         call_shutdown_functions_async(naming::id_type const& gid, bool pre_shutdown)
         {
             typedef server::runtime_support::call_shutdown_functions_action action_type;
-            return lcos::async<action_type>(gid, pre_shutdown);
+            return hpx::async<action_type>(gid, pre_shutdown);
         }
 
         static void call_shutdown_functions(naming::id_type const& gid, bool pre_shutdown)
@@ -223,7 +223,7 @@ namespace hpx { namespace components { namespace stubs
             typedef server::runtime_support::shutdown_action action_type;
 
             lcos::promise<void> value;
-            hpx::applier::apply<action_type>(targetgid, timeout, value.get_gid());
+            hpx::apply<action_type>(targetgid, timeout, value.get_gid());
             return value.get_future();
         }
 
@@ -238,13 +238,13 @@ namespace hpx { namespace components { namespace stubs
         static void
         shutdown_all(naming::id_type const& targetgid, double timeout = -1)
         {
-            hpx::applier::apply<server::runtime_support::shutdown_all_action>(
+            hpx::apply<server::runtime_support::shutdown_all_action>(
                 targetgid, timeout);
         }
 
         static void shutdown_all(double timeout = -1)
         {
-            hpx::applier::apply<server::runtime_support::shutdown_all_action>(
+            hpx::apply<server::runtime_support::shutdown_all_action>(
                 hpx::naming::id_type(
                     hpx::applier::get_applier().get_runtime_support_raw_gid(),
                     hpx::naming::id_type::unmanaged), timeout);
@@ -262,7 +262,7 @@ namespace hpx { namespace components { namespace stubs
             typedef server::runtime_support::terminate_action action_type;
 
             lcos::promise<void> value;
-            hpx::applier::apply<action_type>(targetgid, value.get_gid());
+            hpx::apply<action_type>(targetgid, value.get_gid());
             return value.get_future();
         }
 
@@ -277,13 +277,13 @@ namespace hpx { namespace components { namespace stubs
         static void
         terminate_all(naming::id_type const& targetgid)
         {
-            hpx::applier::apply<server::runtime_support::terminate_all_action>(
+            hpx::apply<server::runtime_support::terminate_all_action>(
                 targetgid);
         }
 
         static void terminate_all()
         {
-            hpx::applier::apply<server::runtime_support::terminate_all_action>(
+            hpx::apply<server::runtime_support::terminate_all_action>(
                 hpx::naming::id_type(
                     hpx::applier::get_applier().get_runtime_support_raw_gid(),
                     hpx::naming::id_type::unmanaged));
@@ -295,7 +295,7 @@ namespace hpx { namespace components { namespace stubs
         {
             typedef server::runtime_support::update_agas_cache_action
                 action_type;
-            hpx::applier::apply<action_type>(targetgid, gid, g);
+            hpx::apply<action_type>(targetgid, gid, g);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -304,7 +304,7 @@ namespace hpx { namespace components { namespace stubs
         {
             typedef server::runtime_support::garbage_collect_action
                 action_type;
-            hpx::applier::apply<action_type>(targetgid);
+            hpx::apply<action_type>(targetgid);
         }
 
         static lcos::future<void>
@@ -312,7 +312,7 @@ namespace hpx { namespace components { namespace stubs
         {
             typedef server::runtime_support::garbage_collect_action
                 action_type;
-            return lcos::async<action_type>(targetgid);
+            return hpx::async<action_type>(targetgid);
         }
 
         static void
@@ -320,7 +320,7 @@ namespace hpx { namespace components { namespace stubs
         {
             typedef server::runtime_support::garbage_collect_action
                 action_type;
-            lcos::async<action_type>(targetgid).get();
+            hpx::async<action_type>(targetgid).get();
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -350,7 +350,7 @@ namespace hpx { namespace components { namespace stubs
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::runtime_support::get_config_action action_type;
-            return lcos::async<action_type>(targetgid);
+            return hpx::async<action_type>(targetgid);
         }
 
         static void get_config(naming::id_type const& targetgid, util::section& ini)

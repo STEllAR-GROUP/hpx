@@ -233,7 +233,7 @@ namespace hpx { namespace traits
                 << get_gid()
                 ;
 #if N == 0
-            hpx::applier::apply_c<Action>(get_gid(), action_id);
+            hpx::apply_c<Action>(get_gid(), action_id);
 #endif
 #if N > 0
             future_slots.reserve(N);
@@ -262,13 +262,13 @@ namespace hpx { namespace traits
                 if(!d.stores_value())
                 {
                     typedef typename lco_type::set_exception_action action_type;
-                    applier::apply<action_type>(t[i], d.get_error());
+                    hpx::apply<action_type>(t[i], d.get_error());
                 }
                 else
                 {
                     typedef typename lco_type::set_value_action action_type;
                     result_type r =  d.get_value();
-                    applier::apply<action_type>(t[i], boost::move(r));
+                    hpx::apply<action_type>(t[i], boost::move(r));
                 }
             }
         }
@@ -320,7 +320,7 @@ namespace hpx { namespace traits
             {
                 typedef typename lco_type::set_value_action action_type;
                 result_type tmp =  r;
-                applier::apply<action_type>(t[i], boost::move(tmp));
+                hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
 
@@ -341,13 +341,13 @@ namespace hpx { namespace traits
                 if(!d.stores_value())
                 {
                     typedef typename lco_type::set_exception_action action_type;
-                    applier::apply<action_type>(target, d.get_error());
+                    hpx::apply<action_type>(target, d.get_error());
                 }
                 else
                 {
                     typedef typename lco_type::set_value_action action_type;
                     result_type r =  d.get_value();
-                    applier::apply<action_type>(target, boost::move(r));
+                    hpx::apply<action_type>(target, boost::move(r));
                 }
             }
             else

@@ -46,7 +46,7 @@ using hpx::naming::get_locality_id_from_gid;
 
 using hpx::lcos::future;
 using hpx::lcos::promise;
-using hpx::lcos::async;
+using hpx::async;
 using hpx::lcos::base_lco;
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -69,7 +69,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
             stencil_data const& val, int row, int column, parameter const& par)
         {
             typedef adaptive1d::server::logging::logentry_action action_type;
-            applier::apply<action_type>(gid, val, row, column,par);
+            hpx::apply<action_type>(gid, val, row, column,par);
         }
     };
 

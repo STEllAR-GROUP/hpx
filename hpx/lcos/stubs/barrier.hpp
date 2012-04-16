@@ -20,7 +20,7 @@ namespace hpx { namespace lcos { namespace stubs
         wait_async(naming::id_type const& gid)
         {
             typedef lcos::base_lco::set_event_action action_type;
-            return lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         static lcos::future<void, util::unused_type>
@@ -28,7 +28,7 @@ namespace hpx { namespace lcos { namespace stubs
             boost::exception_ptr const& e)
         {
             typedef lcos::base_lco::set_exception_action action_type;
-            return lcos::async<action_type>(gid, e);
+            return hpx::async<action_type>(gid, e);
         }
 
         static void wait(naming::id_type const& gid)

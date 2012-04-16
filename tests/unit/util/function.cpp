@@ -58,7 +58,7 @@ struct small_object
         )
       : x_(o.x_)
     {
-        std::cout << "small_object: copy(" << o.x_ << ")\n"; 
+        std::cout << "small_object: copy(" << o.x_ << ")\n";
     }
 
     small_object& operator=(
@@ -66,7 +66,7 @@ struct small_object
         )
     {
         x_ = o.x_;
-        std::cout << "small_object: assign(" << o.x_ << ")\n"; 
+        std::cout << "small_object: assign(" << o.x_ << ")\n";
         return *this;
     }
 
@@ -75,13 +75,13 @@ struct small_object
         std::cout << "small_object: dtor(" << x_ << ")\n";
     }
 
-    int operator()(
-        int const& z_
+    boost::uint64_t operator()(
+        boost::uint64_t const& z_
         )
     {
         std::cout << "small_object: call(" << x_ << ", " << z_ << ")\n";
         return x_ + z_;
-    } 
+    }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -130,7 +130,7 @@ struct big_object
       : x_(o.x_)
       , y_(o.y_)
     {
-        std::cout << "big_object: copy(" << o.x_ << ", " << o.y_ << ")\n"; 
+        std::cout << "big_object: copy(" << o.x_ << ", " << o.y_ << ")\n";
     }
 
     big_object& operator=(
@@ -139,7 +139,7 @@ struct big_object
     {
         x_ = o.x_;
         y_ = o.y_;
-        std::cout << "big_object: assign(" << o.x_ << ", " << o.y_ << ")\n"; 
+        std::cout << "big_object: assign(" << o.x_ << ", " << o.y_ << ")\n";
         return *this;
     }
 
@@ -148,15 +148,15 @@ struct big_object
         std::cout << "big_object: dtor(" << x_ << ", " << y_ << ")\n";
     }
 
-    int operator()(
-        int const& z_
-      , int const& w_
+    boost::uint64_t operator()(
+        boost::uint64_t const& z_
+      , boost::uint64_t const& w_
         )
     {
-        std::cout << "big_object: call(" << x_ << ", " << y_ 
+        std::cout << "big_object: call(" << x_ << ", " << y_
                   << z_ << ", " << w_ << ")\n";
         return x_ + y_ + z_ + w_;
-    } 
+    }
 };
 
 struct foo
@@ -179,15 +179,15 @@ int hpx_main(variables_map& vm)
                 std::cout << "object is large\n";
 
             small_object const f(17);
-    
-            function<int(int const&)> f0(f);
-    
-            function<int(int const&)> f1(f0);
-    
-            function<int(int const&)> f2;
-    
+
+            function<boost::uint64_t(boost::uint64_t const&)> f0(f);
+
+            function<boost::uint64_t(boost::uint64_t const&)> f1(f0);
+
+            function<boost::uint64_t(boost::uint64_t const&)> f2;
+
             f2 = f0;
-    
+
             f0(7);
             f1(9);
             f2(11);
@@ -200,15 +200,15 @@ int hpx_main(variables_map& vm)
                 std::cout << "object is large\n";
 
             big_object const f(5, 12);
-    
-            function<int(int const&, int const&)> f0(f);
-    
-            function<int(int const&, int const&)> f1(f0);
-    
-            function<int(int const&, int const&)> f2;
-    
+
+            function<boost::uint64_t(boost::uint64_t const&, boost::uint64_t const&)> f0(f);
+
+            function<boost::uint64_t(boost::uint64_t const&, boost::uint64_t const&)> f1(f0);
+
+            function<boost::uint64_t(boost::uint64_t const&, boost::uint64_t const&)> f2;
+
             f2 = f0;
-    
+
             f0(0, 1);
             f1(1, 0);
             f2(1, 1);
@@ -223,15 +223,15 @@ int hpx_main(variables_map& vm)
                 std::cout << "object is large\n";
 
             small_object const f(17);
-    
-            function<int(int const&), void, void> f0(f);
-    
-            function<int(int const&), void, void> f1(f0);
-    
-            function<int(int const&), void, void> f2;
-    
+
+            function<boost::uint64_t(boost::uint64_t const&), void, void> f0(f);
+
+            function<boost::uint64_t(boost::uint64_t const&), void, void> f1(f0);
+
+            function<boost::uint64_t(boost::uint64_t const&), void, void> f2;
+
             f2 = f0;
-    
+
             f0(2);
             f1(4);
             f2(6);
@@ -244,15 +244,15 @@ int hpx_main(variables_map& vm)
                 std::cout << "object is large\n";
 
             big_object const f(5, 12);
-    
-            function<int(int const&, int const&), void, void> f0(f);
-    
-            function<int(int const&, int const&), void, void> f1(f0);
-    
-            function<int(int const&, int const&), void, void> f2;
-    
+
+            function<boost::uint64_t(boost::uint64_t const&, boost::uint64_t const&), void, void> f0(f);
+
+            function<boost::uint64_t(boost::uint64_t const&, boost::uint64_t const&), void, void> f1(f0);
+
+            function<boost::uint64_t(boost::uint64_t const&, boost::uint64_t const&), void, void> f2;
+
             f2 = f0;
-    
+
             f0(3, 4);
             f1(5, 6);
             f2(7, 8);

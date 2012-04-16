@@ -211,7 +211,7 @@ struct object_semaphore
 
             LLCO_(info) << "object_semapohre::wait: waiting for " << id;
 
-            applier::apply<action_type>(id);
+            hpx::apply<action_type>(id);
         }
     } // }}}
 

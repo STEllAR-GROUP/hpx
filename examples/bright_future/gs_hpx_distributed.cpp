@@ -15,7 +15,7 @@
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <algorithm>
 
@@ -345,7 +345,7 @@ void gs(
         {
             for(size_type x_block = 0; x_block < n_x_block; ++x_block)
             {
-                hpx::lcos::async<remote_lse_type::init_action>(
+                hpx::async<remote_lse_type::init_action>(
                     grid_ids(x_block, y_block)
                   , n_x_local + 2
                   , n_y_local + 2

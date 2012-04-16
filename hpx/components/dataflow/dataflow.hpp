@@ -12,7 +12,7 @@
 #include <hpx/include/plain_actions.hpp>
 #include <hpx/components/dataflow/dataflow_base.hpp>
 #include <hpx/components/dataflow/dataflow_fwd.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 
 #include <boost/move/move.hpp>
 

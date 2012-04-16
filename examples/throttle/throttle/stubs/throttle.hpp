@@ -25,7 +25,7 @@ namespace throttle { namespace stubs
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::throttle::suspend_action action_type;
-            return hpx::lcos::async<action_type>(gid, thread_num);
+            return hpx::async<action_type>(gid, thread_num);
         }
 
         static void
@@ -42,7 +42,7 @@ namespace throttle { namespace stubs
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef server::throttle::resume_action action_type;
-            return hpx::lcos::async<action_type>(gid, thread_num);
+            return hpx::async<action_type>(gid, thread_num);
         }
 
         static void

@@ -37,7 +37,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef amr::server::functional_component::eval_action action_type;
-            return lcos::async<action_type>(gid, result, gids, row, column,cycle_time,par);
+            return hpx::async<action_type>(gid, result, gids, row, column,cycle_time,par);
         }
 
         static int eval(naming::id_type const& gid,
@@ -59,7 +59,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef amr::server::functional_component::alloc_data_action action_type;
-            return lcos::async<action_type>(gid, item, maxitems,
+            return hpx::async<action_type>(gid, item, maxitems,
                                                    row, interp_src_data,time,par);
         }
 
@@ -78,7 +78,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             naming::id_type const& val)
         {
             typedef amr::server::functional_component::init_action action_type;
-            return lcos::async<action_type>(gid, numsteps, val);
+            return hpx::async<action_type>(gid, numsteps, val);
         }
 
         static void init(naming::id_type const& gid,

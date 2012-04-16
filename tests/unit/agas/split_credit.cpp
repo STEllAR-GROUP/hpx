@@ -29,7 +29,7 @@ using hpx::components::get_component_type;
 
 using hpx::applier::get_applier;
 
-using hpx::lcos::async;
+using hpx::async;
 
 using hpx::test::simple_object;
 using hpx::test::managed_object;

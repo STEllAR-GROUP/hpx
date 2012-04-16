@@ -26,7 +26,7 @@ namespace gtc { namespace stubs
             parameter const& par)
         {
             typedef server::point::init_action action_type;
-            return hpx::lcos::async<action_type>(gid,objectid,par);
+            return hpx::async<action_type>(gid,objectid,par);
         }
 
         /// Initialize the \a gtc::server::point instance with the
@@ -44,7 +44,7 @@ namespace gtc { namespace stubs
             parameter const& par)
         {
             typedef server::point::load_action action_type;
-            return hpx::lcos::async<action_type>(gid,objectid,par);
+            return hpx::async<action_type>(gid,objectid,par);
         }
 
         static void load(hpx::naming::id_type const& gid,std::size_t objectid,
@@ -61,7 +61,7 @@ namespace gtc { namespace stubs
             hpx::components::gtc::parameter const& par)
         {
             typedef server::point::chargei_action action_type;
-            return hpx::lcos::async<action_type>(gid,istep,
+            return hpx::async<action_type>(gid,istep,
                 point_components,par);
         }
 
@@ -78,7 +78,7 @@ namespace gtc { namespace stubs
         get_densityi_async(hpx::naming::id_type const& gid)
         {
             typedef server::point::get_densityi_action action_type;
-            return hpx::lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         static std::valarray<double> get_densityi(hpx::naming::id_type const& gid)
@@ -92,7 +92,7 @@ namespace gtc { namespace stubs
         get_zonali_async(hpx::naming::id_type const& gid)
         {
             typedef server::point::get_zonali_action action_type;
-            return hpx::lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         static std::vector<double> get_zonali(hpx::naming::id_type const& gid)
@@ -109,7 +109,7 @@ namespace gtc { namespace stubs
             hpx::components::gtc::parameter const& par)
         {
             typedef server::point::smooth_action action_type;
-            return hpx::lcos::async<action_type>(gid,iflag,
+            return hpx::async<action_type>(gid,iflag,
                 point_components,idiag,par);
         }
 
@@ -127,7 +127,7 @@ namespace gtc { namespace stubs
         get_phi_async(hpx::naming::id_type const& gid,std::size_t depth)
         {
             typedef server::point::get_phi_action action_type;
-            return hpx::lcos::async<action_type>(gid,depth);
+            return hpx::async<action_type>(gid,depth);
         }
 
         static std::valarray<double> get_phi(hpx::naming::id_type const& gid,std::size_t depth)
@@ -141,7 +141,7 @@ namespace gtc { namespace stubs
         get_eachzeta_async(hpx::naming::id_type const& gid)
         {
             typedef server::point::get_eachzeta_action action_type;
-            return hpx::lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         static std::vector<double> get_eachzeta(hpx::naming::id_type const& gid)
@@ -157,7 +157,7 @@ namespace gtc { namespace stubs
             hpx::components::gtc::parameter const& par)
         {
             typedef server::point::field_action action_type;
-            return hpx::lcos::async<action_type>(gid,
+            return hpx::async<action_type>(gid,
                 point_components,par);
         }
 
@@ -174,7 +174,7 @@ namespace gtc { namespace stubs
         get_evector_async(hpx::naming::id_type const& gid,std::size_t depth,std::size_t extent)
         {
             typedef server::point::get_evector_action action_type;
-            return hpx::lcos::async<action_type>(gid,depth,extent);
+            return hpx::async<action_type>(gid,depth,extent);
         }
 
         static std::valarray<double> get_evector(hpx::naming::id_type const& gid,std::size_t depth,std::size_t extent)
@@ -190,7 +190,7 @@ namespace gtc { namespace stubs
             hpx::components::gtc::parameter const& par)
         {
             typedef server::point::pushi_action action_type;
-            return hpx::lcos::async<action_type>(gid,irk,istep,idiag,
+            return hpx::async<action_type>(gid,irk,istep,idiag,
                 point_components,par);
         }
 
@@ -207,7 +207,7 @@ namespace gtc { namespace stubs
         get_dden_async(hpx::naming::id_type const& gid)
         {
             typedef server::point::get_dden_action action_type;
-            return hpx::lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         static std::vector<double> get_dden(hpx::naming::id_type const& gid)
@@ -221,7 +221,7 @@ namespace gtc { namespace stubs
         get_dtem_async(hpx::naming::id_type const& gid)
         {
             typedef server::point::get_dtem_action action_type;
-            return hpx::lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         static std::vector<double> get_dtem(hpx::naming::id_type const& gid)
@@ -237,7 +237,7 @@ namespace gtc { namespace stubs
             hpx::components::gtc::parameter const& par)
         {
             typedef server::point::shifti_action action_type;
-            return hpx::lcos::async<action_type>(gid,
+            return hpx::async<action_type>(gid,
                 point_components,par);
         }
 
@@ -254,7 +254,7 @@ namespace gtc { namespace stubs
         get_msend_async(hpx::naming::id_type const& gid)
         {
             typedef server::point::get_msend_action action_type;
-            return hpx::lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         static std::size_t get_msend(hpx::naming::id_type const& gid)
@@ -268,7 +268,7 @@ namespace gtc { namespace stubs
         get_msendright_async(hpx::naming::id_type const& gid)
         {
             typedef server::point::get_msendright_action action_type;
-            return hpx::lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         static std::vector<std::size_t> get_msendright(hpx::naming::id_type const& gid)
@@ -282,7 +282,7 @@ namespace gtc { namespace stubs
         get_sendright_async(hpx::naming::id_type const& gid)
         {
             typedef server::point::get_sendright_action action_type;
-            return hpx::lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         static array<double> get_sendright(hpx::naming::id_type const& gid)
@@ -296,7 +296,7 @@ namespace gtc { namespace stubs
         get_msendleft_async(hpx::naming::id_type const& gid)
         {
             typedef server::point::get_msendleft_action action_type;
-            return hpx::lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         static std::vector<std::size_t> get_msendleft(hpx::naming::id_type const& gid)
@@ -310,7 +310,7 @@ namespace gtc { namespace stubs
         get_sendleft_async(hpx::naming::id_type const& gid)
         {
             typedef server::point::get_sendleft_action action_type;
-            return hpx::lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         static array<double> get_sendleft(hpx::naming::id_type const& gid)
@@ -329,7 +329,7 @@ namespace gtc { namespace stubs
             hpx::components::gtc::parameter const& par)
         {
             typedef server::point::poisson_action action_type;
-            return hpx::lcos::async<action_type>(gid,iflag,istep,irk,
+            return hpx::async<action_type>(gid,iflag,istep,irk,
                 point_components,par);
         }
 

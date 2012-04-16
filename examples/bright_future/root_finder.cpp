@@ -11,7 +11,7 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -19,7 +19,7 @@ using boost::program_options::value;
 
 using hpx::naming::id_type;
 using hpx::actions::plain_result_action2;
-using hpx::lcos::async;
+using hpx::async;
 using hpx::util::high_resolution_timer;
 using hpx::init;
 using hpx::finalize;

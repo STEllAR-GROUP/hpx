@@ -25,7 +25,7 @@ namespace gtc { namespace stubs
             hpx::components::gtc::parameter const& par)
         {
             typedef server::particle::init_action action_type;
-            return hpx::lcos::async<action_type>(gid,objectid,
+            return hpx::async<action_type>(gid,objectid,
                 par);
         }
 
@@ -44,7 +44,7 @@ namespace gtc { namespace stubs
             hpx::components::gtc::parameter const& par)
         {
             typedef server::particle::chargei_action action_type;
-            return hpx::lcos::async<action_type>(gid,objectid,istep,
+            return hpx::async<action_type>(gid,objectid,istep,
                 particle_components,par);
         }
 
@@ -62,7 +62,7 @@ namespace gtc { namespace stubs
             double posz) 
         {
             typedef server::particle::distance_action action_type;
-            return hpx::lcos::async<action_type>(gid,posx,posy,posz);
+            return hpx::async<action_type>(gid,posx,posy,posz);
         } 
 
         /// Compute the distance from the particle to the specified coordinates. 
@@ -79,7 +79,7 @@ namespace gtc { namespace stubs
         get_index_async(hpx::naming::id_type const& gid)
         {
             typedef server::particle::get_index_action action_type;
-            return hpx::lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         /// Get the index of the particle.
@@ -94,7 +94,7 @@ namespace gtc { namespace stubs
         get_densityi_async(hpx::naming::id_type const& gid)
         {
             typedef server::particle::get_densityi_action action_type;
-            return hpx::lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         static array<double> get_densityi(hpx::naming::id_type const& gid)

@@ -113,7 +113,7 @@ namespace hpx { namespace lcos
         void apply(naming::id_type const& gid)
         {
             util::block_profiler_wrapper<deferred_packaged_task_tag> bp(apply_logger_);
-            hpx::applier::apply_c<Action>(this->get_gid(), gid);
+            hpx::apply_c<Action>(this->get_gid(), gid);
         }
 
     private:
@@ -189,7 +189,7 @@ namespace hpx { namespace lcos
         void apply(naming::id_type const& gid, Arg0 const& arg0)
         {
             util::block_profiler_wrapper<deferred_packaged_task_tag> bp(apply_logger_);
-            hpx::applier::apply_c<Action>(this->get_gid(), gid, arg0);
+            hpx::apply_c<Action>(this->get_gid(), gid, arg0);
         }
 
     private:
@@ -326,7 +326,7 @@ namespace hpx { namespace lcos
             }
             else {
                 // remote execution
-                hpx::applier::apply_c<Action>(addr, this->get_gid(), gid);
+                hpx::applier::detail::apply_c<Action>(addr, this->get_gid(), gid);
             }
         }
 
@@ -406,7 +406,7 @@ namespace hpx { namespace lcos
             }
             else {
                 // remote execution
-                hpx::applier::apply_c<Action>(addr, this->get_gid(), gid, arg0);
+                hpx::applier::detail::apply_c<Action>(addr, this->get_gid(), gid, arg0);
             }
         }
 

@@ -35,7 +35,7 @@ struct hello_world : hpx::components::stub_base<server::hello_world>
 {
     static void invoke(hpx::naming::id_type const& gid)
     {
-        hpx::lcos::async<server::hello_world::invoke_action>(gid).get();
+        hpx::async<server::hello_world::invoke_action>(gid).get();
     }
 };
 

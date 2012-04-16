@@ -25,7 +25,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
           , Vector const &
         ) const
         {
-            hpx::applier::apply_c<Action>(cont, id);
+            hpx::apply_c<Action>(cont, id);
         }
     };
 #define BOOST_PP_ITERATION_PARAMS_1                                             \
@@ -64,7 +64,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
             LLCO_(info)
                 << "dataflow apply action "
                 << hpx::actions::detail::get_action_name<Action>();
-            hpx::applier::apply_c<Action>(
+            hpx::apply_c<Action>(
                 cont
               , id
               , BOOST_PP_ENUM(N, HPX_LCOS_DATAFLOW_M0, _)

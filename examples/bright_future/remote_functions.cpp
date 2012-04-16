@@ -28,7 +28,7 @@ using hpx::actions::plain_result_action0;
 using hpx::actions::plain_action1;
 using hpx::actions::plain_action2;
 using hpx::naming::id_type;
-using hpx::lcos::async;
+using hpx::async;
 using hpx::lcos::future;
 
 using hpx::find_all_localities;

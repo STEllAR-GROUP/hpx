@@ -238,7 +238,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         if ( hasedgeroot ) {
           std::vector<hpx::lcos::future< std::vector<bool> > > whohasthisedge_phase;
           for (int64_t j=1;j<= nglobalverts;j++) {
-            whohasthisedge_phase.push_back(hpx::lcos::async<whohasthisedge_action>(hpx::find_here(),j,point_components));
+            whohasthisedge_phase.push_back(hpx::async<whohasthisedge_action>(hpx::find_here(),j,point_components));
           }
           // put a callback here instead of search_vector
           hpx::lcos::wait(whohasthisedge_phase,boost::bind(&whohasthisedge_callback,_1,_2,boost::ref(point_components)));

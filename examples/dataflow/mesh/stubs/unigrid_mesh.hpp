@@ -38,7 +38,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef amr::server::unigrid_mesh::init_execute_action action_type;
-            return lcos::async<action_type>(gid, interp_src_data,time,function_type,
+            return hpx::async<action_type>(gid, interp_src_data,time,function_type,
                 numvalues, numsteps, logging_type,par);
         }
 
@@ -67,7 +67,7 @@ namespace hpx { namespace components { namespace amr { namespace stubs
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef amr::server::unigrid_mesh::execute_action action_type;
-            return lcos::async<action_type>(gid, initial_data,
+            return hpx::async<action_type>(gid, initial_data,
                 function_type, numvalues, numsteps, logging_type, par);
         }
 

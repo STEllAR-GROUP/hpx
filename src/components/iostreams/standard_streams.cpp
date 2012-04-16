@@ -7,7 +7,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
@@ -88,7 +88,7 @@ namespace hpx { namespace iostreams
                             "stream_raii::stream_raii", "couldn't contact console");
                     }
 
-                    lcos::async<create_cout_action>(console).get();
+                    hpx::async<create_cout_action>(console).get();
 
                     // Try again
                     bool r = agas::resolve_name(cout_name, gid, ec);

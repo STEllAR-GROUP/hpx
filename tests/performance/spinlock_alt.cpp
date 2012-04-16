@@ -11,7 +11,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/include/iostreams.hpp>
 
 #include <stdexcept>
@@ -35,7 +35,7 @@ using hpx::naming::id_type;
 using hpx::actions::plain_result_action1;
 
 using hpx::lcos::future;
-using hpx::lcos::async;
+using hpx::async;
 using hpx::lcos::wait;
 
 using hpx::util::high_resolution_timer;

@@ -36,7 +36,7 @@
         BOOST_PP_ENUM_BINARY_PARAMS(N, Arg, const& arg))
     {
         util::block_profiler_wrapper<deferred_packaged_task_tag> bp(apply_logger_);
-        hpx::applier::apply_c<Action>(
+        hpx::apply_c<Action>(
             this->get_gid(), gid, BOOST_PP_ENUM_PARAMS(N, arg));
     }
 

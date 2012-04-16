@@ -10,7 +10,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/packaged_task.hpp>
 #include <hpx/lcos/deferred_packaged_task.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 
 #include <hpx/lcos/local/barrier.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
@@ -23,7 +23,7 @@
 #include <hpx/lcos/queue.hpp>
 #include <hpx/lcos/barrier.hpp>
 
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/lcos/future_wait.hpp>
 
 #endif

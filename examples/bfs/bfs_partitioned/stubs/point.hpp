@@ -24,7 +24,7 @@ namespace bfs { namespace stubs
             std::size_t max_levels)
         {
             typedef server::point::init_action action_type;
-            return hpx::lcos::async<action_type>(gid,objectid,grainsize,
+            return hpx::async<action_type>(gid,objectid,grainsize,
                 max_num_neighbors,nodefile,neighborfile,index,max_levels);
         }
 
@@ -46,7 +46,7 @@ namespace bfs { namespace stubs
             std::size_t parent,std::size_t edge)
         {
             typedef server::point::traverse_action action_type;
-            return hpx::lcos::async<action_type>(gid,level,parent,edge);
+            return hpx::async<action_type>(gid,level,parent,edge);
         }
 
         /// Traverse the graph. 
@@ -65,7 +65,7 @@ namespace bfs { namespace stubs
             std::size_t parent,std::size_t edge)
         {
             typedef server::point::depth_traverse_action action_type;
-            return hpx::lcos::async<action_type>(gid,level,parent,edge);
+            return hpx::async<action_type>(gid,level,parent,edge);
         }
 
         /// Traverse the graph. 
@@ -83,7 +83,7 @@ namespace bfs { namespace stubs
         get_parent_async(hpx::naming::id_type const& gid,std::size_t edge)
         {
             typedef server::point::get_parent_action action_type;
-            return hpx::lcos::async<action_type>(gid,edge);
+            return hpx::async<action_type>(gid,edge);
         }
 
         /// get parent
@@ -100,7 +100,7 @@ namespace bfs { namespace stubs
         get_level_async(hpx::naming::id_type const& gid,std::size_t edge)
         {
             typedef server::point::get_level_action action_type;
-            return hpx::lcos::async<action_type>(gid,edge);
+            return hpx::async<action_type>(gid,edge);
         }
 
         /// get level
@@ -116,7 +116,7 @@ namespace bfs { namespace stubs
         reset_visited_async(hpx::naming::id_type const& gid,std::size_t objectid)
         {
             typedef server::point::reset_visited_action action_type;
-            return hpx::lcos::async<action_type>(gid,objectid);
+            return hpx::async<action_type>(gid,objectid);
         }
 
         static void reset_visited(hpx::naming::id_type const& gid,std::size_t objectid)

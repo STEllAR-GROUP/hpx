@@ -14,7 +14,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 
 #include "../server/hplmatrex.hpp"
 
@@ -25,13 +25,13 @@ namespace hpx { namespace components { namespace stubs
     //constructor
     static int construct(naming::id_type gid, unsigned int h,
         unsigned int ab, unsigned int bs){
-        return lcos::async<server::hplmatrex::construct_action>(
+        return hpx::async<server::hplmatrex::construct_action>(
             gid,gid,h,ab,bs).get();
     }
 
     //functions for manipulating the matrix
     static double LUsolve(naming::id_type gid){
-        return lcos::async<server::hplmatrex::solve_action>(gid).get();
+        return hpx::async<server::hplmatrex::solve_action>(gid).get();
     }
     };
 }}}

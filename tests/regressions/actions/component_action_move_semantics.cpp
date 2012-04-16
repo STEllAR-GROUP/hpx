@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/plain_actions.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/foreach.hpp>
@@ -27,7 +27,7 @@ std::size_t pass_object(hpx::naming::id_type id)
     Object obj;
     obj.reset_count();
 
-    return hpx::lcos::async<Action>(test.get_gid(), obj).get();
+    return hpx::async<Action>(test.get_gid(), obj).get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -40,7 +40,7 @@ std::size_t move_object(hpx::naming::id_type id)
     Object obj;
     obj.reset_count();
 
-    return hpx::lcos::async<Action>(test.get_gid(), boost::move(obj)).get();
+    return hpx::async<Action>(test.get_gid(), boost::move(obj)).get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -51,7 +51,7 @@ std::size_t return_object(hpx::naming::id_type id)
 
     action_move_semantics test(action_move_semantics::create_sync(id));
 
-    Object obj(hpx::lcos::async<Action>(test.get_gid()).get());
+    Object obj(hpx::async<Action>(test.get_gid()).get());
     return obj.get_count();
 }
 
@@ -63,7 +63,7 @@ std::size_t return_move_object(hpx::naming::id_type id)
 
     action_move_semantics test(action_move_semantics::create_sync(id));
 
-    Object obj(boost::move(hpx::lcos::async<Action>(test.get_gid()).move_out()));
+    Object obj(boost::move(hpx::async<Action>(test.get_gid()).move_out()));
     return obj.get_count();
 }
 

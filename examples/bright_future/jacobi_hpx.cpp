@@ -16,7 +16,7 @@
 #include <hpx/components/remote_object/distributed_new.hpp>
 #include <hpx/components/dataflow/dataflow_object.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <algorithm>
 

@@ -6,7 +6,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/lcos/future_wait.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 
 #include "../make_graph.hpp"
 #include "../stubs/point.hpp"

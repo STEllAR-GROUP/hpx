@@ -7,7 +7,7 @@
 #define HPX_SHENEOS_PARTITION3D_AUG_08_2011_1219PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 
 #include "../server/partition3d.hpp"
@@ -26,7 +26,7 @@ namespace sheneos { namespace stubs
             // The following get yields control while the action above
             // is executed and the result is returned to the future.
             typedef sheneos::server::partition3d::init_action action_type;
-            return hpx::lcos::async<action_type>(
+            return hpx::async<action_type>(
                 gid, datafilename, dimx, dimy, dimz);
         }
 
@@ -45,7 +45,7 @@ namespace sheneos { namespace stubs
             // The following get yields control while the action above
             // is executed and the result is returned to the future.
             typedef sheneos::server::partition3d::interpolate_action action_type;
-            return hpx::lcos::async<action_type>(gid, ye, temp, rho, eosvalues);
+            return hpx::async<action_type>(gid, ye, temp, rho, eosvalues);
         }
 
         static std::vector<double> interpolate(hpx::naming::id_type const& gid,
@@ -62,7 +62,7 @@ namespace sheneos { namespace stubs
             // The following get yields control while the action above
             // is executed and the result is returned to the future.
             typedef sheneos::server::partition3d::interpolate_one_action action_type;
-            return hpx::lcos::async<action_type>(gid, ye, temp, rho, eosvalues);
+            return hpx::async<action_type>(gid, ye, temp, rho, eosvalues);
         }
 
         static double interpolate_one(hpx::naming::id_type const& gid,
@@ -80,7 +80,7 @@ namespace sheneos { namespace stubs
             // is executed and the result is returned to the future.
             typedef sheneos::server::partition3d::interpolate_one_bulk_action
                 action_type;
-            return hpx::lcos::async<action_type>(gid, coords, eosvalue);
+            return hpx::async<action_type>(gid, coords, eosvalue);
         }
 
         static std::vector<double>
@@ -99,7 +99,7 @@ namespace sheneos { namespace stubs
             // is executed and the result is returned to the future.
             typedef sheneos::server::partition3d::interpolate_bulk_action
                 action_type;
-            return hpx::lcos::async<action_type>(gid, coords, eosvalues);
+            return hpx::async<action_type>(gid, coords, eosvalues);
         }
 
         static std::vector<std::vector<double> >

@@ -12,7 +12,7 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/lcos/future_wait.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/lcos/object_semaphore.hpp>
 
 typedef hpx::lcos::object_semaphore<int> object_semaphore_type;
@@ -66,7 +66,7 @@ int hpx_main(boost::program_options::variables_map &vm)
 
         // create some threads waiting to pull elements from the queue
         for (std::size_t i = 0; i < 5; ++i) {
-            using hpx::lcos::async;
+            using hpx::async;
             barrier.push_back(async<worker_action>(hpx::find_here(), os.get_gid()));
         }
 

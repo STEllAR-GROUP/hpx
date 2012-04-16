@@ -10,7 +10,7 @@
 #include <omp.h>
 #else
 #include <hpx/hpx.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/lcos/future_wait.hpp>
 #endif
 
@@ -147,7 +147,7 @@ namespace bright_future
                 BOOST_FOREACH(std::size_t os_thread, attendance)
                 {
                     futures.push_back(
-                        hpx::lcos::async<touch_mem_action>(
+                        hpx::async<touch_mem_action>(
                             prefix
                           , os_thread
                           , reinterpret_cast<std::size_t>(p)
@@ -180,7 +180,7 @@ namespace bright_future
                 BOOST_FOREACH(std::size_t os_thread, attendance)
                 {
                     futures.push_back(
-                        hpx::lcos::async<touch_mem_action>(
+                        hpx::async<touch_mem_action>(
                             prefix
                           , os_thread
                           , reinterpret_cast<std::size_t>(p)

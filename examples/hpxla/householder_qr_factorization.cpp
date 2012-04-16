@@ -589,7 +589,7 @@ inline orthotope<T> blocked_matrix_multiply(
                            , B_sub(B, {block_size, block_size}, {l, j});
 
                 stop_list.push_back(
-                    hpx::lcos::async<multiply_and_add_action>(
+                    hpx::async<multiply_and_add_action>(
                             hpx::find_here(), C_sub, A_sub, B_sub, mtx
                         ).get_future());
             } 

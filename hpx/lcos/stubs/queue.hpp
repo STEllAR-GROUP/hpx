@@ -8,7 +8,7 @@
 
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/lcos/base_lco.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/lcos/server/queue.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 
@@ -28,7 +28,7 @@ namespace hpx { namespace lcos { namespace stubs
             typedef typename
                 lcos::base_lco_with_value<ValueType, RemoteType>::get_value_action
             action_type;
-            return lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         static lcos::future<void>
@@ -37,7 +37,7 @@ namespace hpx { namespace lcos { namespace stubs
             typedef typename
                 lcos::base_lco_with_value<ValueType, RemoteType>::set_value_action
             action_type;
-            return lcos::async<action_type>(gid, boost::move(val));
+            return hpx::async<action_type>(gid, boost::move(val));
         }
 
         static lcos::future<void>
@@ -45,7 +45,7 @@ namespace hpx { namespace lcos { namespace stubs
             boost::exception_ptr const& e)
         {
             typedef lcos::base_lco::set_exception_action action_type;
-            return lcos::async<action_type>(gid, e);
+            return hpx::async<action_type>(gid, e);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -71,14 +71,14 @@ namespace hpx { namespace lcos { namespace stubs
             typedef typename
                 lcos::base_lco_with_value<ValueType, RemoteType>::set_value_action
             action_type;
-            hpx::applier::apply<action_type>(gid, val);
+            hpx::apply<action_type>(gid, val);
         }
 
         static void abort_pending(naming::id_type const& gid,
             boost::exception_ptr const& e)
         {
             typedef lcos::base_lco::set_exception_action action_type;
-            hpx::applier::apply<action_type>(gid, e);
+            hpx::apply<action_type>(gid, e);
         }
     };
 }}}

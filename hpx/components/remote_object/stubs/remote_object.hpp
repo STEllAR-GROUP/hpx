@@ -9,7 +9,7 @@
 #include <boost/type_traits/is_void.hpp>
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/components/remote_object/server/remote_object.hpp>
 
@@ -32,7 +32,7 @@ namespace hpx { namespace components { namespace stubs
                 action_type;
             using namespace boost::archive::detail::extra_detail;
             init_guid<action_type>::g.initialize();
-            return lcos::async<action_type>(target_id, boost::move(f));
+            return hpx::async<action_type>(target_id, boost::move(f));
         }
 
         template <typename F>
@@ -47,7 +47,7 @@ namespace hpx { namespace components { namespace stubs
         set_dtor_async(naming::id_type const & target_id, F const & f)
         {
             typedef server::remote_object::set_dtor_action action_type;
-            return lcos::async<action_type>(target_id, f);
+            return hpx::async<action_type>(target_id, f);
         }
 
         template <typename F>

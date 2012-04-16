@@ -40,7 +40,7 @@ boost::uint64_t fibonacci(boost::uint64_t n)
     // However, we intentionally demonstrate it this way to create some
     // heavy workload.
     using hpx::lcos::future;
-    using hpx::lcos::async;
+    using hpx::async;
     future<boost::uint64_t> n1 = async<fibonacci_action>(locality_id, n - 1);
     future<boost::uint64_t> n2 = async<fibonacci_action>(locality_id, n - 2);
 
@@ -62,7 +62,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Create a Future for the whole calculation, execute it locally, and
         // wait for it.
         hpx::lcos::future<boost::uint64_t> f =
-            hpx::lcos::async<fibonacci_action>(hpx::find_here(), n);
+            hpx::async<fibonacci_action>(hpx::find_here(), n);
 
         // wait for future f to return value
         boost::uint64_t r = f.get();

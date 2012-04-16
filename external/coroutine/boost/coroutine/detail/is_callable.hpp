@@ -47,7 +47,7 @@ namespace boost { namespace coroutines { namespace detail {
   template<typename T>
   struct is_functor :
     boost::mpl::or_<typename has_result_type<T>::type,
-		    typename has_result<T>::type>
+            typename has_result<T>::type>
   {
     typedef is_functor<T> type;
   };

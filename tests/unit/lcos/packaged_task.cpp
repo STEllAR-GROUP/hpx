@@ -44,7 +44,7 @@ HPX_REGISTER_PLAIN_ACTION(int_action);
 int hpx_main(variables_map&)
 {
     {
-        using hpx::lcos::async;
+        using hpx::async;
 
         // create an explicit future
         null_thread_executed = false;

@@ -14,7 +14,7 @@
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/include/iostreams.hpp>
 
 #include "server/remote_lse.hpp"
@@ -188,7 +188,7 @@ void gs(
         // id on which object we want to call the action. the remaining
         // parameters are the parameters to be passed to the action, see comment
         // above
-        hpx::lcos::async<remote_lse_type::init_action>(
+        hpx::async<remote_lse_type::init_action>(
             remote_id, n_x, n_y, n_x, n_y, hx, hy).get();
 
         // this type represents our grid, instead of doubles, we just use
@@ -220,7 +220,7 @@ void gs(
                 for(size_type x = 0, x_block = 0; x < n_x; x += block_size, ++x_block)
                 {
                     init_rhs_promises(x_block, y_block) =
-                        hpx::lcos::async<remote_lse_type::init_rhs_blocked_action>(
+                        hpx::async<remote_lse_type::init_rhs_blocked_action>(
                             remote_id
                           , init_rhs_fun()
                           , range_type(x, (std::min)(n_x, x + block_size))
@@ -237,7 +237,7 @@ void gs(
                 {
                     // set the promise of the initialization.
                     iteration_dependencies[0](x_block, y_block) =
-                        hpx::lcos::async<remote_lse_type::init_u_blocked_action>(   // invoke the init future.
+                        hpx::async<remote_lse_type::init_u_blocked_action>(   // invoke the init future.
                             remote_id
                           , init_u_fun() // pass the initialization function
                           , range_type(x, (std::min)(n_x, x + block_size))
@@ -320,7 +320,7 @@ void gs(
                             //         u(x, y) = update_fun()(x, y, u, rhs, ...)
                             // the loop will be executed after all the dependencies
                             // are finished.
-                            hpx::lcos::async<remote_lse_type::apply_region_action>(
+                            hpx::async<remote_lse_type::apply_region_action>(
                                 remote_id
                               , update_fun()
                               , x_range
@@ -350,7 +350,7 @@ void gs(
             {
                 for(size_type y = 0; y < n_y; ++y)
                 {
-                    hpx::lcos::async<remote_lse_type::apply_action>(
+                    hpx::async<remote_lse_type::apply_action>(
                         remote_id, out, x, y, std::vector<promise_type>()).get();
                 }
                 (*f.file) << "\n";

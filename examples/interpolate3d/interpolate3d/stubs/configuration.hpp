@@ -27,7 +27,7 @@ namespace interpolate3d { namespace stubs
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef interpolate3d::server::configuration::init_action action_type;
-            return hpx::lcos::async<action_type>(
+            return hpx::async<action_type>(
                 gid, datafile, symbolic_name, num_instances);
         }
 
@@ -46,7 +46,7 @@ namespace interpolate3d { namespace stubs
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef interpolate3d::server::configuration::get_action action_type;
-            return hpx::lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         static config_data get(hpx::naming::id_type const& gid)

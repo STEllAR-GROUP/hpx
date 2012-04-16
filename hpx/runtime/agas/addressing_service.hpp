@@ -27,7 +27,7 @@
 #include <hpx/state.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/counting_semaphore.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
 #include <hpx/runtime/agas/component_namespace.hpp>
 #include <hpx/runtime/agas/primary_namespace.hpp>

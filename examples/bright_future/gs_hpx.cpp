@@ -13,7 +13,7 @@
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/include/iostreams.hpp>
 
 #include "server/remote_lse.hpp"
@@ -194,7 +194,7 @@ void gs(
                 for(size_type x = 0; x < n_x; ++x)
                 {
                     init_rhs_promises(x, y) =
-                        hpx::lcos::async<remote_lse_type::init_rhs_action>(
+                        hpx::async<remote_lse_type::init_rhs_action>(
                             remote_id, init_rhs_fun(), x, y);
                 }
             }
@@ -213,7 +213,7 @@ void gs(
             for(size_type x = 0; x < n_x; ++x)
             {
                 iteration_dependencies[0](x, y) =
-                    hpx::lcos::async<remote_lse_type::init_u_action>(
+                    hpx::async<remote_lse_type::init_u_action>(
                         remote_id, init_u_fun(), x, y);
                 iteration_dependencies[0](x, y).get();
             }
@@ -238,14 +238,14 @@ void gs(
                         std::vector<promise_type> dependencies;
                         dependencies.push_back(prev(0,y));
                         current(0, y) =
-                            hpx::lcos::async<remote_lse_type::apply_action>(
+                            hpx::async<remote_lse_type::apply_action>(
                                 remote_id, identity_fun(), 0, y, dependencies);
                     }
                     {
                         std::vector<promise_type> dependencies;
                         dependencies.push_back(prev(n_x-1,y));
                         current(n_x-1, y) =
-                            hpx::lcos::async<remote_lse_type::apply_action>(
+                            hpx::async<remote_lse_type::apply_action>(
                                 remote_id, identity_fun(), n_x-1, y, dependencies);
                     }
                 }
@@ -255,14 +255,14 @@ void gs(
                         std::vector<promise_type> dependencies;
                         dependencies.push_back(prev(x,0));
                         current(x, 0) =
-                            hpx::lcos::async<remote_lse_type::apply_action>(
+                            hpx::async<remote_lse_type::apply_action>(
                                 remote_id, identity_fun(), x, 0, dependencies);
                     }
                     {
                         std::vector<promise_type> dependencies;
                         dependencies.push_back(prev(x,n_y-1));
                         current(x, n_y-1) =
-                            hpx::lcos::async<remote_lse_type::apply_action>(
+                            hpx::async<remote_lse_type::apply_action>(
                                 remote_id, identity_fun(), x, n_y-1, dependencies);
                     }
                 }
@@ -282,7 +282,7 @@ void gs(
                         dependencies.push_back(current(x,y-1));
 
                         current(x, y) =
-                            hpx::lcos::async<remote_lse_type::apply_action>(
+                            hpx::async<remote_lse_type::apply_action>(
                                 remote_id, update_fun(), x, y, dependencies);
 
                         //u(x, y) = update(u, rhs, x, y, hx_sq, hy_sq, div, relaxation);
@@ -342,7 +342,7 @@ void gs(
             {
                 for(size_type y = 0; y < n_y; ++y)
                 {
-                    hpx::lcos::async<remote_lse_type::apply_action>(
+                    hpx::async<remote_lse_type::apply_action>(
                         remote_id, out, x, y, std::vector<promise_type>()).get();
                 }
                 (*f.file) << "\n";

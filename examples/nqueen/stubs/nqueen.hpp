@@ -11,7 +11,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 
 #include <examples/nqueen/server/nqueen.hpp>
 
@@ -23,7 +23,7 @@ namespace nqueen { namespace stubs
 
         static void init_board(hpx::naming::id_type const& gid, std::size_t size)
         {
-            hpx::applier::apply<server::board::init_action>(gid, size);
+            hpx::apply<server::board::init_action>(gid, size);
         }
         //--------------------------------------------------------------
 
@@ -31,7 +31,7 @@ namespace nqueen { namespace stubs
         access_board_async(hpx::naming::id_type const& gid)
         {
             typedef server::board::access_action action_type;
-            return hpx::lcos::async<action_type>(gid);
+            return hpx::async<action_type>(gid);
         }
 
         static list_type access_board(hpx::naming::id_type const& gid)
@@ -44,7 +44,7 @@ namespace nqueen { namespace stubs
         static void update_board(hpx::naming::id_type const& gid, std::size_t level,
             std::size_t pos)
         {
-            hpx::applier::apply<server::board::update_action>(gid, level, pos);
+            hpx::apply<server::board::update_action>(gid, level, pos);
         }
 
         //------------------------------------------------------------
@@ -54,7 +54,7 @@ namespace nqueen { namespace stubs
             std::size_t level)
         {
             typedef server::board::check_action action_type;
-            return hpx::lcos::async<action_type>(gid, list, level);
+            return hpx::async<action_type>(gid, list, level);
         }
 
         static bool check_board(hpx::naming::id_type const& gid,
@@ -76,14 +76,14 @@ namespace nqueen { namespace stubs
             std::size_t size, std::size_t level, std::size_t col)
         {
             typedef server::board::solve_action action_type;
-            return hpx::lcos::async<action_type>
+            return hpx::async<action_type>
                 (gid, list, size, level, col);
         }
         //----------------------------------------------------------
 
         static void clear_board(hpx::naming::id_type const& gid)
         {
-            hpx::applier::apply<server::board::clear_action>(gid);
+            hpx::apply<server::board::clear_action>(gid);
         }
 
     };

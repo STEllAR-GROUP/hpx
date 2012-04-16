@@ -9,7 +9,7 @@
 #define HPX_85B78E29_DD30_4603_8EF5_29EFB32FD10D
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 
 namespace hpx { namespace agas { namespace stubs
@@ -64,7 +64,7 @@ struct HPX_EXPORT component_namespace
         )
     {
         typedef server_type::bulk_service_action action_type;
-        return lcos::async<action_type>(gid, priority, reqs);
+        return hpx::async<action_type>(gid, priority, reqs);
     }
 
     /// Fire-and-forget semantics.

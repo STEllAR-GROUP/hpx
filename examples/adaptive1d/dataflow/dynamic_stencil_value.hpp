@@ -9,7 +9,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/client_base.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 
 #include "stubs/dynamic_stencil_value.hpp"
 

@@ -12,7 +12,7 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/client_base.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 
 #include "stubs/dataflow_stencil.hpp"
 

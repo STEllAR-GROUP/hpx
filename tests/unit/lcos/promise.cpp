@@ -11,10 +11,6 @@
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
 
-using boost::program_options::variables_map;
-using boost::program_options::options_description;
-using boost::program_options::value;
-
 ///////////////////////////////////////////////////////////////////////////////
 int test()
 {
@@ -64,11 +60,11 @@ void future_callback(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(variables_map& vm)
+int hpx_main(boost::program_options::variables_map&)
 {
     using hpx::lcos::future;
-    using hpx::lcos::async;
-    using hpx::lcos::async_callback;
+    using hpx::async;
+    using hpx::async_callback;
 
     {
         future<int> p = async<test_action>(hpx::find_here());
@@ -141,7 +137,7 @@ int hpx_main(variables_map& vm)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
-    options_description desc_commandline(
+    boost::program_options::options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
     // Initialize and run HPX

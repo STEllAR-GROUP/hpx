@@ -47,7 +47,7 @@
         BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::applier::apply_c<action_type>(
+        hpx::apply_c<action_type>(
             this->get_gid(), gid, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
@@ -57,7 +57,7 @@
         BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::applier::apply_c_p<action_type>(this->get_gid(), gid, priority,
+        hpx::apply_c_p<action_type>(this->get_gid(), gid, priority,
             BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 

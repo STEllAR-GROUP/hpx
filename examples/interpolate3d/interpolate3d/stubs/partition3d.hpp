@@ -27,7 +27,7 @@ namespace interpolate3d { namespace stubs
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef interpolate3d::server::partition3d::init_action action_type;
-            return hpx::lcos::async<action_type>(
+            return hpx::async<action_type>(
                 gid, datafilename, dimx, dimy, dimz);
         }
 
@@ -47,7 +47,7 @@ namespace interpolate3d { namespace stubs
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef interpolate3d::server::partition3d::interpolate_action action_type;
-            return hpx::lcos::async<action_type>(gid, value_x, value_y, value_z);
+            return hpx::async<action_type>(gid, value_x, value_y, value_z);
         }
 
         static double interpolate(hpx::naming::id_type const& gid,

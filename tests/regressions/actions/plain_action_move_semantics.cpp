@@ -11,8 +11,8 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/plain_actions.hpp>
-#include <hpx/lcos/async.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/foreach.hpp>
@@ -32,7 +32,7 @@ using hpx::actions::plain_direct_action1;
 using hpx::actions::plain_direct_result_action1;
 using hpx::actions::plain_direct_result_action0;
 
-using hpx::lcos::async;
+using hpx::async;
 
 using hpx::init;
 using hpx::finalize;

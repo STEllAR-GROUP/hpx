@@ -12,7 +12,7 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 
 #include "../server/dataflow_stencil.hpp"
 
@@ -39,7 +39,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef adaptive1d::server::dataflow_stencil::init_execute_action action_type;
-            return lcos::async<action_type>(gid, interp_src_data,time,function_type,
+            return hpx::async<action_type>(gid, interp_src_data,time,function_type,
                 numvalues, numsteps, logging_type,par);
         }
 
@@ -68,7 +68,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef adaptive1d::server::dataflow_stencil::execute_action action_type;
-            return lcos::async<action_type>(gid, initial_data,
+            return hpx::async<action_type>(gid, initial_data,
                 function_type, numvalues, numsteps, logging_type, par);
         }
 

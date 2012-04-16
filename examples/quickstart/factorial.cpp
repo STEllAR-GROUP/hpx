@@ -13,7 +13,7 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 
 #include <iostream>
 
@@ -28,7 +28,7 @@ using hpx::find_here;
 
 using hpx::actions::plain_result_action1;
 
-using hpx::lcos::async;
+using hpx::async;
 using hpx::lcos::future;
 
 using hpx::util::high_resolution_timer;

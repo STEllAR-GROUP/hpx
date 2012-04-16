@@ -15,7 +15,7 @@
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/include/iostreams.hpp>
 
 #include <hpx/components/dataflow/dataflow.hpp>
@@ -197,7 +197,7 @@ void gs(
         // id on which object we want to call the action. the remaining
         // parameters are the parameters to be passed to the action, see comment
         // above
-        hpx::lcos::async<remote_lse_type::init_action>(
+        hpx::async<remote_lse_type::init_action>(
             remote_id, n_x, n_y, n_x, n_y, hx, hy).get();
 
         // this type represents our grid, instead of doubles, we just use
@@ -281,7 +281,7 @@ void gs(
 
         cout << "finished initializing ...\n" << flush;
 
-        hpx::lcos::async<remote_lse_type::clear_timestamps_action>(remote_id).get();
+        hpx::async<remote_lse_type::clear_timestamps_action>(remote_id).get();
 
         high_resolution_timer t;
 
@@ -385,7 +385,7 @@ void gs(
         }
         std::cout << "\n" << flush;
 
-        hpx::lcos::async<remote_lse_type::print_timestamps_action>(remote_id).get();
+        hpx::async<remote_lse_type::print_timestamps_action>(remote_id).get();
 
         double time_elapsed = t.elapsed();
         cout << time_elapsed << "\n" << flush;

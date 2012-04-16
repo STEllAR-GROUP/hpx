@@ -8,9 +8,9 @@
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/lcos/future_wait.hpp>
-#include <hpx/lcos/local/async.hpp>
+#include <hpx/lcos/local/packaged_task.hpp>
 
 #include <boost/foreach.hpp>
 #include <boost/assert.hpp>
@@ -325,6 +325,7 @@ namespace sheneos
 
     struct bulk_one_context
     {
+        typedef std::vector<double> result_type;
         typedef std::map<hpx::naming::id_type, context_data> partitions_type;
 
         bulk_one_context(boost::shared_ptr<partitions_type> parts, std::size_t s,
@@ -353,7 +354,7 @@ namespace sheneos
 
                 context_data& d = p.second;
                 lazy_results.push_back(
-                    lcos::async_callback<action_type>(
+                    hpx::async_callback<action_type>(
                         on_completed_bulk_one(d, overall_result),
                         p.first, boost::move(d.coords_), eosvalue));
             }
@@ -394,8 +395,9 @@ namespace sheneos
             d.coords_.push_back(*it);
         }
 
-        return hpx::lcos::local::async<std::vector<double> >(
-            bulk_one_context(partitions, coords.size(), eosvalue));
+        return hpx::async(
+            bulk_one_context(partitions, coords.size(), eosvalue)
+        );
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -432,6 +434,7 @@ namespace sheneos
     ///////////////////////////////////////////////////////////////////////////
     struct bulk_context
     {
+        typedef std::vector<std::vector<double> > result_type;
         typedef std::map<hpx::naming::id_type, context_data> partitions_type;
 
         bulk_context(boost::shared_ptr<partitions_type> parts, std::size_t s,
@@ -460,7 +463,7 @@ namespace sheneos
 
                 context_data& d = p.second;
                 lazy_results.push_back(
-                    lcos::async_callback<action_type>(
+                    hpx::async_callback<action_type>(
                         on_completed_bulk(d, overall_results),
                         p.first, boost::move(d.coords_), eosvalues));
             }
@@ -500,8 +503,9 @@ namespace sheneos
             d.coords_.push_back(*it);
         }
 
-        return hpx::lcos::local::async<std::vector<std::vector<double> > >(
-            bulk_context(partitions, coords.size(), eosvalues));
+        return hpx::async(
+            bulk_context(partitions, coords.size(), eosvalues)
+        );
     }
 }
 

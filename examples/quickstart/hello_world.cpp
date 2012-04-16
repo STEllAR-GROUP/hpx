@@ -95,7 +95,7 @@ void hello_world_foreman()
             // future, which we can query to determine if the task has
             // completed.
             typedef hello_world_worker_action action_type;
-            futures.push_back(hpx::lcos::async<action_type>(here, worker));
+            futures.push_back(hpx::async<action_type>(here, worker));
         }
 
         // Wait for all of the futures to finish. The callback version of the
@@ -139,7 +139,7 @@ int hpx_main(boost::program_options::variables_map& vm)
             // future, which we can query to determine if the task has
             // completed.
             typedef hello_world_foreman_action action_type;
-            futures.push_back(hpx::lcos::async<action_type>(node));
+            futures.push_back(hpx::async<action_type>(node));
         }
 
         // The non-callback version of hpx::lcos::wait takes a single parameter,

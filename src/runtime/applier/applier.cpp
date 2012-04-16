@@ -13,7 +13,7 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace applier
@@ -29,7 +29,7 @@ namespace hpx { namespace applier
         typedef
             components::server::runtime_support::create_component_action
         action_type;
-        return lcos::async<action_type>(targetgid, type, count);
+        return hpx::async<action_type>(targetgid, type, count);
     }
 
     //

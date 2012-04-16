@@ -14,12 +14,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
-    namespace applier
-    {
-        template <typename Action, typename Arg0>
-        inline bool
-        apply(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0);
-    }
+    template <typename Action, typename Arg0>
+    inline bool
+    apply(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0);
 
     namespace actions
     {
@@ -50,7 +47,7 @@ namespace hpx
 
                 LLCO_(info) << "continuation::trigger(" << this->get_gid() << ")";
 
-                applier::apply<action_type>(this->get_gid(), boost::move(result));
+                hpx::apply<action_type>(this->get_gid(), boost::move(result));
             }
 
             static void register_base()

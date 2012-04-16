@@ -127,7 +127,7 @@ namespace hpx { namespace lcos { namespace server
             {
                 typedef hpx::lcos::base_lco::set_event_action action_type;
                 BOOST_ASSERT(target);
-                applier::apply<action_type>(target);
+                hpx::apply<action_type>(target);
             }
             BOOST_ASSERT(targets.empty());
         }
@@ -154,7 +154,7 @@ namespace hpx { namespace lcos { namespace server
                 {
                     typedef hpx::lcos::base_lco::set_event_action action_type;
                     BOOST_ASSERT(target);
-                    applier::apply<action_type>(target);
+                    hpx::apply<action_type>(target);
                 }
                 BOOST_ASSERT(targets.empty());
             }
@@ -170,7 +170,7 @@ namespace hpx { namespace lcos { namespace server
                 {
                     typedef hpx::lcos::base_lco::set_event_action action_type;
                     BOOST_ASSERT(target);
-                    applier::apply<action_type>(target);
+                    hpx::apply<action_type>(target);
                 }
                 else
                 {

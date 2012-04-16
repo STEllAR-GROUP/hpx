@@ -381,7 +381,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 //         std::vector<hpx::lcos::future<void> > tests;
 //         BOOST_FOREACH(hpx::naming::id_type const& id, locality_ids)
 //         {
-//             using hpx::lcos::async;
+//             using hpx::async;
 //             for (std::size_t i = 0; i < num_workers; ++i)
 //                 tests.push_back(async<test_action>(id, num_ye_points,
 //                     num_temp_points, num_rho_points, seed));
@@ -399,7 +399,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 //         std::vector<hpx::lcos::future<void> > bulk_one_tests;
 //         BOOST_FOREACH(hpx::naming::id_type const& id, locality_ids)
 //         {
-//             using hpx::lcos::async;
+//             using hpx::async;
 //             for (std::size_t i = 0; i < num_workers; ++i)
 //                 bulk_one_tests.push_back(async<test_one_bulk_action>(id,
 //                     num_ye_points, num_temp_points, num_rho_points, seed));
@@ -418,7 +418,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         std::vector<hpx::lcos::future<void> > bulk_tests;
         BOOST_FOREACH(hpx::naming::id_type const& id, locality_ids)
         {
-            using hpx::lcos::async;
+            using hpx::async;
             for (std::size_t i = 0; i < num_workers; ++i)
                 bulk_tests.push_back(async<test_bulk_action>(id,
                     num_ye_points, num_temp_points, num_rho_points, seed));

@@ -18,7 +18,7 @@ using boost::program_options::options_description;
 
 using hpx::actions::plain_result_action1;
 using hpx::naming::id_type;
-using hpx::lcos::async;
+using hpx::async;
 
 ///////////////////////////////////////////////////////////////////////////////
 bool invoked_f = false;

@@ -10,7 +10,7 @@
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/lcos/future_wait.hpp>
-#include <hpx/lcos/async.hpp>
+#include <hpx/include/async.hpp>
 
 #include <algorithm>
 #include <boost/atomic.hpp>
@@ -30,7 +30,7 @@ using hpx::actions::plain_action4;
 using hpx::applier::applier;
 using hpx::applier::get_applier;
 
-using hpx::lcos::async;
+using hpx::async;
 using hpx::lcos::future;
 
 using hpx::util::high_resolution_timer;
