@@ -157,7 +157,7 @@ namespace hpx { namespace lcos { namespace server
                 reset_queue_entry r(e, queue_);
                 {
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                    threads::this_thread::suspend(threads::suspended,
+                    this_thread::suspend(threads::suspended,
                         "barrier::set_event");
                 }
             }

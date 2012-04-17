@@ -26,7 +26,7 @@ using hpx::get_os_thread_count;
 
 using hpx::applier::register_work;
 
-using hpx::threads::this_thread::suspend;
+using hpx::this_thread::suspend;
 using hpx::threads::get_thread_count;
 
 using hpx::util::high_resolution_timer;

@@ -6,10 +6,7 @@
 #if !defined(HPX_APPLY_APR_15_20012_0441PM)
 #define HPX_APPLY_APR_15_20012_0441PM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/threads/thread.hpp>
-#include <hpx/runtime/applier/apply.hpp>
-#include <hpx/util/bind_action.hpp>
+#include <hpx/apply.hpp>
 
 #endif
 

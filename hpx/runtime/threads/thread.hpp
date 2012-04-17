@@ -24,8 +24,10 @@
 
 #include <iosfwd>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads
+namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_EXPORT thread
@@ -40,7 +42,7 @@ namespace hpx { namespace threads
 
         template <typename F>
         explicit thread(BOOST_FWD_REF(F) f)
-          : id_(invalid_thread_id)
+          : id_(threads::invalid_thread_id)
         {
             start_thread(HPX_STD_FUNCTION<void()>(boost::forward<F>(f)));
         }
@@ -54,8 +56,7 @@ namespace hpx { namespace threads
 // #else
         // Vertical preprocessor repetition to define the remaining constructors
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (4, (1, HPX_ACTION_ARGUMENT_LIMIT                                         \
-          , <hpx/runtime/threads/thread.hpp>, 1))                             \
+    (3, (1, HPX_FUNCTION_LIMIT, <hpx/runtime/threads/thread.hpp>))            \
     /**/
 
 #include BOOST_PP_ITERATE()
@@ -79,14 +80,14 @@ namespace hpx { namespace threads
         bool joinable() const BOOST_NOEXCEPT
         {
             mutex_type::scoped_lock l(mtx_);
-            return invalid_thread_id != id_;
+            return threads::invalid_thread_id != id_;
         }
 
         void join();
         void detach()
         {
             mutex_type::scoped_lock l(mtx_);
-            id_ = invalid_thread_id;
+            id_ = threads::invalid_thread_id;
         }
 
         id get_id() const BOOST_NOEXCEPT;
@@ -110,7 +111,7 @@ namespace hpx { namespace threads
 
     private:
         void start_thread(BOOST_RV_REF(HPX_STD_FUNCTION<void()>) func);
-        static thread_state_enum thread_function_nullary(
+        static threads::thread_state_enum thread_function_nullary(
             HPX_STD_FUNCTION<void()> const& func);
 
         mutable mutex_type mtx_;
@@ -126,7 +127,7 @@ namespace hpx { namespace threads
     class thread::id
     {
     private:
-        thread_id_type id_;
+        threads::thread_id_type id_;
 
         friend bool operator== (thread::id x, thread::id y) BOOST_NOEXCEPT;
         friend bool operator!= (thread::id x, thread::id y) BOOST_NOEXCEPT;
@@ -140,8 +141,8 @@ namespace hpx { namespace threads
         operator<< (std::basic_ostream<Char, Traits>&, thread::id);
 
     public:
-        id() BOOST_NOEXCEPT : id_(invalid_thread_id) {}
-        explicit id(thread_id_type i) BOOST_NOEXCEPT : id_(i) {}
+        id() BOOST_NOEXCEPT : id_(threads::invalid_thread_id) {}
+        explicit id(threads::thread_id_type i) BOOST_NOEXCEPT : id_(i) {}
     };
 
     inline bool operator== (thread::id x, thread::id y) BOOST_NOEXCEPT
@@ -195,13 +196,13 @@ namespace hpx { namespace threads
         template <typename Clock, typename Duration>
         void sleep_until(boost::chrono::time_point<Clock, Duration> const& at)
         {
-            threads::this_thread::suspend(util::to_ptime(at));
+            this_thread::suspend(util::to_ptime(at));
         }
 
         template <typename Rep, typename Period>
         void sleep_for(boost::chrono::duration<Rep, Period> const& p)
         {
-            threads::this_thread::suspend(util::to_time_duration(p));
+            this_thread::suspend(util::to_time_duration(p));
         }
 
         // extensions
@@ -237,27 +238,9 @@ namespace hpx { namespace threads
             ~restore_interruption();
         };
     }
-}}
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx
-{
-    // simply launch the given function or function object asynchronously
-    template <typename F>
-    bool apply(BOOST_FWD_REF(F) f)
-    {
-        threads::thread t(boost::forward<F>(f));
-        t.detach();     // detach the thread
-        return false;   // executed locally
-    }
 }
 
-#define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (4, (1, HPX_ACTION_ARGUMENT_LIMIT                                         \
-          , <hpx/runtime/threads/thread.hpp>, 2))                             \
-    /**/
-
-#include BOOST_PP_ITERATE()
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif
 
@@ -273,34 +256,13 @@ namespace hpx
             boost::forward<BOOST_PP_CAT(Arg, n)>(BOOST_PP_CAT(arg, n))        \
     /**/
 
-#if  BOOST_PP_ITERATION_FLAGS() == 1
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     thread(BOOST_FWD_REF(F) f, BOOST_PP_ENUM(N, HPX_FWD_ARGS, _))
-      : id_(invalid_thread_id)
+      : id_(threads::invalid_thread_id)
     {
         start_thread(HPX_STD_BIND(boost::forward<F>(f),
             BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _)));
     }
-#endif
-
-#if  BOOST_PP_ITERATION_FLAGS() == 2
-namespace hpx
-{
-    // simply launch the given function or function object asynchronously
-    template <typename F, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    typename boost::enable_if<
-        traits::supports_result_of<F>
-      , bool
-    >::type
-    apply(BOOST_FWD_REF(F) f, BOOST_PP_ENUM(N, HPX_FWD_ARGS, _))
-    {
-        threads::thread t(boost::forward<F>(f),
-            BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _));
-        t.detach();     // detach the thread
-        return false;   // executed locally
-    }
-}
-#endif
 
 #undef HPX_FORWARD_ARGS
 #undef HPX_FWD_ARGS

@@ -21,21 +21,21 @@ void do_nothing()
 
 void test_thread_id_for_default_constructed_thread_is_default_constructed_id()
 {
-    hpx::threads::thread t;
-    HPX_TEST_EQ(t.get_id(), hpx::threads::thread::id());
+    hpx::thread t;
+    HPX_TEST_EQ(t.get_id(), hpx::thread::id());
 }
 
 void test_thread_id_for_running_thread_is_not_default_constructed_id()
 {
-    hpx::threads::thread t(&do_nothing);
-    HPX_TEST_NEQ(t.get_id(), hpx::threads::thread::id());
+    hpx::thread t(&do_nothing);
+    HPX_TEST_NEQ(t.get_id(), hpx::thread::id());
     t.join();
 }
 
 void test_different_threads_have_different_ids()
 {
-    hpx::threads::thread t(&do_nothing);
-    hpx::threads::thread t2(&do_nothing);
+    hpx::thread t(&do_nothing);
+    hpx::thread t2(&do_nothing);
     HPX_TEST_NEQ(t.get_id(), t2.get_id());
     t.join();
     t2.join();
@@ -43,13 +43,13 @@ void test_different_threads_have_different_ids()
 
 void test_thread_ids_have_a_total_order()
 {
-    hpx::threads::thread t1(&do_nothing);
-    hpx::threads::thread t2(&do_nothing);
-    hpx::threads::thread t3(&do_nothing);
+    hpx::thread t1(&do_nothing);
+    hpx::thread t2(&do_nothing);
+    hpx::thread t3(&do_nothing);
 
-    hpx::threads::thread::id t1_id = t1.get_id();
-    hpx::threads::thread::id t2_id = t2.get_id();
-    hpx::threads::thread::id t3_id = t3.get_id();
+    hpx::thread::id t1_id = t1.get_id();
+    hpx::thread::id t2_id = t2.get_id();
+    hpx::thread::id t3_id = t3.get_id();
 
     HPX_TEST(t1_id != t2_id);
     HPX_TEST(t1_id != t3_id);
@@ -113,7 +113,7 @@ void test_thread_ids_have_a_total_order()
         HPX_TEST(false);
     }
 
-    hpx::threads::thread::id default_id;
+    hpx::thread::id default_id;
 
     HPX_TEST(default_id < t1_id);
     HPX_TEST(default_id < t2_id);
@@ -136,16 +136,16 @@ void test_thread_ids_have_a_total_order()
     t3.join();
 }
 
-void get_thread_id(hpx::threads::thread::id* id)
+void get_thread_id(hpx::thread::id* id)
 {
-    *id = hpx::threads::this_thread::get_id();
+    *id = hpx::this_thread::get_id();
 }
 
 void test_thread_id_of_running_thread_returned_by_this_thread_get_id()
 {
-    hpx::threads::thread::id id;
-    hpx::threads::thread t(HPX_STD_BIND(&get_thread_id, &id));
-    hpx::threads::thread::id t_id = t.get_id();
+    hpx::thread::id id;
+    hpx::thread t(HPX_STD_BIND(&get_thread_id, &id));
+    hpx::thread::id t_id = t.get_id();
     t.join();
     HPX_TEST_EQ(id, t_id);
 }
@@ -175,7 +175,7 @@ int main(int argc, char* argv[])
     using namespace boost::assign;
     std::vector<std::string> cfg;
     cfg += "hpx.os_threads=" +
-        boost::lexical_cast<int>(hpx::threads::thread::hardware_concurrency());
+        boost::lexical_cast<int>(hpx::thread::hardware_concurrency());
 
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv, cfg);

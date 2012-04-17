@@ -167,7 +167,6 @@ namespace hpx
 
         struct HPX_API_EXPORT threadmanager_base;
         class HPX_API_EXPORT thread_data;
-        class HPX_API_EXPORT thread;
 
         template <
             typename SchedulingPolicy,
@@ -283,6 +282,7 @@ namespace hpx
     }
 
     class HPX_API_EXPORT runtime;
+    class HPX_API_EXPORT thread;
 
     /// A HPX runtime can be executed in two different modes: console mode
     /// and worker mode.

@@ -41,7 +41,7 @@ namespace hpx { namespace lcos
 
         friend class local::promise<Result>;
         friend class promise<Result, RemoteResult>;
-        friend class threads::thread;
+        friend class hpx::thread;
         friend struct detail::future_data<Result, RemoteResult>;
 
     public:
@@ -141,7 +141,7 @@ namespace hpx { namespace lcos
 
         friend class local::promise<void>;
         friend class promise<void, util::unused_type>;
-        friend class threads::thread;
+        friend class hpx::thread;
         friend struct detail::future_data<void, util::unused_type>;
 
     public:

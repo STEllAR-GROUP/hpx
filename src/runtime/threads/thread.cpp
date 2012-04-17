@@ -11,16 +11,16 @@
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/lcos/future.hpp>
 
-namespace hpx { namespace threads
+namespace hpx
 {
     thread::thread() BOOST_NOEXCEPT
-      : id_(invalid_thread_id)
+      : id_(threads::invalid_thread_id)
     {}
 
     thread::thread(BOOST_RV_REF(thread) rhs) BOOST_NOEXCEPT
       : id_(rhs.id_)
     {
-        rhs.id_ = invalid_thread_id;
+        rhs.id_ = threads::invalid_thread_id;
     }
 
     thread& thread::operator=(BOOST_RV_REF(thread) rhs) BOOST_NOEXCEPT
@@ -54,8 +54,8 @@ namespace hpx { namespace threads
     static void run_thread_exit_callbacks()
     {
         threads::thread_self& self = threads::get_self();
-        thread_id_type id = self.get_thread_id();
-        if (id == invalid_thread_id) {
+        threads::thread_id_type id = self.get_thread_id();
+        if (id == threads::invalid_thread_id) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "run_thread_exit_callbacks",
                 "NULL thread id encountered");
@@ -63,7 +63,7 @@ namespace hpx { namespace threads
         threads::run_thread_exit_callbacks(id);
     }
 
-    thread_state_enum thread::thread_function_nullary(
+    threads::thread_state_enum thread::thread_function_nullary(
         HPX_STD_FUNCTION<void()> const& func)
     {
         try {
@@ -76,7 +76,7 @@ namespace hpx { namespace threads
 
         // run all callbacks attached to the exit event for this thread
         run_thread_exit_callbacks();
-        return terminated;
+        return threads::terminated;
     }
 
     thread::id thread::get_id() const BOOST_NOEXCEPT
@@ -91,15 +91,16 @@ namespace hpx { namespace threads
             "thread::thread_function_nullary");
 
         error_code ec;
-        thread_id_type id = hpx::get_runtime().get_thread_manager().
-            register_thread(data, suspended, true, ec);
+        threads::thread_id_type id = hpx::get_runtime().get_thread_manager().
+            register_thread(data, threads::suspended, true, ec);
         if (ec) {
             HPX_THROWS_IF(ec, thread_resource_error, "thread::start_thread",
                 "Could not create thread");
             return;
         }
 
-        set_thread_state(id, pending, wait_signaled, thread_priority_normal, ec);
+        set_thread_state(id, threads::pending, threads::wait_signaled,
+            threads::thread_priority_normal, ec);
         if (ec) {
             HPX_THROWS_IF(ec, thread_resource_error, "thread::start_thread",
                 "Could not start newly created thread");
@@ -110,9 +111,9 @@ namespace hpx { namespace threads
         id_ = id;
     }
 
-    static void resume_thread(thread_id_type id)
+    static void resume_thread(threads::thread_id_type id)
     {
-        threads::set_thread_state(id, pending);
+        threads::set_thread_state(id, threads::pending);
     }
 
     void thread::join()
@@ -120,14 +121,14 @@ namespace hpx { namespace threads
         if (this_thread::get_id() == get_id())
         {
             HPX_THROW_EXCEPTION(thread_resource_error, "thread::join",
-                "hpx::threads::thread: trying joining itself");
+                "hpx::thread: trying joining itself");
             return;
         }
 
-        threads::this_thread::interruption_point();
+        this_thread::interruption_point();
 
         native_handle_type id = native_handle();
-        if (id != invalid_thread_id)
+        if (id != threads::invalid_thread_id)
         {
             // register callback function to be called when thread exits
             if (threads::add_thread_exit_callback(id, HPX_STD_BIND(&resume_thread, id)))
@@ -202,7 +203,7 @@ namespace hpx { namespace threads
 
     lcos::future<void> thread::get_future(error_code& ec)
     {
-        if (id_ == invalid_thread_id) {
+        if (id_ == threads::invalid_thread_id) {
             HPX_THROWS_IF(ec, null_thread_id, "thread::get_future",
                 "NULL thread id encountered");
             return lcos::future<void>();
@@ -224,7 +225,7 @@ namespace hpx { namespace threads
     {
         void yield() BOOST_NOEXCEPT
         {
-            threads::this_thread::suspend();
+            this_thread::suspend();
         }
 
         thread::id get_id() BOOST_NOEXCEPT
@@ -239,7 +240,7 @@ namespace hpx { namespace threads
             if (interruption_enabled() && interruption_requested())
             {
                 throw hpx::exception(thread_interrupted,
-                    "hpx::threads::this_thread::interruption_point: "
+                    "hpx::this_thread::interruption_point: "
                     "thread aborts itself due to requested thread interruption");
             }
         }
@@ -258,12 +259,12 @@ namespace hpx { namespace threads
 
         void sleep_until(boost::posix_time::ptime const& at)
         {
-            threads::this_thread::suspend(at);
+            this_thread::suspend(at);
         }
 
         void sleep_for(boost::posix_time::time_duration const& p)
         {
-            threads::this_thread::suspend(p);
+            this_thread::suspend(p);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -305,5 +306,5 @@ namespace hpx { namespace threads
             }
         }
     }
-}}
+}
 

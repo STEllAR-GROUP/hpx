@@ -328,7 +328,7 @@ namespace hpx { namespace util {
 #else  // !BOOST_PP_IS_ITERATING
 
 #define N BOOST_PP_ITERATION()
-#define NN N
+#define NN BOOST_PP_ITERATION()
 
 #define HPX_UTIL_BIND_INIT_MEMBER(Z, N, D)                                      \
     BOOST_PP_CAT(arg, N)(boost::forward<BOOST_PP_CAT(A, N)>(BOOST_PP_CAT(a, N)))\
@@ -438,7 +438,7 @@ namespace hpx { namespace util {
         R
         eval(
             Env const & env
-          , BOOST_PP_CAT(hpx::util::detail::bound_function, N)<
+          , BOOST_PP_CAT(detail::bound_function, N)<
                 R
               , BOOST_PP_ENUM_PARAMS(N, T)
               , BOOST_PP_ENUM_PARAMS(N, Arg)
@@ -447,7 +447,7 @@ namespace hpx { namespace util {
         {
             return
                 boost::fusion::fused<
-                    BOOST_PP_CAT(hpx::util::detail::bound_function, N)<
+                    BOOST_PP_CAT(detail::bound_function, N)<
                         R
                       , BOOST_PP_ENUM_PARAMS(N, T)
                       , BOOST_PP_ENUM_PARAMS(N, Arg)
@@ -722,7 +722,7 @@ namespace hpx { namespace util {
         R
         eval(
             Env const & env
-          , BOOST_PP_CAT(hpx::util::detail::bound_member_function, N)<
+          , BOOST_PP_CAT(detail::bound_member_function, N)<
                 R
               , C
               , BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(N), T)
@@ -732,7 +732,7 @@ namespace hpx { namespace util {
         {
             return
                 boost::fusion::fused<
-                    BOOST_PP_CAT(hpx::util::detail::bound_member_function, N)<
+                    BOOST_PP_CAT(detail::bound_member_function, N)<
                         R
                       , C
                       , BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(N), T)
@@ -876,7 +876,7 @@ namespace hpx { namespace util {
         typename F::result_type
         eval(
             Env const & env
-          , BOOST_PP_CAT(util::detail::bound_functor, N)<
+          , BOOST_PP_CAT(detail::bound_functor, N)<
                 F
               , BOOST_PP_ENUM_PARAMS(N, Arg)
             > const & f
@@ -884,7 +884,7 @@ namespace hpx { namespace util {
         {
             return
                 boost::fusion::fused<
-                    BOOST_PP_CAT(hpx::util::detail::bound_functor, N)<
+                    BOOST_PP_CAT(detail::bound_functor, N)<
                         F
                       , BOOST_PP_ENUM_PARAMS(N, Arg)
                     >

@@ -9,7 +9,7 @@
 #define HPX_85B78E29_DD30_4603_8EF5_29EFB32FD10D
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/include/async.hpp>
+#include <hpx/lcos/async.hpp>
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 
 namespace hpx { namespace agas { namespace stubs

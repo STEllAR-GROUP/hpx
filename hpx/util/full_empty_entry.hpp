@@ -224,7 +224,7 @@ namespace hpx { namespace util { namespace detail
                 {
                     // yield this thread
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                    threads::this_thread::suspend(threads::suspended,
+                    this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_full_full");
                 }
 
@@ -270,7 +270,7 @@ namespace hpx { namespace util { namespace detail
                 {
                     // yield this thread
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                    threads::this_thread::suspend(threads::suspended,
+                    this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_full_full");
                 }
 
@@ -310,7 +310,7 @@ namespace hpx { namespace util { namespace detail
                 {
                     // yield this thread
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                    threads::this_thread::suspend(threads::suspended,
+                    this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_full_empty");
                 }
 
@@ -352,7 +352,7 @@ namespace hpx { namespace util { namespace detail
                 {
                     // yield this thread
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                    threads::this_thread::suspend(threads::suspended,
+                    this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_full_empty");
                 }
             }
@@ -391,7 +391,7 @@ namespace hpx { namespace util { namespace detail
                 {
                     // yield this thread
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                    threads::this_thread::suspend(threads::suspended,
+                    this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_if_full");
                 }
             }
@@ -431,7 +431,7 @@ namespace hpx { namespace util { namespace detail
                 {
                     // yield this thread
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                    threads::this_thread::suspend(threads::suspended,
+                    this_thread::suspend(threads::suspended,
                         "full_empty_entry::enqueue_if_full");
                 }
             }

@@ -72,7 +72,7 @@ namespace hpx { namespace lcos { namespace local
                 threads::set_thread_state(self.get_thread_id(), wait_until);
 
             // if this timed out, return true
-            statex = threads::this_thread::suspend(threads::suspended,
+            statex = this_thread::suspend(threads::suspended,
                 description_);
         }
 

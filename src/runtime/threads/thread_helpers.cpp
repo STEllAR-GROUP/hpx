@@ -284,14 +284,14 @@ namespace hpx { namespace threads
     }
 }}
 
-namespace hpx { namespace threads { namespace this_thread
+namespace hpx { namespace this_thread
 {
     namespace detail
     {
         struct reset_lco_description
         {
-            reset_lco_description(thread_id_type id, char const* description,
-                    error_code& ec)
+            reset_lco_description(threads::thread_id_type id,
+                    char const* description, error_code& ec)
               : id_(id), ec_(ec)
             {
                 threads::set_thread_lco_description(id_, description, ec_);
@@ -302,7 +302,7 @@ namespace hpx { namespace threads { namespace this_thread
                 threads::set_thread_lco_description(id_, 0, ec_);
             }
 
-            thread_id_type id_;
+            threads::thread_id_type id_;
             error_code& ec_;
         };
     }
@@ -313,24 +313,24 @@ namespace hpx { namespace threads { namespace this_thread
     ///
     /// If the suspension was aborted, this function will throw a
     /// \a yield_aborted exception.
-    thread_state_ex_enum suspend(thread_state_enum state,
+    threads::thread_state_ex_enum suspend(threads::thread_state_enum state,
         char const* description, error_code& ec)
     {
         // handle interruption, if needed
-        threads::this_thread::interruption_point();
+        this_thread::interruption_point();
 
         // let the thread manager do other things while waiting
         threads::thread_self& self = threads::get_self();
         threads::thread_id_type id = self.get_thread_id();
 
-        threads::thread_state_ex_enum statex = wait_unknown;
+        threads::thread_state_ex_enum statex = threads::wait_unknown;
         {
             detail::reset_lco_description desc(id, description, ec);
             statex = self.yield(state);
         }
 
         // handle interrupt and abort
-        threads::this_thread::interruption_point();
+        this_thread::interruption_point();
         if (statex == threads::wait_abort) {
             hpx::util::osstream strm;
             strm << "thread(" << id << ", "
@@ -346,11 +346,11 @@ namespace hpx { namespace threads { namespace this_thread
         return statex;
     }
 
-    thread_state_ex_enum suspend(boost::posix_time::ptime const& at_time,
+    threads::thread_state_ex_enum suspend(boost::posix_time::ptime const& at_time,
         char const* description, error_code& ec)
     {
         // handle interruption, if needed
-        threads::this_thread::interruption_point();
+        this_thread::interruption_point();
 
         // schedule a thread waking us up at_time
         threads::thread_self& self = threads::get_self();
@@ -359,17 +359,17 @@ namespace hpx { namespace threads { namespace this_thread
         threads::set_thread_state(id,
             at_time, threads::pending, threads::wait_signaled,
             threads::thread_priority_critical, ec);
-        if (ec) return wait_unknown;
+        if (ec) return threads::wait_unknown;
 
         // let the thread manager do other things while waiting
-        threads::thread_state_ex_enum statex = wait_unknown;
+        threads::thread_state_ex_enum statex = threads::wait_unknown;
         {
             detail::reset_lco_description desc(id, description, ec);
             statex = self.yield(threads::suspended);
         }
 
         // handle interrupt and abort
-        threads::this_thread::interruption_point();
+        this_thread::interruption_point();
         if (statex == threads::wait_abort) {
             hpx::util::osstream strm;
             strm << "thread(" << id << ", "
@@ -385,12 +385,12 @@ namespace hpx { namespace threads { namespace this_thread
         return statex;
     }
 
-    thread_state_ex_enum suspend(
+    threads::thread_state_ex_enum suspend(
         boost::posix_time::time_duration const& after_duration,
         char const* description, error_code& ec)
     {
         // handle interruption, if needed
-        threads::this_thread::interruption_point();
+        this_thread::interruption_point();
 
         // schedule a thread waking us up after_duration
         threads::thread_self& self = threads::get_self();
@@ -399,17 +399,17 @@ namespace hpx { namespace threads { namespace this_thread
         threads::set_thread_state(id,
             after_duration, threads::pending, threads::wait_signaled,
             threads::thread_priority_critical, ec);
-        if (ec) return wait_unknown;
+        if (ec) return threads::wait_unknown;
 
         // let the thread manager do other things while waiting
-        threads::thread_state_ex_enum statex = wait_unknown;
+        threads::thread_state_ex_enum statex = threads::wait_unknown;
         {
             detail::reset_lco_description desc(id, description, ec);
             statex = self.yield(threads::suspended);
         }
 
         // handle interrupt and abort
-        threads::this_thread::interruption_point();
+        this_thread::interruption_point();
         if (statex == threads::wait_abort) {
             hpx::util::osstream strm;
             strm << "thread(" << id << ", "
@@ -424,5 +424,5 @@ namespace hpx { namespace threads { namespace this_thread
 
         return statex;
     }
-}}}
+}}
 

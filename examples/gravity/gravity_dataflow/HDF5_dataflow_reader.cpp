@@ -41,9 +41,9 @@ vector<point> createvecs (config_f& param) {
  dimsm[1]=dims_out[1];
  dimsm[2]=1;
  DataSpace memspace(3,dimsm);
- 
+
  //Define a buffer
- 
+
 // double data_out[dims_out[0]][dims_out[1]][1];
 
  typedef double array_type[7][1];
@@ -51,7 +51,7 @@ vector<point> createvecs (config_f& param) {
  double (* data_out)[7][1] = new array_type [dims_out[0]];
 
  dataset.read(data_out,PredType::NATIVE_DOUBLE,memspace,dataspace); //Read data
- 
+
  vector<point> pts;
  for (hsize_t i=0;i<dims_out[0];i++) {
   pts.push_back(point(data_out[i][0][0],data_out[i][1][0],data_out[i][2][0],
@@ -59,7 +59,7 @@ vector<point> createvecs (config_f& param) {
                       data_out[i][6][0]));
  }
 
- delete data_out; 
+ delete [] data_out;
 
  return pts;
-} 
+}

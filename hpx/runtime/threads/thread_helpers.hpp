@@ -205,7 +205,7 @@ namespace hpx { namespace threads
         HPX_STD_FUNCTION<void()> const& f, error_code& ec = throws);
 }}
 
-namespace hpx { namespace threads { namespace this_thread
+namespace hpx { namespace this_thread
 {
     ///////////////////////////////////////////////////////////////////////////
     /// The function \a suspend will return control to the thread manager
@@ -224,9 +224,9 @@ namespace hpx { namespace threads { namespace this_thread
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#invalid_status.
     ///
-    HPX_API_EXPORT thread_state_ex_enum suspend(
-        thread_state_enum state = pending,
-        char const* description = "threads::this_thread::suspend",
+    HPX_API_EXPORT threads::thread_state_ex_enum suspend(
+        threads::thread_state_enum state = threads::pending,
+        char const* description = "this_thread::suspend",
         error_code& ec = throws);
 
     /// The function \a suspend will return control to the thread manager
@@ -246,9 +246,9 @@ namespace hpx { namespace threads { namespace this_thread
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#invalid_status.
     ///
-    HPX_API_EXPORT thread_state_ex_enum suspend(
+    HPX_API_EXPORT threads::thread_state_ex_enum suspend(
         boost::posix_time::ptime const&,
-        char const* description = "threads::this_thread::suspend",
+        char const* description = "this_thread::suspend",
         error_code& ec = throws);
 
     /// The function \a suspend will return control to the thread manager
@@ -268,10 +268,10 @@ namespace hpx { namespace threads { namespace this_thread
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#invalid_status.
     ///
-    HPX_API_EXPORT thread_state_ex_enum suspend(
+    HPX_API_EXPORT threads::thread_state_ex_enum suspend(
         boost::posix_time::time_duration const&,
-        char const* description = "threads::this_thread::suspend",
+        char const* description = "this_thread::suspend",
         error_code& ec = throws);
-}}}
+}}
 
 #endif

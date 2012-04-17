@@ -226,7 +226,7 @@ namespace hpx { namespace lcos { namespace server
                 reset_queue_entry r(e, thread_queue_);
                 {
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
-                    threads::this_thread::suspend(threads::suspended,
+                    this_thread::suspend(threads::suspended,
                         "queue::get_value");
                 }
             }

@@ -27,7 +27,7 @@ void normal_function()
 
 void test_thread_function_no_arguments()
 {
-    hpx::threads::thread function(&normal_function);
+    hpx::thread function(&normal_function);
     function.join();
     HPX_TEST(normal_function_called);
 }
@@ -42,7 +42,7 @@ void normal_function_one_arg(int i)
 
 void test_thread_function_one_argument()
 {
-    hpx::threads::thread function(&normal_function_one_arg, 42);
+    hpx::thread function(&normal_function_one_arg, 42);
     function.join();
     HPX_TEST_EQ(42, nfoa_res);
 }
@@ -65,7 +65,7 @@ bool callable_no_args::called = false;
 void test_thread_callable_object_no_arguments()
 {
     callable_no_args func;
-    hpx::threads::thread callable(func);
+    hpx::thread callable(func);
     callable.join();
     HPX_TEST(callable_no_args::called);
 }
@@ -90,7 +90,7 @@ void test_thread_callable_object_ref_no_arguments()
 {
     callable_noncopyable_no_args func;
 
-    hpx::threads::thread callable(boost::ref(func));
+    hpx::thread callable(boost::ref(func));
     callable.join();
     HPX_TEST(callable_noncopyable_no_args::called);
 }
@@ -116,7 +116,7 @@ int callable_one_arg::called_arg = 0;
 void test_thread_callable_object_one_argument()
 {
     callable_one_arg func;
-    hpx::threads::thread callable(func, 42);
+    hpx::thread callable(func, 42);
     callable.join();
     HPX_TEST(callable_one_arg::called);
     HPX_TEST_EQ(callable_one_arg::called_arg, 42);
@@ -169,8 +169,8 @@ void test_thread_callable_object_multiple_arguments()
     callable_multiple_arg func;
 
     // FIXME? char array not automatically decayed to pointer inside bind ...
-    //hpx::threads::thread callable3(func, "hello", x, 1.2);
-    hpx::threads::thread callable3(func, std::string("hello"), x, 1.2);
+    //hpx::thread callable3(func, "hello", x, 1.2);
+    hpx::thread callable3(func, std::string("hello"), x, 1.2);
     callable3.join();
     HPX_TEST(callable_multiple_arg::called_three);
     HPX_TEST_EQ(callable_multiple_arg::called_three_arg1, "hello");
@@ -184,7 +184,7 @@ void test_thread_callable_object_multiple_arguments()
 
     double const dbl = 1.234;
 
-    hpx::threads::thread callable2(func, 19, dbl);
+    hpx::thread callable2(func, 19, dbl);
     callable2.join();
     HPX_TEST(callable_multiple_arg::called_two);
     HPX_TEST_LT(std::abs(callable_multiple_arg::called_two_arg1 - 19.), 1e-16);
@@ -218,7 +218,7 @@ void test_thread_member_function_no_arguments()
 {
     X x;
 
-    hpx::threads::thread function(&X::f0, &x);
+    hpx::thread function(&X::f0, &x);
     function.join();
     HPX_TEST(x.function_called);
 }
@@ -226,7 +226,7 @@ void test_thread_member_function_no_arguments()
 void test_thread_member_function_one_argument()
 {
     X x;
-    hpx::threads::thread function(&X::f1, &x, 42);
+    hpx::thread function(&X::f1, &x, 42);
     function.join();
     HPX_TEST_EQ(42, x.arg_value);
 }
@@ -259,7 +259,7 @@ int main(int argc, char* argv[])
     using namespace boost::assign;
     std::vector<std::string> cfg;
     cfg += "hpx.os_threads=" +
-        boost::lexical_cast<int>(hpx::threads::thread::hardware_concurrency());
+        boost::lexical_cast<int>(hpx::thread::hardware_concurrency());
 
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv, cfg);

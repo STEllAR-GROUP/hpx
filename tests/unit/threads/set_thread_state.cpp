@@ -30,7 +30,7 @@ using hpx::lcos::future;
 using hpx::async;
 
 using hpx::threads::thread_id_type;
-using hpx::threads::this_thread::suspend;
+using hpx::this_thread::suspend;
 using hpx::threads::set_thread_state;
 using hpx::threads::thread_state_ex_enum;
 using hpx::threads::pending;

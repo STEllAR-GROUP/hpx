@@ -36,7 +36,7 @@ inline bool in_range(boost::posix_time::ptime const& xt, int secs = 1)
 template <typename F>
 void timed_test(F func, int /*secs*/)
 {
-    hpx::threads::thread thrd(func);
+    hpx::thread thrd(func);
     thrd.join();
 
     // FIXME: implement execution monitor to verify in-time execution and to
@@ -51,15 +51,15 @@ void simple_thread()
     test_value = 999;
 }
 
-void comparison_thread(hpx::threads::thread::id parent)
+void comparison_thread(hpx::thread::id parent)
 {
-    hpx::threads::thread::id const my_id = hpx::threads::this_thread::get_id();
+    hpx::thread::id const my_id = hpx::this_thread::get_id();
     HPX_TEST_NEQ(my_id, parent);
 
-    hpx::threads::thread::id const my_id2 = hpx::threads::this_thread::get_id();
+    hpx::thread::id const my_id2 = hpx::this_thread::get_id();
     HPX_TEST_EQ(my_id, my_id2);
 
-    hpx::threads::thread::id const no_thread_id = hpx::threads::thread::id();
+    hpx::thread::id const no_thread_id = hpx::thread::id();
     HPX_TEST_NEQ(my_id, no_thread_id);
 }
 
@@ -68,7 +68,7 @@ void test_sleep()
 {
     boost::posix_time::ptime now =
         boost::date_time::second_clock<boost::posix_time::ptime>::universal_time();
-    hpx::threads::this_thread::sleep_for(boost::posix_time::seconds(3));
+    hpx::this_thread::sleep_for(boost::posix_time::seconds(3));
 
     // Ensure it's in a range instead of checking actual equality due to time
     // lapse
@@ -79,7 +79,7 @@ void test_sleep()
 void do_test_creation()
 {
     test_value = 0;
-    hpx::threads::thread thrd(&simple_thread);
+    hpx::thread thrd(&simple_thread);
     thrd.join();
     HPX_TEST_EQ(test_value, 999);
 }
@@ -92,8 +92,8 @@ void test_creation()
 ///////////////////////////////////////////////////////////////////////////////
 void do_test_id_comparison()
 {
-    hpx::threads::thread::id const self = hpx::threads::this_thread::get_id();
-    hpx::threads::thread thrd(HPX_STD_BIND(&comparison_thread, self));
+    hpx::thread::id const self = hpx::this_thread::get_id();
+    hpx::thread thrd(HPX_STD_BIND(&comparison_thread, self));
     thrd.join();
 }
 
@@ -106,7 +106,7 @@ void test_id_comparison()
 void interruption_point_thread(hpx::lcos::local::mutex* m, bool* failed)
 {
     hpx::lcos::local::mutex::scoped_lock lk(*m);
-    hpx::threads::this_thread::interruption_point();
+    hpx::this_thread::interruption_point();
     *failed = true;
 }
 
@@ -115,7 +115,7 @@ void do_test_thread_interrupts_at_interruption_point()
     hpx::lcos::local::mutex m;
     bool failed = false;
     hpx::lcos::local::mutex::scoped_lock lk(m);
-    hpx::threads::thread thrd(
+    hpx::thread thrd(
         HPX_STD_BIND(&interruption_point_thread, &m, &failed));
     thrd.interrupt();
     lk.unlock();
@@ -132,8 +132,8 @@ void test_thread_interrupts_at_interruption_point()
 void disabled_interruption_point_thread(hpx::lcos::local::mutex* m, bool* failed)
 {
     hpx::lcos::local::mutex::scoped_lock lk(*m);
-    hpx::threads::this_thread::disable_interruption dc;
-    hpx::threads::this_thread::interruption_point();
+    hpx::this_thread::disable_interruption dc;
+    hpx::this_thread::interruption_point();
     *failed = false;
 }
 
@@ -142,7 +142,7 @@ void do_test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point()
     hpx::lcos::local::mutex m;
     bool failed = true;
     hpx::lcos::local::mutex::scoped_lock lk(m);
-    hpx::threads::thread thrd(
+    hpx::thread thrd(
         HPX_STD_BIND(&disabled_interruption_point_thread, &m, &failed));
     thrd.interrupt();
     lk.unlock();
@@ -175,7 +175,7 @@ void do_test_creation_through_reference_wrapper()
 {
     non_copyable_functor f;
 
-    hpx::threads::thread thrd(boost::ref(f));
+    hpx::thread thrd(boost::ref(f));
     thrd.join();
     HPX_TEST_EQ(f.value, 999u);
 }
@@ -209,7 +209,7 @@ void test_creation_through_reference_wrapper()
 // void do_test_timed_join()
 // {
 //     long_running_thread f;
-//     hpx::threads::thread thrd(boost::ref(f));
+//     hpx::thread thrd(boost::ref(f));
 //     HPX_TEST(thrd.joinable());
 //     boost::system_time xt=delay(3);
 //     bool const joined=thrd.timed_join(xt);
@@ -237,10 +237,10 @@ void test_creation_through_reference_wrapper()
 
 void test_swap()
 {
-    hpx::threads::thread t1(&simple_thread);
-    hpx::threads::thread t2(&simple_thread);
-    hpx::threads::thread::id id1 = t1.get_id();
-    hpx::threads::thread::id id2 = t2.get_id();
+    hpx::thread t1(&simple_thread);
+    hpx::thread t2(&simple_thread);
+    hpx::thread::id id1 = t1.get_id();
+    hpx::thread::id id2 = t2.get_id();
 
     t1.swap(t2);
     HPX_TEST(t1.get_id() == id2);
@@ -281,7 +281,7 @@ int main(int argc, char* argv[])
     using namespace boost::assign;
     std::vector<std::string> cfg;
     cfg += "hpx.os_threads=" +
-        boost::lexical_cast<int>(hpx::threads::thread::hardware_concurrency());
+        boost::lexical_cast<int>(hpx::thread::hardware_concurrency());
 
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv, cfg);
