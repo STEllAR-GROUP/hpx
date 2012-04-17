@@ -122,12 +122,12 @@ public:
     {
         return compare_exchange_strong(expected, desired, success_order, failure_order);
     }
-    T exchange(T r, memory_order order=memory_order_seq_cst) volatile
+    T exchange(T r, memory_order /*order*/=memory_order_seq_cst) volatile
     {
         __asm__ __volatile__("xchgb %0, %1\n" : "=q" (r) : "m"(i), "0" (r) : "memory");
         return r;
     }
-    T fetch_add(T c, memory_order order=memory_order_seq_cst) volatile
+    T fetch_add(T c, memory_order /*order*/=memory_order_seq_cst) volatile
     {
         __asm__ __volatile__("lock; xaddb %0, %1" : "+q" (c), "+m" (i) :: "memory");
         return c;
@@ -260,12 +260,12 @@ public:
     {
         return compare_exchange_strong(expected, desired, success_order, failure_order);
     }
-    T exchange(T r, memory_order order=memory_order_seq_cst) volatile
+    T exchange(T r, memory_order /*order*/=memory_order_seq_cst) volatile
     {
         __asm__ __volatile__("xchgl %0, %1\n" : "=r" (r) : "m"(i), "0" (r) : "memory");
         return r;
     }
-    T fetch_add(T c, memory_order order=memory_order_seq_cst) volatile
+    T fetch_add(T c, memory_order /*order*/=memory_order_seq_cst) volatile
     {
         __asm__ __volatile__("lock; xaddl %0, %1" : "+r" (c), "+m" (i) :: "memory");
         return c;
@@ -330,12 +330,12 @@ public:
     {
         return compare_exchange_strong(expected, desired, success_order, failure_order);
     }
-    T exchange(T r, memory_order order=memory_order_seq_cst) volatile
+    T exchange(T r, memory_order /*order*/=memory_order_seq_cst) volatile
     {
         __asm__ __volatile__("xchgq %0, %1\n" : "=r" (r) : "m"(i), "0" (r) : "memory");
         return r;
     }
-    T fetch_add(T c, memory_order order=memory_order_seq_cst) volatile
+    T fetch_add(T c, memory_order /*order*/=memory_order_seq_cst) volatile
     {
         __asm__ __volatile__("lock; xaddq %0, %1" : "+r" (c), "+m" (i) :: "memory");
         return c;
