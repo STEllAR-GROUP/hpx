@@ -334,19 +334,19 @@ private:
 
     const Base &get_base(void) const volatile
     {
-        intptr_t address=static_cast<intptr_t>(this);
+        intptr_t address=(intptr_t)this; //static_cast<intptr_t>(this);
         address&=~(sizeof(larger_integral_type)-1);
         return *reinterpret_cast<const Base *>(address);
     }
     Base &get_base(void) volatile
     {
-        intptr_t address=static_cast<intptr_t>(this);
+        intptr_t address=(intptr_t)this; //static_cast<intptr_t>(this);
         address&=~(sizeof(larger_integral_type)-1);
         return *reinterpret_cast<Base *>(address);
     }
     intptr_t get_offset(void) const volatile
     {
-        intptr_t address=static_cast<intptr_t>(this);
+        intptr_t address=(intptr_t)this; //static_cast<intptr_t>(this);
         address&=(sizeof(larger_integral_type)-1);
         return address;
     }
