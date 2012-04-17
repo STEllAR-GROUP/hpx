@@ -23,7 +23,7 @@ public:
     void store(const T &t, memory_order order=memory_order_seq_cst) volatile
     {
         detail::spinlock_pool<0>::scoped_lock guard(const_cast<T*>(&i));
-        memcpy(static_cast<void*>(&i), &t, sizeof(T));
+        memcpy((void*)&i, &t, sizeof(T));
     }
     T load(memory_order /*order*/=memory_order_seq_cst) volatile const
     {
@@ -39,11 +39,11 @@ public:
         memory_order /*failure_order*/) volatile
     {
         detail::spinlock_pool<0>::scoped_lock guard(const_cast<T*>(&i));
-        if (memcmp(static_cast<void*>(&i), &expected, sizeof(T))==0) {
-            memcpy(static_cast<void*>(&i), &desired, sizeof(T));
+        if (memcmp((void*)&i, &expected, sizeof(T))==0) {
+            memcpy((void*)&i, &desired, sizeof(T));
             return true;
         } else {
-            memcpy(&expected, static_cast<void*>(&i), sizeof(T));
+            memcpy(&expected, (void*)&i, sizeof(T));
             return false;
         }
     }
@@ -59,8 +59,8 @@ public:
     {
         detail::spinlock_pool<0>::scoped_lock guard(const_cast<T*>(&i));
         T tmp;
-        memcpy(&tmp, static_cast<void*>(&i), sizeof(T));
-        memcpy(static_cast<void*>(&i), &replacement, sizeof(T));
+        memcpy(&tmp, (void*)&i, sizeof(T));
+        memcpy((void*)&i, &replacement, sizeof(T));
         return tmp;
     }
     bool is_lock_free(void) const volatile {return false;}
