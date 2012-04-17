@@ -23,7 +23,7 @@ namespace hpx { namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////
     // global variable defining the stack size to use for all HPX-threads
-    extern std::size_t default_stacksize;
+    extern std::ptrdiff_t default_stacksize;
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
