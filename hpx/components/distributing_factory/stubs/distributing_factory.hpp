@@ -54,13 +54,13 @@ namespace hpx { namespace components { namespace stubs
         }
 
         /// Free components
-        static void free_components(naming::id_type const& factory,
-            result_type const& gids)
+        static void free_components(naming::id_type const& /*factory*/,
+            result_type const& /*gids*/)
         {
         }
 
-        static void free_components_sync(naming::id_type const& factory,
-            result_type const& gids)
+        static void free_components_sync(naming::id_type const& /*factory*/,
+            result_type const& /*gids*/)
         {
         }
     };

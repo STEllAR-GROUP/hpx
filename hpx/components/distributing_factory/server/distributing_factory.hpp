@@ -130,7 +130,7 @@ namespace hpx { namespace components { namespace server
         enum actions
         {
             factory_create_components = 0,  // create new components
-            factory_create_partitioned = 1, // create components in partitions
+            factory_create_partitioned = 1  // create components in partitions
         };
 
         // constructor
@@ -320,6 +320,6 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::lcos::base_lco_with_value<
         hpx::components::server::distributing_factory::remote_result_type
     >::set_value_action
-  , set_value_action_distributing_factory_result);
+  , set_value_action_distributing_factory_result)
 
 #endif

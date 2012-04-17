@@ -59,11 +59,11 @@ namespace hpx { namespace components
         }
 
         /// Left in for backwards compatibility
-        void free_components(result_type const& gids)
+        void free_components(result_type const& /*gids*/)
         {
         }
 
-        void free_components_sync(result_type const& gids)
+        void free_components_sync(result_type const& /*gids*/)
         {
         }
     };

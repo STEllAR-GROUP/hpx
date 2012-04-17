@@ -41,11 +41,11 @@ namespace hpx { namespace lcos { namespace server { namespace detail
 
         typedef typename T::remote_result_type remote_result;
 
-        dataflow_trigger_slot(SinkAction * back, dataflow_type const & flow, std::size_t slot)
+        dataflow_trigger_slot(SinkAction * back, dataflow_type const & flow, std::size_t s)
             : back_ptr_(0)
             , dataflow_sink(back)
             , dataflow_source(flow)
-            , slot(slot)
+            , slot(s)
         {
         }
         
@@ -58,7 +58,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
                 );
         }
         
-        void connect()
+        void connect_()
         {
             BOOST_ASSERT(get_gid());
 

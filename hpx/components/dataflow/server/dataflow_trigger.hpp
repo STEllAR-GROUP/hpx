@@ -102,7 +102,7 @@ namespace hpx { namespace lcos { namespace server
             {
                 component_type * c
                     = new component_type(this, d, slot_idx);
-                (*c)->connect();
+                (*c)->connect_();
                 future_slots.push_back(c);
                 ++slot_idx;
             }

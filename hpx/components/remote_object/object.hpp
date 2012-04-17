@@ -33,7 +33,7 @@ namespace hpx { namespace components
 
             template <typename Functor>
             invoke_apply_fun(
-                BOOST_FWD_REF(Functor) f
+                BOOST_FWD_REF(Functor) f_
               , typename ::boost::disable_if<
                     typename boost::is_same<
                         invoke_apply_fun
@@ -43,9 +43,9 @@ namespace hpx { namespace components
                             >::type
                         >::type
                     >::type
-                >::type * dummy = 0
+                >::type * = 0
             )
-                : f(boost::forward<Functor>(f))
+                : f(boost::forward<Functor>(f_))
             {}
 
             invoke_apply_fun(invoke_apply_fun const & other)
@@ -92,7 +92,7 @@ namespace hpx { namespace components
             >::type f;
 
             private:
-                BOOST_COPYABLE_AND_MOVABLE(invoke_apply_fun);
+                BOOST_COPYABLE_AND_MOVABLE(invoke_apply_fun)
         };
     }
 
@@ -142,12 +142,12 @@ namespace hpx { namespace traits
         >
     >
     {
-        static HPX_ALWAYS_EXPORT components::component_type
+        HPX_ALWAYS_EXPORT static components::component_type
         get()
         {
             return hpx::components::component_base_lco_with_value;
         }
-        static HPX_ALWAYS_EXPORT void
+        HPX_ALWAYS_EXPORT static void
         set(components::component_type)
         {
             BOOST_ASSERT(false);

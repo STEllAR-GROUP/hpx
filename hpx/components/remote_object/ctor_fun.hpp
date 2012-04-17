@@ -38,7 +38,7 @@ namespace hpx { namespace components { namespace remote_object
         }
 
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
+        void serialize(Archive &, unsigned)
         {}
     };
 
@@ -46,8 +46,16 @@ namespace hpx { namespace components { namespace remote_object
     BOOST_PP_CAT(a, N)(BOOST_PP_CAT(a, N))                                      \
 /**/
 
+#define HPX_REMOTE_OBJECT_COPY_CTOR(Z, N, D)                                    \
+    BOOST_PP_CAT(a, N)(rhs. BOOST_PP_CAT(a, N))                                 \
+/**/
+
 #define HPX_REMOTE_OBJECT_MOVE_ARG(Z, N, D)                                     \
     BOOST_PP_CAT(a, N)(boost::move(BOOST_PP_CAT(a, N)))                         \
+/**/
+
+#define HPX_REMOTE_OBJECT_MOVE_CTOR(Z, N, D)                                    \
+    BOOST_PP_CAT(a, N)(boost::move(rhs. BOOST_PP_CAT(a, N)))                    \
 /**/
 
 #define HPX_REMOTE_OBJECT_RV(Z, N, D)                                           \
@@ -110,6 +118,14 @@ namespace hpx { namespace components { namespace remote_object
 
         ctor_fun(BOOST_PP_ENUM(N, HPX_REMOTE_OBJECT_RV, _))
             : BOOST_PP_ENUM(N, HPX_REMOTE_OBJECT_MOVE_ARG, _)
+        {}
+
+        ctor_fun(BOOST_COPY_ASSIGN_REF(ctor_fun) rhs)
+            : BOOST_PP_ENUM(N, HPX_REMOTE_OBJECT_COPY_CTOR, _)
+        {}
+
+        ctor_fun(BOOST_RV_REF(ctor_fun) rhs)
+            : BOOST_PP_ENUM(N, HPX_REMOTE_OBJECT_MOVE_CTOR, _)
         {}
 
         ctor_fun& operator=(BOOST_COPY_ASSIGN_REF(ctor_fun) rhs)

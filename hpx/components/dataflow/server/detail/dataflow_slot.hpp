@@ -77,7 +77,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
                 );
         }
 
-        void connect()
+        void connect_()
         {
             LLCO_(info)
                 << "dataflow_slot<"

@@ -26,7 +26,7 @@ namespace hpx { namespace lcos
             typedef Action type;
 
             template <typename Archive>
-            void serialize(Archive & ar, unsigned)
+            void serialize(Archive &, unsigned)
             {}
         };
     }

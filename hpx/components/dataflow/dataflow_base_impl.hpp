@@ -65,7 +65,7 @@ namespace hpx { namespace lcos { namespace detail
             ar & id;
         }
 
-        BOOST_SERIALIZATION_SPLIT_MEMBER();
+        BOOST_SERIALIZATION_SPLIT_MEMBER()
     };
 }}}
 
