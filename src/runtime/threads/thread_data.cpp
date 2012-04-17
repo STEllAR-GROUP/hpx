@@ -15,7 +15,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::threads::detail::thread_data, hpx::components::component_thread);
+    hpx::threads::detail::thread_data, hpx::components::component_thread)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace detail
@@ -105,7 +105,7 @@ namespace hpx { namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////
     // global variable defining the stack size to use for all HPX-threads
-    std::size_t default_stacksize = HPX_DEFAULT_STACK_SIZE;
+    std::ptrdiff_t default_stacksize = HPX_DEFAULT_STACK_SIZE;
 
     ///////////////////////////////////////////////////////////////////////////
     // This overload will be called by the ptr_map<> used in the thread_queue
@@ -222,6 +222,6 @@ namespace hpx { namespace threads
 
 ///////////////////////////////////////////////////////////////////////////////
 // explicit instantiation of the function thread_self::set_self
-template void
+template HPX_EXPORT void
 hpx::threads::thread_self::impl_type::set_self(hpx::threads::thread_self*);
 
