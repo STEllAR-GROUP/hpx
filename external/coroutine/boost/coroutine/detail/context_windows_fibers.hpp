@@ -250,6 +250,11 @@ namespace boost {namespace coroutines {
       {
         return ++get_stack_recycle_counter();
       }
+
+      // global functions to be called for each OS-thread after it started
+      // running and before it exits
+      static void thread_startup(char const* thread_type) {}
+      static void thread_shutdown() {}
     };
 
     typedef fibers_context_impl context_impl;

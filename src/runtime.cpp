@@ -486,7 +486,7 @@ namespace hpx
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::init_tss(
         char const* context)
     {
-        // initialize PAPI
+        // initialize thread mapping for external libraries (i.e. PAPI)
         thread_support_.register_thread(context);
 
         // initialize our TSS
@@ -494,11 +494,17 @@ namespace hpx
 
         // initialize applier TSS
         applier_.init_tss();
+
+        // initialize coroutines context switcher
+        boost::coroutines::thread_startup(context);
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::deinit_tss()
     {
+        // initialize coroutines context switcher
+        boost::coroutines::thread_shutdown();
+
         // reset applier TSS
         applier_.deinit_tss();
 

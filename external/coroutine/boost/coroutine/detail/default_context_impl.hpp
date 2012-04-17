@@ -129,4 +129,19 @@ namespace boost { namespace coroutines { namespace detail {
 
 #endif // BOOST_COROUTINE_USE_GENERIC_CONTEXT
 
+namespace boost { namespace coroutines
+{
+    // functions to be called for each thread after it started running
+    // and before it exits
+    void thread_startup(char const* thread_type)
+    {
+        detail::default_context_impl::thread_startup(thread_type);
+    }
+
+    void thread_shutdown()
+    {
+        detail::default_context_impl::thread_shutdown();
+    }
+}}
+
 #endif

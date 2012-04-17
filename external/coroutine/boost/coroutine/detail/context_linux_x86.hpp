@@ -234,6 +234,16 @@ namespace boost { namespace coroutines {
       friend void swap_context(x86_linux_context_impl& from,
           x86_linux_context_impl_base const& to, yield_to_hint);
 
+      // global functions to be called for each OS-thread after it started
+      // running and before it exits
+      static void thread_startup(char const* thread_type)
+      {
+      }
+
+      static void thread_shutdown()
+      {
+      }
+
     private:
       std::ptrdiff_t m_stack_size;
       void * m_stack;
