@@ -200,7 +200,7 @@ namespace distributed
             {
                 //use rem (element_ordinal_position)
 
-                //return hpx::applier::apply<distributed::server::datastructure::get_data_at_action>
+                //return hpx::apply<distributed::server::datastructure::get_data_at_action>
                 //return hpx::lcos::apply<distributed::server::datastructure::get_data_at_action>
                 //    (*itr, rem - 1);
                 hpx::lcos::future<std::size_t> value_at =

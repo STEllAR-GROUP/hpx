@@ -50,7 +50,7 @@ namespace examples { namespace stubs
         add_non_blocking(hpx::naming::id_type const& gid, boost::uint64_t arg)
         {
             typedef server::simple_accumulator::add_action action_type;
-            hpx::applier::apply<action_type>(gid, arg);
+            hpx::apply<action_type>(gid, arg);
         }
 
         /// Add \p arg to the accumulator's value.

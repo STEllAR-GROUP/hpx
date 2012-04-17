@@ -183,7 +183,7 @@ namespace hpx { namespace util
             {
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
-                return hpx::lcos::apply<Action>(
+                return hpx::apply<Action>(
                     hpx::util::detail::eval(env, arg0)
                   BOOST_PP_COMMA_IF(BOOST_PP_DEC(N))
                         BOOST_PP_ENUM_SHIFTED(N, HPX_UTIL_BIND_EVAL, _));
@@ -193,7 +193,7 @@ namespace hpx { namespace util
             {
                 typedef hpx::util::tuple0<> env_type;
                 env_type env;
-                return hpx::lcos::apply<Action>(
+                return hpx::apply<Action>(
                     hpx::util::detail::eval(env, arg0)
                   BOOST_PP_COMMA_IF(BOOST_PP_DEC(N))
                         BOOST_PP_ENUM_SHIFTED(N, HPX_UTIL_BIND_EVAL, _));
@@ -209,7 +209,7 @@ namespace hpx { namespace util
             >                                                                 \
             env_type;                                                         \
         env_type env(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_PARAMS, A));          \
-        return hpx::lcos::apply<Action>(                                      \
+        return hpx::apply<Action>(                                            \
             hpx::util::detail::eval(env, arg0)                                \
           BOOST_PP_COMMA_IF(BOOST_PP_DEC(NN))                                 \
                 BOOST_PP_ENUM_SHIFTED(NN, HPX_UTIL_BIND_EVAL, _));            \
@@ -223,7 +223,7 @@ namespace hpx { namespace util
             >                                                                 \
             env_type;                                                         \
         env_type env(BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_PARAMS, A));          \
-        return hpx::lcos::apply<Action>(                                      \
+        return hpx::apply<Action>(                                            \
             hpx::util::detail::eval(env, arg0)                                \
           BOOST_PP_COMMA_IF(BOOST_PP_DEC(NN))                                 \
                 BOOST_PP_ENUM_SHIFTED(NN, HPX_UTIL_BIND_EVAL, _));            \
