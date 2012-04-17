@@ -75,7 +75,7 @@ namespace hpx { namespace components
         /// \brief Return the unique identifier of the component type this
         ///        factory is responsible for
         ///
-        /// \param prefix       [in] The prefix of the locality this factory
+        /// \param locality     [in] The id of the locality this factory
         ///                     is responsible for.
         /// \param agas_client  [in] The AGAS client to use for component id
         ///                     registration (if needed).
@@ -83,7 +83,7 @@ namespace hpx { namespace components
         /// \return Returns the unique identifier of the component type this
         ///         factory instance is responsible for. This function throws
         ///         on any error.
-        component_type get_component_type(naming::gid_type const& prefix,
+        component_type get_component_type(naming::gid_type const& locality,
             naming::resolver_client& agas_client)
         {
             typedef typename Component::type_holder type_holder;
@@ -94,7 +94,8 @@ namespace hpx { namespace components
                     components::get_component_type<base_type_holder>();
                 if (component_invalid == base_type)
                 {
-                // first call to get_component_type, ask AGAS for a unique id
+                    // First call to get_component_type, ask AGAS for a unique id.
+                    // NOTE: This assumes that the derived component is loaded.
                     base_type = (component_type) agas_client.get_component_id(
                         unique_component_name<derived_component_factory, base_name>::call());
                 }
@@ -102,7 +103,13 @@ namespace hpx { namespace components
                 component_type this_type;
                 if (isenabled_) {
                     this_type = (component_type) agas_client.register_factory(
-                        prefix, unique_component_name<derived_component_factory>::call());
+                        locality, unique_component_name<derived_component_factory>::call());
+
+                    if (component_invalid == this_type)
+                        HPX_THROW_EXCEPTION(duplicate_component_id,
+                            "component_factory::get_component_type",
+                            "the component name " + get_component_name() +
+                            " is already in use");
                 }
                 else {
                     this_type = (component_type) agas_client.get_component_id(

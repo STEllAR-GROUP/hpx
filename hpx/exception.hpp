@@ -73,6 +73,7 @@ namespace hpx
         thread_resource_error = 39,
         thread_interrupted = 40,
         thread_not_interruptable = 41,
+        duplicate_component_id = 42,
         last_error,
 
         // force this enum type to be at least 16 bits.
@@ -123,6 +124,7 @@ namespace hpx
         "thread_resource_error",
         "thread_interrupted",
         "thread_not_interruptable",
+        "duplicate_component_id",
         ""
     };
 
