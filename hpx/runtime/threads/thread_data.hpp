@@ -41,7 +41,7 @@ namespace hpx { namespace threads
 
     ///////////////////////////////////////////////////////////////////////////
     // global variable defining the stack size to use for all HPX-threads
-    HPX_EXPORT extern std::size_t default_stacksize;
+    HPX_EXPORT extern std::ptrdiff_t default_stacksize;
 
     ///////////////////////////////////////////////////////////////////////////
     // This overload will be called by the ptr_map<> used in the thread_queue
