@@ -261,7 +261,9 @@ namespace hpx
             >
         ))) bound)
     {
-        return lcos::local::packaged_task<R>(boost::move(bound)).get_future();
+        return lcos::local::packaged_task<
+            typename detail::create_future<F()>::type
+        >(boost::move(bound)).get_future();
     }
 
     // define async() overloads for n-nary bound member functions
@@ -283,7 +285,11 @@ namespace hpx
       , BOOST_PP_ENUM(N, HPX_FWD_ARGS, _)                                     \
     )                                                                         \
     {                                                                         \
-        return lcos::local::packaged_task<R>(                                 \
+        return lcos::local::packaged_task<                                    \
+            typename detail::create_future<                                   \
+                F(BOOST_PP_ENUM_PARAMS(N, A))                                 \
+            >::type>                                                          \
+        (                                                                     \
             util::bind(                                                       \
                 util::protect(boost::move(bound))                             \
               , BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _)                         \
