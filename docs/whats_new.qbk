@@ -7,6 +7,26 @@
 
 [section:whats_new What's New]
 
+[/////////////////////////////////////////////////////////////////////////////]
+[section:hpx_0_8_1 HPX V0.8.1]
+
+This is a point release including important bug fixes for __0_8_0__.
+
+[heading Bug Fixes (Closed Tickets)]
+
+Here is a list of the important tickets we closed for this point release:
+
+* #371 - Add hpx iostreams to standard build 
+* #384 - Fix compilation with GCC 4.7
+
+[heading Bug Fixes (Commits)]
+
+Here is a list of the important commits included in this point release:
+
+* r7642 - External: Fix backtrace memory violation
+
+[endsect]
+
 [/Proofread by:]
 [/Adrian Serio 3-13-12]
 [/Phillip LeBlanc 3-13-12]
@@ -313,5 +333,3 @@ Here is a list of the important tickets we closed for this release:
 
 [endsect] [/ What's New]
 
-[/Proofread by:]
-[/Adrian Serio 3-13-12]

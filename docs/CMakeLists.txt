@@ -50,3 +50,4 @@ source_group(Documentation
 
 set_source_files_properties(${DOCUMENTATION_FILES}
     PROPERTIES HEADER_FILE_ONLY TRUE)
+
