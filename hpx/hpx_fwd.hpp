@@ -24,6 +24,7 @@
 #endif
 
 #include <boost/shared_ptr.hpp>
+#include <boost/intrusive_ptr.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/coroutine/coroutine.hpp>
 #include <hpx/config.hpp>

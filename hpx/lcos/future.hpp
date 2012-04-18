@@ -11,6 +11,7 @@
 
 #include <boost/move/move.hpp>
 #include <boost/intrusive_ptr.hpp>
+#include <boost/utility/result_of.hpp>
 
 namespace hpx { namespace lcos
 {
@@ -19,6 +20,9 @@ namespace hpx { namespace lcos
     {
         template <typename Result>
         class promise;
+
+        template <typename ContResult, typename Result>
+        class packaged_continuation;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -40,6 +44,9 @@ namespace hpx { namespace lcos
         {}
 
         friend class local::promise<Result>;
+        template <typename ContResult, typename Result_>
+        friend class packaged_continuation;
+
         friend class promise<Result, RemoteResult>;
         friend class hpx::thread;
         friend struct detail::future_data<Result, RemoteResult>;
@@ -94,6 +101,7 @@ namespace hpx { namespace lcos
             return future_data_->move_data(ec);
         }
 
+        // state introspection
         bool is_ready() const
         {
             return future_data_->is_ready();
@@ -116,6 +124,22 @@ namespace hpx { namespace lcos
 
             return future_data_->get_state();
         }
+
+        // cancellation support
+        bool is_cancelable() const
+        {
+            return future_data_->is_cancelable();
+        }
+
+        void cancel()
+        {
+            future_data_->cancel();
+        }
+
+        // continuation support
+        template <typename F>
+        future<typename boost::result_of<F()>::type>
+        when(BOOST_FWD_REF(F) f);
 
     private:
         boost::intrusive_ptr<future_data_type> future_data_;
@@ -193,6 +217,7 @@ namespace hpx { namespace lcos
             future_data_->move_data(ec);
         }
 
+        // state introspection
         bool is_ready() const
         {
             return future_data_->is_ready();
@@ -215,6 +240,22 @@ namespace hpx { namespace lcos
 
             return future_data_->get_state();
         }
+
+        // cancellation support
+        bool is_cancelable() const
+        {
+            return future_data_->is_cancelable();
+        }
+
+        void cancel()
+        {
+            future_data_->cancel();
+        }
+
+        // continuation support
+        template <typename F>
+        future<typename boost::result_of<F()>::type>
+        when(BOOST_FWD_REF(F) f);
 
     private:
         boost::intrusive_ptr<future_data_type> future_data_;

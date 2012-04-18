@@ -131,10 +131,12 @@ namespace hpx
         if (id != threads::invalid_thread_id)
         {
             // register callback function to be called when thread exits
-            if (threads::add_thread_exit_callback(id, HPX_STD_BIND(&resume_thread, id)))
+            native_handle_type this_id = threads::get_self().get_thread_id();
+            if (threads::add_thread_exit_callback(id,
+                    HPX_STD_BIND(&resume_thread, this_id)))
             {
                 // wait for thread to be terminated
-                this_thread::suspend();
+                this_thread::suspend(threads::suspended);
             }
         }
 
@@ -158,18 +160,19 @@ namespace hpx
         struct thread_task_base
           : lcos::detail::future_data<void>
         {
-            typedef boost::intrusive_ptr<lcos::detail::future_data<void> >
-                future_base_type;
+        private:
+            typedef lcos::detail::future_data<void>::mutex_type mutex_type;
+            typedef boost::intrusive_ptr<thread_task_base> future_base_type;
 
         public:
             thread_task_base(threads::thread_id_type id)
-              : valid_(false)
+              : id_(threads::invalid_thread_id)
             {
                 if (threads::add_thread_exit_callback(id,
                         HPX_STD_BIND(&thread_task_base::thread_exit_function,
-                        this, future_base_type(this))))
+                            this, future_base_type(this))))
                 {
-                    valid_ = true;
+                    id_ = id;
                 }
             }
 
@@ -187,17 +190,39 @@ namespace hpx
 
             bool is_valid() const
             {
-                return valid_;
+                return id_ != threads::invalid_thread_id;
+            }
+
+            // cancellation support
+            bool is_cancelable() const
+            {
+                return true;
+            }
+
+            void cancel()
+            {
+                mutex_type::scoped_lock l(this->mtx_);
+                if (!this->is_ready()) {
+                    threads::interrupt_thread(id_);
+                    this->set_error(thread_interrupted,
+                        "thread_task_base::cancel",
+                        "future has been canceled");
+                    id_ = threads::invalid_thread_id;
+                }
             }
 
         protected:
-            void thread_exit_function(future_base_type base)
+            void thread_exit_function(future_base_type)
             {
-                base->set_data(result_type());
+                // might have been finished or canceled
+                mutex_type::scoped_lock l(this->mtx_);
+                if (!this->is_ready())
+                    this->set_data(result_type());
+                id_ = threads::invalid_thread_id;
             }
 
         private:
-            bool valid_;
+            threads::thread_id_type id_;
         };
     }
 

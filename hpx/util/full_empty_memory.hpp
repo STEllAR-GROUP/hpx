@@ -61,6 +61,8 @@ namespace hpx { namespace util
         typedef T value_type;
 
     public:
+//         typedef typename detail::full_empty_entry<T>::mutex_type mutex_type;
+
         /// \brief Create a new full/empty storage in empty state
         full_empty()
         {}
@@ -184,6 +186,12 @@ namespace hpx { namespace util
         {
             return data_.peek(f);
         }
+
+//         /// Retrieve the mutex which protects the underlying data store
+//         mutex_type& get_mutex() const
+//         {
+//             return data_.get_mutex();
+//         }
 
     private:
         detail::full_empty_entry<T> data_;

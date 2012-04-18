@@ -6,6 +6,7 @@
 set(tests
     set_thread_state
     rescheduling
+    test_futures
     test_thread
     test_thread_id
     test_thread_launching

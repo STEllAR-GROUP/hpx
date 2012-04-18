@@ -3,14 +3,15 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_LOCAL_promise_MAR_01_2012_0121PM)
-#define HPX_LCOS_LOCAL_promise_MAR_01_2012_0121PM
+#if !defined(HPX_LCOS_LOCAL_PROMISE_MAR_01_2012_0121PM)
+#define HPX_LCOS_LOCAL_PROMISE_MAR_01_2012_0121PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
 
+#include <boost/atomic.hpp>
 #include <boost/move/move.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -21,7 +22,7 @@ namespace hpx { namespace lcos { namespace local
 {
     namespace detail
     {
-        template<typename Result, typename F>
+        template <typename Result, typename F>
         struct task_object
           : lcos::detail::task_base<Result>
         {
@@ -40,16 +41,20 @@ namespace hpx { namespace lcos { namespace local
 
             void do_run()
             {
+                this->set_id(threads::get_self().get_thread_id());
+
                 try {
-                  this->set_data(f_());
+                    this->set_data(f_());
                 }
                 catch(...) {
                     this->set_exception(boost::current_exception());
                 }
+
+                this->set_id(threads::invalid_thread_id);
             }
         };
 
-        template<typename F>
+        template <typename F>
         struct task_object<void, F>
           : lcos::detail::task_base<void>
         {
@@ -68,6 +73,8 @@ namespace hpx { namespace lcos { namespace local
 
             void do_run()
             {
+                this->set_id(threads::get_self().get_thread_id());
+
                 try {
                     f_();
                     this->set_data(result_type());
@@ -75,6 +82,8 @@ namespace hpx { namespace lcos { namespace local
                 catch(...) {
                     this->set_exception(boost::current_exception());
                 }
+
+                this->set_id(threads::invalid_thread_id);
             }
         };
     }
@@ -83,9 +92,10 @@ namespace hpx { namespace lcos { namespace local
     template <typename Result>
     class promise
     {
-    private:
+    protected:
         typedef lcos::detail::task_base<Result> task_impl_type;
 
+    private:
         BOOST_MOVABLE_BUT_NOT_COPYABLE(promise)
 
     public:
@@ -205,6 +215,11 @@ namespace hpx { namespace lcos { namespace local
           : promise<Result>(f)
         {
             (*this)();    // execute the function immediately
+        }
+
+        packaged_task(BOOST_RV_REF(packaged_task) rhs)
+          : promise<Result>(boost::move(static_cast<promise<Result>&>(rhs)))
+        {
         }
     };
 

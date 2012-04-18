@@ -186,7 +186,7 @@ namespace hpx { namespace components
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-/// The macro \a HPX_REGISTER_PLAIN_ACTION is used create and to
+/// The macro \a HPX_REGISTER_PLAIN_ACTION is used to create and to
 /// register a minimal factory for plain actions with Boost.Plugin.
 #define HPX_REGISTER_PLAIN_ACTION_EX2(plain_action, plain_action_name,        \
         enable_always)                                                        \
@@ -215,12 +215,17 @@ namespace hpx { namespace components
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////
+#define HPX_DEFINE_PLAIN_ACTION(func, name)                                   \
+    typedef HPX_MAKE_ACTION(func)::type name                                  \
+    /**/
+
+///////////////////////////////////////////////////////////////////////////////
 #define HPX_PLAIN_ACTION(func, name)                                          \
-    typedef HPX_MAKE_ACTION(func)::type name;                                 \
+    HPX_DEFINE_PLAIN_ACTION(func, name);                                      \
     HPX_REGISTER_PLAIN_ACTION(name)                                           \
     /**/
 #define HPX_PLAIN_ACTION_EX(func, name, enable_always)                        \
-    typedef HPX_MAKE_ACTION(func)::type name;                                 \
+    HPX_DEFINE_PLAIN_ACTION(func, name);                                      \
     HPX_REGISTER_PLAIN_ACTION_EX2(name, name, enable_always)                  \
     /**/
 

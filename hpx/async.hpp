@@ -263,7 +263,7 @@ namespace hpx
     {
         return lcos::local::packaged_task<
             typename detail::create_future<F()>::type
-        >(boost::move(bound)).get_future();
+        > (boost::move(bound)).get_future();
     }
 
     // define async() overloads for n-nary bound member functions

@@ -1,10 +1,99 @@
 [/=============================================================================
-Copyright (C) 2012 Bryce Adelstein-Lelbach 
+Copyright (C) 2012 Bryce Adelstein-Lelbach
 
-Distributed under the Boost Software License, Version 1.0. (See accompanying     
-file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)            
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================/]
 
 [section:applying_actions Applying Actions]
+
+[heading Action Type Definition]
+
+Actions are special types we use to describe possibly remote operations. For
+every global function and every member function which have to be invoked
+distantly a special type must be defined. For any global function the special
+macro `HPX_PLAIN_ACTION` needs to used to define the action type. Here is an
+example demonstrating this:
+
+    namespace app
+    {
+        int some_global_function(doube d)
+        {
+            cout << d;
+        }
+    }
+    HPX_PLAIN_ACTION(app::some_global_function, some_global_action);
+
+[important The macro `HPX_PLAIN_ACTION` has to be placed in global namespace,
+           even if the wrapped function is located in some other namespace. The
+           resulting defined action type will be placed the in global namespace
+           as well.]
+
+If the action type should be defined somewhere not in global namespace, the
+action type definition has to be split into two macro invocations as shown in
+the next example:
+
+    namespace app
+    {
+        int some_global_function(doube d)
+        {
+            cout << d;
+        }
+
+        // On conforming compilers the following macro expands to:
+        //
+        //    typedef hpx::actions::make_action<
+        //        decltype(&some_global_function), &some_global_function
+        //    >::type some_global_action;
+        //
+        HPX_DEFINE_PLAIN_ACTION(some_global_function, some_global_action);
+    }
+
+    // The following macro expands to a series of definitions of global objects
+    // which are needed for proper serialization and initialization support
+    // enabling the remote invocation of the function `some_global_function`.
+    HPX_REGISTER_PLAIN_ACTION(app::some_global_action);
+
+The shown code defines an action type `some_global_action` inside the namespace
+`app`.
+
+[important If the action type definition is split between two macros as shown
+           above the name of the action type to create has to be the same for
+           both macro invocations (here `some_global_action`).]
+
+[heading Action Invocation]
+
+The process of invoking of a global function with the help of the associated
+action is called 'applying the action'. Actions can have arguments, which will
+be supplied while the action is applied. At the minimum at least one parameter
+is required to apply any action - the id of the locality the associated
+function should be invoked on. __hpx__ provides two ways to apply any
+action:
+
+* /Applying an action without any synchronization/: This method ('fire and
+  forget') will make sure the function associated with the action is scheduled
+  to run on the target locality. Applying the action does not wait for the
+  function to start running, instead it is a fully asynchronous operation.
+  The following example shows how to apply the action from above on the local
+  locality:
+
+      hpx::apply<some_global_action>(hpx::find_here());
+
+  (the function `hpx::find_here()` returns the id of the local locality (the
+  locality this code is executed on).
+
+* /Applying an action with synchronization/:
+
+[note The syntax of applying an action is always the same, regardless whether
+      the target locality is remote to the invocation locality or not. This
+      is a very important feature of __hpx__ as it free the user from the task
+      of keeping track what actions have to be applied locally and which
+      actions are remote.
+      If the target for applying an action is local, a new thread is
+      automatically created and scheduled. If the target is remote, __hpx__
+      will send a parcel to the remote locality which encapsulates the action
+      and its parameters. Once the parcel is received on the remote locality
+      __hpx__ will create and schedule a new thread there.]
+
 [endsect]
 

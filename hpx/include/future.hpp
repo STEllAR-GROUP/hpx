@@ -3,10 +3,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_APPLY_APR_15_2012_0441PM)
-#define HPX_APPLY_APR_15_2012_0441PM
+#if !defined(HPX_FUTURE_APR_17_2012_0840AM)
+#define HPX_FUTURE_APR_17_2012_0840AM
 
-#include <hpx/apply.hpp>
+#include <hpx/lcos/future.hpp>
 
 #endif
 

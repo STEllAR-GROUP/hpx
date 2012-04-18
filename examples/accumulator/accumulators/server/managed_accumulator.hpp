@@ -78,9 +78,9 @@ namespace examples { namespace server
         // serialization, etc.
 
         //[managed_accumulator_action_types
-        HPX_COMPONENT_ACTION(managed_accumulator, reset, reset_action);
-        HPX_COMPONENT_ACTION(managed_accumulator, add, add_action);
-        HPX_COMPONENT_CONST_ACTION(managed_accumulator, query, query_action);
+        HPX_DEFINE_COMPONENT_ACTION(managed_accumulator, reset, reset_action);
+        HPX_DEFINE_COMPONENT_ACTION(managed_accumulator, add, add_action);
+        HPX_DEFINE_COMPONENT_CONST_ACTION(managed_accumulator, query, query_action);
         //]
 
     //[managed_accumulator_server_data_member

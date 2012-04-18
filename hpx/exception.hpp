@@ -69,11 +69,13 @@ namespace hpx
         task_moved = 35,
         future_already_retrieved = 36,
         future_already_satisfied = 37,
-        task_already_started = 38,
-        thread_resource_error = 39,
-        thread_interrupted = 40,
-        thread_not_interruptable = 41,
-        duplicate_component_id = 42,
+        future_does_not_support_cancellation = 42,
+        future_can_not_be_cancelled = 43,
+        task_already_started = 44,
+        thread_resource_error = 45,
+        thread_interrupted = 46,
+        thread_not_interruptable = 47,
+        duplicate_component_id = 48,
         last_error,
 
         // force this enum type to be at least 16 bits.
@@ -120,11 +122,12 @@ namespace hpx
         "task_moved",
         "future_already_retrieved",
         "future_already_satisfied",
+        "future_does_not_support_cancellation",
+        "future_can_not_be_cancelled",
         "task_already_started",
         "thread_resource_error",
         "thread_interrupted",
         "thread_not_interruptable",
-        "duplicate_component_id",
         ""
     };
 
