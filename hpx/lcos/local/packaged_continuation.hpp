@@ -28,12 +28,12 @@ namespace hpx { namespace lcos { namespace detail
     protected:
         threads::thread_id_type get_id() const
         {
-            mutex_type::scoped_lock l(this->mtx_);
+            typename mutex_type::scoped_lock l(this->mtx_);
             return id_;
         }
         void set_id(threads::thread_id_type id)
         {
-            mutex_type::scoped_lock l(this->mtx_);
+            typename mutex_type::scoped_lock l(this->mtx_);
             id_ = id;
         }
 
@@ -68,7 +68,7 @@ namespace hpx { namespace lcos { namespace detail
         void run (lcos::future<Result> f, error_code& ec)
         {
             {
-                mutex_type::scoped_lock l(this->mtx_);
+                typename mutex_type::scoped_lock l(this->mtx_);
                 if (started_) {
                     HPX_THROWS_IF(ec, task_already_started,
                         "continuation_base::run",
@@ -89,7 +89,7 @@ namespace hpx { namespace lcos { namespace detail
 
         void deleting_owner()
         {
-            mutex_type::scoped_lock l(this->mtx_);
+            typename mutex_type::scoped_lock l(this->mtx_);
             if (!started_) {
                 started_ = true;
                 this->set_error(broken_task,
@@ -106,7 +106,7 @@ namespace hpx { namespace lcos { namespace detail
 
         void cancel()
         {
-            mutex_type::scoped_lock l(this->mtx_);
+            typename mutex_type::scoped_lock l(this->mtx_);
             try {
                 if (!this->started_) {
                     HPX_THROW_EXCEPTION(thread_interrupted,
@@ -162,7 +162,7 @@ namespace hpx { namespace lcos { namespace detail
     threads::thread_state_enum continuation_base<ContResult>::run_impl(
         future_base_type, lcos::future<Result> f)
     {
-        typedef continuation<ContResult, typename Result> derived_type;
+        typedef continuation<ContResult, Result> derived_type;
         static_cast<derived_type*>(this)->do_run(f);
         return threads::terminated;
     }
