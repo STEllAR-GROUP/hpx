@@ -18,6 +18,8 @@ Here is a list of the important tickets we closed for this point release:
 
 * #371 - Add hpx iostreams to standard build 
 * #384 - Fix compilation with GCC 4.7
+* #385 - Generate a coherent warning if HPX has not been installed
+* #386 - Warn about the need to install HPX in the documentation
 
 [heading Bug Fixes (Commits)]
 
