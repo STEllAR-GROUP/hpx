@@ -551,7 +551,7 @@ namespace hpx
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    bool  runtime_impl<SchedulingPolicy, NotificationPolicy>::
+    bool runtime_impl<SchedulingPolicy, NotificationPolicy>::
         keep_factory_alive(components::component_type type)
     {
         return runtime_support_.keep_factory_alive(type);
