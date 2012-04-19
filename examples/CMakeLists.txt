@@ -51,7 +51,6 @@ if(HDF5_CPP_FOUND)
        )
   endif()
 
-
   if(HDF5_THREAD_SAFE)
     set(subdirs ${subdirs}
         sheneos
