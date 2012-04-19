@@ -550,6 +550,13 @@ namespace hpx
         runtime_support_.add_shutdown_function(f);
     }
 
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    bool  runtime_impl<SchedulingPolicy, NotificationPolicy>::
+        keep_factory_alive(components::component_type type)
+    {
+        return runtime_support_.keep_factory_alive(type);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     hpx::util::thread_specific_ptr<runtime *, runtime::tls_tag> runtime::runtime_;
 
@@ -799,6 +806,12 @@ namespace hpx
     void register_shutdown_function(shutdown_function_type const& f)
     {
         get_runtime().add_shutdown_function(f);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_EXPORT bool keep_factory_alive(components::component_type type)
+    {
+        return get_runtime().keep_factory_alive(type);
     }
 
     ///////////////////////////////////////////////////////////////////////////

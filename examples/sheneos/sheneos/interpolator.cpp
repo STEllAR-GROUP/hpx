@@ -33,6 +33,31 @@ typedef sheneos::configuration configuration_client_type;
 HPX_DEFINE_GET_COMPONENT_TYPE(configuration_client_type);
 
 ///////////////////////////////////////////////////////////////////////////////
+// Register a startup function which will be called as a px-thread during
+// runtime startup.
+namespace sheneos
+{
+    ///////////////////////////////////////////////////////////////////////////
+    // This function will be registered as a startup function for HPX below.
+    void startup()
+    {
+        // Because of problems while dynamically loading/unloading the HDF5
+        // libraries we need to artificially increase the reference count of
+        // this library, which prevents its unloading.
+        hpx::keep_factory_alive(partition_client_type::get_component_type());
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    bool get_startup(HPX_STD_FUNCTION<void()>& startup_func)
+    {
+        // return our startup-function if performance counters are required
+        startup_func = startup;
+        return true;
+    }
+}
+HPX_REGISTER_STARTUP_MODULE(::sheneos::get_startup);
+
+///////////////////////////////////////////////////////////////////////////////
 // Interpolation client.
 namespace sheneos
 {
