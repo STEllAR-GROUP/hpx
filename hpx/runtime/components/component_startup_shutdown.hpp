@@ -13,16 +13,10 @@
 namespace hpx { namespace components
 {
     ///////////////////////////////////////////////////////////////////////////
-    namespace startup_shutdown_provider
-    {
-        HPX_SYMBOL_INTERNAL bool startup(HPX_STD_FUNCTION<void()>& startup_func);
-        HPX_SYMBOL_INTERNAL bool shutdown(HPX_STD_FUNCTION<void()>& shutdown_func);
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// The \a component_startup_shutdown provides a minimal implementation of
-    /// a component's startup/shutdown function provider.
-    ///
+    /// The \a component_startup_shutdown class provides a minimal
+    /// implementation of a component's startup/shutdown function provider.
+    template <bool(*Startup)(HPX_STD_FUNCTION<void()>&),
+        bool(*Shutdown)(HPX_STD_FUNCTION<void()>&)>    
     struct component_startup_shutdown : public component_startup_shutdown_base
     {
         ///
@@ -39,7 +33,7 @@ namespace hpx { namespace components
         ///         successfully initialized with the startup function.
         bool get_startup_function(HPX_STD_FUNCTION<void()>& startup_)
         {
-            return startup_shutdown_provider::startup(startup_);
+            return Startup(startup_);
         }
 
         /// \brief Return any startup function for this component
@@ -53,7 +47,7 @@ namespace hpx { namespace components
         ///         successfully initialized with the shutdown function.
         bool get_shutdown_function(HPX_STD_FUNCTION<void()>& shutdown_)
         {
-            return startup_shutdown_provider::shutdown(shutdown_);
+            return Shutdown(shutdown_);
         }
     };
 }}
@@ -62,13 +56,15 @@ namespace hpx { namespace components
 #define HPX_DEFINE_COMPONENT_STARTUP_SHUTDOWN(startup_, shutdown_)            \
     namespace hpx { namespace components { namespace startup_shutdown_provider\
     {                                                                         \
-        bool startup(HPX_STD_FUNCTION<void()>& startup_func)                  \
+        bool BOOST_PP_CAT(HPX_COMPONENT_LIB_NAME, _startup)                   \
+            (HPX_STD_FUNCTION<void()>& startup_func)                          \
         {                                                                     \
             HPX_STD_FUNCTION<bool(HPX_STD_FUNCTION<void()>&)> tmp = startup_; \
             if (!!tmp) { return tmp(startup_func); }                          \
             return false;                                                     \
         }                                                                     \
-        bool shutdown(HPX_STD_FUNCTION<void()>& shutdown_func)                \
+        bool BOOST_PP_CAT(HPX_COMPONENT_LIB_NAME, _shutdown)                  \
+            (HPX_STD_FUNCTION<void()>& shutdown_func)                         \
         {                                                                     \
             HPX_STD_FUNCTION<bool(HPX_STD_FUNCTION<void()>&)> tmp = shutdown_;\
             if (!!tmp) { return tmp(shutdown_func); }                         \
@@ -81,10 +77,25 @@ namespace hpx { namespace components
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_STARTUP_SHUTDOWN_MODULE(startup, shutdown)               \
-        HPX_REGISTER_STARTUP_SHUTDOWN_FUNCTIONS()                             \
-        HPX_REGISTER_STARTUP_SHUTDOWN_REGISTRY(                               \
-            hpx::components::component_startup_shutdown, startup_shutdown)    \
-        HPX_DEFINE_COMPONENT_STARTUP_SHUTDOWN(startup, shutdown)              \
+    HPX_REGISTER_STARTUP_SHUTDOWN_FUNCTIONS()                                 \
+    HPX_DEFINE_COMPONENT_STARTUP_SHUTDOWN(startup, shutdown)                  \
+    namespace hpx { namespace components { namespace startup_shutdown_provider\
+    {                                                                         \
+        typedef component_startup_shutdown<                                   \
+            BOOST_PP_CAT(HPX_COMPONENT_LIB_NAME, _startup),                   \
+            BOOST_PP_CAT(HPX_COMPONENT_LIB_NAME, _shutdown)                   \
+        > BOOST_PP_CAT(HPX_COMPONENT_LIB_NAME, _provider);                    \
+    }                                                                         \
+        template struct component_startup_shutdown<                           \
+            startup_shutdown_provider::                                       \
+                BOOST_PP_CAT(HPX_COMPONENT_LIB_NAME, _startup),               \
+            startup_shutdown_provider::                                       \
+                BOOST_PP_CAT(HPX_COMPONENT_LIB_NAME, _shutdown)               \
+        >;                                                                    \
+    }}                                                                        \
+    HPX_REGISTER_STARTUP_SHUTDOWN_REGISTRY(                                   \
+        hpx::components::startup_shutdown_provider::                          \
+        BOOST_PP_CAT(HPX_COMPONENT_LIB_NAME, _provider), startup_shutdown)    \
     /**/
 
 #define HPX_REGISTER_STARTUP_MODULE(startup)                                  \
