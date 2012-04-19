@@ -416,6 +416,8 @@ namespace hpx { namespace components { namespace server
             shutdown_functions_.push_back(f);
         }
 
+        bool keep_factory_alive(component_type t);
+
     protected:
         // Load all components from the ini files found in the configuration
         bool load_components(util::section& ini, naming::gid_type const& prefix,

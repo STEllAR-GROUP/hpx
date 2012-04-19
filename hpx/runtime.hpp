@@ -181,6 +181,12 @@ namespace hpx
 
         virtual void add_shutdown_function(HPX_STD_FUNCTION<void()> const& f) = 0;
 
+        /// Keep the factory object alive which is responsible for the given
+        /// component type. This a purely internal function allowing to work
+        /// around certain compiler specific problems related to dynamic
+        /// loading of external libraries.
+        virtual bool keep_factory_alive(components::component_type type) = 0;
+
     protected:
         void init_tss();
         void deinit_tss();
@@ -528,6 +534,8 @@ namespace hpx
         ///             useful to tear down the runtime environment of the
         ///             application (uninstall performance counters, etc.)
         void add_shutdown_function(HPX_STD_FUNCTION<void()> const& f);
+
+        bool keep_factory_alive(components::component_type type);
 
     private:
         void init_tss(char const* context);

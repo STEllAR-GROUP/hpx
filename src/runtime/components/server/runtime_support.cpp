@@ -672,6 +672,22 @@ namespace hpx { namespace components { namespace server
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    bool runtime_support::keep_factory_alive(component_type type)
+    {
+        mutex_type::scoped_lock l(mtx_);
+
+        // Only after releasing the components we are allowed to release
+        // the modules. This is done in reverse order of loading.
+        component_map_type::iterator it = components_.find(type);
+        if (it == components_.end() || !(*it).second.first)
+            return false;
+
+        (*it).second.second.keep_alive();
+        return true;
+    }
+
+
     ///////////////////////////////////////////////////////////////////////
     inline void decode (std::string &str, char const *s, char const *r)
     {
