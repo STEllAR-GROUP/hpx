@@ -31,6 +31,7 @@
 #include <hpx/util/parse_command_line.hpp>
 
 #include <algorithm>
+#include <set>
 
 #include <boost/assert.hpp>
 #include <boost/filesystem/path.hpp>
@@ -933,6 +934,7 @@ namespace hpx { namespace components { namespace server
             return false;
         }
 
+        std::set<std::string> startup_handled;
         try {
             // get the handle of the library
             boost::plugin::dll d (lib.string(), component);
@@ -987,8 +989,13 @@ namespace hpx { namespace components { namespace server
                 return false;   // duplicate component id?
             }
 
-            load_commandline_options(d, options);
-            load_startup_shutdown_functions(d);
+            // make sure startup/shutdown registration is called once for each
+            // module
+            if (startup_handled.find(d.get_name()) == startup_handled.end()) {
+                startup_handled.insert(d.get_name());
+                load_commandline_options(d, options);
+                load_startup_shutdown_functions(d);
+            }
 
             LRT_(info) << "dynamic loading succeeded: " << lib.string()
                        << ": " << instance << ": "
