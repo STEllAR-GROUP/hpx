@@ -124,6 +124,18 @@ namespace hpx { namespace util
         function(BOOST_RV_REF(function) other)
             : base_type(boost::move(static_cast<BOOST_RV_REF(base_type)>(other)))
         {}
+        
+        function& operator=(BOOST_COPY_ASSIGN_REF(function) t)
+        {
+            this->base_type::operator=(t);
+            return *this;
+        }
+
+        function& operator=(BOOST_RV_REF(function) t)
+        {
+            this->base_type::operator=(boost::move(static_cast<BOOST_RV_REF(base_type)>(t)));
+            return *this;
+        }
 
     private:
         BOOST_COPYABLE_AND_MOVABLE(function);

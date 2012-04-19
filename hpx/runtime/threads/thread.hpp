@@ -48,7 +48,7 @@ namespace hpx { namespace threads
     // whenever an instance of a threads::thread needs to be deleted. We
     // provide this overload as we need to extract the thread_pool from the
     // thread instance the moment before it gets deleted
-    void HPX_EXPORT delete_clone(threads::thread const*);
+    HPX_EXPORT void delete_clone(threads::thread const*);
 
     // This is a policy instance for the boost::ptr_map used to store the
     // pointers to the threads::thread instances

@@ -91,8 +91,8 @@ namespace hpx
 
     // Helper data structures allowing to automatically detect version problems
     // between applications and the core libraries.
-    extern HPX_EXPORT char const HPX_CHECK_VERSION[];
-    extern HPX_EXPORT char const HPX_CHECK_BOOST_VERSION[];
+    HPX_EXPORT extern char const HPX_CHECK_VERSION[];
+    HPX_EXPORT extern char const HPX_CHECK_BOOST_VERSION[];
 }
 
 ///////////////////////////////////////////////////////////////////////////////

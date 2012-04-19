@@ -81,7 +81,7 @@ namespace hpx { namespace lcos { namespace detail
         template <typename T>
         void set_local_data(BOOST_FWD_REF(T) result)
         {
-            return set_data(boost::forward<result_type>(result));
+            return this->set_data(boost::forward<result_type>(result));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -91,7 +91,7 @@ namespace hpx { namespace lcos { namespace detail
         void set_result (BOOST_RV_REF(RemoteResult) result)
         {
             // set the received result, reset error status
-            set_data(boost::move(result));
+            this->set_data(boost::move(result));
         }
 
         Result get_value()
@@ -170,7 +170,7 @@ namespace hpx { namespace lcos { namespace detail
         template <typename T>
         void set_local_data(BOOST_FWD_REF(T) result)
         {
-            return set_data(boost::forward<result_type>(result));
+            return this->set_data(boost::forward<result_type>(result));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -180,7 +180,7 @@ namespace hpx { namespace lcos { namespace detail
         void set_result (BOOST_RV_REF(util::unused_type) result)
         {
             // set the received result, reset error status
-            set_data(boost::move(result));
+            this->set_data(boost::move(result));
         }
 
         void get_value()

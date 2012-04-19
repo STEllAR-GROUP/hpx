@@ -183,6 +183,6 @@ namespace hpx { namespace threads
 
 ///////////////////////////////////////////////////////////////////////////////
 // explicit instantiation of the function thread_self::set_self
-template void
+template HPX_EXPORT void
 hpx::threads::thread_self::impl_type::set_self(hpx::threads::thread_self*);
 

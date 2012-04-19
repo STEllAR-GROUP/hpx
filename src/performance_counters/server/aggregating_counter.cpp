@@ -217,11 +217,11 @@ typedef hpx::components::managed_component<
         boost::accumulators::tag::mean>
 > average_count_counter_type;
 
-template HPX_EXPORT class hpx::performance_counters::server::aggregating_counter<
+template class HPX_EXPORT hpx::performance_counters::server::aggregating_counter<
     boost::accumulators::tag::mean>;
-template HPX_EXPORT class hpx::performance_counters::server::aggregating_counter<
+template class HPX_EXPORT hpx::performance_counters::server::aggregating_counter<
     boost::accumulators::tag::max>;
-template HPX_EXPORT class hpx::performance_counters::server::aggregating_counter<
+template class HPX_EXPORT hpx::performance_counters::server::aggregating_counter<
     boost::accumulators::tag::min>;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY_EX(

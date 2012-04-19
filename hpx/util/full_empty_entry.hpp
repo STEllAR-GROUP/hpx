@@ -48,7 +48,7 @@ namespace hpx { namespace util { namespace detail
         boost::int64_t set_full_;
         lcos::local::spinlock mtx_;
     };
-    extern HPX_EXPORT full_empty_counter_data full_empty_counter_data_;
+    HPX_EXPORT extern full_empty_counter_data full_empty_counter_data_;
 
     // call this to register all counter types for full_empty entries
     void register_counter_types();

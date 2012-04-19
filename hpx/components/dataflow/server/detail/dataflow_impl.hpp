@@ -46,7 +46,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
         boost::int64_t fired_;
         lcos::local::spinlock mtx_;
     };
-    extern HPX_COMPONENT_EXPORT dataflow_counter_data dataflow_counter_data_;
+    HPX_COMPONENT_EXPORT extern dataflow_counter_data dataflow_counter_data_;
 
     // call this to register all counter types for dataflow objects
     void register_counter_types();

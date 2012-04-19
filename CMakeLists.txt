@@ -163,7 +163,7 @@ endif()
 # We have a patched version of FindBoost loosely based on the one that Kitware ships
 find_package(HPX_Boost)
 
-hpx_include_directories(${BOOST_INCLUDE_DIR})
+hpx_include_directories(SYSTEM ${BOOST_INCLUDE_DIR})
 hpx_link_directories(${BOOST_LIBRARY_DIR})
 
 # Boost preprocessor definitions

@@ -40,7 +40,7 @@
 namespace hpx { namespace util
 {
 
-void HPX_ALWAYS_EXPORT
+HPX_ALWAYS_EXPORT void
 portable_binary_oarchive::save_impl(const boost::intmax_t l, const char maxsize)
 {
     char size = 0;
@@ -80,7 +80,7 @@ portable_binary_oarchive::save_impl(const boost::intmax_t l, const char maxsize)
     this->primitive_base_t::save_binary(cptr, size);
 }
 
-void HPX_ALWAYS_EXPORT portable_binary_oarchive::init(unsigned int flags)
+HPX_ALWAYS_EXPORT void portable_binary_oarchive::init(unsigned int flags)
 {
     if (m_flags == (endian_big | endian_little)) {
         BOOST_THROW_EXCEPTION(
