@@ -358,7 +358,7 @@ namespace hpx { namespace lcos
     template <typename Result, typename RemoteResult>
     template <typename F>
     inline future<typename boost::result_of<F()>::type>
-    future<Result, typename RemoteResult>::when(BOOST_FWD_REF(F) f)
+    future<Result, RemoteResult>::when(BOOST_FWD_REF(F) f)
     {
         typedef typename boost::result_of<F()>::type result_type;
 
