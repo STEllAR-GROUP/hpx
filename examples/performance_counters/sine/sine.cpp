@@ -223,8 +223,9 @@ namespace performance_counters { namespace sine
     {
         // check whether the performance counters need to be enabled
         if (!need_perf_counters()) {
-            HPX_THROW_EXCEPTION(hpx::component_load_failure, "sine::get_startup",
-                "The Sine component is not enabled on the commandline "
+            HPX_THROW_EXCEPTION(hpx::component_load_failure,
+                "performance_counters::sine::get_startup",
+                "the sine component is not enabled on the commandline "
                 "(--sine), bailing out");
             return false;
         }
