@@ -9,8 +9,8 @@
 # just recurse into all components subdirectories and execute the scripts there
 
 add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=10)
-add_definitions(-DHPX_FUNCTION_LIMIT=13)
 add_definitions(-DHPX_COMPONENT_CREATE_ARGUMENT_LIMIT=10)
+add_definitions(-DHPX_FUNCTION_LIMIT=13)
 
 include_directories (${HDF5_INCLUDE_DIR} ${HDF5_CPP_INCLUDE_DIR})
 

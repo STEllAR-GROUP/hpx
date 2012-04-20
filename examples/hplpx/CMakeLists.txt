@@ -5,6 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=7)
+add_definitions(-DHPX_FUNCTION_LIMIT=10)
 
 add_subdirectory(hplmatrex)
 add_subdirectory(smphplmatrex)

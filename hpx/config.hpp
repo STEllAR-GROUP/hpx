@@ -78,8 +78,7 @@
 #endif
 
 #if HPX_FUNCTION_LIMIT < (HPX_ACTION_ARGUMENT_LIMIT + 3)
-#  undef HPX_FUNCTION_LIMIT
-#  define HPX_FUNCTION_LIMIT BOOST_PP_ADD(HPX_ACTION_ARGUMENT_LIMIT, 3)
+#  error "The specified HPX_FUNCTION_LIMIT (default is 7) has to be larger than HPX_ACTION_ARGUMENT_LIMIT by at least 3."
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -354,7 +353,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// make sure Chrono is handled properly
+// Make sure Chrono is handled properly
 #if defined(HPX_INTERNAL_CHRONO) && BOOST_VERSION < 104700 && !defined(BOOST_CHRONO_NO_LIB)
 #  define BOOST_CHRONO_NO_LIB
 #endif
