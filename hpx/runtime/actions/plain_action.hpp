@@ -201,16 +201,6 @@ namespace hpx { namespace actions
           : base_type(priority)
         {}
 
-        static Result
-        execute_function(naming::address::address_type lva)
-        {
-            LTM_(debug)
-                << "plain_result_action0::execute_function: name("
-                << detail::get_action_name<derived_type>()
-                << ")";
-            return F();
-        }
-
         /// serialization support
         static void register_base()
         {
@@ -498,17 +488,6 @@ namespace hpx { namespace actions
           : base_type(priority)
         {}
 
-        static util::unused_type
-        execute_function(naming::address::address_type lva)
-        {
-            LTM_(debug)
-                << "plain_action0::execute_function: name("
-                << detail::get_action_name<derived_type>()
-                << ")";
-            F();
-            return util::unused;
-        }
-
         /// serialization support
         static void register_base()
         {
@@ -594,7 +573,7 @@ namespace hpx { namespace actions
         execute_function(naming::address::address_type lva)
         {
             LTM_(debug)
-                << "plain_base_action0::execute_function: name("
+                << "plain_direct_action0::execute_function: name("
                 << detail::get_action_name<derived_type>()
                 << ")";
             F();

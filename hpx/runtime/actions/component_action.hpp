@@ -206,18 +206,6 @@ namespace hpx { namespace actions
           : base_type(priority)
         {}
 
-        static Result
-        execute_function(naming::address::address_type lva)
-        {
-            LTM_(debug)
-                << "result_action0::execute_function: name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component>::call(lva)) << ")";
-
-            return (get_lva<Component>::call(lva)->*F)();
-        }
-
         /// serialization support
         static void register_base()
         {
@@ -577,19 +565,6 @@ namespace hpx { namespace actions
         explicit action0(threads::thread_priority priority = Priority)
           : base_type(priority)
         {}
-
-        static util::unused_type
-        execute_function(naming::address::address_type lva)
-        {
-            LTM_(debug)
-                << "action0::execute_function: name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component>::call(lva)) << ")";
-
-            (get_lva<Component>::call(lva)->*F)();
-            return util::unused;
-        }
 
         /// serialization support
         static void register_base()

@@ -257,19 +257,6 @@ namespace hpx { namespace actions
           : base_type(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
-        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        static Result
-        execute_function(naming::address::address_type lva,
-                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
-        {
-            LTM_(debug)
-                << "plain_result_action" << N
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>() << ")";
-
-            return F(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
-        }
-
         /// serialization support
         static void register_base()
         {
@@ -649,20 +636,6 @@ namespace hpx { namespace actions
           : base_type(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
 
-        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        static util::unused_type
-        execute_function(naming::address::address_type lva,
-                BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
-        {
-            LTM_(debug)
-                << "plain_action" << N
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>() << ")";
-
-            F(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
-            return util::unused;
-        }
-
         /// serialization support
         static void register_base()
         {
@@ -773,7 +746,7 @@ namespace hpx { namespace actions
             BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
             LTM_(debug)
-                << "plain_base_action" << N
+                << "plain_direct_action" << N
                 << "::execute_function name("
                 << detail::get_action_name<derived_type>() << ")";
 

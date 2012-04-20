@@ -248,22 +248,6 @@ namespace hpx { namespace actions
           : base_type(priority)
         {}
 
-        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        static Result execute_function(
-            naming::address::address_type lva,
-            BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
-        {
-            LTM_(debug)
-                << "base_result_action" << N
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component>::call(lva)) << ")";
-
-            return (get_lva<Component>::call(lva)->*F)(
-                BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
-        }
-
         // construct an action from its arguments
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         BOOST_PP_CAT(result_action, N)(
@@ -456,7 +440,7 @@ namespace hpx { namespace actions
             BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
             LTM_(debug)
-                << "base_result_action" << N
+                << "direct_result_action" << N
                 << "::execute_function name("
                 << detail::get_action_name<derived_type>()
                 << ") lva(" << reinterpret_cast<void const*>(
@@ -764,23 +748,6 @@ namespace hpx { namespace actions
                 BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
           : base_type(priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))
         {}
-
-        template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        static util::unused_type
-        execute_function(naming::address::address_type lva,
-            BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
-        {
-            LTM_(debug)
-                << "action" << N
-                << "::execute_function name("
-                << detail::get_action_name<derived_type>()
-                << ") lva(" << reinterpret_cast<void const*>(
-                    get_lva<Component>::call(lva)) << ")";
-
-            (get_lva<Component>::call(lva)->*F)(
-                BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
-            return util::unused;
-        }
 
         /// serialization support
         static void register_base()
