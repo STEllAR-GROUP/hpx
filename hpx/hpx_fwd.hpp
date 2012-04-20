@@ -453,13 +453,6 @@ namespace hpx
 
     HPX_EXPORT components::server::runtime_support* get_runtime_support_ptr();
 
-    ///////////////////////////////////////////////////////////////////////////
-    /// Keep the factory object alive which is responsible for the given
-    /// component type. This a purely internal function allowing to work
-    /// around certain library specific problems related to dynamic
-    /// loading of external libraries.
-    HPX_EXPORT bool keep_factory_alive(components::component_type type);
-
     /// \namespace lcos
     namespace lcos
     {
