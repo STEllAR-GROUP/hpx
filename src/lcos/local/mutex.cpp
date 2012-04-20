@@ -59,7 +59,6 @@ namespace hpx { namespace lcos { namespace local
         queue_entry e(self.get_thread_id());
         queue_.push_back(e);
 
-        bool result = false;
         threads::thread_state_ex_enum statex;
 
         reset_queue_entry r(e, queue_);
