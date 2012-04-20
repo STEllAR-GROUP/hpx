@@ -245,7 +245,7 @@ namespace boost { namespace plugin {
         {
             // now find the full path of the loaded library
             char directory[PATH_MAX];
-            if (::dlinfo(handle, RTLD_DI_ORIGIN, directory) < 0) {
+            if (::dlinfo(dll_handle, RTLD_DI_ORIGIN, directory) < 0) {
                 BOOST_PLUGIN_OSSTREAM str;
                 str << "Boost.Plugin: Could not extract path the shared "
                        "library '" << dll_name << "' has been loaded from "

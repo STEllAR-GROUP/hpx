@@ -22,7 +22,14 @@ namespace hpx { namespace util
                 HPX_MANGLE_NAME_STR(library) + HPX_SHARED_LIB_EXTENSION);
 
             using boost::filesystem::path;
-            return path(dll.get_directory()).parent_path().parent_path().string();
+
+            std::string const prefix =
+                path(dll.get_directory()).parent_path().parent_path().string();
+
+            if (prefix.empty())
+                return HPX_PREFIX;
+            else
+                return prefix;
         }
         catch (std::logic_error const&) {
             ;   // just ignore loader problems
