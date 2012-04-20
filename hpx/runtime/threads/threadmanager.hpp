@@ -335,6 +335,10 @@ namespace hpx { namespace threads
         virtual bool add_thread_exit_callback(thread_id_type id,
             HPX_STD_FUNCTION<void()> const& f, error_code& ec = throws) = 0;
 
+        ///
+        virtual void free_thread_exit_callbacks(thread_id_type id,
+            error_code& ec = throws) = 0;
+
         /// this notifies the thread manager that there is some more work
         /// available
         virtual void do_some_work(std::size_t num_thread = std::size_t(-1)) = 0;
@@ -533,6 +537,10 @@ namespace hpx { namespace threads
         ///                 value will be false.
         bool add_thread_exit_callback(thread_id_type id,
             HPX_STD_FUNCTION<void()> const& f, error_code& ec = throws);
+
+        ///
+        void free_thread_exit_callbacks(thread_id_type id,
+            error_code& ec = throws);
 
         /// \brief Forcefully stop the thread-manager
         ///

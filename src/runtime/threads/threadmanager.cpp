@@ -614,7 +614,7 @@ namespace hpx { namespace threads
     {
         if (HPX_UNLIKELY(!id)) {
             HPX_THROWS_IF(ec, null_thread_id,
-                "threadmanager_impl::interrupt",
+                "threadmanager_impl::run_thread_exit_callbacks",
                 "NULL thread id encountered");
             return;
         }
@@ -634,7 +634,7 @@ namespace hpx { namespace threads
     {
         if (HPX_UNLIKELY(!id)) {
             HPX_THROWS_IF(ec, null_thread_id,
-                "threadmanager_impl::interrupt",
+                "threadmanager_impl::add_thread_exit_callback",
                 "NULL thread id encountered");
             return false;
         }
@@ -644,6 +644,25 @@ namespace hpx { namespace threads
 
         thread_data* thrd = reinterpret_cast<thread_data*>(id);
         return (0 != thrd) ? thrd->add_thread_exit_callback(f) : false;
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        free_thread_exit_callbacks(thread_id_type id, error_code& ec)
+    {
+        if (HPX_UNLIKELY(!id)) {
+            HPX_THROWS_IF(ec, null_thread_id,
+                "threadmanager_impl::free_thread_exit_callbacks",
+                "NULL thread id encountered");
+            return;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        if (0 != thrd)
+            thrd->free_thread_exit_callbacks();
     }
 
     ///////////////////////////////////////////////////////////////////////////

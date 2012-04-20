@@ -16,6 +16,9 @@
 
 #include <hpx/include/local_lcos.hpp>
 #include <hpx/include/async.hpp>
+#include <hpx/lcos/wait_any.hpp>
+#include <hpx/lcos/wait_all.hpp>
+#include <hpx/lcos/wait_n.hpp>
 
 #include <hpx/lcos/future_wait.hpp>
 

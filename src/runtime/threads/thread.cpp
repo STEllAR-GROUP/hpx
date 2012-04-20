@@ -36,11 +36,16 @@ namespace hpx
         // as we have no chance of reporting this error (we can't throw)
         if (joinable()) {
             try {
-                components::stubs::runtime_support::terminate_all(
-                    naming::get_id_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX));
+                // free all registered exit-callback functions
+                threads::free_thread_exit_callbacks(id_);
+
+                // report the error globally
+                HPX_THROW_EXCEPTION(invalid_status,
+                  "~thread::thread", "destroying running thread");
             }
             catch(...) {
-                /* nothing we can do */;
+                hpx::report_error(boost::current_exception());
+                /* nothing else we can do */;
             }
         }
     }
@@ -99,6 +104,10 @@ namespace hpx
             return;
         }
 
+        // inform ourselves if the thread function exits
+        threads::add_thread_exit_callback(id, util::bind(&thread::detach, this));
+
+        // now start the thread
         set_thread_state(id, threads::pending, threads::wait_signaled,
             threads::thread_priority_normal, ec);
         if (ec) {
@@ -170,7 +179,7 @@ namespace hpx
             {
                 if (threads::add_thread_exit_callback(id,
                         HPX_STD_BIND(&thread_task_base::thread_exit_function,
-                            this, future_base_type(this))))
+                            future_base_type(this))))
                 {
                     id_ = id;
                 }
@@ -212,7 +221,7 @@ namespace hpx
             }
 
         protected:
-            void thread_exit_function(future_base_type)
+            void thread_exit_function()
             {
                 // might have been finished or canceled
                 mutex_type::scoped_lock l(this->mtx_);

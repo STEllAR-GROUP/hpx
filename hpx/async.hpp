@@ -54,9 +54,10 @@ namespace hpx
     async (BOOST_FWD_REF(F) f)
     {
         typedef typename boost::result_of<F()>::type result_type;
-        return lcos::local::packaged_task<result_type>(
-            boost::forward<F>(f)
-        ).get_future();
+        lcos::local::packaged_task<result_type> p(
+            boost::forward<F>(f));
+        p.async();
+        return p.get_future();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -85,10 +86,11 @@ namespace hpx
         typedef typename boost::result_of<                                    \
             F(BOOST_PP_ENUM_PARAMS(N, A))                                     \
         >::type result_type;                                                  \
-        return lcos::local::packaged_task<result_type>(                       \
+        lcos::local::packaged_task<result_type> p(                            \
             util::bind(boost::forward<F>(f),                                  \
-                BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _))                        \
-        ).get_future();                                                       \
+                BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _)));                      \
+        p.async();                                                            \
+        return p.get_future();                                                \
     }                                                                         \
     /**/
 
@@ -141,7 +143,9 @@ namespace hpx
             >
         ))) bound)
     {
-        return lcos::local::packaged_task<R>(boost::move(bound)).get_future();
+        lcos::local::packaged_task<R> p(boost::move(bound));
+        p.async();
+        return p.get_future();
     }
 
     // define apply() overloads for n-nary bound actions
@@ -163,12 +167,12 @@ namespace hpx
       , BOOST_PP_ENUM(N, HPX_FWD_ARGS, _)                                     \
     )                                                                         \
     {                                                                         \
-        return lcos::local::packaged_task<R>(                                 \
+        lcos::local::packaged_task<R> p(                                      \
             util::bind(                                                       \
                 util::protect(boost::move(bound))                             \
-              , BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _)                         \
-            )                                                                 \
-        ).get_future();                                                       \
+              , BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _)));                      \
+        p.async();                                                            \
+        return p.get_future();                                                \
     }                                                                         \
     /**/
 
@@ -202,7 +206,9 @@ namespace hpx
             >
         ))) bound)
     {
-        return lcos::local::packaged_task<R>(boost::move(bound)).get_future();
+        lcos::local::packaged_task<R> p(boost::move(bound));
+        p.async();
+        return p.get_future();
     }
 
     // define async() overloads for n-nary bound member functions
@@ -228,12 +234,12 @@ namespace hpx
       , BOOST_PP_ENUM(N, HPX_FWD_ARGS, _)                                     \
     )                                                                         \
     {                                                                         \
-        return lcos::local::packaged_task<R>(                                 \
+        lcos::local::packaged_task<R> p(                                      \
             util::bind(                                                       \
                 util::protect(boost::move(bound))                             \
-              , BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _)                         \
-            )                                                                 \
-        ).get_future();                                                       \
+              , BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _)));                      \
+        p.async();                                                            \
+        return p.get_future();                                                \
     }                                                                         \
     /**/
 
@@ -261,9 +267,10 @@ namespace hpx
             >
         ))) bound)
     {
-        return lcos::local::packaged_task<
-            typename detail::create_future<F()>::type
-        > (boost::move(bound)).get_future();
+        lcos::local::packaged_task<typename detail::create_future<F()>::type>
+            p(boost::move(bound));
+        p.async();
+        return p.get_future();
     }
 
     // define async() overloads for n-nary bound member functions
@@ -285,16 +292,15 @@ namespace hpx
       , BOOST_PP_ENUM(N, HPX_FWD_ARGS, _)                                     \
     )                                                                         \
     {                                                                         \
-        return lcos::local::packaged_task<                                    \
+        lcos::local::packaged_task<                                           \
             typename detail::create_future<                                   \
                 F(BOOST_PP_ENUM_PARAMS(N, A))                                 \
-            >::type>                                                          \
-        (                                                                     \
-            util::bind(                                                       \
-                util::protect(boost::move(bound))                             \
-              , BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _)                         \
-            )                                                                 \
-        ).get_future();                                                       \
+            >::type> p(                                                       \
+                util::bind(                                                   \
+                    util::protect(boost::move(bound))                         \
+                  , BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _)));                  \
+        p.async();                                                            \
+        return p.get_future();                                                \
     }                                                                         \
     /**/
 

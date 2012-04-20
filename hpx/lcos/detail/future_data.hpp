@@ -15,6 +15,9 @@
 #include <boost/mpl/if.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/detail/atomic_count.hpp>
+#include <boost/preprocessor/cat.hpp>
+#include <boost/preprocessor/repetition/enum.hpp>
+#include <boost/preprocessor/repetition/repeat_from_to.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
@@ -72,6 +75,11 @@ namespace hpx { namespace lcos { namespace detail
         typedef typename boost::mpl::if_<
             boost::is_same<void, Result>, util::unused_type, Result
         >::type result_type;
+        typedef
+            HPX_STD_FUNCTION<void(future<Result, RemoteResult>)>
+        completed_callback_type;
+
+        virtual void deleting_owner() {}
 
         virtual result_type get_data(error_code& ec = throws) = 0;
         virtual result_type move_data(error_code& ec = throws) = 0;
@@ -92,6 +100,10 @@ namespace hpx { namespace lcos { namespace detail
                 "this future does not support cancellation");
         }
 
+        // continuation support
+        virtual void set_on_completed(BOOST_RV_REF(completed_callback_type)) = 0;
+        virtual void reset_on_completed() = 0;
+
     protected:
         future_data_base() {}
     };
@@ -107,7 +119,7 @@ namespace hpx { namespace lcos { namespace detail
         typedef boost::exception_ptr error_type;
         typedef util::value_or_error<result_type> data_type;
 
-        typedef HPX_STD_FUNCTION<void(future<Result, RemoteResult>)>
+        typedef typename base_type::completed_callback_type
             completed_callback_type;
 
         typedef lcos::local::spinlock mutex_type;
@@ -213,16 +225,16 @@ namespace hpx { namespace lcos { namespace detail
                 > get_remote_result_type;
 
                 // store the value
-                completed_callback_type on_completed(get_on_completed());
-                if (!on_completed.empty()) {
+                typename mutex_type::scoped_lock l(mtx_);
+                if (!on_completed_.empty()) {
                     // this future instance coincidentally keeps us alive
                     future<Result, RemoteResult> f(this);
                     data_.set(boost::move(get_remote_result_type::call(
                         boost::forward<T>(result))));
-                    on_completed(f);
 
                     // invoke the callback (continuation) function
-                    set_on_completed(completed_callback_type());
+                    on_completed_(f);
+                    on_completed_.reset();
                 }
                 else {
                   data_.set(boost::move(get_remote_result_type::call(
@@ -239,15 +251,15 @@ namespace hpx { namespace lcos { namespace detail
         void set_exception(boost::exception_ptr const& e)
         {
             // store the error code
-            completed_callback_type on_completed(get_on_completed());
-            if (!on_completed.empty()) {
+            typename mutex_type::scoped_lock l(mtx_);
+            if (!on_completed_.empty()) {
                 // this future coincidentally instance keeps us alive
                 future<Result, RemoteResult> f(this);
                 data_.set(e);
-                on_completed(f);
 
                 // invoke the callback (continuation) function
-                set_on_completed(completed_callback_type());
+                on_completed_(f);
+                on_completed_.reset();
             }
             else {
                 data_.set(e);
@@ -304,22 +316,27 @@ namespace hpx { namespace lcos { namespace detail
         /// Set the callback which needs to be invoked when the future becomes
         /// ready. If the future is ready the function will be invoked
         /// immediately.
-        void set_on_completed(completed_callback_type const& data_sink)
+        void set_on_completed(BOOST_RV_REF(completed_callback_type) data_sink)
         {
-            mutex_type::scoped_lock l(mtx_);
-            on_completed_ = data_sink;
-
-            if (!data_sink.empty() && this->is_ready()) {
+            typename mutex_type::scoped_lock l(mtx_);
+            on_completed_ = boost::move(data_sink);
+            if (!on_completed_.empty() && this->is_ready()) {
+                // this future coincidentally instance keeps us alive
                 future<Result, RemoteResult> f(this);
+
+                // invoke the callback (continuation) function
                 on_completed_(f);
+                on_completed_.reset();
             }
         }
 
-    protected:
-        completed_callback_type get_on_completed() const
+        void reset_on_completed()
         {
-            mutex_type::scoped_lock l(mtx_);
-            return on_completed_;
+            completed_callback_type data_sink;
+            {
+                typename mutex_type::scoped_lock l(mtx_);
+                std::swap(on_completed_, data_sink);
+            }
         }
 
     protected:
@@ -375,41 +392,112 @@ namespace hpx { namespace lcos { namespace detail
             return boost::move(this->move_data(ec));
         }
 
-        void run(error_code& ec)
+    private:
+        void check_started()
         {
-            {
-                typename mutex_type::scoped_lock l(this->mtx_);
-                if (started_) {
-                    HPX_THROWS_IF(ec, task_already_started,
-                        "task_base::run", "this task has already been started");
-                    return;
-                }
-                started_ = true;
+            typename mutex_type::scoped_lock l(this->mtx_);
+            if (started_) {
+                HPX_THROW_EXCEPTION(task_already_started,
+                    "task_base::run", "this task has already been started");
+                return;
             }
-
-            future_base_type this_(this);
-            applier::register_thread_plain(
-                HPX_STD_BIND(&task_base::run_impl, this, this_),
-                "task_base::run");
-
-            if (&ec != &throws)
-                ec = make_success_code();
+            started_ = true;
         }
 
-        threads::thread_state_enum run_impl(future_base_type)
+    public:
+        // run synchronously
+        void run()
         {
+            check_started();
+            this->do_run();
+        }
+
+        // run in a separate thread
+        void async()
+        {
+            check_started();
+            future_base_type this_(this);
+            applier::register_thread_plain(
+                HPX_STD_BIND(&task_base::run_impl, this_),
+                "task_base::async");
+        }
+
+// #define HPX_LCOS_TASK_FWD_REF_PARAMS(Z, N, D)                                 \
+//     BOOST_FWD_REF(BOOST_PP_CAT(A, N)) BOOST_PP_CAT(a, N)                      \
+// /**/
+// #define HPX_LCOS_TASK_FWD_PARAMS(Z, N, D)                                     \
+//     boost::forward<BOOST_PP_CAT(D, N)>(BOOST_PP_CAT(a, N))                    \
+// /**/
+//
+// #define HPX_LCOS_TASK_RUN(Z, N, D)                                            \
+//     template <BOOST_PP_ENUM_PARAMS(N, typename A)>                            \
+//     void run()(BOOST_PP_ENUM(N, HPX_LCOS_TASK_FWD_REF_PARAMS, _))             \
+//     {                                                                         \
+//         check_started();                                                      \
+//         future_base_type this_(this);                                         \
+//         applier::register_thread_plain(                                       \
+//             HPX_STD_BIND(&task_base::run_impl, this_,                         \
+//                 BOOST_PP_ENUM(N, HPX_LCOS_TASK_FWD_PARAMS, _)),               \
+//             "task_base::run");                                                \
+//     }                                                                         \
+//     /**/
+//
+//         BOOST_PP_REPEAT_FROM_TO(
+//             1
+//           , HPX_FUNCTION_LIMIT
+//           , HPX_LCOS_TASK_RUN, _
+//         )
+//
+// #undef HPX_LCOS_TASK_RUN
+// #undef HPX_LCOS_TASK_FWD_PARAMS
+// #undef HPX_LCOS_TASK_FWD_REF_PARAMS
+
+    private:
+        struct reset_id
+        {
+            reset_id(task_base& target)
+              : target_(target)
+            {
+                target.set_id(threads::get_self().get_thread_id());
+            }
+            ~reset_id()
+            {
+                target_.set_id(threads::invalid_thread_id);
+            }
+            task_base& target_;
+        };
+
+    protected:
+        threads::thread_state_enum run_impl()
+        {
+            reset_id r(*this);
             this->do_run();
             return threads::terminated;
         }
 
+    public:
         void deleting_owner()
         {
             typename mutex_type::scoped_lock l(this->mtx_);
             if (!started_) {
                 started_ = true;
+                l.unlock();
                 this->set_error(broken_task, "task_base::deleting_owner",
-                    "deleting task owner before future has been executed");
+                    "deleting task owner before future has become ready");
             }
+        }
+
+        template <typename T>
+        void set_data(BOOST_FWD_REF(T) result)
+        {
+            started_ = true;
+            this->future_data<Result>::set_data(boost::forward<T>(result));
+        }
+
+        void set_exception(boost::exception_ptr const& e)
+        {
+            started_ = true;
+            this->future_data<Result>::set_exception(e);
         }
 
         virtual void do_run() = 0;
@@ -439,6 +527,8 @@ namespace hpx { namespace lcos { namespace detail
                     threads::interrupt_thread(id_);
 
                     this->started_ = true;
+
+                    l.unlock();
                     this->set_error(thread_interrupted,
                         "task_base<Result>::cancel",
                         "future has been canceled");

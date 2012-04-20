@@ -196,6 +196,19 @@ namespace hpx { namespace threads
         return app->get_thread_manager().add_thread_exit_callback(id, f, ec);
     }
 
+    void free_thread_exit_callbacks(thread_id_type id, error_code& ec)
+    {
+        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
+        if (NULL == app)
+        {
+            HPX_THROWS_IF(ec, invalid_status,
+                "hpx::threads::add_thread_exit_callback",
+                "global applier object is not accessible");
+            return;
+        }
+        app->get_thread_manager().free_thread_exit_callbacks(id, ec);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     std::string get_thread_description(thread_id_type id, error_code& ec)
     {

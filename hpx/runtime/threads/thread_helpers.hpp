@@ -203,6 +203,9 @@ namespace hpx { namespace threads
 
     HPX_API_EXPORT bool add_thread_exit_callback(thread_id_type id,
         HPX_STD_FUNCTION<void()> const& f, error_code& ec = throws);
+
+    HPX_API_EXPORT void free_thread_exit_callbacks(thread_id_type id,
+        error_code& ec = throws);
 }}
 
 namespace hpx { namespace this_thread

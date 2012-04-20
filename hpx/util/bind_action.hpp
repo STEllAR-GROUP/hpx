@@ -16,6 +16,9 @@
 #include <hpx/include/async.hpp>
 
 #include <boost/serialization/serialization.hpp>
+#include <boost/preprocessor/enum.hpp>
+#include <boost/preprocessor/enum_params.hpp>
+#include <boost/preprocessor/iterate.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_UTIL_BIND_FWD_REF_PARAMS(Z, N, D)                                 \

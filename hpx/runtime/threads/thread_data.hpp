@@ -761,6 +761,12 @@ namespace hpx { namespace threads
             if (t) t->run_thread_exit_callbacks();
         }
 
+        void free_thread_exit_callbacks()
+        {
+            detail::thread_data* t = get();
+            if (t) t->free_thread_exit_callbacks();
+        }
+
         ///////////////////////////////////////////////////////////////////////
         void set_marked_state(thread_state mark) const
         {

@@ -18,11 +18,16 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     namespace local
     {
-        template <typename Result>
-        class promise;
+        template <typename Result> class promise;
+        template <typename Result> class packaged_task;
 
         template <typename ContResult, typename Result>
         class packaged_continuation;
+
+        namespace detail
+        {
+            template <typename ContResult> struct continuation_base;
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -44,8 +49,11 @@ namespace hpx { namespace lcos
         {}
 
         friend class local::promise<Result>;
+        friend class local::packaged_task<Result>;
         template <typename ContResult, typename Result_>
-        friend class packaged_continuation;
+        friend class local::packaged_continuation;
+        template <typename ContResult>
+        friend struct local::detail::continuation_base;
 
         friend class promise<Result, RemoteResult>;
         friend class hpx::thread;
@@ -93,6 +101,12 @@ namespace hpx { namespace lcos
         // retrieving the value
         Result get(error_code& ec = throws) const
         {
+            if (!future_data_) {
+                HPX_THROWS_IF(ec, future_uninitialized,
+                    "future<Result, Remoteresult>::get",
+                    "this future has not been initialized");
+                return Result();
+            }
             return future_data_->get_data(ec);
         }
 
@@ -104,17 +118,17 @@ namespace hpx { namespace lcos
         // state introspection
         bool is_ready() const
         {
-            return future_data_->is_ready();
+            return future_data_ && future_data_->is_ready();
         }
 
         bool has_value() const
         {
-            return future_data_->has_value();
+            return future_data_ && future_data_->has_value();
         }
 
         bool has_exception() const
         {
-            return future_data_->has_exception();
+            return future_data_ && future_data_->has_exception();
         }
 
         future_state::state get_state() const
@@ -141,6 +155,12 @@ namespace hpx { namespace lcos
         future<typename boost::result_of<F()>::type>
         when(BOOST_FWD_REF(F) f);
 
+        // reset any pending continuation function
+        void when()
+        {
+            future_data_->reset_on_completed();
+        }
+
     private:
         boost::intrusive_ptr<future_data_type> future_data_;
     };
@@ -164,6 +184,12 @@ namespace hpx { namespace lcos
         {}
 
         friend class local::promise<void>;
+        friend class local::packaged_task<void>;
+        template <typename ContResult, typename Result_>
+        friend class local::packaged_continuation;
+        template <typename ContResult>
+        friend struct local::detail::continuation_base;
+
         friend class promise<void, util::unused_type>;
         friend class hpx::thread;
         friend struct detail::future_data<void, util::unused_type>;
@@ -252,10 +278,21 @@ namespace hpx { namespace lcos
             future_data_->cancel();
         }
 
+        bool valid() const BOOST_NOEXCEPT
+        {
+            return future_data_;
+        }
+
         // continuation support
         template <typename F>
         future<typename boost::result_of<F()>::type>
         when(BOOST_FWD_REF(F) f);
+
+        // reset any pending continuation function
+        void when()
+        {
+            future_data_->reset_on_completed();
+        }
 
     private:
         boost::intrusive_ptr<future_data_type> future_data_;
