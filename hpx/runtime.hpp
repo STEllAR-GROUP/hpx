@@ -561,6 +561,13 @@ namespace hpx
         components::server::runtime_support runtime_support_;
         boost::signals2::scoped_connection default_error_sink_;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Keep the factory object alive which is responsible for the given
+    /// component type. This a purely internal function allowing to work
+    /// around certain library specific problems related to dynamic
+    /// loading of external libraries.
+    HPX_EXPORT bool keep_factory_alive(components::component_type type);
 }   // namespace hpx
 
 #include <hpx/config/warnings_suffix.hpp>
