@@ -36,7 +36,7 @@ namespace hpx { namespace components
 
         /// \brief Return any startup function for this component
         ///
-        /// \param shutdown  [in, out] The module is expected to fill this
+        /// \param shutdown [in, out] The module is expected to fill this
         ///                 function object with a reference to a startup
         ///                 function. This function will be executed by the
         ///                 runtime system during system startup.
