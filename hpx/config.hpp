@@ -77,8 +77,9 @@
 #  define HPX_FUNCTION_LIMIT 7
 #endif
 
-#if (HPX_FUNCTION_LIMIT+3) < HPX_ACTION_ARGUMENT_LIMIT
-#  error "The specified HPX_FUNCTION_LIMIT (default is 10) has to be larger than HPX_ACTION_ARGUMENT_LIMIT by at least 3."
+#if HPX_FUNCTION_LIMIT < (HPX_ACTION_ARGUMENT_LIMIT + 3)
+#  undef HPX_FUNCTION_LIMIT
+#  define HPX_FUNCTION_LIMIT BOOST_PP_ADD(HPX_ACTION_ARGUMENT_LIMIT, 3)
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
