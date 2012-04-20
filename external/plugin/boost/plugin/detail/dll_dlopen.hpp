@@ -254,6 +254,7 @@ namespace boost { namespace plugin {
                     std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str)));
             }
             ::dlerror();                // Clear the error state.
+            return directory;
         }
 
     protected:
