@@ -943,16 +943,16 @@ namespace hpx { namespace components { namespace server
             boost::plugin::plugin_factory<component_factory_base> pf (d,
                 BOOST_PP_STRINGIZE(HPX_MANGLE_COMPONENT_NAME(factory)));
 
-            // initialize the factory instance using the preferences from the
-            // ini files
-            util::section const* glob_ini = NULL;
-            if (ini.has_section("settings"))
-                glob_ini = ini.get_section("settings");
-
             util::section const* component_ini = NULL;
             std::string component_section("hpx.components." + instance);
             if (ini.has_section(component_section))
                 component_ini = ini.get_section(component_section);
+
+            // initialize the factory instance using the preferences from the
+            // ini files
+            util::section const* glob_ini = NULL;
+            if (component_ini->has_section("settings"))
+                glob_ini = component_ini->get_section("settings");
 
             // create the component factory object
             boost::shared_ptr<component_factory_base> factory (
