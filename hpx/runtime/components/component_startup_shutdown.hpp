@@ -16,7 +16,7 @@ namespace hpx { namespace components
     /// The \a component_startup_shutdown class provides a minimal
     /// implementation of a component's startup/shutdown function provider.
     template <bool(*Startup)(HPX_STD_FUNCTION<void()>&),
-        bool(*Shutdown)(HPX_STD_FUNCTION<void()>&)>    
+        bool(*Shutdown)(HPX_STD_FUNCTION<void()>&)>
     struct component_startup_shutdown : public component_startup_shutdown_base
     {
         ///
@@ -54,7 +54,7 @@ namespace hpx { namespace components
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_DEFINE_COMPONENT_STARTUP_SHUTDOWN(startup_, shutdown_)            \
-    namespace hpx { namespace components { namespace startup_shutdown_provider\
+    namespace hpx { namespace components { namespace startup_shutdown_provider \
     {                                                                         \
         bool BOOST_PP_CAT(HPX_COMPONENT_LIB_NAME, _startup)                   \
             (HPX_STD_FUNCTION<void()>& startup_func)                          \
@@ -79,13 +79,15 @@ namespace hpx { namespace components
 #define HPX_REGISTER_STARTUP_SHUTDOWN_MODULE(startup, shutdown)               \
     HPX_REGISTER_STARTUP_SHUTDOWN_FUNCTIONS()                                 \
     HPX_DEFINE_COMPONENT_STARTUP_SHUTDOWN(startup, shutdown)                  \
-    namespace hpx { namespace components { namespace startup_shutdown_provider\
+    namespace hpx { namespace components { namespace startup_shutdown_provider \
     {                                                                         \
         typedef component_startup_shutdown<                                   \
             BOOST_PP_CAT(HPX_COMPONENT_LIB_NAME, _startup),                   \
             BOOST_PP_CAT(HPX_COMPONENT_LIB_NAME, _shutdown)                   \
         > BOOST_PP_CAT(HPX_COMPONENT_LIB_NAME, _provider);                    \
-    }                                                                         \
+    }}}                                                                       \
+    namespace hpx { namespace components                                      \
+    {                                                                         \
         template struct component_startup_shutdown<                           \
             startup_shutdown_provider::                                       \
                 BOOST_PP_CAT(HPX_COMPONENT_LIB_NAME, _startup),               \

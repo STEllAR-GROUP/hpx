@@ -104,11 +104,12 @@ namespace hpx { namespace components
                     this_type = (component_type)
                         agas_client.register_factory(locality, get_component_name());
 
-                    if (component_invalid == this_type)
+                    if (component_invalid == this_type) {
                         HPX_THROW_EXCEPTION(duplicate_component_id,
                             "component_factory::get_component_type",
                             "the component name " + get_component_name() +
                             " is already in use");
+                    }
                 }
                 else {
                     this_type = (component_type)
