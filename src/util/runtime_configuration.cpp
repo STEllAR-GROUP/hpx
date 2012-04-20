@@ -9,6 +9,7 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/init_ini_data.hpp>
 #include <hpx/util/itt_notify.hpp>
+#include <hpx/util/find_prefix.hpp>
 
 #include <boost/assign/std/vector.hpp>
 #include <boost/preprocessor/stringize.hpp>
@@ -41,7 +42,7 @@ namespace hpx { namespace util
             // create system and application instance specific entries
             "[system]",
             "pid = " + boost::lexical_cast<std::string>(getpid()),
-            "prefix = " HPX_PREFIX,
+            "prefix = " + find_prefix(),
 
             // create default installation location and logging settings
             "[hpx]",
