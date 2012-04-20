@@ -328,7 +328,8 @@ namespace hpx
 
     /// Add a function to be executed inside a HPX thread during hpx::finalize
     HPX_API_EXPORT void register_shutdown_function(shutdown_function_type const&);
-
+    
+    ///////////////////////////////////////////////////////////////////////////
     template <
         typename SchedulingPolicy,
         typename NotificationPolicy = threads::policies::callback_notifier>
@@ -458,6 +459,12 @@ namespace hpx
 
     HPX_EXPORT components::server::runtime_support* get_runtime_support_ptr();
 
+    ///////////////////////////////////////////////////////////////////////////
+    /// Keep the factory object alive which is responsible for the given
+    /// component type. This a purely internal function allowing to work
+    /// around certain library specific problems related to dynamic
+    /// loading of external libraries.
+    HPX_EXPORT bool keep_factory_alive(components::component_type type);
 
     /// \namespace lcos
     namespace lcos

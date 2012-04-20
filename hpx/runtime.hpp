@@ -181,6 +181,10 @@ namespace hpx
 
         virtual void add_shutdown_function(HPX_STD_FUNCTION<void()> const& f) = 0;
 
+        /// Keep the factory object alive which is responsible for the given
+        /// component type. This a purely internal function allowing to work
+        /// around certain library specific problems related to dynamic
+        /// loading of external libraries.
         virtual bool keep_factory_alive(components::component_type type) = 0;
 
     protected:
@@ -531,10 +535,6 @@ namespace hpx
         ///             application (uninstall performance counters, etc.)
         void add_shutdown_function(HPX_STD_FUNCTION<void()> const& f);
 
-        /// Keep the factory object alive which is responsible for the given
-        /// component type. This a purely internal function allowing to work
-        /// around certain compiler specific problems related to dynamic
-        /// loading of external libraries.
         bool keep_factory_alive(components::component_type type);
 
     private:
@@ -561,14 +561,6 @@ namespace hpx
         components::server::runtime_support runtime_support_;
         boost::signals2::scoped_connection default_error_sink_;
     };
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// Keep the factory object alive which is responsible for the given
-    /// component type. This a purely internal function allowing to work
-    /// around certain compiler specific problems related to dynamic
-    /// loading of external libraries.
-    HPX_EXPORT bool keep_factory_alive(components::component_type type);
-
 }   // namespace hpx
 
 #include <hpx/config/warnings_suffix.hpp>
