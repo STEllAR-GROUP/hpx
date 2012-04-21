@@ -28,7 +28,12 @@ if(DOXYGEN_FOUND)
   set(documentation_dependencies ${documentation_dependencies}
       ${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc.xml)
 
-  file(GLOB_RECURSE doxygen_dependencies ${hpx_SOURCE_DIR}/hpx/*.hpp)
+  # Add all files here which should be passed to doxygen
+  set(doxygen_inputs_list
+      ${hpx_SOURCE_DIR}/hpx/hpx_fwd.hpp)
+
+#  file(GLOB_RECURSE doxygen_dependencies ${hpx_SOURCE_DIR}/hpx/*.hpp)
+  set(doxygen_dependencies ${doxygen_inputs_list})
 
   # Generate Doxygen from the source code.
   hpx_source_to_boostbook(hpx_autodoc

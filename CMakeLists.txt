@@ -1217,8 +1217,9 @@ if(NOT HPX_NO_INSTALL)
 endif()
 
 if(DOXYGEN_FOUND)
-  file(GLOB_RECURSE doxygen_inputs_list ${hpx_SOURCE_DIR}/hpx/*.hpp)
+#  file(GLOB_RECURSE doxygen_inputs_list ${hpx_SOURCE_DIR}/hpx/*.hpp)
 
+  # the list of files to pass to doxygen is defined in docs/CMakeLists.txt
   set(doxygen_inputs "")
 
   foreach(doxygen_input ${doxygen_inputs_list})

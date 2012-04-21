@@ -76,9 +76,9 @@ action:
   function to start running, instead it is a fully asynchronous operation.
   The following example shows how to apply the action from above on the local
   locality:
-
+``
       hpx::apply<some_global_action>(hpx::find_here());
-
+``
   (the function `hpx::find_here()` returns the id of the local locality (the
   locality this code is executed on).
 

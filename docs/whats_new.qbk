@@ -16,6 +16,10 @@
 
 This is a point release including important bug fixes for __0_8_0__.
 
+[heading General Changes]
+
+* HPX does not need to be installed anymore to be functional.
+
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the important tickets we closed for this point release:
@@ -87,7 +91,7 @@ approximately 70 tickets (bugs, feature requests, etc.).
   simultaneous connections to a particular host is now limited. Parcels are
   buffered and bundled if all connections are in use.
 * Added more refined thread affinity control. This is based on the external
-  library __hwloc__. 
+  library __hwloc__.
 * Improved support for Windows builds with CMake.
 * Added support for components to register their own command line options.
 * Added the possibility to register custom startup/shutdown functions for
