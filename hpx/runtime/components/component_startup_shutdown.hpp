@@ -103,5 +103,10 @@ namespace hpx { namespace components
             startup, HPX_NULL_STARTUP_SHUTDOWN_PTR)                           \
     /**/
 
+#define HPX_REGISTER_SHUTDOWN_MODULE(shutdown)                                \
+        HPX_REGISTER_STARTUP_SHUTDOWN_MODULE(                                 \
+            HPX_NULL_STARTUP_SHUTDOWN_PTR, shutdown)                          \
+    /**/
+
 #endif // HPX_A7F46A4F_9AF9_4909_B0D8_5304FEFC5649
 

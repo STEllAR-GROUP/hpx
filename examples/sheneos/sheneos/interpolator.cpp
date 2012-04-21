@@ -6,11 +6,12 @@
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
+#include <hpx/runtime/components/component_startup_shutdown.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
-#include <hpx/lcos/async.hpp>
-#include <hpx/lcos/async_future_wait.hpp>
+#include <hpx/lcos/future_wait.hpp>
 #include <hpx/lcos/local/async.hpp>
+#include <hpx/lcos/local/packaged_task.hpp>
 
 #include <boost/foreach.hpp>
 #include <boost/assert.hpp>
@@ -20,6 +21,8 @@
 #include "read_values.hpp"
 #include "partition3d.hpp"
 #include "interpolator.hpp"
+
+#include <H5public.h>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality.
@@ -31,6 +34,30 @@ HPX_DEFINE_GET_COMPONENT_TYPE(partition_client_type);
 
 typedef sheneos::configuration configuration_client_type;
 HPX_DEFINE_GET_COMPONENT_TYPE(configuration_client_type);
+
+///////////////////////////////////////////////////////////////////////////////
+// Register a shutdown function which will be called as a px-thread during
+// runtime shutdown.
+namespace sheneos
+{
+    ///////////////////////////////////////////////////////////////////////////
+    // This function will be registered as a shutdown function for HPX below.
+    void shutdown()
+    {
+        // Because of problems while dynamically loading/unloading the HDF5
+        // libraries we need to manually call the HDF5 termination routines. 
+        ::H5close();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    bool get_shutdown(HPX_STD_FUNCTION<void()>& shutdown_func)
+    {
+        // return our shutdown-function if performance counters are required
+        shutdown_func = shutdown;
+        return true;
+    }
+}
+HPX_REGISTER_SHUTDOWN_MODULE(::sheneos::get_shutdown);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Interpolation client.
