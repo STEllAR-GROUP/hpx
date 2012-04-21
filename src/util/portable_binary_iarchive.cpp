@@ -99,6 +99,11 @@ portable_binary_iarchive::load_override(boost::archive::class_name_type& t, int)
     t.t[cn.size()] = '\0';
 }
 
+#ifdef __GNUG__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif
+
 HPX_ALWAYS_EXPORT void portable_binary_iarchive::init(unsigned int flags)
 {
     if (0 == (flags & boost::archive::no_header))
@@ -118,19 +123,11 @@ HPX_ALWAYS_EXPORT void portable_binary_iarchive::init(unsigned int flags)
         *this >> input_library_version;
 
         // extra little .t is to get around borland quirk
-#ifdef __GNUG__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
-#endif
         if (boost::archive::BOOST_ARCHIVE_VERSION() < input_library_version) {
             BOOST_THROW_EXCEPTION(
                 boost::archive::archive_exception(
                     boost::archive::archive_exception::unsupported_version));
         }
-#ifdef __GNUG__
-#pragma GCC diagnostic pop
-#endif
-
 #if BOOST_WORKAROUND(__MWERKS__, BOOST_TESTED_AT(0x3205))
         this->set_library_version(input_library_version);
         boost::archive::detail::basic_iarchive::set_library_version(
@@ -142,6 +139,10 @@ HPX_ALWAYS_EXPORT void portable_binary_iarchive::init(unsigned int flags)
     load(x);
     m_flags = static_cast<unsigned int>(x << CHAR_BIT);
 }
+#ifdef __GNUG__
+#pragma GCC diagnostic pop
+#endif
+
 
 }}
 

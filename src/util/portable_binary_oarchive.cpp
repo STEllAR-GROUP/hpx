@@ -80,6 +80,10 @@ portable_binary_oarchive::save_impl(const boost::intmax_t l, const char maxsize)
     this->primitive_base_t::save_binary(cptr, static_cast<std::size_t>(size));
 }
 
+#ifdef __GNUG__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif
 HPX_ALWAYS_EXPORT void portable_binary_oarchive::init(unsigned int flags)
 {
     if (m_flags == (endian_big | endian_little)) {
@@ -94,19 +98,15 @@ HPX_ALWAYS_EXPORT void portable_binary_oarchive::init(unsigned int flags)
         *this << file_signature;
 
         // write library version
-#ifdef __GNUG__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
-#endif
         const boost::archive::version_type v(
             boost::archive::BOOST_ARCHIVE_VERSION());
-#ifdef __GNUG__
-#pragma GCC diagnostic pop
-#endif
         *this << v;
     }
     save(static_cast<unsigned char>(m_flags >> CHAR_BIT));
 }
+#ifdef __GNUG__
+#pragma GCC diagnostic pop
+#endif
 
 }}
 
