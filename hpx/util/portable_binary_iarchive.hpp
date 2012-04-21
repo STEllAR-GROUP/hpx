@@ -130,20 +130,20 @@ protected:
     load_impl(boost::intmax_t & l, char maxsize);
 
     // default fall through for any types not specified here
+#ifdef __GNUG__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+#endif
     template<class T>
     void load(T & t) {
         boost::intmax_t l = 0;
         load_impl(l, sizeof(T));
         // use cast to avoid compile time warning
-#ifdef __GNUG__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wsign-conversion"
-#endif
         t = static_cast<T>(l);
+    }
 #ifdef __GNUG__
 #pragma GCC diagnostic pop
 #endif
-    }
     void load(std::string & t) {
         this->primitive_base_t::load(t);
     }
