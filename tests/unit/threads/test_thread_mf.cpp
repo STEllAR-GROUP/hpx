@@ -6,7 +6,7 @@
 //  http://www.boost.org/LICENSE_1_0.txt
 
 #define HPX_ACTION_ARGUMENT_LIMIT 10
-#define HPX_FUNCTION_LIMIT 10
+#define HPX_FUNCTION_LIMIT 13
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/threadmanager.hpp>
