@@ -18,7 +18,7 @@
 #include <sys/syscall.h>
 #include <sys/types.h>
 
-namespace hpx { namespace threads 
+namespace hpx { namespace threads
 {
 
 struct topology
@@ -61,6 +61,16 @@ struct topology
     void set_thread_affinity(
         boost::thread& thrd
       , std::size_t num_thread
+      , bool numa_sensitive
+      , error_code& ec = throws
+        ) const
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
+    }
+
+    void set_thread_affinity(
+        std::size_t num_thread
       , bool numa_sensitive
       , error_code& ec = throws
         ) const
