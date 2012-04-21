@@ -1168,100 +1168,229 @@ void test_wait_for_either_of_five_futures_5()
 //     }
 // }
 
-// void test_wait_for_all_from_range()
-// {
-//     unsigned const count = 10;
-//     hpx::lcos::future<int> futures[count];
-//     for(unsigned j = 0; j < count; ++j)
-//     {
-//         hpx::lcos::local::packaged_task<int> task(make_int_slowly);
-//         futures[j] = task.get_future();
-//         hpx::thread t(boost::move(task));
-//     }
-//
-//     boost::wait_for_all(futures,futures+count);
-//
-//     for(unsigned j = 0; j < count; ++j)
-//     {
-//         HPX_TEST(futures[j].is_ready());
-//     }
-// }
+void test_wait_for_all_from_list()
+{
+    unsigned const count = 10;
+    std::vector<hpx::lcos::future<int> > futures;
+    for (unsigned j = 0; j < count; ++j)
+    {
+        hpx::lcos::local::packaged_task<int> task(make_int_slowly);
+        futures.push_back(task.get_future());
+        task.async();
+    }
 
-// void test_wait_for_all_two_futures()
-// {
-//     unsigned const count = 2;
-//     hpx::lcos::future<int> futures[count];
-//     for(unsigned j = 0; j < count; ++j)
-//     {
-//         hpx::lcos::local::packaged_task<int> task(make_int_slowly);
-//         futures[j]=task.get_future();
-//         hpx::thread t(boost::move(task));
-//     }
-//
-//     boost::wait_for_all(futures[0],futures[1]);
-//
-//     for(unsigned j = 0; j < count; ++j)
-//     {
-//         HPX_TEST(futures[j].is_ready());
-//     }
-// }
+    hpx::lcos::future<std::vector<hpx::lcos::future<int> > > r =
+        hpx::wait_all(futures);
 
-// void test_wait_for_all_three_futures()
-// {
-//     unsigned const count=3;
-//     hpx::lcos::future<int> futures[count];
-//     for(unsigned j = 0; j < count; ++j)
-//     {
-//         hpx::lcos::local::packaged_task<int> task(make_int_slowly);
-//         futures[j]=task.get_future();
-//         hpx::thread t(boost::move(task));
-//     }
-//
-//     boost::wait_for_all(futures[0],futures[1],futures[2]);
-//
-//     for(unsigned j = 0; j < count; ++j)
-//     {
-//         HPX_TEST(futures[j].is_ready());
-//     }
-// }
+    std::vector<hpx::lcos::future<int> > result = r.get();
 
-// void test_wait_for_all_four_futures()
-// {
-//     unsigned const count=4;
-//     hpx::lcos::future<int> futures[count];
-//     for(unsigned j = 0; j < count; ++j)
-//     {
-//         hpx::lcos::local::packaged_task<int> task(make_int_slowly);
-//         futures[j]=task.get_future();
-//         hpx::thread t(boost::move(task));
-//     }
-//
-//     boost::wait_for_all(futures[0],futures[1],futures[2],futures[3]);
-//
-//     for(unsigned j = 0; j < count; ++j)
-//     {
-//         HPX_TEST(futures[j].is_ready());
-//     }
-// }
+    HPX_TEST_EQ(futures.size(), result.size());
+    for (unsigned j = 0; j < count; ++j)
+    {
+        HPX_TEST(futures[j].is_ready());
+        HPX_TEST(result[j].is_ready());
+    }
+}
 
-// void test_wait_for_all_five_futures()
-// {
-//     unsigned const count=5;
-//     hpx::lcos::future<int> futures[count];
-//     for(unsigned j = 0; j < count; ++j)
-//     {
-//         hpx::lcos::local::packaged_task<int> task(make_int_slowly);
-//         futures[j]=task.get_future();
-//         hpx::thread t(boost::move(task));
-//     }
-//
-//     boost::wait_for_all(futures[0],futures[1],futures[2],futures[3],futures[4]);
-//
-//     for(unsigned j = 0; j < count; ++j)
-//     {
-//         HPX_TEST(futures[j].is_ready());
-//     }
-// }
+void test_wait_for_all_two_futures()
+{
+    unsigned const count = 2;
+
+    hpx::lcos::local::packaged_task<int> pt1(make_int_slowly);
+    hpx::lcos::future<int> f1 = pt1.get_future();
+    pt1.async();
+    hpx::lcos::local::packaged_task<int> pt2(make_int_slowly);
+    hpx::lcos::future<int> f2 = pt2.get_future();
+    pt2.async();
+
+    hpx::lcos::future<std::vector<hpx::lcos::future<int> > > r =
+        hpx::wait_all(f1, f2);
+
+    std::vector<hpx::lcos::future<int> > result = r.get();
+
+    HPX_TEST_EQ(result.size(), count);
+    for (unsigned j = 0; j < count; ++j)
+    {
+        HPX_TEST(result[j].is_ready());
+    }
+    HPX_TEST(f1.is_ready());
+    HPX_TEST(f2.is_ready());
+}
+
+void test_wait_for_all_three_futures()
+{
+    unsigned const count = 3;
+
+    hpx::lcos::local::packaged_task<int> pt1(make_int_slowly);
+    hpx::lcos::future<int> f1 = pt1.get_future();
+    pt1.async();
+    hpx::lcos::local::packaged_task<int> pt2(make_int_slowly);
+    hpx::lcos::future<int> f2 = pt2.get_future();
+    pt2.async();
+    hpx::lcos::local::packaged_task<int> pt3(make_int_slowly);
+    hpx::lcos::future<int> f3 = pt3.get_future();
+    pt3.async();
+
+    hpx::lcos::future<std::vector<hpx::lcos::future<int> > > r =
+        hpx::wait_all(f1, f2, f3);
+
+    std::vector<hpx::lcos::future<int> > result = r.get();
+
+    HPX_TEST_EQ(result.size(), count);
+    for (unsigned j = 0; j < count; ++j)
+    {
+        HPX_TEST(result[j].is_ready());
+    }
+    HPX_TEST(f1.is_ready());
+    HPX_TEST(f2.is_ready());
+    HPX_TEST(f3.is_ready());
+}
+
+void test_wait_for_all_four_futures()
+{
+    unsigned const count = 4;
+
+    hpx::lcos::local::packaged_task<int> pt1(make_int_slowly);
+    hpx::lcos::future<int> f1 = pt1.get_future();
+    pt1.async();
+    hpx::lcos::local::packaged_task<int> pt2(make_int_slowly);
+    hpx::lcos::future<int> f2 = pt2.get_future();
+    pt2.async();
+    hpx::lcos::local::packaged_task<int> pt3(make_int_slowly);
+    hpx::lcos::future<int> f3 = pt3.get_future();
+    pt3.async();
+    hpx::lcos::local::packaged_task<int> pt4(make_int_slowly);
+    hpx::lcos::future<int> f4 = pt4.get_future();
+    pt4.async();
+
+    hpx::lcos::future<std::vector<hpx::lcos::future<int> > > r =
+        hpx::wait_all(f1, f2, f3, f4);
+
+    std::vector<hpx::lcos::future<int> > result = r.get();
+
+    HPX_TEST_EQ(result.size(), count);
+    for (unsigned j = 0; j < count; ++j)
+    {
+        HPX_TEST(result[j].is_ready());
+    }
+    HPX_TEST(f1.is_ready());
+    HPX_TEST(f2.is_ready());
+    HPX_TEST(f3.is_ready());
+    HPX_TEST(f4.is_ready());
+}
+
+void test_wait_for_all_five_futures()
+{
+    unsigned const count = 5;
+
+    hpx::lcos::local::packaged_task<int> pt1(make_int_slowly);
+    hpx::lcos::future<int> f1 = pt1.get_future();
+    pt1.async();
+    hpx::lcos::local::packaged_task<int> pt2(make_int_slowly);
+    hpx::lcos::future<int> f2 = pt2.get_future();
+    pt2.async();
+    hpx::lcos::local::packaged_task<int> pt3(make_int_slowly);
+    hpx::lcos::future<int> f3 = pt3.get_future();
+    pt3.async();
+    hpx::lcos::local::packaged_task<int> pt4(make_int_slowly);
+    hpx::lcos::future<int> f4 = pt4.get_future();
+    pt4.async();
+    hpx::lcos::local::packaged_task<int> pt5(make_int_slowly);
+    hpx::lcos::future<int> f5 = pt5.get_future();
+    pt5.async();
+
+    hpx::lcos::future<std::vector<hpx::lcos::future<int> > > r =
+        hpx::wait_all(f1, f2, f3, f4, f5);
+
+    std::vector<hpx::lcos::future<int> > result = r.get();
+
+    HPX_TEST_EQ(result.size(), count);
+    for (unsigned j = 0; j < count; ++j)
+    {
+        HPX_TEST(result[j].is_ready());
+    }
+    HPX_TEST(f1.is_ready());
+    HPX_TEST(f2.is_ready());
+    HPX_TEST(f3.is_ready());
+    HPX_TEST(f4.is_ready());
+    HPX_TEST(f5.is_ready());
+}
+
+void test_wait_for_two_out_of_five_futures()
+{
+    unsigned const count = 2;
+
+    hpx::lcos::local::packaged_task<int> pt1(make_int_slowly);
+    hpx::lcos::future<int> f1 = pt1.get_future();
+    hpx::lcos::local::packaged_task<int> pt2(make_int_slowly);
+    hpx::lcos::future<int> f2 = pt2.get_future();
+    pt2();
+    hpx::lcos::local::packaged_task<int> pt3(make_int_slowly);
+    hpx::lcos::future<int> f3 = pt3.get_future();
+    hpx::lcos::local::packaged_task<int> pt4(make_int_slowly);
+    hpx::lcos::future<int> f4 = pt4.get_future();
+    pt4();
+    hpx::lcos::local::packaged_task<int> pt5(make_int_slowly);
+    hpx::lcos::future<int> f5 = pt5.get_future();
+
+    typedef std::vector<HPX_STD_TUPLE<int, hpx::lcos::future<int> > > result_type;
+    hpx::lcos::future<result_type> r = hpx::wait_n(count, f1, f2, f3, f4, f5);
+
+    result_type result = r.get();
+
+    HPX_TEST_EQ(result.size(), count);
+    for (unsigned j = 0; j < count; ++j)
+    {
+        HPX_TEST(HPX_STD_GET(1, result[j]).is_ready());
+    }
+    HPX_TEST(!f1.is_ready());
+    HPX_TEST(f2.is_ready());
+    HPX_TEST(!f3.is_ready());
+    HPX_TEST(f4.is_ready());
+    HPX_TEST(!f5.is_ready());
+
+    HPX_TEST_EQ(HPX_STD_GET(0, result[0]), 1);
+    HPX_TEST_EQ(HPX_STD_GET(0, result[1]), 3);
+}
+
+void test_wait_for_three_out_of_five_futures()
+{
+    unsigned const count = 3;
+
+    hpx::lcos::local::packaged_task<int> pt1(make_int_slowly);
+    hpx::lcos::future<int> f1 = pt1.get_future();
+    pt1();
+    hpx::lcos::local::packaged_task<int> pt2(make_int_slowly);
+    hpx::lcos::future<int> f2 = pt2.get_future();
+    hpx::lcos::local::packaged_task<int> pt3(make_int_slowly);
+    hpx::lcos::future<int> f3 = pt3.get_future();
+    pt3();
+    hpx::lcos::local::packaged_task<int> pt4(make_int_slowly);
+    hpx::lcos::future<int> f4 = pt4.get_future();
+    hpx::lcos::local::packaged_task<int> pt5(make_int_slowly);
+    hpx::lcos::future<int> f5 = pt5.get_future();
+    pt5();
+
+    typedef std::vector<HPX_STD_TUPLE<int, hpx::lcos::future<int> > > result_type;
+    hpx::lcos::future<result_type> r = hpx::wait_n(count, f1, f2, f3, f4, f5);
+
+    result_type result = r.get();
+
+    HPX_TEST_EQ(result.size(), count);
+    for (unsigned j = 0; j < count; ++j)
+    {
+        HPX_TEST(HPX_STD_GET(1, result[j]).is_ready());
+    }
+    HPX_TEST(f1.is_ready());
+    HPX_TEST(!f2.is_ready());
+    HPX_TEST(f3.is_ready());
+    HPX_TEST(!f4.is_ready());
+    HPX_TEST(f5.is_ready());
+
+    HPX_TEST_EQ(HPX_STD_GET(0, result[0]), 0);
+    HPX_TEST_EQ(HPX_STD_GET(0, result[1]), 2);
+    HPX_TEST_EQ(HPX_STD_GET(0, result[2]), 4);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 using boost::program_options::variables_map;
@@ -1320,11 +1449,13 @@ int hpx_main(variables_map&)
         test_wait_for_either_of_five_futures_5();
 //         test_wait_for_either_invokes_callbacks();
 //         test_wait_for_any_from_range();
-//         test_wait_for_all_from_range();
-//         test_wait_for_all_two_futures();
-//         test_wait_for_all_three_futures();
-//         test_wait_for_all_four_futures();
-//         test_wait_for_all_five_futures();
+        test_wait_for_all_from_list();
+        test_wait_for_all_two_futures();
+        test_wait_for_all_three_futures();
+        test_wait_for_all_four_futures();
+        test_wait_for_all_five_futures();
+        test_wait_for_two_out_of_five_futures();
+        test_wait_for_three_out_of_five_futures();
     }
 
     hpx::finalize();

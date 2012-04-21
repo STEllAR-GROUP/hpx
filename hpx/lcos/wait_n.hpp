@@ -125,7 +125,7 @@ namespace hpx
                 result.reserve(needed_count_);
                 for (std::size_t i = 0; i < needed_count_; ++i) {
                     result.push_back(HPX_STD_MAKE_TUPLE(
-                        ready_[i], lazy_values_[ready_[i]]));
+                        static_cast<int>(ready_[i]), lazy_values_[ready_[i]]));
                 }
 
                 // reset all pending callback functions
