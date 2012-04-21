@@ -29,6 +29,7 @@ Here is a list of the important tickets we closed for this point release:
 * #384 - Fix compilation with GCC 4.7
 * #386 - Warn about the need to install HPX in the documentation
 * #371 - Add hpx iostreams to standard build
+* #393 - Thread affinity control is broken
 
 [heading Bug Fixes (Commits)]
 
