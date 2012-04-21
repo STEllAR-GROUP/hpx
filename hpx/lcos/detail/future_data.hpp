@@ -422,6 +422,7 @@ namespace hpx { namespace lcos { namespace detail
                 "task_base::async");
         }
 
+#if 0
 // #define HPX_LCOS_TASK_FWD_REF_PARAMS(Z, N, D)                                 \
 //     BOOST_FWD_REF(BOOST_PP_CAT(A, N)) BOOST_PP_CAT(a, N)                      \
 // /**/
@@ -451,6 +452,7 @@ namespace hpx { namespace lcos { namespace detail
 // #undef HPX_LCOS_TASK_RUN
 // #undef HPX_LCOS_TASK_FWD_PARAMS
 // #undef HPX_LCOS_TASK_FWD_REF_PARAMS
+#endif
 
     private:
         struct reset_id

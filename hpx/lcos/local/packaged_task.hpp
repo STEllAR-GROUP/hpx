@@ -375,6 +375,7 @@ namespace hpx { namespace lcos { namespace local
             task_->run();
         }
 
+#if 0
 // #define HPX_LCOS_LOCAL_FWD_REF_PARAMS(Z, N, D)                                \
 //     BOOST_FWD_REF(BOOST_PP_CAT(A, N)) BOOST_PP_CAT(a, N)                      \
 // /**/
@@ -404,6 +405,7 @@ namespace hpx { namespace lcos { namespace local
 // #undef HPX_LCOS_LOCAL_PROMISE_OPERATOR
 // #undef HPX_LCOS_LOCAL_FWD_PARAMS
 // #undef HPX_LCOS_LOCAL_FWD_REF_PARAMS
+#endif
 
         // synchronous execution
         void async()

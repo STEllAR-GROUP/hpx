@@ -45,11 +45,6 @@ namespace hpx
                     ++ready_count_ == lazy_values_.size())
                 {
                     threads::set_thread_state(id, threads::pending);
-
-                    // reset all pending callback functions
-                    l.unlock();
-                    for (std::size_t i = 0; i < lazy_values_.size(); ++i)
-                        lazy_values_[i].when();
                 }
             }
 
@@ -80,8 +75,8 @@ namespace hpx
             wait_all& operator= (BOOST_RV_REF(wait_all) rhs)
             {
                 if (this != &rhs) {
-                    mutex_type::scoped_lock l(mtx_);
-                    mutex_type::scoped_lock l(rhs.mtx_);
+                    mutex_type::scoped_lock l1(mtx_);
+                    mutex_type::scoped_lock l2(rhs.mtx_);
                     lazy_values_ = boost::move(rhs.lazy_values_);
                     ready_count_ = rhs.ready_count_;
                     rhs.ready_count_ = 0;
@@ -120,6 +115,11 @@ namespace hpx
 
                 // all futures should be ready
                 BOOST_ASSERT(ready_count_ == lazy_values_.size());
+
+              // reset all pending callback functions
+              l.unlock();
+              for (std::size_t i = 0; i < lazy_values_.size(); ++i)
+                  lazy_values_[i].when();
 
                 return lazy_values_;
             }

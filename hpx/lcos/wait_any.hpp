@@ -44,11 +44,6 @@ namespace hpx
                 if (index_ == -1) {
                     index_ = static_cast<int>(idx);
                     threads::set_thread_state(id, threads::pending);
-
-                    // reset all pending callback functions
-                    l.unlock();
-                    for (std::size_t i = 0; i < lazy_values_.size(); ++i)
-                        lazy_values_[i].when();
                 }
             }
 
@@ -76,8 +71,8 @@ namespace hpx
             wait_any& operator= (BOOST_RV_REF(wait_any) rhs)
             {
                 if (this != &rhs) {
-                    mutex_type::scoped_lock l(mtx_);
-                    mutex_type::scoped_lock l(rhs.mtx_);
+                    mutex_type::scoped_lock l1(mtx_);
+                    mutex_type::scoped_lock l2(rhs.mtx_);
                     lazy_values_ = boost::move(rhs.lazy_values_);
                     index_ = rhs.index_;
                     rhs.index_ = -1;
@@ -114,6 +109,11 @@ namespace hpx
                 }
 
                 BOOST_ASSERT(index_ != -1);       // that should not happen
+
+                // reset all pending callback functions
+                l.unlock();
+                for (std::size_t i = 0; i < lazy_values_.size(); ++i)
+                    lazy_values_[i].when();
 
                 return result_type(index_, lazy_values_[index_]);
             }

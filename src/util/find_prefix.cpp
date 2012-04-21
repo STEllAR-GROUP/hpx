@@ -28,8 +28,8 @@ namespace hpx { namespace util
 
             if (prefix.empty())
                 return HPX_PREFIX;
-            else
-                return prefix;
+
+            return prefix;
         }
         catch (std::logic_error const&) {
             ;   // just ignore loader problems

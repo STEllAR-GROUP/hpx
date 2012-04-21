@@ -41,16 +41,11 @@ namespace hpx
             void on_future_ready(std::size_t idx, threads::thread_id_type id)
             {
                 mutex_type::scoped_lock l(mtx_);
-                if (ready_count_ != needed_count_) {
+                if (ready_.size() != needed_count_) {
                     ready_.push_back(idx);
                     if (ready_.size() == needed_count_)
                     {
                         threads::set_thread_state(id, threads::pending);
-
-                        // reset all pending callback functions
-                        l.unlock();
-                        for (std::size_t i = 0; i < lazy_values_.size(); ++i)
-                            lazy_values_[i].when();
                     }
                 }
             }
@@ -84,8 +79,8 @@ namespace hpx
             wait_n& operator= (BOOST_RV_REF(wait_n) rhs)
             {
                 if (this != &rhs) {
-                    mutex_type::scoped_lock l(mtx_);
-                    mutex_type::scoped_lock l(rhs.mtx_);
+                    mutex_type::scoped_lock l1(mtx_);
+                    mutex_type::scoped_lock l2(rhs.mtx_);
                     lazy_values_ = boost::move(rhs.lazy_values_);
                     ready_ = boost::move(rhs.ready_);
                     needed_count_ = rhs.needed_count_;
@@ -98,7 +93,7 @@ namespace hpx
             result_type operator()()
             {
                 mutex_type::scoped_lock l(mtx_);
-                ready_.erase();
+                ready_.clear();
 
                 {
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
@@ -132,6 +127,12 @@ namespace hpx
                     result.push_back(HPX_STD_MAKE_TUPLE(
                         ready_[i], lazy_values_[ready_[i]]));
                 }
+
+                // reset all pending callback functions
+                l.unlock();
+                for (std::size_t i = 0; i < lazy_values_.size(); ++i)
+                    lazy_values_[i].when();
+
                 return result;
             }
 

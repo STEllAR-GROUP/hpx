@@ -52,7 +52,7 @@ namespace hpx { namespace lcos { namespace detail
             {
                 target_.set_id(threads::invalid_thread_id);
             }
-            task_base& target_;
+            continuation_base& target_;
         };
 
     public:
