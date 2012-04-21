@@ -137,7 +137,16 @@ listed below.
 
 [important The C++ HDF5 libraries must be compiled with enabled threadsafety
            support. This has to be explicitly specified while configuring
-           the HDF5 libraries as it is not the default.]
+           the HDF5 libraries as it is not the default. Additionally, you must
+           set the following environment variables before configuring the HDF5
+           libraries (this part only needs to be done on Linux):
+
+           [teletype]
+           ``
+               $ export CFLAGS='-DHDatexit=""'
+               $ export CPPFLAGS='-DHDatexit=""'
+           ``
+           ]
 
 [endsect] [/ Prerequisites]
 
