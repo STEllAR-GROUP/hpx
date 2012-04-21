@@ -22,7 +22,6 @@ using hpx::agas::server::symbol_namespace;
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_EX(
     hpx::components::fixed_component<symbol_namespace>,
     symbol_namespace, true);
-
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     symbol_namespace, component_agas_symbol_namespace);
 

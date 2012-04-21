@@ -25,7 +25,6 @@ typedef hpx::components::managed_component<
 > ep_point_type;
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(ep_point_type, ep_point);
-HPX_DEFINE_GET_COMPONENT_TYPE(ep_point_type::wrapped_type);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION_EX(

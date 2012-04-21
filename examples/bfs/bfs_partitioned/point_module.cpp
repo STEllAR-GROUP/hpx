@@ -25,7 +25,6 @@ typedef hpx::components::managed_component<
 > bfs_point_type;
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(bfs_point_type, bfs_point);
-HPX_DEFINE_GET_COMPONENT_TYPE(bfs_point_type::wrapped_type);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION_EX(

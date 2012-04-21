@@ -26,5 +26,4 @@ typedef hpx::components::managed_component<
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(queue_of_ints_type, queue_of_ints,
     "hpx::lcos::base_lco_with_value<int, int>");
-HPX_DEFINE_GET_COMPONENT_TYPE(queue_of_ints_type::wrapped_type);
 

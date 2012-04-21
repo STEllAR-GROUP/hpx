@@ -76,4 +76,3 @@ HPX_REGISTER_ACTION_EX(partition_type::interpolate_action,
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<partition_type>,
     interpolate1d_partition_type);
-HPX_DEFINE_GET_COMPONENT_TYPE(partition_type);

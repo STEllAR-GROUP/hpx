@@ -268,6 +268,7 @@ namespace hpx { namespace components
     componentname, basecomponentname)                                         \
         HPX_REGISTER_DERIVED_COMPONENT_FACTORY_ONE_EX(                        \
             ComponentType, componentname, basecomponentname, false)           \
+        HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)            \
     /**/
 
 #endif

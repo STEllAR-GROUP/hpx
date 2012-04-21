@@ -40,6 +40,5 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     accumulator_type::wrapped_type::query_action,
     managed_accumulator_query_action);
-HPX_DEFINE_GET_COMPONENT_TYPE(accumulator_type::wrapped_type);
 //]
 

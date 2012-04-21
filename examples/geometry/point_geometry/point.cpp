@@ -26,7 +26,6 @@ typedef hpx::components::managed_component<
 > point_geometry_type;
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(point_geometry_type, point_geometry);
-HPX_DEFINE_GET_COMPONENT_TYPE(point_geometry_type::wrapped_type);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the point_geometry actions

@@ -140,7 +140,6 @@ typedef throttle::server::throttle throttle_type;
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<throttle_type>, throttle_throttle_type);
-HPX_DEFINE_GET_COMPONENT_TYPE(throttle_type);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions

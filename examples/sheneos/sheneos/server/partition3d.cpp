@@ -417,7 +417,6 @@ HPX_REGISTER_ACTION_EX(partition3d_type::interpolate_one_bulk_action,
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<partition3d_type>,
     sheneos_partition_type);
-HPX_DEFINE_GET_COMPONENT_TYPE(partition3d_type);
 
 HPX_REGISTER_ACTION_EX(
     hpx::lcos::base_lco_with_value<std::vector<std::vector<double> > >::set_value_action,

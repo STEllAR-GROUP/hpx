@@ -49,4 +49,3 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     dataflow_dynamic_stencil_value_double_type::wrapped_type::start_action,
     adaptive1d_dataflow_dynamic_stencil_value_double_start_action);
-HPX_DEFINE_GET_COMPONENT_TYPE(dataflow_dynamic_stencil_value_double_type::wrapped_type);

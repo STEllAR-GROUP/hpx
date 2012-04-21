@@ -149,7 +149,6 @@ HPX_REGISTER_ACTION_EX(distributed::server::datastructure::get_data_at_action,
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<datastructure_type>,
     distributed_datastructure_type);
-HPX_DEFINE_GET_COMPONENT_TYPE(datastructure_type);
 
 
 /*HPX_REGISTER_ACTION_EX(

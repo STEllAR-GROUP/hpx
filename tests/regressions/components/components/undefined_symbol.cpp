@@ -25,5 +25,3 @@ HPX_REGISTER_ACTION_EX(
     undefined_symbol::break_action,
     test_undefined_symbol_break_action);
 
-HPX_DEFINE_GET_COMPONENT_TYPE(undefined_symbol);
-

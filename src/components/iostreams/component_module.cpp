@@ -20,6 +20,7 @@ typedef hpx::iostreams::server::output_stream ostream_type;
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_EX(
     hpx::components::managed_component<ostream_type>,
     output_stream_factory, true);
+HPX_DEFINE_GET_COMPONENT_TYPE(ostream_type);
 
 HPX_REGISTER_ACTION_EX(
     ostream_type::write_async_action,
@@ -29,6 +30,5 @@ HPX_REGISTER_ACTION_EX(
     ostream_type::write_sync_action,
     output_stream_write_sync_action);
 
-HPX_DEFINE_GET_COMPONENT_TYPE(ostream_type);
 
 

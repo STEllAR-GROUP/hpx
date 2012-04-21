@@ -44,7 +44,6 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(dataflow_lco_gid_vector_ptr,
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<dataflow_unigrid_mesh_type>,
     dataflow_unigrid_mesh3d);
-HPX_DEFINE_GET_COMPONENT_TYPE(dataflow_unigrid_mesh_type);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace amr { namespace server

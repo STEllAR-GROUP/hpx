@@ -252,6 +252,7 @@ namespace hpx { namespace components
 #define HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY(ComponentType, componentname) \
         HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY_EX(                    \
             ComponentType, componentname, false)                              \
+        HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)            \
     /**/
 
 #endif

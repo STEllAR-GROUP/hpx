@@ -33,15 +33,11 @@ typedef hpx::components::managed_component<hpx::lcos::server::dataflow> dataflow
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(dataflow_type, bright_future_dataflow,
     "hpx::lcos::server::dataflow");
 
-HPX_DEFINE_GET_COMPONENT_TYPE(dataflow_type::wrapped_type);
-
 typedef hpx::components::managed_component<hpx::lcos::server::dataflow_trigger>
     dataflow_trigger_type;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(dataflow_trigger_type, bright_future_dataflow_trigger,
     "hpx::lcos::server::dataflow");
-
-HPX_DEFINE_GET_COMPONENT_TYPE(dataflow_trigger_type::wrapped_type);
 
 // HPX_REGISTER_ACTION_EX(
 //     hpx::lcos::server::dataflow_trigger::init_action

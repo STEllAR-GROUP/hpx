@@ -24,6 +24,7 @@ typedef hpx::components::server::remote_object remote_object_type;
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_EX(
     hpx::components::simple_component<remote_object_type>,
     remote_object, true);
+HPX_DEFINE_GET_COMPONENT_TYPE(remote_object_type);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the remote_object actions
@@ -35,7 +36,6 @@ HPX_REGISTER_ACTION_EX(
 HPX_REGISTER_ACTION_EX(
     remote_object_type::set_dtor_action,
     remote_object_set_dtor_action);
-HPX_DEFINE_GET_COMPONENT_TYPE(remote_object_type);
 
 HPX_REGISTER_PLAIN_ACTION_EX(
     hpx::components::remote_object::new_impl_action,

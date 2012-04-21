@@ -25,7 +25,6 @@ typedef hpx::components::managed_component<
 > graph500_point_type;
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(graph500_point_type, graph500_point);
-HPX_DEFINE_GET_COMPONENT_TYPE(graph500_point_type::wrapped_type);
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION_EX(

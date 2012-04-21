@@ -39,8 +39,6 @@ HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
     hpx::components::simple_component<dataflow_stencil_type>,
     dataflow_stencil, "dataflow_functional_component_type");
 
-HPX_DEFINE_GET_COMPONENT_TYPE(dataflow_stencil_type);
-
 /// [hpx.components.had_logging]  # this must match the string below
 /// name = had_amr_test           # this must match the name of the shared library
 /// path = $[hpx.location]/lib    # this is the default location where to find the shared library
@@ -49,4 +47,3 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<dataflow_logging_type>, dataflow_logging);
 
 HPX_REGISTER_ACTION_EX(dataflow_logging_type::logentry_action, dataflow_logentry_action);
-HPX_DEFINE_GET_COMPONENT_TYPE(dataflow_logging_type);

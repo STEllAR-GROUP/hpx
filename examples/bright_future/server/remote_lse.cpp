@@ -307,5 +307,4 @@ HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
         hpx::components::simple_component<bright_future::server::remote_lse<double> >
       , gs_hpx
       );
-HPX_DEFINE_GET_COMPONENT_TYPE(bright_future::server::remote_lse<double>);
 

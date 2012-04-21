@@ -25,8 +25,6 @@ typedef hpx::components::managed_component<
     hpx::lcos::server::object_semaphore<int>
 > int_object_semaphore_type;
 
-HPX_DEFINE_GET_COMPONENT_TYPE(int_object_semaphore_type::wrapped_type);
-
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::managed_component<
         hpx::lcos::server::object_semaphore<int>

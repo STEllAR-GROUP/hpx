@@ -41,7 +41,6 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(dataflow_lco_gid_vector_ptr,
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<dataflow_dataflow_stencil_type>,
     adaptive1d_dataflow_dataflow_stencil3d);
-HPX_DEFINE_GET_COMPONENT_TYPE(dataflow_dataflow_stencil_type);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace adaptive1d { namespace server

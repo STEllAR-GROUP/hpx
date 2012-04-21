@@ -18,7 +18,6 @@ typedef hpx::components::managed_component<
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
     sine_counter_type, sine_counter, "base_performance_counter");
-HPX_DEFINE_GET_COMPONENT_TYPE(::performance_counters::sine::server::sine_counter);
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace performance_counters { namespace sine { namespace server

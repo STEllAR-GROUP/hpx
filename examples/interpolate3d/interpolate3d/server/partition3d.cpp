@@ -113,4 +113,3 @@ HPX_REGISTER_ACTION_EX(partition3d_type::interpolate_action,
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::simple_component<partition3d_type>,
     interpolate3d_partition_type);
-HPX_DEFINE_GET_COMPONENT_TYPE(partition3d_type);
