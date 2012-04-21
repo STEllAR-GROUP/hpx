@@ -23,6 +23,7 @@
 #include <boost/plugin/config.hpp>
 
 #include <windows.h>
+#include <Shlwapi.h>
 
 #if !defined(BOOST_WINDOWS)
 #error "This file shouldn't be included directly, use the file boost/plugin/dll.hpp only."
@@ -171,6 +172,26 @@ namespace boost { namespace plugin {
             }
         }
 
+    public:
+        std::string get_directory() const
+        {
+            char buffer[_MAX_PATH];
+            DWORD name_length =
+                GetModuleFileName(dll_handle, buffer, sizeof(buffer));
+            if (name_length <= 0) {
+                BOOST_PLUGIN_OSSTREAM str;
+                str << "Boost.Plugin: Could not extract path the shared "
+                       "library '" << dll_name << "' has been loaded from.";
+                boost::throw_exception(
+                    std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str)));
+            }
+
+            // extract the directory name
+            PathRemoveFileSpec(buffer);
+            return buffer;
+        }
+
+    protected:
         void FreeLibrary()
         {
             if (NULL != dll_handle)

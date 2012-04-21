@@ -24,7 +24,9 @@
 
 #include <boost/plugin/config.hpp>
 
+#include <link.h>
 #include <dlfcn.h>
+#include <limits.h>
 
 #if !defined(BOOST_HAS_DLOPEN)
 #error "This file shouldn't be included directly, use the file boost/plugin/dll.hpp only."
@@ -224,7 +226,7 @@ namespace boost { namespace plugin {
             initialize_mutex();
             boost::mutex::scoped_lock lock(mutex_instance());
 
-            dlerror();              // Clear the error state.
+            ::dlerror();                // Clear the error state.
             dll_handle = MyLoadLibrary((dll_name.empty() ? NULL : dll_name.c_str()));
             // std::cout << "open\n";
             if (!dll_handle) {
@@ -234,9 +236,28 @@ namespace boost { namespace plugin {
                 boost::throw_exception(
                     std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str)));
             }
-            init_library(dll_handle);    // initialize library
+
+            init_library(dll_handle);   // initialize library
         }
 
+    public:
+        std::string get_directory() const
+        {
+            // now find the full path of the loaded library
+            char directory[PATH_MAX];
+            if (::dlinfo(dll_handle, RTLD_DI_ORIGIN, directory) < 0) {
+                BOOST_PLUGIN_OSSTREAM str;
+                str << "Boost.Plugin: Could not extract path the shared "
+                       "library '" << dll_name << "' has been loaded from "
+                       "(dlerror: " << dlerror() << ")";
+                boost::throw_exception(
+                    std::logic_error(BOOST_PLUGIN_OSSTREAM_GETSTRING(str)));
+            }
+            ::dlerror();                // Clear the error state.
+            return directory;
+        }
+
+    protected:
         void FreeLibrary()
         {
             if (NULL != dll_handle)
