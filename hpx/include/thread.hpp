@@ -6,7 +6,7 @@
 #if !defined(HPX_THREAD_APR_17_2012_1003AM)
 #define HPX_THREAD_APR_17_2012_1003AM
 
-#include <hpx/thraeds/thread.hpp>
+#include <hpx/runtime/threads/thread.hpp>
 
 #endif
 

@@ -107,6 +107,8 @@ namespace hpx
         void interrupt();
         bool interruption_requested() const;
 
+        static void interrupt(id);
+
         lcos::future<void> get_future(error_code& ec = throws);
 
     private:
@@ -139,6 +141,8 @@ namespace hpx
         template <typename Char, typename Traits>
         friend std::basic_ostream<Char, Traits>&
         operator<< (std::basic_ostream<Char, Traits>&, thread::id);
+
+        friend class thread;
 
     public:
         id() BOOST_NOEXCEPT : id_(threads::invalid_thread_id) {}

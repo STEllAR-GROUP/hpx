@@ -163,6 +163,11 @@ namespace hpx
         return threads::get_thread_interruption_requested(native_handle());
     }
 
+    void thread::interrupt(thread::id id)
+    {
+        threads::interrupt_thread(id.id_);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
