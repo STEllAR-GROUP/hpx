@@ -104,10 +104,9 @@ namespace hpx { namespace util {
             return r.get();
         }
 
-
+        ///////////////////////////////////////////////////////////////////////
         using boost::get_pointer;
 
-#if BOOST_WORKAROUND(BOOST_MSVC, == 1600)
         template <typename T>
         T* get_pointer(boost::shared_ptr<T>& p)
         {
@@ -119,7 +118,6 @@ namespace hpx { namespace util {
         {
             return p.get();
         }
-#endif
 
         template <typename T>
         T * get_pointer(T &t)
