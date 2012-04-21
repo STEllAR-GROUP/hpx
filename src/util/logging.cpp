@@ -33,7 +33,7 @@ namespace hpx { namespace util
 {
     namespace detail
     {
-        int get_log_level(std::string const& env, bool allow_always = false)
+        boost::logging::level::type get_log_level(std::string const& env, bool allow_always = false)
         {
             try {
                 int env_val = boost::lexical_cast<int>(env);

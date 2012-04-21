@@ -218,7 +218,7 @@ void section::parse (std::string const& sourcename,
                 line_msg("Cannot parse key/value in ", sourcename, linenum);
             }
 
-            section* save = current;  // save the section we're in
+            section* s = current;  // save the section we're in
             current = this;           // start adding sections at the root
 
             // got the section name. It might be hierarchical, so split it up, and
@@ -238,7 +238,7 @@ void section::parse (std::string const& sourcename,
             current->add_entry (what[2], what[3]);
 
             // restore the old section
-            current = save;
+            current = s;
         }
 
         else if (boost::regex_match(line, what, regex_section))
@@ -625,7 +625,7 @@ void section::expand(std::string& value, std::string::size_type begin) const
 // be un-escaped
 inline std::string::size_type
 find_next(char const* ch, std::string& value,
-    std::string::size_type begin = (std::string::size_type)(-1))
+    std::string::size_type begin = static_cast<std::string::size_type>(-1))
 {
     std::string::size_type end = value.find_first_of(ch, begin+1);
     while (end != std::string::npos) {

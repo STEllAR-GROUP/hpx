@@ -81,6 +81,14 @@
 #  error "The specified HPX_FUNCTION_LIMIT (default is 7) has to be larger than HPX_ACTION_ARGUMENT_LIMIT by at least 3."
 #endif
 
+#if !defined(HPX_TUPLE_LIMIT)
+#   define HPX_TUPLE_LIMIT HPX_FUNCTION_LIMIT
+#endif
+
+#if HPX_TUPLE_LIMIT < HPX_FUNCTION_LIMIT
+#   error "The specified HPX_TUPLE_LIMIT (default is 10) has to be bigger or equal than HPX_FUNCTION_LIMIT."
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 /// This defines the number of outgoing (parcel-) connections kept alive (to
 /// all other localities). This value can be changed at runtime by setting

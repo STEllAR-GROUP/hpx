@@ -464,14 +464,14 @@ namespace hpx { namespace util
     }
 
     // Will return the stack size to use for all HPX-threads.
-    std::size_t runtime_configuration::get_default_stack_size() const
+    std::ptrdiff_t runtime_configuration::get_default_stack_size() const
     {
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
                 std::string entry = sec->get_entry("default_stack_size",
                     BOOST_PP_STRINGIZE(HPX_DEFAULT_STACK_SIZE));
-                std::size_t val = HPX_DEFAULT_STACK_SIZE;
+                std::ptrdiff_t val = HPX_DEFAULT_STACK_SIZE;
 
                 namespace qi = boost::spirit::qi;
                 qi::parse(entry.begin(), entry.end(),

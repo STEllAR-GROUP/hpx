@@ -89,7 +89,7 @@ namespace hpx { namespace util
         std::string get_cmd_line() const;
 
         // Will return the stack size to use for all HPX-threads.
-        std::size_t get_default_stack_size() const;
+        std::ptrdiff_t get_default_stack_size() const;
     };
 }}
 

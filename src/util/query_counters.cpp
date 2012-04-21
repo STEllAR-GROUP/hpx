@@ -22,7 +22,7 @@
 namespace hpx { namespace util
 {
     query_counters::query_counters(std::vector<std::string> const& names,
-            std::size_t interval, std::string const& dest)
+            boost::int64_t interval, std::string const& dest)
       : names_(names), destination_(dest),
         timer_(boost::bind(&query_counters::evaluate, this_()),
             interval*1000, "query_counters", true),
@@ -92,7 +92,7 @@ namespace hpx { namespace util
 
         out << name << ",";
         if (!ec) {
-            double elapsed = (value.time_ - started_at_) * 1e-9;
+            double elapsed = static_cast<double>(value.time_ - started_at_) * 1e-9;
             out << boost::str(boost::format("%.6f") % elapsed)
                 << "[s]," << val;
             if (!uom.empty())

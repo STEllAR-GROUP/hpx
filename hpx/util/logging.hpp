@@ -170,7 +170,7 @@ namespace hpx { namespace util { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     // get the data to use to pre-fill the runtime_configuration instance
     // with logging specific data
-    std::vector<std::string> HPX_EXPORT get_logging_data();
+    HPX_EXPORT std::vector<std::string> get_logging_data();
 
     // the init_logging type will be used for initialization purposes only as
     // well
@@ -182,7 +182,7 @@ namespace hpx { namespace util { namespace detail
     };
 
     struct dummy_log_impl {};
-    extern HPX_EXPORT dummy_log_impl dummy_log;
+    HPX_EXPORT extern dummy_log_impl dummy_log;
 
     template <typename T>
     inline dummy_log_impl& operator<<(dummy_log_impl& l, T) { return l; }

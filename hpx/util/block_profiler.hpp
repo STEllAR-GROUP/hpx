@@ -257,7 +257,7 @@ namespace hpx { namespace util
     class block_profiler
     {
     public:
-        block_profiler(char const* description, bool enable_logging = true) {}
+        block_profiler(char const*, bool= true) {}
         ~block_profiler() {}
 
         void restart() {}
@@ -269,7 +269,7 @@ namespace hpx { namespace util
     class block_profiler_wrapper
     {
     public:
-        block_profiler_wrapper(block_profiler<Tag>& profile)
+        block_profiler_wrapper(block_profiler<Tag>&)
         {
         }
 

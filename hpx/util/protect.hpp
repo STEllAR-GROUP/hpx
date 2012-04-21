@@ -136,7 +136,7 @@ namespace hpx { namespace util { namespace detail
 
     private:
         F f_;
-        BOOST_COPYABLE_AND_MOVABLE(protected_bind);
+        BOOST_COPYABLE_AND_MOVABLE(protected_bind)
     };
 }}} // namespace hpx::util::detail
 

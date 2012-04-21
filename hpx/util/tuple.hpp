@@ -8,6 +8,7 @@
 #ifndef HPX_UTIL_TUPLE_HPP
 #define HPX_UTIL_TUPLE_HPP
 
+#include <hpx/config.hpp>
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
@@ -121,7 +122,7 @@ namespace boost {
         3                                                                       \
       , (                                                                       \
             1                                                                   \
-          , HPX_FUNCTION_LIMIT                                                  \
+          , HPX_TUPLE_LIMIT                                                     \
           , <hpx/util/tuple.hpp>                                                \
         )                                                                       \
     )                                                                           \

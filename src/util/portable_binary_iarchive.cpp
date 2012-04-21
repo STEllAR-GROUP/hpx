@@ -46,7 +46,7 @@
 namespace hpx { namespace util
 {
 
-void HPX_ALWAYS_EXPORT
+HPX_ALWAYS_EXPORT void
 portable_binary_iarchive::load_impl(boost::intmax_t & l, char maxsize)
 {
     char size;
@@ -58,7 +58,7 @@ portable_binary_iarchive::load_impl(boost::intmax_t & l, char maxsize)
 
     bool negative = (size < 0) ? true : false;
     if(negative)
-        size = -size;
+        size = static_cast<char>(-size);
 
     if(size > maxsize) {
         BOOST_THROW_EXCEPTION(portable_binary_iarchive_exception());
@@ -68,7 +68,7 @@ portable_binary_iarchive::load_impl(boost::intmax_t & l, char maxsize)
 #ifdef BOOST_BIG_ENDIAN
     cptr += (sizeof(boost::intmax_t) - size);
 #endif
-    this->primitive_base_t::load_binary(cptr, size);
+    this->primitive_base_t::load_binary(cptr, static_cast<std::size_t>(size));
 
 #ifdef BOOST_BIG_ENDIAN
     if(m_flags & endian_little)
@@ -82,7 +82,7 @@ portable_binary_iarchive::load_impl(boost::intmax_t & l, char maxsize)
         l = -l;
 }
 
-void HPX_ALWAYS_EXPORT
+HPX_ALWAYS_EXPORT void
 portable_binary_iarchive::load_override(boost::archive::class_name_type& t, int)
 {
     std::string cn;
@@ -99,7 +99,7 @@ portable_binary_iarchive::load_override(boost::archive::class_name_type& t, int)
     t.t[cn.size()] = '\0';
 }
 
-void HPX_ALWAYS_EXPORT portable_binary_iarchive::init(unsigned int flags)
+HPX_ALWAYS_EXPORT void portable_binary_iarchive::init(unsigned int flags)
 {
     if (0 == (flags & boost::archive::no_header))
     {
@@ -118,11 +118,18 @@ void HPX_ALWAYS_EXPORT portable_binary_iarchive::init(unsigned int flags)
         *this >> input_library_version;
 
         // extra little .t is to get around borland quirk
+#ifdef __GNUG__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif
         if (boost::archive::BOOST_ARCHIVE_VERSION() < input_library_version) {
             BOOST_THROW_EXCEPTION(
                 boost::archive::archive_exception(
                     boost::archive::archive_exception::unsupported_version));
         }
+#ifdef __GNUG__
+#pragma GCC diagnostic pop
+#endif
 
 #if BOOST_WORKAROUND(__MWERKS__, BOOST_TESTED_AT(0x3205))
         this->set_library_version(input_library_version);
@@ -133,7 +140,7 @@ void HPX_ALWAYS_EXPORT portable_binary_iarchive::init(unsigned int flags)
 
     unsigned char x;
     load(x);
-    m_flags = x << CHAR_BIT;
+    m_flags = static_cast<unsigned int>(x << CHAR_BIT);
 }
 
 }}

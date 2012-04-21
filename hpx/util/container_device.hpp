@@ -30,8 +30,8 @@ namespace hpx { namespace util
         typedef typename Container::value_type char_type;
         typedef boost::iostreams::seekable_device_tag category;
 
-        container_device(Container& container)
-          : container_(container), pos_(0)
+        container_device(Container& c)
+          : container_(c), pos_(0)
         {}
 
         /// Read up to n characters from the underlying data source into the
@@ -40,8 +40,9 @@ namespace hpx { namespace util
         std::streamsize read(char_type* s, std::streamsize n)
         {
             std::streamsize amt =
-                static_cast<std::streamsize>(container_.size() - pos_);
+                static_cast<std::streamsize>(container_.size()) - pos_;
             std::streamsize result = (std::min)(n, amt);
+            BOOST_ASSERT(result > 0);
             if (result != 0) {
                 std::copy(container_.begin() + pos_,
                           container_.begin() + pos_ + result, s);
@@ -58,16 +59,17 @@ namespace hpx { namespace util
         std::streamsize write(const char_type* s, std::streamsize n)
         {
             std::streamsize result = 0;
-            if (pos_ != container_.size()) {
+            if (static_cast<size_type>(pos_) != container_.size()) {
                 std::streamsize amt =
-                    static_cast<std::streamsize>(container_.size() - pos_);
-                std::streamsize result = (std::min)(n, amt);
+                    static_cast<std::streamsize>(container_.size()) - pos_;
+                result = (std::min)(n, amt);
                 std::copy(s, s + result, container_.begin() + pos_);
                 pos_ += result;
             }
             if (result < n) {
-                container_.insert(container_.end(), s, s + n);
-                pos_ = container_.size();
+                BOOST_ASSERT(n < std::numeric_limits<difference_type>::max());
+                container_.insert(container_.end(), s, s + static_cast<difference_type>(n));
+                pos_ = static_cast<boost::iostreams::stream_offset>(container_.size());
             }
             return n;
         }
@@ -91,18 +93,19 @@ namespace hpx { namespace util
                 next = pos_ + off;
             }
             else if (way == std::ios_base::end) {
-                next = container_.size() + off - 1;
+                next = static_cast<boost::iostreams::stream_offset>(container_.size()) + off - 1u;
             }
             else {
                 BOOST_ASSERT(false);
             }
 
             // Check for errors
-            if (next < ((boost::iostreams::stream_offset)0)
-             || next >= ((boost::iostreams::stream_offset)container_.size()))
+            BOOST_ASSERT(container_.size() < static_cast<size_type>(std::numeric_limits<boost::iostreams::stream_offset>::max()));
+            if (next < (static_cast<boost::iostreams::stream_offset>(0))
+             || next >= (static_cast<boost::iostreams::stream_offset>(container_.size())))
                 throw std::ios_base::failure("bad seek offset");
 
-            pos_ = (size_type)next;
+            pos_ = next;
             return pos_;
         }
 
@@ -110,8 +113,9 @@ namespace hpx { namespace util
 
     private:
         typedef typename Container::size_type size_type;
+        typedef typename Container::difference_type difference_type;
         Container& container_;
-        size_type pos_;
+        boost::iostreams::stream_offset pos_;
     };
 
 ///////////////////////////////////////////////////////////////////////////////

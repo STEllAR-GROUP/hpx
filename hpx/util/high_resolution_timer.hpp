@@ -243,7 +243,7 @@ namespace hpx { namespace util
         {
             if (!use_backup) {
                 start_time.tv_sec = time_t(t);
-                start_time.tv_nsec = long(double(t - start_time.tv_sec) * 1e9);
+                start_time.tv_nsec = long(double(t - double(start_time.tv_sec)) * 1e9);
             }
         }
 
@@ -276,15 +276,15 @@ namespace hpx { namespace util
             if (use_backup)
                 return start_time_backup.elapsed();
 
-            timespec now;
-            if (-1 == clock_gettime(CLOCK_REALTIME, &now))
+            timespec now_;
+            if (-1 == clock_gettime(CLOCK_REALTIME, &now_))
                 boost::throw_exception(std::runtime_error("Couldn't get current time"));
 
-            if (now.tv_sec == start_time.tv_sec)
-                return double(now.tv_nsec - start_time.tv_nsec) * 1e-9;
+            if (now_.tv_sec == start_time.tv_sec)
+                return double(now_.tv_nsec - start_time.tv_nsec) * 1e-9;
 
-            return double(now.tv_sec - start_time.tv_sec) +
-                (double(now.tv_nsec - start_time.tv_nsec) * 1e-9);
+            return double(now_.tv_sec - start_time.tv_sec) +
+                (double(now_.tv_nsec - start_time.tv_nsec) * 1e-9);
         }
 
         boost::int64_t elapsed_microseconds() const
@@ -313,7 +313,7 @@ namespace hpx { namespace util
             timespec resolution;
             if (-1 == clock_getres(CLOCK_REALTIME, &resolution))
                 boost::throw_exception(std::runtime_error("Couldn't get resolution"));
-            return double(resolution.tv_sec + resolution.tv_nsec * 1e-9);
+            return double(resolution.tv_sec) + (double(resolution.tv_nsec) * 1e-9);
         }
 
     private:

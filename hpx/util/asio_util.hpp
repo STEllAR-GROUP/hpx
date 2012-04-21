@@ -15,26 +15,26 @@
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
-    bool HPX_API_EXPORT get_endpoint(std::string const& addr,
+    HPX_API_EXPORT bool get_endpoint(std::string const& addr,
         boost::uint16_t port, boost::asio::ip::tcp::endpoint& ep);
 
-    std::string HPX_API_EXPORT get_endpoint_name(
+    HPX_API_EXPORT std::string get_endpoint_name(
         boost::asio::ip::tcp::endpoint const& ep);
 
-    boost::fusion::vector2<boost::uint16_t, boost::uint16_t>
-    HPX_EXPORT get_random_ports();
+    HPX_EXPORT boost::fusion::vector2<boost::uint16_t, boost::uint16_t>
+    get_random_ports();
 
-    boost::uint16_t HPX_API_EXPORT get_random_port();
+    HPX_API_EXPORT boost::uint16_t get_random_port();
 
     ///////////////////////////////////////////////////////////////////////////
     // properly resolve a give host name to the corresponding IP address
-    boost::asio::ip::tcp::endpoint
+    HPX_API_EXPORT boost::asio::ip::tcp::endpoint
     HPX_API_EXPORT resolve_hostname(std::string const& hostname,
         boost::uint16_t port, boost::asio::io_service& io_service);
 
     ///////////////////////////////////////////////////////////////////////
     // Addresses are supposed to have the format <hostname>[:port]
-    void HPX_API_EXPORT split_ip_address(std::string const& v, std::string& host,
+    HPX_API_EXPORT void split_ip_address(std::string const& v, std::string& host,
         boost::uint16_t& port);
 }}
 

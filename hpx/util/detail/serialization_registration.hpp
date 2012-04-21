@@ -48,12 +48,15 @@ namespace hpx { namespace util { namespace detail
     inline char
     to_digit(int number)
     {
+        char number_tmp = static_cast<char>(number);
         if (number >= 0 && number <= 9)
-            return number + '0';
-        return number - 10 + 'A';
+        {
+            return static_cast<char>(number_tmp + '0');
+        }
+        return static_cast<char>(number_tmp - 10 + 'A');
     }
 
-    inline void convert_byte(boost::uint8_t b, char*& buffer, char const* end)
+    inline void convert_byte(boost::uint8_t b, char*& buffer, char const* /*end*/)
     {
         BOOST_ASSERT(buffer < end-1);
         *buffer++ = to_digit((b & 0xF0) >> 4);
@@ -63,10 +66,10 @@ namespace hpx { namespace util { namespace detail
     inline void
     convert_unsigned(boost::uint32_t ui, char*& buffer, char const* end)
     {
-        convert_byte(ui / 0x01000000, buffer, end);
-        convert_byte(ui / 0x010000 % 0x0100, buffer, end);
-        convert_byte(ui / 0x0100 % 0x0100, buffer, end);
-        convert_byte(ui % 0x0100, buffer, end);
+        convert_byte(static_cast<boost::uint8_t>(ui / 0x01000000), buffer, end);
+        convert_byte(static_cast<boost::uint8_t>(ui / 0x010000 % 0x0100), buffer, end);
+        convert_byte(static_cast<boost::uint8_t>(ui / 0x0100 % 0x0100), buffer, end);
+        convert_byte(static_cast<boost::uint8_t>(ui % 0x0100), buffer, end);
     }
 
     template <typename T>
