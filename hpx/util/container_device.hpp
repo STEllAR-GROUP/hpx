@@ -67,7 +67,7 @@ namespace hpx { namespace util
                 pos_ += result;
             }
             if (result < n) {
-                BOOST_ASSERT(n < std::numeric_limits<difference_type>::max());
+                BOOST_ASSERT(n < (std::numeric_limits<difference_type>::max)());
                 container_.insert(container_.end(), s, s + static_cast<difference_type>(n));
                 pos_ = static_cast<boost::iostreams::stream_offset>(container_.size());
             }
@@ -100,7 +100,9 @@ namespace hpx { namespace util
             }
 
             // Check for errors
-            BOOST_ASSERT(container_.size() < static_cast<size_type>(std::numeric_limits<boost::iostreams::stream_offset>::max()));
+            BOOST_ASSERT(container_.size() < static_cast<size_type>(
+                (std::numeric_limits<boost::iostreams::stream_offset>::max)()));
+
             if (next < (static_cast<boost::iostreams::stream_offset>(0))
              || next >= (static_cast<boost::iostreams::stream_offset>(container_.size())))
                 throw std::ios_base::failure("bad seek offset");

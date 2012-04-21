@@ -91,7 +91,11 @@ public:
 // "Portable" input binary archive.  It addresses integer size and endianness so
 // that binary archives can be passed across systems. Note:floating point types
 // not addressed here
-class HPX_ALWAYS_EXPORT portable_binary_iarchive :
+#if defined(BOOST_MSVC)
+class portable_binary_iarchive :
+#else
+class HPX_EXPORT portable_binary_iarchive :
+#endif
     public boost::archive::basic_binary_iprimitive<
         portable_binary_iarchive,
         std::istream::char_type,

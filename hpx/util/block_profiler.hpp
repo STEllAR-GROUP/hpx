@@ -257,7 +257,7 @@ namespace hpx { namespace util
     class block_profiler
     {
     public:
-        block_profiler(char const*, bool= true) {}
+        block_profiler(char const*, bool = true) {}
         ~block_profiler() {}
 
         void restart() {}

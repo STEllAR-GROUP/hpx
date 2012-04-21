@@ -91,7 +91,11 @@ public:
 // archive. it addresses integer size and endianness so that binary archives can
 // be passed across systems. Note:floating point types not addressed here
 
-class HPX_ALWAYS_EXPORT portable_binary_oarchive :
+#if defined(BOOST_MSVC)
+class portable_binary_oarchive :
+#else
+class HPX_EXPORT portable_binary_oarchive :
+#endif
     public boost::archive::basic_binary_oprimitive<
         portable_binary_oarchive,
         std::ostream::char_type,
