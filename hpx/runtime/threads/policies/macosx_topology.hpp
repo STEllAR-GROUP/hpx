@@ -67,6 +67,16 @@ struct topology
       , error_code& ec = throws
         ) const
     {
+        if (&ec != &throws)
+            ec = make_success_code();
+    }
+
+    void set_thread_affinity(
+        std::size_t num_thread
+      , bool numa_sensitive
+      , error_code& ec = throws
+        ) const
+    {
         #ifdef AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
             thread_extended_policy_data_t epolicy;
             epolicy.timeshare = FALSE;

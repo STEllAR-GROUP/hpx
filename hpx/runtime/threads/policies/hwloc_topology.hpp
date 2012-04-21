@@ -14,7 +14,7 @@
 
 #include <boost/format.hpp>
 
-namespace hpx { namespace threads 
+namespace hpx { namespace threads
 {
 
 struct topology
@@ -132,6 +132,16 @@ struct topology
     void set_thread_affinity(
         boost::thread& thrd
       , std::size_t num_thread
+      , bool numa_sensitive
+      , error_code& ec = throws
+        ) const
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
+    }
+
+    void set_thread_affinity(
+        std::size_t num_thread
       , bool numa_sensitive
       , error_code& ec = throws
         ) const
@@ -281,7 +291,7 @@ struct topology
           , boost::str(boost::format(
                 "failed to initialize NUMA node affinity mask for thread %1%")
                 % num_thread));
-        return 0; 
+        return 0;
     } // }}}
 
     std::size_t init_thread_affinity_mask(
@@ -333,7 +343,7 @@ struct topology
         }
 
         hwloc_topology_destroy(topology);
-        return 0; 
+        return 0;
     } // }}}
 
     std::vector<std::size_t> numa_node_numbers_;

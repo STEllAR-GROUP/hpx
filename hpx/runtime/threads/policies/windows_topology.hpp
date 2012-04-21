@@ -141,9 +141,20 @@ struct topology
                     "failed to set thread %1% affinity mask")
                     % num_thread));
         }
+
         else if (&ec != &throws)
             ec = make_success_code();
     } // }}}
+
+    void set_thread_affinity(
+        std::size_t num_thread
+      , bool numa_sensitive
+      , error_code& ec = throws
+        ) const
+    {
+        if (&ec != &throws)
+            ec = make_success_code();
+    }
 
     std::size_t get_thread_affinity_mask_from_lva(
         naming::address::address_type lva

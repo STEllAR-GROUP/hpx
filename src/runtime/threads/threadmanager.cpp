@@ -1402,6 +1402,22 @@ namespace hpx { namespace threads
 
         std::size_t idle_loop_count = 0;
 
+        // set affinity on Linux systems or when using hwloc
+        topology const& topology_ = get_topology();
+        std::size_t pu_num = scheduler_.get_pu_num(num_thread);
+
+        LTM_(info) << "tfunc(" << num_thread
+                   << "): will run on processing unit: " << pu_num;
+
+        error_code ec;
+        topology_.set_thread_affinity(pu_num, scheduler_.numa_sensitive(), ec);
+
+        if (ec)
+        {
+            LTM_(warning) << "run: setting thread affinity on OS thread "
+                << num_thread << " failed with: " << ec.get_message();
+        }
+
         // run the work queue
         boost::coroutines::prepare_main_thread main_thread;
 
@@ -1577,10 +1593,10 @@ namespace hpx { namespace threads
                 threads_.push_back(new boost::thread(boost::bind(
                     &threadmanager_impl::tfunc, this, thread_num)));
 
+                // set the new threads affinity (on Windows systems)
                 error_code ec;
-                // set the new threads affinity (on all platforms)
-                topology_.set_thread_affinity
-                    (threads_.back(), pu_num, scheduler_.numa_sensitive(), ec);
+                topology_.set_thread_affinity(threads_.back(), pu_num,
+                    scheduler_.numa_sensitive(), ec);
 
                 if (ec)
                 {
