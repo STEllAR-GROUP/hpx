@@ -375,38 +375,6 @@ namespace hpx { namespace lcos { namespace local
             task_->run();
         }
 
-#if 0
-// #define HPX_LCOS_LOCAL_FWD_REF_PARAMS(Z, N, D)                                \
-//     BOOST_FWD_REF(BOOST_PP_CAT(A, N)) BOOST_PP_CAT(a, N)                      \
-// /**/
-// #define HPX_LCOS_LOCAL_FWD_PARAMS(Z, N, D)                                    \
-//     boost::forward<BOOST_PP_CAT(D, N)>(BOOST_PP_CAT(a, N))                    \
-// /**/
-//
-// #define HPX_LCOS_LOCAL_PROMISE_OPERATOR(Z, N, D)                              \
-//     template <BOOST_PP_ENUM_PARAMS(N, typename A)>                            \
-//     void operator()(BOOST_PP_ENUM(N, HPX_LCOS_LOCAL_FWD_REF_PARAMS, _))       \
-//     {                                                                         \
-//         if (!task_) {                                                         \
-//             HPX_THROWS_IF(ec, task_moved, "packaged_task::operator()",        \
-//                 "packaged_task invalid (has it been moved?)");                \
-//             return;                                                           \
-//         }                                                                     \
-//         task_->run(BOOST_PP_ENUM(N, HPX_LCOS_LOCAL_FWD_PARAMS, _));           \
-//     }                                                                         \
-//     /**/
-//
-//         BOOST_PP_REPEAT_FROM_TO(
-//             1
-//           , HPX_FUNCTION_LIMIT
-//           , HPX_LCOS_LOCAL_PROMISE_OPERATOR, _
-//         )
-//
-// #undef HPX_LCOS_LOCAL_PROMISE_OPERATOR
-// #undef HPX_LCOS_LOCAL_FWD_PARAMS
-// #undef HPX_LCOS_LOCAL_FWD_REF_PARAMS
-#endif
-
         // synchronous execution
         void async()
         {

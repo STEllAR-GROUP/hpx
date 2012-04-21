@@ -422,38 +422,6 @@ namespace hpx { namespace lcos { namespace detail
                 "task_base::async");
         }
 
-#if 0
-// #define HPX_LCOS_TASK_FWD_REF_PARAMS(Z, N, D)                                 \
-//     BOOST_FWD_REF(BOOST_PP_CAT(A, N)) BOOST_PP_CAT(a, N)                      \
-// /**/
-// #define HPX_LCOS_TASK_FWD_PARAMS(Z, N, D)                                     \
-//     boost::forward<BOOST_PP_CAT(D, N)>(BOOST_PP_CAT(a, N))                    \
-// /**/
-//
-// #define HPX_LCOS_TASK_RUN(Z, N, D)                                            \
-//     template <BOOST_PP_ENUM_PARAMS(N, typename A)>                            \
-//     void run()(BOOST_PP_ENUM(N, HPX_LCOS_TASK_FWD_REF_PARAMS, _))             \
-//     {                                                                         \
-//         check_started();                                                      \
-//         future_base_type this_(this);                                         \
-//         applier::register_thread_plain(                                       \
-//             HPX_STD_BIND(&task_base::run_impl, this_,                         \
-//                 BOOST_PP_ENUM(N, HPX_LCOS_TASK_FWD_PARAMS, _)),               \
-//             "task_base::run");                                                \
-//     }                                                                         \
-//     /**/
-//
-//         BOOST_PP_REPEAT_FROM_TO(
-//             1
-//           , HPX_FUNCTION_LIMIT
-//           , HPX_LCOS_TASK_RUN, _
-//         )
-//
-// #undef HPX_LCOS_TASK_RUN
-// #undef HPX_LCOS_TASK_FWD_PARAMS
-// #undef HPX_LCOS_TASK_FWD_REF_PARAMS
-#endif
-
     private:
         struct reset_id
         {
