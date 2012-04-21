@@ -28,8 +28,8 @@ namespace hpx { namespace traits
             typedef is_function_pointer<T> type;
         };
 
-        BOOST_MPL_HAS_XXX_TRAIT_DEF(result_type);
-        BOOST_MPL_HAS_XXX_TRAIT_DEF(result);
+        BOOST_MPL_HAS_XXX_TRAIT_DEF(result_type)
+        BOOST_MPL_HAS_XXX_TRAIT_DEF(result)
 
         template<typename T>
         struct supports_result_of

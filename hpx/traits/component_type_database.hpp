@@ -16,8 +16,8 @@ namespace hpx { namespace traits
     {
         static components::component_type value;
 
-        static HPX_ALWAYS_EXPORT components::component_type get();
-        static HPX_ALWAYS_EXPORT void set(components::component_type);
+        HPX_ALWAYS_EXPORT static components::component_type get();
+        HPX_ALWAYS_EXPORT static void set(components::component_type);
     };
 
     template <typename Component, typename Enable>
