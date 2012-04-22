@@ -278,7 +278,8 @@ namespace hpx
         {
             if (interruption_enabled() && interruption_requested())
             {
-                throw hpx::exception(thread_interrupted,
+                HPX_THROW_EXCEPTION(thread_interrupted,
+                    "hpx::thread::interruption_point",
                     "hpx::this_thread::interruption_point: "
                     "thread aborts itself due to requested thread interruption");
             }
