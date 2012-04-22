@@ -46,7 +46,7 @@ namespace hpx { namespace parcelset
 
         virtual void set_parcelhandler(parcelhandler* ph) = 0;
 
-        virtual boost::int64_t get_queue_length() const = 0;
+        virtual std::size_t get_queue_length() const = 0;
     };
 }}
 

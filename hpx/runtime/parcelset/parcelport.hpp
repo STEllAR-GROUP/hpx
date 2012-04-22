@@ -173,13 +173,13 @@ namespace parcelset
         }
 
         /// number of messages sent
-        boost::int64_t get_send_count() const
+        std::size_t get_send_count() const
         {
             return parcels_sent_.size();
         }
 
         /// number of messages received
-        boost::int64_t get_receive_count() const
+        std::size_t get_receive_count() const
         {
             return parcels_received_.size();
         }
@@ -199,13 +199,13 @@ namespace parcelset
         }
 
         /// total data received (bytes)
-        boost::int64_t get_data_sent() const
+        std::size_t get_data_sent() const
         {
             return parcels_sent_.total_bytes();
         }
 
         /// total data received (bytes)
-        boost::int64_t get_data_received() const
+        std::size_t get_data_received() const
         {
             return parcels_received_.total_bytes();
         }

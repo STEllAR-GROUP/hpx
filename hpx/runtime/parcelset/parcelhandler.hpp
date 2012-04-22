@@ -31,8 +31,8 @@ namespace hpx { namespace parcelset
     class HPX_EXPORT parcelhandler : boost::noncopyable
     {
     private:
-        static void default_write_handler(boost::system::error_code const& e,
-            std::size_t size) {}
+        static void default_write_handler(boost::system::error_code const&,
+            std::size_t /*size*/) {}
 
         void parcel_sink(parcelport& pp,
             boost::shared_ptr<std::vector<char> > parcel_data,
@@ -313,7 +313,7 @@ namespace hpx { namespace parcelset
         void register_counter_types();
 
     protected:
-        boost::int64_t get_queue_length() const
+        std::size_t get_queue_length() const
         {
             return parcels_->get_queue_length();
         }

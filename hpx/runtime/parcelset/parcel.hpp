@@ -122,7 +122,7 @@ namespace hpx { namespace parcelset
         void set_start_time(double starttime)
         {
             start_time_ = starttime;
-            if (creation_time_ == 0)
+            if (std::abs(creation_time_) < 1e-10)
                 creation_time_ = starttime;
         }
         double get_start_time() const
@@ -183,8 +183,15 @@ namespace hpx { namespace parcelset
 ///////////////////////////////////////////////////////////////////////////////
 // this is the current version of the parcel serialization format
 // this definition needs to be in the global namespace
+#ifdef __GNUG__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
 BOOST_CLASS_TRACKING(hpx::parcelset::parcel, boost::serialization::track_never)
 BOOST_CLASS_VERSION(hpx::parcelset::parcel, HPX_PARCEL_VERSION)
+#ifdef __GNUG__
+#pragma GCC diagnostic pop
+#endif
 
 #include <hpx/config/warnings_suffix.hpp>
 

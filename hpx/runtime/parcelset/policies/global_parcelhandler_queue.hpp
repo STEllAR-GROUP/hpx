@@ -106,7 +106,7 @@ namespace hpx { namespace parcelset { namespace policies
             ph_ = ph;
         }
 
-        boost::int64_t get_queue_length() const
+        std::size_t get_queue_length() const
         {
             mutex_type::scoped_lock l(mtx_);
             return parcels_.size();

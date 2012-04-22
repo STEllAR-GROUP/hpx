@@ -54,14 +54,14 @@ namespace hpx { namespace parcelset
 
     ///////////////////////////////////////////////////////////////////////////
     parcelport::parcelport(util::io_service_pool& io_service_pool,
-            naming::locality here
+            naming::locality h
           , std::size_t max_cache_size
           , std::size_t max_connections_per_loc)
       : io_service_pool_(io_service_pool),
         acceptor_(NULL),
         parcels_(This()),
         connection_cache_(max_cache_size, max_connections_per_loc),
-        here_(here)
+        here_(h)
     {}
 
     parcelport::~parcelport()
