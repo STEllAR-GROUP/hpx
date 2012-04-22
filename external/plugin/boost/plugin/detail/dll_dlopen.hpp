@@ -48,36 +48,49 @@ typedef struct HINSTANCE__* HMODULE;
 
 ///////////////////////////////////////////////////////////////////////////////
 #define MyFreeLibrary(x)      dlclose (x)
-#define MyLoadLibrary(x)      (HMODULE)(dlopen(x, RTLD_GLOBAL | RTLD_LAZY))
+#define MyLoadLibrary(x)      reinterpret_cast<HMODULE>(dlopen(x, RTLD_GLOBAL | RTLD_LAZY))
 #define MyGetProcAddress(x,y) dlsym   (x, y)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace boost { namespace plugin {
+
+    namespace very_detail
+    {
+        template <typename TO, typename FROM> 
+        TO nasty_cast(FROM f)
+        {
+            union {
+                FROM f; TO t;
+            } u;
+            u.f = f;
+            return u.t;
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     class dll
     {
     protected:
         ///////////////////////////////////////////////////////////////////////
-        static void init_library(HMODULE dll_handle)
+        static void init_library(HMODULE)
         {
 #if defined(__AIX__) && defined(__GNUC__)
             dlerror();              // Clear the error state.
             typedef void (*init_proc_type)();
             init_proc_type init_proc =
-                (init_proc_type)MyGetProcAddress(dll_handle, "_GLOBAL__DI");
+                (init_proc_type)MyGetProcAddress(dll_hand, "_GLOBAL__DI");
             if (init_proc)
                 init_proc();
 #endif
         }
 
-        static void deinit_library(HMODULE dll_handle)
+        static void deinit_library(HMODULE)
         {
 #if defined(__AIX__) && defined(__GNUC__)
             dlerror();              // Clear the error state.
             typedef void (*free_proc_type)();
             free_proc_type free_proc =
-                (free_proc_type)MyGetProcAddress(dll_handle, "_GLOBAL__DD");
+                (free_proc_type)MyGetProcAddress(dll_hand, "_GLOBAL__DD");
             if (free_proc)
                 free_proc();
 #endif
@@ -87,22 +100,22 @@ namespace boost { namespace plugin {
         template<typename T>
         struct free_dll
         {
-            free_dll(HMODULE h) : h(h) {}
+            free_dll(HMODULE h) : h_(h) {}
 
             void operator()(T)
             {
-                if (NULL != h)
+                if (NULL != h_)
                 {
                     dll::initialize_mutex();
                     boost::mutex::scoped_lock lock(dll::mutex_instance());
 
-                    dll::deinit_library(h);
+                    dll::deinit_library(h_);
                     dlerror();
-                    MyFreeLibrary(h);
+                    MyFreeLibrary(h_);
                 }
             }
 
-            HMODULE h;
+            HMODULE h_;
         };
         template <typename T> friend struct free_dll;
 
@@ -199,7 +212,8 @@ namespace boost { namespace plugin {
 
             // Cast the to right type.
             dlerror();              // Clear the error state.
-            SymbolType address = (SymbolType)MyGetProcAddress(dll_handle, symbol_name.c_str());
+
+            SymbolType address = very_detail::nasty_cast<SymbolType>(MyGetProcAddress(dll_handle, symbol_name.c_str()));
             if (NULL == address)
             {
                 BOOST_PLUGIN_OSSTREAM str;
