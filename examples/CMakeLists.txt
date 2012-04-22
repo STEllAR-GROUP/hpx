@@ -12,6 +12,7 @@ set(subdirs
     balancing
     bfs
     bright_future
+    cancelable_action
     dataflow
     distributed_test
     embarrassingly_parallel
