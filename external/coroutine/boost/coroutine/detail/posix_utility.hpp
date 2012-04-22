@@ -85,15 +85,13 @@ namespace boost { namespace coroutines { namespace detail { namespace posix {
     BOOST_ASSERT(size > EXEC_PAGESIZE);
 
     // Fill the bottom 8 bytes of the first page with 1s.
-    void** watermark = static_cast<void**>(
-        static_cast<char*>(stack) + ((size - EXEC_PAGESIZE) / sizeof(void*)));
+    void** watermark = static_cast<void**>(stack) + ((size - EXEC_PAGESIZE) / sizeof(void*));
     *watermark = reinterpret_cast<void*>(~0);
   }
 
   inline
   bool reset_stack(void* stack, std::size_t size) {
-    void** watermark = static_cast<void**>(
-        static_cast<char*>(stack) + ((size - EXEC_PAGESIZE) / sizeof(void*)));
+    void** watermark = static_cast<void**>(stack) + ((size - EXEC_PAGESIZE) / sizeof(void*));
 
     // If the watermark has been overwritten, then we've gone past the first
     // page.
