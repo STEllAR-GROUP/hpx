@@ -19,7 +19,6 @@
 #include <hpx/components/dataflow/server/dataflow.hpp>
 #include <hpx/components/dataflow/server/dataflow_trigger.hpp>
 #include <hpx/components/dataflow/dataflow_base.hpp>
-#include <hpx/include/iostreams.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
