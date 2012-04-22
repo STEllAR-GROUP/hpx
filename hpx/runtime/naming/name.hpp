@@ -212,7 +212,7 @@ namespace hpx { namespace naming
         friend class boost::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive & ar, const unsigned int version)
+        void serialize(Archive & ar, const unsigned int /*version*/)
         {
             ar & id_msb_;
             ar & id_lsb_;
@@ -271,12 +271,13 @@ namespace hpx { namespace naming
     {
         boost::uint64_t msb = id.get_msb();
         boost::uint32_t c =
-            boost::uint16_t((msb & gid_type::credit_mask) >> 16) + credit;
+            static_cast<boost::uint32_t>(boost::uint16_t((msb & gid_type::credit_mask) >> 16) + credit);
 
         BOOST_ASSERT(0 == (c & ~gid_type::credit_base_mask));
         id.set_msb((msb & ~gid_type::credit_mask) |
             ((c & gid_type::credit_base_mask) << 16));
-        return c;
+        BOOST_ASSERT(c < std::numeric_limits<boost::uint16_t>::max());
+        return static_cast<boost::uint16_t>(c);
     }
 
     inline boost::uint64_t strip_credit_from_gid(boost::uint64_t msb) HPX_SUPER_PURE;
@@ -320,7 +321,8 @@ namespace hpx { namespace naming
     {
         boost::uint64_t msb = id.get_msb();
         boost::uint16_t credits = boost::uint16_t((msb & gid_type::credit_mask) >> 16);
-        boost::uint32_t newcredits = credits / fraction;
+        BOOST_ASSERT(fraction > 0);
+        boost::uint32_t newcredits = static_cast<boost::uint32_t>(credits / fraction);
 
         msb &= ~gid_type::credit_mask;
         id.set_msb(msb | (((credits - newcredits) << 16) & gid_type::credit_mask) | gid_type::was_split_mask);
@@ -351,8 +353,8 @@ namespace hpx { namespace naming
         struct HPX_EXPORT id_type_impl;
 
         // custom deleter for id_type_impl above
-        void HPX_EXPORT gid_managed_deleter (id_type_impl* p);
-        void HPX_EXPORT gid_unmanaged_deleter (id_type_impl* p);
+        HPX_EXPORT void gid_managed_deleter (id_type_impl* p);
+        HPX_EXPORT void gid_unmanaged_deleter (id_type_impl* p);
 
         ///////////////////////////////////////////////////////////////////////
         struct HPX_EXPORT id_type_impl : gid_type
@@ -549,7 +551,7 @@ namespace hpx { namespace naming
         void load(Archive & ar, const unsigned int version);
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()
-        BOOST_COPYABLE_AND_MOVABLE(id_type);
+        BOOST_COPYABLE_AND_MOVABLE(id_type)
 
         boost::intrusive_ptr<detail::id_type_impl> gid_;
     };
@@ -605,11 +607,18 @@ namespace hpx { namespace traits
 
 ///////////////////////////////////////////////////////////////////////////////
 // this is the current version of the id_type serialization format
+#ifdef __GNUG__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
 BOOST_CLASS_VERSION(hpx::naming::gid_type, HPX_GIDTYPE_VERSION)
 BOOST_CLASS_TRACKING(hpx::naming::gid_type, boost::serialization::track_never)
 BOOST_CLASS_VERSION(hpx::naming::id_type, HPX_IDTYPE_VERSION)
 BOOST_CLASS_TRACKING(hpx::naming::id_type, boost::serialization::track_never)
 BOOST_SERIALIZATION_INTRUSIVE_PTR(hpx::naming::detail::id_type_impl)
+#ifdef __GNUG__
+#pragma GCC diagnostic pop
+#endif
 
 #include <hpx/config/warnings_suffix.hpp>
 

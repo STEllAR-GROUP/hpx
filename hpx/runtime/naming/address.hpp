@@ -104,7 +104,7 @@ namespace hpx { namespace naming
     {
         boost::io::ios_flags_saver ifs(os);
         os << "(" << addr.locality_ << ":"
-           << components::get_component_type_name((int)addr.type_)
+           << components::get_component_type_name(static_cast<int>(addr.type_))
            << ":" << std::showbase << std::hex << addr.address_ << ")";
         return os;
     }
@@ -115,8 +115,15 @@ namespace hpx { namespace naming
 ///////////////////////////////////////////////////////////////////////////////
 // this is the current version of the address serialization format
 // this definition needs to be in the global namespace
+#ifdef __GNUG__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
 BOOST_CLASS_VERSION(hpx::naming::address, HPX_ADDRESS_VERSION)
 BOOST_CLASS_TRACKING(hpx::naming::address, boost::serialization::track_never)
+#ifdef __GNUG__
+#pragma GCC diagnostic pop
+#endif
 
 #include <hpx/config/warnings_suffix.hpp>
 

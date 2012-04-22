@@ -57,8 +57,7 @@ namespace hpx { namespace naming
             else {
                 // If the gid was not split at any point in time we can assume
                 // that the referenced object is fully local.
-                components::component_type t =
-                    static_cast<components::component_type>(addr.type_);
+                components::component_type t = addr.type_;
 
                 BOOST_ASSERT(t != components::component_invalid);
 

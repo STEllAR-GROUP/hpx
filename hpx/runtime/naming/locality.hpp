@@ -42,7 +42,7 @@ namespace hpx { namespace naming
             {
             }
 
-            bool operator()(boost::asio::ip::tcp::endpoint ep) const
+            bool operator()(boost::asio::ip::tcp::endpoint) const
             {
                 return true;
             }
@@ -186,8 +186,16 @@ namespace hpx { namespace naming
 ///////////////////////////////////////////////////////////////////////////////
 // this is the current version of the parcel serialization format
 // this definition needs to be in the global namespace
+
+#ifdef __GNUG__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
 BOOST_CLASS_VERSION(hpx::naming::locality, HPX_LOCALITY_VERSION)
 BOOST_CLASS_TRACKING(hpx::naming::locality, boost::serialization::track_never)
+#ifdef __GNUG__
+#pragma GCC diagnostic pop
+#endif
 
 #include <hpx/config/warnings_suffix.hpp>
 
