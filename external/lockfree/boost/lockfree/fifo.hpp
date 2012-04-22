@@ -48,7 +48,8 @@ private:
         {
             /* increment tag to avoid ABA problem */
             tagged_node_ptr old_next = next.load(memory_order_relaxed);
-            tagged_node_ptr new_next (NULL, old_next.get_tag()+1);
+            BOOST_ASSERT(old_next.get_tag()+1 < std::numeric_limits<unsigned short>::max());
+            tagged_node_ptr new_next (NULL, static_cast<unsigned short>(old_next.get_tag()+1));
             next.store(new_next, memory_order_release);
         }
 
@@ -161,13 +162,18 @@ public:
             tagged_node_ptr tail2 = tail_.load(memory_order_acquire);
             if (likely(tail == tail2)) {
                 if (next_ptr == 0) {
-                    if ( tail->next.compare_exchange_weak(next, tagged_node_ptr(n, next.get_tag() + 1)) ) {
-                        tail_.compare_exchange_strong(tail, tagged_node_ptr(n, tail.get_tag() + 1));
+                    BOOST_ASSERT(next.get_tag() + 1 < std::numeric_limits<short unsigned>::max());
+                    if ( tail->next.compare_exchange_weak(next, tagged_node_ptr(n, static_cast<short unsigned>(next.get_tag() + 1))) ) {
+                        BOOST_ASSERT(tail.get_tag() + 1 < std::numeric_limits<short unsigned>::max());
+                        tail_.compare_exchange_strong(tail, tagged_node_ptr(n, static_cast<short unsigned>(tail.get_tag() + 1)));
                         return true;
                     }
                 }
                 else
-                    tail_.compare_exchange_strong(tail, tagged_node_ptr(next_ptr, tail.get_tag() + 1));
+                {
+                    BOOST_ASSERT(tail.get_tag() + 1 < std::numeric_limits<short unsigned>::max());
+                    tail_.compare_exchange_strong(tail, tagged_node_ptr(next_ptr, static_cast<short unsigned>(tail.get_tag() + 1)));
+                }
             }
         }
     }
@@ -225,7 +231,8 @@ public:
                 if (head.get_ptr() == tail.get_ptr()) {
                     if (next_ptr == 0)
                         return false;
-                    tail_.compare_exchange_strong(tail, tagged_node_ptr(next_ptr, tail.get_tag() + 1));
+                    BOOST_ASSERT(tail.get_tag() + 1 < std::numeric_limits<short unsigned>::max());
+                    tail_.compare_exchange_strong(tail, tagged_node_ptr(next_ptr, static_cast<short unsigned>(tail.get_tag() + 1)));
                 } else {
                     if (next_ptr == 0)
                         /* this check is not part of the original algorithm as published by michael and scott
@@ -235,7 +242,8 @@ public:
                          * */
                         continue;
                     ret = next_ptr->data;
-                    if (head_.compare_exchange_weak(head, tagged_node_ptr(next_ptr, head.get_tag() + 1))) {
+                    BOOST_ASSERT(head.get_tag() + 1 < std::numeric_limits<short unsigned>::max());
+                    if (head_.compare_exchange_weak(head, tagged_node_ptr(next_ptr, static_cast<short unsigned>(head.get_tag() + 1)))) {
                         pool.destruct(head.get_ptr());
                         return true;
                     }
@@ -265,7 +273,8 @@ public:
             if (head.get_ptr() == tail.get_ptr()) {
                 if (next_ptr == 0)
                     return false;
-                tail_.store(tagged_node_ptr(next_ptr, tail.get_tag() + 1), memory_order_relaxed);
+                BOOST_ASSERT(tail.get_tag() + 1 < std::numeric_limits<short unsigned>::max());
+                tail_.store(tagged_node_ptr(next_ptr, static_cast<short unsigned>(tail.get_tag() + 1)), memory_order_relaxed);
             } else {
                 if (next_ptr == 0)
                     /* this check is not part of the original algorithm as published by michael and scott
@@ -274,8 +283,9 @@ public:
                      * allocation. we can observe a null-pointer here.
                      * */
                     continue;
+                BOOST_ASSERT(head.get_tag() + 1 < std::numeric_limits<short unsigned>::max());
                 ret = next_ptr->data;
-                head_.store(tagged_node_ptr(next_ptr, head.get_tag() + 1), memory_order_relaxed);
+                head_.store(tagged_node_ptr(next_ptr, static_cast<short unsigned>(head.get_tag() + 1)), memory_order_relaxed);
                 pool.destruct_unsafe(head.get_ptr());
                 return true;
             }
