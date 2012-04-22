@@ -31,14 +31,14 @@ namespace hpx { namespace performance_counters { namespace parcels
 
         void add_data(data_point const& x);
 
-        boost::int64_t size() const;
-        boost::int64_t total_bytes() const;
+        std::size_t size() const;
+        std::size_t total_bytes() const;
         boost::int64_t total_time() const;
 
     private:
-        boost::int64_t overall_bytes_;
+        std::size_t overall_bytes_;
         boost::int64_t overall_time_;
-        boost::int64_t gatherer_size_;
+        std::size_t gatherer_size_;
 
         // Create mutex for accumulator functions.
         mutable mutex_type acc_mtx;
@@ -53,7 +53,7 @@ namespace hpx { namespace performance_counters { namespace parcels
         gatherer_size_ += x.num_parcels_;
     }
 
-    inline boost::int64_t gatherer::size() const
+    inline std::size_t gatherer::size() const
     {
         mutex_type::scoped_lock mtx(acc_mtx);
         return gatherer_size_;
@@ -65,7 +65,7 @@ namespace hpx { namespace performance_counters { namespace parcels
         return overall_time_;
     }
 
-    inline boost::int64_t gatherer::total_bytes() const
+    inline std::size_t gatherer::total_bytes() const
     {
         mutex_type::scoped_lock mtx(acc_mtx);
         return overall_bytes_;

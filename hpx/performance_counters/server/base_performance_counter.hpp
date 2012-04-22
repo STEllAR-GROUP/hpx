@@ -45,7 +45,7 @@ namespace hpx { namespace performance_counters { namespace server
                 "reset_counter_value is not implemented for this counter");
         }
 
-        virtual void set_counter_value(counter_value const& value)
+        virtual void set_counter_value(counter_value const& /*value*/)
         {
             HPX_THROW_EXCEPTION(invalid_status, "set_counter_value",
                 "set_counter_value is not implemented for this counter");
@@ -181,29 +181,29 @@ namespace hpx { namespace performance_counters { namespace server
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::performance_counters::server::base_performance_counter::get_counter_info_action,
-    performance_counter_get_counter_info_action);
+    performance_counter_get_counter_info_action)
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::performance_counters::server::base_performance_counter::get_counter_value_action,
-    performance_counter_get_counter_value_action);
+    performance_counter_get_counter_value_action)
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::performance_counters::server::base_performance_counter::set_counter_value_action,
-    performance_counter_set_counter_value_action);
+    performance_counter_set_counter_value_action)
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::performance_counters::server::base_performance_counter::reset_counter_value_action,
-    performance_counter_reset_counter_value_action);
+    performance_counter_reset_counter_value_action)
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::performance_counters::server::base_performance_counter::start_action,
-    performance_counter_start_action);
+    performance_counter_start_action)
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::performance_counters::server::base_performance_counter::stop_action,
-    performance_counter_stop_action);
+    performance_counter_stop_action)
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::lcos::base_lco_with_value<hpx::performance_counters::counter_info>::set_value_action,
-    set_value_action_counter_info);
+    set_value_action_counter_info)
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::lcos::base_lco_with_value<hpx::performance_counters::counter_value>::set_value_action,
-    set_value_action_counter_value);
+    set_value_action_counter_value)
 
 #endif
 

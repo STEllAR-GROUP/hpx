@@ -57,8 +57,8 @@ namespace hpx { namespace performance_counters
 
     ///////////////////////////////////////////////////////////////////////////
     counter_status registry::add_counter_type(counter_info const& info,
-        HPX_STD_FUNCTION<create_counter_func> const& create_counter,
-        HPX_STD_FUNCTION<discover_counters_func> const& discover_counters,
+        HPX_STD_FUNCTION<create_counter_func> const& create_counter_,
+        HPX_STD_FUNCTION<discover_counters_func> const& discover_counters_,
         error_code& ec)
     {
         // create canonical type name
@@ -75,7 +75,7 @@ namespace hpx { namespace performance_counters
 
         std::pair<counter_type_map_type::iterator, bool> p =
             countertypes_.insert(counter_type_map_type::value_type(
-            type_name, counter_data(info, create_counter, discover_counters)));
+            type_name, counter_data(info, create_counter_, discover_counters_)));
 
         if (p.second) {
             LPCS_(info) << (boost::format("counter type %s registered") %
@@ -240,8 +240,8 @@ namespace hpx { namespace performance_counters
 
         // create the counter as requested
         try {
-            typedef components::managed_component<server::raw_counter> counter_type;
-            id = components::server::create_one<counter_type>(complemented_info, f);
+            typedef components::managed_component<server::raw_counter> counter_t;
+            id = components::server::create_one<counter_t>(complemented_info, f);
 
             std::string name(complemented_info.fullname_);
             ensure_counter_prefix(name);      // pre-pend prefix, if necessary
@@ -291,8 +291,8 @@ namespace hpx { namespace performance_counters
             switch (complemented_info.type_) {
             case counter_elapsed_time:
                 {
-                    typedef components::managed_component<server::elapsed_time_counter> counter_type;
-                    id = components::server::create_one<counter_type>(complemented_info);
+                    typedef components::managed_component<server::elapsed_time_counter> counter_t;
+                    id = components::server::create_one<counter_t>(complemented_info);
                 }
                 break;
 
@@ -330,7 +330,7 @@ namespace hpx { namespace performance_counters
     ///        (milliseconds).
     counter_status registry::create_aggregating_counter(
         counter_info const& info, std::string const& base_counter_name,
-        std::size_t base_time_interval, naming::gid_type& gid, error_code& ec)
+        boost::int64_t base_time_interval, naming::gid_type& gid, error_code& ec)
     {
         // create canonical type name
         std::string type_name;
@@ -370,24 +370,24 @@ namespace hpx { namespace performance_counters
                 typedef hpx::components::managed_component<
                     hpx::performance_counters::server::aggregating_counter<
                         boost::accumulators::tag::mean>
-                > counter_type;
-                gid = components::server::create_one<counter_type>(
+                > counter_t;
+                gid = components::server::create_one<counter_t>(
                     complemented_info, base_counter_name, base_time_interval);
             }
             else if (p.countername_ == "max") {
                 typedef hpx::components::managed_component<
                     hpx::performance_counters::server::aggregating_counter<
                         boost::accumulators::tag::max>
-                > counter_type;
-                gid = components::server::create_one<counter_type>(
+                > counter_t;
+                gid = components::server::create_one<counter_t>(
                     complemented_info, base_counter_name, base_time_interval);
             }
             else if (p.countername_ == "min") {
                 typedef hpx::components::managed_component<
                     hpx::performance_counters::server::aggregating_counter<
                         boost::accumulators::tag::min>
-                > counter_type;
-                gid = components::server::create_one<counter_type>(
+                > counter_t;
+                gid = components::server::create_one<counter_t>(
                     complemented_info, base_counter_name, base_time_interval);
             }
             else {

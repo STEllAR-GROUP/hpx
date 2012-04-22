@@ -135,7 +135,7 @@ namespace hpx { namespace performance_counters
         status_already_defined, ///< The type or instance already has been defined
         status_counter_unknown, ///< The counter instance is unknown
         status_counter_type_unknown,  ///< The counter type is unknown
-        status_generic_error,   ///< A unknown error occurred
+        status_generic_error    ///< A unknown error occurred
     };
 
     inline bool status_is_valid(counter_status s)
@@ -203,7 +203,7 @@ namespace hpx { namespace performance_counters
         counter_path_elements(std::string const& objectname,
                 std::string const& countername, std::string const& parameters,
                 std::string const& parentname, std::string const& instancename,
-                boost::int32_t parentindex = -1, boost::int32_t instanceindex = -1,
+                boost::int64_t parentindex = -1, boost::int64_t instanceindex = -1,
                 bool parentinstance_is_basename = false)
           : counter_type_path_elements(objectname, countername, parameters),
             parentinstancename_(parentname), instancename_(instancename),
@@ -213,8 +213,8 @@ namespace hpx { namespace performance_counters
 
         std::string parentinstancename_;  ///< the name of the parent instance
         std::string instancename_;        ///< the name of the object instance
-        boost::int32_t parentinstanceindex_;    ///< the parent instance index
-        boost::int32_t instanceindex_;    ///< the instance index
+        boost::int64_t parentinstanceindex_;    ///< the parent instance index
+        boost::int64_t instanceindex_;    ///< the instance index
         bool parentinstance_is_basename_; ///< the parentinstancename_ member holds a base counter name
 
     private:
@@ -378,6 +378,8 @@ namespace hpx { namespace performance_counters
                 return T();
             }
 
+            T val = static_cast<T>(value_);
+
             if (scaling_ != 1) {
                 if (scaling_ == 0) {
                     HPX_THROWS_IF(ec, uninitialized_value,
@@ -386,13 +388,14 @@ namespace hpx { namespace performance_counters
                     return T();
                 }
 
+                T scale = static_cast<T>(scaling_);
                 // calculate and return the real counter value
                 if (scale_inverse_)
-                    return T(value_) / scaling_;
+                    return T(value_) / scale;
 
-                return T(value_) * scaling_;
+                return T(value_) * scale;
             }
-            return T(value_);
+            return val;
         }
 
     private:
@@ -499,7 +502,7 @@ namespace hpx { namespace performance_counters
         //        (milliseconds).
         naming::gid_type create_aggregating_counter(
             counter_info const& info, std::string const& base_counter_name,
-            std::size_t base_time_interval, error_code& ec = throws);
+            boost::int64_t base_time_interval, error_code& ec = throws);
 
         // \brief Create a new performance counter instance based on given
         //        counter info
