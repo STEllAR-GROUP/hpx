@@ -67,7 +67,7 @@ namespace op_equal {
             const type & real_other = dynamic_cast<const type&>(other);
 
             // this forces 'type' to implement operator==
-            return ((const type&)*this).operator ==( real_other);
+            return (dynamic_cast<const type&>(*this)).operator ==( real_other);
         }
     };
 

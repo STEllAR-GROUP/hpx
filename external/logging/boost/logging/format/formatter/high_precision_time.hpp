@@ -78,8 +78,8 @@ template<class convert = do_convert_format::prepend> struct high_precision_time_
     template<class msg_type> void write_high_precision_time(msg_type & msg, ::boost::posix_time::ptime val) const {
         char_type buffer[64];
 
-        int nanosecs = (int)val.time_of_day().fractional_seconds();
-        int digits = val.time_of_day().num_fractional_digits();
+        int nanosecs = static_cast<int>(val.time_of_day().fractional_seconds());
+        int digits = static_cast<int>(val.time_of_day().num_fractional_digits());
         switch ( digits) {
         case 0: break; // no high precision at all
         case 1: nanosecs *= 100000000; break;

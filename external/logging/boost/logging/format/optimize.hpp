@@ -57,7 +57,7 @@ namespace optimize {
         @param grow_size - in case we add a string and there's no room for it, with how much should we grow? We'll
                            grow this much in addition to the added string - in the needed direction
          */
-        cache_string_one_str(int reserve_prepend_, int reserve_append_, int grow_size_ = 10)
+        cache_string_one_str(std::size_t reserve_prepend_, std::size_t reserve_append_, std::size_t grow_size_ = 10)
                 : m_reserve_prepend(reserve_prepend_), m_reserve_append(reserve_append_), m_grow_size(grow_size_), m_full_msg_computed(false) {}
 
         /**
@@ -67,7 +67,7 @@ namespace optimize {
         @param grow_size - in case we add a string and there's no room for it, with how much should we grow? We'll
                            grow this much in addition to the added string - in the needed direction
          */
-        cache_string_one_str(const string_type & msg, int reserve_prepend_ = 10, int reserve_append_ = 10, int grow_size_ = 10)
+        cache_string_one_str(const string_type & msg, std::size_t reserve_prepend_ = 10, std::size_t reserve_append_ = 10, std::size_t grow_size_ = 10)
                 : m_reserve_prepend(reserve_prepend_), m_reserve_append(reserve_append_), m_grow_size(grow_size_), m_full_msg_computed(false) {
             set_string(msg);
         }
@@ -75,57 +75,57 @@ namespace optimize {
         cache_string_one_str() : m_reserve_prepend(10), m_reserve_append(10), m_grow_size(10), m_full_msg_computed(false) {}
 
         void set_string(const string_type & str) {
-            m_str.resize( str.size() + m_reserve_prepend + m_reserve_append);
-            std::copy( str.begin(), str.end(), m_str.begin() + m_reserve_prepend);
+            m_str.resize(str.size() + m_reserve_prepend + m_reserve_append);
+            std::copy( str.begin(), str.end(), m_str.begin() + static_cast<typename string_type::difference_type>(m_reserve_prepend));
             m_full_msg_computed = false;
         }
 
-        int reserve_prepend() const { return m_reserve_prepend; }
-        int reserve_append() const { return m_reserve_append; }
-        int grow_size() const { return m_grow_size; }
+        std::size_t reserve_prepend() const { return m_reserve_prepend; }
+        std::size_t reserve_append() const { return m_reserve_append; }
+        std::size_t grow_size() const { return m_grow_size; }
 
-        void reserve_prepend(int new_size) {
+        void reserve_prepend(std::size_t new_size) {
             resize_string(new_size, m_reserve_append);
         }
 
-        void reserve_append(int new_size) {
+        void reserve_append(std::size_t new_size) {
             resize_string(m_reserve_prepend, new_size);
         }
 
-        void grow_size(int new_size) {
+        void grow_size(std::size_t new_size) {
             m_grow_size = new_size;
         }
 
     private:
-        static int str_len(const char* str)             { return (int)strlen(str); }
-        static int str_len(const wchar_t* str)          { return (int)wcslen(str); }
+        static std::size_t str_len(const char* str)             { return strlen(str); }
+        static std::size_t str_len(const wchar_t* str)          { return wcslen(str); }
     public:
 
         void prepend_string(const char_type* str) {
-            int len = str_len(str);
+            std::size_t len = str_len(str);
             if ( m_reserve_prepend < len) {
-                int new_reserve_prepend = len + m_grow_size ;
+                std::size_t new_reserve_prepend = len + m_grow_size ;
                 resize_string( new_reserve_prepend, m_reserve_append);
             }
 
             BOOST_ASSERT(m_reserve_prepend >= len );
 
-            int start_idx = m_reserve_prepend - len;
+            typename string_type::difference_type start_idx = static_cast<typename string_type::difference_type>(m_reserve_prepend - len);
             m_reserve_prepend -= len;
 
             std::copy(str, str + len, m_str.begin() + start_idx);
             m_full_msg_computed = false;
         }
         void append_string(const char_type* str) {
-            int len = str_len(str);
+            std::size_t len = str_len(str);
             if ( m_reserve_append < len) {
-                int new_reserve_append = len + m_grow_size ;
+                std::size_t new_reserve_append = len + m_grow_size ;
                 resize_string( m_reserve_prepend, new_reserve_append);
             }
 
             BOOST_ASSERT(m_reserve_append >= len );
 
-            int start_idx = (int)m_str.size() - m_reserve_append;
+            typename string_type::difference_type start_idx = static_cast<typename string_type::difference_type>(m_str.size() - m_reserve_append);
 
             std::copy(str, str + len, m_str.begin() + start_idx);
             m_reserve_append -= len;
@@ -138,15 +138,15 @@ namespace optimize {
             @brief pre-pends a string (inserts it at the beginning)
         */
         void prepend_string(const string_type & str) {
-            if ( m_reserve_prepend < (int)str.size()) {
-                int new_reserve_prepend = (int)str.size() + m_grow_size ;
+            if ( m_reserve_prepend < str.size()) {
+                std::size_t new_reserve_prepend = str.size() + m_grow_size ;
                 resize_string( new_reserve_prepend, m_reserve_append);
             }
 
-            BOOST_ASSERT(m_reserve_prepend >= (int)str.size() );
+            BOOST_ASSERT(m_reserve_prepend >= str.size() );
 
-            int start_idx = m_reserve_prepend - (int)str.size();
-            m_reserve_prepend -= (int)str.size();
+            typename string_type::difference_type start_idx = static_cast<typename string_type::difference_type>(m_reserve_prepend - str.size());
+            m_reserve_prepend -= str.size();
 
             std::copy(str.begin(), str.end(), m_str.begin() + start_idx);
             m_full_msg_computed = false;
@@ -156,17 +156,17 @@ namespace optimize {
             @brief appends a string (inserts it at the end)
         */
         void append_string(const string_type & str) {
-            if ( m_reserve_append < (int)str.size()) {
-                int new_reserve_append = (int)str.size() + m_grow_size ;
+            if ( m_reserve_append < str.size()) {
+                std::size_t new_reserve_append = str.size() + m_grow_size ;
                 resize_string( m_reserve_prepend, new_reserve_append);
             }
 
-            BOOST_ASSERT(m_reserve_append >= (int)str.size() );
+            BOOST_ASSERT(m_reserve_append >= str.size());
 
-            int start_idx = (int)m_str.size() - m_reserve_append;
+            typename string_type::difference_type start_idx = static_cast<typename string_type::difference_type>(m_str.size() - m_reserve_append);
 
             std::copy(str.begin(), str.end(), m_str.begin() + start_idx);
-            m_reserve_append -= (int)str.size();
+            m_reserve_append -= str.size();
             m_full_msg_computed = false;
         }
 
@@ -191,19 +191,18 @@ namespace optimize {
         operator const string_type&() const { return full_string(); }
 
     private:
-        void resize_string(int reserve_prepend_, int reserve_append_) {
-            BOOST_ASSERT( reserve_prepend_ >= 0 && reserve_append_ >= 0);
-
+        void resize_string(std::size_t reserve_prepend_, std::size_t reserve_append_) {
             if ( is_string_set() ) {
-                int to_add = reserve_prepend_ + reserve_append_ - m_reserve_prepend - m_reserve_append ;
-                int new_size = (int)m_str.size() + to_add;
-                if ( new_size < 0)
-                    new_size = 0;
+                std::size_t to_add = reserve_prepend_ + reserve_append_ - m_reserve_prepend - m_reserve_append ;
+                std::size_t new_size = m_str.size() + to_add;
+                
                 // I'm creating a new string instead of resizing the existing one
                 // this is because the new string could be of lower size
                 string_type new_str(reserve_prepend_, 0);
-                int used_size = (int)m_str.size() - m_reserve_prepend - m_reserve_append;
-                new_str.insert( new_str.end(), m_str.begin() + m_reserve_prepend, m_str.begin() + m_reserve_prepend + used_size);
+                std::size_t used_size = m_str.size() - m_reserve_prepend - m_reserve_append;
+                new_str.insert( new_str.end(), m_str.begin() +
+                        static_cast<typename string_type::difference_type>(m_reserve_prepend), m_str.begin() +
+                        static_cast<typename string_type::difference_type>(m_reserve_prepend + used_size));
 
                 BOOST_ASSERT(new_size == reserve_prepend_ + used_size + reserve_append_);
 
@@ -217,12 +216,12 @@ namespace optimize {
 
         // if true, string was already set
         bool is_string_set() const {
-            return (int)m_str.size() > 0;
+            return !m_str.empty();
         }
     private:
-        int m_reserve_prepend;
-        int m_reserve_append;
-        int m_grow_size;
+        std::size_t m_reserve_prepend;
+        std::size_t m_reserve_append;
+        std::size_t m_grow_size;
         string_type m_str;
 
         // caching

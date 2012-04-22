@@ -541,6 +541,7 @@ g_l().add_formatter( my_cool_formatter() );
 @sa boost::logging::destination::convert, boost::logging::formatter::convert
 */
 struct is_generic {
+    virtual ~is_generic() {}
 
     /** @brief Override this if you want to allow configuration through scripting
 

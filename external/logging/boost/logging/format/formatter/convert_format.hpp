@@ -85,7 +85,7 @@ namespace convert {
         typedef ::boost::logging::tag::holder<string,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10> original_type;
 
         // note: this needs 2 conversions - to string, and then to cache string
-        static const type& get(const original_type & str) { return (const string&)str; }
+        static const type& get(const original_type & str) { return str; }
     };
 
     /**

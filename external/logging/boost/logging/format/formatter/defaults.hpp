@@ -62,7 +62,7 @@ template<class convert = do_convert_format::prepend> struct idx_t : is_generic, 
     typedef formatter::non_const_context<boost::uint64_t> non_const_context_base;
     typedef convert convert_type;
 
-    idx_t() : non_const_context_base((boost::uint64_t)0) {}
+    idx_t() : non_const_context_base(0ull) {}
     template<class msg_type> void operator()(msg_type & str) const {
         std::basic_ostringstream<char_type> idx;
         idx << std::hex << std::setw(sizeof(boost::uint64_t)*2) << std::setfill('0') << ++context();

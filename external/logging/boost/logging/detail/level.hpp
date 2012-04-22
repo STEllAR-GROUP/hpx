@@ -49,7 +49,7 @@ namespace level {
     typedef unsigned int type;
 
     enum {
-        disable_all = (type)-1,
+        disable_all = static_cast<type>(-1),
         enable_all = 0,
         debug = 1000,
         info = 2000,
