@@ -97,7 +97,7 @@ namespace boost { namespace serialization
                 throw_pid_ = *pid_;
             }
 
-            std::size_t const* shepherd =
+            boost::int64_t const* shepherd =
                 boost::get_error_info<hpx::throw_shepherd>(e);
             if (shepherd) {
                 throw_shepherd_ = *shepherd;
