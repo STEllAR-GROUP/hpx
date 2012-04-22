@@ -84,7 +84,7 @@ namespace hpx
         {
             service_mode_invalid = -1,
             service_mode_bootstrap = 0,
-            service_mode_hosted = 1,
+            service_mode_hosted = 1
         };
     }
 
@@ -220,7 +220,7 @@ namespace hpx
             wait_signaled = 0,  ///< The thread has been signaled
             wait_timeout = 1,   ///< The thread has been reactivated after a timeout
             wait_terminate = 2, ///< The thread needs to be terminated
-            wait_abort = 3,     ///< The thread needs to be aborted
+            wait_abort = 3      ///< The thread needs to be aborted
         };
 
         typedef threads::detail::tagged_thread_state<thread_state_ex_enum> thread_state_ex;
@@ -360,7 +360,7 @@ namespace hpx
         destination_hpx = 0,
         destination_timing = 1,
         destination_agas = 2,
-        destination_app = 3,
+        destination_app = 3
     };
 
     /// \namespace components
@@ -375,7 +375,8 @@ namespace hpx
         }
 
         ///////////////////////////////////////////////////////////////////////
-        enum component_type
+        typedef int32_t component_type;
+        enum component_enum_type
         {
             component_invalid = -1,
             component_runtime_support = 0,  // runtime support (needed to create components, etc.)
