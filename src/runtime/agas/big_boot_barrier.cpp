@@ -560,10 +560,10 @@ using hpx::agas::notify_console_action;
 using hpx::agas::register_worker_action;
 using hpx::agas::notify_worker_action;
 
-HPX_REGISTER_PLAIN_ACTION_EX2(register_console_action, register_console_action, true);
-HPX_REGISTER_PLAIN_ACTION_EX2(notify_console_action, notify_console_action, true);
-HPX_REGISTER_PLAIN_ACTION_EX2(register_worker_action, register_worker_action, true);
-HPX_REGISTER_PLAIN_ACTION_EX2(notify_worker_action, notify_worker_action, true);
+HPX_REGISTER_PLAIN_ACTION_EX2(register_console_action, register_console_action, true)
+HPX_REGISTER_PLAIN_ACTION_EX2(notify_console_action, notify_console_action, true)
+HPX_REGISTER_PLAIN_ACTION_EX2(register_worker_action, register_worker_action, true)
+HPX_REGISTER_PLAIN_ACTION_EX2(notify_worker_action, notify_worker_action, true)
 
 namespace hpx { namespace agas
 {
@@ -694,10 +694,10 @@ void big_boot_barrier::wait()
                 registration_header
                     (get_runtime().here(),
                      HPX_INITIAL_GID_RANGE,
-                     (boost::uint64_t) response_heap_type::block_type::heap_step,
+                     response_heap_type::block_type::heap_step,
                      p->get_address(),
-                     (boost::uint64_t) response_heap_type::block_type::heap_size,
-                     (std::size_t) p,
+                     response_heap_type::block_type::heap_size,
+                     reinterpret_cast<std::size_t>(p),
                      get_runtime().get_runtime_support_lva(),
                      get_runtime().get_memory_lva())));
             spin();
@@ -713,10 +713,10 @@ void big_boot_barrier::wait()
                 registration_header
                     (get_runtime().here(),
                      HPX_INITIAL_GID_RANGE,
-                     (boost::uint64_t) response_heap_type::block_type::heap_step,
+                     response_heap_type::block_type::heap_step,
                      p->get_address(),
-                     (boost::uint64_t) response_heap_type::block_type::heap_size,
-                     (std::size_t) p,
+                     response_heap_type::block_type::heap_size,
+                     reinterpret_cast<std::size_t>(p),
                      get_runtime().get_runtime_support_lva(),
                      get_runtime().get_memory_lva())));
             spin();

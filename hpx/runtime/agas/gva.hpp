@@ -194,8 +194,15 @@ operator<< (std::basic_ostream<Char, Traits>& os, gva const& addr)
 
 }}
 
+#ifdef __GNUG__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
 BOOST_CLASS_VERSION(hpx::agas::gva, HPX_AGAS_VERSION)
 BOOST_CLASS_TRACKING(hpx::agas::gva, boost::serialization::track_never)
+#ifdef __GNUG__
+#pragma GCC diagnostic pop
+#endif
 
 #endif // HPX_83DB815F_26D5_4525_AC5B_E702FBD886D4
 

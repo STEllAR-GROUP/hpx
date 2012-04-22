@@ -338,7 +338,7 @@ response component_namespace::iterate_types(
                                          , end = component_ids_.end();
          it != end; ++it)
     {
-        f(it->first, static_cast<components::component_type>(it->second));
+        f(it->first, it->second);
     }
 
     LAGAS_(info) << "component_namespace::iterate_types";

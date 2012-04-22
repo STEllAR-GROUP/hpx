@@ -140,11 +140,11 @@ struct HPX_EXPORT symbol_namespace :
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::agas::server::symbol_namespace::bulk_service_action,
-    symbol_namespace_bulk_service_action);
+    symbol_namespace_bulk_service_action)
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::agas::server::symbol_namespace::service_action,
-    symbol_namespace_service_action);
+    symbol_namespace_service_action)
 
 #endif // HPX_D69CE952_C5D9_4545_B83E_BA3DCFD812EB
 

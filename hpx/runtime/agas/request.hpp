@@ -123,11 +123,12 @@ struct request
       , components::component_type ctype_
         )
       : mc(type_)
-      , data(boost::fusion::make_vector(boost::int32_t(ctype_)))
+      , data(boost::fusion::make_vector(ctype_))
     {
         // TODO: verification of namespace_action_code
     }
 
+/*
     request(
         namespace_action_code type_
       , boost::int32_t ctype_
@@ -137,6 +138,7 @@ struct request
     {
         // TODO: verification of namespace_action_code
     }
+*/
 
     request(
         namespace_action_code type_
@@ -252,7 +254,7 @@ struct request
         return get_data<subtype_gid_gid_credit, 2>(ec);
     }
 
-    boost::int32_t get_component_type(
+    components::component_type get_component_type(
         error_code& ec = throws
         ) const
     {
@@ -430,7 +432,7 @@ struct request
         // 0x6
         // component_ns_resolve_id
       , boost::fusion::vector1<
-            boost::int32_t // ctype
+            components::component_type // ctype
         >
         // 0x7
         // component_ns_bind_prefix
@@ -613,8 +615,15 @@ struct request
 
 }}
 
+#ifdef __GNUG__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
 BOOST_CLASS_VERSION(hpx::agas::request, HPX_AGAS_VERSION)
 BOOST_CLASS_TRACKING(hpx::agas::request, boost::serialization::track_never)
+#ifdef __GNUG__
+#pragma GCC diagnostic pop
+#endif
 
 #endif // HPX_AB01A9FE_45BE_43EF_B9AD_05B701B06685
 

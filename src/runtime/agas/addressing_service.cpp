@@ -438,7 +438,7 @@ components::component_type addressing_service::get_component_id(
         if (ec || (success != rep.get_status()))
             return components::component_invalid;
 
-        return (components::component_type) rep.get_component_type();
+        return rep.get_component_type();
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
@@ -496,7 +496,7 @@ components::component_type addressing_service::register_factory(
         if (ec || (success != rep.get_status()))
             return components::component_invalid;
 
-        return (components::component_type) rep.get_component_type();
+        return rep.get_component_type();
     }
     catch (hpx::exception const& e) {
         if (&ec == &throws) {
@@ -559,7 +559,11 @@ struct checkout_promise
             pool_.enqueue(promise_);
     }
 
-    Future* operator->() { return reinterpret_cast<Future*>(promise_); }
+    Future* operator->()
+    {
+        BOOST_ASSERT(dynamic_cast<Future*>(promise_));
+        return static_cast<Future*>(promise_);
+    }
     void set_ok() { result_ok_ = true; }
 
 private:
