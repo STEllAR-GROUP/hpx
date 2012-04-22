@@ -164,7 +164,7 @@ namespace hpx
                 return "";
             }
 
-            std::string message(int value) const
+            std::string message(int) const
             {
                 return "";
             }
@@ -189,7 +189,7 @@ namespace hpx
     enum throwmode
     {
         plain = 0,
-        rethrow = 1,
+        rethrow = 1
     };
 
     inline boost::system::error_code
@@ -309,8 +309,8 @@ namespace hpx
             std::string what_;
 
           public:
-            explicit std_exception(std::string const& what)
-              : what_(what)
+            explicit std_exception(std::string const& w)
+              : what_(w)
             {}
 
             ~std_exception() throw() {}
@@ -327,8 +327,8 @@ namespace hpx
             std::string what_;
 
           public:
-            explicit bad_alloc(std::string const& what)
-              : what_(what)
+            explicit bad_alloc(std::string const& w)
+              : what_(w)
             {}
 
             ~bad_alloc() throw() {}
@@ -345,8 +345,8 @@ namespace hpx
             std::string what_;
 
           public:
-            explicit bad_exception(std::string const& what)
-              : what_(what)
+            explicit bad_exception(std::string const& w)
+              : what_(w)
             {}
 
             ~bad_exception() throw() {}
@@ -364,8 +364,8 @@ namespace hpx
             std::string what_;
 
           public:
-            explicit bad_cast(std::string const& what)
-              : what_(what)
+            explicit bad_cast(std::string const& w)
+              : what_(w)
             {}
 
             ~bad_cast() throw() {}
@@ -382,8 +382,8 @@ namespace hpx
             std::string what_;
 
           public:
-            explicit bad_typeid(std::string const& what)
-              : what_(what)
+            explicit bad_typeid(std::string const& w)
+              : what_(w)
             {}
 
             ~bad_typeid() throw() {}
@@ -429,7 +429,7 @@ namespace hpx
     /// Stores the information about the shepherd thread the exception has been
     /// raised on. This information will show up in error messages under the
     /// [shepherd] tag.
-    typedef boost::error_info<detail::tag_throw_shepherd, boost::int64_t>
+    typedef boost::error_info<detail::tag_throw_shepherd, std::size_t>
         throw_shepherd;
 
     /// Stores the information about the HPX thread the exception has been
@@ -474,17 +474,17 @@ namespace hpx
         template <typename Exception>
         BOOST_ATTRIBUTE_NORETURN HPX_EXPORT
         void rethrow_exception(Exception const& e,
-            std::string const& func, std::string const& file, int line,
+            std::string const& func, std::string const& file, long line,
             std::string const& back_trace, boost::uint32_t node = 0,
             std::string const& hostname = "", boost::int64_t pid = -1,
-            boost::int64_t shepherd = -1, std::size_t thread_id = 0,
+            std::size_t shepherd = ~0, std::size_t thread_id = 0,
             std::string const& thread_name = "");
 
         // main function for throwing exceptions
         template <typename Exception>
         BOOST_ATTRIBUTE_NORETURN HPX_EXPORT
         void throw_exception(Exception const& e,
-            std::string const& func, std::string const& file, int line);
+            std::string const& func, std::string const& file, long line);
 
         // BOOST_ASSERT handler
         BOOST_ATTRIBUTE_NORETURN HPX_EXPORT
@@ -556,7 +556,7 @@ namespace boost
 #define HPX_THROW_EXCEPTION_EX(except, errcode, func, msg, mode)              \
     {                                                                         \
         boost::filesystem::path p__(hpx::util::create_path(__FILE__));        \
-        hpx::detail::throw_exception(except((hpx::error)errcode, msg, mode),  \
+        hpx::detail::throw_exception(except(static_cast<hpx::error>(errcode), msg, mode),  \
             func, p__.string(), __LINE__);                                    \
     }                                                                         \
     /**/
@@ -583,7 +583,7 @@ namespace boost
         if (&ec == &hpx::throws) {                                            \
             HPX_THROW_EXCEPTION(errcode, f, msg);                             \
         } else {                                                              \
-            ec = make_error_code((hpx::error)errcode, msg);                   \
+            ec = make_error_code(static_cast<hpx::error>(errcode), msg);      \
         }                                                                     \
     }                                                                         \
     /**/
@@ -593,7 +593,7 @@ namespace boost
         if (&ec == &hpx::throws) {                                            \
             HPX_RETHROW_EXCEPTION(errcode, f, msg);                           \
         } else {                                                              \
-            ec = make_error_code((hpx::error)errcode, msg);                   \
+            ec = make_error_code(static_cast<hpx::error>(errcode), msg);      \
         }                                                                     \
     }                                                                         \
     /**/
@@ -613,7 +613,7 @@ namespace boost
         if (&ec == &hpx::throws) {                                            \
             HPX_THROW_EXCEPTION(errcode, BOOST_CURRENT_FUNCTION, msg);        \
         } else {                                                              \
-            ec = make_error_code((hpx::error)errcode, msg);                   \
+            ec = make_error_code(static_cast<hpx::error>(errcode), msg);      \
         }                                                                     \
     }                                                                         \
     /**/
@@ -623,7 +623,7 @@ namespace boost
         if (&ec == &hpx::throws) {                                            \
             HPX_RETHROW_EXCEPTION(errcode, f, msg);                           \
         } else {                                                              \
-            ec = make_error_code((hpx::error)errcode, msg);                   \
+            ec = make_error_code(static_cast<hpx::error>(errcode), msg);      \
         }                                                                     \
     }                                                                         \
     /**/

@@ -56,9 +56,9 @@ namespace hpx { namespace detail
     void list_component_type(std::string const&, components::component_type);
 }}
 
-HPX_PLAIN_ACTION_EX(hpx::detail::console_print, console_print_action, true);
-HPX_PLAIN_ACTION_EX(hpx::detail::list_symbolic_name, list_symbolic_name_action, true);
-HPX_PLAIN_ACTION_EX(hpx::detail::list_component_type, list_component_type_action, true);
+HPX_PLAIN_ACTION_EX(hpx::detail::console_print, console_print_action, true)
+HPX_PLAIN_ACTION_EX(hpx::detail::list_symbolic_name, list_symbolic_name_action, true)
+HPX_PLAIN_ACTION_EX(hpx::detail::list_component_type, list_component_type_action, true)
 
 namespace hpx { namespace detail
 {
@@ -200,9 +200,9 @@ namespace hpx
 {
     // Print stack trace and exit.
 #if defined(BOOST_WINDOWS)
-    BOOL termination_handler(DWORD ctrl_type);
+    extern BOOL termination_handler(DWORD ctrl_type);
 #else
-    void termination_handler(int signum);
+    extern void termination_handler(int signum);
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
@@ -921,7 +921,7 @@ namespace hpx
                 }
                 else {
                     // each node gets an unique port
-                    hpx_port += static_cast<boost::uint16_t>(node);
+                    hpx_port = static_cast<boost::uint16_t>(hpx_port + node);
                     mode = hpx::runtime_mode_worker;
 
                     // do not execute any explicit hpx_main except if asked
@@ -1221,10 +1221,10 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     int finalize(double shutdown_timeout, double localwait)
     {
-        if (localwait == -1.0)
+        if (std::abs(localwait - 1.0) < 1e-16)
             localwait = detail::get_option("hpx.finalize_wait_time", -1.0);
-
-        if (localwait != -1.0) {
+        else
+        {
             hpx::util::high_resolution_timer t;
             double start_time = t.elapsed();
             double current = 0.0;
@@ -1233,7 +1233,7 @@ namespace hpx
             } while (current - start_time < localwait * 1e-6);
         }
 
-        if (shutdown_timeout == -1.0)
+        if (std::abs(shutdown_timeout - 1.0) < 1e-16)
             shutdown_timeout = detail::get_option("hpx.shutdown_timeout", -1.0);
 
         components::stubs::runtime_support::shutdown_all(
@@ -1246,10 +1246,10 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     void disconnect(double shutdown_timeout, double localwait)
     {
-        if (localwait == -1.0)
+        if (std::abs(localwait - 1.0) < 1e-16)
             localwait = detail::get_option("hpx.finalize_wait_time", -1.0);
-
-        if (localwait != -1.0) {
+        else
+        {
             hpx::util::high_resolution_timer t;
             double start_time = t.elapsed();
             double current = 0.0;
@@ -1258,7 +1258,7 @@ namespace hpx
             } while (current - start_time < localwait * 1e-6);
         }
 
-        if (shutdown_timeout == -1.0)
+        if (std::abs(shutdown_timeout - 1.0) < 1e-16)
             shutdown_timeout = detail::get_option("hpx.shutdown_timeout", -1.0);
 
         components::server::runtime_support* p =

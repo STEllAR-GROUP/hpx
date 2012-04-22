@@ -23,7 +23,7 @@ namespace hpx { namespace lcos
     template <typename T1, typename TR1, typename F>
     inline std::size_t
     wait (std::vector<lcos::dataflow_base<T1, TR1> > const& dataflows, F const& f,
-        std::size_t suspend_for = 10)
+        boost::int64_t suspend_for = 10)
     {
         boost::dynamic_bitset<> handled(dataflows.size());
         std::size_t handled_count = 0;

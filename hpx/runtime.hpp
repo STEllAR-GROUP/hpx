@@ -60,7 +60,7 @@ namespace hpx
             counters_.reset(new performance_counters::registry(agas_client));
         }
 
-        ~runtime()
+        virtual ~runtime()
         {
             // allow to reuse instance number if this was the only instance
             if (0 == instance_number_counter_)
@@ -115,7 +115,7 @@ namespace hpx
 
         std::size_t get_instance_number() const
         {
-            return (std::size_t)instance_number_;
+            return static_cast<std::size_t>(instance_number_);
         }
 
         /// \brief Allow access to the registry counter registry instance used
@@ -476,12 +476,12 @@ namespace hpx
 
         std::size_t get_runtime_support_lva() const
         {
-            return (std::size_t) &runtime_support_;
+            return reinterpret_cast<std::size_t>(&runtime_support_);
         }
 
         std::size_t get_memory_lva() const
         {
-            return (std::size_t) &memory_;
+            return reinterpret_cast<std::size_t>(&memory_);
         }
 
         naming::gid_type get_next_id();
