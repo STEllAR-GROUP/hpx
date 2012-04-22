@@ -51,8 +51,8 @@ namespace hpx { namespace actions
 
         /// remotely callable member function identifiers with result
         component_result_action_base = 2000,
-        component_result_action_arg0 = component_result_action_base + 0,
         BOOST_PP_REPEAT(HPX_ACTION_ARGUMENT_LIMIT, HPX_FUNCTION_RETARG_ENUM, _)
+        component_result_action_arg0 = component_result_action_base + 0
     };
 
 #undef HPX_FUNCTION_RETARG_ENUM

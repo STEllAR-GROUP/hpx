@@ -54,15 +54,15 @@ namespace hpx { namespace actions
         static void destruct_(void*) {}
 
         static void save_(boost::uint8_t const* data, std::size_t size,
-            oarchive_type& ar, const unsigned int version,
-            boost::uint8_t const* config)
+            oarchive_type& ar, const unsigned int,
+            boost::uint8_t const*)
         {
             using boost::serialization::make_array;
             ar << make_array(data, size);
         }
         static void load_(boost::uint8_t* data, std::size_t size,
-            iarchive_type& ar, const unsigned int version,
-            boost::uint8_t const* config)
+            iarchive_type& ar, const unsigned int,
+            boost::uint8_t const*)
         {
             using boost::serialization::make_array;
             ar >> make_array(data, size);
@@ -107,7 +107,7 @@ namespace hpx { namespace actions
         friend class boost::serialization::access;
 
         template<class Archive>
-        void serialize(Archive& ar, const unsigned int) {}
+        void serialize(Archive&, const unsigned int) {}
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -121,17 +121,29 @@ namespace hpx { namespace actions
         ~manage_object_action() {}
 
     private:
+#ifdef NDEBUG
+        static void construct_(void* memory, std::size_t)
+#else
         static void construct_(void* memory, std::size_t size)
+#endif
         {
             BOOST_ASSERT(size == sizeof(T));
             new (memory) T;
         }
+#ifdef NDEBUG
+        static void clone_(void* dest, void const* src, std::size_t)
+#else
         static void clone_(void* dest, void const* src, std::size_t size)
+#endif
         {
             BOOST_ASSERT(size == sizeof(T));
             new (dest) T (*reinterpret_cast<T const*>(src));
         }
+#ifdef NDEBUG
+        static void assign_(void* dest, void const* src, std::size_t)
+#else
         static void assign_(void* dest, void const* src, std::size_t size)
+#endif
         {
             BOOST_ASSERT(size == sizeof(T));
             // do not overwrite ourselves
@@ -143,15 +155,15 @@ namespace hpx { namespace actions
             reinterpret_cast<T*>(memory)->~T();
         }
 
-        static void save_(boost::uint8_t const* data, std::size_t size,
-            oarchive_type& ar, const unsigned int version,
-            boost::uint8_t const* config)
+        static void save_(boost::uint8_t const* data, std::size_t /*size*/,
+            oarchive_type& ar, const unsigned int /*version*/,
+            boost::uint8_t const* /*config*/)
         {
             ar << *reinterpret_cast<T const*>(data);
         }
-        static void load_(boost::uint8_t* data, std::size_t size,
-            iarchive_type& ar, const unsigned int version,
-            boost::uint8_t const* config)
+        static void load_(boost::uint8_t* data, std::size_t /*size*/,
+            iarchive_type& ar, const unsigned int /*version*/,
+            boost::uint8_t const* /*config*/)
         {
             ar >> *reinterpret_cast<T*>(data);
         }
@@ -259,14 +271,14 @@ namespace hpx { namespace actions
             serialize_load_function;
 
     private:
-        static void save_(boost::uint8_t const* data, std::size_t size,
+        static void save_(boost::uint8_t const* data, std::size_t /*size*/,
             oarchive_type& ar, const unsigned int version,
             boost::uint8_t const* config)
         {
             reinterpret_cast<T const*>(data)->save(ar, version,
                 reinterpret_cast<Config const*>(config));
         }
-        static void load_(boost::uint8_t* data, std::size_t size,
+        static void load_(boost::uint8_t* data, std::size_t /*size*/,
             iarchive_type& ar, const unsigned int version,
             boost::uint8_t const* config)
         {

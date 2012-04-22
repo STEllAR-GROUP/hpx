@@ -541,7 +541,7 @@ namespace hpx { namespace actions
 // Helper macro for action serialization, each of the defined actions needs to
 // be registered with the serialization library
 #define HPX_DEFINE_GET_ACTION_NAME(action)                                    \
-    HPX_DEFINE_GET_ACTION_NAME(action, action)                                \
+    HPX_DEFINE_GET_ACTION_NAME_EX(action, action)                             \
 /**/
 
 #define HPX_DEFINE_GET_ACTION_NAME_EX(action, actionname)                     \

@@ -50,8 +50,8 @@ namespace hpx { namespace actions
 
         /// plain (free) remotely callable function identifiers with result
         function_result_action_base = 4000,
-        function_result_action_arg0 = function_result_action_base + 0,
         BOOST_PP_REPEAT(HPX_ACTION_ARGUMENT_LIMIT, HPX_FUNCTION_RETARG_ENUM, _)
+        function_result_action_arg0 = function_result_action_base + 0
     };
 
 #undef HPX_FUNCTION_RETARG_ENUM
@@ -121,7 +121,7 @@ namespace hpx { namespace actions
         /// instantiate the \a plain_base_result_action0 type. This is used by
         /// the \a applier in case no continuation has been supplied.
         static HPX_STD_FUNCTION<threads::thread_function_type>
-        construct_thread_function(naming::address::address_type lva)
+        construct_thread_function(naming::address::address_type)
         {
             // we need to assign the address of the thread function to a
             // variable to  help the compiler to deduce the function type
@@ -136,7 +136,7 @@ namespace hpx { namespace actions
         /// applier in case a continuation has been supplied
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
-            naming::address::address_type lva)
+            naming::address::address_type)
         {
             return base_type::construct_continuation_thread_function(cont, F);
         }
@@ -282,7 +282,7 @@ namespace hpx { namespace actions
         typedef boost::mpl::true_ direct_execution;
 
         static Result
-        execute_function(naming::address::address_type lva)
+        execute_function(naming::address::address_type)
         {
             LTM_(debug)
                 << "plain_direct_result_action0::execute_function: name("
@@ -412,7 +412,7 @@ namespace hpx { namespace actions
         /// instantiate the base_action0 type. This is used by the \a applier in
         /// case no continuation has been supplied.
         static HPX_STD_FUNCTION<threads::thread_function_type>
-        construct_thread_function(naming::address::address_type lva)
+        construct_thread_function(naming::address::address_type)
         {
             // we need to assign the address of the thread function to a
             // variable to  help the compiler to deduce the function type
@@ -427,7 +427,7 @@ namespace hpx { namespace actions
         /// case a continuation has been supplied
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
-            naming::address::address_type lva)
+            naming::address::address_type)
         {
             return base_type::construct_continuation_thread_function_void(
                 cont, F);

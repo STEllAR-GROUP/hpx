@@ -43,11 +43,11 @@ namespace hpx
             {
                 typedef typename
                     lcos::template base_lco_with_value<Result>::set_value_action
-                action_type;
+                set_value_action_type;
 
                 LLCO_(info) << "continuation::trigger(" << this->get_gid() << ")";
 
-                hpx::apply<action_type>(this->get_gid(), boost::move(result));
+                hpx::apply<set_value_action_type>(this->get_gid(), boost::move(result));
             }
 
             static void register_base()
