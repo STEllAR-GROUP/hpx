@@ -152,7 +152,7 @@ namespace boost { namespace coroutines { namespace detail {
     BOOST_PP_REPEAT(BOOST_COROUTINE_ARG_MAX,
                     BOOST_COROUTINE_param_typedef,
                     (BOOST_DEDUCED_TYPENAME
-                     coroutine_type::yield_traits::arg, yield_call_arg));
+                     coroutine_type::yield_traits::arg, yield_call_arg))
 
     /*
      * Generate lines like this:
@@ -161,7 +161,7 @@ namespace boost { namespace coroutines { namespace detail {
     BOOST_PP_REPEAT(BOOST_COROUTINE_ARG_MAX,
                     BOOST_COROUTINE_param_typedef,
                     (BOOST_DEDUCED_TYPENAME
-                     coroutine_type::arg, call_arg));
+                     coroutine_type::arg, call_arg))
 
 #undef BOOST_COROUTINE_param_typedef
 #undef  BOOST_COROUTINE_param_with_default

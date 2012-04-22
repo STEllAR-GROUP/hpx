@@ -60,7 +60,7 @@ namespace boost { namespace coroutines { namespace detail {
    * but this is simpler and works well anyway.
    */
 BOOST_PP_REPEAT(BOOST_COROUTINE_ARG_MAX,
-          BOOST_COROUTINE_MAKE_TUPLE_TRAITS_GENERATOR, ~);
+          BOOST_COROUTINE_MAKE_TUPLE_TRAITS_GENERATOR, ~)
 
 #undef BOOST_COROUTINE_MAKE_TUPLE_TRAITS_GENERATOR
 
