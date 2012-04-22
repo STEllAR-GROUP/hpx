@@ -30,7 +30,7 @@ namespace boost { namespace serialization
     {
         hpx::util::exception_type type(hpx::util::unknown_exception);
         std::string what;
-        hpx::error err_value = hpx::success;
+        int err_value = hpx::success;
         std::string err_message;
 
         boost::uint32_t throw_locality_ = 0;
@@ -135,7 +135,7 @@ namespace boost { namespace serialization
         catch (boost::system::system_error const& e) {
             type = hpx::util::boost_system_error;
             what = e.what();
-            //err_value = e.code().value();
+            err_value = e.code().value();
             err_message = e.code().message();
         }
         catch (std::runtime_error const& e) {
@@ -203,7 +203,7 @@ namespace boost { namespace serialization
     {
         hpx::util::exception_type type(hpx::util::unknown_exception);
         std::string what;
-        hpx::error err_value = hpx::success;
+        int err_value = hpx::success;
         std::string err_message;
 
         boost::uint32_t throw_locality_ = 0;
@@ -313,7 +313,8 @@ namespace boost { namespace serialization
             // hpx::exception
             case hpx::util::hpx_exception:
                 hpx::detail::rethrow_exception(
-                    hpx::exception(err_value, what, hpx::rethrow),
+                    hpx::exception(static_cast<hpx::error>(err_value),
+                        what, hpx::rethrow),
                     throw_function_, throw_file_, throw_line_, back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_);
