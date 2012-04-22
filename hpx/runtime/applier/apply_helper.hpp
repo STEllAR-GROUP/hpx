@@ -128,7 +128,7 @@ namespace hpx { namespace applier { namespace detail
         template <typename Arg0>
         static void
         call (naming::address::address_type lva,
-            threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
+            threads::thread_priority, BOOST_FWD_REF(Arg0) arg0)
         {
             Action::execute_function(lva, boost::forward<Arg0>(arg0));
         }
@@ -136,7 +136,7 @@ namespace hpx { namespace applier { namespace detail
         template <typename Arg0>
         static void
         call (actions::continuation_type& c, naming::address::address_type lva,
-            threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
+            threads::thread_priority, BOOST_FWD_REF(Arg0) arg0)
         {
             try {
                 c->trigger(boost::move(Action::execute_function(lva,

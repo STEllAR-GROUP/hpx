@@ -83,7 +83,7 @@ namespace hpx { namespace applier { namespace detail
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static void
         call (naming::address::address_type lva,
-            threads::thread_priority priority,
+            threads::thread_priority,
             BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
             Action::execute_function(lva,
@@ -93,7 +93,7 @@ namespace hpx { namespace applier { namespace detail
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         static void
         call (actions::continuation_type& c, naming::address::address_type lva,
-            threads::thread_priority priority,
+            threads::thread_priority,
             BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         {
             try {
