@@ -96,7 +96,7 @@ namespace hpx
             "thread::thread_function_nullary");
 
         error_code ec;
-        threads::thread_id_type id = hpx::get_runtime().get_thread_manager().
+        threads::thread_id_type ident = hpx::get_runtime().get_thread_manager().
             register_thread(data, threads::suspended, true, ec);
         if (ec) {
             HPX_THROWS_IF(ec, thread_resource_error, "thread::start_thread",
@@ -105,10 +105,10 @@ namespace hpx
         }
 
         // inform ourselves if the thread function exits
-        threads::add_thread_exit_callback(id, util::bind(&thread::detach, this));
+        threads::add_thread_exit_callback(ident, util::bind(&thread::detach, this));
 
         // now start the thread
-        set_thread_state(id, threads::pending, threads::wait_signaled,
+        set_thread_state(ident, threads::pending, threads::wait_signaled,
             threads::thread_priority_normal, ec);
         if (ec) {
             HPX_THROWS_IF(ec, thread_resource_error, "thread::start_thread",
@@ -117,7 +117,7 @@ namespace hpx
         }
 
         mutex_type::scoped_lock l(mtx_);
-        id_ = id;
+        id_ = ident;
     }
 
     static void resume_thread(threads::thread_id_type id)
@@ -136,12 +136,12 @@ namespace hpx
 
         this_thread::interruption_point();
 
-        native_handle_type id = native_handle();
-        if (id != threads::invalid_thread_id)
+        native_handle_type handle = native_handle();
+        if (handle != threads::invalid_thread_id)
         {
             // register callback function to be called when thread exits
             native_handle_type this_id = threads::get_self().get_thread_id();
-            if (threads::add_thread_exit_callback(id,
+            if (threads::add_thread_exit_callback(handle,
                     HPX_STD_BIND(&resume_thread, this_id)))
             {
                 // wait for thread to be terminated

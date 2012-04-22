@@ -130,9 +130,9 @@ struct topology
     } // }}}
 
     void set_thread_affinity(
-        boost::thread& thrd
-      , std::size_t num_thread
-      , bool numa_sensitive
+        boost::thread&
+      , std::size_t //num_thread
+      , bool //numa_sensitive
       , error_code& ec = throws
         ) const
     {
@@ -147,10 +147,10 @@ struct topology
         ) const
     { // {{{
         // Figure out how many cores are available.
-        hwloc_topology_t topology;
+        hwloc_topology_t topo;
 
-        if (0 == hwloc_topology_init(&topology) &&
-            0 == hwloc_topology_load(topology))
+        if (0 == hwloc_topology_init(&topo) &&
+            0 == hwloc_topology_load(topo))
         {
             // Now set the affinity to the required PU.
             std::size_t mask
@@ -165,14 +165,14 @@ struct topology
             hwloc_bitmap_snprintf(buf, 1024, cpuset);
 #endif
 
-            if (hwloc_set_cpubind(topology, cpuset,
+            if (hwloc_set_cpubind(topo, cpuset,
                   HWLOC_CPUBIND_STRICT | HWLOC_CPUBIND_THREAD))
             {
                 // Strict binding not supported or failed, try weak binding.
-                if (hwloc_set_cpubind(topology, cpuset, HWLOC_CPUBIND_THREAD))
+                if (hwloc_set_cpubind(topo, cpuset, HWLOC_CPUBIND_THREAD))
                 {
                     hwloc_bitmap_free(cpuset);
-                    hwloc_topology_destroy(topology);
+                    hwloc_topology_destroy(topo);
 
                     HPX_THROWS_IF(ec, kernel_error
                       , "hpx::threads::topology::set_thread_affinity_mask"
@@ -191,11 +191,11 @@ struct topology
         if (&ec != &throws)
             ec = make_success_code();
 
-        hwloc_topology_destroy(topology);
+        hwloc_topology_destroy(topo);
     } // }}}
 
     std::size_t get_thread_affinity_mask_from_lva(
-        naming::address::address_type lva
+        naming::address::address_type
       , error_code& ec = throws
         ) const
     { // {{{
@@ -213,55 +213,55 @@ struct topology
         if (std::size_t(-1) == num_thread)
              return std::size_t(-1);
 
-        hwloc_topology_t topology;
+        hwloc_topology_t topo;
 
-        if (0 == hwloc_topology_init(&topology) &&
-            0 == hwloc_topology_load(topology))
+        if (0 == hwloc_topology_init(&topo) &&
+            0 == hwloc_topology_load(topo))
         {
-            hwloc_obj_t obj = hwloc_get_obj_by_type(topology, HWLOC_OBJ_PU,
+            hwloc_obj_t obj = hwloc_get_obj_by_type(topo, HWLOC_OBJ_PU,
                 static_cast<unsigned>(num_thread));
             while (obj)
             {
                 if (hwloc_compare_types(obj->type, HWLOC_OBJ_NODE) == 0)
                 {
                     std::size_t numa_node = obj->logical_index;
-                    hwloc_topology_destroy(topology);
+                    hwloc_topology_destroy(topo);
                     return numa_node;
                 }
                 obj = obj->parent;
             }
         }
 
-        hwloc_topology_destroy(topology);
+        hwloc_topology_destroy(topo);
         return std::size_t(-1);
     } // }}}
 
     void extract_node_mask(
-        hwloc_topology_t topology
+        hwloc_topology_t topo
       , hwloc_obj_t parent
       , std::size_t& mask
         )
     { // {{{
-        hwloc_obj_t obj = hwloc_get_next_child(topology, parent, NULL);
+        hwloc_obj_t obj = hwloc_get_next_child(topo, parent, NULL);
         while (obj)
         {
             if (hwloc_compare_types(HWLOC_OBJ_PU, obj->type) == 0)
             {
                 do {
                     mask |= (static_cast<std::size_t>(1) << obj->os_index);
-                    obj = hwloc_get_next_child(topology, parent, obj);
+                    obj = hwloc_get_next_child(topo, parent, obj);
                 } while (obj != NULL &&
                          hwloc_compare_types(HWLOC_OBJ_PU, obj->type) == 0);
                 return;
             }
-            extract_node_mask(topology, obj, mask);
-            obj = hwloc_get_next_child(topology, parent, obj);
+            extract_node_mask(topo, obj, mask);
+            obj = hwloc_get_next_child(topo, parent, obj);
         }
     } // }}}
 
     std::size_t init_numa_node_affinity_mask(
         std::size_t num_thread
-      , bool numa_sensitive
+      , bool
         )
     { // {{{
         std::size_t node_affinity_mask = 0;
@@ -270,22 +270,22 @@ struct topology
         if (std::size_t(-1) == numa_node)
             return 0;
 
-        hwloc_topology_t topology;
+        hwloc_topology_t topo;
 
-        if (0 == hwloc_topology_init(&topology) &&
-            0 == hwloc_topology_load(topology))
+        if (0 == hwloc_topology_init(&topo) &&
+            0 == hwloc_topology_load(topo))
         {
-            hwloc_obj_t numa_node_obj = hwloc_get_obj_by_type(topology,
+            hwloc_obj_t numa_node_obj = hwloc_get_obj_by_type(topo,
                 HWLOC_OBJ_NODE, static_cast<unsigned>(numa_node));
             if (numa_node_obj)
             {
-                extract_node_mask(topology, numa_node_obj, node_affinity_mask);
-                hwloc_topology_destroy(topology);
+                extract_node_mask(topo, numa_node_obj, node_affinity_mask);
+                hwloc_topology_destroy(topo);
                 return node_affinity_mask;
             }
         }
 
-        hwloc_topology_destroy(topology);
+        hwloc_topology_destroy(topo);
         HPX_THROW_EXCEPTION(kernel_error
           , "hpx::threads::topology::init_numa_node_affinity_mask"
           , boost::str(boost::format(
@@ -302,15 +302,20 @@ struct topology
         std::size_t num_of_cores = hardware_concurrency();
         std::size_t affinity = num_thread % num_of_cores;
 
-        hwloc_topology_t topology;
+        hwloc_topology_t topo;
 
-        if (0 == hwloc_topology_init(&topology) &&
-            0 == hwloc_topology_load(topology))
+        if (0 == hwloc_topology_init(&topo) &&
+            0 == hwloc_topology_load(topo))
         {
-            int numa_nodes = hwloc_get_nbobjs_by_type(topology, HWLOC_OBJ_NODE);
-            hwloc_topology_destroy(topology);
+            std::size_t numa_nodes = 0;
+            {
+                int numa_nodes_int = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_NODE);
+                if(numa_nodes_int == -1) return 0;
+                numa_nodes = static_cast<std::size_t>(numa_nodes_int);
+            }
+            hwloc_topology_destroy(topo);
 
-            if (numa_nodes == -1 || numa_nodes == 0)
+            if (numa_nodes == 0)
                 return 0;
 
             std::size_t num_of_cores_per_numa_node = num_of_cores / numa_nodes;
@@ -342,7 +347,7 @@ struct topology
             return mask;
         }
 
-        hwloc_topology_destroy(topology);
+        hwloc_topology_destroy(topo);
         return 0;
     } // }}}
 

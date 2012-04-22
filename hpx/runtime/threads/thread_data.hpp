@@ -48,13 +48,13 @@ namespace hpx { namespace threads
     // whenever an instance of a threads::thread_data needs to be deleted. We
     // provide this overload as we need to extract the thread_pool from the
     // thread instance the moment before it gets deleted
-    void HPX_EXPORT delete_clone(threads::thread_data const*);
+    HPX_EXPORT void delete_clone(threads::thread_data const*);
 
     // This is a policy instance for the boost::ptr_map used to store the
     // pointers to the threads::thread_data instances
     struct heap_clone_allocator
     {
-        static threads::thread_data* allocate_clone(threads::thread_data const& t)
+        static threads::thread_data* allocate_clone(threads::thread_data const&)
         {
             BOOST_ASSERT(false);    // will not be called, ever
             return 0;
@@ -836,16 +836,16 @@ namespace hpx { namespace components { namespace detail
     template <>
     struct heap_factory<threads::detail::thread_data, threads::thread_data>
     {
-        static threads::thread_data* alloc(std::size_t count = 1)
+        static threads::thread_data* alloc(std::size_t = 1)
         {
             return 0;
         }
-        static void free(void* p, std::size_t count = 1)
+        static void free(void*, std::size_t = 1)
         {
         }
 
         // REVIEW: Doesn't this mean that threads will always have invalid GIDs?
-        static naming::gid_type get_gid(void* p)
+        static naming::gid_type get_gid(void*)
         {
             return naming::invalid_gid;
         }

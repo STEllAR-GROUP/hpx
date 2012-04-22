@@ -372,7 +372,7 @@ namespace hpx { namespace threads
     /// The \a threadmanager class is the central instance of management for
     /// all (non-depleted) threads
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    class threadmanager_impl : public threadmanager_base
+    class HPX_EXPORT threadmanager_impl : public threadmanager_base
     {
     private:
         // we use a simple mutex to protect the data members of the

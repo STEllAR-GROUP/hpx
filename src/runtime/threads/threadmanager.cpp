@@ -1688,15 +1688,15 @@ namespace hpx { namespace threads
     boost::int64_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         avg_idle_rate() const
     {
-        boost::uint64_t const exec_total =
-            std::accumulate(exec_times.begin(), exec_times.end(), 0ULL);
-        boost::uint64_t const tfunc_total =
-            std::accumulate(tfunc_times.begin(), tfunc_times.end(), 0ULL);
+        double const exec_total =
+            std::accumulate(exec_times.begin(), exec_times.end(), 0.);
+        double const tfunc_total =
+            std::accumulate(tfunc_times.begin(), tfunc_times.end(), 0.);
 
-        if (0 == tfunc_total)   // avoid division by zero
+        if (std::abs(tfunc_total) < 1e-16)   // avoid division by zero
             return 1000LL;
 
-        double const percent = 1. - (double(exec_total) / tfunc_total);
+        double const percent = 1. - (exec_total / tfunc_total);
         return boost::int64_t(1000. * percent);    // 0.1 percent
     }
 
@@ -1707,8 +1707,10 @@ namespace hpx { namespace threads
         if (0 == tfunc_times[num_thread])   // avoid division by zero
             return 1000LL;
 
+        double const exec_time = static_cast<double>(exec_times[num_thread]);
+        double const tfunc_time = static_cast<double>(tfunc_times[num_thread]);
         double const percent =
-            1. - (double(exec_times[num_thread]) / tfunc_times[num_thread]);
+            1. - (exec_time / tfunc_time);
         return boost::int64_t(1000. * percent);   // 0.1 percent
     }
 
@@ -1810,7 +1812,7 @@ namespace hpx { namespace threads
 #if defined(HPX_GLOBAL_SCHEDULER)
 #include <hpx/runtime/threads/policies/global_queue_scheduler.hpp>
 
-template HPX_EXPORT class hpx::threads::threadmanager_impl<
+template class HPX_EXPORT hpx::threads::threadmanager_impl<
     hpx::threads::policies::global_queue_scheduler,
     hpx::threads::policies::callback_notifier>;
 #endif
@@ -1818,7 +1820,7 @@ template HPX_EXPORT class hpx::threads::threadmanager_impl<
 #if defined(HPX_LOCAL_SCHEDULER)
 #include <hpx/runtime/threads/policies/local_queue_scheduler.hpp>
 
-template HPX_EXPORT class hpx::threads::threadmanager_impl<
+template class HPX_EXPORT hpx::threads::threadmanager_impl<
     hpx::threads::policies::local_queue_scheduler,
     hpx::threads::policies::callback_notifier>;
 #endif
@@ -1826,7 +1828,7 @@ template HPX_EXPORT class hpx::threads::threadmanager_impl<
 #if defined(HPX_ABP_SCHEDULER)
 #include <hpx/runtime/threads/policies/abp_queue_scheduler.hpp>
 
-template HPX_EXPORT class hpx::threads::threadmanager_impl<
+template class HPX_EXPORT hpx::threads::threadmanager_impl<
     hpx::threads::policies::abp_queue_scheduler,
     hpx::threads::policies::callback_notifier>;
 #endif
@@ -1834,21 +1836,21 @@ template HPX_EXPORT class hpx::threads::threadmanager_impl<
 #if defined(HPX_ABP_PRIORITY_SCHEDULER)
 #include <hpx/runtime/threads/policies/abp_priority_queue_scheduler.hpp>
 
-template HPX_EXPORT class hpx::threads::threadmanager_impl<
+template class HPX_EXPORT hpx::threads::threadmanager_impl<
     hpx::threads::policies::abp_priority_queue_scheduler,
     hpx::threads::policies::callback_notifier>;
 #endif
 
 #include <hpx/runtime/threads/policies/local_priority_queue_scheduler.hpp>
 
-template HPX_EXPORT class hpx::threads::threadmanager_impl<
+template class HPX_EXPORT hpx::threads::threadmanager_impl<
     hpx::threads::policies::local_priority_queue_scheduler,
     hpx::threads::policies::callback_notifier>;
 
 #if defined(HPX_HIERARCHY_SCHEDULER)
 #include <hpx/runtime/threads/policies/hierarchy_scheduler.hpp>
 
-template HPX_EXPORT class hpx::threads::threadmanager_impl<
+template class HPX_EXPORT hpx::threads::threadmanager_impl<
     hpx::threads::policies::hierarchy_scheduler,
     hpx::threads::policies::callback_notifier>;
 #endif
@@ -1856,7 +1858,7 @@ template HPX_EXPORT class hpx::threads::threadmanager_impl<
 #if defined(HPX_PERIODIC_PRIORITY_SCHEDULER)
 #include <hpx/runtime/threads/policies/periodic_priority_scheduler.hpp>
 
-template HPX_EXPORT class hpx::threads::threadmanager_impl<
+template class HPX_EXPORT hpx::threads::threadmanager_impl<
     hpx::threads::policies::local_periodic_priority_scheduler,
     hpx::threads::policies::callback_notifier>;
 #endif

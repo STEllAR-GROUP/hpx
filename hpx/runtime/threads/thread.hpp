@@ -44,7 +44,7 @@ namespace hpx
         explicit thread(BOOST_FWD_REF(F) f)
           : id_(threads::invalid_thread_id)
         {
-            start_thread(HPX_STD_FUNCTION<void()>(boost::forward<F>(f)));
+            start_thread(boost::move(HPX_STD_FUNCTION<void()>(boost::forward<F>(f))));
         }
 
 // #if !defined(BOOST_NO_VARIADIC_TEMPLATES)
@@ -210,12 +210,12 @@ namespace hpx
         }
 
         // extensions
-        void HPX_API_EXPORT interruption_point();
-        bool HPX_API_EXPORT interruption_enabled();
-        bool HPX_API_EXPORT interruption_requested();
-
-        void HPX_API_EXPORT sleep_until(boost::posix_time::ptime const& at);
-        void HPX_API_EXPORT sleep_for(boost::posix_time::time_duration const& p);
+        HPX_API_EXPORT void interruption_point();
+        HPX_API_EXPORT bool interruption_enabled();
+        HPX_API_EXPORT bool interruption_requested();
+                       
+        HPX_API_EXPORT void sleep_until(boost::posix_time::ptime const& at);
+        HPX_API_EXPORT void sleep_for(boost::posix_time::time_duration const& p);
 
         class HPX_EXPORT disable_interruption
         {

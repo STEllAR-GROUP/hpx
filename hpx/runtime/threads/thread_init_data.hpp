@@ -32,12 +32,12 @@ namespace hpx { namespace threads
 
         template <typename F>
         thread_init_data(BOOST_FWD_REF(F) f, char const* desc,
-                naming::address::address_type lva = 0,
-                thread_priority priority = thread_priority_normal,
+                naming::address::address_type lva_ = 0,
+                thread_priority priority_ = thread_priority_normal,
                 std::size_t os_thread = std::size_t(-1))
           : func(boost::forward<F>(f)), description(desc),
-            lva(lva), parent_locality_id(0), parent_id(0), parent_phase(0),
-            priority(priority), num_os_thread(os_thread)
+            lva(lva_), parent_locality_id(0), parent_id(0), parent_phase(0),
+            priority(priority_), num_os_thread(os_thread)
         {}
 
         HPX_STD_FUNCTION<threads::thread_function_type> func;
