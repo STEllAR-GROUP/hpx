@@ -73,14 +73,14 @@ namespace hpx { namespace components
     }}}                                                                       \
     /***/
 
-#define HPX_NULL_STARTUP_SHUTDOWN_PTR (
+#define HPX_NULL_STARTUP_SHUTDOWN_PTR (                                       \
         static_cast<bool(*)(HPX_STD_FUNCTION<void()>&)>(0))
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_STARTUP_SHUTDOWN_MODULE(startup, shutdown)               \
     HPX_REGISTER_STARTUP_SHUTDOWN_FUNCTIONS()                                 \
     HPX_DEFINE_COMPONENT_STARTUP_SHUTDOWN(startup, shutdown)                  \
-    namespace hpx { namespace components { namespace startup_shutdown_provider \
+    namespace hpx { namespace components { namespace startup_shutdown_provider\
     {                                                                         \
         typedef component_startup_shutdown<                                   \
             BOOST_PP_CAT(HPX_COMPONENT_LIB_NAME, _startup),                   \
