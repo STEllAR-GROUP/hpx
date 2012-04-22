@@ -27,16 +27,7 @@ using hpx::find_here;
 
 double update(double x, double x_n);
 
-typedef
-    plain_result_action2<
-        double // result type
-      , double // arg1
-      , double // arg2
-      , update // function
-    >
-    update_action;
-
-HPX_REGISTER_PLAIN_ACTION(update_action);
+HPX_PLAIN_ACTION(update, update_action)
 
 double update(double x, double x_n)
 {

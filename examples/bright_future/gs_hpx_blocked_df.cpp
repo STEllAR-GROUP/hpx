@@ -27,7 +27,6 @@ using bright_future::update;
 using bright_future::update_residuum;
 
 typedef bright_future::grid<double> grid_type;
-typedef grid_type::size_type size_type;
 
 using hpx::util::high_resolution_timer;
 
@@ -46,8 +45,9 @@ struct fun_base
     virtual ~fun_base() {}
 
     template <typename Archive>
-    void serialize(Archive & ar, const unsigned int version)
+    void serialize(Archive &, const unsigned int)
     {
+        BOOST_ASSERT(false);
     }
 };
 
@@ -62,10 +62,10 @@ typedef bright_future::server::remote_lse<double>::range_type range_type;
 struct init_rhs_fun
     : fun_base
 {
-    double operator()(size_type x, size_type y, lse_config const & c)
+    double operator()(std::size_t x, std::size_t y, lse_config const & c)
     {
         return
-            39.478 * sin((x * c.hx) * 6.283) * sinh((y * c.hy) * 6.283);
+            39.478 * sin((double(x) * c.hx) * 6.283) * sinh((double(y) * c.hy) * 6.283);
     }
 };
 
@@ -73,10 +73,10 @@ struct init_rhs_fun
 struct init_u_fun
     : fun_base
 {
-    double operator()(size_type x, size_type y, lse_config const & c)
+    double operator()(std::size_t x, std::size_t y, lse_config const & c)
     {
         double value =
-            y == (c.n_y - 1) ? sin((x * c.hx) * 6.283) * sinh(6.283) : 0.0;
+            y == (c.n_y - 1) ? sin((double(x) * c.hx) * 6.283) * sinh(6.283) : 0.0;
 
         return value;
     }
@@ -86,7 +86,7 @@ struct init_u_fun
 struct update_fun
     : fun_base
 {
-    double operator()(grid_type const & u, grid_type const & rhs, size_type x, size_type y, lse_config const & c)
+    double operator()(grid_type const & u, grid_type const & rhs, std::size_t x, std::size_t y, lse_config const & c)
     {
         return
             u(x, y)
@@ -109,7 +109,7 @@ struct update_fun
 struct identity_fun
     : fun_base
 {
-    double operator()(grid_type const & u, grid_type const & rhs, size_type x, size_type y, lse_config const & c)
+    double operator()(grid_type const & u, grid_type const &, std::size_t x, std::size_t y, lse_config const &)
     {
         return u(x, y);
     }
@@ -124,9 +124,9 @@ struct output_fun
     output_fun() {}
     output_fun(std::string const & output) : file(new std::ofstream(output.c_str())) {}
 
-    double operator()(grid_type const & u, grid_type const & rhs, size_type x, size_type y, lse_config const & c)
+    double operator()(grid_type const & u, grid_type const &, std::size_t x, std::size_t y, lse_config const & c)
     {
-        (*file) << x * c.hx << " " << y * c.hy << " " << u(x, y) << "\n";
+        (*file) << double(x) * c.hx << " " << double(y) * c.hy << " " << u(x, y) << "\n";
         return u(x, y);
     }
 };
@@ -135,22 +135,22 @@ struct output_fun
 struct update_residuum_fun
     : fun_base
 {
-    void operator()(grid_type & u, size_type x, size_type y)
+    void operator()(grid_type &, std::size_t, std::size_t)
     {
     }
 };
 
 void gs(
-    size_type n_x
-  , size_type n_y
+    std::size_t n_x
+  , std::size_t n_y
   , double hx
   , double hy
-  , double k
-  , double relaxation
+  , double //k
+  , double //relaxation
   , unsigned max_iterations
-  , unsigned iteration_block
+  , unsigned //iteration_block
   , unsigned block_size
-  , std::size_t cache_block
+  , std::size_t //cache_block
   , std::string const & output
 )
 {
@@ -206,8 +206,8 @@ void gs(
         // this type is used to hold the promise grids of the different iterations
         typedef std::vector<promise_grid_type> iteration_dependencies_type;
 
-        size_type n_x_block = n_x/block_size+1;
-        size_type n_y_block = n_y/block_size+1;
+        std::size_t n_x_block = n_x/block_size+1;
+        std::size_t n_y_block = n_y/block_size+1;
 
         // initialize the iteration dependencies:
         // we need max_iterations+1 elements in that vector. The 0th entry
@@ -229,9 +229,9 @@ void gs(
             cout << "initializing rhs\n" << flush;
             // we opened another scope to just have this vector temporarily, we
             // won't need it after the initializiation
-            for(size_type y = 0, y_block = 0; y < n_y; y += block_size, ++y_block)
+            for(std::size_t y = 0, y_block = 0; y < n_y; y += block_size, ++y_block)
             {
-                for(size_type x = 0, x_block = 0; x < n_x; x += block_size, ++x_block)
+                for(std::size_t x = 0, x_block = 0; x < n_x; x += block_size, ++x_block)
                 {
                     init_rhs_promises(x_block, y_block) =
                         init_rhs_dataflow(
@@ -250,9 +250,9 @@ void gs(
             cout << "initializing u\n" << flush;
             // initialize our grid. This will serve as the dependency of the
             // first loop below.
-            for(size_type y = 0, y_block = 0; y < n_y; y += block_size, ++y_block)
+            for(std::size_t y = 0, y_block = 0; y < n_y; y += block_size, ++y_block)
             {
-                for(size_type x = 0, x_block = 0; x < n_x; x += block_size, ++x_block)
+                for(std::size_t x = 0, x_block = 0; x < n_x; x += block_size, ++x_block)
                 {
                     // set the promise of the initialization.
                     iteration_dependencies[0](x_block, y_block) =
@@ -293,9 +293,9 @@ void gs(
                 promise_grid_type & current = iteration_dependencies[(iter + 1)%2];
 
                 // in every iteration we want to compute this:
-                for(size_type y_block = 0, y = 0; y_block < n_y; y_block += block_size, ++y)
+                for(std::size_t y_block = 0, y = 0; y_block < n_y; y_block += block_size, ++y)
                 {
-                    for(size_type x_block = 0, x = 0; x_block < n_x; x_block += block_size, ++x)
+                    for(std::size_t x_block = 0, x = 0; x_block < n_x; x_block += block_size, ++x)
                     {
                         // set up the x and y ranges, this takes care of the
                         // boundaries, so we don't access invalid rgid points.
@@ -356,8 +356,8 @@ void gs(
                         current(x, y) =
                             // call the update action
                             // this will exectue a loop like this:
-                            // for(size_type y = x_range.first; y < y_range.second; ++y)
-                            //     for(size_type x = x_range.first; x < x_range.second; ++x)
+                            // for(std::size_t y = x_range.first; y < y_range.second; ++y)
+                            //     for(std::size_t x = x_range.first; x < x_range.second; ++x)
                             //         u(x, y) = update_fun()(x, y, u, rhs, ...)
                             // the loop will be executed after all the dependencies
                             // are finished.
@@ -395,9 +395,9 @@ void gs(
             output_fun f(output);
             remote_lse_type::apply_func_type out = f;
 
-            for(size_type x = 0; x < n_x; ++x)
+            for(std::size_t x = 0; x < n_x; ++x)
             {
-                for(size_type y = 0; y < n_y; ++y)
+                for(std::size_t y = 0; y < n_y; ++y)
                 {
                     apply_future(
                         remote_id, out, x, y

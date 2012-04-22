@@ -32,7 +32,6 @@ using bright_future::range_type;
 using bright_future::jacobi_kernel_simple;
 
 typedef bright_future::grid<double> grid_type;
-typedef grid_type::size_type size_type;
 
 using hpx::util::high_resolution_timer;
 
@@ -55,14 +54,14 @@ using hpx::components::dataflow_object;
 struct get_col_fun
 {
     range_type range;
-    size_type col;
-    size_type cur;
+    std::size_t col;
+    std::size_t cur;
 
     typedef std::vector<double> result_type;
 
     get_col_fun() {}
-    get_col_fun(range_type const & r, size_type ro, size_type cur)
-        : range(r), col(ro), cur(cur) {}
+    get_col_fun(range_type const & r, std::size_t ro, std::size_t cu)
+        : range(r), col(ro), cur(cu) {}
 
     template <typename Archive>
     void serialize(Archive & ar, unsigned)
@@ -76,7 +75,7 @@ struct get_col_fun
     {
         std::vector<double> result;
         result.reserve(range.second-range.first);
-        for(size_type y = range.first; y < range.second; ++y)
+        for(std::size_t y = range.first; y < range.second; ++y)
         {
             result.push_back(u[cur](col, y));
         }
@@ -87,14 +86,14 @@ struct get_col_fun
 struct get_row_fun
 {
     range_type range;
-    size_type row;
-    size_type cur;
+    std::size_t row;
+    std::size_t cur;
 
     typedef std::vector<double> result_type;
 
     get_row_fun() {}
-    get_row_fun(range_type const & r, size_type ro, size_type cur)
-        : range(r), row(ro), cur(cur) {}
+    get_row_fun(range_type const & r, std::size_t ro, std::size_t cu)
+        : range(r), row(ro), cur(cu) {}
 
     template <typename Archive>
     void serialize(Archive & ar, unsigned)
@@ -110,7 +109,7 @@ struct get_row_fun
 
         result.reserve((range.second-range.first));
 
-        for(size_type x = range.first; x < range.second; ++x)
+        for(std::size_t x = range.first; x < range.second; ++x)
         {
             result.push_back(u[cur](x, row));
         }
@@ -122,18 +121,18 @@ struct get_row_fun
 struct update_top_boundary_fun
 {
     range_type range;
-    size_type cur;
+    std::size_t cur;
 
     typedef void result_type;
 
     update_top_boundary_fun() {}
-    update_top_boundary_fun(range_type const & r, size_type cur)
+    update_top_boundary_fun(range_type const & r, std::size_t cu)
         : range(r)
-        , cur(cur)
+        , cur(cu)
     {}
 
     template <typename Archive>
-    void serialize(Archive & ar, unsigned version)
+    void serialize(Archive & ar, unsigned )
     {
         ar & range;
         ar & cur;
@@ -141,7 +140,7 @@ struct update_top_boundary_fun
 
     result_type operator()(std::vector<grid_type> & u, std::vector<double> const & b) const
     {
-        for(size_type x = range.first, i = 0; x < range.second; ++x, ++i)
+        for(std::size_t x = range.first, i = 0; x < range.second; ++x, ++i)
         {
             u[cur](x, 0) = b.at(i);
         }
@@ -151,18 +150,18 @@ struct update_top_boundary_fun
 struct update_bottom_boundary_fun
 {
     range_type range;
-    size_type cur;
+    std::size_t cur;
 
     typedef void result_type;
 
     update_bottom_boundary_fun() {}
-    update_bottom_boundary_fun(range_type const & r, size_type cur)
+    update_bottom_boundary_fun(range_type const & r, std::size_t cu)
         : range(r)
-        , cur(cur)
+        , cur(cu)
     {}
 
     template <typename Archive>
-    void serialize(Archive & ar, unsigned version)
+    void serialize(Archive & ar, unsigned )
     {
         ar & range;
         ar & cur;
@@ -170,7 +169,7 @@ struct update_bottom_boundary_fun
 
     result_type operator()(std::vector<grid_type> & u, std::vector<double> const & b) const
     {
-        for(size_type x = range.first, i = 0; x < range.second; ++x, ++i)
+        for(std::size_t x = range.first, i = 0; x < range.second; ++x, ++i)
         {
             u[cur](x, u[cur].y()-1) = b.at(i);
         }
@@ -180,18 +179,18 @@ struct update_bottom_boundary_fun
 struct update_right_boundary_fun
 {
     range_type range;
-    size_type cur;
+    std::size_t cur;
 
     typedef void result_type;
 
     update_right_boundary_fun() {}
-    update_right_boundary_fun(range_type const & r, size_type cur)
+    update_right_boundary_fun(range_type const & r, std::size_t cu)
         : range(r)
-        , cur(cur)
+        , cur(cu)
     {}
 
     template <typename Archive>
-    void serialize(Archive & ar, unsigned version)
+    void serialize(Archive & ar, unsigned )
     {
         ar & range;
         ar & cur;
@@ -199,7 +198,7 @@ struct update_right_boundary_fun
 
     result_type operator()(std::vector<grid_type> & u, std::vector<double> const & b) const
     {
-        for(size_type y = range.first, i = 0; y < range.second; ++y, ++i)
+        for(std::size_t y = range.first, i = 0; y < range.second; ++y, ++i)
         {
             u[cur](u[cur].x()-1, y) = b.at(i);
         }
@@ -209,18 +208,18 @@ struct update_right_boundary_fun
 struct update_left_boundary_fun
 {
     range_type range;
-    size_type cur;
+    std::size_t cur;
 
     typedef void result_type;
 
     update_left_boundary_fun() {}
-    update_left_boundary_fun(range_type const & r, size_type cur)
+    update_left_boundary_fun(range_type const & r, std::size_t cu)
         : range(r)
-        , cur(cur)
+        , cur(cu)
     {}
 
     template <typename Archive>
-    void serialize(Archive & ar, unsigned version)
+    void serialize(Archive & ar, unsigned)
     {
         ar & range;
         ar & cur;
@@ -228,7 +227,7 @@ struct update_left_boundary_fun
 
     result_type operator()(std::vector<grid_type> & u, std::vector<double> const & b) const
     {
-        for(size_type y = range.first, i = 0; y < range.second; ++y, ++i)
+        for(std::size_t y = range.first, i = 0; y < range.second; ++y, ++i)
         {
             u[cur](0, y) = b.at(i);
         }
@@ -241,13 +240,13 @@ struct update_fun
 
     range_type x_range;
     range_type y_range;
-    size_type src;
-    size_type dst;
-    size_type cache_block;
+    std::size_t src;
+    std::size_t dst;
+    std::size_t cache_block;
 
     update_fun() {}
 
-    update_fun(range_type x, range_type y, size_type old, size_type n, size_type c)
+    update_fun(range_type x, range_type y, std::size_t old, std::size_t n, std::size_t c)
         : x_range(x)
         , y_range(y)
         , src(old)
@@ -267,7 +266,7 @@ struct update_fun
     }
 
     template <typename Archive>
-    void serialize(Archive & ar, const unsigned int version)
+    void serialize(Archive & ar, const unsigned int )
     {
         ar & x_range;
         ar & y_range;
@@ -281,17 +280,17 @@ struct update_fun
 };
 
 void gs(
-    size_type n_x
-  , size_type n_y
-  , double hx_
-  , double hy_
-  , double k_
-  , double relaxation_
+    std::size_t n_x
+  , std::size_t n_y
+  , double //hx_
+  , double //hy_
+  , double //k_
+  , double //relaxation_
   , unsigned max_iterations
-  , unsigned iteration_block
+  , unsigned //iteration_block
   , unsigned block_size
   , std::size_t cache_block
-  , std::string const & output
+  , std::string const & //output
 )
 {
     hpx::components::component_type type
@@ -332,8 +331,8 @@ void gs(
                       , 1
                     )
                 );
-        size_type x = 0;
-        size_type y = 0;
+        std::size_t x = 0;
+        std::size_t y = 0;
 
         BOOST_FOREACH(hpx::lcos::future<object<data_type> > const & o, objects)
         {
@@ -356,8 +355,8 @@ void gs(
         }
     }
 
-    size_type n_x_local_block = (n_x_local - 2)/block_size + 1;
-    size_type n_y_local_block = (n_y_local - 2)/block_size + 1;
+    std::size_t n_x_local_block = (n_x_local - 2)/block_size + 1;
+    std::size_t n_y_local_block = (n_y_local - 2)/block_size + 1;
 
     std::vector<grid<grid<promise> > >
         deps(
@@ -380,17 +379,17 @@ void gs(
     t.restart();
     for(std::size_t iter = 0; iter < max_iterations; ++iter)
     {
-        for(size_type y_block = 0; y_block < dims[1]; ++y_block)
+        for(std::size_t y_block = 0; y_block < dims[1]; ++y_block)
         {
-            for(size_type x_block = 0; x_block < dims[0]; ++x_block)
+            for(std::size_t x_block = 0; x_block < dims[0]; ++x_block)
             {
                 promise_grid_type & cur_deps = deps.at(iter)(x_block, y_block);
-                for(size_type y = 1, yy = 0; y < n_y_local; y += block_size, ++yy)
+                for(std::size_t y = 1, yy = 0; y < n_y_local; y += block_size, ++yy)
                 {
-                    size_type y_end = (std::min)(y + block_size, n_y_local);
-                    for(size_type x = 1, xx = 0; x < n_x_local; x += block_size, ++xx)
+                    std::size_t y_end = (std::min)(y + block_size, n_y_local);
+                    for(std::size_t x = 1, xx = 0; x < n_x_local; x += block_size, ++xx)
                     {
-                        size_type x_end = (std::min)(x + block_size, n_x_local);
+                        std::size_t x_end = (std::min)(x + block_size, n_x_local);
                         if(iter > 0)
                         {
                             range_type x_range(x, x_end);
@@ -503,13 +502,13 @@ void gs(
         }
         std::swap(dst, src);
     }
-    for(size_type y_block = 0; y_block < dims[1]; ++y_block)
+    for(std::size_t y_block = 0; y_block < dims[1]; ++y_block)
     {
-        for(size_type x_block = 0; x_block < dims[0]; ++x_block)
+        for(std::size_t x_block = 0; x_block < dims[0]; ++x_block)
         {
-            for(size_type y = 1, yy = 0; y < n_y_local; y += block_size, ++yy)
+            for(std::size_t y = 1, yy = 0; y < n_y_local; y += block_size, ++yy)
             {
-                for(size_type x = 1, xx = 0; x < n_x_local; x += block_size, ++xx)
+                for(std::size_t x = 1, xx = 0; x < n_x_local; x += block_size, ++xx)
                 {
                     deps[max_iterations-1](x_block, y_block)(xx, yy).get_future().get();
                 }
@@ -519,5 +518,5 @@ void gs(
 
     double time_elapsed = t.elapsed();
     cout << n_x << "x" << n_y << " "
-         << ((((n_x-2)*(n_y-2) * max_iterations)/1e6)/time_elapsed) << " MLUP/S\n" << flush;
+         << ((double((n_x-2)*(n_y-2) * max_iterations)/1e6)/time_elapsed) << " MLUP/S\n" << flush;
 }

@@ -25,7 +25,6 @@ using bright_future::range_type;
 using bright_future::jacobi_kernel_simple;
 
 typedef bright_future::grid<double> grid_type;
-typedef grid_type::size_type size_type;
 
 void copy_send_buf(int dir, int disp, std::size_t y_start, std::size_t y_end, std::size_t x_start, std::size_t x_end, std::size_t src, std::vector<grid_type> const & u, std::vector<double> & send_buf, int * local_dim)
 {
@@ -149,8 +148,8 @@ void copy_recv_buf(int dir, int disp, std::size_t y_start, std::size_t y_end, st
 
 
 void gs(
-    size_type n_x
-  , size_type n_y
+    std::size_t n_x
+  , std::size_t n_y
   , double hx_
   , double hy_
   , double k_
@@ -229,8 +228,8 @@ void gs(
 
 
     high_resolution_timer t;
-    size_type src = 0;
-    size_type dst = 1;
+    std::size_t src = 0;
+    std::size_t dst = 1;
     if(myrank == 0)
         t.restart();
     for(std::size_t iter = 0; iter < max_iterations; ++iter)
@@ -271,12 +270,12 @@ void gs(
         }
         
 #pragma omp parallel for shared(u) schedule(static)
-        for(size_type y_block = 1; y_block < static_cast<std::size_t>(local_dim[1]); y_block += block_size)
+        for(std::size_t y_block = 1; y_block < static_cast<std::size_t>(local_dim[1]); y_block += block_size)
         {
-            size_type y_end = (std::min)(y_block + block_size, static_cast<size_type>(local_dim[1]));
-            for(size_type x_block = 1; x_block < static_cast<std::size_t>(local_dim[0]); x_block += block_size)
+            std::size_t y_end = (std::min)(y_block + block_size, static_cast<std::size_t>(local_dim[1]));
+            for(std::size_t x_block = 1; x_block < static_cast<std::size_t>(local_dim[0]); x_block += block_size)
             {
-                size_type x_end = (std::min)(x_block + block_size, static_cast<size_type>(local_dim[0]));
+                std::size_t x_end = (std::min)(x_block + block_size, static_cast<std::size_t>(local_dim[0]));
                 jacobi_kernel_simple(
                     u
                   , range_type(x_block, x_end)

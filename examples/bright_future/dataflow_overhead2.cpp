@@ -50,8 +50,8 @@ boost::uint64_t num_iterations = 0;
 ///////////////////////////////////////////////////////////////////////////////
 double null_function(double d)
 {
-    for (boost::uint64_t i = 0; i < num_iterations; ++i)
-        d += 1 / (2. * i + 1);
+    for (double i = 0; i < num_iterations; ++i)
+        d += 1. / (2. * i + 1.);
     return d;
 }
 
@@ -64,7 +64,7 @@ typedef plain_result_action1<
   , null_function
 > null_action;
 
-HPX_REGISTER_PLAIN_ACTION(null_action);
+HPX_REGISTER_PLAIN_ACTION(null_action)
 
 typedef dataflow<null_action> null_dataflow;
 

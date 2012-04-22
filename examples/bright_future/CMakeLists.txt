@@ -6,6 +6,7 @@
 add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=10)
 add_definitions(-DHPX_COMPONENT_CREATE_ARGUMENT_LIMIT=10)
 add_definitions(-DHPX_FUNCTION_LIMIT=13)
+add_definitions(-DHPX_TUPLE_LIMIT=13)
 
 set(bright_future_programs
         root_finder
@@ -144,7 +145,7 @@ if(HPX_CXX11_LAMBDAS)
   endif()
 
   if(MPI_FOUND AND OPENMP_FOUND)
-    include_directories(${MPI_CXX_INCLUDE_PATH})
+    include_directories(SYSTEM ${MPI_CXX_INCLUDE_PATH})
     target_link_libraries(jacobi_mpi_simple_exe ${MPI_CXX_LIBRARIES})
     set_target_properties(jacobi_mpi_simple_exe PROPERTIES COMPILE_DEFINITIONS BRIGHT_FUTURE_NO_HPX)
     set_target_properties(jacobi_mpi_simple_exe PROPERTIES COMPILE_FLAGS "${MPI_CXX_COMPILE_FLAGS} ${OpenMP_CXX_FLAGS} -DOPENMP_GRID -DBRIGHT_FUTURE_WITH_MPI")

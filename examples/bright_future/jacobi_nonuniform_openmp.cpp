@@ -32,7 +32,7 @@ void solve(
     for(std::size_t iter = 0; iter < max_iterations; ++iter)
     {
 #pragma omp parallel for shared(u) schedule(static)
-        for(int i = 0; i < (int)x.size(); i += (int)block_size)
+        for(std::size_t i = 0; i < x.size(); i += block_size)
         {
             bright_future::jacobi_kernel_nonuniform(
                 A
@@ -47,7 +47,7 @@ void solve(
     }
     double time_elapsed = t.elapsed();
     cout << x.size() << " "
-         << (((x.size() * max_iterations)/1e6)/time_elapsed) << " MLUPS/s\n" << flush;
+         << ((double(x.size() * max_iterations)/1e6)/time_elapsed) << " MLUPS/s\n" << flush;
 
     x = u[old];
 }

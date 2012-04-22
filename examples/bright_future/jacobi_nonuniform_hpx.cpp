@@ -48,13 +48,13 @@ typedef std::pair<std::size_t, std::size_t> range_type;
 struct lse_data
 {
     lse_data(
-        bright_future::crs_matrix<double> const & A
-      , std::vector<double> const & x
-      , std::vector<double> const & b
+        bright_future::crs_matrix<double> const & A_
+      , std::vector<double> const & x_
+      , std::vector<double> const & b_
     )
-        : A(A)
-        , x(2, x)
-        , b(b)
+        : A(A_)
+        , x(2, x_)
+        , b(b_)
     {}
 
     bright_future::crs_matrix<double> A;
@@ -84,11 +84,27 @@ struct update_fun
       , n(boost::move(other.n))
     {}
 
-    update_fun(range_type const & r, std::size_t old, std::size_t n)
+    update_fun(range_type const & r, std::size_t o, std::size_t n_)
         : range(r)
-        , old(old)
-        , n(n)
+        , old(o)
+        , n(n_)
     {}
+
+    update_fun& operator=(BOOST_COPY_ASSIGN_REF(update_fun) other)
+    {
+        range = other.range;
+        old = other.old;
+        n = other.n;
+        return *this;
+    }
+
+    update_fun& operator=(BOOST_RV_REF(update_fun) other)
+    {
+        range = boost::move(other.range);
+        old = boost::move(other.old);
+        n = boost::move(other.n);
+        return *this;
+    }
 
     void operator()(lse_data & lse) const
     {
@@ -102,7 +118,7 @@ struct update_fun
     }
 
     template <typename Archive>
-    void serialize(Archive & ar, const unsigned int version)
+    void serialize(Archive & ar, const unsigned int)
     {
         ar & range;
         ar & old;
@@ -120,7 +136,7 @@ struct return_
     std::size_t which;
 
     return_() {}
-    return_(std::size_t which) : which(which) {}
+    return_(std::size_t w) : which(w) {}
 
     result_type operator()(lse_data & lse) const
     {
@@ -128,7 +144,7 @@ struct return_
     }
 
     template <typename Archive>
-    void serialize(Archive & ar, const unsigned int version)
+    void serialize(Archive & ar, const unsigned int )
     {
         ar & which;
     }
@@ -223,7 +239,7 @@ void solve(
 
     double time_elapsed = t.elapsed();
     cout << x.size() << " "
-         << (((x.size() * max_iterations)/1e6)/time_elapsed) << " MLUPS/s\n" << flush;
+         << ((double(x.size() * max_iterations)/1e6)/time_elapsed) << " MLUPS/s\n" << flush;
 
     x = lse.apply(return_(old)).get_future().get();
 }

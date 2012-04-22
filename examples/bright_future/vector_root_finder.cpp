@@ -57,7 +57,7 @@ typedef
     >
     start_iteration_action;
 
-HPX_REGISTER_PLAIN_ACTION(start_iteration_action);
+HPX_REGISTER_PLAIN_ACTION(start_iteration_action)
 
 int hpx_main(variables_map & vm)
 {

@@ -144,7 +144,6 @@ int hpx_main(variables_map & vm)
         }
         else if(input_format == "matlab")
         {
-            bright_future::crs_matrix<double> A;
             {
                 std::ifstream file(matrix_name.c_str());
                 file.unsetf(std::ios_base::skipws);
@@ -203,7 +202,7 @@ int hpx_main(variables_map & vm)
                 const std::size_t begin = A.row_begin(r);
                 const std::size_t end = A.row_end(r);
                 std::size_t n_row = end-begin;
-                mean_per_row += n_row;
+                mean_per_row += double(n_row);
                 if(n_row > max_per_row)
                 {
                     max_per_row = n_row;
@@ -223,8 +222,8 @@ int hpx_main(variables_map & vm)
             std::cout << "Entries per row:\n";
             std::cout << "\tmax " << max_per_row << "\n";
             std::cout << "\tmin " << min_per_row << "\n";
-            std::cout << "\tmean " << mean_per_row/b.size() << "\n";
-            std::cout << "Density is: " << static_cast<double>(A.values.size())/(b.size() * b.size()) << "\n";
+            std::cout << "\tmean " << mean_per_row/double(b.size()) << "\n";
+            std::cout << "Density is: " << double(A.values.size())/double(b.size() * b.size()) << "\n";
         }
 
 #ifndef BRIGHT_FUTURE_NO_HPX

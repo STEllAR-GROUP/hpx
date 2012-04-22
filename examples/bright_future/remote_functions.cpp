@@ -39,15 +39,7 @@ void f(function<void()> f, int)
 {
     f();
 }
-
-typedef
-    plain_action2<
-        function<void()>
-      , int
-      , &f
-    > f_action;
-
-HPX_REGISTER_PLAIN_ACTION(f_action);
+HPX_PLAIN_ACTION(f, f_action)
 
 struct g
 {

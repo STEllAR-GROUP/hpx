@@ -44,7 +44,7 @@ typedef
       , touch_mem
     >
     touch_mem_action;
-HPX_REGISTER_PLAIN_ACTION_DECLARATION(touch_mem_action);
+HPX_REGISTER_PLAIN_ACTION_DECLARATION(touch_mem_action)
 #endif
 
 #if !defined(BOOST_NOEXCEPT)
@@ -82,7 +82,7 @@ namespace bright_future
         template <typename U> struct rebind { typedef numa_allocator<U> other; };
 
         numa_allocator() BOOST_NOEXCEPT {}
-        explicit numa_allocator(std::size_t block_size) BOOST_NOEXCEPT : block_size(block_size){}
+        explicit numa_allocator(std::size_t b_size) BOOST_NOEXCEPT : block_size(b_size){}
         numa_allocator(numa_allocator const & n) BOOST_NOEXCEPT : block_size(n.block_size) {}
         template <typename U>
         numa_allocator(numa_allocator<U> const & n) BOOST_NOEXCEPT : block_size(n.block_size)  {}
@@ -287,10 +287,10 @@ namespace bright_future
             , data(x_size * y_size)
         {}
 
-        grid(size_type x_size, size_type y_size, size_type block_size, T const & init)
+        grid(size_type x_size, size_type y_size, size_type /*block_size*/, T const & t)
             : n_x(x_size)
             , n_y(y_size)
-            , data(x_size * y_size, init/*, numa_allocator<T>(block_size)*/)
+            , data(x_size * y_size, t/*, numa_allocator<T>(block_size)*/)
         {}
 
         grid(grid const & g)
@@ -309,27 +309,27 @@ namespace bright_future
         template <typename F>
         void init(F f)
         {
-            for(size_type y = 0; y < n_y; ++y)
+            for(size_type y_ = 0; y_ < n_y; ++y_)
             {
-                for(size_type x = 0; x < n_x; ++x)
+                for(size_type x_ = 0; x_ < n_x; ++x_)
                 {
-                    (*this)(x, y) = f(x, y);
+                    (*this)(x_, y_) = f(x_, y_);
                 }
             }
         }
 
-        reference_type operator()(size_type x, size_type y)
+        reference_type operator()(size_type x_, size_type y_)
         {
-            BOOST_ASSERT(x < n_x);
-            BOOST_ASSERT(y < n_y);
-            return data[x + y * n_x];
+            BOOST_ASSERT(x_ < n_x);
+            BOOST_ASSERT(y_ < n_y);
+            return data[x_ + y_ * n_x];
         }
 
-        const_reference_type operator()(size_type x, size_type y) const
+        const_reference_type operator()(size_type x_, size_type y_) const
         {
-            BOOST_ASSERT(x < n_x);
-            BOOST_ASSERT(y < n_y);
-            return data[x + y * n_x];
+            BOOST_ASSERT(x_ < n_x);
+            BOOST_ASSERT(y_ < n_y);
+            return data[x_ + y_ * n_x];
         }
 
         reference_type operator[](size_type i)
@@ -391,7 +391,7 @@ namespace bright_future
         friend class boost::serialization::access;
 
         template<class Archive>
-        void serialize(Archive & ar, const unsigned int version)
+        void serialize(Archive & ar, const unsigned int /*version*/)
         {
             ar & n_x & n_y & data;
         }

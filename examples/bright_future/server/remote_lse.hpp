@@ -18,8 +18,9 @@
 
 namespace boost { namespace serialization {
     template <typename Archive>
-    void serialize(Archive & ar, hpx::lcos::future<void> &, unsigned)
+    void serialize(Archive &, hpx::lcos::future<void> &, unsigned)
     {
+        BOOST_ASSERT(false);
     }
 }}
 
@@ -32,16 +33,16 @@ namespace bright_future {
     struct lse_config
     {
         typedef typename grid<T>::size_type size_type;
-        lse_config(size_type n_x, size_type n_y, T hx_, T hy_, T k, T relaxation)
-            : n_x(n_x)
-            , n_y(n_y)
+        lse_config(size_type n_x_, size_type n_y_, T hx_, T hy_, T k_, T relaxation_)
+            : n_x(n_x_)
+            , n_y(n_y_)
             , hx(hx_)
             , hy(hy_)
             , hx_sq(hx_*hx_)
             , hy_sq(hy_*hy_)
-            , k(k)
-            , div(2.0/(hx_*hx_) + 2.0/(hy_*hy_) + k*k)
-            , relaxation(relaxation)
+            , k(k_)
+            , div(2.0/(hx_*hx_) + 2.0/(hy_*hy_) + k_*k_)
+            , relaxation(relaxation_)
         {}
 
         size_type n_x;
@@ -97,7 +98,7 @@ namespace bright_future {
                 std::size_t n = timestamps.size();
                 for(std::size_t i = 0; i < n; ++i)
                 {
-                    acc += timestamps[0]/n;
+                    acc += timestamps[0]/double(n);
                 }
                 hpx::cout << "Average time per update: " << acc << "\n" << hpx::flush;
             }
@@ -373,66 +374,66 @@ namespace bright_future {
 HPX_REGISTER_ACTION_DECLARATION_EX(
     bright_future::server::remote_lse<double>::init_action
   , remote_lse_init_action
-);
+)
 HPX_REGISTER_ACTION_DECLARATION_EX(
     bright_future::server::remote_lse<double>::init_u_action
   , remote_lse_init_u_action
-);
+)
 HPX_REGISTER_ACTION_DECLARATION_EX(
     bright_future::server::remote_lse<double>::init_u_blocked_action
   , remote_lse_init_u_blocked_action
-);
+)
 HPX_REGISTER_ACTION_DECLARATION_EX(
     bright_future::server::remote_lse<double>::init_rhs_action
   , remote_lse_init_rhs_action
-);
+)
 HPX_REGISTER_ACTION_DECLARATION_EX(
     bright_future::server::remote_lse<double>::init_rhs_blocked_action
   , remote_lse_init_rhs_blocked_action
-);
+)
 HPX_REGISTER_ACTION_DECLARATION_EX(
     bright_future::server::remote_lse<double>::apply_action
   , remote_lse_apply_action
-);
+)
 HPX_REGISTER_ACTION_DECLARATION_EX(
     bright_future::server::remote_lse<double>::apply_region_action
   , remote_lse_apply_region_action
-);
+)
 HPX_REGISTER_ACTION_DECLARATION_EX(
     bright_future::server::remote_lse<double>::apply_region_df_action
   , remote_lse_apply_region_df_action
-);
+)
 /*
 HPX_REGISTER_ACTION_DECLARATION_EX(
     bright_future::server::remote_lse<double>::get_col_action
   , remote_lse_get_col_action
-);
+)
 */
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::lcos::base_lco_with_value<std::vector<double> >::set_value_action
   , remote_lse_base_lco_set_value_action
-);
+)
 /*
 HPX_REGISTER_ACTION_DECLARATION_EX(
     bright_future::server::remote_lse<double>::get_row_action
   , remote_lse_get_row_action
-);
+)
 HPX_REGISTER_ACTION_DECLARATION_EX(
     bright_future::server::remote_lse<double>::update_top_boundary_action
   , remote_lse_update_top_boundary_action
-);
+)
 HPX_REGISTER_ACTION_DECLARATION_EX(
     bright_future::server::remote_lse<double>::update_bottom_boundary_action
   , remote_lse_update_bottom_boundary_action
-);
+)
 HPX_REGISTER_ACTION_DECLARATION_EX(
     bright_future::server::remote_lse<double>::update_left_boundary_action
   , remote_lse_update_left_boundary_action
-);
+)
 HPX_REGISTER_ACTION_DECLARATION_EX(
     bright_future::server::remote_lse<double>::update_right_boundary_action
   , remote_lse_update_right_boundary_action
-);
+)
 */
 
 #endif

@@ -22,7 +22,6 @@ using bright_future::update;
 using bright_future::update_residuum;
 
 typedef bright_future::grid<double> grid_type;
-typedef grid_type::size_type size_type;
 
 using hpx::util::high_resolution_timer;
 
@@ -57,7 +56,7 @@ using boost::phoenix::sin;
 struct init_rhs_fun
     : fun_base
 {
-    double operator()(size_type x, size_type y, lse_config const & c)
+    double operator()(std::size_t x, std::size_t y, lse_config const & c)
     {
         return
             39.478 * sin((x * c.hx) * 6.283) * sinh((y * c.hy) * 6.283);
@@ -77,7 +76,7 @@ struct init_rhs_fun
 struct init_u_fun
     : fun_base
 {
-    double operator()(size_type x, size_type y, lse_config const & c)
+    double operator()(std::size_t x, std::size_t y, lse_config const & c)
     {
         //cout << "hx " << c.hx << "hy " << c.hy << "\n" << flush;
         //return
@@ -104,7 +103,7 @@ struct init_u_fun
 struct update_fun
     : fun_base
 {
-    double operator()(grid_type const & u, grid_type const & rhs, size_type x, size_type y, lse_config const & c)
+    double operator()(grid_type const & u, grid_type const & rhs, std::size_t x, std::size_t y, lse_config const & c)
     {
         return update(u, rhs, x, y, c.hx_sq, c.hy_sq, c.div, c.relaxation);
     }
@@ -113,7 +112,7 @@ struct update_fun
 struct identity_fun
     : fun_base
 {
-    double operator()(grid_type const & u, grid_type const & rhs, size_type x, size_type y, lse_config const & c)
+    double operator()(grid_type const & u, grid_type const & rhs, std::size_t x, std::size_t y, lse_config const & c)
     {
         return u(x, y);
     }
@@ -127,7 +126,7 @@ struct output_fun
     output_fun() {}
     output_fun(std::string const & output) : file(new std::ofstream(output.c_str())) {}
 
-    double operator()(grid_type const & u, grid_type const & rhs, size_type x, size_type y, lse_config const & c)
+    double operator()(grid_type const & u, grid_type const & rhs, std::size_t x, std::size_t y, lse_config const & c)
     {
         (*file) << x * c.hx << " " << y * c.hy << " " << u(x, y) << "\n";
         return u(x, y);
@@ -137,7 +136,7 @@ struct output_fun
 struct update_residuum_fun
     : fun_base
 {
-    void operator()(grid_type & u, size_type x, size_type y)
+    void operator()(grid_type & u, std::size_t x, std::size_t y)
     {
         cout << "init!\n" << flush;
     }
@@ -145,8 +144,8 @@ struct update_residuum_fun
 
 
 void gs(
-    size_type n_x
-  , size_type n_y
+    std::size_t n_x
+  , std::size_t n_y
   , double hx
   , double hy
   , double k
@@ -189,9 +188,9 @@ void gs(
         // boundary condition
         {
             promise_grid_type init_rhs_promises(n_x, n_y);
-            for(size_type y = 0; y < n_y; ++y)
+            for(std::size_t y = 0; y < n_y; ++y)
             {
-                for(size_type x = 0; x < n_x; ++x)
+                for(std::size_t x = 0; x < n_x; ++x)
                 {
                     init_rhs_promises(x, y) =
                         hpx::async<remote_lse_type::init_rhs_action>(
@@ -208,9 +207,9 @@ void gs(
 
         iteration_dependencies_type iteration_dependencies(max_iterations+1, promise_grid_type(n_x, n_y));
 
-        for(size_type y = 0; y < n_y; ++y)
+        for(std::size_t y = 0; y < n_y; ++y)
         {
-            for(size_type x = 0; x < n_x; ++x)
+            for(std::size_t x = 0; x < n_x; ++x)
             {
                 iteration_dependencies[0](x, y) =
                     hpx::async<remote_lse_type::init_u_action>(
@@ -227,7 +226,7 @@ void gs(
             //for(unsigned jter = 0; jter < iteration_block; ++jter)
             {
                 // update the "red" points
-                size_type y, x/*, block_size*/;
+                std::size_t y, x/*, block_size*/;
                 promise_grid_type & current = iteration_dependencies[iter + jter + 1];
                 promise_grid_type & prev = iteration_dependencies[iter + jter];
 
@@ -302,7 +301,7 @@ void gs(
             /*
             // check if we converged yet
             grid_type residuum(u.x(), u.y());
-            size_type y, x;
+            std::size_t y, x;
 #pragma omp parallel for private(x, y)
             for(y = 1; y < n_y - 1; ++y)
             {
@@ -338,9 +337,9 @@ void gs(
             output_fun f(output);
             remote_lse_type::apply_func_type out = f;
 
-            for(size_type x = 0; x < n_x; ++x)
+            for(std::size_t x = 0; x < n_x; ++x)
             {
-                for(size_type y = 0; y < n_y; ++y)
+                for(std::size_t y = 0; y < n_y; ++y)
                 {
                     hpx::async<remote_lse_type::apply_action>(
                         remote_id, out, x, y, std::vector<promise_type>()).get();

@@ -21,23 +21,22 @@ using bright_future::update;
 using bright_future::update_residuum;
 
 typedef bright_future::grid<double> grid_type;
-typedef grid_type::size_type size_type;
 
 void gs(
     /*
     bright_future::grid<double> & u
   , bright_future::grid<double> const & rhs
   */
-    size_type n_x
-  , size_type n_y
+    std::size_t n_x
+  , std::size_t n_y
   , double hx_
   , double hy_
   , double k_
   , double relaxation_
   , unsigned max_iterations
-  , unsigned iteration_block
+  , unsigned //iteration_block
   , unsigned block_size
-  , std::size_t cache_block
+  , std::size_t //cache_block
   , std::string const & output
 )
 {
@@ -56,8 +55,8 @@ void gs(
     unsigned iter;
 
     high_resolution_timer t;
-    size_type old = 0;
-    size_type new_ = 1;
+    std::size_t old = 0;
+    std::size_t new_ = 1;
     {
         hx = hx_;
         hy = hy_;
@@ -70,13 +69,13 @@ void gs(
         double inv_hx_sq = 1.0 / hx_sq;
         double inv_hy_sq = 1.0 / hy_sq;
 #pragma omp parallel for shared(u, rhs) schedule(static)
-        for(size_type y = 0; y < n_y; ++y)
+        for(std::size_t y = 0; y < n_y; ++y)
         {
-            for(size_type x = 0; x < n_x; ++x)
+            for(std::size_t x = 0; x < n_x; ++x)
             {
-                u[0](x, y) = y == (n_y - 1) ? sin((x * hx) * 6.283) * sinh(6.283) : 0.0;
-                u[1](x, y) = y == (n_y - 1) ? sin((x * hx) * 6.283) * sinh(6.283) : 0.0;
-                rhs(x, y) = 39.478 * sin((x * hx) * 6.283) * sinh((y * hy) * 6.283);
+                u[0](x, y) = y == (n_y - 1) ? sin((double(x) * hx) * 6.283) * sinh(6.283) : 0.0;
+                u[1](x, y) = y == (n_y - 1) ? sin((double(x) * hx) * 6.283) * sinh(6.283) : 0.0;
+                rhs(x, y) = 39.478 * sin((double(x) * hx) * 6.283) * sinh((double(y) * hy) * 6.283);
             }
         }
 
@@ -88,15 +87,15 @@ void gs(
             {
                 // update the "red" points
 #pragma omp parallel for shared(u, rhs) schedule(static)
-                for(size_type y_block = 1; y_block < n_y-1; y_block += block_size)
+                for(std::size_t y_block = 1; y_block < n_y-1; y_block += block_size)
                 {
-                    for(size_type x_block = 1; x_block < n_x-1; x_block += block_size)
+                    for(std::size_t x_block = 1; x_block < n_x-1; x_block += block_size)
                     {
-                        size_type y_end = (std::min)(y_block + block_size, n_y-1);
-                        size_type x_end = (std::min)(x_block + block_size, n_x-1);
-                        for(size_type y = y_block; y < y_end; ++y)
+                        std::size_t y_end = (std::min)(y_block + block_size, n_y-1);
+                        std::size_t x_end = (std::min)(x_block + block_size, n_x-1);
+                        for(std::size_t y = y_block; y < y_end; ++y)
                         {
-                            for(size_type x = x_block; x < x_end; ++x)
+                            for(std::size_t x = x_block; x < x_end; ++x)
                             {
                                 u[new_](x,y)
                                     = div_inv * (
@@ -113,7 +112,7 @@ void gs(
             /*
             // check if we converged yet
             grid_type residuum(u.x(), u.y());
-            size_type y, x;
+            std::size_t y, x;
 #pragma omp parallel for private(x, y)
             for(y = 1; y < n_y-1; ++y)
             {
@@ -137,16 +136,16 @@ void gs(
         }
     }
     double time_elapsed = t.elapsed();
-    cout << n_x-1 << "x" << n_y-1 << " " << ((((n_x-2)*(n_y-2) * max_iterations)/1e6)/time_elapsed) << " MLUP/S\n" << flush;
+    cout << n_x-1 << "x" << n_y-1 << " " << (((double((n_x-2)*(n_y-2)) * max_iterations)/1e6)/time_elapsed) << " MLUP/S\n" << flush;
 
     if(!output.empty())
     {
         std::ofstream file(output.c_str());
-        for(size_type x = 0; x < n_x; ++x)
+        for(std::size_t x = 0; x < n_x; ++x)
         {
-            for(size_type y = 0; y < n_y; ++y)
+            for(std::size_t y = 0; y < n_y; ++y)
             {
-                file << x * hx << " " << y * hy << " " << u[new_](x, y) << "\n";
+                file << double(x) * hx << " " << double(y) * hy << " " << u[new_](x, y) << "\n";
             }
             file << "\n";
         }

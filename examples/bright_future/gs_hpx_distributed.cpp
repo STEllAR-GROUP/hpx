@@ -35,7 +35,6 @@ using bright_future::update;
 using bright_future::update_residuum;
 
 typedef bright_future::grid<double> grid_type;
-typedef grid_type::size_type size_type;
 
 using hpx::util::high_resolution_timer;
 
@@ -65,7 +64,7 @@ struct fun_base
     virtual ~fun_base() {}
 
     template <typename Archive>
-    void serialize(Archive & ar, const unsigned int version)
+    void serialize(Archive &, const unsigned int )
     {
     }
 };
@@ -80,26 +79,26 @@ typedef bright_future::server::remote_lse<double>::range_type range_type;
 // this is the functor to initialize the RHS of my partial differential equation
 struct init_rhs_fun
 {
-    size_type x_start;
-    size_type y_start;
+    std::size_t x_start;
+    std::size_t y_start;
 
     init_rhs_fun() {}
 
-    init_rhs_fun(size_type x, size_type y)
+    init_rhs_fun(std::size_t x, std::size_t y)
         : x_start(x)
         , y_start(y)
     {}
 
-    double operator()(size_type x_local, size_type y_local, lse_config const & c)
+    double operator()(std::size_t x_local, std::size_t y_local, lse_config const & c)
     {
-        size_type x = x_start + x_local - 1;
-        size_type y = y_start + y_local - 1;
+        std::size_t x = x_start + x_local - 1;
+        std::size_t y = y_start + y_local - 1;
         return
-            39.478 * sin((x * c.hx) * 6.283) * sinh((y * c.hy) * 6.283);
+            39.478 * sin((double(x) * c.hx) * 6.283) * sinh((double(y) * c.hy) * 6.283);
     }
 
     template <typename Archive>
-    void serialize(Archive & ar, const unsigned int version)
+    void serialize(Archive & ar, const unsigned int )
     {
         ar & x_start;
         ar & y_start;
@@ -109,28 +108,28 @@ struct init_rhs_fun
 // functor to initialize the grid with boundary conditions
 struct init_u_fun
 {
-    size_type x_start;
-    size_type y_start;
+    std::size_t x_start;
+    std::size_t y_start;
 
     init_u_fun() {}
 
-    init_u_fun(size_type x, size_type y)
+    init_u_fun(std::size_t x, std::size_t y)
         : x_start(x)
         , y_start(y)
     {}
 
-    double operator()(size_type x_local, size_type y_local, lse_config const & c)
+    double operator()(std::size_t x_local, std::size_t y_local, lse_config const & c)
     {
-        size_type x = x_start + x_local - 1;
-        size_type y = y_start + y_local - 1;
+        std::size_t x = x_start + x_local - 1;
+        std::size_t y = y_start + y_local - 1;
         double value =
-            y == (c.n_y - 1) ? sin((x * c.hx) * 6.283) * sinh(6.283) : 0.0;
+            y == (c.n_y - 1) ? sin((double(x) * c.hx) * 6.283) * sinh(6.283) : 0.0;
 
         return value;
     }
 
     template <typename Archive>
-    void serialize(Archive & ar, const unsigned int version)
+    void serialize(Archive & ar, const unsigned int )
     {
         ar & x_start;
         ar & y_start;
@@ -141,7 +140,7 @@ struct init_u_fun
 struct update_fun
     : fun_base
 {
-    double operator()(grid_type const & u, grid_type const & rhs, size_type x, size_type y, lse_config const & c)
+    double operator()(grid_type const & u, grid_type const & rhs, std::size_t x, std::size_t y, lse_config const & c)
     {
         return
             u(x, y)
@@ -164,7 +163,7 @@ struct update_fun
 struct identity_fun
     : fun_base
 {
-    double operator()(grid_type const & u, grid_type const & rhs, size_type x, size_type y, lse_config const & c)
+    double operator()(grid_type const & u, grid_type const &, std::size_t x, std::size_t y, lse_config const &)
     {
         return u(x, y);
     }
@@ -174,27 +173,27 @@ struct identity_fun
 struct output_fun
 {
     std::string file_name;
-    size_type x_start;
-    size_type y_start;
+    std::size_t x_start;
+    std::size_t y_start;
 
     output_fun() {}
-    output_fun(std::string const & output, size_type x, size_type y)
+    output_fun(std::string const & output, std::size_t x, std::size_t y)
         : file_name(output)
         , x_start(x)
         , y_start(y)
     {}
 
-    double operator()(grid_type const & u, grid_type const & rhs, size_type x_local, size_type y_local, lse_config const & c)
+    double operator()(grid_type const & u, grid_type const &, std::size_t x_local, std::size_t y_local, lse_config const & c)
     {
         std::ofstream file(file_name.c_str(), std::ios_base::app | std::ios_base::out);
-        size_type x = x_start + x_local - 1;
-        size_type y = y_start + y_local - 1;
-        file << x * c.hx << " " << y * c.hy << " " << u(x_local, y_local) << "\n";
+        std::size_t x = x_start + x_local - 1;
+        std::size_t y = y_start + y_local - 1;
+        file << double(x) * c.hx << " " << double(y) * c.hy << " " << u(x_local, y_local) << "\n";
         return u(x_local, y_local);
     }
 
     template <typename Archive>
-    void load(Archive & ar, const unsigned int version)
+    void load(Archive & ar, const unsigned int )
     {
         ar & file_name;
         ar & x_start;
@@ -202,21 +201,21 @@ struct output_fun
     }
 
     template <typename Archive>
-    void save(Archive & ar, const unsigned int version) const
+    void save(Archive & ar, const unsigned int ) const
     {
         ar & file_name;
         ar & x_start;
         ar & y_start;
     }
 
-    BOOST_SERIALIZATION_SPLIT_MEMBER();
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
 };
 
 // not used currently
 struct update_residuum_fun
     : fun_base
 {
-    void operator()(grid_type & u, size_type x, size_type y)
+    void operator()(grid_type &, std::size_t, std::size_t)
     {
     }
 };
@@ -226,17 +225,17 @@ void dependency()
     //cout << "dependency complete\n" << flush;
 }
 typedef hpx::actions::plain_action0<&dependency> dependency_action;
-HPX_REGISTER_PLAIN_ACTION(dependency_action);
+HPX_REGISTER_PLAIN_ACTION(dependency_action)
 
 void gs(
-    size_type n_x
-  , size_type n_y
+    std::size_t n_x
+  , std::size_t n_y
   , double hx
   , double hy
-  , double k
-  , double relaxation
+  , double //k
+  , double //relaxation
   , unsigned max_iterations
-  , unsigned iteration_block
+  , unsigned //iteration_block
   , unsigned block_size
   , std::size_t cache_block
   , std::string const & output
@@ -265,12 +264,12 @@ void gs(
 
         double num_blocks_sqrt = std::floor(std::sqrt(static_cast<double>(prefixes.size())));
 
-        double num_blocks = 0;
+        std::size_t num_blocks = 0;
         if(std::abs(num_blocks_sqrt - std::sqrt(static_cast<double>(prefixes.size()))) > 1e-9)
         {
             num_blocks_sqrt = num_blocks_sqrt + 1;
         }
-        num_blocks = num_blocks_sqrt * num_blocks_sqrt;
+        num_blocks = std::size_t(num_blocks_sqrt * num_blocks_sqrt);
 
         distributing_factory::async_create_result_type
             result = factory.create_components_async(type, num_blocks);
@@ -288,14 +287,14 @@ void gs(
             parts = hpx::components::server::locality_results(results);
 
 
-        size_type n_x_block = num_blocks_sqrt;
-        size_type n_y_block = num_blocks_sqrt;
+        std::size_t n_x_block = std::size_t(num_blocks_sqrt);
+        std::size_t n_y_block = std::size_t(num_blocks_sqrt);
 
-        size_type n_x_local = n_x / n_x_block + 1;
-        size_type n_y_local = n_y / n_y_block + 1;
+        std::size_t n_x_local = n_x / n_x_block + 1;
+        std::size_t n_y_local = n_y / n_y_block + 1;
 
-        size_type n_x_local_block = n_x_local/block_size+1;
-        size_type n_y_local_block = n_y_local/block_size+1;
+        std::size_t n_x_local_block = n_x_local/block_size+1;
+        std::size_t n_y_local_block = n_y_local/block_size+1;
 
         if(debug)
         {
@@ -312,8 +311,8 @@ void gs(
         typedef grid<hpx::naming::id_type> id_grid_type;
         id_grid_type grid_ids(n_x_block, n_y_block);
         {
-            size_type x = 0;
-            size_type y = 0;
+            std::size_t x = 0;
+            std::size_t y = 0;
 
             BOOST_FOREACH(hpx::naming::id_type const & id, parts)
             {
@@ -341,9 +340,9 @@ void gs(
         // member function on an instance of remote_lse_type
         // the init function has the signature
         // void(unsigned n_x, unsigned n_y, double hx, double hy)
-        for(size_type y_block = 0; y_block < n_y_block; ++y_block)
+        for(std::size_t y_block = 0; y_block < n_y_block; ++y_block)
         {
-            for(size_type x_block = 0; x_block < n_x_block; ++x_block)
+            for(std::size_t x_block = 0; x_block < n_x_block; ++x_block)
             {
                 hpx::async<remote_lse_type::init_action>(
                     grid_ids(x_block, y_block)
@@ -397,13 +396,13 @@ void gs(
                 hpx::lcos::dataflow<remote_lse_type::init_u_blocked_action>
                 init_u_dataflow;
 
-            for(size_type y_block = 0; y_block < n_y_block; ++y_block)
+            for(std::size_t y_block = 0; y_block < n_y_block; ++y_block)
             {
-                for(size_type x_block = 0; x_block < n_x_block; ++x_block)
+                for(std::size_t x_block = 0; x_block < n_x_block; ++x_block)
                 {
-                    for(size_type y = 0, yy = 0; y < n_y_local + 2; y += block_size, ++yy)
+                    for(std::size_t y = 0, yy = 0; y < n_y_local + 2; y += block_size, ++yy)
                     {
-                        for(size_type x = 0, xx = 0; x < n_x_local + 2; x += block_size, ++xx)
+                        for(std::size_t x = 0, xx = 0; x < n_x_local + 2; x += block_size, ++xx)
                         {
                             range_type
                                 x_range(
@@ -457,9 +456,9 @@ void gs(
         {
             promise_grid_block_type & prev_block = iteration_dependencies.at(iter%2);
             promise_grid_block_type & current_block = iteration_dependencies.at((iter + 1)%2);
-            for(size_type y_block = 0; y_block < n_y_block; ++y_block)
+            for(std::size_t y_block = 0; y_block < n_y_block; ++y_block)
             {
-                for(size_type x_block = 0; x_block < n_x_block; ++x_block)
+                for(std::size_t x_block = 0; x_block < n_x_block; ++x_block)
                 {
                     typedef
                         hpx::lcos::dataflow<remote_lse_type::get_col_action>
@@ -483,9 +482,9 @@ void gs(
                     promise_grid_type & prev = prev_block(x_block, y_block);
                     promise_grid_type & current = current_block(x_block, y_block);
 
-                    for(size_type y = 1, yy = 0; y < n_y_local + 1; y += block_size, ++yy)
+                    for(std::size_t y = 1, yy = 0; y < n_y_local + 1; y += block_size, ++yy)
                     {
-                        for(size_type x = 1, xx = 0; x < n_x_local + 1; x += block_size, ++xx)
+                        for(std::size_t x = 1, xx = 0; x < n_x_local + 1; x += block_size, ++xx)
                         {
                             range_type
                                 x_range(
@@ -652,7 +651,7 @@ void gs(
         if(debug) cout << "\n";
 
         double time_elapsed = t.elapsed();
-        cout << ((((n_x-2)*(n_y-2) * max_iterations)/1e6)/time_elapsed) << " MLUP/S\n" << flush;
+        cout << ((double((n_x-2)*(n_y-2) * max_iterations)/1e6)/time_elapsed) << " MLUP/S\n" << flush;
         //ProfilerStop();
         //HeapProfilerDump("computation finished");
         //HeapProfilerStop();
@@ -663,9 +662,9 @@ void gs(
             {
                 std::ofstream(output.c_str());
             }
-            for(size_type x_block = 0; x_block < n_x_block; ++x_block)
+            for(std::size_t x_block = 0; x_block < n_x_block; ++x_block)
             {
-                for(size_type y_block = 0; y_block < n_y_block; ++y_block)
+                for(std::size_t y_block = 0; y_block < n_y_block; ++y_block)
                 {
                     range_type
                         x_range(

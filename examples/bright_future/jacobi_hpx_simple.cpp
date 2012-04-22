@@ -32,7 +32,6 @@ using bright_future::range_type;
 using bright_future::jacobi_kernel_simple;
 
 typedef bright_future::grid<double> grid_type;
-typedef grid_type::size_type size_type;
 
 using hpx::util::high_resolution_timer;
 
@@ -57,9 +56,9 @@ struct update_fun
 
     range_type x_range;
     range_type y_range;
-    size_type old;
-    size_type n;
-    size_type cache_block;
+    std::size_t old;
+    std::size_t n;
+    std::size_t cache_block;
 
     update_fun() {}
 
@@ -79,13 +78,33 @@ struct update_fun
       , cache_block(boost::move(other.cache_block))
     {}
 
-    update_fun(range_type const & x, range_type const & y, size_type old, size_type n, size_type c)
+    update_fun(range_type const & x, range_type const & y, std::size_t o, std::size_t n_, std::size_t c)
         : x_range(x)
         , y_range(y)
-        , old(old)
-        , n(n)
+        , old(o)
+        , n(n_)
         , cache_block(c)
     {}
+
+    update_fun& operator=(BOOST_COPY_ASSIGN_REF(update_fun) other)
+    {
+        x_range = other.x_range;
+        y_range = other.y_range;
+        old = other.old;
+        n = other.n;
+        cache_block = other.cache_block;
+        return *this;
+    }
+
+    update_fun& operator=(BOOST_RV_REF(update_fun) other)
+    {
+        x_range = boost::move(other.x_range);
+        y_range = boost::move(other.y_range);
+        old = boost::move(other.old);
+        n = boost::move(other.n);
+        cache_block = boost::move(other.cache_block);
+        return *this;
+    }
 
     void operator()(std::vector<grid_type> & u) const
     {
@@ -99,7 +118,7 @@ struct update_fun
     }
 
     template <typename Archive>
-    void serialize(Archive & ar, const unsigned int version)
+    void serialize(Archive & ar, const unsigned int )
     {
         ar & x_range;
         ar & y_range;
@@ -117,15 +136,15 @@ struct output_fun
     std::string file_name;
     range_type x_range;
     range_type y_range;
-    size_type cur;
+    std::size_t cur;
 
     output_fun() {}
 
-    output_fun(std::string const & output, range_type x, range_type y, size_type cur)
+    output_fun(std::string const & output, range_type x, range_type y, std::size_t cur_)
         : file_name(output)
         , x_range(x)
         , y_range(y)
-        , cur(cur)
+        , cur(cur_)
     {}
 
     typedef void result_type;
@@ -133,9 +152,9 @@ struct output_fun
     void operator()(std::vector<grid_type> & u) const
     {
         std::ofstream file(file_name.c_str(), std::ios_base::app | std::ios_base::out);
-        for(size_type x = x_range.first; x < x_range.second; ++x)
+        for(std::size_t x = x_range.first; x < x_range.second; ++x)
         {
-            for(size_type y = y_range.first; y < y_range.second; ++y)
+            for(std::size_t y = y_range.first; y < y_range.second; ++y)
             {
                 file << x << " " << y << " " << u[cur](x, y) << "\n";
             }
@@ -144,7 +163,7 @@ struct output_fun
     }
 
     template <typename Archive>
-    void serialize(Archive & ar, const unsigned int version)
+    void serialize(Archive & ar, const unsigned int )
     {
         ar & file_name;
         ar & x_range;
@@ -153,14 +172,14 @@ struct output_fun
 };
 
 void gs(
-    size_type n_x
-  , size_type n_y
-  , double hx_
-  , double hy_
-  , double k_
-  , double relaxation_
+    std::size_t n_x
+  , std::size_t n_y
+  , double //hx_
+  , double //hy_
+  , double //k_
+  , double //relaxation_
   , unsigned max_iterations
-  , unsigned iteration_block
+  , unsigned //iteration_block
   , unsigned block_size
   , std::size_t cache_block
   , std::string const & output
@@ -174,10 +193,10 @@ void gs(
     n_y = n_y -1;
 
     high_resolution_timer t;
-    size_type old = 0;
-    size_type n = 1;
-    size_type n_x_block = (n_x - 2)/block_size + 1;
-    size_type n_y_block = (n_y - 2)/block_size + 1;
+    std::size_t old = 0;
+    std::size_t n = 1;
+    std::size_t n_x_block = (n_x - 2)/block_size + 1;
+    std::size_t n_y_block = (n_y - 2)/block_size + 1;
     typedef dataflow_base<void> promise;
     typedef grid<promise> promise_grid_type;
     std::vector<promise_grid_type> deps(2, promise_grid_type(n_x_block, n_y_block));
@@ -185,12 +204,12 @@ void gs(
     t.restart();
     for(std::size_t iter = 0; iter < max_iterations; ++iter)//iter += iteration_block)
     {
-        for(size_type y = 1, yy = 0; y < n_y - 1; y += block_size, ++yy)
+        for(std::size_t y = 1, yy = 0; y < n_y - 1; y += block_size, ++yy)
         {
-            size_type y_end = (std::min)(y + block_size, n_y-1);
-            for(size_type x = 1, xx = 0; x < n_x - 1; x += block_size, ++xx)
+            std::size_t y_end = (std::min)(y + block_size, n_y-1);
+            for(std::size_t x = 1, xx = 0; x < n_x - 1; x += block_size, ++xx)
             {
-                size_type x_end = (std::min)(x + block_size, n_x-1);
+                std::size_t x_end = (std::min)(x + block_size, n_x-1);
                 if(iter > 0)
                 {
                     std::vector<promise > trigger;
@@ -234,9 +253,9 @@ void gs(
         }
         std::swap(old, n);
     }
-    for(size_type y = 1, yy = 0; y < n_y - 1; y += block_size, ++yy)
+    for(std::size_t y = 1, yy = 0; y < n_y - 1; y += block_size, ++yy)
     {
-        for(size_type x = 1, xx = 0; x < n_x - 1; x += block_size, ++xx)
+        for(std::size_t x = 1, xx = 0; x < n_x - 1; x += block_size, ++xx)
         {
             deps[old](xx, yy).get_future().get();
         }
@@ -245,7 +264,7 @@ void gs(
     double time_elapsed = t.elapsed();
     cout << n_x << "x" << n_y << " "
          //<< ((((n_x-2)*(n_y-2) * max_iterations)/1e6)/time_elapsed) << " MLUPS/s\n" << flush;
-         << ((((n_x-1)*(n_y-1) * max_iterations)/1e6)/time_elapsed) << " MLUPS/s\n" << flush;
+         << ((double((n_x-1)*(n_y-1) * max_iterations)/1e6)/time_elapsed) << " MLUPS/s\n" << flush;
 
     if(!output.empty())
     {

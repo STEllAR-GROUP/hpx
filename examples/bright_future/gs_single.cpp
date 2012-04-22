@@ -22,19 +22,18 @@ using bright_future::update;
 using bright_future::update_residuum;
 
 typedef bright_future::grid<double> grid_type;
-typedef grid_type::size_type size_type;
 
 void gs(
-    size_type n_x
-  , size_type n_y
+    std::size_t n_x
+  , std::size_t n_y
   , double hx_
   , double hy_
   , double k_
   , double relaxation_
   , unsigned max_iterations
-  , unsigned iteration_block
-  , unsigned block_size
-  , std::size_t cache_block
+  , unsigned //iteration_block
+  , unsigned //block_size
+  , std::size_t //cache_block
   , std::string const & output
 )
 {
@@ -48,8 +47,8 @@ void gs(
     double div;// = (2.0/(hx*hx) + 2.0/(hy*hy) + (k*k));
     double hx_sq;// = hx * hx;
     double hy_sq;// = hy * hy;
-    size_type y = 0;
-    size_type x = 0;
+    std::size_t y = 0;
+    std::size_t x = 0;
 
     // set our initial values, setting the top boundary to be a dirichlet
     // boundary condition
@@ -71,8 +70,8 @@ void gs(
         {
             for(x = (y%2) + 1; x < n_x; x += 2)
             {
-                u(x, y) = y == (n_y - 1) ? sin((x * hx) * 6.283) * sinh(6.283) : 0.0;
-                rhs(x, y) = 39.478 * sin((x * hx) * 6.283) * sinh((y * hy) * 6.283);
+                u(x, y) = y == (n_y - 1) ? sin((double(x) * hx) * 6.283) * sinh(6.283) : 0.0;
+                rhs(x, y) = 39.478 * sin((double(x) * hx) * 6.283) * sinh((double(y) * hy) * 6.283);
             }
         }
 #pragma omp parallel for shared(u, rhs, n_x, n_y, hx, hy) private(x, y)  schedule(static)
@@ -80,8 +79,8 @@ void gs(
         {
             for(x = ((y+1)%2) + 1; x < n_x; x += 2)
             {
-                u(x, y) = y == (n_y - 1) ? sin((x * hx) * 6.283) * sinh(6.283) : 0.0;
-                rhs(x, y) = 39.478 * sin((x * hx) * 6.283) * sinh((y * hy) * 6.283);
+                u(x, y) = y == (n_y - 1) ? sin((double(x) * hx) * 6.283) * sinh(6.283) : 0.0;
+                rhs(x, y) = 39.478 * sin((double(x) * hx) * 6.283) * sinh((double(y) * hy) * 6.283);
             }
         }
 
@@ -113,7 +112,7 @@ void gs(
             /*
             // check if we converged yet
             grid_type residuum(u.x(), u.y());
-            size_type y, x;
+            std::size_t y, x;
 #pragma omp parallel for private(x, y)
             for(y = 1; y < n_y-1; ++y)
             {
@@ -137,16 +136,16 @@ void gs(
         }
     }
     double time_elapsed = t.elapsed();
-    cout << ((((n_x-2)*(n_y-2) * max_iterations)/1e6)/time_elapsed) << " MLUP/S\n" << flush;
+    cout << ((double((n_x-2)*(n_y-2) * max_iterations)/1e6)/time_elapsed) << " MLUP/S\n" << flush;
 
     if(!output.empty())
     {
         std::ofstream file(output.c_str());
-        for(size_type x = 0; x < n_x; ++x)
+        for(x = 0; x < n_x; ++x)
         {
-            for(size_type y = 0; y < n_y; ++y)
+            for(y = 0; y < n_y; ++y)
             {
-                file << x * hx << " " << y * hy << " " << u(x, y) << "\n";
+                file << double(x) * hx << " " << double(y) * hy << " " << u(x, y) << "\n";
             }
             file << "\n";
         }

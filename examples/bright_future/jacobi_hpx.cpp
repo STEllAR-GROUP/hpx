@@ -31,8 +31,7 @@ using bright_future::update;
 using bright_future::update_residuum;
 
 typedef bright_future::grid<double> grid_type;
-typedef grid_type::size_type size_type;
-typedef std::pair<size_type, size_type> range_type;
+typedef std::pair<std::size_t, std::size_t> range_type;
 
 using hpx::util::high_resolution_timer;
 
@@ -52,35 +51,35 @@ using hpx::components::object;
 struct data
 {
     data(
-        size_type n_x_local
-      , size_type n_y_local
-      , size_type n_x
-      , size_type n_y
-      , size_type block_size
-      , double hx
-      , double hy
-      , double div_inv
-      , double inv_hx_sq
-      , double inv_hy_sq
+        std::size_t n_x_local_
+      , std::size_t n_y_local_
+      , std::size_t n_x_
+      , std::size_t n_y_
+      , std::size_t block_size_
+      , double hx_
+      , double hy_
+      , double div_inv_
+      , double inv_hx_sq_
+      , double inv_hy_sq_
     )
-        : n_x(n_x)
-        , n_y(n_y)
-        , n_x_local(n_x_local)
-        , n_y_local(n_y_local)
-        , block_size(block_size)
-        , hx(hx)
-        , hy(hy)
-        , div_inv(div_inv)
-        , inv_hx_sq(inv_hx_sq)
-        , inv_hy_sq(inv_hy_sq)
-        , u(2, grid_type(n_x_local, n_y_local))
-        , rhs(n_x_local, n_y_local)
+        : n_x(n_x_)
+        , n_y(n_y_)
+        , n_x_local(n_x_local_)
+        , n_y_local(n_y_local_)
+        , block_size(block_size_)
+        , hx(hx_)
+        , hy(hy_)
+        , div_inv(div_inv_)
+        , inv_hx_sq(inv_hx_sq_)
+        , inv_hy_sq(inv_hy_sq_)
+        , u(2, grid_type(n_x_local_, n_y_local_))
+        , rhs(n_x_local_, n_y_local_)
     {}
-    size_type n_x;
-    size_type n_y;
-    size_type n_x_local;
-    size_type n_y_local;
-    size_type block_size;
+    std::size_t n_x;
+    std::size_t n_y;
+    std::size_t n_x_local;
+    std::size_t n_y_local;
+    std::size_t block_size;
     double hx;
     double hy;
     double div_inv;
@@ -97,12 +96,12 @@ struct init_fun
 {
     range_type x_range;
     range_type y_range;
-    size_type x_start;
-    size_type y_start;
+    std::size_t x_start;
+    std::size_t y_start;
 
     init_fun() {}
 
-    init_fun(range_type x, range_type y, size_type xx, size_type yy)
+    init_fun(range_type x, range_type y, std::size_t xx, std::size_t yy)
         : x_range(x)
         , y_range(y)
         , x_start(xx)
@@ -113,21 +112,21 @@ struct init_fun
 
     void operator()(data & d) const
     {
-        for(size_type y = y_range.first; y < y_range.second; ++y)
+        for(std::size_t y = y_range.first; y < y_range.second; ++y)
         {
-            for(size_type x = x_range.first; x < x_range.second; ++x)
+            for(std::size_t x = x_range.first; x < x_range.second; ++x)
             {
-                double xx = static_cast<double>(x_start + x) - 1.;
-                double yy = static_cast<double>(y_start + y) - 1.;
-                d.u[0](x, y) = yy == (d.n_y - 1) ? sin((xx * d.hx) * 6.283) * sinh(6.283) : 0.0;
-                d.u[1](x, y) = yy == (d.n_y - 1) ? sin((xx * d.hx) * 6.283) * sinh(6.283) : 0.0;
-                d.rhs(x, y) = 39.478 * sin((xx * d.hx) * 6.283) * sinh((yy * d.hy) * 6.283);
+                std::size_t xx = x_start + x - 1;
+                std::size_t yy = y_start + y - 1;
+                d.u[0](x, y) = yy == (d.n_y - 1) ? sin((double(xx) * d.hx) * 6.283) * sinh(6.283) : 0.0;
+                d.u[1](x, y) = yy == (d.n_y - 1) ? sin((double(xx) * d.hx) * 6.283) * sinh(6.283) : 0.0;
+                d.rhs(x, y) = 39.478 * sin((double(xx) * d.hx) * 6.283) * sinh((double(yy) * d.hy) * 6.283);
             }
         }
     }
 
     template <typename Archive>
-    void serialize(Archive & ar, const unsigned int version)
+    void serialize(Archive & ar, const unsigned int )
     {
         ar & x_range;
         ar & y_range;
@@ -139,14 +138,14 @@ struct init_fun
 struct get_col_fun
 {
     range_type range;
-    size_type col;
-    size_type cur;
+    std::size_t col;
+    std::size_t cur;
 
     typedef std::vector<double> result_type;
 
     get_col_fun() {}
-    get_col_fun(range_type const & r, size_type ro, size_type cur)
-        : range(r), col(ro), cur(cur) {}
+    get_col_fun(range_type const & r, std::size_t ro, std::size_t cur_)
+        : range(r), col(ro), cur(cur_) {}
 
     template <typename Archive>
     void serialize(Archive & ar, unsigned)
@@ -160,7 +159,7 @@ struct get_col_fun
     {
         std::vector<double> result;
         result.reserve(range.second-range.first);
-        for(size_type y = range.first; y < range.second; ++y)
+        for(std::size_t y = range.first; y < range.second; ++y)
         {
             result.push_back(d.u[cur](col, y));
         }
@@ -171,14 +170,14 @@ struct get_col_fun
 struct get_row_fun
 {
     range_type range;
-    size_type row;
-    size_type cur;
+    std::size_t row;
+    std::size_t cur;
 
     typedef std::vector<double> result_type;
 
     get_row_fun() {}
-    get_row_fun(range_type const & r, size_type ro, size_type cur)
-        : range(r), row(ro), cur(cur) {}
+    get_row_fun(range_type const & r, std::size_t ro_, std::size_t cur_)
+        : range(r), row(ro_), cur(cur_) {}
 
     template <typename Archive>
     void serialize(Archive & ar, unsigned)
@@ -194,7 +193,7 @@ struct get_row_fun
 
         result.reserve((range.second-range.first));
 
-        for(size_type x = range.first; x < range.second; ++x)
+        for(std::size_t x = range.first; x < range.second; ++x)
         {
             result.push_back(d.u[cur](x, row));
         }
@@ -207,19 +206,19 @@ struct update_top_boundary_fun
 {
     range_type range;
     dataflow_object<data> neighbor;
-    size_type cur;
+    std::size_t cur;
 
     typedef void result_type;
 
     update_top_boundary_fun() {}
-    update_top_boundary_fun(range_type const & r, dataflow_object<data> n, size_type cur)
+    update_top_boundary_fun(range_type const & r, dataflow_object<data> n, std::size_t cur_)
         : range(r)
         , neighbor(n)
-        , cur(cur)
+        , cur(cur_)
     {}
 
     template <typename Archive>
-    void serialize(Archive & ar, unsigned version)
+    void serialize(Archive & ar, unsigned)
     {
         ar & range;
         ar & neighbor;
@@ -231,7 +230,7 @@ struct update_top_boundary_fun
 
         std::vector<double> b = neighbor.apply(
             get_row_fun(range, d.u[cur].y()-2, cur)).get_future().get();
-        for(size_type x = range.first, i = 0; x < range.second; ++x, ++i)
+        for(std::size_t x = range.first, i = 0; x < range.second; ++x, ++i)
         {
             d.u[cur](x, 0) = b.at(i);
         }
@@ -242,19 +241,19 @@ struct update_bottom_boundary_fun
 {
     range_type range;
     dataflow_object<data> neighbor;
-    size_type cur;
+    std::size_t cur;
 
     typedef void result_type;
 
     update_bottom_boundary_fun() {}
-    update_bottom_boundary_fun(range_type const & r, dataflow_object<data> n, size_type cur)
+    update_bottom_boundary_fun(range_type const & r, dataflow_object<data> n, std::size_t cur_)
         : range(r)
         , neighbor(n)
-        , cur(cur)
+        , cur(cur_)
     {}
 
     template <typename Archive>
-    void serialize(Archive & ar, unsigned version)
+    void serialize(Archive & ar, unsigned)
     {
         ar & range;
         ar & neighbor;
@@ -265,7 +264,7 @@ struct update_bottom_boundary_fun
     {
         std::vector<double> b = neighbor.apply(
             get_row_fun(range, 1, cur)).get_future().get();
-        for(size_type x = range.first, i = 0; x < range.second; ++x, ++i)
+        for(std::size_t x = range.first, i = 0; x < range.second; ++x, ++i)
         {
             d.u[cur](x, d.u[cur].y()-1) = b.at(i);
         }
@@ -276,19 +275,19 @@ struct update_right_boundary_fun
 {
     range_type range;
     dataflow_object<data> neighbor;
-    size_type cur;
+    std::size_t cur;
 
     typedef void result_type;
 
     update_right_boundary_fun() {}
-    update_right_boundary_fun(range_type const & r, dataflow_object<data> n, size_type cur)
+    update_right_boundary_fun(range_type const & r, dataflow_object<data> n, std::size_t cur_)
         : range(r)
         , neighbor(n)
-        , cur(cur)
+        , cur(cur_)
     {}
 
     template <typename Archive>
-    void serialize(Archive & ar, unsigned version)
+    void serialize(Archive & ar, unsigned)
     {
         ar & range;
         ar & neighbor;
@@ -299,7 +298,7 @@ struct update_right_boundary_fun
     {
         std::vector<double> b = neighbor.apply(
             get_col_fun(range, 1, cur)).get_future().get();
-        for(size_type y = range.first, i = 0; y < range.second; ++y, ++i)
+        for(std::size_t y = range.first, i = 0; y < range.second; ++y, ++i)
         {
             d.u[cur](d.u[cur].x()-1, y) = b.at(i);
         }
@@ -310,19 +309,19 @@ struct update_left_boundary_fun
 {
     range_type range;
     dataflow_object<data> neighbor;
-    size_type cur;
+    std::size_t cur;
 
     typedef void result_type;
 
     update_left_boundary_fun() {}
-    update_left_boundary_fun(range_type const & r, dataflow_object<data> n, size_type cur)
+    update_left_boundary_fun(range_type const & r, dataflow_object<data> n, std::size_t cur_)
         : range(r)
         , neighbor(n)
-        , cur(cur)
+        , cur(cur_)
     {}
 
     template <typename Archive>
-    void serialize(Archive & ar, unsigned version)
+    void serialize(Archive & ar, unsigned)
     {
         ar & range;
         ar & neighbor;
@@ -333,7 +332,7 @@ struct update_left_boundary_fun
     {
         std::vector<double> b = neighbor.apply(
             get_col_fun(range, d.u[cur].x()-2, cur)).get_future().get();
-        for(size_type y = range.first, i = 0; y < range.second; ++y, ++i)
+        for(std::size_t y = range.first, i = 0; y < range.second; ++y, ++i)
         {
             d.u[cur](0, y) = b.at(i);
         }
@@ -346,29 +345,29 @@ struct update_fun
 
     range_type x_range;
     range_type y_range;
-    size_type old;
-    size_type new_;
+    std::size_t old;
+    std::size_t new_;
 
     update_fun() {}
 
-    update_fun(range_type x, range_type y, size_type old, size_type new_)
+    update_fun(range_type x, range_type y, std::size_t old_, std::size_t n)
         : x_range(x)
         , y_range(y)
-        , old(old)
-        , new_(new_)
+        , old(old_)
+        , new_(n)
     {}
 
     void operator()(data & d) const
     {
-        for(size_type y_block = y_range.first; y_block < y_range.second; y_block += 128)
+        for(std::size_t y_block = y_range.first; y_block < y_range.second; y_block += 128)
         {
-            size_type y_end = (std::min)(y_block + 128, y_range.second);
-            for(size_type x_block = x_range.first; x_block < x_range.second; x_block += 128)
+            std::size_t y_end = (std::min)(y_block + 128, y_range.second);
+            for(std::size_t x_block = x_range.first; x_block < x_range.second; x_block += 128)
             {
-                size_type x_end = (std::min)(x_block + 128, x_range.second);
-                for(size_type y = y_block; y < y_end; ++y)
+                std::size_t x_end = (std::min)(x_block + 128, x_range.second);
+                for(std::size_t y = y_block; y < y_end; ++y)
                 {
-                    for(size_type x = x_block; x < x_end; ++x)
+                    for(std::size_t x = x_block; x < x_end; ++x)
                     {
                         d.u[new_](x,y)
                             = d.div_inv * (
@@ -389,7 +388,7 @@ struct update_fun
     }
 
     template <typename Archive>
-    void serialize(Archive & ar, const unsigned int version)
+    void serialize(Archive & ar, const unsigned int)
     {
         ar & x_range;
         ar & y_range;
@@ -401,19 +400,19 @@ struct output_fun
     std::string file_name;
     range_type x_range;
     range_type y_range;
-    size_type x_start;
-    size_type y_start;
-    size_type cur;
+    std::size_t x_start;
+    std::size_t y_start;
+    std::size_t cur;
 
     output_fun() {}
 
-    output_fun(std::string const & output, range_type x, range_type y, size_type xx, size_type yy, size_type cur)
+    output_fun(std::string const & output, range_type x, range_type y, std::size_t xx, std::size_t yy, std::size_t cur_)
         : file_name(output)
         , x_range(x)
         , y_range(y)
         , x_start(xx)
         , y_start(yy)
-        , cur(cur)
+        , cur(cur_)
     {}
 
     typedef void result_type;
@@ -421,9 +420,9 @@ struct output_fun
     void operator()(data & d) const
     {
         std::ofstream file(file_name.c_str(), std::ios_base::app | std::ios_base::out);
-        for(size_type x = x_range.first; x < x_range.second; ++x)
+        for(std::size_t x = x_range.first; x < x_range.second; ++x)
         {
-            for(size_type y = y_range.first; y < y_range.second; ++y)
+            for(std::size_t y = y_range.first; y < y_range.second; ++y)
             {
                 double xx = static_cast<double>(x_start + x) - 1.;
                 double yy = static_cast<double>(y_start + y) - 1.;
@@ -434,7 +433,7 @@ struct output_fun
     }
 
     template <typename Archive>
-    void serialize(Archive & ar, const unsigned int version)
+    void serialize(Archive & ar, const unsigned int )
     {
         ar & file_name;
         ar & x_range;
@@ -449,16 +448,16 @@ void gs(
     bright_future::grid<double> & u
   , bright_future::grid<double> const & rhs
   */
-    size_type n_x
-  , size_type n_y
+    std::size_t n_x
+  , std::size_t n_y
   , double hx_
   , double hy_
   , double k_
   , double relaxation_
   , unsigned max_iterations
-  , unsigned iteration_block
+  , unsigned //iteration_block
   , unsigned block_size
-  , std::size_t cache_block
+  , std::size_t //cache_block
   , std::string const & output
 )
 {
@@ -479,7 +478,7 @@ void gs(
     // boundary condition
     unsigned iter;
 
-    bool debug = false;
+    //bool debug = false;
 
     high_resolution_timer t;
     {
@@ -495,8 +494,8 @@ void gs(
         double inv_hy_sq = 1.0 / hy_sq;
 
         /*
-        size_type n_x_block = n_x / block_size + 1;
-        size_type n_y_block = n_y / block_size + 1;
+        std::size_t n_x_block = n_x / block_size + 1;
+        std::size_t n_y_block = n_y / block_size + 1;
         */
 
         hpx::components::component_type type
@@ -506,25 +505,25 @@ void gs(
 
         double num_blocks_sqrt = std::floor(std::sqrt(static_cast<double>(prefixes.size())));
 
-        double num_blocks = 0;
+        std::size_t num_blocks = 0;
         if(std::abs(num_blocks_sqrt - std::sqrt(static_cast<double>(prefixes.size()))) > 1e-9)
         {
             num_blocks_sqrt = num_blocks_sqrt + 1;
         }
-        num_blocks = num_blocks_sqrt * num_blocks_sqrt;
+        num_blocks = std::size_t(num_blocks_sqrt * num_blocks_sqrt);
 
         typedef dataflow_object<data> object_type;
 
         typedef hpx::lcos::dataflow_base<void> promise;
 
-        size_type n_x_block = num_blocks_sqrt;
-        size_type n_y_block = num_blocks_sqrt;
+        std::size_t n_x_block = std::size_t(num_blocks_sqrt);
+        std::size_t n_y_block = std::size_t(num_blocks_sqrt);
 
-        size_type n_x_local = n_x / n_x_block + 1;
-        size_type n_y_local = n_y / n_y_block + 1;
+        std::size_t n_x_local = n_x / n_x_block + 1;
+        std::size_t n_y_local = n_y / n_y_block + 1;
 
-        size_type n_x_local_block = n_x_local/block_size+1;
-        size_type n_y_local_block = n_y_local/block_size+1;
+        std::size_t n_x_local_block = n_x_local/block_size+1;
+        std::size_t n_y_local_block = n_y_local/block_size+1;
 
         std::vector<hpx::lcos::future<object<data> > >
             objects =
@@ -546,8 +545,8 @@ void gs(
 
         object_grid_type object_grid(n_x_block, n_y_block);
         {
-            size_type x = 0;
-            size_type y = 0;
+            std::size_t x = 0;
+            std::size_t y = 0;
 
             BOOST_FOREACH(hpx::lcos::future<object<data> > const & o, objects)
             {
@@ -579,13 +578,13 @@ void gs(
                 )
             );
 
-        for(size_type y_block = 0; y_block < n_y_block; ++y_block)
+        for(std::size_t y_block = 0; y_block < n_y_block; ++y_block)
         {
-            for(size_type x_block = 0; x_block < n_x_block; ++x_block)
+            for(std::size_t x_block = 0; x_block < n_x_block; ++x_block)
             {
-                for(size_type y = 0, yy = 0; y < n_y_local + 2; y += block_size, ++yy)
+                for(std::size_t y = 0, yy = 0; y < n_y_local + 2; y += block_size, ++yy)
                 {
-                    for(size_type x = 0, xx = 0; x < n_x_local + 2; x += block_size, ++xx)
+                    for(std::size_t x = 0, xx = 0; x < n_x_local + 2; x += block_size, ++xx)
                     {
                         range_type
                             x_range(
@@ -617,18 +616,18 @@ void gs(
         std::cout << "initialization complete\n";
 
         t.restart();
-        size_type old = 0;
-        size_type new_ = 1;
+        std::size_t old = 0;
+        std::size_t new_ = 1;
         for(iter = 0; iter < max_iterations; ++iter)//iter += iteration_block)
         {
-            for(size_type y_block = 0; y_block < n_y_block; ++y_block)
+            for(std::size_t y_block = 0; y_block < n_y_block; ++y_block)
             {
-                for(size_type x_block = 0; x_block < n_x_block; ++x_block)
+                for(std::size_t x_block = 0; x_block < n_x_block; ++x_block)
                 {
                     promise_grid_type & cur_deps = deps(x_block, y_block);
-                    for(size_type y = 1, yy = 0; y < n_y_local + 1; y += block_size, ++yy)
+                    for(std::size_t y = 1, yy = 0; y < n_y_local + 1; y += block_size, ++yy)
                     {
-                        for(size_type x = 1, xx = 0; x < n_x_local + 1; x += block_size, ++xx)
+                        for(std::size_t x = 1, xx = 0; x < n_x_local + 1; x += block_size, ++xx)
                         {
                             range_type
                                 x_range(
@@ -744,7 +743,7 @@ void gs(
 
         double time_elapsed = t.elapsed();
         cout << n_x-1 << "x" << n_y-1 << " "
-             << ((((n_x-2)*(n_y-2) * max_iterations)/1e6)/time_elapsed) << " MLUP/S\n" << flush;
+             << ((double((n_x-2)*(n_y-2) * max_iterations)/1e6)/time_elapsed) << " MLUP/S\n" << flush;
 
         if(!output.empty())
         {
@@ -752,9 +751,9 @@ void gs(
             {
                 std::ofstream(output.c_str());
             }
-            for(size_type x_block = 0; x_block < n_x_block; ++x_block)
+            for(std::size_t x_block = 0; x_block < n_x_block; ++x_block)
             {
-                for(size_type y_block = 0; y_block < n_y_block; ++y_block)
+                for(std::size_t y_block = 0; y_block < n_y_block; ++y_block)
                 {
                     range_type
                         x_range(

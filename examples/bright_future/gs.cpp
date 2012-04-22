@@ -36,15 +36,14 @@ using hpx::flush;
 #endif
 
 typedef bright_future::grid<double> grid_type;
-typedef grid_type::size_type size_type;
 
 extern void gs(
     /*
     bright_future::grid<double> & u
   , bright_future::grid<double> const & rhs
   */
-    size_type n_x
-  , size_type n_y
+    std::size_t n_x
+  , std::size_t n_y
   , double hx
   , double hy
   , double k
@@ -60,14 +59,14 @@ int hpx_main(variables_map & vm)
 {
     {
 
-        size_type width = vm["width"].as<size_type>();
-        size_type height = vm["height"].as<size_type>();
+        std::size_t width = vm["width"].as<std::size_t>();
+        std::size_t height = vm["height"].as<std::size_t>();
 
         double hx = vm["hx"].as<double>();
         double hy = vm["hy"].as<double>();
 
-        size_type n_x = static_cast<size_type>(width/hx + 0.5) + 1;
-        size_type n_y = static_cast<size_type>(height/hy + 0.5) + 1;
+        std::size_t n_x = static_cast<std::size_t>(double(width)/hx + 0.5 + 1);
+        std::size_t n_y = static_cast<std::size_t>(double(height)/hy + 0.5 + 1);
 
         unsigned max_iterations  = vm["max_iterations"].as<unsigned>();
         unsigned iteration_block = vm["iteration_block"].as<unsigned>();
@@ -115,12 +114,12 @@ int main(int argc, char **argv)
         )
         (
             "width"
-          , value<size_type>()->default_value(2)
+          , value<std::size_t>()->default_value(2)
           , "The width of the domain"
         )
         (
             "height"
-          , value<size_type>()->default_value(1)
+          , value<std::size_t>()->default_value(1)
           , "The height of the domain"
         )
         (
