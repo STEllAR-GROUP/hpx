@@ -136,7 +136,7 @@ namespace hpx { namespace lcos { namespace server
         {
             return components::component_barrier;
         }
-        static void set_component_type(components::component_type type) {}
+        static void set_component_type(components::component_type) {}
 
         // standard LCO action implementations
 

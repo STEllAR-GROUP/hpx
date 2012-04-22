@@ -36,7 +36,7 @@ namespace hpx
         struct wait_all
         {
         private:
-            BOOST_MOVABLE_BUT_NOT_COPYABLE(wait_all);
+            BOOST_MOVABLE_BUT_NOT_COPYABLE(wait_all)
 
             void on_future_ready(threads::thread_id_type id)
             {

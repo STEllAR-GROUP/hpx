@@ -36,28 +36,30 @@ namespace hpx
         struct wait_any
         {
         private:
-            BOOST_MOVABLE_BUT_NOT_COPYABLE(wait_any);
+            BOOST_MOVABLE_BUT_NOT_COPYABLE(wait_any)
+
+            static const std::size_t index_error = std::size_t(-1);
 
             void on_future_ready(std::size_t idx, threads::thread_id_type id)
             {
                 mutex_type::scoped_lock l(mtx_);
-                if (index_ == -1) {
-                    index_ = static_cast<int>(idx);
+                if (index_ == index_error) {
+                    index_ = idx;
                     threads::set_thread_state(id, threads::pending);
                 }
             }
 
         public:
             typedef lcos::local::spinlock mutex_type;
-            typedef HPX_STD_TUPLE<int, lcos::future<T, RT> > result_type;
+            typedef HPX_STD_TUPLE<std::size_t, lcos::future<T, RT> > result_type;
             typedef std::vector<lcos::future<T, RT> > argument_type;
 
             wait_any(argument_type const& lazy_values)
-              : lazy_values_(lazy_values), index_(-1)
+              : lazy_values_(lazy_values), index_(index_error)
             {}
 
             wait_any(BOOST_RV_REF(argument_type) lazy_values)
-              : lazy_values_(boost::move(lazy_values)), index_(-1)
+              : lazy_values_(boost::move(lazy_values)), index_(index_error)
             {}
 
             wait_any(BOOST_RV_REF(wait_any) rhs)
@@ -65,7 +67,7 @@ namespace hpx
                 index_(rhs.index_),
                 mtx_(boost::move(rhs.mtx_))
             {
-                rhs.index_ = -1;
+                rhs.index_ = index_error;
             }
 
             wait_any& operator= (BOOST_RV_REF(wait_any) rhs)
@@ -75,7 +77,7 @@ namespace hpx
                     mutex_type::scoped_lock l2(rhs.mtx_);
                     lazy_values_ = boost::move(rhs.lazy_values_);
                     index_ = rhs.index_;
-                    rhs.index_ = -1;
+                    rhs.index_ = index_error;
                     mtx_ = boost::move(rhs.mtx_);
                 }
                 return *this;
@@ -84,7 +86,7 @@ namespace hpx
             result_type operator()()
             {
                 mutex_type::scoped_lock l(mtx_);
-                index_ = -1;
+                index_ = index_error;
 
                 {
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
@@ -101,14 +103,14 @@ namespace hpx
 
                 // if one of the futures is already set, our callback above has
                 // already been called, otherwise we suspend ourselves
-                if (index_ == -1)
+                if (index_ == index_error)
                 {
                     // wait for any of the futures to return to become ready
                     util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
                     this_thread::suspend(threads::suspended);
                 }
 
-                BOOST_ASSERT(index_ != -1);       // that should not happen
+                BOOST_ASSERT(index_ != index_error);       // that should not happen
 
                 // reset all pending callback functions
                 l.unlock();
@@ -119,7 +121,7 @@ namespace hpx
             }
 
             std::vector<lcos::future<T, RT> > lazy_values_;
-            int index_;
+            std::size_t index_;
             mutable mutex_type mtx_;
         };
     }

@@ -148,7 +148,7 @@ namespace hpx { namespace lcos { namespace local
         boost::int64_t signal_all()
         {
             mutex_type::scoped_lock l(mtx_);
-            boost::int64_t count = queue_.size();
+            boost::int64_t count = static_cast<boost::int64_t>(queue_.size());
             signal_locked(count, l);
             return count;
         }

@@ -88,7 +88,7 @@ namespace hpx { namespace lcos { namespace detail
         template <typename T>
         void set_local_data(BOOST_FWD_REF(T) result)
         {
-            return set_data(boost::forward<result_type>(result));
+            return this->set_data(boost::forward<result_type>(result));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -98,7 +98,7 @@ namespace hpx { namespace lcos { namespace detail
         void set_value (BOOST_RV_REF(RemoteResult) result)
         {
             // set the received result, reset error status
-            set_data(boost::move(result));
+            this->set_data(boost::move(result));
         }
 
         Result get_value()
@@ -356,7 +356,7 @@ namespace hpx { namespace lcos
 
         typedef Result result_type;
 
-        ~promise()
+        virtual ~promise()
         {}
 
         lcos::future<Result, RemoteResult> get_future(error_code& ec = throws)

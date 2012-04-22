@@ -35,7 +35,7 @@ namespace hpx { namespace lcos { namespace local
     private:
         boost::uint64_t v_;
 
-        BOOST_MOVABLE_BUT_NOT_COPYABLE(spinlock);
+        BOOST_MOVABLE_BUT_NOT_COPYABLE(spinlock)
 
         ///////////////////////////////////////////////////////////////////////
         static void yield(std::size_t k)

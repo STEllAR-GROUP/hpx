@@ -195,7 +195,7 @@ namespace hpx { namespace lcos { namespace server
         ///
         /// \param e      [in] The exception encapsulating the error to report
         ///               to this LCO instance.
-        void set_exception(boost::exception_ptr const& e)
+        void set_exception(boost::exception_ptr const& /*e*/)
         {
             mutex_type::scoped_lock l(mtx_);
 
