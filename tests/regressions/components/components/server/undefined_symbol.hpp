@@ -19,26 +19,14 @@ struct undefined_symbol : components::managed_component_base<undefined_symbol>
 {
     void break_();
 
-    enum actions
-    {
-        action_break
-    };
-
-    typedef hpx::actions::action0<
-        // component
-        undefined_symbol
-        // action code
-      , action_break
-        // method
-      , &undefined_symbol::break_
-    > break_action;
+    HPX_DEFINE_COMPONENT_ACTION(undefined_symbol, break_, break_action);
 };
 
 }}}
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::test::server::undefined_symbol::break_action
-  , test_undefined_symbol_break_action);
+  , test_undefined_symbol_break_action)
 
 #endif // HPX_BDD6649D_AA26_435E_96D8_07C9B733E272
 

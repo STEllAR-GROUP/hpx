@@ -68,7 +68,7 @@ std::size_t return_move_object(hpx::naming::id_type id)
 }
 
 
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main(boost::program_options::variables_map&)
 {
     using hpx::test::server::action_move_semantics;
 

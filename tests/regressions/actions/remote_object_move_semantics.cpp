@@ -3,9 +3,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#define HPX_ACTION_ARGUMENT_LIMIT 8
-#define HPX_COMPONENT_CREATE_ARGUMENT_LIMIT 5
-
 #include <hpx/hpx_fwd.hpp>
 
 #include <hpx/hpx_init.hpp>
@@ -83,7 +80,7 @@ struct movable_functor
     }
 
     private:
-        BOOST_COPYABLE_AND_MOVABLE(movable_functor);
+        BOOST_COPYABLE_AND_MOVABLE(movable_functor)
 };
 
 template <typename Object>
@@ -120,7 +117,7 @@ struct non_movable_functor
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(variables_map& vm)
+int hpx_main(variables_map&)
 {
     std::vector<id_type> localities = hpx::find_all_localities();
 

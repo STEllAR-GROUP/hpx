@@ -40,7 +40,7 @@ namespace hpx { namespace test
         void serialize(Archive& ar, const unsigned int);
 
     private:
-        BOOST_COPYABLE_AND_MOVABLE(movable_object);
+        BOOST_COPYABLE_AND_MOVABLE(movable_object)
     };
 
     ///////////////////////////////////////////////////////////////////////////

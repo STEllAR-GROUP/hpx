@@ -14,7 +14,7 @@ using hpx::finalize;
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(
-    variables_map& vm
+    variables_map&
     )
 {
     finalize();

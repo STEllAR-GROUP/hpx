@@ -19,26 +19,26 @@ namespace hpx { namespace test
     }
 
     // Copy constructor.
-    movable_object::movable_object(movable_object const& other)
+    movable_object::movable_object(movable_object const&)
     {
         ++count;
     }
 
     // Move constructor.
-    movable_object::movable_object(BOOST_RV_REF(movable_object) other) {}
+    movable_object::movable_object(BOOST_RV_REF(movable_object)) {}
 
     movable_object::~movable_object() {}
 
     // Copy assignment.
     movable_object& movable_object::operator=(
-        BOOST_COPY_ASSIGN_REF(movable_object) other)
+        BOOST_COPY_ASSIGN_REF(movable_object))
     {
         ++count;
         return *this;
     }
 
     // Move assignment.
-    movable_object& movable_object::operator=(BOOST_RV_REF(movable_object) other)
+    movable_object& movable_object::operator=(BOOST_RV_REF(movable_object))
     {
         return *this;
     }
@@ -76,7 +76,7 @@ namespace hpx { namespace test
     }
 
     // Copy constructor.
-    non_movable_object::non_movable_object(non_movable_object const& other)
+    non_movable_object::non_movable_object(non_movable_object const&)
     {
         ++count;
     }
@@ -84,7 +84,7 @@ namespace hpx { namespace test
     non_movable_object::~non_movable_object() {}
 
     // Copy assignment.
-    non_movable_object& non_movable_object::operator=(non_movable_object const& other)
+    non_movable_object& non_movable_object::operator=(non_movable_object const&)
     {
         ++count;
         return *this;

@@ -47,3 +47,6 @@ foreach(test ${tests})
                               ${test}_test_exe)
 endforeach()
 
+set_target_properties(remote_object_move_semantics_test_exe
+    PROPERTIES COMPILE_FLAGS
+    "-DHPX_ACTION_ARGUMENT_LIMIT=10 -DHPX_COMPONENT_CREATE_ARGUMENT_LIMIT=10 -DHPX_FUNCTION_LIMIT=13 -DHPX_TUPLE_LIMIT=13")
