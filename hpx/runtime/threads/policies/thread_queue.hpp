@@ -193,7 +193,8 @@ namespace hpx { namespace threads { namespace policies
             if (HPX_LIKELY(max_count_)) {
                 std::size_t count = thread_map_.size();
                 if (max_count_ >= count + min_add_new_count) {
-                    BOOST_ASSERT(max_count_ - count < static_cast<std::size_t>(std::numeric_limits<boost::int64_t>::max()));
+                    BOOST_ASSERT(max_count_ - count <
+                        static_cast<std::size_t>((std::numeric_limits<boost::int64_t>::max)()));
                     add_count = static_cast<boost::int64_t>(max_count_ - count);
                     if (add_count < min_add_new_count)
                         add_count = min_add_new_count;
@@ -223,7 +224,8 @@ namespace hpx { namespace threads { namespace policies
             if (HPX_LIKELY(max_count_)) {
                 std::size_t count = thread_map_.size();
                 if (max_count_ >= count + min_add_new_count) {
-                    BOOST_ASSERT(max_count_ - count < static_cast<std::size_t>(std::numeric_limits<boost::int64_t>::max()));
+                    BOOST_ASSERT(max_count_ - count <
+                        static_cast<std::size_t>((std::numeric_limits<boost::int64_t>::max)()));
                     add_count = static_cast<boost::int64_t>(max_count_ - count);
                     if (add_count < min_add_new_count)
                         add_count = min_add_new_count;
@@ -435,7 +437,8 @@ namespace hpx { namespace threads { namespace policies
             mutex_type::scoped_lock lk(mtx_);
             if (unknown == state)
             {
-                BOOST_ASSERT(thread_map_.size() < static_cast<std::size_t>(std::numeric_limits<boost::int64_t>::max()));
+                BOOST_ASSERT(thread_map_.size() <
+                    static_cast<std::size_t>((std::numeric_limits<boost::int64_t>::max)()));
                 return static_cast<boost::int64_t>(thread_map_.size());
             }
 
@@ -658,8 +661,10 @@ namespace hpx { namespace threads { namespace policies
                 }
 
                 namespace bpt = boost::posix_time;
-                BOOST_ASSERT(10*idle_loop_count < static_cast<std::size_t>(std::numeric_limits<boost::int64_t>::max()));
-                bool timed_out = !cond_.timed_wait(lk, bpt::microseconds(static_cast<boost::int64_t>(10*idle_loop_count)));
+                BOOST_ASSERT(10*idle_loop_count <
+                    static_cast<std::size_t>((std::numeric_limits<boost::int64_t>::max)()));
+                bool timed_out = !cond_.timed_wait(lk,
+                    bpt::microseconds(static_cast<boost::int64_t>(10*idle_loop_count)));
 
                 LTM_(debug) << "tfunc(" << num_thread << "): exiting wait";
 

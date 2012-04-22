@@ -276,7 +276,7 @@ namespace hpx { namespace naming
         BOOST_ASSERT(0 == (c & ~gid_type::credit_base_mask));
         id.set_msb((msb & ~gid_type::credit_mask) |
             ((c & gid_type::credit_base_mask) << 16));
-        BOOST_ASSERT(c < std::numeric_limits<boost::uint16_t>::max());
+        BOOST_ASSERT(c < (std::numeric_limits<boost::uint16_t>::max)());
         return static_cast<boost::uint16_t>(c);
     }
 

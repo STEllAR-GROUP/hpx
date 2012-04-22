@@ -128,7 +128,8 @@ namespace boost { namespace coroutines { namespace detail
     }
 
     boost::int64_t count() const {
-      BOOST_ASSERT(m_counter < static_cast<std::size_t>(std::numeric_limits<boost::int64_t>::max()));
+      BOOST_ASSERT(m_counter < static_cast<std::size_t>(
+          (std::numeric_limits<boost::int64_t>::max)()));
       return static_cast<boost::int64_t>(m_counter);
     }
 

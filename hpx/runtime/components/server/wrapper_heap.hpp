@@ -153,12 +153,12 @@ namespace hpx { namespace components { namespace detail
 
 #if HPX_DEBUG_WRAPPER_HEAP
         void free(void *p, std::size_t count = 1)
-#else
-        void free(void *, std::size_t count = 1)
-#endif
         {
             BOOST_ASSERT(did_alloc(p));
-
+#else
+        void free(void *, std::size_t count = 1)
+        {
+#endif
             scoped_lock l(mtx_);
 
 #if HPX_DEBUG_WRAPPER_HEAP != 0
