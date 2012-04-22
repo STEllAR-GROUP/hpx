@@ -82,7 +82,7 @@ namespace hpx { namespace components
             {
                 // First call to get_component_type, ask AGAS for a unique id.
                 if (isenabled_) {
-                    component_type const ctype = (component_type)
+                    component_type const ctype =
                         agas_client.register_factory(locality, get_component_name());
 
                     if (component_invalid == ctype) {
@@ -94,7 +94,7 @@ namespace hpx { namespace components
                     components::set_component_type<type_holder>(ctype);
                 }
                 else {
-                    component_type const ctype = (component_type)
+                    component_type const ctype =
                         agas_client.get_component_id(get_component_name());
 
                     components::set_component_type<type_holder>(ctype);
@@ -223,7 +223,7 @@ namespace hpx { namespace components
             ComponentType, componentname, enable_always)                      \
         HPX_REGISTER_COMPONENT_FACTORY(                                       \
             hpx::components::component_factory<ComponentType>,                \
-            componentname);                                                   \
+            componentname)                                                    \
         HPX_DEF_UNIQUE_COMPONENT_NAME(                                        \
             hpx::components::component_factory<ComponentType>,                \
             componentname)                                                    \

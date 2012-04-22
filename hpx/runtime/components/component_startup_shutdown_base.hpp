@@ -63,7 +63,7 @@ namespace hpx { namespace components
 /// module.
 #define HPX_REGISTER_STARTUP_SHUTDOWN_FUNCTIONS()                             \
         BOOST_PLUGIN_EXPORT_LIST(HPX_COMPONENT_LIB_NAME,                      \
-            HPX_MANGLE_COMPONENT_NAME(startup_shutdown));                     \
+            HPX_MANGLE_COMPONENT_NAME(startup_shutdown))                      \
     /**/
 
 #endif

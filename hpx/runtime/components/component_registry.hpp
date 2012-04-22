@@ -68,7 +68,7 @@ namespace hpx { namespace components
             componentname ## _component_registry_type_ ## always_enabled;     \
         HPX_REGISTER_COMPONENT_REGISTRY(                                      \
             componentname ## _component_registry_type_ ## always_enabled,     \
-            componentname);                                                   \
+            componentname)                                                    \
         HPX_DEF_UNIQUE_COMPONENT_NAME(                                        \
             componentname ## _component_registry_type_ ## always_enabled,     \
             componentname)                                                    \

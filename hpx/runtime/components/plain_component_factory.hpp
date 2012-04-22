@@ -76,7 +76,7 @@ namespace hpx { namespace components
             {
                 // First call to get_component_type, ask AGAS for a unique id.
                 if (isenabled_) {
-                    component_type const ctype = (component_type) 
+                    component_type const ctype = 
                         agas_client.register_factory(locality, get_component_name());
 
                     if (component_invalid == ctype)
@@ -88,7 +88,7 @@ namespace hpx { namespace components
                     components::set_component_type<type_holder>(ctype);
                 }
                 else {
-                    component_type const ctype = (component_type) 
+                    component_type const ctype =
                         agas_client.get_component_id(get_component_name());
 
                     components::set_component_type<type_holder>(ctype);
@@ -128,7 +128,7 @@ namespace hpx { namespace components
         ///         instance. If more than one component instance has been
         ///         created (\a count > 1) the GID's of all new instances are
         ///         sequential in a row.
-        naming::gid_type create (std::size_t count)
+        naming::gid_type create (std::size_t /*count*/)
         {
             HPX_THROW_EXCEPTION(bad_request,
                 "plain_component_factory::create",
@@ -165,7 +165,7 @@ namespace hpx { namespace components
         ///
         /// \param gid    [in] The gid of the first component instance to
         ///               destroy.
-        void destroy(naming::gid_type const& gid)
+        void destroy(naming::gid_type const& /*gid*/)
         {
         }
 
@@ -191,17 +191,17 @@ namespace hpx { namespace components
 #define HPX_REGISTER_PLAIN_ACTION_EX2(plain_action, plain_action_name,        \
         enable_always)                                                        \
     BOOST_CLASS_EXPORT_KEY2(plain_action, BOOST_PP_STRINGIZE(plain_action_name))\
-    HPX_REGISTER_ACTION_EX(plain_action, plain_action_name);                  \
+    HPX_REGISTER_ACTION_EX(plain_action, plain_action_name)                   \
     HPX_REGISTER_COMPONENT_FACTORY(                                           \
         hpx::components::plain_component_factory<plain_action>,               \
-        plain_action_name);                                                   \
+        plain_action_name)                                                    \
     HPX_DEF_UNIQUE_COMPONENT_NAME(                                            \
         hpx::components::plain_component_factory<plain_action>,               \
-        plain_action_name);                                                   \
+        plain_action_name)                                                    \
     template struct hpx::components::plain_component_factory<plain_action>;   \
     HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_EX(                               \
         hpx::components::server::plain_function<plain_action>,                \
-        plain_action_name, enable_always);                                    \
+        plain_action_name, enable_always)                                     \
     HPX_DEFINE_GET_COMPONENT_TYPE(                                            \
         hpx::components::server::plain_function<plain_action>)                \
     /**/

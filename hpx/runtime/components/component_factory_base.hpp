@@ -154,7 +154,7 @@ namespace boost { namespace plugin
 /// compilation unit of a component module.
 #define HPX_REGISTER_COMPONENT_MODULE()                                       \
         BOOST_PLUGIN_EXPORT_LIST(HPX_COMPONENT_LIB_NAME,                      \
-            HPX_MANGLE_COMPONENT_NAME(factory));                              \
+            HPX_MANGLE_COMPONENT_NAME(factory))                               \
         HPX_REGISTER_REGISTRY_MODULE()                                        \
     /**/
 

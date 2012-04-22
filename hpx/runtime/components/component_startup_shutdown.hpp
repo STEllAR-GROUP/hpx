@@ -73,7 +73,8 @@ namespace hpx { namespace components
     }}}                                                                       \
     /***/
 
-#define HPX_NULL_STARTUP_SHUTDOWN_PTR ((bool(*)(HPX_STD_FUNCTION<void()>&))0)
+#define HPX_NULL_STARTUP_SHUTDOWN_PTR (
+        static_cast<bool(*)(HPX_STD_FUNCTION<void()>&)>(0))
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_STARTUP_SHUTDOWN_MODULE(startup, shutdown)               \

@@ -58,7 +58,7 @@ namespace hpx { namespace components
 /// compilation unit of a component module.
 #define HPX_REGISTER_REGISTRY_MODULE()                                        \
         BOOST_PLUGIN_EXPORT_LIST(HPX_COMPONENT_LIB_NAME,                      \
-            HPX_MANGLE_COMPONENT_NAME(registry));                             \
+            HPX_MANGLE_COMPONENT_NAME(registry))                              \
     /**/
 
 #endif

@@ -30,7 +30,7 @@ namespace hpx { namespace components { namespace server
             memory_load8 = 4,         ///< load a 8 bit value from a memory location
             memory_load16 = 5,        ///< load a 16 bit value from a memory location
             memory_load32 = 6,        ///< load a 32 bit value from a memory location
-            memory_load64 = 7,        ///< load a 64 bit value from a memory location
+            memory_load64 = 7         ///< load a 64 bit value from a memory location
         };
 
         static component_type get_component_type()
@@ -154,30 +154,30 @@ namespace hpx { namespace components { namespace server
 
 ///////////////////////////////////////////////////////////////////////////////
 // Declaration of serialization support for the runtime_support actions
-HPX_REGISTER_ACTION_DECLARATION_EX(hpx::components::server::memory::store8_action, store8_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(hpx::components::server::memory::store16_action, store16_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(hpx::components::server::memory::store32_action, store32_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(hpx::components::server::memory::store64_action, store64_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(hpx::components::server::memory::store8_action, store8_action)
+HPX_REGISTER_ACTION_DECLARATION_EX(hpx::components::server::memory::store16_action, store16_action)
+HPX_REGISTER_ACTION_DECLARATION_EX(hpx::components::server::memory::store32_action, store32_action)
+HPX_REGISTER_ACTION_DECLARATION_EX(hpx::components::server::memory::store64_action, store64_action)
 
-HPX_REGISTER_ACTION_DECLARATION_EX(hpx::components::server::memory::load8_action, load8_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(hpx::components::server::memory::load16_action, load16_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(hpx::components::server::memory::load32_action, load32_action);
-HPX_REGISTER_ACTION_DECLARATION_EX(hpx::components::server::memory::load64_action, load64_action);
+HPX_REGISTER_ACTION_DECLARATION_EX(hpx::components::server::memory::load8_action, load8_action)
+HPX_REGISTER_ACTION_DECLARATION_EX(hpx::components::server::memory::load16_action, load16_action)
+HPX_REGISTER_ACTION_DECLARATION_EX(hpx::components::server::memory::load32_action, load32_action)
+HPX_REGISTER_ACTION_DECLARATION_EX(hpx::components::server::memory::load64_action, load64_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 // make sure all needed action::get_action_name() functions get defined
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::lcos::base_lco_with_value<boost::uint8_t>::set_value_action,
-    set_value_action_uint8_t);
+    set_value_action_uint8_t)
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::lcos::base_lco_with_value<boost::uint16_t>::set_value_action,
-    set_value_action_uint16_t);
+    set_value_action_uint16_t)
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::lcos::base_lco_with_value<boost::uint32_t>::set_value_action,
-    set_value_action_uint32_t);
+    set_value_action_uint32_t)
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::lcos::base_lco_with_value<boost::uint64_t>::set_value_action,
-    set_value_action_uint64_t);
+    set_value_action_uint64_t)
 
 #endif
 

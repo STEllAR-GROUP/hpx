@@ -64,7 +64,7 @@ namespace hpx { namespace components
             componentname ## _test_component_registry_type;                   \
         HPX_REGISTER_COMPONENT_REGISTRY(                                      \
             componentname ## _test_component_registry_type,                   \
-            componentname);                                                   \
+            componentname)                                                    \
         HPX_DEF_UNIQUE_COMPONENT_NAME(                                        \
             componentname ## _test_component_registry_type,                   \
             componentname)                                                    \

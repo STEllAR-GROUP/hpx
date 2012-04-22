@@ -140,7 +140,11 @@ namespace hpx { namespace components
 
         /// \brief  The function \a create is used for allocation and
         ///         initialization of instances of the derived components.
+#ifdef NDEBUG
+        static component_type* create(std::size_t)
+#else
         static component_type* create(std::size_t count)
+#endif
         {
             // simple components can be created individually only
             BOOST_ASSERT(1 == count);
@@ -165,7 +169,11 @@ namespace hpx { namespace components
 
         /// \brief  The function \a destroy is used for destruction and
         ///         de-allocation of instances of the derived components.
+#ifdef NDEBUG
+        static void destroy(Component* p, std::size_t /*count*/ = 1)
+#else
         static void destroy(Component* p, std::size_t count = 1)
+#endif
         {
             // simple components can be deleted individually only
             BOOST_ASSERT(1 == count);

@@ -95,13 +95,13 @@ namespace hpx { namespace components
                 {
                     // First call to get_component_type, ask AGAS for a unique id.
                     // NOTE: This assumes that the derived component is loaded.
-                    base_type = (component_type) agas_client.get_component_id(
+                    base_type = agas_client.get_component_id(
                         unique_component_name<derived_component_factory_one, base_name>::call());
                 }
 
                 component_type this_type;
                 if (isenabled_) {
-                    this_type = (component_type)
+                    this_type =
                         agas_client.register_factory(locality, get_component_name());
 
                     if (component_invalid == this_type) {
@@ -112,7 +112,7 @@ namespace hpx { namespace components
                     }
                 }
                 else {
-                    this_type = (component_type)
+                    this_type =
                         agas_client.get_component_id(get_component_name());
                 }
 
@@ -254,7 +254,7 @@ namespace hpx { namespace components
     componentname, basecomponentname, enable_always)                          \
         HPX_REGISTER_COMPONENT_FACTORY(                                       \
             hpx::components::derived_component_factory_one<ComponentType>,    \
-            componentname);                                                   \
+            componentname)                                                    \
         HPX_DEF_UNIQUE_DERIVED_COMPONENT_NAME(                                \
             hpx::components::derived_component_factory_one<ComponentType>,    \
             componentname, basecomponentname)                                 \

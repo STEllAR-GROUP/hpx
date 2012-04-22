@@ -47,57 +47,57 @@
 // Serialization support for the runtime_support actions
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::factory_properties_action,
-    factory_properties_action);
+    factory_properties_action)
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::create_component_action,
-    create_component_action);
+    create_component_action)
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::create_one_component_action,
-    create_one_component_action);
+    create_one_component_action)
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::create_memory_block_action,
-    create_memory_block_action);
+    create_memory_block_action)
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::load_components_action,
-    load_components_action);
+    load_components_action)
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::call_startup_functions_action,
-    call_startup_functions_action);
+    call_startup_functions_action)
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::call_shutdown_functions_action,
-    call_shutdown_functions_action);
+    call_shutdown_functions_action)
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::free_component_action,
-    free_component_action);
+    free_component_action)
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::shutdown_action,
-    shutdown_action);
+    shutdown_action)
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::shutdown_all_action,
-    shutdown_all_action);
+    shutdown_all_action)
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::terminate_action,
-    terminate_action);
+    terminate_action)
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::terminate_all_action,
-    terminate_all_action);
+    terminate_all_action)
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::get_config_action,
-    get_config_action);
+    get_config_action)
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::update_agas_cache_action,
-    update_agas_cache_action);
+    update_agas_cache_action)
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::garbage_collect_action,
-    update_agas_cache_action);
+    update_agas_cache_action)
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::create_performance_counter_action,
-    update_agas_cache_action);
+    update_agas_cache_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::components::server::runtime_support,
-    hpx::components::component_runtime_support);
+    hpx::components::component_runtime_support)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
@@ -571,7 +571,7 @@ namespace hpx { namespace components { namespace server
                 cleanup_threads(tm, l);
 
                 // obey timeout
-                if (timeout != -1 && timeout < (t.elapsed() - start_time)) {
+                if ((std::abs(timeout - 1.) < 1e-16)  && timeout < (t.elapsed() - start_time)) {
                     // we waited long enough
                     timed_out = true;
                     break;
@@ -869,9 +869,9 @@ namespace hpx { namespace components { namespace server
             if (startup_shutdown->get_startup_function(startup))
                 pre_startup_functions_.push_back(startup);
 
-            shutdown_function_type shutdown;
-            if (startup_shutdown->get_shutdown_function(shutdown))
-                shutdown_functions_.push_back(shutdown);
+            shutdown_function_type s;
+            if (startup_shutdown->get_shutdown_function(s))
+                shutdown_functions_.push_back(s);
         }
         catch (hpx::exception const&) {
             throw;

@@ -55,24 +55,27 @@ namespace boost { namespace serialization
 // This must be in global namespace
 HPX_REGISTER_PLAIN_ACTION_EX2(
     hpx::components::server::console_logging_action<>,
-    console_logging_action, true);
+    console_logging_action, true)
+
+namespace {
+    struct log_lock_tag {};
+
+    hpx::util::spinlock& get_log_lock()
+    {
+        hpx::util::static_<hpx::util::spinlock, log_lock_tag> lock;
+        return lock.get();
+    }
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
 {
-    struct log_lock_tag {};
-
-    util::spinlock& get_log_lock()
-    {
-        util::static_<util::spinlock, log_lock_tag> lock;
-        return lock.get();
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // implementation of console based logging
     void console_logging(messages_type const& msgs)
     {
-        util::spinlock::scoped_lock l(get_log_lock());
+        util::spinlock::scoped_lock l(::get_log_lock());
 
         using boost::fusion::at_c;
 
