@@ -375,7 +375,7 @@ namespace hpx
         }
 
         ///////////////////////////////////////////////////////////////////////
-        typedef int32_t component_type;
+        typedef boost::int32_t component_type;
         enum component_enum_type
         {
             component_invalid = -1,
