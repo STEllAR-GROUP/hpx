@@ -148,6 +148,19 @@ response component_namespace::bind_prefix(
 
     if (fit != fend)
     {
+        prefixes_type::iterator pit = fit->second.find(prefix);
+        if (pit != fit->second.end()) {
+            // duplicate type registration for this locality
+            HPX_THROWS_IF(ec, duplicate_component_id
+                , "component_namespace::bind_prefix"
+                , "the component id is already registered for the given "
+                  "locality")
+            return response();
+        }
+
+        // first registration for this locality, we still return no_success to
+        // convey the fact that another locality already registered this
+        // component type
         LAGAS_(info) << (boost::format(
             "component_namespace::bind_prefix, key(%1%), prefix(%2%), "
             "ctype(%3%), response(no_success)")
@@ -157,7 +170,7 @@ response component_namespace::bind_prefix(
             ec = make_success_code();
 
         return response(component_ns_bind_prefix
-                      , cit->second 
+                      , cit->second
                       , no_success);
     }
 

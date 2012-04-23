@@ -493,7 +493,7 @@ components::component_type addressing_service::register_factory(
         else
             rep = hosted->component_ns_.service(req, action_priority_, ec);
 
-        if (ec || (success != rep.get_status()))
+        if (ec || (success != rep.get_status() && no_success != rep.get_status()))
             return components::component_invalid;
 
         return rep.get_component_type();
@@ -599,7 +599,7 @@ bool addressing_service::get_id_range(
             // get a future
             typedef checkout_promise<
                 promise_pool_type
-              , future_type 
+              , future_type
             > checkout_promise_type;
 
             checkout_promise_type cf(hosted->promise_pool_, f);
@@ -685,7 +685,7 @@ bool addressing_service::bind_range(
             // get a future
             typedef checkout_promise<
                 promise_pool_type
-              , future_type 
+              , future_type
             > checkout_promise_type;
 
             checkout_promise_type cf(hosted->promise_pool_, f);
