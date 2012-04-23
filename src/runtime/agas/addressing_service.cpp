@@ -541,7 +541,7 @@ struct lock_semaphore
     lcos::local::counting_semaphore& sem_;
 };
 
-template <typename Pool, typename Future, typename Promise>
+template <typename Pool, typename Promise>
 struct checkout_promise
 {
     checkout_promise(Pool& pool, Promise*& promise)
@@ -559,10 +559,6 @@ struct checkout_promise
             pool_.enqueue(promise_);
     }
 
-    Future* operator->()
-    {
-        return reinterpret_cast<Future*>(promise_);
-    }
     void set_ok() { result_ok_ = true; }
 
 private:
@@ -603,15 +599,14 @@ bool addressing_service::get_id_range(
             // get a future
             typedef checkout_promise<
                 promise_pool_type
-              , future_type
               , lcos::promise<response>
             > checkout_promise_type;
 
             checkout_promise_type cf(hosted->promise_pool_, f);
 
             // execute the action (synchronously)
-            cf->apply(bootstrap_primary_namespace_id(), req);
-            rep = cf->get_future().get(ec);
+            *f = future_type(bootstrap_primary_namespace_id(), req);
+            rep = f->get_future().get(ec);
 
             cf.set_ok();
         }
@@ -690,15 +685,14 @@ bool addressing_service::bind_range(
             // get a future
             typedef checkout_promise<
                 promise_pool_type
-              , future_type
               , lcos::promise<response>
             > checkout_promise_type;
 
             checkout_promise_type cf(hosted->promise_pool_, f);
 
             // execute the action (synchronously)
-            cf->apply(bootstrap_primary_namespace_id(), req);
-            rep = cf->get_future().get(ec);
+            *f = future_type(bootstrap_primary_namespace_id(), req);
+            rep = f->get_future().get(ec);
 
             cf.set_ok();
         }
