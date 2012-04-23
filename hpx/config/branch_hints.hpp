@@ -10,8 +10,8 @@
 #define HPX_50B9885A_AAD3_48C5_814A_EBCD47C858AC
 
 #if defined(__GNUC__)
-  #define HPX_LIKELY(expr)    __builtin_expect(static_cast<long int>(expr), true)
-  #define HPX_UNLIKELY(expr)  __builtin_expect(static_cast<long int>(expr), false)
+  #define HPX_LIKELY(expr)    __builtin_expect(static_cast<bool>(expr), true)
+  #define HPX_UNLIKELY(expr)  __builtin_expect(static_cast<bool>(expr), false)
 #else
   #define HPX_LIKELY(expr)    expr
   #define HPX_UNLIKELY(expr)  expr
