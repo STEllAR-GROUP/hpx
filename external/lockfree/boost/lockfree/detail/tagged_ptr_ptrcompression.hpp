@@ -42,7 +42,7 @@ private:
 
     static T* extract_ptr(volatile compressed_ptr_t const & i)
     {
-        return reinterpret_cast<T*>(i & ptr_mask);
+        return (T*)(i & ptr_mask);
     }
 
     static tag_t extract_tag(volatile compressed_ptr_t const & i)
@@ -52,7 +52,7 @@ private:
         return cu.tag[tag_index];
     }
 
-    static compressed_ptr_t pack_ptr(T * ptr, tag_t tag)
+    static compressed_ptr_t pack_ptr(T * ptr, int tag)
     {
         cast_unit ret;
         ret.value = compressed_ptr_t(ptr);

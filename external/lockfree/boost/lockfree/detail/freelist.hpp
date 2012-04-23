@@ -127,10 +127,7 @@ public:
             }
 
             freelist_node * new_pool_ptr = old_pool->next.get_ptr();
-            BOOST_ASSERT(old_pool.get_tag() + 1 < 
-                (std::numeric_limits<unsigned short>::max)());
-            tagged_node_ptr new_pool (new_pool_ptr, 
-                static_cast<unsigned short>(old_pool.get_tag() + 1));
+            tagged_node_ptr new_pool (new_pool_ptr, old_pool.get_tag() + 1);
 
             if (pool_.compare_exchange_weak(old_pool, new_pool)) {
                 void * ptr = old_pool.get_ptr();
@@ -193,7 +190,7 @@ public:
             freelist_node * current_ptr = current.get_ptr();
             if (current_ptr)
                 current = current_ptr->next;
-            Alloc::deallocate(reinterpret_cast<T*>(current_ptr), 1);
+            Alloc::deallocate((T*)current_ptr, 1);
         }
     }
 
