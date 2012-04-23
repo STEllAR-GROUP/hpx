@@ -579,7 +579,7 @@ bool addressing_service::get_id_range(
     typedef lcos::packaged_task<server::primary_namespace::service_action>
         future_type;
 
-    lcos::promise<response>* f = 0;
+    future_type* f = 0;
 
     try {
         request req(primary_ns_allocate, ep, count);
@@ -599,13 +599,13 @@ bool addressing_service::get_id_range(
             // get a future
             typedef checkout_promise<
                 promise_pool_type
-              , lcos::promise<response>
+              , future_type 
             > checkout_promise_type;
 
             checkout_promise_type cf(hosted->promise_pool_, f);
 
             // execute the action (synchronously)
-            *f = future_type(bootstrap_primary_namespace_id(), req);
+            f->apply(bootstrap_primary_namespace_id(), req);
             rep = f->get_future().get(ec);
 
             cf.set_ok();
@@ -631,7 +631,7 @@ bool addressing_service::get_id_range(
         // future for the pool, and let the old future stay in memory.
         if (!is_bootstrap() && f)
         {
-            hosted->promise_pool_.enqueue(new lcos::promise<response>);
+            hosted->promise_pool_.enqueue(new future_type);
             f->set_exception(boost::current_exception());
         }
 
@@ -659,7 +659,7 @@ bool addressing_service::bind_range(
     typedef lcos::packaged_task<server::primary_namespace::service_action>
         future_type;
 
-    lcos::promise<response>* f = 0;
+    future_type* f = 0;
 
     try {
         naming::locality const& ep = baseaddr.locality_;
@@ -685,13 +685,13 @@ bool addressing_service::bind_range(
             // get a future
             typedef checkout_promise<
                 promise_pool_type
-              , lcos::promise<response>
+              , future_type 
             > checkout_promise_type;
 
             checkout_promise_type cf(hosted->promise_pool_, f);
 
             // execute the action (synchronously)
-            *f = future_type(bootstrap_primary_namespace_id(), req);
+            f->apply(bootstrap_primary_namespace_id(), req);
             rep = f->get_future().get(ec);
 
             cf.set_ok();
@@ -726,7 +726,7 @@ bool addressing_service::bind_range(
         // explanation.
         if (!is_bootstrap() && f)
         {
-            hosted->promise_pool_.enqueue(new lcos::promise<response>);
+            hosted->promise_pool_.enqueue(new future_type);
             f->set_exception(boost::current_exception());
         }
 

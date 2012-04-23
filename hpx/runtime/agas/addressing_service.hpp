@@ -156,7 +156,9 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     > gva_cache_type;
     // }}}
 
-    typedef boost::lockfree::fifo<lcos::promise<response>*> promise_pool_type;
+    typedef boost::lockfree::fifo<
+        lcos::packaged_task<server::primary_namespace::service_action>*
+    > promise_pool_type;
 
     typedef util::merging_map<naming::gid_type, boost::int64_t>
         refcnt_requests_type;

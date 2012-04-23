@@ -403,7 +403,8 @@ void notify_console(notification_header const& header)
     const std::size_t pool_size = ini_.get_agas_promise_pool_size();
 
     for (std::size_t i = 0; i < pool_size; ++i)
-        promise_pool.enqueue(new lcos::promise<response>);
+        promise_pool.enqueue(
+            new lcos::packaged_task<server::primary_namespace::service_action>);
 }
 
 // remote call to AGAS
@@ -549,7 +550,8 @@ void notify_worker(notification_header const& header)
     const std::size_t pool_size = ini_.get_agas_promise_pool_size();
 
     for (std::size_t i = 0; i < pool_size; ++i)
-        promise_pool.enqueue(new lcos::promise<response>);
+        promise_pool.enqueue(
+            new lcos::packaged_task<server::primary_namespace::service_action>);
 }
 // }}}
 
