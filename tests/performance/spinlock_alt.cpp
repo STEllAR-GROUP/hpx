@@ -186,7 +186,7 @@ namespace test
 test::local_spinlock mtx[N];
 
 ///////////////////////////////////////////////////////////////////////////////
-double null_function(int i)
+double null_function(std::size_t i)
 {
     double d = 0.;
     std::size_t idx = i % N;
@@ -194,9 +194,9 @@ double null_function(int i)
         test::local_spinlock::scoped_lock l(mtx[idx]);
         d = global_init[idx];
     }
-    for (boost::uint64_t i = 0; i < num_iterations; ++i)
+    for (double j = 0; j < num_iterations; ++j)
     {
-        d += 1 / (2. * i + 1);
+        d += 1 / (2. * j + 1);
     }
     {
         test::local_spinlock::scoped_lock l(mtx[idx]);
@@ -205,16 +205,7 @@ double null_function(int i)
     return d;
 }
 
-typedef plain_result_action1<
-    // result type
-    double
-  , int
-    // arguments
-    // function
-  , null_function
-> null_action;
-
-HPX_REGISTER_PLAIN_ACTION(null_action);
+HPX_PLAIN_ACTION(null_function, null_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(

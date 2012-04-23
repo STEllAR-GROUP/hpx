@@ -100,13 +100,13 @@ void worker(
     )
 {
     double volatile d = 0.;
-    for (boost::uint64_t i = 0; i < delay_; ++i)
-        d += 1 / (2. * i + 1);
+    for (double i = 0.; i < delay_; ++i)
+        d += 1. / (2. * i + 1.);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(
-    variables_map& vm
+    variables_map&
     )
 {
     {

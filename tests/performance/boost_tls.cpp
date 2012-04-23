@@ -36,11 +36,11 @@ inline void worker(
 {
     b.wait(); 
 
-    for (boost::uint64_t i = 0; i < updates; ++i)
+    for (double i = 0.; i < updates; ++i)
     {
         global_scratch.reset(new double);
 
-        *global_scratch += 1 / (2. * i * (*global_scratch) + 1);
+        *global_scratch += 1. / (2. * i * (*global_scratch) + 1.);
 
         global_scratch.reset();
     }
@@ -58,14 +58,15 @@ int main(
 
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
-    boost::uint64_t threads, updates;
+    unsigned threads;
+    boost::uint64_t updates;
 
     cmdline.add_options()
         ( "help,h"
         , "print out program usage (this message)")
 
         ( "threads,t"
-        , value<boost::uint64_t>(&threads)->default_value(1),
+        , value<unsigned>(&threads)->default_value(1),
          "number of OS-threads")
 
         ( "updates,u"
@@ -97,7 +98,7 @@ int main(
 
     high_resolution_timer t;
 
-    for (boost::uint64_t i = 0; i != threads; ++i)
+    for (unsigned i = 0; i != threads; ++i)
         workers.add_thread(new boost::thread(worker, boost::ref(b), updates));
 
     workers.join_all();

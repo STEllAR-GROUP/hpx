@@ -37,8 +37,8 @@ inline void worker(
 {
     global_scratch.reset(new double);
 
-    for (boost::uint64_t i = 0; i < updates; ++i)
-        *global_scratch += 1 / (2. * i + 1);
+    for (double i = 0.; i < updates; ++i)
+        *global_scratch += 1. / (2. * i + 1.);
 
     global_scratch.reset();
 }

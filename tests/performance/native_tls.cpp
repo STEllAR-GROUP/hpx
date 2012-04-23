@@ -44,11 +44,11 @@ inline void worker(
 {
     b.wait();
 
-    for (boost::uint64_t i = 0; i < updates; ++i)
+    for (double i = 0.; i < updates; ++i)
     {
         global_scratch = new double;
 
-        *global_scratch += 1 / (2. * i * (*global_scratch) + 1);
+        *global_scratch += 1. / (2. * i * (*global_scratch) + 1.);
 
         delete global_scratch;
     }
