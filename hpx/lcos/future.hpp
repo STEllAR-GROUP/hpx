@@ -161,7 +161,7 @@ namespace hpx { namespace lcos
 
         // continuation support
         template <typename F>
-        future<typename boost::result_of<F()>::type>
+        future<typename boost::result_of<F(future)>::type>
         when(BOOST_FWD_REF(F) f);
 
         // reset any pending continuation function
@@ -332,7 +332,7 @@ namespace hpx { namespace lcos
 
         // continuation support
         template <typename F>
-        future<typename boost::result_of<F()>::type>
+        future<typename boost::result_of<F(future)>::type>
         when(BOOST_FWD_REF(F) f);
 
         // reset any pending continuation function

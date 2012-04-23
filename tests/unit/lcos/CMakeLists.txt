@@ -17,10 +17,11 @@ endforeach()
 set(tests
     barrier
     dataflow
-    packaged_task
     deferred_packaged_task
-    promise
     future_wait
+    packaged_task
+    promise
+    test_futures
    )
 
 set(dataflow_FLAGS DEPENDENCIES dataflow_component)

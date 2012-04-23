@@ -419,10 +419,12 @@ namespace hpx { namespace lcos
     // attach a local continuation to this future instance
     template <typename Result, typename RemoteResult>
     template <typename F>
-    inline future<typename boost::result_of<F()>::type>
+    inline future<
+        typename boost::result_of<F(future<Result, RemoteResult>)>::type
+    >
     future<Result, RemoteResult>::when(BOOST_FWD_REF(F) f)
     {
-        typedef typename boost::result_of<F()>::type result_type;
+        typedef typename boost::result_of<F(future)>::type result_type;
 
         // create continuation
         typedef local::packaged_continuation<result_type, Result> cont_type;
