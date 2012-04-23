@@ -104,7 +104,7 @@ namespace hpx { namespace naming
     {
         boost::io::ios_flags_saver ifs(os);
         os << "(" << addr.locality_ << ":"
-           << components::get_component_type_name(static_cast<int>(addr.type_))
+           << components::get_component_type_name(addr.type_)
            << ":" << std::showbase << std::hex << addr.address_ << ")";
         return os;
     }
