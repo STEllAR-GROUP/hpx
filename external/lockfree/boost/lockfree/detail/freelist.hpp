@@ -190,7 +190,7 @@ public:
             freelist_node * current_ptr = current.get_ptr();
             if (current_ptr)
                 current = current_ptr->next;
-            Alloc::deallocate((T*)current_ptr, 1);
+            Alloc::deallocate(reinterpret_cast<T*>(current_ptr), 1);
         }
     }
 
