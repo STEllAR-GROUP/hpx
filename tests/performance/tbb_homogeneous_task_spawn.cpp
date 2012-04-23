@@ -86,7 +86,7 @@ struct worker : tbb::task
     tbb::task* execute()
     {
         double volatile d = 0.;
-        for (double i = 0; i < delay; ++i)
+        for (boost::uint64_t i = 0; i < delay; ++i)
             d += 1. / (2. * i + 1.);
 
         return 0;

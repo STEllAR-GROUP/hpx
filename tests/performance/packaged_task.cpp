@@ -49,7 +49,7 @@ boost::uint64_t num_iterations = 0;
 double null_function()
 {
     double d = 0.;
-    for (double i = 0; i < num_iterations; ++i)
+    for (boost::uint64_t i = 0; i < num_iterations; ++i)
         d += 1. / (2. * i + 1.);
     return d;
 }

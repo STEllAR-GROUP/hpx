@@ -42,7 +42,7 @@ boost::uint64_t total_trials = 1;
 void worker()
 {
     double volatile d = 0.;
-    for (double i = 0; i < delay; ++i)
+    for (boost::uint64_t i = 0; i < delay; ++i)
         d += 1. / (2. * i + 1.);
 }
 
