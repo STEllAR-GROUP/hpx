@@ -95,7 +95,7 @@ namespace hpx { namespace util
         }
 
     private:
-        std::ptrdiff_t runtime_configuration::init_default_stack_size() const;
+        std::ptrdiff_t init_default_stack_size() const;
 
     private:
         std::ptrdiff_t default_stacksize;
