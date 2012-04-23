@@ -14,6 +14,12 @@
 
 namespace hpx { namespace util
 {
+#if BOOST_VERSION >= 105000
+#define HPX_FILESYSTEM3 filesystem
+#else
+#define HPX_FILESYSTEM3 filesystem3
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 // filesystem wrappers allowing to handle different Boost versions
 #if !defined(BOOST_FILESYSTEM_NO_DEPRECATED)
@@ -70,7 +76,7 @@ namespace hpx { namespace util
         boost::filesystem::path const& p)
     {
 #if BOOST_FILESYSTEM_VERSION >= 3
-        return boost::filesystem3::complete(p, initial_path());
+        return boost::HPX_FILESYSTEM3::complete(p, initial_path());
 #else
         return boost::filesystem::complete(p, initial_path());
 #endif
@@ -80,7 +86,7 @@ namespace hpx { namespace util
         boost::filesystem::path const& p, boost::filesystem::path const& base)
     {
 #if BOOST_FILESYSTEM_VERSION >= 3
-        return boost::filesystem3::complete(p, base);
+        return boost::HPX_FILESYSTEM3::complete(p, base);
 #else
         return boost::filesystem::complete(p, base);
 #endif
@@ -92,7 +98,7 @@ namespace hpx { namespace util
     inline boost::filesystem::path initial_path()
     {
 #if BOOST_FILESYSTEM_VERSION >= 3
-        return boost::filesystem3::detail::initial_path();
+        return boost::HPX_FILESYSTEM3::detail::initial_path();
 #else
         return boost::filesystem::initial_path<boost::filesystem::path>();
 #endif
@@ -101,7 +107,7 @@ namespace hpx { namespace util
     inline boost::filesystem::path current_path()
     {
 #if BOOST_FILESYSTEM_VERSION >= 3
-        return boost::filesystem3::current_path();
+        return boost::HPX_FILESYSTEM3::current_path();
 #else
         return boost::filesystem::current_path<boost::filesystem::path>();
 #endif
@@ -161,6 +167,8 @@ namespace hpx { namespace util
 #endif
     }
 #endif
+
+#undef HPX_FILESYSTEM3
 }}
 
 #endif
