@@ -40,10 +40,6 @@ namespace hpx { namespace threads
     class thread_data;
 
     ///////////////////////////////////////////////////////////////////////////
-    // global variable defining the stack size to use for all HPX-threads
-    HPX_EXPORT extern std::ptrdiff_t default_stacksize;
-
-    ///////////////////////////////////////////////////////////////////////////
     // This overload will be called by the ptr_map<> used in the thread_queue
     // whenever an instance of a threads::thread_data needs to be deleted. We
     // provide this overload as we need to extract the thread_pool from the
@@ -143,7 +139,7 @@ namespace hpx { namespace threads { namespace detail
     public:
         thread_data(thread_init_data& init_data, thread_id_type id,
                thread_state_enum newstate, thread_pool& pool)
-          : coroutine_(boost::move(init_data.func), id, default_stacksize), //coroutine_type::impl_type::create(init_data.func, id)),
+          : coroutine_(boost::move(init_data.func), id, init_data.stacksize), //coroutine_type::impl_type::create(init_data.func, id)),
             current_state_(thread_state(newstate)),
             current_state_ex_(thread_state_ex(wait_signaled)),
             description_(init_data.description ? init_data.description : ""),

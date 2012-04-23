@@ -105,10 +105,6 @@ namespace hpx { namespace threads { namespace detail
 namespace hpx { namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////
-    // global variable defining the stack size to use for all HPX-threads
-    std::ptrdiff_t default_stacksize = HPX_DEFAULT_STACK_SIZE;
-
-    ///////////////////////////////////////////////////////////////////////////
     // This overload will be called by the ptr_map<> used in the thread_queue
     // whenever an instance of a threads::thread_data needs to be deleted. We
     // provide this overload as we need to extract the thread_pool from the

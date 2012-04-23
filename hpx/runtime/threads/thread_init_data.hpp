@@ -13,13 +13,16 @@
 
 namespace hpx { namespace threads
 {
+    std::ptrdiff_t get_default_stack_size();
+
     ///////////////////////////////////////////////////////////////////////////
     struct thread_init_data
     {
         thread_init_data()
           : description(0), lva(0), parent_locality_id(0), parent_id(0),
             parent_phase(0), priority(thread_priority_normal),
-            num_os_thread(std::size_t(-1))
+            num_os_thread(std::size_t(-1)),
+            stacksize(get_default_stack_size())
         {}
 
         thread_init_data(BOOST_RV_REF(thread_init_data) rhs)
@@ -27,17 +30,21 @@ namespace hpx { namespace threads
             description(rhs.description), lva(rhs.lva),
             parent_locality_id(rhs.parent_locality_id), parent_id(rhs.parent_id),
             parent_phase(rhs.parent_phase), priority(rhs.priority),
-            num_os_thread(rhs.num_os_thread)
+            num_os_thread(rhs.num_os_thread),
+            stacksize(rhs.stacksize)
         {}
 
         template <typename F>
         thread_init_data(BOOST_FWD_REF(F) f, char const* desc,
                 naming::address::address_type lva_ = 0,
                 thread_priority priority_ = thread_priority_normal,
-                std::size_t os_thread = std::size_t(-1))
+                std::size_t os_thread = std::size_t(-1),
+                std::ptrdiff_t stacksize_ = std::ptrdiff_t(-1))
           : func(boost::forward<F>(f)), description(desc),
             lva(lva_), parent_locality_id(0), parent_id(0), parent_phase(0),
-            priority(priority_), num_os_thread(os_thread)
+            priority(priority_), num_os_thread(os_thread),
+            stacksize(stacksize_ == std::ptrdiff_t(-1) ?
+                get_default_stack_size() : stacksize_)
         {}
 
         HPX_STD_FUNCTION<threads::thread_function_type> func;
@@ -48,6 +55,7 @@ namespace hpx { namespace threads
         std::size_t parent_phase;
         thread_priority priority;
         std::size_t num_os_thread;
+        std::ptrdiff_t stacksize;
 
     private:
         // we don't use the assignment operator

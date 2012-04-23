@@ -10,8 +10,6 @@ example_module		bla bla bla....
 
 namespace hpx::threads
 
-    std::size_t default_stacksize
-
     void delete_clone(threads::thread const*)
 
     struct heap_clone_allocator

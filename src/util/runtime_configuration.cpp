@@ -20,13 +20,6 @@
 #include <boost/spirit/include/qi_alternative.hpp>
 #include <boost/spirit/include/qi_sequence.hpp>
 
-namespace hpx { namespace threads
-{
-    ///////////////////////////////////////////////////////////////////////////
-    // global variable defining the stack size to use for all HPX-threads
-    extern std::ptrdiff_t default_stacksize;
-}}
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
@@ -170,6 +163,7 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     runtime_configuration::runtime_configuration()
+      : default_stacksize(HPX_DEFAULT_STACK_SIZE)
     {
         pre_initialize_ini(*this);
 
@@ -177,7 +171,7 @@ namespace hpx { namespace util
 #if HPX_USE_ITT == 1
         use_ittnotify_api = get_itt_notify_mode();
 #endif
-        threads::default_stacksize = get_default_stack_size();
+        default_stacksize = init_default_stack_size();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -199,7 +193,7 @@ namespace hpx { namespace util
 #if HPX_USE_ITT == 1
         use_ittnotify_api = get_itt_notify_mode();
 #endif
-        threads::default_stacksize = get_default_stack_size();
+        default_stacksize = init_default_stack_size();
     }
 
     void runtime_configuration::reconfigure(
@@ -220,7 +214,7 @@ namespace hpx { namespace util
 #if HPX_USE_ITT == 1
         use_ittnotify_api = get_itt_notify_mode();
 #endif
-        threads::default_stacksize = get_default_stack_size();
+        default_stacksize = init_default_stack_size();
     }
 
     // AGAS configuration information has to be stored in the global hpx.agas
@@ -464,7 +458,7 @@ namespace hpx { namespace util
     }
 
     // Will return the stack size to use for all HPX-threads.
-    std::ptrdiff_t runtime_configuration::get_default_stack_size() const
+    std::ptrdiff_t runtime_configuration::init_default_stack_size() const
     {
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");

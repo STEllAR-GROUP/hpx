@@ -854,6 +854,12 @@ namespace hpx { namespace threads
     {
         return hpx::applier::get_applier().get_thread_manager();
     }
+
+    // shortcut for runtime_configuration::get_default_stack_size
+    std::ptrdiff_t get_default_stack_size()
+    {
+        return get_runtime().get_config().get_default_stack_size();
+    }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
