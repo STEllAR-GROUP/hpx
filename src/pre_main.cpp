@@ -14,7 +14,7 @@
 #include <hpx/lcos/future_wait.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 
-namespace 
+namespace
 {
     void garbage_collect_non_blocking()
     {
@@ -105,8 +105,10 @@ bool pre_main(runtime_mode mode)
 
     bool exit_requested = false;
 
-    BOOST_ASSERT(cfg.get_agas_promise_pool_size() < static_cast<std::size_t>(std::numeric_limits<boost::int64_t>::max()));
-    boost::int64_t const pool_size = static_cast<boost::int64_t>(cfg.get_agas_promise_pool_size());
+    BOOST_ASSERT(cfg.get_agas_promise_pool_size() <
+        static_cast<std::size_t>((std::numeric_limits<boost::int64_t>::max)()));
+    boost::int64_t const pool_size =
+        static_cast<boost::int64_t>(cfg.get_agas_promise_pool_size());
     if (runtime_mode_connect == mode)
     {
         LBT_(info) << "(2nd stage) pre_main: locality is in connect mode, "
