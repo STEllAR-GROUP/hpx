@@ -194,6 +194,7 @@ namespace hpx { namespace lcos { namespace detail
     public:
         typedef future_data_base<Result, RemoteResult> base_type;
         typedef typename base_type::result_type result_type;
+        typedef typename base_type::mutex_type mutex_type;
         typedef boost::exception_ptr error_type;
         typedef util::value_or_error<result_type> data_type;
 
