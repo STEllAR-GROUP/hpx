@@ -561,8 +561,7 @@ struct checkout_promise
 
     Future* operator->()
     {
-        BOOST_ASSERT(dynamic_cast<Future*>(promise_));
-        return static_cast<Future*>(promise_);
+        return reinterpret_cast<Future*>(promise_);
     }
     void set_ok() { result_ok_ = true; }
 
