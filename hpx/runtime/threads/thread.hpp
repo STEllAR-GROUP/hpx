@@ -14,7 +14,6 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/traits/supports_result_of.hpp>
 
-#include <boost/chrono/chrono.hpp>
 #include <boost/move/move.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -197,25 +196,25 @@ namespace hpx
 
         HPX_API_EXPORT void yield() BOOST_NOEXCEPT;
 
+        // extensions
+        HPX_API_EXPORT void interruption_point();
+        HPX_API_EXPORT bool interruption_enabled();
+        HPX_API_EXPORT bool interruption_requested();
+
+        HPX_API_EXPORT void sleep_until(boost::posix_time::ptime const& at);
+        HPX_API_EXPORT void sleep_for(boost::posix_time::time_duration const& p);
+
         template <typename Clock, typename Duration>
         void sleep_until(boost::chrono::time_point<Clock, Duration> const& at)
         {
-            this_thread::suspend(util::to_ptime(at));
+            sleep_until(util::to_ptime(at));
         }
 
         template <typename Rep, typename Period>
         void sleep_for(boost::chrono::duration<Rep, Period> const& p)
         {
-            this_thread::suspend(util::to_time_duration(p));
+            sleep_for(util::to_time_duration(p));
         }
-
-        // extensions
-        HPX_API_EXPORT void interruption_point();
-        HPX_API_EXPORT bool interruption_enabled();
-        HPX_API_EXPORT bool interruption_requested();
-                       
-        HPX_API_EXPORT void sleep_until(boost::posix_time::ptime const& at);
-        HPX_API_EXPORT void sleep_for(boost::posix_time::time_duration const& p);
 
         class HPX_EXPORT disable_interruption
         {

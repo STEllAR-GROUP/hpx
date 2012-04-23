@@ -157,9 +157,9 @@ namespace hpx
     {
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
             return_type;
-        lcos::local::packaged_task<return_type> p(
+        lcos::local::packaged_task<return_type()> p(
             detail::wait_n<T, RT>(boost::move(lazy_values), n));
-        p.async();
+        p.apply();
         return p.get_future();
     }
 
@@ -169,10 +169,10 @@ namespace hpx
     {
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
             return_type;
-        lcos::local::packaged_task<return_type> p =
-            lcos::local::packaged_task<return_type>(
+        lcos::local::packaged_task<return_type()> p =
+            lcos::local::packaged_task<return_type()>(
                 detail::wait_n<T, RT>(lazy_values, n));
-        p.async();
+        p.apply();
         return p.get_future();
     }
 }
@@ -209,9 +209,9 @@ namespace hpx
 
         typedef std::vector<HPX_STD_TUPLE<int, lcos::future<T, RT> > >
             return_type;
-        lcos::local::packaged_task<return_type> p(
+        lcos::local::packaged_task<return_type()> p(
             detail::wait_n<T, RT>(boost::move(lazy_values), n));
-        p.async();
+        p.apply();
         return p.get_future();
     }
 }

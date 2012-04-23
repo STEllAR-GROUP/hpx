@@ -154,7 +154,7 @@ namespace hpx { namespace lcos { namespace detail
             try {
                 if (!this->started_) {
                     HPX_THROW_EXCEPTION(thread_interrupted,
-                        "task_base<Result>::cancel",
+                        "continuation_base<Result>::cancel",
                         "future has been canceled");
                     return;
                 }
@@ -170,12 +170,12 @@ namespace hpx { namespace lcos { namespace detail
 
                     l.unlock();
                     this->set_error(thread_interrupted,
-                        "task_base<Result>::cancel",
+                        "continuation_base<Result>::cancel",
                         "future has been canceled");
                 }
                 else {
                     HPX_THROW_EXCEPTION(future_can_not_be_cancelled,
-                        "task_base<Result>::cancel",
+                        "continuation_base<Result>::cancel",
                         "future can't be canceled at this time");
                 }
             }

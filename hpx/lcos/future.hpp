@@ -8,10 +8,12 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
+#include <hpx/util/date_time_chrono.hpp>
 
 #include <boost/move/move.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/utility/result_of.hpp>
+#include <boost/date_time/posix_time/ptime.hpp>
 
 namespace hpx { namespace lcos
 {
@@ -49,7 +51,7 @@ namespace hpx { namespace lcos
         {}
 
         friend class local::promise<Result>;
-        friend class local::packaged_task<Result>;
+        friend class local::packaged_task<Result()>;
         template <typename ContResult, typename Result_>
         friend class local::packaged_continuation;
         template <typename ContResult>
@@ -60,7 +62,6 @@ namespace hpx { namespace lcos
         friend struct detail::future_data<Result, RemoteResult>;
 
     public:
-
         typedef Result result_type;
 
         future()
@@ -80,6 +81,14 @@ namespace hpx { namespace lcos
             other.future_data_.reset();
         }
 
+        // extension: init from given value, set future to ready right away
+        future(BOOST_RV_REF(Result) init)
+          : future_data_(lcos::detail::future_data<Result>())
+        {
+            future_data_->set_data(boost::move(init));
+        }
+
+        // assignment
         future& operator=(BOOST_COPY_ASSIGN_REF(future) other)
         {
             future_data_ = other.future_data_;
@@ -131,10 +140,10 @@ namespace hpx { namespace lcos
             return future_data_ && future_data_->has_exception();
         }
 
-        future_state::state get_state() const
+        BOOST_SCOPED_ENUM(future_status) get_state() const
         {
             if (!future_data_)
-                return future_state::uninitialized;
+                return future_status::uninitialized;
 
             return future_data_->get_state();
         }
@@ -161,9 +170,47 @@ namespace hpx { namespace lcos
             future_data_->reset_on_completed();
         }
 
+        // wait support
+        void wait() const
+        {
+            future_data_->wait();
+        }
+
+        BOOST_SCOPED_ENUM(future_status)
+        wait_until(boost::posix_time::ptime const& at)
+        {
+            return future_data_->wait_until(at);
+        }
+
+        BOOST_SCOPED_ENUM(future_status)
+        wait_for(boost::posix_time::time_duration const& p)
+        {
+            return future_data_->wait_for(p);
+        }
+        template <typename Clock, typename Duration>
+        BOOST_SCOPED_ENUM(future_status)
+        wait_until(boost::chrono::time_point<Clock, Duration> const& abs_time) const
+        {
+            return wait_until(util::to_ptime(at));
+        }
+
+        template <typename Rep, typename Period>
+        BOOST_SCOPED_ENUM(future_status)
+        wait_for(boost::chrono::duration<Rep, Period> const& rel_time) const
+        {
+            return wait_for(util::to_time_duration(p));
+        }
+
     private:
         boost::intrusive_ptr<future_data_type> future_data_;
     };
+
+    // extension: create a pre-initialized future object
+    template <typename Result>
+    future<Result> create_value(BOOST_FWD_REF(Result) init)
+    {
+        return future<Result>(boost::forward<Result>(init));
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     template <>
@@ -184,7 +231,7 @@ namespace hpx { namespace lcos
         {}
 
         friend class local::promise<void>;
-        friend class local::packaged_task<void>;
+        friend class local::packaged_task<void()>;
         template <typename ContResult, typename Result_>
         friend class local::packaged_continuation;
         template <typename ContResult>
@@ -259,10 +306,10 @@ namespace hpx { namespace lcos
             return future_data_->has_exception();
         }
 
-        future_state::state get_state() const
+        BOOST_SCOPED_ENUM(future_status) get_state() const
         {
             if (!future_data_)
-                return future_state::uninitialized;
+                return future_status::uninitialized;
 
             return future_data_->get_state();
         }
@@ -292,6 +339,38 @@ namespace hpx { namespace lcos
         void when()
         {
             future_data_->reset_on_completed();
+        }
+
+        // wait support
+        void wait() const
+        {
+            future_data_->wait();
+        }
+
+        BOOST_SCOPED_ENUM(future_status)
+        wait_until(boost::posix_time::ptime const& at)
+        {
+            return future_data_->wait_until(at);
+        }
+
+        BOOST_SCOPED_ENUM(future_status)
+        wait_for(boost::posix_time::time_duration const& p)
+        {
+            return future_data_->wait_for(p);
+        }
+
+        template <typename Clock, typename Duration>
+        BOOST_SCOPED_ENUM(future_status)
+        wait_until(boost::chrono::time_point<Clock, Duration> const& abs_time) const
+        {
+            return wait_until(util::to_ptime(at));
+        }
+
+        template <typename Rep, typename Period>
+        BOOST_SCOPED_ENUM(future_status)
+        wait_for(boost::chrono::duration<Rep, Period> const& rel_time) const
+        {
+            return wait_for(util::to_time_duration(p));
         }
 
     private:

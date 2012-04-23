@@ -58,8 +58,7 @@ namespace hpx
 
     static void run_thread_exit_callbacks()
     {
-        threads::thread_self& self = threads::get_self();
-        threads::thread_id_type id = self.get_thread_id();
+        threads::thread_id_type id = threads::get_self_id();
         if (id == threads::invalid_thread_id) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "run_thread_exit_callbacks",
@@ -269,8 +268,7 @@ namespace hpx
 
         thread::id get_id() BOOST_NOEXCEPT
         {
-            threads::thread_self& self = threads::get_self();
-            return thread::id(self.get_thread_id());
+            return thread::id(threads::get_self_id());
         }
 
         // extensions
@@ -287,14 +285,12 @@ namespace hpx
 
         bool interruption_enabled()
         {
-            threads::thread_self& self = threads::get_self();
-            return threads::get_thread_interruption_enabled(self.get_thread_id());
+            return threads::get_thread_interruption_enabled(threads::get_self_id());
         }
 
         bool interruption_requested()
         {
-            threads::thread_self& self = threads::get_self();
-            return threads::get_thread_interruption_requested(self.get_thread_id());
+            return threads::get_thread_interruption_requested(threads::get_self_id());
         }
 
         void sleep_until(boost::posix_time::ptime const& at)
@@ -312,8 +308,7 @@ namespace hpx
           : interruption_was_enabled_(interruption_enabled())
         {
             if (interruption_was_enabled_) {
-                threads::thread_self& self = threads::get_self();
-                threads::set_thread_interruption_enabled(self.get_thread_id(), false);
+                threads::set_thread_interruption_enabled(threads::get_self_id(), false);
             }
         }
 
@@ -331,9 +326,8 @@ namespace hpx
         {
             if (d.interruption_was_enabled_)
             {
-                threads::thread_self& self = threads::get_self();
                 threads::set_thread_interruption_enabled(
-                    self.get_thread_id(), true);
+                    threads::get_self_id(), true);
             }
         }
 

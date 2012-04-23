@@ -51,7 +51,7 @@ namespace hpx
 
         public:
             typedef lcos::local::spinlock mutex_type;
-            typedef HPX_STD_TUPLE<std::size_t, lcos::future<T, RT> > result_type;
+            typedef HPX_STD_TUPLE<int, lcos::future<T, RT> > result_type;
             typedef std::vector<lcos::future<T, RT> > argument_type;
 
             wait_any(argument_type const& lazy_values)
@@ -117,7 +117,7 @@ namespace hpx
                 for (std::size_t i = 0; i < lazy_values_.size(); ++i)
                     lazy_values_[i].when();
 
-                return result_type(index_, lazy_values_[index_]);
+                return result_type(static_cast<int>(index_), lazy_values_[index_]);
             }
 
             std::vector<lcos::future<T, RT> > lazy_values_;
@@ -140,9 +140,9 @@ namespace hpx
         std::vector<lcos::future<T, RT> >))) lazy_values)
     {
         typedef HPX_STD_TUPLE<int, lcos::future<T, RT> > return_type;
-        lcos::local::packaged_task<return_type> p(
+        lcos::local::packaged_task<return_type()> p(
             detail::wait_any<T, RT>(boost::move(lazy_values)));
-        p.async();
+        p.apply();
         return p.get_future();
     }
 
@@ -151,10 +151,10 @@ namespace hpx
     wait_any (std::vector<lcos::future<T, RT> > const& lazy_values)
     {
         typedef HPX_STD_TUPLE<int, lcos::future<T, RT> > return_type;
-        lcos::local::packaged_task<return_type> p =
-            lcos::local::packaged_task<return_type>(
+        lcos::local::packaged_task<return_type()> p =
+            lcos::local::packaged_task<return_type()>(
                 detail::wait_any<T, RT>(lazy_values));
-        p.async();
+        p.apply();
         return p.get_future();
     }
 }
@@ -190,9 +190,9 @@ namespace hpx
         BOOST_PP_REPEAT(N, HPX_WAIT_ANY_PUSH_BACK_ARGS, _)
 
         typedef HPX_STD_TUPLE<int, lcos::future<T, RT> > return_type;
-        lcos::local::packaged_task<return_type> p(
+        lcos::local::packaged_task<return_type()> p(
             detail::wait_any<T, RT>(boost::move(lazy_values)));
-        p.async();
+        p.apply();
         return p.get_future();
     }
 }

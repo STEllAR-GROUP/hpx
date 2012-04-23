@@ -314,8 +314,11 @@ namespace hpx { namespace lcos { namespace local
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename Func>
+    class packaged_task;
+
     template <typename Result>
-    class packaged_task
+    class packaged_task<Result()>
     {
     protected:
         typedef lcos::detail::task_base<Result> task_impl_type;
@@ -324,6 +327,9 @@ namespace hpx { namespace lcos { namespace local
         BOOST_MOVABLE_BUT_NOT_COPYABLE(packaged_task)
 
     public:
+        // support for result_of
+        typedef Result result_type;
+
         // construction and destruction
         packaged_task() {}
 
@@ -376,7 +382,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
         // synchronous execution
-        void async()
+        void apply()
         {
             if (!task_) {
                 HPX_THROW_EXCEPTION(task_moved,
@@ -384,7 +390,7 @@ namespace hpx { namespace lcos { namespace local
                     "packaged_task invalid (has it been moved?)");
                 return;
             }
-            task_->async();
+            task_->apply();
         }
 
         void swap(packaged_task& other)

@@ -7,14 +7,17 @@
 #define HPX_LCOS_DETAIL_FUTURE_DATA_MAR_06_2012_1055AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/full_empty_memory.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/value_or_error.hpp>
+#include <hpx/util/unlock_lock.hpp>
 
 #include <boost/move/move.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/detail/atomic_count.hpp>
+#include <boost/detail/scoped_enum_emulation.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repetition/enum.hpp>
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
@@ -22,10 +25,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
 {
-    namespace future_state
+    BOOST_SCOPED_ENUM_START(future_status)
     {
-        enum state { uninitialized, deferred, ready, timeout };
-    }
+        ready, timeout, deferred, uninitialized
+    };
+    BOOST_SCOPED_ENUM_END
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -78,6 +82,7 @@ namespace hpx { namespace lcos { namespace detail
         typedef
             HPX_STD_FUNCTION<void(future<Result, RemoteResult>)>
         completed_callback_type;
+        typedef lcos::local::spinlock mutex_type;
 
         virtual void deleting_owner() {}
 
@@ -86,7 +91,7 @@ namespace hpx { namespace lcos { namespace detail
         virtual bool is_ready() const = 0;
         virtual bool has_value() const = 0;
         virtual bool has_exception() const = 0;
-        virtual future_state::state get_state() const = 0;
+        virtual BOOST_SCOPED_ENUM(future_status) get_state() const = 0;
 
         // cancellation is disabled by default
         virtual bool is_cancelable() const
@@ -101,8 +106,81 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         // continuation support
-        virtual void set_on_completed(BOOST_RV_REF(completed_callback_type)) = 0;
+        virtual completed_callback_type
+            set_on_completed(BOOST_RV_REF(completed_callback_type)) = 0;
+        virtual completed_callback_type
+            set_on_completed_locked(BOOST_RV_REF(completed_callback_type)) = 0;
         virtual void reset_on_completed() = 0;
+
+        // wait support
+        void wake_me_up(threads::thread_id_type id)
+        {
+            threads::set_thread_state(id, threads::pending, threads::wait_timeout);
+        }
+
+        struct reset_cb
+        {
+            template <typename F>
+            reset_cb(future_data_base& fb, BOOST_FWD_REF(F) f)
+              : target_(fb),
+                oldcb_(fb.set_on_completed_locked(boost::forward<F>(f)))
+            {}
+            ~reset_cb()
+            {
+                target_.set_on_completed_locked(boost::move(oldcb_));
+            }
+
+            future_data_base& target_;
+            completed_callback_type oldcb_;
+        };
+
+        void wait()
+        {
+            mutex_type::scoped_lock l(mtx_);
+            if (!is_ready()) {
+                boost::intrusive_ptr<future_data_base> this_(this);
+                reset_cb r(*this, util::bind(
+                    &future_data_base::wake_me_up, this_, threads::get_self_id()));
+
+                util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                this_thread::suspend(threads::suspended);
+            }
+        }
+
+        BOOST_SCOPED_ENUM(future_status)
+        wait_for(boost::posix_time::time_duration const& p)
+        {
+            mutex_type::scoped_lock l(mtx_);
+            if (!is_ready()) {
+                boost::intrusive_ptr<future_data_base> this_(this);
+                reset_cb r(*this, util::bind(
+                    &future_data_base::wake_me_up, this_, threads::get_self_id()));
+
+                util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                return (this_thread::suspend(p) == threads::wait_signaled) ?
+                    future_status::ready : future_status::timeout;
+            }
+            return future_status::ready;
+        }
+
+        BOOST_SCOPED_ENUM(future_status)
+        wait_until(boost::posix_time::ptime const& at)
+        {
+            mutex_type::scoped_lock l(mtx_);
+            if (!is_ready()) {
+                boost::intrusive_ptr<future_data_base> this_(this);
+                reset_cb r(*this, util::bind(
+                    &future_data_base::wake_me_up, this_, threads::get_self_id()));
+
+                util::unlock_the_lock<mutex_type::scoped_lock> ul(l);
+                return (this_thread::suspend(at) == threads::wait_signaled) ?
+                    future_status::ready : future_status::timeout;
+            }
+            return future_status::ready;
+        }
+
+    protected:
+        mutable mutex_type mtx_;
 
     protected:
         future_data_base() {}
@@ -121,8 +199,6 @@ namespace hpx { namespace lcos { namespace detail
 
         typedef typename base_type::completed_callback_type
             completed_callback_type;
-
-        typedef lcos::local::spinlock mutex_type;
 
     protected:
         future_data() {}
@@ -225,7 +301,7 @@ namespace hpx { namespace lcos { namespace detail
                 > get_remote_result_type;
 
                 // store the value
-                typename mutex_type::scoped_lock l(mtx_);
+                typename mutex_type::scoped_lock l(this->mtx_);
                 if (!on_completed_.empty()) {
                     // this future instance coincidentally keeps us alive
                     future<Result, RemoteResult> f(this);
@@ -251,7 +327,7 @@ namespace hpx { namespace lcos { namespace detail
         void set_exception(boost::exception_ptr const& e)
         {
             // store the error code
-            typename mutex_type::scoped_lock l(mtx_);
+            typename mutex_type::scoped_lock l(this->mtx_);
             if (!on_completed_.empty()) {
                 // this future coincidentally instance keeps us alive
                 future<Result, RemoteResult> f(this);
@@ -301,9 +377,9 @@ namespace hpx { namespace lcos { namespace detail
             return is_ready() && !data_.peek(&has_data_helper);
         }
 
-        future_state::state get_state() const
+        BOOST_SCOPED_ENUM(future_status) get_state() const
         {
-            return is_ready() ? future_state::ready : future_state::deferred;
+            return is_ready() ? future_status::ready : future_status::deferred;
         }
 
         /// Reset the promise to allow to restart an asynchronous
@@ -316,9 +392,17 @@ namespace hpx { namespace lcos { namespace detail
         /// Set the callback which needs to be invoked when the future becomes
         /// ready. If the future is ready the function will be invoked
         /// immediately.
-        void set_on_completed(BOOST_RV_REF(completed_callback_type) data_sink)
+        completed_callback_type
+        set_on_completed(BOOST_RV_REF(completed_callback_type) data_sink)
         {
-            typename mutex_type::scoped_lock l(mtx_);
+            typename mutex_type::scoped_lock l(this->mtx_);
+            return boost::move(set_on_completed_locked(boost::move(data_sink)));
+        }
+
+        completed_callback_type
+        set_on_completed_locked(BOOST_RV_REF(completed_callback_type) data_sink)
+        {
+            completed_callback_type retval = boost::move(on_completed_);
             on_completed_ = boost::move(data_sink);
             if (!on_completed_.empty() && this->is_ready()) {
                 // this future coincidentally instance keeps us alive
@@ -328,19 +412,17 @@ namespace hpx { namespace lcos { namespace detail
                 on_completed_(f);
                 on_completed_.reset();
             }
+            return retval;
         }
 
         void reset_on_completed()
         {
             completed_callback_type data_sink;
             {
-                typename mutex_type::scoped_lock l(mtx_);
+                typename mutex_type::scoped_lock l(this->mtx_);
                 std::swap(on_completed_, data_sink);
             }
         }
-
-    protected:
-        mutable mutex_type mtx_;
 
     private:
         util::full_empty<data_type> data_;
@@ -413,13 +495,13 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         // run in a separate thread
-        void async()
+        void apply()
         {
             check_started();
             future_base_type this_(this);
             applier::register_thread_plain(
                 HPX_STD_BIND(&task_base::run_impl, this_),
-                "task_base::async");
+                "task_base::apply");
         }
 
     private:
