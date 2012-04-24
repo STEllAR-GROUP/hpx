@@ -127,7 +127,7 @@ public:
 protected:
 #endif
     unsigned int m_flags;
-    HPX_SERIALIZATION_EXPORT void
+    HPX_ALWAYS_EXPORT void
     save_impl(const boost::intmax_t l, const char maxsize);
     // add base class to the places considered when matching
     // save function to a specific set of arguments.  Note, this didn't
@@ -209,7 +209,7 @@ protected:
     // binary files don't include the optional information
     void save_override(const boost::archive::class_id_optional_type&, int) {}
 
-    HPX_SERIALIZATION_EXPORT void
+    HPX_ALWAYS_EXPORT void
     init(unsigned int flags);
 
 public:

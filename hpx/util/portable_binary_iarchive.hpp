@@ -128,7 +128,7 @@ public:
 protected:
 #endif
     unsigned int m_flags;
-    HPX_SERIALIZATION_EXPORT void
+    HPX_ALWAYS_EXPORT void
     load_impl(boost::intmax_t & l, char maxsize);
 
     // default fall through for any types not specified here
@@ -214,13 +214,13 @@ protected:
         this->detail_common_iarchive::load_override(t, 0);
     }
 
-    HPX_SERIALIZATION_EXPORT void
+    HPX_ALWAYS_EXPORT void
     load_override(boost::archive::class_name_type & t, int);
 
     // binary files don't include the optional information
     void load_override(boost::archive::class_id_optional_type&, int) {}
 
-    HPX_SERIALIZATION_EXPORT void
+    HPX_ALWAYS_EXPORT void
     init(unsigned int flags);
 
 public:
