@@ -1489,7 +1489,7 @@ int main(int argc, char* argv[])
     using namespace boost::assign;
     std::vector<std::string> cfg;
     cfg += "hpx.os_threads=" +
-        boost::lexical_cast<int>(hpx::thread::hardware_concurrency());
+        boost::lexical_cast<std::string>(hpx::thread::hardware_concurrency());
 
     // Initialize and run HPX
     return hpx::init(cmdline, argc, argv, cfg);
