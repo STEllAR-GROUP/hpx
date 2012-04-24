@@ -92,10 +92,12 @@ public:
 // be passed across systems. Note:floating point types not addressed here
 
 #if defined(BOOST_MSVC)
-class portable_binary_oarchive :
+#define HPX_SERIALIZATION_EXPORT
 #else
-class HPX_EXPORT portable_binary_oarchive :
+#define HPX_SERIALIZATION_EXPORT HPX_ALWAYS_EXPORT
 #endif
+
+class HPX_SERIALIZATION_EXPORT portable_binary_oarchive :
     public boost::archive::basic_binary_oprimitive<
         portable_binary_oarchive,
         std::ostream::char_type,
@@ -125,7 +127,7 @@ public:
 protected:
 #endif
     unsigned int m_flags;
-    HPX_ALWAYS_EXPORT void
+    HPX_SERIALIZATION_EXPORT void
     save_impl(const boost::intmax_t l, const char maxsize);
     // add base class to the places considered when matching
     // save function to a specific set of arguments.  Note, this didn't
@@ -134,58 +136,58 @@ protected:
 
     // default fall through for any types not specified here
     template<class T>
-    HPX_ALWAYS_EXPORT void save(const T & val) {
+    HPX_SERIALIZATION_EXPORT void save(const T & val) {
         boost::intmax_t t = static_cast<boost::intmax_t>(val);
         save_impl(t, sizeof(T));
     }
-    HPX_ALWAYS_EXPORT void save(const std::string & t) {
+    HPX_SERIALIZATION_EXPORT void save(const std::string & t) {
         this->primitive_base_t::save(t);
     }
 #if BOOST_VERSION >= 104400
-    HPX_ALWAYS_EXPORT void save(const boost::archive::class_id_type & t) {
+    HPX_SERIALIZATION_EXPORT void save(const boost::archive::class_id_type & t) {
         /*boost::int16_t*/boost::intmax_t l = t;
         save_impl(l, sizeof(boost::int16_t));
     }
-    HPX_ALWAYS_EXPORT void save(const boost::archive::object_id_type & t) {
+    HPX_SERIALIZATION_EXPORT void save(const boost::archive::object_id_type & t) {
         /*boost::uint32_t*/boost::intmax_t l = t;
         save_impl(l, sizeof(boost::uint32_t));
     }
-    HPX_ALWAYS_EXPORT void save(const boost::archive::tracking_type & t) {
+    HPX_SERIALIZATION_EXPORT void save(const boost::archive::tracking_type & t) {
         bool l = t;
         this->primitive_base_t::save(l);
     }
-    HPX_ALWAYS_EXPORT void save(const boost::archive::version_type & t) {
+    HPX_SERIALIZATION_EXPORT void save(const boost::archive::version_type & t) {
         /*boost::uint32_t*/boost::intmax_t l = t;
         save_impl(l, sizeof(boost::uint32_t));
     }
-    HPX_ALWAYS_EXPORT void save(const boost::archive::library_version_type & t) {
+    HPX_SERIALIZATION_EXPORT void save(const boost::archive::library_version_type & t) {
         /*boost::uint16_t*/boost::intmax_t l = t;
         save_impl(l, sizeof(boost::uint16_t));
     }
-    HPX_ALWAYS_EXPORT void save(const boost::serialization::item_version_type & t) {
+    HPX_SERIALIZATION_EXPORT void save(const boost::serialization::item_version_type & t) {
         boost::intmax_t l = t;
         save_impl(l, sizeof(boost::intmax_t));
     }
 #endif
 #ifndef BOOST_NO_STD_WSTRING
-    HPX_ALWAYS_EXPORT void save(const std::wstring & t) {
+    HPX_SERIALIZATION_EXPORT void save(const std::wstring & t) {
         this->primitive_base_t::save(t);
     }
 #endif
-    HPX_ALWAYS_EXPORT void save(const float & t) {
+    HPX_SERIALIZATION_EXPORT void save(const float & t) {
         this->primitive_base_t::save(t);
         // floats not supported
         //BOOST_STATIC_ASSERT(false);
     }
-    HPX_ALWAYS_EXPORT void save(const double & t) {
+    HPX_SERIALIZATION_EXPORT void save(const double & t) {
         this->primitive_base_t::save(t);
         // doubles not supported
         //BOOST_STATIC_ASSERT(false);
     }
-    HPX_ALWAYS_EXPORT void save(const char & t) {
+    HPX_SERIALIZATION_EXPORT void save(const char & t) {
         this->primitive_base_t::save(t);
     }
-    HPX_ALWAYS_EXPORT void save(const unsigned char & t) {
+    HPX_SERIALIZATION_EXPORT void save(const unsigned char & t) {
         this->primitive_base_t::save(t);
     }
 
@@ -207,7 +209,7 @@ protected:
     // binary files don't include the optional information
     void save_override(const boost::archive::class_id_optional_type&, int) {}
 
-    HPX_ALWAYS_EXPORT void
+    HPX_SERIALIZATION_EXPORT void
     init(unsigned int flags);
 
 public:
@@ -238,6 +240,8 @@ public:
         init(flags);
     }
 };
+
+#undef HPX_SERIALIZATION_EXPORT
 
 }}
 

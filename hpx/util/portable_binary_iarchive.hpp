@@ -92,10 +92,12 @@ public:
 // that binary archives can be passed across systems. Note:floating point types
 // not addressed here
 #if defined(BOOST_MSVC)
-class portable_binary_iarchive :
+#define HPX_SERIALIZATION_EXPORT
 #else
-class HPX_EXPORT portable_binary_iarchive :
+#define HPX_SERIALIZATION_EXPORT HPX_ALWAYS_EXPORT
 #endif
+
+class HPX_SERIALIZATION_EXPORT portable_binary_iarchive :
     public boost::archive::basic_binary_iprimitive<
         portable_binary_iarchive,
         std::istream::char_type,
@@ -126,7 +128,7 @@ public:
 protected:
 #endif
     unsigned int m_flags;
-    HPX_ALWAYS_EXPORT void
+    HPX_SERIALIZATION_EXPORT void
     load_impl(boost::intmax_t & l, char maxsize);
 
     // default fall through for any types not specified here
@@ -212,13 +214,13 @@ protected:
         this->detail_common_iarchive::load_override(t, 0);
     }
 
-    HPX_ALWAYS_EXPORT void
+    HPX_SERIALIZATION_EXPORT void
     load_override(boost::archive::class_name_type & t, int);
 
     // binary files don't include the optional information
     void load_override(boost::archive::class_id_optional_type&, int) {}
 
-    HPX_ALWAYS_EXPORT void
+    HPX_SERIALIZATION_EXPORT void
     init(unsigned int flags);
 
 public:
@@ -250,6 +252,7 @@ public:
     }
 };
 
+#undef HPX_SERIALIZATION_EXPORT
 }}
 
 // required by export in boost version > 1.34
