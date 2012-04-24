@@ -2,7 +2,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
 //  Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 //
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
@@ -50,7 +50,7 @@ struct test_mutexed_data
         HPX_TEST(lock ? true : false);
 
         ++(*data);
- 
+
         lock.unlock();
         HPX_TEST(!lock);
 
@@ -70,7 +70,7 @@ int hpx_main(variables_map& vm)
 
     if (vm.count("pxthreads"))
         pxthreads = vm["pxthreads"].as<std::size_t>();
-    
+
     {
         mutex mtx;
         barrier barr(pxthreads + 1);
@@ -78,7 +78,8 @@ int hpx_main(variables_map& vm)
 
         test_mutexed_data<mutex> t(mtx, barr, data);
         for (std::size_t i = 0; i < pxthreads; ++i)
-            register_work_nullary(t, "test_local_mutex_try_lock");
+            register_work_nullary(HPX_STD_FUNCTION<void()>(t),
+                "test_local_mutex_try_lock");
 
         barr.wait();
 
@@ -86,7 +87,7 @@ int hpx_main(variables_map& vm)
         HPX_TEST(lock ? true : false);
 
         HPX_TEST_EQ(data, pxthreads);
-    } 
+    }
 
     // Initiate shutdown of the runtime system.
     finalize();
@@ -99,9 +100,9 @@ int main(int argc, char* argv[])
     // Configure application-specific options.
     options_description
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
-    
+
     desc_commandline.add_options()
-        ("pxthreads,T", value<std::size_t>(), 
+        ("pxthreads,T", value<std::size_t>(),
             "the number of PX threads to invoke (default: OS threads * 8)")
         ;
 
