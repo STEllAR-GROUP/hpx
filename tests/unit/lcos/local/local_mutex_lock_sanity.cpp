@@ -68,7 +68,8 @@ int hpx_main(variables_map& vm)
         test_lock<mutex> t;
 
         for (std::size_t i = 0; i < pxthreads; ++i)
-            register_work_nullary(t, "test_local_mutex_lock_sanity");
+            register_work_nullary(HPX_STD_FUNCTION<void()>(t), 
+                "test_local_mutex_lock_sanity");
     }
 
     // Initiate shutdown of the runtime system.

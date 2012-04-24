@@ -72,7 +72,8 @@ int hpx_main(variables_map& vm)
 
         test_mutexed_data<mutex> t(mtx, barr, data);
         for (std::size_t i = 0; i < pxthreads; ++i)
-            register_work_nullary(t, "test_local_mutex_lock_raii");
+            register_work_nullary(HPX_STD_FUNCTION<void()>(t), 
+                "test_local_mutex_lock_raii");
 
         barr.wait();
 
