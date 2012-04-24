@@ -43,41 +43,44 @@ using hpx::finalize;
 using hpx::find_here;
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename T1, typename TR1>
-boost::uint64_t wait(
-    std::vector<future<T1, TR1> > const& lazy_values
-  , boost::uint64_t suspend_for = 10
-    )
+namespace detail
 {
-    boost::dynamic_bitset<> handled(lazy_values.size());
-    boost::uint64_t handled_count = 0;
-
-    while (handled_count < lazy_values.size())
+    template <typename T1, typename TR1>
+    boost::uint64_t wait(
+        std::vector<future<T1, TR1> > const& lazy_values
+      , boost::int32_t suspend_for = 10
+        )
     {
-        bool suspended = false;
+        boost::dynamic_bitset<> handled(lazy_values.size());
+        boost::uint64_t handled_count = 0;
 
-        for (boost::uint64_t i = 0; i < lazy_values.size(); ++i)
+        while (handled_count < lazy_values.size())
         {
-            // loop over all lazy_values, executing the next as soon as its
-            // value gets available
-            if (!handled[i] && lazy_values[i].is_ready())
+            bool suspended = false;
+
+            for (boost::uint64_t i = 0; i < lazy_values.size(); ++i)
             {
-                handled[i] = true;
-                ++handled_count;
+                // loop over all lazy_values, executing the next as soon as its
+                // value gets available
+                if (!handled[i] && lazy_values[i].is_ready())
+                {
+                    handled[i] = true;
+                    ++handled_count;
 
-                // give thread-manager a chance to look for more work while
-                // waiting
-                suspend();
-                suspended = true;
+                    // give thread-manager a chance to look for more work while
+                    // waiting
+                    suspend();
+                    suspended = true;
+                }
             }
-        }
 
-        // suspend after one full loop over all values, 10ms should be fine
-        // (default parameter)
-        if (!suspended)
-            suspend(milliseconds(suspend_for));
+            // suspend after one full loop over all values, 10ms should be fine
+            // (default parameter)
+            if (!suspended)
+                suspend(milliseconds(suspend_for));
+        }
+        return handled.count();
     }
-    return handled.count();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -88,14 +91,7 @@ void change_thread_state(
     set_thread_state(reinterpret_cast<void*>(thread), suspended);
 }
 
-typedef plain_action1<
-    // arguments
-    boost::uint64_t
-    // function
-  , change_thread_state
-> change_thread_state_action;
-
-HPX_REGISTER_PLAIN_ACTION(change_thread_state_action);
+HPX_PLAIN_ACTION(change_thread_state, change_thread_state_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 void tree_boot(
@@ -105,17 +101,10 @@ void tree_boot(
   , boost::uint64_t thread
     );
 
-typedef plain_action4<
-    // arguments
-    boost::uint64_t
-  , boost::uint64_t
-  , id_type const&
-  , boost::uint64_t
-    // function
-  , tree_boot
-> tree_boot_action;
-
-HPX_REGISTER_PLAIN_ACTION(tree_boot_action);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wredundant-decls"
+HPX_PLAIN_ACTION(tree_boot, tree_boot_action)
+#pragma GCC diagnostic pop
 
 ///////////////////////////////////////////////////////////////////////////////
 void tree_boot(
@@ -160,12 +149,12 @@ void tree_boot(
     for (boost::uint64_t i = 0; i < actors; ++i)
         promises.push_back(async<change_thread_state_action>(prefix, thread));
 
-    wait(promises);
+    detail::wait(promises);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_dummy_thread(
-    boost::uint64_t futures
+    boost::uint64_t
     )
 {
     bool woken = false;

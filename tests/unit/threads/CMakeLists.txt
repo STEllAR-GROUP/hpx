@@ -10,7 +10,11 @@ set(tests
     test_thread_id
     test_thread_launching
     test_thread_mf
+    thread_affinity
    )
+
+set(thread_affinity_FLAGS
+        DEPENDENCIES iostreams_component)
 
 foreach(test ${tests})
   set(sources
@@ -35,4 +39,3 @@ foreach(test ${tests})
   add_hpx_pseudo_dependencies(tests.unit.threads.${test}
                               ${test}_test_exe)
 endforeach()
-
