@@ -328,7 +328,7 @@ namespace hpx
 
     /// Add a function to be executed inside a HPX thread during hpx::finalize
     HPX_API_EXPORT void register_shutdown_function(shutdown_function_type const&);
-    
+
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename SchedulingPolicy,
@@ -561,7 +561,7 @@ namespace hpx
     ///         returned by \a get_os_thread_count().
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         fail otherwise (it will return -1).
-    HPX_API_EXPORT std::size_t get_worker_thread_num();
+    HPX_API_EXPORT std::size_t get_worker_thread_num(bool* numa_sensitive = 0);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of the locality this function is being called

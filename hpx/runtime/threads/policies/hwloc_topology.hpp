@@ -157,7 +157,7 @@ struct topology
                 = get_thread_affinity_mask(num_thread, numa_sensitive);
             hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();
 
-            hwloc_bitmap_set_ith_ulong(cpuset, 0, mask & 0xFFFFFFFF);
+            hwloc_bitmap_from_ith_ulong(cpuset, 0, mask & 0xFFFFFFFF);
             hwloc_bitmap_set_ith_ulong(cpuset, 1, (mask >> 32) & 0xFFFFFFFF);
 
 #if defined(DEBUG)

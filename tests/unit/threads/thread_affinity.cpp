@@ -12,6 +12,7 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 #include <vector>
 #include <list>
@@ -26,7 +27,9 @@ std::size_t thread_affinity_worker(std::size_t desired)
 {
     // Returns the OS-thread number of the worker that is running this
     // PX-thread.
-    std::size_t current = hpx::get_worker_thread_num();
+    bool numa_sensitive = false;
+    std::size_t current = hpx::get_worker_thread_num(&numa_sensitive);
+
     if (current == desired)
     {
 #if HPX_HAVE_HWLOC
@@ -34,26 +37,23 @@ std::size_t thread_affinity_worker(std::size_t desired)
         hwloc_topology_init(&topo);
         hwloc_topology_load(topo);
 
+        // retrieve the current affinity mask
         hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();
+        if (0 == hwloc_get_cpubind(topo, cpuset, HWLOC_CPUBIND_THREAD)) {
+            // sadly get_cpubind is not implemented for Windows based systems
+            char buf[128];
+            hwloc_bitmap_snprintf(buf, 1024, cpuset);
+            std::size_t current_mask = strtoul(buf, 0, 16);     // parse the value back
 
-        // TODO: make portable ... add check wether run on correct thread
-#ifdef BOOST_MSVC
-        hwloc_get_thread_cpubind(topo, GetCurrentThread(), cpuset, 0);
-#else
-        hwloc_get_thread_cpubind(topo, pthread_self(), cpuset, 0);
+            // extract the desired affinity mask
+            hpx::threads::topology const& t = hpx::get_runtime().get_topology();
+            std::size_t desired_mask = t.get_thread_affinity_mask(current, numa_sensitive);
+            HPX_TEST_EQ(desired_mask, current_mask);
+        }
+
+        hwloc_bitmap_free(cpuset);
+        hwloc_topology_destroy(topo);
 #endif
-
-        char buf[1024];
-
-        hwloc_bitmap_snprintf(buf, 1024, cpuset);
-
-        hpx::cout << buf
-                  << " "
-                  << current
-                  << "\n"
-                  << hpx::flush;
-#endif
-
         return desired;
     }
 
@@ -113,17 +113,10 @@ void thread_affinity_foreman()
             });
     }
 }
-//]
 
-//[thread_affinity_action_wrapper
-// Define the boilerplate code necessary for the function 'thread_affinity_foreman'
-// to be invoked as an HPX action.
 HPX_PLAIN_ACTION(thread_affinity_foreman, thread_affinity_foreman_action)
-//]
 
 ///////////////////////////////////////////////////////////////////////////////
-//[thread_affinity_hpx_main
-//`Here is hpx_main:
 int hpx_main(boost::program_options::variables_map& /*vm*/)
 {
     {
@@ -151,27 +144,24 @@ int hpx_main(boost::program_options::variables_map& /*vm*/)
     }
 
     // Initiate shutdown of the runtime system.
-    return hpx::finalize();
+    hpx::finalize();
+    return hpx::util::report_errors();
 }
-//]
 
 ///////////////////////////////////////////////////////////////////////////////
-//[thread_affinity_main
 int main(int argc, char* argv[])
 {
     // Configure application-specific options.
     boost::program_options::options_description
        desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
 
+    // we force this test to use several (4) threads
+    using namespace boost::assign;
+    std::vector<std::string> cfg;
+    cfg += "hpx.os_threads=" +
+        boost::lexical_cast<std::string>(hpx::thread::hardware_concurrency());
+
     // Initialize and run HPX.
-    return hpx::init(desc_commandline, argc, argv);
+    return hpx::init(desc_commandline, argc, argv, cfg);
 }
-//` In HPX `main` is used to initialize the runtime system and pass the command
-//` line arguments to the program. If you wish to add command line options to
-//` your program you would add them here using the instance of the Boost
-//` class `options_description`, and invoking the public member function
-//` `.add_options()` (see __boost_doc__ or the __fibonacci_example__
-//` for more details). `hpx::init()` calls `hpx_main` after setting up
-//` HPX, which is where the logic of our program is encoded.
-//]
 

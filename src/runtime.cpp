@@ -782,9 +782,9 @@ namespace hpx
         return get_runtime().get_config().get_os_thread_count();
     }
 
-    std::size_t get_worker_thread_num()
+    std::size_t get_worker_thread_num(bool* numa_sensitive)
     {
-        return get_runtime().get_thread_manager().get_worker_thread_num();
+        return get_runtime().get_thread_manager().get_worker_thread_num(numa_sensitive);
     }
 
     ///////////////////////////////////////////////////////////////////////////
