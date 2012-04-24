@@ -30,7 +30,7 @@ struct test_try_lock
     typedef M mutex_type;
     typedef typename M::scoped_try_lock try_lock_type;
 
-    void operator()()
+    void operator()() const
     {
         mutex_type mtx;
 
@@ -75,7 +75,8 @@ int hpx_main(variables_map& vm)
         test_try_lock<mutex> t;
 
         for (std::size_t i = 0; i < pxthreads; ++i)
-            register_work_nullary(t, "local_mutex_try_lock_sanity");
+            register_work_nullary(HPX_STD_FUNCTION<void()>(t),
+                "local_mutex_try_lock_sanity");
     }
 
     // Initiate shutdown of the runtime system.

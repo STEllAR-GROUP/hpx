@@ -39,7 +39,7 @@ struct test_mutexed_data
     test_mutexed_data(mutex_type& m, barrier& b, std::size_t& d)
         : mtx(&m), barr(&b), data(&d) {}
 
-    void operator()()
+    void operator()() const
     {
         {
             try_lock_type lock(*mtx);
@@ -76,7 +76,8 @@ int hpx_main(variables_map& vm)
 
         test_mutexed_data<mutex> t(mtx, barr, data);
         for (std::size_t i = 0; i < pxthreads; ++i)
-            register_work_nullary(t, "test_local_mutex_try_lock_raii");
+            register_work_nullary(HPX_STD_FUNCTION<void()>(t), 
+                "test_local_mutex_try_lock_raii");
 
         barr.wait();
 
