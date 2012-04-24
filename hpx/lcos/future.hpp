@@ -9,6 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/util/date_time_chrono.hpp>
+#include <hpx/util/detail/remove_reference.hpp>
 
 #include <boost/move/move.hpp>
 #include <boost/intrusive_ptr.hpp>
@@ -82,10 +83,12 @@ namespace hpx { namespace lcos
         }
 
         // extension: init from given value, set future to ready right away
-        future(BOOST_RV_REF(Result) init)
-          : future_data_(lcos::detail::future_data<Result>())
+        future(Result const& init)
         {
-            future_data_->set_data(boost::move(init));
+            lcos::detail::future_data<Result>* p =
+                new lcos::detail::future_data<Result>();
+            p->set_data(boost::move(init));
+            future_data_ = p;
         }
 
         // assignment
@@ -207,9 +210,9 @@ namespace hpx { namespace lcos
 
     // extension: create a pre-initialized future object
     template <typename Result>
-    future<Result> create_value(BOOST_FWD_REF(Result) init)
+    future<Result> create_value(Result const& init)
     {
-        return future<Result>(boost::forward<Result>(init));
+        return future<Result>(init);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -240,6 +243,17 @@ namespace hpx { namespace lcos
         friend class promise<void, util::unused_type>;
         friend class hpx::thread;
         friend struct detail::future_data<void, util::unused_type>;
+
+        // create_void uses the dummy argument constructor below
+        friend future<void> create_void();
+
+        future(int)
+        {
+            lcos::detail::future_data<void>* p =
+                new lcos::detail::future_data<void>();
+            p->set_data(util::unused);
+            future_data_ = p;
+        }
 
     public:
         typedef void result_type;
@@ -376,6 +390,12 @@ namespace hpx { namespace lcos
     private:
         boost::intrusive_ptr<future_data_type> future_data_;
     };
+
+    // extension: create a pre-initialized future object
+    inline future<void> create_void()
+    {
+        return future<void>(1);   // dummy argument
+    }
 }}
 
 #endif

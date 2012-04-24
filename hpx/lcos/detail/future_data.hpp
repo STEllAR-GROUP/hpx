@@ -201,6 +201,8 @@ namespace hpx { namespace lcos { namespace detail
         typedef typename base_type::completed_callback_type
             completed_callback_type;
 
+        template <typename R, typename RR> friend class future;
+
     protected:
         future_data() {}
 
