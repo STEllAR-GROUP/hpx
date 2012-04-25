@@ -45,7 +45,10 @@ namespace hpx
                 mutex_type::scoped_lock l(mtx_);
                 if (index_ == index_error) {
                     index_ = idx;
-                    threads::set_thread_state(id, threads::pending);
+
+                    // reactivate waiting thread only if it's not us
+                    if (id != threads::get_self().get_thread_id())
+                        threads::set_thread_state(id, threads::pending);
                 }
             }
 

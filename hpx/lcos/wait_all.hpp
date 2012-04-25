@@ -44,7 +44,9 @@ namespace hpx
                 if (ready_count_ != lazy_values_.size() &&
                     ++ready_count_ == lazy_values_.size())
                 {
-                    threads::set_thread_state(id, threads::pending);
+                    // reactivate waiting thread only if it's not us
+                    if (id != threads::get_self().get_thread_id())
+                        threads::set_thread_state(id, threads::pending);
                 }
             }
 
