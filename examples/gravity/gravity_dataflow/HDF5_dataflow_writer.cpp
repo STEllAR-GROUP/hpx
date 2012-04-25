@@ -11,6 +11,9 @@
 //file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/lcos/async.hpp>
+#include <hpx/lcos/future_wait.hpp>
+
 #include <cstdlib>
 #include <iostream>
 #include <stdlib.h>
@@ -18,9 +21,6 @@
 
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
-
-#include <hpx/lcos/async.hpp>
-#include <hpx/lcos/future_wait.hpp>
 
 #include <H5Cpp.h>
 #include "gravity_dataflow.hpp"
@@ -51,7 +51,7 @@ void printval (Vector_container pts,config_f const & param,uint64_t k,
  }
 }
 
-void printdebug(Vector_container pts,uint64_t k,ofstream &coorfile, 
+void printdebug(Vector_container pts,uint64_t k,ofstream &coorfile,
                  ofstream &trbst) {
  if (debug) {
   for (uint64_t i=0;i<k;i++) {
@@ -64,17 +64,17 @@ void printdebug(Vector_container pts,uint64_t k,ofstream &coorfile,
  }
 }
 
-void printfinalcoord (Vector_container const &pts,config_f& param, uint64_t k) { 
+void printfinalcoord (Vector_container const &pts,config_f& param, uint64_t k) {
                           //Not done with this function
  string j=param.output+"_finalcoord.h5";
  const H5std_string FILE_NAME(j);
  const H5std_string DATASET_NAME("Coordinates");
  H5File file(FILE_NAME, H5F_ACC_TRUNC); //Create new file
- 
+
  //Define a memory space
  hsize_t mdim[]={k,11}; //memory dimentions
  DataSpace mspace(2,mdim); //memory dataspace
- 
+
  //Define a hyperslab
  hsize_t count[2];
  hsize_t offset[2];
@@ -85,7 +85,7 @@ void printfinalcoord (Vector_container const &pts,config_f& param, uint64_t k) {
  offset[1]=0;
  block[0]=k;
  block[1]=7;
- 
+
  mspace.selectHyperslab(H5S_SELECT_SET,count,offset,NULL,block); //create
                                                                  //hyperslab
  //Define new file space

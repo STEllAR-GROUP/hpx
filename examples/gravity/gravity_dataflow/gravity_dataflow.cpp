@@ -1,14 +1,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////////////////     GRAVITY VD    ///////////////////////////////
-//This program calculates the effect of gravity on a set of points in three 
+//This program calculates the effect of gravity on a set of points in three
 //dimentions. It uses a "coordinate file" to define the points and gives the
-//user ability to adjust the number of iterations and time that passes for each 
+//user ability to adjust the number of iterations and time that passes for each
 //iteration. These files and values are changed in the configuraion file,
 //in this case "gravconfig.conf".
 //
 //Problem: Updating to use dataflows
 //
-//Remember to change the program version when program is updated! 
+//Remember to change the program version when program is updated!
 ///////////////////////////////////////////////////////////////////////////////
 //Copyright (c) 2011-2012 Adrian Serio
 //
@@ -17,6 +17,15 @@
 ///////////////////////////////////////////////////////////////////////////////
 //Units are in m, kg, s, and therefore N.
 ///////////////////////////////////////////////////////////////////////////////
+#include<hpx/hpx.hpp>
+#include<hpx/hpx_fwd.hpp>
+#include<hpx/hpx_init.hpp>
+#include<hpx/components/dataflow/dataflow.hpp> ///!!!///
+#include<hpx/runtime/actions/plain_action.hpp>
+#include<hpx/runtime/components/plain_component_factory.hpp>
+#include<hpx/util/high_resolution_timer.hpp>
+#include<hpx/lcos/async.hpp>
+
 #include<iostream>
 #include<fstream>
 #include<sstream>
@@ -30,15 +39,6 @@
 
 #include<boost/cstdint.hpp>
 #include<boost/format.hpp>
-
-#include<hpx/hpx.hpp>
-#include<hpx/hpx_fwd.hpp>
-#include<hpx/hpx_init.hpp>
-#include<hpx/components/dataflow/dataflow.hpp> ///!!!///
-#include<hpx/runtime/actions/plain_action.hpp>
-#include<hpx/runtime/components/plain_component_factory.hpp>
-#include<hpx/util/high_resolution_timer.hpp>
-#include<hpx/lcos/async.hpp>
 
 #include "gravity_dataflow.hpp"
 
@@ -60,7 +60,7 @@ using hpx::actions::plain_action2;
 using hpx::actions::plain_action3;
 using hpx::actions::plain_action4;
 using hpx::actions::plain_action6;
-using hpx::lcos::async;
+using hpx::async;
 using hpx::lcos::future;
 using hpx::lcos::wait;
 using hpx::lcos::dataflow; ///!!!!////
@@ -86,7 +86,7 @@ void printfinalcoord(Vector_container const &pts,config_f& param,uint64_t k);
 void closefile(ofstream &notes,config_f& param,float ct);
 void closedebugfile(ofstream &coorfile,ofstream &trbst); //closefile for debug
 void loadconfig(config_f& param,variables_map& vm);
-void setup(Vector_container pts,ofstream &coorfile,ofstream &trbst,uint64_t k); 
+void setup(Vector_container pts,ofstream &coorfile,ofstream &trbst,uint64_t k);
 Vector_container createvecs(config_f& param);
 void calc_force(Vector_container pts,uint64_t k,uint64_t t,uint64_t i);
 Vector_container identity(Vector_container pts);
@@ -103,14 +103,14 @@ HPX_REGISTER_PLAIN_ACTION(calc_action); //!!//
 
 typedef plain_action4<
      Vector_container, //argument
-     uint64_t,         // argument 
+     uint64_t,         // argument
      uint64_t,         // argument
      uint64_t,         // argument
      &calc_force       // function
  > calc_force_action;
 HPX_REGISTER_PLAIN_ACTION(calc_force_action);
 
-typedef plain_result_action4< 
+typedef plain_result_action4<
      Vector_container, //return type
      Vector_container, //argument
      config_f const &,
@@ -137,7 +137,7 @@ HPX_REGISTER_PLAIN_ACTION(print_action);
 bool debug;
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(variables_map& vm) 
+int hpx_main(variables_map& vm)
 {
   {
      config_f param;
@@ -148,7 +148,7 @@ int hpx_main(variables_map& vm)
      float ct=0;        //Computation time
 
      debug=vm.count("debug");
-     cout <<"Config File Location: "<< vm["config-file"].as<std::string>() 
+     cout <<"Config File Location: "<< vm["config-file"].as<std::string>()
           << "\n";
      param.num_cores=get_os_thread_count();
 
@@ -163,7 +163,7 @@ int hpx_main(variables_map& vm)
       // This section creates and opens the coordinate output file
       j=param.output+".cf.txt";
       coorfile.open(j.c_str());
-      
+
       //This section opens the trb output file
       j=param.output+".trb.txt";
       trbst.open(j.c_str());
@@ -184,7 +184,7 @@ int hpx_main(variables_map& vm)
      if (debug) { setup(pts,coorfile,trbst,k); } // sets up the output files
      dataflow_base<Vector_container >move = dataflow<id_action>(find_here(),pts);
      high_resolution_timer ht;
-     
+
      //This section outlines the program
      for (uint64_t t=0;t<param.steps;t++) {
       if (debug) cout<<"\nFor step "<<t<<":\n";
@@ -193,7 +193,7 @@ int hpx_main(variables_map& vm)
       mp=async<move_action>(find_here(),cfp,param,k,t);
       printval(mp,param,k,t,coorfile,trbst); //Writes output
 #endif
-      dataflow_base<Vector_container > calculate= 
+      dataflow_base<Vector_container > calculate=
                                    dataflow<calc_action>(find_here(),move,k,t);
                                    //This is the calculation of force
       move=dataflow<move_action>(find_here(),calculate,param,k,t);
@@ -201,10 +201,10 @@ int hpx_main(variables_map& vm)
              dataflow<print_action>(find_here(),move,param,k,t);
              //Writes output ?????
       if(debug) { printdebug(pts,k,coorfile,trbst); }
-     
+
      }
      Vector_container result = move.get_future().get();
-     printfinalcoord(pts,param,k); 
+     printfinalcoord(pts,param,k);
      ct=ht.elapsed();
      cout<<"Computation Time: "<<ct<<" [s]\n";
      closefile(notes,param,ct); //normal closefile
@@ -229,7 +229,7 @@ int main(int argc, char*argv[])
 
 //vector<future<void> > calc(uint64_t k,uint64_t t) {
 Vector_container calc(Vector_container pts,uint64_t k,uint64_t t) {
-  
+
  vector<future<void> > cfp;
  for (uint64_t i=0;i<k;++i) { //moves through the points ie 1, 2, etc.
   cfp.push_back(async<calc_force_action>(find_here(),pts,k,t,i));
@@ -259,9 +259,9 @@ vector<components> dist(Vector_container &pts,uint64_t t,uint64_t i,uint64_t l) 
  rz=abs(pts[l].z-pts[i].z);   //
  r2t=(rx*rx)+(ry*ry)+(rz*rz); //
  rt=sqrt(r2t);                //////!!!!!!//////
- 
+
 vector<components>comp(1);
- 
+
  comp[0].d=r2t;
  comp[0].xc=rx/rt;
  comp[0].yc=ry/rt;
@@ -276,7 +276,7 @@ Vector_container calc_move(Vector_container pts,config_f const & param,
                 uint64_t k,uint64_t t) {
 // uint64_t tn=t+1;
  double timestep=param.timestep; //the timestep
- 
+
  for (uint64_t i=0;i<k;++i) {
 #if 0
      wait(cfp[i]);
@@ -299,7 +299,7 @@ Vector_container calc_move(Vector_container pts,config_f const & param,
   pts_timestep[tn][i].vz =pts_timestep[t][i].vz+pts_timestep[t][i].fz/
                             pts_timestep[t][i].m*timestep;
  #endif
-   
+
   //calc x displ. and add to x-coord.
   pts[i].x =pts[i].x+pts[i].vx*timestep+
              .5*pts[i].fx*(timestep*timestep)/pts[i].m;
@@ -316,7 +316,7 @@ Vector_container calc_move(Vector_container pts,config_f const & param,
   //calc new z velocity
   pts[i].vz =pts[i].vz+pts[i].fz/pts[i].m*timestep;
 
-#if 0 
+#if 0
  if(debug) {
   cout<<"The New coordinates for point "<<i<<" are: ("<<pts_timestep[tn][i].x
      <<","<<pts_timestep[tn][i].y<<","<<pts_timestep[tn][i].z<<")\n";
@@ -376,7 +376,7 @@ void setup(Vector_container pts,ofstream &coorfile,ofstream &trbst,uint64_t k) {
   cout<<"Point "<<i<<": "<<'('<<pts[i].x<<','
       <<pts[i].y<<','<<pts[i].z<<')'
       <<" "<< pts[i].m<<'\n';
- 
+
   coorfile<<"Pt:"<<i<<"     ";
   trbst<<"Pt:"<<i<<"                       ";
  }
@@ -402,28 +402,28 @@ void calc_force(Vector_container pts, uint64_t k,uint64_t t,uint64_t i) {
  double const g=6.673e-11; //the Gravitational Constant
  double F; //the force
  vector<components> comp2; //vector to copy unit vector info to
- 
+
  for (uint64_t l=0;l<k;++l) { //moves through points 1-2, 1-3, etc.
   if (i != l) {
 #if 0
    comp2 = dist(t,i,l); //copy in unit vector data
    mt=pts_timestep[t][l].m*pts_timestep[t][i].m*g;
    F=mt/comp2[0].d;
-   if (pts_timestep[t][i].x<pts_timestep[t][l].x || 
+   if (pts_timestep[t][i].x<pts_timestep[t][l].x ||
           pts_timestep[t][i].x==pts_timestep[t][l].x) {
     pts_timestep[t][i].fx+=F*comp2[0].xc; //fx=fx+F*x-component
    }
    if (pts_timestep[t][i].x>pts_timestep[t][l].x) {
     pts_timestep[t][i].fx-=F*comp2[0].xc; //fx=fx-F*x-component
    }
-   if (pts_timestep[t][i].y<pts_timestep[t][l].y || 
+   if (pts_timestep[t][i].y<pts_timestep[t][l].y ||
           pts_timestep[t][i].y==pts_timestep[t][l].y) {
     pts_timestep[t][i].fy+=F*comp2[0].yc; //fx=fx+F*x-component
    }
    if (pts_timestep[t][i].y>pts_timestep[t][l].y) {
     pts_timestep[t][i].fy-=F*comp2[0].yc; //fx=fx-F*x-component
    }
-   if (pts_timestep[t][i].z<pts_timestep[t][l].z || 
+   if (pts_timestep[t][i].z<pts_timestep[t][l].z ||
           pts_timestep[t][i].z==pts_timestep[t][l].z) {
     pts_timestep[t][i].fz+=F*comp2[0].zc; //fx=fx+F*x-component
    }
@@ -433,7 +433,7 @@ void calc_force(Vector_container pts, uint64_t k,uint64_t t,uint64_t i) {
    pts_timestep[t][i].ft=sqrt(pts_timestep[t][i].fx*pts_timestep[t][i].fx+
                               pts_timestep[t][i].fy*pts_timestep[t][i].fy+
                               pts_timestep[t][i].fz*pts_timestep[t][i].fz);
-#endif  
+#endif
    comp2 = dist(pts,t,i,l); //copy in unit vector data
    mt=pts[l].m*pts[i].m*g;
    F=mt/comp2[0].d;
@@ -456,7 +456,7 @@ void calc_force(Vector_container pts, uint64_t k,uint64_t t,uint64_t i) {
     pts[i].fz-=F*comp2[0].zc; //fx=fx-F*x-component
    }
    pts[i].ft=sqrt(pts[i].fx*pts[i].fx+pts[i].fy*pts[i].fy+pts[i].fz*pts[i].fz);
-  
+
 
   }
  }
