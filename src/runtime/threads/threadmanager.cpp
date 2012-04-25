@@ -298,21 +298,40 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     // thread function registered for set_state if thread is currently active
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    thread_state threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+    thread_state_enum threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         set_active_state(thread_id_type id,
             thread_state_enum newstate, thread_state_ex_enum newstate_ex,
-            thread_priority priority)
+            thread_priority priority, thread_state previous_state)
     {
         if (HPX_UNLIKELY(!id)) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::set_active_state",
                 "NULL thread id encountered");
+            return terminated;
+        }
+
+        // make sure that the thread has not been suspended and set active again
+        // in the mean time
+        thread_data* thrd = reinterpret_cast<thread_data*>(id);
+        thread_state current_state = thrd->get_state();
+
+        if (thread_state_enum(current_state) == thread_state_enum(previous_state) &&
+            current_state != previous_state)
+        {
+            LTM_(warning)
+                << "set_active_state: thread is still active, however "
+                      "it was non-active since the original set_state "
+                      "request was issued, aborting state change, thread("
+                << id << "), description("
+                << thrd->get_description() << "), new state("
+                << get_thread_state_name(newstate) << ")";
+            return terminated;
         }
 
         // just retry, set_state will create new thread if target is still active
         error_code ec;      // do not throw
         set_state(id, newstate, newstate_ex, priority, ec);
-        return thread_state(terminated);
+        return terminated;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -372,14 +391,15 @@ namespace hpx { namespace threads
         if (active == previous_state_val)
         {
             // schedule a new thread to set the state
-            LTM_(warning) << "set_state: thread is currently active, scheduling "
-                           "new thread, thread(" << id << "), description("
-                        << thrd->get_description() << "), new state("
-                        << get_thread_state_name(new_state) << ")";
+            LTM_(warning)
+                << "set_state: thread is currently active, scheduling "
+                    "new thread, thread(" << id << "), description("
+                << thrd->get_description() << "), new state("
+                << get_thread_state_name(new_state) << ")";
 
             thread_init_data data(
                 boost::bind(&threadmanager_impl::set_active_state, this,
-                    id, new_state, new_state_ex, priority),
+                    id, new_state, new_state_ex, priority, previous_state),
                 "set state for active thread", 0, priority);
             register_work(data);
 
@@ -389,10 +409,11 @@ namespace hpx { namespace threads
             return previous_state;     // done
         }
         else if (terminated == previous_state_val) {
-            LTM_(warning) << "set_state: thread is terminated, aborting state "
-                           "change, thread(" << id << "), description("
-                        << thrd->get_description() << "), new state("
-                        << get_thread_state_name(new_state) << ")";
+            LTM_(warning)
+                << "set_state: thread is terminated, aborting state "
+                    "change, thread(" << id << "), description("
+                << thrd->get_description() << "), new state("
+                << get_thread_state_name(new_state) << ")";
 
             if (&ec != &throws)
                 ec = make_success_code();

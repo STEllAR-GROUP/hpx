@@ -725,9 +725,9 @@ namespace hpx { namespace threads
 
         // thread function registered for set_state if thread is currently
         // active
-        thread_state set_active_state(thread_id_type id,
+        thread_state_enum set_active_state(thread_id_type id,
                 thread_state_enum newstate, thread_state_ex_enum newstate_ex,
-                thread_priority priority);
+                thread_priority priority, thread_state previous_state);
 
     public:
         /// this notifies the thread manager that there is some more work
