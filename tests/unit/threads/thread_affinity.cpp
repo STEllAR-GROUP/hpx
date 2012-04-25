@@ -42,7 +42,7 @@ std::size_t thread_affinity_worker(std::size_t desired)
         if (0 == hwloc_get_cpubind(topo, cpuset, HWLOC_CPUBIND_THREAD)) {
             // sadly get_cpubind is not implemented for Windows based systems
             char buf[128];
-            hwloc_bitmap_snprintf(buf, 1024, cpuset);
+            hwloc_bitmap_snprintf(buf, sizeof(buf), cpuset);
             std::size_t current_mask = strtoul(buf, 0, 16);     // parse the value back
 
             // extract the desired affinity mask
