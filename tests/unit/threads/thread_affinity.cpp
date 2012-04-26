@@ -32,7 +32,11 @@ std::size_t thread_affinity_worker(std::size_t desired)
 
     if (current == desired)
     {
-#if HPX_HAVE_HWLOC
+        // extract the desired affinity mask
+        hpx::threads::topology const& t = hpx::get_runtime().get_topology();
+        std::size_t desired_mask = t.get_thread_affinity_mask(current, numa_sensitive);
+
+#if defined(HPX_HAVE_HWLOC)
         hwloc_topology_t topo;
         hwloc_topology_init(&topo);
         hwloc_topology_load(topo);
@@ -45,14 +49,37 @@ std::size_t thread_affinity_worker(std::size_t desired)
             hwloc_bitmap_snprintf(buf, sizeof(buf), cpuset);
             std::size_t current_mask = strtoul(buf, 0, 16);     // parse the value back
 
-            // extract the desired affinity mask
-            hpx::threads::topology const& t = hpx::get_runtime().get_topology();
-            std::size_t desired_mask = t.get_thread_affinity_mask(current, numa_sensitive);
             HPX_TEST_EQ(desired_mask, current_mask);
         }
 
         hwloc_bitmap_free(cpuset);
         hwloc_topology_destroy(topo);
+#elif defined(BOOST_WINDOWS)
+        DWORD_PTR current_mask = SetThreadAffinityMask(GetCurrentThread(), DWORD_PTR(-1));
+        SetThreadAffinityMask(GetCurrentThread(), current_mask);
+        HPX_TEST_EQ(desired_mask, current_mask);
+#elif defined(__linux__)
+        cpu_set_t cpu;
+        CPU_ZERO(&cpu);
+
+#  if defined(HPX_HAVE_PTHREAD_SETAFFINITY_NP)
+        if (0 == pthread_getaffinity_np(pthread_self(), sizeof(cpu), &cpu))
+#  else
+        if (0 == sched_getaffinity(syscall(SYS_gettid), sizeof(cpu), &cpu))
+#  endif
+        {
+            std::size_t num_cores = hpx::hardware_concurrency();
+            for (std::size_t i = 0; i < num_cores; ++i)
+            {
+                // only the bit for the current core should be set
+                if (i == current) {
+                    HPX_TEST(CPU_ISSET(i, &cpu));
+                }
+                else {
+                    HPX_TEST(!CPU_ISSET(i, &cpu));
+                }
+            }
+        }
 #endif
         return desired;
     }
