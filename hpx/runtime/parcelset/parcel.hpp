@@ -184,13 +184,17 @@ namespace hpx { namespace parcelset
 // this is the current version of the parcel serialization format
 // this definition needs to be in the global namespace
 #ifdef __GNUG__
+#if HPX_GCC_VERSION >= 40700
 #pragma GCC diagnostic push
+#endif
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 #endif
 BOOST_CLASS_TRACKING(hpx::parcelset::parcel, boost::serialization::track_never)
 BOOST_CLASS_VERSION(hpx::parcelset::parcel, HPX_PARCEL_VERSION)
 #ifdef __GNUG__
+#if HPX_GCC_VERSION >= 40700
 #pragma GCC diagnostic pop
+#endif
 #endif
 
 #include <hpx/config/warnings_suffix.hpp>

@@ -8,6 +8,7 @@
 #define HPX_CONFIG_MAR_24_2008_0943AM
 
 #include <hpx/version.hpp>
+#include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/branch_hints.hpp>
 #include <hpx/config/manual_profiling.hpp>
 

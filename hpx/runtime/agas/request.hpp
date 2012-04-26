@@ -616,13 +616,17 @@ struct request
 }}
 
 #ifdef __GNUG__
+#if HPX_GCC_VERSION >= 40700
 #pragma GCC diagnostic push
+#endif
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 #endif
 BOOST_CLASS_VERSION(hpx::agas::request, HPX_AGAS_VERSION)
 BOOST_CLASS_TRACKING(hpx::agas::request, boost::serialization::track_never)
 #ifdef __GNUG__
+#if HPX_GCC_VERSION >= 40700
 #pragma GCC diagnostic pop
+#endif
 #endif
 
 #endif // HPX_AB01A9FE_45BE_43EF_B9AD_05B701B06685

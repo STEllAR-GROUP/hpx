@@ -58,7 +58,9 @@ namespace boost { namespace coroutines { namespace detail { namespace posix {
 
 #if defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
 #ifdef __GNUG__
+#if HPX_GCC_VERSION >= 40700
 #pragma GCC diagnostic push
+#endif
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 #pragma GCC diagnostic ignored "-pedantic"
 #endif
@@ -112,7 +114,9 @@ namespace boost { namespace coroutines { namespace detail { namespace posix {
   }
 
 #ifdef __GNUG__
+#if HPX_GCC_VERSION >= 40700
 #pragma GCC diagnostic pop
+#endif
 #endif
 #else  // non-mmap()
 

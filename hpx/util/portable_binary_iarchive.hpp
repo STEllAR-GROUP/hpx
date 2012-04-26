@@ -133,7 +133,9 @@ protected:
 
     // default fall through for any types not specified here
 #ifdef __GNUG__
+#if HPX_GCC_VERSION >= 40700
 #pragma GCC diagnostic push
+#endif
 #pragma GCC diagnostic ignored "-Wsign-conversion"
 #endif
     template<class T>
@@ -144,7 +146,9 @@ protected:
         t = static_cast<T>(l);
     }
 #ifdef __GNUG__
+#if HPX_GCC_VERSION >= 40700
 #pragma GCC diagnostic pop
+#endif
 #endif
     void load(std::string & t) {
         this->primitive_base_t::load(t);
