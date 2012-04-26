@@ -148,7 +148,12 @@ namespace hpx { namespace threads
 
     thread_self* get_self_ptr()
     {
-        return thread_self::impl_type/*::super_type*/::get_self();
+        return thread_self::impl_type::get_self();
+    }
+
+    thread_self::impl_type* get_ctx_ptr()
+    {
+        return boost::coroutines::detail::coroutine_accessor::get_impl(get_self());
     }
 
     thread_self* get_self_ptr_checked(error_code& ec)

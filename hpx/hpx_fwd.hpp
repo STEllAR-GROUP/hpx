@@ -245,6 +245,10 @@ namespace hpx
         /// specific) self reference to the current PX thread.
         HPX_API_EXPORT thread_self* get_self_ptr();
 
+        /// The function \a get_ctx_ptr returns a pointer to the internal data
+        /// associated with each coroutine.
+        HPX_API_EXPORT thread_self::impl_type* get_ctx_ptr();
+
         /// The function \a get_self_ptr_checked returns a pointer to the (OS
         /// thread specific) self reference to the current PX thread.
         HPX_API_EXPORT thread_self* get_self_ptr_checked(error_code& ec = throws);
