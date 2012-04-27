@@ -188,7 +188,7 @@ namespace hpx { namespace naming
 // this definition needs to be in the global namespace
 
 #ifdef __GNUG__
-#if HPX_GCC_VERSION >= 40700
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic push
 #endif
 #pragma GCC diagnostic ignored "-Wold-style-cast"
@@ -196,7 +196,7 @@ namespace hpx { namespace naming
 BOOST_CLASS_VERSION(hpx::naming::locality, HPX_LOCALITY_VERSION)
 BOOST_CLASS_TRACKING(hpx::naming::locality, boost::serialization::track_never)
 #ifdef __GNUG__
-#if HPX_GCC_VERSION >= 40700
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic pop
 #endif
 #endif

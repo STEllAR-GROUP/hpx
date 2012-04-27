@@ -195,7 +195,7 @@ operator<< (std::basic_ostream<Char, Traits>& os, gva const& addr)
 }}
 
 #ifdef __GNUG__
-#if HPX_GCC_VERSION >= 40700
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic push
 #endif
 #pragma GCC diagnostic ignored "-Wold-style-cast"
@@ -203,7 +203,7 @@ operator<< (std::basic_ostream<Char, Traits>& os, gva const& addr)
 BOOST_CLASS_VERSION(hpx::agas::gva, HPX_AGAS_VERSION)
 BOOST_CLASS_TRACKING(hpx::agas::gva, boost::serialization::track_never)
 #ifdef __GNUG__
-#if HPX_GCC_VERSION >= 40700
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic pop
 #endif
 #endif

@@ -136,14 +136,14 @@ namespace hpx { namespace util
 // this is the current version of the parcel serialization format
 // this definition needs to be in the global namespace
 #ifdef __GNUG__
-#if HPX_GCC_VERSION >= 40700
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic push
 #endif
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 #endif
 BOOST_CLASS_VERSION(hpx::util::section, HPX_SECTION_VERSION)
 #ifdef __GNUG__
-#if HPX_GCC_VERSION >= 40700
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic pop
 #endif
 #endif

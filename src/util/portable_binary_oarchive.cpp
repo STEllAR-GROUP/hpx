@@ -81,7 +81,9 @@ portable_binary_oarchive::save_impl(const boost::intmax_t l, const char maxsize)
 }
 
 #ifdef __GNUG__
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic push
+#endif
 #pragma GCC diagnostic ignored "-Wconversion"
 #endif
 HPX_ALWAYS_EXPORT void portable_binary_oarchive::init(unsigned int flags)
@@ -105,7 +107,9 @@ HPX_ALWAYS_EXPORT void portable_binary_oarchive::init(unsigned int flags)
     save(static_cast<unsigned char>(m_flags >> CHAR_BIT));
 }
 #ifdef __GNUG__
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic pop
+#endif
 #endif
 
 }}

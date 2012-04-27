@@ -608,7 +608,7 @@ namespace hpx { namespace traits
 ///////////////////////////////////////////////////////////////////////////////
 // this is the current version of the id_type serialization format
 #ifdef __GNUG__
-#if HPX_GCC_VERSION >= 40700
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic push
 #endif
 #pragma GCC diagnostic ignored "-Wold-style-cast"
@@ -619,7 +619,7 @@ BOOST_CLASS_VERSION(hpx::naming::id_type, HPX_IDTYPE_VERSION)
 BOOST_CLASS_TRACKING(hpx::naming::id_type, boost::serialization::track_never)
 BOOST_SERIALIZATION_INTRUSIVE_PTR(hpx::naming::detail::id_type_impl)
 #ifdef __GNUG__
-#if HPX_GCC_VERSION >= 40700
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic pop
 #endif
 #endif

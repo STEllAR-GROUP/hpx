@@ -525,7 +525,7 @@ struct get_remote_result<bool, agas::response>
 }}
 
 #ifdef __GNUG__
-#if HPX_GCC_VERSION >= 40700
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic push
 #endif
 #pragma GCC diagnostic ignored "-Wold-style-cast"
@@ -533,7 +533,7 @@ struct get_remote_result<bool, agas::response>
 BOOST_CLASS_VERSION(hpx::agas::response, HPX_AGAS_VERSION)
 BOOST_CLASS_TRACKING(hpx::agas::response, boost::serialization::track_never)
 #ifdef __GNUG__
-#if HPX_GCC_VERSION >= 40700
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic pop
 #endif
 #endif
