@@ -100,7 +100,9 @@ portable_binary_iarchive::load_override(boost::archive::class_name_type& t, int)
 }
 
 #ifdef __GNUG__
+#if HPX_GCC_VERSION >= 40700
 #pragma GCC diagnostic push
+#endif
 #pragma GCC diagnostic ignored "-Wconversion"
 #endif
 
