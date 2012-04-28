@@ -537,6 +537,12 @@ namespace hpx
     };
     BOOST_SCOPED_ENUM_END
 
+    inline bool
+    operator&(BOOST_SCOPED_ENUM(launch) lhs, BOOST_SCOPED_ENUM(launch) rhs)
+    {
+        return static_cast<int>(lhs) & static_cast<int>(rhs) ? true : false;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the global id representing this locality
     HPX_API_EXPORT naming::id_type find_here();
