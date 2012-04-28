@@ -230,14 +230,13 @@ namespace hpx { namespace components
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-/// The macro \a HPX_REGISTER_MINIMAL_COMPONENT_FACTORY is used create and to
-/// register a minimal component factory with Boost.Plugin. This macro may be
-/// used if the registered component factory is the only factory to be exposed
-/// from a particular module. If more than one factories need to be exposed
-/// the \a HPX_REGISTER_COMPONENT_FACTORY and \a HPX_REGISTER_COMPONENT_MODULE
-/// macros should be used instead.
+/// This macro is used create and to register a minimal component factory with
+/// Boost.Plugin. This macro may be used if the registered component factory is
+/// the only factory to be exposed from a particular module. If more than one
+/// factory needs to be exposed the \a HPX_REGISTER_COMPONENT_FACTORY and
+/// \a HPX_REGISTER_COMPONENT_MODULE macros should be used instead.
 #define HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY_EX(                    \
-            ComponentType, componentname, enable_always)                      \
+            ComponentType, componentname, state)                              \
         HPX_REGISTER_COMPONENT_FACTORY(                                       \
             hpx::components::generic_component_factory<ComponentType>,        \
             componentname);                                                   \
@@ -246,13 +245,14 @@ namespace hpx { namespace components
             componentname)                                                    \
         template struct hpx::components::generic_component_factory<ComponentType>;\
         HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_EX(                           \
-            ComponentType, componentname, enable_always)                      \
+            ComponentType, componentname, state)                              \
     /**/
 
 #define HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY(ComponentType, componentname) \
         HPX_REGISTER_MINIMAL_GENERIC_COMPONENT_FACTORY_EX(                    \
-            ComponentType, componentname, false)                              \
+            ComponentType, componentname, ::hpx::components::factory_check)   \
         HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)            \
     /**/
 
 #endif
+

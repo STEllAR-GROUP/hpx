@@ -28,7 +28,7 @@ namespace hpx { namespace components
     ///
     /// \tparam Component   The component type this registry should be
     ///                     responsible for.
-    template <typename Component, bool enable_always>
+    template <typename Component, factory_state_enum state>
     struct component_registry : public component_registry_base
     {
         ///
@@ -51,34 +51,45 @@ namespace hpx { namespace components
                 unique_component_name<component_registry>::call() + "]";
             fillini += "name = " HPX_COMPONENT_STRING;
             fillini += "path = $[hpx.location]/lib/hpx/" HPX_LIBRARY;
-            fillini += enable_always ?
-                "enabled = 1" : "enabled = $[hpx.components.load_external]";
+            switch (state)
+            {
+                case factory_enabled:
+                    fillini += "enabled = 1";
+                    break;
+                case factory_disabled:
+                    fillini += "enabled = 0";
+                    break;
+                case factory_check:
+                    fillini += "enabled = $[hpx.components.load_external]";
+                    break;
+            };
             return true;
         }
     };
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-/// The macro \a HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY is used create and to
-/// register a minimal component registry with Boost.Plugin.
+/// This macro is used create and to register a minimal component registry with
+/// Boost.Plugin.
 #define HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_EX(                           \
-            ComponentType, componentname, always_enabled)                     \
+            ComponentType, componentname, state)                              \
         typedef hpx::components::component_registry<                          \
-                ComponentType, always_enabled>                                \
-            componentname ## _component_registry_type_ ## always_enabled;     \
+                ComponentType, state>                                         \
+            componentname ## _component_registry_type;                        \
         HPX_REGISTER_COMPONENT_REGISTRY(                                      \
-            componentname ## _component_registry_type_ ## always_enabled,     \
+            componentname ## _component_registry_type,                        \
             componentname)                                                    \
         HPX_DEF_UNIQUE_COMPONENT_NAME(                                        \
-            componentname ## _component_registry_type_ ## always_enabled,     \
+            componentname ## _component_registry_type,                        \
             componentname)                                                    \
         template struct hpx::components::component_registry<                  \
-            ComponentType, always_enabled>;                                   \
+            ComponentType, state>;                                            \
     /**/
 
 #define HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY(ComponentType, componentname) \
         HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_EX(                           \
-            ComponentType, componentname, false)                              \
+            ComponentType, componentname, ::hpx::components::factory_check)   \
     /**/
 
 #endif
+

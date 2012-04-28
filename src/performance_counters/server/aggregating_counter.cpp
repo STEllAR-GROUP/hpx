@@ -226,7 +226,7 @@ template class HPX_EXPORT hpx::performance_counters::server::aggregating_counter
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY_EX(
     average_count_counter_type, average_count_counter,
-    "base_performance_counter", true)
+    "base_performance_counter", hpx::components::factory_enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(average_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -238,7 +238,7 @@ typedef hpx::components::managed_component<
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY_EX(
     max_count_counter_type, max_count_counter,
-    "base_performance_counter", true)
+    "base_performance_counter", hpx::components::factory_enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(max_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -250,7 +250,7 @@ typedef hpx::components::managed_component<
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY_EX(
     min_count_counter_type, min_count_counter,
-    "base_performance_counter", true)
+    "base_performance_counter", hpx::components::factory_enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(min_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////

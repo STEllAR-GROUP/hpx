@@ -23,7 +23,7 @@ typedef hpx::components::server::remote_object remote_object_type;
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_EX(
     hpx::components::simple_component<remote_object_type>,
-    remote_object, true)
+    remote_object, hpx::components::factory_enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(remote_object_type)
 
 ///////////////////////////////////////////////////////////////////////////////

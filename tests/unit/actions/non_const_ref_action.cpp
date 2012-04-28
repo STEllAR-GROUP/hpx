@@ -138,7 +138,7 @@ int main(int argc, char* argv[])
     // we need to explicitly enable the test components used by this test
     using namespace boost::assign;
     std::vector<std::string> cfg;
-    cfg += "hpx.components.test_non_const_ref_component.enabled = 1";
+    cfg += "hpx.components.non_const_ref_component.enabled = 1";
 
     // Initialize and run HPX.
     return init(desc_commandline, argc, argv, cfg);

@@ -186,10 +186,10 @@ namespace hpx { namespace components
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-/// The macro \a HPX_REGISTER_PLAIN_ACTION is used to create and to
-/// register a minimal factory for plain actions with Boost.Plugin.
+/// This macro is used to create and to register a minimal factory for plain
+/// actions with Boost.Plugin.
 #define HPX_REGISTER_PLAIN_ACTION_EX2(plain_action, plain_action_name,        \
-        enable_always)                                                        \
+        state)                                                                \
     BOOST_CLASS_EXPORT_KEY2(plain_action, BOOST_PP_STRINGIZE(plain_action_name))\
     HPX_REGISTER_ACTION_EX(plain_action, plain_action_name)                   \
     HPX_REGISTER_COMPONENT_FACTORY(                                           \
@@ -201,17 +201,19 @@ namespace hpx { namespace components
     template struct hpx::components::plain_component_factory<plain_action>;   \
     HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_EX(                               \
         hpx::components::server::plain_function<plain_action>,                \
-        plain_action_name, enable_always)                                     \
+        plain_action_name, state)                                             \
     HPX_DEFINE_GET_COMPONENT_TYPE(                                            \
         hpx::components::server::plain_function<plain_action>)                \
     /**/
 
 #define HPX_REGISTER_PLAIN_ACTION_EX(plain_action, plain_action_name)         \
-    HPX_REGISTER_PLAIN_ACTION_EX2(plain_action, plain_action_name, false)     \
+    HPX_REGISTER_PLAIN_ACTION_EX2(plain_action, plain_action_name,            \
+    ::hpx::components::factory_check)                                         \
     /**/
 
 #define HPX_REGISTER_PLAIN_ACTION(plain_action)                               \
-    HPX_REGISTER_PLAIN_ACTION_EX2(plain_action, plain_action, false)          \
+    HPX_REGISTER_PLAIN_ACTION_EX2(plain_action, plain_action,                 \
+    ::hpx::components::factory_check)                                         \
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -224,9 +226,9 @@ namespace hpx { namespace components
     HPX_DEFINE_PLAIN_ACTION(func, name);                                      \
     HPX_REGISTER_PLAIN_ACTION(name)                                           \
     /**/
-#define HPX_PLAIN_ACTION_EX(func, name, enable_always)                        \
+#define HPX_PLAIN_ACTION_EX(func, name, state)                                \
     HPX_DEFINE_PLAIN_ACTION(func, name);                                      \
-    HPX_REGISTER_PLAIN_ACTION_EX2(name, name, enable_always)                  \
+    HPX_REGISTER_PLAIN_ACTION_EX2(name, name, state)                          \
     /**/
 
 #endif

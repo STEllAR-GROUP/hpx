@@ -217,10 +217,10 @@ namespace hpx { namespace components
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-/// The macro \a HPX_REGISTER_MINIMAL_COMPONENT_FACTORY is used create and to
-/// register a minimal component factory with Boost.Plugin.
+/// This macro is used create and to register a minimal component factory with
+/// Boost.Plugin.
 #define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_EX(                            \
-            ComponentType, componentname, enable_always)                      \
+            ComponentType, componentname, state)                              \
         HPX_REGISTER_COMPONENT_FACTORY(                                       \
             hpx::components::component_factory<ComponentType>,                \
             componentname)                                                    \
@@ -229,13 +229,26 @@ namespace hpx { namespace components
             componentname)                                                    \
         template struct hpx::components::component_factory<ComponentType>;    \
         HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_EX(                           \
-            ComponentType, componentname, enable_always)                      \
+            ComponentType, componentname, state)                              \
     /**/
 
 #define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(ComponentType, componentname)  \
         HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_EX(                            \
-            ComponentType, componentname, false)                              \
+            ComponentType, componentname, ::hpx::components::factory_check)   \
+        HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)            \
+    /**/
+
+#define HPX_REGISTER_ENABLED_COMPONENT_FACTORY(ComponentType, componentname)  \
+        HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_EX(                            \
+            ComponentType, componentname, ::hpx::components::factory_enabled) \
+        HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)            \
+    /**/
+
+#define HPX_REGISTER_DISABLED_COMPONENT_FACTORY(ComponentType, componentname) \
+        HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_EX(                            \
+            ComponentType, componentname, ::hpx::components::factory_disabled)\
         HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)            \
     /**/
 
 #endif
+

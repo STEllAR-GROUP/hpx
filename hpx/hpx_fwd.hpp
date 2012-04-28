@@ -372,6 +372,13 @@ namespace hpx
     /// \namespace components
     namespace components
     {
+        enum factory_state_enum
+        {
+            factory_enabled  = 0,
+            factory_disabled = 1,
+            factory_check    = 2
+        };
+
         namespace detail
         {
             struct this_type {};

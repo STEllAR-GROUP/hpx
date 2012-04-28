@@ -552,10 +552,14 @@ using hpx::agas::notify_console_action;
 using hpx::agas::register_worker_action;
 using hpx::agas::notify_worker_action;
 
-HPX_REGISTER_PLAIN_ACTION_EX2(register_console_action, register_console_action, true)
-HPX_REGISTER_PLAIN_ACTION_EX2(notify_console_action, notify_console_action, true)
-HPX_REGISTER_PLAIN_ACTION_EX2(register_worker_action, register_worker_action, true)
-HPX_REGISTER_PLAIN_ACTION_EX2(notify_worker_action, notify_worker_action, true)
+HPX_REGISTER_PLAIN_ACTION_EX2(register_console_action,
+    register_console_action, hpx::components::factory_enabled)
+HPX_REGISTER_PLAIN_ACTION_EX2(notify_console_action,
+    notify_console_action, hpx::components::factory_enabled)
+HPX_REGISTER_PLAIN_ACTION_EX2(register_worker_action,
+    register_worker_action, hpx::components::factory_enabled)
+HPX_REGISTER_PLAIN_ACTION_EX2(notify_worker_action,
+    notify_worker_action, hpx::components::factory_enabled)
 
 namespace hpx { namespace agas
 {

@@ -21,7 +21,7 @@ using hpx::agas::server::component_namespace;
 
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_EX(
     hpx::components::fixed_component<component_namespace>,
-    component_namespace, true)
+    component_namespace, hpx::components::factory_enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     component_namespace, component_agas_component_namespace)
 

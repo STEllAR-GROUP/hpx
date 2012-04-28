@@ -140,18 +140,16 @@ namespace boost { namespace plugin
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-/// The macro \a HPX_REGISTER_COMPONENT_FACTORY is used to register the given
-/// component factory with Boost.Plugin. This macro has to be used for each of
-/// the component factories.
+/// This macro is used to register the given component factory with
+/// Boost.Plugin. This macro has to be used for each of the component factories.
 #define HPX_REGISTER_COMPONENT_FACTORY(FactoryType, componentname)            \
         BOOST_PLUGIN_EXPORT(HPX_COMPONENT_LIB_NAME,                           \
             hpx::components::component_factory_base, FactoryType,             \
             componentname, HPX_MANGLE_COMPONENT_NAME(factory))                \
     /**/
 
-/// The macro \a HPX_REGISTER_COMPONENT_MODULE is used to define the required
-/// Boost.Plugin entry points. This macro has to be used in exactly one
-/// compilation unit of a component module.
+/// This macro is used to define the required Boost.Plugin entry points. This
+/// macro has to be used in exactly one compilation unit of a component module.
 #define HPX_REGISTER_COMPONENT_MODULE()                                       \
         BOOST_PLUGIN_EXPORT_LIST(HPX_COMPONENT_LIB_NAME,                      \
             HPX_MANGLE_COMPONENT_NAME(factory))                               \
@@ -159,3 +157,4 @@ namespace boost { namespace plugin
     /**/
 
 #endif
+

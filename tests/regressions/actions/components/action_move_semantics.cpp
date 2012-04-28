@@ -21,17 +21,10 @@ typedef hpx::components::simple_component<action_move_semantics>
 // We use a special component registry for this component as it has to be
 // disabled by default. All tests requiring this component to be active will
 // enable it explicitly.
-
-HPX_REGISTER_COMPONENT_FACTORY(
-    hpx::components::component_factory<action_move_semantics_type>,
-    test_action_move_semantics)
-HPX_DEF_UNIQUE_COMPONENT_NAME(
-    hpx::components::component_factory<action_move_semantics_type>,
-    test_action_move_semantics)
-template struct hpx::components::component_factory<action_move_semantics_type>;
-HPX_REGISTER_TEST_COMPONENT_REGISTRY(
-    hpx::components::component_factory<action_move_semantics_type>,
-    test_action_move_semantics)
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_EX(
+    hpx::components::simple_component<action_move_semantics>,
+    action_move_semantics,
+    hpx::components::factory_disabled)
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION_EX(

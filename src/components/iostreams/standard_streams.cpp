@@ -22,8 +22,10 @@ typedef hpx::actions::plain_action0<hpx::iostreams::create_cout>
 typedef hpx::actions::plain_action0<hpx::iostreams::create_cerr>
     create_cerr_action;
 
-HPX_REGISTER_PLAIN_ACTION_EX2(create_cout_action, create_cout_action, true)
-HPX_REGISTER_PLAIN_ACTION_EX2(create_cerr_action, create_cerr_action, true)
+HPX_REGISTER_PLAIN_ACTION_EX2
+    (create_cout_action, create_cout_action, hpx::components::factory_enabled)
+HPX_REGISTER_PLAIN_ACTION_EX2
+    (create_cerr_action, create_cerr_action, hpx::components::factory_enabled)
 
 ///////////////////////////////////////////////////////////////////////////////
 // TODO: Use startup/shutdown functions to properly create hpx::cout and

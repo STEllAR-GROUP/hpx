@@ -20,7 +20,7 @@ typedef hpx::components::managed_component<
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY_EX(
     elapsed_time_counter_type, elapsed_time_counter,
-    "base_performance_counter", true)
+    "base_performance_counter", hpx::components::factory_enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(
     hpx::performance_counters::server::elapsed_time_counter)
 

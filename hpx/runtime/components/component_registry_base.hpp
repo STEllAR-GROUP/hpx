@@ -13,6 +13,7 @@
 #include <hpx/config.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
+// FIXME: Can we move this to config.hpp?
 #if !defined(HPX_COMPONENT_LIB_NAME)
 #define HPX_COMPONENT_LIB_NAME                                                \
         HPX_MANGLE_COMPONENT_NAME(HPX_COMPONENT_NAME)                         \
@@ -44,21 +45,20 @@ namespace hpx { namespace components
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-/// The macro \a HPX_REGISTER_COMPONENT_REGISTRY is used to register the given
-/// component factory with Boost.Plugin. This macro has to be used for each of
-/// the components.
+/// This macro is used to register the given component factory with
+/// Boost.Plugin. This macro has to be used for each of the components.
 #define HPX_REGISTER_COMPONENT_REGISTRY(RegistryType, componentname)          \
         BOOST_PLUGIN_EXPORT(HPX_COMPONENT_LIB_NAME,                           \
             hpx::components::component_registry_base, RegistryType,           \
             componentname, HPX_MANGLE_COMPONENT_NAME(registry))               \
     /**/
 
-/// The macro \a HPX_REGISTER_REGISTRY_MODULE is used to define the required
-/// Boost.Plugin entry points. This macro has to be used in exactly one
-/// compilation unit of a component module.
+/// This macro is used to define the required Boost.Plugin entry points. This
+/// macro has to be used in exactly one compilation unit of a component module.
 #define HPX_REGISTER_REGISTRY_MODULE()                                        \
         BOOST_PLUGIN_EXPORT_LIST(HPX_COMPONENT_LIB_NAME,                      \
             HPX_MANGLE_COMPONENT_NAME(registry))                              \
     /**/
 
 #endif
+
