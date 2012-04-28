@@ -82,18 +82,16 @@ include(HPX_FortranCompiler)
 ################################################################################
 # search path configuration
 ################################################################################
-# Don't use hpx_link_directories/hpx_include_directories to avoid passing paths
-# from the source tree to FindHPX.cmake
-include_directories(${hpx_SOURCE_DIR})
-include_directories(${hpx_SOURCE_DIR}/external/atomic)
-include_directories(${hpx_SOURCE_DIR}/external/cache)
-include_directories(${hpx_SOURCE_DIR}/external/coroutine)
-include_directories(${hpx_SOURCE_DIR}/external/endian)
-include_directories(${hpx_SOURCE_DIR}/external/logging)
-include_directories(${hpx_SOURCE_DIR}/external/lockfree)
-include_directories(${hpx_SOURCE_DIR}/external/plugin)
-include_directories(${hpx_SOURCE_DIR}/external/backtrace)
-link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
+hpx_include_directories(${hpx_SOURCE_DIR})
+hpx_include_directories(${hpx_SOURCE_DIR}/external/atomic)
+hpx_include_directories(${hpx_SOURCE_DIR}/external/cache)
+hpx_include_directories(${hpx_SOURCE_DIR}/external/coroutine)
+hpx_include_directories(${hpx_SOURCE_DIR}/external/endian)
+hpx_include_directories(${hpx_SOURCE_DIR}/external/logging)
+hpx_include_directories(${hpx_SOURCE_DIR}/external/lockfree)
+hpx_include_directories(${hpx_SOURCE_DIR}/external/plugin)
+hpx_include_directories(${hpx_SOURCE_DIR}/external/backtrace)
+hpx_link_directories(${CMAKE_BINARY_DIR}/lib/hpx)
 
 ################################################################################
 # Boost configuration
@@ -128,7 +126,7 @@ set(BOOST_LIBRARIES date_time
                     thread)
 
 if(${BOOST_MINOR_VERSION} LESS 49)
-  include_directories(${hpx_SOURCE_DIR}/external/serialization)
+  hpx_include_directories(${hpx_SOURCE_DIR}/external/serialization)
 endif()
 
 # Decide whether to use internal version of Boost.Chrono
@@ -140,9 +138,7 @@ endif()
 if(${HPX_INTERNAL_CHRONO})
   add_definitions(-DHPX_INTERNAL_CHRONO)
   add_definitions(-DBOOST_CHRONO_NO_LIB)
-  # Don't use hpx_link_directories/hpx_include_directories to avoid passing
-  # paths from the source tree to FindHPX.cmake
-  include_directories(${hpx_SOURCE_DIR}/external/chrono)
+  hpx_include_directories(${hpx_SOURCE_DIR}/external/chrono)
 else()
   set(BOOST_LIBRARIES ${BOOST_LIBRARIES} chrono)
 endif()
@@ -155,16 +151,14 @@ endif()
 
 if(${HPX_INTERNAL_MOVE})
   add_definitions(-DHPX_INTERNAL_MOVE)
-  # Don't use hpx_link_directories/hpx_include_directories to avoid passing
-  # paths from the source tree to FindHPX.cmake.
-  include_directories(${hpx_SOURCE_DIR}/external/move)
+  hpx_include_directories(${hpx_SOURCE_DIR}/external/move)
 endif()
 
 # We have a patched version of FindBoost loosely based on the one that Kitware ships
 find_package(HPX_Boost)
 
-hpx_include_directories(${BOOST_INCLUDE_DIR})
-hpx_link_directories(${BOOST_LIBRARY_DIR})
+hpx_include_sys_directories(${BOOST_INCLUDE_DIR})
+hpx_link_sys_directories(${BOOST_LIBRARY_DIR})
 
 # Boost preprocessor definitions
 add_definitions(-DBOOST_PARAMETER_MAX_ARITY=7)
@@ -356,8 +350,8 @@ find_package(HPX_PAPI)
 ################################################################################
 find_package(HPX_Hwloc)
 if(HWLOC_FOUND)
-  hpx_include_directories(${HWLOC_INCLUDE_DIR})
-  hpx_link_directories(${HWLOC_LIBRARY_DIR})
+  hpx_include_sys_directories(${HWLOC_INCLUDE_DIR})
+  hpx_link_sys_directories(${HWLOC_LIBRARY_DIR})
   add_definitions(-DHPX_HAVE_HWLOC)
   set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${HWLOC_LIBRARY})
 endif()
@@ -893,8 +887,8 @@ else()
     find_package(HPX_GooglePerftools)
     if(GOOGLE_PERFTOOLS_FOUND AND HPX_GOOGLE_PERFTOOLS)
       set(hpx_LIBRARIES ${hpx_LIBRARIES} ${GOOGLE_PERFTOOLS_LIBRARY})
-      hpx_include_directories(${GOOGLE_PERFTOOLS_INCLUDE_DIR})
-      hpx_link_directories(${GOOGLE_PERFTOOLS_LIBRARY_DIR})
+      hpx_include_sys_directories(${GOOGLE_PERFTOOLS_INCLUDE_DIR})
+      hpx_link_sys_directories(${GOOGLE_PERFTOOLS_LIBRARY_DIR})
       add_definitions(-DHPX_GOOGLE_PERFTOOLS)
     else()
       set(GOOGLE_PERFTOOLS_LIBRARY "")
@@ -926,15 +920,15 @@ else()
         hpx_info("malloc" "Using tcmalloc allocator.")
         set(hpx_MALLOC_LIBRARY ${TCMALLOC_LIBRARY})
         set(hpx_LIBRARIES ${hpx_LIBRARIES} ${TCMALLOC_LIBRARY})
-        hpx_include_directories(${TCMALLOC_INCLUDE_DIR})
-        hpx_link_directories(${TCMALLOC_LIBRARY_DIR})
+        hpx_include_sys_directories(${TCMALLOC_INCLUDE_DIR})
+        hpx_link_sys_directories(${TCMALLOC_LIBRARY_DIR})
         add_definitions(-DHPX_TCMALLOC)
       else()
         hpx_info("malloc" "Using jemalloc allocator.")
         set(hpx_MALLOC_LIBRARY ${JEMALLOC_LIBRARY})
         set(hpx_LIBRARIES ${hpx_LIBRARIES} ${JEMALLOC_LIBRARY})
-        hpx_include_directories(${JEMALLOC_INCLUDE_DIR})
-        hpx_link_directories(${JEMALLOC_LIBRARY_DIR})
+        hpx_include_sys_directories(${JEMALLOC_INCLUDE_DIR})
+        hpx_link_sys_directories(${JEMALLOC_LIBRARY_DIR})
         add_definitions(-DHPX_JEMALLOC)
       endif()
 
@@ -975,7 +969,7 @@ hpx_option(HPX_BUILD_EXAMPLES BOOL "Build HPX examples (default: ON)" ON ADVANCE
 
 if(HPX_BUILD_EXAMPLES)
   add_hpx_pseudo_target(examples)
-  include_directories(examples)
+  hpx_include_directories(examples)
   add_subdirectory(examples)
 endif()
 
@@ -987,7 +981,7 @@ if(HPX_BUILD_TESTS)
   hpx_option(HPX_BUILD_TESTS_UNIT BOOL "Build HPX unit tests (default: ON)" ON ADVANCED)
 
   add_hpx_pseudo_target(tests)
-  include_directories(tests)
+  hpx_include_directories(tests)
   add_subdirectory(tests)
 else()
   unset(HPX_BUILD_TESTS_BENCHMARKS CACHE)

@@ -12,6 +12,15 @@ if(NOT HPX_UTILS_LOADED)
 endif()
 
 macro(hpx_link_directories)
+  if(HPX_NO_INSTALL)
+    # Don't use hpx_link_directories to avoid passing paths from the source
+    # tree to FindHPX.cmake.
+    set(HPX_LINK_DIRECTORIES ${HPX_LINK_DIRECTORIES} ${ARGN})
+  endif()
+  link_directories(${ARGN})
+endmacro()
+
+macro(hpx_link_sys_directories)
   set(HPX_LINK_DIRECTORIES ${HPX_LINK_DIRECTORIES} ${ARGN})
   link_directories(${ARGN})
 endmacro()
