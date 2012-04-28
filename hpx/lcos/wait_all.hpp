@@ -118,10 +118,10 @@ namespace hpx
                 // all futures should be ready
                 BOOST_ASSERT(ready_count_ == lazy_values_.size());
 
-              // reset all pending callback functions
-              l.unlock();
-              for (std::size_t i = 0; i < lazy_values_.size(); ++i)
-                  lazy_values_[i].when();
+                // reset all pending callback functions
+                l.unlock();
+                for (std::size_t i = 0; i < lazy_values_.size(); ++i)
+                    lazy_values_[i].when();
 
                 return lazy_values_;
             }

@@ -12,7 +12,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/traits.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/lcos/packaged_task.hpp>
+#include <hpx/lcos/packaged_action.hpp>
 #include <hpx/lcos/future.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -26,13 +26,53 @@ namespace hpx
         >::type,
         typename hpx::actions::extract_action<Action>::result_type
     >
-    async (naming::id_type const& gid)
+    async (BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
-        return lcos::packaged_task<action_type>(gid).get_future();
+        lcos::packaged_action<action_type> p;
+        if (policy & launch::async)
+            p.apply(gid);
+        return p.get_future();
+    }
+
+    template <typename Action>
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Action>::result_type
+        >::type,
+        typename hpx::actions::extract_action<Action>::result_type
+    >
+    async (naming::id_type const& gid)
+    {
+        return async<Action>(launch::all, gid);
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename Action>
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Action>::result_type
+        >::type,
+        typename hpx::actions::extract_action<Action>::result_type
+    >
+    async_callback (BOOST_SCOPED_ENUM(launch) policy,
+        HPX_STD_FUNCTION<void(lcos::future<typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Action>::result_type
+        >::type>)> const& data_sink, naming::id_type const& gid)
+    {
+        typedef typename hpx::actions::extract_action<Action>::type action_type;
+        typedef typename traits::promise_local_result<
+            typename action_type::result_type
+        >::type result_type;
+        typedef lcos::packaged_action<action_type, result_type>
+            packaged_action_type;
+
+        packaged_action_type p(data_sink);
+        if (policy & launch::async)
+            p.apply(gid);
+        return p.get_future();
+    }
+
     template <typename Action>
     lcos::future<
         typename traits::promise_local_result<
@@ -45,13 +85,7 @@ namespace hpx
             typename hpx::actions::extract_action<Action>::result_type
         >::type>)> const& data_sink, naming::id_type const& gid)
     {
-        typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename traits::promise_local_result<
-            typename action_type::result_type
-        >::type result_type;
-        typedef lcos::packaged_task<action_type, result_type> future_type;
-
-        return future_type(gid, data_sink).get_future();
+        return async_callback<Action>(launch::all, data_sink, gid);
     }
 }
 
@@ -99,17 +133,60 @@ namespace hpx
         >::type,
         typename hpx::actions::extract_action<Action>::result_type
     >
-    async (naming::id_type const& gid, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+    async (BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
+        BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
             typename action_type::result_type
         >::type result_type;
-        typedef lcos::packaged_task<action_type, result_type> packaged_task_type;
+        typedef lcos::packaged_action<action_type, result_type>
+            packaged_action_type;
 
-        return packaged_task_type(
-            gid, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)
-        ).get_future();
+        packaged_action_type p;
+        if (policy & launch::async)
+            p.apply(gid, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+        return p.get_future();
+    }
+
+    template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Action>::result_type
+        >::type,
+        typename hpx::actions::extract_action<Action>::result_type
+    >
+    async (naming::id_type const& gid, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+    {
+        return async<Action>(launch::all, gid,
+            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    lcos::future<
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Action>::result_type
+        >::type,
+        typename hpx::actions::extract_action<Action>::result_type
+    >
+    async_callback (BOOST_SCOPED_ENUM(launch) policy,
+        HPX_STD_FUNCTION<void(lcos::future<typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Action>::result_type
+        >::type>)> const& data_sink, naming::id_type const& gid,
+        BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+    {
+        typedef typename hpx::actions::extract_action<Action>::type action_type;
+        typedef typename traits::promise_local_result<
+            typename action_type::result_type
+        >::type result_type;
+        typedef lcos::packaged_action<action_type, result_type>
+            packaged_action_type;
+
+        packaged_action_type p(data_sink);
+        if (policy & launch::async)
+            p.apply(gid, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+        return p.get_future();
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
@@ -125,15 +202,8 @@ namespace hpx
         >::type>)> const& data_sink, naming::id_type const& gid,
         BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
-        typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename traits::promise_local_result<
-            typename action_type::result_type
-        >::type result_type;
-        typedef lcos::packaged_task<action_type, result_type> packaged_task_type;
-
-        return packaged_task_type(gid, data_sink,
-            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)
-        ).get_future();
+        return async_callback<Action>(launch::all, gid,
+            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 }
 

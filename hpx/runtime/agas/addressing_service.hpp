@@ -157,7 +157,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     // }}}
 
     typedef boost::lockfree::fifo<
-        lcos::packaged_task<server::primary_namespace::service_action>*
+        lcos::packaged_action<server::primary_namespace::service_action>*
     > promise_pool_type;
 
     typedef util::merging_map<naming::gid_type, boost::int64_t>

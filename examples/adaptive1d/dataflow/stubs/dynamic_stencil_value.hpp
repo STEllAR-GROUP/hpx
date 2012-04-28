@@ -35,8 +35,9 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
             typedef adaptive1d::server::dynamic_stencil_value::call_action action_type;
-            return lcos::packaged_task<action_type, naming::id_type>(
-                targetgid, initial).get_future();
+            lcos::packaged_action<action_type, naming::id_type> p;
+            p.async(targetgid, initial);
+            return p.get_future();
         }
 
         static naming::id_type call(naming::id_type const& targetgid,

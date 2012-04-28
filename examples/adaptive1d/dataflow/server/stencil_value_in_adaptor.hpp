@@ -10,7 +10,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/lcos/packaged_task.hpp>
+#include <hpx/lcos/packaged_action.hpp>
 
 #include "stencil_value_out_adaptor.hpp"
 
@@ -18,7 +18,7 @@
 namespace hpx { namespace components { namespace adaptive1d { namespace server
 {
     class stencil_value_in_adaptor
-      : public lcos::packaged_task<
+      : public lcos::packaged_action<
             stencil_value_out_adaptor::get_value_action,
             naming::id_type
         >

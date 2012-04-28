@@ -208,8 +208,10 @@ namespace hpx { namespace components { namespace stubs
                 // moving objects.
                 boost::uint32_t locality_id = naming::get_locality_id_from_gid(gid);
                 naming::id_type id = naming::get_id_from_locality_id(locality_id);
-                lcos::packaged_task<action_type, void>(id, type, gid, count)
-                    .get_future().get();
+
+                lcos::packaged_action<action_type, void> p;
+                p.apply(id, type, gid, count);
+                p.get_future().get();
             }
         }
 
@@ -330,8 +332,10 @@ namespace hpx { namespace components { namespace stubs
         {
             typedef server::runtime_support::create_performance_counter_action
                 action_type;
-            return lcos::packaged_task<action_type, naming::gid_type>(
-                targetgid, info).get_future();
+
+            lcos::packaged_action<action_type, naming::gid_type> p;
+            p.apply(targetgid, info);
+            return p.get_future();
         }
 
         static naming::gid_type

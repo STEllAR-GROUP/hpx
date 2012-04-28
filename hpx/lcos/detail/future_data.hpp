@@ -460,21 +460,21 @@ namespace hpx { namespace lcos { namespace detail
         {}
 
         // retrieving the value
-        result_type get(error_code& ec = throws)
+        result_type get_data(error_code& ec = throws)
         {
             if (!started_)
-                run(ec);
+                run();
 
-            return boost::move(this->get_data(ec));
+            return boost::move(this->future_data<Result>::get_data(ec));
         }
 
         // moving out the value
-        result_type move(error_code& ec = throws)
+        result_type move_data(error_code& ec = throws)
         {
             if (!started_)
-                run(ec);
+                run();
 
-            return boost::move(this->move_data(ec));
+            return boost::move(this->future_data<Result>::move_data(ec));
         }
 
     private:

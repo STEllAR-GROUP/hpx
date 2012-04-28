@@ -5,8 +5,8 @@
 
 #ifndef BOOST_PP_IS_ITERATING
 
-#if !defined(HPX_LCOS_PACKAGED_TASK_CONSTRUCTORS_DIRECT_JUL_01_2008_0116PM)
-#define HPX_LCOS_PACKAGED_TASK_CONSTRUCTORS_DIRECT_JUL_01_2008_0116PM
+#if !defined(HPX_LCOS_PACKAGED_ACTION_CONSTRUCTORS_DIRECT_JUL_01_2008_0116PM)
+#define HPX_LCOS_PACKAGED_ACTION_CONSTRUCTORS_DIRECT_JUL_01_2008_0116PM
 
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repeat.hpp>
@@ -25,7 +25,7 @@
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (2, HPX_ACTION_ARGUMENT_LIMIT,                                        \
-    "hpx/lcos/packaged_task_constructors_direct.hpp"))                        \
+    "hpx/lcos/packaged_action_constructors_direct.hpp"))                      \
     /**/
 
 #include BOOST_PP_ITERATE()
@@ -65,11 +65,11 @@
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    packaged_task(naming::id_type const& gid,
+    packaged_action(naming::id_type const& gid,
             BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
-      : apply_logger_("packaged_task_direct::apply")
+      : apply_logger_("packaged_action_direct::apply")
     {
-        LLCO_(info) << "packaged_task::packaged_task("
+        LLCO_(info) << "packaged_action::packaged_action("
                     << hpx::actions::detail::get_action_name<action_type>()
                     << ", "
                     << gid
@@ -78,13 +78,13 @@
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    packaged_task(naming::id_type const& gid,
+    packaged_action(naming::id_type const& gid,
             completed_callback_type const& data_sink,
             BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
       : base_type(data_sink),
-        apply_logger_("packaged_task_direct::apply")
+        apply_logger_("packaged_action_direct::apply")
     {
-        LLCO_(info) << "packaged_task::packaged_task("
+        LLCO_(info) << "packaged_action::packaged_action("
                     << hpx::actions::detail::get_action_name<action_type>()
                     << ", "
                     << gid

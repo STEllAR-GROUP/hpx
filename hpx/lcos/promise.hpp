@@ -364,7 +364,7 @@ namespace hpx { namespace lcos
             if (future_obtained_) {
                 HPX_THROWS_IF(ec, future_already_retrieved,
                     "promise<Result>::get_future",
-                    "future already has been retrieved from this packaged_task");
+                    "future already has been retrieved from this packaged_action");
                 return lcos::future<Result, RemoteResult>();
             }
 
@@ -474,7 +474,7 @@ namespace hpx { namespace lcos
             if (future_obtained_) {
                 HPX_THROWS_IF(ec, future_already_retrieved,
                     "promise<void>::get_future",
-                    "future already has been retrieved from this packaged_task");
+                    "future already has been retrieved from this packaged_action");
                 return lcos::future<void>();
             }
 

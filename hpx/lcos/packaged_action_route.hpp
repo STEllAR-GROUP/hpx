@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_PACKAGED_TASK_ROUTE_JUN_27_2008_0420PM)
-#define HPX_LCOS_PACKAGED_TASK_ROUTE_JUN_27_2008_0420PM
+#if !defined(HPX_LCOS_PACKAGED_ACTION_ROUTE_JUN_27_2008_0420PM)
+#define HPX_LCOS_PACKAGED_ACTION_ROUTE_JUN_27_2008_0420PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
@@ -30,21 +30,21 @@
 namespace hpx { namespace lcos
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// A packaged_task can be used by a single \a thread to invoke a
+    /// A packaged_action can be used by a single \a thread to invoke a
     /// (remote) action and wait for the result. The result is expected to be
-    /// sent back to the packaged_task using the LCO's set_event action
+    /// sent back to the packaged_action using the LCO's set_event action
     ///
-    /// A packaged_task is one of the simplest synchronization primitives
+    /// A packaged_action is one of the simplest synchronization primitives
     /// provided by HPX. It allows to synchronize on a eager evaluated remote
     /// operation returning a result of the type \a Result.
     ///
     /// \tparam Action   The template parameter \a Action defines the action
-    ///                  to be executed by this packaged_task instance. The
+    ///                  to be executed by this packaged_action instance. The
     ///                  arguments \a arg0,... \a argN are used as parameters
     ///                  for this action.
     /// \tparam Result   The template parameter \a Result defines the type this
-    ///                  packaged_task is expected to return from
-    ///                  \a packaged_task#get.
+    ///                  packaged_action is expected to return from
+    ///                  \a packaged_action#get.
     /// \tparam DirectExecute The template parameter \a DirectExecute is an
     ///                  optimization aid allowing to execute the action
     ///                  directly if the target is local (without spawning a
@@ -52,16 +52,16 @@ namespace hpx { namespace lcos
     ///                  supplied explicitly as it is derived from the template
     ///                  parameter \a Action.
     ///
-    /// \note            The action executed using the packaged_task as a
+    /// \note            The action executed using the packaged_action as a
     ///                  continuation must return a value of a type convertible
     ///                  to the type as specified by the template parameter
     ///                  \a Result.
     template <typename Action, typename Result, typename DirectExecute>
-    class packaged_task_route;
+    class packaged_action_route;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Result>
-    class packaged_task_route<Action, Result, boost::mpl::false_>
+    class packaged_action_route<Action, Result, boost::mpl::false_>
       : public promise<Result, typename Action::result_type>
     {
     private:
@@ -72,15 +72,15 @@ namespace hpx { namespace lcos
         struct profiler_tag {};
 
     public:
-        /// Construct a (non-functional) instance of an \a packaged_task. To use
+        /// Construct a (non-functional) instance of an \a packaged_action. To use
         /// this instance its member function \a apply needs to be directly
         /// called.
-        packaged_task_route(completed_callback_type const& data_sink,
+        packaged_action_route(completed_callback_type const& data_sink,
                 error_callback_type const& error_sink = error_callback_type())
           : base_type(data_sink, error_sink),
-            apply_logger_("packaged_task::apply")
+            apply_logger_("packaged_action::apply")
         {
-            LLCO_(info) << "packaged_task::packaged_task("
+            LLCO_(info) << "packaged_action::packaged_action("
                         << hpx::actions::detail::get_action_name<Action>()
                         << ") args(0)";
         }
@@ -102,10 +102,10 @@ namespace hpx { namespace lcos
             hpx::applier::apply_c_p_route<Action>(this->get_gid(), gid, priority);
         }
 
-        /// Construct a new \a packaged_task instance. The \a thread
-        /// supplied to the function \a packaged_task#get will be
+        /// Construct a new \a packaged_action instance. The \a thread
+        /// supplied to the function \a packaged_action#get will be
         /// notified as soon as the result of the operation associated with
-        /// this packaged_task instance has been returned.
+        /// this packaged_action instance has been returned.
         ///
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
@@ -115,28 +115,28 @@ namespace hpx { namespace lcos
         ///               \a base_lco#set_value action. Any error has to be
         ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
-        ///               packaged_task instance (as it has to be sent along
+        ///               packaged_action instance (as it has to be sent along
         ///               with the action as the continuation parameter).
-        packaged_task_route(naming::gid_type const& gid,
+        packaged_action_route(naming::gid_type const& gid,
                 completed_callback_type const& data_sink,
                 error_callback_type const& error_sink = error_callback_type())
           : base_type(data_sink, error_sink),
-            apply_logger_("packaged_task::apply")
+            apply_logger_("packaged_action::apply")
         {
-            LLCO_(info) << "packaged_task::packaged_task("
+            LLCO_(info) << "packaged_action::packaged_action("
                         << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
                         << ") args(0)";
             apply(naming::id_type(gid, naming::id_type::unmanaged));
         }
-        packaged_task_route(naming::id_type const& gid,
+        packaged_action_route(naming::id_type const& gid,
                 completed_callback_type const& data_sink,
                 error_callback_type const& error_sink = error_callback_type())
           : base_type(data_sink, error_sink),
-            apply_logger_("packaged_task::apply")
+            apply_logger_("packaged_action::apply")
         {
-            LLCO_(info) << "packaged_task::packaged_task("
+            LLCO_(info) << "packaged_action::packaged_action("
                         << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
@@ -144,26 +144,26 @@ namespace hpx { namespace lcos
             apply(gid);
         }
 
-        packaged_task_route(naming::gid_type const& gid,
+        packaged_action_route(naming::gid_type const& gid,
                 completed_callback_type const& data_sink,
                 error_callback_type const& error_sink,
                 threads::thread_priority priority)
-          : apply_logger_("packaged_task::apply")
+          : apply_logger_("packaged_action::apply")
         {
-            LLCO_(info) << "packaged_task::packaged_task("
+            LLCO_(info) << "packaged_action::packaged_action("
                         << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
                         << ") args(0)";
             apply_p(naming::id_type(gid, naming::id_type::unmanaged), priority);
         }
-        packaged_task_route(naming::id_type const& gid,
+        packaged_action_route(naming::id_type const& gid,
                 completed_callback_type const& data_sink,
                 error_callback_type const& error_sink,
                 threads::thread_priority priority)
-          : apply_logger_("packaged_task::apply")
+          : apply_logger_("packaged_action::apply")
         {
-            LLCO_(info) << "packaged_task::packaged_task("
+            LLCO_(info) << "packaged_action::packaged_action("
                         << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
@@ -194,10 +194,10 @@ namespace hpx { namespace lcos
                 this->get_gid(), gid, priority, arg0);
         }
 
-        /// Construct a new \a packaged_task instance. The \a thread
-        /// supplied to the function \a packaged_task#get will be
+        /// Construct a new \a packaged_action instance. The \a thread
+        /// supplied to the function \a packaged_action#get will be
         /// notified as soon as the result of the operation associated with
-        /// this packaged_task instance has been returned.
+        /// this packaged_action instance has been returned.
         ///
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
@@ -209,16 +209,16 @@ namespace hpx { namespace lcos
         ///               \a base_lco#set_value action. Any error has to be
         ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
-        ///               packaged_task instance (as it has to be sent along
+        ///               packaged_action instance (as it has to be sent along
         ///               with the action as the continuation parameter).
         template <typename Arg0>
-        packaged_task_route(naming::gid_type const& gid,
+        packaged_action_route(naming::gid_type const& gid,
                 completed_callback_type const& data_sink,
                 Arg0 const& arg0)
           : base_type(data_sink),
-            apply_logger_("packaged_task::apply")
+            apply_logger_("packaged_action::apply")
         {
-            LLCO_(info) << "packaged_task::packaged_task("
+            LLCO_(info) << "packaged_action::packaged_action("
                         << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
@@ -226,13 +226,13 @@ namespace hpx { namespace lcos
             apply(naming::id_type(gid, naming::id_type::unmanaged), arg0);
         }
         template <typename Arg0>
-        packaged_task_route(naming::id_type const& gid,
+        packaged_action_route(naming::id_type const& gid,
                 completed_callback_type const& data_sink,
                 Arg0 const& arg0)
           : base_type(data_sink),
-            apply_logger_("packaged_task::apply")
+            apply_logger_("packaged_action::apply")
         {
-            LLCO_(info) << "packaged_task::packaged_task("
+            LLCO_(info) << "packaged_action::packaged_action("
                         << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
@@ -241,14 +241,14 @@ namespace hpx { namespace lcos
         }
 
         template <typename Arg0>
-        packaged_task_route(naming::gid_type const& gid,
+        packaged_action_route(naming::gid_type const& gid,
                 completed_callback_type const& data_sink,
                 error_callback_type const& error_sink,
                 Arg0 const& arg0)
           : base_type(data_sink, error_sink),
-            apply_logger_("packaged_task::apply")
+            apply_logger_("packaged_action::apply")
         {
-            LLCO_(info) << "packaged_task::packaged_task("
+            LLCO_(info) << "packaged_action::packaged_action("
                         << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
@@ -256,14 +256,14 @@ namespace hpx { namespace lcos
             apply(naming::id_type(gid, naming::id_type::unmanaged), arg0);
         }
         template <typename Arg0>
-        packaged_task_route(naming::id_type const& gid,
+        packaged_action_route(naming::id_type const& gid,
                 completed_callback_type const& data_sink,
                 error_callback_type const& error_sink,
                 Arg0 const& arg0)
           : base_type(data_sink, error_sink),
-            apply_logger_("packaged_task::apply")
+            apply_logger_("packaged_action::apply")
         {
-            LLCO_(info) << "packaged_task::packaged_task("
+            LLCO_(info) << "packaged_action::packaged_action("
                         << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
@@ -272,13 +272,13 @@ namespace hpx { namespace lcos
         }
 
         template <typename Arg0>
-        packaged_task_route(naming::gid_type const& gid,
+        packaged_action_route(naming::gid_type const& gid,
                 completed_callback_type const& data_sink,
                 threads::thread_priority priority, Arg0 const& arg0)
           : base_type(data_sink),
-            apply_logger_("packaged_task::apply")
+            apply_logger_("packaged_action::apply")
         {
-            LLCO_(info) << "packaged_task::packaged_task("
+            LLCO_(info) << "packaged_action::packaged_action("
                         << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
@@ -287,13 +287,13 @@ namespace hpx { namespace lcos
                 priority, arg0);
         }
         template <typename Arg0>
-        packaged_task_route(naming::id_type const& gid,
+        packaged_action_route(naming::id_type const& gid,
                 completed_callback_type const& data_sink,
                 threads::thread_priority priority, Arg0 const& arg0)
           : base_type(data_sink),
-            apply_logger_("packaged_task::apply")
+            apply_logger_("packaged_action::apply")
         {
-            LLCO_(info) << "packaged_task::packaged_task("
+            LLCO_(info) << "packaged_action::packaged_action("
                         << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
@@ -302,14 +302,14 @@ namespace hpx { namespace lcos
         }
 
         template <typename Arg0>
-        packaged_task_route(naming::gid_type const& gid,
+        packaged_action_route(naming::gid_type const& gid,
                 completed_callback_type const& data_sink,
                 error_callback_type const& error_sink,
                 threads::thread_priority priority, Arg0 const& arg0)
           : base_type(data_sink, error_sink),
-            apply_logger_("packaged_task::apply")
+            apply_logger_("packaged_action::apply")
         {
-            LLCO_(info) << "packaged_task::packaged_task("
+            LLCO_(info) << "packaged_action::packaged_action("
                         << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
@@ -318,14 +318,14 @@ namespace hpx { namespace lcos
                 priority, arg0);
         }
         template <typename Arg0>
-        packaged_task_route(naming::id_type const& gid,
+        packaged_action_route(naming::id_type const& gid,
                 completed_callback_type const& data_sink,
                 error_callback_type const& error_sink,
                 threads::thread_priority priority, Arg0 const& arg0)
           : base_type(data_sink, error_sink),
-            apply_logger_("packaged_task::apply")
+            apply_logger_("packaged_action::apply")
         {
-            LLCO_(info) << "packaged_task::packaged_task("
+            LLCO_(info) << "packaged_action::packaged_action("
                         << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
@@ -334,14 +334,14 @@ namespace hpx { namespace lcos
         }
 
         // pull in remaining constructors
-        #include <hpx/lcos/packaged_task_route_constructors.hpp>
+        #include <hpx/lcos/packaged_action_route_constructors.hpp>
 
         util::block_profiler<profiler_tag> apply_logger_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Result>
-    class packaged_task_route<Action, Result, boost::mpl::true_>
+    class packaged_action_route<Action, Result, boost::mpl::true_>
       : public promise<Result, typename Action::result_type>
     {
     private:
@@ -352,15 +352,15 @@ namespace hpx { namespace lcos
         struct profiler_tag {};
 
     public:
-        /// Construct a (non-functional) instance of an \a packaged_task. To use
+        /// Construct a (non-functional) instance of an \a packaged_action. To use
         /// this instance its member function \a apply needs to be directly
         /// called.
-        packaged_task_route(completed_callback_type const& data_sink,
+        packaged_action_route(completed_callback_type const& data_sink,
                 error_callback_type const& error_sink = error_callback_type())
           : base_type(data_sink, error_sink),
-            apply_logger_("packaged_task_direct::apply")
+            apply_logger_("packaged_action_direct::apply")
         {
-            LLCO_(info) << "packaged_task::packaged_task("
+            LLCO_(info) << "packaged_action::packaged_action("
                         << hpx::actions::detail::get_action_name<Action>()
                         << ") args(0)";
         }
@@ -389,10 +389,10 @@ namespace hpx { namespace lcos
             }
         }
 
-        /// Construct a new \a packaged_task instance. The \a thread
-        /// supplied to the function \a packaged_task#get will be
+        /// Construct a new \a packaged_action instance. The \a thread
+        /// supplied to the function \a packaged_action#get will be
         /// notified as soon as the result of the operation associated with
-        /// this packaged_task instance has been returned.
+        /// this packaged_action instance has been returned.
         ///
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
@@ -402,28 +402,28 @@ namespace hpx { namespace lcos
         ///               \a base_lco#set_value action. Any error has to be
         ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
-        ///               packaged_task instance (as it has to be sent along
+        ///               packaged_action instance (as it has to be sent along
         ///               with the action as the continuation parameter).
-        packaged_task_route(naming::gid_type const& gid,
+        packaged_action_route(naming::gid_type const& gid,
                 completed_callback_type const& data_sink,
                 error_callback_type const& error_sink = error_callback_type())
           : base_type(data_sink, error_sink),
-            apply_logger_("packaged_task_direct::apply")
+            apply_logger_("packaged_action_direct::apply")
         {
-            LLCO_(info) << "packaged_task::packaged_task("
+            LLCO_(info) << "packaged_action::packaged_action("
                         << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
                         << ") args(0)";
             apply(naming::id_type(gid, naming::id_type::unmanaged));
         }
-        packaged_task_route(naming::id_type const& gid,
+        packaged_action_route(naming::id_type const& gid,
                 completed_callback_type const& data_sink,
                 error_callback_type const& error_sink = error_callback_type())
           : base_type(data_sink, error_sink),
-            apply_logger_("packaged_task_direct::apply")
+            apply_logger_("packaged_action_direct::apply")
         {
-            LLCO_(info) << "packaged_task::packaged_task("
+            LLCO_(info) << "packaged_action::packaged_action("
                         << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
@@ -458,10 +458,10 @@ namespace hpx { namespace lcos
             }
         }
 
-        /// Construct a new \a packaged_task instance. The \a thread
-        /// supplied to the function \a packaged_task#get will be
+        /// Construct a new \a packaged_action instance. The \a thread
+        /// supplied to the function \a packaged_action#get will be
         /// notified as soon as the result of the operation associated with
-        /// this packaged_task instance has been returned.
+        /// this packaged_action instance has been returned.
         ///
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
@@ -473,16 +473,16 @@ namespace hpx { namespace lcos
         ///               \a base_lco#set_value action. Any error has to be
         ///               reported using a \a base_lco::set_exception action. The
         ///               target for either of these actions has to be this
-        ///               packaged_task instance (as it has to be sent along
+        ///               packaged_action instance (as it has to be sent along
         ///               with the action as the continuation parameter).
         template <typename Arg0>
-        packaged_task_route(naming::gid_type const& gid,
+        packaged_action_route(naming::gid_type const& gid,
                 completed_callback_type const& data_sink,
                 Arg0 const& arg0)
           : base_type(data_sink),
-            apply_logger_("packaged_task_direct::apply")
+            apply_logger_("packaged_action_direct::apply")
         {
-            LLCO_(info) << "packaged_task::packaged_task("
+            LLCO_(info) << "packaged_action::packaged_action("
                         << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
@@ -490,13 +490,13 @@ namespace hpx { namespace lcos
             apply(naming::id_type(gid, naming::id_type::unmanaged), arg0);
         }
         template <typename Arg0>
-        packaged_task_route(naming::id_type const& gid,
+        packaged_action_route(naming::id_type const& gid,
                 completed_callback_type const& data_sink,
                 Arg0 const& arg0)
           : base_type(data_sink),
-            apply_logger_("packaged_task_direct::apply")
+            apply_logger_("packaged_action_direct::apply")
         {
-            LLCO_(info) << "packaged_task::packaged_task("
+            LLCO_(info) << "packaged_action::packaged_action("
                         << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
@@ -505,14 +505,14 @@ namespace hpx { namespace lcos
         }
 
         template <typename Arg0>
-        packaged_task_route(naming::gid_type const& gid,
+        packaged_action_route(naming::gid_type const& gid,
                 completed_callback_type const& data_sink,
                 error_callback_type const& error_sink,
                 Arg0 const& arg0)
           : base_type(data_sink, error_sink),
-            apply_logger_("packaged_task_direct::apply")
+            apply_logger_("packaged_action_direct::apply")
         {
-            LLCO_(info) << "packaged_task::packaged_task("
+            LLCO_(info) << "packaged_action::packaged_action("
                         << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
@@ -520,14 +520,14 @@ namespace hpx { namespace lcos
             apply(naming::id_type(gid, naming::id_type::unmanaged), arg0);
         }
         template <typename Arg0>
-        packaged_task_route(naming::id_type const& gid,
+        packaged_action_route(naming::id_type const& gid,
                 completed_callback_type const& data_sink,
                 error_callback_type const& error_sink,
                 Arg0 const& arg0)
           : base_type(data_sink, error_sink),
-            apply_logger_("packaged_task_direct::apply")
+            apply_logger_("packaged_action_direct::apply")
         {
-            LLCO_(info) << "packaged_task::packaged_task("
+            LLCO_(info) << "packaged_action::packaged_action("
                         << hpx::actions::detail::get_action_name<Action>()
                         << ", "
                         << gid
@@ -536,7 +536,7 @@ namespace hpx { namespace lcos
         }
 
         // pull in remaining constructors
-        #include <hpx/lcos/packaged_task_route_constructors_direct.hpp>
+        #include <hpx/lcos/packaged_action_route_constructors_direct.hpp>
 
         util::block_profiler<profiler_tag> apply_logger_;
     };

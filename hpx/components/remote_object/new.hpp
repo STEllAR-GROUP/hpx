@@ -41,16 +41,18 @@ namespace hpx { namespace components
     lcos::future<object<T> >
     new_(naming::id_type const & target_id)
     {
-        return
-            lcos::packaged_task<
-                remote_object::new_impl_action
-              , object<T>
-            >(
-                target_id
-              , target_id
-              , remote_object::ctor_fun<T>()
-              , remote_object::dtor_fun<T>()
-            ).get_future();
+        lcos::packaged_action<
+            remote_object::new_impl_action
+          , object<T>
+        > p;
+
+        p.apply(
+            target_id
+          , target_id
+          , remote_object::ctor_fun<T>()
+          , remote_object::dtor_fun<T>()
+        );
+        return p.get_future();
     }
 
     // vertical repetition code to enable constructor parameters up to
@@ -79,21 +81,23 @@ namespace hpx { namespace components
     lcos::future<object<T> >
     new_(naming::id_type const & target_id, BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a))
     {
-        return
-            lcos::packaged_task<
-                remote_object::new_impl_action
-              , object<T>
+        lcos::packaged_action<
+            remote_object::new_impl_action
+          , object<T>
+        > p;
+        
+        p.apply(
+            target_id
+          , target_id
+          , remote_object::ctor_fun<
+                T
+              , BOOST_PP_ENUM_PARAMS(N, A)
             >(
-                target_id
-              , target_id
-              , remote_object::ctor_fun<
-                    T
-                  , BOOST_PP_ENUM_PARAMS(N, A)
-                >(
-                    BOOST_PP_ENUM_PARAMS(N, a)
-                )
-              , remote_object::dtor_fun<T>()
-            ).get_future();
+                BOOST_PP_ENUM_PARAMS(N, a)
+            )
+          , remote_object::dtor_fun<T>()
+        );
+        return p.get_future();
     }
 
 #undef N

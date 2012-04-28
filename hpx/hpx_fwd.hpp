@@ -27,6 +27,8 @@
 #include <boost/intrusive_ptr.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/coroutine/coroutine.hpp>
+#include <boost/detail/scoped_enum_emulation.hpp>
+
 #include <hpx/config.hpp>
 #include <hpx/config/function.hpp>
 #include <hpx/util/unused.hpp>
@@ -480,7 +482,7 @@ namespace hpx
             typename Result = typename traits::promise_local_result<
                 typename Action::result_type>::type,
             typename DirectExecute = typename Action::direct_execution>
-        class packaged_task;
+        class packaged_action;
 
         template <typename Action,
             typename Result = typename traits::promise_local_result<
@@ -524,6 +526,16 @@ namespace hpx
         template <typename Connection, typename Key = boost::uint32_t>
         class connection_cache;
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Launch policy for \a hpx::async
+    BOOST_SCOPED_ENUM_START(launch)
+    {
+        async = 0x01,
+        deferred = 0x02,
+        all = 0x03        // async | deferred
+    };
+    BOOST_SCOPED_ENUM_END
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the global id representing this locality

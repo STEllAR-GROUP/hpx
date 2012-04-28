@@ -346,7 +346,10 @@ namespace hpx { namespace lcos { namespace local
 
         ~packaged_task()
         {
-            if (task_)
+            // For a nullary packaged tasks it's ok to go out of scope as long
+            // as a future has been retrieved. Calling get on that future will
+            // trigger the encapsulated tasks in deferred mode.
+            if (task_ && !future_obtained_)
                 task_->deleting_owner();
         }
 
@@ -381,7 +384,7 @@ namespace hpx { namespace lcos { namespace local
             task_->run();
         }
 
-        // synchronous execution
+        // asynchronous execution, implemented for nullary packaged task only
         void apply()
         {
             if (!task_) {

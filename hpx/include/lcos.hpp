@@ -8,7 +8,7 @@
 #define HPX_LCOS_JUN_27_2008_0820PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/packaged_task.hpp>
+#include <hpx/lcos/packaged_action.hpp>
 #include <hpx/lcos/deferred_packaged_task.hpp>
 
 #include <hpx/lcos/queue.hpp>

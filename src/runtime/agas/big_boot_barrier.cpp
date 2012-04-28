@@ -34,16 +34,6 @@
 namespace hpx { namespace agas
 {
 
-typedef lcos::packaged_task<
-    server::primary_namespace::service_action,
-    response
-> allocate_response_future_type;
-
-typedef lcos::packaged_task<
-    server::primary_namespace::service_action,
-    response
-> bind_response_future_type;
-
 typedef components::detail::heap_factory<
     lcos::detail::promise<
         response
@@ -404,7 +394,7 @@ void notify_console(notification_header const& header)
 
     for (std::size_t i = 0; i < pool_size; ++i)
         promise_pool.enqueue(
-            new lcos::packaged_task<server::primary_namespace::service_action>);
+            new lcos::packaged_action<server::primary_namespace::service_action>);
 }
 
 // remote call to AGAS
@@ -551,7 +541,7 @@ void notify_worker(notification_header const& header)
 
     for (std::size_t i = 0; i < pool_size; ++i)
         promise_pool.enqueue(
-            new lcos::packaged_task<server::primary_namespace::service_action>);
+            new lcos::packaged_action<server::primary_namespace::service_action>);
 }
 // }}}
 

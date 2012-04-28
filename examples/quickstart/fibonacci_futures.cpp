@@ -103,12 +103,13 @@ hpx::lcos::future<boost::uint64_t> fibonacci_future(boost::uint64_t n)
     // asynchronously launch the creation of one of the sub-terms of the
     // execution graph
     hpx::lcos::future<hpx::lcos::future<boost::uint64_t> > f =
-        hpx::async(&fibonacci_future, n-1);
+        hpx::async(hpx::launch::deferred, &fibonacci_future, n-1);
     hpx::lcos::future<boost::uint64_t> r = fibonacci_future(n-2);
 
     // attach a continuation to this future which is called asynchronously on
     // its completion and which calculates the other sub-term
-    return hpx::wait_all(f.get(), r).when(fibonacci_future_continuation());
+    hpx::lcos::future<boost::uint64_t> f1 = f.get();
+    return hpx::async(&add, f1, r); //.when(fibonacci_future_continuation());
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -161,8 +162,8 @@ int hpx_main(boost::program_options::variables_map& vm)
         boost::uint64_t r = fibonacci_future_one(n).get();
 
         double d = t.elapsed();
-        char const* fmt =
-            "fibonacci_future_one(%1%) == %2%\nelapsed time: %3% [s]\n";
+        char const* fmt = "fibonacci_future_one(%1%) == %2%\n"
+            "elapsed time: %3% [s]\n";
         std::cout << (boost::format(fmt) % n % r % d);
     }
 
@@ -175,8 +176,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         boost::uint64_t r = fibonacci(n);
 
         double d = t.elapsed();
-        char const* fmt =
-            "fibonacci_future_one(%1%) == %2%\nelapsed time: %3% [s]\n";
+        char const* fmt = "fibonacci(%1%) == %2%\nelapsed time: %3% [s]\n";
         std::cout << (boost::format(fmt) % n % r % d);
     }
 
@@ -189,8 +189,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         boost::uint64_t r = fibonacci_future(n).get();
 
         double d = t.elapsed();
-        char const* fmt =
-            "fibonacci_future_one(%1%) == %2%\nelapsed time: %3% [s]\n";
+        char const* fmt = "fibonacci_future(%1%) == %2%\nelapsed time: %3% [s]\n";
         std::cout << (boost::format(fmt) % n % r % d);
     }
 
@@ -202,8 +201,8 @@ int hpx_main(boost::program_options::variables_map& vm)
         // wait for it.
         boost::uint64_t r = fibonacci_future_all(n).get();
 
-        char const* fmt =
-            "fibonacci_future_all(%1%) == %2%\nelapsed time: %3% [s]\n";
+        char const* fmt = "fibonacci_future_all(%1%) == %2%\n"
+            "elapsed time: %3% [s]\n";
         std::cout << (boost::format(fmt) % n % r % t.elapsed());
     }
 

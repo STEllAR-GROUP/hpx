@@ -576,7 +576,7 @@ bool addressing_service::get_id_range(
   , error_code& ec
     )
 { // {{{ get_id_range implementation
-    typedef lcos::packaged_task<server::primary_namespace::service_action>
+    typedef lcos::packaged_action<server::primary_namespace::service_action>
         future_type;
 
     future_type* f = 0;
@@ -656,7 +656,7 @@ bool addressing_service::bind_range(
   , error_code& ec
     )
 { // {{{ bind_range implementation
-    typedef lcos::packaged_task<server::primary_namespace::service_action>
+    typedef lcos::packaged_action<server::primary_namespace::service_action>
         future_type;
 
     future_type* f = 0;

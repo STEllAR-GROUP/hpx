@@ -58,9 +58,12 @@ namespace hpx { namespace components { namespace adaptive1d { namespace stubs
             // Create a future, execute the required action,
             // we simply return the initialized future, the caller needs
             // to call get() on the return value to obtain the result
-            typedef adaptive1d::server::functional_component::alloc_data_action action_type;
-            return lcos::packaged_task<action_type, naming::id_type>(
-                gid, item, maxitems, row, interp_src_data,time,par).get_future();
+            typedef adaptive1d::server::functional_component::alloc_data_action
+                action_type;
+
+            lcos::packaged_action<action_type, naming::id_type> p;
+            p.apply(gid, item, maxitems, row, interp_src_data,time,par);
+            return p.get_future();
         }
 
         static naming::id_type alloc_data(naming::id_type const& gid,

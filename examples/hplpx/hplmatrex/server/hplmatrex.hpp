@@ -20,7 +20,7 @@ a destructor, and access operators.
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/lcos/local/mutex.hpp>
-#include <hpx/lcos/packaged_task.hpp>
+#include <hpx/lcos/packaged_action.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -115,19 +115,19 @@ namespace hpx { namespace components { namespace server
 
     //here begins the definitions of most of the future types that will be used
     //the first of which is for assign action
-    typedef hpx::lcos::packaged_task<server::hplmatrex::assign_action> assign_future;
+    typedef hpx::lcos::packaged_action<server::hplmatrex::assign_action> assign_future;
     //the search pivots future
-    typedef hpx::lcos::packaged_task<server::hplmatrex::search_action> search_future;
+    typedef hpx::lcos::packaged_action<server::hplmatrex::search_action> search_future;
     //Here is the swap future
-    typedef hpx::lcos::packaged_task<server::hplmatrex::swap_action> swap_future;
+    typedef hpx::lcos::packaged_action<server::hplmatrex::swap_action> swap_future;
     //the backsubst future is used to make sure all computations are complete
     //before returning from lusolve, to avoid killing processes and erasing the
     //leftdata while it is still being worked on
     typedef
-        hpx::lcos::packaged_task<server::hplmatrex::partbsub_action> partbsub_future;
+        hpx::lcos::packaged_action<server::hplmatrex::partbsub_action> partbsub_future;
     //the final future type for the class is used for checking the accuracy of
     //the results of the lu decomposition
-    typedef hpx::lcos::packaged_task<server::hplmatrex::check_action> check_future;
+    typedef hpx::lcos::packaged_action<server::hplmatrex::check_action> check_future;
     };
 ///////////////////////////////////////////////////////////////////////////////
 
