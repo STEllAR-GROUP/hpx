@@ -26,10 +26,8 @@ if exists(join(path[0], "../share/hpx/python/hpx")):
 from hpx.process import process
 
 def run(cmd, timeout=3600):
-  start = datetime.now() 
   proc = process(cmd)
   (timed_out, returncode) = proc.wait(timeout)
-  now = datetime.now()
 
   output = ''
 
