@@ -78,22 +78,6 @@ boost::uint64_t fibonacci(boost::uint64_t n)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-struct fibonacci_future_continuation
-{
-    typedef hpx::lcos::future<
-        std::vector<hpx::lcos::future<boost::uint64_t> >
-    > argument_type;
-
-    // we return the result of adding the values calculated by the two sub-terms
-    typedef boost::uint64_t result_type;
-
-    result_type operator()(argument_type res) const
-    {
-        std::vector<hpx::lcos::future<boost::uint64_t> > v = res.get();
-        return add(v[0], v[1]);
-    }
-};
-
 hpx::lcos::future<boost::uint64_t> fibonacci_future(boost::uint64_t n)
 {
     // if we know the answer, we return a future encapsulating the final value
@@ -106,10 +90,7 @@ hpx::lcos::future<boost::uint64_t> fibonacci_future(boost::uint64_t n)
         hpx::async(hpx::launch::deferred, &fibonacci_future, n-1);
     hpx::lcos::future<boost::uint64_t> r = fibonacci_future(n-2);
 
-    // attach a continuation to this future which is called asynchronously on
-    // its completion and which calculates the other sub-term
-    hpx::lcos::future<boost::uint64_t> f1 = f.get();
-    return hpx::async(&add, f1, r); //.when(fibonacci_future_continuation());
+    return hpx::async(&add, f.get(), r);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -197,7 +178,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Keep track of the time required to execute.
         hpx::util::high_resolution_timer t;
 
-        // Create a Future for the whole calculation, execute it locally, and
+        // Create a future for the whole calculation, execute it locally, and
         // wait for it.
         boost::uint64_t r = fibonacci_future_all(n).get();
 
