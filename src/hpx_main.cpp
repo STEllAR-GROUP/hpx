@@ -4,11 +4,13 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/hpx_init.hpp>
 #include <boost/program_options/variables_map.hpp>
 
-int hpx_main();
-
-// forwarding of mpx_main, if necessary
+///////////////////////////////////////////////////////////////////////////////
+// Forwarding of hpx_main, if necessary. This has to be in a separate
+// translation unit to ensure the linker can pick or ignore this function,
+// depending on whether the main executable defines this symbol or not.
 int hpx_main(boost::program_options::variables_map&)
 {
     return hpx_main();

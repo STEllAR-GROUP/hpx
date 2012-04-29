@@ -92,4 +92,11 @@ int main(int argc, char* argv[])
     // Initialize and run HPX
     return hpx::init(desc_commandline, argc, argv);
 }
+//` In HPX `main` is used to initialize the runtime system and pass the command
+//` line arguments to the program. If you wish to add command line options to
+//` your program you would add them here using the instance of the Boost
+//` class `options_description`, and invoking the public member function
+//` `.add_options()` (see __boost_doc__ or the __fibonacci_example__
+//` for more details). `hpx::init()` calls `hpx_main` after setting up
+//` HPX, which is where the logic of our program is encoded.
 //]
