@@ -6,7 +6,6 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/serialization.hpp>
-#include <hpx/runtime/components/test_component_registry.hpp>
 
 #include <tests/unit/actions/components/non_const_ref_action_component.hpp>
 
