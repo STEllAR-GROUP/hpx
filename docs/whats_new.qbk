@@ -9,6 +9,50 @@
 
 [/////////////////////////////////////////////////////////////////////////////]
 [section:hpx_1_0_0 HPX V1.0.0]
+
+* Renamed `hpx::lcos::packaged_task<>` to `hpx::lcos::packaged_action<>` to
+  reflect the semantic differences to a packaged_task as defined by the C++11
+  standard.
+* HPX now exposes `hpx::thread` which is compliant to the C++11 std::thread
+  type except that it (purely locally) represents an HPX thread. This new type
+  does not expose any of the remote capabilities of teh underlying PX-thread
+  implementation.
+* The type `hpx::lcos::future<>` is now compliant to the C++11 std::future<>
+  type. This type can be used to synchronize both, local and remote operations.
+  In both cases the control flow will 'return' to the future in order to
+  trigger any continuation.
+* The types `hpx::lcos::local::promise<>` and `hpx::lcos::local::packaged_task<>`
+  are now compliant to the C++11 `std::promise<>`  and `std::packaged_task<>` types.
+  These can be used to create a future representing local work only. Use the
+  types `hpx::lcos::promise<>` and `hpx::lcos::packaged_action<>` to wrap any
+  (possibly remote) action into a future.
+* HPX now exposes `hpx::apply()` and `hpx::async()` as the preferred way of
+  creating (or invoking) any deferred work. These functions are usable with
+  various types of functions, function objects, and actions and provide a
+  uniform way to spawn deferred tasks.
+* HPX now allows to utilize `hpx::util::bind` to (partially) bind no only
+  local functions and function objects, but also actions. Remote bound actions
+  can have placeholders as well.
+* HPX continuations are now fully polymorphic. The class `hpx::actions::forwarding_continuation`
+  is an example of how the user can write is own types of continuations. It
+  can be used to execute any function as an continuation of a particular
+  action.
+* A minimal HPX program now looks like this:
+``
+      #include <hpx/hpx_init.hpp>
+
+      int hpx_main()
+      {
+          return hpx::finalize();
+      }
+
+      int main()
+      {
+          return hpx::init();
+      }
+``
+  This removes the immediate dependency on the __boost_program_options__ library.
+
 [endsect]
 
 [/////////////////////////////////////////////////////////////////////////////]

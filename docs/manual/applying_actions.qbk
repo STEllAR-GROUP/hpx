@@ -17,7 +17,7 @@ example demonstrating this:
 
     namespace app
     {
-        int some_global_function(doube d)
+        void some_global_function(doube d)
         {
             cout << d;
         }
@@ -35,7 +35,7 @@ the next example:
 
     namespace app
     {
-        int some_global_function(doube d)
+        void some_global_function(doube d)
         {
             cout << d;
         }
@@ -61,6 +61,45 @@ The shown code defines an action type `some_global_action` inside the namespace
            above the name of the action type to create has to be the same for
            both macro invocations (here `some_global_action`).]
 
+For member functions of objects which have been registered with AGAS (e.g.
+'components') a different registration macro `HPX_DEFINE_COMPONENT_ACTION` has
+to be utilized. Any component needs to be declared in a header file and have
+some special support macros defined in a source file. Here is an example
+demonstrating this. The first snippet has to go into the header file:
+
+    namespace app
+    {
+        struct HPX_COMPONENT_EXPORT some_component
+          : hpx::components::simple_component<some_component>
+        {
+            int some_member_function(std::string s)
+            {
+                return boost::lexical_cast<int>(s);
+            }
+            HPX_DEFINE_COMPONENT_ACTION(some_component, some_member_function,
+                some_member_action);
+        };
+    }
+
+    // Note: The second arguments to the macro below have to be systemwide-unique
+    //       C++ identifiers
+    HPX_REGISTER_ACTION_DECLARATION_EX(app::some_component::some_member_action,
+        app_some_member_action);
+
+The next snippet belongs into the source file:
+
+    // The parameters for this macro have to be the same as used in the corresponding
+    // HPX_REGISTER_ACTION_DECLARATION_EX() macro invocation above
+    HPX_REGISTER_ACTION_EX(app::some_component::some_member_action, app_some_member_action);
+
+Granted, these macro invocations are a bit more complex than for simple global
+functions, however we believe they are still manageable.
+
+The most important macro invocation is the use of `HPX_DEFINE_COMPONENT_ACTION`
+in the header file as this defines the action type we need to invoke the
+member function.
+
+
 [heading Action Invocation]
 
 The process of invoking of a global function with the help of the associated
@@ -70,19 +109,66 @@ is required to apply any action - the id of the locality the associated
 function should be invoked on. __hpx__ provides two ways to apply any
 action:
 
-* /Applying an action without any synchronization/: This method ('fire and
-  forget') will make sure the function associated with the action is scheduled
-  to run on the target locality. Applying the action does not wait for the
-  function to start running, instead it is a fully asynchronous operation.
-  The following example shows how to apply the action from above on the local
-  locality:
+* /Applying an action asynchronously without any synchronization/:
+  This method ('fire and forget') will make sure the function associated with
+  the action is scheduled to run on the target locality. Applying the action
+  does not wait for the function to start running, instead it is a fully
+  asynchronous operation. The following example shows how to apply the action
+  from above on the local locality:
 ``
-      hpx::apply<some_global_action>(hpx::find_here());
+    hpx::apply<some_global_action>(hpx::find_here(), 2.0);
 ``
   (the function `hpx::find_here()` returns the id of the local locality (the
   locality this code is executed on).
 
-* /Applying an action with synchronization/:
+  Any component member function can be invoked using the same syntactic
+  construct. Given that `id` is the global address for a component instance
+  created earlier, this invocation looks like:
+``
+    hpx::apply<some_component_action>(id, "42");
+``
+  In this case any value returned from this action (e.g. in this case the
+  integer `42`) is ignored.
+
+* /Applying an action asynchronously with synchronization/: This method will
+  make sure the action is scheduled to run on the target locality. Applying the
+  action itself does not wait for the function to start running or to complete,
+  instead this is a fully asynchronous operation similar to using `hpx::apply`
+  as described above. The difference is that this method will return an
+  instance of a `future<>` encapsulating the (possibly remote) execution. The
+  future can be used to synchronize with the asynchronous operation. The
+  following example shows how to apply the action from above on the local
+  locality:
+``
+    hpx::future<void> f = hpx::async<some_global_action>(hpx::find_here(), 2.0);
+    //
+    // ... other code can be executed here
+    //
+    f.get();    // this will possibly wait for the asyncronous operation to 'return'
+``
+  (as before, the function `hpx::find_here()` returns the id of the local
+  locality (the locality this code is executed on).
+  Note, the use of a `hpx::future<void>` allows to synchronize with any remote
+  operation not returning any value.
+
+  Any component member function can be invoked using the same syntactic
+  construct. Given that `id` is the global address for a component instance
+  created earlier, this invocation looks like:
+``
+    hpx::future<int> f = hpx::async<some_component_action>(id, "42");
+    //
+    // ... other code can be executed here
+    //
+    cout << f.get();    // this will possibly wait for the asyncronous operation to 'return' 42
+``
+  Note, the invocation of `f.get()` will return the result immediatly (without
+  suspending the calling thread) if the asynchronous operation has already
+  returned. Otherwise, the invocation of `f.get()` will suspend the execution
+  of the calling thread until the asynchronous operation returns its result.
+
+* /Applying an action synchronously/:
+
+
 
 [note The syntax of applying an action is always the same, regardless whether
       the target locality is remote to the invocation locality or not. This
