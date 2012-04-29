@@ -64,7 +64,7 @@ add_hpx_library_sources(hpx_serialization
 # libhpx sources
 add_hpx_library_sources(hpx
   GLOB GLOBS "${hpx_SOURCE_DIR}/src/*.cpp"
-  EXCLUDE ".*hpx_init.cpp")
+  EXCLUDE ".*hpx_[init|main].cpp")
 add_hpx_library_sources(hpx
   GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/runtime/*.cpp"
   APPEND)
@@ -81,7 +81,7 @@ add_hpx_library_sources(hpx
 
 # libhpx_init sources
 add_hpx_library_sources(hpx_init
-  GLOB GLOBS "${hpx_SOURCE_DIR}/src/*hpx_init.cpp")
+  GLOB GLOBS "${hpx_SOURCE_DIR}/src/hpx_*.cpp")
 
 set(hpx_external_SOURCES "" CACHE INTERNAL "Sources for libhpx_external." FORCE)
 
@@ -200,13 +200,13 @@ add_hpx_source_group(
 
 ################################################################################
 # libhpx_serialization
-add_library(hpx_serialization SHARED 
+add_library(hpx_serialization SHARED
   ${hpx_serialization_SOURCES} ${hpx_serialization_HEADERS})
 
 set_target_properties(hpx_serialization
                       PROPERTIES SKIP_BUILD_RPATH TRUE
                                  BUILD_WITH_INSTALL_RPATH TRUE
-                                 INSTALL_RPATH_USE_LINK_PATH TRUE 
+                                 INSTALL_RPATH_USE_LINK_PATH TRUE
                                  INSTALL_RPATH ${HPX_RPATH})
 
 set_target_properties(hpx_serialization PROPERTIES
@@ -247,7 +247,7 @@ endif()
 
 ################################################################################
 # libhpx
-add_library(hpx SHARED 
+add_library(hpx SHARED
   ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
 
 set_target_properties(hpx PROPERTIES
@@ -264,7 +264,7 @@ set_target_properties(hpx PROPERTIES
 set_target_properties(hpx
                       PROPERTIES SKIP_BUILD_RPATH TRUE
                                  BUILD_WITH_INSTALL_RPATH TRUE
-                                 INSTALL_RPATH_USE_LINK_PATH TRUE 
+                                 INSTALL_RPATH_USE_LINK_PATH TRUE
                                  INSTALL_RPATH ${HPX_RPATH})
 
 if(MSVC AND HPX_EMULATE_SWAP_CONTEXT)
@@ -293,7 +293,7 @@ endif()
 
 ################################################################################
 # libhpx_init
-add_library(hpx_init STATIC 
+add_library(hpx_init STATIC
   ${hpx_init_SOURCES} ${hpx_init_HEADERS})
 
 set_property(TARGET hpx_init APPEND

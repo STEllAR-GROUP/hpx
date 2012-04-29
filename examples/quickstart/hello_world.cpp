@@ -122,7 +122,7 @@ HPX_PLAIN_ACTION(hello_world_foreman, hello_world_foreman_action);
 ///////////////////////////////////////////////////////////////////////////////
 //[hello_world_hpx_main
 //`Here is hpx_main:
-int hpx_main(boost::program_options::variables_map& vm)
+int hpx_main()
 {
     {
         // Get a list of all available localities.
@@ -157,19 +157,11 @@ int hpx_main(boost::program_options::variables_map& vm)
 //[hello_world_main
 int main(int argc, char* argv[])
 {
-    // Configure application-specific options.
-    boost::program_options::options_description
-       desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
-
-    // Initialize and run HPX.
-    return hpx::init(desc_commandline, argc, argv);
+    return hpx::init(argc, argv);       // Initialize and run HPX.
 }
 //` In HPX `main` is used to initialize the runtime system and pass the command
-//` line arguments to the program. If you wish to add command line options to
-//` your program you would add them here using the instance of the Boost
-//` class `options_description`, and invoking the public member function
-//` `.add_options()` (see __boost_doc__ or the __fibonacci_example__
-//` for more details). `hpx::init()` calls `hpx_main` after setting up
-//` HPX, which is where the logic of our program is encoded.
+//` line arguments to the program. `hpx::init()` invokes `hpx_main` as a HPX
+//` thread after setting up HPX, which is where the logic of our program is
+//` encoded.
 //]
 

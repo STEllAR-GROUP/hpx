@@ -133,7 +133,10 @@ int hpx_main(boost::program_options::variables_map& vm)
 {
     // extract command line argument, i.e. fib(N)
     boost::uint64_t n = vm["n-value"].as<boost::uint64_t>();
+    std::string test = vm["test"].as<std::string>();
+    bool executed_one = false;
 
+    if (test == "all" || test == "0")
     {
         // Keep track of the time required to execute.
         hpx::util::high_resolution_timer t;
@@ -146,8 +149,11 @@ int hpx_main(boost::program_options::variables_map& vm)
         char const* fmt = "fibonacci_future_one(%1%) == %2%\n"
             "elapsed time: %3% [s]\n";
         std::cout << (boost::format(fmt) % n % r % d);
+
+        executed_one = true;
     }
 
+    if (test == "all" || test == "1")
     {
         // Keep track of the time required to execute.
         hpx::util::high_resolution_timer t;
@@ -159,8 +165,11 @@ int hpx_main(boost::program_options::variables_map& vm)
         double d = t.elapsed();
         char const* fmt = "fibonacci(%1%) == %2%\nelapsed time: %3% [s]\n";
         std::cout << (boost::format(fmt) % n % r % d);
+
+        executed_one = true;
     }
 
+    if (test == "all" || test == "2")
     {
         // Keep track of the time required to execute.
         hpx::util::high_resolution_timer t;
@@ -172,8 +181,11 @@ int hpx_main(boost::program_options::variables_map& vm)
         double d = t.elapsed();
         char const* fmt = "fibonacci_future(%1%) == %2%\nelapsed time: %3% [s]\n";
         std::cout << (boost::format(fmt) % n % r % d);
+
+        executed_one = true;
     }
 
+    if (test == "all" || test == "3")
     {
         // Keep track of the time required to execute.
         hpx::util::high_resolution_timer t;
@@ -185,6 +197,15 @@ int hpx_main(boost::program_options::variables_map& vm)
         char const* fmt = "fibonacci_future_all(%1%) == %2%\n"
             "elapsed time: %3% [s]\n";
         std::cout << (boost::format(fmt) % n % r % t.elapsed());
+
+        executed_one = true;
+    }
+
+    if (!executed_one)
+    {
+        std::cerr << "fibonacci_futures: wrong command line argument value for "
+            "option 'tests', should be either 'all' or a number between zero "
+            "and 3, value specified: " << test << std::endl;
     }
 
     return hpx::finalize(); // Handles HPX shutdown
@@ -201,6 +222,8 @@ int main(int argc, char* argv[])
     desc_commandline.add_options()
         ( "n-value", value<boost::uint64_t>()->default_value(10),
           "n value for the Fibonacci function")
+        ( "test", value<std::string>()->default_value("all"),
+          "select tests to execute (0-3, default: all)")
     ;
 
     // Initialize and run HPX
