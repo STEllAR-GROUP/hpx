@@ -60,7 +60,7 @@ void handle_interruption_using_error_code()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map&)
+int hpx_main()
 {
     handle_interruption_using_exception();
     handle_interruption_using_error_code();
@@ -70,11 +70,7 @@ int hpx_main(boost::program_options::variables_map&)
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-    // Configure application-specific options.
-    boost::program_options::options_description cmdline(
-        "Usage: " HPX_APPLICATION_STRING " [options]");
-
     // Initialize and run HPX.
-    return hpx::init(cmdline, argc, argv);
+    return hpx::init(argc, argv);
 }
 

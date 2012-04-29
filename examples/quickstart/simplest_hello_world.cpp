@@ -11,21 +11,17 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
 
-int hpx_main(boost::program_options::variables_map&)
+int hpx_main()
 {
     // Say hello to the world!
     hpx::cout << "Hello World!\n" << hpx::flush;
 
-    return hpx::finalize(); // Initiate shutdown of the runtime system.
+    return hpx::finalize();   // Initiate shutdown of the runtime system.
 }
 
-int main(int argc, char* argv[])
+int main()
 {
-    // Configure application-specific options.
-    boost::program_options::options_description desc_commandline(
-        "usage: simplest_hello_world [options]");
-
-    return hpx::init(desc_commandline, argc, argv); // Initialize and run HPX.
+    return hpx::init();       // Initialize and run HPX.
 }
 //]
 

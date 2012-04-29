@@ -24,7 +24,7 @@ void ignore_whitespace(std::istream& is)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(boost::program_options::variables_map&)
+int hpx_main()
 {
     {
         // Create an accumulator component on this locality.
@@ -94,11 +94,7 @@ int hpx_main(boost::program_options::variables_map&)
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-    // Configure application-specific options.
-    boost::program_options::options_description
-       desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
-
     // Initialize and run HPX.
-    return hpx::init(desc_commandline, argc, argv);
+    return hpx::init(argc, argv);
 }
 
