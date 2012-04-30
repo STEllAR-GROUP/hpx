@@ -45,19 +45,18 @@ namespace sheneos
     void shutdown()
     {
         // Because of problems while dynamically loading/unloading the HDF5
-        // libraries we need to manually call the HDF5 termination routines. 
+        // libraries we need to manually call the HDF5 termination routines.
         ::H5close();
     }
 
     ///////////////////////////////////////////////////////////////////////////
     bool get_shutdown(HPX_STD_FUNCTION<void()>& shutdown_func)
     {
-        // return our shutdown-function if performance counters are required
         shutdown_func = shutdown;
         return true;
     }
 }
-HPX_REGISTER_SHUTDOWN_MODULE(::sheneos::get_shutdown);
+HPX_REGISTER_SHUTDOWN_MODULE(&::sheneos::get_shutdown);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Interpolation client.
