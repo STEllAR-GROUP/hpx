@@ -143,6 +143,25 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    runtime::runtime(naming::resolver_client& agas_client,
+            util::runtime_configuration& rtcfg)
+      : ini_(rtcfg),
+        instance_number_(++instance_number_counter_),
+        stopped_(true)
+    {
+        // initialize thread mapping for external libraries (i.e. PAPI)
+        thread_support_.register_thread("main");
+
+        // initialize our TSS
+        runtime::init_tss();
+
+        // initialize coroutines context switcher
+        boost::coroutines::thread_startup("main");
+
+        counters_.reset(new performance_counters::registry(agas_client));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     boost::atomic<int> runtime::instance_number_counter_(-1);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -243,7 +262,7 @@ namespace hpx
         // {{{ early startup code - local
         // in AGAS v2, the runtime pointer (accessible through get_runtime
         // and get_runtime_ptr) is already initialized at this point.
-        init_tss("main");
+        applier_.init_tss();
 
         LRT_(info) << "cmd_line: " << get_config().get_cmd_line();
 
@@ -496,7 +515,7 @@ namespace hpx
         applier_.init_tss();
 
         // initialize coroutines context switcher
-        boost::coroutines::thread_startup(context);
+        boost::coroutines::thread_startup("main");
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>

@@ -51,14 +51,7 @@ namespace hpx
 
         /// construct a new instance of a runtime
         runtime(naming::resolver_client& agas_client,
-                util::runtime_configuration& rtcfg)
-          : ini_(rtcfg),
-            instance_number_(++instance_number_counter_),
-            stopped_(true)
-        {
-            runtime::init_tss();
-            counters_.reset(new performance_counters::registry(agas_client));
-        }
+            util::runtime_configuration& rtcfg);
 
         virtual ~runtime()
         {
