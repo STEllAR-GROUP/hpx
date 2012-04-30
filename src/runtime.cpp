@@ -243,7 +243,7 @@ namespace hpx
         // {{{ early startup code - local
         // in AGAS v2, the runtime pointer (accessible through get_runtime
         // and get_runtime_ptr) is already initialized at this point.
-        applier_.init_tss();
+        init_tss("main");
 
         LRT_(info) << "cmd_line: " << get_config().get_cmd_line();
 
