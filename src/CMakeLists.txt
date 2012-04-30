@@ -203,11 +203,13 @@ add_hpx_source_group(
 add_library(hpx_serialization SHARED
   ${hpx_serialization_SOURCES} ${hpx_serialization_HEADERS})
 
-set_target_properties(hpx_serialization
-                      PROPERTIES SKIP_BUILD_RPATH TRUE
-                                 BUILD_WITH_INSTALL_RPATH TRUE
-                                 INSTALL_RPATH_USE_LINK_PATH TRUE
-                                 INSTALL_RPATH ${HPX_RPATH})
+if(NOT MSVC)
+  set_target_properties(hpx_serialization
+                        PROPERTIES SKIP_BUILD_RPATH TRUE
+                                   BUILD_WITH_INSTALL_RPATH TRUE
+                                   INSTALL_RPATH_USE_LINK_PATH TRUE
+                                   INSTALL_RPATH ${HPX_RPATH})
+endif()
 
 set_target_properties(hpx_serialization PROPERTIES
   VERSION ${HPX_VERSION}
@@ -261,11 +263,13 @@ set_target_properties(hpx PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL}
   RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO})
 
-set_target_properties(hpx
-                      PROPERTIES SKIP_BUILD_RPATH TRUE
-                                 BUILD_WITH_INSTALL_RPATH TRUE
-                                 INSTALL_RPATH_USE_LINK_PATH TRUE
-                                 INSTALL_RPATH ${HPX_RPATH})
+if(NOT MSVC)
+  set_target_properties(hpx
+                        PROPERTIES SKIP_BUILD_RPATH TRUE
+                                   BUILD_WITH_INSTALL_RPATH TRUE
+                                   INSTALL_RPATH_USE_LINK_PATH TRUE
+                                   INSTALL_RPATH ${HPX_RPATH})
+endif()
 
 if(MSVC AND HPX_EMULATE_SWAP_CONTEXT)
   set_target_properties(hpx PROPERTIES LINK_FLAGS "/EXPORT:switch_to_fiber")

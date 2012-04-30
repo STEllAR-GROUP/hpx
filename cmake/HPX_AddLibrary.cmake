@@ -85,14 +85,18 @@ macro(add_hpx_library name)
 
   if(HPX_FLAGS)
     set_property(TARGET ${name}_lib APPEND PROPERTY COMPILE_FLAGS ${HPX_FLAGS})
-    set_property(TARGET ${name}_lib APPEND PROPERTY LINK_FLAGS ${HPX_FLAGS})
+    if(NOT MSVC)
+      set_property(TARGET ${name}_lib APPEND PROPERTY LINK_FLAGS ${HPX_FLAGS})
+    endif()
   endif()
 
-  set_target_properties(${name}_lib 
-                        PROPERTIES SKIP_BUILD_RPATH TRUE
-                                   BUILD_WITH_INSTALL_RPATH TRUE
-                                   INSTALL_RPATH_USE_LINK_PATH TRUE 
-                                   INSTALL_RPATH ${HPX_RPATH})
+  if(NOT MSVC)
+    set_target_properties(${name}_lib 
+                          PROPERTIES SKIP_BUILD_RPATH TRUE
+                                     BUILD_WITH_INSTALL_RPATH TRUE
+                                     INSTALL_RPATH_USE_LINK_PATH TRUE 
+                                     INSTALL_RPATH ${HPX_RPATH})
+  endif()
 
   if(${name}_FOLDER)
     set_target_properties(${name}_lib PROPERTIES FOLDER ${${name}_FOLDER})

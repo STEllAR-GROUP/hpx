@@ -56,14 +56,18 @@ macro(add_hpx_executable name)
 
   if(HPX_FLAGS)
     set_property(TARGET ${name}_exe APPEND PROPERTY COMPILE_FLAGS ${HPX_FLAGS})
-    set_property(TARGET ${name}_exe APPEND PROPERTY LINK_FLAGS ${HPX_FLAGS})
+    if(NOT MSVC)
+      set_property(TARGET ${name}_exe APPEND PROPERTY LINK_FLAGS ${HPX_FLAGS})
+    endif()
   endif()
 
-  set_target_properties(${name}_exe 
-                        PROPERTIES SKIP_BUILD_RPATH TRUE
-                                   BUILD_WITH_INSTALL_RPATH TRUE
-                                   INSTALL_RPATH_USE_LINK_PATH TRUE 
-                                   INSTALL_RPATH ${HPX_RPATH})
+  if(NOT MSVC)
+    set_target_properties(${name}_exe
+                          PROPERTIES SKIP_BUILD_RPATH TRUE
+                                     BUILD_WITH_INSTALL_RPATH TRUE
+                                     INSTALL_RPATH_USE_LINK_PATH TRUE
+                                     INSTALL_RPATH ${HPX_RPATH})
+  endif()
 
 #  set(libs "")
 
@@ -74,9 +78,15 @@ macro(add_hpx_executable name)
   # linker instructions
   if(NOT ${${name}_NOLIBS})
     if(HPX_FOUND AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-      set(hpx_libs hpx${CMAKE_DEBUG_POSTFIX} hpx_init${CMAKE_DEBUG_POSTFIX})
+      set(hpx_libs
+        hpx${CMAKE_DEBUG_POSTFIX}
+        hpx_init${CMAKE_DEBUG_POSTFIX}
+        hpx_serialization${CMAKE_DEBUG_POSTFIX})
     else()
-      set(hpx_libs hpx hpx_init)
+      set(hpx_libs
+        hpx
+        hpx_init
+        hpx_serialization)
     endif()
 
     hpx_handle_component_dependencies(${name}_COMPONENT_DEPENDENCIES)

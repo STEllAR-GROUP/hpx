@@ -296,8 +296,10 @@ endif()
 ################################################################################
 # RPATH configuration
 ################################################################################
-set(HPX_RPATH "${CMAKE_INSTALL_PREFIX}/lib/hpx:${CMAKE_BINARY_DIR}/lib/hpx"
-    CACHE STRING "Base RPATH for linking" FORCE)
+if(NOT MSVC)
+  set(HPX_RPATH "${CMAKE_INSTALL_PREFIX}/lib/hpx:${CMAKE_BINARY_DIR}/lib/hpx"
+      CACHE STRING "Base RPATH for linking" FORCE)
+endif()
 
 ################################################################################
 # C++11 configuration
