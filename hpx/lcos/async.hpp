@@ -202,7 +202,7 @@ namespace hpx
         >::type>)> const& data_sink, naming::id_type const& gid,
         BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
-        return async_callback<Action>(launch::all, gid,
+        return async_callback<Action>(launch::all, data_sink, gid,
             BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 }
