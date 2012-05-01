@@ -17,7 +17,7 @@ namespace distributed
 {
     //Information for component configuration
     struct HPX_COMPONENT_EXPORT config_comp
-    { 
+    {
         config_comp();//: num_instances_(0) {}
         config_comp(std::string const& symbolic_name, std::size_t num_instances
             , std::size_t my_cardinality);
@@ -27,7 +27,7 @@ namespace distributed
         std::size_t num_instances_;
         std::size_t my_cardinality_;
     };
-    
+
 }
 
 namespace distributed { namespace server
@@ -36,8 +36,8 @@ namespace distributed { namespace server
     class HPX_COMPONENT_EXPORT datastructure
         : public hpx::components::simple_component_base<datastructure>
     {
-    public: 
-    
+    public:
+
         enum actions
         {
             datastructure_init = 0,
@@ -47,7 +47,7 @@ namespace distributed { namespace server
             datastructure_get_data_at = 4
             //datastructure_config_init = 4;
         };
-    
+
         datastructure();// {}
         ~datastructure();//{}
 
@@ -98,7 +98,7 @@ namespace distributed { namespace server
         , std::string const&
         , std::size_t
         , std::size_t
-        , data_type 
+        , data_type
         , &datastructure::data_write
         > write_action;
 
@@ -110,7 +110,7 @@ namespace distributed { namespace server
         , std::size_t
         , std::size_t
         , std::size_t
-        , &datastructure::data_init       
+        , &datastructure::data_init
         > init_action;
 
     private:

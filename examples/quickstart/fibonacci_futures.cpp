@@ -94,22 +94,6 @@ hpx::lcos::future<boost::uint64_t> fibonacci_future(boost::uint64_t n)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-struct fibonacci_future_all_continuation
-{
-    typedef hpx::lcos::future<
-        std::vector<hpx::lcos::future<boost::uint64_t> >
-    > argument_type;
-
-    // we return the result of adding the values calculated by the two sub-terms
-    typedef boost::uint64_t result_type;
-
-    result_type operator()(argument_type res) const
-    {
-        std::vector<hpx::lcos::future<boost::uint64_t> > v = res.get();
-        return add(v[0], v[1]);
-    }
-};
-
 hpx::lcos::future<boost::uint64_t> fibonacci_future_all(boost::uint64_t n)
 {
     // if we know the answer, we return a future encapsulating the final value
@@ -125,7 +109,7 @@ hpx::lcos::future<boost::uint64_t> fibonacci_future_all(boost::uint64_t n)
     // create a future representing the successful calculation of both sub-terms
     // attach a continuation to this future which is called asynchronously on
     // its completion and which calculates the the final result
-    return hpx::wait_all(f1, f2).when(fibonacci_future_all_continuation());
+    return hpx::async(&add, f1, f2);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
