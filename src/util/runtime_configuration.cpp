@@ -41,7 +41,8 @@ namespace hpx { namespace util
             "[hpx]",
             "location = ${HPX_LOCATION:$[system.prefix]}",
             "component_path = $[hpx.location]/lib/hpx",
-            "ini_path = $[hpx.location]/share/hpx/ini",
+            "ini_default_path = $[hpx.location]/share/hpx/ini",
+            "ini_path = $[hpx.ini_default_path]",
 #if HPX_USE_ITT == 1
             "use_itt_notify = ${HPX_USE_ITTNOTIFY:0}",
 #endif
@@ -149,9 +150,6 @@ namespace hpx { namespace util
             get_entry("hpx.component_path", HPX_DEFAULT_COMPONENT_PATH));
         util::init_ini_data_default(component_path, *this);
 
-        // merge all found ini files of all components
-        util::merge_component_inis(*this);
-
         // read system and user ini files _again_, to allow the user to
         // overwrite the settings from the default component ini's.
         util::init_ini_data_base(*this, hpx_ini_file);
@@ -159,6 +157,9 @@ namespace hpx { namespace util
         // let the command line override the config file.
         if (!cmdline_ini_defs.empty())
             parse("command line definitions", cmdline_ini_defs);
+
+        // merge all found ini files of all components
+        util::merge_component_inis(*this);
     }
 
     ///////////////////////////////////////////////////////////////////////////
