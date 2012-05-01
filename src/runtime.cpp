@@ -515,7 +515,7 @@ namespace hpx
         applier_.init_tss();
 
         // initialize coroutines context switcher
-        boost::coroutines::thread_startup("main");
+        boost::coroutines::thread_startup(context);
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
