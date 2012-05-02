@@ -16,6 +16,7 @@ if(RNPL_FOUND)
 endif()
 
 add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=7)
+add_definitions(-DHPX_FUNCTION_LIMIT=10)
 
 foreach(subdir ${subdirs})
   add_subdirectory(${subdir})
