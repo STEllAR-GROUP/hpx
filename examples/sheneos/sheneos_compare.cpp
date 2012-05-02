@@ -104,7 +104,8 @@ void test_sheneos(std::size_t num_ye_points, std::size_t num_temp_points,
  
     // Create the three-dimensional future grid.
     //std::vector<hpx::lcos::future<std::vector<double> > > tests;
-#pragma omp parallel for    
+#pragma omp parallel 
+    std::cout << " HELLO WORLD from thread " << omp_get_thread_num() << std::endl;
     for (std::size_t i = 0; i < sequence_ye.size(); ++i)
     {
         std::size_t const& ii = sequence_ye[i];
@@ -133,7 +134,6 @@ void test_sheneos(std::size_t num_ye_points, std::size_t num_temp_points,
             }
         }
     }
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////
