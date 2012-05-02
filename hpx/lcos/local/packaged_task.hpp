@@ -346,10 +346,7 @@ namespace hpx { namespace lcos { namespace local
 
         ~packaged_task()
         {
-            // For a nullary packaged tasks it's ok to go out of scope as long
-            // as a future has been retrieved. Calling get on that future will
-            // trigger the encapsulated tasks in deferred mode.
-            if (task_ && !future_obtained_)
+            if (task_)
                 task_->deleting_owner();
         }
 
@@ -377,23 +374,11 @@ namespace hpx { namespace lcos { namespace local
         {
             if (!task_) {
                 HPX_THROW_EXCEPTION(task_moved,
-                    "packaged_task::operator()",
+                    "packaged_task<Func>::operator()",
                     "packaged_task invalid (has it been moved?)");
                 return;
             }
             task_->run();
-        }
-
-        // asynchronous execution, implemented for nullary packaged task only
-        void apply()
-        {
-            if (!task_) {
-                HPX_THROW_EXCEPTION(task_moved,
-                    "packaged_task::async()",
-                    "packaged_task invalid (has it been moved?)");
-                return;
-            }
-            task_->apply();
         }
 
         void swap(packaged_task& other)
@@ -407,13 +392,134 @@ namespace hpx { namespace lcos { namespace local
         {
             if (!task_) {
                 HPX_THROWS_IF(ec, task_moved,
-                    "packaged_task<Result>::get_future",
+                    "packaged_task<Func>::get_future",
                     "packaged_task invalid (has it been moved?)");
                 return lcos::future<Result>();
             }
             if (future_obtained_) {
                 HPX_THROWS_IF(ec, future_already_retrieved,
-                    "packaged_task<Result>::get_future",
+                    "packaged_task<Func>::get_future",
+                    "future already has been retrieved from this promise");
+                return lcos::future<Result>();
+            }
+
+            future_obtained_ = true;
+            return lcos::future<Result>(task_);
+        }
+
+        bool valid() const BOOST_NOEXCEPT
+        {
+            return task_;
+        }
+
+    protected:
+        boost::intrusive_ptr<task_impl_type> task_;
+        bool future_obtained_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    // The futures_factory is very similar to a packaged_task except that it
+    // allows for the owner to go out of scope before the future becomes ready.
+    // We provide this class to avoid semantic differences to the C++11
+    // std::packaged_task, while otoh it is a very convenient way for us to
+    // implement hpx::async.
+    template <typename Func>
+    class futures_factory;
+
+    template <typename Result>
+    class futures_factory<Result()>
+    {
+    protected:
+        typedef lcos::detail::task_base<Result> task_impl_type;
+
+    private:
+        BOOST_MOVABLE_BUT_NOT_COPYABLE(futures_factory)
+
+    public:
+        // support for result_of
+        typedef Result result_type;
+
+        // construction and destruction
+        futures_factory() {}
+
+        template <typename F>
+        explicit futures_factory(BOOST_FWD_REF(F) f)
+          : task_(new detail::task_object<Result, F>(boost::forward<F>(f))),
+            future_obtained_(false)
+        {}
+
+        explicit futures_factory(Result (*f)())
+          : task_(new detail::task_object<Result , Result (*)()>(f)),
+            future_obtained_(false)
+        {}
+
+        ~futures_factory()
+        {
+            if (task_ && !future_obtained_)
+                task_->deleting_owner();
+        }
+
+        futures_factory(BOOST_RV_REF(futures_factory) rhs)
+          : task_(boost::move(rhs.task_)),
+            future_obtained_(rhs.future_obtained_)
+        {
+            rhs.task_.reset();
+            rhs.future_obtained_ = false;
+        }
+
+        futures_factory& operator=(BOOST_RV_REF(futures_factory) rhs)
+        {
+            if (this != &rhs) {
+                task_ = boost::move(rhs.task_);
+                future_obtained_ = rhs.future_obtained_;
+                rhs.task_.reset();
+                rhs.future_obtained_ = false;
+            }
+            return *this;
+        }
+
+        // synchronous execution
+        void operator()()
+        {
+            if (!task_) {
+                HPX_THROW_EXCEPTION(task_moved,
+                    "futures_factory<Func>::operator()",
+                    "futures_factory invalid (has it been moved?)");
+                return;
+            }
+            task_->run();
+        }
+
+        // asynchronous execution
+        void apply()
+        {
+            if (!task_) {
+                HPX_THROW_EXCEPTION(task_moved,
+                    "futures_factory<Func>::apply()",
+                    "futures_factory invalid (has it been moved?)");
+                return;
+            }
+            task_->apply();
+        }
+
+        void swap(futures_factory& other)
+        {
+            task_.swap(other.task_);
+            std::swap(future_obtained_, other.future_obtained_);
+        }
+
+        // Result retrieval
+        lcos::future<Result> get_future(error_code& ec = throws)
+        {
+            if (!task_) {
+                HPX_THROWS_IF(ec, task_moved,
+                    "futures_factory<Func>::get_future",
+                    "futures_factory invalid (has it been moved?)");
+                return lcos::future<Result>();
+            }
+            if (future_obtained_) {
+                HPX_THROWS_IF(ec, future_already_retrieved,
+                    "futures_factory<Func>::get_future",
                     "future already has been retrieved from this promise");
                 return lcos::future<Result>();
             }

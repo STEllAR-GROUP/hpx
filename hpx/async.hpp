@@ -54,7 +54,7 @@ namespace hpx
     async (BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f)
     {
         typedef typename boost::result_of<F()>::type result_type;
-        lcos::local::packaged_task<result_type()> p(
+        lcos::local::futures_factory<result_type()> p(
             boost::forward<F>(f));
         if (policy & launch::async)
             p.apply();
@@ -95,7 +95,7 @@ namespace hpx
         typedef typename boost::result_of<                                    \
             F(BOOST_PP_ENUM_PARAMS(N, A))                                     \
         >::type result_type;                                                  \
-        lcos::local::packaged_task<result_type()> p(                          \
+        lcos::local::futures_factory<result_type()> p(                        \
             util::bind(boost::forward<F>(f),                                  \
                 BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _)));                      \
         if (policy & launch::async) p.apply();                                \
@@ -166,7 +166,7 @@ namespace hpx
             >
         ))) bound)
     {
-        lcos::local::packaged_task<R()> p(boost::move(bound));
+        lcos::local::futures_factory<R()> p(boost::move(bound));
         if (policy & launch::async)
             p.apply();
         return p.get_future();
@@ -209,7 +209,7 @@ namespace hpx
       , BOOST_PP_ENUM(N, HPX_FWD_ARGS, _)                                     \
     )                                                                         \
     {                                                                         \
-        lcos::local::packaged_task<R()> p(                                    \
+        lcos::local::futures_factory<R()> p(                                  \
             util::bind(                                                       \
                 util::protect(boost::move(bound))                             \
               , BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _)));                      \
@@ -268,7 +268,7 @@ namespace hpx
             >
         ))) bound)
     {
-        lcos::local::packaged_task<R()> p(boost::move(bound));
+        lcos::local::futures_factory<R()> p(boost::move(bound));
         if (policy & launch::async)
             p.apply();
         return p.get_future();
@@ -319,7 +319,7 @@ namespace hpx
       , BOOST_PP_ENUM(N, HPX_FWD_ARGS, _)                                     \
     )                                                                         \
     {                                                                         \
-        lcos::local::packaged_task<R()> p(                                    \
+        lcos::local::futures_factory<R()> p(                                  \
             util::bind(                                                       \
                 util::protect(boost::move(bound))                             \
               , BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _)));                      \
@@ -377,7 +377,7 @@ namespace hpx
         ))) bound)
     {
         typedef typename detail::create_future<F()>::type result_type;
-        lcos::local::packaged_task<result_type()>
+        lcos::local::futures_factory<result_type()>
             p(boost::move(bound));
         if (policy & launch::async)
             p.apply();
@@ -422,7 +422,7 @@ namespace hpx
         typedef typename detail::create_future<                               \
                 F(BOOST_PP_ENUM_PARAMS(N, A))                                 \
             >::type result_type;                                              \
-        lcos::local::packaged_task<result_type()> p(                          \
+        lcos::local::futures_factory<result_type()> p(                        \
             util::bind(                                                       \
                 util::protect(boost::move(bound))                             \
               , BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, _)));                      \

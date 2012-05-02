@@ -22,7 +22,8 @@ namespace hpx { namespace lcos
     namespace local
     {
         template <typename Result> class promise;
-        template <typename Result> class packaged_task;
+        template <typename Func> class packaged_task;
+        template <typename Func> class futures_factory;
 
         template <typename ContResult, typename Result>
         class packaged_continuation;
@@ -53,6 +54,7 @@ namespace hpx { namespace lcos
 
         friend class local::promise<Result>;
         friend class local::packaged_task<Result()>;
+        friend class local::futures_factory<Result()>;
         template <typename ContResult, typename Result_>
         friend class local::packaged_continuation;
         template <typename ContResult>
@@ -235,6 +237,7 @@ namespace hpx { namespace lcos
 
         friend class local::promise<void>;
         friend class local::packaged_task<void()>;
+        friend class local::futures_factory<void()>;
         template <typename ContResult, typename Result_>
         friend class local::packaged_continuation;
         template <typename ContResult>

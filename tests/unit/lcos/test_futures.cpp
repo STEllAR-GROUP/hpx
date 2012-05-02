@@ -664,6 +664,7 @@ void test_destroying_a_promise_stores_broken_promise()
     HPX_TEST(f.has_exception());
     try {
         f.get();
+        HPX_TEST(false);    // shouldn't get here
     }
     catch (hpx::exception const& e) {
         HPX_TEST(e.get_error() == hpx::broken_promise);
@@ -686,6 +687,7 @@ void test_destroying_a_packaged_task_stores_broken_task()
     HPX_TEST(f.has_exception());
     try {
         f.get();
+        HPX_TEST(false);    // shouldn't get here
     }
     catch (hpx::exception const& e) {
       HPX_TEST(e.get_error() == hpx::broken_task);
@@ -1191,7 +1193,7 @@ void test_wait_for_all_from_list()
     std::vector<hpx::lcos::future<int> > futures;
     for (unsigned j = 0; j < count; ++j)
     {
-        hpx::lcos::local::packaged_task<int()> task(make_int_slowly);
+        hpx::lcos::local::futures_factory<int()> task(make_int_slowly);
         futures.push_back(task.get_future());
         task.apply();
     }
@@ -1213,10 +1215,10 @@ void test_wait_for_all_two_futures()
 {
     unsigned const count = 2;
 
-    hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
+    hpx::lcos::local::futures_factory<int()> pt1(make_int_slowly);
     hpx::lcos::future<int> f1 = pt1.get_future();
     pt1.apply();
-    hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
+    hpx::lcos::local::futures_factory<int()> pt2(make_int_slowly);
     hpx::lcos::future<int> f2 = pt2.get_future();
     pt2.apply();
 
@@ -1238,13 +1240,13 @@ void test_wait_for_all_three_futures()
 {
     unsigned const count = 3;
 
-    hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
+    hpx::lcos::local::futures_factory<int()> pt1(make_int_slowly);
     hpx::lcos::future<int> f1 = pt1.get_future();
     pt1.apply();
-    hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
+    hpx::lcos::local::futures_factory<int()> pt2(make_int_slowly);
     hpx::lcos::future<int> f2 = pt2.get_future();
     pt2.apply();
-    hpx::lcos::local::packaged_task<int()> pt3(make_int_slowly);
+    hpx::lcos::local::futures_factory<int()> pt3(make_int_slowly);
     hpx::lcos::future<int> f3 = pt3.get_future();
     pt3.apply();
 
@@ -1267,16 +1269,16 @@ void test_wait_for_all_four_futures()
 {
     unsigned const count = 4;
 
-    hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
+    hpx::lcos::local::futures_factory<int()> pt1(make_int_slowly);
     hpx::lcos::future<int> f1 = pt1.get_future();
     pt1.apply();
-    hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
+    hpx::lcos::local::futures_factory<int()> pt2(make_int_slowly);
     hpx::lcos::future<int> f2 = pt2.get_future();
     pt2.apply();
-    hpx::lcos::local::packaged_task<int()> pt3(make_int_slowly);
+    hpx::lcos::local::futures_factory<int()> pt3(make_int_slowly);
     hpx::lcos::future<int> f3 = pt3.get_future();
     pt3.apply();
-    hpx::lcos::local::packaged_task<int()> pt4(make_int_slowly);
+    hpx::lcos::local::futures_factory<int()> pt4(make_int_slowly);
     hpx::lcos::future<int> f4 = pt4.get_future();
     pt4.apply();
 
@@ -1300,19 +1302,19 @@ void test_wait_for_all_five_futures()
 {
     unsigned const count = 5;
 
-    hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
+    hpx::lcos::local::futures_factory<int()> pt1(make_int_slowly);
     hpx::lcos::future<int> f1 = pt1.get_future();
     pt1.apply();
-    hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
+    hpx::lcos::local::futures_factory<int()> pt2(make_int_slowly);
     hpx::lcos::future<int> f2 = pt2.get_future();
     pt2.apply();
-    hpx::lcos::local::packaged_task<int()> pt3(make_int_slowly);
+    hpx::lcos::local::futures_factory<int()> pt3(make_int_slowly);
     hpx::lcos::future<int> f3 = pt3.get_future();
     pt3.apply();
-    hpx::lcos::local::packaged_task<int()> pt4(make_int_slowly);
+    hpx::lcos::local::futures_factory<int()> pt4(make_int_slowly);
     hpx::lcos::future<int> f4 = pt4.get_future();
     pt4.apply();
-    hpx::lcos::local::packaged_task<int()> pt5(make_int_slowly);
+    hpx::lcos::local::futures_factory<int()> pt5(make_int_slowly);
     hpx::lcos::future<int> f5 = pt5.get_future();
     pt5.apply();
 

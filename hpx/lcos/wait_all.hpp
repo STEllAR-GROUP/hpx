@@ -145,7 +145,7 @@ namespace hpx
         std::vector<lcos::future<T, RT> >))) lazy_values)
     {
         typedef std::vector<lcos::future<T, RT> > return_type;
-        lcos::local::packaged_task<return_type()> p(
+        lcos::local::futures_factory<return_type()> p(
             detail::wait_all<T, RT>(boost::move(lazy_values)));
         p.apply();
         return p.get_future();
@@ -156,8 +156,8 @@ namespace hpx
     wait_all (std::vector<lcos::future<T, RT> > const& lazy_values)
     {
         typedef std::vector<lcos::future<T, RT> > return_type;
-        lcos::local::packaged_task<return_type()> p =
-            lcos::local::packaged_task<return_type()>(
+        lcos::local::futures_factory<return_type()> p =
+            lcos::local::futures_factory<return_type()>(
                 detail::wait_all<T, RT>(lazy_values));
         p.apply();
         return p.get_future();
@@ -195,7 +195,7 @@ namespace hpx
         BOOST_PP_REPEAT(N, HPX_WAIT_ALL_PUSH_BACK_ARGS, _)
 
         typedef std::vector<lcos::future<T, RT> > return_type;
-        lcos::local::packaged_task<return_type()> p(
+        lcos::local::futures_factory<return_type()> p(
             detail::wait_all<T, RT>(boost::move(lazy_values)));
         p.apply();
         return p.get_future();
