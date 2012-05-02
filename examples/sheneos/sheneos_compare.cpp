@@ -4,6 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <omp.h>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
@@ -16,6 +17,13 @@
 
 #include "sheneos/interpolator.hpp"
 #include "fname.h"
+
+int omp_thread_count() {
+    int n = 0;
+    #pragma omp parallel reduction(+:n)
+    n += 1;
+    return n;
+}
 
 extern "C" {void FNAME(read_nuc_table)(); }
 
@@ -89,6 +97,10 @@ void test_sheneos(std::size_t num_ye_points, std::size_t num_temp_points,
     std::random_shuffle(sequence_temp.begin(), sequence_temp.end());
     std::random_shuffle(sequence_rho.begin(), sequence_rho.end());
 
+    std::size_t nthreads = omp_thread_count();
+    //std::size_t nthreads = omp_get_num_threads();   
+    std::cout << " Number of OMP threads " << nthreads << std::endl;
+ 
     // Create the three-dimensional future grid.
     //std::vector<hpx::lcos::future<std::vector<double> > > tests;
     for (std::size_t i = 0; i < sequence_ye.size(); ++i)
@@ -97,6 +109,7 @@ void test_sheneos(std::size_t num_ye_points, std::size_t num_temp_points,
         for (std::size_t j = 0; j < sequence_temp.size(); ++j)
         {
             std::size_t const& jj = sequence_temp[j];
+#pragma OMP parallel do    
             for (std::size_t k = 0; k < sequence_rho.size(); ++k)
             {
                 std::size_t const& kk = sequence_rho[k];
@@ -454,11 +467,11 @@ int main(int argc, char* argv[])
         ("file", value<std::string>()->default_value(
                 "sheneos_220r_180t_50y_extT_analmu_20100322_SVNr28.h5"),
             "name of HDF5 data file containing the Shen EOS tables")
-        ("num-ye-points,Y", value<std::size_t>()->default_value(20),
+        ("num-ye-points,Y", value<std::size_t>()->default_value(40),
             "number of points to interpolate on the ye axis")
-        ("num-temp-points,T", value<std::size_t>()->default_value(20),
+        ("num-temp-points,T", value<std::size_t>()->default_value(40),
             "number of points to interpolate on the temp axis")
-        ("num-rho-points,R", value<std::size_t>()->default_value(20),
+        ("num-rho-points,R", value<std::size_t>()->default_value(40),
             "number of points to interpolate on the rho axis")
         ("num-partitions", value<std::size_t>()->default_value(32),
             "number of partitions to create")

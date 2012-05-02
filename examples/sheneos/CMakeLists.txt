@@ -50,6 +50,10 @@ if(CMAKE_Fortran_COMPILER AND HDF5_FORTRAN_FOUND)
     DEPENDENCIES sheneos_component ${HDF5_FORTRAN_LIBRARY} ${HDF5_LIBRARY}
     FOLDER "Examples/ShenEOS")
 
+set_target_properties(sheneos_compare_exe PROPERTIES COMPILE_FLAGS "${OpenMP_CXX_FLAGS}")
+
+set_target_properties(sheneos_compare_exe PROPERTIES LINK_FLAGS "${OpenMP_CXX_FLAGS}")
+
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(examples.sheneos sheneos_compare_exe)
 endif()
