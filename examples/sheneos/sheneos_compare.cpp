@@ -100,16 +100,17 @@ void test_sheneos(std::size_t num_ye_points, std::size_t num_temp_points,
     std::size_t nthreads = omp_thread_count();
     //std::size_t nthreads = omp_get_num_threads();   
     std::cout << " Number of OMP threads " << nthreads << std::endl;
+    std::cout << " Problem Size: Ye " << sequence_ye.size() << " T " << sequence_temp.size() << " R " << sequence_rho.size()  << std::endl;
  
     // Create the three-dimensional future grid.
     //std::vector<hpx::lcos::future<std::vector<double> > > tests;
+#pragma omp parallel for    
     for (std::size_t i = 0; i < sequence_ye.size(); ++i)
     {
         std::size_t const& ii = sequence_ye[i];
         for (std::size_t j = 0; j < sequence_temp.size(); ++j)
         {
             std::size_t const& jj = sequence_temp[j];
-#pragma OMP parallel do    
             for (std::size_t k = 0; k < sequence_rho.size(); ++k)
             {
                 std::size_t const& kk = sequence_rho[k];
@@ -341,8 +342,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     std::string const datafilename = vm["file"].as<std::string>();
 
     std::size_t const num_ye_points = vm["num-ye-points"].as<std::size_t>();
-    std::size_t const num_temp_points = vm["num-ye-points"].as<std::size_t>();
-    std::size_t const num_rho_points = vm["num-ye-points"].as<std::size_t>();
+    std::size_t const num_temp_points = vm["num-temp-points"].as<std::size_t>();
+    std::size_t const num_rho_points = vm["num-rho-points"].as<std::size_t>();
 
     std::size_t const num_partitions = vm["num-partitions"].as<std::size_t>();
 
