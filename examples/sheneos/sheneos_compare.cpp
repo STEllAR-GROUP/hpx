@@ -87,25 +87,25 @@ void test_sheneos(std::size_t num_ye_points, std::size_t num_temp_points,
         rho += delta_rho;
     }
 
+    std::size_t nthreads = omp_thread_count();
+    //std::size_t nthreads = omp_get_num_threads();   
+    std::cout << " Number of OMP threads " << nthreads << std::endl;
+    std::cout << " Problem Size: Ye " << sequence_ye.size() << " T " << sequence_temp.size() << " R " << sequence_rho.size()  << std::endl;
+
     ///////////////////////////////////////////////////////////////////////////
     // We want to avoid invoking the same evaluation sequence on all localities
     // performing the test, so we randomly shuffle the sequences. We combine
     // the shared seed with the locality id to ensure that each locality has
     // a unique, reproducible seed.
-    std::srand(static_cast<unsigned int>(seed + hpx::get_locality_id()));
+#pragma omp parallel 
+    std::cout << " HELLO WORLD from thread " << omp_get_thread_num() << std::endl;
+    std::srand(static_cast<unsigned int>(omp_get_thread_num() + hpx::get_locality_id()));
     std::random_shuffle(sequence_ye.begin(), sequence_ye.end());
     std::random_shuffle(sequence_temp.begin(), sequence_temp.end());
     std::random_shuffle(sequence_rho.begin(), sequence_rho.end());
 
-    std::size_t nthreads = omp_thread_count();
-    //std::size_t nthreads = omp_get_num_threads();   
-    std::cout << " Number of OMP threads " << nthreads << std::endl;
-    std::cout << " Problem Size: Ye " << sequence_ye.size() << " T " << sequence_temp.size() << " R " << sequence_rho.size()  << std::endl;
- 
     // Create the three-dimensional future grid.
     //std::vector<hpx::lcos::future<std::vector<double> > > tests;
-#pragma omp parallel 
-    std::cout << " HELLO WORLD from thread " << omp_get_thread_num() << std::endl;
     for (std::size_t i = 0; i < sequence_ye.size(); ++i)
     {
         std::size_t const& ii = sequence_ye[i];
