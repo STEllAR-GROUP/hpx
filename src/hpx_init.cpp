@@ -852,11 +852,11 @@ namespace hpx
             if (vm.count("hpx:threads")) {
                 std::size_t threads = vm["hpx:threads"].as<std::size_t>();
                 if ((env.run_with_pbs() || env.run_with_slurm()) &&
-                      threads > num_threads)
+                      num_threads > threads)
                 {
                     std::cerr  << "hpx::init: command line warning: --hpx:threads "
                             "used when running with "
-                        <<  env.get_batch_name() << " , requesting a larger "
+                        <<  env.get_batch_name() << ", requesting a larger "
                             "number of threads than cores have been assigned by "
                         <<  env.get_batch_name()
                         <<  ", the application might not run properly."
