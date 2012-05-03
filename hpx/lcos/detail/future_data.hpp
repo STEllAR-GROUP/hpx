@@ -204,14 +204,14 @@ namespace hpx { namespace lcos { namespace detail
         template <typename R, typename RR> friend class future;
 
     protected:
-        future_data() {}
+        future_data() : set_on_completed_(false) {}
 
         future_data(completed_callback_type const& data_sink)
-          : on_completed_(data_sink)
+          : on_completed_(data_sink), set_on_completed_(!data_sink.empty())
         {}
 
     public:
-        result_type handle_error(data_type const& d, error_code &ec)
+        static result_type handle_error(data_type const& d, error_code &ec)
         {
             // an error has been reported in the meantime, throw or set
             // the error code
@@ -304,21 +304,25 @@ namespace hpx { namespace lcos { namespace detail
                 > get_remote_result_type;
 
                 // store the value
-                typename mutex_type::scoped_lock l(this->mtx_);
-                if (!on_completed_.empty()) {
-                    // this future instance coincidentally keeps us alive
-                    future<Result, RemoteResult> f(this);
-                    data_.set(boost::move(get_remote_result_type::call(
-                        boost::forward<T>(result))));
+                if (set_on_completed_) {
+                    // lock only when needed
+                    typename mutex_type::scoped_lock l(this->mtx_);
+                    if (!on_completed_.empty()) {
+                        // this future instance coincidentally keeps us alive
+                        future<Result, RemoteResult> f(this);
+                        data_.set(boost::move(get_remote_result_type::call(
+                            boost::forward<T>(result))));
 
-                    // invoke the callback (continuation) function
-                    on_completed_(f);
-                    on_completed_.reset();
+                        // invoke the callback (continuation) function
+                        on_completed_(f);
+                        set_on_completed_ = false;
+                        on_completed_.reset();
+                        return;
+                    }
                 }
-                else {
-                  data_.set(boost::move(get_remote_result_type::call(
-                        boost::forward<T>(result))));
-                }
+
+                data_.set(boost::move(get_remote_result_type::call(
+                      boost::forward<T>(result))));
             }
             catch (hpx::exception const&) {
                 // store the error instead
@@ -330,19 +334,21 @@ namespace hpx { namespace lcos { namespace detail
         void set_exception(boost::exception_ptr const& e)
         {
             // store the error code
-            typename mutex_type::scoped_lock l(this->mtx_);
-            if (!on_completed_.empty()) {
-                // this future coincidentally instance keeps us alive
-                future<Result, RemoteResult> f(this);
-                data_.set(e);
+            if (set_on_completed_) {
+                typename mutex_type::scoped_lock l(this->mtx_);
+                if (!on_completed_.empty()) {
+                    // this future coincidentally instance keeps us alive
+                    future<Result, RemoteResult> f(this);
+                    data_.set(e);
 
-                // invoke the callback (continuation) function
-                on_completed_(f);
-                on_completed_.reset();
+                    // invoke the callback (continuation) function
+                    on_completed_(f);
+                    set_on_completed_ = false;
+                    on_completed_.reset();
+                    return;
+                }
             }
-            else {
-                data_.set(e);
-            }
+            data_.set(e);
         }
 
         void set_error(error e, char const* f, char const* msg)
@@ -399,6 +405,7 @@ namespace hpx { namespace lcos { namespace detail
         set_on_completed(BOOST_RV_REF(completed_callback_type) data_sink)
         {
             typename mutex_type::scoped_lock l(this->mtx_);
+            set_on_completed_ = !data_sink.empty();
             return boost::move(set_on_completed_locked(boost::move(data_sink)));
         }
 
@@ -406,6 +413,7 @@ namespace hpx { namespace lcos { namespace detail
         set_on_completed_locked(BOOST_RV_REF(completed_callback_type) data_sink)
         {
             completed_callback_type retval = boost::move(on_completed_);
+            set_on_completed_ = !data_sink.empty();
             on_completed_ = boost::move(data_sink);
             if (!on_completed_.empty() && this->is_ready()) {
                 // this future coincidentally instance keeps us alive
@@ -413,6 +421,7 @@ namespace hpx { namespace lcos { namespace detail
 
                 // invoke the callback (continuation) function
                 on_completed_(f);
+                set_on_completed_ = false;
                 on_completed_.reset();
             }
             return retval;
@@ -423,6 +432,7 @@ namespace hpx { namespace lcos { namespace detail
             completed_callback_type data_sink;
             {
                 typename mutex_type::scoped_lock l(this->mtx_);
+                set_on_completed_ = false;
                 std::swap(on_completed_, data_sink);
             }
         }
@@ -430,6 +440,7 @@ namespace hpx { namespace lcos { namespace detail
     private:
         util::full_empty<data_type> data_;
         completed_callback_type on_completed_;
+        bool set_on_completed_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
