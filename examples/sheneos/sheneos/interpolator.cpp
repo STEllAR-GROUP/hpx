@@ -174,7 +174,10 @@ namespace sheneos
             hpx::components::server::locality_results(results);
 
         BOOST_FOREACH(hpx::naming::id_type id, parts)
+        {
+            std::cout << "Partition " << partitions_.size() << ": " << id << "\n";
             partitions_.push_back(id);
+        }
 
         // Initialize all attached partition objects.
         std::size_t num_localities = partitions_.size();

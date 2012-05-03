@@ -433,8 +433,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     } // Ensure that everything is out of scope before shutdown.
 
     // Shutdown the runtime system.
-    hpx::finalize();
-    return 0;
+    return hpx::finalize();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
