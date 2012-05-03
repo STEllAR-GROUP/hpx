@@ -11,6 +11,8 @@
 
 #include <boost/foreach.hpp>
 
+// TODO: Remove the use of the name "prefix"
+
 namespace hpx { namespace agas
 {
 
@@ -132,9 +134,9 @@ response component_namespace::bind_prefix(
                 std::make_pair(key, type_counter)), cit)))
         {
             HPX_THROWS_IF(ec, lock_error
-                , "component_namespace::bind_prefix"
-                , "component id table insertion failed due to a locking "
-                  "error or memory corruption")
+              , "component_namespace::bind_prefix"
+              , "component id table insertion failed due to a locking "
+                "error or memory corruption")
             return response();
         }
 
@@ -149,18 +151,24 @@ response component_namespace::bind_prefix(
     if (fit != fend)
     {
         prefixes_type::iterator pit = fit->second.find(prefix);
-        if (pit != fit->second.end()) {
-            // duplicate type registration for this locality
+
+        if (pit != fit->second.end())
+        {
+            // Duplicate type registration for this locality.
             HPX_THROWS_IF(ec, duplicate_component_id
-                , "component_namespace::bind_prefix"
-                , "the component id is already registered for the given "
-                  "locality")
+              , "component_namespace::bind_prefix"
+              , boost::str(boost::format(
+                    "component id is already registered for the given "
+                    "locality, key(%1%), prefix(%2%), ctype(%3%)")
+                    % key % prefix % cit->second))
             return response();
         }
 
-        // first registration for this locality, we still return no_success to
+        fit->second.insert(prefix);
+
+        // First registration for this locality, we still return no_success to
         // convey the fact that another locality already registered this
-        // component type
+        // component type.
         LAGAS_(info) << (boost::format(
             "component_namespace::bind_prefix, key(%1%), prefix(%2%), "
             "ctype(%3%), response(no_success)")
