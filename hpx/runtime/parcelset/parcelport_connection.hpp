@@ -95,6 +95,21 @@ namespace hpx { namespace parcelset
             return there_;
         }
 
+#if defined(HPX_DEBUG)
+        void set_locality(naming::locality const& l)
+        {
+            locality_ = l;
+        }
+
+        naming::locality const& get_locality() const
+        {
+            return locality_;
+        }
+
+    private:
+        naming::locality locality_;
+#endif
+
     protected:
         /// handle completed write operation
         template <typename Handler, typename ParcelPostprocess>
@@ -137,9 +152,6 @@ namespace hpx { namespace parcelset
     private:
         /// Socket for the parcelport_connection.
         boost::asio::ip::tcp::socket socket_;
-
-        /// holding on to number of parcels in the current message
-        std::size_t out_parcel_count_;
 
         /// buffer for outgoing data
         boost::integer::ulittle8_t out_priority_;

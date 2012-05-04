@@ -24,6 +24,15 @@ namespace hpx { namespace parcelset
         // we choose the highest priority of all parcels for this message
         threads::thread_priority priority = threads::thread_priority_default;
 
+#if defined(HPX_DEBUG)
+        BOOST_FOREACH(parcel const& p, pv)
+        {
+            const boost::uint32_t locality_id =
+                naming::get_locality_id_from_gid(p.get_destination());
+            BOOST_ASSERT(locality_id == destination());
+        }
+#endif
+
         // guard against serialization errors
         try {
             // create a special io stream on top of out_buffer_

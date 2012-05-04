@@ -121,6 +121,10 @@ namespace hpx { namespace parcelset
                     // de-serialize parcel and add it to incoming parcel queue
                     parcel p;
                     archive >> p;
+
+                    // make sure this parcel ended up on the right locality
+                    BOOST_ASSERT(p.get_destination_addr().locality_ == here());
+
                     parcels_->add_parcel(p);
                 }
 

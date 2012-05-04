@@ -594,21 +594,21 @@ big_boot_barrier::big_boot_barrier(
 }
 
 void big_boot_barrier::apply(
-    boost::uint32_t prefix
+    boost::uint32_t locality_id
   , naming::address const& addr
   , actions::base_action* act
 ) { // {{{
-    parcelset::parcel p(prefix, addr, act);
+    parcelset::parcel p(locality_id, addr, act);
 
     parcelset::parcelport_connection_ptr client_connection
-        (connection_cache_.get(prefix));
+        (connection_cache_.get(locality_id));
 
     if (!client_connection)
     {
         // The parcel gets serialized inside the connection constructor, no
         // need to keep the original parcel alive after this call returned.
         client_connection.reset(new parcelset::parcelport_connection(
-            io_service_pool_.get_io_service(), prefix,
+            io_service_pool_.get_io_service(), locality_id,
             connection_cache_, pp.timer_, pp.parcels_sent_));
         client_connection->set_parcel(p);
 
@@ -660,10 +660,33 @@ void big_boot_barrier::apply(
                 "big_boot_barrier::get_connection",
                 hpx::util::osstream_get_string(strm));
         } // }}}
+#if defined(HPX_DEBUG)
+        else
+        {
+            client_connection->set_locality(addr.locality_);
+
+            std::string connection_addr = client_connection->socket().remote_endpoint().address().to_string();
+            boost::uint16_t connection_port = client_connection->socket().remote_endpoint().port();
+            BOOST_ASSERT(addr.locality_.get_address() == connection_addr);
+            BOOST_ASSERT(addr.locality_.get_port() == connection_port);
+        }
+#endif
     }
 
     else
+    {
         client_connection->set_parcel(p);
+
+#if defined(HPX_DEBUG)
+        BOOST_ASSERT(addr.locality_ == client_connection->get_locality());
+        BOOST_ASSERT(locality_id == client_connection->destination());
+
+        std::string connection_addr = client_connection->socket().remote_endpoint().address().to_string();
+        boost::uint16_t connection_port = client_connection->socket().remote_endpoint().port();
+        BOOST_ASSERT(addr.locality_.get_address() == connection_addr);
+        BOOST_ASSERT(addr.locality_.get_port() == connection_port);
+#endif
+    }
 
     client_connection->async_write(early_write_handler, early_pending_parcel_handler);
 } // }}}
@@ -686,7 +709,7 @@ void big_boot_barrier::wait()
             // on the bootstrap AGAS node, and sleeping on this node. We'll
             // be woken up by notify_console.
 
-            apply(1, bootstrap_agas, new register_console_action(
+            apply(0, bootstrap_agas, new register_console_action(
                 registration_header
                     (get_runtime().here(),
                      HPX_INITIAL_GID_RANGE,
@@ -705,7 +728,7 @@ void big_boot_barrier::wait()
             // we need to contact the bootstrap AGAS node, and then wait
             // for it to signal us.
 
-            apply(1, bootstrap_agas, new register_worker_action(
+            apply(0, bootstrap_agas, new register_worker_action(
                 registration_header
                     (get_runtime().here(),
                      HPX_INITIAL_GID_RANGE,
