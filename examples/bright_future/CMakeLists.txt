@@ -3,11 +3,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=10)
-add_definitions(-DHPX_COMPONENT_CREATE_ARGUMENT_LIMIT=10)
-add_definitions(-DHPX_FUNCTION_LIMIT=13)
-add_definitions(-DHPX_TUPLE_LIMIT=13)
-
 set(bright_future_programs
         root_finder
         vector_root_finder

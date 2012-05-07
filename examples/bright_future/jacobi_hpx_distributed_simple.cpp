@@ -293,10 +293,14 @@ void gs(
   , std::string const & //output
 )
 {
+    /*
     hpx::components::component_type type
         = hpx::components::get_component_type<hpx::components::server::remote_object>();
+    */
 
-    std::vector<id_type> prefixes = find_all_localities(type);
+    std::vector<id_type> prefixes = hpx::find_all_localities();
+
+    cout << "Number of localities: " << prefixes.size() << "\n" << flush;
 
     std::vector<std::size_t> dims = create_dim(prefixes.size(), 2);
 
