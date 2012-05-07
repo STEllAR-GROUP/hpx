@@ -9,10 +9,11 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-
+#include "fname.h"
 #include "ep/point.hpp"
-
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
+
+extern "C" {void FNAME(hello)(); }
 
 /// This function initializes a vector of \a ep::point clients,
 /// connecting them to components created with
@@ -103,6 +104,8 @@ int hpx_main(boost::program_options::variables_map &vm)
 int main(int argc, char* argv[])
 {
     using boost::program_options::value;
+
+    FNAME(hello)();
 
     // Configure application-specific options.
     boost::program_options::options_description
