@@ -327,8 +327,12 @@ namespace hpx
     }
 }
 
+/** FIXME: boost.tuple only allows for a maximum of 10 tuple elements!
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (1, HPX_FUNCTION_LIMIT, <hpx/lcos/wait_any.hpp>))                     \
+*/
+#define BOOST_PP_ITERATION_PARAMS_1                                           \
+    (3, (1, 10, <hpx/lcos/wait_any.hpp>))                                     \
 /**/
 #include BOOST_PP_ITERATE()
 
