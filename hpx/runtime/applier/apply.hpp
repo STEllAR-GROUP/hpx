@@ -48,7 +48,8 @@ namespace hpx
 
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p (gid.get_gid(), new action_type(priority));
+            parcelset::parcel p (gid.get_gid(),
+                new hpx::actions::transfer_action<action_type>(priority));
             if (components::component_invalid == addr.type_)
                 addr.type_ = components::get_component_type<
                     typename action_type::component_type>();
@@ -68,7 +69,8 @@ namespace hpx
 
             // Create a parcel and send it to the AGAS server
             // New parcel with the gid, action, and arguments
-            parcelset::parcel p (gid.get_gid(), new action_type(priority));
+            parcelset::parcel p (gid.get_gid(),
+                new hpx::actions::transfer_action<action_type>(priority));
             if (components::component_invalid == addr.type_)
                 addr.type_ = components::get_component_type<
                     typename action_type::component_type>();
@@ -104,7 +106,8 @@ namespace hpx
             BOOST_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
-            apply_helper0<action_type>::call(addr.address_, priority);
+            util::tuple0<> env;
+            apply_helper<action_type>::call(addr.address_, priority, env);
             return true;     // no parcel has been sent (dest is local)
         }
 
@@ -182,7 +185,8 @@ namespace hpx
 
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p (gid.get_gid(), new action_type(priority), cont);
+            parcelset::parcel p (gid.get_gid(),
+                new hpx::actions::transfer_action<action_type>(priority), cont);
             if (components::component_invalid == addr.type_)
                 addr.type_ = components::get_component_type<
                     typename action_type::component_type>();
@@ -202,7 +206,8 @@ namespace hpx
 
             actions::continuation_type cont(c);
 
-            parcelset::parcel p (gid.get_gid(), new action_type(priority), cont);
+            parcelset::parcel p (gid.get_gid(),
+                new hpx::actions::transfer_action<action_type>(priority), cont);
             if (components::component_invalid == addr.type_)
                 addr.type_ = components::get_component_type<
                     typename action_type::component_type>();
@@ -239,7 +244,8 @@ namespace hpx
 
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p (gid.get_gid(), new action_type(priority));
+            parcelset::parcel p (gid.get_gid(),
+                new hpx::actions::transfer_action<action_type>(priority));
             if (components::component_invalid == addr.type_)
                 addr.type_ = components::get_component_type<
                     typename action_type::component_type>();
@@ -269,7 +275,8 @@ namespace hpx
                 components::get_component_type<
                     typename action_type::component_type>()));
             actions::continuation_type cont(c);
-            apply_helper0<action_type>::call(cont, addr.address_, priority);
+            util::tuple0<> env;
+            apply_helper<action_type>::call(cont, addr.address_, priority, env);
             return true;     // no parcel has been sent (dest is local)
         }
 
@@ -451,7 +458,8 @@ namespace hpx
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
             parcelset::parcel p (gid.get_gid(),
-                new action_type(priority, boost::forward<Arg0>(arg0)));
+                new hpx::actions::transfer_action<action_type>(
+                    priority, boost::forward<Arg0>(arg0)));
             if (components::component_invalid == addr.type_)
                 addr.type_ = components::get_component_type<
                     typename action_type::component_type>();
@@ -471,8 +479,9 @@ namespace hpx
 
             // create parcel
             // addr is probably redundant here!!
-            parcelset::parcel p (gid.get_gid(), new action_type(priority,
-                boost::forward<Arg0>(arg0)));
+            parcelset::parcel p (gid.get_gid(),
+                new hpx::actions::transfer_action<action_type>(
+                    priority, boost::forward<Arg0>(arg0)));
             if (components::component_invalid == addr.type_)
                 addr.type_ = components::get_component_type<
                     typename action_type::component_type>();
@@ -510,7 +519,8 @@ namespace hpx
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
             parcelset::parcel p (gid.get_gid(),
-                new action_type(priority, boost::forward<Arg0>(arg0)));
+                new hpx::actions::transfer_action<action_type>(
+                    priority, boost::forward<Arg0>(arg0)));
             if (components::component_invalid == addr.type_)
                 addr.type_ = components::get_component_type<
                     typename action_type::component_type>();
@@ -540,8 +550,9 @@ namespace hpx
             BOOST_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
-            apply_helper1<action_type>::call(addr.address_, priority,
-                boost::forward<Arg0>(arg0));
+
+            apply_helper<action_type>::call(addr.address_, priority,
+                util::make_argument_pack(arg0));
             return true;     // no parcel has been sent (dest is local)
         }
 
@@ -626,7 +637,8 @@ namespace hpx
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
             parcelset::parcel p (gid.get_gid(),
-                new action_type(priority, boost::forward<Arg0>(arg0)), cont);
+                new hpx::actions::transfer_action<action_type>(
+                    priority, boost::forward<Arg0>(arg0)), cont);
             if (components::component_invalid == addr.type_)
                 addr.type_ = components::get_component_type<
                     typename action_type::component_type>();
@@ -650,7 +662,8 @@ namespace hpx
 
             // create a parcel and forward it to agas server
             parcelset::parcel p (gid.get_gid(),
-                new action_type(priority, boost::forward<Arg0>(arg0)), cont);
+                new hpx::actions::transfer_action<action_type>(
+                    priority, boost::forward<Arg0>(arg0)), cont);
             if (components::component_invalid == addr.type_)
                 addr.type_ = components::get_component_type<
                     typename action_type::component_type>();
@@ -689,8 +702,9 @@ namespace hpx
                 components::get_component_type<
                     typename action_type::component_type>()));
             actions::continuation_type cont(c);
-            apply_helper1<action_type>::call(cont, addr.address_, priority,
-                boost::forward<Arg0>(arg0));
+
+            apply_helper<action_type>::call(cont, addr.address_, priority,
+                util::make_argument_pack(arg0));
             return true;     // no parcel has been sent (dest is local)
         }
 

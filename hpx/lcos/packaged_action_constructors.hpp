@@ -43,18 +43,16 @@
 #define N BOOST_PP_ITERATION()
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    void apply(naming::id_type const& gid,
-        BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+    void apply(naming::id_type const& gid, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
-        hpx::apply_c<action_type>(
-            this->get_gid(), gid, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+        hpx::apply_c<action_type>(this->get_gid(), gid,
+            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     void apply_p(naming::id_type const& gid,
-        threads::thread_priority priority,
-        BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+        threads::thread_priority priority, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p<action_type>(this->get_gid(), gid, priority,

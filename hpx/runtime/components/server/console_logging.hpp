@@ -77,13 +77,15 @@ namespace hpx { namespace components { namespace server
         }
 
     public:
+        template <typename Arguments>
         static util::unused_type
         execute_function(naming::address::address_type lva,
-            messages_type const& msgs)
+            BOOST_FWD_REF(Arguments) args)
         {
             try {
                 // call the function, ignoring the return value
-                console_logging(msgs);
+                console_logging(
+                    boost::move(util::get_argument_from_pack<0>(args)));
             }
             catch (hpx::exception const& /*e*/) {
                 /**/;      // no logging!
@@ -111,9 +113,9 @@ namespace hpx { namespace traits
 {
     template <typename Dummy>
     struct needs_guid_initialization<
-        hpx::components::server::console_logging_action<Dummy>
-    >
-        : boost::mpl::false_
+            hpx::actions::transfer_action<
+                hpx::components::server::console_logging_action<Dummy> > >
+      : boost::mpl::false_
     {};
 }}
 

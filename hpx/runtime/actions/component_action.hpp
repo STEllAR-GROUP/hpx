@@ -79,10 +79,6 @@ namespace hpx { namespace actions
                        Derived, Priority>
             base_type;
 
-        explicit base_result_action0(threads::thread_priority priority = Priority)
-          : base_type(priority)
-        {}
-
     protected:
         /// The \a continuation_thread_function will be registered as the thread
         /// function of a thread. It encapsulates the execution of the
@@ -115,14 +111,14 @@ namespace hpx { namespace actions
         }
 
     public:
-        typedef boost::mpl::false_ direct_execution;
-
         /// \brief This static \a construct_thread_function allows to construct
         /// a proper thread function for a \a thread without having to
         /// instantiate the \a base_result_action0 type. This is used by the \a
         /// applier in case no continuation has been supplied.
+        template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
-        construct_thread_function(naming::address::address_type lva)
+        construct_thread_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) /*args*/)
         {
             threads::thread_state_enum (*f)(naming::address::address_type) =
                 &Derived::template thread_function<naming::address::address_type>;
@@ -134,47 +130,15 @@ namespace hpx { namespace actions
         /// a proper thread function for a \a thread without having to
         /// instantiate the \a base_result_action0 type. This is used by the \a
         /// applier in case a continuation has been supplied
+        template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
-            naming::address::address_type lva)
+            naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return base_type::construct_continuation_thread_object_function(
-                cont, F, get_lva<Component>::call(lva));
-        }
-
-        /// serialization support
-        static void register_base()
-        {
-            util::void_cast_register_nonvirt<base_result_action0, base_type>();
-            base_type::register_base();
-        }
-
-    private:
-        /// This \a get_thread_function will be invoked to retrieve the thread
-        /// function for an action which has to be invoked without continuations.
-        HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(naming::address::address_type lva)
-        {
-            return construct_thread_function(lva);
-        }
-
-        /// This \a get_thread_function will be invoked to retrieve the thread
-        /// function for an action which has to be invoked with continuations.
-        HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(continuation_type& cont,
-            naming::address::address_type lva)
-        {
-            return construct_thread_function(cont, lva);
-        }
-
-    private:
-        // serialization support
-        friend class boost::serialization::access;
-
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int /*version*/)
-        {
-            ar & util::base_object_nonvirt<base_type>(*this);
+            return boost::move(
+                base_type::construct_continuation_thread_object_function(
+                    cont, F, get_lva<Component>::call(lva),
+                    boost::forward<Arguments>(args)));
         }
     };
 
@@ -184,74 +148,18 @@ namespace hpx { namespace actions
         Result (Component::*F)(),
         threads::thread_priority Priority = threads::thread_priority_default,
         typename Derived = detail::this_type>
-    class result_action0
-      : public base_result_action0<Component, Result, Action, F,
+    struct result_action0
+      : base_result_action0<Component, Result, Action, F,
             typename detail::action_type<
                 result_action0<Component, Result, Action, F, Priority>,
                 Derived
             >::type, Priority>
     {
-    public:
         typedef typename detail::action_type<
             result_action0<Component, Result, Action, F, Priority>, Derived
         >::type derived_type;
 
-    private:
-        typedef base_result_action0<
-            Component, Result, Action, F, derived_type, Priority>
-        base_type;
-
-    public:
-        explicit result_action0(threads::thread_priority priority = Priority)
-          : base_type(priority)
-        {}
-
-        /// serialization support
-        static void register_base()
-        {
-            util::void_cast_register_nonvirt<result_action0, base_type>();
-            base_type::register_base();
-        }
-
-    private:
-        // serialization support
-        friend class boost::serialization::access;
-
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int /*version*/)
-        {
-            ar & util::base_object_nonvirt<base_type>(*this);
-        }
-
-    private:
-        threads::thread_init_data&
-        get_thread_init_data(naming::address::address_type lva,
-            threads::thread_init_data& data)
-        {
-            data.lva = lva;
-            data.func = this->construct_thread_function(lva);
-            data.description = detail::get_action_name<derived_type>();
-            data.parent_id =
-                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
-            data.parent_locality_id = this->parent_locality_;
-            data.priority = this->priority_;
-            return data;
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva,
-            threads::thread_init_data& data)
-        {
-            data.lva = lva;
-            data.func = this->construct_thread_function(cont, lva);
-            data.description = detail::get_action_name<derived_type>();
-            data.parent_id =
-                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
-            data.parent_locality_id = this->parent_locality_;
-            data.priority = this->priority_;
-            return data;
-        }
+        typedef boost::mpl::false_ direct_execution;
     };
 
 #if BOOST_WORKAROUND(BOOST_MSVC, <= 1700)
@@ -309,34 +217,22 @@ namespace hpx { namespace actions
     template <
         typename Component, typename Result, int Action,
         Result (Component::*F)(), typename Derived = detail::this_type>
-    class direct_result_action0
+    struct direct_result_action0
       : public base_result_action0<Component, Result, Action, F,
             typename detail::action_type<
                 direct_result_action0<Component, Result, Action, F>, Derived
             >::type>
     {
-    public:
         typedef typename detail::action_type<
             direct_result_action0<Component, Result, Action, F>, Derived
         >::type derived_type;
 
-    private:
-        typedef base_result_action0<
-            Component, Result, Action, F, derived_type>
-        base_type;
-
-    public:
-        direct_result_action0()
-        {}
-
-        explicit direct_result_action0(threads::thread_priority)
-        {}
-
-    public:
         typedef boost::mpl::true_ direct_execution;
 
+        template <typename Arguments>
         static Result
-        execute_function(naming::address::address_type lva)
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments))
         {
             LTM_(debug)
                 << "direct_result_action0::execute_function: name("
@@ -347,58 +243,11 @@ namespace hpx { namespace actions
             return (get_lva<Component>::call(lva)->*F)();
         }
 
-        /// serialization support
-        static void register_base()
-        {
-            util::void_cast_register_nonvirt<direct_result_action0, base_type>();
-            base_type::register_base();
-        }
-
-    private:
-        // serialization support
-        friend class boost::serialization::access;
-
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int /*version*/)
-        {
-            ar & util::base_object_nonvirt<base_type>(*this);
-        }
-
-    private:
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
-        base_action::action_type get_action_type() const
+        static base_action::action_type get_action_type()
         {
             return base_action::direct_action;
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(naming::address::address_type lva,
-            threads::thread_init_data& data)
-        {
-            data.lva = lva;
-            data.func = this->construct_thread_function(lva);
-            data.description = detail::get_action_name<derived_type>();
-            data.parent_id =
-                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
-            data.parent_locality_id = this->parent_locality_;
-            data.priority = this->priority_;
-            return data;
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva,
-            threads::thread_init_data& data)
-        {
-            data.lva = lva;
-            data.func = this->construct_thread_function(cont, lva);
-            data.description = detail::get_action_name<derived_type>();
-            data.parent_id =
-                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
-            data.parent_locality_id = this->parent_locality_;
-            data.priority = this->priority_;
-            return data;
         }
     };
 
@@ -447,10 +296,6 @@ namespace hpx { namespace actions
                        Derived, Priority>
             base_type;
 
-        explicit base_action0(threads::thread_priority priority = Priority)
-          : base_type(priority)
-        {}
-
     protected:
         /// The \a continuation_thread_function will be registered as the thread
         /// function of a thread. It encapsulates the execution of the
@@ -483,14 +328,14 @@ namespace hpx { namespace actions
         }
 
     public:
-        typedef boost::mpl::false_ direct_execution;
-
         /// \brief This static \a construct_thread_function allows to construct
         /// a proper thread function for a \a thread without having to
         /// instantiate the base_action0 type. This is used by the \a applier in
         /// case no continuation has been supplied.
+        template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
-        construct_thread_function(naming::address::address_type lva)
+        construct_thread_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments) /*args*/)
         {
             threads::thread_state_enum (*f)(naming::address::address_type) =
                 &Derived::template thread_function<naming::address::address_type>;
@@ -502,43 +347,15 @@ namespace hpx { namespace actions
         /// a proper thread function for a \a thread without having to
         /// instantiate the base_action0 type. This is used by the \a applier in
         /// case a continuation has been supplied
+        template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
-            naming::address::address_type lva)
+            naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return base_type::construct_continuation_thread_object_function_void(
-                cont, F, get_lva<Component>::call(lva));
-        }
-
-        /// serialization support
-        static void register_base()
-        {
-            util::void_cast_register_nonvirt<base_action0, base_type>();
-            base_type::register_base();
-        }
-
-    private:
-        HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(naming::address::address_type lva)
-        {
-            return construct_thread_function(lva);
-        }
-
-        HPX_STD_FUNCTION<threads::thread_function_type>
-        get_thread_function(continuation_type& cont,
-            naming::address::address_type lva)
-        {
-            return construct_thread_function(cont, lva);
-        }
-
-    private:
-        // serialization support
-        friend class boost::serialization::access;
-
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int /*version*/)
-        {
-            ar & util::base_object_nonvirt<base_type>(*this);
+            return boost::move(
+                base_type::construct_continuation_thread_object_function_void(
+                    cont, F, get_lva<Component>::call(lva),
+                    boost::forward<Arguments>(args)));
         }
     };
 
@@ -546,72 +363,17 @@ namespace hpx { namespace actions
     template <typename Component, int Action, void (Component::*F)(),
         threads::thread_priority Priority = threads::thread_priority_default,
         typename Derived = detail::this_type>
-    class action0
-      : public base_action0<Component, Action, F,
+    struct action0
+      : base_action0<Component, Action, F,
             typename detail::action_type<
                 action0<Component, Action, F, Priority>, Derived
             >::type, Priority>
     {
-    public:
         typedef typename detail::action_type<
             action0<Component, Action, F, Priority>, Derived
         >::type derived_type;
 
-    private:
-        typedef base_action0<Component, Action, F, derived_type, Priority>
-            base_type;
-
-    public:
-        explicit action0(threads::thread_priority priority = Priority)
-          : base_type(priority)
-        {}
-
-        /// serialization support
-        static void register_base()
-        {
-            util::void_cast_register_nonvirt<action0, base_type>();
-            base_type::register_base();
-        }
-
-    private:
-        // serialization support
-        friend class boost::serialization::access;
-
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int /*version*/)
-        {
-            ar & util::base_object_nonvirt<base_type>(*this);
-        }
-
-    private:
-        threads::thread_init_data&
-        get_thread_init_data(naming::address::address_type lva,
-            threads::thread_init_data& data)
-        {
-            data.lva = lva;
-            data.func = this->construct_thread_function(lva);
-            data.description = detail::get_action_name<derived_type>();
-            data.parent_id =
-                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
-            data.parent_locality_id = this->parent_locality_;
-            data.priority = this->priority_;
-            return data;
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva,
-            threads::thread_init_data& data)
-        {
-            data.lva = lva;
-            data.func = this->construct_thread_function(cont, lva);
-            data.description = detail::get_action_name<derived_type>();
-            data.parent_id =
-                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
-            data.parent_locality_id = this->parent_locality_;
-            data.priority = this->priority_;
-            return data;
-        }
+        typedef boost::mpl::false_ direct_execution;
     };
 
 #if BOOST_WORKAROUND(BOOST_MSVC, <= 1700)
@@ -641,32 +403,22 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, int Action, void (Component::*F)(),
         typename Derived = detail::this_type>
-    class direct_action0
-      : public base_action0<Component, Action, F,
+    struct direct_action0
+      : base_action0<Component, Action, F,
             typename detail::action_type<
                 direct_action0<Component, Action, F>, Derived
             >::type>
     {
-    public:
         typedef typename detail::action_type<
             direct_action0<Component, Action, F>, Derived
         >::type derived_type;
 
-    private:
-        typedef base_action0<Component, Action, F, derived_type> base_type;
-
-    public:
-        direct_action0()
-        {}
-
-        explicit direct_action0(threads::thread_priority)
-        {}
-
-    public:
         typedef boost::mpl::true_ direct_execution;
 
+        template <typename Arguments>
         static util::unused_type
-        execute_function(naming::address::address_type lva)
+        execute_function(naming::address::address_type lva,
+            BOOST_FWD_REF(Arguments))
         {
             LTM_(debug)
                 << "direct_action0::execute_function: name("
@@ -677,58 +429,11 @@ namespace hpx { namespace actions
             return util::unused;
         }
 
-        /// serialization support
-        static void register_base()
-        {
-            util::void_cast_register_nonvirt<direct_action0, base_type>();
-            base_type::register_base();
-        }
-
-    private:
-        // serialization support
-        friend class boost::serialization::access;
-
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int /*version*/)
-        {
-            ar & util::base_object_nonvirt<base_type>(*this);
-        }
-
-    private:
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
-        base_action::action_type get_action_type() const
+        static base_action::action_type get_action_type()
         {
             return base_action::direct_action;
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(naming::address::address_type lva,
-            threads::thread_init_data& data)
-        {
-            data.lva = lva;
-            data.func = this->construct_thread_function(lva);
-            data.description = detail::get_action_name<derived_type>();
-            data.parent_id =
-                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
-            data.parent_locality_id = this->parent_locality_;
-            data.priority = this->priority_;
-            return data;
-        }
-
-        threads::thread_init_data&
-        get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva,
-            threads::thread_init_data& data)
-        {
-            data.lva = lva;
-            data.func = this->construct_thread_function(cont, lva);
-            data.description = detail::get_action_name<derived_type>();
-            data.parent_id =
-                reinterpret_cast<threads::thread_id_type>(this->parent_id_);
-            data.parent_locality_id = this->parent_locality_;
-            data.priority = this->priority_;
-            return data;
         }
     };
 
@@ -756,38 +461,16 @@ namespace hpx { namespace actions
     {};
 #endif
 
+    ///////////////////////////////////////////////////////////////////////////
+    // the specialization for void return type is just a template alias
     template <
         typename Component, int Action,
         void (Component::*F)(),
         threads::thread_priority Priority,
         typename Derived>
-    class result_action0<Component, void, Action, F, Priority, Derived>
-        : public action0<Component, Action, F, Priority, Derived>
-    {
-        typedef action0<Component, Action, F, Priority, Derived> base_type;
-
-    public:
-        explicit result_action0(threads::thread_priority priority = Priority)
-          : base_type(priority)
-        {}
-
-        /// serialization support
-        static void register_base()
-        {
-            util::void_cast_register_nonvirt<result_action0, base_type>();
-            base_type::register_base();
-        }
-
-    private:
-        // serialization support
-        friend class boost::serialization::access;
-
-        template<class Archive>
-        void serialize(Archive& ar, const unsigned int /*version*/)
-        {
-            ar & util::base_object_nonvirt<base_type>(*this);
-        }
-    };
+    struct result_action0<Component, void, Action, F, Priority, Derived>
+        : action0<Component, Action, F, Priority, Derived>
+    {};
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -820,7 +503,12 @@ namespace hpx { namespace actions
 ///////////////////////////////////////////////////////////////////////////////
 // bring in the rest of the implementations
 #include <hpx/runtime/actions/component_action_implementations.hpp>
-#include <hpx/runtime/actions/component_action_registration.hpp>
+
+///////////////////////////////////////////////////////////////////////////////
+// Register the action templates with serialization.
+HPX_SERIALIZATION_REGISTER_TEMPLATE(
+    (template <typename Action>), (hpx::actions::transfer_action<Action>)
+)
 
 #include <hpx/config/warnings_suffix.hpp>
 

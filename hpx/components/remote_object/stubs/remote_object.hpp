@@ -31,7 +31,7 @@ namespace hpx { namespace components { namespace stubs
                 >
                 action_type;
             using namespace boost::archive::detail::extra_detail;
-            init_guid<action_type>::g.initialize();
+            init_guid<hpx::actions::transfer_action<action_type> >::g.initialize();
             return hpx::async<action_type>(target_id, boost::move(f));
         }
 

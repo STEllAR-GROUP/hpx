@@ -334,8 +334,10 @@ namespace hpx { namespace lcos
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<
                         typename action_type::component_type>()));
+
                 (*this->impl_)->set_data(
-                    action_type::execute_function(addr.address_));
+                    boost::move(action_type::execute_function(addr.address_,
+                        util::make_argument_pack())));
             }
             else {
                 // remote execution
@@ -401,9 +403,10 @@ namespace hpx { namespace lcos
                 BOOST_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<
                         typename action_type::component_type>()));
+
                 (*this->impl_)->set_data(
-                    action_type::execute_function(addr.address_,
-                        boost::forward<Arg0>(arg0)));
+                    boost::move(action_type::execute_function(addr.address_,
+                        util::make_argument_pack(boost::forward<Arg0>(arg0)))));
             }
             else {
                 // remote execution

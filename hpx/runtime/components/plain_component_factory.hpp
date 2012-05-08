@@ -76,7 +76,7 @@ namespace hpx { namespace components
             {
                 // First call to get_component_type, ask AGAS for a unique id.
                 if (isenabled_) {
-                    component_type const ctype = 
+                    component_type const ctype =
                         agas_client.register_factory(locality, get_component_name());
 
                     if (component_invalid == ctype)
@@ -190,7 +190,8 @@ namespace hpx { namespace components
 /// actions with Boost.Plugin.
 #define HPX_REGISTER_PLAIN_ACTION_EX2(plain_action, plain_action_name,        \
         state)                                                                \
-    BOOST_CLASS_EXPORT_KEY2(plain_action, BOOST_PP_STRINGIZE(plain_action_name))\
+    BOOST_CLASS_EXPORT_KEY2(hpx::actions::transfer_action<plain_action>,      \
+        BOOST_PP_STRINGIZE(plain_action_name))                                \
     HPX_REGISTER_ACTION_EX(plain_action, plain_action_name)                   \
     HPX_REGISTER_COMPONENT_FACTORY(                                           \
         hpx::components::plain_component_factory<plain_action>,               \
@@ -214,11 +215,6 @@ namespace hpx { namespace components
 #define HPX_REGISTER_PLAIN_ACTION(plain_action)                               \
     HPX_REGISTER_PLAIN_ACTION_EX2(plain_action, plain_action,                 \
     ::hpx::components::factory_check)                                         \
-    /**/
-
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_DEFINE_PLAIN_ACTION(func, name)                                   \
-    typedef HPX_MAKE_ACTION(func)::type name                                  \
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////

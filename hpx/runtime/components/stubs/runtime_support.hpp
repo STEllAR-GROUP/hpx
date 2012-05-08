@@ -197,9 +197,10 @@ namespace hpx { namespace components { namespace stubs
             //naming::resolver_client& agas = appl.get_agas_client();
             if (/*agas.is_bootstrap() || */agas::is_local_address(gid)) {
                 // apply locally
-                applier::detail::apply_helper3<action_type>::call(
+                applier::detail::apply_helper<action_type>::call(
                     applier::get_applier().get_runtime_support_raw_gid().get_lsb(),
-                    threads::thread_priority_default, type, gid, count);
+                    threads::thread_priority_default,
+                    util::make_argument_pack(type, gid, count));
             }
             else {
                 // apply remotely

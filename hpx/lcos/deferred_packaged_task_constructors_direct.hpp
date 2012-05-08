@@ -42,8 +42,8 @@
             // local, direct execution
             BOOST_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
-            (*this->impl_)->set_data(Action::execute_function(
-                addr.address_, BOOST_PP_ENUM_PARAMS(N, arg)));
+            (*this->impl_)->set_data(Action::execute_function(addr.address_, 
+                util::make_argument_pack(BOOST_PP_ENUM_PARAMS(N, arg))));
         }
         else {
             // remote execution

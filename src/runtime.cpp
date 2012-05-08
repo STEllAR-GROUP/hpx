@@ -25,9 +25,12 @@
 #include <hpx/runtime/parcelset/policies/global_parcelhandler_queue.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/include/performance_counters.hpp>
-#include <boost/coroutine/detail/coroutine_impl_impl.hpp>
-
 #include <hpx/runtime/agas/big_boot_barrier.hpp>
+
+#include <boost/coroutine/detail/coroutine_impl_impl.hpp>
+#if defined(HPX_HAVE_STACKTRACES)
+#include <boost/backtrace.hpp>
+#endif
 
 #if defined(_WIN64) && defined(_DEBUG) && !defined(BOOST_COROUTINE_USE_FIBERS)
 #include <io.h>
@@ -88,9 +91,6 @@ namespace hpx
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
-#if defined(HPX_HAVE_STACKTRACES)
-    #include <boost/backtrace.hpp>
-#endif
 
 namespace hpx
 {

@@ -193,22 +193,15 @@ namespace hpx { namespace components { namespace server
 #pragma warning(pop)
 #endif
 
-HPX_SERIALIZATION_REGISTER_TEMPLATE(
+HPX_SERIALIZATION_REGISTER_TEMPLATE_ACTION(
     (template <typename F>)
   , (hpx::components::server::remote_object_apply_action1<F>)
 )
 
-HPX_SERIALIZATION_REGISTER_TEMPLATE(
+HPX_SERIALIZATION_REGISTER_TEMPLATE_ACTION(
     (template <typename F, typename A>)
   , (hpx::components::server::remote_object_apply_action2<F, A>)
 )
-
-/*
-HPX_REGISTER_ACTION_DECLARATION_EX(
-    hpx::components::server::remote_object_apply_action<void>
-  , remote_object_apply_action_void
-)
-*/
 
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::components::server::remote_object::set_dtor_action

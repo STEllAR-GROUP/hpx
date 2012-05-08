@@ -152,5 +152,10 @@ namespace boost {                                                               
 }                                                                               \
 /**/
 
+#define HPX_SERIALIZATION_REGISTER_TEMPLATE_ACTION(TEMPLATE, ACTION)            \
+    HPX_SERIALIZATION_REGISTER_TEMPLATE(TEMPLATE,                               \
+        (hpx::actions::transfer_action<HPX_UTIL_STRIP(ACTION)>))                \
+/**/
+
 #endif
 

@@ -5,8 +5,8 @@
 
 #ifndef BOOST_PP_IS_ITERATING
 
-#if !defined(HPX_RUNTIME_ACTIONS_ACTION_CONSTRUCTORS_MAY_20_2008_1045AM)
-#define HPX_RUNTIME_ACTIONS_ACTION_CONSTRUCTORS_MAY_20_2008_1045AM
+#if !defined(HPX_RUNTIME_TRANSFER_ACTIONS_ACTION_CONSTRUCTORS_MAY_05_2012_1018AM)
+#define HPX_RUNTIME_TRANSFER_ACTIONS_ACTION_CONSTRUCTORS_MAY_05_2012_1018AM
 
 #include <boost/preprocessor/iterate.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
@@ -14,7 +14,7 @@
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (2, HPX_ACTION_ARGUMENT_LIMIT,                                        \
-    "hpx/runtime/actions/action_constructors.hpp"))                           \
+    "hpx/runtime/actions/transfer_action_constructors.hpp"))                  \
     /**/
 
 #include BOOST_PP_ITERATE()
@@ -38,22 +38,28 @@
     /**/
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    action(BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+    transfer_action(BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         : arguments_(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)),
-          parent_locality_(action::get_locality_id()),
+          parent_locality_(transfer_action::get_locality_id()),
           parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
           parent_phase_(threads::get_parent_phase()),
-          priority_(detail::thread_priority<Priority>::call(Priority))
+          priority_(
+                detail::thread_priority<
+                    static_cast<threads::thread_priority>(priority_value)
+                >::call(priority_value))
     {}
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    action(threads::thread_priority priority,
+    transfer_action(threads::thread_priority priority,
               BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
         : arguments_(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)),
-          parent_locality_(action::get_locality_id()),
+          parent_locality_(transfer_action::get_locality_id()),
           parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
           parent_phase_(threads::get_parent_phase()),
-          priority_(detail::thread_priority<Priority>::call(priority))
+          priority_(
+                detail::thread_priority<
+                    static_cast<threads::thread_priority>(priority_value)
+                >::call(priority))
     {}
 
 #undef HPX_FORWARD_ARGS

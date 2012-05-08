@@ -47,7 +47,6 @@ namespace hpx { namespace util {
         {
             typedef typename remove_reference<T>::type const & type;
         };
-
 #else
         template <typename T, bool IsRvalue = std::is_rvalue_reference<T>::value>
         struct env_value_type

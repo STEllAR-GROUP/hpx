@@ -54,8 +54,11 @@
             BOOST_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
-            (*this->impl_)->set_data(action_type::execute_function(
-                addr.address_, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)));
+
+            (*this->impl_)->set_data(
+                boost::move(action_type::execute_function(addr.address_,
+                    util::make_argument_pack(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _))))
+            );
         }
         else {
             // remote execution

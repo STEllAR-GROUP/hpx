@@ -205,120 +205,150 @@ namespace hpx { namespace actions
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \tparam Component         component type
-    /// \tparam Action            action code
-    /// \tparam Result            return type
-    /// \tparam Arguments         arguments (fusion vector)
-    /// \tparam Derived           derived action class
-    /// \tparam threads::thread_priority Priority default priority
-    template <typename Component, int Action, typename Result,
-        typename Arguments, typename Derived,
-        threads::thread_priority Priority>
-    class action : public base_action
+    template <typename Action>
+    struct transfer_action : base_action
     {
-    public:
-        typedef Component component_type;
-        typedef Derived derived_type;
-        typedef Result result_type;
-        typedef Arguments arguments_type;
+        typedef typename Action::component_type component_type;
+        typedef typename Action::derived_type derived_type;
+        typedef typename Action::result_type result_type;
+        typedef typename Action::arguments_type arguments_type;
 
         // This is the action code (id) of this action. It is exposed to allow
         // generic handling of actions.
-        enum { value = Action };
+        enum { value = Action::value };
 
         // This is the priority value this action has been instantiated with
         // (statically). This value might be different from the priority member
         // holding the runtime value an action has been created with
-        enum { priority_value = Priority };
+        enum { priority_value = Action::priority_value };
+
+        typedef typename Action::direct_execution direct_execution;
+
+        // default constructor is needed for serialization
+        transfer_action() {}
 
         // construct an action from its arguments
-        explicit action(threads::thread_priority priority)
-          : arguments_(), parent_locality_(0), parent_id_(0), parent_phase_(0),
-            priority_(detail::thread_priority<Priority>::call(priority))
+        explicit transfer_action(threads::thread_priority priority)
+          : arguments_(),
+            parent_locality_(transfer_action::get_locality_id()),
+            parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
+            parent_phase_(threads::get_parent_phase()),
+            priority_(
+                detail::thread_priority<
+                    static_cast<threads::thread_priority>(Action::priority_value)
+                >::call(priority))
         {}
 
         template <typename Arg0>
-        action(BOOST_FWD_REF(Arg0) arg0)
+        explicit transfer_action(BOOST_FWD_REF(Arg0) arg0)
           : arguments_(boost::forward<Arg0>(arg0)),
-            parent_locality_(action::get_locality_id()),
+            parent_locality_(transfer_action::get_locality_id()),
             parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
             parent_phase_(threads::get_parent_phase()),
-            priority_(detail::thread_priority<Priority>::call(Priority))
+            priority_(
+                detail::thread_priority<
+                    static_cast<threads::thread_priority>(Action::priority_value)
+                >::call(threads::thread_priority_default))
         {}
 
         template <typename Arg0>
-        action(threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
+        transfer_action(threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
           : arguments_(boost::forward<Arg0>(arg0)),
-            parent_locality_(action::get_locality_id()),
+            parent_locality_(transfer_action::get_locality_id()),
             parent_id_(reinterpret_cast<std::size_t>(threads::get_parent_id())),
             parent_phase_(threads::get_parent_phase()),
-            priority_(detail::thread_priority<Priority>::call(priority))
+            priority_(
+                detail::thread_priority<
+                    static_cast<threads::thread_priority>(Action::priority_value)
+                >::call(priority))
         {}
 
         // bring in the rest of the constructors
-        #include <hpx/runtime/actions/action_constructors.hpp>
+        #include <hpx/runtime/actions/transfer_action_constructors.hpp>
 
-        /// destructor
-        ~action()
+        //
+        ~transfer_action()
         {
-            detail::guid_initialization<derived_type>();
+            detail::guid_initialization<transfer_action>();
         }
-
-    public:
-        /// retrieve the N's argument
-        template <int N>
-        typename boost::fusion::result_of::at_c<arguments_type, N>::type
-        get()
-        {
-            return boost::fusion::at_c<N>(arguments_);
-        }
-
-    protected:
-        // bring in all overloads for
-        //    construct_continuation_thread_function_void()
-        //    construct_continuation_thread_object_function_void()
-        //    construct_continuation_thread_function()
-        //    construct_continuation_thread_object_function()
-        #include <hpx/runtime/actions/construct_continuation_functions.hpp>
 
     public:
         /// retrieve component type
         static int get_static_component_type()
         {
-            return static_cast<int>(components::get_component_type<Component>());
-        }
-
-        /// serialization support
-        static void register_base()
-        {
-            util::void_cast_register_nonvirt<action, base_action>();
+            return Action::get_component_type();
         }
 
     private:
-        /// retrieve action code
+        /// The function \a get_component_type returns the \a component_type
+        /// of the component this action belongs to.
+        int get_component_type() const
+        {
+            return Action::get_component_type();
+        }
+
+        /// The function \a get_action_code returns the code of the action
+        /// instance it is called for.
         std::size_t get_action_code() const
         {
             return static_cast<std::size_t>(value);
-        }
-
-        /// retrieve component type
-        int get_component_type() const
-        {
-            return get_static_component_type();
         }
 
         /// The function \a get_action_name returns the name of this action
         /// (mainly used for debugging and logging purposes).
         char const* get_action_name() const
         {
-            return detail::get_action_name<Derived>();
+            return detail::get_action_name<derived_type>();
         }
 
         /// The function \a get_action_type returns whether this action needs
         /// to be executed in a new thread or directly.
-        base_action::action_type get_action_type() const
+        action_type get_action_type() const
         {
-            return base_action::plain_action;
+            return Action::get_action_type();
+        }
+
+        /// The \a get_thread_function constructs a proper thread function for
+        /// a \a thread, encapsulating the functionality and the arguments
+        /// of the action it is called for.
+        ///
+        /// \param lva    [in] This is the local virtual address of the
+        ///               component the action has to be invoked on.
+        ///
+        /// \returns      This function returns a proper thread function usable
+        ///               for a \a thread.
+        ///
+        /// \note This \a get_thread_function will be invoked to retrieve the
+        ///       thread function for an action which has to be invoked without
+        ///       continuations.
+        HPX_STD_FUNCTION<threads::thread_function_type>
+        get_thread_function(naming::address::address_type lva)
+        {
+            return boost::move(Action::construct_thread_function(
+                lva, arguments_));
+        }
+
+        /// The \a get_thread_function constructs a proper thread function for
+        /// a \a thread, encapsulating the functionality, the arguments, and
+        /// the continuations of the action it is called for.
+        ///
+        /// \param cont   [in] This is the list of continuations to be
+        ///               triggered after the execution of the action
+        /// \param lva    [in] This is the local virtual address of the
+        ///               component the action has to be invoked on.
+        ///
+        /// \returns      This function returns a proper thread function usable
+        ///               for a \a thread.
+        ///
+        /// \note This \a get_thread_function will be invoked to retrieve the
+        ///       thread function for an action which has to be invoked with
+        ///       continuations.
+        HPX_STD_FUNCTION<threads::thread_function_type>
+        get_thread_function(continuation_type& cont,
+            naming::address::address_type lva)
+        {
+            return boost::move(Action::construct_thread_function(
+                cont, lva, arguments_));
         }
 
         /// Return the locality of the parent thread
@@ -345,10 +375,46 @@ namespace hpx { namespace actions
             return priority_;
         }
 
-        static boost::uint32_t get_locality_id()
+        /// Return all data needed for thread initialization
+        threads::thread_init_data&
+        get_thread_init_data(naming::address::address_type lva,
+            threads::thread_init_data& data)
         {
-            error_code ec;      // ignore any errors
-            return hpx::get_locality_id(ec);
+            data.lva = lva;
+            data.func = boost::move(Action::construct_thread_function(lva, arguments_));
+            data.description = detail::get_action_name<derived_type>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(parent_id_);
+            data.parent_locality_id = parent_locality_;
+            data.priority = priority_;
+            return data;
+        }
+
+        threads::thread_init_data&
+        get_thread_init_data(continuation_type& cont,
+            naming::address::address_type lva, threads::thread_init_data& data)
+        {
+            data.lva = lva;
+            data.func = boost::move(Action::construct_thread_function(cont, lva, arguments_));
+            data.description = detail::get_action_name<derived_type>();
+            data.parent_id = reinterpret_cast<threads::thread_id_type>(parent_id_);
+            data.parent_locality_id = parent_locality_;
+            data.priority = priority_;
+            return data;
+        }
+
+    public:
+        /// retrieve the N's argument
+        template <int N>
+        typename boost::fusion::result_of::at_c<arguments_type, N>::type
+        get()
+        {
+            return boost::fusion::at_c<N>(arguments_);
+        }
+
+        /// serialization support
+        static void register_base()
+        {
+            util::void_cast_register_nonvirt<transfer_action, base_action>();
         }
 
     private:
@@ -359,11 +425,18 @@ namespace hpx { namespace actions
         void serialize(Archive& ar, const unsigned int /*version*/)
         {
             util::serialize_sequence(ar, arguments_);
-            //ar & arguments_;
+
             ar & parent_locality_;
             ar & parent_id_;
             ar & parent_phase_;
             ar & priority_;
+        }
+
+    private:
+        static boost::uint32_t get_locality_id()
+        {
+            error_code ec;      // ignore any errors
+            return hpx::get_locality_id(ec);
         }
 
     protected:
@@ -375,16 +448,61 @@ namespace hpx { namespace actions
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <int N, typename Component, int Action, typename Result,
-      typename Arguments, typename Derived, threads::thread_priority Priority>
+    template <int N, typename Action>
     inline typename boost::fusion::result_of::at_c<
-        typename action<Component, Action, Result, Arguments, Derived,
-            Priority>::arguments_type, N
+        typename transfer_action<Action>::arguments_type, N
     >::type
-    get(action<Component, Action, Result, Arguments, Derived, Priority> & args)
+    get(transfer_action<Action> & args)
     {
         return args.get<N>();
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \tparam Component         component type
+    /// \tparam Action            action code
+    /// \tparam Result            return type
+    /// \tparam Arguments         arguments (fusion vector)
+    /// \tparam Derived           derived action class
+    /// \tparam threads::thread_priority Priority default priority
+    template <typename Component, int Action, typename Result,
+        typename Arguments, typename Derived,
+        threads::thread_priority Priority>
+    struct action
+    {
+        typedef Component component_type;
+        typedef Derived derived_type;
+        typedef Result result_type;
+        typedef Arguments arguments_type;
+
+        // This is the action code (id) of this action. It is exposed to allow
+        // generic handling of actions.
+        enum { value = Action };
+
+        // This is the priority value this action has been instantiated with
+        // (statically). This value might be different from the priority member
+        // holding the runtime value an action has been created with
+        enum { priority_value = Priority };
+
+        // bring in all overloads for
+        //    construct_continuation_thread_function_void()
+        //    construct_continuation_thread_object_function_void()
+        //    construct_continuation_thread_function()
+        //    construct_continuation_thread_object_function()
+        #include <hpx/runtime/actions/construct_continuation_functions.hpp>
+
+        /// retrieve component type
+        static int get_component_type()
+        {
+            return static_cast<int>(components::get_component_type<Component>());
+        }
+
+        /// The function \a get_action_type returns whether this action needs
+        /// to be executed in a new thread or directly.
+        static base_action::action_type get_action_type()
+        {
+            return base_action::plain_action;
+        }
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     // Base template allowing to generate a concrete action type from a function
@@ -555,8 +673,8 @@ namespace hpx { namespace actions
 /**/
 
 #define HPX_REGISTER_ACTION_EX(action, actionname)                            \
-    BOOST_CLASS_EXPORT_IMPLEMENT(action)                                      \
-    HPX_REGISTER_BASE_HELPER(action, actionname)                              \
+    BOOST_CLASS_EXPORT_IMPLEMENT(hpx::actions::transfer_action<action>)       \
+    HPX_REGISTER_BASE_HELPER(hpx::actions::transfer_action<action>, actionname) \
     HPX_DEFINE_GET_ACTION_NAME_EX(action, actionname)                         \
 /**/
 
@@ -570,11 +688,13 @@ namespace hpx { namespace actions
 
 #define HPX_REGISTER_ACTION(action) HPX_REGISTER_ACTION_EX(action, action)
 
-#define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID(action)               \
+#define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID1(action)              \
     namespace hpx { namespace actions { namespace detail {                    \
         template <> HPX_ALWAYS_EXPORT                                         \
         char const* get_action_name<action>();                                \
     }}}                                                                       \
+/**/
+#define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID2(action)              \
     namespace hpx { namespace traits {                                        \
         template <typename Enable>                                            \
         struct needs_guid_initialization<action, Enable>                      \
@@ -591,9 +711,12 @@ namespace hpx { namespace actions
     }}}                                                                       \
 /**/
 #define HPX_REGISTER_ACTION_DECLARATION_EX(action, actionname)                \
-    HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID(action)                   \
-    BOOST_CLASS_EXPORT_KEY2(action, BOOST_PP_STRINGIZE(actionname))           \
-    HPX_REGISTER_ACTION_DECLARATION_GUID(action)                              \
+    HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID1(action)                  \
+    HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID2(                         \
+        hpx::actions::transfer_action<action>)                                \
+    BOOST_CLASS_EXPORT_KEY2(hpx::actions::transfer_action<action>,            \
+        BOOST_PP_STRINGIZE(actionname))                                       \
+    HPX_REGISTER_ACTION_DECLARATION_GUID(hpx::actions::transfer_action<action>) \
 /**/
 #define HPX_REGISTER_ACTION_DECLARATION(action)                               \
     HPX_REGISTER_ACTION_DECLARATION_EX(action, action)                        \
