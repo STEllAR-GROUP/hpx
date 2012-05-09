@@ -16,46 +16,12 @@
 #include <boost/preprocessor/iterate.hpp>
 #include <boost/preprocessor/enum_params.hpp>
 
-#include <boost/fusion/include/size.hpp>
-#include <boost/type_traits/remove_reference.hpp>
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <int N>
-    struct construct_continuation_thread_function_voidN;
-
-    template <int N>
-    struct construct_continuation_thread_functionN;
-
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (0, HPX_ACTION_ARGUMENT_LIMIT,                                        \
     "hpx/runtime/actions/construct_continuation_functions.hpp"))              \
     /**/
 
 #include BOOST_PP_ITERATE()
-
-    template <typename Func, typename Arguments>
-    static HPX_STD_FUNCTION<threads::thread_function_type>
-    construct_continuation_thread_function_void(
-        continuation_type cont, BOOST_FWD_REF(Func) func,
-        BOOST_FWD_REF(Arguments) args)
-    {
-        typedef typename boost::remove_reference<Arguments>::type arguments_type;
-        return construct_continuation_thread_function_voidN<
-                boost::fusion::result_of::size<arguments_type>::value>::call(
-            cont, boost::forward<Func>(func), boost::forward<Arguments>(args));
-    }
-
-    template <typename Func, typename Arguments>
-    static HPX_STD_FUNCTION<threads::thread_function_type>
-    construct_continuation_thread_function(
-        continuation_type cont, BOOST_FWD_REF(Func) func,
-        BOOST_FWD_REF(Arguments) args)
-    {
-        typedef typename boost::remove_reference<Arguments>::type arguments_type;
-        return construct_continuation_thread_functionN<
-                boost::fusion::result_of::size<arguments_type>::value>::call(
-            cont, boost::forward<Func>(func), boost::forward<Arguments>(args));
-    }
 
 #endif
 
@@ -78,107 +44,6 @@
 #define HPX_ACTION_DIRECT_ARGUMENT(z, n, data)                                \
         BOOST_PP_COMMA_IF(n) boost::move(util::get_argument_from_pack<n>(data)) \
     /**/
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// The \a continuation_thread_function will be registered as the thread
-    /// function of a thread. It encapsulates the execution of the
-    /// original function (given by \a func), and afterwards triggers all
-    /// continuations using the result value obtained from the execution
-    /// of the original thread function.
-    struct BOOST_PP_CAT(continuation_thread_function_void_, N)
-    {
-        typedef threads::thread_state_enum result_type;
-
-        template <typename Func
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        result_type operator()(continuation_type cont, Func const& func
-          BOOST_PP_COMMA_IF(N) BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)) const
-        {
-            try {
-                LTM_(debug) << "Executing action("
-                    << detail::get_action_name<derived_type>()
-                    << ") with continuation(" << cont->get_gid() << ")";
-
-                // The arguments are moved here. This function is called from a
-                // bound functor. In order to do true perfect forwarding in an
-                // asynchronous operation. These bound variables must be moved
-                // out of the bound object.
-                func(BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, args));
-                cont->trigger();
-            }
-            catch (hpx::exception const&) {
-                // make sure hpx::exceptions are propagated back to the client
-                cont->trigger_error(boost::current_exception());
-            }
-            return threads::terminated;
-        }
-    };
-
-    /// The \a construct_continuation_thread_function is a helper function
-    /// for constructing the wrapped thread function needed for
-    /// continuation support
-    template <>
-    struct construct_continuation_thread_function_voidN<N>
-    {
-        template <typename Func, typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
-        call(continuation_type cont, BOOST_FWD_REF(Func) func,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            return HPX_STD_BIND(
-                BOOST_PP_CAT(continuation_thread_function_void_, N)(),
-                cont, boost::forward<Func>(func)
-              BOOST_PP_COMMA_IF(N)
-                    BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args));
-        }
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    struct BOOST_PP_CAT(continuation_thread_function_, N)
-    {
-        typedef threads::thread_state_enum result_type;
-
-        template <typename Func
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-        result_type operator()(continuation_type cont, Func const& func
-          BOOST_PP_COMMA_IF(N) BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)) const
-        {
-            try {
-                LTM_(debug) << "Executing action("
-                    << detail::get_action_name<derived_type>()
-                    << ") with continuation(" << cont->get_gid() << ")";
-
-                // The arguments are moved here. This function is called from a
-                // bound functor. In order to do true perfect forwarding in an
-                // asynchronous operation. These bound variables must be moved
-                // out of the bound object.
-                cont->trigger(boost::move(
-                    func(BOOST_PP_REPEAT(N, HPX_MOVE_ARGS, _))
-                ));
-            }
-            catch (hpx::exception const&) {
-                // make sure hpx::exceptions are propagated back to the client
-                cont->trigger_error(boost::current_exception());
-            }
-            return threads::terminated;
-        }
-    };
-
-    template <>
-    struct construct_continuation_thread_functionN<N>
-    {
-        template <typename Func, typename Arguments>
-        static HPX_STD_FUNCTION<threads::thread_function_type>
-        call(continuation_type cont, BOOST_FWD_REF(Func) func,
-            BOOST_FWD_REF(Arguments) args)
-        {
-            return HPX_STD_BIND(
-                BOOST_PP_CAT(continuation_thread_function_, N)(),
-                cont, boost::forward<Func>(func)
-              BOOST_PP_COMMA_IF(N)
-                    BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args));
-        }
-    };
 
     ///////////////////////////////////////////////////////////////////////////
     // special version for member function pointer

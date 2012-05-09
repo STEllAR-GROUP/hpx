@@ -457,6 +457,8 @@ namespace hpx { namespace actions
         return args.get<N>();
     }
 
+    #include <hpx/runtime/actions/construct_continuation_function_objects.hpp>
+
     ///////////////////////////////////////////////////////////////////////////
     /// \tparam Component         component type
     /// \tparam Action            action code
@@ -482,6 +484,33 @@ namespace hpx { namespace actions
         // (statically). This value might be different from the priority member
         // holding the runtime value an action has been created with
         enum { priority_value = Priority };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Func, typename Arguments>
+        static HPX_STD_FUNCTION<threads::thread_function_type>
+        construct_continuation_thread_function_void(
+            continuation_type cont, BOOST_FWD_REF(Func) func,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            typedef typename boost::remove_reference<Arguments>::type arguments_type;
+            return detail::construct_continuation_thread_function_voidN<
+                    derived_type,
+                    boost::fusion::result_of::size<arguments_type>::value>::call(
+                cont, boost::forward<Func>(func), boost::forward<Arguments>(args));
+        }
+
+        template <typename Func, typename Arguments>
+        static HPX_STD_FUNCTION<threads::thread_function_type>
+        construct_continuation_thread_function(
+            continuation_type cont, BOOST_FWD_REF(Func) func,
+            BOOST_FWD_REF(Arguments) args)
+        {
+            typedef typename boost::remove_reference<Arguments>::type arguments_type;
+            return detail::construct_continuation_thread_functionN<
+                    derived_type,
+                    boost::fusion::result_of::size<arguments_type>::value>::call(
+                cont, boost::forward<Func>(func), boost::forward<Arguments>(args));
+        }
 
         // bring in all overloads for
         //    construct_continuation_thread_function_void()

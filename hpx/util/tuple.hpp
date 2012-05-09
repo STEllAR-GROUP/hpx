@@ -94,7 +94,7 @@ namespace hpx { namespace util
     get_argument_from_pack(BOOST_FWD_REF(ArgumentPack) args)
     {
         typedef
-            boost::fusion::result_of::at_c<
+            typename boost::fusion::result_of::at_c<
                 typename boost::remove_reference<ArgumentPack>::type, N
             >::type
         argument_type;
