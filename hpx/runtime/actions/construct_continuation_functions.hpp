@@ -21,18 +21,6 @@
     "hpx/runtime/actions/construct_continuation_functions.hpp"))              \
     /**/
 
-#include BOOST_PP_ITERATE()
-
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-//  Preprocessor vertical repetition code
-///////////////////////////////////////////////////////////////////////////////
-#else // !BOOST_PP_IS_ITERATING
-
-#define N BOOST_PP_ITERATION()
-#define M BOOST_PP_DEC(N)
-
 #define HPX_FWD_ARGS(z, n, _)                                                 \
         BOOST_PP_COMMA_IF(n)                                                  \
             BOOST_FWD_REF(BOOST_PP_CAT(Arg, n)) BOOST_PP_CAT(arg, n)          \
@@ -44,6 +32,21 @@
 #define HPX_ACTION_DIRECT_ARGUMENT(z, n, data)                                \
         BOOST_PP_COMMA_IF(n) boost::move(util::get_argument_from_pack<n>(data)) \
     /**/
+
+#include BOOST_PP_ITERATE()
+
+#undef HPX_FWD_ARGS
+#undef HPX_MOVE_ARGS
+#undef HPX_ACTION_DIRECT_ARGUMENT
+
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+//  Preprocessor vertical repetition code
+///////////////////////////////////////////////////////////////////////////////
+#else // !BOOST_PP_IS_ITERATING
+
+#define N BOOST_PP_ITERATION()
 
     ///////////////////////////////////////////////////////////////////////////
     // special version for member function pointer
@@ -107,13 +110,13 @@
         }
     };
 
-    template <typename Object, typename Arguments
+    template <typename Object, typename Arguments_
         BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename FArg)>
     static HPX_STD_FUNCTION<threads::thread_function_type>
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(BOOST_PP_ENUM_PARAMS(N, FArg)), Object* obj,
-        BOOST_FWD_REF(Arguments) args)
+        BOOST_FWD_REF(Arguments_) args)
     {
         return HPX_STD_BIND(
             BOOST_PP_CAT(continuation_thread_object_function_void_, N)(),
@@ -122,13 +125,13 @@
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args));
     }
 
-    template <typename Object, typename Arguments
+    template <typename Object, typename Arguments_
         BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename FArg)>
     static HPX_STD_FUNCTION<threads::thread_function_type>
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)(BOOST_PP_ENUM_PARAMS(N, FArg)) const,
-        Component* obj, BOOST_FWD_REF(Arguments) args)
+        Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
         return HPX_STD_BIND(
             BOOST_PP_CAT(continuation_thread_object_function_void_, N)(),
@@ -200,13 +203,13 @@
         }
     };
 
-    template <typename Object, typename Arguments
+    template <typename Object, typename Arguments_
         BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename FArg)>
     static HPX_STD_FUNCTION<threads::thread_function_type>
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(BOOST_PP_ENUM_PARAMS(N, FArg)), Component* obj,
-        BOOST_FWD_REF(Arguments) args)
+        BOOST_FWD_REF(Arguments_) args)
     {
         return HPX_STD_BIND(
             BOOST_PP_CAT(continuation_thread_object_function_, N)(),
@@ -215,13 +218,13 @@
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args));
     }
 
-    template <typename Object, typename Arguments
+    template <typename Object, typename Arguments_
         BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename FArg)>
     static HPX_STD_FUNCTION<threads::thread_function_type>
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)(BOOST_PP_ENUM_PARAMS(N, FArg)) const,
-        Component* obj, BOOST_FWD_REF(Arguments) args)
+        Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
         return HPX_STD_BIND(
             BOOST_PP_CAT(continuation_thread_object_function_, N)(),
@@ -230,10 +233,6 @@
                 BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args));
     }
 
-#undef HPX_FWD_ARGS
-#undef HPX_MOVE_ARGS
-#undef HPX_ACTION_DIRECT_ARGUMENT
-#undef M
 #undef N
 
 #endif // !BOOST_PP_IS_ITERATING

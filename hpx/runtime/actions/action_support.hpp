@@ -486,30 +486,30 @@ namespace hpx { namespace actions
         enum { priority_value = Priority };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Func, typename Arguments>
+        template <typename Func, typename Arguments_>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_continuation_thread_function_void(
             continuation_type cont, BOOST_FWD_REF(Func) func,
-            BOOST_FWD_REF(Arguments) args)
+            BOOST_FWD_REF(Arguments_) args)
         {
-            typedef typename boost::remove_reference<Arguments>::type arguments_type;
+            typedef typename boost::remove_reference<Arguments_>::type arguments_type;
             return detail::construct_continuation_thread_function_voidN<
                     derived_type,
                     boost::fusion::result_of::size<arguments_type>::value>::call(
-                cont, boost::forward<Func>(func), boost::forward<Arguments>(args));
+                cont, boost::forward<Func>(func), boost::forward<Arguments_>(args));
         }
 
-        template <typename Func, typename Arguments>
+        template <typename Func, typename Arguments_>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_continuation_thread_function(
             continuation_type cont, BOOST_FWD_REF(Func) func,
-            BOOST_FWD_REF(Arguments) args)
+            BOOST_FWD_REF(Arguments_) args)
         {
-            typedef typename boost::remove_reference<Arguments>::type arguments_type;
+            typedef typename boost::remove_reference<Arguments_>::type arguments_type;
             return detail::construct_continuation_thread_functionN<
                     derived_type,
                     boost::fusion::result_of::size<arguments_type>::value>::call(
-                cont, boost::forward<Func>(func), boost::forward<Arguments>(args));
+                cont, boost::forward<Func>(func), boost::forward<Arguments_>(args));
         }
 
         // bring in all overloads for

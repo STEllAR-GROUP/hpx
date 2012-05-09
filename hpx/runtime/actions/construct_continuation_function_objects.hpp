@@ -33,20 +33,6 @@ namespace detail
     "hpx/runtime/actions/construct_continuation_function_objects.hpp"))       \
     /**/
 
-#include BOOST_PP_ITERATE()
-
-}
-
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-//  Preprocessor vertical repetition code
-///////////////////////////////////////////////////////////////////////////////
-#else // !BOOST_PP_IS_ITERATING
-
-#define N BOOST_PP_ITERATION()
-#define M BOOST_PP_DEC(N)
-
 #define HPX_FWD_ARGS(z, n, _)                                                 \
         BOOST_PP_COMMA_IF(n)                                                  \
             BOOST_FWD_REF(BOOST_PP_CAT(Arg, n)) BOOST_PP_CAT(arg, n)          \
@@ -58,6 +44,23 @@ namespace detail
 #define HPX_ACTION_DIRECT_ARGUMENT(z, n, data)                                \
         BOOST_PP_COMMA_IF(n) boost::move(util::get_argument_from_pack<n>(data)) \
     /**/
+
+#include BOOST_PP_ITERATE()
+
+#undef HPX_FWD_ARGS
+#undef HPX_MOVE_ARGS
+#undef HPX_ACTION_DIRECT_ARGUMENT
+
+}
+
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+//  Preprocessor vertical repetition code
+///////////////////////////////////////////////////////////////////////////////
+#else // !BOOST_PP_IS_ITERATING
+
+#define N BOOST_PP_ITERATION()
 
     ///////////////////////////////////////////////////////////////////////////
     /// The \a continuation_thread_function will be registered as the thread
@@ -162,10 +165,6 @@ namespace detail
         }
     };
 
-#undef HPX_FWD_ARGS
-#undef HPX_MOVE_ARGS
-#undef HPX_ACTION_DIRECT_ARGUMENT
-#undef M
 #undef N
 
 #endif // !BOOST_PP_IS_ITERATING
