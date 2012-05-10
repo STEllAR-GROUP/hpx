@@ -390,6 +390,7 @@ namespace hpx { namespace util
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     template <
         typename Action
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
@@ -405,6 +406,30 @@ namespace hpx { namespace util
         return
             BOOST_PP_CAT(detail::bound_action, N)<
                 Action
+              BOOST_PP_COMMA_IF(N)
+                  BOOST_PP_ENUM(N, HPX_UTIL_BIND_REMOVE_REFERENCE, A)
+            > (BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_PARAMS, A));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Component, int Action, typename Result,
+        typename Arguments, typename Derived, threads::thread_priority Priority
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
+    >
+    BOOST_PP_CAT(detail::bound_action, N)<
+        Derived
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM(N, HPX_UTIL_BIND_REMOVE_REFERENCE, A)
+    >
+    bind(
+        hpx::actions::action<
+            Component, Action, Result, Arguments, Derived, Priority
+        > /*act*/
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_REF_PARAMS, _)
+    )
+    {
+        return
+            BOOST_PP_CAT(detail::bound_action, N)<
+                Derived
               BOOST_PP_COMMA_IF(N)
                   BOOST_PP_ENUM(N, HPX_UTIL_BIND_REMOVE_REFERENCE, A)
             > (BOOST_PP_ENUM(N, HPX_UTIL_BIND_FWD_PARAMS, A));

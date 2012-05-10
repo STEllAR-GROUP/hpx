@@ -15,7 +15,7 @@
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (2, HPX_ACTION_ARGUMENT_LIMIT,                                        \
+    (3, (1, HPX_ACTION_ARGUMENT_LIMIT,                                        \
     "hpx/runtime/applier/apply_implementations.hpp"))                         \
     /**/
 
@@ -158,6 +158,21 @@ namespace hpx
             BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
+    template <typename Component, int Action, typename Result,
+        typename Arguments, typename Derived, threads::thread_priority Priority,
+        BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    inline bool
+    apply (
+        hpx::actions::action<
+            Component, Action, Result, Arguments, Derived, Priority
+        > /*act*/,
+        naming::id_type const& gid,
+        BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+    {
+        return apply_p<Derived>(gid, actions::action_priority<Derived>(),
+            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+    }
+
     namespace applier
     {
         template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
@@ -272,7 +287,7 @@ namespace hpx
             actions::continuation_type cont(c);
 
             apply_helper<action_type>::call(
-                cont, addr.address_, priority, 
+                cont, addr.address_, priority,
                 util::make_argument_pack(BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)));
             return true;     // no parcel has been sent (dest is local)
         }
@@ -312,6 +327,21 @@ namespace hpx
         BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
         return apply_p<Action>(c, gid, actions::action_priority<Action>(),
+            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
+    }
+
+    template <typename Component, int Action, typename Result,
+        typename Arguments, typename Derived, threads::thread_priority Priority,
+        BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    inline bool
+    apply (actions::continuation* c,
+        hpx::actions::action<
+            Component, Action, Result, Arguments, Derived, Priority
+        > /*act*/,
+        naming::id_type const& gid,
+        BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
+    {
+        return apply_p<Derived>(c, gid, actions::action_priority<Derived>(),
             BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
@@ -418,7 +448,7 @@ namespace hpx
             typename hpx::actions::extract_action<Action>::result_type
             result_type;
 
-        return apply<Action>(
+        return apply_p<Action>(
             new actions::base_lco_continuation<result_type>(contgid),
             gid, priority, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }

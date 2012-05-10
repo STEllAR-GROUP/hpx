@@ -8,17 +8,19 @@
 
 #include <hpx/traits.hpp>
 #include <boost/mpl/bool.hpp>
-
-namespace hpx { namespace actions
-{
-    struct base_action;
-}}
+#include <boost/mpl/has_xxx.hpp>
+#include <boost/type_traits/is_base_and_derived.hpp>
 
 namespace hpx { namespace traits
 {
+    namespace detail
+    {
+        BOOST_MPL_HAS_XXX_TRAIT_DEF(action_tag)
+    }
+
     template <typename Action, typename Enable>
     struct is_action
-      : boost::is_base_and_derived<hpx::actions::base_action, Action>
+      : detail::has_action_tag<Action>
     {};
 }}
 

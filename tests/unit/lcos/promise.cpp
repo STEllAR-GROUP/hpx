@@ -72,10 +72,33 @@ int hpx_main(boost::program_options::variables_map&)
     }
 
     {
+        test_action do_test;
+        future<int> p = async(do_test, hpx::find_here());
+        HPX_TEST_EQ(p.get(), 42);
+    }
+
+    {
         bool data_cb_called = false;
         bool error_cb_called = false;
 
         future<int> p = async_callback<test_action>(
+            boost::bind(future_callback, boost::ref(data_cb_called)
+              , boost::ref(error_cb_called), _1),
+            hpx::find_here()
+        );
+
+        HPX_TEST_EQ(p.get(), 42);
+        HPX_TEST(data_cb_called);
+        HPX_TEST(!error_cb_called);
+    }
+
+    {
+        bool data_cb_called = false;
+        bool error_cb_called = false;
+        test_action do_test;
+
+        future<int> p = async_callback(
+            do_test,
             boost::bind(future_callback, boost::ref(data_cb_called)
               , boost::ref(error_cb_called), _1),
             hpx::find_here()
@@ -104,10 +127,56 @@ int hpx_main(boost::program_options::variables_map&)
     }
 
     {
+        test_error_action do_error;
+        future<int> p = async(do_error, hpx::find_here());
+
+        std::string what_msg;
+
+        try {
+            p.get();      // throws
+            HPX_TEST(false);
+        }
+        catch (std::exception const& e) {
+            HPX_TEST(true);
+            what_msg = e.what();
+        }
+
+        HPX_TEST_EQ(what_msg, error_msg);
+    }
+
+    {
         bool data_cb_called = false;
         bool error_cb_called = false;
 
         future<int> p = async_callback<test_error_action>(
+            boost::bind(future_callback, boost::ref(data_cb_called)
+              , boost::ref(error_cb_called), _1),
+            hpx::find_here()
+        );
+
+        std::string what_msg;
+
+        try {
+            p.get();      // throws
+            HPX_TEST(false);
+        }
+        catch (std::exception const& e) {
+            HPX_TEST(true);
+            what_msg = e.what();
+        }
+
+        HPX_TEST_EQ(what_msg, error_msg);
+        HPX_TEST(!data_cb_called);
+        HPX_TEST(error_cb_called);
+    }
+
+    {
+        bool data_cb_called = false;
+        bool error_cb_called = false;
+        test_error_action do_test_error;
+
+        future<int> p = async_callback(
+            do_test_error,
             boost::bind(future_callback, boost::ref(data_cb_called)
               , boost::ref(error_cb_called), _1),
             hpx::find_here()

@@ -63,7 +63,30 @@ int hpx_main(variables_map&)
         //test two successive 'get' from a promise
         hpx::lcos::future<int> int_promise(async<int_action>(hpx::find_here()));
         HPX_TEST(int_promise.get() == int_promise.get());
+    }
 
+    {
+        using hpx::async;
+        null_action do_null;
+
+        // create an explicit future
+        null_thread_executed = false;
+        {
+            HPX_TEST(async(do_null, hpx::find_here()).get());
+        }
+        HPX_TEST(null_thread_executed);
+
+        // create an implicit future
+        null_thread_executed = false;
+        {
+            HPX_TEST(hpx::lcos::wait(async(do_null, hpx::find_here())));
+        }
+        HPX_TEST(null_thread_executed);
+
+        //test two successive 'get' from a promise
+        int_action do_int;
+        hpx::lcos::future<int> int_promise(async(do_int, hpx::find_here()));
+        HPX_TEST(int_promise.get() == int_promise.get());
     }
 
     hpx::finalize();       // Initiate shutdown of the runtime system.

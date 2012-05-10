@@ -29,8 +29,10 @@
 #include <boost/type_traits/is_convertible.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/mpl/bool.hpp>
+#include <boost/mpl/and.hpp>
 #include <boost/move/move.hpp>
 #include <boost/typeof/typeof.hpp>
+#include <boost/utility/enable_if.hpp>
 
 #include <hpx/traits/needs_guid_initialization.hpp>
 #include <hpx/runtime/get_lva.hpp>
@@ -476,6 +478,8 @@ namespace hpx { namespace actions
         typedef Result result_type;
         typedef Arguments arguments_type;
 
+        typedef void action_tag;
+
         // This is the action code (id) of this action. It is exposed to allow
         // generic handling of actions.
         enum { value = Action };
@@ -518,6 +522,20 @@ namespace hpx { namespace actions
         //    construct_continuation_thread_function()
         //    construct_continuation_thread_object_function()
         #include <hpx/runtime/actions/construct_continuation_functions.hpp>
+
+        // bring in the declaration for all overloads for operator()
+        template <typename IdType>
+        typename boost::enable_if<
+            boost::mpl::and_<
+                boost::mpl::bool_<
+                    boost::fusion::result_of::size<arguments_type>::value == 0>,
+                boost::is_same<IdType, naming::id_type> >,
+            Result
+        >::type
+        operator()(IdType const& id) const;
+
+        // bring in the declaration for all overloads for operator()
+        #include <hpx/runtime/actions/declare_function_operators.hpp>
 
         /// retrieve component type
         static int get_component_type()

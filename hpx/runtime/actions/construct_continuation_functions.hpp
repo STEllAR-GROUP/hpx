@@ -9,17 +9,9 @@
 #define HPX_RUNTIME_ACTIONS_CONSTRUCT_CONTINUATION_FUNCTION_FEB_22_2012_1143AM
 
 #include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/inc.hpp>
-#include <boost/preprocessor/dec.hpp>
 #include <boost/preprocessor/repeat.hpp>
-#include <boost/preprocessor/repeat_from_to.hpp>
 #include <boost/preprocessor/iterate.hpp>
 #include <boost/preprocessor/enum_params.hpp>
-
-#define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (0, HPX_ACTION_ARGUMENT_LIMIT,                                        \
-    "hpx/runtime/actions/construct_continuation_functions.hpp"))              \
-    /**/
 
 #define HPX_FWD_ARGS(z, n, _)                                                 \
         BOOST_PP_COMMA_IF(n)                                                  \
@@ -31,6 +23,11 @@
     /**/
 #define HPX_ACTION_DIRECT_ARGUMENT(z, n, data)                                \
         BOOST_PP_COMMA_IF(n) boost::move(util::get_argument_from_pack<n>(data)) \
+    /**/
+
+#define BOOST_PP_ITERATION_PARAMS_1                                           \
+    (3, (0, HPX_ACTION_ARGUMENT_LIMIT,                                        \
+    "hpx/runtime/actions/construct_continuation_functions.hpp"))              \
     /**/
 
 #include BOOST_PP_ITERATE()
