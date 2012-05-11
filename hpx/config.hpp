@@ -54,20 +54,20 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// This defines the maximum number of arguments an action can take
 #if !defined(HPX_ACTION_ARGUMENT_LIMIT)
-#  define HPX_ACTION_ARGUMENT_LIMIT 10
+#  define HPX_ACTION_ARGUMENT_LIMIT 4
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This defines the maximum number of arguments \a hpx#lcos#wait can take
 #if !defined(HPX_WAIT_ARGUMENT_LIMIT)
-#  define HPX_WAIT_ARGUMENT_LIMIT 10
+#  define HPX_WAIT_ARGUMENT_LIMIT 4
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This defines the maximum number of arguments a component constructor can
 /// take
 #if !defined(HPX_COMPONENT_CREATE_ARGUMENT_LIMIT)
-#  define HPX_COMPONENT_CREATE_ARGUMENT_LIMIT 10
+#  define HPX_COMPONENT_CREATE_ARGUMENT_LIMIT 4
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -75,7 +75,7 @@
 /// Note that this needs to be larger than HPX_ACTION_ARGUMENT_LIMIT by at
 /// least 3.
 #if !defined(HPX_FUNCTION_LIMIT)
-#  define HPX_FUNCTION_LIMIT 15
+#  define HPX_FUNCTION_LIMIT 7
 #endif
 
 #if HPX_FUNCTION_LIMIT < (HPX_ACTION_ARGUMENT_LIMIT + 3)
