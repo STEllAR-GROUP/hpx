@@ -165,7 +165,7 @@ namespace hpx
 }
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (1, HPX_FUNCTION_LIMIT, <hpx/lcos/wait_all.hpp>))                     \
+    (3, (1, HPX_WAIT_ARGUMENT_LIMIT, <hpx/lcos/wait_all.hpp>))                \
 /**/
 #include BOOST_PP_ITERATE()
 

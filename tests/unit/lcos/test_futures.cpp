@@ -5,6 +5,8 @@
 //  accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
+#define HPX_WAIT_ARGUMENT_LIMIT 5
+
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/include/lcos.hpp>
