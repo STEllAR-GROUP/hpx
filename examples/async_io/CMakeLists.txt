@@ -20,11 +20,11 @@ foreach(example_program ${example_programs})
                      FOLDER "Examples/AsyncIO/${example_program}")
 
   # add a custom target for this example
-  add_hpx_pseudo_target(examples.balancing.${example_program})
+  add_hpx_pseudo_target(examples.async_io.${example_program})
 
   # make pseudo-targets depend on master pseudo-target
-  add_hpx_pseudo_dependencies(examples.balancing
-                              examples.balancing.${example_program})
+  add_hpx_pseudo_dependencies(examples.async_io
+                              examples.async_io.${example_program})
 
   # add dependencies to pseudo-target
   add_hpx_pseudo_dependencies(examples.balancing.${example_program}
