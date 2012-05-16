@@ -27,7 +27,7 @@ foreach(example_program ${example_programs})
                               examples.async_io.${example_program})
 
   # add dependencies to pseudo-target
-  add_hpx_pseudo_dependencies(examples.balancing.${example_program}
+  add_hpx_pseudo_dependencies(examples.async_io.${example_program}
                               ${example_program}_exe)
 endforeach()
 
