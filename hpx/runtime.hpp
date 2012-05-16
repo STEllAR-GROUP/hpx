@@ -180,6 +180,13 @@ namespace hpx
         /// loading of external libraries.
         virtual bool keep_factory_alive(components::component_type type) = 0;
 
+        /// Access one of the internal thread pools (io_service instances)
+        /// HPX is using to perform specific tasks. The three possible values
+        /// for the argument \p name are "io_pool", "parcel_pool", and
+        /// "timer_pool". For any other argument value the function wil return
+        /// zero.
+        virtual hpx::util::io_service_pool* get_thread_pool(char const* name) = 0;
+
     protected:
         void init_tss();
         void deinit_tss();
@@ -528,7 +535,18 @@ namespace hpx
         ///             application (uninstall performance counters, etc.)
         void add_shutdown_function(HPX_STD_FUNCTION<void()> const& f);
 
+        /// Keep the factory object alive which is responsible for the given
+        /// component type. This a purely internal function allowing to work
+        /// around certain library specific problems related to dynamic
+        /// loading of external libraries.
         bool keep_factory_alive(components::component_type type);
+
+        /// Access one of the internal thread pools (io_service instances)
+        /// HPX is using to perform specific tasks. The three possible values
+        /// for the argument \p name are "io_pool", "parcel_pool", and
+        /// "timer_pool". For any other argument value the function will return
+        /// zero.
+        hpx::util::io_service_pool* get_thread_pool(char const* name);
 
     private:
         void init_tss(char const* context);

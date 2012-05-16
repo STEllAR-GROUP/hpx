@@ -9,6 +9,7 @@ set(subdirs
     1d_hydro
     accumulator
     adaptive1d
+    async_io
     balancing
     bfs
     bright_future

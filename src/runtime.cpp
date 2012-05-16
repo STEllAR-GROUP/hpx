@@ -576,6 +576,23 @@ namespace hpx
         return runtime_support_.keep_factory_alive(type);
     }
 
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    hpx::util::io_service_pool*
+    runtime_impl<SchedulingPolicy, NotificationPolicy>::
+        get_thread_pool(char const* name)
+    {
+        std::string service_name(name);
+
+        if (service_name == "io_pool")
+            return &io_pool_;
+        if (service_name == "parcel_pool")
+            return &parcel_pool_;
+        if (service_name == "timer_pool")
+            return &timer_pool_;
+
+        return 0;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     hpx::util::thread_specific_ptr<runtime *, runtime::tls_tag> runtime::runtime_;
 
