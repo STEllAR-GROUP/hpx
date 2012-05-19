@@ -59,7 +59,8 @@ namespace hpx { namespace parcelset { namespace server
         void async_read(Handler handler)
         {
             // Store the time of the begin of the read operation
-            receive_data_.timer_ = timer_.elapsed_microseconds();
+            receive_data_.time_ = timer_.elapsed_microseconds();
+            receive_data_.serialization_time_ = 0;
             receive_data_.bytes_ = 0;
             receive_data_.num_parcels_ = 0;
 
@@ -124,8 +125,8 @@ namespace hpx { namespace parcelset { namespace server
             }
             else {
                 // complete data point and pass it along
-                receive_data_.timer_ =
-                    timer_.elapsed_microseconds() - receive_data_.timer_;
+                receive_data_.time_ =
+                    timer_.elapsed_microseconds() - receive_data_.time_;
 
                 // add parcel data to incoming parcel queue
                 boost::integer::ulittle8_t::value_type priority = in_priority_;
@@ -142,7 +143,8 @@ namespace hpx { namespace parcelset { namespace server
                     = &parcelport_connection::handle_read_header<Handler>;
 
                 // Store the time of the begin of the read operation
-                receive_data_.timer_ = timer_.elapsed_microseconds();
+                receive_data_.time_ = timer_.elapsed_microseconds();
+                receive_data_.serialization_time_ = 0;
                 receive_data_.bytes_ = 0;
                 receive_data_.num_parcels_ = 0;
 

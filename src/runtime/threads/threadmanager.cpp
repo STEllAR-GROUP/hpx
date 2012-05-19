@@ -1392,7 +1392,7 @@ namespace hpx { namespace threads
               ""
             },
 #if !defined(BOOST_WINDOWS)
-            { "/threads/stack-unbinds", performance_counters::counter_raw,
+            { "/threads/count/stack-unbinds", performance_counters::counter_raw,
               "returns the total number of HPX-thread unbind (madvise) operations "
               "performed for the referenced locality", HPX_PERFORMANCE_COUNTER_V1,
               counts_creator, &performance_counters::locality_counter_discoverer,

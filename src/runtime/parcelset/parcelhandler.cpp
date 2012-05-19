@@ -111,25 +111,41 @@ namespace hpx { namespace parcelset
                 typedef util::container_device<std::vector<char> > io_device_type;
                 boost::iostreams::stream<io_device_type> io(*parcel_data);
 
-                // De-serialize the parcel data
-                hpx::util::portable_binary_iarchive archive(io);
+                // mark start of serialization
+                receive_data.serialization_time_ = timer_.elapsed_microseconds();
+                boost::int64_t overall_add_parcel_time = 0;
 
-                std::size_t parcel_count = 0;
-                archive >> parcel_count;
-                for(std::size_t i = 0; i < parcel_count; ++i)
                 {
-                    // de-serialize parcel and add it to incoming parcel queue
-                    parcel p;
-                    archive >> p;
+                    // De-serialize the parcel data
+                    hpx::util::portable_binary_iarchive archive(io);
 
-                    // make sure this parcel ended up on the right locality
-                    BOOST_ASSERT(p.get_destination_addr().locality_ == here());
+                    std::size_t parcel_count = 0;
+                    archive >> parcel_count;
+                    for(std::size_t i = 0; i < parcel_count; ++i)
+                    {
+                        // de-serialize parcel and add it to incoming parcel queue
+                        parcel p;
+                        archive >> p;
 
-                    parcels_->add_parcel(p);
+                        // make sure this parcel ended up on the right locality
+                        BOOST_ASSERT(p.get_destination_addr().locality_ == here());
+
+                        // be sure not to measure add_parcel as serialization time
+                        boost::int64_t add_parcel_time = timer_.elapsed_microseconds();
+                        parcels_->add_parcel(p);
+                        overall_add_parcel_time +=
+                            timer_.elapsed_microseconds() - add_parcel_time;
+                    }
+
+                    // complete received data with parcel count
+                    receive_data.num_parcels_ = parcel_count;
                 }
 
-                // complete received data with parcel count
-                receive_data.num_parcels_ = parcel_count;
+                // store the time required for serialization
+                receive_data.serialization_time_ =
+                    timer_.elapsed_microseconds() - receive_data.serialization_time_ -
+                    overall_add_parcel_time;
+
                 pp_.add_received_data(receive_data);
             }
             catch (hpx::exception const& e) {
@@ -263,6 +279,11 @@ namespace hpx { namespace parcelset
         HPX_STD_FUNCTION<boost::int64_t()> receiving_time(
             boost::bind(&parcelport::get_receiving_time, &pp_));
 
+        HPX_STD_FUNCTION<boost::int64_t()> sending_serialization_time(
+            boost::bind(&parcelport::get_sending_serialization_time, &pp_));
+        HPX_STD_FUNCTION<boost::int64_t()> receiving_serialization_time(
+            boost::bind(&parcelport::get_receiving_serialization_time, &pp_));
+
         HPX_STD_FUNCTION<boost::int64_t()> data_sent(
             boost::bind(&parcelport::get_data_sent, &pp_));
         HPX_STD_FUNCTION<boost::int64_t()> data_received(
@@ -273,7 +294,7 @@ namespace hpx { namespace parcelset
 
         performance_counters::generic_counter_type_data const counter_types[] =
         {
-            { "/parcelset/count/parcels-sent", performance_counters::counter_raw,
+            { "/parcels/count/sent", performance_counters::counter_raw,
               "returns the number of sent parcels for the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
@@ -281,7 +302,7 @@ namespace hpx { namespace parcelset
               &performance_counters::locality_counter_discoverer,
               ""
             },
-            { "/parcelset/count/parcels-received", performance_counters::counter_raw,
+            { "/parcels/count/received", performance_counters::counter_raw,
               "returns the number of received parcels for the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
@@ -289,7 +310,7 @@ namespace hpx { namespace parcelset
               &performance_counters::locality_counter_discoverer,
               ""
             },
-            { "/parcelset/count/messages-sent", performance_counters::counter_raw,
+            { "/messages/count/sent", performance_counters::counter_raw,
               "returns the number of sent messages for the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
@@ -297,7 +318,7 @@ namespace hpx { namespace parcelset
               &performance_counters::locality_counter_discoverer,
               ""
             },
-            { "/parcelset/count/messages-received", performance_counters::counter_raw,
+            { "/messages/count/received", performance_counters::counter_raw,
               "returns the number of received messages for the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
@@ -305,7 +326,8 @@ namespace hpx { namespace parcelset
               &performance_counters::locality_counter_discoverer,
               ""
             },
-            { "/parcelset/time/sending", performance_counters::counter_raw,
+
+            { "/time/data/sent", performance_counters::counter_raw,
               "returns the total time between the start of each asynchronous "
               "write and the invocation of the write callback for the referenced "
               "locality",
@@ -315,7 +337,7 @@ namespace hpx { namespace parcelset
               &performance_counters::locality_counter_discoverer,
               "ns"
             },
-            { "/parcelset/time/receiving", performance_counters::counter_raw,
+            { "/time/data/received", performance_counters::counter_raw,
               "returns the total time between the start of each asynchronous "
               "read and the invocation of the read callback for the referenced "
               "locality",
@@ -325,7 +347,26 @@ namespace hpx { namespace parcelset
               &performance_counters::locality_counter_discoverer,
               "ns"
             },
-            { "/parcelset/count/data-sent", performance_counters::counter_raw,
+            { "/time/serialize/sent", performance_counters::counter_raw,
+              "returns the total time required to serialize all sent parcels "
+              "for the referenced locality",
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, sending_serialization_time, _2),
+              &performance_counters::locality_counter_discoverer,
+              "ns"
+            },
+            { "/time/serialize/received", performance_counters::counter_raw,
+              "returns the total time required to de-serialize all received "
+              "parcels for the referenced locality",
+              HPX_PERFORMANCE_COUNTER_V1,
+              boost::bind(&performance_counters::locality_raw_counter_creator,
+                  _1, receiving_serialization_time, _2),
+              &performance_counters::locality_counter_discoverer,
+              "ns"
+            },
+
+            { "/data/size/sent", performance_counters::counter_raw,
               "returns the amount of parcel data (including headers) sent "
               "by the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1,
@@ -334,7 +375,7 @@ namespace hpx { namespace parcelset
               &performance_counters::locality_counter_discoverer,
               "bytes"
             },
-            { "/parcelset/count/data-received", performance_counters::counter_raw,
+            { "/data/size/received", performance_counters::counter_raw,
               "returns the amount of parcel data (including headers) received "
               "by the referenced locality",
               HPX_PERFORMANCE_COUNTER_V1,
@@ -343,7 +384,8 @@ namespace hpx { namespace parcelset
               &performance_counters::locality_counter_discoverer,
               "bytes"
             },
-            { "/parcelset/queuelength/instantaneous", performance_counters::counter_raw,
+
+            { "/parcelqueue/length", performance_counters::counter_raw,
               "returns the number current length of the queue of incoming threads",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,

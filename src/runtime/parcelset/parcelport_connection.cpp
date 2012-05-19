@@ -38,20 +38,29 @@ namespace hpx { namespace parcelset
             // create a special io stream on top of out_buffer_
             out_buffer_.clear();
 
-            typedef util::container_device<std::vector<char> > io_device_type;
-            boost::iostreams::stream<io_device_type> io(out_buffer_);
+            // mark start of serialization
+            send_data_.serialization_time_ = timer_.elapsed_microseconds();
 
-            // Serialize the data
-            util::portable_binary_oarchive archive(io);
-
-            std::size_t count = pv.size();
-            archive << count;
-
-            BOOST_FOREACH(parcel const & p, pv)
             {
-                priority = (std::max)(p.get_thread_priority(), priority);
-                archive << p;
+                typedef util::container_device<std::vector<char> > io_device_type;
+                boost::iostreams::stream<io_device_type> io(out_buffer_);
+
+                // Serialize the data
+                util::portable_binary_oarchive archive(io);
+
+                std::size_t count = pv.size();
+                archive << count;
+
+                BOOST_FOREACH(parcel const & p, pv)
+                {
+                    priority = (std::max)(p.get_thread_priority(), priority);
+                    archive << p;
+                }
             }
+
+            // store the time required for serialization
+            send_data_.serialization_time_ =
+                timer_.elapsed_microseconds() - send_data_.serialization_time_;
         }
         catch (boost::archive::archive_exception const& e) {
             // We have to repackage all exceptions thrown by the

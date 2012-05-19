@@ -210,6 +210,20 @@ namespace parcelset
             return parcels_received_.total_time() * 1000;
         }
 
+        /// the total time it took for all sender-side serialization operations
+        /// (nanoseconds)
+        boost::int64_t get_sending_serialization_time() const
+        {
+            return parcels_sent_.total_serialization_time() * 1000;
+        }
+
+        /// the total time it took for all receiver-side serialization
+        /// operations (nanoseconds)
+        boost::int64_t get_receiving_serialization_time() const
+        {
+            return parcels_received_.total_serialization_time() * 1000;
+        }
+
         /// total data received (bytes)
         std::size_t get_data_sent() const
         {

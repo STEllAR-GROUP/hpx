@@ -68,7 +68,7 @@ namespace hpx { namespace parcelset
         void async_write(Handler handler, ParcelPostprocess parcel_postprocess)
         {
             /// Increment sends and begin timer.
-            send_data_.timer_ = timer_.elapsed_microseconds();
+            send_data_.time_ = timer_.elapsed_microseconds();
 
             // Write the serialized data to the socket. We use "gather-write"
             // to send both the header and the data in a single write operation.
@@ -130,7 +130,7 @@ namespace hpx { namespace parcelset
             boost::get<0>(handler)(e, bytes);
 
             // complete data point and push back onto gatherer
-            send_data_.timer_ = timer_.elapsed_microseconds() - send_data_.timer_;
+            send_data_.time_ = timer_.elapsed_microseconds() - send_data_.time_;
             parcels_sent_.add_data(send_data_);
 
             // now we can give this connection back to the cache
@@ -139,7 +139,8 @@ namespace hpx { namespace parcelset
             out_size_ = 0;
 
             send_data_.bytes_ = 0;
-            send_data_.timer_ = 0;
+            send_data_.time_ = 0;
+            send_data_.serialization_time_ = 0;
             send_data_.num_parcels_ = 0;
 
             // Check if connection still fits in cache

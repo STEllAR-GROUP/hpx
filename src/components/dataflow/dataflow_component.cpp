@@ -72,7 +72,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
     {
         performance_counters::generic_counter_type_data const counter_types[] =
         {
-            { "/lcos/dataflow/constructed", performance_counters::counter_raw,
+            { "/dataflow/count/constructed", performance_counters::counter_raw,
               "returns the number of constructed dataflow objects",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
@@ -80,7 +80,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
               &performance_counters::locality_counter_discoverer,
               ""
             },
-            { "/lcos/dataflow/initialized", performance_counters::counter_raw,
+            { "/dataflow/count/initialized", performance_counters::counter_raw,
               "returns the number of initialized dataflow objects",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
@@ -88,7 +88,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
               &performance_counters::locality_counter_discoverer,
               ""
             },
-            { "/lcos/dataflow/fired", performance_counters::counter_raw,
+            { "/dataflow/count/fired", performance_counters::counter_raw,
               "returns the number of fired dataflow objects",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&performance_counters::locality_raw_counter_creator,
