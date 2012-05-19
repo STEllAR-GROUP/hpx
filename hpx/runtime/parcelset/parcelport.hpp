@@ -172,16 +172,28 @@ namespace parcelset
             id_range_.set_range(lower, upper);
         }
 
-        /// number of messages sent
-        std::size_t get_send_count() const
+        /// number of parcels sent
+        std::size_t get_parcel_send_count() const
         {
-            return parcels_sent_.size();
+            return parcels_sent_.num_parcels();
+        }
+
+        /// number of messages sent
+        std::size_t get_message_send_count() const
+        {
+            return parcels_sent_.num_messages();
+        }
+
+        /// number of parcels received
+        std::size_t get_parcel_receive_count() const
+        {
+            return parcels_received_.num_parcels();
         }
 
         /// number of messages received
-        std::size_t get_receive_count() const
+        std::size_t get_message_receive_count() const
         {
-            return parcels_received_.size();
+            return parcels_received_.num_messages();
         }
 
         /// the total time it took for all sends, from async_write to the
