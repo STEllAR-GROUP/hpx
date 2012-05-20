@@ -499,22 +499,33 @@ namespace hpx { namespace naming
 
         friend bool operator< (id_type const& lhs, id_type const& rhs)
         {
-            return lhs.gid_.get() < rhs.gid_.get();
+            // LHS is null, rhs is not.
+            if (!lhs && rhs)
+                return true;
+
+            // RHS is null.
+            if (!rhs)
+                return false;
+
+            return *lhs.gid_ < *rhs.gid_;
         }
 
         friend bool operator<= (id_type const& lhs, id_type const& rhs)
         {
-            return lhs.gid_.get() <= rhs.gid_.get();
+            // Deduced from <.
+            return !(rhs < lhs); 
         }
 
         friend bool operator> (id_type const& lhs, id_type const& rhs)
         {
-            return lhs.gid_.get() > rhs.gid_.get();
+            // Deduced from <.
+            return rhs < lhs; 
         }
 
         friend bool operator>= (id_type const& lhs, id_type const& rhs)
         {
-            return lhs.gid_.get() >= rhs.gid_.get();
+            // Deduced from <.
+            return !(lhs < rhs); 
         }
 
         // access the internal parts of the gid
