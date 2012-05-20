@@ -1,127 +1,152 @@
 #! /usr/bin/env python 
 #
-# Copyright (c) 2011 Bryce Lelbach
+# Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-from threading import Thread
+# TODO: Rename to jobs?
+# TODO: More typechecking?
+# TODO: Match threading.Thread interface and/or subprocess interface better?
+# TODO: Better exception propagation
 
-# subprocess instantiation wrapper. Unfortunately older Python still lurks on
-# some machines.
-try:
-  from subprocess import Popen, STDOUT, PIPE
-  from types import StringType
-  from shlex import split
- 
-  class process:
-    _proc = None
-    _exec = None
-        
-    def __init__(self, cmd):
-      if StringType == type(cmd):
-        cmd = split(cmd)
-      self._proc = Popen(cmd, stderr = STDOUT, stdout = PIPE, shell = False) 
+from threading import Thread, Lock
+from time import sleep
+from subprocess import Popen, STDOUT, PIPE
+from types import StringType
+from shlex import split
+from select import epoll, EPOLLHUP
 
-    def poll(self):
-      return self._proc.poll()
-        
-    def pid(self):
-      return self._proc.pid
+class process(object):
+  _proc = None
+  _error = None
+  _groups = []
 
-    def _call(self):
-      # annoyingly, KeyboardInterrupts are transported to threads, while most
-      # other Exceptions aren't in python
+  def __init__(self, cmd, group=None):
+    if StringType == type(cmd):
+      cmd = split(cmd)
+
+    self._proc = Popen(cmd, stderr = STDOUT, stdout = PIPE, shell = False) 
+
+    if group is not None:
+      group.add_process(self)
+
+  def _call(self):
+    # annoyingly, KeyboardInterrupts are transported to threads, while most
+    # other Exceptions aren't in python
+    try:
+      self._proc.wait()
+    except Exception, err:
+      self._error = err
+
+  def _finish(self, thread):
+    timed_out = None
+
+    # be forceful
+    if thread.is_alive():
+      # the thread may still be alive for a brief period after the process
+      # finishes (e.g. when it is notifying groups), so we ignore any errors
       try:
-        self._proc.wait()
-      except Exception, err:
-        self._exec = err
- 
-    def wait(self, timeout=None):
-      if timeout is not None:
-        thread = Thread(target=self._call)
-        thread.start()
+        self._proc.terminate()
+      except:
+        pass
 
-        # wait for the thread and invoked process to finish
-        thread.join(timeout)
+      thread.join()
+      timed_out = True
 
-        # be forceful
-        if thread.is_alive():
-          self._proc.terminate()
-          thread.join()
-         
-          # if an exception happened, re-raise it here in the master thread 
-          if self._exec is not None:
-            raise self._exec
+    else:
+      timed_out = False
 
-          return (True, self._proc.returncode)
+    # if an exception happened, re-raise it here in the master thread 
+    if self._error is not None:
+      raise self._error
 
-        if self._exec is not None:
-          raise self._exec
+    return (timed_out, self._proc.returncode)
 
-        return (False, self._proc.returncode)
+  def poll(self):
+    return self._proc.poll()
+      
+  def pid(self):
+    return self._proc.pid
+
+  def wait(self, timeout=None):
+    if timeout is not None:
+      thread = Thread(target=self._call)
+      thread.start()
+
+      # wait for the thread and invoked process to finish
+      thread.join(timeout)
+
+      return self._finish(thread)
+
+    else:
+      return (False, self._proc.wait())
+
+  def join(self, timeout=None):
+    return self.wait(timeout)
+
+  def read(self):
+    return self._proc.stdout.read()
+
+# modelled after Boost.Thread's boost::thread_group class
+class process_group(object):
+  _lock = None 
+  _members = {} 
+  _poller = None
+
+  def __init__(self, *cmds):
+    self._lock = Lock()
+    self._poller = epoll()
+
+    for cmd in cmds:
+      self.create_process(cmd)
+
+  def create_process(self, cmd):
+    return process(cmd, self);
+
+  def add_process(self, job):
+    with self._lock:
+      self._members[job._proc.stdout.fileno()] = job 
+      self._poller.register(job._proc.stdout, EPOLLHUP)
+
+  def join_all(self, timeout=None):
+    if timeout is None: 
+      timeout = float(-1)
+
+    with self._lock:
+      num_done = 0
+  
+      while True:
+        for fd, flags in self._poller.poll(timeout=timeout):
+          self._poller.unregister(fd)
+          num_done += 1
+  
+        if len(self._members) == num_done:
+          break
+
+def join_all(*tasks, **keys):
+  def flatten(items):
+    result = []
+
+    for element in items:
+      if hasattr(element, "__iter__"):
+        result.extend(flatten(el))
 
       else:
-        return (False, self._proc.wait())
+        if not isinstance(element, process):
+          raise TypeError( "'%s' is not an instance of 'hpx.process'"
+                         % str(element))
 
-    def read(self):
-      return self._proc.stdout.read()
+        result.append(element)
 
-except ImportError, err:
-  # no "subprocess"; use older popen module
-  from popen2 import Popen4
-  from signal import SIGKILL
-  from os import kill, waitpid, WNOHANG
+    return result
 
-  class process:
-    _proc = None
-    
-    def __init__(self, cmd):
-      self._proc = Popen4(cmd)
+  tasks = flatten(tasks)
 
-    def poll(self):
-      return self._proc.poll()
+  pg = process_group()
 
-    def pid(self):
-      return self._proc.pid
-    
-    def _call(self):
-      # annoyingly, KeyboardInterrupts are transported to threads, while most
-      # other Exceptions aren't in python
-      try:
-        self._proc.wait()
-      except Exception, err:
-        self._exec = err
+  for task in tasks:
+    pg.add_process(task)
 
-    def wait(self, timeout=None):
-      if timeout is not None:
-        thread = Thread(target=self._call)
-        thread.start()
-
-        # wait for the thread and invoked process to finish
-        thread.join(timeout)
-
-        # be forceful
-        if thread.is_alive():
-          kill(self._proc.pid, SIGKILL)
-          waitpid(-1, WNOHANG)
-          thread.join()
-          
-          # if an exception happened, re-raise it here in the master thread 
-          if self._exec is not None:
-            raise self._exec
-
-          return (True, self._proc.wait())
-          
-        if self._exec is not None:
-          raise self._exec
-
-        return (False, self._proc.wait())
-
-      else:
-        return (False, self._proc.wait())
-
-    def read(self):
-      return self._proc.fromchild.read()
-
+  pg.join_all(keys['timeout'])
 
