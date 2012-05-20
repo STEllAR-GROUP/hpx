@@ -58,7 +58,7 @@ find_barrier(char const* symname)
     if (HPX_UNLIKELY(!barrier_id))
     {
         HPX_THROW_EXCEPTION(network_error, "pre_main::find_barrier",
-            std::string("couldn't find stage boot barrier ") + symname);
+            std::string("couldn't find boot barrier ") + symname);
     }
     return lcos::barrier(barrier_id);
 }
