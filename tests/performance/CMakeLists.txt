@@ -4,9 +4,9 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(benchmarks
-    boost_tls
-    native_tls
-    hpx_tls
+    boost_tls_overhead
+    native_tls_overhead
+    hpx_tls_overhead
     delay_baseline
     hpx_homogeneous_task_spawn
     hpx_heterogeneous_task_spawn
@@ -68,14 +68,17 @@ if(SWARM_FOUND)
                    ${SWARM_LIBRARY})
 endif()
 
-set(boost_tls_FLAGS NOLIBS DEPENDENCIES ${BOOST_program_options_LIBRARY}
-                                        ${BOOST_thread_LIBRARY})
+set(boost_tls_overhead_FLAGS NOLIBS
+    DEPENDENCIES ${BOOST_program_options_LIBRARY}
+                 ${BOOST_thread_LIBRARY})
 
-set(native_tls_FLAGS NOLIBS DEPENDENCIES ${BOOST_program_options_LIBRARY}
-                                         ${BOOST_thread_LIBRARY})
+set(native_tls_overhead_FLAGS NOLIBS
+    DEPENDENCIES ${BOOST_program_options_LIBRARY}
+                 ${BOOST_thread_LIBRARY})
 
-set(hpx_tls_FLAGS NOLIBS DEPENDENCIES ${BOOST_program_options_LIBRARY}
-                                      ${BOOST_thread_LIBRARY})
+set(hpx_tls_overhead_FLAGS NOLIBS
+    DEPENDENCIES ${BOOST_program_options_LIBRARY}
+                 ${BOOST_thread_LIBRARY})
 
 set(delay_baseline_FLAGS NOLIBS
     DEPENDENCIES ${BOOST_program_options_LIBRARY})
@@ -87,18 +90,18 @@ set(hpx_heterogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component)
 set(print_heterogeneous_payloads_FLAGS NOLIBS
     DEPENDENCIES ${BOOST_program_options_LIBRARY})
 
-set(spinlock_FLAGS DEPENDENCIES iostreams_component)
-
-set(spinlock_alt_FLAGS DEPENDENCIES iostreams_component)
-
 if(HPX_CXX11_LAMBDAS)
   set(benchmarks ${benchmarks}
-      packaged_task
-      spinlock
-      spinlock_alt
+      packaged_task_overhead
+      spinlock_overhead1
+      spinlock_overhead2
      )
 
-  set(packaged_task_FLAGS DEPENDENCIES iostreams_component)
+  set(packaged_task_overhead_FLAGS DEPENDENCIES iostreams_component)
+
+  set(spinlock_overhead1_FLAGS DEPENDENCIES iostreams_component)
+
+  set(spinlock_overhead2_FLAGS DEPENDENCIES iostreams_component)
 endif()
 
 set(sizeof_FLAGS DEPENDENCIES iostreams_component)
