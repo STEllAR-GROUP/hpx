@@ -23,8 +23,8 @@ from hpx.process import process, process_group
 # Input files should be a list of lists. Each sublist should follow the
 # following structure:
 #
-# format: [ name, timeout, threads_per_locality, localities, arguments ] 
-# types:  [ string, int, int, int, list ]
+# format: [ name, timeout, success, nodes, threads_per_node, args ] 
+# types:  [ string, float or None, bool, int, int, list ]
 
 def create_path(name, prefix="", suffix=""):
   return os.path.expandvars(prefix + name + suffix)
@@ -58,7 +58,7 @@ if __name__ == '__main__':
 
   parser.add_option("--prefix",
                     action="store", type="string",
-                    dest="prefix", default="",
+                    dest="prefix", default="./",
                     help="Prefix added to test names") 
 
   parser.add_option("--log",
@@ -70,7 +70,7 @@ if __name__ == '__main__':
 
   parser.add_option("--log-prefix",
                     action="store", type="string",
-                    dest="log_prefix", default="",
+                    dest="log_prefix", default="./",
                     help="Prefix for log files") 
 
   (options, files) = parser.parse_args()
@@ -80,12 +80,17 @@ if __name__ == '__main__':
     parser.print_help() 
     sys.exit(1) 
 
+  if 0 == len(files):
+    print "Error: no .tests files specified\n" 
+    parser.print_help() 
+    sys.exit(1) 
+
   tests = []
 
   for f in files:
     tests += eval(open(f).read())
 
-  for [name, timeout, threads_per_locality, localities, arguments] in tests:
+  for [name, timeout, success, nodes, threads_per_node, args] in tests:
     full_name = create_path(name, options.prefix, options.suffix)
 
     print "Running: " + full_name
@@ -94,24 +99,27 @@ if __name__ == '__main__':
 
     cmds = {}
 
-    for locality in range(localities):
+    for node in range(nodes):
       cmd = quote_options([ full_name 
-                          , '-t' + str(threads_per_locality)
-                          , '-l' + str(localities)
-                          , '-' + str(locality)] + arguments)
+                          , '-t' + str(threads_per_node)
+                          , '-l' + str(nodes)
+                          , '-' + str(node)] + args)
 
-      cmds[pg.create_process(cmd).fileno()] = (locality, cmd) 
+      cmds[pg.create_process(cmd).fileno()] = (node, cmd) 
 
     def print_result(fd, job, output):
-      print (" " * 2) + cmds[job.fileno()][1]
-      print (" " * 4) + "Return value:",  job.poll()
-      print (" " * 4) + "Timed out:",  job.timed_out()
+      passed = (job.poll() == 0 if success else job.poll() != 0)
 
-      if "always" == options.log or ("fail" == options.log and 0 != job.poll()):
+      print (" " * 2) + cmds[job.fileno()][1]
+      print (" " * 4) + "Result: " + ("Passed" if passed else "Failed")
+      print (" " * 4) + "Exit code:", job.poll()
+      print (" " * 4) + "Timed out:", job.timed_out()
+
+      if "always" == options.log or ("fail" == options.log and not passed):
         if 0 != len(output):
           log = create_path(name, options.log_prefix, options.suffix) \
               + "_l" + str(cmds[job.fileno()][0]) + ".log"
-          print >> open(log, "w"), output
+          print >> open(log, "w"), output,
           print (" " * 4) + "Output log: " + log
 
     pg.read_all(timeout, print_result)

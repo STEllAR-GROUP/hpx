@@ -16,7 +16,28 @@ from time import sleep, time
 from subprocess import Popen, STDOUT, PIPE
 from types import StringType
 from shlex import split
+from signal import SIGKILL
+from os import kill, waitpid, WNOHANG
 from select import epoll, EPOLLHUP
+from platform import system
+
+if "Linux" == system(): 
+  def kill_process_tree(parent_pid, signal=SIGKILL):
+    ps_command = Popen("ps -o pid --ppid %d --noheaders"
+                      % parent_pid, shell=True, stdout=PIPE)
+    ps_output = ps_command.stdout.read()
+    retcode = ps_command.wait()
+
+    if 0 != ps_command.wait():
+      raise RuntimeError("'ps' command returned %d" % retcode) 
+
+    for pid in ps_output.split("\n")[:-1]:
+      kill(int(pid), signal)
+
+    kill(parent_pid, signal)
+else:
+  def kill_process_tree(parent_pid, signal=SIGKILL):
+    kill(parent_pid, signal)
 
 class process(object):
   _proc = None
@@ -28,7 +49,8 @@ class process(object):
     if StringType == type(cmd):
       cmd = split(cmd)
 
-    self._proc = Popen(cmd, stderr = STDOUT, stdout = PIPE, shell = False) 
+    self._proc = Popen(cmd, stderr=STDOUT, stdout=PIPE, shell=False)
+
     self._error = None
     self._groups = []
     self._timed_out = False
@@ -44,7 +66,7 @@ class process(object):
     except Exception, err:
       self._error = err
 
-  def _finish(self, thread):
+  def finish(self, thread):
     # be forceful
     if thread.is_alive():
       # the thread may still be alive for a brief period after the process
@@ -60,7 +82,7 @@ class process(object):
 
   def terminate(self):
     try:
-      self._proc.terminate()
+      kill_process_tree(self.pid())
     except:
       pass
 
@@ -155,10 +177,14 @@ class process_group(object):
 
       # Some of the jobs are not done, we'll have to forcefully stop them 
       for fd in not_done:
-        self._members[fd].terminate()
+        def thread_callback():
+          if callable(callback):
+            callback(fd, self._members[fd])
 
-        if callable(callback):
-          callback(fd, self._members[fd])
+        thread = Thread(target=thread_callback)
+        thread.start()
+
+        self._members[fd].finish(thread)
  
   def read_all(self, timeout=None, callback=None):
     output = {}
