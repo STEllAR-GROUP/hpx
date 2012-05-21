@@ -208,7 +208,7 @@ else()
     endif()
 
     if(WIN32)
-      set(DOCS_OUTPUT_DIR "file:///${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/share/hpx/docs/html/")
+      set(DOCS_OUTPUT_DIR "file:///${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/share/hpx-${HPX_VERSION}/docs/html/")
       add_custom_command(OUTPUT ${name}_HTML.manifest
         COMMAND set XML_CATALOG_FILES=${${name}_CATALOG}
         COMMAND ${XSLTPROC_PROGRAM} ${${name}_XSLTPROC_ARGS}
@@ -224,7 +224,7 @@ else()
         COMMENT "Generating HTML from ${${name}_SOURCE}."
         DEPENDS ${${name}_SOURCE} ${${name}_DEPENDENCIES})
     else()
-      set(DOCS_OUTPUT_DIR "file:///${CMAKE_BINARY_DIR}/share/hpx/docs/html/")
+      set(DOCS_OUTPUT_DIR "file:///${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/html/")
       add_custom_command(OUTPUT ${name}_HTML.manifest
         COMMAND "XML_CATALOG_FILES=${${name}_CATALOG}" ${XSLTPROC_PROGRAM}
                 ${${name}_XSLTPROC_ARGS}
