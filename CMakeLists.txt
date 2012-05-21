@@ -1123,7 +1123,7 @@ if(NOT HPX_NO_INSTALL)
     endif()
 
     install(
-      DIRECTORY ${doc_dir}/share/hpx/docs/
+      DIRECTORY ${doc_dir}/share/hpx-${HPX_VERSION}/docs/
       DESTINATION share/hpx-${HPX_VERSION}/doc
       COMPONENT docs
       OPTIONAL
@@ -1239,5 +1239,20 @@ if(DOXYGEN_FOUND)
   configure_file(${hpx_SOURCE_DIR}/cmake/templates/autodoc.doxy.in
                  ${CMAKE_CURRENT_BINARY_DIR}/docs/hpx_autodoc.doxy
                  @ONLY)
+endif()
+
+file(MAKE_DIRECTORY ${output_dir}/share/hpx-${HPX_VERSION}/tests)
+
+file(WRITE ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_unit.tests
+           "[\n${HPX_UNIT_TEST_LIST}\n]\n")
+
+file(WRITE ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_regression.tests
+           "[\n${HPX_REGRESSION_TEST_LIST}\n]\n")
+
+if(NOT HPX_NO_INSTALL)
+  install(FILES ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_unit.tests
+          DESTINATION share/hpx-${HPX_VERSION}/tests)
+  install(FILES ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_regression.tests
+          DESTINATION share/hpx-${HPX_VERSION}/tests)
 endif()
 
