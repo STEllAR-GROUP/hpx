@@ -39,7 +39,7 @@ def run(cmd, timeout=3600):
     else:
       break
 
-  return (returncode, output, timed_out)
+  return (timed_out, returncode, output)
 
 def rstrip_last(s, chars):
   if s[-1] in chars:
@@ -68,7 +68,7 @@ if None == options.program:
   print "No program specified"
   exit(1)
 
-(returncode, output, timed_out) = run(options.program, options.timeout)
+(timed_out, returncode, output) = run(options.program, options.timeout)
 
 if not 0 == len(output):
   print rstrip_last(output, '\n')
