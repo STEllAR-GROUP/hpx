@@ -22,7 +22,7 @@ macro(add_hpx_test name test_list)
                               "FAILURE_EXPECTED" ${ARGN})
 
   if(NOT ${name}_TIMEOUT)
-    set(${name}_TIMEOUT None)
+    set(${name}_TIMEOUT 600)
   endif()
 
   if(NOT ${name}_LOCALITIES)
@@ -42,12 +42,12 @@ macro(add_hpx_test name test_list)
   set(args)
 
   foreach(arg ${${name}_ARGS})
-    set(args ${args} "\"${arg}\"")
+    set(args ${args} "'${arg}'")
   endforeach()
 
   hpx_make_python_list(args ${name}_ARGS)
 
-  set(test_input "\"${name}\""
+  set(test_input "'${name}'"
                  ${${name}_TIMEOUT}
                  ${expected}
                  ${${name}_LOCALITIES}

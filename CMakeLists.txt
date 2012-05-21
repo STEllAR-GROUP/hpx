@@ -1256,3 +1256,6 @@ if(NOT HPX_NO_INSTALL)
           DESTINATION share/hpx-${HPX_VERSION}/tests)
 endif()
 
+unset(HPX_UNIT_TEST_LIST CACHE)
+unset(HPX_REGRESSION_TEST_LIST CACHE)
+
