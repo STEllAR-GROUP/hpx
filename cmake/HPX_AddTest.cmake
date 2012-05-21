@@ -11,15 +11,15 @@ hpx_include(ParseArguments)
 
 macro(hpx_make_python_list input output)
   set(${output} "[")
-  foreach(element ${input})
-    set(${output} "${output}${element},")
+  foreach(element ${${input}})
+    set(${output} "${${output}}${element},")
   endforeach()
-  set(${output} "]")
+  set(${output} "${${output}}]")
 endmacro()
 
 macro(add_hpx_test name test_list)
-  hpx_parse_argument(${name} "TIMEOUT;LOCALITIES;THREADS_PER_LOCALITY;ARGS"
-                             "FAILURE_EXPECTED" ${ARGN})
+  hpx_parse_arguments(${name} "TIMEOUT;LOCALITIES;THREADS_PER_LOCALITY;ARGS"
+                              "FAILURE_EXPECTED" ${ARGN})
 
   if(NOT ${name}_TIMEOUT)
     set(${name}_TIMEOUT None)
@@ -41,31 +41,32 @@ macro(add_hpx_test name test_list)
 
   set(args)
 
-  foreach(arg ${name}_ARGS)
+  foreach(arg ${${name}_ARGS})
     set(args ${args} "\"${arg}\"")
   endforeach()
 
   hpx_make_python_list(args ${name}_ARGS)
 
-  set(input ${name}
-            ${${name}_TIMEOUT}
-            ${expected}
-            ${${name}_LOCALITIES}
-            ${${name}_THREADS_PER_LOCALITY}
-            ${${name}_ARGS})
+  set(test_input "\"${name}\""
+                 ${${name}_TIMEOUT}
+                 ${expected}
+                 ${${name}_LOCALITIES}
+                 ${${name}_THREADS_PER_LOCALITY}
+                 ${${name}_ARGS})
 
-  hpx_make_python_list(input output)
+  hpx_make_python_list(test_input test_output)
 
-  set(output "  ${output},\n")
+  set(test_output "  ${test_output},\n")
 
-  set(test_list ${test_list} "${output}")
+  set(${test_list} "${${test_list}}${test_output}"
+      CACHE STRING "Test description list" FORCE)
 endmacro()
 
 macro(add_hpx_unit_test name)
-  add_hpx_test(name HPX_UNIT_TEST_LIST ${ARGN})
+  add_hpx_test(${name} HPX_UNIT_TEST_LIST ${ARGN})
 endmacro()
 
 macro(add_hpx_regression_test name)
-  add_hpx_test(name HPX_REGRESSION_TEST_LIST ${ARGN})
+  add_hpx_test(${name} HPX_REGRESSION_TEST_LIST ${ARGN})
 endmacro()
 
