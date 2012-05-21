@@ -10,8 +10,9 @@
 # TODO: Match threading.Thread interface and/or subprocess interface better?
 # TODO: Better exception propagation
 
+from sys import float_info
 from threading import Thread, Lock
-from time import sleep
+from time import sleep, time
 from subprocess import Popen, STDOUT, PIPE
 from types import StringType
 from shlex import split
@@ -20,13 +21,17 @@ from select import epoll, EPOLLHUP
 class process(object):
   _proc = None
   _error = None
-  _groups = []
+  _groups = None
+  _timed_out = None
 
   def __init__(self, cmd, group=None):
     if StringType == type(cmd):
       cmd = split(cmd)
 
     self._proc = Popen(cmd, stderr = STDOUT, stdout = PIPE, shell = False) 
+    self._error = None
+    self._groups = []
+    self._timed_out = False
 
     if group is not None:
       group.add_process(self)
@@ -40,34 +45,38 @@ class process(object):
       self._error = err
 
   def _finish(self, thread):
-    timed_out = None
-
     # be forceful
     if thread.is_alive():
       # the thread may still be alive for a brief period after the process
       # finishes (e.g. when it is notifying groups), so we ignore any errors
-      try:
-        self._proc.terminate()
-      except:
-        pass
-
+      self.terminate()
       thread.join()
-      timed_out = True
-
-    else:
-      timed_out = False
 
     # if an exception happened, re-raise it here in the master thread 
     if self._error is not None:
       raise self._error
 
-    return (timed_out, self._proc.returncode)
+    return (self._timed_out, self._proc.returncode)
+
+  def terminate(self):
+    try:
+      self._proc.terminate()
+    except:
+      pass
+
+    self._timed_out = True
 
   def poll(self):
     return self._proc.poll()
       
   def pid(self):
     return self._proc.pid
+
+  def fileno(self):
+    return self._proc.stdout.fileno()
+
+  def timed_out(self):
+    return self._timed_out
 
   def wait(self, timeout=None):
     if timeout is not None:
@@ -80,49 +89,89 @@ class process(object):
       return self._finish(thread)
 
     else:
-      return (False, self._proc.wait())
+      return (self._timed_out, self._proc.wait())
 
   def join(self, timeout=None):
     return self.wait(timeout)
 
-  def read(self):
-    return self._proc.stdout.read()
+  def read(self, timeout=None):
+    (timed_out, returncode) = self.wait(timeout)
+
+    output = ''
+
+    while True:
+      s = self._proc.stdout.read()
+
+      if s:
+        output += s
+      else:
+        break
+
+    return output
 
 # modelled after Boost.Thread's boost::thread_group class
 class process_group(object):
   _lock = None 
-  _members = {} 
+  _members = None 
   _poller = None
 
   def __init__(self, *cmds):
     self._lock = Lock()
+    self._members = {}
     self._poller = epoll()
 
     for cmd in cmds:
       self.create_process(cmd)
 
   def create_process(self, cmd):
-    return process(cmd, self);
+    return process(cmd, self)
 
   def add_process(self, job):
     with self._lock:
-      self._members[job._proc.stdout.fileno()] = job 
+      self._members[job.fileno()] = job 
       self._poller.register(job._proc.stdout, EPOLLHUP)
 
-  def join_all(self, timeout=None):
-    if timeout is None: 
-      timeout = float(-1)
-
+  def join_all(self, timeout=None, callback=None):
     with self._lock:
-      num_done = 0
+      not_done = self._members.copy()  
   
-      while True:
-        for fd, flags in self._poller.poll(timeout=timeout):
+      started = time()
+
+      while timeout is None or not float_info.epsilon > timeout:
+        ready = self._poller.poll(timeout=-1.0 if timeout is None else timeout)
+
+        if not timeout is None:
+          timeout -= (time() - started)
+
+        for fd, flags in ready:
           self._poller.unregister(fd)
-          num_done += 1
+          not_done.pop(fd)
+
+          if callable(callback):
+            callback(fd, self._members[fd])
   
-        if len(self._members) == num_done:
-          break
+        if 0 == len(not_done):
+          return
+
+      # Some of the jobs are not done, we'll have to forcefully stop them 
+      for fd in not_done:
+        self._members[fd].terminate()
+
+        if callable(callback):
+          callback(fd, self._members[fd])
+ 
+  def read_all(self, timeout=None, callback=None):
+    output = {}
+
+    def read_callback(fd, job):
+      output[fd] = job.read()
+
+      if callable(callback):
+        callback(fd, job, output[fd])
+
+    self.join_all(timeout, read_callback)
+
+    return output
 
 def join_all(*tasks, **keys):
   def flatten(items):
@@ -148,5 +197,22 @@ def join_all(*tasks, **keys):
   for task in tasks:
     pg.add_process(task)
 
-  pg.join_all(keys['timeout'])
+  pg.join_all(keys['timeout'], keys['callback'])
+
+def read_all(*tasks, **keys):
+  output = {}
+
+  callback = keys['callback']
+
+  def read_callback(fd, job):
+    output[fd] = job.read()
+
+    if callable(callback):
+      callback(fd, job, output[fd])
+
+  keys['callback'] = read_callback
+
+  join_all(*tasks, **keys)
+
+  return output
 
