@@ -8,8 +8,6 @@
 
 from os.path import exists, join
 
-from sys import path
-
 from datetime import datetime
 
 from string import letters, digits
@@ -18,10 +16,12 @@ from types import StringType
 
 from optparse import OptionParser
 
+HPX_VERSION = "1.0.0"
+
 if exists(join(path[0], "../hpx")):
   path.append(join(path[0], ".."))
-if exists(join(path[0], "../share/hpx/python/hpx")):
-  path.append(join(path[0], "../share/hpx/python"))
+if exists(join(path[0], "../share/hpx-"+HPX_VERSION+"/python/hpx")):
+  path.append(join(path[0], "../share/hpx-"+HPX_VERSION+"/python"))
 
 from hpx.process import process
 

@@ -8,15 +8,18 @@
 # TODO: Fractional threads_per_locality
 
 import sys, os, string
+import os.path as osp
 
 from types import StringType
 
 from optparse import OptionParser
 
-if os.path.exists(os.path.join(sys.path[0], "../hpx")):
-  sys.path.append(os.path.join(sys.path[0], ".."))
-if os.path.exists(os.path.join(sys.path[0], "../share/hpx/python/hpx")):
-  sys.path.append(os.path.join(sys.path[0], "../share/hpx/python"))
+HPX_VERSION = "1.0.0"
+
+if osp.exists(osp.join(sys.path[0], "../hpx")):
+  sys.path.append(osp.join(sys.path[0], ".."))
+if osp.exists(osp.join(sys.path[0], "../share/hpx-"+HPX_VERSION+"/python/hpx")):
+  sys.path.append(osp.join(sys.path[0], "../share/hpx-"+HPX_VERSION+"/python"))
 
 from hpx.process import process, process_group
 
@@ -27,10 +30,10 @@ from hpx.process import process, process_group
 # types:  [ string, float or None, bool, int, int, list ]
 
 def create_path(name, prefix="", suffix=""):
-  return os.path.expandvars(prefix + name + suffix)
+  return osp.expandvars(prefix + name + suffix)
 
 def quote_options(options, quoting_char = '"'):
-  no_quote = string.letters + string.digits + '-+=/_'
+  no_quote = string.letters + string.digits + '-+=/_.'
   s = ''
 
   for option in options:
@@ -45,11 +48,16 @@ def quote_options(options, quoting_char = '"'):
 
   return string.strip(s)
 
+class TestFailed(Exception):
+  pass
+
 if __name__ == '__main__':
   # {{{ main
   usage = "Usage: %prog [options] [.tests files]" 
 
   parser = OptionParser(usage=usage)
+
+  exe_dir = osp.normpath(osp.dirname(sys.argv[0])) + '/'
 
   parser.add_option("--suffix",
                     action="store", type="string",
@@ -58,8 +66,8 @@ if __name__ == '__main__':
 
   parser.add_option("--prefix",
                     action="store", type="string",
-                    dest="prefix", default="./",
-                    help="Prefix added to test names") 
+                    dest="prefix", default=exe_dir,
+                    help="Prefix added to test names [default: %default]") 
 
   parser.add_option("--log",
                     action="store", type="string",
@@ -71,7 +79,7 @@ if __name__ == '__main__':
   parser.add_option("--log-prefix",
                     action="store", type="string",
                     dest="log_prefix", default="./",
-                    help="Prefix for log files") 
+                    help="Prefix for log files [default: %default]") 
 
   (options, files) = parser.parse_args()
 
@@ -93,10 +101,11 @@ if __name__ == '__main__':
   for [name, timeout, success, nodes, threads_per_node, args] in tests:
     full_name = create_path(name, options.prefix, options.suffix)
 
-    print "Running: " + full_name
+    print "Running: " + full_name + " (Timeout:", timeout, "[s])",
+    sys.stdout.flush()
 
     pg = process_group()
-
+    results = [] # [ cmd, cmd_passed, exit_code, timed_out, output ]
     cmds = {}
 
     for node in range(nodes):
@@ -105,23 +114,72 @@ if __name__ == '__main__':
                           , '-l' + str(nodes)
                           , '-' + str(node)] + args)
 
-      cmds[pg.create_process(cmd).fileno()] = (node, cmd) 
+      cmds[pg.create_process(cmd).fileno()] = cmd
 
-    def print_result(fd, job, output):
-      passed = (job.poll() == 0 if success else job.poll() != 0)
+    def gather_results(fd, job, output):
+      cmd_passed = (job.poll() == 0 if success else job.poll() != 0) \
+           and not job.timed_out()
 
-      print (" " * 2) + cmds[job.fileno()][1]
-      print (" " * 4) + "Result: " + ("Passed" if passed else "Failed")
-      print (" " * 4) + "Exit code:", job.poll()
-      print (" " * 4) + "Timed out:", job.timed_out()
+      results.append([ cmds[job.fileno()]
+                     , cmd_passed
+                     , job.poll()
+                     , job.timed_out()
+                     , output]) 
 
-      if "always" == options.log or ("fail" == options.log and not passed):
-        if 0 != len(output):
-          log = create_path(name, options.log_prefix, options.suffix) \
-              + "_l" + str(cmds[job.fileno()][0]) + ".log"
-          print >> open(log, "w"), output,
-          print (" " * 4) + "Output log: " + log
+#      print (" " * 2) + cmds[job.fileno()][1]
+#      print (" " * 4) + "Result: " + ("Passed" if cmd_passed else "Failed")
+#      print (" " * 4) + "Exit code:", job.poll()
+#      print (" " * 4) + "Timed out:", job.timed_out()
 
-    pg.read_all(timeout, print_result)
+#      if "always" == options.log or ("fail" == options.log and not passed):
+#        if 0 != len(output):
+#          log = create_path(name, options.log_prefix, options.suffix) \
+#              + "_l" + str(cmds[job.fileno()][0]) + ".log"
+#          print >> open(log, "w"), output,
+#          print (" " * 4) + "Output log: " + log
+
+      if not cmd_passed:
+        raise TestFailed()
+
+    try:
+      pg.read_all(timeout, gather_results)
+    except TestFailed:
+      def read_callback(fd, job):
+        try:
+          gather_results(fd, job, job.read(0.5)) 
+        except TestFailed:
+          pass
+
+      pg.terminate_all(read_callback)
+
+    # all the commands are now done
+
+    test_passed = True
+
+    for result in results:
+      if not result[1]:
+        test_passed = False
+        break
+
+    print "-", ("Passed" if test_passed else "Failed")
+
+    if "always" == options.log or ("fail" == options.log and not test_passed):
+      log = create_path(name, options.log_prefix, options.suffix) + ".log"
+      f = open(log, "w")
+      print (" " * 2) + "Output log:", log 
+
+      for result in results:
+        print >> f, ("#" * 80)
+        print >> f, "Command:", result[0] 
+        print >> f, "Result:", ("Passed" if result[1] else "Failed")
+        print >> f, "Exit code:", result[2]
+        print >> f, "Timed out:", result[3]
+        print >> f, ("#" * 80)
+
+        if 0 != len(result[4]):
+          print >> f, result[4],
+          print >> f, ("#" * 80)
+
+        print >> f, "" 
   # }}}
 

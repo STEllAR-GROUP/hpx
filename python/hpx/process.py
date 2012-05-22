@@ -20,24 +20,40 @@ from signal import SIGKILL
 from os import kill, waitpid, WNOHANG
 from select import epoll, EPOLLHUP
 from platform import system
+from Queue import Queue, Empty
+from errno import ESRCH
+
+# TODO: implement for Windows
 
 if "Linux" == system(): 
   def kill_process_tree(parent_pid, signal=SIGKILL):
-    ps_command = Popen("ps -o pid --ppid %d --noheaders"
-                      % parent_pid, shell=True, stdout=PIPE)
+    cmd = "ps -o pid --ppid %d --noheaders" % parent_pid
+    ps_command = Popen(cmd, shell=True, stdout=PIPE)
     ps_output = ps_command.stdout.read()
     retcode = ps_command.wait()
 
-    if 0 != ps_command.wait():
-      raise RuntimeError("'ps' command returned %d" % retcode) 
+    if 0 == ps_command.wait():
+      for pid in ps_output.split("\n")[:-1]:
+        kill(int(pid), signal)
 
-    for pid in ps_output.split("\n")[:-1]:
-      kill(int(pid), signal)
-
-    kill(parent_pid, signal)
+    try: 
+      kill(parent_pid, signal)
+      return True
+    except OSError, err:
+      if ESRCH != err.errno:
+        raise err
+      else:
+        return False
 else:
   def kill_process_tree(parent_pid, signal=SIGKILL):
-    kill(parent_pid, signal)
+    try: 
+      kill(parent_pid, signal)
+      return True
+    except OSError, err:
+      if ESRCH != err.errno:
+        raise err
+      else:
+        return False
 
 class process(object):
   _proc = None
@@ -66,13 +82,15 @@ class process(object):
     except Exception, err:
       self._error = err
 
-  def finish(self, thread):
+  def _finish(self, thread):
     # be forceful
     if thread.is_alive():
       # the thread may still be alive for a brief period after the process
       # finishes (e.g. when it is notifying groups), so we ignore any errors
       self.terminate()
       thread.join()
+
+      self._timed_out = True
 
     # if an exception happened, re-raise it here in the master thread 
     if self._error is not None:
@@ -81,12 +99,7 @@ class process(object):
     return (self._timed_out, self._proc.returncode)
 
   def terminate(self):
-    try:
-      kill_process_tree(self.pid())
-    except:
-      pass
-
-    self._timed_out = True
+    return kill_process_tree(self.pid())
 
   def poll(self):
     return self._proc.poll()
@@ -117,19 +130,28 @@ class process(object):
     return self.wait(timeout)
 
   def read(self, timeout=None):
-    (timed_out, returncode) = self.wait(timeout)
+    read_queue = Queue()
+
+    def enqueue_output():
+      for block in iter(self._proc.stdout.read, b''):
+        read_queue.put(block)
+
+    thread = Thread(target=enqueue_output) 
+    thread.daemon = True
+    thread.start() 
 
     output = ''
 
-    while True:
-      s = self._proc.stdout.read()
+    try:
+      started = time()
 
-      if s:
-        output += s
-      else:
-        break
+      while timeout is None or not float_info.epsilon > timeout:
+        output += read_queue.get(timeout=timeout) 
 
-    return output
+        if not timeout is None:
+          timeout -= (time() - started)
+    except Empty:
+      return output 
 
 # modelled after Boost.Thread's boost::thread_group class
 class process_group(object):
@@ -175,22 +197,19 @@ class process_group(object):
         if 0 == len(not_done):
           return
 
-      # Some of the jobs are not done, we'll have to forcefully stop them 
+      # some of the jobs are not done, we'll have to forcefully stop them 
       for fd in not_done:
-        def thread_callback():
-          if callable(callback):
-            callback(fd, self._members[fd])
+        if self._members[fd].terminate():
+          self._members[fd]._timed_out = True
 
-        thread = Thread(target=thread_callback)
-        thread.start()
+        if callable(callback):
+          callback(fd, self._members[fd])
 
-        self._members[fd].finish(thread)
- 
   def read_all(self, timeout=None, callback=None):
     output = {}
 
     def read_callback(fd, job):
-      output[fd] = job.read()
+      output[fd] = job.read(0.5)
 
       if callable(callback):
         callback(fd, job, output[fd])
@@ -198,6 +217,13 @@ class process_group(object):
     self.join_all(timeout, read_callback)
 
     return output
+
+  def terminate_all(self, callback=None):
+    with self._lock:
+      for (fd, job) in self._members.iteritems():
+        if job.terminate():
+          if callable(callback):
+            callback(fd, job)
 
 def join_all(*tasks, **keys):
   def flatten(items):
