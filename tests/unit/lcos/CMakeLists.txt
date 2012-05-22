@@ -21,7 +21,7 @@ set(tests
     future_wait
     packaged_action
     promise
-    test_futures
+    future
    )
 
 set(dataflow_FLAGS DEPENDENCIES dataflow_component)

@@ -77,7 +77,7 @@ void test_store_value_from_thread()
     HPX_TEST(fi2.is_ready());
     HPX_TEST(fi2.has_value());
     HPX_TEST(!fi2.has_exception());
-    HPX_TEST_EQ(fi2.get_state(), hpx::lcos::future_status::ready);
+    HPX_TEST(fi2.get_state() == hpx::lcos::future_status::ready);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -97,7 +97,7 @@ void test_store_exception()
     HPX_TEST(fi3.is_ready());
     HPX_TEST(!fi3.has_value());
     HPX_TEST(fi3.has_exception());
-    HPX_TEST_EQ(fi3.get_state(), hpx::lcos::future_status::ready);
+    HPX_TEST(fi3.get_state() ==  hpx::lcos::future_status::ready);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -107,7 +107,7 @@ void test_initial_state()
     HPX_TEST(!fi.is_ready());
     HPX_TEST(!fi.has_value());
     HPX_TEST(!fi.has_exception());
-    HPX_TEST_EQ(fi.get_state(), hpx::lcos::future_status::uninitialized);
+    HPX_TEST(fi.get_state() == hpx::lcos::future_status::uninitialized);
     int i;
     try {
         i = fi.get();
@@ -131,7 +131,7 @@ void test_waiting_future()
     HPX_TEST(!fi.is_ready());
     HPX_TEST(!fi.has_value());
     HPX_TEST(!fi.has_exception());
-    HPX_TEST_EQ(fi.get_state(), hpx::lcos::future_status::deferred);
+    HPX_TEST(fi.get_state() == hpx::lcos::future_status::deferred);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -164,7 +164,7 @@ void test_set_value_updates_future_status()
     HPX_TEST(fi.is_ready());
     HPX_TEST(fi.has_value());
     HPX_TEST(!fi.has_exception());
-    HPX_TEST_EQ(fi.get_state(), hpx::lcos::future_status::ready);
+    HPX_TEST(fi.get_state() == hpx::lcos::future_status::ready);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -181,7 +181,7 @@ void test_set_value_can_be_retrieved()
     HPX_TEST(fi.is_ready());
     HPX_TEST(fi.has_value());
     HPX_TEST(!fi.has_exception());
-    HPX_TEST_EQ(fi.get_state(), hpx::lcos::future_status::ready);
+    HPX_TEST(fi.get_state() == hpx::lcos::future_status::ready);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -199,7 +199,7 @@ void test_set_value_can_be_moved()
     HPX_TEST(fi.is_ready());
     HPX_TEST(fi.has_value());
     HPX_TEST(!fi.has_exception());
-    HPX_TEST_EQ(fi.get_state(), hpx::lcos::future_status::ready);
+    HPX_TEST(fi.get_state() == hpx::lcos::future_status::ready);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -211,7 +211,7 @@ void test_future_from_packaged_task_is_waiting()
     HPX_TEST(!fi.is_ready());
     HPX_TEST(!fi.has_value());
     HPX_TEST(!fi.has_exception());
-    HPX_TEST_EQ(fi.get_state(), hpx::lcos::future_status::deferred);
+    HPX_TEST(fi.get_state() == hpx::lcos::future_status::deferred);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -225,7 +225,7 @@ void test_invoking_a_packaged_task_populates_future()
     HPX_TEST(fi.is_ready());
     HPX_TEST(fi.has_value());
     HPX_TEST(!fi.has_exception());
-    HPX_TEST_EQ(fi.get_state(), hpx::lcos::future_status::ready);
+    HPX_TEST(fi.get_state() == hpx::lcos::future_status::ready);
 
     int i = fi.get();
     HPX_TEST_EQ(i, 42);
@@ -298,7 +298,7 @@ void test_void_promise()
     HPX_TEST(f.is_ready());
     HPX_TEST(f.has_value());
     HPX_TEST(!f.has_exception());
-    HPX_TEST_EQ(f.get_state(), hpx::lcos::future_status::ready);
+    HPX_TEST(f.get_state() == hpx::lcos::future_status::ready);
 }
 
 // void test_reference_promise()
@@ -310,7 +310,7 @@ void test_void_promise()
 //     HPX_TEST(f.is_ready());
 //     HPX_TEST(f.has_value());
 //     HPX_TEST(!f.has_exception());
-//     HPX_TEST_EQ(f.get_state(), hpx::lcos::future_status::ready);
+//     HPX_TEST(f.get_state() == hpx::lcos::future_status::ready);
 //     HPX_TEST_EQ(&f.get(), &i);
 // }
 
@@ -328,7 +328,7 @@ void test_task_returning_void()
     HPX_TEST(fi.is_ready());
     HPX_TEST(fi.has_value());
     HPX_TEST(!fi.has_exception());
-    HPX_TEST_EQ(fi.get_state(), hpx::lcos::future_status::ready);
+    HPX_TEST(fi.get_state() == hpx::lcos::future_status::ready);
 }
 
 // int global_ref_target = 0;
@@ -348,7 +348,7 @@ void test_task_returning_void()
 //     HPX_TEST(fi.is_ready());
 //     HPX_TEST(fi.has_value());
 //     HPX_TEST(!fi.has_exception());
-//     HPX_TEST_EQ(fi.get_state(), hpx::lcos::future_status::ready);
+//     HPX_TEST(fi.get_state() == hpx::lcos::future_status::ready);
 //     int& i = fi.get();
 //     HPX_TEST_EQ(&i, &global_ref_target);
 // }
@@ -359,14 +359,14 @@ void test_shared_future()
     hpx::lcos::future<int> fi = pt.get_future();
 
     hpx::lcos::future<int> sf(boost::move(fi));
-    HPX_TEST_EQ(fi.get_state(), hpx::lcos::future_status::uninitialized);
+    HPX_TEST(fi.get_state() == hpx::lcos::future_status::uninitialized);
 
     pt();
 
     HPX_TEST(sf.is_ready());
     HPX_TEST(sf.has_value());
     HPX_TEST(!sf.has_exception());
-    HPX_TEST_EQ(sf.get_state(), hpx::lcos::future_status::ready);
+    HPX_TEST(sf.get_state() == hpx::lcos::future_status::ready);
 
     int i = sf.get();
     HPX_TEST_EQ(i, 42);
@@ -382,16 +382,16 @@ void test_copies_of_shared_future_become_ready_together()
     hpx::lcos::future<int> sf3;
 
     sf3 = sf1;
-    HPX_TEST_EQ(sf1.get_state(), hpx::lcos::future_status::deferred);
-    HPX_TEST_EQ(sf2.get_state(), hpx::lcos::future_status::deferred);
-    HPX_TEST_EQ(sf3.get_state(), hpx::lcos::future_status::deferred);
+    HPX_TEST(sf1.get_state() == hpx::lcos::future_status::deferred);
+    HPX_TEST(sf2.get_state() == hpx::lcos::future_status::deferred);
+    HPX_TEST(sf3.get_state() == hpx::lcos::future_status::deferred);
 
     pt();
 
     HPX_TEST(sf1.is_ready());
     HPX_TEST(sf1.has_value());
     HPX_TEST(!sf1.has_exception());
-    HPX_TEST_EQ(sf1.get_state(), hpx::lcos::future_status::ready);
+    HPX_TEST(sf1.get_state() == hpx::lcos::future_status::ready);
     int i = sf1.get();
     HPX_TEST_EQ(i, 42);
 
@@ -399,7 +399,7 @@ void test_copies_of_shared_future_become_ready_together()
     HPX_TEST(sf2.is_ready());
     HPX_TEST(sf2.has_value());
     HPX_TEST(!sf2.has_exception());
-    HPX_TEST_EQ(sf2.get_state(), hpx::lcos::future_status::ready);
+    HPX_TEST(sf2.get_state() == hpx::lcos::future_status::ready);
     i = sf2.get();
     HPX_TEST_EQ(i, 42);
 
@@ -407,7 +407,7 @@ void test_copies_of_shared_future_become_ready_together()
     HPX_TEST(sf3.is_ready());
     HPX_TEST(sf3.has_value());
     HPX_TEST(!sf3.has_exception());
-    HPX_TEST_EQ(sf3.get_state(), hpx::lcos::future_status::ready);
+    HPX_TEST(sf3.get_state() == hpx::lcos::future_status::ready);
     i = sf3.get();
     HPX_TEST_EQ(i, 42);
 }
@@ -419,12 +419,12 @@ void test_shared_future_can_be_move_assigned_from_unique_future()
 
     hpx::lcos::future<int> sf;
     sf = boost::move(fi);
-    HPX_TEST_EQ(fi.get_state(), hpx::lcos::future_status::uninitialized);
+    HPX_TEST(fi.get_state() == hpx::lcos::future_status::uninitialized);
 
     HPX_TEST(!sf.is_ready());
     HPX_TEST(!sf.has_value());
     HPX_TEST(!sf.has_exception());
-    HPX_TEST_EQ(sf.get_state(), hpx::lcos::future_status::deferred);
+    HPX_TEST(sf.get_state() == hpx::lcos::future_status::deferred);
 }
 
 void test_shared_future_void()
@@ -433,14 +433,14 @@ void test_shared_future_void()
     hpx::lcos::future<void> fi = pt.get_future();
 
     hpx::lcos::future<void> sf(boost::move(fi));
-    HPX_TEST_EQ(fi.get_state(), hpx::lcos::future_status::uninitialized);
+    HPX_TEST(fi.get_state() == hpx::lcos::future_status::uninitialized);
 
     pt();
 
     HPX_TEST(sf.is_ready());
     HPX_TEST(sf.has_value());
     HPX_TEST(!sf.has_exception());
-    HPX_TEST(sf.get_state()==hpx::lcos::future_status::ready);
+    HPX_TEST(sf.get_state() == hpx::lcos::future_status::ready);
     sf.get();
 }
 
@@ -453,7 +453,7 @@ void test_shared_future_void()
 //     HPX_TEST(f.is_ready());
 //     HPX_TEST(f.has_value());
 //     HPX_TEST(!f.has_exception());
-//     HPX_TEST_EQ(f.get_state(), hpx::lcos::future_status::ready);
+//     HPX_TEST(f.get_state() == hpx::lcos::future_status::ready);
 //     HPX_TEST_EQ(&f.get(), &i);
 // }
 
@@ -559,11 +559,11 @@ void test_wait_callback()
 
     t.join();
 
-    HPX_TEST_EQ(callback_called, 1);
+    HPX_TEST_EQ(callback_called, 1U);
     HPX_TEST_EQ(fi.get(), 42);
     fi.wait();
     fi.wait();
-    HPX_TEST_EQ(callback_called, 1);
+    HPX_TEST_EQ(callback_called, 1U);
 }
 
 // void do_nothing_callback(hpx::lcos::local::promise<int>& /*pi*/)
@@ -583,22 +583,22 @@ void test_wait_callback()
 //     BOOST_SCOPED_ENUM(hpx::lcos::future_status) state =
 //         fi.wait_for(boost::posix_time::milliseconds(10));
 //     HPX_TEST_EQ(state, hpx::lcos::future_status::timeout);
-//     HPX_TEST_EQ(callback_called, 0);
+//     HPX_TEST_EQ(callback_called, 0U);
 //
 //     state = fi.wait_for(boost::posix_time::milliseconds(10));
 //     HPX_TEST_EQ(state, hpx::lcos::future_status::timeout);
 //     state = fi.wait_for(boost::posix_time::milliseconds(10));
 //     HPX_TEST_EQ(state, hpx::lcos::future_status::timeout);
-//     HPX_TEST_EQ(callback_called, 0);
+//     HPX_TEST_EQ(callback_called, 0U);
 //
 //     pi.set_value(42);
 //
 //     state = fi.wait_for(boost::posix_time::milliseconds(10));
 //     HPX_TEST_EQ(state, hpx::lcos::future_status::ready);
 //
-//     HPX_TEST_EQ(callback_called, 1);
+//     HPX_TEST_EQ(callback_called, 1U);
 //     HPX_TEST_EQ(fi.get(), 42);
-//     HPX_TEST_EQ(callback_called, 1);
+//     HPX_TEST_EQ(callback_called, 1U);
 // }
 
 // void wait_callback_for_task(hpx::lcos::local::packaged_task<int()>& pt)
@@ -623,7 +623,7 @@ void test_wait_callback()
 //     HPX_TEST_EQ(fi.get(), 42);
 //     fi.wait();
 //     fi.wait();
-//     HPX_TEST_EQ(callback_called, 1);
+//     HPX_TEST_EQ(callback_called, 1U);
 // }
 
 void test_packaged_task_can_be_moved()
@@ -1151,7 +1151,7 @@ void test_wait_for_either_of_five_futures_5()
 //     hpx::thread t(boost::move(pt));
 //
 //     boost::wait_for_any(fi, fi2);
-//     HPX_TEST_EQ(callback_called, 1);
+//     HPX_TEST_EQ(callback_called, 1U);
 //     HPX_TEST_EQ(fi.get(), 42);
 // }
 
@@ -1490,12 +1490,12 @@ int main(int argc, char* argv[])
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     // we force this test to use several (4) threads
-    using namespace boost::assign;
-    std::vector<std::string> cfg;
-    cfg += "hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::thread::hardware_concurrency());
+//    using namespace boost::assign;
+//    std::vector<std::string> cfg;
+//    cfg += "hpx.os_threads=" +
+//        boost::lexical_cast<std::string>(hpx::thread::hardware_concurrency());
 
     // Initialize and run HPX
-    return hpx::init(cmdline, argc, argv, cfg);
+    return hpx::init(cmdline, argc, argv/*, cfg*/);
 }
 
