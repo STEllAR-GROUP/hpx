@@ -136,6 +136,8 @@ class process(object):
       for block in iter(self._proc.stdout.read, b''):
         read_queue.put(block)
 
+      read_queue.put('')
+
     thread = Thread(target=enqueue_output) 
     thread.daemon = True
     thread.start() 
@@ -146,7 +148,12 @@ class process(object):
       started = time()
 
       while timeout is None or not float_info.epsilon > timeout:
-        output += read_queue.get(timeout=timeout) 
+        s = read_queue.get(timeout=timeout) 
+
+        if s:
+          output += s
+        else:
+          return output
 
         if not timeout is None:
           timeout -= (time() - started)
