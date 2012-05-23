@@ -26,6 +26,8 @@ using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
 
+// TODO: Make this test run in distributed.
+
 ///////////////////////////////////////////////////////////////////////////////
 int f(int i, int j)
 {

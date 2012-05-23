@@ -18,13 +18,26 @@ set(tests
     barrier
     dataflow
     deferred_packaged_task
+    future
     future_wait
     packaged_action
     promise
-    future
    )
 
+set(barrier_PARAMETERS THREADS_PER_LOCALITY 4)
+
 set(dataflow_FLAGS DEPENDENCIES dataflow_component)
+set(dataflow_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(deferred_packaged_task_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(future_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(future_wait_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(packaged_action_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(promise_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
   set(sources
@@ -37,6 +50,8 @@ foreach(test ${tests})
                      SOURCES ${sources}
                      ${${test}_FLAGS}
                      FOLDER "Tests/Unit/LCOs")
+
+  add_hpx_unit_test(${test} ${${test}_PARAMETERS})  
 
   # add a custom target for this example
   add_hpx_pseudo_target(tests.unit.lcos.${test})

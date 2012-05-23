@@ -14,6 +14,8 @@ from types import StringType
 
 from optparse import OptionParser
 
+from errno import ENOENT
+
 HPX_VERSION = "1.0.0"
 
 if osp.exists(osp.join(sys.path[0], "../hpx")):
@@ -108,6 +110,21 @@ if __name__ == '__main__':
     results = [] # [ cmd, cmd_passed, exit_code, timed_out, output ]
     cmds = {}
 
+    if not osp.exists(full_name):
+      print "-", "Failed (test not found)"
+
+      if "always" == options.log or "fail" == options.log:
+        log = create_path(name, options.log_prefix, options.suffix) + ".log"
+        f = open(log, "w")
+        print (" " * 2) + "Log:", log 
+
+        print >> f, ("#" * 80)
+        print >> f, "Test:", full_name 
+        print >> f, "Result: Failed (test not found)"
+        print >> f, ("#" * 80)
+
+      continue 
+
     for node in range(nodes):
       cmd = quote_options([ full_name 
                           , '-t' + str(threads_per_node)
@@ -136,7 +153,7 @@ if __name__ == '__main__':
 #          log = create_path(name, options.log_prefix, options.suffix) \
 #              + "_l" + str(cmds[job.fileno()][0]) + ".log"
 #          print >> open(log, "w"), output,
-#          print (" " * 4) + "Output log: " + log
+#          print (" " * 4) + "Log: " + log
 
       if not cmd_passed:
         raise TestFailed()
@@ -166,7 +183,13 @@ if __name__ == '__main__':
     if "always" == options.log or ("fail" == options.log and not test_passed):
       log = create_path(name, options.log_prefix, options.suffix) + ".log"
       f = open(log, "w")
-      print (" " * 2) + "Output log:", log 
+      print (" " * 2) + "Log:", log 
+
+      print >> f, ("#" * 80)
+      print >> f, "Test:", full_name 
+      print >> f, "Result:", ("Passed" if test_passed else "Failed")
+      print >> f, ("#" * 80)
+      print >> f, ""
 
       for result in results:
         print >> f, ("#" * 80)
