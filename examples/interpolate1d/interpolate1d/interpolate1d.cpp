@@ -59,7 +59,7 @@ namespace interpolate1d
         // initialize the partitions
         distributing_factory::result_type results = future.get();
         distributing_factory::iterator_range_type parts =
-            hpx::components::server::locality_results(results);
+            hpx::util::locality_results(results);
 
         BOOST_FOREACH(hpx::naming::id_type id, parts)
             partitions_.push_back(id);

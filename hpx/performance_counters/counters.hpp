@@ -445,12 +445,18 @@ namespace hpx { namespace performance_counters
     /// \brief Get the global id of an existing performance counter, if the
     ///        counter does not exist yet, the function attempts to create the
     ///        counter based on the given counter name.
+//     HPX_API_EXPORT lcos::future<naming::id_type> get_counter_async(
+//         std::string name);
+
     HPX_API_EXPORT naming::id_type get_counter(std::string name,
         error_code& ec = throws);
 
     /// \brief Get the global id of an existing performance counter, if the
     ///        counter does not exist yet, the function attempts to create the
     ///        counter based on the given counter info.
+//     HPX_API_EXPORT lcos::future<naming::id_type> get_counter_async(
+//         counter_info const& info);
+
     HPX_API_EXPORT naming::id_type get_counter(
         counter_info const& info, error_code& ec = throws);
 
@@ -495,6 +501,10 @@ namespace hpx { namespace performance_counters
 
         // Creation function for uptime counters.
         naming::gid_type uptime_counter_creator(counter_info const&,
+            error_code&);
+
+        // Creation function for instance counters.
+        naming::gid_type component_instance_counter_creator(counter_info const&,
             error_code&);
 
         // \brief Create a new aggregating performance counter instance based on

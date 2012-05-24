@@ -659,6 +659,17 @@ namespace hpx
               &performance_counters::detail::uptime_counter_creator,
               &performance_counters::locality_counter_discoverer,
               "s"    // unit of measure is seconds
+            },
+
+            // component instance counters
+            { "/runtime/component/count", performance_counters::counter_raw,
+              "returns the number of component instances currently alive on "
+              "this locality (the component type has to be specified as the "
+              "counter parameter)",
+              HPX_PERFORMANCE_COUNTER_V1,
+              &performance_counters::detail::component_instance_counter_creator,
+              &performance_counters::locality_counter_discoverer,
+              ""
             }
         };
         performance_counters::install_counter_types(

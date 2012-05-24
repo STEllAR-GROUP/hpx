@@ -223,15 +223,14 @@ namespace hpx { namespace components
             --refcnt_;
         }
 
-        /// \brief Ask whether this factory can be unloaded
+        /// \brief Ask how many instances are alive of the type this factory is
+        ///        responsible for
         ///
-        /// \return Returns whether it is safe to unload this factory and
-        ///         the shared library implementing this factory. This
-        ///         function will return 'true' whenever no more outstanding
-        ///         instances of the managed object type are alive.
-        bool may_unload() const
+        /// \return Returns the number of instances of the managed object type
+        ///         which are currently alive.
+        long instance_count() const
         {
-            return refcnt_ == 0;
+            return refcnt_;
         }
 
     protected:

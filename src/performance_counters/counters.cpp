@@ -506,7 +506,7 @@ namespace hpx { namespace performance_counters
             if (ec) {
                 HPX_THROW_EXCEPTION(bad_parameter, "create_counter_local",
                     "no create function for performance counter found: " +
-                        info.fullname_);
+                    info.fullname_ + " (" + ec.get_message() + ")");
                 return naming::invalid_gid;
             }
 
@@ -518,8 +518,9 @@ namespace hpx { namespace performance_counters
                 paths.parentinstanceindex_ !=
                     static_cast<boost::int64_t>(hpx::get_locality_id()))
             {
-                HPX_THROWS_IF(ec, hpx::bad_parameter, "create_counter_local",
-                    "attempt to create counter on wrong locality");
+                HPX_THROW_EXCEPTION(bad_parameter, "create_counter_local",
+                    "attempt to create counter on wrong locality ("
+                     + ec.get_message() + ")");
                 return hpx::naming::invalid_gid;
             }
 
@@ -528,7 +529,7 @@ namespace hpx { namespace performance_counters
             if (ec) {
                 HPX_THROW_EXCEPTION(bad_parameter, "create_counter_local",
                     "couldn't create performance counter: " +
-                        info.fullname_);
+                    info.fullname_ + " (" + ec.get_message() + ")");
                 return naming::invalid_gid;
             }
 
@@ -578,7 +579,8 @@ namespace hpx { namespace performance_counters
                 using namespace components::stubs;
                 naming::gid_type gid = runtime_support::create_performance_counter(
                     naming::get_id_from_locality_id(static_cast<boost::uint32_t>(p.parentinstanceindex_)),
-                    complemented_info);
+                    complemented_info, ec);
+                if (ec) return naming::invalid_id;
 
                 id = naming::id_type(gid, naming::id_type::managed);
             }

@@ -15,6 +15,7 @@
 #include <boost/intrusive_ptr.hpp>
 #include <boost/utility/result_of.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
+#include <boost/function_types/result_type.hpp>
 
 namespace hpx { namespace lcos
 {
@@ -33,6 +34,33 @@ namespace hpx { namespace lcos
             template <typename ContResult> struct continuation_base;
         }
     }
+
+//     namespace detail
+//     {
+//         template <typename Future, typename F, typename Enable = void>
+//         struct future_when_result;
+//
+//         template <typename Future, typename F>
+//         struct future_when_result<
+//             Future, F, typename boost::result_of<F(Future)>::type
+//         >
+//         {
+//             typedef typename boost::result_of<F(Future)>::type result_type;
+//             typedef typename traits::promise_remote_result<result_type>::type remote_type;
+//             typedef lcos::future<typename boost::result_of<F(Future)>::type> type;
+//         };
+//
+//         template <typename Future, typename F>
+//         struct future_when_result<
+//             Future, F,
+//             typename boost::result_of<F(typename Future::result_type)>::type
+//         >
+//         {
+//             typedef typename boost::result_of<F(typename Future::result_type)>::type result_type;
+//             typedef typename traits::promise_remote_result<result_type>::type remote_type;
+//             typedef lcos::future<result_type, remote_type> type;
+//         };
+//     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result, typename RemoteResult>
@@ -166,6 +194,7 @@ namespace hpx { namespace lcos
 
         // continuation support
         template <typename F>
+//         typename detail::future_when_result<future, F>::type
         future<typename boost::result_of<F(future)>::type>
         when(BOOST_FWD_REF(F) f);
 
@@ -350,6 +379,7 @@ namespace hpx { namespace lcos
         // continuation support
         template <typename F>
         future<typename boost::result_of<F(future)>::type>
+//         typename detail::future_when_result<future, F>::type
         when(BOOST_FWD_REF(F) f);
 
         // reset any pending continuation function

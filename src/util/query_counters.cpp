@@ -53,7 +53,8 @@ namespace hpx { namespace util
                     HPX_THROW_EXCEPTION(bad_parameter,
                         "query_counters::find_counters",
                         boost::str(boost::format(
-                            "unknown performance counter: '%1%'") % name))
+                            "unknown performance counter: '%1%' (%2%)") %
+                            name % ec.get_message()))
                 }
 
                 ids_.push_back(id);
@@ -85,7 +86,7 @@ namespace hpx { namespace util
 
     template <typename Stream>
     void query_counters::print_value(Stream& out, std::string const& name,
-      performance_counters::counter_value& value, std::string const& uom)
+        performance_counters::counter_value& value, std::string const& uom)
     {
         error_code ec;        // do not throw
         double val = value.get_value<double>(ec);

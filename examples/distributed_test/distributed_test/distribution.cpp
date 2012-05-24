@@ -48,7 +48,7 @@ namespace distributed
         //wait for the components to be created
         distributing_factory::result_type results = result.get();
         distributing_factory::iterator_range_type parts =
-            hpx::components::server::locality_results(results);
+            hpx::util::locality_results(results);
 
         std::size_t cardinality = 0;
         //Also define cardinality here: TO DO

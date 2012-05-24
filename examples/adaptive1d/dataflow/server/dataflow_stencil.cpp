@@ -9,6 +9,7 @@
 #include <hpx/include/serialization.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/components.hpp>
+#include <hpx/include/util.hpp>
 
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/assign/std/vector.hpp>
@@ -203,7 +204,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         for (int step = 0; step < steps; ++step)
         {
             components::distributing_factory::iterator_range_type r =
-                locality_results(stencils[step]);
+                util::locality_results(stencils[step]);
 
             components::distributing_factory::iterator_type stencil = r.first;
             for (int i = 0; stencil != r.second; ++stencil, ++i)
@@ -334,7 +335,7 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
         if (logging_type != components::component_invalid)
             logging = factory.create_components(logging_type);
 
-        init(locality_results(functions), locality_results(logging), numsteps);
+        init(util::locality_results(functions), util::locality_results(logging), numsteps);
 
         // prep the connections
         std::size_t memsize = 3;
@@ -348,30 +349,30 @@ namespace hpx { namespace components { namespace adaptive1d { namespace server
 
         // initialize stencil_values using the stencil (functional) components
         for (int i = 0; i < num_rows; ++i)
-            init_stencils(locality_results(stencils[i]), locality_results(functions), i,
+            init_stencils(util::locality_results(stencils[i]), util::locality_results(functions), i,
                           dst_port,dst_src,dst_step,dst_size,src_size,time,par);
 
         // ask stencil instances for their output gids
         std::vector<std::vector<std::vector<naming::id_type> > > outputs(num_rows);
         for (int i = 0; i < num_rows; ++i)
-            get_output_ports(locality_results(stencils[i]), outputs[i]);
+            get_output_ports(util::locality_results(stencils[i]), outputs[i]);
 
         // connect output gids with corresponding stencil inputs
         connect_input_ports(&*stencils.begin(), outputs,dst_size,dst_step,dst_src,dst_port,par);
 
         // for loop over second row ; call start for each
         for (int i = 1; i < num_rows; ++i)
-            start_row(locality_results(stencils[i]));
+            start_row(util::locality_results(stencils[i]));
 
         // prepare initial data
         std::vector<naming::id_type> initial_data;
-        prepare_initial_data(locality_results(functions), interp_src_data,
+        prepare_initial_data(util::locality_results(functions), interp_src_data,
                              initial_data,time,
                              each_row[0],par);
 
         //std::cout << " Startup grid cost " << t.elapsed() << std::endl;
         // do actual work
-        execute(locality_results(stencils[0]), initial_data, *result_data);
+        execute(util::locality_results(stencils[0]), initial_data, *result_data);
 
         // free all allocated components (we can do that synchronously)
         if (!logging.empty())

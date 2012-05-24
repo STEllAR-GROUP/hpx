@@ -177,7 +177,7 @@ void gs(
 
         distributing_factory::result_type results = result.get();
         distributing_factory::iterator_range_type
-            parts = hpx::components::server::locality_results(results);
+            parts = hpx::util::locality_results(results);
 
         hpx::naming::id_type remote_id = *parts.first;
 

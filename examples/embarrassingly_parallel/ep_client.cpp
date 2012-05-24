@@ -13,7 +13,7 @@
 #include "ep/point.hpp"
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
-extern "C" {void FNAME(hello)(); }
+// extern "C" {void FNAME(hello)(); }
 
 /// This function initializes a vector of \a ep::point clients,
 /// connecting them to components created with
@@ -44,8 +44,8 @@ int hpx_main(boost::program_options::variables_map &vm)
         scale *= 1E8;
 
         // number_partitions defines the size of the partition
-        // for Additive Schwarz to work, we will need more partitions 
-        // than just number_partitions.  number_partitions should be as 
+        // for Additive Schwarz to work, we will need more partitions
+        // than just number_partitions.  number_partitions should be as
         // small as possible for performance reasons; however, it can't be too
         // small since the partitioned graph won't fit into memory if it is too small
         std::size_t num_pe = number_partitions; // actual number of partitions is num_pe
@@ -77,7 +77,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::vector<ep::point> points;
 
         // Populate the client vectors.
-        init(hpx::components::server::locality_results(blocks), points);
+        init(hpx::util::locality_results(blocks), points);
 
         // Begin Kernel 2
         hpx::util::high_resolution_timer kernel2time;
@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
 {
     using boost::program_options::value;
 
-    FNAME(hello)();
+//     FNAME(hello)();
 
     // Configure application-specific options.
     boost::program_options::options_description

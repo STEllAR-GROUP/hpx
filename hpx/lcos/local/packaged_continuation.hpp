@@ -419,6 +419,7 @@ namespace hpx { namespace lcos
     // attach a local continuation to this future instance
     template <typename Result, typename RemoteResult>
     template <typename F>
+//     inline typename detail::future_when_result<future<Result, RemoteResult>, F>::type
     inline future<
         typename boost::result_of<F(future<Result, RemoteResult>)>::type
     >

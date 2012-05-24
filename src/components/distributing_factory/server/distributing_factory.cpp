@@ -5,12 +5,10 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/include/serialization.hpp>
 #include <hpx/components/distributing_factory/server/distributing_factory.hpp>
 
-#include <hpx/util/portable_binary_iarchive.hpp>
-#include <hpx/util/portable_binary_oarchive.hpp>
 #include <boost/serialization/vector.hpp>
-
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -177,60 +175,6 @@ namespace hpx { namespace components { namespace server
         }
 
         return results;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    ///
-    locality_result_iterator::data::data(result_type::const_iterator begin,
-            result_type::const_iterator end)
-      : current_(begin), end_(end), is_at_end_(begin == end)
-    {
-        if (!is_at_end_)
-            current_gid_ = (*current_).begin();
-    }
-
-    /// construct end iterator
-    locality_result_iterator::data::data()
-      : is_at_end_(true)
-    {}
-
-    void locality_result_iterator::data::increment()
-    {
-        if (!is_at_end_) {
-            if (++current_gid_ == (*current_).end()) {
-                if (++current_ != end_) {
-                    current_gid_ = (*current_).begin();
-                }
-                else {
-                    is_at_end_ = true;
-                }
-            }
-        }
-    }
-
-    bool locality_result_iterator::data::equal(data const& rhs) const
-    {
-        if (is_at_end_ != rhs.is_at_end_)
-            return false;
-
-        return (is_at_end_ && rhs.is_at_end_) ||
-               (current_ == rhs.current_ && current_gid_ == rhs.current_gid_);
-    }
-
-    naming::id_type const& locality_result_iterator::data::dereference() const
-    {
-        BOOST_ASSERT(!is_at_end_);
-        return *current_gid_;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// return an iterator range for the given locality_result's
-    std::pair<locality_result_iterator, locality_result_iterator>
-    locality_results(distributing_factory::result_type const& v)
-    {
-        typedef std::pair<locality_result_iterator, locality_result_iterator>
-            result_type;
-        return result_type(locality_result_iterator(v), locality_result_iterator());
     }
 }}}
 

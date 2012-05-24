@@ -13,8 +13,8 @@ foreach(subdir ${subdirs})
   add_subdirectory(${subdir})
 
   set(sources
-      ${subdir}_client.cpp
-      test.f90)
+      ${subdir}_client.cpp)
+#      test.f90)
 
   source_group("Source Files" FILES ${sources})
 

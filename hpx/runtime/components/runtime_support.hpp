@@ -176,6 +176,11 @@ namespace hpx { namespace components
             this->base_type::get_config(gid_, ini);
         }
 
+        void get_instance_count(components::component_type type)
+        {
+            this->base_type::get_instance_count(gid_, type);
+        }
+
         ///////////////////////////////////////////////////////////////////////
         naming::id_type const& get_gid() const
         {
@@ -185,7 +190,6 @@ namespace hpx { namespace components
     private:
         naming::id_type gid_;
     };
-
 }}
 
 #endif

@@ -89,10 +89,13 @@ HPX_REGISTER_ACTION_EX(
     update_agas_cache_action)
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::garbage_collect_action,
-    update_agas_cache_action)
+    garbage_collect_action)
 HPX_REGISTER_ACTION_EX(
     hpx::components::server::runtime_support::create_performance_counter_action,
-    update_agas_cache_action)
+    create_performance_counter_action)
+HPX_REGISTER_ACTION_EX(
+    hpx::components::server::runtime_support::get_instance_count_action,
+    get_instance_count_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
@@ -115,7 +118,9 @@ namespace hpx { namespace components { namespace server
     // created at the same time
     int runtime_support::factory_properties(components::component_type type)
     {
-    // locate the factory for the requested component type
+        // locate the factory for the requested component type
+        mutex_type::scoped_lock l(mtx_);
+
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end() || !(*it).second.first) {
             // we don't know anything about this component
@@ -138,7 +143,9 @@ namespace hpx { namespace components { namespace server
     naming::gid_type runtime_support::create_component(
         components::component_type type, std::size_t count)
     {
-    // locate the factory for the requested component type
+        // locate the factory for the requested component type
+        mutex_type::scoped_lock l(mtx_);
+
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end() || !(*it).second.first) {
             // we don't know anything about this component
@@ -177,7 +184,9 @@ namespace hpx { namespace components { namespace server
     naming::gid_type runtime_support::create_one_component(
         components::component_type type, constructor_argument const& arg0)
     {
-    // locate the factory for the requested component type
+        // locate the factory for the requested component type
+        mutex_type::scoped_lock l(mtx_);
+
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end()) {
             // we don't know anything about this component
@@ -509,6 +518,28 @@ namespace hpx { namespace components { namespace server
             // now delete the entry
             components_.erase(curr);
         }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    long runtime_support::get_instance_count(components::component_type type)
+    {
+        mutex_type::scoped_lock l(mtx_);
+
+        component_map_type::const_iterator it = components_.find(type);
+        if (it == components_.end() || !(*it).second.first) {
+            // we don't know anything about this component
+            hpx::util::osstream strm;
+            strm << "attempt to query instance count for components of "
+                    "invalid/unknown type: "
+                 << components::get_component_type_name(type);
+            HPX_THROW_EXCEPTION(hpx::bad_component_type,
+                "runtime_support::factory_properties",
+                hpx::util::osstream_get_string(strm));
+            return factory_invalid;
+        }
+
+        // ask for the factory's capabilities
+        return (*it).second.first->instance_count();
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -284,7 +284,7 @@ void gs(
 
         distributing_factory::result_type results = result.get();
         distributing_factory::iterator_range_type
-            parts = hpx::components::server::locality_results(results);
+            parts = hpx::util::locality_results(results);
 
 
         std::size_t n_x_block = std::size_t(num_blocks_sqrt);

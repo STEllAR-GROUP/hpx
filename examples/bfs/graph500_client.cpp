@@ -154,7 +154,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::vector<graph500::point> points;
 
         // Populate the client vectors.
-        init(hpx::components::server::locality_results(blocks), points);
+        init(hpx::util::locality_results(blocks), points);
 
         // Get the gids of each component
         std::vector<hpx::naming::id_type> point_components;

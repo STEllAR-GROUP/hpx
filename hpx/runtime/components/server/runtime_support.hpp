@@ -133,7 +133,8 @@ namespace hpx { namespace components { namespace server
             runtime_support_call_shutdown_functions = 12,
             runtime_support_update_agas_cache = 13,
             runtime_support_garbage_collect = 14,
-            runtime_support_create_performance_counter = 15
+            runtime_support_create_performance_counter = 15,
+            runtime_support_get_instance_count = 16
         };
 
         static component_type get_component_type()
@@ -271,6 +272,10 @@ namespace hpx { namespace components { namespace server
         naming::gid_type create_performance_counter(
             performance_counters::counter_info const& info);
 
+        /// \brief Return the current instance count for the given component
+        ///        type
+        long get_instance_count(components::component_type);
+
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into a action
         // type, allowing to generate all require boilerplate code for threads,
@@ -317,13 +322,13 @@ namespace hpx { namespace components { namespace server
 
         typedef hpx::actions::action3<
             runtime_support, runtime_support_free_component,
-            components::component_type, naming::gid_type const&, naming::gid_type const&,
-            &runtime_support::free_component
+            components::component_type, naming::gid_type const&,
+            naming::gid_type const&, &runtime_support::free_component
         > free_component_action;
 
         typedef hpx::actions::action2<
-            runtime_support, runtime_support_shutdown, double, naming::id_type const&,
-            &runtime_support::shutdown
+            runtime_support, runtime_support_shutdown, double,
+            naming::id_type const&, &runtime_support::shutdown
         > shutdown_action;
 
         typedef hpx::actions::action1<
@@ -367,6 +372,11 @@ namespace hpx { namespace components { namespace server
             performance_counters::counter_info const&,
             &runtime_support::create_performance_counter
         > create_performance_counter_action;
+
+        typedef hpx::actions::result_action1<
+            runtime_support, long, runtime_support_get_instance_count,
+            components::component_type, &runtime_support::get_instance_count
+        > get_instance_count_action;
 
         ///////////////////////////////////////////////////////////////////////
         /// \brief Start the runtime_support component
@@ -546,6 +556,9 @@ HPX_REGISTER_ACTION_DECLARATION_EX(
 HPX_REGISTER_ACTION_DECLARATION_EX(
     hpx::components::server::runtime_support::create_performance_counter_action,
     create_performance_counter_action)
+HPX_REGISTER_ACTION_DECLARATION_EX(
+    hpx::components::server::runtime_support::get_instance_count_action,
+    get_instance_count_action)
 
 #include <hpx/config/warnings_suffix.hpp>
 

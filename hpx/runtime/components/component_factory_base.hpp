@@ -105,7 +105,17 @@ namespace hpx { namespace components
         ///         the shared library implementing this factory. This
         ///         function will return 'true' whenever no more outstanding
         ///         instances of the managed object type are alive.
-        virtual bool may_unload() const = 0;
+        bool may_unload() const
+        {
+            return instance_count() == 0;
+        }
+
+        /// \brief Ask how many instances are alive of the type this factory is
+        ///        responsible for
+        ///
+        /// \return Returns the number of instances of the managed object type
+        ///         which are currently alive.
+        virtual long instance_count() const = 0;
     };
 
 }}

@@ -502,7 +502,7 @@ namespace hpx
                 typename traits::promise_remote_result<Result>::type>
         class future;
 
-       template <typename ValueType>
+        template <typename ValueType>
         struct object_semaphore;
 
         namespace stubs

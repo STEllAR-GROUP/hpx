@@ -292,6 +292,7 @@ namespace hpx { namespace components { namespace stubs
                     hpx::naming::id_type::unmanaged));
         }
 
+        ///////////////////////////////////////////////////////////////////////
         static void
         update_agas_cache(naming::id_type const& targetgid,
             naming::gid_type const& gid, agas::gva const& g)
@@ -341,9 +342,10 @@ namespace hpx { namespace components { namespace stubs
 
         static naming::gid_type
         create_performance_counter(naming::id_type targetgid,
-            performance_counters::counter_info const& info)
+            performance_counters::counter_info const& info,
+            error_code& ec = throws)
         {
-            return create_performance_counter_async(targetgid, info).get();
+            return create_performance_counter_async(targetgid, info).get(ec);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -363,6 +365,27 @@ namespace hpx { namespace components { namespace stubs
             // The following get yields control while the action above
             // is executed and the result is returned to the future
             ini = get_config_async(targetgid).get();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        /// \brief Retrieve instance count for given component type
+        static lcos::future<long> get_instance_count_async(
+            naming::id_type const& targetgid, components::component_type type)
+        {
+            // Create a future, execute the required action,
+            // we simply return the initialized future, the caller needs
+            // to call get() on the return value to obtain the result
+            typedef server::runtime_support::get_instance_count_action
+                action_type;
+            return hpx::async<action_type>(targetgid, type);
+        }
+
+        static long get_instance_count(naming::id_type const& targetgid,
+            components::component_type type)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the future
+            return get_instance_count_async(targetgid, type).get();
         }
     };
 }}}

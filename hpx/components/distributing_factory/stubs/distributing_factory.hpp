@@ -64,7 +64,6 @@ namespace hpx { namespace components { namespace stubs
         {
         }
     };
-
 }}}
 
 #endif

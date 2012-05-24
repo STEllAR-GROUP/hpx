@@ -369,7 +369,7 @@ int hpx_main(boost::program_options::variables_map &vm)
         std::vector<gtc::point> points;
 
         // Populate the client vectors.
-        init(hpx::components::server::locality_results(blocks_points), points);
+        init(hpx::util::locality_results(blocks_points), points);
 
         ///////////////////////////////////////////////////////////////////////
         { // SETUP
