@@ -14,6 +14,12 @@ set(benchmarks
     sizeof
    )
 
+if(MSVC)
+  set(boost_library_dependencies)
+else()
+  set(boost_library_dependencies ${BOOST_program_options_LIBRARY})
+endif()
+
 if(OPENMP_FOUND)
   set(benchmarks
       ${benchmarks}
@@ -21,7 +27,7 @@ if(OPENMP_FOUND)
      )
 
   set(openmp_homogeneous_task_spawn_FLAGS NOLIBS
-      DEPENDENCIES ${BOOST_program_options_LIBRARY})
+      DEPENDENCIES ${boost_library_dependencies})
 endif()
 
 if(QTHREADS_FOUND)
@@ -34,11 +40,11 @@ if(QTHREADS_FOUND)
      )
 
   set(qthreads_homogeneous_task_spawn_FLAGS NOLIBS
-      DEPENDENCIES ${BOOST_program_options_LIBRARY}
+      DEPENDENCIES ${boost_library_dependencies}
                    ${QTHREADS_LIBRARY})
 
   set(qthreads_heterogeneous_task_spawn_FLAGS NOLIBS
-      DEPENDENCIES ${BOOST_program_options_LIBRARY}
+      DEPENDENCIES ${boost_library_dependencies}
                    ${QTHREADS_LIBRARY})
 endif()
 
@@ -51,7 +57,7 @@ if(TBB_FOUND)
      )
 
   set(tbb_homogeneous_task_spawn_FLAGS NOLIBS
-      DEPENDENCIES ${BOOST_program_options_LIBRARY}
+      DEPENDENCIES ${boost_library_dependencies}
                    ${TBB_LIBRARY})
 endif()
 
@@ -64,31 +70,32 @@ if(SWARM_FOUND)
      )
 
   set(swarm_homogeneous_task_spawn_FLAGS NOLIBS
-      DEPENDENCIES ${BOOST_program_options_LIBRARY}
+      DEPENDENCIES ${boost_library_dependencies}
                    ${SWARM_LIBRARY})
 endif()
 
+set(delay_baseline_FLAGS NOLIBS
+    DEPENDENCIES ${boost_library_dependencies})
+
+set(print_heterogeneous_payloads_FLAGS NOLIBS
+    DEPENDENCIES ${boost_library_dependencies})
+
+if(NOT MSVC)
+  set(boost_library_dependencies ${boost_library_dependencies} ${BOOST_thread_LIBRARY})
+endif()
+
 set(boost_tls_overhead_FLAGS NOLIBS
-    DEPENDENCIES ${BOOST_program_options_LIBRARY}
-                 ${BOOST_thread_LIBRARY})
+    DEPENDENCIES ${boost_library_dependencies})
 
 set(native_tls_overhead_FLAGS NOLIBS
-    DEPENDENCIES ${BOOST_program_options_LIBRARY}
-                 ${BOOST_thread_LIBRARY})
+    DEPENDENCIES ${boost_library_dependencies})
 
 set(hpx_tls_overhead_FLAGS NOLIBS
-    DEPENDENCIES ${BOOST_program_options_LIBRARY}
-                 ${BOOST_thread_LIBRARY})
-
-set(delay_baseline_FLAGS NOLIBS
-    DEPENDENCIES ${BOOST_program_options_LIBRARY})
+    DEPENDENCIES ${boost_library_dependencies})
 
 set(hpx_homogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component)
 
 set(hpx_heterogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component)
-
-set(print_heterogeneous_payloads_FLAGS NOLIBS
-    DEPENDENCIES ${BOOST_program_options_LIBRARY})
 
 if(HPX_CXX11_LAMBDAS)
   set(benchmarks ${benchmarks}
