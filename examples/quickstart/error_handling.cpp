@@ -30,7 +30,7 @@ int hpx_main()
 
             // Print all of the available diagnostic information as stored with
             // the exception.
-            hpx::cout << "diagnostic information:\n"
+            hpx::cout << "diagnostic information:"
                       << hpx::diagnostic_information(e) << hpx::flush;
         }
     }
