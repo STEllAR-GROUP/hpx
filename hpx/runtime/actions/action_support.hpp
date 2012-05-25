@@ -530,12 +530,15 @@ namespace hpx { namespace actions
                 boost::mpl::bool_<
                     boost::fusion::result_of::size<arguments_type>::value == 0>,
                 boost::is_same<IdType, naming::id_type> >,
-            Result
+            typename traits::promise_local_result<Result>::type
         >::type
-        operator()(IdType const& id) const;
+        operator()(IdType const& id) const
+        {
+            return hpx::async(*this, id).get();
+        }
 
         // bring in the declaration for all overloads for operator()
-        #include <hpx/runtime/actions/declare_function_operators.hpp>
+        #include <hpx/runtime/actions/define_function_operators.hpp>
 
         /// retrieve component type
         static int get_component_type()

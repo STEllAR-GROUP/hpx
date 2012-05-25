@@ -503,6 +503,8 @@ namespace hpx
         // Extract the diagnostic information embedded in the given exception and
         // return a string holding a formatted message.
         HPX_EXPORT std::string diagnostic_information(boost::exception const& e);
+        HPX_EXPORT std::string diagnostic_information(boost::exception_ptr const& e);
+        HPX_EXPORT std::string diagnostic_information(hpx::exception const& e);
 
         // Report an early or late exception and locally abort execution. There
         // isn't anything more we could do.
@@ -513,6 +515,16 @@ namespace hpx
     /// Extract the diagnostic information embedded in the given exception and
     /// return a string holding a formatted message.
     inline std::string diagnostic_information(boost::exception const& e)
+    {
+        return detail::diagnostic_information(e);
+    }
+
+    inline std::string diagnostic_information(boost::exception_ptr const& e)
+    {
+        return detail::diagnostic_information(e);
+    }
+
+    inline std::string diagnostic_information(hpx::exception const& e)
     {
         return detail::diagnostic_information(e);
     }

@@ -62,22 +62,6 @@ namespace hpx
         HPX_API_EXPORT applier* get_applier_ptr();
     }
 
-    /// \namespace actions
-    ///
-    /// The namespace \a actions contains all definitions needed for the
-    /// class \a hpx#action_manager#action_manager and its related
-    /// functionality. This namespace is part of the HPX core module.
-    namespace actions
-    {
-        struct HPX_API_EXPORT base_action;
-        typedef boost::shared_ptr<base_action> action_type;
-
-        class HPX_API_EXPORT continuation;
-        typedef boost::shared_ptr<continuation> continuation_type;
-
-        class HPX_API_EXPORT action_manager;
-    }
-
     namespace agas
     {
         struct HPX_API_EXPORT addressing_service;
@@ -286,6 +270,26 @@ namespace hpx
         /// known threads.
         HPX_API_EXPORT boost::int64_t get_thread_count(
             thread_state_enum state = unknown);
+    }
+
+    /// \namespace actions
+    ///
+    /// The namespace \a actions contains all definitions needed for the
+    /// class \a hpx#action_manager#action_manager and its related
+    /// functionality. This namespace is part of the HPX core module.
+    namespace actions
+    {
+        struct HPX_API_EXPORT base_action;
+        typedef boost::shared_ptr<base_action> action_type;
+
+        class HPX_API_EXPORT continuation;
+        typedef boost::shared_ptr<continuation> continuation_type;
+
+        class HPX_API_EXPORT action_manager;
+
+        template <typename Component, int Action, typename Result,
+            typename Arguments, typename Derived, threads::thread_priority Priority>
+        struct action;
     }
 
     class HPX_API_EXPORT runtime;
@@ -597,6 +601,8 @@ namespace hpx
     ///        from.
     HPX_API_EXPORT boost::uint32_t get_locality_id(error_code& ec = throws);
 }
+
+#include <hpx/lcos/async_fwd.hpp>
 
 #endif
 

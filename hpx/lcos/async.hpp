@@ -32,6 +32,7 @@ namespace hpx
         typedef typename traits::promise_local_result<
             typename action_type::result_type
         >::type result_type;
+
         lcos::packaged_action<action_type, result_type> p;
         if (policy & launch::async)
             p.apply(gid);
@@ -59,10 +60,7 @@ namespace hpx
             Component, Action, Result, Arguments, Derived, Priority
         > /*act*/, naming::id_type const& gid)
     {
-        lcos::packaged_action<Derived, Result> p;
-        if (policy & launch::async)
-            p.apply(gid);
-        return p.get_future();
+        return async<Derived>(policy, gid);
     }
 
     template <typename Component, int Action, typename Result,
@@ -130,10 +128,7 @@ namespace hpx
         )> const& data_sink,
         naming::id_type const& gid)
     {
-        lcos::packaged_action<Derived, Result> p(data_sink);
-        if (policy & launch::async)
-            p.apply(gid);
-        return p.get_future();
+        return async_callback<Derived>(policy, data_sink, gid);
     }
 
     template <typename Component, int Action, typename Result,
@@ -177,6 +172,8 @@ namespace hpx
 
 #undef HPX_FWD_ARGS
 #undef HPX_FORWARD_ARGS
+
+#include <hpx/runtime/actions/define_function_operators.hpp>
 
 #endif
 
@@ -236,10 +233,8 @@ namespace hpx
             Component, Action, Result, Arguments, Derived, Priority
         > /*act*/, naming::id_type const& gid, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
-        lcos::packaged_action<Derived, Result> p;
-        if (policy & launch::async)
-            p.apply(gid, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
-        return p.get_future();
+        return async<Derived>(policy, gid,
+            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
     template <typename Component, int Action, typename Result,
@@ -314,10 +309,8 @@ namespace hpx
         naming::id_type const& gid,
         BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _))
     {
-        lcos::packaged_action<Derived, Result> p(data_sink);
-        if (policy & launch::async)
-            p.apply(gid, BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
-        return p.get_future();
+        return async_callback<Derived>(policy, data_sink, gid,
+            BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _));
     }
 
     template <typename Component, int Action, typename Result,

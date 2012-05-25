@@ -138,14 +138,10 @@ namespace hpx { namespace detail
     HPX_EXPORT void throw_exception(Exception const& e, std::string const& func,
         std::string const& file, long line)
     {
-        boost::uint32_t node = 0;
-        std::string hostname_ = "";
         boost::int64_t pid_ = ::getpid();
-        std::size_t shepherd = std::size_t(-1);
-        std::size_t thread_id = 0;
-        std::string thread_name("");
         std::string back_trace(backtrace());
 
+        std::string hostname_ = "";
         if (get_runtime_ptr())
         {
             util::osstream strm;
@@ -155,6 +151,11 @@ namespace hpx { namespace detail
 
         // if this is not a HPX thread we do not need to query neither for
         // the shepherd thread nor for the thread id
+        boost::uint32_t node = 0;
+        std::size_t shepherd = std::size_t(-1);
+        std::size_t thread_id = 0;
+        std::string thread_name("");
+
         threads::thread_self* self = threads::get_self_ptr();
         if (NULL != self)
         {
@@ -243,7 +244,7 @@ namespace hpx { namespace detail
             }
             else {
                 std::cerr << "Runtime is not available, reporting error locally. "
-                    << diagnostic_information(boost::current_exception())
+                    << hpx::diagnostic_information(boost::current_exception())
                     << std::flush;
             }
         }
@@ -348,6 +349,21 @@ namespace hpx { namespace detail
         strm << "[stdlib]: " << BOOST_STDLIB << "\n";
 
         return util::osstream_get_string(strm);
+    }
+
+    std::string diagnostic_information(boost::exception_ptr const& e)
+    {
+        try {
+            boost::rethrow_exception(e);
+        }
+        catch (boost::exception const& be) {
+            return hpx::diagnostic_information(be);
+        }
+    }
+
+    std::string diagnostic_information(hpx::exception const& e)
+    {
+        return diagnostic_information(dynamic_cast<boost::exception const&>(e));
     }
 
     ///////////////////////////////////////////////////////////////////////////
