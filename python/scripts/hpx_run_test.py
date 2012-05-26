@@ -16,7 +16,7 @@ from optparse import OptionParser
 
 from errno import ENOENT
 
-HPX_VERSION = "1.0.0"
+from hpx_version import HPX_VERSION
 
 if osp.exists(osp.join(sys.path[0], "../hpx")):
   sys.path.append(osp.join(sys.path[0], ".."))

@@ -17,9 +17,8 @@ from types import *
 from operator import *
 from datetime import datetime
 from pickle import dump
+from hpx_version import HPX_VERSION
 
-HPX_VERSION = "1.0.0"
- 
 if osp.exists(osp.join(sys.path[0], "../hpx")):
   sys.path.append(osp.join(sys.path[0], ".."))
 if osp.exists(osp.join(sys.path[0], "../share/hpx-"+HPX_VERSION+"/python/hpx")):

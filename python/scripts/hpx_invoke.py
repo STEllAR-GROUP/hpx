@@ -16,7 +16,7 @@ from types import StringType
 
 from optparse import OptionParser
 
-HPX_VERSION = "1.0.0"
+from hpx_version import HPX_VERSION
 
 if exists(join(path[0], "../hpx")):
   path.append(join(path[0], ".."))
