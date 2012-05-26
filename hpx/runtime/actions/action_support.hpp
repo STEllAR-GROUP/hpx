@@ -523,7 +523,7 @@ namespace hpx { namespace actions
         //    construct_continuation_thread_object_function()
         #include <hpx/runtime/actions/construct_continuation_functions.hpp>
 
-        // bring in the declaration for all overloads for operator()
+        // bring in the definition for all overloads for operator()
         template <typename IdType>
         typename boost::enable_if<
             boost::mpl::and_<
@@ -532,12 +532,11 @@ namespace hpx { namespace actions
                 boost::is_same<IdType, naming::id_type> >,
             typename traits::promise_local_result<Result>::type
         >::type
-        operator()(IdType const& id) const
+        operator()(IdType const& id, error_code& ec = throws) const
         {
-            return hpx::async(*this, id).get();
+            return hpx::async(*this, id).get(ec);
         }
 
-        // bring in the declaration for all overloads for operator()
         #include <hpx/runtime/actions/define_function_operators.hpp>
 
         /// retrieve component type

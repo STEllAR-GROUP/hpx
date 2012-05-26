@@ -31,13 +31,8 @@ namespace hpx { namespace components { namespace server
     // implementation of this console error sink
     void console_error_sink(boost::exception_ptr const& e)
     {
-        try {
-            boost::rethrow_exception(e);
-        }
-        catch (boost::exception const& be) {
-            // dispatch this error to registered functions
-            get_error_dispatcher()(hpx::diagnostic_information(be));
-        }
+        // dispatch this error to registered functions
+        get_error_dispatcher()(hpx::diagnostic_information(e));
     }
 }}}
 

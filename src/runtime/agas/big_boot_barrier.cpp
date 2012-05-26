@@ -81,13 +81,9 @@ void early_parcel_sink(
                 (threads::thread_state_ex(threads::wait_signaled));
         }
         catch (...) {
-            try {
-                boost::rethrow_exception(boost::current_exception());
-            }
-            catch (boost::exception const& be) {
-                std::cerr << hpx::diagnostic_information(be) << std::endl;
-                std::abort();
-            }
+            std::cerr << hpx::diagnostic_information(boost::current_exception())
+                      << std::endl;
+            std::abort();
         }
     }
 } // }}}

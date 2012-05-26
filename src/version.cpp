@@ -49,8 +49,8 @@ namespace hpx
     {
         char const* const copyright =
             "HPX - High Performance ParalleX\n"
-            "An experimental runtime system for conventional machines implementing\n"
-            "(parts of) the ParalleX execution model.\n\n"
+            "An distributed and parallel runtime system for conventional machines\n"
+            "implementing (parts of) the ParalleX execution model.\n\n"
             "Copyright (C) 1998-2012 Hartmut Kaiser, Bryce Lelbach and others\n"
             "The STE||AR Group, http://stellar.cct.lsu.edu\n\n"
             "Distributed under the Boost Software License, Version 1.0. (See accompanying\n"
@@ -75,6 +75,21 @@ namespace hpx
             (BOOST_VERSION % 100));
     }
 
+    std::string boost_platform()
+    {
+        return BOOST_PLATFORM;
+    }
+
+    std::string boost_compiler()
+    {
+        return BOOST_COMPILER;
+    }
+
+    std::string boost_stdlib()
+    {
+        return BOOST_STDLIB;
+    }
+
     std::string complete_version()
     {
         boost::format logo(
@@ -84,7 +99,7 @@ namespace hpx
             "\n"
             "Build:\n"
             "  Type: %s\n"
-            "  Date: %s %s\n"
+            "  Date: %s\n"
             "  Platform: %s\n"
             "  Compiler: %s\n"
             "  Standard Library: %s\n");
@@ -92,11 +107,21 @@ namespace hpx
         return boost::str(logo %
             build_string() %
             boost_version() %
-            HPX_BUILD_TYPE %
-            __DATE__ % __TIME__ %
-            BOOST_PLATFORM %
-            BOOST_COMPILER %
-            BOOST_STDLIB);
+            build_type() %
+            build_date_time() %
+            boost_platform() %
+            boost_compiler() %
+            boost_stdlib());
+    }
+
+    std::string build_type()
+    {
+        return HPX_BUILD_TYPE;
+    }
+
+    std::string build_date_time()
+    {
+        return std::string(__DATE__)  + " " + __TIME__;
     }
 
     ///////////////////////////////////////////////////////////////////////////

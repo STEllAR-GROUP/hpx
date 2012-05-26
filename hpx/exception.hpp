@@ -500,12 +500,6 @@ namespace hpx
         // stack backtrace, otherwise it will return an empty string.
         HPX_EXPORT std::string backtrace();
 
-        // Extract the diagnostic information embedded in the given exception and
-        // return a string holding a formatted message.
-        HPX_EXPORT std::string diagnostic_information(boost::exception const& e);
-        HPX_EXPORT std::string diagnostic_information(boost::exception_ptr const& e);
-        HPX_EXPORT std::string diagnostic_information(hpx::exception const& e);
-
         // Report an early or late exception and locally abort execution. There
         // isn't anything more we could do.
         HPX_EXPORT void report_exception_and_terminate(boost::exception_ptr const&);
@@ -514,20 +508,64 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     /// Extract the diagnostic information embedded in the given exception and
     /// return a string holding a formatted message.
-    inline std::string diagnostic_information(boost::exception const& e)
-    {
-        return detail::diagnostic_information(e);
-    }
+    HPX_EXPORT std::string diagnostic_information(boost::exception const& e);
+    HPX_EXPORT std::string diagnostic_information(boost::exception_ptr const& e);
+    HPX_EXPORT std::string diagnostic_information(hpx::exception const& e);
 
-    inline std::string diagnostic_information(boost::exception_ptr const& e)
-    {
-        return detail::diagnostic_information(e);
-    }
+    ///////////////////////////////////////////////////////////////////////////
+    /// Extract elements of the diagnostic information embedded in the given
+    /// exception.
 
-    inline std::string diagnostic_information(hpx::exception const& e)
-    {
-        return detail::diagnostic_information(e);
-    }
+    /// Return the locality where the exception was thrown.
+    HPX_EXPORT boost::uint32_t get_locality_id(boost::exception const& e);
+    HPX_EXPORT boost::uint32_t get_locality_id(boost::exception_ptr const& e);
+    HPX_EXPORT boost::uint32_t get_locality_id(hpx::exception const& e);
+
+    /// Return the hostname of the locality where the exception was thrown.
+    HPX_EXPORT std::string get_host_name(boost::exception const& e);
+    HPX_EXPORT std::string get_host_name(boost::exception_ptr const& e);
+    HPX_EXPORT std::string get_host_name(hpx::exception const& e);
+
+    /// Return the (operating system) process id of the locality where the
+    /// exception was thrown.
+    HPX_EXPORT boost::int64_t get_process_id(boost::exception const& e);
+    HPX_EXPORT boost::int64_t get_process_id(boost::exception_ptr const& e);
+    HPX_EXPORT boost::int64_t get_process_id(hpx::exception const& e);
+
+    /// Return the function name from which the exception was thrown.
+    HPX_EXPORT std::string get_function_name(boost::exception const& e);
+    HPX_EXPORT std::string get_function_name(boost::exception_ptr const& e);
+    HPX_EXPORT std::string get_function_name(hpx::exception const& e);
+
+    /// Return the (source code) file name of the function from which the
+    /// exception was thrown.
+    HPX_EXPORT std::string get_file_name(boost::exception const& e);
+    HPX_EXPORT std::string get_file_name(boost::exception_ptr const& e);
+    HPX_EXPORT std::string get_file_name(hpx::exception const& e);
+
+    /// Return the line number in the (source code) file of the function from
+    /// which the exception was thrown.
+    HPX_EXPORT int get_line_number(boost::exception const& e);
+    HPX_EXPORT int get_line_number(boost::exception_ptr const& e);
+    HPX_EXPORT int get_line_number(hpx::exception const& e);
+
+    /// Return the sequence number of the OS-thread used to execute HPX-threads
+    /// from which the exception was thrown.
+    HPX_EXPORT std::size_t get_os_thread(boost::exception const& e);
+    HPX_EXPORT std::size_t get_os_thread(boost::exception_ptr const& e);
+    HPX_EXPORT std::size_t get_os_thread(hpx::exception const& e);
+
+    /// Return the unique thread id of the HPX-thread from which the exception
+    /// was thrown.
+    HPX_EXPORT std::size_t get_thread_id(boost::exception const& e);
+    HPX_EXPORT std::size_t get_thread_id(boost::exception_ptr const& e);
+    HPX_EXPORT std::size_t get_thread_id(hpx::exception const& e);
+
+    /// Return any addition thread description of the HPX-thread from which the
+    /// exception was thrown.
+    HPX_EXPORT std::string get_thread_description(boost::exception const& e);
+    HPX_EXPORT std::string get_thread_description(boost::exception_ptr const& e);
+    HPX_EXPORT std::string get_thread_description(hpx::exception const& e);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

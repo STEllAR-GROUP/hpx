@@ -49,10 +49,11 @@
             boost::is_same<IdType, naming::id_type> >,
         typename traits::promise_local_result<Result>::type
     >::type
-    operator()(IdType const& id, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _)) const
+    operator()(IdType const& id, BOOST_PP_REPEAT(N, HPX_FWD_ARGS, _),
+        error_code& ec = throws) const
     {
         return hpx::async(*this, id
-          BOOST_PP_COMMA_IF(N) BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)).get();
+          BOOST_PP_COMMA_IF(N) BOOST_PP_REPEAT(N, HPX_FORWARD_ARGS, _)).get(ec);
     }
 
 #undef N
