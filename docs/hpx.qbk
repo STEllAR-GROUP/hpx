@@ -10,7 +10,7 @@
     [quickbook 1.5]
     [id hpx]
     [authors [STE||AR Group, The]]
-    [version 1.0.0]
+    [version 0.9.0]
     [copyright 2011 2012 The STE||AR Group]
     [license
         Distributed under the Boost Software License, Version 1.0. (See
@@ -28,9 +28,10 @@
 [def __0_7_0__                  [link hpx.whats_new.hpx_0_7_0 V0.7.0]]
 [def __0_8_0__                  [link hpx.whats_new.hpx_0_8_0 V0.8.0]]
 [def __0_8_1__                  [link hpx.whats_new.hpx_0_8_1 V0.8.1]]
+[def __0_9_0__                  [link hpx.whats_new.hpx_0_9_0 V0.9.0]]
 [def __1_0_0__                  [link hpx.whats_new.hpx_1_0_0 V1.0.0]]
 
-[def __version__                __1_0_0__]
+[def __version__                __0_9_0__]
 
 [def __hpx__                    /HPX/]
 [def __stellar__                [@http://stellar.cct.lsu.edu STE||AR]]
@@ -136,8 +137,8 @@ and [*A]lgorithms [*R]esearch) is a research group at __lsu__'s __cct__. For
 a list of people working in this group and participating in writing this
 documentation see __people__.
 
-This documentation is automatically generated for HPX __hpx_version__ (from SVN
-revision __hpx_svn_revision__) by the Boost QuickBook documentation tool.
+This documentation is automatically generated for HPX __version__ (from SVN
+revision: __hpx_svn_revision__) by the Boost QuickBook documentation tool.
 QuickBook can be found in the collection of __boost_tools__.
 
 [include preface.qbk]

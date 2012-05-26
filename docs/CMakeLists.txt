@@ -55,11 +55,11 @@ hpx_quickbook_to_html(hpx
                 --stringparam toc.section.depth 3
                 --stringparam toc.max.depth 3
                 --stringparam generate.section.toc.level 4
-                --stringparam boost.image.src images/hpx_1_0.png
+                --stringparam boost.image.src images/hpx_0_9.png
                 --stringparam boost.image.w 322
-                --stringparam boost.image.h 101
+                --stringparam boost.image.h 85
                 --stringparam boost.image.alt "HPX - High Performance ParalleX"
-  QUICKBOOK_ARGS ${quickbook_fixme_mode})
+  QUICKBOOK_ARGS ${quickbook_fixme_mode} -D__hpx_svn_revision__=${SVN_REVISION})
 
 add_custom_target(docs
   DEPENDS hpx_HTML.manifest
