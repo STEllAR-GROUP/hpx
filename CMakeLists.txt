@@ -1241,7 +1241,8 @@ if(DOXYGEN_FOUND)
       "BOOST_SCOPED_ENUM_START(x):=enum x"
       "BOOST_SCOPED_ENUM_END="
       "HPX_EXCEPTION_EXPORT="
-      "HPX_EXPORT=")
+      "HPX_EXPORT="
+      "extern=")
 
   foreach(doxygen_predef ${doxygen_definition_list})
     set(doxygen_definitions "${doxygen_definitions} \"${doxygen_predef}\"")

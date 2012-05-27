@@ -22,7 +22,7 @@ int hpx_main()
     {
         ///////////////////////////////////////////////////////////////////////
         // Error reporting using exceptions
-        //[error_handling_throw
+        //[error_handling_diagnostic_information
         try {
             // invoke raise_exception() which throws an exception
             raise_exception_type do_it;
@@ -36,7 +36,17 @@ int hpx_main()
             // the exception.
             hpx::cout << "diagnostic information:"
                 << hpx::diagnostic_information(e) << "\n";
+        }
+        //]
 
+        // Error reporting using exceptions
+        //[error_handling_diagnostic_elements
+        try {
+            // invoke raise_exception() which throws an exception
+            raise_exception_type do_it;
+            do_it(hpx::find_here());
+        }
+        catch (hpx::exception const& e) {
             // Print the elements of the diagnostic information separately
             hpx::cout << "[locality-id]: " << hpx::get_locality_id(e) << "\n";
             hpx::cout << "[hostname]: "    << hpx::get_host_name(e) << "\n";
@@ -51,6 +61,7 @@ int hpx_main()
 
             hpx::cout << hpx::flush;
         }
+        //]
 
         ///////////////////////////////////////////////////////////////////////
         // Error reporting using error code

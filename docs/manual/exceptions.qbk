@@ -28,5 +28,44 @@ associate additional diagnostic information with the exception, such as file
 name and line number, locality id and thread id, and stack backtrace from the
 point where the exception was thrown.
 
+Any exception thrown during the execution of an action is transferred back to
+the (asynchronous) invocation site. It will be rethrown in this context when
+the calling thread tries to wait for the result of the action by invoking
+either `future<>::get()` or the synchronous action invocation wrapper as shown
+here:
+
+[error_handling_diagnostic_information]
+
+[note The exception is transferred back to the invocation site even if it is executed
+      on a different locality.]
+
+Additionally example demonstrates how an exception thrown by an (possibly
+remote) action can be handled. It shows the use of
+[funcref hpx::diagnostic_information `hpx::diagnostic_information()`] which
+retrieves all available diagnostic information from the exception as a
+formatted string. This includes for instance the name of the source file and
+line number, the sequence number of the OS-thread and the HPX-thread id, the
+locality id and the stack backtrace of the point where the original exception
+was thrown.
+
+Under certain circumstances it is desireable to output only some of the
+diagnostics, or to output those using different formatting. For this case HPX
+exposes a set of lower level functions as demonstrated in the following code
+snippet:
+
+[error_handling_diagnostic_elements]
+
+Please refer to the documentation of
+[funcref hpx::get_locality_id `hpx::get_locality_id()`],
+[funcref hpx::get_host_name `hpx::get_host_name()`],
+[funcref hpx::get_process_id `hpx::get_process_id()`],
+[funcref hpx::get_function_name `hpx::get_function_name()`],
+[funcref hpx::get_file_name `hpx::get_file_name()`],
+[funcref hpx::get_line_number `hpx::get_line_number()`],
+[funcref hpx::get_os_thread `hpx::get_os_thread()`],
+[funcref hpx::get_thread_id `hpx::get_thread_id()`], and
+[funcref hpx::get_thread_description `hpx::get_thread_description()`]
+for more details.
+
 [endsect] [/ Working with Exceptions]
 
