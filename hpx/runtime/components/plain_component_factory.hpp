@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file plain_component_factory.hpp
+
 #if !defined(HPX_PLAIN_COMPONENT_FACTORY_JUN_18_2010_1100AM)
 #define HPX_PLAIN_COMPONENT_FACTORY_JUN_18_2010_1100AM
 
@@ -24,6 +26,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
+    /// \cond NOINTERNAL
+
     ///////////////////////////////////////////////////////////////////////////
     /// The \a plain_component_factory provides a minimal implementation of a
     /// component's factory usable for plain_actions.
@@ -182,11 +186,15 @@ namespace hpx { namespace components
     protected:
         bool isenabled_;
     };
+
+    /// \endcond
 }}
 
+/// \cond NOINTERNAL
+
 ///////////////////////////////////////////////////////////////////////////////
-/// This macro is used to create and to register a minimal factory for plain
-/// actions with Boost.Plugin.
+// This macro is used to create and to register a minimal factory for plain
+// actions with Boost.Plugin.
 #define HPX_REGISTER_PLAIN_ACTION_EX2(plain_action, plain_action_name,        \
         state)                                                                \
     BOOST_CLASS_EXPORT_KEY2(hpx::actions::transfer_action<plain_action>,      \
@@ -208,23 +216,10 @@ namespace hpx { namespace components
 
 #define HPX_REGISTER_PLAIN_ACTION_EX(plain_action, plain_action_name)         \
     HPX_REGISTER_PLAIN_ACTION_EX2(plain_action, plain_action_name,            \
-    ::hpx::components::factory_check)                                         \
+        ::hpx::components::factory_check)                                     \
     /**/
 
-#define HPX_REGISTER_PLAIN_ACTION(plain_action)                               \
-    HPX_REGISTER_PLAIN_ACTION_EX2(plain_action, plain_action,                 \
-    ::hpx::components::factory_check)                                         \
-    /**/
-
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_PLAIN_ACTION(func, name)                                          \
-    HPX_DEFINE_PLAIN_ACTION(func, name);                                      \
-    HPX_REGISTER_PLAIN_ACTION(name)                                           \
-    /**/
-#define HPX_PLAIN_ACTION_EX(func, name, state)                                \
-    HPX_DEFINE_PLAIN_ACTION(func, name);                                      \
-    HPX_REGISTER_PLAIN_ACTION_EX2(name, name, state)                          \
-    /**/
+/// \endcond
 
 #endif
 

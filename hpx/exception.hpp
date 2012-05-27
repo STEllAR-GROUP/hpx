@@ -81,10 +81,11 @@ namespace hpx
         thread_interrupted = 45,
         thread_not_interruptable = 46,
         duplicate_component_id = 47,
-        last_error,
 
-        // force this enum type to be at least 16 bits.
-        error_upper_bound = 0x7fffL
+        ///\cond NOINTERNAL
+        last_error,
+        error_upper_bound = 0x7fffL   // force this enum type to be at least 16 bits.
+        /// \endcond
     };
 
     /// \cond NOINTERNAL
@@ -706,11 +707,11 @@ namespace hpx
     ///
     /// \throws     nothing
     ///
-    /// \see        \a hpx::diagnostic_information(), \a hpx::get_host_name,
-    ///             \a hpx::get_process_id, \a hpx::get_function_name,
-    ///             \a hpx::get_file_name, \a hpx::get_line_number,
-    ///             \a hpx::get_os_thread, \a hpx::get_thread_id,
-    ///             \a hpx::get_thread_description
+    /// \see        \a hpx::diagnostic_information(), \a hpx::get_host_name(),
+    ///             \a hpx::get_process_id(), \a hpx::get_function_name(),
+    ///             \a hpx::get_file_name(), \a hpx::get_line_number(),
+    ///             \a hpx::get_os_thread(), \a hpx::get_thread_id(),
+    ///             \a hpx::get_thread_description()
     ///
     HPX_EXPORT boost::uint32_t get_locality_id(hpx::exception const& e);
     /// \cond NOINTERNAL
@@ -1034,6 +1035,18 @@ namespace boost
 /// encapsulate. The parameter \p f is expected to hold the name of the
 /// function exception is thrown from and the parameter \p msg holds the error
 /// message the new exception should encapsulate.
+///
+/// \par Example:
+///
+/// \code
+///      void raise_exception()
+///      {
+///          // Throw a hpx::exception initialized from the given parameters.
+///          // Additionally associate with this exception some detailed
+///          // diagnostic information about the throw-site.
+///          HPX_THROW_EXCEPTION(hpx::no_success, "raise_exception", "simulated error");
+///      }
+/// \endcode
 ///
 #define HPX_THROW_EXCEPTION(errcode, f, msg)                                  \
     HPX_THROW_EXCEPTION_EX(hpx::exception, errcode, f, msg, hpx::plain)       \

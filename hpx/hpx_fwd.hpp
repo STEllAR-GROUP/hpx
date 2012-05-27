@@ -39,7 +39,6 @@
 ///
 /// The namespace \a hpx is the main namespace of the HPX library. All classes
 /// functions and variables are defined inside this namespace.
-
 namespace hpx
 {
     /// \cond NOINTERNAL

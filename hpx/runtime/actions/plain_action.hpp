@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file plain_action.hpp
+
 #if !defined(HPX_RUNTIME_ACTIONS_PLAIN_ACTION_NOV_14_2008_0706PM)
 #define HPX_RUNTIME_ACTIONS_PLAIN_ACTION_NOV_14_2008_0706PM
 
@@ -27,6 +29,8 @@
 #include <boost/mpl/identity.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
+
+/// \cond NOINTERNAL
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
@@ -348,10 +352,12 @@ namespace hpx { namespace actions
     {};
 }}
 
-///////////////////////////////////////////////////////////////////////////////
+/// \endcond
+
 // Disabling the guid initialization stuff for plain actions
 namespace hpx { namespace traits
 {
+    /// \cond NOINTERNAL
     template <void (*F)(), hpx::threads::thread_priority Priority,
         typename Enable>
     struct needs_guid_initialization<
@@ -381,16 +387,127 @@ namespace hpx { namespace traits
                 hpx::actions::plain_direct_result_action0<R, F, Derived> >, Enable>
       : boost::mpl::false_
     {};
+    /// \endcond
 }}
 
-///////////////////////////////////////////////////////////////////////////////
+/// \def HPX_REGISTER_PLAIN_ACTION(action_type)
+/// \brief Registers an existing plain action type with HPX
+///
+/// The macro \a HPX_REGISTER_PLAIN_ACTION can be used to register an existing
+/// plain action type (e.g. an action encapsulating a global or free function)
+/// named \a action_type.
+///
+/// The parameter \p action_type is the name of the action type to register
+/// with HPX.
+///
+/// \par Example:
+///
+/// \code
+///       namespace app
+///       {
+///           void some_global_function(double d)
+///           {
+///               cout << d;
+///           }
+///
+///           // This will define the action type 'app::some_global_action' which
+///           // represents the function 'app::some_global_function'.
+///           HPX_DEFINE_PLAIN_ACTION(some_global_function, some_global_action);
+///       }
+///
+///       // The following macro expands to a series of definitions of global objects
+///       // which are needed for proper serialization and initialization support
+///       // enabling the remote invocation of the function `app::some_global_function`.
+///       HPX_REGISTER_PLAIN_ACTION(app::some_global_action);
+/// \endcode
+///
+/// \note Usually this macro will not be used in user code unless the intend is
+/// to avoid defining the action_type in global namespace. Normally, the use of
+/// the macro \a HPX_PLAIN_ACTION is recommend.
+///
+#define HPX_REGISTER_PLAIN_ACTION(action_type)                                \
+    HPX_REGISTER_PLAIN_ACTION_EX2(action_type, plain_action,                  \
+        ::hpx::components::factory_check)                                     \
+    /**/
+
+/// \def HPX_DEFINE_PLAIN_ACTION(func, name)
+/// \brief Defines a plain action type
+///
+/// \par Example:
+///
+/// \code
+///       namespace app
+///       {
+///           void some_global_function(double d)
+///           {
+///               cout << d;
+///           }
+///
+///           // This will define the action type 'app::some_global_action' which
+///           // represents the function 'app::some_global_function'.
+///           HPX_DEFINE_PLAIN_ACTION(some_global_function, some_global_action);
+///       }
+///
+///       // The following macro expands to a series of definitions of global objects
+///       // which are needed for proper serialization and initialization support
+///       // enabling the remote invocation of the function `app::some_global_function`.
+///       HPX_REGISTER_PLAIN_ACTION(app::some_global_action);
+/// \endcode
+///
+/// \note Usually this macro will not be used in user code unless the intend is
+/// to avoid defining the action_type in global namespace. Normally, the use of
+/// the macro \a HPX_PLAIN_ACTION is recommend.
+///
 #define HPX_DEFINE_PLAIN_ACTION(func, name)                                   \
     typedef HPX_MAKE_ACTION(func)::type name                                  \
     /**/
 
-///////////////////////////////////////////////////////////////////////////
+/// \def HPX_PLAIN_ACTION(func, name)
+/// \brief Defines a plain action type based on the given function \a func and registers it with HPX.
+///
+/// The macro \a HPX_PLAIN_ACTION can be used to define a plain action (e.g. an
+/// action encapsulating a global or free function) based on the given function
+/// \a func. It defines the action type \a name representing the given function.
+/// This macro additionally registers the newly define action type with HPX.
+///
+/// The parameter \p func is a global or free (non-member) function which
+/// should be encapsulated into a plain action. The parameter \p name is the
+/// name of the action type defined by this macro.
+///
+/// \par Example:
+///
+/// \code
+///     namespace app
+///     {
+///         void some_global_function(double d)
+///         {
+///             cout << d;
+///         }
+///     }
+///
+///     // This will define the action type 'some_global_action' which represents
+///     // the function 'app::some_global_function'.
+///     HPX_PLAIN_ACTION(app::some_global_function, some_global_action);
+/// \endcode
+///
+/// \note The macro \a HPX_PLAIN_ACTION has to be used at global namespace even
+/// if the wrapped function is located in some other namespace. The newly
+/// defined action type is placed into the global namespace as well.
+///
+#define HPX_PLAIN_ACTION(func, name)                                          \
+    HPX_DEFINE_PLAIN_ACTION(func, name);                                      \
+    HPX_REGISTER_PLAIN_ACTION(name)                                           \
+    /**/
+
 // bring in the rest of the implementations
 #include <hpx/runtime/actions/plain_action_implementations.hpp>
+
+/// \cond NOINTERNAL
+
+#define HPX_PLAIN_ACTION_EX(func, name, state)                                \
+    HPX_DEFINE_PLAIN_ACTION(func, name);                                      \
+    HPX_REGISTER_PLAIN_ACTION_EX2(name, name, state)                          \
+    /**/
 
 ///////////////////////////////////////////////////////////////////////////////
 /// The macro \a HPX_REGISTER_PLAIN_ACTION_DECLARATION is used create the
@@ -404,6 +521,8 @@ namespace hpx { namespace traits
         get_action_name<plain_action>();                                      \
     }}}                                                                       \
 /**/
+
+/// \endcond
 
 #include <hpx/config/warnings_suffix.hpp>
 

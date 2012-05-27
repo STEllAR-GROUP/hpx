@@ -13,7 +13,7 @@ familiar with the HPX style of programming. We start off with simple examples
 that utilize basic HPX elements and then begin to expose the reader to the more
 complex, yet powerful, HPX concepts.
 
-[note The instructions for building and running the examples currently 
+[note The instructions for building and running the examples currently
       only cover Unix variants.]
 
 [/Proofread by:]
@@ -55,7 +55,8 @@ Fibonacci example below to enable its parallel execution.
 
 [teletype]
 
-The source code for this example can be found [hpx_link examples/quickstart/fibonacci.cpp..here]. 
+The source code for this example can be found here:
+[hpx_link examples/quickstart/fibonacci.cpp..fibonacci.cpp].
 
 To compile this program, go to your HPX build directory (see __getting_started__
 for information on configuring and building HPX) and enter:
@@ -149,8 +150,8 @@ A plain action is the most basic form of action. Plain actions wrap simple globa
 functions which are not associated with any particular object (we will discuss
 other types of actions in the __accumulator_example__).
 In this block of code the function `fibonacci()` is declared. After the
-declaration, the function is wrapped in an action in the declaration 
- `HPX_PLAIN_ACTION()`. This function takes two aruments: the name of the
+declaration, the function is wrapped in an action in the declaration
+[macroref HPX_PLAIN_ACTION `HPX_PLAIN_ACTION`]. This function takes two aruments: the name of the
 function that is to be wrapped and the name of the action that you are
 creating.
 
@@ -168,7 +169,7 @@ we spawn two futures, `n1` and `n2`. Each of these futures represents an asynchr
 recursive call to `fibonacci()`. After we've created both futures, we wait for both
 of them to finish computing, and then we add them together, and return that value
 as our result. The recursive call tree will continue until n is equal to 0 or 1,
-at which point the value can be returned because it is implicitly known. 
+at which point the value can be returned because it is implicitly known.
 When this termination condition is reached, the futures can then be added up,
 producing the n-th value of the Fibonacci sequence.
 
@@ -197,7 +198,8 @@ locality. The output will look something like this:
 
 [heading Setup]
 
-The source code for this example can be found [hpx_link examples/quickstart/hello_world.cpp..here]. 
+The source code for this example can be found here:
+[hpx_link examples/quickstart/hello_world.cpp..hello_world.cpp].
 
 To compile this program, go to your HPX build directory (see __getting_started__
 for information on configuring and building HPX) and enter:
@@ -258,7 +260,7 @@ vector have been executed.
 In the __fibonacci_example__, we used [funcref hpx::find_here]`()` to specified the target'
 of our actions. Here, we instead use [funcref hpx::find_all_localities]`()`, which returns
 an `std::vector<>` containing the identifiers of all the machines in the system,
-including the one that we are on. 
+including the one that we are on.
 
 As in the __fibonacci_example__ our futures are set using [funcref hpx::lcos::async]`<>()`.
 The `hello_world_foreman_action` is declared here:
@@ -270,7 +272,7 @@ Another way of thinking about this wrapping technique is as follows: functions
 locally or remotely (e.g. on another machine participating in the computation).
 
 Now it is time to look at the `hello_world_foreman()` function which was wrapped in
-the action above: 
+the action above:
 
 [hello_world_foreman]
 
@@ -306,7 +308,7 @@ not executing on the correct OS-thread, it returns a value of -1, which causes
 
 Because HPX features work stealing task schedulers, there is no way to guarantee
 that an action will be scheduled on a particular OS-thread. This is why we must
-use a guess-and-check approach. 
+use a guess-and-check approach.
 
 [endsect] [/Hello World]
 
@@ -331,11 +333,11 @@ In the __fibonacci_example__ and the
 __hello_world_example__, we introduced plain actions, which wrapped global
 functions.  The target of a plain action is an identifier which refers to a
 particular machine involved in the computation. For plain actions, the target
-is the machine where the action will be executed. 
+is the machine where the action will be executed.
 
 Component actions, however, do not target machines. Instead, they target
 component instances. The instance may live on the machine that we've invoked
-the component action from, or it may live on another machine. 
+the component action from, or it may live on another machine.
 
 The component in this example exposes three different functions:
 
@@ -351,8 +353,8 @@ accumulator instance.
 
 [teletype]
 
-The source code for this example can be found
-[hpx_link examples/accumulator/accumulators..here]. 
+The source code for this example can be found here:
+[hpx_link examples/accumulator/accumulators..accumulators].
 
 To compile this program, go to your HPX build directory (see __getting_started__
 for information on configuring and building HPX) and enter:
@@ -395,14 +397,15 @@ Now, let's take a look at the source code of the managed_accumulator example. Th
 example consists of two parts: an HPX component library (a library that exposes
 an HPX component) and a client application which uses the library. This
 walkthrough will cover the HPX component library. The code for the client
-application can be found [hpx_link examples/accumulator/managed_accumulator_client.cpp..here]. 
+application can be found here:
+[hpx_link examples/accumulator/managed_accumulator_client.cpp..managed_accumulator_client.cpp].
 
 An HPX component is represented by three C++ classes:
 
 * [*A server class] - The implementation of the components functionality.
 * [*A stubs class] - A lower-level interface to instances of the component.
 * [*A client class] - A high-level interface that acts as a proxy for an
-  instance of the component. 
+  instance of the component.
 
 Typically, these three classes all have the same name, but stubs and server
 classes usually live in different sub-namespaces (`server` and `stubs`
@@ -415,7 +418,7 @@ managed_accumulator are:
 
 [heading The Server Class]
 
-The following code is from
+The following code is from:
 [hpx_link examples/accumulator/accumulators/server/managed_accumulator.hpp..server/managed_accumulator.hpp].
 
 All HPX component server classes must inherit publicly from an HPX component
@@ -474,7 +477,7 @@ action type registration code:
 
 [note The code above must be placed in the global namespace.]
 
-The rest of the registration code is in 
+The rest of the registration code is in
 [hpx_link examples/accumulator/accumulators/managed_accumulator.cpp..managed_accumulator.cpp].
 
 [import ../../examples/accumulator/accumulators/managed_accumulator.cpp]
@@ -572,61 +575,61 @@ Note that `this->gid_` references a data member of the
 
 HPX provides its users with several different tools to simply express parallel
 concepts. One of these tools is a local control object (LCO) called dataflow.
-An LCO is a type of component that can spawn a new thread when triggered. 
-They are also distinguished from other components by a standard interface 
-which allow users to understand and use them easily. 
+An LCO is a type of component that can spawn a new thread when triggered.
+They are also distinguished from other components by a standard interface
+which allow users to understand and use them easily.
 Dataflows, being a LCO, is triggered when the values it depends
 on become available. For instance, if you have a calculation X that depends on
 the result of three other calculations, you could set up a dataflow that
-would begin the calculation X as soon as the other three calculations 
+would begin the calculation X as soon as the other three calculations
 have returned their values.
 Dataflows are set up to depend on other dataflows. It is this property
-that makes dataflow a powerful parallelization tool. If you understand the 
+that makes dataflow a powerful parallelization tool. If you understand the
 dependencies of your calculation, you can devise a simple algorithm which
-sets up a dependency tree to be executed. In this example, we calculate 
-compound interest. To calculate compound interest, one must calculate 
+sets up a dependency tree to be executed. In this example, we calculate
+compound interest. To calculate compound interest, one must calculate
 the interest made in each compound period, and then add that interest back to
-the principal before calculating the interest made in the next period. 
+the principal before calculating the interest made in the next period.
 A practical person would of course use the formula for compound interest:
 
-[teletype] 
+[teletype]
 
-``   
-    F=P(1+i)^n
-     where
-      F= Future value
-      P= Principal
-      i= Interest rate
-      n= number of compound periods
+``
+    F = P(1 + i) ^ n
+    where:
+        F= Future value
+        P= Principal
+        i= Interest rate
+        n= number of compound periods
 ``
 
 Nevertheless, we have chosen for the sake of example to manually calculate
 the future value by iterating:
 
 ``
-    I= P*i
+    I = P * i
      and
-    P= P+I
+    P = P + I
 ``
 
 [heading Setup]
 
-The source code for this example can be found 
-[hpx_link examples/quickstart/interest_calculator.cpp..here].
+The source code for this example can be found here:
+[hpx_link examples/quickstart/interest_calculator.cpp..interest_calculator.cpp].
 
 To compile this program, go to your HPX build directory (see __getting_started__
 for information on configuring and building HPX) and enter:
- 
+
 ``
     $ make examples.quickstart.interest_calculator
 ``
- 
+
 To run the program type:
- 
+
 ``
     $ ./bin/interest_calculator --principal 100 --rate 5 --cp 6 --time 36
 ``
- 
+
 This should print:
 
 ``
@@ -637,7 +640,7 @@ This should print:
 
 [heading Walkthrough]
 
-Let us begin with main, here we can see that we again are using 
+Let us begin with main, here we can see that we again are using
 __boost_program_options__ to set our command line variables (see
 __fibonacci_example__ for more details). These options set the principal,
 rate, compound period, and time. It is important to note that the units of time
@@ -662,7 +665,7 @@ In this way [classref hpx::lcos::dataflow_base]`<double> principal` and `rate`
 will be initialized to `p` and `i_rate` when
 [classref hpx::lcos::dataflow]`<identity_action>` returns a value. These
 dataflows enter for loop and are passed to `interest`. Next `principal`
-and `interest` are passed to the reassignment of `principal`. This loop 
+and `interest` are passed to the reassignment of `principal`. This loop
 continues for each compound period that must be calculated. To see how
 `interest` and `principal` are calculated in the loop let us look at
 `calc_action` and `add_action`:

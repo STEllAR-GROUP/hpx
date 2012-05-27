@@ -13,8 +13,8 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 Actions are special types we use to describe possibly remote operations. For
 every global function and every member function which have to be invoked
 distantly a special type must be defined. For any global function the special
-macro `HPX_PLAIN_ACTION` needs to used to define the action type. Here is an
-example demonstrating this:
+macro [macroref HPX_PLAIN_ACTION `HPX_PLAIN_ACTION`] can be used to define
+the action type. Here is an example demonstrating this:
 
     namespace app
     {
@@ -26,15 +26,18 @@ example demonstrating this:
 
     // This will define the action type 'some_global_action' which represents
     // the function 'app::some_global_function'.
-    HPX_PLAIN_ACTION(app::some_global_function, some_global_action);
+    ``[macroref HPX_PLAIN_ACTION `HPX_PLAIN_ACTION`]``(app::some_global_function, some_global_action);
 
-[important The macro `HPX_PLAIN_ACTION` has to be placed in global namespace,
+[important The macro [macroref HPX_PLAIN_ACTION `HPX_PLAIN_ACTION`] has to be
+           placed in global namespace,
            even if the wrapped function is located in some other namespace. The
-           resulting defined action type will be placed the in global namespace
+           newly defined action type is placed the in global namespace
            as well.]
 
 If the action type should be defined somewhere not in global namespace, the
-action type definition has to be split into two macro invocations as shown in
+action type definition has to be split into two macro invocations
+([macroref HPX_DEFINE_PLAIN_ACTION `HPX_DEFINE_PLAIN_ACTION`] and
+[macroref HPX_REGISTER_PLAIN_ACTION `HPX_REGISTER_PLAIN_ACTION`]) as shown in
 the next example:
 
     namespace app
@@ -52,13 +55,13 @@ the next example:
         //
         // This will define the action type 'some_global_action' which represents
         // the function 'some_global_function'.
-        HPX_DEFINE_PLAIN_ACTION(some_global_function, some_global_action);
+        ``[macroref HPX_DEFINE_PLAIN_ACTION `HPX_DEFINE_PLAIN_ACTION`]``(some_global_function, some_global_action);
     }
 
     // The following macro expands to a series of definitions of global objects
     // which are needed for proper serialization and initialization support
     // enabling the remote invocation of the function `some_global_function`.
-    HPX_REGISTER_PLAIN_ACTION(app::some_global_action);
+    ``[macroref HPX_REGISTER_PLAIN_ACTION `HPX_REGISTER_PLAIN_ACTION`]``(app::some_global_action);
 
 The shown code defines an action type `some_global_action` inside the namespace
 `app`.
@@ -68,7 +71,8 @@ The shown code defines an action type `some_global_action` inside the namespace
            both macro invocations (here `some_global_action`).]
 
 For member functions of objects which have been registered with AGAS (e.g.
-'components') a different registration macro `HPX_DEFINE_COMPONENT_ACTION` has
+'components') a different registration macro
+[macroref HPX_DEFINE_COMPONENT_ACTION `HPX_DEFINE_COMPONENT_ACTION`] has
 to be utilized. Any component needs to be declared in a header file and have
 some special support macros defined in a source file. Here is an example
 demonstrating this. The first snippet has to go into the header file:
@@ -86,26 +90,27 @@ demonstrating this. The first snippet has to go into the header file:
             // This will define the action type 'some_member_action' which
             // represents the member function 'some_member_function' of the
             // obect type 'some_component'.
-            HPX_DEFINE_COMPONENT_ACTION(some_component, some_member_function,
+            ``[macroref HPX_DEFINE_COMPONENT_ACTION `HPX_DEFINE_COMPONENT_ACTION`]``(some_component, some_member_function,
                 some_member_action);
         };
     }
 
     // Note: The second arguments to the macro below have to be systemwide-unique
     //       C++ identifiers
-    HPX_REGISTER_ACTION_DECLARATION_EX(app::some_component::some_member_action,
+    ``[macroref HPX_REGISTER_ACTION_DECLARATION_EX `HPX_REGISTER_ACTION_DECLARATION_EX`]``(app::some_component::some_member_action,
         app_some_member_action);
 
 The next snippet belongs into the source file:
 
     // The parameters for this macro have to be the same as used in the corresponding
     // HPX_REGISTER_ACTION_DECLARATION_EX() macro invocation above
-    HPX_REGISTER_ACTION_EX(app::some_component::some_member_action, app_some_member_action);
+    ``[macroref HPX_REGISTER_ACTION_EX `HPX_REGISTER_ACTION_EX`]``(app::some_component::some_member_action, app_some_member_action);
 
 Granted, these macro invocations are a bit more complex than for simple global
 functions, however we believe they are still manageable.
 
-The most important macro invocation is the `HPX_DEFINE_COMPONENT_ACTION`
+The most important macro invocation is the
+[macroref HPX_DEFINE_COMPONENT_ACTION `HPX_DEFINE_COMPONENT_ACTION`]
 in the header file as this defines the action type we need to invoke the
 member function.
 
@@ -127,20 +132,20 @@ the action is scheduled to run on the target locality. Applying the action
 does not wait for the function to start running, instead it is a fully
 asynchronous operation. The following example shows how to apply the action
 from above on the local locality:
-``
+
     some_global_action act;     // define an instance of some_global_action
     hpx::apply(act, hpx::find_here(), 2.0);
-``
+
 (the function `hpx::find_here()` returns the id of the local locality (the
 locality this code is executed on).
 
 Any component member function can be invoked using the same syntactic
 construct. Given that `id` is the global address for a component instance
 created earlier, this invocation looks like:
-``
+
     some_component_action act;     // define an instance of some_component_action
     hpx::apply(act, id, "42");
-``
+
 In this case any value returned from this action (e.g. in this case the
 integer `42`) is ignored.
 
@@ -154,14 +159,14 @@ an instance of a `future<>` encapsulating the (possibly remote) execution. The
 future can be used to synchronize with the asynchronous operation. The
 following example shows how to apply the action from above on the local
 locality:
-``
+
     some_global_action act;     // define an instance of some_global_action
     hpx::future<void> f = hpx::async(act, hpx::find_here(), 2.0);
     //
     // ... other code can be executed here
     //
     f.get();    // this will possibly wait for the asyncronous operation to 'return'
-``
+
 (as before, the function `hpx::find_here()` returns the id of the local
 locality (the locality this code is executed on).
 
@@ -171,14 +176,14 @@ locality (the locality this code is executed on).
 Any component member function can be invoked using the same syntactic
 construct. Given that `id` is the global address for a component instance
 created earlier, this invocation looks like:
-``
+
     some_component_action act;     // define an instance of some_component_action
     hpx::future<int> f = hpx::async(act, id, "42");
     //
     // ... other code can be executed here
     //
     cout << f.get();    // this will possibly wait for the asyncronous operation to 'return' 42
-``
+
 [note The invocation of `f.get()` will return the result immediately (without
       suspending the calling thread) if the result from the asynchronous operation
       has already been returned. Otherwise, the invocation of `f.get()` will suspend
@@ -192,10 +197,10 @@ target locality. While the invocation appears to be synchronous (as we will
 see), the calling thread will be suspended while waiting for the function to
 return. Invoking a plain action (e.g. a global function) synchronously is
 straightforward:
-``
+
     some_global_action act;     // define an instance of some_global_action
     act(hpx::find_here(), 2.0);
-``
+
 While this call looks just like a normal synchronous function invocation, the
 function wrapped by the action will be scheduled to run on a new thread and the
 calling thread will be suspended. After the new thread has executed  the
@@ -204,10 +209,10 @@ synchronous call.
 
 Equivalently, any action wrapping a component member function can be invoked
 synchronously as follows:
-``
+
     some_component_action act;     // define an instance of some_component_action
     int result = act(id, "42");
-``
+
 The action invocation will either schedule a new thread locally to execute the
 wrapped member function (as before, `id` is the global address of the component
 instance the member function should be invoked on), or it will send a parcel to
@@ -258,13 +263,13 @@ it is rethrown during synchronization with the calling thread.
 
 As an example, we will assume that the following remote function will be
 executed:
-``
+
     namespace app
     {
         void some_function_with_error(int arg)
         {
             if (arg < 0) {
-                HPX_THROW_EXCEPTION(bad_argument, "some_function_with_error",
+                ``[macroref HPX_THROW_EXCEPTION `HPX_THROW_EXCEPTION`]``(bad_argument, "some_function_with_error",
                     "some really bad error happened");
             }
             // do something else...
@@ -273,43 +278,43 @@ executed:
 
     // This will define the action type 'some_error_action' which represents
     // the function 'app::some_function_with_error'.
-    HPX_PLAIN_ACTION(app::some_function_with_error, some_error_action);
-``
-The use of `HPX_THROW_EXCEPTION` to report the error encapsulates the creation
-of a `hpx::exception` which is initialized with the error code
+    ``[macroref HPX_PLAIN_ACTION `HPX_PLAIN_ACTION`]``(app::some_function_with_error, some_error_action);
+
+The use of [macroref HPX_THROW_EXCEPTION `HPX_THROW_EXCEPTION`] to report the error encapsulates the creation
+of a [classref hpx::exception `hpx::exception`] which is initialized with the error code
 `hpx::bad_parameter`. Additionally it carries the passed strings, the
 information about the file name, line number, and call stack of the point the
 exception was thrown from.
 
 We invoke this action using the synchronous syntax as described before:
-``
+
     // note: wrapped function will throw hpx::exception
     some_error_action act;            // define an instance of some_error_action
     try {
         act(hpx::find_here(), -3);    // exception will be rethrown from here
     }
-    catch (hpx::exception const& e) {
+    catch (``[classref hpx::exception `hpx::exception`]`` const& e) {
         // prints: 'some really bad error happened: HPX(bad parameter)'
         cout << e.what();
     }
-``
+
 If this action is invoked asynchronously with synchronization, the exception
 is propagated to the waiting thread as well and is re-thrown from the future's
 function `get()`:
-``
+
     // note: wrapped function will throw hpx::exception
     some_error_action act;            // define an instance of some_error_action
     hpx::future<void> f = hpx::async(act, hpx::find_here(), -3);
     try {
         f.get();                      // exception will be rethrown from here
     }
-    catch (hpx::exception const& e) {
+    catch (``[classref hpx::exception `hpx::exception`]`` const& e) {
         // prints: 'some really bad error happened: HPX(bad parameter)'
         cout << e.what();
     }
-``
+
 For more information about error handling plese refer to the section
-'Working with exceptions'.
+__exceptions__.
 
 [endsect] [/ Action exception handling]
 

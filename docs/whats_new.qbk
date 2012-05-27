@@ -15,7 +15,7 @@
   standard.
 * HPX now exposes `hpx::thread` which is compliant to the C++11 std::thread
   type except that it (purely locally) represents an HPX thread. This new type
-  does not expose any of the remote capabilities of teh underlying PX-thread
+  does not expose any of the remote capabilities of the underlying HPX-thread
   implementation.
 * The type `hpx::lcos::future<>` is now compliant to the C++11 std::future<>
   type. This type can be used to synchronize both, local and remote operations.

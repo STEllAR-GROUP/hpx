@@ -107,6 +107,8 @@
 
 [template hpx_cmdline[str]      [link hpx.tutorial.getting_started.commandline [str]]]
 
+[def __exceptions__             [link hpx.manual.exceptions Working with exceptions]]
+
 [template hpx_link[url txt]     '''<ulink url="file:///'''__hpx_source_dir__/[url]'''">'''[txt]'''</ulink>''']
 
 [/  fig[ref title label]

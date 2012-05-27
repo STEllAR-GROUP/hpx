@@ -14,6 +14,9 @@ exception handling. Any exception thrown during the execution of an asynchronous
 operation will be transferred back to the original invocation locality, where
 it is rethrown during synchronization with the calling thread.
 
+The source code for this example can be found here: 
+[hpx_link examples/quickstart/error_handling.cpp..error_handling.cpp].
+
 [c++]
 [import ../../examples/quickstart/error_handling.cpp]
 
