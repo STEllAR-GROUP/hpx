@@ -1225,7 +1225,6 @@ endif()
 if(DOXYGEN_FOUND)
   # the list of files to pass to doxygen is defined in docs/CMakeLists.txt
   set(doxygen_inputs_list
-      "${hpx_SOURCE_DIR}/hpx/hpx_fwd.hpp"
       "${hpx_SOURCE_DIR}/hpx/exception.hpp")
 
   foreach(doxygen_input ${doxygen_inputs_list})
