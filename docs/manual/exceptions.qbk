@@ -1,0 +1,32 @@
+[/=============================================================================
+Copyright (C) 2012 Hartmut Kaiser
+
+Distributed under the Boost Software License, Version 1.0. (See accompanying
+file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+=============================================================================/]
+
+[section:exceptions Working with Exceptions]
+
+Like in any other asynchronous invocation scheme it is important to be able to
+handle error conditions occurring while the asynchronous (and possibly remote)
+operation is executed. In __hpx__ all error handling is based on standard C++
+exception handling. Any exception thrown during the execution of an asynchronous
+operation will be transferred back to the original invocation locality, where
+it is rethrown during synchronization with the calling thread.
+
+[c++]
+[import ../../examples/quickstart/error_handling.cpp]
+
+For the following description we assume that the function `raise_exception()`
+is executed by invoking the plain action `raise_exception_type`:
+
+[error_handling_raise_exception]
+
+The exception is thrown using the macro [macroref HPX_THROW_EXCEPTION `HPX_THROW_EXCEPTION`]. The type of the
+thrown exception is [classref hpx::exception `hpx::exception`]. This allows to
+associate additional diagnostic information with the exception, such as file
+name and line number, locality id and thread id, and stack backtrace from the
+point where the exception was thrown.
+
+[endsect] [/ Working with Exceptions]
+

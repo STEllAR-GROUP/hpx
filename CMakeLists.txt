@@ -1223,17 +1223,30 @@ if(NOT HPX_NO_INSTALL)
 endif()
 
 if(DOXYGEN_FOUND)
-#  file(GLOB_RECURSE doxygen_inputs_list ${hpx_SOURCE_DIR}/hpx/*.hpp)
-
   # the list of files to pass to doxygen is defined in docs/CMakeLists.txt
-  set(doxygen_inputs "")
+  set(doxygen_inputs_list
+      "${hpx_SOURCE_DIR}/hpx/hpx_fwd.hpp"
+      "${hpx_SOURCE_DIR}/hpx/exception.hpp")
 
   foreach(doxygen_input ${doxygen_inputs_list})
     set(doxygen_inputs "${doxygen_inputs} ${doxygen_input}")
   endforeach()
+  hpx_info("doxygen" "${doxygen_inputs}")
 
   set(doxygen_output_file "${CMAKE_CURRENT_BINARY_DIR}/docs/hpx_autodoc")
-  set(doxygen_output_dir "${CMAKE_CURRENT_BINARY_DIR}/docs")
+  set(doxygen_output_dir "${CMAKE_CURRENT_BINARY_DIR}/docs/doxygen")
+
+  set(doxygen_definition_list
+      "DOXYGEN:=1"
+      "BOOST_SCOPED_ENUM_START(x):=enum x"
+      "BOOST_SCOPED_ENUM_END="
+      "HPX_EXCEPTION_EXPORT="
+      "HPX_EXPORT=")
+
+  foreach(doxygen_predef ${doxygen_definition_list})
+    set(doxygen_definitions "${doxygen_definitions} \"${doxygen_predef}\"")
+  endforeach()
+  hpx_info("doxygen" "${doxygen_definitions}")
 
   hpx_info("doxygen" "Creating ${CMAKE_CURRENT_BINARY_DIR}/docs/hpx_autodoc.doxy")
   configure_file(${hpx_SOURCE_DIR}/cmake/templates/autodoc.doxy.in

@@ -44,8 +44,29 @@ namespace hpx
 {
     class error_code;
 
-    // predefined error_code object used as "throw on error" tag
+    /// \brief Predefined error_code object used as "throw on error" tag.
+    ///
+    /// The predefined hpx#error_code object \a hpx#throws is supplied for use as
+    /// a "throw on error" tag.
+    ///
+    /// Functions that specify an argument in the form 'error_code& ec=throws'
+    /// (with appropriate namespace qualifiers), have the following error
+    /// handling semantics:
+    ///
+    /// If &ec != &throws and an error occurred: ec.value() returns the
+    /// implementation specific error number for the particular error that
+    /// occurred and ec.category() returns the error_category for ec.value().
+    ///
+    /// If &ec != &throws and an error did not occur, ec.clear().
+    ///
+    /// If an error occurs and &ec == &throws, the function throws an exception
+    /// of type \a hpx#exception or of a type derived from it. The exception's
+    /// \a get_errorcode() member function returns a reference to an
+    /// \a hpx#error_code object with the behavior as specified above.
+    ///
     HPX_EXCEPTION_EXPORT extern error_code throws;
+
+    /// \cond NOINTERNAL
 
     /// \namespace applier
     ///
@@ -214,10 +235,13 @@ namespace hpx
         typedef thread_state_enum thread_function_type(thread_state_ex_enum);
 
         ///////////////////////////////////////////////////////////////////////
+        /// \cond NODETAIL
         namespace detail
         {
             template <typename CoroutineImpl> struct coroutine_allocator;
         }
+        /// \endcond
+
         typedef boost::coroutines::coroutine<
             thread_function_type, detail::coroutine_allocator> coroutine_type;
         typedef coroutine_type::thread_id_type thread_id_type;
@@ -383,6 +407,7 @@ namespace hpx
             factory_check    = 2
         };
 
+        /// \cond NODETAIL
         namespace detail
         {
             struct this_type {};
@@ -390,6 +415,7 @@ namespace hpx
             struct simple_component_tag {};
             struct managed_component_tag {};
         }
+        /// \endcond
 
         ///////////////////////////////////////////////////////////////////////
         typedef boost::int32_t component_type;
@@ -600,6 +626,8 @@ namespace hpx
     /// \brief Return the number of the locality this function is being called
     ///        from.
     HPX_API_EXPORT boost::uint32_t get_locality_id(error_code& ec = throws);
+
+    /// \endcond
 }
 
 #include <hpx/lcos/async_fwd.hpp>

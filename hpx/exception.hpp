@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file exception.hpp
+
 #if !defined(HPX_EXCEPTION_MAR_24_2008_0929AM)
 #define HPX_EXCEPTION_MAR_24_2008_0929AM
 
@@ -136,6 +138,7 @@ namespace hpx
         ""
     };
 
+    /// \cond NODETAIL
     namespace detail
     {
         class hpx_category : public boost::system::error_category
@@ -170,6 +173,7 @@ namespace hpx
             }
         };
     } // namespace detail
+    /// \endcond
 
     ///////////////////////////////////////////////////////////////////////////
     //  Define the HPX error category
@@ -201,30 +205,79 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     inline boost::system::error_condition
-        make_error_condition(error e, throwmode mode)
+    make_error_condition(error e, throwmode mode)
     {
         return boost::system::error_condition(static_cast<int>(e),
             mode == rethrow ? get_hpx_rethrow_category() : get_hpx_category());
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \brief A hpx#error_code represents an arbitrary error condition.
+    ///
+    /// The class hpx#error_code describes an object used to hold error code
+    /// values, such as those originating from the operating system or other
+    /// low-level application program interfaces.
+    ///
+    /// \note Class hpx#error_code is an adjunct to error reporting by
+    /// exception
+    ///
     class error_code : public boost::system::error_code
     {
     public:
+        /// Construct an object of type error_code.
+        ///
+        /// \param mode   The parameter \p mode specifies whether the constructed
+        ///               hpx#error_code belongs to the error category
+        ///               \a hpx_category (if mode is \a plain, this is the
+        ///               default) or to the category \a hpx_category_rethrow
+        ///               (if mode is \a rethrow).
+        ///
+        /// \throws nothing
         explicit error_code(throwmode mode = plain)
           : boost::system::error_code(make_system_error_code(success, mode))
         {}
 
+        /// Construct an object of type error_code.
+        ///
+        /// \param e      The parameter \p e holds the hpx#error code the new
+        ///               exception should encapsulate.
+        /// \param msg    The parameter \p msg holds the error message the new
+        ///               exception should encapsulate.
+        /// \param mode   The parameter \p mode specifies whether the constructed
+        ///               hpx#error_code belongs to the error category
+        ///               \a hpx_category (if mode is \a plain, this is the
+        ///               default) or to the category \a hpx_category_rethrow
+        ///               (if mode is \a rethrow).
+        ///
+        /// \throws std#bad_alloc (if allocation of a copy of
+        ///         the passed string fails).
         explicit error_code(error e, char const* msg = "", throwmode mode = plain)
           : boost::system::error_code(make_system_error_code(e, mode))
           , message_(msg)
         {}
 
+        /// Construct an object of type error_code.
+        ///
+        /// \param e      The parameter \p e holds the hpx#error code the new
+        ///               exception should encapsulate.
+        /// \param msg    The parameter \p msg holds the error message the new
+        ///               exception should encapsulate.
+        /// \param mode   The parameter \p mode specifies whether the constructed
+        ///               hpx#error_code belongs to the error category
+        ///               \a hpx_category (if mode is \a plain, this is the
+        ///               default) or to the category \a hpx_category_rethrow
+        ///               (if mode is \a rethrow).
+        ///
+        /// \throws std#bad_alloc (if allocation of a copy of
+        ///         the passed string fails).
         error_code(error e, std::string const& msg, throwmode mode = plain)
           : boost::system::error_code(make_system_error_code(e, mode))
           , message_(msg)
         {}
 
+        /// Return a reference to the error message stored in the hpx#error_code.
+        ///
+        /// \throws nothing
         std::string const& get_message() const { return message_; }
 
     private:
@@ -255,26 +308,64 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \brief A hpx#exception is the main exception type used by HPX to
+    ///        report errors.
+    ///
+    /// The \a hpx#exception type is the main exception type  used by HPX to
+    /// report errors. Any exceptions thrown by functions in the HPX library
+    /// are either of this type or of a type derived from it. This implies that
+    /// it is always safe to use this type only in catch statements guarding
+    /// HPX library calls.
     class HPX_EXCEPTION_EXPORT exception : public boost::system::system_error
     {
     public:
+        /// Construct a hpx#exception from a \a hpx#error.
+        ///
+        /// \param e    The parameter \p e holds the hpx#error code the new
+        ///             exception should encapsulate.
         explicit exception(error e)
           : boost::system::system_error(make_error_code(e, plain))
         {
             BOOST_ASSERT(e >= success && e < last_error);
             LERR_(error) << "created exception: " << this->what();
         }
+
+        /// Construct a hpx#exception from a boost#system_error.
         explicit exception(boost::system::system_error const& e)
           : boost::system::system_error(e)
         {
             LERR_(error) << "created exception: " << this->what();
         }
+
+        /// Construct a hpx#exception from a \a hpx#error and an error message.
+        ///
+        /// \param e      The parameter \p e holds the hpx#error code the new
+        ///               exception should encapsulate.
+        /// \param msg    The parameter \p msg holds the error message the new
+        ///               exception should encapsulate.
+        /// \param mode   The parameter \p mode specifies whether the returned
+        ///               hpx#error_code belongs to the error category
+        ///               \a hpx_category (if mode is \a plain, this is the
+        ///               default) or to the category \a hpx_category_rethrow
+        ///               (if mode is \a rethrow).
         exception(error e, char const* msg, throwmode mode = plain)
           : boost::system::system_error(make_system_error_code(e, mode), msg)
         {
             BOOST_ASSERT(e >= success && e < last_error);
             LERR_(error) << "created exception: " << this->what();
         }
+
+        /// Construct a hpx#exception from a \a hpx#error and an error message.
+        ///
+        /// \param e      The parameter \p e holds the hpx#error code the new
+        ///               exception should encapsulate.
+        /// \param msg    The parameter \p msg holds the error message the new
+        ///               exception should encapsulate.
+        /// \param mode   The parameter \p mode specifies whether the returned
+        ///               hpx#error_code belongs to the error category
+        ///               \a hpx_category (if mode is \a plain, this is the
+        ///               default) or to the category \a hpx_category_rethrow
+        ///               (if mode is \a rethrow).
         exception(error e, std::string const& msg, throwmode mode = plain)
           : boost::system::system_error(make_system_error_code(e, mode), msg)
         {
@@ -282,25 +373,42 @@ namespace hpx
             LERR_(error) << "created exception: " << this->what();
         }
 
+        /// Destruct a hpx#exception
+        ///
+        /// \throws nothing
         ~exception() throw()
         {
         }
 
+        /// The function \a get_error() returns the hpx#error code stored
+        /// in the referenced instance of a hpx#exception. It returns
+        /// the hpx#error code this exception instance was constructed
+        /// from.
+        ///
+        /// \throws nothing
         error get_error() const throw()
         {
             return static_cast<error>(
                 this->boost::system::system_error::code().value());
         }
 
+        /// The function \a get_error_code() returns a hpx#error_code which
+        /// represents the same error condition as this hpx#exception instance.
+        ///
+        /// \param mode   The parameter \p mode specifies whether the returned
+        ///               hpx#error_code belongs to the error category
+        ///               \a hpx_category (if mode is \a plain, this is the
+        ///               default) or to the category \a hpx_category_rethrow
+        ///               (if mode is \a rethrow).
         error_code get_error_code(throwmode mode = plain) const throw()
         {
             return make_error_code(static_cast<error>(
-                this->boost::system::system_error::code().value())
-              , this->boost::system::system_error::what()
-              , mode);
+                this->boost::system::system_error::code().value()),
+                this->boost::system::system_error::what(), mode);
         }
     };
 
+    /// \cond NODETAIL
     namespace detail
     {
         struct HPX_EXCEPTION_EXPORT std_exception : std::exception
@@ -406,70 +514,66 @@ namespace hpx
         struct tag_throw_file {};
         struct tag_throw_function {};
         struct tag_throw_stacktrace {};
-    }
 
-    /// Stores the information about the locality id the exception has been
-    /// raised on. This information will show up in error messages under the
-    /// [locality] tag.
-    typedef boost::error_info<detail::tag_throw_locality, boost::uint32_t>
-        throw_locality;
+        // Stores the information about the locality id the exception has been
+        // raised on. This information will show up in error messages under the
+        // [locality] tag.
+        typedef boost::error_info<detail::tag_throw_locality, boost::uint32_t>
+            throw_locality;
 
-    /// Stores the information about the hostname of the locality the exception
-    /// has been raised on. This information will show up in error messages
-    /// under the [hostname] tag.
-    typedef boost::error_info<detail::tag_throw_hostname, std::string>
-        throw_hostname;
+        // Stores the information about the hostname of the locality the exception
+        // has been raised on. This information will show up in error messages
+        // under the [hostname] tag.
+        typedef boost::error_info<detail::tag_throw_hostname, std::string>
+            throw_hostname;
 
-    /// Stores the information about the pid of the OS process the exception
-    /// has been raised on. This information will show up in error messages
-    /// under the [pid] tag.
-    typedef boost::error_info<detail::tag_throw_pid, boost::int64_t>
-        throw_pid;
+        // Stores the information about the pid of the OS process the exception
+        // has been raised on. This information will show up in error messages
+        // under the [pid] tag.
+        typedef boost::error_info<detail::tag_throw_pid, boost::int64_t>
+            throw_pid;
 
-    /// Stores the information about the shepherd thread the exception has been
-    /// raised on. This information will show up in error messages under the
-    /// [shepherd] tag.
-    typedef boost::error_info<detail::tag_throw_shepherd, std::size_t>
-        throw_shepherd;
+        // Stores the information about the shepherd thread the exception has been
+        // raised on. This information will show up in error messages under the
+        // [shepherd] tag.
+        typedef boost::error_info<detail::tag_throw_shepherd, std::size_t>
+            throw_shepherd;
 
-    /// Stores the information about the HPX thread the exception has been
-    /// raised on. This information will show up in error messages under the
-    /// [thread_id] tag.
-    typedef boost::error_info<detail::tag_throw_thread_id, std::size_t>
-        throw_thread_id;
+        // Stores the information about the HPX thread the exception has been
+        // raised on. This information will show up in error messages under the
+        // [thread_id] tag.
+        typedef boost::error_info<detail::tag_throw_thread_id, std::size_t>
+            throw_thread_id;
 
-    /// Stores the information about the HPX thread name the exception has been
-    /// raised on. This information will show up in error messages under the
-    /// [thread_name] tag.
-    typedef boost::error_info<detail::tag_throw_thread_name, std::string>
-        throw_thread_name;
+        // Stores the information about the HPX thread name the exception has been
+        // raised on. This information will show up in error messages under the
+        // [thread_name] tag.
+        typedef boost::error_info<detail::tag_throw_thread_name, std::string>
+            throw_thread_name;
 
-    /// Stores the information about the function name the exception has been
-    /// raised in. This information will show up in error messages under the
-    /// [function] tag.
-    typedef boost::error_info<detail::tag_throw_function, std::string>
-        throw_function;
+        // Stores the information about the function name the exception has been
+        // raised in. This information will show up in error messages under the
+        // [function] tag.
+        typedef boost::error_info<detail::tag_throw_function, std::string>
+            throw_function;
 
-    /// Stores the information about the source file name the exception has
-    /// been raised in. This information will show up in error messages under
-    /// the [file] tag.
-    typedef boost::error_info<detail::tag_throw_file, std::string>
-        throw_file;
+        // Stores the information about the source file name the exception has
+        // been raised in. This information will show up in error messages under
+        // the [file] tag.
+        typedef boost::error_info<detail::tag_throw_file, std::string>
+            throw_file;
 
-    /// Stores the information about the source file line number the exception
-    /// has been raised at. This information will show up in error messages
-    /// under the [line] tag.
-    using boost::throw_line;
+        // Stores the information about the source file line number the exception
+        // has been raised at. This information will show up in error messages
+        // under the [line] tag.
+        using boost::throw_line;
 
-    /// Stores the information about the stack backtrace at the point the
-    /// exception has been raised at. This information will show up in error
-    /// messages under the [stack_trace] tag.
-    typedef boost::error_info<detail::tag_throw_stacktrace, std::string>
-        throw_stacktrace;
+        // Stores the information about the stack backtrace at the point the
+        // exception has been raised at. This information will show up in error
+        // messages under the [stack_trace] tag.
+        typedef boost::error_info<detail::tag_throw_stacktrace, std::string>
+            throw_stacktrace;
 
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
         // rethrow an exception, internal helper
         template <typename Exception>
         BOOST_ATTRIBUTE_NORETURN HPX_EXPORT
@@ -504,71 +608,242 @@ namespace hpx
         // isn't anything more we could do.
         HPX_EXPORT void report_exception_and_terminate(boost::exception_ptr const&);
     }
+    /// \endcond
 
     ///////////////////////////////////////////////////////////////////////////
-    /// Extract the diagnostic information embedded in the given exception and
-    /// return a string holding a formatted message.
+    /// @{
+    /// \brief Extract the diagnostic information embedded in the given
+    /// exception and return a string holding a formatted message.
+    ///
+    /// The function \a hpx#diagnostic_information can be used to extract all
+    /// diagnostic information stored in the given exception instance as a
+    /// formatted string. This simplifies debug output as it composes the
+    /// diagnostics into one, easy to use function call.
+    ///
+    /// \param e    The parameter \p e will be inspected for all diagnostic
+    ///             information elements which have been stored at the point
+    ///             where the exception was thrown. This parameter can be one
+    ///             of the following types: hpx#exception, boost#exception,
+    ///             or boost#exception_ptr
+    ///
+    /// \returns    The formatted string holding all of the available
+    ///             diagnostic information stored in the given \a hpx#exception
+    ///             instance.
+    ///
+    /// \throws     std#bad_alloc (if any of the required allocation operations
+    ///             fail)
+    ///
+    /// \see        \a hpx#get_locality_id, \a hpx#get_host_name, \a hpx#get_process_id,
+    ///             \a hpx#get_function_name, \a hpx#get_file_name, \a hpx#get_line_number,
+    ///             \a hpx#get_os_thread, \a hpx#get_thread_id, \a hpx#get_thread_description
+    ///
+    HPX_EXPORT std::string diagnostic_information(hpx::exception const& e);
     HPX_EXPORT std::string diagnostic_information(boost::exception const& e);
     HPX_EXPORT std::string diagnostic_information(boost::exception_ptr const& e);
-    HPX_EXPORT std::string diagnostic_information(hpx::exception const& e);
+    /// @}
 
     ///////////////////////////////////////////////////////////////////////////
-    /// Extract elements of the diagnostic information embedded in the given
-    /// exception.
+    // Extract elements of the diagnostic information embedded in the given
+    // exception.
 
-    /// Return the locality where the exception was thrown.
+    /// @{
+    /// \brief Return the locality id where the exception was thrown.
+    ///
+    /// The function \a hpx#get_locality_id can be used to extract the
+    /// diagnostic information element representing the locality id stored in
+    /// the given exception formatted string.
+    ///
+    /// \param e    The parameter \p e will be inspected for all diagnostic
+    ///             information elements which have been stored at the point
+    ///             where the exception was thrown. This parameter can be one
+    ///             of the following types: hpx#exception, boost#exception,
+    ///             or boost#exception_ptr
+    ///
+    /// \returns    The locality id of the locality where the exception was
+    ///             thrown. If the \a hpx#exception instance does not hold
+    ///             this information, the function will return
+    ///             \a hpx#naming#invalid_locality_id.
+    ///
+    /// \throws     nothing
+    ///
+    HPX_EXPORT boost::uint32_t get_locality_id(hpx::exception const& e);
     HPX_EXPORT boost::uint32_t get_locality_id(boost::exception const& e);
     HPX_EXPORT boost::uint32_t get_locality_id(boost::exception_ptr const& e);
-    HPX_EXPORT boost::uint32_t get_locality_id(hpx::exception const& e);
+    /// @}
 
-    /// Return the hostname of the locality where the exception was thrown.
+    /// @{
+    /// \brief Return the hostname of the locality where the exception was
+    ///        thrown.
+    ///
+    /// \param e    The parameter \p e will be inspected for all diagnostic
+    ///             information elements which have been stored at the point
+    ///             where the exception was thrown. This parameter can be one
+    ///             of the following types: hpx#exception, boost#exception,
+    ///             or boost#exception_ptr
+    ///
+    /// \returns    The hostname of the locality where the exception was
+    ///             thrown. If the \a hpx#exception instance does not hold
+    ///             this information, the function will return and empty string.
+    ///
+    /// \throws     std#bad_alloc (if one of the required allocations fails)
+    ///
+    HPX_EXPORT std::string get_host_name(hpx::exception const& e);
     HPX_EXPORT std::string get_host_name(boost::exception const& e);
     HPX_EXPORT std::string get_host_name(boost::exception_ptr const& e);
-    HPX_EXPORT std::string get_host_name(hpx::exception const& e);
+    /// @}
 
-    /// Return the (operating system) process id of the locality where the
-    /// exception was thrown.
+    /// @{
+    /// \brief Return the (operating system) process id of the locality where
+    ///        the exception was thrown.
+    ///
+    /// \returns    The process id of the OS-process which threw the exception
+    ///             If the \a hpx#exception instance does not hold
+    ///             this information, the function will return 0.
+    ///
+    /// \param e    The parameter \p e will be inspected for all diagnostic
+    ///             information elements which have been stored at the point
+    ///             where the exception was thrown. This parameter can be one
+    ///             of the following types: hpx#exception, boost#exception,
+    ///             or boost#exception_ptr
+    ///
+    /// \throws     nothing
+    ///
+    HPX_EXPORT boost::int64_t get_process_id(hpx::exception const& e);
     HPX_EXPORT boost::int64_t get_process_id(boost::exception const& e);
     HPX_EXPORT boost::int64_t get_process_id(boost::exception_ptr const& e);
-    HPX_EXPORT boost::int64_t get_process_id(hpx::exception const& e);
+    /// @}
 
-    /// Return the function name from which the exception was thrown.
+    /// @{
+    /// \brief Return the function name from which the exception was thrown.
+    ///
+    /// \returns    The name of the function from which the exception was
+    ///             thrown. If the \a hpx#exception instance does not hold
+    ///             this information, the function will return an empty string.
+    ///
+    /// \param e    The parameter \p e will be inspected for all diagnostic
+    ///             information elements which have been stored at the point
+    ///             where the exception was thrown. This parameter can be one
+    ///             of the following types: hpx#exception, boost#exception,
+    ///             or boost#exception_ptr
+    ///
+    /// \throws     std#bad_alloc (if one of teh required allocations fails)
+    ///
+    HPX_EXPORT std::string get_function_name(hpx::exception const& e);
     HPX_EXPORT std::string get_function_name(boost::exception const& e);
     HPX_EXPORT std::string get_function_name(boost::exception_ptr const& e);
-    HPX_EXPORT std::string get_function_name(hpx::exception const& e);
+    /// @}
 
-    /// Return the (source code) file name of the function from which the
-    /// exception was thrown.
+    /// @{
+    /// \brief Return the (source code) file name of the function from which
+    ///        the exception was thrown.
+    ///
+    /// \returns    The name of the source file of the function from which the
+    ///             exception was thrown. If the \a hpx#exception instance does
+    ///             not hold this information, the function will return an empty
+    ///             string.
+    ///
+    /// \param e    The parameter \p e will be inspected for all diagnostic
+    ///             information elements which have been stored at the point
+    ///             where the exception was thrown. This parameter can be one
+    ///             of the following types: hpx#exception, boost#exception,
+    ///             or boost#exception_ptr
+    ///
+    /// \throws     std#bad_alloc (if one of teh required allocations fails)
+    ///
+    HPX_EXPORT std::string get_file_name(hpx::exception const& e);
     HPX_EXPORT std::string get_file_name(boost::exception const& e);
     HPX_EXPORT std::string get_file_name(boost::exception_ptr const& e);
-    HPX_EXPORT std::string get_file_name(hpx::exception const& e);
+    /// @}
 
-    /// Return the line number in the (source code) file of the function from
-    /// which the exception was thrown.
+    /// @{
+    /// \brief Return the line number in the (source code) file of the function
+    ///        from which the exception was thrown.
+    ///
+    /// \returns    The line number of the place where the exception was
+    ///             thrown. If the \a hpx#exception instance does not hold
+    ///             this information, the function will return -1.
+    ///
+    /// \param e    The parameter \p e will be inspected for all diagnostic
+    ///             information elements which have been stored at the point
+    ///             where the exception was thrown. This parameter can be one
+    ///             of the following types: hpx#exception, boost#exception,
+    ///             or boost#exception_ptr
+    ///
+    /// \throws     nothing
+    ///
+    HPX_EXPORT int get_line_number(hpx::exception const& e);
     HPX_EXPORT int get_line_number(boost::exception const& e);
     HPX_EXPORT int get_line_number(boost::exception_ptr const& e);
-    HPX_EXPORT int get_line_number(hpx::exception const& e);
+    /// @}
 
-    /// Return the sequence number of the OS-thread used to execute HPX-threads
-    /// from which the exception was thrown.
+    /// @{
+    /// \brief Return the sequence number of the OS-thread used to execute
+    ///        HPX-threads from which the exception was thrown.
+    ///
+    /// \returns    The sequence number of the OS-thread used to execute the
+    ///             HPX-thread from which the exception was
+    ///             thrown. If the \a hpx#exception instance does not hold
+    ///             this information, the function will return std::size(-1).
+    ///
+    /// \param e    The parameter \p e will be inspected for all diagnostic
+    ///             information elements which have been stored at the point
+    ///             where the exception was thrown. This parameter can be one
+    ///             of the following types: hpx#exception, boost#exception,
+    ///             or boost#exception_ptr
+    ///
+    /// \throws     nothing
+    ///
+    HPX_EXPORT std::size_t get_os_thread(hpx::exception const& e);
     HPX_EXPORT std::size_t get_os_thread(boost::exception const& e);
     HPX_EXPORT std::size_t get_os_thread(boost::exception_ptr const& e);
-    HPX_EXPORT std::size_t get_os_thread(hpx::exception const& e);
+    /// @}
 
-    /// Return the unique thread id of the HPX-thread from which the exception
-    /// was thrown.
+    /// @{
+    /// \brief Return the unique thread id of the HPX-thread from which the
+    ///        exception was thrown.
+    ///
+    /// \returns    The unique thread id of the HPX-thread from which the
+    ///             exception was thrown. If the \a hpx#exception instance
+    ///             does not hold this information, the function will return
+    ///             std::size_t(0).
+    ///
+    /// \param e    The parameter \p e will be inspected for all diagnostic
+    ///             information elements which have been stored at the point
+    ///             where the exception was thrown. This parameter can be one
+    ///             of the following types: hpx#exception, boost#exception,
+    ///             or boost#exception_ptr
+    ///
+    /// \throws     nothing
+    ///
+    HPX_EXPORT std::size_t get_thread_id(hpx::exception const& e);
     HPX_EXPORT std::size_t get_thread_id(boost::exception const& e);
     HPX_EXPORT std::size_t get_thread_id(boost::exception_ptr const& e);
-    HPX_EXPORT std::size_t get_thread_id(hpx::exception const& e);
+    /// @}
 
-    /// Return any addition thread description of the HPX-thread from which the
-    /// exception was thrown.
+    /// @{
+    /// \brief Return any additionally available thread description of the
+    ///        HPX-thread from which the exception was thrown.
+    ///
+    /// \returns    Any additionally available thread description of the
+    ///             HPX-thread from which the exception was
+    ///             thrown. If the \a hpx#exception instance does not hold
+    ///             this information, the function will return an empty string.
+    ///
+    /// \param e    The parameter \p e will be inspected for all diagnostic
+    ///             information elements which have been stored at the point
+    ///             where the exception was thrown. This parameter can be one
+    ///             of the following types: hpx#exception, boost#exception,
+    ///             or boost#exception_ptr
+    ///
+    /// \throws     std#bad_alloc (if one of teh required allocations fails)
+    ///
+    HPX_EXPORT std::string get_thread_description(hpx::exception const& e);
     HPX_EXPORT std::string get_thread_description(boost::exception const& e);
     HPX_EXPORT std::string get_thread_description(boost::exception_ptr const& e);
-    HPX_EXPORT std::string get_thread_description(hpx::exception const& e);
+    /// @}
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/// \cond NOEXTERNAL
 namespace boost
 {
     // forwarder for BOOST_ASSERT handler
@@ -599,7 +874,9 @@ namespace boost
         };
     }
 }
+/// \endcond
 
+/// \cond NOINTERNAL
 ///////////////////////////////////////////////////////////////////////////////
 // helper macro allowing to prepend file name and line number to a generated
 // exception
@@ -618,24 +895,8 @@ namespace boost
     }                                                                         \
     /**/
 
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_THROW_EXCEPTION(errcode, f, msg)                                  \
-    HPX_THROW_EXCEPTION_EX(hpx::exception, errcode, f, msg, hpx::plain)       \
-    /**/
-
 #define HPX_RETHROW_EXCEPTION(errcode, f, msg)                                \
     HPX_THROW_EXCEPTION_EX(hpx::exception, errcode, f, msg, hpx::rethrow)     \
-    /**/
-
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_THROWS_IF(ec, errcode, f, msg)                                    \
-    {                                                                         \
-        if (&ec == &hpx::throws) {                                            \
-            HPX_THROW_EXCEPTION(errcode, f, msg);                             \
-        } else {                                                              \
-            ec = make_error_code(static_cast<hpx::error>(errcode), msg);      \
-        }                                                                     \
-    }                                                                         \
     /**/
 
 #define HPX_RETHROWS_IF(ec, errcode, f, msg)                                  \
@@ -672,6 +933,52 @@ namespace boost
     {                                                                         \
         if (&ec == &hpx::throws) {                                            \
             HPX_RETHROW_EXCEPTION(errcode, f, msg);                           \
+        } else {                                                              \
+            ec = make_error_code(static_cast<hpx::error>(errcode), msg);      \
+        }                                                                     \
+    }                                                                         \
+    /**/
+/// \endcond
+
+///////////////////////////////////////////////////////////////////////////////
+/// \def HPX_THROW_EXCEPTION(errcode, f, msg)
+/// \brief Throw a hpx#exception initialized from the given parameters
+///
+/// The macro \a HPX_THROW_EXCEPTION can be used to throw a \a hpx#exception.
+/// The purpose of this macro is to prepend the source file name and line number
+/// of the position where the exception is thrown to the error message.
+/// Moreover, this associates additional diagnostic information with the
+/// exception, such as file name and line number, locality id and thread id,
+/// and stack backtrace from the point where the exception was thrown.
+///
+/// The parameter \p errcode holds the hpx#error code the new exception should
+/// encapsulate. The parameter \p f is expected to hold the name of the
+/// function exception is thrown from and the parameter \p msg holds the error
+/// message the new exception should encapsulate.
+///
+#define HPX_THROW_EXCEPTION(errcode, f, msg)                                  \
+    HPX_THROW_EXCEPTION_EX(hpx::exception, errcode, f, msg, hpx::plain)       \
+    /**/
+
+/// \def HPX_THROWS_IF(ec, errcode, f, msg)
+/// \brief Either throw a hpx#exception or initialize \a hpx#error_code from
+///        the given parameters
+///
+/// The macro \a HPX_THROWS_IF can be used to either throw a \a hpx#exception
+/// or to initialize a \a hpx::error_code from the given parameters. If
+/// &ec == &hpx#throws, the semantics of this macro are equivalent to
+/// \a HPX_THROW_EXCEPTION. If &ec != &hpx#throws, the \a hpx#error_code
+/// instance \p ec is initialized instead.
+///
+/// The parameter \p errcode holds the hpx#error code the new exception should
+/// encapsulate. The parameter \p f is expected to hold the name of the
+/// function exception is thrown from and the parameter \p msg holds the error
+/// message the new exception should encapsulate.
+///
+#define HPX_THROWS_IF(ec, errcode, f, msg)                                    \
+    {                                                                         \
+        if (&ec == &hpx::throws) {                                            \
+            HPX_THROW_EXCEPTION(errcode, f, msg);                             \
         } else {                                                              \
             ec = make_error_code(static_cast<hpx::error>(errcode), msg);      \
         }                                                                     \

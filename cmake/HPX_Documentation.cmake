@@ -277,6 +277,10 @@ else()
   macro(hpx_source_to_doxygen name)
     hpx_parse_arguments(${name} "DEPENDENCIES;DOXYGEN_ARGS" "" ${ARGN})
 
+    hpx_print_list("DEBUG"
+        "hpx_source_to_doxygen.${name}" "Doxygen dependencies"
+        ${name}_DEPENDENCIES)
+
     add_custom_command(OUTPUT ${name}/index.xml
       COMMAND ${DOXYGEN_PROGRAM} ${${name}_DOXYGEN_ARGS}
               ${CMAKE_CURRENT_BINARY_DIR}/${name}.doxy

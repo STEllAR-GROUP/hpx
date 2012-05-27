@@ -8,21 +8,24 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
 
+//[error_handling_raise_exception
 void raise_exception()
 {
     HPX_THROW_EXCEPTION(hpx::no_success, "raise_exception", "simulated error");
 }
 HPX_PLAIN_ACTION(raise_exception, raise_exception_type);
+//]
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    raise_exception_type do_it;
     {
         ///////////////////////////////////////////////////////////////////////
         // Error reporting using exceptions
+        //[error_handling_throw
         try {
             // invoke raise_exception() which throws an exception
+            raise_exception_type do_it;
             do_it(hpx::find_here());
         }
         catch (hpx::exception const& e) {
@@ -56,6 +59,7 @@ int hpx_main()
         // If an instance of an error_code is passed as the last argument while
         // invoking the action, the function will not throw in case of an error
         // but store some limited error information in this error_code instance.
+        raise_exception_type do_it;
         do_it(hpx::find_here(), ec);
 
         // Print just the essential error information. There is currently no

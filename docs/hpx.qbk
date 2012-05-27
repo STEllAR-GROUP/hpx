@@ -11,7 +11,7 @@
     [id hpx]
     [authors [STE||AR Group, The]]
     [version 0.9.0]
-    [copyright 2011 2012 The STE||AR Group]
+    [copyright 2011 2012 The STE||AR Group, Louisiana State University]
     [license
         Distributed under the Boost Software License, Version 1.0. (See
         accompanying file [@http://www.boost.org/LICENSE_1_0.txt LICENSE_1_0.txt] or copy at
@@ -162,6 +162,7 @@ QuickBook can be found in the collection of __boost_tools__.
 [include manual/plain_actions.qbk]
 [include manual/components.qbk]
 [include manual/lcos.qbk]
+[include manual/exceptions.qbk]
 
 [endsect] [/ Manual]
 

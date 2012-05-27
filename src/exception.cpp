@@ -49,16 +49,16 @@ namespace hpx { namespace detail
         // be thrown and annotate it with all the local information we have
         throw boost::enable_current_exception(
             boost::enable_error_info(e)
-                << hpx::throw_stacktrace(back_trace)
-                << hpx::throw_locality(node)
-                << hpx::throw_hostname(hostname_)
-                << hpx::throw_pid(pid_)
-                << hpx::throw_shepherd(shepherd)
-                << hpx::throw_thread_id(thread_id)
-                << hpx::throw_thread_name(thread_name)
-                << hpx::throw_function(func)
-                << hpx::throw_file(file)
-                << hpx::throw_line(static_cast<int>(line)));
+                << hpx::detail::throw_stacktrace(back_trace)
+                << hpx::detail::throw_locality(node)
+                << hpx::detail::throw_hostname(hostname_)
+                << hpx::detail::throw_pid(pid_)
+                << hpx::detail::throw_shepherd(shepherd)
+                << hpx::detail::throw_thread_id(thread_id)
+                << hpx::detail::throw_thread_name(thread_name)
+                << hpx::detail::throw_function(func)
+                << hpx::detail::throw_file(file)
+                << hpx::detail::throw_line(static_cast<int>(line)));
     }
 
     ///////////////////////////////////////////////////////////////////////////

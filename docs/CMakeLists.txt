@@ -16,6 +16,7 @@ set(documentation_dependencies
     ${documentation_files}
     ${hpx_SOURCE_DIR}/examples/quickstart/hello_world.cpp
     ${hpx_SOURCE_DIR}/examples/quickstart/simplest_hello_world.cpp
+    ${hpx_SOURCE_DIR}/examples/quickstart/error_handling.cpp
     ${hpx_SOURCE_DIR}/examples/accumulator/accumulators/server/managed_accumulator.hpp
     ${hpx_SOURCE_DIR}/examples/accumulator/accumulators/stubs/managed_accumulator.hpp
     ${hpx_SOURCE_DIR}/examples/accumulator/accumulators/managed_accumulator.hpp
@@ -29,11 +30,9 @@ if(DOXYGEN_FOUND)
       ${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc.xml)
 
   # Add all files here which should be passed to doxygen
-  set(doxygen_inputs_list
-      ${hpx_SOURCE_DIR}/hpx/hpx_fwd.hpp)
-
-#  file(GLOB_RECURSE doxygen_dependencies ${hpx_SOURCE_DIR}/hpx/*.hpp)
-  set(doxygen_dependencies ${doxygen_inputs_list})
+  set(doxygen_dependencies
+      ${hpx_SOURCE_DIR}/hpx/hpx_fwd.hpp
+      ${hpx_SOURCE_DIR}/hpx/exception.hpp)
 
   # Generate Doxygen from the source code.
   hpx_source_to_boostbook(hpx_autodoc
