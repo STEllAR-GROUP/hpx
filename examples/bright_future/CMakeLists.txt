@@ -3,6 +3,10 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=10)
+add_definitions(-DHPX_COMPONENT_CREATE_ARGUMENT_LIMIT=10)
+add_definitions(-DHPX_FUNCTION_LIMIT=15)
+
 set(bright_future_programs
         root_finder
         vector_root_finder
@@ -34,7 +38,7 @@ if(HPX_CXX11_LAMBDAS)
     )
   endif()
 
-  if(MPI_FOUND AND OPENMP_FOUND)
+  if(MPI_CXX_FOUND AND OPENMP_FOUND)
     set(bright_future_programs ${bright_future_programs}
       jacobi_mpi_simple
     )
@@ -67,7 +71,7 @@ if(OPENMP_FOUND)
   set(jacobi_nonuniform_openmp_dynamic_sources jacobi_nonuniform.cpp grid.cpp)
 endif()
 
-if(MPI_FOUND AND OPENMP_FOUND)
+if(MPI_CXX_FOUND AND OPENMP_FOUND)
   set(jacobi_mpi_simple_sources gs.cpp)
 endif()
 
@@ -139,7 +143,7 @@ if(HPX_CXX11_LAMBDAS)
     set_target_properties(jacobi_nonuniform_openmp_dynamic_exe PROPERTIES LINK_FLAGS "${OpenMP_CXX_FLAGS}")
   endif()
 
-  if(MPI_FOUND AND OPENMP_FOUND)
+  if(MPI_CXX_FOUND AND OPENMP_FOUND)
     include_directories(SYSTEM ${MPI_CXX_INCLUDE_PATH})
     target_link_libraries(jacobi_mpi_simple_exe ${MPI_CXX_LIBRARIES})
     set_target_properties(jacobi_mpi_simple_exe PROPERTIES COMPILE_DEFINITIONS BRIGHT_FUTURE_NO_HPX)

@@ -56,7 +56,7 @@ namespace boost { namespace serialization
             }
             else {
                 std::string const* s =
-                    boost::get_error_info<hpx::throw_function>(e);
+                    boost::get_error_info<hpx::detail::throw_function>(e);
                 if (s)
                     throw_function_ = *s;
             }
@@ -68,7 +68,7 @@ namespace boost { namespace serialization
             }
             else {
                 std::string const* s =
-                    boost::get_error_info<hpx::throw_file>(e);
+                    boost::get_error_info<hpx::detail::throw_file>(e);
                 if (s)
                     throw_file_ = *s;
             }
@@ -80,44 +80,44 @@ namespace boost { namespace serialization
             }
 
             boost::uint32_t const* locality =
-                boost::get_error_info<hpx::throw_locality>(e);
+                boost::get_error_info<hpx::detail::throw_locality>(e);
             if (locality) {
                 throw_locality_ = *locality;
             }
 
             std::string const* hostname_ =
-                boost::get_error_info<hpx::throw_hostname>(e);
+                boost::get_error_info<hpx::detail::throw_hostname>(e);
             if (hostname_) {
                 throw_hostname_ = *hostname_;
             }
 
             boost::int64_t const* pid_ =
-                boost::get_error_info<hpx::throw_pid>(e);
+                boost::get_error_info<hpx::detail::throw_pid>(e);
             if (pid_) {
                 throw_pid_ = *pid_;
             }
 
             std::size_t const* shepherd =
-                boost::get_error_info<hpx::throw_shepherd>(e);
+                boost::get_error_info<hpx::detail::throw_shepherd>(e);
             if (shepherd) {
                 throw_shepherd_ = *shepherd;
             }
 
             std::size_t const* thread_id =
-                boost::get_error_info<hpx::throw_thread_id>(e);
+                boost::get_error_info<hpx::detail::throw_thread_id>(e);
             if (thread_id) {
                 throw_thread_id_ = *thread_id;
             }
 
             std::string const* thread_name =
-                boost::get_error_info<hpx::throw_thread_name>(e);
+                boost::get_error_info<hpx::detail::throw_thread_name>(e);
             if (thread_name) {
                 throw_thread_name_ = *thread_name;
             }
 
 #if defined(HPX_HAVE_STACKTRACES)
             std::string const* back_trace =
-                boost::get_error_info<hpx::throw_stacktrace>(e);
+                boost::get_error_info<hpx::detail::throw_stacktrace>(e);
             if (back_trace)
                 back_trace_ = *back_trace;
 #endif

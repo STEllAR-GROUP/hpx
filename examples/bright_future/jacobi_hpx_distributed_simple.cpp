@@ -400,7 +400,7 @@ void gs(
                             range_type y_range(y, y_end);
                             std::vector<promise > trigger;
                             trigger.reserve(9);
-                            promise_grid_type & old_deps = deps.at(iter-1)(x_block, y_block);
+                            promise_grid_type & old_deps = deps[iter-1](x_block, y_block);
                             trigger.push_back(old_deps(xx,yy));
                             if(xx + 1 < n_x_local_block)
                                 trigger.push_back(old_deps(xx+1, yy));
