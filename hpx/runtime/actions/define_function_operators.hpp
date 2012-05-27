@@ -12,6 +12,10 @@
 #include <boost/preprocessor/iterate.hpp>
 #include <boost/preprocessor/enum_params.hpp>
 
+#define HPX_FORWARD_ARGS(z, n, _)                                             \
+        BOOST_PP_COMMA_IF(n)                                                  \
+            BOOST_PP_CAT(arg, n)                                              \
+    /**/
 #define HPX_FWD_ARGS(z, n, _)                                                 \
         BOOST_PP_COMMA_IF(n)                                                  \
             BOOST_FWD_REF(BOOST_PP_CAT(Arg, n)) BOOST_PP_CAT(arg, n)          \
@@ -28,6 +32,7 @@
 
 #include BOOST_PP_ITERATE()
 
+#undef HPX_FORWARD_ARGS
 #undef HPX_FWD_ARGS
 #undef HPX_MOVE_ARGS
 

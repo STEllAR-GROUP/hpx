@@ -279,7 +279,7 @@ namespace hpx
         strm << "\n";
 
         std::string const* back_trace =
-            boost::get_error_info<hpx::throw_stacktrace>(e);
+            boost::get_error_info<hpx::detail::throw_stacktrace>(e);
         if (back_trace && !back_trace->empty()) {
             // FIXME: add indentation to stack frame information
             strm << "[stack_trace]: " << *back_trace << "\n";
@@ -292,17 +292,17 @@ namespace hpx
             strm << "[what]: " << se->what() << "\n";
 
         boost::uint32_t const* locality =
-            boost::get_error_info<hpx::throw_locality>(e);
+            boost::get_error_info<hpx::detail::throw_locality>(e);
         if (locality)
             strm << "[locality-id]: " << *locality << "\n";
 
         std::string const* hostname_ =
-            boost::get_error_info<hpx::throw_hostname>(e);
+            boost::get_error_info<hpx::detail::throw_hostname>(e);
         if (hostname_ && !hostname_->empty())
             strm << "[hostname]: " << *hostname_ << "\n";
 
         boost::int64_t const* pid_ =
-            boost::get_error_info<hpx::throw_pid>(e);
+            boost::get_error_info<hpx::detail::throw_pid>(e);
         if (pid_ && -1 != *pid_)
             strm << "[process-id]: " << *pid_ << "\n";
 
@@ -313,7 +313,7 @@ namespace hpx
         }
         else {
             std::string const* s =
-                boost::get_error_info<hpx::throw_function>(e);
+                boost::get_error_info<hpx::detail::throw_function>(e);
             if (s)
                 strm << "[function]: " << *s << "\n";
         }
@@ -325,7 +325,7 @@ namespace hpx
         }
         else {
             std::string const* s =
-                boost::get_error_info<hpx::throw_file>(e);
+                boost::get_error_info<hpx::detail::throw_file>(e);
             if (s)
                 strm << "[file]: " << *s << "\n";
         }
@@ -336,17 +336,17 @@ namespace hpx
             strm << "[line]: " << *line << "\n";
 
         std::size_t const* shepherd =
-            boost::get_error_info<hpx::throw_shepherd>(e);
+            boost::get_error_info<hpx::detail::throw_shepherd>(e);
         if (shepherd && std::size_t(-1) != *shepherd)
             strm << "[os-thread]: " << *shepherd << "\n";
 
         std::size_t const* thread_id =
-            boost::get_error_info<hpx::throw_thread_id>(e);
+            boost::get_error_info<hpx::detail::throw_thread_id>(e);
         if (thread_id && *thread_id)
             strm << (boost::format("[thread-id]: %016x\n") % *thread_id);
 
         std::string const* thread_description =
-            boost::get_error_info<hpx::throw_thread_name>(e);
+            boost::get_error_info<hpx::detail::throw_thread_name>(e);
         if (thread_description && !thread_description->empty())
             strm << "[thread-description]: " << *thread_description << "\n";
 
@@ -383,7 +383,7 @@ namespace hpx
     boost::uint32_t get_locality_id(boost::exception const& e)
     {
         boost::uint32_t const* locality =
-            boost::get_error_info<hpx::throw_locality>(e);
+            boost::get_error_info<hpx::detail::throw_locality>(e);
         if (locality)
             return *locality;
         return naming::invalid_locality_id;
@@ -409,7 +409,7 @@ namespace hpx
     std::string get_host_name(boost::exception const& e)
     {
         std::string const* hostname_ =
-            boost::get_error_info<hpx::throw_hostname>(e);
+            boost::get_error_info<hpx::detail::throw_hostname>(e);
         if (hostname_ && !hostname_->empty())
             return *hostname_;
         return "";
@@ -436,7 +436,7 @@ namespace hpx
     boost::int64_t get_process_id(boost::exception const& e)
     {
         boost::int64_t const* pid_ =
-            boost::get_error_info<hpx::throw_pid>(e);
+            boost::get_error_info<hpx::detail::throw_pid>(e);
         if (pid_)
             return *pid_;
         return -1;
@@ -467,7 +467,7 @@ namespace hpx
             return *func;
 
         std::string const* s =
-            boost::get_error_info<hpx::throw_function>(e);
+            boost::get_error_info<hpx::detail::throw_function>(e);
         if (s)
             return *s;
 
@@ -500,7 +500,7 @@ namespace hpx
             return *file;
 
         std::string const* s =
-            boost::get_error_info<hpx::throw_file>(e);
+            boost::get_error_info<hpx::detail::throw_file>(e);
         if (s)
             return *s;
 
@@ -555,7 +555,7 @@ namespace hpx
     std::size_t get_os_thread(boost::exception const& e)
     {
         std::size_t const* shepherd =
-            boost::get_error_info<hpx::throw_shepherd>(e);
+            boost::get_error_info<hpx::detail::throw_shepherd>(e);
         if (shepherd && std::size_t(-1) != *shepherd)
             return *shepherd;
         return std::size_t(-1);
@@ -582,7 +582,7 @@ namespace hpx
     std::size_t get_thread_id(boost::exception const& e)
     {
         std::size_t const* thread_id =
-            boost::get_error_info<hpx::throw_thread_id>(e);
+            boost::get_error_info<hpx::detail::throw_thread_id>(e);
         if (thread_id && *thread_id)
             return *thread_id;
         return 0;
@@ -609,7 +609,7 @@ namespace hpx
     std::string get_thread_description(boost::exception const& e)
     {
         std::string const* thread_description =
-            boost::get_error_info<hpx::throw_thread_name>(e);
+            boost::get_error_info<hpx::detail::throw_thread_name>(e);
         if (thread_description && !thread_description->empty())
             return *thread_description;
         return "";
