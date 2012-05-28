@@ -373,7 +373,7 @@ namespace hpx { namespace util
             agas_logger()->writer().add_destination("console",
                 console(lvl, destination_agas));
             agas_logger()->writer().write(logformat, logdest);
-            agas_logger()->writer().replace_formatter("shepherd", shepherd_thread_id());
+            agas_logger()->writer().replace_formatter("osthread", shepherd_thread_id());
             agas_logger()->writer().replace_formatter("locality", locality_prefix());
             agas_logger()->writer().replace_formatter("hpxthread", thread_id());
             agas_logger()->writer().replace_formatter("hpxphase", thread_phase());
@@ -421,7 +421,7 @@ namespace hpx { namespace util
             timing_logger()->writer().add_destination("console",
                 console(lvl, destination_timing));
             timing_logger()->writer().write(logformat, logdest);
-            timing_logger()->writer().replace_formatter("shepherd", shepherd_thread_id());
+            timing_logger()->writer().replace_formatter("osthread", shepherd_thread_id());
             timing_logger()->writer().replace_formatter("locality", locality_prefix());
             timing_logger()->writer().replace_formatter("hpxthread", thread_id());
             timing_logger()->writer().replace_formatter("hpxphase", thread_phase());
@@ -470,7 +470,7 @@ namespace hpx { namespace util
             hpx_logger()->writer().add_destination("console",
                 console(lvl, destination_hpx));
             hpx_logger()->writer().write(logformat, logdest);
-            hpx_logger()->writer().replace_formatter("shepherd", shepherd_thread_id());
+            hpx_logger()->writer().replace_formatter("osthread", shepherd_thread_id());
             hpx_logger()->writer().replace_formatter("locality", locality_prefix());
             hpx_logger()->writer().replace_formatter("hpxthread", thread_id());
             hpx_logger()->writer().replace_formatter("hpxphase", thread_phase());
@@ -485,7 +485,7 @@ namespace hpx { namespace util
             hpx_error_logger()->writer().add_destination("console",
                 console(lvl, destination_hpx));
             hpx_error_logger()->writer().write(logformat, logdest + " cerr");
-            hpx_error_logger()->writer().replace_formatter("shepherd", shepherd_thread_id());
+            hpx_error_logger()->writer().replace_formatter("osthread", shepherd_thread_id());
             hpx_error_logger()->writer().replace_formatter("locality", locality_prefix());
             hpx_error_logger()->writer().replace_formatter("hpxthread", thread_id());
             hpx_error_logger()->writer().replace_formatter("hpxphase", thread_phase());
@@ -506,7 +506,7 @@ namespace hpx { namespace util
             else {
                 hpx_error_logger()->writer().write(logformat, "cerr");
             }
-            hpx_error_logger()->writer().replace_formatter("shepherd", shepherd_thread_id());
+            hpx_error_logger()->writer().replace_formatter("osthread", shepherd_thread_id());
             hpx_error_logger()->writer().replace_formatter("locality", locality_prefix());
             hpx_error_logger()->writer().replace_formatter("hpxthread", thread_id());
             hpx_error_logger()->writer().replace_formatter("hpxphase", thread_phase());
@@ -556,7 +556,7 @@ namespace hpx { namespace util
             app_logger()->writer().add_destination("console",
                 console(lvl, destination_app));
             app_logger()->writer().write(logformat, logdest);
-            app_logger()->writer().replace_formatter("shepherd", shepherd_thread_id());
+            app_logger()->writer().replace_formatter("osthread", shepherd_thread_id());
             app_logger()->writer().replace_formatter("locality", locality_prefix());
             app_logger()->writer().replace_formatter("hpxthread", thread_id());
             app_logger()->writer().replace_formatter("hpxphase", thread_phase());

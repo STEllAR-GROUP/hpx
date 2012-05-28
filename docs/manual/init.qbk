@@ -1,9 +1,9 @@
 [/=============================================================================
-Copyright (C) 2007-2012 Hartmut Kaiser
-Copyright (C) 2011-2012 Bryce Adelstein-Lelbach
+    Copyright (C) 2007-2012 Hartmut Kaiser
+    Copyright (C) 2011-2012 Bryce Adelstein-Lelbach
 
-Distributed under the Boost Software License, Version 1.0. (See accompanying
-file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================/]
 
 [section:init Launching HPX]
@@ -37,8 +37,8 @@ application, where it is collected and written to a file, one file for each
 logging category.
 
 Each logging category can be customized at two levels, the parameters for each
-are stored in the ini configuration sections `hpx.CATEGORY.logging` and
-`hpx.CATEGORY.logging.console` (where 'CATEGORY' is the category shortcut as
+are stored in the ini configuration sections `hpx.logging.CATEGORY` and
+`hpx.logging.console.CATEGORY` (where 'CATEGORY' is the category shortcut as
 listed in the table above). The former influences logging at the source
 locality and the latter modifies the logging behaviour for each of the
 categories at the console instance of an application.
@@ -68,7 +68,7 @@ default.
      logging output for the general category. Please note, that the syntax and
      means of setting environment variables varies between operating systems.]
 
-[heading Destinations]
+[heading Configuration]
 
 Logs will be saved to destinations as configured by the user. By default, logging
 output is saved on the console instance of an application to
@@ -91,7 +91,23 @@ The logging level is taken from the environment variable `HPX_LOGLEVEL` and
 defaults to zero, e.g. no logging. The default logging destination is read from
 the environment vaiable `HPX_LOGDESTINATION`. On any of the localities it
 defaults to `console` which redirects all generated logging output to the
-console instance of an application.
+console instance of an application. The following table lists the possible
+destinations for any logging output. It is possible to specify more than one
+destination separaneted by whitespace.
+
+[table Logging destinations
+    [[Logging destination]      [Description]]
+    [[file(<filename>)]         [Direct all output to a file with the given
+                                 <filename>.]]
+    [[cout]                     [Direct all output to the local standard output
+                                 of the application instance on this locality.]]
+    [[cerr]                     [Direct all output to the local standard error
+                                 output of the application instance on this
+                                 locality.]]
+    [[console]                  [Direct all output to the console instance of
+                                 the application. The console instance has its
+                                 logging destinations configured separately.]]
+]
 
 The logging format is read from the environment variable `HPX_LOGFORMAT` and
 it defaults to a complex format description. This format consists of several
@@ -103,7 +119,7 @@ the logging message prefix formatted as shown and the actual log message which
 will replace the separator.
 
 [table Available field placeholders
-    [[Name]           [Purpose]]
+    [[Name]           [Description]]
     [[locality]       [The id of the locality on which the logging message was
                        generated.]]
     [[hpxthread]      [The id of the HPX-thread generating this logging
@@ -126,6 +142,8 @@ will replace the separator.
                        by the source locality.]]
     [[idx]            [The sequence number of the logging output line as
                        generated on the source locality.]]
+    [[osthread]       [The sequence number of the OS-thread which executes the
+                       current HPX-thread.]]
 ]
 
 [note Not all of the field placeholder may be expanded for all generated
