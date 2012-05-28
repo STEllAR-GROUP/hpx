@@ -41,10 +41,9 @@ namespace hpx { namespace util
 
         section* root_;
         entry_map entries_;
-        // FIXME: section_env_ is filled, but doesn't appear to be used anywhere
-        entry_map section_env_;
         section_map sections_;
         std::string name_;
+        std::string parent_name_;
 
     private:
         friend class boost::serialization::access;
@@ -96,7 +95,7 @@ namespace hpx { namespace util
         section_map const& get_sections() const
             { return sections_; }
 
-        void add_entry(std::string const& key, std::string const& val);
+        void add_entry(std::string const& key, std::string val);
         bool has_entry(std::string const& key) const;
         std::string get_entry(std::string const& key) const;
         std::string get_entry(std::string const& key, std::string const& dflt) const;
@@ -114,6 +113,16 @@ namespace hpx { namespace util
         void expand_bracket(std::string&, std::string::size_type) const;
         void expand_brace(std::string&, std::string::size_type) const;
 
+        std::string expand_only(std::string in,
+            std::string const& expand_this) const;
+
+        void expand_only(std::string&, std::string::size_type,
+            std::string const& expand_this) const;
+        void expand_bracket_only(std::string&, std::string::size_type,
+            std::string const& expand_this) const;
+        void expand_brace_only(std::string&, std::string::size_type,
+            std::string const& expand_this) const;
+
         void set_root(section* r, bool recursive = false)
         {
             root_ = r;
@@ -125,9 +134,15 @@ namespace hpx { namespace util
         }
         section* get_root() const { return root_; }
         std::string get_name() const { return name_; }
-        void set_name(std::string const& name) { name_ = name; }
+        std::string get_parent_name() const { return parent_name_; }
+        std::string get_full_name() const
+        {
+            if (!parent_name_.empty())
+                return parent_name_ + "." + name_;
+            return name_;
+        }
 
-        section clone(section* root = NULL) const;
+        void set_name(std::string const& name) { name_ = name; }
     };
 
 }} // namespace hpx::util

@@ -41,8 +41,7 @@ namespace hpx { namespace util
             "[hpx]",
             "location = ${HPX_LOCATION:$[system.prefix]}",
             "component_path = $[hpx.location]/lib/hpx",
-            "ini_default_path = $[hpx.location]/share/hpx/ini",
-            "ini_path = $[hpx.ini_default_path]",
+            "ini_path = $[hpx.location]/share/" HPX_BASE_DIR_NAME "/ini",
 #if HPX_USE_ITT == 1
             "use_itt_notify = ${HPX_USE_ITTNOTIFY:0}",
 #endif

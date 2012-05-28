@@ -58,9 +58,9 @@ namespace hpx { namespace components
         {
             // store the configuration settings
             if (NULL != global)
-                global_settings_ = global->clone();
+                global_settings_ = *global;
             if (NULL != local)
-                local_settings_ = local->clone();
+                local_settings_ = *local;
         }
 
         ///

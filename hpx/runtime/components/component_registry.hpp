@@ -50,7 +50,7 @@ namespace hpx { namespace components
             fillini += std::string("[hpx.components.") +
                 unique_component_name<component_registry>::call() + "]";
             fillini += "name = " HPX_COMPONENT_STRING;
-            fillini += "path = $[hpx.location]/lib/hpx/" HPX_LIBRARY;
+            fillini += "path = $[hpx.location]/lib/hpx/";
             switch (state)
             {
                 case factory_enabled:
