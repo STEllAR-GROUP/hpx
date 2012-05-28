@@ -5,16 +5,32 @@
 
 set(tests
     set_thread_state
-    rescheduling
-    test_thread
-    test_thread_id
-    test_thread_launching
-    test_thread_mf
+    thread
     thread_affinity
+    thread_id
+    thread_launching
+    thread_mf
+    thread_rescheduling
    )
 
 set(thread_affinity_FLAGS
-        DEPENDENCIES iostreams_component)
+    DEPENDENCIES iostreams_component)
+
+set(set_thread_state_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(thread_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(thread_affinity_FLAGS
+    DEPENDENCIES iostreams_component)
+set(thread_affinity_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(thread_id_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(thread_launching_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(thread_mf_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(thread_rescheduling_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
   set(sources
@@ -28,6 +44,8 @@ foreach(test ${tests})
                      ${${test}_FLAGS}
                      FOLDER "Tests/Unit/Threads")
 
+  add_hpx_unit_test(${test} ${${test}_PARAMETERS})  
+
   # add a custom target for this example
   add_hpx_pseudo_target(tests.unit.threads.${test})
 
@@ -39,3 +57,4 @@ foreach(test ${tests})
   add_hpx_pseudo_dependencies(tests.unit.threads.${test}
                               ${test}_test_exe)
 endforeach()
+

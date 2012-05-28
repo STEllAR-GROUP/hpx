@@ -4,22 +4,14 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(subdirs
-    local
-   )
-
-foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(tests.unit.lcos.local)
-  add_subdirectory(local)
-  add_hpx_pseudo_dependencies(tests.unit.lcos tests.unit.lcos.local)
-endforeach()
-
 set(tests
     barrier
     dataflow
     deferred_packaged_task
     future
     future_wait
+    local_barrier
+    local_mutex
     packaged_action
     promise
    )
@@ -34,6 +26,10 @@ set(deferred_packaged_task_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(future_wait_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(local_barrier_PARAMETERS THREADS_PER_LOCALITY 4)
+
+set(local_mutex_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(packaged_action_PARAMETERS THREADS_PER_LOCALITY 4)
 

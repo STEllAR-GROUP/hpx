@@ -171,13 +171,7 @@ int main(int argc, char* argv[])
     // Configure application-specific options
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
-    // we force this test to use several (4) threads
-    using namespace boost::assign;
-    std::vector<std::string> cfg;
-    cfg += "hpx.os_threads=" +
-        boost::lexical_cast<std::string>(hpx::thread::hardware_concurrency());
-
     // Initialize and run HPX
-    return hpx::init(cmdline, argc, argv, cfg);
+    return hpx::init(cmdline, argc, argv);
 }
 
