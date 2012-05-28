@@ -1232,7 +1232,7 @@ if(DOXYGEN_FOUND)
   foreach(doxygen_input ${doxygen_inputs_list})
     set(doxygen_inputs "${doxygen_inputs} ${doxygen_input}")
   endforeach()
-  hpx_info("doxygen" "${doxygen_inputs}")
+  #hpx_info("doxygen" "${doxygen_inputs}")
 
   set(doxygen_output_file "${CMAKE_CURRENT_BINARY_DIR}/docs/hpx_autodoc")
   set(doxygen_output_dir "${CMAKE_CURRENT_BINARY_DIR}/docs/doxygen")
@@ -1248,7 +1248,7 @@ if(DOXYGEN_FOUND)
   foreach(doxygen_predef ${doxygen_definition_list})
     set(doxygen_definitions "${doxygen_definitions} \"${doxygen_predef}\"")
   endforeach()
-  hpx_info("doxygen" "${doxygen_definitions}")
+  #hpx_info("doxygen" "${doxygen_definitions}")
 
   hpx_info("doxygen" "Creating ${CMAKE_CURRENT_BINARY_DIR}/docs/hpx_autodoc.doxy")
   configure_file(${hpx_SOURCE_DIR}/cmake/templates/autodoc.doxy.in
