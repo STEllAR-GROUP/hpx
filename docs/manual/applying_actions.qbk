@@ -244,7 +244,7 @@ communication latencies.
 
 [endsect] [/ Action Invocation]
 
-[section:action_exception_handling Action exception handling]
+[section:action_exception_handling Action Exception Handling]
 
 Like in any other asynchronous invocation scheme it is important to be able to
 handle error conditions occurring while the asynchronous (and possibly remote)
@@ -316,7 +316,7 @@ function `get()`:
 For more information about error handling plese refer to the section
 __exceptions__.
 
-[endsect] [/ Action exception handling]
+[endsect] [/ Action Exception Handling]
 
 [endsect] [/ Applying Actions]
 

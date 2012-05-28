@@ -8,6 +8,194 @@
 
 [section:init Launching HPX]
 
+[/////////////////////////////////////////////////////////////////////////////]
+[section:configuration Configure HPX Applications]
+
+All __hpx__ applications can be configured using special command line options
+and/or using special configuration files. This section describes the available
+options, the configuration file format, and the algorithm used to locate
+possible predefined configuration files. Additionally this section describes
+the defaults assumed if no external configuration information is supplied.
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:ini_format The HPX INI File Format]
+
+All __hpx__ applications can be configured using a special file format which is
+similar to the well known __ini_file_format__. This is a structured text format
+allowing to group key/value pairs (properties) into sections. The basic element
+contained in an ini file is the property. Every property has a name and a
+value, delimited by an equals sign (=). The name appears to the left of the
+equals sign:
+``
+    name=value
+``
+The value may contain equal signs as only the first `'='` character
+is interpreted as the delimter between `name` and `value`. Whitespace before
+the name, afterthe value and immediately before and after the delimiting equal
+sign is ignored. Whitespace inside the value is retained.
+
+Properties may be grouped into arbitrarily named sections. The section name
+appears on a line by itself, in square brackets (`[` and `]`). All properties
+after the section declaration are associated with that section. There is no
+explicit "end of section" delimiter; sections end at the next section
+declaration, or the end of the file
+``
+    [section]
+``
+In __hpx__ sections can be nested. A nested section has a name composed of
+all section names it is embedded in. The section names are concatenated using
+a dot (`'.'`):
+``
+    [outer_section.inner_section]
+``
+Here `inner_section` is logically nested within `outer_section`.
+
+It is possible to use the full section name concateenated with the property
+name to refer to a particular property. For example in:
+``
+    [a.b.c]
+    d = e
+``
+the property value of `d` can be referred to as `a.b.c.d=e`.
+
+In __hpx__ ini files can contain comments. Hash signs (`'#'`) at the beginning
+of a line indicate a comment. All characters starting with the `'#'` until the
+end of line are ignored.
+
+If a property with the same name is reused inside a section, the second
+occurrence of a property name will override the first occurrence (discard the
+first value). Duplicate sections simply merge their properties together, as if
+they occurred contiguously.
+
+[teletype]
+In __hpx__ ini files, a property value `${FOO:default}` will use the environmental
+variable `FOO` if it is set and `default` otherwise. No default has to be
+specified. Therefore this `${FOO}` refers to the environmental variable `FOO`.
+If `FOO` is not set or empty the overall expression will evaluate to an empty
+string. A property value `$[section.key:default]` refers to the value held
+by the property `section.key` if it exists and `default` otherwise. No default
+has to be specified. Therefore this `$[section.key]` refers to the property
+`section.key`. If the property `section.key` is not set or empty the overall
+expression will evaluate to an empty string.
+
+[note Any property `$[section.key:default]` is evaluated whenever it is queried
+      and when the configuration data is initialized. This allows for lazy
+      evaluation and relaxes initialization order of different sections]
+[c++]
+
+[endsect] [/ The HPX INI File Format]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:config_defaults Default Configuration Settings]
+
+During startup any __hpx__ application applies a predefined search pattern to
+locate one or more configuration files. All found files will be read and merged
+in the sequence they are found into one single internal data structure holding
+all configuration properties.
+
+[heading Built-in Default Configuration Settings]
+
+As a first step the internal configuration database is filled with a set of
+default configuration properties. Those settings are described on a section
+by section basis.
+
+['[*The `system` Configuration Section]]
+
+[teletype]
+``
+    [system]
+    pid = <process-id>
+    prefix = <current prefix path>
+``
+[c++]
+
+[table
+    [[Property]         [Description]                                 [Remark]]
+    [[`system.pid`]     [This is initialized to store the current
+                         OS-process id of the application instance]   [dynamically filled]]
+    [[`system.prefix`]  [This is initialized to the base directory
+                         __hpx__ has been loaded from.]               [dynamically filled]]
+]
+
+['[*The `hpx` Configuration Section]]
+
+[teletype]
+``
+    [hpx]
+    location = ${HPX_LOCATION:$[system.prefix]}
+    component_path = $[hpx.location]/lib/hpx
+    ini_default_path = $[hpx.location]/share/hpx/ini
+    ini_path = $[hpx.ini_default_path]
+    finalize_wait_time = ${HPX_FINALIZE_WAIT_TIME:-1.0}
+    shutdown_timeout = ${HPX_SHUTDOWN_TIMEOUT:-1.0}
+    default_stack_size = ${HPX_DEFAULT_STACK_SIZE:<hpx_default_stack_size>}
+``
+[c++]
+
+[table
+    [[Property]             [Description]                                 [Remark]]
+    [[`hpx.location`]       [ ]               [dynamically filled]]
+    [[`hpx.component_path`] [ ]               [dynamically filled]]
+    [[`hpx.ini_default_path`] [ ]               [dynamically filled]]
+    [[`hpx.ini_path`] [ ]                     []]
+    [[`hpx.finalize_wait_time`] [ ]               []]
+    [[`hpx.shutdown_timeout`] [ ]               []]
+    [[`hpx.default_stack_size`] [ ]               []]
+]
+
+['[*The `hpx.parcel` Configuration Section]]
+
+[teletype]
+``
+    [hpx.parcel]
+    address = ${HPX_PARCEL_SERVER_ADDRESS:<hpx_initial_ip_address>}
+    port = ${HPX_PARCEL_SERVER_PORT:<hpx_initial_ip_port>}
+    max_connections_cache_size = ${HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE:<hpx_max_parcel_connection_cache_size>}
+    max_connections_per_locality = ${HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY:<hpx_max_parcel_connections_per_locality}
+``
+[c++]
+
+[table
+    [[Property]             [Description]                                 [Remark]]
+    [[`hpx.parcel.address`] [ ]               [ ]]
+    [[`hpx.parcel.port`] [ ]               [ ]]
+    [[`hpx.parcel.max_connections_cache_size`] [ ]               [ ]]
+    [[`hpx.parcel.max_connections_per_locality`] [ ]               [ ]]
+]
+
+['[*The `hpx.agas` Configuration Section]]
+
+[teletype]
+``
+    [hpx.agas]
+    address = ${HPX_AGAS_SERVER_ADDRESS:<hpx_initial_ip_address>}
+    port = ${HPX_AGAS_SERVER_PORT:<hpx_initial_ip_port>}
+    max_pending_refcnt_requests = ${HPX_AGAS_MAX_PENDING_REFCNT_REQUESTS:<hpx_initial_agas_max_pending_refcnt_requests>}
+    service_mode = hosted
+    dedicated_server = 0
+    local_cache_size = ${HPX_AGAS_LOCAL_CACHE_SIZE:<hpx_initial_agas_local_cache_size>}
+    use_range_caching = ${HPX_AGAS_USE_RANGE_CACHING:1}
+    use_caching = ${HPX_AGAS_USE_CACHING:1}
+``
+[c++]
+
+[table
+    [[Property]             [Description]                                 [Remark]]
+    [[`hpx.agas.address`] [ ]               [ ]]
+    [[`hpx.agas.port`] [ ]               [ ]]
+    [[`hpx.agas.max_pending_refcnt_requests`] [ ]               [ ]]
+    [[`hpx.agas.service_mode`] [ ]               [ ]]
+    [[`hpx.agas.dedicated_server`] [ ]               [ ]]
+    [[`hpx.agas.local_cache_size`] [ ]               [ ]]
+    [[`hpx.agas.use_range_caching`] [ ]               [ ]]
+    [[`hpx.agas.use_caching`] [ ]               [ ]]
+]
+
+[endsect] [/ Default Configuration Settings]
+
+[endsect] [/ Configure HPX Applications]
+
+[/////////////////////////////////////////////////////////////////////////////]
 [section:logging Logging]
 
 HPX logging uses a sophisticated logging framework allowing to follow in detail
@@ -76,7 +264,7 @@ output is saved on the console instance of an application to
 shortcut and the OS process id). The output for
 the general logging category is saved to `hpx.PID.log`. The default settings for
 the general logging category are show here (the syntax is described in the
-section about the HPX ini configuration model):
+section __iniformat__):
 
 [teletype]
 ``

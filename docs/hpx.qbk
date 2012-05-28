@@ -76,6 +76,8 @@
 [def __qstat__                  [@http://www.clusterresources.com/torquedocs21/commands/qstat.shtml qstat]]
 [def __pbsdsh__                 [@http://www.clusterresources.com/torquedocs21/commands/pbsdsh.shtml pbsdsh]]
 
+[def __ini_file_format__        [@http://en.wikipedia.org/wiki/INI_file Windows INI file format]]
+
 [/ Optional external dependencies]
 [def __hwloc__                  [@http://www.open-mpi.org/projects/hwloc/ Portable Hardware Locality (HWLOC)]]
 [def __tbb__                    [@http://threadingbuildingblocks.org/ Intel Threading Building Blocks (TBB)]]
@@ -107,6 +109,8 @@
 
 [template hpx_cmdline[str]      [link hpx.tutorial.getting_started.commandline [str]]]
 
+[def __configuration__          [link hpx.manual.init.configuration Configure HPX Applications]]
+[def __inifirmat__              [link hpx.manual.init.configuration.ini_format The HPX INI File Format]]
 [def __exceptions__             [link hpx.manual.exceptions Working with exceptions]]
 
 [template hpx_link[url txt]     '''<ulink url="file:///'''__hpx_source_dir__/[url]'''">'''[txt]'''</ulink>''']
