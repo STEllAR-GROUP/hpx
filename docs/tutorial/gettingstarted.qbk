@@ -322,6 +322,94 @@ which should print [^Hello HPX World!] and exit.
 [endsect] [/ How to Build HPX Components with pkg-config]
 
 [/////////////////////////////////////////////////////////////////////////////]
+[section:existing_apps Integrating HPX into existing applications]
+
+Having your application work with __hpx__ is unfortunately not as simple as just
+linking against it. However it can be rather straightforward or rather complex
+based on the type of application that is trying to be integrated. The complexity
+derives from the overall design of the application. If the application was
+designed to be parallel, then integrating should be relatively straightforward.
+However HPX is not some magic wand that will make your application work in
+parallel. Applications that are serial or that rely too heavily on global
+variables will have a more difficult time in integrating. Most parallel
+applications have already identified the sections of code that do the most
+work and have abstracted them out to use the parallel library of their choice.
+
+One of the big advantages of __hpx__ is the concept of moving work to data.
+Data-heavy applications can use components to create remote objects that
+encapsulate that data, and call methods on these component-objects.
+Computation-heavy applications do not care so much about moving work to data,
+but instead try to get as much parallel computation done as possible. __hpx__
+futures provide a nice tool for accomplishing this. Using futures, one can
+set up a lot of work to be done, fire it off and wait for them to be finished.
+__hpx__ takes care of creating the threads, moving the work across node
+boundaries, and making sure the calling thread suspends when it wants the
+value from a future that is still executing. A lot of boring code that you do not
+need to write. The one caveat is that for any function you wrap with a
+future, any parameters of those functions need to be serializable. This can be
+a rather complicated procedure if the data structures are complex.
+__hpx__ uses __boost_serialization__ for the serialization of the data to be
+used in futures. That really is the hardest part, because once the serialization
+functions are completed, you can use futures anywhere in your code. If you
+plan on only running on an SMP machine, then __hpx__ never calls the
+serialization functions and they may be blank (but the signatures are still
+required).
+
+The next stumbling block to integrating __hpx__ is having it actually link
+against your program. If your application uses a CMake build system, you can
+set the CMake Module Path to the path where __hpx__ has the `FindHPX.cmake`
+module. Here is a code snippet demonstrating this. It adds the preprocessor
+definition `HPX_ENABLED` to the compiler command line if __hpx__ is found.
+
+[teletype]
+``
+    # This adds the HPX cmake configuration directory to the search path.
+    set(CMAKE_MODULE_PATH
+        $(CMAKE_MODULE_PATH)
+        ${HPX_INSTALL_DIR}/share/cmake-2.8/Modules)
+
+    # Instruct cmake to find the HPX installation
+    find_package(HPX)
+    IF(HPX_FOUND)
+        # Add a special option to you compiler command line.
+        MESSAGE("HPX was found.")
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D HPX_ENABLED")
+    ENDIF()
+``
+
+Now to actually build the application you should have a code snippet similar
+to this in your CMakeLists.txt file:
+
+``
+    IF(HPX_FOUND)
+        # build your application using HPX
+        add_hpx_executable(your_app
+            ESSENTIAL
+            SOURCES ${your_app_SRCS})
+    ELSE()
+        # build your application with out using HPX
+        add_executable(your_app ${your_app_SRCS})
+    ENDIF()
+``
+[c++]
+
+When you configure your application, all you need to do is set the
+HPX_INSTALL_DIR variable to point to the installation of __hpx__! Now all you
+have to do is type `make` and the application should build using the __hpx__
+installation you specified.
+
+If you do not use CMake, you can still build against __hpx__ but you should refer
+to the section on __pkg_config__.
+
+Those two things, the serialization and actually integrating with __hpx__,
+are the biggest stumbling blocks that you should encountered when trying to
+integrate your application with __hpx__. For an idea on how to integrate __hpx__
+constructs into your application, you should take a look at some of the examples
+that __hpx__ includes.
+
+[endsect] [/ Integrating HPX into existing applications]
+
+[/////////////////////////////////////////////////////////////////////////////]
 [section:unix_pbs How to Use HPX Applications with PBS]
 
 [teletype]

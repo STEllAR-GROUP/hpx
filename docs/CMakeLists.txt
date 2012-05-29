@@ -52,8 +52,8 @@ hpx_quickbook_to_html(hpx
   CATALOG ${CMAKE_CURRENT_BINARY_DIR}/boostbook_catalog.xml
   XSLTPROC_ARGS --stringparam chunk.section.depth 4
                 --stringparam chunk.first.sections 1
-                --stringparam toc.section.depth 3
-                --stringparam toc.max.depth 3
+                --stringparam toc.section.depth 4
+                --stringparam toc.max.depth 4
                 --stringparam generate.section.toc.level 4
                 --stringparam boost.image.src images/hpx_0_9.png
                 --stringparam boost.image.w 322

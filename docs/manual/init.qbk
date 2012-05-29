@@ -125,7 +125,7 @@ by section basis below.
 ``
 [c++]
 
-[table
+[table:ini_system
     [[Property]         [Description]                                 [Remark]]
     [[`system.pid`]
      [This is initialized to store the current OS-process id of the application
@@ -148,7 +148,7 @@ by section basis below.
 ``
 [c++]
 
-[table
+[table:ini_hpx
     [[Property]                 [Description]                         [Remark]]
     [[`hpx.location`]
      [This is initialized to the id of the locality this application instance
@@ -177,7 +177,7 @@ by section basis below.
 ``
 [c++]
 
-[table
+[table:ini_hpx_components
     [[Property]                 [Description]                         [Remark]]
     [[`hpx.components.load_external`]
      [This entry defines whether external components will be loaded on this
@@ -201,7 +201,7 @@ of the components will contain at least the folowing properties:
 ``
 [c++]
 
-[table
+[table:ini_hpx_components_custom
     [[Property]                 [Description]                         [Remark]]
     [[`hpx.components.<component_instance_name>.name`]
      [This is the name of a component, usually the same as the second argument
@@ -238,7 +238,7 @@ sections, one for each component.
 ``
 [c++]
 
-[table
+[table:ini_hpx_parcel
     [[Property]                 [Description]                         [Remark]]
     [[`hpx.parcel.address`]
      [This property defines the default IP address to be used for the parcel
@@ -284,7 +284,7 @@ sections, one for each component.
 ``
 [c++]
 
-[table
+[table:ini_hpx_agas
     [[Property]                 [Description]                         [Remark]]
     [[`hpx.agas.address`]
      [This property defines the default IP address to be used for the AGAS root

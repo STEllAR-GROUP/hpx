@@ -36,7 +36,7 @@
 [def __hpx__                    /HPX/]
 [def __stellar__                [@http://stellar.cct.lsu.edu STE||AR]]
 [def __stellar_list__           [@email:gopx@cct.lsu.edu gopx@cct.lsu.edu]]
-[def __stellar_irc__            [@irc://irc.freenode.net:6667/#ste||ar #stellar at Freenet]]
+[def __stellar_irc__            [@irc://irc.freenode.net:6667/#ste||ar #ste||ar at Freenet]]
 [def __lsu__                    [@http://www.lsu.edu Louisiana State University (LSU)]]
 [def __cct__                    [@http://www.cct.lsu.edu Center for Computation and Technology (CCT)]]
 [def __iu__                     [@http://www.iu.edu Indiana University (IU)]]
@@ -53,6 +53,7 @@
 
 [def __boost_program_options__  [@http://www.boost.org/doc/html/program_options.html Boost.Program Options]]
 [def __boost_atomic__           [@http://www.chaoticmind.net/~hcb/projects/boost.atomic/doc/index.html Boost.Atomic]]
+[def __boost_serialization__    [@http://www.boost.org/doc/libs/release/libs/serialization/doc/index.html Boost.Serialization]]
 
 [/ External dependencies]
 [def __cmake__                  [@http://www.cmake.org CMake]]
@@ -97,6 +98,7 @@
 
 [/ Section link shortcuts]
 [def __pbs__                    [link hpx.tutorial.getting_started.unix_pbs PBS]]
+[def __pkg_config__             [link hpx.tutorial.getting_started.unix_comps_pkg_config How to Build HPX Components with pkg-config]]
 
 [def __fibonacci_example__      [link hpx.tutorial.examples.fibonacci Fibonacci Example]]
 [def __hello_world_example__    [link hpx.tutorial.examples.hello_world Hello World Example]]
