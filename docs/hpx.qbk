@@ -7,7 +7,7 @@
 ===============================================================================/]
 
 [article HPX
-    [quickbook 1.5]
+    [quickbook 1.6]
     [id hpx]
     [authors [STE||AR Group, The]]
     [version 0.9.0]
@@ -82,8 +82,18 @@
 [/ Optional external dependencies]
 [def __hwloc__                  [@http://www.open-mpi.org/projects/hwloc/ Portable Hardware Locality (HWLOC)]]
 [def __tbb__                    [@http://threadingbuildingblocks.org/ Intel Threading Building Blocks (TBB)]]
+[def __ppl__                    [@http://msdn.microsoft.com/en-us/library/dd492418.aspx Microsoft Parallel Patterns Library (PPL)]]
+[def __cilk_pp__                [@http://software.intel.com/en-us/articles/intel-cilk-plus/ Cilk++]]
 [def __swarm__                  [@http://www.etinternational.com/index.php/products/swarmbeta/ ETI SWift Adaptive Runtime Machine (SWARM)]]
 [def __qthreads__               [@http://www.cs.sandia.gov/qthreads/ Sandia National Labs Qthreads]]
+[def __mpi__                    [@http://en.wikipedia.org/wiki/Message_Passing_Interface MPI]]
+[def __openmp__                 [@http://openmp.org/wp/ OpenMP]]
+[def __charm_pp__               [@http://charm.cs.uiuc.edu/ Charm++]]
+[def __pgas__                   [@http://www.pgas.org/ PGAS]]
+[def __chapel__                 [@http://chapel.cray.com/ Chapel]]
+[def __x10__                    [@http://x10-lang.org/ X10]]
+[def __upc__                    [@http://upc.lbl.gov/ UPC]]
+[def __fortress__               [@http://labs.oracle.com/projects/plrg/Publications/index.html Fortress]]
 
 [/ Some images]
 [def __note__                   [$./images/note.png]]
