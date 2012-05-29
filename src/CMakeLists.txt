@@ -113,7 +113,7 @@ else()
       COMMAND ${CMAKE_ASM_MASM_COMPILER} /Fo ${CMAKE_CURRENT_BINARY_DIR}/switch_to_fiber.obj /nologo /c ${switch_to_fiber_source}
       DEPENDS ${switch_to_fiber_source})
     set(hpx_external_OBJECTS ${CMAKE_CURRENT_BINARY_DIR}/switch_to_fiber.obj
-      CACHE INTERNAL "Object files for libhpx_external." FORCE)
+      CACHE INTERNAL "External object files for HPX." FORCE)
     add_definitions(-DHPX_EMULATE_SWAP_CONTEXT)
   endif()
 endif()
