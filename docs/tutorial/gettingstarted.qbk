@@ -351,7 +351,7 @@ in the section __hello_world_example__.
     APP_PATH=~/packages/hpx/bin/hello_world
     APP_OPTIONS=
 
-    __pbsdsh__ -u $APP_PATH ``[link hpx.tutorial.getting_started.commandline --hpx:nodes]``=`cat $PBS_NODEFILE` $APP_OPTIONS
+    __pbsdsh__ -u $APP_PATH ``[hpx_cmdline --hpx:nodes]``=`cat $PBS_NODEFILE` $APP_OPTIONS
 ```
 
 The [^#PBS -l nodes=2:ppn=4] directive will cause two compute nodes to be
@@ -436,101 +436,6 @@ Congratulations! You have just run your first distributed HPX application!
 [/Proofread by:]
 [/Adrian Serio 3-13-12]
 [/Phillip LeBlanc 3-13-12]
-
-[/////////////////////////////////////////////////////////////////////////////]
-[section:commandline HPX Command Line Options]
-
-The predefined command line options for any application using `hpx::init` are
-described in the table below:
-
-[/ TODO: proofread the options]
-[table:commandline Default HPX Command Line Options
-    [[Option]                   [Description]]
-    [[[*HPX options (allowed on command line only)]]]
-    [[`--hpx:help`, `--help` or `-h`]       [print out program usage]]
-    [[`--hpx:version`, `--version` or `-v`] [print out HPX version and copyright information]]
-    [[`--hpx:options-file arg`]             [specify a file containing command line options
-                                             (alternatively: @filepath)]]
-
-    [[[*HPX options (additionally allowed in an options file)]]]
-    [[`--hpx:worker`]           [run this instance in worker mode]]
-    [[`--hpx:console`]          [run this instance in console mode]]
-    [[`--hpx:connect`]          [run this instance in worker mode, but connecting
-                                 late]]
-    [[`--hpx:run-agas-server`]  [run AGAS server as part of this runtime instance]]
-    [[`--hpx:run-hpx-main`]     [run the hpx_main function, regardless of locality
-                                 mode]]
-    [[`--hpx:hpx arg`]          [the IP address the HPX parcelport is listening
-                                 on, expected format: 'address:port' (default:
-                                 127.0.0.1:7910)]]
-    [[`--hpx:agas arg`]         [the IP address the AGAS server is running on,
-                                 expected format: 'address:port' (default:
-                                 127.0.0.1:7910)]]
-    [[`--hpx:run-agas-server-only`][run only the AGAS server]]
-    [[`--hpx:nodefile arg`]     [the file name of a node file to use (list of nodes, one
-                                 node name per line and core)]]
-    [[`--hpx:nodes arg`]        [the (space separated) list of the nodes to use (usually
-                                 this is extracted from a node file)]]
-    [[`--hpx:ifsuffix arg`]     [suffix to append to host names in order to resolve them
-                                 to the proper network interconnect]]
-    [[`--hpx:ifprefix arg`]     [prefix to prepend to host names in order to resolve them
-                                 to the proper network interconnect]]
-    [[`--hpx:iftransform arg`]  [sed-style search and replace (s/search/replace/) used to
-                                 transform host names to the proper network interconnect]]
-    [[`--hpx:localities arg`]   [the number of localities to wait for at
-                                 application startup (default: 1)]]
-    [[`--hpx:node arg`]         [number of the node this locality is run on
-                                 (must be unique)]]
-    [[`--hpx:pu-offset`]        [the first processing unit this instance of HPX should be
-                                 run on (default: 0)]]
-    [[`--hpx:pu-step`]          [the step between used processing unit numbers for this
-                                 instance of HPX (default: 1)]]
-    [[`--hpx:threads arg`]      [the number of operating system threads to spawn
-                                 for this HPX locality (default: 1)]]
-    [[`--hpx:queuing arg`]      [the queue scheduling policy to use, options are
-                                 'local/l', 'priority_local/pr', 'abp/a', 'priority_abp',
-                                 'hierarchy/h', and 'periodic/pe' (default: priority_local/p)]]
-    [[`--hpx:hierarchy-arity`]  [the arity of the of the thread queue tree, valid for
-                                 --hpx:queuing=hierarchy only (default: 2)]]
-    [[`--hpx:high-priority-threads arg`] [the number of operating system threads
-                                 maintaining a high priority queue (default:
-                                 number of OS threads), valid for
-                                 --hpx:queuing=priority_local only]]
-    [[`--hpx:numa-sensitive`]   [makes the priority_local scheduler NUMA sensitive, valid for
-                                 --hpx:queuing=priority_local only]]
-
-    [[[*HPX configuration options]]]
-    [[`--hpx:app-config arg`]   [load the specified application configuration
-                                 (ini) file]]
-    [[`--hpx:config arg`]       [load the specified hpx configuration (ini) file]]
-    [[`--hpx:ini arg`]          [add a configuration definition to the default
-                                 runtime configuration]]
-    [[`--hpx:exit`]             [exit after configuring the runtime]]
-
-    [[[*HPX debugging options]]]
-    [[`--hpx:list-symbolic-names`][list all registered symbolic names after startup]]
-    [[`--hpx:list-component-types`][list all dynamic component types after startup]]
-    [[`--hpx:dump-config-initial`][print the initial runtime configuration]]
-    [[`--hpx:dump-config`]      [print the final runtime configuration]]
-    [[`--hpx:debug-hpx-log`]    [enable all messages on the HPX log channel and send all
-                                 HPX logs to the target destination]]
-    [[`--hpx:debug-agas-log`]   [enable all messages on the AGAS log channel and send all
-                                 AGAS logs to the target destination]]
-    [[`--hpx:debug-clp`]        [debug command line processing]]
-
-    [[[*HPX options related to performance counters]]]
-    [[`--hpx:print-counter`]    [print the specified performance counter either repeatedly or
-                                 before shutting down the system (see option --hpx:print-counter-interval)]]
-    [[`--hpx:print-counter-interval`][print the performance counter(s) specified with --hpx:print-counter
-                                 repeatedly after the time interval (specified in milliseconds)
-                                 (default: 0, which means print once at shutdown)]]
-    [[`--hpx:print-counter-destination`][print the performance counter(s) specified with --hpx:print-counter
-                                 to the given file (default: console)]]
-    [[`--hpx:list-counters`]    [list the names of all registered performance counters]]
-    [[`--hpx:list-counter-infos`][list the description of all registered performance counters]]
-]
-
-[endsect] [/ Command Line Handling]
 
 [endsect] [/ Getting Started]
 

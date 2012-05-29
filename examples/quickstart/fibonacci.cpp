@@ -41,8 +41,10 @@ boost::uint64_t fibonacci(boost::uint64_t n)
     // heavy workload.
     using hpx::lcos::future;
     using hpx::async;
-    future<boost::uint64_t> n1 = async<fibonacci_action>(locality_id, n - 1);
-    future<boost::uint64_t> n2 = async<fibonacci_action>(locality_id, n - 2);
+
+    fibonacci_action fib;
+    future<boost::uint64_t> n1 = async(fib, locality_id, n - 1);
+    future<boost::uint64_t> n2 = async(fib, locality_id, n - 2);
 
     return n1.get() + n2.get();   // wait for the Futures to return their values
 }
@@ -59,13 +61,9 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Keep track of the time required to execute.
         hpx::util::high_resolution_timer t;
 
-        // Create a Future for the whole calculation, execute it locally, and
-        // wait for it.
-        hpx::lcos::future<boost::uint64_t> f =
-            hpx::async<fibonacci_action>(hpx::find_here(), n);
-
-        // wait for future f to return value
-        boost::uint64_t r = f.get();
+        // Wait for fib() to return the value
+        fibonacci_action fib;
+        boost::uint64_t r = fib(hpx::find_here(), n);
 
         char const* fmt = "fibonacci(%1%) == %2%\nelapsed time: %3% [s]\n";
         std::cout << (boost::format(fmt) % n % r % t.elapsed());
@@ -92,11 +90,4 @@ int main(int argc, char* argv[])
     // Initialize and run HPX
     return hpx::init(desc_commandline, argc, argv);
 }
-//` In HPX `main` is used to initialize the runtime system and pass the command
-//` line arguments to the program. If you wish to add command line options to
-//` your program you would add them here using the instance of the Boost
-//` class `options_description`, and invoking the public member function
-//` `.add_options()` (see __boost_doc__ or the __fibonacci_example__
-//` for more details). `hpx::init()` calls `hpx_main` after setting up
-//` HPX, which is where the logic of our program is encoded.
 //]

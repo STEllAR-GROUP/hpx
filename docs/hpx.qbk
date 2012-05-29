@@ -97,7 +97,6 @@
 
 [/ Section link shortcuts]
 [def __pbs__                    [link hpx.tutorial.getting_started.unix_pbs PBS]]
-[def __commandline__            [link hpx.tutorial.getting_started.commandline HPX Command Line Options]]
 
 [def __fibonacci_example__      [link hpx.tutorial.examples.fibonacci Fibonacci Example]]
 [def __hello_world_example__    [link hpx.tutorial.examples.hello_world Hello World Example]]
@@ -107,11 +106,13 @@
 [def __getting_started__        [link hpx.tutorial.getting_started Getting Started]]
 [def __intro__                  [link hpx.tutorial.intro Introduction]]
 
-[template hpx_cmdline[str]      [link hpx.tutorial.getting_started.commandline [str]]]
 
 [def __configuration__          [link hpx.manual.init.configuration Configure HPX Applications]]
 [def __inifirmat__              [link hpx.manual.init.configuration.ini_format The HPX INI File Format]]
 [def __exceptions__             [link hpx.manual.exceptions Working with exceptions]]
+[def __commandline__            [link hpx.manual.init.commandline HPX Command Line Options]]
+
+[template hpx_cmdline[str] [link hpx.manual.init.commandline [str]]]
 
 [template hpx_link[url txt]     '''<ulink url="file:///'''__hpx_source_dir__/[url]'''">'''[txt]'''</ulink>''']
 

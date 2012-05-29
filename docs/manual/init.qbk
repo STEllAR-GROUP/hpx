@@ -26,9 +26,10 @@ application to configure different aspects of the runtime system.
 In addition to the ini files any application can supply its own configuration
 files which will be merged with the configuration database as well. Moreover,
 the user can specify additional configuration parameters on the command
-line when executing an application. The _-hpx__ runtime system will merge all
-command line configuration options (see the description of the `--hpx::ini`,
-`--hpx:config`, and `--hpx::app-config` command line options).
+line when executing an application. The __hpx__ runtime system will merge all
+command line configuration options (see the description of the
+[hpx_cmdline `--hpx::ini`], [hpx_cmdline `--hpx:config`], and
+[hpx_cmdline `--hpx::app-config`] command line options).
 
 
 [/////////////////////////////////////////////////////////////////////////////]
@@ -38,7 +39,7 @@ All __hpx__ applications can be configured using a special file format which is
 similar to the well known __ini_file_format__. This is a structured text format
 allowing to group key/value pairs (properties) into sections. The basic element
 contained in an ini file is the property. Every property has a name and a
-value, delimited by an equals sign (=). The name appears to the left of the
+value, delimited by an equals sign (`'='`). The name appears to the left of the
 equals sign:
 ``
     name=value
@@ -96,7 +97,7 @@ expression will evaluate to an empty string.
       and not when the configuration data is initialized. This allows for lazy
       evaluation and relaxes initialization order of different sections. The
       only exception are recursive property values, e.g. values referring to
-      the very key they are associated with. Those property values are evaluate
+      the very key they are associated with. Those property values are evaluated
       at initialization time to avoid infinite recursion.]
 [c++]
 
@@ -112,7 +113,7 @@ all configuration properties.
 
 As a first step the internal configuration database is filled with a set of
 default configuration properties. Those settings are described on a section
-by section basis.
+by section basis below.
 
 ['[*The `system` Configuration Section]]
 
@@ -126,10 +127,13 @@ by section basis.
 
 [table
     [[Property]         [Description]                                 [Remark]]
-    [[`system.pid`]     [This is initialized to store the current
-                         OS-process id of the application instance]   [dynamic information]]
-    [[`system.prefix`]  [This is initialized to the base directory
-                         __hpx__ has been loaded from.]               [dynamic information]]
+    [[`system.pid`]
+     [This is initialized to store the current OS-process id of the application
+      instance]
+     [dynamic information]]
+    [[`system.prefix`]
+     [This is initialized to the base directory __hpx__ has been loaded from.]
+     [dynamic information]]
 ]
 
 ['[*The `hpx` Configuration Section]]
@@ -140,25 +144,28 @@ by section basis.
     location = ${HPX_LOCATION:$[system.prefix]}
     component_path = $[hpx.location]/lib/hpx
     ini_path = $[hpx.location]/share/hpx-<version>/ini
-    finalize_wait_time = ${HPX_FINALIZE_WAIT_TIME:-1.0}
-    shutdown_timeout = ${HPX_SHUTDOWN_TIMEOUT:-1.0}
     default_stack_size = ${HPX_DEFAULT_STACK_SIZE:<hpx_default_stack_size>}
 ``
 [c++]
 
 [table
-    [[Property]                 [Description]                                 [Remark]]
-    [[`hpx.location`]           [This is initialized to the id of the
-                                 locality this application instance is
-                                 running on.]                                 [dynamic information]]
-    [[`hpx.component_path`]     [This is initialized to the default
-                                 directory where the __hpx__ runtime
-                                 library will look for installed
-                                 components.]                                 [static information]]
-    [[`hpx.ini_path`]           [ ]                     [static information]]
-    [[`hpx.finalize_wait_time`] [ ]               [static information]]
-    [[`hpx.shutdown_timeout`]   [ ]               [static information]]
-    [[`hpx.default_stack_size`] [ ]               [static information, depending on compile time preprocessor constant (`HPX_DEFAULT_STACK_SIZE`)]]
+    [[Property]                 [Description]                         [Remark]]
+    [[`hpx.location`]
+     [This is initialized to the id of the locality this application instance
+      is running on.]
+     [dynamic information]]
+    [[`hpx.component_path`]
+     [This is initialized to the default directory where the __hpx__ runtime
+      library will look for installed components.]
+     [static information]]
+    [[`hpx.ini_path`]
+     [This is initialized to the default path of the main hpx.ini configuration
+      file]
+     [static information, depends on __hpx__'s installation path]]
+    [[`hpx.default_stack_size`]
+     [This is initialized to the default stack size to be used by HPX-threads]
+     [static information, depends on the compile time preprocessor constant
+      `HPX_DEFAULT_STACK_SIZE` (`0x8000`)]]
 ]
 
 ['[*The `hpx.components` Configuration Section]]
@@ -171,8 +178,14 @@ by section basis.
 [c++]
 
 [table
-    [[Property]             [Description]                                 [Remark]]
-    [[`hpx.components.load_external`] [ ]               [ ]]
+    [[Property]                 [Description]                         [Remark]]
+    [[`hpx.components.load_external`]
+     [This entry defines whether external components will be loaded on this
+      locality.]
+     [This entry normally is set to `1` and usuallay there is no need to directly
+      change this value. It is automatically set to `0` for a dedicated AGAS
+      server locality.]
+    ]
 ]
 
 Additionally, the section `hpx.components` will be populated with the
@@ -189,10 +202,28 @@ of the components will contain at least the folowing properties:
 [c++]
 
 [table
-    [[Property]             [Description]                                 [Remark]]
-    [[`hpx.components.load_external`] [ ]               [ ]]
+    [[Property]                 [Description]                         [Remark]]
+    [[`hpx.components.<component_instance_name>.name`]
+     [This is the name of a component, usually the same as the second argument
+      to the macro used while registering the component with
+      [macroref HPX_REGISTER_MINIMAL_COMPONENT_FACTORY `HPX_REGISTER_MINIMAL_COMPONENT_FACTORY`]]
+      [dynamic information, filled by the component]]
+    [[`hpx.components.<component_instance_name>.path`]
+     [This is either the full path file name of the component module or the
+      directory the component module is located in. In this case, the component
+      module name will be derived from the property
+      `hpx.components.<component_instance_name>.name`]
+     [dynamic information, filled by the component]]
+    [[`hpx.components.<component_instance_name>.enabled`]
+     [This setting allows to explicitly enable or disable the component.]
+     [This is an optional property, __hpx__ assumed that the component is
+      enabled if it is not defined.]]
 ]
 
+The value for `<component_instance_name>` is usually the same as for the
+corresponding `name` property. However generally it can be defined to any
+arbitrary instance name. It is used to distinguish between different ini
+sections, one for each component.
 
 
 ['[*The `hpx.parcel` Configuration Section]]
@@ -208,11 +239,33 @@ of the components will contain at least the folowing properties:
 [c++]
 
 [table
-    [[Property]             [Description]                                 [Remark]]
-    [[`hpx.parcel.address`] [ ]               [ ]]
-    [[`hpx.parcel.port`] [ ]               [ ]]
-    [[`hpx.parcel.max_connections_cache_size`] [ ]               [ ]]
-    [[`hpx.parcel.max_connections_per_locality`] [ ]               [ ]]
+    [[Property]                 [Description]                         [Remark]]
+    [[`hpx.parcel.address`]
+     [This property defines the default IP address to be used for the parcel
+      layer to listen on. This IP address will be used as long as no other
+      values are specified (for instance using the [hpx_cmdline `--hpx:hpx`]
+      command line option). The expected format is any valid IP address or
+      domain name format which can be resolved into an IP address.]
+     [static information, the default depends on the compile time preprocessor
+      constant `HPX_INITIAL_IP_ADDRESS` (`"127.0.0.1"`)]]
+    [[`hpx.parcel.port`]
+     [This property defines the default IP port to be used for the parcel
+      layer to listen on. This IP port will be used as long as no other
+      values are specified (for instance using the [hpx_cmdline `--hpx:hpx`]
+      command line option). ]
+     [static information, the default depends on the compile time preprocessor
+      constant `HPX_INITIAL_IP_PORT` (`7010`)]]
+    [[`hpx.parcel.max_connections_cache_size`]
+     [This property defines how many network connections between different
+      localities are overall kept alive by each of the localities by the parcel
+      layer.]
+     [static information, the default depends on the compile time preprocessor
+      constant `HPX_MAX_PARCEL_CONNECTION_CACHE_SIZE` (`256`)]]
+    [[`hpx.parcel.max_connections_per_locality`]
+     [This property defines how many network connections between two localities
+      are kept alive by the parcel layer.]
+     [static information, the default depends on the compile time preprocessor
+      constant `HPX_MAX_PARCEL_CONNECTIONS_PER_LOCALITY` (`2`)]]
 ]
 
 ['[*The `hpx.agas` Configuration Section]]
@@ -222,9 +275,9 @@ of the components will contain at least the folowing properties:
     [hpx.agas]
     address = ${HPX_AGAS_SERVER_ADDRESS:<hpx_initial_ip_address>}
     port = ${HPX_AGAS_SERVER_PORT:<hpx_initial_ip_port>}
-    max_pending_refcnt_requests = ${HPX_AGAS_MAX_PENDING_REFCNT_REQUESTS:<hpx_initial_agas_max_pending_refcnt_requests>}
     service_mode = hosted
     dedicated_server = 0
+    max_pending_refcnt_requests = ${HPX_AGAS_MAX_PENDING_REFCNT_REQUESTS:<hpx_initial_agas_max_pending_refcnt_requests>}
     local_cache_size = ${HPX_AGAS_LOCAL_CACHE_SIZE:<hpx_initial_agas_local_cache_size>}
     use_range_caching = ${HPX_AGAS_USE_RANGE_CACHING:1}
     use_caching = ${HPX_AGAS_USE_CACHING:1}
@@ -232,18 +285,66 @@ of the components will contain at least the folowing properties:
 [c++]
 
 [table
-    [[Property]             [Description]                                 [Remark]]
-    [[`hpx.agas.address`] [ ]               [ ]]
-    [[`hpx.agas.port`] [ ]               [ ]]
-    [[`hpx.agas.max_pending_refcnt_requests`] [ ]               [ ]]
-    [[`hpx.agas.service_mode`] [ ]               [ ]]
-    [[`hpx.agas.dedicated_server`] [ ]               [ ]]
-    [[`hpx.agas.local_cache_size`] [ ]               [ ]]
-    [[`hpx.agas.use_range_caching`] [ ]               [ ]]
-    [[`hpx.agas.use_caching`] [ ]               [ ]]
+    [[Property]                 [Description]                         [Remark]]
+    [[`hpx.agas.address`]
+     [This property defines the default IP address to be used for the AGAS root
+      server. This IP address will be used as long as no other
+      values are specified (for instance using the [hpx_cmdline `--hpx:agas`]
+      command line option). The expected format is any valid IP address or
+      domain name format which can be resolved into an IP address.]
+     [static information, the default depends on the compile time preprocessor
+      constant `HPX_INITIAL_IP_ADDRESS` (`"127.0.0.1"`)]]
+    [[`hpx.agas.port`]
+     [This property defines the default IP port to be used for the AGAS root
+      server. This IP port will be used as long as no other
+      values are specified (for instance using the [hpx_cmdline `--hpx:agas`]
+      command line option). ]
+     [static information, the default depends on the compile time preprocessor
+      constant `HPX_INITIAL_IP_PORT` (`7010`)]]
+    [[`hpx.agas.service_mode`]
+     []
+     []]
+    [[`hpx.agas.dedicated_server`]
+     []
+     []]
+    [[`hpx.agas.max_pending_refcnt_requests`]
+     []
+     []]
+    [[`hpx.agas.local_cache_size`]
+     []
+     []]
+    [[`hpx.agas.use_range_caching`]
+     []
+     []]
+    [[`hpx.agas.use_caching`]
+     []
+     []]
 ]
 
 [endsect] [/ Default Configuration Settings]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:loading_ini_files Loading INI Files]
+
+[fixme Describe the sequence of file system locations which are tried in order
+       to load additional configuration information]
+
+[endsect] [/ Loading INI Files]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:commandline Command Line Configuration]
+
+[fixme Describe what command line options can be used to add configuration
+       information]
+
+[endsect] [/ Command Line Configuration]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:loading_components Loading Components]
+
+[fixme Describe how components are located and loaded at startup/]
+
+[endsect] [/ Loading Components]
 
 [endsect] [/ Configure HPX Applications]
 
@@ -424,6 +525,101 @@ output file. The logging format is set to leave the original logging output
 unchanged, as received from one of the localities the application runs on.
 
 [endsect] [/ Logging]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:commandline HPX Command Line Options]
+
+The predefined command line options for any application using `hpx::init` are
+described in the table below:
+
+[/ TODO: proofread the options]
+[table:commandline Default HPX Command Line Options
+    [[Option]                   [Description]]
+    [[[*HPX options (allowed on command line only)]]]
+    [[`--hpx:help`, `--help` or `-h`]       [print out program usage]]
+    [[`--hpx:version`, `--version` or `-v`] [print out HPX version and copyright information]]
+    [[`--hpx:options-file arg`]             [specify a file containing command line options
+                                             (alternatively: @filepath)]]
+
+    [[[*HPX options (additionally allowed in an options file)]]]
+    [[`--hpx:worker`]           [run this instance in worker mode]]
+    [[`--hpx:console`]          [run this instance in console mode]]
+    [[`--hpx:connect`]          [run this instance in worker mode, but connecting
+                                 late]]
+    [[`--hpx:run-agas-server`]  [run AGAS server as part of this runtime instance]]
+    [[`--hpx:run-hpx-main`]     [run the hpx_main function, regardless of locality
+                                 mode]]
+    [[`--hpx:hpx arg`]          [the IP address the HPX parcelport is listening
+                                 on, expected format: 'address:port' (default:
+                                 127.0.0.1:7910)]]
+    [[`--hpx:agas arg`]         [the IP address the AGAS root server is running on,
+                                 expected format: 'address:port' (default:
+                                 127.0.0.1:7910)]]
+    [[`--hpx:run-agas-server-only`][run only the AGAS server]]
+    [[`--hpx:nodefile arg`]     [the file name of a node file to use (list of nodes, one
+                                 node name per line and core)]]
+    [[`--hpx:nodes arg`]        [the (space separated) list of the nodes to use (usually
+                                 this is extracted from a node file)]]
+    [[`--hpx:ifsuffix arg`]     [suffix to append to host names in order to resolve them
+                                 to the proper network interconnect]]
+    [[`--hpx:ifprefix arg`]     [prefix to prepend to host names in order to resolve them
+                                 to the proper network interconnect]]
+    [[`--hpx:iftransform arg`]  [sed-style search and replace (s/search/replace/) used to
+                                 transform host names to the proper network interconnect]]
+    [[`--hpx:localities arg`]   [the number of localities to wait for at
+                                 application startup (default: 1)]]
+    [[`--hpx:node arg`]         [number of the node this locality is run on
+                                 (must be unique)]]
+    [[`--hpx:pu-offset`]        [the first processing unit this instance of HPX should be
+                                 run on (default: 0)]]
+    [[`--hpx:pu-step`]          [the step between used processing unit numbers for this
+                                 instance of HPX (default: 1)]]
+    [[`--hpx:threads arg`]      [the number of operating system threads to spawn
+                                 for this HPX locality (default: 1)]]
+    [[`--hpx:queuing arg`]      [the queue scheduling policy to use, options are
+                                 'local/l', 'priority_local/pr', 'abp/a', 'priority_abp',
+                                 'hierarchy/h', and 'periodic/pe' (default: priority_local/p)]]
+    [[`--hpx:hierarchy-arity`]  [the arity of the of the thread queue tree, valid for
+                                 --hpx:queuing=hierarchy only (default: 2)]]
+    [[`--hpx:high-priority-threads arg`] [the number of operating system threads
+                                 maintaining a high priority queue (default:
+                                 number of OS threads), valid for
+                                 --hpx:queuing=priority_local only]]
+    [[`--hpx:numa-sensitive`]   [makes the priority_local scheduler NUMA sensitive, valid for
+                                 --hpx:queuing=priority_local only]]
+
+    [[[*HPX configuration options]]]
+    [[`--hpx:app-config arg`]   [load the specified application configuration
+                                 (ini) file]]
+    [[`--hpx:config arg`]       [load the specified hpx configuration (ini) file]]
+    [[`--hpx:ini arg`]          [add a configuration definition to the default
+                                 runtime configuration]]
+    [[`--hpx:exit`]             [exit after configuring the runtime]]
+
+    [[[*HPX debugging options]]]
+    [[`--hpx:list-symbolic-names`][list all registered symbolic names after startup]]
+    [[`--hpx:list-component-types`][list all dynamic component types after startup]]
+    [[`--hpx:dump-config-initial`][print the initial runtime configuration]]
+    [[`--hpx:dump-config`]      [print the final runtime configuration]]
+    [[`--hpx:debug-hpx-log`]    [enable all messages on the HPX log channel and send all
+                                 HPX logs to the target destination]]
+    [[`--hpx:debug-agas-log`]   [enable all messages on the AGAS log channel and send all
+                                 AGAS logs to the target destination]]
+    [[`--hpx:debug-clp`]        [debug command line processing]]
+
+    [[[*HPX options related to performance counters]]]
+    [[`--hpx:print-counter`]    [print the specified performance counter either repeatedly or
+                                 before shutting down the system (see option --hpx:print-counter-interval)]]
+    [[`--hpx:print-counter-interval`][print the performance counter(s) specified with --hpx:print-counter
+                                 repeatedly after the time interval (specified in milliseconds)
+                                 (default: 0, which means print once at shutdown)]]
+    [[`--hpx:print-counter-destination`][print the performance counter(s) specified with --hpx:print-counter
+                                 to the given file (default: console)]]
+    [[`--hpx:list-counters`]    [list the names of all registered performance counters]]
+    [[`--hpx:list-counter-infos`][list the description of all registered performance counters]]
+]
+
+[endsect] [/ Command Line Handling]
 
 [endsect]
 

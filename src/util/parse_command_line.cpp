@@ -298,7 +298,7 @@ namespace hpx { namespace util
                 ("hpx:run-hpx-main",
                   "run the hpx_main function, regardless of locality mode")
                 ("hpx:agas", value<std::string>(),
-                  "the IP address the AGAS server is running on, "
+                  "the IP address the AGAS root server is running on, "
                   "expected format: `address:port' (default: "
                   "127.0.0.1:7910)")
                 ("hpx:run-agas-server-only", "run only the AGAS server")
