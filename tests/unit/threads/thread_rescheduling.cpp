@@ -101,10 +101,16 @@ void tree_boot(
   , boost::uint64_t thread
     );
 
+#ifdef __GNUG__
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wredundant-decls"
+#endif
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
 HPX_PLAIN_ACTION(tree_boot, tree_boot_action)
+#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic pop
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 void tree_boot(
