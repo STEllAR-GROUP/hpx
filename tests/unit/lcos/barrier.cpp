@@ -93,8 +93,14 @@ int main(int argc, char* argv[])
             "the number of times to repeat the test") 
         ;
 
+    // We force this test to use several threads by default.
+    using namespace boost::assign;
+    std::vector<std::string> cfg;
+    cfg += "hpx.os_threads=" +
+        boost::lexical_cast<std::string>(hpx::thread::hardware_concurrency());
+
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(init(desc_commandline, argc, argv), 0,
+    HPX_TEST_EQ_MSG(init(desc_commandline, argc, argv, cfg), 0,
       "HPX main exited with non-zero status");
     return report_errors();
 }
