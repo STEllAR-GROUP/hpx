@@ -187,6 +187,8 @@ QuickBook can be found in the collection of __boost_tools__.
 
 [? __hpx_doxygen__ [xinclude __hpx_docs_dir__/hpx_autodoc.xml]]
 
+[include terminology.qbk]
+
 [/////////////////////////////////////////////////////////////////////////////]
 [include people.qbk]
 

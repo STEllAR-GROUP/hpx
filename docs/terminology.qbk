@@ -1,0 +1,85 @@
+[/==============================================================================
+    Copyright (C) 2007-2012 Hartmut Kaiser
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+===============================================================================/]
+
+[section:terminology Terminology]
+
+This section gives definitions for some of the terms used throughout the
+__hpx__ documentation and source code.
+
+[heading:locality Locality]
+
+A locality in __hpx__ describes a synchronous domain of execution, or the
+domain of bounded upper response time. This normally is just a single node in a
+cluster or a NUMA domain in a SMP machine.
+
+[heading:agas Active Global Address Space (AGAS)]
+
+__hpx__ incorporates a global address space. Any executing thread can access
+any object within the domain of the parallel application with the caveat that
+it must have appropriate access privileges. The model does not assume that
+global addresses are cache coherent; all loads and stores will deal directly
+with the site of the target object. All global addresses within a Synchronous
+Domain are assumed to be cache coherent for those processor cores that
+incorporate transparent caches. The Active Global Address Space used by
+__hpx__ differs from research __pgas__ models. Partitioned Global Address
+Space is passive in their means of address translation. Copy semantics,
+distributed compound operations and affinity relationships are some of the
+global functionality supported by AGAS.
+
+[heading:process Process]
+
+The concept of the "process" in __hpx__ is extended beyond that of either
+sequential execution or communicating sequential processes. While the notion
+of process suggests action (as do "function" or "subroutine") it has a further
+responsibility of context, that is, the logical container of program state.
+It is this aspect of operation that process is employed in __hpx__. Furthermore,
+referring to "parallel processes" in __hpx__ designates the presence of
+parallelism within the context of a given process, as well as the coarse grained
+parallelism achieved through concurrency of multiple processes of an executing
+user job. __hpx__ processes provide a hierarchical name space within the
+framework of the active global address space and support multiple means of
+internal state access from external sources. It also incorporates capabilities
+based access rights for protection and security.
+
+[heading:parcel Parcel]
+
+The Parcel is a component in __hpx__ that communicates data, invokes an action
+at a distance, and distributes flow-control through the migration of
+continuations. Parcels bridge the gap of asynchrony between synchronous domains
+while maintaining symmetry of semantics between local and global execution.
+Parcels enable message-driven computation and may be seen as a form of
+"active messages". Other important forms of message-driven computation
+predating active messages include
+[@http://en.wikipedia.org/wiki/Dataflow_architecture dataflow tokens], the
+[@http://en.wikipedia.org/wiki/J%E2%80%93Machine J-machine's] support for
+remote method instantiation, and at the coarse grained variations of Unix
+remote procedure calls, among others. This enables work to be moved to the
+data as well as performing the more common get action of bringing data to
+the work. A parcel can cause actions to occur remotely and asynchronously,
+among which are the creation of threads at different system nodes or
+synchronous domains.
+
+[heading:lco Local Control Object (LCO)]
+
+A local control object (sometimes called a lightweight control object) is a
+general term for the synchronization mechanisms used in __hpx__. Any object
+implementing a certain concept can be seen as an LCO. This concepts encapsulates
+the ability to be triggered by one or more events which when taking the object
+into a predefined state will cause a thread to be executed. This could either
+create a new thread or resume an existing thread.
+
+The LCO is a family of synchronization functions potentially representing many
+classes of synchronization constructs, each with many possible variations and
+multiple instances. The LCO is sufficiently general that it can subsume the
+functionality of conventional synchronization primitives such as spinlocks,
+mutexes, semaphores, and global barriers. However due to the rich concept
+and LCO can represent powerful synchronization and control
+functionality not widely employed, such as dataflow and futures among others
+which open up enormous opportunities for rich diversity of distributed
+control and operation.
+
+[endsect] [/ Terminology]
