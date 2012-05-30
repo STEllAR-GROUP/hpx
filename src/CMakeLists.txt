@@ -64,7 +64,7 @@ add_hpx_library_sources(hpx_serialization
 # libhpx sources
 add_hpx_library_sources(hpx
   GLOB GLOBS "${hpx_SOURCE_DIR}/src/*.cpp"
-  EXCLUDE ".*hpx_.*.cpp")
+  EXCLUDE ".*(hpx_main|hpx_init)[.]cpp")
 add_hpx_library_sources(hpx
   GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/runtime/*.cpp"
   APPEND)
