@@ -426,7 +426,7 @@ namespace hpx { namespace traits
 /// the macro \a HPX_PLAIN_ACTION is recommend.
 ///
 #define HPX_REGISTER_PLAIN_ACTION(action_type)                                \
-    HPX_REGISTER_PLAIN_ACTION_EX2(action_type, plain_action,                  \
+    HPX_REGISTER_PLAIN_ACTION_EX2(action_type, action_type,                   \
         ::hpx::components::factory_check)                                     \
     /**/
 
