@@ -202,10 +202,8 @@ operator<< (std::basic_ostream<Char, Traits>& os, gva const& addr)
 #endif
 BOOST_CLASS_VERSION(hpx::agas::gva, HPX_AGAS_VERSION)
 BOOST_CLASS_TRACKING(hpx::agas::gva, boost::serialization::track_never)
-#ifdef __GNUG__
 #if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
 #pragma GCC diagnostic pop
-#endif
 #endif
 
 #endif // HPX_83DB815F_26D5_4525_AC5B_E702FBD886D4

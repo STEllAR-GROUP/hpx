@@ -143,7 +143,8 @@ by section basis below.
     [hpx]
     location = ${HPX_LOCATION:$[system.prefix]}
     component_path = $[hpx.location]/lib/hpx
-    ini_path = $[hpx.location]/share/hpx-<version>/ini
+    master_ini_path = $[hpx.location]/share/hpx-<version>
+    ini_path = $[hpx.master_ini_path]/ini
     default_stack_size = ${HPX_DEFAULT_STACK_SIZE:<hpx_default_stack_size>}
 ``
 [c++]
@@ -158,9 +159,15 @@ by section basis below.
      [This is initialized to the default directory where the __hpx__ runtime
       library will look for installed components.]
      [static information]]
-    [[`hpx.ini_path`]
+    [[`hpx.master_ini_path`]
      [This is initialized to the default path of the main hpx.ini configuration
       file]
+     [static information, depends on __hpx__'s installation path]]
+    [[`hpx.ini_path`]
+     [This is initialized to the default path where __hpx__ will look for more
+      ini configuration files. The value of this property will be interpreted
+      as a list of directories delited by `':'` (on Windows `';'`), each of
+      which will be scanned for ini files.]
      [static information, depends on __hpx__'s installation path]]
     [[`hpx.default_stack_size`]
      [This is initialized to the default stack size to be used by HPX-threads]
@@ -326,8 +333,45 @@ sections, one for each component.
 [/////////////////////////////////////////////////////////////////////////////]
 [section:loading_ini_files Loading INI Files]
 
-[fixme Describe the sequence of file system locations which are tried in order
-       to load additional configuration information]
+During startup and after the internal database has been initialized as
+described in the section __config_defaults__, __hpx__ will try to locate and
+load additional ini files to be used as a source for configuration properties.
+This allows for a wide spectrum of additional customization possibilities by
+the user and system administrators. The sequence of locations where __hpx__
+will try loading the ini files is well defined and documented in this section.
+All ini files found are merged into the internal configuration database.
+The merge operation itself conforms to the rules as described in the section
+__iniformat__.
+
+# Load a file named `hpx.ini` in the directory referenced by the property
+  `hpx.master_ini_path`.
+# Load a file named `.hpx.ini` in the current working directory, e.g. the
+  directory the application was invoked from.
+# Load a file referenced by the environment variable `HPX_INI`. This
+  variable is expected to provide the full path name of the ini configuration
+  file (if any).
+# Load a file named `/etc/hpx.ini`. This lookup is done on Linux systems
+  only.
+# Load a file named `.hpx.ini` in the home directorz of the current user,
+  e.g. the directory refernced by the environment variable `HOME`.
+# Load a file named `.hpx.ini` in the directory refernced by the environment
+  variable `PWD`.
+# Load the file specified on the command line using the option
+  [hpx_cmdline `--hpx:config].
+# Load files based on the pattern `*.ini` in all directories listed by the
+  property `hpx.ini_path`. Allfiles found during this search will be merged.
+# Load the file specified on the command line using the option
+  [hpx_cmdline `--hpx:app-config`]. Note that this file will be merged as the
+  content for a top level section `[application]`.
+
+[note Any changes made to the configuration dabase caused by one of the files
+      will influence the loading process for all subsequent files. For instance,
+      if one of the ini files loaded changes the property `hpx.ini_path`, this
+      will influence the directories searched in the step 8 as described
+      above.]
+
+If any of the environment variables or files listed above is not found the
+corresponding loading step will be silently skipped.
 
 [endsect] [/ Loading INI Files]
 
