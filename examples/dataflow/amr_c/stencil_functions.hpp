@@ -17,12 +17,12 @@ namespace hpx { namespace components { namespace amr
 ///////////////////////////////////////////////////////////////////////////////
 /// The function \a generate_initial_data will be called to initialize the
 /// given instance of 'stencil_data'
-HPX_COMPONENT_EXPORT int generate_initial_data(
+HPX_LIBRARY_EXPORT int generate_initial_data(
     stencil_data* data, int item, int maxitems, int row, detail::parameter const& par);
 
 /// The function \a evaluate_timestep will be called to compute the result data
 /// for the given timestep
-HPX_COMPONENT_EXPORT int rkupdate(std::vector<access_memory_block<stencil_data> > const&val,
+HPX_LIBRARY_EXPORT int rkupdate(std::vector<access_memory_block<stencil_data> > const&val,
     stencil_data *result,
     std::vector<int> &src, std::vector<int> &vsrc,double dt,double dx,double t,
     int nx0, int ny0, int nz0,
