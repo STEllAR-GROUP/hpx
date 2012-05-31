@@ -1,4 +1,9 @@
 Matthew Anderson
+31 May 2012
+Update:  The code can now take an arbitrary number of stencils (specified by parameter nx0) 
+as long as the parameter nx0 is >= 3. 
+This simplifies tests on multiple localities and checks serialization.  
+
 2 Aug 2011
 This simple example illustrates a dataflow component called unigrid_mesh which creates 
 two rows of three stencils set up

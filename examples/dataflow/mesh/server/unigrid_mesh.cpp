@@ -421,8 +421,34 @@ namespace hpx { namespace components { namespace amr { namespace server
       // vport is the output port number; increases consecutively
       std::vector<int> vcolumn,vstep,vsrc_column,vsrc_step,vport;
 
-      //using namespace boost::assign;
+      std::size_t end = par->nx0-1;
 
+      std::size_t sstart, sstop;
+      for ( std::size_t k=0;k<2;k++) {
+        if ( k == 0 ) {
+          sstart = 0;
+          sstop = 1;
+        } else {
+          sstart = 1;
+          sstop = 0;
+        }
+        vsrc_step.push_back(sstart);vsrc_column.push_back(end);vstep.push_back(sstop);vcolumn.push_back(0);vport.push_back(0);
+        vsrc_step.push_back(sstart);vsrc_column.push_back(0);vstep.push_back(sstop);vcolumn.push_back(0);vport.push_back(1);
+        vsrc_step.push_back(sstart);vsrc_column.push_back(1);vstep.push_back(sstop);vcolumn.push_back(0);vport.push_back(2);
+
+        for (std::size_t i=1;i<end;i++) {
+          vsrc_step.push_back(sstart);vsrc_column.push_back(i-1);vstep.push_back(sstop);vcolumn.push_back(i);vport.push_back(0);
+          vsrc_step.push_back(sstart);vsrc_column.push_back(i);vstep.push_back(sstop);vcolumn.push_back(i);vport.push_back(1);
+          vsrc_step.push_back(sstart);vsrc_column.push_back(i+1);vstep.push_back(sstop);vcolumn.push_back(i);vport.push_back(2);
+        }
+
+        vsrc_step.push_back(sstart);vsrc_column.push_back(end-1);vstep.push_back(sstop);vcolumn.push_back(end);vport.push_back(0);
+        vsrc_step.push_back(sstart);vsrc_column.push_back(end);vstep.push_back(sstop);vcolumn.push_back(end);vport.push_back(1);
+        vsrc_step.push_back(sstart);vsrc_column.push_back(0);vstep.push_back(sstop);vcolumn.push_back(end);vport.push_back(2);
+      }
+
+      //using namespace boost::assign;
+#if 0
       vsrc_step.push_back(0);vsrc_column.push_back(2);vstep.push_back(1);vcolumn.push_back(0);vport.push_back(0);
       vsrc_step.push_back(0);vsrc_column.push_back(0);vstep.push_back(1);vcolumn.push_back(0);vport.push_back(1);
       vsrc_step.push_back(0);vsrc_column.push_back(1);vstep.push_back(1);vcolumn.push_back(0);vport.push_back(2);
@@ -446,6 +472,7 @@ namespace hpx { namespace components { namespace amr { namespace server
       vsrc_step.push_back(1);vsrc_column.push_back(1);vstep.push_back(0);vcolumn.push_back(2);vport.push_back(0);
       vsrc_step.push_back(1);vsrc_column.push_back(2);vstep.push_back(0);vcolumn.push_back(2);vport.push_back(1);
       vsrc_step.push_back(1);vsrc_column.push_back(0);vstep.push_back(0);vcolumn.push_back(2);vport.push_back(2);
+#endif
 
       // Create a ragged 3D array
       for (j=0;j<vsrc_step.size();j++) {

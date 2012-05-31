@@ -88,16 +88,16 @@ int hpx_main(variables_map& vm)
         section pars = *(root.get_section("dataflow"));
 
         appconfig_option<std::size_t>("loglevel", pars, par->loglevel);
-        //appconfig_option<std::size_t>("nx0", pars, par->nx0);
+        appconfig_option<std::size_t>("nx0", pars, par->nx0);
         appconfig_option<std::size_t>("nt0", pars, par->nt0);
         appconfig_option<std::size_t>("grain_size", pars, par->grain_size);
     }
 
     // derived parameters
-    if ( (par->nx0 % 2) == 0 )
+    if ( par->nx0 < 3 )
     {
         std::string msg = boost::str(boost::format(
-            "mesh dimensions (%1%) must be odd "
+            "mesh dimension (%1%) must be 3 or greater "
             ) % par->nx0 );
         HPX_THROW_IN_CURRENT_FUNC(bad_parameter, msg);
     }
