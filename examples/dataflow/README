@@ -4,6 +4,14 @@ Update:  The code can now take an arbitrary number of stencils (specified by par
 as long as the parameter nx0 is >= 3. 
 This simplifies tests on multiple localities and checks serialization.  
 
+The syntax for testing on several nodes explicitly has changed somewhat:
+
+in one console, type:
+./dataflow -p iddataflow -0 -l2
+
+in another console, type:
+./dataflow -p iddataflow -1 -l2
+
 2 Aug 2011
 This simple example illustrates a dataflow component called unigrid_mesh which creates 
 two rows of three stencils set up
