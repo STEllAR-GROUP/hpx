@@ -12,6 +12,7 @@ add_subdirectory(gtc_hpx)
 # for all targets specified above
 set(sources
     gtc_hpx_client.cpp
+    gtc/gtc.F90
     )
 
 source_group("Source Files" FILES ${sources})

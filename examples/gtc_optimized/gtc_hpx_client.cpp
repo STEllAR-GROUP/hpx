@@ -12,7 +12,7 @@
 
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
-//extern "C" {void FNAME(gtc)(char *datastem); }
+extern "C" {void FNAME(gtc)(); }
 
 bool fexists(std::string const filename)
 {
@@ -61,6 +61,9 @@ int hpx_main(boost::program_options::variables_map &vm)
      //     sprintf(datastem,"%s",parfilename.c_str());
      //     FNAME(gtc)(datastem);
      //   }
+        std::cout << " HELLO WORLD " << std::endl;
+        FNAME(gtc)();
+        std::cout << " HELLO WORLD A" << std::endl;
 #if 0
         // placeholder
         std::size_t const number_partitions = 2;
