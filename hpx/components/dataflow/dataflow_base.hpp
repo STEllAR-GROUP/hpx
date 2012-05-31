@@ -40,6 +40,11 @@ namespace hpx { namespace lcos
             return p.get_future();
         }
 
+        bool valid()
+        {
+            return impl && impl->get_gid();
+        }
+
     private:
         friend class boost::serialization::access;
 

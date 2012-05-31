@@ -25,6 +25,7 @@ if(HPX_CXX11_LAMBDAS)
         jacobi_hpx
         jacobi_hpx_simple
         jacobi_hpx_distributed_simple
+        jacobi_hpx_distributed_simple_2
         jacobi_nonuniform_hpx
       )
 
@@ -57,6 +58,7 @@ set(gs_single_sources gs.cpp grid.cpp)
 set(jacobi_hpx_sources gs.cpp grid.cpp)
 set(jacobi_hpx_simple_sources gs.cpp grid.cpp)
 set(jacobi_hpx_distributed_simple_sources gs.cpp grid.cpp)
+set(jacobi_hpx_distributed_simple_2_sources gs.cpp grid.cpp)
 set(jacobi_nonuniform_hpx_sources jacobi_nonuniform.cpp grid.cpp)
 set(gs_hpx_blocked_sources gs.cpp grid.cpp)
 set(gs_hpx_blocked_df_sources gs.cpp grid.cpp)
@@ -86,6 +88,7 @@ if(HPX_CXX11_LAMBDAS)
   set(jacobi_hpx_FLAGS DEPENDENCIES dataflow_component iostreams_component remote_object_component)
   set(jacobi_hpx_simple_FLAGS DEPENDENCIES dataflow_component iostreams_component remote_object_component)
   set(jacobi_hpx_distributed_simple_FLAGS DEPENDENCIES dataflow_component iostreams_component remote_object_component)
+  set(jacobi_hpx_distributed_simple_2_FLAGS DEPENDENCIES dataflow_component iostreams_component remote_object_component)
   set(jacobi_nonuniform_hpx_FLAGS DEPENDENCIES dataflow_component iostreams_component remote_object_component)
   set(gs_hpx_grid_ro_FLAGS DEPENDENCIES remote_object_component iostreams_component)
 endif()

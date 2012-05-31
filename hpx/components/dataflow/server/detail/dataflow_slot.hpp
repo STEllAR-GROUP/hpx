@@ -89,7 +89,14 @@ namespace hpx { namespace lcos { namespace server { namespace detail
             
             BOOST_ASSERT(get_gid());
 
-            dataflow_source.connect(get_gid());
+            if(dataflow_source.valid())
+            {
+                dataflow_source.connect(get_gid());
+            }
+            else
+            {
+                //this->set_value_nonvirt(remote_result());
+            }
         }
 
         void set_event()

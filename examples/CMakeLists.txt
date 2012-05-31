@@ -20,6 +20,7 @@ set(subdirs
     gtc
     heartbeat
     hplpx
+    jacobi
     nbody
     nqueen
     object_semaphore

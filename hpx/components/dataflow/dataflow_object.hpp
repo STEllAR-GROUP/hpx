@@ -160,6 +160,65 @@ namespace hpx { namespace components
                 );
         }
 
+        template <typename F, typename A0, typename A1, typename A2>
+        lcos::dataflow_base<
+            typename boost::result_of<typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<F>::type
+            >::type(T &)>::type
+        >
+        apply4(BOOST_FWD_REF(F) f, A0 const & a0, A1 const & a1, A2 const & a2) const
+        {
+            typedef
+                server::remote_object_apply_action2<
+                    remote_object::invoke_apply_fun<
+                        T
+                      , typename boost::remove_const<
+                            typename hpx::util::detail::remove_reference<F>::type
+                        >::type
+                    >
+                  , typename detail::dataflow_result<A0>::type
+                >
+                apply_action;
+
+
+            return lcos::dataflow<apply_action>(gid_
+                  , boost::move(remote_object::invoke_apply_fun<T, F>(boost::forward<F>(f)))
+                  , a0
+                  , a1
+                  , a2
+                );
+        }
+
+        template <typename F, typename A0, typename A1, typename A2, typename A3>
+        lcos::dataflow_base<
+            typename boost::result_of<typename boost::remove_const<
+                typename hpx::util::detail::remove_reference<F>::type
+            >::type(T &)>::type
+        >
+        apply5(BOOST_FWD_REF(F) f, A0 const & a0, A1 const & a1, A2 const & a2, A3 const & a3) const
+        {
+            typedef
+                server::remote_object_apply_action2<
+                    remote_object::invoke_apply_fun<
+                        T
+                      , typename boost::remove_const<
+                            typename hpx::util::detail::remove_reference<F>::type
+                        >::type
+                    >
+                  , typename detail::dataflow_result<A0>::type
+                >
+                apply_action;
+
+
+            return lcos::dataflow<apply_action>(gid_
+                  , boost::move(remote_object::invoke_apply_fun<T, F>(boost::forward<F>(f)))
+                  , a0
+                  , a1
+                  , a2
+                  , a3
+                );
+        }
+
         template <typename Archive>
         void serialize(Archive & ar, unsigned)
         {

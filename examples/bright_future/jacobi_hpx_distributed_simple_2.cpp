@@ -359,8 +359,10 @@ void gs(
         }
     }
 
-    std::size_t n_x_local_block = (n_x_local - 2)/block_size + 1;
-    std::size_t n_y_local_block = (n_y_local - 2)/block_size + 1;
+    std::size_t n_x_local_block = 0;
+    for(std::size_t x = 1; x < n_x_local; x += block_size, ++n_x_local_block);
+    std::size_t n_y_local_block = 0;
+    for(std::size_t y = 1; y < n_y_local; y += block_size, ++n_y_local_block);
 
     std::vector<grid<grid<promise> > >
         deps(
@@ -375,6 +377,7 @@ void gs(
                 )
             )
         );
+    grid<boost::array<promise, 4> > boundary_deps(dims[0], dims[1]);
 
     std::size_t src = 0;
     std::size_t dst = 1;
@@ -387,7 +390,125 @@ void gs(
         {
             for(std::size_t x_block = 0; x_block < dims[0]; ++x_block)
             {
-                promise_grid_type & cur_deps = deps.at(dst)(x_block, y_block);
+                if(iter > 0)
+                {
+                    range_type y_range(0, n_y_local);
+                    range_type x_range(0, n_x_local);
+                    // left neighbor:
+                    if(x_block > 0)
+                    {
+                        std::vector<promise > trigger;
+                        trigger.reserve(n_y_local);
+                        for(std::size_t y = 1, yy = 0; y < n_y_local; y += block_size, ++yy)
+                        {
+                            trigger.push_back(
+                                deps[src](x_block-1, y_block)(n_x_local_block - 1, yy)
+                            );
+                        }
+                        BOOST_ASSERT(trigger.size() > 0);
+                        boundary_deps(x_block, y_block)[0] =
+                        object_grid(x_block, y_block).apply3(
+                            update_left_boundary_fun(
+                                y_range
+                              , src
+                            )
+                          , object_grid(x_block-1, y_block).apply(
+                                get_col_fun(
+                                    y_range
+                                  , n_x_local-1
+                                  , src
+                                )
+                            )
+                          , dataflow_trigger(object_grid(x_block, y_block).gid_, trigger)
+                        );
+                    }
+                    // right neighbor:
+                    if(x_block + 1 < dims[0])
+                    {
+                        std::vector<promise > trigger;
+                        trigger.reserve(n_y_local);
+                        for(std::size_t y = 1, yy = 0; y < n_y_local; y += block_size, ++yy)
+                        {
+                            trigger.push_back(
+                                deps[src](x_block+1, y_block)(0, yy)
+                            );
+                        }
+                        boundary_deps(x_block, y_block)[1] =
+                        object_grid(x_block, y_block).apply3(
+                            update_right_boundary_fun(
+                                y_range
+                              , src
+                            )
+                          , object_grid(x_block + 1, y_block).apply(
+                                get_col_fun(
+                                    y_range
+                                  , 1
+                                  , src
+                                )
+                            )
+                          , dataflow_trigger(object_grid(x_block, y_block).gid_, trigger)
+                        );
+                    }
+                    // top neighbor:
+                    if(y_block > 0)
+                    {
+                        std::vector<promise > trigger;
+                        trigger.reserve(n_x_local);
+                        for(std::size_t x = 1, xx = 0; x < n_x_local; x += block_size, ++xx)
+                        {
+                            trigger.push_back(
+                                deps[src](x_block, y_block-1)(xx, n_y_local_block - 1)
+                            );
+                        }
+                        BOOST_ASSERT(trigger.size() > 0);
+                        boundary_deps(x_block, y_block)[2] =
+                        object_grid(x_block, y_block).apply3(
+                            update_top_boundary_fun(
+                                x_range
+                              , src
+                            )
+                          , object_grid(x_block, y_block - 1).apply(
+                                get_row_fun(
+                                    x_range
+                                  , n_y_local-1
+                                  , src
+                                )
+                            )
+                          , dataflow_trigger(object_grid(x_block, y_block).gid_, trigger)
+                        );
+                        //boundary_deps(x_block, y_block)[2].get_future().get();
+                    }
+                    // bottom neighbor:
+                    if(y_block + 1 < dims[1])
+                    {
+                        std::vector<promise > trigger;
+                        trigger.reserve(n_x_local);
+                        for(std::size_t x = 1, xx = 0; x < n_x_local; x += block_size, ++xx)
+                        {
+                            trigger.push_back(
+                                deps[src](x_block, y_block+1)(xx, 0)
+                            );
+                        }
+                        BOOST_ASSERT(trigger.size() > 0);
+                        boundary_deps(x_block, y_block)[3] =
+                        object_grid(x_block, y_block).apply3(
+                            update_bottom_boundary_fun(
+                                x_range
+                              , src
+                            )
+                          , object_grid(x_block, y_block + 1).apply(
+                                get_row_fun(
+                                    x_range
+                                  , 1
+                                  , src
+                                )
+                            )
+                          , dataflow_trigger(object_grid(x_block, y_block).gid_, trigger)
+                        );
+                        //boundary_deps(x_block, y_block)[3].get_future().get();
+                    }
+                }
+                promise_grid_type & cur_deps = deps[dst](x_block, y_block);
                 for(std::size_t y = 1, yy = 0; y < n_y_local; y += block_size, ++yy)
                 {
                     std::size_t y_end = (std::min)(y + block_size, n_y_local);
@@ -414,64 +535,32 @@ void gs(
                             if(xx == 0 && x_block > 0)
                             {
                                 trigger.push_back(
-                                    object_grid(x_block, y_block).apply2(
-                                        update_left_boundary_fun(
-                                            y_range
-                                          , src
-                                        )
-                                      , object_grid(x_block - 1, y_block).apply(
-                                          get_col_fun(y_range, n_x_local-1, src)
-                                        )
-                                      //, deps[src](x_block-1, y_block)(n_x_local_block-1, yy)
-                                    )
+                                    // left_boundary_dep
+                                    boundary_deps(x_block, y_block)[0]
                                 );
                             }
 
                             if(xx + 1 == n_x_local && x_block + 1 < dims[0])
                             {
                                 trigger.push_back(
-                                    object_grid(x_block, y_block).apply2(
-                                        update_right_boundary_fun(
-                                            y_range
-                                          , src
-                                        )
-                                      , object_grid(x_block + 1, y_block).apply(
-                                            get_col_fun(y_range, 1, src)
-                                        )
-                                      //, deps[src](x_block+1, y_block)(1, yy)
-                                    )
+                                    // right_boundary_dep
+                                    boundary_deps(x_block, y_block)[1]
                                 );
                             }
 
                             if(yy == 0 && y_block > 0)
                             {
                                 trigger.push_back(
-                                    object_grid(x_block, y_block).apply2(
-                                        update_top_boundary_fun(
-                                            x_range
-                                          , src
-                                        )
-                                      , object_grid(x_block, y_block - 1).apply(
-                                          get_row_fun(x_range, n_y_local-1, src)
-                                        )
-                                      //, deps[src](x_block, y_block-1)(xx, n_y_local_block-1)
-                                    )
+                                    // top_boundary_dep
+                                    boundary_deps(x_block, y_block)[2]
                                 );
                             }
 
                             if(yy + 1 == n_y_local && y_block + 1 < dims[1])
                             {
                                 trigger.push_back(
-                                    object_grid(x_block, y_block).apply2(
-                                        update_bottom_boundary_fun(
-                                            x_range
-                                          , src
-                                        )
-                                      , object_grid(x_block, y_block + 1).apply(
-                                          get_row_fun(x_range, 1, src)
-                                        )
-                                      //, deps[src](x_block, y_block+1)(xx, 1)
-                                    )
+                                    // bottom_boundary_dep
+                                    boundary_deps(x_block, y_block)[3]
                                 );
                             }
 
@@ -499,6 +588,7 @@ void gs(
                                       , cache_block
                                     )
                                 );
+                            //cur_deps(xx, yy).get_future().get();
                         }
                     }
                 }
@@ -514,7 +604,6 @@ void gs(
             {
                 for(std::size_t x = 1, xx = 0; x < n_x_local; x += block_size, ++xx)
                 {
-                    deps[dst](x_block, y_block)(xx, yy).get_future().get();
                     deps[src](x_block, y_block)(xx, yy).get_future().get();
                 }
             }
