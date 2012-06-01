@@ -322,7 +322,7 @@ namespace hpx { namespace components { namespace amr { namespace server
         // amount of stencil_value components
         result_type functions = factory.create_components(function_type, numvalues);
 
-        int num_rows = 2;
+        int num_rows = 5;
 
         std::vector<std::size_t> each_row;
         each_row.resize(num_rows);
@@ -424,12 +424,12 @@ namespace hpx { namespace components { namespace amr { namespace server
       std::size_t end = par->nx0-1;
 
       std::size_t sstart, sstop;
-      for ( std::size_t k=0;k<2;k++) {
-        if ( k == 0 ) {
-          sstart = 0;
-          sstop = 1;
+      for ( std::size_t k=0;k<5;k++) {
+        if ( k < 4 ) {
+          sstart = k;
+          sstop = k+1;
         } else {
-          sstart = 1;
+          sstart = k;
           sstop = 0;
         }
         vsrc_step.push_back(sstart);vsrc_column.push_back(end);vstep.push_back(sstop);vcolumn.push_back(0);vport.push_back(0);
