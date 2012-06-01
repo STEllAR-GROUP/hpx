@@ -101,19 +101,22 @@ namespace examples { namespace server
             //run the simulation
             for(i = 0; i < iters; i++){
                 cargs[2] = i;
+                vector<int> cargsb(cargs);
                 if(i > 0) calcFutures[0][0]->get();
-                if(i % 2 == 0) calcFutures[0][0] = new future<void>(async<calc_action>(
-                    gid_, false, false, cargs));
-                else           calcFutures[0][0] = new future<void>(async<calc_action>(
-                    gid_, false, true, cargs));
-                printf("dinner %d\n", i);
+                if(i % 2 == 0) calcFutures[0][0] =
+                    new future<void>(async<calc_action>(
+                        gid_, false, false, cargsb));
+                else           calcFutures[0][0] =
+                    new future<void>(async<calc_action>(
+                        gid_, false, true, cargsb));
+                printf("generating history %d\n", i);
             }
             histories = iters;
+            printf("final history calculated\n");
         }
 
         //performs a block of computations
         void calculate(bool cont, bool odd, vector<int> const& cargs){
-            printf("in calculate\n");
             int A = (int)std::ceil(cargs[4]/(double)cargs[1]);
             int B = (int)std::ceil(cargs[3]/(double)cargs[0]);
             vector<int> temp1(cargs);

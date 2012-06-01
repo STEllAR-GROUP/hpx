@@ -22,7 +22,6 @@ int hpx_main(boost::program_options::variables_map& vm)
         rval = solver.init(vm["input-file"].as<std::string>());
 
         if(rval == 0){
-            printf("in main before run\n");
             solver.run(vm["histories"].as<int>(), 
                 vm["body-chunk"].as<int>(), vm["time-chunk"].as<int>());
             solver.report(vm["output-directory"].as<std::string>());

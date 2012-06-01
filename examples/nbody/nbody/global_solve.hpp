@@ -40,9 +40,7 @@ namespace examples{
 
         //run the entire series of simulations
         void run(int iters, int bch, int tch){
-            printf("wow1\n");
             BOOST_ASSERT(this->gid_);
-            printf("wow2\n");
             return this->base_type::solve_run(this->gid_, iters, bch, tch);
         }
 

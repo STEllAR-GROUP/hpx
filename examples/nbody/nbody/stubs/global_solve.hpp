@@ -29,14 +29,11 @@ namespace examples { namespace stubs
         }
         static void solve_run(hpx::naming::id_type const& gid, 
         int it, int bch, int tch){
-            printf("wow in stubs\n");
-            async<
-                server::global_solve::run_action>(gid, it, bch, tch).get();
+            async<server::global_solve::run_action>(gid, it, bch, tch).get();
         }
         static void solve_report(hpx::naming::id_type const& gid,
         std::string directory){
-            async<
-                server::global_solve::report_action>(gid, directory).get();
+            async<server::global_solve::report_action>(gid, directory).get();
         }
         static void solve_calculate(hpx::naming::id_type const& gid,
         bool cont, bool odd, vector<int> const& cargs){
