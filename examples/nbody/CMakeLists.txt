@@ -20,7 +20,8 @@ foreach(example ${examples})
   # add example executable
   add_hpx_executable(${example}
     SOURCES ${sources}
-    DEPENDENCIES ${example}_component)
+    DEPENDENCIES ${example}_component
+    FOLDER "Examples/Applications/NBody")
 
   # add a custom target for this example
   add_hpx_pseudo_target(examples.nbody.${example})
