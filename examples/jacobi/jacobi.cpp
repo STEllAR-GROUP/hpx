@@ -8,6 +8,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/components/remote_object/distributed_new.hpp>
+#include <hpx/components/dataflow/dataflow_trigger.hpp>
 
 #include <hpx/include/iostreams.hpp>
 
@@ -47,8 +48,14 @@ namespace jacobi
 
         std::vector<hpx::lcos::dataflow_base<void> > dep;
         std::size_t nx;
+        std::size_t src_;
+        std::size_t dst_;
 
-        stencil_row() : dep(2){}
+        stencil_row()
+            : dep(2)
+            , src_(0)
+            , dst_(1)
+        {}
 
         struct setup
         {
@@ -89,10 +96,6 @@ namespace jacobi
                 s.bottom_ = bottom_;
                 s.nx = nx;
 
-                /*
-                BOOST_ASSERT(s.top_.gid_);
-                BOOST_ASSERT(s.bottom_.gid_);
-                */
                 BOOST_ASSERT(s.center_[0].gid_);
                 BOOST_ASSERT(s.center_[1].gid_);
             }
@@ -126,19 +129,28 @@ namespace jacobi
 
             result_type operator()(stencil_row & s) const
             {
-                if(s.dep[idx_].valid())
+                /*
+                BOOST_ASSERT(idx_ == 0 || idx_ == 1);
+                BOOST_ASSERT(s.center_[idx_].gid_);
+                */
+                /*
+                if(s.dep[s.src_].valid())
                 {
                     return
-                        s.center_[idx_].apply(
-                            row::get(begin_, end_)
-                          , s.dep[idx_]
+                        //s.center_[idx_].apply(
+                        s.center_[s.src_].apply(
+                            ::jacobi::row::get(begin_, end_)
+                          //, s.dep[idx_]
+                          , s.dep[s.src_]
                         ).get_future().get();
                 }
                 else
+                    */
                 {
                     return
-                        s.center_[idx_].apply(
-                            row::get(begin_, end_)
+                        //s.center_[idx_].apply(
+                        s.center_[s.src_].apply(
+                            ::jacobi::row::get(begin_, end_)
                         ).get_future().get();
                 }
             }
@@ -156,43 +168,47 @@ namespace jacobi
         {
             typedef void result_type;
 
-            std::size_t src_;
-            std::size_t dst_;
-
             update() {}
-
-            update(std::size_t src, std::size_t dst)
-                : src_(src)
-                , dst_(dst)
-            {}
 
             result_type operator()(stencil_row & s) const
             {
-                BOOST_ASSERT(s.center_[src_].gid_);
-                BOOST_ASSERT(s.center_[dst_].gid_);
+                BOOST_ASSERT((s.src_ == 0 && s.dst_ == 1) || (s.src_ == 1 && s.dst_ == 0));
+                BOOST_ASSERT(s.center_[s.src_].gid_);
+                BOOST_ASSERT(s.center_[s.dst_].gid_);
                 BOOST_ASSERT(s.top_.gid_);
                 BOOST_ASSERT(s.bottom_.gid_);
-                if(s.dep[src_].valid())
+                BOOST_ASSERT(s.dep.size() == 2);
+                /*
+                if(s.dep[s.src_].valid())
                 {
-                    s.dep[dst_] =
+                    s.dep[s.dst_] =
                         hpx::lcos::dataflow<jacobi_stencil_row_update>(
-                            hpx::naming::get_locality_from_id(s.center_[dst_].gid_)
-                          , s.center_[dst_].apply(row::get(0, s.nx))
-                          , s.top_.apply(stencil_row::get(src_, 0, s.nx))
-                          , s.center_[src_].apply(row::get(0, s.nx))
-                          , s.bottom_.apply(stencil_row::get(src_, 0, s.nx))
-                          , s.dep[src_]
+                            hpx::naming::get_locality_from_id(s.center_[s.dst_].gid_)
+                          , s.center_[s.dst_].apply(row::get(0, s.nx))
+                          , s.top_.apply(stencil_row::get(s.src_, 0, s.nx))
+                          , s.center_[s.src_].apply(row::get(0, s.nx))
+                          , s.bottom_.apply(stencil_row::get(s.src_, 0, s.nx))
+                          , s.dep[s.src_]
                         );
                 }
                 else
+                    */
                 {
-                    s.dep[dst_] =
+                    s.dep[s.dst_] =
                         hpx::lcos::dataflow<jacobi_stencil_row_update>(
-                            hpx::naming::get_locality_from_id(s.center_[dst_].gid_)
-                          , s.center_[dst_].apply(row::get(0, s.nx))
-                          , s.top_.apply(stencil_row::get(src_, 0, s.nx))
-                          , s.center_[src_].apply(row::get(0, s.nx))
-                          , s.bottom_.apply(stencil_row::get(src_, 0, s.nx))
+                            hpx::naming::get_locality_from_id(s.center_[s.dst_].gid_)
+                          , s.center_[s.dst_].apply(
+                                ::jacobi::row::get(0, s.nx)
+                            )
+                          , s.top_.apply(
+                                ::jacobi::stencil_row::get(s.src_, 0, s.nx)
+                            )
+                          , s.center_[s.src_].apply(
+                                ::jacobi::row::get(0, s.nx)
+                            )
+                          , s.bottom_.apply(
+                                ::jacobi::stencil_row::get(s.src_, 0, s.nx)
+                            )
                         );
                 }
             }
@@ -200,28 +216,42 @@ namespace jacobi
             template <typename Archive>
             void serialize(Archive & ar, unsigned)
             {
-                ar & src_;
-                ar & dst_;
+            }
+        };
+
+        struct swap
+        {
+            typedef void result_type;
+
+            swap() {}
+
+            result_type operator()(stencil_row & s) const
+            {
+                std::swap(s.src_, s.dst_);
+            }
+            template <typename Archive>
+            void serialize(Archive & ar, unsigned)
+            {
             }
         };
 
         struct wait
         {
             wait() {}
-            std::size_t idx_;
-            wait(std::size_t idx) : idx_(idx) {}
 
             typedef void result_type;
             result_type operator()(stencil_row & s) const
             {
-                if(s.dep[idx_].valid())
-                    hpx::lcos::wait(s.dep[idx_].get_future());
+                if(s.dep[s.src_].valid())
+                    s.dep[s.src_].get_future().get();
+                if(s.dep[s.dst_].valid())
+                    s.dep[s.dst_].get_future().get();
             }
 
             template <typename Archive>
             void serialize(Archive & ar, unsigned)
             {
-                ar & idx_;
+                //ar & idx_;
             }
         };
     };
@@ -233,6 +263,7 @@ int hpx_main(variables_map & vm)
         std::size_t nx = vm["nx"].as<std::size_t>();
         std::size_t ny = vm["ny"].as<std::size_t>();
         std::size_t max_iterations = vm["max_iterations"].as<std::size_t>();
+
         std::vector<jacobi::grid> u(2, jacobi::grid(nx, ny, 1.0));
 
         std::vector<hpx::components::dataflow_object<jacobi::stencil_row> > stencil_rows(ny);
@@ -244,6 +275,8 @@ int hpx_main(variables_map & vm)
             stencil_rows[0] = stencil_row_futures[0].get();
             rows[0] = u[0].rows[0];
             rows[1] = u[1].rows[0];
+            BOOST_ASSERT(rows[0].gid_);
+            BOOST_ASSERT(rows[1].gid_);
             stencil_rows[0].apply(jacobi::stencil_row::setup(rows, nx)).get_future().get();
 
             stencil_rows[1] = stencil_row_futures[0].get();
@@ -253,44 +286,70 @@ int hpx_main(variables_map & vm)
                 BOOST_ASSERT(stencil_rows[idx].gid_);
                 rows[0] = u[0].rows[idx];
                 rows[1] = u[1].rows[idx];
+                BOOST_ASSERT(rows[0].gid_);
+                BOOST_ASSERT(rows[1].gid_);
                 BOOST_ASSERT(stencil_rows[idx-1].gid_);
                 BOOST_ASSERT(stencil_rows[idx+1].gid_);
                 stencil_rows[idx].apply(jacobi::stencil_row::setup(stencil_rows[idx-1], rows, stencil_rows[idx+1], nx)).get_future().get();
             }
 
-            stencil_rows[ny-1] = stencil_row_futures[ny-1].get();
+            //stencil_rows[ny-1] = stencil_row_futures[ny-1].get();
             rows[0] = u[0].rows[ny-1];
             rows[1] = u[1].rows[ny-1];
+            BOOST_ASSERT(rows[0].gid_);
+            BOOST_ASSERT(rows[1].gid_);
             stencil_rows[ny-1].apply(jacobi::stencil_row::setup(rows, nx)).get_future().get();
         }
 
-        std::size_t src = 0;
-        std::size_t dst = 1;
-
         high_resolution_timer t;
         t.restart();
+        std::vector<hpx::lcos::dataflow_base<void> > iter_deps(ny-2);
         for(std::size_t iter = 0; iter < max_iterations; ++iter)
         {
             for(std::size_t y = 1; y < ny - 1; ++y)
             {
-                typedef
-                    hpx::components::server::remote_object_apply_action1<
-                        hpx::components::remote_object::invoke_apply_fun<
-                            jacobi::stencil_row
-                          , jacobi::stencil_row::update
-                        >
-                    >
-                    update_action;
-
-                hpx::apply<update_action>(stencil_rows[y].gid_, jacobi::stencil_row::update(src, dst));
+                if(iter_deps[y-1].valid())
+                {
+                    iter_deps[y-1] = 
+                        stencil_rows[y].apply(
+                            jacobi::stencil_row::update()
+                          , iter_deps[y-1]
+                        );
+                }
+                else
+                {
+                    iter_deps[y-1] = 
+                        stencil_rows[y].apply(
+                            jacobi::stencil_row::update()
+                        );
+                }
+                //iter_deps[y-1].get_future().get();
             }
-            std::swap(dst, src);
+            for(std::size_t y = 0; y < ny - 2; ++y)
+            {
+                std::vector<hpx::lcos::dataflow_base<void> > swap_trigger;
+
+                swap_trigger.reserve(3);
+                if(y > 0)
+                    swap_trigger.push_back(iter_deps[y-1]);
+
+                swap_trigger.push_back(iter_deps[y]);
+
+                if(y  + 1 < ny - 2)
+                    swap_trigger.push_back(iter_deps[y+1]);
+
+                iter_deps[y-1] = 
+                    stencil_rows[y].apply(
+                        jacobi::stencil_row::swap()
+                      , hpx::lcos::dataflow_trigger(stencil_rows[y].gid_, swap_trigger)
+                    );
+            }
         }
         // wait for everything to complete ...
         for(std::size_t y = 1; y < ny - 1; ++y)
         {
-            stencil_rows[y].apply(jacobi::stencil_row::wait(src));
-            stencil_rows[y].apply(jacobi::stencil_row::wait(dst));
+            stencil_rows[y].apply(jacobi::stencil_row::wait()).get_future().get();
+            iter_deps[y-1].get_future().get();
         }
         
         double time_elapsed = t.elapsed();
