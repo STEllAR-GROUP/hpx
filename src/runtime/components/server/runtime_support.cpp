@@ -11,6 +11,7 @@
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/filesystem_compatibility.hpp>
+#include <hpx/util/unlock_lock.hpp>
 
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
@@ -119,7 +120,7 @@ namespace hpx { namespace components { namespace server
     int runtime_support::factory_properties(components::component_type type)
     {
         // locate the factory for the requested component type
-        mutex_type::scoped_lock l(mtx_);
+        component_map_mutex_type::scoped_lock l(cm_mtx_);
 
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end() || !(*it).second.first) {
@@ -144,7 +145,7 @@ namespace hpx { namespace components { namespace server
         components::component_type type, std::size_t count)
     {
         // locate the factory for the requested component type
-        mutex_type::scoped_lock l(mtx_);
+        component_map_mutex_type::scoped_lock l(cm_mtx_);
 
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end() || !(*it).second.first) {
@@ -159,10 +160,16 @@ namespace hpx { namespace components { namespace server
         }
 
     // create new component instance
-        naming::gid_type id = (*it).second.first->create(count);
+        naming::gid_type id;
+        boost::shared_ptr<component_factory_base> factory((*it).second.first);
+        {
+            util::unlock_the_lock<component_map_mutex_type::scoped_lock> ul(l);
+            id = factory->create(count);
+        }
 
     // set result if requested
-        if (LHPX_ENABLED(info)) {
+        if (LHPX_ENABLED(info))
+        {
             if ((*it).second.first->get_factory_properties() & factory_instance_count_is_size)
             {
                 LRT_(info) << "successfully created component " << id
@@ -185,7 +192,7 @@ namespace hpx { namespace components { namespace server
         components::component_type type, constructor_argument const& arg0)
     {
         // locate the factory for the requested component type
-        mutex_type::scoped_lock l(mtx_);
+        component_map_mutex_type::scoped_lock l(cm_mtx_);
 
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end()) {
@@ -212,7 +219,12 @@ namespace hpx { namespace components { namespace server
         }
 
     // create new component instance
-        naming::gid_type id = (*it).second.first->create_one(arg0);
+        naming::gid_type id;
+        boost::shared_ptr<component_factory_base> factory((*it).second.first);
+        {
+            util::unlock_the_lock<component_map_mutex_type::scoped_lock> ul(l);
+            id = factory->create_one(arg0);
+        }
 
     // set result if requested
         LRT_(info) << "successfully created component " << id
@@ -495,7 +507,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     void runtime_support::tidy()
     {
-        mutex_type::scoped_lock l(mtx_);
+        component_map_mutex_type::scoped_lock l(cm_mtx_);
 
         // Only after releasing the components we are allowed to release
         // the modules. This is done in reverse order of loading.
@@ -523,7 +535,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     long runtime_support::get_instance_count(components::component_type type)
     {
-        mutex_type::scoped_lock l(mtx_);
+        component_map_mutex_type::scoped_lock l(cm_mtx_);
 
         component_map_type::const_iterator it = components_.find(type);
         if (it == components_.end() || !(*it).second.first) {
@@ -709,7 +721,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     bool runtime_support::keep_factory_alive(component_type type)
     {
-        mutex_type::scoped_lock l(mtx_);
+        component_map_mutex_type::scoped_lock l(cm_mtx_);
 
         // Only after releasing the components we are allowed to release
         // the modules. This is done in reverse order of loading.

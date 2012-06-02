@@ -26,7 +26,7 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/util/spinlock.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -90,7 +90,9 @@ namespace hpx { namespace components { namespace server
     class runtime_support
     {
     private:
+        typedef lcos::local::spinlock component_map_mutex_type;
         typedef boost::mutex mutex_type;
+
         struct component_factory
         {
             component_factory() : isenabled(false) {}
@@ -404,25 +406,25 @@ namespace hpx { namespace components { namespace server
 
         void add_pre_startup_function(HPX_STD_FUNCTION<void()> const& f)
         {
-            util::spinlock::scoped_lock l(globals_mtx_);
+            lcos::local::spinlock::scoped_lock l(globals_mtx_);
             pre_startup_functions_.push_back(f);
         }
 
         void add_startup_function(HPX_STD_FUNCTION<void()> const& f)
         {
-            util::spinlock::scoped_lock l(globals_mtx_);
+            lcos::local::spinlock::scoped_lock l(globals_mtx_);
             startup_functions_.push_back(f);
         }
 
         void add_pre_shutdown_function(HPX_STD_FUNCTION<void()> const& f)
         {
-            util::spinlock::scoped_lock l(globals_mtx_);
+            lcos::local::spinlock::scoped_lock l(globals_mtx_);
             pre_shutdown_functions_.push_back(f);
         }
 
         void add_shutdown_function(HPX_STD_FUNCTION<void()> const& f)
         {
-            util::spinlock::scoped_lock l(globals_mtx_);
+            lcos::local::spinlock::scoped_lock l(globals_mtx_);
             shutdown_functions_.push_back(f);
         }
 
@@ -449,10 +451,11 @@ namespace hpx { namespace components { namespace server
         bool stopped_;
         bool terminated_;
 
+        component_map_mutex_type cm_mtx_;
         component_map_type components_;
         util::section& ini_;
 
-        util::spinlock globals_mtx_;
+        lcos::local::spinlock globals_mtx_;
         std::list<HPX_STD_FUNCTION<void()> > pre_startup_functions_;
         std::list<HPX_STD_FUNCTION<void()> > startup_functions_;
         std::list<HPX_STD_FUNCTION<void()> > pre_shutdown_functions_;
