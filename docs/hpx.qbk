@@ -122,6 +122,9 @@
 [def __configuration__          [link hpx.manual.init.configuration Configure HPX Applications]]
 [def __config_defaults__        [link hpx.manual.init.configuration.config_defaults Built-in Default Configuration Settings]]
 [def __iniformat__              [link hpx.manual.init.configuration.ini_format The HPX INI File Format]]
+[def __loading_ini__            [link hpx.manual.init.configuration.loading_ini_files Loading INI Files]]
+[def __loading_components__     [link hpx.manual.init.configuration.loading_components Loading Components]]
+[def __component_example__      [link hpx.manual.init.configuration.component_example Application Specific Component Example]]
 [def __exceptions__             [link hpx.manual.exceptions Working with exceptions]]
 [def __commandline__            [link hpx.manual.init.commandline HPX Command Line Options]]
 

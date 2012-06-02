@@ -146,6 +146,10 @@ by section basis below.
     master_ini_path = $[hpx.location]/share/hpx-<version>
     ini_path = $[hpx.master_ini_path]/ini
     default_stack_size = ${HPX_DEFAULT_STACK_SIZE:<hpx_default_stack_size>}
+    os_threads = 1
+    localities = 1
+    program_name =
+    cmd_line =
 ``
 [c++]
 
@@ -173,6 +177,23 @@ by section basis below.
      [This is initialized to the default stack size to be used by HPX-threads]
      [static information, depends on the compile time preprocessor constant
       `HPX_DEFAULT_STACK_SIZE` (`0x8000`)]]
+    [[`hpx.os_threads`]
+     [This setting reflects the number of OS-threads used for running
+      HPX-threads.]
+     [static information, usually depends on command line options and/or
+      environment setting (for PBS and SLURM), by default it is set to `1`]]
+    [[`hpx.localities`]
+     [This setting reflects the number of localities the application is running
+      on.]
+     [static information, usually depends on command line options and/or
+      environment setting (for PBS and SLURM), by default it is set to `1`]]
+    [[`hpx.program_name`]
+     [This setting reflects the program name of the application instance.]
+     [dynamic information, initialized from the command line (arv\[0\])]]
+    [[`hpx.cmd_line`]
+     [This setting reflects the actual command line used to launch this
+      applicaion instance.]
+     [dynamic information, initialized from command line (argc/argv)]]
 ]
 
 ['[*The `hpx.components` Configuration Section]]
@@ -343,6 +364,9 @@ All ini files found are merged into the internal configuration database.
 The merge operation itself conforms to the rules as described in the section
 __iniformat__.
 
+# Load all component shared libraries found in the directory specified by the
+  property `hpx.component_path` and retrieve their default configuration
+  information (see section __loading_components__ for more details).
 # Load a file named `hpx.ini` in the directory referenced by the property
   `hpx.master_ini_path`.
 # Load a file named `.hpx.ini` in the current working directory, e.g. the
@@ -357,9 +381,20 @@ __iniformat__.
 # Load a file named `.hpx.ini` in the directory refernced by the environment
   variable `PWD`.
 # Load the file specified on the command line using the option
-  [hpx_cmdline `--hpx:config].
+  [hpx_cmdline `--hpx:config`].
+# Load all properties specified on the command line using the option
+  [hpx_cmdline `--hpx:ini`]. The properties will be added to the database in the
+  same sequence as they are specified on the command line. The format for those
+  options is for instance `--hpx:ini=hpx.default_stack_size=0x4000`. In
+  adddition to the explicit command line options, this will set the following
+  properties as implied from other settings:
+    * `hpx.parcel.address` and `hpx.parcel.port`
+    * `hpx.agas.address`, `hpx.agas.port`, and `hpx.agas.service_mode`
+    * `hpx.program_name` and `hpx.cmd_line`
+    * `hpx.os_threads`, and `hpx.localities`
+    * `hpx.runtime_mode`
 # Load files based on the pattern `*.ini` in all directories listed by the
-  property `hpx.ini_path`. Allfiles found during this search will be merged.
+  property `hpx.ini_path`. All files found during this search will be merged.
 # Load the file specified on the command line using the option
   [hpx_cmdline `--hpx:app-config`]. Note that this file will be merged as the
   content for a top level section `[application]`.
@@ -367,8 +402,7 @@ __iniformat__.
 [note Any changes made to the configuration dabase caused by one of the files
       will influence the loading process for all subsequent files. For instance,
       if one of the ini files loaded changes the property `hpx.ini_path`, this
-      will influence the directories searched in the step 8 as described
-      above.]
+      will influence the directories searched in step 9 as described above.]
 
 If any of the environment variables or files listed above is not found the
 corresponding loading step will be silently skipped.
@@ -376,19 +410,62 @@ corresponding loading step will be silently skipped.
 [endsect] [/ Loading INI Files]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[section:commandline Command Line Configuration]
-
-[fixme Describe what command line options can be used to add configuration
-       information]
-
-[endsect] [/ Command Line Configuration]
-
-[/////////////////////////////////////////////////////////////////////////////]
 [section:loading_components Loading Components]
 
-[fixme Describe how components are located and loaded at startup/]
+__hpx__ relies on loading application specific components during the runtime
+of an application. Moreover, __hpx__ comes with a set of components
+preinstalled supporting basic functionalities useful for almost every
+application. Any component in __hpx__ is loaded from a shared library, where
+any of the shared libraries can contain more than one component type. During
+startup, __hpx__ tries to locate all available components (e.g. the
+corresponding shared libraries) and creates an internal component registry for
+later use. This section describes the algorithm used by __hpx__ to locate all
+relevant shared libraries on a system. As described, this algorithm is
+customizable by the configuration properties loaded from the ini files (see
+section __loading_ini__).
+
+Loading components is a two stage process. First __hpx__ tries to locate all
+component shared libraries, loads those, and generates default configuration
+section in the internal configuration database for each component found. For
+each found component the following information is generated:
+
+[teletype]
+``
+    [hpx.components.<component_instance_name>]
+    name = <name_of_shared_library>
+    path = $[component_path]
+    enabled = $[hpx.location]/lib/hpx/
+    default = 1
+``
+[c++]
+
+The values in this section correspond to the expected configuration information 
+for a component as described in the section __config_defaults__.
+
+In order to locate component shared libraries, __hpx__ will try loading all 
+shared libraries (files with the platform specific extension of a shared 
+library, Linux: `*.so`, Windows: `*.dll`, MacOS: `*.dylib`) found in the 
+directory referenced by the ini property `hpx.component_path`. 
+
+This first step corresponds to step 1) during the process of filling the 
+internal configuration database with default information as described in 
+section __loading_ini__.
+
+After all of the configuration information has been loaded, __hpx__ performs 
+the second step in terms of loading components. During this step, __hpx__ scans
+all existing configuration sections `[hpx.component.<some_component_instance_name>]`
+and instantiates a special factory object for each of the successfully located 
+and loaded components. During the application's life time, these factory objects
+will be responsible to create new and discard old instances of the component 
+they are associated with.
 
 [endsect] [/ Loading Components]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:component_example Application Specific Component Example]
+
+
+[endsect] [/ Application Specific Component Example]
 
 [endsect] [/ Configure HPX Applications]
 
@@ -619,7 +696,8 @@ described in the table below:
     [[`--hpx:pu-step`]          [the step between used processing unit numbers for this
                                  instance of HPX (default: 1)]]
     [[`--hpx:threads arg`]      [the number of operating system threads to spawn
-                                 for this HPX locality (default: 1)]]
+                                 for this HPX locality (default: 1, using 'all' will
+                                 spawn one thread for each processing unit)]]
     [[`--hpx:queuing arg`]      [the queue scheduling policy to use, options are
                                  'local/l', 'priority_local/pr', 'abp/a', 'priority_abp',
                                  'hierarchy/h', and 'periodic/pe' (default: priority_local/p)]]
