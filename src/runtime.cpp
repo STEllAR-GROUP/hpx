@@ -725,6 +725,7 @@ namespace hpx
         runtime* rt = get_runtime_ptr();
         if (NULL == rt)
             return false;
+
         rt->on_exit(f);
         return true;
     }
@@ -738,11 +739,15 @@ namespace hpx
 
     std::string get_config_entry(std::string const& key, std::string const& dflt)
     {
+        if (NULL == get_runtime_ptr())
+            return "";
         return get_runtime().get_config().get_entry(key, dflt);
     }
 
     std::string get_config_entry(std::string const& key, std::size_t dflt)
     {
+        if (NULL == get_runtime_ptr())
+            return "";
         return get_runtime().get_config().get_entry(key, dflt);
     }
 
@@ -750,6 +755,9 @@ namespace hpx
     // Helpers
     naming::id_type find_here()
     {
+        if (NULL == hpx::applier::get_applier_ptr())
+            return naming::invalid_id;
+
         return naming::id_type(hpx::applier::get_applier().get_raw_locality(),
             naming::id_type::unmanaged);
     }
@@ -758,14 +766,16 @@ namespace hpx
     find_all_localities(components::component_type type)
     {
         std::vector<naming::id_type> locality_ids;
-        hpx::applier::get_applier().get_localities(locality_ids, type);
+        if (NULL != hpx::applier::get_applier_ptr())
+            hpx::applier::get_applier().get_localities(locality_ids, type);
         return locality_ids;
     }
 
     std::vector<naming::id_type> find_all_localities()
     {
         std::vector<naming::id_type> locality_ids;
-        hpx::applier::get_applier().get_localities(locality_ids);
+        if (NULL != hpx::applier::get_applier_ptr())
+            hpx::applier::get_applier().get_localities(locality_ids);
         return locality_ids;
     }
 
@@ -773,20 +783,25 @@ namespace hpx
     find_remote_localities(components::component_type type)
     {
         std::vector<naming::id_type> locality_ids;
-        hpx::applier::get_applier().get_remote_localities(locality_ids, type);
+        if (NULL != hpx::applier::get_applier_ptr())
+            hpx::applier::get_applier().get_remote_localities(locality_ids, type);
         return locality_ids;
     }
 
     std::vector<naming::id_type> find_remote_localities()
     {
         std::vector<naming::id_type> locality_ids;
-        hpx::applier::get_applier().get_remote_localities(locality_ids);
+        if (NULL != hpx::applier::get_applier_ptr())
+            hpx::applier::get_applier().get_remote_localities(locality_ids);
         return locality_ids;
     }
 
     // find a locality supporting the given component
     naming::id_type find_locality(components::component_type type)
     {
+        if (NULL == hpx::applier::get_applier_ptr())
+            return naming::invalid_id;
+
         std::vector<naming::id_type> locality_ids;
         hpx::applier::get_applier().get_localities(locality_ids, type);
 
@@ -804,6 +819,9 @@ namespace hpx
     ///        for the running application.
     boost::uint32_t get_num_localities()
     {
+        if (NULL == hpx::applier::get_applier_ptr())
+            return 0;
+
         // FIXME: this is overkill
         std::vector<naming::id_type> locality_ids;
         hpx::applier::get_applier().get_localities(locality_ids);
@@ -812,6 +830,9 @@ namespace hpx
 
     boost::uint32_t get_num_localities(components::component_type type)
     {
+        if (NULL == hpx::applier::get_applier_ptr())
+            return 0;
+
         // FIXME: this is overkill
         std::vector<naming::id_type> locality_ids;
         hpx::applier::get_applier().get_localities(locality_ids, type);
@@ -819,50 +840,67 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    naming::gid_type get_next_id()
+    namespace detail
     {
-        return get_runtime().get_next_id();
+        naming::gid_type get_next_id()
+        {
+            if (NULL == hpx::applier::get_applier_ptr())
+                return naming::invalid_gid;
+
+            return get_runtime().get_next_id();
+        }
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     std::size_t get_os_thread_count()
     {
+        if (NULL == get_runtime_ptr())
+            return 0;
         return get_runtime().get_config().get_os_thread_count();
     }
 
     std::size_t get_worker_thread_num(bool* numa_sensitive)
     {
+        if (NULL == get_runtime_ptr())
+            return std::size_t(-1);
         return get_runtime().get_thread_manager().get_worker_thread_num(numa_sensitive);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     void register_startup_function(startup_function_type const& f)
     {
-        get_runtime().add_startup_function(f);
+        if (NULL != get_runtime_ptr())
+            get_runtime().add_startup_function(f);
     }
 
     void register_pre_startup_function(startup_function_type const& f)
     {
-        get_runtime().add_pre_startup_function(f);
+        if (NULL != get_runtime_ptr())
+            get_runtime().add_pre_startup_function(f);
     }
 
     void register_pre_shutdown_function(shutdown_function_type const& f)
     {
-        get_runtime().add_pre_shutdown_function(f);
+        if (NULL != get_runtime_ptr())
+            get_runtime().add_pre_shutdown_function(f);
     }
 
     void register_shutdown_function(shutdown_function_type const& f)
     {
-        get_runtime().add_shutdown_function(f);
+        if (NULL != get_runtime_ptr())
+            get_runtime().add_shutdown_function(f);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT bool keep_factory_alive(components::component_type type)
+    bool keep_factory_alive(components::component_type type)
     {
-        return get_runtime().keep_factory_alive(type);
+        if (NULL != get_runtime_ptr())
+            return get_runtime().keep_factory_alive(type);
+        return false;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT components::server::runtime_support* get_runtime_support_ptr()
+    components::server::runtime_support* get_runtime_support_ptr()
     {
         return reinterpret_cast<components::server::runtime_support*>(
             get_runtime().get_runtime_support_lva());

@@ -1226,6 +1226,7 @@ if(DOXYGEN_FOUND)
   # the list of files to pass to doxygen is defined in docs/CMakeLists.txt
   set(doxygen_inputs_list
       "${hpx_SOURCE_DIR}/hpx/hpx_fwd.hpp"
+      "${hpx_SOURCE_DIR}/hpx/hpx_init.hpp"
       "${hpx_SOURCE_DIR}/hpx/exception.hpp"
       "${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action.hpp")
 
@@ -1243,6 +1244,8 @@ if(DOXYGEN_FOUND)
       "BOOST_SCOPED_ENUM_END="
       "HPX_EXCEPTION_EXPORT="
       "HPX_EXPORT="
+      "HPX_API_EXPORT="
+      "HPX_STD_FUNCTION=std::function"
       "extern=")
 
   foreach(doxygen_predef ${doxygen_definition_list})

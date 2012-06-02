@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file hpx_fwd.hpp
+
 #if !defined(HPX_HPX_FWD_MAR_24_2008_1119AM)
 #define HPX_HPX_FWD_MAR_24_2008_1119AM
 
@@ -558,18 +560,6 @@ namespace hpx
         return static_cast<int>(lhs) & static_cast<int>(rhs) ? true : false;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    /// \brief Return the global id representing this locality
-    HPX_API_EXPORT naming::id_type find_here();
-
-    /// \brief Return the list of locality ids of the localities supporting the
-    ///        given component type. By default this function will return the
-    ///        list of all localities.
-    HPX_API_EXPORT std::vector<naming::id_type> find_all_localities();
-    HPX_API_EXPORT std::vector<naming::id_type> find_all_localities(
-        components::component_type);
-    HPX_API_EXPORT naming::id_type find_locality(components::component_type);
-
     /// \brief Return the list of locality ids of remote localities supporting
     ///        the given component type. By default this function will return
     ///        the list of all remote localities (all but the current locality).
@@ -582,7 +572,12 @@ namespace hpx
     HPX_API_EXPORT boost::uint32_t get_num_localities();
     HPX_API_EXPORT boost::uint32_t get_num_localities(components::component_type);
 
-    HPX_API_EXPORT naming::gid_type get_next_id();
+    /// \cond NODETAIL
+    namespace detail
+    {
+        HPX_API_EXPORT naming::gid_type get_next_id();
+    }
+    /// \endcond
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of OS-threads running in the runtime instance
@@ -606,6 +601,106 @@ namespace hpx
     HPX_API_EXPORT boost::uint32_t get_locality_id(error_code& ec = throws);
 
     /// \endcond
+}
+
+namespace hpx
+{
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the global id representing this locality
+    ///
+    /// The function \a find_here() can be used to retrieve the global id
+    /// usable to refer to the current locality.
+    ///
+    /// \note     Generally, the id of a locality can be used for instance to
+    ///           create new instances of components and to invoke plain actions
+    ///           (global functions).
+    ///
+    /// \returns  The global id representing the locality this function has
+    ///           been called on.
+    ///
+    /// \note     This function will return meaningful results only if called
+    ///           from an HPX-thread. It will return \a hpx::naming::invalid_id
+    ///           otherwise.
+    ///
+    /// \see      \a hpx::find_all_localities(), \a hpx::find_locality()
+    HPX_API_EXPORT naming::id_type find_here();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the list of global ids representing all localities
+    ///        available to this application.
+    ///
+    /// The function \a find_all_localities() can be used to retrieve the
+    /// global ids of all localities currently available to this application.
+    ///
+    /// \note     Generally, the id of a locality can be used for instance to
+    ///           create new instances of components and to invoke plain actions
+    ///           (global functions).
+    ///
+    /// \returns  The global ids representing the localities currently
+    ///           available to this application.
+    ///
+    /// \note     This function will return meaningful results only if called
+    ///           from an HPX-thread. It will return an empty vector otherwise.
+    ///
+    /// \see      \a hpx::find_here(), \a hpx::find_locality()
+    HPX_API_EXPORT std::vector<naming::id_type> find_all_localities();
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the list of global ids representing all localities
+    ///        available to this application which support the given component
+    ///        type.
+    ///
+    /// The function \a find_all_localities() can be used to retrieve the
+    /// global ids of all localities currently available to this application
+    /// which support the creation of instances of the given component type.
+    ///
+    /// \note     Generally, the id of a locality can be used for instance to
+    ///           create new instances of components and to invoke plain actions
+    ///           (global functions).
+    ///
+    /// \param type  [in] The type of the components for which the function should
+    ///           return the available localities.
+    ///
+    /// \returns  The global ids representing the localities currently
+    ///           available to this application which support the creation of
+    ///           instances of the given component type. If no localities
+    ///           supporting the given component type are currently available,
+    ///           this function will return an empty vector.
+    ///
+    /// \note     This function will return meaningful results only if called
+    ///           from an HPX-thread. It will return an empty vector otherwise.
+    ///
+    /// \see      \a hpx::find_here(), \a hpx::find_locality()
+    HPX_API_EXPORT std::vector<naming::id_type> find_all_localities(
+        components::component_type type);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Return the global id representing an arbitrary locality which
+    ///        supports the given component type.
+    ///
+    /// The function \a find_locality() can be used to retrieve the
+    /// global ids of all localities currently available to this application
+    /// which support the creation of instances of the given component type.
+    ///
+    /// \note     Generally, the id of a locality can be used for instance to
+    ///           create new instances of components and to invoke plain actions
+    ///           (global functions).
+    ///
+    /// \param type  [in] The type of the components for which the function should
+    ///           return any available locality.
+    ///
+    /// \returns  The global id representing an arbitrary locality currently
+    ///           available to this application which supports the creation of
+    ///           instances of the given component type. If no locality
+    ///           supporting the given component type is currently available,
+    ///           this function will return \a hpx::naming::invalid_id.
+    ///
+    /// \note     This function will return meaningful results only if called
+    ///           from an HPX-thread. It will return \a hpx::naming::invalid_id
+    ///           otherwise.
+    ///
+    /// \see      \a hpx::find_here(), \a hpx::find_all_localities()
+    HPX_API_EXPORT naming::id_type find_locality(components::component_type);
 }
 
 #include <hpx/lcos/async_fwd.hpp>

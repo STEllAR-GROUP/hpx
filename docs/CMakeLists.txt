@@ -32,6 +32,7 @@ if(DOXYGEN_FOUND)
   # Add all files here which should be passed to doxygen
   set(doxygen_dependencies
       ${hpx_SOURCE_DIR}/hpx/hpx_fwd.hpp
+      ${hpx_SOURCE_DIR}/hpx/hpx_init.hpp
       ${hpx_SOURCE_DIR}/hpx/exception.hpp
       ${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action.hpp)
 

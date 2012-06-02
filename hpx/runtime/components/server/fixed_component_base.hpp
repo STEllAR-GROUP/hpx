@@ -80,7 +80,7 @@ struct fixed_component_base : detail::fixed_component_tag
             // Try to bind the preset GID first
             if (!applier::bind_gid(gid_, addr))
             {
-                gid_ = get_next_id();
+                gid_ = hpx::detail::get_next_id();
 
                 // If we can't bind the preset GID, then try to bind the next
                 // available GID on this locality.

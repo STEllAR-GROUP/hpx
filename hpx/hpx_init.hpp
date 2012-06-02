@@ -5,6 +5,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// \file hpx_init.hpp
+
 #if !defined(ABC9B037_3A25_4591_BB60_CD166773D61D)
 #define ABC9B037_3A25_4591_BB60_CD166773D61D
 
@@ -14,15 +16,21 @@
 #include <boost/program_options.hpp>
 #include <boost/lexical_cast.hpp>
 
+/// \cond NOINTERNAL
+
 ///////////////////////////////////////////////////////////////////////////////
 // One of these functions must be implemented by the application for the
 // console locality.
 int hpx_main();
 int hpx_main(boost::program_options::variables_map& vm);
 
+/// \endcond
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
+    /// \cond NOINTERNAL
+
 #if !defined(HPX_NO_DEPRECATED)
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
@@ -55,7 +63,11 @@ namespace hpx
 
     typedef int (*hpx_main_type)(boost::program_options::variables_map&);
 
+    /// \endcond
+
     ///////////////////////////////////////////////////////////////////////////
+    /// \brief Main entry point for launching the HPX runtime system.
+    ///
     /// This is the main entry point for any HPX application. This function
     /// (or one of its overloads below) should be called from the users main()
     /// function. It will set up the HPX runtime environment and schedule the
@@ -127,6 +139,8 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \brief Main entry point for launching the HPX runtime system.
+    ///
     /// This is a simplified main entry point, which can be used to set up the
     /// runtime for an HPX application (the runtime system will be set up in
     /// console mode or worker mode depending on the command line settings).
@@ -152,6 +166,8 @@ namespace hpx
         std::string const& app_name, int argc, char* argv[]);
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \brief Main entry point for launching the HPX runtime system.
+    ///
     /// This is a simplified main entry point, which can be used to set up the
     /// runtime for an HPX application (the runtime system will be set up in
     /// console mode or worker mode depending on the command line settings).
@@ -220,6 +236,8 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \brief Main entry point for launching the HPX runtime system.
+    ///
     /// This is a simplified main entry point, which can be used to set up the
     /// runtime for an HPX application (the runtime system will be set up in
     /// console mode or worker mode depending on the command line settings).
@@ -267,6 +285,8 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \brief Main entry point for launching the HPX runtime system.
+    ///
     /// This is a simplified main entry point, which can be used to set up the
     /// runtime for an HPX application (the runtime system will be set up in
     /// console mode or worker mode depending on the command line settings).
@@ -294,6 +314,8 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \brief Main entry point for launching the HPX runtime system.
+    ///
     /// This is a simplified main entry point, which can be used to set up the
     /// runtime for an HPX application (the runtime system will be set up in
     /// console mode or worker mode depending on the command line settings).
@@ -311,7 +333,14 @@ namespace hpx
     ///
     /// \note               The created runtime system instance will be
     ///                     executed in console or worker mode depending on the
-    ///                     command line arguments passed in argc/argv.
+    ///                     command line arguments passed in `argc/argv`. If not
+    ///                     command line arguments are passed, console mode is
+    ///                     assumed.
+    ///
+    /// \note               If no command line arguments are passed the HPX
+    ///                     runtime system will not support any of the default
+    ///                     command line options as described in the section
+    ///                     'HPX Command Line Options'.
     inline int
     init(int argc = 0, char* argv[] = 0)
     {
@@ -320,6 +349,8 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \brief Main entry point for launching the HPX runtime system.
+    ///
     /// This is a simplified main entry point, which can be used to set up the
     /// runtime for an HPX application (the runtime system will be set up in
     /// console mode or worker mode depending on the command line settings).
@@ -360,6 +391,8 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \brief Main function to gracefully terminate the the HPX runtime system.
+    ///
     /// The function \a hpx#finalize is the main way to (gracefully) exit any
     /// HPX application. It should be called from one locality only (usually
     /// the console) and it will notify all connected localities to finish
@@ -423,9 +456,9 @@ namespace hpx
     ///           PX-threads. In any case the shutdown will not proceed as long
     ///           as there is at least one pending/running PX-thread.
     ///
-    ///           The default value (-1.) will try to find a globally set
+    ///           The default value (`-1.0`) will try to find a globally set
     ///           timeout value (can be set as the configuration parameter
-    ///           "hpx.shutdown_timeout"), and if that is not set or `-1.` as
+    ///           "hpx.shutdown_timeout"), and if that is not set or `-1.0` as
     ///           well, it will disable any timeout, each connected
     ///           locality will wait for all existing PX-threads to terminate.
     ///
@@ -433,7 +466,7 @@ namespace hpx
     ///           (in microseconds) before the connected localities will be
     ///           notified and the overall shutdown process starts.
     ///
-    ///           The default value (-1.) will try to find a globally set
+    ///           The default value (`-1.0`) will try to find a globally set
     ///           wait time value (can be set as the configuration parameter
     ///           "hpx.finalize_wait_time"), and if this is not set or `-1.`
     ///           as well, it will disable any addition local wait time before
@@ -442,9 +475,6 @@ namespace hpx
     /// This function will block and wait for this locality to finish executing
     /// before returning to the caller. It should be the last HPX-function
     /// called by any locality being disconnected.
-    ///
-    /// Using this function is an alternative to \a hpx#finalize, these
-    /// functions do not need to be called both.
     void disconnect(double shutdown_timeout = -1.0,
         double localwait = -1.0);
 }
