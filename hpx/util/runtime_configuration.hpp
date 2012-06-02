@@ -97,8 +97,13 @@ namespace hpx { namespace util
     private:
         std::ptrdiff_t init_default_stack_size() const;
 
+        void pre_initialize_ini();
+        void post_initialize_ini(std::string const& hpx_ini_file,
+            std::vector<std::string> const& cmdline_ini_defs);
+
     private:
         std::ptrdiff_t default_stacksize;
+        bool need_to_call_pre_initialize;
     };
 }}
 

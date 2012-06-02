@@ -24,8 +24,11 @@
 namespace hpx { namespace util
 {
     // pre-initialize entries with compile time based values
-    void pre_initialize_ini(section& ini)
+    void runtime_configuration::pre_initialize_ini()
     {
+        if (!need_to_call_pre_initialize)
+            return;
+
         using namespace boost::assign;
         std::vector<std::string> lines;
         lines +=
@@ -125,19 +128,26 @@ namespace hpx { namespace util
             "enabled = 1"
         ;
         // don't overload user overrides
-        ini.parse("static defaults", lines);
+        this->parse("static defaults", lines);
+
+        need_to_call_pre_initialize = false;
     }
 
-    void post_initialize_ini(section& ini, std::string const& hpx_ini_file,
+    void runtime_configuration::post_initialize_ini(
+        std::string const& hpx_ini_file,
         std::vector<std::string> const& cmdline_ini_defs)
     {
         // add explicit configuration information if its provided
-        if (!hpx_ini_file.empty())
-            util::init_ini_data_base(ini, hpx_ini_file);
+        if (!hpx_ini_file.empty()) {
+            util::init_ini_data_base(*this, hpx_ini_file);
+            need_to_call_pre_initialize = true;
+        }
 
         // let the command line override the config file.
-        if (!cmdline_ini_defs.empty())
-            ini.parse("command line definitions", cmdline_ini_defs);
+        if (!cmdline_ini_defs.empty()) {
+            this->parse("command line definitions", cmdline_ini_defs);
+            need_to_call_pre_initialize = true;
+        }
     }
 
     void runtime_configuration::load_components()
@@ -159,13 +169,16 @@ namespace hpx { namespace util
 
         // merge all found ini files of all components
         util::merge_component_inis(*this);
+
+        need_to_call_pre_initialize = true;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     runtime_configuration::runtime_configuration()
-      : default_stacksize(HPX_DEFAULT_STACK_SIZE)
+      : default_stacksize(HPX_DEFAULT_STACK_SIZE),
+        need_to_call_pre_initialize(true)
     {
-        pre_initialize_ini(*this);
+        pre_initialize_ini();
 
         // set global config options
 #if HPX_USE_ITT == 1
@@ -180,14 +193,14 @@ namespace hpx { namespace util
     {
         hpx_ini_file = hpx_ini_file_;
 
-        pre_initialize_ini(*this);
+        pre_initialize_ini();
 
         std::vector<std::string> const& prefill =
             util::detail::get_logging_data();
         if (!prefill.empty())
             this->parse("static prefill defaults", prefill);
 
-        post_initialize_ini(*this, hpx_ini_file, cmdline_ini_defs);
+        post_initialize_ini(hpx_ini_file, cmdline_ini_defs);
 
         // set global config options
 #if HPX_USE_ITT == 1
@@ -201,14 +214,14 @@ namespace hpx { namespace util
     {
         cmdline_ini_defs = cmdline_ini_defs_;
 
-        pre_initialize_ini(*this);
+        pre_initialize_ini();
 
         std::vector<std::string> const& prefill =
             util::detail::get_logging_data();
         if (!prefill.empty())
             this->parse("static prefill defaults", prefill);
 
-        post_initialize_ini(*this, hpx_ini_file, cmdline_ini_defs);
+        post_initialize_ini(hpx_ini_file, cmdline_ini_defs);
 
         // set global config options
 #if HPX_USE_ITT == 1
