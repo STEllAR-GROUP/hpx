@@ -700,7 +700,7 @@ namespace hpx
     ///           otherwise.
     ///
     /// \see      \a hpx::find_here(), \a hpx::find_all_localities()
-    HPX_API_EXPORT naming::id_type find_locality(components::component_type);
+    HPX_API_EXPORT naming::id_type find_locality(components::component_type type);
 }
 
 #include <hpx/lcos/async_fwd.hpp>
