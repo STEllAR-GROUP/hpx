@@ -99,8 +99,11 @@ int hpx_main(boost::program_options::variables_map&)
 
         future<int> p = async_callback(
             do_test,
-            boost::bind(future_callback, boost::ref(data_cb_called)
-              , boost::ref(error_cb_called), _1),
+            // The HPX_STD_FUNCTION is a workaround for a GCC bug, see the
+            // async_callback_non_deduced_context regression test.
+            HPX_STD_FUNCTION<void(hpx::lcos::future<int>)>(
+                boost::bind(future_callback, boost::ref(data_cb_called)
+                  , boost::ref(error_cb_called), _1)),
             hpx::find_here()
         );
 
@@ -177,8 +180,11 @@ int hpx_main(boost::program_options::variables_map&)
 
         future<int> p = async_callback(
             do_test_error,
-            boost::bind(future_callback, boost::ref(data_cb_called)
-              , boost::ref(error_cb_called), _1),
+            // The HPX_STD_FUNCTION is a workaround for a GCC bug, see the
+            // async_callback_non_deduced_context regression test.
+            HPX_STD_FUNCTION<void(hpx::lcos::future<int>)>(
+                boost::bind(future_callback, boost::ref(data_cb_called)
+                  , boost::ref(error_cb_called), _1)),
             hpx::find_here()
         );
 
@@ -206,7 +212,7 @@ int hpx_main(boost::program_options::variables_map&)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
-    boost::program_options::options_description desc_commandline(
+    boost::program_options::options_description cmdline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
     // We force this test to use several threads by default.

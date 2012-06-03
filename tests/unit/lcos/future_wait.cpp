@@ -12,6 +12,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/atomic.hpp>
+#include <boost/lexical_cast.hpp>
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;

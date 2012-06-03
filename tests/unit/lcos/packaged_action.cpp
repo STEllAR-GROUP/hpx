@@ -97,8 +97,7 @@ int hpx_main(variables_map&)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options.
-    options_description
-        desc_commandline("usage: " HPX_APPLICATION_STRING " [options]");
+    options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
 
     // We force this test to use several threads by default.
     using namespace boost::assign;

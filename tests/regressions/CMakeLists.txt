@@ -7,6 +7,7 @@
 set(subdirs
     actions
     components
+    lcos
     util
    )
 

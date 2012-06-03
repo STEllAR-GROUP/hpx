@@ -6,7 +6,7 @@
 
 # Windows requires all symbols to be resolved at link time, this test does not
 # make sense on this platform.
-if(NOT WIN32)
+if(NOT MSVC)
   add_hpx_component(undefined_symbol
     HEADER_GLOB "undefined_symbol.h*"
     SOURCE_GLOB "undefined_symbol.c*"
@@ -19,3 +19,4 @@ if(NOT WIN32)
   set_target_properties(undefined_symbol_component
       PROPERTIES LINK_FLAGS "-Wl,--allow-shlib-undefined")
 endif()
+
