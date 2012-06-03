@@ -192,7 +192,7 @@ by section basis below.
      [dynamic information, initialized from the command line (arv\[0\])]]
     [[`hpx.cmd_line`]
      [This setting reflects the actual command line used to launch this
-      applicaion instance.]
+      application instance.]
      [dynamic information, initialized from command line (argc/argv)]]
 ]
 
@@ -315,6 +315,7 @@ sections, one for each component.
 [table:ini_hpx_agas
     [[Property]                 [Description]                         [Remark]]
     [[`hpx.agas.address`]
+     [/ REVIEW: Technically, I believe --hpx:agas sets this parameter, this may need to be reworded. ]
      [This property defines the default IP address to be used for the AGAS root
       server. This IP address will be used as long as no other
       values are specified (for instance using the [hpx_cmdline `--hpx:agas`]
@@ -323,6 +324,7 @@ sections, one for each component.
      [static information, the default depends on the compile time preprocessor
       constant `HPX_INITIAL_IP_ADDRESS` (`"127.0.0.1"`)]]
     [[`hpx.agas.port`]
+     [/ REVIEW: Technically, I believe --hpx:agas sets this parameter, this may need to be reworded. ]
      [This property defines the default IP port to be used for the AGAS root
       server. This IP port will be used as long as no other
       values are specified (for instance using the [hpx_cmdline `--hpx:agas`]
@@ -330,23 +332,38 @@ sections, one for each component.
      [static information, the default depends on the compile time preprocessor
       constant `HPX_INITIAL_IP_PORT` (`7010`)]]
     [[`hpx.agas.service_mode`]
-     []
-     []]
+     [This property specifies what type of AGAS service is running on this locality.
+      Currently, two modes exist. The locality that acts as the AGAS server runs
+      in `bootstrap` mode. All other localities are in `hosted` mode.]
+     [dynamic information]]
     [[`hpx.agas.dedicated_server`]
-     []
-     []]
+     [This property specifies whether the AGAS server is exclusively running
+      AGAS services and not hosting any application components. It is a boolean
+      value.]
+     [dynamic information, true if [hpx_cmdline `--hpx-run-agas-server-only`]
+      is present.]
     [[`hpx.agas.max_pending_refcnt_requests`]
-     []
-     []]
+     [This property defines the number of reference counting requests (increments
+      or decrements) to buffer.]
+     [static information, the default depends on the compile time preprocessor
+      constant `HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS` (`4096`)]]
     [[`hpx.agas.local_cache_size`]
-     []
-     []]
-    [[`hpx.agas.use_range_caching`]
-     []
-     []]
     [[`hpx.agas.use_caching`]
-     []
-     []]
+     [This property specifies whether a software address translation cache is
+      used. It is a boolean value.]
+     [static information, defaults to true.]]
+    [[`hpx.agas.use_range_caching`]
+     [This property specifies whether range-based caching is used by the software
+      address translation cache. This property is ignored if `hpx.agas.use_caching`
+      is false. It is a boolean value.]
+     [static information, defaults to true.]]
+     [This property defines the size of the software address translation cache
+      for AGAS services. This property is ignored if `hpx.agas.use_caching` is
+      false. Note that if `hpx.agas.use_range_caching` is true, this size will
+      refer to the maximum number of ranges stored in the cache, not the number
+      of entries spanned by the cache.]
+     [static information, the default depends on the compile time preprocessor
+      constant `HPX_INITIAL_AGAS_LOCAL_CACHE_SIZE` (`256`)]]
 ]
 
 [endsect] [/ Default Configuration Settings]
