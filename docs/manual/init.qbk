@@ -341,13 +341,12 @@ sections, one for each component.
       AGAS services and not hosting any application components. It is a boolean
       value.]
      [dynamic information, true if [hpx_cmdline `--hpx-run-agas-server-only`]
-      is present.]
+      is present.]]
     [[`hpx.agas.max_pending_refcnt_requests`]
      [This property defines the number of reference counting requests (increments
       or decrements) to buffer.]
      [static information, the default depends on the compile time preprocessor
       constant `HPX_INITIAL_AGAS_MAX_PENDING_REFCNT_REQUESTS` (`4096`)]]
-    [[`hpx.agas.local_cache_size`]
     [[`hpx.agas.use_caching`]
      [This property specifies whether a software address translation cache is
       used. It is a boolean value.]
@@ -357,6 +356,7 @@ sections, one for each component.
       address translation cache. This property is ignored if `hpx.agas.use_caching`
       is false. It is a boolean value.]
      [static information, defaults to true.]]
+    [[`hpx.agas.local_cache_size`]
      [This property defines the size of the software address translation cache
       for AGAS services. This property is ignored if `hpx.agas.use_caching` is
       false. Note that if `hpx.agas.use_range_caching` is true, this size will
@@ -482,7 +482,11 @@ they are associated with.
 [section:component_example Application Specific Component Example]
 
 In this section we assume to have a simple application component which exposes
-one member function as a component action:
+one member function as a component action. The header file `app_server.hpp`
+declares the C++ type to be exposed as a component. This type has a member
+function `print_greating()` which is exposed as an action (`print_greating_action`).
+We assume the source files fo rthis example are located in a directory
+referenced by [teletype]`$APP_ROOT`[c++]:
 
     // file: $APP_ROOT/app_server.hpp
     #include <hpx/hpx.hpp>
@@ -508,7 +512,8 @@ one member function as a component action:
     // Declare boilerplate code required for each of the component actions.
     ``[macroref HPX_REGISTER_ACTION_DECLARATION `HPX_REGISTER_ACTION_DECLARATION`]``(app::server::print_greating_action);
 
-and
+The corresponding source file contains mainly macro invocations which define
+boilerplate code needed for __hpx__ to function properly:
 
     // file: $APP_ROOT/app_server.cpp
     #include "app_server.hpp"
@@ -516,14 +521,20 @@ and
     // Define boilerplate required once per component module.
     ``[macroref HPX_REGISTER_COMPONENT_MODULE `HPX_REGISTER_COMPONENT_MODULE`]``();
 
-    // Define factory object associated with our component of type 'app::server'
+    // Define factory object associated with our component of type 'app::server'.
     ``[macroref HPX_REGISTER_MINIMAL_COMPONENT_FACTORY `HPX_REGISTER_MINIMAL_COMPONENT_FACTORY`]``(app::server, app_server);
 
     // Define boilerplate code required for each of the component actions. Use the
-    // same argiments as used for HPX_REGISTER_ACTION_DECLARATION above.
+    // same argument as used for HPX_REGISTER_ACTION_DECLARATION above.
     ``[macroref HPX_REGISTER_ACTION `HPX_REGISTER_ACTION`]``(app::server::print_greating_action);
 
-The following gives an example of how the newly created component can be used:
+The following gives an example of how the component can be used. We create one
+instance of the `app::server` component on the current locality and invoke the
+exposed action `print_greating_action` using the global id of the newly created
+instance. Note, that no special code is required to delete the component
+instance after it is not needed anymore. It will be deleted automatically when
+its last reference goes out of scope, here at the closing brace of the block
+surrounding the code.
 
     // file: $APP_ROOT/use_app_server_example.cpp
     #include <hpx/hpx_init.hpp>
@@ -532,13 +543,14 @@ The following gives an example of how the newly created component can be used:
     int hpx_main()
     {
         {
-            // Create an instance of the app_server component on the current
-            // locality.
-            hpx::naming:id_type app_server_instance = hpx::create_component(
-                ``[funcref hpx::find_here `hpx::find_here`]``(), hpx::get_component_type<app::server>());
+            // Create an instance of the app_server component on the current locality.
+            hpx::naming:id_type app_server_instance =
+                hpx::create_component<app::server>(``[funcref hpx::find_here `hpx::find_here`]``());
 
-            // Invoke the action print_greating on the newly created component.
+            // Create an instance of the action 'print_greating_action'.
             app::server::print_greating_action print_greating;
+
+            // Invoke the action 'print_greating' on the newly created component.
             print_greating(app_server_instance);
         }
         return ``[funcref hpx::finalize `hpx::finalize`]``();
@@ -600,17 +612,17 @@ default.
 
 [table Logging levels
     [[Logging level]    [Integral value]]
-    [[<debug>]          [5]]
-    [[<info>]           [4]]
-    [[<warning>]        [3]]
-    [[<error>]          [2]]
-    [[<fatal>]          [1]]
-    [[No logging]       [0]]
+    [[<debug>]          [`5`]]
+    [[<info>]           [`4`]]
+    [[<warning>]        [`3`]]
+    [[<error>]          [`2`]]
+    [[<fatal>]          [`1`]]
+    [[No logging]       [`0`]]
 ]
 
 [tip The easiest way to enable logging output is to set the environment variable
      corresponding to the logging category to an integral value as described in
-     the table above. For instance, setting `HPX_LOGLEVEL=4` will enable full
+     the table above. For instance, setting `HPX_LOGLEVEL=5` will enable full
      logging output for the general category. Please note, that the syntax and
      means of setting environment variables varies between operating systems.]
 
@@ -697,12 +709,13 @@ will replace the separator.
       replaced with a sequence of `'-'` characters.]
 
 Here is an example line from a logging output generated by one of the HPX
-examples:
+examples (please note that this is generated on a single line, without line
+break):
 
 [teletype]
 ``
     (T00000000/0000000002d46f90.01/00000000009ebc10) P--------/0000000002d46f80.02 17:49.37.320 [000000000000004d]
-    <info>  [RT] successfully created component {0000000100ff0001, 0000000000030002} of type: component_barrier[7(3)]
+        <info>  [RT] successfully created component {0000000100ff0001, 0000000000030002} of type: component_barrier[7(3)]
 ``
 [c++]
 
