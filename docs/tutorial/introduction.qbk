@@ -24,7 +24,7 @@ algorithms and adaptive mesh refinement methods for astrophysics. An additional
 benefit of ParalleX is fine-grained control of power usage, enabling reductions
 in power consumption.
 
-[heading ParalleX - a new Executrion Model for Future Architectures]
+[heading ParalleX - a new Execution Model for Future Architectures]
 
 ParalleX is a new parallel execution model that offers an alternative to
 the conventional computation models, such as message passing. ParalleX
@@ -340,7 +340,7 @@ utilization. The more complex and more dynamic the data structures and
 algorithms become, the larger are the adverse effects. The community has
 discovered message-driven and (data-driven) methods of implementing algorithms
 a long time ago, and systems such as __charm_pp__ already have integrated active
-messages demonstrating the validity of the concept. message driven computation
+messages demonstrating the validity of the concept. Message driven computation
 allows to send messages without that the receiver has to actively wait for
 them. Any incoming message is handled asynchronously and triggers the encoded
 action by passing along arguments and - possibly - continuations. __hpx__ combines
