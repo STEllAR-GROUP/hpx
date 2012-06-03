@@ -510,7 +510,7 @@ The following gives an example of how the newly created component can be used:
 
     // file: $APP_ROOT/use_app_server_example.cpp
     #include <hpx/hpx_init.hpp>
-    #include:app_server.hpp"
+    #include "app_server.hpp"
 
     int hpx_main()
     {
