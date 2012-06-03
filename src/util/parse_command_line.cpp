@@ -335,9 +335,10 @@ namespace hpx { namespace util
                   "the step between used processing unit numbers for this "
                   "instance of HPX (default: 1)")
 #endif
-                ("hpx:threads", value<std::size_t>(),
-                  "the number of operating system threads to dedicate as "
-                  "shepherd threads for this HPX locality (default: 1)")
+                ("hpx:threads", value<std::string>(),
+                 "the number of operating system threads to spawn for this HPX "
+                 "locality (default: 1, using 'all' will spawn one thread for "
+                 "each processing unit")
                 ("hpx:queuing", value<std::string>(),
                   "the queue scheduling policy to use, options are 'global/g', "
                   "'local/l', 'priority_local/pr', 'abp/a', 'priority_abp', "

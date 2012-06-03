@@ -831,36 +831,55 @@ namespace hpx
             std::string hpx_host(env.host_name(HPX_INITIAL_IP_ADDRESS));
             boost::uint16_t hpx_port = HPX_INITIAL_IP_PORT;
 
-            // handling number of threads
+            // handle number of threads
             std::size_t batch_threads = env.retrieve_number_of_threads();
+
+            {
+                std::string threads_str
+                    = cfgmap.get_value<std::string>("hpx.os_threads", ""); 
+
+                if ("all" == threads_str)
+                    cfgmap.config_["hpx.os_threads"] =
+                        boost::lexical_cast<std::string>(
+                            thread::hardware_concurrency());
+            }
+
             std::size_t num_threads = cfgmap.get_value<std::size_t>(
                 "hpx.os_threads", batch_threads);
 
             if ((env.run_with_pbs() || env.run_with_slurm()) &&
                   num_threads > batch_threads)
             {
-                std::cerr  << "hpx::init: command line warning: "
-                        "--hpx:ini=hpx.os_threads used when running with "
-                    <<  env.get_batch_name()
-                    <<  ", requesting a larger number of threads than cores have "
-                        "been assigned by "
-                    <<  env.get_batch_name()
-                    <<  ", the application might not run properly."
+                std::cerr << "hpx::init: command line warning: "
+                       "--hpx:ini=hpx.os_threads used when running with "
+                    << env.get_batch_name()
+                    << ", requesting a larger number of threads than cores have "
+                       "been assigned by "
+                    << env.get_batch_name()
+                    << ", the application might not run properly."
                     << std::endl;
             }
 
             if (vm.count("hpx:threads")) {
-                std::size_t threads = vm["hpx:threads"].as<std::size_t>();
+                std::string threads_str = vm["hpx:threads"].as<std::string>();
+
+                std::size_t threads = 0;
+
+                if ("all" == threads_str)
+                    threads = thread::hardware_concurrency();
+                else
+                    threads = boost::lexical_cast<std::size_t>(threads_str);
+
                 if ((env.run_with_pbs() || env.run_with_slurm()) &&
                       num_threads > threads)
                 {
-                    std::cerr  << "hpx::init: command line warning: --hpx:threads "
+                    std::cerr << "hpx::init: command line warning: --hpx:threads "
                             "used when running with "
-                        <<  env.get_batch_name() << ", requesting a larger "
-                            "number of threads than cores have been assigned by "
-                        <<  env.get_batch_name()
-                        <<  ", the application might not run properly."
-                        <<  std::endl;
+                        << env.get_batch_name() << ", requesting a larger "
+                           "number of threads than cores have been assigned by "
+                        << env.get_batch_name()
+                        << ", the application might not run properly."
+                        << std::endl;
                 }
                 num_threads = threads;
             }
@@ -873,12 +892,12 @@ namespace hpx
             if ((env.run_with_pbs() || env.run_with_slurm()) &&
                     batch_localities != num_localities)
             {
-                std::cerr  << "hpx::init: command line warning: "
+                std::cerr << "hpx::init: command line warning: "
                         "--hpx:ini=hpx.localities used when running with "
-                    <<  env.get_batch_name()
-                    <<  ", requesting a different number of localities than have "
-                        "been assigned by " << env.get_batch_name()
-                    <<  ", the application might not run properly."
+                    << env.get_batch_name()
+                    << ", requesting a different number of localities than have "
+                       "been assigned by " << env.get_batch_name()
+                    << ", the application might not run properly."
                     << std::endl;
             }
 
@@ -887,13 +906,13 @@ namespace hpx
                 if ((env.run_with_pbs() || env.run_with_slurm()) &&
                         localities != num_localities)
                 {
-                    std::cerr  << "hpx::init: command line warning: --hpx:localities "
+                    std::cerr << "hpx::init: command line warning: --hpx:localities "
                             "used when running with " << env.get_batch_name()
-                        <<  ", requesting a different "
+                        << ", requesting a different "
                             "number of localities than have been assigned by "
-                        <<  env.get_batch_name()
-                        <<  ", the application might not run properly."
-                        <<  std::endl;
+                        << env.get_batch_name()
+                        << ", the application might not run properly."
+                        << std::endl;
                 }
                 num_localities = localities;
             }
@@ -1039,7 +1058,7 @@ namespace hpx
                     "can be specified only for the node running the AGAS server.");
             }
             if (1 == num_localities && vm.count("hpx:run-agas-server-only")) {
-                std::cerr  << "hpx::init: command line warning: --hpx:run-agas-server-only "
+                std::cerr << "hpx::init: command line warning: --hpx:run-agas-server-only "
                     "used for single locality execution, application might "
                     "not run properly." << std::endl;
             }
