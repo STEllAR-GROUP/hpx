@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file component_action.hpp
+
 #if !defined(HPX_RUNTIME_ACTIONS_COMPONENT_ACTION_MAR_26_2008_1054AM)
 #define HPX_RUNTIME_ACTIONS_COMPONENT_ACTION_MAR_26_2008_1054AM
 
@@ -32,6 +34,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
+    /// \cond NOINTERNAL
+
     ///////////////////////////////////////////////////////////////////////////
 #define HPX_FUNCTION_ARG_ENUM(z, n, data)                                     \
         BOOST_PP_CAT(component_action_arg, BOOST_PP_INC(n)) =                 \
@@ -471,15 +475,92 @@ namespace hpx { namespace actions
     struct result_action0<Component, void, Action, F, Priority, Derived>
         : action0<Component, Action, F, Priority, Derived>
     {};
+
+    /// \endcond
 }}
 
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_DEFINE_COMPONENT_ACTION(component, func, name)                    \
-    typedef HPX_MAKE_COMPONENT_ACTION(component, func) name                   \
+/// \def HPX_DEFINE_COMPONENT_ACTION(component, func, action_type)
+///
+/// \brief Registers a non-const member function of a component as an action type
+/// with HPX
+///
+/// The macro \a HPX_DEFINE_COMPONENT_CONST_ACTION can be used to register a
+/// non-const member function of a component as an action type named \a action_type.
+///
+/// The parameter \a component is the type of the component exposing the
+/// non-const member function \a func which should be associated with the newly
+/// defined action type. The parameter \p action_type is the name of the action
+/// type to register with HPX.
+///
+/// \par Example:
+///
+/// \code
+///       namespace app
+///       {
+///           // Define a simple component exposing one action 'print_greating'
+///           class HPX_COMPONENT_EXPORT server
+///             : public hpx::components::simple_component_base<server>
+///           {
+///               void print_greating ()
+///               {
+///                   hpx::cout << "Hey, how are you?\n" << hpx::flush;
+///               }
+///
+///               // Component actions need to be declared, this also defines the
+///               // type 'print_greating_action' representing the action.
+///               HPX_DEFINE_COMPONENT_ACTION(server, print_greating, print_greating_action);
+///           };
+///       }
+/// \endcode
+///
+/// \note This macro should be used for non-const member functions only. Use
+/// the macro \a HPX_DEFINE_COMPONENT_CONST_ACTION for const member functions.
+#define HPX_DEFINE_COMPONENT_ACTION(component, func, action_type)             \
+    typedef HPX_MAKE_COMPONENT_ACTION(component, func) action_type            \
     /**/
+
+/// \def HPX_DEFINE_COMPONENT_CONST_ACTION(component, func, action_type)
+///
+/// \brief Registers a const member function of a component as an action type
+/// with HPX
+///
+/// The macro \a HPX_DEFINE_COMPONENT_CONST_ACTION can be used to register a
+/// const member function of a component as an action type named \a action_type.
+///
+/// The parameter \a component is the type of the component exposing the const
+/// member function \a func which should be associated with the newly defined
+/// action type. The parameter \p action_type is the name of the action type to
+/// register with HPX.
+///
+/// \par Example:
+///
+/// \code
+///       namespace app
+///       {
+///           // Define a simple component exposing one action 'print_greating'
+///           class HPX_COMPONENT_EXPORT server
+///             : public hpx::components::simple_component_base<server>
+///           {
+///               void print_greating() const
+///               {
+///                   hpx::cout << "Hey, how are you?\n" << hpx::flush;
+///               }
+///
+///               // Component actions need to be declared, this also defines the
+///               // type 'print_greating_action' representing the action.
+///               HPX_DEFINE_COMPONENT_CONST_ACTION(server, print_greating, print_greating_action);
+///           };
+///       }
+/// \endcode
+///
+/// \note This macro should be used for const member functions only. Use
+/// the macro \a HPX_DEFINE_COMPONENT_ACTION for non-const member functions.
 #define HPX_DEFINE_COMPONENT_CONST_ACTION(component, func, name)              \
     typedef HPX_MAKE_CONST_COMPONENT_ACTION(component, func) name             \
     /**/
+
+/// \cond NOINTERNAL
+
 #define HPX_DEFINE_COMPONENT_DIRECT_ACTION(component, func, name)             \
     typedef HPX_MAKE_DIRECT_COMPONENT_ACTION(component, func) name            \
     /**/
@@ -509,6 +590,8 @@ namespace hpx { namespace actions
 HPX_SERIALIZATION_REGISTER_TEMPLATE(
     (template <typename Action>), (hpx::actions::transfer_action<Action>)
 )
+
+/// \endcond
 
 #include <hpx/config/warnings_suffix.hpp>
 

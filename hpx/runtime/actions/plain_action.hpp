@@ -30,11 +30,12 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-/// \cond NOINTERNAL
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
+    /// \cond NOINTERNAL
+
     ///////////////////////////////////////////////////////////////////////////
 #define HPX_FUNCTION_ARG_ENUM(z, n, data)                                     \
         BOOST_PP_CAT(function_action_arg, BOOST_PP_INC(n)) =                  \
@@ -350,9 +351,10 @@ namespace hpx { namespace actions
     struct plain_result_action0<void, F, Priority, Derived>
         : plain_action0<F, Priority, Derived>
     {};
+
+    /// \endcond
 }}
 
-/// \endcond
 
 // Disabling the guid initialization stuff for plain actions
 namespace hpx { namespace traits
@@ -391,10 +393,10 @@ namespace hpx { namespace traits
 }}
 
 /// \def HPX_REGISTER_PLAIN_ACTION(action_type)
-/// \brief Registers an existing plain action type with HPX
+/// \brief Registers an existing free function as a plain action with HPX
 ///
 /// The macro \a HPX_REGISTER_PLAIN_ACTION can be used to register an existing
-/// plain action type (e.g. an action encapsulating a global or free function)
+/// free function as a plain action. It additionally defines an action type
 /// named \a action_type.
 ///
 /// The parameter \p action_type is the name of the action type to register

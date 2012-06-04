@@ -5,6 +5,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file action_support.hpp
+
 #if !defined(HPX_RUNTIME_ACTIONS_ACTION_SUPPORT_NOV_14_2008_0711PM)
 #define HPX_RUNTIME_ACTIONS_ACTION_SUPPORT_NOV_14_2008_0711PM
 
@@ -54,6 +56,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {
+    /// \cond NOINTERNAL
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
@@ -700,7 +704,11 @@ namespace hpx { namespace actions
           : boost::mpl::if_<boost::is_same<Derived, this_type>, Action, Derived>
         {};
     }
+
+    /// \endcond
 }}
+
+/// \cond NOINTERNAL
 
 #include <hpx/config/warnings_suffix.hpp>
 
@@ -735,8 +743,6 @@ namespace hpx { namespace actions
                 _##actionname);                                               \
     /**/
 
-#define HPX_REGISTER_ACTION(action) HPX_REGISTER_ACTION_EX(action, action)
-
 #define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID1(action)              \
     namespace hpx { namespace actions { namespace detail {                    \
         template <> HPX_ALWAYS_EXPORT                                         \
@@ -767,8 +773,69 @@ namespace hpx { namespace actions
         BOOST_PP_STRINGIZE(actionname))                                       \
     HPX_REGISTER_ACTION_DECLARATION_GUID(hpx::actions::transfer_action<action>) \
 /**/
+
+/// \endcond
+
+/// \def HPX_REGISTER_ACTION_DECLARATION(action)
+///
+/// \brief Declare the necessary component action boilerplate code.
+///
+/// The macro \a HPX_REGISTER_ACTION_DECLARATION can be used to declare all the
+/// boilerplate code which is required for proper functioning of component
+/// actions in the context of HPX.
+///
+/// The parameter \a action is the type of the action to declare the
+/// boilerplate for.
+///
+/// \par Example:
+///
+/// \code
+///      namespace app
+///      {
+///          // Define a simple component exposing one action 'print_greating'
+///          class HPX_COMPONENT_EXPORT server
+///            : public hpx::components::simple_component_base<server>
+///          {
+///              void print_greating ()
+///              {
+///                  hpx::cout << "Hey, how are you?\n" << hpx::flush;
+///              }
+///
+///              // Component actions need to be declared, this also defines the
+///              // type 'print_greating_action' representing the action.
+///              HPX_DEFINE_COMPONENT_ACTION(server, print_greating, print_greating_action);
+///          };
+///      }
+///
+///      // Declare boilerplate code required for each of the component actions.
+///      HPX_REGISTER_ACTION_DECLARATION(app::server::print_greating_action);
+/// \endcode
+///
+/// \note This macro has to be used once for each of the component actions
+/// defined using one of the \a HPX_DEFINE_COMPONENT_ACTION macros. It has to
+/// be visible in all translation units using the action, thus it is
+/// recommended to place it into the header file defining the component.
 #define HPX_REGISTER_ACTION_DECLARATION(action)                               \
     HPX_REGISTER_ACTION_DECLARATION_EX(action, action)                        \
+/**/
+
+/// \def HPX_REGISTER_ACTION(action)
+///
+/// \brief Define the necessary component action boilerplate code.
+///
+/// The macro \a HPX_REGISTER_ACTION can be used to define all the
+/// boilerplate code which is required for proper functioning of component
+/// actions in the context of HPX.
+///
+/// The parameter \a action is the type of the action to define the
+/// boilerplate for.
+///
+/// \note This macro has to be used once for each of the component actions
+/// defined using one of the \a HPX_DEFINE_COMPONENT_ACTION macros. It has to
+/// occur exactly once for each of the actions, thus it is recommended to
+/// place it into the source file defining the component.
+#define HPX_REGISTER_ACTION(action)                                           \
+    HPX_REGISTER_ACTION_EX(action, action)                                    \
 /**/
 
 #endif

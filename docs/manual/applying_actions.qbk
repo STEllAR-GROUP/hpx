@@ -97,14 +97,13 @@ demonstrating this. The first snippet has to go into the header file:
 
     // Note: The second arguments to the macro below have to be systemwide-unique
     //       C++ identifiers
-    ``[macroref HPX_REGISTER_ACTION_DECLARATION_EX `HPX_REGISTER_ACTION_DECLARATION_EX`]``(app::some_component::some_member_action,
-        app_some_member_action);
+    ``[macroref HPX_REGISTER_ACTION_DECLARATION `HPX_REGISTER_ACTION_DECLARATION`]``(app::some_component::some_member_action);
 
 The next snippet belongs into the source file:
 
     // The parameters for this macro have to be the same as used in the corresponding
-    // HPX_REGISTER_ACTION_DECLARATION_EX() macro invocation above
-    ``[macroref HPX_REGISTER_ACTION_EX `HPX_REGISTER_ACTION_EX`]``(app::some_component::some_member_action, app_some_member_action);
+    // HPX_REGISTER_ACTION_DECLARATION() macro invocation above
+    ``[macroref HPX_REGISTER_ACTION `HPX_REGISTER_ACTION`]``(app::some_component::some_member_action);
 
 Granted, these macro invocations are a bit more complex than for simple global
 functions, however we believe they are still manageable.

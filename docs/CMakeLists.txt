@@ -34,7 +34,9 @@ if(DOXYGEN_FOUND)
       ${hpx_SOURCE_DIR}/hpx/hpx_fwd.hpp
       ${hpx_SOURCE_DIR}/hpx/hpx_init.hpp
       ${hpx_SOURCE_DIR}/hpx/exception.hpp
-      ${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action.hpp)
+      ${hpx_SOURCE_DIR}/hpx/runtime/actions/action_support.hpp 
+      ${hpx_SOURCE_DIR}/hpx/runtime/actions/plain_action.hpp
+      ${hpx_SOURCE_DIR}/hpx/runtime/actions/component_action.hpp)
 
   # Generate Doxygen from the source code.
   hpx_source_to_boostbook(hpx_autodoc
