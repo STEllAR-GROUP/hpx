@@ -21,7 +21,6 @@ if(EXODUS_ROOT)
   set(EXODUS_FORTRAN_ROOT ${EXODUS_ROOT})
 endif()
 
-
 hpx_find_package(EXODUS_FORTRAN
   LIBRARIES exoIIv2for libexoIIv2for
   LIBRARY_PATHS lib64 lib

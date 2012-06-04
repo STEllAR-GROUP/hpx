@@ -745,8 +745,8 @@ namespace hpx { namespace actions
 /**/
 #define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID2(action)              \
     namespace hpx { namespace traits {                                        \
-        template <typename Enable>                                            \
-        struct needs_guid_initialization<action, Enable>                      \
+        template <>                                                           \
+        struct needs_guid_initialization<action>                              \
           : boost::mpl::false_                                                \
         {};                                                                   \
     }}                                                                        \
