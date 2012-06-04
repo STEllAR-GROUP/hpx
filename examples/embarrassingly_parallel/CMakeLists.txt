@@ -13,12 +13,13 @@ foreach(subdir ${subdirs})
   add_subdirectory(${subdir})
 
   set(sources
-      ${subdir}_client.cpp)
-#      test.f90)
+      ${subdir}_client.cpp
+      test.f90)
 
   source_group("Source Files" FILES ${sources})
 
   set(dependencies
+#      ${HDF5_FORTRAN_LIBRARY}
       distributing_factory_component)
 
   # add example executable
