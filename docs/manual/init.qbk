@@ -393,7 +393,7 @@ __iniformat__.
   file (if any).
 # Load a file named `/etc/hpx.ini`. This lookup is done on Linux systems
   only.
-# Load a file named `.hpx.ini` in the home directorz of the current user,
+# Load a file named `.hpx.ini` in the home directory of the current user,
   e.g. the directory refernced by the environment variable `HOME`.
 # Load a file named `.hpx.ini` in the directory refernced by the environment
   variable `PWD`.
@@ -560,6 +560,52 @@ surrounding the code.
     {
         return ``[funcref hpx::init `hpx::init`]``(argc, argv);
     ]
+
+In order to make sure that the application will be able to use the component
+`app::server`, special configuration information must be passed to __hpx__.
+The simples way to allow __hpx__ to 'find' the component is to provide special
+ini configuration files, which add the necessary information to the internal
+configuration database. The component should have a special ini file containing
+the information specific to the component `app_server`:
+
+[teletype]
+``
+    # file: $APP_ROOT/app_server.ini
+    [hpx.components.app_server]
+    name = app_server
+    path = $APP_LOCATION/
+``
+[c++]
+
+Here [teletype]`$APP_LOCATION`[c++] is the directory where the (binary)
+component shared library is located. __hpx__ will attempt to load the shared
+library from there. The section name `hpx.components.app_server`
+reflects the instance name of the component (`app_server` is an arbitrary,
+but unique name) . The property value for `hpx.components.app_server.name`
+should be the same as used for the second argument to the macro
+[macroref HPX_REGISTER_MINIMAL_COMPONENT_FACTORY `HPX_REGISTER_MINIMAL_COMPONENT_FACTORY`]
+above.
+
+Additionally a file `.hpx.ini` which could be located in the current working
+directory (see step 3 as described in the section __loading_ini__) allows to
+add the directory to the ini search path where the above ini file specific to
+the component is located:
+
+[teletype]
+``
+    # file: $PWD/.hpx.ini
+    [hpx]
+    ini_path = $[hpx.ini_path]:$APP_ROOT/
+``
+[c++]
+
+This assumes that the above ini file specific to the component is located in
+the directory [teletype]`$APP_ROOT`[c++].
+
+[note It is possible to reference the defined property from inside its
+      value. __hpx__ will gracefully use the previous value of `hpx.ini_path`
+      for the reference on the right hand side and assign the overall (now
+      expanded) value to the property.]
 
 [endsect] [/ Application Specific Component Example]
 
