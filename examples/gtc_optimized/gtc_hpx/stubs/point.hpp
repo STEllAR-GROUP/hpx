@@ -16,17 +16,17 @@ namespace gtc { namespace stubs
     struct point : hpx::components::stub_base<server::point>
     {
         static hpx::lcos::future<void>
-        bfs_async(hpx::naming::id_type const& gid,std::size_t scale)
+        setup_async(hpx::naming::id_type const& gid,std::size_t numberpe,std::size_t mype)
         {
-            typedef server::point::bfs_action action_type;
-            return hpx::async<action_type>(gid,scale);
+            typedef server::point::setup_action action_type;
+            return hpx::async<action_type>(gid,numberpe,mype);
         }
 
-        static void bfs(hpx::naming::id_type const& gid,std::size_t scale)
+        static void setup(hpx::naming::id_type const& gid,std::size_t numberpe,std::size_t mype)
         {
             // The following get yields control while the action above
             // is executed and the result is returned to the future.
-            bfs_async(gid,scale).get();
+            setup_async(gid,numberpe,mype).get();
         }
     };
 }}

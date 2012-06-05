@@ -34,16 +34,16 @@ namespace gtc
         ///////////////////////////////////////////////////////////////////////
         // Exposed functionality of this component.
 
-        hpx::lcos::future<void> bfs_async(std::size_t scale)
+        hpx::lcos::future<void> setup_async(std::size_t numberpe,std::size_t mype)
         {
             BOOST_ASSERT(gid_);
-            return this->base_type::bfs_async(gid_,scale);
+            return this->base_type::setup_async(gid_,numberpe,mype);
         }
 
-        void bfs(std::size_t scale)
+        void setup(std::size_t numberpe,std::size_t mype)
         {
             BOOST_ASSERT(gid_);
-            this->base_type::bfs(gid_,scale);
+            this->base_type::setup(gid_,numberpe,mype);
         }
     };
 }

@@ -9,6 +9,7 @@
 #include <hpx/lcos/future_wait.hpp>
 
 #include "../stubs/point.hpp"
+#include "../../fname.h"
 #include "point.hpp"
 
 #include <boost/format.hpp>
@@ -17,14 +18,16 @@
 #include <iostream>
 #include <fstream>
 
+extern "C" {void FNAME(SETUP)(int *,int *); }
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace gtc { namespace server
 {
-    void point::bfs(std::size_t scale)
+    void point::setup(std::size_t numberpe,std::size_t mype)
     {
-      for (std::size_t i=0;i<scale;i++) {
-        sum_ += i+(i-1)*(i+1)/(i+2);
-      }
+      int t1 = numberpe;
+      int t2 = mype;
+      FNAME(SETUP)(&t1,&t2);
     }
 }}
 
