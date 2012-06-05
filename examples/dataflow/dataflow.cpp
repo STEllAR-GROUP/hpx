@@ -101,13 +101,13 @@ int hpx_main(variables_map& vm)
             ) % par->nx0 );
         HPX_THROW_IN_CURRENT_FUNC(bad_parameter, msg);
     }
-    //if ( (par->nt0 % 5) != 0 )
-    //{
-    //    std::string msg = boost::str(boost::format(
-    //        "nt0 needs to be even: (%1%) "
-    //        ) % par->nt0);
-    //    HPX_THROW_IN_CURRENT_FUNC(bad_parameter, msg);
-    //}
+    if ( (par->nt0 % 2) != 0 )
+    {
+        std::string msg = boost::str(boost::format(
+            "nt0 needs to be even: (%1%) "
+            ) % par->nt0);
+        HPX_THROW_IN_CURRENT_FUNC(bad_parameter, msg);
+    }
 
     std::cout << " Parameters    : " << std::endl;
     std::cout << " nx0           : " << par->nx0 << std::endl;

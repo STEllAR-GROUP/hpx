@@ -157,7 +157,7 @@ namespace hpx { namespace components { namespace amr
             << std::endl;
 
         //std::cout << " row " << row << " column " << column << " timestep " << resultval->timestep_ << " size " << val.size() << std::endl;
-        if (val[3]->timestep_ >= 1) {
+        if (val[3]->timestep_ >= par->nt0-1) {
           return 0;
         }
         return 1;
