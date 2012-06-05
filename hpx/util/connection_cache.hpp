@@ -44,16 +44,10 @@ namespace hpx { namespace util
         typedef std::deque<connection_type> value_type;
         typedef Key key_type;
         typedef std::list<key_type> key_tracker_type;
-        typedef
-            std::map<
-                key_type
-              , boost::tuple<
-                    value_type
-                  , std::size_t
-                  , typename key_tracker_type::iterator
-                >
-            >
-            cache_type;
+        typedef boost::tuple<
+            value_type, std::size_t, typename key_tracker_type::iterator
+        > cache_value_type;
+        typedef std::map<key_type, cache_value_type> cache_type;
         typedef typename cache_type::size_type size_type;
 
         connection_cache(
@@ -93,14 +87,20 @@ namespace hpx { namespace util
                 {
                     connection_type result = boost::get<0>(it->second).front();
                     boost::get<0>(it->second).pop_front();
-                    --boost::get<1>(it->second);
                     --cache_size_;
 
+                    // The following line has to be removed in order to fix
+                    // the behavior of the connection cache. Sadly, this breaks
+                    // the AGAS booststrap.
+                    --boost::get<1>(it->second);
+
+                    check_invariants();
                     return result;
                 }
             }
 
             // If we get here then the item is not in the cache.
+            check_invariants();
             return connection_type();
         }
 
@@ -112,13 +112,15 @@ namespace hpx { namespace util
 
             const typename cache_type::iterator jt = cache_.find(l);
 
-            if(jt != cache_.end() && boost::get<1>(jt->second) >= max_connections_per_locality_)
+            if (jt != cache_.end() && boost::get<1>(jt->second) >= max_connections_per_locality_)
             {
                 key_tracker_.splice(
                     key_tracker_.end()
                   , key_tracker_
                   , boost::get<2>(jt->second)
                 );
+
+                check_invariants();
                 return;
             }
 
@@ -133,7 +135,7 @@ namespace hpx { namespace util
                 // Find the least recently used key entry
                 typename key_tracker_type::iterator it = key_tracker_.begin();
 
-                while(cache_size_ >= max_cache_size_)
+                while (cache_size_ >= max_cache_size_)
                 {
                     // find it ...
                     const typename cache_type::iterator kt = cache_.find(*it);
@@ -157,9 +159,8 @@ namespace hpx { namespace util
                 }
             }
 
-
             // If we reach here, we can safely add a new entry ...
-            if(jt == cache_.end())
+            if (jt == cache_.end())
             {
                 // cache doesn't hold the key yet ... insert
                 typename key_tracker_type::iterator it =
@@ -178,6 +179,7 @@ namespace hpx { namespace util
                 // add it to our vector of connections for this prefix
                 boost::get<0>(jt->second).push_back(conn);
                 ++boost::get<1>(jt->second);
+
                 // updating LRU info ... this key has just been used.
                 key_tracker_.splice(
                     key_tracker_.end()
@@ -186,35 +188,88 @@ namespace hpx { namespace util
                 );
             }
             ++cache_size_;
+
+            check_invariants();
         }
 
-        bool full()
+        bool full() const
         {
             mutex_type::scoped_lock lock(mtx_);
             return (cache_size_ >= max_cache_size_);
         }
 
-        bool full(key_type const & l)
+        bool full(key_type const & l) const
         {
             mutex_type::scoped_lock lock(mtx_);
-            return cache_.count(l) && boost::get<1>(cache_[l]) >= max_connections_per_locality_;
+
+            if (!cache_.count(l))
+                return false;
+
+            typename cache_type::const_iterator jt = cache_.find(l);
+            BOOST_ASSERT(jt != cache_.end());
+            return boost::get<1>(jt->second) >= max_connections_per_locality_;
         }
 
-        bool contains(key_type const & l)
+        bool contains(key_type const & l) const
         {
             mutex_type::scoped_lock lock(mtx_);
-            return cache_.count(l) && boost::get<0>(cache_[l]).size();
+
+            if (!cache_.count(l))
+                return false;
+
+            typename cache_type::const_iterator jt = cache_.find(l);
+            BOOST_ASSERT(jt != cache_.end());
+            return boost::get<0>(jt->second).size();
         }
 
         void clear()
         {
             mutex_type::scoped_lock lock(mtx_);
+            key_tracker_.clear();
             cache_.clear();
             cache_size_ = 0;
+
+            check_invariants();
+        }
+
+    protected:
+        // verify class invariants
+        void check_invariants() const
+        {
+#if defined(HPX_DEBUG)
+            typedef typename cache_type::const_iterator const_iterator;
+
+            size_type count = 0;
+            const_iterator end = cache_.end();
+            for (const_iterator it = cache_.begin(); it != end; ++it)
+            {
+                cache_value_type const& val = it->second;
+
+                // The separate item counter has to properly count all the
+                // existing the elements, not only those in the cache entry.
+                BOOST_ASSERT(boost::get<0>(val).size() <= boost::get<1>(val));
+
+                // The overall number of connections in each entry (for each
+                // locality) should  not be larger than the allowed number.
+                BOOST_ASSERT(boost::get<1>(val) <= max_connections_per_locality_);
+
+                // count overall cache entries
+                count += boost::get<0>(val).size();
+            }
+
+            // Overall number of entries should match separate counter.
+            BOOST_ASSERT(count == cache_size_);
+
+            // check that we do not hold too many elements
+            BOOST_ASSERT(cache_size_ <= max_cache_size_);
+
+            // the list of key trackers should have the right size
+            BOOST_ASSERT(key_tracker_.size() == cache_.size());
+#endif
         }
 
     private:
-        mutex_type mtx_;
+        mutable mutex_type mtx_;
         size_type const max_cache_size_;
         size_type const max_connections_per_locality_;
         key_tracker_type key_tracker_;
