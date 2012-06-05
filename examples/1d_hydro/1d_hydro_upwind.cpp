@@ -84,6 +84,17 @@ struct time_element{
     , computed(other.computed)
   {}
 
+  time_element& operator=(time_element const& rhs)
+  {
+    if (this != &rhs) 
+    {
+      dt = rhs.dt;
+      elapsed_time = rhs.elapsed_time;
+      computed = rhs.computed;
+    }
+    return *this;
+  }
+
   hpx::lcos::local::mutex mtx;
   double dt;
   double elapsed_time;
