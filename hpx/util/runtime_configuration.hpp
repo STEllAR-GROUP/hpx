@@ -94,6 +94,9 @@ namespace hpx { namespace util
             return default_stacksize;
         }
 
+        // Return the configured sizes of any of the know thread pools
+        std::size_t get_thread_pool_size(char const* poolname) const;
+
     private:
         std::ptrdiff_t init_default_stack_size() const;
 

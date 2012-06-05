@@ -196,6 +196,33 @@ by section basis below.
      [dynamic information, initialized from command line (argc/argv)]]
 ]
 
+['[*The `hpx.threadpools` Configuration Section]]
+
+[teletype]
+``
+    [hpx.threadpools]
+    io_pool_size = ${HPX_NUM_IO_POOL_THREADS:2}
+    parcel_pool_size = ${HPX_NUM_PARCEL_POOL_THREADS:2}
+    timer_pool_size = ${HPX_NUM_TIMER_POOL_THREADS:2}
+``
+[c++]
+
+[table:ini_hpx_thread_pools
+    [[Property]                 [Description]                         [Remark]]
+    [[`hpx.threadpools.io_pool_size`]
+     [The value of this property defines the number of OS-threads created for
+      the internal I/O thread pool.]
+     [static information]]
+    [[`hpx.threadpools.parcel_pool_size`]
+     [The value of this property defines the number of OS-threads created for
+      the internal parcel thread pool.]
+     [static information]]
+    [[`hpx.threadpools.timer_pool_size`]
+     [The value of this property defines the number of OS-threads created for
+      the internal timer thread pool.]
+     [static information]]
+]
+
 ['[*The `hpx.components` Configuration Section]]
 
 [teletype]

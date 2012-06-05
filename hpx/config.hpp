@@ -145,6 +145,19 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+/// This defines the default number of OS-threads created for the different
+/// internal thread pools
+#if !defined(HPX_NUM_IO_POOL_THREADS)
+#define HPX_NUM_IO_POOL_THREADS 2
+#endif
+#if !defined(HPX_NUM_PARCEL_POOL_THREADS)
+#define HPX_NUM_PARCEL_POOL_THREADS 2
+#endif
+#if !defined(HPX_NUM_TIMER_POOL_THREADS)
+#define HPX_NUM_TIMER_POOL_THREADS 2
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 // This defines the default installation location, should be set by build system
 #if !defined(HPX_PREFIX)
 #  define HPX_PREFIX "."

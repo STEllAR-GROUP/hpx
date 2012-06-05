@@ -14,7 +14,7 @@ exception handling. Any exception thrown during the execution of an asynchronous
 operation will be transferred back to the original invocation locality, where
 it is rethrown during synchronization with the calling thread.
 
-The source code for this example can be found here: 
+The source code for this example can be found here:
 [hpx_link examples/quickstart/error_handling.cpp..error_handling.cpp].
 
 [c++]
@@ -42,7 +42,7 @@ here:
 [note The exception is transferred back to the invocation site even if it is executed
       on a different locality.]
 
-Additionally example demonstrates how an exception thrown by an (possibly
+Additionally, this example demonstrates how an exception thrown by an (possibly
 remote) action can be handled. It shows the use of
 [funcref hpx::diagnostic_information `hpx::diagnostic_information()`] which
 retrieves all available diagnostic information from the exception as a
@@ -52,7 +52,7 @@ locality id and the stack backtrace of the point where the original exception
 was thrown.
 
 Under certain circumstances it is desireable to output only some of the
-diagnostics, or to output those using different formatting. For this case HPX
+diagnostics, or to output those using different formatting. For this case, HPX
 exposes a set of lower level functions as demonstrated in the following code
 snippet:
 

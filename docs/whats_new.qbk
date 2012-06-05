@@ -66,13 +66,16 @@
 
 [note This minimal version of an HPX program does not support any of the
       default command line arguments (such as --help, or command line options
-      related to PBS).]
+      related to PBS). It is suggested to always pass `argc` and `argv` to
+      __hpx__ as shown in the example below.]
 
 * In order to support those, but still not to depend on __boost_program_options__,
   the minimal program can be written as:
 ``
       #include <hpx/hpx_init.hpp>
 
+      // The arguments for hpx_main can be left off, whihc very similar to the
+      // behavior of `main()` as defined by C++.
       int hpx_main(int argc, char* argv[])
       {
           return hpx::finalize();

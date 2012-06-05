@@ -53,6 +53,14 @@ namespace hpx { namespace util
             "default_stack_size = ${HPX_DEFAULT_STACK_SIZE:"
                 BOOST_PP_STRINGIZE(HPX_DEFAULT_STACK_SIZE) "}",
 
+            "[hpx.threadpools]",
+            "io_pool_size = ${HPX_NUM_IO_POOL_THREADS:"
+                BOOST_PP_STRINGIZE(HPX_NUM_IO_POOL_THREADS) "}",
+            "parcel_pool_size = ${HPX_NUM_PARCEL_POOL_THREADS:"
+                BOOST_PP_STRINGIZE(HPX_NUM_PARCEL_POOL_THREADS) "}",
+            "timer_pool_size = ${HPX_NUM_TIMER_POOL_THREADS:"
+                BOOST_PP_STRINGIZE(HPX_NUM_TIMER_POOL_THREADS) "}",
+
             "[hpx.parcel]",
             "address = ${HPX_PARCEL_SERVER_ADDRESS:" HPX_INITIAL_IP_ADDRESS "}",
             "port = ${HPX_PARCEL_SERVER_PORT:"
@@ -468,6 +476,19 @@ namespace hpx { namespace util
             }
         }
         return "";
+    }
+
+    // Return the configured sizes of any of the know thread pools
+    std::size_t runtime_configuration::get_thread_pool_size(char const* poolname) const
+    {
+        if (has_section("hpx.threadpools")) {
+            util::section const* sec = get_section("hpx.threadpools");
+            if (NULL != sec) {
+                return boost::lexical_cast<std::size_t>(
+                    sec->get_entry(std::string(poolname) + "_size", "2"));
+            }
+        }
+        return 2;     // the default size for all pools is 2
     }
 
     // Will return the stack size to use for all HPX-threads.
