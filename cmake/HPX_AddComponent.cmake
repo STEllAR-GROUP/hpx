@@ -29,7 +29,15 @@ macro(add_hpx_component name)
     hpx_debug("add_component.${name}" "${name}_SOURCE_ROOT: ${${name}_SOURCE_ROOT}")
 
     if(NOT ${name}_SOURCE_GLOB)
-      set(${name}_SOURCE_GLOB "${${name}_SOURCE_ROOT}/*.cpp")
+      set(${name}_SOURCE_GLOB "${${name}_SOURCE_ROOT}/*.cpp"
+                              "${${name}_SOURCE_ROOT}/*.f"
+                              "${${name}_SOURCE_ROOT}/*.F"
+                              "${${name}_SOURCE_ROOT}/*.f77"
+                              "${${name}_SOURCE_ROOT}/*.F77"
+                              "${${name}_SOURCE_ROOT}/*.f90"
+                              "${${name}_SOURCE_ROOT}/*.F90"
+                              "${${name}_SOURCE_ROOT}/*.f95"
+                              "${${name}_SOURCE_ROOT}/*.F95")
     endif()
     hpx_debug("add_component.${name}" "${name}_SOURCE_GLOB: ${${name}_SOURCE_GLOB}")
 
