@@ -45,8 +45,8 @@ equals sign:
     name=value
 ``
 The value may contain equal signs as only the first `'='` character
-is interpreted as the delimter between `name` and `value`. Whitespace before
-the name, afterthe value and immediately before and after the delimiting equal
+is interpreted as the delimiter between `name` and `value`. Whitespace before
+the name, after the value and immediately before and after the delimiting equal
 sign is ignored. Whitespace inside the value is retained.
 
 Properties may be grouped into arbitrarily named sections. The section name
@@ -421,8 +421,8 @@ __iniformat__.
 # Load a file named `/etc/hpx.ini`. This lookup is done on Linux systems
   only.
 # Load a file named `.hpx.ini` in the home directory of the current user,
-  e.g. the directory refernced by the environment variable `HOME`.
-# Load a file named `.hpx.ini` in the directory refernced by the environment
+  e.g. the directory referenced by the environment variable `HOME`.
+# Load a file named `.hpx.ini` in the directory referenced by the environment
   variable `PWD`.
 # Load the file specified on the command line using the option
   [hpx_cmdline `--hpx:config`].
@@ -432,13 +432,23 @@ __iniformat__.
   options is for instance `--hpx:ini=hpx.default_stack_size=0x4000`. In
   adddition to the explicit command line options, this will set the following
   properties as implied from other settings:
-    * `hpx.parcel.address` and `hpx.parcel.port`
-    * `hpx.agas.address`, `hpx.agas.port`, and `hpx.agas.service_mode`
-    * `hpx.program_name` and `hpx.cmd_line`
-    * `hpx.os_threads`, and `hpx.localities`
-    * `hpx.runtime_mode`
+    * `hpx.parcel.address` and `hpx.parcel.port` as set by
+      [hpx_cmdline `--hpx:hpx`]
+    * `hpx.agas.address`, `hpx.agas.port`, and `hpx.agas.service_mode` as set
+      by [hpx_cmdline `--hpx:agas`]
+    * `hpx.program_name` and `hpx.cmd_line` will be derived from the actual
+      command line
+    * `hpx.os_threads`, and `hpx.localities` as set by
+       [hpx_cmdline `--hpx:threads`] and [hpx_cmdline `--hpx:localities`]
+    * `hpx.runtime_mode` will be derived from any explicit
+      [hpx_cmdline `--hpx:console`], [hpx_cmdline `--hpx:worker`], or
+      [hpx_cmdline `--hpx:connect`], or it will be derived from other settings,
+      such as [hpx_cmdline `--hpx:node=0`] which implies
+      [hpx_cmdline `--hpx:console`]
 # Load files based on the pattern `*.ini` in all directories listed by the
   property `hpx.ini_path`. All files found during this search will be merged.
+  The property `hpx.ini_path` can hold a list of directories separated by `':'`
+  (on Linux or Mac) or `';'` (on Windows)
 # Load the file specified on the command line using the option
   [hpx_cmdline `--hpx:app-config`]. Note that this file will be merged as the
   content for a top level section `[application]`.
@@ -457,11 +467,11 @@ corresponding loading step will be silently skipped.
 [section:loading_components Loading Components]
 
 __hpx__ relies on loading application specific components during the runtime
-of an application. Moreover, __hpx__ comes with a set of components
-preinstalled supporting basic functionalities useful for almost every
+of an application. Moreover, __hpx__ comes with a set of preinstalled
+components supporting basic functionalities useful for almost every
 application. Any component in __hpx__ is loaded from a shared library, where
 any of the shared libraries can contain more than one component type. During
-startup, __hpx__ tries to locate all available components (e.g. the
+startup, __hpx__ tries to locate all available components (e.g. their
 corresponding shared libraries) and creates an internal component registry for
 later use. This section describes the algorithm used by __hpx__ to locate all
 relevant shared libraries on a system. As described, this algorithm is
@@ -501,7 +511,9 @@ all existing configuration sections `[hpx.component.<some_component_instance_nam
 and instantiates a special factory object for each of the successfully located
 and loaded components. During the application's life time, these factory objects
 will be responsible to create new and discard old instances of the component
-they are associated with.
+they are associated with. This step is performed after step 11) of the process
+of filling the internal configuration database with default information as
+described in section __loading_ini__.
 
 [endsect] [/ Loading Components]
 
