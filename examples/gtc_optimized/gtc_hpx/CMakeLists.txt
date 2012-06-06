@@ -7,6 +7,6 @@
 add_hpx_component(gtc_hpx
   SOURCES ${sources}
   DEPENDENCIES iostreams_component
-  FOLDER "Examples/Gtc_optimized/gtc_hpx"
+  FOLDER "Examples/GTC Optimized"
   AUTOGLOB)
 

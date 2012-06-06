@@ -25,7 +25,7 @@ if (CMAKE_Fortran_COMPILER)
   add_hpx_executable(gtc_hpx_client
     SOURCES ${sources}
     DEPENDENCIES gtc_hpx_component ${dependencies}
-    FOLDER "Examples/Gtc_optimized/gtc_hpx")
+    FOLDER "Examples/GTC Optimized")
 
   # add a custom target for this example
   add_hpx_pseudo_target(examples.gtc_optimized.gtc_hpx)

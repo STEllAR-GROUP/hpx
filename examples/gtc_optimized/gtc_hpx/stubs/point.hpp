@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_95F90266_2241_4547_A2A5_2D1E88242D14)
-#define HPX_95F90266_2241_4547_A2A5_2D1E88242D14
+#if !defined(HPX_6E16120B_C251_4FFE_A659_FDA2986A7FE3)
+#define HPX_6E16120B_C251_4FFE_A659_FDA2986A7FE3
 
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 
