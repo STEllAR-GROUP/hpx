@@ -88,7 +88,7 @@ namespace boost { namespace coroutines { namespace detail { namespace posix {
 
     // Fill the bottom 8 bytes of the first page with 1s.
     void** watermark = static_cast<void**>(stack) + ((size - EXEC_PAGESIZE) / sizeof(void*));
-    *watermark = reinterpret_cast<void*>(~0);
+    *watermark = reinterpret_cast<void*>(0xDEADBEEFDEADBEEFull);
   }
 
   inline
@@ -97,7 +97,7 @@ namespace boost { namespace coroutines { namespace detail { namespace posix {
 
     // If the watermark has been overwritten, then we've gone past the first
     // page.
-    if((reinterpret_cast<void*>(~0)) != *watermark)
+    if((reinterpret_cast<void*>(0xDEADBEEFDEADBEEFull)) != *watermark)
     {
       // We never free up the first page, as it's initialized only when the
       // stack is created.
