@@ -805,6 +805,13 @@ else()
   # Silence warning about __sync_fetch_and_nand changing semantics
   hpx_use_flag_if_available(-Wno-sync-nand)
 
+  # Silence warnings about deleting polymorphic objects with non-virtual dtors.
+  # These come from within Boost. Detection for this flag fails with GCC 4.4,
+  # 4.5 and 4.6.
+  if(040700 LESS ${GCC_VERSION} OR 040700 EQUAL ${GCC_VERSION})
+    hpx_use_flag_if_available(-Wno-delete-non-virtual-dtor)
+  endif()
+
   ##############################################################################
   # GCC-only configuration
   ##############################################################################
